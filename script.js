@@ -1,7 +1,8 @@
 const images = [
-  "slide1.jpeg",
-  "slide2.jpeg",
-  "slide3.jpeg"
+ const slides = [
+  "banner1.jpeg",
+  "banner2.jpeg",
+  "banner3.jpeg"
 ];
 
 let index = 0;
