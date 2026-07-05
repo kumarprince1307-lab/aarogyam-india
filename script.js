@@ -5,9 +5,9 @@
 /* Banner Slider */
 
 const images = [
-"images/banners/banner1.jpg",
-"images/banners/banner2.jpg",
-"images/banners/banner3.jpg"
+"images/banners/banner1.jpeg",
+"images/banners/banner2.jpeg",
+"images/banners/banner3.jpeg"
 ];
 
 let current = 0;
