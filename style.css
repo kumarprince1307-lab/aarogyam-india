@@ -610,7 +610,79 @@ width:60px;
 height:60px;
 
 }
+/* ===========================
+   CATEGORIES
+=========================== */
 
+.categories{
+padding:70px 20px;
+background:#fff8f2;
+text-align:center;
+}
+
+.categories h2{
+font-size:36px;
+color:#e76f00;
+margin-bottom:40px;
+}
+
+.category-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:25px;
+max-width:1200px;
+margin:auto;
+}
+
+.category-card{
+background:#fff;
+padding:30px 20px;
+border-radius:18px;
+text-decoration:none;
+color:#333;
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+transition:.3s;
+}
+
+.category-card:hover{
+transform:translateY(-8px);
+box-shadow:0 15px 30px rgba(0,0,0,.15);
+}
+
+.category-card h3{
+margin:15px 0;
+font-size:24px;
+color:#d35400;
+}
+
+.category-card p{
+font-size:16px;
+line-height:1.7;
+}
+
+/* ===========================
+   JOIN SECTION
+=========================== */
+
+.join-box{
+padding:70px 20px;
+text-align:center;
+background:linear-gradient(135deg,#fff4e6,#ffffff);
+}
+
+.join-box h2{
+font-size:34px;
+color:#d35400;
+margin-bottom:20px;
+}
+
+.join-box p{
+max-width:700px;
+margin:auto;
+font-size:18px;
+line-height:1.8;
+margin-bottom:30px;
+}
 .logo-area h1{
 
 font-size:22
