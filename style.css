@@ -129,9 +129,9 @@ font-weight:bold;
 background:#1ea952;
 }
 .hero-slider{
-    width:100%;
-    max-width:1000px;
-    height:350px;
+    width:70%;
+    max-width:700px;
+    height:250px;
     margin:20px auto;
     overflow:hidden;
     border-radius:15px;
