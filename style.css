@@ -1,7 +1,7 @@
-/* ===================================
-   Aarogyam India Version 2.0
-   Master Style Sheet
-=================================== */
+/* ==========================================
+   AAROGYAM INDIA - MASTER CSS V3
+   PART 1
+========================================== */
 
 *{
 margin:0;
@@ -11,20 +11,26 @@ box-sizing:border-box;
 
 :root{
 
---primary:#ff7a00;
+--primary:#f57c00;
 --secondary:#2e7d32;
---light:#f8faf7;
+--light:#fdfcf8;
 --white:#ffffff;
 --dark:#222;
---gray:#666;
---shadow:0 10px 30px rgba(0,0,0,.08);
---radius:16px;
+--text:#555;
+--shadow:0 10px 25px rgba(0,0,0,.08);
+--radius:18px;
+
+}
+
+html{
+
+scroll-behavior:smooth;
 
 }
 
 body{
 
-font-family:'Poppins',sans-serif;
+font-family:'Poppins',Arial,sans-serif;
 background:var(--light);
 color:var(--dark);
 overflow-x:hidden;
@@ -34,7 +40,6 @@ overflow-x:hidden;
 img{
 
 max-width:100%;
-height:auto;
 display:block;
 
 }
@@ -48,34 +53,37 @@ text-decoration:none;
 .container{
 
 width:92%;
-max-width:1400px;
+max-width:1300px;
 margin:auto;
 
 }
 
-/* Announcement */
+/*=====================
+TOP BAR
+======================*/
 
 .top-bar{
 
-background:#ffedd5;
-color:#8a3b00;
-text-align:center;
+background:#fff3e0;
 padding:10px;
+text-align:center;
 font-size:15px;
 font-weight:600;
+color:#c75b00;
 
 }
 
-/* Header */
+/*=====================
+HEADER
+======================*/
 
 header{
 
 position:sticky;
 top:0;
 z-index:999;
-background:rgba(255,255,255,.96);
-backdrop-filter:blur(10px);
-box-shadow:0 2px 15px rgba(0,0,0,.05);
+background:#fff;
+box-shadow:0 2px 15px rgba(0,0,0,.08);
 
 }
 
@@ -84,7 +92,7 @@ header .container{
 display:flex;
 align-items:center;
 justify-content:space-between;
-padding:16px 0;
+padding:15px 0;
 
 }
 
@@ -98,8 +106,8 @@ gap:15px;
 
 .logo{
 
-width:72px;
-height:72px;
+width:75px;
+height:75px;
 object-fit:contain;
 
 }
@@ -113,25 +121,26 @@ color:var(--primary);
 
 .logo-area p{
 
-font-size:14px;
-color:var(--gray);
+font-size:15px;
+color:#666;
 
 }
 
-/* Navigation */
+/*=====================
+MENU
+======================*/
 
 nav{
 
 display:flex;
-gap:25px;
 align-items:center;
+gap:25px;
 
 }
 
 nav a{
 
-color:var(--dark);
-font-size:16px;
+color:#222;
 font-weight:600;
 transition:.3s;
 
@@ -143,23 +152,23 @@ color:var(--primary);
 
 }
 
-/* Mobile Menu */
-
 .menu-btn{
 
 display:none;
 background:none;
 border:none;
-font-size:34px;
+font-size:32px;
 cursor:pointer;
 
 }
 
-/* Hero */
+/*=====================
+HERO
+======================*/
 
 .hero{
 
-padding:25px 0 60px;
+padding:20px 0 60px;
 
 }
 
@@ -167,7 +176,7 @@ padding:25px 0 60px;
 
 position:relative;
 overflow:hidden;
-border-radius:25px;
+border-radius:20px;
 box-shadow:var(--shadow);
 
 }
@@ -175,273 +184,34 @@ box-shadow:var(--shadow);
 .hero-slider img{
 
 width:100%;
-aspect-ratio:16/6;
+aspect-ratio:16/7;
 object-fit:cover;
-transition:.5s;
+transition:.6s;
 
 }
-
-.hero-content{
-
-text-align:center;
-margin-top:35px;
-
-}
-
-.hero-content h2{
-
-font-size:48px;
-line-height:1.3;
-color:var(--primary);
-
-}
-
-.hero-content p{
-
-font-size:20px;
-color:var(--gray);
-max-width:900px;
-margin:20px auto;
-
-}
-
-/* Buttons */
-
-.hero-buttons{
-
-display:flex;
-justify-content:center;
-gap:20px;
-flex-wrap:wrap;
-margin-top:35px;
-
-}
-
-.btn{
-
-background:var(--primary);
-color:#fff;
-padding:16px 34px;
-border-radius:50px;
-font-weight:600;
-transition:.3s;
-
-}
-
-.btn:hover{
-
-transform:translateY(-3px);
-box-shadow:var(--shadow);
-
-}
-
-.btn2{
-
-border:2px solid var(--secondary);
-color:var(--secondary);
-padding:15px 34px;
-border-radius:50px;
-font-weight:600;
-transition:.3s;
-
-}
-
-.btn2:hover{
-
-background:var(--secondary);
-color:#fff;
-
-}
-
-/* Section */
-
-section{
-
-padding:70px 0;
-
-}
-
-.section-title{
-
-text-align:center;
-font-size:38px;
-margin-bottom:45px;
-color:var(--primary);
-/* ==========================
-   Categories
-========================== */
-
-.category-grid{
-
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-gap:25px;
-
-}
-
-.category-card{
-
-background:#fff;
-padding:35px 25px;
-border-radius:20px;
-box-shadow:var(--shadow);
-text-align:center;
-transition:.35s;
-
-}
-
-.category-card:hover{
-
-transform:translateY(-8px);
-border-top:5px solid var(--primary);
-
-}
-
-.category-card h3{
-
-font-size:24px;
-margin:18px 0;
-color:var(--primary);
-
-}
-
-.category-card p{
-
-font-size:16px;
-color:var(--gray);
-
-}
-
-/* ==========================
-   Services
-========================== */
-
-.service-grid{
-
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:30px;
-
-}
-
-.card{
-
-background:#fff;
-padding:35px;
-border-radius:20px;
-box-shadow:var(--shadow);
-transition:.35s;
-text-align:center;
-
-}
-
-.card:hover{
-
-transform:translateY(-10px);
-
-}
-
-.card h3{
-
-font-size:24px;
-margin:18px 0;
-color:var(--primary);
-
-}
-
-.card p{
-
-font-size:16px;
-color:var(--gray);
-
-}
-
-/* ==========================
-   Featured Book
-========================== */
-
-.featured{
-
-background:#fffaf5;
-
-}
-
-.featured-book{
-
-display:flex;
-align-items:center;
-justify-content:center;
-gap:50px;
-flex-wrap:wrap;
-
-}
-
-.featured-book img{
-
-width:300px;
-border-radius:20px;
-box-shadow:var(--shadow);
-
-}
-
-.featured-book h3{
-
-font-size:34px;
-margin-bottom:20px;
-color:var(--primary);
-
-}
-
-.featured-book p{
-
-font-size:18px;
-line-height:1.8;
-margin-bottom:25px;
-color:var(--gray);
-
-}
-
-/* ==========================
-   Footer
-========================== */
-
-footer{
-
-background:#202124;
-color:#fff;
-padding:60px 0;
-text-align:center;
-
-}
-
-footer h3
-  /* ==========================
-   Slider Dots
-========================== */
 
 .slider-dots{
 
 position:absolute;
+
 left:50%;
-bottom:20px;
+bottom:18px;
 
 transform:translateX(-50%);
 
 display:flex;
-gap:12px;
-
-z-index:10;
+gap:10px;
 
 }
 
 .dot{
 
-width:14px;
-height:14px;
+width:13px;
+height:13px;
 
 border-radius:50%;
 
-background:rgba(255,255,255,.6);
+background:rgba(255,255,255,.5);
 
 cursor:pointer;
 
@@ -457,60 +227,523 @@ transform:scale(1.2);
 
 }
 
-/* ==========================
-   Popup Ready
-========================== */
+.hero-content{
 
-.popup{
+text-align:center;
+padding-top:35px;
 
-position:fixed;
+}
 
-top:50%;
-left:50%;
+.hero-content h2{
 
-transform:translate(-50%,-50%);
+font-size:46px;
+color:var(--primary);
+margin-bottom:20px;
+
+}
+
+.hero-content p{
+
+max-width:900px;
+margin:auto;
+font-size:20px;
+line-height:1.8;
+color:#666;
+
+}
+
+.hero-buttons{
+
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+margin-top:35px;
+
+}
+
+/*=====================
+BUTTON
+======================*/
+
+.btn{
+
+background:var(--primary);
+color:#fff;
+
+padding:16px 35px;
+
+border-radius:50px;
+
+font-weight:600;
+
+transition:.3s;
+
+}
+
+.btn:hover{
+
+transform:translateY(-4px);
+
+box-shadow:var(--shadow);
+
+}
+
+.btn2{
+
+border:2px solid var(--secondary);
+
+padding:16px 35px;
+
+border-radius:50px;
+
+color:var(--secondary);
+
+font-weight:600;
+
+transition:.3s;
+
+}
+
+.btn2:hover{
+
+background:var(--secondary);
+
+color:#fff;
+
+}
+
+/*=====================
+SECTION
+======================*/
+
+section{
+
+padding:70px 0;
+
+}
+
+.section-title{
+
+text-align:center;
+font-size:38px;
+margin-bottom:45px;
+color:var(--primary);
+
+}
+/*=========================================
+   CATEGORIES
+=========================================*/
+
+.categories{
+
+background:#fff8f1;
+
+}
+
+.category-grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+gap:30px;
+
+margin-top:40px;
+
+}
+
+.category-card{
 
 background:#fff;
 
-padding:30px;
+padding:35px 25px;
+
+border-radius:18px;
+
+box-shadow:var(--shadow);
+
+text-align:center;
+
+transition:.35s;
+
+color:#333;
+
+}
+
+.category-card:hover{
+
+transform:translateY(-8px);
+
+box-shadow:0 18px 35px rgba(0,0,0,.12);
+
+border-top:5px solid var(--primary);
+
+}
+
+.category-card h3{
+
+font-size:24px;
+
+margin:18px 0;
+
+color:var(--primary);
+
+}
+
+.category-card p{
+
+font-size:16px;
+
+line-height:1.8;
+
+color:#666;
+
+}
+
+/*=========================================
+   SERVICES
+=========================================*/
+
+.services{
+
+background:#fff;
+
+}
+
+.service-grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+gap:30px;
+
+margin-top:40px;
+
+}
+
+.card{
+
+background:#fff;
+
+padding:35px;
 
 border-radius:20px;
 
 box-shadow:var(--shadow);
 
-z-index:9999;
+transition:.35s;
 
-display:none;
-
-max-width:500px;
-width:90%;
+text-align:center;
 
 }
 
-.popup.show{
+.card:hover{
+
+transform:translateY(-10px);
+
+box-shadow:0 18px 35px rgba(0,0,0,.12);
+
+}
+
+.card h3{
+
+font-size:24px;
+
+margin:20px 0;
+
+color:var(--primary);
+
+}
+
+.card p{
+
+font-size:16px;
+
+line-height:1.8;
+
+color:#666;
+
+}
+
+/*=========================================
+   FEATURED BOOK
+=========================================*/
+
+.featured{
+
+background:#fffdf9;
+
+}
+
+.featured-book{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+gap:50px;
+
+flex-wrap:wrap;
+
+margin-top:40px;
+
+}
+
+.featured-book img{
+
+width:300px;
+
+border-radius:18px;
+
+box-shadow:var(--shadow);
+
+}
+
+.featured-book h3{
+
+font-size:34px;
+
+margin-bottom:20px;
+
+color:var(--primary);
+
+}
+
+.featured-book p{
+
+font-size:18px;
+
+line-height:1.8;
+
+color:#666;
+
+margin-bottom:25px;
+
+}
+
+/*=========================================
+   JOIN SECTION
+=========================================*/
+
+.join-box{
+
+background:linear-gradient(135deg,#fff6e9,#ffffff);
+
+text-align:center;
+
+padding:80px 20px;
+
+}
+
+.join-box h2{
+
+font-size:36px;
+
+color:var(--primary);
+
+margin-bottom:20px;
+
+}
+
+.join-box p{
+
+max-width:800px;
+
+margin:auto;
+
+font-size:18px;
+
+line-height:1.8;
+
+color:#666;
+
+margin-bottom:30px;
+
+}
+
+/*=========================================
+   WHATSAPP FLOAT
+=========================================*/
+
+.whatsapp{
+
+position:fixed;
+
+right:20px;
+
+bottom:20px;
+
+width:60px;
+
+height:60px;
+
+background:#25D366;
+
+color:#fff;
+
+border-radius:50%;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:30px;
+
+box-shadow:var(--shadow);
+
+z-index:999;
+
+transition:.3s;
+
+}
+
+.whatsapp:hover{
+
+transform:scale(1.1);
+
+}
+/*=========================================
+   FOOTER
+=========================================*/
+
+footer{
+
+background:#1f2937;
+color:#fff;
+padding:60px 20px 25px;
+
+}
+
+.footer-container{
+
+max-width:1300px;
+margin:auto;
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+
+gap:35px;
+
+}
+
+.footer-logo{
+
+width:90px;
+margin-bottom:15px;
+
+}
+
+footer h3{
+
+font-size:28px;
+margin-bottom:15px;
+
+}
+
+footer h4{
+
+font-size:20px;
+margin-bottom:18px;
+color:#ffb74d;
+
+}
+
+footer p{
+
+line-height:1.8;
+font-size:15px;
+color:#ddd;
+
+}
+
+footer a{
 
 display:block;
 
+margin:10px 0;
+
+color:#ddd;
+
+transition:.3s;
+
 }
 
-/* ==========================
-   Image Auto Fit
-========================== */
+footer a:hover{
+
+color:#ff9800;
+
+padding-left:6px;
+
+}
+
+footer hr{
+
+margin:35px 0 20px;
+
+border:none;
+
+border-top:1px solid rgba(255,255,255,.15);
+
+}
+
+.copyright{
+
+text-align:center;
+
+font-size:15px;
+
+color:#ccc;
+
+}
+
+/*=========================================
+   ANIMATION
+=========================================*/
+
+.card,
+.category-card,
+.featured-book{
+
+animation:fadeUp .8s ease;
+
+}
+
+@keyframes fadeUp{
+
+0%{
+
+opacity:0;
+transform:translateY(35px);
+
+}
+
+100%{
+
+opacity:1;
+transform:translateY(0);
+
+}
+
+}
+
+/*=========================================
+   IMAGE AUTO FIT
+=========================================*/
 
 .hero-slider img,
-.featured-book img,
+.card img,
 .category-card img,
-.card img{
+.featured-book img{
 
 width:100%;
 height:100%;
 object-fit:cover;
-
-}
-
-.square{
-
-aspect-ratio:1/1;
 
 }
 
@@ -520,31 +753,33 @@ aspect-ratio:16/9;
 
 }
 
+.square{
+
+aspect-ratio:1/1;
+
+}
+
 .portrait{
 
 aspect-ratio:3/4;
 
 }
 
-/* ==========================
-   Smooth Scroll
-========================== */
-
-html{
-
-scroll-behavior:smooth;
-
-}
-
-/* ==========================
-   Tablet
-========================== */
+/*=========================================
+   TABLET
+=========================================*/
 
 @media(max-width:991px){
 
 .hero-content h2{
 
-font-size:38px;
+font-size:36px;
+
+}
+
+.hero-content p{
+
+font-size:18px;
 
 }
 
@@ -560,17 +795,11 @@ flex-direction:column;
 
 }
 
-nav{
-
-gap:15px;
-
 }
 
-}
-
-/* ==========================
-   Mobile
-========================== */
+/*=========================================
+   MOBILE
+=========================================*/
 
 @media(max-width:768px){
 
@@ -590,9 +819,11 @@ nav{
 
 display:none;
 
+width:100%;
+
 flex-direction:column;
 
-width:100%;
+gap:15px;
 
 padding:20px 0;
 
@@ -610,79 +841,125 @@ width:60px;
 height:60px;
 
 }
-/* ===========================
-   CATEGORIES
-=========================== */
 
-.categories{
-padding:70px 20px;
-background:#fff8f2;
-text-align:center;
-}
-
-.categories h2{
-font-size:36px;
-color:#e76f00;
-margin-bottom:40px;
-}
-
-.category-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-gap:25px;
-max-width:1200px;
-margin:auto;
-}
-
-.category-card{
-background:#fff;
-padding:30px 20px;
-border-radius:18px;
-text-decoration:none;
-color:#333;
-box-shadow:0 8px 20px rgba(0,0,0,.08);
-transition:.3s;
-}
-
-.category-card:hover{
-transform:translateY(-8px);
-box-shadow:0 15px 30px rgba(0,0,0,.15);
-}
-
-.category-card h3{
-margin:15px 0;
-font-size:24px;
-color:#d35400;
-}
-
-.category-card p{
-font-size:16px;
-line-height:1.7;
-}
-
-/* ===========================
-   JOIN SECTION
-=========================== */
-
-.join-box{
-padding:70px 20px;
-text-align:center;
-background:linear-gradient(135deg,#fff4e6,#ffffff);
-}
-
-.join-box h2{
-font-size:34px;
-color:#d35400;
-margin-bottom:20px;
-}
-
-.join-box p{
-max-width:700px;
-margin:auto;
-font-size:18px;
-line-height:1.8;
-margin-bottom:30px;
-}
 .logo-area h1{
 
-font-size:22
+font-size:22px;
+
+}
+
+.logo-area p{
+
+font-size:13px;
+
+}
+
+.hero{
+
+padding:10px 0 40px;
+
+}
+
+.hero-content h2{
+
+font-size:28px;
+
+}
+
+.hero-content p{
+
+font-size:16px;
+
+padding:0 10px;
+
+}
+
+.hero-buttons{
+
+flex-direction:column;
+
+}
+
+.btn,
+.btn2{
+
+width:100%;
+
+text-align:center;
+
+}
+
+.hero-slider img{
+
+aspect-ratio:16/9;
+
+}
+
+.category-grid,
+.service-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.featured-book img{
+
+width:220px;
+
+}
+
+.footer-container{
+
+grid-template-columns:1fr;
+
+text-align:center;
+
+}
+
+.footer-logo{
+
+margin:auto;
+
+}
+
+.whatsapp{
+
+width:55px;
+height:55px;
+font-size:28px;
+
+}
+
+}
+
+/*=========================================
+   SMALL MOBILE
+=========================================*/
+
+@media(max-width:480px){
+
+.top-bar{
+
+font-size:13px;
+
+}
+
+.hero-content h2{
+
+font-size:22px;
+
+}
+
+.logo-area h1{
+
+font-size:20px;
+
+}
+
+.section-title{
+
+font-size:24px;
+
+}
+
+}
