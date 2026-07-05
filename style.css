@@ -128,5 +128,17 @@ font-weight:bold;
 .btn2:hover{
 background:#1ea952;
 }
+  .hero-slider{
+    width:100%;
+    height:450px;
+    overflow:hidden;
+}
+
+.hero-slider img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
 margin-top:30px;
 }
