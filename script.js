@@ -1,13 +1,16 @@
-window.onload = function () {
-    console.log("Aarogyam India Website Loaded Successfully");
+const images = [
+  "slide1.jpeg",
+  "slide2.jpeg",
+  "slide3.jpeg"
+];
 
-    const button = document.querySelector(".btn");
+let index = 0;
+const slider = document.getElementById("slider");
 
-    button.addEventListener("click", function (e) {
-        e.preventDefault();
-
-        alert(
-            "🚜 Aarogyam India\n\nWebsite पर काम चल रहा है। जल्द ही किसानों के लिए पूरी डिजिटल सेवा उपलब्ध होगी।"
-        );
-    });
-};
+setInterval(() => {
+  index++;
+  if (index >= images.length) {
+    index = 0;
+  }
+  slider.src = images[index];
+}, 3000);
