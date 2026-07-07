@@ -429,14 +429,12 @@ observer.observe(card);
 // CATEGORY ACTIVE
 //=============================
 
-const menu=document.querySelectorAll(".ebook-category-menu a");
-
+const categoryMenu=document.querySelectorAll(".ebook-category-menu a");
 menu.forEach(function(link){
 
 link.onclick=function(){
 
-menu.forEach(function(item){
-
+categoryMenu.forEach(function(link){
 item.classList.remove("active");
 
 });
