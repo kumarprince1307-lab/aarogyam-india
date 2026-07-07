@@ -429,24 +429,21 @@ observer.observe(card);
 // CATEGORY ACTIVE
 //=============================
 
-const categoryMenu=document.querySelectorAll(".ebook-category-menu a");
+const categoryMenu = document.querySelectorAll(".ebook-category-menu a");
+
 categoryMenu.forEach(function(link){
 
-link.onclick=function(){
+    link.onclick = function(){
 
-categoryMenu.forEach(function(item){
-    item.classList.remove("active");
-});
+        categoryMenu.forEach(function(item){
+            item.classList.remove("active");
+        });
 
-});
+        this.classList.add("active");
 
-this.classList.add("active");
-
-};
+    };
 
 });
-
-
 //=============================
 // LOADING COMPLETE
 //=============================
