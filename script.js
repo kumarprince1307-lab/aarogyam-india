@@ -430,12 +430,13 @@ observer.observe(card);
 //=============================
 
 const categoryMenu=document.querySelectorAll(".ebook-category-menu a");
-menu.forEach(function(link){
+categoryMenu.forEach(function(link){
 
 link.onclick=function(){
 
-categoryMenu.forEach(function(link){
-item.classList.remove("active");
+categoryMenu.forEach(function(item){
+    item.classList.remove("active");
+});
 
 });
 
