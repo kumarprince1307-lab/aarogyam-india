@@ -456,3 +456,11 @@ window.addEventListener("load",function(){
 console.log("Aarogyam India eBook Store Loaded");
 
 });
+const menuBtn = document.getElementById("menuBtn");
+const menu = document.getElementById("menu");
+
+if (menuBtn && menu) {
+    menuBtn.onclick = function () {
+        menu.classList.toggle("active");
+    };
+}
