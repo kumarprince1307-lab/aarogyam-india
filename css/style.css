@@ -789,11 +789,11 @@ section{
 
     width:100%;
 
-    height:90vh;
+    height:60vh;
 
     overflow:hidden;
 
-    background:#000;
+    background:#eef8ee;
 
 }
 
@@ -892,7 +892,7 @@ section{
 
     transform:translateY(-50%);
 
-    max-width:680px;
+    max-width:600px;
 
     color:#fff;
 
