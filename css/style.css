@@ -697,7 +697,7 @@ section{
 
     height:100vh;
 
-    background:#fff;
+  background: linear-gradient(to bottom, #D97706 0%, #F59E0B 30%, #FFF8E8 70%, #EAF8E6 100%);
 
     z-index:10000;
 
