@@ -2527,4 +2527,132 @@ section{
    VERSION 2.0
    AI BIBLE V2 LOCK
 ========================================================== */
+/* ==========================================================
+   ABOUT PAGE
+========================================================== */
 
+.page-banner{
+
+    background:linear-gradient(135deg,#f57c00,#2e7d32);
+
+    color:#fff;
+
+    text-align:center;
+
+    padding:80px 20px;
+
+}
+
+.page-banner h1{
+
+    font-size:48px;
+
+    font-weight:700;
+
+    margin-bottom:15px;
+
+}
+
+.page-banner p{
+
+    font-size:18px;
+
+    opacity:.95;
+
+}
+
+/* ========================================= */
+
+.about-section{
+
+    padding:80px 0;
+
+    background:#ffffff;
+
+}
+
+.about-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:35px;
+
+    margin-top:45px;
+
+}
+
+.about-card{
+
+    background:#ffffff;
+
+    border-radius:18px;
+
+    padding:35px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+.about-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 18px 35px rgba(0,0,0,.12);
+
+}
+
+.about-card h3{
+
+    color:#f57c00;
+
+    font-size:24px;
+
+    margin-bottom:18px;
+
+}
+
+.about-card p{
+
+    color:#555;
+
+    line-height:1.9;
+
+    font-size:16px;
+
+}
+
+/* ========================================= */
+
+.section-title{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+}
+
+.section-title h2{
+
+    font-size:40px;
+
+    color:#222;
+
+    margin-bottom:15px;
+
+}
+
+.section-title p{
+
+    max-width:900px;
+
+    margin:auto;
+
+    line-height:2;
+
+    color:#666;
+
+}
