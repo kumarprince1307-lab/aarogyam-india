@@ -475,7 +475,213 @@ MOBILE NAVIGATION START
 <!-- =========================================
 MOBILE NAVIGATION END
 ========================================== -->
+/* ==========================================================
+   MISSION & VISION
+========================================================== */
 
+.mission-section{
+
+    padding:80px 0;
+
+    background:#f8faf8;
+
+}
+
+.mission-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:35px;
+
+}
+
+.mission-box{
+
+    background:#ffffff;
+
+    padding:40px;
+
+    border-radius:18px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+    transition:.35s;
+
+}
+
+.mission-box:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 18px 35px rgba(0,0,0,.12);
+
+}
+
+.mission-box h2{
+
+    color:#2e7d32;
+
+    font-size:30px;
+
+    margin-bottom:18px;
+
+}
+
+.mission-box p{
+
+    line-height:2;
+
+    color:#555;
+
+}
+
+/* ==========================================================
+   WHY CHOOSE US
+========================================================== */
+
+.why-us{
+
+    padding:80px 0;
+
+    background:#ffffff;
+
+}
+
+/* ==========================================================
+   CTA
+========================================================== */
+
+.cta{
+
+    background:linear-gradient(135deg,#f57c00,#2e7d32);
+
+    color:#ffffff;
+
+    text-align:center;
+
+    padding:80px 20px;
+
+}
+
+.cta-content span{
+
+    display:block;
+
+    font-size:18px;
+
+    margin-bottom:15px;
+
+    opacity:.95;
+
+}
+
+.cta-content h2{
+
+    font-size:42px;
+
+    margin-bottom:20px;
+
+}
+
+.cta-content p{
+
+    max-width:700px;
+
+    margin:auto;
+
+    line-height:2;
+
+    margin-bottom:35px;
+
+}
+
+.cta-buttons{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+}
+
+.cta-buttons .btn{
+
+    min-width:180px;
+
+}
+
+/* ==========================================================
+   ABOUT RESPONSIVE
+========================================================== */
+
+@media(max-width:992px){
+
+.about-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.mission-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.page-banner{
+
+    padding:60px 20px;
+
+}
+
+.page-banner h1{
+
+    font-size:34px;
+
+}
+
+.section-title h2{
+
+    font-size:30px;
+
+}
+
+.about-card{
+
+    padding:25px;
+
+}
+
+.mission-box{
+
+    padding:25px;
+
+}
+
+.cta-content h2{
+
+    font-size:30px;
+
+}
+
+.cta-buttons{
+
+    flex-direction:column;
+
+    align-items:center;
+
+}
+
+}
 
 <!-- =========================================
 CALL TO ACTION END
