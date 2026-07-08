@@ -360,7 +360,7 @@ section{
 
     align-items:center;
 
-    min-height:65px;
+    min-height:50px;
 
 }
 
@@ -378,7 +378,7 @@ section{
 
 .logo img{
 
-    width:130px;
+    width:100px;
 
     height:auto;
 
@@ -394,7 +394,7 @@ section{
 
     align-items:center;
 
-    gap:35px;
+    gap:25px;
 
 }
 
