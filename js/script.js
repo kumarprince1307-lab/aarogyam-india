@@ -1,463 +1,504 @@
-/* =====================================
-   Aarogyam India Version 2.0
-===================================== */
+/* ==========================================================
+   AAROGYAM INDIA
+   SCRIPT.JS
+   VERSION : 2.0
+   PART : 1 / 6
+========================================================== */
 
-/* Banner Slider */
+"use strict";
 
-const images = [
-"images/banners/banner1.jpeg",
-"images/banners/banner2.jpeg",
-"images/banners/banner3.jpeg"
-];
+/* ==========================================================
+   DOM ELEMENTS
+========================================================== */
 
-let current = 0;
+const slides = document.querySelectorAll(".slide");
 
-const slider = document.getElementById("slider");
 const dots = document.querySelectorAll(".dot");
+
+const prevBtn = document.getElementById("sliderPrev");
+
+const nextBtn = document.getElementById("sliderNext");
+
+const menuBtn = document.getElementById("menuBtn");
+
+const closeMenu = document.getElementById("closeMenu");
+
+const mobileMenu = document.getElementById("mobileMenu");
+
+/* ==========================================================
+   HERO SLIDER
+========================================================== */
+
+let currentSlide = 0;
+
+const totalSlides = slides.length;
+
+/* ==========================================================
+   SHOW SLIDE
+========================================================== */
 
 function showSlide(index){
 
-current=index;
+    if(index >= totalSlides){
 
-if(slider){
+        currentSlide = 0;
 
-slider.style.opacity="0";
+    }
 
-setTimeout(()=>{
+    else if(index < 0){
 
-slider.src=images[current];
+        currentSlide = totalSlides - 1;
 
-slider.style.opacity="1";
+    }
 
-},300);
+    else{
+
+        currentSlide = index;
+
+    }
+
+    slides.forEach((slide)=>{
+
+        slide.classList.remove("active");
+
+    });
+
+    dots.forEach((dot)=>{
+
+        dot.classList.remove("active");
+
+    });
+
+    slides[currentSlide].classList.add("active");
+
+    dots[currentSlide].classList.add("active");
 
 }
 
-if(dots.length){
+/* ==========================================================
+   NEXT
+========================================================== */
 
-dots.forEach(dot=>dot.classList.remove("active"));
+function nextSlide(){
 
-dots[current].classList.add("active");
+    showSlide(currentSlide + 1);
 
 }
 
+/* ==========================================================
+   PREVIOUS
+========================================================== */
+
+function previousSlide(){
+
+    showSlide(currentSlide - 1);
+
 }
 
-if(dots.length){
+/* ==========================================================
+   BUTTON EVENTS
+========================================================== */
 
-dots.forEach((dot,i)=>{
+if(nextBtn){
 
-dot.addEventListener("click",()=>{
+    nextBtn.addEventListener("click",nextSlide);
 
-showSlide(i);
+}
+
+if(prevBtn){
+
+    prevBtn.addEventListener("click",previousSlide);
+
+}
+
+/* ==========================================================
+   DOT EVENTS
+========================================================== */
+
+dots.forEach((dot,index)=>{
+
+    dot.addEventListener("click",()=>{
+
+        showSlide(index);
+
+    });
 
 });
 
-});
+/* ==========================================================
+   AUTO SLIDER
+========================================================== */
 
-}
+let sliderInterval = setInterval(()=>{
 
-setInterval(()=>{
-
-current++;
-
-if(current>=images.length){
-
-current=0;
-
-}
-
-showSlide(current);
+    nextSlide();
 
 },5000);
+/* ==========================================================
+   SCRIPT.JS
+   VERSION : 2.0
+   PART : 2 / 6
+========================================================== */
 
+/* ==========================================================
+   PAUSE SLIDER ON HOVER
+========================================================== */
 
-/* Mobile Menu */
+const heroSlider = document.getElementById("heroSlider");
 
-const menuBtn=document.getElementById("menuBtn");
+function startSlider(){
 
-const menu=document.getElementById("menu");
+    sliderInterval = setInterval(()=>{
+
+        nextSlide();
+
+    },5000);
+
+}
+
+function stopSlider(){
+
+    clearInterval(sliderInterval);
+
+}
+
+if(heroSlider){
+
+    heroSlider.addEventListener("mouseenter",stopSlider);
+
+    heroSlider.addEventListener("mouseleave",startSlider);
+
+}
+
+/* ==========================================================
+   MOBILE MENU
+========================================================== */
 
 if(menuBtn){
 
-menuBtn.addEventListener("click",()=>{
+    menuBtn.addEventListener("click",()=>{
 
-menu.classList.toggle("active");
+        mobileMenu.classList.add("active");
+
+        document.body.style.overflow="hidden";
+
+    });
+
+}
+
+if(closeMenu){
+
+    closeMenu.addEventListener("click",()=>{
+
+        mobileMenu.classList.remove("active");
+
+        document.body.style.overflow="auto";
+
+    });
+
+}
+
+/* ==========================================================
+   CLOSE MENU WHEN LINK CLICKED
+========================================================== */
+
+const mobileLinks=document.querySelectorAll(".mobile-nav a");
+
+mobileLinks.forEach(link=>{
+
+    link.addEventListener("click",()=>{
+
+        mobileMenu.classList.remove("active");
+
+        document.body.style.overflow="auto";
+
+    });
+
+});
+
+/* ==========================================================
+   TOUCH SWIPE
+========================================================== */
+
+let touchStartX=0;
+
+let touchEndX=0;
+
+if(heroSlider){
+
+heroSlider.addEventListener("touchstart",(e)=>{
+
+touchStartX=e.changedTouches[0].screenX;
+
+});
+
+heroSlider.addEventListener("touchend",(e)=>{
+
+touchEndX=e.changedTouches[0].screenX;
+
+handleSwipe();
 
 });
 
 }
 
+function handleSwipe(){
 
-/* Smooth Scroll */
+if(touchEndX<touchStartX-50){
 
-document.querySelectorAll('a[href^="#"]').forEach(anchor=>{
+nextSlide();
 
-anchor.addEventListener("click",function(e){
+}
 
-e.preventDefault();
+if(touchEndX>touchStartX+50){
 
-const target=document.querySelector(this.getAttribute("href"));
+previousSlide();
 
-if(target){
+}
 
-target.scrollIntoView({
+}
 
-behavior:"smooth"
+/* ==========================================================
+   ESC KEY CLOSE MENU
+========================================================== */
 
-});
+document.addEventListener("keydown",(e)=>{
+
+if(e.key==="Escape"){
+
+mobileMenu.classList.remove("active");
+
+document.body.style.overflow="auto";
 
 }
 
 });
 
-});
+/* ==========================================================
+   HEADER SHADOW ON SCROLL
+========================================================== */
 
-
-/* Future Popup Support */
-
-function openPopup(){
-
-const popup=document.querySelector(".popup");
-
-if(popup){
-
-popup.classList.add("show");
-
-}
-
-}
-
-function closePopup(){
-
-const popup=document.querySelector(".popup");
-
-if(popup){
-
-popup.classList.remove("show");
-
-}
-
-}
-
-
-/* Scroll Animation */
-
-const cards=document.querySelectorAll(".card,.category-card");
+const header=document.querySelector(".header");
 
 window.addEventListener("scroll",()=>{
 
-cards.forEach(card=>{
+if(window.scrollY>60){
 
-const top=card.getBoundingClientRect().top;
+header.classList.add("sticky");
 
-if(top<window.innerHeight-100){
+}
 
-card.style.opacity="1";
+else{
 
-card.style.transform="translateY(0)";
+header.classList.remove("sticky");
 
 }
 
 });
+/* ==========================================================
+   SCRIPT.JS
+   VERSION : 2.0
+   PART : 3 / 6
+========================================================== */
 
-});
+/* ==========================================================
+   SEARCH BUTTON
+========================================================== */
 
+const searchBtn = document.getElementById("searchBtn");
 
-/* Initial Animation */
+const searchPopup = document.getElementById("searchPopup");
 
-cards.forEach(card=>{
+const searchClose = document.getElementById("searchClose");
 
-card.style.opacity="0";
+const searchInput = document.getElementById("searchInput");
 
-card.style.transform="translateY(40px)";
+if(searchBtn && searchPopup){
 
-card.style.transition=".6s";
+    searchBtn.addEventListener("click",()=>{
 
-});
+        searchPopup.classList.add("active");
 
+        document.body.style.overflow="hidden";
 
-console.log("Aarogyam India Version 2.0 Loaded");
-/*=========================================
-AAROGYAM INDIA
-EBOOK SCRIPT
-PART-1
-=========================================*/
+        if(searchInput){
 
-//=============================
-// SEARCH BOOK
-//=============================
+            searchInput.focus();
 
-const searchInput = document.getElementById("bookSearch");
+        }
 
-if(searchInput){
-
-searchInput.addEventListener("keyup",function(){
-
-let value=this.value.toLowerCase();
-
-let books=document.querySelectorAll(".ebook-card");
-
-books.forEach(function(book){
-
-let text=book.innerText.toLowerCase();
-
-if(text.indexOf(value)>-1){
-
-book.style.display="block";
-
-}else{
-
-book.style.display="none";
+    });
 
 }
 
-});
+if(searchClose){
 
-});
+    searchClose.addEventListener("click",()=>{
+
+        searchPopup.classList.remove("active");
+
+        document.body.style.overflow="auto";
+
+    });
 
 }
 
-//=============================
-// SHARE WHATSAPP
-//=============================
+/* ==========================================================
+   CLOSE SEARCH BY ESC
+========================================================== */
 
-document.querySelectorAll(".share-whatsapp").forEach(function(btn){
+document.addEventListener("keydown",(e)=>{
 
-btn.onclick=function(e){
+    if(e.key==="Escape"){
 
-e.preventDefault();
+        if(searchPopup){
 
-let url=window.location.href;
+            searchPopup.classList.remove("active");
 
-window.open(
+            document.body.style.overflow="auto";
 
-"https://wa.me/?text="+
+        }
 
-encodeURIComponent(url),
-
-"_blank"
-
-);
-
-};
+    }
 
 });
 
-//=============================
-// SHARE FACEBOOK
-//=============================
+/* ==========================================================
+   BACK TO TOP
+========================================================== */
 
-document.querySelectorAll(".share-facebook").forEach(function(btn){
+const backTop=document.querySelector(".back-to-top");
 
-btn.onclick=function(e){
+window.addEventListener("scroll",()=>{
 
-e.preventDefault();
+    if(window.scrollY>500){
 
-window.open(
+        if(backTop){
 
-"https://www.facebook.com/sharer/sharer.php?u="+
+            backTop.classList.add("active");
 
-encodeURIComponent(window.location.href),
+        }
 
-"_blank"
+    }
 
-);
+    else{
 
-};
+        if(backTop){
 
-});
+            backTop.classList.remove("active");
 
-//=============================
-// COPY LINK
-//=============================
+        }
 
-document.querySelectorAll(".copy-link").forEach(function(btn){
-
-btn.onclick=function(e){
-
-e.preventDefault();
-
-navigator.clipboard.writeText(window.location.href);
-
-alert("Link Copied");
-
-};
-
-});
-/*=========================================
-AAROGYAM INDIA
-SCRIPT PART-2
-=========================================*/
-
-
-//=============================
-// BUY NOW
-//=============================
-
-document.querySelectorAll(".buy-now").forEach(function(btn){
-
-btn.addEventListener("click",function(){
-
-alert("Payment System Coming Soon");
+    }
 
 });
 
-});
+if(backTop){
 
+    backTop.addEventListener("click",()=>{
 
-//=============================
-// ADD TO CART
-//=============================
+        window.scrollTo({
 
-document.querySelectorAll(".add-cart").forEach(function(btn){
+            top:0,
 
-btn.addEventListener("click",function(){
+            behavior:"smooth"
 
-alert("Book Added To Cart");
-
-});
-
-});
-
-
-//=============================
-// WISHLIST
-//=============================
-
-document.querySelectorAll(".wishlist").forEach(function(btn){
-
-btn.addEventListener("click",function(){
-
-btn.classList.toggle("active");
-
-});
-
-});
-
-
-//=============================
-// SMOOTH SCROLL
-//=============================
-
-document.querySelectorAll('a[href^="#"]').forEach(function(anchor){
-
-anchor.addEventListener("click",function(e){
-
-e.preventDefault();
-
-document.querySelector(this.getAttribute("href")).scrollIntoView({
-
-behavior:"smooth"
-
-});
-
-});
-
-});
-
-
-//=============================
-// BACK TO TOP
-//=============================
-
-const topBtn=document.getElementById("topBtn");
-
-window.onscroll=function(){
-
-if(topBtn){
-
-if(document.documentElement.scrollTop>300){
-
-topBtn.style.display="block";
-
-}else{
-
-topBtn.style.display="none";
-
-}
-
-}
-
-};
-
-if(topBtn){
-
-topBtn.onclick=function(){
-
-window.scrollTo({
-
-top:0,
-
-behavior:"smooth"
-
-});
-
-};
-
-}
-
-
-//=============================
-// FADE ANIMATION
-//=============================
-
-const cards=document.querySelectorAll(".ebook-card");
-
-const observer=new IntersectionObserver(function(entries){
-
-entries.forEach(function(entry){
-
-if(entry.isIntersecting){
-
-entry.target.classList.add("show");
-
-}
-
-});
-
-});
-
-cards.forEach(function(card){
-
-observer.observe(card);
-
-});
-
-
-//=============================
-// CATEGORY ACTIVE
-//=============================
-
-const categoryMenu = document.querySelectorAll(".ebook-category-menu a");
-
-categoryMenu.forEach(function(link){
-
-    link.onclick = function(){
-
-        categoryMenu.forEach(function(item){
-            item.classList.remove("active");
         });
 
-        this.classList.add("active");
+    });
 
-    };
-
-});
-//=============================
-// LOADING COMPLETE
-//=============================
-
-window.addEventListener("load",function(){
-
-console.log("Aarogyam India eBook Store Loaded");
-
-});
-const menuBtn = document.getElementById("menuBtn");
-const menu = document.getElementById("menu");
-
-if (menuBtn && menu) {
-    menuBtn.onclick = function () {
-        menu.classList.toggle("active");
-    };
 }
+
+/* ==========================================================
+   SMOOTH SCROLL
+========================================================== */
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor=>{
+
+    anchor.addEventListener("click",function(e){
+
+        const target=document.querySelector(this.getAttribute("href"));
+
+        if(target){
+
+            e.preventDefault();
+
+            target.scrollIntoView({
+
+                behavior:"smooth",
+
+                block:"start"
+
+            });
+
+        }
+
+    });
+
+});
+
+/* ==========================================================
+   ACTIVE NAVIGATION
+========================================================== */
+
+const sections=document.querySelectorAll("section");
+
+const navLinks=document.querySelectorAll(".nav-menu a");
+
+window.addEventListener("scroll",()=>{
+
+    let current="";
+
+    sections.forEach(section=>{
+
+      const sectionTop=section.offsetTop-120;
+
+        const sectionHeight=section.clientHeight;
+
+        if(pageYOffset>=sectionTop){
+
+            current=section.getAttribute("id");
+
+        }
+
+    });
+
+    navLinks.forEach(link=>{
+
+        link.classList.remove("active");
+
+        const href=link.getAttribute("href");
+
+        if(href==="#" + current){
+
+            link.classList.add("active");
+
+        }
+
+    });
+
+});
+
+/* ==========================================================
+   PRELOADER
+========================================================== */
+
+const preloader=document.querySelector(".preloader");
+
+window.addEventListener("load",()=>{
+
+    if(preloader){
+
+        preloader.style.opacity="0";
+
+        preloader.style.visibility="hidden";
+
+        setTimeout(()=>{
+
+            preloader.remove();
+
+        },500);
+
+    }
+
+});
