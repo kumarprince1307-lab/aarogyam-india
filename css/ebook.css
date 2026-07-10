@@ -488,3 +488,144 @@ section{
 /*=========================================================
         END OF PART 2
 =========================================================*/
+/*=========================================================
+        PART 3 : PROFESSIONAL MEGA MENU
+=========================================================*/
+
+
+/*=========================================================
+        3.1 MEGA MENU CONTAINER
+=========================================================*/
+
+.mega-category-menu{
+
+    position:absolute;
+
+    top:78px;
+
+    left:0;
+
+    width:100%;
+
+    background:#ffffff;
+
+    display:none;
+
+    box-shadow:0 18px 40px rgba(0,0,0,.12);
+
+    border-top:3px solid #ff8c00;
+
+    z-index:999;
+
+    animation:menuFade .30s ease;
+
+}
+
+
+/*=========================================================
+        3.2 SHOW MENU
+=========================================================*/
+
+.mega-menu:hover + .mega-category-menu{
+
+    display:block;
+
+}
+
+.mega-category-menu:hover{
+
+    display:block;
+
+}
+
+
+/*=========================================================
+        3.3 CATEGORY CONTAINER
+=========================================================*/
+
+.category-container{
+
+    max-width:1400px;
+
+    margin:auto;
+
+    padding:35px;
+
+    display:grid;
+
+    grid-template-columns:repeat(6,1fr);
+
+    gap:30px;
+
+}
+
+
+/*=========================================================
+        3.4 CATEGORY COLUMN
+=========================================================*/
+
+.category-column h3{
+
+    color:#ff7a00;
+
+    font-size:18px;
+
+    margin-bottom:15px;
+
+    padding-bottom:8px;
+
+    border-bottom:2px solid #eeeeee;
+
+}
+
+.category-column a{
+
+    display:block;
+
+    color:#555;
+
+    padding:8px 0;
+
+    transition:.25s;
+
+    font-size:15px;
+
+}
+
+.category-column a:hover{
+
+    color:#ff7a00;
+
+    padding-left:10px;
+
+}
+
+
+/*=========================================================
+        3.5 MENU ANIMATION
+=========================================================*/
+
+@keyframes menuFade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+/*=========================================================
+        END OF PART 3
+=========================================================*/
