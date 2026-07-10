@@ -493,7 +493,7 @@ section{
 =========================================================*/
 
  .mega-menu{
-    position:relative;
+    position:static;
 }
 
 .mega-menu::after{
