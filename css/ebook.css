@@ -1038,3 +1038,192 @@ section{
 /*=========================================================
             END OF PART 6
 =========================================================*/
+/*=========================================================
+            PART 6A
+      PREMIUM CATEGORY CARDS
+=========================================================*/
+
+.quick-category{
+    padding:80px 0;
+    background:#f8fafc;
+}
+
+.quick-category .section-title{
+    text-align:center;
+    margin-bottom:50px;
+}
+
+.quick-category .section-title h2{
+    font-size:38px;
+    font-weight:700;
+    color:#222;
+}
+
+.quick-category .section-title p{
+    color:#777;
+    margin-top:10px;
+    font-size:18px;
+}
+
+.category-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(6,1fr);
+
+    gap:25px;
+
+}
+
+.category-card{
+
+    background:#fff;
+
+    border-radius:22px;
+
+    padding:28px 20px;
+
+    text-align:center;
+
+    text-decoration:none;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    transition:.35s;
+
+    border:2px solid transparent;
+
+}
+
+.category-card:hover{
+
+    transform:translateY(-8px);
+
+    border-color:#ff7a00;
+
+    box-shadow:0 20px 45px rgba(0,0,0,.15);
+
+}
+
+.category-card img{
+
+    width:90px;
+
+    height:90px;
+
+    object-fit:contain;
+
+    margin-bottom:18px;
+
+}
+
+.category-card h3{
+
+    font-size:21px;
+
+    color:#222;
+
+    margin-bottom:10px;
+
+}
+
+.category-card p{
+
+    font-size:15px;
+
+    color:#777;
+
+    line-height:1.6;
+
+    margin-bottom:18px;
+
+}
+
+.category-card span{
+
+    color:#ff7a00;
+
+    font-weight:700;
+
+    font-size:15px;
+
+}
+
+/* Tablet */
+
+@media(max-width:992px){
+
+.category-grid{
+
+grid-template-columns:repeat(3,1fr);
+
+}
+
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+.quick-category{
+
+padding:60px 0;
+
+}
+
+.category-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+gap:18px;
+
+}
+
+.category-card{
+
+padding:20px 12px;
+
+}
+
+.category-card img{
+
+width:70px;
+
+height:70px;
+
+}
+
+.category-card h3{
+
+font-size:18px;
+
+}
+
+.category-card p{
+
+font-size:14px;
+
+}
+
+}
+
+/*=========================================================
+        END PART 6A
+=========================================================*/
+<section class="quick-category">
+
+    <div class="section-title">
+
+        <h2>Browse Categories</h2>
+
+        <p>Select Your Favorite Category</p>
+
+    </div>
+
+    <div class="category-grid">
+
+        <a href="agriculture.html" class="category-card">
+            <img src="../images/categories/agriculture.webp" alt="Agriculture">
+            <h3>Agriculture</h3>
+            <p>Farming Guides & eBooks</p>
+            <span>Explore →</span>
