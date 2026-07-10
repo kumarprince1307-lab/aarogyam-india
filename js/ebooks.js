@@ -366,3 +366,353 @@ initDetailsButtons();
 /*=========================================================
                 END OF PART B
 =========================================================*/
+/*=========================================================
+                EBOOK.JS
+                  PART C
+    FLOATING BUTTONS + NEWSLETTER + ANIMATIONS
+=========================================================*/
+
+/*=========================================================
+        STICKY BUY BUTTON
+=========================================================*/
+
+function initStickyBuy(){
+
+    const sticky=document.querySelector('.sticky-buy');
+
+    if(!sticky) return;
+
+    window.addEventListener('scroll',()=>{
+
+        if(window.scrollY>300){
+
+            sticky.classList.add('show');
+
+        }else{
+
+            sticky.classList.remove('show');
+
+        }
+
+    });
+
+}
+
+initStickyBuy();
+
+/*=========================================================
+        WHATSAPP BUTTON
+=========================================================*/
+
+function initWhatsappButton(){
+
+    const whatsapp=document.querySelector('.whatsapp-float');
+
+    if(!whatsapp) return;
+
+    whatsapp.addEventListener('mouseenter',()=>{
+
+        whatsapp.classList.add('pulse');
+
+    });
+
+    whatsapp.addEventListener('mouseleave',()=>{
+
+        whatsapp.classList.remove('pulse');
+
+    });
+
+}
+
+initWhatsappButton();
+
+/*=========================================================
+        NEWSLETTER BANNER
+=========================================================*/
+
+function initNewsletter(){
+
+    const banner=document.querySelector('.newsletter-banner');
+
+    if(!banner) return;
+
+    banner.addEventListener('click',()=>{
+
+        console.log('Newsletter Banner Clicked');
+
+    });
+
+}
+
+initNewsletter();
+
+/*=========================================================
+        FOOTER LINKS
+=========================================================*/
+
+function initFooter(){
+
+    const links=document.querySelectorAll('.footer-column a');
+
+    if(!links.length) return;
+
+    links.forEach(link=>{
+
+        link.addEventListener('mouseenter',()=>{
+
+            link.classList.add('active');
+
+        });
+
+        link.addEventListener('mouseleave',()=>{
+
+            link.classList.remove('active');
+
+        });
+
+    });
+
+}
+
+initFooter();
+
+/*=========================================================
+        FADE IN ON SCROLL
+=========================================================*/
+
+function initReveal(){
+
+    const elements=document.querySelectorAll(
+
+        '.book-card,.feature-box,.category-grid a,.featured-book-card'
+
+    );
+
+    if(!elements.length) return;
+
+    const observer=new IntersectionObserver(entries=>{
+
+        entries.forEach(entry=>{
+
+            if(entry.isIntersecting){
+
+                entry.target.classList.add('show');
+
+            }
+
+        });
+
+    },{
+
+        threshold:.15
+
+    });
+
+    elements.forEach(el=>observer.observe(el));
+
+}
+
+initReveal();
+
+/*=========================================================
+        COMMON UTILITIES
+=========================================================*/
+
+function scrollTopPage(){
+
+    window.scrollTo({
+
+        top:0,
+
+        behavior:'smooth'
+
+    });
+
+}
+
+function pageReload(){
+
+    location.reload();
+
+}
+
+/*=========================================================
+                END OF PART C
+=========================================================*/
+/*=========================================================
+                EBOOK.JS
+                  PART D
+        FINAL UTILITIES + PERFORMANCE
+=========================================================*/
+
+/*=========================================================
+        IMAGE LAZY LOADING
+=========================================================*/
+
+function initLazyImages(){
+
+    const images=document.querySelectorAll('img');
+
+    if(!images.length) return;
+
+    const observer=new IntersectionObserver(entries=>{
+
+        entries.forEach(entry=>{
+
+            if(entry.isIntersecting){
+
+                const img=entry.target;
+
+                const src=img.dataset.src;
+
+                if(src){
+
+                    img.src=src;
+
+                }
+
+                observer.unobserve(img);
+
+            }
+
+        });
+
+    });
+
+    images.forEach(img=>observer.observe(img));
+
+}
+
+initLazyImages();
+
+/*=========================================================
+        BUTTON RIPPLE EFFECT
+=========================================================*/
+
+function initRipple(){
+
+    const buttons=document.querySelectorAll('button,.buy-btn,.demo-btn');
+
+    buttons.forEach(button=>{
+
+        button.addEventListener('click',()=>{
+
+            button.classList.add('clicked');
+
+            setTimeout(()=>{
+
+                button.classList.remove('clicked');
+
+            },250);
+
+        });
+
+    });
+
+}
+
+initRipple();
+
+/*=========================================================
+        WINDOW RESIZE
+=========================================================*/
+
+function initResize(){
+
+    window.addEventListener('resize',()=>{
+
+        console.log(
+
+            'Screen :',
+
+            window.innerWidth,
+
+            'x',
+
+            window.innerHeight
+
+        );
+
+    });
+
+}
+
+initResize();
+
+/*=========================================================
+        FUTURE HOOKS
+=========================================================*/
+
+function initFutureModules(){
+
+    console.log('Future Modules Ready');
+
+    /*
+        Wishlist
+
+        Cart
+
+        Login
+
+        Razorpay
+
+        Coupons
+
+        Reviews
+
+        Search API
+
+        Admin Panel
+
+        Dashboard
+
+        Notifications
+    */
+
+}
+
+initFutureModules();
+
+/*=========================================================
+        GLOBAL ERROR SAFE
+=========================================================*/
+
+window.addEventListener('error',(e)=>{
+
+    console.error(
+
+        'JS Error :',
+
+        e.message
+
+    );
+
+});
+
+/*=========================================================
+        PAGE LOADED
+=========================================================*/
+
+window.addEventListener('load',()=>{
+
+    document.body.classList.add('page-loaded');
+
+});
+
+/*=========================================================
+        VERSION
+=========================================================*/
+
+const APP_VERSION='1.0.0';
+
+console.log(
+
+    'Aarogyam India eBook',
+
+    APP_VERSION
+
+);
+
+/*=========================================================
+            END OF EBOOK.JS
+=========================================================*/
