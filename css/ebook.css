@@ -272,7 +272,9 @@ section{
     margin:auto;
 
     height:78px;
-
+        
+position:relative;
+        
     display:flex;
 
     align-items:center;
@@ -504,13 +506,23 @@ section{
 
     left:50%;
 
-    transform:translateX(-50%);
+  .mega-category-menu{
 
-    width:98vw;
+    position:absolute;
 
-    max-width:1500px;
+    top:100%;
 
-    min-width:1200px;
+    left:50%;
+
+    margin-left:-700px;
+
+    transform:none;
+
+    width:1400px;
+
+    max-width:none;
+
+    min-width:0;
 
     background:#fff;
 
