@@ -1954,6 +1954,51 @@ height:30px;
     font-size:20px;
 
 }
+        @media (max-width:768px){
+
+    .sticky-buy{
+
+        left:0;
+
+        right:0;
+
+        bottom:0;
+
+        width:100%;
+
+        border-radius:0;
+
+        padding:16px 0;
+
+        display:flex;
+
+        justify-content:center;
+
+        align-items:center;
+
+        font-size:18px;
+
+        z-index:9999;
+
+    }
+
+    .whatsapp-float{
+
+        bottom:75px;
+
+        right:15px;
+
+    }
+
+    .back-top{
+
+        bottom:140px;
+
+        right:15px;
+
+    }
+
+}
 /*=========================================================
             END OF PART 10
 =========================================================*/
