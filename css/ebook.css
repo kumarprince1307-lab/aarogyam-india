@@ -1561,7 +1561,7 @@ grid-template-columns:repeat(2,1fr);
         MOBILE
 ------------------------------*/
 
-@media(max-width:500px){
+@media(max-width:1100px){
 
 .features{
 
@@ -1585,9 +1585,9 @@ padding:28px 20px;
 
 .feature-box img{
 
-width:70px;
+width:250px;
 
-height:70px;
+height:200px;
 
 }
 
