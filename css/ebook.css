@@ -1620,3 +1620,321 @@ border-radius:18px;
 /*=========================================================
             END OF PART 9
 =========================================================*/
+/*=========================================================
+                PART 10
+        FOOTER + FLOATING BUTTONS
+=========================================================*/
+
+/*------------------------------
+        FOOTER
+------------------------------*/
+
+.ebook-footer{
+
+    width:100%;
+
+    background:#1f2937;
+
+    color:#ffffff;
+
+    padding:70px 0 0;
+
+}
+
+.footer-container{
+
+    width:95%;
+
+    max-width:1300px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:40px;
+
+}
+
+.footer-column h3{
+
+    font-size:22px;
+
+    margin-bottom:22px;
+
+    color:#ffffff;
+
+}
+
+.footer-column a{
+
+    display:block;
+
+    color:#d1d5db;
+
+    text-decoration:none;
+
+    margin-bottom:14px;
+
+    transition:.3s;
+
+}
+
+.footer-column a:hover{
+
+    color:#ff7a00;
+
+    padding-left:8px;
+
+}
+
+.footer-bottom{
+
+    margin-top:50px;
+
+    padding:22px;
+
+    text-align:center;
+
+    border-top:1px solid rgba(255,255,255,.12);
+
+}
+
+.footer-bottom p{
+
+    color:#cbd5e1;
+
+    font-size:15px;
+
+}
+
+/*------------------------------
+      WHATSAPP BUTTON
+------------------------------*/
+
+.whatsapp-float{
+
+    position:fixed;
+
+    left:20px;
+
+    bottom:20px;
+
+    width:60px;
+
+    height:60px;
+
+    background:#25D366;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+    z-index:999;
+
+    transition:.35s;
+
+}
+
+.whatsapp-float:hover{
+
+    transform:scale(1.1);
+
+}
+
+.whatsapp-float img{
+
+    width:34px;
+
+    height:34px;
+
+}
+
+/*------------------------------
+      STICKY BUY
+------------------------------*/
+
+.sticky-buy{
+
+    position:fixed;
+
+    right:20px;
+
+    bottom:20px;
+
+    background:linear-gradient(135deg,#ff7a00,#ffb347);
+
+    color:#ffffff;
+
+    text-decoration:none;
+
+    padding:16px 30px;
+
+    border-radius:50px;
+
+    font-weight:700;
+
+    box-shadow:0 12px 30px rgba(255,122,0,.35);
+
+    z-index:999;
+
+    transition:.35s;
+
+}
+
+.sticky-buy:hover{
+
+    transform:translateY(-4px);
+
+}
+
+/*------------------------------
+      BACK TO TOP
+------------------------------*/
+
+.back-top{
+
+    position:fixed;
+
+    right:20px;
+
+    bottom:95px;
+
+    width:50px;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#ffffff;
+
+    color:#ff7a00;
+
+    font-size:22px;
+
+    cursor:pointer;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+    transition:.35s;
+
+    z-index:999;
+
+}
+
+.back-top:hover{
+
+    background:#ff7a00;
+
+    color:#ffffff;
+
+}
+
+/*------------------------------
+      TABLET
+------------------------------*/
+
+@media(max-width:992px){
+
+.footer-container{
+
+grid-template-columns:repeat(2,1fr);
+
+gap:30px;
+
+}
+
+}
+
+/*------------------------------
+      MOBILE
+------------------------------*/
+
+@media(max-width:768px){
+
+.ebook-footer{
+
+padding:50px 0 0;
+
+}
+
+.footer-container{
+
+grid-template-columns:1fr;
+
+gap:25px;
+
+}
+
+.footer-column{
+
+text-align:center;
+
+}
+
+.footer-column a:hover{
+
+padding-left:0;
+
+}
+
+.whatsapp-float{
+
+width:55px;
+
+height:55px;
+
+left:15px;
+
+bottom:15px;
+
+}
+
+.whatsapp-float img{
+
+width:30px;
+
+height:30px;
+
+}
+
+.sticky-buy{
+
+right:15px;
+
+bottom:15px;
+
+padding:14px 24px;
+
+font-size:15px;
+
+}
+
+.back-top{
+
+right:15px;
+
+bottom:85px;
+
+width:45px;
+
+height:45px;
+
+font-size:20px;
+
+}
+
+}
+
+/*=========================================================
+            END OF PART 10
+=========================================================*/
