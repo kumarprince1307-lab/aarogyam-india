@@ -1,1 +1,211 @@
+/*=========================================================
+        AAROGYAM INDIA
+        EBOOK STORE CSS
+        PART - 1
+=========================================================*/
 
+
+/*=========================================================
+        GOOGLE FONT
+=========================================================*/
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+
+/*=========================================================
+        CSS RESET
+=========================================================*/
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+
+body{
+
+    font-family:'Poppins',sans-serif;
+
+    background:#f7f8fa;
+
+    color:#222;
+
+    overflow-x:hidden;
+
+}
+
+
+/*=========================================================
+        ROOT COLORS
+=========================================================*/
+
+:root{
+
+    --primary:#ff7a00;
+
+    --secondary:#1b8f3a;
+
+    --white:#ffffff;
+
+    --black:#202020;
+
+    --text:#555555;
+
+    --border:#e5e5e5;
+
+    --background:#f7f8fa;
+
+    --shadow:0 8px 25px rgba(0,0,0,.08);
+
+    --radius:14px;
+
+    --transition:.3s ease;
+
+}
+
+
+/*=========================================================
+        COMMON
+=========================================================*/
+
+img{
+
+    width:100%;
+
+    display:block;
+
+}
+
+
+a{
+
+    text-decoration:none;
+
+    color:inherit;
+
+}
+
+
+ul{
+
+    list-style:none;
+
+}
+
+
+button{
+
+    border:none;
+
+    outline:none;
+
+    cursor:pointer;
+
+    font-family:'Poppins',sans-serif;
+
+}
+
+
+.container{
+
+    width:95%;
+
+    max-width:1400px;
+
+    margin:auto;
+
+}
+
+
+/*=========================================================
+        COMMON SECTION
+=========================================================*/
+
+section{
+
+    padding:40px 0;
+
+}
+
+
+.section-title{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+
+.section-title h2{
+
+    font-size:30px;
+
+    color:var(--black);
+
+    font-weight:700;
+
+}
+
+
+.section-title p{
+
+    color:var(--text);
+
+    margin-top:5px;
+
+}
+
+
+.section-title a{
+
+    color:var(--primary);
+
+    font-weight:600;
+
+}
+
+
+/*=========================================================
+        BUTTON
+=========================================================*/
+
+.btn{
+
+    background:var(--primary);
+
+    color:#fff;
+
+    padding:12px 28px;
+
+    border-radius:10px;
+
+    transition:var(--transition);
+
+    display:inline-block;
+
+}
+
+
+.btn:hover{
+
+    background:var(--secondary);
+
+}
+
+
+/*=========================================================
+        PART 1 END
+=========================================================*/
