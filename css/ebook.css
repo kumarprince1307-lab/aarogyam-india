@@ -913,7 +913,7 @@ section{
 
 /*=========================================================
                 PART 6
-          QUICK CATEGORY
+           QUICK CATEGORY
 =========================================================*/
 
 .quick-category{
@@ -924,19 +924,13 @@ section{
 
 .quick-category .section-title{
     text-align:center;
-    margin-bottom:45px;
+    margin-bottom:40px;
 }
 
 .quick-category .section-title h2{
-    font-size:36px;
+    font-size:38px;
     font-weight:700;
     color:#222;
-    margin-bottom:10px;
-}
-
-.quick-category .section-title p{
-    font-size:17px;
-    color:#666;
 }
 
 .category-grid{
@@ -949,60 +943,44 @@ section{
     gap:25px;
 }
 
-.category-card{
+.category-grid a{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    height:120px;
+
+    text-decoration:none;
+    color:#222;
+    font-size:20px;
+    font-weight:700;
+
     background:#fff;
     border-radius:20px;
-    padding:35px 20px;
-    text-align:center;
-    text-decoration:none;
 
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-    transition:.35s;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
     border:2px solid transparent;
+
+    transition:.35s;
 }
 
-.category-card:hover{
+.category-grid a:hover{
+
     transform:translateY(-8px);
+
     border-color:#ff7a00;
+
+    color:#ff7a00;
+
     box-shadow:0 18px 40px rgba(255,122,0,.18);
-}
 
-.category-card h3{
-    font-size:22px;
-    color:#222;
-    margin-bottom:12px;
-}
-
-.category-card p{
-    font-size:15px;
-    color:#666;
-    line-height:1.6;
 }
 
 @media(max-width:768px){
 
     .quick-category{
-        padding:50px 0;
-    }
 
-    .category-grid{
-        grid-template-columns:repeat(2,1fr);
-        gap:18px;
-    }
-
-    .category-card{
-        padding:25px 15px;
-    }
-
-    .category-card h3{
-        font-size:18px;
-    }
-
-    .category-card p{
-        font-size:14px;
-    }
-}
-
+        padding
 /*=========================================================
             END OF PART 6
 =========================================================*/
