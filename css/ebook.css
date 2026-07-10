@@ -1416,3 +1416,184 @@ section{
 /*=========================================================
             END OF PART 8
 =========================================================*/
+/*=========================================================
+                PART 9
+      NEW ARRIVAL | PREMIUM | FLASH SALE
+            | COMING SOON
+=========================================================*/
+
+/* Common Sections */
+
+.new-arrival,
+.premium-books,
+.flash-sale,
+.coming-soon{
+
+    width:100%;
+
+    padding:70px 0;
+
+    background:#ffffff;
+
+}
+
+/* Section Heading */
+
+.new-arrival .section-title,
+.premium-books .section-title,
+.flash-sale .section-title,
+.coming-soon .section-title{
+
+    width:95%;
+
+    max-width:1300px;
+
+    margin:0 auto 35px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+/* Title */
+
+.new-arrival .section-title h2,
+.premium-books .section-title h2,
+.flash-sale .section-title h2,
+.coming-soon .section-title h2{
+
+    font-size:36px;
+
+    font-weight:700;
+
+    color:#222;
+
+}
+
+/* View All */
+
+.new-arrival .section-title a,
+.premium-books .section-title a,
+.flash-sale .section-title a,
+.coming-soon .section-title a{
+
+    text-decoration:none;
+
+    color:#ff7a00;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    transition:.3s;
+
+}
+
+.new-arrival .section-title a:hover,
+.premium-books .section-title a:hover,
+.flash-sale .section-title a:hover,
+.coming-soon .section-title a:hover{
+
+    color:#e65f00;
+
+}
+
+/* Book Grid */
+
+.new-arrival .book-grid,
+.premium-books .book-grid,
+.flash-sale .book-grid,
+.coming-soon .book-grid{
+
+    width:95%;
+
+    max-width:1300px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+
+    gap:30px;
+
+    min-height:250px;
+
+}
+
+/* Empty Placeholder */
+
+.new-arrival .book-grid:empty,
+.premium-books .book-grid:empty,
+.flash-sale .book-grid:empty,
+.coming-soon .book-grid:empty{
+
+    border:2px dashed #e6e6e6;
+
+    border-radius:20px;
+
+    background:#fafafa;
+
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+    .new-arrival,
+    .premium-books,
+    .flash-sale,
+    .coming-soon{
+
+        padding:50px 0;
+
+    }
+
+    .new-arrival .section-title,
+    .premium-books .section-title,
+    .flash-sale .section-title,
+    .coming-soon .section-title{
+
+        margin-bottom:20px;
+
+    }
+
+    .new-arrival .section-title h2,
+    .premium-books .section-title h2,
+    .flash-sale .section-title h2,
+    .coming-soon .section-title h2{
+
+        font-size:28px;
+
+    }
+
+    .new-arrival .section-title a,
+    .premium-books .section-title a,
+    .flash-sale .section-title a,
+    .coming-soon .section-title a{
+
+        font-size:15px;
+
+    }
+
+    .new-arrival .book-grid,
+    .premium-books .book-grid,
+    .flash-sale .book-grid,
+    .coming-soon .book-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+        gap:18px;
+
+        min-height:180px;
+
+    }
+
+}
+
+/*=========================================================
+                END OF PART 9
+=========================================================*/
