@@ -492,18 +492,24 @@ section{
         PART 3 : PROFESSIONAL MEGA MENU
 =========================================================*/
 
-.mega-menu{
-    position:static;
+ .mega-menu{
+    position:relative;
 }
 
+.mega-menu::after{
+    content:"";
+    position:absolute;
+    left:0;
+    top:100%;
+    width:100%;
+    height:20px;
+}
 .mega-category-menu{
 
     position:fixed;
 
-top:20px;
-        top:100%;
-       margin-top:0;
-        
+top:100px;
+       
     left:0;
 
     width:100%;
