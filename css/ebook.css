@@ -501,6 +501,8 @@ section{
     position:fixed;
 
 top:100px;
+        top:100%;
+       margin-top:0;
         
     left:0;
 
