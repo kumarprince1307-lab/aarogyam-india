@@ -489,59 +489,36 @@ section{
         END OF PART 2
 =========================================================*/
 /*=========================================================
-        PART 3 : PROFESSIONAL MEGA MENU (REVISED)
-=========================================================*/
-
-
-/*=========================================================
-        3.1 MEGA MENU PARENT
+        PART 3 : PROFESSIONAL MEGA MENU
 =========================================================*/
 
 .mega-menu{
-
-    position:relative;
-
+    position:static;
 }
-
-
-/*=========================================================
-        3.2 MEGA MENU CONTAINER
-=========================================================*/
 
 .mega-category-menu{
 
-    position:absolute;
+    position:fixed;
 
-    top:100%;
+    top:78px;
 
-    left:50%;
+    left:0;
 
-    transform:translateX(-50%);
+    width:100%;
 
-    width:1400px;
-    max-width:96%
     background:#ffffff;
-
-    border-radius:0 0 18px 18px;
-
-    border-top:4px solid var(--primary);
-
-    box-shadow:0 18px 45px rgba(0,0,0,.15);
 
     display:none;
 
-    overflow:hidden;
+    border-top:4px solid var(--primary);
+
+    box-shadow:0 15px 40px rgba(0,0,0,.15);
 
     z-index:99999;
 
-    animation:megaFade .30s ease;
+    animation:megaFade .35s ease;
 
 }
-
-
-/*=========================================================
-        3.3 SHOW MENU
-=========================================================*/
 
 .mega-menu:hover .mega-category-menu{
 
@@ -549,27 +526,23 @@ section{
 
 }
 
-
-/*=========================================================
-        3.4 CATEGORY CONTAINER
-=========================================================*/
-
 .category-container{
+
+    width:95%;
+
+    max-width:1400px;
+
+    margin:auto;
 
     display:grid;
 
     grid-template-columns:repeat(6,1fr);
 
-    gap:30px;
+    gap:35px;
 
-    padding:35px 45px;
+    padding:35px 10px;
 
 }
-
-
-/*=========================================================
-        3.5 CATEGORY COLUMN
-=========================================================*/
 
 .category-column{
 
@@ -579,27 +552,25 @@ section{
 
 }
 
-
 .category-column h3{
 
     color:var(--primary);
 
     font-size:18px;
 
-    margin-bottom:14px;
+    margin-bottom:15px;
 
-    padding-bottom:8px;
+    padding-bottom:10px;
 
     border-bottom:2px solid #eeeeee;
 
 }
 
-
 .category-column a{
 
-    color:#555;
+    display:block;
 
-    font-size:14px;
+    color:#555;
 
     padding:8px 0;
 
@@ -607,41 +578,13 @@ section{
 
 }
 
-
 .category-column a:hover{
 
     color:var(--primary);
 
-    padding-left:8px;
+    padding-left:10px;
 
 }
-
-
-/*=========================================================
-        3.6 LINK EFFECT
-=========================================================*/
-
-.category-column a::before{
-
-    content:"› ";
-
-    color:transparent;
-
-    transition:.30s;
-
-}
-
-
-.category-column a:hover::before{
-
-    color:var(--primary);
-
-}
-
-
-/*=========================================================
-        3.7 MENU ANIMATION
-=========================================================*/
 
 @keyframes megaFade{
 
@@ -649,7 +592,7 @@ section{
 
         opacity:0;
 
-        transform:translateX(-50%) translateY(15px);
+        transform:translateY(15px);
 
     }
 
@@ -657,29 +600,13 @@ section{
 
         opacity:1;
 
-        transform:translateX(-50%) translateY(0);
+        transform:translateY(0);
 
     }
 
 }
 
-
-/*=========================================================
-        3.8 RESPONSIVE FOUNDATION
-=========================================================*/
-
-@media(max-width:1200px){
-
-.mega-category-menu{
-
-    width:1000px;
-
-}
-
-}
-
-
-@media(max-width:992px){
+@media(max-width:991px){
 
 .mega-category-menu{
 
@@ -688,7 +615,6 @@ section{
 }
 
 }
-
 
 /*=========================================================
         END OF PART 3
