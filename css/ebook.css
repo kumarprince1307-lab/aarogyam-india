@@ -685,7 +685,7 @@ section{
 =========================================================*/
 /*=========================================================
         PART 3.3 (V5)
-        RIGHT SUB CATEGORY PANEL
+        RIGHT SUB CATEGORY PANEL (REVISED)
 =========================================================*/
 
 
@@ -697,7 +697,9 @@ section{
 
     flex:1;
 
-    padding:35px 40px;
+    position:relative;
+
+    padding:35px;
 
     background:#ffffff;
 
@@ -711,6 +713,8 @@ section{
 .mega-panel{
 
     display:none;
+
+    animation:panelFade .25s ease;
 
 }
 
@@ -742,29 +746,18 @@ section{
 
 
 /*=========================================================
-        3.3.4 SUB CATEGORY GRID
-=========================================================*/
-
-.mega-panel{
-
-    display:grid;
-
-    grid-template-columns:repeat(2,1fr);
-
-    gap:14px 40px;
-
-}
-
-
-/*=========================================================
-        3.3.5 LINK
+        3.3.4 SUB CATEGORY
 =========================================================*/
 
 .mega-panel a{
 
     display:block;
 
-    padding:10px 14px;
+    width:100%;
+
+    padding:12px 16px;
+
+    margin-bottom:8px;
 
     border-radius:10px;
 
@@ -781,7 +774,32 @@ section{
 
     color:var(--primary);
 
-    padding-left:22px;
+    padding-left:24px;
+
+}
+
+
+/*=========================================================
+        3.3.5 ANIMATION
+=========================================================*/
+
+@keyframes panelFade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(10px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
 
 }
 
@@ -791,12 +809,12 @@ section{
 =========================================================*/
 /*=========================================================
         PART 3.4 (V5)
-        HOVER & ANIMATION
+        CATEGORY INTERACTION
 =========================================================*/
 
 
 /*=========================================================
-        3.4.1 MENU ANIMATION
+        3.4.1 SHOW MENU
 =========================================================*/
 
 .mega-category-menu{
@@ -805,16 +823,11 @@ section{
 
     visibility:hidden;
 
-    transform:translateX(-50%) translateY(15px);
+    pointer-events:none;
 
-    transition:.30s ease;
+    transition:.30s;
 
 }
-
-
-/*=========================================================
-        3.4.2 SHOW MENU
-=========================================================*/
 
 .mega-menu:hover .mega-category-menu{
 
@@ -822,85 +835,62 @@ section{
 
     visibility:visible;
 
-    transform:translateX(-50%) translateY(0);
+    pointer-events:auto;
 
 }
 
 
 /*=========================================================
-        3.4.3 CATEGORY HOVER
+        3.4.2 LEFT MENU
 =========================================================*/
 
 .mega-left a{
 
     position:relative;
 
-    overflow:hidden;
-
 }
 
+.mega-left a.active{
 
-.mega-left a::before{
+    background:var(--primary);
 
-    content:"";
-
-    position:absolute;
-
-    left:0;
-
-    top:0;
-
-    width:4px;
-
-    height:100%;
-
-    background:#ffffff;
-
-    opacity:0;
-
-    transition:.30s;
-
-}
-
-
-.mega-left a:hover::before,
-
-.mega-left a.active::before{
-
-    opacity:1;
+    color:#ffffff;
 
 }
 
 
 /*=========================================================
-        3.4.4 SUB LINK EFFECT
+        3.4.3 PANEL DEFAULT
 =========================================================*/
 
-.mega-panel a{
+.mega-panel{
 
-    position:relative;
+    display:none;
+
+}
+
+.mega-panel.active{
+
+    display:block;
 
 }
 
 
-.mega-panel a::after{
+/*=========================================================
+        3.4.4 HOVER EFFECT
+=========================================================*/
 
-    content:"›";
+.mega-left a:hover{
 
-    position:absolute;
+    background:var(--primary);
 
-    right:12px;
-
-    opacity:0;
-
-    transition:.30s;
+    color:#ffffff;
 
 }
 
+.mega-panel a:hover{
 
-.mega-panel a:hover::after{
-
-    opacity:1;
+    color:var(--primary);
 
 }
 
