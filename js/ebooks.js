@@ -794,3 +794,60 @@ if (menuBtn && navMenu) {
 /*=========================================================
             END PART E
 =========================================================*/
+/*=========================================================
+                MOBILE MENU
+=========================================================*/
+
+const menuBtn = document.querySelector(".menu-button");
+
+const mobileMenu = document.querySelector(".mobile-menu");
+
+const menuClose = document.querySelector(".menu-close");
+
+const mobileOverlay = document.querySelector(".mobile-overlay");
+
+if(menuBtn && mobileMenu){
+
+    menuBtn.addEventListener("click",()=>{
+
+        mobileMenu.classList.add("active");
+
+        mobileOverlay.classList.add("active");
+
+        document.body.style.overflow="hidden";
+
+    });
+
+}
+
+if(menuClose){
+
+    menuClose.addEventListener("click",()=>{
+
+        mobileMenu.classList.remove("active");
+
+        mobileOverlay.classList.remove("active");
+
+        document.body.style.overflow="";
+
+    });
+
+}
+
+if(mobileOverlay){
+
+    mobileOverlay.addEventListener("click",()=>{
+
+        mobileMenu.classList.remove("active");
+
+        mobileOverlay.classList.remove("active");
+
+        document.body.style.overflow="";
+
+    });
+
+}
+
+/*=========================================================
+            END MOBILE MENU
+=========================================================*/
