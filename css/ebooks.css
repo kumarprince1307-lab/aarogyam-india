@@ -209,3 +209,223 @@ section{
 /*=========================================================
         PART 1 END
 =========================================================*/
+/*=========================================================
+                    HEADER
+=========================================================*/
+
+.ebook-header{
+
+    width:100%;
+
+    background:#ffffff;
+
+    box-shadow:var(--shadow);
+
+    position:sticky;
+
+    top:0;
+
+    left:0;
+
+    z-index:999;
+
+}
+
+.header-container{
+
+    max-width:1400px;
+
+    margin:auto;
+
+    padding:15px 20px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:25px;
+
+}
+
+
+/*=========================================================
+                    LOGO
+=========================================================*/
+
+.logo img{
+
+    width:220px;
+
+    display:block;
+
+}
+
+
+/*=========================================================
+                NAVIGATION
+=========================================================*/
+
+.ebook-navigation{
+
+    flex:1;
+
+}
+
+.ebook-navigation ul{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:28px;
+
+}
+
+.ebook-navigation ul li{
+
+    position:relative;
+
+}
+
+.ebook-navigation ul li a{
+
+    color:var(--black);
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+    white-space:nowrap;
+
+}
+
+.ebook-navigation ul li a:hover{
+
+    color:var(--primary);
+
+}
+
+
+/*=========================================================
+                HEADER RIGHT
+=========================================================*/
+
+.header-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+.header-icon{
+
+    width:44px;
+
+    height:44px;
+
+    border-radius:50%;
+
+    background:#fff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+    position:relative;
+
+}
+
+.header-icon:hover{
+
+    background:var(--primary);
+
+}
+
+.header-icon img{
+
+    width:22px;
+
+    height:22px;
+
+    object-fit:contain;
+
+}
+
+
+/*=========================================================
+                CART
+=========================================================*/
+
+.cart-icon{
+
+    position:relative;
+
+}
+
+.cart-count{
+
+    position:absolute;
+
+    top:-5px;
+
+    right:-5px;
+
+    width:22px;
+
+    height:22px;
+
+    background:red;
+
+    color:#fff;
+
+    border-radius:50%;
+
+    font-size:12px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-weight:700;
+
+}
+
+
+/*=========================================================
+                MOBILE MENU
+=========================================================*/
+
+.menu-button{
+
+    width:45px;
+
+    height:45px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    border-radius:10px;
+
+    background:#fff;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
