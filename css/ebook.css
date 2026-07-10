@@ -230,3 +230,258 @@ section{
 /*=========================================================
         END OF PART 1
 =========================================================*/
+/*=========================================================
+        PART 2 : HEADER
+=========================================================*/
+
+
+/*=========================================================
+        PART 2.1 : HEADER
+=========================================================*/
+
+.ebook-header{
+
+    position:sticky;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    z-index:9999;
+
+    background:linear-gradient(
+        90deg,
+        #ffd89b 0%,
+        #ff9f1c 55%,
+        #d96b00 100%
+    );
+
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
+
+}
+
+
+/*=========================================================
+        PART 2.2 : HEADER CONTAINER
+=========================================================*/
+
+.header-container{
+
+    max-width:1400px;
+
+    margin:auto;
+
+    padding:12px 22px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:30px;
+
+}
+
+
+/*=========================================================
+        PART 2.3 : LOGO
+=========================================================*/
+
+.logo{
+
+    flex-shrink:0;
+
+}
+
+.logo img{
+
+    width:95px;
+
+    height:auto;
+
+    transition:.35s;
+
+}
+
+.logo img:hover{
+
+    transform:scale(1.05);
+
+}
+
+
+/*=========================================================
+        PART 2.4 : NAVIGATION
+=========================================================*/
+
+.ebook-navigation{
+
+    flex:1;
+
+}
+
+.ebook-navigation ul{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:30px;
+
+}
+
+.ebook-navigation ul li{
+
+    position:relative;
+
+}
+
+.ebook-navigation ul li a{
+
+    font-size:15px;
+
+    font-weight:600;
+
+    color:#ffffff;
+
+    transition:.30s;
+
+}
+
+.ebook-navigation ul li a:hover{
+
+    color:#fff8d6;
+
+}
+
+
+/*=========================================================
+        PART 2.5 : HEADER RIGHT
+=========================================================*/
+
+.header-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+
+/*=========================================================
+        PART 2.6 : HEADER ICON
+=========================================================*/
+
+.header-icon{
+
+    width:42px;
+
+    height:42px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.18);
+
+    backdrop-filter:blur(8px);
+
+    transition:.30s;
+
+}
+
+.header-icon:hover{
+
+    background:#ffffff;
+
+}
+
+.header-icon img{
+
+    width:20px;
+
+    height:20px;
+
+}
+
+
+/*=========================================================
+        PART 2.7 : CART
+=========================================================*/
+
+.cart-icon{
+
+    position:relative;
+
+}
+
+.cart-count{
+
+    position:absolute;
+
+    top:-6px;
+
+    right:-6px;
+
+    width:20px;
+
+    height:20px;
+
+    border-radius:50%;
+
+    background:#ff2b2b;
+
+    color:#fff;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+/*=========================================================
+        PART 2.8 : MOBILE MENU
+=========================================================*/
+
+.menu-button{
+
+    display:none;
+
+    width:44px;
+
+    height:44px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.20);
+
+}
+
+.menu-button img{
+
+    width:22px;
+
+}
+
+
+/*=========================================================
+        END OF PART 2
+=========================================================*/
