@@ -1061,5 +1061,118 @@ section{
             END OF PART 6
 =========================================================*/
 /*=========================================================
-            END OF PART 6
+                PART 7
+              FILTER BAR
+=========================================================*/
+
+.filter-bar{
+
+    width:95%;
+
+    max-width:1300px;
+
+    margin:40px auto;
+
+    display:flex;
+
+    gap:15px;
+
+    overflow-x:auto;
+
+    scrollbar-width:none;
+
+    -ms-overflow-style:none;
+
+}
+
+.filter-bar::-webkit-scrollbar{
+
+    display:none;
+
+}
+
+.filter-bar button{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    padding:14px 24px;
+
+    background:#ffffff;
+
+    border:2px solid #eeeeee;
+
+    border-radius:50px;
+
+    color:#333;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    white-space:nowrap;
+
+    transition:.35s;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.06);
+
+}
+
+.filter-bar button img{
+
+    width:20px;
+
+    height:20px;
+
+}
+
+.filter-bar button:hover{
+
+    background:linear-gradient(135deg,#ff7a00,#ffb347);
+
+    color:#ffffff;
+
+    border-color:#ff7a00;
+
+    transform:translateY(-3px);
+
+    box-shadow:0 15px 30px rgba(255,122,0,.25);
+
+}
+
+.filter-bar button:active{
+
+    transform:scale(.96);
+
+}
+
+@media(max-width:768px){
+
+    .filter-bar{
+
+        gap:12px;
+
+        padding-bottom:5px;
+
+    }
+
+    .filter-bar button{
+
+        padding:12px 20px;
+
+        font-size:15px;
+
+    }
+
+}
+
+/*=========================================================
+            END OF PART 7
 =========================================================*/
