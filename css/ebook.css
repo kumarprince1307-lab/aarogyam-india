@@ -1191,42 +1191,6 @@ section{
 
 }
 
-.best-seller .section-title{
-
-    width:95%;
-
-    max-width:1300px;
-
-    margin:0 auto 35px;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-}
-
-.best-seller .section-title h2{
-
-    font-size:38px;
-
-    font-weight:700;
-
-    color:#222;
-
-}
-
-.best-seller .section-title a{
-
-    color:#ff7a00;
-
-    text-decoration:none;
-
-    font-weight:700;
-
-}
-
 .book-grid{
 
     width:95%;
@@ -1237,7 +1201,7 @@ section{
 
     display:grid;
 
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
 
     gap:30px;
 
@@ -1246,10 +1210,6 @@ section{
 .book-card{
 
     position:relative;
-
-    display:flex;
-
-    flex-direction:column;
 
     background:#ffffff;
 
@@ -1281,29 +1241,19 @@ section{
 
     left:15px;
 
-    z-index:5;
+    z-index:2;
 
 }
 
 .book-badge img{
 
-    width:70px;
-
-    display:block;
+    width:75px;
 
 }
 
 .book-image{
 
     width:100%;
-
-    height:320px;
-
-    object-fit:cover;
-
-    object-position:center;
-
-    display:block;
 
     border-radius:18px;
 
@@ -1323,8 +1273,6 @@ section{
 
     font-size:22px;
 
-    font-weight:700;
-
     color:#222;
 
     margin-bottom:8px;
@@ -1333,9 +1281,9 @@ section{
 
 .book-category{
 
-    font-size:15px;
-
     color:#777;
+
+    font-size:15px;
 
     margin-bottom:18px;
 
@@ -1355,7 +1303,7 @@ section{
 
 .new-price{
 
-    font-size:30px;
+    font-size:28px;
 
     font-weight:700;
 
@@ -1379,8 +1327,6 @@ section{
 
     gap:12px;
 
-    margin-top:auto;
-
 }
 
 .book-buttons a{
@@ -1389,15 +1335,13 @@ section{
 
     text-align:center;
 
-    padding:13px 0;
+    padding:12px 0;
 
     border-radius:12px;
 
     text-decoration:none;
 
-    font-size:16px;
-
-    font-weight:700;
+    font-weight:600;
 
     transition:.35s;
 
@@ -1405,11 +1349,11 @@ section{
 
 .book-buttons a:first-child{
 
-    background:#fff;
-
     border:2px solid #ff7a00;
 
     color:#ff7a00;
+
+    background:#fff;
 
 }
 
@@ -1427,43 +1371,7 @@ section{
 
 }
 
-/* Tablet */
-
-@media(max-width:992px){
-
-    .book-grid{
-
-        grid-template-columns:repeat(2,1fr);
-
-    }
-
-}
-
-/* Mobile */
-
 @media(max-width:768px){
-
-    .best-seller{
-
-        padding:50px 0;
-
-    }
-
-    .best-seller .section-title{
-
-        flex-direction:column;
-
-        align-items:flex-start;
-
-        gap:10px;
-
-    }
-
-    .best-seller .section-title h2{
-
-        font-size:30px;
-
-    }
 
     .book-grid{
 
@@ -1475,7 +1383,36 @@ section{
 
     .book-card{
 
-        padding:14px;
-            /*=========================================================
+        padding:15px;
+
+    }
+
+    .book-card h3{
+
+        font-size:18px;
+
+    }
+
+    .new-price{
+
+        font-size:22px;
+
+    }
+
+    .old-price{
+
+        font-size:15px;
+
+    }
+
+    .book-buttons{
+
+        flex-direction:column;
+
+    }
+
+}
+
+/*=========================================================
             END OF PART 8
 =========================================================*/
