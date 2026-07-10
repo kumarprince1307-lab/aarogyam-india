@@ -177,3 +177,192 @@ function initSmoothScroll(){
 /*=========================================================
                 END OF PART A
 =========================================================*/
+/*=========================================================
+                EBOOK.JS
+                  PART B
+     CATEGORY + FILTER + BOOK ACTIONS
+=========================================================*/
+
+/*=========================================================
+        CATEGORY MENU
+=========================================================*/
+
+function initCategoryMenu(){
+
+    const categoryBtn=document.querySelector('.mega-menu');
+
+    if(!categoryBtn) return;
+
+    categoryBtn.addEventListener('mouseenter',()=>{
+
+        categoryBtn.classList.add('active');
+
+    });
+
+    categoryBtn.addEventListener('mouseleave',()=>{
+
+        categoryBtn.classList.remove('active');
+
+    });
+
+}
+
+initCategoryMenu();
+
+/*=========================================================
+        FILTER BUTTONS
+=========================================================*/
+
+function initFilterBar(){
+
+    const buttons=document.querySelectorAll('.filter-bar button');
+
+    if(!buttons.length) return;
+
+    buttons.forEach(btn=>{
+
+        btn.addEventListener('click',()=>{
+
+            buttons.forEach(item=>{
+
+                item.classList.remove('active');
+
+            });
+
+            btn.classList.add('active');
+
+        });
+
+    });
+
+}
+
+initFilterBar();
+
+/*=========================================================
+        BOOK CARD HOVER
+=========================================================*/
+
+function initBookCards(){
+
+    const cards=document.querySelectorAll('.book-card');
+
+    if(!cards.length) return;
+
+    cards.forEach(card=>{
+
+        card.addEventListener('mouseenter',()=>{
+
+            card.classList.add('hover');
+
+        });
+
+        card.addEventListener('mouseleave',()=>{
+
+            card.classList.remove('hover');
+
+        });
+
+    });
+
+}
+
+initBookCards();
+
+/*=========================================================
+        FEATURED BOOK
+=========================================================*/
+
+function initFeaturedBook(){
+
+    const book=document.querySelector('.featured-book-card');
+
+    if(!book) return;
+
+    book.addEventListener('mouseenter',()=>{
+
+        book.classList.add('active');
+
+    });
+
+    book.addEventListener('mouseleave',()=>{
+
+        book.classList.remove('active');
+
+    });
+
+}
+
+initFeaturedBook();
+
+/*=========================================================
+        OFFER BANNER
+=========================================================*/
+
+function initOfferBanner(){
+
+    const banner=document.querySelector('.offer-banner');
+
+    if(!banner) return;
+
+    banner.addEventListener('click',()=>{
+
+        window.location.href='agriculture.html';
+
+    });
+
+}
+
+initOfferBanner();
+
+/*=========================================================
+        BUY BUTTONS
+=========================================================*/
+
+function initBuyButtons(){
+
+    const buttons=document.querySelectorAll('.buy-btn');
+
+    if(!buttons.length) return;
+
+    buttons.forEach(btn=>{
+
+        btn.addEventListener('click',()=>{
+
+            window.location.href='agriculture.html';
+
+        });
+
+    });
+
+}
+
+initBuyButtons();
+
+/*=========================================================
+        VIEW DETAILS
+=========================================================*/
+
+function initDetailsButtons(){
+
+    const buttons=document.querySelectorAll('.view-book-btn');
+
+    if(!buttons.length) return;
+
+    buttons.forEach(btn=>{
+
+        btn.addEventListener('click',()=>{
+
+            window.location.href='agriculture.html';
+
+        });
+
+    });
+
+}
+
+initDetailsButtons();
+
+/*=========================================================
+                END OF PART B
+=========================================================*/
