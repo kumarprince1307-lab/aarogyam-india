@@ -496,14 +496,6 @@ section{
     position:static;
 }
 
-.mega-menu::after{
-    content:"";
-    position:absolute;
-    left:0;
-    top:100%;
-    width:100%;
-    height:20px;
-}
 .mega-category-menu{
 
     position:fixed;
