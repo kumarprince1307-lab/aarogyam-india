@@ -518,8 +518,8 @@ section{
 
     transform:translateX(-50%);
 
-    width:1200px;
-
+    width:1400px;
+    max-width:96%
     background:#ffffff;
 
     border-radius:0 0 18px 18px;
@@ -562,7 +562,7 @@ section{
 
     gap:30px;
 
-    padding:35px;
+    padding:35px 45px;
 
 }
 
