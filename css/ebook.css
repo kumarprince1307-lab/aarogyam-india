@@ -492,7 +492,7 @@ section{
         PART 3 : PROFESSIONAL MEGA MENU
 =========================================================*/
 
- .mega-menu{
+.mega-menu{
     position:relative;
 }
 
@@ -506,11 +506,11 @@ section{
 
     transform:translateX(-50%);
 
-    width:95vw;
+    width:98vw;
 
-    max-width:1400px;
+    max-width:1500px;
 
-    min-width:1100px;
+    min-width:1200px;
 
     background:#fff;
 
@@ -608,7 +608,6 @@ section{
     }
 
 }
-
 /*=========================================================
         END OF PART 3
 =========================================================*/
