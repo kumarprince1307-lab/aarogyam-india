@@ -716,3 +716,81 @@ console.log(
 /*=========================================================
             END OF EBOOK.JS
 =========================================================*/
+/*=========================================================
+            PART E
+    STICKY BUY + BACK TO TOP
+=========================================================*/
+
+const stickyBuy = document.querySelector(".sticky-buy");
+const backTop = document.querySelector(".back-top");
+
+window.addEventListener("scroll", () => {
+
+    if (window.scrollY > 300) {
+
+        if (stickyBuy) {
+
+            stickyBuy.classList.add("show");
+
+        }
+
+        if (backTop) {
+
+            backTop.style.display = "flex";
+
+        }
+
+    } else {
+
+        if (stickyBuy) {
+
+            stickyBuy.classList.remove("show");
+
+        }
+
+        if (backTop) {
+
+            backTop.style.display = "none";
+
+        }
+
+    }
+
+});
+
+if (backTop) {
+
+    backTop.addEventListener("click", () => {
+
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+
+        });
+
+    });
+
+}
+
+/*=========================================================
+            MOBILE MENU
+=========================================================*/
+
+const menuBtn = document.querySelector(".menu-toggle");
+const navMenu = document.querySelector(".nav-menu");
+
+if (menuBtn && navMenu) {
+
+    menuBtn.addEventListener("click", () => {
+
+        navMenu.classList.toggle("active");
+
+    });
+
+}
+
+/*=========================================================
+            END PART E
+=========================================================*/
