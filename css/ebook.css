@@ -231,12 +231,12 @@ section{
         END OF PART 1
 =========================================================*/
 /*=========================================================
-        PART 2 : HEADER
+                PART 2 : HEADER
 =========================================================*/
 
 
 /*=========================================================
-        PART 2.1 : HEADER
+        2.1 HEADER
 =========================================================*/
 
 .ebook-header{
@@ -245,26 +245,24 @@ section{
 
     top:0;
 
-    left:0;
-
     width:100%;
 
     z-index:9999;
 
     background:linear-gradient(
         90deg,
-        #ffd89b 0%,
-        #ff9f1c 55%,
-        #d96b00 100%
+        #ffd79b 0%,
+        #ff9f1c 45%,
+        #d35400 100%
     );
 
-    box-shadow:0 8px 20px rgba(0,0,0,.12);
+    box-shadow:0 8px 25px rgba(0,0,0,.12);
 
 }
 
 
 /*=========================================================
-        PART 2.2 : HEADER CONTAINER
+        2.2 HEADER CONTAINER
 =========================================================*/
 
 .header-container{
@@ -273,36 +271,40 @@ section{
 
     margin:auto;
 
-    padding:12px 22px;
+    height:78px;
 
     display:flex;
 
-    justify-content:space-between;
-
     align-items:center;
 
+    justify-content:space-between;
+
     gap:30px;
+
+    padding:0 18px;
 
 }
 
 
 /*=========================================================
-        PART 2.3 : LOGO
+        2.3 LOGO
 =========================================================*/
 
 .logo{
 
-    flex-shrink:0;
+    display:flex;
+
+    align-items:center;
 
 }
 
 .logo img{
 
-    width:95px;
+    width:82px;
 
     height:auto;
 
-    transition:.35s;
+    transition:.30s;
 
 }
 
@@ -314,7 +316,7 @@ section{
 
 
 /*=========================================================
-        PART 2.4 : NAVIGATION
+        2.4 NAVIGATION
 =========================================================*/
 
 .ebook-navigation{
@@ -331,37 +333,39 @@ section{
 
     align-items:center;
 
-    gap:30px;
+    gap:34px;
 
 }
 
-.ebook-navigation ul li{
+.ebook-navigation li{
 
     position:relative;
 
 }
 
-.ebook-navigation ul li a{
+.ebook-navigation a{
+
+    color:#ffffff;
 
     font-size:15px;
 
     font-weight:600;
 
-    color:#ffffff;
+    letter-spacing:.3px;
 
     transition:.30s;
 
 }
 
-.ebook-navigation ul li a:hover{
+.ebook-navigation a:hover{
 
-    color:#fff8d6;
+    color:#fff3d2;
 
 }
 
 
 /*=========================================================
-        PART 2.5 : HEADER RIGHT
+        2.5 RIGHT SIDE
 =========================================================*/
 
 .header-right{
@@ -370,13 +374,13 @@ section{
 
     align-items:center;
 
-    gap:14px;
+    gap:12px;
 
 }
 
 
 /*=========================================================
-        PART 2.6 : HEADER ICON
+        2.6 ICONS
 =========================================================*/
 
 .header-icon{
@@ -395,7 +399,7 @@ section{
 
     background:rgba(255,255,255,.18);
 
-    backdrop-filter:blur(8px);
+    backdrop-filter:blur(12px);
 
     transition:.30s;
 
@@ -405,19 +409,21 @@ section{
 
     background:#ffffff;
 
+    transform:translateY(-2px);
+
 }
 
 .header-icon img{
 
-    width:20px;
+    width:18px;
 
-    height:20px;
+    height:18px;
 
 }
 
 
 /*=========================================================
-        PART 2.7 : CART
+        2.7 CART
 =========================================================*/
 
 .cart-icon{
@@ -430,21 +436,21 @@ section{
 
     position:absolute;
 
-    top:-6px;
+    top:-5px;
 
-    right:-6px;
+    right:-5px;
 
-    width:20px;
+    width:18px;
 
-    height:20px;
+    height:18px;
 
     border-radius:50%;
 
-    background:#ff2b2b;
+    background:#ff2d2d;
 
     color:#fff;
 
-    font-size:11px;
+    font-size:10px;
 
     font-weight:700;
 
@@ -458,26 +464,23 @@ section{
 
 
 /*=========================================================
-        PART 2.8 : MOBILE MENU
+        2.8 MOBILE BUTTON
 =========================================================*/
 
 .menu-button{
 
     display:none;
 
-    width:44px;
-
-    height:44px;
-
-    border-radius:10px;
-
-    background:rgba(255,255,255,.20);
-
 }
 
-.menu-button img{
 
-    width:22px;
+/*=========================================================
+        2.9 MEGA MENU
+=========================================================*/
+
+.mega-category-menu{
+
+    display:none;
 
 }
 
