@@ -775,26 +775,6 @@ if (backTop) {
 }
 
 /*=========================================================
-            MOBILE MENU
-=========================================================*/
-
-const menuBtn = document.querySelector(".menu-toggle");
-const navMenu = document.querySelector(".nav-menu");
-
-if (menuBtn && navMenu) {
-
-    menuBtn.addEventListener("click", () => {
-
-        navMenu.classList.toggle("active");
-
-    });
-
-}
-
-/*=========================================================
-            END PART E
-=========================================================*/
-/*=========================================================
                 MOBILE MENU
 =========================================================*/
 
