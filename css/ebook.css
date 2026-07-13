@@ -468,11 +468,17 @@ section{
 =========================================================*/
 
 .menu-button{
-
     display:none;
-
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:8px;
 }
 
+.menu-button img{
+    width:28px;
+    height:28px;
+}
 
 /*=========================================================
         2.9 MEGA MENU
@@ -1955,7 +1961,18 @@ height:30px;
 
 }
       @media (max-width:768px){
+.menu-button{
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    background:none;
+    border:none;
+    cursor:pointer;
+}
 
+.ebook-navigation{
+    display:none;
+}
 .sticky-buy{
 
     display:flex !important;
