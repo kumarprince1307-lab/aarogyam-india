@@ -503,374 +503,128 @@ stickyBuyBtn.style.transform="";
                 PART 1.4 END
 ========================================================== */
 /* ==========================================================
-                PART 1.5 START
-        FLOATING SHARE BAR JS
+            MASTER SHARE SYSTEM
 ========================================================== */
 
-/* =========================================
-        SHARE ELEMENTS
-========================================= */
+document.addEventListener("DOMContentLoaded", () => {
 
-const shareToggle=document.querySelector(".share-toggle");
+    const pageUrl = window.location.href;
 
-const shareIcons=document.querySelector(".share-icons");
+    const pageTitle = document.title;
 
-const stickyShareBtn=document.querySelector(".sticky-share-btn");
+    const shareText =
+`${pageTitle}
 
-/* =========================================
-        INITIAL STATE
-========================================= */
+${pageUrl}`;
 
-if(shareIcons){
+    /* ===========================
+        Desktop Buttons
+    =========================== */
 
-shareIcons.style.display="none";
+    const whatsappBtn = document.querySelector(".share-whatsapp");
 
-}
+    const facebookBtn = document.querySelector(".share-facebook");
 
-/* =========================================
-        SHARE TOGGLE
-========================================= */
+    const copyBtn = document.querySelector(".share-copy");
 
-function toggleShareBar(){
+    const mobileBtn = document.querySelector(".mobile-share-btn");
 
-if(!shareIcons) return;
+    /* ===========================
+        WhatsApp
+    =========================== */
 
-if(shareIcons.style.display==="flex"){
+    function shareWhatsApp(e){
 
-shareIcons.style.display="none";
+        if(e) e.preventDefault();
 
-}else{
+        window.open(
 
-shareIcons.style.display="flex";
+            "https://wa.me/?text="+encodeURIComponent(shareText),
 
-}
+            "_blank"
 
-}
+        );
 
-/* =========================================
-        FLOATING SHARE BUTTON
-========================================= */
+    }
 
-if(shareToggle){
+    /* ===========================
+        Facebook
+    =========================== */
 
-shareToggle.addEventListener("click",()=>{
+    function shareFacebook(e){
 
-toggleShareBar();
+        if(e) e.preventDefault();
+
+        window.open(
+
+            "https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(pageUrl),
+
+            "_blank"
+
+        );
+
+    }
+
+    /* ===========================
+        Copy Link
+    =========================== */
+
+    function copyLink(){
+
+        navigator.clipboard.writeText(pageUrl);
+
+        alert("✅ Link Copied");
+
+    }
+
+    /* ===========================
+        Mobile Share
+    =========================== */
+
+    function mobileShare(){
+
+        if(navigator.share){
+
+            navigator.share({
+
+                title:pageTitle,
+
+                text:pageTitle,
+
+                url:pageUrl
+
+            });
+
+        }else{
+
+            copyLink();
+
+        }
+
+    }
+
+    /* ===========================
+        Events
+    =========================== */
+
+    if(whatsappBtn)
+
+        whatsappBtn.addEventListener("click",shareWhatsApp);
+
+    if(facebookBtn)
+
+        facebookBtn.addEventListener("click",shareFacebook);
+
+    if(copyBtn)
+
+        copyBtn.addEventListener("click",copyLink);
+
+    if(mobileBtn)
+
+        mobileBtn.addEventListener("click",mobileShare);
 
 });
 
-}
-
-/* =========================================
-        STICKY SHARE BUTTON
-========================================= */
-
-if(stickyShareBtn){
-
-stickyShareBtn.addEventListener("click",()=>{
-
-toggleShareBar();
-
-});
-
-}
-
-/* =========================================
-        CLOSE ON OUTSIDE CLICK
-========================================= */
-
-document.addEventListener("click",(event)=>{
-
-if(!shareIcons || !shareToggle) return;
-
-const clickedInside=
-
-shareIcons.contains(event.target) ||
-
-shareToggle.contains(event.target) ||
-
-(stickyShareBtn && stickyShareBtn.contains(event.target));
-
-if(!clickedInside){
-
-shareIcons.style.display="none";
-
-}
-
-});
-
-/* =========================================
-        ESC KEY CLOSE
-========================================= */
-
-document.addEventListener("keydown",(event)=>{
-
-if(event.key==="Escape"){
-
-if(shareIcons){
-
-shareIcons.style.display="none";
-
-}
-
-}
-
-});
-
-/* ==========================================================
-                PART 1.5 END
-========================================================== */\/* ==========================================================
-                PART 1.6 START
-        SHARE BUTTON FUNCTIONALITY
-========================================================== */
-
-/* =========================================
-        SHARE BUTTONS
-========================================= */
-
-const whatsappBtn=document.querySelector(".popup-whatsapp");
-
-const facebookBtn=document.querySelector(".popup-facebook");
-
-const copyBtn=document.querySelector(".popup-copy");
-
-/* =========================================
-        CURRENT PAGE
-========================================= */
-
-const currentUrl=window.location.href;
-
-const bookTitle="खरीफ फसल मास्टर गाइड 2026";
-
-const shareText=
-
-`📘 ${bookTitle}
-
-🌾 खरीफ खेती की सम्पूर्ण Practical Guide
-
-👉 ${currentUrl}`;
-
-/* =========================================
-        WHATSAPP SHARE
-========================================= */
-
-if(whatsappBtn){
-
-whatsappBtn.addEventListener("click",()=>{
-
-window.open(
-
-"https://wa.me/?text="+
-
-encodeURIComponent(shareText),
-
-"_blank"
-
-);
-
-});
-
-}
-
-/* =========================================
-        FACEBOOK SHARE
-========================================= */
-
-if(facebookBtn){
-
-facebookBtn.addEventListener("click",()=>{
-
-window.open(
-
-"https://www.facebook.com/sharer/sharer.php?u="+
-
-encodeURIComponent(currentUrl),
-
-"_blank"
-
-);
-
-});
-
-}
-
-/* =========================================
-        COPY LINK
-========================================= */
-
-if(copyBtn){
-
-copyBtn.addEventListener("click",()=>{
-
-navigator.clipboard.writeText(currentUrl)
-
-.then(()=>{
-
-copyBtn.innerHTML=
-
-'<i class="fa-solid fa-circle-check"></i> Link Copied';
-
-setTimeout(()=>{
-
-copyBtn.innerHTML=
-
-'<i class="fa-solid fa-link"></i> Copy Link';
-
-},2000);
-
-})
-
-.catch(()=>{
-
-alert("Link Copy Failed");
-
-});
-
-});
-
-}
-
-/* ==========================================================
-                PART 1.6 END
-========================================================== */
-/* ==========================================================
-                PART 1.7 START
-        SHARE POPUP + OVERLAY SYSTEM
-========================================================== */
-
-/* =========================================
-        POPUP ELEMENTS
-========================================= */
-
-const popupOverlay=document.querySelector(".popup-overlay");
-
-const sharePopup=document.querySelector(".share-popup");
-
-const popupCloseButtons=document.querySelectorAll(".popup-close");
-
-const floatingShareButton=document.querySelector(".share-toggle");
-
-const stickyShareButton=document.querySelector(".sticky-share-btn");
-
-/* =========================================
-        OPEN SHARE POPUP
-========================================= */
-
-function openSharePopup(){
-
-if(!popupOverlay || !sharePopup) return;
-
-popupOverlay.style.display="block";
-
-sharePopup.style.display="block";
-
-document.body.style.overflow="hidden";
-
-}
-
-/* =========================================
-        CLOSE SHARE POPUP
-========================================= */
-
-function closeSharePopup(){
-
-if(!popupOverlay || !sharePopup) return;
-
-popupOverlay.style.display="none";
-
-sharePopup.style.display="none";
-
-document.body.style.overflow="";
-
-}
-
-/* =========================================
-        FLOATING SHARE
-========================================= */
-
-if(floatingShareButton){
-
-floatingShareButton.addEventListener(
-
-"click",
-
-openSharePopup
-
-);
-
-}
-
-/* =========================================
-        STICKY SHARE
-========================================= */
-
-if(stickyShareButton){
-
-stickyShareButton.addEventListener(
-
-"click",
-
-openSharePopup
-
-);
-
-}
-
-/* =========================================
-        CLOSE BUTTON
-========================================= */
-
-popupCloseButtons.forEach((button)=>{
-
-button.addEventListener(
-
-"click",
-
-closeSharePopup
-
-);
-
-});
-
-/* =========================================
-        CLICK OVERLAY
-========================================= */
-
-if(popupOverlay){
-
-popupOverlay.addEventListener(
-
-"click",
-
-closeSharePopup
-
-);
-
-}
-
-/* =========================================
-        ESC CLOSE
-========================================= */
-
-document.addEventListener(
-
-"keydown",
-
-(event)=>{
-
-if(event.key==="Escape"){
-
-closeSharePopup();
-
-}
-
-}
-
-);
-
-/* ==========================================================
-                PART 1.7 END
-========================================================== */
 /* ==========================================================
                 PART 1.8 START
     INTEREST FORM + FINAL INITIALIZATION
