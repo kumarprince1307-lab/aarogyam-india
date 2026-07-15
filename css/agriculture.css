@@ -1,0 +1,855 @@
+/* ==========================================================
+                    HERO BANNER START
+                 PART 2.1 : SLIDER LAYOUT
+========================================================== */
+
+/* Hero Section */
+
+.hero-slider{
+
+    width:100%;
+
+    margin: 25px;auto;
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+/* Slider Container */
+
+.hero-slider-container{
+
+    width:100%;
+
+    position:relative;
+
+}
+
+/* Hero Slide */
+
+.hero-slide{
+
+    display:none;
+
+    position:relative;
+
+    width:100%;
+
+    animation:heroFade .6s ease-in-out;
+
+}
+
+/* Active Slide */
+
+.hero-slide.active{
+
+    display:block;
+
+}
+
+/* Banner Image */
+
+.hero-slide img{
+
+    width:100%;
+
+    display:block;
+
+    border-radius:18px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+
+}
+
+/* Fade Animation */
+
+@keyframes heroFade{
+
+    from{
+
+        opacity:.3;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+/* ==========================================================
+                HERO BANNER PART 2.1 END
+========================================================== */
+/* ==========================================================
+                HERO BANNER PART 2.2
+        BUTTONS • ARROWS • DOTS
+========================================================== */
+
+/* Hero Buttons */
+
+.hero-buttons{
+
+    position:absolute;
+
+    bottom:7%;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    display:flex;
+
+    gap:12px;
+
+    z-index:100;
+
+}
+
+/* Common Button */
+
+.hero-btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-width:150px;
+
+    height:46px;
+
+    padding:0 22px;
+
+    border-radius:10px;
+
+    text-decoration:none;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.30s ease;
+
+    cursor:pointer;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.18);
+
+}
+
+/* Sample Book */
+
+.sample-btn{
+
+    background:#ffffff;
+
+    color:#222;
+
+}
+
+.sample-btn:hover{
+
+    background:#f4f4f4;
+
+    transform:translateY(-2px);
+
+}
+
+/* Buy Now */
+
+.buy-btn{
+
+    background:#ff9800;
+
+    color:#fff;
+
+}
+
+.buy-btn:hover{
+
+    background:#e68900;
+
+    transform:translateY(-2px);
+
+}
+
+/* Previous */
+
+.hero-prev,
+
+.hero-next{
+
+    position:absolute;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    width:46px;
+
+    height:46px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.90);
+
+    cursor:pointer;
+
+    font-size:22px;
+
+    transition:.30s;
+
+    z-index:120;
+
+}
+
+.hero-prev{
+
+    left:18px;
+
+}
+
+.hero-next{
+
+    right:18px;
+
+}
+
+.hero-prev:hover,
+
+.hero-next:hover{
+
+    background:#ffffff;
+
+    transform:translateY(-50%) scale(1.08);
+
+}
+
+/* Dots */
+
+.hero-dots{
+
+    position:absolute;
+
+    bottom:18px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    display:flex;
+
+    gap:10px;
+
+    z-index:120;
+
+}
+
+.hero-dot{
+
+    width:12px;
+
+    height:12px;
+
+    border-radius:50%;
+
+    background:#d5d5d5;
+
+    cursor:pointer;
+
+    transition:.30s;
+
+}
+
+.hero-dot.active{
+
+    width:34px;
+
+    border-radius:20px;
+
+    background:#ff9800;
+
+}
+
+/* ==========================================================
+                HERO BANNER PART 2.2 END
+========================================================== */
+/* ==========================================================
+                HERO BANNER PART 2.3
+                RESPONSIVE DESIGN
+========================================================== */
+
+/* ==========================
+        Tablet
+========================== */
+
+@media (max-width:992px){
+
+.hero-slider{
+
+    margin:20px auto;
+
+}
+
+.hero-slide img{
+
+    border-radius:14px;
+
+}
+
+.hero-buttons{
+
+    bottom:6%;
+
+    gap:10px;
+
+}
+
+.hero-btn{
+
+    min-width:135px;
+
+    height:42px;
+
+    font-size:14px;
+
+    padding:0 18px;
+
+}
+
+.hero-prev,
+
+.hero-next{
+
+    width:40px;
+
+    height:40px;
+
+    font-size:20px;
+
+}
+
+.hero-dot{
+
+    width:10px;
+
+    height:10px;
+
+}
+
+.hero-dot.active{
+
+    width:28px;
+
+}
+
+}
+
+
+/* ==========================
+        Mobile
+========================== */
+
+@media (max-width:768px){
+
+.hero-slider{
+
+    margin:15px auto;
+
+}
+
+.hero-slide img{
+
+    border-radius:12px;
+
+}
+
+.hero-buttons{
+
+    width:100%;
+
+    bottom:5%;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    justify-content:center;
+
+    gap:8px;
+
+}
+
+.hero-btn{
+
+    min-width:120px;
+
+    height:38px;
+
+    padding:0 14px;
+
+    font-size:13px;
+
+    border-radius:8px;
+
+}
+
+.hero-prev,
+
+.hero-next{
+
+    width:34px;
+
+    height:34px;
+
+    font-size:16px;
+
+}
+
+.hero-prev{
+
+    left:8px;
+
+}
+
+.hero-next{
+
+    right:8px;
+
+}
+
+.hero-dots{
+
+    bottom:10px;
+
+}
+
+.hero-dot{
+
+    width:8px;
+
+    height:8px;
+
+}
+
+.hero-dot.active{
+
+    width:22px;
+
+}
+
+}
+
+
+/* ==========================
+        Small Mobile
+========================== */
+
+@media (max-width:480px){
+
+.hero-buttons{
+
+    flex-direction:row;
+
+    gap:6px;
+
+}
+
+.hero-btn{
+
+    min-width:105px;
+
+    height:34px;
+
+    font-size:12px;
+
+    padding:0 10px;
+
+}
+
+.hero-slide img{
+
+    border-radius:10px;
+
+}
+
+.hero-prev,
+
+.hero-next{
+
+    display:none;
+
+}
+
+}
+
+/* ==========================================================
+                HERO BANNER END
+========================================================== */
+/* ==========================================================
+                PART 3 START
+             AVAILABLE EBOOKS CSS
+========================================================== */
+
+/* Section */
+
+.available-books{
+
+    padding:70px 20px;
+
+    background:#fafafa;
+
+}
+
+/* Container */
+
+.available-books .container{
+
+    max-width:1300px;
+
+    margin:auto;
+
+}
+
+/* Heading */
+
+.section-heading{
+
+    text-align:center;
+
+    margin-bottom:45px;
+
+}
+
+.section-heading h2{
+
+    font-size:36px;
+
+    font-weight:700;
+
+    color:#222;
+
+    margin-bottom:12px;
+
+}
+
+.section-heading p{
+
+    font-size:18px;
+
+    color:#666;
+
+}
+
+/* Grid */
+
+.books-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:30px;
+
+}
+
+/* Book Card */
+
+.book-card{
+
+    background:#fff;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    position:relative;
+
+    transition:.35s ease;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.book-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 18px 40px rgba(0,0,0,.15);
+
+}
+
+/* Badge */
+
+.book-badge{
+
+    position:absolute;
+
+    top:15px;
+
+    left:15px;
+
+    background:#ff9800;
+
+    color:#fff;
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    z-index:5;
+
+}
+
+/* Book Image */
+
+.book-card img{
+
+    width:100%;
+
+    display:block;
+
+    transition:.4s;
+
+}
+
+.book-card:hover img{
+
+    transform:scale(1.05);
+
+}
+
+/* Content */
+
+.book-content{
+
+    padding:22px;
+
+}
+
+.book-content h3{
+
+    font-size:24px;
+
+    color:#222;
+
+    margin-bottom:10px;
+
+}
+
+.book-content h4{
+
+    font-size:16px;
+
+    color:#4d4d4d;
+
+    margin-bottom:15px;
+
+}
+
+.book-content p{
+
+    font-size:15px;
+
+    line-height:1.7;
+
+    color:#666;
+
+    margin-bottom:18px;
+
+}
+
+/* Price */
+
+.book-price{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    margin-bottom:20px;
+
+}
+
+.mrp{
+
+    text-decoration:line-through;
+
+    color:#888;
+
+    font-size:18px;
+
+}
+
+.offer-price{
+
+    color:#e65100;
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+/* Buttons */
+
+.book-buttons{
+
+    display:flex;
+
+    gap:12px;
+
+    margin-bottom:18px;
+
+}
+
+.book-buttons a{
+
+    flex:1;
+
+    text-align:center;
+
+    text-decoration:none;
+
+    padding:12px;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.sample-btn{
+
+    background:#fff;
+
+    color:#333;
+
+    border:1px solid #ddd;
+
+}
+
+.sample-btn:hover{
+
+    background:#f5f5f5;
+
+}
+
+.buy-btn{
+
+    background:#ff9800;
+
+    color:#fff;
+
+}
+
+.buy-btn:hover{
+
+    background:#e68900;
+
+}
+
+/* Share */
+
+.share-btn{
+
+    display:inline-block;
+
+    text-decoration:none;
+
+    color:#0d6efd;
+
+    font-size:15px;
+
+    font-weight:600;
+
+}
+
+.share-btn:hover{
+
+    color:#084298;
+
+}
+
+/* ==========================================================
+                RESPONSIVE
+========================================================== */
+
+@media(max-width:992px){
+
+.books-grid{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.books-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.section-heading h2{
+
+    font-size:28px;
+
+}
+
+.book-content h3{
+
+    font-size:22px;
+
+}
+
+.book-buttons{
+
+    flex-direction:column;
+
+}
+
+}
+
+/* ==========================================================
+                PART 3 END
+========================================================== *
+/* =========================================
+        CARD ANIMATION
+========================================= */
+
+.book-hidden{
+
+    opacity:0;
+
+    transform:translateY(40px);
+
+    transition:all .6s ease;
+
+}
+
+.show-book{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
