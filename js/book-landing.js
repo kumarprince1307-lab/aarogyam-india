@@ -916,3 +916,226 @@ alert("Link Copied Successfully");
 /* ==========================================================
             PART 2.3 END
 ========================================================== */
+/* ==========================================================
+        MASTER SHARE & STICKY SYSTEM
+                JS PART 1
+========================================================== */
+
+/* ===============================
+        ELEMENTS
+================================ */
+
+const helpButton=document.getElementById("helpButton");
+
+const mobileShareButton=document.getElementById("mobileShareButton");
+
+const shareData=document.getElementById("book-share-data");
+
+/* ===============================
+        BOOK DATA
+================================ */
+
+const bookTitle=shareData.dataset.title;
+
+const bookDescription=shareData.dataset.description;
+
+const bookPrice=shareData.dataset.price;
+
+const bookUrl=shareData.dataset.url;
+
+/* ===============================
+        HELP BUTTON
+================================ */
+
+if(helpButton){
+
+helpButton.addEventListener("click",(e)=>{
+
+e.preventDefault();
+
+const message=
+
+`नमस्ते,
+
+मुझे "${bookTitle}" के बारे में जानकारी चाहिए।
+
+${bookUrl}`;
+
+window.open(
+
+"https://wa.me/917974422572?text="+
+
+encodeURIComponent(message),
+
+"_blank"
+
+);
+
+});
+
+}
+
+/* ===============================
+        MOBILE SHARE
+================================ */
+
+if(mobileShareButton){
+
+mobileShareButton.addEventListener("click",async()=>{
+
+if(navigator.share){
+
+try{
+
+await navigator.share({
+
+title:bookTitle,
+
+text:
+
+`${bookDescription}
+
+💰 ऑफर : ${bookPrice}`,
+
+url:bookUrl
+
+});
+
+}catch(err){
+
+console.log("Share Cancelled");
+
+}
+
+}else{
+
+navigator.clipboard.writeText(bookUrl);
+
+alert("Link Copied");
+
+}
+
+});
+
+}
+
+/* ==========================================================
+                PART 3C PART 1 END
+========================================================== */
+/* ==========================================================
+        MASTER SHARE & STICKY SYSTEM
+                JS PART 2
+========================================================== */
+
+/* ===============================
+        DESKTOP BUTTONS
+================================ */
+
+const desktopWhatsapp =
+document.querySelector(".share-whatsapp");
+
+const desktopFacebook =
+document.querySelector(".share-facebook");
+
+const desktopCopy =
+document.querySelector(".share-copy");
+
+/* ===============================
+        SHARE MESSAGE
+================================ */
+
+const shareMessage =
+
+`📖 ${bookTitle}
+
+${bookDescription}
+
+💰 Limited Time Offer : ${bookPrice}
+
+👇 अभी देखें
+
+${bookUrl}`;
+
+/* ===============================
+        WHATSAPP
+================================ */
+
+if(desktopWhatsapp){
+
+desktopWhatsapp.addEventListener("click",()=>{
+
+window.open(
+
+"https://wa.me/?text="+
+
+encodeURIComponent(shareMessage),
+
+"_blank"
+
+);
+
+});
+
+}
+
+/* ===============================
+        FACEBOOK
+================================ */
+
+if(desktopFacebook){
+
+desktopFacebook.addEventListener("click",()=>{
+
+window.open(
+
+"https://www.facebook.com/sharer/sharer.php?u="+
+
+encodeURIComponent(bookUrl),
+
+"_blank"
+
+);
+
+});
+
+}
+
+/* ===============================
+        COPY LINK
+================================ */
+
+if(desktopCopy){
+
+desktopCopy.addEventListener("click",()=>{
+
+navigator.clipboard.writeText(bookUrl)
+
+.then(()=>{
+
+desktopCopy.innerHTML=
+
+'<i class="fa-solid fa-circle-check"></i> Copied';
+
+setTimeout(()=>{
+
+desktopCopy.innerHTML=
+
+'<i class="fa-solid fa-link"></i> Copy Link';
+
+},2000);
+
+})
+
+.catch(()=>{
+
+alert("Link Copy Failed");
+
+});
+
+});
+
+}
+
+/* ==========================================================
+                PART 3C PART 2 END
+========================================================== */
