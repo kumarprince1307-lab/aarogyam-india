@@ -611,37 +611,165 @@ section{
         HERO BUTTONS + FEATURES + TRUST BAR
 ========================================================== */
 
-/* ===========================
-        HERO BUTTONS
-=========================== */
+/* ==========================================================
+            PART 2.2 START
+        HERO ACTION BUTTONS CSS
+========================================================== */
 
-.hero-buttons{
+.hero-action-buttons{
 
     display:flex;
 
-    gap:18px;
+    gap:15px;
+
+    margin-top:25px;
 
     flex-wrap:wrap;
 
-    margin-bottom:35px;
+    align-items:center;
 
 }
 
-.hero-buttons .sample-btn,
-.hero-buttons .buy-btn{
+.hero-action-buttons a,
+.hero-action-buttons button{
+
+    flex:1;
 
     min-width:180px;
 
-    min-height:56px;
+    height:58px;
 
-    font-size:1rem;
+    border:none;
 
-    border-radius:12px;
+    border-radius:14px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    text-decoration:none;
+
+    cursor:pointer;
+
+    transition:.35s;
 
     box-shadow:0 10px 25px rgba(0,0,0,.12);
 
 }
 
+/* ==========================
+        FREE SAMPLE
+========================== */
+
+.sample-btn{
+
+    background:#16a34a;
+
+    color:#fff;
+
+}
+
+.sample-btn:hover{
+
+    transform:translateY(-3px);
+
+}
+
+/* ==========================
+        BUY NOW
+========================== */
+
+.buy-btn{
+
+    background:#ff8a00;
+
+    color:#fff;
+
+}
+
+.buy-btn:hover{
+
+    transform:translateY(-3px);
+
+}
+
+/* ==========================
+        SHARE NOW
+========================== */
+
+.share-now-btn{
+
+    background:#1565c0;
+
+    color:#fff;
+
+}
+
+.share-now-btn:hover{
+
+    transform:translateY(-3px);
+
+}
+
+/* ==========================
+        TABLET
+========================== */
+
+@media(max-width:992px){
+
+.hero-action-buttons{
+
+    gap:12px;
+
+}
+
+.hero-action-buttons a,
+.hero-action-buttons button{
+
+    min-width:160px;
+
+}
+
+}
+
+/* ==========================
+        MOBILE
+========================== */
+
+@media(max-width:768px){
+
+.hero-action-buttons{
+
+    flex-direction:column;
+
+}
+
+.hero-action-buttons a,
+.hero-action-buttons button{
+
+    width:100%;
+
+    min-width:100%;
+
+    height:54px;
+
+    font-size:16px;
+
+}
+
+}
+
+/* ==========================================================
+            PART 2.2 END
+========================================================== */
 /* ===========================
         HERO FEATURES
 =========================== */
@@ -1940,271 +2068,6 @@ section{
 
 }
 
-/*==============================
-        STICKY BUY BAR
-==============================*/
-
-.sticky-buy-bar{
-
-    position:fixed;
-
-    bottom:0;
-
-    left:0;
-
-    width:100%;
-
-    background:#ffffff;
-
-    box-shadow:0 -6px 25px rgba(0,0,0,.15);
-
-    padding:12px 20px;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    z-index:999;
-
-}
-
-.sticky-book{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:15px;
-
-}
-
-.sticky-book img{
-
-    width:55px;
-
-    border-radius:8px;
-
-}
-
-.sticky-book-info h4{
-
-    font-size:15px;
-
-}
-
-.sticky-book-info span{
-
-    text-decoration:line-through;
-
-    color:#888;
-
-}
-
-.sticky-book-info strong{
-
-    display:block;
-
-    color:#F57C00;
-
-    font-size:20px;
-
-}
-
-.sticky-actions{
-
-    display:flex;
-
-    gap:15px;
-
-}
-
-/* ==========================================================
-        MASTER SHARE SYSTEM CSS
-========================================================== */
-
-/* ---------- Desktop Floating Share ---------- */
-
-.master-share{
-
-    position:fixed;
-
-    right:20px;
-
-    top:50%;
-
-    transform:translateY(-50%);
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:12px;
-
-    z-index:999;
-
-}
-
-.share-btn{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    min-width:170px;
-
-    padding:14px 18px;
-
-    border:none;
-
-    border-radius:12px;
-
-    background:#ffffff;
-
-    color:#333;
-
-    cursor:pointer;
-
-    text-decoration:none;
-
-    font-weight:600;
-
-    box-shadow:0 8px 25px rgba(0,0,0,.12);
-
-    transition:.30s;
-
-}
-
-.share-btn:hover{
-
-    transform:translateX(-6px);
-
-}
-
-/* ---------- WhatsApp ---------- */
-
-.share-whatsapp{
-
-    color:#25D366;
-
-}
-
-/* ---------- Facebook ---------- */
-
-.share-facebook{
-
-    color:#1877F2;
-
-}
-
-/* ---------- Copy ---------- */
-
-.share-copy{
-
-    color:#ff9800;
-
-}
-
-/* ---------- Mobile Share Button ---------- */
-
-.mobile-share-btn{
-
-    display:none;
-
-    position:fixed;
-
-    right:18px;
-
-    bottom:95px;
-
-    width:60px;
-
-    height:60px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:#ff9800;
-
-    color:#fff;
-
-    font-size:22px;
-
-    cursor:pointer;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.20);
-
-    z-index:1000;
-
-}
-
-/* ---------- Sticky Buy ---------- */
-
-.sticky-buy-bar{
-
-    z-index:998;
-
-}
-
-/* ---------- Tablet ---------- */
-
-@media(max-width:991px){
-
-.master-share{
-
-    right:15px;
-
-}
-
-.share-btn{
-
-    min-width:150px;
-
-}
-
-}
-
-/* ---------- Mobile ---------- */
-
-@media(max-width:768px){
-
-.master-share{
-
-    display:none;
-
-}
-
-.mobile-share-btn{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-}
-
-}
-
-/* ---------- Small Mobile ---------- */
-
-@media(max-width:480px){
-
-.mobile-share-btn{
-
-    width:56px;
-
-    height:56px;
-
-    font-size:20px;
-
-}
-
-}
 
 .interest-form{
 
@@ -2321,3 +2184,343 @@ section{
 /* ==========================================================
                 PART 1.8 END
 ========================================================== */
+/* ==========================================================
+        MASTER SHARE & STICKY SYSTEM
+                CSS PART 1
+========================================================== */
+
+/* ===============================
+   DESKTOP SHARE BAR
+================================ */
+
+.desktop-share-bar{
+
+    position:fixed;
+
+    right:20px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    z-index:999;
+
+}
+
+/* ===============================
+   SHARE BUTTON
+================================ */
+
+.desktop-share-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    width:170px;
+
+    height:52px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    color:#fff;
+
+    transition:.30s;
+
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
+
+}
+
+.desktop-share-btn:hover{
+
+    transform:translateX(-6px);
+
+}
+
+/* ===============================
+   COLORS
+================================ */
+
+.share-whatsapp{
+
+    background:#25D366;
+
+}
+
+.share-facebook{
+
+    background:#1877F2;
+
+}
+
+.share-copy{
+
+    background:#ff9800;
+
+}
+
+/* ===============================
+   SHARE TITLE
+================================ */
+
+.share-title{
+
+    background:#ffffff;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    padding:12px;
+
+    font-weight:700;
+
+    color:#333;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
+
+}
+
+/* ===============================
+   MOBILE STICKY BAR
+================================ */
+
+.mobile-sticky-bar{
+
+    position:fixed;
+
+    left:0;
+
+    bottom:0;
+
+    width:100%;
+
+    background:#ffffff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:10px;
+
+    box-shadow:0 -5px 20px rgba(0,0,0,.15);
+
+    z-index:999;
+
+}
+/* ==========================================================
+        MASTER SHARE & STICKY SYSTEM
+                CSS PART 2
+========================================================== */
+
+/* ===============================
+        HELP BUTTON
+================================ */
+
+.sticky-help-btn{
+
+    width:70px;
+
+    height:52px;
+
+    border-radius:12px;
+
+    background:#16a34a;
+
+    color:#fff;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
+    flex-shrink:0;
+
+}
+
+/* ===============================
+      BOOK PREVIEW
+================================ */
+
+.mobile-book-preview{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    flex:1;
+
+    margin:0 10px;
+
+}
+
+.mobile-book-preview img{
+
+    width:46px;
+
+    height:60px;
+
+    border-radius:8px;
+
+    object-fit:cover;
+
+}
+
+.mobile-book-info h4{
+
+    font-size:13px;
+
+    margin:0;
+
+    line-height:1.3;
+
+    color:#222;
+
+}
+
+.mobile-book-price{
+
+    margin-top:4px;
+
+}
+
+.old-price{
+
+    color:#888;
+
+    text-decoration:line-through;
+
+    margin-right:6px;
+
+    font-size:12px;
+
+}
+
+.offer-price{
+
+    color:#e65100;
+
+    font-size:16px;
+
+    font-weight:700;
+
+}
+
+/* ===============================
+        SHARE BUTTON
+================================ */
+
+.sticky-share-btn{
+
+    width:85px;
+
+    height:52px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#1565c0;
+
+    color:#fff;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    flex-shrink:0;
+
+}
+
+/* ===============================
+        BUY BUTTON
+================================ */
+
+.sticky-buy-btn{
+
+    width:100px;
+
+    height:52px;
+
+    border-radius:12px;
+
+    background:#ff8a00;
+
+    color:#fff;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
+    flex-shrink:0;
+
+}
+
+/* ===============================
+      RESPONSIVE
+================================ */
+
+@media(max-width:768px){
+
+.desktop-share-bar{
+
+    display:none;
+
+}
+
+.mobile-sticky-bar{
+
+    display:flex;
+
+}
+
+}
+
+@media(min-width:769px){
+
+.mobile-sticky-bar{
+
+    display:none;
+
+}
+
+}

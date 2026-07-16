@@ -790,3 +790,129 @@ console.log(
                 PART 1.8 END
         BOOK LANDING JS COMPLETE
 ========================================================== */
+/* ==========================================================
+            PART 2.3 START
+        HERO SHARE BUTTON JS
+========================================================== */
+
+const heroShareBtn = document.querySelector(".share-now-btn");
+
+const shareTitle = "खरीफ फसल मास्टर गाइड 2026";
+
+const shareText =
+`🌾 खरीफ फसल मास्टर गाइड 2026
+
+📘 धान, सोयाबीन, मक्का सहित खरीफ फसलों की सम्पूर्ण Practical Guide।
+
+💰 सीमित समय के लिए ₹299 की जगह ₹99
+
+👇 अभी देखें`;
+
+const shareUrl = window.location.href;
+
+/* =========================================
+        SHARE NOW
+========================================= */
+
+if(heroShareBtn){
+
+heroShareBtn.addEventListener("click",async()=>{
+
+if(navigator.share){
+
+try{
+
+await navigator.share({
+
+title:shareTitle,
+
+text:shareText,
+
+url:shareUrl
+
+});
+
+}catch(error){
+
+console.log("Share Cancelled");
+
+}
+
+}else{
+
+navigator.clipboard.writeText(shareUrl);
+
+alert("Link Copied Successfully");
+
+}
+
+});
+
+}
+
+/* ==========================================================
+            PART 2.3 END
+========================================================== */
+/* ==========================================================
+            PART 2.3 START
+        HERO SHARE BUTTON JS
+========================================================== */
+
+const heroShareBtn = document.querySelector(".share-now-btn");
+
+const shareTitle = "खरीफ फसल मास्टर गाइड 2026";
+
+const shareText =
+`🌾 खरीफ फसल मास्टर गाइड 2026
+
+📘 धान, सोयाबीन, मक्का सहित खरीफ फसलों की सम्पूर्ण Practical Guide।
+
+💰 सीमित समय के लिए ₹299 की जगह ₹99
+
+👇 अभी देखें`;
+
+const shareUrl = window.location.href;
+
+/* =========================================
+        SHARE NOW
+========================================= */
+
+if(heroShareBtn){
+
+heroShareBtn.addEventListener("click",async()=>{
+
+if(navigator.share){
+
+try{
+
+await navigator.share({
+
+title:shareTitle,
+
+text:shareText,
+
+url:shareUrl
+
+});
+
+}catch(error){
+
+console.log("Share Cancelled");
+
+}
+
+}else{
+
+navigator.clipboard.writeText(shareUrl);
+
+alert("Link Copied Successfully");
+
+}
+
+});
+
+}
+
+/* ==========================================================
+            PART 2.3 END
+========================================================== */
