@@ -1,1 +1,205 @@
+<!DOCTYPE html>
+<html lang="hi">
 
+<head>
+
+    <!-- ==========================================
+         AAROGYAM INDIA
+         Universal Demo Book
+         File : demo-book.html
+         Version : 2.0
+         Status : HTML
+    =========================================== -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Demo Book | Aarogyam India</title>
+
+    <link rel="stylesheet" href="../css/demo-book.css">
+
+</head>
+
+<body>
+
+<!-- ==========================================
+SECTION 01
+HEADER
+========================================== -->
+
+<header id="demoHeader">
+
+    <button id="backButton">
+        ← Back
+    </button>
+
+    <h1>Aarogyam India</h1>
+
+</header>
+
+
+<!-- ==========================================
+SECTION 02
+BOOK INFORMATION
+========================================== -->
+
+<section id="bookInfo">
+
+    <img id="bookCover" alt="Book Cover">
+
+    <h2 id="bookTitle"></h2>
+
+    <p id="bookAuthor"></p>
+
+    <p id="bookDescription"></p>
+
+</section>
+
+
+<!-- ==========================================
+SECTION 03
+BOOK PREVIEW
+========================================== -->
+
+<section id="previewSection">
+
+    <h2>Preview</h2>
+
+    <div id="previewGallery">
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================
+SECTION 04
+GET STARTED
+========================================== -->
+
+<section id="registrationSection">
+
+    <h2>Get Started</h2>
+
+    <form id="demoForm">
+
+        <input
+            type="text"
+            id="userName"
+            placeholder="Full Name">
+
+        <input
+            type="tel"
+            id="mobileNumber"
+            placeholder="Mobile Number">
+
+        <input
+            type="text"
+            id="state"
+            placeholder="State">
+
+        <input
+            type="text"
+            id="district"
+            placeholder="District">
+
+        <input
+            type="text"
+            id="occupation"
+            placeholder="Occupation">
+
+        <button type="submit">
+            Continue
+        </button>
+
+    </form>
+
+</section>
+
+
+<!-- ==========================================
+SECTION 05
+PDF VIEWER
+========================================== -->
+
+<section id="pdfSection">
+
+    <iframe
+
+        id="pdfViewer"
+
+        width="100%"
+
+        height="700">
+
+    </iframe>
+
+</section>
+
+
+<!-- ==========================================
+SECTION 06
+BUY NOW
+========================================== -->
+
+<section id="buySection">
+
+    <h2 id="bookPrice"></h2>
+
+    <button id="buyNowButton">
+
+        Buy Now
+
+    </button>
+
+</section>
+
+<!-- ==========================================
+FLOATING ACTION BUTTONS
+========================================== -->
+
+<div id="floatingActionButtons">
+
+    <!-- BUY NOW -->
+
+    <a href="checkout.html"
+       id="floatingBuyButton">
+
+        🛒 Buy Now
+
+    </a>
+
+    <!-- WHATSAPP HELP -->
+
+    <a href="https://wa.me/917974422572?text=नमस्ते,%20मुझे%20यह%20बुक%20बहुत%20पसंद%20आई।%20मैं%20इसे%20खरीदना%20चाहता%20हूँ।%20कृपया%20मुझे%20खरीदने%20में%20मदद%20करें।"
+
+       target="_blank"
+
+       id="floatingWhatsAppButton">
+
+        💬 Help
+
+    </a>
+
+</div>
+<!-- ==========================================
+SECTION 07
+FOOTER
+========================================== -->
+
+<footer>
+
+    <p>
+
+        © Aarogyam India
+
+    </p>
+
+</footer>
+
+
+<script src="../js/demo-book.js"></script>
+
+</body>
+
+</html>
