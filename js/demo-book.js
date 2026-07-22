@@ -498,15 +498,13 @@ viewerImage.addEventListener("dblclick", () => {
 
     if (zoomed) {
 
-      viewerImage.style.transform =
-translate(${currentX}px, ${currentY}px) scale(2);
+     viewerImage.style.transform = "scale(2)";
 
         viewerImage.style.cursor = "zoom-out";
 
     } else {
 
-       viewerImage.style.transform =
-"translate(0px,0px) scale(1)";
+     viewerImage.style.transform = "scale(1)";
 
         viewerImage.style.cursor = "zoom-in";
 
