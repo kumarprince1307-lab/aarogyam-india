@@ -1,20 +1,35 @@
 /*==================================================
 AAROGYAM INDIA
-COMMON DEMO BOOK JS
+DEMO BOOK JS
 PART - 1
 ==================================================*/
-
-"use strict";
 
 /*==================================================
 DOM ELEMENTS
 ==================================================*/
 
 const demoForm = document.getElementById("demoForm");
-const demoSection = document.getElementById("demoPreview");
+
+const formSection = document.querySelector(".demo-form-section");
+
+const demoPreview = document.getElementById("demoPreview");
+
+const previewSlider = document.querySelector(".preview-slider");
 
 const loader = document.getElementById("loader");
+
 const toast = document.getElementById("toast");
+
+const nameInput = document.getElementById("name");
+
+const mobileInput = document.getElementById("mobile");
+
+const emailInput = document.getElementById("email");
+
+const stateInput = document.getElementById("state");
+
+const districtInput = document.getElementById("district");
+
 
 /*==================================================
 LOADER
@@ -22,23 +37,16 @@ LOADER
 
 function showLoader(){
 
-    if(loader){
-
-        loader.style.display="flex";
-
-    }
+    loader.style.display = "flex";
 
 }
 
 function hideLoader(){
 
-    if(loader){
-
-        loader.style.display="none";
-
-    }
+    loader.style.display = "none";
 
 }
+
 
 /*==================================================
 TOAST
@@ -46,264 +54,216 @@ TOAST
 
 function showToast(message){
 
-    if(!toast){
+    toast.innerText = message;
 
-        alert(message);
-
-        return;
-
-    }
-
-    toast.innerHTML=message;
-
-    toast.style.display="block";
+    toast.classList.add("show");
 
     setTimeout(()=>{
 
-        toast.style.display="none";
+        toast.classList.remove("show");
 
-    },2500);
-
-}
-
-/*==================================================
-MOBILE VALIDATION
-==================================================*/
-
-function validMobile(number){
-
-    return /^[6-9]\d{9}$/.test(number);
+    },3000);
 
 }
 
+
 /*==================================================
-SUPABASE PLACE HOLDER
-
-Future
-
-await supabase
-.from("demo_users")
-.insert([userData]);
-
+PAGE INITIALIZE
 ==================================================*/
 
-async function saveUser(userData){
+function initializePage(){
 
-    console.log(
+    hideLoader();
 
-        "Future Supabase",
+    demoPreview.style.display = "none";
 
-        userData
+    previewSlider.style.display = "none";
 
-    );
+}
+
+
+/*==================================================
+VALIDATION
+==================================================*/
+
+function validateName(){
+
+    const value = nameInput.value.trim();
+
+    if(value.length < 3){
+
+        showToast("कृपया पूरा नाम दर्ज करें");
+
+        nameInput.focus();
+
+        return false;
+
+    }
 
     return true;
 
 }
 
+
+function validateMobile(){
+
+    const mobile = mobileInput.value.trim();
+
+    const mobilePattern = /^[6-9]\d{9}$/;
+
+    if(!mobilePattern.test(mobile)){
+
+        showToast("सही मोबाइल नंबर दर्ज करें");
+
+        mobileInput.focus();
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+
+function validateForm(){
+
+    if(!validateName()){
+
+        return false;
+
+    }
+
+    if(!validateMobile()){
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+
+/*==================================================
+SAVE USER
+SUPABASE PLACEHOLDER
+==================================================*/
+
+async function saveUser(){
+
+    /*
+    Future
+
+    await supabase
+    .from("demo_users")
+    .insert([...]);
+
+    */
+
+    return true;
+
+}
 /*==================================================
 FORM SUBMIT
 ==================================================*/
 
-if(demoForm){
+demoForm.addEventListener("submit", async function (event) {
 
-demoForm.addEventListener(
+    event.preventDefault();
 
-"submit",
+    if (!validateForm()) {
 
-async function(e){
+        return;
 
-e.preventDefault();
+    }
 
-const name=document
-.getElementById("name")
-.value.trim();
+    showLoader();
 
-const mobile=document
-.getElementById("mobile")
-.value.trim();
+    const userData = {
 
-const email=document
-.getElementById("email")
-.value.trim();
+        name: nameInput.value.trim(),
 
-const state=document
-.getElementById("state")
-.value.trim();
+        mobile: mobileInput.value.trim(),
 
-const district=document
-.getElementById("district")
-.value.trim();
+        email: emailInput.value.trim(),
 
-/*=========================
-VALIDATION
-=========================*/
+        state: stateInput.value.trim(),
 
-if(name.length<3){
+        district: districtInput.value.trim(),
 
-showToast(
+        createdAt: new Date().toISOString()
 
-"कृपया पूरा नाम दर्ज करें"
+    };
 
-);
-
-return;
-
-}
-
-if(!validMobile(mobile)){
-
-showToast(
-
-"सही मोबाइल नंबर दर्ज करें"
-
-);
-
-return;
-
-}
-
-/*=========================
-USER DATA
-=========================*/
-
-const userData={
-
-name,
-
-mobile,
-
-email,
-
-state,
-
-district,
-
-date:new Date()
-
-.toISOString()
-
-};
-
-/*=========================
-SAVE
-=========================*/
-
-showLoader();
-
-await saveUser(userData);
-
-/*=========================
-LOCAL BACKUP
-=========================*/
-
-localStorage.setItem(
-
-"demoUser",
-
-JSON.stringify(userData)
-
-);
-
-/*=========================
-SUCCESS
-=========================*/
-
-if(demoSection){
-
-    demoSection.style.display="block";
-
-    demoSection.scrollIntoView({
-
-        behavior:"smooth"
-
-    });
-
-}
-
-const previewSlider=document.querySelector(".preview-slider");
-
-if(previewSlider){
-
-    previewSlider.style.display="block";
-
-}
-
-showToast(
-
-"Demo Unlock Successfully"
-
-);
-
-});
-
-}
-
-/*==================================================
-AUTO RESTORE
-
-Future
-
-Supabase Session
-
-==================================================*/
-
-window.addEventListener("load",()=>{
+    const saved = await saveUser(userData);
 
     hideLoader();
 
-    if(demoSection){
+    if (!saved) {
 
-        demoSection.style.display="none";
+        showToast("कुछ समस्या हुई। कृपया पुनः प्रयास करें।");
 
-    }
-
-    const previewSlider=document.querySelector(".preview-slider");
-
-    if(previewSlider){
-
-        previewSlider.style.display="none";
+        return;
 
     }
+
+    unlockDemo();
 
 });
+
+
 /*==================================================
-PART 1 END
-
-NEXT
-
-Slider
-
-Previous
-
-Next
-
-Swipe
-
-Image Viewer
-
+UNLOCK DEMO
 ==================================================*/
+
+function unlockDemo() {
+
+    formSection.style.display = "none";
+
+    demoPreview.style.display = "block";
+
+    previewSlider.style.display = "block";
+
+    showToast("🎉 Demo सफलतापूर्वक Unlock हो गया");
+
+}
+
+
+/*==================================================
+RESET FORM
+==================================================*/
+
+function resetForm() {
+
+    demoForm.reset();
+
+}
+
+
+/*==================================================
+AUTO FOCUS
+==================================================*/
+
+window.addEventListener("load", () => {
+
+    initializePage();
+
+    nameInput.focus();
+
+});
 /*==================================================
 IMAGE SLIDER
 ==================================================*/
 
-const images=document.querySelectorAll(".preview-image");
+const previewImages = document.querySelectorAll(".preview-image");
 
-const prevBtn=document.querySelector(".prev-btn");
+const prevBtn = document.querySelector(".prev-btn");
 
-const nextBtn=document.querySelector(".next-btn");
+const nextBtn = document.querySelector(".next-btn");
 
-const viewer=document.getElementById("imageViewer");
+let currentIndex = 0;
 
-const viewerImage=document.getElementById("viewerImage");
-
-const closeViewer=document.querySelector(".close-viewer");
-
-const viewerPrev=document.querySelector(".viewer-prev");
-
-const viewerNext=document.querySelector(".viewer-next");
-
-let currentImage=0;
 
 /*==================================================
 SHOW IMAGE
@@ -311,387 +271,275 @@ SHOW IMAGE
 
 function showImage(index){
 
-if(images.length===0){
+    previewImages.forEach((image)=>{
 
-return;
+        image.classList.remove("active");
 
-}
+    });
 
-if(index<0){
-
-index=images.length-1;
+    previewImages[index].classList.add("active");
 
 }
 
-if(index>=images.length){
-
-index=0;
-
-}
-
-images.forEach((img)=>{
-
-img.classList.remove("active");
-
-});
-
-images[index].classList.add("active");
-
-currentImage=index;
-
-}
 
 /*==================================================
-PREVIOUS
+NEXT IMAGE
 ==================================================*/
 
-if(prevBtn){
+function nextImage(){
 
-prevBtn.addEventListener("click",()=>{
+    currentIndex++;
 
-showImage(currentImage-1);
+    if(currentIndex >= previewImages.length){
 
-});
+        currentIndex = 0;
+
+    }
+
+    showImage(currentIndex);
 
 }
+
 
 /*==================================================
-NEXT
+PREVIOUS IMAGE
 ==================================================*/
 
-if(nextBtn){
+function previousImage(){
 
-nextBtn.addEventListener("click",()=>{
+    currentIndex--;
 
-showImage(currentImage+1);
+    if(currentIndex < 0){
 
-});
+        currentIndex = previewImages.length - 1;
+
+    }
+
+    showImage(currentIndex);
 
 }
+
 
 /*==================================================
-OPEN VIEWER
+BUTTON EVENTS
 ==================================================*/
 
-images.forEach((img,index)=>{
+nextBtn.addEventListener("click", nextImage);
 
-img.addEventListener("click",()=>{
+prevBtn.addEventListener("click", previousImage);
 
-currentImage=index;
-
-viewerImage.src=images[currentImage].src;
-
-viewer.classList.add("active");
-
-});
-
-});
 
 /*==================================================
-VIEWER IMAGE
+SWIPE SUPPORT
 ==================================================*/
 
-function updateViewer(){
+let touchStartX = 0;
 
-viewerImage.src=images[currentImage].src;
+let touchEndX = 0;
 
-}
+previewSlider.addEventListener("touchstart",(event)=>{
 
-/*==================================================
-VIEWER PREVIOUS
-==================================================*/
-
-if(viewerPrev){
-
-viewerPrev.addEventListener("click",()=>{
-
-showImage(currentImage-1);
-
-updateViewer();
+    touchStartX = event.changedTouches[0].screenX;
 
 });
 
-}
+previewSlider.addEventListener("touchend",(event)=>{
 
-/*==================================================
-VIEWER NEXT
-==================================================*/
+    touchEndX = event.changedTouches[0].screenX;
 
-if(viewerNext){
+    if(touchStartX - touchEndX > 50){
 
-viewerNext.addEventListener("click",()=>{
+        nextImage();
 
-showImage(currentImage+1);
+    }
 
-updateViewer();
+    else if(touchEndX - touchStartX > 50){
 
-});
+        previousImage();
 
-}
-
-/*==================================================
-CLOSE
-==================================================*/
-
-if(closeViewer){
-
-closeViewer.addEventListener("click",()=>{
-
-viewer.classList.remove("active");
+    }
 
 });
 
-}
-
-if(viewer){
-
-viewer.addEventListener("click",(e)=>{
-
-if(e.target===viewer){
-
-viewer.classList.remove("active");
-
-}
-
-});
-
-}
-
-/*==================================================
-MOBILE SWIPE
-==================================================*/
-
-const slider=document.querySelector(".slider-container");
-
-let touchStart=0;
-
-let touchEnd=0;
-
-if(slider){
-
-slider.addEventListener("touchstart",(e)=>{
-
-touchStart=e.changedTouches[0].screenX;
-
-});
-
-slider.addEventListener("touchend",(e)=>{
-
-touchEnd=e.changedTouches[0].screenX;
-
-if(touchStart-touchEnd>50){
-
-showImage(currentImage+1);
-
-}
-
-if(touchEnd-touchStart>50){
-
-showImage(currentImage-1);
-
-}
-
-});
-
-}
 
 /*==================================================
 INITIAL IMAGE
 ==================================================*/
 
-if(images.length){
-
-showImage(0);
-
-}
-
+showImage(currentIndex);
 /*==================================================
-PART-2 END
-
-NEXT
-
-✓ Zoom
-
-✓ Keyboard Support
-
-✓ Initialization
-
-==================================================*/
-/*==================================================
-IMAGE ZOOM
+IMAGE VIEWER
 ==================================================*/
 
-let zoomLevel = 1;
+const imageViewer = document.getElementById("imageViewer");
 
-if(viewerImage){
+const viewerImage = document.getElementById("viewerImage");
 
-viewerImage.addEventListener("dblclick",()=>{
+const viewerPrev = document.querySelector(".viewer-prev");
 
-if(zoomLevel===1){
+const viewerNext = document.querySelector(".viewer-next");
 
-zoomLevel=2;
+const closeViewer = document.querySelector(".close-viewer");
 
-}else{
 
-zoomLevel=1;
+/*==================================================
+OPEN VIEWER
+==================================================*/
 
-}
+previewImages.forEach((image, index) => {
 
-viewerImage.style.transform=`scale(${zoomLevel})`;
+    image.addEventListener("click", () => {
 
-viewerImage.style.transition="0.3s";
+        currentIndex = index;
+
+        viewerImage.src = previewImages[currentIndex].src;
+
+        imageViewer.style.display = "flex";
+
+    });
 
 });
 
-}
 
 /*==================================================
-RESET ZOOM
+VIEWER NEXT
 ==================================================*/
 
-function resetZoom(){
+viewerNext.addEventListener("click", () => {
 
-zoomLevel=1;
+    nextImage();
 
-viewerImage.style.transform="scale(1)";
+    viewerImage.src = previewImages[currentIndex].src;
 
-}
+});
+
+
+/*==================================================
+VIEWER PREVIOUS
+==================================================*/
+
+viewerPrev.addEventListener("click", () => {
+
+    previousImage();
+
+    viewerImage.src = previewImages[currentIndex].src;
+
+});
+
 
 /*==================================================
 CLOSE VIEWER
 ==================================================*/
 
-function closeImageViewer(){
+closeViewer.addEventListener("click", () => {
 
-if(viewer){
-
-viewer.classList.remove("active");
-
-}
-
-resetZoom();
-
-}
-
-if(closeViewer){
-
-closeViewer.addEventListener("click",closeImageViewer);
-
-}
-
-if(viewer){
-
-viewer.addEventListener("click",(e)=>{
-
-if(e.target===viewer){
-
-closeImageViewer();
-
-}
+    imageViewer.style.display = "none";
 
 });
 
-}
+
+/*==================================================
+CLICK OUTSIDE TO CLOSE
+==================================================*/
+
+imageViewer.addEventListener("click", (event) => {
+
+    if (event.target === imageViewer) {
+
+        imageViewer.style.display = "none";
+
+    }
+
+});
+
 
 /*==================================================
 KEYBOARD SUPPORT
 ==================================================*/
 
-document.addEventListener("keydown",(e)=>{
+document.addEventListener("keydown", (event) => {
 
-if(!viewer.classList.contains("active")){
+    if (imageViewer.style.display !== "flex") return;
 
-return;
+    if (event.key === "ArrowRight") {
 
-}
+        nextImage();
 
-if(e.key==="ArrowLeft"){
+        viewerImage.src = previewImages[currentIndex].src;
 
-showImage(currentImage-1);
+    }
 
-updateViewer();
+    if (event.key === "ArrowLeft") {
 
-resetZoom();
+        previousImage();
 
-}
+        viewerImage.src = previewImages[currentIndex].src;
 
-if(e.key==="ArrowRight"){
+    }
 
-showImage(currentImage+1);
+    if (event.key === "Escape") {
 
-updateViewer();
+        imageViewer.style.display = "none";
 
-resetZoom();
-
-}
-
-if(e.key==="Escape"){
-
-closeImageViewer();
-
-}
+    }
 
 });
 
+
 /*==================================================
-INITIALIZE
+DOUBLE CLICK ZOOM
 ==================================================*/
 
-window.addEventListener("DOMContentLoaded",()=>{
+let zoomed = false;
 
-hideLoader();
+viewerImage.addEventListener("dblclick", () => {
 
-if(images.length){
+    zoomed = !zoomed;
 
-showImage(0);
+    if (zoomed) {
 
-}
+        viewerImage.style.transform = "scale(2)";
+
+        viewerImage.style.cursor = "zoom-out";
+
+    } else {
+
+        viewerImage.style.transform = "scale(1)";
+
+        viewerImage.style.cursor = "zoom-in";
+
+    }
 
 });
 
+
 /*==================================================
-COMMON PLACEHOLDERS
+RESET ZOOM AFTER CLOSE
 ==================================================*/
 
-/*
+function resetViewer() {
 
-Future
+    zoomed = false;
 
-1.
+    viewerImage.style.transform = "scale(1)";
 
-Supabase
+    viewerImage.style.cursor = "zoom-in";
 
-saveUser()
+}
 
-2.
+closeViewer.addEventListener("click", resetViewer);
 
-Razorpay
+imageViewer.addEventListener("click", (event) => {
 
-3.
+    if (event.target === imageViewer) {
 
-Payment Verification
+        resetViewer();
 
-4.
+    }
 
-Book Unlock
+});
 
-5.
-
-My Library
-
-Only these sections will be added later.
-
-No change in HTML/CSS/JS flow.
-
-*/
 
 /*==================================================
 END OF FILE
-
-AAROGYAM INDIA
-
-COMMON DEMO BOOK JS
-
-VERSION : V1
-
 ==================================================*/
