@@ -1,1 +1,39 @@
+{
+  "books": [
+    {
+      "id": "BK001",
+      "slug": "kharif-2026",
 
+      "name": "खरीफ फसल मास्टर गाइड 2026",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "author": "Aarogyam India",
+      "version": "1.0",
+      "status": "active",
+
+      "cover": "/images/books/kharif-cover.webp",
+      "thumbnail": "/images/books/kharif-thumb.webp",
+      "banner": "/images/books/kharif-banner.webp",
+
+      "landingPage": "/books/kharif-fasal-master-guide-2026.html",
+      "demoPage": "/demo/demo-kharif.html",
+      "checkoutPage": "/checkout.html",
+
+      "mrp": 299,
+      "offerPrice": 99,
+      "currency": "INR",
+
+      "demoAvailable": true,
+      "demoImages": 5,
+
+      "accessType": "Lifetime",
+
+      "seo": {
+        "title": "खरीफ फसल मास्टर गाइड 2026",
+        "description": "",
+        "keywords": "",
+        "canonical": ""
+      }
+    }
+  ]
+}
