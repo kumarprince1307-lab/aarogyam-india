@@ -209,23 +209,23 @@ JSON.stringify(userData)
 SUCCESS
 =========================*/
 
-hideLoader();
-
-demoForm.style.display="none";
-
 if(demoSection){
 
-demoSection.classList.add(
+    demoSection.style.display="block";
 
-"active"
+    demoSection.scrollIntoView({
 
-);
+        behavior:"smooth"
 
-demoSection.scrollIntoView({
+    });
 
-behavior:"smooth"
+}
 
-});
+const previewSlider=document.querySelector(".preview-slider");
+
+if(previewSlider){
+
+    previewSlider.style.display="block";
 
 }
 
@@ -248,16 +248,25 @@ Supabase Session
 
 ==================================================*/
 
-window.addEventListener(
+window.addEventListener("load",()=>{
 
-"load",
+    hideLoader();
 
-()=>{
+    if(demoSection){
 
-hideLoader();
+        demoSection.style.display="none";
+
+    }
+
+    const previewSlider=document.querySelector(".preview-slider");
+
+    if(previewSlider){
+
+        previewSlider.style.display="none";
+
+    }
 
 });
-
 /*==================================================
 PART 1 END
 
