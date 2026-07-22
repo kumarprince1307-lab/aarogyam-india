@@ -539,7 +539,100 @@ imageViewer.addEventListener("click", (event) => {
 
 });
 
+/*==================================================
+PART - 5
+MOBILE DRAG & PAN AFTER ZOOM
+==================================================*/
 
+let startX = 0;
+let startY = 0;
+
+let currentX = 0;
+let currentY = 0;
+
+let isDragging = false;
+
+
+/*==================================================
+START DRAG
+==================================================*/
+
+viewerImage.addEventListener("touchstart", (e) => {
+
+    if (!zoomed) return;
+
+    isDragging = true;
+
+    startX = e.touches[0].clientX - currentX;
+    startY = e.touches[0].clientY - currentY;
+
+});
+
+
+/*==================================================
+MOVE IMAGE
+==================================================*/
+
+viewerImage.addEventListener("touchmove", (e) => {
+
+    if (!zoomed || !isDragging) return;
+
+    e.preventDefault();
+
+    currentX = e.touches[0].clientX - startX;
+    currentY = e.touches[0].clientY - startY;
+
+    viewerImage.style.transform =
+        `translate(${currentX}px, ${currentY}px) scale(2)`;
+
+}, { passive: false });
+
+
+/*==================================================
+STOP DRAG
+==================================================*/
+
+viewerImage.addEventListener("touchend", () => {
+
+    isDragging = false;
+
+});
+
+
+/*==================================================
+RESET POSITION
+==================================================*/
+
+function resetViewerPosition() {
+
+    currentX = 0;
+    currentY = 0;
+
+    viewerImage.style.transform = "scale(1)";
+
+}
+
+
+/*==================================================
+RESET AFTER CLOSE
+==================================================*/
+
+closeViewer.addEventListener("click", () => {
+
+    resetViewerPosition();
+
+});
+
+
+imageViewer.addEventListener("click", (e) => {
+
+    if (e.target === imageViewer) {
+
+        resetViewerPosition();
+
+    }
+
+});
 /*==================================================
 END OF FILE
 ==================================================*/
