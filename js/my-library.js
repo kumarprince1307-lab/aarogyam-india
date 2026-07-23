@@ -9,9 +9,9 @@ VERSION : V1
 CONFIG
 ==================================================*/
 
-const BOOKS_JSON = "data/books.json";
+const BOOKS_JSON = "../data/books.json";
 
-const PURCHASES_JSON = "data/purchases.json";
+const PURCHASES_JSON = "../data/purchases.json";
 
 
 /*==================================================
@@ -48,17 +48,21 @@ try{
 
 showLoading();
 
-const purchasesResponse =
-await fetch(PURCHASES_JSON);
+const purchasesResponse = await fetch(PURCHASES_JSON);
 
-const purchasesData =
-await purchasesResponse.json();
+if (!purchasesResponse.ok) {
+    throw new Error("Purchases JSON not found: " + PURCHASES_JSON);
+}
 
-const booksResponse =
-await fetch(BOOKS_JSON);
+const purchasesData = await purchasesResponse.json();
 
-const booksData =
-await booksResponse.json();
+const booksResponse = await fetch(BOOKS_JSON);
+
+if (!booksResponse.ok) {
+    throw new Error("Books JSON not found: " + BOOKS_JSON);
+}
+
+const booksData = await booksResponse.json();
 
 renderLibrary(
 booksData,
@@ -126,7 +130,7 @@ purchasesData.books || [];
 
 purchasedIds.forEach(function(item){
 
-const book=booksData.find(function(data){
+const book = booksData.books.find(function(data){
 
 return data.id===item.id;
 
