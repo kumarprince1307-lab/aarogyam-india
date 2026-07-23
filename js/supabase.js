@@ -1130,3 +1130,348 @@ console.log(
 console.log(
     "================================"
 );
+/* ==========================================================
+   PART 5A
+   Session Management Functions
+   ========================================================== */
+
+/* ================================
+   Save User Session
+================================ */
+
+async function saveUserSession(profile) {
+
+    try {
+
+        if (!profile) return false;
+
+        localStorage.setItem(
+            "ai_current_profile",
+            JSON.stringify(profile)
+        );
+
+        localStorage.setItem(
+            "ai_logged_in",
+            "true"
+        );
+
+        currentProfile = profile;
+
+        return true;
+
+    } catch (error) {
+
+        console.error(error);
+
+        return false;
+
+    }
+
+}
+
+/* ================================
+   Load User Session
+================================ */
+
+function loadUserSession() {
+
+    try {
+
+        const session =
+            localStorage.getItem(
+                "ai_current_profile"
+            );
+
+        if (!session) return null;
+
+        const profile =
+            JSON.parse(session);
+
+        currentProfile = profile;
+
+        return profile;
+
+    } catch (error) {
+
+        console.error(error);
+
+        return null;
+
+    }
+
+}
+
+/* ================================
+   Check Login
+================================ */
+
+function isLoggedIn() {
+
+    return localStorage.getItem(
+        "ai_logged_in"
+    ) === "true";
+
+}
+
+/* ================================
+   Restore Session
+================================ */
+
+async function restoreUserSession() {
+
+    try {
+
+        if (!isLoggedIn()) {
+
+            return null;
+
+        }
+
+        const profile =
+            loadUserSession();
+
+        if (!profile) {
+
+            return null;
+
+        }
+
+        const latestProfile =
+            await getProfileById(
+                profile.id
+            );
+
+        if (latestProfile) {
+
+            currentProfile =
+                latestProfile;
+
+            localStorage.setItem(
+                "ai_current_profile",
+                JSON.stringify(
+                    latestProfile
+                )
+            );
+
+            return latestProfile;
+
+        }
+
+        return profile;
+
+    } catch (error) {
+
+        console.error(error);
+
+        return null;
+
+    }
+
+}
+
+/* ================================
+   Clear Session
+================================ */
+
+function clearUserSession() {
+
+    localStorage.removeItem(
+        "ai_current_profile"
+    );
+
+    localStorage.removeItem(
+        "ai_logged_in"
+    );
+
+    currentProfile = null;
+
+}
+
+/* ================================
+   Logout
+================================ */
+
+function logoutUser() {
+
+    clearUserSession();
+
+    window.location.href =
+        "registration.html";
+
+}
+/* ==========================================================
+   PART 5B
+   Referral, Auto Login & Redirect Functions
+========================================================== */
+
+/* ================================
+   Get Referral Profile
+================================ */
+
+async function getReferralProfile(referralMobile) {
+
+    try {
+
+        referralMobile = cleanValue(referralMobile);
+
+        if (!referralMobile) return null;
+
+        const profile =
+            await getProfileByMobile(referralMobile);
+
+        return profile;
+
+    } catch (error) {
+
+        showDatabaseError(error);
+
+        return null;
+
+    }
+
+}
+
+/* ================================
+   Process Referral
+================================ */
+
+async function processReferral(profile, referralMobile) {
+
+    try {
+
+        referralMobile =
+            cleanValue(referralMobile);
+
+        if (!referralMobile) {
+
+            return true;
+
+        }
+
+        const referrer =
+            await getReferralProfile(
+                referralMobile
+            );
+
+        if (!referrer) {
+
+            console.warn(
+                "Referral Mobile Not Found"
+            );
+
+            return false;
+
+        }
+
+        const { error } =
+            await supabase
+            .from("profiles")
+            .update({
+
+                referred_by:
+                    referrer.id,
+
+                referral_mobile:
+                    referrer.mobile,
+
+                updated_at:
+                    getCurrentDateTime()
+
+            })
+            .eq("id", profile.id);
+
+        if (error) throw error;
+
+        return true;
+
+    } catch (error) {
+
+        showDatabaseError(error);
+
+        return false;
+
+    }
+
+}
+
+/* ================================
+   Auto Login
+================================ */
+
+async function autoLogin(mobile) {
+
+    try {
+
+        const profile =
+            await getProfileByMobile(mobile);
+
+        if (!profile) {
+
+            return null;
+
+        }
+
+        await saveUserSession(profile);
+
+        return profile;
+
+    } catch (error) {
+
+        showDatabaseError(error);
+
+        return null;
+
+    }
+
+}
+
+/* ================================
+   Redirect After Login
+================================ */
+
+function redirectAfterLogin(page = "index.html") {
+
+    window.location.href = page;
+
+}
+
+/* ================================
+   Redirect After Registration
+================================ */
+
+function redirectAfterRegistration(page = "index.html") {
+
+    window.location.href = page;
+
+}
+
+/* ================================
+   Future Hook
+   My Library / Wallet / Membership
+================================ */
+
+async function afterSuccessfulRegistration(profile) {
+
+    console.log(
+        "Future Modules Ready",
+        profile
+    );
+
+    /*
+        Future
+
+        Wallet
+
+        Membership
+
+        My Library
+
+        Notification
+
+        Activity Log
+
+    */
+
+    return true;
+
+}
