@@ -1,609 +1,198 @@
-/* ==========================================
-   Aarogyam India
-   registration.js
-   Part 1
-========================================== */
+/*=========================================================
+  FILE NAME : registration.js
+  PROJECT   : Aarogyam India V1
+  MODULE    : Free Registration
+  VERSION   : 1.0.1 (Fixed & Optimized)
+=========================================================*/
 
 "use strict";
 
-/* ==========================================
-   APP CONFIG
-========================================== */
-
-const APP = {
-
-    version: "1.0",
-
-    redirectAfterLogin: "index.html",
-
-    redirectAfterRegister: "index.html"
-
-};
-
-/* ==========================================
-   DOM ELEMENTS
-========================================== */
-
-const registrationForm = document.getElementById("registrationForm");
-
+const form = document.getElementById("registrationForm");
 const fullName = document.getElementById("fullName");
-
 const mobile = document.getElementById("mobile");
-
 const email = document.getElementById("email");
-
-const state = document.getElementById("state");
-
-const district = document.getElementById("district");
-
 const referralMobile = document.getElementById("referralMobile");
-
-const terms = document.getElementById("terms");
-
+const agreeTerms = document.getElementById("agreeTerms");
 const registerBtn = document.getElementById("registerBtn");
-
-const statusMessage = document.getElementById("statusMessage");
-
-const pageLoader = document.getElementById("pageLoader");
-
-const toastMessage = document.getElementById("toastMessage");
-
+const formMessage = document.getElementById("formMessage");
 const backBtn = document.getElementById("backBtn");
 
-/* ==========================================
-   GLOBAL USER OBJECT
-========================================== */
-
-const userData = {
-
-    userId: "",
-
-    referral: "",
-
-    referralSource: "",
-
-    redirectPage: "",
-
-    language: "en"
-
-};
-
-/* ==========================================
-   PAGE LOAD
-========================================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    detectReferral();
-
-    loadLanguage();
-
-    attachEvents();
-
-});
-
-/* ==========================================
-   EVENTS
-========================================== */
-
-function attachEvents(){
-
-    if(backBtn){
-
-        backBtn.addEventListener("click", () => {
-
-            history.back();
-
-        });
-
-    }
-
-}
-
-/* ==========================================
-   REFERRAL DETECTION
-========================================== */
-
-function detectReferral(){
-
-    const params = new URLSearchParams(window.location.search);
-
-    const ref = params.get("ref");
-
-    if(ref){
-
-        referralMobile.value = ref;
-
-        referralMobile.readOnly = true;
-
-        userData.referral = ref;
-
-    }
-
-}
-
-/* ==========================================
-   LANGUAGE
-========================================== */
-
-function loadLanguage(){
-
-    const lang = localStorage.getItem("language");
-
-    if(lang){
-
-        userData.language = lang;
-
-    }
-
-}
-
-/* ==========================================
-   LOADER
-========================================== */
-
-function showLoader(){
-
-    pageLoader.classList.add("active");
-
-}
-
-function hideLoader(){
-
-    pageLoader.classList.remove("active");
-
-}
-
-/* ==========================================
-   TOAST
-========================================== */
-
-function showToast(message){
-
-    toastMessage.innerText = message;
-
-    toastMessage.classList.add("show");
-
-    setTimeout(() => {
-
-        toastMessage.classList.remove("show");
-
-    },3000);
-
-}
-
-/* ==========================================
-   STATUS
-========================================== */
-
-function setStatus(message,color="#0F7B3F"){
-
-    statusMessage.innerText = message;
-
-    statusMessage.style.color = color;
-
-}
-/* ==========================================
-   VALIDATION
-========================================== */
-
-function validateForm(){
-
-    if(fullName.value.trim().length < 3){
-
-        showToast("Enter valid full name");
-
-        fullName.focus();
-
-        return false;
-
-    }
-
-    if(!/^[6-9]\d{9}$/.test(mobile.value.trim())){
-
-        showToast("Enter valid mobile number");
-
-        mobile.focus();
-
-        return false;
-
-    }
-
-    if(email.value.trim() !== ""){
-
-        const emailRegex =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if(!emailRegex.test(email.value.trim())){
-
-            showToast("Enter valid email");
-
-            email.focus();
-
-            return false;
-
+document.addEventListener("DOMContentLoaded", initializePage);
+
+async function initializePage() {
+    try {
+        if (typeof initializeAuthentication === "function") {
+            initializeAuthentication();
         }
 
+        if (typeof isLoggedIn === "function" && isLoggedIn()) {
+            window.location.href = "ebooks/agriculture.html";
+            return;
+        }
+
+        bindEvents();
+    }
+    catch (error) {
+        console.error("Initialization Error :", error);
+    }
+}
+
+function bindEvents() {
+    if (form) {
+        form.addEventListener("submit", registerAccount);
+    }
+    if (backBtn) {
+        backBtn.addEventListener("click", () => {
+            history.back();
+        });
+    }
+}
+
+function setLoading(status) {
+    if (!registerBtn) return;
+    registerBtn.disabled = status;
+    registerBtn.textContent = status
+        ? "Creating Account..."
+        : "CREATE FREE ACCOUNT";
+}
+
+function showMessage(message) {
+    if (formMessage) formMessage.textContent = message;
+}
+
+function clearMessage() {
+    if (formMessage) formMessage.textContent = "";
+}
+
+if (mobile) {
+    mobile.addEventListener("input", () => {
+        mobile.value = mobile.value.replace(/\D/g, "").slice(0, 10);
+    });
+}
+
+if (referralMobile) {
+    referralMobile.addEventListener("input", () => {
+        referralMobile.value = referralMobile.value.replace(/\D/g, "").slice(0, 10);
+    });
+}
+
+function validateForm() {
+    clearMessage();
+
+    const name = fullName.value.trim();
+    const mobileNo = mobile.value.trim();
+    const emailId = email.value.trim();
+    const referral = referralMobile.value.trim();
+
+    if (name.length < 3) {
+        showMessage("Please enter your full name.");
+        fullName.focus();
+        return false;
     }
 
-    if(!terms.checked){
-
-        showToast("Please accept Terms & Privacy Policy");
-
+    if (!/^[6-9]\d{9}$/.test(mobileNo)) {
+        showMessage("Please enter a valid 10 digit mobile number.");
+        mobile.focus();
         return false;
+    }
 
+    if (emailId !== "" && !/^\S+@\S+\.\S+$/.test(emailId)) {
+        showMessage("Please enter a valid email address.");
+        email.focus();
+        return false;
+    }
+
+    if (referral !== "" && !/^[6-9]\d{9}$/.test(referral)) {
+        showMessage("Please enter a valid referral mobile.");
+        referralMobile.focus();
+        return false;
+    }
+
+    if (!agreeTerms.checked) {
+        showMessage("Please accept Terms & Privacy Policy.");
+        agreeTerms.focus();
+        return false;
     }
 
     return true;
-
 }
 
-/* ==========================================
-   USER OBJECT
-========================================== */
+async function registerAccount(event) {
+    event.preventDefault();
 
-function collectFormData(){
+    if (!validateForm()) return;
 
-    return{
+    setLoading(true);
 
-        full_name:fullName.value.trim(),
+    try {
+        const formData = {
+            fullName: fullName.value.trim(),
+            mobile: mobile.value.trim(),
+            email: email.value.trim(),
+            referralCode: referralMobile.value.trim(),
+            source: "registration"
+        };
 
-        mobile:mobile.value.trim(),
+        // यह चेक करेगा कि registerUser फंक्शन उपलब्ध है या नहीं
+        if (typeof registerUser !== "function") {
+            throw new Error("Database engine not loaded properly.");
+        }
 
-        email:email.value.trim(),
+        const result = await registerUser(formData);
 
-        state:state.value.trim(),
+        if (!result || !result.success) {
+            throw new Error(result?.message || "Registration failed on server.");
+        }
 
-        district:district.value.trim(),
+        if (typeof showToast === "function") {
+            showToast("Registration Successful");
+        }
 
-        referral_mobile:referralMobile.value.trim(),
+        showMessage("Registration Successful...");
 
-        language:userData.language,
-
-        created_at:new Date().toISOString()
-
-    };
-
-}
-
-/* ==========================================
-   SUBMIT
-========================================== */
-
-registrationForm.addEventListener("submit",
-
-async function(e){
-
-    e.preventDefault();
-
-    if(!validateForm()){
-
-        return;
+        setTimeout(() => {
+            completeRegistration(result);
+        }, 800);
 
     }
+    catch (error) {
+        console.error("Registration Error :", error);
+        showMessage(error.message || "Registration failed.");
+        setLoading(false);
+    }
+}
 
-    showLoader();
+function completeRegistration(result) {
+    try {
+        if (!result || !result.success) {
+            throw new Error("Registration failed.");
+        }
 
-    registerBtn.disabled=true;
+        if (typeof getCurrentUser === "function") {
+            const user = getCurrentUser();
+            console.log("Current User :", user);
+        }
 
-    setStatus("Checking account...");
+        showMessage("Registration completed successfully.");
+        setLoading(false);
 
-    const formData=collectFormData();
+        setTimeout(() => {
+            window.location.href = "ebooks/agriculture.html";
+        }, 1000);
+    }
+    catch (error) {
+        console.error("Complete Registration Error :", error);
+        showMessage("Unable to continue.");
+        setLoading(false);
+    }
+}
 
-    await processRegistration(formData);
-
+window.addEventListener("online", () => {
+    clearMessage();
 });
 
-/* ==========================================
-   MAIN FLOW
-========================================== */
-
-async function processRegistration(formData){
-
-    try{
-
-        const existingUser=
-        await checkExistingMobile(
-        formData.mobile
-        );
-
-        if(existingUser){
-
-            await loginExistingUser(existingUser);
-
-            return;
-
-        }
-
-        await createNewUser(formData);
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-        hideLoader();
-
-        registerBtn.disabled=false;
-
-        setStatus(
-        "Registration failed",
-        "#d32f2f"
-        );
-
-        showToast(
-        "Something went wrong"
-        );
-
-    }
-
-}
-
-/* ==========================================
-   PLACEHOLDERS
-========================================== */
-
-async function checkExistingMobile(mobileNumber){
-
-    /*
-      Part-3
-      Supabase Query
-
-      select *
-      from profiles
-      where mobile=mobileNumber
-
-    */
-
-    return null;
-
-}
-
-async function loginExistingUser(user){
-
-    setStatus(
-    "Already registered. Logging in..."
-    );
-
-    showToast(
-    "Welcome Back"
-    );
-
-    /*
-      Part-3
-
-      Create Session
-
-      Save User
-
-      Redirect
-
-    */
-
-}
-
-async function createNewUser(formData){
-
-    setStatus(
-    "Creating account..."
-    );
-
-    /*
-      Part-3
-
-      Insert into Supabase
-
-      Referral Process
-
-      Session
-
-      Redirect
-
-    */
-
-}
-/* ==========================================================
-   PART 3
-   Registration Complete Flow
-   ========================================================== */
-
-/* ================================
-   Check Existing Mobile
-================================ */
-
-async function checkExistingMobile(mobileNumber){
-
-    try{
-
-        return await getProfileByMobile(mobileNumber);
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-        return null;
-
-    }
-
-}
-
-/* ================================
-   Existing User Login
-================================ */
-
-async function loginExistingUser(profile){
-
-    try{
-
-        setStatus(
-            "Already Registered. Logging In..."
-        );
-
-        showToast(
-            "Welcome Back"
-        );
-
-        await saveUserSession(profile);
-
-        hideLoader();
-
-        registerBtn.disabled = false;
-
-        setTimeout(()=>{
-
-            redirectAfterLogin(
-                userData.redirectPage ||
-                APP.redirectAfterLogin
-            );
-
-        },1000);
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-        hideLoader();
-
-        registerBtn.disabled = false;
-
-        showToast(
-            "Login Failed"
-        );
-
-    }
-
-}
-
-/* ================================
-   Create New User
-================================ */
-
-async function createNewUser(formData){
-
-    try{
-
-        setStatus(
-            "Creating Account..."
-        );
-
-        const profile =
-            await saveProfile(formData);
-
-        if(!profile){
-
-            throw new Error(
-                "Profile Not Created"
-            );
-
-        }
-
-        if(formData.referral_mobile){
-
-            await processReferral(
-
-                profile,
-
-                formData.referral_mobile
-
-            );
-
-        }
-
-        await saveUserSession(profile);
-
-        await afterSuccessfulRegistration(profile);
-
-        hideLoader();
-
-        registerBtn.disabled = false;
-
-        setStatus(
-            "Registration Successful"
-        );
-
-        showToast(
-            "Welcome To Aarogyam India"
-        );
-
-        setTimeout(()=>{
-
-            redirectAfterRegistration(
-
-                userData.redirectPage ||
-
-                APP.redirectAfterRegister
-
-            );
-
-        },1200);
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-        hideLoader();
-
-        registerBtn.disabled = false;
-
-        setStatus(
-
-            "Registration Failed",
-
-            "#d32f2f"
-
-        );
-
-        showToast(
-
-            "Please Try Again"
-
-        );
-
-    }
-
-}
-
-/* ================================
-   Auto Login Check
-================================ */
-
-document.addEventListener(
-
-    "DOMContentLoaded",
-
-    async()=>{
-
-        try{
-
-            const profile=
-
-                await restoreUserSession();
-
-            if(profile){
-
-                console.log(
-
-                    "Session Restored"
-
-                );
-
-            }
-
-        }
-
-        catch(error){
-
-            console.error(error);
-
-        }
-
-    }
-
-);
+window.addEventListener("offline", () => {
+    showMessage("No Internet Connection.");
+});
+
+console.log("Registration Module Ready");
