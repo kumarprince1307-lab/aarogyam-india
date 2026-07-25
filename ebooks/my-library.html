@@ -1,330 +1,167 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-
-    <!-- =========================================
-         BASIC SEO
-    ========================================== -->
-
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-
-    <title>My Library | Aarogyam India</title>
-
-    <meta
-        name="description"
-        content="Aarogyam India My Library. अपने खरीदे गए eBooks पढ़ें और डाउनलोड करें।">
-
-    <meta
-        name="keywords"
-        content="Aarogyam India,eBook,My Library,Agriculture Books,PDF">
-
-    <meta
-        name="author"
-        content="Aarogyam India">
-
-    <meta
-        name="robots"
-        content="index,follow">
-
-    <link
-        rel="canonical"
-        href="https://aarogyamindia.online/my-library.html">
-
-
-    <!-- =========================================
-         OPEN GRAPH
-    ========================================== -->
-
-    <meta property="og:type" content="website">
-
-    <meta
-        property="og:title"
-        content="My Library | Aarogyam India">
-
-    <meta
-        property="og:description"
-        content="अपने खरीदे गए eBooks पढ़ें और डाउनलोड करें।">
-
-    <meta
-        property="og:url"
-        content="https://aarogyamindia.online/my-library.html">
-
-    <meta
-        property="og:image"
-        content="https://aarogyamindia.online/images/og-image.jpg">
-
-
-    <!-- =========================================
-         TWITTER
-    ========================================== -->
-
-    <meta
-        name="twitter:card"
-        content="summary_large_image">
-
-    <meta
-        name="twitter:title"
-        content="My Library | Aarogyam India">
-
-    <meta
-        name="twitter:description"
-        content="अपने खरीदे गए eBooks पढ़ें और डाउनलोड करें।">
-
-    <meta
-        name="twitter:image"
-        content="https://aarogyamindia.online/images/og-image.jpg">
-
-
-    <!-- =========================================
-         FAVICON
-    ========================================== -->
-
-    <link rel="icon" href="/favicon.ico">
-
-    <link
-        rel="apple-touch-icon"
-        href="/apple-touch-icon.png">
-
-
-    <!-- =========================================
-         GOOGLE ANALYTICS
-    ========================================== -->
-
-    <script async
-        src="https://www.googletagmanager.com/gtag/js?id=G-2BWPJVQWPK">
-    </script>
-
-    <script>
-
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag(){
-            dataLayer.push(arguments);
-        }
-
-        gtag('js', new Date());
-
-        gtag(
-            'config',
-            'G-2BWPJVQWPK'
-        );
-
-    </script>
-
-
-    <!-- =========================================
-         CSS
-    ========================================== -->
-
-    <link
-        rel="stylesheet"
-        href="../css\my-library.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Library - Aarogyam India</title>
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="/css/my-library.css">
+    <!-- FontAwesome for Icons & Heart -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
 
+    <!-- Desktop & Mobile Header with Matching Navigation -->
+    <header class="library-header">
+        <div class="header-logo-title">
+            <img src="/images/logo/logo.png" alt="Logo" class="site-logo">
+            <h1>My Library</h1>
+        </div>
 
-<!-- =========================================
-     HEADER
-========================================== -->
+        <!-- Desktop Navigation Links (मोबाइल मेनू के बिल्कुल समान) -->
+        <nav class="desktop-nav">
+            <a href="/index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/ebooks/my-library.html" class="active"><i class="fa-solid fa-book-open"></i> My Library</a>
+            <a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchase</a>
+            <a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a>
+            <a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+            <a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms</a>
+            <a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping</a>
+        </nav>
 
-<header class="library-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button class="back-btn" onclick="window.location.href='/index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
 
-    <div class="header-container">
+    <!-- Slide-out Mobile & Quick Menu Drawer (Right Side) -->
+    <div class="side-menu" id="sideMenu">
+        <button class="close-menu" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; padding: 10px 0; border-bottom: 1px solid #eee; margin-bottom: 10px;">
+            <h3 style="font-size: 0.95rem; color: #333;">नमस्ते, <span id="menuUserName">अविनाश मिश्रा</span></h3>
+        </div>
+        <ul>
+            <li><a href="/index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open"></i> My Library</a></li>
+            <li><a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchase & Invoices</a></li>
+            <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a></li>
+            <li><a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
+            <li><a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms & Conditions</a></li>
+            <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping & Return Policy</a></li>
+            <li><a href="#" class="logout-link" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        </ul>
+    </div>
 
-        <a
-            href="ebook.html"
-            class="back-btn"
-            aria-label="Back">
+    <!-- Welcome Card Soft Banner -->
+    <div class="welcome-card-soft">
+        <h2>नमस्ते, <span id="userName">अविनाश मिश्रा</span> जी! 👋</h2>
+        <p>आपकी पर्सनल डिजिटल लाइब्रेरी में आपका स्वागत है। यहाँ से आप अपनी खरीदी गई और उपलब्ध ई-बुक्स को देख, पढ़ और डाउनलोड कर सकते हैं।</p>
+    </div>
 
-            ←
+    <!-- Category Pill Tabs -->
+    <div class="category-tabs">
+        <button class="tab-btn active" onclick="switchTab('purchased')">मेरी पुस्तकें (My Books)</button>
+        <button class="tab-btn" onclick="switchTab('available')">उपलब्ध बुक्स (Available)</button>
+        <button class="tab-btn" onclick="switchTab('bonus')">फ्री बोनस (Bonus)</button>
+        <button class="tab-btn" onclick="switchTab('demo')">डेमो बुक्स (Demo)</button>
+        <button class="tab-btn" onclick="switchTab('coming')">आने वाली बुक्स (Coming Soon)</button>
+    </div>
 
-        </a>
+    <!-- Main Container -->
+    <div class="library-container">
 
-        <h1>
+        <!-- Section 1: Purchased / Active Books -->
+        <div id="section-purchased" class="book-section">
+            <div class="section-title">
+                <span>मेरी एक्टिव / खरीदी गई ई-बुक्स</span>
+                <span class="view-all-text" onclick="openLeadModal()">Update Profile</span>
+            </div>
+            <div class="book-grid-2col" id="purchasedBooksGrid">
+                <!-- JavaScript द्वारा डायनेमिक कार्ड्स यहाँ लोड होंगे -->
+            </div>
+        </div>
 
-            My Library
+        <!-- Section 2: Available Books (3 मुख्य तैयार किताबें: खरीफ, फसल का डॉक्टर, AI डिजिटल बुक) -->
+        <div id="section-available" class="book-section" style="display: none;">
+            <div class="section-title">
+                <span>खरीद के लिए उपलब्ध प्रमुख पुस्तकें (Available Books)</span>
+            </div>
+            <div class="book-grid-2col" id="availableBooksGrid">
+                <!-- 3 मुख्य तैयार किताबें यहाँ दिखेंगी -->
+            </div>
+        </div>
 
-        </h1>
+        <!-- Section 3: Bonus Books -->
+        <div id="section-bonus" class="book-section" style="display: none;">
+            <div class="section-title"><span>फ्री बोनस पुस्तकें</span></div>
+            <div class="book-grid-2col">
+                <p style="font-size: 0.85rem; color: #666; grid-column: span 2; text-align: center; padding: 20px;">जल्द ही आपके लिए फ्री बोनस बुक्स जोड़ी जाएंगी।</p>
+            </div>
+        </div>
+
+        <!-- Section 4: Demo Books -->
+        <div id="section-demo" class="book-section" style="display: none;">
+            <div class="section-title"><span>डेमो ई-बुक्स प्रिव्यू</span></div>
+            <div class="book-grid-2col">
+                <p style="font-size: 0.85rem; color: #666; grid-column: span 2; text-align: center; padding: 20px;">डेमो बुक्स यहाँ उपलब्ध होंगी।</p>
+            </div>
+        </div>
+
+        <!-- Section 5: Coming Soon Books -->
+        <div id="section-coming" class="book-section" style="display: none;">
+            <div class="section-title"><span>आने वाली प्रीमियम बुक्स (Coming Soon & Wishlist)</span></div>
+            <div class="book-grid-2col" id="comingSoonGrid">
+                <!-- कमिंग सून किताबें और हार्ट विशलिस्ट कार्ड्स यहाँ लोड होंगे -->
+            </div>
+        </div>
 
     </div>
 
-</header>
-
-
-
-<!-- =========================================
-     MAIN
-========================================== -->
-
-<main class="library-page">
-
-    <section class="library-top">
-
-        <h2>
-
-            Purchased Books
-
-        </h2>
-
-        <p>
-
-            आपके खरीदे गए सभी eBooks
-
-        </p>
-
-    </section>
-
-
-
-    <!-- Purchased Count -->
-
-    <section class="library-count">
-
-        <div class="count-card">
-
-            <span
-                id="bookCount">
-
-                0
-
-            </span>
-
-            <p>
-
-                Purchased Books
-
-            </p>
-
+    <!-- Full Detailed Profile Update Form Modal -->
+    <div class="modal-overlay" id="leadModal">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeLeadModal()">&times;</span>
+            <h3>पूर्ण प्रोफाइल जानकारी अपडेट करें</h3>
+            <form onsubmit="submitLeadForm(event)">
+                <input type="text" id="leadName" class="modal-input" placeholder="पूरा नाम (Full Name)" required>
+                <input type="tel" id="leadPhone" class="modal-input" placeholder="व्हाट्सएप मोबाइल नंबर (Mobile Number)" required>
+                <input type="email" id="leadEmail" class="modal-input" placeholder="ईमेल आईडी (Email Address)">
+                <input type="text" id="leadCity" class="modal-input" placeholder="शहर / जिला (City / District)">
+                <textarea id="leadAddress" class="modal-input" placeholder="पूरा पता (Full Address)" rows="2" style="resize: none;"></textarea>
+                <button type="submit" class="modal-submit-btn">जानकारी सुरक्षित करें (Save Profile)</button>
+            </form>
         </div>
+    </div>
 
-    </section>
-    <!-- =========================================
-         BOOKS GRID
-    ========================================== -->
-
-    <section class="library-books">
-
-        <div
-            id="booksContainer"
-            class="books-grid">
-
-            <!-- Dynamic Book Cards -->
-            <!-- my-library.js यहाँ Book Cards बनाएगा -->
-
+    <!-- Sticky Bottom Timer & Deal Bar -->
+    <div class="sticky-action-bar">
+        <div class="deal-timer-banner">
+            <span>⚡ स्पेशल ऑफर समाप्त होने में शेष:</span>
+            <span id="dealTimer" style="font-family: monospace; font-size: 0.9rem; font-weight: bold;">00:00:00</span>
         </div>
-
-    </section>
-
-
-
-    <!-- =========================================
-         EMPTY STATE
-    ========================================== -->
-
-    <section
-        id="emptyState"
-        class="empty-library hidden">
-
-        <img
-            src="images/icons/empty-library.svg"
-            alt="No Books">
-
-        <h2>
-
-            अभी तक कोई eBook नहीं खरीदी गई
-
-        </h2>
-
-        <p>
-
-            आपकी खरीदी गई सभी किताबें यहाँ दिखाई देंगी।
-
-        </p>
-
-        <a
-            href="ebook.html"
-            class="browse-btn">
-
-            Browse eBooks
-
+        <a href="https://wa.me/917974422572?text=नमस्ते%20अविनाश%20जी,%20मुझे%20ई-बुक्स%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" class="sticky-deal-btn">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp / TODAY DEAL 
         </a>
+    </div>
 
-    </section>
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a href="/index.html" class="nav-item">
+            <span><i class="fa-solid fa-house"></i></span>Home
+        </a>
+        <a href="/ebooks/wishlist.html" class="nav-item">
+            <span><i class="fa-solid fa-heart"></i></span>Wishlist
+        </a>
+        <a href="/ebooks/my-library.html" class="nav-item active">
+            <span><i class="fa-solid fa-book-bookmark"></i></span>Library
+        </a>
+        <a href="/ebooks/mypurchase.html" class="nav-item">
+            <span><i class="fa-solid fa-file-invoice"></i></span>Purchase
+        </a>
+    </div>
 
-
-
-    <!-- =========================================
-         WHATSAPP HELP
-    ========================================== -->
-
-    <section class="help-section">
-
-        <div class="help-card">
-
-            <h2>
-
-                सहायता चाहिए?
-
-            </h2>
-
-            <p>
-
-                यदि आपकी खरीदी गई Book दिखाई नहीं दे रही है
-                या Download में समस्या है,
-                तो हमारी Support Team से संपर्क करें।
-
-            </p>
-
-            <a
-                href="https://wa.me/917974422572"
-                target="_blank"
-                rel="noopener"
-                class="help-btn">
-
-                WhatsApp Support
-
-            </a>
-
-        </div>
-
-    </section>
-
-</main>
-
-
-
-<!-- =========================================
-     FOOTER
-========================================== -->
-
-<footer class="library-footer">
-
-    <p>
-
-        © 2026 Aarogyam India.
-        All Rights Reserved.
-
-    </p>
-
-</footer>
-
-
-
-<!-- =========================================
-     JAVASCRIPT
-========================================== -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="../js\my-library.js"></script>
-
+    <!-- JavaScript Link -->
+    <script src="/js/my-library.js"></script>
 </body>
 </html>
-
