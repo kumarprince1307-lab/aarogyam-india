@@ -249,28 +249,47 @@ console.log("✅ Interest Form Module Loaded");
    END OF MODULE 3: INTEREST FORM SYSTEM
 =========================================================== */
 
-
 /* ===========================================================
-   MODULE 4: DEMO SYSTEM
+   MODULE 4: DEMO SYSTEM (EXACT WORKING MATCH + MOBILE CLEANER)
 =========================================================== */
 const DEMO = { TABLE: "demo_users", STATUS: "viewed" };
 
 async function saveDemoUser(data) {
     try {
-        const { data: result, error } = await supabase.from(DEMO.TABLE).insert([{
-            profile_id: data.profileId,
+        // 1. मोबाइल नंबर को साफ़ करने का लॉजिक (0 या 91 हटाने के लिए)
+        let cleanMobile = String(data.mobile || "").trim();
+        if (cleanMobile.startsWith("+91")) {
+            cleanMobile = cleanMobile.slice(3);
+        } else if (cleanMobile.startsWith("91") && cleanMobile.length === 12) {
+            cleanMobile = cleanMobile.slice(2);
+        }
+        if (cleanMobile.startsWith("0") && cleanMobile.length === 11) {
+            cleanMobile = cleanMobile.slice(1);
+        }
+
+        console.log("Saving demo user with data:", { ...data, mobile: cleanMobile });
+
+        // ठीक वैसे ही जैसे मॉड्यूल 8 में 'db.from' का उपयोग किया गया है
+        const { data: result, error } = await db.from(DEMO.TABLE).insert([{
+            profile_id: data.profileId || null,
             name: data.name,
-            mobile: data.mobile,
+            mobile: cleanMobile, // यहाँ बिल्कुल साफ़ किया हुआ 10 अंकों का नंबर जाएगा
             email: data.email || null,
             state: data.state || null,
             district: data.district || null,
             demo_book_id: data.bookId,
             demo_viewed_at: new Date().toISOString()
-        }]).select().single();
+        }]).select();
 
-        if (error) throw error;
+        if (error) {
+            console.error("Supabase Error Details:", error);
+            throw error;
+        }
+
+        console.log("✅ Data saved successfully to Supabase:", result);
         return { success: true, data: result };
     } catch (error) {
+        console.error("❌ Supabase Save Exception:", error.message);
         return { success: false, message: error.message };
     }
 }
@@ -278,7 +297,6 @@ console.log("✅ Demo Module Loaded");
 /* ===========================================================
    END OF MODULE 4: DEMO SYSTEM
 =========================================================== */
-
 
 /* ===========================================================
    MODULE 5: BOOKS ENGINE (books.json Driven)

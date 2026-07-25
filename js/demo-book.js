@@ -1,5 +1,5 @@
 /* ==========================================================
-   AAROGYAM INDIA - UNIVERSAL DEMO BOOK JS (FINAL)
+   AAROGYAM INDIA - UNIVERSAL DEMO BOOK JS (FINAL FIXED)
    ========================================================== */
 
 let currentBookData = null;
@@ -29,7 +29,7 @@ async function loadBookData() {
 
         if (!currentBookData) {
             alert("Book Demo Not Found");
-            window.location.href = "/";
+            window.location.href = "../ebooks/agriculture.html";
             return;
         }
 
@@ -64,22 +64,21 @@ async function loadBookData() {
                 imgTag.src = imgPath;
                 imgTag.className = index === 0 ? "preview-image active" : "preview-image";
                 imgTag.alt = `Preview Page ${index + 1}`;
-                // सुरक्षा: डाउनलोड रोकने के लिए contextmenu disable करना
                 imgTag.oncontextmenu = (e) => e.preventDefault();
                 sliderContainer.appendChild(imgTag);
             });
         }
 
-        // Update Checkout Link dynamically
+        // --- UPDATE CHECKOUT LINK (सटीक पाथ के साथ) ---
         const buyBtn = document.getElementById("stickyBuyBtn");
         if(buyBtn) {
-            buyBtn.href = `${currentBookData.checkoutPage || '../checkout.html'}?id=${currentBookData.id}`;
+            buyBtn.href = `../ebooks/checkout.html?id=${currentBookData.id}`;
         }
 
-        // Update Back Button Link
+        // --- UPDATE BACK BUTTON LINK (सटीक पाथ के साथ) ---
         const backBtn = document.getElementById("backBtn");
-        if(backBtn && currentBookData.landingPage) {
-            backBtn.href = currentBookData.landingPage;
+        if(backBtn) {
+            backBtn.href = "../ebooks/agriculture.html";
         }
 
     } catch (error) {
@@ -145,36 +144,30 @@ function validateForm() {
 
 async function saveUserToSupabase(userData) {
     try {
-        // चूंकि HTML के नीचे Supabase की स्क्रिप्ट है, यह window.supabase का उपयोग करेगा
-        if (!window.supabase) {
-            console.error("Supabase script not loaded in HTML");
-            return true; // अगर स्क्रिप्ट लोड होने में दिक्कत हो तो भी यूजर का फ्लो न रुके
+        // आपकी मुख्य supabase.js फाइल से window.db का उपयोग किया गया है
+        const client = window.db || window.supabaseClient || window.supabase;
+        
+        if (!client || typeof client.from !== 'function') {
+            console.error("Supabase client not found");
+            return true; 
         }
 
-        // मान लीजिए आपने HTML में supabase client इनिशियलाइज किया है या यहाँ कर रहे हैं
-        // अगर window.supabaseClient उपलब्ध है या स्टैंडर्ड supabase ऑब्जेक्ट है:
-        const client = window.supabaseClient || window.supabase;
-        
-        if (client && typeof client.from === 'function') {
-            const { data, error } = await client
-                .from("demo_users") // आपकी Supabase टेबल का नाम
-                .insert([
-                    {
-                        book_id: userData.book_id,
-                        book_name: userData.book_name,
-                        full_name: userData.name,
-                        mobile: userData.mobile,
-                        email: userData.email,
-                        state: userData.state,
-                        district: userData.district,
-                        created_at: userData.created_at
-                    }
-                ]);
+        // आपकी Supabase टेबल (demo_users) के कॉलम के अनुसार डेटा इंसर्ट
+        const { data, error } = await client
+            .from("demo_users")
+            .insert([
+                {
+                    name: userData.name,
+                    mobile: userData.mobile,
+                    email: userData.email,
+                    state: userData.state,
+                    district: userData.district,
+                    demo_book_id: userData.book_id
+                }
+            ]);
 
-            if (error) {
-                console.error("Supabase Insert Error:", error.message);
-                // एरर होने पर भी यूजर को रोकने के बजाय लॉग कर रहे हैं ताकि डेमो न अटके
-            }
+        if (error) {
+            console.error("Supabase Insert Error:", error.message);
         }
         return true;
     } catch (err) {
@@ -194,17 +187,20 @@ if(demoForm) {
         showLoader();
 
         const userData = {
-            book_id: currentBookData ? currentBookData.id : "BK001",
-            book_name: currentBookData ? currentBookData.name : "",
+            bookId: currentBookData ? currentBookData.id : "BK001",
             name: nameInput.value.trim(),
             mobile: mobileInput.value.trim(),
             email: emailInput.value.trim(),
             state: stateInput.value.trim(),
             district: districtInput.value.trim(),
-            created_at: new Date().toISOString()
+            profileId: null
         };
 
-        await saveUserToSupabase(userData);
+        // यह सीधा supabase.js के अंदर बने saveDemoUser फंक्शन को कॉल करेगा
+        if (typeof saveDemoUser === "function") {
+            await saveDemoUser(userData);
+        }
+
         hideLoader();
         unlockDemo();
     });
@@ -291,7 +287,6 @@ function openViewer() {
     if(!imageViewer || !viewerImage) return;
     viewerImage.src = previewImages[currentIndex].src;
     imageViewer.style.display = "flex";
-    // सुरक्षा: व्यूअर में भी डाउनलोड रोकने के लिए
     viewerImage.oncontextmenu = (e) => e.preventDefault();
 }
 
@@ -323,7 +318,6 @@ let zoomed = false;
 let startX = 0, startY = 0, currentX = 0, currentY = 0, isDragging = false;
 
 if(viewerImage) {
-    // Double click zoom
     viewerImage.ondblclick = () => {
         zoomed = !zoomed;
         if (zoomed) {
@@ -334,7 +328,6 @@ if(viewerImage) {
         }
     };
 
-    // Mobile touch drag after zoom
     viewerImage.addEventListener("touchstart", (e) => {
         if (!zoomed) return;
         isDragging = true;

@@ -78,7 +78,7 @@ REGISTRATION FORM
 <p>एक बार जानकारी भरने के बाद आप Demo Preview देख पाएँगे।</p>
 <form id="demoForm">
 <input type="text" id="name" placeholder="पूरा नाम" required>
-<input type="tel" id="mobile" placeholder="मोबाइल नंबर" required>
+<input type="tel" id="mobile" name="mobile" maxlength="10" placeholder="मोबाइल नंबर दर्ज करें" required>
 <input type="email" id="email" placeholder="ईमेल (Optional)">
 <input type="text" id="state" placeholder="राज्य (Optional)">
 <input type="text" id="district" placeholder="जिला (Optional)">
@@ -172,6 +172,12 @@ TOAST MESSAGE & LOADER
 <!-- =========================================================
 JAVASCRIPT
 ========================================================= -->
+<!-- 1. सबसे पहले Supabase की लाइब्रेरी लोड होनी चाहिए -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<!-- 2. दूसरे नंबर पर आपकी supabase.js फाइल होनी चाहिए -->
+<script src="../js/supabase.js"></script>
+
 <script src="../js/demo-book.js"></script>
 
 </body>
