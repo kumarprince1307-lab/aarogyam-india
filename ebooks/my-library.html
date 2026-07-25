@@ -123,14 +123,22 @@
         <div class="modal-card">
             <span class="close-modal" onclick="closeLeadModal()">&times;</span>
             <h3>पूर्ण प्रोफाइल जानकारी अपडेट करें</h3>
-            <form onsubmit="submitLeadForm(event)">
-                <input type="text" id="leadName" class="modal-input" placeholder="पूरा नाम (Full Name)" required>
-                <input type="tel" id="leadPhone" class="modal-input" placeholder="व्हाट्सएप मोबाइल नंबर (Mobile Number)" required>
-                <input type="email" id="leadEmail" class="modal-input" placeholder="ईमेल आईडी (Email Address)">
-                <input type="text" id="leadCity" class="modal-input" placeholder="शहर / जिला (City / District)">
-                <textarea id="leadAddress" class="modal-input" placeholder="पूरा पता (Full Address)" rows="2" style="resize: none;"></textarea>
-                <button type="submit" class="modal-submit-btn">जानकारी सुरक्षित करें (Save Profile)</button>
-            </form>
+           <form onsubmit="submitLeadForm(event)">
+    <input type="text" id="leadName" class="modal-input" placeholder="आपका पूरा नाम" required>
+    <input type="tel" id="leadPhone" class="modal-input" placeholder="मोबाइल नंबर (WhatsApp)" required>
+    <input type="email" id="leadEmail" class="modal-input" placeholder="ईमेल आईडी (Email Address)">
+    
+    <!-- यहाँ हमने State और DOB के दो नए कॉलम/इनपुट जोड़ दिए हैं -->
+    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+        <input type="text" id="leadState" class="modal-input" placeholder="राज्य (State)" style="margin-bottom: 0;">
+        <input type="date" id="leadDob" class="modal-input" placeholder="जन्म तिथि (DOB)" style="margin-bottom: 0;" title="जन्म तिथि (Date of Birth)">
+    </div>
+
+    <input type="text" id="leadCity" class="modal-input" placeholder="शहर / जिला (City / District)">
+    <textarea id="leadAddress" class="modal-input" placeholder="पूरा पता (Full Address)" rows="2" style="resize: none;"></textarea>
+    
+    <button type="submit" class="modal-submit-btn">जानकारी सुरक्षित करें (Save Profile)</button>
+</form>
         </div>
     </div>
 
@@ -162,6 +170,12 @@
     </div>
 
     <!-- JavaScript Link -->
+     <!-- 1. सबसे पहले Supabase की लाइब्रेरी लोड होनी चाहिए -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<!-- 2. दूसरे नंबर पर आपकी supabase.js फाइल होनी चाहिए -->
+<script src="../js/supabase.js"></script>
+
     <script src="/js/my-library.js"></script>
 </body>
 </html>
