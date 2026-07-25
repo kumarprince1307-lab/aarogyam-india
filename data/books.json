@@ -3,35 +3,34 @@
     {
       "id": "BK001",
       "slug": "kharif-2026",
-
       "name": "खरीफ फसल मास्टर गाइड 2026",
       "category": "Agriculture",
       "language": "Hindi",
       "author": "Aarogyam India",
       "version": "1.0",
       "status": "active",
-
       "cover": "/images/books/kharif-master-guide-2026-cover.webp",
       "thumbnail": "/images/books/kharif-master-guide-2026-cover.webp",
       "banner": "/images/books/kharif-banner.webp",
-
       "landingPage": "/books/kharif-fasal-master-guide-2026.html",
       "demoPage": "/demo/demo-kharif.html",
       "checkoutPage": "/checkout.html",
-
       "mrp": 299,
       "offerPrice": 99,
       "currency": "INR",
-
       "demoAvailable": true,
-      "demoImages": 5,
-
+      "demoImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
       "accessType": "Lifetime",
-
       "seo": {
         "title": "खरीफ फसल मास्टर गाइड 2026",
-        "description": "",
-        "keywords": "",
+        "description": "खरीफ फसल मास्टर गाइड 2026 का डेमो देखें और सम्पूर्ण eBook खरीदें।",
+        "keywords": "खरीफ फसल, सोयाबीन, धान, मक्का, eBook, Aarogyam India",
         "canonical": ""
       }
     }

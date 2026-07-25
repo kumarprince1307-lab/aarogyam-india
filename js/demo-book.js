@@ -1,638 +1,372 @@
-/*==================================================
-AAROGYAM INDIA
-DEMO BOOK JS
-PART - 1
-==================================================*/
+/* ==========================================================
+   AAROGYAM INDIA - UNIVERSAL DEMO BOOK JS (FINAL)
+   ========================================================== */
+
+let currentBookData = null;
+let previewImages = [];
+let currentIndex = 0;
+
+document.addEventListener("DOMContentLoaded", async () => {
+    showLoader();
+    await loadBookData();
+    initializePage();
+    setupEventListeners();
+});
 
 /*==================================================
-DOM ELEMENTS
+  1. LOAD BOOK DATA FROM books.json BASED ON URL ID
 ==================================================*/
+async function loadBookData() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const bookId = params.get("id") || "BK001";
 
+        const response = await fetch("../data/books.json");
+        const jsonResult = await response.json();
+        const booksArray = Array.isArray(jsonResult) ? jsonResult : (jsonResult.books || []);
+        
+        currentBookData = booksArray.find(item => item.id === bookId || item.book_id === bookId);
+
+        if (!currentBookData) {
+            alert("Book Demo Not Found");
+            window.location.href = "/";
+            return;
+        }
+
+        // Bind Dynamic Data to HTML Elements
+        document.title = `${currentBookData.name} | Aarogyam India`;
+        
+        const coverEl = document.getElementById("bookCover");
+        if (coverEl) coverEl.src = currentBookData.cover || currentBookData.thumbnail;
+
+        const titleEl = document.getElementById("bookTitle");
+        if (titleEl) titleEl.textContent = currentBookData.name;
+
+        // Price Updates
+        const mrpEl = document.getElementById("bookMrp");
+        if (mrpEl) mrpEl.textContent = "₹" + currentBookData.mrp;
+
+        const priceEl = document.getElementById("bookPrice");
+        if (priceEl) priceEl.textContent = "₹" + currentBookData.offerPrice;
+
+        const barMrp = document.getElementById("barMrp");
+        if (barMrp) barMrp.textContent = "₹" + currentBookData.mrp;
+
+        const barOffer = document.getElementById("barOffer");
+        if (barOffer) barOffer.textContent = "₹" + currentBookData.offerPrice;
+
+        // Dynamic Demo Images Generation from JSON Array
+        const sliderContainer = document.querySelector(".slider-container");
+        if (sliderContainer && currentBookData.demoImages && Array.isArray(currentBookData.demoImages)) {
+            sliderContainer.innerHTML = "";
+            currentBookData.demoImages.forEach((imgPath, index) => {
+                let imgTag = document.createElement("img");
+                imgTag.src = imgPath;
+                imgTag.className = index === 0 ? "preview-image active" : "preview-image";
+                imgTag.alt = `Preview Page ${index + 1}`;
+                // सुरक्षा: डाउनलोड रोकने के लिए contextmenu disable करना
+                imgTag.oncontextmenu = (e) => e.preventDefault();
+                sliderContainer.appendChild(imgTag);
+            });
+        }
+
+        // Update Checkout Link dynamically
+        const buyBtn = document.getElementById("stickyBuyBtn");
+        if(buyBtn) {
+            buyBtn.href = `${currentBookData.checkoutPage || '../checkout.html'}?id=${currentBookData.id}`;
+        }
+
+        // Update Back Button Link
+        const backBtn = document.getElementById("backBtn");
+        if(backBtn && currentBookData.landingPage) {
+            backBtn.href = currentBookData.landingPage;
+        }
+
+    } catch (error) {
+        console.error("Error loading book data:", error);
+        showToast("डेटा लोड करने में समस्या हुई।");
+    }
+}
+
+/*==================================================
+  2. DOM ELEMENTS & UTILITIES
+==================================================*/
 const demoForm = document.getElementById("demoForm");
-
 const formSection = document.querySelector(".demo-form-section");
-
 const demoPreview = document.getElementById("demoPreview");
-
 const previewSlider = document.querySelector(".preview-slider");
-
 const loader = document.getElementById("loader");
-
 const toast = document.getElementById("toast");
 
 const nameInput = document.getElementById("name");
-
 const mobileInput = document.getElementById("mobile");
-
 const emailInput = document.getElementById("email");
-
 const stateInput = document.getElementById("state");
-
 const districtInput = document.getElementById("district");
 
+function showLoader() { if(loader) loader.style.display = "flex"; }
+function hideLoader() { if(loader) loader.style.display = "none"; }
 
-/*==================================================
-LOADER
-==================================================*/
-
-function showLoader(){
-
-    loader.style.display = "flex";
-
-}
-
-function hideLoader(){
-
-    loader.style.display = "none";
-
-}
-
-
-/*==================================================
-TOAST
-==================================================*/
-
-function showToast(message){
-
+function showToast(message) {
+    if(!toast) return;
     toast.innerText = message;
-
     toast.classList.add("show");
-
-    setTimeout(()=>{
-
+    setTimeout(() => {
         toast.classList.remove("show");
-
-    },3000);
-
+    }, 3000);
 }
 
-
-/*==================================================
-PAGE INITIALIZE
-==================================================*/
-
-function initializePage(){
-
+function initializePage() {
     hideLoader();
-
-    demoPreview.style.display = "none";
-
-    previewSlider.style.display = "none";
-
+    if(demoPreview) demoPreview.style.display = "none";
+    if(previewSlider) previewSlider.style.display = "none";
 }
-
 
 /*==================================================
-VALIDATION
+  3. VALIDATION & SUPABASE DATA SAVE
 ==================================================*/
-
-function validateName(){
-
-    const value = nameInput.value.trim();
-
-    if(value.length < 3){
-
+function validateForm() {
+    const name = nameInput.value.trim();
+    if (name.length < 3) {
         showToast("कृपया पूरा नाम दर्ज करें");
-
         nameInput.focus();
-
         return false;
-
     }
-
-    return true;
-
-}
-
-
-function validateMobile(){
 
     const mobile = mobileInput.value.trim();
-
     const mobilePattern = /^[6-9]\d{9}$/;
-
-    if(!mobilePattern.test(mobile)){
-
+    if (!mobilePattern.test(mobile)) {
         showToast("सही मोबाइल नंबर दर्ज करें");
-
         mobileInput.focus();
-
         return false;
-
     }
-
     return true;
-
 }
 
+async function saveUserToSupabase(userData) {
+    try {
+        // चूंकि HTML के नीचे Supabase की स्क्रिप्ट है, यह window.supabase का उपयोग करेगा
+        if (!window.supabase) {
+            console.error("Supabase script not loaded in HTML");
+            return true; // अगर स्क्रिप्ट लोड होने में दिक्कत हो तो भी यूजर का फ्लो न रुके
+        }
 
-function validateForm(){
+        // मान लीजिए आपने HTML में supabase client इनिशियलाइज किया है या यहाँ कर रहे हैं
+        // अगर window.supabaseClient उपलब्ध है या स्टैंडर्ड supabase ऑब्जेक्ट है:
+        const client = window.supabaseClient || window.supabase;
+        
+        if (client && typeof client.from === 'function') {
+            const { data, error } = await client
+                .from("demo_users") // आपकी Supabase टेबल का नाम
+                .insert([
+                    {
+                        book_id: userData.book_id,
+                        book_name: userData.book_name,
+                        full_name: userData.name,
+                        mobile: userData.mobile,
+                        email: userData.email,
+                        state: userData.state,
+                        district: userData.district,
+                        created_at: userData.created_at
+                    }
+                ]);
 
-    if(!validateName()){
-
-        return false;
-
+            if (error) {
+                console.error("Supabase Insert Error:", error.message);
+                // एरर होने पर भी यूजर को रोकने के बजाय लॉग कर रहे हैं ताकि डेमो न अटके
+            }
+        }
+        return true;
+    } catch (err) {
+        console.error("Supabase Connection Error:", err);
+        return true; 
     }
-
-    if(!validateMobile()){
-
-        return false;
-
-    }
-
-    return true;
-
 }
 
-
 /*==================================================
-SAVE USER
-SUPABASE PLACEHOLDER
+  4. FORM SUBMIT EVENT
 ==================================================*/
+if(demoForm) {
+    demoForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        if (!validateForm()) return;
 
-async function saveUser(){
+        showLoader();
 
-    /*
-    Future
+        const userData = {
+            book_id: currentBookData ? currentBookData.id : "BK001",
+            book_name: currentBookData ? currentBookData.name : "",
+            name: nameInput.value.trim(),
+            mobile: mobileInput.value.trim(),
+            email: emailInput.value.trim(),
+            state: stateInput.value.trim(),
+            district: districtInput.value.trim(),
+            created_at: new Date().toISOString()
+        };
 
-    await supabase
-    .from("demo_users")
-    .insert([...]);
-
-    */
-
-    return true;
-
+        await saveUserToSupabase(userData);
+        hideLoader();
+        unlockDemo();
+    });
 }
-/*==================================================
-FORM SUBMIT
-==================================================*/
-
-demoForm.addEventListener("submit", async function (event) {
-
-    event.preventDefault();
-
-    if (!validateForm()) {
-
-        return;
-
-    }
-
-    showLoader();
-
-    const userData = {
-
-        name: nameInput.value.trim(),
-
-        mobile: mobileInput.value.trim(),
-
-        email: emailInput.value.trim(),
-
-        state: stateInput.value.trim(),
-
-        district: districtInput.value.trim(),
-
-        createdAt: new Date().toISOString()
-
-    };
-
-    const saved = await saveUser(userData);
-
-    hideLoader();
-
-    if (!saved) {
-
-        showToast("कुछ समस्या हुई। कृपया पुनः प्रयास करें।");
-
-        return;
-
-    }
-
-    unlockDemo();
-
-});
-
-
-/*==================================================
-UNLOCK DEMO
-==================================================*/
 
 function unlockDemo() {
-
-    formSection.style.display = "none";
-
-    demoPreview.style.display = "block";
-
-    previewSlider.style.display = "block";
-
+    if(formSection) formSection.style.display = "none"; // फॉर्म गायब हो जाएगा
+    if(demoPreview) demoPreview.style.display = "block";
+    if(previewSlider) previewSlider.style.display = "block"; // डेमो बुक इमेज खुल जाएगी
     showToast("🎉 Demo सफलतापूर्वक Unlock हो गया");
-
+    
+    setupSliderImages();
 }
 
-
 /*==================================================
-RESET FORM
+  5. IMAGE SLIDER & VIEWER LOGIC
 ==================================================*/
+let prevBtn, nextBtn;
 
-function resetForm() {
-
-    demoForm.reset();
-
+function setupEventListeners() {
+    setupSliderImages();
 }
 
+function setupSliderImages() {
+    previewImages = document.querySelectorAll(".preview-image");
+    prevBtn = document.querySelector(".prev-btn");
+    nextBtn = document.querySelector(".next-btn");
 
-/*==================================================
-AUTO FOCUS
-==================================================*/
+    if(nextBtn) nextBtn.onclick = nextImage;
+    if(prevBtn) prevBtn.onclick = previousImage;
 
-window.addEventListener("load", () => {
+    // Swipe Support for Mobile
+    if(previewSlider) {
+        let touchStartX = 0;
+        let touchEndX = 0;
+        previewSlider.addEventListener("touchstart", (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        previewSlider.addEventListener("touchend", (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) nextImage();
+            else if (touchEndX - touchStartX > 50) previousImage();
+        });
+    }
 
-    initializePage();
-
-    nameInput.focus();
-
-});
-/*==================================================
-IMAGE SLIDER
-==================================================*/
-
-const previewImages = document.querySelectorAll(".preview-image");
-
-const prevBtn = document.querySelector(".prev-btn");
-
-const nextBtn = document.querySelector(".next-btn");
-
-let currentIndex = 0;
-
-
-/*==================================================
-SHOW IMAGE
-==================================================*/
-
-function showImage(index){
-
-    previewImages.forEach((image)=>{
-
-        image.classList.remove("active");
-
+    // Full screen viewer bindings on image click
+    previewImages.forEach((image, index) => {
+        image.onclick = () => {
+            currentIndex = index;
+            openViewer();
+        };
     });
-
-    previewImages[index].classList.add("active");
-
 }
 
+function showImage(index) {
+    previewImages.forEach((image) => image.classList.remove("active"));
+    if(previewImages[index]) previewImages[index].classList.add("active");
+}
 
-/*==================================================
-NEXT IMAGE
-==================================================*/
-
-function nextImage(){
-
+function nextImage() {
+    if(previewImages.length === 0) return;
     currentIndex++;
-
-    if(currentIndex >= previewImages.length){
-
-        currentIndex = 0;
-
-    }
-
+    if (currentIndex >= previewImages.length) currentIndex = 0;
     showImage(currentIndex);
-
+    updateViewerImage();
 }
 
-
-/*==================================================
-PREVIOUS IMAGE
-==================================================*/
-
-function previousImage(){
-
+function previousImage() {
+    if(previewImages.length === 0) return;
     currentIndex--;
-
-    if(currentIndex < 0){
-
-        currentIndex = previewImages.length - 1;
-
-    }
-
+    if (currentIndex < 0) currentIndex = previewImages.length - 1;
     showImage(currentIndex);
-
+    updateViewerImage();
 }
 
-
-/*==================================================
-BUTTON EVENTS
-==================================================*/
-
-nextBtn.addEventListener("click", nextImage);
-
-prevBtn.addEventListener("click", previousImage);
-
-
-/*==================================================
-SWIPE SUPPORT
-==================================================*/
-
-let touchStartX = 0;
-
-let touchEndX = 0;
-
-previewSlider.addEventListener("touchstart",(event)=>{
-
-    touchStartX = event.changedTouches[0].screenX;
-
-});
-
-previewSlider.addEventListener("touchend",(event)=>{
-
-    touchEndX = event.changedTouches[0].screenX;
-
-    if(touchStartX - touchEndX > 50){
-
-        nextImage();
-
-    }
-
-    else if(touchEndX - touchStartX > 50){
-
-        previousImage();
-
-    }
-
-});
-
-
-/*==================================================
-INITIAL IMAGE
-==================================================*/
-
-showImage(currentIndex);
-/*==================================================
-IMAGE VIEWER
-==================================================*/
-
+// Fullscreen Viewer Elements
 const imageViewer = document.getElementById("imageViewer");
-
 const viewerImage = document.getElementById("viewerImage");
-
 const viewerPrev = document.querySelector(".viewer-prev");
-
 const viewerNext = document.querySelector(".viewer-next");
-
 const closeViewer = document.querySelector(".close-viewer");
 
+function openViewer() {
+    if(!imageViewer || !viewerImage) return;
+    viewerImage.src = previewImages[currentIndex].src;
+    imageViewer.style.display = "flex";
+    // सुरक्षा: व्यूअर में भी डाउनलोड रोकने के लिए
+    viewerImage.oncontextmenu = (e) => e.preventDefault();
+}
 
-/*==================================================
-OPEN VIEWER
-==================================================*/
+if(viewerNext) viewerNext.onclick = () => { nextImage(); };
+if(viewerPrev) viewerPrev.onclick = () => { previousImage(); };
+if(closeViewer) closeViewer.onclick = () => { closeImageModal(); };
 
-previewImages.forEach((image, index) => {
+if(imageViewer) {
+    imageViewer.onclick = (e) => {
+        if (e.target === imageViewer) closeImageModal();
+    };
+}
 
-    image.addEventListener("click", () => {
+function closeImageModal() {
+    if(imageViewer) imageViewer.style.display = "none";
+    resetViewerZoom();
+}
 
-        currentIndex = index;
+// Keyboard Support (ESC से बाहर, Arrow Keys से स्लाइड)
+document.addEventListener("keydown", (event) => {
+    if (!imageViewer || imageViewer.style.display !== "flex") return;
+    if (event.key === "ArrowRight") nextImage();
+    if (event.key === "ArrowLeft") previousImage();
+    if (event.key === "Escape") closeImageModal();
+});
 
-        viewerImage.src = previewImages[currentIndex].src;
+// Zoom & Pan Variables
+let zoomed = false;
+let startX = 0, startY = 0, currentX = 0, currentY = 0, isDragging = false;
 
-        imageViewer.style.display = "flex";
+if(viewerImage) {
+    // Double click zoom
+    viewerImage.ondblclick = () => {
+        zoomed = !zoomed;
+        if (zoomed) {
+            viewerImage.style.transform = "scale(2)";
+            viewerImage.style.cursor = "zoom-out";
+        } else {
+            resetViewerZoom();
+        }
+    };
 
+    // Mobile touch drag after zoom
+    viewerImage.addEventListener("touchstart", (e) => {
+        if (!zoomed) return;
+        isDragging = true;
+        startX = e.touches[0].clientX - currentX;
+        startY = e.touches[0].clientY - currentY;
     });
 
-});
+    viewerImage.addEventListener("touchmove", (e) => {
+        if (!zoomed || !isDragging) return;
+        e.preventDefault();
+        currentX = e.touches[0].clientX - startX;
+        currentY = e.touches[0].clientY - startY;
+        viewerImage.style.transform = `translate(${currentX}px, ${currentY}px) scale(2)`;
+    }, { passive: false });
 
-
-/*==================================================
-VIEWER NEXT
-==================================================*/
-
-viewerNext.addEventListener("click", () => {
-
-    nextImage();
-
-    viewerImage.src = previewImages[currentIndex].src;
-
-});
-
-
-/*==================================================
-VIEWER PREVIOUS
-==================================================*/
-
-viewerPrev.addEventListener("click", () => {
-
-    previousImage();
-
-    viewerImage.src = previewImages[currentIndex].src;
-
-});
-
-
-/*==================================================
-CLOSE VIEWER
-==================================================*/
-
-closeViewer.addEventListener("click", () => {
-
-    imageViewer.style.display = "none";
-
-});
-
-
-/*==================================================
-CLICK OUTSIDE TO CLOSE
-==================================================*/
-
-imageViewer.addEventListener("click", (event) => {
-
-    if (event.target === imageViewer) {
-
-        imageViewer.style.display = "none";
-
-    }
-
-});
-
-
-/*==================================================
-KEYBOARD SUPPORT
-==================================================*/
-
-document.addEventListener("keydown", (event) => {
-
-    if (imageViewer.style.display !== "flex") return;
-
-    if (event.key === "ArrowRight") {
-
-        nextImage();
-
-        viewerImage.src = previewImages[currentIndex].src;
-
-    }
-
-    if (event.key === "ArrowLeft") {
-
-        previousImage();
-
-        viewerImage.src = previewImages[currentIndex].src;
-
-    }
-
-    if (event.key === "Escape") {
-
-        imageViewer.style.display = "none";
-
-    }
-
-});
-
-
-/*==================================================
-DOUBLE CLICK ZOOM
-==================================================*/
-
-let zoomed = false;
-
-viewerImage.addEventListener("dblclick", () => {
-
-    zoomed = !zoomed;
-
-    if (zoomed) {
-
-     viewerImage.style.transform = "scale(2)";
-
-        viewerImage.style.cursor = "zoom-out";
-
-    } else {
-
-     viewerImage.style.transform = "scale(1)";
-
-        viewerImage.style.cursor = "zoom-in";
-
-    }
-
-});
-
-
-/*==================================================
-RESET ZOOM AFTER CLOSE
-==================================================*/
-
-function resetViewer() {
-
-    zoomed = false;
-
-    viewerImage.style.transform = "scale(1)";
-
-    viewerImage.style.cursor = "zoom-in";
-
+    viewerImage.addEventListener("touchend", () => { isDragging = false; });
 }
 
-closeViewer.addEventListener("click", resetViewer);
-
-imageViewer.addEventListener("click", (event) => {
-
-    if (event.target === imageViewer) {
-
-        resetViewer();
-
+function updateViewerImage() {
+    if (imageViewer && imageViewer.style.display === "flex" && viewerImage) {
+        viewerImage.src = previewImages[currentIndex].src;
     }
+}
 
-});
-
-/*==================================================
-PART - 5
-MOBILE DRAG & PAN AFTER ZOOM
-==================================================*/
-
-let startX = 0;
-let startY = 0;
-
-let currentX = 0;
-let currentY = 0;
-
-let isDragging = false;
-
-
-/*==================================================
-START DRAG
-==================================================*/
-
-viewerImage.addEventListener("touchstart", (e) => {
-
-    if (!zoomed) return;
-
-    isDragging = true;
-
-    startX = e.touches[0].clientX - currentX;
-    startY = e.touches[0].clientY - currentY;
-
-});
-
-
-/*==================================================
-MOVE IMAGE
-==================================================*/
-
-viewerImage.addEventListener("touchmove", (e) => {
-
-    if (!zoomed || !isDragging) return;
-
-    e.preventDefault();
-
-    currentX = e.touches[0].clientX - startX;
-    currentY = e.touches[0].clientY - startY;
-
-    viewerImage.style.transform =
-        `translate(${currentX}px, ${currentY}px) scale(2)`;
-
-}, { passive: false });
-
-
-/*==================================================
-STOP DRAG
-==================================================*/
-
-viewerImage.addEventListener("touchend", () => {
-
-    isDragging = false;
-
-});
-
-
-/*==================================================
-RESET POSITION
-==================================================*/
-
-function resetViewerPosition() {
-
+function resetViewerZoom() {
+    zoomed = false;
     currentX = 0;
     currentY = 0;
-
-    viewerImage.style.transform = "scale(1)";
-
+    if(viewerImage) {
+        viewerImage.style.transform = "scale(1)";
+        viewerImage.style.cursor = "zoom-in";
+    }
 }
 
-
-/*==================================================
-RESET AFTER CLOSE
-==================================================*/
-
-closeViewer.addEventListener("click", () => {
-
-    resetViewerPosition();
-
-});
-
-
-imageViewer.addEventListener("click", (e) => {
-
-    if (e.target === imageViewer) {
-
-        resetViewerPosition();
-
-    }
-
-});
-/*==================================================
-END OF FILE
-==================================================*/
+closeViewer.addEventListener("click", resetViewerZoom);
