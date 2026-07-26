@@ -142,16 +142,32 @@
         </div>
     </div>
 
-    <!-- Sticky Bottom Timer & Deal Bar -->
-    <div class="sticky-action-bar">
-        <div class="deal-timer-banner">
-            <span>⚡ स्पेशल ऑफर समाप्त होने में शेष:</span>
-            <span id="dealTimer" style="font-family: monospace; font-size: 0.9rem; font-weight: bold;">00:00:00</span>
-        </div>
-        <a href="https://wa.me/917974422572?text=नमस्ते%20अविनाश%20जी,%20मुझे%20ई-बुक्स%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" class="sticky-deal-btn">
-            <i class="fa-brands fa-whatsapp"></i> WhatsApp / TODAY DEAL 
-        </a>
+   <!-- Sticky Bottom Timer & Deal Bar -->
+<div class="sticky-action-bar">
+    <div class="deal-timer-banner">
+        <span>⚡ स्पेशल ऑफर समाप्त होने में शेष:</span>
+        <span id="dealTimer" style="font-family: monospace; font-size: 0.9rem; font-weight: bold;">00:00:00</span>
     </div>
+    <a href="https://wa.me/917974422572" id="whatsappDealBtn" target="_blank" class="sticky-deal-btn">
+        <i class="fa-brands fa-whatsapp"></i> WhatsApp / TODAY DEAL
+    </a>
+</div>
+
+<!-- यह स्क्रिप्ट यूजर का नाम ऑटोमैटिक व्हाट्सएप मैसेज में जोड़ देगी -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+        const currentUserName = storedUser.full_name || localStorage.getItem('aim_user_name') || 'ग्राहक';
+
+        const waMsg = `नमस्ते Aarogyam, मैंने अभी लाइब्रेरी पेज में ऑफर देखा, मेरा नाम ${currentUserName} है, मुझे आज के ऑफर के बारे में बताएं, मैं इंटरेस्टेड हूँ।`;
+        const waLink = `https://wa.me/917974422572?text=` + encodeURIComponent(waMsg);
+
+        const waBtn = document.getElementById('whatsappDealBtn');
+        if (waBtn) {
+            waBtn.href = waLink;
+        }
+    });
+</script>
 
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
