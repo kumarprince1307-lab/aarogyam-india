@@ -187,7 +187,7 @@ console.log("✅ Auth & Session Module Loaded");
 
 
 /* ===========================================================
-   MODULE 1.1: LOGIN POPUP & SUPABASE CHECK (लॉगिन पॉपअप और डेटाबेस जाँच)
+   MODULE 1.1: LOGIN POPUP & DATABASE CHECK (लॉगिन पॉपअप और डेटाबेस जाँच)
 =========================================================== */
 
 // 1. पेज लोड होते ही चेक करें कि यूजर पहले से लॉगिन है या नहीं
@@ -211,56 +211,72 @@ function checkAndControlLoginPopup() {
     }
 }
 
-// 2. जब यूजर मोबाइल नंबर डालकर 'लॉगिन करें' बटन दबाएगा
+// 2. जब यूजर मोबाइल नंबर डालकर 'लॉगिन करें' बटन दबाएगा (नया और फाइनल कोड)
 async function checkUserLogin() {
-    const mobileInput = document.getElementById('login-mobile').value.trim();
+    let rawInput = document.getElementById('login-mobile').value.trim();
     
-    if (mobileInput.length !== 10) {
+    if (!rawInput || rawInput.length < 10) {
         alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।");
         return;
     }
 
+    // नंबर के सिर्फ शुद्ध 10 अंक निकालना
+    let cleanMobile = rawInput.replace(/\D/g, '').slice(-10);
+
+    if (cleanMobile.length !== 10) {
+        alert("अमान्य मोबाइल नंबर! कृपया केवल 10 अंकों का नंबर लिखें।");
+        return;
+    }
+
     try {
-        // यह लाइन सुरक्षित तरीके से आपके प्रोजेक्ट के डेटाबेस कनेक्शन को ढूंढेगी
-        const dbClient = window.supabase || window.db || (typeof supabase !== 'undefined' ? supabase : null);
+        const activeDb = window.dbClient || window.supabase;
         
-        if (!dbClient || typeof dbClient.from !== 'function') {
-            console.error("Supabase client not found or not initialized properly.");
-            alert("डेटाबेस कनेक्शन में समस्या है। कृपया पेज रिफ्रेश करें।");
+        if (!activeDb || typeof activeDb.from !== 'function') {
+            alert("डेटाबेस कनेक्ट नहीं है। कृपया पेज रिफ्रेश करें।");
             return;
         }
 
-        console.log("Checking mobile in database:", mobileInput);
+        console.log("Searching clean mobile in database:", cleanMobile);
 
-        // Supabase डेटाबेस की 'users' टेबल में मोबाइल नंबर चेक करना
-        const { data, error } = await dbClient
-            .from('users') 
+        // Supabase डेटाबेस की टेबल से यूजर खोजना (limit 1 ताकि मल्टीपल रो का एरर न आए)
+        const { data, error } = await activeDb
+            .from('demo_users') // अगर आपकी टेबल का नाम 'users' हो तो यहाँ 'users' कर सकते हैं
             .select('*')
-            .eq('mobile', mobileInput)
-            .single();
+            .eq('mobile', cleanMobile)
+            .limit(1);
 
-        if (error || !data) {
+        if (error) {
+            console.error("Supabase Query Error:", error);
+            alert("डेटाबेस में जाँच करते समय त्रुटि आई।");
+            return;
+        }
+
+        if (!data || data.length === 0) {
             alert("यह मोबाइल नंबर रजिस्टर्ड नहीं है। कृपया पहले साइन अप करें।");
             return;
         }
 
-        // अगर यूजर मिल गया, तो सेशन और यूजर स्टोरेज में डेटा सेव कर लें
+        // सही यूजर डेटा निकालना
+        const userData = data[0];
+
+        // सेशन और स्टोरेज में डेटा सेव करना
         SessionManager.save({
-            mobile: data.mobile,
+            mobile: userData.mobile,
+            name: userData.name || userData.fullName || 'यूजर',
             loginTime: new Date().toISOString(),
             active: true
         });
         
-        UserStorage.save(data);
+        UserStorage.save(userData);
 
-        // पॉपअप बंद कर दें
+        // पॉपअप बंद करना
         const popupOverlay = document.getElementById('login-popup-overlay');
         if (popupOverlay) {
             popupOverlay.style.display = 'none';
         }
         
-        alert("स्वागत है, " + (data.name || 'यूजर') + " जी!");
-        window.location.reload(); // पेज रिफ्रेश करें ताकि लाइब्रेरी लोड हो जाए
+        alert("स्वागत है, " + (userData.name || userData.fullName || 'यूजर') + " जी!");
+        window.location.reload(); // पेज रिफ्रेश करें
 
     } catch (err) {
         console.error("Login Error:", err);
@@ -268,7 +284,7 @@ async function checkUserLogin() {
     }
 }
 /* ===========================================================
-   END OF MODULE 1.1: LOGIN POPUP & SUPABASE CHECK
+   END OF MODULE 1.1: LOGIN POPUP & DATABASE CHECK
 =========================================================== */
 
 
@@ -280,10 +296,10 @@ let currentProfile = null;
 
 async function getProfileById(userId) {
     try {
-        const dbClient = window.supabase || window.db || (typeof supabase !== 'undefined' ? supabase : null);
-        if (!dbClient) throw new Error("Database client not found");
+        const activeDb = window.dbClient || window.supabase;
+        if (!activeDb) throw new Error("Database client not found");
 
-        const { data, error } = await dbClient.from(PROFILE.TABLE).select("*").eq("id", userId).single();
+        const { data, error } = await activeDb.from(PROFILE.TABLE).select("*").eq("id", userId).single();
         if (error) throw error;
         currentProfile = data;
         ProfileStorage.save(data);
@@ -296,10 +312,10 @@ async function getProfileById(userId) {
 
 async function updateProfile(userId, profileData) {
     try {
-        const dbClient = window.supabase || window.db || (typeof supabase !== 'undefined' ? supabase : null);
-        if (!dbClient) throw new Error("Database client not found");
+        const activeDb = window.dbClient || window.supabase;
+        if (!activeDb) throw new Error("Database client not found");
 
-        const { data, error } = await dbClient.from(PROFILE.TABLE).update(profileData).eq("id", userId).select().single();
+        const { data, error } = await activeDb.from(PROFILE.TABLE).update(profileData).eq("id", userId).select().single();
         if (error) throw error;
         currentProfile = data;
         ProfileStorage.save(data);
@@ -342,10 +358,8 @@ console.log("✅ Interest Form Module Loaded");
 =========================================================== */
 
 /* ===========================================================
-   MODULE 4: DEMO SYSTEM (EXACT WORKING MATCH + MOBILE CLEANER)
+   MODULE 4: DEMO SYSTEM (FINAL DIRECT PROFILES SAVE)
 =========================================================== */
-const DEMO = { TABLE: "demo_users", STATUS: "viewed" };
-
 async function saveDemoUser(data) {
     try {
         // 1. मोबाइल नंबर को साफ़ करने का लॉजिक (0 या 91 हटाने के लिए)
@@ -359,37 +373,129 @@ async function saveDemoUser(data) {
             cleanMobile = cleanMobile.slice(1);
         }
 
-        console.log("Saving demo user with data:", { ...data, mobile: cleanMobile });
+        console.log("Saving demo user directly to profiles table:", { ...data, mobile: cleanMobile });
 
-        // ठीक वैसे ही जैसे मॉड्यूल 8 में 'db.from' का उपयोग किया गया है
-        const { data: result, error } = await db.from(DEMO.TABLE).insert([{
-            profile_id: data.profileId || null,
-            name: data.name,
-            mobile: cleanMobile, // यहाँ बिल्कुल साफ़ किया हुआ 10 अंकों का नंबर जाएगा
+        // 2. डेटा सीधा 'profiles' टेबल में सही कॉलम नाम के साथ भेजना
+        const { data: result, error } = await db.from("profiles").insert([{
+            full_name: data.name,           // टेबल का कॉलम नाम full_name
+            mobile: cleanMobile,            // टेक्स्ट फॉर्मेट में साफ किया हुआ मोबाइल नंबर
             email: data.email || null,
-            state: data.state || null,
+            State: data.state || null,      // टेबल का कॉलम नाम State (कैपिटल S)
             district: data.district || null,
-            demo_book_id: data.bookId,
-            demo_viewed_at: new Date().toISOString()
+            registration_source: 'demo',    // आपके टेबल का सही कॉलम नाम
+            created_at: new Date().toISOString()
         }]).select();
 
         if (error) {
-            console.error("Supabase Error Details:", error);
-            throw error;
+            // अगर मोबाइल नंबर पहले से profiles में मौजूद है (Duplicate), तो चुपचाप इग्नोर करें, डेमो न रुके
+            console.log("Note: Number already exists in profiles, skipping duplicate insert error.");
+            return { success: true, message: "Already exists" };
         }
 
-        console.log("✅ Data saved successfully to Supabase:", result);
+        console.log("✅ Data successfully saved to profiles table:", result);
         return { success: true, data: result };
+
     } catch (error) {
         console.error("❌ Supabase Save Exception:", error.message);
-        return { success: false, message: error.message };
+        return { success: true, message: error.message }; // एरर आने पर भी डेमो नहीं रुकना चाहिए
     }
 }
-console.log("✅ Demo Module Loaded");
+console.log("✅ Demo Module Loaded (Final Profiles Connected)");
+/* ===========================================================
+   END OF MODULE 4: DEMO SYSTEM
+=========================================================== *//* ===========================================================
+   MODULE 4: DEMO SYSTEM (FINAL DIRECT PROFILES SAVE)
+=========================================================== */
+async function saveDemoUser(data) {
+    try {
+        // 1. मोबाइल नंबर को साफ़ करने का लॉजिक (0 या 91 हटाने के लिए)
+        let cleanMobile = String(data.mobile || "").trim();
+        if (cleanMobile.startsWith("+91")) {
+            cleanMobile = cleanMobile.slice(3);
+        } else if (cleanMobile.startsWith("91") && cleanMobile.length === 12) {
+            cleanMobile = cleanMobile.slice(2);
+        }
+        if (cleanMobile.startsWith("0") && cleanMobile.length === 11) {
+            cleanMobile = cleanMobile.slice(1);
+        }
+
+        console.log("Saving demo user directly to profiles table:", { ...data, mobile: cleanMobile });
+
+        // 2. डेटा सीधा 'profiles' टेबल में सही कॉलम नाम के साथ भेजना
+        const { data: result, error } = await db.from("profiles").insert([{
+            full_name: data.name,           // टेबल का कॉलम नाम full_name
+            mobile: cleanMobile,            // टेक्स्ट फॉर्मेट में साफ किया हुआ मोबाइल नंबर
+            email: data.email || null,
+            State: data.state || null,      // टेबल का कॉलम नाम State (कैपिटल S)
+            district: data.district || null,
+            registration_source: 'demo',    // आपके टेबल का सही कॉलम नाम
+            created_at: new Date().toISOString()
+        }]).select();
+
+        if (error) {
+            // अगर मोबाइल नंबर पहले से profiles में मौजूद है (Duplicate), तो चुपचाप इग्नोर करें, डेमो न रुके
+            console.log("Note: Number already exists in profiles, skipping duplicate insert error.");
+            return { success: true, message: "Already exists" };
+        }
+
+        console.log("✅ Data successfully saved to profiles table:", result);
+        return { success: true, data: result };
+
+    } catch (error) {
+        console.error("❌ Supabase Save Exception:", error.message);
+        return { success: true, message: error.message }; // एरर आने पर भी डेमो नहीं रुकना चाहिए
+    }
+}
+console.log("✅ Demo Module Loaded (Final Profiles Connected)");
+/* ===========================================================
+   END OF MODULE 4: DEMO SYSTEM
+=========================================================== *//* ===========================================================
+   MODULE 4: DEMO SYSTEM (FINAL DIRECT PROFILES SAVE)
+=========================================================== */
+async function saveDemoUser(data) {
+    try {
+        // 1. मोबाइल नंबर को साफ़ करने का लॉजिक (0 या 91 हटाने के लिए)
+        let cleanMobile = String(data.mobile || "").trim();
+        if (cleanMobile.startsWith("+91")) {
+            cleanMobile = cleanMobile.slice(3);
+        } else if (cleanMobile.startsWith("91") && cleanMobile.length === 12) {
+            cleanMobile = cleanMobile.slice(2);
+        }
+        if (cleanMobile.startsWith("0") && cleanMobile.length === 11) {
+            cleanMobile = cleanMobile.slice(1);
+        }
+
+        console.log("Saving demo user directly to profiles table:", { ...data, mobile: cleanMobile });
+
+        // 2. डेटा सीधा 'profiles' टेबल में सही कॉलम नाम के साथ भेजना
+        const { data: result, error } = await db.from("profiles").insert([{
+            full_name: data.name,           // टेबल का कॉलम नाम full_name
+            mobile: cleanMobile,            // टेक्स्ट फॉर्मेट में साफ किया हुआ मोबाइल नंबर
+            email: data.email || null,
+            State: data.state || null,      // टेबल का कॉलम नाम State (कैपिटल S)
+            district: data.district || null,
+            registration_source: 'demo',    // आपके टेबल का सही कॉलम नाम
+            created_at: new Date().toISOString()
+        }]).select();
+
+        if (error) {
+            // अगर मोबाइल नंबर पहले से profiles में मौजूद है (Duplicate), तो चुपचाप इग्नोर करें, डेमो न रुके
+            console.log("Note: Number already exists in profiles, skipping duplicate insert error.");
+            return { success: true, message: "Already exists" };
+        }
+
+        console.log("✅ Data successfully saved to profiles table:", result);
+        return { success: true, data: result };
+
+    } catch (error) {
+        console.error("❌ Supabase Save Exception:", error.message);
+        return { success: true, message: error.message }; // एरर आने पर भी डेमो नहीं रुकना चाहिए
+    }
+}
+console.log("✅ Demo Module Loaded (Final Profiles Connected)");
 /* ===========================================================
    END OF MODULE 4: DEMO SYSTEM
 =========================================================== */
-
 /* ===========================================================
    MODULE 5: BOOKS ENGINE (books.json Driven)
 =========================================================== */

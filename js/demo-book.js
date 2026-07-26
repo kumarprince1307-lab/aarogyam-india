@@ -176,9 +176,9 @@ async function saveUserToSupabase(userData) {
     }
 }
 
-/*==================================================
-  4. FORM SUBMIT EVENT
-==================================================*/
+/* ==================================================
+  4. FORM SUBMIT EVENT (डेमो फॉर्म सबमिट और अनलॉक लॉजिक)
+================================================== */
 if(demoForm) {
     demoForm.addEventListener("submit", async function (event) {
         event.preventDefault();
@@ -196,16 +196,20 @@ if(demoForm) {
             profileId: null
         };
 
-        // यह सीधा supabase.js के अंदर बने saveDemoUser फंक्शन को कॉल करेगा
+        // यह सीधा supabase.js के अंदर बने saveDemoUser फंक्शन को कॉल करेगा 
+        // (जो अब डेटा को सीधे profiles टेबल में सेव करेगा)
         if (typeof saveDemoUser === "function") {
             await saveDemoUser(userData);
         }
 
         hideLoader();
-        unlockDemo();
+        unlockDemo(); // यूजर का डेमो बिना रोके तुरंत खुल जाएगा
     });
 }
 
+/* ==================================================
+  DEMO UNLOCK FUNCTION (डेमो स्क्रीन दिखाने का फंक्शन)
+================================================== */
 function unlockDemo() {
     if(formSection) formSection.style.display = "none"; // फॉर्म गायब हो जाएगा
     if(demoPreview) demoPreview.style.display = "block";
@@ -215,6 +219,9 @@ function unlockDemo() {
     setupSliderImages();
 }
 
+/* ==================================================
+  5. IMAGE SLIDER & VIEWER LOGIC
+================================================== */
 /*==================================================
   5. IMAGE SLIDER & VIEWER LOGIC
 ==================================================*/
