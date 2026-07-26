@@ -123,7 +123,7 @@ function initializeAuthentication() {
 
 
 /* ===========================================================
-   MODULE 1: AUTHENTICATION & SESSION BASE
+   MODULE 1: AUTHENTICATION & SESSION BASE (ऑथेंटिकेशन और सेशन बेस)
 =========================================================== */
 const AUTH = {
     LOGIN_STATUS: "AI_LOGIN_STATUS",
@@ -184,8 +184,10 @@ console.log("✅ Auth & Session Module Loaded");
 /* ===========================================================
    END OF MODULE 1: AUTHENTICATION & SESSION BASE
 =========================================================== */
+
+
 /* ===========================================================
-   लॉगिन पॉपअप और Supabase चेक करने का लॉजिक (Login & Popup Integration)
+   MODULE 1.1: LOGIN POPUP & SUPABASE CHECK (लॉगिन पॉपअप और डेटाबेस जाँच)
 =========================================================== */
 
 // 1. पेज लोड होते ही चेक करें कि यूजर पहले से लॉगिन है या नहीं
@@ -198,7 +200,6 @@ function checkAndControlLoginPopup() {
     
     if (!popupOverlay) return; // अगर उस पेज पर पॉपअप नहीं है, तो कुछ न करें
 
-    // isLoggedIn() फंक्शन आपके ऊपर वाले मॉड्यूल में पहले से मौजूद है!
     if (isLoggedIn()) {
         // अगर यूजर पहले से लॉगिन है, तो पॉपअप छुपा दें
         popupOverlay.style.display = 'none';
@@ -220,9 +221,20 @@ async function checkUserLogin() {
     }
 
     try {
-        // Supabase डेटाबेस में मोबाइल नंबर चेक करना
-        const { data, error } = await supabaseClient
-            .from('users') // आपकी डेटाबेस टेबल का नाम
+        // यह लाइन सुरक्षित तरीके से आपके प्रोजेक्ट के डेटाबेस कनेक्शन को ढूंढेगी
+        const dbClient = window.supabase || window.db || (typeof supabase !== 'undefined' ? supabase : null);
+        
+        if (!dbClient || typeof dbClient.from !== 'function') {
+            console.error("Supabase client not found or not initialized properly.");
+            alert("डेटाबेस कनेक्शन में समस्या है। कृपया पेज रिफ्रेश करें।");
+            return;
+        }
+
+        console.log("Checking mobile in database:", mobileInput);
+
+        // Supabase डेटाबेस की 'users' टेबल में मोबाइल नंबर चेक करना
+        const { data, error } = await dbClient
+            .from('users') 
             .select('*')
             .eq('mobile', mobileInput)
             .single();
@@ -232,7 +244,7 @@ async function checkUserLogin() {
             return;
         }
 
-        // अगर यूजर मिल गया, तो आपके बनाए गए Storage टूल का इस्तेमाल करके डेटा सेव कर लेंगे
+        // अगर यूजर मिल गया, तो सेशन और यूजर स्टोरेज में डेटा सेव कर लें
         SessionManager.save({
             mobile: data.mobile,
             loginTime: new Date().toISOString(),
@@ -255,16 +267,23 @@ async function checkUserLogin() {
         alert("लॉगिन करने में कुछ समस्या आई, कृपया पुनः प्रयास करें।");
     }
 }
+/* ===========================================================
+   END OF MODULE 1.1: LOGIN POPUP & SUPABASE CHECK
+=========================================================== */
+
 
 /* ===========================================================
-   MODULE 2: PROFILE MANAGEMENT
+   MODULE 2: PROFILE MANAGEMENT (प्रोफाइल मैनेजमेंट मॉड्यूल)
 =========================================================== */
 const PROFILE = { TABLE: "profiles" };
 let currentProfile = null;
 
 async function getProfileById(userId) {
     try {
-        const { data, error } = await supabase.from(PROFILE.TABLE).select("*").eq("id", userId).single();
+        const dbClient = window.supabase || window.db || (typeof supabase !== 'undefined' ? supabase : null);
+        if (!dbClient) throw new Error("Database client not found");
+
+        const { data, error } = await dbClient.from(PROFILE.TABLE).select("*").eq("id", userId).single();
         if (error) throw error;
         currentProfile = data;
         ProfileStorage.save(data);
@@ -277,7 +296,10 @@ async function getProfileById(userId) {
 
 async function updateProfile(userId, profileData) {
     try {
-        const { data, error } = await supabase.from(PROFILE.TABLE).update(profileData).eq("id", userId).select().single();
+        const dbClient = window.supabase || window.db || (typeof supabase !== 'undefined' ? supabase : null);
+        if (!dbClient) throw new Error("Database client not found");
+
+        const { data, error } = await dbClient.from(PROFILE.TABLE).update(profileData).eq("id", userId).select().single();
         if (error) throw error;
         currentProfile = data;
         ProfileStorage.save(data);
