@@ -187,7 +187,7 @@ console.log("✅ Auth & Session Module Loaded");
 
 
 /* ===========================================================
-   MODULE 1.1: LOGIN POPUP & DATABASE CHECK (लॉगिन पॉपअप और डेटाबेस जाँच)
+   MODULE 1.1: LOGIN POPUP & DATABASE CHECK (UPDATED TO PROFILES)
 =========================================================== */
 
 // 1. पेज लोड होते ही चेक करें कि यूजर पहले से लॉगिन है या नहीं
@@ -211,7 +211,7 @@ function checkAndControlLoginPopup() {
     }
 }
 
-// 2. जब यूजर मोबाइल नंबर डालकर 'लॉगिन करें' बटन दबाएगा (नया और फाइनल कोड)
+// 2. जब यूजर मोबाइल नंबर डालकर 'लॉगिन करें' बटन दबाएगा (अब यह सीधा profiles टेबल से चेक करेगा)
 async function checkUserLogin() {
     let rawInput = document.getElementById('login-mobile').value.trim();
     
@@ -236,11 +236,11 @@ async function checkUserLogin() {
             return;
         }
 
-        console.log("Searching clean mobile in database:", cleanMobile);
+        console.log("Searching clean mobile in profiles table:", cleanMobile);
 
-        // Supabase डेटाबेस की टेबल से यूजर खोजना (limit 1 ताकि मल्टीपल रो का एरर न आए)
+        // Supabase की मुख्य 'profiles' टेबल से यूजर खोजना (full_name कॉलम के साथ)
         const { data, error } = await activeDb
-            .from('demo_users') // अगर आपकी टेबल का नाम 'users' हो तो यहाँ 'users' कर सकते हैं
+            .from('profiles') // <-- यहाँ demo_users की जगह profiles कर दिया है
             .select('*')
             .eq('mobile', cleanMobile)
             .limit(1);
@@ -252,17 +252,17 @@ async function checkUserLogin() {
         }
 
         if (!data || data.length === 0) {
-            alert("यह मोबाइल नंबर रजिस्टर्ड नहीं है। कृपया पहले साइन अप करें।");
+            alert("यह मोबाइल नंबर रजिस्टर्ड नहीं है। कृपया पहले डेमो देखें या रजिस्टर करें।");
             return;
         }
 
-        // सही यूजर डेटा निकालना
+        // सही यूजर डेटा निकालना (full_name का उपयोग करते हुए)
         const userData = data[0];
 
         // सेशन और स्टोरेज में डेटा सेव करना
         SessionManager.save({
             mobile: userData.mobile,
-            name: userData.name || userData.fullName || 'यूजर',
+            name: userData.full_name || userData.name || 'यूजर', // full_name प्राथमिकता पर
             loginTime: new Date().toISOString(),
             active: true
         });
@@ -275,7 +275,7 @@ async function checkUserLogin() {
             popupOverlay.style.display = 'none';
         }
         
-        alert("स्वागत है, " + (userData.name || userData.fullName || 'यूजर') + " जी!");
+        alert("स्वागत है, " + (userData.full_name || userData.name || 'यूजर') + " जी!");
         window.location.reload(); // पेज रिफ्रेश करें
 
     } catch (err) {
