@@ -17,19 +17,19 @@ function toggleMenu() {
     }
 }
 
-// 2. Logout Function (using Engine Logout)
+// 2. सुरक्षित लॉगआउट फंक्शन (बिना किसी लूप के, उसी पेज पर रीफ्रेश करने के लिए)
 function logoutUser() {
-    if (typeof logoutUser === 'function') {
-        logoutUser();
-    } else {
-        localStorage.removeItem('AI_SESSION');
-        localStorage.removeItem('AI_USER');
-        localStorage.removeItem('AI_PROFILE');
-    }
+    // ब्राउज़र के लोकल स्टोरेज से सारा पुराना डेटा और सेशन साफ करें
+    localStorage.removeItem('AI_SESSION');
+    localStorage.removeItem('AI_USER');
+    localStorage.removeItem('AI_PROFILE');
+    
+    // यूजर को संदेश दें
     alert('आप सफलतापूर्वक लॉग आउट हो चुके हैं।');
-    window.location.href = '/index.html';
+    
+    // होम पेज पर न भेजकर इसी पेज को फ्रेश (रीलोड) करें ताकि यूजर भटके नहीं
+    window.location.reload();
 }
-
 // 3. Category Tabs Switching Logic
 function switchTab(category) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -133,7 +133,7 @@ function closeLeadModal() {
     }
 }
 
-// 7. Supabase में फॉर्म डेटा रजिस्ट्रेशन लॉजिक के साथ सेव करना (State और DOB के साथ)
+// सुधरा हुआ फॉर्म सबमिट फंक्शन (डेटाबेस के नामों के अनुसार)
 async function submitLeadForm(event) {
     event.preventDefault();
     const fullName = document.getElementById('leadName').value;
@@ -153,33 +153,30 @@ async function submitLeadForm(event) {
         fullName: fullName,
         mobile: mobile,
         email: email,
-        state: state,
-        dob: dob,
-        city: city,
-        address: address,
         source: "my_library_profile"
     };
 
     try {
-        // Supabase Engine के registerUser फंक्शन का उपयोग
         if (typeof registerUser === 'function') {
             const result = await registerUser(formData);
             if (result.success) {
-                // अतिरिक्त फील्ड्स (state, dob, city, address) को प्रोफाइल टेबल में अपडेट करें
                 const currentUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
                 if (currentUser.id && typeof updateProfile === 'function') {
-                    await updateProfile(currentUser.id, { state, dob, city, address });
+                    // यहाँ 'State' को बड़े S के साथ भेजा जा रहा है जो आपके डेटाबेस से मैच करता है
+                    await updateProfile(currentUser.id, { 
+                        State: state, 
+                        district: city // अगर आप city को district में सेव करना चाहते हैं
+                    });
                 }
                 
-                alert('बधाई हो! आपकी प्रोफाइल जानकारी Supabase में सफलतापूर्वक सहेज ली गई है।');
+                alert('बधाई हो! आपकी प्रोफाइल जानकारी Aarogyam India में सफलतापूर्वक सहेज ली गई है।');
                 closeLeadModal();
                 initUserData();
             } else {
                 alert('सेव करने में त्रुटि: ' + (result.message || 'अज्ञात एरर'));
             }
         } else {
-            // फॉलबैक लोकल स्टोरेज
-            localStorage.setItem('AI_USER', JSON.stringify(formData));
+            localStorage.setItem('AI_USER', JSON.stringify({ fullName, mobile, email, state, dob, city, address }));
             alert('प्रोफाइल सहेज ली गई है।');
             closeLeadModal();
             initUserData();

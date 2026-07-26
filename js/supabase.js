@@ -184,7 +184,77 @@ console.log("✅ Auth & Session Module Loaded");
 /* ===========================================================
    END OF MODULE 1: AUTHENTICATION & SESSION BASE
 =========================================================== */
+/* ===========================================================
+   लॉगिन पॉपअप और Supabase चेक करने का लॉजिक (Login & Popup Integration)
+=========================================================== */
 
+// 1. पेज लोड होते ही चेक करें कि यूजर पहले से लॉगिन है या नहीं
+document.addEventListener("DOMContentLoaded", function() {
+    checkAndControlLoginPopup();
+});
+
+function checkAndControlLoginPopup() {
+    const popupOverlay = document.getElementById('login-popup-overlay');
+    
+    if (!popupOverlay) return; // अगर उस पेज पर पॉपअप नहीं है, तो कुछ न करें
+
+    // isLoggedIn() फंक्शन आपके ऊपर वाले मॉड्यूल में पहले से मौजूद है!
+    if (isLoggedIn()) {
+        // अगर यूजर पहले से लॉगिन है, तो पॉपअप छुपा दें
+        popupOverlay.style.display = 'none';
+        console.log("User is already logged in. Popup hidden.");
+    } else {
+        // अगर यूजर लॉगिन नहीं है, तो पॉपअप दिखा दें
+        popupOverlay.style.display = 'flex';
+        console.log("User not logged in. Showing login popup.");
+    }
+}
+
+// 2. जब यूजर मोबाइल नंबर डालकर 'लॉगिन करें' बटन दबाएगा
+async function checkUserLogin() {
+    const mobileInput = document.getElementById('login-mobile').value.trim();
+    
+    if (mobileInput.length !== 10) {
+        alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।");
+        return;
+    }
+
+    try {
+        // Supabase डेटाबेस में मोबाइल नंबर चेक करना
+        const { data, error } = await supabaseClient
+            .from('users') // आपकी डेटाबेस टेबल का नाम
+            .select('*')
+            .eq('mobile', mobileInput)
+            .single();
+
+        if (error || !data) {
+            alert("यह मोबाइल नंबर रजिस्टर्ड नहीं है। कृपया पहले साइन अप करें।");
+            return;
+        }
+
+        // अगर यूजर मिल गया, तो आपके बनाए गए Storage टूल का इस्तेमाल करके डेटा सेव कर लेंगे
+        SessionManager.save({
+            mobile: data.mobile,
+            loginTime: new Date().toISOString(),
+            active: true
+        });
+        
+        UserStorage.save(data);
+
+        // पॉपअप बंद कर दें
+        const popupOverlay = document.getElementById('login-popup-overlay');
+        if (popupOverlay) {
+            popupOverlay.style.display = 'none';
+        }
+        
+        alert("स्वागत है, " + (data.name || 'यूजर') + " जी!");
+        window.location.reload(); // पेज रिफ्रेश करें ताकि लाइब्रेरी लोड हो जाए
+
+    } catch (err) {
+        console.error("Login Error:", err);
+        alert("लॉगिन करने में कुछ समस्या आई, कृपया पुनः प्रयास करें।");
+    }
+}
 
 /* ===========================================================
    MODULE 2: PROFILE MANAGEMENT

@@ -177,7 +177,7 @@ function completeRegistration(result) {
         setLoading(false);
 
         setTimeout(() => {
-            window.location.href = "ebooks/agriculture.html";
+            window.location.href = "ebooks/my-library.html";
         }, 1000);
     }
     catch (error) {
