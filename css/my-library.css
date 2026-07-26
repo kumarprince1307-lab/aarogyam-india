@@ -1,32 +1,65 @@
-/* ========================================================================= */
-/* AIM PROJECT - MY LIBRARY V2 PREMIUM STYLES (Full Zoom, Flag Wave & Fixes) */
-/* ========================================================================= */
+/* ==========================================================================
+   AAROGYAM INDIA - MY LIBRARY PREMIUM CSS (AIM V1)
+   Theme: Netflix + Kindle + Google Play Books Luxury Digital Locker
+   ========================================================================== */
 
+/* Root Variables & Brand Colors */
+:root {
+    --primary-orange: #E86A17;
+    --secondary-green: #138A36;
+    --accent-gold: #F6B93B;
+    --bg-warm-white: #FFFDF8;
+    --card-pure-white: #FFFFFF;
+    --text-charcoal: #2C2C2C;
+    --text-light: #666666;
+    --border-light: #ECECEC;
+    --success-color: #138A36;
+    --warning-color: #F6B93B;
+    --danger-color: #E74C3C;
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 15px 35px rgba(232, 106, 23, 0.12);
+    --radius-card: 20px;
+    --radius-btn: 16px;
+    --radius-popup: 28px;
+}
+
+/* Global Reset & Box Sizing */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    background-color: #f8f9fa;
-    color: #333;
-    padding-bottom: 110px; /* नीचे के स्टिकी बार और बॉटम बार के लिए जगह */
+    background-color: var(--bg-warm-white);
+    color: var(--text-charcoal);
+    background-image: radial-gradient(circle at 50% 0%, rgba(246, 185, 59, 0.04) 0%, transparent 60%),
+                      radial-gradient(circle at 100% 100%, rgba(19, 138, 54, 0.03) 0%, transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding-bottom: 90px; /* Space for bottom nav */
+    overflow-x: hidden;
 }
 
-/* 1. Desktop & Mobile Header */
+/* ==========================================================================
+   1. STICKY PREMIUM HEADER
+   ========================================================================== */
 .library-header {
-    background: linear-gradient(135deg, #f39c12, #d35400);
-    color: white;
-    padding: 12px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    background: rgba(255, 253, 248, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
 }
 
 .header-logo-title {
@@ -38,73 +71,175 @@ body {
 .site-logo {
     width: 38px;
     height: 38px;
+    object-fit: contain;
     border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.library-header h1 {
-    font-size: 1.2rem;
+.header-logo-title h1 {
+    font-size: 1.25rem;
     font-weight: 700;
+    color: var(--text-charcoal);
+    letter-spacing: -0.5px;
 }
 
-/* Desktop Navigation Links */
 .desktop-nav {
     display: none;
 }
 
-@media (min-width: 768px) {
+@media(min-width: 768px) {
     .desktop-nav {
         display: flex;
-        gap: 18px;
+        gap: 20px;
+        align-items: center;
     }
     .desktop-nav a {
-        color: white;
         text-decoration: none;
+        color: var(--text-light);
         font-size: 0.9rem;
         font-weight: 600;
-        transition: opacity 0.2s;
+        transition: color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
     .desktop-nav a:hover, .desktop-nav a.active {
-        opacity: 0.8;
-        border-bottom: 2px solid white;
-    }
-    .menu-btn {
-        display: none;
+        color: var(--primary-orange);
     }
 }
 
 .back-btn, .menu-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    cursor: pointer;
+    border: 1px solid var(--border-light);
+    background: var(--card-pure-white);
+    color: var(--text-charcoal);
     font-size: 1rem;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: all 0.2s ease;
 }
 
 .back-btn:hover, .menu-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--primary-orange);
+    color: white;
+    border-color: var(--primary-orange);
+    transform: scale(1.05);
 }
 
-/* 2. Slide-out Mobile & Quick Menu Drawer (Right Side) */
+/* ==========================================================================
+   2. WELCOME CARD & DASHBOARD
+   ========================================================================== */
+.welcome-card-soft {
+    background: linear-gradient(135deg, #ffffff 0%, #fefcf7 100%) !important;
+    border: 1px solid #f0e6d2 !important;
+    border-left: 5px solid var(--primary-orange) !important;
+    border-radius: var(--radius-card) !important;
+    box-shadow: var(--shadow-soft) !important;
+    transition: transform 0.3s ease;
+}
+
+.welcome-card-soft:hover {
+    box-shadow: var(--shadow-hover) !important;
+}
+
+/* ==========================================================================
+   3. CATEGORY PILL TABS
+   ========================================================================== */
+.category-tabs {
+    display: flex;
+    gap: 10px;
+    padding: 15px 20px;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    background: transparent;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.category-tabs::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.tab-btn {
+    background: var(--card-pure-white);
+    border: 1px solid var(--border-light);
+    color: var(--text-light);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn:hover {
+    border-color: var(--primary-orange);
+    color: var(--primary-orange);
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, var(--primary-orange), #d05712);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(232, 106, 23, 0.3);
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   4. LIBRARY CONTAINER & BOOK GRIDS
+   ========================================================================== */
+.library-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 20px 30px 20px;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-charcoal);
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--secondary-green);
+    padding-left: 10px;
+}
+
+.book-grid-2col {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+@media(min-width: 768px) {
+    .book-grid-2col {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+    }
+}
+
+/* ==========================================================================
+   5. MOBILE SIDE DRAWER (MENU)
+   ========================================================================== */
 .side-menu {
     position: fixed;
     top: 0;
-    right: -280px;
-    width: 280px;
+    right: -100%;
+    width: 300px;
     height: 100%;
-    background: white;
-    box-shadow: -4px 0 15px rgba(0,0,0,0.2);
-    z-index: 2000;
-    transition: right 0.3s ease-in-out;
-    padding: 20px;
+    background: var(--card-pure-white);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.15);
+    z-index: 99999;
+    padding: 25px 20px;
+    transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
     overflow-y: auto;
 }
 
@@ -113,482 +248,273 @@ body {
 }
 
 .close-menu {
-    background: none;
+    background: #f1f5f9;
     border: none;
-    font-size: 1.8rem;
-    color: #333;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 20px;
+    color: var(--text-charcoal);
     cursor: pointer;
-    float: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-bottom: 15px;
+    transition: background 0.2s;
+}
+
+.close-menu:hover {
+    background: var(--primary-orange);
+    color: white;
 }
 
 .side-menu ul {
     list-style: none;
-    margin-top: 40px;
+    margin-top: 15px;
 }
 
 .side-menu ul li {
-    margin-bottom: 15px;
-    border-bottom: 1px solid #f1f1f1;
-    padding-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .side-menu ul li a {
-    text-decoration: none;
-    color: #333;
-    font-size: 0.95rem;
-    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 12px;
-    transition: color 0.2s;
+    padding: 12px 15px;
+    color: var(--text-charcoal);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.2s ease;
 }
 
 .side-menu ul li a:hover {
-    color: #e67e22;
+    background: #fdf2e9;
+    color: var(--primary-orange);
+    padding-left: 20px;
+}
+
+.side-menu ul li a i {
+    width: 20px;
+    color: var(--primary-orange);
 }
 
 .logout-link {
-    color: #dc3545 !important;
+    color: var(--danger-color) !important;
 }
 
-/* 3. Welcome Card Banner */
-.welcome-card-soft {
-    background: white;
-    margin: 15px;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    border-left: 5px solid #e67e22;
+.logout-link i {
+    color: var(--danger-color) !important;
 }
 
-.welcome-card-soft h2 {
-    font-size: 1.15rem;
-    color: #2c3e50;
-    margin-bottom: 5px;
-}
-
-.welcome-card-soft p {
-    font-size: 0.85rem;
-    color: #666;
-}
-
-/* 4. Category Pill Tabs */
-.category-tabs {
-    display: flex;
-    gap: 8px;
-    padding: 0 15px;
-    overflow-x: auto;
-    margin-bottom: 15px;
-    scrollbar-width: none;
-}
-
-.category-tabs::-webkit-scrollbar {
-    display: none;
-}
-
-.tab-btn {
-    background: white;
-    border: 1px solid #ddd;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #555;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-}
-
-.tab-btn.active, .tab-btn:hover {
-    background: #e67e22;
-    color: white;
-    border-color: #e67e22;
-    box-shadow: 0 2px 6px rgba(230, 126, 34, 0.3);
-}
-
-/* 5. Library Main Container & 2-Column Grid */
-.library-container {
-    padding: 0 15px;
-}
-
-.book-section {
-    margin-bottom: 25px;
-}
-
-.section-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 12px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 6px;
-}
-
-.view-all-text {
-    font-size: 0.8rem;
-    color: #e67e22;
-    cursor: pointer;
-}
-
-/* 2-Column Grid (Responsive) */
-.book-grid-2col {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-}
-
-@media (min-width: 768px) {
-    .book-grid-2col {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-/* ========================================================================= */
-/* BOOK CARD DESIGN & FULL SCREEN ZOOM (इमेज बिल्कुल नहीं कटेगी, फुल ज़ूम होगा) */
-/* ========================================================================= */
-
-.book-card {
-    background: white;
-    border-radius: 12px;
-    padding: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.book-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-}
-
-/* बुक कवर इमेज - object-fit: contain ताकि इमेज बिल्कुल न कटे */
-.book-card img {
-    width: 100%;
-    height: 190px;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 8px;
-    cursor: pointer;
-    animation: floatEffect 4s ease-in-out infinite;
-    transition: transform 0.4s ease;
-}
-
-.book-card img:hover {
-    transform: scale(1.08);
-}
-
-@keyframes floatEffect {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-4px); }
-    100% { transform: translateY(0px); }
-}
-
-/* फुल स्क्रीन ज़ूम मॉडल/व्यूअर (जब इमेज पर क्लिक हो) */
-.image-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 5000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-
-.image-modal-overlay.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.image-modal-content {
-    max-width: 90%;
-    max-height: 90%;
-    border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
-    animation: zoomIn 0.3s ease;
-}
-
-@keyframes zoomIn {
-    from { transform: scale(0.7); }
-    to { transform: scale(1); }
-}
-
-.close-image-modal {
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    color: white;
-    font-size: 2.5rem;
-    cursor: pointer;
-    background: none;
-    border: none;
-}
-
-/* बुक टाइटल */
-.book-card h4 {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin: 10px 0 6px 0;
-    text-align: center;
-    transition: color 0.3s;
-}
-
-.book-card h4:hover {
-    color: #e67e22;
-}
-
-/* बटन्स ग्रुप */
-.book-btn-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 8px;
-}
-
-.btn-read {
-    background: #27ae60;
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-}
-
-.btn-read:hover {
-    background: #219653;
-    transform: scale(1.02);
-}
-
-.btn-buy {
-    background: #e67e22;
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-}
-
-.btn-buy:hover {
-    background: #d35400;
-    transform: scale(1.02);
-}
-
-.btn-available {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
-    color: white;
-    border: none;
-    padding: 9px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    box-shadow: 0 3px 8px rgba(230, 126, 34, 0.3);
-    transition: transform 0.2s;
-}
-
-.btn-available:hover {
-    transform: scale(1.03);
-}
-
-/* कमिंग सून विशलिस्ट हार्ट एनिमेशन (सफेद से लाल) */
-.wishlist-heart {
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #ffffff;
-    background: rgba(0,0,0,0.3);
-    padding: 4px 8px;
-    border-radius: 50%;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.wishlist-heart.active {
-    color: #dc3545;
-    transform: scale(1.3);
-    background: rgba(220, 53, 69, 0.1);
-}
-
-/* 6. Lead Form Modal Popup */
+/* ==========================================================================
+   6. LOGIN & LEAD MODALS (OVERLAYS)
+   ========================================================================== */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-    opacity: 0;
-    visibility: hidden;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     transition: all 0.3s ease;
-}
-
-.modal-overlay.show {
-    opacity: 1;
-    visibility: visible;
 }
 
 .modal-card {
-    background: white;
-    width: 90%;
-    max-width: 400px;
-    padding: 25px;
-    border-radius: 12px;
-    position: relative;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    border-radius: var(--radius-popup) !important;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15) !important;
+    border: 1px solid rgba(255,255,255,0.8);
+    animation: modalScaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.close-modal {
-    position: absolute;
-    top: 12px;
-    right: 15px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #888;
-}
-
-.modal-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    color: #2c3e50;
-    text-align: center;
+@keyframes modalScaleUp {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 .modal-input {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 0.9rem;
+    padding: 14px 16px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-btn);
+    font-size: 0.95rem;
+    background: #fafaf9;
+    transition: all 0.3s ease;
+}
+
+.modal-input:focus {
+    border-color: var(--secondary-green);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(19, 138, 54, 0.1);
+    outline: none;
 }
 
 .modal-submit-btn {
     width: 100%;
-    background: #e67e22;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--secondary-green), #0d6526);
     color: white;
     border: none;
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 0.95rem;
+    border-radius: var(--radius-btn);
+    font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
+    box-shadow: 0 4px 15px rgba(19, 138, 54, 0.3);
+    transition: all 0.2s ease;
 }
 
-/* 7. Sticky Bottom Timer & Deal Bar (एक लाइन में, बड़ा साइज़, हाफ पट्टी तक) */
+.modal-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(19, 138, 54, 0.4);
+}
+
+/* ==========================================================================
+   7. STICKY OFFER TIMER & DEAL BAR (Indian Flag Inspired Flowing Light Wave)
+   ========================================================================== */
 .sticky-action-bar {
     position: fixed;
-    bottom: 60px;
+    bottom: 65px;
     left: 0;
     width: 100%;
-    background: #111;
-    color: white;
-    padding: 10px 15px;
+    z-index: 999;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 999;
-    box-shadow: 0 -3px 12px rgba(0,0,0,0.3);
+    padding: 8px 15px;
+    background: #111827;
+    overflow: hidden;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+}
+
+/* Indian flag inspired flowing animated light waves background */
+.sticky-action-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 300%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        rgba(232, 106, 23, 0.15) 0%, 
+        rgba(255, 255, 255, 0.1) 25%, 
+        rgba(19, 138, 54, 0.15) 50%, 
+        rgba(255, 255, 255, 0.1) 75%, 
+        rgba(232, 106, 23, 0.15) 100%
+    );
+    animation: flagWaveFlow 8s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@keyframes flagWaveFlow {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(50%); }
+}
+
+.deal-timer-banner, .sticky-deal-btn {
+    position: relative;
+    z-index: 2;
 }
 
 .deal-timer-banner {
-    font-size: 0.85rem;
+    color: #f3f4f6;
+    font-size: 0.8rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 8px;
-    white-space: nowrap;
+    gap: 6px;
 }
 
-.deal-timer-banner span:last-child {
-    font-size: 1.05rem;
-    color: #f39c12;
+#dealTimer {
+    color: var(--accent-gold);
+    text-shadow: 0 0 10px rgba(246, 185, 59, 0.4);
 }
 
 .sticky-deal-btn {
-    background: #25d366;
+    background: linear-gradient(135deg, var(--secondary-green), #0e6327);
     color: white;
     padding: 8px 16px;
-    border-radius: 25px;
+    border-radius: 50px;
     text-decoration: none;
-    font-size: 0.88rem;
+    font-size: 0.8rem;
     font-weight: 700;
+    box-shadow: 0 4px 15px rgba(19, 138, 54, 0.4);
     display: flex;
     align-items: center;
-    gap: 8px;
-    box-shadow: 0 3px 10px rgba(37, 211, 102, 0.4);
-    transition: transform 0.2s;
+    gap: 6px;
+    animation: breathingGlow 3s ease-in-out infinite;
 }
 
-.sticky-deal-btn:hover {
-    transform: scale(1.05);
+@keyframes breathingGlow {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(19, 138, 54, 0.4); }
+    50% { transform: scale(1.03); box-shadow: 0 0 20px rgba(19, 138, 54, 0.7); }
 }
 
-/* ========================================================================= */
-/* 8. BOTTOM NAVIGATION BAR (तिरंगे की तरह लहराता हुआ इफ़ेक्ट) */
-/* ========================================================================= */
-
+/* ==========================================================================
+   8. BOTTOM NAVIGATION BAR
+   ========================================================================== */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 60px;
-    background: linear-gradient(90deg, #ff9933 0%, #ffffff 50%, #138808 100%);
-    background-size: 200% 100%;
-    animation: flagWaving 6s ease-in-out infinite;
+    height: 65px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-top: 1px solid var(--border-light);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    border-top: 2px solid #e67e22;
     z-index: 1000;
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 -5px 25px rgba(0,0,0,0.06);
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
 }
 
-@keyframes flagWaving {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-.nav-item {
+.bottom-nav .nav-item {
+    color: var(--text-light);
     text-decoration: none;
-    color: #222;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 600;
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: transform 0.2s, color 0.2s;
-    text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+    gap: 3px;
+    transition: all 0.3s ease;
 }
 
-.nav-item span {
+.bottom-nav .nav-item span {
     font-size: 1.2rem;
+    transition: transform 0.3s ease;
 }
 
-.nav-item.active, .nav-item:hover {
-    color: #d35400;
-    transform: scale(1.1);
+.bottom-nav .nav-item:hover, .bottom-nav .nav-item.active {
+    color: var(--primary-orange);
+}
+
+.bottom-nav .nav-item.active span {
+    transform: translateY(-3px);
+    color: var(--primary-orange);
+}
+
+/* Responsive Polish for Desktop */
+@media(min-width: 1024px) {
+    .sticky-action-bar {
+        max-width: 500px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 16px;
+        bottom: 20px;
+    }
+    .bottom-nav {
+        max-width: 600px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 24px 24px 0 0;
+    }
+    body {
+        padding-bottom: 40px;
+    }
 }

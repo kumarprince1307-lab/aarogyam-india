@@ -1,1 +1,250 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Library - Aarogyam India</title>
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="/css/my-library.css">
+    <!-- FontAwesome for Icons & Heart -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 
+<!-- लॉगिन पॉपअप (Overlay Design with Close Button) -->
+<div id="login-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+    <div style="background: #ffffff; padding: 30px; width: 100%; max-width: 380px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; font-family: sans-serif; position: relative;">
+        <!-- क्रॉस (Close) बटन यहाँ है -->
+        <button onclick="closeLoginPopup()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 20px; color: #888; cursor: pointer; line-height: 1;">&times;</button>
+        
+        <h2 style="margin-bottom: 10px; color: #333; font-size: 22px;">लॉगिन करें</h2>
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">अपनी लाइब्रेरी देखने के लिए रजिस्टर्ड मोबाइल नंबर दर्ज करें</p>
+        
+        <input type="tel" id="login-mobile" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; outline: none;">
+        
+        <button onclick="checkUserLogin()" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">लॉगिन करें</button>
+        
+        <p style="margin-top: 20px; font-size: 14px; color: #555;">नया यूजर हैं? <a href="/registration.html" style="color: #007bff; text-decoration: none; font-weight: bold;">यहाँ साइन अप करें</a></p>
+    </div>
+</div>
+
+<!-- पॉपअप बंद करने के लिए जावास्क्रिप्ट -->
+<script>
+    function closeLoginPopup() {
+        document.getElementById('login-popup-overlay').style.display = 'none';
+    }
+</script>
+
+    <!-- Premium Desktop & Mobile Header -->
+    <header class="library-header">
+        <div class="header-logo-title">
+            <img src="/images/logo/logo.png" alt="Logo" class="site-logo">
+            <h1>My Library</h1>
+        </div>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="desktop-nav">
+            <a href="/index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/ebooks/my-library.html" class="active"><i class="fa-solid fa-book-open"></i> My Library</a>
+            <a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchase</a>
+            <a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a>
+            <a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+            <a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms</a>
+            <a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping</a>
+        </nav>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button class="back-btn" onclick="window.location.href='/index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- Slide-out Mobile & Quick Menu Drawer (Right Side) -->
+    <div class="side-menu" id="sideMenu">
+        <button class="close-menu" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; padding: 12px 0; border-bottom: 1px solid #eee; margin-bottom: 10px; background: #f9f9f9; border-radius: 8px;">
+            <h3 style="font-size: 1rem; color: #333; margin-bottom: 4px;">नमस्ते, <span id="menuUserName">अविनाश मिश्रा</span></h3>
+            <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">👑 Premium Member</p>
+        </div>
+        <ul>
+            <li><a href="/index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open"></i> My Library</a></li>
+            <li><a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchases & Invoices</a></li>
+            <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a></li>
+            <li><a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
+            <li><a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms & Conditions</a></li>
+            <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping & Return Policy</a></li>
+            <li><a href="#" class="logout-link" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Dashboard Style Welcome Card (Digital Locker View) -->
+    <div class="welcome-card-soft" style="background: linear-gradient(135deg, #ffffff 0%, #f4fdf4 100%); border: 1px solid #d4edda; border-radius: 12px; padding: 20px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h2 style="font-size: 1.3rem; color: #2c3e50; margin-bottom: 5px;">नमस्ते, <span id="userName">अविनाश मिश्रा</span> जी! 👋</h2>
+                <p style="font-size: 0.9rem; color: #666; margin: 0;">आपकी पर्सनल डिजिटल लाइब्रेरी सुरक्षित है। सभी खरीदी गई बुक्स यहाँ आजीवन उपलब्ध रहेंगी।</p>
+            </div>
+            <button onclick="openLeadModal()" style="background: #28a745; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-user-pen"></i> Update Profile
+            </button>
+        </div>
+
+        <!-- Stats Counter Row -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1; text-align: center;">
+            <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <span style="display: block; font-size: 0.75rem; color: #64748b;">📚 Purchased</span>
+                <strong style="font-size: 1rem; color: #28a745;">1</strong>
+            </div>
+            <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <span style="display: block; font-size: 0.75rem; color: #64748b;">🎁 Bonus</span>
+                <strong style="font-size: 1rem; color: #d97706;">2</strong>
+            </div>
+            <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <span style="display: block; font-size: 0.75rem; color: #64748b;">📖 Available</span>
+                <strong style="font-size: 1rem; color: #0284c7;">15</strong>
+            </div>
+        </div>
+
+        <!-- Profile Completion Progress Bar -->
+        <div style="margin-top: 12px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">
+                <span>प्रोफाइल पूर्णता (Profile Completion)</span>
+                <strong>85%</strong>
+            </div>
+            <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                <div style="width: 85%; height: 100%; background: #28a745; border-radius: 3px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Pill Tabs -->
+    <div class="category-tabs">
+        <button class="tab-btn active" onclick="switchTab('purchased')">मेरी पुस्तकें (My Books)</button>
+        <button class="tab-btn" onclick="switchTab('available')">उपलब्ध बुक्स (Available)</button>
+        <button class="tab-btn" onclick="switchTab('bonus')">फ्री बोनस (Bonus)</button>
+        <button class="tab-btn" onclick="switchTab('demo')">डेमो बुक्स (Demo)</button>
+        <button class="tab-btn" onclick="switchTab('coming')">आने वाली बुक्स (Coming Soon)</button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="library-container">
+
+        <!-- Section 1: Purchased / Active Books -->
+        <div id="section-purchased" class="book-section">
+            <div class="section-title">
+                <span>मेरी एक्टिव / खरीदी गई ई-बुक्स (Digital Locker)</span>
+            </div>
+            <div class="book-grid-2col" id="purchasedBooksGrid">
+                <!-- JavaScript द्वारा डायनेमिक कार्ड्स यहाँ लोड होंगे -->
+            </div>
+        </div>
+
+        <!-- Section 2: Available Books -->
+        <div id="section-available" class="book-section" style="display: none;">
+            <div class="section-title">
+                <span>खरीद के लिए उपलब्ध प्रमुख पुस्तकें (Available Books)</span>
+            </div>
+            <div class="book-grid-2col" id="availableBooksGrid">
+                <!-- 3 मुख्य तैयार किताबें यहाँ दिखेंगी -->
+            </div>
+        </div>
+
+        <!-- Section 3: Bonus Books -->
+        <div id="section-bonus" class="book-section" style="display: none;">
+            <div class="section-title"><span>फ्री बोनस पुस्तकें</span></div>
+            <div class="book-grid-2col">
+                <p style="font-size: 0.85rem; color: #666; grid-column: span 2; text-align: center; padding: 30px; background: #fff; border-radius: 8px; border: 1px dashed #cbd5e1;">🎁 बोनस बुक्स मुख्य खरीदारी के बाद आपके अकाउंट में स्वतः अनलॉक हो जाएंगी।</p>
+            </div>
+        </div>
+
+        <!-- Section 4: Demo Books -->
+        <div id="section-demo" class="book-section" style="display: none;">
+            <div class="section-title"><span>डेमो ई-बुक्स प्रिव्यू</span></div>
+            <div class="book-grid-2col">
+                <p style="font-size: 0.85rem; color: #666; grid-column: span 2; text-align: center; padding: 30px; background: #fff; border-radius: 8px; border: 1px dashed #cbd5e1;">📖 डेमो बुक्स यहाँ उपलब्ध होंगी, जिन्हें आप मुफ्त पढ़ सकते हैं।</p>
+            </div>
+        </div>
+
+        <!-- Section 5: Coming Soon Books (No Buy Now Rule Applied) -->
+        <div id="section-coming" class="book-section" style="display: none;">
+            <div class="section-title"><span>आने वाली प्रीमियम बुक्स (Coming Soon & Wishlist)</span></div>
+            <div class="book-grid-2col" id="comingSoonGrid">
+                <!-- कमिंग सून किताबें और विशलिस्ट कार्ड्स यहाँ लोड होंगे -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Full Detailed Profile Update Form Modal -->
+    <div class="modal-overlay" id="leadModal">
+        <div class="modal-card">
+            <span class="close-modal" onclick="closeLeadModal()">&times;</span>
+            <h3>पूर्ण प्रोफाइल जानकारी अपडेट करें</h3>
+            <form onsubmit="submitLeadForm(event)">
+                <input type="text" id="leadName" class="modal-input" placeholder="आपका पूरा नाम" required>
+                <input type="tel" id="leadPhone" class="modal-input" placeholder="मोबाइल नंबर (WhatsApp)" required>
+                <input type="email" id="leadEmail" class="modal-input" placeholder="ईमेल आईडी (Email Address)">
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                    <input type="text" id="leadState" class="modal-input" placeholder="राज्य (State)" style="margin-bottom: 0;">
+                    <input type="date" id="leadDob" class="modal-input" placeholder="जन्म तिथि (DOB)" style="margin-bottom: 0;" title="जन्म तिथि (Date of Birth)">
+                </div>
+
+                <input type="text" id="leadCity" class="modal-input" placeholder="शहर / जिला (City / District)">
+                <textarea id="leadAddress" class="modal-input" placeholder="पूरा पता (Full Address)" rows="2" style="resize: none;"></textarea>
+                
+                <button type="submit" class="modal-submit-btn">जानकारी सुरक्षित करें (Save Profile)</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sticky Bottom Timer & Deal Bar -->
+    <div class="sticky-action-bar">
+        <div class="deal-timer-banner">
+            <span>⚡ TODAY DEAL:</span>
+            <span id="dealTimer" style="font-family: monospace; font-size: 0.9rem; font-weight: bold;">00:00:00</span>
+        </div>
+        <a href="https://wa.me/917974422572" id="whatsappDealBtn" target="_blank" class="sticky-deal-btn">
+            <i class="fa-brands fa-whatsapp"></i> TODAY DEAL
+        </a>
+    </div>
+
+    <!-- WhatsApp Dynamic Message Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+            const currentUserName = storedUser.full_name || localStorage.getItem('aim_user_name') || 'ग्राहक';
+
+            const waMsg = `नमस्ते Aarogyam, मैंने अभी लाइब्रेरी पेज में ऑफर देखा, मेरा नाम ${currentUserName} है, मुझे आज के ऑफर के बारे में बताएं, मैं इंटरेस्टेड हूँ।`;
+            const waLink = `https://wa.me/917974422572?text=` + encodeURIComponent(waMsg);
+
+            const waBtn = document.getElementById('whatsappDealBtn');
+            if (waBtn) {
+                waBtn.href = waLink;
+            }
+        });
+    </script>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a href="/index.html" class="nav-item">
+            <span><i class="fa-solid fa-house"></i></span>Home
+        </a>
+        <a href="/ebooks/wishlist.html" class="nav-item">
+            <span><i class="fa-solid fa-heart"></i></span>Wishlist
+        </a>
+        <a href="/ebooks/my-library.html" class="nav-item active">
+            <span><i class="fa-solid fa-book-bookmark"></i></span>Library
+        </a>
+        <a href="/ebooks/mypurchase.html" class="nav-item">
+            <span><i class="fa-solid fa-file-invoice"></i></span>Purchase
+        </a>
+    </div>
+
+    <!-- JavaScript Links -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="/js/my-library.js"></script>
+</body>
+</html>
