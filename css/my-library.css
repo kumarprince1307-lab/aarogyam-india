@@ -1,9 +1,7 @@
 /* ==========================================================================
-   AAROGYAM INDIA - MY LIBRARY PREMIUM CSS (AIM V1)
-   Theme: Netflix + Kindle + Google Play Books Luxury Digital Locker
+   AAROGYAM INDIA - MY LIBRARY ULTIMATE PREMIUM CSS (AIM V1)
    ========================================================================== */
 
-/* Root Variables & Brand Colors */
 :root {
     --primary-orange: #E86A17;
     --secondary-green: #138A36;
@@ -13,17 +11,13 @@
     --text-charcoal: #2C2C2C;
     --text-light: #666666;
     --border-light: #ECECEC;
-    --success-color: #138A36;
-    --warning-color: #F6B93B;
-    --danger-color: #E74C3C;
     --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
-    --shadow-hover: 0 15px 35px rgba(232, 106, 23, 0.12);
+    --shadow-hover: 0 15px 35px rgba(232, 106, 23, 0.15);
     --radius-card: 20px;
     --radius-btn: 16px;
     --radius-popup: 28px;
 }
 
-/* Global Reset & Box Sizing */
 * {
     margin: 0;
     padding: 0;
@@ -35,31 +29,47 @@
 body {
     background-color: var(--bg-warm-white);
     color: var(--text-charcoal);
-    background-image: radial-gradient(circle at 50% 0%, rgba(246, 185, 59, 0.04) 0%, transparent 60%),
-                      radial-gradient(circle at 100% 100%, rgba(19, 138, 54, 0.03) 0%, transparent 50%);
-    background-attachment: fixed;
     min-height: 100vh;
-    padding-bottom: 90px; /* Space for bottom nav */
+    padding-bottom: 110px;
     overflow-x: hidden;
 }
 
 /* ==========================================================================
-   1. STICKY PREMIUM HEADER
+   1. TIRANGA WAVE HEADER & GLASS EFFECT
    ========================================================================== */
 .library-header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: rgba(255, 253, 248, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-light);
+    background: rgba(255, 253, 248, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border-bottom: 2px solid transparent;
+    border-image: linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;
+}
+
+/* Tiranga Flowing Wave Banner right below the header */
+.library-header::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, rgba(232,106,23,0.8), rgba(255,255,255,0.9), rgba(19,138,54,0.8), rgba(232,106,23,0.8));
+    background-size: 300% 100%;
+    animation: tirangaWave 6s linear infinite;
+    z-index: 1001;
+}
+
+@keyframes tirangaWave {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 0%; }
 }
 
 .header-logo-title {
@@ -80,7 +90,6 @@ body {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-charcoal);
-    letter-spacing: -0.5px;
 }
 
 .desktop-nav {
@@ -140,11 +149,9 @@ body {
     border-left: 5px solid var(--primary-orange) !important;
     border-radius: var(--radius-card) !important;
     box-shadow: var(--shadow-soft) !important;
-    transition: transform 0.3s ease;
-}
-
-.welcome-card-soft:hover {
-    box-shadow: var(--shadow-hover) !important;
+    margin: 15px auto;
+    padding: 20px;
+    max-width: 1200px;
 }
 
 /* ==========================================================================
@@ -153,17 +160,13 @@ body {
 .category-tabs {
     display: flex;
     gap: 10px;
-    padding: 15px 20px;
+    padding: 10px 20px;
     overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
-    background: transparent;
+    scrollbar-width: none;
     max-width: 1200px;
     margin: 0 auto;
 }
-
-.category-tabs::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
-}
+.category-tabs::-webkit-scrollbar { display: none; }
 
 .tab-btn {
     background: var(--card-pure-white);
@@ -176,7 +179,7 @@ body {
     white-space: nowrap;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
 }
 
 .tab-btn:hover {
@@ -189,16 +192,15 @@ body {
     color: white;
     border-color: transparent;
     box-shadow: 0 4px 15px rgba(232, 106, 23, 0.3);
-    transform: translateY(-1px);
 }
 
 /* ==========================================================================
-   4. LIBRARY CONTAINER & BOOK GRIDS
+   4. RESPONSIVE BOOK GRIDS (Mobile: 2-Col Pair, Desktop: 3-Col Row)
    ========================================================================== */
 .library-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 10px 20px 30px 20px;
+    padding: 10px 15px 30px 15px;
 }
 
 .section-title {
@@ -213,17 +215,66 @@ body {
     padding-left: 10px;
 }
 
+/* Mobile: Exactly 2 columns (pair), Desktop: 3 columns */
 .book-grid-2col {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
 }
 
 @media(min-width: 768px) {
     .book-grid-2col {
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 25px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
     }
+}
+
+/* Book Card & Cover Responsiveness & Touch Zoom effect */
+.book-card, .ebook-card, [id*="Grid"] > div {
+    background: var(--card-pure-white);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-light);
+    padding: 12px;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-card:hover, .ebook-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Book Cover image size control for perfect responsiveness */
+.book-card img, .ebook-card img, img[alt*="Cover"], img[alt*="book"] {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+@media(min-width: 768px) {
+    .book-card img, .ebook-card img, img[alt*="Cover"], img[alt*="book"] {
+        height: 210px;
+    }
+}
+
+.book-card img:hover {
+    transform: scale(1.03);
+}
+
+/* Empty State Animated Box */
+.book-section p, div:empty {
+    animation: pulseEmpty 2s infinite ease-in-out;
+}
+
+@keyframes pulseEmpty {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; transform: scale(1.01); }
 }
 
 /* ==========================================================================
@@ -243,9 +294,7 @@ body {
     overflow-y: auto;
 }
 
-.side-menu.active {
-    right: 0;
-}
+.side-menu.active { right: 0; }
 
 .close-menu {
     background: #f1f5f9;
@@ -254,30 +303,16 @@ body {
     height: 36px;
     border-radius: 50%;
     font-size: 20px;
-    color: var(--text-charcoal);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-left: auto;
     margin-bottom: 15px;
-    transition: background 0.2s;
 }
 
-.close-menu:hover {
-    background: var(--primary-orange);
-    color: white;
-}
-
-.side-menu ul {
-    list-style: none;
-    margin-top: 15px;
-}
-
-.side-menu ul li {
-    margin-bottom: 8px;
-}
-
+.side-menu ul { list-style: none; margin-top: 15px; }
+.side-menu ul li { margin-bottom: 8px; }
 .side-menu ul li a {
     display: flex;
     align-items: center;
@@ -290,45 +325,23 @@ body {
     border-radius: 12px;
     transition: all 0.2s ease;
 }
-
 .side-menu ul li a:hover {
     background: #fdf2e9;
     color: var(--primary-orange);
     padding-left: 20px;
 }
 
-.side-menu ul li a i {
-    width: 20px;
-    color: var(--primary-orange);
-}
-
-.logout-link {
-    color: var(--danger-color) !important;
-}
-
-.logout-link i {
-    color: var(--danger-color) !important;
-}
-
 /* ==========================================================================
-   6. LOGIN & LEAD MODALS (OVERLAYS)
+   6. MODALS
    ========================================================================== */
 .modal-overlay {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
 }
 
 .modal-card {
     border-radius: var(--radius-popup) !important;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15) !important;
-    border: 1px solid rgba(255,255,255,0.8);
-    animation: modalScaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes modalScaleUp {
-    from { transform: scale(0.85); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2) !important;
 }
 
 .modal-input {
@@ -339,14 +352,6 @@ body {
     border-radius: var(--radius-btn);
     font-size: 0.95rem;
     background: #fafaf9;
-    transition: all 0.3s ease;
-}
-
-.modal-input:focus {
-    border-color: var(--secondary-green);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(19, 138, 54, 0.1);
-    outline: none;
 }
 
 .modal-submit-btn {
@@ -360,16 +365,10 @@ body {
     font-weight: 700;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(19, 138, 54, 0.3);
-    transition: all 0.2s ease;
-}
-
-.modal-submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(19, 138, 54, 0.4);
 }
 
 /* ==========================================================================
-   7. STICKY OFFER TIMER & DEAL BAR (Indian Flag Inspired Flowing Light Wave)
+   7. STICKY OFFER TIMER & DEAL BAR (Tiranga Wave Animated Background)
    ========================================================================== */
 .sticky-action-bar {
     position: fixed;
@@ -380,13 +379,14 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 15px;
+    padding: 9px 18px;
     background: #111827;
     overflow: hidden;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+    border-top: 2px solid transparent;
+    border-image: linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;
 }
 
-/* Indian flag inspired flowing animated light waves background */
 .sticky-action-bar::before {
     content: '';
     position: absolute;
@@ -396,13 +396,13 @@ body {
     height: 100%;
     background: linear-gradient(
         90deg, 
-        rgba(232, 106, 23, 0.15) 0%, 
-        rgba(255, 255, 255, 0.1) 25%, 
-        rgba(19, 138, 54, 0.15) 50%, 
-        rgba(255, 255, 255, 0.1) 75%, 
-        rgba(232, 106, 23, 0.15) 100%
+        rgba(232, 106, 23, 0.2) 0%, 
+        rgba(255, 255, 255, 0.12) 30%, 
+        rgba(19, 138, 54, 0.2) 60%, 
+        rgba(255, 255, 255, 0.12) 80%, 
+        rgba(232, 106, 23, 0.2) 100%
     );
-    animation: flagWaveFlow 8s linear infinite;
+    animation: flagWaveFlow 7s linear infinite;
     z-index: 1;
     pointer-events: none;
 }
@@ -419,7 +419,7 @@ body {
 
 .deal-timer-banner {
     color: #f3f4f6;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -428,7 +428,8 @@ body {
 
 #dealTimer {
     color: var(--accent-gold);
-    text-shadow: 0 0 10px rgba(246, 185, 59, 0.4);
+    text-shadow: 0 0 10px rgba(246, 185, 59, 0.5);
+    font-weight: 700;
 }
 
 .sticky-deal-btn {
@@ -460,7 +461,7 @@ body {
     left: 0;
     width: 100%;
     height: 65px;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.94);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border-top: 1px solid var(--border-light);
@@ -499,7 +500,7 @@ body {
     color: var(--primary-orange);
 }
 
-/* Responsive Polish for Desktop */
+/* Desktop Centering Fix */
 @media(min-width: 1024px) {
     .sticky-action-bar {
         max-width: 500px;
@@ -514,7 +515,5 @@ body {
         transform: translateX(-50%);
         border-radius: 24px 24px 0 0;
     }
-    body {
-        padding-bottom: 40px;
-    }
+    body { padding-bottom: 40px; }
 }
