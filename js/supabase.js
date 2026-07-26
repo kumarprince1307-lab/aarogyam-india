@@ -499,18 +499,18 @@ console.log("✅ Demo Module Loaded (Final Profiles Connected)");
 /* ===========================================================
    MODULE 5: BOOKS ENGINE (books.json Driven)
 =========================================================== */
-const BOOK = { JSON: "data/books.json", CACHE_KEY: "AI_BOOKS" };
+const BOOKS = { JSON: "../data/books.json", CACHE_KEY: "AI_BOOKS" };
 let booksCache = [];
 let currentBook = null;
 
 async function loadBooks() {
     try {
-        const response = await fetch(BOOK.JSON);
+        const response = await fetch(BOOKS.JSON);
         if (!response.ok) throw new Error("Books JSON not found.");
-        const books = await response.json();
-        booksCache = books;
-        localStorage.setItem(BOOK.CACHE_KEY, JSON.stringify(books));
-        return books;
+       const data = await response.json();
+booksCache = data.books || [];
+localStorage.setItem(BOOKS.CACHE_KEY, JSON.stringify(booksCache));
+return booksCache;
     } catch (error) {
         console.error("Load Books Error:", error);
         return [];
