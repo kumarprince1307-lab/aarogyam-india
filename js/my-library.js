@@ -19,15 +19,10 @@ function toggleMenu() {
 
 // 2. सुरक्षित लॉगआउट फंक्शन (बिना किसी लूप के, उसी पेज पर रीफ्रेश करने के लिए)
 function logoutUser() {
-    // ब्राउज़र के लोकल स्टोरेज से सारा पुराना डेटा और सेशन साफ करें
     localStorage.removeItem('AI_SESSION');
     localStorage.removeItem('AI_USER');
     localStorage.removeItem('AI_PROFILE');
-    
-    // यूजर को संदेश दें
     alert('आप सफलतापूर्वक लॉग आउट हो चुके हैं।');
-    
-    // होम पेज पर न भेजकर इसी पेज को फ्रेश (रीलोड) करें ताकि यूजर भटके नहीं
     window.location.reload();
 }
 
@@ -79,7 +74,7 @@ function startDailyTimer() {
     setInterval(updateTimer, 1000);
 }
 
-// 5. Supabase और LocalStorage से असली यूजर का नाम, डेटा और प्रोफाइल परसेंटेज कैलकुलेट करना
+// 5. Supabase और LocalStorage से असली यूजर का डेटा और डायनेमिक प्रोग्रेस कैलकुलेशन
 function initUserData() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     
@@ -111,14 +106,14 @@ function initUserData() {
     if (document.getElementById('leadOccupation')) document.getElementById('leadOccupation').value = userOccupation;
     if (document.getElementById('leadInterest')) document.getElementById('leadInterest').value = userInterest;
 
-    // प्रोफाइल कंप्लीशन परसेंटेज कैलकुलेट करना और प्रोग्रेस बार/UI अपडेट करना
+    // डायनेमिक प्रोफाइल परसेंटेज कैलकुलेशन
     calculateAndUpdateProfileProgress({ userName, userMobile, userEmail, userState, userDob, userCity, userAddress, userOccupation, userInterest });
 }
 
-// प्रोफाइल प्रोग्रेस कैलकुलेशन और डायनेमिक बार अपडेट
+// प्रोफाइल प्रोग्रेस बार (10% से 100% तक वास्तविक डेटा के आधार पर)
 function calculateAndUpdateProfileProgress(data) {
     let filledFields = 0;
-    const totalFields = 9; // कुल 9 जरूरी फील्ड्स
+    const totalFields = 9;
 
     if (data.userName && data.userName !== "प्रिय पाठक") filledFields++;
     if (data.userMobile) filledFields++;
@@ -130,32 +125,31 @@ function calculateAndUpdateProfileProgress(data) {
     if (data.userOccupation) filledFields++;
     if (data.userInterest) filledFields++;
 
-    const percentage = Math.round((filledFields / totalFields) * 100);
+    const percentage = Math.max(10, Math.round((filledFields / totalFields) * 100)); // न्यूनतम 10% से शुरू होकर 100% तक
 
-    // UI में प्रोग्रेस बार और परसेंटेज टेक्स्ट अपडेट करना
+    // प्रोग्रेस बार की चौड़ाई और परसेंटेज टेक्स्ट अपडेट करना
     const progressFill = document.querySelector('.welcome-card-soft div[style*="background: #28a745"], .welcome-card-soft div[style*="background: rgb(40, 167, 69)"], .welcome-card-soft div[style*="background: linear-gradient"]');
-    const progressText = document.querySelector('.welcome-card-soft strong');
-
     if (progressFill) {
         progressFill.style.width = percentage + '%';
     }
-    // यदि परसेंटेज दिखाने वाला स्ट्रॉन्ग टैग मौजूद है
-    const statsElements = document.querySelectorAll('.welcome-card-soft div div strong');
-    // हम प्रोग्रेस परसेंटेज वाले एलिमेंट को टारगेट कर सकते हैं
-    const percentLabel = document.querySelector('.welcome-card-soft span + strong');
-    if (percentLabel && percentLabel.textContent.includes('%')) {
-        percentLabel.textContent = percentage + '%';
-    }
+
+    // परसेंटेज टेक्स्ट लेबल अपडेट
+    const percentLabels = document.querySelectorAll('.welcome-card-soft strong');
+    percentLabels.forEach(el => {
+        if (el.textContent.includes('%') || el.previousElementSibling?.textContent.includes('प्रोफाइल')) {
+            el.textContent = percentage + '%';
+        }
+    });
 }
 
-// 6. लाइब्रेरी खुलते ही प्रोफाइल फॉर्म ऑटो-ओपन होना (क्रॉस बटन के साथ)
+// 6. लाइब्रेरी खुलते ही प्रोफाइल फॉर्म ऑटो-ओपन होना (क्रॉस से पूरी तरह बंद होना)
 function checkAndOpenProfileModal() {
     const hasSeenModal = localStorage.getItem('aim_profile_prompted');
     if (!hasSeenModal) {
         setTimeout(() => {
             openLeadModal();
             localStorage.setItem('aim_profile_prompted', 'true');
-        }, 1000);
+        }, 800);
     }
 }
 
@@ -164,7 +158,7 @@ function openLeadModal() {
     if (modal) {
         initUserData();
         modal.classList.add('show');
-        modal.style.display = 'flex'; // पॉपअप को सही से दिखने के लिए
+        modal.style.display = 'flex'; // पॉपअप को सही से स्क्रीन पर लाना
     }
 }
 
@@ -172,11 +166,11 @@ function closeLeadModal() {
     const modal = document.getElementById('leadModal');
     if (modal) {
         modal.classList.remove('show');
-        modal.style.display = 'none'; // क्रॉस बटन दबाने पर पूरी तरह गायब हो जाए
+        modal.style.display = 'none'; // क्रॉस दबाते ही पॉपअप पूरी तरह गायब हो जाए
     }
 }
 
-// सुधरा हुआ फॉर्म सबमिट फंक्शन (डेटाबेस के नामों के अनुसार)
+// फॉर्म सबमिट और सेव फंक्शन
 async function submitLeadForm(event) {
     event.preventDefault();
     const fullName = document.getElementById('leadName').value;
@@ -221,12 +215,12 @@ async function submitLeadForm(event) {
                     });
                 }
                 
-                // LocalStorage अपडेट करें
                 localStorage.setItem('AI_USER', JSON.stringify({ ...currentUser, full_name: fullName, mobile, email, state, dob, city, address, occupation, interest }));
                 
                 alert('बधाई हो! आपकी प्रोफाइल जानकारी Aarogyam India में सफलतापूर्वक सहेज ली गई है।');
                 closeLeadModal();
                 initUserData();
+                window.location.reload();
             } else {
                 alert('सेव करने में त्रुटि: ' + (result.message || 'अज्ञात एरर'));
             }
@@ -235,6 +229,7 @@ async function submitLeadForm(event) {
             alert('प्रोफाइल सहेज ली गई है।');
             closeLeadModal();
             initUserData();
+            window.location.reload();
         }
     } catch (err) {
         console.error("Profile Submit Error:", err);
@@ -253,7 +248,7 @@ function openImageZoom(imgSrc) {
         modal.innerHTML = `
             <button onclick="closeImageZoom()" style="position:absolute;top:20px;right:25px;background:#fff;border:none;width:45px;height:45px;border-radius:50%;font-size:26px;font-weight:bold;cursor:pointer;color:#333;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:1000000;">&times;</button>
             <div style="max-width:90%;max-height:90%;overflow:auto;display:flex;justify-content:center;align-items:center;">
-                <img id="zoomedImg" src="" alt="Zoomed Book Cover" style="max-width:100%;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:transform 0.3s ease;transform:scale(1);">
+                <img id="zoomedImg" src="" alt="Zoomed Book Cover" style="max-width:100%;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
             </div>
         `;
         document.body.appendChild(modal);
@@ -270,7 +265,7 @@ function closeImageZoom() {
     }
 }
 
-// 9. Load Books Data and Render Dynamic Library Sections
+// 9. Load Books Data and Render Dynamic Library Sections & Dynamic Counts
 async function loadLibraryData() {
     try {
         const books = typeof getAllBooks === 'function' ? await getAllBooks() : [];
@@ -302,7 +297,6 @@ async function renderLibrarySections(booksArray) {
 
     if (!booksArray) return;
 
-    // चेक करें कि यूजर ने कोई बुक खरीदी है या नहीं (Supabase purchases टेबल से)
     let userPurchases = [];
     const localUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
     if (localUser.id && typeof db !== 'undefined') {
@@ -317,13 +311,19 @@ async function renderLibrarySections(booksArray) {
     const testPaymentDone = localStorage.getItem('AI_CURRENT_PAYMENT');
     let hasBoughtAny = userPurchases.length > 0 || testPaymentDone;
 
+    // डायनेमिक काउंट्स कैलकुलेट करना (Purchased, Bonus, Wishlist)
+    let purchasedCount = 0;
+    let bonusCount = 2; // उदाहरण के लिए फिक्स या डायनेमिक बोनस
+    let wishlistCount = JSON.parse(localStorage.getItem('AI_WISHLIST') || '[]').length;
+
     booksArray.forEach(book => {
         const bookId = book.book_id || book.id;
         const bookName = book.title || book.name;
         const bookCover = book.cover_image || book.cover;
 
-        // 1. Purchased / My Books (खरीदी गई किताबें)
+        // 1. Purchased / My Books
         if (hasBoughtAny && (bookId === 'BK001' || userPurchases.some(p => p.book_id === bookId))) {
+            purchasedCount++;
             const card = document.createElement('div');
             card.className = 'book-card';
             card.innerHTML = `
@@ -337,7 +337,7 @@ async function renderLibrarySections(booksArray) {
             if (purchasedGrid) purchasedGrid.appendChild(card);
         }
 
-        // 2. Available Books (उपलब्ध बुक्स)
+        // 2. Available Books
         if (bookId === 'BK001' || bookId === 'BK002' || bookId === 'BK006') {
             const availCard = document.createElement('div');
             availCard.className = 'book-card';
@@ -357,7 +357,7 @@ async function renderLibrarySections(booksArray) {
             if (availableGrid) availableGrid.appendChild(availCard);
         }
 
-        // 3. Demo Books (डेमो बुक्स)
+        // 3. Demo Books
         if (bookId === 'BK001') {
             const demoCard = document.createElement('div');
             demoCard.className = 'book-card';
@@ -372,7 +372,7 @@ async function renderLibrarySections(booksArray) {
             if (targetDemoGrid) targetDemoGrid.appendChild(demoCard);
         }
 
-        // 4. Coming Soon Books (कमिंग सून बुक्स)
+        // 4. Coming Soon Books
         if (bookId !== 'BK001' && bookId !== 'BK002' && bookId !== 'BK006') {
             const comingCard = document.createElement('div');
             comingCard.className = 'book-card';
@@ -391,7 +391,9 @@ async function renderLibrarySections(booksArray) {
         }
     });
 
-    // यदि यूजर ने कोई बुक नहीं खरीदी है, तो Purchased सेक्शन में संदेश दिखाएं
+    // वेलकम कार्ड के स्टेट्स काउंट्स को डायनेमिक रूप से अपडेट करना
+    updateWelcomeStatsCounts(hasBoughtAny ? purchasedCount : 0, bonusCount, wishlistCount);
+
     if (!hasBoughtAny && purchasedGrid && purchasedGrid.children.length === 0) {
         purchasedGrid.innerHTML = `
             <div style="grid-column: span 2; text-align: center; padding: 30px; color: #666;">
@@ -402,17 +404,34 @@ async function renderLibrarySections(booksArray) {
     }
 }
 
-// 10. Wishlist Heart Toggle
-function toggleWishlist(element, bookName) {
-    element.classList.toggle('active');
-    if (element.classList.contains('active')) {
-        alert(bookName + ' को आपकी Wishlist में जोड़ दिया गया है!');
-    } else {
-        alert(bookName + ' को Wishlist से हटा दिया गया है।');
+// वेलकम कार्ड के काउंट्स को वास्तविक वैल्यू से अपडेट करने का फंक्शन
+function updateWelcomeStatsCounts(purchased, bonus, wishlist) {
+    const statsContainer = document.querySelector('.welcome-card-soft');
+    if (!statsContainer) return;
+    
+    const countElements = statsContainer.querySelectorAll('div[style*="background: #fff"] strong, div[style*="background: #FFFFFF"] strong, .welcome-card-soft div > div > strong');
+    if (countElements.length >= 3) {
+        countElements[0].textContent = purchased;
+        countElements[1].textContent = bonus;
+        countElements[2].textContent = wishlist;
     }
 }
 
-// 11. बधाई हो! सक्सेस पॉपअप (टेस्ट पेमेंट के बाद या बुक खरीदने पर दिखने के लिए)
+// 10. Wishlist Heart Toggle
+function toggleWishlist(element, bookName) {
+    element.classList.toggle('active');
+    let wishlist = JSON.parse(localStorage.getItem('AI_WISHLIST') || '[]');
+    if (element.classList.contains('active')) {
+        if (!wishlist.includes(bookName)) wishlist.push(bookName);
+        alert(bookName + ' को आपकी Wishlist में जोड़ दिया गया है!');
+    } else {
+        wishlist = wishlist.filter(item => item !== bookName);
+        alert(bookName + ' को Wishlist से हटा दिया गया है।');
+    }
+    localStorage.setItem('AI_WISHLIST', JSON.stringify(wishlist));
+}
+
+// 11. बधाई हो! सक्सेस पॉपअप
 function showCongratulationsPopup() {
     let pop = document.getElementById('congratsPopup');
     if (!pop) {
