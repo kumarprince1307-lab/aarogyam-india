@@ -337,21 +337,22 @@ async function renderLibrarySections(booksArray) {
         const bookName = book.title || book.name;
         const bookCover = book.cover_image || book.cover;
 
-        // 1. Purchased / My Books
-        if (hasBoughtAny && (bookId === 'BK001' || userPurchases.some(p => p.book_id === bookId))) {
-            purchasedCount++;
-            const card = document.createElement('div');
-            card.className = 'book-card';
-            card.innerHTML = `
-                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
-                <h4>${bookName}</h4>
-                <div class="book-btn-group" style="display:flex;gap:8px;margin-top:10px;">
-                    <button class="btn-read" onclick="window.location.href='/ebooks/kharif-master-guide-2026.html'" style="flex:1;padding:10px;background:#138A36;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;">Read Now</button>
-                    <button class="btn-buy" onclick="window.location.href='/ebooks/kharif-master-guide-2026.html'" style="flex:1;padding:10px;background:#E86A17;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;">Download</button>
-                </div>
-            `;
-            if (purchasedGrid) purchasedGrid.appendChild(card);
-        }
+      
+       // 1. Purchased / My Books
+if (hasBoughtAny && (bookId === 'BK001' || userPurchases.some(p => p.book_id === bookId))) {
+    purchasedCount++;
+    const card = document.createElement('div');
+    card.className = 'book-card';
+    card.innerHTML = `
+        <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
+        <h4>${bookName}</h4>
+        <div class="book-btn-group" style="display:flex;gap:8px;margin-top:10px;">
+            <a href="reader.html?book=${bookId}" class="btn-read" style="flex:1;padding:10px;background:#138A36;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Read Now</a>
+            <a href="download.html?book=${bookId}" class="btn-buy" style="flex:1;padding:10px;background:#E86A17;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Download</a>
+        </div>
+    `;
+    if (purchasedGrid) purchasedGrid.appendChild(card);
+}
 
         // 2. Available Books
         if (bookId === 'BK001' || bookId === 'BK002' || bookId === 'BK006') {
@@ -381,7 +382,7 @@ async function renderLibrarySections(booksArray) {
                 <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
                 <h4>${bookName} (Demo)</h4>
                 <div class="book-btn-group" style="margin-top:10px;">
-                    <button class="btn-read" onclick="window.location.href='/ebooks/demo-kharif.html'" style="width:100%;padding:10px;background:#138A36;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;">Read Demo</button>
+                    <button class="btn-read" onclick="window.location.href='download.html'" style="width:100%;padding:10px;background:#138A36;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;">Read Demo</button>
                 </div>
             `;
             const targetDemoGrid = document.getElementById('unlockBooksGrid') || (document.getElementById('section-demo') ? document.getElementById('section-demo').querySelector('.book-grid-2col') : null);
