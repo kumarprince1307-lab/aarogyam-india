@@ -17,11 +17,11 @@ function toggleMenu() {
     }
 }
 
-// 2. सुरक्षित लॉगआउट फंक्शन (बिना किसी लूप के, उसी पेज पर रीफ्रेश करने के लिए)
+// 2. सुरक्षित लॉगआउट फंक्शन (पूरी तरह से स्टोरेज साफ करने वाला)
 function logoutUser() {
-    localStorage.removeItem('AI_SESSION');
-    localStorage.removeItem('AI_USER');
-    localStorage.removeItem('AI_PROFILE');
+    // ब्राउज़र की पूरी लोकल स्टोरेज को साफ़ कर दें ताकि कोई पुराना सेशन या परचेज कैश न बचे
+    localStorage.clear();
+    
     alert('आप सफलतापूर्वक लॉग आउट हो चुके हैं।');
     window.location.reload();
 }
