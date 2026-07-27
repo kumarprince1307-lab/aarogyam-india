@@ -1,5 +1,5 @@
 /* ==========================================================================
-   AAROGYAM INDIA - MY LIBRARY ULTIMATE PREMIUM CSS (AIM V1)
+   AAROGYAM INDIA - MY LIBRARY ULTIMATE PREMIUM CSS (AIM V1 - FINAL)
    ========================================================================== */
 
 :root {
@@ -16,6 +16,8 @@
     --radius-card: 20px;
     --radius-btn: 16px;
     --radius-popup: 28px;
+    --prog-orange: #f97316;
+    --prog-green: #138A36;
 }
 
 * {
@@ -30,18 +32,18 @@ body {
     background-color: var(--bg-warm-white);
     color: var(--text-charcoal);
     min-height: 100vh;
-    padding-bottom: 110px;
+    padding-bottom: 140px; /* Safe space for sticky timer bar & bottom nav */
     overflow-x: hidden;
 }
 
 /* ==========================================================================
-   1. TIRANGA WAVE HEADER & GLASS EFFECT
+   1. PREMIUM HEADER & TIRANGA WAVE LINES
    ========================================================================== */
 .library-header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: rgba(255, 253, 248, 0.82);
+    background: rgba(255, 253, 248, 0.9);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     display: flex;
@@ -53,23 +55,39 @@ body {
     border-image: linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;
 }
 
-/* Tiranga Flowing Wave Banner right below the header */
+.library-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #E86A17, #ffffff, #138A36, #E86A17);
+    background-size: 300% 100%;
+    animation: tirangaWave 6s linear infinite;
+}
+
 .library-header::after {
     content: '';
     position: absolute;
-    bottom: -6px;
+    bottom: -2px;
     left: 0;
     width: 100%;
-    height: 6px;
-    background: linear-gradient(90deg, rgba(232,106,23,0.8), rgba(255,255,255,0.9), rgba(19,138,54,0.8), rgba(232,106,23,0.8));
-    background-size: 300% 100%;
-    animation: tirangaWave 6s linear infinite;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(19,138,54,0.3), rgba(19,138,54,0.9), rgba(19,138,54,0.3));
+    background-size: 200% 100%;
+    animation: greenLineFlow 4s linear infinite;
     z-index: 1001;
 }
 
 @keyframes tirangaWave {
     0% { background-position: 0% 0%; }
     100% { background-position: 100% 0%; }
+}
+
+@keyframes greenLineFlow {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
 }
 
 .header-logo-title {
@@ -79,8 +97,8 @@ body {
 }
 
 .site-logo {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
     object-fit: contain;
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -122,80 +140,161 @@ body {
     height: 42px;
     border-radius: 50%;
     border: 1px solid var(--border-light);
-    background: var(--card-pure-white);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
     color: var(--text-charcoal);
     font-size: 1rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(232, 106, 23, 0.1);
+    transition: all 0.3s ease;
 }
 
 .back-btn:hover, .menu-btn:hover {
     background: var(--primary-orange);
     color: white;
     border-color: var(--primary-orange);
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 0 15px rgba(232, 106, 23, 0.4);
 }
 
 /* ==========================================================================
-   2. WELCOME CARD & DASHBOARD
+   2. MOBILE SIDE MENU DRAWER (Restored Premium Look)
+   ========================================================================== */
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 310px;
+    height: 100%;
+    background: var(--card-pure-white);
+    box-shadow: -15px 0 40px rgba(0,0,0,0.18);
+    z-index: 99999;
+    padding: 25px 20px;
+    transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+    overflow-y: auto;
+}
+
+.side-menu.active {
+    right: 0;
+}
+
+.close-menu {
+    background: #f1f5f9;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 20px;
+    color: var(--text-charcoal);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-bottom: 15px;
+    transition: background 0.2s;
+}
+
+.close-menu:hover {
+    background: var(--primary-orange);
+    color: white;
+}
+
+.side-menu ul {
+    list-style: none;
+    margin-top: 15px;
+}
+
+.side-menu ul li {
+    margin-bottom: 10px;
+}
+
+.side-menu ul li a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    color: var(--text-charcoal);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.side-menu ul li a:hover {
+    background: #fdf2e9;
+    color: var(--primary-orange);
+    padding-left: 22px;
+}
+
+.side-menu ul li a i {
+    width: 20px;
+    color: var(--primary-orange);
+}
+
+/* ==========================================================================
+   3. WELCOME DASHBOARD & STATS CARDS
    ========================================================================== */
 .welcome-card-soft {
-    background: linear-gradient(135deg, #ffffff 0%, #fefcf7 100%) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(254, 252, 247, 0.95) 100%) !important;
+    backdrop-filter: blur(10px);
     border: 1px solid #f0e6d2 !important;
-    border-left: 5px solid var(--primary-orange) !important;
+    border-left: 6px solid var(--primary-orange) !important;
     border-radius: var(--radius-card) !important;
     box-shadow: var(--shadow-soft) !important;
     margin: 15px auto;
-    padding: 20px;
+    padding: 22px;
     max-width: 1200px;
 }
 
 /* ==========================================================================
-   3. CATEGORY PILL TABS
+   4. TABS (Wrapped Two Rows on Mobile, No Horizontal Scroll)
    ========================================================================== */
 .category-tabs {
     display: flex;
-    gap: 10px;
-    padding: 10px 20px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 15px;
     max-width: 1200px;
     margin: 0 auto;
+    justify-content: center;
 }
-.category-tabs::-webkit-scrollbar { display: none; }
 
 .tab-btn {
-    background: var(--card-pure-white);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
     border: 1px solid var(--border-light);
     color: var(--text-light);
-    padding: 10px 20px;
+    padding: 9px 18px;
     border-radius: 50px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    white-space: nowrap;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     transition: all 0.3s ease;
+    flex: 1 1 auto;
+    text-align: center;
 }
 
 .tab-btn:hover {
     border-color: var(--primary-orange);
     color: var(--primary-orange);
+    transform: translateY(-1px);
 }
 
 .tab-btn.active {
     background: linear-gradient(135deg, var(--primary-orange), #d05712);
     color: white;
     border-color: transparent;
-    box-shadow: 0 4px 15px rgba(232, 106, 23, 0.3);
+    box-shadow: 0 4px 15px rgba(232, 106, 23, 0.35);
 }
 
 /* ==========================================================================
-   4. RESPONSIVE BOOK GRIDS (Mobile: 2-Col Pair, Desktop: 3-Col Row)
+   5. BOOK CARDS & FULL-SCREEN PINCH-ZOOM COVER FEATURE
    ========================================================================== */
 .library-container {
     max-width: 1200px;
@@ -215,11 +314,10 @@ body {
     padding-left: 10px;
 }
 
-/* Mobile: Exactly 2 columns (pair), Desktop: 3 columns */
 .book-grid-2col {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 14px;
 }
 
 @media(min-width: 768px) {
@@ -229,12 +327,11 @@ body {
     }
 }
 
-/* Book Card & Cover Responsiveness & Touch Zoom effect */
 .book-card, .ebook-card, [id*="Grid"] > div {
     background: var(--card-pure-white);
     border-radius: var(--radius-card);
     border: 1px solid var(--border-light);
-    padding: 12px;
+    padding: 14px;
     box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
@@ -247,107 +344,71 @@ body {
     box-shadow: var(--shadow-hover);
 }
 
-/* Book Cover image size control for perfect responsiveness */
+/* Book Cover: object-fit contain + Full Screen Pinch Zoom Ready */
 .book-card img, .ebook-card img, img[alt*="Cover"], img[alt*="book"] {
     width: 100%;
-    height: 160px;
-    object-fit: cover;
-    border-radius: 12px;
+    height: 180px;
+    object-fit: contain !important;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 4px;
     transition: transform 0.3s ease;
-    cursor: pointer;
+    cursor: zoom-in;
 }
 
 @media(min-width: 768px) {
     .book-card img, .ebook-card img, img[alt*="Cover"], img[alt*="book"] {
-        height: 210px;
+        height: 230px;
     }
 }
 
-.book-card img:hover {
-    transform: scale(1.03);
+.book-card img:active, .book-card img:hover {
+    transform: scale(1.02);
 }
 
-/* Empty State Animated Box */
-.book-section p, div:empty {
-    animation: pulseEmpty 2s infinite ease-in-out;
-}
-
-@keyframes pulseEmpty {
-    0%, 100% { opacity: 0.85; }
-    50% { opacity: 1; transform: scale(1.01); }
-}
-
-/* ==========================================================================
-   5. MOBILE SIDE DRAWER (MENU)
-   ========================================================================== */
-.side-menu {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 300px;
-    height: 100%;
-    background: var(--card-pure-white);
-    box-shadow: -10px 0 30px rgba(0,0,0,0.15);
-    z-index: 99999;
-    padding: 25px 20px;
-    transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
-    overflow-y: auto;
-}
-
-.side-menu.active { right: 0; }
-
-.close-menu {
-    background: #f1f5f9;
-    border: none;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto;
-    margin-bottom: 15px;
-}
-
-.side-menu ul { list-style: none; margin-top: 15px; }
-.side-menu ul li { margin-bottom: 8px; }
-.side-menu ul li a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 15px;
-    color: var(--text-charcoal);
+/* Book action buttons (Buy Now / Details) styling to match premium theme */
+.book-card button, .ebook-card button, .book-card a.btn, .ebook-card a.btn {
+    padding: 10px 14px;
+    border-radius: var(--radius-btn);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: center;
     text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 600;
-    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--primary-orange), #c75610);
+    color: white;
+    box-shadow: 0 4px 12px rgba(232, 106, 23, 0.25);
     transition: all 0.2s ease;
 }
-.side-menu ul li a:hover {
-    background: #fdf2e9;
-    color: var(--primary-orange);
-    padding-left: 20px;
+
+.book-card button:hover, .ebook-card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(232, 106, 23, 0.4);
 }
 
 /* ==========================================================================
-   6. MODALS
+   6. PROFILE UPDATE FORM MODAL (Full Mobile Screen & Smooth Close)
    ========================================================================== */
 .modal-overlay {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    z-index: 999999;
 }
 
 .modal-card {
     border-radius: var(--radius-popup) !important;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.2) !important;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25) !important;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 92% !important;
+    max-width: 480px !important;
 }
 
 .modal-input {
     width: 100%;
     padding: 14px 16px;
-    margin-bottom: 15px;
+    margin-bottom: 14px;
     border: 1px solid var(--border-light);
     border-radius: var(--radius-btn);
     font-size: 0.95rem;
@@ -368,21 +429,21 @@ body {
 }
 
 /* ==========================================================================
-   7. STICKY OFFER TIMER & DEAL BAR (Tiranga Wave Animated Background)
+   7. STICKY TIMER & TODAY DEAL BAR (Fixed Desktop Overlap Position)
    ========================================================================== */
 .sticky-action-bar {
     position: fixed;
-    bottom: 65px;
+    bottom: 75px; /* Safely above bottom navigation bar to prevent overlap */
     left: 0;
     width: 100%;
-    z-index: 999;
+    z-index: 998;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 9px 18px;
+    padding: 10px 20px;
     background: #111827;
     overflow: hidden;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
     border-top: 2px solid transparent;
     border-image: linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;
 }
@@ -396,11 +457,11 @@ body {
     height: 100%;
     background: linear-gradient(
         90deg, 
-        rgba(232, 106, 23, 0.2) 0%, 
-        rgba(255, 255, 255, 0.12) 30%, 
-        rgba(19, 138, 54, 0.2) 60%, 
-        rgba(255, 255, 255, 0.12) 80%, 
-        rgba(232, 106, 23, 0.2) 100%
+        rgba(232, 106, 23, 0.25) 0%, 
+        rgba(255, 255, 255, 0.15) 30%, 
+        rgba(19, 138, 54, 0.25) 60%, 
+        rgba(255, 255, 255, 0.15) 80%, 
+        rgba(232, 106, 23, 0.25) 100%
     );
     animation: flagWaveFlow 7s linear infinite;
     z-index: 1;
@@ -419,28 +480,29 @@ body {
 
 .deal-timer-banner {
     color: #f3f4f6;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 #dealTimer {
     color: var(--accent-gold);
-    text-shadow: 0 0 10px rgba(246, 185, 59, 0.5);
-    font-weight: 700;
+    text-shadow: 0 0 12px rgba(246, 185, 59, 0.6);
+    font-weight: 800;
+    font-size: 0.95rem;
 }
 
 .sticky-deal-btn {
     background: linear-gradient(135deg, var(--secondary-green), #0e6327);
     color: white;
-    padding: 8px 16px;
+    padding: 8px 18px;
     border-radius: 50px;
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(19, 138, 54, 0.4);
+    box-shadow: 0 4px 18px rgba(19, 138, 54, 0.45);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -448,8 +510,8 @@ body {
 }
 
 @keyframes breathingGlow {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(19, 138, 54, 0.4); }
-    50% { transform: scale(1.03); box-shadow: 0 0 20px rgba(19, 138, 54, 0.7); }
+    0%, 100% { transform: scale(1); box-shadow: 0 0 12px rgba(19, 138, 54, 0.4); }
+    50% { transform: scale(1.03); box-shadow: 0 0 22px rgba(19, 138, 54, 0.75); }
 }
 
 /* ==========================================================================
@@ -461,7 +523,7 @@ body {
     left: 0;
     width: 100%;
     height: 65px;
-    background: rgba(255, 255, 255, 0.94);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border-top: 1px solid var(--border-light);
@@ -500,14 +562,14 @@ body {
     color: var(--primary-orange);
 }
 
-/* Desktop Centering Fix */
+/* Desktop Centering & Spacing Fixes */
 @media(min-width: 1024px) {
     .sticky-action-bar {
-        max-width: 500px;
+        max-width: 520px;
         left: 50%;
         transform: translateX(-50%);
         border-radius: 16px;
-        bottom: 20px;
+        bottom: 80px; /* Perfectly separated from bottom nav on desktop */
     }
     .bottom-nav {
         max-width: 600px;
@@ -515,5 +577,5 @@ body {
         transform: translateX(-50%);
         border-radius: 24px 24px 0 0;
     }
-    body { padding-bottom: 40px; }
+    body { padding-bottom: 50px; }
 }
