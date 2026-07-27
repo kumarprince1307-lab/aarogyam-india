@@ -1,6 +1,6 @@
 /* ==========================================
    AAROGYAM INDIA
-   CHECKOUT.JS (Complete & Clean)
+   CHECKOUT.JS (Complete & Clean - Updated)
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", loadBook);
@@ -8,7 +8,8 @@ document.addEventListener("DOMContentLoaded", loadBook);
 async function loadBook() {
     try {
         const params = new URLSearchParams(window.location.search);
-        const bookId = params.get("id") || "BK001";
+        // Universal book_id or id support
+        const bookId = params.get("book_id") || params.get("id") || "BK001";
 
         // Load Master Book Data from books.json
         const response = await fetch("../data/books.json");
@@ -37,15 +38,29 @@ async function loadBook() {
         };
 
         // UI Binding
-        document.getElementById("bookCover").src = bookCover;
-        document.getElementById("bookName").textContent = bookName;
-        document.getElementById("bookMrp").textContent = "₹" + bookMrp;
-        document.getElementById("bookPrice").textContent = "₹" + bookOffer;
+        const coverEl = document.getElementById("bookCover");
+        if (coverEl) coverEl.src = bookCover;
+        
+        const nameEl = document.getElementById("bookName");
+        if (nameEl) nameEl.textContent = bookName;
+        
+        const mrpEl = document.getElementById("bookMrp");
+        if (mrpEl) mrpEl.textContent = "₹" + bookMrp;
+        
+        const priceEl = document.getElementById("bookPrice");
+        if (priceEl) priceEl.textContent = "₹" + bookOffer;
 
-        document.getElementById("summaryBook").textContent = bookName;
-        document.getElementById("summaryMrp").textContent = "₹" + bookMrp;
-        document.getElementById("summaryPrice").textContent = "₹" + bookOffer;
-        document.getElementById("totalPrice").textContent = "₹" + bookOffer;
+        const sumBook = document.getElementById("summaryBook");
+        if (sumBook) sumBook.textContent = bookName;
+        
+        const sumMrp = document.getElementById("summaryMrp");
+        if (sumMrp) sumMrp.textContent = "₹" + bookMrp;
+        
+        const sumPrice = document.getElementById("summaryPrice");
+        if (sumPrice) sumPrice.textContent = "₹" + bookOffer;
+        
+        const totPrice = document.getElementById("totalPrice");
+        if (totPrice) totPrice.textContent = "₹" + bookOffer;
 
         autoFillUserData();
 
@@ -56,12 +71,30 @@ async function loadBook() {
 }
 
 function autoFillUserData() {
+    // 1. Check direct LocalStorage first (AI_USER or AI_PROFILE)
+    const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+    
+    const nameVal = storedUser.full_name || storedUser.name || "";
+    const mobileVal = storedUser.mobile || "";
+    const emailVal = storedUser.email || "";
+
+    if (nameVal && document.getElementById("customerName")) {
+        document.getElementById("customerName").value = nameVal;
+    }
+    if (mobileVal && document.getElementById("customerMobile")) {
+        document.getElementById("customerMobile").value = mobileVal;
+    }
+    if (emailVal && document.getElementById("customerEmail")) {
+        document.getElementById("customerEmail").value = emailVal;
+    }
+
+    // 2. Fallback to getCurrentUser function if available
     if (typeof getCurrentUser === "function") {
         const user = getCurrentUser();
         if (user) {
-            if (user.full_name) document.getElementById("customerName").value = user.full_name;
-            if (user.mobile) document.getElementById("customerMobile").value = user.mobile;
-            if (user.email) document.getElementById("customerEmail").value = user.email;
+            if (user.full_name && document.getElementById("customerName")) document.getElementById("customerName").value = user.full_name;
+            if (user.mobile && document.getElementById("customerMobile")) document.getElementById("customerMobile").value = user.mobile;
+            if (user.email && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = user.email;
         }
     }
 }
@@ -117,12 +150,22 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
         if (typeof startPayment === "function") {
             const res = startPayment();
-            if (res && !res.success) {
-                alert(res.message || "Payment initialization failed.");
+            
+            // यदि पेमेंट इनिशियलाइज़ेशन फेल हो जाए या यूजर पॉपअप बंद/कैंसिल कर दे, तो बटन रिसेट करने के लिए
+            if (res && typeof res === 'object' && res.success === false) {
                 payBtn.disabled = false;
                 payBtn.textContent = "Pay Now";
+                if (res.message) alert(res.message);
             }
         } else {
+            // अगर startPayment ग्लोबल स्कोप में किसी कारण से मॉनिटर न हो पाए, तो सेफ्टी के लिए टाइमर या फोल्बैक
+            setTimeout(() => {
+                if (payBtn.textContent === "Processing...") {
+                    payBtn.disabled = false;
+                    payBtn.textContent = "Pay Now";
+                }
+            }, 3000);
+
             alert("Error: Payment module not loaded properly.");
             payBtn.disabled = false;
             payBtn.textContent = "Pay Now";
@@ -133,5 +176,17 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         alert("Something went wrong.");
         payBtn.disabled = false;
         payBtn.textContent = "Pay Now";
+    }
+});
+
+// Extra Window focus/blur listener ताकि Razorpay पॉपअप कटने या कैंसिल होने पर 'Processing' हट जाए
+window.addEventListener('focus', function() {
+    const payBtn = document.getElementById("payNowBtn");
+    if (payBtn && payBtn.textContent === "Processing...") {
+        // यदि यूजर ने पेमेंट विंडो बंद कर दी है, तो बटन तुरंत सामान्य हो जाएगा
+        setTimeout(() => {
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay Now";
+        }, 1000);
     }
 });

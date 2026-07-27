@@ -5,252 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- SEO -->
-    <title>Checkout | Aarogyam India</title>
-    <meta name="description" content="Secure Checkout for Aarogyam India eBooks.">
+    <title>Secure Checkout | Aarogyam India</title>
     <meta name="robots" content="index,follow">
 
     <!-- CSS -->
     <link rel="stylesheet" href="../css/checkout.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
 
     <!-- =========================
-         HEADER
+         HEADER (With Back & Login Button)
     ========================== -->
     <header class="checkout-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="javascript:history.back()" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+            <h1>Secure Checkout</h1>
+        </div>
 
-        <a href="javascript:history.back()" class="back-btn">
-            ← Back
-        </a>
-
-        <h1>Secure Checkout</h1>
-
+        <!-- स्मार्ट लॉगिन / प्रोफाइल बटन (My Library की तरह) -->
+        <div>
+            <button onclick="handleLoginOrProfileClick()" style="background: #E86A17; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <i class="fa-solid fa-user-gear"></i> लॉगिन / प्रोफाइल
+            </button>
+        </div>
     </header>
 
-    <!-- =========================
-         MAIN CONTAINER
-    ========================== -->
+    <!-- वेलकम लाइन -->
+    <div style="text-align: center; background: #e8f5e9; color: #2e7d32; padding: 10px; font-size: 0.9rem; font-weight: 600;">
+        🎉 सुरक्षित चेकआउट पेज - अपनी पसंद की डिजिटल सामग्री प्राप्त करें
+    </div>
 
+    <!-- =========================
+         MAIN CONTAINER (Universal 2-Column Grid)
+    ========================== -->
     <main class="checkout-container">
 
-        <!-- =====================
-             BOOK SUMMARY
-        ====================== -->
-
-        <section class="book-summary">
-
-            <div class="book-cover">
-
-                <img
-                    id="bookCover"
-                    src=""
-                    alt="Book Cover">
-
-            </div>
-
-            <div class="book-info">
-
-                <h2 id="bookName">
-                    Loading...
-                </h2>
-
-                <p class="mrp">
-                    MRP :
-                    <del id="bookMrp"></del>
-                </p>
-
-                <p class="offer">
-
-                    Offer Price :
-
-                    <strong id="bookPrice"></strong>
-
-                </p>
-
-                <p class="access">
-
-                    ✅ Lifetime Access
-
-                </p>
-
-            </div>
-
-        </section>
-
-        <!-- =====================
-             CUSTOMER DETAILS
-        ====================== -->
-
-        <section class="customer-details">
-
-            <h2>
-                Customer Details
-            </h2>
-
-            <form id="checkoutForm">
-
-                <div class="form-group">
-
-                    <label for="customerName">
-
-                        Full Name
-
-                    </label>
-
-                    <input
-                        type="text"
-                        id="customerName"
-                        placeholder="Enter Full Name"
-                        required>
-
+        <!-- Left Column: Book / Product Summary -->
+        <div class="checkout-left-col">
+            <section class="book-summary">
+                <div class="book-cover">
+                    <img id="bookCover" src="" alt="Product Cover">
                 </div>
-
-                <div class="form-group">
-
-                    <label for="customerMobile">
-
-                        Mobile Number
-
-                    </label>
-
-                    <input
-                        type="tel"
-                        id="customerMobile"
-                        maxlength="10"
-                        placeholder="Enter Mobile Number"
-                        required>
-
+                <div class="book-info">
+                    <h2 id="bookName">Loading...</h2>
+                    <p class="mrp">MRP : <del id="bookMrp">₹0</del></p>
+                    <p class="offer">Offer Price : <strong id="bookPrice">₹0</strong></p>
+                    <p class="access">✅ Lifetime Access</p>
                 </div>
+            </section>
 
-                <div class="form-group">
-
-                    <label for="customerEmail">
-
-                        Email (Optional)
-
-                    </label>
-
-                    <input
-                        type="email"
-                        id="customerEmail"
-                        placeholder="Enter Email">
-
+            <!-- Order Summary Section -->
+            <section class="order-summary">
+                <h2>Order Summary</h2>
+                <div class="summary-row">
+                    <span>Product</span>
+                    <span id="summaryBook">-</span>
                 </div>
+                <div class="summary-row">
+                    <span>MRP</span>
+                    <span id="summaryMrp">-</span>
+                </div>
+                <div class="summary-row">
+                    <span>Offer Price</span>
+                    <span id="summaryPrice">-</span>
+                </div>
+                <div class="summary-row total">
+                    <strong>Total Payable</strong>
+                    <strong id="totalPrice">-</strong>
+                </div>
+            </section>
+        </div>
 
-            </form>
+        <!-- Right Column: Customer Details & Payment -->
+        <div class="checkout-right-col">
+            <section class="customer-details">
+                <h2>Customer Details</h2>
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label for="customerName">Full Name</label>
+                        <input type="text" id="customerName" placeholder="Enter Full Name" required>
+                    </div>
 
-        </section>
+                    <div class="form-group">
+                        <label for="customerMobile">Mobile Number</label>
+                        <input type="tel" id="customerMobile" maxlength="10" placeholder="Enter Mobile Number" required>
+                    </div>
 
-        <!-- =====================
-             ORDER SUMMARY
-        ====================== -->
+                    <div class="form-group">
+                        <label for="customerEmail">Email (Optional)</label>
+                        <input type="email" id="customerEmail" placeholder="Enter Email">
+                    </div>
+                </form>
+            </section>
 
-        <section class="order-summary">
-
-            <h2>
-
-                Order Summary
-
-            </h2>
-
-            <div class="summary-row">
-
-                <span>Book</span>
-
-                <span id="summaryBook"></span>
-
-            </div>
-
-            <div class="summary-row">
-
-                <span>MRP</span>
-
-                <span id="summaryMrp"></span>
-
-            </div>
-
-            <div class="summary-row">
-
-                <span>Offer Price</span>
-
-                <span id="summaryPrice"></span>
-
-            </div>
-
-            <div class="summary-row total">
-
-                <strong>Total Payable</strong>
-
-                <strong id="totalPrice"></strong>
-
-            </div>
-
-        </section>
-
-        <!-- =====================
-             PAYMENT
-        ====================== -->
-
-        <section class="payment-section">
-
-            <div class="payment-info">
-
-                🔒 100% Secure Payment Powered by Razorpay
-
-            </div>
-
-            <button
-                id="payNowBtn"
-                type="button">
-
-                Pay Now
-
-            </button>
-
-        </section>
+            <section class="payment-section">
+                <div class="payment-info">
+                    🔒 100% Secure Payment Powered by Razorpay
+                </div>
+                <button id="payNowBtn" type="button">Pay Now</button>
+            </section>
+        </div>
 
     </main>
 
     <!-- =========================
          FOOTER
     ========================== -->
-
     <footer class="checkout-footer">
-
-        <a href="terms.html">
-
-            Terms & Conditions
-
-        </a>
-
+        <a href="terms.html">Terms & Conditions</a>
         <span>|</span>
-
-        <a href="privacy-policy.html">
-
-            Privacy Policy
-
-        </a>
-
+        <a href="privacy-policy.html">Privacy Policy</a>
     </footer>
 
     <!-- =========================
-         JAVASCRIPT
+         JAVASCRIPT SCRIPTS
     ========================== -->
-<!-- =========================
-     JAVASCRIPT
-========================= -->
-<!-- 1. Supabase JS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/checkout.js"></script>
 
-<!-- 2. Razorpay की यह ऑफिशियल स्क्रिप्ट होना सबसे ज़रूरी है -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- लॉगिन या प्रोफाइल ट्रिगर करने के लिए छोटा फंक्शन -->
+    <script>
+        function handleLoginOrProfileClick() {
+            const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+            const isLoggedIn = storedUser.id || storedUser.mobile;
 
-<!-- 3. आपका supabase.js -->
-<script src="../js/supabase.js"></script>
-
-<!-- 4. आपका checkout.js -->
-<script src="../js/checkout.js"></script>
-
+            if (!isLoggedIn) {
+                // यदि यूजर लॉग-इन नहीं है, तो यदि आपकी साइट पर लॉगिन पॉपअप फंक्शन है तो उसे कॉल करें, या अलर्ट दें
+                if (typeof openLeadModal === 'function') {
+                    openLeadModal();
+                } else {
+                    alert("कृपया पहले होम पेज से लॉगिन करें।");
+                }
+            } else {
+                if (typeof openLeadModal === 'function') {
+                    openLeadModal();
+                }
+            }
+        }
+    </script>
 </body>
 </html>

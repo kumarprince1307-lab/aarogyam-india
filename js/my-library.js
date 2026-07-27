@@ -360,7 +360,7 @@ async function renderLibrarySections(booksArray) {
             
             let targetUrl = '/ebooks/checkout.html';
             if (bookId === 'BK001') {
-                targetUrl = '/ebooks/kharif-master-guide-2026.html';
+                targetUrl = '/ebooks/checkout.html';
             }
 
             availCard.innerHTML = `
