@@ -145,14 +145,28 @@ function calculateAndUpdateProfileProgress(data) {
     });
 }
 
-// 6. लाइब्रेरी खुलते ही प्रोफाइल फॉर्म ऑटो-ओपन होना (क्रॉस से पूरी तरह बंद होना)
+// 6. स्मार्ट चेक: यदि यूजर लॉग-इन नहीं है या प्रोफाइल पहले से भरी हुई है, तो ऑटो-पॉपअप नहीं खुलेगा
 function checkAndOpenProfileModal() {
+    const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+    
+    // अगर यूजर लॉग-इन ही नहीं है, तो बिल्कुल मत खोलो (लॉगिन पॉपअप के साथ क्लैश बंद)
+    if (!storedUser.id && !storedUser.mobile) {
+        return;
+    }
+
+    // अगर यूजर की प्रोफाइल पहले से भरी हुई है (यानी नाम और मोबाइल दोनों मौजूद हैं और प्रोग्रेस अच्छी है), तो बार-बार परेशान न करो
+    const isProfileComplete = storedUser.full_name && storedUser.mobile && (storedUser.state || storedUser.city || storedUser.occupation);
+    if (isProfileComplete) {
+        return; 
+    }
+
+    // केवल नए या अधूरे प्रोफाइल वाले यूजर के लिए एक बार पॉपअप दिखाएं
     const hasSeenModal = localStorage.getItem('aim_profile_prompted');
     if (!hasSeenModal) {
         setTimeout(() => {
             openLeadModal();
             localStorage.setItem('aim_profile_prompted', 'true');
-        }, 800);
+        }, 1200);
     }
 }
 
@@ -239,7 +253,6 @@ async function submitLeadForm(event) {
         alert('कनेक्शन एरर। कृपया पुनः प्रयास करें।');
     }
 }
-
 // 8. Full Screen Zoom Modal Handler (बुक कवर फुल-स्क्रीन और पिंच-ज़ूम इफ़ेक्ट)
 function openImageZoom(imgSrc) {
     let modal = document.getElementById('imageZoomModal');
@@ -316,7 +329,7 @@ async function renderLibrarySections(booksArray) {
 
     // डायनेमिक काउंट्स कैलकुलेट करना (Purchased, Bonus, Wishlist)
     let purchasedCount = 0;
-    let bonusCount = 2; // उदाहरण के लिए फिक्स या डायनेमिक बोनस
+    let bonusCount = 0; // उदाहरण के लिए फिक्स या डायनेमिक बोनस
     let wishlistCount = JSON.parse(localStorage.getItem('AI_WISHLIST') || '[]').length;
 
     booksArray.forEach(book => {

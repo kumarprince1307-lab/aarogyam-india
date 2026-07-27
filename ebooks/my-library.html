@@ -34,7 +34,7 @@
     }
 </script>
 
-    <!-- 2. Premium Desktop & Mobile Header (Upgraded) -->
+   <!-- 2. Premium Desktop & Mobile Header (Upgraded) -->
     <header class="library-header">
         <div class="header-logo-title">
             <img src="/images/logo/logo.png" alt="Logo" class="site-logo">
@@ -50,6 +50,11 @@
             <a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
             <a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms</a>
             <a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping</a>
+            
+            <!-- डेस्कटॉप मेनू के लिए लॉगिन/प्रोफाइल बटन -->
+            <button onclick="openLeadModal()" style="background: #E86A17; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <i class="fa-solid fa-user-gear"></i> लॉगिन / प्रोफाइल
+            </button>
         </nav>
 
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -68,6 +73,14 @@
             <h3 style="font-size: 0.95rem; color: #1e293b; margin-bottom: 2px;">नमस्ते, <span id="menuUserName">अविनाश मिश्रा</span></h3>
             <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">👑 Premium Member • 85% Profile</p>
         </div>
+
+        <!-- मोबाइल मेनू के अंदर तुरंत क्लिक करने के लिए लॉगिन/प्रोफाइल बटन -->
+        <div style="padding: 0 15px 10px 15px;">
+            <button onclick="openLeadModal(); toggleMenu();" style="background: #E86A17; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <i class="fa-solid fa-user-gear"></i> लॉगिन / प्रोफाइल अपडेट करें
+            </button>
+        </div>
+
         <ul>
             <li><a href="/index.html"><i class="fa-solid fa-house"></i> Home</a></li>
             <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open"></i> My Library</a></li>
