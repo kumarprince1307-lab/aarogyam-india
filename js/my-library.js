@@ -19,13 +19,16 @@ function toggleMenu() {
 
 // 2. सुरक्षित लॉगआउट फंक्शन (पूरी तरह से स्टोरेज साफ करने वाला)
 function logoutUser() {
-    // ब्राउज़र की पूरी लोकल स्टोरेज को साफ़ कर दें ताकि कोई पुराना सेशन या परचेज कैश न बचे
+    // 1. ब्राउज़र की पूरी स्टोरेज साफ़ करें
     localStorage.clear();
+    sessionStorage.clear();
     
+    // 2. यूजर को सूचित करें
     alert('आप सफलतापूर्वक लॉग आउट हो चुके हैं।');
-    window.location.reload();
+    
+    // 3. बिना किसी रुकावट के तुरंत पेज को फ्रेश रीलोड करें
+    window.location.href = window.location.pathname;
 }
-
 // 3. Category Tabs Switching Logic
 function switchTab(category) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
