@@ -12,7 +12,7 @@
 <body>
 
 <!-- 1. Login Popup (Overlay Design with Close Button) -->
-<div id="login-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+<div id="login-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; display: none; justify-content: center; align-items: center;">
     <div style="background: #ffffff; padding: 30px; width: 100%; max-width: 380px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; font-family: sans-serif; position: relative;">
         <!-- Close Button -->
         <button onclick="closeLoginPopup()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 20px; color: #888; cursor: pointer; line-height: 1;">&times;</button>
@@ -29,74 +29,100 @@
 </div>
 
 <script>
+    // लॉगिन पॉपअप बंद करने का फंक्शन
     function closeLoginPopup() {
-        document.getElementById('login-popup-overlay').style.display = 'none';
+        const popup = document.getElementById('login-popup-overlay');
+        if (popup) popup.style.display = 'none';
+    }
+
+    // स्मार्ट फंक्शन: चेक करेगा कि यूजर लॉग-इन है या नहीं
+    function handleLoginOrProfileClick() {
+        const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+        const isLoggedIn = storedUser.id || storedUser.mobile;
+
+        if (!isLoggedIn) {
+            // यदि यूजर लॉग-इन नहीं है, तो लॉगिन पॉपअप दिखाएं
+            const loginPopup = document.getElementById('login-popup-overlay');
+            if (loginPopup) {
+                loginPopup.style.display = 'flex';
+            }
+        } else {
+            // यदि यूजर पहले से लॉग-इन है, तो प्रोफाइल अपडेट फॉर्म खोलें
+            if (typeof openLeadModal === 'function') {
+                openLeadModal();
+            }
+        }
     }
 </script>
 
-   <!-- 2. Premium Desktop & Mobile Header (Upgraded) -->
-    <header class="library-header">
-        <div class="header-logo-title">
-            <img src="/images/logo/logo.png" alt="Logo" class="site-logo">
-            <h1>My Library</h1>
-        </div>
+<!-- 2. Premium Desktop & Mobile Header (Upgraded) -->
+<header class="library-header">
+    <div class="header-logo-title">
+        <img src="/images/logo/logo.png" alt="Logo" class="site-logo">
+        <h1>My Library</h1>
+    </div>
 
-        <!-- Desktop Navigation Links (Fully Restored & Upgraded) -->
-        <nav class="desktop-nav">
-            <a href="/index.html"><i class="fa-solid fa-house"></i> Home</a>
-            <a href="/ebooks/my-library.html" class="active"><i class="fa-solid fa-book-open"></i> My Library</a>
-            <a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchase</a>
-            <a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a>
-            <a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-            <a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms</a>
-            <a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping</a>
-            
-            <!-- डेस्कटॉप मेनू के लिए लॉगिन/प्रोफाइल बटन -->
-            <button onclick="openLeadModal()" style="background: #E86A17; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <i class="fa-solid fa-user-gear"></i> लॉगिन / प्रोफाइल
-            </button>
-        </nav>
+    <!-- Desktop Navigation Links (Fully Restored & Upgraded) -->
+    <nav class="desktop-nav">
+        <a href="/index.html"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/ebooks/my-library.html" class="active"><i class="fa-solid fa-book-open"></i> My Library</a>
+        <a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchase</a>
+        <a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a>
+        <a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+        <a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms</a>
+        <a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping</a>
+        
+        <!-- डेस्कटॉप मेनू के लिए स्मार्ट लॉगिन/प्रोफाइल बटन -->
+        <button onclick="handleLoginOrProfileClick()" style="background: #E86A17; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <i class="fa-solid fa-user-gear"></i> लॉगिन / प्रोफाइल
+        </button>
+    </nav>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <button class="back-btn" onclick="window.location.href='/index.html'"><i class="fa-solid fa-arrow-left"></i></button>
-            <button class="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
-        </div>
-    </header>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <button class="back-btn" onclick="window.location.href='/index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    </div>
+</header>
 
-    <!-- 3. Slide-out Mobile & Quick Menu Drawer (Right Side - Upgraded) -->
+<!-- 3. Slide-out Mobile & Quick Menu Drawer (Right Side - Upgraded) -->
     <div class="side-menu" id="sideMenu">
         <button class="close-menu" onclick="toggleMenu()">&times;</button>
         <div style="text-align: center; padding: 15px 10px; border-bottom: 1px solid #eee; margin-bottom: 10px; background: #f8fafc; border-radius: 8px;">
             <div style="width: 45px; height: 45px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto 6px;">
                 <i class="fa-solid fa-user"></i>
             </div>
-            <h3 style="font-size: 0.95rem; color: #1e293b; margin-bottom: 2px;">नमस्ते, <span id="menuUserName">अविनाश मिश्रा</span></h3>
-            <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">👑 Premium Member • 85% Profile</p>
+            <!-- यहाँ ID 'menuUserName' से असली यूजर का नाम आ जाएगा -->
+            <h3 style="font-size: 0.95rem; color: #1e293b; margin-bottom: 2px;">नमस्ते, <span id="menuUserName">प्रिय पाठक</span></h3>
+            
+            <!-- यहाँ प्रोग्रेस और मेंबरशिप के लिए ID जोड़ दी गई है -->
+            <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">
+                👑 <span id="mobileMemberStatus">Premium Member</span> • <span id="mobileProfileProgressText">33%</span> Profile
+            </p>
         </div>
 
-        <!-- मोबाइल मेनू के अंदर तुरंत क्लिक करने के लिए लॉगिन/प्रोफाइल बटन -->
-        <div style="padding: 0 15px 10px 15px;">
-            <button onclick="openLeadModal(); toggleMenu();" style="background: #E86A17; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <i class="fa-solid fa-user-gear"></i> लॉगिन / प्रोफाइल अपडेट करें
-            </button>
-        </div>
-
-        <ul>
-            <li><a href="/index.html"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open"></i> My Library</a></li>
-            <li><a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchases & Invoices</a></li>
-            <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a></li>
-            <li><a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
-            <li><a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms & Conditions</a></li>
-            <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping & Return Policy</a></li>
-            <li><a href="/privacy.html"><i class="fa-solid fa-shield-halved"></i> Privacy Policy</a></li>
-            <li><a href="#" class="logout-link" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
-        </ul>
-        <div style="text-align: center; padding: 15px 0; font-size: 0.75rem; color: #94a3b8; border-top: 1px solid #eee; margin-top: 15px;">
-            Aarogyam India V1.0<br>&copy; 2026 All Rights Reserved
-        </div>
+    <!-- मोबाइल मेनू के अंदर स्मार्ट बटन -->
+     
+    <div style="padding: 0 15px 10px 15px;">
+        <button onclick="handleLoginOrProfileClick(); toggleMenu();" style="background: #E86A17; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <i class="fa-solid fa-user-gear"></i> लॉगिन / प्रोफाइल अपडेट करें
+        </button>
     </div>
 
+    <ul>
+        <li><a href="/index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open"></i> My Library</a></li>
+        <li><a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchases & Invoices</a></li>
+        <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a></li>
+        <li><a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
+        <li><a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms & Conditions</a></li>
+        <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping & Return Policy</a></li>
+        <li><a href="/privacy.html"><i class="fa-solid fa-shield-halved"></i> Privacy Policy</a></li>
+        <li><a href="#" class="logout-link" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+    </ul>
+    <div style="text-align: center; padding: 15px 0; font-size: 0.75rem; color: #94a3b8; border-top: 1px solid #eee; margin-top: 15px;">
+        Aarogyam India V1.0<br>&copy; 2026 All Rights Reserved
+    </div>
+</div>
     <!-- 4. Dashboard Style Welcome Card (Digital Locker View) -->
     <div class="welcome-card-soft" style="background: linear-gradient(135deg, #ffffff 0%, #f4fdf4 100%); border: 1px solid #d4edda; border-radius: 12px; padding: 20px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
@@ -139,14 +165,14 @@
 
     <!-- 5. Category Pill Tabs -->
     <div class="category-tabs">
-        <button class="tab-btn active" onclick="switchTab('purchased')">मेरी पुस्तकें (My Books)</button>
-        <button class="tab-btn" onclick="switchTab('available')">उपलब्ध बुक्स (Available)</button>
-        <button class="tab-btn" onclick="switchTab('bonus')">फ्री बोनस (Bonus)</button>
-        <button class="tab-btn" onclick="switchTab('demo')">डेमो बुक्स (Demo)</button>
-        <button class="tab-btn" onclick="switchTab('coming')">आने वाली बुक्स (Coming Soon)</button>
+        <button class="tab-btn active" onclick="switchTab('purchased')">मेरी पुस्तकें (MY BOOKS)</button>
+        <button class="tab-btn" onclick="switchTab('available')">उपलब्ध बुक्स (AVAILABLE)</button>
+        <button class="tab-btn" onclick="switchTab('bonus')">फ्री बोनस (BONUS)</button>
+        <button class="tab-btn" onclick="switchTab('demo')">डेमो बुक्स (DEMO)</button>
+        <button class="tab-btn" onclick="switchTab('coming')">आने वाली बुक्स (COMING SOON)</button>
     </div>
 
-    <!-- 6. Main Container & Sections -->
+    <!-- 6. Main Container & Sections -->   
     <div class="library-container">
 
         <!-- Section 1: Purchased / Active Books -->
