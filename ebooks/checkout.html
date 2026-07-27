@@ -123,6 +123,43 @@
     </footer>
 
     <!-- =========================
+         UNIVERSAL LOGIN / REGISTRATION MODAL
+    ========================== -->
+    <div id="leadModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div style="background: #fff; width: 90%; max-width: 400px; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative;">
+            
+            <!-- Close Button -->
+            <button onclick="closeLeadModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: #1e293b; font-size: 1.3rem; margin-bottom: 5px;">🔑 लॉगिन या रजिस्टर करें</h3>
+                <p style="color: #64748b; font-size: 0.85rem;">अपनी डिटेल भरकर आसानी से आगे बढ़ें</p>
+            </div>
+
+            <form id="leadModalForm" onsubmit="handleModalSubmit(event)">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 5px;">पूरा नाम (Full Name)</label>
+                    <input type="text" id="modalName" placeholder="अपना नाम दर्ज करें" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; background: #f8fafc;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 5px;">मोबाइल नंबर (Mobile Number)</label>
+                    <input type="tel" id="modalMobile" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; background: #f8fafc;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 5px;">ईमेल (Email - वैकल्पिक)</label>
+                    <input type="email" id="modalEmail" placeholder="email@example.com" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; background: #f8fafc;">
+                </div>
+
+                <button type="submit" style="width: 100%; padding: 14px; background: #2e7d32; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);">
+                    जारी रखें (Continue)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- =========================
          JAVASCRIPT SCRIPTS
     ========================== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -130,25 +167,68 @@
     <script src="../js/supabase.js"></script>
     <script src="../js/checkout.js"></script>
 
-    <!-- लॉगिन या प्रोफाइल ट्रिगर करने के लिए छोटा फंक्शन -->
+    <!-- लॉगिन या प्रोफाइल ट्रिगर करने के लिए स्क्रिप्ट -->
     <script>
         function handleLoginOrProfileClick() {
-            const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-            const isLoggedIn = storedUser.id || storedUser.mobile;
+            openLeadModal();
+        }
 
-            if (!isLoggedIn) {
-                // यदि यूजर लॉग-इन नहीं है, तो यदि आपकी साइट पर लॉगिन पॉपअप फंक्शन है तो उसे कॉल करें, या अलर्ट दें
-                if (typeof openLeadModal === 'function') {
-                    openLeadModal();
-                } else {
-                    alert("कृपया पहले होम पेज से लॉगिन करें।");
-                }
-            } else {
-                if (typeof openLeadModal === 'function') {
-                    openLeadModal();
-                }
+        function openLeadModal() {
+            const modal = document.getElementById('leadModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                const savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+                if (savedUser.full_name || savedUser.name) document.getElementById('modalName').value = savedUser.full_name || savedUser.name;
+                if (savedUser.mobile) document.getElementById('modalMobile').value = savedUser.mobile;
+                if (savedUser.email) document.getElementById('modalEmail').value = savedUser.email;
             }
         }
+
+        function closeLeadModal() {
+            const modal = document.getElementById('leadModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        async function handleModalSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('modalName').value.trim();
+            const mobile = document.getElementById('modalMobile').value.trim();
+            const email = document.getElementById('modalEmail').value.trim();
+
+            if (mobile.length !== 10) {
+                alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।");
+                return;
+            }
+
+            const userData = { full_name: name, mobile: mobile, email: email };
+            
+            localStorage.setItem('AI_USER', JSON.stringify(userData));
+            localStorage.setItem('AI_PROFILE', JSON.stringify(userData));
+
+            if (document.getElementById("customerName")) document.getElementById("customerName").value = name;
+            if (document.getElementById("customerMobile")) document.getElementById("customerMobile").value = mobile;
+            if (document.getElementById("customerEmail")) document.getElementById("customerEmail").value = email;
+
+            if (typeof registerUser === "function") {
+                try {
+                    await registerUser({ fullName: name, mobile: mobile, email: email, source: "modal" });
+                } catch (e) {
+                    console.log("Reg sync note:", e);
+                }
+            }
+
+            closeLeadModal();
+            alert("सफलतापूर्वक लॉगिन/अपडेट हो गया!");
+        }
+
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('leadModal');
+            if (event.target === modal) {
+                closeLeadModal();
+            }
+        });
     </script>
 </body>
 </html>
