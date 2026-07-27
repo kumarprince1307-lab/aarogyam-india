@@ -579,3 +579,36 @@ body {
     }
     body { padding-bottom: 50px; }
 }
+/* ==========================================================================
+   FINAL OVERRIDE: AVAILABLE BOOKS LINKS TO PREMIUM BUTTONS
+   ========================================================================== */
+#availableBooksGrid a, 
+#section-available a,
+.book-card a[href*="buy"], 
+.book-card a[href*="detail"],
+.book-card a[onclick],
+.book-card p a {
+    display: block !important;
+    width: 100% !important;
+    padding: 12px 16px !important;
+    margin-top: 12px !important;
+    border-radius: 16px !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    background: linear-gradient(135deg, #E86A17, #c75610) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(232, 106, 23, 0.3) !important;
+    transition: all 0.25s ease !important;
+}
+
+#availableBooksGrid a:hover, 
+#section-available a:hover,
+.book-card a[href*="buy"]:hover, 
+.book-card a[href*="detail"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(232, 106, 23, 0.45) !important;
+    background: linear-gradient(135deg, #f07422, #E86A17) !important;
+    color: #ffffff !important;
+}
