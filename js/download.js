@@ -1,16 +1,25 @@
 /* ================================================================= *
-   AAROGYAM INDIA - UNIVERSAL DOWNLOAD SYSTEM JS (FINAL WITH POPUP)
+   AAROGYAM INDIA - SUPABASE CONNECTED DOWNLOAD SYSTEM JS
    ================================================================ */
 
 let currentBookData = null;
 let maxAllowedDownloads = 3;
+let currentUserId = null; // Supabase से मिलने वाली यूजर आईडी
 
 document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
     let bookId = urlParams.get("book") || urlParams.get("id") || "BK001";
 
     try {
-        // books.json से डेटा फेच करना (रूट फोल्डर के पाथ के अनुसार)
+        // 1. Supabase से वर्तमान यूजर का पता लगाना
+        if (typeof supabaseClient !== 'undefined') {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session && session.user) {
+                currentUserId = session.user.id;
+            }
+        }
+
+        // 2. books.json से डेटा फेच करना
         const response = await fetch("../data/books.json");
         const data = await response.json();
         
@@ -26,11 +35,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             maxAllowedDownloads = currentBookData.downloadLimit || 3;
 
-            // डाउनलोड इनेबल चेक
+            // डाउनलोड इनेबल चेक और डेटाबेस से लिमिट चेक करना
             if (currentBookData.downloadEnabled === false) {
                 disableDownloadButton("इस ई-बुक का डाउनलोड अभी बंद है।");
             } else {
-                checkDownloadLimit(bookId);
+                await checkDownloadLimitFromDatabase(bookId);
             }
         } else {
             document.getElementById("bookHeading").textContent = "ई-बुक नहीं मिली!";
@@ -39,20 +48,43 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     } catch (error) {
         console.error("Error loading book data:", error);
-        // फॉलबैक वैल्यू
         document.getElementById("bookHeading").textContent = "खरीफ फसल मास्टर गाइड 2026";
         document.getElementById("bookIdDisplay").textContent = bookId;
-        checkDownloadLimit(bookId);
+        await checkDownloadLimitFromDatabase(bookId);
     }
 });
 
-// डाउनलोड लिमिट चेक करने का फंक्शन
-function checkDownloadLimit(bookId) {
-    let downloadCounts = JSON.parse(localStorage.getItem("AOI_DOWNLOAD_COUNTS") || "{}");
-    let currentCount = downloadCounts[bookId] || 0;
-    let remaining = maxAllowedDownloads - currentCount;
+// Supabase डेटाबेस से डाउनलोड लिमिट चेक करने का फंक्शन
+async function checkDownloadLimitFromDatabase(bookId) {
+    let currentCount = 0;
 
+    // अगर यूजर लॉगिन है, तो Supabase से डेटाबेस रिकॉर्ड चेक करें
+    if (currentUserId && typeof supabaseClient !== 'undefined') {
+        try {
+            const { data, error } = await supabaseClient
+                .from('user_downloads') // सुनिश्चित करें कि आपके Supabase में यह टेबल हो या purchases टेबल का उपयोग करें
+                .select('download_count')
+                .eq('user_id', currentUserId)
+                .eq('book_id', bookId)
+                .single();
+
+            if (data) {
+                currentCount = data.download_count || 0;
+            }
+        } catch (err) {
+            console.log("Database fetch fallback to LocalStorage");
+        }
+    }
+
+    // अगर डेटाबेस में नहीं मिला तो लोकल स्टोरेज का बैकअप उपयोग करें
+    if (currentCount === 0) {
+        let downloadCounts = JSON.parse(localStorage.getItem("AOI_DOWNLOAD_COUNTS") || "{}");
+        currentCount = downloadCounts[bookId] || 0;
+    }
+
+    let remaining = maxAllowedDownloads - currentCount;
     const remainingEl = document.getElementById("remainingCount");
+
     if (remainingEl) {
         if (remaining <= 0) {
             remainingEl.textContent = `सीमा समाप्त: 0/${maxAllowedDownloads}`;
@@ -63,13 +95,30 @@ function checkDownloadLimit(bookId) {
     }
 }
 
-// डाउनलोड ट्रिगर करने का मुख्य फंक्शन (फाइल डाउनलोड + सक्सेस पॉपअप एक साथ)
-function triggerDownload() {
+// डाउनलोड ट्रिगर करने का मुख्य फंक्शन (डेटाबेस अपडेट + फाइल डाउनलोड + पॉपअप)
+async function triggerDownload() {
     if (!currentBookData) return;
 
     let bookId = currentBookData.id;
-    let downloadCounts = JSON.parse(localStorage.getItem("AOI_DOWNLOAD_COUNTS") || "{}");
-    let currentCount = downloadCounts[bookId] || 0;
+    let currentCount = 0;
+
+    // पहले वर्तमान काउंट डेटाबेस या लोकल से निकालें
+    if (currentUserId && typeof supabaseClient !== 'undefined') {
+        try {
+            const { data } = await supabaseClient
+                .from('user_downloads')
+                .select('download_count')
+                .eq('user_id', currentUserId)
+                .eq('book_id', bookId)
+                .single();
+            if (data) currentCount = data.download_count || 0;
+        } catch (e) {}
+    }
+
+    if (currentCount === 0) {
+        let downloadCounts = JSON.parse(localStorage.getItem("AOI_DOWNLOAD_COUNTS") || "{}");
+        currentCount = downloadCounts[bookId] || 0;
+    }
 
     if (currentCount >= maxAllowedDownloads) {
         alert("माफ कीजिए, आप इस ई-बुक को डाउनलोड करने की अधिकतम सीमा समाप्त कर चुके हैं।");
@@ -78,11 +127,30 @@ function triggerDownload() {
 
     // काउंटर बढ़ाना
     currentCount++;
+
+    // 1. लोकल स्टोरेज में सेव करें
+    let downloadCounts = JSON.parse(localStorage.getItem("AOI_DOWNLOAD_COUNTS") || "{}");
     downloadCounts[bookId] = currentCount;
     localStorage.setItem("AOI_DOWNLOAD_COUNTS", JSON.stringify(downloadCounts));
 
+    // 2. Supabase डेटाबेस में सुरक्षित रूप से सेव करें
+    if (currentUserId && typeof supabaseClient !== 'undefined') {
+        try {
+            await supabaseClient
+                .from('user_downloads')
+                .upsert({ 
+                    user_id: currentUserId, 
+                    book_id: bookId, 
+                    download_count: currentCount,
+                    updated_at: new Date()
+                }, { onConflict: 'user_id,book_id' });
+        } catch (err) {
+            console.error("Failed to sync download count to Supabase:", err);
+        }
+    }
+
     // UI अपडेट करें
-    checkDownloadLimit(bookId);
+    await checkDownloadLimitFromDatabase(bookId);
 
     // असली पीडीएफ फाइल डाउनलोड करना
     let pdfUrl = currentBookData.mainPdf || "pdf/full/BK001.pdf";
@@ -94,7 +162,7 @@ function triggerDownload() {
     link.click();
     document.body.removeChild(link);
 
-    // एक ही क्लिक में प्रोफेशनल सक्सेस पॉपअप दिखाना
+    // प्रोफेशनल सक्सेस पॉपअप दिखाना
     showDownloadSuccessPopup(currentBookData.heading || currentBookData.name || "Aarogyam India E-Book");
 }
 
