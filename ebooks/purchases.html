@@ -1,1 +1,71 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Purchases - Aarogyam India</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Custom Purchases CSS -->
+    <link rel="stylesheet" href="../css/purchases.css">
+</head>
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
+    <!-- 1. HEADER (With Logo & Brand Name) -->
+    <header class="purchases-header">
+        <div class="header-left">
+            <button onclick="window.location.href='my-library.html'" class="back-btn" title="Back to Library">
+                ←
+            </button>
+            <div class="brand-box">
+                <img src="../images/logo/logo.png" alt="Aarogyam India Logo" class="brand-logo" onerror="this.style.display='none'">
+                <span class="brand-title">आरोग्यम इंडिया (Aarogyam India)</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="page-main-title">📦 My Purchases & Invoices</span>
+        </div>
+    </header>
+
+    <!-- 2. MAIN CONTAINER -->
+    <main class="purchases-main">
+        <div class="purchases-container-wrapper">
+            
+            <div class="section-title-box">
+                <h2>मेरी खरीदी गई ई-बुक्स (Purchased eBooks)</h2>
+                <p>यहाँ आप अपनी सभी खरीदी गई किताबों की सूची और उनके इनवॉइस (Invoice) डाउनलोड कर सकते हैं।</p>
+            </div>
+
+            <!-- Purchases List Dynamic Container -->
+            <div id="purchasesContainer" class="purchases-list">
+                <!-- Loading State -->
+                <div class="loading-state">
+                    <p>खरीद का डेटा लोड हो रहा है...</p>
+                </div>
+            </div>
+
+            <!-- Empty State (Hidden by default) -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">🛒</div>
+                <h3>अभी तक कोई खरीदारी नहीं हुई है</h3>
+                <p>आपने हमारे स्टोर से अभी तक कोई ई-बुक नहीं खरीदी है।</p>
+                <button onclick="window.location.href='../store.html'" class="primary-btn">Go To Store</button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 3. FOOTER -->
+    <footer class="purchases-footer">
+        <p>© 2026 Aarogyam India • सभी अधिकार सुरक्षित</p>
+    </footer>
+
+    <!-- Main Supabase & App Engine -->
+    <script src="../js/supabase.js"></script>
+    
+    <!-- Custom Purchases JS -->
+    <script src="../js/purchases.js"></script>
+</body>
+</html>
