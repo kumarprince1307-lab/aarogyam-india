@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         1. URL से बुक की ID या Slug पहचानना
     ====================================================== */
     const urlParams = new URLSearchParams(window.location.search);
-    const bookId = urlParams.get("book") || "kharif-master-guide-2026"; // डिफ़ॉल्ट आईडी
+    const bookId = urlParams.get("book") || "BK002"; // डिफ़ॉल्ट आईडी
 
     let book = null;
 
