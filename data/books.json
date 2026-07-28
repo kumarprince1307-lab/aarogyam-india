@@ -42,31 +42,155 @@
         "title": "खरीफ फसल मास्टर गाइड 2026",
         "description": "खरीफ फसल मास्टर गाइड 2026 का डेमो देखें और सम्पूर्ण eBook खरीदें।",
         "keywords": "खरीफ फसल, सोयाबीन, धान, मक्का, eBook, Aarogyam India",
-        "canonical": ""
+        "canonical": "https://aarogyamindia.online/books/kharif-fasal-master-guide-2026.html"
       }
     },
     {
-      "id": "BK006",
-      "slug": "ai-website-guide",
-      "heading": "AI वेबसाइट गाइड",
-      "name": "AI वेबसाइट गाइड (Coming Soon)",
-      "category": "Digital Skills",
+      "id": "BK002",
+      "slug": "kheti-ka-doctor",
+      "heading": "खेती का डॉक्टर",
+      "shortTitle": "खेती का डॉक्टर",
+      "name": "खेती का डॉक्टर",
+      "tagline": "सम्पूर्ण कृषि समाधान | हर किसान के मोबाइल में होने वाली आवश्यक पुस्तक",
+      "category": "Agriculture",
+      "subcategory": "Crop Guide",
       "language": "Hindi",
       "author": "Aarogyam India",
+      "publisher": "Aarogyam India",
+      "brand": "Krishi Experts",
       "version": "1.0",
-      "status": "coming_soon",
-      "cover": "/images/books/ai-website-guide-cover.webp",
-      "thumbnail": "/images/books/ai-website-guide-cover.webp",
+      "status": "active",
+      "featured": true,
+      "bestseller": true,
+      "newArrival": false,
+      "cover": "/images/books/fasal-ka-doctor-cover.webp",
+      "thumbnail": "/images/books/fasal-ka-doctor-cover.webp",
+      "heroBanners": [
+        "/images/banners/kheti-dr-banner-1.webp",
+        "/images/banners/kheti-dr-banner-2.webp",
+        "/images/banners/kheti-dr-banner-3.webp"
+      ],
+      "banner": "/images/banners/kheti-dr-banner-1.webp",
+      "landingPage": "/ebook/landingpage.html",
+      "checkoutPage": "/checkout.html",
+      "readerPage": "/reader.html",
+      "purchasePage": "/purchases.html",
+      "libraryPage": "/my-library.html",
       "mrp": 299,
       "offerPrice": 99,
       "currency": "INR",
-      "demoAvailable": false,
-      "readEnabled": false,
-      "downloadEnabled": false,
+      "discount": 67,
+      "demoAvailable": true,
+      "readEnabled": true,
+      "downloadEnabled": true,
       "downloadLimit": 3,
-      "mainPdf": "",
-      "fileSize": "15.0 MB",
-      "accessType": "Lifetime"
+      "mainPdf": "/pdf/full/BK002.pdf",
+      "bonusPdf": "/pdf/bonus/BK002.pdf",
+      "demoPdf": "/pdf/demo/BK002-demo.pdf",
+      "fileSize": "25 MB",
+      "totalPages": 120,
+      "totalImages": 300,
+      "accessType": "Lifetime",
+      "previewImages": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "description": {
+        "short": "खेती का डॉक्टर किसानों के लिए तैयार की गई एक प्रीमियम डिजिटल कृषि मार्गदर्शिका है, जिसमें कीट, रोग, पोषक तत्वों की कमी, स्प्रे विज्ञान, pH, EC, जल गुणवत्ता एवं फसल प्रबंधन की सम्पूर्ण जानकारी सरल हिंदी में दी गई है।",
+        "full": "खेती का डॉक्टर किसानों के लिए तैयार की गई एक प्रीमियम डिजिटल कृषि मार्गदर्शिका (PDF) है। यह केवल एक किताब नहीं, बल्कि आपकी खेती की हर समस्या का व्यावहारिक समाधान देने वाली रेफरेंस गाइड है।"
+      },
+      "highlights": [
+        "120 पेज की प्रीमियम डिजिटल पुस्तक",
+        "300+ रंगीन फोटो, चार्ट एवं इन्फोग्राफिक्स",
+        "सरल एवं किसान की भाषा में जानकारी",
+        "कीट, रोग एवं पोषक तत्वों की पहचान",
+        "Spray Science की सम्पूर्ण जानकारी",
+        "pH, EC एवं Water Quality Guide"
+      ],
+      "keyFeatures": {
+        "cropHealth": ["कीट पहचान", "रोग पहचान", "पोषक तत्व कमी पहचान", "खरपतवार प्रबंधन"],
+        "sprayScience": ["सही दवा", "सही मात्रा", "सही समय", "सही नोज़ल", "पानी की गुणवत्ता", "pH एवं EC"]
+      },
+      "benefits": [
+        "फसल की समस्याओं की सही पहचान",
+        "सही दवा एवं सही मात्रा का चयन"
+      ],
+      "included": [
+        "120 पेज की प्रीमियम PDF",
+        "300+ रंगीन चित्र"
+      ],
+      "targetAudience": [
+        "किसान",
+        "कृषि विद्यार्थी",
+        "कृषि सलाहकार"
+      ],
+      "cta": {
+        "buyNow": "अभी खरीदें",
+        "demo": "फ्री डेमो देखें",
+        "library": "My Library",
+        "share": "दोस्तों के साथ शेयर करें",
+        "whatsapp": "WhatsApp सहायता"
+      },
+      "faq": [
+        {
+          "question": "यह पुस्तक किसके लिए है?",
+          "answer": "सभी किसानों, कृषि विद्यार्थियों और कृषि सलाहकारों के लिए।"
+        }
+      ],
+      "support": {
+        "company": "Aarogyam India",
+        "brand": "Krishi Experts",
+        "mobile": "7974422572",
+        "whatsapp": "7974422572"
+      },
+      "badges": [
+        "Best Seller",
+        "Premium eBook"
+      ],
+      "stats": {
+        "pages": 120,
+        "images": 300,
+        "faqCount": 1,
+        "language": "Hindi",
+        "category": "Agriculture"
+      },
+      "rating": {
+        "enabled": false,
+        "value": 5,
+        "totalReviews": 0
+      },
+      "share": {
+        "enabled": true,
+        "shareTitle": "खेती का डॉक्टर",
+        "shareText": "खेती का डॉक्टर - सम्पूर्ण कृषि समाधान",
+        "shareImage": "/images/books/fasal-ka-doctor-cover.webp"
+      },
+      "seo": {
+        "title": "खेती का डॉक्टर | सम्पूर्ण कृषि समाधान | Aarogyam India",
+        "description": "खेती का डॉक्टर किसानों के लिए प्रीमियम डिजिटल कृषि पुस्तक है।",
+        "keywords": "खेती का डॉक्टर, Agriculture eBook, Aarogyam India",
+        "canonical": "/ebook/landingpage.html?book=BK002",
+        "robots": "index,follow"
+      },
+      "analytics": {
+        "trackView": true,
+        "trackDemo": true,
+        "trackBuy": true
+      },
+      "display": {
+        "showHeroSlider": true,
+        "showHighlights": true
+      },
+      "relatedBooks": [
+        "BK001"
+      ],
+      "createdAt": "2026-07-28",
+      "updatedAt": "2026-07-28"
     },
     {
       "id": "BK003",
@@ -138,17 +262,17 @@
       "accessType": "Lifetime"
     },
     {
-      "id": "BK002",
-      "slug": "fasal-ka-doctor",
-      "heading": "फसल का डॉक्टर",
-      "name": "फसल का डॉक्टर (Coming Soon)",
-      "category": "Agriculture",
+      "id": "BK006",
+      "slug": "ai-website-guide",
+      "heading": "AI वेबसाइट गाइड",
+      "name": "AI वेबसाइट गाइड (Coming Soon)",
+      "category": "Digital Skills",
       "language": "Hindi",
       "author": "Aarogyam India",
       "version": "1.0",
       "status": "coming_soon",
-      "cover": "/images/books/fasal-ka-doctor-cover.webp",
-      "thumbnail": "/images/books/fasal-ka-doctor-cover.webp",
+      "cover": "/images/books/ai-website-guide-cover.webp",
+      "thumbnail": "/images/books/ai-website-guide-cover.webp",
       "mrp": 299,
       "offerPrice": 99,
       "currency": "INR",
@@ -157,7 +281,7 @@
       "downloadEnabled": false,
       "downloadLimit": 3,
       "mainPdf": "",
-      "fileSize": "19.4 MB",
+      "fileSize": "15.0 MB",
       "accessType": "Lifetime"
     },
     {
