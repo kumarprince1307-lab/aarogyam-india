@@ -507,7 +507,7 @@ color:#444;
 </div>
 
 <button
-onclick="window.location.href='../my-library.html'"
+onclick="window.location.href='../ebooks/my-library.html'"
 style="
 width:100%;
 padding:15px;
