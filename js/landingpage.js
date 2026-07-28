@@ -266,3 +266,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 });
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('PWA Service Worker Active'))
+      .catch(err => console.log('PWA Error:', err));
+  });
+}
