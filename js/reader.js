@@ -328,15 +328,18 @@ function showErrorScreen() {
 }
 
 // =======================================================
-// WHATSAPP DYNAMIC USER LINK GENERATOR
+// WHATSAPP DYNAMIC USER LINK GENERATOR (FIXED)
 // =======================================================
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const whatsappBtn = document.getElementById("whatsappFloatBtn");
         if (whatsappBtn) {
             const userEmailText = watermarkUser ? watermarkUser.textContent : "User";
-            const encodedMsg = encodeURIComponent(`नमस्ते Aarogyam India जी, मेरी आईडी/यूजर (${userEmailText}) है। मैं आरोग्यम इंडिया की ई-बुक पढ़ रहा हूँ और मुझे सहायता चाहिए।`);
-            whatsappBtn.href = `https://wa.me/917974422572?text=${encodedMsg}`;
+            // साफ़ और ब्राउज़र-फ्रेंडली टेक्स्ट फॉर्मेट
+            const message = "नमस्ते अविनाश जी, मैं आरोग्यम इंडिया की ई-बुक पढ़ रहा हूँ और मुझे सहायता चाहिए।";
+            
+            // encodeURIComponent का उपयोग करके यूआरएल बनाना
+            whatsappBtn.href = "https://wa.me/917974422572?text=" + encodeURIComponent(message);
         }
     }, 1500);
 });
