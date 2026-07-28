@@ -326,3 +326,48 @@ function showErrorScreen() {
     if (loadingIndicator) loadingIndicator.style.display = "none";
     if (pdfErrorScreen) pdfErrorScreen.style.display = "flex";
 }
+
+// =======================================================
+// WHATSAPP DYNAMIC USER LINK GENERATOR
+// =======================================================
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        const whatsappBtn = document.getElementById("whatsappFloatBtn");
+        if (whatsappBtn) {
+            const userEmailText = watermarkUser ? watermarkUser.textContent : "User";
+            const encodedMsg = encodeURIComponent(`नमस्ते Aarogyam India जी, मेरी आईडी/यूजर (${userEmailText}) है। मैं आरोग्यम इंडिया की ई-बुक पढ़ रहा हूँ और मुझे सहायता चाहिए।`);
+            whatsappBtn.href = `https://wa.me/917974422572?text=${encodedMsg}`;
+        }
+    }, 1500);
+});
+
+// AI Ask Modal Toggle
+const aiAskBtn = document.getElementById("aiAskBtn");
+const aiAskModal = document.getElementById("aiAskModal");
+const closeAiModal = document.getElementById("closeAiModal");
+const submitAiQuery = document.getElementById("submitAiQuery");
+
+if (aiAskBtn) {
+    aiAskBtn.addEventListener("click", () => {
+        if (aiAskModal) aiAskModal.style.display = "flex";
+    });
+}
+
+if (closeAiModal) {
+    closeAiModal.addEventListener("click", () => {
+        if (aiAskModal) aiAskModal.style.display = "none";
+    });
+}
+
+if (submitAiQuery) {
+    submitAiQuery.addEventListener("click", () => {
+        const queryText = document.getElementById("aiQueryInput").value.trim();
+        if (!queryText) {
+            alert("कृपया अपना सवाल दर्ज करें।");
+            return;
+        }
+        alert("यह V1 रीडर का प्रीमियम फीचर है! V2 अपडेट में इस पर AI आधारित उत्तर मिलना शुरू हो जाएगा। आपका सवाल दर्ज कर लिया गया है: " + queryText);
+        document.getElementById("aiQueryInput").value = "";
+        if (aiAskModal) aiAskModal.style.display = "none";
+    });
+}

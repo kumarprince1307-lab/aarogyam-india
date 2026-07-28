@@ -21,12 +21,18 @@
         <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
     </div>
 
-    <!-- 2. FINAL V1 HEADER -->
+    <!-- 2. FINAL V1 HEADER (Logo + Full Waving Tricolor Flag Effect) -->
     <header class="reader-header">
         <div class="header-left">
             <button onclick="window.location.href='my-library.html'" class="back-btn" title="Back to Library">
                 ←
             </button>
+            <div class="brand-box">
+                <img src="../images/logo/logo.png" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
+                <div class="tricolour-flag-container" title="Proudly Indian - Aarogyam India">
+                    <span>🇮🇳</span>
+                </div>
+            </div>
         </div>
         <div class="header-center">
             <h1 id="bookHeading">Loading Book...</h1>
@@ -93,7 +99,7 @@
 
     </main>
 
-    <!-- 4. BOTTOM READER BAR (Pagination + Page Slider) -->
+    <!-- 4. STICKY BOTTOM READER BAR (Pagination + Page Slider) -->
     <footer class="reader-footer">
         <div class="footer-row-slider">
             <input type="range" id="pageSlider" min="1" max="100" value="1">
@@ -105,10 +111,14 @@
         </div>
     </footer>
 
-    <!-- 5. FLOATING CONTROLS (Right Bottom) -->
+    <!-- 5. FLOATING CONTROLS (Right Bottom: Zoom, WhatsApp Direct Chat with Dynamic ID & Library) -->
     <div class="floating-controls">
         <button id="zoomInBtn" class="float-btn" title="Zoom In">＋</button>
         <button id="zoomOutBtn" class="float-btn" title="Zoom Out">－</button>
+        <!-- WhatsApp Floating Button with ID -->
+        <a href="https://wa.me/917974422572" id="whatsappFloatBtn" target="_blank" class="float-btn whatsapp-float-btn" title="WhatsApp पर संपर्क करें (7974422572)">
+            💬
+        </a>
         <button onclick="window.location.href='my-library.html'" class="float-btn" title="My Library">🏠</button>
     </div>
 

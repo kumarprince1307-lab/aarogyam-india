@@ -1,5 +1,5 @@
 /* =================================================================
-   AAROGYAM INDIA - EBOOK READER CSS (FINAL V1 + ENHANCEMENTS)
+   AAROGYAM INDIA - EBOOK READER CSS (FINAL V1 + GLAS & TRICOLOR HEADER)
 ================================================================= */
 
 * {
@@ -36,11 +36,13 @@ body {
     transition: width 0.2s ease;
 }
 
-/* 2. HEADER WITH TRICOLOR & LOGO */
+/* 2. HEADER WITH GLASS EFFECT & FULL TRICOLOR TEXT AREA */
 .reader-header {
     height: 60px;
-    background: #1e293b;
-    border-bottom: 1px solid #334155;
+    background: rgba(30, 41, 59, 0.75); /* हल्का ग्लास इफेक्ट (Glassmorphism) */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -55,7 +57,7 @@ body {
 }
 
 .header-left .back-btn {
-    background: #334155;
+    background: rgba(51, 65, 85, 0.8);
     border: none;
     color: #fff;
     font-size: 18px;
@@ -73,52 +75,60 @@ body {
     background: #475569;
 }
 
-/* Brand Logo & Tricolored Flag Animation */
+/* Brand Logo Box */
 .brand-box {
     display: flex;
     align-items: center;
     gap: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .brand-logo {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid #10b981;
+    border: 2px solid #10b981;
 }
 
-.tricolour-flag {
-    font-size: 16px;
-    animation: waveFlag 2s infinite ease-in-out;
-    display: inline-block;
-}
-
-@keyframes waveFlag {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(15deg) scale(1.1); }
-}
-
+/* 🇮🇳 जहाँ बुक का नाम है, उस पूरे सेंटर एरिया में हल्का लहराता हुआ तिरंगा इफ़ेक्ट */
 .header-center {
     flex: 1;
     text-align: center;
-    padding: 0 10px;
+    padding: 6px 12px;
+    margin: 0 12px;
     overflow: hidden;
+    border-radius: 8px;
+    background: linear-gradient(270deg, rgba(255, 153, 51, 0.18), rgba(255, 255, 255, 0.1), rgba(19, 136, 8, 0.18));
+    background-size: 600% 600%;
+    animation: headerTricolorWave 8s ease infinite;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@keyframes headerTricolorWave {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .header-center h1 {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #f1f5f9;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .header-sub-info {
     font-size: 11px;
-    color: #94a3b8;
+    color: #cbd5e1;
     margin-top: 2px;
+    font-weight: 500;
 }
 
 .header-right .page-jump-box {
@@ -130,7 +140,7 @@ body {
 .page-jump-box input {
     width: 45px;
     height: 32px;
-    background: #0f172a;
+    background: rgba(15, 23, 42, 0.8);
     border: 1px solid #475569;
     color: #fff;
     text-align: center;
@@ -273,9 +283,9 @@ body {
     100% { transform: translateX(-100%); }
 }
 
-/* 5. STICKY BOTTOM READER BAR (NEW PREMIUM COLOR & FIXED) */
+/* 5. STICKY BOTTOM READER BAR */
 .reader-footer {
-    background: linear-gradient(135deg, #064e3b, #065f46); /* नया आकर्षक गहरा हरा/एमरल्ड रंग */
+    background: linear-gradient(135deg, #064e3b, #065f46);
     border-top: 1px solid #047857;
     padding: 10px 16px;
     display: flex;
@@ -331,7 +341,7 @@ body {
     font-weight: 600;
 }
 
-/* 6. FLOATING CONTROLS (Right Bottom + AI Ask Button) */
+/* 6. FLOATING CONTROLS (Right Bottom + WhatsApp Floating Button) */
 .floating-controls {
     position: fixed;
     right: 20px;
@@ -363,11 +373,18 @@ body {
     transform: scale(1.05);
 }
 
-/* AI Ask Question Floating Button Highlight */
-.float-btn.ai-ask-btn {
-    background: linear-gradient(135deg, #10b981, #047857);
-    border: 1px solid #34d399;
+/* WhatsApp Floating Button Style */
+.float-btn.whatsapp-float-btn {
+    background: #25d366;
+    color: #ffffff;
+    border: 1px solid #1ebe57;
     font-size: 20px;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+}
+
+.float-btn.whatsapp-float-btn:hover {
+    background: #20ba5a;
+    transform: scale(1.1);
 }
 
 /* MODALS & ERRORS */
