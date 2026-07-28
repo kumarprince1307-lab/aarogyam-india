@@ -1,1 +1,130 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aarogyam India - eBook Reader</title>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <!-- Custom Reader CSS -->
+    <link rel="stylesheet" href="../css/reader.css">
+</head>
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
+    <!-- 1. TOP READING PROGRESS BAR -->
+    <div id="topProgressBar" class="progress-bar-container">
+        <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
+    </div>
+
+    <!-- 2. FINAL V1 HEADER -->
+    <header class="reader-header">
+        <div class="header-left">
+            <button onclick="window.location.href='my-library.html'" class="back-btn" title="Back to Library">
+                ←
+            </button>
+        </div>
+        <div class="header-center">
+            <h1 id="bookHeading">Loading Book...</h1>
+            <div class="header-sub-info">
+                <span id="headerPageInfo">Page 1 / --</span> • 
+                <span id="headerPercentInfo">0%</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <!-- Page Jump Direct Input -->
+            <div class="page-jump-box">
+                <input type="number" id="pageJumpInput" placeholder="Pg" min="1">
+                <button id="pageJumpBtn">Go</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. MAIN READER AREA (Single Page Canvas Viewer with Watermark) -->
+    <main class="reader-main" id="readerContainer">
+        
+        <!-- Premium Book Cover Loader -->
+        <div id="loadingIndicator" class="loading-overlay">
+            <div class="loader-card">
+                <div class="loader-cover-icon">📕</div>
+                <h3 id="loaderBookTitle">Loading...</h3>
+                <p class="loader-status-text">Loading eBook...</p>
+                <div class="loader-bar-bg">
+                    <div id="loaderFill" class="loader-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Error Screen (PDF Missing / Not Found) -->
+        <div id="pdfErrorScreen" class="error-screen" style="display: none;">
+            <div class="error-box">
+                <div class="error-icon">❌</div>
+                <h2>PDF Not Found</h2>
+                <p>इस ई-बुक की फाइल उपलब्ध नहीं है या हटाई जा चुकी है।</p>
+                <button onclick="window.location.href='my-library.html'" class="primary-btn">Return Library</button>
+            </div>
+        </div>
+
+        <!-- Continue Reading Modal Prompt -->
+        <div id="continueReadingModal" class="modal-overlay" style="display: none;">
+            <div class="modal-box continue-box">
+                <h3>📖 Continue Reading?</h3>
+                <p>आपने पिछली बार इस ई-बुक को <strong id="lastSavedPageText">Page 1</strong> पर छोड़ा था।</p>
+                <div class="continue-actions">
+                    <button id="confirmContinueBtn" class="primary-btn">Continue</button>
+                    <button id="startAgainBtn" class="secondary-btn">Start Again</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Watermark Layer -->
+        <div id="watermarkLayer" class="watermark-layer">
+            <span class="wm-text">Aarogyam India • Purchased • <span id="watermarkUser">Loading...</span></span>
+        </div>
+
+        <!-- Zoomable Canvas Container -->
+        <div id="canvasContainer" class="canvas-container">
+            <canvas id="pdfCanvas"></canvas>
+        </div>
+
+    </main>
+
+    <!-- 4. BOTTOM READER BAR (Pagination + Page Slider) -->
+    <footer class="reader-footer">
+        <div class="footer-row-slider">
+            <input type="range" id="pageSlider" min="1" max="100" value="1">
+        </div>
+        <div class="footer-row-controls">
+            <button id="prevPageBtn" class="control-btn">◀ Prev</button>
+            <span id="pageInfoDisplay" class="page-info">Page -- / --</span>
+            <button id="nextPageBtn" class="control-btn">Next ▶</button>
+        </div>
+    </footer>
+
+    <!-- 5. FLOATING CONTROLS (Right Bottom) -->
+    <div class="floating-controls">
+        <button id="zoomInBtn" class="float-btn" title="Zoom In">＋</button>
+        <button id="zoomOutBtn" class="float-btn" title="Zoom Out">－</button>
+        <button onclick="window.location.href='my-library.html'" class="float-btn" title="My Library">🏠</button>
+    </div>
+
+    <!-- 6. ACCESS DENIED MODAL (Security & Purchase Check) -->
+    <div id="accessDeniedModal" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <h2>❌ Access Denied</h2>
+            <p>आपने इस ई-बुक को अभी तक खरीदा नहीं है या आपका सत्र समाप्त हो गया है।</p>
+            <button onclick="window.location.href='../store.html'" class="primary-btn">Go To Store</button>
+        </div>
+    </div>
+
+    <!-- Main Supabase & App Engine -->
+    <script src="../js/supabase.js"></script>
+    
+    <!-- Custom Reader JS -->
+    <script src="../js/reader.js"></script>
+</body>
+</html>
