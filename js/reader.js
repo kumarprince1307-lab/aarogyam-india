@@ -163,13 +163,25 @@ function initReaderAtPage(startPage) {
 }
 
 // =======================================================
-// RENDER SINGLE PAGE
+// RENDER SINGLE PAGE (AUTO-FIT RESPONSIVE FIX)
 // =======================================================
 function renderPage(num) {
     aoiPageRendering = true;
     
     aoiPdfDoc.getPage(num).then(page => {
-        const viewport = page.getViewport({ scale: aoiScale });
+        const container = document.getElementById('readerContainer');
+        const availableHeight = container ? container.clientHeight - 20 : window.innerHeight - 150;
+        const availableWidth = container ? container.clientWidth - 20 : window.innerWidth - 40;
+
+        const unscaledViewport = page.getViewport({ scale: 1.0 });
+        
+        let hScale = availableHeight / unscaledViewport.height;
+        let wScale = availableWidth / unscaledViewport.width;
+        let autoScale = Math.min(hScale, wScale);
+        
+        const finalScale = autoScale * (aoiScale / 1.2);
+
+        const viewport = page.getViewport({ scale: finalScale });
         aoiCanvas.height = viewport.height;
         aoiCanvas.width = viewport.width;
 
