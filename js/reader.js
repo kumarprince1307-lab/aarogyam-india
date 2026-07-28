@@ -336,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (whatsappBtn) {
             const userEmailText = watermarkUser ? watermarkUser.textContent : "User";
             // साफ़ और ब्राउज़र-फ्रेंडली टेक्स्ट फॉर्मेट
-            const message = "नमस्ते अविनाश जी, मैं आरोग्यम इंडिया की ई-बुक पढ़ रहा हूँ और मुझे सहायता चाहिए।";
+            const message = "नमस्ते Aarogyam Inida , मैं आरोग्यम इंडिया की ई-बुक पढ़ रहा हूँ और मुझे सहायता चाहिए।";
             
             // encodeURIComponent का उपयोग करके यूआरएल बनाना
             whatsappBtn.href = "https://wa.me/917974422572?text=" + encodeURIComponent(message);
