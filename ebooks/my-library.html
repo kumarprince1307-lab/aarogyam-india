@@ -234,7 +234,13 @@
                 <input type="text" id="leadName" class="modal-input" placeholder="आपका पूरा नाम (Full Name)" required>
                 <input type="tel" id="leadPhone" class="modal-input" placeholder="मोबाइल नंबर (Mobile)" required>
                 <input type="email" id="leadEmail" class="modal-input" placeholder="ईमेल आईडी (Email Address)">
-                
+                <select id="leadGender" class="modal-input" style="margin-bottom: 12px;">
+                    <option value="">लिंग चुनें (Gender)</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                 
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
                     <input type="text" id="leadState" class="modal-input" placeholder="राज्य (State)" style="margin-bottom: 0;">
                     <input type="date" id="leadDob" class="modal-input" placeholder="जन्म तिथि (Date of Birth)" style="margin-bottom: 0;" title="जन्म तिथि (DOB)">
@@ -292,7 +298,7 @@
 
     <!-- 10. JavaScript Links -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <!-- Supabase script intentionally left unchanged for the Step 1 structure scope -->
+    <script src="/js/supabase.js"></script>
     <script src="/js/my-library.js"></script>
 </body>
 </html>

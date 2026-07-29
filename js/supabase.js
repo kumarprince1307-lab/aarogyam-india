@@ -50,15 +50,83 @@ function logoutUser() {
 // -----------------------------------------------------------
 // MODULE 3: USER & PROFILE ACTIONS
 // -----------------------------------------------------------
+async function findExistingProfile({ mobile, email }) {
+    const normalizedMobile = (mobile || "").replace(/\D/g, "").slice(-10);
+    const normalizedEmail = (email || "").trim().toLowerCase();
+
+    if (normalizedMobile) {
+        const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("mobile", normalizedMobile)
+            .limit(1)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Profile lookup error:", error);
+            return { data: null, error };
+        }
+
+        if (data) {
+            return { data, error: null };
+        }
+    }
+
+    if (normalizedEmail) {
+        const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("email", normalizedEmail)
+            .limit(1)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Profile lookup error:", error);
+            return { data: null, error };
+        }
+
+        if (data) {
+            return { data, error: null };
+        }
+    }
+
+    return { data: null, error: null };
+}
+
 async function isMobileRegistered(mobile) {
-    return await supabase.from("profiles").select("*").eq("mobile", mobile).single();
+    return await findExistingProfile({ mobile });
+}
+
+async function getProfileById(userId) {
+    if (!userId) return { data: null, error: null };
+
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .limit(1)
+        .maybeSingle();
+
+    return { data, error };
 }
 
 async function createUserProfile(userData) {
+    const normalizedMobile = (userData.mobile || "").replace(/\D/g, "").slice(-10);
+    const normalizedEmail = (userData.email || "").trim().toLowerCase();
+
+    const { data: existingProfile } = await findExistingProfile({
+        mobile: normalizedMobile,
+        email: normalizedEmail
+    });
+
+    if (existingProfile) {
+        return { data: existingProfile, error: null, existing: true };
+    }
+
     const profileData = {
         full_name: userData.fullName,
-        mobile: userData.mobile,
-        email: userData.email || null,
+        mobile: normalizedMobile,
+        email: normalizedEmail || null,
         referral_code: userData.referralCode || null,
         registration_source: userData.source || "registration",
         profile_complete: false,
@@ -68,7 +136,15 @@ async function createUserProfile(userData) {
 }
 
 async function registerUser(formData) {
-    const { data: existingUser, error: findError } = await isMobileRegistered(formData.mobile);
+    const { data: existingUser, error: findError } = await findExistingProfile({
+        mobile: formData.mobile,
+        email: formData.email
+    });
+
+    if (findError) {
+        console.error("Profile lookup failed:", findError);
+        return { success: false, message: "Profile lookup failed." };
+    }
 
     if (existingUser) {
         console.log("Existing user found. Logging in.", existingUser);
@@ -90,10 +166,16 @@ async function registerUser(formData) {
 
 async function updateProfile(userId, profileData) {
     if (!userId) return { success: false, message: "User ID not provided." };
-    
+
+    const sanitizedProfileData = {
+        ...profileData,
+        profile_complete: Boolean(profileData.full_name && profileData.mobile),
+        updated_at: new Date().toISOString()
+    };
+
     const { data, error } = await supabase
         .from("profiles")
-        .update(profileData)
+        .update(sanitizedProfileData)
         .eq("id", userId)
         .select()
         .single();
@@ -102,10 +184,13 @@ async function updateProfile(userId, profileData) {
         console.error("Update Profile Error:", error);
         return { success: false, message: error.message };
     }
-    
+
+    const { data: freshProfile, error: refreshError } = await getProfileById(userId);
+    const persistedProfile = refreshError || !freshProfile ? data : freshProfile;
+
     // Update user data in local storage
-    localStorage.setItem(AUTH_KEYS.USER, JSON.stringify(data));
-    return { success: true, profile: data };
+    localStorage.setItem(AUTH_KEYS.USER, JSON.stringify(persistedProfile));
+    return { success: true, profile: persistedProfile };
 }
 
 // -----------------------------------------------------------
@@ -167,8 +252,9 @@ async function getPurchaseForDownload(userId, bookId) {
         .eq("profile_id", userId)
         .eq("book_id", bookId)
         .eq("payment_status", "success")
-        .single();
-    
+        .limit(1)
+        .maybeSingle();
+
     if (error) {
         console.error("Error fetching purchase for download:", error);
         return null;

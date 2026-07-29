@@ -2,8 +2,8 @@
 // AIM PROJECT - MY LIBRARY FINAL JAVASCRIPT (Supabase & Real User Integrated)
 // =========================================================================
 
-document.addEventListener('DOMContentLoaded', () => {
-    initUserData();
+document.addEventListener('DOMContentLoaded', async () => {
+    await initUserData();
     startDailyTimer();
     loadLibraryData();
     checkAndOpenProfileModal();
@@ -122,9 +122,21 @@ function startDailyTimer() {
 }
 
 // 5. Supabase और LocalStorage से असली यूजर का डेटा और डायनेमिक प्रोग्रेस कैलकुलेशन
-function initUserData() {
-    const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-    
+async function initUserData() {
+    let storedUser = getCurrentUser();
+
+    if (!storedUser?.id) {
+        storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+    }
+
+    if (storedUser?.id) {
+        const { data: freshProfile, error } = await getProfileById(storedUser.id);
+        if (!error && freshProfile) {
+            storedUser = freshProfile;
+            createLoginSession(storedUser);
+        }
+    }
+
     const userName = storedUser.full_name || storedUser.name || "प्रिय पाठक";
     const userMobile = storedUser.mobile || "";
     const userEmail = storedUser.email || "";
@@ -134,11 +146,12 @@ function initUserData() {
     const userAddress = storedUser.address || "";
     const userOccupation = storedUser.occupation || "";
     const userInterest = storedUser.interest || "";
+    const userGender = storedUser.gender || "";
 
     // DOM Elements Update
     const userNameSpan = document.getElementById('userName');
     const menuUserName = document.getElementById('menuUserName');
-    
+
     if (userNameSpan) userNameSpan.textContent = userName;
     if (menuUserName) menuUserName.textContent = userName;
 
@@ -152,15 +165,16 @@ function initUserData() {
     if (document.getElementById('leadAddress')) document.getElementById('leadAddress').value = userAddress;
     if (document.getElementById('leadOccupation')) document.getElementById('leadOccupation').value = userOccupation;
     if (document.getElementById('leadInterest')) document.getElementById('leadInterest').value = userInterest;
+    if (document.getElementById('leadGender')) document.getElementById('leadGender').value = userGender;
 
     // डायनेमिक प्रोफाइल परसेंटेज कैलकुलेशन
-    calculateAndUpdateProfileProgress({ userName, userMobile, userEmail, userState, userDob, userCity, userAddress, userOccupation, userInterest });
+    calculateAndUpdateProfileProgress({ userName, userMobile, userEmail, userState, userDob, userCity, userAddress, userOccupation, userInterest, userGender });
 }
 
 // प्रोफाइल प्रोग्रेस बार (10% से 100% तक वास्तविक डेटा के आधार पर)
 function calculateAndUpdateProfileProgress(data) {
     let filledFields = 0;
-    const totalFields = 9;
+    const totalFields = 10;
 
     if (data.userName && data.userName !== "प्रिय पाठक") filledFields++;
     if (data.userMobile) filledFields++;
@@ -171,6 +185,7 @@ function calculateAndUpdateProfileProgress(data) {
     if (data.userAddress) filledFields++;
     if (data.userOccupation) filledFields++;
     if (data.userInterest) filledFields++;
+    if (data.userGender) filledFields++;
 
     const percentage = Math.max(10, Math.round((filledFields / totalFields) * 100)); // न्यूनतम 10% से शुरू होकर 100% तक
 
@@ -214,10 +229,10 @@ function checkAndOpenProfileModal() {
     }
 }
 
-function openLeadModal() {
+async function openLeadModal() {
     const modal = document.getElementById('leadModal');
     if (modal) {
-        initUserData();
+        await initUserData();
         modal.classList.add('show');
         modal.style.display = 'flex'; // पॉपअप को सही से स्क्रीन पर लाना
     }
@@ -249,7 +264,8 @@ async function submitLeadForm(event) {
         district: document.getElementById('leadCity') ? document.getElementById('leadCity').value : '',
         address: document.getElementById('leadAddress') ? document.getElementById('leadAddress').value : '',
         occupation: document.getElementById('leadOccupation') ? document.getElementById('leadOccupation').value : '',
-        interest: document.getElementById('leadInterest') ? document.getElementById('leadInterest').value : ''
+        interest: document.getElementById('leadInterest') ? document.getElementById('leadInterest').value : '',
+        gender: document.getElementById('leadGender') ? document.getElementById('leadGender').value : ''
     };
 
     if (!profileData.full_name || !profileData.mobile) {
@@ -260,9 +276,9 @@ async function submitLeadForm(event) {
     const { success, message, profile } = await updateProfile(currentUser.id, profileData);
 
     if (success) {
+        await initUserData();
         alert('Congratulations! Your profile has been successfully updated.');
         closeLeadModal();
-        initUserData(); // Re-initialize user data to reflect changes
     } else {
         alert('Error saving profile: ' + (message || 'Unknown error'));
     }
