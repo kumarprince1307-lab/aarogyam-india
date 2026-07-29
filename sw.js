@@ -91,9 +91,34 @@ const URLS_TO_CACHE = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then((cache) => {
+            .then(async (cache) => {
                 console.log('Opened cache');
-                return cache.addAll(URLS_TO_CACHE);
+                // Attempt to cache resources. Use a tolerant approach so that
+                // cross-origin requests (which may be opaque or blocked) do not
+                // cause the whole install to fail.
+                const results = await Promise.all(URLS_TO_CACHE.map(async (url) => {
+                    try {
+                                        const requestUrl = new URL(url, self.location.href);
+                        if (requestUrl.origin === self.location.origin) {
+                            // Same-origin: use cache.add which will reject if fetch fails
+                                            await cache.add(requestUrl.href);
+                        } else {
+                            // Cross-origin: fetch with no-cors and store opaque response if possible
+                            const response = await fetch(requestUrl.href, { mode: 'no-cors' }).catch(() => null);
+                            if (response) {
+                                try {
+                                    await cache.put(requestUrl.href, response.clone());
+                                } catch (e) {
+                                    // Some opaque responses may not be cacheable in certain browsers; ignore
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        // Ignore individual failures so the install can proceed
+                        return null;
+                    }
+                }));
+                return results;
             })
     );
 });
