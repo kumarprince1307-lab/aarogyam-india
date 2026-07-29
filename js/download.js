@@ -11,137 +11,55 @@ if (typeof window.currentBookData === 'undefined') {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-
     console.clear();
     console.log("====================================");
     console.log("AAROGYAM INDIA DOWNLOAD SYSTEM");
     console.log("====================================");
 
     const urlParams = new URLSearchParams(window.location.search);
-    const bookId =
-        urlParams.get("book") ||
-        urlParams.get("id") ||
-        "BK001";
-
-    console.log("Book ID :", bookId);
+    const bookId = urlParams.get("book") || urlParams.get("id") || "BK001";
+    console.log("Book ID:", bookId);
 
     try {
-
-        // -----------------------------
-        // LOGIN SESSION (WITH SAFE RETRY)
-        // -----------------------------
-        let attempts = 0;
-        while (typeof supabaseClient === "undefined" && attempts < 10) {
-            await new Promise(resolve => setTimeout(resolve, 200));
-            attempts++;
-        }
-
-        if (typeof supabaseClient !== "undefined") {
-
-            const {
-                data: { session },
-                error: sessionError
-            } = await supabaseClient.auth.getSession();
-
-            if (sessionError) {
-                console.error("Session Error:", sessionError);
-            }
-
-            if (session?.user) {
-
-                window.currentUserId = session.user.id;
-
-                console.log("Logged User UUID:");
-                console.log(window.currentUserId);
-
-            } else {
-
-                console.warn("User Not Logged In");
-
-            }
-
+        const user = getCurrentUser();
+        if (user) {
+            window.currentUserId = user.id;
+            console.log("Logged In User ID:", user.id);
         } else {
-
-            console.error("supabaseClient Missing");
-
+            console.warn("User Not Logged In");
         }
-
-        // -----------------------------
-        // LOAD BOOK JSON
-        // -----------------------------
-
-        console.log("Loading books.json...");
 
         const response = await fetch("../data/books.json");
-
         if (!response.ok) {
             throw new Error("books.json Not Found");
         }
-
         const json = await response.json();
-
-        window.currentBookData =
-            json.books.find(book => book.id === bookId);
-
-        console.log("Book Data");
-        console.log(window.currentBookData);
+        window.currentBookData = json.books.find(book => book.id === bookId);
 
         if (!window.currentBookData) {
-
-            document.getElementById("bookHeading").textContent =
-                "Book Not Found";
-
+            document.getElementById("bookHeading").textContent = "Book Not Found";
             disableDownloadButton("Book Not Found");
-
             return;
         }
 
-        // -----------------------------
-        // UPDATE UI
-        // -----------------------------
-
-        document.getElementById("bookHeading").textContent =
-            window.currentBookData.heading || window.currentBookData.name;
-
-        document.getElementById("bookCategory").textContent =
-            `Category : ${window.currentBookData.category}`;
-
-        document.getElementById("bookIdDisplay").textContent =
-            window.currentBookData.id;
-
-        document.getElementById("fileSizeDisplay").textContent =
-            window.currentBookData.fileSize || "-";
-
-        document.getElementById("accessDisplay").textContent =
-            window.currentBookData.accessType || "Lifetime";
-
-        window.maxAllowedDownloads =
-            window.currentBookData.downloadLimit || 3;
-
-        console.log("Maximum Downloads:", window.maxAllowedDownloads);
+        document.getElementById("bookHeading").textContent = window.currentBookData.heading || window.currentBookData.name;
+        document.getElementById("bookCategory").textContent = `Category: ${window.currentBookData.category}`;
+        document.getElementById("bookIdDisplay").textContent = window.currentBookData.id;
+        document.getElementById("fileSizeDisplay").textContent = window.currentBookData.fileSize || "-";
+        document.getElementById("accessDisplay").textContent = window.currentBookData.accessType || "Lifetime";
+        window.maxAllowedDownloads = window.currentBookData.downloadLimit || 3;
 
         if (window.currentBookData.downloadEnabled === false) {
-
-            disableDownloadButton(
-                "Download Disabled"
-            );
-
+            disableDownloadButton("Download Disabled");
             return;
         }
 
         await checkDownloadLimitFromDatabase(bookId);
 
     } catch (err) {
-
-        console.error("Initialization Error");
-        console.error(err);
-
-        disableDownloadButton(
-            "System Error"
-        );
-
+        console.error("Initialization Error:", err);
+        disableDownloadButton("System Error");
     }
-
 });
 
 
@@ -150,111 +68,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 // =======================================================
 
 async function checkDownloadLimitFromDatabase(bookId) {
-
-    console.log("------------------------------------");
-    console.log("Checking Download Limit...");
-    console.log("------------------------------------");
-
-    let currentCount = 0;
-
-    try {
-
-        if (!window.currentUserId) {
-
-            console.warn("User Not Logged In");
-
-            // यदि यूजर लॉगिन नहीं है, तो लोकल स्टोरेज से चेक करें ताकि पेज अटके नहीं
-            let cache = JSON.parse(localStorage.getItem("AOI_DOWNLOAD_COUNTS") || "{}");
-            currentCount = cache[bookId] || 0;
-            window.currentPurchase = { id: "local_" + bookId, download_count: currentCount, max_downloads: window.maxAllowedDownloads };
-
-        } else {
-
-            const {
-                data,
-                error
-            } = await supabaseClient
-                .from("purchases")
-                .select(`
-                    id,
-                    download_count,
-                    max_downloads
-                `)
-                .eq("profile_id", window.currentUserId)
-                .eq("book_id", bookId)
-                .single();
-
-            if (error) {
-
-                console.error("Purchase Fetch Error");
-                console.error(error);
-
-                // फॉलबैक के लिए लोकल स्टोरेज का उपयोग
-                let cache = JSON.parse(localStorage.getItem("AOI_DOWNLOAD_COUNTS") || "{}");
-                currentCount = cache[bookId] || 0;
-                window.currentPurchase = { id: "local_" + bookId, download_count: currentCount, max_downloads: window.maxAllowedDownloads };
-
-            } else {
-
-                window.currentPurchase = data;
-
-                console.log("Purchase Record");
-                console.log(data);
-
-                currentCount =
-                    data.download_count || 0;
-
-                window.maxAllowedDownloads =
-                    data.max_downloads || 3;
-
-                // Cache
-                let cache =
-                    JSON.parse(
-                        localStorage.getItem("AOI_DOWNLOAD_COUNTS") || "{}"
-                    );
-
-                cache[bookId] = currentCount;
-
-                localStorage.setItem(
-                    "AOI_DOWNLOAD_COUNTS",
-                    JSON.stringify(cache)
-                );
-
-            }
-
-        }
-
-        const remaining =
-            window.maxAllowedDownloads - currentCount;
-
-        console.log("Current Count :", currentCount);
-        console.log("Remaining :", remaining);
-
-        const remainingEl =
-            document.getElementById("remainingCount");
-
-        if (remainingEl) {
-
-            remainingEl.textContent =
-                `Remaining : ${remaining}/${window.maxAllowedDownloads}`;
-
-        }
-
-        if (remaining <= 0) {
-
-            disableDownloadButton(
-                "Download Limit Reached"
-            );
-
-        }
-
-    } catch (err) {
-
-        console.error("Download Limit Error");
-        console.error(err);
-
+    const user = getCurrentUser();
+    if (!user) {
+        disableDownloadButton("You must be logged in to download.");
+        return;
     }
 
+    const purchase = await getPurchaseForDownload(user.id, bookId);
+    if (!purchase) {
+        disableDownloadButton("Purchase record not found.");
+        return;
+    }
+
+    const currentCount = purchase.download_count || 0;
+    const limit = window.maxAllowedDownloads;
+    const remaining = limit - currentCount;
+
+    const remainingEl = document.getElementById("remainingCount");
+    if (remainingEl) {
+        remainingEl.textContent = `Remaining: ${remaining}/${limit}`;
+    }
+
+    if (remaining <= 0) {
+        disableDownloadButton("Download limit reached.");
+    }
 }
 
 
@@ -263,74 +100,48 @@ async function checkDownloadLimitFromDatabase(bookId) {
 // =======================================================
 
 window.triggerDownload = async function() {
+    const user = getCurrentUser();
+    if (!user) {
+        alert("You must be logged in to download.");
+        return;
+    }
 
     if (!window.currentBookData) {
-        alert("डाउनलोड डेटा उपलब्ध नहीं है।");
+        alert("Book data is not available.");
         return;
     }
 
-    if (!window.currentPurchase) {
-        window.currentPurchase = { id: "local_" + window.currentBookData.id, download_count: 0, max_downloads: window.maxAllowedDownloads };
-    }
+    const bookId = window.currentBookData.id;
+    
+    const result = await processDownload(user.id, bookId);
 
-    let bookId = window.currentBookData.id;
-    let currentCount = window.currentPurchase.download_count || 0;
+    if (result.success) {
+        const remainingEl = document.getElementById("remainingCount");
+        if (remainingEl) {
+            remainingEl.textContent = `Remaining: ${result.remaining}/${window.maxAllowedDownloads}`;
+        }
 
-    if (currentCount >= window.maxAllowedDownloads) {
-        alert("माफ कीजिए, आप इस ई-बुक को डाउनलोड करने की अधिकतम सीमा समाप्त कर चुके हैं।");
-        return;
-    }
+        if (result.remaining <= 0) {
+            disableDownloadButton("Download limit reached");
+        }
+        
+        // Trigger the actual file download
+        const pdfUrl = window.currentBookData.mainPdf || `pdf/full/${bookId}.pdf`;
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = `${bookId}-Aarogyam-India.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
-    // काउंटर बढ़ाना
-    currentCount++;
-    window.currentPurchase.download_count = currentCount;
+        showDownloadSuccessPopup(window.currentBookData.heading || window.currentBookData.name);
 
-    // Supabase डेटाबेस में अपडेट करना (यदि ऑनलाइन परचेस आईडी है)
-    if (window.currentUserId && typeof supabaseClient !== 'undefined' && window.currentPurchase.id && !window.currentPurchase.id.startsWith("local_")) {
-        try {
-            const { error } = await supabaseClient
-                .from("purchases")
-                .update({ download_count: currentCount })
-                .eq("id", window.currentPurchase.id);
-
-            if (error) {
-                console.error("Failed to update download count in database:", error);
-            } else {
-                console.log("Download count updated in database successfully.");
-            }
-        } catch (err) {
-            console.error("Database update error:", err);
+    } else {
+        alert(result.message || "An unknown error occurred during download.");
+        if(result.message.includes("limit")){
+             disableDownloadButton("Download limit reached");
         }
     }
-
-    // लोकल स्टोरेज कैश अपडेट करना
-    let cache = JSON.parse(localStorage.getItem("AOI_DOWNLOAD_COUNTS") || "{}");
-    cache[bookId] = currentCount;
-    localStorage.setItem("AOI_DOWNLOAD_COUNTS", JSON.stringify(cache));
-
-    // UI और रिमेनिंग काउंट अपडेट करें
-    const remaining = window.maxAllowedDownloads - currentCount;
-    const remainingEl = document.getElementById("remainingCount");
-    if (remainingEl) {
-        remainingEl.textContent = `Remaining : ${remaining}/${window.maxAllowedDownloads}`;
-    }
-
-    if (remaining <= 0) {
-        disableDownloadButton("Download Limit Reached");
-    }
-
-    // असली पीडीएफ फाइल डाउनलोड करना
-    let pdfUrl = window.currentBookData.mainPdf || "pdf/full/BK001.pdf";
-    
-    const link = document.createElement('a');
-    link.href = pdfUrl;
-    link.download = `${window.currentBookData.id}-Aarogyam-India.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // प्रोफेशनल सक्सेस पॉपअप दिखाना
-    showDownloadSuccessPopup(window.currentBookData.heading || window.currentBookData.name || "Aarogyam India E-Book");
 };
 
 

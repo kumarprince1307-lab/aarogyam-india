@@ -105,13 +105,8 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
     const mobile = document.getElementById("customerMobile").value.trim();
     const email = document.getElementById("customerEmail").value.trim();
 
-    if (name === "") {
-        alert("Please Enter Full Name");
-        return;
-    }
-
-    if (mobile.length !== 10) {
-        alert("Enter Valid Mobile Number");
+    if (name === "" || mobile.length !== 10) {
+        alert("Please enter a valid name and 10-digit mobile number.");
         return;
     }
 
@@ -120,60 +115,45 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
     payBtn.textContent = "Processing...";
 
     try {
-        if (typeof registerUser === "function") {
-            const regResult = await registerUser({
-                fullName: name,
-                mobile: mobile,
-                email: email,
-                source: "checkout"
-            });
+        const regResult = await registerUser({
+            fullName: name,
+            mobile: mobile,
+            email: email,
+            source: "checkout"
+        });
 
-            if (!regResult.success) {
-                alert(regResult.message || "User registration failed.");
-                payBtn.disabled = false;
-                payBtn.textContent = "Pay Now";
-                return;
-            }
+        if (!regResult.success) {
+            alert(regResult.message || "User registration failed.");
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay Now";
+            return;
+        }
+
+        const user = getCurrentUser();
+        if (!user) {
+            alert("Could not retrieve user details after registration. Please try again.");
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay Now";
+            return;
         }
 
         const orderData = {
-            bookId: window.currentCheckoutBook ? window.currentCheckoutBook.id : "BK001",
-            title: window.currentCheckoutBook ? window.currentCheckoutBook.title : document.getElementById("bookName").textContent,
-            amount: window.currentCheckoutBook ? window.currentCheckoutBook.offerPrice : 99,
-            customerName: name,
-            mobile: mobile,
-            email: email
+            bookId: window.currentCheckoutBook.id,
+            title: window.currentCheckoutBook.title,
+            amount: window.currentCheckoutBook.offerPrice
         };
 
-        window.currentOrder = orderData;
-        localStorage.setItem("AI_CURRENT_ORDER", JSON.stringify(orderData));
+        const paymentResult = startPayment(orderData, user);
 
-        if (typeof startPayment === "function") {
-            const res = startPayment();
-            
-            // यदि पेमेंट इनिशियलाइज़ेशन फेल हो जाए या यूजर पॉपअप बंद/कैंसिल कर दे, तो बटन रिसेट करने के लिए
-            if (res && typeof res === 'object' && res.success === false) {
-                payBtn.disabled = false;
-                payBtn.textContent = "Pay Now";
-                if (res.message) alert(res.message);
-            }
-        } else {
-            // अगर startPayment ग्लोबल स्कोप में किसी कारण से मॉनिटर न हो पाए, तो सेफ्टी के लिए टाइमर या फोल्बैक
-            setTimeout(() => {
-                if (payBtn.textContent === "Processing...") {
-                    payBtn.disabled = false;
-                    payBtn.textContent = "Pay Now";
-                }
-            }, 3000);
-
-            alert("Error: Payment module not loaded properly.");
+        if (!paymentResult.success) {
+            alert(paymentResult.message || "Failed to initialize payment.");
             payBtn.disabled = false;
             payBtn.textContent = "Pay Now";
         }
 
     } catch (error) {
         console.error("Payment Error:", error);
-        alert("Something went wrong.");
+        alert("An unexpected error occurred. Please try again.");
         payBtn.disabled = false;
         payBtn.textContent = "Pay Now";
     }

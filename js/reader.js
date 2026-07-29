@@ -55,30 +55,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 // SESSION & PURCHASE VERIFICATION
 // =======================================================
 async function verifyUserAccessAndSession(targetBookId) {
-    let attempts = 0;
-    while (typeof supabaseClient === "undefined" && attempts < 20) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        attempts++;
+    const user = getCurrentUser();
+    if (user && watermarkUser) {
+        watermarkUser.textContent = user.email || user.id.substring(0, 8);
     }
 
-    let userId = null;
-    let userEmail = "User";
-
-    if (typeof supabaseClient !== "undefined") {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session?.user) {
-            userId = session.user.id;
-            userEmail = session.user.email || session.user.id.substring(0, 8);
-        }
-    }
-
-    if (watermarkUser) watermarkUser.textContent = userEmail;
-
-    // Load books.json (Path root relative check)
     const res = await fetch("../data/books.json");
     if (!res.ok) throw new Error("books.json not found");
     const json = await res.json();
-    
     aoiCurrentBookData = json.books.find(b => b.id === targetBookId);
 
     if (!aoiCurrentBookData) {
@@ -86,32 +70,30 @@ async function verifyUserAccessAndSession(targetBookId) {
         return;
     }
 
-    // Universal Book Name Display in Header & Loader
     const bookTitle = aoiCurrentBookData.heading || aoiCurrentBookData.name || "Aarogyam India eBook";
     if (bookHeading) bookHeading.textContent = bookTitle;
     if (loaderBookTitle) loaderBookTitle.textContent = bookTitle;
 
-    // Check Purchase Access
     if (aoiCurrentBookData.readEnabled === false) {
         accessDeniedModal.style.display = "flex";
         return;
     }
 
-    // If logged in, check DB purchase (Optional V1 strict check)
-    if (userId && typeof supabaseClient !== "undefined") {
-        const { data, error } = await supabaseClient
-            .from("purchases")
-            .select("id")
-            .eq("profile_id", userId)
-            .eq("book_id", targetBookId)
-            .single();
+    if (!user) {
+        accessDeniedModal.style.display = "flex";
+        return;
+    }
+    
+    const { data: purchases, error } = await getUserPurchases(user.id);
+    const hasPurchased = purchases && purchases.some(p => p.book_id === targetBookId);
 
-        if (error || !data) {
-            console.warn("No purchase record in DB, proceeding with local access...");
-        }
+    if (error || !hasPurchased) {
+        console.warn("Access denied. User has not purchased this book.");
+        accessDeniedModal.style.display = "flex";
+        return;
     }
 
-    // Initialize PDF Loading
+    console.log("Access granted. User has purchased this book.");
     loadPdfFile(aoiCurrentBookData.mainPdf || "pdf/full/" + targetBookId + ".pdf");
 }
 

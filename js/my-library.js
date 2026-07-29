@@ -7,7 +7,51 @@ document.addEventListener('DOMContentLoaded', () => {
     startDailyTimer();
     loadLibraryData();
     checkAndOpenProfileModal();
+    checkAndControlLoginPopup(); // Check for login status on page load
 });
+
+// LOGIN POPUP & DATABASE CHECK
+function checkAndControlLoginPopup() {
+    const popupOverlay = document.getElementById('login-popup-overlay');
+    if (!popupOverlay) return;
+
+    if (isLoggedIn()) {
+        popupOverlay.style.display = 'none';
+    } else {
+        popupOverlay.style.display = 'flex';
+    }
+}
+
+async function checkUserLogin() {
+    let rawInput = document.getElementById('login-mobile').value.trim();
+    if (!rawInput || rawInput.length < 10) {
+        alert("Please enter a valid 10-digit mobile number.");
+        return;
+    }
+
+    let cleanMobile = rawInput.replace(/\D/g, '').slice(-10);
+    if (cleanMobile.length !== 10) {
+        alert("Invalid mobile number! Please enter only 10 digits.");
+        return;
+    }
+
+    const { data, error } = await isMobileRegistered(cleanMobile);
+
+    if (error || !data) {
+        alert("This mobile number is not registered. Please sign up first.");
+        return;
+    }
+
+    createLoginSession(data);
+    
+    const popupOverlay = document.getElementById('login-popup-overlay');
+    if (popupOverlay) {
+        popupOverlay.style.display = 'none';
+    }
+    
+    alert("Welcome back, " + (data.full_name || 'User') + "!");
+    window.location.reload();
+}
 
 // 1. Sidebar Menu Toggle Function
 function toggleMenu() {
@@ -187,99 +231,44 @@ function closeLeadModal() {
     }
 }
 
-// फॉर्म सबमिट और सेव फंक्शन
+// Form submission and save function
 async function submitLeadForm(event) {
     event.preventDefault();
-    const fullName = document.getElementById('leadName').value;
-    const mobile = document.getElementById('leadPhone').value;
-    const email = document.getElementById('leadEmail') ? document.getElementById('leadEmail').value : '';
-    const state = document.getElementById('leadState') ? document.getElementById('leadState').value : '';
-    const dob = document.getElementById('leadDob') ? document.getElementById('leadDob').value : '';
-    const city = document.getElementById('leadCity') ? document.getElementById('leadCity').value : '';
-    const address = document.getElementById('leadAddress') ? document.getElementById('leadAddress').value : '';
-    const occupation = document.getElementById('leadOccupation') ? document.getElementById('leadOccupation').value : '';
-    const interest = document.getElementById('leadInterest') ? document.getElementById('leadInterest').value : '';
-
-    if (!fullName || !mobile) {
-        alert('कृपया नाम और मोबाइल नंबर दर्ज करें।');
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        alert('You must be logged in to update your profile.');
         return;
     }
 
-    const formData = {
-        fullName: fullName,
-        mobile: mobile,
-        email: email,
-        state: state,
-        dob: dob,
-        city: city,
-        address: address,
-        occupation: occupation,
-        interest: interest,
-        source: "my_library_profile"
+    const profileData = {
+        full_name: document.getElementById('leadName').value,
+        mobile: document.getElementById('leadPhone').value,
+        email: document.getElementById('leadEmail') ? document.getElementById('leadEmail').value : '',
+        State: document.getElementById('leadState') ? document.getElementById('leadState').value : '',
+        dob: document.getElementById('leadDob') ? document.getElementById('leadDob').value : '',
+        district: document.getElementById('leadCity') ? document.getElementById('leadCity').value : '',
+        address: document.getElementById('leadAddress') ? document.getElementById('leadAddress').value : '',
+        occupation: document.getElementById('leadOccupation') ? document.getElementById('leadOccupation').value : '',
+        interest: document.getElementById('leadInterest') ? document.getElementById('leadInterest').value : ''
     };
 
-    try {
-        if (typeof registerUser === 'function') {
-            const result = await registerUser(formData);
-            if (result.success) {
-                const currentUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-                if (currentUser.id && typeof updateProfile === 'function') {
-                    await updateProfile(currentUser.id, { 
-                        State: state, 
-                        district: city,
-                        occupation: occupation,
-                        interest: interest
-                    });
-                }
-                
-                localStorage.setItem('AI_USER', JSON.stringify({ ...currentUser, full_name: fullName, mobile, email, state, dob, city, address, occupation, interest }));
-                
-                alert('बधाई हो! आपकी प्रोफाइल जानकारी Aarogyam India में सफलतापूर्वक सहेज ली गई है।');
-                closeLeadModal();
-                initUserData();
-                window.location.reload();
-            } else {
-                alert('सेव करने में त्रुटि: ' + (result.message || 'अज्ञात एरर'));
-            }
-        } else {
-            localStorage.setItem('AI_USER', JSON.stringify({ full_name: fullName, mobile, email, state, dob, city, address, occupation, interest }));
-            alert('प्रोफाइल सहेज ली गई है।');
-            closeLeadModal();
-            initUserData();
-            window.location.reload();
-        }
-    } catch (err) {
-        console.error("Profile Submit Error:", err);
-        alert('कनेक्शन एरर। कृपया पुनः प्रयास करें।');
+    if (!profileData.full_name || !profileData.mobile) {
+        alert('Please enter your name and mobile number.');
+        return;
     }
-}
-// 8. Full Screen Zoom Modal Handler (बुक कवर फुल-स्क्रीन और पिंच-ज़ूम इफ़ेक्ट)
-function openImageZoom(imgSrc) {
-    let modal = document.getElementById('imageZoomModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'imageZoomModal';
-        modal.className = 'image-modal-overlay';
-        modal.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999999;display:flex;justify-content:center;align-items:center;backdrop-filter:blur(8px);";
-        modal.innerHTML = `
-            <button onclick="closeImageZoom()" style="position:absolute;top:20px;right:25px;background:#fff;border:none;width:45px;height:45px;border-radius:50%;font-size:26px;font-weight:bold;cursor:pointer;color:#333;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:1000000;">&times;</button>
-            <div style="max-width:90%;max-height:90%;overflow:auto;display:flex;justify-content:center;align-items:center;">
-                <img id="zoomedImg" src="" alt="Zoomed Book Cover" style="max-width:100%;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-            </div>
-        `;
-        document.body.appendChild(modal);
+
+    const { success, message, profile } = await updateProfile(currentUser.id, profileData);
+
+    if (success) {
+        alert('Congratulations! Your profile has been successfully updated.');
+        closeLeadModal();
+        initUserData(); // Re-initialize user data to reflect changes
+    } else {
+        alert('Error saving profile: ' + (message || 'Unknown error'));
     }
-    const imgEl = document.getElementById('zoomedImg');
-    if (imgEl) imgEl.src = imgSrc;
-    modal.style.display = 'flex';
 }
 
-function closeImageZoom() {
-    const modal = document.getElementById('imageZoomModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
+// ... (rest of the file remains the same until renderLibrarySections)
 
 // 9. Load Books Data and Render Dynamic Library Sections & Dynamic Counts
 async function loadLibraryData() {
@@ -313,23 +302,16 @@ async function renderLibrarySections(booksArray) {
 
     if (!booksArray) return;
 
-    let userPurchases = [];
-    const localUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-    if (localUser.id && typeof db !== 'undefined') {
-        try {
-            const { data } = await db.from('purchases').select('*').eq('profile_id', localUser.id);
-            userPurchases = data || [];
-        } catch (e) {
-            console.log("Purchases fetch note:", e);
+    const currentUser = getCurrentUser();
+    let purchasedBookIds = [];
+    if (currentUser) {
+        const { data: purchases } = await getUserPurchases(currentUser.id);
+        if (purchases) {
+            purchasedBookIds = purchases.map(p => p.book_id);
         }
     }
 
-    const testPaymentDone = localStorage.getItem('AI_CURRENT_PAYMENT');
-    let hasBoughtAny = userPurchases.length > 0 || testPaymentDone;
-
-    // डायनेमिक काउंट्स कैलकुलेट करना (Purchased, Bonus, Wishlist)
     let purchasedCount = 0;
-    let bonusCount = 0; // उदाहरण के लिए फिक्स या डायनेमिक बोनस
     let wishlistCount = JSON.parse(localStorage.getItem('AI_WISHLIST') || '[]').length;
 
     booksArray.forEach(book => {
@@ -337,41 +319,31 @@ async function renderLibrarySections(booksArray) {
         const bookName = book.title || book.name;
         const bookCover = book.cover_image || book.cover;
 
-      
-       // 1. Purchased / My Books
-if (hasBoughtAny && (bookId === 'BK001' || userPurchases.some(p => p.book_id === bookId))) {
-    purchasedCount++;
-    const card = document.createElement('div');
-    card.className = 'book-card';
-    card.innerHTML = `
-        <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
-        <h4>${bookName}</h4>
-        <div class="book-btn-group" style="display:flex;gap:8px;margin-top:10px;">
-            <a href="reader.html?book=${bookId}" class="btn-read" style="flex:1;padding:10px;background:#138A36;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Read Now</a>
-            <a href="download.html?book=${bookId}" class="btn-buy" style="flex:1;padding:10px;background:#E86A17;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Download</a>
-        </div>
-    `;
-    if (purchasedGrid) purchasedGrid.appendChild(card);
-}
-
-      // 2. Available Books
-    if (bookId === 'BK001' || bookId === 'BK002' || bookId === 'BK006') {
-        const availCard = document.createElement('div');
-        availCard.className = 'book-card';
-        
-        let targetUrl = '/ebooks/checkout.html';
-        
-        if (bookId === 'BK001') {
-            targetUrl = '/ebooks/checkout.html?id=BK001';
-        } else if (bookId === 'BK002') {
-            targetUrl = '/ebooks/checkout.html?id=BK002';
-        } else if (bookId === 'BK006') {
-            targetUrl = '/ebooks/checkout.html?id=BK006';
+        // 1. Purchased / My Books
+        if (purchasedBookIds.includes(bookId)) {
+            purchasedCount++;
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.innerHTML = `
+                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="Click to view full screen">
+                <h4>${bookName}</h4>
+                <div class="book-btn-group" style="display:flex;gap:8px;margin-top:10px;">
+                    <a href="reader.html?book=${bookId}" class="btn-read" style="flex:1;padding:10px;background:#138A36;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Read Now</a>
+                    <a href="download.html?book=${bookId}" class="btn-buy" style="flex:1;padding:10px;background:#E86A17;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Download</a>
+                </div>
+            `;
+            if (purchasedGrid) purchasedGrid.appendChild(card);
         }
-        
-        // आगे का कोड जो आप यहाँ जोड़ना चाहें...
+
+        // 2. Available Books
+        if (bookId === 'BK001' || bookId === 'BK002' || bookId === 'BK006') {
+            const availCard = document.createElement('div');
+            availCard.className = 'book-card';
+            
+            let targetUrl = `/ebooks/checkout.html?id=${bookId}`;
+            
             availCard.innerHTML = `
-                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
+                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="Click to view full screen">
                 <h4>${bookName}</h4>
                 <div class="book-btn-group" style="margin-top: 10px;">
                     <a href="${targetUrl}" class="btn-available">Buy Now / Details</a>
@@ -385,7 +357,7 @@ if (hasBoughtAny && (bookId === 'BK001' || userPurchases.some(p => p.book_id ===
             const demoCard = document.createElement('div');
             demoCard.className = 'book-card';
             demoCard.innerHTML = `
-                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
+                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="Click to view full screen">
                 <h4>${bookName} (Demo)</h4>
                 <div class="book-btn-group" style="margin-top:10px;">
                     <button class="btn-read" onclick="window.location.href='download.html'" style="width:100%;padding:10px;background:#138A36;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;">Read Demo</button>
@@ -396,12 +368,12 @@ if (hasBoughtAny && (bookId === 'BK001' || userPurchases.some(p => p.book_id ===
         }
 
         // 4. Coming Soon Books
-        if (bookId !== 'BK001' && bookId !== 'BK002' && bookId !== 'BK006') {
+        if (bookId !== 'BK001' && bookId !== 'BK002' && bookId !== 'BK006' && !purchasedBookIds.includes(bookId)) {
             const comingCard = document.createElement('div');
             comingCard.className = 'book-card';
             comingCard.innerHTML = `
                 <div style="position: relative;">
-                    <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
+                    <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="Click to view full screen">
                     <span style="position: absolute; top: 8px; right: 8px; cursor:pointer; font-size:1.2rem;" onclick="toggleWishlist(this, '${bookName}')" class="wishlist-heart">❤️</span>
                 </div>
                 <h4>${bookName}</h4>
@@ -414,14 +386,13 @@ if (hasBoughtAny && (bookId === 'BK001' || userPurchases.some(p => p.book_id ===
         }
     });
 
-    // वेलकम कार्ड के स्टेट्स काउंट्स को डायनेमिक रूप से अपडेट करना
-    updateWelcomeStatsCounts(hasBoughtAny ? purchasedCount : 0, bonusCount, wishlistCount);
+    updateWelcomeStatsCounts(purchasedCount, 0, wishlistCount);
 
-    if (!hasBoughtAny && purchasedGrid && purchasedGrid.children.length === 0) {
+    if (purchasedCount === 0 && purchasedGrid) {
         purchasedGrid.innerHTML = `
             <div style="grid-column: span 2; text-align: center; padding: 30px; color: #666;">
-                <p style="font-size: 0.95rem; font-weight: 600;">📚 आपकी लाइब्रेरी में अभी कोई ई-बुक नहीं है।</p>
-                <p style="font-size: 0.8rem; margin-top: 5px;">कृपया 'Available' टैब से ई-बुक खरीदें।</p>
+                <p style="font-size: 0.95rem; font-weight: 600;">📚 You don't have any eBooks in your library yet.</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">Please purchase an eBook from the 'Available' tab.</p>
             </div>
         `;
     }
