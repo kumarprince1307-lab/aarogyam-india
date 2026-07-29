@@ -41,10 +41,7 @@
 
     // स्मार्ट फंक्शन: चेक करेगा कि यूजर लॉग-इन है या नहीं
     function handleLoginOrProfileClick() {
-        const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-        const isLoggedIn = storedUser.id || storedUser.mobile;
-
-        if (!isLoggedIn) {
+        if (!isLoggedIn()) {
             // यदि यूजर लॉग-इन नहीं है, तो लॉगिन पॉपअप दिखाएं
             const loginPopup = document.getElementById('login-popup-overlay');
             if (loginPopup) {
@@ -292,6 +289,7 @@
 
     <!-- 10. JavaScript Links -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="/js/supabase.js"></script>
     <!-- Supabase script intentionally left unchanged for the Step 1 structure scope -->
     <script src="/js/my-library.js"></script>
 </body>

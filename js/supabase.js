@@ -8,7 +8,7 @@
 const SUPABASE_URL = "https://qjhjrzsnrtahmhswxyvb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU";
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 console.log("Supabase Client Initialized.");
 
