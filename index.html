@@ -347,6 +347,18 @@ HEADER START
 
             </button>
 
+            <!-- INSTALL APP -->
+            <button
+                class="install-btn"
+                id="installBtn"
+                aria-label="Install App" style="display: none;">
+
+                <img
+                    src="images/icons/download.png"
+                    alt="Install App">
+
+            </button>
+
             <!-- LOGIN -->
 
             <a
@@ -2163,6 +2175,15 @@ JAVASCRIPT
 <!-- Supabase script intentionally left unchanged for the Step 1 structure scope -->
 
 <script src="js/script.js"></script>
+<script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => console.log('PWA Service Worker registered successfully:', registration))
+          .catch(err => console.error('PWA Service Worker registration failed:', err));
+      });
+    }
+</script>
 
 </body>
 
