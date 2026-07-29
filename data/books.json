@@ -86,7 +86,7 @@
       "downloadLimit": 3,
       "mainPdf": "/pdf/full/BK002.pdf",
       "bonusPdf": "/pdf/bonus/BK002.pdf",
-      "demoPdf": "/pdf/demo/BK002-demo.pdf",
+      "demoPdf": "/pdf/sample/BK002-demo.pdf",
       "fileSize": "25 MB",
       "totalPages": 120,
       "totalImages": 300,
