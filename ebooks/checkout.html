@@ -27,7 +27,7 @@
             <h1>Secure Checkout</h1>
         </div>
 
-        <!-- स्मार्ट लॉगिन / प्रोफाइल बटन (My Library की तरह) -->
+        <!-- स्मार्ट लॉगिन / प्रोफाइल बटन -->
         <div>
             <button onclick="handleLoginOrProfileClick()" style="background: #E86A17; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 <i class="fa-solid fa-user-gear"></i> लॉगिन / प्रोफाइल
@@ -41,7 +41,7 @@
     </div>
 
     <!-- =========================
-         MAIN CONTAINER (Universal 2-Column Grid)
+         MAIN CONTAINER
     ========================== -->
     <main class="checkout-container">
 
@@ -133,7 +133,7 @@
             
             <div style="text-align: center; margin-bottom: 20px;">
                 <h3 style="color: #1e293b; font-size: 1.3rem; margin-bottom: 5px;">🔑 लॉगिन या रजिस्टर करें</h3>
-                <p style="color: #64748b; font-size: 0.85rem;">अपनी डिटेल भरकर आसानी से आगे बढ़ें</p>
+                <p style="color: #64748b; font-size: 0.85rem;">अपनी डिटेल भरकर आसानी से आगे बढ़ें</p>
             </div>
 
             <form id="leadModalForm" onsubmit="handleModalSubmit(event)">
@@ -160,14 +160,15 @@
     </div>
 
     <!-- =========================
-         JAVASCRIPT SCRIPTS
+         JAVASCRIPT SCRIPTS (Strict Order)
     ========================== -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="../js/supabase.js"></script>
-    <script src="../js/checkout.js"></script>
+   <!-- JAVASCRIPT SCRIPTS (Version Force Refresh) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="../js/supabase.js?v=2.0"></script>
+<script src="../js/checkout.js?v=2.0"></script>
 
-    <!-- लॉगिन या प्रोफाइल ट्रिगर करने के लिए स्क्रिप्ट -->
+    <!-- इनलाइन सहायक स्क्रिप्ट्स -->
     <script>
         function handleLoginOrProfileClick() {
             openLeadModal();
@@ -177,10 +178,14 @@
             const modal = document.getElementById('leadModal');
             if (modal) {
                 modal.style.display = 'flex';
-                const savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-                if (savedUser.full_name || savedUser.name) document.getElementById('modalName').value = savedUser.full_name || savedUser.name;
-                if (savedUser.mobile) document.getElementById('modalMobile').value = savedUser.mobile;
-                if (savedUser.email) document.getElementById('modalEmail').value = savedUser.email;
+                if (typeof getCurrentUser === 'function') {
+                    const savedUser = getCurrentUser();
+                    if (savedUser) {
+                        if (savedUser.full_name || savedUser.name) document.getElementById('modalName').value = savedUser.full_name || savedUser.name;
+                        if (savedUser.mobile) document.getElementById('modalMobile').value = savedUser.mobile;
+                        if (savedUser.email) document.getElementById('modalEmail').value = savedUser.email;
+                    }
+                }
             }
         }
 
@@ -202,25 +207,32 @@
                 return;
             }
 
-            const userData = { full_name: name, mobile: mobile, email: email };
-            
-            localStorage.setItem('AI_USER', JSON.stringify(userData));
-            localStorage.setItem('AI_PROFILE', JSON.stringify(userData));
-
-            if (document.getElementById("customerName")) document.getElementById("customerName").value = name;
-            if (document.getElementById("customerMobile")) document.getElementById("customerMobile").value = mobile;
-            if (document.getElementById("customerEmail")) document.getElementById("customerEmail").value = email;
-
-            if (typeof registerUser === "function") {
-                try {
-                    await registerUser({ fullName: name, mobile: mobile, email: email, source: "modal" });
-                } catch (e) {
-                    console.log("Reg sync note:", e);
-                }
+            if (typeof registerUser !== 'function') {
+                alert("सिस्टम लोड हो रहा है, कृपया एक सेकंड बाद पुनः प्रयास करें।");
+                return;
             }
 
-            closeLeadModal();
-            alert("सफलतापूर्वक लॉगिन/अपडेट हो गया!");
+            try {
+                const regResult = await registerUser({
+                    fullName: name,
+                    mobile: mobile,
+                    email: email,
+                    source: "modal"
+                });
+
+                if (regResult && regResult.success) {
+                    if (typeof autoFillUserData === 'function') {
+                        autoFillUserData();
+                    }
+                    closeLeadModal();
+                    alert("सफलतापूर्वक लॉगिन/अपडेट हो गया!");
+                } else {
+                    alert((regResult && regResult.message) || "रजिस्ट्रेशन के दौरान त्रुटि हुई।");
+                }
+            } catch (err) {
+                console.error("Modal Submit Error:", err);
+                alert("कुछ तकनीकी समस्या आ रही है, कृपया पुनः प्रयास करें।");
+            }
         }
 
         window.addEventListener('click', function(event) {

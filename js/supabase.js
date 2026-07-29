@@ -1,5 +1,5 @@
 /* ===========================================================
-    AAROGYAM INDIA - SUPABASE ENGINE (REFACTORED V1.5)
+    AAROGYAM INDIA - SUPABASE ENGINE (CLEAN FINAL V1.6)
 =========================================================== */
 
 // -----------------------------------------------------------
@@ -8,9 +8,12 @@
 const SUPABASE_URL = "https://qjhjrzsnrtahmhswxyvb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+if (typeof window.supabaseClient === 'undefined') {
+    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+const supabase = window.supabaseClient;
 
-console.log("Supabase Client Initialized.");
+console.log("Supabase Client Initialized Successfully.");
 
 // -----------------------------------------------------------
 // MODULE 2: AUTHENTICATION & SESSION MANAGEMENT
@@ -21,8 +24,13 @@ const AUTH_KEYS = {
 };
 
 function getCurrentUser() {
-    const user = localStorage.getItem(AUTH_KEYS.USER);
-    return user ? JSON.parse(user) : null;
+    try {
+        const user = localStorage.getItem(AUTH_KEYS.USER);
+        return user ? JSON.parse(user) : null;
+    } catch (e) {
+        console.error("Error reading user from localStorage:", e);
+        return null;
+    }
 }
 
 function isLoggedIn() {
@@ -51,7 +59,7 @@ function logoutUser() {
 // MODULE 3: USER & PROFILE ACTIONS
 // -----------------------------------------------------------
 async function isMobileRegistered(mobile) {
-    return await supabase.from("profiles").select("*").eq("mobile", mobile).single();
+    return await supabase.from("profiles").select("*").eq("mobile", mobile).maybeSingle();
 }
 
 async function createUserProfile(userData) {
@@ -70,6 +78,10 @@ async function createUserProfile(userData) {
 async function registerUser(formData) {
     const { data: existingUser, error: findError } = await isMobileRegistered(formData.mobile);
 
+    if (findError) {
+        console.error("Error finding user:", findError);
+    }
+
     if (existingUser) {
         console.log("Existing user found. Logging in.", existingUser);
         createLoginSession(existingUser);
@@ -80,7 +92,7 @@ async function registerUser(formData) {
 
     if (createError) {
         console.error("Profile creation failed:", createError);
-        return { success: false, message: "Profile creation failed." };
+        return { success: false, message: "Profile creation failed: " + createError.message };
     }
 
     console.log("New user created. Logging in.", newUser);
@@ -103,7 +115,6 @@ async function updateProfile(userId, profileData) {
         return { success: false, message: error.message };
     }
     
-    // Update user data in local storage
     localStorage.setItem(AUTH_KEYS.USER, JSON.stringify(data));
     return { success: true, profile: data };
 }
@@ -118,12 +129,11 @@ async function savePurchase(purchaseData) {
         return { success: false, message: "Missing required purchase data." };
     }
 
-    // Check for duplicate purchase by payment_id
     const { data: existingPurchase, error: findError } = await supabase
         .from("purchases")
         .select("id")
         .eq("payment_id", paymentId)
-        .single();
+        .maybeSingle();
 
     if (existingPurchase) {
         console.warn("Duplicate purchase attempt detected for payment_id:", paymentId);
@@ -152,7 +162,6 @@ async function getUserPurchases(userId) {
     return await supabase.from("purchases").select("book_id").eq("profile_id", userId).eq("payment_status", "success");
 }
 
-
 // -----------------------------------------------------------
 // MODULE 5: DOWNLOAD MANAGEMENT
 // -----------------------------------------------------------
@@ -167,7 +176,7 @@ async function getPurchaseForDownload(userId, bookId) {
         .eq("profile_id", userId)
         .eq("book_id", bookId)
         .eq("payment_status", "success")
-        .single();
+        .maybeSingle();
     
     if (error) {
         console.error("Error fetching purchase for download:", error);
@@ -188,7 +197,6 @@ async function processDownload(userId, bookId) {
         return { success: false, message: `Download limit of ${DOWNLOAD_LIMIT} has been reached.` };
     }
 
-    // Increment download count
     const newCount = currentCount + 1;
     const { error: updateError } = await supabase
         .from("purchases")
@@ -200,7 +208,6 @@ async function processDownload(userId, bookId) {
         return { success: false, message: "Could not update download count. Please try again." };
     }
 
-    // Log the download
     await supabase.from("download_logs").insert({
         profile_id: userId,
         book_id: bookId,
@@ -212,9 +219,8 @@ async function processDownload(userId, bookId) {
     return { success: true, remaining: DOWNLOAD_LIMIT - newCount };
 }
 
-
 // -----------------------------------------------------------
-// MODULE 6: DEMO USER (Simplified)
+// MODULE 6: DEMO USER
 // -----------------------------------------------------------
 async function saveDemoUser(demoData) {
     const { data: existingUser } = await isMobileRegistered(demoData.mobile);
@@ -232,7 +238,6 @@ async function saveDemoUser(demoData) {
         registration_source: 'demo'
     }).select().single();
 }
-
 
 // -----------------------------------------------------------
 // MODULE 7: RAZORPAY PAYMENT GATEWAY

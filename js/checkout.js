@@ -72,29 +72,21 @@ async function loadBook() {
 
 function autoFillUserData() {
     // 1. Check direct LocalStorage first (AI_USER or AI_PROFILE)
-    const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+    const user = getCurrentUser();
     
-    const nameVal = storedUser.full_name || storedUser.name || "";
-    const mobileVal = storedUser.mobile || "";
-    const emailVal = storedUser.email || "";
+    if(user){
+        const nameVal = user.full_name || user.name || "";
+        const mobileVal = user.mobile || "";
+        const emailVal = user.email || "";
 
-    if (nameVal && document.getElementById("customerName")) {
-        document.getElementById("customerName").value = nameVal;
-    }
-    if (mobileVal && document.getElementById("customerMobile")) {
-        document.getElementById("customerMobile").value = mobileVal;
-    }
-    if (emailVal && document.getElementById("customerEmail")) {
-        document.getElementById("customerEmail").value = emailVal;
-    }
-
-    // 2. Fallback to getCurrentUser function if available
-    if (typeof getCurrentUser === "function") {
-        const user = getCurrentUser();
-        if (user) {
-            if (user.full_name && document.getElementById("customerName")) document.getElementById("customerName").value = user.full_name;
-            if (user.mobile && document.getElementById("customerMobile")) document.getElementById("customerMobile").value = user.mobile;
-            if (user.email && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = user.email;
+        if (nameVal && document.getElementById("customerName")) {
+            document.getElementById("customerName").value = nameVal;
+        }
+        if (mobileVal && document.getElementById("customerMobile")) {
+            document.getElementById("customerMobile").value = mobileVal;
+        }
+        if (emailVal && document.getElementById("customerEmail")) {
+            document.getElementById("customerEmail").value = emailVal;
         }
     }
 }
