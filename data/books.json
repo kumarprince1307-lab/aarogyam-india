@@ -46,7 +46,7 @@
       }
     },
     {
-      "id": "BK002",
+      "id": "BK006",
       "slug": "ai-website-guide",
       "heading": "AI वेबसाइट गाइड",
       "name": "AI वेबसाइट गाइड (Coming Soon)",
@@ -138,7 +138,7 @@
       "accessType": "Lifetime"
     },
     {
-      "id": "BK006",
+      "id": "BK002",
       "slug": "fasal-ka-doctor",
       "heading": "फसल का डॉक्टर",
       "name": "फसल का डॉक्टर (Coming Soon)",
@@ -146,17 +146,17 @@
       "language": "Hindi",
       "author": "Aarogyam India",
       "version": "1.0",
-      "status": "coming_soon",
+      "status": "active",
       "cover": "/images/books/fasal-ka-doctor-cover.webp",
       "thumbnail": "/images/books/fasal-ka-doctor-cover.webp",
       "mrp": 299,
       "offerPrice": 99,
       "currency": "INR",
       "demoAvailable": false,
-      "readEnabled": false,
-      "downloadEnabled": false,
+      "readEnabled": true,
+      "downloadEnabled": true,
       "downloadLimit": 3,
-      "mainPdf": "",
+      "mainPdf": "/pdf/full/BK002.pdf",
       "fileSize": "19.4 MB",
       "accessType": "Lifetime"
     },
