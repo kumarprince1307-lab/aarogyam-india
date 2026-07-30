@@ -52,8 +52,34 @@ async function isMobileRegistered(mobile) {
     }
 }
 
+async function isEmailRegistered(email) {
+    if (!email) return false;
+    try {
+        const { data, error } = await db
+            .from("profiles")
+            .select("id,email")
+            .eq("email", email)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error("Email Check Error :", error);
+        return null;
+    }
+}
+
 async function createUserProfile(userData) {
     try {
+        // Referral code validation
+        let referralCode = userData.referralCode || null;
+        if (referralCode) {
+            const referrer = await isMobileRegistered(referralCode);
+            if (!referrer) {
+                console.warn(`Referral mobile ${referralCode} not found. Setting referral code to null.`);
+                referralCode = null; // अगर रेफ़रल मोबाइल मौजूद नहीं है तो null सेट करें
+            }
+        }
+
         const { data, error } = await db
             .from("profiles")
             .insert([{
@@ -61,7 +87,7 @@ async function createUserProfile(userData) {
                 mobile: userData.mobile,
                 email: userData.email || null,
                 gender: userData.gender || null,
-                referral_code: userData.referralCode || null,
+                referral_code: referralCode,
                 registration_source: userData.source || "registration",
                 profile_complete: false,
                 is_active: true
@@ -96,9 +122,17 @@ async function registerUser(formData) {
             createLoginSession(existingUser);
             return { success: true, type: "existing", profile: existingUser };
         }
+
+        if (formData.email) {
+            const emailExists = await isEmailRegistered(formData.email);
+            if (emailExists) {
+                return { success: false, message: "This email address is already registered." };
+            }
+        }
+
         const profile = await createUserProfile(formData);
         if (!profile) {
-            return { success: false, message: "Profile creation failed." };
+            return { success: false, message: "Profile creation failed. Please try again." };
         }
         createLoginSession(profile);
         return { success: true, type: "new", profile: profile };

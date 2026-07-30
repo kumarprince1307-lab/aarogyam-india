@@ -141,6 +141,7 @@ async function registerAccount(event) {
         const result = await registerUser(formData);
 
         if (!result || !result.success) {
+            // Display a more specific error message if available
             throw new Error(result?.message || "Registration failed on server.");
         }
 

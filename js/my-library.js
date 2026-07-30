@@ -209,50 +209,45 @@ async function submitLeadForm(event) {
         return;
     }
 
-    const formData = {
-        fullName: fullName,
-        mobile: mobile,
+    const currentUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+    if (!currentUser.id) {
+        alert('User not logged in. Cannot update profile.');
+        return;
+    }
+
+    const profileData = {
+        full_name: fullName,
         email: email,
         gender: gender,
-        state: state,
         dob: dob,
-        city: city,
+        State: state, // Capital 'S' as inferred from other files
+        district: city,
         address: address,
         occupation: occupation,
         interest: interest,
-        source: "my_library_profile"
+        // mobile is not updated as it's the primary identifier
     };
 
     try {
-        if (typeof registerUser === 'function') {
-            const result = await registerUser(formData);
-            if (result.success) {
-                const currentUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-                if (currentUser.id && typeof updateProfile === 'function') {
-                    await updateProfile(currentUser.id, { 
-                        State: state, 
-                        district: city,
-                        occupation: occupation,
-                        interest: interest,
-                        gender: gender
-                    });
-                }
-                
-                localStorage.setItem('AI_USER', JSON.stringify({ ...currentUser, full_name: fullName, mobile, email, gender, state, dob, city, address, occupation, interest }));
-                
-                alert('बधाई हो! आपकी प्रोफाइल जानकारी Aarogyam India में सफलतापूर्वक सहेज ली गई है।');
-                closeLeadModal();
-                initUserData();
-                window.location.reload();
-            } else {
-                alert('सेव करने में त्रुटि: ' + (result.message || 'अज्ञात एरर'));
-            }
-        } else {
-            localStorage.setItem('AI_USER', JSON.stringify({ full_name: fullName, mobile, email, gender, state, dob, city, address, occupation, interest }));
-            alert('प्रोफाइल सहेज ली गई है।');
+        if (typeof updateProfile !== 'function') {
+            alert('Error: Update function is not available.');
+            return;
+        }
+
+        const result = await updateProfile(currentUser.id, profileData);
+
+        if (result.success) {
+            // Update local storage only after successful DB update
+            const updatedUser = { ...currentUser, ...result.profile };
+            localStorage.setItem('AI_USER', JSON.stringify(updatedUser));
+            ProfileStorage.save(updatedUser); // Also update the dedicated profile storage
+
+            alert('बधाई हो! आपकी प्रोफाइल जानकारी Aarogyam India में सफलतापूर्वक सहेज ली गई है।');
             closeLeadModal();
-            initUserData();
-            window.location.reload();
+            initUserData(); // Refresh the UI with new data
+            window.location.reload(); // Reload to ensure all components have the latest data
+        } else {
+            alert('प्रोफाइल अपडेट करने में त्रुटि: ' + (result.message || 'अज्ञात एरर'));
         }
     } catch (err) {
         console.error("Profile Submit Error:", err);
