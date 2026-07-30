@@ -3,74 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Book Download | Aarogyam India</title>
+    <title>Premium eBook Download - Aarogyam India</title>
     <link rel="stylesheet" href="../css/download.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- हेडर -->
-    <header class="success-header">
-        <h1>Aarogyam India - Secure Download</h1>
+    <!-- 1. Header -->
+    <header class="download-header">
+        <a href="my-library.html" class="back-button" title="Back to My Library">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1>Secure Download</h1>
+        <img src="/images/logo/logo.png" alt="Logo" class="header-logo">
     </header>
 
-    <!-- मुख्य कंटेनर -->
-    <main class="success-container">
-        
-        <!-- बुक कार्ड -->
-        <div class="success-card">
-            <div class="success-icon">
-                <div class="success-circle" id="statusIcon">📥</div>
-            </div>
+    <!-- 2. Main Content -->
+    <main class="download-container">
 
-            <div class="success-message">
-                <h2 id="bookHeading">बुक लोड हो रही है...</h2>
-                <p id="bookCategory">कृपया प्रतीक्षा करें</p>
-            </div>
+        <!-- Loading/Error State -->
+        <div id="loadingState" class="state-card">
+            <div class="spinner"></div>
+            <p>Loading your download details...</p>
+        </div>
 
-            <!-- डाउनलोड स्टेटस / लिमिट बॉक्स -->
-            <div class="next-step">
-                <div>
-                    <p id="downloadStatusText">आपकी ई-बुक डाउनलोड के लिए तैयार है।</p>
-                    <span id="remainingCount">शेष डाउनलोड: 3/3</span>
+        <div id="errorState" class="state-card" style="display: none;">
+            <i class="fa-solid fa-circle-exclamation error-icon"></i>
+            <p id="errorMessage">An error occurred.</p>
+            <a href="my-library.html" class="action-button secondary">Go to My Library</a>
+        </div>
+
+        <!-- Main Download Card (hidden until data is loaded) -->
+        <div id="downloadCard" class="download-card" style="display: none;">
+
+            <!-- Book Info -->
+            <div class="book-info">
+                <img id="bookCover" src="" alt="Book Cover" class="book-cover">
+                <div class="book-details">
+                    <h2 id="bookName"></h2>
+                    <p id="bookCategory"></p>
                 </div>
             </div>
 
-            <!-- ऑर्डर और बुक डिटेल्स समरी -->
-            <div class="order-details">
-                <h3>बुक विवरण</h3>
-                <div class="detail-row">
-                    <span>बुक आईडी</span>
-                    <span id="bookIdDisplay" class="order-id">--</span>
-                </div>
-                <div class="detail-row">
-                    <span>फाइल का आकार</span>
-                    <span id="fileSizeDisplay">--</span>
-                </div>
-                <div class="detail-row">
-                    <span>वैलिडिटी</span>
-                    <span id="accessDisplay">Lifetime</span>
+            <!-- Purchase Summary -->
+            <div class="purchase-summary">
+                <h3>Purchase Summary</h3>
+                <div class="summary-item"><span>Customer:</span> <strong id="customerName"></strong></div>
+                <div class="summary-item"><span>Mobile:</span> <strong id="customerMobile"></strong></div>
+                <div class="summary-item"><span>Book ID:</span> <strong id="bookId"></strong></div>
+                <div class="summary-item"><span>Purchase Date:</span> <strong id="purchaseDate"></strong></div>
+                <div class="summary-item"><span>Access:</span> <strong>Lifetime</strong></div>
+            </div>
+
+            <!-- Download Status -->
+            <div id="statusReady" class="download-status ready">
+                <p class="status-title">Your eBook is ready.</p>
+                <div class="download-counter">
+                    <div><span>Used:</span> <strong id="downloadsUsed"></strong></div>
+                    <div><span>Remaining:</span> <strong id="downloadsRemaining"></strong></div>
+                    <div><span>Maximum:</span> <strong id="downloadsMax"></strong></div>
                 </div>
             </div>
 
-            <!-- डाउनलोड बटन -->
-            <div class="success-buttons">
-                <button id="downloadBtn" class="library-btn" onclick="triggerDownload()">
-                    📥 PDF डाउनलोड करें
+            <div id="statusExhausted" class="download-status exhausted" style="display: none;">
+                <p class="status-title">Download limit reached.</p>
+                <p class="status-subtitle">Don't worry, your Lifetime Access is safe.</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="downloadBtn" class="action-button primary">
+                    <i class="fa-solid fa-download"></i> Download PDF
                 </button>
-                <a href="../ebooks/my-library.html" class="shopping-btn">
-                    📚 My Library पर वापस जाएं
-                </a>
+                <button id="readNowBtn" class="action-button secondary">
+                    <i class="fa-solid fa-book-open"></i> Read Now
+                </button>
             </div>
-        </div>r
+
+            <!-- Info Message -->
+            <p class="info-message">
+                Your purchase is permanently linked with your account. Even after the download limit is exhausted, you can always read this book from My Library.
+            </p>
+        </div>
     </main>
 
-    <!-- फुटर -->
-    <footer class="success-footer">
+    <!-- 3. Footer -->
+    <footer class="download-footer">
         &copy; 2026 Aarogyam India. All Rights Reserved.
     </footer>
 
-    <!-- जावास्क्रिप्ट फाइल लिंक -->
-      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <!-- 4. Download Success Popup -->
+    <div id="successPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-card">
+            <div class="popup-header">
+                <i class="fa-solid fa-circle-check"></i>
+                <h2>Download Successful</h2>
+            </div>
+            <div class="popup-body">
+                <img id="popupBookCover" src="" alt="Book Cover" class="popup-book-cover">
+                <h3 id="popupBookName"></h3>
+                <p>Thank you, <strong id="popupCustomerName"></strong>!</p>
+                <p class="popup-info-text">This book is permanently available in your library.</p>
+            </div>
+            <div class="popup-actions">
+                <button id="popupReadNowBtn" class="action-button secondary">
+                    <i class="fa-solid fa-book-open"></i> Read Now
+                </button>
+                <a href="my-library.html" class="action-button secondary">
+                    <i class="fa-solid fa-book-bookmark"></i> Go To My Library
+                </a>
+            </div>
+            <button id="popupCloseBtn" class="popup-close-btn">&times;</button>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js"></script>
     <script src="../js/download.js"></script>
 </body>

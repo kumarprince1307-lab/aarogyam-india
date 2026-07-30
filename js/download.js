@@ -1,131 +1,229 @@
 /* =================================================================
-   AAROGYAM INDIA - DOWNLOAD SYSTEM V1 (COMPLETE ORIGINAL + FIXED)
+   AAROGYAM INDIA - PREMIUM DOWNLOAD EXPERIENCE (V1 FINAL)
 ================================================================= */
 
-// डुप्लीकेट डिक्लेरेशन एरर से बचने के लिए विंडो स्कोप का उपयोग
-if (typeof window.currentBookData === 'undefined') {
-    window.currentBookData = null;
-    window.maxAllowedDownloads = 3;
-    window.currentUserId = null;
-    window.currentPurchase = null;
-}
+// --- GLOBAL STATE ---
+let state = {
+    bookId: null,
+    bookData: null,
+    userData: null,
+    purchaseData: null,
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
-
-    console.clear();
-    console.log("====================================");
-    console.log("AAROGYAM INDIA DOWNLOAD SYSTEM");
-    console.log("====================================");
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const bookId =
-        urlParams.get("book") ||
-        urlParams.get("id") ||
-        "BK001";
-
-    console.log("Book ID :", bookId);
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    const downloadCard = document.getElementById('downloadCard');
 
     try {
+        // 1. Get Book ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        state.bookId = urlParams.get("book") || urlParams.get("id");
+        if (!state.bookId) throw new Error("Book ID is missing from the URL.");
 
-        // -----------------------------
-        // LOGIN SESSION (WITH SAFE RETRY)
-        // -----------------------------
-        let attempts = 0;
-        while (typeof supabaseClient === "undefined" && attempts < 10) {
-            await new Promise(resolve => setTimeout(resolve, 200));
-            attempts++;
-        }
-
-        if (typeof supabaseClient !== "undefined") {
-
-            const {
-                data: { session },
-                error: sessionError
-            } = await supabaseClient.auth.getSession();
-
-            if (sessionError) {
-                console.error("Session Error:", sessionError);
-            }
-
-            if (session?.user) {
-
-                window.currentUserId = session.user.id;
-
-                console.log("Logged User UUID:");
-                console.log(window.currentUserId);
-
-            } else {
-
-                console.warn("User Not Logged In");
-
-            }
-
-        } else {
-
-            console.error("supabaseClient Missing");
-
-        }
-
-        // -----------------------------
-        // LOAD BOOK JSON
-        // -----------------------------
-
-        console.log("Loading books.json...");
-
-        const response = await fetch("../data/books.json");
-
-        if (!response.ok) {
-            throw new Error("books.json Not Found");
-        }
-
-        const json = await response.json();
-
-        window.currentBookData =
-            json.books.find(book => book.id === bookId);
-
-        console.log("Book Data");
-        console.log(window.currentBookData);
-
-        if (!window.currentBookData) {
-
-            document.getElementById("bookHeading").textContent =
-                "Book Not Found";
-
-            disableDownloadButton("Book Not Found");
-
+        // 2. Authenticate user (stricter check)
+        const user = await getAuthenticatedUser();
+        if (!user) {
+            showError("Authentication Required", "Please log in to access your download.");
             return;
         }
+        state.userData = user;
 
-        // -----------------------------
-        // UPDATE UI
-        // -----------------------------
+        // 3. Fetch all necessary data in parallel
+        const [bookData, purchaseData] = await Promise.all([
+            fetchBookData(state.bookId),
+            fetchPurchaseRecord(user.id, state.bookId),
+        ]);
 
-        document.getElementById("bookHeading").textContent =
-            window.currentBookData.heading || window.currentBookData.name;
+        if (!bookData) throw new Error("Book data could not be found.");
+        if (!purchaseData) throw new Error("You have not purchased this book.");
 
-        document.getElementById("bookCategory").textContent =
-            `Category : ${window.currentBookData.category}`;
+        state.bookData = bookData;
+        state.purchaseData = purchaseData;
 
-        document.getElementById("bookIdDisplay").textContent =
-            window.currentBookData.id;
+        // 4. Check if download is enabled for this book
+        if (state.bookData.downloadEnabled === false) {
+            throw new Error("Download for this book is currently disabled by the administrator.");
+        }
 
-        document.getElementById("fileSizeDisplay").textContent =
-            window.currentBookData.fileSize || "-";
+        // 5. Populate the UI with all fetched data
+        populateUI();
 
-        document.getElementById("accessDisplay").textContent =
-            window.currentBookData.accessType || "Lifetime";
+        // 6. Hide loading state and show the main card
+        loadingState.style.display = 'none';
+        downloadCard.style.display = 'block';
 
-        window.maxAllowedDownloads =
-            window.currentBookData.downloadLimit || 3;
+    } catch (err) {
+        showError("An Error Occurred", err.message);
+    }
+});
 
-        console.log("Maximum Downloads:", window.maxAllowedDownloads);
+// --- DATA FETCHING FUNCTIONS ---
 
-        if (window.currentBookData.downloadEnabled === false) {
+async function getAuthenticatedUser() {
+    const { data: { session } } = await db.auth.getSession();
+    if (!session || !session.user) return null;
 
-            disableDownloadButton(
-                "Download Disabled"
-            );
+    const { data: profile, error } = await db
+        .from('profiles')
+        .select('id, full_name, mobile')
+        .eq('id', session.user.id)
+        .single();
 
+    if (error) throw new Error("Failed to fetch user profile.");
+    return profile;
+}
+
+async function fetchBookData(bookId) {
+    const response = await fetch("../data/books.json");
+    if (!response.ok) throw new Error("Failed to load book master file.");
+    const data = await response.json();
+    return data.books.find(book => book.id === bookId);
+}
+
+async function fetchPurchaseRecord(userId, bookId) {
+    const { data, error } = await db
+        .from("purchases")
+        .select('*')
+        .eq("profile_id", userId)
+        .eq("book_id", bookId)
+        .single();
+    if (error) return null; // It's not an error if no record is found
+    return data;
+}
+
+// --- UI MANIPULATION ---
+
+function populateUI() {
+    // Book Info
+    document.getElementById('bookCover').src = state.bookData.cover || '';
+    document.getElementById('bookName').textContent = state.bookData.name || 'N/A';
+    document.getElementById('bookCategory').textContent = state.bookData.category || 'N/A';
+
+    // Purchase Summary
+    document.getElementById('customerName').textContent = state.userData.full_name || 'Valued Customer';
+    document.getElementById('customerMobile').textContent = state.userData.mobile || 'N/A';
+    document.getElementById('bookId').textContent = state.bookData.id;
+    document.getElementById('purchaseDate').textContent = new Date(state.purchaseData.purchase_date).toLocaleDateString('en-GB');
+
+    // Download Status
+    const used = state.purchaseData.download_count || 0;
+    const max = state.bookData.downloadLimit || 3;
+    const remaining = max - used;
+
+    document.getElementById('downloadsUsed').textContent = used;
+    document.getElementById('downloadsRemaining').textContent = remaining;
+    document.getElementById('downloadsMax').textContent = max;
+
+    const downloadBtn = document.getElementById('downloadBtn');
+    const readNowBtn = document.getElementById('readNowBtn');
+
+    if (remaining <= 0) {
+        document.getElementById('statusReady').style.display = 'none';
+        document.getElementById('statusExhausted').style.display = 'block';
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Limit Reached';
+    }
+
+    // Setup button actions
+    downloadBtn.onclick = triggerDownload;
+    readNowBtn.onclick = () => {
+        window.location.href = `reader.html?book=${state.bookId}`;
+    };
+}
+
+function showError(title, message) {
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    const errorMessage = document.getElementById('errorMessage');
+
+    loadingState.style.display = 'none';
+    errorMessage.textContent = `${title}: ${message}`;
+    errorState.style.display = 'block';
+}
+
+// --- CORE DOWNLOAD LOGIC ---
+
+async function triggerDownload() {
+    const downloadBtn = document.getElementById('downloadBtn');
+    downloadBtn.disabled = true;
+    downloadBtn.innerHTML = '<div class="spinner-small"></div> Processing...';
+
+    const used = state.purchaseData.download_count || 0;
+    const max = state.bookData.downloadLimit || 3;
+
+    if (used >= max) {
+        alert("Download limit reached.");
+        downloadBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Limit Reached';
+        return;
+    }
+
+    const newCount = used + 1;
+
+    // Update Supabase first
+    const { error } = await db
+        .from('purchases')
+        .update({ download_count: newCount })
+        .eq('id', state.purchaseData.id);
+
+    if (error) {
+        alert("Failed to update download count. Please try again.");
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download PDF';
+        return;
+    }
+
+    // Update state and UI
+    state.purchaseData.download_count = newCount;
+    document.getElementById('downloadsUsed').textContent = newCount;
+    document.getElementById('downloadsRemaining').textContent = max - newCount;
+
+    // Trigger file download
+    const link = document.createElement('a');
+    link.href = state.bookData.mainPdf;
+    link.download = `${state.bookData.id}-Aarogyam-India.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Show success popup and re-enable button
+    showSuccessPopup();
+    downloadBtn.disabled = false;
+    downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download PDF';
+
+    if (newCount >= max) {
+        document.getElementById('statusReady').style.display = 'none';
+        document.getElementById('statusExhausted').style.display = 'block';
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Limit Reached';
+    }
+}
+
+// --- SUCCESS POPUP ---
+
+function showSuccessPopup() {
+    const popup = document.getElementById('successPopup');
+    document.getElementById('popupBookCover').src = state.bookData.cover;
+    document.getElementById('popupBookName').textContent = state.bookData.name;
+    document.getElementById('popupCustomerName').textContent = state.userData.full_name;
+
+    popup.style.display = 'flex';
+
+    document.getElementById('popupReadNowBtn').onclick = () => {
+        window.location.href = `reader.html?book=${state.bookId}`;
+    };
+
+    document.getElementById('popupCloseBtn').onclick = () => {
+        popup.style.display = 'none';
+    };
+
+    // Close on overlay click
+    popup.onclick = (event) => {
+        if (event.target === popup) {
+            popup.style.display = 'none';
+        }
+    };
+}
             return;
         }
 
