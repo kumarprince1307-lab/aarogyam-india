@@ -95,9 +95,11 @@ function initUserData() {
     // DOM Elements Update
     const userNameSpan = document.getElementById('userName');
     const menuUserName = document.getElementById('menuUserName');
-    
+    const mobileUserPhoneSpan = document.getElementById('mobileUserPhone'); // Get the new span
+
     if (userNameSpan) userNameSpan.textContent = userName;
     if (menuUserName) menuUserName.textContent = userName;
+    if (mobileUserPhoneSpan) mobileUserPhoneSpan.textContent = userMobile; // Set mobile number
 
     // फॉर्म इनपुट्स में ऑटो-फिल करना
     if (document.getElementById('leadName')) document.getElementById('leadName').value = userName;
@@ -110,42 +112,6 @@ function initUserData() {
     if (document.getElementById('leadAddress')) document.getElementById('leadAddress').value = userAddress;
     if (document.getElementById('leadOccupation')) document.getElementById('leadOccupation').value = userOccupation;
     if (document.getElementById('leadInterest')) document.getElementById('leadInterest').value = userInterest;
-
-    // डायनेमिक प्रोफाइल परसेंटेज कैलकुलेशन
-    calculateAndUpdateProfileProgress({ userName, userMobile, userEmail, userState, userDob, userCity, userAddress, userOccupation, userInterest, userGender });
-}
-
-// प्रोफाइल प्रोग्रेस बार (10% से 100% तक वास्तविक डेटा के आधार पर)
-function calculateAndUpdateProfileProgress(data) {
-    let filledFields = 0;
-    const totalFields = 10; // Updated from 9 to 10
-
-    if (data.userName && data.userName !== "प्रिय पाठक") filledFields++;
-    if (data.userMobile) filledFields++;
-    if (data.userEmail) filledFields++;
-    if (data.userState) filledFields++;
-    if (data.userDob) filledFields++;
-    if (data.userCity) filledFields++;
-    if (data.userAddress) filledFields++;
-    if (data.userOccupation) filledFields++;
-    if (data.userInterest) filledFields++;
-    if (data.userGender) filledFields++; // Added gender check
-
-    const percentage = Math.max(10, Math.round((filledFields / totalFields) * 100)); // न्यूनतम 10% से शुरू होकर 100% तक
-
-    // प्रोग्रेस बार की चौड़ाई और परसेंटेज टेक्स्ट अपडेट करना
-    const progressFill = document.querySelector('.welcome-card-soft div[style*="background: #28a745"], .welcome-card-soft div[style*="background: rgb(40, 167, 69)"], .welcome-card-soft div[style*="background: linear-gradient"]');
-    if (progressFill) {
-        progressFill.style.width = percentage + '%';
-    }
-
-    // परसेंटेज टेक्स्ट लेबल अपडेट
-    const percentLabels = document.querySelectorAll('.welcome-card-soft strong');
-    percentLabels.forEach(el => {
-        if (el.textContent.includes('%') || el.previousElementSibling?.textContent.includes('प्रोफाइल')) {
-            el.textContent = percentage + '%';
-        }
-    });
 }
 
 // 6. स्मार्ट चेक: यदि यूजर लॉग-इन नहीं है या प्रोफाइल पहले से भरी हुई है, तो ऑटो-पॉपअप नहीं खुलेगा
