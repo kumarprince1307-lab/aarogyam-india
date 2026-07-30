@@ -68,28 +68,28 @@
 
         // Get all button elements
         const desktopLoginBtn = document.getElementById('desktop-login-btn');
-        const desktopProfileBtn = document.getElementById('desktop-profile-btn');
+        const desktopLogoutBtn = document.getElementById('desktop-logout-btn'); // New Logout button
         const mobileLoginBtn = document.getElementById('mobile-login-btn');
-        const mobileProfileBtn = document.getElementById('mobile-profile-btn');
+        const mobileLogoutBtn = document.getElementById('mobile-logout-btn'); // New Logout button
         const welcomeCard = document.querySelector('.welcome-card-soft');
 
         if (isLoggedIn) {
-            // User is logged in: show profile buttons, hide login buttons
-            if (desktopProfileBtn) desktopProfileBtn.style.display = 'inline-flex';
-            if (mobileProfileBtn) mobileProfileBtn.style.display = 'flex';
+            // User is logged in: show logout buttons, hide login buttons
+            if (desktopLogoutBtn) desktopLogoutBtn.style.display = 'inline-flex';
+            if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'flex';
             if (welcomeCard) welcomeCard.style.display = 'block';
             
             if (desktopLoginBtn) desktopLoginBtn.style.display = 'none';
             if (mobileLoginBtn) mobileLoginBtn.style.display = 'none';
 
         } else {
-            // User is not logged in: show login buttons, hide profile buttons
+            // User is not logged in: show login buttons, hide logout buttons
             if (desktopLoginBtn) desktopLoginBtn.style.display = 'inline-flex';
             if (mobileLoginBtn) mobileLoginBtn.style.display = 'flex';
             if (welcomeCard) welcomeCard.style.display = 'none';
 
-            if (desktopProfileBtn) desktopProfileBtn.style.display = 'none';
-            if (mobileProfileBtn) mobileProfileBtn.style.display = 'none';
+            if (desktopLogoutBtn) desktopLogoutBtn.style.display = 'none';
+            if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'none';
         }
     });
 </script>
@@ -115,8 +115,8 @@
         <button id="desktop-login-btn" onclick="openLoginPopup()" style="background: #28a745; color: white; display: none; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: 8px;">
             <i class="fa-solid fa-right-to-bracket"></i> लॉगिन करें
         </button>
-        <button id="desktop-profile-btn" onclick="openLeadModal()" style="background: #E86A17; color: white; display: none; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: 8px;">
-            <i class="fa-solid fa-user-gear"></i> प्रोफाइल अपडेट
+        <button id="desktop-logout-btn" onclick="logoutUser()" style="background: #e81717; color: white; display: none; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: 8px;">
+            <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट
         </button>
     </nav>
 
@@ -138,7 +138,7 @@
             
             <!-- यहाँ प्रोग्रेस और मेंबरशिप के लिए ID जोड़ दी गई है -->
             <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">
-                👑 <span id="mobileMemberStatus">Premium Member</span> • <span id="mobileProfileProgressText">33%</span> Profile
+                👑 <span id="mobileMemberStatus">Premium Member</span> • मोबाइल: <span id="mobileUserPhone"></span>
             </p>
         </div>
 
@@ -149,8 +149,8 @@
         <button id="mobile-login-btn" onclick="openLoginPopupAndToggleMenu()" style="background: #28a745; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px; margin-bottom: 5px;">
             <i class="fa-solid fa-right-to-bracket"></i> लॉगिन करें
         </button>
-        <button id="mobile-profile-btn" onclick="openLeadModalAndToggleMenu()" style="background: #E86A17; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px;">
-            <i class="fa-solid fa-user-gear"></i> प्रोफाइल अपडेट करें
+        <button id="mobile-logout-btn" onclick="logoutUser()" style="background: #e81717; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px;">
+            <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट
         </button>
     </div>
 
