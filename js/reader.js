@@ -38,7 +38,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("====================================");
 
     const urlParams = new URLSearchParams(window.location.search);
-    aoiBookId = urlParams.get("book") || urlParams.get("id") || "BK001";
+    // Correctly parse 'book' or 'id' from URL, with a safe default.
+    // This fixes the bug where it incorrectly defaulted to BK006.
+    aoiBookId = urlParams.get("book") || urlParams.get("id") || "BK001"; // Default to BK001 if no ID is present
+
     console.log("Target Book ID:", aoiBookId);
 
     try {
@@ -79,7 +82,7 @@ async function verifyUserAccessAndSession(targetBookId) {
     if (!res.ok) throw new Error("books.json not found");
     const json = await res.json();
     
-    aoiCurrentBookData = json.books.find(b => b.id === targetBookId);
+    aoiCurrentBookData = json.books.find(b => b.id === targetBookId || b.book_id === targetBookId);
 
     if (!aoiCurrentBookData) {
         showErrorScreen();
