@@ -17,7 +17,7 @@ async function fetchUserPurchases() {
     }
 
     try {
-        const user = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+        const user = V1_SESSION.getCurrentUser();
         if (!user || !user.id) {
             loadingState.style.display = 'none';
             emptyState.style.display = 'block';
@@ -112,7 +112,7 @@ function showInvoiceModal(purchase) {
     const modal = document.getElementById('invoiceModal');
     if (!modal) return;
 
-    const user = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+    const user = V1_SESSION.getCurrentUser();
 
     setElementText('modalOrderId', purchase.order_id || 'N/A');
     setElementText('modalPurchaseDate', purchase.purchase_date ? new Date(purchase.purchase_date).toLocaleDateString('en-GB') : 'N/A');

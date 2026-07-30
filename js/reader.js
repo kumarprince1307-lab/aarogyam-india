@@ -1,5 +1,5 @@
 /* =================================================================
-   AAROGYAM INDIA - EBOOK READER ENGINE (FINAL V1 FIXED)
+    AAROGYAM INDIA - EBOOK READER ENGINE (FINAL V1 FIXED)
 ================================================================= */
 
 // PDF.js Worker Configuration
@@ -38,16 +38,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("====================================");
 
     const urlParams = new URLSearchParams(window.location.search);
-    // Correctly parse 'book' or 'id' from URL, with a safe default.
-    // This fixes the bug where it incorrectly defaulted to BK006.
-    aoiBookId = urlParams.get("book") || urlParams.get("id") || "BK001"; // Default to BK001 if no ID is present
+    aoiBookId = urlParams.get("book") || urlParams.get("id") || "BK001";
 
     console.log("Target Book ID:", aoiBookId);
 
     try {
-        // 1. Supabase Session & Purchase Check
         await verifyUserAccessAndSession(aoiBookId);
-
     } catch (err) {
         console.error("Reader Initialization Error:", err);
         showErrorScreen();
@@ -65,19 +61,20 @@ async function verifyUserAccessAndSession(targetBookId) {
     }
 
     let userId = null;
-    let userEmail = "User";
+    let userIdentifier = "User";
 
-    if (typeof supabaseClient !== "undefined") {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session?.user) {
-            userId = session.user.id;
-            userEmail = session.user.email || session.user.id.substring(0, 8);
-        }
+    const sessionManager = (typeof V1_SESSION !== "undefined") ? V1_SESSION : window.V1_SESSION;
+    const currentUser = sessionManager && typeof sessionManager.getCurrentUser === "function" 
+        ? sessionManager.getCurrentUser() 
+        : null;
+
+    if (currentUser) {
+        userId = currentUser.id;
+        userIdentifier = currentUser.email || currentUser.mobile || currentUser.id.substring(0, 8);
     }
 
-    if (watermarkUser) watermarkUser.textContent = userEmail;
+    if (watermarkUser) watermarkUser.textContent = userIdentifier;
 
-    // Load books.json (Path root relative check)
     const res = await fetch("../data/books.json");
     if (!res.ok) throw new Error("books.json not found");
     const json = await res.json();
@@ -89,18 +86,15 @@ async function verifyUserAccessAndSession(targetBookId) {
         return;
     }
 
-    // Universal Book Name Display in Header & Loader
     const bookTitle = aoiCurrentBookData.heading || aoiCurrentBookData.name || "Aarogyam India eBook";
     if (bookHeading) bookHeading.textContent = bookTitle;
     if (loaderBookTitle) loaderBookTitle.textContent = bookTitle;
 
-    // Check Purchase Access
     if (aoiCurrentBookData.readEnabled === false) {
         accessDeniedModal.style.display = "flex";
         return;
     }
 
-    // If logged in, check DB purchase (Optional V1 strict check)
     if (userId && typeof supabaseClient !== "undefined") {
         const { data, error } = await supabaseClient
             .from("purchases")
@@ -114,7 +108,6 @@ async function verifyUserAccessAndSession(targetBookId) {
         }
     }
 
-    // Initialize PDF Loading
     loadPdfFile(aoiCurrentBookData.mainPdf || "pdf/full/" + targetBookId + ".pdf");
 }
 
@@ -129,10 +122,8 @@ function loadPdfFile(pdfUrl) {
         aoiTotalPages = aoiPdfDoc.numPages;
         console.log("PDF Loaded Successfully. Total Pages:", aoiTotalPages);
 
-        // Update Slider Max
         if (pageSlider) pageSlider.max = aoiTotalPages;
 
-        // Check LocalStorage for Last Read Page (Continue Reading)
         let savedData = JSON.parse(localStorage.getItem("AOI_READ_PROGRESS") || "{}");
         let savedPage = savedData[aoiBookId] || 1;
 
@@ -262,7 +253,6 @@ const nextBtnEl = document.getElementById("nextPageBtn");
 if (prevBtnEl) prevBtnEl.addEventListener("click", onPrevPage);
 if (nextBtnEl) nextBtnEl.addEventListener("click", onNextPage);
 
-// Page Slider Event
 if (pageSlider) {
     pageSlider.addEventListener("input", (e) => {
         let targetPage = parseInt(e.target.value);
@@ -273,7 +263,6 @@ if (pageSlider) {
     });
 }
 
-// Page Jump Direct Input
 const pageJumpBtn = document.getElementById("pageJumpBtn");
 if (pageJumpBtn) {
     pageJumpBtn.addEventListener("click", () => {
@@ -288,7 +277,6 @@ if (pageJumpBtn) {
     });
 }
 
-// Zoom Controls
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
 
@@ -310,7 +298,6 @@ if (zoomOutBtn) {
     });
 }
 
-// Keyboard Navigation
 document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight" || e.key === "PageDown") {
         onNextPage();
@@ -331,17 +318,13 @@ function showErrorScreen() {
 }
 
 // =======================================================
-// WHATSAPP DYNAMIC USER LINK GENERATOR (FIXED)
+// WHATSAPP DYNAMIC USER LINK GENERATOR
 // =======================================================
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const whatsappBtn = document.getElementById("whatsappFloatBtn");
         if (whatsappBtn) {
-            const userEmailText = watermarkUser ? watermarkUser.textContent : "User";
-            // साफ़ और ब्राउज़र-फ्रेंडली टेक्स्ट फॉर्मेट
-            const message = "नमस्ते Aarogyam Inida , मैं आरोग्यम इंडिया की ई-बुक पढ़ रहा हूँ और मुझे सहायता चाहिए।";
-            
-            // encodeURIComponent का उपयोग करके यूआरएल बनाना
+            const message = "नमस्ते Aarogyam India, मैं आरोग्यम इंडिया की ई-बुक पढ़ रहा हूँ और मुझे सहायता चाहिए।";
             whatsappBtn.href = "https://wa.me/917974422572?text=" + encodeURIComponent(message);
         }
     }, 1500);
