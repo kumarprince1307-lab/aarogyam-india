@@ -152,6 +152,14 @@
       "mrp": 299,
       "offerPrice": 99,
       "currency": "INR",
+      "demoImages": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp"
+        
+      ],
       "demoAvailable": false,
       "readEnabled": true,
       "downloadEnabled": true,
