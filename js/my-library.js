@@ -321,15 +321,13 @@ if (hasBoughtAny && (bookId === 'BK001' || userPurchases.some(p => p.book_id ===
     if (purchasedGrid) purchasedGrid.appendChild(card);
 }
 
-        // 2. Available Books
+      // 2. Available Books
         if (bookId === 'BK001' || bookId === 'BK002' || bookId === 'BK006') {
             const availCard = document.createElement('div');
             availCard.className = 'book-card';
             
-            let targetUrl = '/ebooks/checkout.html';
-            if (bookId === 'BK001') {
-                targetUrl = '/ebooks/checkout.html';
-            }
+            // हर बुक के हिसाब से उसकी सही ID के साथ URL सेट करें
+            let targetUrl = `/ebooks/checkout.html?id=${bookId}`;
 
             availCard.innerHTML = `
                 <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
