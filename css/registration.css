@@ -1,0 +1,145 @@
+/*=========================================
+REGISTRATION V1
+=========================================*/
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f7f8;
+    color:#222;
+}
+
+.top-bar{
+    padding:12px;
+}
+
+#backBtn{
+    border:none;
+    background:#1f2937;
+    color:#fff;
+    padding:10px 16px;
+    border-radius:10px;
+    font-size:14px;
+    cursor:pointer;
+}
+
+.registration-page{
+    display:flex;
+    justify-content:center;
+    padding:10px;
+}
+
+.register-card{
+    width:100%;
+    max-width:380px;
+    background:#fff;
+    border-radius:18px;
+    padding:18px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.logo{
+    width:60px;
+    height:60px;
+    display:block;
+    margin:0 auto 10px;
+    object-fit:contain;
+}
+
+.register-card h1{
+    text-align:center;
+    font-size:28px;
+    color:#177245;
+    margin-bottom:6px;
+}
+
+.register-card p{
+    text-align:center;
+    font-size:13px;
+    color:#666;
+    margin-bottom:16px;
+    line-height:1.4;
+}
+
+.form-group{
+    margin-bottom:12px;
+}
+
+.form-group label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:5px;
+}
+
+.form-group input{
+    width:100%;
+    height:44px;
+    border:1px solid #dcdcdc;
+    border-radius:10px;
+    padding:0 12px;
+    font-size:15px;
+    outline:none;
+}
+
+.form-group input:focus{
+    border-color:#1c8d55;
+}
+
+.terms{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    font-size:12px;
+    margin:14px 0;
+    color:#555;
+}
+
+#agreeTerms{
+    margin-top:2px;
+}
+
+#registerBtn{
+    width:100%;
+    height:48px;
+    border:none;
+    border-radius:12px;
+    background:#169c55;
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+#registerBtn:hover{
+    background:#12864a;
+}
+
+.form-message{
+    margin-top:12px;
+    text-align:center;
+    font-size:13px;
+    color:#d32f2f;
+}
+
+@media (max-width:400px){
+
+    .register-card{
+        padding:16px;
+    }
+
+    .register-card h1{
+        font-size:24px;
+    }
+
+    .logo{
+        width:55px;
+        height:55px;
+    }
+
+}

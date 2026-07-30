@@ -1,0 +1,307 @@
+/* ================================================================= *
+   AAROGYAM INDIA - ULTIMATE LUXURY PAYMENT SUCCESS CSS (FINAL FIX)
+   ================================================================ */
+
+:root {
+  --primary: #16A34A;
+  --success: #22C55E;
+  --orange: #FF9933;
+  --saffron: #FF9933;
+  --white: #FFFFFF;
+  --green: #138808;
+  --bg-main: #F4F7F6;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  --radius-card: 20px;
+  --radius-btn: 14px;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+/* ==========================
+   1. तिरंगा लहराता हुआ प्रीमियम हेडर
+   ========================== */
+.success-header {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 12px 20px;
+  text-align: center;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+  border-bottom: 4px solid transparent;
+  border-image: linear-gradient(90deg, var(--saffron), var(--white), var(--green)) 1;
+  position: relative;
+  z-index: 10;
+}
+
+.success-header h1 {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #1b5e20, #2e7d32, #388e3c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ==========================
+   2. कॉम्पैक्ट और लक्जरी कंटेनर
+   ========================== */
+.success-container {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0;
+  animation: cardEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardEntrance {
+  from { opacity: 0; transform: translateY(15px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ==========================
+   3. सक्सेस आइकॉन (टिक मार्क 100% परफ़ेक्ट सेंटर)
+   ========================== */
+.success-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.success-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22C55E, #15803D);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
+  animation: pulseGlow 2s infinite;
+  position: relative;
+}
+
+/* टिक मार्क का सटीक सेंटर एलाइनमेंट */
+.success-circle::after {
+  content: "✓";
+  color: #FFFFFF;
+  font-size: 30px;
+  font-weight: 900;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+  line-height: 1;
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* ==========================
+   4. सक्सेस मैसेज
+   ========================== */
+.success-message {
+  text-align: center;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  padding: 12px;
+  border-radius: var(--radius-card);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  border: 1px solid rgba(255,255,255,0.8);
+}
+
+.success-message h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.5px;
+  margin-bottom: 2px;
+}
+
+.success-message p {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ==========================
+   5. वेलकम बॉक्स
+   ========================== */
+.welcome-box, .next-step {
+  background: linear-gradient(135deg, rgba(255, 153, 51, 0.12) 0%, rgba(255, 255, 255, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 153, 51, 0.3);
+  border-left: 5px solid var(--orange);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 6px 20px rgba(255, 153, 51, 0.08);
+}
+
+.welcome-title, .next-step p {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9a3412;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.welcome-desc {
+  font-size: 11px;
+  color: #4b5563;
+  line-height: 1.35;
+}
+
+.timer-badge, #timerDisplay, .timer-highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: #FFF7ED;
+  border: 1px solid #FFEDD5;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #C2410C;
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.1);
+}
+
+/* ==========================
+   6. आर्डर समरी
+   ========================== */
+.order-details {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+  border: 1px solid rgba(255,255,255,0.9);
+}
+
+.order-details h3 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #E2E8F0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 12px;
+}
+
+.detail-row span:first-child {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.detail-row span:last-child {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.success-status {
+  background: #DCFCE7;
+  color: #15803D !important;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid #BBF7D0;
+}
+
+/* ==========================
+   7. प्रीमियम बटन
+   ========================== */
+.success-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.library-btn, .shopping-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 48px;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.library-btn {
+  background: linear-gradient(135deg, #22C55E, #15803D);
+  color: #FFFFFF;
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+  border: none;
+}
+
+.library-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(22, 163, 74, 0.4);
+}
+
+.shopping-btn {
+  background: #FFFFFF;
+  color: #C2410C;
+  border: 2px solid #FFEDD5;
+  box-shadow: 0 4px 15px rgba(255, 153, 51, 0.08);
+}
+
+.shopping-btn:hover, .shopping-btn:active {
+  background: linear-gradient(135deg, #FF9933, #EA580C);
+  color: #FFFFFF;
+  border-color: #EA580C;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.3);
+}
+
+/* ==========================
+   8. फुटर
+   ========================== */
+.success-footer {
+  text-align: center;
+  font-size: 11px;
+  color: #64748B;
+  padding: 4px 0;
+  font-weight: 500;
+}

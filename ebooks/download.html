@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Book Download | Aarogyam India</title>
+    <link rel="stylesheet" href="../css/download.css">
+</head>
+<body>
+
+    <!-- हेडर -->
+    <header class="success-header">
+        <h1>Aarogyam India - Secure Download</h1>
+    </header>
+
+    <!-- मुख्य कंटेनर -->
+    <main class="success-container">
+        
+        <!-- बुक कार्ड -->
+        <div class="success-card">
+            <div class="success-icon">
+                <div class="success-circle" id="statusIcon">📥</div>
+            </div>
+
+            <div class="success-message">
+                <h2 id="bookHeading">बुक लोड हो रही है...</h2>
+                <p id="bookCategory">कृपया प्रतीक्षा करें</p>
+            </div>
+
+            <!-- डाउनलोड स्टेटस / लिमिट बॉक्स -->
+            <div class="next-step">
+                <div>
+                    <p id="downloadStatusText">आपकी ई-बुक डाउनलोड के लिए तैयार है।</p>
+                    <span id="remainingCount">शेष डाउनलोड: 3/3</span>
+                </div>
+            </div>
+
+            <!-- ऑर्डर और बुक डिटेल्स समरी -->
+            <div class="order-details">
+                <h3>बुक विवरण</h3>
+                <div class="detail-row">
+                    <span>बुक आईडी</span>
+                    <span id="bookIdDisplay" class="order-id">--</span>
+                </div>
+                <div class="detail-row">
+                    <span>फाइल का आकार</span>
+                    <span id="fileSizeDisplay">--</span>
+                </div>
+                <div class="detail-row">
+                    <span>वैलिडिटी</span>
+                    <span id="accessDisplay">Lifetime</span>
+                </div>
+            </div>
+
+            <!-- डाउनलोड बटन -->
+            <div class="success-buttons">
+                <button id="downloadBtn" class="library-btn" onclick="triggerDownload()">
+                    📥 PDF डाउनलोड करें
+                </button>
+                <a href="../ebooks/my-library.html" class="shopping-btn">
+                    📚 My Library पर वापस जाएं
+                </a>
+            </div>
+        </div>r
+    </main>
+
+    <!-- फुटर -->
+    <footer class="success-footer">
+        &copy; 2026 Aarogyam India. All Rights Reserved.
+    </footer>
+
+    <!-- जावास्क्रिप्ट फाइल लिंक -->
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/download.js"></script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<!-- =========================================================
+HEAD SECTION
+SEO + META + CSS + GOOGLE ANALYTICS
+========================================================= -->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>लोड हो रहा है... | Aarogyam India</title>
+<meta name="description" content="eBook का डेमो देखें और सम्पूर्ण बुक खरीदें।">
+<meta name="keywords" content="eBook, Aarogyam India, कृषि गाइड">
+<meta name="author" content="Aarogyam India">
+<link rel="icon" href="/images/logo/favicon.png">
+<link rel="stylesheet" href="../css/demo-book.css">
+</head>
+
+<body>
+
+<!-- =========================================================
+STICKY HEADER
+========================================================= -->
+<header class="top-header">
+<a href="#" id="backBtn" class="back-btn">← Back</a>
+<img src="/images/logo/logo.png" alt="Aarogyam India" class="header-logo">
+<a href="https://wa.me/917974422572?text=नमस्ते!%20मैं%20डेमो%20बुक%20के%20बारे%20में%20जानकारी%20चाहता/चाहती%20हूँ।" target="_blank" class="help-btn">💬 Help</a>
+</header>
+
+<!-- =========================================================
+BOOK HERO SECTION
+========================================================= -->
+<section class="book-hero">
+<img src="" alt="Book Cover" class="book-cover" id="bookCover">
+<h1 id="bookTitle">लोड हो रहा है...</h1>
+<p class="book-subtitle" id="bookSubtitle">सम्पूर्ण Practical Guide</p>
+</section>
+
+<!-- =========================================================
+PRICE SECTION
+========================================================= -->
+<section class="price-box">
+<span class="old-price" id="bookMrp">₹0</span>
+<span class="offer-price" id="bookPrice">₹0</span>
+<span class="save-tag">बचत करें</span>
+</section>
+
+<!-- =========================================================
+SHORT DESCRIPTION
+========================================================= -->
+<section class="short-description">
+<h2>इस eBook में आपको क्या मिलेगा?</h2>
+<ul>
+<li>✅ सभी प्रमुख अध्यायों की सम्पूर्ण जानकारी</li>
+<li>✅ सही पहचान एवं Practical तरीके</li>
+<li>✅ सही दवा एवं सही मात्रा का विवरण</li>
+<li>✅ उर्वरक एवं पोषण प्रबंधन</li>
+<li>✅ विशेषज्ञ सलाह</li>
+<li>✅ वास्तविक उच्च गुणवत्ता वाली तस्वीरें</li>
+</ul>
+</section>
+
+<!-- =========================================================
+TRUST SECTION
+========================================================= -->
+<section class="trust-box">
+<div>📖 Practical Pages</div>
+<div>🖼️ Real Images</div>
+<div>🌾 Easy to Read</div>
+<div>📱 Mobile Friendly</div>
+</section>
+
+<!-- =========================================================
+REGISTRATION FORM
+========================================================= -->
+<section class="demo-form-section">
+<h2>डेमो देखने के लिए जानकारी भरें</h2>
+<p>एक बार जानकारी भरने के बाद आप Demo Preview देख पाएँगे।</p>
+<form id="demoForm">
+<input type="text" id="name" placeholder="पूरा नाम" required>
+<input type="tel" id="mobile" name="mobile" maxlength="10" placeholder="मोबाइल नंबर दर्ज करें" required>
+<input type="email" id="email" placeholder="ईमेल (Optional)">
+<input type="text" id="state" placeholder="राज्य (Optional)">
+<input type="text" id="district" placeholder="जिला (Optional)">
+<button type="submit" class="unlock-btn">📖 Demo देखें</button>
+</form>
+</section>
+
+<!-- =========================================================
+DEMO PREVIEW SECTION
+========================================================= -->
+<section id="demoPreview" class="demo-preview">
+    <h2>📖 eBook Demo Preview</h2>
+    <p>नीचे दिए गए पेज केवल डेमो के लिए हैं। पूरी eBook खरीदने पर सभी पेज उपलब्ध होंगे।</p>
+</section>
+
+<!-- =========================================================
+PREVIEW IMAGE SLIDER (DYNAMICALLY POPULATED BY JS)
+========================================================= -->
+<section class="preview-slider">
+    <button class="slider-btn prev-btn">❮</button>
+    <div class="slider-container">
+        <!-- JavaScript यहाँ अपने आप demoImages के हिसाब से <img> टैग जोड़ देगा -->
+    </div>
+    <button class="slider-btn next-btn">❯</button>
+</section>
+
+<!-- =========================================================
+FULL SCREEN IMAGE VIEWER
+========================================================= -->
+<div id="imageViewer" class="image-viewer">
+    <span class="close-viewer">✕</span>
+    <button class="viewer-prev">❮</button>
+    <img id="viewerImage" src="" alt="Preview">
+    <button class="viewer-next">❯</button>
+</div>
+
+<!-- =========================================================
+STICKY BUY NOW BAR
+========================================================= -->
+<div class="sticky-buy-bar">
+    <div class="price-area">
+        <span class="old-price" id="barMrp">₹299</span>
+        <span class="offer-price" id="barOffer">₹99</span>
+    </div>
+    <a href="#" class="buy-btn" id="stickyBuyBtn">🛒 Buy Now</a>
+</div>
+
+<!-- =========================================================
+WHATSAPP HELP SECTION
+========================================================= -->
+<section class="whatsapp-help">
+    <h2>💬 सहायता चाहिए?</h2>
+    <p>यदि आपको eBook, Payment, Demo या Download से संबंधित कोई भी समस्या हो तो सीधे WhatsApp पर संपर्क करें।</p>
+    <a href="https://wa.me/917974422572?text=नमस्ते!" target="_blank" class="whatsapp-help-btn">
+        💬 WhatsApp Help <br>
+        <small>+91 7974422572</small>
+    </a>
+</section>
+
+<!-- =========================================================
+FOOTER
+========================================================= -->
+<footer class="footer">
+    <img src="/images/logo/logo.png" alt="Aarogyam India" class="footer-logo">
+    <h3>Aarogyam India</h3>
+    <p>किसानों के लिए विश्वसनीय डिजिटल कृषि समाधान</p>
+    <div class="footer-links">
+        <a href="../privacy-policy.html">Privacy Policy</a>
+        <a href="../terms-conditions.html">Terms & Conditions</a>
+        <a href="../refund-policy.html">Refund Policy</a>
+        <a href="../contact.html">Contact Us</a>
+    </div>
+    <div class="footer-contact">
+        📞 +91 7974422572 <br>
+        ✉️ support@aarogyamindia.online <br>
+        🌐 aarogyamindia.online
+    </div>
+    <p class="footer-version">Website Version : V1.0</p>
+    <p class="copyright">© 2026 Aarogyam India. All Rights Reserved.</p>
+</footer>
+
+<!-- =========================================================
+TOAST MESSAGE & LOADER
+========================================================= -->
+<div id="toast"></div>
+<div id="loader">
+    <div class="loader-spinner"></div>
+    <p>कृपया प्रतीक्षा करें...</p>
+</div>
+
+<!-- =========================================================
+JAVASCRIPT
+========================================================= -->
+<!-- 1. सबसे पहले Supabase की लाइब्रेरी लोड होनी चाहिए -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<!-- 2. दूसरे नंबर पर आपकी supabase.js फाइल होनी चाहिए -->
+<script src="../js/supabase.js"></script>
+
+<script src="../js/demo-book.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- SEO + Google Analytics (AIM Rule) -->
+
+    <title>Free Registration | Aarogyam India</title>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Free Registration for Aarogyam India">
+
+    <link rel="stylesheet"
+          href="css/registration.css">
+
+</head>
+
+<body>
+
+<header class="top-bar">
+
+    <button
+        id="backBtn"
+        type="button">
+        ← Back
+    </button>
+
+</header>
+
+<main class="registration-page">
+
+    <section class="register-card">
+
+        <img
+            src="images/logo/logo.png"
+            alt="Aarogyam India"
+            class="logo">
+
+        <h1>Free Registration</h1>
+
+        <p>
+            Register once and access Demo Books,
+            eBooks and My Library.
+        </p>
+
+        <form id="registrationForm">
+
+            <div class="form-group">
+
+                <label for="fullName">
+                    Full Name *
+                </label>
+
+                <input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    autocomplete="name"
+                    required>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="mobile">
+                    Mobile Number *
+                </label>
+
+                <input
+                    id="mobile"
+                    name="mobile"
+                    type="tel"
+                    maxlength="10"
+                    inputmode="numeric"
+                    required>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email (Optional)
+                </label>
+
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="email">
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="referralMobile">
+                    Referral Mobile (Optional)
+                </label>
+
+                <input
+                    id="referralMobile"
+                    name="referralMobile"
+                    type="tel"
+                    maxlength="10"
+                    inputmode="numeric">
+
+            </div>
+
+            <label class="terms">
+
+                <input
+                    id="agreeTerms"
+                    type="checkbox"
+                    required>
+
+                <span>
+                    I agree to the
+                    Terms & Privacy Policy
+                </span>
+
+            </label>
+
+            <button
+                id="registerBtn"
+                type="submit">
+
+                CREATE FREE ACCOUNT
+
+            </button>
+
+        </form>
+
+        <p
+            id="formMessage"
+            class="form-message">
+        </p>
+
+    </section>
+
+</main>
+<!-- 1. सबसे पहले Supabase की लाइब्रेरी लोड होनी चाहिए -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<!-- 2. दूसरे नंबर पर आपकी supabase.js फाइल होनी चाहिए -->
+<script src="js/supabase.js"></script>
+
+<!-- 3. सबसे आखिर में आपकी registration.js फाइल होनी चाहिए -->
+<script src="js/registration.js"></script>
+
+</body>
+</html>

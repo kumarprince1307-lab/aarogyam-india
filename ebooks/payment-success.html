@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful | Aarogyam India</title>
+    <meta name="description" content="Your payment has been completed successfully.">
+    <link rel="stylesheet" href="../css/payment-success.css">
+</head>
+<body>
+
+<header class="success-header">
+    <h1>Aarogyam India</h1>
+</header>
+
+<main class="success-container">
+
+    <!-- Success Icon with Smooth Pop Animation -->
+    <section class="success-icon">
+        <div class="success-circle">
+            <svg class="checkmark" viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Success Message -->
+    <section class="success-message">
+        <h2>Payment Successful!</h2>
+        <p>Your transaction has been completed securely.</p>
+    </section>
+
+    <!-- Welcome & Instruction Box -->
+    <section class="welcome-box" id="welcomeBox">
+        <div class="welcome-title" id="welcomeUserMsg">📌 बधाई हो! आपका पेमेंट सफल रहा।</div>
+        <p class="welcome-desc">
+            आपकी ई-बुक और डिजिटल इन्वॉइस सुरक्षित रूप से आपकी 'My Library' में जोड़ दी गई है।
+        </p>
+        <div class="timer-badge" id="timerDisplay">⏳ आपको 6 सेकंड में ऑटोमैटिकली लाइब्रेरी में भेजा जा रहा है...</div>
+    </section>
+
+    <!-- Order Details (100% Real & Dynamic) -->
+    <section class="order-details">
+        <h3>Order Summary</h3>
+        <div class="detail-row">
+            <span>Order ID</span>
+            <span id="orderId">Loading...</span>
+        </div>
+        <div class="detail-row">
+            <span>Book Name</span>
+            <span id="bookName">Loading...</span>
+        </div>
+        <div class="detail-row">
+            <span>Amount Paid</span>
+            <span id="amountPaid">₹0</span>
+        </div>
+        <div class="detail-row">
+            <span>Payment Status</span>
+            <span class="success-status">Successful</span>
+        </div>
+    </section>
+
+    <!-- Buttons -->
+    <section class="success-buttons">
+        <a href="my-library.html" class="library-btn">📖 Go To My Library Now</a>
+        <a href="agriculture.html" class="shopping-btn">🛍️ Continue Shopping</a>
+    </section>
+
+</main>
+
+<footer class="success-footer">
+    © Aarogyam India Digital Locker
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/payment-success.js"></script>
+
+</body>
+</html>
