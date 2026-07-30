@@ -306,7 +306,7 @@ async function renderLibrarySections(booksArray) {
 
       
        // 1. Purchased / My Books
-if (hasBoughtAny && (bookId === 'BK001' || userPurchases.some(p => p.book_id === bookId))) {
+if (userPurchases.some(p => p.book_id === bookId)) {
     purchasedCount++;
     const card = document.createElement('div');
     card.className = 'book-card';
