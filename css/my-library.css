@@ -239,16 +239,32 @@ body {
 /* ==========================================================================
    3. WELCOME DASHBOARD & STATS CARDS
    ========================================================================== */
+/* New Glassmorphism Welcome Card */
 .welcome-card-soft {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(254, 252, 247, 0.95) 100%) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid #f0e6d2 !important;
-    border-left: 6px solid var(--primary-orange) !important;
-    border-radius: var(--radius-card) !important;
-    box-shadow: var(--shadow-soft) !important;
+    background: linear-gradient(135deg, rgba(255, 245, 238, 0.6), rgba(236, 253, 245, 0.6), rgba(255, 255, 255, 0.6));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-card);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
     margin: 15px auto;
-    padding: 22px;
+    padding: 25px;
     max-width: 1200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1a2e05;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+    margin-bottom: 5px;
+}
+
+.welcome-subtitle {
+    font-size: 0.9rem;
+    color: #365221;
 }
 
 /* ==========================================================================
@@ -431,53 +447,26 @@ body {
 /* ==========================================================================
    7. STICKY TIMER & TODAY DEAL BAR (Fixed Desktop Overlap Position)
    ========================================================================== */
+/* New Sticky Banner */
 .sticky-action-bar {
     position: fixed;
-    bottom: 75px; /* Safely above bottom navigation bar to prevent overlap */
+    bottom: 80px;
     left: 0;
     width: 100%;
     z-index: 998;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    background: #111827;
-    overflow: hidden;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
-    border-top: 2px solid transparent;
-    border-image: linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;
-}
-
-.sticky-action-bar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 300%;
-    height: 100%;
-    background: linear-gradient(
-        90deg, 
-        rgba(232, 106, 23, 0.25) 0%, 
-        rgba(255, 255, 255, 0.15) 30%, 
-        rgba(19, 138, 54, 0.25) 60%, 
-        rgba(255, 255, 255, 0.15) 80%, 
-        rgba(232, 106, 23, 0.25) 100%
-    );
-    animation: flagWaveFlow 7s linear infinite;
-    z-index: 1;
-    pointer-events: none;
-}
-
-@keyframes flagWaveFlow {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(50%); }
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #1e3a8a, #1e40af, #1d4ed8);
+    box-shadow: 0 -5px 25px rgba(29, 78, 216, 0.4);
+    border-top: 2px solid #3b82f6;
 }
 
 .deal-timer-banner, .sticky-deal-btn {
     position: relative;
     z-index: 2;
 }
-
 .deal-timer-banner {
     color: #f3f4f6;
     font-size: 0.85rem;
@@ -487,22 +476,29 @@ body {
     gap: 8px;
 }
 
+/* New Timer Pill/Badge Style */
 #dealTimer {
-    color: var(--accent-gold);
-    text-shadow: 0 0 12px rgba(246, 185, 59, 0.6);
-    font-weight: 800;
-    font-size: 0.95rem;
+    background: #ffffff;
+    color: #1e40af;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 900;
+    font-size: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border: 2px solid #93c5fd;
 }
 
 .sticky-deal-btn {
-    background: linear-gradient(135deg, var(--secondary-green), #0e6327);
+    background: linear-gradient(135deg, #facc15, #eab308);
     color: white;
-    padding: 8px 18px;
+    padding: 10px 22px;
     border-radius: 50px;
     text-decoration: none;
-    font-size: 0.82rem;
-    font-weight: 700;
-    box-shadow: 0 4px 18px rgba(19, 138, 54, 0.45);
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #422006;
+    box-shadow: 0 5px 20px rgba(250, 204, 21, 0.5);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -510,8 +506,8 @@ body {
 }
 
 @keyframes breathingGlow {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 12px rgba(19, 138, 54, 0.4); }
-    50% { transform: scale(1.03); box-shadow: 0 0 22px rgba(19, 138, 54, 0.75); }
+    0%, 100% { transform: scale(1); box-shadow: 0 5px 20px rgba(250, 204, 21, 0.5); }
+    50% { transform: scale(1.05); box-shadow: 0 8px 30px rgba(250, 204, 21, 0.7); }
 }
 
 /* ==========================================================================
@@ -565,12 +561,13 @@ body {
 /* Desktop Centering & Spacing Fixes */
 @media(min-width: 1024px) {
     .sticky-action-bar {
-        max-width: 520px;
+        max-width: 600px;
         left: 50%;
         transform: translateX(-50%);
-        border-radius: 16px;
-        bottom: 80px; /* Perfectly separated from bottom nav on desktop */
+        border-radius: 18px;
+        bottom: 30px;
     }
+
     .bottom-nav {
         max-width: 600px;
         left: 50%;
