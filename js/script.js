@@ -198,6 +198,14 @@ if(closeMenu){
 
 }
 
+const altCloseMenu = document.getElementById("altCloseMenu");
+if(altCloseMenu){
+    altCloseMenu.addEventListener("click",()=>{
+        mobileMenu.classList.remove("active");
+        document.body.style.overflow="auto";
+    });
+}
+
 /* ==========================================================
    CLOSE MENU WHEN LINK CLICKED
 ========================================================== */
@@ -205,15 +213,13 @@ if(closeMenu){
 const mobileLinks=document.querySelectorAll(".mobile-nav a");
 
 mobileLinks.forEach(link=>{
-
-    link.addEventListener("click",()=>{
-
-        mobileMenu.classList.remove("active");
-
-        document.body.style.overflow="auto";
-
+    link.addEventListener("click", (e) => {
+        // Only close the menu if it's NOT a dropdown toggle
+        if (!link.classList.contains('dropdown-toggle')) {
+            mobileMenu.classList.remove("active");
+            document.body.style.overflow="auto";
+        }
     });
-
 });
 
 /* ==========================================================

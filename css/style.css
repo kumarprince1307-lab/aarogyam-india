@@ -1998,6 +1998,77 @@ color: #fff;
 .training-content h3{
 
     font-size:34px;
+}
+
+/* FINAL MOBILE MENU POLISH (v1.3) */
+.mobile-menu-header {
+    display: none; /* Remove empty header */
+}
+
+.mobile-user-card, .mobile-login-prompt {
+    position: relative;
+    margin: 15px;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.mobile-user-card {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.1), rgba(255, 255, 255, 0.1), rgba(19, 138, 78, 0.1));
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}
+
+#closeMenu, .close-btn-alt {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+#closeMenu img, .close-btn-alt img {
+    width: 14px;
+    filter: invert(1);
+}
+
+.mobile-user-info h3 {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+#mobile-user-meta {
+    font-size: 0.8rem;
+    color: #334155;
+    font-weight: 500;
+}
+
+.close-btn-alt {
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.2);
+}
+.close-btn-alt img {
+    filter: none;
+}
+.mobile-login-prompt {
+    padding: 0;
+}
+.login-prompt-btn {
+    padding: 20px;
+}
+
 
 }
 
@@ -2094,6 +2165,25 @@ color: #fff;
 .mobile-dropdown-menu li a {
     padding: 12px 0;
     font-size: 0.9rem;
+}
+
+/* Final Refinements (V1.2) */
+.mobile-menu-header {
+    justify-content: flex-end; /* Push close button to the right */
+}
+
+.mobile-dropdown > .dropdown-toggle {
+    transition: all 250ms ease-in-out;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 4px;
+}
+
+.mobile-dropdown.active > .dropdown-toggle {
+    background-color: rgba(0,0,0,0.05);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    color: var(--primary);
+    transform: scale(1.02);
 }
 /* ==========================================================
    CALL TO ACTION
