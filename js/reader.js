@@ -192,6 +192,9 @@ function renderPage(num) {
         // Create a new viewport for rendering, scaled up by the device pixel ratio.
         const renderViewport = page.getViewport({ scale: baseScale * devicePixelRatio });
 
+        // Disable image smoothing to get crisper text and vectors.
+        aoiCtx.imageSmoothingEnabled = false;
+
         const renderContext = {
             canvasContext: aoiCtx,
             viewport: renderViewport
