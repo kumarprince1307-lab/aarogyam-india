@@ -173,15 +173,28 @@ function renderPage(num) {
         let wScale = availableWidth / unscaledViewport.width;
         let autoScale = Math.min(hScale, wScale);
         
-        const finalScale = autoScale * (aoiScale / 1.2);
+        // Base scale for fitting the page, including user zoom.
+        const baseScale = autoScale * (aoiScale / 1.2);
+        
+        // Get the viewport at this base scale.
+        const viewport = page.getViewport({ scale: baseScale });
 
-        const viewport = page.getViewport({ scale: finalScale });
-        aoiCanvas.height = viewport.height;
-        aoiCanvas.width = viewport.width;
+        const devicePixelRatio = window.devicePixelRatio || 1;
+
+        // Set the canvas backing store size to be higher resolution.
+        aoiCanvas.width = viewport.width * devicePixelRatio;
+        aoiCanvas.height = viewport.height * devicePixelRatio;
+
+        // Set the canvas display size.
+        aoiCanvas.style.width = `${viewport.width}px`;
+        aoiCanvas.style.height = `${viewport.height}px`;
+        
+        // Create a new viewport for rendering, scaled up by the device pixel ratio.
+        const renderViewport = page.getViewport({ scale: baseScale * devicePixelRatio });
 
         const renderContext = {
             canvasContext: aoiCtx,
-            viewport: viewport
+            viewport: renderViewport
         };
 
         const renderTask = page.render(renderContext);
