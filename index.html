@@ -261,6 +261,11 @@ HEADER START
 
                     </li>
 
+                    <!-- MY LIBRARY -->
+                    <li>
+                        <a href="ebooks/my-library.html">My Library</a>
+                    </li>
+
                     <!-- TRAINING -->
 
                     <li>
@@ -339,14 +344,15 @@ HEADER START
             <!-- LOGIN -->
 
             <a
-                href="admin/login.html"
+                href="#"
+                id="universalLoginBtn"
                 class="login-btn">
 
                 <img
                     src="images/icons/login.png"
                     alt="Login">
 
-                <span>
+                <span id="loginBtnText">
                     Login
                 </span>
 
@@ -477,9 +483,12 @@ MOBILE NAVIGATION START
                 Contact
             </a>
         </li>
-
+        <li>
+            <a href="#" id="mobileLoginBtn">
+                <span id="mobileLoginBtnText">Login</span>
+            </a>
+        </li>
     </ul>
-
 </div>
 
 <!-- =========================================
@@ -2149,10 +2158,32 @@ JAVASCRIPT
 ========================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="../js/supabase.js"></script>
-
+<script src="js/supabase.js"></script>
+<script src="session.js"></script>
 <script src="js/script.js"></script>
+
+<!-- =========================================
+UNIVERSAL LOGIN MODAL
+========================================== -->
+<div id="universalLoginModal" class="login-modal-overlay" style="display: none;">
+    <div class="login-modal-card">
+        <button id="universalLoginCloseBtn" class="login-modal-close">&times;</button>
+        <img src="images/logo/logo.png" alt="Aarogyam India" class="login-modal-logo">
+        <h2 class="login-modal-title">Login or Register</h2>
+        <p class="login-modal-subtitle">Enter your mobile number to continue</p>
+        <form id="universalLoginForm">
+            <div class="login-modal-form-group">
+                <label for="universalLoginMobile">Mobile Number</label>
+                <input type="tel" id="universalLoginMobile" placeholder="10-digit mobile number" maxlength="10" required>
+            </div>
+            <button type="submit" id="universalLoginSubmitBtn" class="login-modal-submit">Login</button>
+        </form>
+        <p id="universalLoginMessage" class="login-modal-message"></p>
+        <p class="login-modal-footer">
+            New user? <a href="/registration.html" id="modalRegisterLink">Sign up here</a>
+        </p>
+    </div>
+</div>
 
 </body>
 

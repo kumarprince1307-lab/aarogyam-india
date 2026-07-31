@@ -2527,6 +2527,138 @@ section{
    VERSION 2.0
    AI BIBLE V2 LOCK
 ========================================================== */
+
+/* ==========================================================
+   UNIVERSAL LOGIN MODAL
+========================================================== */
+
+.login-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+}
+
+.login-modal-card {
+    background: #fff;
+    padding: 35px 30px;
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.login-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.login-modal-close:hover {
+    color: var(--black);
+}
+
+.login-modal-logo {
+    width: 80px;
+    margin: 0 auto 15px;
+}
+
+.login-modal-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 8px;
+}
+
+.login-modal-subtitle {
+    font-size: 16px;
+    color: var(--gray);
+    margin-bottom: 25px;
+}
+
+.login-modal-form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.login-modal-form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.login-modal-form-group input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: inherit;
+}
+
+.login-modal-form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(11, 122, 62, 0.2);
+}
+
+.login-modal-submit {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.login-modal-submit:hover {
+    background: var(--primary-dark);
+}
+
+.login-modal-submit:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.login-modal-message {
+    margin-top: 15px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--primary);
+    min-height: 22px;
+}
+
+.login-modal-footer {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.7;
+}
+
+.login-modal-footer a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
 /* ==========================================================
    ABOUT PAGE
 ========================================================== */

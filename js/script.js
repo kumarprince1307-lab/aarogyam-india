@@ -417,20 +417,17 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor=>{
 
     anchor.addEventListener("click",function(e){
 
-        const target=document.querySelector(this.getAttribute("href"));
+        const href = this.getAttribute("href");
+        if(href && href.length > 1) {
+            const target=document.querySelector(href);
 
-        if(target){
-
-            e.preventDefault();
-
-            target.scrollIntoView({
-
-                behavior:"smooth",
-
-                block:"start"
-
-            });
-
+            if(target){
+                e.preventDefault();
+                target.scrollIntoView({
+                    behavior:"smooth",
+                    block:"start"
+                });
+            }
         }
 
     });
@@ -501,5 +498,160 @@ window.addEventListener("load",()=>{
 
     }
 
+});
+
+/* ==========================================================
+   UNIVERSAL LOGIN MODAL
+========================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements for Universal Login
+    const universalLoginModal = document.getElementById('universalLoginModal');
+    const universalLoginBtn = document.getElementById('universalLoginBtn');
+    const universalLoginCloseBtn = document.getElementById('universalLoginCloseBtn');
+    const universalLoginForm = document.getElementById('universalLoginForm');
+    const universalLoginMobile = document.getElementById('universalLoginMobile');
+    const universalLoginSubmitBtn = document.getElementById('universalLoginSubmitBtn');
+    const universalLoginMessage = document.getElementById('universalLoginMessage');
+    const loginBtnText = document.getElementById('loginBtnText');
+    const modalRegisterLink = document.getElementById('modalRegisterLink');
+
+    // Function to open the modal
+    function openLoginModal(e) {
+        e.preventDefault();
+
+        const mobileMenu = document.querySelector(".mobile-menu");
+        const mobileOverlay = document.querySelector(".mobile-overlay");
+
+        if(mobileMenu && mobileMenu.classList.contains("active")) {
+            mobileMenu.classList.remove("active");
+            if (mobileOverlay) {
+                mobileOverlay.classList.remove("active");
+            }
+            document.body.style.overflow="";
+        }
+
+        if (universalLoginModal) {
+            universalLoginModal.style.display = 'flex';
+            universalLoginMessage.textContent = '';
+            universalLoginSubmitBtn.disabled = false;
+            universalLoginSubmitBtn.textContent = 'Login';
+            if(universalLoginMobile) universalLoginMobile.focus();
+        }
+    }
+
+    // Function to close the modal
+    function closeLoginModal() {
+        if (universalLoginModal) {
+            universalLoginModal.style.display = 'none';
+        }
+    }
+
+    // Main Logout Function
+    function handleLogout(e) {
+        e.preventDefault();
+        if (typeof V1_SESSION !== 'undefined') {
+            V1_SESSION.logout();
+        }
+        updateLoginUI();
+    }
+
+    // Function to update the login button UI based on session state
+    function updateLoginUI() {
+        const isLoggedIn = typeof V1_SESSION !== 'undefined' && V1_SESSION.isLoggedIn();
+        const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+        const mobileLoginBtnText = document.getElementById('mobileLoginBtnText');
+
+        if (isLoggedIn) {
+            // Logged-in state
+            if (loginBtnText) loginBtnText.textContent = 'Logout';
+            if(universalLoginBtn) {
+                universalLoginBtn.href = '#';
+                universalLoginBtn.removeEventListener('click', openLoginModal);
+                universalLoginBtn.addEventListener('click', handleLogout);
+            }
+
+            if(mobileLoginBtnText) mobileLoginBtnText.textContent = 'Logout';
+            if(mobileLoginBtn) {
+                mobileLoginBtn.removeEventListener('click', openLoginModal);
+                mobileLoginBtn.addEventListener('click', handleLogout);
+            }
+        } else {
+            // Logged-out state
+            if (loginBtnText) loginBtnText.textContent = 'Login';
+            if(universalLoginBtn) {
+                universalLoginBtn.href = '#';
+                universalLoginBtn.removeEventListener('click', handleLogout);
+                universalLoginBtn.addEventListener('click', openLoginModal);
+            }
+
+            if(mobileLoginBtnText) mobileLoginBtnText.textContent = 'Login';
+            if(mobileLoginBtn) {
+                mobileLoginBtn.removeEventListener('click', handleLogout);
+                mobileLoginBtn.addEventListener('click', openLoginModal);
+            }
+        }
+    }
+
+    // Event listener for the close button
+    if (universalLoginCloseBtn) {
+        universalLoginCloseBtn.addEventListener('click', closeLoginModal);
+    }
+
+    // Event listener to close the modal when clicking on the overlay
+    if (universalLoginModal) {
+        universalLoginModal.addEventListener('click', (e) => {
+            if (e.target === universalLoginModal) {
+                closeLoginModal();
+            }
+        });
+    }
+    
+    // Event listener for the form submission
+    if (universalLoginForm) {
+        universalLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const mobile = universalLoginMobile.value.trim();
+
+            if (!/^[6-9]\d{9}$/.test(mobile)) {
+                universalLoginMessage.textContent = 'Please enter a valid 10-digit mobile number.';
+                return;
+            }
+
+            universalLoginSubmitBtn.disabled = true;
+            universalLoginSubmitBtn.textContent = 'Checking...';
+            universalLoginMessage.textContent = '';
+
+            try {
+                const userExists = await isMobileRegistered(mobile);
+
+                if (userExists) {
+                    // User exists, create session and log them in
+                    createLoginSession(userExists);
+                    universalLoginMessage.textContent = 'Login successful!';
+                    setTimeout(() => {
+                        closeLoginModal();
+                        updateLoginUI(); // Refresh the UI
+                    }, 500);
+                } else {
+                    // User does not exist, show message and update register link
+                    universalLoginMessage.textContent = 'This mobile number is not registered.';
+                    universalLoginSubmitBtn.disabled = false;
+                    universalLoginSubmitBtn.textContent = 'Login'; // Revert button text
+                    
+                    const returnUrl = window.location.pathname;
+                    modalRegisterLink.href = `/registration.html?mobile=${mobile}&source=homepage-modal&return=${encodeURIComponent(returnUrl)}`;
+                }
+            } catch (error) {
+                console.error('Login Error:', error);
+                universalLoginMessage.textContent = 'An error occurred. Please try again.';
+                universalLoginSubmitBtn.disabled = false;
+                universalLoginSubmitBtn.textContent = 'Login';
+            }
+        });
+    }
+
+    // Initial check of login status on page load
+    updateLoginUI();
 });
 

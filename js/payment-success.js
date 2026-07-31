@@ -1,116 +1,99 @@
-/* =================================================================
-   AAROGYAM INDIA - PREMIUM PAYMENT SUCCESS EXPERIENCE (V1)
-================================================================= */
+/*=========================================
+AAROGYAM INDIA
+PAYMENT SUCCESS JS V1
+=========================================*/
 
-document.addEventListener("DOMContentLoaded", () => {
-    runSuccessAnimation();
-});
+document.addEventListener("DOMContentLoaded", loadSuccessPage);
 
-async function runSuccessAnimation() {
-    const step1 = document.getElementById('step1');
-    const step2 = document.getElementById('step2');
-    const step3 = document.getElementById('step3');
-    let redirectTimeout;
+async function loadSuccessPage() {
 
     try {
-        // --- Step 1: Show "Payment Successful" ---
-        step1.style.display = 'block';
 
-        // --- Fetch Data in Background ---
+        // =========================
+        // URL PARAMETERS
+        // Example:
+        // payment-success.html?id=BK001&amount=99&order=ORD12345
+        // =========================
+
         const params = new URLSearchParams(window.location.search);
-        const bookId = params.get("id") || localStorage.getItem("last_purchased_book_id") || "BK001";
-        const bookData = await getBookData(bookId);
 
-        await new Promise(resolve => setTimeout(resolve, 1200)); // Wait for initial message
+        const bookId = params.get("id") || "BK001";
 
-        // --- Step 2: Prepare and Show Unlock Animation ---
-        step1.style.display = 'none';
-        step2.style.display = 'block';
-        
-        const mainBookCover = document.getElementById('mainBookCover');
-        mainBookCover.src = bookData.cover;
+        const amount = params.get("amount") || "0";
 
-        // Inject demo images
-        const bookWrapper = document.querySelector('.book-unlock-wrapper');
-        bookData.previews.slice(0, 5).forEach((imgSrc, index) => {
-            const img = document.createElement('img');
-            img.src = imgSrc;
-            img.className = `demo-image pos-${index + 1}`;
-            bookWrapper.appendChild(img);
-        });
+        const orderId = params.get("order") || "Not Available";
 
-        // Trigger animations
-        step2.classList.add('animate');
+        // =========================
+        // LOAD BOOK DATA
+        // =========================
 
-        await new Promise(resolve => setTimeout(resolve, 4000)); // Wait for animations to complete
+        const response = await fetch("../data/books.json");
 
-        // --- Step 3: Show Final Content ---
-        step2.style.display = 'none';
-        step3.style.display = 'block';
+        const data = await response.json();
 
-        // Setup buttons
-        document.getElementById('readNowBtn').onclick = () => {
-            clearTimeout(redirectTimeout);
-            window.location.href = `reader.html?book=${bookId}`;
-        };
-        document.getElementById('downloadBtn').onclick = () => {
-            clearTimeout(redirectTimeout);
-            window.location.href = `download.html?book=${bookId}`;
-        };
-        document.getElementById('libraryBtn').onclick = () => {
-            clearTimeout(redirectTimeout);
-        };
+        const book = data.books.find(item => item.id === bookId);
 
-        // Start redirect timer
-        let timeLeft = 8;
-        const timerDisplay = document.getElementById('redirectTimer');
-        timerDisplay.textContent = `Redirecting to My Library in ${timeLeft}...`;
+        if (!book) {
 
-        const countdown = setInterval(() => {
-            timeLeft--;
-            if (timeLeft > 0) {
-                timerDisplay.textContent = `Redirecting to My Library in ${timeLeft}...`;
-            } else {
-                clearInterval(countdown);
-                window.location.href = 'my-library.html';
-            }
-        }, 1000);
+            alert("Book Not Found");
 
-        redirectTimeout = setTimeout(() => {
-            clearInterval(countdown);
-        }, timeLeft * 1000 + 500);
+            return;
 
-    } catch (error) {
-        console.error("Success page critical error:", error);
-        // Fallback to a simple success message if animations or data fetching fail
-        step1.style.display = 'block';
-        step2.style.display = 'none';
-        step3.style.display = 'none';
-        document.querySelector('.success-container').innerHTML = `
-            <h1>✅ Payment Successful</h1>
-            <p>Your book has been added to your library.</p>
-            <a href="my-library.html" class="btn btn-primary" style="margin-top: 20px;">Go To My Library</a>
-        `;
+        }
+
+        // =========================
+        // UPDATE PAGE
+        // =========================
+
+        document.getElementById("bookName").textContent =
+            book.name;
+
+        document.getElementById("amountPaid").textContent =
+            "₹" + amount;
+
+        document.getElementById("orderId").textContent =
+            orderId;
+
     }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert("Unable To Load Order Details");
+
+    }
+
 }
 
-/**
- * Fetches the master book list and finds the specific book by its ID.
- * @param {string} bookId The ID of the book to find.
- * @returns {object} The book data object.
- */
-async function getBookData(bookId) {
-    const response = await fetch("../data/books.json");
-    if (!response.ok) throw new Error("Could not load book data.");
-    const data = await response.json();
-    const book = data.books.find(b => b.id === bookId);
+/*=========================================
+GO TO LIBRARY
+=========================================*/
 
-    if (!book) throw new Error(`Book with ID ${bookId} not found.`);
+const libraryBtn = document.querySelector(".library-btn");
 
-    // Prepare a structured object for the UI
-    return {
-        id: book.id,
-        cover: book.cover || "/images/books/default-cover.webp",
-        previews: book.demoImages || []
-    };
+if (libraryBtn) {
+
+    libraryBtn.addEventListener("click", function () {
+
+        console.log("Opening My Library");
+
+    });
+
+}
+
+/*=========================================
+CONTINUE SHOPPING
+=========================================*/
+
+const shoppingBtn = document.querySelector(".shopping-btn");
+
+if (shoppingBtn) {
+
+    shoppingBtn.addEventListener("click", function () {
+
+        console.log("Continue Shopping");
+
+    });
+
 }

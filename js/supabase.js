@@ -41,7 +41,7 @@ async function isMobileRegistered(mobile) {
     try {
         const { data, error } = await db
             .from("profiles")
-            .select("id,mobile")
+            .select("*")
             .eq("mobile", mobile)
             .maybeSingle();
         if (error) throw error;

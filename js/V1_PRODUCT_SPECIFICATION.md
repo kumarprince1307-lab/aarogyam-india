@@ -259,3 +259,9 @@ Every engineering decision must answer one question:
 **"Will this make the experience easier for a real farmer using the Aarogyam India website?"**
 
 If the answer is No, do not include it in V1.
+
+---
+
+## Engineering Rule
+
+A module must never be marked as Complete until the entire user workflow has been tested end-to-end and all existing related functionality has been verified to still work.

@@ -7,6 +7,8 @@
 
 "use strict";
 
+let returnUrl = null; // This will hold the redirect URL after registration
+
 const form = document.getElementById("registrationForm");
 const fullName = document.getElementById("fullName");
 const mobile = document.getElementById("mobile");
@@ -21,13 +23,12 @@ document.addEventListener("DOMContentLoaded", initializePage);
 
 async function initializePage() {
     try {
-        if (typeof initializeAuthentication === "function") {
-            initializeAuthentication();
-        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const mobileParam = urlParams.get('mobile');
+        returnUrl = urlParams.get('return');
 
-        if (typeof isLoggedIn === "function" && isLoggedIn()) {
-            window.location.href = "ebooks/agriculture.html";
-            return;
+        if (mobileParam && mobile) {
+            mobile.value = mobileParam;
         }
 
         bindEvents();
@@ -45,6 +46,31 @@ function bindEvents() {
         backBtn.addEventListener("click", () => {
             history.back();
         });
+    }
+    if(mobile) {
+        mobile.addEventListener('blur', checkExistingUser);
+    }
+}
+
+async function checkExistingUser() {
+    const mobileNo = mobile.value.trim();
+    if (/^[6-9]\d{9}$/.test(mobileNo)) {
+        try {
+            const userExists = await isMobileRegistered(mobileNo);
+            if (userExists) {
+                showMessage("This mobile number is already registered. Please login.");
+                if(registerBtn) registerBtn.disabled = true;
+            } else {
+                // Only clear the message if it's the specific "already registered" message
+                if (formMessage.textContent === "This mobile number is already registered. Please login.") {
+                    clearMessage();
+                }
+                if(registerBtn) registerBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error("Error checking user:", error);
+            if(registerBtn) registerBtn.disabled = false; // Don't block registration on API error
+        }
     }
 }
 
@@ -125,12 +151,24 @@ async function registerAccount(event) {
     setLoading(true);
 
     try {
+        const mobileNo = mobile.value.trim();
+        // Final check to prevent duplicate registration
+        const userExists = await isMobileRegistered(mobileNo);
+        if (userExists) {
+            showMessage("This mobile number is already registered. Please login.");
+            setLoading(false);
+            return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const sourceParam = urlParams.get('source') || 'registration';
+
         const formData = {
             fullName: fullName.value.trim(),
-            mobile: mobile.value.trim(),
+            mobile: mobileNo,
             email: email.value.trim(),
             referralCode: referralMobile.value.trim(),
-            source: "registration"
+            source: sourceParam
         };
 
         // यह चेक करेगा कि registerUser फंक्शन उपलब्ध है या नहीं
@@ -178,7 +216,11 @@ function completeRegistration(result) {
         setLoading(false);
 
         setTimeout(() => {
-            window.location.href = "ebooks/my-library.html";
+            if (returnUrl) {
+                window.location.href = returnUrl;
+            } else {
+                window.location.href = "ebooks/my-library.html";
+            }
         }, 1000);
     }
     catch (error) {

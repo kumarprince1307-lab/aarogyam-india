@@ -78,6 +78,31 @@ function startDailyTimer() {
 }
 
 // 5. Supabase और LocalStorage से असली यूजर का डेटा और डायनेमिक प्रोग्रेस कैलकुलेशन
+function calculateProfileProgress() {
+    const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+    let score = 0;
+    const totalFields = 10;
+    
+    if (storedUser.full_name) score++;
+    if (storedUser.mobile) score++;
+    if (storedUser.email) score++;
+    if (storedUser.gender) score++;
+    if (storedUser.State || storedUser.state) score++;
+    if (storedUser.dob && String(storedUser.dob).trim()) score++;
+    if (storedUser.district || storedUser.city) score++;
+    if (storedUser.address) score++;
+    if (storedUser.occupation) score++;
+    if (storedUser.interest) score++;
+    
+    const percentage = Math.min(100, Math.round((score / totalFields) * 100));
+
+    const completionText = document.getElementById('profileCompletionText');
+    const completionBar = document.getElementById('profileCompletionBar');
+
+    if(completionText) completionText.textContent = `${percentage}%`;
+    if(completionBar) completionBar.style.width = `${percentage}%`;
+}
+
 function initUserData() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     
@@ -112,6 +137,8 @@ function initUserData() {
     if (document.getElementById('leadAddress')) document.getElementById('leadAddress').value = userAddress;
     if (document.getElementById('leadOccupation')) document.getElementById('leadOccupation').value = userOccupation;
     if (document.getElementById('leadInterest')) document.getElementById('leadInterest').value = userInterest;
+
+    calculateProfileProgress();
 }
 
 // 6. स्मार्ट चेक: यदि यूजर लॉग-इन नहीं है या प्रोफाइल पहले से भरी हुई है, तो ऑटो-पॉपअप नहीं खुलेगा
@@ -161,14 +188,31 @@ async function submitLeadForm(event) {
     event.preventDefault();
     const fullName = document.getElementById('leadName').value;
     const mobile = document.getElementById('leadPhone').value;
-    const email = document.getElementById('leadEmail') ? document.getElementById('leadEmail').value : '';
-    const gender = document.getElementById('leadGender') ? document.getElementById('leadGender').value : '';
-    const state = document.getElementById('leadState') ? document.getElementById('leadState').value : '';
-    const dob = document.getElementById('leadDob') ? document.getElementById('leadDob').value : '';
-    const city = document.getElementById('leadCity') ? document.getElementById('leadCity').value : '';
-    const address = document.getElementById('leadAddress') ? document.getElementById('leadAddress').value : '';
-    const occupation = document.getElementById('leadOccupation') ? document.getElementById('leadOccupation').value : '';
-    const interest = document.getElementById('leadInterest') ? document.getElementById('leadInterest').value : '';
+    
+    // वैकल्पिक फ़ील्ड्स: यदि खाली हों तो null भेजें, वरना उनकी वैल्यू लें
+    const emailElem = document.getElementById('leadEmail');
+    const email = emailElem && emailElem.value.trim() !== '' ? emailElem.value.trim() : null;
+
+    const genderElem = document.getElementById('leadGender');
+    const gender = genderElem && genderElem.value.trim() !== '' ? genderElem.value.trim() : null;
+
+    const stateElem = document.getElementById('leadState');
+    const state = stateElem && stateElem.value.trim() !== '' ? stateElem.value.trim() : null;
+
+    const dobElem = document.getElementById('leadDob');
+    const dob = dobElem && dobElem.value.trim() !== '' ? dobElem.value.trim() : null; // <--- यहाँ सुधार किया गया है
+
+    const cityElem = document.getElementById('leadCity');
+    const city = cityElem && cityElem.value.trim() !== '' ? cityElem.value.trim() : null;
+
+    const addressElem = document.getElementById('leadAddress');
+    const address = addressElem && addressElem.value.trim() !== '' ? addressElem.value.trim() : null;
+
+    const occupationElem = document.getElementById('leadOccupation');
+    const occupation = occupationElem && occupationElem.value.trim() !== '' ? occupationElem.value.trim() : null;
+
+    const interestElem = document.getElementById('leadInterest');
+    const interest = interestElem && interestElem.value.trim() !== '' ? interestElem.value.trim() : null;
 
     if (!fullName || !mobile) {
         alert('कृपया नाम और मोबाइल नंबर दर्ज करें।');
@@ -185,13 +229,12 @@ async function submitLeadForm(event) {
         full_name: fullName,
         email: email,
         gender: gender,
-        dob: dob,
-        State: state, // Capital 'S' as inferred from other files
+        dob: dob, // अब यदि यह खाली होगा तो database में null जाएगा और एरर नहीं आएगी
+        State: state, 
         district: city,
         address: address,
         occupation: occupation,
         interest: interest,
-        // mobile is not updated as it's the primary identifier
     };
 
     try {
@@ -203,15 +246,14 @@ async function submitLeadForm(event) {
         const result = await updateProfile(currentUser.id, profileData);
 
         if (result.success) {
-            // Update local storage only after successful DB update
             const updatedUser = { ...currentUser, ...result.profile };
             localStorage.setItem('AI_USER', JSON.stringify(updatedUser));
-            ProfileStorage.save(updatedUser); // Also update the dedicated profile storage
+            ProfileStorage.save(updatedUser);
 
             alert('बधाई हो! आपकी प्रोफाइल जानकारी Aarogyam India में सफलतापूर्वक सहेज ली गई है।');
             closeLeadModal();
-            initUserData(); // Refresh the UI with new data
-            window.location.reload(); // Reload to ensure all components have the latest data
+            initUserData();
+            window.location.reload();
         } else {
             alert('प्रोफाइल अपडेट करने में त्रुटि: ' + (result.message || 'अज्ञात एरर'));
         }
