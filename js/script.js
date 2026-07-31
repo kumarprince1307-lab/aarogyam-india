@@ -652,5 +652,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial check of login status on page load
     updateLoginUI();
+
+    // --- NEW MOBILE MENU LOGIC ---
+    const mobileUserCard = document.getElementById('mobile-user-card');
+    const mobileLoginPrompt = document.getElementById('mobile-login-prompt');
+    const mobileUserName = document.getElementById('mobile-user-name');
+    const mobileUserMobile = document.getElementById('mobile-user-mobile');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+    const mobileLoginBtn = document.getElementById('mobileLoginBtn'); // The one in the prompt
+    
+    function updateMobileMenuUI() {
+        if (typeof V1_SESSION === 'undefined') return;
+        const isLoggedIn = V1_SESSION.isLoggedIn();
+
+        if (isLoggedIn) {
+            const user = V1_SESSION.getCurrentUser();
+            if (user) {
+                mobileUserName.textContent = user.full_name || 'Esteemed User';
+                mobileUserMobile.textContent = user.mobile || '';
+            }
+            mobileUserCard.style.display = 'flex';
+            mobileLoginPrompt.style.display = 'none';
+
+            mobileLogoutBtn.addEventListener('click', handleLogout);
+
+        } else {
+            mobileUserCard.style.display = 'none';
+            mobileLoginPrompt.style.display = 'block';
+            if (mobileLoginBtn) {
+                 mobileLoginBtn.addEventListener('click', (e) => {
+                    openLoginModal(e);
+                    // Also close the mobile menu if it's open
+                    const mobileMenu = document.getElementById("mobileMenu");
+                    if (mobileMenu && mobileMenu.classList.contains("active")) {
+                        mobileMenu.classList.remove("active");
+                        document.body.style.overflow = "auto";
+                    }
+                });
+            }
+        }
+    }
+
+    // Dropdown functionality for mobile menu
+    const dropdownToggles = document.querySelectorAll('.mobile-dropdown .dropdown-toggle');
+    dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const parent = toggle.parentElement;
+            parent.classList.toggle('active');
+        });
+    });
+
+    updateMobileMenuUI();
 });
 

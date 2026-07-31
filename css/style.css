@@ -2015,6 +2015,87 @@ color: #fff;
 
 }
 /* ==========================================================
+   NEW MOBILE MENU STYLES (V1.1)
+========================================================== */
+.mobile-user-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #ffffff;
+    padding: 15px;
+    margin: 15px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+.mobile-user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+}
+.mobile-user-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: #1e293b;
+}
+.mobile-user-info p {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+}
+.mobile-user-info span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--secondary);
+}
+.mobile-logout-btn {
+    margin-left: auto;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #ef4444;
+    background: #fee2e2;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+.mobile-login-prompt {
+    padding: 15px;
+}
+.login-prompt-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    border-radius: 10px;
+    font-weight: 600;
+}
+.login-prompt-btn img {
+    width: 20px;
+    filter: brightness(0) invert(1);
+}
+.mobile-dropdown .mobile-dropdown-menu {
+    display: none;
+    padding-left: 20px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 8px;
+    margin-top: 8px;
+}
+.mobile-dropdown.active .mobile-dropdown-menu {
+    display: block;
+}
+.mobile-dropdown-menu li {
+    border-color: rgba(0,0,0,0.05);
+}
+.mobile-dropdown-menu li a {
+    padding: 12px 0;
+    font-size: 0.9rem;
+}
+/* ==========================================================
    CALL TO ACTION
 ========================================================== */
 
