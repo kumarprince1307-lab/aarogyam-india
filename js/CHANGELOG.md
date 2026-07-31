@@ -4,3 +4,4 @@
 
 - Initial project setup and core functionalities.
 - Ebook reader, download, and payment flows implemented.
+- Finalized and locked the V1 Product Specification.

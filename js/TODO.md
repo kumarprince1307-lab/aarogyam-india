@@ -1,43 +1,46 @@
 # Aarogyam India V1 TODO
 
-## High Priority
-
-☐ Complete Website UI Audit
-☐ Font Consistency Check
-☐ Navigation Flow Review
-☑ Reader V1 Locked
-☐ Add My Library Navigation on Home
-☐ End-to-End Flow Testing
-☐ Mobile Testing
-☐ PWA Finalization
-☐ Simple Admin Panel V1
-☐ Launch Checklist
-☐ V1 Lock
+*This document is now aligned with the official V1_PRODUCT_SPECIFICATION.md.*
 
 ---
 
-## V1 Scope
+## V1 Launch Phases
 
-✔ eBook Store
-✔ Book Landing Page
-✔ Registration
-✔ Checkout
-✔ Payment
-✔ Payment Success
-✔ My Library
-✔ Reader
-✔ Download
-☐ PWA
+### Phase 1: Authentication
+☐ Universal Login System
+☐ Common Session
+☐ Protected Routes
+
+### Phase 2: UI/UX Polish
+☐ Complete UI Audit
+☐ Add My Library Navigation
+☐ Font Review
+☐ Mobile UI Review
+
+### Phase 3: PWA
+☐ PWA Conversion
+☐ Install Popup
+☐ Install Tracking
+☐ Manifest & Service Worker
+
+### Phase 4: Admin Panel
 ☐ Simple Admin Panel
+☐ User Report
+☐ Purchase Report
+☐ Download Report
+☐ Visitor Source Report
 
----
+### Phase 5: Bug Squashing
+☐ Purchase Modal Bugs
+☐ Download Modal Bugs
+☐ Session Bugs
+☐ Access Bugs
 
-## Deferred to V2
+### Phase 6: Final Testing
+☐ End-to-End Testing
 
-- Wallet
-- Reward System
-- Notifications
-- Advanced Admin
-- Premium Reader
-- Text Layer
-- AI Features
+### Phase 7: Launch Prep
+☐ **V1 Lock:** Final code freeze for V1 launch.
+
+### Phase 8: Go Live
+☐ Launch
