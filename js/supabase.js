@@ -119,8 +119,7 @@ async function registerUser(formData) {
     try {
         const existingUser = await isMobileRegistered(formData.mobile);
         if (existingUser) {
-            createLoginSession(existingUser);
-            return { success: true, type: "existing", profile: existingUser };
+            return { success: false, message: "This mobile number is already registered." };
         }
 
         if (formData.email) {

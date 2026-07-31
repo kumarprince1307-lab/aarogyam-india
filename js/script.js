@@ -628,11 +628,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (userExists) {
                     // User exists, create session and log them in
                     createLoginSession(userExists);
-                    universalLoginMessage.textContent = 'Login successful!';
+                    universalLoginMessage.textContent = 'Login successful! Reloading...';
                     setTimeout(() => {
-                        closeLoginModal();
-                        updateLoginUI(); // Refresh the UI
-                    }, 500);
+                        window.location.reload();
+                    }, 800);
                 } else {
                     // User does not exist, show message and update register link
                     universalLoginMessage.textContent = 'This mobile number is not registered.';
