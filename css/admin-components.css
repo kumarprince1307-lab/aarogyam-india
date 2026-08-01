@@ -13,8 +13,8 @@
 .admin-sidebar .menu-link:hover, .admin-sidebar .menu-toggle:hover { background: rgba(255,255,255,0.02); color: var(--admin-text); }
 .admin-sidebar .menu-link.active { background: linear-gradient(90deg, rgba(79,70,229,0.12), rgba(79,70,229,0.08)); color: var(--admin-primary); box-shadow: inset 4px 0 0 rgba(79,70,229,0.12); }
 .admin-sidebar .menu-icon { width: 34px; display: inline-flex; justify-content: center; align-items:center; color: var(--admin-primary); }
-.admin-sidebar .menu-children { list-style: none; padding-left: 6px; margin: 6px 0 0 0; display: none; }
-.admin-sidebar .menu-children.open { display: block; }
+.admin-sidebar .menu-children { list-style: none; padding-left: 6px; margin: 6px 0 0 0; max-height: 0; overflow: hidden; transition: max-height 220ms ease; }
+.admin-sidebar .menu-children.open { max-height: 600px; }
 .admin-sidebar .menu-caret { margin-left: auto; transform: rotate(0deg); transition: transform 0.2s ease; opacity: 0.6; }
 .admin-sidebar .menu-toggle.open .menu-caret { transform: rotate(90deg); }
 .admin-sidebar .admin-sidebar-footer { margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.03); }
@@ -115,3 +115,10 @@ body.admin-sidebar-collapsed .admin-sidebar { transform: translateX(0); }
   .admin-sidebar { padding: 16px; }
   .admin-header-row { flex-direction: column; align-items: flex-start; }
 }
+
+/* profile menu */
+.admin-profile { position: relative; }
+.admin-profile-menu { position: absolute; right: 0; top: 56px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.02); border-radius: 10px; padding: 8px 12px; display: none; min-width: 160px; box-shadow: 0 12px 40px rgba(2,6,23,0.6); }
+.admin-profile-menu.open { display:block; }
+.admin-profile-menu a { display:block; padding:8px 10px; color:var(--admin-text); text-decoration:none; border-radius:6px; }
+.admin-profile-menu a:hover { background: rgba(255,255,255,0.02); }
