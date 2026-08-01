@@ -2088,15 +2088,19 @@ color: #fff;
 /* ==========================================================
    NEW MOBILE MENU STYLES (V1.1)
 ========================================================== */
-.mobile-user-card {
+.mobile-menu .mobile-user-card {
+    padding: 20px; /* Use 20px padding from the desired glassmorphism version */
     display: flex;
     align-items: center;
     gap: 15px;
-    background: #ffffff;
-    padding: 15px;
-    margin: 15px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.1), rgba(255, 255, 255, 0.1), rgba(19, 138, 78, 0.1));
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 16px; /* Slightly rounded corners */
+    margin: 15px; /* Keep margin consistent */
+    overflow: hidden; /* Ensure content respects border-radius and backdrop-filter */
 }
 .mobile-user-avatar {
     width: 50px;
@@ -2111,10 +2115,13 @@ color: #fff;
     margin: 0 0 4px;
     color: #1e293b;
 }
-.mobile-user-info p {
-    font-size: 0.85rem;
-    color: #64748b;
+.mobile-menu .mobile-user-info p {
+    font-size: 0.95rem; /* Slightly larger for readability */
+    color: var(--black); /* Better contrast */
     margin: 0;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden; /* Hide overflowing content */
+    text-overflow: ellipsis; /* Add ellipsis for truncated text */
 }
 .mobile-user-info span {
     font-size: 0.75rem;

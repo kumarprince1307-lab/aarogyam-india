@@ -567,8 +567,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const isLoggedIn = typeof V1_SESSION !== 'undefined' && V1_SESSION.isLoggedIn();
         const mobileLoginBtn = document.getElementById('mobileLoginBtn');
         const mobileLoginBtnText = document.getElementById('mobileLoginBtnText');
+        const headerUserInfo = document.getElementById('header-user-info');
+        const headerUserName = document.getElementById('header-user-name');
+        const headerUserMobile = document.getElementById('header-user-mobile');
 
         if (isLoggedIn) {
+            const user = V1_SESSION.getCurrentUser();
+            if (user && headerUserInfo) {
+                if(headerUserName) headerUserName.textContent = user.full_name || 'Aarogyam User';
+                if(headerUserMobile) headerUserMobile.textContent = user.mobile || '';
+                headerUserInfo.style.display = 'block';
+            }
             // Logged-in state
             if (loginBtnText) loginBtnText.textContent = 'Logout';
             if(universalLoginBtn) {
@@ -583,6 +592,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 mobileLoginBtn.addEventListener('click', handleLogout);
             }
         } else {
+            if (headerUserInfo) {
+                headerUserInfo.style.display = 'none';
+            }
             // Logged-out state
             if (loginBtnText) loginBtnText.textContent = 'Login';
             if(universalLoginBtn) {

@@ -147,6 +147,10 @@ HEADER START
                 <img src="images/logo/logo.png" alt="Aarogyam India Logo">
             </a>
         </div>
+        <div id="header-user-info" style="display: none;">
+            <h3 id="header-user-name"></h3>
+            <p id="header-user-mobile"></p>
+        </div>
         <div class="header-right">
             <nav class="navbar">
                 <ul class="nav-menu">
@@ -205,11 +209,11 @@ MOBILE NAVIGATION START
         <button id="closeMenu">
             <img src="images/icons/close.png" alt="Close">
         </button>
-        <img src="images/logo/favicon.png" alt="User" class="mobile-user-avatar">
+        <img src="/images/logo/fevicon.png" alt="User" class="mobile-user-avatar">
         <div class="mobile-user-info">
             <h3 id="mobile-user-name">Guest User</h3>
             <p id="mobile-user-meta">
-                <span id="mobile-member-status">Premium Member</span> • <span id="mobile-user-mobile"></span>
+                <span id="mobile-member-status"</span><span id="mobile-user-mobile"></span>
             </p>
         </div>
         <a href="#" id="mobile-logout-btn" class="mobile-logout-btn">Logout</a>
@@ -228,6 +232,21 @@ MOBILE NAVIGATION START
 
     <ul class="mobile-nav">
         <li><a href="index.html">Home</a></li>
+        <li><a href="ebooks/my-library.html">My Library</a></li>
+        <li><a href="purchases.html">My Purchases & Invoices</a></li>
+        <li class="mobile-dropdown">
+            <a href="#" class="dropdown-toggle">Categories ▼</a>
+            <ul class="mobile-dropdown-menu">
+                <li><a href="ebooks/agriculture.html">Agriculture</a></li>
+                <li><a href="pages/health.html">Health</a></li>
+                <li><a href="categories/business.html">Business</a></li>
+                <li><a href="categories/netsurf.html">NetSurf</a></li>
+                <li><a href="categories/education.html">Education</a></li>
+                <li><a href="categories/digital-ai.html">Digital AI</a></li>
+            </ul>
+        </li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
         <li class="mobile-dropdown">
             <a href="#" class="dropdown-toggle">Services ▼</a>
             <ul class="mobile-dropdown-menu">
@@ -247,9 +266,15 @@ MOBILE NAVIGATION START
                 <li><a href="pages/self-help.html">Self Help</a></li>
             </ul>
         </li>
-        <li><a href="ebooks/my-library.html">My Library</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li class="mobile-dropdown">
+            <a href="#" class="dropdown-toggle">Support ▼</a>
+            <ul class="mobile-dropdown-menu">
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="terms-conditions.html">Terms & Conditions</a></li>
+                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                <li><a href="shipping-policy.html">Shipping & Return Policy</a></li>
+            </ul>
+        </li>
     </ul>
 </div>
 
