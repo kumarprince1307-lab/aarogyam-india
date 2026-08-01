@@ -38,13 +38,14 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
   const c = document.getElementById(containerId);
   if (!c) return;
 
-  const currentPath = location.pathname.split('/').pop();
+  const currentHash = (location.hash || '#dashboard').replace('#','');
 
   c.innerHTML = `
-    <aside class="admin-sidebar admin-card" aria-hidden="false">
+    <aside class="admin-sidebar" aria-hidden="false">
       <div class="admin-sidebar-top">
         <div class="admin-logo">
-          <strong>Aarogyam Admin</strong>
+          <span class="logo-mark" aria-hidden="true"></span>
+          <strong>Aarogyam</strong>
         </div>
         <button id="admin-sidebar-collapse" class="admin-button" aria-label="Toggle sidebar">☰</button>
       </div>
@@ -54,7 +55,7 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
         </ul>
       </nav>
       <div class="admin-sidebar-footer">
-        <small class="admin-muted">Admin Panel V1 (UI)</small>
+        <small class="admin-muted">Admin Panel V1 • UI Only</small>
       </div>
     </aside>
   `;
@@ -75,11 +76,32 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
     document.body.classList.toggle('admin-sidebar-collapsed');
   });
 
-  // Highlight current link if matches
-  c.querySelectorAll('a').forEach(a => {
-    const href = a.getAttribute('href') || '';
-    if (href.split('/').pop() === currentPath) a.classList.add('active');
-  });
+  // Update active link based on hash-driven route
+  function updateActive(route) {
+    c.querySelectorAll('.menu-link').forEach(a => a.classList.remove('active'));
+    c.querySelectorAll('.menu-children li a').forEach(a => a.classList.remove('active'));
+
+    // top-level matches
+    const top = c.querySelector(`.menu-link[data-route="${route}"]`);
+    if (top) top.classList.add('active');
+    // child matches
+    const child = c.querySelector(`.menu-children a[data-route="${route}"]`);
+    if (child) {
+      child.classList.add('active');
+      // open parent
+      const parent = child.closest('.menu-children');
+      if (parent) parent.classList.add('open');
+      const toggle = parent.previousElementSibling;
+      if (toggle) toggle.classList.add('open');
+    }
+  }
+
+  // initial active
+  updateActive(currentHash || 'dashboard');
+
+  // listen for route changes
+  document.addEventListener('admin:route-changed', (e) => updateActive(e.detail.route));
+
 }
 
 // TODO: add permissions-aware items and icons in Phase-2

@@ -29,6 +29,8 @@ export async function navigateTo(routeName) {
  if (loader) loader.innerHTML = '<div class="admin-loading">Loading ' + name + '…</div>';
 
  const route = ROUTES[name];
+
+ const route = ROUTES[name];
  if (!route) {
    if (loader) loader.innerHTML = '<div class="admin-error"><strong>Page not found.</strong></div>';
    return;
@@ -36,6 +38,8 @@ export async function navigateTo(routeName) {
 
  try {
    await route();
+   // notify other components of route change
+   document.dispatchEvent(new CustomEvent('admin:route-changed', { detail: { route: name } }));
  } catch (err) {
    console.error('navigateTo route error', err);
    if (loader) loader.innerHTML = '<div class="admin-error"><strong>Unable to load page.</strong></div>';
