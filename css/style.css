@@ -2084,12 +2084,11 @@ color: #fff;
 
 }
 
-}
 /* ==========================================================
-   NEW MOBILE MENU STYLES (V1.1)
+   NEW MOBILE MENU STYLES (V1.1) - COMPLETE FINAL CODE
 ========================================================== */
 .mobile-menu .mobile-user-card {
-    padding: 20px; /* Use 20px padding from the desired glassmorphism version */
+    padding: 20px;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -2098,9 +2097,9 @@ color: #fff;
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-    border-radius: 16px; /* Slightly rounded corners */
-    margin: 15px; /* Keep margin consistent */
-    overflow: hidden; /* Ensure content respects border-radius and backdrop-filter */
+    border-radius: 16px;
+    margin: 15px;
+    overflow: hidden;
 }
 .mobile-user-avatar {
     width: 50px;
@@ -2115,14 +2114,16 @@ color: #fff;
     margin: 0 0 4px;
     color: #1e293b;
 }
+
 .mobile-menu .mobile-user-info p {
-    font-size: 0.95rem; /* Slightly larger for readability */
-    color: var(--black); /* Better contrast */
+    font-size: 0.9rem; 
+    color: #1e293b; 
     margin: 0;
-    white-space: nowrap; /* Prevent wrapping */
-    overflow: hidden; /* Hide overflowing content */
-    text-overflow: ellipsis; /* Add ellipsis for truncated text */
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
 }
+
 .mobile-user-info span {
     font-size: 0.75rem;
     font-weight: 700;
@@ -2176,7 +2177,7 @@ color: #fff;
 
 /* Final Refinements (V1.2) */
 .mobile-menu-header {
-    justify-content: flex-end; /* Push close button to the right */
+    justify-content: flex-end;
 }
 
 .mobile-dropdown > .dropdown-toggle {
@@ -2191,6 +2192,23 @@ color: #fff;
     box-shadow: 0 3px 8px rgba(0,0,0,0.08);
     color: var(--primary);
     transform: scale(1.02);
+}
+
+/* ==========================================================
+   SUPABASE DYNAMIC MOBILE NUMBER VISIBILITY FIX
+========================================================== */
+#mobile-user-meta,
+#mobile-user-mobile,
+#mobile-member-status {
+    font-size: 0.85rem !important;
+    color: #0f172a !important;        /* गहरा डार्क कलर ताकि साफ़ दिखे */
+    font-weight: 700 !important;      /* बोल्ड */
+    opacity: 1 !important;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+#mobile-user-mobile {
+    margin-left: 4px;
 }
 /* ==========================================================
    CALL TO ACTION
