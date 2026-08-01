@@ -78,6 +78,10 @@ button, select, input { font: inherit; }
   .admin-page-heading { padding: 12px; }
   .admin-section { padding: 12px; }
   .admin-auth-card { padding: 24px; }
+  .admin-header { height: 64px; padding: 8px 12px; }
+  .admin-header-center { display:none; }
+  .admin-main { padding-top: 84px; }
+  :root { --sidebar-width: 0px; }
 }
 
 .admin-page-heading { padding: 8px 24px 0; }
