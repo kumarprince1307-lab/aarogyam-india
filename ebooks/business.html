@@ -1,13 +1,492 @@
+
+
+<!--
+=========================================================
+AAROGYAM INDIA WEBSITE
+INDEX.HTML
+VERSION : 2.0
+PART : 1 / 12
+STATUS : AI BIBLE V2 LOCKED
+=========================================================
+-->
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Business Books</title>
+
+    <!-- =========================================
+    BASIC META
+    ========================================== -->
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <!-- =========================================
+    SEO
+    ========================================== -->
+
+   <title>
+Aarogyam India | One Platform • Multiple Missions
+</title>
+    <link rel="icon" type="image/png" href="images/logo/favicon.png">
+
+    <meta name="description"
+        content="Aarogyam India Official Website. Agriculture eBooks, Crop Doctor, Weather, Mandi Bhav, Digital Training, Health Knowledge and Premium Learning Platform.">
+
+    <meta name="keywords"
+        content="Agriculture, Farming, Crop Doctor, eBook, Digital Training, Weather, Mandi Bhav, Aarogyam India">
+
+    <meta name="author"
+        content="Aarogyam India">
+
+    <meta name="robots"
+        content="index,follow">
+
+    <!-- =========================================
+    OPEN GRAPH
+    ========================================== -->
+
+    <meta property="og:title"
+        content="Aarogyam India">
+
+    <meta property="og:description"
+        content="Premium Digital Agriculture Platform">
+
+    <meta property="og:type"
+        content="website">
+
+    <meta property="og:image"
+        content="images/logo/logo.png">
+
+    <!-- =========================================
+    FAVICON
+    ========================================== -->
+
+    <link rel="icon"
+        type="image/png"
+        href="images/logo/favicon.png">
+
+    <!-- =========================================
+    GOOGLE FONT
+    ========================================== -->
+
+    <link rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- =========================================
+    CSS
+    ========================================== -->
+
+    <link rel="stylesheet"
+        href="css/style.css">
+
 </head>
+
 <body>
-  <h1>Business Books</h1>
-  <p>This compatibility page is available for the ebook navigation links.</p>
-  <p><a href="./ebook.html">Back to eBooks</a></p>
+
+<!-- =========================================
+TOP BAR START
+========================================== -->
+
+<div class="top-bar">
+
+    <div class="container">
+
+        <div class="top-left">
+
+            🇮🇳 Welcome to Aarogyam India
+
+        </div>
+
+        <div class="top-right">
+
+            <a href="tel:+917974422572">
+                📞 +91 79744 22572
+            </a>
+
+            <a href="mailto:info@aarogyamindia.in">
+                ✉ info@aarogyamindia.in
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================
+TOP BAR END
+========================================== -->
+
+<!-- =========================================
+HEADER START
+========================================== -->
+
+<header class="header" id="header">
+    <div class="container">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logo/logo.png" alt="Aarogyam India Logo">
+            </a>
+        </div>
+        <div id="header-user-info" style="display: none;">
+            <h3 id="header-user-name"></h3>
+            <p id="header-user-mobile"></p>
+        </div>
+        <div class="header-right">
+            <nav class="navbar">
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li class="dropdown">
+                        <a href="#">Services</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="ebooks/agriculture.html">Agriculture</a></li>
+                            <li><a href="crop-doctor.html">Crop Doctor</a></li>
+                            <li><a href="weather.html">Weather</a></li>
+                            <li><a href="mandi.html">Mandi Bhav</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#">eBooks</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="ebooks/ebook.html">All eBooks</a></li>
+                            <li><a href="ebooks/agriculture.html">Agriculture Books</a></li>
+                            <li><a href="pages/health.html">Health Books</a></li>
+                            <li><a href="pages/digital-training.html">Digital Training</a></li>
+                            <li><a href="pages/self-help.html">Self Help</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="ebooks/my-library.html">My Library</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button class="search-btn" id="searchBtn" aria-label="Search">
+                    <img src="images/icons/search.png" alt="Search">
+                </button>
+                <a href="#" id="universalLoginBtn" class="login-btn">
+                    <img src="images/icons/login.png" alt="Login">
+                    <span id="loginBtnText">Login</span>
+                </a>
+                <a href="ebooks/checkout.html" class="cart-btn">
+                    <img src="images/icons/cart.png" alt="Cart">
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <button class="menu-btn" id="menuBtn" aria-label="Menu">
+                    <img src="images/icons/menu.png" alt="Menu">
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- =========================================
+MOBILE NAVIGATION START
+========================================== -->
+<div class="mobile-menu" id="mobileMenu">
+    
+    <!-- User Profile Card (Visible when logged in) -->
+    <div id="mobile-user-card" class="mobile-user-card" style="display: none;">
+        <button id="closeMenu">
+            <img src="images/icons/close.png" alt="Close">
+        </button>
+        <img src="/images/logo/fevicon.png" alt="User" class="mobile-user-avatar">
+        <div class="mobile-user-info">
+            <h3 id="mobile-user-name">Guest User</h3>
+            <p id="mobile-user-meta">
+                <span id="mobile-member-status"</span><span id="mobile-user-mobile"></span>
+            </p>
+        </div>
+        <a href="#" id="mobile-logout-btn" class="mobile-logout-btn">Logout</a>
+    </div>
+
+    <!-- Login Prompt (Visible when logged out) -->
+    <div id="mobile-login-prompt" class="mobile-login-prompt">
+        <button class="close-btn-alt" id="altCloseMenu">
+            <img src="images/icons/close.png" alt="Close">
+        </button>
+        <a href="#" id="mobileLoginBtn" class="login-prompt-btn">
+            <img src="images/icons/login.png" alt="Login">
+            <span id="mobileLoginBtnText">Login / Register</span>
+        </a>
+    </div>
+
+    <ul class="mobile-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="ebooks/my-library.html">My Library</a></li>
+        <li><a href="purchases.html">My Purchases & Invoices</a></li>
+        <li class="mobile-dropdown">
+            <a href="#" class="dropdown-toggle">Categories ▼</a>
+            <ul class="mobile-dropdown-menu">
+                <li><a href="ebooks/agriculture.html">Agriculture</a></li>
+                <li><a href="pages/health.html">Health</a></li>
+                <li><a href="categories/business.html">Business</a></li>
+                <li><a href="categories/netsurf.html">NetSurf</a></li>
+                <li><a href="categories/education.html">Education</a></li>
+                <li><a href="categories/digital-ai.html">Digital AI</a></li>
+            </ul>
+        </li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li class="mobile-dropdown">
+            <a href="#" class="dropdown-toggle">Services ▼</a>
+            <ul class="mobile-dropdown-menu">
+                <li><a href="ebooks/agriculture.html">Agriculture</a></li>
+                <li><a href="crop-doctor.html">Crop Doctor</a></li>
+                <li><a href="weather.html">Weather</a></li>
+                <li><a href="mandi.html">Mandi Bhav</a></li>
+            </ul>
+        </li>
+        <li class="mobile-dropdown">
+            <a href="#" class="dropdown-toggle">eBooks ▼</a>
+            <ul class="mobile-dropdown-menu">
+                <li><a href="ebooks/ebook.html">All eBooks</a></li>
+                <li><a href="ebooks/agriculture.html">Agriculture Books</a></li>
+                <li><a href="pages/health.html">Health Books</a></li>
+                <li><a href="pages/digital-training.html">Digital Training</a></li>
+                <li><a href="pages/self-help.html">Self Help</a></li>
+            </ul>
+        </li>
+        <li class="mobile-dropdown">
+            <a href="#" class="dropdown-toggle">Support ▼</a>
+            <ul class="mobile-dropdown-menu">
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="terms-conditions.html">Terms & Conditions</a></li>
+                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                <li><a href="shipping-policy.html">Shipping & Return Policy</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<!-- =========================================
+MOBILE NAVIGATION END
+========================================== -->
+<!-- =========================================
+FOOTER START
+========================================== -->
+
+<footer class="footer">
+
+    <div class="container">
+
+        <div class="footer-grid">
+
+            <!-- Company -->
+
+            <div class="footer-column">
+
+                <img
+                    src="images/logo/logo.png"
+                    alt="Aarogyam India Logo"
+                    class="footer-logo">
+
+                <p>
+
+                    Aarogyam India is a premium digital
+                    agriculture knowledge platform helping
+                    farmers with practical learning,
+                    eBooks and expert guidance.
+
+                </p>
+
+            </div>
+
+            <!-- Quick Links -->
+
+            <div class="footer-column">
+
+                <h3>
+
+                    Quick Links
+
+                </h3>
+
+                <ul>
+
+                    <li><a href="index.html">Home</a></li>
+
+                    <li><a href="about.html">About</a></li>
+
+                    <li><a href="blog.html">Blog</a></li>
+
+                    <li><a href="contact.html">Contact</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Services -->
+
+            <div class="footer-column">
+
+                <h3>
+
+                    Services
+
+                </h3>
+
+                <ul>
+
+                    <li><a href="crop-doctor.html">Crop Doctor</a></li>
+
+                    <li><a href="weather.html">Weather</a></li>
+
+                    <li><a href="mandi.html">Mandi Bhav</a></li>
+
+                    <li><a href="ebooks/ebook.html">eBooks</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Contact -->
+
+            <div class="footer-column">
+
+                <h3>
+
+                    Contact
+
+                </h3>
+
+                <p>
+
+                    📍 Rewa, Madhya Pradesh
+
+                </p>
+
+                <p>
+
+                    📞 +91 79744 22572
+
+                </p>
+
+                <p>
+
+                    ✉ info@aarogyamindia.in
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- =========================================
+        SOCIAL MEDIA
+        ========================================== -->
+
+        <div class="footer-social">
+
+            <a href="#">
+                <img src="images/icons/facebook.png"
+                     alt="Facebook">
+            </a>
+
+            <a href="#">
+                <img src="images/icons/instagram.png"
+                     alt="Instagram">
+            </a>
+
+            <a href="#">
+                <img src="images/icons/youtube.png"
+                     alt="YouTube">
+            </a>
+
+            <a href="#">
+                <img src="images/icons/telegram.png"
+                     alt="Telegram">
+            </a>
+
+            <a href="#">
+                <img src="images/icons/whatsapp.png"
+                     alt="WhatsApp">
+            </a>
+
+        </div>
+
+        <!-- =========================================
+        COPYRIGHT
+        ========================================== -->
+
+        <div class="copyright">
+
+            <p>
+
+                © 2026 Aarogyam India.
+                All Rights Reserved.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<!-- =========================================
+FOOTER END
+========================================== -->
+
+<!-- =========================================
+WHATSAPP FLOATING BUTTON
+========================================== -->
+
+<a
+    href="https://wa.me/917974422572"
+    class="whatsapp-float"
+    target="_blank"
+    aria-label="WhatsApp">
+
+   <img src="images/icons/whatsapp.png" alt="WhatsApp">
+
+</a>
+
+<!-- =========================================
+JAVASCRIPT
+========================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="session.js"></script>
+<script src="js/script.js"></script>
+
+<!-- =========================================
+UNIVERSAL LOGIN MODAL
+========================================== -->
+<div id="universalLoginModal" class="login-modal-overlay" style="display: none;">
+    <div class="login-modal-card">
+        <button id="universalLoginCloseBtn" class="login-modal-close">&times;</button>
+        <img src="images/logo/logo.png" alt="Aarogyam India" class="login-modal-logo">
+        <h2 class="login-modal-title">Login or Register</h2>
+        <p class="login-modal-subtitle">Enter your mobile number to continue</p>
+        <form id="universalLoginForm">
+            <div class="login-modal-form-group">
+                <label for="universalLoginMobile">Mobile Number</label>
+                <input type="tel" id="universalLoginMobile" placeholder="10-digit mobile number" maxlength="10" required>
+            </div>
+            <button type="submit" id="universalLoginSubmitBtn" class="login-modal-submit">Login</button>
+        </form>
+        <p id="universalLoginMessage" class="login-modal-message"></p>
+        <p class="login-modal-footer">
+            New user? <a href="/registration.html" id="modalRegisterLink">Sign up here</a>
+        </p>
+    </div>
+</div>
+
 </body>
+
 </html>
+
