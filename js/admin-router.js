@@ -16,11 +16,12 @@ const ROUTES = {
 
 export async function navigateTo(routeName) {
  const name = (routeName || '').replace('#','') || 'dashboard';
- // update page title in header
- const titleEl = document.getElementById('page-title');
- const subtitleEl = document.getElementById('page-subtitle');
- if (titleEl) titleEl.textContent = name.charAt(0).toUpperCase() + name.slice(1);
- if (subtitleEl) subtitleEl.textContent = '';
+ // update compact title in header if present
+ const compactTitle = document.querySelector('.admin-title-compact');
+ const breadcrumb = document.querySelector('.admin-breadcrumb');
+ const pretty = name.charAt(0).toUpperCase() + name.slice(1);
+ if (compactTitle) compactTitle.textContent = pretty;
+ if (breadcrumb) breadcrumb.textContent = `Home / ${pretty}`;
 
  // update history
  try { history.pushState(null, '', `#${name}`); } catch(e){}
