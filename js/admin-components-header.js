@@ -52,9 +52,6 @@ export function renderHeader(containerId = 'header-placeholder', title = 'Admin 
   `;
 
   // Events
-  const hamburger = c.querySelector('#admin-hamburger');
-  hamburger?.addEventListener('click', () => document.body.classList.toggle('admin-sidebar-collapsed'));
-
   const searchInput = c.querySelector('#admin-global-search');
   searchInput?.addEventListener('input', event => {
     const query = event.target.value;

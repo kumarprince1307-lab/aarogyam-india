@@ -30,8 +30,6 @@ export async function navigateTo(routeName) {
  if (loader) loader.innerHTML = '<div class="admin-loading">Loading ' + name + '…</div>';
 
  const route = ROUTES[name];
-
- const route = ROUTES[name];
  if (!route) {
    if (loader) loader.innerHTML = '<div class="admin-error"><strong>Page not found.</strong></div>';
    return;

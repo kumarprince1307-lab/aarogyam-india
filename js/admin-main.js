@@ -20,15 +20,50 @@ export function initAdminLayout(pageTitle = 'Admin Panel', pageDescription = '')
   }
 }
 
+function manageBackdrop(shouldShow) {
+  let backdrop = document.getElementById('sidebar-backdrop');
+  if (shouldShow) {
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'sidebar-backdrop';
+      document.body.appendChild(backdrop);
+      backdrop.addEventListener('click', () => {
+        document.body.classList.remove('mobile-drawer-open');
+        manageBackdrop(false);
+      });
+    }
+    backdrop.style.display = 'block';
+  } else {
+    if (backdrop) {
+      backdrop.remove();
+    }
+  }
+}
+
+function initLayoutToggles() {
+  const hamburger = document.getElementById('admin-hamburger');
+  if (!hamburger) return;
+
+  hamburger.addEventListener('click', () => {
+    const isDesktop = window.innerWidth > 768;
+    if (isDesktop) {
+      document.body.classList.toggle('desktop-collapsed');
+    } else {
+      const isOpen = document.body.classList.toggle('mobile-drawer-open');
+      manageBackdrop(isOpen);
+    }
+  });
+}
+
 // Immediately render the base layout and start the router so index.html becomes the SPA entry
 try {
   // render layout into placeholders
   initAdminLayout();
-  // small timeout to allow DOM insertion and component wiring before navigating
-  setTimeout(() => {
-    initRouter();
-    console.log('✅ admin-router initialized');
-  }, 50);
+  // Initialize router immediately after synchronous layout rendering
+  initRouter();
+  console.log('✅ admin-router initialized');
+  // Setup responsive UI toggles
+  initLayoutToggles();
 } catch (e) {
   console.error('admin-main bootstrap failed', e);
 }

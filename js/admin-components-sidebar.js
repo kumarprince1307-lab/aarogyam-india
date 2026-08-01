@@ -45,9 +45,8 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
       <div class="admin-sidebar-top">
         <div class="admin-logo">
           <span class="logo-mark" aria-hidden="true"></span>
-          <strong>Aarogyam</strong>
+          <strong class="menu-label">Aarogyam</strong>
         </div>
-        <button id="admin-sidebar-collapse" class="admin-button" aria-label="Toggle sidebar">☰</button>
       </div>
       <nav>
         <ul class="menu-root">
@@ -55,81 +54,68 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
         </ul>
       </nav>
       <div class="admin-sidebar-footer">
-        <small class="admin-muted">Admin Panel V1 • UI Only</small>
+        <small class="admin-muted menu-label">Admin Panel V1 • UI Only</small>
       </div>
     </aside>
   `;
 
-  // Attach toggle handlers for collapsible groups
-  c.querySelectorAll('.menu-toggle').forEach(btn => {
+  // --- Professional Accordion Menu Logic ---
+  const menuToggles = c.querySelectorAll('.menu-toggle');
+  menuToggles.forEach(btn => {
     btn.addEventListener('click', () => {
-      const target = document.getElementById(btn.dataset.target);
+      const targetId = btn.dataset.target;
+      const target = document.getElementById(targetId);
       if (!target) return;
-      const expanded = target.classList.toggle('open');
-      btn.classList.toggle('open', expanded);
+
+      const isOpening = !target.classList.contains('open');
+
+      // Close all other open menus
+      c.querySelectorAll('.menu-children.open').forEach(openMenu => {
+        if (openMenu.id !== targetId) {
+          openMenu.classList.remove('open');
+          openMenu.style.maxHeight = '0px';
+          const otherBtn = c.querySelector(`.menu-toggle[data-target="${openMenu.id}"]`);
+          otherBtn?.classList.remove('open');
+        }
+      });
+
+      // Toggle the clicked menu
+      if (isOpening) {
+        target.classList.add('open');
+        target.style.maxHeight = target.scrollHeight + 'px';
+        btn.classList.add('open');
+      } else {
+        target.classList.remove('open');
+        target.style.maxHeight = '0px';
+        btn.classList.remove('open');
+      }
     });
   });
 
-  // Sidebar collapse (mobile)
-  const collapseBtn = c.querySelector('#admin-sidebar-collapse');
-  collapseBtn?.addEventListener('click', () => {
-    const open = !document.body.classList.contains('admin-sidebar-collapsed');
-    document.body.classList.toggle('admin-sidebar-collapsed');
 
-    // add backdrop for mobile
-    let backdrop = document.getElementById('admin-sidebar-backdrop');
-    if (open) {
-      if (!backdrop) {
-        backdrop = document.createElement('div');
-        backdrop.id = 'admin-sidebar-backdrop';
-        backdrop.style.position = 'fixed';
-        backdrop.style.inset = '0';
-        backdrop.style.background = 'rgba(0,0,0,0.4)';
-        backdrop.style.zIndex = '45';
-        document.body.appendChild(backdrop);
-        backdrop.addEventListener('click', () => {
-          document.body.classList.remove('admin-sidebar-collapsed');
-          backdrop.remove();
-        });
-      }
-    } else {
-      backdrop?.remove();
-    }
-  });
-
-  // Update active link based on hash-driven route
+  // --- Active Link Updater ---
   function updateActive(route) {
     c.querySelectorAll('.menu-link').forEach(a => a.classList.remove('active'));
     c.querySelectorAll('.menu-children li a').forEach(a => a.classList.remove('active'));
 
-    // top-level matches
-    const top = c.querySelector(`.menu-link[data-route="${route}"]`);
-    if (top) top.classList.add('active');
-    // child matches
-    const child = c.querySelector(`.menu-children a[data-route="${route}"]`);
-    if (child) {
-      child.classList.add('active');
-      // open parent
-      const parent = child.closest('.menu-children');
-      if (parent) parent.classList.add('open');
-      const toggle = parent.previousElementSibling;
-      if (toggle) toggle.classList.add('open');
+    const activeLink = c.querySelector(`a[data-route="${route}"]`);
+    if (activeLink) {
+      activeLink.classList.add('active');
+      
+      const parentSubMenu = activeLink.closest('.menu-children');
+      if (parentSubMenu && !parentSubMenu.classList.contains('open')) {
+        // Auto-open the accordion if the active link is inside
+        const toggleBtn = parentSubMenu.previousElementSibling;
+        toggleBtn?.click();
+      }
     }
   }
 
-  // initial active
+  // Set initial active link
   updateActive(currentHash || 'dashboard');
 
-  // listen for route changes
+  // Listen for route changes from the router to update active link
   document.addEventListener('admin:route-changed', (e) => updateActive(e.detail.route));
-
-  // remove backdrop on route change
-  document.addEventListener('admin:route-changed', () => {
-    const backdrop = document.getElementById('admin-sidebar-backdrop');
-    backdrop?.remove();
-    document.body.classList.remove('admin-sidebar-collapsed');
-  });
-
 }
 
 // TODO: add permissions-aware items and icons in Phase-2
