@@ -73,7 +73,28 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
   // Sidebar collapse (mobile)
   const collapseBtn = c.querySelector('#admin-sidebar-collapse');
   collapseBtn?.addEventListener('click', () => {
+    const open = !document.body.classList.contains('admin-sidebar-collapsed');
     document.body.classList.toggle('admin-sidebar-collapsed');
+
+    // add backdrop for mobile
+    let backdrop = document.getElementById('admin-sidebar-backdrop');
+    if (open) {
+      if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.id = 'admin-sidebar-backdrop';
+        backdrop.style.position = 'fixed';
+        backdrop.style.inset = '0';
+        backdrop.style.background = 'rgba(0,0,0,0.4)';
+        backdrop.style.zIndex = '45';
+        document.body.appendChild(backdrop);
+        backdrop.addEventListener('click', () => {
+          document.body.classList.remove('admin-sidebar-collapsed');
+          backdrop.remove();
+        });
+      }
+    } else {
+      backdrop?.remove();
+    }
   });
 
   // Update active link based on hash-driven route
@@ -101,6 +122,13 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
 
   // listen for route changes
   document.addEventListener('admin:route-changed', (e) => updateActive(e.detail.route));
+
+  // remove backdrop on route change
+  document.addEventListener('admin:route-changed', () => {
+    const backdrop = document.getElementById('admin-sidebar-backdrop');
+    backdrop?.remove();
+    document.body.classList.remove('admin-sidebar-collapsed');
+  });
 
 }
 

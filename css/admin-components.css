@@ -30,8 +30,21 @@ body.admin-sidebar-collapsed .admin-sidebar { transform: translateX(0); }
 
 /* header area */
 .admin-header-row { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 12px 8px; width: 100%; }
-.admin-breadcrumb { color: var(--admin-muted); font-size: 0.95rem; }
+.admin-header-left { display:flex; align-items:center; gap:12px; }
+.admin-header-title { display:flex; flex-direction:column; }
+.admin-title-compact { font-weight:700; font-size:1.05rem; color:var(--admin-text); }
+.admin-breadcrumb { color: var(--admin-muted); font-size: 0.85rem; margin:0; }
+.admin-header-center { flex:1; display:flex; justify-content:center; }
+.search-wrapper { display:flex; align-items:center; gap:8px; width:100%; max-width:680px; background: rgba(255,255,255,0.02); padding:8px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.02); }
+.search-wrapper .search-icon { opacity:0.6 }
+.search-wrapper .admin-input { border:none; background:transparent; color:var(--admin-text); padding:6px; }
+.admin-header-right { display:flex; align-items:center; gap:8px }
+.icon-button { display:inline-flex; align-items:center; justify-content:center; padding:8px; border-radius:10px; background:transparent; border:1px solid rgba(255,255,255,0.02); }
+.profile-button { display:flex; align-items:center; gap:8px; padding:8px 12px; }
+.avatar { width:28px; height:28px; border-radius:8px; background: linear-gradient(135deg,var(--admin-primary),var(--admin-primary-600)); box-shadow:0 6px 14px rgba(79,70,229,0.18); }
+
 .admin-stats-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.admin-stat-card { padding: 20px; border-radius: 14px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.02); }
 .admin-stat-card { padding: 20px; border-radius: 14px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.02); }
 .admin-stat-card h3 { margin: 0 0 8px; font-size: 0.95rem; color: var(--admin-muted); }
 .admin-stat-card p { margin: 0; font-size: 1.6rem; font-weight: 700; color: var(--admin-text); }
