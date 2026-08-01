@@ -1,1 +1,28 @@
-
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Login - Aarogyam India</title>
+  <link rel="stylesheet" href="../css/admin-panel.css">
+  <link rel="stylesheet" href="../css/admin-components.css">
+</head>
+<body>
+  <div class="admin-auth-screen">
+    <div class="admin-auth-card">
+      <h1>Admin Login</h1>
+      <p>Enter your admin credentials to access the dashboard. This UI is a Phase-1 placeholder and does not perform live authentication.</p>
+      <form class="admin-auth-form" onsubmit="event.preventDefault(); window.location.href='dashboard.html';">
+        <input type="email" class="admin-input" placeholder="Email address" required>
+        <input type="password" class="admin-input" placeholder="Password" required>
+        <button class="admin-button" type="submit">Login</button>
+      </form>
+      <div class="admin-auth-footer">
+        <a href="forgot-password.html">Forgot password?</a>
+        <a href="register.html">Create an admin account</a>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="../js/admin-main.js"></script>
+</body>
+</html>

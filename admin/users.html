@@ -1,0 +1,36 @@
+<!-- Admin Users (V1 skeleton) -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin - Users</title>
+  <link rel="stylesheet" href="../css/admin-panel.css">
+  <link rel="stylesheet" href="../css/admin-components.css">
+</head>
+<body>
+  <div id="admin-app" class="admin-app">
+    <div id="sidebar-placeholder"></div>
+    <main id="main-placeholder" class="admin-main">
+      <div id="header-placeholder"></div>
+      <section class="admin-page-heading">
+        <h2>Users</h2>
+        <p>Search and manage customer profiles and referral details.</p>
+      </section>
+      <div class="admin-section admin-card">
+        <div class="admin-controls">
+          <input id="user-search" type="search" placeholder="Search by name, mobile, or email" class="admin-input" />
+          <select id="user-status-filter" class="admin-select">
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+      <div id="users-table" class="admin-table"></div>
+    </main>
+  </div>
+  <script type="module" src="../js/admin-main.js"></script>
+  <script type="module" src="../js/admin-pages-users.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Panel - Aarogyam India (V1)</title>
+  <link rel="stylesheet" href="../css/admin-panel.css">
+  <link rel="stylesheet" href="../css/admin-components.css">
+</head>
+<body>
+  <div id="admin-app" class="admin-app">
+    <div id="sidebar-placeholder"></div>
+    <div id="main-area" class="admin-main">
+      <div id="header-placeholder"></div>
+
+      <section class="admin-page-heading">
+        <h2 id="page-title">Dashboard</h2>
+        <p id="page-subtitle">Business summary, lead sources, sales, and activity at a glance.</p>
+      </section>
+
+      <div id="page-content" class="admin-container">
+        <!-- Page content will be rendered here by admin page modules -->
+      </div>
+
+      <footer id="admin-footer" class="admin-card" style="margin:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>© 2026 Aarogyam India</div>
+          <div class="admin-muted">Admin Panel V1 — UI only</div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script type="module" src="../js/admin-main.js"></script>
+  <script type="module" src="../js/admin-api.js"></script>
+  <!-- admin-main bootstraps layout and initializes the router -->
+</body>
+</html>
