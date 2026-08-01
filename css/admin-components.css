@@ -97,6 +97,10 @@ body.admin-sidebar-collapsed .admin-sidebar { transform: translateX(0); }
 
 .admin-search-row { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 16px; }
 
+.admin-section-title { margin: 0 0 16px; font-size: 1.1rem; color:var(--admin-text); font-weight:700 }
+.u-row { display:flex; gap:12px; flex-wrap:wrap }
+.u-col { flex:1 }
+
 .admin-section-title { margin: 0 0 16px; font-size: 1.1rem; }
 .admin-action-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 20px; }
 

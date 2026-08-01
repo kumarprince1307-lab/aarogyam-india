@@ -4,8 +4,8 @@ import { initAdminLayout } from './admin-main.js';
 import { fetchDashboardData } from './admin-api.js';
 
 function renderKpiGroup(kpis) {
-  return `<div class="admin-stats-grid">
-    ${kpis.map(kpi => `<div class="admin-stat-card"><h3>${kpi.label}</h3><p>${kpi.value}</p></div>`).join('')}
+  return `<div class="kpi-row">
+    ${kpis.map(kpi => `<div class="kpi-card"><div class="kpi-label">${kpi.label}</div><div class="kpi-value">${kpi.value}</div></div>`).join('')}
   </div>`;
 }
 
