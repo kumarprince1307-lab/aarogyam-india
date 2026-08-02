@@ -1,3 +1,12 @@
+// --- Theme Restoration ---
+// Apply theme as early as possible to prevent flash
+(function() {
+  const theme = localStorage.getItem('aarogyam-admin-theme') || 'dark';
+  if (theme === 'light') {
+    document.body.classList.add('light-theme');
+  }
+})();
+
 /* Admin Main
    Responsibilities:
    - Bootstraps the admin UI layout for each admin page.
@@ -11,46 +20,56 @@ import { initRouter } from './admin-router.js';
 
 export function initAdminLayout(pageTitle = 'Admin Panel', pageDescription = '') {
   try {
+    // Ensure backdrop exists for mobile drawer
+    if (!document.getElementById('sidebar-backdrop')) {
+      const backdrop = document.createElement('div');
+      backdrop.id = 'sidebar-backdrop';
+      document.body.appendChild(backdrop);
+    }
+    
     renderHeader('header-placeholder', pageTitle, pageDescription);
     renderSidebar('sidebar-placeholder');
-    // ensure body classes for layout
     document.body.classList.add('admin-ready');
+    
+    // Restore desktop sidebar state
+    const isDesktopCollapsed = localStorage.getItem('desktop-sidebar-collapsed') === 'true';
+    if (isDesktopCollapsed && window.innerWidth > 768) {
+      document.body.classList.add('desktop-collapsed');
+    }
+
   } catch (err) {
     console.error('admin-main:initAdminLayout failed', err);
   }
 }
 
-function manageBackdrop(shouldShow) {
-  let backdrop = document.getElementById('sidebar-backdrop');
-  if (shouldShow) {
-    if (!backdrop) {
-      backdrop = document.createElement('div');
-      backdrop.id = 'sidebar-backdrop';
-      document.body.appendChild(backdrop);
-      backdrop.addEventListener('click', () => {
-        document.body.classList.remove('mobile-drawer-open');
-        manageBackdrop(false);
-      });
-    }
-    backdrop.style.display = 'block';
-  } else {
-    if (backdrop) {
-      backdrop.remove();
-    }
-  }
-}
-
 function initLayoutToggles() {
   const hamburger = document.getElementById('admin-hamburger');
-  if (!hamburger) return;
+  const backdrop = document.getElementById('sidebar-backdrop');
 
-  hamburger.addEventListener('click', () => {
-    const isDesktop = window.innerWidth > 768;
-    if (isDesktop) {
-      document.body.classList.toggle('desktop-collapsed');
-    } else {
-      const isOpen = document.body.classList.toggle('mobile-drawer-open');
-      manageBackdrop(isOpen);
+  const toggleMobileDrawer = (force) => {
+    document.body.classList.toggle('mobile-drawer-open', force);
+  };
+
+  if (hamburger) {
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isDesktop = window.innerWidth > 768;
+      if (isDesktop) {
+        const isCollapsed = document.body.classList.toggle('desktop-collapsed');
+        localStorage.setItem('desktop-sidebar-collapsed', isCollapsed);
+      } else {
+        toggleMobileDrawer();
+      }
+    });
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener('click', () => toggleMobileDrawer(false));
+  }
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('mobile-drawer-open')) {
+      toggleMobileDrawer(false);
     }
   });
 }

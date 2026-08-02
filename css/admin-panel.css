@@ -33,12 +33,65 @@ html, body { height: 100%; }
 body { 
   margin: 0; 
   font-family: var(--admin-font-sans); 
-  background: linear-gradient(180deg, #071028 0%, var(--admin-bg) 100%); 
+  background: var(--admin-bg); 
   color: var(--admin-text); 
   -webkit-font-smoothing:antialiased; 
   -moz-osx-font-smoothing:grayscale;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+body.light-theme {
+  --admin-bg: #f1f5f9; /* light grey */
+  --admin-surface: #ffffff;
+  --admin-surface-2: #f8fafc;
+  --admin-surface-strong: #e2e8f0;
+  --admin-border: #e2e8f0;
+  --admin-text: #0f172a;
+  --admin-muted: #64748b;
+  --admin-shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+  --admin-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+body.light-theme .admin-sidebar {
+  background: var(--admin-surface);
+}
+
+body.light-theme .admin-header {
+  background: rgba(255,255,255,0.7);
+  border-bottom-color: #e2e8f0;
+}
+
+body.light-theme .admin-button,
+body.light-theme .admin-input, 
+body.light-theme .admin-select {
+  background: var(--admin-surface);
+  color: var(--admin-text);
+  border-color: #cbd5e1;
+}
+
+body.light-theme .admin-button {
+    background: var(--admin-primary);
+    color: #fff;
+}
+
+body.light-theme .search-wrapper {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+body.light-theme .admin-sidebar .menu-link:hover, 
+body.light-theme .admin-sidebar .menu-toggle:hover {
+    color: var(--admin-primary);
+}
+
+body.light-theme .admin-table th {
+    background: #f8fafc;
+}
+
+body.light-theme .admin-table tbody tr:hover { 
+    background: #f1f5f9;
+}
+
 button, select, input { font: inherit; }
 
 /* === Base Layout === */
@@ -129,26 +182,121 @@ body.desktop-collapsed .admin-header {
 
 
 /* === Responsive Design === */
-@media (max-width: 768px) {
-  .admin-sidebar { 
-    transform: translateX(-100%);
+
+/* Tablet & Smaller Desktops */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 240px;
+    --sidebar-width-collapsed: 80px;
   }
-  body.mobile-drawer-open .admin-sidebar { 
-    transform: translateX(0); 
+  .admin-container {
+    padding: 16px;
+  }
+  .admin-page-heading h2 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--admin-shadow);
+    /* Make sidebar scrollable on mobile if content overflows */
+    overflow-y: auto; 
   }
   
-  .admin-header { left: 0; }
-  .admin-main { margin-left: 0; }
-  .admin-grid { grid-template-columns: 1fr; }
-  .admin-section, .admin-card { margin: 16px; }
+  body.mobile-drawer-open .admin-sidebar {
+    transform: translateX(0);
+  }
+  
+  body.mobile-drawer-open #sidebar-backdrop {
+    display: block;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  
+  #sidebar-backdrop {
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  body.mobile-drawer-open #sidebar-backdrop {
+    pointer-events: all;
+  }
+  
+  /* When mobile drawer is open, prevent body scroll */
+  body.mobile-drawer-open {
+    overflow: hidden;
+  }
+
+  .admin-header {
+    left: 0;
+  }
+  .admin-main {
+    margin-left: 0;
+  }
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-section, .admin-card {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  #admin-footer .admin-muted {
+    display:none;
+  }
 }
 
+/* Large Mobile Phones */
 @media (max-width: 640px) {
-  .admin-header { height: 64px; padding: 8px 12px; }
-  .admin-header-center { display:none; }
-  .admin-main { padding-top: 84px; }
-
-  .admin-page-heading { padding: 16px; }
-  .admin-section { padding: 16px; }
-  .admin-auth-card { padding: 24px; }
+  .admin-header {
+    height: 64px;
+    padding: 8px 16px;
+  }
+  .admin-main {
+    padding-top: 72px; /* 64px header + 8px margin */
+  }
+  .admin-container {
+    padding: 12px;
+  }
+  .admin-section, #admin-footer {
+    margin: 12px;
+    padding: 16px;
+  }
+   .admin-page-heading { 
+    padding: 8px 16px 0;
+  }
+   .admin-page-heading h2 {
+    font-size: 1.5rem;
+  }
+  .admin-auth-card {
+    padding: 24px;
+  }
 }
+
+/* Standard Mobile Phones */
+@media (max-width: 480px) {
+  :root {
+    --admin-radius: 10px;
+    --admin-radius-lg: 14px;
+  }
+  .admin-button {
+    padding: 12px 16px;
+  }
+  #admin-footer div:first-child {
+    font-size: 0.9rem;
+  }
+}
+
+/* Small Mobile Phones */
+@media (max-width: 360px) {
+   .admin-page-heading h2 {
+    font-size: 1.3rem;
+  }
+  .admin-auth-card h1 {
+    font-size: 1.8rem;
+  }
+}
+
