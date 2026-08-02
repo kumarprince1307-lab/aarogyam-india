@@ -130,7 +130,7 @@ body.desktop-collapsed .admin-sidebar .menu-children {
     gap: 12px;
   }
   .admin-header-center {
-    display: none; /* Hiding search on tablets for now, will be fixed in Phase 6 */
+    display: none; /* Hiding desktop search on tablets/mobile */
   }
   .admin-header-left .admin-page-title-full {
       display: none;
@@ -144,6 +144,55 @@ body.desktop-collapsed .admin-sidebar .menu-children {
    .profile-button {
       padding: 8px;
   }
+
+  /* Mobile Search View - Hidden by default, slides in when active */
+  .mobile-search-view {
+    display: none; /* Hide by default */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--admin-surface); /* Use existing surface background */
+    align-items: center;
+    gap: 12px; /* Space between back button and search input */
+    padding: 0 16px;
+    z-index: 100; /* Ensure it overlays other header content */
+    transform: translateX(100%); /* Start off-screen to the right */
+    transition: transform 0.3s ease-out; /* Smooth slide animation */
+  }
+
+  .mobile-search-view.active {
+    display: flex; /* Show when active */
+    transform: translateX(0); /* Slide into view */
+  }
+
+  /* Make search input full-width within the mobile search view */
+  .mobile-search-view .search-wrapper {
+    max-width: none; /* Override max-width from desktop search-wrapper */
+    flex-grow: 1; /* Allow it to take available space */
+  }
+
+  .mobile-search-view .admin-input {
+    width: 100%; /* Ensure input fills its wrapper */
+  }
+
+  /* Force hide other header sections when mobile search is active */
+  .admin-header-section.hidden {
+    display: none !important; /* Use !important to override other display rules */
+  }
+
+  /* Ensure the mobile search button is visible on mobile */
+  #admin-mobile-search-btn {
+      display: flex;
+  }
+}
+
+/* Hide the mobile search button on desktop */
+@media (min-width: 769px) {
+    #admin-mobile-search-btn {
+        display: none;
+    }
 }
 
 /* Mobile Phones */

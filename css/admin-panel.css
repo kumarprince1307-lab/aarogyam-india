@@ -301,3 +301,37 @@ body.desktop-collapsed .admin-header {
   }
 }
 
+/* === Mobile Search === */
+#admin-mobile-search-btn {
+  display: none; /* Hidden by default */
+}
+
+.mobile-search-view {
+  display: none; /* Hidden by default */
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  /* Hide desktop search on mobile */
+  .admin-header .admin-header-center {
+    display: none;
+  }
+
+  /* Show mobile search button */
+  #admin-mobile-search-btn {
+    display: block;
+  }
+
+  /* When mobile search is active */
+  .admin-header.mobile-search-active .admin-header-row > .admin-header-left,
+  .admin-header.mobile-search-active .admin-header-row > .admin-header-right {
+    display: none;
+  }
+
+  .admin-header.mobile-search-active .mobile-search-view {
+    display: flex;
+  }
+}
+

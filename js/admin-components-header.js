@@ -115,6 +115,26 @@ export function renderHeader(containerId = 'header-placeholder', title = 'Admin 
       profileMenu?.classList.remove('open');
     }
   });
+
+  // --- Mobile Search Logic ---
+  const mobileSearchBtn = c.querySelector('#admin-mobile-search-btn');
+  const mobileSearchBackBtn = c.querySelector('#admin-search-back-btn');
+  const adminHeader = c.querySelector('.admin-header');
+  const mobileSearchInput = c.querySelector('#admin-mobile-search-input');
+
+  mobileSearchBtn?.addEventListener('click', () => {
+    adminHeader?.classList.add('mobile-search-active');
+    mobileSearchInput?.focus();
+  });
+
+  mobileSearchBackBtn?.addEventListener('click', () => {
+    adminHeader?.classList.remove('mobile-search-active');
+  });
+  
+  mobileSearchInput?.addEventListener('input', event => {
+    const query = event.target.value;
+    document.dispatchEvent(new CustomEvent('admin:global-search', { detail: { query } }));
+  });
 }
 
 // TODO: Add admin notifications dropdown and account menu in Phase-2
