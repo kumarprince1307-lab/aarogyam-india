@@ -204,6 +204,7 @@ body.desktop-collapsed .admin-header {
     box-shadow: var(--admin-shadow);
     /* Make sidebar scrollable on mobile if content overflows */
     overflow-y: auto; 
+    transition: transform 0.3s ease-out; /* ADDED: Smooth transition for sidebar */
   }
   
   body.mobile-drawer-open .admin-sidebar {
