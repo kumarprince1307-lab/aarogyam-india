@@ -11,6 +11,16 @@
 (function (window) {
   'use strict';
 
+  // V1 Session Guard: Redirect to login if no session exists.
+  // This must run before any other admin logic.
+  const isLoginPage = window.location.pathname.endsWith('/admin/login.html');
+  const hasSession = localStorage.getItem('admin_session') === 'true';
+
+  if (!hasSession && !isLoginPage) {
+    window.location.href = 'login.html';
+    return; // Stop further execution
+  }
+
   /**
    * checkAdminProfile
    * - Lightweight helper that checks for the presence of the V1_SESSION object and returns profile info if present.
