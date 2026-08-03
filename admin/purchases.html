@@ -1,0 +1,36 @@
+<!-- Admin Purchases (V1 skeleton) -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin - Purchases</title>
+  <link rel="stylesheet" href="../css/admin-panel.css">
+  <link rel="stylesheet" href="../css/admin-components.css">
+</head>
+<body>
+  <div id="admin-app" class="admin-app">
+    <div id="sidebar-placeholder"></div>
+    <main id="main-placeholder" class="admin-main">
+      <div id="header-placeholder"></div>
+      <section class="admin-page-heading">
+        <h2>Purchases</h2>
+        <p>View recent orders including source, status and purchase value.</p>
+      </section>
+      <div class="admin-section admin-card">
+        <div class="admin-controls">
+          <input id="purchase-search" type="search" placeholder="Search orders by ID, book or customer" class="admin-input" />
+          <select id="purchase-status-filter" class="admin-select">
+            <option value="all">All statuses</option>
+            <option value="success">Success</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+      </div>
+      <div id="purchases-table" class="admin-table"></div>
+    </main>
+  </div>
+  <script type="module" src="../js/admin-main.js"></script>
+  <script type="module" src="../js/admin-pages-purchases.js"></script>
+</body>
+</html>

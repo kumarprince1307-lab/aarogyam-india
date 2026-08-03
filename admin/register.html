@@ -1,1 +1,28 @@
-
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Register - Aarogyam India</title>
+  <link rel="stylesheet" href="../css/admin-panel.css">
+  <link rel="stylesheet" href="../css/admin-components.css">
+</head>
+<body>
+  <div class="admin-auth-screen">
+    <div class="admin-auth-card">
+      <h1>Admin Registration</h1>
+      <p>Create a Phase-1 admin account. This page is UI-only and does not connect to a real backend.</p>
+      <form class="admin-auth-form" onsubmit="event.preventDefault(); window.location.href='login.html';">
+        <input type="text" class="admin-input" placeholder="Full name" required>
+        <input type="email" class="admin-input" placeholder="Email address" required>
+        <input type="password" class="admin-input" placeholder="Password" required>
+        <button class="admin-button" type="submit">Register</button>
+      </form>
+      <div class="admin-auth-footer">
+        <a href="login.html">Back to login</a>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="../js/admin-main.js"></script>
+</body>
+</html>
