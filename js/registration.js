@@ -21,11 +21,37 @@ const backBtn = document.getElementById("backBtn");
 
 document.addEventListener("DOMContentLoaded", initializePage);
 
+function syncShareContextFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareContext = {
+        source: urlParams.get('source') || urlParams.get('utm_source') || null,
+        share_channel: urlParams.get('share_channel') || urlParams.get('channel') || urlParams.get('utm_medium') || null,
+        share_token: urlParams.get('share_token') || urlParams.get('share_id') || urlParams.get('tracking_token') || null,
+        referral_mobile: urlParams.get('referral_mobile') || urlParams.get('referral') || null,
+        asset_type: urlParams.get('asset_type') || null,
+        asset_id: urlParams.get('asset_id') || null,
+        asset_title: urlParams.get('asset_title') || null,
+        asset_url: urlParams.get('asset_url') || null,
+        referrer: document.referrer || null,
+        landing_url: window.location.href || null
+    };
+
+    if (typeof persistShareContext === 'function') {
+        persistShareContext(shareContext);
+    }
+
+    if (referralMobile && shareContext.referral_mobile && !referralMobile.value) {
+        referralMobile.value = shareContext.referral_mobile;
+    }
+}
+
 async function initializePage() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
         const mobileParam = urlParams.get('mobile');
         returnUrl = urlParams.get('return');
+
+        syncShareContextFromUrl();
 
         if (mobileParam && mobile) {
             mobile.value = mobileParam;
@@ -161,7 +187,7 @@ async function registerAccount(event) {
         }
 
         const urlParams = new URLSearchParams(window.location.search);
-        const sourceParam = urlParams.get('source') || 'registration';
+        const sourceParam = urlParams.get('source') || urlParams.get('utm_source') || 'registration';
 
         const formData = {
             fullName: fullName.value.trim(),
@@ -170,6 +196,13 @@ async function registerAccount(event) {
             referralCode: referralMobile.value.trim(),
             source: sourceParam
         };
+
+        if (typeof persistShareContext === 'function') {
+            persistShareContext({
+                source: sourceParam,
+                referral_mobile: referralMobile.value.trim() || null
+            });
+        }
 
         // यह चेक करेगा कि registerUser फंक्शन उपलब्ध है या नहीं
         if (typeof registerUser !== "function") {

@@ -14,6 +14,7 @@
    - Provides foundation for page initialization.
 */
 
+import './supabase.js'; // CRITICAL: Initialize Supabase client globally
 import { renderHeader } from './admin-components-header.js';
 import { renderSidebar } from './admin-components-sidebar.js';
 import { initRouter } from './admin-router.js';
@@ -42,16 +43,46 @@ export function initAdminLayout(pageTitle = 'Admin Panel', pageDescription = '')
   }
 }
 
-function initLayoutToggles() {
-  const hamburger = document.getElementById('admin-hamburger');
+export function toggleMobileDrawer(force) {
+  document.body.classList.toggle('mobile-drawer-open', force);
+}
+
+function initCoreToggles() {
   const backdrop = document.getElementById('sidebar-backdrop');
 
-  const toggleMobileDrawer = (force) => {
-    document.body.classList.toggle('mobile-drawer-open', force);
-  };
+  if (backdrop) {
+    backdrop.addEventListener('click', () => toggleMobileDrawer(false));
+  }
+  
+  // Document-level delegation ensuring clean separation between search and hamburger
+  document.addEventListener('click', (e) => {
+    // 1. Mobile Search Trigger Handling (Targeting all potential search button IDs/classes)
+    const mobileSearchBtn = e.target.closest('#admin-mobile-search-btn, .mobile-search-trigger, [data-action="mobile-search"], button[title*="Search"], .admin-header-right button:first-child');
+    const headerElement = document.querySelector('.admin-header');
+    
+    if (mobileSearchBtn && headerElement) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Toggle search active class safely
+      const isActive = headerElement.classList.toggle('mobile-search-active');
+      
+      // Ensure mobile-search-view display is properly handled inline if CSS selector misses it
+      const searchView = headerElement.querySelector('.mobile-search-view');
+      if (searchView) {
+        searchView.style.display = isActive ? 'flex' : 'none';
+      }
 
-  if (hamburger) {
-    hamburger.addEventListener('click', (e) => {
+      const searchInput = headerElement.querySelector('.mobile-search-view input, .mobile-search-view .admin-input, input[type="search"]');
+      if (isActive && searchInput) {
+        setTimeout(() => searchInput.focus(), 100);
+      }
+      return;
+    }
+
+    // 2. Hamburger / Sidebar Toggle Handling
+    const hamburger = e.target.closest('#admin-hamburger, .admin-hamburger, .menu-btn, [data-action="toggle-sidebar"]');
+    if (hamburger) {
       e.stopPropagation();
       const isDesktop = window.innerWidth > 768;
       if (isDesktop) {
@@ -60,31 +91,45 @@ function initLayoutToggles() {
       } else {
         toggleMobileDrawer();
       }
-    });
-  }
+      return;
+    }
+  });
 
-  if (backdrop) {
-    backdrop.addEventListener('click', () => toggleMobileDrawer(false));
-  }
-  
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.body.classList.contains('mobile-drawer-open')) {
-      toggleMobileDrawer(false);
+    if (e.key === 'Escape') {
+      if (document.body.classList.contains('mobile-drawer-open')) {
+        toggleMobileDrawer(false);
+      }
+      const headerElement = document.querySelector('.admin-header');
+      if (headerElement && headerElement.classList.contains('mobile-search-active')) {
+        headerElement.classList.remove('mobile-search-active');
+        const searchView = headerElement.querySelector('.mobile-search-view');
+        if (searchView) searchView.style.display = 'none';
+      }
     }
   });
 }
 
-// Immediately render the base layout and start the router so index.html becomes the SPA entry
-try {
-  // render layout into placeholders
-  initAdminLayout();
-  // Initialize router immediately after synchronous layout rendering
-  initRouter();
-  console.log('✅ admin-router initialized');
-  // Setup responsive UI toggles
-  initLayoutToggles();
-} catch (e) {
-  console.error('admin-main bootstrap failed', e);
+// Safely bootstrap admin layout and router once DOM is fully ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapAdminApp);
+} else {
+  bootstrapAdminApp();
+}
+
+function bootstrapAdminApp() {
+  try {
+    initAdminLayout();
+    if (typeof initRouter === 'function') {
+      initRouter();
+      console.log('✅ admin-router initialized');
+    } else {
+      console.warn('⚠️ initRouter is not available yet.');
+    }
+    initCoreToggles();
+  } catch (e) {
+    console.error('admin-main bootstrap failed', e);
+  }
 }
 
 export function formatDate(dateString) {

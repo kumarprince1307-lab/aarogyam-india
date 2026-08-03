@@ -121,14 +121,20 @@ export function renderHeader(containerId = 'header-placeholder', title = 'Admin 
   const mobileSearchBackBtn = c.querySelector('#admin-search-back-btn');
   const adminHeader = c.querySelector('.admin-header');
   const mobileSearchInput = c.querySelector('#admin-mobile-search-input');
+  const adminHeaderLeft = c.querySelector('.admin-header-left');
+  const adminHeaderRight = c.querySelector('.admin-header-right');
 
   mobileSearchBtn?.addEventListener('click', () => {
     adminHeader?.classList.add('mobile-search-active');
+    adminHeaderLeft?.classList.add('hidden');
+    adminHeaderRight?.classList.add('hidden');
     mobileSearchInput?.focus();
   });
 
   mobileSearchBackBtn?.addEventListener('click', () => {
     adminHeader?.classList.remove('mobile-search-active');
+    adminHeaderLeft?.classList.remove('hidden');
+    adminHeaderRight?.classList.remove('hidden');
   });
   
   mobileSearchInput?.addEventListener('input', event => {

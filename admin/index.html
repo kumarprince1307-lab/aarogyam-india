@@ -16,6 +16,7 @@
 <body>
   <div id="admin-app" class="admin-app">
     <div id="sidebar-placeholder"></div>
+    <div id="sidebar-backdrop"></div>
     <div id="main-area" class="admin-main">
       <div id="header-placeholder"></div>
 
@@ -35,7 +36,12 @@
     </div>
   </div>
 
+  <!-- 1. Supabase Official SDK CDN (यह सबसे पहले लोड होना जरूरी है) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- 2. Admin Main Module Script -->
   <script type="module" src="../js/admin-main.js"></script>
-  <!-- admin-main bootstraps layout and initializes the router -->
+
 </body>
+
 </html>

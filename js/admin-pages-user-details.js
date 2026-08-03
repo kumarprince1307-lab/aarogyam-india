@@ -8,27 +8,94 @@ function getQueryParam(name) {
   return params.get(name);
 }
 
+function renderShareInformation() {
+  return `
+    <div class="admin-section">
+      <div class="admin-section-title">Share Information</div>
+      <div class="admin-data-grid">
+        <div class="admin-data-card"><h4>Share ID</h4><p>N/A</p></div>
+        <div class="admin-data-card"><h4>Total Shares</h4><p>0</p></div>
+        <div class="admin-data-card"><h4>Total Clicks</h4><p>0</p></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderReferralInformation() {
+  return `
+    <div class="admin-section">
+      <div class="admin-section-title">Referral Information</div>
+      <div class="admin-data-grid">
+        <div class="admin-data-card"><h4>Referred By</h4><p>N/A</p></div>
+        <div class="admin-data-card"><h4>Direct Referrals</h4><p>0</p></div>
+        <div class="admin-data-card"><h4>Total Network</h4><p>0</p></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSharePerformance() {
+  return `
+    <div class="admin-section">
+      <div class="admin-section-title">Share Performance</div>
+      <div class="admin-empty"><strong>No Data Available</strong></div>
+    </div>
+  `;
+}
+
+function renderLeadInformation() {
+  return `
+    <div class="admin-section">
+      <div class="admin-section-title">Lead Information</div>
+      <div class="admin-empty"><strong>No Data Available</strong></div>
+    </div>
+  `;
+}
+
+function renderPermissions() {
+    const permissions = [
+        'Books', 'Library', 'Reports', 'Share', 'Downloads',
+        'Products', 'Agriculture', 'Disease', 'Webinar', 'Business', 'Admin Access'
+    ];
+    return `
+    <div class="admin-section">
+      <div class="admin-section-title">Permissions</div>
+      <div class="admin-data-grid">
+        ${permissions.map(p => `<div class="admin-data-card"><h4>${p}</h4><p>N/A</p></div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
 function renderProfile(detail) {
   if (!detail) return '<div class="admin-empty"><strong>User not found.</strong></div>';
 
   return `
-    <div class="admin-section admin-data-grid">
-      <div class="admin-data-card"><h4>Name</h4><p>${detail.name}</p></div>
-      <div class="admin-data-card"><h4>Mobile</h4><p>${detail.mobile}</p></div>
-      <div class="admin-data-card"><h4>Email</h4><p>${detail.email}</p></div>
-      <div class="admin-data-card"><h4>Source</h4><p>${detail.source}</p></div>
-      <div class="admin-data-card"><h4>Status</h4><p>${detail.status}</p></div>
-      <div class="admin-data-card"><h4>Joined</h4><p>${detail.joined}</p></div>
-      <div class="admin-data-card"><h4>Referral Token</h4><p>${detail.referralToken || 'N/A'}</p></div>
-    </div>
     <div class="admin-section">
-      <div class="admin-section-title">Recent Purchases</div>
+      <div class="admin-section-title">Profile</div>
+      <div class="admin-data-grid">
+        <div class="admin-data-card"><h4>Name</h4><p>${detail.name}</p></div>
+        <div class="admin-data-card"><h4>Mobile</h4><p>${detail.mobile}</p></div>
+        <div class="admin-data-card"><h4>Email</h4><p>${detail.email}</p></div>
+        <div class="admin-data-card"><h4>Source</h4><p>${detail.source}</p></div>
+        <div class="admin-data-card"><h4>Status</h4><p>${detail.status}</p></div>
+        <div class="admin-data-card"><h4>Joined</h4><p>${detail.joined}</p></div>
+        <div class="admin-data-card"><h4>Referral Token</h4><p>${detail.referralToken || 'N/A'}</p></div>
+      </div>
+    </div>
+    ${renderShareInformation()}
+    ${renderReferralInformation()}
+    <div class="admin-section">
+      <div class="admin-section-title">Purchase Summary</div>
       ${renderPurchases(detail.purchases)}
     </div>
     <div class="admin-section">
-      <div class="admin-section-title">Activity Timeline</div>
+      <div class="admin-section-title">Activity Summary</div>
       ${renderActivity(detail.activity)}
     </div>
+    ${renderSharePerformance()}
+    ${renderLeadInformation()}
+    ${renderPermissions()}
   `;
 }
 

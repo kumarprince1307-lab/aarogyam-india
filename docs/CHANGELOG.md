@@ -51,3 +51,16 @@ Notes: All admin changes are UI-only, use dummy/mock data (js/admin-api.js). No 
 - Added admin auth placeholder pages: admin/login.html, admin/register.html, admin/forgot-password.html.
 - Enhanced reports page with daily and total report cards, search and status filters, support for loading/empty/error states.
 - Added user detail purchase history and activity timeline using dummy data.
+
+## [Unreleased] — Phase-1 Share Engine Foundation (2026-08-03)
+- Added: js/share-engine-core.js with additive helpers for asset normalization, share token generation, attribution payload creation, visitor-id persistence, and report-summary shaping.
+- Added: js/permissions-core.js with additive helpers for normalized permissions, module visibility checks, and action-level permission evaluation.
+- Added: js/lead-owner-core.js with additive helpers for permanent lead-owner assignment and lead-history entry creation.
+- Updated: docs/V1_IMPLEMENTATION_PLAN.md to record the non-invasive Phase-1 foundation work.
+- Notes: No existing public flow, registration, checkout, payment, download, library, or admin UI code was modified. The foundation is ready for later Phase-2 integration.
+
+## [Unreleased] — Phase-2 Attribution Capture (2026-08-03)
+- Extended: js/supabase.js to capture share/referral attribution from URL parameters and stored context, persist it locally, and pass it into registration/profile creation without breaking existing flows.
+- Extended: js/registration.js to read share/referral context from the URL and preserve it through the registration process.
+- Extended: js/checkout.js to preserve attribution context through checkout and store it with the current order payload.
+- Notes: The implementation remains additive and safe. Existing registration, checkout, and payment logic continue to work; attribution is captured as metadata and stored locally first, with future database persistence handled through the same safe helper path.

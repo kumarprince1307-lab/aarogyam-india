@@ -12,6 +12,101 @@ const SUPABASE_CONFIG = {
     KEY: "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU"
 };
 
+const SHARE_CONTEXT_STORAGE_KEY = "AI_SHARE_CONTEXT";
+const SHARE_EVENT_STORAGE_KEY = "AI_SHARE_EVENTS";
+
+function readStoredShareContext() {
+    try {
+        const stored = localStorage.getItem(SHARE_CONTEXT_STORAGE_KEY);
+        return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+        console.warn("Share context read failed:", error);
+        return {};
+    }
+}
+
+function persistShareContext(context) {
+    const current = readStoredShareContext();
+    const merged = { ...current, ...context };
+
+    try {
+        localStorage.setItem(SHARE_CONTEXT_STORAGE_KEY, JSON.stringify(merged));
+    } catch (error) {
+        console.warn("Share context persist failed:", error);
+    }
+
+    return merged;
+}
+
+function readShareContextFromUrl() {
+    if (typeof window === 'undefined' || !window.location) {
+        return {};
+    }
+
+    const params = new URLSearchParams(window.location.search || "");
+    return {
+        source: params.get("source") || params.get("utm_source") || null,
+        share_channel: params.get("share_channel") || params.get("channel") || params.get("utm_medium") || null,
+        share_token: params.get("share_token") || params.get("share_id") || params.get("tracking_token") || null,
+        referral_mobile: params.get("referral_mobile") || params.get("referral") || null,
+        asset_type: params.get("asset_type") || null,
+        asset_id: params.get("asset_id") || null,
+        asset_title: params.get("asset_title") || null,
+        asset_url: params.get("asset_url") || null,
+        referrer: document.referrer || null,
+        landing_url: window.location.href || null
+    };
+}
+
+function getCurrentShareContext() {
+    const urlContext = readShareContextFromUrl();
+    const storedContext = readStoredShareContext();
+    return { ...storedContext, ...urlContext };
+}
+
+function resolveProfileAttribution(userData) {
+    const context = getCurrentShareContext();
+    const resolvedSource = userData?.source || context.source || context.acquisition_source || "registration";
+    const resolvedReferral = userData?.referralCode || context.referral_mobile || context.referralCode || null;
+    const resolvedShareToken = userData?.shareToken || context.share_token || context.tracking_token || null;
+    const resolvedShareChannel = userData?.shareChannel || context.share_channel || context.channel || "direct";
+
+    return {
+        source: resolvedSource,
+        referralCode: resolvedReferral,
+        shareToken: resolvedShareToken,
+        shareChannel: resolvedShareChannel,
+        context: context
+    };
+}
+
+async function trackAttributionEvent(eventPayload) {
+    const currentContext = getCurrentShareContext();
+    const payload = {
+        ...currentContext,
+        ...eventPayload,
+        created_at: new Date().toISOString()
+    };
+
+    try {
+        const queuedEvents = JSON.parse(localStorage.getItem(SHARE_EVENT_STORAGE_KEY) || "[]");
+        queuedEvents.push(payload);
+        localStorage.setItem(SHARE_EVENT_STORAGE_KEY, JSON.stringify(queuedEvents));
+    } catch (error) {
+        console.warn("Share event queueing failed:", error);
+    }
+
+    try {
+        if (db && typeof db.from === "function") {
+            await db.from("share_events").insert([payload]).select().single();
+        }
+    } catch (error) {
+        console.warn("Share event persistence skipped:", error.message || error);
+    }
+
+    return { success: true, queued: true, payload };
+}
+
 // यहाँ हम 'supabase' की जगह 'dbClient' इस्तेमाल कर रहे हैं ताकि कभी डुप्लीकेट एरर न आए
 window.dbClient = window.dbClient || window.supabase.createClient(
     SUPABASE_CONFIG.URL,
@@ -70,36 +165,58 @@ async function isEmailRegistered(email) {
 
 async function createUserProfile(userData) {
     try {
-        // Referral code validation
-        let referralCode = userData.referralCode || null;
-        if (referralCode) {
-            const referrer = await isMobileRegistered(referralCode);
-            if (!referrer) {
-                console.warn(`Referral mobile ${referralCode} not found. Setting referral code to null.`);
-                referralCode = null; // अगर रेफ़रल मोबाइल मौजूद नहीं है तो null सेट करें
-            }
-        }
+    const attribution = resolveProfileAttribution(userData);
+    persistShareContext({
+        source: attribution.source,
+        referral_mobile: attribution.referralCode,
+        share_token: attribution.shareToken,
+        share_channel: attribution.shareChannel
+    });
 
-        const { data, error } = await db
-            .from("profiles")
-            .insert([{
-                full_name: userData.fullName,
-                mobile: userData.mobile,
-                email: userData.email || null,
-                gender: userData.gender || null,
-                referral_code: referralCode,
-                registration_source: userData.source || "registration",
-                profile_complete: false,
-                is_active: true
-            }])
-            .select()
-            .single();
-        if (error) throw error;
-        return data;
-    } catch (error) {
-        console.error("Create Profile Error :", error);
-        return null;
+    // Referral code validation
+    let referralCode = attribution.referralCode || null;
+    if (referralCode) {
+        const referrer = await isMobileRegistered(referralCode);
+        if (!referrer) {
+            console.warn(`Referral mobile ${referralCode} not found. Setting referral code to null.`);
+            referralCode = null; // अगर रेफ़रल मोबाइल मौजूद नहीं है तो null सेट करें
+        }
     }
+
+    const { data, error } = await db
+        .from("profiles")
+        .insert([{
+            full_name: userData.fullName,
+            mobile: userData.mobile,
+            email: userData.email || null,
+            gender: userData.gender || null,
+            referral_code: referralCode,
+            registration_source: attribution.source || "registration",
+            profile_complete: false,
+            is_active: true
+        }])
+        .select()
+        .single();
+    if (error) throw error;
+
+    await trackAttributionEvent({
+        event_type: "registration",
+        profile_id: data?.id || null,
+        mobile: userData.mobile,
+        email: userData.email || null,
+        referral_code: referralCode,
+        source: attribution.source || "registration"
+    });
+
+    return data;
+} catch (error) {
+    console.error("Create Profile Error:", error);
+console.log("MESSAGE:", error?.message);
+console.log("DETAILS:", error?.details);
+console.log("HINT:", error?.hint);
+console.log("CODE:", error?.code);
+    return null;
+}
 }
 
 function createLoginSession(profile) {
@@ -117,19 +234,28 @@ function createLoginSession(profile) {
 
 async function registerUser(formData) {
     try {
-        const existingUser = await isMobileRegistered(formData.mobile);
+        const attribution = resolveProfileAttribution(formData);
+        const registrationPayload = {
+            ...formData,
+            source: attribution.source,
+            referralCode: attribution.referralCode,
+            shareToken: attribution.shareToken,
+            shareChannel: attribution.shareChannel
+        };
+
+        const existingUser = await isMobileRegistered(registrationPayload.mobile);
         if (existingUser) {
             return { success: false, message: "This mobile number is already registered." };
         }
 
-        if (formData.email) {
-            const emailExists = await isEmailRegistered(formData.email);
+        if (registrationPayload.email) {
+            const emailExists = await isEmailRegistered(registrationPayload.email);
             if (emailExists) {
                 return { success: false, message: "This email address is already registered." };
             }
         }
 
-        const profile = await createUserProfile(formData);
+        const profile = await createUserProfile(registrationPayload);
         if (!profile) {
             return { success: false, message: "Profile creation failed. Please try again." };
         }
@@ -207,12 +333,53 @@ const ProfileStorage = {
     remove() { localStorage.removeItem(AUTH.PROFILE_KEY); }
 };
 
-function isLoggedIn() { return SessionManager.exists(); }
+
 function logoutUser() {
     SessionManager.remove();
     UserStorage.remove();
     ProfileStorage.remove();
     return true;
+}
+
+function getCurrentUserProfile() {
+    return UserStorage.get();
+}
+
+async function createShareLink(asset, channel) {
+    // 1. Get profile from UserStorage
+    const profile = getCurrentUserProfile();
+
+    // 2. Build payload using the engine
+    const payload = AarogyamShareEngine.buildShareLinkPayload({
+        asset: asset,
+        profile: profile,
+        channel: channel,
+        source: "share"
+    });
+
+    // 3. Save payload to 'share_links' table
+    try {
+        const { data, error } = await db.from("share_links").insert(payload).select().single();
+        if (error) {
+            console.error("Failed to create share link:", error);
+            // Fallback to non-tracked URL if DB fails
+            return asset.asset_url || window.location.href;
+        }
+
+        // 4. Construct the final URL with the share token
+        const trackedUrl = new URL(asset.asset_url || window.location.href);
+        trackedUrl.searchParams.set('share_token', payload.token);
+        if (channel) {
+            trackedUrl.searchParams.set('channel', channel);
+        }
+        trackedUrl.searchParams.set('source', 'share');
+
+
+        return trackedUrl.toString();
+    } catch (dbError) {
+        console.error("Database error creating share link:", dbError);
+        return asset.asset_url || window.location.href;
+    }
 }
 console.log("✅ Auth & Session Module Loaded");
 /* ===========================================================
@@ -437,99 +604,9 @@ async function saveDemoUser(data) {
 console.log("✅ Demo Module Loaded (Final Profiles Connected)");
 /* ===========================================================
    END OF MODULE 4: DEMO SYSTEM
-=========================================================== *//* ===========================================================
-   MODULE 4: DEMO SYSTEM (FINAL DIRECT PROFILES SAVE)
 =========================================================== */
-async function saveDemoUser(data) {
-    try {
-        // 1. मोबाइल नंबर को साफ़ करने का लॉजिक (0 या 91 हटाने के लिए)
-        let cleanMobile = String(data.mobile || "").trim();
-        if (cleanMobile.startsWith("+91")) {
-            cleanMobile = cleanMobile.slice(3);
-        } else if (cleanMobile.startsWith("91") && cleanMobile.length === 12) {
-            cleanMobile = cleanMobile.slice(2);
-        }
-        if (cleanMobile.startsWith("0") && cleanMobile.length === 11) {
-            cleanMobile = cleanMobile.slice(1);
-        }
 
-        console.log("Saving demo user directly to profiles table:", { ...data, mobile: cleanMobile });
 
-        // 2. डेटा सीधा 'profiles' टेबल में सही कॉलम नाम के साथ भेजना
-        const { data: result, error } = await db.from("profiles").insert([{
-            full_name: data.name,           // टेबल का कॉलम नाम full_name
-            mobile: cleanMobile,            // टेक्स्ट फॉर्मेट में साफ किया हुआ मोबाइल नंबर
-            email: data.email || null,
-            State: data.state || null,      // टेबल का कॉलम नाम State (कैपिटल S)
-            district: data.district || null,
-            registration_source: 'demo',    // आपके टेबल का सही कॉलम नाम
-            created_at: new Date().toISOString()
-        }]).select();
-
-        if (error) {
-            // अगर मोबाइल नंबर पहले से profiles में मौजूद है (Duplicate), तो चुपचाप इग्नोर करें, डेमो न रुके
-            console.log("Note: Number already exists in profiles, skipping duplicate insert error.");
-            return { success: true, message: "Already exists" };
-        }
-
-        console.log("✅ Data successfully saved to profiles table:", result);
-        return { success: true, data: result };
-
-    } catch (error) {
-        console.error("❌ Supabase Save Exception:", error.message);
-        return { success: true, message: error.message }; // एरर आने पर भी डेमो नहीं रुकना चाहिए
-    }
-}
-console.log("✅ Demo Module Loaded (Final Profiles Connected)");
-/* ===========================================================
-   END OF MODULE 4: DEMO SYSTEM
-=========================================================== *//* ===========================================================
-   MODULE 4: DEMO SYSTEM (FINAL DIRECT PROFILES SAVE)
-=========================================================== */
-async function saveDemoUser(data) {
-    try {
-        // 1. मोबाइल नंबर को साफ़ करने का लॉजिक (0 या 91 हटाने के लिए)
-        let cleanMobile = String(data.mobile || "").trim();
-        if (cleanMobile.startsWith("+91")) {
-            cleanMobile = cleanMobile.slice(3);
-        } else if (cleanMobile.startsWith("91") && cleanMobile.length === 12) {
-            cleanMobile = cleanMobile.slice(2);
-        }
-        if (cleanMobile.startsWith("0") && cleanMobile.length === 11) {
-            cleanMobile = cleanMobile.slice(1);
-        }
-
-        console.log("Saving demo user directly to profiles table:", { ...data, mobile: cleanMobile });
-
-        // 2. डेटा सीधा 'profiles' टेबल में सही कॉलम नाम के साथ भेजना
-        const { data: result, error } = await db.from("profiles").insert([{
-            full_name: data.name,           // टेबल का कॉलम नाम full_name
-            mobile: cleanMobile,            // टेक्स्ट फॉर्मेट में साफ किया हुआ मोबाइल नंबर
-            email: data.email || null,
-            State: data.state || null,      // टेबल का कॉलम नाम State (कैपिटल S)
-            district: data.district || null,
-            registration_source: 'demo',    // आपके टेबल का सही कॉलम नाम
-            created_at: new Date().toISOString()
-        }]).select();
-
-        if (error) {
-            // अगर मोबाइल नंबर पहले से profiles में मौजूद है (Duplicate), तो चुपचाप इग्नोर करें, डेमो न रुके
-            console.log("Note: Number already exists in profiles, skipping duplicate insert error.");
-            return { success: true, message: "Already exists" };
-        }
-
-        console.log("✅ Data successfully saved to profiles table:", result);
-        return { success: true, data: result };
-
-    } catch (error) {
-        console.error("❌ Supabase Save Exception:", error.message);
-        return { success: true, message: error.message }; // एरर आने पर भी डेमो नहीं रुकना चाहिए
-    }
-}
-console.log("✅ Demo Module Loaded (Final Profiles Connected)");
-/* ===========================================================
-   END OF MODULE 4: DEMO SYSTEM
-=========================================================== */
 /* ===========================================================
    MODULE 5: BOOKS ENGINE (books.json Driven)
 =========================================================== */
@@ -567,30 +644,30 @@ console.log("✅ Books Engine Module Loaded");
 
 
 /* ===========================================================
-   MODULE 6: UNIVERSAL CHECKOUT
+   MODULE 6: UNIVERSAL CHECKOUT
 =========================================================== */
 const CHECKOUT = { CURRENCY: "INR", STATUS: "pending" };
 let currentOrder = null;
 
 async function createCheckout(bookId) {
-    const book = await getBookById(bookId);
-    if (!book) return { success: false, message: "Book not found." };
+    const book = await getBookById(bookId);
+    if (!book) return { success: false, message: "Book not found." };
 
-    currentOrder = {
-        bookId: book.book_id,
-        title: book.title,
-        mrp: Number(book.mrp),
-        offerPrice: Number(book.offer_price),
-        amount: Number(book.offer_price),
-        paymentStatus: CHECKOUT.STATUS,
-        createdAt: new Date().toISOString()
-    };
-    localStorage.setItem("AI_CURRENT_ORDER", JSON.stringify(currentOrder));
-    return { success: true, order: currentOrder };
+    currentOrder = {
+        bookId: book.book_id,
+        title: book.title,
+        mrp: Number(book.mrp),
+        offerPrice: Number(book.offer_price),
+        amount: Number(book.offer_price),
+        paymentStatus: CHECKOUT.STATUS,
+        createdAt: new Date().toISOString()
+    };
+    localStorage.setItem("AI_CURRENT_ORDER", JSON.stringify(currentOrder));
+    return { success: true, order: currentOrder };
 }
 console.log("✅ Checkout Module Loaded");
 /* ===========================================================
-   END OF MODULE 6: UNIVERSAL CHECKOUT
+   END OF MODULE 6: UNIVERSAL CHECKOUT
 =========================================================== */
 
 
@@ -641,7 +718,8 @@ function startPayment() {
                     bookId: window.currentOrder.bookId,
                     paymentId: response.razorpay_payment_id,
                     amount: window.currentOrder.amount,
-                    purchasedAt: new Date().toISOString()
+                    purchasedAt: new Date().toISOString(),
+                    attribution: window.currentOrder.attribution // Add attribution data here
                 };
 
                 console.log("💾 Saving purchase data to Supabase...", window.currentPurchase);
@@ -689,7 +767,7 @@ console.log("✅ Razorpay Payment Module Loaded");
 =========================================================== */
 
 /* ===========================================================
-   MODULE 8: PURCHASES ENGINE (Profile ID Fix)
+   MODULE 8: PURCHASES ENGINE (Clean & Safe Insert)
 =========================================================== */
 let currentPurchase = null;
 
@@ -722,9 +800,10 @@ async function savePurchase() {
 
     // अगर फिर भी आईडी न मिले, तो एक डिफ़ॉल्ट या गेस्ट आईडी सेट कर दें ताकि एरर न आए
     if (!userProfileId) {
-        userProfileId = "00000000-0000-0000-0000-000000000000"; // या अपनी टेबल के हिसाब से कोई वैलिड UUID
+        userProfileId = "00000000-0000-0000-0000-000000000000"; // वैलिड UUID फॉर्मेट
     }
     
+    // केवल वही कॉलम भेजे जा रहे हैं जो डेटाबेस टेबल में सुरक्षित रूप से मौजूद हैं
     const { data, error } = await db.from("purchases").insert([{
         profile_id: userProfileId,
         order_id: currentPurchase.purchaseId,

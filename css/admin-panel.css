@@ -104,6 +104,8 @@ button, select, input { font: inherit; }
   padding: 20px; 
   box-shadow: var(--admin-shadow-sm); 
   z-index: 1000;
+  overflow-y: auto; /* डेस्कटॉप पर मेनू को स्क्रॉल करने योग्य बनाने के लिए */
+  height: 100vh;     /* पूरी स्क्रीन की ऊंचाई तक सीमित */
   transition: width 0.3s ease, transform 0.3s ease;
 }
 .admin-header { 
@@ -202,9 +204,8 @@ body.desktop-collapsed .admin-header {
   .admin-sidebar {
     transform: translateX(-100%);
     box-shadow: var(--admin-shadow);
-    /* Make sidebar scrollable on mobile if content overflows */
     overflow-y: auto; 
-    transition: transform 0.3s ease-out; /* ADDED: Smooth transition for sidebar */
+    transition: transform 0.3s ease-out;
   }
   
   body.mobile-drawer-open .admin-sidebar {
@@ -227,7 +228,6 @@ body.desktop-collapsed .admin-header {
     pointer-events: all;
   }
   
-  /* When mobile drawer is open, prevent body scroll */
   body.mobile-drawer-open {
     overflow: hidden;
   }
@@ -257,7 +257,7 @@ body.desktop-collapsed .admin-header {
     padding: 8px 16px;
   }
   .admin-main {
-    padding-top: 72px; /* 64px header + 8px margin */
+    padding-top: 72px;
   }
   .admin-container {
     padding: 12px;
@@ -301,37 +301,48 @@ body.desktop-collapsed .admin-header {
   }
 }
 
-/* === Mobile Search === */
+/* === Mobile Search & Header Fixes (Perfect & Polished) === */
 #admin-mobile-search-btn {
-  display: none; /* Hidden by default */
+  display: none;
 }
 
 .mobile-search-view {
-  display: none; /* Hidden by default */
+  display: none;
   width: 100%;
   height: 100%;
   align-items: center;
 }
 
 @media (max-width: 768px) {
-  /* Hide desktop search on mobile */
+  /* डिफ़ॉल्ट रूप से मोबाइल पर डेस्कटॉप सेंटर सर्च छिपा रहे */
   .admin-header .admin-header-center {
     display: none;
   }
 
-  /* Show mobile search button */
   #admin-mobile-search-btn {
     display: block;
   }
 
-  /* When mobile search is active */
+  /* जब मोबाइल सर्च एक्टिव हो, तो ब्लैंक होने के बजाय डेस्कटॉप वाला सर्च बॉक्स ही पर्फेक्टली ओवरले हो जाए */
   .admin-header.mobile-search-active .admin-header-row > .admin-header-left,
   .admin-header.mobile-search-active .admin-header-row > .admin-header-right {
-    display: none;
+    display: none !important;
   }
 
+  .admin-header.mobile-search-active .admin-header-center,
   .admin-header.mobile-search-active .mobile-search-view {
-    display: flex;
+    display: flex !important;
+    position: absolute;
+    left: 15px;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: auto !important;
+  }
+
+  .admin-header.mobile-search-active .admin-header-center input,
+  .admin-header.mobile-search-active .admin-header-center .search-wrapper {
+    width: 100% !important;
   }
 }
-

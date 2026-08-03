@@ -854,225 +854,117 @@ alert("Link Copied Successfully");
             PART 2.3 END
 ========================================================== */
 /* ==========================================================
-        MASTER SHARE & STICKY SYSTEM
-                JS PART 1
+        MASTER SHARE & STICKY SYSTEM (Phase-3 Integrated)
 ========================================================== */
 
-/* ===============================
-        ELEMENTS
-================================ */
+const shareDataElement = document.getElementById("book-share-data");
+const helpButton = document.getElementById("helpButton");
+const mobileShareButton = document.getElementById("mobileShareButton");
+const desktopWhatsapp = document.querySelector(".share-whatsapp");
+const desktopFacebook = document.querySelector(".share-facebook");
+const desktopCopy = document.querySelector(".share-copy");
 
-const helpButton=document.getElementById("helpButton");
-
-const mobileShareButton=document.getElementById("mobileShareButton");
-
-const shareData=document.getElementById("book-share-data");
-
-/* ===============================
-        BOOK DATA
-================================ */
-
-const bookTitle=shareData.dataset.title;
-
-const bookDescription=shareData.dataset.description;
-
-const bookPrice=shareData.dataset.price;
-
-const bookUrl=shareData.dataset.url;
-
-/* ===============================
-        HELP BUTTON
-================================ */
-
-if(helpButton){
-
-helpButton.addEventListener("click",(e)=>{
-
-e.preventDefault();
-
-const message=
-
-`नमस्ते,
-
-मुझे "${bookTitle}" के बारे में जानकारी चाहिए।
-
-${bookUrl}`;
-
-window.open(
-
-"https://wa.me/917974422572?text="+
-
-encodeURIComponent(message),
-
-"_blank"
-
-);
-
-});
-
+// Helper to get asset data from the DOM
+function getBookAsset() {
+    if (!shareDataElement) return null;
+    return {
+        asset_id: shareDataElement.dataset.id || null,
+        asset_type: 'book',
+        asset_title: shareDataElement.dataset.title || document.title,
+        asset_url: shareDataElement.dataset.url || window.location.href,
+        description: shareDataElement.dataset.description || '',
+        price: shareDataElement.dataset.price || ''
+    };
 }
 
-/* ===============================
-        MOBILE SHARE
-================================ */
+// Central share handler
+async function handleShare(channel) {
+    const asset = getBookAsset();
+    if (!asset) {
+        console.error("Share asset data not found.");
+        return;
+    }
 
-if(mobileShareButton){
+    // Use a non-tracked URL for the help button
+    if (channel === 'help') {
+        const message = `नमस्ते,\n\nमुझे "${asset.asset_title}" के बारे में जानकारी चाहिए।\n\n${asset.asset_url}`;
+        window.open("https://wa.me/917974422572?text=" + encodeURIComponent(message), "_blank");
+        return;
+    }
 
-mobileShareButton.addEventListener("click",async()=>{
+    // Generate tracked URL for all other channels
+    if (typeof createShareLink !== 'function') {
+        console.error("createShareLink function is not available.");
+        alert("Sharing service is currently unavailable.");
+        return;
+    }
 
-if(navigator.share){
+    const trackedUrl = await createShareLink(asset, channel);
+    const shareText = `📖 ${asset.asset_title}\n${asset.description}\n💰 Limited Time Offer : ${asset.price}\n👇 अभी देखें`;
 
-try{
+    switch (channel) {
+        case 'whatsapp':
+            window.open("https://wa.me/?text=" + encodeURIComponent(shareText + '\n' + trackedUrl), "_blank");
+            break;
 
-await navigator.share({
+        case 'facebook':
+            window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(trackedUrl), "_blank");
+            break;
 
-title:bookTitle,
+        case 'copy':
+            navigator.clipboard.writeText(trackedUrl)
+                .then(() => {
+                    if (desktopCopy) {
+                        desktopCopy.innerHTML = '<i class="fa-solid fa-circle-check"></i> Copied';
+                        setTimeout(() => {
+                            desktopCopy.innerHTML = '<i class="fa-solid fa-link"></i> Copy Link';
+                        }, 2000);
+                    } else {
+                        alert("Link Copied!");
+                    }
+                })
+                .catch(() => alert("Link Copy Failed"));
+            break;
 
-text:
-
-`${bookDescription}
-
-💰 ऑफर : ${bookPrice}`,
-
-url:bookUrl
-
-});
-
-}catch(err){
-
-console.log("Share Cancelled");
-
+        case 'native':
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: asset.asset_title,
+                        text: `${asset.description}\n💰 ऑफर : ${asset.price}`,
+                        url: trackedUrl
+                    });
+                } catch (err) {
+                    console.log("Share Cancelled");
+                }
+            } else {
+                // Fallback for desktop "mobile" share button
+                handleShare('copy');
+            }
+            break;
+    }
 }
 
-}else{
-
-navigator.clipboard.writeText(bookUrl);
-
-alert("Link Copied");
-
+// Bind events
+if (helpButton) {
+    helpButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        handleShare('help');
+    });
 }
-
-});
-
+if (mobileShareButton) {
+    mobileShareButton.addEventListener("click", () => handleShare('native'));
+}
+if (desktopWhatsapp) {
+    desktopWhatsapp.addEventListener("click", () => handleShare('whatsapp'));
+}
+if (desktopFacebook) {
+    desktopFacebook.addEventListener("click", () => handleShare('facebook'));
+}
+if (desktopCopy) {
+    desktopCopy.addEventListener("click", () => handleShare('copy'));
 }
 
 /* ==========================================================
-                PART 3C PART 1 END
-========================================================== */
-/* ==========================================================
-        MASTER SHARE & STICKY SYSTEM
-                JS PART 2
-========================================================== */
-
-/* ===============================
-        DESKTOP BUTTONS
-================================ */
-
-const desktopWhatsapp =
-document.querySelector(".share-whatsapp");
-
-const desktopFacebook =
-document.querySelector(".share-facebook");
-
-const desktopCopy =
-document.querySelector(".share-copy");
-
-/* ===============================
-        SHARE MESSAGE
-================================ */
-
-const shareMessage =
-
-`📖 ${bookTitle}
-
-${bookDescription}
-
-💰 Limited Time Offer : ${bookPrice}
-
-👇 अभी देखें
-
-${bookUrl}`;
-
-/* ===============================
-        WHATSAPP
-================================ */
-
-if(desktopWhatsapp){
-
-desktopWhatsapp.addEventListener("click",()=>{
-
-window.open(
-
-"https://wa.me/?text="+
-
-encodeURIComponent(shareMessage),
-
-"_blank"
-
-);
-
-});
-
-}
-
-/* ===============================
-        FACEBOOK
-================================ */
-
-if(desktopFacebook){
-
-desktopFacebook.addEventListener("click",()=>{
-
-window.open(
-
-"https://www.facebook.com/sharer/sharer.php?u="+
-
-encodeURIComponent(bookUrl),
-
-"_blank"
-
-);
-
-});
-
-}
-
-/* ===============================
-        COPY LINK
-================================ */
-
-if(desktopCopy){
-
-desktopCopy.addEventListener("click",()=>{
-
-navigator.clipboard.writeText(bookUrl)
-
-.then(()=>{
-
-desktopCopy.innerHTML=
-
-'<i class="fa-solid fa-circle-check"></i> Copied';
-
-setTimeout(()=>{
-
-desktopCopy.innerHTML=
-
-'<i class="fa-solid fa-link"></i> Copy Link';
-
-},2000);
-
-})
-
-.catch(()=>{
-
-alert("Link Copy Failed");
-
-});
-
-});
-
-}
-
-/* ==========================================================
-                PART 3C PART 2 END
+                PART 3C END
 ========================================================== */

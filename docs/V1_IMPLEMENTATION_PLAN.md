@@ -80,4 +80,33 @@ Next steps (Phase-2 preparation):
 - Replace js/admin-api.js dummy provider with secured endpoints or server-proxied Supabase queries.
 - Add export and charting modules (CSV/Excel export, chart library integration) as needed.
 
+Phase-1 Foundation Extension (implemented)
+- Scope: add non-invasive core helpers for a future Universal Share Engine without altering the current website, registration, payments, admin UI, or user flows.
+- Files introduced:
+  - js/share-engine-core.js: asset normalization, share token generation, attribution payload construction, visitor-id helpers, and report-summary shaping.
+  - js/permissions-core.js: permission normalization, module visibility checks, and action-level permission helpers.
+  - js/lead-owner-core.js: permanent lead-owner assignment helpers and history-entry construction.
+- Design notes:
+  - These modules are pure utility layers and are not wired into any existing page or flow yet.
+  - They are safe to keep in place for Phase-2 integration and can be imported later by existing modules without changing current behavior.
+  - The implementation deliberately avoids touching current registration, checkout, payment, library, downloads, or admin UI code paths.
+- Verification:
+  - JavaScript syntax was checked for each new module.
+  - No public page was modified.
+  - No database changes were executed.
+  - No existing functionality was altered.
+
+End of Phase-1 Implementation Plan
+
+Phase-2 Implementation (implemented)
+- Scope: extend the existing registration and checkout flows with additive attribution capture while preserving all current behavior.
+- Files changed:
+  - js/supabase.js: added safe share-context helpers, local persistence, and registration attribution capture that feeds profile creation and future share-event tracking without breaking current flows.
+  - js/registration.js: added URL-based share/referral context capture and preservation during registration.
+  - js/checkout.js: added checkout-side attribution capture and order payload enrichment using the same context helpers.
+- Safety notes:
+  - No existing UI structure or business flow was removed or replaced.
+  - Attribution is captured as metadata and stored locally first; the Supabase helper gracefully tolerates missing tables or connection issues.
+  - This keeps the system backward-compatible while preparing for later admin reporting and share analytics.
+
 End of Phase-1 Implementation Plan

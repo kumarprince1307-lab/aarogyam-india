@@ -79,13 +79,45 @@ export async function initReports() {
         <div class="admin-section-title">Total Report</div>
         ${renderReportCards(totalData)}
       </section>
-      <section class="admin-section" id="lead-report">
-        <div class="admin-section-title">Lead Report</div>
-        ${renderLeadReportTable(filteredLeadData)}
-      </section>
+
+      {/* Share Report → share_links */}
       <section class="admin-section" id="share-report">
         <div class="admin-section-title">Share Report</div>
         ${renderShareReportTable(shareData)}
+      </section>
+
+      {/* Referral Report → profiles */}
+      <section class="admin-section" id="referral-report-placeholder">
+        <div class="admin-section-title">Referral Report</div>
+        <div class="admin-empty"><strong>No Data Available</strong></div>
+      </section>
+      
+      {/* Asset Report → share_assets */}
+      <section class="admin-section" id="asset-report-placeholder">
+        <div class="admin-section-title">Asset Report</div>
+        <div class="admin-empty"><strong>No Data Available</strong></div>
+      </section>
+
+      {/* Lead Owner Report → lead_owners */}
+      <section class="admin-section" id="lead-owner-report-placeholder">
+        <div class="admin-section-title">Lead Owner Report</div>
+        <div class="admin-empty"><strong>No Data Available</strong></div>
+      </section>
+
+      {/* Source Report → registration_sources */}
+      <section class="admin-section" id="source-report-placeholder">
+        <div class="admin-section-title">Source Report</div>
+        <div class="admin-empty"><strong>No Data Available</strong></div>
+      </section>
+
+      <section class="admin-section" id="performance-report-placeholder">
+        <div class="admin-section-title">Performance Report</div>
+        <div class="admin-empty"><strong>No Data Available</strong></div>
+      </section>
+
+      <section class="admin-section" id="legacy-lead-report">
+        <div class="admin-section-title">Lead Report (Legacy)</div>
+        ${renderLeadReportTable(filteredLeadData)}
       </section>
     `;
   }

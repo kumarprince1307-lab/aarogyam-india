@@ -1,7 +1,7 @@
 /* Admin Dashboard Page */
 
 import { initAdminLayout } from './admin-main.js';
-import { fetchDashboardData } from './admin-api.js';
+import { fetchDashboardData, fetchShareEngineSummaryData } from './admin-api.js';
 
 function renderKpiGroup(kpis) {
   return `<div class="kpi-row">
@@ -72,15 +72,37 @@ export async function initDashboard() {
   content.innerHTML = '<div class="admin-loading">Loading dashboard data...</div>';
 
   try {
-    const result = await fetchDashboardData();
+    // Fetch both standard dashboard data and share summary data in parallel
+    const [result, shareResult] = await Promise.all([
+      fetchDashboardData(),
+      fetchShareEngineSummaryData()
+    ]);
+
     if (!result.success || !result.data) {
       content.innerHTML = '<div class="admin-error"><strong>Unable to load dashboard data.</strong><br>Please try again later.</div>';
       return;
     }
 
     const { kpis, leadSources, customerJourney, bookSales, recentActivity } = result.data;
+    const shareSummary = shareResult.success ? shareResult.data : {};
+
+    // Use live data for Share KPIs, with fallbacks
+    const shareKpis = [
+      { label: 'Total Shares', value: shareSummary.totalShares || 0 },
+      { label: 'Total Clicks', value: shareSummary.totalClicks || 0 },
+      { label: 'Total Visitors', value: shareSummary.totalVisitors || 0 },
+      { label: 'Total Leads', value: shareSummary.totalLeads || 0 },
+      { label: 'Total Registrations', value: shareSummary.totalRegistrations || 0 },
+      { label: 'Total Purchases', value: shareSummary.totalPurchases || 0 },
+      { label: 'Total Revenue', value: `₹${(shareSummary.totalRevenue || 0).toLocaleString('en-IN')}` },
+      { label: 'Conversion Rate', value: shareSummary.conversionRate || '0.00%' }
+    ];
 
     content.innerHTML = `
+      <div class="admin-section" id="share-summary">
+        <div class="admin-section-title">Share Engine Summary</div>
+        ${renderKpiGroup(shareKpis)}
+      </div>
       <div class="admin-section" id="business-summary">
         <div class="admin-section-title">Business Summary</div>
         ${renderKpiGroup(kpis)}

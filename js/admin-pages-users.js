@@ -6,12 +6,20 @@ import { fetchUsers } from './admin-api.js';
 function renderUserRow(user) {
   return `
     <tr>
-      <td>${user.id}</td>
-      <td>${user.name}</td>
+      <td><a href="user-details.html?id=${user.id}" class="admin-subtle-link">${user.id}</a></td>
+      <td>
+        <div class="admin-user-name">${user.name}</div>
+        <div class="admin-user-email">${user.email}</div>
+      </td>
       <td>${user.mobile}</td>
-      <td>${user.email}</td>
       <td>${user.source}</td>
-      <td><span class="status-pill ${user.status}">${user.status}</span></td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td><span class="admin-pill ${user.status.toLowerCase()}">${user.status}</span></td>
       <td><a href="user-details.html?id=${user.id}" class="admin-button">View</a></td>
     </tr>
   `;
@@ -26,7 +34,20 @@ function renderUsersTable(users) {
     <div class="admin-table-wrapper">
       <table class="admin-table">
         <thead>
-          <tr><th>ID</th><th>Name</th><th>Mobile</th><th>Email</th><th>Source</th><th>Status</th><th>Action</th></tr>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Reg. Source</th>
+            <th>Share ID</th>
+            <th>Lead Owner</th>
+            <th>Direct Referrals</th>
+            <th>Total Shares</th>
+            <th>Total Leads</th>
+            <th>Total Purchases</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
         </thead>
         <tbody>
           ${users.map(renderUserRow).join('')}
