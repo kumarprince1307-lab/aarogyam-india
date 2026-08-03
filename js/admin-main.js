@@ -19,17 +19,6 @@ import { renderHeader } from './admin-components-header.js';
 import { renderSidebar } from './admin-components-sidebar.js';
 import { initRouter } from './admin-router.js';
 
-// Function to check admin session
-function checkAdminSession() {
-  const session = localStorage.getItem("AI_SESSION");
-  if (!session) {
-    // Redirect to login page if no session exists
-    window.location.href = '../admin/login.html';
-    return false; // Indicate that redirection happened
-  }
-  return true; // Indicate that session exists
-}
-
 export function initAdminLayout(pageTitle = 'Admin Panel', pageDescription = '') {
   try {
     // Ensure backdrop exists for mobile drawer
@@ -130,11 +119,6 @@ if (document.readyState === 'loading') {
 
 function bootstrapAdminApp() {
   try {
-    // Perform session check before anything else
-    if (!checkAdminSession()) {
-      return; // Stop further execution if session is not valid
-    }
-
     initAdminLayout();
     if (typeof initRouter === 'function') {
       initRouter();
