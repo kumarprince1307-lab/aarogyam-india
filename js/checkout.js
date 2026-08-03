@@ -1,9 +1,31 @@
 /* ==========================================
    AAROGYAM INDIA
-   CHECKOUT.JS (Complete & Clean - Updated)
+   CHECKOUT.JS (Complete, Full & Clean - Smart Existing/New User Bypass)
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", loadBook);
+
+function syncCheckoutShareContext() {
+    const params = new URLSearchParams(window.location.search);
+    const shareContext = {
+        source: params.get("source") || params.get("utm_source") || "checkout",
+        share_channel: params.get("share_channel") || params.get("channel") || params.get("utm_medium") || null,
+        share_token: params.get("share_token") || params.get("share_id") || params.get("tracking_token") || null,
+        referral_mobile: params.get("referral_mobile") || params.get("referral") || null,
+        asset_type: params.get("asset_type") || null,
+        asset_id: params.get("asset_id") || null,
+        asset_title: params.get("asset_title") || null,
+        asset_url: params.get("asset_url") || null,
+        referrer: document.referrer || null,
+        landing_url: window.location.href || null
+    };
+
+    if (typeof persistShareContext === "function") {
+        persistShareContext(shareContext);
+    }
+
+    return typeof getCurrentShareContext === "function" ? getCurrentShareContext() : shareContext;
+}
 
 async function loadBook() {
     try {
@@ -62,6 +84,7 @@ async function loadBook() {
         const totPrice = document.getElementById("totalPrice");
         if (totPrice) totPrice.textContent = "₹" + bookOffer;
 
+        syncCheckoutShareContext();
         autoFillUserData();
 
     } catch (error) {
@@ -120,6 +143,8 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
     payBtn.textContent = "Processing...";
 
     try {
+        syncCheckoutShareContext();
+
         if (typeof registerUser === "function") {
             const regResult = await registerUser({
                 fullName: name,
@@ -128,7 +153,10 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 source: "checkout"
             });
 
-            if (!regResult.success) {
+            // स्मार्ट बायपास: यदि यूजर पहले से रजिस्टर्ड है (Already exists), तो एरर न देकर सीधे पेमेंट पर जाने दें
+            const isAlreadyExists = regResult.message && regResult.message.toLowerCase().includes("already");
+
+            if (!regResult.success && !isAlreadyExists) {
                 alert(regResult.message || "User registration failed.");
                 payBtn.disabled = false;
                 payBtn.textContent = "Pay Now";
@@ -136,13 +164,16 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
             }
         }
 
+        const attributionContext = typeof getCurrentShareContext === "function" ? getCurrentShareContext() : {};
         const orderData = {
             bookId: window.currentCheckoutBook ? window.currentCheckoutBook.id : "BK001",
             title: window.currentCheckoutBook ? window.currentCheckoutBook.title : document.getElementById("bookName").textContent,
             amount: window.currentCheckoutBook ? window.currentCheckoutBook.offerPrice : 99,
             customerName: name,
             mobile: mobile,
-            email: email
+            email: email,
+            attribution: attributionContext,
+            source: attributionContext.source || "checkout"
         };
 
         window.currentOrder = orderData;
@@ -151,14 +182,12 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         if (typeof startPayment === "function") {
             const res = startPayment();
             
-            // यदि पेमेंट इनिशियलाइज़ेशन फेल हो जाए या यूजर पॉपअप बंद/कैंसिल कर दे, तो बटन रिसेट करने के लिए
             if (res && typeof res === 'object' && res.success === false) {
                 payBtn.disabled = false;
                 payBtn.textContent = "Pay Now";
                 if (res.message) alert(res.message);
             }
         } else {
-            // अगर startPayment ग्लोबल स्कोप में किसी कारण से मॉनिटर न हो पाए, तो सेफ्टी के लिए टाइमर या फोल्बैक
             setTimeout(() => {
                 if (payBtn.textContent === "Processing...") {
                     payBtn.disabled = false;
@@ -182,8 +211,9 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 // Extra Window focus/blur listener ताकि Razorpay पॉपअप कटने या कैंसिल होने पर 'Processing' हट जाए
 window.addEventListener('focus', function() {
     const payBtn = document.getElementById("payNowBtn");
-    if (payBtn && payBtn.textContent === "Processing...") {
-        // यदि यूजर ने पेमेंट विंडो बंद कर दी है, तो बटन तुरंत सामान्य हो जाएगा
+    if (payBtn && payBtn.textContent === "Processing...") 
+        
+        {
         setTimeout(() => {
             payBtn.disabled = false;
             payBtn.textContent = "Pay Now";

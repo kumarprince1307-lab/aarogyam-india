@@ -44,7 +44,6 @@ const URLS_TO_CACHE = [
     '/categories/education.html',
     '/categories/health.html',
     '/categories/netsurf.html',
-    '/css/admin.css',
     '/css/agriculture.css',
     '/css/book-landing.css',
     '/css/cart.css',
