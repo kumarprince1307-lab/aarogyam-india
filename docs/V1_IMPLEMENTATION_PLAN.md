@@ -1,112 +1,109 @@
-# Admin Panel V1 — Phase-1 Implementation Plan
+# Universal Share Engine V1: Official Implementation Plan
 
-Version: V1 Phase-1
-Date: 2026-08-02
+Version: 2.0
+Date: 2026-08-04
 
-Overview
-- Purpose: Prepare and document a safe, stepwise Phase-1 plan for introducing a locked Admin Panel V1 while guaranteeing the live selling website continues to operate exactly as today.
-- Constraints:
-  - V1 only.
-  - No modifications to working features in Phase-1 unless explicitly authorized.
-  - All Phase-1 work is documentation and the creation of isolated admin skeleton files only. No changes to registration, checkout, payment, my library, demo book, downloads, wallet, or selling flow.
+---
 
-Phase-1 Objectives
-1. Create and record the Phase-1 Implementation Plan and changelog in docs/.
-2. Produce a read-only Gap Analysis (inventory of integration points and schema needs) and record findings here.
-3. Create the minimal, safest admin skeleton files (client-side only) that do not run automatically nor alter existing behavior.
-4. Prepare exact SQL ALTER statements and a Phase-2 patch plan (will be drafted in Phase-1 but not executed until approved).
+## 1. Overview
 
-Phase-1 Deliverables (created in this iteration)
-- docs/V1_IMPLEMENTATION_PLAN.md (this file)
-- docs/CHANGELOG.md (new changelog entry for Phase-1)
-- js/admin-auth.js (safe skeleton, not referenced by public pages)
-- js/admin-dashboard.js (safe skeleton, not referenced by public pages)
+This document is the single source of truth for the Universal Share Engine V1. It merges the official 11-point V1 architecture with the foundational work already completed. The purpose is to create a comprehensive, multi-level referral and attribution system and the corresponding admin and user-facing modules to manage it.
 
-Gap Analysis (read-only summary)
-- Existing authoritative DB integration point: js/supabase.js — all profile, purchases, download logs and registration helpers live here.
-- Session management: session.js — site-wide session abstraction uses localStorage keys AI_USER, AI_PROFILE, AI_SESSION. Admin auth should use this for identifying the currently logged-in profile.
-- Registration flow: registration.js already supports a source URL param and calls registerUser(formData) — safe for later attribution capture.
-- Checkout flow: checkout.js builds orderData and calls registerUser() before payment. This ensures attribution saved at checkout if we pass it.
-- Purchases: purchases.js reads purchases table using supabase client. Admin read-only UI can reuse same client methods.
+This plan supersedes all previous share-related planning and aligns development with the official V1 goals for sharing, referral, and marketing analytics.
 
-Immediate Gap items for Phase-2 (do not implement now):
-- DB schema additions: purchases.{acquisition_source, referrer_profile_id, tracking_token, utm_*}, profiles.is_admin, download_logs.{acquisition_source,tracking_token,referrer_profile_id}, all NULLABLE or with safe defaults.
-- Admin auth server-side enforcement: require Supabase RLS or a secure server-side admin token for privileged queries. Phase-1 will only design the approach.
+---
 
-Phase-1 Tasks (explicit)
-- Task A: Documentation (create this file and docs/CHANGELOG.md).
-- Task B: Create admin-skeleton JS files (admin-auth.js, admin-dashboard.js) that are inert and not included in any public page. These are placeholders for Phase-2.
-- Task C: Draft SQL ALTER statements (kept in Phase-1 docs, not executed).
-- Task D: Produce Phase-2 patch plan (line-level edits, tests, rollback). Drafted in Phase-1 docs but not executed.
+## 2. Official V1 Universal Share Engine Workflow
 
-Acceptance criteria for Phase-1
-- The docs files exist at docs/V1_IMPLEMENTATION_PLAN.md and docs/CHANGELOG.md with exact approved content.
-- The admin-skeleton files exist under js/ and do not alter public pages or flows.
-- No existing file is modified.
-- No database changes are executed.
-- A Gap Analysis is captured in this document.
+The following 11-point workflow is the locked, official standard for the V1 implementation.
 
-Testing and Verification (Phase-1)
-- Confirm that the new docs and admin JS files exist and contain the planned content.
-- Confirm git status (no modified files other than new files created).
-- Confirm that no public page references the new admin JS files (no automatic execution).
+1.  **Documentation Audit:** Understand the complete Share Engine documentation.
+2.  **Final Share Engine Blueprint:** Visitor → Landing Page → Share Button → Share Link → Referral Detection → Registration → Internal User ID → Referral Save → Admin Reports.
+3.  **Universal Share Coverage:** Must support Book, Demo Book, Product, Webinar, Agriculture, Health, Beauty, Business, Education, Digital AI, and All Landing Pages.
+4.  **Referral Tree:** Support a multi-level `A → B → C` team structure.
+5.  **Marketing Analytics:** Track Shares, Visitors, Clicks, Registration, Demo, Purchase, Referral, and Conversion.
+6.  **Admin Share Module:** Includes Dashboard, Reports, Top Sharers, Referral Tree, Marketing Analytics, Conversion, and Share Management.
+7.  **Coding & Integration:** To begin only after this blueprint is formally approved.
+8.  **End-to-End Testing:** Cover Book, Demo Book, Registration, Landing Page, Referral, Admin, and Database interactions.
+9.  **Git Workflow:** Feature Branch → Testing → Pull Request → Main Merge.
+10. **Production Launch:** Online Testing (Mobile, Desktop) → Verification → Launch.
+11. **User Profile & Privacy (`myprofile.html`):** Includes User Share History, Referral Summary, Team Summary, Registration Count, and Purchase Count, with admin-controlled visibility for private user data.
 
-Future Phase-2 (high level, not implemented in Phase-1)
-- Add read-only admin helper functions to js/supabase.js (only used by /admin pages).
-- Create static admin pages (admin/dashboard.html, admin/users.html, admin/purchases.html) and protect them with a secure admin-auth mechanism (server-side or RLS enforced).
-- Add DB columns for attribution (NULLABLE) and add attribution capture in script.js (first-touch) and propagate attribution in registration and checkout flows via feature-flag.
-- QA in staging, then gradual rollout with monitoring and rollback plan.
+---
 
-Notes & Constraints (must be followed)
-- Do not touch payment/checkout/registration/demo/book/my-library/downloads/wallet/selling flow in Phase-1.
-- All Phase-1 changes are reversible and non-invasive (create-only; no edits to existing files).
-- All V2 or V3 ideas are to be left as TODO comments in admin skeleton files only.
+## 3. Architectural Deep Dive & V1 Gaps
 
-Contact
-- Reply to this message to approve Phase-2 planning or to request modifications to Phase-1 artifacts.
+This section details the new architectural requirements and how they expand upon the existing foundation.
 
-Task-2 completed in Phase-1: Admin Panel skeleton created. See docs/CHANGELOG.md for created files list.
+### 3.1. Referral Tree (Point 4)
 
-Update: The Admin Panel V1 UI has been extended to a full responsive Phase-1 placeholder experience with dashboard, reports, users, purchases, downloads, and admin auth screens.
+The existing foundation supports only a single-level `referrer_profile_id`. The V1 standard requires a database schema and business logic capable of supporting a multi-level referral tree (e.g., A refers B, who refers C). This will involve significant changes to `supabase.js` helpers and the user profile data structure to store and query parent/child relationships efficiently. This is the basis for the "Team Structure."
 
-Decisions made during Admin UI Completion (recorded):
-- Admin UI will remain entirely client-side in V1 and use a local dummy-data provider (js/admin-api.js). No server-side keys or service_role tokens will be added.
-- Admin pages are intentionally static files under /admin and must be deployed only to a protected area in Phase-2. Do NOT expose these under the public site until server-side auth and RLS are implemented.
-- Global search is implemented as a custom DOM event (admin:global-search) to avoid tight coupling between header and page modules.
-- Sidebar submenus are expandable client-side only. Permission gating will be implemented in Phase-2 server-side or at render time after a secure auth check.
+### 3.2. Admin Share Module (Point 6)
 
-Next steps (Phase-2 preparation):
-- Implement secure server-side admin authentication and RLS-protected endpoints before enabling admin pages in production.
-- Replace js/admin-api.js dummy provider with secured endpoints or server-proxied Supabase queries.
-- Add export and charting modules (CSV/Excel export, chart library integration) as needed.
+The current Admin Panel is a static, client-side skeleton with dummy data. The V1 standard requires a full-featured, data-driven module with secure, server-side authentication and RLS.
 
-Phase-1 Foundation Extension (implemented)
-- Scope: add non-invasive core helpers for a future Universal Share Engine without altering the current website, registration, payments, admin UI, or user flows.
-- Files introduced:
-  - js/share-engine-core.js: asset normalization, share token generation, attribution payload construction, visitor-id helpers, and report-summary shaping.
-  - js/permissions-core.js: permission normalization, module visibility checks, and action-level permission helpers.
-  - js/lead-owner-core.js: permanent lead-owner assignment helpers and history-entry construction.
-- Design notes:
-  - These modules are pure utility layers and are not wired into any existing page or flow yet.
-  - They are safe to keep in place for Phase-2 integration and can be imported later by existing modules without changing current behavior.
-  - The implementation deliberately avoids touching current registration, checkout, payment, library, downloads, or admin UI code paths.
-- Verification:
-  - JavaScript syntax was checked for each new module.
-  - No public page was modified.
-  - No database changes were executed.
-  - No existing functionality was altered.
+The new required components are:
+- **Dashboard:** High-level overview of share-related KPIs.
+- **Reports:** Detailed, filterable reports on all tracked marketing analytics.
+- **Top Sharers:** Leaderboards for users generating the most traffic and conversions.
+- **Referral Tree Explorer:** A UI to visualize user hierarchy and team structures.
+- **Marketing Analytics:** Views for all metrics listed in Point 5.
+- **Share Management:** Tools for admins to manage shareable campaigns or links.
 
-End of Phase-1 Implementation Plan
+### 3.3. User Profile & Privacy (Point 11)
 
-Phase-2 Implementation (implemented)
-- Scope: extend the existing registration and checkout flows with additive attribution capture while preserving all current behavior.
-- Files changed:
-  - js/supabase.js: added safe share-context helpers, local persistence, and registration attribution capture that feeds profile creation and future share-event tracking without breaking current flows.
-  - js/registration.js: added URL-based share/referral context capture and preservation during registration.
-  - js/checkout.js: added checkout-side attribution capture and order payload enrichment using the same context helpers.
-- Safety notes:
-  - No existing UI structure or business flow was removed or replaced.
-  - Attribution is captured as metadata and stored locally first; the Supabase helper gracefully tolerates missing tables or connection issues.
-  - This keeps the system backward-compatible while preparing for later admin reporting and share analytics.
+A new or updated `myprofile.html` page is required. This page will serve as a user's personal dashboard for their sharing activity.
 
-End of Phase-1 Implementation Plan
+Key features include:
+- **User Share History:** A log of assets the user has shared.
+- **Referral & Team Summary:** High-level statistics on their referral network.
+- **Counts:** Key metrics like Registration Count and Purchase Count from their referrals.
+- **Privacy Controls:** The module must feature admin-controlled visibility settings to show or hide sensitive user data (State, District, Mobile, etc.) from other users in the referral tree.
+
+---
+
+## 4. Implementation Plan
+
+Development will proceed in phases, with documentation approval required before coding begins for each phase.
+
+-   **Phase 1: Schema & Backend:** Design and implement the new database schema for the multi-level referral tree. Update `supabase.js` with secure helpers for managing the tree and tracking all new analytics events.
+-   **Phase 2: Admin Module:** Build out the complete, data-driven Admin Share Module with all required reports and visualizations. This includes replacing the dummy data provider (`js/admin-api.js`) with secure, RLS-protected endpoints.
+-   **Phase 3: Frontend Integration:** Implement the user-facing "Share Button" on all required assets (Point 3). Update the registration flow to correctly handle the new referral tree logic.
+-   **Phase 4: User Profile Module:** Build the `myprofile.html` page with all specified features and privacy controls.
+-   **Phase 5: Testing & Launch:** Conduct rigorous end-to-end testing (Point 8) and follow the official Git (Point 9) and Launch (Point 10) workflows.
+
+---
+
+## Appendix: Completed Foundational Work (Historical Context)
+
+The following notes are preserved from previous implementation phases and describe the foundational attribution system upon which the Universal Share Engine will be built.
+
+### A.1. Initial Gap Analysis (Read-Only Summary)
+
+-   **DB Integration:** `js/supabase.js` is the authoritative integration point.
+-   **Session Management:** `session.js` uses `localStorage` and can be used for admin auth.
+-   **Attribution Capture:** `registration.js` and `checkout.js` were already prepared for URL-based attribution capture.
+
+### A.2. Phase-1 Foundation Extension (Implemented)
+
+This phase added non-invasive core helpers for a future share engine.
+-   **Files Introduced:**
+    -   `js/share-engine-core.js`: For asset normalization, token generation, payload construction, and report shaping.
+    -   `js/permissions-core.js`: For permission normalization and checks.
+    -   `js/lead-owner-core.js`: For lead ownership assignment.
+-   **Notes:** These are pure utility layers, not yet wired into user-facing flows.
+
+### A.3. Phase-2 Attribution Integration (Implemented)
+
+This phase extended existing flows with additive attribution capture.
+-   **Files Changed:**
+    -   `js/supabase.js`: Added safe share-context helpers and local persistence.
+    -   `js/registration.js`: Added URL-based share/referral context capture.
+    -   `js/checkout.js`: Added checkout-side attribution capture.
+-   **Safety Notes:** The changes were backward-compatible and did not alter existing business flows, providing a safe foundation for the single-level attribution that must now be upgraded.
+
+### A.4. Admin Panel Skeleton (Implemented)
+
+- **UI Status:** A responsive, client-side placeholder UI was created for the admin panel (`/admin` folder).
+- **Data Status:** The UI is powered by a local dummy-data provider (`js/admin-api.js`). No server-side keys or connections were implemented. It is not production-ready.
