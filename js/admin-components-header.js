@@ -50,7 +50,7 @@ export function renderHeader(containerId = 'header-placeholder', title = 'Admin 
             <div id="admin-profile-menu" class="admin-profile-menu" aria-hidden="true">
               <a href="#">Profile</a>
               <a href="#" data-route="settings">Settings</a>
-              <a href="#">Logout</a>
+              <a href="#" id="admin-logout-btn">Logout</a>
             </div>
           </div>
         </div>
@@ -67,13 +67,23 @@ export function renderHeader(containerId = 'header-placeholder', title = 'Admin 
     </header>
   `;
 
-  // Events
+  // --- Event Listeners ---
+
+  // Logout Button
+  const logoutBtn = c.querySelector('#admin-logout-btn');
+  logoutBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('admin_session');
+    window.location.href = 'login.html';
+  });
+
+  // Search Input
   const searchInput = c.querySelector('#admin-global-search');
   searchInput?.addEventListener('input', event => {
     const query = event.target.value;
     document.dispatchEvent(new CustomEvent('admin:global-search', { detail: { query } }));
   });
-
+  
   const refreshButton = c.querySelector('#admin-refresh-button');
   refreshButton?.addEventListener('click', () => window.location.reload());
 
