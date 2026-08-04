@@ -16,6 +16,12 @@ const ROUTES = {
 
 export async function navigateTo(routeName) {
  const name = (routeName || '').replace('#','') || 'dashboard';
+ const adminSession = localStorage.getItem('admin_session');
+ if (!adminSession) {
+   window.location.href = 'admin/login.html';
+   return;
+ }
+
  // update compact title in header if present
  const compactTitle = document.querySelector('.admin-title-compact');
  const breadcrumb = document.querySelector('.admin-breadcrumb');
@@ -65,3 +71,5 @@ export function initRouter() {
    }
  });
 }
+
+console.log('✅ admin-router.js loaded');
