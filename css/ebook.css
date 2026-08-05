@@ -1999,6 +1999,63 @@ height:30px;
 
 }
 
+/*=========================================================
+                PART 11
+        UNIVERSAL SHARE COMPONENT
+=========================================================*/
+
+.share-component {
+    background: var(--background);
+    padding: 50px 0;
+    text-align: center;
+}
+
+.share-component-title h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 25px;
+}
+
+.share-component-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 28px;
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 50px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+}
+
+.share-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.share-btn:hover {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary-dark);
+    transform: translateY(-3px);
+}
+
+
 }
     .whatsapp-float{
 

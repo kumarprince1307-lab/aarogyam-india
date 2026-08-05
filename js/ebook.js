@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initSearchPlaceholder();
 
+    // Initialize Universal Share Engine
+    const shareEngine = new UniversalShareEngine();
+    shareEngine.init();
+
 });
 
 /*=========================================================
@@ -753,6 +757,12 @@ window.addEventListener("scroll", () => {
             backTop.style.display = "none";
 
         }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const shareEngine = new UniversalShareEngine();
+    shareEngine.init();
 
     }
 

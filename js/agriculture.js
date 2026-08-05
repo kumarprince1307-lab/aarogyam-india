@@ -1,182 +1,50 @@
-/* ==========================================================
-                HERO BANNER START
-                HERO SLIDER JS
-========================================================== */
+document.addEventListener('DOMContentLoaded', function () {
 
-const heroSlides = document.querySelectorAll(".hero-slide");
-const heroDots = document.querySelectorAll(".hero-dot");
-const heroPrev = document.querySelector(".hero-prev");
-const heroNext = document.querySelector(".hero-next");
+    // Initialize the Universal Share Engine
+    const shareEngine = new UniversalShareEngine();
+    shareEngine.init();
 
-let currentSlide = 0;
-let heroInterval;
+    // Hero Slider Logic
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.hero-dot');
+    const prevBtn = document.querySelector('.hero-prev');
+    const nextBtn = document.querySelector('.hero-next');
 
-/* ===============================
-        Show Slide
-================================ */
+    let currentSlide = 0;
 
-function showSlide(index){
+    function showSlide(n) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
 
-    heroSlides.forEach((slide)=>{
-        slide.classList.remove("active");
-    });
+        currentSlide = (n + slides.length) % slides.length;
 
-    heroDots.forEach((dot)=>{
-        dot.classList.remove("active");
-    });
-
-    heroSlides[index].classList.add("active");
-    heroDots[index].classList.add("active");
-
-    currentSlide = index;
-
-}
-
-/* ===============================
-        Next Slide
-================================ */
-
-function nextSlide(){
-
-    currentSlide++;
-
-    if(currentSlide >= heroSlides.length){
-
-        currentSlide = 0;
-
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
     }
 
-    showSlide(currentSlide);
-
-}
-
-/* ===============================
-        Previous Slide
-================================ */
-
-function prevSlide(){
-
-    currentSlide--;
-
-    if(currentSlide < 0){
-
-        currentSlide = heroSlides.length-1;
-
+    function nextSlide() {
+        showSlide(currentSlide + 1);
     }
 
-    showSlide(currentSlide);
+    function prevSlide() {
+        showSlide(currentSlide - 1);
+    }
 
-}
+    // Event Listeners for slider controls
+    if (nextBtn) {
+        nextBtn.addEventListener('click', nextSlide);
+    }
 
-/* ===============================
-        Auto Slide
-================================ */
+    if (prevBtn) {
+        prevBtn.addEventListener('click', prevSlide);
+    }
 
-function startSlider(){
-
-    heroInterval = setInterval(nextSlide,5000);
-
-}
-
-/* ===============================
-        Stop Slider
-================================ */
-
-function stopSlider(){
-
-    clearInterval(heroInterval);
-
-}
-
-/* ===============================
-        Buttons
-================================ */
-
-if(heroNext){
-
-    heroNext.addEventListener("click",()=>{
-
-        stopSlider();
-        nextSlide();
-        startSlider();
-
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => showSlide(index));
     });
 
-}
+    // Auto-play the slider
+    setInterval(nextSlide, 5000); // Change slide every 5 seconds
 
-if(heroPrev){
-
-    heroPrev.addEventListener("click",()=>{
-
-        stopSlider();
-        prevSlide();
-        startSlider();
-
-    });
-
-}
-
-/* ===============================
-        Dot Click
-================================ */
-
-heroDots.forEach((dot,index)=>{
-
-    dot.addEventListener("click",()=>{
-
-        stopSlider();
-
-        showSlide(index);
-
-        startSlider();
-
-    });
-
+    console.log("Agriculture page script and Share Engine initialized.");
 });
-
-/* ===============================
-               HERO BANNER end
-                 : HERO SLIDER JS
-========================================================== */
-/* ==========================================================
-                START
-            AVAILABLE EBOOKS JS
-========================================================== */
-
-const bookCards = document.querySelectorAll(".book-card");
-
-/* ===============================
-        Scroll Animation
-================================ */
-
-const bookObserver = new IntersectionObserver((entries) => {
-
-    entries.forEach((entry) => {
-
-        if (entry.isIntersecting) {
-
-            entry.target.classList.add("show-book");
-
-        }
-
-    });
-
-}, {
-
-    threshold: 0.15
-
-});
-
-/* Observe Cards */
-
-bookCards.forEach((card) => {
-
-    card.classList.add("book-hidden");
-
-    bookObserver.observe(card);
-
-});
-
-/* ==========================================================
-               e book available END
-========================================================== */
