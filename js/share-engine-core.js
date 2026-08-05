@@ -1,194 +1,122 @@
-/*
- * Share Engine Core (Phase-1 foundation)
- * Purpose: provide additive helpers for asset normalization, share token generation,
- * attribution payload construction and share/lead reporting metadata.
- *
- * This file is intentionally side-effect free and does not alter current flows.
- */
 
-(function (root, factory) {
-  var api = factory();
-
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = api;
-  }
-
-  if (root) {
-    root.AarogyamShareEngine = api;
-  }
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-  var SHARE_ENGINE_DEFAULTS = {
-    assetType: 'website',
-    shareChannel: 'other',
-    shareSource: 'direct',
-    visitorKey: 'aarogyam-share-visitor',
-    shareTokenPrefix: 'sh'
-  };
-
-  function normalizeAsset(asset) {
-    if (!asset || typeof asset !== 'object') {
-      return {
-        asset_type: SHARE_ENGINE_DEFAULTS.assetType,
-        asset_id: 'unknown',
-        asset_title: 'Unknown Asset',
-        asset_url: ''
-      };
+class UniversalShareEngine {
+    constructor() {
+        // Get the share_id upon initialization.
+        this.share_id = this.getShareId();
     }
 
-    return {
-      asset_type: asset.asset_type || asset.type || SHARE_ENGINE_DEFAULTS.assetType,
-      asset_id: asset.asset_id || asset.id || 'unknown',
-      asset_title: asset.asset_title || asset.title || 'Unknown Asset',
-      asset_url: asset.asset_url || asset.url || ''
-    };
-  }
-
-  function generateShareToken(prefix) {
-    prefix = prefix || SHARE_ENGINE_DEFAULTS.shareTokenPrefix;
-    var randomPart = Math.random().toString(36).slice(2, 10).toUpperCase();
-    var timePart = Date.now().toString(36).toUpperCase();
-    return prefix + '-' + timePart + '-' + randomPart;
-  }
-
-  function buildShareLinkPayload(options) {
-    var asset = options && options.asset;
-    var profile = options && options.profile;
-    var channel = options && options.channel;
-    var source = options && options.source;
-    var location = options && options.location;
-    var referrer = options && options.referrer;
-    var visitorId = options && options.visitorId;
-    var shareToken = options && options.shareToken;
-
-    var normalizedAsset = normalizeAsset(asset);
-    var effectiveToken = shareToken || generateShareToken();
-    var effectiveProfile = profile || {};
-
-    return {
-      token: effectiveToken,
-      asset_type: normalizedAsset.asset_type,
-      asset_id: normalizedAsset.asset_id,
-      asset_title: normalizedAsset.asset_title,
-      asset_url: normalizedAsset.asset_url || (location && location.href) || '',
-      created_by_profile_id: effectiveProfile.id || null,
-      share_channel: channel || SHARE_ENGINE_DEFAULTS.shareChannel,
-      share_source: source || SHARE_ENGINE_DEFAULTS.shareSource,
-      referrer_profile_id: effectiveProfile.referrer_profile_id || null,
-      visitor_id: visitorId || null,
-      referrer_url: referrer || '',
-      created_at: new Date().toISOString()
-    };
-  }
-
-  function buildAttributionPayload(options) {
-    var asset = options && options.asset;
-    var profile = options && options.profile;
-    var channel = options && options.channel;
-    var source = options && options.source;
-    var location = options && options.location;
-    var referrer = options && options.referrer;
-    var visitorId = options && options.visitorId;
-    var shareLinkId = options && options.shareLinkId;
-    var shareToken = options && options.shareToken;
-
-    var normalizedAsset = normalizeAsset(asset);
-    var effectiveProfile = profile || {};
-
-    return {
-      acquisition_source: source || SHARE_ENGINE_DEFAULTS.shareSource,
-      asset_type: normalizedAsset.asset_type,
-      asset_id: normalizedAsset.asset_id,
-      asset_title: normalizedAsset.asset_title,
-      share_link_id: shareLinkId || null,
-      referrer_profile_id: effectiveProfile.referrer_profile_id || null,
-      tracking_token: shareToken || null,
-      visitor_id: visitorId || null,
-      share_channel: channel || SHARE_ENGINE_DEFAULTS.shareChannel,
-      referrer_url: referrer || '',
-      landing_url: (location && location.href) || '',
-      created_at: new Date().toISOString()
-    };
-  }
-
-  function buildLeadOwnershipPayload(options) {
-    var leadId = options && options.leadId;
-    var ownerProfileId = options && options.ownerProfileId;
-    var ownerShareId = options && options.ownerShareId;
-    var assignedByProfileId = options && options.assignedByProfileId;
-    var asset = options && options.asset;
-    var note = options && options.note;
-
-    return {
-      lead_id: leadId || null,
-      owner_profile_id: ownerProfileId || null,
-      owner_share_id: ownerShareId || null,
-      assigned_by_profile_id: assignedByProfileId || null,
-      asset_type: (asset && asset.asset_type) || null,
-      asset_id: (asset && asset.asset_id) || null,
-      assigned_at: new Date().toISOString(),
-      is_permanent: true,
-      note: note || null
-    };
-  }
-
-  function buildReportSummary(rows) {
-    if (!Array.isArray(rows)) {
-      return [];
+    // Initialize the engine, find and prepare all share buttons on the page
+    init() {
+        const shareButtons = document.querySelectorAll('[data-share-button="true"]');
+        shareButtons.forEach(button => {
+            // Share buttons are always active for both guests and logged-in users.
+            button.addEventListener('click', (event) => this.handleShareClick(event));
+        });
     }
 
-    return rows.map(function (row) {
-      return {
-        ...row,
-        shares: row.shares || 0,
-        clicks: row.clicks || 0,
-        visitors: row.visitors || 0,
-        leads: row.leads || 0,
-        registrations: row.registrations || 0,
-        purchases: row.purchases || 0,
-        conversion: row.conversion || 0
-      };
-    });
-  }
-
-  function readVisitorId(storage, key) {
-    key = key || SHARE_ENGINE_DEFAULTS.visitorKey;
-
-    if (typeof storage === 'undefined' || !storage) {
-      return null;
+    // Get the share_id.
+    // If a user is logged in, use their share_id.
+    // If no user is logged in (guest), use the universal guest share_id 'AI00004'.
+    getShareId() {
+        const userString = localStorage.getItem('AI_USER');
+        if (userString) {
+            const user = JSON.parse(userString);
+            return user.share_id || 'AI00004'; // Fallback for logged-in user without share_id
+        }
+        return 'AI00004'; // Universal Guest Share ID
     }
 
-    try {
-      var value = storage.getItem(key);
-      return value || null;
-    } catch (error) {
-      return null;
+    // Main handler for all share button clicks
+    handleShareClick(event) {
+        const button = event.currentTarget;
+        const target = button.dataset.shareTarget; // e.g., 'native', 'whatsapp', 'facebook', 'copy'
+        
+        const assetType = button.dataset.assetType || 'page';
+        const assetId = button.dataset.assetId || window.location.pathname;
+        const pageTitle = document.title;
+
+        const shareUrl = this.generateShareLink(assetType, assetId);
+        const shareText = `Check this out: ${pageTitle}`;
+
+        switch (target) {
+            case 'native':
+                this.nativeShare(pageTitle, shareText, shareUrl);
+                break;
+            case 'whatsapp':
+                this.whatsAppShare(shareText, shareUrl);
+                break;
+            case 'facebook':
+                this.facebookShare(shareUrl);
+                break;
+            case 'copy':
+                this.copyToClipboard(shareUrl, button);
+                break;
+            default:
+                console.warn(`Unknown share target: ${target}`);
+        }
     }
-  }
 
-  function writeVisitorId(storage, visitorId, key) {
-    key = key || SHARE_ENGINE_DEFAULTS.visitorKey;
+    // Generate the universal share link.
+    generateShareLink(assetType, assetId) {
+        const baseUrl = window.location.origin;
+        const pagePath = window.location.pathname;
+        // The 'src' parameter provides context on what is being shared.
+        const src = `${assetType}:${assetId}`; 
+        const url = new URL(baseUrl + pagePath);
 
-    if (typeof storage === 'undefined' || !storage) {
-      return null;
+        // Always include the share_id (either user's or guest's).
+        url.searchParams.set('share_id', this.share_id);
+        url.searchParams.set('src', src);
+
+        return url.toString();
     }
 
-    try {
-      storage.setItem(key, visitorId);
-      return visitorId;
-    } catch (error) {
-      return null;
+    // Use the Web Share API for a native mobile sharing experience
+    nativeShare(title, text, url) {
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                text: text,
+                url: url,
+            })
+            .then(() => console.log('Successful native share'))
+            .catch((error) => console.log('Error sharing', error));
+        } else {
+            console.log('Web Share API not supported, falling back or doing nothing.');
+            // As a fallback, you could open a custom share modal, but for now, we'll just log.
+        }
     }
-  }
 
-  return {
-    SHARE_ENGINE_DEFAULTS: SHARE_ENGINE_DEFAULTS,
-    normalizeAsset: normalizeAsset,
-    generateShareToken: generateShareToken,
-    buildShareLinkPayload: buildShareLinkPayload,
-    buildAttributionPayload: buildAttributionPayload,
-    buildLeadOwnershipPayload: buildLeadOwnershipPayload,
-    buildReportSummary: buildReportSummary,
-    readVisitorId: readVisitorId,
-    writeVisitorId: writeVisitorId
-  };
-});
+    // Open WhatsApp share link
+    whatsAppShare(text, url) {
+        const message = encodeURIComponent(`${text} ${url}`);
+        window.open(`https://api.whatsapp.com/send?text=${message}`);
+    }
+
+    // Open Facebook share link
+    facebookShare(url) {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+    }
+
+    // Copy the link to the clipboard
+    copyToClipboard(url, button) {
+        navigator.clipboard.writeText(url).then(() => {
+            const originalText = button.innerHTML;
+            button.innerHTML = 'Copied!';
+            button.disabled = true;
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+}
+
+// To be instantiated and initialized on pages that use it.
+// Example:
+// document.addEventListener('DOMContentLoaded', () => {
+//     const shareEngine = new UniversalShareEngine();
+//     shareEngine.init();
+// });

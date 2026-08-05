@@ -414,6 +414,7 @@
             FEATURED EBOOK
     ====================================== -->
 
+
 <section class="featured-ebook">
 
     <div class="section-title">
@@ -462,9 +463,39 @@
     </div>
 
 </section>
+
+
+<!-- =====================================
+        UNIVERSAL SHARE COMPONENT
+====================================== -->
+<section class="share-component">
+    <div class="share-component-title">
+        <h2>Share This eBook</h2>
+    </div>
+    <div class="share-component-buttons">
+        <a href="#" class="share-btn" data-share-button="true" data-share-target="native" data-asset-type="ebook" data-asset-id="kheti-dr-master-guide-2026">
+            <img src="../images/icons/share.png" alt="Share"> Native
+        </a>
+        <a href="#" class="share-btn" data-share-button="true" data-share-target="whatsapp" data-asset-type="ebook" data-asset-id="kheti-dr-master-guide-2026">
+            <img src="../images/icons/whatsapp.png" alt="WhatsApp"> WhatsApp
+        </a>
+        <a href="#" class="share-btn" data-share-button="true" data-share-target="facebook" data-asset-type="ebook" data-asset-id="kheti-dr-master-guide-2026">
+            <img src="../images/icons/facebook.png" alt="Facebook"> Facebook
+        </a>
+        <a href="#" class="share-btn" data-share-button="true" data-share-target="copy" data-asset-type="ebook" data-asset-id="kheti-dr-master-guide-2026">
+            <img src="../images/icons/copy.png" alt="Copy Link"> Copy Link
+        </a>
+    </div>
+</section>
+<!-- =====================================
+        END UNIVERSAL SHARE COMPONENT
+====================================== -->
+
+
     <!-- =====================================
             QUICK CATEGORY
     ====================================== -->
+
 
     <section class="quick-category">
 
@@ -830,6 +861,23 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="../js/ebook.js"></script>
+
+<!-- =====================================
+        UNIVERSAL SHARE ENGINE
+====================================== -->
+<script src="../js/share-engine-core.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const shareEngine = new UniversalShareEngine();
+        shareEngine.init();
+    });
+</script>
+
+<!-- Universal Sticky Share Button for Desktop -->
+<button class="sticky-share-button sticky-share-desktop" data-share-button="true" data-share-target="native">Share Now</button>
+
+<!-- Universal Sticky Share Button for Mobile -->
+<button class="sticky-share-button sticky-share-mobile" data-share-button="true" data-share-target="native">Share</button>
 
 </body>
 
