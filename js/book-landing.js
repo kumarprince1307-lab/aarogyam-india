@@ -893,13 +893,14 @@ async function handleShare(channel) {
     }
 
     // Generate tracked URL for all other channels
-    if (typeof createShareLink !== 'function') {
-        console.error("createShareLink function is not available.");
-        alert("Sharing service is currently unavailable.");
-        return;
+    let trackedUrl;
+    if (window.universalShareEngine) {
+        const assetId = asset.asset_id || 'kharif-master-guide-2026'; // Fallback assetId
+        trackedUrl = window.universalShareEngine.generateShareLink(asset.asset_type, assetId);
+    } else {
+        console.error("UniversalShareEngine not found. Falling back to asset URL.");
+        trackedUrl = asset.asset_url;
     }
-
-    const trackedUrl = await createShareLink(asset, channel);
     const shareText = `📖 ${asset.asset_title}\n${asset.description}\n💰 Limited Time Offer : ${asset.price}\n👇 अभी देखें`;
 
     switch (channel) {
@@ -923,7 +924,7 @@ async function handleShare(channel) {
                         alert("Link Copied!");
                     }
                 })
-                .catch(() => alert("Link Copy Failed"));
+                .catch((err) => console.error("Link Copy Failed:", err));
             break;
 
         case 'native':
