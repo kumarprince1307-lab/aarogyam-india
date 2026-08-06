@@ -3,6 +3,8 @@ class UniversalShareEngine {
     constructor() {
         // Get the share_id upon initialization.
         this.share_id = this.getShareId();
+        // Make this instance globally accessible to be used by other scripts.
+        window.universalShareEngine = this;
     }
 
     // Initialize the engine, find and prepare all share buttons on the page

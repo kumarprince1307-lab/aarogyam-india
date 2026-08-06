@@ -1960,8 +1960,8 @@
 <!-- Initialize Share Engine -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const shareEngine = new UniversalShareEngine();
-        shareEngine.init();
+        window.universalShareEngine = new UniversalShareEngine();
+        window.universalShareEngine.init();
     });
 </script>
 
