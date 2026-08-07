@@ -38,6 +38,10 @@ const totalSlides = slides.length;
 ========================================================== */
 
 function showSlide(index){
+    if (totalSlides === 0) {
+        console.warn("No slides found. Skipping slider operations.");
+        return;
+    }
 
     if(index >= totalSlides){
 
