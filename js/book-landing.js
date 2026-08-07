@@ -816,35 +816,9 @@ const shareUrl = window.location.href;
 
 if(heroShareBtn){
 
-heroShareBtn.addEventListener("click",async()=>{
+heroShareBtn.addEventListener("click",()=>{
 
-if(navigator.share){
-
-try{
-
-await navigator.share({
-
-title:shareTitle,
-
-text:shareText,
-
-url:shareUrl
-
-});
-
-}catch(error){
-
-console.log("Share Cancelled");
-
-}
-
-}else{
-
-navigator.clipboard.writeText(shareUrl);
-
-alert("Link Copied Successfully");
-
-}
+handleShare('native');
 
 });
 

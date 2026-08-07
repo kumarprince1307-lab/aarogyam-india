@@ -559,7 +559,11 @@
 
     <button
         type="button"
-        class="share-now-btn">
+        class="share-now-btn"
+        data-share-button="true"
+        data-share-target="native"
+        data-asset-type="book"
+        data-asset-id="kheti-dr">
 
         <i class="fa-solid fa-share-nodes"></i>
 
@@ -1625,7 +1629,11 @@
 
     <button
         class="desktop-share-btn share-whatsapp"
-        type="button">
+        type="button"
+        data-share-button="true"
+        data-share-target="whatsapp"
+        data-asset-type="book"
+        data-asset-id="kheti-dr">
 
         <i class="fa-brands fa-whatsapp"></i>
 
@@ -1637,7 +1645,11 @@
 
     <button
         class="desktop-share-btn share-facebook"
-        type="button">
+        type="button"
+        data-share-button="true"
+        data-share-target="facebook"
+        data-asset-type="book"
+        data-asset-id="kheti-dr">
 
         <i class="fa-brands fa-facebook-f"></i>
 
@@ -1649,7 +1661,11 @@
 
     <button
         class="desktop-share-btn share-copy"
-        type="button">
+        type="button"
+        data-share-button="true"
+        data-share-target="copy"
+        data-asset-type="book"
+        data-asset-id="kheti-dr">
 
         <i class="fa-solid fa-link"></i>
 
@@ -1664,6 +1680,7 @@
 ========================================================== -->
 
 <div id="book-share-data"
+     data-id="kheti-dr"
 
      data-title="खेती का डॉक्टर"
 
@@ -1745,7 +1762,11 @@
 
         id="mobileShareButton"
 
-        type="button">
+        type="button"
+        data-share-button="true"
+        data-share-target="native"
+        data-asset-type="book"
+        data-asset-id="kheti-dr">
 
         Share
 
@@ -1963,8 +1984,19 @@
 <!-- Common JS -->
 <script src="../js/ebook.js"></script>
 
+<!-- Share Engine -->
+<script src="../js/share-engine-core.js"></script>
+
 <!-- book-landing JS -->
 <script src="../js/book-landing.js"></script>
+
+<!-- Initialize Share Engine -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const shareEngine = new UniversalShareEngine();
+        shareEngine.init();
+    });
+</script>
 
 </body>
 </html>
