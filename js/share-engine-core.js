@@ -1,5 +1,7 @@
 
 class UniversalShareEngine {
+    // Add a static property to track if a share operation is in progress
+    static isSharing = false;
     constructor() {
         // Get the share_id upon initialization.
         this.share_id = this.getShareId();
@@ -75,18 +77,32 @@ class UniversalShareEngine {
 
     // Use the Web Share API for a native mobile sharing experience
     nativeShare(title, text, url) {
-        if (navigator.share) {
-            navigator.share({
-                title: title,
-                text: text,
-                url: url,
-            })
-            .then(() => console.log('Successful native share'))
-            .catch((error) => console.log('Error sharing', error));
-        } else {
+        if (!navigator.share) {
             console.log('Web Share API not supported, falling back or doing nothing.');
-            // As a fallback, you could open a custom share modal, but for now, we'll just log.
+            return;
         }
+
+        // Prevent multiple simultaneous share calls
+        if (UniversalShareEngine.isSharing) {
+            console.log('A native share is already in progress. Skipping.');
+            return;
+        }
+
+        UniversalShareEngine.isSharing = true;
+        navigator.share({
+            title: title,
+            text: text,
+            url: url,
+        })
+        .then(() => {
+            console.log('Successful native share');
+        })
+        .catch((error) => {
+            console.log('Error sharing', error);
+        })
+        .finally(() => {
+            UniversalShareEngine.isSharing = false;
+        });
     }
 
     // Open WhatsApp share link

@@ -763,9 +763,6 @@ window.addEventListener("scroll", () => {
 document.addEventListener('DOMContentLoaded', () => {
     const shareEngine = new UniversalShareEngine();
     shareEngine.init();
-
-    }
-
 });
 
 if (backTop) {
