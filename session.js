@@ -1,8 +1,8 @@
 /* =================================================================
-   AAROGYAM INDIA - V1 COMMON SESSION MODULE (REPAIRED)
-   - This file is the single source of truth for session management.
-   - It relies on localStorage keys set by the custom mobile login.
-   - DO NOT use Supabase Auth functions here.
+    AAROGYAM INDIA - V1 COMMON SESSION MODULE (REPAIRED)
+    - This file is the single source of truth for session management.
+    - It relies on localStorage keys set by the custom mobile login.
+    - DO NOT use Supabase Auth functions here.
 ================================================================= */
 
 (function(window) {
@@ -72,7 +72,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             const shareId = urlParams.get('share_id');
 
-            const isValidShareId = (id) => id && /^AI\d{6}$/.test(id);
+            // Updated regex to support 4 to 8 digits (e.g., AI00004)
+            const isValidShareId = (id) => id && /^AI\d{4,8}$/.test(id);
 
             if (isValidShareId(shareId)) {
                 const session = initializeSession(); // Use the initializing getter
@@ -175,9 +176,9 @@
     /**
      * If the user is not logged in, redirects them to the My Library page
      * to trigger the login popup.
-     * @param {string} [redirectTo='../ebooks/my-library.html'] - The URL to redirect to.
+     * @param {string} [redirectTo='/my-library.html'] - The URL to redirect to.
      */
-    function requireLogin(redirectTo = '/my-library.html') { // Note: Path changed to absolute
+    function requireLogin(redirectTo = '/my-library.html') {
         if (!isLoggedIn()) {
             console.warn("Authentication required. Redirecting to login page.");
             alert("Please log in to access this page.");
@@ -195,14 +196,12 @@
         logout,
         requireLogin,
         getReferralId,
-        getSession: initializeSession, // Expose the initializer
+        getSession: initializeSession,
         saveSession
     };
 
     // --- INITIALIZATION ---
-    // 1. Ensure the session object exists.
     initializeSession();
-    // 2. Capture referral information on every page load.
     captureReferral();
 
     console.log("✅ AISession Common Session Module Loaded.");
