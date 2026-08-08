@@ -1,8 +1,8 @@
 /* =================================================================
-    AAROGYAM INDIA - V1 COMMON SESSION MODULE (REPAIRED)
-    - This file is the single source of truth for session management.
-    - It relies on localStorage keys set by the custom mobile login.
-    - DO NOT use Supabase Auth functions here.
+   AAROGYAM INDIA - V1 COMMON SESSION MODULE (REFRESH & LOGIN FIX)
+   - This file is the single source of truth for session management.
+   - It relies on localStorage keys set by the custom mobile login.
+   - DO NOT use Supabase Auth functions here.
 ================================================================= */
 
 (function(window) {
@@ -13,9 +13,7 @@
     const SESSION_KEY = 'AI_SESSION';
 
     /**
-     * Gets the main session object from localStorage.
-     * This is for internal use; prefer `initializeSession` for public use.
-     * @returns {object} The AI_SESSION object.
+     * Retrieves the current session object from localStorage.
      */
     function getSession() {
         try {
@@ -23,36 +21,12 @@
             return sessionString ? JSON.parse(sessionString) : {};
         } catch (e) {
             console.error("Error parsing AI_SESSION from localStorage", e);
-            return {}; // Return a clean slate on error
+            return {};
         }
     }
 
     /**
-     * Initializes the session.
-     * Ensures that the AI_SESSION object exists in localStorage.
-     * @returns {object} The AI_SESSION object.
-     */
-    function initializeSession() {
-        try {
-            const sessionString = localStorage.getItem(SESSION_KEY);
-            if (!sessionString) {
-                const newSession = {};
-                saveSession(newSession);
-                console.log("AI_SESSION created in localStorage.");
-                return newSession;
-            }
-            return JSON.parse(sessionString);
-        } catch (e) {
-            console.error("Error initializing AI_SESSION", e);
-            const freshSession = {};
-            saveSession(freshSession);
-            return freshSession;
-        }
-    }
-
-    /**
-     * Saves the main session object to localStorage.
-     * @param {object} session - The AI_SESSION object to save.
+     * Saves the session object to localStorage.
      */
     function saveSession(session) {
         try {
@@ -64,27 +38,36 @@
 
     /**
      * Captures and stores the share_id from the URL into the AI_SESSION object.
-     * Adheres to the "First Click Rule": if a referral_share_id already
-     * exists in the session, it will not be overwritten.
+     * Adheres to the "First Click Rule" with SessionStorage backup to survive login overwrites.
      */
     function captureReferral() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const shareId = urlParams.get('share_id');
-
-            // Updated regex to support 4 to 8 digits (e.g., AI00004)
             const isValidShareId = (id) => id && /^AI\d{4,8}$/.test(id);
 
-            if (isValidShareId(shareId)) {
-                const session = initializeSession(); // Use the initializing getter
+            let session = getSession();
 
-                // First Click Rule: Only set the referral ID if one doesn't already exist.
+            // 1. अगर URL में share_id है, तो उसे वैलिडेट करके प्रोसेस करें
+            if (isValidShareId(shareId)) {
+                // First Click Rule: अगर पहले से सेशन में आईडी नहीं है, तभी नई सेव करें
                 if (!session.referral_share_id) {
                     session.referral_share_id = shareId;
                     saveSession(session);
                     console.log(`Referral session started. share_id "${shareId}" captured in AI_SESSION.`);
                 } else {
-                    console.log(`Referral session already exists in AI_SESSION. First click rule applied.`);
+                    console.log(`Referral session already exists in AI_SESSION: ${session.referral_share_id}. First click rule applied.`);
+                }
+                // बैकअप के रूप में sessionStorage में भी सुरक्षित रखें ताकि लॉगिन के वक्त न उड़े
+                sessionStorage.setItem('temp_share_id', shareId);
+            } 
+            // 2. अगर URL में share_id नहीं है (या लॉगिन के बाद गायब हो गया है), तो बैकअप से रिकवर करें
+            else if (!session.referral_share_id) {
+                const backupShareId = sessionStorage.getItem('temp_share_id');
+                if (isValidShareId(backupShareId)) {
+                    session.referral_share_id = backupShareId;
+                    saveSession(session);
+                    console.log(`Recovered referral share_id "${backupShareId}" from sessionStorage backup.`);
                 }
             }
         } catch (e) {
@@ -98,10 +81,9 @@
      */
     function getReferralId() {
         try {
-            const session = getSession(); // Internal get is fine here
-            return session.referral_share_id || null;
+            const session = getSession();
+            return session.referral_share_id || sessionStorage.getItem('temp_share_id') || null;
         } catch (e) {
-            console.error("Error retrieving referral ID from AI_SESSION", e);
             return null;
         }
     }
@@ -168,6 +150,7 @@
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem(PROFILE_KEY);
         localStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem('temp_share_id');
         
         console.log("User session cleared. Reloading...");
         window.location.reload();
@@ -176,9 +159,9 @@
     /**
      * If the user is not logged in, redirects them to the My Library page
      * to trigger the login popup.
-     * @param {string} [redirectTo='/my-library.html'] - The URL to redirect to.
+     * @param {string} [redirectTo='../ebooks/my-library.html'] - The URL to redirect to.
      */
-    function requireLogin(redirectTo = '/my-library.html') {
+    function requireLogin(redirectTo = '../ebooks/my-library.html') {
         if (!isLoggedIn()) {
             console.warn("Authentication required. Redirecting to login page.");
             alert("Please log in to access this page.");
@@ -187,7 +170,7 @@
     }
 
     // Expose functions to the global window object to be used by other scripts
-    window.AISession = {
+    window.V1_SESSION = {
         isLoggedIn,
         getCurrentUser,
         getCurrentProfile,
@@ -196,23 +179,25 @@
         logout,
         requireLogin,
         getReferralId,
-        getSession: initializeSession,
+        getSession,
         saveSession
     };
 
-    // --- INITIALIZATION ---
-    initializeSession();
+    // Also support AISession for cross-compatibility
+    window.AISession = window.V1_SESSION;
+
+    // Run referral capture on load / refresh / login transition
     captureReferral();
 
-    console.log("✅ AISession Common Session Module Loaded.");
-    const currentSession = initializeSession();
-    const currentReferral = currentSession.referral_share_id;
+    console.log("✅ V1 Common Session Module Loaded.");
 
-    if (currentReferral) {
-        console.log(`Current referral session in AI_SESSION: ${currentReferral}`);
+    // रीफ्रेश होने पर भी कंसोल में आईडी दिखाने के लिए
+    const activeSession = getSession();
+    if (activeSession.referral_share_id) {
+        console.log(`Current referral session in AI_SESSION: ${activeSession.referral_share_id}`);
     } else {
         console.log("No active referral session found in AI_SESSION.");
     }
-    console.log("Current AI_SESSION object:", currentSession);
+    console.log("Current AI_SESSION object:", activeSession);
 
 })(window);
