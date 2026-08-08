@@ -79,6 +79,14 @@ REGISTRATION FORM
 <form id="demoForm">
 <input type="text" id="name" placeholder="पूरा नाम" required>
 <input type="tel" id="mobile" name="mobile" maxlength="10" placeholder="मोबाइल नंबर दर्ज करें" required>
+
+<!-- 🟢 यहाँ रजिस्ट्रेशन और चेकआउट जैसा स्मार्ट रेफरल शेयर आईडी बॉक्स जोड़ दिया गया है -->
+<div style="margin-bottom: 15px; text-align: left;">
+    <label for="referralMobile" style="font-size: 0.85rem; font-weight: 600; color: #475569; display: block; margin-bottom: 5px;">Referral Share ID / Mobile (Optional)</label>
+    <input type="text" id="referralMobile" placeholder="Enter Referral ID or Mobile" readonly style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; outline: none; background: #e9ecef; cursor: not-allowed;">
+    <div id="referrerDisplayName" style="font-size: 13px; margin-top: 4px; font-weight: 600;"></div>
+</div>
+
 <input type="email" id="email" placeholder="ईमेल (Optional)">
 <input type="text" id="state" placeholder="राज्य (Optional)">
 <input type="text" id="district" placeholder="जिला (Optional)">
@@ -100,7 +108,7 @@ PREVIEW IMAGE SLIDER (DYNAMICALLY POPULATED BY JS)
 <section class="preview-slider">
     <button class="slider-btn prev-btn">❮</button>
     <div class="slider-container">
-        <!-- JavaScript यहाँ अपने आप demoImages के हिसाब से <img> टैग जोड़ देगा -->
+        <!-- JavaScript यहाँ अपने आप demoImages के हिसाब से <img> टैग जोड़ देगा -->
     </div>
     <button class="slider-btn next-btn">❯</button>
 </section>

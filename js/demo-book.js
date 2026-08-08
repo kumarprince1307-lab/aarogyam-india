@@ -1,17 +1,126 @@
-/* ==========================================================
-   AAROGYAM INDIA - UNIVERSAL DEMO BOOK JS (FINAL FIXED)
-   ========================================================== */
+/* ==========================================
+   AAROGYAM INDIA
+   DEMO-BOOK.JS (Complete & Final - With Smart Referral Engine)
+========================================== */
+
+"use strict";
 
 let currentBookData = null;
 let previewImages = [];
 let currentIndex = 0;
+let referrerDisplay = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
     showLoader();
+    syncDemoShareContext(); // URL और सेशन से शेयर आईडी रिकवर करना
     await loadBookData();
     initializePage();
     setupEventListeners();
 });
+
+/*==================================================
+  0. SYNC SHARE CONTEXT & REFERRAL LOOKUP
+==================================================*/
+function syncDemoShareContext() {
+    const params = new URLSearchParams(window.location.search);
+    
+    const sessionReferralId = (window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function') 
+        ? window.V1_SESSION.getReferralId() : null;
+
+    const shareTokenFromUrl = params.get('share_token') || params.get('share_id') || params.get('tracking_token');
+    const referralMobileParam = params.get('referral_mobile') || params.get('referral');
+
+    const shareContext = {
+        source: params.get("source") || params.get("utm_source") || "demo",
+        share_channel: params.get("share_channel") || params.get("channel") || params.get("utm_medium") || null,
+        share_token: shareTokenFromUrl || sessionReferralId || 'AI000004',
+        referral_mobile: referralMobileParam || null,
+        asset_url: window.location.href || null
+    };
+
+    if (typeof persistShareContext === "function") {
+        persistShareContext(shareContext);
+    }
+
+    const demoRefInput = document.getElementById("referralMobile");
+    if (demoRefInput) {
+        if (!demoRefInput.value) {
+            demoRefInput.value = shareContext.share_token || shareContext.referral_mobile || 'AI000004';
+        }
+
+        if (demoRefInput.value) {
+            lookupReferrerName(demoRefInput.value.trim());
+        }
+    }
+}
+
+// स्मार्ट डेटा बाइंडिंग बंडल
+window.currentReferrerData = {
+    uuid: null,
+    name: null,
+    mobile: null,
+    shareId: null
+};
+
+async function lookupReferrerName(identifier) {
+    if (!identifier) return;
+    
+    try {
+        const activeDb = window.dbClient || window.supabase;
+        if (!activeDb) return;
+
+        let data = null;
+
+        if (/^[6-9]\d{9}$/.test(identifier)) {
+            const res = await activeDb
+                .from("profiles")
+                .select("id, full_name, share_id, mobile")
+                .eq("mobile", identifier)
+                .maybeSingle();
+            data = res.data;
+        } 
+        
+        if (!data) {
+            const res = await activeDb
+                .from("profiles")
+                .select("id, full_name, share_id, mobile")
+                .eq("share_id", identifier)
+                .maybeSingle();
+            data = res.data;
+        }
+
+        if (data) {
+            window.currentReferrerData = {
+                uuid: data.id,
+                name: data.full_name || "Aarogyam Member",
+                mobile: data.mobile,
+                shareId: data.share_id
+            };
+            showReferrerGreen(`✔ Referred by: ${data.full_name} (${data.mobile || 'No Mobile'})`);
+        } else {
+            window.currentReferrerData = { uuid: null, name: null, mobile: null, shareId: null };
+            showReferrerRed("✖ Invalid Share ID/Mobile");
+        }
+    } catch (err) {
+        console.error("Referrer lookup exception:", err);
+    }
+}
+
+function showReferrerGreen(text) {
+    referrerDisplay = document.getElementById("referrerDisplayName");
+    if (referrerDisplay) {
+        referrerDisplay.style.color = "#28a745"; 
+        referrerDisplay.textContent = text;
+    }
+}
+
+function showReferrerRed(text) {
+    referrerDisplay = document.getElementById("referrerDisplayName");
+    if (referrerDisplay) {
+        referrerDisplay.style.color = "#dc3545"; 
+        referrerDisplay.textContent = text;
+    }
+}
 
 /*==================================================
   1. LOAD BOOK DATA FROM books.json BASED ON URL ID
@@ -33,7 +142,6 @@ async function loadBookData() {
             return;
         }
 
-        // Bind Dynamic Data to HTML Elements
         document.title = `${currentBookData.name} | Aarogyam India`;
         
         const coverEl = document.getElementById("bookCover");
@@ -42,7 +150,6 @@ async function loadBookData() {
         const titleEl = document.getElementById("bookTitle");
         if (titleEl) titleEl.textContent = currentBookData.name;
 
-        // Price Updates
         const mrpEl = document.getElementById("bookMrp");
         if (mrpEl) mrpEl.textContent = "₹" + currentBookData.mrp;
 
@@ -55,7 +162,6 @@ async function loadBookData() {
         const barOffer = document.getElementById("barOffer");
         if (barOffer) barOffer.textContent = "₹" + currentBookData.offerPrice;
 
-        // Dynamic Demo Images Generation from JSON Array
         const sliderContainer = document.querySelector(".slider-container");
         if (sliderContainer && currentBookData.demoImages && Array.isArray(currentBookData.demoImages)) {
             sliderContainer.innerHTML = "";
@@ -69,13 +175,11 @@ async function loadBookData() {
             });
         }
 
-        // --- UPDATE CHECKOUT LINK (सटीक पाथ के साथ) ---
         const buyBtn = document.getElementById("stickyBuyBtn");
         if(buyBtn) {
             buyBtn.href = `../ebooks/checkout.html?id=${currentBookData.id}`;
         }
 
-        // --- UPDATE BACK BUTTON LINK (सटीक पाथ के साथ) ---
         const backBtn = document.getElementById("backBtn");
         if(backBtn) {
             backBtn.href = "../ebooks/agriculture.html";
@@ -102,6 +206,7 @@ const mobileInput = document.getElementById("mobile");
 const emailInput = document.getElementById("email");
 const stateInput = document.getElementById("state");
 const districtInput = document.getElementById("district");
+const refInputEl = document.getElementById("referralMobile");
 
 function showLoader() { if(loader) loader.style.display = "flex"; }
 function hideLoader() { if(loader) loader.style.display = "none"; }
@@ -142,42 +247,8 @@ function validateForm() {
     return true;
 }
 
-async function saveUserToSupabase(userData) {
-    try {
-        // आपकी मुख्य supabase.js फाइल से window.db का उपयोग किया गया है
-        const client = window.db || window.supabaseClient || window.supabase;
-        
-        if (!client || typeof client.from !== 'function') {
-            console.error("Supabase client not found");
-            return true; 
-        }
-
-        // आपकी Supabase टेबल (demo_users) के कॉलम के अनुसार डेटा इंसर्ट
-        const { data, error } = await client
-            .from("demo_users")
-            .insert([
-                {
-                    name: userData.name,
-                    mobile: userData.mobile,
-                    email: userData.email,
-                    state: userData.state,
-                    district: userData.district,
-                    demo_book_id: userData.book_id
-                }
-            ]);
-
-        if (error) {
-            console.error("Supabase Insert Error:", error.message);
-        }
-        return true;
-    } catch (err) {
-        console.error("Supabase Connection Error:", err);
-        return true; 
-    }
-}
-
 /* ==================================================
-  4. FORM SUBMIT EVENT (डेमो फॉर्म सबमिट और अनलॉक लॉजिक)
+  4. FORM SUBMIT EVENT (डेमो फॉर्म सबमिट और स्मार्ट रेफरल बाइंडिंग)
 ================================================== */
 if(demoForm) {
     demoForm.addEventListener("submit", async function (event) {
@@ -186,6 +257,11 @@ if(demoForm) {
 
         showLoader();
 
+        const enteredReferral = refInputEl ? refInputEl.value.trim() : 'AI000004';
+        const finalUuid = window.currentReferrerData.uuid || null;
+        const finalReferralMobile = window.currentReferrerData.mobile || null;
+        const finalReferralCode = window.currentReferrerData.shareId || enteredReferral;
+
         const userData = {
             bookId: currentBookData ? currentBookData.id : "BK001",
             name: nameInput.value.trim(),
@@ -193,17 +269,36 @@ if(demoForm) {
             email: emailInput.value.trim(),
             state: stateInput.value.trim(),
             district: districtInput.value.trim(),
-            profileId: null
+            referred_by: finalUuid,
+            referralMobile: finalReferralMobile,
+            referralCode: finalReferralCode,
+            source: "demo"
         };
 
-        // यह सीधा supabase.js के अंदर बने saveDemoUser फंक्शन को कॉल करेगा 
-        // (जो अब डेटा को सीधे profiles टेबल में सेव करेगा)
+        // पहले मुख्य रजिस्ट्रेशन इंजन से यूजर को रजिस्टर करें ताकि रेफरल डेटा पक्का सेव हो
+        if (typeof registerUser === "function") {
+            try {
+                await registerUser({
+                    fullName: userData.name,
+                    mobile: userData.mobile,
+                    email: userData.email,
+                    referred_by: userData.referred_by,
+                    referralMobile: userData.referralMobile,
+                    referralCode: userData.referralCode,
+                    source: "demo"
+                });
+            } catch (regErr) {
+                console.log("Demo reg sync note:", regErr);
+            }
+        }
+
+        // डेमो यूजर सेव फंक्शन कॉल करना
         if (typeof saveDemoUser === "function") {
             await saveDemoUser(userData);
         }
 
         hideLoader();
-        unlockDemo(); // यूजर का डेमो बिना रोके तुरंत खुल जाएगा
+        unlockDemo(); 
     });
 }
 
@@ -211,9 +306,9 @@ if(demoForm) {
   DEMO UNLOCK FUNCTION (डेमो स्क्रीन दिखाने का फंक्शन)
 ================================================== */
 function unlockDemo() {
-    if(formSection) formSection.style.display = "none"; // फॉर्म गायब हो जाएगा
+    if(formSection) formSection.style.display = "none"; 
     if(demoPreview) demoPreview.style.display = "block";
-    if(previewSlider) previewSlider.style.display = "block"; // डेमो बुक इमेज खुल जाएगी
+    if(previewSlider) previewSlider.style.display = "block"; 
     showToast("🎉 Demo सफलतापूर्वक Unlock हो गया");
     
     setupSliderImages();
@@ -222,9 +317,6 @@ function unlockDemo() {
 /* ==================================================
   5. IMAGE SLIDER & VIEWER LOGIC
 ================================================== */
-/*==================================================
-  5. IMAGE SLIDER & VIEWER LOGIC
-==================================================*/
 let prevBtn, nextBtn;
 
 function setupEventListeners() {
@@ -239,7 +331,6 @@ function setupSliderImages() {
     if(nextBtn) nextBtn.onclick = nextImage;
     if(prevBtn) prevBtn.onclick = previousImage;
 
-    // Swipe Support for Mobile
     if(previewSlider) {
         let touchStartX = 0;
         let touchEndX = 0;
@@ -253,7 +344,6 @@ function setupSliderImages() {
         });
     }
 
-    // Full screen viewer bindings on image click
     previewImages.forEach((image, index) => {
         image.onclick = () => {
             currentIndex = index;
@@ -283,7 +373,6 @@ function previousImage() {
     updateViewerImage();
 }
 
-// Fullscreen Viewer Elements
 const imageViewer = document.getElementById("imageViewer");
 const viewerImage = document.getElementById("viewerImage");
 const viewerPrev = document.querySelector(".viewer-prev");
@@ -312,7 +401,6 @@ function closeImageModal() {
     resetViewerZoom();
 }
 
-// Keyboard Support (ESC से बाहर, Arrow Keys से स्लाइड)
 document.addEventListener("keydown", (event) => {
     if (!imageViewer || imageViewer.style.display !== "flex") return;
     if (event.key === "ArrowRight") nextImage();
@@ -320,7 +408,6 @@ document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeImageModal();
 });
 
-// Zoom & Pan Variables
 let zoomed = false;
 let startX = 0, startY = 0, currentX = 0, currentY = 0, isDragging = false;
 
