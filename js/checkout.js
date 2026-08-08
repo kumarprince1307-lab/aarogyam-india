@@ -1,21 +1,35 @@
 /* ==========================================
    AAROGYAM INDIA
-   CHECKOUT.JS (Complete, Full & Clean - Smart Existing/New User Bypass)
-========================================= */
+   CHECKOUT.JS (Complete & Final - With Smart Referral Engine)
+========================================== */
 
-document.addEventListener("DOMContentLoaded", loadBook);
+"use strict";
+
+let referrerDisplay = document.getElementById("referrerDisplayName");
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadBook();
+    syncCheckoutShareContext();
+});
 
 function syncCheckoutShareContext() {
     const params = new URLSearchParams(window.location.search);
+    
+    const sessionReferralId = (window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function') 
+        ? window.V1_SESSION.getReferralId() : null;
+
+    const shareTokenFromUrl = params.get('share_token') || params.get('share_id') || params.get('tracking_token');
+    const referralMobileParam = params.get('referral_mobile') || params.get('referral');
+
     const shareContext = {
         source: params.get("source") || params.get("utm_source") || "checkout",
         share_channel: params.get("share_channel") || params.get("channel") || params.get("utm_medium") || null,
-        share_token: params.get("share_token") || params.get("share_id") || params.get("tracking_token") || null,
-        referral_mobile: params.get("referral_mobile") || params.get("referral") || null,
+        share_token: shareTokenFromUrl || sessionReferralId || 'AI000004',
+        referral_mobile: referralMobileParam || null,
         asset_type: params.get("asset_type") || null,
         asset_id: params.get("asset_id") || null,
         asset_title: params.get("asset_title") || null,
-        asset_url: params.get("asset_url") || null,
+        asset_url: window.location.href || null,
         referrer: document.referrer || null,
         landing_url: window.location.href || null
     };
@@ -24,16 +38,109 @@ function syncCheckoutShareContext() {
         persistShareContext(shareContext);
     }
 
+    // यदि चेकआउट फॉर्म में रेफरल इनपुट है, तो उसे ऑटो-फिल करें और लुकअप चलाएं
+    const checkoutRefInput = document.getElementById("referralMobile");
+    if (checkoutRefInput) {
+        if (!checkoutRefInput.value) {
+            checkoutRefInput.value = shareContext.share_token || shareContext.referral_mobile || 'AI000004';
+        }
+        // रीड-ऑनली बनाना चाहें तो यह लाइन ऑन कर सकते हैं:
+        // checkoutRefInput.setAttribute("readonly", true);
+
+        if (checkoutRefInput.value) {
+            lookupReferrerName(checkoutRefInput.value.trim());
+        }
+    }
+
     return typeof getCurrentShareContext === "function" ? getCurrentShareContext() : shareContext;
+}
+
+// स्मार्ट डेटा बाइंडिंग बंडल
+window.currentReferrerData = {
+    uuid: null,
+    name: null,
+    mobile: null,
+    shareId: null
+};
+
+// डेटाबेस से रेफरर का नाम ढूंढने वाला फंक्शन
+async function lookupReferrerName(identifier) {
+    if (!identifier) return;
+    
+    try {
+        const activeDb = window.dbClient || window.supabase;
+        if (!activeDb) return;
+
+        let data = null;
+
+        if (/^[6-9]\d{9}$/.test(identifier)) {
+            const res = await activeDb
+                .from("profiles")
+                .select("id, full_name, share_id, mobile")
+                .eq("mobile", identifier)
+                .maybeSingle();
+            data = res.data;
+        } 
+        
+        if (!data) {
+            const res = await activeDb
+                .from("profiles")
+                .select("id, full_name, share_id, mobile")
+                .eq("share_id", identifier)
+                .maybeSingle();
+            data = res.data;
+        }
+
+        if (data) {
+            window.currentReferrerData = {
+                uuid: data.id,
+                name: data.full_name || "Aarogyam Member",
+                mobile: data.mobile,
+                shareId: data.share_id
+            };
+            showReferrerGreen(`✔ Referred by: ${data.full_name} (${data.mobile || 'No Mobile'})`);
+        } else {
+            window.currentReferrerData = { uuid: null, name: null, mobile: null, shareId: null };
+            showReferrerRed("✖ Invalid Share ID/Mobile");
+        }
+    } catch (err) {
+        console.error("Referrer lookup exception:", err);
+    }
+}
+
+function showReferrerGreen(text) {
+    if (!referrerDisplay) createReferrerSpanElement();
+    if (referrerDisplay) {
+        referrerDisplay.style.color = "#28a745"; 
+        referrerDisplay.textContent = text;
+    }
+}
+
+function showReferrerRed(text) {
+    if (!referrerDisplay) createReferrerSpanElement();
+    if (referrerDisplay) {
+        referrerDisplay.style.color = "#dc3545"; 
+        referrerDisplay.textContent = text;
+    }
+}
+
+function createReferrerSpanElement() {
+    const refInput = document.getElementById("referralMobile");
+    if (refInput && !document.getElementById("referrerDisplayName")) {
+        referrerDisplay = document.createElement("div");
+        referrerDisplay.id = "referrerDisplayName";
+        referrerDisplay.style.fontSize = "13px";
+        referrerDisplay.style.marginTop = "4px";
+        referrerDisplay.style.fontWeight = "600";
+        refInput.parentNode.appendChild(referrerDisplay);
+    }
 }
 
 async function loadBook() {
     try {
         const params = new URLSearchParams(window.location.search);
-        // Universal book_id or id support
         const bookId = params.get("book_id") || params.get("id") || "BK001";
 
-        // Load Master Book Data from books.json
         const response = await fetch("../data/books.json");
         const jsonResult = await response.json();
 
@@ -50,7 +157,6 @@ async function loadBook() {
         const bookMrp = book.mrp || 0;
         const bookOffer = book.offer_price || book.offerPrice || 0;
 
-        // Save globally
         window.currentCheckoutBook = {
             id: book.id || book.book_id,
             title: bookName,
@@ -59,7 +165,6 @@ async function loadBook() {
             cover: bookCover
         };
 
-        // UI Binding
         const coverEl = document.getElementById("bookCover");
         if (coverEl) coverEl.src = bookCover;
         
@@ -84,7 +189,6 @@ async function loadBook() {
         const totPrice = document.getElementById("totalPrice");
         if (totPrice) totPrice.textContent = "₹" + bookOffer;
 
-        syncCheckoutShareContext();
         autoFillUserData();
 
     } catch (error) {
@@ -94,24 +198,16 @@ async function loadBook() {
 }
 
 function autoFillUserData() {
-    // 1. Check direct LocalStorage first (AI_USER or AI_PROFILE)
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     
     const nameVal = storedUser.full_name || storedUser.name || "";
     const mobileVal = storedUser.mobile || "";
     const emailVal = storedUser.email || "";
 
-    if (nameVal && document.getElementById("customerName")) {
-        document.getElementById("customerName").value = nameVal;
-    }
-    if (mobileVal && document.getElementById("customerMobile")) {
-        document.getElementById("customerMobile").value = mobileVal;
-    }
-    if (emailVal && document.getElementById("customerEmail")) {
-        document.getElementById("customerEmail").value = emailVal;
-    }
+    if (nameVal && document.getElementById("customerName")) document.getElementById("customerName").value = nameVal;
+    if (mobileVal && document.getElementById("customerMobile")) document.getElementById("customerMobile").value = mobileVal;
+    if (emailVal && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = emailVal;
 
-    // 2. Fallback to getCurrentUser function if available
     if (typeof getCurrentUser === "function") {
         const user = getCurrentUser();
         if (user) {
@@ -122,11 +218,13 @@ function autoFillUserData() {
     }
 }
 
-// Pay Now Button Logic
+// Pay Now Button Logic with Smart Referral Payload
 document.getElementById("payNowBtn").addEventListener("click", async function () {
     const name = document.getElementById("customerName").value.trim();
     const mobile = document.getElementById("customerMobile").value.trim();
     const email = document.getElementById("customerEmail").value.trim();
+    const refInputEl = document.getElementById("referralMobile");
+    const enteredReferral = refInputEl ? refInputEl.value.trim() : 'AI000004';
 
     if (name === "") {
         alert("Please Enter Full Name");
@@ -145,15 +243,22 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
     try {
         syncCheckoutShareContext();
 
+        // सही रेफरल डेटा तैयार करना
+        const finalUuid = window.currentReferrerData.uuid || null;
+        const finalReferralMobile = window.currentReferrerData.mobile || null;
+        const finalReferralCode = window.currentReferrerData.shareId || enteredReferral;
+
         if (typeof registerUser === "function") {
             const regResult = await registerUser({
                 fullName: name,
                 mobile: mobile,
                 email: email,
+                referred_by: finalUuid,
+                referralMobile: finalReferralMobile,
+                referralCode: finalReferralCode,
                 source: "checkout"
             });
 
-            // स्मार्ट बायपास: यदि यूजर पहले से रजिस्टर्ड है (Already exists), तो एरर न देकर सीधे पेमेंट पर जाने दें
             const isAlreadyExists = regResult.message && regResult.message.toLowerCase().includes("already");
 
             if (!regResult.success && !isAlreadyExists) {
@@ -172,6 +277,9 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
             customerName: name,
             mobile: mobile,
             email: email,
+            referred_by: finalUuid,
+            referralMobile: finalReferralMobile,
+            referralCode: finalReferralCode,
             attribution: attributionContext,
             source: attributionContext.source || "checkout"
         };
@@ -208,12 +316,9 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
     }
 });
 
-// Extra Window focus/blur listener ताकि Razorpay पॉपअप कटने या कैंसिल होने पर 'Processing' हट जाए
 window.addEventListener('focus', function() {
     const payBtn = document.getElementById("payNowBtn");
-    if (payBtn && payBtn.textContent === "Processing...") 
-        
-        {
+    if (payBtn && payBtn.textContent === "Processing...") {
         setTimeout(() => {
             payBtn.disabled = false;
             payBtn.textContent = "Pay Now";
