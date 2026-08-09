@@ -1,1129 +1,186 @@
 /* ==========================================================
-                    HERO BANNER START
-                 PART 2.1 : SLIDER LAYOUT
+        HERO BANNER & SLIDER LAYOUT
 ========================================================== */
-
-/* Hero Section */
-
-.hero-slider{
-
-    width:100%;
-
-    margin: 25px;auto;
-
-    position:relative;
-
-    overflow:hidden;
-
-}
-
-/* Slider Container */
-
-.hero-slider-container{
-
-    width:100%;
-
-    position:relative;
-
-}
-
-/* Hero Slide */
-
-.hero-slide{
-
-    display:none;
-
-    position:relative;
-
-    width:100%;
-
-    animation:heroFade .6s ease-in-out;
-
-}
-
-/* Active Slide */
-
-.hero-slide.active{
-
-    display:block;
-
-}
-
-/* Banner Image */
-
-.hero-slide img{
-
-    width:100%;
-
-    display:block;
-
-    border-radius:18px;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.18);
-
-}
-
-/* Fade Animation */
+.hero-slider{width:100%;margin:25px auto;position:relative;overflow:hidden;}
+.hero-slider-container{width:100%;position:relative;}
+.hero-slide{display:none;position:relative;width:100%;animation:heroFade .6s ease-in-out;}
+.hero-slide.active{display:block;}
+.hero-slide img{width:100%;display:block;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.18);}
 
 @keyframes heroFade{
-
-    from{
-
-        opacity:.3;
-
-    }
-
-    to{
-
-        opacity:1;
-
-    }
-
+    from{opacity:.3;}
+    to{opacity:1;}
 }
 
-/* ==========================================================
-                HERO BANNER PART 2.1 END
-========================================================== */
-/* ==========================================================
-                HERO BANNER PART 2.2
-        BUTTONS • ARROWS • DOTS
-========================================================== */
-
-/* Hero Buttons */
-
-.hero-buttons{
-
-    position:absolute;
-
-    bottom:7%;
-
-    left:50%;
-
-    transform:translateX(-50%);
-
-    display:flex;
-
-    gap:12px;
-
-    z-index:100;
-
-}
-
-/* Common Button */
-
-.hero-btn{
-
-    display:inline-flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    min-width:150px;
-
-    height:46px;
-
-    padding:0 22px;
-
-    border-radius:10px;
-
-    text-decoration:none;
-
-    font-size:15px;
-
-    font-weight:600;
-
-    transition:.30s ease;
-
-    cursor:pointer;
-
-    box-shadow:0 8px 20px rgba(0,0,0,.18);
-
-}
-
-/* Sample Book */
-
-.sample-btn{
-
-    background:#ffffff;
-
-    color:#222;
-
-}
-
-.sample-btn:hover{
-
-    background:#f4f4f4;
-
-    transform:translateY(-2px);
-
-}
-
-/* Buy Now */
-
-.buy-btn{
-
-    background:#ff9800;
-
-    color:#fff;
-
-}
-
-.buy-btn:hover{
-
-    background:#e68900;
-
-    transform:translateY(-2px);
-
-}
-
-/* Previous */
-
-.hero-prev,
-
-.hero-next{
-
-    position:absolute;
-
-    top:50%;
-
-    transform:translateY(-50%);
-
-    width:46px;
-
-    height:46px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:rgba(255,255,255,.90);
-
-    cursor:pointer;
-
-    font-size:22px;
-
-    transition:.30s;
-
-    z-index:120;
-
-}
-
-.hero-prev{
-
-    left:18px;
-
-}
-
-.hero-next{
-
-    right:18px;
-
-}
-
-.hero-prev:hover,
-
-.hero-next:hover{
-
-    background:#ffffff;
-
-    transform:translateY(-50%) scale(1.08);
-
-}
-
-/* Dots */
-
-.hero-dots{
-
-    position:absolute;
-
-    bottom:18px;
-
-    left:50%;
-
-    transform:translateX(-50%);
-
-    display:flex;
-
-    gap:10px;
-
-    z-index:120;
-
-}
-
-.hero-dot{
-
-    width:12px;
-
-    height:12px;
-
-    border-radius:50%;
-
-    background:#d5d5d5;
-
-    cursor:pointer;
-
-    transition:.30s;
-
-}
-
-.hero-dot.active{
-
-    width:34px;
-
-    border-radius:20px;
-
-    background:#ff9800;
-
-}
-
-/* ==========================================================
-                HERO BANNER PART 2.2 END
-========================================================== */
-/* ==========================================================
-                HERO BANNER PART 2.3
-                RESPONSIVE DESIGN
-========================================================== */
-
-/* ==========================
-        Tablet
-========================== */
-
+/* Hero Buttons & Controls */
+.hero-buttons{position:absolute;bottom:7%;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:100;}
+.hero-btn{display:inline-flex;align-items:center;justify-content:center;min-width:150px;height:46px;padding:0 22px;border-radius:10px;text-decoration:none;font-size:15px;font-weight:600;transition:.30s ease;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.18);}
+.sample-btn{background:#ffffff;color:#222;}
+.sample-btn:hover{background:#f4f4f4;transform:translateY(-2px);}
+.buy-btn{background:#ff9800;color:#fff;}
+.buy-btn:hover{background:#e68900;transform:translateY(-2px);}
+
+.hero-prev,.hero-next{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border:none;border-radius:50%;background:rgba(255,255,255,.90);cursor:pointer;font-size:22px;transition:.30s;z-index:120;}
+.hero-prev{left:18px;}
+.hero-next{right:18px;}
+.hero-prev:hover,.hero-next:hover{background:#ffffff;transform:translateY(-50%) scale(1.08);}
+
+.hero-dots{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:120;}
+.hero-dot{width:12px;height:12px;border-radius:50%;background:#d5d5d5;cursor:pointer;transition:.30s;}
+.hero-dot.active{width:34px;border-radius:20px;background:#ff9800;}
+
+/* Hero Responsive */
 @media (max-width:992px){
-
-.hero-slider{
-
-    margin:20px auto;
-
+    .hero-slider{margin:20px auto;}
+    .hero-slide img{border-radius:14px;}
+    .hero-buttons{bottom:6%;gap:10px;}
+    .hero-btn{min-width:135px;height:42px;font-size:14px;padding:0 18px;}
+    .hero-prev,.hero-next{width:40px;height:40px;font-size:20px;}
+    .hero-dot{width:10px;height:10px;}
+    .hero-dot.active{width:28px;}
 }
-
-.hero-slide img{
-
-    border-radius:14px;
-
-}
-
-.hero-buttons{
-
-    bottom:6%;
-
-    gap:10px;
-
-}
-
-.hero-btn{
-
-    min-width:135px;
-
-    height:42px;
-
-    font-size:14px;
-
-    padding:0 18px;
-
-}
-
-.hero-prev,
-
-.hero-next{
-
-    width:40px;
-
-    height:40px;
-
-    font-size:20px;
-
-}
-
-.hero-dot{
-
-    width:10px;
-
-    height:10px;
-
-}
-
-.hero-dot.active{
-
-    width:28px;
-
-}
-
-}
-
-
-/* ==========================
-        Mobile
-========================== */
 
 @media (max-width:768px){
-
-.hero-slider{
-
-    margin:15px auto;
-
+    .hero-slider{margin:15px auto;}
+    .hero-slide img{border-radius:12px;}
+    .hero-buttons{width:100%;bottom:5%;left:50%;transform:translateX(-50%);justify-content:center;gap:8px;}
+    .hero-btn{min-width:120px;height:38px;padding:0 14px;font-size:13px;border-radius:8px;}
+    .hero-prev,.hero-next{width:34px;height:34px;font-size:16px;}
+    .hero-prev{left:8px;}
+    .hero-next{right:8px;}
+    .hero-dots{bottom:10px;}
+    .hero-dot{width:8px;height:8px;}
+    .hero-dot.active{width:22px;}
 }
-
-.hero-slide img{
-
-    border-radius:12px;
-
-}
-
-.hero-buttons{
-
-    width:100%;
-
-    bottom:5%;
-
-    left:50%;
-
-    transform:translateX(-50%);
-
-    justify-content:center;
-
-    gap:8px;
-
-}
-
-.hero-btn{
-
-    min-width:120px;
-
-    height:38px;
-
-    padding:0 14px;
-
-    font-size:13px;
-
-    border-radius:8px;
-
-}
-
-.hero-prev,
-
-.hero-next{
-
-    width:34px;
-
-    height:34px;
-
-    font-size:16px;
-
-}
-
-.hero-prev{
-
-    left:8px;
-
-}
-
-.hero-next{
-
-    right:8px;
-
-}
-
-.hero-dots{
-
-    bottom:10px;
-
-}
-
-.hero-dot{
-
-    width:8px;
-
-    height:8px;
-
-}
-
-.hero-dot.active{
-
-    width:22px;
-
-}
-
-}
-
-
-/* ==========================
-        Small Mobile
-========================== */
 
 @media (max-width:480px){
-
-.hero-buttons{
-
-    flex-direction:row;
-
-    gap:6px;
-
-}
-
-.hero-btn{
-
-    min-width:105px;
-
-    height:34px;
-
-    font-size:12px;
-
-    padding:0 10px;
-
-}
-
-.hero-slide img{
-
-    border-radius:10px;
-
-}
-
-.hero-prev,
-
-.hero-next{
-
-    display:none;
-
-}
-
+    .hero-buttons{flex-direction:row;gap:6px;}
+    .hero-btn{min-width:105px;height:34px;font-size:12px;padding:0 10px;}
+    .hero-slide img{border-radius:10px;}
+    .hero-prev,.hero-next{display:none;}
 }
 
 /* ==========================================================
-                HERO BANNER END
+        AVAILABLE EBOOKS (PART 3)
 ========================================================== */
-/* ==========================================================
-                PART 3 START
-             AVAILABLE EBOOKS CSS
-========================================================== */
-
-/* Section */
-
-.available-books{
-
-    padding:70px 20px;
-
-    background:#fafafa;
-
-}
-
-/* Container */
-
-.available-books .container{
-
-    max-width:1300px;
-
-    margin:auto;
-
-}
-
-/* Heading */
-
-.section-heading{
-
-    text-align:center;
-
-    margin-bottom:45px;
-
-}
-
-.section-heading h2{
-
-    font-size:36px;
-
-    font-weight:700;
-
-    color:#222;
-
-    margin-bottom:12px;
-
-}
-
-.section-heading p{
-
-    font-size:18px;
-
-    color:#666;
-
-}
-
-/* Grid */
-
-.books-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(3,1fr);
-
-    gap:30px;
-
-}
-
-/* Book Card */
-
-.book-card{
-
-    background:#fff;
-
-    border-radius:18px;
-
-    overflow:hidden;
-
-    position:relative;
-
-    transition:.35s ease;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-
-}
-
-.book-card:hover{
-
-    transform:translateY(-8px);
-
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
-
-}
-
-/* Badge */
-
-.book-badge{
-
-    position:absolute;
-
-    top:15px;
-
-    left:15px;
-
-    background:#ff9800;
-
-    color:#fff;
-
-    padding:6px 14px;
-
-    border-radius:30px;
-
-    font-size:13px;
-
-    font-weight:600;
-
-    z-index:5;
-
-}
-
-/* Book Image */
-
-.book-card img{
-
-    width:100%;
-
-    display:block;
-
-    transition:.4s;
-
-}
-
-.book-card:hover img{
-
-    transform:scale(1.05);
-
-}
-
-/* Content */
-
-.book-content{
-
-    padding:22px;
-
-}
-
-.book-content h3{
-
-    font-size:24px;
-
-    color:#222;
-
-    margin-bottom:10px;
-
-}
-
-.book-content h4{
-
-    font-size:16px;
-
-    color:#4d4d4d;
-
-    margin-bottom:15px;
-
-}
-
-.book-content p{
-
-    font-size:15px;
-
-    line-height:1.7;
-
-    color:#666;
-
-    margin-bottom:18px;
-
-}
-
-/* Price */
-
-.book-price{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:15px;
-
-    margin-bottom:20px;
-
-}
-
-.mrp{
-
-    text-decoration:line-through;
-
-    color:#888;
-
-    font-size:18px;
-
-}
-
-.offer-price{
-
-    color:#e65100;
-
-    font-size:28px;
-
-    font-weight:700;
-
-}
-
-/* Buttons */
-
-.book-buttons{
-
-    display:flex;
-
-    gap:12px;
-
-    margin-bottom:18px;
-
-}
-
-.book-buttons a{
-
-    flex:1;
-
-    text-align:center;
-
-    text-decoration:none;
-
-    padding:12px;
-
-    border-radius:10px;
-
-    font-size:15px;
-
-    font-weight:600;
-
-    transition:.3s;
-
-}
-
-.sample-btn{
-
-    background:#fff;
-
-    color:#333;
-
-    border:1px solid #ddd;
-
-}
-
-.sample-btn:hover{
-
-    background:#f5f5f5;
-
-}
-
-.buy-btn{
-
-    background:#ff9800;
-
-    color:#fff;
-
-}
-
-.buy-btn:hover{
-
-    background:#e68900;
-
-}
-
-/* Share */
-
-.share-btn{
-
-    display:inline-block;
-
-    text-decoration:none;
-
-    color:#0d6efd;
-
-    font-size:15px;
-
-    font-weight:600;
-
-}
-
-.share-btn:hover{
-
-    color:#084298;
-
-}
-
-/* ==========================================================
-                RESPONSIVE
-========================================================== */
-
-@media(max-width:992px){
-
-.books-grid{
-
-    grid-template-columns:repeat(2,1fr);
-
-}
-
-}
-
+.available-books{padding:70px 20px;background:#fafafa;}
+.available-books .container{max-width:1300px;margin:auto;}
+.section-heading{text-align:center;margin-bottom:45px;}
+.section-heading h2{font-size:36px;font-weight:700;color:#222;margin-bottom:12px;}
+.section-heading p{font-size:18px;color:#666;}
+.books-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;}
+.book-card{background:#fff;border-radius:18px;overflow:hidden;position:relative;transition:.35s ease;box-shadow:0 10px 25px rgba(0,0,0,.08);}
+.book-card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(0,0,0,.15);}
+.book-badge{position:absolute;top:15px;left:15px;background:#ff9800;color:#fff;padding:6px 14px;border-radius:30px;font-size:13px;font-weight:600;z-index:5;}
+.book-card img{width:100%;display:block;transition:.4s;}
+.book-card:hover img{transform:scale(1.05);}
+.book-content{padding:22px;}
+.book-content h3{font-size:24px;color:#222;margin-bottom:10px;}
+.book-content h4{font-size:16px;color:#4d4d4d;margin-bottom:15px;}
+.book-content p{font-size:15px;line-height:1.7;color:#666;margin-bottom:18px;}
+.book-price{display:flex;align-items:center;gap:15px;margin-bottom:20px;}
+.mrp{text-decoration:line-through;color:#888;font-size:18px;}
+.offer-price{color:#e65100;font-size:28px;font-weight:700;}
+.book-buttons{display:flex;gap:12px;margin-bottom:18px;}
+.book-buttons a{flex:1;text-align:center;text-decoration:none;padding:12px;border-radius:10px;font-size:15px;font-weight:600;transition:.3s;}
+.sample-btn{background:#fff;color:#333;border:1px solid #ddd;}
+.sample-btn:hover{background:#f5f5f5;}
+.buy-btn{background:#ff9800;color:#fff;}
+.buy-btn:hover{background:#e68900;}
+.share-btn{display:inline-block;text-decoration:none;color:#0d6efd;font-size:15px;font-weight:600;}
+.share-btn:hover{color:#084298;}
+
+@media(max-width:992px){.books-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:768px){
-
-.books-grid{
-
-    grid-template-columns:1fr;
-
+    .books-grid{grid-template-columns:1fr;}
+    .section-heading h2{font-size:28px;}
+    .book-content h3{font-size:22px;}
+    .book-buttons{flex-direction:column;}
 }
 
-.section-heading h2{
-
-    font-size:28px;
-
-}
-
-.book-content h3{
-
-    font-size:22px;
-
-}
-
-.book-buttons{
-
-    flex-direction:column;
-
-}
-
-}
+/* Card Animation */
+.book-hidden{opacity:0;transform:translateY(40px);transition:all .6s ease;}
+.show-book{opacity:1;transform:translateY(0);}
 
 /* ==========================================================
-                PART 3 END
-========================================================== *
-/* =========================================
-        CARD ANIMATION
-========================================= */
-
-.book-hidden{
-
-    opacity:0;
-
-    transform:translateY(40px);
-
-    transition:all .6s ease;
-
-}
-
-.show-book{
-
-    opacity:1;
-
-    transform:translateY(0);
-
-}
-/* ==========================================================
-                PART 4 START
-            UPCOMING EBOOKS CSS
+        UPCOMING EBOOKS (PART 4)
 ========================================================== */
-
-/* Section */
-
-.upcoming-books{
-
-    padding:70px 20px;
-
-    background:#ffffff;
-
-}
-
-/* Container */
-
-.upcoming-books .container{
-
-    max-width:1300px;
-
-    margin:auto;
-
-}
-
-/* Grid */
-
-.upcoming-books-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(5,1fr);
-
-    gap:25px;
-
-}
-
-/* Card */
-
-.upcoming-book-card{
-
-    position:relative;
-
-    background:#fff;
-
-    border-radius:18px;
-
-    overflow:hidden;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-
-    transition:.35s ease;
-
-}
-
-.upcoming-book-card:hover{
-
-    transform:translateY(-8px);
-
-    box-shadow:0 18px 40px rgba(0,0,0,.15);
-
-}
-
-/* Coming Soon Badge */
-
-.coming-badge{
-
-    position:absolute;
-
-    top:12px;
-
-    left:12px;
-
-    background:#ff5722;
-
-    color:#fff;
-
-    padding:6px 14px;
-
-    border-radius:30px;
-
-    font-size:12px;
-
-    font-weight:600;
-
-    z-index:5;
-
-}
-
-/* Book Image */
-
-.upcoming-book-card img{
-
-    width:100%;
-
-    display:block;
-
-    transition:.35s;
-
-}
-
-.upcoming-book-card:hover img{
-
-    transform:scale(1.05);
-
-}
-
-/* Content */
-
-.upcoming-content{
-
-    padding:18px;
-
-    text-align:center;
-
-}
-
-.upcoming-content h3{
-
-    font-size:20px;
-
-    color:#222;
-
-    margin-bottom:10px;
-
-}
-
-.upcoming-content p{
-
-    font-size:14px;
-
-    color:#666;
-
-    line-height:1.6;
-
-    margin-bottom:18px;
-
-}
-
-/* Interested Button */
-
-.interested-btn{
-
-    width:100%;
-
-    border:none;
-
-    cursor:pointer;
-
-    background:#ff9800;
-
-    color:#fff;
-
-    padding:12px;
-
-    border-radius:10px;
-
-    font-size:15px;
-
-    font-weight:600;
-
-    transition:.3s;
-
-}
-
-.interested-btn:hover{
-
-    background:#e68900;
-
-}
-
-/* =====================================================
-            CARD ANIMATION
-===================================================== */
-
-.upcoming-book-card{
-
-    animation:floatCard 4s ease-in-out infinite;
-
-}
-
-.upcoming-book-card:nth-child(2){
-
-    animation-delay:.3s;
-
-}
-
-.upcoming-book-card:nth-child(3){
-
-    animation-delay:.6s;
-
-}
-
-.upcoming-book-card:nth-child(4){
-
-    animation-delay:.9s;
-
-}
-
-.upcoming-book-card:nth-child(5){
-
-    animation-delay:1.2s;
-
-}
+.upcoming-books{padding:70px 20px;background:#ffffff;}
+.upcoming-books .container{max-width:1300px;margin:auto;}
+.upcoming-books-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:25px;}
+.upcoming-book-card{position:relative;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,.08);transition:.35s ease;animation:floatCard 4s ease-in-out infinite;}
+.upcoming-book-card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(0,0,0,.15);}
+.upcoming-book-card:nth-child(2){animation-delay:.3s;}
+.upcoming-book-card:nth-child(3){animation-delay:.6s;}
+.upcoming-book-card:nth-child(4){animation-delay:.9s;}
+.upcoming-book-card:nth-child(5){animation-delay:1.2s;}
 
 @keyframes floatCard{
-
-    0%,100%{
-
-        transform:translateY(0);
-
-    }
-
-    50%{
-
-        transform:translateY(-6px);
-
-    }
-
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
 }
 
-/* =====================================================
-                RESPONSIVE
-===================================================== */
+.coming-badge{position:absolute;top:12px;left:12px;background:#ff5722;color:#fff;padding:6px 14px;border-radius:30px;font-size:12px;font-weight:600;z-index:5;}
+.upcoming-book-card img{width:100%;display:block;transition:.35s;}
+.upcoming-book-card:hover img{transform:scale(1.05);}
+.upcoming-content{padding:18px;text-align:center;}
+.upcoming-content h3{font-size:20px;color:#222;margin-bottom:10px;}
+.upcoming-content p{font-size:14px;color:#666;line-height:1.6;margin-bottom:18px;}
+.interested-btn{width:100%;border:none;cursor:pointer;background:#ff9800;color:#fff;padding:12px;border-radius:10px;font-size:15px;font-weight:600;transition:.3s;}
+.interested-btn:hover{background:#e68900;}
 
-@media(max-width:1200px){
-
-.upcoming-books-grid{
-
-    grid-template-columns:repeat(4,1fr);
-
-}
-
-}
-
-@media(max-width:992px){
-
-.upcoming-books-grid{
-
-    grid-template-columns:repeat(3,1fr);
-
-}
-
-}
-
-@media(max-width:768px){
-
-.upcoming-books-grid{
-
-    grid-template-columns:repeat(2,1fr);
-
-}
-
-}
-
+@media(max-width:1200px){.upcoming-books-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:992px){.upcoming-books-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:768px){.upcoming-books-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:480px){
-
-.upcoming-books-grid{
-
-    grid-template-columns:1fr;
-
-}
-
-.upcoming-content h3{
-
-    font-size:18px;
-
-}
-
+    .upcoming-books-grid{grid-template-columns:1fr;}
+    .upcoming-content h3{font-size:18px;}
 }
 
 /* ==========================================================
-                PART 4 END
+        SHARE BUTTON - CENTERED (DESKTOP & MOBILE)
 ========================================================== */
+.sticky-share-button, .share-component-buttons {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+}
+
+@media(min-width: 769px) {
+    .sticky-share-desktop, .sticky-share-button {
+        position: fixed !important;
+        bottom: 20px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        right: auto !important;
+        top: auto !important;
+        z-index: 9999 !important;
+        background: var(--primary, #ff9800) !important;
+        color: #fff !important;
+        padding: 12px 30px !important;
+        border-radius: 30px !important;
+        font-weight: 700 !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
+    }
+}
+
+@media(max-width: 768px) {
+    .sticky-share-mobile, .sticky-share-button {
+        position: fixed !important;
+        bottom: 65px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        right: auto !important;
+        top: auto !important;
+        z-index: 9999 !important;
+        background: var(--primary, #ff9800) !important;
+        color: #fff !important;
+        padding: 10px 24px !important;
+        border-radius: 30px !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2) !important;
+    }
+}
