@@ -1,2251 +1,314 @@
 /*=========================================================
-        AAROGYAM INDIA
-        EBOOK STORE
-
-        FILE : ebook.css
-        VERSION : 2.0
-
-        AUTHOR : Aarogyam India
-=========================================================*/
-
-
-
-/*=========================================================
-        PART 1 : RESET
-=========================================================*/
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-html{
-
-    scroll-behavior:smooth;
-
-}
-
-body{
-
-    font-family:'Poppins',sans-serif;
-
-    background:#f8f9fb;
-
-    color:#222;
-
-    overflow-x:hidden;
-
-}
-
-
-/*=========================================================
-        PART 1.1 : GOOGLE FONT
+        AAROGYAM INDIA - EBOOK STORE (ebook.css)
 =========================================================*/
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
-
-/*=========================================================
-        PART 1.2 : ROOT COLORS
-=========================================================*/
-
 :root{
-
     --primary:#ff8c00;
-
     --primary-dark:#d35400;
-
     --primary-light:#ffd08a;
-
     --secondary:#1f8d43;
-
     --secondary-light:#4caf50;
-
     --white:#ffffff;
-
     --black:#222222;
-
     --text:#666666;
-
     --border:#ececec;
-
     --background:#f8f9fb;
-
     --shadow:0 8px 25px rgba(0,0,0,.08);
-
     --radius:14px;
-
     --transition:.35s ease;
-
 }
 
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Poppins',sans-serif;background:#f8f9fb;color:#222;overflow-x:hidden;}
+
+img{display:block;max-width:100%;}
+a{text-decoration:none;color:inherit;}
+ul{list-style:none;}
+button{border:none;cursor:pointer;background:none;font-family:'Poppins',sans-serif;}
+input{outline:none;font-family:'Poppins',sans-serif;}
+
+.container{width:95%;max-width:1400px;margin:auto;}
+section{padding:55px 0;}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+.section-title h2{font-size:32px;font-weight:700;color:var(--black);}
+.section-title p{margin-top:8px;color:var(--text);}
+.section-title a{color:var(--primary);font-weight:600;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:13px 28px;border-radius:12px;background:linear-gradient(90deg,var(--primary-light),var(--primary),var(--primary-dark));color:#fff;font-weight:600;transition:var(--transition);}
+.btn:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
 
 /*=========================================================
-        PART 1.3 : COMMON TAG
+        HEADER & NAVIGATION
 =========================================================*/
+.ebook-header{position:sticky;top:0;width:100%;z-index:9999;background:linear-gradient(90deg,#ffd79b 0%,#ff9f1c 45%,#d35400 100%);box-shadow:0 8px 25px rgba(0,0,0,.12);}
+.header-container{max-width:1400px;margin:auto;height:78px;display:flex;align-items:center;justify-content:space-between;gap:30px;padding:0 18px;}
+.logo{display:flex;align-items:center;}
+.logo img{width:82px;height:auto;transition:.30s;}
+.logo img:hover{transform:scale(1.05);}
 
-img{
+.ebook-navigation{flex:1;}
+.ebook-navigation ul{display:flex;justify-content:center;align-items:center;gap:34px;}
+.ebook-navigation li{position:relative;}
+.ebook-navigation a{color:#ffffff;font-size:15px;font-weight:600;letter-spacing:.3px;transition:.30s;}
+.ebook-navigation a:hover{color:#fff3d2;}
 
-    display:block;
+.header-right{display:flex;align-items:center;gap:12px;}
+.header-icon{width:42px;height:42px;display:flex;justify-content:center;align-items:center;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(12px);transition:.30s;}
+.header-icon:hover{background:#ffffff;transform:translateY(-2px);}
+.header-icon img{width:18px;height:18px;}
 
-    max-width:100%;
+.cart-icon{position:relative;}
+.cart-count{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#ff2d2d;color:#fff;font-size:10px;font-weight:700;display:flex;justify-content:center;align-items:center;}
 
-}
-
-a{
-
-    text-decoration:none;
-
-    color:inherit;
-
-}
-
-ul{
-
-    list-style:none;
-
-}
-
-button{
-
-    border:none;
-
-    cursor:pointer;
-
-    background:none;
-
-    font-family:'Poppins',sans-serif;
-
-}
-
-input{
-
-    outline:none;
-
-    font-family:'Poppins',sans-serif;
-
-}
-
+.menu-button{display:none;background:none;border:none;cursor:pointer;padding:8px;}
+.menu-button img{width:28px;height:28px;}
 
 /*=========================================================
-        PART 1.4 : COMMON CLASS
+        MEGA MENU (CATEGORIES)
 =========================================================*/
-
-.container{
-
-    width:95%;
-
-    max-width:1400px;
-
-    margin:auto;
-
-}
-
-section{
-
-    padding:55px 0;
-
-}
-
-.section-title{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:28px;
-
-}
-
-.section-title h2{
-
-    font-size:32px;
-
-    font-weight:700;
-
-    color:var(--black);
-
-}
-
-.section-title p{
-
-    margin-top:8px;
-
-    color:var(--text);
-
-}
-
-.section-title a{
-
-    color:var(--primary);
-
-    font-weight:600;
-
-}
-
-
-/*=========================================================
-        PART 1.5 : BUTTON STYLE
-=========================================================*/
-
-.btn{
-
-    display:inline-flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:13px 28px;
-
-    border-radius:12px;
-
-    background:linear-gradient(
-            90deg,
-            var(--primary-light),
-            var(--primary),
-            var(--primary-dark)
-    );
-
-    color:#fff;
-
-    font-weight:600;
-
-    transition:var(--transition);
-
-}
-
-.btn:hover{
-
-    transform:translateY(-3px);
-
-    box-shadow:var(--shadow);
-
-}
-
-
-/*=========================================================
-        END OF PART 1
-=========================================================*/
-/*=========================================================
-                PART 2 : HEADER
-=========================================================*/
-
-
-/*=========================================================
-        2.1 HEADER
-=========================================================*/
-
-.ebook-header{
-
-    position:sticky;
-
-    top:0;
-
-    width:100%;
-
-    z-index:9999;
-
-    background:linear-gradient(
-        90deg,
-        #ffd79b 0%,
-        #ff9f1c 45%,
-        #d35400 100%
-    );
-
-    box-shadow:0 8px 25px rgba(0,0,0,.12);
-
-}
-
-
-/*=========================================================
-        2.2 HEADER CONTAINER
-=========================================================*/
-
-.header-container{
-
-    max-width:1400px;
-
-    margin:auto;
-
-    height:78px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    gap:30px;
-
-    padding:0 18px;
-
-}
-
-
-/*=========================================================
-        2.3 LOGO
-=========================================================*/
-
-.logo{
-
-    display:flex;
-
-    align-items:center;
-
-}
-
-.logo img{
-
-    width:82px;
-
-    height:auto;
-
-    transition:.30s;
-
-}
-
-.logo img:hover{
-
-    transform:scale(1.05);
-
-}
-
-
-/*=========================================================
-        2.4 NAVIGATION
-=========================================================*/
-
-.ebook-navigation{
-
-    flex:1;
-
-}
-
-.ebook-navigation ul{
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    gap:34px;
-
-}
-
-.ebook-navigation li{
-
-    position:relative;
-
-}
-
-.ebook-navigation a{
-
-    color:#ffffff;
-
-    font-size:15px;
-
-    font-weight:600;
-
-    letter-spacing:.3px;
-
-    transition:.30s;
-
-}
-
-.ebook-navigation a:hover{
-
-    color:#fff3d2;
-
-}
-
-
-/*=========================================================
-        2.5 RIGHT SIDE
-=========================================================*/
-
-.header-right{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
-}
-
-
-/*=========================================================
-        2.6 ICONS
-=========================================================*/
-
-.header-icon{
-
-    width:42px;
-
-    height:42px;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    border-radius:50%;
-
-    background:rgba(255,255,255,.18);
-
-    backdrop-filter:blur(12px);
-
-    transition:.30s;
-
-}
-
-.header-icon:hover{
-
-    background:#ffffff;
-
-    transform:translateY(-2px);
-
-}
-
-.header-icon img{
-
-    width:18px;
-
-    height:18px;
-
-}
-
-
-/*=========================================================
-        2.7 CART
-=========================================================*/
-
-.cart-icon{
-
-    position:relative;
-
-}
-
-.cart-count{
-
-    position:absolute;
-
-    top:-5px;
-
-    right:-5px;
-
-    width:18px;
-
-    height:18px;
-
-    border-radius:50%;
-
-    background:#ff2d2d;
-
-    color:#fff;
-
-    font-size:10px;
-
-    font-weight:700;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-}
-
-
-/*=========================================================
-        2.8 MOBILE BUTTON
-=========================================================*/
-
-.menu-button{
-    display:none;
-    background:none;
-    border:none;
-    cursor:pointer;
-    padding:8px;
-}
-
-.menu-button img{
-    width:28px;
-    height:28px;
-}
-
-/*=========================================================
-        2.9 MEGA MENU
-=========================================================*/
-
-.mega-category-menu{
-
-    display:none;
-
-}
-
-
-/*=========================================================
-        END OF PART 2
-=========================================================*/
-/*=========================================================
-        PART 3 (V6)
-        CATEGORY DROPDOWN MENU
-=========================================================*/
-
-/*---------------------------------------------------------
-        CATEGORY MENU
----------------------------------------------------------*/
-
-.mega-menu{
-
-    position:relative;
-
-}
-
-.mega-menu>a{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:6px;
-
-}
-
-/*---------------------------------------------------------
-        DROPDOWN BOX
----------------------------------------------------------*/
-
-.mega-category-menu{
-
-    position:absolute;
-
-    top:100%;
-
-    left:0;
-
-    width:260px;
-
-    background:#ffffff;
-
-    border-radius:0 0 16px 16px;
-
-    box-shadow:0 12px 30px rgba(0,0,0,.12);
-
-    overflow:hidden;
-
-    display:none;
-
-    z-index:999;
-
-}
-
-/*---------------------------------------------------------
-        SHOW DROPDOWN
----------------------------------------------------------*/
-
-.mega-menu:hover .mega-category-menu{
-
-    display:block;
-
-}
-
-/*---------------------------------------------------------
-        CATEGORY LINK
----------------------------------------------------------*/
-
-.mega-category-menu a{
-
-    display:block;
-
-    padding:16px 22px;
-
-    text-decoration:none;
-
-    color:#333;
-
-    font-size:16px;
-
-    font-weight:600;
-
-    border-bottom:1px solid #eeeeee;
-
-    transition:.3s;
-
-}
-
-/*---------------------------------------------------------
-        LAST ITEM
----------------------------------------------------------*/
-
-.mega-category-menu a:last-child{
-
-    border-bottom:none;
-
-}
-
-/*---------------------------------------------------------
-        HOVER
----------------------------------------------------------*/
-
-.mega-category-menu a:hover{
-
-    background:#ff7a00;
-
-    color:#ffffff;
-
-    padding-left:30px;
-
-}
-
-/*---------------------------------------------------------
-        MOBILE
----------------------------------------------------------*/
+.mega-menu{position:relative;}
+.mega-menu>a{display:flex;align-items:center;gap:6px;}
+.mega-category-menu{position:absolute;top:100%;left:0;width:260px;background:#ffffff;border-radius:0 0 16px 16px;box-shadow:0 12px 30px rgba(0,0,0,.12);overflow:hidden;display:none;z-index:999;}
+.mega-menu:hover .mega-category-menu{display:block;}
+.mega-category-menu a{display:block;padding:16px 22px;text-decoration:none;color:#333;font-size:16px;font-weight:600;border-bottom:1px solid #eeeeee;transition:.3s;}
+.mega-category-menu a:last-child{border-bottom:none;}
+.mega-category-menu a:hover{background:#ff7a00;color:#ffffff;padding-left:30px;}
 
 @media(max-width:992px){
-
-    .mega-category-menu{
-
-        position:static;
-
-        width:100%;
-
-        border-radius:0;
-
-        box-shadow:none;
-
-    }
-
-}
-/*=========================================================
-        PART 4.1
-        OFFER SLIDER
-=========================================================*/
-
-
-/*=========================================================
-        4.1.1 OFFER SLIDER
-=========================================================*/
-
-.offer-slider{
-
-    width:100%;
-
-    padding:20px 0;
-
-}
-
-
-/*=========================================================
-        4.1.2 OFFER BANNER
-=========================================================*/
-
-.offer-banner{
-
-    max-width:1400px;
-
-    margin:auto;
-
-    border-radius:20px;
-
-    overflow:hidden;
-
-    background:#ffffff;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-
-}
-
-
-/*=========================================================
-        4.1.3 OFFER IMAGE
-=========================================================*/
-
-.offer-banner img{
-
-    display:block;
-
-    width:100%;
-
-    height:500px;
-
-    transition:.40s ease;
-
-}
-
-
-/*=========================================================
-        4.1.4 HOVER EFFECT
-=========================================================*/
-
-.offer-banner:hover img{
-
-    transform:scale(1.02);
-
-}
-
-
-/*=========================================================
-        END OF PART 4.1
-=========================================================*/
-/*=========================================================
-                PART 5
-            FEATURED BOOK
-=========================================================*/
-
-/* Featured Section */
-
-.featured-ebook{
-    width:100%;
-    padding:70px 0;
-    background:#f8fafc;
-}
-
-/* Container */
-
-.featured-container{
-    width:95%;
-    max-width:1300px;
-    margin:auto;
-}
-
-/* Heading */
-
-.featured-title{
-    font-size:36px;
-    font-weight:700;
-    color:#222;
-    margin-bottom:45px;
-    text-align:center;
-}
-
-/* Card */
-
-.featured-book-card{
-    display:flex;
-    align-items:center;
-    gap:50px;
-    background:#fff;
-    border-radius:24px;
-    padding:45px;
-    box-shadow:0 15px 45px rgba(0,0,0,.08);
-    transition:.35s;
-    overflow:hidden;
-}
-
-/* Hover */
-
-.featured-book-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 22px 60px rgba(0,0,0,.12);
-}
-
-/* Cover */
-
-.book-cover{
-    width:330px;
-    flex-shrink:0;
-}
-
-.book-cover img{
-    width:100%;
-    display:block;
-    border-radius:20px;
-    transition:.35s;
-}
-
-.book-cover:hover img{
-    transform:scale(1.05);
-}
-
-/* Details */
-
-.book-details{
-    flex:1;
-}
-
-/* Premium */
-
-.premium-badge{
-    display:inline-block;
-    background:linear-gradient(90deg,#ff7a00,#ff9800);
-    color:#fff;
-    padding:8px 20px;
-    border-radius:50px;
-    font-size:15px;
-    font-weight:700;
-    margin-bottom:20px;
-}
-
-/* Book Name */
-
-.book-title{
-    font-size:38px;
-    font-weight:700;
-    color:#222;
-    margin-bottom:18px;
-    line-height:1.3;
-}
-
-/* Description */
-
-.book-description{
-    font-size:18px;
-    color:#555;
-    line-height:1.9;
-    margin-bottom:25px;
-}
-
-/* Rating */
-
-.book-rating{
-    color:#ffb400;
-    font-size:22px;
-    margin-bottom:22px;
-}
-
-/* Price */
-
-.price-box{
-    display:flex;
-    align-items:center;
-    gap:20px;
-    margin:30px 0;
-}
-
-.old-price{
-    color:#999;
-    text-decoration:line-through;
-    font-size:24px;
-}
-
-.new-price{
-    color:#ff6600;
-    font-size:42px;
-    font-weight:700;
-}
-
-/* Buttons */
-
-.book-buttons{
-    display:flex;
-    gap:18px;
-    margin-top:20px;
-    flex-wrap:wrap;
-}
-
-.buy-btn,
-.demo-btn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    padding:16px 38px;
-    border-radius:14px;
-    text-decoration:none;
-    font-size:17px;
-    font-weight:700;
-    transition:.35s;
-}
-
-.buy-btn{
-    background:linear-gradient(90deg,#ff7a00,#ff9800);
-    color:#fff;
-    box-shadow:0 8px 20px rgba(255,122,0,.30);
-}
-
-.buy-btn:hover{
-    transform:translateY(-3px);
-}
-
-.demo-btn{
-    border:2px solid #ff7a00;
-    color:#ff7a00;
-    background:#fff;
-}
-
-.demo-btn:hover{
-    background:#ff7a00;
-    color:#fff;
-}
-
-/* Mobile */
-
-@media(max-width:992px){
-
-    .featured-book-card{
-        flex-direction:column;
-        text-align:center;
-        padding:30px 20px;
-        gap:25px;
-    }
-
-    .book-cover{
-        width:230px;
-    }
-
-    .book-title{
-        font-size:30px;
-    }
-
-    .book-description{
-        font-size:16px;
-    }
-
-    .price-box{
-        justify-content:center;
-    }
-
-    .book-buttons{
-        justify-content:center;
-    }
-
-    .buy-btn,
-    .demo-btn{
-        width:100%;
-        max-width:240px;
-    }
+    .mega-category-menu{position:static;width:100%;border-radius:0;box-shadow:none;}
 }
 
 /*=========================================================
-        END OF PART 5
+        OFFER SLIDER & RESPONSIVE HERO BANNER
 =========================================================*/
-
-/*=========================================================
-                PART 6
-            QUICK CATEGORY
-=========================================================*/
-
-.quick-category{
-    width:100%;
-    padding:80px 0;
-    background:#f8fafc;
-}
-
-.quick-category .section-title{
-    text-align:center;
-    margin-bottom:50px;
-}
-
-.quick-category .section-title h2{
-    font-size:42px;
-    font-weight:700;
-    color:#222;
-    margin-bottom:10px;
-}
-
-.quick-category .section-title p{
-    font-size:18px;
-    color:#666;
-}
-
-.category-grid{
-
-    width:95%;
-    max-width:1300px;
-    margin:auto;
-
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-
-    gap:30px;
-
-}
-
-.category-grid a{
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    height:170px;
-
-    text-decoration:none;
-
-    color:#222;
-
-    font-size:22px;
-
-    font-weight:700;
-
-    background:#ffffff;
-
-    border-radius:24px;
-
-    border:2px solid #f2f2f2;
-
-    box-shadow:0 15px 35px rgba(0,0,0,.08);
-
-    transition:.35s;
-
-}
-
-.category-grid a:hover{
-
-    transform:translateY(-10px) scale(1.03);
-
-    background:linear-gradient(135deg,#ff7a00,#ffb347);
-
-    color:#fff;
-
-    border-color:#ff7a00;
-
-    box-shadow:0 20px 45px rgba(255,122,0,.30);
-
-}
-
-.category-grid a:active{
-
-    transform:scale(.98);
-
-}
-
-@media(max-width:992px){
-
-    .category-grid{
-
-        grid-template-columns:repeat(3,1fr);
-
-    }
-
-}
+.offer-slider{width:100%;padding:20px 0;}
+.offer-banner{max-width:1400px;margin:auto;border-radius:20px;overflow:hidden;background:#ffffff;box-shadow:0 10px 30px rgba(0,0,0,.08);}
+.offer-banner img{display:block;width:100%;height:auto;max-height:500px;object-fit:cover;transition:.40s ease;}
+.offer-banner:hover img{transform:scale(1.02);}
 
 @media(max-width:768px){
-
-    .quick-category{
-
-        padding:60px 0;
-
-    }
-
-    .quick-category .section-title h2{
-
-        font-size:32px;
-
-    }
-
-    .category-grid{
-
-        grid-template-columns:repeat(2,1fr);
-
-        gap:18px;
-
-    }
-
-    .category-grid a{
-
-        height:120px;
-
-        font-size:18px;
-
-        border-radius:18px;
-
-    }
-
-}
-
-@media(max-width:480px){
-
-    .category-grid{
-
-        grid-template-columns:1fr 1fr;
-
-    }
-
+    .offer-banner img{max-height:250px;border-radius:14px;}
 }
 
 /*=========================================================
-            END OF PART 6
+        FEATURED EBOOK
 =========================================================*/
-/*=========================================================
-                PART 7
-              FILTER BAR
-=========================================================*/
-
-.filter-bar{
-
-    width:95%;
-
-    max-width:1300px;
-
-    margin:40px auto;
-
-    display:flex;
-
-    gap:15px;
-
-    overflow-x:auto;
-
-    scrollbar-width:none;
-
-    -ms-overflow-style:none;
-
-}
-
-.filter-bar::-webkit-scrollbar{
-
-    display:none;
-
-}
-
-.filter-bar button{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:10px;
-
-    padding:14px 24px;
-
-    background:#ffffff;
-
-    border:2px solid #eeeeee;
-
-    border-radius:50px;
-
-    color:#333;
-
-    font-size:16px;
-
-    font-weight:600;
-
-    cursor:pointer;
-
-    white-space:nowrap;
-
-    transition:.35s;
-
-    box-shadow:0 8px 20px rgba(0,0,0,.06);
-
-}
-
-.filter-bar button img{
-
-    width:20px;
-
-    height:20px;
-
-}
-
-.filter-bar button:hover{
-
-    background:linear-gradient(135deg,#ff7a00,#ffb347);
-
-    color:#ffffff;
-
-    border-color:#ff7a00;
-
-    transform:translateY(-3px);
-
-    box-shadow:0 15px 30px rgba(255,122,0,.25);
-
-}
-
-.filter-bar button:active{
-
-    transform:scale(.96);
-
-}
-
-@media(max-width:768px){
-
-    .filter-bar{
-
-        gap:12px;
-
-        padding-bottom:5px;
-
-    }
-
-    .filter-bar button{
-
-        padding:12px 20px;
-
-        font-size:15px;
-
-    }
-
-}
-
-/*=========================================================
-            END OF PART 7
-=========================================================*/
-/*=========================================================
-                PART 8
-          BEST SELLER BOOKS
-=========================================================*/
-
-.best-seller{
-
-    width:100%;
-
-    padding:70px 0;
-
-    background:#ffffff;
-
-}
-
-.book-grid{
-
-    width:95%;
-
-    max-width:1300px;
-
-    margin:auto;
-
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-
-    gap:30px;
-
-}
-
-.book-card{
-
-    position:relative;
-
-    background:#ffffff;
-
-    border-radius:22px;
-
-    padding:20px;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-
-    transition:.35s;
-
-    overflow:hidden;
-
-}
-
-.book-card:hover{
-
-    transform:translateY(-8px);
-
-    box-shadow:0 18px 45px rgba(0,0,0,.15);
-
-}
-
-.book-badge{
-
-    position:absolute;
-
-    top:15px;
-
-    left:15px;
-
-    z-index:2;
-
-}
-
-.book-badge img{
-
-    width:75px;
-
-}
-
-.book-image{
-
-    width:100%;
-
-    border-radius:18px;
-
-    margin-bottom:18px;
-
-    transition:.35s;
-
-}
-
-.book-card:hover .book-image{
-
-    transform:scale(1.04);
-
-}
-
-.book-card h3{
-
-    font-size:22px;
-
-    color:#222;
-
-    margin-bottom:8px;
-
-}
-
-.book-category{
-
-    color:#777;
-
-    font-size:15px;
-
-    margin-bottom:18px;
-
-}
-
-.price-box{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:20px;
-
-}
-
-.new-price{
-
-    font-size:28px;
-
-    font-weight:700;
-
-    color:#ff7a00;
-
-}
-
-.old-price{
-
-    font-size:18px;
-
-    color:#999;
-
-    text-decoration:line-through;
-
-}
-
-.book-buttons{
-
-    display:flex;
-
-    gap:12px;
-
-}
-
-.book-buttons a{
-
-    flex:1;
-
-    text-align:center;
-
-    padding:12px 0;
-
-    border-radius:12px;
-
-    text-decoration:none;
-
-    font-weight:600;
-
-    transition:.35s;
-
-}
-
-.book-buttons a:first-child{
-
-    border:2px solid #ff7a00;
-
-    color:#ff7a00;
-
-    background:#fff;
-
-}
-
-.book-buttons a:last-child{
-
-    background:linear-gradient(135deg,#ff7a00,#ffb347);
-
-    color:#fff;
-
-}
-
-.book-buttons a:hover{
-
-    transform:translateY(-3px);
-
-}
-
-@media(max-width:768px){
-
-    .book-grid{
-
-        grid-template-columns:repeat(2,1fr);
-
-        gap:18px;
-
-    }
-
-    .book-card{
-
-        padding:15px;
-
-    }
-
-    .book-card h3{
-
-        font-size:18px;
-
-    }
-
-    .new-price{
-
-        font-size:22px;
-
-    }
-
-    .old-price{
-
-        font-size:15px;
-
-    }
-
-    .book-buttons{
-
-        flex-direction:column;
-
-    }
-
-}
-
-/*=========================================================
-            END OF PART 8
-=========================================================*/
-/*=========================================================
-                PART 9
-        FEATURES + NEWSLETTER
-=========================================================*/
-
-/*------------------------------
-        FEATURES
-------------------------------*/
-
-.features{
-
-    width:100%;
-
-    padding:70px 0;
-
-    background:#f8fafc;
-
-}
-
-.feature-grid{
-
-    width:95%;
-
-    max-width:1300px;
-
-    margin:auto;
-
-    display:grid;
-
-    grid-template-columns:repeat(3,1fr);
-
-    gap:30px;
-
-}
-
-.feature-box{
-
-    background:#ffffff;
-
-    border-radius:24px;
-
-    padding:35px 25px;
-
-    text-align:center;
-
-    border:2px solid #f2f2f2;
-
-    box-shadow:0 12px 30px rgba(0,0,0,.08);
-
-    transition:.35s;
-
-}
-
-.feature-box:hover{
-
-    transform:translateY(-8px);
-
-    border-color:#ff7a00;
-
-    box-shadow:0 18px 40px rgba(255,122,0,.20);
-
-}
-
-.feature-box img{
-
-    width:350px;
-
-    height:350px;
-
-    object-fit:contain;
-
-    margin-bottom:20px;
-
-}
-
-.feature-box h3{
-
-    font-size:22px;
-
-    font-weight:700;
-
-    color:#222;
-
-    line-height:1.4;
-
-}
-
-/*------------------------------
-        NEWSLETTER
-------------------------------*/
-
-.newsletter{
-
-    width:100%;
-
-    padding:70px 0;
-
-    background:#ffffff;
-
-}
-
-.newsletter-banner{
-
-    width:95%;
-
-    max-width:1100px;
-
-    margin:auto;
-
-    border-radius:24px;
-
-    overflow:hidden;
-
-    box-shadow:0 15px 35px rgba(0,0,0,.10);
-
-}
-
-.newsletter-banner img{
-
-    width:90%;
-
-    display:block;
-
-    border-radius:24px;
-
-}
-
-/*------------------------------
-        TABLET
-------------------------------*/
+.featured-ebook{width:100%;padding:70px 0;background:#f8fafc;}
+.featured-book-card{display:flex;align-items:center;gap:50px;background:#fff;border-radius:24px;padding:45px;box-shadow:0 15px 45px rgba(0,0,0,.08);transition:.35s;overflow:hidden;}
+.featured-book-card:hover{transform:translateY(-8px);box-shadow:0 22px 60px rgba(0,0,0,.12);}
+.book-cover{width:330px;flex-shrink:0;}
+.book-cover img{width:100%;display:block;border-radius:20px;transition:.35s;}
+.book-cover:hover img{transform:scale(1.05);}
+.book-details{flex:1;}
+.premium-badge{display:inline-block;background:linear-gradient(90deg,#ff7a00,#ff9800);color:#fff;padding:8px 20px;border-radius:50px;font-size:15px;font-weight:700;margin-bottom:20px;}
+.book-title{font-size:38px;font-weight:700;color:#222;margin-bottom:18px;line-height:1.3;}
+.book-description{font-size:18px;color:#555;line-height:1.9;margin-bottom:25px;}
+.price-box{display:flex;align-items:center;gap:20px;margin:30px 0;}
+.old-price{color:#999;text-decoration:line-through;font-size:24px;}
+.new-price{color:#ff6600;font-size:42px;font-weight:700;}
+.book-buttons{display:flex;gap:18px;margin-top:20px;flex-wrap:wrap;}
+.buy-btn,.demo-btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 38px;border-radius:14px;text-decoration:none;font-size:17px;font-weight:700;transition:.35s;}
+.buy-btn{background:linear-gradient(90deg,#ff7a00,#ff9800);color:#fff;box-shadow:0 8px 20px rgba(255,122,0,.30);}
+.buy-btn:hover{transform:translateY(-3px);}
+.demo-btn{border:2px solid #ff7a00;color:#ff7a00;background:#fff;}
+.demo-btn:hover{background:#ff7a00;color:#fff;}
 
 @media(max-width:992px){
-
-.feature-grid{
-
-grid-template-columns:repeat(2,1fr);
-
-}
-
-}
-
-/*------------------------------
-        MOBILE
-------------------------------*/
-
-@media(max-width:1100px){
-
-.features{
-
-padding:50px 0;
-
-}
-
-.feature-grid{
-
-grid-template-columns:1fr;
-
-gap:20px;
-
-}
-
-.feature-box{
-
-padding:28px 20px;
-
-}
-
-.feature-box img{
-
-width:400px;
-
-height:200px;
-
-}
-
-.feature-box h3{
-
-font-size:18px;
-
-}
-
-.newsletter{
-
-padding:50px 0;
-
-}
-
-.newsletter-banner{
-
-border-radius:18px;
-
-}
-
-.newsletter-banner img{
-
-border-radius:18px;
-
-}
-
+    .featured-book-card{flex-direction:column;text-align:center;padding:30px 20px;gap:25px;}
+    .book-cover{width:230px;}
+    .book-title{font-size:30px;}
+    .book-description{font-size:16px;}
+    .price-box{justify-content:center;}
+    .book-buttons{justify-content:center;}
+    .buy-btn,.demo-btn{width:100%;max-width:240px;}
 }
 
 /*=========================================================
-            END OF PART 9
+        QUICK CATEGORY
 =========================================================*/
-/*=========================================================
-                PART 10
-        FOOTER + FLOATING BUTTONS
-=========================================================*/
+.quick-category{width:100%;padding:80px 0;background:#f8fafc;}
+.quick-category .section-title{text-align:center;margin-bottom:50px;display:block;}
+.quick-category .section-title h2{font-size:42px;font-weight:700;color:#222;margin-bottom:10px;}
+.quick-category .section-title p{font-size:18px;color:#666;}
+.category-grid{width:95%;max-width:1300px;margin:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:30px;}
+.category-grid a{display:flex;justify-content:center;align-items:center;height:170px;text-decoration:none;color:#222;font-size:22px;font-weight:700;background:#ffffff;border-radius:24px;border:2px solid #f2f2f2;box-shadow:0 15px 35px rgba(0,0,0,.08);transition:.35s;}
+.category-grid a:hover{transform:translateY(-10px) scale(1.03);background:linear-gradient(135deg,#ff7a00,#ffb347);color:#fff;border-color:#ff7a00;box-shadow:0 20px 45px rgba(255,122,0,.30);}
 
-/*------------------------------
+@media(max-width:992px){.category-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:768px){
+    .quick-category{padding:60px 0;}
+    .quick-category .section-title h2{font-size:32px;}
+    .category-grid{grid-template-columns:repeat(2,1fr);gap:18px;}
+    .category-grid a{height:120px;font-size:18px;border-radius:18px;}
+}
+
+/*=========================================================
+        FILTER BAR
+=========================================================*/
+.filter-bar{width:95%;max-width:1300px;margin:40px auto;display:flex;gap:15px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-bar button{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;background:#ffffff;border:2px solid #eeeeee;border-radius:50px;color:#333;font-size:16px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.35s;box-shadow:0 8px 20px rgba(0,0,0,.06);}
+.filter-bar button img{width:20px;height:20px;}
+.filter-bar button:hover{background:linear-gradient(135deg,#ff7a00,#ffb347);color:#ffffff;border-color:#ff7a00;transform:translateY(-3px);box-shadow:0 15px 30px rgba(255,122,0,.25);}
+
+@media(max-width:768px){
+    .filter-bar{gap:12px;padding-bottom:5px;}
+    .filter-bar button{padding:12px 20px;font-size:15px;}
+}
+
+/*=========================================================
+        BEST SELLER BOOKS
+=========================================================*/
+.best-seller{width:100%;padding:70px 0;background:#ffffff;}
+.book-grid{width:95%;max-width:1300px;margin:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:30px;}
+.book-card{position:relative;background:#ffffff;border-radius:22px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.08);transition:.35s;overflow:hidden;}
+.book-card:hover{transform:translateY(-8px);box-shadow:0 18px 45px rgba(0,0,0,.15);}
+.book-badge{position:absolute;top:15px;left:15px;z-index:2;}
+.book-badge img{width:75px;}
+.book-image{width:100%;border-radius:18px;margin-bottom:18px;transition:.35s;}
+.book-card:hover .book-image{transform:scale(1.04);}
+.book-card h3{font-size:22px;color:#222;margin-bottom:8px;}
+.book-category{color:#777;font-size:15px;margin-bottom:18px;}
+.book-card .price-box{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.book-card .new-price{font-size:28px;font-weight:700;color:#ff7a00;}
+.book-card .old-price{font-size:18px;color:#999;text-decoration:line-through;}
+.book-buttons{display:flex;gap:12px;}
+.book-buttons a{flex:1;text-align:center;padding:12px 0;border-radius:12px;text-decoration:none;font-weight:600;transition:.35s;}
+.book-buttons a:first-child{border:2px solid #ff7a00;color:#ff7a00;background:#fff;}
+.book-buttons a:last-child{background:linear-gradient(135deg,#ff7a00,#ffb347);color:#fff;}
+.book-buttons a:hover{transform:translateY(-3px);}
+
+@media(max-width:768px){
+    .book-grid{grid-template-columns:repeat(2,1fr);gap:18px;}
+    .book-card{padding:15px;}
+    .book-card h3{font-size:18px;}
+    .book-card .new-price{font-size:22px;}
+    .book-card .old-price{font-size:15px;}
+    .book-buttons{flex-direction:column;}
+}
+
+/*=========================================================
+        FEATURES & NEWSLETTER
+=========================================================*/
+.features{width:100%;padding:70px 0;background:#f8fafc;}
+.feature-grid{width:95%;max-width:1300px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:30px;}
+.feature-box{background:#ffffff;border-radius:24px;padding:35px 25px;text-align:center;border:2px solid #f2f2f2;box-shadow:0 12px 30px rgba(0,0,0,.08);transition:.35s;}
+.feature-box:hover{transform:translateY(-8px);border-color:#ff7a00;box-shadow:0 18px 40px rgba(255,122,0,.20);}
+.feature-box img{width:120px;height:120px;object-fit:contain;margin:0 auto 20px;}
+.feature-box h3{font-size:22px;font-weight:700;color:#222;line-height:1.4;}
+
+.newsletter{width:100%;padding:70px 0;background:#ffffff;}
+.newsletter-banner{width:95%;max-width:1100px;margin:auto;border-radius:24px;overflow:hidden;box-shadow:0 15px 35px rgba(0,0,0,.10);}
+.newsletter-banner img{width:100%;display:block;border-radius:24px;}
+
+@media(max-width:992px){
+    .feature-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:768px){
+    .features, .newsletter{padding:50px 0;}
+    .feature-grid{grid-template-columns:1fr;gap:20px;}
+    .feature-box{padding:28px 20px;}
+    .feature-box img{width:80px;height:80px;}
+    .feature-box h3{font-size:18px;}
+}
+
+/*=========================================================
         FOOTER
-------------------------------*/
-
-.ebook-footer{
-
-    width:100%;
-
-    background:#1f2937;
-
-    color:#ffffff;
-
-    padding:70px 0 0;
-
-}
-
-.footer-container{
-
-    width:95%;
-
-    max-width:1300px;
-
-    margin:auto;
-
-    display:grid;
-
-    grid-template-columns:repeat(4,1fr);
-
-    gap:40px;
-
-}
-
-.footer-column h3{
-
-    font-size:22px;
-
-    margin-bottom:22px;
-
-    color:#ffffff;
-
-}
-
-.footer-column a{
-
-    display:block;
-
-    color:#d1d5db;
-
-    text-decoration:none;
-
-    margin-bottom:14px;
-
-    transition:.3s;
-
-}
-
-.footer-column a:hover{
-
-    color:#ff7a00;
-
-    padding-left:8px;
-
-}
-
-.footer-bottom{
-
-    margin-top:50px;
-
-    padding:22px;
-
-    text-align:center;
-
-    border-top:1px solid rgba(255,255,255,.12);
-
-}
-
-.footer-bottom p{
-
-    color:#cbd5e1;
-
-    font-size:15px;
-
-}
-
-/*------------------------------
-      WHATSAPP BUTTON
-------------------------------*/
-
-.whatsapp-float{
-
-    position:fixed;
-
-    left:20px;
-
-    bottom:20px;
-
-    width:60px;
-
-    height:60px;
-
-    background:#25D366;
-
-    border-radius:50%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.25);
-
-    z-index:999;
-
-    transition:.35s;
-
-}
-
-.whatsapp-float:hover{
-
-    transform:scale(1.1);
-
-}
-
-.whatsapp-float img{
-
-    width:34px;
-
-    height:34px;
-
-}
-
-/*------------------------------
-      STICKY BUY
-------------------------------*/
-
-.sticky-buy{
-
-    position:fixed;
-
-    right:20px;
-
-    bottom:20px;
-
-    background:linear-gradient(135deg,#ff7a00,#ffb347);
-
-    color:#ffffff;
-
-    text-decoration:none;
-
-    padding:16px 30px;
-
-    border-radius:50px;
-
-    font-weight:700;
-
-    box-shadow:0 12px 30px rgba(255,122,0,.35);
-
-    z-index:999;
-
-    transition:.35s;
-
-}
-
-.sticky-buy:hover{
-
-    transform:translateY(-4px);
-
-}
-
-/*------------------------------
-      BACK TO TOP
-------------------------------*/
-
-.back-top{
-
-    position:fixed;
-
-    right:20px;
-
-    bottom:95px;
-
-    width:50px;
-
-    height:50px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:#ffffff;
-
-    color:#ff7a00;
-
-    font-size:22px;
-
-    cursor:pointer;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.15);
-
-    transition:.35s;
-
-    z-index:999;
-
-}
-
-.back-top:hover{
-
-    background:#ff7a00;
-
-    color:#ffffff;
-
-}
-
-/*------------------------------
-      TABLET
-------------------------------*/
-
-@media(max-width:992px){
-
-.footer-container{
-
-grid-template-columns:repeat(2,1fr);
-
-gap:30px;
-
-}
-
-}
-
-/*------------------------------
-      MOBILE
-------------------------------*/
-
+=========================================================*/
+.ebook-footer{width:100%;background:#1f2937;color:#ffffff;padding:70px 0 0;}
+.footer-container{width:95%;max-width:1300px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:40px;}
+.footer-column h3{font-size:22px;margin-bottom:22px;color:#ffffff;}
+.footer-column a{display:block;color:#d1d5db;text-decoration:none;margin-bottom:14px;transition:.3s;}
+.footer-column a:hover{color:#ff7a00;padding-left:8px;}
+.footer-bottom{margin-top:50px;padding:22px;text-align:center;border-top:1px solid rgba(255,255,255,.12);}
+.footer-bottom p{color:#cbd5e1;font-size:15px;}
+
+@media(max-width:992px){.footer-container{grid-template-columns:repeat(2,1fr);gap:30px;}}
 @media(max-width:768px){
-
-.ebook-footer{
-
-padding:50px 0 0;
-
-}
-
-.footer-container{
-
-grid-template-columns:1fr;
-
-gap:25px;
-
-}
-
-.footer-column{
-
-text-align:center;
-
-}
-
-.footer-column a:hover{
-
-padding-left:0;
-
-}
-
-.whatsapp-float{
-
-width:55px;
-
-height:55px;
-
-left:15px;
-
-bottom:15px;
-
-}
-
-.whatsapp-float img{
-
-width:30px;
-
-height:30px;
-
-}
-
-.sticky-buy{
-
-    position:fixed;
-
-    left:0;
-
-    bottom:0;
-
-    width:100%;
-
-    height:55px;
-
-    background:linear-gradient(135deg,#ff7a00,#ff9d2f);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    text-decoration:none;
-
-    font-size:18px;
-
-    font-weight:700;
-
-    z-index:9999;
-
-    box-shadow:0 -4px 15px rgba(0,0,0,.15);
-
-}
-
-.back-top{
-
-    right:15px;
-
-    bottom:70px;
-
-    width:45px;
-
-    height:45px;
-
-    font-size:20px;
-
-}
-      @media (max-width:768px){
-.menu-button{
-    display:flex !important;
-    align-items:center;
-    justify-content:center;
-    background:none;
-    border:none;
-    cursor:pointer;
-}
-
-.ebook-navigation{
-    display:none;
-}
-.sticky-buy{
-
-    display:flex !important;
-
-    position:fixed;
-
-    left:0;
-
-    right:0;
-
-    bottom:0;
-
-    width:100%;
-
-    height:55px;
-
-    border-radius:0;
-
-    font-size:18px;
-
-    font-weight:700;
-
-    z-index:9999;
-
+    .ebook-footer{padding:50px 0 0;}
+    .footer-container{grid-template-columns:1fr;gap:25px;}
+    .footer-column{text-align:center;}
+    .footer-column a:hover{padding-left:0;}
 }
 
 /*=========================================================
-                PART 11
         UNIVERSAL SHARE COMPONENT
 =========================================================*/
+.share-component{background:var(--background);padding:50px 0;text-align:center;}
+.share-component-title h2{font-size:32px;font-weight:700;color:var(--black);margin-bottom:25px;}
+.share-component-buttons{display:flex;justify-content:center;align-items:center;gap:15px;flex-wrap:wrap;}
+.share-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 28px;background:var(--white);border:2px solid var(--border);border-radius:50px;color:var(--text);font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;transition:var(--transition);box-shadow:var(--shadow);}
+.share-btn img{width:20px;height:20px;}
+.share-btn:hover{background:var(--primary);color:var(--white);border-color:var(--primary-dark);transform:translateY(-3px);}
 
-.share-component {
-    background: var(--background);
-    padding: 50px 0;
-    text-align: center;
-}
-
-.share-component-title h2 {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--black);
-    margin-bottom: 25px;
-}
-
-.share-component-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.share-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px 28px;
-    background: var(--white);
-    border: 2px solid var(--border);
-    border-radius: 50px;
-    color: var(--text);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: var(--transition);
-    box-shadow: var(--shadow);
-}
-
-.share-btn img {
-    width: 20px;
-    height: 20px;
-}
-
-.share-btn:hover {
-    background: var(--primary);
-    color: var(--white);
-    border-color: var(--primary-dark);
-    transform: translateY(-3px);
-}
-
-
-}
-    .whatsapp-float{
-
-        bottom:75px;
-
-        right:15px;
-
-    }
-
-    .back-top{
-
-        bottom:140px;
-
-        right:15px;
-
-    }
-
-}
 /*=========================================================
-            END OF PART 10
+        FLOATING BUTTONS & OVERLAP FIX (DESKTOP & MOBILE)
 =========================================================*/
+.whatsapp-float{position:fixed;left:20px;bottom:20px;width:55px;height:55px;background:#25D366;border-radius:50%;display:flex;justify-content:center;align-items:center;box-shadow:0 10px 25px rgba(0,0,0,.25);z-index:999;transition:.35s;}
+.whatsapp-float:hover{transform:scale(1.1);}
+.whatsapp-float img{width:30px;height:30px;}
+
+.sticky-buy{position:fixed;right:20px;bottom:20px;background:linear-gradient(135deg,#ff7a00,#ffb347);color:#ffffff;text-decoration:none;padding:16px 30px;border-radius:50px;font-weight:700;box-shadow:0 12px 30px rgba(255,122,0,.35);z-index:999;transition:.35s;}
+.sticky-buy:hover{transform:translateY(-4px);}
+
+.back-top{position:fixed;right:20px;bottom:90px;width:45px;height:45px;border:none;border-radius:50%;background:#ffffff;color:#ff7a00;font-size:20px;cursor:pointer;box-shadow:0 10px 25px rgba(0,0,0,.15);transition:.35s;z-index:999;display:flex;align-items:center;justify-content:center;}
+.back-top:hover{background:#ff7a00;color:#ffffff;}
+
+/* Desktop Sticky Share Customization */
+.sticky-share-button {display:none;}
+@media(min-width:769px){
+    .sticky-share-desktop {display:inline-flex;position:fixed;bottom:20px;right:180px;z-index:999;background:var(--primary);color:#fff;padding:12px 25px;border-radius:30px;font-weight:700;box-shadow:var(--shadow);}
+}
+
+/* Mobile Overlap Protection */
+@media(max-width:768px){
+    .menu-button{display:flex !important;align-items:center;justify-content:center;}
+    .ebook-navigation{display:none;}
+    
+    .sticky-buy{display:flex !important;position:fixed;left:0;right:0;bottom:0;width:100%;height:55px;border-radius:0;font-size:18px;font-weight:700;justify-content:center;align-items:center;z-index:9999;box-shadow:0 -4px 15px rgba(0,0,0,.15);}
+    
+    .whatsapp-float{left:15px;bottom:65px;width:48px;height:48px;}
+    .whatsapp-float img{width:26px;height:26px;}
+    
+    .back-top{right:15px;bottom:125px;width:40px;height:40px;font-size:18px;}
+    
+    .sticky-share-mobile {display:inline-flex !important;position:fixed;bottom:65px;right:15px;z-index:999;background:var(--primary);color:#fff;padding:10px 20px;border-radius:30px;font-size:14px;font-weight:700;box-shadow:var(--shadow);}
+}
+
 /*=========================================================
-                PART 11
-              MOBILE MENU
+        MOBILE MENU DRAWER
 =========================================================*/
-
-.mobile-overlay{
-
-    position:fixed;
-
-    top:0;
-
-    left:0;
-
-    width:100%;
-
-    height:100%;
-
-    background:rgba(0,0,0,.45);
-
-    opacity:0;
-
-    visibility:hidden;
-
-    transition:.35s;
-
-    z-index:9998;
-
-}
-
-.mobile-menu{
-
-    position:fixed;
-
-    top:0;
-
-    right:-80%;
-
-    width:80%;
-
-    max-width:340px;
-
-    height:100%;
-
-    background:#ffffff;
-
-    overflow-y:auto;
-
-    transition:.35s;
-
-    z-index:9999;
-
-    box-shadow:-10px 0 35px rgba(0,0,0,.15);
-
-}
-
-.mobile-menu-header{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    padding:18px;
-
-    border-bottom:1px solid #eee;
-
-}
-
-.mobile-menu-header img{
-
-    width:130px;
-
-}
-
-.menu-close{
-
-    width:42px;
-
-    height:42px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:#ff7a00;
-
-    color:#fff;
-
-    font-size:22px;
-
-    cursor:pointer;
-
-}
-
-.mobile-menu ul{
-
-    list-style:none;
-
-    padding:0;
-
-    margin:0;
-
-}
-
-.mobile-menu ul li{
-
-    border-bottom:1px solid #f2f2f2;
-
-}
-
-.mobile-menu ul li a{
-
-    display:block;
-
-    padding:18px 22px;
-
-    color:#333;
-
-    text-decoration:none;
-
-    font-size:17px;
-
-    font-weight:600;
-
-    transition:.3s;
-
-}
-
-.mobile-menu ul li a:hover{
-
-    background:#fff5eb;
-
-    color:#ff7a00;
-
-    padding-left:30px;
-
-}
-
-/* OPEN */
-
-.mobile-overlay.active{
-
-    opacity:1;
-
-    visibility:visible;
-
-}
-
-.mobile-menu.active{
-
-    right:0;
-
-}
-
-/* Desktop */
+.mobile-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:.35s;z-index:9998;}
+.mobile-menu{position:fixed;top:0;right:-80%;width:80%;max-width:340px;height:100%;background:#ffffff;overflow-y:auto;transition:.35s;z-index:9999;box-shadow:-10px 0 35px rgba(0,0,0,.15);}
+.mobile-menu-header{display:flex;align-items:center;justify-content:space-between;padding:18px;border-bottom:1px solid #eee;}
+.mobile-menu-header img{width:130px;}
+.menu-close{width:42px;height:42px;border:none;border-radius:50%;background:#ff7a00;color:#fff;font-size:22px;cursor:pointer;}
+.mobile-menu ul{list-style:none;padding:0;margin:0;}
+.mobile-menu ul li{border-bottom:1px solid #f2f2f2;}
+.mobile-menu ul li a{display:block;padding:18px 22px;color:#333;text-decoration:none;font-size:17px;font-weight:600;transition:.3s;}
+.mobile-menu ul li a:hover{background:#fff5eb;color:#ff7a00;padding-left:30px;}
+
+.mobile-overlay.active{opacity:1;visibility:visible;}
+.mobile-menu.active{right:0;}
 
 @media(min-width:769px){
-
-    .mobile-menu,
-
-    .mobile-overlay{
-
-        display:none;
-
-    }
-
+    .mobile-menu,.mobile-overlay{display:none;}
 }
-
-/*=========================================================
-            END OF PART 11
-=========================================================*/
+/* =========================================================
+   ULTIMATE DESKTOP SHARE OVERLAP FIX (FORCE OVERRIDE)
+========================================================= */
+@media(min-width: 769px) {
+    button.sticky-share-desktop.sticky-share-button {
+        display: inline-flex !important;
+        position: fixed !important;
+        bottom: 20px !important;
+        left: 50% !important;     /* स्क्रीन के बिल्कुल बीच से शुरुआत करो */
+        transform: translateX(-160px) !important; /* और अपनी मर्जी से थोड़ा बाईं तरफ शिफ्ट कर लो */
+        right: auto !important;
+        top: auto !important;
+        z-index: 2147483647 !important;
+    }
+}
