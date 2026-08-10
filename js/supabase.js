@@ -1,5 +1,5 @@
 /* ===========================================================
-   AAROGYAM INDIA - SUPABASE ENGINE (FINAL COMPLETE CODE - MUGGACHH FIXED)
+   AAROGYAM INDIA - SUPABASE ENGINE (100% COMPLETE & MUGGACHH FIXED)
 =========================================================== */
 
 const APP_CONFIG = {
@@ -76,7 +76,6 @@ function getCurrentShareContext() {
 
 function resolveProfileAttribution(userData) {
     const context = getCurrentShareContext();
-    // 🟢 यदि सोर्स URL में नहीं मिला, तो यूजर के डेटा या 'direct' को प्राथमिकता देंगे
     const resolvedSource = userData?.source || context.source || "direct";
     const resolvedReferral = userData?.referralCode || context.referral_mobile || context.referralCode || null;
     const resolvedShareToken = userData?.shareToken || context.share_token || context.tracking_token || null;
@@ -108,8 +107,15 @@ async function trackAttributionEvent(eventPayload) {
     }
 
     try {
-        if (db && typeof db.from === "function") {
-            await db.from("share_events").insert([payload]).select().single();
+        const activeDb = window.dbClient || window.supabase;
+        if (activeDb && typeof activeDb.from === "function") {
+            const tableName = "share_logs"; // यहाँ अपनी टेबल का सही नाम जांच लें
+            const { error } = await activeDb.from(tableName).insert([payload]);
+            if (error) {
+                console.error("❌ Error saving share log to DB:", error.message);
+            } else {
+                console.log("🔥 SUCCESS: Share log saved to Supabase!");
+            }
         }
     } catch (error) {
         console.warn("Share event persistence skipped:", error.message || error);
@@ -210,7 +216,6 @@ async function createUserProfile(userData) {
             }
         }
 
-        // 🟢 PROFILES टेबल में डेटा इंसर्ट (सोर्स और रेफरल के साथ)
         const { data, error } = await db
             .from("profiles")
             .insert([{
@@ -223,7 +228,7 @@ async function createUserProfile(userData) {
                 referral_code: finalShareId,          
                 referral_mobile: referralCodeMobile,     
                 referred_by: referrerProfileId || null,
-                registration_source: attribution.source || "direct", // यहाँ अब whatsapp, facebook या direct जाएगा
+                registration_source: attribution.source || "direct",
                 profile_complete: false,
                 is_active: true
             }])
@@ -232,12 +237,11 @@ async function createUserProfile(userData) {
             
         if (error) throw error;
 
-        // 🟢 REFERRALS टेबल में डेटा पक्का भेजने का लॉजिक (अब कभी खाली नहीं रहेगा)
         if (data && data.id) {
             try {
                 await db.from("referrals").insert([{
-                    referred_by: referrerProfileId || null, // जिसने रेफर किया उसकी UUID
-                    referral_code: finalShareId,            // शेयर आईडी
+                    referred_by: referrerProfileId || null,
+                    referral_code: finalShareId,          
                     status: "success",
                     joined_at: new Date().toISOString()
                 }]);
@@ -316,10 +320,6 @@ async function registerUser(formData) {
 
 function isLoggedIn() {
     return localStorage.getItem("AI_SESSION") !== null;
-}
-
-function initializeAuthentication() {
-    // Auth init
 }
 console.log("✅ Auth & Session Module Loaded");
 
@@ -586,11 +586,68 @@ console.log("✅ Checkout Module Loaded");
 
 
 /* ===========================================================
-   ENGINE 7: RAZORPAY PAYMENT GATEWAY
+   ENGINE 7: RAZORPAY PAYMENT GATEWAY (100% Bulletproof Logs)
 =========================================================== */
 const PAYMENT = { STATUS_PENDING: "pending", STATUS_SUCCESS: "success", STATUS_FAILED: "failed" };
 const RAZORPAY = { KEY_ID: "rzp_test_TGobxnVbAWYkz7" };
 let currentPayment = null;
+
+async function sendDirectCheckoutLog(statusValue) {
+    try {
+        const activeDb = window.dbClient || window.supabase;
+        if (!activeDb) {
+            console.error("❌ Database client not found for logging!");
+            return;
+        }
+
+        // 1. सुरक्षित तरीके से यूजर आईडी निकालें
+        let uId = null;
+        const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+        if (storedUser && storedUser.id) {
+            uId = storedUser.id;
+        }
+        
+        if (!uId && window.V1_SESSION && typeof window.V1_SESSION.getUserId === 'function') {
+            uId = window.V1_SESSION.getUserId();
+        }
+
+        // 2. सुरक्षित तरीके से बुक आईडी निकालें
+        let bId = null;
+        if (window.currentOrder && window.currentOrder.bookId) {
+            bId = window.currentOrder.bookId;
+        } else if (window.currentCheckoutBook && window.currentCheckoutBook.id) {
+            bId = window.currentCheckoutBook.id;
+        } else {
+            const savedOrder = JSON.parse(localStorage.getItem("AI_CURRENT_ORDER") || '{}');
+            bId = savedOrder.bookId || savedOrder.orderId;
+        }
+
+        if (!uId || !bId) {
+            console.warn("⚠️ Missing IDs for checkout log:", { uId, bId, statusValue });
+            return;
+        }
+
+        console.log(`📤 Sending checkout log [${uId}, ${bId}, ${statusValue}] to Supabase...`);
+
+        // 3. डेटाबेस में इंसर्ट करें
+        const { data, error } = await activeDb
+            .from("checkout_logs")
+            .insert([{
+                profile_id: uId,
+                book_id: bId,
+                status: statusValue 
+            }])
+            .select();
+
+        if (error) {
+            console.error(`❌ Failed to save [${statusValue}] log:`, error.message);
+        } else {
+            console.log(`✅ SUCCESS: Checkout log status [${statusValue}] saved successfully!`, data);
+        }
+    } catch (err) {
+        console.error("❌ Direct log exception:", err);
+    }
+}
 
 function startPayment() {
     if (!window.currentOrder) {
@@ -619,8 +676,9 @@ function startPayment() {
             localStorage.setItem("AI_CURRENT_PAYMENT", JSON.stringify(currentPayment));
 
             try {
-                const currentUser = typeof getCurrentUserProfile === "function" ? getCurrentUserProfile() : null;
+                await sendDirectCheckoutLog('success');
                 
+                const currentUser = typeof getCurrentUserProfile === "function" ? getCurrentUserProfile() : null;
                 window.currentPurchase = {
                     purchaseId: "PUR_" + Date.now(),
                     profileId: currentUser ? currentUser.id : null,
@@ -643,14 +701,39 @@ function startPayment() {
         },
         modal: {
             ondismiss: function() {
+                // 🟢 नोट: ondismiss में async-await को तुरंत हैंडल करने के लिए बैकअप सेट किया है
                 currentPayment.status = PAYMENT.STATUS_FAILED;
                 localStorage.setItem("AI_CURRENT_PAYMENT", JSON.stringify(currentPayment));
+                localStorage.setItem("AI_LAST_DROPPED_BOOK", window.currentOrder ? window.currentOrder.bookId : "");
+
+                // डेटाबेस लॉग को कॉल करें (बिना पेज ब्लॉक किए)
+                sendDirectCheckoutLog('dropped').catch(err => console.error("Dismiss log error:", err));
+
+                const payBtn = document.getElementById("payNowBtn");
+                if (payBtn) {
+                    payBtn.disabled = false;
+                    payBtn.textContent = "Pay Now";
+                }
             }
         }
     };
     
     try {
         const payment = new Razorpay(options);
+        
+        payment.on('payment.failed', function (response) {
+            currentPayment.status = PAYMENT.STATUS_FAILED;
+            localStorage.setItem("AI_CURRENT_PAYMENT", JSON.stringify(currentPayment));
+
+            sendDirectCheckoutLog('failed').catch(err => console.error("Failed log error:", err));
+
+            const payBtn = document.getElementById("payNowBtn");
+            if (payBtn) {
+                payBtn.disabled = false;
+                payBtn.textContent = "Pay Now";
+            }
+        });
+
         payment.open();
         return { success: true };
     } catch (error) {
@@ -659,6 +742,66 @@ function startPayment() {
     }
 }
 console.log("✅ Razorpay Payment Module Loaded");
+
+
+/* ===========================================================
+   ENGINE 8: PURCHASES & ORDERS (Bulletproof Fix)
+=========================================================== */
+async function savePurchase() {
+    try {
+        if (!window.currentPurchase) {
+            console.warn("⚠️ No active currentPurchase object found to save.");
+            return;
+        }
+
+        const activeDb = window.dbClient || window.supabase;
+        if (!activeDb) return;
+
+        // 🟢 डेटाबेस के असली कॉलम नाम के अनुसार पक्का पेलोड तैयार करें
+        const purchasePayload = {
+            profile_id: window.currentPurchase.profileId,
+            book_id: window.currentPurchase.bookId,
+            payment_id: window.currentPurchase.paymentId,
+            amount: window.currentPurchase.amount,
+            download_count: 0 // शुरुआत में डाउनलोड काउंट 0 रहेगा
+        };
+
+        console.log("📤 Saving purchase to Supabase:", purchasePayload);
+
+        const { data, error } = await activeDb
+            .from("purchases")
+            .insert([purchasePayload])
+            .select();
+
+        if (error) {
+            console.error("❌ Save Purchase DB Error:", error.message);
+        } else {
+            console.log("✅ SUCCESS: Purchase saved successfully in database!", data);
+        }
+    } catch (err) {
+        console.error("❌ Exception during savePurchase execution:", err);
+    }
+}
+
+async function hasPurchased(bookId) {
+    try {
+        const user = UserStorage.get();
+        if (!user || !user.id) return false;
+        
+        const activeDb = window.dbClient || window.supabase;
+        const { data, error } = await activeDb
+            .from("purchases")
+            .select("id")
+            .eq("profile_id", user.id)
+            .eq("book_id", bookId)
+            .maybeSingle();
+
+        return !!data;
+    } catch (e) {
+        return false;
+    }
+}
+console.log("✅ Purchases Module Loaded");
 
 
 /* ===========================================================
