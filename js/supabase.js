@@ -1,5 +1,5 @@
 /* ===========================================================
-   AAROGYAM INDIA - SUPABASE ENGINE (FINAL COMPLETE CODE)
+   AAROGYAM INDIA - SUPABASE ENGINE (FINAL COMPLETE CODE - MUGGACHH FIXED)
 =========================================================== */
 
 const APP_CONFIG = {
@@ -44,8 +44,19 @@ function readShareContextFromUrl() {
     }
 
     const params = new URLSearchParams(window.location.search || "");
+    
+    // 🟢 सोर्स सुधार: अब यह चेक करेगा कि यूजर whatsapp से आया है, facebook से, या किसी पेज से
+    let rawSource = params.get("src") || params.get("source") || params.get("utm_source");
+    
+    if (rawSource) {
+        rawSource = rawSource.toLowerCase();
+        if (rawSource.includes("whatsapp")) rawSource = "whatsapp";
+        else if (rawSource.includes("facebook") || rawSource.includes("fb")) rawSource = "facebook";
+        else if (rawSource.includes("telegram")) rawSource = "telegram";
+    }
+
     return {
-        source: params.get("source") || params.get("utm_source") || null,
+        source: rawSource || null,
         share_channel: params.get("share_channel") || params.get("channel") || params.get("utm_medium") || null,
         share_token: params.get("share_token") || params.get("share_id") || params.get("tracking_token") || null,
         referral_mobile: params.get("referral_mobile") || params.get("referral") || null,
@@ -66,7 +77,8 @@ function getCurrentShareContext() {
 
 function resolveProfileAttribution(userData) {
     const context = getCurrentShareContext();
-    const resolvedSource = userData?.source || context.source || context.acquisition_source || "registration";
+    // 🟢 यदि सोर्स URL में नहीं मिला, तो यूजर के डेटा या 'direct' को प्राथमिकता देंगे
+    const resolvedSource = userData?.source || context.source || "direct";
     const resolvedReferral = userData?.referralCode || context.referral_mobile || context.referralCode || null;
     const resolvedShareToken = userData?.shareToken || context.share_token || context.tracking_token || null;
     const resolvedShareChannel = userData?.shareChannel || context.share_channel || context.channel || "direct";
@@ -178,8 +190,6 @@ async function createUserProfile(userData) {
         let referralCodeMobile = userData.referralMobile || attribution.referralCode || null; 
         let incomingReferralCode = userData.referralCode || attribution.shareToken || null;
 
-        // 🟢 लॉजिक सुधार: यदि यूआरएल या सेशन में शेयर आईडी (जैसे AI000037) आई है, 
-        // तो वही नए यूजर का referral_code बनेगी। अगर नहीं है, तभी नया रैंडम आईडी जनरेट होगा।
         let finalShareId = incomingReferralCode || ("AI" + Math.floor(100000 + Math.random() * 900000)); 
 
         if (!referrerProfileId && referralCodeMobile) {
@@ -201,7 +211,7 @@ async function createUserProfile(userData) {
             }
         }
 
-        // 🟢 PROFILES टेबल में डेटा इंसर्ट (अब referral_code में सही शेयर आईडी जाएगी)
+        // 🟢 PROFILES टेबल में डेटा इंसर्ट (सोर्स और रेफरल के साथ)
         const { data, error } = await db
             .from("profiles")
             .insert([{
@@ -214,7 +224,7 @@ async function createUserProfile(userData) {
                 referral_code: finalShareId,          
                 referral_mobile: referralCodeMobile,     
                 referred_by: referrerProfileId || null,
-                registration_source: attribution.source || "registration",
+                registration_source: attribution.source || "direct", // यहाँ अब whatsapp, facebook या direct जाएगा
                 profile_complete: false,
                 is_active: true
             }])
@@ -223,13 +233,12 @@ async function createUserProfile(userData) {
             
         if (error) throw error;
 
-        // 🟢 REFERRALS टेबल में सही डेटा सिंक होगा
+        // 🟢 REFERRALS टेबल में डेटा पक्का भेजने का लॉजिक (अब कभी खाली नहीं रहेगा)
         if (data && data.id) {
             try {
                 await db.from("referrals").insert([{
-                    referrer_profile_id: referrerProfileId || null,
-                    referred_profile_id: data.id,
-                    referral_code: finalShareId,
+                    referred_by: referrerProfileId || null, // जिसने रेफर किया उसकी UUID
+                    referral_code: finalShareId,            // शेयर आईडी
                     status: "success",
                     joined_at: new Date().toISOString()
                 }]);
@@ -245,7 +254,7 @@ async function createUserProfile(userData) {
             mobile: userData.mobile,
             email: userData.email || null,
             referral_code: finalShareId,
-            source: attribution.source || "registration"
+            source: attribution.source || "direct"
         });
 
         return data;
