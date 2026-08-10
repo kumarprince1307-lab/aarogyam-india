@@ -1,6 +1,6 @@
 /* ==========================================
    AAROGYAM INDIA
-   CHECKOUT.JS (Complete & Final - With Smart Referral & Checkout Logging)
+   CHECKOUT.JS (Complete & Final - With Smart Referral, Session Landing Page & Checkout Logging)
 ========================================== */
 
 "use strict";
@@ -15,14 +15,20 @@ document.addEventListener("DOMContentLoaded", () => {
 function syncCheckoutShareContext() {
     const params = new URLSearchParams(window.location.search);
     
-    const sessionReferralId = (window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function') 
-        ? window.V1_SESSION.getReferralId() : null;
+    const session = (window.V1_SESSION && typeof window.V1_SESSION.getSession === 'function') 
+        ? window.V1_SESSION.getSession() : {};
+
+    const sessionReferralId = session.referral_share_id || (window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function' ? window.V1_SESSION.getReferralId() : null);
 
     const shareTokenFromUrl = params.get('share_token') || params.get('share_id') || params.get('tracking_token');
     const referralMobileParam = params.get('referral_mobile') || params.get('referral');
 
+    // सेशन या URL से सही सोर्स और लैंडिंग पेज उठाना
+    const sourceVal = params.get("source") || params.get("utm_source") || session.registration_source || "checkout";
+    const landingUrlVal = session.landing_page || window.location.href || null;
+
     const shareContext = {
-        source: params.get("source") || params.get("utm_source") || "checkout",
+        source: sourceVal,
         share_channel: params.get("share_channel") || params.get("channel") || params.get("utm_medium") || null,
         share_token: shareTokenFromUrl || sessionReferralId || 'AI000004',
         referral_mobile: referralMobileParam || null,
@@ -31,7 +37,7 @@ function syncCheckoutShareContext() {
         asset_title: params.get("asset_title") || null,
         asset_url: window.location.href || null,
         referrer: document.referrer || null,
-        landing_url: window.location.href || null
+        landing_url: landingUrlVal
     };
 
     if (typeof persistShareContext === "function") {
@@ -217,7 +223,7 @@ function autoFillUserData() {
 }
 
 // -------------------------------------------------------------
-// CHECKOUT LOGS HELPER FUNCTION (टूटे हुए चेकआउट या पेमेंट ट्रैक करने के लिए)
+// CHECKOUT LOGS HELPER FUNCTION
 // -------------------------------------------------------------
 async function logCheckoutActivity(profileId, bookId, status) {
     try {
@@ -251,7 +257,7 @@ async function logCheckoutActivity(profileId, bookId, status) {
     }
 }
 
-// Pay Now Button Logic with Smart Referral Payload & Checkout Logging
+// Pay Now Button Logic with Smart Referral Payload, Landing Page & Checkout Logging
 document.getElementById("payNowBtn").addEventListener("click", async function () {
     const name = document.getElementById("customerName").value.trim();
     const mobile = document.getElementById("customerMobile").value.trim();
@@ -274,12 +280,14 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
     payBtn.textContent = "Processing...";
 
     try {
-        syncCheckoutShareContext();
+        const shareContextData = syncCheckoutShareContext();
 
-        // सही रेफरल डेटा तैयार करना
+        // सही रेफरल और सेशन डेटा तैयार करना
         const finalUuid = window.currentReferrerData.uuid || null;
         const finalReferralMobile = window.currentReferrerData.mobile || null;
         const finalReferralCode = window.currentReferrerData.shareId || enteredReferral;
+        const sourceVal = shareContextData.source || "checkout";
+        const landingPageVal = shareContextData.landing_url || window.location.pathname;
 
         if (typeof registerUser === "function") {
             const regResult = await registerUser({
@@ -289,7 +297,8 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 referred_by: finalUuid,
                 referralMobile: finalReferralMobile,
                 referralCode: finalReferralCode,
-                source: "checkout"
+                source: sourceVal,
+                landing_page: landingPageVal
             });
 
             const isAlreadyExists = regResult.message && regResult.message.toLowerCase().includes("already");
@@ -302,7 +311,6 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
             }
         }
 
-        const attributionContext = typeof getCurrentShareContext === "function" ? getCurrentShareContext() : {};
         const bookIdToBuy = window.currentCheckoutBook ? window.currentCheckoutBook.id : "BK001";
         
         const orderData = {
@@ -315,8 +323,9 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
             referred_by: finalUuid,
             referralMobile: finalReferralMobile,
             referralCode: finalReferralCode,
-            attribution: attributionContext,
-            source: attributionContext.source || "checkout"
+            attribution: shareContextData,
+            source: sourceVal,
+            landing_page: landingPageVal
         };
 
         window.currentOrder = orderData;
@@ -332,7 +341,6 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
             if (res && typeof res === 'object' && res.success === false) {
                 payBtn.disabled = false;
                 payBtn.textContent = "Pay Now";
-                // पेमेंट फेल या ड्रॉप होने पर लॉग दर्ज करें
                 await logCheckoutActivity(activeUserId || finalUuid, bookIdToBuy, 'failed');
                 if (res.message) alert(res.message);
             }
@@ -351,13 +359,12 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
     } catch (error) {
         console.error("Payment Error:", error);
-        // एरर आने पर लॉग दर्ज करें
         const activeUserId = (window.V1_SESSION && typeof window.V1_SESSION.getUserId === 'function') ? window.V1_SESSION.getUserId() : null;
         const bookIdToBuy = window.currentCheckoutBook ? window.currentCheckoutBook.id : "BK001";
         await logCheckoutActivity(activeUserId, bookIdToBuy, 'dropped');
 
         alert("Something went wrong.");
-        payBtn.disabled = false;
+        payBtn.disabled, payBtn.disabled = false;
         payBtn.textContent = "Pay Now";
     }
 });

@@ -149,7 +149,7 @@ async function lookupReferrerName(identifier) {
 
         if (data) {
             window.currentReferrerData = {
-                uuid: data.id,                // referred_by के लिए
+                uuid: data.id,             // referred_by के लिए
                 name: data.full_name || "Aarogyam Member", 
                 mobile: data.mobile,            // referral_mobile के लिए
                 shareId: data.share_id          // referral_code के लिए
@@ -284,7 +284,7 @@ function validateForm() {
     return true;
 }
 
-// [5] सबमिट लॉजिक - शत-प्रतिशत सही डेटा बाइंडिंग के साथ
+// [5] सबमिट लॉजिक - शत-प्रतिशत सही डेटा बाइंडिंग और सेशन सोर्स/लैंडिंग पेज के साथ
 async function registerAccount(event) {
     event.preventDefault();
     if (!validateForm()) return;
@@ -299,8 +299,13 @@ async function registerAccount(event) {
             return;
         }
 
+        // सेशन या URL से मास्टर सोर्स और लैंडिंग पेज उठाना
+        const session = (window.V1_SESSION && typeof window.V1_SESSION.getSession === 'function') 
+            ? window.V1_SESSION.getSession() : {};
+
         const urlParams = new URLSearchParams(window.location.search);
-        const sourceParam = urlParams.get('source') || urlParams.get('utm_source') || 'registration';
+        const sourceParam = urlParams.get('source') || urlParams.get('utm_source') || session.registration_source || 'organic';
+        const landingPageParam = session.landing_page || window.location.pathname || '/';
 
         const finalUuid = window.currentReferrerData.uuid || null;
         const finalReferralMobile = window.currentReferrerData.mobile || null;
@@ -310,10 +315,11 @@ async function registerAccount(event) {
             fullName: fullName.value.trim(),
             mobile: mobileNo,
             email: email.value.trim(),
-            referred_by: finalUuid,            // UUID
+            referred_by: finalUuid,             // UUID
             referralMobile: finalReferralMobile, // मोबाइल नंबर
             referralCode: finalReferralCode,     // सही Share ID (या AI000004)
-            source: sourceParam
+            source: sourceParam,                 // ट्रैफिक सोर्स (facebook, whatsapp, organic आदि)
+            landing_page: landingPageParam       // किस पेज से यूजर आया उसका पाथ
         };
 
         console.log("📦 Final Payload Being Sent to Database:", formData);
@@ -359,4 +365,5 @@ function completeRegistration(result) {
         setLoading(false);
     }
 }
+
 console.log("✅ Registration Module Loaded");

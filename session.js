@@ -37,7 +37,7 @@
     }
 
     /**
-     * Captures and stores the share_id, source, and device info into the AI_SESSION object.
+     * Captures and stores the share_id, source, landing_page, and device info into the AI_SESSION object.
      * Adheres to the "First Click Rule" with SessionStorage backup to survive login overwrites.
      */
     function captureReferral() {
@@ -48,6 +48,12 @@
             const isValidShareId = (id) => id && /^AI\d{4,8}$/.test(id);
 
             let session = getSession();
+
+            // 1. लैंडिंग पेज का पाथ ऑटो-कैप्चर करना (जैसे /ebooks/agriculture.html)
+            const currentLandingPage = window.location.pathname || '/';
+            if (!session.landing_page) {
+                session.landing_page = currentLandingPage; // फर्स्ट लैंडिंग पेज सुरक्षित रखें
+            }
 
             // अगर URL में utm_source या source नहीं है, तो ट्रैफिक के आधार पर ऑटो-डिटेक्ट करें
             if (!source) {
@@ -61,27 +67,24 @@
                 } else if (shareId) {
                     source = 'referral_link';
                 } else {
-                    source = 'organic';
+                    source = session.registration_source || 'organic';
                 }
             }
 
-            // सोर्स और डिवाइस इन्फो को हमेशा अपडेट रखें
+            // सोर्स और डिवाइस इन्फो अपडेट करें
             session.registration_source = source;
             session.device_info = navigator.userAgent;
 
-            // 1. अगर URL में share_id है, तो उसे वैलिडेट करके प्रोसेस करें
+            // 2. अगर URL में share_id है, तो उसे वैलिडेट करके प्रोसेस करें
             if (isValidShareId(shareId)) {
-                // First Click Rule: अगर पहले से सेशन में आईडी नहीं है, तभी नई सेव करें
                 if (!session.referral_share_id) {
                     session.referral_share_id = shareId;
                     console.log(`Referral session started. share_id "${shareId}" captured in AI_SESSION.`);
                 } else {
                     console.log(`Referral session already exists in AI_SESSION: ${session.referral_share_id}. First click rule applied.`);
                 }
-                // बैकअप के रूप में sessionStorage में भी सुरक्षित रखें ताकि लॉगिन के वक्त न उड़े
                 sessionStorage.setItem('temp_share_id', shareId);
             } 
-            // 2. अगर URL में share_id नहीं है (या लॉगिन के बाद गायब हो गया है), तो बैकअप से रिकवर करें
             else if (!session.referral_share_id) {
                 const backupShareId = sessionStorage.getItem('temp_share_id');
                 if (isValidShareId(backupShareId)) {
