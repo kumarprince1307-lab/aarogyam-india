@@ -2,7 +2,7 @@
   FILE NAME : registration.js
   PROJECT   : Aarogyam India V1
   MODULE    : Free Registration & Complete Smart Referral Engine
-  VERSION   : 2.0.0 (Final - Share_ID Fix & Read-Only Input)
+  VERSION   : 2.1.0 (Final - Master Default & User Share ID Perfect Fix)
 ===========================================================*/
 
 "use strict";
@@ -30,7 +30,7 @@ let referrerDisplay = document.getElementById("referrerDisplayName");
 
 document.addEventListener("DOMContentLoaded", initializePage);
 
-// [2] URL से शेयर आईडी लाना और इनपुट को Read-Only बनाना
+// [2] URL से शेयर आईडी लाना और इनपुट को Read-Only बनाना (Organic पर AI000004 और User पर उसकी Share ID)
 function syncShareContextFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
     
@@ -40,10 +40,25 @@ function syncShareContextFromUrl() {
     const shareTokenFromUrl = urlParams.get('share_token') || urlParams.get('share_id') || urlParams.get('tracking_token');
     const referralMobileParam = urlParams.get('referral_mobile') || urlParams.get('referral');
 
+    // प्राथमिकता: 1. URL की शेयर आईडी, 2. Session/Storage की शेयर आईडी, 3. डिफ़ॉल्ट ऑर्गेनिक मास्टर आईडी (AI000004)
+    let finalShareToken = shareTokenFromUrl || sessionReferralId || 'AI000004';
+
+    // फॉर्मेट वैलिडेट और फिक्स करना (ताकि अधूरा कोड डेटाबेस में null न दे)
+    const isValidShareIdFormat = (id) => id && /^AI\d{4,8}$/i.test(id);
+    if (finalShareToken && isValidShareIdFormat(finalShareToken)) {
+        let match = finalShareToken.match(/AI(\d+)/i);
+        if (match && match[1].length < 6) {
+            let paddedNum = match[1].padStart(6, '0');
+            finalShareToken = `AI${paddedNum}`;
+        }
+    } else {
+        finalShareToken = 'AI000004';
+    }
+
     const shareContext = {
         source: urlParams.get('source') || urlParams.get('utm_source') || null,
         share_channel: urlParams.get('share_channel') || urlParams.get('channel') || urlParams.get('utm_medium') || null,
-        share_token: shareTokenFromUrl || sessionReferralId || 'AI000004',
+        share_token: finalShareToken,
         referral_mobile: referralMobileParam || null,
         asset_url: window.location.href || null
     };
@@ -52,12 +67,12 @@ function syncShareContextFromUrl() {
 
     if (referralMobile) {
         if (!referralMobile.value) {
-            referralMobile.value = shareContext.share_token || shareContext.referral_mobile || 'AI000004';
+            referralMobile.value = shareContext.share_token;
         }
         
-        // **यहाँ शेयर आईडी को Read-Only (एडिट न हो सकने वाला) बनाया गया है**
+        // **यहाँ शेयर आईडी को Read-Only बनाया गया है**
         referralMobile.setAttribute("readonly", true);
-        referralMobile.style.backgroundColor = "#e9ecef"; // डिसेबल दिखने के लिए हल्का ग्रे रंग
+        referralMobile.style.backgroundColor = "#e9ecef";
         referralMobile.style.cursor = "not-allowed";
 
         if (referralMobile.value) {
@@ -120,7 +135,7 @@ async function lookupReferrerName(identifier) {
             data = res.data;
         } 
         
-        // 3.2 अगर शेयर आईडी (जैसे AI000037) है, तो share_id कॉलम में खोजें
+        // 3.2 अगर शेयर आईडी है, तो share_id कॉलम में खोजें
         if (!data) {
             const res = await activeDb
                 .from("profiles")
@@ -133,9 +148,8 @@ async function lookupReferrerName(identifier) {
         console.log("📊 Database Response for Share ID:", data);
 
         if (data) {
-            // बंडल में डेटा सेव करना
             window.currentReferrerData = {
-                uuid: data.id,                  // referred_by के लिए
+                uuid: data.id,                // referred_by के लिए
                 name: data.full_name || "Aarogyam Member", 
                 mobile: data.mobile,            // referral_mobile के लिए
                 shareId: data.share_id          // referral_code के लिए
@@ -288,20 +302,17 @@ async function registerAccount(event) {
         const urlParams = new URLSearchParams(window.location.search);
         const sourceParam = urlParams.get('source') || urlParams.get('utm_source') || 'registration';
 
-        // **यहाँ सबसे महत्वपूर्ण सुधार किया गया है:**
-        // अगर सर्च होकर currentReferrerData मिल चुका है, तो वही जाएगा। 
-        // अगर किसी वजह से सर्च नहीं हुआ और इनपुट में शेयर आईडी है, तो वह जाएगी, वरना खाली रहेगा।
         const finalUuid = window.currentReferrerData.uuid || null;
         const finalReferralMobile = window.currentReferrerData.mobile || null;
-        const finalReferralCode = window.currentReferrerData.shareId || (referralMobile ? referralMobile.value.trim() : null);
+        const finalReferralCode = window.currentReferrerData.shareId || (referralMobile ? referralMobile.value.trim() : 'AI000004');
 
         const formData = {
             fullName: fullName.value.trim(),
             mobile: mobileNo,
             email: email.value.trim(),
-            referred_by: finalUuid,             // अब यहाँ पक्का UUID जाएगा
-            referralMobile: finalReferralMobile, // अब यहाँ पक्का मोबाइल नंबर जाएगा
-            referralCode: finalReferralCode,     // अब यहाँ पक्का सही Share ID जाएगी (AI000004 जबरदस्ती नहीं घुसेगा)
+            referred_by: finalUuid,            // UUID
+            referralMobile: finalReferralMobile, // मोबाइल नंबर
+            referralCode: finalReferralCode,     // सही Share ID (या AI000004)
             source: sourceParam
         };
 
@@ -327,6 +338,7 @@ async function registerAccount(event) {
         setLoading(false);
     }
 }
+
 // [6] रजिस्ट्रेशन पूरा होने के बाद पेज रीडायरेक्ट करने वाला फंक्शन
 function completeRegistration(result) {
     try {

@@ -1,6 +1,6 @@
 /* ==========================================
    AAROGYAM INDIA
-   CHECKOUT.JS (Complete & Final - With Smart Referral Engine)
+   CHECKOUT.JS (Complete & Final - With Smart Referral & Checkout Logging)
 ========================================== */
 
 "use strict";
@@ -44,8 +44,6 @@ function syncCheckoutShareContext() {
         if (!checkoutRefInput.value) {
             checkoutRefInput.value = shareContext.share_token || shareContext.referral_mobile || 'AI000004';
         }
-        // रीड-ऑनली बनाना चाहें तो यह लाइन ऑन कर सकते हैं:
-        // checkoutRefInput.setAttribute("readonly", true);
 
         if (checkoutRefInput.value) {
             lookupReferrerName(checkoutRefInput.value.trim());
@@ -218,7 +216,42 @@ function autoFillUserData() {
     }
 }
 
-// Pay Now Button Logic with Smart Referral Payload
+// -------------------------------------------------------------
+// CHECKOUT LOGS HELPER FUNCTION (टूटे हुए चेकआउट या पेमेंट ट्रैक करने के लिए)
+// -------------------------------------------------------------
+async function logCheckoutActivity(profileId, bookId, status) {
+    try {
+        const activeDb = window.dbClient || window.supabase;
+        if (!activeDb) return;
+
+        let currentUuid = profileId;
+        if (!currentUuid && window.V1_SESSION && typeof window.V1_SESSION.getUserId === 'function') {
+            currentUuid = window.V1_SESSION.getUserId();
+        }
+
+        if (!currentUuid) return;
+
+        const { error } = await activeDb
+            .from("checkout_logs")
+            .insert([
+                {
+                    profile_id: currentUuid,
+                    book_id: bookId || "BK001",
+                    status: status // 'initiated', 'success', 'failed', 'dropped'
+                }
+            ]);
+
+        if (error) {
+            console.error("Error inserting checkout log:", error);
+        } else {
+            console.log(`✅ Checkout log recorded: [${status}] for book ${bookId}`);
+        }
+    } catch (err) {
+        console.error("Checkout log exception:", err);
+    }
+}
+
+// Pay Now Button Logic with Smart Referral Payload & Checkout Logging
 document.getElementById("payNowBtn").addEventListener("click", async function () {
     const name = document.getElementById("customerName").value.trim();
     const mobile = document.getElementById("customerMobile").value.trim();
@@ -270,8 +303,10 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         }
 
         const attributionContext = typeof getCurrentShareContext === "function" ? getCurrentShareContext() : {};
+        const bookIdToBuy = window.currentCheckoutBook ? window.currentCheckoutBook.id : "BK001";
+        
         const orderData = {
-            bookId: window.currentCheckoutBook ? window.currentCheckoutBook.id : "BK001",
+            bookId: bookIdToBuy,
             title: window.currentCheckoutBook ? window.currentCheckoutBook.title : document.getElementById("bookName").textContent,
             amount: window.currentCheckoutBook ? window.currentCheckoutBook.offerPrice : 99,
             customerName: name,
@@ -287,12 +322,18 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         window.currentOrder = orderData;
         localStorage.setItem("AI_CURRENT_ORDER", JSON.stringify(orderData));
 
+        // 📝 चेकआउट लॉग दर्ज करें: पेमेंट शुरू (initiated)
+        const activeUserId = (window.V1_SESSION && typeof window.V1_SESSION.getUserId === 'function') ? window.V1_SESSION.getUserId() : null;
+        await logCheckoutActivity(activeUserId || finalUuid, bookIdToBuy, 'initiated');
+
         if (typeof startPayment === "function") {
             const res = startPayment();
             
             if (res && typeof res === 'object' && res.success === false) {
                 payBtn.disabled = false;
                 payBtn.textContent = "Pay Now";
+                // पेमेंट फेल या ड्रॉप होने पर लॉग दर्ज करें
+                await logCheckoutActivity(activeUserId || finalUuid, bookIdToBuy, 'failed');
                 if (res.message) alert(res.message);
             }
         } else {
@@ -310,6 +351,11 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
     } catch (error) {
         console.error("Payment Error:", error);
+        // एरर आने पर लॉग दर्ज करें
+        const activeUserId = (window.V1_SESSION && typeof window.V1_SESSION.getUserId === 'function') ? window.V1_SESSION.getUserId() : null;
+        const bookIdToBuy = window.currentCheckoutBook ? window.currentCheckoutBook.id : "BK001";
+        await logCheckoutActivity(activeUserId, bookIdToBuy, 'dropped');
+
         alert("Something went wrong.");
         payBtn.disabled = false;
         payBtn.textContent = "Pay Now";
