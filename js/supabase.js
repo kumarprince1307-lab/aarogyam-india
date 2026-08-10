@@ -45,7 +45,6 @@ function readShareContextFromUrl() {
 
     const params = new URLSearchParams(window.location.search || "");
     
-    // 🟢 सोर्स सुधार: अब यह चेक करेगा कि यूजर whatsapp से आया है, facebook से, या किसी पेज से
     let rawSource = params.get("src") || params.get("source") || params.get("utm_source");
     
     if (rawSource) {
