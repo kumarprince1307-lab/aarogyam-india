@@ -1,8 +1,8 @@
 /* =================================================================
-   AAROGYAM INDIA - V1 COMMON SESSION MODULE (REFRESH & LOGIN FIX)
-   - This file is the single source of truth for session management.
-   - It relies on localStorage keys set by the custom mobile login.
-   - DO NOT use Supabase Auth functions here.
+    AAROGYAM INDIA - V1 COMMON SESSION MODULE (REFRESH & LOGIN FIX)
+    - This file is the single source of truth for session management.
+    - It relies on localStorage keys set by the custom mobile login.
+    - DO NOT use Supabase Auth functions here.
 ================================================================= */
 
 (function(window) {
@@ -37,23 +37,43 @@
     }
 
     /**
-     * Captures and stores the share_id from the URL into the AI_SESSION object.
+     * Captures and stores the share_id, source, and device info into the AI_SESSION object.
      * Adheres to the "First Click Rule" with SessionStorage backup to survive login overwrites.
      */
     function captureReferral() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            const shareId = urlParams.get('share_id');
+            const shareId = urlParams.get('share_id') || urlParams.get('share') || urlParams.get('ref');
+            let source = urlParams.get('utm_source') || urlParams.get('source');
             const isValidShareId = (id) => id && /^AI\d{4,8}$/.test(id);
 
             let session = getSession();
+
+            // अगर URL में utm_source या source नहीं है, तो ट्रैफिक के आधार पर ऑटो-डिटेक्ट करें
+            if (!source) {
+                const referrer = document.referrer.toLowerCase();
+                if (referrer.includes('whatsapp')) {
+                    source = 'whatsapp';
+                } else if (referrer.includes('facebook') || referrer.includes('fb')) {
+                    source = 'facebook';
+                } else if (referrer.includes('instagram')) {
+                    source = 'instagram';
+                } else if (shareId) {
+                    source = 'referral_link';
+                } else {
+                    source = 'organic';
+                }
+            }
+
+            // सोर्स और डिवाइस इन्फो को हमेशा अपडेट रखें
+            session.registration_source = source;
+            session.device_info = navigator.userAgent;
 
             // 1. अगर URL में share_id है, तो उसे वैलिडेट करके प्रोसेस करें
             if (isValidShareId(shareId)) {
                 // First Click Rule: अगर पहले से सेशन में आईडी नहीं है, तभी नई सेव करें
                 if (!session.referral_share_id) {
                     session.referral_share_id = shareId;
-                    saveSession(session);
                     console.log(`Referral session started. share_id "${shareId}" captured in AI_SESSION.`);
                 } else {
                     console.log(`Referral session already exists in AI_SESSION: ${session.referral_share_id}. First click rule applied.`);
@@ -66,12 +86,15 @@
                 const backupShareId = sessionStorage.getItem('temp_share_id');
                 if (isValidShareId(backupShareId)) {
                     session.referral_share_id = backupShareId;
-                    saveSession(session);
                     console.log(`Recovered referral share_id "${backupShareId}" from sessionStorage backup.`);
                 }
             }
+
+            // फाइनल सेशन सेव करें
+            saveSession(session);
+
         } catch (e) {
-            console.error("Error capturing referral data", e);
+            console.error("Error capturing referral and session data", e);
         }
     }
 
@@ -191,7 +214,7 @@
 
     console.log("✅ V1 Common Session Module Loaded.");
 
-    // रीफ्रेश होने पर भी कंसोल में आईडी दिखाने के लिए
+    // रीफ्रेश होने पर भी कंसोल में पूरी जानकारी दिखाने के लिए
     const activeSession = getSession();
     if (activeSession.referral_share_id) {
         console.log(`Current referral session in AI_SESSION: ${activeSession.referral_share_id}`);
