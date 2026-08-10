@@ -14,6 +14,15 @@ const getPurchasesClient = () => {
 
 const getPurchasesCurrentUser = () => {
     try {
+        // 1. सबसे पहले direct AI_USER चेक करें जो supabase.js सेव करता है
+        const aiUser = localStorage.getItem("AI_USER");
+        if (aiUser) {
+            const parsedUser = JSON.parse(aiUser);
+            if (parsedUser && parsedUser.id) {
+                return parsedUser;
+            }
+        }
+
         if (typeof V1_SESSION !== "undefined" && typeof V1_SESSION.getCurrentUser === "function") {
             const u = V1_SESSION.getCurrentUser();
             if (u) return u;
@@ -33,11 +42,11 @@ const getPurchasesCurrentUser = () => {
         console.warn("Session retrieval warning:", e);
     }
 
-    // Default fallback user for safety
+    // 🟢 सुरक्षित फॉलबैक (डमी टेक्स्ट "avinish_user_123" को पूरी तरह हटा दिया गया है)
     return {
-        id: localStorage.getItem("user_id") || localStorage.getItem("profile_id") || "avinish_user_123",
-        full_name: localStorage.getItem("user_name") || "Avinish Kumar Mishra",
-        mobile: localStorage.getItem("user_mobile") || "7974422572"
+        id: localStorage.getItem("user_id") || localStorage.getItem("profile_id") || null,
+        full_name: localStorage.getItem("user_name") || "Valued Customer",
+        mobile: localStorage.getItem("user_mobile") || null
     };
 };
 
@@ -109,7 +118,7 @@ async function fetchUserPurchases() {
             const titleEl = emptyState.querySelector('h3');
             const descEl = emptyState.querySelector('p');
             if (titleEl) titleEl.textContent = "Purchase History";
-            if (descErr => descEl) descEl.textContent = "कोई परचेस रिकॉर्ड नहीं मिला या डेटा लोड करने में समस्या आई।";
+            if (descEl) descEl.textContent = "कोई परचेस रिकॉर्ड नहीं मिला या डेटा लोड करने में समस्या आई।";
         }
     }
 }

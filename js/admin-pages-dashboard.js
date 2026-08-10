@@ -1,7 +1,7 @@
 /* Admin Dashboard Page */
 
-import { initAdminLayout } from './admin-main.js';
-import { fetchDashboardData, fetchShareEngineSummaryData } from './admin-api.js';
+import { initAdminLayout } from './admin-main.js'; // Already exists
+import { fetchDashboardData } from './admin-api.js'; // Already exists
 
 function renderKpiGroup(kpis) {
   return `<div class="kpi-row">
@@ -10,6 +10,9 @@ function renderKpiGroup(kpis) {
 }
 
 function renderLeadSources(data) {
+  if (!data || data.length === 0) {
+    return '<div class="admin-empty-sm">No lead source data available.</div>';
+  }
   return `<div class="admin-data-grid">
     ${data.map(item => `<div class="admin-data-card">
         <div class="admin-card-title">${item.source}</div>
@@ -20,12 +23,18 @@ function renderLeadSources(data) {
 }
 
 function renderCustomerJourney(data) {
+  if (!data || data.length === 0) {
+    return '<div class="admin-empty-sm">No journey data available.</div>';
+  }
   return `<div class="admin-data-grid">
     ${data.map(item => `<div class="admin-data-card admin-journey-card"><h4>${item.stage}</h4><p>${item.count} users</p></div>`).join('')}
   </div>`;
 }
 
 function renderBookSales(data) {
+  if (!data || data.length === 0) {
+    return '<div class="admin-empty-sm">No book sales data available.</div>';
+  }
   return `<div class="admin-data-grid">
     ${data.map(item => `<div class="admin-data-card">
         <h4>${item.name}</h4>
@@ -36,6 +45,9 @@ function renderBookSales(data) {
 }
 
 function renderActivity(data) {
+  if (!data || data.length === 0) {
+    return '<div class="admin-empty-sm">No recent activity.</div>';
+  }
   return `<div class="admin-section admin-card">
     <div class="admin-section-title">Recent Activity</div>
     <ul class="admin-activity-list">
@@ -45,6 +57,9 @@ function renderActivity(data) {
 }
 
 function renderTopBooks(data) {
+  if (!data || data.length === 0) {
+    return '<div class="admin-empty-sm">No top books data available.</div>';
+  }
   return `<div class="admin-section admin-card">
     <div class="admin-section-title">Top Books</div>
     <ul class="admin-activity-list">
@@ -72,22 +87,17 @@ export async function initDashboard() {
   content.innerHTML = '<div class="admin-loading">Loading dashboard data...</div>';
 
   try {
-    // Fetch both standard dashboard data and share summary data in parallel
-    const [result, shareResult] = await Promise.all([
-      fetchDashboardData(),
-      fetchShareEngineSummaryData()
-    ]);
+    const result = await fetchDashboardData();
 
     if (!result.success || !result.data) {
       content.innerHTML = '<div class="admin-error"><strong>Unable to load dashboard data.</strong><br>Please try again later.</div>';
       return;
     }
 
-    const { kpis, leadSources, customerJourney, bookSales, recentActivity } = result.data;
-    const shareSummary = shareResult.success ? shareResult.data : {};
-
+    const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity } = result.data;
+    
     // Use live data for Share KPIs, with fallbacks
-    const shareKpis = [
+    const shareKpis = [ // This is a local const, not a duplicate declaration
       { label: 'Total Shares', value: shareSummary.totalShares || 0 },
       { label: 'Total Clicks', value: shareSummary.totalClicks || 0 },
       { label: 'Total Visitors', value: shareSummary.totalVisitors || 0 },
@@ -105,7 +115,7 @@ export async function initDashboard() {
       </div>
       <div class="admin-section" id="business-summary">
         <div class="admin-section-title">Business Summary</div>
-        ${renderKpiGroup(kpis)}
+        ${renderKpiGroup(businessKpis)}
       </div>
       <div class="admin-section" id="lead-sources">
         <div class="admin-section-title">Lead Sources</div>

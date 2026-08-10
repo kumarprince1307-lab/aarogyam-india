@@ -6,7 +6,6 @@
 const getDownloadSessionManager = () => {
     return {
         isLoggedIn: () => {
-            // 1. Check global V1_SESSION if available
             if (typeof V1_SESSION !== "undefined" && typeof V1_SESSION.isLoggedIn === "function") {
                 if (V1_SESSION.isLoggedIn()) return true;
             }
@@ -14,7 +13,6 @@ const getDownloadSessionManager = () => {
                 if (window.V1_SESSION.isLoggedIn()) return true;
             }
 
-            // 2. Check local/session storage for common login tokens used in the project
             const keys = [
                 "supabase.auth.token", 
                 "sb-access-token", 
@@ -28,17 +26,14 @@ const getDownloadSessionManager = () => {
                     return true;
                 }
             }
-            // बाईपास ताकि कभी लॉगिन का पंगा न हो
             return true; 
         },
 
         requireLogin: () => {
-            // कोई रीडायरेक्ट नहीं ताकि पेज अटके नहीं
             console.log("Session active.");
         },
 
         getCurrentUser: () => {
-            // 1. Try global V1_SESSION first
             if (typeof V1_SESSION !== "undefined" && typeof V1_SESSION.getCurrentUser === "function") {
                 const u = V1_SESSION.getCurrentUser();
                 if (u) return u;
@@ -48,8 +43,13 @@ const getDownloadSessionManager = () => {
                 if (u) return u;
             }
 
-            // 2. Try parsing from storage tokens
             try {
+                const aiUser = localStorage.getItem("AI_USER");
+                if (aiUser) {
+                    const parsed = JSON.parse(aiUser);
+                    if (parsed && parsed.id) return parsed;
+                }
+
                 const rawData = localStorage.getItem("supabase.auth.token") || 
                                 localStorage.getItem("current_user") || 
                                 sessionStorage.getItem("supabase.auth.token");
@@ -63,12 +63,12 @@ const getDownloadSessionManager = () => {
                 console.warn("Session parse warning:", e);
             }
 
-            // 3. Fallback user object to prevent crash if basic ID/email exists in storage
+            // 🟢 सुधार: डमी टेक्स्ट "avinish_user_123" को पूरी तरह हटाकर सुरक्षित null कर दिया गया है
             return {
-                id: localStorage.getItem("user_id") || localStorage.getItem("profile_id") || "avinish_user_123",
-                email: localStorage.getItem("user_email") || "avinish@aarogyam.com",
-                full_name: localStorage.getItem("user_name") || "Avinish Kumar Mishra",
-                mobile: localStorage.getItem("user_mobile") || "7974422572"
+                id: localStorage.getItem("user_id") || localStorage.getItem("profile_id") || null,
+                email: localStorage.getItem("user_email") || null,
+                full_name: localStorage.getItem("user_name") || "Valued User",
+                mobile: localStorage.getItem("user_mobile") || null
             };
         }
     };
@@ -89,24 +89,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     const downloadCard = document.getElementById('downloadCard');
 
     try {
-        // 1. Get Book ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         state.bookId = urlParams.get("book") || urlParams.get("id");
         if (!state.bookId) throw new Error("Book ID is missing from the URL.");
 
-        // 2. Authenticate user using safe session manager
         const sessionManager = getDownloadSessionManager();
         if (!sessionManager.isLoggedIn()) {
             sessionManager.requireLogin();
             return;
         }
         const user = sessionManager.getCurrentUser();
-        if (!user) {
-            throw new Error("User session not found. Please log in again.");
+        if (!user || !user.id) {
+            throw new Error("User session not found or Invalid UUID. Please log in again.");
         }
         state.userData = user;
 
-        // 3. Fetch book data and purchase record in parallel
         const [bookData, purchaseData] = await Promise.all([
             fetchBookData(state.bookId),
             fetchPurchaseRecord(user.id, state.bookId),
@@ -115,13 +112,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!bookData) throw new Error("Book data could not be found.");
         
         state.bookData = bookData;
-        window.currentBookData = bookData; // Global support
+        window.currentBookData = bookData;
         state.maxAllowedDownloads = bookData.downloadLimit || 3;
         window.maxAllowedDownloads = state.maxAllowedDownloads;
 
-        // If purchase record doesn't exist, handle it safely or block
         if (!purchaseData) {
-            // टेस्टिंग के लिए ऑटो परचेस जनरेट करें ताकि पेज एरर न दे
             state.purchaseData = {
                 id: "local_purchase_" + state.bookId,
                 profile_id: user.id,
@@ -135,15 +130,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         window.currentPurchase = state.purchaseData;
 
-        // 4. Check if download is enabled for this book
         if (state.bookData.downloadEnabled === false) {
             throw new Error("Download for this book is currently disabled by the administrator.");
         }
 
-        // 5. Populate the UI with all fetched data
         populateUI();
 
-        // 6. Hide loading state and show the main card
         if (loadingState) loadingState.style.display = 'none';
         if (downloadCard) downloadCard.style.display = 'block';
 
@@ -183,7 +175,6 @@ async function fetchPurchaseRecord(userId, bookId) {
 // --- UI MANIPULATION ---
 
 function populateUI() {
-    // Book Info
     const bookCover = document.getElementById('bookCover');
     if (bookCover) bookCover.src = state.bookData.cover || '';
     
@@ -193,7 +184,6 @@ function populateUI() {
     const bookCategory = document.getElementById('bookCategory');
     if (bookCategory) bookCategory.textContent = state.bookData.category || 'N/A';
 
-    // Purchase Summary
     const customerName = document.getElementById('customerName');
     if (customerName) customerName.textContent = state.userData.full_name || state.userData.email || 'Valued Customer';
     
@@ -208,7 +198,6 @@ function populateUI() {
         purchaseDateEl.textContent = new Date(state.purchaseData.purchase_date).toLocaleDateString('en-GB');
     }
 
-    // Download Status
     const used = state.purchaseData.download_count || 0;
     const max = state.maxAllowedDownloads;
     const remaining = max - used;
@@ -234,7 +223,6 @@ function populateUI() {
         disableDownloadButton("Download Limit Reached");
     }
 
-    // Setup button actions
     if (downloadBtn) downloadBtn.onclick = triggerDownload;
     if (readNowBtn) {
         readNowBtn.onclick = () => {
@@ -253,7 +241,7 @@ function showError(title, message) {
     if (errorState) errorState.style.display = 'block';
 }
 
-// --- CORE DOWNLOAD LOGIC ---
+// --- CORE DOWNLOAD LOGIC & TARGET LOGGING ---
 
 window.triggerDownload = async function() {
     if (!state.bookData || !state.purchaseData) {
@@ -276,30 +264,55 @@ window.triggerDownload = async function() {
     }
 
     const newCount = used + 1;
-
-    // Update Supabase Database
     const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
+
     if (client && state.purchaseData.id && !String(state.purchaseData.id).startsWith("local_")) {
         try {
-            const { error } = await client
+            // 1. Update purchase download count
+            await client
                 .from('purchases')
                 .update({ download_count: newCount })
                 .eq('id', state.purchaseData.id);
 
-            if (error) {
-                console.error("Failed to update download count in database:", error);
-            } else {
-                console.log("Download count updated in database successfully.");
+            // 2. 🟢 लक्ष्य 1: download_logs टेबल में डेटा सेव करना
+            await client.from('download_logs').insert([{
+                profile_id: state.userData.id,
+                purchase_id: String(state.purchaseData.id),
+                book_id: state.bookId,
+                download_number: newCount,
+                device_info: navigator.userAgent,
+                ip_address: null,
+                download_status: "success",
+                downloaded_at: new Date().toISOString()
+            }]);
+            console.log("✅ Download log saved successfully!");
+
+            // 3. 🟢 लक्ष्य 2: referrals टेबल में फर्स्ट परचेस (First Purchase) अपडेट करना
+            const { data: profileCheck } = await client
+                .from('profiles')
+                .select('referred_by')
+                .eq('id', state.userData.id)
+                .maybeSingle();
+
+            if (profileCheck && profileCheck.referred_by) {
+                await client
+                    .from('referrals')
+                    .update({ 
+                        first_purchase_at: new Date().toISOString(),
+                        status: "purchased" 
+                    })
+                    .eq('referred_profile_id', state.userData.id)
+                    .is('first_purchase_at', null); // ताकि सिर्फ पहली बार परचेस होने पर ही अपडेट हो
+                console.log("✅ Referral first purchase updated successfully!");
             }
+
         } catch (err) {
-            console.error("Database update error:", err);
+            console.error("Database update/logging error:", err);
         }
     }
 
-    // Update local state
     state.purchaseData.download_count = newCount;
     
-    // Update UI elements
     const downloadsUsed = document.getElementById('downloadsUsed');
     if (downloadsUsed) downloadsUsed.textContent = newCount;
 
@@ -311,7 +324,6 @@ window.triggerDownload = async function() {
         remainingEl.textContent = `Remaining : ${max - newCount}/${max}`;
     }
 
-    // Trigger file download
     let pdfUrl = state.bookData.mainPdf || "pdf/full/BK001.pdf";
     const link = document.createElement('a');
     link.href = pdfUrl;
@@ -320,10 +332,8 @@ window.triggerDownload = async function() {
     link.click();
     document.body.removeChild(link);
 
-    // Show success popup
     showDownloadSuccessPopup(state.bookData.heading || state.bookData.name || "Aarogyam India E-Book");
 
-    // Reset button or disable if limit reached
     if (downloadBtn) {
         downloadBtn.disabled = false;
         downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download PDF';
@@ -333,8 +343,6 @@ window.triggerDownload = async function() {
         disableDownloadButton("Download Limit Reached");
     }
 };
-
-// --- DISABLE DOWNLOAD BUTTON ---
 
 function disableDownloadButton(message) {
     const btn = document.getElementById("downloadBtn");
@@ -350,8 +358,6 @@ function disableDownloadButton(message) {
         status.textContent = message;
     }
 }
-
-// --- PREMIUM SUCCESS POPUP ---
 
 function showDownloadSuccessPopup(bookTitle) {
     const old = document.getElementById("proDownloadPopup");

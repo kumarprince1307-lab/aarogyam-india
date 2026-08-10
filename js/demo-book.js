@@ -1,6 +1,6 @@
 /* ==========================================
    AAROGYAM INDIA
-   DEMO-BOOK.JS (Complete & Final - With Smart Referral Engine)
+   DEMO-BOOK.JS (Complete & Final - With Smart Referral, Session Landing Page & Demo Engine)
 ========================================== */
 
 "use strict";
@@ -12,7 +12,7 @@ let referrerDisplay = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
     showLoader();
-    syncDemoShareContext(); // URL और सेशन से शेयर आईडी रिकवर करना
+    syncDemoShareContext(); // URL और सेशन से शेयर आईडी और सोर्स रिकवर करना
     await loadBookData();
     initializePage();
     setupEventListeners();
@@ -24,18 +24,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 function syncDemoShareContext() {
     const params = new URLSearchParams(window.location.search);
     
-    const sessionReferralId = (window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function') 
-        ? window.V1_SESSION.getReferralId() : null;
+    const session = (window.V1_SESSION && typeof window.V1_SESSION.getSession === 'function') 
+        ? window.V1_SESSION.getSession() : {};
+
+    const sessionReferralId = session.referral_share_id || (window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function' ? window.V1_SESSION.getReferralId() : null);
 
     const shareTokenFromUrl = params.get('share_token') || params.get('share_id') || params.get('tracking_token');
     const referralMobileParam = params.get('referral_mobile') || params.get('referral');
 
+    // सेशन या URL से सही सोर्स और लैंडिंग पेज उठाना
+    const sourceVal = params.get("source") || params.get("utm_source") || session.registration_source || "demo";
+    const landingUrlVal = session.landing_page || window.location.href || null;
+
     const shareContext = {
-        source: params.get("source") || params.get("utm_source") || "demo",
+        source: sourceVal,
         share_channel: params.get("share_channel") || params.get("channel") || params.get("utm_medium") || null,
         share_token: shareTokenFromUrl || sessionReferralId || 'AI000004',
         referral_mobile: referralMobileParam || null,
-        asset_url: window.location.href || null
+        asset_url: window.location.href || null,
+        landing_url: landingUrlVal
     };
 
     if (typeof persistShareContext === "function") {
@@ -52,6 +59,8 @@ function syncDemoShareContext() {
             lookupReferrerName(demoRefInput.value.trim());
         }
     }
+
+    return shareContext;
 }
 
 // स्मार्ट डेटा बाइंडिंग बंडल
@@ -248,7 +257,7 @@ function validateForm() {
 }
 
 /* ==================================================
-  4. FORM SUBMIT EVENT (डेमो फॉर्म सबमिट और स्मार्ट रेफरल बाइंडिंग)
+  4. FORM SUBMIT EVENT (डेमो फॉर्म सबमिट और स्मार्ट रेफरल बाइंडिंग विद सोर्स & लैंडिंग पेज)
 ================================================== */
 if(demoForm) {
     demoForm.addEventListener("submit", async function (event) {
@@ -257,10 +266,13 @@ if(demoForm) {
 
         showLoader();
 
+        const shareContextData = syncDemoShareContext();
         const enteredReferral = refInputEl ? refInputEl.value.trim() : 'AI000004';
         const finalUuid = window.currentReferrerData.uuid || null;
         const finalReferralMobile = window.currentReferrerData.mobile || null;
         const finalReferralCode = window.currentReferrerData.shareId || enteredReferral;
+        const sourceVal = shareContextData.source || "demo";
+        const landingPageVal = shareContextData.landing_url || window.location.pathname;
 
         const userData = {
             bookId: currentBookData ? currentBookData.id : "BK001",
@@ -272,10 +284,11 @@ if(demoForm) {
             referred_by: finalUuid,
             referralMobile: finalReferralMobile,
             referralCode: finalReferralCode,
-            source: "demo"
+            source: sourceVal,
+            landing_page: landingPageVal
         };
 
-        // पहले मुख्य रजिस्ट्रेशन इंजन से यूजर को रजिस्टर करें ताकि रेफरल डेटा पक्का सेव हो
+        // पहले मुख्य रजिस्ट्रेशन इंजन से यूजर को रजिस्टर करें ताकि सोर्स और लैंडिंग पेज पक्का सेव हो
         if (typeof registerUser === "function") {
             try {
                 await registerUser({
@@ -285,7 +298,8 @@ if(demoForm) {
                     referred_by: userData.referred_by,
                     referralMobile: userData.referralMobile,
                     referralCode: userData.referralCode,
-                    source: "demo"
+                    source: sourceVal,
+                    landing_page: landingPageVal
                 });
             } catch (regErr) {
                 console.log("Demo reg sync note:", regErr);

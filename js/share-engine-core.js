@@ -20,14 +20,14 @@ class UniversalShareEngine {
 
     // Get the share_id.
     // If a user is logged in, use their share_id.
-    // If no user is logged in (guest), use the universal guest share_id 'AI00004'.
+    // If no user is logged in (guest), use the universal guest share_id 'AI000004'.
     getShareId() {
         const userString = localStorage.getItem('AI_USER');
         if (userString) {
             const user = JSON.parse(userString);
-            return user.share_id || 'AI00004'; // Fallback for logged-in user without share_id
+            return user.share_id || 'AI000004'; // Fallback for logged-in user without share_id
         }
-        return 'AI00004'; // Universal Guest Share ID
+        return 'AI000004'; // Fallback for guests
     }
 
     // Main handler for all share button clicks
