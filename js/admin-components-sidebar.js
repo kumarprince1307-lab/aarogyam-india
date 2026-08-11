@@ -6,7 +6,7 @@ const MENU = [
   { label: 'Books', icon: '📚', children: [ { label: 'Categories', href: '#' }, { label: 'Books', href: '#' }, { label: 'Demo Books', href: '#' } ] },
   { label: 'Products', icon: '🛍️', children: [ { label: 'Categories', href: '#' }, { label: 'Products', href: '#' } ] },
   { label: 'Diseases', href: '#', icon: '🧾' },
-  { label: 'Orders', icon: '🧾', children: [ { label: 'Purchases', href: 'purchases.html' }, { label: 'Downloads', href: 'downloads.html' } ] },
+  { label: 'Orders', icon: '🧾', children: [ { label: 'Purchases', href: 'purchases.html' }, { label: 'Checkout Funnel', href: 'checkout-funnel.html' }, { label: 'Downloads', href: 'downloads.html' } ] },
   { label: 'Reports', icon: '📈', children: [ { label: 'Daily', href: 'reports.html#daily-report' }, { label: 'Monthly', href: '#' }, { label: 'Sales', href: '#' }, { label: 'Referral', href: 'reports.html#share-report' }, { label: 'Source', href: 'reports.html#lead-report' } ] },
   { label: 'Marketing', icon: '📣', children: [ { label: 'Landing Pages', href: '#' }, { label: 'Share Links', href: '#' }, { label: 'Campaigns', href: '#' } ] },
   { label: 'Webinars', href: '#', icon: '🎥' },
@@ -30,7 +30,7 @@ function createMenuItem(item) {
     `;
   }
   // for top-level links map known pages to data-route for SPA
-  const routeName = ['dashboard','users','purchases','downloads','reports','settings'].includes((item.href||'').split('.').shift()) ? (item.href||'').split('.').shift() : '';
+  const routeName = ['dashboard','users','purchases','checkout-funnel','downloads','reports','settings'].includes((item.href||'').split('.').shift()) ? (item.href||'').split('.').shift() : '';
   return `<li><a href="#" ${routeName?`data-route="${routeName}"`:''} class="menu-link"><span class="menu-icon">${item.icon || ''}</span><span class="menu-label">${item.label}</span></a></li>`;
 }
 

@@ -1,5 +1,6 @@
 /* Admin Dashboard Page */
 
+import { navigateTo } from './admin-router.js';
 import { initAdminLayout } from './admin-main.js'; // Already exists
 import { fetchDashboardData } from './admin-api.js'; // Already exists
 
@@ -79,6 +80,22 @@ function renderQuickActions() {
   </div>`;
 }
 
+function renderCheckoutFunnelWidget(summary) {
+  if (!summary) return '';
+  return `
+    <div class="admin-section" id="checkout-funnel-summary">
+        <div class="admin-section-title">Today's Checkout Funnel</div>
+        <div class="kpi-row">
+            <div class="kpi-card clickable" data-status="followup"> <div class="kpi-label">🔥 Follow-up Required</div> <div class="kpi-value">${summary.follow_up || 0}</div> </div>
+            <div class="kpi-card clickable" data-status="initiated"> <div class="kpi-label">🟠 Initiated</div> <div class="kpi-value">${summary.initiated || 0}</div> </div>
+            <div class="kpi-card clickable" data-status="dropped"> <div class="kpi-label">🔴 Dropped</div> <div class="kpi-value">${summary.dropped || 0}</div> </div>
+            <div class="kpi-card clickable" data-status="failed"> <div class="kpi-label">❌ Failed</div> <div class="kpi-value">${summary.failed || 0}</div> </div>
+            <div class="kpi-card clickable" data-status="success"> <div class="kpi-label">🟢 Success</div> <div class="kpi-value">${summary.success || 0}</div> </div>
+            <div class="kpi-card"> <div class="kpi-label">📈 Conversion</div> <div class="kpi-value">${summary.conversion_rate || '0%'}</div> </div>
+        </div>
+    </div>`;
+}
+
 export async function initDashboard() {
   initAdminLayout('Dashboard', 'Business, lead and share metrics in one place.');
 
@@ -94,7 +111,7 @@ export async function initDashboard() {
       return;
     }
 
-    const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity } = result.data;
+    const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity, todaysCheckoutSummary } = result.data;
     
     // Use live data for Share KPIs, with fallbacks
     const shareKpis = [ // This is a local const, not a duplicate declaration
@@ -117,6 +134,7 @@ export async function initDashboard() {
         <div class="admin-section-title">Business Summary</div>
         ${renderKpiGroup(businessKpis)}
       </div>
+      ${renderCheckoutFunnelWidget(todaysCheckoutSummary)}
       <div class="admin-section" id="lead-sources">
         <div class="admin-section-title">Lead Sources</div>
         ${renderLeadSources(leadSources)}
@@ -136,6 +154,15 @@ export async function initDashboard() {
         <div class="admin-col">${renderTopBooks(bookSales)}${renderActivity(recentActivity)}</div>
       </div>
     `;
+
+    // Add event listeners for the new widget
+    const checkoutCards = document.querySelectorAll('#checkout-funnel-summary .kpi-card.clickable');
+    checkoutCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const status = card.dataset.status;
+            window.location.hash = `checkout-funnel?status=${status}`;
+        });
+    });
   } catch (err) {
     console.error('admin-pages-dashboard init error', err);
     content.innerHTML = '<div class="admin-error"><strong>Unable to load dashboard.</strong><br>Something went wrong.</div>';
