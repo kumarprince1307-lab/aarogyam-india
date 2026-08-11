@@ -6,21 +6,21 @@ import { fetchUsers } from './admin-api.js';
 function renderUserRow(user) {
   return `
     <tr>
-      <td><a href="user-details.html?id=${user.id}" class="admin-subtle-link">${user.id}</a></td>
       <td>
         <div class="admin-user-name">${user.name}</div>
         <div class="admin-user-email">${user.email}</div>
       </td>
       <td>${user.mobile}</td>
       <td>${user.source}</td>
+      <td><a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-subtle-link">${user.shareId || 'N/A'}</a></td>
       <td>N/A</td>
-      <td>N/A</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
+      <td>${user.totalPurchases || 0}</td>
+      <td>₹${(user.totalSpent || 0).toLocaleString('en-IN')}</td>
       <td><span class="admin-pill ${user.status.toLowerCase()}">${user.status}</span></td>
-      <td><a href="user-details.html?id=${user.id}" class="admin-button">View</a></td>
+      <td><a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-button">View</a></td>
     </tr>
   `;
 }
@@ -35,7 +35,6 @@ function renderUsersTable(users) {
       <table class="admin-table">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Mobile</th>
             <th>Reg. Source</th>
@@ -45,6 +44,7 @@ function renderUsersTable(users) {
             <th>Total Shares</th>
             <th>Total Leads</th>
             <th>Total Purchases</th>
+            <th>Total Spent</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -95,6 +95,14 @@ export async function initUsers() {
 
   // Listen to global admin search
   document.addEventListener('admin:global-search', (e) => reload(e.detail?.query || ''));
+
+  // Handle clicks on data-route links inside the table
+  container.addEventListener('click', (e) => {
+    const link = e.target.closest('[data-route="user-details"]');
+    if (link && link.dataset.id) {
+        window.location.hash = `user-details?id=${link.dataset.id}`;
+    }
+  });
 
   await reload();
 }

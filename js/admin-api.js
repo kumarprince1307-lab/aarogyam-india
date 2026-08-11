@@ -150,6 +150,33 @@ export async function fetchCheckoutSummary(params = {}) {
   }
 }
 
+export async function fetchTodaysBirthdays() {
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        const { data: allProfiles, error } = await db
+            .from('profiles')
+            .select('full_name, mobile, dob')
+            .not('dob', 'is', null);
+
+        if (error) throw error;
+
+        const today = new Date();
+        const todayMonth = today.getMonth() + 1;
+        const todayDay = today.getDate();
+
+        const birthdayUsers = allProfiles.filter(profile => {
+            const dob = new Date(profile.dob);
+            return (dob.getMonth() + 1 === todayMonth) && (dob.getDate() === todayDay);
+        });
+
+        return { success: true, data: birthdayUsers };
+    } catch (error) {
+        return { success: false, data: [], error: error.message };
+    }
+}
+
 export async function fetchDashboardData() {
   await delay(250); // Simulate network latency
   try {
@@ -166,6 +193,7 @@ export async function fetchDashboardData() {
       allProfilesRes,
       allPurchasesRes,
       booksRes,
+      birthdaysRes,
       todaysCheckoutRes,
       recentPurchasesRes,
       recentProfilesRes
@@ -176,6 +204,7 @@ export async function fetchDashboardData() {
       db.from('profiles').select('id, full_name, created_at, registration_source'),
       db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status'),
       db.from('books').select('id, title, name'),
+      fetchTodaysBirthdays(),
       fetchCheckoutSummary(), // MODIFIED: Call with no params to get today's data by default
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
       db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5)
@@ -187,6 +216,7 @@ export async function fetchDashboardData() {
     const newCustomers = newCustomersRes.count || 0;
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
+    const todaysBirthdays = birthdaysRes.success ? birthdaysRes.data : [];
     
     const todaysCheckoutSummary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
     if (todaysCheckoutRes.success) {
@@ -282,6 +312,7 @@ export async function fetchDashboardData() {
         leadSources,
         customerJourney,
         bookSales,
+        todaysBirthdays,
         todaysCheckoutSummary,
         recentActivity: sortedActivity
       }
@@ -304,15 +335,47 @@ export async function fetchTotalReport() {
   return { success: true, data: [], message: "Total Report not yet connected to live data." };
 }
  
+export async function fetchPurchaseFilterOptions() {
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        const [booksRes, sourcesRes] = await Promise.all([
+            db.from('purchases').select('book_id'),
+            db.from('profiles').select('registration_source')
+        ]);
+
+        const distinctBooks = [...new Set((booksRes.data || []).map(p => p.book_id).filter(Boolean))];
+        const distinctSources = [...new Set((sourcesRes.data || []).map(p => p.registration_source).filter(Boolean))];
+
+        return { success: true, data: { books: distinctBooks, sources: distinctSources } };
+    } catch (error) {
+        console.error('Failed to fetch purchase filter options:', error);
+        return { success: false, data: { books: [], sources: [] }, error: error.message };
+    }
+}
+
 export async function fetchAllBooks() {
     try {
         const db = window.dbClient;
         if (!db) throw new Error("Supabase client not available.");
-        const { data, error } = await db.from('books').select('id, name, title').order('name');
+        // The 'books' table is empty. Fetch distinct book_ids from checkout_logs instead.
+        const { data, error } = await db.from('checkout_logs').select('book_id');
         if (error) throw error;
-        return { success: true, data };
+
+        // Get unique, non-empty book_ids
+        const distinctBookIds = [...new Set(data.map(log => log.book_id).filter(id => id))];
+        
+        // Format them for the filter dropdown which expects {id, name, title}
+        const bookOptions = distinctBookIds.map(id => ({
+            id: id,
+            name: id, // Use the ID itself as the name
+            title: id
+        }));
+
+        return { success: true, data: bookOptions };
     } catch (error) {
-        console.error('Failed to fetch all books:', error);
+        console.error('Failed to fetch distinct book IDs for filter:', error);
         return { success: false, data: [], error: error.message };
     }
 }
@@ -337,19 +400,9 @@ export async function fetchCheckoutLogs(params = {}) {
       `);
     
     // Date Filter
-    if (params.dateRange && params.dateRange !== 'all') {
-        const now = new Date();
-        let startDate;
-        if (params.dateRange === 'today') {
-            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-        } else if (params.dateRange === 'last7days') {
-            const pastDate = new Date();
-            pastDate.setDate(now.getDate() - 7);
-            startDate = pastDate.toISOString();
-        }
-        if (startDate) {
-            queryBuilder = queryBuilder.gte('created_at', startDate);
-        }
+    if (params.startDate && params.endDate) {
+        queryBuilder = queryBuilder.gte('created_at', params.startDate.toISOString());
+        queryBuilder = queryBuilder.lt('created_at', params.endDate.toISOString());
     }
 
     // Status Filter
@@ -374,25 +427,20 @@ export async function fetchCheckoutLogs(params = {}) {
 
     // 2. Collect unique IDs to fetch related data without joins
     const profileIds = [...new Set(logs.map(log => log.profile_id).filter(id => id))];
-    const bookIds = [...new Set(logs.map(log => log.book_id).filter(id => id))];
 
     // 3. Fetch related profiles and books in parallel
-    const [profilesRes, booksRes] = await Promise.all([
+    const [profilesRes] = await Promise.all([
         profileIds.length > 0 ? db.from('profiles').select('id, full_name, mobile').in('id', profileIds) : Promise.resolve({ data: [] }),
-        bookIds.length > 0 ? db.from('books').select('id, name, title').in('id', bookIds) : Promise.resolve({ data: [] })
     ]);
 
     if (profilesRes.error) console.error('Error fetching profiles for checkout logs:', profilesRes.error);
-    if (booksRes.error) console.error('Error fetching books for checkout logs:', booksRes.error);
 
     // 4. Create lookup maps for efficient data merging
     const profilesMap = (profilesRes.data || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
-    const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
 
     // 5. Map logs and enrich with profile/book data
     let mappedData = logs.map(log => {
       const profile = profilesMap[log.profile_id] || {};
-      const book = booksMap[log.book_id] || {};
       return {
       id: log.id,
       created_at: log.created_at,
@@ -401,7 +449,7 @@ export async function fetchCheckoutLogs(params = {}) {
       profile_id: log.profile_id,
       customer_name: profile.full_name || 'N/A',
       customer_mobile: profile.mobile || 'N/A',
-      book_name: book.name || book.title || 'Unknown Book'
+      book_name: log.book_id || 'Unknown Book'
       };
     });
 
@@ -455,7 +503,8 @@ export async function fetchUsers(params = {}) {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
 
-    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active');
+    // Step 1: Fetch all profiles with filtering
+    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at, referral_code, referred_by');
 
     if (params.status && params.status !== 'all') {
       queryBuilder = queryBuilder.eq('is_active', params.status === 'active');
@@ -468,18 +517,55 @@ export async function fetchUsers(params = {}) {
     
     queryBuilder = queryBuilder.order('created_at', { ascending: false });
 
-    const { data, error } = await queryBuilder;
+    const { data: profiles, error: profilesError } = await queryBuilder;
+    if (profilesError) throw profilesError;
 
-    if (error) throw error;
+    // Step 1.5: Create a map of who referred whom for direct referral count
+    const referralCounts = (profiles || []).reduce((acc, profile) => {
+        if (profile.referred_by) {
+            acc[profile.referred_by] = (acc[profile.referred_by] || 0) + 1;
+        }
+        return acc;
+    }, {});
 
-    const mappedData = data.map(user => ({
+    // Step 2: Fetch all purchases to aggregate data
+    const { data: allPurchases, error: purchasesError } = await db
+        .from('purchases')
+        .select('profile_id, amount');
+
+    if (purchasesError) {
+        console.error('Error fetching purchases for user aggregation:', purchasesError.message);
+    }
+
+    // Step 3: Aggregate purchase data into a map for quick lookup
+    const purchaseSummary = (allPurchases || []).reduce((acc, purchase) => {
+        const profileId = purchase.profile_id;
+        if (!profileId) return acc;
+
+        if (!acc[profileId]) {
+            acc[profileId] = { totalPurchases: 0, totalSpent: 0 };
+        }
+        acc[profileId].totalPurchases += 1;
+        acc[profileId].totalSpent += purchase.amount || 0;
+        return acc;
+    }, {});
+
+    // Step 4: Map profiles and merge with purchase summary
+    const mappedData = profiles.map(user => {
+        const summary = purchaseSummary[user.id] || { totalPurchases: 0, totalSpent: 0 };
+        return {
         id: user.id,
         name: user.full_name,
         mobile: user.mobile,
         email: user.email,
         source: user.registration_source,
         status: user.is_active ? 'active' : 'inactive',
-    }));
+        shareId: user.referral_code,
+        directReferrals: referralCounts[user.id] || 0,
+        totalPurchases: summary.totalPurchases,
+        totalSpent: summary.totalSpent
+        };
+    });
 
     return { success: true, data: mappedData };
 
@@ -490,21 +576,136 @@ export async function fetchUsers(params = {}) {
 }
 
 export async function fetchPurchases(params = {}) {
-  await delay(120);
-  let data = PURCHASES; // Still using mock data for Purchases page
-  const query = (params.query || '').toLowerCase();
-  if (query) {
-    data = data.filter(item => item.order.toLowerCase().includes(query) || item.book.toLowerCase().includes(query) || item.customer.toLowerCase().includes(query));
-  }
-  if (params.status && params.status !== 'all') {
-    data = data.filter(item => item.status === params.status);
-  }
-  return { success: true, data };
+    await delay(150);
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        // 1. Fetch base purchases
+        let queryBuilder = db.from('purchases')
+            .select('payment_id, amount, purchase_date, payment_status, profile_id, book_id')
+            .order('purchase_date', { ascending: false });
+
+        // Server-side filters
+        if (params.status && params.status !== 'all') {
+            queryBuilder = queryBuilder.eq('payment_status', params.status);
+        }
+        if (params.startDate && params.endDate) {
+            queryBuilder = queryBuilder.gte('purchase_date', params.startDate.toISOString());
+            queryBuilder = queryBuilder.lt('purchase_date', params.endDate.toISOString());
+        }
+        if (params.bookId && params.bookId !== 'all') {
+            queryBuilder = queryBuilder.eq('book_id', params.bookId);
+        }
+
+        const { data: purchases, error: purchasesError } = await queryBuilder;
+        if (purchasesError) throw purchasesError;
+        if (!purchases || purchases.length === 0) return { success: true, data: [] };
+
+        // 2. Collect related IDs
+        const profileIds = [...new Set(purchases.map(p => p.profile_id).filter(id => id))];
+        const bookIds = [...new Set(purchases.map(p => p.book_id).filter(id => id))];
+
+        // 3. Fetch related data in parallel
+        const [profilesRes, booksRes] = await Promise.all([
+            profileIds.length > 0 ? db.from('profiles').select('id, full_name, registration_source').in('id', profileIds) : Promise.resolve({ data: [] }),
+            bookIds.length > 0 ? db.from('books').select('id, name, title').in('id', bookIds) : Promise.resolve({ data: [] })
+        ]);
+
+        // 4. Create lookup maps for efficiency
+        const profilesMap = (profilesRes.data || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+        const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
+
+        // 5. Map and enrich the data, matching the format expected by the UI
+        let mappedData = purchases.map(p => {
+            const profile = profilesMap[p.profile_id] || {};
+            const book = booksMap[p.book_id] || {};
+            return {
+                order: p.payment_id || 'N/A',
+                customer: profile.full_name || 'Unknown User',
+                book: book.name || book.title || p.book_id || 'Unknown Book',
+                amount: `₹${p.amount || 0}`,
+                source: profile.registration_source || 'Direct',
+                status: p.payment_status || 'success',
+                date: new Date(p.purchase_date).toLocaleDateString('en-GB')
+            };
+        });
+
+        // 6. Apply client-side filters
+        if (params.source && params.source !== 'all') {
+            mappedData = mappedData.filter(item => item.source === params.source);
+        }
+
+        if (params.query) {
+            const searchTerm = params.query.toLowerCase();
+            mappedData = mappedData.filter(item =>
+                item.order.toLowerCase().includes(searchTerm) ||
+                item.customer.toLowerCase().includes(searchTerm) ||
+                item.book.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        return { success: true, data: mappedData };
+    } catch (error) {
+        console.error('Failed to fetch real purchases:', error);
+        return { success: false, data: [], error: error.message };
+    }
 }
 
 export async function fetchDownloads() {
-  await delay(120);
-  return { success: true, data: DOWNLOADS }; // Still using mock data for Downloads page
+    await delay(150);
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        // Fetch all download logs
+        const { data: logs, error } = await db
+            .from('download_logs')
+            .select('book_id, profile_id, downloaded_at')
+            .order('downloaded_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!logs || logs.length === 0) {
+            return { success: true, data: [] };
+        }
+
+        // Aggregate the data in JavaScript
+        const summary = logs.reduce((acc, log) => {
+            const bookId = log.book_id || 'Unknown';
+            if (!acc[bookId]) {
+                acc[bookId] = {
+                    book: bookId,
+                    downloads: 0,
+                    usersSet: new Set(),
+                    lastDownloaded: new Date(0)
+                };
+            }
+            acc[bookId].downloads++;
+            acc[bookId].usersSet.add(log.profile_id);
+            const downloadDate = new Date(log.downloaded_at);
+            if (downloadDate > acc[bookId].lastDownloaded) {
+                acc[bookId].lastDownloaded = downloadDate;
+            }
+            return acc;
+        }, {});
+
+        // Format the aggregated data for the UI
+        const formattedData = Object.values(summary).map(item => ({
+            book: item.book,
+            downloads: item.downloads,
+            users: item.usersSet.size,
+            lastDownloaded: item.lastDownloaded.toISOString() === new Date(0).toISOString() 
+                ? 'N/A' 
+                : item.lastDownloaded.toLocaleDateString('en-GB')
+        }));
+
+        return { success: true, data: formattedData };
+
+    } catch (error) {
+        console.error('Failed to fetch real download data:', error);
+        return { success: false, data: [], error: error.message };
+    }
 }
 
 export async function fetchUserDetails(userId) {
