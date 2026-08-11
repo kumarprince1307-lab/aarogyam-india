@@ -60,20 +60,21 @@ export async function fetchShareEngineSummaryData() {
 
     // 1. Total Shares
     const { count: totalShares, error: sharesError } = await db
-      .from('share_links')
-      .select('id', { count: 'exact', head: true });
+      .from('share_logs')
+      .select('id', { count: 'exact', head: true })
+      .eq('event_type', 'share');
     if (sharesError) console.error('Error fetching total shares:', sharesError.message);
 
     // 2. Total Clicks (from share_events)
     const { count: totalClicks, error: clicksError } = await db
-      .from('share_events')
+      .from('share_logs')
       .select('id', { count: 'exact', head: true })
       .eq('event_type', 'click');
     if (clicksError) console.error('Error fetching total clicks:', clicksError.message);
     
     // 3. Total Visitors (from share_events)
      const { count: totalVisitors, error: visitorsError } = await db
-      .from('share_events')
+      .from('share_logs')
       .select('id', { count: 'exact', head: true })
       .eq('event_type', 'visit');
     if (visitorsError) console.error('Error fetching total visitors:', visitorsError.message);
