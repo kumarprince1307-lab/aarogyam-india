@@ -80,6 +80,45 @@ function renderQuickActions() {
   </div>`;
 }
 
+function renderBirthdaysWidget(birthdays) {
+    let content;
+    if (!birthdays || birthdays.length === 0) {
+        content = '<div class="admin-empty-sm">आज किसी का जन्मदिन नहीं है।</div>';
+    } else {
+        content = `
+            <ul class="admin-activity-list">
+                ${birthdays.map(user => {
+                    const sanitizedMobile = String(user.mobile || '').replace(/\D/g, '');
+                    let whatsappNumber = sanitizedMobile;
+                    if (whatsappNumber.length === 10) {
+                        whatsappNumber = '91' + whatsappNumber;
+                    }
+                    const message = `नमस्कार ${user.full_name} जी 🙏\n\n🎂 आपको जन्मदिन की हार्दिक शुभकामनाएँ!\n\nAarogyam India की ओर से आपके सुखी, स्वस्थ और सफल जीवन की मंगलकामनाएँ। 🌿\n\nमैं Aarogyam India का AI सहायक हूँ।\nकैसे हैं आप? क्या मैं आपकी कोई मदद कर सकता हूँ?\n\n— Aarogyam India`;
+                    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+                    return `
+                        <li style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong>🎂 ${user.full_name}</strong>
+                                <span>📅 ${new Date(user.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} | 📱 ${user.mobile}</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="tel:${sanitizedMobile}" class="admin-button small-button">📞 Call</a>
+                                <a href="${whatsappUrl}" target="_blank" class="admin-button small-button">💬 WhatsApp</a>
+                            </div>
+                        </li>
+                    `;
+                }).join('')}
+            </ul>`;
+    }
+
+    return `
+        <div class="admin-section" id="birthdays-widget">
+            <div class="admin-section-title">🎂 Today's Birthdays</div>
+            ${content}
+        </div>`;
+}
+
 function renderCheckoutFunnelWidget(summary) {
   if (!summary) return '';
   return `
@@ -124,7 +163,7 @@ export async function initDashboard() {
       return;
     }
 
-    const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity, todaysCheckoutSummary } = result.data;
+    const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity, todaysCheckoutSummary, todaysBirthdays } = result.data;
     
     // Use live data for Share KPIs, with fallbacks
     const shareKpis = [ // This is a local const, not a duplicate declaration
@@ -147,6 +186,7 @@ export async function initDashboard() {
         <div class="admin-section-title">Business Summary</div>
         ${renderKpiGroup(businessKpis)}
       </div>
+      ${renderBirthdaysWidget(todaysBirthdays)}
       ${renderCheckoutFunnelWidget(todaysCheckoutSummary)}
       <div class="admin-section" id="lead-sources">
         <div class="admin-section-title">Lead Sources</div>

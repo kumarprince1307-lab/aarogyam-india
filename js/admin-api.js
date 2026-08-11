@@ -150,6 +150,33 @@ export async function fetchCheckoutSummary(params = {}) {
   }
 }
 
+export async function fetchTodaysBirthdays() {
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        const { data: allProfiles, error } = await db
+            .from('profiles')
+            .select('full_name, mobile, dob')
+            .not('dob', 'is', null);
+
+        if (error) throw error;
+
+        const today = new Date();
+        const todayMonth = today.getMonth() + 1;
+        const todayDay = today.getDate();
+
+        const birthdayUsers = allProfiles.filter(profile => {
+            const dob = new Date(profile.dob);
+            return (dob.getMonth() + 1 === todayMonth) && (dob.getDate() === todayDay);
+        });
+
+        return { success: true, data: birthdayUsers };
+    } catch (error) {
+        return { success: false, data: [], error: error.message };
+    }
+}
+
 export async function fetchDashboardData() {
   await delay(250); // Simulate network latency
   try {
@@ -166,6 +193,7 @@ export async function fetchDashboardData() {
       allProfilesRes,
       allPurchasesRes,
       booksRes,
+      birthdaysRes,
       todaysCheckoutRes,
       recentPurchasesRes,
       recentProfilesRes
@@ -176,6 +204,7 @@ export async function fetchDashboardData() {
       db.from('profiles').select('id, full_name, created_at, registration_source'),
       db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status'),
       db.from('books').select('id, title, name'),
+      fetchTodaysBirthdays(),
       fetchCheckoutSummary(), // MODIFIED: Call with no params to get today's data by default
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
       db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5)
@@ -187,6 +216,7 @@ export async function fetchDashboardData() {
     const newCustomers = newCustomersRes.count || 0;
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
+    const todaysBirthdays = birthdaysRes.success ? birthdaysRes.data : [];
     
     const todaysCheckoutSummary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
     if (todaysCheckoutRes.success) {
@@ -282,6 +312,7 @@ export async function fetchDashboardData() {
         leadSources,
         customerJourney,
         bookSales,
+        todaysBirthdays,
         todaysCheckoutSummary,
         recentActivity: sortedActivity
       }
@@ -473,7 +504,7 @@ export async function fetchUsers(params = {}) {
     if (!db) throw new Error("Supabase client not available.");
 
     // Step 1: Fetch all profiles with filtering
-    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at');
+    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at, referral_code, referred_by');
 
     if (params.status && params.status !== 'all') {
       queryBuilder = queryBuilder.eq('is_active', params.status === 'active');
@@ -488,6 +519,14 @@ export async function fetchUsers(params = {}) {
 
     const { data: profiles, error: profilesError } = await queryBuilder;
     if (profilesError) throw profilesError;
+
+    // Step 1.5: Create a map of who referred whom for direct referral count
+    const referralCounts = (profiles || []).reduce((acc, profile) => {
+        if (profile.referred_by) {
+            acc[profile.referred_by] = (acc[profile.referred_by] || 0) + 1;
+        }
+        return acc;
+    }, {});
 
     // Step 2: Fetch all purchases to aggregate data
     const { data: allPurchases, error: purchasesError } = await db
@@ -521,6 +560,8 @@ export async function fetchUsers(params = {}) {
         email: user.email,
         source: user.registration_source,
         status: user.is_active ? 'active' : 'inactive',
+        shareId: user.referral_code,
+        directReferrals: referralCounts[user.id] || 0,
         totalPurchases: summary.totalPurchases,
         totalSpent: summary.totalSpent
         };
