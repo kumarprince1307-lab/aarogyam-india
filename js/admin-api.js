@@ -304,6 +304,26 @@ export async function fetchTotalReport() {
   return { success: true, data: [], message: "Total Report not yet connected to live data." };
 }
  
+export async function fetchPurchaseFilterOptions() {
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        const [booksRes, sourcesRes] = await Promise.all([
+            db.from('purchases').select('book_id'),
+            db.from('profiles').select('registration_source')
+        ]);
+
+        const distinctBooks = [...new Set((booksRes.data || []).map(p => p.book_id).filter(Boolean))];
+        const distinctSources = [...new Set((sourcesRes.data || []).map(p => p.registration_source).filter(Boolean))];
+
+        return { success: true, data: { books: distinctBooks, sources: distinctSources } };
+    } catch (error) {
+        console.error('Failed to fetch purchase filter options:', error);
+        return { success: false, data: { books: [], sources: [] }, error: error.message };
+    }
+}
+
 export async function fetchAllBooks() {
     try {
         const db = window.dbClient;
@@ -487,16 +507,80 @@ export async function fetchUsers(params = {}) {
 }
 
 export async function fetchPurchases(params = {}) {
-  await delay(120);
-  let data = PURCHASES; // Still using mock data for Purchases page
-  const query = (params.query || '').toLowerCase();
-  if (query) {
-    data = data.filter(item => item.order.toLowerCase().includes(query) || item.book.toLowerCase().includes(query) || item.customer.toLowerCase().includes(query));
-  }
-  if (params.status && params.status !== 'all') {
-    data = data.filter(item => item.status === params.status);
-  }
-  return { success: true, data };
+    await delay(150);
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        // 1. Fetch base purchases
+        let queryBuilder = db.from('purchases')
+            .select('payment_id, amount, purchase_date, payment_status, profile_id, book_id')
+            .order('purchase_date', { ascending: false });
+
+        // Server-side filters
+        if (params.status && params.status !== 'all') {
+            queryBuilder = queryBuilder.eq('payment_status', params.status);
+        }
+        if (params.startDate && params.endDate) {
+            queryBuilder = queryBuilder.gte('purchase_date', params.startDate.toISOString());
+            queryBuilder = queryBuilder.lt('purchase_date', params.endDate.toISOString());
+        }
+        if (params.bookId && params.bookId !== 'all') {
+            queryBuilder = queryBuilder.eq('book_id', params.bookId);
+        }
+
+        const { data: purchases, error: purchasesError } = await queryBuilder;
+        if (purchasesError) throw purchasesError;
+        if (!purchases || purchases.length === 0) return { success: true, data: [] };
+
+        // 2. Collect related IDs
+        const profileIds = [...new Set(purchases.map(p => p.profile_id).filter(id => id))];
+        const bookIds = [...new Set(purchases.map(p => p.book_id).filter(id => id))];
+
+        // 3. Fetch related data in parallel
+        const [profilesRes, booksRes] = await Promise.all([
+            profileIds.length > 0 ? db.from('profiles').select('id, full_name, registration_source').in('id', profileIds) : Promise.resolve({ data: [] }),
+            bookIds.length > 0 ? db.from('books').select('id, name, title').in('id', bookIds) : Promise.resolve({ data: [] })
+        ]);
+
+        // 4. Create lookup maps for efficiency
+        const profilesMap = (profilesRes.data || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+        const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
+
+        // 5. Map and enrich the data, matching the format expected by the UI
+        let mappedData = purchases.map(p => {
+            const profile = profilesMap[p.profile_id] || {};
+            const book = booksMap[p.book_id] || {};
+            return {
+                order: p.payment_id || 'N/A',
+                customer: profile.full_name || 'Unknown User',
+                book: book.name || book.title || p.book_id || 'Unknown Book',
+                amount: `₹${p.amount || 0}`,
+                source: profile.registration_source || 'Direct',
+                status: p.payment_status || 'success',
+                date: new Date(p.purchase_date).toLocaleDateString('en-GB')
+            };
+        });
+
+        // 6. Apply client-side filters
+        if (params.source && params.source !== 'all') {
+            mappedData = mappedData.filter(item => item.source === params.source);
+        }
+
+        if (params.query) {
+            const searchTerm = params.query.toLowerCase();
+            mappedData = mappedData.filter(item =>
+                item.order.toLowerCase().includes(searchTerm) ||
+                item.customer.toLowerCase().includes(searchTerm) ||
+                item.book.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        return { success: true, data: mappedData };
+    } catch (error) {
+        console.error('Failed to fetch real purchases:', error);
+        return { success: false, data: [], error: error.message };
+    }
 }
 
 export async function fetchDownloads() {
