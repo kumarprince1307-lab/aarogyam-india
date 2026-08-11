@@ -1,12 +1,15 @@
-
 class UniversalShareEngine {
     // Add a static property to track if a share operation is in progress
     static isSharing = false;
+    
     constructor() {
         // Get the share_id upon initialization.
         this.share_id = this.getShareId();
         // Make this instance globally accessible to be used by other scripts.
         window.universalShareEngine = this;
+
+        // Automatically handle incoming click/visit tracking on page load
+        this.handleIncomingAttribution();
     }
 
     // Initialize the engine, find and prepare all share buttons on the page
@@ -42,6 +45,20 @@ class UniversalShareEngine {
         const shareUrl = this.generateShareLink(assetType, assetId);
         const shareText = `Check this out: ${pageTitle}`;
 
+        // ==========================================
+        // 1. TRACK 'share' EVENT IN SUPABASE
+        // ==========================================
+        if (typeof trackAttributionEvent === 'function') {
+            console.log('Tracking Event:', { event_type: 'share', share_token: this.share_id });
+            trackAttributionEvent({
+                event_type: 'share',
+                share_token: this.share_id,
+                referral_code: this.share_id,
+                asset_type: assetType,
+                asset_id: assetId
+            });
+        }
+
         switch (target) {
             case 'native':
                 this.nativeShare(pageTitle, shareText, shareUrl);
@@ -60,15 +77,45 @@ class UniversalShareEngine {
         }
     }
 
+    // Handle incoming visitors via shared link (Click & Visit)
+    handleIncomingAttribution() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const incomingShareId = urlParams.get('share_id');
+
+        if (incomingShareId) {
+            // Save incoming share_id to localStorage so registration can use it later
+            localStorage.setItem('AI_PENDING_REFERRAL', incomingShareId);
+
+            // ==========================================
+            // 2. TRACK 'click' & 'visit' EVENTS IN SUPABASE
+            // ==========================================
+            if (typeof trackAttributionEvent === 'function') {
+                // Track Click
+                console.log('Tracking Event:', { event_type: 'click', share_token: incomingShareId });
+                trackAttributionEvent({
+                    event_type: 'click',
+                    share_token: incomingShareId,
+                    referral_code: incomingShareId
+                });
+
+                // Track Visit
+                console.log('Tracking Event:', { event_type: 'visit', share_token: incomingShareId });
+                trackAttributionEvent({
+                    event_type: 'visit',
+                    share_token: incomingShareId,
+                    referral_code: incomingShareId
+                });
+            }
+        }
+    }
+
     // Generate the universal share link.
     generateShareLink(assetType, assetId) {
         const baseUrl = window.location.origin;
         const pagePath = window.location.pathname;
-        // The 'src' parameter provides context on what is being shared.
         const src = `${assetType}:${assetId}`; 
         const url = new URL(baseUrl + pagePath);
 
-        // Always include the share_id (either user's or guest's).
         url.searchParams.set('share_id', this.share_id);
         url.searchParams.set('src', src);
 
@@ -82,7 +129,6 @@ class UniversalShareEngine {
             return;
         }
 
-        // Prevent multiple simultaneous share calls
         if (UniversalShareEngine.isSharing) {
             console.log('A native share is already in progress. Skipping.');
             return;
@@ -131,10 +177,3 @@ class UniversalShareEngine {
         });
     }
 }
-
-// To be instantiated and initialized on pages that use it.
-// Example:
-// document.addEventListener('DOMContentLoaded', () => {
-//     const shareEngine = new UniversalShareEngine();
-//     shareEngine.init();
-// });
