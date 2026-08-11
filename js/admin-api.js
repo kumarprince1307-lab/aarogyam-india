@@ -337,19 +337,9 @@ export async function fetchCheckoutLogs(params = {}) {
       `);
     
     // Date Filter
-    if (params.dateRange && params.dateRange !== 'all') {
-        const now = new Date();
-        let startDate;
-        if (params.dateRange === 'today') {
-            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-        } else if (params.dateRange === 'last7days') {
-            const pastDate = new Date();
-            pastDate.setDate(now.getDate() - 7);
-            startDate = pastDate.toISOString();
-        }
-        if (startDate) {
-            queryBuilder = queryBuilder.gte('created_at', startDate);
-        }
+    if (params.startDate && params.endDate) {
+        queryBuilder = queryBuilder.gte('created_at', params.startDate.toISOString());
+        queryBuilder = queryBuilder.lt('created_at', params.endDate.toISOString());
     }
 
     // Status Filter

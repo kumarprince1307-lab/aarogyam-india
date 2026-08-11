@@ -14,6 +14,7 @@ function renderLayout() {
                 <input id="search-input" type="search" placeholder="Search by Name or Mobile" class="admin-input">
                 <select id="status-filter" class="admin-select"></select>
                 <select id="date-filter" class="admin-select"></select>
+                <input type="date" id="custom-date-input" class="admin-input" style="display: none;">
                 <select id="book-filter" class="admin-select"></select>
             </div>
         </div>
@@ -77,11 +78,44 @@ async function applyFiltersAndReload() {
     if (!container) return;
     container.innerHTML = '<div class="admin-loading">Loading checkout logs...</div>';
 
+    const dateFilterValue = document.getElementById('date-filter')?.value || 'today';
+    const customDateValue = document.getElementById('custom-date-input')?.value;
+    let startDate, endDate;
+    const now = new Date();
+
+    switch (dateFilterValue) {
+        case 'yesterday':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        case 'last7days':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+          break;
+        case 'thismonth':
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+          break;
+        case 'custom':
+          if (customDateValue) {
+            const selectedDate = new Date(customDateValue);
+            startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+            endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1);
+          }
+          break;
+        case 'today':
+        default:
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+          break;
+    }
+
     const params = {
         status: document.getElementById('status-filter')?.value || 'all',
-        dateRange: document.getElementById('date-filter')?.value || 'all',
         bookId: document.getElementById('book-filter')?.value || 'all',
-        search: document.getElementById('search-input')?.value || ''
+        search: document.getElementById('search-input')?.value || '',
+        startDate: startDate,
+        endDate: endDate
     };
 
     const result = await fetchCheckoutLogs(params);
@@ -114,9 +148,11 @@ function populateFilters(preselectedStatus) {
 
     if (dateFilter) {
         dateFilter.innerHTML = `
-            <option value="all">All Time</option>
             <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
             <option value="last7days">Last 7 Days</option>
+            <option value="thismonth">This Month</option>
+            <option value="custom">Custom Date</option>
         `;
     }
 
@@ -130,6 +166,7 @@ function setupEventListeners() {
     const searchInput = document.getElementById('search-input');
     const statusFilter = document.getElementById('status-filter');
     const dateFilter = document.getElementById('date-filter');
+    const customDateInput = document.getElementById('custom-date-input');
     const bookFilter = document.getElementById('book-filter');
 
     let searchTimeout;
@@ -141,7 +178,16 @@ function setupEventListeners() {
     });
 
     statusFilter?.addEventListener('change', applyFiltersAndReload);
-    dateFilter?.addEventListener('change', applyFiltersAndReload);
+    dateFilter?.addEventListener('change', () => {
+        if (dateFilter.value === 'custom') {
+            customDateInput.style.display = 'inline-block';
+            // Don't reload until a date is picked
+        } else {
+            customDateInput.style.display = 'none';
+            applyFiltersAndReload();
+        }
+    });
+    customDateInput?.addEventListener('change', applyFiltersAndReload);
     bookFilter?.addEventListener('change', applyFiltersAndReload);
 }
 
