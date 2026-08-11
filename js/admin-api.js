@@ -584,8 +584,59 @@ export async function fetchPurchases(params = {}) {
 }
 
 export async function fetchDownloads() {
-  await delay(120);
-  return { success: true, data: DOWNLOADS }; // Still using mock data for Downloads page
+    await delay(150);
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        // Fetch all download logs
+        const { data: logs, error } = await db
+            .from('download_logs')
+            .select('book_id, profile_id, downloaded_at')
+            .order('downloaded_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!logs || logs.length === 0) {
+            return { success: true, data: [] };
+        }
+
+        // Aggregate the data in JavaScript
+        const summary = logs.reduce((acc, log) => {
+            const bookId = log.book_id || 'Unknown';
+            if (!acc[bookId]) {
+                acc[bookId] = {
+                    book: bookId,
+                    downloads: 0,
+                    usersSet: new Set(),
+                    lastDownloaded: new Date(0)
+                };
+            }
+            acc[bookId].downloads++;
+            acc[bookId].usersSet.add(log.profile_id);
+            const downloadDate = new Date(log.downloaded_at);
+            if (downloadDate > acc[bookId].lastDownloaded) {
+                acc[bookId].lastDownloaded = downloadDate;
+            }
+            return acc;
+        }, {});
+
+        // Format the aggregated data for the UI
+        const formattedData = Object.values(summary).map(item => ({
+            book: item.book,
+            downloads: item.downloads,
+            users: item.usersSet.size,
+            lastDownloaded: item.lastDownloaded.toISOString() === new Date(0).toISOString() 
+                ? 'N/A' 
+                : item.lastDownloaded.toLocaleDateString('en-GB')
+        }));
+
+        return { success: true, data: formattedData };
+
+    } catch (error) {
+        console.error('Failed to fetch real download data:', error);
+        return { success: false, data: [], error: error.message };
+    }
 }
 
 export async function fetchUserDetails(userId) {
