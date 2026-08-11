@@ -122,23 +122,28 @@ export async function fetchShareEngineSummaryData() {
   }
 }
 
-export async function fetchTodaysCheckoutSummary() {
+export async function fetchCheckoutSummary(params = {}) {
   try {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
 
+    // Default to today if no params provided
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
+    const startDate = params.startDate || today;
+    const endDate = params.endDate || tomorrow;
+
     const { data, error } = await db
       .from('checkout_logs')
-      .select('status', { count: 'exact' })
-      .gte('created_at', today.toISOString())
-      .lt('created_at', tomorrow.toISOString());
+      .select('status') // FIX: Was using 'count' which returns a number, not the list of statuses.
+      .gte('created_at', startDate.toISOString())
+      .lt('created_at', endDate.toISOString());
 
     if (error) throw error;
+    // The data is now an array of objects like [{status: 'initiated'}, {status: 'success'}]
     return { success: true, data: data };
   } catch (error) {
     return { success: false, data: [], error: error.message };
@@ -171,7 +176,7 @@ export async function fetchDashboardData() {
       db.from('profiles').select('id, full_name, created_at, registration_source'),
       db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status'),
       db.from('books').select('id, title, name'),
-      fetchTodaysCheckoutSummary(),
+      fetchCheckoutSummary(), // MODIFIED: Call with no params to get today's data by default
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
       db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5)
     ]);
