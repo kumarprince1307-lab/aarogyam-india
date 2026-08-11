@@ -122,6 +122,34 @@ export async function fetchShareEngineSummaryData() {
   }
 }
 
+export async function fetchCheckoutSummary(params = {}) {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+
+    // Default to today if no params provided
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const startDate = params.startDate || today;
+    const endDate = params.endDate || tomorrow;
+
+    const { data, error } = await db
+      .from('checkout_logs')
+      .select('status') // FIX: Was using 'count' which returns a number, not the list of statuses.
+      .gte('created_at', startDate.toISOString())
+      .lt('created_at', endDate.toISOString());
+
+    if (error) throw error;
+    // The data is now an array of objects like [{status: 'initiated'}, {status: 'success'}]
+    return { success: true, data: data };
+  } catch (error) {
+    return { success: false, data: [], error: error.message };
+  }
+}
+
 export async function fetchDashboardData() {
   await delay(250); // Simulate network latency
   try {
@@ -138,6 +166,7 @@ export async function fetchDashboardData() {
       allProfilesRes,
       allPurchasesRes,
       booksRes,
+      todaysCheckoutRes,
       recentPurchasesRes,
       recentProfilesRes
     ] = await Promise.all([
@@ -147,6 +176,7 @@ export async function fetchDashboardData() {
       db.from('profiles').select('id, full_name, created_at, registration_source'),
       db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status'),
       db.from('books').select('id, title, name'),
+      fetchCheckoutSummary(), // MODIFIED: Call with no params to get today's data by default
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
       db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5)
     ]);
@@ -157,6 +187,18 @@ export async function fetchDashboardData() {
     const newCustomers = newCustomersRes.count || 0;
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
+    
+    const todaysCheckoutSummary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
+    if (todaysCheckoutRes.success) {
+        (todaysCheckoutRes.data || []).forEach(log => {
+            if (todaysCheckoutSummary.hasOwnProperty(log.status)) {
+                todaysCheckoutSummary[log.status]++;
+            }
+        });
+    }
+    todaysCheckoutSummary.follow_up = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed;
+    const totalAttempts = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed + todaysCheckoutSummary.success;
+    todaysCheckoutSummary.conversion_rate = totalAttempts > 0 ? ((todaysCheckoutSummary.success / totalAttempts) * 100).toFixed(1) + '%' : '0%';
 
     // Business KPIs
     const businessKpis = [
@@ -240,6 +282,7 @@ export async function fetchDashboardData() {
         leadSources,
         customerJourney,
         bookSales,
+        todaysCheckoutSummary,
         recentActivity: sortedActivity
       }
     };
@@ -261,6 +304,123 @@ export async function fetchTotalReport() {
   return { success: true, data: [], message: "Total Report not yet connected to live data." };
 }
  
+export async function fetchAllBooks() {
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+        const { data, error } = await db.from('books').select('id, name, title').order('name');
+        if (error) throw error;
+        return { success: true, data };
+    } catch (error) {
+        console.error('Failed to fetch all books:', error);
+        return { success: false, data: [], error: error.message };
+    }
+}
+
+export async function fetchCheckoutLogs(params = {}) {
+  await delay(150); // Simulate network latency, consistent with other functions
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+    
+    // This query assumes foreign key relationships are set up in Supabase:
+    // - checkout_logs.profile_id -> profiles.id
+    // - checkout_logs.book_id -> books.id
+    let queryBuilder = db
+      .from('checkout_logs')
+      .select(`
+        id,
+        created_at,
+        status,
+        book_id,
+        profile_id
+      `);
+    
+    // Date Filter
+    if (params.dateRange && params.dateRange !== 'all') {
+        const now = new Date();
+        let startDate;
+        if (params.dateRange === 'today') {
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+        } else if (params.dateRange === 'last7days') {
+            const pastDate = new Date();
+            pastDate.setDate(now.getDate() - 7);
+            startDate = pastDate.toISOString();
+        }
+        if (startDate) {
+            queryBuilder = queryBuilder.gte('created_at', startDate);
+        }
+    }
+
+    // Status Filter
+    if (params.status && params.status !== 'all') {
+        if (params.status === 'followup') {
+            queryBuilder = queryBuilder.in('status', ['initiated', 'dropped', 'failed']);
+        } else {
+            queryBuilder = queryBuilder.eq('status', params.status);
+        }
+    }
+
+    // Book Filter
+    if (params.bookId && params.bookId !== 'all') {
+        queryBuilder = queryBuilder.eq('book_id', params.bookId);
+    }
+
+    queryBuilder = queryBuilder.order('created_at', { ascending: false }).limit(200); // Fetch more for client-side search
+
+    const { data: logs, error: logsError } = await queryBuilder;
+    if (logsError) throw logsError;
+    if (!logs || logs.length === 0) return { success: true, data: [] };
+
+    // 2. Collect unique IDs to fetch related data without joins
+    const profileIds = [...new Set(logs.map(log => log.profile_id).filter(id => id))];
+    const bookIds = [...new Set(logs.map(log => log.book_id).filter(id => id))];
+
+    // 3. Fetch related profiles and books in parallel
+    const [profilesRes, booksRes] = await Promise.all([
+        profileIds.length > 0 ? db.from('profiles').select('id, full_name, mobile').in('id', profileIds) : Promise.resolve({ data: [] }),
+        bookIds.length > 0 ? db.from('books').select('id, name, title').in('id', bookIds) : Promise.resolve({ data: [] })
+    ]);
+
+    if (profilesRes.error) console.error('Error fetching profiles for checkout logs:', profilesRes.error);
+    if (booksRes.error) console.error('Error fetching books for checkout logs:', booksRes.error);
+
+    // 4. Create lookup maps for efficient data merging
+    const profilesMap = (profilesRes.data || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+    const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
+
+    // 5. Map logs and enrich with profile/book data
+    let mappedData = logs.map(log => {
+      const profile = profilesMap[log.profile_id] || {};
+      const book = booksMap[log.book_id] || {};
+      return {
+      id: log.id,
+      created_at: log.created_at,
+      status: log.status,
+      book_id: log.book_id,
+      profile_id: log.profile_id,
+      customer_name: profile.full_name || 'N/A',
+      customer_mobile: profile.mobile || 'N/A',
+      book_name: book.name || book.title || 'Unknown Book'
+      };
+    });
+
+    // 6. Apply search filter on the client side after data is merged
+    if (params.search) {
+        const searchTerm = params.search.toLowerCase();
+        mappedData = mappedData.filter(log => 
+            log.customer_name.toLowerCase().includes(searchTerm) ||
+            log.customer_mobile.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    return { success: true, data: mappedData.slice(0, 100) }; // Return final page size
+  } catch (error) {
+    console.error('Failed to fetch checkout logs:', error);
+    return { success: false, data: [], error: error.message };
+  }
+}
+
 export async function fetchShareReport() {
   await delay(180);
   try {

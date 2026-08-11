@@ -9,13 +9,15 @@ const ROUTES = {
  'dashboard': () => import('./admin-pages-dashboard.js').then(m => m.initDashboard()),
  'users': () => import('./admin-pages-users.js').then(m => m.initUsers()),
  'purchases': () => import('./admin-pages-purchases.js').then(m => m.initPurchases()),
+ 'checkout-funnel': () => import('./admin-pages-checkout-funnel.js').then(m => m.initCheckoutFunnel()),
  'downloads': () => import('./admin-pages-downloads.js').then(m => m.initDownloads()),
  'reports': () => import('./admin-pages-reports.js').then(m => m.initReports()),
  'settings': () => import('./admin-pages-settings.js').then(m => m.initSettings()).catch(() => { /* settings may be placeholder */ })
 };
 
 export async function navigateTo(routeName) {
- const name = (routeName || '').replace('#','') || 'dashboard';
+ // Fix: Split route from query params to handle URLs like #checkout-funnel?status=dropped
+ const name = (routeName || '').replace('#','').split('?')[0] || 'dashboard';
  const adminSession = localStorage.getItem('admin_session');
  if (!adminSession) {
    window.location.href = 'admin/login.html';
@@ -53,12 +55,12 @@ export async function navigateTo(routeName) {
 
 export function initRouter() {
  // load initial route from hash
- const initial = location.hash.replace('#','') || 'dashboard';
+ const initial = location.hash.replace('#','').split('?')[0] || 'dashboard';
  navigateTo(initial);
 
  // handle back/forward
  window.addEventListener('popstate', () => {
-   const route = location.hash.replace('#','') || 'dashboard';
+   const route = location.hash.replace('#','').split('?')[0] || 'dashboard';
    navigateTo(route);
  });
 

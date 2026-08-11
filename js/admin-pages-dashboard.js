@@ -1,7 +1,8 @@
 /* Admin Dashboard Page */
 
-import { initAdminLayout } from './admin-main.js'; // Already exists
-import { fetchDashboardData } from './admin-api.js'; // Already exists
+import { navigateTo } from './admin-router.js';
+import { initAdminLayout } from './admin-main.js';
+import { fetchDashboardData, fetchCheckoutSummary } from './admin-api.js';
 
 function renderKpiGroup(kpis) {
   return `<div class="kpi-row">
@@ -79,6 +80,35 @@ function renderQuickActions() {
   </div>`;
 }
 
+function renderCheckoutFunnelWidget(summary) {
+  if (!summary) return '';
+  return `
+    <div class="admin-section" id="checkout-funnel-summary">
+        <div class="admin-section-header">
+          <div class="admin-section-title">Checkout Funnel</div>
+          <div class="admin-controls">
+            <label for="checkout-date-filter" class="admin-label">📅 Date:</label>
+            <select id="checkout-date-filter" class="admin-select">
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="last7days">Last 7 Days</option>
+              <option value="thismonth">This Month</option>
+              <option value="custom">Custom Date</option>
+            </select>
+            <input type="date" id="checkout-custom-date" class="admin-input" style="display: none;">
+          </div>
+        </div>
+        <div class="kpi-row" id="checkout-kpi-row">
+            <div class="kpi-card clickable" data-status="followup"> <div class="kpi-label">🔥 Follow-up Required</div> <div class="kpi-value">${summary.follow_up || 0}</div> </div>
+            <div class="kpi-card clickable" data-status="initiated"> <div class="kpi-label">🟠 Initiated</div> <div class="kpi-value">${summary.initiated || 0}</div> </div>
+            <div class="kpi-card clickable" data-status="dropped"> <div class="kpi-label">🔴 Dropped</div> <div class="kpi-value">${summary.dropped || 0}</div> </div>
+            <div class="kpi-card clickable" data-status="failed"> <div class="kpi-label">❌ Failed</div> <div class="kpi-value">${summary.failed || 0}</div> </div>
+            <div class="kpi-card clickable" data-status="success"> <div class="kpi-label">🟢 Success</div> <div class="kpi-value">${summary.success || 0}</div> </div>
+            <div class="kpi-card"> <div class="kpi-label">📈 Conversion</div> <div class="kpi-value">${summary.conversion_rate || '0%'}</div> </div>
+        </div>
+    </div>`;
+}
+
 export async function initDashboard() {
   initAdminLayout('Dashboard', 'Business, lead and share metrics in one place.');
 
@@ -94,7 +124,7 @@ export async function initDashboard() {
       return;
     }
 
-    const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity } = result.data;
+    const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity, todaysCheckoutSummary } = result.data;
     
     // Use live data for Share KPIs, with fallbacks
     const shareKpis = [ // This is a local const, not a duplicate declaration
@@ -117,6 +147,7 @@ export async function initDashboard() {
         <div class="admin-section-title">Business Summary</div>
         ${renderKpiGroup(businessKpis)}
       </div>
+      ${renderCheckoutFunnelWidget(todaysCheckoutSummary)}
       <div class="admin-section" id="lead-sources">
         <div class="admin-section-title">Lead Sources</div>
         ${renderLeadSources(leadSources)}
@@ -136,6 +167,85 @@ export async function initDashboard() {
         <div class="admin-col">${renderTopBooks(bookSales)}${renderActivity(recentActivity)}</div>
       </div>
     `;
+
+    // Add event listeners for the checkout widget
+    const checkoutCards = document.querySelectorAll('#checkout-funnel-summary .kpi-card.clickable');
+    checkoutCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const status = card.dataset.status;
+            window.location.hash = `checkout-funnel?status=${status}`;
+        });
+    });
+
+    const dateFilter = document.getElementById('checkout-date-filter');
+    const customDateInput = document.getElementById('checkout-custom-date');
+
+    const handleFilterChange = async () => {
+      const filterValue = dateFilter.value;
+      let startDate, endDate;
+      const now = new Date();
+
+      customDateInput.style.display = 'none';
+
+      switch (filterValue) {
+        case 'yesterday':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        case 'last7days':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+          break;
+        case 'thismonth':
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+          break;
+        case 'custom':
+          customDateInput.style.display = 'inline-block';
+          if (customDateInput.value) {
+            const selectedDate = new Date(customDateInput.value);
+            startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+            endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1);
+          } else {
+            return; // Don't fetch until a date is chosen
+          }
+          break;
+        case 'today':
+        default:
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+          break;
+      }
+      
+      const widget = document.getElementById('checkout-funnel-summary');
+      const kpiRow = widget.querySelector('#checkout-kpi-row');
+      kpiRow.style.opacity = '0.5';
+
+      const result = await fetchCheckoutSummary({ startDate, endDate });
+      
+      kpiRow.style.opacity = '1';
+
+      if (result.success) {
+        const summary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
+        (result.data || []).forEach(log => {
+            if (summary.hasOwnProperty(log.status)) summary[log.status]++;
+        });
+        summary.follow_up = summary.initiated + summary.dropped + summary.failed;
+        const totalAttempts = summary.initiated + summary.dropped + summary.failed + summary.success;
+        summary.conversion_rate = totalAttempts > 0 ? ((summary.success / totalAttempts) * 100).toFixed(1) + '%' : '0%';
+
+        widget.querySelector('[data-status="followup"] .kpi-value').textContent = summary.follow_up;
+        widget.querySelector('[data-status="initiated"] .kpi-value').textContent = summary.initiated;
+        widget.querySelector('[data-status="dropped"] .kpi-value').textContent = summary.dropped;
+        widget.querySelector('[data-status="failed"] .kpi-value').textContent = summary.failed;
+        widget.querySelector('[data-status="success"] .kpi-value').textContent = summary.success;
+        widget.querySelector('.kpi-card:not(.clickable) .kpi-value').textContent = summary.conversion_rate;
+      }
+    };
+
+    dateFilter.addEventListener('change', handleFilterChange);
+    customDateInput.addEventListener('change', handleFilterChange);
+
   } catch (err) {
     console.error('admin-pages-dashboard init error', err);
     content.innerHTML = '<div class="admin-error"><strong>Unable to load dashboard.</strong><br>Something went wrong.</div>';
