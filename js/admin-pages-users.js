@@ -18,7 +18,8 @@ function renderUserRow(user) {
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
+      <td>${user.totalPurchases || 0}</td>
+      <td>₹${(user.totalSpent || 0).toLocaleString('en-IN')}</td>
       <td><span class="admin-pill ${user.status.toLowerCase()}">${user.status}</span></td>
       <td><a href="user-details.html?id=${user.id}" class="admin-button">View</a></td>
     </tr>
@@ -45,6 +46,7 @@ function renderUsersTable(users) {
             <th>Total Shares</th>
             <th>Total Leads</th>
             <th>Total Purchases</th>
+            <th>Total Spent</th>
             <th>Status</th>
             <th>Action</th>
           </tr>

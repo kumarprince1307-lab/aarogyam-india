@@ -472,7 +472,8 @@ export async function fetchUsers(params = {}) {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
 
-    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active');
+    // Step 1: Fetch all profiles with filtering
+    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at');
 
     if (params.status && params.status !== 'all') {
       queryBuilder = queryBuilder.eq('is_active', params.status === 'active');
@@ -485,18 +486,45 @@ export async function fetchUsers(params = {}) {
     
     queryBuilder = queryBuilder.order('created_at', { ascending: false });
 
-    const { data, error } = await queryBuilder;
+    const { data: profiles, error: profilesError } = await queryBuilder;
+    if (profilesError) throw profilesError;
 
-    if (error) throw error;
+    // Step 2: Fetch all purchases to aggregate data
+    const { data: allPurchases, error: purchasesError } = await db
+        .from('purchases')
+        .select('profile_id, amount');
 
-    const mappedData = data.map(user => ({
+    if (purchasesError) {
+        console.error('Error fetching purchases for user aggregation:', purchasesError.message);
+    }
+
+    // Step 3: Aggregate purchase data into a map for quick lookup
+    const purchaseSummary = (allPurchases || []).reduce((acc, purchase) => {
+        const profileId = purchase.profile_id;
+        if (!profileId) return acc;
+
+        if (!acc[profileId]) {
+            acc[profileId] = { totalPurchases: 0, totalSpent: 0 };
+        }
+        acc[profileId].totalPurchases += 1;
+        acc[profileId].totalSpent += purchase.amount || 0;
+        return acc;
+    }, {});
+
+    // Step 4: Map profiles and merge with purchase summary
+    const mappedData = profiles.map(user => {
+        const summary = purchaseSummary[user.id] || { totalPurchases: 0, totalSpent: 0 };
+        return {
         id: user.id,
         name: user.full_name,
         mobile: user.mobile,
         email: user.email,
         source: user.registration_source,
         status: user.is_active ? 'active' : 'inactive',
-    }));
+        totalPurchases: summary.totalPurchases,
+        totalSpent: summary.totalSpent
+        };
+    });
 
     return { success: true, data: mappedData };
 
