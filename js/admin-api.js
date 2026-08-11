@@ -94,7 +94,7 @@ export async function fetchShareEngineSummaryData() {
     const { data: purchases, error: purchasesError } = await db
       .from('purchases')
       .select('amount')
-      .eq('payment_status', 'success'); // Only count successful purchases
+      ; // All records in 'purchases' are successful, so no status filter is needed.
     if(purchasesError) console.error('Error fetching purchases:', purchasesError.message);
     
     const totalPurchases = purchases ? purchases.length : 0;
@@ -141,10 +141,10 @@ export async function fetchDashboardData() {
       recentProfilesRes
     ] = await Promise.all([
       fetchShareEngineSummaryData(), // Reuse the existing summary function
-      db.from('purchases').select('amount').gte('purchase_date', thirtyDaysAgo).eq('payment_status', 'success'),
+      db.from('purchases').select('amount').gte('purchase_date', thirtyDaysAgo),
       db.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', thirtyDaysAgo),
       db.from('profiles').select('id, full_name, created_at, registration_source'),
-      db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status').eq('payment_status', 'success'),
+      db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status'),
       db.from('books').select('id, title, name'),
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
       db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5)
