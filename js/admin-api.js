@@ -308,11 +308,23 @@ export async function fetchAllBooks() {
     try {
         const db = window.dbClient;
         if (!db) throw new Error("Supabase client not available.");
-        const { data, error } = await db.from('books').select('id, name, title').order('name');
+        // The 'books' table is empty. Fetch distinct book_ids from checkout_logs instead.
+        const { data, error } = await db.from('checkout_logs').select('book_id');
         if (error) throw error;
-        return { success: true, data };
+
+        // Get unique, non-empty book_ids
+        const distinctBookIds = [...new Set(data.map(log => log.book_id).filter(id => id))];
+        
+        // Format them for the filter dropdown which expects {id, name, title}
+        const bookOptions = distinctBookIds.map(id => ({
+            id: id,
+            name: id, // Use the ID itself as the name
+            title: id
+        }));
+
+        return { success: true, data: bookOptions };
     } catch (error) {
-        console.error('Failed to fetch all books:', error);
+        console.error('Failed to fetch distinct book IDs for filter:', error);
         return { success: false, data: [], error: error.message };
     }
 }
@@ -364,25 +376,20 @@ export async function fetchCheckoutLogs(params = {}) {
 
     // 2. Collect unique IDs to fetch related data without joins
     const profileIds = [...new Set(logs.map(log => log.profile_id).filter(id => id))];
-    const bookIds = [...new Set(logs.map(log => log.book_id).filter(id => id))];
 
     // 3. Fetch related profiles and books in parallel
-    const [profilesRes, booksRes] = await Promise.all([
+    const [profilesRes] = await Promise.all([
         profileIds.length > 0 ? db.from('profiles').select('id, full_name, mobile').in('id', profileIds) : Promise.resolve({ data: [] }),
-        bookIds.length > 0 ? db.from('books').select('id, name, title').in('id', bookIds) : Promise.resolve({ data: [] })
     ]);
 
     if (profilesRes.error) console.error('Error fetching profiles for checkout logs:', profilesRes.error);
-    if (booksRes.error) console.error('Error fetching books for checkout logs:', booksRes.error);
 
     // 4. Create lookup maps for efficient data merging
     const profilesMap = (profilesRes.data || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
-    const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
 
     // 5. Map logs and enrich with profile/book data
     let mappedData = logs.map(log => {
       const profile = profilesMap[log.profile_id] || {};
-      const book = booksMap[log.book_id] || {};
       return {
       id: log.id,
       created_at: log.created_at,
@@ -391,7 +398,7 @@ export async function fetchCheckoutLogs(params = {}) {
       profile_id: log.profile_id,
       customer_name: profile.full_name || 'N/A',
       customer_mobile: profile.mobile || 'N/A',
-      book_name: book.name || book.title || 'Unknown Book'
+      book_name: log.book_id || 'Unknown Book'
       };
     });
 
