@@ -37,7 +37,7 @@ class UniversalShareEngine {
     handleShareClick(event) {
         const button = event.currentTarget;
         
-        // --- RAPID CLICK PREVENTION ---
+        // --- RAPID CLICK & GLOBAL SHARING PREVENTION ---
         if (button.dataset.isProcessing === 'true' || UniversalShareEngine.isSharing) {
             console.log('Share action already in progress. Ignoring rapid click.');
             return;
@@ -45,8 +45,8 @@ class UniversalShareEngine {
         button.dataset.isProcessing = 'true';
         setTimeout(() => {
             button.dataset.isProcessing = 'false';
-        }, 1200); // 1.2 सेकंड का कूलडाउन
-        // ------------------------------
+        }, 1500); // 1.5 सेकंड का कूलडाउन
+        // ---------------------------------------------
 
         const target = button.dataset.shareTarget; // e.g., 'native', 'whatsapp', 'facebook', 'copy'
         
@@ -159,7 +159,10 @@ class UniversalShareEngine {
             console.log('Error sharing', error);
         })
         .finally(() => {
-            UniversalShareEngine.isSharing = false;
+            // थोड़ा डिले ताकि नेटिव प्रॉम्प्ट बंद होने तक स्टेट सुरक्षित रहे
+            setTimeout(() => {
+                UniversalShareEngine.isSharing = false;
+            }, 1000);
         });
     }
 
