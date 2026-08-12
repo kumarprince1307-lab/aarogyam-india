@@ -102,13 +102,13 @@ class UniversalShareEngine {
 
         switch (target) {
             case 'native':
-                this.nativeShare(pageTitle, shareText, shareUrl);
+                this.nativeShare(pageTitle, shareText, shareUrl, button);
                 break;
             case 'whatsapp':
-                this.whatsAppShare(shareText, shareUrl);
+                this.whatsAppShare(shareText, shareUrl, button);
                 break;
             case 'facebook':
-                this.facebookShare(shareUrl);
+                this.facebookShare(shareUrl, button);
                 break;
             case 'copy':
                 this.copyToClipboard(shareUrl, button);
@@ -164,7 +164,7 @@ class UniversalShareEngine {
     }
 
     // Use the Web Share API for a native mobile sharing experience (Updated with strict error & state lock)
-    nativeShare(title, text, url) {
+    nativeShare(title, text, url, button) {
         if (!navigator.share) {
             console.log('Web Share API not supported, falling back or doing nothing.');
             return;
@@ -183,6 +183,7 @@ class UniversalShareEngine {
         })
         .then(() => {
             console.log('Successful native share');
+            this._showConfirmation(button, 'Shared!');
         })
         .catch((error) => {
             if (error.name !== 'AbortError') {
@@ -197,28 +198,36 @@ class UniversalShareEngine {
     }
 
     // Open WhatsApp share link
-    whatsAppShare(text, url) {
+    whatsAppShare(text, url, button) {
         const message = encodeURIComponent(`${text} ${url}`);
         window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+        this._showConfirmation(button, 'Shared!');
     }
 
     // Open Facebook share link
-    facebookShare(url) {
+    facebookShare(url, button) {
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        this._showConfirmation(button, 'Shared!');
     }
 
     // Copy the link to the clipboard
     copyToClipboard(url, button) {
         navigator.clipboard.writeText(url).then(() => {
-            const originalText = button.innerHTML;
-            button.innerHTML = 'Copied!';
-            button.disabled = true;
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }, 2000);
+            this._showConfirmation(button, 'Copied!');
         }).catch(err => {
             console.error('Failed to copy: ', err);
         });
+    }
+
+    // Private helper to show a temporary confirmation message on a button
+    _showConfirmation(button, message = 'Shared!', duration = 2000) {
+        if (!button) return;
+        const originalText = button.innerHTML;
+        button.innerHTML = message;
+        button.disabled = true;
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, duration);
     }
 }
