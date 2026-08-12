@@ -1973,8 +1973,8 @@
 
 
 <!-- =====================================
-                    js
-====================================== --
+                    JS
+====================================== -->
 <!-- 1. सबसे पहले Supabase की लाइब्रेरी लोड होनी चाहिए -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
@@ -1987,19 +1987,17 @@
 <!-- Common JS -->
 <script src="../js/ebook.js"></script>
 
-<!-- Share Engine -->
+<!-- Share Engine (यह खुद ब खुद अपने आप को इनिशियलाइज कर लेगा) -->
 <script src="../js/share-engine-core.js"></script>
 
 <!-- book-landing JS -->
 <script src="../js/book-landing.js"></script>
 
-<!-- Initialize Share Engine -->
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const shareEngine = new UniversalShareEngine();
-        shareEngine.init();
-    });
-</script>
+<!-- 
+  नोट: यहाँ से फालतू <script> ब्लॉक पूरी तरह हटा दिया गया है, 
+  क्योंकि UniversalShareEngine और book-landing.js अपनी-अपनी 
+  फाइलों के अंदर खुद ही DOMContentLoaded को संभाल रहे हैं।
+-->
 
 </body>
 </html>
