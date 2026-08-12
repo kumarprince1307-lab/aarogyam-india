@@ -12,9 +12,8 @@ class UniversalShareEngine {
         this.handleIncomingAttribution();
     }
 
-   // Initialize the engine using Event Delegation (Runs only once globally)
+    // Initialize the engine using Event Delegation (Runs only once globally)
     init() {
-        // अगर पहले से ग्लोबल डेलिगेशन लग चुका है, तो दोबारा न लगाएं
         if (window.universalShareDelegated === true) {
             return;
         }
@@ -25,7 +24,7 @@ class UniversalShareEngine {
             const button = event.target.closest('[data-share-button="true"]');
             if (!button) return;
 
-            // सीधे हैंडलर को कॉल करें
+            // सही बटन और इवेंट को हैंडलर में पास करें
             this.handleShareClick(event, button);
         });
     }
@@ -43,8 +42,12 @@ class UniversalShareEngine {
     }
 
     // Main handler for all share button clicks
-    handleShareClick(event) {
-        // --- सुरक्षा: किसी भी अन्य छुपे हुए लिसनर या डुप्लीकेट ट्रिगर को रोकें ---
+    handleShareClick(event, directButton = null) {
+        // --- सुरक्षा: सही बटन का रेफेरेंस प्राप्त करें ---
+        const button = directButton || event.currentTarget || event.target.closest('[data-share-button="true"]');
+        if (!button) return;
+
+        // --- किसी भी अन्य छुपे हुए लिसनर या डुप्लीकेट ट्रिगर को रोकें ---
         if (event) {
             if (typeof event.stopImmediatePropagation === 'function') {
                 event.stopImmediatePropagation();
@@ -53,9 +56,8 @@ class UniversalShareEngine {
                 event.preventDefault();
             }
         }
-
+        
         // --- RAPID CLICK & GLOBAL SHARING PREVENTION ---
-        // The button element is now correctly passed from the delegated event listener, fixing the concurrency bug.
         if (button.dataset.isProcessing === 'true' || UniversalShareEngine.isSharing) {
             console.log('Share action already in progress. Ignoring rapid click.');
             return;
