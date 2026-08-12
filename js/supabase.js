@@ -589,7 +589,7 @@ console.log("✅ Checkout Module Loaded");
    ENGINE 7: RAZORPAY PAYMENT GATEWAY (100% Bulletproof Logs)
 =========================================================== */
 const PAYMENT = { STATUS_PENDING: "pending", STATUS_SUCCESS: "success", STATUS_FAILED: "failed" };
-const RAZORPAY = { KEY_ID: "rzp_test_TGobxnVbAWYkz7" };
+const RAZORPAY = { KEY_ID: "rzp_live_TOlsqOqkmxYCWP" };
 let currentPayment = null;
 
 async function sendDirectCheckoutLog(statusValue) {

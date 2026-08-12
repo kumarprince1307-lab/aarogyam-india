@@ -504,7 +504,7 @@ export async function fetchUsers(params = {}) {
     if (!db) throw new Error("Supabase client not available.");
 
     // Step 1: Fetch all profiles with filtering
-    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at, referral_code, referred_by');
+    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at, share_id, referred_by');
 
     if (params.status && params.status !== 'all') {
       queryBuilder = queryBuilder.eq('is_active', params.status === 'active');
@@ -519,40 +519,63 @@ export async function fetchUsers(params = {}) {
 
     const { data: profiles, error: profilesError } = await queryBuilder;
     if (profilesError) throw profilesError;
+    if (!profiles) return { success: true, data: [] };
 
-    // Step 1.5: Create a map of who referred whom for direct referral count
-    const referralCounts = (profiles || []).reduce((acc, profile) => {
+    const profileIds = profiles.map(p => p.id).filter(Boolean);
+    const shareIds = profiles.map(p => p.share_id).filter(Boolean);
+
+    // Step 2: Fetch all necessary aggregated data in parallel
+    const [purchasesRes, shareLogsRes] = await Promise.all([
+        db.from('purchases').select('profile_id, amount').eq('payment_status', 'success'),
+        db.from('share_logs').select('share_token, event_type').in('share_token', shareIds)
+    ]);
+
+    if (purchasesRes.error) console.error('Error fetching purchases for user aggregation:', purchasesRes.error.message);
+    if (shareLogsRes.error) console.error('Error fetching share logs for user aggregation:', shareLogsRes.error.message);
+
+    // Data is already filtered for success by the query.
+    const allPurchases = purchasesRes.data || [];
+    const allShareLogs = shareLogsRes.data || [];
+
+    // Step 3: Create lookup maps from the fetched data
+    const directReferralMap = profiles.reduce((acc, profile) => {
         if (profile.referred_by) {
-            acc[profile.referred_by] = (acc[profile.referred_by] || 0) + 1;
+            if (!acc[profile.referred_by]) acc[profile.referred_by] = [];
+            acc[profile.referred_by].push(profile.id);
         }
         return acc;
     }, {});
+    const directReferralCounts = Object.fromEntries(Object.entries(directReferralMap).map(([key, value]) => [key, value.length]));
 
-    // Step 2: Fetch all purchases to aggregate data
-    const { data: allPurchases, error: purchasesError } = await db
-        .from('purchases')
-        .select('profile_id, amount');
-
-    if (purchasesError) {
-        console.error('Error fetching purchases for user aggregation:', purchasesError.message);
-    }
-
-    // Step 3: Aggregate purchase data into a map for quick lookup
     const purchaseSummary = (allPurchases || []).reduce((acc, purchase) => {
         const profileId = purchase.profile_id;
         if (!profileId) return acc;
-
-        if (!acc[profileId]) {
-            acc[profileId] = { totalPurchases: 0, totalSpent: 0 };
-        }
+        if (!acc[profileId]) acc[profileId] = { totalPurchases: 0, totalSpent: 0 };
         acc[profileId].totalPurchases += 1;
         acc[profileId].totalSpent += purchase.amount || 0;
         return acc;
     }, {});
 
+    const shareStatsMap = allShareLogs.reduce((acc, log) => {
+        const shareToken = log.share_token;
+        if (!shareToken) return acc;
+        if (!acc[shareToken]) acc[shareToken] = { shares: 0, clicks: 0, visitors: 0 };
+        if (log.event_type === 'share') acc[shareToken].shares++;
+        if (log.event_type === 'click') acc[shareToken].clicks++;
+        if (log.event_type === 'visit') acc[shareToken].visitors++;
+        return acc;
+    }, {});
+
+    const purchasingUserIds = new Set(allPurchases.map(p => p.profile_id));
+    const directPurchaseCounts = {};
+    for (const referrerId in directReferralMap) {
+        directPurchaseCounts[referrerId] = directReferralMap[referrerId].filter(id => purchasingUserIds.has(id)).length;
+    }
+
     // Step 4: Map profiles and merge with purchase summary
     const mappedData = profiles.map(user => {
-        const summary = purchaseSummary[user.id] || { totalPurchases: 0, totalSpent: 0 };
+        const ownPurchases = purchaseSummary[user.id] || { totalPurchases: 0, totalSpent: 0 };
+        const shareStats = shareStatsMap[user.share_id] || { shares: 0, clicks: 0, visitors: 0 };
         return {
         id: user.id,
         name: user.full_name,
@@ -560,10 +583,14 @@ export async function fetchUsers(params = {}) {
         email: user.email,
         source: user.registration_source,
         status: user.is_active ? 'active' : 'inactive',
-        shareId: user.referral_code,
-        directReferrals: referralCounts[user.id] || 0,
-        totalPurchases: summary.totalPurchases,
-        totalSpent: summary.totalSpent
+        shareId: user.share_id,
+        directReferrals: directReferralCounts[user.id] || 0,
+        totalShares: shareStats.shares,
+        totalClicks: shareStats.clicks,
+        totalVisitors: shareStats.visitors,
+        totalDirectPurchases: directPurchaseCounts[user.id] || 0,
+        totalPurchases: ownPurchases.totalPurchases,
+        totalSpent: ownPurchases.totalSpent
         };
     });
 

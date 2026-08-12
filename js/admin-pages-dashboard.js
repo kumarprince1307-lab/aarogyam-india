@@ -93,7 +93,7 @@ function renderBirthdaysWidget(birthdays) {
                     if (whatsappNumber.length === 10) {
                         whatsappNumber = '91' + whatsappNumber;
                     }
-                    const message = `नमस्कार ${user.full_name} जी 🙏\n\n🎂 आपको जन्मदिन की हार्दिक शुभकामनाएँ!\n\nAarogyam India की ओर से आपके सुखी, स्वस्थ और सफल जीवन की मंगलकामनाएँ। 🌿\n\nमैं Aarogyam India का AI सहायक हूँ।\nकैसे हैं आप? क्या मैं आपकी कोई मदद कर सकता हूँ?\n\n— Aarogyam India`;
+                    const message = `नमस्कार ${user.full_name} जी 🙏\nआपको जन्मदिन की हार्दिक शुभकामनाएँ 🎂🎉\nमैं Aarogyam India का AI सहायक हूँ।\nआपकी क्या मदद कर सकता हूँ?`;
                     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
                     return `

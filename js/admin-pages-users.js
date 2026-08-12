@@ -4,23 +4,45 @@ import { initAdminLayout } from './admin-main.js';
 import { fetchUsers } from './admin-api.js';
 
 function renderUserRow(user) {
+  const sanitizedMobile = String(user.mobile || '').replace(/\D/g, '');
+  const mobileLink = sanitizedMobile ? `<a href="tel:${sanitizedMobile}" class="admin-subtle-link">${user.mobile}</a>` : (user.mobile || 'N/A');
+
+  let whatsappButtonHTML = '';
+  if (sanitizedMobile) {
+      let whatsappNumber = sanitizedMobile;
+      if (whatsappNumber.length === 10) {
+          whatsappNumber = '91' + whatsappNumber;
+      }
+      const customerName = user.name || 'Customer';
+      const message = `नमस्ते ${customerName} जी, मैं आरोग्यम इंडिया से बात कर रहा हूँ।`;
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button icon-button" title="WhatsApp">💬</a>`;
+  }
+
   return `
     <tr>
       <td>
         <div class="admin-user-name">${user.name}</div>
         <div class="admin-user-email">${user.email}</div>
       </td>
-      <td>${user.mobile}</td>
-      <td>${user.source}</td>
+      <td>${mobileLink}</td>
+      <td>${user.source || 'N/A'}</td>
       <td><a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-subtle-link">${user.shareId || 'N/A'}</a></td>
-      <td>N/A</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>${user.directReferrals || 0}</td>
+      <td>${user.totalShares || 0}</td>
+      <td>${user.totalClicks || 0}</td>
+      <td>${user.totalVisitors || 0}</td>
+      <td>${user.totalDirectPurchases || 0}</td>
       <td>${user.totalPurchases || 0}</td>
       <td>₹${(user.totalSpent || 0).toLocaleString('en-IN')}</td>
       <td><span class="admin-pill ${user.status.toLowerCase()}">${user.status}</span></td>
-      <td><a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-button">View</a></td>
+      <td>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-button small-button">View</a>
+            ${whatsappButtonHTML}
+        </div>
+      </td>
     </tr>
   `;
 }
@@ -39,10 +61,11 @@ function renderUsersTable(users) {
             <th>Mobile</th>
             <th>Reg. Source</th>
             <th>Share ID</th>
-            <th>Lead Owner</th>
             <th>Direct Referrals</th>
             <th>Total Shares</th>
-            <th>Total Leads</th>
+            <th>Total Clicks</th>
+            <th>Total Visitors</th>
+            <th>Total Direct Purchases</th>
             <th>Total Purchases</th>
             <th>Total Spent</th>
             <th>Status</th>
