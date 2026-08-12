@@ -3,6 +3,12 @@ class UniversalShareEngine {
     static isSharing = false;
     
     constructor() {
+        // --- सुरक्षा: इंजन को जीवन में सिर्फ एक ही बार बनने दें ---
+        if (window.activeShareEngine) {
+            return window.activeShareEngine;
+        }
+        window.activeShareEngine = this;
+
         // Get the share_id upon initialization.
         this.share_id = this.getShareId();
         // Make this instance globally accessible to be used by other scripts.
@@ -10,6 +16,9 @@ class UniversalShareEngine {
 
         // Automatically handle incoming click/visit tracking on page load
         this.handleIncomingAttribution();
+
+        // ऑटोमैटिकली init चलाएं ताकि अलग से कॉल करने की जरूरत न पड़े
+        this.init();
     }
 
     // Initialize the engine using Event Delegation (Runs only once globally)
@@ -154,7 +163,7 @@ class UniversalShareEngine {
         return url.toString();
     }
 
-    // Use the Web Share API for a native mobile sharing experience
+    // Use the Web Share API for a native mobile sharing experience (Updated with strict error & state lock)
     nativeShare(title, text, url) {
         if (!navigator.share) {
             console.log('Web Share API not supported, falling back or doing nothing.');
@@ -176,12 +185,14 @@ class UniversalShareEngine {
             console.log('Successful native share');
         })
         .catch((error) => {
-            console.log('Error sharing', error);
+            if (error.name !== 'AbortError') {
+                console.log('Error sharing', error);
+            }
         })
         .finally(() => {
             setTimeout(() => {
                 UniversalShareEngine.isSharing = false;
-            }, 1000);
+            }, 1500);
         });
     }
 
