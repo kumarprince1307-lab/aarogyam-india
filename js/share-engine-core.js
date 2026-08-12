@@ -12,17 +12,21 @@ class UniversalShareEngine {
         this.handleIncomingAttribution();
     }
 
-    // Initialize the engine, find and prepare all share buttons on the page
+   // Initialize the engine using Event Delegation (Runs only once globally)
     init() {
-        const shareButtons = document.querySelectorAll('[data-share-button="true"]');
-        shareButtons.forEach(button => {
-            // Check if listener is already attached to prevent duplicate binding
-            if (button.dataset.shareBound === 'true') {
-                return;
-            }
-            button.dataset.shareBound = 'true';
+        // अगर पहले से ग्लोबल डेलिगेशन लग चुका है, तो दोबारा न लगाएं
+        if (window.universalShareDelegated === true) {
+            return;
+        }
+        window.universalShareDelegated = true;
 
-            button.addEventListener('click', (event) => this.handleShareClick(event));
+        // पूरे डॉक्यूमेंट पर सिर्फ एक बार क्लिक लिसनर लगेगा
+        document.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-share-button="true"]');
+            if (!button) return;
+
+            // सीधे हैंडलर को कॉल करें
+            this.handleShareClick(event, button);
         });
     }
 
@@ -40,6 +44,16 @@ class UniversalShareEngine {
 
     // Main handler for all share button clicks
     handleShareClick(event) {
+        // --- सुरक्षा: किसी भी अन्य छुपे हुए लिसनर या डुप्लीकेट ट्रिगर को रोकें ---
+        if (event) {
+            if (typeof event.stopImmediatePropagation === 'function') {
+                event.stopImmediatePropagation();
+            }
+            if (typeof event.preventDefault === 'function') {
+                event.preventDefault();
+            }
+        }
+
         const button = event.currentTarget;
         
         // --- RAPID CLICK & GLOBAL SHARING PREVENTION ---
