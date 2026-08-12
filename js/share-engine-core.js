@@ -54,9 +54,8 @@ class UniversalShareEngine {
             }
         }
 
-        const button = event.currentTarget;
-        
         // --- RAPID CLICK & GLOBAL SHARING PREVENTION ---
+        // The button element is now correctly passed from the delegated event listener, fixing the concurrency bug.
         if (button.dataset.isProcessing === 'true' || UniversalShareEngine.isSharing) {
             console.log('Share action already in progress. Ignoring rapid click.');
             return;
