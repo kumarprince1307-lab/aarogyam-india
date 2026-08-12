@@ -177,4 +177,18 @@ class UniversalShareEngine {
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
     }
 
-    
+    // Copy the link to the clipboard
+    copyToClipboard(url, button) {
+        navigator.clipboard.writeText(url).then(() => {
+            const originalText = button.innerHTML;
+            button.innerHTML = 'Copied!';
+            button.disabled = true;
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+}
