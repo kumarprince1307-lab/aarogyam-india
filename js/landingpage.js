@@ -161,10 +161,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderPage();
 
     /* ======================================================
-        4. RICH SHARING & COPY LINK SYSTEM (Phase-3 Integrated)
+        4. RICH SHARING & COPY LINK SYSTEM (Safe Integration)
     ====================================================== */
-
-    // Helper to get asset data from the loaded book object
     function getBookAsset() {
         if (!book) return null;
         return {
@@ -177,55 +175,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
     }
 
-    // Central share handler
-    async function handleShare(channel) {
-        const asset = getBookAsset();
-        if (!asset) {
-            console.error("Share asset data not found.");
-            return;
-        }
+    // Ensure share buttons have proper attributes so UniversalShareEngine handles them smoothly
+    const shareBtns = [
+        document.getElementById("heroShareBtn"),
+        document.getElementById("deskShareWhatsapp"),
+        document.getElementById("mobileShareButton"),
+        document.getElementById("mobileShareBtn"),
+        document.getElementById("deskShareFb"),
+        document.getElementById("deskShareCopy")
+    ];
 
-        // Generate tracked URL for all channels
-        if (typeof createShareLink !== 'function') {
-            console.error("createShareLink function is not available.");
-            // Fallback to original functions if engine is not ready
-            const untrackedUrl = asset.asset_url || window.location.href;
-            if (channel === 'whatsapp') {
-                 const text = `📚 *${asset.asset_title}*\n${book.subtitle}\n\n💰 विशेष ऑफर: केवल ₹${book.price} (MRP: ₹${book.oldPrice})\n\n👇 अभी देखें और आर्डर करें:\n${untrackedUrl}`;
-                 window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-            } else if (channel === 'facebook') {
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(untrackedUrl)}`, '_blank', 'width=600,height=400');
-            } else if (channel === 'copy') {
-                navigator.clipboard.writeText(untrackedUrl).then(() => alert("✅ लिंक सफलतापूर्वक कॉपी हो गया है!"));
-            }
-            return;
+    shareBtns.forEach(btn => {
+        if (btn && !btn.hasAttribute('data-share-button')) {
+            btn.setAttribute('data-share-button', 'true');
         }
+    });
 
-        const trackedUrl = await createShareLink(asset, channel);
-        const shareText = `📚 *${asset.asset_title}*\n${book.subtitle}\n\n💰 विशेष ऑफर: केवल ₹${book.price} (MRP: ₹${book.oldPrice})\n\n👇 अभी देखें और आर्डर करें:\n${trackedUrl}`;
-
-        switch (channel) {
-            case 'whatsapp':
-                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
-                break;
-            case 'facebook':
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(trackedUrl)}`, '_blank', 'width=600,height=400');
-                break;
-            case 'copy':
-                navigator.clipboard.writeText(trackedUrl).then(() => {
-                    alert("✅ लिंक सफलतापूर्वक कॉपी हो गया है!");
-                });
-                break;
-        }
+    // If UniversalShareEngine is already loaded globally, initialize it for this page's buttons
+    if (window.universalShareEngine && typeof window.universalShareEngine.init === 'function') {
+        window.universalShareEngine.init();
     }
-
-    document.getElementById("heroShareBtn")?.addEventListener("click", () => handleShare('whatsapp'));
-    document.getElementById("deskShareWhatsapp")?.addEventListener("click", () => handleShare('whatsapp'));
-    document.getElementById("mobileShareButton")?.addEventListener("click", () => handleShare('whatsapp'));
-    document.getElementById("mobileShareBtn")?.addEventListener("click", () => handleShare('whatsapp'));
-
-    document.getElementById("deskShareFb")?.addEventListener("click", () => handleShare('facebook'));
-    document.getElementById("deskShareCopy")?.addEventListener("click", () => handleShare('copy'));
 
     /* ======================================================
         5. FAQ ACCORDION & STICKY BAR UI LOGIC
@@ -304,6 +273,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 });
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
