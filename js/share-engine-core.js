@@ -36,6 +36,18 @@ class UniversalShareEngine {
     // Main handler for all share button clicks
     handleShareClick(event) {
         const button = event.currentTarget;
+        
+        // --- RAPID CLICK PREVENTION ---
+        if (button.dataset.isProcessing === 'true' || UniversalShareEngine.isSharing) {
+            console.log('Share action already in progress. Ignoring rapid click.');
+            return;
+        }
+        button.dataset.isProcessing = 'true';
+        setTimeout(() => {
+            button.dataset.isProcessing = 'false';
+        }, 1200); // 1.2 सेकंड का कूलडाउन
+        // ------------------------------
+
         const target = button.dataset.shareTarget; // e.g., 'native', 'whatsapp', 'facebook', 'copy'
         
         const assetType = button.dataset.assetType || 'page';
