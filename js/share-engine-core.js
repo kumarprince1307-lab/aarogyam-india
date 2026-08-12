@@ -16,7 +16,12 @@ class UniversalShareEngine {
     init() {
         const shareButtons = document.querySelectorAll('[data-share-button="true"]');
         shareButtons.forEach(button => {
-            // Share buttons are always active for both guests and logged-in users.
+            // Check if listener is already attached to prevent duplicate binding
+            if (button.dataset.shareBound === 'true') {
+                return;
+            }
+            button.dataset.shareBound = 'true';
+
             button.addEventListener('click', (event) => this.handleShareClick(event));
         });
     }
@@ -45,7 +50,7 @@ class UniversalShareEngine {
         button.dataset.isProcessing = 'true';
         setTimeout(() => {
             button.dataset.isProcessing = 'false';
-        }, 1500); // 1.5 सेकंड का कूलडाउन
+        }, 2000); // 2 सेकंड का कड़ा कूलडाउन
         // ---------------------------------------------
 
         const target = button.dataset.shareTarget; // e.g., 'native', 'whatsapp', 'facebook', 'copy'
@@ -159,7 +164,6 @@ class UniversalShareEngine {
             console.log('Error sharing', error);
         })
         .finally(() => {
-            // थोड़ा डिले ताकि नेटिव प्रॉम्प्ट बंद होने तक स्टेट सुरक्षित रहे
             setTimeout(() => {
                 UniversalShareEngine.isSharing = false;
             }, 1000);
@@ -169,12 +173,12 @@ class UniversalShareEngine {
     // Open WhatsApp share link
     whatsAppShare(text, url) {
         const message = encodeURIComponent(`${text} ${url}`);
-        window.open(`https://api.whatsapp.com/send?text=${message}`);
+        window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
     }
 
     // Open Facebook share link
     facebookShare(url) {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
     }
 
     // Copy the link to the clipboard
