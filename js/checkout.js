@@ -367,7 +367,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         } 
         else if (typeof Razorpay !== "undefined") {
             var options = {
-                "key": window.RAZORPAY_KEY || "rzp_live_G9N2m8x7P1q3V5",
+                "key": window.RAZORPAY_KEY || "rzp_live_TOlsqOqkmxYCWP",
                 "amount": bookPrice * 100, // पैसों में कन्वर्ट करने के लिए 100 से गुणा
                 "currency": "INR",
                 "name": "Aarogyam India",
