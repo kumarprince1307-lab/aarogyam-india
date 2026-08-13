@@ -225,6 +225,30 @@ body.desktop-collapsed .admin-sidebar .menu-children {
     }
 }
 
+/* === Sticky Header Table for Users Page === */
+.admin-table-wrapper.sticky-header-table {
+  max-height: 70vh; /* Adjust as needed for your layout */
+  overflow: auto; /* Creates the scroll context for both axes */
+  position: relative;
+}
+
+.admin-table-wrapper.sticky-header-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2; /* Ensures header is above scrolling content */
+}
+
+/* Make controls responsive */
+.admin-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.admin-controls .admin-input, .admin-controls .admin-select {
+    flex-grow: 1;
+    min-width: 200px; /* Prevents controls from becoming too narrow */
+}
+
 /* === Theme Toggle Switch === */
 .theme-switch-wrapper {
   display: flex;

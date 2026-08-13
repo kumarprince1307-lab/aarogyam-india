@@ -515,6 +515,16 @@ export async function fetchUsers(params = {}) {
       queryBuilder = queryBuilder.or(`full_name.ilike.${q},mobile.ilike.${q},email.ilike.${q}`);
     }
     
+    if (params.registrationDate) {
+        const startDate = new Date(params.registrationDate);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 1);
+
+        queryBuilder = queryBuilder.gte('created_at', startDate.toISOString());
+        queryBuilder = queryBuilder.lt('created_at', endDate.toISOString());
+    }
+    
     queryBuilder = queryBuilder.order('created_at', { ascending: false });
 
     const { data: profiles, error: profilesError } = await queryBuilder;
