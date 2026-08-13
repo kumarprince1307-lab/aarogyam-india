@@ -3,6 +3,8 @@
 import { initAdminLayout } from './admin-main.js';
 import { fetchUsers } from './admin-api.js';
 
+let currentUsersData = []; // Store current user data for export
+
 function renderUserRow(user) {
   const sanitizedMobile = String(user.mobile || '').replace(/\D/g, '');
   const mobileLink = sanitizedMobile ? `<a href="tel:${sanitizedMobile}" class="admin-subtle-link">${user.mobile}</a>` : (user.mobile || 'N/A');
@@ -53,7 +55,7 @@ function renderUsersTable(users) {
   }
 
   return `
-    <div class="admin-table-wrapper">
+    <div class="admin-table-wrapper sticky-header-table">
       <table class="admin-table">
         <thead>
           <tr>
@@ -88,14 +90,26 @@ export async function initUsers() {
 
   content.innerHTML = `
     <div class="admin-section">
-      <div class="admin-section-title">Users</div>
+      <div class="admin-section-title">All Users</div>
       <div class="admin-card admin-controls">
         <input id="user-search" type="search" placeholder="Search by name, mobile, or email" class="admin-input" />
+        <input id="user-reg-date-filter" type="date" title="Filter by registration date" class="admin-input" />
         <select id="user-status-filter" class="admin-select">
           <option value="all">All statuses</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
+        <select id="user-sort-filter" class="admin-select">
+          <option value="default">Sort by Registration Date</option>
+          <option value="directReferrals">Direct Referrals (High-Low)</option>
+          <option value="totalShares">Total Shares (High-Low)</option>
+          <option value="totalClicks">Total Clicks (High-Low)</option>
+          <option value="totalVisitors">Total Visitors (High-Low)</option>
+          <option value="totalDirectPurchases">Total Direct Purchases (High-Low)</option>
+          <option value="totalPurchases">Total Purchases (High-Low)</option>
+          <option value="totalSpent">Total Spent (High-Low)</option>
+        </select>
+        <button id="export-csv-btn" class="admin-button">Export CSV</button>
       </div>
       <div id="users-table" style="margin-top:12px;"></div>
     </div>
@@ -104,17 +118,75 @@ export async function initUsers() {
   const container = document.getElementById('users-table');
   const searchInput = document.getElementById('user-search');
   const statusSelect = document.getElementById('user-status-filter');
+  const dateInput = document.getElementById('user-reg-date-filter');
+  const sortSelect = document.getElementById('user-sort-filter');
+  const exportBtn = document.getElementById('export-csv-btn');
+
   if (!container) return;
 
   async function reload(queryFromEvent) {
     container.innerHTML = '<div class="admin-loading">Loading users…</div>';
-    const params = { query: (queryFromEvent !== undefined) ? queryFromEvent : (searchInput?.value || ''), status: statusSelect?.value || 'all' };
+    const params = { 
+      query: (queryFromEvent !== undefined) ? queryFromEvent : (searchInput?.value || ''), 
+      status: statusSelect?.value || 'all',
+      registrationDate: dateInput?.value || null
+    };
     const result = await fetchUsers(params);
-    container.innerHTML = result.success ? renderUsersTable(result.data) : '<div class="admin-error"><strong>Unable to load users.</strong></div>';
+
+    let users = result.success ? result.data : [];
+
+    // Client-side sorting
+    const sortValue = sortSelect?.value;
+    if (sortValue && sortValue !== 'default' && users.length > 0) {
+        users.sort((a, b) => (b[sortValue] || 0) - (a[sortValue] || 0));
+    }
+
+    currentUsersData = users; // Store for CSV export
+    container.innerHTML = renderUsersTable(currentUsersData);
+  }
+
+  function exportToCsv() {
+    if (currentUsersData.length === 0) {
+        alert("No data to export.");
+        return;
+    }
+
+    const headers = [
+        "Name", "Mobile", "Reg. Source", "Share ID", "Direct Referrals", 
+        "Total Shares", "Total Clicks", "Total Visitors", "Total Direct Purchases", 
+        "Total Purchases", "Total Spent", "Status", "Registration Date"
+    ];
+    const rows = currentUsersData.map(user => [
+        `"${(user.name || '').replace(/"/g, '""')}"`,
+        `"${user.mobile || ''}"`,
+        `"${user.source || ''}"`,
+        `"${user.shareId || ''}"`,
+        user.directReferrals || 0,
+        user.totalShares || 0,
+        user.totalClicks || 0,
+        user.totalVisitors || 0,
+        user.totalDirectPurchases || 0,
+        user.totalPurchases || 0,
+        user.totalSpent || 0,
+        `"${user.status || ''}"`,
+        `"${user.registrationDate ? new Date(user.registrationDate).toLocaleDateString('en-CA') : ''}"` // YYYY-MM-DD
+    ].join(','));
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `aarogyam_users_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   if (searchInput) searchInput.addEventListener('input', () => reload());
   if (statusSelect) statusSelect.addEventListener('change', () => reload());
+  if (dateInput) dateInput.addEventListener('change', () => reload());
+  if (sortSelect) sortSelect.addEventListener('change', () => reload());
+  if (exportBtn) exportBtn.addEventListener('click', exportToCsv);
 
   // Listen to global admin search
   document.addEventListener('admin:global-search', (e) => reload(e.detail?.query || ''));

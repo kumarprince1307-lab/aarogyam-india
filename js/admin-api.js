@@ -201,9 +201,9 @@ export async function fetchDashboardData() {
       fetchShareEngineSummaryData(), // Reuse the existing summary function
       db.from('purchases').select('amount').gte('purchase_date', thirtyDaysAgo),
       db.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', thirtyDaysAgo),
-      db.from('profiles').select('id, full_name, created_at, registration_source'),
+      db.from('profiles').select('id, full_name, created_at, registration_source'), // This is for profiles, not books
       db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status'),
-      db.from('books').select('id, title, name'),
+      db.from('books').select('id, title'), // FIX: Removed 'name' as it may not exist.
       fetchTodaysBirthdays(),
       fetchCheckoutSummary(), // MODIFIED: Call with no params to get today's data by default
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
@@ -269,7 +269,7 @@ export async function fetchDashboardData() {
 
     // Book Sales
     const booksMap = (booksRes.data || []).reduce((acc, book) => {
-      acc[book.id] = book.name || book.title;
+      acc[book.id] = book.title; // FIX: Only 'title' is guaranteed to be selected.
       return acc;
     }, {});
     const salesMap = allPurchases.reduce((acc, p) => {
@@ -515,6 +515,16 @@ export async function fetchUsers(params = {}) {
       queryBuilder = queryBuilder.or(`full_name.ilike.${q},mobile.ilike.${q},email.ilike.${q}`);
     }
     
+    if (params.registrationDate) {
+        const startDate = new Date(params.registrationDate);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 1);
+
+        queryBuilder = queryBuilder.gte('created_at', startDate.toISOString());
+        queryBuilder = queryBuilder.lt('created_at', endDate.toISOString());
+    }
+    
     queryBuilder = queryBuilder.order('created_at', { ascending: false });
 
     const { data: profiles, error: profilesError } = await queryBuilder;
@@ -525,20 +535,24 @@ export async function fetchUsers(params = {}) {
     const shareIds = profiles.map(p => p.share_id).filter(Boolean);
 
     // Step 2: Fetch all necessary aggregated data in parallel
-    const [purchasesRes, shareLogsRes] = await Promise.all([
-        db.from('purchases').select('profile_id, amount').eq('payment_status', 'success'),
-        db.from('share_logs').select('share_token, event_type').in('share_token', shareIds)
+    const [purchasesRes, shareLogsRes, allProfileRelationsRes] = await Promise.all([
+        db.from('purchases').select('profile_id, amount').or('payment_status.eq.success,payment_status.is.null'),
+        db.from('share_logs').select('share_token, event_type').in('share_token', shareIds),
+        db.from('profiles').select('id, referred_by') // Fetch all referral relationships
     ]);
 
     if (purchasesRes.error) console.error('Error fetching purchases for user aggregation:', purchasesRes.error.message);
     if (shareLogsRes.error) console.error('Error fetching share logs for user aggregation:', shareLogsRes.error.message);
+    if (allProfileRelationsRes.error) console.error('Error fetching profile relations:', allProfileRelationsRes.error.message);
 
     // Data is already filtered for success by the query.
     const allPurchases = purchasesRes.data || [];
     const allShareLogs = shareLogsRes.data || [];
+    const allProfileRelations = allProfileRelationsRes.data || [];
 
     // Step 3: Create lookup maps from the fetched data
-    const directReferralMap = profiles.reduce((acc, profile) => {
+    // Use all profile relations to build a complete map, not just filtered profiles
+    const directReferralMap = allProfileRelations.reduce((acc, profile) => {
         if (profile.referred_by) {
             if (!acc[profile.referred_by]) acc[profile.referred_by] = [];
             acc[profile.referred_by].push(profile.id);
@@ -566,10 +580,12 @@ export async function fetchUsers(params = {}) {
         return acc;
     }, {});
 
-    const purchasingUserIds = new Set(allPurchases.map(p => p.profile_id));
     const directPurchaseCounts = {};
     for (const referrerId in directReferralMap) {
-        directPurchaseCounts[referrerId] = directReferralMap[referrerId].filter(id => purchasingUserIds.has(id)).length;
+        directPurchaseCounts[referrerId] = directReferralMap[referrerId].reduce((sum, referredId) => {
+            const referredUserStats = purchaseSummary[referredId];
+            return sum + (referredUserStats ? referredUserStats.totalPurchases : 0);
+        }, 0);
     }
 
     // Step 4: Map profiles and merge with purchase summary
@@ -636,7 +652,7 @@ export async function fetchPurchases(params = {}) {
         // 3. Fetch related data in parallel
         const [profilesRes, booksRes] = await Promise.all([
             profileIds.length > 0 ? db.from('profiles').select('id, full_name, registration_source').in('id', profileIds) : Promise.resolve({ data: [] }),
-            bookIds.length > 0 ? db.from('books').select('id, name, title').in('id', bookIds) : Promise.resolve({ data: [] })
+            bookIds.length > 0 ? db.from('books').select('id, title').in('id', bookIds) : Promise.resolve({ data: [] }) // FIX: Removed 'name' column
         ]);
 
         // 4. Create lookup maps for efficiency
@@ -650,7 +666,7 @@ export async function fetchPurchases(params = {}) {
             return {
                 order: p.payment_id || 'N/A',
                 customer: profile.full_name || 'Unknown User',
-                book: book.name || book.title || p.book_id || 'Unknown Book',
+                book: book.title || p.book_id || 'Unknown Book', // FIX: Use only 'title'
                 amount: `₹${p.amount || 0}`,
                 source: profile.registration_source || 'Direct',
                 status: p.payment_status || 'success',
@@ -750,6 +766,52 @@ export async function fetchUserDetails(userId) {
     if (profileError) throw profileError;
     if (!profile) return { success: false, data: null };
 
+    // Fetch parent referrer's profile
+    let referredByProfile = null;
+    if (profile.referred_by) {
+        const { data: parentProfile, error: parentError } = await db
+            .from('profiles')
+            .select('id, full_name')
+            .eq('id', profile.referred_by)
+            .single();
+        if (parentError) console.error("Error fetching referrer profile:", parentError.message);
+        else referredByProfile = parentProfile;
+    }
+
+    // Fetch direct referrals (children) and their purchase counts
+    const { data: directReferrals, error: referralsError } = await db
+        .from('profiles')
+        .select('id, full_name, mobile')
+        .eq('referred_by', userId);
+    
+    if (referralsError) console.error("Error fetching direct referrals:", referralsError.message);
+
+    let directReferralsList = [];
+    if (directReferrals && directReferrals.length > 0) {
+        const referredUserIds = directReferrals.map(r => r.id);
+
+        const { data: referralPurchases, error: refPurchaseError } = await db
+            .from('purchases')
+            .select('profile_id') // only need profile_id to count
+            .or('payment_status.eq.success,payment_status.is.null')
+            .in('profile_id', referredUserIds);
+        
+        if (refPurchaseError) console.error("Error fetching referral purchases:", refPurchaseError.message);
+
+        const referralPurchaseSummary = (referralPurchases || []).reduce((acc, purchase) => {
+            const profileId = purchase.profile_id;
+            acc[profileId] = (acc[profileId] || 0) + 1;
+            return acc;
+        }, {});
+
+        directReferralsList = directReferrals.map(ref => ({
+            id: ref.id,
+            name: ref.full_name,
+            mobile: ref.mobile,
+            totalPurchases: referralPurchaseSummary[ref.id] || 0
+        }));
+    }
+
     const { data: purchases, error: purchasesError } = await db
       .from('purchases')
       .select('order_id, book_id, amount, purchase_date, payment_status')
@@ -763,11 +825,11 @@ export async function fetchUserDetails(userId) {
     if (bookIds.length > 0) {
         const { data: booksData, error: booksError } = await db
             .from('books') // Assuming a 'books' table or similar for book titles
-            .select('id, title, name')
+            .select('id, title') // FIX: Removed 'name' as it does not exist in the schema.
             .in('id', [...new Set(bookIds)]); // Use Set to get unique book IDs
         if (booksError) console.error("Error fetching book titles:", booksError.message);
         booksMap = (booksData || []).reduce((acc, book) => {
-            acc[book.id] = book.name || book.title;
+            acc[book.id] = book.title; // FIX: Only 'title' is guaranteed to be selected.
             return acc;
         }, {});
     }
@@ -790,6 +852,8 @@ export async function fetchUserDetails(userId) {
       joined: new Date(profile.created_at).toLocaleDateString(),
       status: profile.is_active ? 'active' : 'inactive',
       referralToken: profile.referral_code || 'N/A',
+      referredBy: referredByProfile,
+      directReferrals: directReferralsList,
       purchases: (purchases || []).map(p => ({
           order: p.order_id,
           book: booksMap[p.book_id] || p.book_id, // Use book name if available

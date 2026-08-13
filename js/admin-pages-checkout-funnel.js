@@ -2,6 +2,7 @@ import { initAdminLayout } from './admin-main.js';
 import { fetchCheckoutLogs, fetchAllBooks } from './admin-api.js';
 
 let allLogs = [];
+let currentLogsData = []; // For CSV export
 let allBooks = [];
 
 function renderLayout() {
@@ -9,22 +10,26 @@ function renderLayout() {
     if (!content) return;
 
     content.innerHTML = `
-        <div class="admin-section admin-card">
-            <div id="filters" class="admin-controls checkout-filters">
+        <div class="admin-section">
+            <div class="admin-section-title">Checkout Funnel</div>
+            <div class="admin-card admin-controls">
                 <input id="search-input" type="search" placeholder="Search by Name or Mobile" class="admin-input">
                 <select id="status-filter" class="admin-select"></select>
                 <select id="date-filter" class="admin-select"></select>
                 <input type="date" id="custom-date-input" class="admin-input" style="display: none;">
                 <select id="book-filter" class="admin-select"></select>
+                <button id="export-csv-btn" class="admin-button">Export CSV</button>
             </div>
         </div>
-        <div id="logs-table-container" class="admin-section admin-card" style="margin-top: 1rem;"></div>
+        <div id="logs-table-container" style="margin-top: 12px;"></div>
     `;
 }
 
 function renderTable(logs) {
     const container = document.getElementById('logs-table-container');
     if (!container) return;
+
+    currentLogsData = logs; // Store for export
 
     if (logs.length === 0) {
         container.innerHTML = '<div class="admin-empty">No checkout logs found for the selected filters.</div>';
@@ -39,7 +44,7 @@ function renderTable(logs) {
     };
 
     container.innerHTML = `
-        <div class="admin-table-wrapper">
+        <div class="admin-table-wrapper sticky-header-table">
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -151,6 +156,31 @@ async function applyFiltersAndReload() {
     }
 }
 
+function exportToCsv() {
+    if (currentLogsData.length === 0) {
+        alert("No data to export.");
+        return;
+    }
+
+    const headers = ["Date & Time", "Customer", "Mobile", "Book", "Status"];
+    const rows = currentLogsData.map(log => [
+        `"${new Date(log.created_at).toLocaleString('en-IN')}"`,
+        `"${(log.customer_name || '').replace(/"/g, '""')}"`,
+        `"${log.customer_mobile || ''}"`,
+        `"${(log.book_name || '').replace(/"/g, '""')}"`,
+        `"${log.status || ''}"`
+    ].join(','));
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `aarogyam_checkout_funnel_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 function populateFilters(preselectedStatus) {
     const statusFilter = document.getElementById('status-filter');
     const dateFilter = document.getElementById('date-filter');
@@ -192,6 +222,7 @@ function setupEventListeners() {
     const dateFilter = document.getElementById('date-filter');
     const customDateInput = document.getElementById('custom-date-input');
     const bookFilter = document.getElementById('book-filter');
+    const exportBtn = document.getElementById('export-csv-btn');
 
     let searchTimeout;
     searchInput?.addEventListener('input', () => {
@@ -213,6 +244,7 @@ function setupEventListeners() {
     });
     customDateInput?.addEventListener('change', applyFiltersAndReload);
     bookFilter?.addEventListener('change', applyFiltersAndReload);
+    if (exportBtn) exportBtn.addEventListener('click', exportToCsv);
 }
 
 export async function initCheckoutFunnel() {
