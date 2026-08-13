@@ -3,6 +3,8 @@
 import { initAdminLayout } from './admin-main.js';
 import { fetchPurchases, fetchPurchaseFilterOptions } from './admin-api.js';
 
+let currentPurchasesData = []; // For CSV export
+
 function renderPurchaseRow(item) {
   return `
     <tr>
@@ -18,11 +20,12 @@ function renderPurchaseRow(item) {
 }
 
 function renderPurchasesTable(purchases) {
+  currentPurchasesData = purchases; // Store for export
   if (!purchases || purchases.length === 0) {
     return '<div class="admin-empty"><strong>No purchases found.</strong><br>Adjust filters or search terms.</div>';
   }
   return `
-    <div class="admin-table-wrapper">
+    <div class="admin-table-wrapper sticky-header-table">
       <table class="admin-table">
         <thead>
           <tr><th>Order</th><th>Customer</th><th>Book</th><th>Amount</th><th>Source</th><th>Status</th><th>Date</th></tr>
@@ -62,6 +65,7 @@ export async function initPurchases() {
         <select id="purchase-book-filter" class="admin-select">
           <option value="all">All Books</option>
         </select>
+        <button id="export-csv-btn" class="admin-button">Export CSV</button>
       </div>
       <div id="purchases-table" style="margin-top:12px;"></div>
     </div>
@@ -74,6 +78,7 @@ export async function initPurchases() {
   const customDateInput = document.getElementById('purchase-custom-date');
   const sourceSelect = document.getElementById('purchase-source-filter');
   const bookSelect = document.getElementById('purchase-book-filter');
+  const exportBtn = document.getElementById('export-csv-btn');
 
   if (!container) return;
 
@@ -141,6 +146,33 @@ export async function initPurchases() {
     container.innerHTML = result.success ? renderPurchasesTable(result.data) : '<div class="admin-error"><strong>Unable to load purchases.</strong></div>';
   }
 
+  function exportToCsv() {
+    if (currentPurchasesData.length === 0) {
+        alert("No data to export.");
+        return;
+    }
+
+    const headers = ["Order", "Customer", "Book", "Amount", "Source", "Status", "Date"];
+    const rows = currentPurchasesData.map(p => [
+        `"${p.order || ''}"`,
+        `"${(p.customer || '').replace(/"/g, '""')}"`,
+        `"${(p.book || '').replace(/"/g, '""')}"`,
+        `"${(p.amount || '').replace('₹', '')}"`,
+        `"${p.source || ''}"`,
+        `"${p.status || ''}"`,
+        `"${p.date || ''}"`
+    ].join(','));
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `aarogyam_purchases_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   if (searchInput) searchInput.addEventListener('input', () => reload());
   if (statusSelect) statusSelect.addEventListener('change', () => reload());
   if (sourceSelect) sourceSelect.addEventListener('change', () => reload());
@@ -150,6 +182,7 @@ export async function initPurchases() {
     if (dateSelect.value !== 'custom') reload();
   });
   if (customDateInput) customDateInput.addEventListener('change', () => reload());
+  if (exportBtn) exportBtn.addEventListener('click', exportToCsv);
 
   document.addEventListener('admin:global-search', (e) => reload(e.detail?.query || ''));
 

@@ -90,10 +90,7 @@ export async function initUsers() {
 
   content.innerHTML = `
     <div class="admin-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-        <div class="admin-section-title" style="margin-bottom: 0;">All Users</div>
-        <button id="export-csv-btn" class="admin-button">Export CSV</button>
-      </div>
+      <div class="admin-section-title">All Users</div>
       <div class="admin-card admin-controls">
         <input id="user-search" type="search" placeholder="Search by name, mobile, or email" class="admin-input" />
         <input id="user-reg-date-filter" type="date" title="Filter by registration date" class="admin-input" />
@@ -112,6 +109,7 @@ export async function initUsers() {
           <option value="totalPurchases">Total Purchases (High-Low)</option>
           <option value="totalSpent">Total Spent (High-Low)</option>
         </select>
+        <button id="export-csv-btn" class="admin-button">Export CSV</button>
       </div>
       <div id="users-table" style="margin-top:12px;"></div>
     </div>
