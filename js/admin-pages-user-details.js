@@ -111,6 +111,8 @@ function renderProfile(detail) {
         <div class="admin-data-card"><h4>Status</h4><p>${detail.status}</p></div>
         <div class="admin-data-card"><h4>Joined</h4><p>${detail.joined}</p></div>
         <div class="admin-data-card"><h4>Referral Token</h4><p>${detail.referralToken || 'N/A'}</p></div>
+        <div class="admin-data-card"><h4>कुल डाउनलोड</h4><p>${detail.totalDownloads || 0}</p></div>
+        <div class="admin-data-card"><h4>डाउनलोड उपयोग (Used/Limit)</h4><p>${detail.totalDownloads || 0} / ${detail.downloadLimit || 0}</p></div>
       </div>
     </div>
     ${renderShareInformation()}
