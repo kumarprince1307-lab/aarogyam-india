@@ -292,6 +292,31 @@ body.desktop-collapsed .admin-sidebar .menu-children {
     flex-wrap: wrap;
 }
 
+/* === Tabs Component === */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--admin-border);
+  margin-bottom: 20px;
+}
+.admin-tabs .tab-link {
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: var(--admin-muted);
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transform: translateY(1px);
+}
+.admin-tabs .tab-link:hover {
+  color: var(--admin-text);
+}
+.admin-tabs .tab-link.active {
+  color: var(--admin-primary);
+  border-bottom-color: var(--admin-primary);
+}
+
 /* === Theme Toggle Switch === */
 .theme-switch-wrapper {
   display: flex;

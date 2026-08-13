@@ -323,17 +323,6 @@ export async function fetchDashboardData() {
   }
 }
 
-// Placeholder for reports not yet connected to live data.
-// As per instructions, "Do NOT start Users, User Details, Reports, Marketing or any other Admin module."
-export async function fetchDailyReport() {
-  await delay(140);
-  return { success: true, data: [], message: "Daily Report not yet connected to live data." };
-}
-
-export async function fetchTotalReport() {
-  await delay(140);
-  return { success: true, data: [], message: "Total Report not yet connected to live data." };
-}
  
 export async function fetchPurchaseFilterOptions() {
     try {
@@ -469,34 +458,6 @@ export async function fetchCheckoutLogs(params = {}) {
   }
 }
 
-export async function fetchShareReport() {
-  await delay(180);
-  try {
-    const db = window.dbClient;
-    if (!db) throw new Error("Supabase client not available.");
-
-    const { data, error } = await db
-        .from('share_links')
-        .select('token, clicks, conversions, asset_title, channel, created_at')
-        .order('created_at', { ascending: false })
-        .limit(100);
-
-    if (error) throw error;
-    
-    const mappedData = data.map(item => ({
-        token: item.token,
-        clicks: item.clicks || 0,
-        conversions: item.conversions || 0,
-        revenue: '₹0'
-    }));
-
-    return { success: true, data: mappedData };
-  } catch (error) {
-    console.error('Failed to fetch share report:', error);
-    return { success: false, data: [], error: error.message };
-  }
-}
-
 export async function fetchUsers(params = {}) {
   await delay(100);
   try {
@@ -535,20 +496,23 @@ export async function fetchUsers(params = {}) {
     const shareIds = profiles.map(p => p.share_id).filter(Boolean);
 
     // Step 2: Fetch all necessary aggregated data in parallel
-    const [purchasesRes, shareLogsRes, allProfileRelationsRes] = await Promise.all([
+    const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes] = await Promise.all([
         db.from('purchases').select('profile_id, amount').or('payment_status.eq.success,payment_status.is.null'),
         db.from('share_logs').select('share_token, event_type').in('share_token', shareIds),
-        db.from('profiles').select('id, referred_by') // Fetch all referral relationships
+        db.from('profiles').select('id, referred_by'), // Fetch all referral relationships
+        db.from('download_logs').select('profile_id').in('profile_id', profileIds)
     ]);
 
     if (purchasesRes.error) console.error('Error fetching purchases for user aggregation:', purchasesRes.error.message);
     if (shareLogsRes.error) console.error('Error fetching share logs for user aggregation:', shareLogsRes.error.message);
     if (allProfileRelationsRes.error) console.error('Error fetching profile relations:', allProfileRelationsRes.error.message);
+    if (downloadLogsRes.error) console.error('Error fetching download logs for user aggregation:', downloadLogsRes.error.message);
 
     // Data is already filtered for success by the query.
     const allPurchases = purchasesRes.data || [];
     const allShareLogs = shareLogsRes.data || [];
     const allProfileRelations = allProfileRelationsRes.data || [];
+    const allDownloads = downloadLogsRes.data || [];
 
     // Step 3: Create lookup maps from the fetched data
     // Use all profile relations to build a complete map, not just filtered profiles
@@ -580,6 +544,13 @@ export async function fetchUsers(params = {}) {
         return acc;
     }, {});
 
+    const downloadCounts = allDownloads.reduce((acc, log) => {
+        const profileId = log.profile_id;
+        if (!profileId) return acc;
+        acc[profileId] = (acc[profileId] || 0) + 1;
+        return acc;
+    }, {});
+
     const directPurchaseCounts = {};
     for (const referrerId in directReferralMap) {
         directPurchaseCounts[referrerId] = directReferralMap[referrerId].reduce((sum, referredId) => {
@@ -606,7 +577,9 @@ export async function fetchUsers(params = {}) {
         totalVisitors: shareStats.visitors,
         totalDirectPurchases: directPurchaseCounts[user.id] || 0,
         totalPurchases: ownPurchases.totalPurchases,
-        totalSpent: ownPurchases.totalSpent
+        totalSpent: ownPurchases.totalSpent,
+        totalDownloads: downloadCounts[user.id] || 0,
+        downloadLimit: (ownPurchases.totalPurchases || 0) * 3
         };
     });
 
@@ -766,6 +739,13 @@ export async function fetchUserDetails(userId) {
     if (profileError) throw profileError;
     if (!profile) return { success: false, data: null };
 
+    // Fetch total download count for the user
+    const { count: downloadCount, error: downloadError } = await db
+        .from('download_logs')
+        .select('id', { count: 'exact', head: true })
+        .eq('profile_id', userId);
+    if (downloadError) console.error("Error fetching download count:", downloadError.message);
+
     // Fetch parent referrer's profile
     let referredByProfile = null;
     if (profile.referred_by) {
@@ -819,6 +799,9 @@ export async function fetchUserDetails(userId) {
       .order('purchase_date', { ascending: false });
     if(purchasesError) console.error("Error fetching purchases for user:", purchasesError.message);
 
+    // Calculate total download limit based on successful purchases
+    const successfulPurchases = (purchases || []).filter(p => p.payment_status === 'success' || p.payment_status === null);
+
     // Fetch book names for purchases
     const bookIds = (purchases || []).map(p => p.book_id);
     let booksMap = {};
@@ -854,6 +837,8 @@ export async function fetchUserDetails(userId) {
       referralToken: profile.referral_code || 'N/A',
       referredBy: referredByProfile,
       directReferrals: directReferralsList,
+      totalDownloads: downloadCount || 0,
+      downloadLimit: successfulPurchases.length * 3, // Assuming 3 downloads per purchase
       purchases: (purchases || []).map(p => ({
           order: p.order_id,
           book: booksMap[p.book_id] || p.book_id, // Use book name if available
@@ -872,15 +857,139 @@ export async function fetchUserDetails(userId) {
   }
 }
 
-// Mock data for Reports page - NOT part of Dashboard scope for this task.
-// As per instructions, "Do NOT start Users, User Details, Reports, Marketing or any other Admin module."
-// So, this mock data remains for now.
-export async function fetchLeadReport() {
-  await delay(180);
-  const LEAD_REPORT = [
-    { name: 'Amit Kumar', mobile: '9876543210', source: 'WhatsApp', status: 'Contacted', assigned: 'Ravi' },
-    { name: 'Sita Devi', mobile: '8765432109', source: 'Facebook', status: 'Interested', assigned: 'Anjali' },
-    { name: 'Rahul Jain', mobile: '9123456789', source: 'Organic', status: 'Converted', assigned: 'Vijay' }
-  ];
-  return { success: true, data: LEAD_REPORT };
+export async function fetchSalesReport(params = {}) {
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        let purchasesQuery = db.from('purchases').select('purchase_date, amount, book_id').or('payment_status.eq.success,payment_status.is.null');
+        let profilesQuery = db.from('profiles').select('created_at');
+
+        if (params.startDate && params.endDate) {
+            purchasesQuery = purchasesQuery.gte('purchase_date', params.startDate).lt('purchase_date', params.endDate);
+            profilesQuery = profilesQuery.gte('created_at', params.startDate).lt('created_at', params.endDate);
+        }
+
+        const [purchasesRes, profilesRes, booksRes] = await Promise.all([
+            purchasesQuery,
+            profilesQuery,
+            db.from('books').select('id, title')
+        ]);
+
+        if (purchasesRes.error) throw purchasesRes.error;
+        if (profilesRes.error) throw profilesRes.error;
+
+        const booksMap = (booksRes.data || []).reduce((acc, book) => {
+            acc[book.id] = book.title;
+            return acc;
+        }, {});
+
+        const salesByDay = (purchasesRes.data || []).reduce((acc, p) => {
+            const date = new Date(p.purchase_date).toISOString().split('T')[0];
+            if (!acc[date]) {
+                acc[date] = { date, orders: 0, revenue: 0, newUsers: 0 };
+            }
+            acc[date].orders++;
+            acc[date].revenue += p.amount || 0;
+            return acc;
+        }, {});
+
+        (profilesRes.data || []).forEach(p => {
+            const date = new Date(p.created_at).toISOString().split('T')[0];
+            if (salesByDay[date]) {
+                salesByDay[date].newUsers++;
+            }
+        });
+
+        const salesByBook = (purchasesRes.data || []).reduce((acc, p) => {
+            const bookTitle = booksMap[p.book_id] || p.book_id || 'Unknown Book';
+            if (!acc[bookTitle]) {
+                acc[bookTitle] = { book: bookTitle, unitsSold: 0, revenue: 0 };
+            }
+            acc[bookTitle].unitsSold++;
+            acc[bookTitle].revenue += p.amount || 0;
+            return acc;
+        }, {});
+
+        return {
+            success: true,
+            data: {
+                daily: Object.values(salesByDay).sort((a, b) => new Date(b.date) - new Date(a.date)),
+                byBook: Object.values(salesByBook).sort((a, b) => b.revenue - a.revenue)
+            }
+        };
+    } catch (error) {
+        console.error('Failed to fetch sales report:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function fetchReferralReport(params = {}) {
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        const [profilesRes, purchasesRes] = await Promise.all([
+            db.from('profiles').select('id, full_name, share_id, referred_by'),
+            db.from('purchases').select('profile_id, amount').or('payment_status.eq.success,payment_status.is.null')
+        ]);
+
+        if (profilesRes.error) throw profilesRes.error;
+        if (purchasesRes.error) throw purchasesRes.error;
+
+        const profiles = profilesRes.data || [];
+        const purchases = purchasesRes.data || [];
+
+        const purchaseSummary = purchases.reduce((acc, p) => {
+            if (!acc[p.profile_id]) acc[p.profile_id] = { totalPurchases: 0, totalSpent: 0 };
+            acc[p.profile_id].totalPurchases++;
+            acc[p.profile_id].totalSpent += p.amount || 0;
+            return acc;
+        }, {});
+
+        const referralStats = profiles.reduce((acc, p) => {
+            if (p.referred_by) {
+                if (!acc[p.referred_by]) acc[p.referred_by] = { referredUsers: 0, totalSales: 0, totalRevenue: 0 };
+                acc[p.referred_by].referredUsers++;
+                const userPurchases = purchaseSummary[p.id];
+                if (userPurchases) {
+                    acc[p.referred_by].totalSales += userPurchases.totalPurchases;
+                    acc[p.referred_by].totalRevenue += userPurchases.totalSpent;
+                }
+            }
+            return acc;
+        }, {});
+
+        const profilesById = profiles.reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+
+        const reportData = Object.entries(referralStats).map(([referrerId, stats]) => ({
+            referrerId: referrerId,
+            referrerName: profilesById[referrerId]?.full_name || `User ID: ${referrerId}`,
+            shareId: profilesById[referrerId]?.share_id || 'N/A',
+            ...stats
+        })).sort((a, b) => b.totalRevenue - a.totalRevenue);
+
+        return { success: true, data: reportData };
+    } catch (error) {
+        console.error('Failed to fetch referral report:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function fetchSourceReport(params = {}) {
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
+
+        const { data, error } = await db.rpc('get_source_report', {
+            start_date: params.startDate,
+            end_date: params.endDate
+        });
+
+        if (error) throw error;
+        return { success: true, data: data };
+    } catch (error) {
+        console.error('Failed to fetch source report:', error);
+        return { success: false, error: error.message };
+    }
 }

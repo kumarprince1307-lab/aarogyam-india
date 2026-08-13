@@ -37,7 +37,7 @@ function renderUserRow(user) {
       <td>${user.totalVisitors || 0}</td>
       <td>${user.totalDirectPurchases || 0}</td>
       <td>${user.totalPurchases || 0}</td>
-      <td>₹${(user.totalSpent || 0).toLocaleString('en-IN')}</td>
+      <td>₹${(user.totalSpent || 0).toLocaleString('en-IN')}</td>      <td>${user.totalDownloads || 0} / ${user.downloadLimit || 0}</td>
       <td><span class="admin-pill ${user.status.toLowerCase()}">${user.status}</span></td>
       <td>
         <div style="display: flex; gap: 8px; align-items: center;">
@@ -70,6 +70,7 @@ function renderUsersTable(users) {
             <th>Total Direct Purchases</th>
             <th>Total Purchases</th>
             <th>Total Spent</th>
+            <th>Downloads (Used/Limit)</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -108,6 +109,7 @@ export async function initUsers() {
           <option value="totalDirectPurchases">Total Direct Purchases (High-Low)</option>
           <option value="totalPurchases">Total Purchases (High-Low)</option>
           <option value="totalSpent">Total Spent (High-Low)</option>
+          <option value="totalDownloads">Total Downloads (High-Low)</option>
         </select>
         <button id="export-csv-btn" class="admin-button">Export CSV</button>
       </div>
@@ -154,7 +156,7 @@ export async function initUsers() {
     const headers = [
         "Name", "Mobile", "Reg. Source", "Share ID", "Direct Referrals", 
         "Total Shares", "Total Clicks", "Total Visitors", "Total Direct Purchases", 
-        "Total Purchases", "Total Spent", "Status", "Registration Date"
+        "Total Purchases", "Total Spent", "Total Downloads", "Download Limit", "Status", "Registration Date"
     ];
     const rows = currentUsersData.map(user => [
         `"${(user.name || '').replace(/"/g, '""')}"`,
@@ -168,6 +170,8 @@ export async function initUsers() {
         user.totalDirectPurchases || 0,
         user.totalPurchases || 0,
         user.totalSpent || 0,
+        user.totalDownloads || 0,
+        user.downloadLimit || 0,
         `"${user.status || ''}"`,
         `"${user.registrationDate ? new Date(user.registrationDate).toLocaleDateString('en-CA') : ''}"` // YYYY-MM-DD
     ].join(','));
