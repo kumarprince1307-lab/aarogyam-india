@@ -21,15 +21,45 @@ function renderShareInformation() {
   `;
 }
 
-function renderReferralInformation() {
+function renderReferralInformation(detail) {
+  const referrals = detail.directReferrals;
+  const directReferralCount = referrals ? referrals.length : 0;
+
+  const referredByName = detail.referredBy
+    ? `<a href="#user-details?id=${detail.referredBy.id}" data-route="user-details" data-id="${detail.referredBy.id}" class="admin-subtle-link">${detail.referredBy.full_name}</a>`
+    : 'N/A';
+
+  let referralsTableHtml;
+  if (!referrals || referrals.length === 0) {
+    referralsTableHtml = '<div class="admin-empty"><strong>No direct referrals found for this user.</strong></div>';
+  } else {
+    referralsTableHtml = `
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead><tr><th>Name</th><th>Mobile</th><th>Total Purchases</th></tr></thead>
+          <tbody>
+            ${referrals.map(ref => `
+              <tr>
+                <td><a href="#user-details?id=${ref.id}" data-route="user-details" data-id="${ref.id}" class="admin-subtle-link">${ref.name || 'N/A'}</a></td>
+                <td>${ref.mobile || 'N/A'}</td>
+                <td>${ref.totalPurchases || 0}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+  
   return `
     <div class="admin-section">
       <div class="admin-section-title">Referral Information</div>
       <div class="admin-data-grid">
-        <div class="admin-data-card"><h4>Referred By</h4><p>N/A</p></div>
-        <div class="admin-data-card"><h4>Direct Referrals</h4><p>0</p></div>
-        <div class="admin-data-card"><h4>Total Network</h4><p>0</p></div>
+        <div class="admin-data-card"><h4>Referred By</h4><p>${referredByName}</p></div>
+        <div class="admin-data-card"><h4>Direct Referrals</h4><p>${directReferralCount}</p></div>
+        <div class="admin-data-card"><h4>Total Network</h4><p>${directReferralCount}</p></div>
       </div>
+      <div class="admin-section-title" style="margin-top: 24px; margin-bottom: 16px;">Direct Referrals List</div>
+      ${referralsTableHtml}
     </div>
   `;
 }
@@ -84,7 +114,7 @@ function renderProfile(detail) {
       </div>
     </div>
     ${renderShareInformation()}
-    ${renderReferralInformation()}
+    ${renderReferralInformation(detail)}
     <div class="admin-section">
       <div class="admin-section-title">Purchase Summary</div>
       ${renderPurchases(detail.purchases)}
@@ -128,9 +158,10 @@ export async function initUserDetails() {
   if (!content) return;
 
   // the user id can be provided via hash query or via selection from Users page
-  const hash = location.hash || '';
-  const params = new URLSearchParams(hash.replace('#',''));
-  const userId = params.get('id') || params.get('user') || 'U001';
+  const hash = window.location.hash || '';
+  const queryString = hash.substring(hash.indexOf('?'));
+  const params = new URLSearchParams(queryString);
+  const userId = params.get('id');
 
   content.innerHTML = `
     <div class="admin-action-row">
@@ -142,6 +173,11 @@ export async function initUserDetails() {
   const container = document.getElementById('user-details-content');
   if (!container) return;
 
+  if (!userId) {
+    container.innerHTML = '<div class="admin-error"><strong>No user ID provided.</strong><br>Please go back to the users list and select a user.</div>';
+    return;
+  }
+
   const result = await fetchUserDetails(userId);
 
   if (!result.success || !result.data) {
@@ -150,6 +186,14 @@ export async function initUserDetails() {
   }
 
   container.innerHTML = renderProfile(result.data);
+
+  // Handle clicks on data-route links inside the new referrals table
+  container.addEventListener('click', (e) => {
+    const link = e.target.closest('[data-route="user-details"]');
+    if (link && link.dataset.id) {
+        window.location.hash = `user-details?id=${link.dataset.id}`;
+    }
+  });
 }
 
 // TODO: add referral network and system notes in Phase-2

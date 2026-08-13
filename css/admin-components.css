@@ -249,6 +249,49 @@ body.desktop-collapsed .admin-sidebar .menu-children {
     min-width: 200px; /* Prevents controls from becoming too narrow */
 }
 
+/* === Referral Tree (User Details) === */
+.referral-tree-container {
+    background: var(--admin-surface);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--admin-border);
+}
+
+.referral-tree-level {
+    list-style: none;
+    padding-left: 24px;
+    margin-top: 10px;
+    border-left: 2px solid var(--admin-primary-soft);
+}
+
+.referral-tree-level li {
+    position: relative;
+}
+
+/* Connector line from the node to the vertical bar */
+.referral-tree-level li::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 22px; /* Adjust to align with the middle of the node */
+    width: 22px;
+    height: 2px;
+    background: var(--admin-primary-soft);
+}
+
+.referral-tree-node {
+    background: var(--admin-surface-2);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid var(--admin-border);
+    flex-wrap: wrap;
+}
+
 /* === Theme Toggle Switch === */
 .theme-switch-wrapper {
   display: flex;

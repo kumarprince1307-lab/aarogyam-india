@@ -8,6 +8,7 @@
 const ROUTES = {
  'dashboard': () => import('./admin-pages-dashboard.js').then(m => m.initDashboard()),
  'users': () => import('./admin-pages-users.js').then(m => m.initUsers()),
+ 'user-details': () => import('./admin-pages-user-details.js').then(m => m.initUserDetails()),
  'purchases': () => import('./admin-pages-purchases.js').then(m => m.initPurchases()),
  'checkout-funnel': () => import('./admin-pages-checkout-funnel.js').then(m => m.initCheckoutFunnel()),
  'downloads': () => import('./admin-pages-downloads.js').then(m => m.initDownloads()),
@@ -32,7 +33,7 @@ export async function navigateTo(routeName) {
  if (breadcrumb) breadcrumb.textContent = `Home / ${pretty}`;
 
  // update history
- try { history.pushState(null, '', `#${name}`); } catch(e){}
+ try { history.pushState(null, '', `#${routeName}`); } catch(e){}
 
  const loader = document.getElementById('page-content');
  if (loader) loader.innerHTML = '<div class="admin-loading">Loading ' + name + '…</div>';
@@ -55,12 +56,12 @@ export async function navigateTo(routeName) {
 
 export function initRouter() {
  // load initial route from hash
- const initial = location.hash.replace('#','').split('?')[0] || 'dashboard';
+ const initial = location.hash.replace('#','') || 'dashboard';
  navigateTo(initial);
 
  // handle back/forward
  window.addEventListener('popstate', () => {
-   const route = location.hash.replace('#','').split('?')[0] || 'dashboard';
+   const route = location.hash.replace('#','') || 'dashboard';
    navigateTo(route);
  });
 
@@ -69,7 +70,8 @@ export function initRouter() {
    const target = e.target.closest('[data-route]');
    if (target) {
      e.preventDefault();
-     navigateTo(target.dataset.route);
+     const route = target.getAttribute('href')?.replace('#', '') || target.dataset.route;
+     navigateTo(route);
    }
  });
 }
