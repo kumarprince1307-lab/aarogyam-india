@@ -525,20 +525,24 @@ export async function fetchUsers(params = {}) {
     const shareIds = profiles.map(p => p.share_id).filter(Boolean);
 
     // Step 2: Fetch all necessary aggregated data in parallel
-    const [purchasesRes, shareLogsRes] = await Promise.all([
+    const [purchasesRes, shareLogsRes, allProfileRelationsRes] = await Promise.all([
         db.from('purchases').select('profile_id, amount').or('payment_status.eq.success,payment_status.is.null'),
-        db.from('share_logs').select('share_token, event_type').in('share_token', shareIds)
+        db.from('share_logs').select('share_token, event_type').in('share_token', shareIds),
+        db.from('profiles').select('id, referred_by') // Fetch all referral relationships
     ]);
 
     if (purchasesRes.error) console.error('Error fetching purchases for user aggregation:', purchasesRes.error.message);
     if (shareLogsRes.error) console.error('Error fetching share logs for user aggregation:', shareLogsRes.error.message);
+    if (allProfileRelationsRes.error) console.error('Error fetching profile relations:', allProfileRelationsRes.error.message);
 
     // Data is already filtered for success by the query.
     const allPurchases = purchasesRes.data || [];
     const allShareLogs = shareLogsRes.data || [];
+    const allProfileRelations = allProfileRelationsRes.data || [];
 
     // Step 3: Create lookup maps from the fetched data
-    const directReferralMap = profiles.reduce((acc, profile) => {
+    // Use all profile relations to build a complete map, not just filtered profiles
+    const directReferralMap = allProfileRelations.reduce((acc, profile) => {
         if (profile.referred_by) {
             if (!acc[profile.referred_by]) acc[profile.referred_by] = [];
             acc[profile.referred_by].push(profile.id);
