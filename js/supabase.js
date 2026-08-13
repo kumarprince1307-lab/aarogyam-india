@@ -763,7 +763,8 @@ async function savePurchase() {
             book_id: window.currentPurchase.bookId,
             payment_id: window.currentPurchase.paymentId,
             amount: window.currentPurchase.amount,
-            download_count: 0 // शुरुआत में डाउनलोड काउंट 0 रहेगा
+            download_count: 0, // शुरुआत में डाउनलोड काउंट 0 रहेगा
+            payment_status: PAYMENT.STATUS_SUCCESS // पेमेंट स्टेटस को 'success' पर सेट करें
         };
 
         console.log("📤 Saving purchase to Supabase:", purchasePayload);

@@ -526,7 +526,7 @@ export async function fetchUsers(params = {}) {
 
     // Step 2: Fetch all necessary aggregated data in parallel
     const [purchasesRes, shareLogsRes] = await Promise.all([
-        db.from('purchases').select('profile_id, amount').eq('payment_status', 'success'),
+        db.from('purchases').select('profile_id, amount').or('payment_status.eq.success,payment_status.is.null'),
         db.from('share_logs').select('share_token, event_type').in('share_token', shareIds)
     ]);
 
@@ -566,10 +566,12 @@ export async function fetchUsers(params = {}) {
         return acc;
     }, {});
 
-    const purchasingUserIds = new Set(allPurchases.map(p => p.profile_id));
     const directPurchaseCounts = {};
     for (const referrerId in directReferralMap) {
-        directPurchaseCounts[referrerId] = directReferralMap[referrerId].filter(id => purchasingUserIds.has(id)).length;
+        directPurchaseCounts[referrerId] = directReferralMap[referrerId].reduce((sum, referredId) => {
+            const referredUserStats = purchaseSummary[referredId];
+            return sum + (referredUserStats ? referredUserStats.totalPurchases : 0);
+        }, 0);
     }
 
     // Step 4: Map profiles and merge with purchase summary
