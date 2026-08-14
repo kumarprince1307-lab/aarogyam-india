@@ -110,6 +110,40 @@ function initCoreToggles() {
   });
 }
 
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+async function initPushNotifications() {
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+        console.warn('Push notifications are not supported in this browser.');
+        return;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+        console.log('Push notification permission not granted.');
+        return;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array('YOUR_PUBLIC_VAPID_KEY') // <-- महत्वपूर्ण: इसे अपनी VAPID कुंजी से बदलें
+    });
+
+    console.log('Push subscription successful:', subscription);
+    // इस सब्सक्रिप्शन ऑब्जेक्ट को अपने सर्वर पर भेजें
+    // await saveSubscriptionToServer(subscription);
+}
+
 // Safely bootstrap admin layout and router once DOM is fully ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', bootstrapAdminApp);
@@ -127,6 +161,7 @@ function bootstrapAdminApp() {
       console.warn('⚠️ initRouter is not available yet.');
     }
     initCoreToggles();
+    initPushNotifications(); // PWA नोटिफ़िकेशन शुरू करें
 
     // Register PWA Service Worker
     if ('serviceWorker' in navigator) {

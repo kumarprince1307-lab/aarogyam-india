@@ -13,6 +13,7 @@ const ROUTES = {
  'checkout-funnel': () => import('./admin-pages-checkout-funnel.js').then(m => m.initCheckoutFunnel()),
  'downloads': () => import('./admin-pages-downloads.js').then(m => m.initDownloads()),
  'reports': () => import('./admin-pages-reports.js').then(m => m.initReports()),
+ 'notifications': () => import('./admin-pages-notifications.js').then(m => m.initNotifications()),
  'settings': () => import('./admin-pages-settings.js').then(m => m.initSettings()).catch(() => { /* settings may be placeholder */ })
 };
 
