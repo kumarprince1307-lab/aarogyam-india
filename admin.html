@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aarogyam India Admin</title>
+    <link rel="stylesheet" href="/css/admin-main.css">
+    <link rel="stylesheet" href="/css/admin-components.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Theme color for browser UI -->
+    <meta name="theme-color" content="#020617"/>
+
+    <!-- iOS specific tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Aarogyam Admin">
+    <link rel="apple-touch-icon" href="/images/icons/icon-192x192.png">
+</head>
+<body class="admin-body">
+    <div id="sidebar-backdrop"></div>
+    <aside class="admin-sidebar" id="sidebar-placeholder"></aside>
+    <div class="admin-main-content">
+        <header class="admin-header" id="header-placeholder"></header>
+        <main class="admin-page-content" id="page-content"></main>
+    </div>
+
+    <!-- PWA Install Prompt Modal -->
+    <div id="pwa-install-prompt" class="pwa-prompt-overlay" style="display: none;">
+        <div class="pwa-prompt-card">
+            <div class="pwa-prompt-header">
+                <img src="/images/logo/logo.png" alt="Aarogyam India Logo" class="pwa-prompt-logo">
+                <h3>Install Aarogyam Admin App</h3>
+            </div>
+            <p class="pwa-prompt-desc">For a faster and better experience, add the admin panel to your home screen.</p>
+            <ul class="pwa-prompt-features">
+                <li><i class="fa-solid fa-bolt"></i> Faster Access</li>
+                <li><i class="fa-solid fa-bell"></i> Real-time Notifications</li>
+                <li><i class="fa-solid fa-mobile-screen"></i> Full Screen Experience</li>
+            </ul>
+            <div class="pwa-prompt-actions">
+                <button id="pwa-install-btn" class="pwa-install-button">Install App</button>
+                <button id="pwa-later-btn" class="pwa-later-button">Maybe Later</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="/js/admin-main.js"></script>
+</body>
+</html>

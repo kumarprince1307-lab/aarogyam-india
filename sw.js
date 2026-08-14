@@ -1,4 +1,5 @@
-const CACHE_NAME = 'aarogyam-admin-pwa-v2';
+const CACHE_NAME = 'aarogyam-admin-pwa-v3';
+const OFFLINE_URL = 'offline.html';
 const urlsToCache = [
   '/admin.html',
   '/css/admin-main.css',
@@ -9,29 +10,19 @@ const urlsToCache = [
   '/js/admin-components-header.js',
   '/js/admin-components-sidebar.js',
   '/js/supabase.js',
-  '/images/icons/icon-192x192.png',
-  '/images/icons/icon-512x512.png'
+  OFFLINE_URL
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Caching app shell');
+        console.log('Service Worker: Caching app shell and offline page');
         self.skipWaiting(); // नए सर्विस वर्कर को तुरंत एक्टिवेट करें
         return cache.addAll(urlsToCache);
       })
-  );
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(function(response) {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
+      .catch(error => {
+        console.error('Service Worker: Failed to cache app shell:', error);
       })
   );
 });
@@ -41,9 +32,41 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => Promise.all(
       // पुराने कैश को हटाएं
-      cacheNames.map(cacheName => (cacheWhitelist.indexOf(cacheName) === -1) ? caches.delete(cacheName) : null)
+      cacheNames.map(cacheName => {
+        if (cacheWhitelist.indexOf(cacheName) === -1) {
+          return caches.delete(cacheName);
+        }
+      })
     )).then(() => self.clients.claim()) // खुले हुए पेजों का कंट्रोल तुरंत लें
   );
+});
+
+self.addEventListener('fetch', event => {
+    const requestUrl = new URL(event.request.url);
+
+    // Bypass service worker for Supabase API requests to ensure fresh data.
+    if (requestUrl.hostname === 'qjhjrzsnrtahmhswxyvb.supabase.co') {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
+    if (event.request.mode === 'navigate') {
+        event.respondWith((async () => {
+            try {
+                const preloadResponse = await event.preloadResponse;
+                if (preloadResponse) return preloadResponse;
+                
+                const networkResponse = await fetch(event.request);
+                return networkResponse;
+            } catch (error) {
+                console.log('Fetch failed; returning offline page instead.', error);
+                const cache = await caches.open(CACHE_NAME);
+                return await cache.match(OFFLINE_URL);
+            }
+        })());
+    } else {
+        event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
+    }
 });
 
 self.addEventListener('message', event => {
