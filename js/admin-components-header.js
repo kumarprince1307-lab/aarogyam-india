@@ -33,9 +33,8 @@ export function renderHeader(containerId = 'header-placeholder', title = 'Admin 
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 1 0-3.2 6.4L21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           
-          <button id="admin-notify" class="admin-button icon-button" title="Notifications">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6 6 0 1 0-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span class="admin-badge">3</span>
+          <button id="admin-test-notify-btn" class="admin-button icon-button" title="Test Notification">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
           </button>
 
           <div class="theme-switch-wrapper">
@@ -123,6 +122,34 @@ export function renderHeader(containerId = 'header-placeholder', title = 'Admin 
     if (!c.contains(e.target)) {
       profileMenu?.setAttribute('aria-hidden', 'true');
       profileMenu?.classList.remove('open');
+    }
+  });
+
+  // --- Test Notification Button ---
+  const testNotifyBtn = c.querySelector('#admin-test-notify-btn');
+  testNotifyBtn?.addEventListener('click', async () => {
+    if ('serviceWorker' in navigator && 'Notification' in window) {
+        if (Notification.permission === 'granted') {
+            try {
+                // navigator.serviceWorker.ready ensures the service worker is active
+                const registration = await navigator.serviceWorker.ready;
+                registration.active.postMessage({
+                    type: 'SHOW_TEST_NOTIFICATION',
+                    payload: {
+                        title: 'Test Notification',
+                        body: 'यह एडमिन पैनल से एक टेस्ट नोटिफ़िकेशन है।',
+                        url: '#dashboard'
+                    }
+                });
+            } catch (error) {
+                console.error('Error sending message to service worker:', error);
+                alert('Could not communicate with the service worker. Please refresh.');
+            }
+        } else {
+            alert('Notification permission has not been granted. Please allow notifications in your browser settings.');
+        }
+    } else {
+      alert('Push notifications are not supported in this browser.');
     }
   });
 

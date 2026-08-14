@@ -110,6 +110,85 @@ function initCoreToggles() {
   });
 }
 
+
+// --- PWA Install Prompt Logic ---
+function initPwaInstallPrompt() {
+    const installPromptOverlay = document.getElementById('pwa-install-prompt');
+    const installBtn = document.getElementById('pwa-install-btn');
+    const laterBtn = document.getElementById('pwa-later-btn');
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        
+        // Check if user has already dismissed it in this session
+        const dismissed = sessionStorage.getItem('pwa_install_dismissed');
+        if (!dismissed) {
+            // Show the custom install prompt
+            if (installPromptOverlay) {
+                installPromptOverlay.style.display = 'flex';
+            }
+        }
+    });
+
+    installBtn?.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        installPromptOverlay.style.display = 'none';
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        deferredPrompt = null;
+    });
+
+    laterBtn?.addEventListener('click', () => {
+        installPromptOverlay.style.display = 'none';
+        sessionStorage.setItem('pwa_install_dismissed', 'true');
+    });
+
+    window.addEventListener('appinstalled', () => {
+        if (installPromptOverlay) installPromptOverlay.style.display = 'none';
+        deferredPrompt = null;
+        console.log('PWA was installed');
+    });
+}
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+async function initPushNotifications() {
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+        console.warn('Push notifications are not supported in this browser.');
+        return;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+        console.log('Push notification permission not granted.');
+        return;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array('YOUR_PUBLIC_VAPID_KEY') // <-- महत्वपूर्ण: इसे अपनी VAPID कुंजी से बदलें
+    });
+
+    console.log('Push subscription successful:', subscription);
+    // इस सब्सक्रिप्शन ऑब्जेक्ट को अपने सर्वर पर भेजें
+    // await saveSubscriptionToServer(subscription);
+}
+
 // Safely bootstrap admin layout and router once DOM is fully ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', bootstrapAdminApp);
@@ -127,6 +206,19 @@ function bootstrapAdminApp() {
       console.warn('⚠️ initRouter is not available yet.');
     }
     initCoreToggles();
+    initPushNotifications(); // PWA नोटिफ़िकेशन शुरू करें
+    initPwaInstallPrompt(); // PWA Install Prompt शुरू करें
+
+    // Register PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('✅ PWA ServiceWorker registration successful, scope is:', registration.scope);
+        }, err => {
+          console.error('❌ PWA ServiceWorker registration failed:', err);
+        });
+      });
+    }
   } catch (e) {
     console.error('admin-main bootstrap failed', e);
   }
