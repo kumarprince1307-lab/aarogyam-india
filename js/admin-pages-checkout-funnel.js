@@ -57,6 +57,17 @@ function renderTable(logs) {
                 </thead>
                 <tbody>
                     ${logs.map(log => {
+                        const statusValue = log.status.toLowerCase();
+                        let pillClass;
+
+                        if (statusValue.includes('/')) {
+                            // This is a combined follow-up status like IN/DR/F
+                            pillClass = 'warning'; 
+                        } else {
+                            // This is a single status like 'success'
+                            pillClass = statusColors[statusValue] || 'default';
+                        }
+
                         const sanitizedMobile = String(log.customer_mobile || '').replace(/\D/g, '');
                         
                         let callButtonHTML = '';
@@ -90,7 +101,7 @@ function renderTable(logs) {
                                 <div class="admin-user-email">${log.customer_mobile || 'No Mobile'}</div>
                             </td>
                             <td>${log.book_name || 'Unknown Book'}</td>
-                            <td><span class="admin-pill ${statusColors[log.status] || 'default'}">${log.status.toUpperCase()}</span></td>
+                            <td><span class="admin-pill ${pillClass}">${log.status.toUpperCase()}</span></td>
                             <td>
                                 ${actionButtons}
                             </td>

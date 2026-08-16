@@ -259,18 +259,7 @@ export async function fetchDashboardData(params = {}) {
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
     const todaysBirthdays = birthdaysRes.success ? birthdaysRes.data : [];
-    
-    const todaysCheckoutSummary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
-    if (todaysCheckoutRes.success) {
-        (todaysCheckoutRes.data || []).forEach(log => {
-            if (todaysCheckoutSummary.hasOwnProperty(log.status)) {
-                todaysCheckoutSummary[log.status]++;
-            }
-        });
-    }
-    todaysCheckoutSummary.follow_up = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed;
-    const totalAttempts = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed + todaysCheckoutSummary.success;
-    todaysCheckoutSummary.conversion_rate = totalAttempts > 0 ? ((todaysCheckoutSummary.success / totalAttempts) * 100).toFixed(1) + '%' : '0%';
+    const todaysCheckoutSummary = todaysCheckoutRes.success ? todaysCheckoutRes.data : { follow_up: 0, initiated: 0, dropped: 0, failed: 0, success: 0, conversion_rate: '0%' };
 
     // Business KPIs
     const businessKpis = [
@@ -461,8 +450,28 @@ export async function fetchCheckoutLogs(params = {}) {
     if (logsError) throw logsError;
     if (!logs || logs.length === 0) return { success: true, data: [] };
 
-    // If filtering for 'followup', we need to remove users who have already purchased the book.
+    // If filtering for 'followup', we need to group and then remove users who have already purchased.
     if (isFollowup && logs.length > 0) {
+        // NEW: Group logs by user and book to remove duplicates and combine statuses.
+        const groupedLogsMap = new Map();
+        for (const log of logs) {
+            // Only process logs with a profile_id
+            if (!log.profile_id) continue;
+
+            const key = `${log.profile_id}_${log.book_id}`;
+            if (!groupedLogsMap.has(key)) {
+                groupedLogsMap.set(key, {
+                    ...log, // Keep all fields from the first log
+                    statuses: new Set([log.status]),
+                });
+            } else {
+                groupedLogsMap.get(key).statuses.add(log.status);
+            }
+        }
+        
+        // The original `logs` array is replaced by the grouped and de-duplicated logs.
+        logs = Array.from(groupedLogsMap.values());
+
         // 1. Get unique profile_ids from the potential follow-up logs.
         const potentialFollowupProfileIds = [...new Set(logs.map(log => log.profile_id).filter(id => id))];
 
@@ -503,10 +512,24 @@ export async function fetchCheckoutLogs(params = {}) {
     // 5. Map logs and enrich with profile/book data
     let mappedData = logs.map(log => {
       const profile = profilesMap[log.profile_id] || {};
+      
+      // Format the status for display
+      let displayStatus;
+      if (isFollowup && log.statuses instanceof Set) {
+          const statusMap = { initiated: 'IN', dropped: 'DR', failed: 'F' };
+          const order = ['initiated', 'dropped', 'failed'];
+          displayStatus = order
+              .filter(s => log.statuses.has(s))
+              .map(s => statusMap[s])
+              .join('/');
+      } else {
+          displayStatus = log.status;
+      }
+
       return {
       id: log.id,
       created_at: log.created_at,
-      status: log.status,
+      status: displayStatus,
       book_id: log.book_id,
       profile_id: log.profile_id,
       customer_name: profile.full_name || 'N/A',

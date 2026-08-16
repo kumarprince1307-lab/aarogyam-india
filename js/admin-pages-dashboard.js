@@ -357,20 +357,14 @@ export async function initDashboard() {
       kpiRow.style.opacity = '1';
 
       if (result.success) {
-        const summary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
-        (result.data || []).forEach(log => {
-            if (summary.hasOwnProperty(log.status)) summary[log.status]++;
-        });
-        summary.follow_up = summary.initiated + summary.dropped + summary.failed;
-        const totalAttempts = summary.initiated + summary.dropped + summary.failed + summary.success;
-        summary.conversion_rate = totalAttempts > 0 ? ((summary.success / totalAttempts) * 100).toFixed(1) + '%' : '0%';
+        const summary = result.data; // The API now returns the complete summary object
 
-        widget.querySelector('[data-status="followup"] .kpi-value').textContent = summary.follow_up;
-        widget.querySelector('[data-status="initiated"] .kpi-value').textContent = summary.initiated;
-        widget.querySelector('[data-status="dropped"] .kpi-value').textContent = summary.dropped;
-        widget.querySelector('[data-status="failed"] .kpi-value').textContent = summary.failed;
-        widget.querySelector('[data-status="success"] .kpi-value').textContent = summary.success;
-        widget.querySelector('.kpi-card:not(.clickable) .kpi-value').textContent = summary.conversion_rate;
+        widget.querySelector('[data-status="followup"] .kpi-value').textContent = summary.follow_up || 0;
+        widget.querySelector('[data-status="initiated"] .kpi-value').textContent = summary.initiated || 0;
+        widget.querySelector('[data-status="dropped"] .kpi-value').textContent = summary.dropped || 0;
+        widget.querySelector('[data-status="failed"] .kpi-value').textContent = summary.failed || 0;
+        widget.querySelector('[data-status="success"] .kpi-value').textContent = summary.success || 0;
+        widget.querySelector('.kpi-card:not(.clickable) .kpi-value').textContent = summary.conversion_rate || '0%';
       }
     };
 
