@@ -134,74 +134,84 @@ export async function fetchShareEngineSummaryData() {
 }
 
 export async function fetchCheckoutSummary(params = {}) {
-  try {
-    const db = window.dbClient;
-    if (!db) throw new Error("Supabase client not available.");
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
 
-    // Default to today if no params provided
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const startDate = params.startDate || today;
-    const endDate = params.endDate || tomorrow;
+        const startDate = params.startDate || today;
+        const endDate = params.endDate || tomorrow;
 
-    const { data, error } = await db
-      .from('checkout_logs')
-      .select('status, profile_id, book_id') // MODIFIED: select book_id for accurate filtering
-      .gte('created_at', startDate.toISOString())
-      .lt('created_at', endDate.toISOString());
+        const { data, error } = await db
+            .from('checkout_logs')
+            .select('status, profile_id, book_id')
+            .gte('created_at', startDate.toISOString())
+            .lt('created_at', endDate.toISOString());
 
-    if (error) throw error;
-    if (!data || data.length === 0) return { success: true, data: [] };
+        if (error) throw error;
 
-    // --- NEW LOGIC TO CORRECT FOLLOW-UP COUNT ---
+        const summary = { follow_up: 0, initiated: 0, dropped: 0, failed: 0, success: 0, conversion_rate: '0%' };
+        if (!data || data.length === 0) return { success: true, data: summary };
 
-    // 1. Separate logs that are potential follow-ups from successful ones.
-    const potentialFollowupLogs = data.filter(log => 
-        log.status === 'initiated' || log.status === 'dropped' || log.status === 'failed'
-    );
-    const successLogs = data.filter(log => log.status === 'success');
+        const successLogs = data.filter(log => log.status === 'success');
+        const potentialFollowupLogs = data.filter(log => ['initiated', 'dropped', 'failed'].includes(log.status));
+        summary.success = successLogs.length;
 
-    if (potentialFollowupLogs.length === 0) {
-        // No potential follow-ups, just return the original data.
-        return { success: true, data: data };
+        if (potentialFollowupLogs.length === 0) {
+            const totalUniqueAttempts = new Set(successLogs.map(l => l.profile_id)).size;
+            summary.conversion_rate = totalUniqueAttempts > 0 ? ((summary.success / totalUniqueAttempts) * 100).toFixed(1) + '%' : '0%';
+            return { success: true, data: summary };
+        }
+
+        const potentialFollowupProfileIds = [...new Set(potentialFollowupLogs.map(log => log.profile_id).filter(id => id))];
+        const { data: successfulPurchases, error: purchaseError } = await db
+            .from('purchases')
+            .select('profile_id, book_id')
+            .in('profile_id', potentialFollowupProfileIds)
+            .or('payment_status.eq.success,payment_status.is.null');
+
+        if (purchaseError) {
+            console.error("Error fetching purchases for summary:", purchaseError);
+            potentialFollowupLogs.forEach(log => summary[log.status]++);
+            summary.follow_up = summary.initiated + summary.dropped + summary.failed;
+            return { success: true, data: summary };
+        }
+
+        const successfulPurchaseSet = new Set((successfulPurchases || []).map(p => `${p.profile_id}_${p.book_id}`));
+
+        // --- "Follow-up Required" KPI (Grouped Logic) ---
+        const actualFollowupGroups = new Set();
+        potentialFollowupLogs.forEach(log => {
+            if (log.profile_id && !successfulPurchaseSet.has(`${log.profile_id}_${log.book_id}`)) {
+                actualFollowupGroups.add(`${log.profile_id}_${log.book_id}`);
+            }
+        });
+        summary.follow_up = actualFollowupGroups.size;
+
+        // --- Individual KPIs (Ungrouped Logic, but filtered) ---
+        const actualFollowupLogs_ungrouped = potentialFollowupLogs.filter(log => 
+            !successfulPurchaseSet.has(`${log.profile_id}_${log.book_id}`)
+        );
+        actualFollowupLogs_ungrouped.forEach(log => {
+            if (summary.hasOwnProperty(log.status)) summary[log.status]++;
+        });
+
+        // --- Final Conversion Rate ---
+        const initiatingUserIds = new Set(potentialFollowupLogs.map(l => l.profile_id));
+        const successfulUserIds = new Set(successLogs.map(l => l.profile_id));
+        const totalUniqueAttempts = new Set([...initiatingUserIds, ...successfulUserIds]).size;
+        summary.conversion_rate = totalUniqueAttempts > 0 ? ((summary.success / totalUniqueAttempts) * 100).toFixed(1) + '%' : '0%';
+
+        return { success: true, data: summary };
+
+    } catch (error) {
+        console.error("Failed to fetch checkout summary:", error);
+        return { success: false, data: null, error: error.message };
     }
-
-    // 2. Get unique profile_ids from the potential follow-up logs.
-    const potentialFollowupProfileIds = [...new Set(potentialFollowupLogs.map(log => log.profile_id).filter(id => id))];
-
-    // 3. Fetch all successful purchases for these specific users.
-    const { data: successfulPurchases, error: purchaseError } = await db
-        .from('purchases')
-        .select('profile_id, book_id')
-        .in('profile_id', potentialFollowupProfileIds)
-        .or('payment_status.eq.success,payment_status.is.null');
-    
-    if (purchaseError) {
-        console.error("Error fetching successful purchases for checkout summary:", purchaseError);
-        // On error, return original data to avoid breaking the dashboard.
-        return { success: true, data: data };
-    }
-
-    // 4. Create a lookup Set for efficient filtering. Key: "profileId_bookId"
-    const successfulPurchaseSet = new Set(
-        (successfulPurchases || []).map(p => `${p.profile_id}_${p.book_id}`)
-    );
-
-    // 5. Filter out logs where the user has successfully purchased that specific book.
-    const actualFollowupLogs = potentialFollowupLogs.filter(log => 
-        !successfulPurchaseSet.has(`${log.profile_id}_${log.book_id}`)
-    );
-
-    // 6. Combine the accurate follow-up list with the success logs and return.
-    const correctedData = [...successLogs, ...actualFollowupLogs];
-
-    return { success: true, data: correctedData };
-  } catch (error) {
-    return { success: false, data: [], error: error.message };
-  }
 }
 
 export async function fetchTodaysBirthdays() {
@@ -302,18 +312,7 @@ export async function fetchDashboardData(params = {}) {
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
     const todaysBirthdays = birthdaysRes.success ? birthdaysRes.data : [];
-    
-    const todaysCheckoutSummary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
-    if (todaysCheckoutRes.success && Array.isArray(todaysCheckoutRes.data)) {
-        todaysCheckoutRes.data.forEach(log => {
-            if (todaysCheckoutSummary.hasOwnProperty(log.status)) {
-                todaysCheckoutSummary[log.status]++;
-            }
-        });
-    }
-    todaysCheckoutSummary.follow_up = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed;
-    const totalAttempts = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed + todaysCheckoutSummary.success;
-    todaysCheckoutSummary.conversion_rate = totalAttempts > 0 ? ((todaysCheckoutSummary.success / totalAttempts) * 100).toFixed(1) + '%' : '0%';
+    const todaysCheckoutSummary = todaysCheckoutRes.success ? todaysCheckoutRes.data : { follow_up: 0, initiated: 0, dropped: 0, failed: 0, success: 0, conversion_rate: '0%' };
 
     // Business KPIs
     const businessKpis = [

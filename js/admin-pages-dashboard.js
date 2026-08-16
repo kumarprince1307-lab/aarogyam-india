@@ -357,17 +357,7 @@ export async function initDashboard() {
       kpiRow.style.opacity = '1';
 
       if (result.success) {
-        // The API returns an array of logs, so we need to summarize it here.
-        const logs = result.data;
-        const summary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
-        (logs || []).forEach(log => {
-            if (summary.hasOwnProperty(log.status)) {
-                summary[log.status]++;
-            }
-        });
-        summary.follow_up = summary.initiated + summary.dropped + summary.failed;
-        const totalAttempts = summary.initiated + summary.dropped + summary.failed + summary.success;
-        summary.conversion_rate = totalAttempts > 0 ? ((summary.success / totalAttempts) * 100).toFixed(1) + '%' : '0%';
+        const summary = result.data; // The API now returns the complete summary object
 
         widget.querySelector('[data-status="followup"] .kpi-value').textContent = summary.follow_up || 0;
         widget.querySelector('[data-status="initiated"] .kpi-value').textContent = summary.initiated || 0;
