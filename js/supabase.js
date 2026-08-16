@@ -676,13 +676,14 @@ function startPayment() {
         name: "Aarogyam India",
         description: window.currentOrder.title,
         
-        // 🟢 बस इतना सा हिस्सा जोड़ना है:
+        // 🟢 अपडेटेड notes (order_id हटा दिया गया है)
         notes: {
             book_id: currentBookId,
-            invoice_number: currentInvoiceNo,
-            order_id: window.currentPurchase ? window.currentPurchase.orderId : "Pending"
+            invoice_number: currentInvoiceNo
         },
 
+        handler: async function (response) {
+            // आपका बाकी का पुराना कोड वैसे ही रहेगा...
         handler: async function (response) {
             currentPayment.status = PAYMENT.STATUS_SUCCESS;
             currentPayment.paymentId = response.razorpay_payment_id;
