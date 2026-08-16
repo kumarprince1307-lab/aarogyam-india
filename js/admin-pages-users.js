@@ -1,7 +1,7 @@
 /* Admin Users Page */
 
 import { initAdminLayout } from './admin-main.js';
-import { fetchUsers } from './admin-api.js';
+import { fetchUsers, updateUserStatus, batchUpdateUserStatuses } from './admin-api.js';
 
 let currentUsersData = []; // Store current user data for export
 
@@ -38,7 +38,16 @@ function renderUserRow(user) {
       <td>${user.totalDirectPurchases || 0}</td>
       <td>${user.totalPurchases || 0}</td>
       <td>₹${(user.totalSpent || 0).toLocaleString('en-IN')}</td>      <td>${user.totalDownloads || 0} / ${user.downloadLimit || 0}</td>
-      <td><span class="admin-pill ${user.status.toLowerCase()}">${user.status}</span></td>
+      <td>
+        <button 
+          class="admin-button small-button admin-status-toggle ${user.status.toLowerCase()}"
+          data-user-id="${user.id}"
+          data-current-status="${user.status.toLowerCase()}"
+          title="Click to toggle status"
+        >
+          ${user.status}
+        </button>
+      </td>
       <td>
         <div style="display: flex; gap: 8px; align-items: center;">
             <a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-button small-button">View</a>
@@ -195,14 +204,43 @@ export async function initUsers() {
   // Listen to global admin search
   document.addEventListener('admin:global-search', (e) => reload(e.detail?.query || ''));
 
-  // Handle clicks on data-route links inside the table
-  container.addEventListener('click', (e) => {
+  // Handle clicks on data-route links and status toggles inside the table
+  container.addEventListener('click', async (e) => {
     const link = e.target.closest('[data-route="user-details"]');
     if (link && link.dataset.id) {
         window.location.hash = `user-details?id=${link.dataset.id}`;
+        return; // It's a navigation link, stop here.
+    }
+
+    const toggleBtn = e.target.closest('.admin-status-toggle');
+    if (toggleBtn) {
+        const userId = toggleBtn.dataset.userId;
+        const currentStatus = toggleBtn.dataset.currentStatus;
+        const newStatusBool = currentStatus === 'inactive';
+
+        const originalText = toggleBtn.textContent;
+        toggleBtn.disabled = true;
+        toggleBtn.textContent = '...';
+
+        const result = await updateUserStatus(userId, newStatusBool);
+
+        if (result.success) {
+            const newStatusString = newStatusBool ? 'active' : 'inactive';
+            toggleBtn.dataset.currentStatus = newStatusString;
+            toggleBtn.textContent = newStatusString;
+            toggleBtn.classList.remove('active', 'inactive');
+            toggleBtn.classList.add(newStatusString);
+        } else {
+            alert('Failed to update status. Please try again.');
+            toggleBtn.textContent = originalText; // revert text
+        }
+        toggleBtn.disabled = false;
     }
   });
 
+  // Automatically sync statuses on page load to correct any discrepancies.
+  container.innerHTML = '<div class="admin-loading">Syncing user statuses...</div>';
+  await batchUpdateUserStatuses();
   await reload();
 }
 

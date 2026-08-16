@@ -85,11 +85,20 @@ export async function fetchShareEngineSummaryData() {
       .select('id', { count: 'exact', head: true });
     if(leadsError) console.error('Error fetching total leads:', leadsError.message);
 
-    // 5. Total Registrations
+    // 5. Total Registrations, Active & Inactive Users
     const { count: totalRegistrations, error: regsError } = await db
       .from('profiles')
       .select('id', { count: 'exact', head: true });
     if(regsError) console.error('Error fetching total registrations:', regsError.message);
+
+    const { count: totalActiveUsers, error: activeError } = await db
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true);
+    if(activeError) console.error('Error fetching active users:', activeError.message);
+
+    const totalInactiveUsers = (totalRegistrations || 0) - (totalActiveUsers || 0);
+
 
     // 6. Total Purchases & Revenue
     const { data: purchases, error: purchasesError } = await db
@@ -110,6 +119,8 @@ export async function fetchShareEngineSummaryData() {
       totalVisitors: totalVisitors || 0,
       totalLeads: totalLeads || 0,
       totalRegistrations: totalRegistrations || 0,
+      totalActiveUsers: totalActiveUsers || 0,
+      totalInactiveUsers: totalInactiveUsers || 0,
       totalPurchases: totalPurchases || 0,
       totalRevenue: totalRevenue || 0,
       conversionRate: `${conversionRate}%`,
@@ -123,31 +134,84 @@ export async function fetchShareEngineSummaryData() {
 }
 
 export async function fetchCheckoutSummary(params = {}) {
-  try {
-    const db = window.dbClient;
-    if (!db) throw new Error("Supabase client not available.");
+    try {
+        const db = window.dbClient;
+        if (!db) throw new Error("Supabase client not available.");
 
-    // Default to today if no params provided
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const startDate = params.startDate || today;
-    const endDate = params.endDate || tomorrow;
+        const startDate = params.startDate || today;
+        const endDate = params.endDate || tomorrow;
 
-    const { data, error } = await db
-      .from('checkout_logs')
-      .select('status') // FIX: Was using 'count' which returns a number, not the list of statuses.
-      .gte('created_at', startDate.toISOString())
-      .lt('created_at', endDate.toISOString());
+        const { data, error } = await db
+            .from('checkout_logs')
+            .select('status, profile_id, book_id')
+            .gte('created_at', startDate.toISOString())
+            .lt('created_at', endDate.toISOString());
 
-    if (error) throw error;
-    // The data is now an array of objects like [{status: 'initiated'}, {status: 'success'}]
-    return { success: true, data: data };
-  } catch (error) {
-    return { success: false, data: [], error: error.message };
-  }
+        if (error) throw error;
+
+        const summary = { follow_up: 0, initiated: 0, dropped: 0, failed: 0, success: 0, conversion_rate: '0%' };
+        if (!data || data.length === 0) return { success: true, data: summary };
+
+        const successLogs = data.filter(log => log.status === 'success');
+        const potentialFollowupLogs = data.filter(log => ['initiated', 'dropped', 'failed'].includes(log.status));
+        summary.success = successLogs.length;
+
+        if (potentialFollowupLogs.length === 0) {
+            const totalUniqueAttempts = new Set(successLogs.map(l => l.profile_id)).size;
+            summary.conversion_rate = totalUniqueAttempts > 0 ? ((summary.success / totalUniqueAttempts) * 100).toFixed(1) + '%' : '0%';
+            return { success: true, data: summary };
+        }
+
+        const potentialFollowupProfileIds = [...new Set(potentialFollowupLogs.map(log => log.profile_id).filter(id => id))];
+        const { data: successfulPurchases, error: purchaseError } = await db
+            .from('purchases')
+            .select('profile_id, book_id')
+            .in('profile_id', potentialFollowupProfileIds)
+            .or('payment_status.eq.success,payment_status.is.null');
+
+        if (purchaseError) {
+            console.error("Error fetching purchases for summary:", purchaseError);
+            potentialFollowupLogs.forEach(log => summary[log.status]++);
+            summary.follow_up = summary.initiated + summary.dropped + summary.failed;
+            return { success: true, data: summary };
+        }
+
+        const successfulPurchaseSet = new Set((successfulPurchases || []).map(p => `${p.profile_id}_${p.book_id}`));
+
+        // --- "Follow-up Required" KPI (Grouped Logic) ---
+        const actualFollowupGroups = new Set();
+        potentialFollowupLogs.forEach(log => {
+            if (log.profile_id && !successfulPurchaseSet.has(`${log.profile_id}_${log.book_id}`)) {
+                actualFollowupGroups.add(`${log.profile_id}_${log.book_id}`);
+            }
+        });
+        summary.follow_up = actualFollowupGroups.size;
+
+        // --- Individual KPIs (Ungrouped Logic, but filtered) ---
+        const actualFollowupLogs_ungrouped = potentialFollowupLogs.filter(log => 
+            !successfulPurchaseSet.has(`${log.profile_id}_${log.book_id}`)
+        );
+        actualFollowupLogs_ungrouped.forEach(log => {
+            if (summary.hasOwnProperty(log.status)) summary[log.status]++;
+        });
+
+        // --- Final Conversion Rate ---
+        const initiatingUserIds = new Set(potentialFollowupLogs.map(l => l.profile_id));
+        const successfulUserIds = new Set(successLogs.map(l => l.profile_id));
+        const totalUniqueAttempts = new Set([...initiatingUserIds, ...successfulUserIds]).size;
+        summary.conversion_rate = totalUniqueAttempts > 0 ? ((summary.success / totalUniqueAttempts) * 100).toFixed(1) + '%' : '0%';
+
+        return { success: true, data: summary };
+
+    } catch (error) {
+        console.error("Failed to fetch checkout summary:", error);
+        return { success: false, data: null, error: error.message };
+    }
 }
 
 export async function fetchTodaysBirthdays() {
@@ -177,65 +241,88 @@ export async function fetchTodaysBirthdays() {
     }
 }
 
-export async function fetchDashboardData() {
+export async function fetchDashboardData(params = {}) {
   await delay(250); // Simulate network latency
   try {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
 
-    const thirtyDaysAgo = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString();
+    const defaultEndDate = new Date();
+    const defaultStartDate = new Date(new Date().setDate(defaultEndDate.getDate() - 30));
+
+    const endDateForFilter = params.endDate ? new Date(params.endDate) : defaultEndDate;
+    // To make the 'lt' operator inclusive of the end date, we set the time to the end of the day or go to the next day.
+    const apiEndDate = new Date(endDateForFilter);
+    apiEndDate.setHours(23, 59, 59, 999);
+
+    const startDateForFilter = params.startDate ? new Date(params.startDate) : defaultStartDate;
+    startDateForFilter.setHours(0, 0, 0, 0);
 
     // --- Fetch all required data in parallel ---
     const [
       shareSummaryRes,
-      monthlyPurchasesRes,
-      newCustomersRes,
+      periodPurchasesRes,
       allProfilesRes,
       allPurchasesRes,
       booksRes,
       birthdaysRes,
       todaysCheckoutRes,
       recentPurchasesRes,
-      recentProfilesRes
+      recentProfilesRes,
+      periodProfilesRes,
+      periodSharesRes,
+      periodClicksRes,
+      periodVisitorsRes
     ] = await Promise.all([
       fetchShareEngineSummaryData(), // Reuse the existing summary function
-      db.from('purchases').select('amount').gte('purchase_date', thirtyDaysAgo),
-      db.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', thirtyDaysAgo),
+      db.from('purchases').select('amount, profile_id').or('payment_status.eq.success,payment_status.is.null').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
       db.from('profiles').select('id, full_name, created_at, registration_source'), // This is for profiles, not books
-      db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status'),
+      db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status').or('payment_status.eq.success,payment_status.is.null').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
       db.from('books').select('id, title'), // FIX: Removed 'name' as it may not exist.
       fetchTodaysBirthdays(),
       fetchCheckoutSummary(), // MODIFIED: Call with no params to get today's data by default
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
-      db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5)
+      db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5),
+      // New query for period-specific user counts
+      db.from('profiles').select('id, is_active').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
+      // Period-specific share engine stats
+      db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'share').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
+      db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'click').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
+      db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'visit').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString())
     ]);
 
     // --- Process Data ---
     const shareSummary = shareSummaryRes.success ? shareSummaryRes.data : {};
-    const monthlyRevenue = (monthlyPurchasesRes.data || []).reduce((sum, p) => sum + (p.amount || 0), 0);
-    const newCustomers = newCustomersRes.count || 0;
+    const periodPurchases = periodPurchasesRes.data || [];
+    const monthlyRevenue = periodPurchases.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const totalPurchasesInPeriod = periodPurchases.length;
+
+    // Process period-specific user counts
+    const periodProfiles = periodProfilesRes.data || [];
+    const totalUsersInPeriod = periodProfiles.length;
+    const activeUsersInPeriod = periodProfiles.filter(p => p.is_active).length;
+    const inactiveUsersInPeriod = totalUsersInPeriod - activeUsersInPeriod;
+
+    // Process period-specific share stats
+    const periodShares = periodSharesRes.count || 0;
+    const periodClicks = periodClicksRes.count || 0;
+    const periodVisitors = periodVisitorsRes.count || 0;
+    const periodConversionRate = periodVisitors > 0 ? ((totalPurchasesInPeriod / periodVisitors) * 100).toFixed(2) : '0.00';
+
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
     const todaysBirthdays = birthdaysRes.success ? birthdaysRes.data : [];
-    
-    const todaysCheckoutSummary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
-    if (todaysCheckoutRes.success) {
-        (todaysCheckoutRes.data || []).forEach(log => {
-            if (todaysCheckoutSummary.hasOwnProperty(log.status)) {
-                todaysCheckoutSummary[log.status]++;
-            }
-        });
-    }
-    todaysCheckoutSummary.follow_up = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed;
-    const totalAttempts = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed + todaysCheckoutSummary.success;
-    todaysCheckoutSummary.conversion_rate = totalAttempts > 0 ? ((todaysCheckoutSummary.success / totalAttempts) * 100).toFixed(1) + '%' : '0%';
+    const todaysCheckoutSummary = todaysCheckoutRes.success ? todaysCheckoutRes.data : { follow_up: 0, initiated: 0, dropped: 0, failed: 0, success: 0, conversion_rate: '0%' };
 
     // Business KPIs
     const businessKpis = [
-      { label: 'Monthly Revenue', value: `₹${monthlyRevenue.toLocaleString('en-IN')}` },
-      { label: 'New Customers', value: newCustomers.toLocaleString('en-IN') },
-      { label: 'Conversion Rate', value: shareSummary.conversionRate || '0.00%' },
-      { label: 'Total Shares', value: shareSummary.totalShares || 0 }
+      { label: 'Revenue', value: `₹${monthlyRevenue.toLocaleString('en-IN')}` },
+      { label: 'New Users', value: totalUsersInPeriod.toLocaleString('en-IN') },
+      { label: 'Active Users', value: activeUsersInPeriod.toLocaleString('en-IN') },
+      { label: 'Inactive Users', value: inactiveUsersInPeriod.toLocaleString('en-IN') },
+      { label: 'Conversion Rate', value: `${periodConversionRate}%` },
+      { label: 'Total Shares', value: periodShares.toLocaleString('en-IN') },
+      { label: 'Total Clicks', value: periodClicks.toLocaleString('en-IN') }
     ];
 
     // Lead Sources
@@ -395,8 +482,10 @@ export async function fetchCheckoutLogs(params = {}) {
     }
 
     // Status Filter
+    const isFollowup = params.status === 'followup';
     if (params.status && params.status !== 'all') {
-        if (params.status === 'followup') {
+        if (isFollowup) {
+            // For followup, we fetch all non-success logs first, then filter out those who have purchased.
             queryBuilder = queryBuilder.in('status', ['initiated', 'dropped', 'failed']);
         } else {
             queryBuilder = queryBuilder.eq('status', params.status);
@@ -410,8 +499,54 @@ export async function fetchCheckoutLogs(params = {}) {
 
     queryBuilder = queryBuilder.order('created_at', { ascending: false }).limit(200); // Fetch more for client-side search
 
-    const { data: logs, error: logsError } = await queryBuilder;
+    let { data: logs, error: logsError } = await queryBuilder;
     if (logsError) throw logsError;
+    if (!logs || logs.length === 0) return { success: true, data: [] };
+
+    // If filtering for 'followup', we need to group and then remove users who have already purchased.
+    if (isFollowup && logs.length > 0) {
+        // NEW: Group logs by user and book to remove duplicates and combine statuses.
+        const groupedLogsMap = new Map();
+        for (const log of logs) {
+            // Only process logs with a profile_id
+            if (!log.profile_id) continue;
+
+            const key = `${log.profile_id}_${log.book_id}`;
+            if (!groupedLogsMap.has(key)) {
+                groupedLogsMap.set(key, {
+                    ...log, // Keep all fields from the first log
+                    statuses: new Set([log.status]),
+                });
+            } else {
+                groupedLogsMap.get(key).statuses.add(log.status);
+            }
+        }
+        
+        // The original `logs` array is replaced by the grouped and de-duplicated logs.
+        logs = Array.from(groupedLogsMap.values());
+
+        // 1. Get unique profile_ids from the potential follow-up logs.
+        const potentialFollowupProfileIds = [...new Set(logs.map(log => log.profile_id).filter(id => id))];
+
+        // 2. Fetch all successful purchases for these specific users.
+        const { data: successfulPurchases, error: purchaseError } = await db
+            .from('purchases')
+            .select('profile_id, book_id')
+            .in('profile_id', potentialFollowupProfileIds)
+            .or('payment_status.eq.success,payment_status.is.null');
+        
+        if (purchaseError) {
+            console.error("Error fetching successful purchases for followup filter:", purchaseError);
+        } else if (successfulPurchases && successfulPurchases.length > 0) {
+            // 3. Create a lookup Set for efficient filtering. Key: "profileId_bookId"
+            const successfulPurchaseSet = new Set(
+                successfulPurchases.map(p => `${p.profile_id}_${p.book_id}`)
+            );
+
+            // 4. Filter out logs where the user has successfully purchased that specific book.
+            logs = logs.filter(log => !successfulPurchaseSet.has(`${log.profile_id}_${log.book_id}`));
+        }
+    }
     if (!logs || logs.length === 0) return { success: true, data: [] };
 
     // 2. Collect unique IDs to fetch related data without joins
@@ -430,10 +565,24 @@ export async function fetchCheckoutLogs(params = {}) {
     // 5. Map logs and enrich with profile/book data
     let mappedData = logs.map(log => {
       const profile = profilesMap[log.profile_id] || {};
+      
+      // Format the status for display
+      let displayStatus;
+      if (isFollowup && log.statuses instanceof Set) {
+          const statusMap = { initiated: 'IN', dropped: 'DR', failed: 'F' };
+          const order = ['initiated', 'dropped', 'failed'];
+          displayStatus = order
+              .filter(s => log.statuses.has(s))
+              .map(s => statusMap[s])
+              .join('/');
+      } else {
+          displayStatus = log.status;
+      }
+
       return {
       id: log.id,
       created_at: log.created_at,
-      status: log.status,
+      status: displayStatus,
       book_id: log.book_id,
       profile_id: log.profile_id,
       customer_name: profile.full_name || 'N/A',
@@ -854,6 +1003,76 @@ export async function fetchUserDetails(userId) {
   } catch (error) {
     console.error('Failed to fetch user details:', error);
     return { success: false, data: null, error: error.message };
+  }
+}
+
+export async function updateUserStatus(userId, isActive) {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+
+    const { data, error } = await db
+      .from('profiles')
+      .update({ is_active: isActive })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Failed to update user status:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function batchUpdateUserStatuses() {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+
+    // Step 1: Get all profile IDs and their current status
+    const { data: profiles, error: profilesError } = await db.from('profiles').select('id, is_active');
+    if (profilesError) throw profilesError;
+
+    // Step 2: Get all unique profile IDs from successful purchases
+    const { data: purchases, error: purchasesError } = await db.from('purchases').select('profile_id').or('payment_status.eq.success,payment_status.is.null');
+    if (purchasesError) throw purchasesError;
+
+    const purchasingUserIds = new Set((purchases || []).map(p => p.profile_id).filter(Boolean));
+
+    // Step 3: Determine which users need their status changed
+    const idsToActivate = [];
+    const idsToDeactivate = [];
+
+    for (const profile of profiles) {
+        const hasPurchases = purchasingUserIds.has(profile.id);
+        const currentlyActive = profile.is_active;
+
+        if (hasPurchases && !currentlyActive) {
+            idsToActivate.push(profile.id);
+        } else if (!hasPurchases && currentlyActive) {
+            idsToDeactivate.push(profile.id);
+        }
+    }
+
+    // Step 4: Perform bulk updates in parallel if needed
+    const updatePromises = [];
+    if (idsToActivate.length > 0) {
+        updatePromises.push(db.from('profiles').update({ is_active: true }).in('id', idsToActivate));
+    }
+    if (idsToDeactivate.length > 0) {
+        updatePromises.push(db.from('profiles').update({ is_active: false }).in('id', idsToDeactivate));
+    }
+
+    const results = await Promise.all(updatePromises);
+    results.forEach(res => { if (res.error) console.error('A batch update failed:', res.error); });
+
+    return { success: true, activated: idsToActivate.length, deactivated: idsToDeactivate.length };
+
+  } catch (error) {
+    console.error('Failed to run batch user status update:', error);
+    return { success: false, error: error.message, activated: 0, deactivated: 0 };
   }
 }
 

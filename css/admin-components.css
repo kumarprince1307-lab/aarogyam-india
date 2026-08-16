@@ -317,6 +317,29 @@ body.desktop-collapsed .admin-sidebar .menu-children {
   border-bottom-color: var(--admin-primary);
 }
 
+/* === Status Toggle Button === */
+.admin-button.admin-status-toggle.active {
+    background-color: #10b981; /* Solid Green */
+    color: #fff;
+    border-color: #0f9a6c;
+    text-transform: capitalize;
+    min-width: 85px;
+    text-align: center;
+}
+
+.admin-button.admin-status-toggle.inactive {
+    background-color: #ef4444; /* Solid Red */
+    color: #fff;
+    border-color: #d73737;
+    text-transform: capitalize;
+    min-width: 85px;
+    text-align: center;
+}
+
+.admin-status-toggle:hover {
+    opacity: 0.9;
+}
+
 /* === PWA Install Prompt === */
 .pwa-prompt-overlay {
   position: fixed;
