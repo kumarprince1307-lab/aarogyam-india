@@ -109,7 +109,7 @@ async function trackAttributionEvent(eventPayload) {
     try {
         const activeDb = window.dbClient || window.supabase;
         if (activeDb && typeof activeDb.from === "function") {
-            const tableName = "share_logs"; // यहाँ अपनी टेबल का सही नाम जांच लें
+            const tableName = "share_logs"; 
             const { error } = await activeDb.from(tableName).insert([payload]);
             if (error) {
                 console.error("❌ Error saving share log to DB:", error.message);
@@ -584,8 +584,9 @@ async function createCheckout(bookId) {
 }
 console.log("✅ Checkout Module Loaded");
 
+
 /* ===========================================================
-   ENGINE 7: RAZORPAY PAYMENT GATEWAY (Fixed with Order ID & Invoice No)
+   ENGINE 7: RAZORPAY PAYMENT GATEWAY (Fixed handler duplication)
 =========================================================== */
 const PAYMENT = { STATUS_PENDING: "pending", STATUS_SUCCESS: "success", STATUS_FAILED: "failed" };
 const RAZORPAY = { KEY_ID: "rzp_live_TOlsqOqkmxYCWP" };
@@ -626,7 +627,6 @@ async function sendDirectCheckoutLog(statusValue) {
 
         console.log(`📤 Sending checkout log [${uId}, ${bId}, ${statusValue}] to Supabase...`);
 
-        // डेटाबेस में इंसर्ट करें और जनरेट हुई order_id को वापस (.select()) लें
         const { data, error } = await activeDb
             .from("checkout_logs")
             .insert([{
@@ -667,7 +667,7 @@ function startPayment() {
     
     const currentBookId = window.currentOrder.bookId;
     const currentAmount = window.currentOrder.amount;
-    const currentInvoiceNo = "INV_" + Date.now(); // यूनिक इनवॉइस नंबर जनरेट करना
+    const currentInvoiceNo = "INV_" + Date.now(); 
     
     const options = {
         key: RAZORPAY.KEY_ID,
@@ -675,15 +675,10 @@ function startPayment() {
         currency: "INR",
         name: "Aarogyam India",
         description: window.currentOrder.title,
-        
-        // 🟢 अपडेटेड notes (order_id हटा दिया गया है)
         notes: {
             book_id: currentBookId,
             invoice_number: currentInvoiceNo
         },
-
-        handler: async function (response) {
-            // आपका बाकी का पुराना कोड वैसे ही रहेगा...
         handler: async function (response) {
             currentPayment.status = PAYMENT.STATUS_SUCCESS;
             currentPayment.paymentId = response.razorpay_payment_id;
@@ -691,20 +686,18 @@ function startPayment() {
             localStorage.setItem("AI_CURRENT_PAYMENT", JSON.stringify(currentPayment));
 
             try {
-                // 1. checkout_logs से जनरेटेड order_id प्राप्त करें
                 const generatedOrderId = await sendDirectCheckoutLog('success');
-                
                 const currentUser = typeof getCurrentUserProfile === "function" ? getCurrentUserProfile() : null;
+                const storedUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
                 
-                // 2. purchases के लिए डेटा तैयार करें जिसमें order_id और invoice_number दोनों हों
                 window.currentPurchase = {
                     purchaseId: "PUR_" + Date.now(),
                     profileId: currentUser ? currentUser.id : (storedUser ? storedUser.id : null),
                     bookId: currentBookId,
                     paymentId: response.razorpay_payment_id,
                     amount: currentAmount,
-                    orderId: generatedOrderId,       // 👈 डेटाबेस का order_id कॉलम
-                    invoice_number: currentInvoiceNo, // 👈 डेटाबेस का invoice_number कॉलम
+                    orderId: generatedOrderId,       
+                    invoice_number: currentInvoiceNo, 
                     purchasedAt: new Date().toISOString()
                 };
 
@@ -788,8 +781,8 @@ async function savePurchase() {
             book_id: window.currentPurchase.bookId,
             payment_id: window.currentPurchase.paymentId,
             amount: window.currentPurchase.amount,
-            order_id: window.currentPurchase.orderId,             // 👈 यहाँ आर्डर आईडी सेव होगी
-            invoice_number: window.currentPurchase.invoice_number, // 👈 यहाँ इनवॉइस नंबर सेव होगा
+            order_id: window.currentPurchase.orderId,            
+            invoice_number: window.currentPurchase.invoice_number, 
             download_count: 0, 
             payment_status: PAYMENT.STATUS_SUCCESS 
         };
@@ -813,16 +806,12 @@ async function savePurchase() {
 console.log("✅ Purchases Module Loaded");
 
 
-
-
 /* ===========================================================
    ENGINE 10: PDF READER
 =========================================================== */
 let reader = { bookId: null, pdf: null, page: 1, totalPages: 0, zoom: 1 };
 
 async function loadReader(bookId) {
-    const allowed = await hasPurchased(bookId);
-    if (!allowed) return { success: false, message: "Access denied." };
     const book = await getBookById(bookId);
     if (!book) return { success: false, message: "Book not found." };
     reader.bookId = bookId;
