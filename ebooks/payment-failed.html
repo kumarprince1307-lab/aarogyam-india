@@ -1,221 +1,80 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Failed | Aarogyam India</title>
-
-    <meta name="description"
-          content="Payment Failed">
-
-    <link rel="stylesheet"
-          href="../css/payment-failed.css">
-
+    <link rel="stylesheet" href="../css/payment-failed.css">
 </head>
-
 <body>
 
 <header class="failed-header">
-
-    <h1>
-
-        Payment Failed
-
-    </h1>
-
+    <h1>Payment Failed</h1>
 </header>
 
 <main class="failed-container">
 
-    <!--==========================
-        FAILED ICON
-    ===========================-->
-
-    <section class="failed-icon">
-
-        <div class="failed-circle">
-
-            ✕
-
+    <!-- TOP SECTION: Small Cross & Black Glass Box (Yellow Area) -->
+    <div class="top-status-wrapper">
+        <div class="failed-circle">✕</div>
+        
+        <div class="black-glass-warning">
+            <h2>Payment Incomplete</h2>
+            <p>Your payment could not be processed at the moment.<br>Don't worry, if any amount was deducted, it is 100% safe.</p>
         </div>
+    </div>
 
+    <!-- REFUND REASSURANCE: Light Green Glass Box (Red Area 2) -->
+    <div class="green-glass-box">
+        <p>🛡️ <strong>पैसे कट गए हैं?</strong> यदि बैंक खाते से पैसे कट गए हैं, तो घबराएं नहीं। यह राशि सामान्यतः <strong>4-5 कार्यदिवसों</strong> के भीतर आपके बैंक खाते में स्वतः वापस आ जाएगी।</p>
+    </div>
+
+    <!-- ORDER SUMMARY CARD -->
+    <section class="order-details-card">
+        <h3>Order Summary</h3>
+        <div class="detail-row">
+            <span>Order ID</span>
+            <span id="orderId">Not Available</span>
+        </div>
+        <div class="detail-row">
+            <span>Book</span>
+            <span id="bookName">Loading...</span>
+        </div>
+        <div class="detail-row">
+            <span>Amount</span>
+            <span id="amount">₹0</span>
+        </div>
+        <div class="detail-row">
+            <span>Status</span>
+            <span class="failed-status">Failed / Dropped</span>
+        </div>
     </section>
 
-    <!--==========================
-        MESSAGE
-    ===========================-->
-
-    <section class="failed-message">
-
-        <h2>
-
-            Payment Failed
-
-        </h2>
-
-        <p>
-
-            Your payment could not be completed.
-
-        </p>
-
-        <p>
-
-            Please try again.
-
-        </p>
-
-    </section>
-
-    <!--==========================
-        ORDER DETAILS
-    ===========================-->
-
-    <section class="order-details">
-
-        <h3>
-
-            Order Details
-
-        </h3>
-
-        <div class="detail-row">
-
-            <span>
-
-                Order ID
-
-            </span>
-
-            <span id="orderId">
-
-                Loading...
-
-            </span>
-
+    <!-- SUPPORT SECTION: Black Premium Box with Centered WhatsApp (Red Area 1) -->
+    <div class="black-glass-support">
+        <h3>Need Immediate Assistance?</h3>
+        <p>अगर आपको पेमेंट करने में या किसी भी अन्य तकनीकी समस्या का सामना करना पड़ रहा है, तो हमारी सहायता टीम से सीधे व्हाट्सएप पर संपर्क करें।</p>
+        
+        <div class="whatsapp-btn-container">
+            <a href="#" id="whatsappSupportBtn" target="_blank" class="help-btn">
+                💬 WhatsApp Support से बात करें
+            </a>
         </div>
+    </div>
 
-        <div class="detail-row">
-
-            <span>
-
-                Book
-
-            </span>
-
-            <span id="bookName">
-
-                Loading...
-
-            </span>
-
-        </div>
-
-        <div class="detail-row">
-
-            <span>
-
-                Amount
-
-            </span>
-
-            <span id="amount">
-
-                ₹0
-
-            </span>
-
-        </div>
-
-        <div class="detail-row">
-
-            <span>
-
-                Status
-
-            </span>
-
-            <span class="failed-status">
-
-                Failed
-
-            </span>
-
-        </div>
-
-    </section>
-
-    <!--==========================
-        HELP MESSAGE
-    ===========================-->
-
-    <section class="help-box">
-
-        <p>
-
-            If money has been deducted,
-            please contact support.
-
-        </p>
-
-    </section>
-<!--=========================================
-UNIVERSAL HELP SECTION
-==========================================-->
-
-<section class="universal-help">
-
-    <h3>Need Help?</h3>
-
-    <p>
-        If your payment has failed, your payment was deducted, or you are facing any issue, our support team is ready to help. Contact us on WhatsApp and we'll assist you as soon as possible.
-    </p>
-
-    <a href="https://wa.me/917974422572?text=Hello%20Aarogyam%20India,%20My%20payment%20is%20failing.%20Please%20suggest%20another%20payment%20option."
-       target="_blank"
-       class="help-btn">
-
-        💬 WhatsApp Support
-
-    </a>
-
-</section>
-    <!--==========================
-        BUTTONS
-    ===========================-->
-
+    <!-- ACTION BUTTONS: Premium Hover / Touch Effect -->
     <section class="failed-buttons">
-
-        <a href="checkout.html"
-           class="retry-btn">
-
-            Retry Payment
-
-        </a>
-
-        <a href="ebook.html"
-           class="back-btn">
-
-            Back To Store
-
-        </a>
-
+        <a href="#" id="retryBtn" class="retry-btn">🔄 Retry Payment</a>
+        <a href="#" id="backStoreBtn" class="back-btn">📚 Back To Store</a>
     </section>
 
 </main>
 
 <footer class="failed-footer">
-
     © Aarogyam India
-
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="../js/payment-failed.js"></script>
 
 </body>

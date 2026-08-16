@@ -2,7 +2,16 @@
    AAROGYAM INDIA
    CHECKOUT.JS (Complete, Final & Butter-Smooth with Dynamic Book ID & Full Checkout Logs)
 ========================================== */
+/* =========================================
+   CHECKOUT.JS - PREV PAGE TRACKER
+========================================= */
 
+// जैसे ही चेकआउट पेज खुले, तुरंत पिछला स्टोर पेज सेव कर लें
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.referrer && !document.referrer.includes("checkout.html") && !document.referrer.includes("payment-failed.html")) {
+        sessionStorage.setItem("AI_PREV_STORE_PAGE", document.referrer);
+    }
+});
 "use strict";
 
 let referrerDisplay = document.getElementById("referrerDisplayName");
