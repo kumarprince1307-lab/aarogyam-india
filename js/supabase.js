@@ -586,7 +586,7 @@ console.log("✅ Checkout Module Loaded");
 
 
 /* ===========================================================
-   ENGINE 7: RAZORPAY PAYMENT GATEWAY (100% Bulletproof Logs)
+   ENGINE 7: RAZORPAY PAYMENT GATEWAY (Fixed Failure Redirect)
 =========================================================== */
 const PAYMENT = { STATUS_PENDING: "pending", STATUS_SUCCESS: "success", STATUS_FAILED: "failed" };
 const RAZORPAY = { KEY_ID: "rzp_live_TOlsqOqkmxYCWP" };
@@ -663,13 +663,18 @@ function startPayment() {
         createdAt: new Date().toISOString()
     };
     
+    // वर्तमान बुक आईडी और अमाउंट सुरक्षित करें
+    const currentBookId = window.currentOrder.bookId;
+    const currentAmount = window.currentOrder.amount;
+    
     const options = {
         key: RAZORPAY.KEY_ID,
-        amount: currentPayment.amount * 100,
+        amount: currentAmount * 100,
         currency: "INR",
         name: "Aarogyam India",
         description: window.currentOrder.title,
         handler: async function (response) {
+            // ✅ SUCCESS FLOW (बिल्कुल सुरक्षित)
             currentPayment.status = PAYMENT.STATUS_SUCCESS;
             currentPayment.paymentId = response.razorpay_payment_id;
             
@@ -682,9 +687,9 @@ function startPayment() {
                 window.currentPurchase = {
                     purchaseId: "PUR_" + Date.now(),
                     profileId: currentUser ? currentUser.id : null,
-                    bookId: window.currentOrder.bookId,
+                    bookId: currentBookId,
                     paymentId: response.razorpay_payment_id,
-                    amount: window.currentOrder.amount,
+                    amount: currentAmount,
                     purchasedAt: new Date().toISOString()
                 };
 
@@ -696,17 +701,15 @@ function startPayment() {
             }
 
             setTimeout(() => {
-                window.location.href = "payment-success.html"; 
+                window.location.href = `payment-success.html?book_id=${currentBookId}`; 
             }, 1000);
         },
         modal: {
             ondismiss: function() {
-                // 🟢 नोट: ondismiss में async-await को तुरंत हैंडल करने के लिए बैकअप सेट किया है
                 currentPayment.status = PAYMENT.STATUS_FAILED;
                 localStorage.setItem("AI_CURRENT_PAYMENT", JSON.stringify(currentPayment));
-                localStorage.setItem("AI_LAST_DROPPED_BOOK", window.currentOrder ? window.currentOrder.bookId : "");
+                localStorage.setItem("AI_LAST_DROPPED_BOOK", currentBookId);
 
-                // डेटाबेस लॉग को कॉल करें (बिना पेज ब्लॉक किए)
                 sendDirectCheckoutLog('dropped').catch(err => console.error("Dismiss log error:", err));
 
                 const payBtn = document.getElementById("payNowBtn");
@@ -714,6 +717,11 @@ function startPayment() {
                     payBtn.disabled = false;
                     payBtn.textContent = "Pay Now";
                 }
+
+                // 🟢 विंडो बंद होने पर book_id और amount के साथ फेलियर पेज पर जाना
+                setTimeout(() => {
+                    window.location.href = `payment-failed.html?book_id=${currentBookId}&amount=${currentAmount}`;
+                }, 500);
             }
         }
     };
@@ -732,6 +740,11 @@ function startPayment() {
                 payBtn.disabled = false;
                 payBtn.textContent = "Pay Now";
             }
+
+            // 🟢 पेमेंट फेल होने पर book_id और amount के साथ फेलियर पेज पर जाना
+            setTimeout(() => {
+                window.location.href = `payment-failed.html?book_id=${currentBookId}&amount=${currentAmount}`;
+            }, 500);
         });
 
         payment.open();
@@ -745,7 +758,7 @@ console.log("✅ Razorpay Payment Module Loaded");
 
 
 /* ===========================================================
-   ENGINE 8: PURCHASES & ORDERS (Bulletproof Fix)
+   ENGINE 8: PURCHASES & ORDERS (Unchanged)
 =========================================================== */
 async function savePurchase() {
     try {
@@ -757,14 +770,13 @@ async function savePurchase() {
         const activeDb = window.dbClient || window.supabase;
         if (!activeDb) return;
 
-        // 🟢 डेटाबेस के असली कॉलम नाम के अनुसार पक्का पेलोड तैयार करें
         const purchasePayload = {
             profile_id: window.currentPurchase.profileId,
             book_id: window.currentPurchase.bookId,
             payment_id: window.currentPurchase.paymentId,
             amount: window.currentPurchase.amount,
-            download_count: 0, // शुरुआत में डाउनलोड काउंट 0 रहेगा
-            payment_status: PAYMENT.STATUS_SUCCESS // पेमेंट स्टेटस को 'success' पर सेट करें
+            download_count: 0, 
+            payment_status: PAYMENT.STATUS_SUCCESS 
         };
 
         console.log("📤 Saving purchase to Supabase:", purchasePayload);
