@@ -216,7 +216,10 @@ export async function fetchDashboardData(params = {}) {
       todaysCheckoutRes,
       recentPurchasesRes,
       recentProfilesRes,
-      periodProfilesRes
+      periodProfilesRes,
+      periodSharesRes,
+      periodClicksRes,
+      periodVisitorsRes
     ] = await Promise.all([
       fetchShareEngineSummaryData(), // Reuse the existing summary function
       db.from('purchases').select('amount, profile_id').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
@@ -228,19 +231,30 @@ export async function fetchDashboardData(params = {}) {
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
       db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5),
       // New query for period-specific user counts
-      db.from('profiles').select('id, is_active').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString())
+      db.from('profiles').select('id, is_active').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
+      // Period-specific share engine stats
+      db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'share').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
+      db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'click').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
+      db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'visit').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString())
     ]);
 
     // --- Process Data ---
     const shareSummary = shareSummaryRes.success ? shareSummaryRes.data : {};
     const revenueData = monthlyPurchasesRes.data || [];
     const monthlyRevenue = revenueData.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const totalPurchasesInPeriod = revenueData.length;
 
     // Process period-specific user counts
     const periodProfiles = periodProfilesRes.data || [];
     const totalUsersInPeriod = periodProfiles.length;
     const activeUsersInPeriod = periodProfiles.filter(p => p.is_active).length;
     const inactiveUsersInPeriod = totalUsersInPeriod - activeUsersInPeriod;
+
+    // Process period-specific share stats
+    const periodShares = periodSharesRes.count || 0;
+    const periodClicks = periodClicksRes.count || 0;
+    const periodVisitors = periodVisitorsRes.count || 0;
+    const periodConversionRate = periodVisitors > 0 ? ((totalPurchasesInPeriod / periodVisitors) * 100).toFixed(2) : '0.00';
 
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
@@ -263,7 +277,10 @@ export async function fetchDashboardData(params = {}) {
       { label: 'Revenue', value: `₹${monthlyRevenue.toLocaleString('en-IN')}` },
       { label: 'New Users', value: totalUsersInPeriod.toLocaleString('en-IN') },
       { label: 'Active Users', value: activeUsersInPeriod.toLocaleString('en-IN') },
-      { label: 'Inactive Users', value: inactiveUsersInPeriod.toLocaleString('en-IN') }
+      { label: 'Inactive Users', value: inactiveUsersInPeriod.toLocaleString('en-IN') },
+      { label: 'Conversion Rate', value: `${periodConversionRate}%` },
+      { label: 'Total Shares', value: periodShares.toLocaleString('en-IN') },
+      { label: 'Total Clicks', value: periodClicks.toLocaleString('en-IN') }
     ];
 
     // Lead Sources
