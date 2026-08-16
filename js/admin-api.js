@@ -259,7 +259,18 @@ export async function fetchDashboardData(params = {}) {
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
     const todaysBirthdays = birthdaysRes.success ? birthdaysRes.data : [];
-    const todaysCheckoutSummary = todaysCheckoutRes.success ? todaysCheckoutRes.data : { follow_up: 0, initiated: 0, dropped: 0, failed: 0, success: 0, conversion_rate: '0%' };
+    
+    const todaysCheckoutSummary = { initiated: 0, dropped: 0, failed: 0, success: 0 };
+    if (todaysCheckoutRes.success && Array.isArray(todaysCheckoutRes.data)) {
+        todaysCheckoutRes.data.forEach(log => {
+            if (todaysCheckoutSummary.hasOwnProperty(log.status)) {
+                todaysCheckoutSummary[log.status]++;
+            }
+        });
+    }
+    todaysCheckoutSummary.follow_up = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed;
+    const totalAttempts = todaysCheckoutSummary.initiated + todaysCheckoutSummary.dropped + todaysCheckoutSummary.failed + todaysCheckoutSummary.success;
+    todaysCheckoutSummary.conversion_rate = totalAttempts > 0 ? ((todaysCheckoutSummary.success / totalAttempts) * 100).toFixed(1) + '%' : '0%';
 
     // Business KPIs
     const businessKpis = [
