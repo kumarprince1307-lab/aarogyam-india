@@ -149,13 +149,56 @@ export async function fetchCheckoutSummary(params = {}) {
 
     const { data, error } = await db
       .from('checkout_logs')
-      .select('status, profile_id') // Include profile_id to track unique users
+      .select('status, profile_id, book_id') // MODIFIED: select book_id for accurate filtering
       .gte('created_at', startDate.toISOString())
       .lt('created_at', endDate.toISOString());
 
     if (error) throw error;
-    // The data is now an array of objects like [{status: 'initiated'}, {status: 'success'}]
-    return { success: true, data: data };
+    if (!data || data.length === 0) return { success: true, data: [] };
+
+    // --- NEW LOGIC TO CORRECT FOLLOW-UP COUNT ---
+
+    // 1. Separate logs that are potential follow-ups from successful ones.
+    const potentialFollowupLogs = data.filter(log => 
+        log.status === 'initiated' || log.status === 'dropped' || log.status === 'failed'
+    );
+    const successLogs = data.filter(log => log.status === 'success');
+
+    if (potentialFollowupLogs.length === 0) {
+        // No potential follow-ups, just return the original data.
+        return { success: true, data: data };
+    }
+
+    // 2. Get unique profile_ids from the potential follow-up logs.
+    const potentialFollowupProfileIds = [...new Set(potentialFollowupLogs.map(log => log.profile_id).filter(id => id))];
+
+    // 3. Fetch all successful purchases for these specific users.
+    const { data: successfulPurchases, error: purchaseError } = await db
+        .from('purchases')
+        .select('profile_id, book_id')
+        .in('profile_id', potentialFollowupProfileIds)
+        .or('payment_status.eq.success,payment_status.is.null');
+    
+    if (purchaseError) {
+        console.error("Error fetching successful purchases for checkout summary:", purchaseError);
+        // On error, return original data to avoid breaking the dashboard.
+        return { success: true, data: data };
+    }
+
+    // 4. Create a lookup Set for efficient filtering. Key: "profileId_bookId"
+    const successfulPurchaseSet = new Set(
+        (successfulPurchases || []).map(p => `${p.profile_id}_${p.book_id}`)
+    );
+
+    // 5. Filter out logs where the user has successfully purchased that specific book.
+    const actualFollowupLogs = potentialFollowupLogs.filter(log => 
+        !successfulPurchaseSet.has(`${log.profile_id}_${log.book_id}`)
+    );
+
+    // 6. Combine the accurate follow-up list with the success logs and return.
+    const correctedData = [...successLogs, ...actualFollowupLogs];
+
+    return { success: true, data: correctedData };
   } catch (error) {
     return { success: false, data: [], error: error.message };
   }
