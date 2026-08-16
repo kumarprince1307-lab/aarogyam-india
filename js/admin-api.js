@@ -149,7 +149,7 @@ export async function fetchCheckoutSummary(params = {}) {
 
     const { data, error } = await db
       .from('checkout_logs')
-      .select('status') // FIX: Was using 'count' which returns a number, not the list of statuses.
+      .select('status, profile_id') // Include profile_id to track unique users
       .gte('created_at', startDate.toISOString())
       .lt('created_at', endDate.toISOString());
 
@@ -440,8 +440,10 @@ export async function fetchCheckoutLogs(params = {}) {
     }
 
     // Status Filter
+    const isFollowup = params.status === 'followup';
     if (params.status && params.status !== 'all') {
-        if (params.status === 'followup') {
+        if (isFollowup) {
+            // For followup, we fetch all non-success logs first, then filter out those who have purchased.
             queryBuilder = queryBuilder.in('status', ['initiated', 'dropped', 'failed']);
         } else {
             queryBuilder = queryBuilder.eq('status', params.status);
@@ -455,8 +457,34 @@ export async function fetchCheckoutLogs(params = {}) {
 
     queryBuilder = queryBuilder.order('created_at', { ascending: false }).limit(200); // Fetch more for client-side search
 
-    const { data: logs, error: logsError } = await queryBuilder;
+    let { data: logs, error: logsError } = await queryBuilder;
     if (logsError) throw logsError;
+    if (!logs || logs.length === 0) return { success: true, data: [] };
+
+    // If filtering for 'followup', we need to remove users who have already purchased the book.
+    if (isFollowup && logs.length > 0) {
+        // 1. Get unique profile_ids from the potential follow-up logs.
+        const potentialFollowupProfileIds = [...new Set(logs.map(log => log.profile_id).filter(id => id))];
+
+        // 2. Fetch all successful purchases for these specific users.
+        const { data: successfulPurchases, error: purchaseError } = await db
+            .from('purchases')
+            .select('profile_id, book_id')
+            .in('profile_id', potentialFollowupProfileIds)
+            .or('payment_status.eq.success,payment_status.is.null');
+        
+        if (purchaseError) {
+            console.error("Error fetching successful purchases for followup filter:", purchaseError);
+        } else if (successfulPurchases && successfulPurchases.length > 0) {
+            // 3. Create a lookup Set for efficient filtering. Key: "profileId_bookId"
+            const successfulPurchaseSet = new Set(
+                successfulPurchases.map(p => `${p.profile_id}_${p.book_id}`)
+            );
+
+            // 4. Filter out logs where the user has successfully purchased that specific book.
+            logs = logs.filter(log => !successfulPurchaseSet.has(`${log.profile_id}_${log.book_id}`));
+        }
+    }
     if (!logs || logs.length === 0) return { success: true, data: [] };
 
     // 2. Collect unique IDs to fetch related data without joins
