@@ -584,9 +584,8 @@ async function createCheckout(bookId) {
 }
 console.log("✅ Checkout Module Loaded");
 
-
 /* ===========================================================
-   ENGINE 7: RAZORPAY PAYMENT GATEWAY (Fixed Failure Redirect)
+   ENGINE 7: RAZORPAY PAYMENT GATEWAY (Fixed with Order ID)
 =========================================================== */
 const PAYMENT = { STATUS_PENDING: "pending", STATUS_SUCCESS: "success", STATUS_FAILED: "failed" };
 const RAZORPAY = { KEY_ID: "rzp_live_TOlsqOqkmxYCWP" };
@@ -597,10 +596,9 @@ async function sendDirectCheckoutLog(statusValue) {
         const activeDb = window.dbClient || window.supabase;
         if (!activeDb) {
             console.error("❌ Database client not found for logging!");
-            return;
+            return null;
         }
 
-        // 1. सुरक्षित तरीके से यूजर आईडी निकालें
         let uId = null;
         const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
         if (storedUser && storedUser.id) {
@@ -611,7 +609,6 @@ async function sendDirectCheckoutLog(statusValue) {
             uId = window.V1_SESSION.getUserId();
         }
 
-        // 2. सुरक्षित तरीके से बुक आईडी निकालें
         let bId = null;
         if (window.currentOrder && window.currentOrder.bookId) {
             bId = window.currentOrder.bookId;
@@ -624,12 +621,12 @@ async function sendDirectCheckoutLog(statusValue) {
 
         if (!uId || !bId) {
             console.warn("⚠️ Missing IDs for checkout log:", { uId, bId, statusValue });
-            return;
+            return null;
         }
 
         console.log(`📤 Sending checkout log [${uId}, ${bId}, ${statusValue}] to Supabase...`);
 
-        // 3. डेटाबेस में इंसर्ट करें
+        // डेटाबेस में इंसर्ट करें और जनरेट हुई order_id को वापस (.select()) लें
         const { data, error } = await activeDb
             .from("checkout_logs")
             .insert([{
@@ -641,11 +638,17 @@ async function sendDirectCheckoutLog(statusValue) {
 
         if (error) {
             console.error(`❌ Failed to save [${statusValue}] log:`, error.message);
+            return null;
         } else {
             console.log(`✅ SUCCESS: Checkout log status [${statusValue}] saved successfully!`, data);
+            // यहाँ ट्रिगर द्वारा बनाई गई order_id मिल जाएगी!
+            if (data && data.length > 0) {
+                return data[0].order_id;
+            }
         }
     } catch (err) {
         console.error("❌ Direct log exception:", err);
+        return null;
     }
 }
 
@@ -663,7 +666,6 @@ function startPayment() {
         createdAt: new Date().toISOString()
     };
     
-    // वर्तमान बुक आईडी और अमाउंट सुरक्षित करें
     const currentBookId = window.currentOrder.bookId;
     const currentAmount = window.currentOrder.amount;
     
@@ -674,22 +676,25 @@ function startPayment() {
         name: "Aarogyam India",
         description: window.currentOrder.title,
         handler: async function (response) {
-            // ✅ SUCCESS FLOW (बिल्कुल सुरक्षित)
             currentPayment.status = PAYMENT.STATUS_SUCCESS;
             currentPayment.paymentId = response.razorpay_payment_id;
             
             localStorage.setItem("AI_CURRENT_PAYMENT", JSON.stringify(currentPayment));
 
             try {
-                await sendDirectCheckoutLog('success');
+                // 1. पहले checkout_log भेजें और वहाँ से ट्रिगर द्वारा बनी order_id प्राप्त करें
+                const generatedOrderId = await sendDirectCheckoutLog('success');
                 
                 const currentUser = typeof getCurrentUserProfile === "function" ? getCurrentUserProfile() : null;
+                
+                // 2. purchases के लिए डेटा तैयार करें जिसमें generatedOrderId भी शामिल हो
                 window.currentPurchase = {
                     purchaseId: "PUR_" + Date.now(),
-                    profileId: currentUser ? currentUser.id : null,
+                    profileId: currentUser ? currentUser.id : (storedUser ? storedUser.id : null),
                     bookId: currentBookId,
                     paymentId: response.razorpay_payment_id,
                     amount: currentAmount,
+                    orderId: generatedOrderId, // 👈 यह रही वह आर्डर आईडी जो अब purchases में जाएगी!
                     purchasedAt: new Date().toISOString()
                 };
 
@@ -718,7 +723,6 @@ function startPayment() {
                     payBtn.textContent = "Pay Now";
                 }
 
-                // 🟢 विंडो बंद होने पर book_id और amount के साथ फेलियर पेज पर जाना
                 setTimeout(() => {
                     window.location.href = `payment-failed.html?book_id=${currentBookId}&amount=${currentAmount}`;
                 }, 500);
@@ -741,7 +745,6 @@ function startPayment() {
                 payBtn.textContent = "Pay Now";
             }
 
-            // 🟢 पेमेंट फेल होने पर book_id और amount के साथ फेलियर पेज पर जाना
             setTimeout(() => {
                 window.location.href = `payment-failed.html?book_id=${currentBookId}&amount=${currentAmount}`;
             }, 500);
@@ -758,7 +761,7 @@ console.log("✅ Razorpay Payment Module Loaded");
 
 
 /* ===========================================================
-   ENGINE 8: PURCHASES & ORDERS (Unchanged)
+   ENGINE 8: PURCHASES & ORDERS (Updated with order_id)
 =========================================================== */
 async function savePurchase() {
     try {
@@ -775,11 +778,12 @@ async function savePurchase() {
             book_id: window.currentPurchase.bookId,
             payment_id: window.currentPurchase.paymentId,
             amount: window.currentPurchase.amount,
+            order_id: window.currentPurchase.orderId, // 👈 यहाँ आर्डर आईडी जोड़ी गई है
             download_count: 0, 
             payment_status: PAYMENT.STATUS_SUCCESS 
         };
 
-        console.log("📤 Saving purchase to Supabase:", purchasePayload);
+        console.log("📤 Saving purchase to Supabase with Order ID:", purchasePayload);
 
         const { data, error } = await activeDb
             .from("purchases")
@@ -789,32 +793,15 @@ async function savePurchase() {
         if (error) {
             console.error("❌ Save Purchase DB Error:", error.message);
         } else {
-            console.log("✅ SUCCESS: Purchase saved successfully in database!", data);
+            console.log("✅ SUCCESS: Purchase saved successfully in database with Order ID!", data);
         }
     } catch (err) {
         console.error("❌ Exception during savePurchase execution:", err);
     }
 }
-
-async function hasPurchased(bookId) {
-    try {
-        const user = UserStorage.get();
-        if (!user || !user.id) return false;
-        
-        const activeDb = window.dbClient || window.supabase;
-        const { data, error } = await activeDb
-            .from("purchases")
-            .select("id")
-            .eq("profile_id", user.id)
-            .eq("book_id", bookId)
-            .maybeSingle();
-
-        return !!data;
-    } catch (e) {
-        return false;
-    }
-}
 console.log("✅ Purchases Module Loaded");
+
+
 
 
 /* ===========================================================
