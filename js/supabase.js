@@ -230,7 +230,7 @@ async function createUserProfile(userData) {
                 referred_by: referrerProfileId || null,
                 registration_source: attribution.source || "direct",
                 profile_complete: false,
-                is_active: true
+                is_active: false
             }])
             .select()
             .single();
@@ -803,6 +803,15 @@ async function savePurchase() {
             console.error("❌ Save Purchase DB Error:", error.message);
         } else {
             console.log("✅ SUCCESS: Purchase saved successfully with Order ID and Invoice Number!", data);
+            // After a successful purchase, set the user's status to active.
+            if (purchasePayload.profile_id) {
+                const { error: updateError } = await activeDb
+                    .from('profiles')
+                    .update({ is_active: true })
+                    .eq('id', purchasePayload.profile_id);
+                if (updateError) console.error("❌ Failed to update user status to active:", updateError.message);
+                else console.log(`✅ User ${purchasePayload.profile_id} status set to ACTIVE.`);
+            }
         }
     } catch (err) {
         console.error("❌ Exception during savePurchase execution:", err);

@@ -85,11 +85,20 @@ export async function fetchShareEngineSummaryData() {
       .select('id', { count: 'exact', head: true });
     if(leadsError) console.error('Error fetching total leads:', leadsError.message);
 
-    // 5. Total Registrations
+    // 5. Total Registrations, Active & Inactive Users
     const { count: totalRegistrations, error: regsError } = await db
       .from('profiles')
       .select('id', { count: 'exact', head: true });
     if(regsError) console.error('Error fetching total registrations:', regsError.message);
+
+    const { count: totalActiveUsers, error: activeError } = await db
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true);
+    if(activeError) console.error('Error fetching active users:', activeError.message);
+
+    const totalInactiveUsers = (totalRegistrations || 0) - (totalActiveUsers || 0);
+
 
     // 6. Total Purchases & Revenue
     const { data: purchases, error: purchasesError } = await db
@@ -110,6 +119,8 @@ export async function fetchShareEngineSummaryData() {
       totalVisitors: totalVisitors || 0,
       totalLeads: totalLeads || 0,
       totalRegistrations: totalRegistrations || 0,
+      totalActiveUsers: totalActiveUsers || 0,
+      totalInactiveUsers: totalInactiveUsers || 0,
       totalPurchases: totalPurchases || 0,
       totalRevenue: totalRevenue || 0,
       conversionRate: `${conversionRate}%`,
@@ -177,19 +188,27 @@ export async function fetchTodaysBirthdays() {
     }
 }
 
-export async function fetchDashboardData() {
+export async function fetchDashboardData(params = {}) {
   await delay(250); // Simulate network latency
   try {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
 
-    const thirtyDaysAgo = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString();
+    const defaultEndDate = new Date();
+    const defaultStartDate = new Date(new Date().setDate(defaultEndDate.getDate() - 30));
+
+    const endDateForFilter = params.endDate ? new Date(params.endDate) : defaultEndDate;
+    // To make the 'lt' operator inclusive of the end date, we set the time to the end of the day or go to the next day.
+    const apiEndDate = new Date(endDateForFilter);
+    apiEndDate.setHours(23, 59, 59, 999);
+
+    const startDateForFilter = params.startDate ? new Date(params.startDate) : defaultStartDate;
+    startDateForFilter.setHours(0, 0, 0, 0);
 
     // --- Fetch all required data in parallel ---
     const [
       shareSummaryRes,
       monthlyPurchasesRes,
-      newCustomersRes,
       allProfilesRes,
       allPurchasesRes,
       booksRes,
@@ -199,8 +218,7 @@ export async function fetchDashboardData() {
       recentProfilesRes
     ] = await Promise.all([
       fetchShareEngineSummaryData(), // Reuse the existing summary function
-      db.from('purchases').select('amount').gte('purchase_date', thirtyDaysAgo),
-      db.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', thirtyDaysAgo),
+      db.from('purchases').select('amount, profile_id').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
       db.from('profiles').select('id, full_name, created_at, registration_source'), // This is for profiles, not books
       db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status'),
       db.from('books').select('id, title'), // FIX: Removed 'name' as it may not exist.
@@ -212,8 +230,9 @@ export async function fetchDashboardData() {
 
     // --- Process Data ---
     const shareSummary = shareSummaryRes.success ? shareSummaryRes.data : {};
-    const monthlyRevenue = (monthlyPurchasesRes.data || []).reduce((sum, p) => sum + (p.amount || 0), 0);
-    const newCustomers = newCustomersRes.count || 0;
+    const revenueData = monthlyPurchasesRes.data || [];
+    const monthlyRevenue = revenueData.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const activeCustomers = new Set(revenueData.map(p => p.profile_id)).size;
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
     const todaysBirthdays = birthdaysRes.success ? birthdaysRes.data : [];
@@ -232,10 +251,14 @@ export async function fetchDashboardData() {
 
     // Business KPIs
     const businessKpis = [
-      { label: 'Monthly Revenue', value: `₹${monthlyRevenue.toLocaleString('en-IN')}` },
-      { label: 'New Customers', value: newCustomers.toLocaleString('en-IN') },
+      { label: 'Revenue', value: `₹${monthlyRevenue.toLocaleString('en-IN')}` },
+      { label: 'Active Customers (Period)', value: activeCustomers.toLocaleString('en-IN') },
+      { label: 'Total Users', value: (shareSummary.totalRegistrations || 0).toLocaleString('en-IN') },
+      { label: 'Total Active Users', value: (shareSummary.totalActiveUsers || 0).toLocaleString('en-IN') },
+      { label: 'Total Inactive Users', value: (shareSummary.totalInactiveUsers || 0).toLocaleString('en-IN') },
       { label: 'Conversion Rate', value: shareSummary.conversionRate || '0.00%' },
-      { label: 'Total Shares', value: shareSummary.totalShares || 0 }
+      { label: 'Total Shares', value: shareSummary.totalShares || 0 },
+      { label: 'Total Clicks', value: shareSummary.totalClicks || 0 }
     ];
 
     // Lead Sources
@@ -854,6 +877,76 @@ export async function fetchUserDetails(userId) {
   } catch (error) {
     console.error('Failed to fetch user details:', error);
     return { success: false, data: null, error: error.message };
+  }
+}
+
+export async function updateUserStatus(userId, isActive) {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+
+    const { data, error } = await db
+      .from('profiles')
+      .update({ is_active: isActive })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Failed to update user status:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function batchUpdateUserStatuses() {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+
+    // Step 1: Get all profile IDs and their current status
+    const { data: profiles, error: profilesError } = await db.from('profiles').select('id, is_active');
+    if (profilesError) throw profilesError;
+
+    // Step 2: Get all unique profile IDs from successful purchases
+    const { data: purchases, error: purchasesError } = await db.from('purchases').select('profile_id').or('payment_status.eq.success,payment_status.is.null');
+    if (purchasesError) throw purchasesError;
+
+    const purchasingUserIds = new Set((purchases || []).map(p => p.profile_id).filter(Boolean));
+
+    // Step 3: Determine which users need their status changed
+    const idsToActivate = [];
+    const idsToDeactivate = [];
+
+    for (const profile of profiles) {
+        const hasPurchases = purchasingUserIds.has(profile.id);
+        const currentlyActive = profile.is_active;
+
+        if (hasPurchases && !currentlyActive) {
+            idsToActivate.push(profile.id);
+        } else if (!hasPurchases && currentlyActive) {
+            idsToDeactivate.push(profile.id);
+        }
+    }
+
+    // Step 4: Perform bulk updates in parallel if needed
+    const updatePromises = [];
+    if (idsToActivate.length > 0) {
+        updatePromises.push(db.from('profiles').update({ is_active: true }).in('id', idsToActivate));
+    }
+    if (idsToDeactivate.length > 0) {
+        updatePromises.push(db.from('profiles').update({ is_active: false }).in('id', idsToDeactivate));
+    }
+
+    const results = await Promise.all(updatePromises);
+    results.forEach(res => { if (res.error) console.error('A batch update failed:', res.error); });
+
+    return { success: true, activated: idsToActivate.length, deactivated: idsToDeactivate.length };
+
+  } catch (error) {
+    console.error('Failed to run batch user status update:', error);
+    return { success: false, error: error.message, activated: 0, deactivated: 0 };
   }
 }
 

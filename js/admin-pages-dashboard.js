@@ -156,7 +156,73 @@ export async function initDashboard() {
   content.innerHTML = '<div class="admin-loading">Loading dashboard data...</div>';
 
   try {
-    const result = await fetchDashboardData();
+    // This function will fetch data and update the business summary KPIs
+    async function updateBusinessSummary() {
+        const businessDateFilter = document.getElementById('business-date-filter');
+        const businessCustomDate = document.getElementById('business-custom-date');
+        const businessSummaryContainer = document.getElementById('business-summary');
+        const kpiRowContainer = businessSummaryContainer.querySelector('.kpi-row-container');
+
+        const filterValue = businessDateFilter.value;
+        const customDateValue = businessCustomDate.value;
+        let startDate, endDate;
+        const now = new Date();
+
+        businessCustomDate.style.display = 'none';
+
+        switch (filterValue) {
+            case 'today':
+                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                break;
+            case 'yesterday':
+                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                break;
+            case 'last7days':
+                startDate = new Date(new Date().setDate(now.getDate() - 6));
+                endDate = new Date(new Date().setDate(now.getDate() + 1));
+                break;
+            case 'thismonth':
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+                break;
+            case 'custom':
+                businessCustomDate.style.display = 'inline-block';
+                if (customDateValue) {
+                    const selectedDate = new Date(customDateValue);
+                    startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+                    endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1);
+                } else {
+                    return; // Don't fetch until a date is picked
+                }
+                break;
+            case 'last30days':
+            default:
+                startDate = new Date(new Date().setDate(now.getDate() - 29));
+                endDate = new Date(new Date().setDate(now.getDate() + 1));
+                break;
+        }
+
+        if(kpiRowContainer) {
+            kpiRowContainer.style.opacity = '0.5';
+        }
+
+        const result = await fetchDashboardData({ startDate, endDate });
+
+        if(kpiRowContainer) kpiRowContainer.style.opacity = '1';
+
+        if (result.success && result.data) {
+            const { businessKpis } = result.data;
+            if (businessSummaryContainer) {
+                kpiRowContainer.innerHTML = renderKpiGroup(businessKpis);
+            }
+        } else {
+            console.error("Failed to update business summary");
+        }
+    }
+
+    const result = await fetchDashboardData(); // Initial load
 
     if (!result.success || !result.data) {
       content.innerHTML = '<div class="admin-error"><strong>Unable to load dashboard data.</strong><br>Please try again later.</div>';
@@ -166,15 +232,15 @@ export async function initDashboard() {
     const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity, todaysCheckoutSummary, todaysBirthdays } = result.data;
     
     // Use live data for Share KPIs, with fallbacks
-    const shareKpis = [ // This is a local const, not a duplicate declaration
+    const shareKpis = [
       { label: 'Total Shares', value: shareSummary.totalShares || 0 },
       { label: 'Total Clicks', value: shareSummary.totalClicks || 0 },
       { label: 'Total Visitors', value: shareSummary.totalVisitors || 0 },
       { label: 'Total Leads', value: shareSummary.totalLeads || 0 },
-      { label: 'Total Registrations', value: shareSummary.totalRegistrations || 0 },
+      { label: 'Total Active Users', value: (shareSummary.totalActiveUsers || 0).toLocaleString('en-IN') },
+      { label: 'Total Inactive Users', value: (shareSummary.totalInactiveUsers || 0).toLocaleString('en-IN') },
       { label: 'Total Purchases', value: shareSummary.totalPurchases || 0 },
-      { label: 'Total Revenue', value: `₹${(shareSummary.totalRevenue || 0).toLocaleString('en-IN')}` },
-      { label: 'Conversion Rate', value: shareSummary.conversionRate || '0.00%' }
+      { label: 'Total Revenue', value: `₹${(shareSummary.totalRevenue || 0).toLocaleString('en-IN')}` }
     ];
 
     content.innerHTML = `
@@ -183,8 +249,23 @@ export async function initDashboard() {
         ${renderKpiGroup(shareKpis)}
       </div>
       <div class="admin-section" id="business-summary">
-        <div class="admin-section-title">Business Summary</div>
-        ${renderKpiGroup(businessKpis)}
+        <div class="admin-section-header">
+            <div class="admin-section-title">Business Summary</div>
+            <div class="admin-controls">
+                <select id="business-date-filter" class="admin-select">
+                  <option value="last30days" selected>Last 30 Days</option>
+                  <option value="today">Today</option>
+                  <option value="yesterday">Yesterday</option>
+                  <option value="last7days">Last 7 Days</option>
+                  <option value="thismonth">This Month</option>
+                  <option value="custom">Custom Date</option>
+                </select>
+                <input type="date" id="business-custom-date" class="admin-input" style="display: none;">
+            </div>
+        </div>
+        <div class="kpi-row-container">
+          ${renderKpiGroup(businessKpis)}
+        </div>
       </div>
       ${renderBirthdaysWidget(todaysBirthdays)}
       ${renderCheckoutFunnelWidget(todaysCheckoutSummary)}
@@ -207,6 +288,16 @@ export async function initDashboard() {
         <div class="admin-col">${renderTopBooks(bookSales)}${renderActivity(recentActivity)}</div>
       </div>
     `;
+
+    // After rendering, set default dates and add listeners for Business Summary
+    const businessDateFilter = document.getElementById('business-date-filter');
+    const businessCustomDate = document.getElementById('business-custom-date');
+
+    if(businessDateFilter && businessCustomDate) {
+        businessCustomDate.value = new Date().toISOString().split('T')[0]; // Set default for custom picker
+        businessDateFilter.addEventListener('change', updateBusinessSummary);
+        businessCustomDate.addEventListener('change', updateBusinessSummary);
+    }
 
     // Add event listeners for the checkout widget
     const checkoutCards = document.querySelectorAll('#checkout-funnel-summary .kpi-card.clickable');
