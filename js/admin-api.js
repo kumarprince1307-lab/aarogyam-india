@@ -261,7 +261,7 @@ export async function fetchDashboardData(params = {}) {
     // --- Fetch all required data in parallel ---
     const [
       shareSummaryRes,
-      monthlyPurchasesRes,
+      periodPurchasesRes,
       allProfilesRes,
       allPurchasesRes,
       booksRes,
@@ -275,9 +275,9 @@ export async function fetchDashboardData(params = {}) {
       periodVisitorsRes
     ] = await Promise.all([
       fetchShareEngineSummaryData(), // Reuse the existing summary function
-      db.from('purchases').select('amount, profile_id').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
+      db.from('purchases').select('amount, profile_id').or('payment_status.eq.success,payment_status.is.null').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
       db.from('profiles').select('id, full_name, created_at, registration_source'), // This is for profiles, not books
-      db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status'),
+      db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status').or('payment_status.eq.success,payment_status.is.null').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
       db.from('books').select('id, title'), // FIX: Removed 'name' as it may not exist.
       fetchTodaysBirthdays(),
       fetchCheckoutSummary(), // MODIFIED: Call with no params to get today's data by default
@@ -293,9 +293,9 @@ export async function fetchDashboardData(params = {}) {
 
     // --- Process Data ---
     const shareSummary = shareSummaryRes.success ? shareSummaryRes.data : {};
-    const revenueData = monthlyPurchasesRes.data || [];
-    const monthlyRevenue = revenueData.reduce((sum, p) => sum + (p.amount || 0), 0);
-    const totalPurchasesInPeriod = revenueData.length;
+    const periodPurchases = periodPurchasesRes.data || [];
+    const monthlyRevenue = periodPurchases.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const totalPurchasesInPeriod = periodPurchases.length;
 
     // Process period-specific user counts
     const periodProfiles = periodProfilesRes.data || [];

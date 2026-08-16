@@ -34,7 +34,7 @@ function renderCustomerJourney(data) {
 
 function renderBookSales(data) {
   if (!data || data.length === 0) {
-    return '<div class="admin-empty-sm">No book sales data available.</div>';
+    return '<div class="admin-empty-sm">No book sales data available for this period.</div>';
   }
   return `<div class="admin-data-grid">
     ${data.map(item => `<div class="admin-data-card">
@@ -146,6 +146,69 @@ function renderCheckoutFunnelWidget(summary) {
             <div class="kpi-card"> <div class="kpi-label">📈 Conversion</div> <div class="kpi-value">${summary.conversion_rate || '0%'}</div> </div>
         </div>
     </div>`;
+}
+
+async function updateBookSalesWidget() {
+    const dateFilter = document.getElementById('booksales-date-filter');
+    const customDateInput = document.getElementById('booksales-custom-date');
+    const contentContainer = document.getElementById('book-sales-content');
+
+    const filterValue = dateFilter.value;
+    const customDateValue = customDateInput.value;
+    let startDate, endDate;
+    const now = new Date();
+
+    customDateInput.style.display = 'none';
+
+    switch (filterValue) {
+        case 'today':
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+            break;
+        case 'yesterday':
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+            endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            break;
+        case 'last7days':
+            startDate = new Date(new Date().setDate(now.getDate() - 6));
+            endDate = new Date(new Date().setDate(now.getDate() + 1));
+            break;
+        case 'thismonth':
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            break;
+        case 'custom':
+            customDateInput.style.display = 'inline-block';
+            if (customDateValue) {
+                const selectedDate = new Date(customDateValue);
+                startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+                endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1);
+            } else {
+                return; // Don't fetch until a date is picked
+            }
+            break;
+        case 'last30days':
+        default:
+            startDate = new Date(new Date().setDate(now.getDate() - 29));
+            endDate = new Date(new Date().setDate(now.getDate() + 1));
+            break;
+    }
+
+    if(contentContainer) {
+        contentContainer.innerHTML = '<div class="admin-loading-sm">Loading...</div>';
+    }
+
+    const result = await fetchDashboardData({ startDate, endDate });
+
+    if (result.success && result.data) {
+        const { bookSales } = result.data;
+        if (contentContainer) {
+            contentContainer.innerHTML = renderBookSales(bookSales);
+        }
+    } else {
+        console.error("Failed to update book sales widget");
+        if (contentContainer) contentContainer.innerHTML = '<div class="admin-error-sm">Could not load data.</div>';
+    }
 }
 
 export async function initDashboard() {
@@ -280,8 +343,21 @@ export async function initDashboard() {
       <div class="admin-grid">
         <div class="admin-col">
           <div class="admin-section" id="book-sales">
-            <div class="admin-section-title">Book Sales</div>
-            ${renderBookSales(bookSales)}
+            <div class="admin-section-header">
+              <div class="admin-section-title">Book Sales</div>
+              <div class="admin-controls">
+                  <select id="booksales-date-filter" class="admin-select">
+                    <option value="last30days" selected>Last 30 Days</option>
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="last7days">Last 7 Days</option>
+                    <option value="thismonth">This Month</option>
+                    <option value="custom">Custom Date</option>
+                  </select>
+                  <input type="date" id="booksales-custom-date" class="admin-input" style="display: none;">
+              </div>
+            </div>
+            <div id="book-sales-content">${renderBookSales(bookSales)}</div>
           </div>
           ${renderQuickActions()}
         </div>
@@ -297,6 +373,15 @@ export async function initDashboard() {
         businessCustomDate.value = new Date().toISOString().split('T')[0]; // Set default for custom picker
         businessDateFilter.addEventListener('change', updateBusinessSummary);
         businessCustomDate.addEventListener('change', updateBusinessSummary);
+    }
+
+    // Add event listeners for the Book Sales widget
+    const bookSalesDateFilter = document.getElementById('booksales-date-filter');
+    const bookSalesCustomDate = document.getElementById('booksales-custom-date');
+
+    if(bookSalesDateFilter && bookSalesCustomDate) {
+        bookSalesDateFilter.addEventListener('change', updateBookSalesWidget);
+        bookSalesCustomDate.addEventListener('change', updateBookSalesWidget);
     }
 
     // Add event listeners for the checkout widget
