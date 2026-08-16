@@ -215,7 +215,8 @@ export async function fetchDashboardData(params = {}) {
       birthdaysRes,
       todaysCheckoutRes,
       recentPurchasesRes,
-      recentProfilesRes
+      recentProfilesRes,
+      periodProfilesRes
     ] = await Promise.all([
       fetchShareEngineSummaryData(), // Reuse the existing summary function
       db.from('purchases').select('amount, profile_id').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
@@ -225,14 +226,22 @@ export async function fetchDashboardData(params = {}) {
       fetchTodaysBirthdays(),
       fetchCheckoutSummary(), // MODIFIED: Call with no params to get today's data by default
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
-      db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5)
+      db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5),
+      // New query for period-specific user counts
+      db.from('profiles').select('id, is_active').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString())
     ]);
 
     // --- Process Data ---
     const shareSummary = shareSummaryRes.success ? shareSummaryRes.data : {};
     const revenueData = monthlyPurchasesRes.data || [];
     const monthlyRevenue = revenueData.reduce((sum, p) => sum + (p.amount || 0), 0);
-    const activeCustomers = new Set(revenueData.map(p => p.profile_id)).size;
+
+    // Process period-specific user counts
+    const periodProfiles = periodProfilesRes.data || [];
+    const totalUsersInPeriod = periodProfiles.length;
+    const activeUsersInPeriod = periodProfiles.filter(p => p.is_active).length;
+    const inactiveUsersInPeriod = totalUsersInPeriod - activeUsersInPeriod;
+
     const allProfiles = allProfilesRes.data || [];
     const allPurchases = allPurchasesRes.data || [];
     const todaysBirthdays = birthdaysRes.success ? birthdaysRes.data : [];
@@ -252,13 +261,9 @@ export async function fetchDashboardData(params = {}) {
     // Business KPIs
     const businessKpis = [
       { label: 'Revenue', value: `₹${monthlyRevenue.toLocaleString('en-IN')}` },
-      { label: 'Active Customers (Period)', value: activeCustomers.toLocaleString('en-IN') },
-      { label: 'Total Users', value: (shareSummary.totalRegistrations || 0).toLocaleString('en-IN') },
-      { label: 'Total Active Users', value: (shareSummary.totalActiveUsers || 0).toLocaleString('en-IN') },
-      { label: 'Total Inactive Users', value: (shareSummary.totalInactiveUsers || 0).toLocaleString('en-IN') },
-      { label: 'Conversion Rate', value: shareSummary.conversionRate || '0.00%' },
-      { label: 'Total Shares', value: shareSummary.totalShares || 0 },
-      { label: 'Total Clicks', value: shareSummary.totalClicks || 0 }
+      { label: 'New Users', value: totalUsersInPeriod.toLocaleString('en-IN') },
+      { label: 'Active Users', value: activeUsersInPeriod.toLocaleString('en-IN') },
+      { label: 'Inactive Users', value: inactiveUsersInPeriod.toLocaleString('en-IN') }
     ];
 
     // Lead Sources
