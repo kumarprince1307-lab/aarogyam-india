@@ -676,10 +676,11 @@ function startPayment() {
         name: "Aarogyam India",
         description: window.currentOrder.title,
         
-        // 🟢 Razorpay डैशबोर्ड और नोट्स के लिए
+        // 🟢 बस इतना सा हिस्सा जोड़ना है:
         notes: {
             book_id: currentBookId,
-            invoice_number: currentInvoiceNo
+            invoice_number: currentInvoiceNo,
+            order_id: window.currentPurchase ? window.currentPurchase.orderId : "Pending"
         },
 
         handler: async function (response) {
