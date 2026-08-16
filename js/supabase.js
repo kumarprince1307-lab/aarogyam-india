@@ -585,7 +585,7 @@ async function createCheckout(bookId) {
 console.log("✅ Checkout Module Loaded");
 
 /* ===========================================================
-   ENGINE 7: RAZORPAY PAYMENT GATEWAY (Fixed with Order ID)
+   ENGINE 7: RAZORPAY PAYMENT GATEWAY (Fixed with Order ID & Invoice No)
 =========================================================== */
 const PAYMENT = { STATUS_PENDING: "pending", STATUS_SUCCESS: "success", STATUS_FAILED: "failed" };
 const RAZORPAY = { KEY_ID: "rzp_live_TOlsqOqkmxYCWP" };
@@ -641,7 +641,6 @@ async function sendDirectCheckoutLog(statusValue) {
             return null;
         } else {
             console.log(`✅ SUCCESS: Checkout log status [${statusValue}] saved successfully!`, data);
-            // यहाँ ट्रिगर द्वारा बनाई गई order_id मिल जाएगी!
             if (data && data.length > 0) {
                 return data[0].order_id;
             }
@@ -668,6 +667,7 @@ function startPayment() {
     
     const currentBookId = window.currentOrder.bookId;
     const currentAmount = window.currentOrder.amount;
+    const currentInvoiceNo = "INV_" + Date.now(); // यूनिक इनवॉइस नंबर जनरेट करना
     
     const options = {
         key: RAZORPAY.KEY_ID,
@@ -675,6 +675,13 @@ function startPayment() {
         currency: "INR",
         name: "Aarogyam India",
         description: window.currentOrder.title,
+        
+        // 🟢 Razorpay डैशबोर्ड और नोट्स के लिए
+        notes: {
+            book_id: currentBookId,
+            invoice_number: currentInvoiceNo
+        },
+
         handler: async function (response) {
             currentPayment.status = PAYMENT.STATUS_SUCCESS;
             currentPayment.paymentId = response.razorpay_payment_id;
@@ -682,19 +689,20 @@ function startPayment() {
             localStorage.setItem("AI_CURRENT_PAYMENT", JSON.stringify(currentPayment));
 
             try {
-                // 1. पहले checkout_log भेजें और वहाँ से ट्रिगर द्वारा बनी order_id प्राप्त करें
+                // 1. checkout_logs से जनरेटेड order_id प्राप्त करें
                 const generatedOrderId = await sendDirectCheckoutLog('success');
                 
                 const currentUser = typeof getCurrentUserProfile === "function" ? getCurrentUserProfile() : null;
                 
-                // 2. purchases के लिए डेटा तैयार करें जिसमें generatedOrderId भी शामिल हो
+                // 2. purchases के लिए डेटा तैयार करें जिसमें order_id और invoice_number दोनों हों
                 window.currentPurchase = {
                     purchaseId: "PUR_" + Date.now(),
                     profileId: currentUser ? currentUser.id : (storedUser ? storedUser.id : null),
                     bookId: currentBookId,
                     paymentId: response.razorpay_payment_id,
                     amount: currentAmount,
-                    orderId: generatedOrderId, // 👈 यह रही वह आर्डर आईडी जो अब purchases में जाएगी!
+                    orderId: generatedOrderId,       // 👈 डेटाबेस का order_id कॉलम
+                    invoice_number: currentInvoiceNo, // 👈 डेटाबेस का invoice_number कॉलम
                     purchasedAt: new Date().toISOString()
                 };
 
@@ -761,7 +769,7 @@ console.log("✅ Razorpay Payment Module Loaded");
 
 
 /* ===========================================================
-   ENGINE 8: PURCHASES & ORDERS (Updated with order_id)
+   ENGINE 8: PURCHASES & ORDERS (Updated with order_id & invoice_number)
 =========================================================== */
 async function savePurchase() {
     try {
@@ -778,12 +786,13 @@ async function savePurchase() {
             book_id: window.currentPurchase.bookId,
             payment_id: window.currentPurchase.paymentId,
             amount: window.currentPurchase.amount,
-            order_id: window.currentPurchase.orderId, // 👈 यहाँ आर्डर आईडी जोड़ी गई है
+            order_id: window.currentPurchase.orderId,             // 👈 यहाँ आर्डर आईडी सेव होगी
+            invoice_number: window.currentPurchase.invoice_number, // 👈 यहाँ इनवॉइस नंबर सेव होगा
             download_count: 0, 
             payment_status: PAYMENT.STATUS_SUCCESS 
         };
 
-        console.log("📤 Saving purchase to Supabase with Order ID:", purchasePayload);
+        console.log("📤 Saving purchase to Supabase with Order ID & Invoice:", purchasePayload);
 
         const { data, error } = await activeDb
             .from("purchases")
@@ -793,7 +802,7 @@ async function savePurchase() {
         if (error) {
             console.error("❌ Save Purchase DB Error:", error.message);
         } else {
-            console.log("✅ SUCCESS: Purchase saved successfully in database with Order ID!", data);
+            console.log("✅ SUCCESS: Purchase saved successfully with Order ID and Invoice Number!", data);
         }
     } catch (err) {
         console.error("❌ Exception during savePurchase execution:", err);
