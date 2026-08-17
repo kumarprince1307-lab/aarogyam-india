@@ -52,6 +52,17 @@ async function loadSuccessPage() {
             welcomeMsgEl.innerHTML = `📌 बधाई हो, ${userName} जी! आपका पेमेंट सफल रहा।`;
         }
 
+        // 5. फेसबुक पिक्सेल को सही डेटा भेजने के लिए (Purchase Event)
+        if (typeof fbq === 'function') {
+            fbq('track', 'Purchase', {
+                value: parseFloat(amount),
+                currency: 'INR',
+                content_ids: [bookId],
+                content_type: 'product',
+                order_id: orderId
+            });
+        }
+
     } catch (error) {
         console.error("Success Page Load Error:", error);
     }
