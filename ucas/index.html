@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UCAS V1 — Universal Customer Acquisition System | Aarogyam India</title>
+  
+  <meta name="description" content="Universal Customer Acquisition System (UCAS V1) for Aarogyam India. Search, Filter, and Acquire customers effortlessly.">
+  <meta name="theme-color" content="#0B7A3E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="UCAS">
+
+  <!-- Favicon & PWA Manifest -->
+  <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+  <link rel="apple-touch-icon" href="/images/logo/logo.png">
+  <link rel="manifest" href="/ucas/manifest.json">
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- UCAS Design System -->
+  <link rel="stylesheet" href="/ucas/ucas.css">
+</head>
+<body>
+
+<!-- =========================================================================
+     AUTH GATEWAY (BEFORE LOGIN — SHOWN ONLY WHEN NOT LOGGED IN)
+     ========================================================================= -->
+<div id="ucas-auth-gate" style="display:none;">
+  <div class="ucas-auth-card">
+    <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:52px;margin:0 auto 14px;object-fit:contain;">
+    <h2 style="font-size:1.45rem;color:var(--primary-dark);margin-bottom:4px;">UCAS V1 पोर्टल</h2>
+    <p style="font-size:0.86rem;color:var(--text-muted);margin-bottom:1.5rem;">
+      यूनिवर्सल कस्टमर एक्विजिशन सिस्टम (UCAS) में प्रवेश करने के लिए अपने पंजीकृत मोबाइल नंबर से लॉगिन करें।
+    </p>
+
+    <form id="ucas-gate-login-form">
+      <div class="ucas-form-group" style="text-align:left;">
+        <label class="ucas-label">रजिस्टर्ड मोबाइल नंबर (Mobile Number)</label>
+        <input type="tel" id="ucas-gate-mobile" class="ucas-input" placeholder="10 अंकों का मोबाइल नंबर दर्ज करें" maxlength="10" required style="font-size:1.1rem;padding:0.8rem;">
+      </div>
+
+      <div id="ucas-gate-login-msg" style="margin-bottom:12px;font-size:0.84rem;"></div>
+
+      <button type="submit" id="ucas-gate-submit-btn" class="ucas-btn ucas-btn-primary ucas-btn-block" style="padding:0.85rem;font-size:1.05rem;">
+        <i class="fa-solid fa-right-to-bracket"></i> लॉगिन करें (Login)
+      </button>
+    </form>
+
+    <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);font-size:0.84rem;color:var(--text-muted);">
+      <div>नया यूजर हैं? <a href="/registration.html" style="color:var(--primary);font-weight:700;">फ्री अकाउंट बनाएं (Sign Up)</a></div>
+      <div style="margin-top:8px;">या <a href="/ebooks/my-library.html" style="color:var(--text-muted);text-decoration:underline;">Aarogyam India मुख्य लॉगिन खोलें</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     AUTHENTICATED APP SHELL (AFTER LOGIN)
+     ========================================================================= -->
+<div class="ucas-app" id="ucas-app-authenticated" style="display:none;">
+
+  <!-- 1. TOP APP HEADER -->
+  <header class="ucas-header">
+    <a href="/ucas/index.html" class="ucas-brand">
+      <img src="/images/logo/logo.png" alt="Aarogyam India" class="ucas-brand-logo">
+      <div class="ucas-brand-text">
+        <div class="ucas-brand-title">
+          UCAS <span class="ucas-badge-v1">V1.0</span>
+        </div>
+        <div class="ucas-brand-sub">Customer Acquisition System</div>
+      </div>
+    </a>
+
+    <div class="ucas-header-actions">
+      <!-- PWA Install Button -->
+      <button id="ucas-pwa-install-btn" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="display:none;" onclick="UCAS_PWA.triggerInstall()">
+        <i class="fa-solid fa-mobile-screen-button"></i> Install App
+      </button>
+
+      <!-- User Profile Pill (Opens User Drawer / My Profile) -->
+      <div class="ucas-user-pill" onclick="UCAS_APP.openUserDrawer()" title="यूजर मेनू खोलें">
+        <div class="ucas-user-avatar">A</div>
+        <div class="ucas-user-info">
+          <span class="ucas-user-name">Loading...</span>
+          <span class="ucas-user-shareid">ID: ---</span>
+        </div>
+      </div>
+
+      <!-- Hamburger Menu Button (Drawer Toggle) -->
+      <button class="ucas-menu-toggle-btn" onclick="UCAS_APP.toggleUserDrawer()" title="मेनू खोलें" aria-label="Toggle Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. DESKTOP / TABLET SIDEBAR (>= 768px) -->
+  <aside class="ucas-sidebar">
+    <div>
+      <div class="ucas-nav-section-title">UCAS Destinations</div>
+      <ul class="ucas-nav-list">
+        <li class="ucas-nav-item active">
+          <button data-tab="profile">
+            <i class="fa-solid fa-chart-pie ucas-nav-icon"></i>
+            <span>My Profile</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="library">
+            <i class="fa-solid fa-book-open ucas-nav-icon"></i>
+            <span>My Library</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="survey">
+            <i class="fa-solid fa-clipboard-list ucas-nav-icon"></i>
+            <span>Survey</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="phonebook">
+            <i class="fa-solid fa-address-book ucas-nav-icon"></i>
+            <span>My Phonebook</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="leads">
+            <i class="fa-solid fa-user-group ucas-nav-icon"></i>
+            <span>My Share Leads</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="marketing">
+            <i class="fa-solid fa-rocket ucas-nav-icon"></i>
+            <span>Marketing Engine</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="permissions">
+            <i class="fa-solid fa-shield-halved ucas-nav-icon"></i>
+            <span>Permissions</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item ucas-nav-admin-only" style="display:none;">
+          <button data-tab="admin" style="color:var(--secondary-dark);">
+            <i class="fa-solid fa-screwdriver-wrench ucas-nav-icon"></i>
+            <span>Admin Center</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div style="padding:0.75rem 0.5rem;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span>🔒 Isolated UCAS V1</span>
+        <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_SESSION.logout()" style="padding:3px 8px;font-size:0.72rem;color:var(--danger);">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+      <div style="margin-top:4px;">Aarogyam India &copy; 2026</div>
+    </div>
+  </aside>
+
+  <!-- 3. SLIDE-OUT USER MENU DRAWER (MOBILE & DESKTOP OVERLAY) -->
+  <div class="ucas-drawer-overlay" id="ucas-drawer-overlay" onclick="UCAS_APP.closeUserDrawer()"></div>
+  <div class="ucas-drawer" id="ucas-user-drawer">
+    <div>
+      <div class="ucas-drawer-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="ucas-user-avatar" style="width:38px;height:38px;font-size:1.1rem;">A</div>
+          <div>
+            <div class="ucas-user-name" style="font-size:0.95rem;">Loading...</div>
+            <div class="ucas-user-shareid" style="font-size:0.75rem;">ID: ---</div>
+          </div>
+        </div>
+        <button class="ucas-drawer-close" onclick="UCAS_APP.closeUserDrawer()">&times;</button>
+      </div>
+
+      <div class="ucas-nav-section-title">USER MENU / PROFILE</div>
+      <ul class="ucas-nav-list">
+        <li class="ucas-nav-item active">
+          <button data-tab="profile" onclick="UCAS_APP.switchView('profile'); UCAS_APP.closeUserDrawer();">
+            <i class="fa-solid fa-chart-pie ucas-nav-icon"></i>
+            <span>My Profile</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="library" onclick="window.location.href='/ebooks/my-library.html';">
+            <i class="fa-solid fa-book-open ucas-nav-icon"></i>
+            <span>My Library</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="survey" onclick="UCAS_APP.switchView('survey'); UCAS_APP.closeUserDrawer();">
+            <i class="fa-solid fa-clipboard-list ucas-nav-icon"></i>
+            <span>Survey</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="phonebook" onclick="UCAS_APP.switchView('phonebook'); UCAS_APP.closeUserDrawer();">
+            <i class="fa-solid fa-address-book ucas-nav-icon"></i>
+            <span>My Phonebook</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="leads" onclick="UCAS_APP.switchView('leads'); UCAS_APP.closeUserDrawer();">
+            <i class="fa-solid fa-user-group ucas-nav-icon"></i>
+            <span>My Share Leads</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="marketing" onclick="UCAS_APP.switchView('marketing'); UCAS_APP.closeUserDrawer();">
+            <i class="fa-solid fa-rocket ucas-nav-icon"></i>
+            <span>Marketing Engine</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="permissions" onclick="UCAS_APP.switchView('permissions'); UCAS_APP.closeUserDrawer();">
+            <i class="fa-solid fa-shield-halved ucas-nav-icon"></i>
+            <span>Permissions</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item ucas-nav-admin-only" style="display:none;">
+          <button data-tab="admin" onclick="UCAS_APP.switchView('admin'); UCAS_APP.closeUserDrawer();" style="color:var(--secondary-dark);">
+            <i class="fa-solid fa-screwdriver-wrench ucas-nav-icon"></i>
+            <span>Admin Center</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Drawer Logout -->
+    <div style="padding-top:1rem;border-top:1px solid var(--border);">
+      <button class="ucas-btn ucas-btn-outline ucas-btn-block" onclick="UCAS_SESSION.logout()" style="color:var(--danger);justify-content:center;">
+        <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट (Logout)
+      </button>
+    </div>
+  </div>
+
+  <!-- 4. MAIN CONTENT VIEWS -->
+  <main class="ucas-main">
+
+    <!-- -----------------------------------------------------------------------
+         VIEW 1: MY PROFILE / DASHBOARD
+         ----------------------------------------------------------------------- -->
+    <section id="view-profile" class="ucas-view active">
+      <!-- Hero Banner -->
+      <div class="ucas-hero-banner">
+        <div class="ucas-hero-content">
+          <h2>नमस्ते, <span id="ucas-hero-user-name">प्रिय सदस्य</span> 👋</h2>
+          <p>आपके अपने यूनिवर्सल कस्टमर एक्विजिशन सिस्टम (UCAS V1) में आपका स्वागत है। अपने संपर्कों को व्यवस्थित करें, सर्वे भरें और 1-क्लिक में मार्केटिंग संदेश साझा करें।</p>
+          <div class="ucas-hero-stats">
+            <div class="ucas-hero-pill">
+              <i class="fa-solid fa-fingerprint"></i> Share ID: <strong id="ucas-hero-share-id">AI000004</strong>
+            </div>
+            <div class="ucas-hero-pill">
+              <i class="fa-solid fa-phone"></i> <span id="ucas-hero-mobile">---</span>
+            </div>
+            <div class="ucas-hero-pill">
+              <i class="fa-solid fa-circle-check" style="color:#A7F3D0;"></i> Verified Member
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards (Real Dynamic Data) -->
+      <div class="ucas-kpi-grid">
+        <div class="ucas-kpi-card kpi-green">
+          <div class="ucas-kpi-icon-wrap">
+            <i class="fa-solid fa-clipboard-list"></i>
+          </div>
+          <div class="ucas-kpi-val" id="kpi_total_surveys">0</div>
+          <div class="ucas-kpi-label">Total Surveys</div>
+        </div>
+
+        <div class="ucas-kpi-card kpi-blue">
+          <div class="ucas-kpi-icon-wrap">
+            <i class="fa-solid fa-address-book"></i>
+          </div>
+          <div class="ucas-kpi-val" id="kpi_total_contacts">0</div>
+          <div class="ucas-kpi-label">Total Contacts</div>
+        </div>
+
+        <div class="ucas-kpi-card kpi-orange">
+          <div class="ucas-kpi-icon-wrap">
+            <i class="fa-solid fa-users-viewfinder"></i>
+          </div>
+          <div class="ucas-kpi-val" id="kpi_total_leads">0</div>
+          <div class="ucas-kpi-label">Total Leads</div>
+        </div>
+
+        <div class="ucas-kpi-card kpi-purple">
+          <div class="ucas-kpi-icon-wrap">
+            <i class="fa-solid fa-heart-circle-check"></i>
+          </div>
+          <div class="ucas-kpi-val" id="kpi_total_interested">0</div>
+          <div class="ucas-kpi-label">Interested</div>
+        </div>
+
+        <div class="ucas-kpi-card kpi-green">
+          <div class="ucas-kpi-icon-wrap">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <div class="ucas-kpi-val" id="kpi_total_converted">0</div>
+          <div class="ucas-kpi-label">Converted</div>
+        </div>
+      </div>
+
+      <!-- Direct Referrals & Purchase Earnings with Date Filter -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
+          <div>
+            <div class="ucas-card-title">
+              <i class="fa-solid fa-users" style="color:var(--primary);"></i> मेरे डायरेक्ट रेफरल एवं कुल परचेज (Direct Referrals & Purchases)
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
+              आपकी Share ID से सीधे जुड़े सदस्य और उनके द्वारा की गई कुल खरीदारी
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
+            <input type="date" id="profile_ref_date_from" class="ucas-input" style="padding:4px 8px;font-size:0.8rem;width:130px;">
+            <span style="font-size:0.78rem;color:var(--text-muted);">से</span>
+            <input type="date" id="profile_ref_date_to" class="ucas-input" style="padding:4px 8px;font-size:0.8rem;width:130px;">
+            <button class="ucas-btn ucas-btn-sm ucas-btn-primary" onclick="UCAS_APP.filterProfileReferrals()" style="padding:4px 10px;font-size:0.8rem;">
+              फ़िल्टर करें
+            </button>
+            <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_APP.resetProfileReferralsDate()" style="padding:4px 8px;font-size:0.8rem;">
+              All Time
+            </button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;text-align:center;">
+          <div style="background:#DCFCE7;color:#15803D;padding:12px;border-radius:var(--radius-md);border:1px solid #86EFAC;">
+            <div style="font-size:1.6rem;font-weight:800;" id="kpi_direct_referrals">0</div>
+            <div style="font-size:0.82rem;font-weight:700;">👥 Total Direct Referrals (कुल डायरेक्ट रेफरल)</div>
+          </div>
+          <div style="background:#FEF3C7;color:#92400E;padding:12px;border-radius:var(--radius-md);border:1px solid #FCD34D;">
+            <div style="font-size:1.6rem;font-weight:800;" id="kpi_direct_purchases">₹0</div>
+            <div style="font-size:0.82rem;font-weight:700;">💰 Total Direct Purchase (कुल परचेज राशि)</div>
+          </div>
+        </div>
+
+        <div id="ucas-profile-referrals-list" style="max-height:220px;overflow-y:auto;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Quick Action Shortcuts -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-bolt" style="color:var(--secondary);"></i> त्वरित कार्य (Quick Actions)
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;">
+          <button class="ucas-btn ucas-btn-primary" onclick="UCAS_APP.switchView('survey')">
+            <i class="fa-solid fa-plus-circle"></i> नया सर्वे भरें
+          </button>
+          <button class="ucas-btn ucas-btn-outline" onclick="UCAS_APP.switchView('phonebook')">
+            <i class="fa-solid fa-file-import"></i> फोनबुक / CSV इम्पोर्ट
+          </button>
+          <button class="ucas-btn ucas-btn-secondary" onclick="UCAS_APP.switchView('marketing')">
+            <i class="fa-solid fa-paper-plane"></i> मार्केटिंग इंजन खोलें
+          </button>
+          <button class="ucas-btn ucas-btn-outline" onclick="window.location.href='/ebooks/my-library.html'">
+            <i class="fa-solid fa-book-open"></i> My Library खोलें
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Activity Feed -->
+      <div class="ucas-card">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-clock-rotate-left" style="color:var(--primary);"></i> हालिया गतिविधियां (Recent Activity)
+          </div>
+          <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_APP.refreshDashboardKPIs()">
+            <i class="fa-solid fa-rotate"></i> रीफ्रेश
+          </button>
+        </div>
+        <div id="ucas-dashboard-recent-activity">
+          <div style="text-align:center;padding:1rem;color:var(--text-muted);">लोड हो रहा है...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW 2: SMART SURVEY (Single Multi-Category Form)
+         ----------------------------------------------------------------------- -->
+    <section id="view-survey" class="ucas-view">
+      <div class="ucas-card" style="margin-bottom:1.5rem;">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-clipboard-list" style="color:var(--primary);"></i>
+            <span>स्मार्ट सर्वे फॉर्म (Intelligent Single Survey)</span>
+          </div>
+          <span style="font-size:0.78rem;background:var(--primary-subtle);color:var(--primary);padding:4px 8px;border-radius:var(--radius-sm);font-weight:700;">
+            1 Person • 1 Record • Multiple Categories
+          </span>
+        </div>
+
+        <form id="ucas-survey-form">
+          <!-- Step 1: Person Information -->
+          <div style="font-weight:800;font-size:0.95rem;color:var(--text-main);margin-bottom:0.75rem;display:flex;align-items:center;gap:6px;">
+            <span style="width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:0.75rem;">1</span>
+            <span>व्यक्तिगत जानकारी (Person Information)</span>
+          </div>
+
+          <div class="ucas-grid-2">
+            <div class="ucas-form-group">
+              <label class="ucas-label">पूरा नाम (Full Name) <span class="ucas-label-req">*</span></label>
+              <input type="text" id="survey_name" class="ucas-input" placeholder="उदा. रामेश्वर पटेल" required>
+            </div>
+            <div class="ucas-form-group">
+              <label class="ucas-label">मोबाइल नंबर (Mobile) <span class="ucas-label-req">*</span></label>
+              <input type="tel" id="survey_mobile" class="ucas-input" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" required>
+            </div>
+          </div>
+
+          <div class="ucas-grid-3">
+            <div class="ucas-form-group">
+              <label class="ucas-label">उम्र (Age)</label>
+              <input type="number" id="survey_age" class="ucas-input" placeholder="उदा. 35">
+            </div>
+            <div class="ucas-form-group">
+              <label class="ucas-label">लिंग (Sex / Gender)</label>
+              <select id="survey_sex" class="ucas-select">
+                <option value="Male">पुरुष (Male)</option>
+                <option value="Female">महिला (Female)</option>
+                <option value="Other">अन्य (Other)</option>
+              </select>
+            </div>
+            <div class="ucas-form-group">
+              <label class="ucas-label">व्यवसाय (Occupation)</label>
+              <select id="survey_occupation" class="ucas-select">
+                <option value="किसान (Farmer)">किसान (Farmer)</option>
+                <option value="नौकरी (Job / Service)">नौकरी (Job / Service)</option>
+                <option value="व्यापार (Business)">व्यापार (Business)</option>
+                <option value="गृहणी (Housewife)">गृहणी (Housewife)</option>
+                <option value="विद्यार्थी (Student)">विद्यार्थी (Student)</option>
+                <option value="अन्य (Other)">अन्य (Other)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="ucas-grid-3">
+            <div class="ucas-form-group">
+              <label class="ucas-label">राज्य (State)</label>
+              <select id="survey_state" class="ucas-select">
+                <option value="Madhya Pradesh">मध्य प्रदेश (Madhya Pradesh)</option>
+                <option value="Uttar Pradesh">उत्तर प्रदेश (Uttar Pradesh)</option>
+                <option value="Maharashtra">महाराष्ट्र (Maharashtra)</option>
+                <option value="Rajasthan">राजस्थान (Rajasthan)</option>
+                <option value="Bihar">बिहार (Bihar)</option>
+                <option value="Chhattisgarh">छत्तीसगढ़ (Chhattisgarh)</option>
+                <option value="Gujarat">गुजरात (Gujarat)</option>
+                <option value="Other">अन्य राज्य</option>
+              </select>
+            </div>
+            <div class="ucas-form-group">
+              <label class="ucas-label">जिला (District)</label>
+              <input type="text" id="survey_district" class="ucas-input" placeholder="उदा. रीवा / सतना / भोपाल">
+            </div>
+            <div class="ucas-form-group">
+              <label class="ucas-label">ग्राम / कस्बा (Village / Area)</label>
+              <input type="text" id="survey_village" class="ucas-input" placeholder="उदा. रामपुर / वार्ड 4">
+            </div>
+          </div>
+
+          <!-- Step 2: Category Selection (Multi-Select Cards) -->
+          <div style="font-weight:800;font-size:0.95rem;color:var(--text-main);margin:1.5rem 0 0.5rem;display:flex;align-items:center;gap:6px;">
+            <span style="width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:0.75rem;">2</span>
+            <span>कैटेगरी चुनें (Select Applicable Categories — Multiple Allowed)</span>
+          </div>
+
+          <div class="ucas-category-grid" id="ucas-survey-category-cards">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Step 3: Dynamic Category-Specific Questions -->
+          <div id="ucas-survey-dynamic-sections">
+            <!-- Rendered dynamically based on selected cards -->
+          </div>
+
+          <div style="margin-top:1.5rem;">
+            <button type="submit" id="survey_submit_btn" class="ucas-btn ucas-btn-primary ucas-btn-block" style="padding:0.85rem;font-size:1.05rem;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> सर्वे सुरक्षित करें (Save Survey)
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Survey History Table -->
+      <div class="ucas-card">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-list-check"></i> मेरे सर्वे रिकॉर्ड्स (<span id="ucas-survey-history-count">0</span>)
+          </div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" class="ucas-input" style="padding:4px 8px;font-size:0.82rem;width:180px;" placeholder="नाम/मोबाइल खोजें..." oninput="UCAS_SURVEY.searchSurveys(this.value)">
+          </div>
+        </div>
+
+        <div class="ucas-table-wrap">
+          <table class="ucas-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>व्यक्ति का नाम</th>
+                <th>मोबाइल</th>
+                <th>कैटेगरी</th>
+                <th>तारीख</th>
+                <th>विवरण</th>
+              </tr>
+            </thead>
+            <tbody id="ucas-survey-history-body">
+              <tr><td colspan="6" style="text-align:center;padding:1rem;">लोड हो रहा है...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW 3: MY PHONEBOOK
+         ----------------------------------------------------------------------- -->
+    <section id="view-phonebook" class="ucas-view">
+      <!-- Phonebook Header & Stats -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;">
+        
+        <!-- Primary Action Banner: Real Mobile Contact Import -->
+        <div style="background:linear-gradient(135deg, #0B7A3E 0%, #159E52 100%);color:#fff;padding:1.25rem;border-radius:var(--radius-md);margin-bottom:1.25rem;box-shadow:0 4px 15px rgba(11,122,62,0.25);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+            <div>
+              <h3 style="color:#fff;font-size:1.2rem;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+                <i class="fa-solid fa-mobile-screen-button"></i> 📱 फोन से Contacts Import करें
+              </h3>
+              <p style="font-size:0.84rem;color:rgba(255,255,255,0.92);margin:0;">
+                अपने मोबाइल के सभी संपर्कों को सीधे 1-टैप में चुनें और बिना किसी झंझट के तुरंत UCAS में सुरक्षित रूप से इम्पोर्ट करें।
+              </p>
+            </div>
+            <button id="ucas-pb-primary-import-btn" class="ucas-btn" onclick="UCAS_PHONEBOOK.startNativeContactImport()" style="background:#FFFFFF;color:var(--primary-dark);font-weight:800;font-size:0.96rem;padding:0.8rem 1.5rem;border-radius:var(--radius-full);box-shadow:0 4px 12px rgba(0,0,0,0.15);cursor:pointer;">
+              <i class="fa-solid fa-cloud-arrow-down"></i> अभी Contacts चुनें
+            </button>
+          </div>
+        </div>
+
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.75rem;">
+          <div>
+            <div class="ucas-card-title">
+              <i class="fa-solid fa-address-book" style="color:var(--accent-blue);"></i> My Phonebook (<span id="ucas-phonebook-total-count">0</span>)
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
+              📱 फोनबुक: <strong id="ucas-pb-stat-phone">0</strong> • ✍️ मैनुअल: <strong id="ucas-pb-stat-manual">0</strong> • 📊 CSV: <strong id="ucas-pb-stat-csv">0</strong>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            <button class="ucas-btn ucas-btn-sm ucas-btn-primary" onclick="UCAS_APP.openModal('ucas-modal-add-contact')">
+              <i class="fa-solid fa-user-plus"></i> + Add Contact
+            </button>
+            <button class="ucas-btn ucas-btn-sm ucas-btn-secondary" onclick="UCAS_PHONEBOOK.openVcfModal()">
+              <i class="fa-solid fa-file-invoice"></i> 📂 VCF Import
+            </button>
+            <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_APP.openModal('ucas-modal-import-csv')">
+              <i class="fa-solid fa-file-csv"></i> Upload CSV
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;margin-top:0.5rem;">
+          <input type="text" class="ucas-input" placeholder="नाम, मोबाइल या स्थान से खोजें..." oninput="UCAS_PHONEBOOK.searchPhonebook(this.value)">
+        </div>
+      </div>
+
+      <!-- Contacts Table -->
+      <div class="ucas-card">
+        <div class="ucas-table-wrap">
+          <table class="ucas-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>नाम (Name)</th>
+                <th>मोबाइल (Mobile)</th>
+                <th>स्थान (Place)</th>
+                <th>स्रोत (Source)</th>
+              </tr>
+            </thead>
+            <tbody id="ucas-phonebook-table-body">
+              <tr><td colspan="5" style="text-align:center;padding:1rem;">लोड हो रहा है...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW 4: MY SHARE LEADS
+         ----------------------------------------------------------------------- -->
+    <section id="view-leads" class="ucas-view">
+      <div class="ucas-card" style="margin-bottom:1.25rem;">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.75rem;">
+          <div>
+            <div class="ucas-card-title">
+              <i class="fa-solid fa-user-group" style="color:var(--primary);"></i> My Share Leads (<span id="ucas-leads-total-count">0</span>)
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">
+              Interested: <strong id="ucas-leads-interested-count" style="color:var(--secondary-dark);">0</strong> • Converted: <strong id="ucas-leads-converted-count" style="color:var(--primary);">0</strong>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <select id="ucas-leads-status-filter" class="ucas-select" style="padding:6px 10px;font-size:0.82rem;">
+              <option value="all">सभी स्थितियां (All Statuses)</option>
+              <option value="new">New (नया)</option>
+              <option value="contacted">Contacted (संपर्क किया)</option>
+              <option value="interested">Interested (इच्छुक)</option>
+              <option value="followup">Follow-up (फॉलो-अप)</option>
+              <option value="converted">Converted (सफल / कन्वर्टेड)</option>
+              <option value="notinterested">Not Interested (रुचि नहीं)</option>
+              <option value="wrongnumber">Wrong Number</option>
+              <option value="notrelevant">Not Relevant</option>
+            </select>
+          </div>
+        </div>
+
+        <input type="text" class="ucas-input" placeholder="लीड नाम, मोबाइल या कैटेगरी खोजें..." oninput="UCAS_LEADS.searchLeads(this.value)">
+      </div>
+
+      <!-- Leads List Container -->
+      <div id="ucas-leads-container">
+        <div style="text-align:center;padding:1rem;">लोड हो रहा है...</div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW 5: MARKETING ENGINE (SEARCH → FILTER → SEND)
+         ----------------------------------------------------------------------- -->
+    <section id="view-marketing" class="ucas-view">
+      <div class="ucas-card" style="margin-bottom:1.25rem;background:var(--primary-subtle);border-color:rgba(11, 122, 62, 0.2);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+            <i class="fa-solid fa-rocket"></i>
+          </div>
+          <div>
+            <h3 style="font-size:1.15rem;color:var(--primary-dark);">Marketing Engine (V1)</h3>
+            <p style="font-size:0.8rem;color:var(--text-muted);">दर्शन: <strong>SEARCH → FILTER → SEND</strong> • अपनी लक्षित ऑडियंस चुनें और व्यक्तिगत संदेश साझा करें।</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 1: Select Landing Page -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <span>1. लैंडिंग पेज चुनें (Select Destination Landing Page)</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:0.75rem;" id="ucas-marketing-landing-pages">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Step 2 & 3: Message Builder & Referral Link -->
+      <div class="ucas-grid-2" style="margin-bottom:1.25rem;">
+        <!-- Message Box -->
+        <div class="ucas-card">
+          <div class="ucas-card-header">
+            <div class="ucas-card-title">
+              <span>2. मैसेज बिल्डर (Message Builder)</span>
+            </div>
+          </div>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">
+            उपलब्ध प्लेसहोल्डर: <code>{name}</code>, <code>{place}</code>, <code>{link}</code>, <code>{my_name}</code>
+          </p>
+          <textarea id="ucas-marketing-message-box" class="ucas-textarea" rows="7" style="font-size:0.86rem;"></textarea>
+
+          <div style="margin-top:10px;">
+            <label class="ucas-label">जनरेटेड रेफरल लिंक (Share Engine):</label>
+            <div style="display:flex;gap:6px;">
+              <input type="text" id="ucas-marketing-referral-link" class="ucas-input" readonly style="background:#F1F5F9;font-size:0.8rem;">
+              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_MARKETING.copyReferralLink()">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview Bubble -->
+        <div class="ucas-card" style="background:#ECE5DD;border-color:#D1D7DB;">
+          <div class="ucas-card-header" style="border-bottom:1px solid rgba(0,0,0,0.08);">
+            <div class="ucas-card-title" style="font-size:0.95rem;color:#075E54;">
+              <i class="fa-brands fa-whatsapp"></i> लाइव संदेश पूर्वावलोकन (Live Preview)
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border-radius:12px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,0.15);font-size:0.86rem;line-height:1.5;color:#111;position:relative;margin-top:8px;" id="ucas-marketing-preview-bubble">
+            मैसेज लोड हो रहा है...
+          </div>
+
+          <div style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:6px;">
+            <button class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" onclick="UCAS_MARKETING.shareWhatsAppBroadcast()">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर
+            </button>
+            <button class="ucas-btn ucas-btn-sm ucas-btn-primary" onclick="UCAS_MARKETING.shareNative()">
+              <i class="fa-solid fa-share-nodes"></i> Native Share
+            </button>
+            <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_MARKETING.shareFacebook()">
+              <i class="fa-brands fa-facebook"></i> FB
+            </button>
+            <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_MARKETING.shareTelegram()">
+              <i class="fa-brands fa-telegram"></i> Telegram
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: 1-to-1 Recipient Dispatch with Compact Area & Category Filters -->
+      <div class="ucas-card">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.75rem;">
+          <div>
+            <div class="ucas-card-title">
+              <i class="fa-solid fa-paper-plane" style="color:var(--primary);"></i> 3. 1-to-1 व्यक्तिगत संदेश भेजें (Direct Recipient Dispatch)
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
+              प्रत्येक संपर्क को उनके नाम से व्यक्तिगत संदेश और आपकी Share ID लिंक के साथ भेजें।
+            </div>
+          </div>
+          <span id="ucas-marketing-match-counter" style="font-size:0.85rem;font-weight:800;color:var(--primary);background:var(--primary-subtle);padding:4px 10px;border-radius:var(--radius-full);">
+            🎯 0 Matching Contacts Found
+          </span>
+        </div>
+
+        <!-- Compact Area-wise + Category-wise Filter -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;background:#F8FAFC;padding:10px;border-radius:var(--radius-md);border:1px solid var(--border);">
+          <div>
+            <label class="ucas-label" style="font-size:0.78rem;margin-bottom:2px;">📍 स्थान फ़िल्टर (Area / Place)</label>
+            <select id="mkt_filter_compact_area" class="ucas-select" style="padding:6px 10px;font-size:0.84rem;">
+              <option value="all">📍 सभी स्थान (All Areas)</option>
+            </select>
+          </div>
+          <div>
+            <label class="ucas-label" style="font-size:0.78rem;margin-bottom:2px;">🏷️ कैटेगरी फ़िल्टर (Category)</label>
+            <select id="mkt_filter_compact_category" class="ucas-select" style="padding:6px 10px;font-size:0.84rem;">
+              <option value="all">🏷️ सभी कैटेगरी (All Categories)</option>
+              <option value="agriculture">🌾 Agriculture (कृषि)</option>
+              <option value="healthcare">❤️ Health Care (स्वास्थ्य)</option>
+              <option value="cattlecare">🐄 Cattle Care (पशुपालन)</option>
+              <option value="beautycare">💄 Beauty Care (सौंदर्य)</option>
+              <option value="haircare">💇 Hair Care (केश)</option>
+              <option value="netsurf">💼 NetSurf (बिजनेस)</option>
+              <option value="phonebook">📱 Phonebook Contacts</option>
+              <option value="other">➕ अन्य (Other)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="ucas-marketing-recipients-list">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW 6: PERMISSIONS
+         ----------------------------------------------------------------------- -->
+    <section id="view-permissions" class="ucas-view">
+      <div class="ucas-card" style="margin-bottom:1.25rem;">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> मेरी अनुमतियां (My Granted Permissions)
+          </div>
+          <span style="font-size:0.75rem;background:var(--primary-subtle);color:var(--primary);padding:4px 8px;border-radius:var(--radius-sm);font-weight:700;">
+            Admin Controlled
+          </span>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+          आपकी प्रोफ़ाइल के अनुसार अधिकृत सुविधाएं नीचे सूचीबद्ध हैं:
+        </p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:0.75rem;">
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text-main);"><code>survey_create</code></span>
+            <span style="background:#DCFCE7;color:#15803D;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;">✓ Active</span>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text-main);"><code>phonebook_import</code></span>
+            <span style="background:#DCFCE7;color:#15803D;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;">✓ Active</span>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text-main);"><code>whatsapp</code></span>
+            <span style="background:#DCFCE7;color:#15803D;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;">✓ Active</span>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text-main);"><code>call</code></span>
+            <span style="background:#DCFCE7;color:#15803D;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;">✓ Active</span>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text-main);"><code>message</code></span>
+            <span style="background:#DCFCE7;color:#15803D;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;">✓ Active</span>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text-main);"><code>leads_manage</code></span>
+            <span style="background:#DCFCE7;color:#15803D;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;">✓ Active</span>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text-main);"><code>facebook_share</code></span>
+            <span style="background:#DCFCE7;color:#15803D;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;">✓ Active</span>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text-main);"><code>link_generate</code></span>
+            <span style="background:#DCFCE7;color:#15803D;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;">✓ Active</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW 7: ADMIN CENTER (Protected)
+         ----------------------------------------------------------------------- -->
+    <section id="view-admin" class="ucas-view">
+      <div class="ucas-card" style="margin-bottom:1.25rem;background:var(--secondary-subtle);border-color:rgba(255,152,0,0.2);">
+        <div class="ucas-card-title" style="color:var(--secondary-dark);">
+          <i class="fa-solid fa-screwdriver-wrench"></i> UCAS Admin Management & Analytics
+        </div>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">
+          यूजर डायरेक्टरी, सर्वे रिकॉर्ड्स, फोनबुक संपर्क, परमिशन मैट्रिक्स और रियल-टाइम रिपोर्ट। (नीचे दिए गए कार्ड्स पर क्लिक करके टेबल बदलें)
+        </p>
+      </div>
+
+      <!-- Clickable Admin KPI Cards (Users, Surveys, Phonebook) -->
+      <div class="ucas-kpi-grid" style="margin-bottom:1.25rem;">
+        <div class="ucas-kpi-card kpi-blue ucas-admin-kpi-card" data-admintab="users" onclick="UCAS_ADMIN.switchAdminTab('users')" style="cursor:pointer;border-color:var(--primary);box-shadow:0 0 0 2px rgba(11,122,62,0.2);background:var(--primary-subtle);" title="यूजर डायरेक्टरी देखें">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-users"></i></div>
+          <div class="ucas-kpi-val" id="ucas-rep-total-users">0</div>
+          <div class="ucas-kpi-label">Total Users (क्लिक करें)</div>
+        </div>
+        <div class="ucas-kpi-card kpi-green ucas-admin-kpi-card" data-admintab="surveys" onclick="UCAS_ADMIN.switchAdminTab('surveys')" style="cursor:pointer;" title="सर्वे रिकॉर्ड्स देखें">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-clipboard-list"></i></div>
+          <div class="ucas-kpi-val" id="ucas-rep-total-surveys">0</div>
+          <div class="ucas-kpi-label">Total Surveys (क्लिक करें)</div>
+        </div>
+        <div class="ucas-kpi-card kpi-purple ucas-admin-kpi-card" data-admintab="phonebook" onclick="UCAS_ADMIN.switchAdminTab('phonebook')" style="cursor:pointer;" title="फोनबुक संपर्क देखें">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-address-book"></i></div>
+          <div class="ucas-kpi-val" id="ucas-rep-total-contacts">0</div>
+          <div class="ucas-kpi-label">Total Phonebook (क्लिक करें)</div>
+        </div>
+      </div>
+
+      <!-- Category Breakdown Chart / Progress Bars -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-chart-simple"></i> श्रेणीवार सर्वे वितरण (Category-wise Breakdown)
+          </div>
+        </div>
+        <div id="ucas-admin-category-breakdown">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Dynamic Active Admin List Table (Users / Surveys / Phonebook) -->
+      <div class="ucas-card">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
+          <div class="ucas-card-title" id="ucas-admin-table-title">
+            <i class="fa-solid fa-users"></i> पंजीकृत यूजर डायरेक्टरी (Users Directory)
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:0.82rem;color:var(--text-muted);">कुल रिकॉर्ड: <strong id="ucas-admin-active-count">0</strong></span>
+            <input type="text" id="ucas-admin-search-input" class="ucas-input" style="width:200px;padding:4px 8px;font-size:0.82rem;" placeholder="खोजें (Search)...">
+          </div>
+        </div>
+
+        <div class="ucas-table-wrap">
+          <table class="ucas-table">
+            <thead id="ucas-admin-table-head">
+              <tr>
+                <th>#</th>
+                <th>यूजर का नाम</th>
+                <th>मोबाइल (Call / WhatsApp)</th>
+                <th>Share ID</th>
+                <th>पंजीकरण तारीख</th>
+                <th>कार्यवाही</th>
+              </tr>
+            </thead>
+            <tbody id="ucas-admin-table-body">
+              <tr><td colspan="6" style="text-align:center;padding:1rem;">लोड हो रहा है...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 5. MOBILE BOTTOM NAVIGATION BAR (< 768px) -->
+  <nav class="ucas-bottom-nav">
+    <button class="ucas-bottom-tab active" data-tab="profile">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </button>
+    <button class="ucas-bottom-tab" data-tab="survey">
+      <i class="fa-solid fa-clipboard-list"></i>
+      <span>Survey</span>
+    </button>
+    <button class="ucas-bottom-tab" data-tab="phonebook">
+      <i class="fa-solid fa-address-book"></i>
+      <span>Phonebook</span>
+    </button>
+    <button class="ucas-bottom-tab" data-tab="leads">
+      <i class="fa-solid fa-user-group"></i>
+      <span>Leads</span>
+    </button>
+    <button class="ucas-bottom-tab" data-tab="marketing">
+      <i class="fa-solid fa-rocket"></i>
+      <span>Marketing</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- =========================================================================
+     6. MODALS & POPUPS
+     ========================================================================= -->
+
+<!-- Modal: Add Contact (Manual) -->
+<div id="ucas-modal-add-contact" class="ucas-modal-overlay">
+  <div class="ucas-modal">
+    <div class="ucas-modal-header">
+      <div class="ucas-card-title"><i class="fa-solid fa-user-plus"></i> नया संपर्क जोड़ें</div>
+      <button class="ucas-modal-close">&times;</button>
+    </div>
+    <form id="ucas-phonebook-manual-form">
+      <div class="ucas-form-group">
+        <label class="ucas-label">नाम (Name) <span class="ucas-label-req">*</span></label>
+        <input type="text" id="pb_add_name" class="ucas-input" placeholder="उदा. सुरेश शर्मा" required>
+      </div>
+      <div class="ucas-form-group">
+        <label class="ucas-label">मोबाइल नंबर (Mobile) <span class="ucas-label-req">*</span></label>
+        <input type="tel" id="pb_add_mobile" class="ucas-input" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" required>
+      </div>
+      <div class="ucas-form-group">
+        <label class="ucas-label">स्थान / शहर / ग्राम (Place)</label>
+        <input type="text" id="pb_add_place" class="ucas-input" placeholder="उदा. रीवा">
+      </div>
+      <button type="submit" class="ucas-btn ucas-btn-primary ucas-btn-block">सुरक्षित करें (Save Contact)</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Import Phonebook Fallback (vCard / Instructions) -->
+<div id="ucas-modal-import-phonebook" class="ucas-modal-overlay">
+  <div class="ucas-modal" style="max-width:500px;">
+    <div class="ucas-modal-header">
+      <div class="ucas-card-title"><i class="fa-solid fa-mobile-screen"></i> VCF से Phonebook Import करें</div>
+      <button class="ucas-modal-close">&times;</button>
+    </div>
+    
+    <div id="ucas-contact-picker-fallback-banner" style="background:#FFF3E0;border:1px solid #FFE0B2;padding:12px;border-radius:var(--radius-md);margin-bottom:1.25rem;font-size:0.84rem;color:#E65100;line-height:1.5;">
+      💡 <strong>सुझाव:</strong> डायरेक्ट फोन कांटेक्ट सेलेक्टर केवल <strong>Android Mobile Chrome</strong> में उपलब्ध होता है। डेस्कटॉप या अन्य ब्राउज़र पर आप <strong>.vcf (vCard)</strong> फाइल से अपनी पूरी Phonebook एक साथ 1-क्लिक में सुरक्षित रूप से इम्पोर्ट कर सकते हैं।
+    </div>
+
+    <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;margin-bottom:1.25rem;font-size:0.82rem;color:var(--text-main);">
+      <strong>📲 फोन से VCF फाइल कैसे निकालें (2 आसान स्टेप):</strong>
+      <ol style="margin-left:18px;margin-top:6px;line-height:1.6;">
+        <li>अपने फोन का <strong>Contacts App</strong> खोलें ➔ <strong>Settings / Fix & Manage</strong> ➔ <strong>Export to .vcf file</strong> दबाएं।</li>
+        <li>नीचे दिए गए बटन पर क्लिक करके वही <code>.vcf</code> फाइल चुनें।</li>
+      </ol>
+    </div>
+
+    <div class="ucas-form-group">
+      <label class="ucas-label">📂 .vcf (vCard) फाइल चुनें:</label>
+      <input type="file" id="ucas-phonebook-vcf-file" accept=".vcf,text/vcard,text/x-vcard" class="ucas-input" style="padding:0.75rem;">
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Upload CSV -->
+<div id="ucas-modal-import-csv" class="ucas-modal-overlay">
+  <div class="ucas-modal">
+    <div class="ucas-modal-header">
+      <div class="ucas-card-title"><i class="fa-solid fa-file-csv"></i> CSV फाइल अपलोड करें</div>
+      <button class="ucas-modal-close">&times;</button>
+    </div>
+    <div style="background:#F8FAFC;padding:10px;border-radius:var(--radius-md);margin-bottom:1rem;font-size:0.8rem;color:var(--text-muted);">
+      📌 <strong>CSV कॉलम गाइड:</strong> CSV फाइल में <code>Name</code>, <code>Mobile</code>, <code>Place</code> कॉलम होने चाहिए।
+    </div>
+    <div class="ucas-form-group">
+      <label class="ucas-label">.CSV फाइल चुनें:</label>
+      <input type="file" id="ucas-phonebook-csv-file" accept=".csv" class="ucas-input">
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Import Preview -->
+<div id="ucas-modal-import-preview" class="ucas-modal-overlay">
+  <div class="ucas-modal" style="max-width:520px;">
+    <div class="ucas-modal-header">
+      <div class="ucas-card-title"><i class="fa-solid fa-list-check"></i> कांटेक्ट इम्पोर्ट सारांश (Import Preview)</div>
+      <button class="ucas-modal-close">&times;</button>
+    </div>
+    
+    <!-- 4 Stats Cards (कुल मिले, नए contacts, पहले से मौजूद, Invalid) -->
+    <div id="ucas-import-preview-summary"></div>
+    
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text-muted);margin-bottom:6px;">
+      इम्पोर्ट होने वाले संपर्क की सूची:
+    </div>
+    <div class="ucas-table-wrap" style="max-height:220px;overflow-y:auto;margin-bottom:1.25rem;">
+      <table class="ucas-table">
+        <thead>
+          <tr><th>#</th><th>नाम (Name)</th><th>मोबाइल (Mobile)</th></tr>
+        </thead>
+        <tbody id="ucas-import-preview-table-body"></tbody>
+      </table>
+    </div>
+
+    <button id="ucas-import-confirm-btn" class="ucas-btn ucas-btn-primary ucas-btn-block" onclick="UCAS_PHONEBOOK.confirmPendingImport()" style="padding:0.85rem;font-size:1.05rem;">
+      Contacts Import करें
+    </button>
+  </div>
+</div>
+
+<!-- Modal: Survey View Details -->
+<div id="ucas-survey-view-modal" class="ucas-modal-overlay">
+  <div class="ucas-modal" style="max-width:560px;">
+    <div class="ucas-modal-header">
+      <div class="ucas-card-title"><i class="fa-solid fa-clipboard-check"></i> सर्वे संपूर्ण विवरण</div>
+      <button class="ucas-modal-close">&times;</button>
+    </div>
+    <div id="ucas-survey-view-content"></div>
+  </div>
+</div>
+
+<!-- Modal: Lead Feedback Notes -->
+<div id="ucas-modal-lead-feedback" class="ucas-modal-overlay">
+  <div class="ucas-modal" style="max-width:440px;">
+    <div class="ucas-modal-header">
+      <div class="ucas-card-title"><i class="fa-solid fa-pen-to-square"></i> लीड स्थिति व फॉलो-अप नोट</div>
+      <button class="ucas-modal-close">&times;</button>
+    </div>
+    <form id="ucas-lead-feedback-form">
+      <div style="font-weight:700;font-size:0.95rem;margin-bottom:10px;" id="feedback_lead_name">Lead Name</div>
+      <div class="ucas-form-group">
+        <label class="ucas-label">वर्तमान स्थिति (Status)</label>
+        <select id="feedback_status" class="ucas-select">
+          <option value="new">New (नया)</option>
+          <option value="contacted">Contacted (संपर्क किया)</option>
+          <option value="interested">Interested (इच्छुक)</option>
+          <option value="followup">Follow-up (फॉलो-अप)</option>
+          <option value="converted">Converted (सफल)</option>
+          <option value="notinterested">Not Interested</option>
+          <option value="wrongnumber">Wrong Number</option>
+          <option value="notrelevant">Not Relevant</option>
+        </select>
+      </div>
+      <div class="ucas-form-group">
+        <label class="ucas-label">फॉलो-अप नोट / बातचीत का विवरण (Notes)</label>
+        <textarea id="feedback_notes" class="ucas-textarea" rows="3" placeholder="उदा. ग्राहक ने कल दोपहर में बात करने को कहा है..."></textarea>
+      </div>
+      <button type="submit" class="ucas-btn ucas-btn-primary ucas-btn-block">सुरक्षित करें (Save)</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Admin User Details Inspection -->
+<div id="ucas-modal-admin-user-details" class="ucas-modal-overlay">
+  <div class="ucas-modal" style="max-width:580px;">
+    <div class="ucas-modal-header">
+      <div class="ucas-card-title"><i class="fa-solid fa-user-gear"></i> यूजर संपूर्ण विवरण</div>
+      <button class="ucas-modal-close">&times;</button>
+    </div>
+    <div id="ucas-admin-user-details-content"></div>
+  </div>
+</div>
+
+<!-- Modal: Admin Permissions Matrix -->
+<div id="ucas-modal-admin-permissions-matrix" class="ucas-modal-overlay">
+  <div class="ucas-modal" style="max-width:520px;">
+    <div class="ucas-modal-header">
+      <div>
+        <div class="ucas-card-title"><i class="fa-solid fa-shield-halved"></i> यूजर अनुमतियां (Permissions Matrix)</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);" id="ucas-admin-matrix-user-name">User Name</div>
+      </div>
+      <button class="ucas-modal-close">&times;</button>
+    </div>
+    <div class="ucas-table-wrap" style="max-height:360px;overflow-y:auto;">
+      <table class="ucas-table">
+        <thead>
+          <tr><th>#</th><th>Permission Key</th><th>Allowed</th></tr>
+        </thead>
+        <tbody id="ucas-admin-matrix-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     7. SCRIPT INCLUDES (Safe Isolation & Zero Duplication)
+     ========================================================================= -->
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Aarogyam India Base Systems (Reused Untouched) -->
+<script src="/session.js"></script>
+<script src="/js/supabase.js"></script>
+<script src="/js/share-engine-core.js"></script>
+
+<!-- UCAS Modular Engines -->
+<script src="/ucas/js/ucas-session.js?v=1.3"></script>
+<script src="/ucas/js/ucas-db.js?v=1.3"></script>
+<script src="/ucas/js/ucas-permissions.js?v=1.3"></script>
+<script src="/ucas/js/ucas-survey.js?v=1.3"></script>
+<script src="/ucas/js/ucas-phonebook.js?v=1.3"></script>
+<script src="/ucas/js/ucas-leads.js?v=1.3"></script>
+<script src="/ucas/js/ucas-marketing.js?v=1.3"></script>
+<script src="/ucas/js/ucas-admin.js?v=1.3"></script>
+<script src="/ucas/js/ucas-pwa.js?v=1.3"></script>
+<script src="/ucas/js/ucas-app.js?v=1.3"></script>
+
+</body>
+</html>
