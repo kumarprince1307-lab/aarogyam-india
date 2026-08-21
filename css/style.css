@@ -2601,33 +2601,66 @@ color: #fff;
 }
 
 .header .container{
-
     min-height:60px;
-
+    padding: 0 12px;
+    gap: 8px;
+    flex-wrap: nowrap;
 }
 
 .logo img{
+    width:80px;
+    max-width: 80px;
+    height: auto;
+}
 
-    width:100px;
+#header-user-info {
+    max-width: 130px;
+    overflow: hidden;
+    line-height: 1.2;
+}
 
+#header-user-info h3 {
+    font-size: 13px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#header-user-info p {
+    font-size: 11px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .navbar{
-
     display:none;
-
 }
 
 .login-btn span{
-
     display:none;
+}
 
+#desktop-pwa-install-btn,
+.pwa-install-btn {
+    display: none !important;
+}
+
+.header-actions{
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.search-btn{
+    width: 38px;
+    height: 38px;
 }
 
 .menu-btn{
-
-    display:flex;
-
+    display:flex !important;
+    flex-shrink: 0;
 }
 
 .footer-grid{

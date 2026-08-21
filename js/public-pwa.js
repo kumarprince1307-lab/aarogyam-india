@@ -215,12 +215,15 @@ export function updateAllInstallButtons() {
   const libraryBtn = document.getElementById('library-pwa-install-btn');
   const libraryCard = document.getElementById('library-pwa-card');
 
+  if (desktopBtn) {
+    desktopBtn.style.display = ''; // Clear inline style so CSS controls desktop/mobile display
+  }
+
   if (isStandalone) {
     // App is running in standalone mode
     if (desktopBtn) {
       desktopBtn.innerHTML = '<span>✓</span> App Installed';
       desktopBtn.classList.add('pwa-installed-btn');
-      desktopBtn.style.display = 'inline-flex';
     }
     if (mobileBtn) {
       mobileBtn.innerHTML = '<span>✓</span> App Installed';
@@ -235,7 +238,6 @@ export function updateAllInstallButtons() {
     if (desktopBtn) {
       desktopBtn.innerHTML = '<span>📱</span> Install App';
       desktopBtn.classList.remove('pwa-installed-btn');
-      desktopBtn.style.display = 'inline-flex';
     }
     if (mobileBtn) {
       mobileBtn.innerHTML = '<span>📱</span> Install App';
