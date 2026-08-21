@@ -1,0 +1,22 @@
+{
+  "name": "UCAS — Universal Customer Acquisition System",
+  "short_name": "UCAS V1",
+  "description": "Universal Customer Acquisition System for Aarogyam India. Search, Filter, and Send with Ease.",
+  "start_url": "/ucas/index.html",
+  "display": "standalone",
+  "background_color": "#F4F6F9",
+  "theme_color": "#0B7A3E",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/logo/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/logo/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
