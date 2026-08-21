@@ -232,6 +232,22 @@
     const profileId = window.UCAS_SESSION.getUserId();
     const shareId = window.UCAS_SESSION.getShareId();
 
+    // ==========================================
+    // INACTIVE USER LANDING PAGE LIMIT CHECK (MAX 3)
+    // ==========================================
+    const UCAS_LANDING_LIMITS = {
+      INACTIVE_LIMIT: 3,
+      ACTIVE_LIMIT: Infinity
+    };
+
+    if (!editingLandingPageId && profileId) {
+      const sub = await window.UCAS_DB.getUserSubscription(profileId);
+      if (!sub.isActive && userLandingPages.length >= UCAS_LANDING_LIMITS.INACTIVE_LIMIT) {
+        window.UCAS_APP.showToast('आपकी 3 Landing Page limit पूरी हो गई है। अधिक Landing Pages बनाने के लिए Active User बनें।', 'warning');
+        return;
+      }
+    }
+
     const generateBtn = document.getElementById('lp_btn_generate');
     if (generateBtn) {
       generateBtn.disabled = true;

@@ -568,6 +568,206 @@
     return { success: true };
   }
 
+  // ==========================================
+  // 6. USER SUBSCRIPTION & ACTIVITY ENGINE
+  // ==========================================
+
+  async function getUserSubscription(profileId) {
+    const client = getDb();
+    if (!profileId) {
+      return {
+        isActive: false,
+        status: 'INACTIVE',
+        subscriber: 'NO',
+        plan: 'None',
+        source: 'NONE',
+        amount: '₹0',
+        startDate: null,
+        expiryDate: null,
+        purchaseDate: null,
+        paymentId: 'N/A',
+        daysRemaining: 0
+      };
+    }
+
+    let purchaseRecord = null;
+
+    // 1. Query Purchases from Supabase
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('purchases')
+          .select('*')
+          .eq('profile_id', profileId)
+          .order('purchase_date', { ascending: false })
+          .limit(1);
+
+        if (!error && data && data.length > 0) {
+          purchaseRecord = data[0];
+        }
+      } catch (e) {
+        console.warn('Subscription purchase query notice:', e);
+      }
+    }
+
+    // 2. Check Admin Manual Override
+    const manualStatus = localStorage.getItem(`UCAS_USER_STATUS_${profileId}`);
+
+    if (purchaseRecord) {
+      const pDate = purchaseRecord.purchase_date || purchaseRecord.created_at || new Date().toISOString();
+      const pTime = new Date(pDate).getTime();
+      // 1 Year = 365 days - 1 day
+      const expTime = pTime + (365 * 24 * 60 * 60 * 1000) - (24 * 60 * 60 * 1000);
+      const expiryDate = new Date(expTime).toISOString();
+      const now = Date.now();
+      const isNaturalActive = now <= expTime;
+      const daysRemaining = Math.max(0, Math.ceil((expTime - now) / (1000 * 60 * 60 * 24)));
+
+      const isActuallyActive = manualStatus ? (manualStatus === 'ACTIVE') : isNaturalActive;
+
+      return {
+        isActive: isActuallyActive,
+        status: isActuallyActive ? 'ACTIVE' : 'INACTIVE',
+        subscriber: isActuallyActive ? 'YES' : 'NO',
+        plan: 'Basic (1 Year)',
+        source: purchaseRecord.book_id ? 'EBOOK_PURCHASE' : 'DIRECT_PAYMENT',
+        amount: purchaseRecord.book_id ? 'FREE' : `₹${purchaseRecord.amount || 99}`,
+        startDate: pDate,
+        purchaseDate: pDate,
+        expiryDate: expiryDate,
+        paymentId: purchaseRecord.payment_id || purchaseRecord.order_id || 'N/A',
+        daysRemaining: daysRemaining,
+        purchaseRecord: purchaseRecord
+      };
+    }
+
+    // If no purchase, but admin manually activated
+    if (manualStatus === 'ACTIVE') {
+      const now = new Date();
+      const expTime = now.getTime() + (365 * 24 * 60 * 60 * 1000) - (24 * 60 * 60 * 1000);
+      return {
+        isActive: true,
+        status: 'ACTIVE',
+        subscriber: 'YES',
+        plan: 'Basic (1 Year)',
+        source: 'DIRECT_PAYMENT',
+        amount: '₹99',
+        startDate: now.toISOString(),
+        purchaseDate: now.toISOString(),
+        expiryDate: new Date(expTime).toISOString(),
+        paymentId: 'MANUAL_ADMIN',
+        daysRemaining: 365
+      };
+    }
+
+    // Default Inactive
+    return {
+      isActive: false,
+      status: 'INACTIVE',
+      subscriber: 'NO',
+      plan: 'None',
+      source: 'NONE',
+      amount: '₹0',
+      startDate: null,
+      expiryDate: null,
+      purchaseDate: null,
+      paymentId: 'N/A',
+      daysRemaining: 0
+    };
+  }
+
+  async function setUserStatus(profileId, status) {
+    if (!profileId) return { success: false };
+    localStorage.setItem(`UCAS_USER_STATUS_${profileId}`, status);
+    return { success: true, status };
+  }
+
+  async function getAllLandingPagesAdmin() {
+    const client = getDb();
+    let pages = [];
+
+    // 1. Try Supabase
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('landing_pages')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && data) {
+          pages = data;
+        }
+      } catch (e) {}
+    }
+
+    // 2. Scan LocalStorage for all LP keys
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('UCAS_LP_')) {
+        try {
+          const list = JSON.parse(localStorage.getItem(key) || '[]');
+          list.forEach(p => {
+            if (!pages.some(existing => existing.id === p.id)) {
+              pages.push(p);
+            }
+          });
+        } catch (err) {}
+      }
+    }
+
+    return { success: true, data: pages };
+  }
+
+  async function getUserActivityLogs(profileId) {
+    const logs = [];
+
+    if (!profileId) return { success: true, data: [] };
+
+    try {
+      const [surveys, phonebook, lpRes] = await Promise.all([
+        getSurveys(profileId),
+        getPhonebook(profileId),
+        getLandingPages(profileId)
+      ]);
+
+      (surveys.data || []).forEach(s => {
+        logs.push({
+          action: 'सर्वे दर्ज किया (Survey Created)',
+          type: 'survey',
+          date: s.created_at || new Date().toISOString(),
+          refId: s.id,
+          detail: `नाम: ${s.name} (${s.village || 'स्थान'})`
+        });
+      });
+
+      (phonebook.data || []).forEach(p => {
+        logs.push({
+          action: 'फोनबुक संपर्क जोड़ा (Contact Added)',
+          type: 'phonebook',
+          date: p.created_at || new Date().toISOString(),
+          refId: p.id,
+          detail: `नाम: ${p.name} (${p.mobile})`
+        });
+      });
+
+      (lpRes.data || []).forEach(lp => {
+        logs.push({
+          action: 'लैंडिंग पेज बनाया (Landing Page Created)',
+          type: 'landing_page',
+          date: lp.created_at || new Date().toISOString(),
+          refId: lp.id,
+          detail: `टाइटल: ${lp.title} (${lp.category})`
+        });
+      });
+
+      logs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    } catch (e) {
+      console.warn('Activity log compiling notice:', e);
+    }
+
+    return { success: true, data: logs };
+  }
+
   window.UCAS_DB = {
     getDb,
     getSurveys,
@@ -583,8 +783,12 @@
     getLandingPageById,
     createLandingPage,
     updateLandingPage,
-    deleteLandingPage
+    deleteLandingPage,
+    getUserSubscription,
+    setUserStatus,
+    getAllLandingPagesAdmin,
+    getUserActivityLogs
   };
 
-  console.log('✅ UCAS DB Module (with Landing Pages CRUD) Ready.');
+  console.log('✅ UCAS DB Module (with Subscription & Admin Engines) Ready.');
 })(window);

@@ -33,7 +33,14 @@
     'referral_link_view',
     'link_generate',
     'contacts_export',
-    'leads_export'
+    'leads_export',
+    'landing_page_view',
+    'landing_page_create',
+    'landing_page_share',
+    'library_view',
+    'user_name_visible',
+    'directory_visible',
+    'subscription_view'
   ];
 
   // Default permissions granted to standard registered users
@@ -62,7 +69,14 @@
     referral_link_view: true,
     link_generate: true,
     contacts_export: false,
-    leads_export: false
+    leads_export: false,
+    landing_page_view: true,
+    landing_page_create: true,
+    landing_page_share: true,
+    library_view: true,
+    user_name_visible: false, // DEFAULT = OFF
+    directory_visible: false, // DEFAULT = OFF
+    subscription_view: true
   };
 
   let userPermissionsMap = { ...DEFAULT_USER_PERMISSIONS };

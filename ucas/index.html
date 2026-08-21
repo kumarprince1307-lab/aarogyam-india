@@ -991,22 +991,42 @@
         </p>
       </div>
 
-      <!-- Clickable Admin KPI Cards (Users, Surveys, Phonebook) -->
-      <div class="ucas-kpi-grid" style="margin-bottom:1.25rem;">
-        <div class="ucas-kpi-card kpi-blue ucas-admin-kpi-card" data-admintab="users" onclick="UCAS_ADMIN.switchAdminTab('users')" style="cursor:pointer;border-color:var(--primary);box-shadow:0 0 0 2px rgba(11,122,62,0.2);background:var(--primary-subtle);" title="यूजर डायरेक्टरी देखें">
+      <!-- 7 Clickable Admin KPI Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:0.65rem;margin-bottom:1.25rem;">
+        <div class="ucas-kpi-card kpi-blue ucas-admin-kpi-card" data-admintab="users" onclick="UCAS_ADMIN.switchAdminTab('users')" style="cursor:pointer;border-color:var(--primary);box-shadow:0 0 0 2px rgba(11,122,62,0.2);background:var(--primary-subtle);" title="सभी यूजर देखें">
           <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-users"></i></div>
           <div class="ucas-kpi-val" id="ucas-rep-total-users">0</div>
-          <div class="ucas-kpi-label">Total Users (क्लिक करें)</div>
+          <div class="ucas-kpi-label">Total Users</div>
         </div>
-        <div class="ucas-kpi-card kpi-green ucas-admin-kpi-card" data-admintab="surveys" onclick="UCAS_ADMIN.switchAdminTab('surveys')" style="cursor:pointer;" title="सर्वे रिकॉर्ड्स देखें">
+        <div class="ucas-kpi-card kpi-green ucas-admin-kpi-card" data-admintab="active_users" onclick="UCAS_ADMIN.switchAdminTab('active_users')" style="cursor:pointer;" title="एक्टिव यूजर्स देखें">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-user-check"></i></div>
+          <div class="ucas-kpi-val" id="ucas-rep-active-users">0</div>
+          <div class="ucas-kpi-label">Active Users</div>
+        </div>
+        <div class="ucas-kpi-card kpi-orange ucas-admin-kpi-card" data-admintab="inactive_users" onclick="UCAS_ADMIN.switchAdminTab('inactive_users')" style="cursor:pointer;" title="इनएक्टिव यूजर्स देखें">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-user-xmark"></i></div>
+          <div class="ucas-kpi-val" id="ucas-rep-inactive-users">0</div>
+          <div class="ucas-kpi-label">Inactive Users</div>
+        </div>
+        <div class="ucas-kpi-card kpi-green ucas-admin-kpi-card" data-admintab="subscribers" onclick="UCAS_ADMIN.switchAdminTab('subscribers')" style="cursor:pointer;" title="सब्सक्राइबर्स देखें">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-crown"></i></div>
+          <div class="ucas-kpi-val" id="ucas-rep-total-subscribers">0</div>
+          <div class="ucas-kpi-label">Subscribers</div>
+        </div>
+        <div class="ucas-kpi-card kpi-purple ucas-admin-kpi-card" data-admintab="surveys" onclick="UCAS_ADMIN.switchAdminTab('surveys')" style="cursor:pointer;" title="सर्वे रिकॉर्ड्स देखें">
           <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-clipboard-list"></i></div>
           <div class="ucas-kpi-val" id="ucas-rep-total-surveys">0</div>
-          <div class="ucas-kpi-label">Total Surveys (क्लिक करें)</div>
+          <div class="ucas-kpi-label">Total Surveys</div>
         </div>
-        <div class="ucas-kpi-card kpi-purple ucas-admin-kpi-card" data-admintab="phonebook" onclick="UCAS_ADMIN.switchAdminTab('phonebook')" style="cursor:pointer;" title="फोनबुक संपर्क देखें">
+        <div class="ucas-kpi-card kpi-blue ucas-admin-kpi-card" data-admintab="phonebook" onclick="UCAS_ADMIN.switchAdminTab('phonebook')" style="cursor:pointer;" title="फोनबुक संपर्क देखें">
           <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-address-book"></i></div>
           <div class="ucas-kpi-val" id="ucas-rep-total-contacts">0</div>
-          <div class="ucas-kpi-label">Total Phonebook (क्लिक करें)</div>
+          <div class="ucas-kpi-label">Total Phonebook</div>
+        </div>
+        <div class="ucas-kpi-card kpi-orange ucas-admin-kpi-card" data-admintab="landing_pages" onclick="UCAS_ADMIN.switchAdminTab('landing_pages')" style="cursor:pointer;" title="लैंडिंग पेज देखें">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+          <div class="ucas-kpi-val" id="ucas-rep-total-lps">0</div>
+          <div class="ucas-kpi-label">Landing Pages</div>
         </div>
       </div>
 
@@ -1270,17 +1290,17 @@
 <script src="/js/share-engine-core.js"></script>
 
 <!-- UCAS Modular Engines -->
-<script src="/ucas/js/ucas-session.js?v=1.5"></script>
-<script src="/ucas/js/ucas-db.js?v=1.5"></script>
-<script src="/ucas/js/ucas-permissions.js?v=1.5"></script>
-<script src="/ucas/js/ucas-survey.js?v=1.5"></script>
-<script src="/ucas/js/ucas-phonebook.js?v=1.5"></script>
-<script src="/ucas/js/ucas-leads.js?v=1.5"></script>
-<script src="/ucas/js/ucas-marketing.js?v=1.5"></script>
-<script src="/ucas/js/ucas-landing-builder.js?v=1.5"></script>
-<script src="/ucas/js/ucas-admin.js?v=1.5"></script>
-<script src="/ucas/js/ucas-pwa.js?v=1.5"></script>
-<script src="/ucas/js/ucas-app.js?v=1.5"></script>
+<script src="/ucas/js/ucas-session.js?v=1.6"></script>
+<script src="/ucas/js/ucas-db.js?v=1.6"></script>
+<script src="/ucas/js/ucas-permissions.js?v=1.6"></script>
+<script src="/ucas/js/ucas-survey.js?v=1.6"></script>
+<script src="/ucas/js/ucas-phonebook.js?v=1.6"></script>
+<script src="/ucas/js/ucas-leads.js?v=1.6"></script>
+<script src="/ucas/js/ucas-marketing.js?v=1.6"></script>
+<script src="/ucas/js/ucas-landing-builder.js?v=1.6"></script>
+<script src="/ucas/js/ucas-admin.js?v=1.6"></script>
+<script src="/ucas/js/ucas-pwa.js?v=1.6"></script>
+<script src="/ucas/js/ucas-app.js?v=1.6"></script>
 
 </body>
 </html>
