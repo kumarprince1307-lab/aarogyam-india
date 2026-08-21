@@ -1372,3 +1372,308 @@ export async function fetchSourceReport(params = {}) {
         return { success: false, error: error.message };
     }
 }
+
+/* ===========================================================
+   UNIVERSAL ADMIN NOTIFICATION ENGINE & PERSISTENCE
+=========================================================== */
+const NOTIF_STORAGE_KEY = 'AI_ADMIN_READ_NOTIFICATIONS';
+const NOTIF_LAST_READ_KEY = 'AI_ADMIN_LAST_READ_TIME';
+
+function getReadNotificationIds() {
+  try {
+    const raw = localStorage.getItem(NOTIF_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveReadNotificationIds(ids) {
+  try {
+    localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(ids));
+  } catch (e) {}
+}
+
+function getLastReadTimestamp() {
+  try {
+    return localStorage.getItem(NOTIF_LAST_READ_KEY) || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function getRelativeTime(date) {
+  if (!date || isNaN(date.getTime())) return 'Recently';
+  const now = new Date();
+  const diffSec = Math.floor((now - date) / 1000);
+  if (diffSec < 60) return 'Just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+}
+
+export async function fetchAdminNotifications(params = {}) {
+  await delay(80);
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+
+    const readIds = new Set(getReadNotificationIds());
+    const lastReadTime = getLastReadTimestamp() ? new Date(getLastReadTimestamp()) : null;
+
+    // 1. Parallel fetch of live events from purchases, checkout_logs, profiles, interested_users, books
+    const [purchasesRes, checkoutLogsRes, profilesRes, leadsRes, booksRes] = await Promise.all([
+      db.from('purchases').select('id, profile_id, book_id, payment_id, amount, order_id, invoice_number, payment_status, purchase_date, created_at').order('purchase_date', { ascending: false }).limit(40),
+      db.from('checkout_logs').select('id, profile_id, book_id, status, created_at').order('created_at', { ascending: false }).limit(40),
+      db.from('profiles').select('id, full_name, mobile, email, registration_source, created_at').order('created_at', { ascending: false }).limit(40),
+      db.from('interested_users').select('id, full_name, mobile, email, interested_book, source, created_at').order('created_at', { ascending: false }).limit(25),
+      db.from('books').select('id, title')
+    ]);
+
+    const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b.title; return acc; }, {});
+
+    try {
+      if (Object.keys(booksMap).length === 0) {
+        const booksList = await fetchAvailableBooks();
+        if (booksList.success && booksList.data) {
+          booksList.data.forEach(b => { booksMap[b.id] = b.title; });
+        }
+      }
+    } catch(e) {}
+
+    // Collect all profile IDs to resolve user names
+    const allProfileIds = new Set();
+    (purchasesRes.data || []).forEach(p => p.profile_id && allProfileIds.add(p.profile_id));
+    (checkoutLogsRes.data || []).forEach(c => c.profile_id && allProfileIds.add(c.profile_id));
+    (profilesRes.data || []).forEach(u => u.id && allProfileIds.add(u.id));
+
+    let profilesMap = {};
+    if (allProfileIds.size > 0) {
+      const { data: allProfiles } = await db.from('profiles').select('id, full_name, mobile, email, registration_source').in('id', [...allProfileIds]);
+      profilesMap = (allProfiles || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+    }
+
+    const notifications = [];
+
+    // Adapter A: Purchases & Manual Purchases
+    (purchasesRes.data || []).forEach(p => {
+      const uniqueId = `purchase:${p.id || p.order_id || p.payment_id}`;
+      const rawDate = p.purchase_date || p.created_at;
+      const dateObj = rawDate ? new Date(rawDate) : new Date();
+      const user = profilesMap[p.profile_id] || {};
+      const userName = user.full_name || 'Customer';
+      const bookTitle = booksMap[p.book_id] || p.book_id || 'eBook';
+      const isManual = (p.payment_id && p.payment_id.startsWith('PAY_MANUAL_')) || (p.order_id && p.order_id.startsWith('ORD_') && !p.payment_id?.startsWith('pay_'));
+
+      const isRead = readIds.has(uniqueId) || (lastReadTime && dateObj <= lastReadTime);
+
+      notifications.push({
+        id: uniqueId,
+        type: isManual ? 'manual_purchase' : 'purchase',
+        category: 'purchases',
+        icon: isManual ? '✍️' : '🛒',
+        title: isManual ? 'Manual Purchase Added' : 'New Purchase',
+        message: `${userName} purchased ${bookTitle}`,
+        userName: userName,
+        userId: p.profile_id || '',
+        userMobile: user.mobile || '',
+        bookName: bookTitle,
+        bookId: p.book_id || '',
+        amount: p.amount || 0,
+        amountFormatted: `₹${Number(p.amount || 0).toLocaleString('en-IN')}`,
+        status: (p.payment_status || 'SUCCESS').toUpperCase(),
+        paymentId: p.payment_id || p.order_id || 'N/A',
+        timestamp: dateObj.toISOString(),
+        dateFormatted: dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        timeFormatted: dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        relativeTime: getRelativeTime(dateObj),
+        isRead: isRead,
+        primaryAction: {
+          label: 'View User',
+          route: p.profile_id ? `user-details?id=${p.profile_id}` : 'users',
+          id: p.profile_id
+        },
+        secondaryAction: {
+          label: 'View Purchase',
+          route: 'purchases'
+        }
+      });
+    });
+
+    // Adapter B: Checkout Logs
+    (checkoutLogsRes.data || []).forEach(c => {
+      const uniqueId = `checkout:${c.id}`;
+      const rawDate = c.created_at;
+      const dateObj = rawDate ? new Date(rawDate) : new Date();
+      const user = profilesMap[c.profile_id] || {};
+      const userName = user.full_name || 'Visitor';
+      const bookTitle = booksMap[c.book_id] || c.book_id || 'eBook';
+      const statusRaw = (c.status || 'initiated').toLowerCase();
+      
+      let statusTitle = 'Checkout Activity';
+      let icon = '⚡';
+      if (statusRaw === 'dropped') {
+        statusTitle = 'Checkout Dropped';
+        icon = '⚠️';
+      } else if (statusRaw === 'failed') {
+        statusTitle = 'Checkout Payment Failed';
+        icon = '❌';
+      } else if (statusRaw === 'initiated') {
+        statusTitle = 'Checkout Initiated';
+        icon = '🛒';
+      } else if (statusRaw === 'success') {
+        statusTitle = 'Checkout Completed';
+        icon = '✅';
+      }
+
+      const isRead = readIds.has(uniqueId) || (lastReadTime && dateObj <= lastReadTime);
+
+      notifications.push({
+        id: uniqueId,
+        type: 'checkout',
+        category: 'checkout',
+        icon: icon,
+        title: statusTitle,
+        message: `${userName} — ${statusTitle} (${bookTitle})`,
+        userName: userName,
+        userId: c.profile_id || '',
+        userMobile: user.mobile || '',
+        bookName: bookTitle,
+        bookId: c.book_id || '',
+        status: statusRaw.toUpperCase(),
+        timestamp: dateObj.toISOString(),
+        dateFormatted: dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        timeFormatted: dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        relativeTime: getRelativeTime(dateObj),
+        isRead: isRead,
+        primaryAction: {
+          label: c.profile_id ? 'View User' : 'View Funnel',
+          route: c.profile_id ? `user-details?id=${c.profile_id}` : 'checkout-funnel',
+          id: c.profile_id
+        },
+        secondaryAction: {
+          label: 'View Funnel',
+          route: 'checkout-funnel'
+        }
+      });
+    });
+
+    // Adapter C: New User Registrations
+    (profilesRes.data || []).forEach(u => {
+      const uniqueId = `joining:${u.id}`;
+      const rawDate = u.created_at;
+      const dateObj = rawDate ? new Date(rawDate) : new Date();
+      const userName = u.full_name || 'New Farmer';
+      const source = u.registration_source || 'Direct';
+
+      const isRead = readIds.has(uniqueId) || (lastReadTime && dateObj <= lastReadTime);
+
+      notifications.push({
+        id: uniqueId,
+        type: 'joining',
+        category: 'joining',
+        icon: '👥',
+        title: 'New User Joined',
+        message: `${userName} registered via ${source}`,
+        userName: userName,
+        userId: u.id,
+        userMobile: u.mobile || '',
+        source: source,
+        status: 'JOINED',
+        timestamp: dateObj.toISOString(),
+        dateFormatted: dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        timeFormatted: dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        relativeTime: getRelativeTime(dateObj),
+        isRead: isRead,
+        primaryAction: {
+          label: 'View User',
+          route: `user-details?id=${u.id}`,
+          id: u.id
+        }
+      });
+    });
+
+    // Adapter D: Leads & Inquiries
+    (leadsRes.data || []).forEach(l => {
+      const uniqueId = `lead:${l.id}`;
+      const rawDate = l.created_at;
+      const dateObj = rawDate ? new Date(rawDate) : new Date();
+      const userName = l.full_name || 'Lead';
+      const bookTitle = booksMap[l.interested_book] || l.interested_book || 'General Inquiry';
+      const source = l.source || 'Website';
+
+      const isRead = readIds.has(uniqueId) || (lastReadTime && dateObj <= lastReadTime);
+
+      notifications.push({
+        id: uniqueId,
+        type: 'lead',
+        category: 'leads',
+        icon: '📋',
+        title: 'New Lead / Interest',
+        message: `${userName} expressed interest in ${bookTitle}`,
+        userName: userName,
+        userMobile: l.mobile || '',
+        bookName: bookTitle,
+        source: source,
+        status: 'NEW LEAD',
+        timestamp: dateObj.toISOString(),
+        dateFormatted: dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        timeFormatted: dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        relativeTime: getRelativeTime(dateObj),
+        isRead: isRead,
+        primaryAction: {
+          label: 'View Reports',
+          route: 'reports'
+        }
+      });
+    });
+
+    // Sort descending by timestamp (latest first)
+    notifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    // Filter by category if requested
+    let filtered = notifications;
+    if (params.category && params.category !== 'all') {
+      filtered = notifications.filter(n => n.category === params.category || n.type === params.category);
+    }
+
+    const unreadCount = notifications.filter(n => !n.isRead).length;
+
+    return {
+      success: true,
+      data: filtered,
+      total: notifications.length,
+      unreadCount: unreadCount
+    };
+
+  } catch (error) {
+    console.error('Failed to fetch admin notifications:', error);
+    return { success: false, data: [], total: 0, unreadCount: 0, error: error.message };
+  }
+}
+
+export function markNotificationAsRead(notificationId) {
+  if (!notificationId) return;
+  const ids = getReadNotificationIds();
+  if (!ids.includes(notificationId)) {
+    ids.push(notificationId);
+    saveReadNotificationIds(ids);
+    document.dispatchEvent(new CustomEvent('admin:notifications-updated'));
+  }
+}
+
+export function markAllNotificationsAsRead() {
+  localStorage.setItem(NOTIF_LAST_READ_KEY, new Date().toISOString());
+  saveReadNotificationIds([]);
+  document.dispatchEvent(new CustomEvent('admin:notifications-updated'));
+}
+
+export async function getUnreadNotificationCount() {
+  const res = await fetchAdminNotifications();
+  return res.unreadCount || 0;
+}

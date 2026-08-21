@@ -167,26 +167,30 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 async function initPushNotifications() {
-    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-        console.warn('Push notifications are not supported in this browser.');
-        return;
+    try {
+      if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+          return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+          return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      // In-App Universal Notifications are the primary system
+    } catch (e) {
+      // Safe fallback for push notifications
     }
+}
 
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-        console.log('Push notification permission not granted.');
-        return;
+// Lightweight background polling for live admin notifications (every 30s)
+function initAdminNotificationPolling() {
+  setInterval(() => {
+    if (!document.hidden) {
+      document.dispatchEvent(new CustomEvent('admin:notifications-updated'));
     }
-
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array('YOUR_PUBLIC_VAPID_KEY') // <-- महत्वपूर्ण: इसे अपनी VAPID कुंजी से बदलें
-    });
-
-    console.log('Push subscription successful:', subscription);
-    // इस सब्सक्रिप्शन ऑब्जेक्ट को अपने सर्वर पर भेजें
-    // await saveSubscriptionToServer(subscription);
+  }, 30000);
 }
 
 // Safely bootstrap admin layout and router once DOM is fully ready
@@ -206,7 +210,8 @@ function bootstrapAdminApp() {
       console.warn('⚠️ initRouter is not available yet.');
     }
     initCoreToggles();
-    initPushNotifications(); // PWA नोटिफ़िकेशन शुरू करें
+    initPushNotifications();
+    initAdminNotificationPolling(); // Live Notification Polling
     initPwaInstallPrompt(); // PWA Install Prompt शुरू करें
 
     // Register PWA Service Worker
