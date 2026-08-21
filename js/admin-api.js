@@ -943,7 +943,7 @@ export async function fetchUserDetails(userId) {
 
     const { data: purchases, error: purchasesError } = await db
       .from('purchases')
-      .select('order_id, book_id, amount, purchase_date, payment_status')
+      .select('id, order_id, payment_id, book_id, amount, purchase_date, payment_status')
       .eq('profile_id', userId)
       .order('purchase_date', { ascending: false });
     if(purchasesError) console.error("Error fetching purchases for user:", purchasesError.message);
@@ -968,12 +968,16 @@ export async function fetchUserDetails(userId) {
 
     const activity = (purchases || []).map(p => ({
         date: new Date(p.purchase_date).toLocaleDateString(),
-        description: `Purchased ${booksMap[p.book_id] || `Book ID ${p.book_id}`} (Order: ${p.order_id})`
+        description: `Purchased ${booksMap[p.book_id] || `Book ID ${p.book_id}`} (Order: ${p.order_id || p.payment_id || 'N/A'})`
     }));
     activity.push({
         date: new Date(profile.created_at).toLocaleDateString(),
         description: `User registered via ${profile.registration_source || 'direct'}`
     });
+
+    const createdDateObj = profile.created_at ? new Date(profile.created_at) : null;
+    const joinedDateFormatted = createdDateObj ? createdDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A';
+    const joinedTimeFormatted = createdDateObj ? createdDateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : 'N/A';
 
     const userDetails = {
       id: profile.id,
@@ -981,7 +985,9 @@ export async function fetchUserDetails(userId) {
       mobile: profile.mobile,
       email: profile.email,
       source: profile.registration_source,
-      joined: new Date(profile.created_at).toLocaleDateString(),
+      joined: joinedDateFormatted,
+      joinedDate: joinedDateFormatted,
+      joinedTime: joinedTimeFormatted,
       status: profile.is_active ? 'active' : 'inactive',
       referralToken: profile.referral_code || 'N/A',
       referredBy: referredByProfile,
@@ -989,11 +995,12 @@ export async function fetchUserDetails(userId) {
       totalDownloads: downloadCount || 0,
       downloadLimit: successfulPurchases.length * 3, // Assuming 3 downloads per purchase
       purchases: (purchases || []).map(p => ({
-          order: p.order_id,
+          id: p.id,
+          order: p.order_id || p.payment_id || 'N/A',
           book: booksMap[p.book_id] || p.book_id, // Use book name if available
           amount: `₹${p.amount}`,
-          date: new Date(p.purchase_date).toLocaleDateString(),
-          status: p.payment_status
+          date: new Date(p.purchase_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          status: p.payment_status || 'success'
       })),
       activity: activity.sort((a,b) => new Date(b.date) - new Date(a.date))
     };
@@ -1003,6 +1010,159 @@ export async function fetchUserDetails(userId) {
   } catch (error) {
     console.error('Failed to fetch user details:', error);
     return { success: false, data: null, error: error.message };
+  }
+}
+
+export async function fetchAvailableBooks() {
+  try {
+    let books = [];
+    try {
+      const res = await fetch('../data/books.json');
+      if (res.ok) {
+        const json = await res.json();
+        books = json.books || json;
+      }
+    } catch (e) {
+      console.warn("Could not fetch ../data/books.json, attempting fallback:", e);
+      try {
+        const res2 = await fetch('/data/books.json');
+        if (res2.ok) {
+          const json2 = await res2.json();
+          books = json2.books || json2;
+        }
+      } catch (e2) {
+        console.warn("Could not fetch /data/books.json:", e2);
+      }
+    }
+
+    if (books && books.length > 0) {
+      return {
+        success: true,
+        data: books.map(b => ({
+          id: b.id || b.book_id,
+          title: b.heading || b.name || b.title || (b.id || b.book_id),
+          offerPrice: Number(b.offerPrice || b.offer_price || b.mrp || 99)
+        }))
+      };
+    }
+
+    const db = window.dbClient;
+    if (db) {
+      const { data } = await db.from('books').select('id, title');
+      if (data && data.length > 0) {
+        return {
+          success: true,
+          data: data.map(b => ({ id: b.id, title: b.title, offerPrice: 99 }))
+        };
+      }
+    }
+
+    return { success: true, data: [] };
+  } catch (error) {
+    console.error('Failed to fetch available books:', error);
+    return { success: false, data: [], error: error.message };
+  }
+}
+
+export async function addManualPurchase(params) {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+
+    const profileId = params.profileId;
+    const paymentId = (params.paymentId || '').trim();
+    const bookId = (params.bookId || '').trim();
+    const amount = Number(params.amount);
+    const purchaseDate = params.purchaseDate;
+
+    if (!profileId) throw new Error("User ID is required.");
+    if (!paymentId) throw new Error("Payment ID is required.");
+    if (!bookId) throw new Error("Book ID is required.");
+    if (isNaN(amount) || amount < 0) throw new Error("Valid numeric Amount is required.");
+    if (!purchaseDate) throw new Error("Purchase Date is required.");
+
+    const timestamp = new Date(purchaseDate).toISOString();
+    const generatedInvoiceNo = "INV_" + Date.now();
+    const generatedOrderId = "ORD_" + Date.now();
+
+    const purchasePayload = {
+      profile_id: profileId,
+      book_id: bookId,
+      payment_id: paymentId,
+      amount: amount,
+      order_id: generatedOrderId,
+      invoice_number: generatedInvoiceNo,
+      download_count: 0,
+      payment_status: 'success',
+      purchase_date: timestamp
+    };
+
+    // 1. Insert into purchases table
+    const { data: insertedData, error: insertError } = await db
+      .from('purchases')
+      .insert([purchasePayload])
+      .select();
+
+    if (insertError) throw insertError;
+
+    // 2. Set user status to active (is_active: true) in profiles
+    const { error: profileError } = await db
+      .from('profiles')
+      .update({ is_active: true })
+      .eq('id', profileId);
+
+    if (profileError) {
+      console.warn("Failed to activate user in profiles table:", profileError.message);
+    }
+
+    return { success: true, data: insertedData };
+  } catch (error) {
+    console.error('Failed to add manual purchase:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deletePurchase(purchaseId, profileId) {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+
+    if (!purchaseId) throw new Error("Purchase ID is required.");
+
+    // 1. Delete purchase record from purchases table
+    let deleteQuery = db.from('purchases').delete();
+    if (typeof purchaseId === 'number' || (typeof purchaseId === 'string' && /^\d+$/.test(purchaseId))) {
+      deleteQuery = deleteQuery.eq('id', purchaseId);
+    } else {
+      deleteQuery = deleteQuery.or(`id.eq.${purchaseId},order_id.eq.${purchaseId},payment_id.eq.${purchaseId}`);
+    }
+
+    const { error: deleteError } = await deleteQuery;
+    if (deleteError) throw deleteError;
+
+    // 2. Synchronize user active/inactive status in profiles
+    if (profileId) {
+      const { data: remainingPurchases, error: checkError } = await db
+        .from('purchases')
+        .select('id')
+        .eq('profile_id', profileId)
+        .or('payment_status.eq.success,payment_status.is.null');
+
+      if (checkError) {
+        console.warn("Failed to check remaining purchases:", checkError.message);
+      } else {
+        const hasSuccessPurchases = remainingPurchases && remainingPurchases.length > 0;
+        await db
+          .from('profiles')
+          .update({ is_active: hasSuccessPurchases })
+          .eq('id', profileId);
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete purchase:', error);
+    return { success: false, error: error.message };
   }
 }
 
