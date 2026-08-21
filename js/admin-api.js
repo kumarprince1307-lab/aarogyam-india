@@ -99,6 +99,19 @@ export async function fetchShareEngineSummaryData() {
 
     const totalInactiveUsers = (totalRegistrations || 0) - (totalActiveUsers || 0);
 
+    // 5b. Total App Installs (Safe query that works with or without app_installed column)
+    let totalAppInstalls = 0;
+    try {
+      const { count: appInstallsCount, error: appError } = await db
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .or('registration_source.ilike.%pwa%,registration_source.ilike.%app%');
+      if (!appError) {
+        totalAppInstalls = appInstallsCount || 0;
+      }
+    } catch (e) {
+      console.warn("Could not query app installs, falling back to 0:", e);
+    }
 
     // 6. Total Purchases & Revenue
     const { data: purchases, error: purchasesError } = await db
@@ -121,6 +134,7 @@ export async function fetchShareEngineSummaryData() {
       totalRegistrations: totalRegistrations || 0,
       totalActiveUsers: totalActiveUsers || 0,
       totalInactiveUsers: totalInactiveUsers || 0,
+      totalAppInstalls: totalAppInstalls || 0,
       totalPurchases: totalPurchases || 0,
       totalRevenue: totalRevenue || 0,
       conversionRate: `${conversionRate}%`,
@@ -317,6 +331,7 @@ export async function fetchDashboardData(params = {}) {
     // Business KPIs
     const businessKpis = [
       { label: 'Revenue', value: `₹${monthlyRevenue.toLocaleString('en-IN')}` },
+      { label: 'App Installs', value: (shareSummary.totalAppInstalls || 0).toLocaleString('en-IN') },
       { label: 'New Users', value: totalUsersInPeriod.toLocaleString('en-IN') },
       { label: 'Active Users', value: activeUsersInPeriod.toLocaleString('en-IN') },
       { label: 'Inactive Users', value: inactiveUsersInPeriod.toLocaleString('en-IN') },
@@ -613,11 +628,17 @@ export async function fetchUsers(params = {}) {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
 
-    // Step 1: Fetch all profiles with filtering
+    // Step 1: Fetch all profiles with filtering (Safe standard columns)
     let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at, share_id, referred_by');
 
     if (params.status && params.status !== 'all') {
-      queryBuilder = queryBuilder.eq('is_active', params.status === 'active');
+      if (params.status === 'installed') {
+        queryBuilder = queryBuilder.or('registration_source.ilike.%pwa%,registration_source.ilike.%app%');
+      } else if (params.status === 'web') {
+        queryBuilder = queryBuilder.not('registration_source', 'ilike', '%pwa%').not('registration_source', 'ilike', '%app%');
+      } else {
+        queryBuilder = queryBuilder.eq('is_active', params.status === 'active');
+      }
     }
 
     if (params.query) {
@@ -638,8 +659,8 @@ export async function fetchUsers(params = {}) {
     queryBuilder = queryBuilder.order('created_at', { ascending: false });
 
     const { data: profiles, error: profilesError } = await queryBuilder;
-    if (profilesError) throw profilesError;
-    if (!profiles) return { success: true, data: [] };
+    if (profilesError) console.error("fetchUsers query error:", profilesError.message);
+    if (!profiles || profiles.length === 0) return { success: true, data: [] };
 
     const profileIds = profiles.map(p => p.id).filter(Boolean);
     const shareIds = profiles.map(p => p.share_id).filter(Boolean);
@@ -728,7 +749,9 @@ export async function fetchUsers(params = {}) {
         totalPurchases: ownPurchases.totalPurchases,
         totalSpent: ownPurchases.totalSpent,
         totalDownloads: downloadCounts[user.id] || 0,
-        downloadLimit: (ownPurchases.totalPurchases || 0) * 3
+        downloadLimit: (ownPurchases.totalPurchases || 0) * 3,
+        appInstalled: user.app_installed === true || String(user.registration_source || '').toLowerCase().includes('pwa') || String(user.registration_source || '').toLowerCase().includes('app'),
+        appInstalledAt: user.app_installed_at ? new Date(user.app_installed_at).toLocaleDateString('en-GB') : null
         };
     });
 
@@ -989,6 +1012,8 @@ export async function fetchUserDetails(userId) {
       joinedDate: joinedDateFormatted,
       joinedTime: joinedTimeFormatted,
       status: profile.is_active ? 'active' : 'inactive',
+      appInstalled: profile.app_installed === true || String(profile.registration_source || '').toLowerCase().includes('pwa') || String(profile.registration_source || '').toLowerCase().includes('app'),
+      appInstalledAt: profile.app_installed_at ? new Date(profile.app_installed_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : null,
       referralToken: profile.referral_code || 'N/A',
       referredBy: referredByProfile,
       directReferrals: directReferralsList,

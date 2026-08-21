@@ -151,6 +151,19 @@ function renderProfile(detail) {
         </div>
         <div class="admin-data-card"><h4>Joined Date</h4><p>${detail.joinedDate || detail.joined || 'N/A'}</p></div>
         <div class="admin-data-card"><h4>Joined Time</h4><p>${detail.joinedTime || 'N/A'}</p></div>
+        <div class="admin-data-card">
+          <h4>App Status</h4>
+          <p style="margin-top: 4px;">
+            ${detail.appInstalled 
+              ? `<span class="admin-pill active" style="display: inline-flex; align-items: center; gap: 4px;">📱 App Installed (PWA)</span>` 
+              : `<span class="admin-pill" style="opacity:0.65; display: inline-flex; align-items: center; gap: 4px;">🌐 Web Only (Not Installed)</span>`
+            }
+          </p>
+        </div>
+        <div class="admin-data-card">
+          <h4>App Install Date</h4>
+          <p>${detail.appInstalledAt || (detail.appInstalled ? 'Installed' : 'N/A')}</p>
+        </div>
         <div class="admin-data-card"><h4>Referral Token</h4><p>${detail.referralToken || 'N/A'}</p></div>
         <div class="admin-data-card"><h4>कुल डाउनलोड</h4><p>${detail.totalDownloads || 0}</p></div>
         <div class="admin-data-card"><h4>डाउनलोड उपयोग (Used/Limit)</h4><p>${detail.totalDownloads || 0} / ${detail.downloadLimit || 0}</p></div>

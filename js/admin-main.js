@@ -57,7 +57,13 @@ export function initAdminLayout(pageTitle = 'Admin Panel', pageDescription = '')
   }
 }
 
+let lastToggleTime = 0;
+
 export function toggleMobileDrawer(force) {
+  const now = Date.now();
+  if (force === undefined && (now - lastToggleTime < 250)) return;
+  lastToggleTime = now;
+
   if (typeof force === 'boolean') {
     document.body.classList.toggle('mobile-drawer-open', force);
   } else {
@@ -67,6 +73,10 @@ export function toggleMobileDrawer(force) {
 window.toggleMobileDrawer = toggleMobileDrawer;
 
 export function toggleDesktopSidebar(force) {
+  const now = Date.now();
+  if (force === undefined && (now - lastToggleTime < 250)) return;
+  lastToggleTime = now;
+
   const isCollapsed = typeof force === 'boolean'
     ? document.body.classList.toggle('desktop-collapsed', force)
     : document.body.classList.toggle('desktop-collapsed');
@@ -77,8 +87,8 @@ window.toggleDesktopSidebar = toggleDesktopSidebar;
 
 export function toggleAdminSidebar(e) {
   if (e) {
-    e.preventDefault();
-    e.stopPropagation();
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+    if (typeof e.stopPropagation === 'function') e.stopPropagation();
   }
   if (window.innerWidth > 768) {
     toggleDesktopSidebar();
@@ -92,8 +102,11 @@ function initCoreToggles() {
   const backdrop = document.getElementById('sidebar-backdrop');
 
   if (backdrop) {
-    backdrop.addEventListener('click', () => toggleMobileDrawer(false));
-    backdrop.onclick = () => toggleMobileDrawer(false);
+    backdrop.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMobileDrawer(false);
+    });
   }
 
   // Unified document-level click delegation
@@ -124,11 +137,7 @@ function initCoreToggles() {
     if (hamburger || e.target.closest('.admin-hamburger-icon')) {
       e.preventDefault();
       e.stopPropagation();
-      if (window.innerWidth > 768) {
-        toggleDesktopSidebar();
-      } else {
-        toggleMobileDrawer();
-      }
+      toggleAdminSidebar();
       return;
     }
 

@@ -107,12 +107,89 @@ function initInstallPromptCapture() {
     isStandalone = true;
     console.log('🎉 [Public PWA] Aarogyam India App was successfully installed!');
     updateAllInstallButtons();
+    syncAppInstallToSupabase();
   });
+
+  if (isStandalone) {
+    syncAppInstallToSupabase();
+  }
 
   window.matchMedia('(display-mode: standalone)').addEventListener('change', (evt) => {
     isStandalone = evt.matches;
     updateAllInstallButtons();
+    if (isStandalone) {
+      syncAppInstallToSupabase();
+    }
   });
+}
+
+export async function syncAppInstallToSupabase() {
+  try {
+    if (typeof window === 'undefined') return;
+
+    let userId = null;
+    let userMobile = null;
+
+    if (window.V1_SESSION) {
+      if (typeof window.V1_SESSION.getUserId === 'function') userId = window.V1_SESSION.getUserId();
+      if (typeof window.V1_SESSION.getCurrentUser === 'function') {
+        const cu = window.V1_SESSION.getCurrentUser();
+        if (cu) {
+          if (!userId) userId = cu.id || cu.userId;
+          if (!userMobile) userMobile = cu.mobile;
+        }
+      }
+    }
+
+    const rawUser = localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('AI_SESSION');
+    if (rawUser) {
+      try {
+        const parsed = JSON.parse(rawUser);
+        if (!userId) userId = parsed.id || parsed.user_id || parsed.userId;
+        if (!userMobile) userMobile = parsed.mobile;
+      } catch(e) {}
+    }
+
+    const db = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+    if (!db) {
+      setTimeout(syncAppInstallToSupabase, 1000);
+      return;
+    }
+
+    // Update existing registration_source column to 'pwa'
+    if (userId) {
+      const { error } = await db.from('profiles').update({
+        registration_source: 'pwa'
+      }).eq('id', userId);
+      if (!error) {
+        console.log('📱 [PWA Track] Synced App Install (pwa) for user:', userId);
+      }
+      try {
+        await db.from('profiles').update({
+          app_installed: true,
+          app_installed_at: new Date().toISOString()
+        }).eq('id', userId);
+      } catch(e) {}
+    } else if (userMobile) {
+      const cleanMobile = String(userMobile).replace(/\D/g, '').slice(-10);
+      if (cleanMobile.length === 10) {
+        const { error } = await db.from('profiles').update({
+          registration_source: 'pwa'
+        }).eq('mobile', cleanMobile);
+        if (!error) {
+          console.log('📱 [PWA Track] Synced App Install (pwa) for mobile:', cleanMobile);
+        }
+        try {
+          await db.from('profiles').update({
+            app_installed: true,
+            app_installed_at: new Date().toISOString()
+          }).eq('mobile', cleanMobile);
+        } catch(e) {}
+      }
+    }
+  } catch (err) {
+    console.warn('[PWA Track] App install sync note:', err.message);
+  }
 }
 
 export function bindInstallButtons() {
