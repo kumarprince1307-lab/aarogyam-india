@@ -125,31 +125,66 @@ function initInstallPromptCapture() {
 
 export async function syncAppInstallToSupabase() {
   try {
+    if (typeof window === 'undefined') return;
+
     let userId = null;
-    if (typeof window !== 'undefined') {
-      if (window.V1_SESSION && typeof window.V1_SESSION.getUserId === 'function') {
-        userId = window.V1_SESSION.getUserId();
-      }
-      if (!userId) {
-        const u = localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE');
-        if (u) {
-          try {
-            const parsed = JSON.parse(u);
-            userId = parsed.id || parsed.user_id || parsed.userId;
-          } catch(e) {}
+    let userMobile = null;
+
+    if (window.V1_SESSION) {
+      if (typeof window.V1_SESSION.getUserId === 'function') userId = window.V1_SESSION.getUserId();
+      if (typeof window.V1_SESSION.getCurrentUser === 'function') {
+        const cu = window.V1_SESSION.getCurrentUser();
+        if (cu) {
+          if (!userId) userId = cu.id || cu.userId;
+          if (!userMobile) userMobile = cu.mobile;
         }
       }
-      if (!userId && window.supabaseClient && typeof window.supabaseClient.auth?.getUser === 'function') {
-        const authRes = await window.supabaseClient.auth.getUser();
-        userId = authRes?.data?.user?.id;
+    }
+
+    const rawUser = localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('AI_SESSION');
+    if (rawUser) {
+      try {
+        const parsed = JSON.parse(rawUser);
+        if (!userId) userId = parsed.id || parsed.user_id || parsed.userId;
+        if (!userMobile) userMobile = parsed.mobile;
+      } catch(e) {}
+    }
+
+    const db = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+    if (!db) {
+      setTimeout(syncAppInstallToSupabase, 1000);
+      return;
+    }
+
+    // Update existing registration_source column to 'pwa'
+    if (userId) {
+      const { error } = await db.from('profiles').update({
+        registration_source: 'pwa'
+      }).eq('id', userId);
+      if (!error) {
+        console.log('📱 [PWA Track] Synced App Install (pwa) for user:', userId);
       }
-      if (userId && (window.dbClient || window.supabaseClient)) {
-        const db = window.dbClient || window.supabaseClient;
+      try {
         await db.from('profiles').update({
           app_installed: true,
           app_installed_at: new Date().toISOString()
         }).eq('id', userId);
-        console.log('📱 [PWA Track] Synced app_installed = true to Supabase profile for user:', userId);
+      } catch(e) {}
+    } else if (userMobile) {
+      const cleanMobile = String(userMobile).replace(/\D/g, '').slice(-10);
+      if (cleanMobile.length === 10) {
+        const { error } = await db.from('profiles').update({
+          registration_source: 'pwa'
+        }).eq('mobile', cleanMobile);
+        if (!error) {
+          console.log('📱 [PWA Track] Synced App Install (pwa) for mobile:', cleanMobile);
+        }
+        try {
+          await db.from('profiles').update({
+            app_installed: true,
+            app_installed_at: new Date().toISOString()
+          }).eq('mobile', cleanMobile);
+        } catch(e) {}
       }
     }
   } catch (err) {

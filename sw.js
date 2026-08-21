@@ -7,8 +7,8 @@
    - Strict Isolation: Admin Panel (/admin/*, admin.html) is never cached by public SW
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v1';
-const PAGES_CACHE = 'aarogyam-public-pages-v1';
+const STATIC_CACHE = 'aarogyam-public-static-v2';
+const PAGES_CACHE = 'aarogyam-public-pages-v2';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_SHELL = [
