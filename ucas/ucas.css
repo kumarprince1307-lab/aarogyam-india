@@ -1076,6 +1076,31 @@ button, input, select, textarea {
   to { opacity: 1; transform: translateX(0); }
 }
 
+.ucas-filter-compact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ucas-recipient-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ucas-recipient-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 /* ==========================================================================
    RESPONSIVE BREAKPOINTS (Desktop & Tablet >= 768px vs Mobile < 768px)
    ========================================================================== */
@@ -1115,7 +1140,138 @@ button, input, select, textarea {
 
   .ucas-main {
     margin-left: 0;
-    margin-bottom: calc(var(--bottom-nav-h) + 1.25rem);
-    padding: 1rem;
+    margin-bottom: calc(var(--bottom-nav-h) + 1.5rem);
+    padding: 0.75rem 0.65rem;
+  }
+
+  /* Full 1-Column Grid Collapse for Mobile */
+  .ucas-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+
+  .ucas-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem;
+  }
+
+  .ucas-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem;
+  }
+
+  .ucas-category-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem;
+  }
+
+  .ucas-card {
+    padding: 1rem 0.85rem;
+    border-radius: var(--radius-md);
+  }
+
+  .ucas-hero-banner {
+    padding: 1rem 0.85rem;
+  }
+
+  .ucas-hero-stats {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .ucas-hero-pill {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ucas-lead-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .ucas-lead-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .ucas-lead-actions .ucas-btn {
+    flex: 1 1 calc(50% - 4px);
+    justify-content: center;
+    padding: 6px 4px;
+    font-size: 0.78rem;
+  }
+
+  .ucas-modal {
+    width: 95% !important;
+    max-width: 95% !important;
+    padding: 1.25rem 1rem;
+    margin: 10px auto;
   }
 }
+
+@media (max-width: 600px) {
+  .ucas-filter-compact-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+  }
+
+  .ucas-recipient-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ucas-recipient-actions {
+    width: 100%;
+  }
+
+  .ucas-recipient-actions .ucas-btn,
+  .ucas-recipient-actions a {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .ucas-header {
+    padding: 0 0.5rem;
+  }
+
+  .ucas-brand-title {
+    font-size: 1rem;
+  }
+
+  .ucas-brand-sub {
+    display: none;
+  }
+
+  .ucas-user-pill {
+    padding: 3px 8px 3px 4px;
+    max-width: 135px;
+  }
+
+  .ucas-user-name {
+    max-width: 75px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.78rem;
+  }
+
+  .ucas-user-shareid {
+    display: none;
+  }
+
+  .ucas-bottom-tab {
+    font-size: 0.65rem;
+    padding: 4px 2px;
+  }
+
+  .ucas-bottom-tab i {
+    font-size: 1.1rem;
+  }
+}
+

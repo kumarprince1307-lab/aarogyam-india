@@ -4,9 +4,10 @@
    No private user data caching.
    ========================================================================== */
 
-const CACHE_NAME = 'ucas-v1-shell-v3';
+const CACHE_NAME = 'ucas-v1-shell-v5';
 const STATIC_ASSETS = [
   '/ucas/index.html',
+  '/ucas/landing.html',
   '/ucas/ucas.css',
   '/ucas/manifest.json',
   '/ucas/js/ucas-app.js',
@@ -17,6 +18,7 @@ const STATIC_ASSETS = [
   '/ucas/js/ucas-phonebook.js',
   '/ucas/js/ucas-leads.js',
   '/ucas/js/ucas-marketing.js',
+  '/ucas/js/ucas-landing-builder.js',
   '/ucas/js/ucas-admin.js',
   '/ucas/js/ucas-pwa.js',
   '/images/logo/logo.png'

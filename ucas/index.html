@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   
   <!-- UCAS Design System -->
-  <link rel="stylesheet" href="/ucas/ucas.css">
+  <link rel="stylesheet" href="/ucas/ucas.css?v=1.5">
 </head>
 <body>
 
@@ -733,7 +733,7 @@
         </div>
 
         <!-- Compact Area-wise + Category-wise Filter -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;background:#F8FAFC;padding:10px;border-radius:var(--radius-md);border:1px solid var(--border);">
+        <div class="ucas-filter-compact-grid" style="margin-bottom:1rem;background:#F8FAFC;padding:10px;border-radius:var(--radius-md);border:1px solid var(--border);">
           <div>
             <label class="ucas-label" style="font-size:0.78rem;margin-bottom:2px;">📍 स्थान फ़िल्टर (Area / Place)</label>
             <select id="mkt_filter_compact_area" class="ucas-select" style="padding:6px 10px;font-size:0.84rem;">
@@ -758,6 +758,168 @@
 
         <div id="ucas-marketing-recipients-list">
           <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Step 4: 🎯 Landing Page Builder (Zero-Code Custom Pages with Full Edit/Delete CRUD) -->
+      <div class="ucas-card" id="lp_builder_card_main" style="margin-top:1.25rem;">
+        <div class="ucas-card-header">
+          <div>
+            <div class="ucas-card-title">
+              <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--secondary-dark);"></i> 4. 🎯 लैंडिंग पेज बिल्डर (Landing Page Builder)
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
+              इमेज या यूट्यूब वीडियो + संदेश + कैटेगरी जोड़कर 1-क्लिक में अपना कस्टम लैंडिंग पेज बनाएं या बदलें।
+            </div>
+          </div>
+          <span style="font-size:0.75rem;background:var(--secondary-subtle);color:var(--secondary-dark);padding:4px 8px;border-radius:var(--radius-sm);font-weight:700;">
+            Zero Code • Mobile First
+          </span>
+        </div>
+
+        <!-- Edit Mode Banner (Shown when editing an existing LP) -->
+        <div id="lp_edit_mode_notice" style="display:none;background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:12px;align-items:center;justify-content:space-between;font-size:0.85rem;font-weight:700;">
+          <span><i class="fa-solid fa-pen-to-square"></i> संपादन मोड सक्रिय (Editing Page: <code id="lp_editing_page_id">LP000001</code>)</span>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.cancelEdit()" style="padding:2px 8px;font-size:0.75rem;">रद्द करें (Cancel)</button>
+        </div>
+
+        <!-- 1. Content Type Switcher -->
+        <div style="margin-bottom:1rem;">
+          <label class="ucas-label" style="margin-bottom:6px;">1. मीडिया प्रकार चुनें (Content Type):</label>
+          <div style="display:flex;gap:8px;">
+            <button type="button" id="lp_btn_mode_image" class="ucas-btn ucas-btn-sm ucas-btn-primary" style="padding:6px 14px;">
+              <i class="fa-regular fa-image"></i> 🖼️ Image Upload
+            </button>
+            <button type="button" id="lp_btn_mode_youtube" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:6px 14px;">
+              <i class="fa-brands fa-youtube" style="color:#EF4444;"></i> 🎥 YouTube Link
+            </button>
+          </div>
+        </div>
+
+        <div class="ucas-grid-2" style="margin-bottom:1rem;">
+          <!-- Left: Media Input Controls -->
+          <div>
+            <!-- Image Upload Section -->
+            <div id="lp_section_image_upload">
+              <label class="ucas-label">इमेज चुनें (Upload Image):</label>
+              <input type="file" id="lp_image_file_input" class="ucas-input" accept="image/*" style="padding:6px;">
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">JPG, PNG या WEBP इमेज चुनें।</div>
+            </div>
+
+            <!-- YouTube Input Section -->
+            <div id="lp_section_youtube_input" style="display:none;">
+              <label class="ucas-label">YouTube वीडियो लिंक दर्ज करें:</label>
+              <input type="url" id="lp_youtube_url_input" class="ucas-input" placeholder="https://youtu.be/... या https://youtube.com/shorts/...">
+              <div id="lp_yt_helper_text" style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">
+                वीडियो ID पहचानकर हाई-रेजोल्यूशन थंबनेल स्वतः लग जाएगा।
+              </div>
+            </div>
+
+            <!-- Title & Category -->
+            <div style="margin-top:10px;">
+              <label class="ucas-label">कैम्पेन शीर्षक (Title):</label>
+              <input type="text" id="lp_input_title" class="ucas-input" placeholder="उदा. खरीफ स्पेशल 2026 या किसान जागरूकता">
+            </div>
+
+            <div style="margin-top:10px;">
+              <label class="ucas-label">कैटेगरी चुनें (Category):</label>
+              <select id="lp_select_category" class="ucas-select">
+                <option value="agriculture">🌾 Agriculture (कृषि)</option>
+                <option value="healthcare">❤️ Health Care (स्वास्थ्य)</option>
+                <option value="cattlecare">🐄 Cattle Care (पशुपालन)</option>
+                <option value="beautycare">💄 Beauty Care (सौंदर्य)</option>
+                <option value="haircare">💇 Hair Care (केश)</option>
+                <option value="netsurf">💼 NetSurf (बिजनेस)</option>
+                <option value="other">➕ अन्य (Other)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Right: Live Media Preview -->
+          <div>
+            <label class="ucas-label">मीडिया पूर्वावलोकन (Live Media Preview):</label>
+            <div id="lp_preview_media_container">
+              <div style="background:#F1F5F9;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:2rem;text-align:center;color:var(--text-muted);">
+                <i class="fa-regular fa-image" style="font-size:2rem;margin-bottom:6px;display:block;"></i>
+                <span style="font-size:0.85rem;">इमेज या YouTube लिंक जोड़ने पर पूर्वावलोकन यहाँ दिखेगा</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message Box -->
+        <div style="margin-bottom:1rem;">
+          <label class="ucas-label">2. अपना संदेश लिखें (Custom Hook / Invitation Message): *</label>
+          <textarea id="lp_input_message" class="ucas-textarea" rows="3" placeholder="उदा. क्या आप अपनी फसल की पैदावार बढ़ाना और लागत कम करना चाहते हैं? नीचे दिए गए छोटे सर्वे को भरें।"></textarea>
+        </div>
+
+        <!-- Generate / Update Button -->
+        <div style="display:flex;gap:8px;">
+          <button type="button" id="lp_btn_generate" class="ucas-btn ucas-btn-primary" style="flex:1;padding:12px;font-size:1rem;justify-content:center;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> 🔗 Generate Landing Page
+          </button>
+          <button type="button" id="lp_btn_cancel_edit" class="ucas-btn ucas-btn-outline" style="display:none;padding:12px 18px;font-size:1rem;justify-content:center;color:var(--text-muted);">
+            रद्द करें (Cancel)
+          </button>
+        </div>
+
+        <!-- Generated Result Card (Initially Hidden) -->
+        <div id="lp_generated_result_card" style="display:none;margin-top:1.25rem;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:var(--radius-md);padding:1rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-weight:800;color:#15803D;font-size:1rem;">
+              <i class="fa-solid fa-circle-check"></i> आपका लैंडिंग पेज तैयार है! (<span id="lp_generated_id_badge">LP000001</span>)
+            </div>
+            <span style="font-size:0.75rem;background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:4px;font-weight:700;">Live</span>
+          </div>
+
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <input type="text" id="lp_generated_share_url" class="ucas-input" readonly style="background:#fff;font-weight:600;font-size:0.85rem;">
+            <button type="button" id="lp_btn_copy_url" class="ucas-btn ucas-btn-outline" title="Copy Link">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button type="button" id="lp_btn_wa_share" class="ucas-btn ucas-btn-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर
+            </button>
+            <button type="button" id="lp_btn_native_share" class="ucas-btn ucas-btn-primary">
+              <i class="fa-solid fa-share-nodes"></i> Native Share
+            </button>
+            <button type="button" id="lp_btn_view_page" class="ucas-btn ucas-btn-outline">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> लाइव पेज देखें
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Landing Pages Table -->
+      <div class="ucas-card" style="margin-top:1.25rem;">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-layer-group" style="color:var(--primary);"></i> मेरे लैंडिंग पेज (My Created Landing Pages) (<span id="ucas-my-landing-pages-count">0</span>)
+          </div>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.loadMyLandingPages()">
+            <i class="fa-solid fa-rotate"></i> रीफ्रेश
+          </button>
+        </div>
+
+        <div class="ucas-table-wrap">
+          <table class="ucas-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>लैंडिंग पेज</th>
+                <th>कैटेगरी / मीडिया</th>
+                <th>सर्वे रिस्पॉन्स (Surveys)</th>
+                <th>तारीख</th>
+                <th>कार्यवाही</th>
+              </tr>
+            </thead>
+            <tbody id="ucas-my-landing-pages-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -1108,16 +1270,17 @@
 <script src="/js/share-engine-core.js"></script>
 
 <!-- UCAS Modular Engines -->
-<script src="/ucas/js/ucas-session.js?v=1.3"></script>
-<script src="/ucas/js/ucas-db.js?v=1.3"></script>
-<script src="/ucas/js/ucas-permissions.js?v=1.3"></script>
-<script src="/ucas/js/ucas-survey.js?v=1.3"></script>
-<script src="/ucas/js/ucas-phonebook.js?v=1.3"></script>
-<script src="/ucas/js/ucas-leads.js?v=1.3"></script>
-<script src="/ucas/js/ucas-marketing.js?v=1.3"></script>
-<script src="/ucas/js/ucas-admin.js?v=1.3"></script>
-<script src="/ucas/js/ucas-pwa.js?v=1.3"></script>
-<script src="/ucas/js/ucas-app.js?v=1.3"></script>
+<script src="/ucas/js/ucas-session.js?v=1.5"></script>
+<script src="/ucas/js/ucas-db.js?v=1.5"></script>
+<script src="/ucas/js/ucas-permissions.js?v=1.5"></script>
+<script src="/ucas/js/ucas-survey.js?v=1.5"></script>
+<script src="/ucas/js/ucas-phonebook.js?v=1.5"></script>
+<script src="/ucas/js/ucas-leads.js?v=1.5"></script>
+<script src="/ucas/js/ucas-marketing.js?v=1.5"></script>
+<script src="/ucas/js/ucas-landing-builder.js?v=1.5"></script>
+<script src="/ucas/js/ucas-admin.js?v=1.5"></script>
+<script src="/ucas/js/ucas-pwa.js?v=1.5"></script>
+<script src="/ucas/js/ucas-app.js?v=1.5"></script>
 
 </body>
 </html>

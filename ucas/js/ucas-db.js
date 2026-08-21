@@ -380,6 +380,194 @@
     }
   }
 
+  // ==========================================
+  // 5. LANDING PAGES ENGINE QUERIES
+  // ==========================================
+
+  async function getLandingPages(profileId) {
+    const client = getDb();
+    let pages = [];
+
+    // 1. Try Supabase
+    if (client && profileId) {
+      try {
+        const { data, error } = await client
+          .from('landing_pages')
+          .select('*')
+          .eq('profile_id', profileId)
+          .order('created_at', { ascending: false });
+
+        if (!error && data) {
+          pages = data;
+        }
+      } catch (e) {
+        // Fallback silently if table not created yet
+      }
+    }
+
+    // 2. Sync / Fallback with LocalStorage
+    const localStoreKey = `UCAS_LP_${profileId || 'global'}`;
+    const localPages = JSON.parse(localStorage.getItem(localStoreKey) || '[]');
+
+    const combinedMap = new Map();
+    pages.forEach(p => combinedMap.set(p.id, p));
+    localPages.forEach(p => {
+      if (!combinedMap.has(p.id)) combinedMap.set(p.id, p);
+    });
+
+    const finalPages = Array.from(combinedMap.values());
+
+    // 3. Attach real-time survey response count for each landing page
+    if (profileId) {
+      try {
+        const surveysRes = await getSurveys(profileId);
+        const userSurveys = surveysRes.data || [];
+
+        finalPages.forEach(lp => {
+          const matching = userSurveys.filter(s => {
+            const lpId = s.category_answers?.landing_page_id;
+            return lpId && (lpId === lp.id || lpId === lp.slug);
+          });
+          lp.response_count = matching.length;
+        });
+      } catch (e) {
+        console.warn('Error computing survey counts for landing pages', e);
+      }
+    }
+
+    return { success: true, data: finalPages };
+  }
+
+  async function getLandingPageById(landingPageId) {
+    const client = getDb();
+    if (!landingPageId) return { success: false, data: null };
+
+    // 1. Try Supabase
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('landing_pages')
+          .select('*')
+          .eq('id', landingPageId)
+          .single();
+
+        if (!error && data) {
+          return { success: true, data };
+        }
+      } catch (e) {
+        // Fallback
+      }
+    }
+
+    // 2. Try all localStorage stores
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('UCAS_LP_')) {
+        try {
+          const list = JSON.parse(localStorage.getItem(key) || '[]');
+          const found = list.find(item => item.id === landingPageId);
+          if (found) return { success: true, data: found };
+        } catch (err) {}
+      }
+    }
+
+    return { success: false, data: null, message: 'Landing page not found' };
+  }
+
+  async function createLandingPage(payload) {
+    const client = getDb();
+    const profileId = payload.profile_id || 'anonymous';
+    const localStoreKey = `UCAS_LP_${profileId}`;
+
+    // 1. Save to LocalStorage immediately
+    const localPages = JSON.parse(localStorage.getItem(localStoreKey) || '[]');
+    localPages.unshift(payload);
+    localStorage.setItem(localStoreKey, JSON.stringify(localPages));
+
+    // 2. Try Supabase insert
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('landing_pages')
+          .insert([payload])
+          .select();
+
+        if (!error && data) {
+          return { success: true, data: data[0] };
+        }
+      } catch (e) {
+        console.warn('Supabase landing_pages insert notice:', e.message);
+      }
+    }
+
+    return { success: true, data: payload };
+  }
+
+  async function updateLandingPage(lpId, payload, profileId) {
+    const client = getDb();
+    const pid = profileId || payload.profile_id || 'anonymous';
+    const localStoreKey = `UCAS_LP_${pid}`;
+
+    // 1. Update in LocalStorage
+    const localPages = JSON.parse(localStorage.getItem(localStoreKey) || '[]');
+    const idx = localPages.findIndex(p => p.id === lpId);
+    if (idx !== -1) {
+      localPages[idx] = { ...localPages[idx], ...payload, updated_at: new Date().toISOString() };
+      localStorage.setItem(localStoreKey, JSON.stringify(localPages));
+    }
+
+    // 2. Update in Supabase
+    if (client) {
+      try {
+        const { data, error } = await client
+          .from('landing_pages')
+          .update({ ...payload, updated_at: new Date().toISOString() })
+          .eq('id', lpId)
+          .select();
+
+        if (!error && data) {
+          return { success: true, data: data[0] };
+        }
+      } catch (e) {
+        console.warn('Supabase landing_pages update notice:', e.message);
+      }
+    }
+
+    return { success: true, data: payload };
+  }
+
+  async function deleteLandingPage(lpId, profileId) {
+    const client = getDb();
+    const pid = profileId || 'anonymous';
+    const localStoreKey = `UCAS_LP_${pid}`;
+
+    // 1. Delete from LocalStorage
+    const localPages = JSON.parse(localStorage.getItem(localStoreKey) || '[]');
+    const filtered = localPages.filter(p => p.id !== lpId);
+    localStorage.setItem(localStoreKey, JSON.stringify(filtered));
+
+    // Also check global store
+    const globalPages = JSON.parse(localStorage.getItem('UCAS_LP_global') || '[]');
+    const filteredGlobal = globalPages.filter(p => p.id !== lpId);
+    localStorage.setItem('UCAS_LP_global', JSON.stringify(filteredGlobal));
+
+    // 2. Delete from Supabase
+    if (client) {
+      try {
+        const { error } = await client
+          .from('landing_pages')
+          .delete()
+          .eq('id', lpId);
+
+        if (error) throw error;
+      } catch (e) {
+        console.warn('Supabase landing_pages delete notice:', e.message);
+      }
+    }
+
+    return { success: true };
+  }
+
   window.UCAS_DB = {
     getDb,
     getSurveys,
@@ -390,8 +578,13 @@
     getPermissions,
     setPermission,
     getAllProfiles,
-    getDirectReferralsWithPurchases
+    getDirectReferralsWithPurchases,
+    getLandingPages,
+    getLandingPageById,
+    createLandingPage,
+    updateLandingPage,
+    deleteLandingPage
   };
 
-  console.log('✅ UCAS DB Module Ready.');
+  console.log('✅ UCAS DB Module (with Landing Pages CRUD) Ready.');
 })(window);
