@@ -1,111 +1,143 @@
-const CACHE_NAME = 'aarogyam-admin-pwa-v3';
-const OFFLINE_URL = 'offline.html';
-const urlsToCache = [
-  '/admin.html',
-  '/css/admin-main.css',
-  '/css/admin-components.css',
-  '/js/admin-main.js',
-  '/js/admin-router.js',
-  '/js/admin-api.js',
-  '/js/admin-components-header.js',
-  '/js/admin-components-sidebar.js',
-  '/js/supabase.js',
-  OFFLINE_URL
+/* Aarogyam India - Dedicated Public Website Service Worker (V1)
+   Scope: /
+   Responsibilities:
+   - Cache First for public static assets (CSS, JS, Images, Fonts)
+   - Network First with automatic runtime caching for all current & future public HTML pages
+   - Network Only for Supabase API, Razorpay, and Auth
+   - Strict Isolation: Admin Panel (/admin/*, admin.html) is never cached by public SW
+*/
+
+const STATIC_CACHE = 'aarogyam-public-static-v1';
+const PAGES_CACHE = 'aarogyam-public-pages-v1';
+const OFFLINE_URL = '/offline.html';
+
+const PRECACHE_SHELL = [
+  '/',
+  '/index.html',
+  '/offline.html',
+  '/manifest.json',
+  '/css/style.css',
+  '/css/landingpage.css',
+  '/css/my-library.css',
+  '/css/ebook.css',
+  '/js/public-pwa.js',
+  '/js/landingpage.js',
+  '/js/my-library.js',
+  '/images/logo/logo.png',
+  '/images/logo/fevicon.png'
 ];
 
-self.addEventListener('install', event => {
+// Install: Precache Core App Shell
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Service Worker: Caching app shell and offline page');
-        self.skipWaiting(); // नए सर्विस वर्कर को तुरंत एक्टिवेट करें
-        return cache.addAll(urlsToCache);
-      })
-      .catch(error => {
-        console.error('Service Worker: Failed to cache app shell:', error);
+    caches.open(STATIC_CACHE)
+      .then((cache) => {
+        console.log('[Public SW] Precaching Public App Shell');
+        self.skipWaiting();
+        return cache.addAll(PRECACHE_SHELL).catch((err) => {
+          console.warn('[Public SW] Precache partial warning:', err);
+        });
       })
   );
 });
 
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
+// Activate: Clean up old public caches while preserving admin caches
+self.addEventListener('activate', (event) => {
+  const allowedCaches = [STATIC_CACHE, PAGES_CACHE];
   event.waitUntil(
-    caches.keys().then(cacheNames => Promise.all(
-      // पुराने कैश को हटाएं
-      cacheNames.map(cacheName => {
-        if (cacheWhitelist.indexOf(cacheName) === -1) {
-          return caches.delete(cacheName);
-        }
-      })
-    )).then(() => self.clients.claim()) // खुले हुए पेजों का कंट्रोल तुरंत लें
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => {
+            // Delete old public caches or legacy root caches, leave isolated admin-shell caches alone
+            return (name.startsWith('aarogyam-public-') && !allowedCaches.includes(name)) ||
+                   name.startsWith('aarogyam-admin-pwa-');
+          })
+          .map((name) => caches.delete(name))
+      );
+    }).then(() => {
+      console.log('[Public SW] Claiming clients for immediate control');
+      return self.clients.claim();
+    })
   );
 });
 
-self.addEventListener('fetch', event => {
-    const requestUrl = new URL(event.request.url);
+// Fetch Strategy Implementation
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  const url = new URL(request.url);
 
-    // Bypass service worker for Supabase API requests to ensure fresh data.
-    if (requestUrl.hostname === 'qjhjrzsnrtahmhswxyvb.supabase.co') {
-        event.respondWith(fetch(event.request));
-        return;
-    }
-
-    if (event.request.mode === 'navigate') {
-        event.respondWith((async () => {
-            try {
-                const preloadResponse = await event.preloadResponse;
-                if (preloadResponse) return preloadResponse;
-                
-                const networkResponse = await fetch(event.request);
-                return networkResponse;
-            } catch (error) {
-                console.log('Fetch failed; returning offline page instead.', error);
-                const cache = await caches.open(CACHE_NAME);
-                return await cache.match(OFFLINE_URL);
-            }
-        })());
-    } else {
-        event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
-    }
-});
-
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SHOW_TEST_NOTIFICATION') {
-    const data = event.data.payload;
-    const title = data.title || 'Test Notification';
-    const options = {
-      body: data.body || 'This is a test.',
-      icon: '/images/icons/icon-192x192.png',
-      badge: '/images/icons/icon-96x96.png',
-      data: {
-        url: data.url || '/admin.html'
-      }
-    };
-    event.waitUntil(self.registration.showNotification(title, options));
+  // 1. Admin Panel Strict Isolation: Never intercept or cache Admin Panel
+  if (url.pathname.startsWith('/admin') || url.pathname === '/admin.html') {
+    return; // Pass through to browser / admin-sw
   }
-});
 
-self.addEventListener('push', event => {
-  console.log('[Service Worker] Push Received.');
-  const data = event.data.json();
+  // 2. Dynamic Live APIs: Supabase, Razorpay, Non-GET requests (Network Only)
+  if (
+    request.method !== 'GET' ||
+    url.hostname.includes('supabase.co') ||
+    url.hostname.includes('razorpay.com') ||
+    url.pathname.includes('/rest/v1/')
+  ) {
+    event.respondWith(fetch(request));
+    return;
+  }
 
-  const title = data.title || 'Aarogyam India Admin';
-  const options = {
-    body: data.body || 'You have a new update.',
-    icon: '/images/icons/icon-192x192.png',
-    badge: '/images/icons/icon-96x96.png',
-    data: {
-      url: data.url || '/admin.html'
-    }
-  };
+  // 3. Navigation Requests (Public HTML pages): Network First, fallback to runtime Pages Cache / offline page
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(PAGES_CACHE).then((cache) => cache.put(request, responseToCache));
+          }
+          return networkResponse;
+        })
+        .catch(async () => {
+          // Check runtime pages cache first
+          const pageCache = await caches.open(PAGES_CACHE);
+          const cachedPage = await pageCache.match(request);
+          if (cachedPage) return cachedPage;
 
-  event.waitUntil(self.registration.showNotification(title, options));
-});
+          // Check static shell cache for index.html if navigating to root
+          if (url.pathname === '/' || url.pathname === '/index.html') {
+            const staticCache = await caches.open(STATIC_CACHE);
+            const cachedHome = await staticCache.match('/index.html');
+            if (cachedHome) return cachedHome;
+          }
 
-self.addEventListener('notificationclick', event => {
-  console.log('[Service Worker] Notification click Received.');
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow(event.notification.data.url)
+          // Fallback to offline page
+          const staticCache = await caches.open(STATIC_CACHE);
+          const cachedOffline = await staticCache.match(OFFLINE_URL);
+          return cachedOffline || new Response('Offline - Aarogyam India', { headers: { 'Content-Type': 'text/html' } });
+        })
+    );
+    return;
+  }
+
+  // 4. Static Assets (CSS, JS, Fonts, Images): Cache First, background refresh
+  event.respondWith(
+    caches.match(request).then((cachedResponse) => {
+      if (cachedResponse) {
+        // Fetch fresh copy in background to keep cache up-to-date
+        fetch(request).then((freshResponse) => {
+          if (freshResponse && freshResponse.status === 200) {
+            caches.open(STATIC_CACHE).then((cache) => cache.put(request, freshResponse));
+          }
+        }).catch(() => {});
+        return cachedResponse;
+      }
+
+      return fetch(request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(STATIC_CACHE).then((cache) => cache.put(request, responseToCache));
+        }
+        return networkResponse;
+      }).catch(() => {
+        return new Response('', { status: 408, statusText: 'Offline' });
+      });
+    })
   );
 });

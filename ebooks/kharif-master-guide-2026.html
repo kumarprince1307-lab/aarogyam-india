@@ -33,6 +33,14 @@
 <link rel="canonical"
       href="https://aarogyamindia.online/ebooks/kharif-master-guide-2026.html">
 
+<!-- Favicon & PWA -->
+<link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+<link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Aarogyam">
+
 <!-- =========================
         OPEN GRAPH
 ========================= -->
@@ -286,6 +294,11 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 
             </a>
 
+            <!-- Desktop Install Button -->
+            <button id="desktop-pwa-install-btn" class="pwa-install-btn" style="display: none; margin-right: 8px;" title="Install Aarogyam India App">
+                <span>📱</span> Install App
+            </button>
+
             <!-- Mobile Menu -->
 
             <button
@@ -320,6 +333,13 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 
         </button>
 
+    </div>
+
+    <!-- Mobile Menu PWA Install Button -->
+    <div style="padding: 10px 15px;">
+        <button id="mobile-pwa-install-btn" class="mobile-pwa-install-btn" style="display: flex;">
+            <span>📱</span> Install App
+        </button>
     </div>
 
     <ul>
@@ -2034,10 +2054,6 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 <!-- Share Engine -->
 <script src="../js/share-engine-core.js"></script>
 
-<!-- book-landing JS -->
-<script src="../js/book-landing.js"></script>
-
-<!-- Share Engine स्वतः ही इनिशियलाइज हो जाता है, अलग से कॉल करने की कोई जरूरत नहीं है -->
-
+<script type="module" src="/js/public-pwa.js"></script>
 </body>
 </html>

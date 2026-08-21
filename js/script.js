@@ -728,3 +728,14 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMobileMenuUI();
 });
 
+// Load Public PWA Controller across all pages loading script.js
+if (typeof window !== 'undefined') {
+    import('/js/public-pwa.js').catch(() => {
+        const pwaScript = document.createElement('script');
+        pwaScript.type = 'module';
+        pwaScript.src = '/js/public-pwa.js';
+        document.head.appendChild(pwaScript);
+    });
+}
+
+
