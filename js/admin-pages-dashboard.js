@@ -300,6 +300,7 @@ export async function initDashboard() {
       { label: 'Total Clicks', value: shareSummary.totalClicks || 0 },
       { label: 'Total Visitors', value: shareSummary.totalVisitors || 0 },
       { label: 'Total Leads', value: shareSummary.totalLeads || 0 },
+      { label: 'Total App Installs', value: (shareSummary.totalAppInstalls || 0).toLocaleString('en-IN') },
       { label: 'Total Active Users', value: (shareSummary.totalActiveUsers || 0).toLocaleString('en-IN') },
       { label: 'Total Inactive Users', value: (shareSummary.totalInactiveUsers || 0).toLocaleString('en-IN') },
       { label: 'Total Purchases', value: shareSummary.totalPurchases || 0 },

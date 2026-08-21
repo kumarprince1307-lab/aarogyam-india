@@ -107,12 +107,54 @@ function initInstallPromptCapture() {
     isStandalone = true;
     console.log('🎉 [Public PWA] Aarogyam India App was successfully installed!');
     updateAllInstallButtons();
+    syncAppInstallToSupabase();
   });
+
+  if (isStandalone) {
+    syncAppInstallToSupabase();
+  }
 
   window.matchMedia('(display-mode: standalone)').addEventListener('change', (evt) => {
     isStandalone = evt.matches;
     updateAllInstallButtons();
+    if (isStandalone) {
+      syncAppInstallToSupabase();
+    }
   });
+}
+
+export async function syncAppInstallToSupabase() {
+  try {
+    let userId = null;
+    if (typeof window !== 'undefined') {
+      if (window.V1_SESSION && typeof window.V1_SESSION.getUserId === 'function') {
+        userId = window.V1_SESSION.getUserId();
+      }
+      if (!userId) {
+        const u = localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE');
+        if (u) {
+          try {
+            const parsed = JSON.parse(u);
+            userId = parsed.id || parsed.user_id || parsed.userId;
+          } catch(e) {}
+        }
+      }
+      if (!userId && window.supabaseClient && typeof window.supabaseClient.auth?.getUser === 'function') {
+        const authRes = await window.supabaseClient.auth.getUser();
+        userId = authRes?.data?.user?.id;
+      }
+      if (userId && (window.dbClient || window.supabaseClient)) {
+        const db = window.dbClient || window.supabaseClient;
+        await db.from('profiles').update({
+          app_installed: true,
+          app_installed_at: new Date().toISOString()
+        }).eq('id', userId);
+        console.log('📱 [PWA Track] Synced app_installed = true to Supabase profile for user:', userId);
+      }
+    }
+  } catch (err) {
+    console.warn('[PWA Track] App install sync note:', err.message);
+  }
 }
 
 export function bindInstallButtons() {

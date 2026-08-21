@@ -29,6 +29,12 @@ function renderUserRow(user) {
         <div class="admin-user-email">${user.email}</div>
       </td>
       <td>${mobileLink}</td>
+      <td>
+        ${user.appInstalled 
+          ? `<span class="admin-pill active" title="${user.appInstalledAt ? 'Installed: ' + user.appInstalledAt : 'App Installed'}" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">📱 Installed</span>` 
+          : `<span class="admin-pill" style="opacity:0.65; white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">🌐 Web Only</span>`
+        }
+      </td>
       <td>${user.source || 'N/A'}</td>
       <td><a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-subtle-link">${user.shareId || 'N/A'}</a></td>
       <td>${user.directReferrals || 0}</td>
@@ -70,6 +76,7 @@ function renderUsersTable(users) {
           <tr>
             <th>Name</th>
             <th>Mobile</th>
+            <th>App Status</th>
             <th>Reg. Source</th>
             <th>Share ID</th>
             <th>Direct Referrals</th>
@@ -106,6 +113,8 @@ export async function initUsers() {
         <input id="user-reg-date-filter" type="date" title="Filter by registration date" class="admin-input" />
         <select id="user-status-filter" class="admin-select">
           <option value="all">All statuses</option>
+          <option value="installed">📱 App Installed</option>
+          <option value="web">🌐 Web Only</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
