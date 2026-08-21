@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aarogyam India — महत्वपूर्ण सूचना एवं सर्वे</title>
+  
+  <!-- Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #0B7A3E;
+      --primary-dark: #075229;
+      --primary-light: #159C53;
+      --primary-subtle: #E8F5EE;
+      --secondary: #FF9800;
+      --secondary-dark: #E65100;
+      --bg-page: #F4F7F5;
+      --bg-card: #FFFFFF;
+      --text-main: #1A231E;
+      --text-muted: #5A6E63;
+      --border: #D8E5DC;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(11,122,62,0.08);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', sans-serif;
+      background: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+    }
+
+    .lp-container {
+      width: 100%;
+      max-width: 540px;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin: 8px 0 24px 0;
+    }
+
+    /* Verified Header */
+    .lp-header {
+      background: linear-gradient(135deg, #0B7A3E 0%, #075229 100%);
+      color: #fff;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lp-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lp-brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #fff;
+      padding: 2px;
+    }
+
+    .lp-brand-text {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+    }
+
+    .lp-verified-badge {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Media Container */
+    .lp-media-wrapper {
+      position: relative;
+      width: 100%;
+      background: #000;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lp-media-img {
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .lp-yt-iframe {
+      width: 100%;
+      height: 280px;
+      border: none;
+    }
+
+    .lp-yt-thumb-box {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .lp-yt-thumb-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.92;
+    }
+
+    .lp-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      background: rgba(255, 0, 0, 0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.8rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: transform 0.2s ease;
+    }
+
+    .lp-play-btn:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    /* Message Body */
+    .lp-body {
+      padding: 1.25rem 1rem;
+    }
+
+    .lp-message-card {
+      background: var(--primary-subtle);
+      border: 1px solid rgba(11,122,62,0.2);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    /* Survey Form Box */
+    .lp-survey-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .lp-survey-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lp-survey-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .lp-form-group {
+      margin-bottom: 12px;
+    }
+
+    .lp-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .lp-input, .lp-select {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #FAFAFA;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s ease;
+      font-family: inherit;
+    }
+
+    .lp-input:focus, .lp-select:focus {
+      border-color: var(--primary);
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(11,122,62,0.12);
+    }
+
+    .lp-btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #0B7A3E 0%, #075229 100%);
+      color: #FFFFFF;
+      font-size: 1rem;
+      font-weight: 800;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(11,122,62,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+      margin-top: 14px;
+      font-family: inherit;
+    }
+
+    .lp-btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    /* Success Screen */
+    .lp-success-screen {
+      display: none;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .lp-success-icon {
+      width: 64px;
+      height: 64px;
+      background: #DCFCE7;
+      color: #15803D;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 12px auto;
+    }
+
+    .lp-footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      background: #F8FAFC;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="lp-container">
+    <!-- Header -->
+    <header class="lp-header">
+      <div class="lp-brand">
+        <img src="/images/logo/logo.png" alt="Aarogyam India Logo" onerror="this.style.display='none'">
+        <div class="lp-brand-text">Aarogyam India</div>
+      </div>
+      <div class="lp-verified-badge">
+        <i class="fa-solid fa-circle-check"></i> प्रामाणिक जानकारी
+      </div>
+    </header>
+
+    <!-- Media Area (Image or YouTube) -->
+    <div class="lp-media-wrapper" id="lp_media_holder">
+      <div style="color:#fff;padding:2rem;text-align:center;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i>
+      </div>
+    </div>
+
+    <!-- Body & Form -->
+    <div class="lp-body">
+      <!-- Creator's Message -->
+      <div class="lp-message-card" id="lp_message_holder">
+        संदेश लोड हो रहा है...
+      </div>
+
+      <!-- Survey Form -->
+      <div class="lp-survey-box" id="lp_survey_form_container">
+        <div class="lp-survey-title">
+          <i class="fa-solid fa-clipboard-list"></i> छोटा सर्वे भरें (Quick Survey)
+        </div>
+        <div class="lp-survey-subtitle">
+          सटीक जानकारी व समाधान प्राप्त करने के लिए कृपया नीचे अपना विवरण भरें:
+        </div>
+
+        <form id="lp_public_survey_form">
+          <div class="lp-form-group">
+            <label class="lp-label">आपका नाम *</label>
+            <input type="text" id="lp_name" class="lp-input" placeholder="उदा. रमेश कुमार" required>
+          </div>
+
+          <div class="lp-form-group">
+            <label class="lp-label">मोबाइल नंबर (10 अंक) *</label>
+            <input type="tel" id="lp_mobile" class="lp-input" placeholder="उदा. 9827372989" maxlength="10" required>
+          </div>
+
+          <div class="lp-form-group">
+            <label class="lp-label">स्थान / ग्राम / जिला *</label>
+            <input type="text" id="lp_place" class="lp-input" placeholder="उदा. रामपुर, जिला रीवा" required>
+          </div>
+
+          <!-- Dynamic Category Specific Question -->
+          <div id="lp_dynamic_category_question">
+            <!-- Rendered by JS based on LP category -->
+          </div>
+
+          <button type="submit" class="lp-btn-submit" id="lp_btn_survey_submit">
+            <i class="fa-solid fa-paper-plane"></i> सर्वे पूरा करें (Submit)
+          </button>
+        </form>
+      </div>
+
+      <!-- Success Screen (Shown after submit) -->
+      <div class="lp-success-screen" id="lp_success_screen">
+        <div class="lp-success-icon">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h3 style="font-size:1.25rem;color:var(--primary-dark);font-weight:800;margin-bottom:6px;">धन्यवाद!</h3>
+        <p style="font-size:0.9rem;color:var(--text-main);margin-bottom:1rem;">
+          आपकी जानकारी सफलतापूर्वक सुरक्षित कर ली गई है। हमारे विशेषज्ञ जल्द ही आपसे संपर्क करेंगे।
+        </p>
+
+        <div id="lp_contact_creator_box" style="margin-top:1rem;">
+          <!-- Optional WhatsApp connection to creator -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="lp-footer">
+      <div>© 2026 Aarogyam India • Universal Customer Acquisition System</div>
+      <div style="font-size:0.7rem;margin-top:2px;">सुरक्षित एवं प्रामाणिक डेटा प्रबंधन</div>
+    </footer>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/session.js"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/share-engine-core.js"></script>
+  <script src="/ucas/js/ucas-db.js?v=1.4"></script>
+
+  <script>
+    (async function () {
+      'use strict';
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const lpId = urlParams.get('id') || 'LP000001';
+      const shareId = urlParams.get('share_id') || '';
+
+      let landingPageData = null;
+
+      // 1. Fetch Landing Page Configuration
+      try {
+        const res = await window.UCAS_DB.getLandingPageById(lpId);
+        if (res.success && res.data) {
+          landingPageData = res.data;
+        } else {
+          // Default Sample fallback
+          landingPageData = {
+            id: lpId,
+            title: 'Aarogyam India विशेष जानकारी',
+            category: 'agriculture',
+            content_type: 'youtube',
+            media_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            thumbnail_url: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80',
+            message: 'नमस्ते! Aarogyam India में आपका स्वागत है। क्या आप उन्नत कृषि, जैविक समाधान या स्वास्थ्य के बारे में अधिक जानकारी चाहते हैं? नीचे छोटा सर्वे अवश्य भरें।'
+          };
+        }
+      } catch (e) {
+        console.warn('Error loading landing page', e);
+      }
+
+      renderLandingPage(landingPageData);
+
+      function renderLandingPage(lp) {
+        if (!lp) return;
+
+        // Title
+        document.title = `${lp.title || 'Aarogyam India'} — सर्वे`;
+
+        // Render Media
+        const mediaHolder = document.getElementById('lp_media_holder');
+        if (mediaHolder) {
+          if (lp.content_type === 'youtube') {
+            const ytId = extractYtId(lp.media_url);
+            const thumb = lp.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '');
+            
+            if (ytId) {
+              mediaHolder.innerHTML = `
+                <div class="lp-yt-thumb-box" id="lp_yt_click_play" onclick="playYoutubeEmbed('${ytId}')">
+                  <img src="${thumb}" alt="YouTube Preview">
+                  <div class="lp-play-btn"><i class="fa-solid fa-play"></i></div>
+                </div>
+              `;
+            } else {
+              mediaHolder.innerHTML = `<img src="${thumb}" class="lp-media-img" alt="Banner">`;
+            }
+          } else {
+            mediaHolder.innerHTML = `<img src="${lp.media_url}" class="lp-media-img" alt="Banner Image">`;
+          }
+        }
+
+        // Render Message
+        const msgHolder = document.getElementById('lp_message_holder');
+        if (msgHolder) {
+          msgHolder.textContent = lp.message;
+        }
+
+        // Render Dynamic Category Question
+        renderCategorySpecificQuestion(lp.category);
+
+        // Bind Survey Submit
+        const form = document.getElementById('lp_public_survey_form');
+        form?.addEventListener('submit', handlePublicSurveySubmit);
+      }
+
+      function extractYtId(url) {
+        if (!url) return null;
+        const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+        return (match && match[2] && match[2].length === 11) ? match[2] : null;
+      }
+
+      window.playYoutubeEmbed = function(videoId) {
+        const mediaHolder = document.getElementById('lp_media_holder');
+        if (mediaHolder) {
+          mediaHolder.innerHTML = `
+            <iframe class="lp-yt-iframe" src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          `;
+        }
+      };
+
+      function renderCategorySpecificQuestion(category = 'agriculture') {
+        const container = document.getElementById('lp_dynamic_category_question');
+        if (!container) return;
+
+        const cat = category.toLowerCase();
+        if (cat === 'agriculture') {
+          container.innerHTML = `
+            <div class="lp-form-group">
+              <label class="lp-label">आप मुख्य रूप से कौन सी फसल उगाते हैं?</label>
+              <select id="lp_cat_ans" class="lp-select">
+                <option value="सोयाबीन / मक्का">सोयाबीन / मक्का</option>
+                <option value="धान / गेहूं">धान / गेहूं</option>
+                <option value="सब्जियां / बागवानी">सब्जियां / बागवानी</option>
+                <option value="कपास / दलहन">कपास / दलहन</option>
+                <option value="अन्य">अन्य फसल</option>
+              </select>
+            </div>
+          `;
+        } else if (cat === 'healthcare') {
+          container.innerHTML = `
+            <div class="lp-form-group">
+              <label class="lp-label">आप किस स्वास्थ्य विषय में रुचि रखते हैं?</label>
+              <select id="lp_cat_ans" class="lp-select">
+                <option value="डायबिटीज / बीपी नियंत्रण">डायबिटीज / बीपी नियंत्रण</option>
+                <option value="जोड़ों का दर्द / वात">जोड़ों का दर्द / वात</option>
+                <option value="पाचन / गैस / कब्ज">पाचन / गैस / कब्ज</option>
+                <option value="सामान्य स्वास्थ्य एवं इम्यूनिटी">सामान्य स्वास्थ्य एवं इम्यूनिटी</option>
+              </select>
+            </div>
+          `;
+        } else if (cat === 'cattlecare') {
+          container.innerHTML = `
+            <div class="lp-form-group">
+              <label class="lp-label">आपके पास कौन सा पशुधन है?</label>
+              <select id="lp_cat_ans" class="lp-select">
+                <option value="गाय (देशी / संकर)">गाय (देशी / संकर)</option>
+                <option value="भैंस">भैंस</option>
+                <option value="बकरी / मुर्गी">बकरी / मुर्गी</option>
+                <option value="दुग्ध उत्पादन सुधार">दुग्ध उत्पादन सुधार</option>
+              </select>
+            </div>
+          `;
+        } else if (cat === 'netsurf' || cat === 'income') {
+          container.innerHTML = `
+            <div class="lp-form-group">
+              <label class="lp-label">आप किस प्रकार के बिजनेस अवसर में रुचि रखते हैं?</label>
+              <select id="lp_cat_ans" class="lp-select">
+                <option value="पार्ट-टाइम साइड इनकम (₹25k-₹50k)">पार्ट-टाइम साइड इनकम (₹25k-₹50k)</option>
+                <option value="एग्रीकल्चर डिस्ट्रीब्यूशन">एग्रीकल्चर डिस्ट्रीब्यूशन</option>
+                <option value="हेल्थकेयर डायरेक्ट सेलिंग">हेल्थकेयर डायरेक्ट सेलिंग</option>
+                <option value="फुल-टाइम बिज़नेस">फुल-टाइम बिज़नेस</option>
+              </select>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <div class="lp-form-group">
+              <label class="lp-label">आपकी मुख्य आवश्यकता / प्रश्न</label>
+              <input type="text" id="lp_cat_ans" class="lp-input" placeholder="उदा. विशेष सलाह चाहिए">
+            </div>
+          `;
+        }
+      }
+
+      async function handlePublicSurveySubmit(e) {
+        e.preventDefault();
+
+        const name = (document.getElementById('lp_name')?.value || '').trim();
+        let mobile = (document.getElementById('lp_mobile')?.value || '').replace(/\D/g, '').trim();
+        const place = (document.getElementById('lp_place')?.value || '').trim();
+        const catAns = document.getElementById('lp_cat_ans')?.value || '';
+
+        if (!name || mobile.length !== 10 || !place) {
+          alert('कृपया सभी आवश्यक जानकारी (10 अंकों का मोबाइल नंबर) सही भरें।');
+          return;
+        }
+
+        const submitBtn = document.getElementById('lp_btn_survey_submit');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> सबमिट हो रहा है...';
+        }
+
+        const creatorProfileId = landingPageData.profile_id || null;
+        const creatorShareId = shareId || landingPageData.share_id || '';
+
+        const payload = {
+          profile_id: creatorProfileId,
+          name,
+          mobile,
+          village: place,
+          selected_categories: [landingPageData.category || 'agriculture'],
+          category_answers: {
+            landing_page_id: landingPageData.id,
+            creator_share_id: creatorShareId,
+            source: 'landing_page',
+            status: 'new',
+            response: catAns
+          }
+        };
+
+        try {
+          const db = window.UCAS_DB.getDb();
+          if (db) {
+            await db.from('surveys').insert([payload]);
+          }
+
+          // Track attribution
+          if (typeof trackAttributionEvent === 'function') {
+            trackAttributionEvent({
+              event_type: 'landing_page_survey_submit',
+              asset_id: landingPageData.id,
+              asset_title: landingPageData.title
+            });
+          }
+
+          // Show Success Screen
+          document.getElementById('lp_survey_form_container').style.display = 'none';
+          const successScreen = document.getElementById('lp_success_screen');
+          if (successScreen) successScreen.style.display = 'block';
+
+          // Optional WhatsApp Contact Box
+          const contactBox = document.getElementById('lp_contact_creator_box');
+          if (contactBox) {
+            contactBox.innerHTML = `
+              <a href="https://wa.me/917428068147?text=${encodeURIComponent('नमस्ते! मैंने Aarogyam India लैंडिंग पेज पर सर्वे भरा है।')}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:10px 18px;border-radius:var(--radius-md);text-decoration:none;font-weight:700;font-size:0.9rem;">
+                <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i> WhatsApp पर तुरंत बात करें
+              </a>
+            `;
+          }
+        } catch (err) {
+          console.error('Survey submission error', err);
+          alert('सर्वे सबमिट करने में समस्या आई। कृपया पुनः प्रयास करें।');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> सर्वे पूरा करें (Submit)';
+          }
+        }
+      }
+
+    })();
+  </script>
+</body>
+</html>

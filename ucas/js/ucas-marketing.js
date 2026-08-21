@@ -78,6 +78,9 @@
     renderLandingPageCards();
     bindMarketingEvents();
     updateMarketingEngine();
+    if (window.UCAS_LANDING_BUILDER) {
+      window.UCAS_LANDING_BUILDER.init();
+    }
   }
 
   function renderLandingPageCards() {
@@ -267,10 +270,10 @@
       const callLink = cleanMob ? `tel:${cleanMob}` : '#';
 
       return `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:var(--radius-md);margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <div class="ucas-recipient-item">
           <div>
             <div style="font-weight:700;font-size:0.92rem;color:var(--text-main);">${contact.name}</div>
-            <div style="font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:8px;margin-top:2px;">
+            <div style="font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:8px;margin-top:2px;flex-wrap:wrap;">
               <a href="${callLink}" style="color:var(--primary-dark);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" title="कॉल करें">
                 <i class="fa-solid fa-phone" style="color:var(--primary);"></i> <code>${contact.mobile}</code>
               </a>
@@ -278,11 +281,11 @@
               <span>• 🏷️ ${contact.categoryDisplay}</span>
             </div>
           </div>
-          <div style="display:flex;gap:6px;">
-            <a href="${callLink}" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:4px 10px;" title="कॉल करें">
+          <div class="ucas-recipient-actions">
+            <a href="${callLink}" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:5px 12px;" title="कॉल करें">
               <i class="fa-solid fa-phone" style="color:var(--primary);"></i> Call
             </a>
-            <button class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" onclick="UCAS_MARKETING.sendToOne('${contact.mobile}', '${encodeURIComponent(contact.name)}', '${encodeURIComponent(contact.place)}')" title="व्यक्तिगत WhatsApp भेजें">
+            <button class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" onclick="UCAS_MARKETING.sendToOne('${contact.mobile}', '${encodeURIComponent(contact.name)}', '${encodeURIComponent(contact.place)}')" title="व्यक्तिगत WhatsApp भेजें" style="padding:5px 12px;">
               <i class="fa-brands fa-whatsapp"></i> WhatsApp भेजें
             </button>
           </div>
