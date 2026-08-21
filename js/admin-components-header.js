@@ -10,8 +10,8 @@ export function renderHeader(containerId = 'header-placeholder', title = 'Admin 
     <header class="admin-header">
       <div class="admin-header-row">
         <div class="admin-header-left">
-          <button id="admin-hamburger" class="admin-button icon-button" aria-label="Toggle navigation">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <button id="admin-hamburger" onclick="window.toggleAdminSidebar && window.toggleAdminSidebar(event)" class="admin-button icon-button" aria-label="Toggle navigation" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="pointer-events:none;"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <div class="admin-header-title">
             <p class="admin-breadcrumb">Dashboard</p>

@@ -25,23 +25,25 @@
 .admin-sidebar .admin-sidebar-footer { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--admin-border); }
 
 /* Desktop Collapsed Sidebar Styles */
-body.desktop-collapsed .admin-sidebar {
-  padding: 20px 12px;
-}
-body.desktop-collapsed .admin-sidebar .menu-label,
-body.desktop-collapsed .admin-sidebar .menu-caret {
-  display: none;
-}
-body.desktop-collapsed .admin-sidebar .admin-logo {
-  justify-content: center;
-}
-body.desktop-collapsed .admin-sidebar .menu-link,
-body.desktop-collapsed .admin-sidebar .menu-toggle {
-  justify-content: center;
-  gap: 0;
-}
-body.desktop-collapsed .admin-sidebar .menu-children {
-  display: none; /* Hide submenus completely when collapsed */
+@media (min-width: 769px) {
+  body.desktop-collapsed .admin-sidebar {
+    padding: 20px 12px;
+  }
+  body.desktop-collapsed .admin-sidebar .menu-label,
+  body.desktop-collapsed .admin-sidebar .menu-caret {
+    display: none;
+  }
+  body.desktop-collapsed .admin-sidebar .admin-logo {
+    justify-content: center;
+  }
+  body.desktop-collapsed .admin-sidebar .menu-link,
+  body.desktop-collapsed .admin-sidebar .menu-toggle {
+    justify-content: center;
+    gap: 0;
+  }
+  body.desktop-collapsed .admin-sidebar .menu-children {
+    display: none; /* Hide submenus completely when collapsed */
+  }
 }
 
 

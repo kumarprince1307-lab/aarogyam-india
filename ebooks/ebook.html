@@ -30,12 +30,18 @@
     </title>
 
     <!-- =========================================
-            FAVICON
+            FAVICON & PWA
     ========================================== -->
 
     <link rel="icon"
         type="image/png"
-        href="../images/logo/favicon.png">
+        href="/images/logo/fevicon.png">
+    <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#28a745">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Aarogyam">
 
     <!-- =========================================
             CSS FILES
@@ -214,6 +220,11 @@
 
             </a>
 
+            <!-- Desktop Install Button -->
+            <button id="desktop-pwa-install-btn" class="pwa-install-btn" style="display: none; margin-right: 8px;" title="Install Aarogyam India App">
+                <span>📱</span> Install App
+            </button>
+
             <!-- Mobile Menu -->
 
             <button
@@ -248,6 +259,13 @@
 
         </button>
 
+    </div>
+
+    <!-- Mobile Menu PWA Install Button -->
+    <div style="padding: 10px 15px;">
+        <button id="mobile-pwa-install-btn" class="mobile-pwa-install-btn" style="display: flex;">
+            <span>📱</span> Install App
+        </button>
     </div>
 
     <ul>
@@ -880,6 +898,7 @@
 <!-- Universal Sticky Share Button for Mobile -->
 <button class="sticky-share-button sticky-share-mobile" data-share-button="true" data-share-target="native">Share</button>
 
+<script type="module" src="/js/public-pwa.js"></script>
 </body>
 
 </html>

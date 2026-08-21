@@ -1,6 +1,6 @@
 // --- Theme Restoration ---
 // Apply theme as early as possible to prevent flash
-(function() {
+(function () {
   const theme = localStorage.getItem('aarogyam-admin-theme') || 'dark';
   if (theme === 'light') {
     document.body.classList.add('light-theme');
@@ -28,15 +28,28 @@ export function initAdminLayout(pageTitle = 'Admin Panel', pageDescription = '')
       backdrop.id = 'sidebar-backdrop';
       document.body.appendChild(backdrop);
     }
-    
+
+    // Always render header with updated title/description
     renderHeader('header-placeholder', pageTitle, pageDescription);
-    renderSidebar('sidebar-placeholder');
+
+    // Only render sidebar if empty or not yet mounted (preserves sidebar state during SPA navigation)
+    const sidebarContainer = document.getElementById('sidebar-placeholder');
+    if (sidebarContainer && !sidebarContainer.firstElementChild) {
+      renderSidebar('sidebar-placeholder');
+    }
+
     document.body.classList.add('admin-ready');
-    
-    // Restore desktop sidebar state
+
+    // Synchronize desktop sidebar state
     const isDesktopCollapsed = localStorage.getItem('desktop-sidebar-collapsed') === 'true';
-    if (isDesktopCollapsed && window.innerWidth > 768) {
-      document.body.classList.add('desktop-collapsed');
+    if (window.innerWidth > 768) {
+      if (isDesktopCollapsed) {
+        document.body.classList.add('desktop-collapsed');
+      } else {
+        document.body.classList.remove('desktop-collapsed');
+      }
+    } else {
+      document.body.classList.remove('desktop-collapsed');
     }
 
   } catch (err) {
@@ -45,54 +58,96 @@ export function initAdminLayout(pageTitle = 'Admin Panel', pageDescription = '')
 }
 
 export function toggleMobileDrawer(force) {
-  document.body.classList.toggle('mobile-drawer-open', force);
+  if (typeof force === 'boolean') {
+    document.body.classList.toggle('mobile-drawer-open', force);
+  } else {
+    document.body.classList.toggle('mobile-drawer-open');
+  }
 }
+window.toggleMobileDrawer = toggleMobileDrawer;
+
+export function toggleDesktopSidebar(force) {
+  const isCollapsed = typeof force === 'boolean'
+    ? document.body.classList.toggle('desktop-collapsed', force)
+    : document.body.classList.toggle('desktop-collapsed');
+  localStorage.setItem('desktop-sidebar-collapsed', isCollapsed ? 'true' : 'false');
+  return isCollapsed;
+}
+window.toggleDesktopSidebar = toggleDesktopSidebar;
+
+export function toggleAdminSidebar(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  if (window.innerWidth > 768) {
+    toggleDesktopSidebar();
+  } else {
+    toggleMobileDrawer();
+  }
+}
+window.toggleAdminSidebar = toggleAdminSidebar;
 
 function initCoreToggles() {
   const backdrop = document.getElementById('sidebar-backdrop');
 
   if (backdrop) {
     backdrop.addEventListener('click', () => toggleMobileDrawer(false));
+    backdrop.onclick = () => toggleMobileDrawer(false);
   }
-  
-  // Document-level delegation ensuring clean separation between search and hamburger
+
+  // Unified document-level click delegation
   document.addEventListener('click', (e) => {
-    // 1. Mobile Search Trigger Handling (Targeting all potential search button IDs/classes)
-    const mobileSearchBtn = e.target.closest('#admin-mobile-search-btn, .mobile-search-trigger, [data-action="mobile-search"], button[title*="Search"], .admin-header-right button:first-child');
+    // 1. Mobile Search Trigger Handling
+    const mobileSearchBtn = e.target.closest('#admin-mobile-search-btn, .mobile-search-trigger');
     const headerElement = document.querySelector('.admin-header');
-    
+
     if (mobileSearchBtn && headerElement) {
       e.preventDefault();
       e.stopPropagation();
-      
-      // Toggle search active class safely
+
       const isActive = headerElement.classList.toggle('mobile-search-active');
-      
-      // Ensure mobile-search-view display is properly handled inline if CSS selector misses it
       const searchView = headerElement.querySelector('.mobile-search-view');
       if (searchView) {
         searchView.style.display = isActive ? 'flex' : 'none';
       }
 
-      const searchInput = headerElement.querySelector('.mobile-search-view input, .mobile-search-view .admin-input, input[type="search"]');
+      const searchInput = headerElement.querySelector('#admin-mobile-search-input');
       if (isActive && searchInput) {
         setTimeout(() => searchInput.focus(), 100);
       }
       return;
     }
 
-    // 2. Hamburger / Sidebar Toggle Handling
-    const hamburger = e.target.closest('#admin-hamburger, .admin-hamburger, .menu-btn, [data-action="toggle-sidebar"]');
-    if (hamburger) {
+    // 2. Hamburger / Sidebar Toggle Handling (Desktop collapse + Mobile drawer)
+    const hamburger = e.target.closest('#admin-hamburger, .admin-hamburger, [data-action="toggle-sidebar"], .menu-toggle-btn, button[aria-label*="menu" i], button[aria-label*="Toggle" i]');
+    if (hamburger || e.target.closest('.admin-hamburger-icon')) {
+      e.preventDefault();
       e.stopPropagation();
-      const isDesktop = window.innerWidth > 768;
-      if (isDesktop) {
-        const isCollapsed = document.body.classList.toggle('desktop-collapsed');
-        localStorage.setItem('desktop-sidebar-collapsed', isCollapsed);
+      if (window.innerWidth > 768) {
+        toggleDesktopSidebar();
       } else {
         toggleMobileDrawer();
       }
       return;
+    }
+
+    // 3. Sidebar Close Button (✕)
+    const closeBtn = e.target.closest('#admin-sidebar-close-btn, .admin-sidebar-close-btn');
+    if (closeBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMobileDrawer(false);
+      return;
+    }
+
+    // 4. Click outside to close mobile drawer on dashboard / content / backdrop
+    if (document.body.classList.contains('mobile-drawer-open')) {
+      const isInsideSidebar = e.target.closest('.admin-sidebar, #sidebar-placeholder');
+      const isHamburger = e.target.closest('#admin-hamburger, .admin-hamburger, [data-action="toggle-sidebar"]');
+      if (!isInsideSidebar && !isHamburger) {
+        toggleMobileDrawer(false);
+      }
     }
   });
 
@@ -111,78 +166,87 @@ function initCoreToggles() {
   });
 }
 
-
 // --- PWA Install Prompt Logic ---
 function initPwaInstallPrompt() {
-    const installPromptOverlay = document.getElementById('pwa-install-prompt');
-    const installBtn = document.getElementById('pwa-install-btn');
-    const laterBtn = document.getElementById('pwa-later-btn');
-    let deferredPrompt;
+  const installPromptOverlay = document.getElementById('pwa-install-prompt');
+  const installBtn = document.getElementById('pwa-install-btn');
+  const laterBtn = document.getElementById('pwa-later-btn');
+  let deferredPrompt;
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent the mini-infobar from appearing on mobile
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        deferredPrompt = e;
-        
-        // Check if user has already dismissed it in this session
-        const dismissed = sessionStorage.getItem('pwa_install_dismissed');
-        if (!dismissed) {
-            // Show the custom install prompt
-            if (installPromptOverlay) {
-                installPromptOverlay.style.display = 'flex';
-            }
-        }
-    });
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
 
-    installBtn?.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        installPromptOverlay.style.display = 'none';
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-        deferredPrompt = null;
-    });
+    // Check if user has already dismissed it in this session
+    const dismissed = sessionStorage.getItem('pwa_install_dismissed');
+    if (!dismissed) {
+      // Show the custom install prompt
+      if (installPromptOverlay) {
+        installPromptOverlay.style.display = 'flex';
+        installPromptOverlay.style.pointerEvents = 'auto';
+      }
+    }
+  });
 
-    laterBtn?.addEventListener('click', () => {
-        installPromptOverlay.style.display = 'none';
-        sessionStorage.setItem('pwa_install_dismissed', 'true');
-    });
+  installBtn?.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    if (installPromptOverlay) {
+      installPromptOverlay.style.display = 'none';
+      installPromptOverlay.style.pointerEvents = 'none';
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+    deferredPrompt = null;
+  });
 
-    window.addEventListener('appinstalled', () => {
-        if (installPromptOverlay) installPromptOverlay.style.display = 'none';
-        deferredPrompt = null;
-        console.log('PWA was installed');
-    });
+  laterBtn?.addEventListener('click', () => {
+    if (installPromptOverlay) {
+      installPromptOverlay.style.display = 'none';
+      installPromptOverlay.style.pointerEvents = 'none';
+    }
+    sessionStorage.setItem('pwa_install_dismissed', 'true');
+  });
+
+  window.addEventListener('appinstalled', () => {
+    if (installPromptOverlay) {
+      installPromptOverlay.style.display = 'none';
+      installPromptOverlay.style.pointerEvents = 'none';
+    }
+    deferredPrompt = null;
+    console.log('PWA was installed');
+  });
 }
 
 function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
 }
 
 async function initPushNotifications() {
-    try {
-      if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-          return;
-      }
-
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-          return;
-      }
-
-      const registration = await navigator.serviceWorker.ready;
-      // In-App Universal Notifications are the primary system
-    } catch (e) {
-      // Safe fallback for push notifications
+  try {
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+      return;
     }
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      return;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+    // In-App Universal Notifications are the primary system
+  } catch (e) {
+    // Safe fallback for push notifications
+  }
 }
 
 // Lightweight background polling for live admin notifications (every 30s)
@@ -204,17 +268,32 @@ if (document.readyState === 'loading') {
 function bootstrapAdminApp() {
   try {
     initAdminLayout();
+  } catch (e) {
+    console.error('initAdminLayout error', e);
+  }
+  try {
     if (typeof initRouter === 'function') {
       initRouter();
       console.log('✅ admin-router initialized');
-    } else {
-      console.warn('⚠️ initRouter is not available yet.');
     }
-    initCoreToggles();
-    initAdminNotificationPolling(); // Live Notification Polling
-    initAdminPwa(); // Initialize Isolated Admin PWA
   } catch (e) {
-    console.error('admin-main bootstrap failed', e);
+    console.error('initRouter error', e);
+  }
+  try {
+    initCoreToggles();
+  } catch (e) {
+    console.error('initCoreToggles error', e);
+  }
+  try {
+    initAdminNotificationPolling();
+  } catch (e) {
+    console.error('initAdminNotificationPolling error', e);
+  }
+  try {
+    initAdminPwa();
+    initPwaInstallPrompt();
+  } catch (e) {
+    console.error('initAdminPwa error', e);
   }
 }
 

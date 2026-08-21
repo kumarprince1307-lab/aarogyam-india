@@ -76,6 +76,12 @@ Aarogyam India | One Platform • Multiple Missions
     <link rel="icon"
         type="image/png"
         href="/images/logo/fevicon.png">
+    <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#28a745">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Aarogyam">
 
     <!-- =========================================
     GOOGLE FONT
@@ -200,6 +206,9 @@ HEADER START
                 <button class="search-btn" id="searchBtn" aria-label="Search">
                     <img src="images/icons/search.png" alt="Search">
                 </button>
+                <button id="desktop-pwa-install-btn" class="pwa-install-btn" style="display: none;" title="Install Aarogyam India App">
+                    <span>📱</span> Install App
+                </button>
                 <a href="#" id="universalLoginBtn" class="login-btn">
                     <img src="images/icons/login.png" alt="Login">
                     <span id="loginBtnText">Login</span>
@@ -245,6 +254,13 @@ MOBILE NAVIGATION START
             <img src="images/icons/login.png" alt="Login">
             <span id="mobileLoginBtnText">Login / Register</span>
         </a>
+    </div>
+
+    <!-- Mobile PWA Install Button -->
+    <div style="padding: 0 15px 10px 15px;">
+        <button id="mobile-pwa-install-btn" class="mobile-pwa-install-btn" style="display: none;">
+            <span>📱</span> Install App
+        </button>
     </div>
 
     <ul class="mobile-nav">
@@ -1965,6 +1981,7 @@ JAVASCRIPT
 <script src="js/supabase.js"></script>
 <script src="session.js"></script>
 <script src="js/script.js"></script>
+<script type="module" src="/js/public-pwa.js"></script>
 
 <!-- =========================================
 UNIVERSAL LOGIN MODAL

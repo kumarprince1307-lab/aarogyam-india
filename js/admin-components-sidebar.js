@@ -46,8 +46,9 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
       <div class="admin-sidebar-top">
         <div class="admin-logo">
           <span class="logo-mark" aria-hidden="true"></span>
-          <strong class="menu-label">Aarogyam</strong>
+          <strong class="menu-label">Aarogyam Admin</strong>
         </div>
+        <button id="admin-sidebar-close-btn" onclick="window.toggleMobileDrawer && window.toggleMobileDrawer(false)" class="admin-sidebar-close-btn" aria-label="Close menu" type="button" style="background:transparent; border:none; color:var(--admin-muted); font-size:1.4rem; cursor:pointer; padding:4px 8px; display:none;">✕</button>
       </div>
       <nav>
         <ul class="menu-root">
@@ -59,6 +60,22 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
       </div>
     </aside>
   `;
+
+  // --- Mobile Close Button Handler ---
+  const closeBtn = c.querySelector('#admin-sidebar-close-btn');
+  closeBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.body.classList.remove('mobile-drawer-open');
+  });
+
+  // --- Close mobile drawer on any route link click ---
+  c.querySelectorAll('a[data-route]').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        document.body.classList.remove('mobile-drawer-open');
+      }
+    });
+  });
 
   // --- Professional Accordion Menu Logic ---
   const menuToggles = c.querySelectorAll('.menu-toggle');

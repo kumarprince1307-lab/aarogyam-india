@@ -127,13 +127,13 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '1671873500553134');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
- 
+<!-- Favicon & PWA -->
+<link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+<link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Aarogyam">
 </head>
 
 <body>
@@ -300,6 +300,11 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 
             </a>
 
+            <!-- Desktop Install Button -->
+            <button id="desktop-pwa-install-btn" class="pwa-install-btn" style="display: none; margin-right: 8px;" title="Install Aarogyam India App">
+                <span>📱</span> Install App
+            </button>
+
             <!-- Mobile Menu -->
 
             <button
@@ -334,6 +339,13 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 
         </button>
 
+    </div>
+
+    <!-- Mobile Menu PWA Install Button -->
+    <div style="padding: 10px 15px;">
+        <button id="mobile-pwa-install-btn" class="mobile-pwa-install-btn" style="display: flex;">
+            <span>📱</span> Install App
+        </button>
     </div>
 
     <ul>
@@ -2052,5 +2064,6 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   फाइलों के अंदर खुद ही DOMContentLoaded को संभाल रहे हैं।
 -->
 
+<script type="module" src="/js/public-pwa.js"></script>
 </body>
 </html>

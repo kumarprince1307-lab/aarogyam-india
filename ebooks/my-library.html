@@ -4,7 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Library - Aarogyam India</title>
+    <!-- Favicon & PWA Manifest -->
+    <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+    <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#28a745">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Aarogyam">
     <!-- CSS Link -->
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/my-library.css">
     <!-- FontAwesome for Icons & Heart -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -128,6 +137,11 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         <a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms</a>
         <a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping</a>
         
+        <!-- PWA Install Button for Desktop -->
+        <button id="desktop-pwa-install-btn" class="pwa-install-btn" style="display: none; margin-left: 8px;" title="Install Aarogyam India App">
+            <span>📱</span> Install App
+        </button>
+
         <!-- SEPARATE LOGIN/PROFILE BUTTONS FOR DESKTOP -->
         <button id="desktop-login-btn" onclick="openLoginPopup()" style="background: #28a745; color: white; display: none; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: 8px;">
             <i class="fa-solid fa-right-to-bracket"></i> लॉगिन करें
@@ -169,6 +183,10 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         <button id="mobile-logout-btn" onclick="logoutUser()" style="background: #e81717; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px;">
             <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट
         </button>
+        <!-- Mobile PWA Install Button -->
+        <button id="mobile-pwa-install-btn" class="mobile-pwa-install-btn" style="display: none;">
+            <span>📱</span> Install App
+        </button>
     </div>
 
     <ul>
@@ -201,6 +219,10 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         <!-- Stats Counter Row -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1; text-align: center;">
             <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <span style="display: block; font-size: 0.75rem; color: #64748b;">📖 Read Free</span>
+                <strong style="font-size: 1rem; color: #0284c7;">1</strong>
+            </div>
+            <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <span style="display: block; font-size: 0.75rem; color: #64748b;">📚 Purchased</span>
                 <strong style="font-size: 1rem; color: #28a745;">1</strong>
             </div>
@@ -223,6 +245,23 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
             <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
                 <div id="profileCompletionBar" style="width: 85%; height: 100%; background: #28a745; border-radius: 3px;"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- 4.1 PWA Digital Locker Install Banner Card -->
+    <div id="library-pwa-card" style="display: none; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px 22px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div style="flex: 1; min-width: 260px;">
+                <h3 style="font-size: 1.15rem; color: #166534; margin: 0 0 6px 0; display: flex; align-items: center; gap: 8px;">
+                    <span>📱</span> Install Aarogyam India App
+                </h3>
+                <p style="font-size: 0.92rem; color: #334155; margin: 0; line-height: 1.5;">
+                    आप अपने मोबाइल में Aarogyam India App Install करें और Offline में भी अपनी जरूरी किताबें और सामग्री पढ़ें।
+                </p>
+            </div>
+            <button id="library-pwa-install-btn" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);">
+                <span>📱</span> Install App Now
+            </button>
         </div>
     </div>
 
@@ -348,5 +387,6 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     <script src="../js/supabase.js"></script>
     <script src="../session.js"></script>
     <script src="/js/my-library.js"></script>
+    <script type="module" src="/js/public-pwa.js"></script>
 </body>
 </html>
