@@ -3,7 +3,6 @@
 import { navigateTo } from './admin-router.js';
 import { initAdminLayout } from './admin-main.js';
 import { fetchDashboardData, fetchCheckoutSummary } from './admin-api.js';
-import { renderAdminPwaCard, attachPwaCardListeners } from './admin-pwa.js';
 
 function renderKpiGroup(kpis) {
   return `<div class="kpi-row">
@@ -308,9 +307,6 @@ export async function initDashboard() {
     ];
 
     content.innerHTML = `
-      <div class="admin-section" id="admin-pwa-card-container">
-        ${renderAdminPwaCard()}
-      </div>
       <div class="admin-section" id="share-summary">
         <div class="admin-section-title">Share Engine Summary</div>
         ${renderKpiGroup(shareKpis)}
@@ -368,9 +364,6 @@ export async function initDashboard() {
         <div class="admin-col">${renderTopBooks(bookSales)}${renderActivity(recentActivity)}</div>
       </div>
     `;
-
-    // Attach PWA card listeners
-    attachPwaCardListeners(document.getElementById('admin-pwa-card-container'));
 
     // After rendering, set default dates and add listeners for Business Summary
     const businessDateFilter = document.getElementById('business-date-filter');

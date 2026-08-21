@@ -14,6 +14,7 @@ const ROUTES = {
  'downloads': () => import('./admin-pages-downloads.js').then(m => m.initDownloads()),
  'reports': () => import('./admin-pages-reports.js').then(m => m.initReports()),
  'notifications': () => import('./admin-pages-notifications.js').then(m => m.initNotifications()),
+ 'admin-app': () => import('./admin-pages-admin-app.js').then(m => m.initAdminApp()),
  'settings': () => import('./admin-pages-settings.js').then(m => m.initSettings()).catch(() => { /* settings may be placeholder */ })
 };
 

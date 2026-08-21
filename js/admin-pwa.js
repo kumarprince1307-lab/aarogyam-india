@@ -125,11 +125,26 @@ export function attachPwaCardListeners(container) {
 }
 
 function updatePwaDashboardCard() {
-  const container = document.getElementById('admin-pwa-card-container');
-  if (container) {
-    container.innerHTML = renderAdminPwaCard();
-    attachPwaCardListeners(container);
-  }
+  const containers = [
+    document.getElementById('admin-app-page-container'),
+    document.getElementById('admin-pwa-card-container')
+  ];
+  containers.forEach(container => {
+    if (container) {
+      container.innerHTML = renderAdminPwaCard();
+      attachPwaCardListeners(container);
+    }
+  });
+
+  // Update sidebar item if installed
+  const sidebarAppLinks = document.querySelectorAll('a[data-route="admin-app"] .menu-label, a[href="admin-app.html"] .menu-label');
+  sidebarAppLinks.forEach(link => {
+    if (isStandalone) {
+      link.textContent = 'Admin App ✓';
+    } else {
+      link.textContent = 'Admin App';
+    }
+  });
 }
 
 // --- Network Status Sync Banner ---
