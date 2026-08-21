@@ -38,13 +38,17 @@ function renderReferralInformation(detail) {
         <table class="admin-table">
           <thead><tr><th>Name</th><th>Mobile</th><th>Total Purchases</th></tr></thead>
           <tbody>
-            ${referrals.map(ref => `
-              <tr>
-                <td><a href="#user-details?id=${ref.id}" data-route="user-details" data-id="${ref.id}" class="admin-subtle-link">${ref.name || 'N/A'}</a></td>
-                <td>${ref.mobile || 'N/A'}</td>
-                <td>${ref.totalPurchases || 0}</td>
-              </tr>
-            `).join('')}
+            ${referrals.map(ref => {
+              const refSanitized = String(ref.mobile || '').replace(/\D/g, '');
+              const refMobile = refSanitized ? `<a href="tel:${refSanitized}" class="admin-subtle-link">${ref.mobile}</a>` : (ref.mobile || 'N/A');
+              return `
+                <tr>
+                  <td><a href="#user-details?id=${ref.id}" data-route="user-details" data-id="${ref.id}" class="admin-subtle-link">${ref.name || 'N/A'}</a></td>
+                  <td>${refMobile}</td>
+                  <td>${ref.totalPurchases || 0}</td>
+                </tr>
+              `;
+            }).join('')}
           </tbody>
         </table>
       </div>`;
@@ -100,12 +104,36 @@ function renderPermissions() {
 function renderProfile(detail) {
   if (!detail) return '<div class="admin-empty"><strong>User not found.</strong></div>';
 
+  const sanitizedMobile = String(detail.mobile || '').replace(/\D/g, '');
+  const mobileLink = sanitizedMobile 
+    ? `<a href="tel:${sanitizedMobile}" class="admin-subtle-link" title="Click to Call">${detail.mobile}</a>` 
+    : (detail.mobile || 'N/A');
+
+  let whatsappButtonHTML = '';
+  if (sanitizedMobile) {
+      let whatsappNumber = sanitizedMobile;
+      if (whatsappNumber.length === 10) {
+          whatsappNumber = '91' + whatsappNumber;
+      }
+      const customerName = detail.name || 'Customer';
+      const message = `नमस्ते ${customerName} जी, मैं आरोग्यम इंडिया से बात कर रहा हूँ।`;
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button" style="padding: 2px 8px; margin-left: 8px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;" title="WhatsApp Chat">💬 WhatsApp</a>`;
+  }
+
   return `
     <div class="admin-section">
       <div class="admin-section-title">Profile</div>
       <div class="admin-data-grid">
         <div class="admin-data-card"><h4>Name</h4><p>${detail.name}</p></div>
-        <div class="admin-data-card"><h4>Mobile</h4><p>${detail.mobile}</p></div>
+        <div class="admin-data-card">
+          <h4>Mobile</h4>
+          <p style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 0;">
+            ${mobileLink}
+            ${whatsappButtonHTML}
+          </p>
+        </div>
         <div class="admin-data-card"><h4>Email</h4><p>${detail.email || 'N/A'}</p></div>
         <div class="admin-data-card"><h4>Source</h4><p>${detail.source || 'N/A'}</p></div>
         <div class="admin-data-card">

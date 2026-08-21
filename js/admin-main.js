@@ -18,6 +18,7 @@ import './supabase.js'; // CRITICAL: Initialize Supabase client globally
 import { renderHeader } from './admin-components-header.js';
 import { renderSidebar } from './admin-components-sidebar.js';
 import { initRouter } from './admin-router.js';
+import { initAdminPwa } from './admin-pwa.js';
 
 export function initAdminLayout(pageTitle = 'Admin Panel', pageDescription = '') {
   try {
@@ -210,20 +211,8 @@ function bootstrapAdminApp() {
       console.warn('⚠️ initRouter is not available yet.');
     }
     initCoreToggles();
-    initPushNotifications();
     initAdminNotificationPolling(); // Live Notification Polling
-    initPwaInstallPrompt(); // PWA Install Prompt शुरू करें
-
-    // Register PWA Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(registration => {
-          console.log('✅ PWA ServiceWorker registration successful, scope is:', registration.scope);
-        }, err => {
-          console.error('❌ PWA ServiceWorker registration failed:', err);
-        });
-      });
-    }
+    initAdminPwa(); // Initialize Isolated Admin PWA
   } catch (e) {
     console.error('admin-main bootstrap failed', e);
   }

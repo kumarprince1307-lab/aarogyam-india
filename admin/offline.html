@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Offline Mode — Aarogyam India Admin</title>
+  <link rel="icon" type="image/png" href="../images/logo/fevicon.png">
+  <link rel="stylesheet" href="../css/admin-panel.css">
+  <link rel="stylesheet" href="../css/admin-components.css">
+  <style>
+    body {
+      background-color: var(--admin-surface, #0f172a);
+      color: var(--admin-text, #f8fafc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    .offline-card {
+      background: var(--admin-surface-2, #1e293b);
+      border: 1px solid var(--admin-border, #334155);
+      border-radius: 16px;
+      padding: 36px 28px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    .offline-logo {
+      height: 48px;
+      margin-bottom: 20px;
+      object-fit: contain;
+    }
+    .offline-icon {
+      font-size: 3rem;
+      margin-bottom: 14px;
+    }
+    .offline-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+    }
+    .offline-desc {
+      color: var(--admin-muted, #94a3b8);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin: 0 0 24px 0;
+    }
+    .offline-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-card">
+    <img src="../images/logo/logo.png" alt="Aarogyam India" class="offline-logo">
+    <div class="offline-icon">📡</div>
+    <h1 class="offline-title">Offline Mode</h1>
+    <p class="offline-desc">
+      इंटरनेट कनेक्शन उपलब्ध नहीं है। Admin App Shell सुरक्षित रूप से लोड हो गया है। लाइव डेटा और नया सिंक कनेक्शन आने पर स्वतः अपडेट हो जाएगा।
+    </p>
+    <div class="offline-actions">
+      <button class="admin-button" onclick="window.location.reload();" style="width: 100%; background: var(--admin-primary, #3b82f6);">
+        🔄 पुनः प्रयास करें (Retry)
+      </button>
+      <a href="index.html#dashboard" class="admin-button" style="width: 100%; background: var(--admin-surface-strong, #0f172a); border: 1px solid var(--admin-border, #334155); text-decoration: none; display: inline-block; box-sizing: border-box;">
+        🏠 Open Dashboard Shell
+      </a>
+    </div>
+  </div>
+</body>
+</html>

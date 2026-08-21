@@ -12,6 +12,7 @@ const MENU = [
   { label: 'Webinars', href: '#', icon: '🎥' },
   { label: 'Wallet', href: '#', icon: '💰' },
   { label: 'Notifications', href: 'notifications.html', icon: '🔔' },
+  { label: 'Admin App', href: 'admin-app.html', icon: '📱' },
   { label: 'Settings', href: 'settings.html', icon: '⚙️' },
   { label: 'Support', href: '#', icon: '🆘' },
   { label: 'Logout', href: '#', icon: '⛔' }
@@ -30,7 +31,7 @@ function createMenuItem(item) {
     `;
   }
   // for top-level links map known pages to data-route for SPA
-  const routeName = ['dashboard','users','purchases','checkout-funnel','downloads','reports','notifications','settings'].includes((item.href||'').split('.').shift()) ? (item.href||'').split('.').shift() : '';
+  const routeName = ['dashboard','users','purchases','checkout-funnel','downloads','reports','notifications','admin-app','settings'].includes((item.href||'').split('.').shift()) ? (item.href||'').split('.').shift() : '';
   return `<li><a href="#" ${routeName?`data-route="${routeName}"`:''} class="menu-link"><span class="menu-icon">${item.icon || ''}</span><span class="menu-label">${item.label}</span></a></li>`;
 }
 
