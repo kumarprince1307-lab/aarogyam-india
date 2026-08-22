@@ -81,7 +81,7 @@ function startDailyTimer() {
 function calculateProfileProgress() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     let score = 0;
-    const totalFields = 10;
+    const totalFields = 11; // 11 fields including NetSurf ID
     
     if (storedUser.full_name) score++;
     if (storedUser.mobile) score++;
@@ -93,14 +93,47 @@ function calculateProfileProgress() {
     if (storedUser.address) score++;
     if (storedUser.occupation) score++;
     if (storedUser.interest) score++;
+    if (storedUser.netsurf_id && String(storedUser.netsurf_id).trim()) score++;
     
     const percentage = Math.min(100, Math.round((score / totalFields) * 100));
 
     const completionText = document.getElementById('profileCompletionText');
     const completionBar = document.getElementById('profileCompletionBar');
+    const statusHint = document.getElementById('profileStatusHint');
+    const nudgePopup = document.getElementById('profile100NudgePopup');
+    const nudgePercent = document.getElementById('nudgePercentText');
 
-    if(completionText) completionText.textContent = `${percentage}%`;
-    if(completionBar) completionBar.style.width = `${percentage}%`;
+    if (completionText) completionText.textContent = `${percentage}%`;
+    if (completionBar) {
+        completionBar.style.width = `${percentage}%`;
+        if (percentage === 100) {
+            completionBar.style.background = '#10b981';
+        } else if (percentage >= 60) {
+            completionBar.style.background = 'linear-gradient(90deg, #f59e0b, #10b981)';
+        } else {
+            completionBar.style.background = '#f59e0b';
+        }
+    }
+
+    if (statusHint) {
+        if (percentage === 100) {
+            statusHint.textContent = '🟢 प्रोफाइल 100% पूर्ण है!';
+            statusHint.style.color = '#10b981';
+        } else {
+            statusHint.textContent = `⚠️ केवल ${percentage}% पूर्ण — 100% करें`;
+            statusHint.style.color = '#d97706';
+        }
+    }
+
+    // Persistent Popup Reminder if < 100%
+    if (nudgePopup) {
+        if (percentage < 100 && (storedUser.id || storedUser.mobile)) {
+            nudgePopup.style.display = 'block';
+            if (nudgePercent) nudgePercent.textContent = `${percentage}%`;
+        } else {
+            nudgePopup.style.display = 'none';
+        }
+    }
 }
 
 function initUserData() {
@@ -109,6 +142,7 @@ function initUserData() {
     const userName = storedUser.full_name || storedUser.name || "प्रिय पाठक";
     const userMobile = storedUser.mobile || "";
     const userEmail = storedUser.email || "";
+    const userNetsurfId = storedUser.netsurf_id || "";
     const userState = storedUser.state || storedUser.State || "";
     const userDob = storedUser.dob || "";
     const userCity = storedUser.city || storedUser.district || "";
@@ -120,15 +154,16 @@ function initUserData() {
     // DOM Elements Update
     const userNameSpan = document.getElementById('userName');
     const menuUserName = document.getElementById('menuUserName');
-    const mobileUserPhoneSpan = document.getElementById('mobileUserPhone'); // Get the new span
+    const mobileUserPhoneSpan = document.getElementById('mobileUserPhone');
 
     if (userNameSpan) userNameSpan.textContent = userName;
     if (menuUserName) menuUserName.textContent = userName;
-    if (mobileUserPhoneSpan) mobileUserPhoneSpan.textContent = userMobile; // Set mobile number
+    if (mobileUserPhoneSpan) mobileUserPhoneSpan.textContent = userMobile;
 
     // फॉर्म इनपुट्स में ऑटो-फिल करना
     if (document.getElementById('leadName')) document.getElementById('leadName').value = userName;
     if (document.getElementById('leadPhone')) document.getElementById('leadPhone').value = userMobile;
+    if (document.getElementById('leadNetsurfId')) document.getElementById('leadNetsurfId').value = userNetsurfId;
     if (document.getElementById('leadEmail')) document.getElementById('leadEmail').value = userEmail;
     if (document.getElementById('leadGender')) document.getElementById('leadGender').value = userGender;
     if (document.getElementById('leadState')) document.getElementById('leadState').value = userState;
@@ -138,30 +173,79 @@ function initUserData() {
     if (document.getElementById('leadOccupation')) document.getElementById('leadOccupation').value = userOccupation;
     if (document.getElementById('leadInterest')) document.getElementById('leadInterest').value = userInterest;
 
+    // 🟢 Active / Inactive User Status & 365-Day Countdown Timer
+    updateSubscriptionTimerAndStatus(storedUser);
+
     calculateProfileProgress();
 }
 
-// 6. स्मार्ट चेक: यदि यूजर लॉग-इन नहीं है या प्रोफाइल पहले से भरी हुई है, तो ऑटो-पॉपअप नहीं खुलेगा
+function updateSubscriptionTimerAndStatus(storedUser) {
+    const isActive = Boolean(storedUser.is_active || storedUser.is_subscriber || storedUser.status === 'active');
+    const badgeEl = document.getElementById('userStatusBadge');
+    const badgeText = document.getElementById('userStatusText');
+    const activeCard = document.getElementById('activeSubscriptionCard');
+    const inactiveBanner = document.getElementById('inactiveSubscriptionBanner');
+
+    if (badgeEl && badgeText) {
+        if (isActive) {
+            badgeEl.style.background = 'rgba(16,185,129,0.15)';
+            badgeEl.style.color = '#059669';
+            badgeEl.style.borderColor = 'rgba(16,185,129,0.3)';
+            badgeText.textContent = '🟢 Active Subscriber';
+        } else {
+            badgeEl.style.background = 'rgba(239,68,68,0.12)';
+            badgeEl.style.color = '#dc2626';
+            badgeEl.style.borderColor = 'rgba(239,68,68,0.25)';
+            badgeText.textContent = '🔴 Inactive / Free Member';
+        }
+    }
+
+    if (isActive) {
+        if (activeCard) activeCard.style.display = 'block';
+        if (inactiveBanner) inactiveBanner.style.display = 'none';
+
+        // 365-Day Countdown Calculation
+        const regDateStr = storedUser.created_at || storedUser.subscribed_at || new Date().toISOString();
+        const startDate = new Date(regDateStr);
+        const endDate = new Date(startDate.getTime() + (365 * 24 * 60 * 60 * 1000));
+        const now = new Date();
+
+        const diffTime = endDate - now;
+        const daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+        const subStartDateEl = document.getElementById('subStartDate');
+        const subEndDateEl = document.getElementById('subEndDate');
+        const daysBadge = document.getElementById('subDaysLeftBadge');
+
+        if (subStartDateEl) subStartDateEl.textContent = startDate.toLocaleDateString('hi-IN');
+        if (subEndDateEl) subEndDateEl.textContent = endDate.toLocaleDateString('hi-IN');
+        if (daysBadge) daysBadge.textContent = `⏳ ${daysLeft} दिन शेष`;
+    } else {
+        if (activeCard) activeCard.style.display = 'none';
+        if (inactiveBanner) inactiveBanner.style.display = 'block';
+    }
+}
+
+// 6. स्मार्ट चेक: यदि यूजर लॉग-इन नहीं है तो ऑटो-पॉपअप नहीं खुलेगा
 function checkAndOpenProfileModal() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     
-    // अगर यूजर लॉग-इन ही नहीं है, तो बिल्कुल मत खोलो (लॉगिन पॉपअप के साथ क्लैश बंद)
     if (!storedUser.id && !storedUser.mobile) {
         return;
     }
 
-    // अगर यूजर की प्रोफाइल पहले से भरी हुई है (यानी नाम और मोबाइल दोनों मौजूद हैं और प्रोग्रेस अच्छी है), तो बार-बार परेशान न करो
-    const isProfileComplete = storedUser.full_name && storedUser.mobile && (storedUser.state || storedUser.city || storedUser.occupation);
-    if (isProfileComplete) {
+    // अगर यूजर की प्रोफाइल 100% पूरी है तो सीधे रिटर्न करें
+    const is100Complete = storedUser.full_name && storedUser.mobile && storedUser.email && storedUser.gender && storedUser.dob && (storedUser.state || storedUser.State) && (storedUser.city || storedUser.district) && storedUser.address && storedUser.occupation && storedUser.interest && storedUser.netsurf_id;
+    if (is100Complete) {
         return; 
     }
 
-    // केवल नए या अधूरे प्रोफाइल वाले यूजर के लिए एक बार पॉपअप दिखाएं
-    const hasSeenModal = localStorage.getItem('aim_profile_prompted');
+    // अगर प्रोफाइल अधूरी है तो 1.5 सेकंड बाद पॉपअप खोलें
+    const hasSeenModal = sessionStorage.getItem('aim_profile_prompted_session');
     if (!hasSeenModal) {
         setTimeout(() => {
             openLeadModal();
-            localStorage.setItem('aim_profile_prompted', 'true');
+            sessionStorage.setItem('aim_profile_prompted_session', 'true');
         }, 1200);
     }
 }
@@ -171,7 +255,7 @@ function openLeadModal() {
     if (modal) {
         initUserData();
         modal.classList.add('show');
-        modal.style.display = 'flex'; // पॉपअप को सही से स्क्रीन पर लाना
+        modal.style.display = 'flex';
     }
 }
 
@@ -179,17 +263,19 @@ function closeLeadModal() {
     const modal = document.getElementById('leadModal');
     if (modal) {
         modal.classList.remove('show');
-        modal.style.display = 'none'; // क्रॉस दबाते ही पॉपअप पूरी तरह गायब हो जाए
+        modal.style.display = 'none';
     }
 }
 
 // फॉर्म सबमिट और सेव फंक्शन
 async function submitLeadForm(event) {
     event.preventDefault();
-    const fullName = document.getElementById('leadName').value;
-    const mobile = document.getElementById('leadPhone').value;
+    const fullName = document.getElementById('leadName').value.trim();
+    const mobile = document.getElementById('leadPhone').value.trim();
     
-    // वैकल्पिक फ़ील्ड्स: यदि खाली हों तो null भेजें, वरना उनकी वैल्यू लें
+    const netsurfIdElem = document.getElementById('leadNetsurfId');
+    const netsurfId = netsurfIdElem && netsurfIdElem.value.trim() !== '' ? netsurfIdElem.value.trim() : null;
+
     const emailElem = document.getElementById('leadEmail');
     const email = emailElem && emailElem.value.trim() !== '' ? emailElem.value.trim() : null;
 
@@ -200,7 +286,7 @@ async function submitLeadForm(event) {
     const state = stateElem && stateElem.value.trim() !== '' ? stateElem.value.trim() : null;
 
     const dobElem = document.getElementById('leadDob');
-    const dob = dobElem && dobElem.value.trim() !== '' ? dobElem.value.trim() : null; // <--- यहाँ सुधार किया गया है
+    const dob = dobElem && dobElem.value.trim() !== '' ? dobElem.value.trim() : null;
 
     const cityElem = document.getElementById('leadCity');
     const city = cityElem && cityElem.value.trim() !== '' ? cityElem.value.trim() : null;
@@ -227,15 +313,22 @@ async function submitLeadForm(event) {
 
     const profileData = {
         full_name: fullName,
+        netsurf_id: netsurfId,
         email: email,
         gender: gender,
-        dob: dob, // अब यदि यह खाली होगा तो database में null जाएगा और एरर नहीं आएगी
+        dob: dob,
         State: state, 
         district: city,
         address: address,
         occupation: occupation,
         interest: interest,
     };
+
+    const submitBtn = document.getElementById('leadSubmitBtn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'सेव हो रहा है...';
+    }
 
     try {
         if (typeof updateProfile !== 'function') {
@@ -246,20 +339,25 @@ async function submitLeadForm(event) {
         const result = await updateProfile(currentUser.id, profileData);
 
         if (result.success) {
-            const updatedUser = { ...currentUser, ...result.profile };
+            const updatedUser = { ...currentUser, ...result.profile, netsurf_id: netsurfId };
             localStorage.setItem('AI_USER', JSON.stringify(updatedUser));
-            ProfileStorage.save(updatedUser);
+            if (typeof ProfileStorage !== 'undefined') ProfileStorage.save(updatedUser);
 
-            alert('बधाई हो! आपकी प्रोफाइल जानकारी Aarogyam India में सफलतापूर्वक सहेज ली गई है।');
+            alert('🎉 बधाई हो! आपकी प्रोफाइल जानकारी (NetSurf ID सहित) सफलतापूर्वक सहेज ली गई है।');
             closeLeadModal();
             initUserData();
-            window.location.reload();
+            calculateProfileProgress();
         } else {
             alert('प्रोफाइल अपडेट करने में त्रुटि: ' + (result.message || 'अज्ञात एरर'));
         }
     } catch (err) {
-        console.error("Profile Submit Error:", err);
-        alert('कनेक्शन एरर। कृपया पुनः प्रयास करें।');
+        console.error('Profile update exception', err);
+        alert('प्रोफाइल सेव करने में त्रुटि हुई।');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'जानकारी सुरक्षित करें (Save Profile)';
+        }
     }
 }
 // 8. Full Screen Zoom Modal Handler (बुक कवर फुल-स्क्रीन और पिंच-ज़ूम इफ़ेक्ट)

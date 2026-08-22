@@ -210,7 +210,12 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     <div class="welcome-card-soft" style="background: linear-gradient(135deg, #ffffff 0%, #f4fdf4 100%); border: 1px solid #d4edda; border-radius: 12px; padding: 20px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
             <div>
-                <h2 style="font-size: 1.3rem; color: #2c3e50; margin-bottom: 5px;">नमस्ते, <span id="userName">अविनाश मिश्रा</span> जी! 👋</h2>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 5px;">
+                    <h2 style="font-size: 1.3rem; color: #2c3e50; margin: 0;">नमस्ते, <span id="userName">अविनाश मिश्रा</span> जी! 👋</h2>
+                    <span id="userStatusBadge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; background: rgba(16,185,129,0.15); color: #059669; border: 1px solid rgba(16,185,129,0.3);">
+                        <i class="fa-solid fa-circle-check"></i> <span id="userStatusText">🟢 Active Subscriber</span>
+                    </span>
+                </div>
                 <p style="font-size: 0.9rem; color: #666; margin: 0;">आपकी पर्सनल डिजिटल लाइब्रेरी सुरक्षित है। सभी खरीदी गई बुक्स यहाँ आजीवन उपलब्ध रहेंगी।</p>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -223,6 +228,52 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
             </div>
         </div>
 
+        <!-- 365-Day Subscription Countdown Card (For Active Users) -->
+        <div id="activeSubscriptionCard" style="display: none; background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); color: #ecfdf5; border-radius: 10px; padding: 12px 16px; margin-top: 14px; border: 1px solid #10b981; box-shadow: 0 4px 12px rgba(6,78,59,0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5rem;">👑</span>
+                    <div>
+                        <div style="font-size: 0.92rem; font-weight: 800; color: #34d399; display: flex; align-items: center; gap: 6px;">
+                            <span>Aarogyam VIP Annual Pass (365 Days Access)</span>
+                            <span style="background: #059669; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px;">ACTIVE</span>
+                        </div>
+                        <div style="font-size: 0.78rem; color: #a7f3d0; margin-top: 2px;">
+                            📅 आज की सब्सक्राइब डेट: <strong id="subStartDate">--/--/----</strong> &nbsp;•&nbsp; 🔄 अगला रिन्यूअल: <strong id="subEndDate">--/--/----</strong>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 6px 14px; text-align: center;">
+                    <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700;">वैधता शेष</div>
+                    <div id="subDaysLeftBadge" style="font-size: 1.1rem; font-weight: 900; color: #fbbf24;">⏳ 365 दिन शेष</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Color-Changing Subscription Upgrade KPI Card (For Inactive Users) -->
+        <div id="inactiveSubscriptionBanner" style="display: none; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fee2e2 100%); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin-top: 14px; box-shadow: 0 4px 14px rgba(245,158,11,0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div style="flex: 2; min-width: 260px;">
+                    <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.96rem; color: #b45309;">
+                        <span>🔥</span>
+                        <span>Aarogyam VIP 365-Day Subscription Offer!</span>
+                        <span style="background: #ef4444; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; animation: pulse 2s infinite;">LIMITED OFFER</span>
+                    </div>
+                    <p style="font-size: 0.86rem; color: #451a03; margin: 4px 0 0 0; line-height: 1.4;">
+                        <strong>₹999</strong> का वार्षिक सब्सक्रिप्शन अभी <strong>मात्र ₹99 में!</strong> कोई भी 1 ई-बुक लेकर तुरंत VIP सब्सक्रिप्शन + UCAS मार्केटिंग टूल्स 365 दिनों के लिए एक्टिव करें।
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button onclick="switchTab('available')" style="background: #d97706; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(217,119,6,0.3);">
+                        <span>📚</span> अभी ₹99 में बुक लेकर एक्टिव करें
+                    </button>
+                    <a href="https://wa.me/917974422572?text=नमस्ते%20Aarogyam%20India,%20मुझे%20₹99%20वाले%20VIP%20सब्सक्रिप्शन%20ऑफर%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" style="background: #25D366; color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                        <i class="fa-brands fa-whatsapp"></i> पूछताछ
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- Stats Counter Row -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1; text-align: center;">
             <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
@@ -231,7 +282,7 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
             </div>
             <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <span style="display: block; font-size: 0.75rem; color: #64748b;">📚 Purchased</span>
-                <strong style="font-size: 1rem; color: #28a745;">1</strong>
+                <strong id="kpiPurchasedCount" style="font-size: 1rem; color: #28a745;">0</strong>
             </div>
             <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <span style="display: block; font-size: 0.75rem; color: #64748b;">🎁 Bonus</span>
@@ -244,13 +295,13 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         </div>
 
         <!-- Profile Completion Progress Bar -->
-        <div style="margin-top: 12px;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">
-                <span>प्रोफाइल पूर्णता (Profile Completion)</span>
-                <strong id="profileCompletionText">85%</strong>
+        <div style="margin-top: 12px; background: #fff; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: #64748b; margin-bottom: 6px;">
+                <span><span>📊</span> <strong>प्रोफाइल पूर्णता (Profile Completion):</strong> <span id="profileStatusHint" style="color:#d97706;">कृपया 100% पूरा करें</span></span>
+                <strong id="profileCompletionText" style="color: #28a745; font-size: 0.88rem;">0%</strong>
             </div>
-            <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
-                <div id="profileCompletionBar" style="width: 85%; height: 100%; background: #28a745; border-radius: 3px;"></div>
+            <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                <div id="profileCompletionBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 4px; transition: width 0.4s ease;"></div>
             </div>
         </div>
     </div>
@@ -334,10 +385,20 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     <div class="modal-overlay" id="leadModal">
         <div class="modal-card">
             <span class="close-modal" onclick="closeLeadModal()">&times;</span>
-            <h3>पूर्ण प्रोफाइल जानकारी अपडेट करें</h3>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                <span style="font-size: 1.4rem;">👤</span>
+                <h3 style="margin: 0; color: #2c3e50;">पूर्ण प्रोफाइल जानकारी अपडेट करें</h3>
+            </div>
             <form onsubmit="submitLeadForm(event)">
-                <input type="text" id="leadName" class="modal-input" placeholder="आपका पूरा नाम (Full Name)" required>
-                <input type="tel" id="leadPhone" class="modal-input" placeholder="मोबाइल नंबर (Mobile)" required>
+                <input type="text" id="leadName" class="modal-input" placeholder="आपका पूरा नाम (Full Name) *" required>
+                <input type="tel" id="leadPhone" class="modal-input" placeholder="मोबाइल नंबर (Mobile) *" required>
+                
+                <!-- NetSurf ID Input (Requested by User) -->
+                <div style="margin-bottom: 12px;">
+                    <input type="text" id="leadNetsurfId" class="modal-input" placeholder="NetSurf ID (उदा. NS123456 / यदि उपलब्ध हो)" style="margin-bottom: 4px; border-color: #3b82f6; background: #f0f9ff;">
+                    <div style="font-size: 0.74rem; color: #0284c7; padding-left: 2px;">💼 NetSurf Distributor / Direct Seller ID</div>
+                </div>
+
                 <input type="email" id="leadEmail" class="modal-input" placeholder="ईमेल आईडी (Email Address)">
                 
                 <select id="leadGender" class="modal-input">
@@ -357,8 +418,29 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
                 <input type="text" id="leadInterest" class="modal-input" placeholder="रुचि (Interest)">
                 <textarea id="leadAddress" class="modal-input" placeholder="पूरा पता (Full Address)" rows="2" style="resize: none;"></textarea>
                 
-                <button type="submit" class="modal-submit-btn">जानकारी सुरक्षित करें (Save Profile)</button>
+                <button type="submit" id="leadSubmitBtn" class="modal-submit-btn">जानकारी सुरक्षित करें (Save Profile)</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Persistent 100% Profile Incomplete Nudge Popup (Shown until 100% filled) -->
+    <div id="profile100NudgePopup" style="display: none; position: fixed; bottom: 85px; right: 20px; z-index: 999; max-width: 360px; background: #ffffff; border: 2px solid #f59e0b; border-radius: 12px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); animation: bounce 1s ease-in-out;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+            <div style="display: flex; gap: 10px;">
+                <span style="font-size: 1.6rem;">⚠️</span>
+                <div>
+                    <div style="font-weight: 800; font-size: 0.88rem; color: #b45309;">
+                        प्रोफाइल अधूरी है (<span id="nudgePercentText">0%</span>)
+                    </div>
+                    <p style="font-size: 0.78rem; color: #475569; margin: 4px 0 8px 0; line-height: 1.4;">
+                        रेफरल रिवॉर्ड्स और सभी VIP फीचर्स पाने के लिए 100% प्रोफाइल पूरी करना अनिवार्य है।
+                    </p>
+                    <button onclick="openLeadModal()" style="background: #f59e0b; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
+                        ✨ अभी 100% पूरी करें
+                    </button>
+                </div>
+            </div>
+            <button onclick="document.getElementById('profile100NudgePopup').style.display='none'" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
         </div>
     </div>
 

@@ -377,7 +377,7 @@ body {
     }
 
     .brand-title {
-        display: none; /* छोटी स्क्रीन पर केवल लोगो दिखेगा */
+        display: none;
     }
 
     .page-main-title {
@@ -392,5 +392,40 @@ body {
     .invoice-btn {
         width: 100%;
         text-align: center;
+    }
+}
+
+/* =========================
+   Print Styles for Invoice
+========================= */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #invoiceModal, #invoiceModal * {
+        visibility: visible;
+    }
+    #invoiceModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #fff !important;
+        padding: 0;
+        display: block !important;
+    }
+    .invoice-modal-card {
+        background: #fff !important;
+        color: #000 !important;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    .invoice-modal-header, .invoice-modal-footer button {
+        display: none !important;
+    }
+    .invoice-modal-body * {
+        color: #000 !important;
     }
 }

@@ -254,7 +254,12 @@
       <!-- Hero Banner -->
       <div class="ucas-hero-banner">
         <div class="ucas-hero-content">
-          <h2>नमस्ते, <span id="ucas-hero-user-name">प्रिय सदस्य</span> 👋</h2>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:6px;">
+            <h2 style="margin:0;">नमस्ते, <span id="ucas-hero-user-name">प्रिय सदस्य</span> 👋</h2>
+            <span id="ucas-user-status-badge" style="display:inline-flex; align-items:center; gap:5px; font-size:0.78rem; font-weight:800; padding:4px 12px; border-radius:20px; background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.4);">
+              <i class="fa-solid fa-circle-check"></i> <span id="ucas-user-status-text">🟢 Active Subscriber</span>
+            </span>
+          </div>
           <p>आपके अपने यूनिवर्सल कस्टमर एक्विजिशन सिस्टम (UCAS V1) में आपका स्वागत है। अपने संपर्कों को व्यवस्थित करें, सर्वे भरें और 1-क्लिक में मार्केटिंग संदेश साझा करें।</p>
           <div class="ucas-hero-stats">
             <div class="ucas-hero-pill">
@@ -263,10 +268,80 @@
             <div class="ucas-hero-pill">
               <i class="fa-solid fa-phone"></i> <span id="ucas-hero-mobile">---</span>
             </div>
-            <div class="ucas-hero-pill">
-              <i class="fa-solid fa-circle-check" style="color:#A7F3D0;"></i> Verified Member
+            <div class="ucas-hero-pill" id="ucas-hero-netsurf-pill" style="display:none;">
+              <i class="fa-solid fa-briefcase"></i> NetSurf ID: <strong id="ucas-hero-netsurf-id">---</strong>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- 365-Day Subscription Countdown Card (For Active Users in UCAS) -->
+      <div id="ucas-active-subscription-card" style="display: none; background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); color: #ecfdf5; border-radius: var(--radius-md, 10px); padding: 12px 18px; margin-bottom: 1.25rem; border: 1px solid #10b981; box-shadow: 0 4px 14px rgba(6,78,59,0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;">👑</span>
+            <div>
+              <div style="font-size: 0.92rem; font-weight: 800; color: #34d399; display: flex; align-items: center; gap: 6px;">
+                <span>Aarogyam VIP Annual Pass (365 Days Access)</span>
+                <span style="background: #059669; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px;">ACTIVE</span>
+              </div>
+              <div style="font-size: 0.78rem; color: #a7f3d0; margin-top: 2px;">
+                📅 आज की सब्सक्राइब डेट: <strong id="ucas-sub-start-date">--/--/----</strong> &nbsp;•&nbsp; 🔄 अगला रिन्यूअल: <strong id="ucas-sub-end-date">--/--/----</strong>
+              </div>
+            </div>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 6px 14px; text-align: center;">
+            <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700;">वैधता शेष</div>
+            <div id="ucas-sub-days-badge" style="font-size: 1.1rem; font-weight: 900; color: #fbbf24;">⏳ 365 दिन शेष</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic Color-Changing Subscription Upgrade KPI Card (For Inactive Users in UCAS) -->
+      <div id="ucas-inactive-subscription-banner" style="display: none; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fee2e2 100%); border: 1.5px solid #f59e0b; border-radius: var(--radius-md, 10px); padding: 14px 18px; margin-bottom: 1.25rem; box-shadow: 0 4px 14px rgba(245,158,11,0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div style="flex: 2; min-width: 260px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.96rem; color: #b45309;">
+              <span>🔥</span>
+              <span>Aarogyam VIP 365-Day Subscription Offer!</span>
+              <span style="background: #ef4444; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px;">LIMITED OFFER</span>
+            </div>
+            <p style="font-size: 0.86rem; color: #451a03; margin: 4px 0 0 0; line-height: 1.4;">
+              <strong>₹999</strong> का वार्षिक सब्सक्रिप्शन अभी <strong>मात्र ₹99 में!</strong> कोई भी 1 ई-बुक लेकर तुरंत VIP सब्सक्रिप्शन + UCAS मार्केटिंग टूल्स 365 दिनों के लिए एक्टिव करें।
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <a href="/ebooks/my-library.html" style="background: #d97706; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(217,119,6,0.3);">
+              <span>📚</span> My Library से ₹99 में एक्टिव करें
+            </a>
+            <a href="https://wa.me/917974422572?text=नमस्ते%20Aarogyam%20India,%20मुझे%20₹99%20वाले%20VIP%20सब्सक्रिप्शन%20ऑफर%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" style="background: #25D366; color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+              <i class="fa-brands fa-whatsapp"></i> पूछताछ
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Completion Progress Bar Card (Identical to My Library) -->
+      <div class="ucas-card" style="margin-bottom:1.25rem; background: #fff; padding: 14px 18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
+          <div>
+            <div style="font-weight:800; font-size:0.92rem; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+              <span>📊</span> <span>प्रोफाइल पूर्णता (Profile Completion)</span>
+              <span id="ucas-profile-status-hint" style="font-size:0.76rem; color:#d97706; font-weight:700;">(अधूरी है)</span>
+            </div>
+            <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">
+              सभी UCAS फीचर्स, रेफरल अर्निंग और नेटसर्फ आईडी जोड़ने के लिए 100% प्रोफाइल पूरा करें।
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <strong id="ucas-profile-percent-text" style="color:var(--primary); font-size:1.15rem; font-weight:900;">0%</strong>
+            <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-primary" onclick="openLeadModal()" style="font-weight:700; font-size:0.8rem; padding:6px 14px;">
+              <i class="fa-solid fa-user-pen"></i> Update Profile
+            </button>
+          </div>
+        </div>
+        <div style="width:100%; height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden;">
+          <div id="ucas-profile-progress-bar" style="width:0%; height:100%; background:linear-gradient(90deg, #10b981, #059669); border-radius:4px; transition:width 0.4s ease;"></div>
         </div>
       </div>
 
@@ -1502,14 +1577,105 @@
   </div>
 </div>
 
-<!-- Modal: Webinar Attendees Inspection -->
-<div id="ucas-modal-webinar-attendees" class="ucas-modal-overlay">
-  <div class="ucas-modal" style="max-width:580px;">
-    <div class="ucas-modal-header">
-      <div class="ucas-card-title"><i class="fa-solid fa-users"></i> <span id="ucas-wb-attendees-modal-title">Webinar Attendees</span></div>
-      <button class="ucas-modal-close">&times;</button>
+<!-- Modal: Detailed Profile Update Form (Identical to My Library with NetSurf ID) -->
+<div id="leadModal" class="ucas-modal-overlay" style="display:none; align-items:center; justify-content:center;">
+  <div class="ucas-modal" style="max-width:480px; max-height:90vh; overflow-y:auto; padding:22px; border-radius:14px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:1.4rem;">👤</span>
+        <h3 style="margin:0; font-size:1.15rem; color:var(--text-main);">पूर्ण प्रोफाइल जानकारी अपडेट करें</h3>
+      </div>
+      <button type="button" class="ucas-modal-close" onclick="closeLeadModal()" style="font-size:24px; background:none; border:none; color:var(--text-muted); cursor:pointer;">&times;</button>
     </div>
-    <div id="ucas-wb-attendees-modal-body" style="padding:10px 0;"></div>
+    <form id="ucasLeadForm" onsubmit="submitLeadForm(event)">
+      <div class="ucas-form-group">
+        <label class="ucas-label">पूरा नाम (Full Name) *</label>
+        <input type="text" id="leadName" class="ucas-input" placeholder="आपका पूरा नाम" required>
+      </div>
+      <div class="ucas-form-group">
+        <label class="ucas-label">मोबाइल नंबर (Mobile) *</label>
+        <input type="tel" id="leadPhone" class="ucas-input" placeholder="10 अंकों का मोबाइल नंबर" required readonly style="background:#f1f5f9; cursor:not-allowed;">
+      </div>
+      
+      <!-- NetSurf ID Input (Requested by User) -->
+      <div class="ucas-form-group">
+        <label class="ucas-label" style="color:#0284c7; font-weight:800;">💼 NetSurf ID (यदि उपलब्ध हो):</label>
+        <input type="text" id="leadNetsurfId" class="ucas-input" placeholder="उदा. NS123456" style="border-color:#38bdf8; background:#f0f9ff;">
+        <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">NetSurf डायरेक्ट सेलर / डिस्ट्रीब्यूटर आईडी</div>
+      </div>
+
+      <div class="ucas-form-group">
+        <label class="ucas-label">ईमेल आईडी (Email Address)</label>
+        <input type="email" id="leadEmail" class="ucas-input" placeholder="उदा. rahul@gmail.com">
+      </div>
+
+      <div class="ucas-form-group">
+        <label class="ucas-label">लिंग (Gender)</label>
+        <select id="leadGender" class="ucas-select">
+          <option value="" disabled selected>लिंग चुनें (Select Gender)</option>
+          <option value="Male">पुरुष (Male)</option>
+          <option value="Female">महिला (Female)</option>
+          <option value="Other">अन्य (Other)</option>
+        </select>
+      </div>
+
+      <div class="ucas-grid-2">
+        <div class="ucas-form-group">
+          <label class="ucas-label">राज्य (State)</label>
+          <input type="text" id="leadState" class="ucas-input" placeholder="उदा. मध्य प्रदेश">
+        </div>
+        <div class="ucas-form-group">
+          <label class="ucas-label">जन्म तिथि (DOB)</label>
+          <input type="date" id="leadDob" class="ucas-input" title="जन्म तिथि">
+        </div>
+      </div>
+
+      <div class="ucas-grid-2">
+        <div class="ucas-form-group">
+          <label class="ucas-label">शहर / जिला (City / District)</label>
+          <input type="text" id="leadCity" class="ucas-input" placeholder="उदा. रीवा">
+        </div>
+        <div class="ucas-form-group">
+          <label class="ucas-label">व्यवसाय (Occupation)</label>
+          <input type="text" id="leadOccupation" class="ucas-input" placeholder="उदा. किसान / व्यापार">
+        </div>
+      </div>
+
+      <div class="ucas-form-group">
+        <label class="ucas-label">रुचि (Interest)</label>
+        <input type="text" id="leadInterest" class="ucas-input" placeholder="उदा. जैविक कृषि, स्वास्थ्य">
+      </div>
+
+      <div class="ucas-form-group">
+        <label class="ucas-label">पूरा पता (Full Address)</label>
+        <textarea id="leadAddress" class="ucas-textarea" rows="2" placeholder="मकान नं, ग्राम, पोस्ट, पिन कोड..."></textarea>
+      </div>
+
+      <button type="submit" id="leadSubmitBtn" class="ucas-btn ucas-btn-primary ucas-btn-block" style="padding:12px; font-size:1rem; justify-content:center; margin-top:8px;">
+        ✨ जानकारी सुरक्षित करें (Save Profile)
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Persistent 100% Profile Incomplete Nudge Popup in UCAS (Shown until 100% filled) -->
+<div id="profile100NudgePopup" style="display: none; position: fixed; bottom: 85px; right: 20px; z-index: 999; max-width: 360px; background: #ffffff; border: 2px solid #f59e0b; border-radius: 12px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); animation: bounce 1s ease-in-out;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+    <div style="display: flex; gap: 10px;">
+      <span style="font-size: 1.6rem;">⚠️</span>
+      <div>
+        <div style="font-weight: 800; font-size: 0.88rem; color: #b45309;">
+          प्रोफाइल अधूरी है (<span id="nudgePercentText">0%</span>)
+        </div>
+        <p style="font-size: 0.78rem; color: #475569; margin: 4px 0 8px 0; line-height: 1.4;">
+          रेफरल रिवॉर्ड्स और सभी VIP फीचर्स पाने के लिए 100% प्रोफाइल पूरी करना अनिवार्य है।
+        </p>
+        <button type="button" onclick="openLeadModal()" style="background: #f59e0b; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
+          ✨ अभी 100% पूरी करें
+        </button>
+      </div>
+    </div>
+    <button type="button" onclick="document.getElementById('profile100NudgePopup').style.display='none'" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
   </div>
 </div>
 

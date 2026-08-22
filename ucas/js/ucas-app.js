@@ -234,7 +234,7 @@
   }
 
   // ==========================================
-  // USER PROFILE & KPI CALCULATION
+  // USER PROFILE, SUBSCRIPTION TIMER & PROGRESS
   // ==========================================
 
   async function loadUserProfileAndPermissions() {
@@ -242,6 +242,7 @@
     const name = user.full_name || user.name || 'Aarogyam Member';
     const mobile = user.mobile || '';
     const shareId = window.UCAS_SESSION.getShareId();
+    const netsurfId = user.netsurf_id || '';
 
     // Populate Header Elements
     const nameEls = document.querySelectorAll('.ucas-user-name');
@@ -256,10 +257,25 @@
     const heroName = document.getElementById('ucas-hero-user-name');
     const heroShareId = document.getElementById('ucas-hero-share-id');
     const heroMobile = document.getElementById('ucas-hero-mobile');
+    const heroNetsurfPill = document.getElementById('ucas-hero-netsurf-pill');
+    const heroNetsurfId = document.getElementById('ucas-hero-netsurf-id');
 
     if (heroName) heroName.textContent = name;
     if (heroShareId) heroShareId.textContent = shareId;
     if (heroMobile) heroMobile.textContent = mobile;
+
+    if (netsurfId && heroNetsurfPill && heroNetsurfId) {
+      heroNetsurfPill.style.display = 'inline-flex';
+      heroNetsurfId.textContent = netsurfId;
+    } else if (heroNetsurfPill) {
+      heroNetsurfPill.style.display = 'none';
+    }
+
+    // 🟢 Active / Inactive Status & 365-Day Subscription Timer
+    updateUcasSubscriptionState(user);
+
+    // 📊 Profile Completion Progress Calculation
+    calculateUcasProfileProgress(user);
 
     // Load User Permissions
     await window.UCAS_PERMISSIONS.loadUserPermissions(user.id);
@@ -272,6 +288,206 @@
       adminNavItems.forEach(el => el.style.display = 'none');
     }
   }
+
+  function updateUcasSubscriptionState(user) {
+    const isActive = Boolean(user.is_active || user.is_subscriber || user.status === 'active');
+    const badgeEl = document.getElementById('ucas-user-status-badge');
+    const badgeText = document.getElementById('ucas-user-status-text');
+    const activeCard = document.getElementById('ucas-active-subscription-card');
+    const inactiveBanner = document.getElementById('ucas-inactive-subscription-banner');
+
+    if (badgeEl && badgeText) {
+      if (isActive) {
+        badgeEl.style.background = 'rgba(16,185,129,0.2)';
+        badgeEl.style.color = '#fff';
+        badgeEl.style.borderColor = 'rgba(16,185,129,0.5)';
+        badgeText.textContent = '🟢 Active VIP Subscriber';
+      } else {
+        badgeEl.style.background = 'rgba(239,68,68,0.2)';
+        badgeEl.style.color = '#fff';
+        badgeEl.style.borderColor = 'rgba(239,68,68,0.4)';
+        badgeText.textContent = '🔴 Inactive / Free Member';
+      }
+    }
+
+    if (isActive) {
+      if (activeCard) activeCard.style.display = 'block';
+      if (inactiveBanner) inactiveBanner.style.display = 'none';
+
+      // 365-Day Timer Calculation
+      const regDateStr = user.created_at || user.subscribed_at || new Date().toISOString();
+      const startDate = new Date(regDateStr);
+      const endDate = new Date(startDate.getTime() + (365 * 24 * 60 * 60 * 1000));
+      const now = new Date();
+
+      const diffTime = endDate - now;
+      const daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+      const subStartDateEl = document.getElementById('ucas-sub-start-date');
+      const subEndDateEl = document.getElementById('ucas-sub-end-date');
+      const daysBadge = document.getElementById('ucas-sub-days-badge');
+
+      if (subStartDateEl) subStartDateEl.textContent = startDate.toLocaleDateString('hi-IN');
+      if (subEndDateEl) subEndDateEl.textContent = endDate.toLocaleDateString('hi-IN');
+      if (daysBadge) daysBadge.textContent = `⏳ ${daysLeft} दिन शेष`;
+    } else {
+      if (activeCard) activeCard.style.display = 'none';
+      if (inactiveBanner) inactiveBanner.style.display = 'block';
+    }
+  }
+
+  function calculateUcasProfileProgress(user) {
+    let score = 0;
+    const totalFields = 11; // 11 fields including NetSurf ID
+
+    if (user.full_name || user.name) score++;
+    if (user.mobile) score++;
+    if (user.email) score++;
+    if (user.gender) score++;
+    if (user.state || user.State) score++;
+    if (user.dob && String(user.dob).trim()) score++;
+    if (user.district || user.city) score++;
+    if (user.address) score++;
+    if (user.occupation) score++;
+    if (user.interest) score++;
+    if (user.netsurf_id && String(user.netsurf_id).trim()) score++;
+
+    const percentage = Math.min(100, Math.round((score / totalFields) * 100));
+
+    const percentText = document.getElementById('ucas-profile-percent-text');
+    const progressBar = document.getElementById('ucas-profile-progress-bar');
+    const statusHint = document.getElementById('ucas-profile-status-hint');
+    const nudgePopup = document.getElementById('profile100NudgePopup');
+    const nudgePercent = document.getElementById('nudgePercentText');
+
+    if (percentText) percentText.textContent = `${percentage}%`;
+    if (progressBar) {
+      progressBar.style.width = `${percentage}%`;
+      if (percentage === 100) {
+        progressBar.style.background = '#10b981';
+      } else if (percentage >= 60) {
+        progressBar.style.background = 'linear-gradient(90deg, #f59e0b, #10b981)';
+      } else {
+        progressBar.style.background = '#f59e0b';
+      }
+    }
+
+    if (statusHint) {
+      if (percentage === 100) {
+        statusHint.textContent = '🟢 (100% पूर्ण)';
+        statusHint.style.color = '#10b981';
+      } else {
+        statusHint.textContent = `⚠️ (केवल ${percentage}% पूर्ण — 100% पूरा करें)`;
+        statusHint.style.color = '#d97706';
+      }
+    }
+
+    // Persistent Popup Reminder if < 100%
+    if (nudgePopup) {
+      if (percentage < 100 && (user.id || user.mobile)) {
+        nudgePopup.style.display = 'block';
+        if (nudgePercent) nudgePercent.textContent = `${percentage}%`;
+      } else {
+        nudgePopup.style.display = 'none';
+      }
+    }
+  }
+
+  // Profile Modal Global Handlers
+  window.openLeadModal = function() {
+    const user = window.UCAS_SESSION.getCurrentUser() || {};
+    const modal = document.getElementById('leadModal');
+    if (!modal) return;
+
+    if (document.getElementById('leadName')) document.getElementById('leadName').value = user.full_name || user.name || '';
+    if (document.getElementById('leadPhone')) document.getElementById('leadPhone').value = user.mobile || '';
+    if (document.getElementById('leadNetsurfId')) document.getElementById('leadNetsurfId').value = user.netsurf_id || '';
+    if (document.getElementById('leadEmail')) document.getElementById('leadEmail').value = user.email || '';
+    if (document.getElementById('leadGender')) document.getElementById('leadGender').value = user.gender || '';
+    if (document.getElementById('leadState')) document.getElementById('leadState').value = user.state || user.State || '';
+    if (document.getElementById('leadDob')) document.getElementById('leadDob').value = user.dob || '';
+    if (document.getElementById('leadCity')) document.getElementById('leadCity').value = user.city || user.district || '';
+    if (document.getElementById('leadOccupation')) document.getElementById('leadOccupation').value = user.occupation || '';
+    if (document.getElementById('leadInterest')) document.getElementById('leadInterest').value = user.interest || '';
+    if (document.getElementById('leadAddress')) document.getElementById('leadAddress').value = user.address || '';
+
+    modal.style.display = 'flex';
+  };
+
+  window.closeLeadModal = function() {
+    const modal = document.getElementById('leadModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.submitLeadForm = async function(event) {
+    if (event) event.preventDefault();
+
+    const fullName = document.getElementById('leadName')?.value.trim();
+    const mobile = document.getElementById('leadPhone')?.value.trim();
+    const netsurfId = document.getElementById('leadNetsurfId')?.value.trim() || null;
+    const email = document.getElementById('leadEmail')?.value.trim() || null;
+    const gender = document.getElementById('leadGender')?.value || null;
+    const state = document.getElementById('leadState')?.value.trim() || null;
+    const dob = document.getElementById('leadDob')?.value.trim() || null;
+    const city = document.getElementById('leadCity')?.value.trim() || null;
+    const occupation = document.getElementById('leadOccupation')?.value.trim() || null;
+    const interest = document.getElementById('leadInterest')?.value.trim() || null;
+    const address = document.getElementById('leadAddress')?.value.trim() || null;
+
+    if (!fullName || !mobile) {
+      alert('कृपया नाम और मोबाइल नंबर दर्ज करें।');
+      return;
+    }
+
+    const user = window.UCAS_SESSION.getCurrentUser() || {};
+    if (!user.id) {
+      alert('लॉगिन सेशन नहीं मिला।');
+      return;
+    }
+
+    const profileData = {
+      full_name: fullName,
+      netsurf_id: netsurfId,
+      email: email,
+      gender: gender,
+      dob: dob,
+      State: state,
+      district: city,
+      address: address,
+      occupation: occupation,
+      interest: interest
+    };
+
+    const submitBtn = document.getElementById('leadSubmitBtn');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> सेव हो रहा है...';
+    }
+
+    try {
+      const db = window.dbClient || window.supabase;
+      if (db) {
+        await db.from('profiles').update(profileData).eq('id', user.id);
+      }
+
+      const updatedUser = { ...user, ...profileData };
+      localStorage.setItem('UCAS_USER', JSON.stringify(updatedUser));
+      localStorage.setItem('AI_USER', JSON.stringify(updatedUser));
+      if (typeof ProfileStorage !== 'undefined') ProfileStorage.save(updatedUser);
+
+      alert('🎉 बधाई हो! आपकी प्रोफाइल (NetSurf ID सहित) सफलतापूर्वक सहेज ली गई है।');
+      window.closeLeadModal();
+      await loadUserProfileAndPermissions();
+    } catch (err) {
+      console.error('UCAS Profile update error', err);
+      alert('प्रोफाइल सेव करने में समस्या आई।');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '✨ जानकारी सुरक्षित करें (Save Profile)';
+      }
+    }
+  };
 
   async function refreshDashboardKPIs(startDate = '', endDate = '') {
     const profileId = window.UCAS_SESSION.getUserId();
