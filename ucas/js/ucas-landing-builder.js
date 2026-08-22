@@ -36,9 +36,15 @@
     const imageInput = document.getElementById('lp_image_file_input');
     imageInput?.addEventListener('change', handleImageUpload);
 
-    // YouTube URL input
+    // YouTube URL input (multi-event listener for instant detection)
     const ytInput = document.getElementById('lp_youtube_url_input');
-    ytInput?.addEventListener('input', (e) => handleYoutubeInput(e.target.value));
+    if (ytInput) {
+      ['input', 'paste', 'change', 'blur'].forEach(evtType => {
+        ytInput.addEventListener(evtType, (e) => {
+          setTimeout(() => handleYoutubeInput(ytInput.value), 20);
+        });
+      });
+    }
 
     // Form submit / update
     const generateBtn = document.getElementById('lp_btn_generate');
@@ -112,11 +118,11 @@
     reader.onload = (event) => {
       const img = new Image();
       img.onload = () => {
-        // Downscale image to max 900px width/height for fast loading & storage
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const maxDim = 900;
+        // High Definition scaling: 1920px max dimension for crystal-clear quality
+        const maxDim = 1920;
 
         if (width > maxDim || height > maxDim) {
           if (width > height) {
@@ -130,10 +136,14 @@
 
         canvas.width = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: file.type === 'image/png' });
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
-        uploadedImageData = canvas.toDataURL('image/jpeg', 0.82);
+        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        const quality = mimeType === 'image/jpeg' ? 0.92 : undefined;
+        uploadedImageData = canvas.toDataURL(mimeType, quality);
         updateBuilderPreview();
       };
       img.src = event.target.result;
@@ -147,15 +157,34 @@
 
   function extractYoutubeVideoId(url) {
     if (!url) return null;
-    const str = url.trim();
+    const str = String(url).trim();
+    if (!str) return null;
 
-    // Regex matching: youtu.be/xxx, watch?v=xxx, shorts/xxx, embed/xxx
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = str.match(regExp);
-
-    if (match && match[2] && match[2].length === 11) {
-      return match[2];
+    // Direct 11 character video ID
+    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) {
+      return str;
     }
+
+    // Comprehensive URL patterns: watch?v=, youtu.be/, shorts/, live/, embed/, v/
+    const patterns = [
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/,
+      /[?&]v=([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    ];
+
+    for (const pattern of patterns) {
+      const match = str.match(pattern);
+      if (match && match[1] && match[1].length === 11) {
+        return match[1];
+      }
+    }
+
+    // Fallback: search for 11 character sequence
+    const genericMatch = str.match(/(?:[\/=])([a-zA-Z0-9_-]{11})(?:[?&#/]|$)/);
+    if (genericMatch && genericMatch[1] && genericMatch[1].length === 11) {
+      return genericMatch[1];
+    }
+
     return null;
   }
 
@@ -173,7 +202,7 @@
       detectedYoutubeId = null;
       detectedYoutubeThumbnail = null;
       if (helperEl) {
-        helperEl.innerHTML = `<span style="color:var(--text-muted);">उदा. https://youtu.be/dQw4w9WgXcQ या https://youtube.com/shorts/...</span>`;
+        helperEl.innerHTML = `<span style="color:var(--text-muted);">उदा. https://youtu.be/dQw4w9WgXcQ या https://youtube.com/shorts/... या https://youtube.com/live/...</span>`;
       }
     }
 
@@ -191,7 +220,7 @@
     if (activeContentType === 'image') {
       if (uploadedImageData) {
         previewMedia.innerHTML = `
-          <img src="${uploadedImageData}" alt="Uploaded Preview" style="width:100%;max-height:220px;object-fit:cover;border-radius:var(--radius-md);border:1px solid #E2E8F0;">
+          <img src="${uploadedImageData}" alt="Uploaded Preview" style="width:100%;max-height:260px;object-fit:contain;background:#0f172a;border-radius:var(--radius-md);border:1px solid #E2E8F0;image-rendering:-webkit-optimize-contrast;">
         `;
       } else {
         previewMedia.innerHTML = `
@@ -247,9 +276,15 @@
       return;
     }
 
-    if (activeContentType === 'youtube' && !detectedYoutubeId) {
-      window.UCAS_APP.showToast('कृपया मान्य YouTube वीडियो लिंक दर्ज करें।', 'error');
-      return;
+    if (activeContentType === 'youtube') {
+      const ytRaw = (document.getElementById('lp_youtube_url_input')?.value || '').trim();
+      const videoId = extractYoutubeVideoId(ytRaw) || detectedYoutubeId;
+      if (!videoId) {
+        window.UCAS_APP.showToast('कृपया मान्य YouTube वीडियो लिंक दर्ज करें।', 'error');
+        return;
+      }
+      detectedYoutubeId = videoId;
+      detectedYoutubeThumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
     }
 
     const profileId = window.UCAS_SESSION.getUserId();
@@ -328,6 +363,9 @@
           showGeneratedResult({ ...updatePayload, share_id: shareId });
           cancelEdit();
           await loadMyLandingPages();
+          if (window.UCAS_MARKETING && typeof window.UCAS_MARKETING.refreshLandingPages === 'function') {
+            await window.UCAS_MARKETING.refreshLandingPages();
+          }
         } else {
           window.UCAS_APP.showToast('अपडेट करने में त्रुटि: ' + (res.message || ''), 'error');
         }
@@ -382,6 +420,9 @@
           showGeneratedResult(payload);
           resetBuilderForm();
           await loadMyLandingPages();
+          if (window.UCAS_MARKETING && typeof window.UCAS_MARKETING.refreshLandingPages === 'function') {
+            await window.UCAS_MARKETING.refreshLandingPages();
+          }
         } else {
           window.UCAS_APP.showToast('लैंडिंग पेज बनाने में त्रुटि: ' + (res.message || ''), 'error');
         }
@@ -497,6 +538,9 @@
           cancelEdit();
         }
         await loadMyLandingPages();
+        if (window.UCAS_MARKETING && typeof window.UCAS_MARKETING.refreshLandingPages === 'function') {
+          await window.UCAS_MARKETING.refreshLandingPages();
+        }
       } else {
         window.UCAS_APP.showToast('हटाने में त्रुटि: ' + (res.message || ''), 'error');
       }
@@ -517,10 +561,12 @@
     }
 
     let thumbUrl = lp.thumbnail_url;
+    let ytId = null;
     if (lp.content_type === 'youtube') {
-      const ytId = extractYoutubeId(lp.media_url);
+      ytId = extractYoutubeVideoId(lp.media_url);
       if (ytId) {
         thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        url.searchParams.set('yt', ytId);
       }
     } else if (lp.media_url && !lp.media_url.startsWith('data:')) {
       thumbUrl = lp.media_url;
@@ -528,6 +574,10 @@
 
     if (thumbUrl && !thumbUrl.startsWith('data:')) {
       url.searchParams.set('thumb', thumbUrl);
+    }
+
+    if (lp.message) {
+      url.searchParams.set('desc', lp.message.slice(0, 160));
     }
 
     url.searchParams.set('src', 'ucas_lp_builder');

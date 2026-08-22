@@ -28,9 +28,15 @@
     const imgInput = document.getElementById('wb_image_file_input');
     imgInput?.addEventListener('change', handleWebinarImageUpload);
 
-    // YouTube Input
+    // YouTube Input (multi-event listener)
     const ytInput = document.getElementById('wb_youtube_url_input');
-    ytInput?.addEventListener('input', (e) => handleWebinarYoutubeInput(e.target.value));
+    if (ytInput) {
+      ['input', 'paste', 'change', 'blur'].forEach(evtType => {
+        ytInput.addEventListener(evtType, (e) => {
+          setTimeout(() => handleWebinarYoutubeInput(ytInput.value), 20);
+        });
+      });
+    }
 
     // Submit / Generate Button
     const btnSubmit = document.getElementById('wb_btn_generate');
@@ -79,16 +85,21 @@
         const canvas = document.createElement('canvas');
         let w = img.width;
         let h = img.height;
-        const maxD = 900;
+        const maxD = 1920;
         if (w > maxD || h > maxD) {
           if (w > h) { h = Math.round((h * maxD) / w); w = maxD; }
           else { w = Math.round((w * maxD) / h); h = maxD; }
         }
         canvas.width = w;
         canvas.height = h;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: file.type === 'image/png' });
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, w, h);
-        uploadedWebinarImageData = canvas.toDataURL('image/jpeg', 0.82);
+
+        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        const quality = mimeType === 'image/jpeg' ? 0.92 : undefined;
+        uploadedWebinarImageData = canvas.toDataURL(mimeType, quality);
         updateWebinarPreview();
       };
       img.src = evt.target.result;
@@ -96,9 +107,39 @@
     reader.readAsDataURL(file);
   }
 
+  function extractYoutubeVideoId(url) {
+    if (!url) return null;
+    const str = String(url).trim();
+    if (!str) return null;
+
+    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) {
+      return str;
+    }
+
+    const patterns = [
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/,
+      /[?&]v=([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    ];
+
+    for (const pattern of patterns) {
+      const match = str.match(pattern);
+      if (match && match[1] && match[1].length === 11) {
+        return match[1];
+      }
+    }
+
+    const genericMatch = str.match(/(?:[\/=])([a-zA-Z0-9_-]{11})(?:[?&#/]|$)/);
+    if (genericMatch && genericMatch[1] && genericMatch[1].length === 11) {
+      return genericMatch[1];
+    }
+
+    return null;
+  }
+
   function handleWebinarYoutubeInput(url) {
-    const match = (url || '').match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-    detectedWebinarYtId = (match && match[2] && match[2].length === 11) ? match[2] : null;
+    const videoId = extractYoutubeVideoId(url);
+    detectedWebinarYtId = videoId;
     updateWebinarPreview();
   }
 
@@ -107,7 +148,7 @@
     if (!container) return;
 
     if (activeWebinarContentType === 'image' && uploadedWebinarImageData) {
-      container.innerHTML = `<img src="${uploadedWebinarImageData}" style="width:100%;max-height:180px;object-fit:cover;border-radius:var(--radius-md);" alt="Webinar Banner">`;
+      container.innerHTML = `<img src="${uploadedWebinarImageData}" style="width:100%;max-height:220px;object-fit:contain;background:#0f172a;border-radius:var(--radius-md);image-rendering:-webkit-optimize-contrast;" alt="Webinar Banner">`;
     } else if (activeWebinarContentType === 'youtube' && detectedWebinarYtId) {
       container.innerHTML = `
         <div style="position:relative;border-radius:var(--radius-md);overflow:hidden;background:#000;">
@@ -149,6 +190,16 @@
     if (!zoomLink && !meetingId) {
       window.UCAS_APP.showToast('कृपया Zoom Join Link या Meeting ID अवश्य दर्ज करें।', 'error');
       return;
+    }
+
+    if (activeWebinarContentType === 'youtube') {
+      const ytRaw = (document.getElementById('wb_youtube_url_input')?.value || '').trim();
+      const videoId = extractYoutubeVideoId(ytRaw) || detectedWebinarYtId;
+      if (!videoId) {
+        window.UCAS_APP.showToast('कृपया मान्य YouTube वीडियो लिंक दर्ज करें।', 'error');
+        return;
+      }
+      detectedWebinarYtId = videoId;
     }
 
     const profileId = window.UCAS_SESSION.getUserId();
@@ -193,6 +244,9 @@
           window.UCAS_APP.showToast(`✅ वेबिनार (${lpId}) सफलतापूर्वक अपडेट हुआ!`, 'success');
           cancelWebinarEdit();
           await loadWebinars();
+          if (window.UCAS_MARKETING && typeof window.UCAS_MARKETING.refreshLandingPages === 'function') {
+            await window.UCAS_MARKETING.refreshLandingPages();
+          }
         } else {
           window.UCAS_APP.showToast('अपडेट त्रुटि: ' + (res.message || ''), 'error');
         }
@@ -245,6 +299,9 @@
           showGeneratedWebinarResult(payload);
           resetWebinarForm();
           await loadWebinars();
+          if (window.UCAS_MARKETING && typeof window.UCAS_MARKETING.refreshLandingPages === 'function') {
+            await window.UCAS_MARKETING.refreshLandingPages();
+          }
         } else {
           window.UCAS_APP.showToast('बनाने में त्रुटि: ' + (res.message || ''), 'error');
         }
@@ -350,9 +407,27 @@
     url.searchParams.set('id', lp.id);
     url.searchParams.set('share_id', lp.share_id || window.UCAS_SESSION.getShareId());
     if (lp.title) url.searchParams.set('title', lp.title);
-    if (lp.thumbnail_url && !lp.thumbnail_url.startsWith('data:')) {
-      url.searchParams.set('thumb', lp.thumbnail_url);
+
+    let thumbUrl = lp.thumbnail_url;
+    let ytId = null;
+    if (lp.content_type === 'youtube') {
+      ytId = extractYoutubeVideoId(lp.media_url);
+      if (ytId) {
+        thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        url.searchParams.set('yt', ytId);
+      }
+    } else if (lp.media_url && !lp.media_url.startsWith('data:')) {
+      thumbUrl = lp.media_url;
     }
+
+    if (thumbUrl && !thumbUrl.startsWith('data:')) {
+      url.searchParams.set('thumb', thumbUrl);
+    }
+
+    if (lp.message) {
+      url.searchParams.set('desc', lp.message.slice(0, 160));
+    }
+
     url.searchParams.set('src', 'ucas_webinar');
     return url.toString();
   }
@@ -691,6 +766,9 @@
       if (res.success) {
         window.UCAS_APP.showToast('✅ वेबिनार सफलतापूर्वक हटा दिया गया।', 'success');
         await loadWebinars();
+        if (window.UCAS_MARKETING && typeof window.UCAS_MARKETING.refreshLandingPages === 'function') {
+          await window.UCAS_MARKETING.refreshLandingPages();
+        }
       }
     } catch (e) {
       console.error('Delete webinar error', e);

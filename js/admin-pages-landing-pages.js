@@ -37,6 +37,7 @@ export async function initAllLandingPages() {
   // User Target Mode: 'single' | 'multi' | 'all'
   let targetUserMode = 'single';
   let multiSelectedUserIds = new Set();
+  let selectedLandingPageIds = new Set();
 
   content.innerHTML = `
     <!-- Top Header & Action Controls -->
@@ -183,10 +184,13 @@ export async function initAllLandingPages() {
               <option value="agriculture">🌾 Agriculture (कृषि समाधान)</option>
               <option value="healthcare">🩺 Healthcare (स्वास्थ्य एवं पोषण)</option>
               <option value="wealth">💰 Wealth & Business (व्यापार एवं आय)</option>
+              <option value="insurance">🛡️ Insurance (बीमा एवं सुरक्षा)</option>
+              <option value="property">🏢 Property (प्रॉपर्टी एवं रियल एस्टेट)</option>
               <option value="women_empowerment">👩 Women Empowerment (महिला सशक्तिकरण)</option>
               <option value="cattlecare">🐄 Cattle Care (पशु पालन)</option>
               <option value="beautycare">✨ Beauty Care (सौंदर्य देखभाल)</option>
               <option value="webinar">🎥 Webinar Invitation (वेबिनार आमंत्रण)</option>
+              <option value="other">📦 Other / General (सामान्य)</option>
             </select>
           </div>
 
@@ -313,13 +317,16 @@ export async function initAllLandingPages() {
           <option value="type_webinar">🎥 Webinar Invitations</option>
         </optgroup>
         <optgroup label="Categories">
-          <option value="agriculture">🌾 Agriculture</option>
-          <option value="healthcare">🩺 Healthcare</option>
-          <option value="wealth">💰 Wealth & Business</option>
+          <option value="agriculture">🌾 Agriculture (कृषि)</option>
+          <option value="healthcare">🩺 Healthcare (स्वास्थ्य)</option>
+          <option value="wealth">💰 Wealth & NetSurf (व्यवसाय)</option>
+          <option value="insurance">🛡️ Insurance (बीमा)</option>
+          <option value="property">🏢 Property (प्रॉपर्टी)</option>
           <option value="women_empowerment">👩 Women Empowerment</option>
-          <option value="cattlecare">🐄 Cattle Care</option>
+          <option value="cattlecare">🐄 Cattle Care (पशु पालन)</option>
           <option value="beautycare">✨ Beauty Care</option>
           <option value="webinar">🎥 Webinar</option>
+          <option value="other">📦 Other / General</option>
         </optgroup>
       </select>
 
@@ -338,6 +345,32 @@ export async function initAllLandingPages() {
         <option value="7days">Last 7 Days</option>
         <option value="30days">Last 30 Days</option>
       </select>
+    </div>
+
+    <!-- =========================================================================
+         BULK ACTIONS TOOLBAR (Select All, Bulk Activate, Bulk Block, Bulk Delete)
+         ========================================================================= -->
+    <div id="lp-bulk-actions-bar" style="display: none; margin-top: 10px; background: linear-gradient(135deg, #1e293b, #0f172a); border: 1.5px solid #3b82f6; border-radius: 10px; padding: 10px 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span id="lp-bulk-selected-count" style="font-weight:800; color:#60a5fa; font-size:0.92rem;">0 पेजेस चुने गए</span>
+        <button type="button" id="btn-bulk-select-all-filtered" class="admin-button small-button" style="background: rgba(59,130,246,0.15); color:#60a5fa; border: 1px solid rgba(59,130,246,0.3); font-size:0.78rem; font-weight:700;">
+          ✓ सभी फ़िल्टर चुने (Select All)
+        </button>
+        <button type="button" id="btn-bulk-deselect-all" class="admin-button small-button" style="background: transparent; border: 1px solid var(--admin-border); color:var(--admin-muted); font-size:0.78rem; font-weight:700;">
+          ✕ अन-सेलेक्ट (Clear)
+        </button>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button type="button" id="btn-bulk-activate" class="admin-button small-button" style="background:#10b981; color:#fff; font-weight:800; font-size:0.82rem; padding:6px 14px; box-shadow:0 2px 8px rgba(16,185,129,0.3);">
+          🟢 सभी सक्रिय करें (Activate Selected)
+        </button>
+        <button type="button" id="btn-bulk-block" class="admin-button small-button" style="background:#f59e0b; color:#fff; font-weight:800; font-size:0.82rem; padding:6px 14px; box-shadow:0 2px 8px rgba(245,158,11,0.3);">
+          🔴 सभी ब्लॉक करें (Block Selected)
+        </button>
+        <button type="button" id="btn-bulk-delete" class="admin-button small-button" style="background:#ef4444; color:#fff; font-weight:800; font-size:0.82rem; padding:6px 14px; box-shadow:0 2px 8px rgba(239,68,68,0.3);">
+          🗑️ सभी हटाएं (Delete Selected)
+        </button>
+      </div>
     </div>
 
     <!-- Table Container -->
@@ -612,24 +645,30 @@ export async function initAllLandingPages() {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_W = 800;
-        const MAX_H = 600;
+        const MAX_DIM = 1920;
         let w = img.width;
         let h = img.height;
 
-        if (w > h && w > MAX_W) {
-          h = Math.round((h * MAX_W) / w);
-          w = MAX_W;
-        } else if (h > MAX_H) {
-          w = Math.round((w * MAX_H) / h);
-          h = MAX_H;
+        if (w > MAX_DIM || h > MAX_DIM) {
+          if (w > h) {
+            h = Math.round((h * MAX_DIM) / w);
+            w = MAX_DIM;
+          } else {
+            w = Math.round((w * MAX_DIM) / h);
+            h = MAX_DIM;
+          }
         }
 
         canvas.width = w;
         canvas.height = h;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: file.type === 'image/png' });
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, w, h);
-        uploadedImageData = canvas.toDataURL('image/jpeg', 0.85);
+
+        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        const quality = mimeType === 'image/jpeg' ? 0.92 : undefined;
+        uploadedImageData = canvas.toDataURL(mimeType, quality);
 
         if (imgPreview) imgPreview.src = uploadedImageData;
         if (imgPreviewWrap) imgPreviewWrap.style.display = 'block';
@@ -639,15 +678,41 @@ export async function initAllLandingPages() {
     reader.readAsDataURL(file);
   });
 
-  // YouTube Live Parsing & Thumbnail Extraction
-  ytUrlInput?.addEventListener('input', (e) => {
-    const val = e.target.value.trim();
-    const ytRegex = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
-    const match = val.match(ytRegex);
+  function extractYoutubeVideoId(url) {
+    if (!url) return null;
+    const str = String(url).trim();
+    if (!str) return null;
 
-    if (match && match[1]) {
-      detectedYoutubeId = match[1];
-      detectedYoutubeThumbnail = `https://img.youtube.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) {
+      return str;
+    }
+
+    const patterns = [
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/,
+      /[?&]v=([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    ];
+
+    for (const pattern of patterns) {
+      const match = str.match(pattern);
+      if (match && match[1] && match[1].length === 11) {
+        return match[1];
+      }
+    }
+
+    const genericMatch = str.match(/(?:[\/=])([a-zA-Z0-9_-]{11})(?:[?&#/]|$)/);
+    if (genericMatch && genericMatch[1] && genericMatch[1].length === 11) {
+      return genericMatch[1];
+    }
+
+    return null;
+  }
+
+  function handleAdminYoutubeInput(val) {
+    const videoId = extractYoutubeVideoId(val);
+    if (videoId) {
+      detectedYoutubeId = videoId;
+      detectedYoutubeThumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
       if (ytPreview) ytPreview.src = detectedYoutubeThumbnail;
       if (ytPreviewWrap) ytPreviewWrap.style.display = 'block';
     } else {
@@ -655,7 +720,16 @@ export async function initAllLandingPages() {
       detectedYoutubeThumbnail = null;
       if (ytPreviewWrap) ytPreviewWrap.style.display = 'none';
     }
-  });
+  }
+
+  // YouTube Live Parsing & Thumbnail Extraction (multi-event)
+  if (ytUrlInput) {
+    ['input', 'paste', 'change', 'blur'].forEach(evtType => {
+      ytUrlInput.addEventListener(evtType, () => {
+        setTimeout(() => handleAdminYoutubeInput(ytUrlInput.value), 20);
+      });
+    });
+  }
 
   // User Selection Badge
   userSelect?.addEventListener('change', () => {
@@ -930,6 +1004,9 @@ export async function initAllLandingPages() {
           <table class="admin-table">
             <thead>
               <tr>
+                <th style="width: 44px; text-align: center;">
+                  <input type="checkbox" disabled style="opacity:0.5;" />
+                </th>
                 <th style="width: 50px;">#</th>
                 <th>Type & ID</th>
                 <th>Title & Preview</th>
@@ -941,7 +1018,7 @@ export async function initAllLandingPages() {
             </thead>
             <tbody>
               <tr>
-                <td colspan="7" style="text-align:center;padding:2.5rem;color:var(--admin-muted);">
+                <td colspan="8" style="text-align:center;padding:2.5rem;color:var(--admin-muted);">
                   <div style="font-size: 2.2rem; margin-bottom: 8px;">📣</div>
                   <div style="font-size:1rem;font-weight:700;color:var(--admin-text);margin-bottom:4px;">कोई लैंडिंग पेज या वेबिनार नहीं मिला</div>
                   <span style="font-size: 0.85rem; color: var(--admin-muted);">ऊपर '+ नया पेज / वेबिनार बनाएं' बटन पर क्लिक करके किसी भी यूजर के लिए पेज बनाएं।</span>
@@ -951,6 +1028,7 @@ export async function initAllLandingPages() {
           </table>
         </div>
       `;
+      updateBulkActionBar();
       return;
     }
 
@@ -963,7 +1041,10 @@ export async function initAllLandingPages() {
         <table class="admin-table">
           <thead>
             <tr>
-              <th style="width: 50px;">#</th>
+              <th style="width: 44px; text-align: center;">
+                <input type="checkbox" id="th-select-all-pages" title="वर्तमान पेज के सभी चुनें" style="width: 17px; height: 17px; accent-color: #3b82f6; cursor: pointer;" />
+              </th>
+              <th style="width: 45px;">#</th>
               <th>Type & ID</th>
               <th>Title & Thumbnail</th>
               <th>Creator (Attribution)</th>
@@ -975,6 +1056,7 @@ export async function initAllLandingPages() {
           <tbody>
             ${pageItems.map((p, idx) => {
               const rowNum = startIndex + idx + 1;
+              const isChecked = selectedLandingPageIds.has(p.id);
               const isWb = p.category === 'webinar' || Boolean(p.webinar_data);
               const pStatus = p.status || 'active';
               const dateStr = p.created_at ? new Date(p.created_at).toLocaleDateString('hi-IN') : '-';
@@ -984,16 +1066,20 @@ export async function initAllLandingPages() {
               const creatorShareId = p.share_id || creator?.share_id || 'ADMIN';
               const isCreatorActive = creator ? (creator.is_active || creator.is_subscriber) : true;
 
-              // Ensure thumbnail URL exists
+              // Ensure thumbnail URL & YouTube ID exist
               let thumbUrl = p.thumbnail_url;
+              let ytId = null;
               if (p.content_type === 'youtube') {
-                const match = (p.media_url || '').match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                if (match && match[1]) thumbUrl = `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
+                ytId = extractYoutubeVideoId(p.media_url);
+                if (ytId) thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
               } else if (p.media_url && !p.media_url.startsWith('data:')) {
                 thumbUrl = p.media_url;
               }
 
-              const publicUrl = `/ucas/landing.html?id=${p.id}&share_id=${creatorShareId}${thumbUrl && !thumbUrl.startsWith('data:') ? `&thumb=${encodeURIComponent(thumbUrl)}` : ''}`;
+              let publicUrl = `/ucas/landing.html?id=${encodeURIComponent(p.id)}&share_id=${encodeURIComponent(creatorShareId)}`;
+              if (p.title) publicUrl += `&title=${encodeURIComponent(p.title)}`;
+              if (ytId) publicUrl += `&yt=${encodeURIComponent(ytId)}`;
+              if (thumbUrl && !thumbUrl.startsWith('data:')) publicUrl += `&thumb=${encodeURIComponent(thumbUrl)}`;
 
               // Responses Count
               const responses = allSurveys.filter(s => s.category_answers?.landing_page_id === p.id);
@@ -1013,7 +1099,10 @@ export async function initAllLandingPages() {
               }
 
               return `
-                <tr>
+                <tr style="${isChecked ? 'background: rgba(59,130,246,0.08);' : ''}">
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="lp-row-checkbox" data-page-id="${p.id}" ${isChecked ? 'checked' : ''} style="width: 17px; height: 17px; accent-color: #3b82f6; cursor: pointer;" />
+                  </td>
                   <td><strong>#${rowNum}</strong></td>
                   <td>
                     <div>${typeBadge}</div>
@@ -1110,6 +1199,28 @@ export async function initAllLandingPages() {
       </div>
     `;
 
+    updateBulkActionBar();
+
+    // Checkbox Listeners
+    const thSelectAll = document.getElementById('th-select-all-pages');
+    thSelectAll?.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      pageItems.forEach(p => {
+        if (isChecked) selectedLandingPageIds.add(p.id);
+        else selectedLandingPageIds.delete(p.id);
+      });
+      renderTable();
+    });
+
+    tableContainer.querySelectorAll('.lp-row-checkbox').forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const id = e.target.dataset.pageId;
+        if (e.target.checked) selectedLandingPageIds.add(id);
+        else selectedLandingPageIds.delete(id);
+        updateBulkActionBar();
+      });
+    });
+
     // Pagination Listeners
     document.getElementById('lp-prev-page')?.addEventListener('click', () => {
       if (currentPage > 1) { currentPage--; renderTable(); }
@@ -1144,6 +1255,160 @@ export async function initAllLandingPages() {
   }
 
   // ==========================================
+  // BULK ACTIONS TOOLBAR CONTROLS & HANDLERS
+  // ==========================================
+  function updateBulkActionBar() {
+    const bar = document.getElementById('lp-bulk-actions-bar');
+    const countEl = document.getElementById('lp-bulk-selected-count');
+    const thSelectAll = document.getElementById('th-select-all-pages');
+    
+    if (countEl) {
+      countEl.textContent = `${selectedLandingPageIds.size} पेजेस चुने गए`;
+    }
+    if (bar) {
+      bar.style.display = selectedLandingPageIds.size > 0 ? 'flex' : 'none';
+    }
+    if (thSelectAll) {
+      const filtered = getFilteredPages();
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+      const allVisibleChecked = pageItems.length > 0 && pageItems.every(p => selectedLandingPageIds.has(p.id));
+      thSelectAll.checked = allVisibleChecked;
+    }
+  }
+
+  // Bulk Toolbar Buttons
+  document.getElementById('btn-bulk-select-all-filtered')?.addEventListener('click', () => {
+    const filtered = getFilteredPages();
+    filtered.forEach(p => selectedLandingPageIds.add(p.id));
+    renderTable();
+  });
+
+  document.getElementById('btn-bulk-deselect-all')?.addEventListener('click', () => {
+    selectedLandingPageIds.clear();
+    renderTable();
+  });
+
+  document.getElementById('btn-bulk-activate')?.addEventListener('click', () => {
+    handleBulkStatusChange('active');
+  });
+
+  document.getElementById('btn-bulk-block')?.addEventListener('click', () => {
+    handleBulkStatusChange('blocked');
+  });
+
+  document.getElementById('btn-bulk-delete')?.addEventListener('click', () => {
+    handleBulkDelete();
+  });
+
+  async function handleBulkStatusChange(newStatus) {
+    if (selectedLandingPageIds.size === 0) return;
+    const selectedIds = Array.from(selectedLandingPageIds);
+    const actionLabel = newStatus === 'active' ? '🟢 सक्रिय (Activate/Approve)' : '🔴 ब्लॉक (Block/Reject)';
+
+    if (!confirm(`क्या आप सचमुच चुने गए सभी ${selectedIds.length} पेजेस को ${actionLabel} करना चाहते हैं?`)) {
+      return;
+    }
+
+    const db = getAdminDb();
+    if (db) {
+      try {
+        await db
+          .from('landing_pages')
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .in('id', selectedIds);
+      } catch (err) {
+        console.warn('Supabase bulk status update error:', err);
+      }
+    }
+
+    // Sync LocalStorage
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('UCAS_LP_') || key === 'UCAS_LOCAL_LANDING_PAGES')) {
+          const list = JSON.parse(localStorage.getItem(key) || '[]');
+          list.forEach(p => {
+            if (selectedLandingPageIds.has(p.id)) p.status = newStatus;
+          });
+          localStorage.setItem(key, JSON.stringify(list));
+        }
+      }
+    } catch (e) {}
+
+    // Update in-memory
+    allPages.forEach(p => {
+      if (selectedLandingPageIds.has(p.id)) p.status = newStatus;
+    });
+
+    alert(`🎉 चुने गए ${selectedIds.length} पेजेस सफलतापूर्वक ${actionLabel} कर दिए गए!`);
+    selectedLandingPageIds.clear();
+    updateKPIs();
+    renderTable();
+  }
+
+  async function handleBulkDelete() {
+    if (selectedLandingPageIds.size === 0) return;
+    const selectedIds = Array.from(selectedLandingPageIds);
+
+    if (!confirm(`⚠️ चेतावनी: क्या आप वाकई चुने गए ${selectedIds.length} पेजेस को हमेशा के लिए हटाना (Delete) चाहते हैं?\n\nयह डेटाबेस और सभी यूजर्स के पोर्टल से हमेशा के लिए हट जाएगा।`)) {
+      return;
+    }
+
+    const db = getAdminDb();
+    if (db) {
+      try {
+        await db
+          .from('landing_pages')
+          .delete()
+          .in('id', selectedIds);
+      } catch (err) {
+        console.warn('Supabase bulk delete error:', err);
+      }
+    }
+
+    // Sync LocalStorage
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('UCAS_LP_') || key === 'UCAS_LOCAL_LANDING_PAGES')) {
+          const list = JSON.parse(localStorage.getItem(key) || '[]');
+          const filtered = list.filter(p => !selectedLandingPageIds.has(p.id));
+          localStorage.setItem(key, JSON.stringify(filtered));
+        }
+      }
+    } catch (e) {}
+
+    // Update in-memory
+    allPages = allPages.filter(p => !selectedLandingPageIds.has(p.id));
+
+    alert(`🗑️ कुल ${selectedIds.length} पेजेस सफलतापूर्वक हटा दिए गए!`);
+    selectedLandingPageIds.clear();
+    updateKPIs();
+    renderTable();
+  }
+
+  function updateKPIs() {
+    const total = allPages.length;
+    const pending = allPages.filter(p => p.status === 'pending_review').length;
+    const active = allPages.filter(p => !p.status || p.status === 'active' || p.status === 'approved').length;
+    const blocked = allPages.filter(p => p.status === 'blocked' || p.status === 'disabled').length;
+    const webinars = allPages.filter(p => p.category === 'webinar' || Boolean(p.webinar_data)).length;
+
+    const elTotal = document.getElementById('kpi-lp-total');
+    const elPending = document.getElementById('kpi-lp-pending');
+    const elActive = document.getElementById('kpi-lp-active');
+    const elBlocked = document.getElementById('kpi-lp-blocked');
+    const elWebinars = document.getElementById('kpi-lp-webinars');
+
+    if (elTotal) elTotal.textContent = total;
+    if (elPending) elPending.textContent = pending;
+    if (elActive) elActive.textContent = active;
+    if (elBlocked) elBlocked.textContent = blocked;
+    if (elWebinars) elWebinars.textContent = webinars;
+  }
+
+  // ==========================================
   // STATUS TOGGLE & DELETE (Supabase + LocalStorage)
   // ==========================================
   async function updatePageStatus(pageId, newStatus) {
@@ -1155,7 +1420,7 @@ export async function initAllLandingPages() {
       try {
         await db
           .from('landing_pages')
-          .update({ status: newStatus })
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
           .eq('id', pageId);
       } catch (e) {
         console.warn('DB update status warning:', e);
@@ -1181,15 +1446,7 @@ export async function initAllLandingPages() {
     const target = allPages.find(p => p.id === pageId);
     if (target) target.status = newStatus;
 
-    // Update KPIs
-    const pending = allPages.filter(p => p.status === 'pending_review').length;
-    const active = allPages.filter(p => !p.status || p.status === 'active' || p.status === 'approved').length;
-    const blocked = allPages.filter(p => p.status === 'blocked' || p.status === 'disabled').length;
-
-    document.getElementById('kpi-lp-pending').textContent = pending;
-    document.getElementById('kpi-lp-active').textContent = active;
-    document.getElementById('kpi-lp-blocked').textContent = blocked;
-
+    updateKPIs();
     renderTable();
   }
 
@@ -1223,7 +1480,8 @@ export async function initAllLandingPages() {
 
     alert(`🗑️ पेज ${pageId} सफलतापूर्वक हटा दिया गया!`);
     allPages = allPages.filter(x => x.id !== pageId);
-    renderTable();
+    selectedLandingPageIds.delete(pageId);
+    updateKPIs();
   }
 
   // ==========================================
@@ -1396,8 +1654,15 @@ export async function initAllLandingPages() {
     let thumbUrl = '';
 
     if (activeContentType === 'youtube') {
-      mediaUrl = ytUrlInput.value.trim();
-      thumbUrl = detectedYoutubeThumbnail || (detectedYoutubeId ? `https://img.youtube.com/vi/${detectedYoutubeId}/hqdefault.jpg` : '');
+      const rawYt = ytUrlInput.value.trim();
+      const vidId = extractYoutubeVideoId(rawYt) || detectedYoutubeId;
+      if (!vidId) {
+        alert('कृपया मान्य YouTube वीडियो लिंक दर्ज करें।');
+        ytUrlInput.focus();
+        return;
+      }
+      mediaUrl = `https://www.youtube.com/watch?v=${vidId}`;
+      thumbUrl = `https://img.youtube.com/vi/${vidId}/hqdefault.jpg`;
     } else {
       mediaUrl = uploadedImageData || '';
       thumbUrl = uploadedImageData || '';

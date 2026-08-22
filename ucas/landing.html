@@ -15,10 +15,13 @@
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" id="og_image_alt" content="Aarogyam India Banner">
   <meta property="og:url" id="og_url" content="https://aarogyamindia.in/ucas/landing.html">
+  <link rel="image_src" id="link_image_src" href="https://aarogyamindia.in/images/logo/logo.png">
 
   <!-- Twitter Card Tags -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@AarogyamIndia">
   <meta name="twitter:title" id="tw_title" content="Aarogyam India — महत्वपूर्ण सूचना एवं सर्वे">
   <meta name="twitter:description" id="tw_desc" content="Aarogyam India में आपका स्वागत है। विशेष जानकारी और सर्वे के लिए अभी देखें।">
   <meta name="twitter:image" id="tw_image" content="https://aarogyamindia.in/images/logo/logo.png">
@@ -29,9 +32,14 @@
       try {
         const params = new URLSearchParams(window.location.search);
         const pTitle = params.get('title');
-        const pThumb = params.get('thumb');
-        const pDesc = params.get('desc') || params.get('msg');
+        let pThumb = params.get('thumb') || params.get('img') || params.get('thumbnail') || params.get('media');
+        const pYt = params.get('yt') || params.get('v');
+        const pDesc = params.get('desc') || params.get('msg') || params.get('message');
         
+        if (pYt && !pThumb) {
+          pThumb = 'https://img.youtube.com/vi/' + encodeURIComponent(pYt) + '/hqdefault.jpg';
+        }
+
         if (pTitle) {
           document.title = pTitle + ' — Aarogyam India';
           document.getElementById('og_title')?.setAttribute('content', pTitle);
@@ -41,6 +49,7 @@
           document.getElementById('og_image')?.setAttribute('content', pThumb);
           document.getElementById('og_image_secure')?.setAttribute('content', pThumb);
           document.getElementById('tw_image')?.setAttribute('content', pThumb);
+          document.getElementById('link_image_src')?.setAttribute('href', pThumb);
         }
         if (pDesc) {
           document.getElementById('og_desc')?.setAttribute('content', pDesc);
@@ -156,18 +165,22 @@
     .lp-media-wrapper {
       position: relative;
       width: 100%;
-      background: #000;
+      background: #0f172a;
       min-height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
     .lp-media-img {
       width: 100%;
-      max-height: 320px;
-      object-fit: cover;
+      height: auto;
+      max-height: 540px;
+      object-fit: contain;
       display: block;
+      margin: 0 auto;
+      image-rendering: -webkit-optimize-contrast;
     }
 
     .lp-yt-iframe {
@@ -629,8 +642,32 @@
 
       function extractYtId(url) {
         if (!url) return null;
-        const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-        return (match && match[2] && match[2].length === 11) ? match[2] : null;
+        const str = String(url).trim();
+        if (!str) return null;
+
+        if (/^[a-zA-Z0-9_-]{11}$/.test(str)) {
+          return str;
+        }
+
+        const patterns = [
+          /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/,
+          /[?&]v=([a-zA-Z0-9_-]{11})/,
+          /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+        ];
+
+        for (const pattern of patterns) {
+          const match = str.match(pattern);
+          if (match && match[1] && match[1].length === 11) {
+            return match[1];
+          }
+        }
+
+        const genericMatch = str.match(/(?:[\/=])([a-zA-Z0-9_-]{11})(?:[?&#/]|$)/);
+        if (genericMatch && genericMatch[1] && genericMatch[1].length === 11) {
+          return genericMatch[1];
+        }
+
+        return null;
       }
 
       window.playYoutubeEmbed = function(videoId) {
