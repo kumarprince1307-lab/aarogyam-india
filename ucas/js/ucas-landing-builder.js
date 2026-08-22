@@ -160,16 +160,22 @@
     const str = String(url).trim();
     if (!str) return null;
 
-    // Direct 11 character video ID
+    // 1. Direct 11 character video ID
     if (/^[a-zA-Z0-9_-]{11}$/.test(str)) {
       return str;
     }
 
-    // Comprehensive URL patterns: watch?v=, youtu.be/, shorts/, live/, embed/, v/
+    // 2. Direct thumbnail URL pasted
+    const thumbMatch = str.match(/(?:img\.youtube\.com|i\.ytimg\.com)\/vi\/([a-zA-Z0-9_-]{11})/i);
+    if (thumbMatch && thumbMatch[1] && thumbMatch[1].length === 11) {
+      return thumbMatch[1];
+    }
+
+    // 3. Comprehensive URL patterns: watch?v=, youtu.be/, shorts/, live/, embed/, v/, m.youtube.com
     const patterns = [
-      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/,
-      /[?&]v=([a-zA-Z0-9_-]{11})/,
-      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i,
+      /[?&]v=([a-zA-Z0-9_-]{11})/i,
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i
     ];
 
     for (const pattern of patterns) {
@@ -179,7 +185,7 @@
       }
     }
 
-    // Fallback: search for 11 character sequence
+    // 4. Fallback: search for 11 character sequence
     const genericMatch = str.match(/(?:[\/=])([a-zA-Z0-9_-]{11})(?:[?&#/]|$)/);
     if (genericMatch && genericMatch[1] && genericMatch[1].length === 11) {
       return genericMatch[1];
@@ -194,15 +200,15 @@
 
     if (videoId) {
       detectedYoutubeId = videoId;
-      detectedYoutubeThumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      detectedYoutubeThumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
       if (helperEl) {
-        helperEl.innerHTML = `<span style="color:#15803D;font-weight:600;"><i class="fa-solid fa-circle-check"></i> YouTube Video ID पहचाना गया: <code>${videoId}</code></span>`;
+        helperEl.innerHTML = `<span style="color:#15803D;font-weight:700;"><i class="fa-solid fa-circle-check"></i> YouTube Video ID पहचाना गया: <code>${videoId}</code></span>`;
       }
     } else {
       detectedYoutubeId = null;
       detectedYoutubeThumbnail = null;
       if (helperEl) {
-        helperEl.innerHTML = `<span style="color:var(--text-muted);">उदा. https://youtu.be/dQw4w9WgXcQ या https://youtube.com/shorts/... या https://youtube.com/live/...</span>`;
+        helperEl.innerHTML = `<span style="color:var(--text-muted);">उदा. https://youtu.be/dQw4w9WgXcQ या https://youtube.com/shorts/...</span>`;
       }
     }
 
@@ -220,31 +226,40 @@
     if (activeContentType === 'image') {
       if (uploadedImageData) {
         previewMedia.innerHTML = `
-          <img src="${uploadedImageData}" alt="Uploaded Preview" style="width:100%;max-height:260px;object-fit:contain;background:#0f172a;border-radius:var(--radius-md);border:1px solid #E2E8F0;image-rendering:-webkit-optimize-contrast;">
+          <div style="position:relative;width:100%;max-height:260px;background:#0f172a;border-radius:var(--radius-md);border:1.5px solid #CBD5E1;overflow:hidden;text-align:center;">
+            <img src="${uploadedImageData}" alt="Uploaded Preview" style="width:100%;max-height:260px;object-fit:contain;display:block;margin:0 auto;image-rendering:-webkit-optimize-contrast;">
+          </div>
         `;
       } else {
         previewMedia.innerHTML = `
-          <div style="background:#F1F5F9;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:2rem;text-align:center;color:var(--text-muted);">
-            <i class="fa-regular fa-image" style="font-size:2rem;margin-bottom:6px;display:block;"></i>
-            <span style="font-size:0.85rem;">इमेज अपलोड करने पर पूर्वावलोकन यहाँ दिखाई देगा</span>
+          <div style="background:#F8FAFC;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:2rem;text-align:center;color:var(--text-muted);">
+            <i class="fa-regular fa-image" style="font-size:2.2rem;margin-bottom:6px;display:block;color:var(--primary);"></i>
+            <span style="font-size:0.88rem;font-weight:600;">इमेज अपलोड करने पर लाइव पूर्वावलोकन यहाँ दिखाई देगा</span>
           </div>
         `;
       }
     } else if (activeContentType === 'youtube') {
-      if (detectedYoutubeId && detectedYoutubeThumbnail) {
+      if (detectedYoutubeId) {
+        const primaryThumb = `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+        const altThumb = `https://img.youtube.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+        const mqThumb = `https://i.ytimg.com/vi/${detectedYoutubeId}/mqdefault.jpg`;
+
         previewMedia.innerHTML = `
-          <div style="position:relative;width:100%;max-height:220px;border-radius:var(--radius-md);overflow:hidden;border:1px solid #E2E8F0;background:#000;">
-            <img src="${detectedYoutubeThumbnail}" alt="YouTube Thumbnail" style="width:100%;height:200px;object-fit:cover;opacity:0.9;">
-            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;background:rgba(255,0,0,0.85);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;box-shadow:0 4px 10px rgba(0,0,0,0.3);">
+          <div style="position:relative;width:100%;max-height:220px;border-radius:var(--radius-md);overflow:hidden;border:1.5px solid #CBD5E1;background:#000;">
+            <img src="${primaryThumb}" onerror="this.onerror=null;this.src='${altThumb}';this.onerror=function(){this.src='${mqThumb}';};" alt="YouTube Thumbnail" style="width:100%;height:200px;object-fit:cover;opacity:0.92;display:block;">
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:58px;height:58px;background:rgba(255,0,0,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.6rem;box-shadow:0 4px 15px rgba(0,0,0,0.4);border:2px solid #fff;">
               <i class="fa-solid fa-play" style="margin-left:4px;"></i>
+            </div>
+            <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.8);color:#fff;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">
+              <i class="fa-brands fa-youtube" style="color:#FF0000;"></i> YouTube
             </div>
           </div>
         `;
       } else {
         previewMedia.innerHTML = `
-          <div style="background:#F1F5F9;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:2rem;text-align:center;color:var(--text-muted);">
-            <i class="fa-brands fa-youtube" style="font-size:2rem;color:#EF4444;margin-bottom:6px;display:block;"></i>
-            <span style="font-size:0.85rem;">YouTube लिंक डालने पर थंबनेल यहाँ दिखाई देगा</span>
+          <div style="background:#F8FAFC;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:2rem;text-align:center;color:var(--text-muted);">
+            <i class="fa-brands fa-youtube" style="font-size:2.4rem;color:#EF4444;margin-bottom:6px;display:block;"></i>
+            <span style="font-size:0.88rem;font-weight:600;">YouTube लिंक डालने पर थंबनेल यहाँ दिखाई देगा</span>
           </div>
         `;
       }
@@ -257,8 +272,9 @@
 
   function generateUniqueLandingPageId() {
     const count = userLandingPages.length + 1;
-    const padCount = String(count).padStart(6, '0');
-    return `LP${padCount}`;
+    const padCount = String(count).padStart(4, '0');
+    const randSuffix = Math.floor(100 + Math.random() * 900);
+    return `LP${padCount}${randSuffix}`;
   }
 
   async function handleFormSubmit() {
@@ -560,14 +576,15 @@
       url.searchParams.set('title', lp.title);
     }
 
+    if (lp.category) {
+      url.searchParams.set('cat', lp.category);
+    }
+
     let thumbUrl = lp.thumbnail_url;
-    let ytId = null;
-    if (lp.content_type === 'youtube') {
-      ytId = extractYoutubeVideoId(lp.media_url);
-      if (ytId) {
-        thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
-        url.searchParams.set('yt', ytId);
-      }
+    let ytId = extractYoutubeVideoId(lp.media_url) || extractYoutubeVideoId(lp.thumbnail_url);
+    if (ytId) {
+      thumbUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+      url.searchParams.set('yt', ytId);
     } else if (lp.media_url && !lp.media_url.startsWith('data:')) {
       thumbUrl = lp.media_url;
     }

@@ -414,12 +414,19 @@
 
     // 2. Sync / Fallback with LocalStorage
     const localStoreKey = `UCAS_LP_${profileId || 'global'}`;
-    const localPages = JSON.parse(localStorage.getItem(localStoreKey) || '[]');
+    let localPages = [];
+    try {
+      localPages = JSON.parse(localStorage.getItem(localStoreKey) || '[]');
+    } catch (e) {
+      localPages = [];
+    }
 
     const combinedMap = new Map();
-    pages.forEach(p => combinedMap.set(p.id, p));
-    localPages.forEach(p => {
-      if (!combinedMap.has(p.id)) combinedMap.set(p.id, p);
+    (pages || []).forEach(p => {
+      if (p && p.id) combinedMap.set(p.id, p);
+    });
+    (localPages || []).forEach(p => {
+      if (p && p.id && !combinedMap.has(p.id)) combinedMap.set(p.id, p);
     });
 
     const finalPages = Array.from(combinedMap.values());
@@ -428,11 +435,12 @@
     if (profileId) {
       try {
         const surveysRes = await getSurveys(profileId);
-        const userSurveys = surveysRes.data || [];
+        const userSurveys = surveysRes?.data || [];
 
         finalPages.forEach(lp => {
+          if (!lp) return;
           const matching = userSurveys.filter(s => {
-            const lpId = s.category_answers?.landing_page_id;
+            const lpId = s?.category_answers?.landing_page_id;
             return lpId && (lpId === lp.id || lpId === lp.slug);
           });
           lp.response_count = matching.length;

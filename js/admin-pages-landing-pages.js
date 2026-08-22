@@ -683,14 +683,22 @@ export async function initAllLandingPages() {
     const str = String(url).trim();
     if (!str) return null;
 
+    // 1. Direct 11 character video ID
     if (/^[a-zA-Z0-9_-]{11}$/.test(str)) {
       return str;
     }
 
+    // 2. Direct thumbnail URL pasted
+    const thumbMatch = str.match(/(?:img\.youtube\.com|i\.ytimg\.com)\/vi\/([a-zA-Z0-9_-]{11})/i);
+    if (thumbMatch && thumbMatch[1] && thumbMatch[1].length === 11) {
+      return thumbMatch[1];
+    }
+
+    // 3. Comprehensive URL patterns: watch?v=, youtu.be/, shorts/, live/, embed/, v/, m.youtube.com
     const patterns = [
-      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/,
-      /[?&]v=([a-zA-Z0-9_-]{11})/,
-      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i,
+      /[?&]v=([a-zA-Z0-9_-]{11})/i,
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i
     ];
 
     for (const pattern of patterns) {
@@ -700,6 +708,7 @@ export async function initAllLandingPages() {
       }
     }
 
+    // 4. Fallback: search for 11 character sequence
     const genericMatch = str.match(/(?:[\/=])([a-zA-Z0-9_-]{11})(?:[?&#/]|$)/);
     if (genericMatch && genericMatch[1] && genericMatch[1].length === 11) {
       return genericMatch[1];
@@ -712,8 +721,14 @@ export async function initAllLandingPages() {
     const videoId = extractYoutubeVideoId(val);
     if (videoId) {
       detectedYoutubeId = videoId;
-      detectedYoutubeThumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-      if (ytPreview) ytPreview.src = detectedYoutubeThumbnail;
+      detectedYoutubeThumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+      if (ytPreview) {
+        ytPreview.src = detectedYoutubeThumbnail;
+        ytPreview.onerror = function() {
+          this.onerror = null;
+          this.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+        };
+      }
       if (ytPreviewWrap) ytPreviewWrap.style.display = 'block';
     } else {
       detectedYoutubeId = null;

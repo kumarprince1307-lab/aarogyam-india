@@ -112,14 +112,22 @@
     const str = String(url).trim();
     if (!str) return null;
 
+    // 1. Direct 11 character video ID
     if (/^[a-zA-Z0-9_-]{11}$/.test(str)) {
       return str;
     }
 
+    // 2. Direct thumbnail URL pasted
+    const thumbMatch = str.match(/(?:img\.youtube\.com|i\.ytimg\.com)\/vi\/([a-zA-Z0-9_-]{11})/i);
+    if (thumbMatch && thumbMatch[1] && thumbMatch[1].length === 11) {
+      return thumbMatch[1];
+    }
+
+    // 3. Comprehensive URL patterns: watch?v=, youtu.be/, shorts/, live/, embed/, v/, m.youtube.com
     const patterns = [
-      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/,
-      /[?&]v=([a-zA-Z0-9_-]{11})/,
-      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i,
+      /[?&]v=([a-zA-Z0-9_-]{11})/i,
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i
     ];
 
     for (const pattern of patterns) {
@@ -129,6 +137,7 @@
       }
     }
 
+    // 4. Fallback: search for 11 character sequence
     const genericMatch = str.match(/(?:[\/=])([a-zA-Z0-9_-]{11})(?:[?&#/]|$)/);
     if (genericMatch && genericMatch[1] && genericMatch[1].length === 11) {
       return genericMatch[1];
@@ -148,21 +157,32 @@
     if (!container) return;
 
     if (activeWebinarContentType === 'image' && uploadedWebinarImageData) {
-      container.innerHTML = `<img src="${uploadedWebinarImageData}" style="width:100%;max-height:220px;object-fit:contain;background:#0f172a;border-radius:var(--radius-md);image-rendering:-webkit-optimize-contrast;" alt="Webinar Banner">`;
-    } else if (activeWebinarContentType === 'youtube' && detectedWebinarYtId) {
       container.innerHTML = `
-        <div style="position:relative;border-radius:var(--radius-md);overflow:hidden;background:#000;">
-          <img src="https://img.youtube.com/vi/${detectedWebinarYtId}/hqdefault.jpg" style="width:100%;max-height:180px;object-fit:cover;display:block;opacity:0.85;" alt="YouTube Preview">
-          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:2rem;background:rgba(255,0,0,0.85);border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;">
-            <i class="fa-solid fa-play"></i>
+        <div style="position:relative;border-radius:var(--radius-md);overflow:hidden;background:#0f172a;border:1.5px solid #CBD5E1;text-align:center;">
+          <img src="${uploadedWebinarImageData}" style="width:100%;max-height:220px;object-fit:contain;display:block;margin:0 auto;image-rendering:-webkit-optimize-contrast;" alt="Webinar Banner">
+        </div>
+      `;
+    } else if (activeWebinarContentType === 'youtube' && detectedWebinarYtId) {
+      const primaryThumb = `https://i.ytimg.com/vi/${detectedWebinarYtId}/hqdefault.jpg`;
+      const altThumb = `https://img.youtube.com/vi/${detectedWebinarYtId}/hqdefault.jpg`;
+      const mqThumb = `https://i.ytimg.com/vi/${detectedWebinarYtId}/mqdefault.jpg`;
+
+      container.innerHTML = `
+        <div style="position:relative;border-radius:var(--radius-md);overflow:hidden;background:#000;border:1.5px solid #CBD5E1;">
+          <img src="${primaryThumb}" onerror="this.onerror=null;this.src='${altThumb}';this.onerror=function(){this.src='${mqThumb}';};" style="width:100%;max-height:180px;object-fit:cover;display:block;opacity:0.9;" alt="YouTube Preview">
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:1.6rem;background:rgba(255,0,0,0.9);border-radius:50%;width:52px;height:52px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(0,0,0,0.4);border:2px solid #fff;">
+            <i class="fa-solid fa-play" style="margin-left:4px;"></i>
+          </div>
+          <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.8);color:#fff;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">
+            <i class="fa-brands fa-youtube" style="color:#FF0000;"></i> YouTube
           </div>
         </div>
       `;
     } else {
       container.innerHTML = `
-        <div style="background:#F1F5F9;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:1.5rem;text-align:center;color:var(--text-muted);">
-          <i class="fa-solid fa-video" style="font-size:2rem;margin-bottom:6px;display:block;color:#3B82F6;"></i>
-          <span style="font-size:0.85rem;">बैनर इमेज या YouTube लिंक का पूर्वावलोकन यहाँ दिखेगा</span>
+        <div style="background:#F8FAFC;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:1.5rem;text-align:center;color:var(--text-muted);">
+          <i class="fa-solid fa-video" style="font-size:2.2rem;margin-bottom:6px;display:block;color:#2563EB;"></i>
+          <span style="font-size:0.85rem;font-weight:600;">बैनर इमेज या YouTube लिंक का पूर्वावलोकन यहाँ दिखेगा</span>
         </div>
       `;
     }
@@ -206,8 +226,15 @@
     const shareId = window.UCAS_SESSION.getShareId();
 
     // Check user active status
-    const sub = await window.UCAS_DB.getUserSubscription(profileId);
-    const isUserActive = Boolean(sub?.isActive);
+    let isUserActive = true;
+    try {
+      if (profileId && window.UCAS_DB && typeof window.UCAS_DB.getUserSubscription === 'function') {
+        const sub = await window.UCAS_DB.getUserSubscription(profileId);
+        isUserActive = Boolean(sub?.isActive);
+      }
+    } catch (subErr) {
+      console.warn('Subscription check error:', subErr);
+    }
     const initialStatus = isUserActive ? 'active' : 'pending_review';
 
     const btnSubmit = document.getElementById('wb_btn_generate');
@@ -251,9 +278,11 @@
           window.UCAS_APP.showToast('अपडेट त्रुटि: ' + (res.message || ''), 'error');
         }
       } else {
-        // CREATE
+        // CREATE with unique collision-free ID
         const count = userWebinarsList.length + 1;
-        const lpId = `WB${String(count).padStart(6, '0')}`;
+        const padCount = String(count).padStart(4, '0');
+        const randSuffix = Math.floor(100 + Math.random() * 900);
+        const lpId = `WB${padCount}${randSuffix}`;
 
         const payload = {
           id: lpId,
@@ -272,10 +301,10 @@
 
         const res = await window.UCAS_DB.createLandingPage(payload);
         if (res.success) {
-          // Trigger Admin Notification
+          // Trigger Admin Notification silently
           try {
             const db = window.UCAS_DB.getDb();
-            if (db) {
+            if (db && profileId) {
               const userName = window.UCAS_SESSION.getUserName() || 'User';
               await db.from('notifications').insert([{
                 profile_id: profileId,
@@ -287,7 +316,7 @@
               }]);
             }
           } catch (notifErr) {
-            console.warn('Admin notification error', notifErr);
+            console.warn('Admin notification notice:', notifErr);
           }
 
           if (isUserActive) {
@@ -307,8 +336,8 @@
         }
       }
     } catch (e) {
-      console.error('Webinar submit error', e);
-      window.UCAS_APP.showToast('कनेक्शन त्रुटि। कृपया पुनः प्रयास करें।', 'error');
+      console.error('UCAS Webinar submit error:', e);
+      window.UCAS_APP.showToast('डेटा सेव करने में समस्या आई। कृपया पुनः प्रयास करें।', 'error');
     } finally {
       if (btnSubmit) {
         btnSubmit.disabled = false;
@@ -406,16 +435,13 @@
     const url = new URL('/ucas/landing.html', origin);
     url.searchParams.set('id', lp.id);
     url.searchParams.set('share_id', lp.share_id || window.UCAS_SESSION.getShareId());
-    if (lp.title) url.searchParams.set('title', lp.title);
+    url.searchParams.set('cat', 'webinar');
 
     let thumbUrl = lp.thumbnail_url;
-    let ytId = null;
-    if (lp.content_type === 'youtube') {
-      ytId = extractYoutubeVideoId(lp.media_url);
-      if (ytId) {
-        thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
-        url.searchParams.set('yt', ytId);
-      }
+    let ytId = extractYoutubeVideoId(lp.media_url) || extractYoutubeVideoId(lp.thumbnail_url);
+    if (ytId) {
+      thumbUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+      url.searchParams.set('yt', ytId);
     } else if (lp.media_url && !lp.media_url.startsWith('data:')) {
       thumbUrl = lp.media_url;
     }
