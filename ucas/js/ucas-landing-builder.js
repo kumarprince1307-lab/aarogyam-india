@@ -567,7 +567,7 @@
   }
 
   function getLandingPageShareUrl(lp) {
-    const origin = window.location.origin || 'https://aarogyamindia.in';
+    const origin = window.location.origin || 'https://aarogyamindia.online';
     const url = new URL('/ucas/landing.html', origin);
     url.searchParams.set('id', lp.id);
     url.searchParams.set('share_id', lp.share_id || window.UCAS_SESSION.getShareId());

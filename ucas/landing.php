@@ -36,6 +36,7 @@ $finalUrl = "https://" . ($_SERVER['HTTP_HOST'] ?? 'aarogyamindia.online') . ($_
   <title><?php echo $finalTitle; ?> — Aarogyam India</title>
 
   <!-- Server-Rendered Open Graph Tags for Facebook & WhatsApp Crawlers -->
+  <meta property="fb:app_id" content="966242223397117">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Aarogyam India">
   <meta property="og:title" id="og_title" content="<?php echo $finalTitle; ?>">
