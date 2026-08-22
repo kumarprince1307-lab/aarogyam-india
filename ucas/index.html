@@ -229,6 +229,12 @@
           </button>
         </li>
         <li class="ucas-nav-item">
+          <button data-tab="webinars" onclick="UCAS_APP.switchView('webinars'); UCAS_APP.closeUserDrawer();">
+            <i class="fa-solid fa-video ucas-nav-icon"></i>
+            <span>Webinars & Live</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
           <button data-tab="permissions" onclick="UCAS_APP.switchView('permissions'); UCAS_APP.closeUserDrawer();">
             <i class="fa-solid fa-shield-halved ucas-nav-icon"></i>
             <span>Permissions</span>
@@ -451,6 +457,9 @@
           </button>
           <button class="ucas-btn ucas-btn-secondary" onclick="UCAS_APP.switchView('marketing')">
             <i class="fa-solid fa-paper-plane"></i> मार्केटिंग इंजन खोलें
+          </button>
+          <button class="ucas-btn" style="background:#7c3aed;color:#fff;" onclick="UCAS_APP.switchView('webinars')">
+            <i class="fa-solid fa-video"></i> वेबिनार व लाइव इवेंट्स
           </button>
           <button class="ucas-btn ucas-btn-outline" onclick="window.location.href='/ebooks/my-library.html'">
             <i class="fa-solid fa-book-open"></i> My Library खोलें
@@ -1394,7 +1403,7 @@
     </button>
     <button class="ucas-bottom-tab" data-tab="phonebook">
       <i class="fa-solid fa-address-book"></i>
-      <span>Phonebook</span>
+      <span>Contacts</span>
     </button>
     <button class="ucas-bottom-tab" data-tab="leads">
       <i class="fa-solid fa-user-group"></i>
@@ -1402,10 +1411,18 @@
     </button>
     <button class="ucas-bottom-tab" data-tab="marketing">
       <i class="fa-solid fa-rocket"></i>
-      <span>Marketing</span>
+      <span>Pages</span>
+    </button>
+    <button class="ucas-bottom-tab" data-tab="webinars">
+      <i class="fa-solid fa-video"></i>
+      <span>Webinar</span>
     </button>
   </nav>
 
+  <!-- WhatsApp Sticky Floating Button for User Support (7974422572) -->
+  <a href="https://wa.me/917974422572?text=नमस्ते%20Aarogyam%20India,%20मुझे%20UCAS%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" id="ucasWhatsappFloatingBtn" style="position:fixed;bottom:75px;right:18px;z-index:9998;background:#25D366;color:#ffffff;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(37,211,102,0.45);text-decoration:none;font-size:1.75rem;transition:all 0.3s ease;border:2.5px solid #ffffff;" title="WhatsApp Support (7974422572)">
+    <i class="fa-brands fa-whatsapp"></i>
+  </a>
 </div>
 
 <!-- =========================================================================
