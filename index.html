@@ -79,6 +79,7 @@ Aarogyam India | One Platform • Multiple Missions
     <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#28a745">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Aarogyam">
@@ -103,6 +104,10 @@ Aarogyam India | One Platform • Multiple Missions
 
     <link rel="stylesheet"
         href="css/style.css">
+    <link rel="stylesheet"
+        href="css/user-notifications.css">
+    <!-- FontAwesome for Notification Bell Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -209,6 +214,11 @@ HEADER START
                 </button>
                 <button id="desktop-pwa-install-btn" class="pwa-install-btn" style="display: none;" title="Install Aarogyam India App">
                     <span>📱</span> Install App
+                </button>
+                <!-- Personal Notification Bell Button -->
+                <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications" style="margin-right: 4px;">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="user-notif-badge" style="display: none;">0</span>
                 </button>
                 <a href="#" id="universalLoginBtn" class="login-btn">
                     <img src="images/icons/login.png" alt="Login">
@@ -1982,6 +1992,7 @@ JAVASCRIPT
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="session.js"></script>
+<script src="/js/user-notifications.js"></script>
 <script src="js/script.js"></script>
 <script type="module" src="/js/public-pwa.js"></script>
 

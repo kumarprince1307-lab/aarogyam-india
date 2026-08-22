@@ -8,13 +8,14 @@
     <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
     <!-- CSS Links -->
     <link rel="stylesheet" href="../css/purchases.css">
+    <link rel="stylesheet" href="../css/user-notifications.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <!-- 1. Premium Header -->
-    <header class="purchases-header">
+    <header class="purchases-header" style="display:flex; justify-content:space-between; align-items:center;">
         <div class="header-left">
             <button class="back-btn" onclick="window.location.href='/ebooks/my-library.html'" title="Back to My Library">
                 <i class="fa-solid fa-arrow-left"></i>
@@ -24,7 +25,13 @@
                 <span class="brand-title">Aarogyam India</span>
             </div>
         </div>
-        <h1 class="page-main-title">My Purchases & Invoices</h1>
+        <h1 class="page-main-title" style="margin:0;">My Purchases & Invoices</h1>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications">
+                <i class="fa-regular fa-bell"></i>
+                <span class="user-notif-badge" style="display: none;">0</span>
+            </button>
+        </div>
     </header>
 
     <!-- 2. Main Content Area -->
@@ -183,6 +190,7 @@
     <!-- JavaScript Links -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js"></script>
+    <script src="/js/user-notifications.js"></script>
     <script src="../js/purchases.js"></script>
 
 </body>

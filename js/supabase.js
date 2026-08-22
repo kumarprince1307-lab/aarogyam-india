@@ -864,9 +864,10 @@ async function processDownload(bookId) {
     window.open(book.pdf_url, "_blank");
     return { success: true, remaining: DOWNLOAD.LIMIT - newCount };
 }
-console.log("✅ PDF Download & Logs Module Loaded");
-
-// ES Module export compatibility
-export const supabase = (typeof window !== 'undefined' && (window.dbClient || window.supabase)) || (typeof db !== 'undefined' ? db : null);
-export const dbClient = (typeof window !== 'undefined' && (window.dbClient || window.supabase)) || (typeof db !== 'undefined' ? db : null);
-export default supabase;
+// Global window exports
+if (typeof window !== 'undefined') {
+    window.supabase = window.dbClient || window.supabase;
+    window.dbClient = window.dbClient || window.supabase;
+    window.isMobileRegistered = isMobileRegistered;
+    window.createLoginSession = createLoginSession;
+}

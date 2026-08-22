@@ -21,6 +21,7 @@
   
   <!-- UCAS Design System -->
   <link rel="stylesheet" href="/ucas/ucas.css?v=1.5">
+  <link rel="stylesheet" href="/css/user-notifications.css">
 </head>
 <body>
 
@@ -76,6 +77,12 @@
       <!-- PWA Install Button -->
       <button id="ucas-pwa-install-btn" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="display:none;" onclick="UCAS_PWA.triggerInstall()">
         <i class="fa-solid fa-mobile-screen-button"></i> Install App
+      </button>
+
+      <!-- User Personal Notification Bell Button -->
+      <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff;">
+        <i class="fa-regular fa-bell"></i>
+        <span class="user-notif-badge" style="display: none;">0</span>
       </button>
 
       <!-- User Profile Pill (Opens User Drawer / My Profile) -->
@@ -1702,6 +1709,7 @@
 <script src="/ucas/js/ucas-webinars.js?v=2.5"></script>
 <script src="/ucas/js/ucas-admin.js?v=2.5"></script>
 <script src="/ucas/js/ucas-pwa.js?v=2.5"></script>
+<script src="/js/user-notifications.js"></script>
 <script src="/ucas/js/ucas-app.js?v=2.5"></script>
 
 </body>

@@ -280,18 +280,25 @@
     }
 
     try {
-      // 1. Fetch profiles where referred_by is referrerId OR referralCode
+      const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
+      let targetProfileId = null;
+
+      if (referrerId && isUuid(referrerId)) {
+        targetProfileId = referrerId;
+      } else if (referralCode) {
+        const { data: p } = await client.from('profiles').select('id').eq('share_id', referralCode).maybeSingle();
+        if (p && p.id) targetProfileId = p.id;
+      }
+
+      if (!targetProfileId) {
+        return { success: true, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 } };
+      }
+
+      // 1. Fetch profiles where referred_by is the UUID targetProfileId
       let query = client
         .from('profiles')
-        .select('id, full_name, mobile, email, created_at, State, district, referral_code, registration_source');
-
-      if (referrerId && referralCode) {
-        query = query.or(`referred_by.eq.${referrerId},referred_by.eq.${referralCode}`);
-      } else if (referrerId) {
-        query = query.eq('referred_by', referrerId);
-      } else if (referralCode) {
-        query = query.eq('referred_by', referralCode);
-      }
+        .select('id, full_name, mobile, email, created_at, State, district, referral_code, registration_source')
+        .eq('referred_by', targetProfileId);
 
       if (startDate) {
         query = query.gte('created_at', new Date(startDate).toISOString());
