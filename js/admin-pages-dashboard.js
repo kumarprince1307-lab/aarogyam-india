@@ -2,7 +2,55 @@
 
 import { navigateTo } from './admin-router.js';
 import { initAdminLayout } from './admin-main.js';
-import { fetchDashboardData, fetchCheckoutSummary } from './admin-api.js';
+import { fetchDashboardData, fetchCheckoutSummary, fetchUcasDashboardSummary } from './admin-api.js';
+
+function renderUcasDetailWidget(summary) {
+  if (!summary) return '';
+  return `
+    <div class="admin-section" id="ucas-detail-summary" style="margin-bottom: 24px;">
+      <div class="admin-section-header">
+        <div class="admin-section-title" style="display:flex;align-items:center;gap:8px;">
+          <span>⚡ UCAS DETAIL</span>
+          <span style="font-size:0.75rem;background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:12px;font-weight:700;">Live Database</span>
+        </div>
+      </div>
+      <div class="kpi-row" id="ucas-kpi-row">
+        <div class="kpi-card clickable" data-route="users" title="सभी यूजर्स देखें" style="cursor:pointer;">
+          <div class="kpi-label">👥 Total UCAS Users</div>
+          <div class="kpi-value">${summary.totalUsers || 0}</div>
+        </div>
+        <div class="kpi-card clickable" data-route="users" data-status="active" title="एक्टिव यूजर्स देखें" style="cursor:pointer;">
+          <div class="kpi-label">🟢 Active Users</div>
+          <div class="kpi-value" style="color:#10b981;">${summary.activeUsers || 0}</div>
+        </div>
+        <div class="kpi-card clickable" data-route="users" data-status="inactive" title="इनएक्टिव यूजर्स देखें" style="cursor:pointer;">
+          <div class="kpi-label">🔴 Inactive Users</div>
+          <div class="kpi-value" style="color:#ef4444;">${summary.inactiveUsers || 0}</div>
+        </div>
+        <div class="kpi-card clickable" data-route="users" data-status="active" title="सब्सक्राइबर्स देखें" style="cursor:pointer;">
+          <div class="kpi-label">👑 Subscribers</div>
+          <div class="kpi-value" style="color:#f59e0b;">${summary.totalSubscribers || 0}</div>
+        </div>
+        <div class="kpi-card clickable" data-route="all-surveys" title="सर्वे लिस्ट देखें" style="cursor:pointer;">
+          <div class="kpi-label">📋 Total Surveys</div>
+          <div class="kpi-value" style="color:#8b5cf6;">${summary.totalSurveys || 0}</div>
+        </div>
+        <div class="kpi-card clickable" data-route="all-phonebook" title="फोनबुक देखें" style="cursor:pointer;">
+          <div class="kpi-label">📱 Total Phonebook</div>
+          <div class="kpi-value" style="color:#3b82f6;">${summary.totalPhonebook || 0}</div>
+        </div>
+        <div class="kpi-card clickable" data-route="all-landing-pages" title="लैंडिंग पेज देखें" style="cursor:pointer;">
+          <div class="kpi-label">🎯 Landing Pages</div>
+          <div class="kpi-value" style="color:#ec4899;">${summary.totalLandingPages || 0}</div>
+        </div>
+        <div class="kpi-card" title="शेयर और सर्वे रिस्पॉन्स">
+          <div class="kpi-label">📊 Shares / Responses</div>
+          <div class="kpi-value">${summary.totalShares || 0} / ${summary.surveyResponses || 0}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
 
 function renderKpiGroup(kpis) {
   return `<div class="kpi-row">
@@ -307,7 +355,11 @@ export async function initDashboard() {
       { label: 'Total Revenue', value: `₹${(shareSummary.totalRevenue || 0).toLocaleString('en-IN')}` }
     ];
 
+    const ucasRes = await fetchUcasDashboardSummary();
+    const ucasSummary = ucasRes.success ? ucasRes.data : {};
+
     content.innerHTML = `
+      ${renderUcasDetailWidget(ucasSummary)}
       <div class="admin-section" id="share-summary">
         <div class="admin-section-title">Share Engine Summary</div>
         ${renderKpiGroup(shareKpis)}
@@ -365,6 +417,21 @@ export async function initDashboard() {
         <div class="admin-col">${renderTopBooks(bookSales)}${renderActivity(recentActivity)}</div>
       </div>
     `;
+
+    // UCAS Detail KPI Click Handlers
+    document.querySelectorAll('#ucas-kpi-row .kpi-card.clickable').forEach(card => {
+      card.addEventListener('click', () => {
+        const route = card.dataset.route;
+        const status = card.dataset.status;
+        if (route) {
+          if (status) {
+            window.location.hash = `${route}?status=${status}`;
+          } else {
+            window.location.hash = route;
+          }
+        }
+      });
+    });
 
     // After rendering, set default dates and add listeners for Business Summary
     const businessDateFilter = document.getElementById('business-date-filter');

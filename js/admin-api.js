@@ -1451,13 +1451,14 @@ export async function fetchAdminNotifications(params = {}) {
     const readIds = new Set(getReadNotificationIds());
     const lastReadTime = getLastReadTimestamp() ? new Date(getLastReadTimestamp()) : null;
 
-    // 1. Parallel fetch of live events from purchases, checkout_logs, profiles, interested_users, books
-    const [purchasesRes, checkoutLogsRes, profilesRes, leadsRes, booksRes] = await Promise.all([
+    // 1. Parallel fetch of live events from purchases, checkout_logs, profiles, interested_users, books, landing_pages
+    const [purchasesRes, checkoutLogsRes, profilesRes, leadsRes, booksRes, landingPagesRes] = await Promise.all([
       db.from('purchases').select('id, profile_id, book_id, payment_id, amount, order_id, invoice_number, payment_status, purchase_date, created_at').order('purchase_date', { ascending: false }).limit(40),
       db.from('checkout_logs').select('id, profile_id, book_id, status, created_at').order('created_at', { ascending: false }).limit(40),
       db.from('profiles').select('id, full_name, mobile, email, registration_source, created_at').order('created_at', { ascending: false }).limit(40),
       db.from('interested_users').select('id, full_name, mobile, email, interested_book, source, created_at').order('created_at', { ascending: false }).limit(25),
-      db.from('books').select('id, title')
+      db.from('books').select('id, title'),
+      db.from('landing_pages').select('id, profile_id, share_id, title, category, status, webinar_data, created_at').order('created_at', { ascending: false }).limit(35)
     ]);
 
     const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b.title; return acc; }, {});
@@ -1476,6 +1477,7 @@ export async function fetchAdminNotifications(params = {}) {
     (purchasesRes.data || []).forEach(p => p.profile_id && allProfileIds.add(p.profile_id));
     (checkoutLogsRes.data || []).forEach(c => c.profile_id && allProfileIds.add(c.profile_id));
     (profilesRes.data || []).forEach(u => u.id && allProfileIds.add(u.id));
+    (landingPagesRes.data || []).forEach(lp => lp.profile_id && allProfileIds.add(lp.profile_id));
 
     let profilesMap = {};
     if (allProfileIds.size > 0) {
@@ -1658,6 +1660,40 @@ export async function fetchAdminNotifications(params = {}) {
       });
     });
 
+    // Adapter E: Landing Pages & Webinars Created
+    (landingPagesRes.data || []).forEach(lp => {
+      const isWb = lp.category === 'webinar' || Boolean(lp.webinar_data);
+      const uniqueId = `lp:${lp.id}`;
+      const rawDate = lp.created_at;
+      const dateObj = rawDate ? new Date(rawDate) : new Date();
+      const user = profilesMap[lp.profile_id] || {};
+      const userName = user.full_name || user.name || 'User';
+      const isRead = readIds.has(uniqueId) || (lastReadTime && dateObj <= lastReadTime);
+      const isPending = lp.status === 'pending_review';
+
+      notifications.push({
+        id: uniqueId,
+        type: isWb ? 'webinar_created' : 'landing_page_created',
+        category: 'marketing',
+        icon: isWb ? '🎥' : '📄',
+        title: isWb ? 'New Webinar Created' : 'New Landing Page Created',
+        message: `${userName} (${lp.share_id || '-'}) created ${isWb ? 'webinar' : 'landing page'}: "${lp.title || lp.id}" ${isPending ? '⏳ (Review Required)' : ''}`,
+        userName: userName,
+        userId: lp.profile_id || '',
+        status: isPending ? 'PENDING_REVIEW' : (lp.status || 'ACTIVE').toUpperCase(),
+        timestamp: dateObj.toISOString(),
+        dateFormatted: dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        timeFormatted: dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        relativeTime: getRelativeTime(dateObj),
+        isRead: isRead,
+        primaryAction: {
+          label: 'Review / Control URL',
+          route: 'landing-page-control',
+          id: lp.id
+        }
+      });
+    });
+
     // Sort descending by timestamp (latest first)
     notifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
@@ -1702,3 +1738,591 @@ export async function getUnreadNotificationCount() {
   const res = await fetchAdminNotifications();
   return res.unreadCount || 0;
 }
+
+// =========================================================================
+// UCAS V1 — REAL DATA INTEGRATION API (MAIN ADMIN PANEL)
+// =========================================================================
+
+function getAdminDb() {
+  if (window.dbClient) return window.dbClient;
+  if (window.supabaseClient) return window.supabaseClient;
+  if (window.supabase && typeof window.supabase.createClient === 'function') {
+    window.dbClient = window.supabase.createClient(
+      'https://qjhjrzsnrtahmhswxyvb.supabase.co',
+      'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU'
+    );
+    return window.dbClient;
+  }
+  return null;
+}
+
+export async function fetchUcasDashboardSummary() {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Supabase client not available.");
+
+    const [profilesRes, purchasesRes, surveysRes, phonebookRes, lpsRes, sharesRes] = await Promise.all([
+      db.from('profiles').select('id, is_active, created_at'),
+      db.from('purchases').select('profile_id, purchase_date, amount, payment_status, book_id'),
+      db.from('surveys').select('id, profile_id, selected_categories, created_at'),
+      db.from('phonebook').select('id, profile_id, created_at'),
+      db.from('landing_pages').select('id, profile_id, created_at'),
+      db.from('share_logs').select('id, event_type')
+    ]);
+
+    const profiles = profilesRes.data || [];
+    const purchases = purchasesRes.data || [];
+    const surveys = surveysRes.data || [];
+    const phonebook = phonebookRes.data || [];
+    let landingPages = lpsRes.data || [];
+    const shareLogs = sharesRes.data || [];
+
+    // Also include any landing pages from localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('UCAS_LP_')) {
+        try {
+          const list = JSON.parse(localStorage.getItem(key) || '[]');
+          list.forEach(p => {
+            if (!landingPages.some(existing => existing.id === p.id)) {
+              landingPages.push(p);
+            }
+          });
+        } catch (e) {}
+      }
+    }
+
+    // Compute active subscriber map
+    const activeSubscriberSet = new Set();
+    const now = Date.now();
+
+    purchases.forEach(p => {
+      if (p.profile_id && (p.payment_status === 'success' || p.payment_status === null || p.amount >= 0)) {
+        const pDate = p.purchase_date || new Date().toISOString();
+        const pTime = new Date(pDate).getTime();
+        const expTime = pTime + (365 * 24 * 60 * 60 * 1000) - (24 * 60 * 60 * 1000);
+        if (now <= expTime) {
+          activeSubscriberSet.add(p.profile_id);
+        }
+      }
+    });
+
+    // Check manual admin status overrides
+    profiles.forEach(u => {
+      const override = localStorage.getItem(`UCAS_USER_STATUS_${u.id}`);
+      if (override === 'ACTIVE') {
+        activeSubscriberSet.add(u.id);
+      } else if (override === 'INACTIVE') {
+        activeSubscriberSet.delete(u.id);
+      }
+    });
+
+    const totalUsers = profiles.length;
+    const activeUsers = profiles.filter(u => activeSubscriberSet.has(u.id) || u.is_active).length;
+    const inactiveUsers = Math.max(0, totalUsers - activeUsers);
+    const totalSubscribers = activeSubscriberSet.size;
+    const totalSurveys = surveys.length;
+    const totalPhonebook = phonebook.length;
+    const totalLandingPages = landingPages.length;
+
+    const totalShares = shareLogs.filter(l => l.event_type === 'share').length;
+    const surveyResponses = totalSurveys;
+
+    return {
+      success: true,
+      data: {
+        totalUsers,
+        activeUsers,
+        inactiveUsers,
+        totalSubscribers,
+        totalSurveys,
+        totalPhonebook,
+        totalLandingPages,
+        totalShares,
+        surveyResponses
+      }
+    };
+  } catch (error) {
+    console.error('Failed to fetch UCAS dashboard summary:', error);
+    return {
+      success: false,
+      data: {
+        totalUsers: 0,
+        activeUsers: 0,
+        inactiveUsers: 0,
+        totalSubscribers: 0,
+        totalSurveys: 0,
+        totalPhonebook: 0,
+        totalLandingPages: 0,
+        totalShares: 0,
+        surveyResponses: 0
+      },
+      error: error.message
+    };
+  }
+}
+
+export async function fetchUserUcasDetail(userId) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Supabase client not available.");
+
+    const [profileRes, purchasesRes, phonebookRes, surveysRes, lpsRes, permsRes] = await Promise.all([
+      db.from('profiles').select('*').eq('id', userId).single(),
+      db.from('purchases').select('*').eq('profile_id', userId).order('purchase_date', { ascending: false }),
+      db.from('phonebook').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
+      db.from('surveys').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
+      db.from('landing_pages').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
+      db.from('permissions').select('*').eq('profile_id', userId)
+    ]);
+
+    const profile = profileRes.data || {};
+    const purchases = purchasesRes.data || [];
+    const phonebook = phonebookRes.data || [];
+    const surveys = surveysRes.data || [];
+    let landingPages = lpsRes.data || [];
+    const permissions = permsRes.data || [];
+
+    // LocalStorage LPs check for this user
+    try {
+      const localLps = JSON.parse(localStorage.getItem(`UCAS_LP_${userId}`) || '[]');
+      localLps.forEach(p => {
+        if (!landingPages.some(existing => existing.id === p.id)) {
+          landingPages.push(p);
+        }
+      });
+    } catch (e) {}
+
+    // Calculate Subscription (eBook purchase date = subscription start date)
+    const latestPurchase = purchases.find(p => p.payment_status === 'success' || p.payment_status === null || p.amount >= 0) || purchases[0];
+    const manualStatus = localStorage.getItem(`UCAS_USER_STATUS_${userId}`);
+
+    let subscription = {
+      plan: 'Basic (1 Year)',
+      status: 'INACTIVE',
+      subscriber: 'NO',
+      isActive: false,
+      startDate: null,
+      expiryDate: null,
+      source: 'NONE',
+      amount: '₹0',
+      paymentId: 'N/A',
+      daysRemaining: 0
+    };
+
+    if (latestPurchase) {
+      const pDate = latestPurchase.purchase_date || latestPurchase.created_at || new Date().toISOString();
+      const pTime = new Date(pDate).getTime();
+      const expTime = pTime + (365 * 24 * 60 * 60 * 1000) - (24 * 60 * 60 * 1000);
+      const expiryDate = new Date(expTime).toISOString();
+      const now = Date.now();
+      const isNaturalActive = now <= expTime;
+      const daysRemaining = Math.max(0, Math.ceil((expTime - now) / (1000 * 60 * 60 * 24)));
+      const isActuallyActive = manualStatus ? (manualStatus === 'ACTIVE') : isNaturalActive;
+
+      subscription = {
+        plan: 'Basic (1 Year)',
+        status: isActuallyActive ? 'ACTIVE' : 'INACTIVE',
+        subscriber: isActuallyActive ? 'YES' : 'NO',
+        isActive: isActuallyActive,
+        startDate: pDate,
+        purchaseDate: pDate,
+        expiryDate: expiryDate,
+        source: latestPurchase.book_id ? 'EBOOK_PURCHASE' : 'DIRECT_PAYMENT',
+        amount: latestPurchase.book_id ? 'FREE' : `₹${latestPurchase.amount || 99}`,
+        paymentId: latestPurchase.payment_id || latestPurchase.order_id || 'N/A',
+        daysRemaining: daysRemaining
+      };
+    } else if (manualStatus === 'ACTIVE') {
+      const now = new Date();
+      const expTime = now.getTime() + (365 * 24 * 60 * 60 * 1000) - (24 * 60 * 60 * 1000);
+      subscription = {
+        plan: 'Basic (1 Year)',
+        status: 'ACTIVE',
+        subscriber: 'YES',
+        isActive: true,
+        startDate: now.toISOString(),
+        purchaseDate: now.toISOString(),
+        expiryDate: new Date(expTime).toISOString(),
+        source: 'DIRECT_PAYMENT',
+        amount: '₹99',
+        paymentId: 'MANUAL_ADMIN',
+        daysRemaining: 365
+      };
+    }
+
+    // Fetch survey responses count for each landing page
+    const allSurveysRes = await db.from('surveys').select('id, category_answers');
+    const allSurveys = allSurveysRes.data || [];
+    landingPages = landingPages.map(lp => {
+      const respCount = allSurveys.filter(s => {
+        return s.category_answers && s.category_answers.landing_page_id === lp.id;
+      }).length;
+      return { ...lp, response_count: respCount };
+    });
+
+    // Compile real timestamped activity log
+    const activityLogs = [];
+
+    surveys.forEach(s => {
+      activityLogs.push({
+        type: 'survey',
+        action: 'सर्वे दर्ज किया (Survey Created)',
+        date: s.created_at || new Date().toISOString(),
+        detail: `नाम: ${s.name} (${s.village || s.district || 'स्थान'})`
+      });
+    });
+
+    phonebook.forEach(p => {
+      activityLogs.push({
+        type: 'phonebook',
+        action: 'फोनबुक संपर्क जोड़ा (Contact Added)',
+        date: p.created_at || new Date().toISOString(),
+        detail: `नाम: ${p.name} (${p.mobile})`
+      });
+    });
+
+    landingPages.forEach(lp => {
+      activityLogs.push({
+        type: 'landing_page',
+        action: 'लैंडिंग पेज बनाया (Landing Page Created)',
+        date: lp.created_at || new Date().toISOString(),
+        detail: `टाइटल: ${lp.title} (${lp.category})`
+      });
+    });
+
+    purchases.forEach(pr => {
+      activityLogs.push({
+        type: 'purchase',
+        action: `खरीदारी की (eBook Purchase)`,
+        date: pr.purchase_date || pr.created_at || new Date().toISOString(),
+        detail: `राशि: ₹${pr.amount || 0} (Order: ${pr.payment_id || pr.order_id || 'N/A'})`
+      });
+    });
+
+    if (profile.created_at) {
+      activityLogs.push({
+        type: 'registration',
+        action: 'पंजीकरण किया (User Registered)',
+        date: profile.created_at,
+        detail: `स्रोत: ${profile.registration_source || 'Direct'}`
+      });
+    }
+
+    activityLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return {
+      success: true,
+      data: {
+        profile,
+        subscription,
+        phonebook,
+        surveys,
+        landingPages,
+        permissions,
+        purchases,
+        activityLogs
+      }
+    };
+  } catch (error) {
+    console.error('Failed to fetch user UCAS detail:', error);
+    return { success: false, data: null, error: error.message };
+  }
+}
+
+export async function fetchAllPhonebook(params = {}) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Supabase client not available.");
+
+    let query = db.from('phonebook').select('*').order('created_at', { ascending: false });
+
+    if (params.userId && params.userId !== 'all') {
+      query = query.eq('profile_id', params.userId);
+    }
+    if (params.source && params.source !== 'all') {
+      query = query.eq('source', params.source);
+    }
+
+    const { data: contacts, error } = await query;
+    if (error) throw error;
+
+    // Fetch profiles for owner details mapping
+    const profileIds = [...new Set((contacts || []).map(c => c.profile_id).filter(Boolean))];
+    let profilesMap = {};
+    if (profileIds.length > 0) {
+      const { data: profs } = await db.from('profiles').select('id, full_name, mobile, share_id').in('id', profileIds);
+      profilesMap = (profs || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+    }
+
+    let mapped = (contacts || []).map(c => {
+      const owner = profilesMap[c.profile_id] || {};
+      return {
+        ...c,
+        owner_name: owner.full_name || 'Unknown User',
+        owner_mobile: owner.mobile || '-',
+        owner_share_id: owner.share_id || '-'
+      };
+    });
+
+    if (params.search) {
+      const s = params.search.toLowerCase().trim();
+      mapped = mapped.filter(c =>
+        (c.name || '').toLowerCase().includes(s) ||
+        (c.mobile || '').includes(s) ||
+        (c.place || '').toLowerCase().includes(s) ||
+        (c.owner_name || '').toLowerCase().includes(s)
+      );
+    }
+
+    return { success: true, data: mapped };
+  } catch (error) {
+    console.error('Failed to fetch all phonebook:', error);
+    return { success: false, data: [], error: error.message };
+  }
+}
+
+export async function fetchAllSurveys(params = {}) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Supabase client not available.");
+
+    let query = db.from('surveys').select('*').order('created_at', { ascending: false });
+
+    if (params.userId && params.userId !== 'all') {
+      query = query.eq('profile_id', params.userId);
+    }
+    if (params.district && params.district !== 'all') {
+      query = query.ilike('district', `%${params.district}%`);
+    }
+    if (params.startDate) {
+      query = query.gte('created_at', params.startDate);
+    }
+    if (params.endDate) {
+      query = query.lte('created_at', params.endDate);
+    }
+
+    const { data: surveys, error } = await query;
+    if (error) throw error;
+
+    // Fetch profiles for owner details mapping
+    const profileIds = [...new Set((surveys || []).map(s => s.profile_id).filter(Boolean))];
+    let profilesMap = {};
+    if (profileIds.length > 0) {
+      const { data: profs } = await db.from('profiles').select('id, full_name, mobile, share_id').in('id', profileIds);
+      profilesMap = (profs || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+    }
+
+    let mapped = (surveys || []).map(s => {
+      const owner = profilesMap[s.profile_id] || {};
+      return {
+        ...s,
+        owner_name: owner.full_name || 'Unknown User',
+        owner_mobile: owner.mobile || '-',
+        owner_share_id: owner.share_id || '-'
+      };
+    });
+
+    if (params.category && params.category !== 'all') {
+      mapped = mapped.filter(s => {
+        if (Array.isArray(s.selected_categories)) {
+          return s.selected_categories.includes(params.category);
+        }
+        return String(s.selected_categories || '').toLowerCase().includes(params.category.toLowerCase());
+      });
+    }
+
+    if (params.search) {
+      const s = params.search.toLowerCase().trim();
+      mapped = mapped.filter(item =>
+        (item.name || '').toLowerCase().includes(s) ||
+        (item.mobile || '').includes(s) ||
+        (item.village || '').toLowerCase().includes(s) ||
+        (item.district || '').toLowerCase().includes(s) ||
+        (item.owner_name || '').toLowerCase().includes(s)
+      );
+    }
+
+    return { success: true, data: mapped };
+  } catch (error) {
+    console.error('Failed to fetch all surveys:', error);
+    return { success: false, data: [], error: error.message };
+  }
+}
+
+export async function fetchAllLandingPages(params = {}) {
+  try {
+    const db = getAdminDb();
+    let pages = [];
+
+    if (db) {
+      const { data, error } = await db.from('landing_pages').select('*').order('created_at', { ascending: false });
+      if (!error && data) pages = data;
+    }
+
+    // Scan LocalStorage for all LP keys
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('UCAS_LP_')) {
+        try {
+          const list = JSON.parse(localStorage.getItem(key) || '[]');
+          list.forEach(p => {
+            if (!pages.some(existing => existing.id === p.id)) {
+              pages.push(p);
+            }
+          });
+        } catch (err) {}
+      }
+    }
+
+    // Fetch survey responses count and owner details
+    let surveys = [];
+    if (db) {
+      const { data: sData } = await db.from('surveys').select('id, category_answers');
+      if (sData) surveys = sData;
+    }
+
+    const profileIds = [...new Set(pages.map(p => p.profile_id).filter(Boolean))];
+    let profilesMap = {};
+    if (db && profileIds.length > 0) {
+      const { data: profs } = await db.from('profiles').select('id, full_name, mobile, share_id').in('id', profileIds);
+      profilesMap = (profs || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+    }
+
+    let mapped = pages.map(lp => {
+      const owner = profilesMap[lp.profile_id] || {};
+      const respCount = surveys.filter(s => s.category_answers && s.category_answers.landing_page_id === lp.id).length;
+      return {
+        ...lp,
+        owner_name: owner.full_name || 'Creator',
+        owner_mobile: owner.mobile || '-',
+        creator_share_id: lp.share_id || owner.share_id || 'AI000000',
+        response_count: respCount,
+        status: lp.status || 'Active'
+      };
+    });
+
+    if (params.userId && params.userId !== 'all') {
+      mapped = mapped.filter(p => p.profile_id === params.userId);
+    }
+    if (params.category && params.category !== 'all') {
+      mapped = mapped.filter(p => p.category === params.category);
+    }
+    if (params.search) {
+      const s = params.search.toLowerCase().trim();
+      mapped = mapped.filter(p =>
+        (p.title || '').toLowerCase().includes(s) ||
+        (p.id || '').toLowerCase().includes(s) ||
+        (p.owner_name || '').toLowerCase().includes(s) ||
+        (p.creator_share_id || '').toLowerCase().includes(s)
+      );
+    }
+
+    return { success: true, data: mapped };
+  } catch (error) {
+    console.error('Failed to fetch all landing pages:', error);
+    return { success: false, data: [], error: error.message };
+  }
+}
+
+export async function deleteLandingPageAdmin(lpId) {
+  try {
+    const db = getAdminDb();
+    if (db) {
+      await db.from('landing_pages').delete().eq('id', lpId);
+    }
+
+    // Clean from LocalStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('UCAS_LP_')) {
+        try {
+          const list = JSON.parse(localStorage.getItem(key) || '[]');
+          const filtered = list.filter(p => p.id !== lpId);
+          localStorage.setItem(key, JSON.stringify(filtered));
+        } catch (e) {}
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete landing page:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function fetchAllUserPermissions(params = {}) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Supabase client not available.");
+
+    let profilesQuery = db.from('profiles').select('id, full_name, mobile, is_active').order('full_name', { ascending: true });
+    if (params.userId && params.userId !== 'all') {
+      profilesQuery = profilesQuery.eq('id', params.userId);
+    }
+
+    const [profilesRes, permsRes] = await Promise.all([
+      profilesQuery,
+      db.from('permissions').select('*')
+    ]);
+
+    const profiles = profilesRes.data || [];
+    const perms = permsRes.data || [];
+
+    const permsByUser = perms.reduce((acc, p) => {
+      if (!acc[p.profile_id]) acc[p.profile_id] = {};
+      acc[p.profile_id][p.permission_key] = Boolean(p.allowed);
+      return acc;
+    }, {});
+
+    return {
+      success: true,
+      data: {
+        profiles,
+        permsByUser
+      }
+    };
+  } catch (error) {
+    console.error('Failed to fetch user permissions:', error);
+    return { success: false, data: { profiles: [], permsByUser: {} }, error: error.message };
+  }
+}
+
+export async function updateUserPermissionAdmin(userId, permissionKey, allowed) {
+  try {
+    const db = getAdminDb();
+    if (!db) throw new Error("Supabase client not available.");
+
+    const { error } = await db
+      .from('permissions')
+      .upsert({
+        profile_id: userId,
+        permission_key: permissionKey,
+        allowed: allowed,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'profile_id,permission_key' });
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to update user permission:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateUserStatusAdmin(userId, status) {
+  try {
+    const isBool = status === 'active' || status === true || status === 'ACTIVE';
+    localStorage.setItem(`UCAS_USER_STATUS_${userId}`, isBool ? 'ACTIVE' : 'INACTIVE');
+
+    const db = getAdminDb();
+    if (db) {
+      await db.from('profiles').update({ is_active: isBool }).eq('id', userId);
+    }
+
+    return { success: true, status: isBool ? 'active' : 'inactive' };
+  } catch (error) {
+    console.error('Failed to update user status:', error);
+    return { success: false, error: error.message };
+  }
+}

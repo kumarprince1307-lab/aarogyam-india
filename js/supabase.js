@@ -865,3 +865,8 @@ async function processDownload(bookId) {
     return { success: true, remaining: DOWNLOAD.LIMIT - newCount };
 }
 console.log("✅ PDF Download & Logs Module Loaded");
+
+// ES Module export compatibility
+export const supabase = (typeof window !== 'undefined' && (window.dbClient || window.supabase)) || (typeof db !== 'undefined' ? db : null);
+export const dbClient = (typeof window !== 'undefined' && (window.dbClient || window.supabase)) || (typeof db !== 'undefined' ? db : null);
+export default supabase;

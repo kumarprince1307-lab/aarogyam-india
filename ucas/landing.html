@@ -1,9 +1,57 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="hi" prefix="og: https://ogp.me/ns#">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Aarogyam India — महत्वपूर्ण सूचना एवं सर्वे</title>
+
+  <!-- Open Graph / Facebook & WhatsApp Dynamic Preview Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Aarogyam India">
+  <meta property="og:title" id="og_title" content="Aarogyam India — महत्वपूर्ण सूचना एवं सर्वे">
+  <meta property="og:description" id="og_desc" content="Aarogyam India में आपका स्वागत है। विशेष जानकारी और सर्वे के लिए अभी देखें।">
+  <meta property="og:image" id="og_image" content="https://aarogyamindia.in/images/logo/logo.png">
+  <meta property="og:image:secure_url" id="og_image_secure" content="https://aarogyamindia.in/images/logo/logo.png">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" id="og_url" content="https://aarogyamindia.in/ucas/landing.html">
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" id="tw_title" content="Aarogyam India — महत्वपूर्ण सूचना एवं सर्वे">
+  <meta name="twitter:description" id="tw_desc" content="Aarogyam India में आपका स्वागत है। विशेष जानकारी और सर्वे के लिए अभी देखें।">
+  <meta name="twitter:image" id="tw_image" content="https://aarogyamindia.in/images/logo/logo.png">
+
+  <!-- Immediate Head OG Metadata Dynamic Resolver -->
+  <script>
+    (function() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const pTitle = params.get('title');
+        const pThumb = params.get('thumb');
+        const pDesc = params.get('desc') || params.get('msg');
+        
+        if (pTitle) {
+          document.title = pTitle + ' — Aarogyam India';
+          document.getElementById('og_title')?.setAttribute('content', pTitle);
+          document.getElementById('tw_title')?.setAttribute('content', pTitle);
+        }
+        if (pThumb) {
+          document.getElementById('og_image')?.setAttribute('content', pThumb);
+          document.getElementById('og_image_secure')?.setAttribute('content', pThumb);
+          document.getElementById('tw_image')?.setAttribute('content', pThumb);
+        }
+        if (pDesc) {
+          document.getElementById('og_desc')?.setAttribute('content', pDesc);
+          document.getElementById('tw_desc')?.setAttribute('content', pDesc);
+        }
+        document.getElementById('og_url')?.setAttribute('content', window.location.href);
+      } catch (e) {
+        console.warn('OG meta resolver error', e);
+      }
+    })();
+  </script>
   
   <!-- Fonts & FontAwesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -321,18 +369,18 @@
         संदेश लोड हो रहा है...
       </div>
 
-      <!-- Survey Form -->
+      <!-- Survey / Registration Form -->
       <div class="lp-survey-box" id="lp_survey_form_container">
-        <div class="lp-survey-title">
+        <div class="lp-survey-title" id="lp_form_title">
           <i class="fa-solid fa-clipboard-list"></i> छोटा सर्वे भरें (Quick Survey)
         </div>
-        <div class="lp-survey-subtitle">
+        <div class="lp-survey-subtitle" id="lp_form_subtitle">
           सटीक जानकारी व समाधान प्राप्त करने के लिए कृपया नीचे अपना विवरण भरें:
         </div>
 
         <form id="lp_public_survey_form">
           <div class="lp-form-group">
-            <label class="lp-label">आपका नाम *</label>
+            <label class="lp-label">आपका नाम (Full Name) *</label>
             <input type="text" id="lp_name" class="lp-input" placeholder="उदा. रमेश कुमार" required>
           </div>
 
@@ -341,9 +389,9 @@
             <input type="tel" id="lp_mobile" class="lp-input" placeholder="उदा. 9827372989" maxlength="10" required>
           </div>
 
-          <div class="lp-form-group">
+          <div class="lp-form-group" id="lp_place_group">
             <label class="lp-label">स्थान / ग्राम / जिला *</label>
-            <input type="text" id="lp_place" class="lp-input" placeholder="उदा. रामपुर, जिला रीवा" required>
+            <input type="text" id="lp_place" class="lp-input" placeholder="उदा. रामपुर, जिला रीवा">
           </div>
 
           <!-- Dynamic Category Specific Question -->
@@ -357,7 +405,61 @@
         </form>
       </div>
 
-      <!-- Success Screen (Shown after submit) -->
+      <!-- Webinar Unlocked Screen (Revealed immediately after Webinar Registration) -->
+      <div class="lp-webinar-unlocked-screen" id="lp_webinar_unlocked_screen" style="display:none;background:#FFFFFF;border:2px solid #3B82F6;border-radius:var(--radius-lg);padding:1.25rem;box-shadow:0 8px 25px rgba(59,130,246,0.15);text-align:center;">
+        <div style="width:60px;height:60px;background:#DBEAFE;color:#2563EB;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 10px auto;">
+          <i class="fa-solid fa-video"></i>
+        </div>
+        <div style="font-size:0.8rem;font-weight:800;color:#2563EB;text-transform:uppercase;letter-spacing:0.5px;">Webinar Registration Confirmed</div>
+        <h3 id="webinar_unlocked_title" style="font-size:1.2rem;font-weight:800;color:var(--text-main);margin:4px 0 8px 0;">लाइव वेबिनार में आपका स्वागत है!</h3>
+        
+        <div id="webinar_unlocked_datetime_box" style="display:inline-flex;align-items:center;gap:6px;background:#EFF6FF;color:#1E40AF;padding:6px 14px;border-radius:var(--radius-full);font-size:0.85rem;font-weight:700;margin-bottom:14px;">
+          <i class="fa-regular fa-calendar-check"></i> <span id="webinar_unlocked_datetime">25 अगस्त 2026, शाम 7:00 बजे</span>
+        </div>
+
+        <p id="webinar_unlocked_msg" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;line-height:1.4;">
+          आपकी सीट सुरक्षित कर ली गई है। नीचे दिए गए बटन पर क्लिक करके Zoom मीटिंग में शामिल हों:
+        </p>
+
+        <!-- Big Join Zoom Button -->
+        <a id="webinar_btn_join_zoom" href="#" target="_blank" class="lp-btn-submit" style="background:linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);text-decoration:none;font-size:1.05rem;padding:14px;border-radius:var(--radius-md);margin-bottom:14px;box-shadow:0 4px 15px rgba(37,99,235,0.35);">
+          <i class="fa-solid fa-video"></i> Join Zoom Meeting Now
+        </a>
+
+        <!-- Meeting ID & Password Box -->
+        <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;margin-bottom:14px;text-align:left;">
+          <div id="webinar_meeting_id_row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">Meeting ID (मीटिंग आईडी):</div>
+              <div id="webinar_unlocked_meeting_id" style="font-size:1.1rem;font-weight:800;color:var(--text-main);letter-spacing:1px;">-</div>
+            </div>
+            <button type="button" id="btn_copy_meeting_id" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:4px 10px;font-size:0.75rem;">
+              <i class="fa-solid fa-copy"></i> Copy ID
+            </button>
+          </div>
+
+          <div id="webinar_passcode_row" style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">Passcode / Password (पासवर्ड):</div>
+              <div id="webinar_unlocked_passcode" style="font-size:1.1rem;font-weight:800;color:#15803D;letter-spacing:1px;">-</div>
+            </div>
+            <button type="button" id="btn_copy_passcode" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:4px 10px;font-size:0.75rem;">
+              <i class="fa-solid fa-copy"></i> Copy Pass
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <button type="button" id="btn_copy_full_invite" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:6px 12px;font-size:0.8rem;">
+            <i class="fa-solid fa-clipboard"></i> निमंत्रण कॉपी करें
+          </button>
+          <button type="button" id="webinar_btn_wa_save" class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" style="padding:6px 12px;font-size:0.8rem;">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp पर सेव करें
+          </button>
+        </div>
+      </div>
+
+      <!-- General Success Screen (For regular surveys) -->
       <div class="lp-success-screen" id="lp_success_screen">
         <div class="lp-success-icon">
           <i class="fa-solid fa-circle-check"></i>
@@ -423,15 +525,64 @@
       function renderLandingPage(lp) {
         if (!lp) return;
 
-        // Title
-        document.title = `${lp.title || 'Aarogyam India'} — सर्वे`;
+        // Security & Abuse Shield: Blocked / Pending Review Gate
+        if (lp.status === 'blocked' || lp.status === 'disabled') {
+          const container = document.querySelector('.lp-container') || document.body;
+          container.innerHTML = `
+            <div class="lp-card" style="text-align:center;padding:3rem 1.5rem;margin-top:2rem;">
+              <div style="font-size:3.5rem;color:#EF4444;margin-bottom:12px;"><i class="fa-solid fa-shield-halved"></i></div>
+              <h2 style="font-size:1.4rem;font-weight:800;color:#1E293B;margin-bottom:8px;">⚠️ लिंक अस्थायी रूप से बंद है</h2>
+              <p style="font-size:0.95rem;color:#64748B;line-height:1.6;max-width:420px;margin:0 auto 20px;">
+                यह लैंडिंग पेज सुरक्षा एवं एडमिन समीक्षा नियमों के तहत अस्थायी रूप से निष्क्रिय (Blocked) कर दिया गया है।
+              </p>
+              <a href="https://aarogyamindia.in" class="lp-btn lp-btn-primary" style="display:inline-flex;width:auto;padding:10px 24px;text-decoration:none;">
+                <i class="fa-solid fa-house"></i> मुख्य वेबसाइट पर जाएं
+              </a>
+            </div>
+          `;
+          return;
+        }
 
-        // Render Media
+        if (lp.status === 'pending_review') {
+          const container = document.querySelector('.lp-container') || document.body;
+          container.innerHTML = `
+            <div class="lp-card" style="text-align:center;padding:3rem 1.5rem;margin-top:2rem;">
+              <div style="font-size:3.5rem;color:#F59E0B;margin-bottom:12px;"><i class="fa-solid fa-hourglass-half"></i></div>
+              <h2 style="font-size:1.4rem;font-weight:800;color:#1E293B;margin-bottom:8px;">⏳ पेज अभी समीक्षा (Under Review) में है</h2>
+              <p style="font-size:0.95rem;color:#64748B;line-height:1.6;max-width:420px;margin:0 auto 20px;">
+                यह लैंडिंग पेज अभी एडमिन समीक्षा के अंतर्गत है। स्वीकृति के बाद ही यह सार्वजनिक रूप से उपलब्ध होगा।
+              </p>
+              <a href="https://aarogyamindia.in" class="lp-btn lp-btn-primary" style="display:inline-flex;width:auto;padding:10px 24px;text-decoration:none;">
+                <i class="fa-solid fa-house"></i> Aarogyam India होमपेज
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        // Title & Meta Tags
+        const finalTitle = `${lp.title || 'Aarogyam India'} — सर्वे`;
+        document.title = finalTitle;
+        document.getElementById('og_title')?.setAttribute('content', finalTitle);
+        document.getElementById('tw_title')?.setAttribute('content', finalTitle);
+
+        if (lp.message) {
+          document.getElementById('og_desc')?.setAttribute('content', lp.message);
+          document.getElementById('tw_desc')?.setAttribute('content', lp.message);
+        }
+
+        // Render Media & Thumbnails
         const mediaHolder = document.getElementById('lp_media_holder');
         if (mediaHolder) {
           if (lp.content_type === 'youtube') {
             const ytId = extractYtId(lp.media_url);
             const thumb = lp.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '');
+            
+            if (thumb) {
+              document.getElementById('og_image')?.setAttribute('content', thumb);
+              document.getElementById('og_image_secure')?.setAttribute('content', thumb);
+              document.getElementById('tw_image')?.setAttribute('content', thumb);
+            }
             
             if (ytId) {
               mediaHolder.innerHTML = `
@@ -454,8 +605,22 @@
           msgHolder.textContent = lp.message;
         }
 
-        // Render Dynamic Category Question
-        renderCategorySpecificQuestion(lp.category);
+        // Webinar Customization
+        const isWebinar = lp.category === 'webinar' || Boolean(lp.webinar_data);
+        const formTitle = document.getElementById('lp_form_title');
+        const formSubtitle = document.getElementById('lp_form_subtitle');
+        const placeGroup = document.getElementById('lp_place_group');
+        const submitBtn = document.getElementById('lp_btn_survey_submit');
+
+        if (isWebinar) {
+          if (formTitle) formTitle.innerHTML = '<i class="fa-solid fa-video" style="color:#2563EB;"></i> वेबिनार में भाग लेने के लिए रजिस्टर करें';
+          if (formSubtitle) formSubtitle.textContent = 'कृपया अपना नाम और मोबाइल नंबर दर्ज करें। सबमिट करते ही Zoom Meeting Link और पासवर्ड तुरंत खुल जाएगा:';
+          if (placeGroup) placeGroup.style.display = 'none';
+          if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> 🔓 रजिस्टर करें और Zoom Link देखें';
+        } else {
+          // Render Dynamic Category Question
+          renderCategorySpecificQuestion(lp.category);
+        }
 
         // Bind Survey Submit
         const form = document.getElementById('lp_public_survey_form');
@@ -546,11 +711,17 @@
 
         const name = (document.getElementById('lp_name')?.value || '').trim();
         let mobile = (document.getElementById('lp_mobile')?.value || '').replace(/\D/g, '').trim();
-        const place = (document.getElementById('lp_place')?.value || '').trim();
-        const catAns = document.getElementById('lp_cat_ans')?.value || '';
+        const place = (document.getElementById('lp_place')?.value || '').trim() || 'Online';
+        const catAns = document.getElementById('lp_cat_ans')?.value || 'Webinar Registration';
+        const isWebinar = landingPageData.category === 'webinar' || Boolean(landingPageData.webinar_data);
 
-        if (!name || mobile.length !== 10 || !place) {
-          alert('कृपया सभी आवश्यक जानकारी (10 अंकों का मोबाइल नंबर) सही भरें।');
+        if (!name || mobile.length !== 10) {
+          alert('कृपया अपना नाम और 10 अंकों का मान्य मोबाइल नंबर सही भरें।');
+          return;
+        }
+
+        if (!isWebinar && !place) {
+          alert('कृपया स्थान / ग्राम / जिला दर्ज करें।');
           return;
         }
 
@@ -572,7 +743,7 @@
           category_answers: {
             landing_page_id: landingPageData.id,
             creator_share_id: creatorShareId,
-            source: 'landing_page',
+            source: isWebinar ? 'webinar_landing_page' : 'landing_page',
             status: 'new',
             response: catAns
           }
@@ -587,32 +758,85 @@
           // Track attribution
           if (typeof trackAttributionEvent === 'function') {
             trackAttributionEvent({
-              event_type: 'landing_page_survey_submit',
+              event_type: isWebinar ? 'webinar_registration' : 'landing_page_survey_submit',
               asset_id: landingPageData.id,
               asset_title: landingPageData.title
             });
           }
 
-          // Show Success Screen
+          // Hide Form
           document.getElementById('lp_survey_form_container').style.display = 'none';
-          const successScreen = document.getElementById('lp_success_screen');
-          if (successScreen) successScreen.style.display = 'block';
 
-          // Optional WhatsApp Contact Box
-          const contactBox = document.getElementById('lp_contact_creator_box');
-          if (contactBox) {
-            contactBox.innerHTML = `
-              <a href="https://wa.me/917428068147?text=${encodeURIComponent('नमस्ते! मैंने Aarogyam India लैंडिंग पेज पर सर्वे भरा है।')}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:10px 18px;border-radius:var(--radius-md);text-decoration:none;font-weight:700;font-size:0.9rem;">
-                <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i> WhatsApp पर तुरंत बात करें
-              </a>
-            `;
+          if (isWebinar) {
+            // Unlocked Zoom Meeting Screen
+            const wData = landingPageData.webinar_data || {};
+            const unlockedScreen = document.getElementById('lp_webinar_unlocked_screen');
+            const unTitle = document.getElementById('webinar_unlocked_title');
+            const unDt = document.getElementById('webinar_unlocked_datetime');
+            const unMsg = document.getElementById('webinar_unlocked_msg');
+            const btnJoin = document.getElementById('webinar_btn_join_zoom');
+            const meetingIdEl = document.getElementById('webinar_unlocked_meeting_id');
+            const passcodeEl = document.getElementById('webinar_unlocked_passcode');
+
+            if (unTitle) unTitle.textContent = landingPageData.title || 'लाइव वेबिनार में आपका स्वागत है!';
+            if (unDt) unDt.textContent = wData.datetime || 'आज का लाइव वेबिनार सत्र';
+            if (unMsg && wData.success_msg) unMsg.textContent = wData.success_msg;
+
+            const zoomUrl = wData.zoom_link || '#';
+            if (btnJoin) btnJoin.href = zoomUrl;
+
+            const mId = wData.meeting_id || '-';
+            const mPass = wData.passcode || '-';
+            if (meetingIdEl) meetingIdEl.textContent = mId;
+            if (passcodeEl) passcodeEl.textContent = mPass;
+
+            // Copy Action Listeners
+            document.getElementById('btn_copy_meeting_id')?.addEventListener('click', () => {
+              if (navigator.clipboard) navigator.clipboard.writeText(mId);
+              alert('Meeting ID कॉपी हो गई: ' + mId);
+            });
+
+            document.getElementById('btn_copy_passcode')?.addEventListener('click', () => {
+              if (navigator.clipboard) navigator.clipboard.writeText(mPass);
+              alert('Passcode कॉपी हो गया: ' + mPass);
+            });
+
+            const fullInvite = `🎥 *${landingPageData.title || 'Aarogyam India Live Webinar'}*\n\n📅 समय: ${wData.datetime || 'लाइव सत्र'}\n🔗 Zoom लिंक: ${zoomUrl}\n🆔 Meeting ID: ${mId}\n🔑 Passcode: ${mPass}\n\n👉 अभी जुड़ें: ${zoomUrl}`;
+
+            document.getElementById('btn_copy_full_invite')?.addEventListener('click', () => {
+              if (navigator.clipboard) navigator.clipboard.writeText(fullInvite);
+              alert('पूरा वेबिनार निमंत्रण कॉपी हो गया!');
+            });
+
+            document.getElementById('webinar_btn_wa_save')?.addEventListener('click', () => {
+              window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(fullInvite)}`, '_blank');
+            });
+
+            if (unlockedScreen) {
+              unlockedScreen.style.display = 'block';
+              unlockedScreen.scrollIntoView({ behavior: 'smooth' });
+            }
+          } else {
+            // Regular Survey Success Screen
+            const successScreen = document.getElementById('lp_success_screen');
+            if (successScreen) successScreen.style.display = 'block';
+
+            // Optional WhatsApp Contact Box
+            const contactBox = document.getElementById('lp_contact_creator_box');
+            if (contactBox) {
+              contactBox.innerHTML = `
+                <a href="https://wa.me/917428068147?text=${encodeURIComponent('नमस्ते! मैंने Aarogyam India लैंडिंग पेज पर सर्वे भरा है।')}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:10px 18px;border-radius:var(--radius-md);text-decoration:none;font-weight:700;font-size:0.9rem;">
+                  <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i> WhatsApp पर तुरंत बात करें
+                </a>
+              `;
+            }
           }
         } catch (err) {
           console.error('Survey submission error', err);
-          alert('सर्वे सबमिट करने में समस्या आई। कृपया पुनः प्रयास करें।');
+          alert('सबमिट करने में समस्या आई। कृपया पुनः प्रयास करें।');
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> सर्वे पूरा करें (Submit)';
+            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> सबमिट करें';
           }
         }
       }

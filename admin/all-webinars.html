@@ -1,0 +1,26 @@
+<!-- Admin Webinars & Live Events Page -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin - Webinars & Live Events</title>
+  <link rel="stylesheet" href="../css/admin-panel.css">
+  <link rel="stylesheet" href="../css/admin-components.css">
+</head>
+<body>
+  <div id="admin-app" class="admin-app">
+    <div id="sidebar-placeholder"></div>
+    <main id="main-placeholder" class="admin-main">
+      <div id="header-placeholder"></div>
+      <div id="page-content"></div>
+    </main>
+  </div>
+  <script type="module" src="../js/admin-main.js"></script>
+  <script type="module" src="../js/admin-pages-webinars.js?v=8.0"></script>
+  <script type="module">
+    import { initWebinars } from '../js/admin-pages-webinars.js?v=8.0';
+    initWebinars();
+  </script>
+</body>
+</html>

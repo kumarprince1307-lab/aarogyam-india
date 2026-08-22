@@ -1,6 +1,6 @@
-/* Aarogyam India Admin - Isolated Service Worker (V5) */
+/* Aarogyam India Admin - Isolated Service Worker (V10) */
 
-const CACHE_NAME = 'aarogyam-admin-shell-v5';
+const CACHE_NAME = 'aarogyam-admin-shell-v10';
 const OFFLINE_FALLBACK = '/admin/offline.html';
 
 const APP_SHELL_ASSETS = [
@@ -19,6 +19,10 @@ const APP_SHELL_ASSETS = [
   '/js/admin-pages-notifications.js',
   '/js/admin-pages-users.js',
   '/js/admin-pages-user-details.js',
+  '/js/admin-pages-user-permissions.js',
+  '/js/admin-pages-phonebook.js',
+  '/js/admin-pages-surveys.js',
+  '/js/admin-pages-landing-pages.js',
   '/js/admin-pages-purchases.js',
   '/js/admin-pages-checkout-funnel.js',
   '/js/admin-pages-downloads.js',
@@ -92,29 +96,20 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Static Assets (CSS, JS, Images, Fonts): Cache First, fallback to network
+  // 3. Static Assets (CSS, JS, Images, Fonts): Network First, fallback to cache
   event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Fetch fresh copy in background to keep cache updated
-        fetch(request).then((freshResponse) => {
-          if (freshResponse && freshResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, freshResponse));
-          }
-        }).catch(() => {});
-        return cachedResponse;
-      }
-
-      return fetch(request).then((networkResponse) => {
+    fetch(request)
+      .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && request.method === 'GET') {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
         }
         return networkResponse;
-      }).catch(() => {
-        // Return empty or fallback if resource fails offline
+      })
+      .catch(async () => {
+        const cachedResponse = await caches.match(request);
+        if (cachedResponse) return cachedResponse;
         return new Response('', { status: 408, statusText: 'Offline' });
-      });
-    })
+      })
   );
 });

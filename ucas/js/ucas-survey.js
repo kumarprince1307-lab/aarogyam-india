@@ -542,7 +542,11 @@
     }
 
     tbody.innerHTML = surveys.map((s, idx) => {
-      const cats = Array.isArray(s.selected_categories) ? s.selected_categories.join(', ') : (s.selected_categories || '-');
+      const rawCats = Array.isArray(s.selected_categories) ? s.selected_categories.join(', ') : (s.selected_categories || '-');
+      const isWebinar = rawCats.includes('webinar') || s.category_answers?.source?.includes('webinar');
+      const catBadge = isWebinar
+        ? '<span style="font-size:0.78rem;background:#EFF6FF;color:#2563EB;padding:3px 8px;border-radius:4px;font-weight:700;"><i class="fa-solid fa-video"></i> Webinar Attendee</span>'
+        : `<span style="font-size:0.78rem;background:var(--primary-subtle);color:var(--primary);padding:3px 8px;border-radius:4px;font-weight:600;">${rawCats}</span>`;
       const dateStr = s.created_at ? new Date(s.created_at).toLocaleDateString('hi-IN') : '-';
       return `
         <tr>
@@ -552,7 +556,7 @@
             <div style="font-size:0.75rem;color:var(--text-muted);">${s.village || s.district || s.state || '-'}</div>
           </td>
           <td><code>${s.mobile}</code></td>
-          <td><span style="font-size:0.78rem;background:var(--primary-subtle);color:var(--primary);padding:3px 8px;border-radius:4px;font-weight:600;">${cats}</span></td>
+          <td>${catBadge}</td>
           <td>${dateStr}</td>
           <td>
             <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_SURVEY.viewSurveyDetails('${s.id}')">

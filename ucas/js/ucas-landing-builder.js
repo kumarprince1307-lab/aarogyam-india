@@ -47,6 +47,29 @@
     // Cancel edit button
     const cancelBtn = document.getElementById('lp_btn_cancel_edit');
     cancelBtn?.addEventListener('click', cancelEdit);
+
+    // Category change listener (for dynamic Webinar & Zoom fields)
+    const categorySelect = document.getElementById('lp_select_category');
+    categorySelect?.addEventListener('change', handleCategoryChange);
+  }
+
+  function handleCategoryChange() {
+    const catSelect = document.getElementById('lp_select_category');
+    const webinarBox = document.getElementById('lp_webinar_fields_container');
+    const msgBox = document.getElementById('lp_input_message');
+    const titleInput = document.getElementById('lp_input_title');
+
+    if (catSelect?.value === 'webinar') {
+      if (webinarBox) webinarBox.style.display = 'block';
+      if (titleInput && !titleInput.value) {
+        titleInput.placeholder = 'उदा. लाइव हेल्थ वेबिनार या आधुनिक कृषि प्रशिक्षण 2026';
+      }
+      if (msgBox && !msgBox.value) {
+        msgBox.placeholder = 'उदा. इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें। रजिस्ट्रेशन के तुरंत बाद Zoom लिंक और पासवर्ड मिल जाएगा।';
+      }
+    } else {
+      if (webinarBox) webinarBox.style.display = 'none';
+    }
   }
 
   function setContentType(type) {
@@ -232,17 +255,43 @@
     const profileId = window.UCAS_SESSION.getUserId();
     const shareId = window.UCAS_SESSION.getShareId();
 
+    // Webinar / Zoom Data Extraction
+    let webinarData = null;
+    if (categoryInput === 'webinar') {
+      const zoomLink = (document.getElementById('lp_webinar_zoom_link')?.value || '').trim();
+      const meetingId = (document.getElementById('lp_webinar_meeting_id')?.value || '').trim();
+      const passcode = (document.getElementById('lp_webinar_passcode')?.value || '').trim();
+      const datetime = (document.getElementById('lp_webinar_datetime')?.value || '').trim();
+      const successMsg = (document.getElementById('lp_webinar_success_msg')?.value || '').trim();
+
+      if (!zoomLink && !meetingId) {
+        window.UCAS_APP.showToast('कृपया Zoom Join Link या Meeting ID अवश्य दर्ज करें।', 'error');
+        return;
+      }
+
+      webinarData = {
+        zoom_link: zoomLink,
+        meeting_id: meetingId,
+        passcode: passcode,
+        datetime: datetime,
+        success_msg: successMsg
+      };
+    }
+
     // ==========================================
-    // INACTIVE USER LANDING PAGE LIMIT CHECK (MAX 3)
+    // USER ACTIVE STATUS & REVIEW GOVERNANCE
     // ==========================================
+    const sub = await window.UCAS_DB.getUserSubscription(profileId);
+    const isUserActive = Boolean(sub?.isActive);
+    const initialStatus = isUserActive ? 'active' : 'pending_review';
+
     const UCAS_LANDING_LIMITS = {
       INACTIVE_LIMIT: 3,
       ACTIVE_LIMIT: Infinity
     };
 
     if (!editingLandingPageId && profileId) {
-      const sub = await window.UCAS_DB.getUserSubscription(profileId);
-      if (!sub.isActive && userLandingPages.length >= UCAS_LANDING_LIMITS.INACTIVE_LIMIT) {
+      if (!isUserActive && userLandingPages.length >= UCAS_LANDING_LIMITS.INACTIVE_LIMIT) {
         window.UCAS_APP.showToast('आपकी 3 Landing Page limit पूरी हो गई है। अधिक Landing Pages बनाने के लिए Active User बनें।', 'warning');
         return;
       }
@@ -269,7 +318,8 @@
           content_type: activeContentType,
           media_url: activeContentType === 'image' ? uploadedImageData : `https://www.youtube.com/watch?v=${detectedYoutubeId}`,
           thumbnail_url: activeContentType === 'image' ? uploadedImageData : detectedYoutubeThumbnail,
-          message: messageInput
+          message: messageInput,
+          webinar_data: webinarData
         };
 
         const res = await window.UCAS_DB.updateLandingPage(lpId, updatePayload, profileId);
@@ -298,12 +348,37 @@
           media_url: activeContentType === 'image' ? uploadedImageData : `https://www.youtube.com/watch?v=${detectedYoutubeId}`,
           thumbnail_url: activeContentType === 'image' ? uploadedImageData : detectedYoutubeThumbnail,
           message: messageInput,
+          webinar_data: webinarData,
+          status: initialStatus,
           created_at: new Date().toISOString()
         };
 
         const res = await window.UCAS_DB.createLandingPage(payload);
         if (res.success) {
-          window.UCAS_APP.showToast(`🎉 लैंडिंग पेज (${lpId}) सफलतापूर्वक बन गया!`, 'success');
+          // Trigger Admin Notification
+          try {
+            const db = window.UCAS_DB.getDb();
+            if (db) {
+              const userName = window.UCAS_SESSION.getUserName() || 'User';
+              await db.from('notifications').insert([{
+                profile_id: profileId,
+                type: 'landing_page_created',
+                title: `📄 नया लैंडिंग पेज बनाया गया: ${title}`,
+                message: `${userName} (${shareId} - ${isUserActive ? '🟢 Active User' : '🔴 Inactive User'}) ने नया लैंडिंग पेज बनाया। ${isUserActive ? 'स्वतः लाइव हुआ।' : 'समीक्षा (Review) करें।'}`,
+                link: '#landing-page-control',
+                created_at: new Date().toISOString()
+              }]);
+            }
+          } catch (notifErr) {
+            console.warn('Admin notification error', notifErr);
+          }
+
+          if (isUserActive) {
+            window.UCAS_APP.showToast(`🎉 लैंडिंग पेज (${lpId}) लाइव हो गया!`, 'success');
+          } else {
+            window.UCAS_APP.showToast(`⏳ लैंडिंग पेज (${lpId}) समीक्षा के लिए सबमिट हुआ। एडमिन अप्रूवल के बाद शेयर होगा।`, 'info');
+          }
+
           showGeneratedResult(payload);
           resetBuilderForm();
           await loadMyLandingPages();
@@ -339,6 +414,26 @@
     if (titleInput) titleInput.value = lp.title || '';
     if (messageInput) messageInput.value = lp.message || '';
     if (categorySelect) categorySelect.value = lp.category || 'agriculture';
+
+    // Populate Webinar Fields if applicable
+    const webinarBox = document.getElementById('lp_webinar_fields_container');
+    if (lp.category === 'webinar') {
+      const webData = lp.webinar_data || {};
+      const zoomLinkInput = document.getElementById('lp_webinar_zoom_link');
+      const meetingIdInput = document.getElementById('lp_webinar_meeting_id');
+      const passcodeInput = document.getElementById('lp_webinar_passcode');
+      const dtInput = document.getElementById('lp_webinar_datetime');
+      const successMsgInput = document.getElementById('lp_webinar_success_msg');
+
+      if (zoomLinkInput) zoomLinkInput.value = webData.zoom_link || '';
+      if (meetingIdInput) meetingIdInput.value = webData.meeting_id || '';
+      if (passcodeInput) passcodeInput.value = webData.passcode || '';
+      if (dtInput) dtInput.value = webData.datetime || '';
+      if (successMsgInput) successMsgInput.value = webData.success_msg || '';
+      if (webinarBox) webinarBox.style.display = 'block';
+    } else {
+      if (webinarBox) webinarBox.style.display = 'none';
+    }
 
     // Set Media Content
     if (lp.content_type === 'youtube') {
@@ -416,6 +511,25 @@
     const url = new URL('/ucas/landing.html', origin);
     url.searchParams.set('id', lp.id);
     url.searchParams.set('share_id', lp.share_id || window.UCAS_SESSION.getShareId());
+
+    if (lp.title) {
+      url.searchParams.set('title', lp.title);
+    }
+
+    let thumbUrl = lp.thumbnail_url;
+    if (lp.content_type === 'youtube') {
+      const ytId = extractYoutubeId(lp.media_url);
+      if (ytId) {
+        thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+      }
+    } else if (lp.media_url && !lp.media_url.startsWith('data:')) {
+      thumbUrl = lp.media_url;
+    }
+
+    if (thumbUrl && !thumbUrl.startsWith('data:')) {
+      url.searchParams.set('thumb', thumbUrl);
+    }
+
     url.searchParams.set('src', 'ucas_lp_builder');
     return url.toString();
   }
@@ -430,14 +544,49 @@
     linkInput.value = shareUrl;
     if (idBadge) idBadge.textContent = lp.id;
 
+    const isPending = lp.status === 'pending_review';
+    const isBlocked = lp.status === 'blocked' || lp.status === 'disabled';
+
+    // Show under review notice if applicable
+    let reviewNotice = document.getElementById('lp_result_review_notice');
+    if (!reviewNotice) {
+      reviewNotice = document.createElement('div');
+      reviewNotice.id = 'lp_result_review_notice';
+      resultCard.insertBefore(reviewNotice, resultCard.firstChild);
+    }
+
+    if (isPending) {
+      reviewNotice.style.display = 'block';
+      reviewNotice.innerHTML = `
+        <div style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;font-size:0.85rem;color:#B45309;font-weight:700;display:flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-hourglass-half" style="font-size:1.2rem;"></i>
+          <span>⏳ आपका लैंडिंग पेज एडमिन समीक्षा (Under Review) में है। एडमिन द्वारा स्वीकृत होने के बाद ही यह लाइव होगा और शेयर किया जा सकेगा।</span>
+        </div>
+      `;
+    } else if (isBlocked) {
+      reviewNotice.style.display = 'block';
+      reviewNotice.innerHTML = `
+        <div style="background:#FEE2E2;border:1.5px solid #EF4444;border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;font-size:0.85rem;color:#B91C1C;font-weight:700;display:flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-ban" style="font-size:1.2rem;"></i>
+          <span>🔴 यह लैंडिंग पेज एडमिन द्वारा ब्लॉक/निष्क्रिय किया गया है।</span>
+        </div>
+      `;
+    } else {
+      reviewNotice.style.display = 'none';
+    }
+
     // Attach actions
     const btnCopy = document.getElementById('lp_btn_copy_url');
     const btnWa = document.getElementById('lp_btn_wa_share');
+    const btnFb = document.getElementById('lp_btn_fb_share');
     const btnNative = document.getElementById('lp_btn_native_share');
     const btnView = document.getElementById('lp_btn_view_page');
 
     if (btnCopy) {
       btnCopy.onclick = () => {
+        if (isPending) {
+          window.UCAS_APP.showToast('⚠️ पेज समीक्षा में है। एडमिन अप्रूवल के बाद लिंक शेयर करें।', 'warning');
+        }
         if (navigator.clipboard) {
           navigator.clipboard.writeText(shareUrl).then(() => {
             window.UCAS_APP.showToast('✅ लैंडिंग पेज लिंक कॉपी हो गया!', 'success');
@@ -450,13 +599,39 @@
 
     if (btnWa) {
       btnWa.onclick = () => {
+        if (isPending) {
+          window.UCAS_APP.showToast('⚠️ यह लैंडिंग पेज अभी एडमिन समीक्षा में है। अप्रूवल के बाद WhatsApp पर शेयर कर सकेंगे।', 'warning');
+          return;
+        }
+        if (isBlocked) {
+          window.UCAS_APP.showToast('🔴 यह लैंडिंग पेज ब्लॉक है।', 'error');
+          return;
+        }
         const text = `${lp.message}\n\n👉 यहाँ देखें और छोटा सर्वे भरें:\n${shareUrl}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
       };
     }
 
+    if (btnFb) {
+      btnFb.onclick = () => {
+        if (isPending) {
+          window.UCAS_APP.showToast('⚠️ यह लैंडिंग पेज अभी एडमिन समीक्षा में है। अप्रूवल के बाद Facebook पर शेयर कर सकेंगे।', 'warning');
+          return;
+        }
+        if (isBlocked) {
+          window.UCAS_APP.showToast('🔴 यह लैंडिंग पेज ब्लॉक है।', 'error');
+          return;
+        }
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+      };
+    }
+
     if (btnNative) {
       btnNative.onclick = () => {
+        if (isPending) {
+          window.UCAS_APP.showToast('⚠️ पेज अभी समीक्षा में है।', 'warning');
+          return;
+        }
         if (navigator.share) {
           navigator.share({
             title: lp.title,
@@ -485,10 +660,24 @@
     const imgInput = document.getElementById('lp_image_file_input');
     const ytInput = document.getElementById('lp_youtube_url_input');
 
+    const zoomLinkInput = document.getElementById('lp_webinar_zoom_link');
+    const meetingIdInput = document.getElementById('lp_webinar_meeting_id');
+    const passcodeInput = document.getElementById('lp_webinar_passcode');
+    const dtInput = document.getElementById('lp_webinar_datetime');
+    const successMsgInput = document.getElementById('lp_webinar_success_msg');
+    const webinarBox = document.getElementById('lp_webinar_fields_container');
+
     if (titleInput) titleInput.value = '';
     if (messageInput) messageInput.value = '';
     if (imgInput) imgInput.value = '';
     if (ytInput) ytInput.value = '';
+
+    if (zoomLinkInput) zoomLinkInput.value = '';
+    if (meetingIdInput) meetingIdInput.value = '';
+    if (passcodeInput) passcodeInput.value = '';
+    if (dtInput) dtInput.value = '';
+    if (successMsgInput) successMsgInput.value = '';
+    if (webinarBox) webinarBox.style.display = 'none';
 
     uploadedImageData = null;
     detectedYoutubeId = null;
@@ -535,17 +724,25 @@
       const dateStr = lp.created_at ? new Date(lp.created_at).toLocaleDateString('hi-IN') : '-';
       const shareUrl = getLandingPageShareUrl(lp);
       const responsesCount = lp.response_count || 0;
+      const isPending = lp.status === 'pending_review';
+      const isBlocked = lp.status === 'blocked' || lp.status === 'disabled';
 
       const mediaBadge = lp.content_type === 'youtube'
         ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fa-brands fa-youtube"></i> YouTube</span>'
         : '<span style="background:#E0F2FE;color:#0284C7;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fa-regular fa-image"></i> Image</span>';
+
+      const statusBadge = isPending
+        ? '<span style="background:#FEF3C7;color:#D97706;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-hourglass-half"></i> Under Review</span>'
+        : isBlocked
+        ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-ban"></i> Blocked</span>'
+        : '<span style="background:#DCFCE7;color:#15803D;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-circle-check"></i> Live</span>';
 
       return `
         <tr>
           <td><strong>#${idx + 1}</strong></td>
           <td>
             <div style="font-weight:700;color:var(--text-main);">${lp.title}</div>
-            <div style="font-size:0.75rem;color:var(--primary-dark);font-weight:600;">ID: <code>${lp.id}</code></div>
+            <div style="font-size:0.75rem;color:var(--primary-dark);font-weight:600;">ID: <code>${lp.id}</code> • ${statusBadge}</div>
           </td>
           <td>
             <span style="font-size:0.78rem;background:var(--primary-subtle);color:var(--primary-dark);padding:2px 8px;border-radius:4px;font-weight:600;">
@@ -562,16 +759,19 @@
           <td>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
               <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.editLandingPage('${lp.id}')" title="संपादित करें (Edit)" style="color:var(--secondary-dark);border-color:var(--secondary);">
-                <i class="fa-solid fa-pen-to-square"></i> Edit
+                <i class="fa-solid fa-pen-to-square"></i>
               </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" onclick="UCAS_LANDING_BUILDER.shareLandingPageWhatsApp('${lp.id}')" title="WhatsApp Share">
+              <button class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" onclick="UCAS_LANDING_BUILDER.shareLandingPageWhatsApp('${lp.id}')" title="${isPending ? 'अंडर रिव्यू' : 'WhatsApp Share'}" ${isPending || isBlocked ? 'style="opacity:0.6;"' : ''}>
                 <i class="fa-brands fa-whatsapp"></i>
+              </button>
+              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.shareLandingPageFacebook('${lp.id}')" title="${isPending ? 'अंडर रिव्यू' : 'Facebook Share'}" style="color:#1877F2;border-color:#1877F2;${isPending || isBlocked ? 'opacity:0.6;' : ''}">
+                <i class="fa-brands fa-facebook"></i>
               </button>
               <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.copyLandingPageLink('${lp.id}')" title="Copy Link">
                 <i class="fa-solid fa-copy"></i>
               </button>
               <button class="ucas-btn ucas-btn-sm ucas-btn-primary" onclick="window.open('${shareUrl}', '_blank')" title="View Public Page">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> देखें
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
               </button>
               <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.deleteLandingPage('${lp.id}')" title="हटाएं (Delete)" style="color:var(--danger);border-color:rgba(220,38,38,0.3);">
                 <i class="fa-solid fa-trash-can"></i>
@@ -586,9 +786,32 @@
   function shareLandingPageWhatsApp(lpId) {
     const lp = userLandingPages.find(item => item.id === lpId);
     if (!lp) return;
+    if (lp.status === 'pending_review') {
+      window.UCAS_APP.showToast('⚠️ यह लैंडिंग पेज अभी एडमिन समीक्षा (Under Review) में है। अप्रूवल के बाद ही शेयर करें।', 'warning');
+      return;
+    }
+    if (lp.status === 'blocked' || lp.status === 'disabled') {
+      window.UCAS_APP.showToast('🔴 यह लैंडिंग पेज ब्लॉक/निष्क्रिय है।', 'error');
+      return;
+    }
     const shareUrl = getLandingPageShareUrl(lp);
     const text = `${lp.message}\n\n👉 यहाँ देखें और छोटा सर्वे भरें:\n${shareUrl}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+  }
+
+  function shareLandingPageFacebook(lpId) {
+    const lp = userLandingPages.find(item => item.id === lpId);
+    if (!lp) return;
+    if (lp.status === 'pending_review') {
+      window.UCAS_APP.showToast('⚠️ यह लैंडिंग पेज अभी एडमिन समीक्षा (Under Review) में है। अप्रूवल के बाद ही शेयर करें।', 'warning');
+      return;
+    }
+    if (lp.status === 'blocked' || lp.status === 'disabled') {
+      window.UCAS_APP.showToast('🔴 यह लैंडिंग पेज ब्लॉक/निष्क्रिय है।', 'error');
+      return;
+    }
+    const shareUrl = getLandingPageShareUrl(lp);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
   }
 
   function copyLandingPageLink(lpId) {
@@ -613,6 +836,7 @@
     deleteLandingPage,
     loadMyLandingPages,
     shareLandingPageWhatsApp,
+    shareLandingPageFacebook,
     copyLandingPageLink,
     getLandingPageShareUrl
   };

@@ -920,9 +920,12 @@
       'landing_page_create',
       'landing_page_share',
       'library_view',
+      'subscription_view',
       'user_name_visible',
       'directory_visible',
-      'subscription_view'
+      'referral_mobile_visible',
+      'admin_center_visible',
+      'admin_permissions_manage'
     ];
 
     const permsMap = {};
@@ -931,8 +934,8 @@
     });
 
     return keys.map((key, i) => {
-      // Default: user_name_visible & directory_visible = OFF (false), others = ON (true)
-      const isDefaultOff = (key === 'user_name_visible' || key === 'directory_visible');
+      // Default: user_name_visible, directory_visible, admin_center_visible, admin_permissions_manage = OFF
+      const isDefaultOff = (key === 'user_name_visible' || key === 'directory_visible' || key === 'admin_center_visible' || key === 'admin_permissions_manage');
       const isAllowed = typeof permsMap[key] !== 'undefined' ? permsMap[key] : !isDefaultOff;
 
       return `

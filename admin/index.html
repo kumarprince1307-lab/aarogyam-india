@@ -17,19 +17,32 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Admin">
 
-  <!-- Security Check: अगर बिना लॉगिन सीधे लिंक खोला, तो तुरंत login.html पर भेज देगा -->
+  <!-- Security & Cache Sync -->
   <script>
     const adminSession = localStorage.getItem('admin_session');
     if (!adminSession) {
       window.location.replace('login.html');
+    }
+    // Force immediate Service Worker and Cache update
+    if ('caches' in window) {
+      caches.keys().then(keys => {
+        keys.forEach(k => {
+          if (k !== 'aarogyam-admin-shell-v8') caches.delete(k);
+        });
+      });
+    }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.update());
+      });
     }
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/admin-panel.css?v=6.0">
-  <link rel="stylesheet" href="../css/admin-components.css?v=6.0">
+  <link rel="stylesheet" href="../css/admin-panel.css?v=8.5">
+  <link rel="stylesheet" href="../css/admin-components.css?v=8.5">
 </head>
 <body>
   <div id="admin-app" class="admin-app">
@@ -58,7 +71,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- 2. Admin Main Module Script -->
-  <script type="module" src="../js/admin-main.js?v=6.0"></script>
+  <script type="module" src="../js/admin-main.js?v=9.0"></script>
 
 </body>
 

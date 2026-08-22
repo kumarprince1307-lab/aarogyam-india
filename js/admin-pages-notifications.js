@@ -35,6 +35,7 @@ export async function initNotifications() {
       <!-- Filter Tabs -->
       <div class="notif-filter-bar">
         <button class="notif-filter-tab active" data-filter="all">All <span class="tab-badge" id="badge-all">0</span></button>
+        <button class="notif-filter-tab" data-filter="marketing">🛡️ Pages & Webinars <span class="tab-badge" id="badge-marketing">0</span></button>
         <button class="notif-filter-tab" data-filter="purchases">Purchases <span class="tab-badge" id="badge-purchases">0</span></button>
         <button class="notif-filter-tab" data-filter="checkout">Checkout <span class="tab-badge" id="badge-checkout">0</span></button>
         <button class="notif-filter-tab" data-filter="joining">Registrations <span class="tab-badge" id="badge-joining">0</span></button>
@@ -87,13 +88,14 @@ export async function initNotifications() {
   function updateFilterBadges(list) {
     const counts = {
       all: list.length,
+      marketing: list.filter(n => n.category === 'marketing' || n.type?.includes('landing_page') || n.type?.includes('webinar')).length,
       purchases: list.filter(n => n.category === 'purchases').length,
       checkout: list.filter(n => n.category === 'checkout').length,
       joining: list.filter(n => n.category === 'joining').length,
       leads: list.filter(n => n.category === 'leads').length
     };
 
-    ['all', 'purchases', 'checkout', 'joining', 'leads'].forEach(cat => {
+    ['all', 'marketing', 'purchases', 'checkout', 'joining', 'leads'].forEach(cat => {
       const el = document.getElementById(`badge-${cat}`);
       if (el) el.textContent = counts[cat] || 0;
     });

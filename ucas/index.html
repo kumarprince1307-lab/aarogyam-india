@@ -136,6 +136,12 @@
           </button>
         </li>
         <li class="ucas-nav-item">
+          <button data-tab="webinars">
+            <i class="fa-solid fa-video ucas-nav-icon"></i>
+            <span>Webinars</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
           <button data-tab="permissions">
             <i class="fa-solid fa-shield-halved ucas-nav-icon"></i>
             <span>Permissions</span>
@@ -830,6 +836,7 @@
                 <option value="beautycare">💄 Beauty Care (सौंदर्य)</option>
                 <option value="haircare">💇 Hair Care (केश)</option>
                 <option value="netsurf">💼 NetSurf (बिजनेस)</option>
+                <option value="webinar">🎥 Webinar Invitation (वेबिनार आमंत्रण)</option>
                 <option value="other">➕ अन्य (Other)</option>
               </select>
             </div>
@@ -847,10 +854,39 @@
           </div>
         </div>
 
+        <!-- Dynamic Webinar & Zoom Settings Box (Shown when Webinar category is selected) -->
+        <div id="lp_webinar_fields_container" style="display:none;background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:var(--radius-md);padding:14px;margin-bottom:1rem;">
+          <div style="font-weight:800;color:#1D4ED8;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+            <i class="fa-solid fa-video"></i> 🎥 Zoom & Webinar मीटिंग सेटिंग्स (Name व Mobile भरने के बाद ही दिखेगा)
+          </div>
+          <div class="ucas-grid-2" style="gap:10px;">
+            <div>
+              <label class="ucas-label" style="font-size:0.8rem;">📅 वेबिनार दिनांक व समय (Date & Time): *</label>
+              <input type="text" id="lp_webinar_datetime" class="ucas-input" placeholder="उदा. 25 अगस्त 2026, शाम 7:00 बजे">
+            </div>
+            <div>
+              <label class="ucas-label" style="font-size:0.8rem;">🔗 Zoom / Meeting Join Link: *</label>
+              <input type="url" id="lp_webinar_zoom_link" class="ucas-input" placeholder="https://us02web.zoom.us/j/82345678901?pwd=...">
+            </div>
+            <div>
+              <label class="ucas-label" style="font-size:0.8rem;">🆔 Meeting ID (मीटिंग आईडी):</label>
+              <input type="text" id="lp_webinar_meeting_id" class="ucas-input" placeholder="उदा. 823 4567 8901">
+            </div>
+            <div>
+              <label class="ucas-label" style="font-size:0.8rem;">🔑 Passcode / Password (पासवर्ड):</label>
+              <input type="text" id="lp_webinar_passcode" class="ucas-input" placeholder="उदा. 123456 या AI2026">
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <label class="ucas-label" style="font-size:0.8rem;">💬 अनलॉक होने पर संदेश (Unlock Notice):</label>
+            <input type="text" id="lp_webinar_success_msg" class="ucas-input" placeholder="उदा. धन्यवाद! आपका रजिस्ट्रेशन सफल हुआ। नीचे दिए गए Zoom लिंक से जुड़ें।">
+          </div>
+        </div>
+
         <!-- Message Box -->
         <div style="margin-bottom:1rem;">
-          <label class="ucas-label">2. अपना संदेश लिखें (Custom Hook / Invitation Message): *</label>
-          <textarea id="lp_input_message" class="ucas-textarea" rows="3" placeholder="उदा. क्या आप अपनी फसल की पैदावार बढ़ाना और लागत कम करना चाहते हैं? नीचे दिए गए छोटे सर्वे को भरें।"></textarea>
+          <label class="ucas-label">2. अपना संदेश / आमंत्रण विवरण लिखें (Invitation Message / Agenda): *</label>
+          <textarea id="lp_input_message" class="ucas-textarea" rows="3" placeholder="उदा. क्या आप आधुनिक कृषि तकनीक और रोग निवारण सीखना चाहते हैं? इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।"></textarea>
         </div>
 
         <!-- Generate / Update Button -->
@@ -882,6 +918,9 @@
           <div style="display:flex;flex-wrap:wrap;gap:8px;">
             <button type="button" id="lp_btn_wa_share" class="ucas-btn ucas-btn-whatsapp">
               <i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर
+            </button>
+            <button type="button" id="lp_btn_fb_share" class="ucas-btn ucas-btn-outline" style="color:#1877F2;border-color:#1877F2;">
+              <i class="fa-brands fa-facebook"></i> Facebook शेयर
             </button>
             <button type="button" id="lp_btn_native_share" class="ucas-btn ucas-btn-primary">
               <i class="fa-solid fa-share-nodes"></i> Native Share
@@ -925,7 +964,192 @@
     </section>
 
     <!-- -----------------------------------------------------------------------
-         VIEW 6: PERMISSIONS
+         VIEW 6: WEBINARS & LIVE ZOOM EVENTS
+         ----------------------------------------------------------------------- -->
+    <section id="view-webinars" class="ucas-view">
+      <!-- Header Banner -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;background:linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%);color:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:8px;">
+              <i class="fa-solid fa-video"></i> वेबिनार एवं लाइव ज़ूम इवेंट्स (Webinars & Zoom Events)
+            </div>
+            <p style="font-size:0.85rem;color:#DBEAFE;margin:4px 0 0 0;">
+              अपने Zoom वेबिनार का प्रचार करें, विज़िटर्स का नाम व मोबाइल नंबर लें, और ज़ूम लिंक अनलॉक कराएं।
+            </p>
+          </div>
+          <button type="button" class="ucas-btn" onclick="document.getElementById('wb_creator_card').scrollIntoView({behavior:'smooth'})" style="background:#fff;color:#1D4ED8;font-weight:800;">
+            <i class="fa-solid fa-plus"></i> नया वेबिनार बनाएं
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="ucas-kpi-grid" style="margin-bottom:1.25rem;">
+        <div class="ucas-kpi-card kpi-blue">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-video"></i></div>
+          <div class="ucas-kpi-val" id="ucas-wb-kpi-total">0</div>
+          <div class="ucas-kpi-label">My Webinars</div>
+        </div>
+        <div class="ucas-kpi-card kpi-green">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-users"></i></div>
+          <div class="ucas-kpi-val" id="ucas-wb-kpi-attendees">0</div>
+          <div class="ucas-kpi-label">Registered Attendees</div>
+        </div>
+        <div class="ucas-kpi-card kpi-purple">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-link"></i></div>
+          <div class="ucas-kpi-val" id="ucas-wb-kpi-active">0</div>
+          <div class="ucas-kpi-label">Active Zoom Sessions</div>
+        </div>
+      </div>
+
+      <!-- Webinar Creator Card -->
+      <div class="ucas-card" id="wb_creator_card" style="margin-bottom:1.25rem;">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color:#2563EB;"></i> 🎥 वेबिनार लैंडिंग पेज बनाएं (Create Webinar Landing Page)
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+          शीर्षक, बैनर इमेज/वीडियो, दिनांक/समय और Zoom मीटिंग विवरण भरें। विज़िटर को केवल नाम व मोबाइल नंबर भरने के बाद Zoom लिंक दिखेगा:
+        </p>
+
+        <!-- Media Selector: Image vs YouTube -->
+        <div style="margin-bottom:1rem;">
+          <label class="ucas-label">1. बैनर मीडिया चुनें (Media Type):</label>
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <button type="button" id="wb_btn_mode_image" class="ucas-btn ucas-btn-sm ucas-btn-primary">
+              <i class="fa-regular fa-image"></i> Image Upload
+            </button>
+            <button type="button" id="wb_btn_mode_youtube" class="ucas-btn ucas-btn-sm ucas-btn-outline">
+              <i class="fa-brands fa-youtube"></i> YouTube Video Link
+            </button>
+          </div>
+
+          <div class="ucas-grid-2" style="gap:12px;">
+            <!-- Left: Inputs -->
+            <div>
+              <div id="wb_section_image_upload">
+                <input type="file" id="wb_image_file_input" class="ucas-input" accept="image/*">
+                <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;display:block;">अनुशंसित आकार: 1200x630 या 800x450 (JPG, PNG)</span>
+              </div>
+
+              <div id="wb_section_youtube_input" style="display:none;">
+                <input type="url" id="wb_youtube_url_input" class="ucas-input" placeholder="https://www.youtube.com/watch?v=...">
+                <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;display:block;">YouTube वीडियो या Shorts का लिंक पेस्ट करें</span>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label class="ucas-label">वेबिनार शीर्षक / हेडिंग (Title / Heading): *</label>
+                <input type="text" id="wb_input_title" class="ucas-input" placeholder="उदा. आधुनिक कृषि व स्वास्थ्य सुरक्षा — विशेष लाइव वेबिनार">
+              </div>
+            </div>
+
+            <!-- Right: Preview -->
+            <div>
+              <label class="ucas-label">मीडिया पूर्वावलोकन (Preview):</label>
+              <div id="wb_preview_media_container">
+                <div style="background:#F1F5F9;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:1.5rem;text-align:center;color:var(--text-muted);">
+                  <i class="fa-solid fa-video" style="font-size:2rem;margin-bottom:6px;display:block;color:#3B82F6;"></i>
+                  <span style="font-size:0.85rem;">बैनर इमेज या YouTube लिंक का पूर्वावलोकन</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zoom Settings Box -->
+        <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:var(--radius-md);padding:14px;margin-bottom:1rem;">
+          <div style="font-weight:800;color:#1D4ED8;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+            <i class="fa-solid fa-video"></i> Zoom मीटिंग एवं समय सेटिंग्स (Registration के बाद अनलॉक होगा)
+          </div>
+          <div class="ucas-grid-2" style="gap:10px;">
+            <div>
+              <label class="ucas-label" style="font-size:0.8rem;">📅 दिनांक व समय (Date & Time): *</label>
+              <input type="text" id="wb_input_datetime" class="ucas-input" placeholder="उदा. 25 अगस्त 2026, शाम 7:00 बजे">
+            </div>
+            <div>
+              <label class="ucas-label" style="font-size:0.8rem;">🔗 Zoom / Meeting Join Link: *</label>
+              <input type="url" id="wb_input_zoom_link" class="ucas-input" placeholder="https://us02web.zoom.us/j/82345678901?pwd=...">
+            </div>
+            <div>
+              <label class="ucas-label" style="font-size:0.8rem;">🆔 Meeting ID (मीटिंग आईडी):</label>
+              <input type="text" id="wb_input_meeting_id" class="ucas-input" placeholder="उदा. 823 4567 8901">
+            </div>
+            <div>
+              <label class="ucas-label" style="font-size:0.8rem;">🔑 Passcode / Password (पासवर्ड):</label>
+              <input type="text" id="wb_input_passcode" class="ucas-input" placeholder="उदा. 123456 या AI2026">
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <label class="ucas-label" style="font-size:0.8rem;">💬 अनलॉक होने पर संदेश (Unlock Notice):</label>
+            <input type="text" id="wb_input_success_msg" class="ucas-input" placeholder="उदा. धन्यवाद! आपका रजिस्ट्रेशन सफल हुआ। नीचे दिए गए Zoom लिंक से जुड़ें।">
+          </div>
+        </div>
+
+        <!-- Invitation Message -->
+        <div style="margin-bottom:1rem;">
+          <label class="ucas-label">आमंत्रण विवरण / विषय सूची (Invitation Message / Agenda): *</label>
+          <textarea id="wb_input_message" class="ucas-textarea" rows="3" placeholder="उदा. क्या आप आधुनिक कृषि तकनीक, जैविक समाधान और स्वास्थ्य पर आयोजित लाइव वेबिनार में भाग लेना चाहते हैं? अपनी सीट सुरक्षित करने के लिए नीचे अपना नाम व मोबाइल नंबर दर्ज करें।"></textarea>
+        </div>
+
+        <!-- Generate Buttons -->
+        <div style="display:flex;gap:8px;">
+          <button type="button" id="wb_btn_generate" class="ucas-btn ucas-btn-primary" style="flex:1;padding:12px;font-size:1rem;justify-content:center;background:linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> 🔗 Generate Webinar Page
+          </button>
+          <button type="button" id="wb_btn_cancel_edit" class="ucas-btn ucas-btn-outline" style="display:none;padding:12px 18px;font-size:1rem;justify-content:center;color:var(--text-muted);">
+            रद्द करें (Cancel)
+          </button>
+        </div>
+
+        <!-- Result Box -->
+        <div id="wb_generated_result_card" style="display:none;margin-top:1.25rem;background:#F0FDF4;border:2px solid #86EFAC;border-radius:var(--radius-md);padding:1rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-weight:800;color:#15803D;font-size:0.95rem;">🎉 वेबिनार लैंडिंग पेज तैयार है!</span>
+          </div>
+          <div class="ucas-copy-box" style="margin-bottom:10px;">
+            <input type="text" id="wb_generated_share_url" class="ucas-input" readonly>
+            <button type="button" id="wb_btn_copy_url" class="ucas-btn ucas-btn-sm ucas-btn-primary"><i class="fa-solid fa-copy"></i> कॉपी</button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button type="button" id="wb_btn_wa_share" class="ucas-btn ucas-btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर</button>
+            <button type="button" id="wb_btn_fb_share" class="ucas-btn ucas-btn-outline" style="color:#1877F2;border-color:#1877F2;"><i class="fa-brands fa-facebook"></i> Facebook शेयर</button>
+            <button type="button" id="wb_btn_view_page" class="ucas-btn ucas-btn-outline"><i class="fa-solid fa-arrow-up-right-from-square"></i> लाइव पेज देखें</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Webinars Table -->
+      <div class="ucas-card">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-video"></i> मेरे लाइव वेबिनार (My Webinars)
+          </div>
+          <span style="font-size:0.82rem;color:var(--text-muted);">कुल: <strong id="ucas-my-webinars-count">0</strong></span>
+        </div>
+
+        <div class="ucas-table-wrap">
+          <table class="ucas-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Webinar Title & ID</th>
+                <th>Date & Zoom Info</th>
+                <th>Registered Attendees</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ucas-my-webinars-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW 7: PERMISSIONS
          ----------------------------------------------------------------------- -->
     <section id="view-permissions" class="ucas-view">
       <div class="ucas-card" style="margin-bottom:1.25rem;">
@@ -1278,6 +1502,17 @@
   </div>
 </div>
 
+<!-- Modal: Webinar Attendees Inspection -->
+<div id="ucas-modal-webinar-attendees" class="ucas-modal-overlay">
+  <div class="ucas-modal" style="max-width:580px;">
+    <div class="ucas-modal-header">
+      <div class="ucas-card-title"><i class="fa-solid fa-users"></i> <span id="ucas-wb-attendees-modal-title">Webinar Attendees</span></div>
+      <button class="ucas-modal-close">&times;</button>
+    </div>
+    <div id="ucas-wb-attendees-modal-body" style="padding:10px 0;"></div>
+  </div>
+</div>
+
 <!-- =========================================================================
      7. SCRIPT INCLUDES (Safe Isolation & Zero Duplication)
      ========================================================================= -->
@@ -1290,17 +1525,18 @@
 <script src="/js/share-engine-core.js"></script>
 
 <!-- UCAS Modular Engines -->
-<script src="/ucas/js/ucas-session.js?v=1.6"></script>
-<script src="/ucas/js/ucas-db.js?v=1.6"></script>
-<script src="/ucas/js/ucas-permissions.js?v=1.6"></script>
-<script src="/ucas/js/ucas-survey.js?v=1.6"></script>
-<script src="/ucas/js/ucas-phonebook.js?v=1.6"></script>
-<script src="/ucas/js/ucas-leads.js?v=1.6"></script>
-<script src="/ucas/js/ucas-marketing.js?v=1.6"></script>
-<script src="/ucas/js/ucas-landing-builder.js?v=1.6"></script>
-<script src="/ucas/js/ucas-admin.js?v=1.6"></script>
-<script src="/ucas/js/ucas-pwa.js?v=1.6"></script>
-<script src="/ucas/js/ucas-app.js?v=1.6"></script>
+<script src="/ucas/js/ucas-session.js?v=2.5"></script>
+<script src="/ucas/js/ucas-db.js?v=2.5"></script>
+<script src="/ucas/js/ucas-permissions.js?v=2.5"></script>
+<script src="/ucas/js/ucas-survey.js?v=2.5"></script>
+<script src="/ucas/js/ucas-phonebook.js?v=2.5"></script>
+<script src="/ucas/js/ucas-leads.js?v=2.5"></script>
+<script src="/ucas/js/ucas-marketing.js?v=2.5"></script>
+<script src="/ucas/js/ucas-landing-builder.js?v=2.5"></script>
+<script src="/ucas/js/ucas-webinars.js?v=2.5"></script>
+<script src="/ucas/js/ucas-admin.js?v=2.5"></script>
+<script src="/ucas/js/ucas-pwa.js?v=2.5"></script>
+<script src="/ucas/js/ucas-app.js?v=2.5"></script>
 
 </body>
 </html>
