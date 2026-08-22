@@ -1,79 +1,61 @@
+<?php
+// Dynamic Server-Side Open Graph Meta Resolver for Facebook & WhatsApp Crawlers
+$reqYt = isset($_GET['yt']) ? trim($_GET['yt']) : (isset($_GET['v']) ? trim($_GET['v']) : (isset($_GET['video']) ? trim($_GET['video']) : ''));
+$reqTitle = isset($_GET['title']) ? trim($_GET['title']) : '';
+$reqThumb = isset($_GET['thumb']) ? trim($_GET['thumb']) : (isset($_GET['img']) ? trim($_GET['img']) : (isset($_GET['thumbnail']) ? trim($_GET['thumbnail']) : ''));
+$reqDesc = isset($_GET['desc']) ? trim($_GET['desc']) : (isset($_GET['msg']) ? trim($_GET['msg']) : (isset($_GET['message']) ? trim($_GET['message']) : ''));
+
+// Extract 11-char YouTube ID if present
+$ytId = '';
+if (!empty($reqYt) && preg_match('/^[a-zA-Z0-9_-]{11}$/', $reqYt)) {
+    $ytId = $reqYt;
+} elseif (!empty($reqThumb) && preg_match('/(?:img\.youtube\.com|i\.ytimg\.com)\/vi\/([a-zA-Z0-9_-]{11})/i', $reqThumb, $matches)) {
+    $ytId = $matches[1];
+} elseif (!empty($_SERVER['REQUEST_URI']) && preg_match('/(?:[?&]v=|youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/)|[?&]yt=)([a-zA-Z0-9_-]{11})/i', $_SERVER['REQUEST_URI'], $matches)) {
+    $ytId = $matches[1];
+}
+
+// Determine dynamic values
+if (!empty($ytId)) {
+    $finalThumb = "https://i.ytimg.com/vi/{$ytId}/hqdefault.jpg";
+} elseif (!empty($reqThumb) && strpos($reqThumb, 'data:') !== 0) {
+    $finalThumb = $reqThumb;
+} else {
+    $finalThumb = "https://aarogyamindia.online/images/logo/logo.png";
+}
+
+$finalTitle = !empty($reqTitle) ? htmlspecialchars($reqTitle, ENT_QUOTES, 'UTF-8') : "Aarogyam India — महत्वपूर्ण सूचना एवं जानकारी";
+$finalDesc = !empty($reqDesc) ? htmlspecialchars($reqDesc, ENT_QUOTES, 'UTF-8') : "Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी, समाधान और परामर्श के लिए अभी देखें।";
+$finalUrl = "https://" . ($_SERVER['HTTP_HOST'] ?? 'aarogyamindia.online') . ($_SERVER['REQUEST_URI'] ?? '/ucas/landing.php');
+?>
 <!DOCTYPE html>
 <html lang="hi" prefix="og: https://ogp.me/ns#">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Aarogyam India — महत्वपूर्ण सूचना एवं जानकारी</title>
+  <title><?php echo $finalTitle; ?> — Aarogyam India</title>
 
-  <!-- Open Graph / Facebook & WhatsApp Dynamic Preview Tags -->
+  <!-- Server-Rendered Open Graph Tags for Facebook & WhatsApp Crawlers -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Aarogyam India">
-  <meta property="og:title" id="og_title" content="Aarogyam India — महत्वपूर्ण सूचना एवं जानकारी">
-  <meta property="og:description" id="og_desc" content="Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी, समाधान और परामर्श के लिए अभी देखें।">
-  <meta property="og:image" id="og_image" content="https://aarogyamindia.online/images/logo/logo.png">
-  <meta property="og:image:secure_url" id="og_image_secure" content="https://aarogyamindia.online/images/logo/logo.png">
+  <meta property="og:title" id="og_title" content="<?php echo $finalTitle; ?>">
+  <meta property="og:description" id="og_desc" content="<?php echo $finalDesc; ?>">
+  <meta property="og:image" id="og_image" content="<?php echo $finalThumb; ?>">
+  <meta property="og:image:secure_url" id="og_image_secure" content="<?php echo $finalThumb; ?>">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" id="og_image_alt" content="Aarogyam India Post">
-  <meta property="og:url" id="og_url" content="https://aarogyamindia.online/ucas/landing.html">
-  <link rel="image_src" id="link_image_src" href="https://aarogyamindia.online/images/logo/logo.png">
+  <meta property="og:image:alt" id="og_image_alt" content="<?php echo $finalTitle; ?>">
+  <meta property="og:url" id="og_url" content="<?php echo $finalUrl; ?>">
+  <link rel="image_src" id="link_image_src" href="<?php echo $finalThumb; ?>">
 
-  <!-- Twitter Card Tags -->
+  <!-- Server-Rendered Twitter Card Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@AarogyamIndia">
-  <meta name="twitter:title" id="tw_title" content="Aarogyam India — महत्वपूर्ण सूचना एवं जानकारी">
-  <meta name="twitter:description" id="tw_desc" content="Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी और समाधान के लिए अभी देखें।">
-  <meta name="twitter:image" id="tw_image" content="https://aarogyamindia.online/images/logo/logo.png">
+  <meta name="twitter:title" id="tw_title" content="<?php echo $finalTitle; ?>">
+  <meta name="twitter:description" id="tw_desc" content="<?php echo $finalDesc; ?>">
+  <meta name="twitter:image" id="tw_image" content="<?php echo $finalThumb; ?>">
 
-  <!-- Immediate Head OG Metadata Dynamic Resolver -->
-  <script>
-    (function() {
-      try {
-        var params = new URLSearchParams(window.location.search);
-        var pTitle = params.get('title');
-        var pThumb = params.get('thumb') || params.get('img') || params.get('thumbnail') || params.get('media');
-        var pYt = params.get('yt') || params.get('v');
-        var pDesc = params.get('desc') || params.get('msg') || params.get('message');
-        
-        var ytMatch = (window.location.search || '').match(/(?:[?&]v=|youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/)|[?&]yt=)([a-zA-Z0-9_-]{11})/i);
-        var ytId = (pYt && /^[a-zA-Z0-9_-]{11}$/.test(pYt)) ? pYt : (ytMatch ? ytMatch[1] : null);
-
-        if (ytId) {
-          pThumb = 'https://i.ytimg.com/vi/' + ytId + '/hqdefault.jpg';
-        }
-
-        if (pTitle) {
-          document.title = pTitle + ' — Aarogyam India';
-          var ogTitle = document.getElementById('og_title');
-          var twTitle = document.getElementById('tw_title');
-          if (ogTitle) ogTitle.setAttribute('content', pTitle);
-          if (twTitle) twTitle.setAttribute('content', pTitle);
-        }
-        if (pThumb && !pThumb.startsWith('data:')) {
-          var ogImg = document.getElementById('og_image');
-          var ogImgSec = document.getElementById('og_image_secure');
-          var twImg = document.getElementById('tw_image');
-          var linkImg = document.getElementById('link_image_src');
-          if (ogImg) ogImg.setAttribute('content', pThumb);
-          if (ogImgSec) ogImgSec.setAttribute('content', pThumb);
-          if (twImg) twImg.setAttribute('content', pThumb);
-          if (linkImg) linkImg.setAttribute('href', pThumb);
-        }
-        if (pDesc) {
-          var ogDesc = document.getElementById('og_desc');
-          var twDesc = document.getElementById('tw_desc');
-          if (ogDesc) ogDesc.setAttribute('content', pDesc);
-          if (twDesc) twDesc.setAttribute('content', pDesc);
-        }
-        var ogUrl = document.getElementById('og_url');
-        if (ogUrl) ogUrl.setAttribute('content', window.location.href);
-      } catch (e) {
-        console.warn('OG meta resolver error', e);
-      }
-    })();
-  </script>
-  
   <!-- Fonts & FontAwesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -492,10 +474,7 @@
       border-color: rgba(37,211,102,0.35);
     }
 
-    /* =========================================================================
-       PUBLIC WEBSITE FIRST-SCREEN SURVEY GATE MODAL
-       ========================================================================= -->
-    */
+    /* Survey Gate Modal */
     .pub-gate-overlay {
       position: fixed;
       top: 0;
@@ -506,7 +485,7 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       z-index: 9999;
-      display: none; /* Initially none, shown by JS only if not unlocked */
+      display: none;
       align-items: center;
       justify-content: center;
       padding: 16px;
@@ -642,29 +621,6 @@
       transform: scale(0.97);
     }
 
-    .pub-btn-submit::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        60deg,
-        rgba(255, 255, 255, 0) 20%,
-        rgba(255, 255, 255, 0.35) 50%,
-        rgba(255, 255, 255, 0) 80%
-      );
-      transform: translateX(-100%) rotate(45deg);
-      animation: pubShine 3.5s infinite;
-    }
-
-    @keyframes pubShine {
-      0% { transform: translateX(-100%) rotate(45deg); }
-      100% { transform: translateX(200%) rotate(45deg); }
-    }
-
-    /* Gate Success Animation Screen */
     .pub-gate-success-screen {
       display: none;
       text-align: center;
@@ -691,7 +647,6 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
-    /* Webinar Unlocked Details */
     .pub-webinar-unlocked-card {
       background: #FFFFFF;
       border: 2px solid #3B82F6;
@@ -702,7 +657,6 @@
       margin-top: 1rem;
     }
 
-    /* Floating WhatsApp Button */
     .pub-wa-float-btn {
       position: fixed;
       bottom: 20px;
@@ -728,11 +682,6 @@
       box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
     }
 
-    .pub-wa-float-btn:active {
-      transform: scale(0.95);
-    }
-
-    /* Public Footer */
     .pub-footer {
       width: 100%;
       max-width: 780px;
@@ -757,19 +706,13 @@
       text-decoration: none;
       font-weight: 600;
     }
-
-    .pub-footer-links a:hover {
-      text-decoration: underline;
-    }
   </style>
 </head>
 <body>
 
-  <!-- =========================================================================
-       1. PUBLIC WEBSITE HEADER
-       ========================================================================= -->
+  <!-- 1. PUBLIC WEBSITE HEADER -->
   <header class="pub-site-header">
-    <a href="https://aarogyamindia.in" class="pub-site-brand">
+    <a href="https://aarogyamindia.online" class="pub-site-brand">
       <img src="/images/logo/logo.png" alt="Aarogyam India" class="pub-site-logo" onerror="this.style.display='none'">
       <div>
         <div class="pub-site-title">Aarogyam India</div>
@@ -782,13 +725,9 @@
     </div>
   </header>
 
-  <!-- =========================================================================
-       2. FIRST-SCREEN SURVEY GATE (MANDATORY PUBLIC POPUP)
-       ========================================================================= -->
+  <!-- 2. FIRST-SCREEN SURVEY GATE -->
   <div class="pub-gate-overlay" id="lp_survey_gate_overlay">
     <div class="pub-gate-card" id="lp_gate_card">
-      
-      <!-- Gate Form View -->
       <div id="lp_gate_form_view">
         <div class="pub-gate-brand-head">
           <img src="/images/logo/logo.png" alt="Aarogyam India" onerror="this.style.display='none'">
@@ -820,7 +759,6 @@
             <input type="text" id="gate_input_place" class="pub-input" placeholder="उदा. रामपुर, जिला रीवा">
           </div>
 
-          <!-- Dynamic Category Question -->
           <div id="gate_dynamic_category_question"></div>
 
           <button type="submit" class="pub-btn-submit" id="gate_btn_submit">
@@ -833,7 +771,6 @@
         </div>
       </div>
 
-      <!-- Gate Success Transition View -->
       <div class="pub-gate-success-screen" id="lp_gate_success_view">
         <div class="pub-gate-success-icon">
           <i class="fa-solid fa-check"></i>
@@ -846,16 +783,11 @@
           <i class="fa-solid fa-spinner fa-spin"></i> कृपया 1 सेकंड प्रतीक्षा करें...
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- =========================================================================
-       3. MAIN EDITORIAL CONTENT POST
-       ========================================================================= -->
+  <!-- 3. MAIN EDITORIAL CONTENT POST -->
   <main class="pub-post-container" id="lp_main_content">
-    
-    <!-- Creator Meta Bar -->
     <div class="pub-creator-bar">
       <div class="pub-creator-info">
         <div class="pub-creator-avatar" id="lp_creator_avatar">A</div>
@@ -883,15 +815,13 @@
 
     <!-- Post Body -->
     <div class="pub-post-body">
-      <!-- Title -->
-      <h1 class="pub-post-title" id="lp_post_title">Aarogyam India विशेष जानकारी</h1>
+      <h1 class="pub-post-title" id="lp_post_title"><?php echo $finalTitle; ?></h1>
 
-      <!-- Message / Description -->
       <div class="pub-message-box" id="lp_message_holder">
-        संदेश लोड हो रहा है...
+        <?php echo $finalDesc; ?>
       </div>
 
-      <!-- Webinar Unlocked Session Details (Shown only for webinar pages after survey gate) -->
+      <!-- Webinar Unlocked Session Details -->
       <div class="pub-webinar-unlocked-card" id="lp_webinar_unlocked_screen" style="display:none;">
         <div style="width:60px;height:60px;background:#DBEAFE;color:#2563EB;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.9rem;margin:0 auto 10px auto;">
           <i class="fa-solid fa-video"></i>
@@ -907,12 +837,10 @@
           आपकी सीट सुरक्षित कर ली गई है। नीचे दिए गए बटन पर क्लिक करके Zoom मीटिंग में शामिल हों:
         </p>
 
-        <!-- Join Zoom Button -->
         <a id="webinar_btn_join_zoom" href="#" target="_blank" class="pub-btn-cta" style="background:linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);color:#fff;font-size:1.08rem;padding:14px;border-radius:var(--radius-md);margin-bottom:14px;box-shadow:0 4px 15px rgba(37,99,235,0.35);">
           <i class="fa-solid fa-video"></i> Join Zoom Meeting Now
         </a>
 
-        <!-- Meeting ID & Passcode Box -->
         <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;margin-bottom:14px;text-align:left;">
           <div id="webinar_meeting_id_row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">
             <div>
@@ -945,38 +873,32 @@
         </div>
       </div>
 
-      <!-- Action / Contact CTA -->
+      <!-- Action CTA -->
       <div class="pub-cta-section" id="lp_cta_section">
         <a id="lp_btn_whatsapp_cta" href="#" target="_blank" class="pub-btn-cta pub-btn-wa">
           <i class="fa-brands fa-whatsapp" style="font-size:1.35rem;"></i>
           <span>WhatsApp पर तुरंत संपर्क करें</span>
         </a>
 
-        <!-- Social Share Row -->
         <div class="pub-share-row">
-          <button type="button" id="pub_btn_share_wa" class="pub-share-btn pub-share-btn-wa" title="WhatsApp पर शेयर करें">
+          <button type="button" id="pub_btn_share_wa" class="pub-share-btn pub-share-btn-wa">
             <i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर
           </button>
-          <button type="button" id="pub_btn_share_fb" class="pub-share-btn pub-share-btn-fb" title="Facebook पर शेयर करें">
+          <button type="button" id="pub_btn_share_fb" class="pub-share-btn pub-share-btn-fb">
             <i class="fa-brands fa-facebook"></i> Facebook शेयर
           </button>
-          <button type="button" id="pub_btn_share_native" class="pub-share-btn" title="शेयर या कॉपी करें">
+          <button type="button" id="pub_btn_share_native" class="pub-share-btn">
             <i class="fa-solid fa-share-nodes"></i> शेयर करें
           </button>
         </div>
       </div>
-
     </div>
   </main>
 
-  <!-- Floating WhatsApp Support Button -->
-  <a id="pub_wa_floating_btn" href="#" target="_blank" class="pub-wa-float-btn" title="WhatsApp पर संपर्क करें">
+  <a id="pub_wa_floating_btn" href="#" target="_blank" class="pub-wa-float-btn">
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
-  <!-- =========================================================================
-       4. PUBLIC WEBSITE FOOTER
-       ========================================================================= -->
   <footer class="pub-footer">
     <div style="font-weight:700;color:var(--text-main);font-size:0.92rem;">Aarogyam India</div>
     <div style="margin-top:2px;">विश्वसनीय जानकारी, सही दिशा</div>
@@ -999,7 +921,7 @@
   <script src="/js/share-engine-core.js"></script>
   <script src="/ucas/js/ucas-db.js?v=2.6"></script>
 
-  <!-- Landing Page Engine Script -->
+  <!-- Client-Side Hydration Script -->
   <script>
     (async function () {
       'use strict';
@@ -1015,7 +937,6 @@
       let landingPageData = null;
       let creatorProfileData = null;
 
-      // 1. Fetch Landing Page Configuration from DB or LocalStorage
       try {
         if (window.UCAS_DB && typeof window.UCAS_DB.getLandingPageById === 'function') {
           const res = await window.UCAS_DB.getLandingPageById(lpId);
@@ -1027,7 +948,6 @@
         console.warn('DB landing page load notice:', e);
       }
 
-      // Universal YouTube extractor helper available immediately
       function extractYoutubeId(url) {
         if (!url) return null;
         const str = String(url).trim();
@@ -1057,7 +977,6 @@
         return null;
       }
 
-      // Default fallback & URL Param Override Fix
       const resolvedYtId = extractYoutubeId(customYt) || extractYoutubeId(landingPageData?.media_url) || extractYoutubeId(landingPageData?.thumbnail_url);
       
       if (!landingPageData) {
@@ -1072,7 +991,6 @@
           message: customMsg || 'नमस्ते! Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी और समाधान के लिए नीचे दिया गया विवरण अवश्य देखें।'
         };
       } else {
-        // If URL params provided overrides, apply them instantly
         if (customTitle) landingPageData.title = customTitle;
         if (customMsg) landingPageData.message = customMsg;
         if (resolvedYtId) {
@@ -1086,7 +1004,6 @@
         }
       }
 
-      // 2. Fetch Creator Profile to display proper Creator Full Name
       const targetProfileId = landingPageData.profile_id || null;
       const targetShareId = shareId || landingPageData.share_id || '';
 
@@ -1116,59 +1033,12 @@
 
       const isWebinar = landingPageData.category === 'webinar' || Boolean(landingPageData.webinar_data);
 
-      // Render Landing Post Content
       renderLandingPost(landingPageData, creatorProfileData);
-
-      // Setup First-Screen Survey Gate with Universal Visitor Memory
       setupSurveyGate(landingPageData, creatorProfileData);
 
       function renderLandingPost(lp, creator) {
         if (!lp) return;
 
-        // Security / Admin Block Screen checks
-        if (lp.status === 'blocked' || lp.status === 'disabled') {
-          const container = document.getElementById('lp_main_content') || document.body;
-          const overlay = document.getElementById('lp_survey_gate_overlay');
-          if (overlay) overlay.style.display = 'none';
-          container.style.opacity = '1';
-          container.style.filter = 'none';
-          container.innerHTML = `
-            <div style="text-align:center;padding:3.5rem 1.5rem;">
-              <div style="font-size:3.5rem;color:#EF4444;margin-bottom:12px;"><i class="fa-solid fa-shield-halved"></i></div>
-              <h2 style="font-size:1.4rem;font-weight:800;color:#1E293B;margin-bottom:8px;">⚠️ लिंक अस्थायी रूप से बंद है</h2>
-              <p style="font-size:0.95rem;color:#64748B;line-height:1.6;max-width:440px;margin:0 auto 20px;">
-                यह लैंडिंग पेज सुरक्षा एवं एडमिन समीक्षा नियमों के तहत अस्थायी रूप से निष्क्रिय (Blocked) कर दिया गया है।
-              </p>
-              <a href="https://aarogyamindia.in" class="pub-btn-cta" style="background:#0B7A3E;color:#fff;display:inline-flex;width:auto;padding:10px 24px;text-decoration:none;">
-                <i class="fa-solid fa-house"></i> मुख्य वेबसाइट पर जाएं
-              </a>
-            </div>
-          `;
-          return;
-        }
-
-        if (lp.status === 'pending_review') {
-          const container = document.getElementById('lp_main_content') || document.body;
-          const overlay = document.getElementById('lp_survey_gate_overlay');
-          if (overlay) overlay.style.display = 'none';
-          container.style.opacity = '1';
-          container.style.filter = 'none';
-          container.innerHTML = `
-            <div style="text-align:center;padding:3.5rem 1.5rem;">
-              <div style="font-size:3.5rem;color:#F59E0B;margin-bottom:12px;"><i class="fa-solid fa-hourglass-half"></i></div>
-              <h2 style="font-size:1.4rem;font-weight:800;color:#1E293B;margin-bottom:8px;">⏳ पेज अभी समीक्षा में है</h2>
-              <p style="font-size:0.95rem;color:#64748B;line-height:1.6;max-width:440px;margin:0 auto 20px;">
-                यह लैंडिंग पेज अभी एडमिन समीक्षा के अंतर्गत है। स्वीकृति के बाद ही यह सार्वजनिक रूप से उपलब्ध होगा।
-              </p>
-              <a href="https://aarogyamindia.in" class="pub-btn-cta" style="background:#0B7A3E;color:#fff;display:inline-flex;width:auto;padding:10px 24px;text-decoration:none;">
-                <i class="fa-solid fa-house"></i> Aarogyam India होमपेज
-              </a>
-            </div>
-          `;
-          return;
-        }
-
-        // Creator Identity Setup
         const creatorName = creator?.full_name || 'Aarogyam India Community';
         const avatarInitial = creatorName.trim().charAt(0).toUpperCase() || 'A';
         const nameEl = document.getElementById('lp_creator_name');
@@ -1182,41 +1052,10 @@
           dateEl.textContent = d.toLocaleDateString('hi-IN', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
-        // Title & Category
         const finalTitle = lp.title || 'Aarogyam India विशेष जानकारी';
         document.title = `${finalTitle} — Aarogyam India`;
         const postTitleEl = document.getElementById('lp_post_title');
         if (postTitleEl) postTitleEl.textContent = finalTitle;
-
-        // Dynamic Open Graph (OG) & Twitter Card Meta Update
-        try {
-          let syncThumb = 'https://aarogyamindia.in/images/logo/logo.png';
-          const ytVidId = extractYoutubeId(lp.media_url) || extractYoutubeId(lp.thumbnail_url);
-
-          if (ytVidId) {
-            syncThumb = `https://i.ytimg.com/vi/${ytVidId}/hqdefault.jpg`;
-          } else if (lp.thumbnail_url && !lp.thumbnail_url.startsWith('data:')) {
-            syncThumb = lp.thumbnail_url;
-          } else if (lp.media_url && !lp.media_url.includes('youtube') && !lp.media_url.startsWith('data:')) {
-            syncThumb = lp.media_url;
-          }
-
-          document.getElementById('og_image')?.setAttribute('content', syncThumb);
-          document.getElementById('og_image_secure')?.setAttribute('content', syncThumb);
-          document.getElementById('tw_image')?.setAttribute('content', syncThumb);
-          document.getElementById('link_image_src')?.setAttribute('href', syncThumb);
-          
-          document.getElementById('og_title')?.setAttribute('content', finalTitle);
-          document.getElementById('tw_title')?.setAttribute('content', finalTitle);
-          
-          if (lp.message) {
-            const shortDesc = lp.message.slice(0, 160);
-            document.getElementById('og_desc')?.setAttribute('content', shortDesc);
-            document.getElementById('tw_desc')?.setAttribute('content', shortDesc);
-          }
-        } catch (ogErr) {
-          console.warn('OG update notice:', ogErr);
-        }
 
         const catBadge = document.getElementById('lp_category_badge');
         if (catBadge) {
@@ -1236,7 +1075,6 @@
           catBadge.innerHTML = `<span>${catNames[lp.category] || 'विशेष जानकारी'}</span>`;
         }
 
-        // Message Box
         const msgHolder = document.getElementById('lp_message_holder');
         if (msgHolder) {
           if (lp.message && lp.message.trim()) {
@@ -1247,14 +1085,12 @@
           }
         }
 
-        // Media Renderer (YouTube vs Image)
         const mediaHolder = document.getElementById('lp_media_holder');
         if (mediaHolder) {
           mediaHolder.innerHTML = '';
           const ytId = extractYoutubeId(lp.media_url) || extractYoutubeId(lp.thumbnail_url);
 
           if (ytId) {
-            // YouTube Click-to-Load Thumbnail View
             const primaryThumb = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
             const altThumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
 
@@ -1279,7 +1115,6 @@
             `;
             mediaHolder.appendChild(thumbBox);
           } else {
-            // Standard Image View with Fallback
             const rawImg = lp.media_url || lp.thumbnail_url || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80';
             const imgElem = document.createElement('img');
             imgElem.className = 'pub-media-img';
@@ -1287,13 +1122,12 @@
             imgElem.src = rawImg;
             imgElem.onerror = function () {
               this.onerror = null;
-              this.src = 'https://aarogyamindia.in/images/logo/logo.png';
+              this.src = 'https://aarogyamindia.online/images/logo/logo.png';
             };
             mediaHolder.appendChild(imgElem);
           }
         }
 
-        // WhatsApp Floating & CTA Links
         let creatorPhone = (creator?.mobile || '').replace(/\D/g, '');
         if (creatorPhone.length === 10) creatorPhone = '91' + creatorPhone;
         else if (creatorPhone.length !== 12) creatorPhone = '917974422572';
@@ -1306,7 +1140,6 @@
         if (waBtn) waBtn.href = waLink;
         if (floatWaBtn) floatWaBtn.href = waLink;
 
-        // Share Buttons
         const currentUrl = window.location.href;
         const shareWaBtn = document.getElementById('pub_btn_share_wa');
         const shareFbBtn = document.getElementById('pub_btn_share_fb');
@@ -1353,9 +1186,6 @@
         }
       };
 
-      // =========================================================================
-      // SURVEY GATE WITH PERSISTENT VISITOR MEMORY
-      // =========================================================================
       function setupSurveyGate(lp, creator) {
         const overlay = document.getElementById('lp_survey_gate_overlay');
         const mainContent = document.getElementById('lp_main_content');
@@ -1385,7 +1215,6 @@
           mainContent.style.filter = 'blur(2px)';
         }
 
-        // Customize Gate based on Category
         const gateIcon = document.getElementById('lp_gate_icon');
         const gateTitle = document.getElementById('lp_gate_title');
         const gateSubtitle = document.getElementById('lp_gate_subtitle');
@@ -1398,190 +1227,66 @@
           if (gateSubtitle) gateSubtitle.textContent = 'अपना नाम व मोबाइल नंबर भरें। सबमिट करते ही Zoom Meeting लिंक और पासवर्ड तुरंत अनलॉक हो जाएगा:';
           if (gatePlaceGroup) gatePlaceGroup.style.display = 'none';
           if (gateBtnText) gateBtnText.textContent = '🔓 Get Access (सीट सुरक्षित करें)';
-        } else {
-          renderDynamicCategoryQuestion(lp.category);
         }
 
-        // Bind Submit
         const form = document.getElementById('lp_gate_survey_form');
-        form?.addEventListener('submit', (e) => handleGateSubmit(e, lp, creator));
-      }
+        form?.addEventListener('submit', async (e) => {
+          e.preventDefault();
 
-      function renderDynamicCategoryQuestion(category = 'agriculture') {
-        const container = document.getElementById('gate_dynamic_category_question');
-        if (!container) return;
+          const name = (document.getElementById('gate_input_name')?.value || '').trim();
+          let mobile = (document.getElementById('gate_input_mobile')?.value || '').replace(/\D/g, '').trim();
+          const place = (document.getElementById('gate_input_place')?.value || '').trim() || 'Online';
+          const catAns = document.getElementById('gate_cat_ans')?.value || (isWebinar ? 'Webinar Registration' : 'General Inquiry');
 
-        const cat = (category || '').toLowerCase();
-        if (cat === 'agriculture') {
-          container.innerHTML = `
-            <div class="pub-form-group">
-              <label class="pub-label">आप मुख्य रूप से कौन सी फसल उगाते हैं?</label>
-              <select id="gate_cat_ans" class="pub-select">
-                <option value="सोयाबीन / मक्का">सोयाबीन / मक्का</option>
-                <option value="धान / गेहूं">धान / गेहूं</option>
-                <option value="सब्जियां / बागवानी">सब्जियां / बागवानी</option>
-                <option value="कपास / दलहन">कपास / दलहन</option>
-                <option value="अन्य">अन्य फसल</option>
-              </select>
-            </div>
-          `;
-        } else if (cat === 'healthcare') {
-          container.innerHTML = `
-            <div class="pub-form-group">
-              <label class="pub-label">आप किस स्वास्थ्य विषय में रुचि रखते हैं?</label>
-              <select id="gate_cat_ans" class="pub-select">
-                <option value="डायबिटीज / बीपी नियंत्रण">डायबिटीज / बीपी नियंत्रण</option>
-                <option value="जोड़ों का दर्द / वात">जोड़ों का दर्द / वात</option>
-                <option value="पाचन / गैस / कब्ज">पाचन / गैस / कब्ज</option>
-                <option value="सामान्य स्वास्थ्य एवं इम्यूनिटी">सामान्य स्वास्थ्य एवं इम्यूनिटी</option>
-              </select>
-            </div>
-          `;
-        } else if (cat === 'cattlecare') {
-          container.innerHTML = `
-            <div class="pub-form-group">
-              <label class="pub-label">आपके पास कौन सा पशुधन है?</label>
-              <select id="gate_cat_ans" class="pub-select">
-                <option value="गाय (देशी / संकर)">गाय (देशी / संकर)</option>
-                <option value="भैंस">भैंस</option>
-                <option value="बकरी / मुर्गी">बकरी / मुर्गी</option>
-                <option value="दुग्ध उत्पादन सुधार">दुग्ध उत्पादन सुधार</option>
-              </select>
-            </div>
-          `;
-        } else if (cat === 'netsurf' || cat === 'income') {
-          container.innerHTML = `
-            <div class="pub-form-group">
-              <label class="pub-label">आप किस प्रकार के अवसर में रुचि रखते हैं?</label>
-              <select id="gate_cat_ans" class="pub-select">
-                <option value="पार्ट-टाइम साइड इनकम (₹25k-₹50k)">पार्ट-टाइम साइड इनकम (₹25k-₹50k)</option>
-                <option value="एग्रीकल्चर डिस्ट्रीब्यूशन">एग्रीकल्चर डिस्ट्रीब्यूशन</option>
-                <option value="हेल्थकेयर डायरेक्ट सेलिंग">हेल्थकेयर डायरेक्ट सेलिंग</option>
-                <option value="फुल-टाइम बिज़नेस">फुल-टाइम बिज़नेस</option>
-              </select>
-            </div>
-          `;
-        } else {
-          container.innerHTML = `
-            <div class="pub-form-group">
-              <label class="pub-label">आपकी मुख्य आवश्यकता / प्रश्न</label>
-              <input type="text" id="gate_cat_ans" class="pub-input" placeholder="उदा. विशेष सलाह चाहिए">
-            </div>
-          `;
-        }
-      }
+          if (!name) return alert('कृपया अपना पूरा नाम दर्ज करें।');
+          if (mobile.length !== 10) return alert('कृपया 10 अंकों का मान्य मोबाइल नंबर दर्ज करें।');
 
-      async function handleGateSubmit(e, lp, creator) {
-        e.preventDefault();
-
-        const name = (document.getElementById('gate_input_name')?.value || '').trim();
-        let mobile = (document.getElementById('gate_input_mobile')?.value || '').replace(/\D/g, '').trim();
-        const place = (document.getElementById('gate_input_place')?.value || '').trim() || 'Online';
-        const catAns = document.getElementById('gate_cat_ans')?.value || (isWebinar ? 'Webinar Registration' : 'General Inquiry');
-
-        if (!name) {
-          alert('कृपया अपना पूरा नाम दर्ज करें।');
-          return;
-        }
-
-        if (mobile.length !== 10) {
-          alert('कृपया 10 अंकों का मान्य मोबाइल नंबर दर्ज करें।');
-          return;
-        }
-
-        const submitBtn = document.getElementById('gate_btn_submit');
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> सबमिट हो रहा है...';
-        }
-
-        const payload = {
-          profile_id: lp.profile_id || creator?.id || null,
-          name: name,
-          mobile: mobile,
-          village: place,
-          selected_categories: [lp.category || 'agriculture'],
-          category_answers: {
-            landing_page_id: lp.id,
-            creator_share_id: shareId || lp.share_id || creator?.share_id || '',
-            source: isWebinar ? 'webinar_gate' : 'survey_gate',
-            status: 'new',
-            response: catAns
+          const submitBtn = document.getElementById('gate_btn_submit');
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> सबमिट हो रहा है...';
           }
-        };
 
-        try {
-          // 1. Submit to Supabase Surveys
-          if (window.UCAS_DB && typeof window.UCAS_DB.createSurvey === 'function') {
-            await window.UCAS_DB.createSurvey(payload);
-          } else {
-            const db = (window.supabase && typeof window.supabase.createClient === 'function') ? window.dbClient : null;
-            if (db) {
-              await db.from('surveys').insert([payload]);
+          const payload = {
+            profile_id: lp.profile_id || creator?.id || null,
+            name: name,
+            mobile: mobile,
+            village: place,
+            selected_categories: [lp.category || 'agriculture'],
+            category_answers: {
+              landing_page_id: lp.id,
+              creator_share_id: shareId || lp.share_id || creator?.share_id || '',
+              source: isWebinar ? 'webinar_gate' : 'survey_gate',
+              status: 'new',
+              response: catAns
             }
-          }
+          };
 
-          // 2. Track attribution event
-          if (typeof trackAttributionEvent === 'function') {
-            trackAttributionEvent({
-              event_type: isWebinar ? 'webinar_registration' : 'landing_page_survey_submit',
-              asset_id: lp.id,
-              asset_title: lp.title
-            });
-          }
+          try {
+            if (window.UCAS_DB && typeof window.UCAS_DB.createSurvey === 'function') {
+              await window.UCAS_DB.createSurvey(payload);
+            }
+          } catch (err) {}
 
-          // 3. Mark visitor as permanently unlocked in localStorage
           localStorage.setItem(`ucas_unlocked_v1_${lp.id}`, 'true');
           localStorage.setItem('ucas_visitor_verified', 'true');
           localStorage.setItem('ucas_visitor_name', name);
           localStorage.setItem('ucas_visitor_mobile', mobile);
 
-          // 4. Show success animation transition view (0.8s)
           const formView = document.getElementById('lp_gate_form_view');
           const successView = document.getElementById('lp_gate_success_view');
-          const successMsgEl = document.getElementById('lp_gate_success_msg');
-
           if (formView) formView.style.display = 'none';
           if (successView) successView.style.display = 'block';
 
-          if (isWebinar && successMsgEl) {
-            successMsgEl.innerHTML = '🎉 आपका रजिस्ट्रेशन सफल हुआ! <strong>Zoom लिंक व पासवर्ड अनलॉक हो गया है...</strong>';
-          }
-
-          // Smooth reveal of main content after brief animation
           setTimeout(() => {
-            const overlay = document.getElementById('lp_survey_gate_overlay');
-            const mainContent = document.getElementById('lp_main_content');
-
-            if (overlay) {
-              overlay.style.opacity = '0';
-              overlay.style.visibility = 'hidden';
-              setTimeout(() => { overlay.style.display = 'none'; }, 400);
-            }
-
+            if (overlay) overlay.style.display = 'none';
             if (mainContent) {
               mainContent.style.opacity = '1';
               mainContent.style.filter = 'none';
-              mainContent.scrollIntoView({ behavior: 'smooth' });
             }
-
-            if (isWebinar) {
-              showWebinarDetails(lp);
-            }
-          }, 850);
-
-        } catch (err) {
-          console.error('Survey submission notice:', err);
-          localStorage.setItem(`ucas_unlocked_v1_${lp.id}`, 'true');
-          localStorage.setItem('ucas_visitor_verified', 'true');
-          const overlay = document.getElementById('lp_survey_gate_overlay');
-          const mainContent = document.getElementById('lp_main_content');
-          if (overlay) overlay.style.display = 'none';
-          if (mainContent) {
-            mainContent.style.opacity = '1';
-            mainContent.style.filter = 'none';
-          }
-        }
+            if (isWebinar) showWebinarDetails(lp);
+          }, 800);
+        });
       }
 
       function showWebinarDetails(lp) {
@@ -1606,31 +1311,7 @@
         if (meetingIdEl) meetingIdEl.textContent = mId;
         if (passcodeEl) passcodeEl.textContent = mPass;
 
-        // Copy actions
-        document.getElementById('btn_copy_meeting_id')?.addEventListener('click', () => {
-          if (navigator.clipboard) navigator.clipboard.writeText(mId);
-          alert('Meeting ID कॉपी हो गई: ' + mId);
-        });
-
-        document.getElementById('btn_copy_passcode')?.addEventListener('click', () => {
-          if (navigator.clipboard) navigator.clipboard.writeText(mPass);
-          alert('Passcode कॉपी हो गया: ' + mPass);
-        });
-
-        const fullInvite = `🎥 *${lp.title || 'Aarogyam India Live Webinar'}*\n\n📅 समय: ${wData.datetime || 'लाइव सत्र'}\n🔗 Zoom लिंक: ${zoomUrl}\n🆔 Meeting ID: ${mId}\n🔑 Passcode: ${mPass}\n\n👉 अभी जुड़ें: ${zoomUrl}`;
-
-        document.getElementById('btn_copy_full_invite')?.addEventListener('click', () => {
-          if (navigator.clipboard) navigator.clipboard.writeText(fullInvite);
-          alert('पूरा वेबिनार निमंत्रण कॉपी हो गया!');
-        });
-
-        document.getElementById('webinar_btn_wa_save')?.addEventListener('click', () => {
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(fullInvite)}`, '_blank');
-        });
-
-        if (unlockedScreen) {
-          unlockedScreen.style.display = 'block';
-        }
+        if (unlockedScreen) unlockedScreen.style.display = 'block';
       }
 
     })();
