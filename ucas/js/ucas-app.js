@@ -198,9 +198,12 @@
     if (viewName === 'profile') refreshDashboardKPIs();
     if (viewName === 'survey' && window.UCAS_SURVEY) window.UCAS_SURVEY.loadSurveys();
     if (viewName === 'phonebook' && window.UCAS_PHONEBOOK) window.UCAS_PHONEBOOK.loadPhonebook();
-    if (viewName === 'leads' && window.UCAS_LEADS) window.UCAS_LEADS.loadLeads();
-    if (viewName === 'marketing' && window.UCAS_MARKETING) window.UCAS_MARKETING.updateMarketingEngine();
-    if (viewName === 'webinars' && window.UCAS_WEBINARS) window.UCAS_WEBINARS.loadWebinars();
+    if (viewName === 'marketing' && window.UCAS_MARKETING) {
+      if (typeof window.UCAS_MARKETING.refreshLandingPages === 'function') {
+        window.UCAS_MARKETING.refreshLandingPages();
+      }
+      window.UCAS_MARKETING.updateMarketingEngine();
+    }
     if (viewName === 'admin' && window.UCAS_ADMIN) window.UCAS_ADMIN.loadAdminData();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });

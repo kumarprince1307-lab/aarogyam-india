@@ -13,7 +13,7 @@
 (function (window) {
   'use strict';
 
-  const LANDING_PAGES = [
+  const CORE_LANDING_PAGES = [
     {
       id: 'kharif_guide',
       title: '🌾 खरीफ मास्टर गाइड 2026',
@@ -40,6 +40,24 @@
       badge: 'Wellness',
       defaultHook: 'डायबिटीज, बीपी और जोड़ों के दर्द का सुरक्षित व प्राकृतिक उपचार!',
       defaultMsg: 'नमस्ते {name} जी,\n\nस्वस्थ और रोगमुक्त जीवन के लिए Aarogyam India का विशेष स्वास्थ्य परामर्श और आयुर्वेदिक ई-बुक गाइड देखें।\n\n👉 अपनी हेल्थ गाइड अभी पढ़ें:\n{link}\n\nशुभकामनाएं,\n{my_name}'
+    },
+    {
+      id: 'insurance_care',
+      title: '🛡️ संपूर्ण सुरक्षा एवं बीमा मार्गदर्शन (Insurance)',
+      category: 'insurance',
+      path: '/ucas/landing.html',
+      badge: 'Protection',
+      defaultHook: 'अपने और परिवार के भविष्य को सुरक्षित करें सबसे भरोसेमंद बीमा योजना के साथ!',
+      defaultMsg: 'नमस्ते {name} जी,\n\nक्या आप अपने परिवार के लिए सर्वश्रेष्ठ स्वास्थ्य व जीवन बीमा योजना की तलाश में हैं?\n\n👉 मुफ्त परामर्श और योजना की जानकारी के लिए यहाँ क्लिक करें:\n{link}\n\nसादर,\n{my_name}'
+    },
+    {
+      id: 'property_realestate',
+      title: '🏢 प्रीमियम प्रॉपर्टी एवं रियल एस्टेट अवसर',
+      category: 'property',
+      path: '/ucas/landing.html',
+      badge: 'Real Estate',
+      defaultHook: 'सर्वोत्तम लोकेशन पर प्लॉट, मकान व व्यावसायिक प्रॉपर्टी में सुरक्षित निवेश करें!',
+      defaultMsg: 'नमस्ते {name} जी,\n\nक्या आप प्राइम लोकेशन पर प्रॉपर्टी निवेश या अपना सपनों का घर तलाश रहे हैं?\n\n👉 पूरी प्रॉपर्टी लिस्टिंग और विवरण यहाँ देखें:\n{link}\n\nसम्पर्क: {my_name}'
     },
     {
       id: 'netsurf_biz',
@@ -79,11 +97,13 @@
     }
   ];
 
-  let selectedLandingPage = LANDING_PAGES[0];
+  let dynamicLandingPages = [];
+  let selectedLandingPage = CORE_LANDING_PAGES[0];
   let allRecipientsList = [];
   let filteredContacts = [];
 
-  function initMarketingModule() {
+  async function initMarketingModule() {
+    await loadDynamicLandingPages();
     renderLandingPageCards();
     bindMarketingEvents();
     updateMarketingEngine();
@@ -92,17 +112,60 @@
     }
   }
 
+  async function loadDynamicLandingPages() {
+    const profileId = window.UCAS_SESSION.getUserId();
+    dynamicLandingPages = [];
+    if (!profileId) return;
+
+    try {
+      if (window.UCAS_DB && typeof window.UCAS_DB.getLandingPages === 'function') {
+        const res = await window.UCAS_DB.getLandingPages(profileId);
+        const list = res.data || [];
+        // Include all user's created landing pages that are not blocked
+        dynamicLandingPages = list
+          .filter(p => !p.status || (p.status !== 'blocked' && p.status !== 'disabled'))
+          .map(p => {
+            const isWb = p.category === 'webinar' || Boolean(p.webinar_data);
+            return {
+              id: p.id,
+              title: `${isWb ? '🎥' : '📄'} ${p.title || 'Untitled Campaign'}`,
+              category: p.category || 'other',
+              path: `/ucas/landing.html?id=${p.id}`,
+              isCustom: true,
+              badge: isWb ? 'Live Webinar' : 'Custom Page',
+              defaultHook: p.message ? (p.message.slice(0, 70) + (p.message.length > 70 ? '...' : '')) : 'विशेष कैम्पेन एवं सर्वे फॉर्म भरें',
+              defaultMsg: `नमस्ते {name} जी,\n\n${p.title}\n\n${p.message || ''}\n\n👉 यहाँ देखें और रजिस्टर करें:\n{link}\n\nसादर,\n{my_name}`
+            };
+          });
+      }
+    } catch (e) {
+      console.warn('Error loading dynamic landing pages for marketing:', e);
+    }
+  }
+
+  async function refreshLandingPages() {
+    await loadDynamicLandingPages();
+    renderLandingPageCards();
+    updateMarketingEngine();
+  }
+
+  function getAllLandingPages() {
+    return [...dynamicLandingPages, ...CORE_LANDING_PAGES];
+  }
+
   function renderLandingPageCards() {
     const container = document.getElementById('ucas-marketing-landing-pages');
     if (!container) return;
 
-    container.innerHTML = LANDING_PAGES.map(lp => {
+    const allPages = getAllLandingPages();
+    container.innerHTML = allPages.map(lp => {
       const isSelected = selectedLandingPage.id === lp.id;
+      const isCustom = Boolean(lp.isCustom);
       return `
-        <div class="ucas-card ${isSelected ? 'selected' : ''}" style="cursor:pointer;border-width:2px;${isSelected ? 'border-color:var(--primary);background:var(--primary-subtle);' : ''}" onclick="UCAS_MARKETING.selectLandingPage('${lp.id}')">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div class="ucas-card ${isSelected ? 'selected' : ''}" style="cursor:pointer;border-width:2px;${isSelected ? 'border-color:var(--primary);background:var(--primary-subtle);' : isCustom ? 'border-color:#3B82F6;background:rgba(59,130,246,0.04);' : ''}" onclick="UCAS_MARKETING.selectLandingPage('${lp.id}')">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:6px;">
             <div style="font-weight:700;font-size:0.95rem;color:var(--text-main);">${lp.title}</div>
-            <span style="font-size:0.7rem;background:var(--secondary-subtle);color:var(--secondary-dark);padding:2px 6px;border-radius:4px;font-weight:700;">${lp.badge}</span>
+            <span style="font-size:0.7rem;background:${isCustom ? '#DBEAFE' : 'var(--secondary-subtle)'};color:${isCustom ? '#1D4ED8' : 'var(--secondary-dark)'};padding:2px 6px;border-radius:4px;font-weight:800;white-space:nowrap;">${lp.badge}</span>
           </div>
           <div style="font-size:0.78rem;color:var(--text-muted);">${lp.defaultHook}</div>
         </div>
@@ -111,7 +174,8 @@
   }
 
   function selectLandingPage(lpId) {
-    const found = LANDING_PAGES.find(p => p.id === lpId);
+    const allPages = getAllLandingPages();
+    const found = allPages.find(p => p.id === lpId);
     if (!found) return;
     selectedLandingPage = found;
     renderLandingPageCards();
@@ -438,6 +502,7 @@
 
   window.UCAS_MARKETING = {
     init: initMarketingModule,
+    refreshLandingPages,
     selectLandingPage,
     updateMarketingEngine,
     sendToOne,
