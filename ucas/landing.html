@@ -36,12 +36,7 @@
         var pYt = params.get('yt') || params.get('v');
         var pDesc = params.get('desc') || params.get('msg') || params.get('message');
         
-        // Universal YouTube ID extraction from pYt, pThumb, or window.location
-        var rawSearch = window.location.search || '';
-        var rawHref = window.location.href || '';
-        var ytMatch = rawSearch.match(/(?:[?&]v=|youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/)|[?&]yt=)([a-zA-Z0-9_-]{11})/i) ||
-                      rawHref.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/)|vi\/)([a-zA-Z0-9_-]{11})/i);
-        
+        var ytMatch = (window.location.search || '').match(/(?:[?&]v=|youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/)|[?&]yt=)([a-zA-Z0-9_-]{11})/i);
         var ytId = (pYt && /^[a-zA-Z0-9_-]{11}$/.test(pYt)) ? pYt : (ytMatch ? ytMatch[1] : null);
 
         if (ytId) {
@@ -207,7 +202,7 @@
       border: 1px solid var(--border);
       overflow: hidden;
       margin-bottom: 24px;
-      transition: opacity 0.5s ease, transform 0.5s ease;
+      transition: opacity 0.4s ease, filter 0.4s ease;
     }
 
     /* Creator Meta Bar */
@@ -288,7 +283,7 @@
     .pub-media-img {
       width: 100%;
       height: auto;
-      max-height: 600px;
+      max-height: 620px;
       object-fit: contain;
       display: block;
       margin: 0 auto;
@@ -499,18 +494,19 @@
 
     /* =========================================================================
        PUBLIC WEBSITE FIRST-SCREEN SURVEY GATE MODAL
-       ========================================================================= */
+       ========================================================================= -->
+    */
     .pub-gate-overlay {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(15, 23, 42, 0.82);
+      background: rgba(15, 23, 42, 0.84);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       z-index: 9999;
-      display: flex;
+      display: none; /* Initially none, shown by JS only if not unlocked */
       align-items: center;
       justify-content: center;
       padding: 16px;
@@ -789,7 +785,7 @@
   <!-- =========================================================================
        2. FIRST-SCREEN SURVEY GATE (MANDATORY PUBLIC POPUP)
        ========================================================================= -->
-  <div class="pub-gate-overlay" id="lp_survey_gate_overlay" style="display: flex;">
+  <div class="pub-gate-overlay" id="lp_survey_gate_overlay">
     <div class="pub-gate-card" id="lp_gate_card">
       
       <!-- Gate Form View -->
@@ -857,7 +853,7 @@
   <!-- =========================================================================
        3. MAIN EDITORIAL CONTENT POST
        ========================================================================= -->
-  <main class="pub-post-container" id="lp_main_content" style="opacity: 0.15; filter: blur(2px);">
+  <main class="pub-post-container" id="lp_main_content">
     
     <!-- Creator Meta Bar -->
     <div class="pub-creator-bar">
@@ -1019,7 +1015,7 @@
       let landingPageData = null;
       let creatorProfileData = null;
 
-      // 1. Fetch Landing Page Configuration
+      // 1. Fetch Landing Page Configuration from DB or LocalStorage
       try {
         if (window.UCAS_DB && typeof window.UCAS_DB.getLandingPageById === 'function') {
           const res = await window.UCAS_DB.getLandingPageById(lpId);
@@ -1028,19 +1024,21 @@
           }
         }
       } catch (e) {
-        console.warn('Error loading landing page from DB:', e);
+        console.warn('DB landing page load notice:', e);
       }
 
+      // Default fallback if page not found in DB
       if (!landingPageData) {
+        const isExplicitYt = Boolean(customYt || urlParams.get('yt') || urlParams.get('v'));
         landingPageData = {
           id: lpId,
           share_id: shareId,
           title: customTitle || 'Aarogyam India विशेष जानकारी',
           category: urlParams.get('cat') || 'agriculture',
-          content_type: (customYt || urlParams.get('yt')) ? 'youtube' : 'image',
-          media_url: customYt ? `https://www.youtube.com/watch?v=${customYt}` : (customThumb || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80'),
-          thumbnail_url: customThumb || (customYt ? `https://img.youtube.com/vi/${customYt}/hqdefault.jpg` : ''),
-          message: customMsg || 'नमस्ते! Aarogyam India में आपका स्वागत है। क्या आप उन्नत कृषि, जैविक समाधान या स्वास्थ्य के बारे में अधिक जानकारी चाहते हैं? नीचे दिया गया विवरण अवश्य देखें।'
+          content_type: isExplicitYt ? 'youtube' : 'image',
+          media_url: isExplicitYt ? `https://www.youtube.com/watch?v=${customYt || urlParams.get('yt')}` : (customThumb || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80'),
+          thumbnail_url: customThumb || (isExplicitYt ? `https://i.ytimg.com/vi/${customYt || urlParams.get('yt')}/hqdefault.jpg` : ''),
+          message: customMsg || 'नमस्ते! Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी और समाधान के लिए नीचे दिया गया विवरण अवश्य देखें।'
         };
       }
 
@@ -1077,7 +1075,7 @@
       // Render Landing Post Content
       renderLandingPost(landingPageData, creatorProfileData);
 
-      // Setup First-Screen Survey Gate
+      // Setup First-Screen Survey Gate with Universal Visitor Memory
       setupSurveyGate(landingPageData, creatorProfileData);
 
       function renderLandingPost(lp, creator) {
@@ -1086,7 +1084,8 @@
         // Security / Admin Block Screen
         if (lp.status === 'blocked' || lp.status === 'disabled') {
           const container = document.getElementById('lp_main_content') || document.body;
-          document.getElementById('lp_survey_gate_overlay').style.display = 'none';
+          const overlay = document.getElementById('lp_survey_gate_overlay');
+          if (overlay) overlay.style.display = 'none';
           container.style.opacity = '1';
           container.style.filter = 'none';
           container.innerHTML = `
@@ -1106,7 +1105,8 @@
 
         if (lp.status === 'pending_review') {
           const container = document.getElementById('lp_main_content') || document.body;
-          document.getElementById('lp_survey_gate_overlay').style.display = 'none';
+          const overlay = document.getElementById('lp_survey_gate_overlay');
+          if (overlay) overlay.style.display = 'none';
           container.style.opacity = '1';
           container.style.filter = 'none';
           container.innerHTML = `
@@ -1146,16 +1146,19 @@
 
         // Dynamic OG Metadata sync
         try {
-          const detectedVidId = extractYoutubeId(lp.media_url) || extractYoutubeId(lp.thumbnail_url);
-          const finalThumbUrl = detectedVidId 
-            ? `https://i.ytimg.com/vi/${detectedVidId}/hqdefault.jpg`
-            : (lp.thumbnail_url || lp.media_url);
+          let syncThumb = null;
+          if (lp.content_type === 'youtube') {
+            const vidId = extractYoutubeId(lp.media_url) || extractYoutubeId(lp.thumbnail_url);
+            if (vidId) syncThumb = `https://i.ytimg.com/vi/${vidId}/hqdefault.jpg`;
+          } else {
+            syncThumb = lp.thumbnail_url || lp.media_url;
+          }
 
-          if (finalThumbUrl && !finalThumbUrl.startsWith('data:')) {
-            document.getElementById('og_image')?.setAttribute('content', finalThumbUrl);
-            document.getElementById('og_image_secure')?.setAttribute('content', finalThumbUrl);
-            document.getElementById('tw_image')?.setAttribute('content', finalThumbUrl);
-            document.getElementById('link_image_src')?.setAttribute('href', finalThumbUrl);
+          if (syncThumb && !syncThumb.startsWith('data:')) {
+            document.getElementById('og_image')?.setAttribute('content', syncThumb);
+            document.getElementById('og_image_secure')?.setAttribute('content', syncThumb);
+            document.getElementById('tw_image')?.setAttribute('content', syncThumb);
+            document.getElementById('link_image_src')?.setAttribute('href', syncThumb);
           }
           if (finalTitle) {
             document.getElementById('og_title')?.setAttribute('content', finalTitle);
@@ -1199,42 +1202,80 @@
           }
         }
 
-        // Media Renderer
+        // =========================================================================
+        // DETERMINISTIC MEDIA RENDERER (IMAGE VS YOUTUBE)
+        // =========================================================================
         const mediaHolder = document.getElementById('lp_media_holder');
         if (mediaHolder) {
-          // Check if YouTube ID exists in media_url, thumbnail_url, or query params
-          const detectedYtId = extractYoutubeId(lp.media_url) ||
-                               extractYoutubeId(lp.thumbnail_url) ||
-                               extractYoutubeId(urlParams.get('yt')) ||
-                               extractYoutubeId(urlParams.get('v'));
+          mediaHolder.innerHTML = '';
 
-          if (detectedYtId || lp.content_type === 'youtube') {
-            const finalYtId = detectedYtId || extractYoutubeId(lp.media_url) || extractYoutubeId(lp.thumbnail_url) || 'dQw4w9WgXcQ';
-            const primaryThumb = `https://i.ytimg.com/vi/${finalYtId}/hqdefault.jpg`;
-            const altThumb = `https://img.youtube.com/vi/${finalYtId}/hqdefault.jpg`;
-            const mqThumb = `https://i.ytimg.com/vi/${finalYtId}/mqdefault.jpg`;
-            const svgFallback = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360"><rect width="640" height="360" fill="%230F172A"/><circle cx="320" cy="180" r="40" fill="%23FF0000"/><polygon points="312,165 336,180 312,195" fill="%23FFFFFF"/><text x="50%" y="78%" fill="%23FFFFFF" font-family="sans-serif" font-size="18" font-weight="bold" text-anchor="middle">Aarogyam India Video</text></svg>`;
+          let isYouTube = false;
+          let videoId = null;
 
-            mediaHolder.innerHTML = `
-              <div class="pub-yt-thumb-box" id="lp_yt_click_play" onclick="playYoutubeVideo('${finalYtId}')" title="क्लिक करके वीडियो देखें">
-                <img src="${primaryThumb}" 
-                     onerror="this.onerror=null;this.src='${altThumb}';this.onerror=function(){this.src='${mqThumb}';this.onerror=function(){this.src='${svgFallback}';};};" 
-                     alt="YouTube Preview"
-                     style="width:100%;height:100%;object-fit:cover;display:block;">
-                <div class="pub-play-btn"><i class="fa-solid fa-play"></i></div>
-                <div class="pub-yt-badge"><i class="fa-brands fa-youtube" style="color:#FF0000;font-size:1.15rem;"></i> YouTube</div>
-              </div>
+          // 1. If explicitly configured as YouTube
+          if (lp.content_type === 'youtube') {
+            videoId = extractYoutubeId(lp.media_url) || extractYoutubeId(lp.thumbnail_url) || extractYoutubeId(urlParams.get('yt')) || extractYoutubeId(urlParams.get('v'));
+            if (videoId) {
+              isYouTube = true;
+            }
+          }
+
+          // 2. If content_type was not set, but media_url contains YouTube link
+          if (!isYouTube && lp.content_type !== 'image') {
+            if (lp.media_url && (lp.media_url.includes('youtube.com') || lp.media_url.includes('youtu.be'))) {
+              videoId = extractYoutubeId(lp.media_url);
+              if (videoId) isYouTube = true;
+            }
+          }
+
+          if (isYouTube && videoId) {
+            // RENDER YOUTUBE POST
+            const primaryThumb = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+            const altThumb = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+            const thumbBox = document.createElement('div');
+            thumbBox.className = 'pub-yt-thumb-box';
+            thumbBox.id = 'lp_yt_click_play';
+            thumbBox.title = 'क्लिक करके वीडियो देखें';
+            thumbBox.onclick = () => playYoutubeVideo(videoId);
+
+            const ytImg = document.createElement('img');
+            ytImg.alt = lp.title || 'YouTube Video';
+            ytImg.src = primaryThumb;
+            ytImg.onerror = function () {
+              this.onerror = null;
+              this.src = altThumb;
+            };
+
+            thumbBox.appendChild(ytImg);
+            thumbBox.innerHTML += `
+              <div class="pub-play-btn"><i class="fa-solid fa-play"></i></div>
+              <div class="pub-yt-badge"><i class="fa-brands fa-youtube" style="color:#FF0000;font-size:1.15rem;"></i> YouTube</div>
             `;
+            mediaHolder.appendChild(thumbBox);
+
           } else {
-            const rawImg = lp.media_url || lp.thumbnail_url;
-            if (rawImg && rawImg.trim() && !rawImg.includes('undefined') && !rawImg.includes('null')) {
-              mediaHolder.innerHTML = `
-                <img src="${rawImg}" class="pub-media-img" alt="Banner Image" onerror="this.onerror=null;this.parentElement.innerHTML='<div style=\\'padding:3.5rem 1rem;color:#94A3B8;text-align:center;background:#0F172A;width:100%;\\'><i class=\\'fa-regular fa-image\\' style=\\'font-size:3.5rem;margin-bottom:10px;color:#10B981;display:block;\\'></i><div style=\\'font-size:1rem;color:#E2E8F0;font-weight:700;\\'>Aarogyam India विशेष जानकारी</div></div>';">
-              `;
+            // RENDER IMAGE POST
+            const rawImg = lp.media_url || lp.thumbnail_url || urlParams.get('thumb') || urlParams.get('img');
+            
+            if (rawImg && rawImg.trim() && rawImg !== 'null' && rawImg !== 'undefined') {
+              const imgElem = document.createElement('img');
+              imgElem.className = 'pub-media-img';
+              imgElem.alt = lp.title || 'Aarogyam India Post';
+              imgElem.src = rawImg;
+              imgElem.onerror = function () {
+                mediaHolder.innerHTML = `
+                  <div style="padding:3.5rem 1.5rem;color:#94A3B8;text-align:center;background:#0F172A;width:100%;">
+                    <i class="fa-regular fa-image" style="font-size:3rem;margin-bottom:10px;color:#10B981;display:block;"></i>
+                    <div style="font-size:1rem;color:#E2E8F0;font-weight:700;">Aarogyam India विशेष जानकारी</div>
+                  </div>
+                `;
+              };
+              mediaHolder.appendChild(imgElem);
             } else {
               mediaHolder.innerHTML = `
-                <div style="padding:3.5rem 1rem;color:#94A3B8;text-align:center;background:#0F172A;width:100%;">
-                  <i class="fa-regular fa-image" style="font-size:3.5rem;margin-bottom:10px;color:#10B981;display:block;"></i>
+                <div style="padding:3.5rem 1.5rem;color:#94A3B8;text-align:center;background:#0F172A;width:100%;">
+                  <i class="fa-regular fa-image" style="font-size:3rem;margin-bottom:10px;color:#10B981;display:block;"></i>
                   <div style="font-size:1rem;color:#E2E8F0;font-weight:700;">Aarogyam India Verified Content</div>
                 </div>
               `;
@@ -1294,21 +1335,38 @@
         }
       }
 
+      // =========================================================================
+      // SURVEY GATE WITH PERSISTENT VISITOR MEMORY
+      // =========================================================================
       function setupSurveyGate(lp, creator) {
         const overlay = document.getElementById('lp_survey_gate_overlay');
         const mainContent = document.getElementById('lp_main_content');
-        const unlockedStorageKey = `ucas_unlocked_v1_${lp.id}`;
 
-        // Check if visitor has already submitted
-        const isUnlocked = localStorage.getItem(unlockedStorageKey) === 'true';
+        // Check if visitor is already unlocked (by Page ID, by Global Visitor Session, or Logged In)
+        const isPageUnlocked = Boolean(lp?.id && localStorage.getItem(`ucas_unlocked_v1_${lp.id}`) === 'true');
+        const isGlobalVisitorUnlocked = localStorage.getItem('ucas_visitor_verified') === 'true';
+        const isSessionLoggedIn = Boolean(window.UCAS_SESSION && typeof window.UCAS_SESSION.isLoggedIn === 'function' && window.UCAS_SESSION.isLoggedIn()) || Boolean(localStorage.getItem('ucas_user_id'));
+        const isPreviewMode = urlParams.get('preview') === '1' || urlParams.get('unlock') === '1' || urlParams.get('admin') === '1';
+
+        const isUnlocked = isPageUnlocked || isGlobalVisitorUnlocked || isSessionLoggedIn || isPreviewMode;
+
         if (isUnlocked) {
-          overlay.style.display = 'none';
-          mainContent.style.opacity = '1';
-          mainContent.style.filter = 'none';
+          if (overlay) overlay.style.display = 'none';
+          if (mainContent) {
+            mainContent.style.opacity = '1';
+            mainContent.style.filter = 'none';
+          }
           if (isWebinar) {
             showWebinarDetails(lp);
           }
           return;
+        }
+
+        // Otherwise, show the survey gate for the first-time visitor
+        if (overlay) overlay.style.display = 'flex';
+        if (mainContent) {
+          mainContent.style.opacity = '0.15';
+          mainContent.style.filter = 'blur(2px)';
         }
 
         // Customize Gate based on Category
@@ -1456,8 +1514,11 @@
             });
           }
 
-          // 3. Mark visitor as unlocked in localStorage
+          // 3. Mark visitor as permanently unlocked in localStorage
           localStorage.setItem(`ucas_unlocked_v1_${lp.id}`, 'true');
+          localStorage.setItem('ucas_visitor_verified', 'true');
+          localStorage.setItem('ucas_visitor_name', name);
+          localStorage.setItem('ucas_visitor_mobile', mobile);
 
           // 4. Show success animation transition view (0.8s)
           const formView = document.getElementById('lp_gate_form_view');
@@ -1476,27 +1537,34 @@
             const overlay = document.getElementById('lp_survey_gate_overlay');
             const mainContent = document.getElementById('lp_main_content');
 
-            overlay.style.opacity = '0';
-            overlay.style.visibility = 'hidden';
-            setTimeout(() => { overlay.style.display = 'none'; }, 400);
+            if (overlay) {
+              overlay.style.opacity = '0';
+              overlay.style.visibility = 'hidden';
+              setTimeout(() => { overlay.style.display = 'none'; }, 400);
+            }
 
-            mainContent.style.opacity = '1';
-            mainContent.style.filter = 'none';
-            mainContent.scrollIntoView({ behavior: 'smooth' });
+            if (mainContent) {
+              mainContent.style.opacity = '1';
+              mainContent.style.filter = 'none';
+              mainContent.scrollIntoView({ behavior: 'smooth' });
+            }
 
             if (isWebinar) {
               showWebinarDetails(lp);
             }
-          }, 900);
+          }, 850);
 
         } catch (err) {
-          console.error('Survey submission error:', err);
+          console.error('Survey submission notice:', err);
           localStorage.setItem(`ucas_unlocked_v1_${lp.id}`, 'true');
+          localStorage.setItem('ucas_visitor_verified', 'true');
           const overlay = document.getElementById('lp_survey_gate_overlay');
           const mainContent = document.getElementById('lp_main_content');
-          overlay.style.display = 'none';
-          mainContent.style.opacity = '1';
-          mainContent.style.filter = 'none';
+          if (overlay) overlay.style.display = 'none';
+          if (mainContent) {
+            mainContent.style.opacity = '1';
+            mainContent.style.filter = 'none';
+          }
         }
       }
 
@@ -1552,7 +1620,7 @@
       function extractYoutubeId(url) {
         if (!url) return null;
         const str = String(url).trim();
-        if (!str) return null;
+        if (!str || str.startsWith('data:')) return null;
 
         // 1. Direct 11-char ID
         if (/^[a-zA-Z0-9_-]{11}$/.test(str)) {
@@ -1579,18 +1647,12 @@
           }
         }
 
-        // 4. Generic fallback: 11 character sequence
-        const genericMatch = str.match(/(?:[\/=])([a-zA-Z0-9_-]{11})(?:[?&#/]|$)/);
-        if (genericMatch && genericMatch[1] && genericMatch[1].length === 11) {
-          return genericMatch[1];
-        }
-
         return null;
       }
 
       window.playYoutubeVideo = function (videoId) {
         const mediaHolder = document.getElementById('lp_media_holder');
-        if (mediaHolder) {
+        if (mediaHolder && videoId) {
           mediaHolder.innerHTML = `
             <iframe class="pub-yt-iframe" src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
           `;
