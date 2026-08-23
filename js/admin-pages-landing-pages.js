@@ -1827,7 +1827,7 @@ export async function initAllLandingPages() {
         const lpId = editingPageId;
         const ogTitle = title.includes('Aarogyam India') ? title : `${title} | Aarogyam India`;
         const ogDesc = message.slice(0, 160).trim();
-        let ogImg = defaultBanner;
+        let ogImg = '';
         if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
           ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
         } else if (activeContentType === 'youtube' && detectedYoutubeId) {
@@ -1885,7 +1885,7 @@ export async function initAllLandingPages() {
           const lpId = `${prefix}${randomNum}`;
           const ogTitle = title.includes('Aarogyam India') ? title : `${title} | Aarogyam India`;
           const ogDesc = message.slice(0, 160).trim();
-          let ogImg = defaultBanner;
+          let ogImg = '';
           if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
             ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
           } else if (activeContentType === 'youtube' && detectedYoutubeId) {

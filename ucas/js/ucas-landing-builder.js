@@ -580,7 +580,7 @@
         const ogTitle = cleanTitle.includes('Aarogyam India') ? cleanTitle : `${cleanTitle} | Aarogyam India`;
         const ogDesc = (messageInput ? messageInput.slice(0, 160).trim() : 'Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी, समाधान और परामर्श के लिए अभी देखें।');
         
-        let ogImg = defaultBanner;
+        let ogImg = '';
         if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
           ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
         } else if (activeContentType === 'youtube' && detectedYoutubeId) {
@@ -622,7 +622,7 @@
         const ogTitle = cleanTitle.includes('Aarogyam India') ? cleanTitle : `${cleanTitle} | Aarogyam India`;
         const ogDesc = (messageInput ? messageInput.slice(0, 160).trim() : 'Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी, समाधान और परामर्श के लिए अभी देखें।');
         
-        let ogImg = defaultBanner;
+        let ogImg = '';
         if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
           ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
         } else if (activeContentType === 'youtube' && detectedYoutubeId) {

@@ -45,6 +45,60 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+function fetchOpenGraphImage(targetUrl, maxRedirects = 2) {
+  return new Promise((resolve) => {
+    if (!targetUrl || (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://'))) {
+      return resolve(null);
+    }
+    try {
+      const parsed = new URL(targetUrl);
+      const isHttps = parsed.protocol === 'https:';
+      const client = isHttps ? https : require('http');
+
+      const req = client.get(targetUrl, {
+        headers: {
+          'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.html)',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        },
+        timeout: 3000
+      }, (res) => {
+        if ((res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307 || res.statusCode === 308) && res.headers.location && maxRedirects > 0) {
+          const nextUrl = res.headers.location.startsWith('http') ? res.headers.location : new URL(res.headers.location, targetUrl).toString();
+          return fetchOpenGraphImage(nextUrl, maxRedirects - 1).then(resolve);
+        }
+
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          return resolve(null);
+        }
+
+        let raw = '';
+        res.on('data', (chunk) => {
+          raw += chunk;
+          if (raw.length > 500000) req.destroy();
+        });
+        res.on('end', () => {
+          try {
+            let m = raw.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+            if (!m) m = raw.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+            if (m && m[1]) {
+              let imgUrl = m[1].replace(/&amp;/g, '&');
+              return resolve(imgUrl);
+            }
+            resolve(null);
+          } catch (e) {
+            resolve(null);
+          }
+        });
+      });
+
+      req.on('error', () => resolve(null));
+      req.on('timeout', () => { req.destroy(); resolve(null); });
+    } catch (e) {
+      resolve(null);
+    }
+  });
+}
+
 function fetchLandingPageFromSupabase(lpId) {
   return new Promise((resolve) => {
     if (!lpId) return resolve(null);
@@ -154,11 +208,23 @@ module.exports = async function handler(req, res) {
   } else if (lp?.og_image_url && (lp.og_image_url.startsWith('http://') || lp.og_image_url.startsWith('https://')) && !lp.og_image_url.includes('farmer-community-banner')) {
     finalOgImage = lp.og_image_url;
   } else {
-    const candidateImg = lp?.thumbnail_url || lp?.media_url || queryThumb;
+    const candidateImg = lp?.thumbnail_url || queryThumb;
     if (candidateImg && candidateImg.startsWith('data:image/')) {
       finalOgImage = `${HOST_ORIGIN}/api/image?id=${encodeURIComponent(lp?.id || lpId || 'default')}`;
     } else if (candidateImg && (candidateImg.startsWith('http://') || candidateImg.startsWith('https://')) && !candidateImg.includes('farmer-community-banner')) {
       finalOgImage = candidateImg;
+    } else if (lp?.media_url && (lp.media_url.startsWith('http://') || lp.media_url.startsWith('https://'))) {
+      // Dynamically extract real OG Image from Facebook / Instagram / Web link!
+      try {
+        const dynamicOg = await fetchOpenGraphImage(lp.media_url);
+        if (dynamicOg) {
+          finalOgImage = dynamicOg;
+        } else {
+          finalOgImage = DEFAULT_FALLBACK_IMAGE;
+        }
+      } catch (ogErr) {
+        finalOgImage = DEFAULT_FALLBACK_IMAGE;
+      }
     } else {
       finalOgImage = DEFAULT_FALLBACK_IMAGE;
     }
