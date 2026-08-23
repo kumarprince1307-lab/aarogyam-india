@@ -767,23 +767,29 @@
   }
 
   function renderMyLandingPagesTable(pages) {
-    const tbody = document.getElementById('ucas-my-landing-pages-tbody');
+    const container = document.getElementById('ucas-my-landing-pages-container') || document.getElementById('ucas-my-landing-pages-cards') || document.getElementById('ucas-my-landing-pages-tbody');
     const countEl = document.getElementById('ucas-my-landing-pages-count');
     if (countEl) countEl.textContent = pages.length;
-    if (!tbody) return;
+    if (!container) return;
 
     if (pages.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">
-            🎯 आपने अभी तक कोई लैंडिंग पेज नहीं बनाया है। ऊपर दिए गए फॉर्म से अपना पहला पेज बनाएं।
-          </td>
-        </tr>
+      container.innerHTML = `
+        <div style="text-align:center;padding:2.5rem 1.5rem;color:var(--text-muted);background:#F8FAFC;border-radius:var(--radius-md);border:1.5px dashed #CBD5E1;">
+          <div style="font-size:2rem;margin-bottom:8px;">🎯</div>
+          <strong style="font-size:1rem;color:var(--text-main);">आपने अभी तक कोई लैंडिंग पेज नहीं बनाया है।</strong>
+          <p style="font-size:0.82rem;margin-top:4px;">ऊपर दिए गए "लैंडिंग पेज बिल्डर" फॉर्म से अपना पहला पेज बनाएं।</p>
+        </div>
       `;
       return;
     }
 
-    tbody.innerHTML = pages.map((lp, idx) => {
+    // Split pages by content type
+    const imagePages = pages.filter(p => p.content_type === 'image' || (!p.content_type && !p.webinar_data));
+    const youtubePages = pages.filter(p => p.content_type === 'youtube');
+    const facebookPages = pages.filter(p => p.content_type === 'facebook' || p.content_type === 'fb');
+    const otherPages = pages.filter(p => p.content_type !== 'image' && p.content_type !== 'youtube' && p.content_type !== 'facebook' && p.content_type !== 'fb' && p.content_type);
+
+    function renderPageCard(lp, idx, categoryTheme) {
       const dateStr = lp.created_at ? new Date(lp.created_at).toLocaleDateString('hi-IN') : '-';
       const shareUrl = getLandingPageShareUrl(lp);
       const responsesCount = lp.response_count || 0;
@@ -791,59 +797,130 @@
       const isBlocked = lp.status === 'blocked' || lp.status === 'disabled';
 
       const mediaBadge = lp.content_type === 'youtube'
-        ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fa-brands fa-youtube"></i> YouTube</span>'
-        : '<span style="background:#E0F2FE;color:#0284C7;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fa-regular fa-image"></i> Image</span>';
+        ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;"><i class="fa-brands fa-youtube"></i> YouTube</span>'
+        : lp.content_type === 'facebook' || lp.content_type === 'fb'
+        ? '<span style="background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;"><i class="fa-brands fa-facebook"></i> Facebook</span>'
+        : '<span style="background:#E0F2FE;color:#0284C7;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;"><i class="fa-regular fa-image"></i> Image</span>';
 
       const statusBadge = isPending
-        ? '<span style="background:#FEF3C7;color:#D97706;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-hourglass-half"></i> Under Review</span>'
+        ? '<span style="background:#FEF3C7;color:#D97706;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-hourglass-half"></i> Under Review</span>'
         : isBlocked
-        ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-ban"></i> Blocked</span>'
-        : '<span style="background:#DCFCE7;color:#15803D;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-circle-check"></i> Live</span>';
+        ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-ban"></i> Blocked</span>'
+        : '<span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-circle-check"></i> Live</span>';
 
       return `
-        <tr>
-          <td><strong>#${idx + 1}</strong></td>
-          <td>
-            <div style="font-weight:700;color:var(--text-main);">${lp.title}</div>
-            <div style="font-size:0.75rem;color:var(--primary-dark);font-weight:600;">ID: <code>${lp.id}</code> • ${statusBadge}</div>
-          </td>
-          <td>
-            <span style="font-size:0.78rem;background:var(--primary-subtle);color:var(--primary-dark);padding:2px 8px;border-radius:4px;font-weight:600;">
-              ${lp.category.toUpperCase()}
-            </span>
-            <div style="margin-top:2px;">${mediaBadge}</div>
-          </td>
-          <td>
-            <span style="font-weight:800;font-size:0.95rem;color:#15803D;background:#DCFCE7;padding:3px 10px;border-radius:var(--radius-full);display:inline-flex;align-items:center;gap:4px;">
+        <div class="ucas-post-elevated-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <span style="background:var(--primary);color:#fff;font-weight:800;font-size:0.8rem;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                ${idx + 1}
+              </span>
+              <div>
+                <div style="font-weight:800;font-size:1.02rem;color:var(--text-main);line-height:1.3;">${lp.title}</div>
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">
+                  ID: <strong style="color:var(--primary-dark);font-family:monospace;">${lp.id}</strong> • 📅 ${dateStr}
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+              ${statusBadge}
+              ${mediaBadge}
+            </div>
+          </div>
+
+          <!-- Category & Surveys Info -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#F8FAFC;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">कैटेगरी: <strong style="color:var(--text-main);">${(lp.category || 'other').toUpperCase()}</strong></span>
+            <span style="font-weight:800;font-size:0.85rem;color:#15803D;background:#DCFCE7;padding:3px 10px;border-radius:var(--radius-full);display:inline-flex;align-items:center;gap:4px;">
               <i class="fa-solid fa-clipboard-check"></i> ${responsesCount} Surveys
             </span>
-          </td>
-          <td>${dateStr}</td>
-          <td>
-            <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.editLandingPage('${lp.id}')" title="संपादित करें (Edit)" style="color:var(--secondary-dark);border-color:var(--secondary);">
-                <i class="fa-solid fa-pen-to-square"></i>
+          </div>
+
+          <!-- 2 Rows of Buttons: Top Row 4 Buttons, Bottom Row 3 Buttons -->
+          <div class="ucas-actions-two-rows">
+            <!-- Row 1: 4 Sharing Buttons -->
+            <div class="ucas-btn-row-4">
+              <button class="ucas-btn-act ucas-btn-act-wa" onclick="UCAS_LANDING_BUILDER.shareLandingPageWhatsApp('${lp.id}')" title="WhatsApp Share">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
               </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" onclick="UCAS_LANDING_BUILDER.shareLandingPageWhatsApp('${lp.id}')" title="${isPending ? 'अंडर रिव्यू' : 'WhatsApp Share'}" ${isPending || isBlocked ? 'style="opacity:0.6;"' : ''}>
-                <i class="fa-brands fa-whatsapp"></i>
+              <button class="ucas-btn-act ucas-btn-act-fb" onclick="UCAS_LANDING_BUILDER.shareLandingPageFacebook('${lp.id}')" title="Facebook Share">
+                <i class="fa-brands fa-facebook"></i> Facebook
               </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.shareLandingPageFacebook('${lp.id}')" title="${isPending ? 'अंडर रिव्यू' : 'Facebook Share'}" style="color:#1877F2;border-color:#1877F2;${isPending || isBlocked ? 'opacity:0.6;' : ''}">
-                <i class="fa-brands fa-facebook"></i>
+              <button class="ucas-btn-act ucas-btn-act-share" onclick="UCAS_LANDING_BUILDER.shareLandingPageNative('${lp.id}')" title="अन्य ऐप्स पर शेयर">
+                <i class="fa-solid fa-share-nodes"></i> शेयर
               </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.copyLandingPageLink('${lp.id}')" title="Copy Link">
-                <i class="fa-solid fa-copy"></i>
-              </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-primary" onclick="window.open('${shareUrl}', '_blank')" title="View Public Page">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-              </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.deleteLandingPage('${lp.id}')" title="हटाएं (Delete)" style="color:var(--danger);border-color:rgba(220,38,38,0.3);">
-                <i class="fa-solid fa-trash-can"></i>
+              <button class="ucas-btn-act ucas-btn-act-copy" onclick="UCAS_LANDING_BUILDER.copyLandingPageLink('${lp.id}')" title="Copy Link">
+                <i class="fa-regular fa-copy"></i> कॉपी
               </button>
             </div>
-          </td>
-        </tr>
+            <!-- Row 2: 3 Management Buttons -->
+            <div class="ucas-btn-row-3">
+              <button class="ucas-btn-act ucas-btn-act-view" onclick="window.open('${shareUrl}', '_blank')" title="पेज देखें">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> देखें
+              </button>
+              <button class="ucas-btn-act ucas-btn-act-edit" onclick="UCAS_LANDING_BUILDER.editLandingPage('${lp.id}')" title="एडिट करें">
+                <i class="fa-solid fa-pen-to-square"></i> एडिट
+              </button>
+              <button class="ucas-btn-act ucas-btn-act-delete" onclick="UCAS_LANDING_BUILDER.deleteLandingPage('${lp.id}')" title="हटाएं">
+                <i class="fa-solid fa-trash-can"></i> हटाएं
+              </button>
+            </div>
+          </div>
+        </div>
       `;
-    }).join('');
+    }
+
+    let html = '';
+
+    // 1. Image Landing Pages Group
+    if (imagePages.length > 0) {
+      html += `
+        <div class="ucas-lp-cat-header" style="border-left-color:#0284C7;">
+          <i class="fa-regular fa-image" style="color:#0284C7;font-size:1.15rem;"></i>
+          <span>🖼️ इमेज लैंडिंग पेज (Image Posts)</span>
+          <span class="ucas-lp-cat-badge" style="background:#0284C7;">${imagePages.length}</span>
+        </div>
+        ${imagePages.map((lp, idx) => renderPageCard(lp, idx, 'image')).join('')}
+      `;
+    }
+
+    // 2. YouTube Video Landing Pages Group
+    if (youtubePages.length > 0) {
+      html += `
+        <div class="ucas-lp-cat-header" style="border-left-color:#DC2626;">
+          <i class="fa-brands fa-youtube" style="color:#DC2626;font-size:1.15rem;"></i>
+          <span>🎥 YouTube वीडियो लैंडिंग पेज (YouTube Video Posts)</span>
+          <span class="ucas-lp-cat-badge" style="background:#DC2626;">${youtubePages.length}</span>
+        </div>
+        ${youtubePages.map((lp, idx) => renderPageCard(lp, idx, 'youtube')).join('')}
+      `;
+    }
+
+    // 3. Facebook Video Landing Pages Group
+    if (facebookPages.length > 0) {
+      html += `
+        <div class="ucas-lp-cat-header" style="border-left-color:#1877F2;">
+          <i class="fa-brands fa-facebook" style="color:#1877F2;font-size:1.15rem;"></i>
+          <span>📹 Facebook वीडियो लैंडिंग पेज (Facebook Video Posts)</span>
+          <span class="ucas-lp-cat-badge" style="background:#1877F2;">${facebookPages.length}</span>
+        </div>
+        ${facebookPages.map((lp, idx) => renderPageCard(lp, idx, 'facebook')).join('')}
+      `;
+    }
+
+    // 4. Other Landing Pages Group
+    if (otherPages.length > 0) {
+      html += `
+        <div class="ucas-lp-cat-header" style="border-left-color:#7C3AED;">
+          <i class="fa-solid fa-layer-group" style="color:#7C3AED;font-size:1.15rem;"></i>
+          <span>📄 अन्य लैंडिंग पेज (Other Campaigns)</span>
+          <span class="ucas-lp-cat-badge" style="background:#7C3AED;">${otherPages.length}</span>
+        </div>
+        ${otherPages.map((lp, idx) => renderPageCard(lp, idx, 'other')).join('')}
+      `;
+    }
+
+    container.innerHTML = html;
   }
 
   function shareLandingPageWhatsApp(lpId) {
@@ -877,6 +954,21 @@
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
   }
 
+  function shareLandingPageNative(lpId) {
+    const lp = userLandingPages.find(item => item.id === lpId);
+    if (!lp) return;
+    const shareUrl = getLandingPageShareUrl(lp);
+    if (navigator.share) {
+      navigator.share({
+        title: lp.title,
+        text: lp.message,
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      copyLandingPageLink(lpId);
+    }
+  }
+
   function copyLandingPageLink(lpId) {
     const lp = userLandingPages.find(item => item.id === lpId);
     if (!lp) return;
@@ -900,6 +992,7 @@
     loadMyLandingPages,
     shareLandingPageWhatsApp,
     shareLandingPageFacebook,
+    shareLandingPageNative,
     copyLandingPageLink,
     getLandingPageShareUrl
   };

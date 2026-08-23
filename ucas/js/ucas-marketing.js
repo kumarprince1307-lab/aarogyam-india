@@ -162,12 +162,12 @@
       const isSelected = selectedLandingPage.id === lp.id;
       const isCustom = Boolean(lp.isCustom);
       return `
-        <div class="ucas-card ${isSelected ? 'selected' : ''}" style="cursor:pointer;border-width:2px;${isSelected ? 'border-color:var(--primary);background:var(--primary-subtle);' : isCustom ? 'border-color:#3B82F6;background:rgba(59,130,246,0.04);' : ''}" onclick="UCAS_MARKETING.selectLandingPage('${lp.id}')">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:6px;">
-            <div style="font-weight:700;font-size:0.95rem;color:var(--text-main);">${lp.title}</div>
-            <span style="font-size:0.7rem;background:${isCustom ? '#DBEAFE' : 'var(--secondary-subtle)'};color:${isCustom ? '#1D4ED8' : 'var(--secondary-dark)'};padding:2px 6px;border-radius:4px;font-weight:800;white-space:nowrap;">${lp.badge}</span>
+        <div class="ucas-card ${isSelected ? 'selected' : ''}" style="cursor:pointer;border-width:2px;padding:12px;border-radius:var(--radius-md);transition:all 0.2s ease;${isSelected ? 'border-color:var(--primary);background:var(--primary-subtle);box-shadow:0 4px 12px rgba(11,122,62,0.15);' : isCustom ? 'border-color:#3B82F6;background:rgba(59,130,246,0.04);' : 'border-color:var(--border);'}" onclick="UCAS_MARKETING.selectLandingPage('${lp.id}')">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;flex-wrap:wrap;">
+            <div style="font-weight:800;font-size:0.95rem;color:var(--text-main);line-height:1.3;flex:1;min-width:140px;">${lp.title}</div>
+            <span style="font-size:0.7rem;background:${isCustom ? '#DBEAFE' : 'var(--secondary-subtle)'};color:${isCustom ? '#1D4ED8' : 'var(--secondary-dark)'};padding:2px 8px;border-radius:var(--radius-full);font-weight:800;white-space:nowrap;flex-shrink:0;">${lp.badge}</span>
           </div>
-          <div style="font-size:0.78rem;color:var(--text-muted);">${lp.defaultHook}</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.4;">${lp.defaultHook}</div>
         </div>
       `;
     }).join('');

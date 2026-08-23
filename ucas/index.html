@@ -69,10 +69,8 @@
     <a href="/ucas/index.html" class="ucas-brand">
       <img src="/images/logo/logo.png" alt="Aarogyam India" class="ucas-brand-logo">
       <div class="ucas-brand-text">
-        <div class="ucas-brand-title">
-          UCAS <span class="ucas-badge-v1">V1.0</span>
-        </div>
-        <div class="ucas-brand-sub">Customer Acquisition System</div>
+        <div class="ucas-brand-title">Aarogyam India</div>
+        <div class="ucas-brand-sub" style="font-size:0.75rem;font-weight:700;color:var(--primary);">My Profile & UCAS</div>
       </div>
     </a>
 
@@ -82,20 +80,11 @@
         <i class="fa-solid fa-mobile-screen-button"></i> Install App
       </button>
 
-      <!-- User Personal Notification Bell Button -->
-      <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff;">
-        <i class="fa-regular fa-bell"></i>
+      <!-- User Personal Notification Bell Button with Strong Contrast -->
+      <button class="user-notif-bell-btn ucas-bell-styled" title="सूचनाएं (Notifications)" aria-label="Notifications">
+        <i class="fa-solid fa-bell"></i>
         <span class="user-notif-badge" style="display: none;">0</span>
       </button>
-
-      <!-- User Profile Pill (Opens User Drawer / My Profile) -->
-      <div class="ucas-user-pill" onclick="UCAS_APP.openUserDrawer()" title="यूजर मेनू खोलें">
-        <div class="ucas-user-avatar">A</div>
-        <div class="ucas-user-info">
-          <span class="ucas-user-name">Loading...</span>
-          <span class="ucas-user-shareid">ID: ---</span>
-        </div>
-      </div>
 
       <!-- Hamburger Menu Button (Drawer Toggle) -->
       <button class="ucas-menu-toggle-btn" onclick="UCAS_APP.toggleUserDrawer()" title="मेनू खोलें" aria-label="Toggle Menu">
@@ -503,9 +492,8 @@
 
         <form id="ucas-survey-form">
           <!-- Step 1: Person Information -->
-          <div style="font-weight:800;font-size:0.95rem;color:var(--text-main);margin-bottom:0.75rem;display:flex;align-items:center;gap:6px;">
-            <span style="width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:0.75rem;">1</span>
-            <span>व्यक्तिगत जानकारी (Person Information)</span>
+          <div style="margin-bottom:0.85rem;">
+            <span class="ucas-heading-pill"><i class="fa-solid fa-user"></i> 1. व्यक्तिगत जानकारी (Person Information)</span>
           </div>
 
           <div class="ucas-grid-2">
@@ -570,9 +558,8 @@
           </div>
 
           <!-- Step 2: Category Selection (Multi-Select Cards) -->
-          <div style="font-weight:800;font-size:0.95rem;color:var(--text-main);margin:1.5rem 0 0.5rem;display:flex;align-items:center;gap:6px;">
-            <span style="width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:0.75rem;">2</span>
-            <span>कैटेगरी चुनें (Select Applicable Categories — Multiple Allowed)</span>
+          <div style="margin:1.5rem 0 0.75rem 0;">
+            <span class="ucas-heading-pill"><i class="fa-solid fa-tags"></i> 2. कैटेगरी चुनें (Select Categories — Multiple Allowed)</span>
           </div>
 
           <div class="ucas-category-grid" id="ucas-survey-category-cards">
@@ -739,14 +726,19 @@
          VIEW 5: MARKETING ENGINE (SEARCH → FILTER → SEND)
          ----------------------------------------------------------------------- -->
     <section id="view-marketing" class="ucas-view">
-      <div class="ucas-card" style="margin-bottom:1.25rem;background:var(--primary-subtle);border-color:rgba(11, 122, 62, 0.2);">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+      <div class="ucas-card" style="margin-bottom:1.25rem;background:var(--primary-subtle);border:1.5px solid rgba(11, 122, 62, 0.25);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--primary-gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;box-shadow:0 4px 10px rgba(11,122,62,0.25);">
             <i class="fa-solid fa-rocket"></i>
           </div>
           <div>
-            <h3 style="font-size:1.15rem;color:var(--primary-dark);">Marketing Engine (V1)</h3>
-            <p style="font-size:0.8rem;color:var(--text-muted);">दर्शन: <strong>SEARCH → FILTER → SEND</strong> • अपनी लक्षित ऑडियंस चुनें और व्यक्तिगत संदेश साझा करें।</p>
+            <h3 style="font-size:1.15rem;font-weight:800;color:var(--primary-dark);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span>UCAS — Unified Customer Acquisition System</span>
+              <span style="font-size:0.75rem;background:var(--primary);color:#fff;padding:2px 8px;border-radius:var(--radius-full);font-weight:700;">ग्राहक अर्जन प्रणाली</span>
+            </h3>
+            <p style="font-size:0.85rem;color:var(--text-main);margin-top:3px;line-height:1.4;">
+              <strong>अर्थ (मतलब):</strong> अपने ग्राहकों व संपर्कों को सीधे जोड़ने, उच्च-गुणवत्ता वाले लैंडिंग पेज साझा करने, 1-to-1 व्यक्तिगत संदेश भेजने और व्यापार का तेजी से विस्तार करने का संपूर्ण डिजिटल माध्यम।
+            </p>
           </div>
         </div>
       </div>
@@ -755,10 +747,10 @@
       <div class="ucas-card" style="margin-bottom:1.25rem;">
         <div class="ucas-card-header">
           <div class="ucas-card-title">
-            <span>1. लैंडिंग पेज चुनें (Select Destination Landing Page)</span>
+            <span class="ucas-heading-pill"><i class="fa-solid fa-list-check"></i> 1. लैंडिंग पेज चुनें (Select Destination)</span>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:0.75rem;" id="ucas-marketing-landing-pages">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:0.75rem;" id="ucas-marketing-landing-pages">
           <!-- Rendered by JS -->
         </div>
       </div>
@@ -769,7 +761,7 @@
         <div class="ucas-card">
           <div class="ucas-card-header">
             <div class="ucas-card-title">
-              <span>2. मैसेज बिल्डर (Message Builder)</span>
+              <span class="ucas-heading-pill"><i class="fa-solid fa-pen-nib"></i> 2. मैसेज बिल्डर (Message Builder)</span>
             </div>
           </div>
           <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">
@@ -800,30 +792,30 @@
           </div>
 
           <div style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:6px;">
-            <button class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" onclick="UCAS_MARKETING.shareWhatsAppBroadcast()">
+            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-wa" onclick="UCAS_MARKETING.shareWhatsAppBroadcast()">
               <i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर
             </button>
-            <button class="ucas-btn ucas-btn-sm ucas-btn-primary" onclick="UCAS_MARKETING.shareNative()">
+            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-share" onclick="UCAS_MARKETING.shareNative()">
               <i class="fa-solid fa-share-nodes"></i> Native Share
             </button>
-            <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_MARKETING.shareFacebook()">
+            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-fb" onclick="UCAS_MARKETING.shareFacebook()">
               <i class="fa-brands fa-facebook"></i> FB
             </button>
-            <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_MARKETING.shareTelegram()">
-              <i class="fa-brands fa-telegram"></i> Telegram
+            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-copy" onclick="UCAS_MARKETING.copyReferralLink()">
+              <i class="fa-regular fa-copy"></i> कॉपी लिंक
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Step 4: 1-to-1 Recipient Dispatch with Compact Area & Category Filters -->
+      <!-- Step 3: 1-to-1 Recipient Dispatch with Compact Area & Category Filters -->
       <div class="ucas-card">
         <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.75rem;">
           <div>
             <div class="ucas-card-title">
-              <i class="fa-solid fa-paper-plane" style="color:var(--primary);"></i> 3. 1-to-1 व्यक्तिगत संदेश भेजें (Direct Recipient Dispatch)
+              <span class="ucas-heading-pill"><i class="fa-solid fa-paper-plane"></i> 3. 1-to-1 व्यक्तिगत संदेश भेजें</span>
             </div>
-            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
+            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">
               प्रत्येक संपर्क को उनके नाम से व्यक्तिगत संदेश और आपकी Share ID लिंक के साथ भेजें।
             </div>
           </div>
@@ -866,9 +858,9 @@
         <div class="ucas-card-header">
           <div>
             <div class="ucas-card-title">
-              <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--secondary-dark);"></i> 4. 🎯 लैंडिंग पेज बिल्डर (Landing Page Builder)
+              <span class="ucas-heading-pill"><i class="fa-solid fa-wand-magic-sparkles"></i> 4. लैंडिंग पेज बिल्डर (Landing Page Builder)</span>
             </div>
-            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
+            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">
               इमेज या यूट्यूब वीडियो + संदेश + कैटेगरी जोड़कर 1-क्लिक में अपना कस्टम लैंडिंग पेज बनाएं या बदलें।
             </div>
           </div>
@@ -1028,33 +1020,20 @@
         </div>
       </div>
 
-      <!-- My Landing Pages Table -->
+      <!-- My Landing Pages Single Unified Container -->
       <div class="ucas-card" style="margin-top:1.25rem;">
         <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
           <div class="ucas-card-title">
-            <i class="fa-solid fa-layer-group" style="color:var(--primary);"></i> मेरे लैंडिंग पेज (My Created Landing Pages) (<span id="ucas-my-landing-pages-count">0</span>)
+            <span class="ucas-heading-pill"><i class="fa-solid fa-layer-group"></i> मेरे लैंडिंग पेज (My Landing Pages)</span>
+            <span id="ucas-my-landing-pages-count" style="background:var(--primary-subtle);color:var(--primary-dark);font-weight:800;padding:2px 8px;border-radius:var(--radius-full);font-size:0.85rem;margin-left:6px;">0</span>
           </div>
           <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_LANDING_BUILDER.loadMyLandingPages()">
             <i class="fa-solid fa-rotate"></i> रीफ्रेश
           </button>
         </div>
 
-        <div class="ucas-table-wrap">
-          <table class="ucas-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>लैंडिंग पेज</th>
-                <th>कैटेगरी / मीडिया</th>
-                <th>सर्वे रिस्पॉन्स (Surveys)</th>
-                <th>तारीख</th>
-                <th>कार्यवाही</th>
-              </tr>
-            </thead>
-            <tbody id="ucas-my-landing-pages-tbody">
-              <tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</td></tr>
-            </tbody>
-          </table>
+        <div id="ucas-my-landing-pages-container">
+          <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
         </div>
       </div>
     </section>
@@ -1216,30 +1195,20 @@
         </div>
       </div>
 
-      <!-- My Webinars Table -->
+      <!-- My Webinars Single Unified Container -->
       <div class="ucas-card">
-        <div class="ucas-card-header">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
           <div class="ucas-card-title">
-            <i class="fa-solid fa-video"></i> मेरे लाइव वेबिनार (My Webinars)
+            <span class="ucas-heading-pill"><i class="fa-solid fa-video"></i> मेरे लाइव वेबिनार (My Webinars)</span>
+            <span id="ucas-my-webinars-count" style="background:var(--primary-subtle);color:var(--primary-dark);font-weight:800;padding:2px 8px;border-radius:var(--radius-full);font-size:0.85rem;margin-left:6px;">0</span>
           </div>
-          <span style="font-size:0.82rem;color:var(--text-muted);">कुल: <strong id="ucas-my-webinars-count">0</strong></span>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_WEBINARS.loadWebinars()">
+            <i class="fa-solid fa-rotate"></i> रीफ्रेश
+          </button>
         </div>
 
-        <div class="ucas-table-wrap">
-          <table class="ucas-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Webinar Title & ID</th>
-                <th>Date & Zoom Info</th>
-                <th>Registered Attendees</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="ucas-my-webinars-tbody">
-              <tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</td></tr>
-            </tbody>
-          </table>
+        <div id="ucas-my-webinars-container">
+          <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
         </div>
       </div>
     </section>

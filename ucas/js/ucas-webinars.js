@@ -555,23 +555,23 @@
   }
 
   function renderWebinarsTable(webinars, allSurveys) {
-    const tbody = document.getElementById('ucas-my-webinars-tbody');
+    const container = document.getElementById('ucas-my-webinars-container') || document.getElementById('ucas-my-webinars-cards') || document.getElementById('ucas-my-webinars-tbody');
     const countEl = document.getElementById('ucas-my-webinars-count');
     if (countEl) countEl.textContent = webinars.length;
-    if (!tbody) return;
+    if (!container) return;
 
     if (webinars.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">
-            🎥 आपने अभी तक कोई वेबिनार पेज नहीं बनाया है। ऊपर दिए गए फॉर्म से अपना पहला वेबिनार बनाएं।
-          </td>
-        </tr>
+      container.innerHTML = `
+        <div style="text-align:center;padding:2.5rem 1.5rem;color:var(--text-muted);background:#F8FAFC;border-radius:var(--radius-md);border:1.5px dashed #CBD5E1;">
+          <div style="font-size:2rem;margin-bottom:8px;">🎥</div>
+          <strong style="font-size:1rem;color:var(--text-main);">आपने अभी तक कोई वेबिनार पेज नहीं बनाया है।</strong>
+          <p style="font-size:0.82rem;margin-top:4px;">ऊपर दिए गए फॉर्म से अपना पहला लाइव वेबिनार बनाएं।</p>
+        </div>
       `;
       return;
     }
 
-    tbody.innerHTML = webinars.map((wb, idx) => {
+    container.innerHTML = webinars.map((wb, idx) => {
       const dateStr = wb.created_at ? new Date(wb.created_at).toLocaleDateString('hi-IN') : '-';
       const wData = wb.webinar_data || {};
       const shareUrl = getWebinarShareUrl(wb);
@@ -583,55 +583,71 @@
       const isBlocked = wb.status === 'blocked' || wb.status === 'disabled';
 
       const statusBadge = isPending
-        ? '<span style="background:#FEF3C7;color:#D97706;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-hourglass-half"></i> Under Review</span>'
+        ? '<span style="background:#FEF3C7;color:#D97706;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-hourglass-half"></i> Under Review</span>'
         : isBlocked
-        ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-ban"></i> Blocked</span>'
-        : '<span style="background:#DCFCE7;color:#15803D;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-circle-check"></i> Live</span>';
+        ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-ban"></i> Blocked</span>'
+        : '<span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-circle-check"></i> Live</span>';
 
       return `
-        <tr>
-          <td><strong>#${idx + 1}</strong></td>
-          <td>
-            <div style="font-weight:700;color:var(--text-main);">${wb.title}</div>
-            <div style="font-size:0.75rem;color:var(--primary-dark);font-weight:600;">ID: <code>${wb.id}</code> • ${statusBadge}</div>
-          </td>
-          <td>
-            <span style="font-size:0.8rem;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:4px;font-weight:700;">
+        <div class="ucas-post-elevated-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <span style="background:#1D4ED8;color:#fff;font-weight:800;font-size:0.8rem;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                ${idx + 1}
+              </span>
+              <div>
+                <div style="font-weight:800;font-size:1.02rem;color:var(--text-main);line-height:1.3;">${wb.title}</div>
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">
+                  ID: <strong style="color:var(--primary-dark);font-family:monospace;">${wb.id}</strong> • 📅 ${dateStr}
+                </div>
+              </div>
+            </div>
+            <div style="flex-shrink:0;">
+              ${statusBadge}
+            </div>
+          </div>
+
+          <!-- Webinar Schedule & Attendees Info -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#EFF6FF;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid #BFDBFE;">
+            <span style="font-size:0.8rem;color:#1E40AF;font-weight:700;">
               📅 ${wData.datetime || 'लाइव सत्र'}
             </span>
-            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;">
-              ${wData.meeting_id ? `ID: <code>${wData.meeting_id}</code>` : ''}
-              ${wData.passcode ? `• Pass: <strong>${wData.passcode}</strong>` : ''}
-            </div>
-          </td>
-          <td>
-            <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_WEBINARS.viewAttendees('${wb.id}')" style="background:#DCFCE7;color:#15803D;border-color:#86EFAC;font-weight:800;border-radius:var(--radius-full);">
+            <button class="ucas-btn ucas-btn-sm" onclick="UCAS_WEBINARS.viewAttendees('${wb.id}')" style="background:#DCFCE7;color:#15803D;border:1px solid #86EFAC;font-weight:800;border-radius:var(--radius-full);padding:3px 10px;font-size:0.8rem;">
               <i class="fa-solid fa-users"></i> ${attendeesCount} Attendees
             </button>
-          </td>
-          <td>
-            <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_WEBINARS.editWebinar('${wb.id}')" title="संपादित करें (Edit)" style="color:var(--secondary-dark);border-color:var(--secondary);">
-                <i class="fa-solid fa-pen-to-square"></i>
+          </div>
+
+          <!-- 2 Rows of Action Buttons: Row 1 has 4 sharing buttons, Row 2 has 3 management buttons -->
+          <div class="ucas-actions-two-rows">
+            <!-- Row 1: 4 Sharing Buttons -->
+            <div class="ucas-btn-row-4">
+              <button class="ucas-btn-act ucas-btn-act-wa" onclick="UCAS_WEBINARS.shareWhatsApp('${wb.id}')" title="WhatsApp Share">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
               </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" onclick="UCAS_WEBINARS.shareWhatsApp('${wb.id}')" title="${isPending ? 'अंडर रिव्यू' : 'WhatsApp Share'}" ${isPending || isBlocked ? 'style="opacity:0.6;"' : ''}>
-                <i class="fa-brands fa-whatsapp"></i>
+              <button class="ucas-btn-act ucas-btn-act-fb" onclick="UCAS_WEBINARS.shareFacebook('${wb.id}')" title="Facebook Share">
+                <i class="fa-brands fa-facebook"></i> Facebook
               </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_WEBINARS.shareFacebook('${wb.id}')" title="${isPending ? 'अंडर रिव्यू' : 'Facebook Share'}" style="color:#1877F2;border-color:#1877F2;${isPending || isBlocked ? 'opacity:0.6;' : ''}">
-                <i class="fa-brands fa-facebook"></i>
+              <button class="ucas-btn-act ucas-btn-act-share" onclick="UCAS_WEBINARS.shareNative('${wb.id}')" title="अन्य ऐप्स पर शेयर">
+                <i class="fa-solid fa-share-nodes"></i> शेयर
               </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_WEBINARS.copyLink('${wb.id}')" title="Copy Link">
-                <i class="fa-solid fa-copy"></i>
-              </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-primary" onclick="window.open('${shareUrl}', '_blank')" title="View Public Page">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-              </button>
-              <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_WEBINARS.deleteWebinar('${wb.id}')" title="हटाएं (Delete)" style="color:var(--danger);border-color:rgba(220,38,38,0.3);">
-                <i class="fa-solid fa-trash-can"></i>
+              <button class="ucas-btn-act ucas-btn-act-copy" onclick="UCAS_WEBINARS.copyLink('${wb.id}')" title="Copy Link">
+                <i class="fa-regular fa-copy"></i> कॉपी
               </button>
             </div>
-          </td>
-        </tr>
+            <!-- Row 2: 3 Management Buttons -->
+            <div class="ucas-btn-row-3">
+              <button class="ucas-btn-act ucas-btn-act-view" onclick="window.open('${shareUrl}', '_blank')" title="पेज देखें">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> देखें
+              </button>
+              <button class="ucas-btn-act ucas-btn-act-edit" onclick="UCAS_WEBINARS.editWebinar('${wb.id}')" title="एडिट करें">
+                <i class="fa-solid fa-pen-to-square"></i> एडिट
+              </button>
+              <button class="ucas-btn-act ucas-btn-act-delete" onclick="UCAS_WEBINARS.deleteWebinar('${wb.id}')" title="हटाएं">
+                <i class="fa-solid fa-trash-can"></i> हटाएं
+              </button>
+            </div>
+          </div>
+        </div>
       `;
     }).join('');
   }
@@ -783,6 +799,21 @@
     }
   }
 
+  function shareNative(wbId) {
+    const wb = userWebinarsList.find(item => item.id === wbId);
+    if (!wb) return;
+    const shareUrl = getWebinarShareUrl(wb);
+    if (navigator.share) {
+      navigator.share({
+        title: wb.title,
+        text: wb.message,
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      copyLink(wbId);
+    }
+  }
+
   window.UCAS_WEBINARS = {
     init: initWebinars,
     loadWebinars,
@@ -792,6 +823,7 @@
     viewAttendees,
     shareWhatsApp,
     shareFacebook,
+    shareNative,
     copyLink
   };
 
