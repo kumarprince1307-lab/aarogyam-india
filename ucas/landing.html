@@ -807,7 +807,7 @@
         <div class="pub-site-tagline">🇮🇳 Jai Hind</div>
       </div>
     </a>
-    <a id="pub_btn_free_join" href="/index.html?src=survey" class="pub-btn-free-join" title="मुफ़्त रजिस्ट्रेशन करें">
+    <a id="pub_btn_free_join" href="/registration.html?src=survey" class="pub-btn-free-join" title="मुफ़्त रजिस्ट्रेशन करें">
       <i class="fa-solid fa-user-plus"></i> Free Join
     </a>
   </header>
@@ -1003,7 +1003,7 @@
       <span>•</span>
       <a href="/ebooks/my-library.html">My Library</a>
       <span>•</span>
-      <a href="/my-profile.html">My Profile</a>
+      <a href="/ucas/index.html">My Profile</a>
       <span>•</span>
       <a href="/privacy-policy.html">गोपनीयता नीति</a>
     </div>
@@ -1326,7 +1326,7 @@
         const freeJoinBtn = document.getElementById('pub_btn_free_join');
         const joinShareId = targetShareId || lp.share_id || creator?.share_id || '';
         if (freeJoinBtn) {
-          freeJoinBtn.href = `/index.html?ref=${encodeURIComponent(joinShareId)}&src=survey`;
+          freeJoinBtn.href = `/registration.html?ref=${encodeURIComponent(joinShareId)}&src=survey`;
         }
 
         // Share Buttons
