@@ -199,13 +199,14 @@ module.exports = async function handler(req, res) {
   <meta name="twitter:title" content="${escapeHtml(finalTitle)}">
   <meta name="twitter:description" content="${escapeHtml(finalDesc)}">
   <meta name="twitter:image" content="${escapeHtml(finalOgImage)}">
-
-  <!-- Instant Client-Side Fallback Redirect -->
-  <meta http-equiv="refresh" content="0;url=${escapeHtml(destinationLandingUrl)}">
-  <script>window.location.replace('${escapeHtml(destinationLandingUrl)}');</script>
+  <link rel="canonical" href="${escapeHtml(canonicalShareUrl)}">
 </head>
 <body>
-  <p>Redirecting to <a href="${escapeHtml(destinationLandingUrl)}">${escapeHtml(cleanTitle)}</a>...</p>
+  <div style="font-family:sans-serif;text-align:center;padding:40px 20px;">
+    <h2>${escapeHtml(cleanTitle)}</h2>
+    <p>${escapeHtml(finalDesc)}</p>
+    <p><a href="${escapeHtml(destinationLandingUrl)}" style="display:inline-block;padding:12px 24px;background:#0B7A3E;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">यहाँ क्लिक करके पूरी जानकारी देखें →</a></p>
+  </div>
 </body>
 </html>`;
 
