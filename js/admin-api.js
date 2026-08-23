@@ -1764,9 +1764,9 @@ export async function fetchUcasDashboardSummary() {
     const [profilesRes, purchasesRes, surveysRes, phonebookRes, lpsRes, sharesRes] = await Promise.all([
       db.from('profiles').select('id, is_active, created_at'),
       db.from('purchases').select('profile_id, purchase_date, amount, payment_status, book_id'),
-      db.from('surveys').select('id, profile_id, selected_categories, created_at'),
+      db.from('surveys').select('id, profile_id, selected_categories, category_answers, created_at'),
       db.from('phonebook').select('id, profile_id, created_at'),
-      db.from('landing_pages').select('id, profile_id, created_at'),
+      db.from('landing_pages').select('id, profile_id, category, webinar_data, created_at'),
       db.from('share_logs').select('id, event_type')
     ]);
 
@@ -1825,6 +1825,12 @@ export async function fetchUcasDashboardSummary() {
     const totalPhonebook = phonebook.length;
     const totalLandingPages = landingPages.length;
 
+    const totalWebinarAttendees = surveys.filter(s => {
+      const cat = String(s.selected_categories || '');
+      const src = s.category_answers?.source || '';
+      return cat.includes('webinar') || src.includes('webinar');
+    }).length;
+
     const totalShares = shareLogs.filter(l => l.event_type === 'share').length;
     const surveyResponses = totalSurveys;
 
@@ -1838,6 +1844,7 @@ export async function fetchUcasDashboardSummary() {
         totalSurveys,
         totalPhonebook,
         totalLandingPages,
+        totalWebinarAttendees,
         totalShares,
         surveyResponses
       }
@@ -1854,6 +1861,7 @@ export async function fetchUcasDashboardSummary() {
         totalSurveys: 0,
         totalPhonebook: 0,
         totalLandingPages: 0,
+        totalWebinarAttendees: 0,
         totalShares: 0,
         surveyResponses: 0
       },

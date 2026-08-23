@@ -43,6 +43,10 @@ function renderUcasDetailWidget(summary) {
           <div class="kpi-label">🎯 Landing Pages</div>
           <div class="kpi-value" style="color:#ec4899;">${summary.totalLandingPages || 0}</div>
         </div>
+        <div class="kpi-card clickable" data-route="all-webinars" title="वेबिनार अटेंडेंट्स देखें" style="cursor:pointer;">
+          <div class="kpi-label">🎥 Webinar Attendees</div>
+          <div class="kpi-value" style="color:#2563eb;">${summary.totalWebinarAttendees || 0}</div>
+        </div>
         <div class="kpi-card" title="शेयर और सर्वे रिस्पॉन्स">
           <div class="kpi-label">📊 Shares / Responses</div>
           <div class="kpi-value">${summary.totalShares || 0} / ${summary.surveyResponses || 0}</div>

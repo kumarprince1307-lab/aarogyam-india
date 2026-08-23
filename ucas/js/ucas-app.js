@@ -541,6 +541,11 @@
       const totalSurveys = surveys.length;
       const totalContacts = contacts.length;
       const totalLeads = totalSurveys + totalContacts;
+      const totalWebinarAttendees = surveys.filter(s => {
+        const cat = String(s.selected_categories || '');
+        const src = s.category_answers?.source || '';
+        return cat.includes('webinar') || src.includes('webinar');
+      }).length;
 
       // Update KPI Counter DOM Elements
       animateCounter('kpi_total_surveys', totalSurveys);
@@ -548,6 +553,7 @@
       animateCounter('kpi_total_leads', totalLeads);
       animateCounter('kpi_total_interested', interested);
       animateCounter('kpi_total_converted', converted);
+      animateCounter('kpi_total_webinar_attendees', totalWebinarAttendees);
 
       // Direct Referrals & Purchases Counters
       const dirRefEl = document.getElementById('kpi_direct_referrals');

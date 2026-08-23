@@ -1395,12 +1395,14 @@
         const overlay = document.getElementById('lp_survey_gate_overlay');
         const mainContent = document.getElementById('lp_main_content');
 
+        const todayKey = new Date().toISOString().slice(0, 10);
+        const isWebinarJoinedToday = Boolean(lp?.id && (sessionStorage.getItem(`ucas_wb_joined_${lp.id}`) === 'true' || localStorage.getItem(`ucas_wb_joined_${lp.id}_${todayKey}`) === 'true'));
         const isPageUnlocked = Boolean(lp?.id && localStorage.getItem(`ucas_unlocked_v1_${lp.id}`) === 'true');
         const isGlobalVisitorUnlocked = localStorage.getItem('ucas_visitor_verified') === 'true';
         const isSessionLoggedIn = Boolean(window.UCAS_SESSION && typeof window.UCAS_SESSION.isLoggedIn === 'function' && window.UCAS_SESSION.isLoggedIn()) || Boolean(localStorage.getItem('ucas_user_id'));
         const isPreviewMode = urlParams.get('preview') === '1' || urlParams.get('unlock') === '1' || urlParams.get('admin') === '1';
 
-        const isUnlocked = isPageUnlocked || isGlobalVisitorUnlocked || isSessionLoggedIn || isPreviewMode;
+        const isUnlocked = isWebinar ? (isWebinarJoinedToday || isPreviewMode) : (isPageUnlocked || isGlobalVisitorUnlocked || isSessionLoggedIn || isPreviewMode);
 
         if (isUnlocked) {
           if (overlay) overlay.style.display = 'none';
@@ -1420,6 +1422,14 @@
           mainContent.style.filter = 'blur(2px)';
         }
 
+        // Auto-fill saved visitor details if available
+        const savedName = localStorage.getItem('ucas_visitor_name') || '';
+        const savedMobile = localStorage.getItem('ucas_visitor_mobile') || '';
+        const nameInput = document.getElementById('gate_input_name');
+        const mobileInput = document.getElementById('gate_input_mobile');
+        if (nameInput && savedName) nameInput.value = savedName;
+        if (mobileInput && savedMobile) mobileInput.value = savedMobile;
+
         // Customize Gate based on Category
         const gateIcon = document.getElementById('lp_gate_icon');
         const gateTitle = document.getElementById('lp_gate_title');
@@ -1429,10 +1439,10 @@
 
         if (isWebinar) {
           if (gateIcon) gateIcon.innerHTML = '<i class="fa-solid fa-video" style="color:#2563EB;"></i>';
-          if (gateTitle) gateTitle.textContent = 'लाइव वेबिनार में भाग लेने के लिए रजिस्टर करें';
-          if (gateSubtitle) gateSubtitle.textContent = 'अपना नाम व मोबाइल नंबर भरें। सबमिट करते ही Zoom Meeting लिंक और पासवर्ड तुरंत अनलॉक हो जाएगा:';
+          if (gateTitle) gateTitle.textContent = 'लाइव वेबिनार में भाग लेने के लिए सीट सुरक्षित करें';
+          if (gateSubtitle) gateSubtitle.textContent = savedName ? `नमस्ते ${savedName} जी! अपनी सीट सुरक्षित करने के लिए नीचे बटन पर क्लिक करें:` : 'अपना नाम व मोबाइल नंबर भरें। सबमिट करते ही Zoom Meeting लिंक और पासवर्ड तुरंत अनलॉक हो जाएगा:';
           if (gatePlaceGroup) gatePlaceGroup.style.display = 'none';
-          if (gateBtnText) gateBtnText.textContent = '🔓 Get Access (सीट सुरक्षित करें)';
+          if (gateBtnText) gateBtnText.textContent = '👉 Zoom मीटिंग में शामिल हों (Join Now)';
         } else {
           renderDynamicCategoryQuestion(lp.category);
         }
@@ -1570,6 +1580,11 @@
           localStorage.setItem('ucas_visitor_verified', 'true');
           localStorage.setItem('ucas_visitor_name', name);
           localStorage.setItem('ucas_visitor_mobile', mobile);
+          if (isWebinar) {
+            const todayKey = new Date().toISOString().slice(0, 10);
+            sessionStorage.setItem(`ucas_wb_joined_${lp.id}`, 'true');
+            localStorage.setItem(`ucas_wb_joined_${lp.id}_${todayKey}`, 'true');
+          }
 
           // 4. Show success animation transition view (0.8s)
           const formView = document.getElementById('lp_gate_form_view');

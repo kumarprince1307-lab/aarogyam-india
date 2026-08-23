@@ -52,6 +52,16 @@
         document.querySelectorAll('.ucas-modal-overlay').forEach(m => m.classList.remove('active'));
       });
     });
+
+    // Attendee Filter & Search Listeners
+    const attFilter = document.getElementById('ucas-wb-attendee-filter-wb');
+    const attSearch = document.getElementById('ucas-wb-attendee-search');
+    attFilter?.addEventListener('change', () => {
+      renderAllWebinarAttendeesList(cachedWebinarSurveys, cachedWebinarsList);
+    });
+    attSearch?.addEventListener('input', () => {
+      renderAllWebinarAttendeesList(cachedWebinarSurveys, cachedWebinarsList);
+    });
   }
 
   function setWebinarContentType(type) {
@@ -191,7 +201,24 @@
   async function handleWebinarSubmit() {
     const title = (document.getElementById('wb_input_title')?.value || '').trim();
     const message = (document.getElementById('wb_input_message')?.value || '').trim();
-    const datetime = (document.getElementById('wb_input_datetime')?.value || '').trim();
+    const rawDate = document.getElementById('wb_input_date')?.value || '';
+    const rawTime = document.getElementById('wb_input_time')?.value || '';
+    let datetime = (document.getElementById('wb_input_datetime')?.value || '').trim();
+
+    if (rawDate) {
+      const dateObj = new Date(rawDate);
+      const formattedDate = dateObj.toLocaleDateString('hi-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+      let formattedTime = rawTime || '';
+      if (rawTime) {
+        const [hh, mm] = rawTime.split(':');
+        const hNum = parseInt(hh, 10);
+        const ampm = hNum >= 12 ? 'PM' : 'AM';
+        const h12 = hNum % 12 || 12;
+        formattedTime = `${h12}:${mm} ${ampm}`;
+      }
+      datetime = `${formattedDate}${formattedTime ? ', ' + formattedTime : ''}`;
+    }
+
     const zoomLink = (document.getElementById('wb_input_zoom_link')?.value || '').trim();
     const meetingId = (document.getElementById('wb_input_meeting_id')?.value || '').trim();
     const passcode = (document.getElementById('wb_input_passcode')?.value || '').trim();
@@ -484,6 +511,10 @@
     if (titleInput) titleInput.value = wb.title || '';
     if (messageInput) messageInput.value = wb.message || '';
     if (dtInput) dtInput.value = wData.datetime || '';
+    const dInput = document.getElementById('wb_input_date');
+    const tInput = document.getElementById('wb_input_time');
+    if (dInput) dInput.value = wData.date || '';
+    if (tInput) tInput.value = wData.time || '';
     if (zoomInput) zoomInput.value = wData.zoom_link || '';
     if (meetingInput) meetingInput.value = wData.meeting_id || '';
     if (passInput) passInput.value = wData.passcode || '';
@@ -549,9 +580,125 @@
       if (kpiActive) kpiActive.textContent = activeZoomCount;
 
       renderWebinarsTable(userWebinarsList, surveys);
+      renderAllWebinarAttendeesList(surveys, userWebinarsList);
     } catch (e) {
       console.error('Load webinars error', e);
     }
+  }
+
+  let cachedWebinarsList = [];
+  let cachedWebinarSurveys = [];
+
+  function renderAllWebinarAttendeesList(surveys, webinars) {
+    const container = document.getElementById('ucas-webinar-all-attendees-list');
+    const totalCountEl = document.getElementById('ucas-webinar-attendees-total-count');
+    const filterSelect = document.getElementById('ucas-wb-attendee-filter-wb');
+    const searchInput = document.getElementById('ucas-wb-attendee-search');
+    if (!container) return;
+
+    cachedWebinarsList = webinars || [];
+    cachedWebinarSurveys = surveys || [];
+
+    // Filter surveys for webinar attendees
+    const webinarAttendees = surveys.filter(s => {
+      const cat = String(s.selected_categories || '');
+      const src = s.category_answers?.source || '';
+      const lpId = s.category_answers?.landing_page_id || '';
+      return cat.includes('webinar') || src.includes('webinar') || webinars.some(w => w.id === lpId);
+    });
+
+    if (totalCountEl) totalCountEl.textContent = webinarAttendees.length;
+
+    // Populate filter dropdown with creator's webinars if needed
+    if (filterSelect && filterSelect.options.length <= 1) {
+      filterSelect.innerHTML = '<option value="all">सभी वेबिनार (All Webinars)</option>';
+      webinars.forEach(w => {
+        const opt = document.createElement('option');
+        opt.value = w.id;
+        opt.textContent = (w.title || w.id).slice(0, 35);
+        filterSelect.appendChild(opt);
+      });
+    }
+
+    const selectedWbId = filterSelect?.value || 'all';
+    const searchQuery = (searchInput?.value || '').toLowerCase().trim();
+
+    const filtered = webinarAttendees.filter(a => {
+      const aLpId = a.category_answers?.landing_page_id || '';
+      if (selectedWbId !== 'all' && aLpId !== selectedWbId) return false;
+
+      if (searchQuery) {
+        const name = (a.name || '').toLowerCase();
+        const mob = (a.mobile || '').toLowerCase();
+        const place = (a.village || '').toLowerCase();
+        const lp = webinars.find(w => w.id === aLpId);
+        const title = (lp?.title || '').toLowerCase();
+        if (!name.includes(searchQuery) && !mob.includes(searchQuery) && !place.includes(searchQuery) && !title.includes(searchQuery)) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:2rem 1rem;color:var(--text-muted);background:#F8FAFC;border-radius:var(--radius-md);border:1.5px dashed #CBD5E1;">
+          <div style="font-size:1.8rem;margin-bottom:6px;">👥</div>
+          <strong style="color:var(--text-main);">कोई अटेंडेंस रिकॉर्ड नहीं मिला।</strong>
+          <p style="font-size:0.82rem;margin-top:4px;">वेबिनार का लिंक शेयर करें ताकि लोग रजिस्टर कर सकें।</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${filtered.map((att, idx) => {
+          const sMob = String(att.mobile || '').replace(/\D/g, '');
+          const clean10Mob = sMob.length === 10 ? sMob : sMob.slice(-10);
+          const aLpId = att.category_answers?.landing_page_id || '';
+          const lp = webinars.find(w => w.id === aLpId);
+          const webinarTitle = lp?.title || 'लाइव वेबिनार सत्र';
+          const regDate = att.created_at ? new Date(att.created_at).toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+          const regTime = att.created_at ? new Date(att.created_at).toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+          
+          const attendeeName = att.name || 'मित्र';
+          const waMsg = `नमस्ते ${attendeeName} जी! आपने हमारे लाइव वेबिनार "${webinarTitle}" में भाग लिया था। आपको वेबिनार कैसा लगा और क्या-क्या समझ में आया? अब आइए आगे का प्लान करते हैं और इस पर विस्तार से बात करते हैं।`;
+          const waLink = `https://wa.me/91${clean10Mob}?text=${encodeURIComponent(waMsg)}`;
+
+          return `
+            <div style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:var(--radius-md);padding:12px 14px;box-shadow:0 2px 6px rgba(0,0,0,0.03);display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="background:#1D4ED8;color:#fff;font-weight:800;font-size:0.75rem;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    ${idx + 1}
+                  </span>
+                  <div>
+                    <div style="font-weight:800;font-size:0.96rem;color:var(--text-main);">${att.name}</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);">
+                      📍 ${att.village || 'Online'} • 📅 ${regDate} ${regTime}
+                    </div>
+                  </div>
+                </div>
+                <div style="background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:var(--radius-sm);font-size:0.75rem;font-weight:700;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  🎥 ${webinarTitle}
+                </div>
+              </div>
+
+              <!-- Action Buttons: Direct Call & Customized WhatsApp Discussion -->
+              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:8px;margin-top:2px;">
+                <a href="tel:${clean10Mob}" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="justify-content:center;font-weight:700;border-color:#3B82F6;color:#1D4ED8;padding:7px 10px;font-size:0.82rem;text-decoration:none;">
+                  <i class="fa-solid fa-phone"></i> कॉल करें (${clean10Mob})
+                </a>
+                <a href="${waLink}" target="_blank" class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" style="justify-content:center;font-weight:700;padding:7px 10px;font-size:0.82rem;text-decoration:none;" title="वेबिनार फॉलो-अप मैसेज भेजें">
+                  <i class="fa-brands fa-whatsapp"></i> चर्चा करें (WhatsApp)
+                </a>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
   }
 
   function renderWebinarsTable(webinars, allSurveys) {

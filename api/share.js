@@ -83,7 +83,15 @@ function fetchLandingPageFromSupabase(lpId) {
   });
 }
 
-const CRAWLER_USER_AGENTS = /facebookexternalhit|Facebot|WhatsApp|Twitterbot|LinkedInBot|TelegramBot|Slackbot|Discordbot|SkypeUriPreview|Google-Structured-Data-Testing-Tool|Googlebot|bingbot|Yahoo|DuckDuckBot|Baiduspider|YandexBot/i;
+const CRAWLER_USER_AGENTS = /facebookexternalhit|Facebot|Twitterbot|LinkedInBot|TelegramBot|Slackbot|Discordbot|SkypeUriPreview|Google-Structured-Data-Testing-Tool|Googlebot|bingbot|DuckDuckBot|Baiduspider|YandexBot/i;
+
+function isBotScraper(userAgent) {
+  if (!userAgent) return false;
+  // If it's a mobile browser UA (Chrome, Safari, Firefox, Android, iPhone), it's a human!
+  const isHumanBrowser = /Mozilla\/5\.0.*(Mobile|Android|iPhone|iPad|Safari|Chrome)/i.test(userAgent) && !/facebookexternalhit|Facebot|Twitterbot/i.test(userAgent);
+  if (isHumanBrowser) return false;
+  return CRAWLER_USER_AGENTS.test(userAgent);
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -161,7 +169,7 @@ module.exports = async function handler(req, res) {
   const canonicalShareUrl = `${HOST_ORIGIN}/api/share?id=${encodeURIComponent(lpId || '')}${finalShareId ? '&share_id=' + encodeURIComponent(finalShareId) : ''}`;
 
   const userAgent = String(req.headers['user-agent'] || '');
-  const isCrawler = CRAWLER_USER_AGENTS.test(userAgent);
+  const isCrawler = isBotScraper(userAgent);
 
   // 5. If Human Visitor, issue immediate 302 Redirect
   if (!isCrawler && !query.debug) {
@@ -169,13 +177,14 @@ module.exports = async function handler(req, res) {
     return res.redirect(302, destinationLandingUrl);
   }
 
-  // 6. If Social Crawler (or debug request), return Pre-Rendered RAW HTML with real OG tags
+  // 6. If Social Crawler (or in-app webview fallback), return Pre-Rendered RAW HTML with real OG tags + instant client redirect
   const cleanTitle = finalTitle.includes('Aarogyam India') ? finalTitle : `${finalTitle} — Aarogyam India`;
 
   const html = `<!DOCTYPE html>
 <html lang="hi" prefix="og: https://ogp.me/ns#">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(cleanTitle)}</title>
 
   <!-- Open Graph / WhatsApp & Facebook Crawlers -->
@@ -200,13 +209,32 @@ module.exports = async function handler(req, res) {
   <meta name="twitter:description" content="${escapeHtml(finalDesc)}">
   <meta name="twitter:image" content="${escapeHtml(finalOgImage)}">
   <link rel="canonical" href="${escapeHtml(canonicalShareUrl)}">
+
+  <!-- Instant Client-Side Redirection for human visitors -->
+  <script>
+    (function() {
+      try {
+        window.location.replace("${destinationLandingUrl}");
+      } catch (e) {}
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=${escapeHtml(destinationLandingUrl)}">
+  </noscript>
 </head>
-<body>
-  <div style="font-family:sans-serif;text-align:center;padding:40px 20px;">
-    <h2>${escapeHtml(cleanTitle)}</h2>
-    <p>${escapeHtml(finalDesc)}</p>
-    <p><a href="${escapeHtml(destinationLandingUrl)}" style="display:inline-block;padding:12px 24px;background:#0B7A3E;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">यहाँ क्लिक करके पूरी जानकारी देखें →</a></p>
+<body style="margin:0;padding:0;background:#F1F5F9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <div style="background:#FFFFFF;max-width:440px;width:90%;margin:20px auto;padding:28px 20px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.08);text-align:center;border:1px solid #E2E8F0;">
+    <img src="https://aarogyamindia.online/images/logo/logo.png" alt="Aarogyam India" style="height:44px;margin-bottom:14px;object-fit:contain;">
+    <h2 style="font-size:1.15rem;font-weight:800;color:#0F172A;margin:0 0 10px 0;line-height:1.35;">${escapeHtml(cleanTitle)}</h2>
+    <p style="font-size:0.88rem;color:#475569;margin:0 0 20px 0;line-height:1.45;">${escapeHtml(finalDesc)}</p>
+    <a href="${escapeHtml(destinationLandingUrl)}" style="display:block;padding:14px;background:#0B7A3E;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:800;font-size:1rem;box-shadow:0 4px 12px rgba(11,122,62,0.3);">यहाँ क्लिक करके पूरी जानकारी देखें →</a>
+    <div style="margin-top:16px;font-size:0.75rem;color:#94A3B8;">Aarogyam India • सुरक्षित व प्रामाणिक जानकारी</div>
   </div>
+  <script>
+    setTimeout(function() {
+      try { window.location.href = "${destinationLandingUrl}"; } catch(e) {}
+    }, 150);
+  </script>
 </body>
 </html>`;
 

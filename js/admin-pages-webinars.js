@@ -23,9 +23,11 @@ export async function initWebinars() {
   const content = document.getElementById('page-content');
   if (!content) return;
 
+  let activeTab = 'webinars'; // 'webinars' | 'attendees'
   let currentPage = 1;
   let allWebinars = [];
   let allRegistrations = [];
+  let allProfiles = [];
 
   content.innerHTML = `
     <!-- Top Action Row -->
@@ -34,7 +36,7 @@ export async function initWebinars() {
         <div>
           <div class="admin-section-title" style="display: flex; align-items: center; gap: 8px;">
             <span>🎥 All Webinars & Live Events Management</span>
-            <span style="font-size: 0.75rem; background: rgba(37,99,235,0.15); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Live Zoom Tracking</span>
+            <span style="font-size: 0.75rem; background: rgba(37,99,235,0.15); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Live Zoom & Attendees Tracking</span>
           </div>
           <p style="font-size: 0.85rem; color: var(--admin-muted); margin: 0;">
             Track webinar landing pages, Zoom meeting links, passcodes, and registered attendee leads.
@@ -59,9 +61,23 @@ export async function initWebinars() {
         </div>
       </div>
 
-      <!-- Multi-Filter Bar -->
+      <!-- Tab Switcher -->
+      <div style="display:flex; gap:10px; margin-top:14px; border-bottom: 2px solid var(--admin-border, #334155); padding-bottom: 8px;">
+        <button type="button" id="tab-btn-webinars" class="admin-button" style="background:#3b82f6; color:#fff; font-weight:800; font-size:0.88rem; padding:8px 16px;">
+          🎥 Webinars List (<span id="tab-count-webinars">0</span>)
+        </button>
+        <button type="button" id="tab-btn-attendees" class="admin-button" style="background:var(--admin-surface-2, #0f172a); color:var(--admin-muted); font-weight:800; font-size:0.88rem; padding:8px 16px; border:1px solid var(--admin-border, #334155);">
+          👥 Attendees Report (<span id="tab-count-attendees">0</span>)
+        </button>
+      </div>
+
+      <!-- Multi-Filter Bar: User Filter + Date Filter + Search -->
       <div class="admin-card admin-controls" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; background: var(--admin-surface-2, #0f172a);">
-        <input id="webinar-search-box" type="search" placeholder="🔍 शीर्षक, क्रिएटर, Meeting ID से खोजें..." class="admin-input" style="flex: 2; min-width: 220px;" />
+        <input id="webinar-search-box" type="search" placeholder="🔍 नाम, मोबाइल, शीर्षक, क्रिएटर से खोजें..." class="admin-input" style="flex: 2; min-width: 220px;" />
+
+        <select id="webinar-user-filter" class="admin-select" style="flex: 1.2; min-width: 170px;">
+          <option value="all">👥 All Creators (सभी यूजर्स)</option>
+        </select>
 
         <select id="webinar-date-dropdown" class="admin-select" style="flex: 1; min-width: 140px;">
           <option value="all">📅 All Time (सभी तारीखें)</option>
@@ -72,7 +88,7 @@ export async function initWebinars() {
       </div>
     </div>
 
-    <!-- Table Container -->
+    <!-- Main Table Container -->
     <div id="webinars-table-wrapper" style="margin-top: 10px;">
       <div class="admin-loading">डेटाबेस से वेबिनार डेटा लोड हो रहा है…</div>
     </div>
@@ -93,13 +109,37 @@ export async function initWebinars() {
 
   const tableContainer = document.getElementById('webinars-table-wrapper');
   const searchInput = document.getElementById('webinar-search-box');
+  const userFilter = document.getElementById('webinar-user-filter');
   const dateDropdown = document.getElementById('webinar-date-dropdown');
   const refreshBtn = document.getElementById('btn-refresh-webinars');
+
+  const tabBtnWebinars = document.getElementById('tab-btn-webinars');
+  const tabBtnAttendees = document.getElementById('tab-btn-attendees');
 
   const drawerOverlay = document.getElementById('webinar-drawer-overlay');
   const drawerCloseBtn = document.getElementById('webinar-drawer-close');
   const drawerTitle = document.getElementById('drawer-webinar-title');
   const drawerBody = document.getElementById('webinar-drawer-body');
+
+  tabBtnWebinars?.addEventListener('click', () => {
+    activeTab = 'webinars';
+    tabBtnWebinars.style.background = '#3b82f6';
+    tabBtnWebinars.style.color = '#fff';
+    tabBtnAttendees.style.background = 'var(--admin-surface-2, #0f172a)';
+    tabBtnAttendees.style.color = 'var(--admin-muted)';
+    currentPage = 1;
+    renderTable();
+  });
+
+  tabBtnAttendees?.addEventListener('click', () => {
+    activeTab = 'attendees';
+    tabBtnAttendees.style.background = '#10b981';
+    tabBtnAttendees.style.color = '#fff';
+    tabBtnWebinars.style.background = 'var(--admin-surface-2, #0f172a)';
+    tabBtnWebinars.style.color = 'var(--admin-muted)';
+    currentPage = 1;
+    renderTable();
+  });
 
   drawerCloseBtn?.addEventListener('click', () => drawerOverlay?.classList.remove('active'));
   drawerOverlay?.addEventListener('click', (e) => {
@@ -116,25 +156,18 @@ export async function initWebinars() {
     }
 
     try {
-      // 1. Fetch Landing Pages with category = webinar or all landing pages
-      const { data: lpData, error: lpErr } = await db
-        .from('landing_pages')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // 1. Fetch Profiles, Landing Pages & Surveys in parallel
+      const [lpRes, surveyRes, profRes] = await Promise.all([
+        db.from('landing_pages').select('*').order('created_at', { ascending: false }),
+        db.from('surveys').select('*').order('created_at', { ascending: false }),
+        db.from('profiles').select('id, full_name, mobile, share_id')
+      ]);
 
-      // 2. Fetch Surveys / Leads with category = webinar or source = webinar_landing_page
-      const { data: surveyData, error: sErr } = await db
-        .from('surveys')
-        .select('*')
-        .order('created_at', { ascending: false });
+      let allLps = lpRes.data || [];
+      let allSurveys = surveyRes.data || [];
+      allProfiles = profRes.data || [];
 
-      if (lpErr) console.warn('LP fetch error', lpErr);
-      if (sErr) console.warn('Survey fetch error', sErr);
-
-      let allLps = lpData || [];
-      let allSurveys = surveyData || [];
-
-      // Scan LocalStorage
+      // Scan LocalStorage for local testing
       try {
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
@@ -168,14 +201,36 @@ export async function initWebinars() {
       allRegistrations = allSurveys.filter(s => {
         const cat = String(s.selected_categories || '');
         const src = s.category_answers?.source || '';
-        return cat.includes('webinar') || src.includes('webinar');
+        const lpId = s.category_answers?.landing_page_id || '';
+        return cat.includes('webinar') || src.includes('webinar') || allWebinars.some(w => w.id === lpId);
       });
+
+      // Populate User Filter Dropdown
+      if (userFilter) {
+        userFilter.innerHTML = '<option value="all">👥 All Creators (सभी यूजर्स)</option>';
+        const creatorIds = new Set();
+        allWebinars.forEach(w => { if (w.profile_id) creatorIds.add(w.profile_id); });
+        allRegistrations.forEach(r => { if (r.profile_id) creatorIds.add(r.profile_id); });
+
+        creatorIds.forEach(pId => {
+          const prof = allProfiles.find(p => p.id === pId);
+          const opt = document.createElement('option');
+          opt.value = pId;
+          opt.textContent = prof ? `${prof.full_name || 'User'} (${prof.share_id || pId.slice(0, 8)})` : pId.slice(0, 8);
+          userFilter.appendChild(opt);
+        });
+      }
 
       // Calculate KPI Stats
       document.getElementById('kpi-total-webinars').textContent = allWebinars.length;
       document.getElementById('kpi-total-attendees').textContent = allRegistrations.length;
       const activeZoomCount = allWebinars.filter(w => w.webinar_data?.zoom_link).length;
       document.getElementById('kpi-active-sessions').textContent = activeZoomCount;
+
+      const tabCountWb = document.getElementById('tab-count-webinars');
+      const tabCountAtt = document.getElementById('tab-count-attendees');
+      if (tabCountWb) tabCountWb.textContent = allWebinars.length;
+      if (tabCountAtt) tabCountAtt.textContent = allRegistrations.length;
 
       currentPage = 1;
       renderTable();
@@ -188,9 +243,15 @@ export async function initWebinars() {
   function getFilteredWebinars() {
     const query = (searchInput.value || '').toLowerCase().trim();
     const dateVal = dateDropdown.value;
+    const selectedUserId = userFilter.value;
     const now = new Date();
 
     return allWebinars.filter(w => {
+      // User Filter
+      if (selectedUserId !== 'all' && w.profile_id !== selectedUserId) {
+        return false;
+      }
+
       // Date Filter
       if (dateVal !== 'all' && w.created_at) {
         const wDate = new Date(w.created_at);
@@ -209,8 +270,54 @@ export async function initWebinars() {
         const shareId = (w.share_id || '').toLowerCase();
         const meetingId = (w.webinar_data?.meeting_id || '').toLowerCase();
         const zoomUrl = (w.webinar_data?.zoom_link || '').toLowerCase();
+        const prof = allProfiles.find(p => p.id === w.profile_id);
+        const creatorName = (prof?.full_name || '').toLowerCase();
 
-        if (!title.includes(query) && !shareId.includes(query) && !meetingId.includes(query) && !zoomUrl.includes(query)) {
+        if (!title.includes(query) && !shareId.includes(query) && !meetingId.includes(query) && !zoomUrl.includes(query) && !creatorName.includes(query)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
+
+  function getFilteredAttendees() {
+    const query = (searchInput.value || '').toLowerCase().trim();
+    const dateVal = dateDropdown.value;
+    const selectedUserId = userFilter.value;
+    const now = new Date();
+
+    return allRegistrations.filter(att => {
+      // User Filter
+      if (selectedUserId !== 'all' && att.profile_id !== selectedUserId) {
+        return false;
+      }
+
+      // Date Filter
+      if (dateVal !== 'all' && att.created_at) {
+        const aDate = new Date(att.created_at);
+        if (dateVal === 'today') {
+          if (aDate.toDateString() !== now.toDateString()) return false;
+        } else if (dateVal === '7days') {
+          if ((now - aDate) / (1000 * 60 * 60 * 24) > 7) return false;
+        } else if (dateVal === '30days') {
+          if ((now - aDate) / (1000 * 60 * 60 * 24) > 30) return false;
+        }
+      }
+
+      // Search Query
+      if (query) {
+        const name = (att.name || '').toLowerCase();
+        const mob = (att.mobile || '').toLowerCase();
+        const place = (att.village || '').toLowerCase();
+        const aLpId = att.category_answers?.landing_page_id || '';
+        const lp = allWebinars.find(w => w.id === aLpId);
+        const title = (lp?.title || '').toLowerCase();
+        const prof = allProfiles.find(p => p.id === att.profile_id);
+        const creatorName = (prof?.full_name || '').toLowerCase();
+
+        if (!name.includes(query) && !mob.includes(query) && !place.includes(query) && !title.includes(query) && !creatorName.includes(query)) {
           return false;
         }
       }
@@ -220,6 +327,14 @@ export async function initWebinars() {
   }
 
   function renderTable() {
+    if (activeTab === 'attendees') {
+      renderAttendeesReportTable();
+    } else {
+      renderWebinarsListTable();
+    }
+  }
+
+  function renderWebinarsListTable() {
     const filtered = getFilteredWebinars();
     const total = filtered.length;
     const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
@@ -239,7 +354,7 @@ export async function initWebinars() {
               <tr>
                 <th style="width: 50px;">#</th>
                 <th>Webinar Title & ID</th>
-                <th>Creator Share ID</th>
+                <th>Creator User</th>
                 <th>Date & Time</th>
                 <th>Zoom Link & Passcode</th>
                 <th>Registered Attendees</th>
@@ -272,7 +387,7 @@ export async function initWebinars() {
             <tr>
               <th style="width: 50px;">#</th>
               <th>Webinar Title & ID</th>
-              <th>Creator Share ID</th>
+              <th>Creator User</th>
               <th>Date & Time</th>
               <th>Zoom Link & Passcode</th>
               <th>Registered Attendees</th>
@@ -287,6 +402,7 @@ export async function initWebinars() {
               const attendeesCount = attendees.length;
               const dateStr = w.created_at ? new Date(w.created_at).toLocaleDateString('hi-IN') : '-';
               const publicLpUrl = `/ucas/landing.html?id=${w.id}&share_id=${w.share_id || ''}`;
+              const creator = allProfiles.find(p => p.id === w.profile_id);
 
               return `
                 <tr>
@@ -298,8 +414,11 @@ export async function initWebinars() {
                     </div>
                   </td>
                   <td>
-                    <span style="font-size: 0.82rem; font-weight: 700; color: var(--admin-primary);">
-                      <code>${w.share_id || 'AI000000'}</code>
+                    <div style="font-weight:700; color:var(--admin-text); font-size:0.85rem;">
+                      ${creator?.full_name || 'Community'}
+                    </div>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--admin-primary);">
+                      <code>${w.share_id || creator?.share_id || 'AI000000'}</code>
                     </span>
                   </td>
                   <td>
@@ -360,15 +479,165 @@ export async function initWebinars() {
       </div>
     `;
 
+    bindPaginationAndActionEvents();
+  }
+
+  function renderAttendeesReportTable() {
+    const filtered = getFilteredAttendees();
+    const total = filtered.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = Math.min(startIndex + PAGE_SIZE, total);
+    const pageItems = filtered.slice(startIndex, endIndex);
+
+    if (total === 0) {
+      tableContainer.innerHTML = `
+        <div class="admin-table-wrapper sticky-header-table">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Attendee Name & Place</th>
+                <th>Mobile Number</th>
+                <th>Webinar Topic / Title</th>
+                <th>Creator User</th>
+                <th>Joined Date & Time</th>
+                <th style="text-align: right;">Action (Call / WA)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="7" style="text-align:center;padding:2.5rem;color:var(--admin-muted);">
+                  <div style="font-size: 2.2rem; margin-bottom: 8px;">👥</div>
+                  <div style="font-size:1rem;font-weight:700;color:var(--admin-text);margin-bottom:4px;">कोई वेबिनार अटेंडेंट रिकॉर्ड नहीं मिला</div>
+                  <span style="font-size: 0.85rem; color: var(--admin-muted);">फ़िल्टर बदलें या नया सर्च करें।</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+      return;
+    }
+
+    tableContainer.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--admin-muted);margin-bottom:8px;">
+        <span>दिखा रहे हैं <strong>${startIndex + 1}-${endIndex}</strong> of <strong>${total}</strong> अटेंडेंट्स</span>
+      </div>
+
+      <div class="admin-table-wrapper sticky-header-table">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">#</th>
+              <th>Attendee Name & Place</th>
+              <th>Mobile Number</th>
+              <th>Webinar Topic / Title</th>
+              <th>Creator User</th>
+              <th>Joined Date & Time</th>
+              <th style="text-align: right;">Action (Call / WA)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pageItems.map((att, idx) => {
+              const rowNum = startIndex + idx + 1;
+              const sMob = String(att.mobile || '').replace(/\D/g, '');
+              const clean10Mob = sMob.length === 10 ? sMob : sMob.slice(-10);
+              const aLpId = att.category_answers?.landing_page_id || '';
+              const lp = allWebinars.find(w => w.id === aLpId);
+              const webinarTitle = lp?.title || 'लाइव वेबिनार सत्र';
+              const regDate = att.created_at ? new Date(att.created_at).toLocaleString('hi-IN') : '-';
+              const creator = allProfiles.find(p => p.id === att.profile_id);
+
+              const attendeeName = att.name || 'मित्र';
+              const waMsg = `नमस्ते ${attendeeName} जी! आपने हमारे लाइव वेबिनार "${webinarTitle}" में भाग लिया था। आपको वेबिनार कैसा लगा और क्या-क्या समझ में आया? अब आइए आगे का प्लान करते हैं और इस पर चर्चा करते हैं।`;
+              const waLink = `https://wa.me/91${clean10Mob}?text=${encodeURIComponent(waMsg)}`;
+
+              return `
+                <tr>
+                  <td><strong>#${rowNum}</strong></td>
+                  <td>
+                    <div style="font-weight: 700; color: var(--admin-text); font-size: 0.92rem;">${att.name}</div>
+                    <div style="font-size: 0.75rem; color: var(--admin-muted); margin-top: 2px;">
+                      📍 <span>${att.village || 'Online'}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <a href="tel:${clean10Mob}" class="admin-subtle-link" style="font-weight: 700; font-size: 0.85rem; color: #3b82f6;">
+                      📞 ${att.mobile || '-'}
+                    </a>
+                  </td>
+                  <td>
+                    <div style="font-size: 0.85rem; font-weight: 700; color: var(--admin-text); max-width: 220px;">
+                      🎥 ${webinarTitle}
+                    </div>
+                    <div style="font-size: 0.72rem; color: var(--admin-muted);">ID: <code>${aLpId || '-'}</code></div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600; font-size: 0.82rem; color: var(--admin-text);">
+                      ${creator?.full_name || 'Community'}
+                    </div>
+                    <span style="font-size: 0.72rem; color: var(--admin-muted);"><code>${creator?.share_id || att.category_answers?.creator_share_id || '-'}</code></span>
+                  </td>
+                  <td>
+                    <div style="font-size: 0.8rem; color: var(--admin-muted);">
+                      📅 ${regDate}
+                    </div>
+                  </td>
+                  <td style="text-align: right;">
+                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                      <a href="tel:${clean10Mob}" class="admin-button small-button" style="background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); font-weight: 700; font-size: 0.75rem; padding: 4px 10px; text-decoration: none;" title="Call Attendee">
+                        📞 Call
+                      </a>
+                      <a href="${waLink}" target="_blank" class="admin-button small-button" style="background: #25D366; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 4px 10px; text-decoration: none;" title="Send WhatsApp Message">
+                        💬 WhatsApp
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border, #334155); border-radius: 10px; padding: 12px 16px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div style="font-size: 0.85rem; color: var(--admin-muted);">
+          Total Attendees: <strong style="color: var(--admin-text);">${total}</strong>
+        </div>
+
+        <div class="admin-pagination-controls">
+          <button type="button" id="webinar-prev-page" class="admin-button small-button" ${currentPage <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+            ◀ Previous
+          </button>
+          <span style="font-weight:700;font-size:0.85rem;padding:0 6px;">Page ${currentPage} of ${totalPages} (20 Items/Page)</span>
+          <button type="button" id="webinar-next-page" class="admin-button small-button" ${currentPage >= totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+            Next ▶
+          </button>
+        </div>
+      </div>
+    `;
+
+    bindPaginationAndActionEvents();
+  }
+
+  function bindPaginationAndActionEvents() {
     // Pagination Listeners
     document.getElementById('webinar-prev-page')?.addEventListener('click', () => {
       if (currentPage > 1) { currentPage--; renderTable(); }
     });
     document.getElementById('webinar-next-page')?.addEventListener('click', () => {
+      const filtered = activeTab === 'attendees' ? getFilteredAttendees() : getFilteredWebinars();
+      const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
       if (currentPage < totalPages) { currentPage++; renderTable(); }
     });
 
-    // View Attendees Click
+    // View Attendees Click in Webinars List
     tableContainer.querySelectorAll('.btn-view-attendees').forEach(btn => {
       btn.addEventListener('click', () => {
         const wId = btn.dataset.webinarId;
@@ -418,7 +687,12 @@ export async function initWebinars() {
             <tbody>
               ${attendees.map((att, i) => {
                 const sMob = String(att.mobile || '').replace(/\D/g, '');
+                const clean10Mob = sMob.length === 10 ? sMob : sMob.slice(-10);
                 const regDate = att.created_at ? new Date(att.created_at).toLocaleString('hi-IN') : '-';
+                const attendeeName = att.name || 'मित्र';
+                const waMsg = `नमस्ते ${attendeeName} जी! आपने हमारे लाइव वेबिनार "${webinar.title || 'लाइव वेबिनार'}" में भाग लिया था। आपको वेबिनार कैसा लगा और क्या-क्या समझ में आया? अब आइए आगे का प्लान करते हैं और इस पर चर्चा करते हैं।`;
+                const waLink = `https://wa.me/91${clean10Mob}?text=${encodeURIComponent(waMsg)}`;
+
                 return `
                   <tr>
                     <td><strong>#${i + 1}</strong></td>
@@ -428,8 +702,8 @@ export async function initWebinars() {
                     </td>
                     <td>
                       <div style="display: flex; align-items: center; gap: 6px;">
-                        <a href="tel:${sMob}" class="admin-subtle-link" style="font-weight: 600; font-size: 0.82rem;">📞 ${att.mobile || '-'}</a>
-                        ${sMob ? `<a href="https://wa.me/91${sMob.length === 10 ? '91' + sMob : sMob}" target="_blank" class="admin-button small-button icon-button" style="background:#25D366;color:#fff;padding:2px 6px;font-size:0.75rem;" title="WhatsApp Chat">💬</a>` : ''}
+                        <a href="tel:${clean10Mob}" class="admin-subtle-link" style="font-weight: 700; font-size: 0.82rem; color:#3b82f6;">📞 ${att.mobile || '-'}</a>
+                        ${clean10Mob ? `<a href="${waLink}" target="_blank" class="admin-button small-button icon-button" style="background:#25D366;color:#fff;padding:2px 6px;font-size:0.75rem;" title="WhatsApp Follow-up">💬</a>` : ''}
                       </div>
                     </td>
                     <td style="font-size: 0.78rem; color: var(--admin-muted);">
@@ -448,6 +722,7 @@ export async function initWebinars() {
   }
 
   searchInput?.addEventListener('input', () => { currentPage = 1; renderTable(); });
+  userFilter?.addEventListener('change', () => { currentPage = 1; renderTable(); });
   dateDropdown?.addEventListener('change', () => { currentPage = 1; renderTable(); });
   refreshBtn?.addEventListener('click', loadWebinarData);
 

@@ -318,7 +318,24 @@
       const zoomLink = (document.getElementById('lp_webinar_zoom_link')?.value || '').trim();
       const meetingId = (document.getElementById('lp_webinar_meeting_id')?.value || '').trim();
       const passcode = (document.getElementById('lp_webinar_passcode')?.value || '').trim();
-      const datetime = (document.getElementById('lp_webinar_datetime')?.value || '').trim();
+      const rawDate = document.getElementById('lp_webinar_date')?.value || '';
+      const rawTime = document.getElementById('lp_webinar_time')?.value || '';
+      let datetime = (document.getElementById('lp_webinar_datetime')?.value || '').trim();
+
+      if (rawDate) {
+        const dateObj = new Date(rawDate);
+        const formattedDate = dateObj.toLocaleDateString('hi-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        let formattedTime = rawTime || '';
+        if (rawTime) {
+          const [hh, mm] = rawTime.split(':');
+          const hNum = parseInt(hh, 10);
+          const ampm = hNum >= 12 ? 'PM' : 'AM';
+          const h12 = hNum % 12 || 12;
+          formattedTime = `${h12}:${mm} ${ampm}`;
+        }
+        datetime = `${formattedDate}${formattedTime ? ', ' + formattedTime : ''}`;
+      }
+
       const successMsg = (document.getElementById('lp_webinar_success_msg')?.value || '').trim();
 
       if (!zoomLink && !meetingId) {
@@ -331,6 +348,8 @@
         meeting_id: meetingId,
         passcode: passcode,
         datetime: datetime,
+        date: rawDate,
+        time: rawTime,
         success_msg: successMsg
       };
     }
@@ -507,6 +526,10 @@
       if (meetingIdInput) meetingIdInput.value = webData.meeting_id || '';
       if (passcodeInput) passcodeInput.value = webData.passcode || '';
       if (dtInput) dtInput.value = webData.datetime || '';
+      const dInput = document.getElementById('lp_webinar_date');
+      const tInput = document.getElementById('lp_webinar_time');
+      if (dInput) dInput.value = webData.date || '';
+      if (tInput) tInput.value = webData.time || '';
       if (successMsgInput) successMsgInput.value = webData.success_msg || '';
       if (webinarBox) webinarBox.style.display = 'block';
     } else {

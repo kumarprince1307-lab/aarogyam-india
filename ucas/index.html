@@ -391,6 +391,14 @@
           <div class="ucas-kpi-val" id="kpi_total_converted">0</div>
           <div class="ucas-kpi-label">Converted</div>
         </div>
+
+        <div class="ucas-kpi-card kpi-blue" style="cursor:pointer;" onclick="UCAS_APP.switchView('webinars')" title="वेबिनार अटेंडेंस देखें">
+          <div class="ucas-kpi-icon-wrap" style="background:#DBEAFE;color:#1D4ED8;">
+            <i class="fa-solid fa-video"></i>
+          </div>
+          <div class="ucas-kpi-val" id="kpi_total_webinar_attendees" style="color:#1D4ED8;">0</div>
+          <div class="ucas-kpi-label">Webinar Attendees</div>
+        </div>
       </div>
 
       <!-- Direct Referrals & Purchase Earnings with Date Filter -->
@@ -950,7 +958,11 @@
           <div class="ucas-grid-2" style="gap:10px;">
             <div>
               <label class="ucas-label" style="font-size:0.8rem;">📅 वेबिनार दिनांक व समय (Date & Time): *</label>
-              <input type="text" id="lp_webinar_datetime" class="ucas-input" placeholder="उदा. 25 अगस्त 2026, शाम 7:00 बजे">
+              <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:6px;">
+                <input type="date" id="lp_webinar_date" class="ucas-input" style="padding:6px 8px;font-size:0.84rem;" title="दिनांक चुनें">
+                <input type="time" id="lp_webinar_time" class="ucas-input" style="padding:6px 8px;font-size:0.84rem;" title="समय चुनें">
+              </div>
+              <input type="hidden" id="lp_webinar_datetime">
             </div>
             <div>
               <label class="ucas-label" style="font-size:0.8rem;">🔗 Zoom / Meeting Join Link: *</label>
@@ -1141,7 +1153,11 @@
           <div class="ucas-grid-2" style="gap:10px;">
             <div>
               <label class="ucas-label" style="font-size:0.8rem;">📅 दिनांक व समय (Date & Time): *</label>
-              <input type="text" id="wb_input_datetime" class="ucas-input" placeholder="उदा. 25 अगस्त 2026, शाम 7:00 बजे">
+              <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:6px;">
+                <input type="date" id="wb_input_date" class="ucas-input" style="padding:6px 8px;font-size:0.84rem;" title="दिनांक चुनें">
+                <input type="time" id="wb_input_time" class="ucas-input" style="padding:6px 8px;font-size:0.84rem;" title="समय चुनें">
+              </div>
+              <input type="hidden" id="wb_input_datetime">
             </div>
             <div>
               <label class="ucas-label" style="font-size:0.8rem;">🔗 Zoom / Meeting Join Link: *</label>
@@ -1208,6 +1224,31 @@
         </div>
 
         <div id="ucas-my-webinars-container">
+          <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
+        </div>
+      </div>
+
+      <!-- All Webinar Attendees Live Attendance Report Table with WhatsApp Followup & Call -->
+      <div class="ucas-card" style="margin-top:1.25rem;">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
+          <div class="ucas-card-title">
+            <span class="ucas-heading-pill" style="background:linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%);">
+              <i class="fa-solid fa-users"></i> वेबिनार अटेंडेंस रिपोर्ट (Webinar Attendees Report)
+            </span>
+            <span id="ucas-webinar-attendees-total-count" style="background:#DBEAFE;color:#1E40AF;font-weight:800;padding:2px 8px;border-radius:var(--radius-full);font-size:0.85rem;margin-left:6px;">0</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <input type="search" id="ucas-wb-attendee-search" class="ucas-input" placeholder="🔍 नाम या मोबाइल खोजें..." style="padding:4px 8px;font-size:0.8rem;width:160px;">
+            <select id="ucas-wb-attendee-filter-wb" class="ucas-select" style="padding:4px 8px;font-size:0.8rem;max-width:180px;">
+              <option value="all">सभी वेबिनार (All)</option>
+            </select>
+            <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_WEBINARS.loadWebinars()">
+              <i class="fa-solid fa-rotate"></i> रीफ्रेश
+            </button>
+          </div>
+        </div>
+
+        <div id="ucas-webinar-all-attendees-list">
           <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
         </div>
       </div>
