@@ -49,7 +49,7 @@ function fetchLandingPageFromSupabase(lpId) {
   return new Promise((resolve) => {
     if (!lpId) return resolve(null);
     const cleanId = encodeURIComponent(String(lpId).trim());
-    const apiUrl = `${SUPABASE_URL}/rest/v1/landing_pages?id=eq.${cleanId}&select=id,title,category,content_type,media_url,thumbnail_url,message,share_id,status`;
+    const apiUrl = `${SUPABASE_URL}/rest/v1/landing_pages?id=eq.${cleanId}&select=id,title,category,content_type,media_url,thumbnail_url,message,share_id,status,og_title,og_description,og_image_url`;
 
     const options = {
       headers: {
@@ -57,7 +57,7 @@ function fetchLandingPageFromSupabase(lpId) {
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         'Accept': 'application/json'
       },
-      timeout: 3500
+      timeout: 5000
     };
 
     const req = https.get(apiUrl, options, (res) => {
@@ -95,7 +95,7 @@ module.exports = async function handler(req, res) {
 
   const query = req.query || {};
   const lpId = (query.id || query.lp || '').trim();
-  const queryShareId = (query.share_id || '').trim();
+  const queryShareId = (query.share_id || query.ref || '').trim();
   const queryYt = (query.yt || query.v || query.video || '').trim();
   const queryThumb = (query.thumb || query.img || query.thumbnail || '').trim();
   const queryTitle = (query.title || '').trim();
@@ -113,35 +113,42 @@ module.exports = async function handler(req, res) {
   }
 
   // 2. Resolve Content Details
-  const finalTitle = (lp?.title || queryTitle || 'Aarogyam India विशेष जानकारी').trim();
-  const finalDesc = (lp?.message || queryDesc || 'Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी, समाधान और परामर्श के लिए अभी देखें।').slice(0, 160).trim();
+  const rawTitle = (lp?.title || queryTitle || 'Aarogyam India विशेष जानकारी').trim();
+  const finalTitle = lp?.og_title || (rawTitle.includes('Aarogyam India') ? rawTitle : `${rawTitle} | Aarogyam India`);
+  const finalDesc = (lp?.og_description || lp?.message || queryDesc || 'Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी, समाधान और परामर्श के लिए अभी देखें।').slice(0, 160).trim();
   const finalShareId = lp?.share_id || queryShareId || '';
   const finalCategory = lp?.category || queryCat || 'agriculture';
 
   // 3. Determine Media & Thumbnail
   let finalOgImage = DEFAULT_FALLBACK_IMAGE;
 
-  const detectedYtId = extractYoutubeVideoId(queryYt) ||
-                       extractYoutubeVideoId(lp?.media_url) ||
-                       extractYoutubeVideoId(lp?.thumbnail_url) ||
-                       extractYoutubeVideoId(queryThumb);
-
-  const isYouTube = Boolean(detectedYtId || lp?.content_type === 'youtube');
-
-  if (isYouTube && detectedYtId) {
-    // YouTube Video Post: High-Quality reliable thumbnail
-    finalOgImage = `https://i.ytimg.com/vi/${detectedYtId}/hqdefault.jpg`;
+  if (lp?.og_image_url && (lp.og_image_url.startsWith('http://') || lp.og_image_url.startsWith('https://'))) {
+    // Ground Truth pre-computed OG image
+    finalOgImage = lp.og_image_url;
   } else {
-    // Image Post
-    const candidateImg = lp?.thumbnail_url || lp?.media_url || queryThumb;
+    // Dynamic Resolution Fallback for legacy records
+    const detectedYtId = extractYoutubeVideoId(queryYt) ||
+                         extractYoutubeVideoId(lp?.media_url) ||
+                         extractYoutubeVideoId(lp?.thumbnail_url) ||
+                         extractYoutubeVideoId(queryThumb);
 
-    if (candidateImg && candidateImg.startsWith('data:image/')) {
-      // User uploaded Base64 image: Served as real binary image by /api/image
-      finalOgImage = `${HOST_ORIGIN}/api/image?id=${encodeURIComponent(lp?.id || lpId || 'default')}`;
-    } else if (candidateImg && (candidateImg.startsWith('http://') || candidateImg.startsWith('https://'))) {
-      finalOgImage = candidateImg;
+    const isYouTube = Boolean(detectedYtId || lp?.content_type === 'youtube');
+
+    if (isYouTube && detectedYtId) {
+      // YouTube Video Post: High-Quality reliable thumbnail
+      finalOgImage = `https://i.ytimg.com/vi/${detectedYtId}/hqdefault.jpg`;
     } else {
-      finalOgImage = DEFAULT_FALLBACK_IMAGE;
+      // Image Post
+      const candidateImg = lp?.thumbnail_url || lp?.media_url || queryThumb;
+
+      if (candidateImg && candidateImg.startsWith('data:image/')) {
+        // User uploaded Base64 image: Served as real binary image by /api/image
+        finalOgImage = `${HOST_ORIGIN}/api/image?id=${encodeURIComponent(lp?.id || lpId || 'default')}`;
+      } else if (candidateImg && (candidateImg.startsWith('http://') || candidateImg.startsWith('https://'))) {
+        finalOgImage = candidateImg;
+      } else {
+        finalOgImage = DEFAULT_FALLBACK_IMAGE;
+      }
     }
   }
 
@@ -163,7 +170,7 @@ module.exports = async function handler(req, res) {
   }
 
   // 6. If Social Crawler (or debug request), return Pre-Rendered RAW HTML with real OG tags
-  const cleanTitle = `${finalTitle} — Aarogyam India`;
+  const cleanTitle = finalTitle.includes('Aarogyam India') ? finalTitle : `${finalTitle} — Aarogyam India`;
 
   const html = `<!DOCTYPE html>
 <html lang="hi" prefix="og: https://ogp.me/ns#">

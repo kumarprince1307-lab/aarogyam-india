@@ -437,26 +437,6 @@
     const url = new URL(targetPath, origin);
     url.searchParams.set('id', lp.id);
     url.searchParams.set('share_id', lp.share_id || window.UCAS_SESSION.getShareId());
-    url.searchParams.set('cat', 'webinar');
-
-    let thumbUrl = lp.thumbnail_url;
-    let ytId = extractYoutubeVideoId(lp.media_url) || extractYoutubeVideoId(lp.thumbnail_url);
-    if (ytId) {
-      thumbUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
-      url.searchParams.set('yt', ytId);
-    } else if (lp.media_url && !lp.media_url.startsWith('data:')) {
-      thumbUrl = lp.media_url;
-    }
-
-    if (thumbUrl && !thumbUrl.startsWith('data:')) {
-      url.searchParams.set('thumb', thumbUrl);
-    }
-
-    if (lp.message) {
-      url.searchParams.set('desc', lp.message.slice(0, 160));
-    }
-
-    url.searchParams.set('src', 'ucas_webinar');
     return url.toString();
   }
 

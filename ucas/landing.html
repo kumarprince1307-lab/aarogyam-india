@@ -1007,7 +1007,7 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       const lpId = urlParams.get('id') || 'LP000001';
-      const shareId = urlParams.get('share_id') || '';
+      const shareId = urlParams.get('share_id') || urlParams.get('ref') || '';
       const customTitle = urlParams.get('title');
       const customThumb = urlParams.get('thumb') || urlParams.get('img') || urlParams.get('thumbnail');
       const customYt = urlParams.get('yt') || urlParams.get('v') || urlParams.get('video');

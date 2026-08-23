@@ -357,20 +357,26 @@
     try {
       if (editingLandingPageId) {
         // =======================
-        // UPDATE EXISTING PAGE
-        // =======================
-        const lpId = editingLandingPageId;
-        const title = titleInput || `${categoryInput.toUpperCase()} Campaign (${lpId})`;
+        // Compute Social OG Metadata (Single Source of Truth)
+        const cleanTitle = (titleInput ? titleInput.trim() : `${categoryInput.toUpperCase()} Campaign (${lpId})`);
+        const ogTitle = cleanTitle.includes('Aarogyam India') ? cleanTitle : `${cleanTitle} | Aarogyam India`;
+        const ogDesc = (messageInput ? messageInput.slice(0, 160).trim() : 'Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी, समाधान और परामर्श के लिए अभी देखें।');
+        const ogImg = activeContentType === 'youtube'
+          ? `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`
+          : `https://aarogyamindia.online/api/image?id=${lpId}`;
 
         const updatePayload = {
           id: lpId,
-          title: title,
+          title: cleanTitle,
           category: categoryInput,
           content_type: activeContentType,
           media_url: activeContentType === 'image' ? uploadedImageData : `https://www.youtube.com/watch?v=${detectedYoutubeId}`,
           thumbnail_url: activeContentType === 'image' ? uploadedImageData : detectedYoutubeThumbnail,
           message: messageInput,
-          webinar_data: webinarData
+          webinar_data: webinarData,
+          og_title: ogTitle,
+          og_description: ogDesc,
+          og_image_url: ogImg
         };
 
         const res = await window.UCAS_DB.updateLandingPage(lpId, updatePayload, profileId);
@@ -390,13 +396,18 @@
         // CREATE NEW PAGE
         // =======================
         const lpId = generateUniqueLandingPageId();
-        const title = titleInput || `${categoryInput.toUpperCase()} Campaign (${lpId})`;
+        const cleanTitle = (titleInput ? titleInput.trim() : `${categoryInput.toUpperCase()} Campaign (${lpId})`);
+        const ogTitle = cleanTitle.includes('Aarogyam India') ? cleanTitle : `${cleanTitle} | Aarogyam India`;
+        const ogDesc = (messageInput ? messageInput.slice(0, 160).trim() : 'Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी, समाधान और परामर्श के लिए अभी देखें।');
+        const ogImg = activeContentType === 'youtube'
+          ? `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`
+          : `https://aarogyamindia.online/api/image?id=${lpId}`;
 
         const payload = {
           id: lpId,
           profile_id: profileId,
           share_id: shareId,
-          title: title,
+          title: cleanTitle,
           category: categoryInput,
           content_type: activeContentType,
           media_url: activeContentType === 'image' ? uploadedImageData : `https://www.youtube.com/watch?v=${detectedYoutubeId}`,
@@ -404,6 +415,9 @@
           message: messageInput,
           webinar_data: webinarData,
           status: initialStatus,
+          og_title: ogTitle,
+          og_description: ogDesc,
+          og_image_url: ogImg,
           created_at: new Date().toISOString()
         };
 
@@ -573,33 +587,6 @@
     const url = new URL(targetPath, origin);
     url.searchParams.set('id', lp.id);
     url.searchParams.set('share_id', lp.share_id || window.UCAS_SESSION.getShareId());
-
-    if (lp.title) {
-      url.searchParams.set('title', lp.title);
-    }
-
-    if (lp.category) {
-      url.searchParams.set('cat', lp.category);
-    }
-
-    let thumbUrl = lp.thumbnail_url;
-    let ytId = extractYoutubeVideoId(lp.media_url) || extractYoutubeVideoId(lp.thumbnail_url);
-    if (ytId) {
-      thumbUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
-      url.searchParams.set('yt', ytId);
-    } else if (lp.media_url && !lp.media_url.startsWith('data:')) {
-      thumbUrl = lp.media_url;
-    }
-
-    if (thumbUrl && !thumbUrl.startsWith('data:')) {
-      url.searchParams.set('thumb', thumbUrl);
-    }
-
-    if (lp.message) {
-      url.searchParams.set('desc', lp.message.slice(0, 160));
-    }
-
-    url.searchParams.set('src', 'ucas_lp_builder');
     return url.toString();
   }
 
