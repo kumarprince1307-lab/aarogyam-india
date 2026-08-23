@@ -432,7 +432,9 @@
 
   function getWebinarShareUrl(lp) {
     const origin = window.location.origin || 'https://aarogyamindia.online';
-    const url = new URL('/ucas/landing.html', origin);
+    const isProduction = !window.location.port;
+    const targetPath = isProduction ? '/api/share' : '/ucas/landing.html';
+    const url = new URL(targetPath, origin);
     url.searchParams.set('id', lp.id);
     url.searchParams.set('share_id', lp.share_id || window.UCAS_SESSION.getShareId());
     url.searchParams.set('cat', 'webinar');
