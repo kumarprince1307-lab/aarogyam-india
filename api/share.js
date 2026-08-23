@@ -145,20 +145,19 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // 4. Construct Destination URL for Human Visitors
-  const targetParams = new URLSearchParams();
-  if (lpId) targetParams.set('id', lpId);
-  if (finalShareId) targetParams.set('share_id', finalShareId);
-  if (finalTitle) targetParams.set('title', finalTitle);
-  if (finalCategory) targetParams.set('cat', finalCategory);
-  if (detectedYtId) targetParams.set('yt', detectedYtId);
-  if (finalOgImage && !finalOgImage.includes('farmer-community-banner.jpeg')) {
-    targetParams.set('thumb', finalOgImage);
+  // 4. Construct Clean Destination URL for Human Visitors
+  const destParams = new URLSearchParams();
+  if (lpId) destParams.set('id', lpId);
+  if (finalShareId) destParams.set('share_id', finalShareId);
+  if (!lp) {
+    if (finalTitle) destParams.set('title', finalTitle);
+    if (finalCategory) destParams.set('cat', finalCategory);
+    if (detectedYtId) destParams.set('yt', detectedYtId);
+    if (finalDesc) destParams.set('desc', finalDesc);
   }
-  if (finalDesc) targetParams.set('desc', finalDesc);
 
-  const destinationLandingUrl = `${HOST_ORIGIN}/ucas/landing.html?${targetParams.toString()}`;
-  const canonicalShareUrl = `${HOST_ORIGIN}/api/share?${targetParams.toString()}`;
+  const destinationLandingUrl = `${HOST_ORIGIN}/ucas/landing.html?${destParams.toString()}`;
+  const canonicalShareUrl = `${HOST_ORIGIN}/api/share?id=${encodeURIComponent(lpId || '')}${finalShareId ? '&share_id=' + encodeURIComponent(finalShareId) : ''}`;
 
   const userAgent = String(req.headers['user-agent'] || '');
   const isCrawler = CRAWLER_USER_AGENTS.test(userAgent);

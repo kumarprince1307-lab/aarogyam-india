@@ -1058,33 +1058,26 @@
         return null;
       }
 
-      // Default fallback & URL Param Override Fix
-      const resolvedYtId = extractYoutubeId(customYt) || extractYoutubeId(landingPageData?.media_url) || extractYoutubeId(landingPageData?.thumbnail_url);
-      
-      if (!landingPageData) {
+      // 1. If landingPageData exists from Supabase, database is authoritative!
+      if (landingPageData) {
+        if (landingPageData.content_type === 'youtube' || extractYoutubeId(landingPageData.media_url) || extractYoutubeId(landingPageData.thumbnail_url)) {
+          landingPageData.content_type = 'youtube';
+        } else {
+          landingPageData.content_type = 'image';
+        }
+      } else {
+        // Fallback for standalone/direct links without DB record
+        const fallbackYt = extractYoutubeId(customYt) || extractYoutubeId(customThumb);
         landingPageData = {
           id: lpId,
           share_id: shareId,
           title: customTitle || 'Aarogyam India विशेष जानकारी',
           category: urlParams.get('cat') || 'agriculture',
-          content_type: resolvedYtId ? 'youtube' : 'image',
-          media_url: resolvedYtId ? `https://www.youtube.com/watch?v=${resolvedYtId}` : (customThumb || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80'),
-          thumbnail_url: customThumb || (resolvedYtId ? `https://i.ytimg.com/vi/${resolvedYtId}/hqdefault.jpg` : ''),
+          content_type: fallbackYt ? 'youtube' : 'image',
+          media_url: fallbackYt ? `https://www.youtube.com/watch?v=${fallbackYt}` : (customThumb || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80'),
+          thumbnail_url: customThumb || (fallbackYt ? `https://i.ytimg.com/vi/${fallbackYt}/hqdefault.jpg` : ''),
           message: customMsg || 'नमस्ते! Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी और समाधान के लिए नीचे दिया गया विवरण अवश्य देखें।'
         };
-      } else {
-        // If URL params provided overrides, apply them instantly
-        if (customTitle) landingPageData.title = customTitle;
-        if (customMsg) landingPageData.message = customMsg;
-        if (resolvedYtId) {
-          landingPageData.content_type = 'youtube';
-          landingPageData.media_url = `https://www.youtube.com/watch?v=${resolvedYtId}`;
-          landingPageData.thumbnail_url = `https://i.ytimg.com/vi/${resolvedYtId}/hqdefault.jpg`;
-        } else if (customThumb) {
-          landingPageData.content_type = 'image';
-          landingPageData.media_url = customThumb;
-          landingPageData.thumbnail_url = customThumb;
-        }
       }
 
       // 2. Fetch Creator Profile to display proper Creator Full Name
@@ -1263,11 +1256,17 @@
             thumbBox.className = 'pub-yt-thumb-box';
             thumbBox.id = 'lp_yt_click_play';
             thumbBox.title = 'क्लिक करके वीडियो देखें';
-            thumbBox.onclick = () => playYoutubeVideo(ytId);
+            thumbBox.style.cursor = 'pointer';
+            thumbBox.onclick = function () {
+              window.playYoutubeVideo(ytId);
+            };
 
             const ytImg = document.createElement('img');
             ytImg.alt = finalTitle;
             ytImg.src = primaryThumb;
+            ytImg.style.width = '100%';
+            ytImg.style.height = '100%';
+            ytImg.style.objectFit = 'cover';
             ytImg.onerror = function () {
               this.onerror = null;
               this.src = altThumb;
@@ -1280,7 +1279,7 @@
             `;
             mediaHolder.appendChild(thumbBox);
           } else {
-            // Standard Image View with Fallback
+            // Standard Image View
             const rawImg = lp.media_url || lp.thumbnail_url || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80';
             const imgElem = document.createElement('img');
             imgElem.className = 'pub-media-img';
@@ -1288,7 +1287,7 @@
             imgElem.src = rawImg;
             imgElem.onerror = function () {
               this.onerror = null;
-              this.src = 'https://aarogyamindia.in/images/logo/logo.png';
+              this.src = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
             };
             mediaHolder.appendChild(imgElem);
           }
