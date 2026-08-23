@@ -121,8 +121,10 @@
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        // High Definition scaling: 1920px max dimension for crystal-clear quality
-        const maxDim = 1920;
+        
+        // Optimized Social & Web Standard: 1280px max dimension
+        // Delivers crisp HD clarity on WhatsApp/Facebook without heavy payload (150-220 KB)
+        const maxDim = 1280;
 
         if (width > maxDim || height > maxDim) {
           if (width > height) {
@@ -136,14 +138,18 @@
 
         canvas.width = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d', { alpha: file.type === 'image/png' });
+        const ctx = canvas.getContext('2d');
+        
+        // Fill white background for transparent images
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
-        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-        const quality = mimeType === 'image/jpeg' ? 0.92 : undefined;
-        uploadedImageData = canvas.toDataURL(mimeType, quality);
+        // Standard HD JPEG at 0.88 quality
+        uploadedImageData = canvas.toDataURL('image/jpeg', 0.88);
         updateBuilderPreview();
       };
       img.src = event.target.result;

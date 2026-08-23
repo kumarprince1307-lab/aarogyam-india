@@ -85,21 +85,21 @@
         const canvas = document.createElement('canvas');
         let w = img.width;
         let h = img.height;
-        const maxD = 1920;
+        const maxD = 1280;
         if (w > maxD || h > maxD) {
           if (w > h) { h = Math.round((h * maxD) / w); w = maxD; }
           else { w = Math.round((w * maxD) / h); h = maxD; }
         }
         canvas.width = w;
         canvas.height = h;
-        const ctx = canvas.getContext('2d', { alpha: file.type === 'image/png' });
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, w, h);
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, w, h);
 
-        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-        const quality = mimeType === 'image/jpeg' ? 0.92 : undefined;
-        uploadedWebinarImageData = canvas.toDataURL(mimeType, quality);
+        uploadedWebinarImageData = canvas.toDataURL('image/jpeg', 0.88);
         updateWebinarPreview();
       };
       img.src = evt.target.result;
