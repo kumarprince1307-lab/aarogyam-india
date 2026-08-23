@@ -208,10 +208,12 @@ export async function initAllLandingPages() {
 
           <!-- 6. Media Options -->
           <div class="admin-form-group" style="grid-column: 1 / -1;">
-            <label class="admin-label" style="font-weight: 700;">बैनर मीडिया (Image या YouTube Video)</label>
-            <div style="display: flex; gap: 10px; margin-bottom: 8px; margin-top: 4px;">
-              <button type="button" id="adm_btn_media_image" class="admin-button small-button" style="background:#2563eb;color:#fff;font-weight:700;">🖼️ Banner Image</button>
-              <button type="button" id="adm_btn_media_youtube" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">🎥 YouTube Video</button>
+            <label class="admin-label" style="font-weight: 700;">बैनर मीडिया (Content Media Type)</label>
+            <div style="display: flex; gap: 8px; margin-bottom: 8px; margin-top: 4px; flex-wrap: wrap;">
+              <button type="button" id="adm_btn_media_image" class="admin-button small-button" style="background:#2563eb;color:#fff;font-weight:700;">🖼️ Image</button>
+              <button type="button" id="adm_btn_media_youtube" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">🎥 YouTube</button>
+              <button type="button" id="adm_btn_media_facebook" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">📸 Facebook/Insta</button>
+              <button type="button" id="adm_btn_media_other" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">🌐 Web Link</button>
             </div>
 
             <!-- Image File Input -->
@@ -227,6 +229,27 @@ export async function initAllLandingPages() {
               <input type="url" id="adm_lp_youtube_url" class="admin-input" placeholder="https://www.youtube.com/watch?v=... या https://youtu.be/..." style="width: 100%; padding: 10px 12px;" />
               <div id="adm_lp_yt_preview_wrap" style="display:none; margin-top: 10px;">
                 <img id="adm_lp_yt_preview" src="" alt="YouTube Preview" style="max-height: 160px; border-radius: 8px; border: 1px solid var(--admin-border);" />
+              </div>
+            </div>
+
+            <!-- Facebook Video / Reel Input -->
+            <div id="adm_box_facebook_input" style="display: none;">
+              <input type="url" id="adm_lp_facebook_url" class="admin-input" placeholder="https://fb.watch/... या https://instagram.com/reel/..." style="width: 100%; padding: 10px 12px;" />
+            </div>
+
+            <!-- Other / Universal Web Link Input -->
+            <div id="adm_box_other_input" style="display: none;">
+              <input type="url" id="adm_lp_other_url" class="admin-input" placeholder="https://example.com/news-article-or-blog" style="width: 100%; padding: 10px 12px;" />
+            </div>
+
+            <!-- Optional Custom Thumbnail for Video/Link posts -->
+            <div id="adm_box_custom_thumb_wrap" style="display: none; margin-top: 10px; background: rgba(255,255,255,0.03); border: 1px dashed var(--admin-border); border-radius: 8px; padding: 10px;">
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">
+                🖼️ वैकल्पिक कस्टम थंबनेल (Optional Custom Thumbnail)
+              </label>
+              <input type="file" id="adm_lp_custom_thumb_file" accept="image/*" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;" />
+              <div id="adm_lp_custom_thumb_preview_wrap" style="display:none; margin-top: 8px;">
+                <img id="adm_lp_custom_thumb_preview" src="" alt="Custom Thumb" style="max-height: 120px; border-radius: 6px; border: 1px solid var(--admin-border);" />
               </div>
             </div>
           </div>
@@ -404,7 +427,6 @@ export async function initAllLandingPages() {
   const toggleBuilderBtn = document.getElementById('btn-toggle-admin-builder');
   const closeBuilderBtn = document.getElementById('btn-close-admin-builder');
   const builderTitle = document.getElementById('admin-builder-title');
-
   // User Mode Buttons & Containers
   const btnModeSingle = document.getElementById('adm_mode_single');
   const btnModeMulti = document.getElementById('adm_mode_multi');
@@ -447,6 +469,18 @@ export async function initAllLandingPages() {
   const ytUrlInput = document.getElementById('adm_lp_youtube_url');
   const ytPreviewWrap = document.getElementById('adm_lp_yt_preview_wrap');
   const ytPreview = document.getElementById('adm_lp_yt_preview');
+
+  const btnMediaFb = document.getElementById('adm_btn_media_facebook');
+  const btnMediaOther = document.getElementById('adm_btn_media_other');
+  const boxFbInput = document.getElementById('adm_box_facebook_input');
+  const boxOtherInput = document.getElementById('adm_box_other_input');
+  const boxCustomThumbWrap = document.getElementById('adm_box_custom_thumb_wrap');
+  const fbUrlInput = document.getElementById('adm_lp_facebook_url');
+  const otherUrlInput = document.getElementById('adm_lp_other_url');
+  const customThumbFileInput = document.getElementById('adm_lp_custom_thumb_file');
+  const customThumbPreviewWrap = document.getElementById('adm_lp_custom_thumb_preview_wrap');
+  const customThumbPreview = document.getElementById('adm_lp_custom_thumb_preview');
+  let uploadedCustomThumbData = null;
 
   const resultCard = document.getElementById('adm-lp-result-card');
   const resultHeaderMsg = document.getElementById('adm_result_header_msg');
@@ -545,18 +579,14 @@ export async function initAllLandingPages() {
     const q = (multiSearchInput?.value || '').toLowerCase().trim();
     const filteredUsers = allUsers.filter(u => {
       if (!q) return true;
-      const n = (u.name || u.full_name || '').toLowerCase();
-      const m = (u.mobile || '').toLowerCase();
-      const s = (u.share_id || '').toLowerCase();
-      return n.includes(q) || m.includes(q) || s.includes(q);
+      const name = (u.name || u.full_name || '').toLowerCase();
+      const mob = (u.mobile || '').toLowerCase();
+      const sid = (u.share_id || '').toLowerCase();
+      return name.includes(q) || mob.includes(q) || sid.includes(q);
     });
 
-    if (multiCountBadge) {
-      multiCountBadge.textContent = `${multiSelectedUserIds.size} / ${allUsers.length} यूजर्स चुने गए`;
-    }
-
     if (filteredUsers.length === 0) {
-      multiUserList.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--admin-muted);padding:1rem;">कोई यूजर नहीं मिला</div>';
+      multiUserList.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding: 1rem; color: var(--admin-muted); font-size:0.85rem;">कोई यूजर नहीं मिला (No users matched)</div>';
       return;
     }
 
@@ -564,11 +594,11 @@ export async function initAllLandingPages() {
       const isChecked = multiSelectedUserIds.has(u.id);
       const isAct = u.is_active || u.is_subscriber;
       return `
-        <label style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--admin-surface-2, #0f172a);border:1px solid ${isChecked ? '#3b82f6' : 'var(--admin-border)'};border-radius:6px;cursor:pointer;user-select:none;">
-          <input type="checkbox" class="adm-user-checkbox" value="${u.id}" ${isChecked ? 'checked' : ''} style="width:16px;height:16px;accent-color:#3b82f6;" />
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:0.84rem;color:var(--admin-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-              ${u.name || u.full_name || 'User'}
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: var(--admin-surface-2, #0f172a); border: 1px solid ${isChecked ? '#3b82f6' : 'var(--admin-border, #334155)'}; border-radius: 6px; cursor: pointer;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" class="adm-user-checkbox" value="${u.id}" ${isChecked ? 'checked' : ''} style="accent-color:#3b82f6;" />
+            <div>
+              <div style="font-weight: 700; font-size: 0.85rem; color: var(--admin-text);">${u.name || u.full_name || 'User'}</div>
             </div>
             <div style="font-size:0.75rem;color:var(--admin-muted);display:flex;gap:6px;align-items:center;">
               <span>📞 ${u.mobile || '-'}</span>
@@ -597,25 +627,65 @@ export async function initAllLandingPages() {
     });
   }
 
-  // Media Tab Switcher
-  btnMediaImg?.addEventListener('click', () => {
-    activeContentType = 'image';
-    btnMediaImg.style.background = '#2563eb';
-    btnMediaImg.style.color = '#fff';
-    btnMediaYt.style.background = 'var(--admin-surface)';
-    btnMediaYt.style.color = 'var(--admin-text)';
-    boxImgInput.style.display = 'block';
-    boxYtInput.style.display = 'none';
-  });
+  function setAdminMediaType(type) {
+    activeContentType = type;
+    [btnMediaImg, btnMediaYt, btnMediaFb, btnMediaOther].forEach(btn => {
+      if (!btn) return;
+      btn.style.background = 'var(--admin-surface)';
+      btn.style.color = 'var(--admin-text)';
+      btn.style.border = '1px solid var(--admin-border)';
+    });
 
-  btnMediaYt?.addEventListener('click', () => {
-    activeContentType = 'youtube';
-    btnMediaYt.style.background = '#2563eb';
-    btnMediaYt.style.color = '#fff';
-    btnMediaImg.style.background = 'var(--admin-surface)';
-    btnMediaImg.style.color = 'var(--admin-text)';
-    boxImgInput.style.display = 'none';
-    boxYtInput.style.display = 'block';
+    if (boxImgInput) boxImgInput.style.display = type === 'image' ? 'block' : 'none';
+    if (boxYtInput) boxYtInput.style.display = type === 'youtube' ? 'block' : 'none';
+    if (boxFbInput) boxFbInput.style.display = type === 'facebook' ? 'block' : 'none';
+    if (boxOtherInput) boxOtherInput.style.display = type === 'other' ? 'block' : 'none';
+    if (boxCustomThumbWrap) boxCustomThumbWrap.style.display = type !== 'image' ? 'block' : 'none';
+
+    if (type === 'image' && btnMediaImg) { btnMediaImg.style.background = '#2563eb'; btnMediaImg.style.color = '#fff'; btnMediaImg.style.border = 'none'; }
+    if (type === 'youtube' && btnMediaYt) { btnMediaYt.style.background = '#2563eb'; btnMediaYt.style.color = '#fff'; btnMediaYt.style.border = 'none'; }
+    if (type === 'facebook' && btnMediaFb) { btnMediaFb.style.background = '#2563eb'; btnMediaFb.style.color = '#fff'; btnMediaFb.style.border = 'none'; }
+    if (type === 'other' && btnMediaOther) { btnMediaOther.style.background = '#2563eb'; btnMediaOther.style.color = '#fff'; btnMediaOther.style.border = 'none'; }
+  }
+
+  // Media Tab Switcher
+  btnMediaImg?.addEventListener('click', () => setAdminMediaType('image'));
+  btnMediaYt?.addEventListener('click', () => setAdminMediaType('youtube'));
+  btnMediaFb?.addEventListener('click', () => setAdminMediaType('facebook'));
+  btnMediaOther?.addEventListener('click', () => setAdminMediaType('other'));
+
+  // Custom Thumbnail Upload Handler
+  customThumbFileInput?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_DIM = 1280;
+        let w = img.width;
+        let h = img.height;
+        if (w > MAX_DIM || h > MAX_DIM) {
+          if (w > h) { h = Math.round((h * MAX_DIM) / w); w = MAX_DIM; }
+          else { w = Math.round((w * MAX_DIM) / h); h = MAX_DIM; }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, w, h);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, w, h);
+        uploadedCustomThumbData = canvas.toDataURL('image/jpeg', 0.88);
+        if (customThumbPreview) customThumbPreview.src = uploadedCustomThumbData;
+        if (customThumbPreviewWrap) customThumbPreviewWrap.style.display = 'block';
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
   });
 
   // Campaign Type Radio Toggle
@@ -1100,10 +1170,19 @@ export async function initAllLandingPages() {
               const responses = allSurveys.filter(s => s.category_answers?.landing_page_id === p.id);
               const responsesCount = responses.length;
 
-              // Type Badge
+              // Type Badge & Media Badge
               const typeBadge = isWb
                 ? '<span style="background:rgba(139,92,246,0.15);color:#8b5cf6;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;"><i class="fa-solid fa-video"></i> Webinar</span>'
                 : '<span style="background:rgba(16,185,129,0.15);color:#10b981;font-size:0.72rem;padding:2px 6px;border-radius:4px;font-weight:700;"><i class="fa-regular fa-file-lines"></i> Landing Page</span>';
+
+              const ct = p.content_type || (isWb ? 'webinar' : 'image');
+              const mediaTypeBadge = ct === 'youtube'
+                ? '<span style="background:rgba(239,68,68,0.15);color:#ef4444;font-size:0.7rem;padding:1px 5px;border-radius:4px;font-weight:700;display:inline-block;margin-top:2px;"><i class="fa-brands fa-youtube"></i> YouTube</span>'
+                : ct === 'facebook' || ct === 'fb'
+                ? '<span style="background:rgba(37,99,235,0.15);color:#3b82f6;font-size:0.7rem;padding:1px 5px;border-radius:4px;font-weight:700;display:inline-block;margin-top:2px;"><i class="fa-brands fa-facebook"></i> FB/Insta</span>'
+                : ct === 'other' || ct === 'link'
+                ? '<span style="background:rgba(16,185,129,0.15);color:#10b981;font-size:0.7rem;padding:1px 5px;border-radius:4px;font-weight:700;display:inline-block;margin-top:2px;"><i class="fa-solid fa-globe"></i> Web Link</span>'
+                : '<span style="background:rgba(14,165,233,0.15);color:#0ea5e9;font-size:0.7rem;padding:1px 5px;border-radius:4px;font-weight:700;display:inline-block;margin-top:2px;"><i class="fa-regular fa-image"></i> Image</span>';
 
               // Status Badge
               let statusBadge = '<span style="background:rgba(16,185,129,0.15);color:#10b981;font-size:0.75rem;padding:3px 8px;border-radius:4px;font-weight:700;">🟢 Active / Live</span>';
@@ -1121,6 +1200,7 @@ export async function initAllLandingPages() {
                   <td><strong>#${rowNum}</strong></td>
                   <td>
                     <div>${typeBadge}</div>
+                    <div>${mediaTypeBadge}</div>
                     <div style="font-size: 0.78rem; font-weight: 700; color: var(--admin-text); margin-top: 3px;">
                       <code>${p.id}</code>
                     </div>
@@ -1540,13 +1620,42 @@ export async function initAllLandingPages() {
       wbSuccessMsg.value = wData.success_msg || '';
     }
 
+    // Reset Media state
+    uploadedImageData = null;
+    uploadedCustomThumbData = null;
+    if (customThumbPreviewWrap) customThumbPreviewWrap.style.display = 'none';
+    if (customThumbFileInput) customThumbFileInput.value = '';
+
+    const isCustomThumb = Boolean(page.thumbnail_url && page.thumbnail_url.startsWith('data:image/') && !page.thumbnail_url.includes('farmer-community-banner'));
+
     // Media
     if (page.content_type === 'youtube') {
-      btnMediaYt.click();
+      setAdminMediaType('youtube');
       ytUrlInput.value = page.media_url || '';
       ytUrlInput.dispatchEvent(new Event('input'));
+      if (isCustomThumb) {
+        uploadedCustomThumbData = page.thumbnail_url;
+        if (customThumbPreview) customThumbPreview.src = uploadedCustomThumbData;
+        if (customThumbPreviewWrap) customThumbPreviewWrap.style.display = 'block';
+      }
+    } else if (page.content_type === 'facebook' || page.content_type === 'fb') {
+      setAdminMediaType('facebook');
+      if (fbUrlInput) fbUrlInput.value = page.media_url || '';
+      if (isCustomThumb) {
+        uploadedCustomThumbData = page.thumbnail_url;
+        if (customThumbPreview) customThumbPreview.src = uploadedCustomThumbData;
+        if (customThumbPreviewWrap) customThumbPreviewWrap.style.display = 'block';
+      }
+    } else if (page.content_type === 'other' || page.content_type === 'link') {
+      setAdminMediaType('other');
+      if (otherUrlInput) otherUrlInput.value = page.media_url || '';
+      if (isCustomThumb) {
+        uploadedCustomThumbData = page.thumbnail_url;
+        if (customThumbPreview) customThumbPreview.src = uploadedCustomThumbData;
+        if (customThumbPreviewWrap) customThumbPreviewWrap.style.display = 'block';
+      }
     } else {
-      btnMediaImg.click();
+      setAdminMediaType('image');
       uploadedImageData = page.media_url || page.thumbnail_url;
       if (uploadedImageData && imgPreview) {
         imgPreview.src = uploadedImageData;
@@ -1581,14 +1690,19 @@ export async function initAllLandingPages() {
     const defaultType = form.querySelector('input[name="adm_campaign_type"][value="landing_page"]');
     if (defaultType) defaultType.checked = true;
 
-    btnMediaImg.click();
+    setAdminMediaType('image');
     uploadedImageData = null;
+    uploadedCustomThumbData = null;
     detectedYoutubeId = null;
     detectedYoutubeThumbnail = null;
     if (imgFileInput) imgFileInput.value = '';
     if (ytUrlInput) ytUrlInput.value = '';
+    if (fbUrlInput) fbUrlInput.value = '';
+    if (otherUrlInput) otherUrlInput.value = '';
+    if (customThumbFileInput) customThumbFileInput.value = '';
     if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
     if (ytPreviewWrap) ytPreviewWrap.style.display = 'none';
+    if (customThumbPreviewWrap) customThumbPreviewWrap.style.display = 'none';
   }
 
   // ==========================================
@@ -1667,6 +1781,7 @@ export async function initAllLandingPages() {
     // Determine Media & Thumbnail
     let mediaUrl = '';
     let thumbUrl = '';
+    const defaultBanner = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
 
     if (activeContentType === 'youtube') {
       const rawYt = ytUrlInput.value.trim();
@@ -1677,7 +1792,25 @@ export async function initAllLandingPages() {
         return;
       }
       mediaUrl = `https://www.youtube.com/watch?v=${vidId}`;
-      thumbUrl = `https://img.youtube.com/vi/${vidId}/hqdefault.jpg`;
+      thumbUrl = uploadedCustomThumbData || `https://img.youtube.com/vi/${vidId}/hqdefault.jpg`;
+    } else if (activeContentType === 'facebook') {
+      const rawFb = (fbUrlInput?.value || '').trim();
+      if (!rawFb) {
+        alert('कृपया Facebook Video या Instagram Reel लिंक दर्ज करें।');
+        fbUrlInput?.focus();
+        return;
+      }
+      mediaUrl = rawFb;
+      thumbUrl = uploadedCustomThumbData || '';
+    } else if (activeContentType === 'other') {
+      const rawOther = (otherUrlInput?.value || '').trim();
+      if (!rawOther) {
+        alert('कृपया वेबसाइट / न्यूज़ / ब्लॉग लिंक दर्ज करें।');
+        otherUrlInput?.focus();
+        return;
+      }
+      mediaUrl = rawOther;
+      thumbUrl = uploadedCustomThumbData || '';
     } else {
       mediaUrl = uploadedImageData || '';
       thumbUrl = uploadedImageData || '';
@@ -1692,6 +1825,15 @@ export async function initAllLandingPages() {
         // SINGLE UPDATE
         const targetUser = targetUsers[0];
         const lpId = editingPageId;
+        const ogTitle = title.includes('Aarogyam India') ? title : `${title} | Aarogyam India`;
+        const ogDesc = message.slice(0, 160).trim();
+        let ogImg = defaultBanner;
+        if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
+          ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
+        } else if (activeContentType === 'youtube' && detectedYoutubeId) {
+          ogImg = `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+        }
+
         const updatePayload = {
           title: title,
           category: category,
@@ -1702,7 +1844,10 @@ export async function initAllLandingPages() {
           thumbnail_url: thumbUrl,
           message: message,
           webinar_data: webinarData,
-          status: status
+          status: status,
+          og_title: ogTitle,
+          og_description: ogDesc,
+          og_image_url: ogImg
         };
 
         if (db) {
@@ -1738,6 +1883,15 @@ export async function initAllLandingPages() {
         targetUsers.forEach(u => {
           const randomNum = Math.floor(100000 + Math.random() * 900000);
           const lpId = `${prefix}${randomNum}`;
+          const ogTitle = title.includes('Aarogyam India') ? title : `${title} | Aarogyam India`;
+          const ogDesc = message.slice(0, 160).trim();
+          let ogImg = defaultBanner;
+          if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
+            ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
+          } else if (activeContentType === 'youtube' && detectedYoutubeId) {
+            ogImg = `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+          }
+
           const p = {
             id: lpId,
             profile_id: u.id,
@@ -1750,6 +1904,9 @@ export async function initAllLandingPages() {
             message: message,
             webinar_data: webinarData,
             status: status,
+            og_title: ogTitle,
+            og_description: ogDesc,
+            og_image_url: ogImg,
             created_at: nowIso
           };
           batchPayloads.push(p);

@@ -1076,8 +1076,13 @@
 
       // 1. If landingPageData exists from Supabase, database is authoritative!
       if (landingPageData) {
-        if (landingPageData.content_type === 'youtube' || extractYoutubeId(landingPageData.media_url) || extractYoutubeId(landingPageData.thumbnail_url)) {
+        const ct = String(landingPageData.content_type || '').toLowerCase();
+        if (ct === 'youtube' || extractYoutubeId(landingPageData.media_url)) {
           landingPageData.content_type = 'youtube';
+        } else if (ct === 'facebook' || ct === 'fb' || ct === 'instagram' || String(landingPageData.media_url || '').includes('facebook.com') || String(landingPageData.media_url || '').includes('fb.watch') || String(landingPageData.media_url || '').includes('instagram.com')) {
+          landingPageData.content_type = 'facebook';
+        } else if (ct === 'other' || ct === 'link' || String(landingPageData.media_url || '').startsWith('http')) {
+          landingPageData.content_type = 'other';
         } else {
           landingPageData.content_type = 'image';
         }
@@ -1257,25 +1262,29 @@
           }
         }
 
-        // Media Renderer (YouTube vs Image)
+        // Media Renderer (YouTube, Facebook/Instagram, Other Link, Image)
         const mediaHolder = document.getElementById('lp_media_holder');
         if (mediaHolder) {
           mediaHolder.innerHTML = '';
           const ytId = extractYoutubeId(lp.media_url) || extractYoutubeId(lp.thumbnail_url);
+          const defaultBanner = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
 
-          if (ytId) {
+          if (lp.content_type === 'youtube' || ytId) {
             // YouTube Click-to-Load Thumbnail View
-            const primaryThumb = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
-            const altThumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+            const hasCustomThumb = lp.thumbnail_url && (lp.thumbnail_url.startsWith('data:image/') || (!lp.thumbnail_url.includes('ytimg.com') && lp.thumbnail_url.startsWith('http')));
+            const primaryThumb = hasCustomThumb ? lp.thumbnail_url : (ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : defaultBanner);
+            const altThumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : defaultBanner;
 
             const thumbBox = document.createElement('div');
             thumbBox.className = 'pub-yt-thumb-box';
             thumbBox.id = 'lp_yt_click_play';
             thumbBox.title = 'क्लिक करके वीडियो देखें';
             thumbBox.style.cursor = 'pointer';
-            thumbBox.onclick = function () {
-              window.playYoutubeVideo(ytId);
-            };
+            if (ytId) {
+              thumbBox.onclick = function () {
+                window.playYoutubeVideo(ytId);
+              };
+            }
 
             const ytImg = document.createElement('img');
             ytImg.alt = finalTitle;
@@ -1294,16 +1303,121 @@
               <div class="pub-yt-badge"><i class="fa-brands fa-youtube" style="color:#FF0000;font-size:1.15rem;"></i> YouTube</div>
             `;
             mediaHolder.appendChild(thumbBox);
+          } else if (lp.content_type === 'facebook') {
+            // Facebook / Instagram Reel View
+            const hasFbCustomThumb = Boolean(lp.thumbnail_url && !lp.thumbnail_url.includes('farmer-community-banner'));
+            const fbThumb = hasFbCustomThumb ? lp.thumbnail_url : '';
+            const fbUrl = lp.media_url || '#';
+            const isInsta = String(fbUrl).includes('instagram.com');
+
+            const fbBox = document.createElement('div');
+            fbBox.style.position = 'relative';
+            fbBox.style.width = '100%';
+            fbBox.style.borderRadius = 'var(--radius-md)';
+            fbBox.style.overflow = 'hidden';
+            fbBox.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+
+            if (hasFbCustomThumb) {
+              fbBox.style.background = '#000';
+              fbBox.innerHTML = `
+                <div style="position:relative;width:100%;height:240px;">
+                  <img src="${fbThumb}" alt="${finalTitle}" style="width:100%;height:100%;object-fit:cover;opacity:0.92;">
+                  <a href="${fbUrl}" target="_blank" rel="noopener noreferrer" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:62px;height:62px;background:rgba(24,119,242,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.6rem;box-shadow:0 4px 18px rgba(0,0,0,0.4);border:2.5px solid #fff;text-decoration:none;">
+                    <i class="fa-solid fa-play" style="margin-left:4px;"></i>
+                  </a>
+                  <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.8);color:#fff;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:4px;">
+                    <i class="${isInsta ? 'fa-brands fa-instagram' : 'fa-brands fa-facebook'}" style="color:${isInsta ? '#E1306C' : '#1877F2'};"></i> ${isInsta ? 'Instagram Reel' : 'Facebook Video'}
+                  </div>
+                </div>
+                <div style="padding:12px;background:#F8FAFC;border-top:1px solid #E2E8F0;text-align:center;">
+                  <a href="${fbUrl}" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#1877F2;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(24,119,242,0.3);">
+                    <i class="${isInsta ? 'fa-brands fa-instagram' : 'fa-brands fa-facebook'}"></i> ${isInsta ? 'Instagram' : 'Facebook'} पर वीडियो/रील देखें
+                  </a>
+                </div>
+              `;
+            } else {
+              fbBox.style.background = isInsta 
+                ? 'linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #FCB045 100%)' 
+                : 'linear-gradient(135deg, #1877F2 0%, #0d233a 100%)';
+              fbBox.innerHTML = `
+                <div style="padding:2.5rem 1.5rem;text-align:center;color:#fff;">
+                  <a href="${fbUrl}" target="_blank" rel="noopener noreferrer" style="width:68px;height:68px;background:rgba(255,255,255,0.22);backdrop-filter:blur(8px);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;box-shadow:0 6px 20px rgba(0,0,0,0.3);border:3px solid #fff;text-decoration:none;margin-bottom:14px;">
+                    <i class="fa-solid fa-play" style="margin-left:4px;"></i>
+                  </a>
+                  <div style="font-weight:800;font-size:1.15rem;line-height:1.4;margin-bottom:8px;text-shadow:0 2px 4px rgba(0,0,0,0.3);">${finalTitle}</div>
+                  <div style="font-size:0.8rem;background:rgba(0,0,0,0.3);display:inline-block;padding:4px 14px;border-radius:var(--radius-full);font-weight:600;">
+                    <i class="${isInsta ? 'fa-brands fa-instagram' : 'fa-brands fa-facebook'}"></i> ${isInsta ? 'Instagram Reel' : 'Facebook Video / Reel'}
+                  </div>
+                </div>
+                <div style="padding:12px;background:#F8FAFC;border-top:1px solid #E2E8F0;text-align:center;">
+                  <a href="${fbUrl}" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#1877F2;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(24,119,242,0.3);">
+                    <i class="${isInsta ? 'fa-brands fa-instagram' : 'fa-brands fa-facebook'}"></i> ${isInsta ? 'Instagram' : 'Facebook'} पर वीडियो/रील देखें
+                  </a>
+                </div>
+              `;
+            }
+            mediaHolder.appendChild(fbBox);
+          } else if (lp.content_type === 'other') {
+            // Other / Universal Web Link View
+            const hasOtherCustomThumb = Boolean(lp.thumbnail_url && !lp.thumbnail_url.includes('farmer-community-banner'));
+            const linkThumb = hasOtherCustomThumb ? lp.thumbnail_url : '';
+            const linkUrl = lp.media_url || '#';
+
+            const linkBox = document.createElement('div');
+            linkBox.style.position = 'relative';
+            linkBox.style.width = '100%';
+            linkBox.style.borderRadius = 'var(--radius-md)';
+            linkBox.style.overflow = 'hidden';
+            linkBox.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+
+            if (hasOtherCustomThumb) {
+              linkBox.style.background = '#0f172a';
+              linkBox.innerHTML = `
+                <div style="position:relative;width:100%;height:240px;">
+                  <img src="${linkThumb}" alt="${finalTitle}" style="width:100%;height:100%;object-fit:cover;opacity:0.92;">
+                  <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;background:rgba(5,150,105,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;box-shadow:0 4px 18px rgba(0,0,0,0.4);border:2.5px solid #fff;text-decoration:none;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                  <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.8);color:#fff;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:4px;">
+                    <i class="fa-solid fa-globe" style="color:#10B981;"></i> Web Article
+                  </div>
+                </div>
+                <div style="padding:12px;background:#F8FAFC;border-top:1px solid #E2E8F0;text-align:center;">
+                  <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#059669;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(5,150,105,0.3);">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> मूल समाचार / आर्टिकल पढ़ें (Read Article)
+                  </a>
+                </div>
+              `;
+            } else {
+              linkBox.style.background = 'linear-gradient(135deg, #059669 0%, #0f172a 100%)';
+              linkBox.innerHTML = `
+                <div style="padding:2.5rem 1.5rem;text-align:center;color:#fff;">
+                  <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" style="width:68px;height:68px;background:rgba(255,255,255,0.22);backdrop-filter:blur(8px);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:1.8rem;box-shadow:0 6px 20px rgba(0,0,0,0.3);border:3px solid #fff;text-decoration:none;margin-bottom:14px;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                  <div style="font-weight:800;font-size:1.15rem;line-height:1.4;margin-bottom:8px;text-shadow:0 2px 4px rgba(0,0,0,0.3);">${finalTitle}</div>
+                  <div style="font-size:0.8rem;background:rgba(0,0,0,0.3);display:inline-block;padding:4px 14px;border-radius:var(--radius-full);font-weight:600;">
+                    <i class="fa-solid fa-globe" style="color:#34D399;"></i> Web Article / News Link
+                  </div>
+                </div>
+                <div style="padding:12px;background:#F8FAFC;border-top:1px solid #E2E8F0;text-align:center;">
+                  <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#059669;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(5,150,105,0.3);">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> मूल समाचार / आर्टिकल पढ़ें (Read Article)
+                  </a>
+                </div>
+              `;
+            }
+            mediaHolder.appendChild(linkBox);
           } else {
             // Standard Image View
-            const rawImg = lp.media_url || lp.thumbnail_url || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80';
+            const rawImg = lp.media_url || lp.thumbnail_url || defaultBanner;
             const imgElem = document.createElement('img');
             imgElem.className = 'pub-media-img';
             imgElem.alt = finalTitle;
             imgElem.src = rawImg;
             imgElem.onerror = function () {
               this.onerror = null;
-              this.src = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
+              this.src = defaultBanner;
             };
             mediaHolder.appendChild(imgElem);
           }

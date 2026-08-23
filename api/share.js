@@ -83,12 +83,13 @@ function fetchLandingPageFromSupabase(lpId) {
   });
 }
 
-const CRAWLER_USER_AGENTS = /facebookexternalhit|Facebot|Twitterbot|LinkedInBot|TelegramBot|Slackbot|Discordbot|SkypeUriPreview|Google-Structured-Data-Testing-Tool|Googlebot|bingbot|DuckDuckBot|Baiduspider|YandexBot/i;
+const CRAWLER_USER_AGENTS = /facebookexternalhit|Facebot|Twitterbot|LinkedInBot|TelegramBot|WhatsApp|Slackbot|Discordbot|SkypeUriPreview|Google-Structured-Data-Testing-Tool|Googlebot|bingbot|DuckDuckBot|Baiduspider|YandexBot/i;
 
 function isBotScraper(userAgent) {
-  if (!userAgent) return false;
-  // If it's a mobile browser UA (Chrome, Safari, Firefox, Android, iPhone), it's a human!
-  const isHumanBrowser = /Mozilla\/5\.0.*(Mobile|Android|iPhone|iPad|Safari|Chrome)/i.test(userAgent) && !/facebookexternalhit|Facebot|Twitterbot/i.test(userAgent);
+  if (!userAgent) return true; // Default to serving crawler HTML for unknown scrapers
+  if (/WhatsApp/i.test(userAgent)) return true;
+  if (/facebookexternalhit|Facebot|Twitterbot|LinkedInBot|TelegramBot|Slackbot|Discordbot/i.test(userAgent)) return true;
+  const isHumanBrowser = /Mozilla\/5\.0.*(Mobile|Android|iPhone|iPad|Safari|Chrome)/i.test(userAgent) && !/facebookexternalhit|Facebot|Twitterbot|WhatsApp/i.test(userAgent);
   if (isHumanBrowser) return false;
   return CRAWLER_USER_AGENTS.test(userAgent);
 }
@@ -130,33 +131,36 @@ module.exports = async function handler(req, res) {
   // 3. Determine Media & Thumbnail
   let finalOgImage = DEFAULT_FALLBACK_IMAGE;
 
-  if (lp?.og_image_url && (lp.og_image_url.startsWith('http://') || lp.og_image_url.startsWith('https://'))) {
-    // Ground Truth pre-computed OG image
+  const detectedYtId = extractYoutubeVideoId(queryYt) ||
+                       extractYoutubeVideoId(lp?.media_url) ||
+                       extractYoutubeVideoId(lp?.thumbnail_url) ||
+                       extractYoutubeVideoId(queryThumb);
+
+  const isYouTube = Boolean(detectedYtId || lp?.content_type === 'youtube');
+
+  // Check if custom thumbnail (Base64 data URI) was uploaded
+  const customThumbData = (lp?.thumbnail_url && lp.thumbnail_url.startsWith('data:image/'))
+    ? lp.thumbnail_url
+    : (lp?.media_url && lp.media_url.startsWith('data:image/'))
+    ? lp.media_url
+    : null;
+
+  if (customThumbData) {
+    // User explicitly uploaded custom thumbnail image: Served as real binary image by /api/image
+    finalOgImage = `${HOST_ORIGIN}/api/image?id=${encodeURIComponent(lp?.id || lpId || 'default')}`;
+  } else if (isYouTube && detectedYtId) {
+    // YouTube Video Post: High-Quality reliable thumbnail directly from YouTube HQ CDN
+    finalOgImage = `https://i.ytimg.com/vi/${detectedYtId}/hqdefault.jpg`;
+  } else if (lp?.og_image_url && (lp.og_image_url.startsWith('http://') || lp.og_image_url.startsWith('https://')) && !lp.og_image_url.includes('farmer-community-banner')) {
     finalOgImage = lp.og_image_url;
   } else {
-    // Dynamic Resolution Fallback for legacy records
-    const detectedYtId = extractYoutubeVideoId(queryYt) ||
-                         extractYoutubeVideoId(lp?.media_url) ||
-                         extractYoutubeVideoId(lp?.thumbnail_url) ||
-                         extractYoutubeVideoId(queryThumb);
-
-    const isYouTube = Boolean(detectedYtId || lp?.content_type === 'youtube');
-
-    if (isYouTube && detectedYtId) {
-      // YouTube Video Post: High-Quality reliable thumbnail
-      finalOgImage = `https://i.ytimg.com/vi/${detectedYtId}/hqdefault.jpg`;
+    const candidateImg = lp?.thumbnail_url || lp?.media_url || queryThumb;
+    if (candidateImg && candidateImg.startsWith('data:image/')) {
+      finalOgImage = `${HOST_ORIGIN}/api/image?id=${encodeURIComponent(lp?.id || lpId || 'default')}`;
+    } else if (candidateImg && (candidateImg.startsWith('http://') || candidateImg.startsWith('https://')) && !candidateImg.includes('farmer-community-banner')) {
+      finalOgImage = candidateImg;
     } else {
-      // Image Post
-      const candidateImg = lp?.thumbnail_url || lp?.media_url || queryThumb;
-
-      if (candidateImg && candidateImg.startsWith('data:image/')) {
-        // User uploaded Base64 image: Served as real binary image by /api/image
-        finalOgImage = `${HOST_ORIGIN}/api/image?id=${encodeURIComponent(lp?.id || lpId || 'default')}`;
-      } else if (candidateImg && (candidateImg.startsWith('http://') || candidateImg.startsWith('https://'))) {
-        finalOgImage = candidateImg;
-      } else {
-        finalOgImage = DEFAULT_FALLBACK_IMAGE;
-      }
+      finalOgImage = DEFAULT_FALLBACK_IMAGE;
     }
   }
 

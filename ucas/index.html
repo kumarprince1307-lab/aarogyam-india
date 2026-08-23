@@ -886,12 +886,18 @@
         <!-- 1. Content Type Switcher -->
         <div style="margin-bottom:1rem;">
           <label class="ucas-label" style="margin-bottom:6px;">1. मीडिया प्रकार चुनें (Content Type):</label>
-          <div style="display:flex;gap:8px;">
-            <button type="button" id="lp_btn_mode_image" class="ucas-btn ucas-btn-sm ucas-btn-primary" style="padding:6px 14px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="lp_btn_mode_image" class="ucas-btn ucas-btn-sm ucas-btn-primary" style="padding:6px 12px;">
               <i class="fa-regular fa-image"></i> 🖼️ Image Upload
             </button>
-            <button type="button" id="lp_btn_mode_youtube" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:6px 14px;">
-              <i class="fa-brands fa-youtube" style="color:#EF4444;"></i> 🎥 YouTube Link
+            <button type="button" id="lp_btn_mode_youtube" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:6px 12px;">
+              <i class="fa-brands fa-youtube" style="color:#EF4444;"></i> 🎥 YouTube Video
+            </button>
+            <button type="button" id="lp_btn_mode_facebook" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:6px 12px;">
+              <i class="fa-brands fa-facebook" style="color:#1877F2;"></i> 📸 Facebook / Insta Reel
+            </button>
+            <button type="button" id="lp_btn_mode_other" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="padding:6px 12px;">
+              <i class="fa-solid fa-globe" style="color:#059669;"></i> 🌐 Other / Web Link
             </button>
           </div>
         </div>
@@ -901,17 +907,51 @@
           <div>
             <!-- Image Upload Section -->
             <div id="lp_section_image_upload">
-              <label class="ucas-label">इमेज चुनें (Upload Image):</label>
+              <label class="ucas-label">इमेज चुनें (Upload Image): *</label>
               <input type="file" id="lp_image_file_input" class="ucas-input" accept="image/*" style="padding:6px;">
               <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">JPG, PNG या WEBP इमेज चुनें।</div>
             </div>
 
             <!-- YouTube Input Section -->
             <div id="lp_section_youtube_input" style="display:none;">
-              <label class="ucas-label">YouTube वीडियो लिंक दर्ज करें:</label>
+              <label class="ucas-label">YouTube वीडियो / शॉर्ट्स लिंक दर्ज करें: *</label>
               <input type="url" id="lp_youtube_url_input" class="ucas-input" placeholder="https://youtu.be/... या https://youtube.com/shorts/...">
               <div id="lp_yt_helper_text" style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">
                 वीडियो ID पहचानकर हाई-रेजोल्यूशन थंबनेल स्वतः लग जाएगा।
+              </div>
+            </div>
+
+            <!-- Facebook & Instagram Input Section -->
+            <div id="lp_section_facebook_input" style="display:none;">
+              <label class="ucas-label">Facebook Video / Instagram Reel लिंक दर्ज करें: *</label>
+              <input type="url" id="lp_facebook_url_input" class="ucas-input" placeholder="https://fb.watch/... या https://instagram.com/reel/...">
+              <div id="lp_fb_helper_text" style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">
+                फेसबुक वीडियो या इंस्टाग्राम रील का सार्वजनिक लिंक दर्ज करें।
+              </div>
+            </div>
+
+            <!-- Other / Universal Web Link Section -->
+            <div id="lp_section_other_input" style="display:none;">
+              <label class="ucas-label">वेबसाइट / न्यूज़ / ब्लॉग लिंक दर्ज करें: *</label>
+              <input type="url" id="lp_other_url_input" class="ucas-input" placeholder="https://example.com/news-article-or-blog">
+              <div id="lp_other_helper_text" style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">
+                किसी भी समाचार, ब्लॉग, पोस्ट या वेबसाइट का लिंक यहाँ पेस्ट करें।
+              </div>
+            </div>
+
+            <!-- Optional Custom Thumbnail Section for Video/Link posts -->
+            <div id="lp_section_custom_thumb_upload" style="display:none;margin-top:10px;background:#F8FAFC;border:1px dashed #CBD5E1;border-radius:var(--radius-sm);padding:8px 10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <label class="ucas-label" style="font-size:0.8rem;margin:0;">
+                  🖼️ कस्टम थंबनेल पोस्टर (Optional Custom Thumbnail):
+                </label>
+                <button type="button" id="lp_btn_clear_custom_thumb" class="ucas-btn ucas-btn-sm" style="display:none;padding:1px 6px;font-size:0.72rem;background:#FEE2E2;color:#DC2626;border:none;">
+                  हटाएं (Remove)
+                </button>
+              </div>
+              <input type="file" id="lp_custom_thumb_file_input" class="ucas-input" accept="image/*" style="padding:4px 6px;font-size:0.8rem;margin-top:4px;">
+              <div style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;">
+                यदि आप अपना कस्टम थंबनेल पोस्टर लगाना चाहते हैं, तो यहाँ इमेज अपलोड करें (वैकल्पिक)। खाली छोड़ने पर वीडियो/डिफ़ॉल्ट थंबनेल स्वतः उपयोग होगा।
               </div>
             </div>
 
@@ -944,7 +984,7 @@
             <div id="lp_preview_media_container">
               <div style="background:#F1F5F9;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:2rem;text-align:center;color:var(--text-muted);">
                 <i class="fa-regular fa-image" style="font-size:2rem;margin-bottom:6px;display:block;"></i>
-                <span style="font-size:0.85rem;">इमेज या YouTube लिंक जोड़ने पर पूर्वावलोकन यहाँ दिखेगा</span>
+                <span style="font-size:0.85rem;">इमेज या लिंक जोड़ने पर पूर्वावलोकन यहाँ दिखेगा</span>
               </div>
             </div>
           </div>
