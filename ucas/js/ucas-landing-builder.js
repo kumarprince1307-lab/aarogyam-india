@@ -363,6 +363,7 @@
     try {
       if (editingLandingPageId) {
         // =======================
+        const lpId = editingLandingPageId;
         // Compute Social OG Metadata (Single Source of Truth)
         const cleanTitle = (titleInput ? titleInput.trim() : `${categoryInput.toUpperCase()} Campaign (${lpId})`);
         const ogTitle = cleanTitle.includes('Aarogyam India') ? cleanTitle : `${cleanTitle} | Aarogyam India`;
