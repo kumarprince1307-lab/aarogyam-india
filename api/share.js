@@ -149,12 +149,6 @@ module.exports = async function handler(req, res) {
   const destParams = new URLSearchParams();
   if (lpId) destParams.set('id', lpId);
   if (finalShareId) destParams.set('share_id', finalShareId);
-  if (!lp) {
-    if (finalTitle) destParams.set('title', finalTitle);
-    if (finalCategory) destParams.set('cat', finalCategory);
-    if (detectedYtId) destParams.set('yt', detectedYtId);
-    if (finalDesc) destParams.set('desc', finalDesc);
-  }
 
   const destinationLandingUrl = `${HOST_ORIGIN}/ucas/landing.html?${destParams.toString()}`;
   const canonicalShareUrl = `${HOST_ORIGIN}/api/share?id=${encodeURIComponent(lpId || '')}${finalShareId ? '&share_id=' + encodeURIComponent(finalShareId) : ''}`;
