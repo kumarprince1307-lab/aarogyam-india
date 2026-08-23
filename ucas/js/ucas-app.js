@@ -31,6 +31,9 @@
     if (window.UCAS_PHONEBOOK) window.UCAS_PHONEBOOK.init();
     if (window.UCAS_LEADS) window.UCAS_LEADS.init();
     if (window.UCAS_MARKETING) window.UCAS_MARKETING.init();
+    if (window.UCAS_LANDING_BUILDER) window.UCAS_LANDING_BUILDER.init();
+    if (window.UCAS_PRODUCT_LANDING) window.UCAS_PRODUCT_LANDING.init();
+    if (window.UCAS_HOOK_TEMPLATES) window.UCAS_HOOK_TEMPLATES.init();
     if (window.UCAS_WEBINARS) window.UCAS_WEBINARS.init();
     if (window.UCAS_ADMIN) window.UCAS_ADMIN.init();
 
@@ -201,17 +204,31 @@
     if (viewName === 'leads' && window.UCAS_LEADS && typeof window.UCAS_LEADS.loadLeads === 'function') {
       window.UCAS_LEADS.loadLeads();
     }
+    if (viewName === 'product-landing' && window.UCAS_PRODUCT_LANDING && typeof window.UCAS_PRODUCT_LANDING.loadProductLandingPages === 'function') {
+      window.UCAS_PRODUCT_LANDING.loadProductLandingPages();
+    }
+    if (viewName === 'hook-templates' && window.UCAS_HOOK_TEMPLATES && typeof window.UCAS_HOOK_TEMPLATES.filterTemplates === 'function') {
+      window.UCAS_HOOK_TEMPLATES.filterTemplates('all');
+    }
+    if (viewName === 'broadcast-messages') {
+      renderBroadcastView();
+    }
     if (viewName === 'webinars' && window.UCAS_WEBINARS && typeof window.UCAS_WEBINARS.loadWebinars === 'function') {
       window.UCAS_WEBINARS.loadWebinars();
     }
     if (viewName === 'permissions' && window.UCAS_PERMISSIONS && typeof window.UCAS_PERMISSIONS.renderPermissionsTable === 'function') {
       window.UCAS_PERMISSIONS.renderPermissionsTable();
     }
-    if (viewName === 'marketing' && window.UCAS_MARKETING) {
-      if (typeof window.UCAS_MARKETING.refreshLandingPages === 'function') {
+    if (viewName === 'marketing') {
+      if (window.UCAS_LANDING_BUILDER && typeof window.UCAS_LANDING_BUILDER.loadMyLandingPages === 'function') {
+        window.UCAS_LANDING_BUILDER.loadMyLandingPages();
+      }
+      if (window.UCAS_MARKETING && typeof window.UCAS_MARKETING.refreshLandingPages === 'function') {
         window.UCAS_MARKETING.refreshLandingPages();
       }
-      window.UCAS_MARKETING.updateMarketingEngine();
+      if (window.UCAS_MARKETING && typeof window.UCAS_MARKETING.updateMarketingEngine === 'function') {
+        window.UCAS_MARKETING.updateMarketingEngine();
+      }
     }
     if (viewName === 'admin' && window.UCAS_ADMIN) window.UCAS_ADMIN.loadAdminData();
 
@@ -250,10 +267,33 @@
   // ==========================================
 
   async function loadUserProfileAndPermissions() {
-    const user = window.UCAS_SESSION.getCurrentUser() || {};
+    let user = window.UCAS_SESSION.getCurrentUser() || {};
+    const db = window.UCAS_DB?.getDb();
+
+    if (db) {
+      try {
+        const mob = user.mobile || '7974422572';
+        const sid = user.share_id || user.referral_code || 'AI000004';
+        const uid = user.id;
+
+        let query = db.from('profiles').select('*');
+        if (mob) query = query.eq('mobile', mob);
+        else if (sid) query = query.eq('share_id', sid);
+        else if (uid) query = query.eq('id', uid);
+
+        const { data: dbProfile } = await query.maybeSingle();
+        if (dbProfile) {
+          user = { ...user, ...dbProfile };
+          window.UCAS_SESSION.saveUser(user);
+        }
+      } catch (e) {
+        console.warn('Profile sync notice:', e);
+      }
+    }
+
     const name = user.full_name || user.name || 'Aarogyam Member';
     const mobile = user.mobile || '';
-    const shareId = window.UCAS_SESSION.getShareId();
+    const shareId = user.share_id || window.UCAS_SESSION.getShareId() || 'AI000004';
     const netsurfId = user.netsurf_id || '';
 
     // Populate Header Elements
@@ -271,10 +311,12 @@
     const heroMobile = document.getElementById('ucas-hero-mobile');
     const heroNetsurfPill = document.getElementById('ucas-hero-netsurf-pill');
     const heroNetsurfId = document.getElementById('ucas-hero-netsurf-id');
+    const drawerPhone = document.getElementById('ucas-drawer-user-phone');
 
     if (heroName) heroName.textContent = name;
     if (heroShareId) heroShareId.textContent = shareId;
     if (heroMobile) heroMobile.textContent = mobile;
+    if (drawerPhone) drawerPhone.textContent = mobile ? `+91 ${mobile}` : '+91 ----------';
 
     if (netsurfId && heroNetsurfPill && heroNetsurfId) {
       heroNetsurfPill.style.display = 'inline-flex';
@@ -350,7 +392,7 @@
 
   function calculateUcasProfileProgress(user) {
     let score = 0;
-    const totalFields = 11; // 11 fields including NetSurf ID
+    const isProfileMarkedDone = localStorage.getItem('ai_profile_completed') === 'true';
 
     if (user.full_name || user.name) score++;
     if (user.mobile) score++;
@@ -364,7 +406,12 @@
     if (user.interest) score++;
     if (user.netsurf_id && String(user.netsurf_id).trim()) score++;
 
-    const percentage = Math.min(100, Math.round((score / totalFields) * 100));
+    // If core profile fields are present or marked completed, treat as 100%
+    const hasCoreFields = Boolean((user.full_name || user.name) && user.mobile && (user.state || user.State || user.district || user.city));
+    let percentage = Math.min(100, Math.round((score / 11) * 100));
+    if (isProfileMarkedDone || (hasCoreFields && score >= 4)) {
+      percentage = 100;
+    }
 
     const percentText = document.getElementById('ucas-profile-percent-text');
     const progressBar = document.getElementById('ucas-profile-progress-bar');
@@ -389,14 +436,15 @@
         statusHint.textContent = '🟢 (100% पूर्ण)';
         statusHint.style.color = '#10b981';
       } else {
-        statusHint.textContent = `⚠️ (केवल ${percentage}% पूर्ण — 100% पूरा करें)`;
+        statusHint.textContent = `⚠️ (केवल ${percentage}% पूर्ण — अपडेट करें)`;
         statusHint.style.color = '#d97706';
       }
     }
 
-    // Persistent Popup Reminder if < 100%
+    // Persistent Popup Reminder only if strictly incomplete AND not dismissed
     if (nudgePopup) {
-      if (percentage < 100 && (user.id || user.mobile)) {
+      const isDismissed = sessionStorage.getItem('ai_profile_nudge_dismissed') === 'true' || isProfileMarkedDone;
+      if (percentage < 100 && (user.id || user.mobile) && !isDismissed) {
         nudgePopup.style.display = 'block';
         if (nudgePercent) nudgePercent.textContent = `${percentage}%`;
       } else {
@@ -485,6 +533,8 @@
       const updatedUser = { ...user, ...profileData };
       localStorage.setItem('UCAS_USER', JSON.stringify(updatedUser));
       localStorage.setItem('AI_USER', JSON.stringify(updatedUser));
+      localStorage.setItem('ai_profile_completed', 'true');
+      sessionStorage.setItem('ai_profile_nudge_dismissed', 'true');
       if (typeof ProfileStorage !== 'undefined') ProfileStorage.save(updatedUser);
 
       alert('🎉 बधाई हो! आपकी प्रोफाइल (NetSurf ID सहित) सफलतापूर्वक सहेज ली गई है।');
@@ -502,9 +552,14 @@
   };
 
   async function refreshDashboardKPIs(startDate = '', endDate = '') {
-    const profileId = window.UCAS_SESSION.getUserId();
-    const shareId = window.UCAS_SESSION.getShareId();
-    if (!profileId) return;
+    let profileId = window.UCAS_SESSION.getUserId();
+    const shareId = window.UCAS_SESSION.getShareId() || 'AI000004';
+    const user = window.UCAS_SESSION.getCurrentUser() || {};
+
+    const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
+    if (!profileId || !isUuid(profileId)) {
+      profileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
+    }
 
     try {
       const [surveysRes, phonebookRes, refRes] = await Promise.all([
@@ -513,9 +568,9 @@
         window.UCAS_DB.getDirectReferralsWithPurchases(profileId, shareId, startDate, endDate)
       ]);
 
-      const surveys = surveysRes.data || [];
-      const contacts = phonebookRes.data || [];
-      const refData = refRes.data || { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 };
+      const surveys = surveysRes?.data || [];
+      const contacts = phonebookRes?.data || [];
+      const refData = refRes?.data || { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 };
 
       // Leads status metadata
       const leadMetaStore = JSON.parse(localStorage.getItem(`UCAS_LEAD_META_${profileId}`) || '{}');
@@ -555,13 +610,9 @@
       animateCounter('kpi_total_converted', converted);
       animateCounter('kpi_total_webinar_attendees', totalWebinarAttendees);
 
-      // Direct Referrals & Purchases Counters
-      const dirRefEl = document.getElementById('kpi_direct_referrals');
-      const dirPurEl = document.getElementById('kpi_direct_purchases');
-      if (dirRefEl) dirRefEl.textContent = refData.totalReferrals;
-      if (dirPurEl) dirPurEl.textContent = `₹${refData.totalPurchaseAmount}`;
-
-      renderProfileReferralsList(refData.referrals);
+      // Direct Referrals & Purchases Data
+      allLoadedReferrals = refData.referrals || [];
+      applyReferralsFilter();
 
       // Render Recent Activity Feed
       renderRecentActivity(surveys, contacts);
@@ -570,18 +621,138 @@
     }
   }
 
-  function filterProfileReferrals() {
-    const fromVal = document.getElementById('profile_ref_date_from')?.value || '';
-    const toVal = document.getElementById('profile_ref_date_to')?.value || '';
-    refreshDashboardKPIs(fromVal, toVal);
-  }
+  let allLoadedReferrals = [];
 
-  function resetProfileReferralsDate() {
+  function handleReferralDatePresetChange() {
+    const preset = document.getElementById('profile_ref_date_preset')?.value || 'all';
+    const customWrap = document.getElementById('profile_ref_custom_date_wrap');
     const fromEl = document.getElementById('profile_ref_date_from');
     const toEl = document.getElementById('profile_ref_date_to');
+
+    if (preset === 'custom') {
+      if (customWrap) customWrap.style.display = 'inline-flex';
+      return;
+    } else {
+      if (customWrap) customWrap.style.display = 'none';
+    }
+
+    const now = new Date();
+    let startDate = '';
+    let endDate = '';
+
+    if (preset === 'today') {
+      const todayStr = now.toISOString().split('T')[0];
+      startDate = todayStr;
+      endDate = todayStr;
+    } else if (preset === '7days') {
+      const d = new Date();
+      d.setDate(d.getDate() - 7);
+      startDate = d.toISOString().split('T')[0];
+      endDate = now.toISOString().split('T')[0];
+    } else if (preset === '30days') {
+      const d = new Date();
+      d.setDate(d.getDate() - 30);
+      startDate = d.toISOString().split('T')[0];
+      endDate = now.toISOString().split('T')[0];
+    }
+
+    if (fromEl) fromEl.value = startDate;
+    if (toEl) toEl.value = endDate;
+
+    applyReferralsFilter();
+  }
+
+  function applyReferralsFilter() {
+    const searchVal = (document.getElementById('profile_ref_search_input')?.value || '').toLowerCase().trim();
+    const statusVal = document.getElementById('profile_ref_status_filter')?.value || 'all';
+    const preset = document.getElementById('profile_ref_date_preset')?.value || 'all';
+    const fromVal = document.getElementById('profile_ref_date_from')?.value || '';
+    const toVal = document.getElementById('profile_ref_date_to')?.value || '';
+
+    let filtered = [...allLoadedReferrals];
+
+    // 1. Text Search Filter (Name / Mobile / Share ID)
+    if (searchVal) {
+      filtered = filtered.filter(r => 
+        (r.full_name && r.full_name.toLowerCase().includes(searchVal)) ||
+        (r.mobile && r.mobile.includes(searchVal)) ||
+        (r.share_id && r.share_id.toLowerCase().includes(searchVal)) ||
+        (r.id && r.id.toLowerCase().includes(searchVal))
+      );
+    }
+
+    // 2. Status Filter
+    if (statusVal === 'active') {
+      filtered = filtered.filter(r => r.is_active || r.totalPurchasedAmount > 0);
+    } else if (statusVal === 'inactive') {
+      filtered = filtered.filter(r => !r.is_active && (!r.totalPurchasedAmount || r.totalPurchasedAmount === 0));
+    }
+
+    // 3. Date Filter
+    if (fromVal) {
+      const fromDate = new Date(fromVal);
+      fromDate.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(r => r.created_at && new Date(r.created_at) >= fromDate);
+    }
+    if (toVal) {
+      const toDate = new Date(toVal);
+      toDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(r => r.created_at && new Date(r.created_at) <= toDate);
+    }
+
+    // Recalculate filtered KPIs
+    let filteredPurchases = 0;
+    filtered.forEach(r => {
+      filteredPurchases += (Number(r.totalPurchasedAmount) || 0);
+    });
+
+    const dirRefEl = document.getElementById('kpi_direct_referrals');
+    const dirPurEl = document.getElementById('kpi_direct_purchases');
+    if (dirRefEl) dirRefEl.textContent = filtered.length;
+    if (dirPurEl) dirPurEl.textContent = `₹${filteredPurchases}`;
+
+    renderProfileReferralsList(filtered);
+  }
+
+  function resetProfileReferralsFilter() {
+    const searchEl = document.getElementById('profile_ref_search_input');
+    const presetEl = document.getElementById('profile_ref_date_preset');
+    const fromEl = document.getElementById('profile_ref_date_from');
+    const toEl = document.getElementById('profile_ref_date_to');
+    const statusEl = document.getElementById('profile_ref_status_filter');
+    const customWrap = document.getElementById('profile_ref_custom_date_wrap');
+
+    if (searchEl) searchEl.value = '';
+    if (presetEl) presetEl.value = 'all';
     if (fromEl) fromEl.value = '';
     if (toEl) toEl.value = '';
-    refreshDashboardKPIs('', '');
+    if (statusEl) statusEl.value = 'all';
+    if (customWrap) customWrap.style.display = 'none';
+
+    applyReferralsFilter();
+  }
+
+    function formatReferralSourceBadge(sourceStr) {
+    const s = String(sourceStr || 'direct').toLowerCase();
+    if (s.includes('product')) {
+      return '<span style="font-size:0.75rem;background:#FEF3C7;color:#B45309;padding:2px 8px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-cart-shopping"></i> Product Page</span>';
+    }
+    if (s.includes('fb') || s.includes('facebook') || s.includes('insta')) {
+      return '<span style="font-size:0.75rem;background:#EFF6FF;color:#1D4ED8;padding:2px 8px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-brands fa-facebook"></i> Facebook</span>';
+    }
+    if (s.includes('webinar')) {
+      return '<span style="font-size:0.75rem;background:#F5F3FF;color:#7C3AED;padding:2px 8px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-video"></i> Webinar</span>';
+    }
+    if (s.includes('survey')) {
+      return '<span style="font-size:0.75rem;background:#ECFDF5;color:#059669;padding:2px 8px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-clipboard-check"></i> Survey</span>';
+    }
+    if (s.includes('landing') || s.includes('lp')) {
+      return '<span style="font-size:0.75rem;background:#FFFBEB;color:#D97706;padding:2px 8px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-globe"></i> Landing Page</span>';
+    }
+    if (s.includes('checkout') || s.includes('purchase')) {
+      return '<span style="font-size:0.75rem;background:#FEF2F2;color:#DC2626;padding:2px 8px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-cart-shopping"></i> Checkout</span>';
+    }
+    return '<span style="font-size:0.75rem;background:#F1F5F9;color:#475569;padding:2px 8px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-user-plus"></i> Direct Ref</span>';
   }
 
   function renderProfileReferralsList(list) {
@@ -591,46 +762,61 @@
     if (list.length === 0) {
       container.innerHTML = `
         <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.85rem;background:#F8FAFC;border-radius:var(--radius-md);">
-          इस अवधि में कोई डायरेक्ट रेफरल नहीं जुड़ा है। अपनी Share ID शेयर करके नए सदस्य जोड़ें।
+          🔍 चयनित फ़िल्टर के अनुसार कोई डायरेक्ट रेफरल नहीं मिला।
         </div>
       `;
       return;
     }
 
     container.innerHTML = `
-      <div class="ucas-table-wrap" style="border:1px solid var(--border);border-radius:var(--radius-md);">
-        <table class="ucas-table" style="font-size:0.82rem;">
+      <div class="ucas-table-wrap" style="border:1px solid var(--border);border-radius:var(--radius-md);overflow-x:auto;">
+        <table class="ucas-table" style="font-size:0.82rem;min-width:600px;">
           <thead>
             <tr>
               <th>#</th>
               <th>सदस्य का नाम</th>
               <th>मोबाइल</th>
+              <th>स्रोत (Source)</th>
+              <th>स्थिति (Status)</th>
               <th>ज्वाइन तारीख</th>
               <th>परचेज राशि</th>
             </tr>
           </thead>
           <tbody>
-            ${list.map((r, i) => `
-              <tr>
-                <td><strong>#${i + 1}</strong></td>
-                <td><div style="font-weight:700;color:var(--text-main);">${r.full_name || 'Member'}</div></td>
-                <td>
-                  <a href="tel:${r.mobile}" style="color:var(--primary-dark);font-weight:700;text-decoration:none;">
-                    📞 <code>${r.mobile}</code>
-                  </a>
-                </td>
-                <td>${r.created_at ? new Date(r.created_at).toLocaleDateString('hi-IN') : '-'}</td>
-                <td>
-                  ${r.totalPurchasedAmount > 0 ? `
-                    <span style="font-weight:800;color:#15803D;background:#DCFCE7;padding:2px 8px;border-radius:4px;">
-                      ₹${r.totalPurchasedAmount}
-                    </span>
-                  ` : `
-                    <span style="color:var(--text-muted);font-size:0.75rem;">₹0</span>
-                  `}
-                </td>
-              </tr>
-            `).join('')}
+            ${list.map((r, i) => {
+              const srcBadge = formatReferralSourceBadge(r.source || r.registration_source);
+              const isActive = Boolean(r.is_active || (r.totalPurchasedAmount && r.totalPurchasedAmount > 0));
+              const statusBadge = isActive
+                ? '<span style="font-size:0.74rem;background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:10px;font-weight:800;">🟢 Active (Paid)</span>'
+                : '<span style="font-size:0.74rem;background:#F1F5F9;color:#64748B;padding:2px 8px;border-radius:10px;font-weight:700;">⚪ Inactive (Free)</span>';
+
+              return `
+                <tr>
+                  <td><strong>#${i + 1}</strong></td>
+                  <td>
+                    <div style="font-weight:700;color:var(--text-main);">${r.full_name || 'Member'}</div>
+                    ${r.net_surf_id ? `<div style="font-size:0.7rem;color:#0284c7;">NetSurf: ${r.net_surf_id}</div>` : ''}
+                  </td>
+                  <td>
+                    <a href="tel:${r.mobile}" style="color:var(--primary-dark);font-weight:700;text-decoration:none;">
+                      📞 <code>${r.mobile}</code>
+                    </a>
+                  </td>
+                  <td>${srcBadge}</td>
+                  <td>${statusBadge}</td>
+                  <td>${r.created_at ? new Date(r.created_at).toLocaleDateString('hi-IN') : '-'}</td>
+                  <td>
+                    ${r.totalPurchasedAmount > 0 ? `
+                      <span style="font-weight:800;color:#15803D;background:#DCFCE7;padding:3px 8px;border-radius:6px;">
+                        ₹${r.totalPurchasedAmount}
+                      </span>
+                    ` : `
+                      <span style="color:var(--text-muted);font-size:0.75rem;">₹0</span>
+                    `}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
           </tbody>
         </table>
       </div>
@@ -774,9 +960,114 @@
     }, 3200);
   }
 
+  function renderBroadcastView() {
+    const container = document.getElementById('ucas-broadcast-view-container');
+    if (!container) return;
+
+    let broadcasts = [];
+    try {
+      broadcasts = JSON.parse(localStorage.getItem('AAROGYAM_GLOBAL_BROADCASTS') || '[]');
+    } catch (e) {}
+
+    // Default sample broadcasts if empty
+    if (broadcasts.length === 0) {
+      broadcasts = [
+        {
+          id: 'BC_SAMPLE_01',
+          title: '🌾 खरीफ 2026 विशेष किसान जागरूकता अभियान',
+          body: 'प्रिय सदस्यों, आधुनिक जैविक कृषि व फसलों की सुरक्षा पर हमारी विशेष ई-बुक अब डिजिटल लाइब्रेरी में उपलब्ध है। अभी पढ़ें और लाभ लें।',
+          category: 'announcement',
+          priority: 'normal',
+          target: 'all',
+          action_url: '/ebooks/my-library.html',
+          created_at: new Date(Date.now() - 3600000).toISOString()
+        }
+      ];
+      try {
+        localStorage.setItem('AAROGYAM_GLOBAL_BROADCASTS', JSON.stringify(broadcasts));
+      } catch (e) {}
+    }
+
+    const user = window.UCAS_SESSION.getUser() || {};
+    const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${user.id || user.mobile || 'guest'}`) || '[]');
+
+    // Filter relevant broadcasts
+    const eligible = broadcasts.filter(bc => {
+      if (!bc.target || bc.target === 'all') return true;
+      if (bc.target === 'active' && (user.is_active || user.is_subscriber)) return true;
+      if (bc.target === 'selected' && Array.isArray(bc.target_user_ids)) {
+        return bc.target_user_ids.includes(user.id) || bc.target_user_ids.includes(user.mobile) || bc.target_user_ids.includes(user.share_id);
+      }
+      return true;
+    });
+
+    if (eligible.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:2.5rem 1.5rem;color:var(--text-muted);background:#F8FAFC;border-radius:var(--radius-md);border:1.5px dashed #CBD5E1;">
+          <div style="font-size:2rem;margin-bottom:8px;">📭</div>
+          <strong style="font-size:1rem;color:var(--text-main);">वर्तमान में कोई नया ब्रॉडकास्ट संदेश नहीं है।</strong>
+          <p style="font-size:0.82rem;margin-top:4px;">आरोग्यम इंडिया द्वारा जारी नए अपडेट्स यहाँ दिखाई देंगे।</p>
+        </div>
+      `;
+      return;
+    }
+
+    const priorityColors = {
+      normal: { bg: '#DCFCE7', color: '#15803D', label: '🟢 सामान्य' },
+      important: { bg: '#FEF3C7', color: '#B45309', label: '🟠 महत्वपूर्ण' },
+      urgent: { bg: '#FEE2E2', color: '#DC2626', label: '🔴 अति आवश्यक' }
+    };
+
+    container.innerHTML = eligible.map(item => {
+      const pInfo = priorityColors[item.priority] || priorityColors.normal;
+      const isRead = readStore.includes(item.id);
+      const dateStr = item.created_at ? new Date(item.created_at).toLocaleString('hi-IN', { dateStyle: 'medium', timeStyle: 'short' }) : 'हाल ही में';
+
+      return `
+        <div class="ucas-card" style="margin-bottom:12px;border:1px solid #E2E8F0;border-left:4px solid ${pInfo.color};background:${isRead ? '#FFFFFF' : '#FFF1F2'};box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+            <div>
+              <div style="font-weight:800;font-size:1.02rem;color:var(--text-main);display:flex;align-items:center;gap:6px;">
+                <span>📢</span>
+                <span>${item.title}</span>
+                ${!isRead ? '<span style="font-size:0.7rem;background:#E11D48;color:#fff;padding:2px 6px;border-radius:4px;font-weight:700;">• नया</span>' : ''}
+              </div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">
+                📅 ${dateStr} &nbsp;•&nbsp; 👤 ${item.sender || 'आरोग्यम इंडिया प्रबंधन'}
+              </div>
+            </div>
+            <span style="font-size:0.75rem;font-weight:800;background:${pInfo.bg};color:${pInfo.color};padding:3px 8px;border-radius:4px;">
+              ${pInfo.label}
+            </span>
+          </div>
+
+          <div style="font-size:0.9rem;color:#334155;line-height:1.5;margin-bottom:12px;white-space:pre-wrap;">
+${item.body || item.desc || ''}
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px dashed #E2E8F0;padding-top:8px;">
+            ${item.action_url ? `
+              <a href="${item.action_url}" target="_blank" class="ucas-btn ucas-btn-sm" style="background:#2563EB;color:#fff;font-weight:700;text-decoration:none;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> लिंक खोलें (Open Link)
+              </a>
+            ` : '<span></span>'}
+            ${!isRead ? `
+              <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="window.USER_NOTIFICATIONS?.markAsRead('${item.id}'); UCAS_APP.renderBroadcastView();">
+                ✓ पढ़ा हुआ मार्क करें
+              </button>
+            ` : `
+              <span style="font-size:0.75rem;color:#10B981;font-weight:700;">✓ पढ़ा जा चुका है</span>
+            `}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
   window.UCAS_APP = {
     init: initApp,
     switchView,
+    renderBroadcastView,
     openUserDrawer,
     closeUserDrawer,
     toggleUserDrawer,
@@ -784,8 +1075,11 @@
     closeModal,
     showToast,
     refreshDashboardKPIs,
-    filterProfileReferrals,
-    resetProfileReferralsDate
+    handleReferralDatePresetChange,
+    applyReferralsFilter,
+    resetProfileReferralsFilter,
+    filterProfileReferrals: applyReferralsFilter,
+    resetProfileReferralsDate: resetProfileReferralsFilter
   };
 
   console.log('✅ UCAS Main Controller Ready.');

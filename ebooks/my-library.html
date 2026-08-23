@@ -64,6 +64,19 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         if (popup) popup.style.display = 'flex';
     }
 
+    // Global Sidebar Menu Toggle Function
+    function toggleMenu() {
+        const sideMenu = document.getElementById('sideMenu');
+        const overlay = document.getElementById('sideMenuOverlay');
+        if (sideMenu) {
+            const isActive = sideMenu.classList.toggle('active');
+            if (overlay) {
+                overlay.style.display = isActive ? 'block' : 'none';
+            }
+        }
+    }
+    window.toggleMenu = toggleMenu;
+
     // Function to close the login popup
     function closeLoginPopup() {
         const popup = document.getElementById('login-popup-overlay');
@@ -128,44 +141,157 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         <h1>My Library</h1>
     </div>
 
-    <!-- Desktop Navigation Links (Fully Restored & Upgraded) -->
-    <nav class="desktop-nav">
-        <a href="/index.html"><i class="fa-solid fa-house"></i> Home</a>
-        <a href="/ucas/index.html"><i class="fa-solid fa-chart-pie"></i> UCAS Profile</a>
-        <a href="/ebooks/my-library.html" class="active"><i class="fa-solid fa-book-open"></i> My Library</a>
-        <a href="../ebooks/purchases.html"><i class="fa-solid fa-file-invoice"></i> My Purchase</a>
-        <a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a>
-        <a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-        <a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms</a>
-        <a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping</a>
-        
-        <!-- PWA Install Button for Desktop -->
-        <button id="desktop-pwa-install-btn" class="pwa-install-btn" style="display: none; margin-left: 8px;" title="Install Aarogyam India App">
-            <span>📱</span> Install App
-        </button>
-
-        <!-- SEPARATE LOGIN/PROFILE BUTTONS FOR DESKTOP -->
-        <button id="desktop-login-btn" onclick="openLoginPopup()" style="background: #28a745; color: white; display: none; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: 8px;">
-            <i class="fa-solid fa-right-to-bracket"></i> लॉगिन करें
-        </button>
-        <button id="desktop-logout-btn" onclick="logoutUser()" style="background: #e81717; color: white; display: none; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: 8px;">
-            <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट
-        </button>
-    </nav>
+    <!-- Clean Header (Navigation lives cleanly inside Side Drawer) -->
 
     <div style="display: flex; align-items: center; gap: 10px;">
-        <!-- Personal Notification Bell Button -->
-        <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications">
-            <i class="fa-regular fa-bell"></i>
-            <span class="user-notif-badge" style="display: none;">0</span>
+        <!-- Personal Notification Bell Button (Green as requested) -->
+        <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1.5px solid #10B981; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.15rem; transition: transform 0.2s; position: relative;">
+            <i class="fa-solid fa-bell" style="color: #10B981;"></i>
+            <span class="user-notif-badge" style="display: none; position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.7rem; font-weight: 800; padding: 2px 6px;">0</span>
         </button>
         <button class="back-btn" onclick="window.location.href='/index.html'"><i class="fa-solid fa-arrow-left"></i></button>
-        <button class="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+        <button class="menu-btn" onclick="toggleMenu()" title="मेनू खोलें" aria-label="Toggle Menu"><i class="fa-solid fa-bars"></i></button>
     </div>
 </header>
 
-<!-- 3. Slide-out Mobile & Quick Menu Drawer (Right Side - Upgraded) -->
-    <div class="side-menu" id="sideMenu">
+<!-- 2.1 DESKTOP LEFT SIDEBAR (>= 768px - Identical to My Profile / UCAS) -->
+<aside class="library-sidebar" id="libraryDesktopSidebar">
+    <div>
+      <div class="library-nav-section-title">Library Destinations</div>
+      <ul class="library-nav-list">
+        <li class="library-nav-item active">
+          <a href="/ebooks/my-library.html">
+            <i class="fa-solid fa-book-open library-nav-icon" style="color:#2563EB;"></i>
+            <span>My Library</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html">
+            <i class="fa-solid fa-user-gear library-nav-icon" style="color:#E86A17;"></i>
+            <span>My Profile & UCAS</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/subscription.html">
+            <i class="fa-solid fa-crown library-nav-icon" style="color:#F59E0B;"></i>
+            <span>VIP Pass (Subscription)</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/purchases.html">
+            <i class="fa-solid fa-file-invoice library-nav-icon" style="color:#10B981;"></i>
+            <span>My Purchases</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html#survey">
+            <i class="fa-solid fa-clipboard-list library-nav-icon" style="color:#0284C7;"></i>
+            <span>Smart Survey</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html#phonebook">
+            <i class="fa-solid fa-address-book library-nav-icon" style="color:#8B5CF6;"></i>
+            <span>My Phonebook</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html#leads">
+            <i class="fa-solid fa-user-group library-nav-icon" style="color:#EA580C;"></i>
+            <span>My Share Leads</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html?tab=marketing">
+            <i class="fa-solid fa-rocket library-nav-icon" style="color:#EC4899;"></i>
+            <span>Marketing Engine</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html?tab=product-landing">
+            <i class="fa-solid fa-cart-shopping library-nav-icon" style="color:#F59E0B;"></i>
+            <span>Product Landing Page</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html?tab=hook-templates">
+            <i class="fa-solid fa-pen-nib library-nav-icon" style="color:#8B5CF6;"></i>
+            <span>हुक व शायरी (Hook & Shayari)</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html?tab=webinars">
+            <i class="fa-solid fa-video library-nav-icon" style="color:#3B82F6;"></i>
+            <span>Webinars & Live</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html?tab=broadcast-messages" style="display:flex;align-items:center;">
+            <i class="fa-solid fa-bullhorn library-nav-icon" style="color:#E11D48;"></i>
+            <span>आरोग्यम संदेश</span>
+            <span id="library-broadcast-unread-badge" style="background:#E11D48;color:#fff;font-size:0.75rem;font-weight:800;padding:2px 7px;border-radius:12px;margin-left:auto;display:none;">0</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ucas/index.html?tab=permissions">
+            <i class="fa-solid fa-shield-halved library-nav-icon" style="color:#64748B;"></i>
+            <span>Permissions</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/index.html">
+            <i class="fa-solid fa-house library-nav-icon" style="color:#10B981;"></i>
+            <span>Home</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/ebooks/wishlist.html">
+            <i class="fa-solid fa-heart library-nav-icon" style="color:#EF4444;"></i>
+            <span>Wishlist</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/faq.html">
+            <i class="fa-solid fa-circle-question library-nav-icon" style="color:#64748B;"></i>
+            <span>FAQ</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/terms.html">
+            <i class="fa-solid fa-file-contract library-nav-icon" style="color:#64748B;"></i>
+            <span>Terms & Conditions</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/shipping-policy.html">
+            <i class="fa-solid fa-truck library-nav-icon" style="color:#64748B;"></i>
+            <span>Shipping Policy</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/privacy-policy.html">
+            <i class="fa-solid fa-shield-halved library-nav-icon" style="color:#64748B;"></i>
+            <span>Privacy Policy</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div style="padding:0.75rem 0.5rem;border-top:1px solid #ECECEC;font-size:0.75rem;color:#64748B;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span>🔒 Aarogyam Library</span>
+        <button onclick="logoutUser()" style="padding:3px 8px;font-size:0.72rem;color:#EF4444;background:#FEE2E2;border:none;border-radius:6px;cursor:pointer;font-weight:700;">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+      <div style="margin-top:4px;">Aarogyam India &copy; 2026</div>
+    </div>
+</aside>
+
+<!-- 3. Backdrop Overlay & Slide-out Quick Menu Drawer (Right Side - Upgraded) -->
+<div class="side-menu-overlay" id="sideMenuOverlay" onclick="toggleMenu()" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 99998; display: none;"></div>
+<div class="side-menu" id="sideMenu">
         <button class="close-menu" onclick="toggleMenu()">&times;</button>
         <div style="text-align: center; padding: 15px 10px; border-bottom: 1px solid #eee; margin-bottom: 10px; background: #f8fafc; border-radius: 8px;">
             <div style="width: 45px; height: 45px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto 6px;">
@@ -197,21 +323,32 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     </div>
 
     <ul>
-        <li><a href="/index.html"><i class="fa-solid fa-house"></i> Home</a></li>
-        <li><a href="/ucas/index.html"><i class="fa-solid fa-chart-pie"></i> UCAS / My Profile</a></li>
-        <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open"></i> My Library</a></li>
-        <li><a href="../ebooks/purchases.html"><i class="fa-solid fa-file-invoice"></i> My Purchases & Invoices</a></li>
-        <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a></li>
-        <li><a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
-        <li><a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms & Conditions</a></li>
-        <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping & Return Policy</a></li>
-        <li><a href="/privacy.html"><i class="fa-solid fa-shield-halved"></i> Privacy Policy</a></li>
-       
+        <li><a href="/index.html"><i class="fa-solid fa-house" style="color:#10B981;"></i> Home</a></li>
+        <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> UCAS / My Profile</a></li>
+        <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a></li>
+        <li><a href="/subscription.html"><i class="fa-solid fa-crown" style="color:#F59E0B;"></i> VIP Pass (Subscription)</a></li>
+        <li><a href="/purchases.html"><i class="fa-solid fa-file-invoice" style="color:#10B981;"></i> My Purchases & Invoices</a></li>
+        <li><a href="/ucas/index.html#survey"><i class="fa-solid fa-clipboard-list" style="color:#0284C7;"></i> Smart Survey</a></li>
+        <li><a href="/ucas/index.html#phonebook"><i class="fa-solid fa-address-book" style="color:#8B5CF6;"></i> My Phonebook</a></li>
+        <li><a href="/ucas/index.html#leads"><i class="fa-solid fa-user-group" style="color:#EA580C;"></i> My Share Leads</a></li>
+        <li><a href="/ucas/index.html#marketing"><i class="fa-solid fa-rocket" style="color:#EC4899;"></i> Marketing Engine</a></li>
+        <li><a href="/ucas/index.html#marketing"><i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> Product Landing Page</a></li>
+        <li><a href="/ucas/index.html#webinars"><i class="fa-solid fa-video" style="color:#3B82F6;"></i> Webinars & Live</a></li>
+        <li><a href="/ucas/index.html#permissions"><i class="fa-solid fa-shield-halved" style="color:#64748B;"></i> Permissions</a></li>
+        <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart" style="color:#EF4444;"></i> Wishlist</a></li>
+        <li><a href="/faq.html"><i class="fa-solid fa-circle-question" style="color:#64748B;"></i> FAQ</a></li>
+        <li><a href="/terms.html"><i class="fa-solid fa-file-contract" style="color:#64748B;"></i> Terms & Conditions</a></li>
+        <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck" style="color:#64748B;"></i> Shipping Policy</a></li>
+        <li><a href="/privacy-policy.html"><i class="fa-solid fa-shield-halved" style="color:#64748B;"></i> Privacy Policy</a></li>
     </ul>
     <div style="text-align: center; padding: 15px 0; font-size: 0.75rem; color: #94a3b8; border-top: 1px solid #eee; margin-top: 15px;">
         Aarogyam India V1.0<br>&copy; 2026 All Rights Reserved
     </div>
 </div>
+
+    <!-- MAIN LIBRARY CONTENT CONTAINER (Pushes right of Left Sidebar on Desktop) -->
+    <main class="library-main" id="mainLibraryContent">
+
     <!-- 4. Dashboard Style Welcome Card (Digital Locker View) -->
     <div class="welcome-card-soft" style="background: linear-gradient(135deg, #ffffff 0%, #f4fdf4 100%); border: 1px solid #d4edda; border-radius: 12px; padding: 20px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
@@ -257,7 +394,7 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         </div>
 
         <!-- Dynamic Color-Changing Subscription Upgrade KPI Card (For Inactive Users) -->
-        <div id="inactiveSubscriptionBanner" style="display: none; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fee2e2 100%); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin-top: 14px; box-shadow: 0 4px 14px rgba(245,158,11,0.15);">
+        <div id="inactiveSubscriptionBanner" style="display: none; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fee2e2 100%); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin-top: 14px; box-shadow: 0 4px 14px rgba(245,158,11,0.15); cursor: pointer;" onclick="window.location.href='/subscription.html'">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div style="flex: 2; min-width: 260px;">
                     <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.96rem; color: #b45309;">
@@ -266,15 +403,15 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
                         <span style="background: #ef4444; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; animation: pulse 2s infinite;">LIMITED OFFER</span>
                     </div>
                     <p style="font-size: 0.86rem; color: #451a03; margin: 4px 0 0 0; line-height: 1.4;">
-                        <strong>₹999</strong> का वार्षिक सब्सक्रिप्शन अभी <strong>मात्र ₹99 में!</strong> कोई भी 1 ई-बुक लेकर तुरंत VIP सब्सक्रिप्शन + UCAS मार्केटिंग टूल्स 365 दिनों के लिए एक्टिव करें।
+                        <strong>₹999</strong> का वार्षिक VIP सब्सक्रिप्शन देखें और <strong>UCAS मार्केटिंग टूल्स + सभी ई-बुक्स</strong> 365 दिनों के लिए एक्टिव करें।
                     </p>
                 </div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button onclick="switchTab('available')" style="background: #d97706; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(217,119,6,0.3);">
-                        <span>📚</span> अभी ₹99 में बुक लेकर एक्टिव करें
-                    </button>
-                    <a href="https://wa.me/917974422572?text=नमस्ते%20Aarogyam%20India,%20मुझे%20₹99%20वाले%20VIP%20सब्सक्रिप्शन%20ऑफर%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" style="background: #25D366; color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
-                        <i class="fa-brands fa-whatsapp"></i> पूछताछ
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;" onclick="event.stopPropagation();">
+                    <a href="/subscription.html" style="background: #d97706; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(217,119,6,0.3);">
+                        <span>👑</span> VIP सब्सक्रिप्शन प्लान देखें (₹999/yr)
+                    </a>
+                    <a href="/ebooks/checkout.html?product=kheti-dr&amount=99&title=Kheti%20Doctor%20Book" style="background: #10b981; color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                        <span>📖</span> ₹99 बुक से एक्टिव करें
                     </a>
                 </div>
             </div>
@@ -446,11 +583,12 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
                     </button>
                 </div>
             </div>
-            <button onclick="document.getElementById('profile100NudgePopup').style.display='none'" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
+            <button onclick="sessionStorage.setItem('ai_profile_nudge_dismissed', 'true'); document.getElementById('profile100NudgePopup').style.display='none';" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
         </div>
     </div>
+    </main>
 
-    <!-- 8. Sticky Bottom Timer & Deal Bar -->
+    <!-- 8. Sticky Bottom Timer & Deal Bar (Centered) -->
     <div class="sticky-action-bar">
         <div class="deal-timer-banner">
             <span>⚡ Today's Offer Ends In:</span>
@@ -477,11 +615,73 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         });
     </script>
 
+    <!-- UNIFIED AAROGYAM INDIA FOOTER -->
+    <footer class="site-footer" style="background:#0f172a; color:#cbd5e1; padding:45px 20px 25px; margin-top:50px; border-top:3px solid transparent; border-image:linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;">
+      <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:30px; margin-bottom:30px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:44px; width:auto; object-fit:contain;">
+            <div>
+              <div style="font-size:1.15rem; font-weight:800; color:#fff; line-height:1.2;">Aarogyam India</div>
+              <div style="font-size:0.75rem; color:#10B981; font-weight:700;">डिजिटल कृषि व ज्ञान मंच</div>
+            </div>
+          </div>
+          <p style="font-size:0.85rem; line-height:1.6; color:#94a3b8;">
+            Aarogyam India is a premier digital agriculture knowledge platform empowering farmers and users with smart digital tools, eBooks, and expert guidance.
+          </p>
+        </div>
+
+        <div>
+          <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #E86A17; display:inline-block; padding-bottom:4px;">Quick Links</h3>
+          <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
+            <li><a href="/index.html" style="color:#cbd5e1; text-decoration:none;">🏠 Home</a></li>
+            <li><a href="/ucas/index.html" style="color:#cbd5e1; text-decoration:none;">👤 My Profile & UCAS</a></li>
+            <li><a href="/ebooks/my-library.html" style="color:#cbd5e1; text-decoration:none;">📚 Digital Library</a></li>
+            <li><a href="/subscription.html" style="color:#f59e0b; text-decoration:none; font-weight:700;">👑 VIP Pass / Subscription</a></li>
+            <li><a href="/purchases.html" style="color:#cbd5e1; text-decoration:none;">🧾 My Purchases & Invoices</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #10b981; display:inline-block; padding-bottom:4px;">Legal & Policies</h3>
+          <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
+            <li><a href="/terms.html" style="color:#cbd5e1; text-decoration:none;">📄 Terms & Conditions</a></li>
+            <li><a href="/privacy-policy.html" style="color:#cbd5e1; text-decoration:none;">🔒 Privacy Policy</a></li>
+            <li><a href="/shipping-policy.html" style="color:#cbd5e1; text-decoration:none;">🚚 Shipping & Return Policy</a></li>
+            <li><a href="/faq.html" style="color:#cbd5e1; text-decoration:none;">❓ FAQ & Support</a></li>
+            <li><a href="/contact.html" style="color:#cbd5e1; text-decoration:none;">📞 Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #3b82f6; display:inline-block; padding-bottom:4px;">Contact & Helpline</h3>
+          <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">📍 Rewa, Madhya Pradesh, India</p>
+          <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">
+            📞 <a href="tel:917974422572" style="color:#38bdf8; text-decoration:none; font-weight:700;">+91 79744 22572</a>
+          </p>
+          <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 12px 0;">
+            ✉ <a href="mailto:info@aarogyamindia.in" style="color:#38bdf8; text-decoration:none;">info@aarogyamindia.in</a>
+          </p>
+          <div style="display:flex; gap:10px;">
+            <a href="https://wa.me/917974422572" target="_blank" style="background:#25d366; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="#" style="background:#1877f2; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-facebook"></i></a>
+            <a href="#" style="background:#ff0000; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; padding-top:20px; border-top:1px solid #334155; font-size:0.82rem; color:#64748b;">
+        © 2026 Aarogyam India. All Rights Reserved. • ISO Certified Digital Platform
+      </div>
+    </footer>
+
     <!-- 10. JavaScript Links -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="../js/supabase.js"></script>
     <script src="../session.js"></script>
-    <script src="/js/user-notifications.js"></script>
+    <script src="/js/user-notifications.js?v=12.0"></script>
+    <script src="/js/global-guest-modal.js?v=12.0"></script>
+    <script src="/js/book-promo-toast.js?v=12.0"></script>
     <script src="/js/my-library.js"></script>
     <script type="module" src="/js/public-pwa.js"></script>
 </body>

@@ -983,6 +983,11 @@
             <i class="fa-regular fa-copy"></i> कॉपी लिंक
           </button>
         </div>
+
+        <!-- Legal & Safety Disclaimer -->
+        <div style="margin-top:20px;padding:12px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;font-size:0.74rem;color:#64748B;line-height:1.45;text-align:center;">
+          🛡️ <strong>कानूनी घोषणा व सुरक्षा डिस्क्लेमर (Terms & Disclaimer):</strong> यह पेज अधिकृत स्वतंत्र यूज़र/मेंबर द्वारा साझा किया गया है। किसी भी प्रचार, दावे या वादे की सम्पूर्ण कानूनी जवाबदारी प्रेषक यूज़र की है। Aarogyam India केवल एक डिजिटल प्लेटफॉर्म प्रदाता है और व्यक्तिगत दावों के लिए उत्तरदायी नहीं है।
+        </div>
       </div>
 
     </div>
@@ -1074,30 +1079,41 @@
         return null;
       }
 
-      // 1. If landingPageData exists from Supabase, database is authoritative!
+      // 1. If landingPageData exists from Supabase or LocalStorage, database is authoritative!
       if (landingPageData) {
         const ct = String(landingPageData.content_type || '').toLowerCase();
-        if (ct === 'youtube' || extractYoutubeId(landingPageData.media_url)) {
+        if (ct === 'product' || Boolean(landingPageData.product_data) || Boolean(landingPageData.offer_price) || lpId.startsWith('PR') || urlParams.get('type') === 'product') {
+          landingPageData.content_type = 'product';
+        } else if (ct === 'youtube' || extractYoutubeId(landingPageData.media_url)) {
           landingPageData.content_type = 'youtube';
         } else if (ct === 'facebook' || ct === 'fb' || ct === 'instagram' || String(landingPageData.media_url || '').includes('facebook.com') || String(landingPageData.media_url || '').includes('fb.watch') || String(landingPageData.media_url || '').includes('instagram.com')) {
           landingPageData.content_type = 'facebook';
-        } else if (ct === 'other' || ct === 'link' || String(landingPageData.media_url || '').startsWith('http')) {
+        } else if (ct === 'other' || ct === 'link') {
           landingPageData.content_type = 'other';
         } else {
           landingPageData.content_type = 'image';
         }
       } else {
         // Fallback for standalone/direct links without DB record
+        const isProdParam = urlParams.get('type') === 'product' || Boolean(urlParams.get('mrp')) || Boolean(urlParams.get('buy')) || lpId.startsWith('PR');
         const fallbackYt = extractYoutubeId(customYt) || extractYoutubeId(customThumb);
         landingPageData = {
           id: lpId,
           share_id: shareId,
-          title: customTitle || 'Aarogyam India विशेष जानकारी',
-          category: urlParams.get('cat') || 'agriculture',
-          content_type: fallbackYt ? 'youtube' : 'image',
-          media_url: fallbackYt ? `https://www.youtube.com/watch?v=${fallbackYt}` : (customThumb || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80'),
+          title: customTitle || (isProdParam ? 'Aarogyam India प्रीमियम उत्पाद' : 'Aarogyam India विशेष जानकारी'),
+          category: urlParams.get('cat') || (isProdParam ? 'product' : 'agriculture'),
+          content_type: isProdParam ? 'product' : (fallbackYt ? 'youtube' : 'image'),
+          media_url: fallbackYt ? `https://www.youtube.com/watch?v=${fallbackYt}` : (customThumb || 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg'),
           thumbnail_url: customThumb || (fallbackYt ? `https://i.ytimg.com/vi/${fallbackYt}/hqdefault.jpg` : ''),
-          message: customMsg || 'नमस्ते! Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी और समाधान के लिए नीचे दिया गया विवरण अवश्य देखें।'
+          message: customMsg || 'नमस्ते! Aarogyam India में आपका स्वागत है। विस्तृत जानकारी और विशेष छूट ऑफर के लिए नीचे दिया गया विवरण अवश्य देखें।',
+          product_data: isProdParam ? {
+            mrp: urlParams.get('mrp') || '1499',
+            offer_price: urlParams.get('offer') || urlParams.get('price') || '999',
+            buynow_url: urlParams.get('buy') || urlParams.get('url') || '#'
+          } : null,
+          mrp: urlParams.get('mrp') || '1499',
+          offer_price: urlParams.get('offer') || urlParams.get('price') || '999',
+          buynow_url: urlParams.get('buy') || urlParams.get('url') || '#'
         };
       }
 
@@ -1408,6 +1424,64 @@
               `;
             }
             mediaHolder.appendChild(linkBox);
+          } else if (lp.content_type === 'product') {
+            // Product Landing Page View
+            const pData = lp.product_data || {};
+            const mrp = pData.mrp || lp.product_mrp || '';
+            const offerPrice = pData.offer_price || lp.product_offer_price || '';
+            const buyNowUrl = pData.buynow_url || lp.product_buynow_url || '#';
+            const prodImg = pData.image || lp.media_url || lp.thumbnail_url || defaultBanner;
+
+            const prodBox = document.createElement('div');
+            prodBox.style.borderRadius = 'var(--radius-md)';
+            prodBox.style.overflow = 'hidden';
+            prodBox.style.border = '1.5px solid #FCD34D';
+            prodBox.style.background = '#FFFFFF';
+            prodBox.style.boxShadow = '0 8px 25px rgba(245,158,11,0.12)';
+
+            prodBox.innerHTML = `
+              <div style="position:relative;width:100%;max-height:360px;overflow:hidden;background:#F8FAFC;text-align:center;padding:12px 0;">
+                <img src="${prodImg}" alt="${finalTitle}" style="width:100%;max-height:340px;object-fit:contain;">
+                ${offerPrice && mrp ? `
+                  <div style="position:absolute;top:10px;right:10px;background:#DC2626;color:#fff;font-weight:900;padding:4px 12px;border-radius:20px;font-size:0.82rem;box-shadow:0 2px 8px rgba(220,38,38,0.4);">
+                    🔥 SAVE ₹${Number(mrp) - Number(offerPrice)} OFF
+                  </div>
+                ` : ''}
+              </div>
+              <div style="padding:16px 18px;">
+                <div style="font-size:1.2rem;font-weight:800;color:#0F172A;line-height:1.3;margin-bottom:6px;">
+                  ${finalTitle}
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                  ${offerPrice ? `
+                    <span style="font-size:1.6rem;font-weight:900;color:#059669;">₹${offerPrice}</span>
+                  ` : ''}
+                  ${mrp ? `
+                    <span style="font-size:1.05rem;color:#94A3B8;text-decoration:line-through;">₹${mrp}</span>
+                  ` : ''}
+                  <span style="font-size:0.75rem;background:#FEF3C7;color:#B45309;font-weight:800;padding:2px 8px;border-radius:6px;">
+                    SPECIAL OFFER
+                  </span>
+                </div>
+                ${lp.message ? `
+                  <p style="font-size:0.88rem;color:#475569;line-height:1.5;margin-bottom:16px;">${lp.message}</p>
+                ` : ''}
+                <button type="button" id="lp_btn_buy_now_action" class="pub-btn-cta" style="background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%);color:#fff;font-weight:900;font-size:1.1rem;padding:14px 20px;border-radius:12px;box-shadow:0 6px 20px rgba(217,119,6,0.35);border:none;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">
+                  <i class="fa-solid fa-cart-shopping"></i> 🛍️ अभी खरीदें (BUY NOW)
+                </button>
+              </div>
+            `;
+            mediaHolder.appendChild(prodBox);
+
+            // Hook Buy Now click
+            setTimeout(() => {
+              const buyBtn = document.getElementById('lp_btn_buy_now_action');
+              if (buyBtn) {
+                buyBtn.onclick = async function() {
+                  await handleProductBuyNowClick(lp, buyNowUrl);
+                };
+              }
+            }, 50);
           } else {
             // Standard Image View
             const rawImg = lp.media_url || lp.thumbnail_url || defaultBanner;
@@ -1420,6 +1494,45 @@
               this.src = defaultBanner;
             };
             mediaHolder.appendChild(imgElem);
+          }
+        }
+
+        async function handleProductBuyNowClick(lp, buyNowUrl) {
+          const shareId = lp.share_id || 'DIRECT';
+          const profileId = lp.profile_id;
+          const client = (window.supabase && typeof window.supabase.createClient === 'function') ? window.dbClient : null;
+
+          let visitorName = document.getElementById('pub_survey_name')?.value || localStorage.getItem('aim_user_name') || 'Product Buyer Lead';
+          let visitorMobile = document.getElementById('pub_survey_mobile')?.value || localStorage.getItem('aim_user_mobile') || '';
+
+          try {
+            const leadRecord = {
+              referrer_id: profileId || shareId,
+              source: 'product_landing_page',
+              name: visitorName,
+              mobile: visitorMobile || 'Buyer Click',
+              product_name: lp.title,
+              landing_id: lp.id,
+              created_at: new Date().toISOString()
+            };
+
+            try {
+              const stored = JSON.parse(localStorage.getItem(`UCAS_PRODUCT_LEADS_${profileId}`) || '[]');
+              stored.unshift(leadRecord);
+              localStorage.setItem(`UCAS_PRODUCT_LEADS_${profileId}`, JSON.stringify(stored));
+            } catch(e) {}
+
+            if (client) {
+              await client.from('leads').insert([leadRecord]);
+            }
+          } catch (e) {
+            console.warn('Lead capture error', e);
+          }
+
+          if (buyNowUrl && buyNowUrl !== '#') {
+            window.location.href = buyNowUrl;
+          } else {
+            alert('धन्यवाद! आपका अनुरोध दर्ज कर लिया गया है।');
           }
         }
 
@@ -1516,7 +1629,8 @@
         const isSessionLoggedIn = Boolean(window.UCAS_SESSION && typeof window.UCAS_SESSION.isLoggedIn === 'function' && window.UCAS_SESSION.isLoggedIn()) || Boolean(localStorage.getItem('ucas_user_id'));
         const isPreviewMode = urlParams.get('preview') === '1' || urlParams.get('unlock') === '1' || urlParams.get('admin') === '1';
 
-        const isUnlocked = isWebinar ? (isWebinarJoinedToday || isPreviewMode) : (isPageUnlocked || isGlobalVisitorUnlocked || isSessionLoggedIn || isPreviewMode);
+        const isProduct = lp?.content_type === 'product' || Boolean(lp?.product_data) || Boolean(lp?.offer_price);
+        const isUnlocked = isProduct || (isWebinar ? (isWebinarJoinedToday || isPreviewMode) : (isPageUnlocked || isGlobalVisitorUnlocked || isSessionLoggedIn || isPreviewMode));
 
         if (isUnlocked) {
           if (overlay) overlay.style.display = 'none';

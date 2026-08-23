@@ -43,6 +43,10 @@ function renderUcasDetailWidget(summary) {
           <div class="kpi-label">🎯 Landing Pages</div>
           <div class="kpi-value" style="color:#ec4899;">${summary.totalLandingPages || 0}</div>
         </div>
+        <div class="kpi-card clickable" data-route="product-landing-pages" title="प्रोडक्ट लैंडिंग पेज देखें" style="cursor:pointer;border-left:3px solid #f59e0b;">
+          <div class="kpi-label">🛍️ Product Pages</div>
+          <div class="kpi-value" style="color:#f59e0b;">${summary.totalProductPages || 0}</div>
+        </div>
         <div class="kpi-card clickable" data-route="all-webinars" title="वेबिनार अटेंडेंट्स देखें" style="cursor:pointer;">
           <div class="kpi-label">🎥 Webinar Attendees</div>
           <div class="kpi-value" style="color:#2563eb;">${summary.totalWebinarAttendees || 0}</div>
@@ -124,10 +128,10 @@ function renderTopBooks(data) {
 function renderQuickActions() {
   return `<div class="admin-card admin-section">
     <div class="admin-section-title">Quick Actions</div>
-    <div class="u-row">
-      <button class="admin-button">Create Campaign</button>
-      <button class="admin-button">Export Leads</button>
-      <button class="admin-button">Run Report</button>
+    <div class="u-row" style="flex-wrap:wrap;gap:8px;">
+      <a href="product-landing-pages.html" class="admin-button" style="background:#f59e0b;color:#fff;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">🛍️ Product Landing Pages</a>
+      <a href="all-landing-pages.html" class="admin-button" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">📣 Create Campaign</a>
+      <a href="marketing-templates.html" class="admin-button" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">✨ Hook Templates</a>
     </div>
   </div>`;
 }
@@ -427,8 +431,11 @@ export async function initDashboard() {
       card.addEventListener('click', () => {
         const route = card.dataset.route;
         const status = card.dataset.status;
+        const param = card.dataset.param;
         if (route) {
-          if (status) {
+          if (param) {
+            window.location.href = `${route}.html?${param}`;
+          } else if (status) {
             window.location.hash = `${route}?status=${status}`;
           } else {
             window.location.hash = route;

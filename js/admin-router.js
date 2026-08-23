@@ -6,23 +6,26 @@
 */
 
 const ROUTES = {
- 'dashboard': () => import('./admin-pages-dashboard.js?v=9.0').then(m => m.initDashboard()),
- 'users': () => import('./admin-pages-users.js?v=9.0').then(m => m.initUsers()),
- 'user-details': () => import('./admin-pages-user-details.js?v=9.0').then(m => m.initUserDetails()),
- 'user-permissions': () => import('./admin-pages-user-permissions.js?v=9.0').then(m => m.initUserPermissions()),
- 'all-phonebook': () => import('./admin-pages-phonebook.js?v=9.0').then(m => m.initAllPhonebook()),
- 'all-surveys': () => import('./admin-pages-surveys.js?v=9.0').then(m => m.initAllSurveys()),
- 'all-landing-pages': () => import('./admin-pages-landing-pages.js?v=9.0').then(m => m.initAllLandingPages()),
- 'purchases': () => import('./admin-pages-purchases.js?v=9.0').then(m => m.initPurchases()),
- 'checkout-funnel': () => import('./admin-pages-checkout-funnel.js?v=9.0').then(m => m.initCheckoutFunnel()),
- 'downloads': () => import('./admin-pages-downloads.js?v=9.0').then(m => m.initDownloads()),
- 'reports': () => import('./admin-pages-reports.js?v=9.0').then(m => m.initReports()),
- 'notifications': () => import('./admin-pages-notifications.js?v=9.0').then(m => m.initNotifications()),
- 'all-webinars': () => import('./admin-pages-webinars.js?v=9.0').then(m => m.initWebinars()),
- 'webinars': () => import('./admin-pages-webinars.js?v=9.0').then(m => m.initWebinars()),
- 'landing-page-control': () => import('./admin-pages-landing-pages.js?v=9.0').then(m => m.initAllLandingPages()),
- 'admin-app': () => import('./admin-pages-admin-app.js?v=9.0').then(m => m.initAdminApp()),
- 'settings': () => import('./admin-pages-settings.js?v=9.0').then(m => m.initSettings()).catch(() => { /* settings may be placeholder */ })
+ 'dashboard': () => import('./admin-pages-dashboard.js?v=16.0').then(m => m.initDashboard()),
+ 'users': () => import('./admin-pages-users.js?v=16.0').then(m => m.initUsers()),
+ 'user-details': () => import('./admin-pages-user-details.js?v=16.0').then(m => m.initUserDetails()),
+ 'user-permissions': () => import('./admin-pages-user-permissions.js?v=16.0').then(m => m.initUserPermissions()),
+ 'all-phonebook': () => import('./admin-pages-phonebook.js?v=16.0').then(m => m.initAllPhonebook()),
+ 'all-surveys': () => import('./admin-pages-surveys.js?v=16.0').then(m => m.initAllSurveys()),
+ 'all-landing-pages': () => import('./admin-pages-landing-pages.js?v=16.0').then(m => m.initAllLandingPages()),
+ 'product-landing-pages': () => import('./admin-pages-product-landing.js?v=16.0').then(m => m.initProductLandingPages()),
+ 'marketing-templates': () => import('./admin-pages-marketing-templates.js?v=16.0').then(m => m.initMarketingTemplatesPage()),
+ 'purchases': () => import('./admin-pages-purchases.js?v=16.0').then(m => m.initPurchases()),
+ 'checkout-funnel': () => import('./admin-pages-checkout-funnel.js?v=16.0').then(m => m.initCheckoutFunnel()),
+ 'downloads': () => import('./admin-pages-downloads.js?v=16.0').then(m => m.initDownloads()),
+ 'reports': () => import('./admin-pages-reports.js?v=16.0').then(m => m.initReports()),
+ 'notifications': () => import('./admin-pages-notifications.js?v=16.0').then(m => m.initNotifications()),
+ 'broadcast': () => import('./admin-pages-broadcast.js?v=16.0').then(m => m.initAdminBroadcast()),
+ 'all-webinars': () => import('./admin-pages-webinars.js?v=16.0').then(m => m.initWebinars()),
+ 'webinars': () => import('./admin-pages-webinars.js?v=16.0').then(m => m.initWebinars()),
+ 'landing-page-control': () => import('./admin-pages-landing-pages.js?v=16.0').then(m => m.initAllLandingPages()),
+ 'admin-app': () => import('./admin-pages-admin-app.js?v=16.0').then(m => m.initAdminApp()),
+ 'settings': () => import('./admin-pages-settings.js?v=16.0').then(m => m.initSettings()).catch(() => { /* settings may be placeholder */ })
 };
 
 export async function navigateTo(routeName) {

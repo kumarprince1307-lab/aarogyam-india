@@ -103,6 +103,7 @@
   let filteredContacts = [];
 
   async function initMarketingModule() {
+    await loadMarketingTemplates();
     await loadDynamicLandingPages();
     renderLandingPageCards();
     bindMarketingEvents();
@@ -187,6 +188,129 @@
     }
 
     updateMarketingEngine();
+  }
+
+  let marketingCategories = [];
+
+  async function loadMarketingTemplates() {
+    try {
+      const res = await fetch('/data/marketing-templates.json');
+      if (res.ok) {
+        const data = await res.json();
+        marketingCategories = data.categories || [];
+      }
+    } catch (e) {
+      console.warn('Could not load marketing-templates.json, using defaults', e);
+    }
+
+    if (!marketingCategories || marketingCategories.length === 0) {
+      marketingCategories = [
+        {
+          id: 'agriculture',
+          name: '🌾 कृषि एवं फसल सुरक्षा (Agriculture)',
+          templates: [
+            {
+              id: 'ag_01',
+              title: 'फसल में कीट, इल्ली व पीलापन का 100% जैविक समाधान',
+              hook: '🚨 *क्या आपकी फसल में भी कीट, इल्ली या पीलापन आ रहा है?*\n\nअब रासायनिक कीटनाशकों पर लाखों खर्च करने की जरूरत नहीं! आरोग्यम इंडिया का 100% जैविक समाधान अपनाएं और पाएं 30% तक अधिक पैदावार। 🌱',
+              shayari: '🌾 *मेहनत किसान की, रंग लाएगी हर बार,*\n*आरोग्यम के साथ बनेगी, खुशहाली की सरकार!* ✨',
+              cta: '📲 अभी मुफ्त संपूर्ण मार्गदर्शिका देखने के लिए क्लिक करें:'
+            },
+            {
+              id: 'ag_02',
+              title: 'कम लागत में बंपर पैदावार व जैविक खाद फॉर्मूला',
+              hook: '🌾 *कम लागत, ज्यादा मुनाफा! जैविक खाद से बदलें अपनी खेती का भविष्य।*\n\nमिट्टी की उर्वरा शक्ति बढ़ाएं और बिना खतरनाक रसायनों के अपनी फसल का दाना चमकदार और वजनी बनाएं। हजारों किसान इसका लाभ ले चुके हैं। 🚜',
+              shayari: '🌱 *धरती माता मुस्कुराए जब जैविक खाद डले,*\n*किसान का हर एक सपना खुशहाली से फले!* 🌾',
+              cta: '👉 पूरी रिपोर्ट और किसानों के लाइव अनुभव देखें:'
+            }
+          ]
+        },
+        {
+          id: 'health',
+          name: '🌿 स्वास्थ्य व आयुर्वेद (Health & Ayurveda)',
+          templates: [
+            {
+              id: 'hl_01',
+              title: 'डायबिटीज (शुगर) व बीपी का प्राकृतिक आयुर्वेदिक नियंत्रण',
+              hook: '🩺 *क्या आप या आपके परिवार में कोई शुगर, बीपी या जोड़ों के दर्द से परेशान है?*\n\nबिना किसी साइड-इफेक्ट के प्राचीन भारतीय आयुर्वेदिक पद्धति से पाएं स्वस्थ जीवन और नई ताजगी। शरीर को अंदर से डिटॉक्स करें। 🌿',
+              shayari: '🌿 *आयुर्वेद का संग मिले तो हर बीमारी भागे,*\n*स्वस्थ रहे शरीर तो नया सवेरा जागे!* ☀️',
+              cta: '👉 तुरंत प्राकृतिक स्वास्थ्य डाइट चार्ट व उपाय देखें:'
+            }
+          ]
+        },
+        {
+          id: 'business',
+          name: '💼 रोजगार व बिजनेस (Income & Business)',
+          templates: [
+            {
+              id: 'bs_01',
+              title: 'घर बैठे मोबाइल से ₹25,000-₹50,000 कमाने का सुनहरा अवसर',
+              hook: '💰 *स्मार्टफोन का सही इस्तेमाल करें और हर महीने अतिरिक्त आय बनाएं!*\n\nआरोग्यम डिजिटल कम्युनिटी से जुड़कर पार्ट-टाइम या फुल-टाइम काम करें। बिना किसी रिस्क के सीखें डिजिटल मार्केटिंग।',
+              shayari: '🚀 *मंजिलें उन्हीं को मिलती हैं जिनके सपनों में जान होती है,*\n*पंखों से कुछ नहीं होता, हौसलों से उड़ान होती है!* 🌈',
+              cta: '👉 फ्री ट्रेनिंग और ज़ूम वेबिनार में भाग लेने के लिए यहाँ रजिस्टर करें:'
+            }
+          ]
+        },
+        {
+          id: 'product',
+          name: '🛒 प्रोडक्ट व ऑफर्स (Products & Offers)',
+          templates: [
+            {
+              id: 'pr_01',
+              title: 'विशेष छूट ऑफर - सीधे घर तक डिलीवरी',
+              hook: '🎁 *धमाकेदार ऑफर! प्रीमियम क्वालिटी प्रोडक्ट पर भारी छूट!*\n\nअसली और प्रमाणित उत्पाद सीधे आपके घर तक। ऑफर केवल सीमित समय तक मान्य है। 📦',
+              shayari: '💎 *गुणवत्ता में नंबर वन, कीमत में सबसे खास,*\n*आरोग्यम उत्पाद लाएं, खुशियों का अहसास!* ✨',
+              cta: '🛍️ अभी ऑफर प्राइस देखें और ऑर्डर करें:'
+            }
+          ]
+        }
+      ];
+    }
+
+    populateHookCategoryDropdown();
+  }
+
+  function populateHookCategoryDropdown() {
+    const catSelect = document.getElementById('ucas_hook_category_select');
+    if (!catSelect) return;
+    catSelect.innerHTML = marketingCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    if (marketingCategories.length > 0) {
+      onHookCategoryChange(marketingCategories[0].id);
+    }
+  }
+
+  function onHookCategoryChange(categoryId) {
+    const templateSelect = document.getElementById('ucas_hook_template_select');
+    if (!templateSelect) return;
+
+    const cat = marketingCategories.find(c => c.id === categoryId);
+    if (!cat || !cat.templates || cat.templates.length === 0) {
+      templateSelect.innerHTML = '<option value="">कोई टेम्पलेट उपलब्ध नहीं</option>';
+      return;
+    }
+
+    templateSelect.innerHTML = cat.templates.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
+    onHookTemplateSelect(cat.templates[0].id);
+  }
+
+  function onHookTemplateSelect(templateId) {
+    if (!templateId) return;
+    let found = null;
+    for (const cat of marketingCategories) {
+      const t = (cat.templates || []).find(item => item.id === templateId);
+      if (t) {
+        found = t;
+        break;
+      }
+    }
+    if (!found) return;
+
+    const msgBox = document.getElementById('ucas-marketing-message-box');
+    if (!msgBox) return;
+
+    const fullMsg = `नमस्ते {name} जी,\n\n${found.hook}\n\n${found.cta}\n{link}\n\n${found.shayari}\n\nसादर,\n{my_name}`;
+    msgBox.value = fullMsg;
+    updateLiveMessagePreview();
   }
 
   function bindMarketingEvents() {
@@ -291,6 +415,35 @@
       areaSelect.innerHTML = `<option value="all">📍 सभी स्थान (All Areas)</option>` +
         sortedAreas.map(a => `<option value="${escapeHtml(a.toLowerCase())}">${escapeHtml(a)}</option>`).join('');
       areaSelect.value = currentArea;
+    }
+
+    // Populate Category dropdown dynamically
+    const catSelect = document.getElementById('mkt_filter_compact_category');
+    if (catSelect) {
+      const curCat = catSelect.value || 'all';
+      let lpCats = [
+        { id: 'agriculture', name: '🌾 Agriculture (कृषि)' },
+        { id: 'healthcare', name: '❤️ Health Care (स्वास्थ्य)' },
+        { id: 'cattlecare', name: '🐄 Cattle Care (पशुपालन)' },
+        { id: 'beautycare', name: '💄 Beauty Care (सौंदर्य)' },
+        { id: 'haircare', name: '💇 Hair Care (केश)' },
+        { id: 'netsurf', name: '💼 NetSurf (बिजनेस)' },
+        { id: 'phonebook', name: '📱 Phonebook Contacts' },
+        { id: 'other', name: '➕ अन्य (Other)' }
+      ];
+      try {
+        const stored = localStorage.getItem('AAROGYAM_LP_CATEGORIES');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            lpCats = [...parsed, { id: 'phonebook', name: '📱 Phonebook Contacts' }];
+          }
+        }
+      } catch (e) {}
+
+      catSelect.innerHTML = `<option value="all">🏷️ सभी कैटेगरी (All Categories)</option>` +
+        lpCats.map(c => `<option value="${escapeHtml(c.id.toLowerCase())}">${escapeHtml(c.name)}</option>`).join('');
+      catSelect.value = curCat;
     }
   }
 
@@ -437,10 +590,102 @@
   }
 
   // ==========================================
-  // SEND & SHARE ACTIONS
+  // SEND & SHARE ACTIONS WITH UPGRADE PROMPT
   // ==========================================
 
-  function sendToOne(rawMobile, encodedName, encodedPlace) {
+  function showUpgradeModal(featureName = 'यह फीचर') {
+    let modal = document.getElementById('ucas-upgrade-pro-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'ucas-upgrade-pro-modal';
+      modal.style.cssText = `
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      `;
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div style="background: #ffffff; border-radius: 20px; max-width: 440px; width: 100%; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 2px solid #F59E0B; text-align: center;">
+        <div style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); padding: 24px 20px 20px; color: #fff; position: relative;">
+          <button type="button" onclick="document.getElementById('ucas-upgrade-pro-modal').style.display='none'" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;">&times;</button>
+          <div style="font-size: 2.2rem; margin-bottom: 6px;">👑</div>
+          <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #FBBF24;">Aarogyam Pro / Active सदस्यता</h3>
+          <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #94A3B8;">${featureName} केवल एक्टिव मेंबर्स के लिए उपलब्ध है</p>
+        </div>
+        <div style="padding: 20px;">
+          <p style="font-size: 0.86rem; color: #475569; line-height: 1.45; margin-bottom: 18px;">
+            इस फीचर को अनलॉक करने के लिए Aarogyam Pro VIP सदस्यता लें या कोई भी एक ई-बुक खरीदकर तुरंत अपना खाता एक्टिवेट करें।
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="/subscription.html" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #fff; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+              👑 Aarogyam Pro VIP बनें (₹999 / वर्ष)
+            </a>
+            <a href="/ebooks/checkout.html?product=kheti-dr&amount=99&title=Kheti%20Doctor%20Book" style="background: #FEF3C7; border: 1.5px solid #F59E0B; color: #92400E; text-decoration: none; padding: 10px; border-radius: 10px; font-weight: 800; font-size: 0.88rem;">
+              📖 ₹99 में ई-बुक खरीदकर एक्टिवेट करें
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+    modal.style.display = 'flex';
+  }
+
+  async function exportContactsCSV() {
+    const profileId = window.UCAS_SESSION.getUserId();
+    const perms = await window.UCAS_DB.getUserMediaPermissions(profileId);
+
+    if (!perms.export_csv) {
+      showUpgradeModal('CSV डेटा एक्सपोर्ट');
+      return;
+    }
+
+    const list = filteredContacts.length > 0 ? filteredContacts : allRecipientsList;
+    if (list.length === 0) {
+      window.UCAS_APP.showToast('एक्सपोर्ट करने के लिए कोई संपर्क नहीं है।', 'warning');
+      return;
+    }
+
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    csvContent += 'Name,Mobile,Place,Categories,Source\r\n';
+
+    list.forEach(c => {
+      const row = [
+        `"${(c.name || '').replace(/"/g, '""')}"`,
+        `"${(c.mobile || '').replace(/"/g, '""')}"`,
+        `"${(c.place || '').replace(/"/g, '""')}"`,
+        `"${(c.categoryDisplay || '').replace(/"/g, '""')}"`,
+        `"${(c.source || '').replace(/"/g, '""')}"`
+      ].join(',');
+      csvContent += row + '\r\n';
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Aarogyam_Contacts_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.UCAS_APP.showToast(`✅ ${list.length} संपर्कों का CSV सफलतापूर्वक डाउनलोड हो गया!`, 'success');
+  }
+
+  async function sendToOne(rawMobile, encodedName, encodedPlace) {
+    const profileId = window.UCAS_SESSION.getUserId();
+    const perms = await window.UCAS_DB.getUserMediaPermissions(profileId);
+    if (!perms.isActive) {
+      showUpgradeModal('1-to-1 WhatsApp ब्रॉडकास्ट');
+      return;
+    }
+
     const cleanMobile = normalizeIndianMobile(rawMobile);
     if (!cleanMobile) {
       window.UCAS_APP.showToast('अमान्य मोबाइल नंबर।', 'error');
@@ -505,13 +750,17 @@
     refreshLandingPages,
     selectLandingPage,
     updateMarketingEngine,
+    onHookCategoryChange,
+    onHookTemplateSelect,
     sendToOne,
     shareNative,
     shareWhatsAppBroadcast,
     shareFacebook,
     shareTelegram,
-    copyReferralLink
+    copyReferralLink,
+    exportContactsCSV,
+    showUpgradeModal
   };
 
-  console.log('✅ UCAS Marketing Engine (Compact Area/Category Filter + Direct Actions) Ready.');
+  console.log('✅ UCAS Marketing Engine (with Hook Templates & Touchy Shayari Engine) Ready.');
 })(window);

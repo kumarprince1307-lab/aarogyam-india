@@ -53,10 +53,40 @@ export async function initAllLandingPages() {
           </p>
         </div>
         <div style="display:flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-manage-lp-categories" class="admin-button" style="background: #0d9488; border-color: #0f766e; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <span>📁</span> <span>श्रेणियां जोड़ें / एडिट करें (Categories)</span>
+          </button>
           <button id="btn-toggle-admin-builder" class="admin-button" style="background: #2563eb; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
             <span>🪄</span> <span>+ नया पेज / वेबिनार बनाएं (Create for User)</span>
           </button>
+          <button id="btn-toggle-media-perms" class="admin-button" style="background: #059669; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <span>⚙️</span> <span>यूजर सेवाएं On/Off करें (Permissions)</span>
+          </button>
           <button id="lp-refresh-btn" class="admin-button small-button">🔄 Refresh Data</button>
+        </div>
+      </div>
+
+      <!-- User Media Permissions Drawer/Card -->
+      <div id="admin-media-perms-card" class="admin-card" style="display: none; margin-top: 14px; background: var(--admin-surface-2, #0f172a); border: 2px solid #059669; border-radius: 12px; padding: 18px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--admin-border, #334155); padding-bottom: 10px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.3rem;">⚙️</span>
+            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #34d399;">
+              यूजर मीडिया सेवाएं नियंत्रण (User Media Services & Permissions)
+            </h3>
+          </div>
+          <button type="button" id="btn-close-media-perms" class="admin-button small-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted);">
+            &times; बंद करें (Close)
+          </button>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--admin-muted); margin-bottom: 12px;">
+          प्रत्येक यूजर के लिए अलग-अलग सेवाएं चालू (On) या बंद (Off) करें। (Inactive यूजर्स के लिए YouTube/Facebook/Other चालू करने पर भी पोस्ट Admin Approval के बाद ही लाइव होगी)।
+        </p>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center;">
+          <input type="text" id="adm_perms_search" class="admin-input" placeholder="🔍 नाम, मोबाइल या Share ID से खोजें..." style="flex: 1; padding: 8px 12px; font-size: 0.88rem;" />
+        </div>
+        <div id="adm_perms_user_list" style="max-height: 340px; overflow-y: auto; background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border, #334155); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+          <!-- Dynamically populated -->
         </div>
       </div>
 
@@ -177,20 +207,16 @@ export async function initAllLandingPages() {
             </div>
           </div>
 
-          <!-- 3. Category Selector -->
+          <!-- 3. Category Selector with Quick Manage Button -->
           <div class="admin-form-group">
-            <label class="admin-label" style="font-weight: 700;">कैटेगरी (Category)</label>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label class="admin-label" style="font-weight: 700;">कैटेगरी (Category)</label>
+              <button type="button" id="btn-quick-manage-lp-cat" class="admin-button small-button" style="font-size: 0.72rem; padding: 2px 8px; background: #0d9488; color: #fff;">
+                📁 श्रेणियां मैनेज करें
+              </button>
+            </div>
             <select id="adm_lp_category" class="admin-select" style="width: 100%; padding: 10px 12px; margin-top: 6px;">
-              <option value="agriculture">🌾 Agriculture (कृषि समाधान)</option>
-              <option value="healthcare">🩺 Healthcare (स्वास्थ्य एवं पोषण)</option>
-              <option value="wealth">💰 Wealth & Business (व्यापार एवं आय)</option>
-              <option value="insurance">🛡️ Insurance (बीमा एवं सुरक्षा)</option>
-              <option value="property">🏢 Property (प्रॉपर्टी एवं रियल एस्टेट)</option>
-              <option value="women_empowerment">👩 Women Empowerment (महिला सशक्तिकरण)</option>
-              <option value="cattlecare">🐄 Cattle Care (पशु पालन)</option>
-              <option value="beautycare">✨ Beauty Care (सौंदर्य देखभाल)</option>
-              <option value="webinar">🎥 Webinar Invitation (वेबिनार आमंत्रण)</option>
-              <option value="other">📦 Other / General (सामान्य)</option>
+              <!-- Populated dynamically -->
             </select>
           </div>
 
@@ -206,15 +232,16 @@ export async function initAllLandingPages() {
             <textarea id="adm_lp_message" class="admin-textarea" rows="3" placeholder="नमस्ते! Aarogyam India में आपका स्वागत है। विस्तृत जानकारी व सलाह के लिए नीचे दिया गया छोटा सर्वे फॉर्म अवश्य भरें..." style="width: 100%; padding: 10px 12px;" required></textarea>
           </div>
 
-          <!-- 6. Media Options -->
-          <div class="admin-form-group" style="grid-column: 1 / -1;">
-            <label class="admin-label" style="font-weight: 700;">बैनर मीडिया (Content Media Type)</label>
-            <div style="display: flex; gap: 8px; margin-bottom: 8px; margin-top: 4px; flex-wrap: wrap;">
-              <button type="button" id="adm_btn_media_image" class="admin-button small-button" style="background:#2563eb;color:#fff;font-weight:700;">🖼️ Image</button>
-              <button type="button" id="adm_btn_media_youtube" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">🎥 YouTube</button>
-              <button type="button" id="adm_btn_media_facebook" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">📸 Facebook/Insta</button>
-              <button type="button" id="adm_btn_media_other" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">🌐 Web Link</button>
-            </div>
+            <!-- 6. Media Options -->
+            <div class="admin-form-group" style="grid-column: 1 / -1;">
+              <label class="admin-label" style="font-weight: 700;">बैनर मीडिया (Content Media Type)</label>
+              <div style="display: flex; gap: 8px; margin-bottom: 8px; margin-top: 4px; flex-wrap: wrap;">
+                <button type="button" id="adm_btn_media_image" class="admin-button small-button" style="background:#2563eb;color:#fff;font-weight:700;">🖼️ Image</button>
+                <button type="button" id="adm_btn_media_youtube" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">🎥 YouTube</button>
+                <button type="button" id="adm_btn_media_facebook" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">📸 Facebook/Insta</button>
+                <button type="button" id="adm_btn_media_product" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">🛒 Product Page</button>
+                <button type="button" id="adm_btn_media_other" class="admin-button small-button" style="background:var(--admin-surface);color:var(--admin-text);border:1px solid var(--admin-border);font-weight:700;">🌐 Web Link</button>
+              </div>
 
             <!-- Image File Input -->
             <div id="adm_box_image_input">
@@ -240,6 +267,30 @@ export async function initAllLandingPages() {
             <!-- Other / Universal Web Link Input -->
             <div id="adm_box_other_input" style="display: none;">
               <input type="url" id="adm_lp_other_url" class="admin-input" placeholder="https://example.com/news-article-or-blog" style="width: 100%; padding: 10px 12px;" />
+            </div>
+
+            <!-- Product Landing Page Input Section -->
+            <div id="adm_box_product_input" style="display: none; background: rgba(245,158,11,0.08); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 14px; margin-top: 10px;">
+              <div style="font-weight: 800; color: #f59e0b; margin-bottom: 10px; font-size: 0.95rem; display:flex; align-items:center; gap:6px;">
+                <span>🛒</span> <span>प्रोडक्ट विवरण, ऑफर मूल्य एवं बाय नाउ लिंक (Product & Buy Now Settings)</span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 10px;">
+                <div>
+                  <label class="admin-label" style="font-size:0.8rem; font-weight:700;">असली MRP (₹):</label>
+                  <input type="number" id="adm_prod_mrp" class="admin-input" placeholder="उदा. 1499" style="width:100%;" />
+                </div>
+                <div>
+                  <label class="admin-label" style="font-size:0.8rem; font-weight:700;">ऑफर मूल्य / डिस्काउंट प्राइस (₹): *</label>
+                  <input type="number" id="adm_prod_offer_price" class="admin-input" placeholder="उदा. 999" style="width:100%;" />
+                </div>
+              </div>
+              <div>
+                <label class="admin-label" style="font-size:0.8rem; font-weight:700;">🔗 थर्ड-पार्टी "Buy Now" लिंक (External Affiliate/Store URL): *</label>
+                <input type="url" id="adm_prod_buynow_url" class="admin-input" placeholder="https://store.example.com/checkout..." style="width:100%;" />
+                <div style="font-size: 0.72rem; color: var(--admin-muted); margin-top: 3px;">
+                  💡 यूजर के "Buy Now" क्लिक करते ही उसकी लीड डेटाबेस में सेव होगी और वह तुरंत इस लिंक पर चला जाएगा।
+                </div>
+              </div>
             </div>
 
             <!-- Optional Custom Thumbnail for Video/Link posts -->
@@ -337,6 +388,7 @@ export async function initAllLandingPages() {
         <option value="all">📂 All Types & Categories</option>
         <optgroup label="Campaign Types">
           <option value="type_landing_page">📄 Standard Landing Pages</option>
+          <option value="type_product">🛒 Product Landing Pages</option>
           <option value="type_webinar">🎥 Webinar Invitations</option>
         </optgroup>
         <optgroup label="Categories">
@@ -411,6 +463,52 @@ export async function initAllLandingPages() {
           <button type="button" id="lp-drawer-close" class="admin-drawer-close">&times;</button>
         </div>
         <div id="lp-drawer-body" class="admin-drawer-body"></div>
+      </div>
+    </div>
+
+    <!-- Modal: Landing Page Category Manager (Add / Edit / Delete) -->
+    <div id="admin_lp_category_modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 99999; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: #fff; border-radius: 14px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 10px; margin-bottom: 14px;">
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #0F172A; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-folder-open" style="color: #0d9488;"></i> लैंडिंग पेज श्रेणियां (Landing Page Categories)
+          </h3>
+          <button type="button" id="btn_close_lp_cat_modal" style="background: transparent; border: none; font-size: 1.5rem; color: #64748B; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+
+        <!-- Add / Edit Category Form Box -->
+        <div style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+          <div style="font-weight: 800; font-size: 0.92rem; color: #1E293B; margin-bottom: 10px;" id="lp_cat_form_title">
+            ➕ नई लैंडिंग पेज श्रेणी जोड़ें (Add New Category)
+          </div>
+          <form id="admin_add_lp_category_form" onsubmit="return false;">
+            <input type="hidden" id="lp_cat_edit_id" value="">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">कैटेगरी ID / Slug: *</label>
+                <input type="text" id="lp_cat_input_id" class="admin-input" placeholder="organic_farming" required style="width: 100%; padding: 6px 10px; font-size: 0.85rem;">
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">कैटेगरी का नाम व इमोजी: *</label>
+                <input type="text" id="lp_cat_input_name" class="admin-input" placeholder="🌱 जैविक खेती व खाद" required style="width: 100%; padding: 6px 10px; font-size: 0.85rem;">
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button type="button" id="btn_cancel_lp_cat_edit" class="admin-button small-button" style="display: none; background: #E2E8F0; color: #475569;">रद्द करें</button>
+              <button type="button" id="btn_save_lp_category" class="admin-button small-button" style="background: #0d9488; border-color: #0f766e; color: #fff; font-weight: 800;">
+                💾 श्रेणी सुरक्षित करें
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Current Categories List -->
+        <div style="font-weight: 800; font-size: 0.88rem; color: #334155; margin-bottom: 8px;">
+          वर्तमान लैंडिंग पेज श्रेणियां (Active Landing Page Categories):
+        </div>
+        <div id="admin_lp_categories_list_wrap" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+          <!-- Populated dynamically -->
+        </div>
       </div>
     </div>
   `;
@@ -496,10 +594,296 @@ export async function initAllLandingPages() {
     if (e.target === drawerOverlay) drawerOverlay.classList.remove('active');
   });
 
+  // Permissions Drawer Toggle
+  const btnTogglePerms = document.getElementById('btn-toggle-media-perms');
+  const cardPerms = document.getElementById('admin-media-perms-card');
+  const btnClosePerms = document.getElementById('btn-close-media-perms');
+  const permsSearchInput = document.getElementById('adm_perms_search');
+  const permsUserList = document.getElementById('adm_perms_user_list');
+
+  btnTogglePerms?.addEventListener('click', () => {
+    if (cardPerms.style.display === 'none') {
+      cardPerms.style.display = 'block';
+      renderUserMediaPermissionsList();
+      cardPerms.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      cardPerms.style.display = 'none';
+    }
+  });
+
+  btnClosePerms?.addEventListener('click', () => {
+    cardPerms.style.display = 'none';
+  });
+
+  permsSearchInput?.addEventListener('input', () => {
+    renderUserMediaPermissionsList();
+  });
+
+  function renderUserMediaPermissionsList() {
+    if (!permsUserList) return;
+    const q = (permsSearchInput?.value || '').toLowerCase().trim();
+    const filtered = allUsers.filter(u => {
+      if (!q) return true;
+      const name = (u.name || u.full_name || '').toLowerCase();
+      const mob = (u.mobile || '').toLowerCase();
+      const sid = (u.share_id || '').toLowerCase();
+      return name.includes(q) || mob.includes(q) || sid.includes(q);
+    });
+
+    if (filtered.length === 0) {
+      permsUserList.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--admin-muted);font-size:0.85rem;">कोई यूजर नहीं मिला</div>';
+      return;
+    }
+
+    permsUserList.innerHTML = filtered.map(u => {
+      const isAct = Boolean(u.is_active || u.is_subscriber);
+      const savedKey = `UCAS_MEDIA_PERMS_${u.id}`;
+      let p = { image: true, youtube: isAct, facebook: isAct, other: isAct, export_csv: isAct };
+      const saved = localStorage.getItem(savedKey);
+      if (saved) {
+        try { p = { ...p, ...JSON.parse(saved) }; } catch (e) {}
+      }
+
+      return `
+        <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border, #334155); border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-weight: 800; font-size: 0.95rem; color: var(--admin-text);">${u.name || u.full_name || 'User'}</span>
+              <span style="font-size: 0.8rem; color: var(--admin-muted); font-family: monospace;">📞 ${u.mobile || '-'} • 🆔 ${u.share_id || '-'}</span>
+            </div>
+            <div>
+              ${isAct ? '<span style="color:#10b981;font-size:0.72rem;font-weight:800;background:rgba(16,185,129,0.15);padding:2px 8px;border-radius:4px;">🟢 Active User</span>' : '<span style="color:#ef4444;font-size:0.72rem;font-weight:800;background:rgba(239,68,68,0.15);padding:2px 8px;border-radius:4px;">🔴 Inactive User</span>'}
+            </div>
+          </div>
+
+          <!-- 6 Service Toggles including Product Landing -->
+          <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center; border-top: 1px dashed var(--admin-border, #334155); padding-top: 8px; font-size: 0.82rem;">
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--admin-text);">
+              <input type="checkbox" onchange="window.saveUserPermSingle('${u.id}', 'image', this.checked)" ${p.image ? 'checked' : ''} style="accent-color: #2563eb;" />
+              <span>🖼️ Image</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--admin-text);">
+              <input type="checkbox" onchange="window.saveUserPermSingle('${u.id}', 'youtube', this.checked)" ${p.youtube ? 'checked' : ''} style="accent-color: #ef4444;" />
+              <span>🎥 YouTube</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--admin-text);">
+              <input type="checkbox" onchange="window.saveUserPermSingle('${u.id}', 'facebook', this.checked)" ${p.facebook ? 'checked' : ''} style="accent-color: #1877f2;" />
+              <span>📸 FB/Insta</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--admin-text);">
+              <input type="checkbox" onchange="window.saveUserPermSingle('${u.id}', 'product_landing', this.checked)" ${p.product_landing !== false ? 'checked' : ''} style="accent-color: #f59e0b;" />
+              <span>🛒 Product Page</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--admin-text);">
+              <input type="checkbox" onchange="window.saveUserPermSingle('${u.id}', 'other', this.checked)" ${p.other ? 'checked' : ''} style="accent-color: #10b981;" />
+              <span>🌐 Web Link</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--admin-text);">
+              <input type="checkbox" onchange="window.saveUserPermSingle('${u.id}', 'export_csv', this.checked)" ${p.export_csv ? 'checked' : ''} style="accent-color: #8b5cf6;" />
+              <span>📥 CSV Export</span>
+            </label>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.saveUserPermSingle = function(profileId, serviceKey, isAllowed) {
+    const savedKey = `UCAS_MEDIA_PERMS_${profileId}`;
+    let p = { image: true, youtube: true, facebook: true, other: true, export_csv: true };
+    const saved = localStorage.getItem(savedKey);
+    if (saved) {
+      try { p = { ...p, ...JSON.parse(saved) }; } catch (e) {}
+    }
+    p[serviceKey] = Boolean(isAllowed);
+    localStorage.setItem(savedKey, JSON.stringify(p));
+  };
+
   // Builder Toggle
+  // ==========================================
+  // LANDING PAGE CATEGORIES MANAGEMENT
+  // ==========================================
+  const DEFAULT_LP_CATEGORIES = [
+    { id: 'agriculture', name: '🌾 Agriculture (कृषि समाधान)' },
+    { id: 'healthcare', name: '🩺 Healthcare (स्वास्थ्य एवं पोषण)' },
+    { id: 'wealth', name: '💰 Wealth & Business (व्यापार एवं आय)' },
+    { id: 'insurance', name: '🛡️ Insurance (बीमा एवं सुरक्षा)' },
+    { id: 'property', name: '🏢 Property (प्रॉपर्टी एवं रियल एस्टेट)' },
+    { id: 'women_empowerment', name: '👩 Women Empowerment (महिला सशक्तिकरण)' },
+    { id: 'cattlecare', name: '🐄 Cattle Care (पशु पालन)' },
+    { id: 'beautycare', name: '✨ Beauty Care (सौंदर्य देखभाल)' },
+    { id: 'webinar', name: '🎥 Webinar Invitation (वेबिनार आमंत्रण)' },
+    { id: 'other', name: '📦 Other / General (सामान्य)' }
+  ];
+
+  function getLandingPageCategories() {
+    try {
+      const stored = localStorage.getItem('AAROGYAM_LP_CATEGORIES');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return DEFAULT_LP_CATEGORIES;
+  }
+
+  function syncLandingPageCategories(cats) {
+    try {
+      localStorage.setItem('AAROGYAM_LP_CATEGORIES', JSON.stringify(cats));
+      localStorage.setItem('AAROGYAM_GLOBAL_LP_CATEGORIES', JSON.stringify(cats));
+    } catch (e) {}
+  }
+
+  function populateLpCategoryDropdowns() {
+    const cats = getLandingPageCategories();
+    const select = document.getElementById('adm_lp_category');
+    const filterSelect = document.getElementById('lp-type-cat-filter');
+
+    if (select) {
+      const currentVal = select.value;
+      select.innerHTML = cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      if (currentVal && cats.some(c => c.id === currentVal)) select.value = currentVal;
+    }
+
+    if (filterSelect) {
+      const currentFilter = filterSelect.value;
+      filterSelect.innerHTML = `
+        <option value="all">📁 सभी श्रेणियां / प्रकार (All)</option>
+        <option value="webinar">🎥 केवल वेबिनार (Webinars Only)</option>
+        <option value="landing_page">📄 केवल लैंडिंग पेज (Regular Pages)</option>
+        ${cats.filter(c => c.id !== 'webinar').map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+      `;
+      if (currentFilter) filterSelect.value = currentFilter;
+    }
+  }
+
+  function openLpCategoryModal() {
+    const modal = document.getElementById('admin_lp_category_modal');
+    if (!modal) return;
+    resetLpCategoryForm();
+    renderLpCategoriesListInModal();
+    modal.style.display = 'flex';
+  }
+
+  function closeLpCategoryModal() {
+    const modal = document.getElementById('admin_lp_category_modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function renderLpCategoriesListInModal() {
+    const wrap = document.getElementById('admin_lp_categories_list_wrap');
+    if (!wrap) return;
+    const cats = getLandingPageCategories();
+
+    wrap.innerHTML = cats.map(c => `
+      <div style="background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong style="font-size: 0.9rem; color: #1E293B;">${c.name}</strong>
+          <span style="font-size: 0.75rem; color: #64748B; font-family: monospace; margin-left: 6px;">(ID: ${c.id})</span>
+        </div>
+        <div style="display: flex; gap: 4px;">
+          <button type="button" onclick="window.editLpCategoryAdmin('${c.id}')" class="admin-button small-button" style="padding: 2px 8px; font-size: 0.72rem; background: #3B82F6; color: #fff;">
+            ✏️ एडिट
+          </button>
+          <button type="button" onclick="window.deleteLpCategoryAdmin('${c.id}')" class="admin-button small-button" style="padding: 2px 8px; font-size: 0.72rem; background: #EF4444; color: #fff;">
+            🗑️ हटाएं
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function resetLpCategoryForm() {
+    const editId = document.getElementById('lp_cat_edit_id');
+    const idInput = document.getElementById('lp_cat_input_id');
+    const nameInput = document.getElementById('lp_cat_input_name');
+    const formTitle = document.getElementById('lp_cat_form_title');
+    const cancelBtn = document.getElementById('btn_cancel_lp_cat_edit');
+
+    if (editId) editId.value = '';
+    if (idInput) { idInput.value = ''; idInput.disabled = false; }
+    if (nameInput) nameInput.value = '';
+    if (formTitle) formTitle.textContent = '➕ नई लैंडिंग पेज श्रेणी जोड़ें (Add New Category)';
+    if (cancelBtn) cancelBtn.style.display = 'none';
+  }
+
+  function saveLpCategory() {
+    const editId = document.getElementById('lp_cat_edit_id')?.value.trim();
+    const idInput = document.getElementById('lp_cat_input_id')?.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+    const nameInput = document.getElementById('lp_cat_input_name')?.value.trim();
+
+    if (!idInput || !nameInput) {
+      showToast('कृपया कैटेगरी ID और नाम दोनों दर्ज करें।', 'error');
+      return;
+    }
+
+    let cats = getLandingPageCategories();
+    if (editId) {
+      const target = cats.find(c => c.id === editId);
+      if (target) {
+        target.name = nameInput;
+        target.id = idInput;
+      }
+    } else {
+      if (cats.some(c => c.id === idInput)) {
+        showToast('यह श्रेणी ID पहले से मौजूद है। कृपया दूसरी ID चुनें।', 'error');
+        return;
+      }
+      cats.push({ id: idInput, name: nameInput });
+    }
+
+    syncLandingPageCategories(cats);
+    resetLpCategoryForm();
+    renderLpCategoriesListInModal();
+    populateLpCategoryDropdowns();
+    showToast('✅ लैंडिंग पेज श्रेणी सफलतापूर्वक सुरक्षित हो गई और सभी यूज़र्स के लिए अपडेट हो गई!', 'success');
+  }
+
+  window.editLpCategoryAdmin = function(catId) {
+    const cats = getLandingPageCategories();
+    const target = cats.find(c => c.id === catId);
+    if (!target) return;
+
+    const editId = document.getElementById('lp_cat_edit_id');
+    const idInput = document.getElementById('lp_cat_input_id');
+    const nameInput = document.getElementById('lp_cat_input_name');
+    const formTitle = document.getElementById('lp_cat_form_title');
+    const cancelBtn = document.getElementById('btn_cancel_lp_cat_edit');
+
+    if (editId) editId.value = target.id;
+    if (idInput) { idInput.value = target.id; idInput.disabled = true; }
+    if (nameInput) nameInput.value = target.name;
+    if (formTitle) formTitle.textContent = `✏️ श्रेणी एडिट करें: ${target.name}`;
+    if (cancelBtn) cancelBtn.style.display = 'inline-block';
+  };
+
+  window.deleteLpCategoryAdmin = function(catId) {
+    let cats = getLandingPageCategories();
+    if (cats.length <= 1) {
+      showToast('कम से कम एक श्रेणी होना आवश्यक है।', 'error');
+      return;
+    }
+    if (!confirm(`क्या आप वाकई श्रेणी ${catId} को हटाना चाहते हैं?`)) return;
+
+    cats = cats.filter(c => c.id !== catId);
+    syncLandingPageCategories(cats);
+    renderLpCategoriesListInModal();
+    populateLpCategoryDropdowns();
+    showToast('🗑️ श्रेणी हटा दी गई।', 'info');
+  };
+
+  document.getElementById('btn-manage-lp-categories')?.addEventListener('click', openLpCategoryModal);
+  document.getElementById('btn-quick-manage-lp-cat')?.addEventListener('click', openLpCategoryModal);
+  document.getElementById('btn_close_lp_cat_modal')?.addEventListener('click', closeLpCategoryModal);
+  document.getElementById('btn_save_lp_category')?.addEventListener('click', saveLpCategory);
+  document.getElementById('btn_cancel_lp_cat_edit')?.addEventListener('click', resetLpCategoryForm);
+
+  populateLpCategoryDropdowns();
+
   toggleBuilderBtn?.addEventListener('click', () => {
     if (builderCard.style.display === 'none') {
       resetAdminBuilder();
+      populateLpCategoryDropdowns();
       builderCard.style.display = 'block';
       builderCard.scrollIntoView({ behavior: 'smooth' });
     } else {
@@ -627,24 +1011,29 @@ export async function initAllLandingPages() {
     });
   }
 
+  const btnMediaProd = document.getElementById('adm_btn_media_product');
+  const boxProdInput = document.getElementById('adm_box_product_input');
+
   function setAdminMediaType(type) {
     activeContentType = type;
-    [btnMediaImg, btnMediaYt, btnMediaFb, btnMediaOther].forEach(btn => {
+    [btnMediaImg, btnMediaYt, btnMediaFb, btnMediaProd, btnMediaOther].forEach(btn => {
       if (!btn) return;
       btn.style.background = 'var(--admin-surface)';
       btn.style.color = 'var(--admin-text)';
       btn.style.border = '1px solid var(--admin-border)';
     });
 
-    if (boxImgInput) boxImgInput.style.display = type === 'image' ? 'block' : 'none';
+    if (boxImgInput) boxImgInput.style.display = (type === 'image' || type === 'product') ? 'block' : 'none';
     if (boxYtInput) boxYtInput.style.display = type === 'youtube' ? 'block' : 'none';
     if (boxFbInput) boxFbInput.style.display = type === 'facebook' ? 'block' : 'none';
+    if (boxProdInput) boxProdInput.style.display = type === 'product' ? 'block' : 'none';
     if (boxOtherInput) boxOtherInput.style.display = type === 'other' ? 'block' : 'none';
-    if (boxCustomThumbWrap) boxCustomThumbWrap.style.display = type !== 'image' ? 'block' : 'none';
+    if (boxCustomThumbWrap) boxCustomThumbWrap.style.display = (type !== 'image' && type !== 'product') ? 'block' : 'none';
 
     if (type === 'image' && btnMediaImg) { btnMediaImg.style.background = '#2563eb'; btnMediaImg.style.color = '#fff'; btnMediaImg.style.border = 'none'; }
     if (type === 'youtube' && btnMediaYt) { btnMediaYt.style.background = '#2563eb'; btnMediaYt.style.color = '#fff'; btnMediaYt.style.border = 'none'; }
     if (type === 'facebook' && btnMediaFb) { btnMediaFb.style.background = '#2563eb'; btnMediaFb.style.color = '#fff'; btnMediaFb.style.border = 'none'; }
+    if (type === 'product' && btnMediaProd) { btnMediaProd.style.background = '#f59e0b'; btnMediaProd.style.color = '#fff'; btnMediaProd.style.border = 'none'; }
     if (type === 'other' && btnMediaOther) { btnMediaOther.style.background = '#2563eb'; btnMediaOther.style.color = '#fff'; btnMediaOther.style.border = 'none'; }
   }
 
@@ -652,6 +1041,7 @@ export async function initAllLandingPages() {
   btnMediaImg?.addEventListener('click', () => setAdminMediaType('image'));
   btnMediaYt?.addEventListener('click', () => setAdminMediaType('youtube'));
   btnMediaFb?.addEventListener('click', () => setAdminMediaType('facebook'));
+  btnMediaProd?.addEventListener('click', () => setAdminMediaType('product'));
   btnMediaOther?.addEventListener('click', () => setAdminMediaType('other'));
 
   // Custom Thumbnail Upload Handler
@@ -1033,7 +1423,8 @@ export async function initAllLandingPages() {
 
       // Type & Category Filter
       if (typeCatVal !== 'all') {
-        if (typeCatVal === 'type_landing_page' && isWb) return false;
+        if (typeCatVal === 'type_landing_page' && (isWb || p.content_type === 'product' || Boolean(p.product_data))) return false;
+        if (typeCatVal === 'type_product' && p.content_type !== 'product' && !p.product_data) return false;
         if (typeCatVal === 'type_webinar' && !isWb) return false;
         if (!typeCatVal.startsWith('type_') && p.category !== typeCatVal) return false;
       }
@@ -1646,6 +2037,20 @@ export async function initAllLandingPages() {
         if (customThumbPreview) customThumbPreview.src = uploadedCustomThumbData;
         if (customThumbPreviewWrap) customThumbPreviewWrap.style.display = 'block';
       }
+    } else if (page.content_type === 'product' || page.product_data) {
+      setAdminMediaType('product');
+      const pData = page.product_data || {};
+      const mrpEl = document.getElementById('adm_prod_mrp');
+      const offerEl = document.getElementById('adm_prod_offer_price');
+      const buyUrlEl = document.getElementById('adm_prod_buynow_url');
+      if (mrpEl) mrpEl.value = pData.mrp || page.mrp || '';
+      if (offerEl) offerEl.value = pData.offer_price || page.offer_price || '';
+      if (buyUrlEl) buyUrlEl.value = pData.buynow_url || page.buynow_url || '';
+      uploadedImageData = page.media_url || page.thumbnail_url;
+      if (uploadedImageData && imgPreview) {
+        imgPreview.src = uploadedImageData;
+        imgPreviewWrap.style.display = 'block';
+      }
     } else if (page.content_type === 'other' || page.content_type === 'link') {
       setAdminMediaType('other');
       if (otherUrlInput) otherUrlInput.value = page.media_url || '';
@@ -1834,6 +2239,17 @@ export async function initAllLandingPages() {
           ogImg = `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
         }
 
+        const prodMrp = (document.getElementById('adm_prod_mrp')?.value || '').trim();
+        const prodOffer = (document.getElementById('adm_prod_offer_price')?.value || '').trim();
+        const prodBuyUrl = (document.getElementById('adm_prod_buynow_url')?.value || '').trim();
+
+        const productData = activeContentType === 'product' ? {
+          mrp: prodMrp,
+          offer_price: prodOffer,
+          buynow_url: prodBuyUrl,
+          image: mediaUrl
+        } : null;
+
         const updatePayload = {
           title: title,
           category: category,
@@ -1844,10 +2260,16 @@ export async function initAllLandingPages() {
           thumbnail_url: thumbUrl,
           message: message,
           webinar_data: webinarData,
+          product_data: productData,
+          mrp: prodMrp ? Number(prodMrp) : null,
+          offer_price: prodOffer ? Number(prodOffer) : null,
+          buynow_url: prodBuyUrl || null,
           status: status,
           og_title: ogTitle,
           og_description: ogDesc,
-          og_image_url: ogImg
+          og_image_url: ogImg,
+          created_by_admin: true,
+          is_admin_template: true
         };
 
         if (db) {
@@ -1877,8 +2299,19 @@ export async function initAllLandingPages() {
       } else {
         // BATCH / MULTI / ALL / SINGLE INSERT
         const batchPayloads = [];
-        const prefix = isWb ? 'WB' : 'LP';
+        const prefix = isWb ? 'WB' : (activeContentType === 'product' ? 'PR' : 'LP');
         const nowIso = new Date().toISOString();
+
+        const prodMrp = (document.getElementById('adm_prod_mrp')?.value || '').trim();
+        const prodOffer = (document.getElementById('adm_prod_offer_price')?.value || '').trim();
+        const prodBuyUrl = (document.getElementById('adm_prod_buynow_url')?.value || '').trim();
+
+        const productData = activeContentType === 'product' ? {
+          mrp: prodMrp,
+          offer_price: prodOffer,
+          buynow_url: prodBuyUrl,
+          image: mediaUrl
+        } : null;
 
         targetUsers.forEach(u => {
           const randomNum = Math.floor(100000 + Math.random() * 900000);
@@ -1903,10 +2336,16 @@ export async function initAllLandingPages() {
             thumbnail_url: thumbUrl,
             message: message,
             webinar_data: webinarData,
+            product_data: productData,
+            mrp: prodMrp ? Number(prodMrp) : null,
+            offer_price: prodOffer ? Number(prodOffer) : null,
+            buynow_url: prodBuyUrl || null,
             status: status,
             og_title: ogTitle,
             og_description: ogDesc,
             og_image_url: ogImg,
+            created_by_admin: true,
+            is_admin_template: true,
             created_at: nowIso
           };
           batchPayloads.push(p);
@@ -2069,6 +2508,14 @@ export async function initAllLandingPages() {
   statusFilter?.addEventListener('change', () => { currentPage = 1; renderTable(); });
   dateFilter?.addEventListener('change', () => { currentPage = 1; renderTable(); });
   refreshBtn?.addEventListener('click', loadData);
+
+  // Handle URL param ?filter=product
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('filter') === 'product') {
+    if (typeCatFilter) {
+      typeCatFilter.value = 'type_product';
+    }
+  }
 
   await loadData();
 }

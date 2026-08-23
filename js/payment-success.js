@@ -52,7 +52,34 @@ async function loadSuccessPage() {
             welcomeMsgEl.innerHTML = `📌 बधाई हो, ${userName} जी! आपका पेमेंट सफल रहा।`;
         }
 
-        // 5. फेसबुक पिक्सेल को सही डेटा भेजने के लिए (Purchase Event)
+        // 5. Save Purchase Record and Activate User
+        try {
+            const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+            const exists = localPurchases.some(p => p.book_id === bookId || p.order_id === orderId);
+            if (!exists) {
+                localPurchases.push({
+                    book_id: bookId,
+                    title: bookName,
+                    amount: amount,
+                    order_id: orderId,
+                    created_at: new Date().toISOString()
+                });
+                localStorage.setItem('AI_PURCHASES', JSON.stringify(localPurchases));
+                localStorage.setItem('purchases', JSON.stringify(localPurchases));
+            }
+
+            const isSub = (bookId === 'SUB001' || parseInt(amount, 10) >= 999);
+            const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+            userObj.is_active = true;
+            if (isSub) userObj.is_subscriber = true;
+            localStorage.setItem('AI_USER', JSON.stringify(userObj));
+            localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
+            localStorage.setItem('UCAS_USER', JSON.stringify(userObj));
+            localStorage.setItem('user_is_active', 'true');
+            if (isSub) localStorage.setItem('user_is_subscriber', 'true');
+        } catch (e) {}
+
+        // 6. फेसबुक पिक्सेल को सही डेटा भेजने के लिए (Purchase Event)
         if (typeof fbq === 'function') {
             fbq('track', 'Purchase', {
                 value: parseFloat(amount),

@@ -81,9 +81,9 @@ function startDailyTimer() {
 function calculateProfileProgress() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     let score = 0;
-    const totalFields = 11; // 11 fields including NetSurf ID
+    const isProfileMarkedDone = localStorage.getItem('ai_profile_completed') === 'true';
     
-    if (storedUser.full_name) score++;
+    if (storedUser.full_name || storedUser.name) score++;
     if (storedUser.mobile) score++;
     if (storedUser.email) score++;
     if (storedUser.gender) score++;
@@ -95,7 +95,11 @@ function calculateProfileProgress() {
     if (storedUser.interest) score++;
     if (storedUser.netsurf_id && String(storedUser.netsurf_id).trim()) score++;
     
-    const percentage = Math.min(100, Math.round((score / totalFields) * 100));
+    const hasCoreFields = Boolean((storedUser.full_name || storedUser.name) && storedUser.mobile && (storedUser.state || storedUser.State || storedUser.district || storedUser.city));
+    let percentage = Math.min(100, Math.round((score / 11) * 100));
+    if (isProfileMarkedDone || (hasCoreFields && score >= 4)) {
+        percentage = 100;
+    }
 
     const completionText = document.getElementById('profileCompletionText');
     const completionBar = document.getElementById('profileCompletionBar');
@@ -125,9 +129,10 @@ function calculateProfileProgress() {
         }
     }
 
-    // Persistent Popup Reminder if < 100%
+    // Persistent Popup Reminder only if strictly incomplete AND not dismissed
     if (nudgePopup) {
-        if (percentage < 100 && (storedUser.id || storedUser.mobile)) {
+        const isDismissed = sessionStorage.getItem('ai_profile_nudge_dismissed') === 'true' || isProfileMarkedDone;
+        if (percentage < 100 && (storedUser.id || storedUser.mobile) && !isDismissed) {
             nudgePopup.style.display = 'block';
             if (nudgePercent) nudgePercent.textContent = `${percentage}%`;
         } else {
@@ -407,95 +412,92 @@ async function loadLibraryData() {
 async function renderLibrarySections(booksArray) {
     const purchasedGrid = document.getElementById('purchasedBooksGrid');
     const availableGrid = document.getElementById('availableBooksGrid');
-    const demoGrid = document.getElementById('unlockBooksGrid') || document.getElementById('section-demo');
+    const demoGrid = document.getElementById('section-demo');
+    const bonusGrid = document.getElementById('section-bonus');
     const comingSoonGrid = document.getElementById('comingSoonGrid');
 
     if (purchasedGrid) purchasedGrid.innerHTML = '';
     if (availableGrid) availableGrid.innerHTML = '';
-    if (demoGrid) {
-        const demoContent = demoGrid.querySelector('.book-grid-2col') || demoGrid;
-        if (demoContent && demoContent !== demoGrid) demoContent.innerHTML = '';
-    }
     if (comingSoonGrid) comingSoonGrid.innerHTML = '';
 
     if (!booksArray) return;
 
-    let userPurchases = [];
-    const localUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-    if (localUser.id && typeof db !== 'undefined') {
+    // 1. Gather all purchases (LocalStorage + Supabase)
+    const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+    let userPurchases = [...localPurchases];
+
+    const localUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+    if (localUser.id) {
         try {
-            const { data } = await db.from('purchases').select('*').eq('profile_id', localUser.id);
-            userPurchases = data || [];
+            const activeDb = window.dbClient || window.supabase || (typeof db !== 'undefined' ? db : null);
+            if (activeDb) {
+                const { data } = await activeDb.from('purchases').select('*').eq('profile_id', localUser.id);
+                if (data && data.length) {
+                    data.forEach(p => {
+                        if (!userPurchases.some(up => up.book_id === p.book_id)) {
+                            userPurchases.push(p);
+                        }
+                    });
+                }
+            }
         } catch (e) {
             console.log("Purchases fetch note:", e);
         }
     }
 
     const testPaymentDone = localStorage.getItem('AI_CURRENT_PAYMENT');
-    let hasBoughtAny = userPurchases.length > 0 || testPaymentDone;
+    let hasBoughtAny = userPurchases.length > 0 || Boolean(testPaymentDone);
 
-    // डायनेमिक काउंट्स कैलकुलेट करना (Purchased, Bonus, Wishlist)
     let purchasedCount = 0;
-    let bonusCount = 0; // उदाहरण के लिए फिक्स या डायनेमिक बोनस
-    let wishlistCount = JSON.parse(localStorage.getItem('AI_WISHLIST') || '[]').length;
+    let bonusCount = 2; // Default 2 unlocked VIP Bonus Kits
+    let wishlistItems = JSON.parse(localStorage.getItem('AI_WISHLIST') || '[]');
+    let wishlistCount = wishlistItems.length;
 
+    // Render Books across all sections
     booksArray.forEach(book => {
         const bookId = book.book_id || book.id;
         const bookName = book.title || book.name;
-        const bookCover = book.cover_image || book.cover;
+        const bookCover = book.cover_image || book.cover || '/images/banners/farmer-community-banner.jpeg';
 
-      
-       // 1. Purchased / My Books
-if (userPurchases.some(p => p.book_id === bookId)) {
-    purchasedCount++;
-    const card = document.createElement('div');
-    card.className = 'book-card';
-    card.innerHTML = `
-        <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
-        <h4>${bookName}</h4>
-        <div class="book-btn-group" style="display:flex;gap:8px;margin-top:10px;">
-            <a href="reader.html?book=${bookId}" class="btn-read" style="flex:1;padding:10px;background:#138A36;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Read Now</a>
-            <a href="download.html?book=${bookId}" class="btn-buy" style="flex:1;padding:10px;background:#E86A17;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Download</a>
-        </div>
-    `;
-    if (purchasedGrid) purchasedGrid.appendChild(card);
-}
+        // 1. Purchased / My Books
+        const isPurchased = userPurchases.some(p => (p.book_id && p.book_id.toLowerCase() === bookId.toLowerCase()) || (p.id && p.id.toLowerCase() === bookId.toLowerCase()));
+        if (isPurchased) {
+            purchasedCount++;
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.innerHTML = `
+                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
+                <h4>${bookName}</h4>
+                <div class="book-btn-group" style="display:flex;gap:8px;margin-top:10px;">
+                    <a href="/reader.html?book=${bookId}" class="btn-read" style="flex:1;padding:10px;background:#138A36;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Read Now</a>
+                    <a href="/pdf/full/${bookId}.pdf" target="_blank" class="btn-buy" style="flex:1;padding:10px;background:#E86A17;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Download PDF</a>
+                </div>
+            `;
+            if (purchasedGrid) purchasedGrid.appendChild(card);
+        }
 
-      // 2. Available Books
-        if (bookId === 'BK001' || bookId === 'BK002' || bookId === 'BK006') {
+        // 2. Available Books
+        if (book.status === 'active' || bookId === 'BK001' || bookId === 'BK002' || bookId === 'BK006') {
             const availCard = document.createElement('div');
             availCard.className = 'book-card';
-            
-            // हर बुक के हिसाब से उसकी सही ID के साथ URL सेट करें
             let targetUrl = `/ebooks/checkout.html?id=${bookId}`;
 
             availCard.innerHTML = `
                 <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
                 <h4>${bookName}</h4>
-                <div class="book-btn-group" style="margin-top: 10px;">
-                    <a href="${targetUrl}" class="btn-available">Buy Now / Details</a>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0;">
+                    <span style="font-weight:800;color:#138A36;font-size:1.05rem;">₹${book.offerPrice || 99}</span>
+                    <span style="text-decoration:line-through;color:#94a3b8;font-size:0.85rem;">₹${book.mrp || 299}</span>
+                </div>
+                <div class="book-btn-group" style="margin-top: 6px;">
+                    <a href="${targetUrl}" class="btn-available" style="width:100%;text-align:center;display:block;padding:10px;background:#E86A17;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;">Buy Now / Details</a>
                 </div>
             `;
             if (availableGrid) availableGrid.appendChild(availCard);
         }
 
-        // 3. Demo Books
-        if (bookId === 'BK001') {
-            const demoCard = document.createElement('div');
-            demoCard.className = 'book-card';
-            demoCard.innerHTML = `
-                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
-                <h4>${bookName} (Demo)</h4>
-                <div class="book-btn-group" style="margin-top:10px;">
-                    <button class="btn-read" onclick="window.location.href='download.html'" style="width:100%;padding:10px;background:#138A36;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;">Read Demo</button>
-                </div>
-            `;
-            const targetDemoGrid = document.getElementById('unlockBooksGrid') || (document.getElementById('section-demo') ? document.getElementById('section-demo').querySelector('.book-grid-2col') : null);
-            if (targetDemoGrid) targetDemoGrid.appendChild(demoCard);
-        }
-
-        // 4. Coming Soon Books
-        if (bookId !== 'BK001' && bookId !== 'BK002' && bookId !== 'BK006') {
+        // 3. Coming Soon Books
+        if (book.status === 'coming_soon' || (bookId !== 'BK001' && bookId !== 'BK002' && bookId !== 'BK006' && bookId !== 'SUB001')) {
             const comingCard = document.createElement('div');
             comingCard.className = 'book-card';
             comingCard.innerHTML = `
@@ -506,21 +508,64 @@ if (userPurchases.some(p => p.book_id === bookId)) {
                 <h4>${bookName}</h4>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 0 4px;">
                     <span style="font-size: 0.75rem; color: #E86A17; font-weight: 700; background:#fdf2e9; padding:4px 8px; border-radius:6px;">Coming Soon</span>
-                    <a href="/ebooks/wishlist.html" style="padding: 6px 12px; font-size: 0.75rem; background:#138A36; color:#fff; border-radius:10px; text-decoration:none; font-weight:700;">Notify Me</a>
+                    <a href="javascript:void(0)" onclick="alert('✅ आपकी रुचि दर्ज कर ली गई है। पुस्तक लाइव होने पर आपको सूचित किया जाएगा।')" style="padding: 6px 12px; font-size: 0.75rem; background:#138A36; color:#fff; border-radius:10px; text-decoration:none; font-weight:700;">Notify Me</a>
                 </div>
             `;
             if (comingSoonGrid) comingSoonGrid.appendChild(comingCard);
         }
     });
 
-    // वेलकम कार्ड के स्टेट्स काउंट्स को डायनेमिक रूप से अपडेट करना
-    updateWelcomeStatsCounts(hasBoughtAny ? purchasedCount : 0, bonusCount, wishlistCount);
+    // Populate Bonus Books section
+    if (bonusGrid) {
+        bonusGrid.innerHTML = `
+            <div class="section-title"><span>🎁 फ्री बोनस सामग्री (Free Bonus Materials)</span></div>
+            <div class="book-grid-2col">
+                <div class="book-card" style="background:#fff;border-radius:12px;padding:14px;border:1.5px solid #10b981;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+                    <div style="font-size:2.2rem;text-align:center;margin-bottom:8px;">🌿</div>
+                    <h4 style="color:#065f46;margin-bottom:6px;">ऑर्गेनिक स्प्रे एवं फसल सुरक्षा फॉर्मूला</h4>
+                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:12px;line-height:1.4;">घर पर प्राकृतिक कीटनाशक और टॉनिक बनाने की सम्पूर्ण विधि।</p>
+                    <a href="/pdf/sample/BK001-demo.pdf" target="_blank" style="display:block;text-align:center;background:#10b981;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;">📥 बोनस PDF डाउनलोड</a>
+                </div>
+                <div class="book-card" style="background:#fff;border-radius:12px;padding:14px;border:1.5px solid #f59e0b;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+                    <div style="font-size:2.2rem;text-align:center;margin-bottom:8px;">💻</div>
+                    <h4 style="color:#92400e;margin-bottom:6px;">AI वेबसाइट एवं डिजिटल टूल्स चीटशीट</h4>
+                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:12px;line-height:1.4;">10 उपयोगी AI टूल्स व प्रॉम्प्ट्स का विशेष गाइड।</p>
+                    <a href="/pdf/sample/BK001-demo.pdf" target="_blank" style="display:block;text-align:center;background:#f59e0b;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;">📥 बोनस PDF डाउनलोड</a>
+                </div>
+            </div>
+        `;
+    }
 
-    if (!hasBoughtAny && purchasedGrid && purchasedGrid.children.length === 0) {
+    // Populate Demo Books section
+    if (demoGrid) {
+        demoGrid.innerHTML = `
+            <div class="section-title"><span>📖 डेमो ई-बुक्स प्रिव्यू (Read Free)</span></div>
+            <div class="book-grid-2col">
+                <div class="book-card" style="background:#fff;border-radius:12px;padding:14px;border:1px solid #cbd5e1;">
+                    <img src="/images/books/kharif-master-guide-2026-cover.webp" alt="Kharif Master Guide" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+                    <h4>खरीफ फसल मास्टर गाइड 2026 (Free Sample)</h4>
+                    <a href="/pdf/sample/BK001-demo.pdf" target="_blank" style="display:block;text-align:center;background:#0284c7;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;margin-top:8px;">📖 सैंपल पढ़ें (Read Demo)</a>
+                </div>
+                <div class="book-card" style="background:#fff;border-radius:12px;padding:14px;border:1px solid #cbd5e1;">
+                    <img src="/images/books/fasal-ka-doctor-cover.webp" alt="Fasal Ka Doctor" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
+                    <h4>फसल का डॉक्टर (Free Sample)</h4>
+                    <a href="/pdf/sample/BK001-demo.pdf" target="_blank" style="display:block;text-align:center;background:#0284c7;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;margin-top:8px;">📖 सैंपल पढ़ें (Read Demo)</a>
+                </div>
+            </div>
+        `;
+    }
+
+    // Update Welcome Card Stats
+    updateWelcomeStatsCounts(purchasedCount, bonusCount, wishlistCount);
+
+    if (purchasedCount === 0 && purchasedGrid) {
         purchasedGrid.innerHTML = `
-            <div style="grid-column: span 2; text-align: center; padding: 30px; color: #666;">
-                <p style="font-size: 0.95rem; font-weight: 600;">📚 आपकी लाइब्रेरी में अभी कोई ई-बुक नहीं है।</p>
-                <p style="font-size: 0.8rem; margin-top: 5px;">कृपया 'Available' टैब से ई-बुक खरीदें।</p>
+            <div style="grid-column: span 2; text-align: center; padding: 30px; color: #666; background:#fff; border-radius:12px; border:1px dashed #cbd5e1;">
+                <p style="font-size: 0.95rem; font-weight: 700; color:#1e293b;">📚 आपकी लाइब्रेरी में अभी कोई खरीदी गई ई-बुक नहीं है।</p>
+                <p style="font-size: 0.82rem; margin-top: 6px; color:#64748b;">कृपया 'उपलब्ध बुक्स (AVAILABLE)' टैब से अपनी पसंद की ई-बुक या VIP पास प्राप्त करें।</p>
+                <button onclick="switchTab('available')" style="margin-top:12px; background:#E86A17; color:#fff; border:none; padding:8px 18px; border-radius:8px; font-weight:800; cursor:pointer;">
+                    🛍️ उपलब्ध पुस्तकें देखें
+                </button>
             </div>
         `;
     }
@@ -530,12 +575,16 @@ if (userPurchases.some(p => p.book_id === bookId)) {
 function updateWelcomeStatsCounts(purchased, bonus, wishlist) {
     const statsContainer = document.querySelector('.welcome-card-soft');
     if (!statsContainer) return;
+
+    const kpiEl = document.getElementById('kpiPurchasedCount');
+    if (kpiEl) kpiEl.textContent = purchased;
     
-    const countElements = statsContainer.querySelectorAll('div[style*="background: #fff"] strong, div[style*="background: #FFFFFF"] strong, .welcome-card-soft div > div > strong');
-    if (countElements.length >= 3) {
-        countElements[0].textContent = purchased;
-        countElements[1].textContent = bonus;
-        countElements[2].textContent = wishlist;
+    const countElements = statsContainer.querySelectorAll('div[style*="border-top: 1px dashed"] strong');
+    if (countElements.length >= 4) {
+        countElements[0].textContent = '2'; // Read Free
+        countElements[1].textContent = purchased; // Purchased
+        countElements[2].textContent = bonus; // Bonus
+        countElements[3].textContent = wishlist; // Wishlist
     }
 }
 

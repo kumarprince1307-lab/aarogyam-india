@@ -194,8 +194,9 @@ function renderUsersTable(users) {
                   </button>
                 </td>
                 <td>
-                  <div style="display: flex; gap: 8px; align-items: center;">
+                  <div style="display: flex; gap: 6px; align-items: center;">
                       <a href="#user-details?id=${u.id}" data-route="user-details" data-id="${u.id}" class="admin-button small-button">View</a>
+                      <a href="#user-permissions?userId=${u.id}" data-route="user-permissions" data-id="${u.id}" class="admin-button small-button" style="background:#0F172A;color:#FBBF24;border:1px solid #F59E0B;" title="Manage Granular Media & Platform Permissions">🔒 Perms</a>
                   </div>
                 </td>
               </tr>
@@ -224,14 +225,19 @@ function renderUsersTable(users) {
 }
 
 export async function initUsers() {
-  initAdminLayout('Users', 'Customer profiles, referral sources and user status.');
+  initAdminLayout('Users', 'Customer profiles, referral sources, media services and user status.');
 
   const content = document.getElementById('page-content');
   if (!content) return;
 
   content.innerHTML = `
     <div class="admin-section">
-      <div class="admin-section-title">All Users</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div class="admin-section-title" style="margin:0;">All Users</div>
+        <a href="#user-permissions" data-route="user-permissions" class="admin-button" style="background:linear-gradient(135deg, #1E293B 0%, #0F172A 100%);color:#FBBF24;border:1.5px solid #F59E0B;display:inline-flex;align-items:center;gap:6px;font-weight:800;text-decoration:none;padding:8px 14px;border-radius:8px;">
+          <span>🛡️</span> All User Permissions Matrix
+        </a>
+      </div>
       <div class="admin-card admin-controls">
         <input id="user-search" type="search" placeholder="Search by name, mobile, or email" class="admin-input" />
         <input id="user-reg-date-filter" type="date" title="Filter by registration date" class="admin-input" />

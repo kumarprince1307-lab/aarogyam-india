@@ -141,8 +141,10 @@ button, input, select, textarea {
 
 .ucas-app {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   position: relative;
+  width: 100%;
 }
 
 /* Top App Header */
@@ -152,15 +154,16 @@ button, input, select, textarea {
   left: 0;
   right: 0;
   height: var(--header-h);
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 253, 248, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
-  z-index: 90;
+  padding: 0 1.25rem;
+  z-index: 1000;
   transition: all var(--transition-normal);
 }
 
@@ -304,6 +307,52 @@ button, input, select, textarea {
   flex-direction: column;
   justify-content: space-between;
   padding: 1.25rem 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .ucas-sidebar {
+    display: flex !important;
+  }
+
+  .ucas-main {
+    margin-left: var(--sidebar-w) !important;
+    width: calc(100% - var(--sidebar-w)) !important;
+    max-width: calc(100% - var(--sidebar-w)) !important;
+    padding: 1.25rem 2rem !important;
+    margin-top: var(--header-h) !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .ucas-bottom-nav {
+    display: none !important;
+  }
+
+  .site-footer {
+    margin-left: var(--sidebar-w) !important;
+    width: calc(100% - var(--sidebar-w)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .ucas-sidebar {
+    display: none !important;
+  }
+
+  .ucas-main {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0.85rem !important;
+    margin-top: var(--header-h) !important;
+    margin-bottom: calc(var(--bottom-nav-h) + 1.5rem) !important;
+  }
+
+  .site-footer {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-bottom: calc(var(--bottom-nav-h) + 30px) !important;
+  }
 }
 
 .ucas-nav-list {
@@ -513,14 +562,14 @@ button, input, select, textarea {
   color: var(--danger);
 }
 
-/* Main Content Area */
+/* Main Content Area (Centered, Clean Layout matching My Library) */
 .ucas-main {
   flex: 1;
   width: 100%;
-  margin-top: var(--header-h);
-  margin-bottom: calc(var(--bottom-nav-h) + 1rem);
-  padding: 1rem;
-  max-width: 1320px;
+  margin-top: calc(var(--header-h) + 0.75rem);
+  margin-bottom: calc(var(--bottom-nav-h) + 1.5rem);
+  padding: 0 1rem;
+  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -1418,7 +1467,7 @@ button, input, select, textarea {
 .ucas-actions-two-rows {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   margin-top: 6px;
   padding-top: 10px;
   border-top: 1px solid #F1F5F9;
@@ -1462,30 +1511,51 @@ button, input, select, textarea {
 }
 
 .ucas-btn-act {
-  padding: 8px 6px;
-  font-size: 0.78rem;
+  padding: 8px 8px;
+  font-size: 0.8rem;
   font-weight: 800;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
   text-decoration: none;
   transition: transform 0.15s ease, opacity 0.15s ease;
   white-space: nowrap;
+  min-height: 36px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 .ucas-btn-act:active {
   transform: scale(0.95);
 }
 
-@media (max-width: 480px) {
+/* 📱 Responsive 2x2 Grid for Mobile Sharing Buttons */
+@media (max-width: 640px) {
+  .ucas-btn-row-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .ucas-btn-row-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+  }
   .ucas-btn-act {
-    padding: 7px 3px !important;
-    font-size: 0.72rem !important;
-    gap: 3px !important;
-    min-width: 0 !important;
+    padding: 9px 8px !important;
+    font-size: 0.82rem !important;
+    min-height: 38px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .ucas-btn-row-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 4px !important;
+  }
+  .ucas-btn-act {
+    font-size: 0.76rem !important;
+    padding: 7px 4px !important;
   }
 }
 
@@ -1516,5 +1586,53 @@ button, input, select, textarea {
 .ucas-btn-act-delete {
   background: #EF4444 !important;
   color: #FFFFFF !important;
+}
+
+/* Tiranga Header Animation & Green Notification Bell */
+.ucas-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 253, 248, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;
+}
+
+.ucas-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #E86A17, #ffffff, #138A36, #E86A17);
+  background-size: 300% 100%;
+  animation: tirangaWave 6s linear infinite;
+}
+
+@keyframes tirangaWave {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 0%; }
+}
+
+.user-notif-bell-btn, .ucas-bell-styled {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: #10B981 !important;
+  border: 1.5px solid #10B981 !important;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+  position: relative;
+}
+.user-notif-bell-btn i, .ucas-bell-styled i {
+  color: #10B981 !important;
 }
 

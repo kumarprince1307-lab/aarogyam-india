@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aarogyam Pro VIP Subscription | ₹999/Year All-Access Pass</title>
+  <meta name="description" content="Aarogyam India Pro VIP Annual Membership. Get full access to UCAS marketing engine, unlimited landing pages, eBooks, live webinars, and lead tools.">
+  
+  <link rel="icon" type="image/png" href="/images/logo/logo.png">
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #090D16;
+      --card-bg: rgba(18, 24, 38, 0.85);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #10B981;
+      --primary-glow: rgba(16, 185, 129, 0.4);
+      --gold: #F59E0B;
+      --gold-glow: rgba(245, 158, 11, 0.35);
+      --text-light: #F8FAFC;
+      --text-muted: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 20% 15%, rgba(16, 185, 129, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 85%, rgba(245, 158, 11, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.3) 0%, transparent 100%);
+      color: var(--text-light);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* Animated background grid */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Navbar */
+    .navbar {
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .brand-logo img {
+      height: 44px;
+      filter: drop-shadow(0 2px 8px var(--primary-glow));
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-outline {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 60px 0 40px;
+    }
+
+    .vip-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid var(--gold);
+      border-radius: 30px;
+      color: var(--gold);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 20px var(--gold-glow);
+      animation: pulse 2.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.03); opacity: 0.9; }
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #10B981 0%, #34D399 50%, #F59E0B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 35px;
+    }
+
+    /* Pricing Main Card */
+    .pricing-card-wrapper {
+      max-width: 780px;
+      margin: 0 auto 60px;
+      position: relative;
+    }
+
+    .pricing-glow {
+      position: absolute;
+      inset: -4px;
+      background: linear-gradient(135deg, #10B981, #F59E0B, #3B82F6);
+      border-radius: 28px;
+      z-index: 0;
+      filter: blur(12px);
+      opacity: 0.6;
+    }
+
+    .pricing-card {
+      position: relative;
+      z-index: 1;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    .pricing-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 25px;
+      margin-bottom: 30px;
+    }
+
+    .plan-info h3 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .plan-info p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .price-tag {
+      text-align: right;
+    }
+
+    .price-value {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: #10B981;
+      line-height: 1;
+    }
+
+    .price-period {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .old-price {
+      font-size: 1.1rem;
+      color: #64748B;
+      text-decoration: line-through;
+      margin-right: 6px;
+    }
+
+    /* Benefits Grid */
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 35px;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 14px 16px;
+      border-radius: 12px;
+    }
+
+    .benefit-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .benefit-text strong {
+      display: block;
+      font-size: 0.92rem;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .benefit-text span {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* CTA Button */
+    .cta-btn {
+      width: 100%;
+      padding: 18px 24px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px -5px var(--primary-glow);
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px -5px var(--primary-glow);
+      background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+    }
+
+    .cta-guarantee {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Secondary Option Box */
+    .alternative-box {
+      max-width: 780px;
+      margin: 0 auto 60px;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1.5px dashed var(--gold);
+      border-radius: 18px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .alt-info h4 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 3px;
+    }
+
+    .alt-info p {
+      font-size: 0.82rem;
+      color: #CBD5E1;
+    }
+
+    .alt-btn {
+      padding: 10px 18px;
+      background: var(--gold);
+      color: #000;
+      font-weight: 800;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .alt-btn:hover {
+      background: #FBBF24;
+      transform: translateY(-1px);
+    }
+
+    /* Comparison Table */
+    .comparison-section {
+      max-width: 780px;
+      margin: 0 auto 80px;
+    }
+
+    .section-head {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .section-head h3 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+
+    .comp-table th, .comp-table td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.86rem;
+    }
+
+    .comp-table th {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .comp-table th:last-child {
+      color: var(--primary);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 30px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.1rem;
+      }
+      .pricing-card {
+        padding: 24px 18px;
+      }
+      .price-value {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <div class="container">
+    <!-- Navbar -->
+    <header class="navbar">
+      <a href="/index.html" class="brand-logo">
+        <img src="/images/logo/logo.png" alt="Aarogyam India" onerror="this.style.display='none'">
+        <span class="brand-title">Aarogyam <span style="color:var(--primary);">India</span></span>
+      </a>
+      <div class="nav-actions">
+        <a href="/ucas/index.html" class="btn-outline">
+          <i class="fa-solid fa-house-user"></i> My Profile
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="vip-pill">
+        <i class="fa-solid fa-crown"></i> Prime VIP Pass
+      </div>
+      <h1 class="hero-title">
+        असीमित शक्ति, स्मार्ट टूल्स और <br>
+        <span class="gradient-text">Aarogyam Pro VIP सदस्यता</span>
+      </h1>
+      <p class="hero-subtitle">
+        UCAS मार्केटिंग इंजन, अनकंडीशनल लाइव अप्रूवल, डिजिटल ई-बुक्स, लाइव वेबिनार और सम्पूर्ण लीड जेनरेशन टूल्स का 1 साल का ऑल-एक्सेस पास।
+      </p>
+    </section>
+
+    <!-- Pricing Card -->
+    <div class="pricing-card-wrapper">
+      <div class="pricing-glow"></div>
+      <div class="pricing-card">
+        
+        <div class="pricing-header">
+          <div class="plan-info">
+            <h3>👑 Aarogyam Pro Annual VIP</h3>
+            <p>12 महीने की सम्पूर्ण एक्टिव सदस्यता (All Access)</p>
+          </div>
+          <div class="price-tag">
+            <div>
+              <span class="old-price">₹2,999</span>
+              <span class="price-value">₹999</span>
+            </div>
+            <div class="price-period">प्रति वर्ष (Just ₹83/Month)</div>
+          </div>
+        </div>
+
+        <!-- 8 VIP Benefits Grid -->
+        <div class="benefits-grid">
+          <div class="benefit-item">
+            <div class="benefit-icon"><i class="fa-solid fa-rocket"></i></div>
+            <div class="benefit-text">
+              <strong>UCAS अनलिमिटेड मार्केटिंग इंजन</strong>
+              <span>YouTube, Facebook व Web Link पोस्ट तुरंत लाइव बनाएं।</span>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon"><i class="fa-solid fa-bolt"></i></div>
+            <div class="benefit-text">
+              <strong>इंस्टेंट लाइव अप्रूवल (No Review)</strong>
+              <span>आपके बनाए गए लैंडिंग पेज बिना रुके तुरंत लाइव व शेयर योग्य होंगे।</span>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+            <div class="benefit-text">
+              <strong>सम्पूर्ण डिजिटल ई-लाइब्रेरी</strong>
+              <span>कृषि डॉक्टर, खरीफ फसल, हेल्थ व बिज़नेस ई-बुक्स अनलॉक।</span>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon"><i class="fa-solid fa-video"></i></div>
+            <div class="benefit-text">
+              <strong>VIP वेबिनार एवं मीटिंग डेस्क</strong>
+              <span>विशेषज्ञ सत्रों और राष्ट्रीय वेबिनार में भाग लेने की पूर्ण अनुमति।</span>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon"><i class="fa-solid fa-file-csv"></i></div>
+            <div class="benefit-text">
+              <strong>CSV डेटा एक्सपोर्ट व लीड मैनेजर</strong>
+              <span>अपने सभी फॉर्म सर्वे लीड्स को 1-क्लिक में एक्सेल/CSV में डाउनलोड करें।</span>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon"><i class="fa-solid fa-comments"></i></div>
+            <div class="benefit-text">
+              <strong>डायरेक्ट WhatsApp ब्रॉडकास्ट</strong>
+              <span>पंजीकृत ग्राहकों को बिना किसी रोकटोक के व्यक्तिगत संदेश भेजें।</span>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon"><i class="fa-solid fa-qrcode"></i></div>
+            <div class="benefit-text">
+              <strong>व्यक्तिगत Smart QR & Share ID</strong>
+              <span>हर शेयर पर 100% स्थायी रेफरल एट्रिब्यूशन सुरक्षा।</span>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon"><i class="fa-solid fa-headset"></i></div>
+            <div class="benefit-text">
+              <strong>24/7 VIP प्रायोरिटी सपोर्ट</strong>
+              <span>तकनीकी व व्यावसायिक सहायता के लिए विशेष हेल्पलाइन।</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Checkout Button -->
+        <a href="/ebooks/checkout.html?product=subscription&amount=999&title=Aarogyam%20Pro%20VIP%20Annual%20Subscription" class="cta-btn" id="btn-subscribe-now">
+          <span>👑 अभी Aarogyam Pro VIP बनें (₹999 / वर्ष)</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <div class="cta-guarantee">
+          <i class="fa-solid fa-shield-check" style="color:var(--primary);"></i>
+          <span>100% सुरक्षित भुगतान • GST इनवॉइस तुरंत My Purchases में उपलब्ध</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Alternative Activation Box -->
+    <div class="alternative-box">
+      <div class="alt-info">
+        <h4>💡 क्या आप केवल एक ई-बुक से शुरुआत करना चाहते हैं?</h4>
+        <p>कोई भी ₹99 की ई-बुक (खेती डॉक्टर या खरीफ फसल) खरीदकर भी आपका अकाउंट एक्टिव हो जाता है!</p>
+      </div>
+      <a href="/ebooks/checkout.html?product=kheti-dr&amount=99&title=Kheti%20Doctor%20Book" class="alt-btn">
+        📖 ₹99 में ई-बुक खरीदें &rarr;
+      </a>
+    </div>
+
+    <!-- Feature Comparison Table -->
+    <section class="comparison-section">
+      <div class="section-head">
+        <h3>मुफ़्त (Free) vs Aarogyam Pro VIP तुलना</h3>
+        <p style="color:var(--text-muted);font-size:0.88rem;">देखें प्रो मेंबरशिप आपके काम को कितनी गति देती है</p>
+      </div>
+
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>सुविधा / फीचर</th>
+            <th>मुफ़्त यूज़र (Free)</th>
+            <th>👑 Pro VIP (₹999/yr)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>इमेज लैंडिंग पेज</td>
+            <td>✅ उपलब्ध (Pending Review)</td>
+            <td>🟢 अनलिमिटेड (Instant Live)</td>
+          </tr>
+          <tr>
+            <td>YouTube व Video पोस्ट</td>
+            <td>🔒 लॉक</td>
+            <td>🟢 अनलिमिटेड</td>
+          </tr>
+          <tr>
+            <td>Facebook / Insta Reel पोस्ट</td>
+            <td>🔒 लॉक</td>
+            <td>🟢 अनलिमिटेड</td>
+          </tr>
+          <tr>
+            <td>Web / Blog Links</td>
+            <td>🔒 लॉक</td>
+            <td>🟢 अनलिमिटेड</td>
+          </tr>
+          <tr>
+            <td>CSV डेटा एक्सपोर्ट</td>
+            <td>🔒 लॉक</td>
+            <td>🟢 1-क्लिक डाउनलोड</td>
+          </tr>
+          <tr>
+            <td>WhatsApp व डायरेक्ट कॉल टूल्स</td>
+            <td>🔒 सीमित</td>
+            <td>🟢 असीमित उपयोग</td>
+          </tr>
+          <tr>
+            <td>GST इनवॉइस व डिजिटल रसीद</td>
+            <td>-</td>
+            <td>🟢 My Purchases में तत्काल</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2026 Aarogyam India. All rights reserved. | <a href="/terms.html" style="color:var(--text-muted);">Terms & Privacy</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // Record interaction
+    console.log('✅ Subscription Page Loaded.');
+  </script>
+</body>
+</html>

@@ -10,14 +10,14 @@ const MENU = [
     { label: 'All Survey List', href: 'all-surveys.html' }
   ] },
   { label: 'Books', icon: '📚', children: [ { label: 'Categories', href: '#' }, { label: 'Books', href: '#' }, { label: 'Demo Books', href: '#' } ] },
-  { label: 'Products', icon: '🛍️', children: [ { label: 'Categories', href: '#' }, { label: 'Products', href: '#' } ] },
+  { label: 'Products', icon: '🛍️', children: [ { label: 'Product Landing Pages', href: 'product-landing-pages.html' }, { label: 'Categories', href: '#' }, { label: 'Products', href: '#' } ] },
   { label: 'Diseases', href: '#', icon: '🧾' },
   { label: 'Orders', icon: '🧾', children: [ { label: 'Purchases', href: 'purchases.html' }, { label: 'Checkout Funnel', href: 'checkout-funnel.html' }, { label: 'Downloads', href: 'downloads.html' } ] },
   { label: 'Reports', icon: '📈', children: [ { label: 'Daily', href: 'reports.html#daily-report' }, { label: 'Monthly', href: '#' }, { label: 'Sales', href: '#' }, { label: 'Referral', href: 'reports.html#share-report' }, { label: 'Source', href: 'reports.html#lead-report' } ] },
-  { label: 'Marketing', icon: '📣', children: [ { label: 'UCAS Landing Pages', href: 'all-landing-pages.html' }, { label: 'Share Links', href: '#' }, { label: 'Campaigns', href: '#' } ] },
+  { label: 'Marketing', icon: '📣', children: [ { label: 'UCAS Landing Pages', href: 'all-landing-pages.html' }, { label: 'Hook Templates & Shayari', href: 'marketing-templates.html' }, { label: 'Share Links', href: '#' }, { label: 'Campaigns', href: '#' } ] },
   { label: 'Webinars', href: 'all-webinars.html', icon: '🎥' },
   { label: 'Wallet', href: '#', icon: '💰' },
-  { label: 'Notifications', href: 'notifications.html', icon: '🔔' },
+  { label: 'Notifications', icon: '🔔', children: [ { label: 'All Notifications', href: 'notifications.html' }, { label: '📢 Broadcast Center', href: 'broadcast.html' } ] },
   { label: 'Admin App', href: 'admin-app.html', icon: '📱' },
   { label: 'Settings', href: 'settings.html', icon: '⚙️' },
   { label: 'Support', href: '#', icon: '🆘' },
@@ -37,7 +37,7 @@ function createMenuItem(item) {
     `;
   }
   // for top-level links map known pages to data-route for SPA
-  const routeName = ['dashboard','users','all-webinars','webinars','purchases','checkout-funnel','downloads','reports','notifications','admin-app','settings'].includes((item.href||'').split('.').shift()) ? (item.href||'').split('.').shift() : '';
+  const routeName = ['dashboard','users','all-webinars','webinars','purchases','checkout-funnel','downloads','reports','notifications','broadcast','admin-app','settings'].includes((item.href||'').split('.').shift()) ? (item.href||'').split('.').shift() : '';
   return `<li><a href="#" ${routeName?`data-route="${routeName}"`:''} class="menu-link"><span class="menu-icon">${item.icon || ''}</span><span class="menu-label">${item.label}</span></a></li>`;
 }
 

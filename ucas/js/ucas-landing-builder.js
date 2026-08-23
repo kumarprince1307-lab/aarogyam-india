@@ -21,7 +21,42 @@
   let userLandingPages = [];
   let editingLandingPageId = null; // null for new, string for edit
 
+  const DEFAULT_LP_CATEGORIES = [
+    { id: 'agriculture', name: '🌾 Agriculture (कृषि)' },
+    { id: 'healthcare', name: '❤️ Health Care (स्वास्थ्य)' },
+    { id: 'insurance', name: '🛡️ Insurance (बीमा एवं सुरक्षा)' },
+    { id: 'property', name: '🏢 Property (प्रॉपर्टी एवं रियल एस्टेट)' },
+    { id: 'cattlecare', name: '🐄 Cattle Care (पशुपालन)' },
+    { id: 'beautycare', name: '💄 Beauty Care (सौंदर्य)' },
+    { id: 'haircare', name: '💇 Hair Care (केश)' },
+    { id: 'netsurf', name: '💼 NetSurf (बिजनेस)' },
+    { id: 'webinar', name: '🎥 Webinar Invitation (वेबिनार आमंत्रण)' },
+    { id: 'other', name: '📦 अन्य (Other / General)' }
+  ];
+
+  function getLandingCategories() {
+    try {
+      const stored = localStorage.getItem('AAROGYAM_LP_CATEGORIES') || localStorage.getItem('AAROGYAM_GLOBAL_LP_CATEGORIES');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return DEFAULT_LP_CATEGORIES;
+  }
+
+  function populateLandingCategories() {
+    const cats = getLandingCategories();
+    const select = document.getElementById('lp_select_category');
+    if (select) {
+      const cur = select.value;
+      select.innerHTML = cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      if (cur && cats.some(c => c.id === cur)) select.value = cur;
+    }
+  }
+
   function initLandingBuilder() {
+    populateLandingCategories();
     bindBuilderEvents();
     loadMyLandingPages();
   }
@@ -90,6 +125,9 @@
     // Category change listener (for dynamic Webinar & Zoom fields)
     const categorySelect = document.getElementById('lp_select_category');
     categorySelect?.addEventListener('change', handleCategoryChange);
+
+    // Initial load of landing pages
+    loadMyLandingPages();
   }
 
   function handleCategoryChange() {
@@ -111,7 +149,17 @@
     }
   }
 
-  function setContentType(type) {
+  async function setContentType(type) {
+    const profileId = window.UCAS_SESSION.getUserId();
+    const perms = await window.UCAS_DB.getUserMediaPermissions(profileId);
+
+    const isAllowed = type === 'image' || perms[type] || perms[`${type}_landing`] || perms.isActive || perms.product || perms.product_landing;
+
+    if (!isAllowed) {
+      window.UCAS_APP.showToast(`🔒 ${type.toUpperCase()} सेवा केवल एक्टिव मेंबर्स के लिए उपलब्ध है। अधिक जानकारी के लिए सदस्यता लें।`, 'warning');
+      return;
+    }
+
     activeContentType = type;
 
     const imgSection = document.getElementById('lp_section_image_upload');
@@ -120,6 +168,7 @@
     const otherSection = document.getElementById('lp_section_other_input');
     const customThumbSection = document.getElementById('lp_section_custom_thumb_upload');
 
+    // Toggle Buttons UI
     const btnImg = document.getElementById('lp_btn_mode_image');
     const btnYt = document.getElementById('lp_btn_mode_youtube');
     const btnFb = document.getElementById('lp_btn_mode_facebook');
@@ -527,10 +576,27 @@
     }
 
     // ==========================================
+    // LEGAL TERMS & CONDITIONS CHECK
+    // ==========================================
+    const termsCheckbox = document.getElementById('lp_terms_checkbox');
+    if (termsCheckbox && !termsCheckbox.checked) {
+      window.UCAS_APP.showToast('कृपया आगे बढ़ने के लिए नियम, शर्तें व कानूनी घोषणा स्वीकार करें।', 'warning');
+      return;
+    }
+
+    // ==========================================
     // USER ACTIVE STATUS & REVIEW GOVERNANCE
     // ==========================================
     const sub = await window.UCAS_DB.getUserSubscription(profileId);
     const isUserActive = Boolean(sub?.isActive);
+    const perms = await window.UCAS_DB.getUserMediaPermissions(profileId);
+
+    if (!perms[activeContentType]) {
+      window.UCAS_APP.showToast(`🔒 ${activeContentType.toUpperCase()} पोस्ट बनाने की अनुमति नहीं है। केवल अधिकृत मेंबर्स के लिए उपलब्ध है।`, 'error');
+      return;
+    }
+
+    // Inactive users always go to pending_review (requires admin approval)
     const initialStatus = isUserActive ? 'active' : 'pending_review';
 
     const UCAS_LANDING_LIMITS = {
@@ -557,9 +623,23 @@
       let finalThumbnailUrl = '';
       const defaultBanner = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
 
+      const prodMrp = (document.getElementById('lp_prod_mrp')?.value || '').trim();
+      const prodOffer = (document.getElementById('lp_prod_offer_price')?.value || '').trim();
+      const prodBuyUrl = (document.getElementById('lp_prod_buynow_url')?.value || '').trim();
+
+      let productData = null;
       if (activeContentType === 'image') {
         finalMediaUrl = uploadedImageData;
         finalThumbnailUrl = uploadedImageData;
+      } else if (activeContentType === 'product') {
+        finalMediaUrl = uploadedImageData || defaultBanner;
+        finalThumbnailUrl = uploadedImageData || defaultBanner;
+        productData = {
+          mrp: prodMrp,
+          offer_price: prodOffer,
+          buynow_url: prodBuyUrl,
+          image: uploadedImageData || defaultBanner
+        };
       } else if (activeContentType === 'youtube') {
         finalMediaUrl = `https://www.youtube.com/watch?v=${detectedYoutubeId}`;
         finalThumbnailUrl = uploadedCustomThumbData || detectedYoutubeThumbnail || '';
@@ -596,6 +676,10 @@
           thumbnail_url: finalThumbnailUrl,
           message: messageInput,
           webinar_data: webinarData,
+          product_data: productData,
+          mrp: prodMrp ? Number(prodMrp) : null,
+          offer_price: prodOffer ? Number(prodOffer) : null,
+          buynow_url: prodBuyUrl || null,
           og_title: ogTitle,
           og_description: ogDesc,
           og_image_url: ogImg
@@ -640,6 +724,10 @@
           thumbnail_url: finalThumbnailUrl,
           message: messageInput,
           webinar_data: webinarData,
+          product_data: productData,
+          mrp: prodMrp ? Number(prodMrp) : null,
+          offer_price: prodOffer ? Number(prodOffer) : null,
+          buynow_url: prodBuyUrl || null,
           status: initialStatus,
           og_title: ogTitle,
           og_description: ogDesc,
@@ -700,6 +788,11 @@
     const lp = userLandingPages.find(item => item.id === lpId);
     if (!lp) return;
 
+    if (lp.created_by_admin || lp.is_admin_template || (lp.share_id === 'ADMIN' && lp.profile_id !== window.UCAS_SESSION.getUserId())) {
+      window.UCAS_APP.showToast('🔒 यह पेज एडमिन द्वारा जारी किया गया है। आप इसे सीधे शेयर कर सकते हैं, पर एडिट नहीं कर सकते।', 'info');
+      return;
+    }
+
     editingLandingPageId = lp.id;
 
     // Reset Custom Thumb State before populating
@@ -749,7 +842,17 @@
     // Set Media Content & Mode
     const isCustomThumb = Boolean(lp.thumbnail_url && lp.thumbnail_url.startsWith('data:image/') && !lp.thumbnail_url.includes('farmer-community-banner'));
 
-    if (lp.content_type === 'youtube') {
+    if (lp.content_type === 'product' || lp.product_data) {
+      setContentType('product');
+      const pData = lp.product_data || {};
+      const mrpEl = document.getElementById('lp_prod_mrp');
+      const offerEl = document.getElementById('lp_prod_offer_price');
+      const buyUrlEl = document.getElementById('lp_prod_buynow_url');
+      if (mrpEl) mrpEl.value = pData.mrp || lp.mrp || '';
+      if (offerEl) offerEl.value = pData.offer_price || lp.offer_price || '';
+      if (buyUrlEl) buyUrlEl.value = pData.buynow_url || lp.buynow_url || '';
+      uploadedImageData = pData.image || lp.media_url || lp.thumbnail_url;
+    } else if (lp.content_type === 'youtube') {
       setContentType('youtube');
       if (ytInput) ytInput.value = lp.media_url || '';
       handleYoutubeInput(lp.media_url || '');
@@ -816,6 +919,11 @@
   async function deleteLandingPage(lpId) {
     const lp = userLandingPages.find(item => item.id === lpId);
     const title = lp ? lp.title : lpId;
+
+    if (lp && (lp.created_by_admin || lp.is_admin_template || (lp.share_id === 'ADMIN' && lp.profile_id !== window.UCAS_SESSION.getUserId()))) {
+      window.UCAS_APP.showToast('🔒 यह पेज एडमिन द्वारा जारी किया गया है। इसे हटाया नहीं जा सकता।', 'info');
+      return;
+    }
 
     if (!confirm(`क्या आप वाकई लैंडिंग पेज "${title}" (${lpId}) को हटाना चाहते हैं?`)) {
       return;
@@ -1009,9 +1117,13 @@
   // MY LANDING PAGES TABLE & STATS
   // ==========================================
 
+  let currentMediaFilter = 'all';
+
   async function loadMyLandingPages() {
-    const profileId = window.UCAS_SESSION.getUserId();
-    if (!profileId) return;
+    let profileId = window.UCAS_SESSION.getUserId();
+    if (!profileId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(profileId).trim())) {
+      profileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
+    }
 
     try {
       const res = await window.UCAS_DB.getLandingPages(profileId);
@@ -1019,31 +1131,96 @@
       renderMyLandingPagesTable(userLandingPages);
     } catch (e) {
       console.error('Load landing pages error', e);
+      const container = document.getElementById('ucas-my-landing-pages-container') || document.getElementById('ucas-my-landing-pages-cards');
+      if (container) {
+        container.innerHTML = `
+          <div style="text-align:center;padding:2.5rem 1.5rem;color:var(--text-muted);background:#F8FAFC;border-radius:var(--radius-md);border:1.5px dashed #CBD5E1;">
+            <div style="font-size:2rem;margin-bottom:8px;">🎯</div>
+            <strong style="font-size:1rem;color:var(--text-main);">कोई लैंडिंग पेज उपलब्ध नहीं है।</strong>
+            <p style="font-size:0.82rem;margin-top:4px;">ऊपर दिए गए फॉर्म से अपना नया लैंडिंग पेज बनाएं।</p>
+          </div>
+        `;
+      }
     }
+  }
+
+  function isProductPage(p) {
+    if (!p) return false;
+    if (p.content_type === 'product') return true;
+    if (p.product_data && typeof p.product_data === 'object' && Object.keys(p.product_data).length > 0 && (p.product_data.buynow_url || p.product_data.offer_price)) {
+      return true;
+    }
+    return false;
+  }
+
+  function filterMyLandingPages(filterType, btnEl) {
+    currentMediaFilter = filterType || 'all';
+
+    const filterBtns = document.querySelectorAll('.ucas-lp-filter-btn');
+    filterBtns.forEach(b => {
+      if (b.getAttribute('data-filter') === filterType) {
+        b.className = 'ucas-btn ucas-btn-sm ucas-lp-filter-btn active';
+      } else {
+        b.className = 'ucas-btn ucas-btn-sm ucas-lp-filter-btn';
+      }
+    });
+
+    const nonProductPages = (userLandingPages || []).filter(p => !isProductPage(p));
+
+    if (currentMediaFilter === 'all') {
+      renderMyLandingPagesTable(nonProductPages);
+      return;
+    }
+
+    const filtered = nonProductPages.filter(p => {
+      const cType = String(p.content_type || '').toLowerCase();
+      const mUrl = String(p.media_url || '').toLowerCase();
+      if (currentMediaFilter === 'image') return cType === 'image' || (!cType && !p.webinar_data);
+      if (currentMediaFilter === 'youtube') return cType === 'youtube' || mUrl.includes('youtube') || mUrl.includes('youtu.be');
+      if (currentMediaFilter === 'facebook') return cType === 'facebook' || cType === 'fb' || cType === 'instagram' || mUrl.includes('facebook') || mUrl.includes('fb.') || mUrl.includes('instagram.com');
+      if (currentMediaFilter === 'other') return cType === 'other' || cType === 'link';
+      return true;
+    });
+
+    renderMyLandingPagesTable(filtered);
   }
 
   function renderMyLandingPagesTable(pages) {
     const container = document.getElementById('ucas-my-landing-pages-container') || document.getElementById('ucas-my-landing-pages-cards') || document.getElementById('ucas-my-landing-pages-tbody');
     const countEl = document.getElementById('ucas-my-landing-pages-count');
-    if (countEl) countEl.textContent = pages.length;
+    
+    // Filter out product pages from Marketing Engine view
+    const nonProductPages = (pages || []).filter(p => !isProductPage(p));
+    const allNonProductTotal = (userLandingPages || []).filter(p => !isProductPage(p)).length;
+
+    if (countEl) countEl.textContent = allNonProductTotal;
     if (!container) return;
 
-    if (pages.length === 0) {
+    if (!nonProductPages || nonProductPages.length === 0) {
+      const filterNameMap = {
+        'all': 'सोशल/मीडिया',
+        'image': 'इमेज',
+        'youtube': 'YouTube वीडियो',
+        'facebook': 'Facebook / Insta',
+        'other': 'Web Link'
+      };
+      const selName = filterNameMap[currentMediaFilter] || 'इस श्रेणी में';
+
       container.innerHTML = `
         <div style="text-align:center;padding:2.5rem 1.5rem;color:var(--text-muted);background:#F8FAFC;border-radius:var(--radius-md);border:1.5px dashed #CBD5E1;">
           <div style="font-size:2rem;margin-bottom:8px;">🎯</div>
-          <strong style="font-size:1rem;color:var(--text-main);">आपने अभी तक कोई लैंडिंग पेज नहीं बनाया है।</strong>
-          <p style="font-size:0.82rem;margin-top:4px;">ऊपर दिए गए "लैंडिंग पेज बिल्डर" फॉर्म से अपना पहला पेज बनाएं।</p>
+          <strong style="font-size:1rem;color:var(--text-main);">${selName} का कोई लैंडिंग पेज नहीं मिला।</strong>
+          <p style="font-size:0.82rem;margin-top:4px;">अन्य फ़िल्टर चुनें या ऊपर दिए गए फॉर्म से नया पेज बनाएं।</p>
         </div>
       `;
       return;
     }
 
     // Split pages by content type
-    const imagePages = pages.filter(p => p.content_type === 'image' || (!p.content_type && !p.webinar_data));
-    const youtubePages = pages.filter(p => p.content_type === 'youtube');
-    const facebookPages = pages.filter(p => p.content_type === 'facebook' || p.content_type === 'fb');
-    const otherPages = pages.filter(p => p.content_type !== 'image' && p.content_type !== 'youtube' && p.content_type !== 'facebook' && p.content_type !== 'fb' && p.content_type);
+    const imagePages = nonProductPages.filter(p => (p.content_type === 'image' || (!p.content_type && !p.webinar_data)) && !String(p.media_url || '').includes('youtu') && !String(p.media_url || '').includes('facebook') && !String(p.media_url || '').includes('fb.') && !String(p.media_url || '').includes('instagram'));
+    const youtubePages = nonProductPages.filter(p => p.content_type === 'youtube' || String(p.media_url || '').includes('youtu'));
+    const facebookPages = nonProductPages.filter(p => p.content_type === 'facebook' || p.content_type === 'fb' || p.content_type === 'instagram' || String(p.media_url || '').includes('fb') || String(p.media_url || '').includes('insta'));
+    const otherPages = nonProductPages.filter(p => p.content_type === 'other' || p.content_type === 'link');
 
     function renderPageCard(lp, idx, categoryTheme) {
       const dateStr = lp.created_at ? new Date(lp.created_at).toLocaleDateString('hi-IN') : '-';
@@ -1051,8 +1228,11 @@
       const responsesCount = lp.response_count || 0;
       const isPending = lp.status === 'pending_review';
       const isBlocked = lp.status === 'blocked' || lp.status === 'disabled';
+      const isProduct = lp.content_type === 'product' || Boolean(lp.product_data) || Boolean(lp.offer_price);
 
-      const mediaBadge = lp.content_type === 'youtube'
+      const mediaBadge = isProduct
+        ? '<span style="background:#FEF3C7;color:#B45309;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;"><i class="fa-solid fa-cart-shopping"></i> Product</span>'
+        : lp.content_type === 'youtube'
         ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;"><i class="fa-brands fa-youtube"></i> YouTube</span>'
         : lp.content_type === 'facebook' || lp.content_type === 'fb' || lp.content_type === 'instagram'
         ? '<span style="background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;"><i class="fa-brands fa-facebook"></i> Facebook / Insta</span>'
@@ -1066,6 +1246,8 @@
         ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-ban"></i> Blocked</span>'
         : '<span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-circle-check"></i> Live</span>';
 
+      const isAdminCreated = Boolean(lp.created_by_admin || lp.is_admin_template || (lp.share_id === 'ADMIN' && lp.profile_id !== window.UCAS_SESSION.getUserId()));
+
       return `
         <div class="ucas-post-elevated-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -1074,9 +1256,12 @@
                 ${idx + 1}
               </span>
               <div>
-                <div style="font-weight:800;font-size:1.02rem;color:var(--text-main);line-height:1.3;">${lp.title}</div>
+                <div style="font-weight:800;font-size:1.02rem;color:var(--text-main);line-height:1.3;">
+                  ${lp.title} ${isAdminCreated ? '<span style="font-size:0.7rem;background:#FEF3C7;color:#B45309;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;">👑 एडमिन जारी</span>' : ''}
+                </div>
                 <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">
                   ID: <strong style="color:var(--primary-dark);font-family:monospace;">${lp.id}</strong> • 📅 ${dateStr}
+                  ${isProduct && (lp.offer_price || lp.product_data?.offer_price) ? ` • <strong style="color:#059669;">₹${lp.offer_price || lp.product_data?.offer_price}</strong>` : ''}
                 </div>
               </div>
             </div>
@@ -1090,7 +1275,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between;background:#F8FAFC;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);">
             <span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">कैटेगरी: <strong style="color:var(--text-main);">${(lp.category || 'other').toUpperCase()}</strong></span>
             <span style="font-weight:800;font-size:0.85rem;color:#15803D;background:#DCFCE7;padding:3px 10px;border-radius:var(--radius-full);display:inline-flex;align-items:center;gap:4px;">
-              <i class="fa-solid fa-clipboard-check"></i> ${responsesCount} Surveys
+              <i class="fa-solid fa-clipboard-check"></i> ${responsesCount} Surveys / Leads
             </span>
           </div>
 
@@ -1116,12 +1301,21 @@
               <button class="ucas-btn-act ucas-btn-act-view" onclick="window.open('${shareUrl}', '_blank')" title="पेज देखें">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i> देखें
               </button>
-              <button class="ucas-btn-act ucas-btn-act-edit" onclick="UCAS_LANDING_BUILDER.editLandingPage('${lp.id}')" title="एडिट करें">
-                <i class="fa-solid fa-pen-to-square"></i> एडिट
-              </button>
-              <button class="ucas-btn-act ucas-btn-act-delete" onclick="UCAS_LANDING_BUILDER.deleteLandingPage('${lp.id}')" title="हटाएं">
-                <i class="fa-solid fa-trash-can"></i> हटाएं
-              </button>
+              ${isAdminCreated ? `
+                <button class="ucas-btn-act ucas-btn-act-edit" style="opacity:0.7;background:#F1F5F9;color:#64748B;cursor:not-allowed;" onclick="window.UCAS_APP.showToast('🔒 यह पेज एडमिन द्वारा जारी किया गया है। आप इसे सीधे शेयर कर सकते हैं, पर एडिट नहीं कर सकते।', 'info')" title="एडमिन द्वारा सुरक्षित (Admin Template)">
+                  <i class="fa-solid fa-lock"></i> एडमिन पेज
+                </button>
+                <button class="ucas-btn-act ucas-btn-act-delete" style="opacity:0.7;background:#F1F5F9;color:#64748B;cursor:not-allowed;" onclick="window.UCAS_APP.showToast('🔒 एडमिन द्वारा जारी किया गया पेज हटाया नहीं जा सकता।', 'info')" title="हटाया नहीं जा सकता">
+                  <i class="fa-solid fa-lock"></i> सुरक्षित
+                </button>
+              ` : `
+                <button class="ucas-btn-act ucas-btn-act-edit" onclick="UCAS_LANDING_BUILDER.editLandingPage('${lp.id}')" title="एडिट करें">
+                  <i class="fa-solid fa-pen-to-square"></i> एडिट
+                </button>
+                <button class="ucas-btn-act ucas-btn-act-delete" onclick="UCAS_LANDING_BUILDER.deleteLandingPage('${lp.id}')" title="हटाएं">
+                  <i class="fa-solid fa-trash-can"></i> हटाएं
+                </button>
+              `}
             </div>
           </div>
         </div>
@@ -1178,7 +1372,13 @@
       `;
     }
 
-    container.innerHTML = html;
+    container.innerHTML = html || `
+      <div style="text-align:center;padding:2.5rem 1.5rem;color:var(--text-muted);background:#F8FAFC;border-radius:var(--radius-md);border:1.5px dashed #CBD5E1;">
+        <div style="font-size:2rem;margin-bottom:8px;">🎯</div>
+        <strong style="font-size:1rem;color:var(--text-main);">कोई लैंडिंग पेज उपलब्ध नहीं है।</strong>
+        <p style="font-size:0.82rem;margin-top:4px;">ऊपर दिए गए फॉर्म से अपना नया लैंडिंग पेज बनाएं।</p>
+      </div>
+    `;
   }
 
   function shareLandingPageWhatsApp(lpId) {
@@ -1248,6 +1448,7 @@
     cancelEdit,
     deleteLandingPage,
     loadMyLandingPages,
+    filterMyLandingPages,
     shareLandingPageWhatsApp,
     shareLandingPageFacebook,
     shareLandingPageNative,
@@ -1255,5 +1456,5 @@
     getLandingPageShareUrl
   };
 
-  console.log('✅ UCAS Landing Page Builder Module (with Edit & Delete CRUD) Ready.');
+  console.log('✅ UCAS Landing Page Builder Module (with Product Landing & Filter Tabs) Ready.');
 })(window);

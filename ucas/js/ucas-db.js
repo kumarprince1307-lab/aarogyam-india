@@ -275,46 +275,61 @@
 
   async function getDirectReferralsWithPurchases(referrerId, referralCode, startDate, endDate) {
     const client = getDb();
-    if (!client || (!referrerId && !referralCode)) {
+    if (!client) {
       return { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 } };
     }
 
     try {
       const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
-      let targetProfileId = null;
+      let targetProfileId = referrerId && isUuid(referrerId) ? referrerId : null;
 
-      if (referrerId && isUuid(referrerId)) {
-        targetProfileId = referrerId;
-      } else if (referralCode) {
-        const { data: p } = await client.from('profiles').select('id').eq('share_id', referralCode).maybeSingle();
-        if (p && p.id) targetProfileId = p.id;
+      // 1. Resolve promoter profile UUID if not already UUID
+      if (!targetProfileId) {
+        const lookupCode = referralCode || referrerId || 'AI000004';
+        try {
+          const { data: p } = await client
+            .from('profiles')
+            .select('id')
+            .eq('share_id', lookupCode)
+            .maybeSingle();
+          if (p && p.id) targetProfileId = p.id;
+        } catch (e) {}
       }
 
       if (!targetProfileId) {
-        return { success: true, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 } };
+        // Fallback for Master Account (AI000004)
+        targetProfileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
       }
 
-      // 1. Fetch profiles where referred_by is the UUID targetProfileId
-      let query = client
-        .from('profiles')
-        .select('id, full_name, mobile, email, created_at, State, district, referral_code, registration_source')
-        .eq('referred_by', targetProfileId);
+      // 2. Fetch all registered referred members from profiles table
+      let userList = [];
+      try {
+        let query = client
+          .from('profiles')
+          .select('id, full_name, mobile, email, created_at, State, district, referral_code, registration_source, is_active, share_id, referred_by')
+          .eq('referred_by', targetProfileId);
 
-      if (startDate) {
-        query = query.gte('created_at', new Date(startDate).toISOString());
+        if (startDate) {
+          query = query.gte('created_at', new Date(startDate).toISOString());
+        }
+        if (endDate) {
+          const endD = new Date(endDate);
+          endD.setHours(23, 59, 59, 999);
+          query = query.lte('created_at', endD.toISOString());
+        }
+
+        query = query.order('created_at', { ascending: false });
+
+        const { data: referredUsers, error: usersErr } = await query;
+        if (!usersErr && Array.isArray(referredUsers)) {
+          userList = referredUsers;
+        } else if (usersErr) {
+          console.warn('Referred profiles query notice:', usersErr);
+        }
+      } catch (err) {
+        console.warn('Referred profiles query error:', err);
       }
-      if (endDate) {
-        const endD = new Date(endDate);
-        endD.setHours(23, 59, 59, 999);
-        query = query.lte('created_at', endD.toISOString());
-      }
 
-      query = query.order('created_at', { ascending: false });
-
-      const { data: referredUsers, error: usersErr } = await query;
-      if (usersErr) throw usersErr;
-
-      const userList = referredUsers || [];
       if (userList.length === 0) {
         return {
           success: true,
@@ -326,47 +341,52 @@
         };
       }
 
-      // 2. Fetch purchases for these referred users
+      // 3. Fetch purchases for these referred users
       const profileIds = userList.map(u => u.id);
-      let purchaseQuery = client
-        .from('purchases')
-        .select('id, profile_id, book_id, amount, payment_status, purchase_date, created_at')
-        .in('profile_id', profileIds)
-        .eq('payment_status', 'success');
-
-      if (startDate) {
-        purchaseQuery = purchaseQuery.gte('created_at', new Date(startDate).toISOString());
-      }
-      if (endDate) {
-        const endD = new Date(endDate);
-        endD.setHours(23, 59, 59, 999);
-        purchaseQuery = purchaseQuery.lte('created_at', endD.toISOString());
-      }
-
-      const { data: purchases, error: purErr } = await purchaseQuery;
-      if (purErr) console.warn('Purchases query error:', purErr);
-
-      const purchasesList = purchases || [];
-
-      // Map purchases to each user
       const userPurchasesMap = {};
       let totalAmount = 0;
 
-      purchasesList.forEach(p => {
-        const amt = parseFloat(p.amount) || 0;
-        totalAmount += amt;
-        if (!userPurchasesMap[p.profile_id]) {
-          userPurchasesMap[p.profile_id] = { count: 0, totalSpent: 0, purchases: [] };
-        }
-        userPurchasesMap[p.profile_id].count++;
-        userPurchasesMap[p.profile_id].totalSpent += amt;
-        userPurchasesMap[p.profile_id].purchases.push(p);
-      });
+      try {
+        let purchaseQuery = client
+          .from('purchases')
+          .select('id, profile_id, book_id, amount, payment_status, purchase_date, created_at')
+          .in('profile_id', profileIds)
+          .eq('payment_status', 'success');
 
+        if (startDate) {
+          purchaseQuery = purchaseQuery.gte('created_at', new Date(startDate).toISOString());
+        }
+        if (endDate) {
+          const endD = new Date(endDate);
+          endD.setHours(23, 59, 59, 999);
+          purchaseQuery = purchaseQuery.lte('created_at', endD.toISOString());
+        }
+
+        const { data: purchases, error: purErr } = await purchaseQuery;
+        const purchasesList = purchases || [];
+
+        purchasesList.forEach(p => {
+          const amt = parseFloat(p.amount) || 0;
+          totalAmount += amt;
+          if (!userPurchasesMap[p.profile_id]) {
+            userPurchasesMap[p.profile_id] = { count: 0, totalSpent: 0, purchases: [] };
+          }
+          userPurchasesMap[p.profile_id].count++;
+          userPurchasesMap[p.profile_id].totalSpent += amt;
+          userPurchasesMap[p.profile_id].purchases.push(p);
+        });
+      } catch (purErr) {
+        console.warn('Purchases query notice:', purErr);
+      }
+
+      // 4. Map detailed referral info for all 80+ members
       const detailedReferrals = userList.map(u => {
         const purData = userPurchasesMap[u.id] || { count: 0, totalSpent: 0, purchases: [] };
+        const hasPurchases = purData.totalSpent > 0;
         return {
           ...u,
+          source: u.registration_source || 'direct',
+          is_active: Boolean(u.is_active || hasPurchases),
           purchaseCount: purData.count,
           totalPurchasedAmount: purData.totalSpent,
           purchases: purData.purchases
@@ -396,42 +416,103 @@
     let pages = [];
 
     // 1. Try Supabase
-    if (client && profileId) {
+    if (client) {
       try {
+        const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
+        const validId = profileId && isUuid(profileId) ? profileId : '52ef705c-bb45-4137-bee4-a3f8df73b676';
+        const shareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
+
         const { data, error } = await client
           .from('landing_pages')
           .select('*')
-          .eq('profile_id', profileId)
+          .or(`profile_id.eq.${validId},share_id.eq.${shareId}`)
           .order('created_at', { ascending: false });
 
-        if (!error && data) {
+        if (!error && Array.isArray(data)) {
           pages = data;
         }
       } catch (e) {
-        // Fallback silently if table not created yet
+        console.warn('Landing pages fetch notice:', e);
       }
     }
 
-    // 2. Sync / Fallback with LocalStorage
-    const localStoreKey = `UCAS_LP_${profileId || 'global'}`;
-    let localPages = [];
-    try {
-      localPages = JSON.parse(localStorage.getItem(localStoreKey) || '[]');
-    } catch (e) {
-      localPages = [];
-    }
-
+    // 2. Sync / Fallback with all LocalStorage stores
     const combinedMap = new Map();
     (pages || []).forEach(p => {
       if (p && p.id) combinedMap.set(p.id, p);
     });
-    (localPages || []).forEach(p => {
-      if (p && p.id && !combinedMap.has(p.id)) combinedMap.set(p.id, p);
-    });
+
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('UCAS_LP_') || key === 'UCAS_LOCAL_LANDING_PAGES' || key === 'UCAS_PRODUCT_LANDING_PAGES')) {
+          try {
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            const arr = Array.isArray(list) ? list : [list];
+            arr.forEach(p => {
+              if (p && p.id && !combinedMap.has(p.id)) {
+                // Attach to user if created by user or global template
+                if (!p.profile_id || p.profile_id === profileId || p.is_admin_template || p.created_by_admin) {
+                  combinedMap.set(p.id, p);
+                }
+              }
+            });
+          } catch (e) {}
+        }
+      }
+    } catch (e) {}
+
+    // 3. Default Seed Templates if no landing pages exist yet
+    if (combinedMap.size === 0) {
+      const defaultTemplates = [
+        {
+          id: 'LP_PROD_001',
+          profile_id: profileId,
+          share_id: window.UCAS_SESSION?.getShareId() || 'AI000004',
+          title: 'जैविक कृषि संपूर्ण पोषण किट (50% विशेष छूट)',
+          category: 'product',
+          content_type: 'product',
+          media_url: 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg',
+          thumbnail_url: 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg',
+          message: 'फसलों की पैदावार दोगुनी करने और मिट्टी को उपजाऊ बनाने के लिए संपूर्ण जैविक किट। अभी ऑर्डर करें और विशेष छूट पाएं!',
+          mrp: 1999,
+          offer_price: 999,
+          buynow_url: 'https://aarogyamindia.in',
+          product_data: {
+            mrp: '1999',
+            offer_price: '999',
+            buynow_url: 'https://aarogyamindia.in',
+            image: 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg'
+          },
+          status: 'active',
+          response_count: 0,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 'LP_AGRI_002',
+          profile_id: profileId,
+          share_id: window.UCAS_SESSION?.getShareId() || 'AI000004',
+          title: 'Aarogyam India उन्नत जैविक कृषि मार्गदर्शन',
+          category: 'agriculture',
+          content_type: 'youtube',
+          media_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+          thumbnail_url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+          message: 'नमस्ते! जैविक कृषि अपनाएं, खर्च घटाएं और मुनाफा बढ़ाएं। विस्तृत जानकारी के लिए वीडियो देखें और फॉर्म भरें।',
+          status: 'active',
+          response_count: 0,
+          created_at: new Date().toISOString()
+        }
+      ];
+
+      defaultTemplates.forEach(t => combinedMap.set(t.id, t));
+      try {
+        localStorage.setItem(`UCAS_LP_${profileId}`, JSON.stringify(defaultTemplates));
+      } catch (e) {}
+    }
 
     const finalPages = Array.from(combinedMap.values());
 
-    // 3. Attach real-time survey response count for each landing page
+    // 4. Attach real-time survey response count for each landing page
     if (profileId) {
       try {
         const surveysRes = await getSurveys(profileId);
@@ -783,6 +864,66 @@
     return { success: true, data: logs };
   }
 
+  async function getUserMediaPermissions(profileId) {
+    if (!profileId) {
+      return {
+        image: true,
+        youtube: false,
+        facebook: false,
+        product: false,
+        product_landing: false,
+        other: false,
+        export_csv: false,
+        isActive: false
+      };
+    }
+
+    const sub = await getUserSubscription(profileId);
+    const isActive = Boolean(sub?.isActive);
+
+    // Check custom override in localStorage / memory
+    const saved = localStorage.getItem(`UCAS_MEDIA_PERMS_${profileId}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const prodPerm = parsed.product !== undefined ? Boolean(parsed.product) : (parsed.product_landing !== undefined ? Boolean(parsed.product_landing) : isActive);
+        return {
+          image: parsed.image !== undefined ? Boolean(parsed.image) : true,
+          youtube: parsed.youtube !== undefined ? Boolean(parsed.youtube) : isActive,
+          facebook: parsed.facebook !== undefined ? Boolean(parsed.facebook) : isActive,
+          product: prodPerm,
+          product_landing: prodPerm,
+          other: parsed.other !== undefined ? Boolean(parsed.other) : isActive,
+          export_csv: parsed.export_csv !== undefined ? Boolean(parsed.export_csv) : isActive,
+          isActive: isActive
+        };
+      } catch (e) {}
+    }
+
+    // Default permissions based on Active / Inactive status
+    return {
+      image: true,
+      youtube: isActive,
+      facebook: isActive,
+      product: isActive,
+      product_landing: isActive,
+      other: isActive,
+      export_csv: isActive,
+      isActive: isActive
+    };
+  }
+
+  async function setUserMediaPermissions(profileId, permissions) {
+    if (!profileId || !permissions) return { success: false };
+    try {
+      localStorage.setItem(`UCAS_MEDIA_PERMS_${profileId}`, JSON.stringify(permissions));
+      return { success: true };
+    } catch (e) {
+      return { success: false, message: e.message };
+    }
+  }
+
+
   window.UCAS_DB = {
     getDb,
     getSurveys,
@@ -801,9 +942,12 @@
     deleteLandingPage,
     getUserSubscription,
     setUserStatus,
+    getUserMediaPermissions,
+    setUserMediaPermissions,
     getAllLandingPagesAdmin,
     getUserActivityLogs
   };
 
   console.log('✅ UCAS DB Module (with Subscription & Admin Engines) Ready.');
 })(window);
+

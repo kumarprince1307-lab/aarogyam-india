@@ -14,6 +14,17 @@ import { initAdminLayout } from './admin-main.js';
 import { fetchAllUserPermissions, updateUserPermissionAdmin } from './admin-api.js';
 
 export const PERMISSIONS_20 = [
+  // 🌟 UCAS Media & Marketing Services Permissions (Highlighted)
+  { key: 'image', label: '🖼️ Image Post', short: '🖼️ Image', desc: 'इमेज लैंडिंग पेज बनाने की अनुमति', defaultOff: false, isMedia: true },
+  { key: 'youtube', label: '🎥 YouTube Post', short: '🎥 YouTube', desc: 'यूट्यूब वीडियो लैंडिंग पेज बनाने की अनुमति', defaultOff: true, isMedia: true },
+  { key: 'facebook', label: '📸 FB/Insta Post', short: '📸 FB/Insta', desc: 'फेसबुक व इंस्टाग्राम रील पोस्ट की अनुमति', defaultOff: true, isMedia: true },
+  { key: 'product_landing', label: '🛒 Product Page', short: '🛒 Product', desc: 'प्रोडक्ट लैंडिंग पेज बनाने व प्रबंधित करने की अनुमति', defaultOff: false, isMedia: true },
+  { key: 'webinar_landing', label: '🎥 Webinar & Live', short: '🎥 Webinar', desc: 'वेबिनार लैंडिंग पेज व ज़ूम इवेंट्स की अनुमति', defaultOff: true, isMedia: true },
+  { key: 'hook_templates', label: '✍️ Hook & Shayari', short: '✍️ Shayari', desc: 'हुक व शायरी टेम्पलेट्स का उपयोग करने की अनुमति', defaultOff: false, isMedia: true },
+  { key: 'other', label: '🌐 Web Link Post', short: '🌐 Web Link', desc: 'वेब लिंक व यूनिवर्सल पोस्ट की अनुमति', defaultOff: true, isMedia: true },
+  { key: 'export_csv', label: '📥 CSV Export', short: '📥 CSV Export', desc: 'लीड्स/संपर्क CSV एक्सपोर्ट की अनुमति', defaultOff: true, isMedia: true },
+
+  // Standard Platform Permissions
   { key: 'profile_view', label: 'Profile View', short: 'Profile View', desc: 'प्रोफाइल देखने की अनुमति', defaultOff: false },
   { key: 'profile_edit', label: 'Profile Edit', short: 'Profile Edit', desc: 'प्रोफाइल एडिट करने की अनुमति', defaultOff: false },
   { key: 'survey_access', label: 'Survey Access', short: 'Survey Acc', desc: 'सर्वे मॉड्यूल एक्सेस', defaultOff: false },
@@ -40,6 +51,13 @@ export const ALL_PERMISSION_KEYS = PERMISSIONS_20.map(p => p.key);
 const PAGE_SIZE = 20;
 
 function isPermAllowed(permsByUser, userId, key) {
+  // Check local UCAS media cache first for media keys
+  if (['image', 'youtube', 'facebook', 'product_landing', 'other', 'export_csv'].includes(key)) {
+    try {
+      const local = JSON.parse(localStorage.getItem(`UCAS_MEDIA_PERMS_${userId}`) || '{}');
+      if (typeof local[key] !== 'undefined') return Boolean(local[key]);
+    } catch(e) {}
+  }
   const uPerms = permsByUser[userId] || {};
   const permObj = PERMISSIONS_20.find(p => p.key === key);
   const isDefaultOff = permObj ? permObj.defaultOff : false;
@@ -47,7 +65,7 @@ function isPermAllowed(permsByUser, userId, key) {
 }
 
 export async function initUserPermissions() {
-  initAdminLayout('All User Permissions', '20-Permission matrix with multi-filter and horizontal row controls.');
+  initAdminLayout('All User Permissions', '25-Permission matrix with multi-filter, media services toggles, and live sync.');
 
   const content = document.getElementById('page-content');
   if (!content) return;
@@ -62,18 +80,18 @@ export async function initUserPermissions() {
     <div class="admin-section" style="margin-bottom: 12px;">
       <div class="admin-section-header" style="flex-wrap: wrap; gap: 10px;">
         <div class="admin-section-title" style="display: flex; align-items: center; gap: 8px;">
-          <span>🛡️ All User Permissions Matrix (20 Permissions)</span>
+          <span>🛡️ All User Permissions Matrix (26 Permissions)</span>
           <span style="font-size: 0.75rem; background: rgba(16,185,129,0.15); color: #10b981; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Live Sync</span>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button id="btn-perm-safe-preset" class="admin-button small-button" style="background: #3b82f6; border-color: #2563eb; color: #fff; font-weight: 700;" title="सुरक्षित डिफ़ॉल्ट लागू करें">
-            🛡️ Safe Default (16 ON / 4 OFF)
+            🛡️ Safe Default
           </button>
-          <button id="btn-perm-all-on" class="admin-button small-button" style="background: #10b981; border-color: #059669; color: #fff; font-weight: 700;" title="सभी 20 अनुमतियां चालू करें">
-            👑 Full Access (All 20 ON)
+          <button id="btn-perm-all-on" class="admin-button small-button" style="background: #10b981; border-color: #059669; color: #fff; font-weight: 700;" title="सभी 26 अनुमतियां चालू करें">
+            👑 Full Access (All 26 ON)
           </button>
           <button id="btn-perm-all-off" class="admin-button small-button" style="background: #ef4444; border-color: #dc2626; color: #fff; font-weight: 700;" title="सभी अनुमतियां बंद करें">
-            ✕ All 20 OFF
+            ✕ All 26 OFF
           </button>
         </div>
       </div>
@@ -100,7 +118,7 @@ export async function initUserPermissions() {
 
         <!-- 4. Permission Filter -->
         <select id="perm-key-dropdown" class="admin-select" style="flex: 1.5; min-width: 200px;">
-          <option value="all">🛡️ All 20 Permissions</option>
+          <option value="all">🛡️ All 26 Permissions</option>
           ${PERMISSIONS_20.map((p, i) => `<option value="${p.key}">#${i + 1} ${p.label} ${p.defaultOff ? '(Default OFF)' : ''}</option>`).join('')}
         </select>
 
@@ -487,7 +505,7 @@ export async function initUserPermissions() {
       }
     }
     btnBulkOn.disabled = false;
-    showToast(`All 20 permissions turned ON for ${selectedUserIds.size} users`);
+    showToast(`All 26 permissions turned ON for ${selectedUserIds.size} users`);
     renderMatrix();
   });
 
@@ -502,7 +520,7 @@ export async function initUserPermissions() {
       }
     }
     btnBulkOff.disabled = false;
-    showToast(`All 20 permissions turned OFF for ${selectedUserIds.size} users`);
+    showToast(`All 26 permissions turned OFF for ${selectedUserIds.size} users`);
     renderMatrix();
   });
 

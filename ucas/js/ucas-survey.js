@@ -541,13 +541,117 @@
       return;
     }
 
+  const CATEGORY_NAMES_MAP = {
+    agriculture: { name: 'कृषि (Agriculture)', icon: '🌾', color: '#15803D', bg: '#DCFCE7' },
+    healthcare: { name: 'स्वास्थ्य (Healthcare)', icon: '❤️', color: '#B91C1C', bg: '#FEE2E2' },
+    cattlecare: { name: 'पशुपालन (Cattle Care)', icon: '🐄', color: '#92400E', bg: '#FEF3C7' },
+    beautycare: { name: 'ब्यूटी केयर (Beauty)', icon: '💄', color: '#BE185D', bg: '#FCE7F3' },
+    haircare: { name: 'हेयर केयर (Hair Care)', icon: '💇', color: '#7C2D12', bg: '#FFEDD5' },
+    fishpoultry: { name: 'मछली/पोल्ट्री (Poultry)', icon: '🐟', color: '#0369A1', bg: '#E0F2FE' },
+    netsurf: { name: 'नेटसर्फ (NetSurf)', icon: '💼', color: '#1D4ED8', bg: '#DBEAFE' },
+    other: { name: 'अन्य (Other Needs)', icon: '➕', color: '#475569', bg: '#F1F5F9' }
+  };
+
+  function formatCategoryBadges(cats) {
+    if (!Array.isArray(cats)) {
+      try {
+        if (typeof cats === 'string' && (cats.startsWith('[') || cats.startsWith('{'))) {
+          cats = JSON.parse(cats);
+        }
+      } catch (e) {
+        cats = [cats];
+      }
+    }
+    if (!Array.isArray(cats)) cats = [String(cats || '')];
+
+    return cats.filter(Boolean).map(c => {
+      const info = CATEGORY_NAMES_MAP[c.toLowerCase()] || { name: c, icon: '🏷️', color: '#334155', bg: '#E2E8F0' };
+      return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;background:${info.bg};color:${info.color};padding:2px 8px;border-radius:12px;font-weight:700;margin:2px;">
+        <span>${info.icon}</span> ${info.name}
+      </span>`;
+    }).join(' ');
+  }
+
+  function formatCategoryAnswersSection(catKey, ans) {
+    if (!ans || typeof ans !== 'object') return '<p style="color:var(--text-muted);font-size:0.8rem;">कोई विशेष विवरण दर्ज नहीं है</p>';
+
+    const info = CATEGORY_NAMES_MAP[catKey.toLowerCase()] || { name: catKey, icon: '📋', color: '#1E293B', bg: '#F8FAFC' };
+
+    let fieldsHtml = '';
+
+    if (catKey === 'agriculture') {
+      if (ans.status) fieldsHtml += `<div><strong>किसान का प्रकार:</strong> ${ans.status}</div>`;
+      if (ans.land_size) fieldsHtml += `<div><strong>कुल जमीन:</strong> ${ans.land_size}</div>`;
+      if (ans.crops) {
+        const cropsList = Array.isArray(ans.crops) ? ans.crops.join(', ') : ans.crops;
+        fieldsHtml += `<div style="grid-column: span 2;"><strong>मुख्य फसलें:</strong> <span style="color:#15803D;font-weight:700;">${cropsList}</span></div>`;
+      }
+      if (ans.problems) {
+        const pList = Array.isArray(ans.problems) ? ans.problems.join(', ') : ans.problems;
+        fieldsHtml += `<div style="grid-column: span 2;"><strong>रोग व समस्याएं:</strong> <span style="color:#B91C1C;">${pList}</span></div>`;
+      }
+    } else if (catKey === 'healthcare') {
+      if (ans.concerns) {
+        const cList = Array.isArray(ans.concerns) ? ans.concerns.join(', ') : ans.concerns;
+        fieldsHtml += `<div style="grid-column: span 2;"><strong>स्वास्थ्य समस्याएं:</strong> <span style="color:#B91C1C;font-weight:700;">${cList}</span></div>`;
+      }
+      if (ans.duration) fieldsHtml += `<div><strong>अवधि:</strong> ${ans.duration}</div>`;
+      if (ans.medication) fieldsHtml += `<div><strong>चल रही दवा:</strong> ${ans.medication}</div>`;
+    } else if (catKey === 'cattlecare') {
+      if (ans.animal_type) fieldsHtml += `<div><strong>पशु का प्रकार:</strong> ${ans.animal_type}</div>`;
+      if (ans.animal_count) fieldsHtml += `<div><strong>पशुओं की संख्या:</strong> ${ans.animal_count}</div>`;
+      if (ans.daily_milk_liters) fieldsHtml += `<div><strong>दैनिक दूध उत्पादन:</strong> ${ans.daily_milk_liters} लीटर</div>`;
+      if (ans.problem) fieldsHtml += `<div style="grid-column: span 2;"><strong>समस्या:</strong> ${ans.problem}</div>`;
+    } else if (catKey === 'netsurf') {
+      if (ans.interests) {
+        const iList = Array.isArray(ans.interests) ? ans.interests.join(', ') : ans.interests;
+        fieldsHtml += `<div style="grid-column: span 2;"><strong>रुचि क्षेत्र:</strong> <span style="color:#1D4ED8;font-weight:700;">${iList}</span></div>`;
+      }
+    } else {
+      // Generic formatted key-value rendering
+      Object.keys(ans).forEach(k => {
+        const val = ans[k];
+        const label = k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const displayVal = Array.isArray(val) ? val.join(', ') : (typeof val === 'object' ? JSON.stringify(val) : String(val || '-'));
+        fieldsHtml += `<div><strong>${label}:</strong> ${displayVal}</div>`;
+      });
+    }
+
+    return `
+      <div style="background:#fff;border:1.5px solid #E2E8F0;border-left:4px solid ${info.color};border-radius:8px;padding:12px;margin-top:10px;box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+        <div style="font-size:0.92rem;font-weight:800;color:${info.color};margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <span>${info.icon}</span> <span>${info.name}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.84rem;color:#334155;">
+          ${fieldsHtml || '<p style="color:var(--text-muted);grid-column:span 2;">सामान्य विवरण</p>'}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSurveysTable(surveys) {
+    const tbody = document.getElementById('ucas-survey-history-body');
+    const countEl = document.getElementById('ucas-survey-history-count');
+    if (countEl) countEl.textContent = surveys.length;
+    if (!tbody) return;
+
+    if (surveys.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">
+            📝 अभी तक कोई सर्वे रिकॉर्ड नहीं है। ऊपर दिए गए फॉर्म से पहला सर्वे जोड़ें।
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
     tbody.innerHTML = surveys.map((s, idx) => {
-      const rawCats = Array.isArray(s.selected_categories) ? s.selected_categories.join(', ') : (s.selected_categories || '-');
-      const isWebinar = rawCats.includes('webinar') || s.category_answers?.source?.includes('webinar');
-      const catBadge = isWebinar
-        ? '<span style="font-size:0.78rem;background:#EFF6FF;color:#2563EB;padding:3px 8px;border-radius:4px;font-weight:700;"><i class="fa-solid fa-video"></i> Webinar Attendee</span>'
-        : `<span style="font-size:0.78rem;background:var(--primary-subtle);color:var(--primary);padding:3px 8px;border-radius:4px;font-weight:600;">${rawCats}</span>`;
+      const catBadges = formatCategoryBadges(s.selected_categories);
+      const isWebinar = String(s.selected_categories || '').includes('webinar') || s.category_answers?.source?.includes('webinar');
+      const extraBadge = isWebinar ? '<span style="font-size:0.75rem;background:#EFF6FF;color:#2563EB;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;"><i class="fa-solid fa-video"></i> Webinar</span>' : '';
       const dateStr = s.created_at ? new Date(s.created_at).toLocaleDateString('hi-IN') : '-';
+
       return `
         <tr>
           <td><strong>#${idx + 1}</strong></td>
@@ -556,7 +660,7 @@
             <div style="font-size:0.75rem;color:var(--text-muted);">${s.village || s.district || s.state || '-'}</div>
           </td>
           <td><code>${s.mobile}</code></td>
-          <td>${catBadge}</td>
+          <td><div style="display:flex;flex-wrap:wrap;gap:4px;">${catBadges}${extraBadge}</div></td>
           <td>${dateStr}</td>
           <td>
             <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_SURVEY.viewSurveyDetails('${s.id}')">
@@ -571,7 +675,6 @@
   async function viewSurveyDetails(surveyId) {
     let s = userSurveysList.find(item => String(item.id) === String(surveyId));
     if (!s) {
-      // Try fetching survey by ID from DB (for Admin Center inspection)
       try {
         const db = window.UCAS_DB.getDb();
         const { data } = await db.from('surveys').select('*').eq('id', surveyId).single();
@@ -586,31 +689,43 @@
     const content = document.getElementById('ucas-survey-view-content');
     if (!modal || !content) return;
 
-    const cats = Array.isArray(s.selected_categories) ? s.selected_categories : [];
+    let cats = s.selected_categories;
+    if (typeof cats === 'string') {
+      try {
+        cats = JSON.parse(cats);
+      } catch(e) {
+        cats = [cats];
+      }
+    }
+    if (!Array.isArray(cats)) cats = [];
+
     const answers = s.category_answers || {};
 
     let catDetailsHtml = '';
     cats.forEach(catKey => {
       const ans = answers[catKey] || {};
-      catDetailsHtml += `
-        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px;margin-top:8px;">
-          <h4 style="font-size:0.88rem;color:var(--primary);margin-bottom:6px;text-transform:capitalize;">${catKey} Details</h4>
-          <pre style="font-size:0.78rem;background:#fff;padding:6px;border-radius:4px;white-space:pre-wrap;">${JSON.stringify(ans, null, 2)}</pre>
-        </div>
-      `;
+      catDetailsHtml += formatCategoryAnswersSection(catKey, ans);
     });
 
     content.innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;font-size:0.85rem;">
-        <div><strong>नाम:</strong> ${s.name}</div>
-        <div><strong>मोबाइल:</strong> ${s.mobile}</div>
-        <div><strong>उम्र / लिंग:</strong> ${s.age || '-'} / ${s.sex || '-'}</div>
-        <div><strong>व्यवसाय:</strong> ${s.occupation || '-'}</div>
-        <div><strong>राज्य / जिला:</strong> ${s.state || '-'} / ${s.district || '-'}</div>
-        <div><strong>ग्राम / क्षेत्र:</strong> ${s.village || s.area || '-'}</div>
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:0.95rem;font-weight:800;color:var(--primary);margin-bottom:10px;border-bottom:1px solid #E2E8F0;padding-bottom:6px;">
+          👤 व्यक्तिगत जानकारी (Personal Information)
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.86rem;color:#334155;">
+          <div><strong>पूरा नाम:</strong> ${s.name}</div>
+          <div><strong>मोबाइल नंबर:</strong> <a href="tel:${s.mobile}" style="color:var(--primary);font-weight:700;text-decoration:none;">📞 ${s.mobile}</a></div>
+          <div><strong>उम्र / लिंग:</strong> ${s.age || '-'} / ${s.sex || '-'}</div>
+          <div><strong>व्यवसाय:</strong> ${s.occupation || '-'}</div>
+          <div><strong>राज्य / जिला:</strong> ${s.state || '-'} / ${s.district || '-'}</div>
+          <div><strong>ग्राम / क्षेत्र:</strong> ${s.village || s.area || '-'}</div>
+        </div>
       </div>
-      <div style="font-size:0.85rem;font-weight:700;margin-top:10px;">कैटेगरी उत्तर (Category Answers):</div>
-      ${catDetailsHtml || '<p style="color:var(--text-muted);font-size:0.8rem;">कोई विशेष उत्तर नहीं</p>'}
+
+      <div style="font-size:0.92rem;font-weight:800;color:#1E293B;margin-top:14px;">
+        📋 चुनी गई कैटेगरी और विवरण (Category Details):
+      </div>
+      ${catDetailsHtml || '<p style="color:var(--text-muted);font-size:0.82rem;padding:10px;">कोई विशेष कैटेगरी उत्तर दर्ज नहीं है</p>'}
     `;
 
     modal.classList.add('active');

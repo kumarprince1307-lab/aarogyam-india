@@ -16,7 +16,7 @@
       "banner": "/images/books/kharif-banner.webp",
       "landingPage": "/books/kharif-fasal-master-guide-2026.html",
       "demoPage": "/demo/demo-kharif.html",
-      "checkoutPage": "/checkout.html",
+      "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/reader.html",
       "mrp": 299,
       "offerPrice": 99,
@@ -46,6 +46,36 @@
       }
     },
     {
+      "id": "SUB001",
+      "slug": "subscription",
+      "heading": "👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)",
+      "shortTitle": "Aarogyam Pro VIP",
+      "name": "👑 Aarogyam Pro VIP Annual Subscription (1 Year All-Access)",
+      "category": "Membership",
+      "language": "Hindi",
+      "author": "Aarogyam India",
+      "version": "2.0",
+      "status": "active",
+      "cover": "/images/banners/farmer-community-banner.jpeg",
+      "thumbnail": "/images/banners/farmer-community-banner.jpeg",
+      "banner": "/images/banners/farmer-community-banner.jpeg",
+      "landingPage": "/subscription.html",
+      "checkoutPage": "/ebooks/checkout.html",
+      "mrp": 2999,
+      "offerPrice": 99,
+      "currency": "INR",
+      "demoAvailable": false,
+      "readEnabled": true,
+      "downloadEnabled": true,
+      "accessType": "1 Year All-Access",
+      "seo": {
+        "title": "Aarogyam Pro VIP Subscription",
+        "description": "1 Year All-Access Pass to UCAS Marketing Engine, Digital Library, and Webinars.",
+        "keywords": "Aarogyam Pro, VIP Subscription, UCAS Marketing, Aarogyam India",
+        "canonical": ""
+      }
+    },
+    {
       "id": "BK006",
       "slug": "ai-website-guide",
       "heading": "AI वेबसाइट गाइड",
@@ -57,7 +87,7 @@
       "status": "active",
       "cover": "/images/books/ai-website-guide-cover.webp",
       "thumbnail": "/images/books/ai-website-guide-cover.webp",
-      "checkoutPage": "/checkout.html",
+      "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/reader.html",
       "mrp": 1299,
       "offerPrice": 199,
@@ -68,7 +98,9 @@
       "downloadLimit": 3,
       "mainPdf": "/pdf/full/BK006.pdf",
       "fileSize": "25.0 MB",
-       "bonusBooks": ["/pdf/bonus/BK006-BONUS.docx"],
+      "bonusBooks": [
+        "/pdf/bonus/BK006-BONUS.docx"
+      ],
       "accessType": "Lifetime"
     },
     {
@@ -161,7 +193,6 @@
         "/images/books/kheti-dr-demo-3.webp",
         "/images/books/kheti-dr-demo-4.webp",
         "/images/books/kheti-dr-demo-5.webp"
-        
       ],
       "demoAvailable": false,
       "readEnabled": true,
@@ -309,6 +340,30 @@
       "mainPdf": "",
       "fileSize": "25.0 MB",
       "accessType": "Lifetime"
+    },
+    {
+      "id": "SUB001",
+      "slug": "subscription",
+      "heading": "Aarogyam Pro VIP Annual Subscription",
+      "shortTitle": "VIP Annual Pass",
+      "name": "Aarogyam Pro VIP Annual Subscription (365 Days Pass)",
+      "title": "Aarogyam Pro VIP Annual Subscription",
+      "category": "Membership",
+      "language": "Hindi",
+      "author": "Aarogyam India",
+      "version": "1.0",
+      "status": "active",
+      "cover": "/images/banners/farmer-community-banner.jpeg",
+      "thumbnail": "/images/banners/farmer-community-banner.jpeg",
+      "landingPage": "/subscription.html",
+      "checkoutPage": "/ebooks/checkout.html",
+      "mrp": 2999,
+      "offerPrice": 999,
+      "currency": "INR",
+      "demoAvailable": false,
+      "readEnabled": true,
+      "downloadEnabled": true,
+      "accessType": "Annual (365 Days)"
     }
   ]
 }

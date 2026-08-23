@@ -64,7 +64,7 @@
      ========================================================================= -->
 <div class="ucas-app" id="ucas-app-authenticated" style="display:none;">
 
-  <!-- 1. TOP APP HEADER -->
+  <!-- 1. TOP APP HEADER (Clean, Identical to My Library) -->
   <header class="ucas-header">
     <a href="/ucas/index.html" class="ucas-brand">
       <img src="/images/logo/logo.png" alt="Aarogyam India" class="ucas-brand-logo">
@@ -80,10 +80,15 @@
         <i class="fa-solid fa-mobile-screen-button"></i> Install App
       </button>
 
-      <!-- User Personal Notification Bell Button with Strong Contrast -->
+      <!-- User Personal Notification Bell Button (Green) -->
       <button class="user-notif-bell-btn ucas-bell-styled" title="सूचनाएं (Notifications)" aria-label="Notifications">
         <i class="fa-solid fa-bell"></i>
         <span class="user-notif-badge" style="display: none;">0</span>
+      </button>
+
+      <!-- Back Button -->
+      <button class="ucas-menu-toggle-btn" onclick="window.location.href='/index.html'" title="मुख्य वेबसाइट होम (Home)">
+        <i class="fa-solid fa-arrow-left"></i>
       </button>
 
       <!-- Hamburger Menu Button (Drawer Toggle) -->
@@ -94,56 +99,123 @@
   </header>
 
   <!-- 2. DESKTOP / TABLET SIDEBAR (>= 768px) -->
-  <aside class="ucas-sidebar">
+  <aside class="ucas-sidebar" id="ucas-desktop-sidebar">
     <div>
       <div class="ucas-nav-section-title">UCAS Destinations</div>
       <ul class="ucas-nav-list">
         <li class="ucas-nav-item active">
           <button data-tab="profile">
-            <i class="fa-solid fa-chart-pie ucas-nav-icon"></i>
+            <i class="fa-solid fa-user-gear ucas-nav-icon"></i>
             <span>My Profile</span>
           </button>
         </li>
         <li class="ucas-nav-item">
-          <button data-tab="library">
-            <i class="fa-solid fa-book-open ucas-nav-icon"></i>
+          <button onclick="window.location.href='/ebooks/my-library.html';">
+            <i class="fa-solid fa-book-open ucas-nav-icon" style="color:#2563EB;"></i>
             <span>My Library</span>
           </button>
         </li>
         <li class="ucas-nav-item">
+          <button onclick="window.location.href='/subscription.html';">
+            <i class="fa-solid fa-crown ucas-nav-icon" style="color:#F59E0B;"></i>
+            <span>VIP Pass (Subscription)</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/purchases.html';">
+            <i class="fa-solid fa-file-invoice ucas-nav-icon" style="color:#10B981;"></i>
+            <span>My Purchases</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
           <button data-tab="survey">
-            <i class="fa-solid fa-clipboard-list ucas-nav-icon"></i>
-            <span>Survey</span>
+            <i class="fa-solid fa-clipboard-list ucas-nav-icon" style="color:#0284C7;"></i>
+            <span>Smart Survey</span>
           </button>
         </li>
         <li class="ucas-nav-item">
           <button data-tab="phonebook">
-            <i class="fa-solid fa-address-book ucas-nav-icon"></i>
+            <i class="fa-solid fa-address-book ucas-nav-icon" style="color:#8B5CF6;"></i>
             <span>My Phonebook</span>
           </button>
         </li>
         <li class="ucas-nav-item">
           <button data-tab="leads">
-            <i class="fa-solid fa-user-group ucas-nav-icon"></i>
+            <i class="fa-solid fa-user-group ucas-nav-icon" style="color:#EA580C;"></i>
             <span>My Share Leads</span>
           </button>
         </li>
         <li class="ucas-nav-item">
           <button data-tab="marketing">
-            <i class="fa-solid fa-rocket ucas-nav-icon"></i>
+            <i class="fa-solid fa-rocket ucas-nav-icon" style="color:#EC4899;"></i>
             <span>Marketing Engine</span>
           </button>
         </li>
         <li class="ucas-nav-item">
-          <button data-tab="webinars">
-            <i class="fa-solid fa-video ucas-nav-icon"></i>
-            <span>Webinars</span>
+          <button data-tab="product-landing" onclick="UCAS_APP.switchView('product-landing');">
+            <i class="fa-solid fa-cart-shopping ucas-nav-icon" style="color:#F59E0B;"></i>
+            <span>Product Landing Page</span>
           </button>
         </li>
         <li class="ucas-nav-item">
-          <button data-tab="permissions">
-            <i class="fa-solid fa-shield-halved ucas-nav-icon"></i>
+          <button data-tab="hook-templates" onclick="UCAS_APP.switchView('hook-templates');">
+            <i class="fa-solid fa-pen-nib ucas-nav-icon" style="color:#8B5CF6;"></i>
+            <span>हुक व शायरी (Hook & Shayari)</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="webinars" onclick="UCAS_APP.switchView('webinars');">
+            <i class="fa-solid fa-video ucas-nav-icon" style="color:#3B82F6;"></i>
+            <span>Webinars & Live</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="broadcast-messages" onclick="UCAS_APP.switchView('broadcast-messages');" style="display:flex;align-items:center;width:100%;">
+            <i class="fa-solid fa-bullhorn ucas-nav-icon" style="color:#E11D48;"></i>
+            <span>आरोग्यम संदेश</span>
+            <span id="ucas-broadcast-unread-badge" style="background:#E11D48;color:#fff;font-size:0.75rem;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:auto;display:none;">0</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="permissions" onclick="UCAS_APP.switchView('permissions');">
+            <i class="fa-solid fa-shield-halved ucas-nav-icon" style="color:#64748B;"></i>
             <span>Permissions</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/index.html';">
+            <i class="fa-solid fa-house ucas-nav-icon" style="color:#10B981;"></i>
+            <span>Home</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/ebooks/wishlist.html';">
+            <i class="fa-solid fa-heart ucas-nav-icon" style="color:#EF4444;"></i>
+            <span>Wishlist</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/faq.html';">
+            <i class="fa-solid fa-circle-question ucas-nav-icon" style="color:#64748B;"></i>
+            <span>FAQ</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/terms.html';">
+            <i class="fa-solid fa-file-contract ucas-nav-icon" style="color:#64748B;"></i>
+            <span>Terms & Conditions</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/shipping-policy.html';">
+            <i class="fa-solid fa-truck ucas-nav-icon" style="color:#64748B;"></i>
+            <span>Shipping Policy</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/privacy-policy.html';">
+            <i class="fa-solid fa-shield-halved ucas-nav-icon" style="color:#64748B;"></i>
+            <span>Privacy Policy</span>
           </button>
         </li>
         <li class="ucas-nav-item ucas-nav-admin-only" style="display:none;">
@@ -158,7 +230,7 @@
     <!-- Sidebar Footer -->
     <div style="padding:0.75rem 0.5rem;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span>🔒 Isolated UCAS V1</span>
+        <span>🔒 Aarogyam UCAS</span>
         <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_SESSION.logout()" style="padding:3px 8px;font-size:0.72rem;color:var(--danger);">
           <i class="fa-solid fa-right-from-bracket"></i> Logout
         </button>
@@ -175,31 +247,60 @@
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="ucas-user-avatar" style="width:38px;height:38px;font-size:1.1rem;">A</div>
           <div>
-            <div class="ucas-user-name" style="font-size:0.95rem;">Loading...</div>
-            <div class="ucas-user-shareid" style="font-size:0.75rem;">ID: ---</div>
+            <div class="ucas-user-name" style="font-size:0.95rem;font-weight:700;">Loading...</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);display:flex;gap:6px;align-items:center;">
+              <span class="ucas-user-shareid">ID: ---</span>
+              <span>•</span>
+              <span id="ucas-drawer-user-phone" style="color:var(--primary);font-weight:700;">+91 ----------</span>
+            </div>
           </div>
         </div>
         <button class="ucas-drawer-close" onclick="UCAS_APP.closeUserDrawer()">&times;</button>
       </div>
 
-      <div class="ucas-nav-section-title">USER MENU / PROFILE</div>
+      <!-- Mobile Drawer App Install Action -->
+      <div style="padding: 10px 14px 6px; display: flex; flex-direction: column; gap: 8px;">
+        <button id="ucas-drawer-pwa-btn" class="ucas-btn ucas-btn-sm" style="display: none; width: 100%; background: #10B981; color: #fff; font-weight: 700; border-radius: 8px; padding: 8px 12px; justify-content: center; gap: 8px;" onclick="UCAS_PWA.triggerInstall()">
+          <i class="fa-solid fa-mobile-screen-button"></i> 📱 Install Aarogyam App
+        </button>
+      </div>
+
+      <div class="ucas-nav-section-title">USER MENU / NAVIGATION</div>
       <ul class="ucas-nav-list">
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/index.html';">
+            <i class="fa-solid fa-house ucas-nav-icon" style="color:#10B981;"></i>
+            <span>Home</span>
+          </button>
+        </li>
         <li class="ucas-nav-item active">
           <button data-tab="profile" onclick="UCAS_APP.switchView('profile'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-chart-pie ucas-nav-icon"></i>
+            <i class="fa-solid fa-user-gear ucas-nav-icon"></i>
             <span>My Profile</span>
           </button>
         </li>
         <li class="ucas-nav-item">
-          <button data-tab="library" onclick="window.location.href='/ebooks/my-library.html';">
-            <i class="fa-solid fa-book-open ucas-nav-icon"></i>
+          <button onclick="window.location.href='/ebooks/my-library.html';">
+            <i class="fa-solid fa-book-open ucas-nav-icon" style="color:#2563EB;"></i>
             <span>My Library</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/subscription.html';">
+            <i class="fa-solid fa-crown ucas-nav-icon" style="color:#F59E0B;"></i>
+            <span>VIP Pass (Subscription)</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/purchases.html';">
+            <i class="fa-solid fa-file-invoice ucas-nav-icon" style="color:#10B981;"></i>
+            <span>My Purchases & Invoices</span>
           </button>
         </li>
         <li class="ucas-nav-item">
           <button data-tab="survey" onclick="UCAS_APP.switchView('survey'); UCAS_APP.closeUserDrawer();">
             <i class="fa-solid fa-clipboard-list ucas-nav-icon"></i>
-            <span>Survey</span>
+            <span>Smart Survey</span>
           </button>
         </li>
         <li class="ucas-nav-item">
@@ -221,15 +322,64 @@
           </button>
         </li>
         <li class="ucas-nav-item">
+          <button data-tab="product-landing" onclick="UCAS_APP.switchView('product-landing'); UCAS_APP.closeUserDrawer();">
+            <i class="fa-solid fa-cart-shopping ucas-nav-icon" style="color:#F59E0B;"></i>
+            <span>Product Landing Page</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="hook-templates" onclick="UCAS_APP.switchView('hook-templates'); UCAS_APP.closeUserDrawer();">
+            <i class="fa-solid fa-pen-nib ucas-nav-icon" style="color:#8B5CF6;"></i>
+            <span>हुक व शायरी (Hook & Shayari)</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
           <button data-tab="webinars" onclick="UCAS_APP.switchView('webinars'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-video ucas-nav-icon"></i>
-            <span>Webinars & Live</span>
+            <i class="fa-solid fa-video ucas-nav-icon" style="color:#3B82F6;"></i>
+            <span>Webinars & Live Events</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button data-tab="broadcast-messages" onclick="UCAS_APP.switchView('broadcast-messages'); UCAS_APP.closeUserDrawer();" style="display:flex;align-items:center;width:100%;">
+            <i class="fa-solid fa-bullhorn ucas-nav-icon" style="color:#E11D48;"></i>
+            <span>आरोग्यम संदेश</span>
+            <span id="ucas-drawer-broadcast-unread-badge" class="broadcast-unread-badge" style="background:#E11D48;color:#fff;font-size:0.75rem;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:auto;display:none;">0</span>
           </button>
         </li>
         <li class="ucas-nav-item">
           <button data-tab="permissions" onclick="UCAS_APP.switchView('permissions'); UCAS_APP.closeUserDrawer();">
             <i class="fa-solid fa-shield-halved ucas-nav-icon"></i>
             <span>Permissions</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/ebooks/wishlist.html';">
+            <i class="fa-solid fa-heart ucas-nav-icon" style="color:#EF4444;"></i>
+            <span>Wishlist</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/faq.html';">
+            <i class="fa-solid fa-circle-question ucas-nav-icon"></i>
+            <span>FAQ</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/terms.html';">
+            <i class="fa-solid fa-file-contract ucas-nav-icon"></i>
+            <span>Terms & Conditions</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/shipping-policy.html';">
+            <i class="fa-solid fa-truck ucas-nav-icon"></i>
+            <span>Shipping Policy</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/privacy-policy.html';">
+            <i class="fa-solid fa-shield-halved ucas-nav-icon"></i>
+            <span>Privacy Policy</span>
           </button>
         </li>
         <li class="ucas-nav-item ucas-nav-admin-only" style="display:none;">
@@ -399,30 +549,66 @@
           <div class="ucas-kpi-val" id="kpi_total_webinar_attendees" style="color:#1D4ED8;">0</div>
           <div class="ucas-kpi-label">Webinar Attendees</div>
         </div>
+        
+        <div class="ucas-kpi-card kpi-pink">
+          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-share-nodes"></i></div>
+          <div class="ucas-kpi-val" id="ucas-kpi-marketing-sent">0</div>
+          <div class="ucas-kpi-label">Campaigns Shared</div>
+        </div>
+        <div class="ucas-kpi-card kpi-orange" style="border-left:4px solid #F59E0B;">
+          <div class="ucas-kpi-icon-wrap" style="background:rgba(245,158,11,0.15);color:#F59E0B;"><i class="fa-solid fa-cart-shopping"></i></div>
+          <div class="ucas-kpi-val" id="ucas-kpi-product-leads">0</div>
+          <div class="ucas-kpi-label">Product Leads</div>
+        </div>
       </div>
 
-      <!-- Direct Referrals & Purchase Earnings with Date Filter -->
+      <!-- Direct Referrals & Purchase Earnings with Multi-Filter -->
       <div class="ucas-card" style="margin-bottom:1.25rem;">
-        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.75rem;">
           <div>
             <div class="ucas-card-title">
               <i class="fa-solid fa-users" style="color:var(--primary);"></i> मेरे डायरेक्ट रेफरल एवं कुल परचेज (Direct Referrals & Purchases)
             </div>
             <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
-              आपकी Share ID से सीधे जुड़े सदस्य और उनके द्वारा की गई कुल खरीदारी
+              आपकी Share ID से सीधे जुड़े सदस्य, उनका सोर्स और उनके द्वारा की गई कुल खरीदारी
             </div>
           </div>
-          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
-            <input type="date" id="profile_ref_date_from" class="ucas-input" style="padding:4px 8px;font-size:0.8rem;width:130px;">
-            <span style="font-size:0.78rem;color:var(--text-muted);">से</span>
-            <input type="date" id="profile_ref_date_to" class="ucas-input" style="padding:4px 8px;font-size:0.8rem;width:130px;">
-            <button class="ucas-btn ucas-btn-sm ucas-btn-primary" onclick="UCAS_APP.filterProfileReferrals()" style="padding:4px 10px;font-size:0.8rem;">
-              फ़िल्टर करें
-            </button>
-            <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_APP.resetProfileReferralsDate()" style="padding:4px 8px;font-size:0.8rem;">
-              All Time
-            </button>
+        </div>
+
+        <!-- 🔍 Dynamic Multi-Filter Bar -->
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:var(--radius-md);padding:10px 12px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+          <!-- 1. Search by Name / Mobile -->
+          <div style="flex:1;min-width:180px;position:relative;">
+            <input type="text" id="profile_ref_search_input" class="ucas-input" placeholder="🔍 नाम या मोबाइल नंबर से खोजें..." oninput="UCAS_APP.applyReferralsFilter()" style="padding:6px 10px;font-size:0.82rem;width:100%;">
           </div>
+
+          <!-- 2. Date Range Presets -->
+          <select id="profile_ref_date_preset" class="ucas-select" onchange="UCAS_APP.handleReferralDatePresetChange()" style="padding:6px 10px;font-size:0.82rem;width:auto;min-width:130px;">
+            <option value="all" selected>📅 All Time (सभी)</option>
+            <option value="today">📅 Today (आज)</option>
+            <option value="7days">📅 Last 7 Days (7 दिन)</option>
+            <option value="30days">📅 Last 30 Days (30 दिन)</option>
+            <option value="custom">📅 Custom Date Range...</option>
+          </select>
+
+          <!-- 3. Custom Date Range Pickers (hidden by default) -->
+          <div id="profile_ref_custom_date_wrap" style="display:none;align-items:center;gap:4px;">
+            <input type="date" id="profile_ref_date_from" class="ucas-input" style="padding:5px 8px;font-size:0.78rem;width:125px;" onchange="UCAS_APP.applyReferralsFilter()">
+            <span style="font-size:0.75rem;color:var(--text-muted);">से</span>
+            <input type="date" id="profile_ref_date_to" class="ucas-input" style="padding:5px 8px;font-size:0.78rem;width:125px;" onchange="UCAS_APP.applyReferralsFilter()">
+          </div>
+
+          <!-- 4. Status Filter (All / Active / Inactive) -->
+          <select id="profile_ref_status_filter" class="ucas-select" onchange="UCAS_APP.applyReferralsFilter()" style="padding:6px 10px;font-size:0.82rem;width:auto;min-width:130px;">
+            <option value="all" selected>⚡ All Status (सभी)</option>
+            <option value="active">🟢 Active (खरीदारी/सक्रिय)</option>
+            <option value="inactive">⚪ Inactive (नॉन-परचेज)</option>
+          </select>
+
+          <!-- Reset Filter -->
+          <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_APP.resetProfileReferralsFilter()" style="padding:6px 10px;font-size:0.8rem;" title="फ़िल्टर रीसेट करें">
+            <i class="fa-solid fa-rotate-left"></i> Reset
+          </button>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;text-align:center;">
@@ -436,33 +622,36 @@
           </div>
         </div>
 
-        <div id="ucas-profile-referrals-list" style="max-height:220px;overflow-y:auto;">
-          <!-- Populated by JS -->
+        <div id="ucas-profile-referrals-list" style="max-height:480px;overflow-y:auto;">
+          <!-- Populated by JS with Source & Status Columns -->
         </div>
       </div>
 
-      <!-- Quick Action Shortcuts -->
+      <!-- Quick Action Shortcuts (Unified Light Blue Theme) -->
       <div class="ucas-card" style="margin-bottom:1.25rem;">
         <div class="ucas-card-header">
           <div class="ucas-card-title">
-            <i class="fa-solid fa-bolt" style="color:var(--secondary);"></i> त्वरित कार्य (Quick Actions)
+            <i class="fa-solid fa-bolt" style="color:#2563EB;"></i> त्वरित कार्य (Quick Actions)
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;">
-          <button class="ucas-btn ucas-btn-primary" onclick="UCAS_APP.switchView('survey')">
-            <i class="fa-solid fa-plus-circle"></i> नया सर्वे भरें
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:0.75rem;">
+          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('survey')">
+            <i class="fa-solid fa-plus-circle" style="color:#2563EB;"></i> नया सर्वे भरें
           </button>
-          <button class="ucas-btn ucas-btn-outline" onclick="UCAS_APP.switchView('phonebook')">
-            <i class="fa-solid fa-file-import"></i> फोनबुक / CSV इम्पोर्ट
+          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('phonebook')">
+            <i class="fa-solid fa-address-book" style="color:#2563EB;"></i> फोनबुक / CSV इम्पोर्ट
           </button>
-          <button class="ucas-btn ucas-btn-secondary" onclick="UCAS_APP.switchView('marketing')">
-            <i class="fa-solid fa-paper-plane"></i> मार्केटिंग इंजन खोलें
+          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('product-landing')">
+            <i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> प्रोडक्ट लैंडिंग पेज
           </button>
-          <button class="ucas-btn" style="background:#7c3aed;color:#fff;" onclick="UCAS_APP.switchView('webinars')">
-            <i class="fa-solid fa-video"></i> वेबिनार व लाइव इवेंट्स
+          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('marketing')">
+            <i class="fa-solid fa-paper-plane" style="color:#2563EB;"></i> मार्केटिंग इंजन खोलें
           </button>
-          <button class="ucas-btn ucas-btn-outline" onclick="window.location.href='/ebooks/my-library.html'">
-            <i class="fa-solid fa-book-open"></i> My Library खोलें
+          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('webinars')">
+            <i class="fa-solid fa-video" style="color:#2563EB;"></i> वेबिनार व लाइव (Webinar & Live)
+          </button>
+          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="window.location.href='/ebooks/my-library.html'">
+            <i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library खोलें
           </button>
         </div>
       </div>
@@ -549,7 +738,7 @@
                 <option value="Uttar Pradesh">उत्तर प्रदेश (Uttar Pradesh)</option>
                 <option value="Maharashtra">महाराष्ट्र (Maharashtra)</option>
                 <option value="Rajasthan">राजस्थान (Rajasthan)</option>
-                <option value="Bihar">बिहार (Bihar)</option>
+                <option value="Bihar">बिहार (बिहार)</option>
                 <option value="Chhattisgarh">छत्तीसगढ़ (Chhattisgarh)</option>
                 <option value="Gujarat">गुजरात (Gujarat)</option>
                 <option value="Other">अन्य राज्य</option>
@@ -765,13 +954,40 @@
 
       <!-- Step 2 & 3: Message Builder & Referral Link -->
       <div class="ucas-grid-2" style="margin-bottom:1.25rem;">
-        <!-- Message Box -->
+        <!-- Message Box with Ready Hook & Shayari Selector -->
         <div class="ucas-card">
           <div class="ucas-card-header">
             <div class="ucas-card-title">
-              <span class="ucas-heading-pill"><i class="fa-solid fa-pen-nib"></i> 2. मैसेज बिल्डर (Message Builder)</span>
+              <span class="ucas-heading-pill"><i class="fa-solid fa-pen-nib"></i> 2. मैसेज बिल्डर (Message & Hook Builder)</span>
             </div>
           </div>
+
+          <!-- Category Hook Message & Shayari Engine -->
+          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-md);padding:10px 12px;margin-bottom:10px;">
+            <div style="font-weight:800;font-size:0.85rem;color:#15803D;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> <span>रेडीमेड हुक मैसेज व शायरी चुनें (Hook & Shayari):</span>
+            </div>
+            <div class="ucas-grid-2" style="gap:8px;">
+              <div>
+                <label class="ucas-label" style="font-size:0.75rem;margin-bottom:2px;">कैटेगरी (Category):</label>
+                <select id="ucas_hook_category_select" class="ucas-select" style="padding:6px 8px;font-size:0.82rem;" onchange="UCAS_MARKETING.onHookCategoryChange(this.value)">
+                  <option value="agriculture">🌾 कृषि एवं फसल सुरक्षा</option>
+                  <option value="health">🌿 स्वास्थ्य व आयुर्वेद</option>
+                  <option value="beauty">🌸 हर्बल ब्यूटी व हेयर</option>
+                  <option value="business">💼 रोजगार व बिजनेस</option>
+                  <option value="product">🛒 प्रोडक्ट व ऑफर्स</option>
+                  <option value="webinar">🎥 लाइव वेबिनार आमंत्रण</option>
+                </select>
+              </div>
+              <div>
+                <label class="ucas-label" style="font-size:0.75rem;margin-bottom:2px;">हुक स्टाइल टेम्पलेट (Select Hook):</label>
+                <select id="ucas_hook_template_select" class="ucas-select" style="padding:6px 8px;font-size:0.82rem;" onchange="UCAS_MARKETING.onHookTemplateSelect(this.value)">
+                  <!-- Populated from marketing-templates.json -->
+                </select>
+              </div>
+            </div>
+          </div>
+
           <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">
             उपलब्ध प्लेसहोल्डर: <code>{name}</code>, <code>{place}</code>, <code>{link}</code>, <code>{my_name}</code>
           </p>
@@ -799,17 +1015,17 @@
             मैसेज लोड हो रहा है...
           </div>
 
-          <div style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:6px;">
-            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-wa" onclick="UCAS_MARKETING.shareWhatsAppBroadcast()">
-              <i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर
+          <div style="margin-top:1rem;display:grid;grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));gap:8px;">
+            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-wa" onclick="UCAS_MARKETING.shareWhatsAppBroadcast()" style="justify-content:center;padding:9px 10px;">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp
             </button>
-            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-share" onclick="UCAS_MARKETING.shareNative()">
-              <i class="fa-solid fa-share-nodes"></i> Native Share
+            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-share" onclick="UCAS_MARKETING.shareNative()" style="justify-content:center;padding:9px 10px;">
+              <i class="fa-solid fa-share-nodes"></i> शेयर करें
             </button>
-            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-fb" onclick="UCAS_MARKETING.shareFacebook()">
-              <i class="fa-brands fa-facebook"></i> FB
+            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-fb" onclick="UCAS_MARKETING.shareFacebook()" style="justify-content:center;padding:9px 10px;">
+              <i class="fa-brands fa-facebook"></i> Facebook
             </button>
-            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-copy" onclick="UCAS_MARKETING.copyReferralLink()">
+            <button class="ucas-btn ucas-btn-sm ucas-btn-act ucas-btn-act-copy" onclick="UCAS_MARKETING.copyReferralLink()" style="justify-content:center;padding:9px 10px;">
               <i class="fa-regular fa-copy"></i> कॉपी लिंक
             </button>
           </div>
@@ -827,9 +1043,14 @@
               प्रत्येक संपर्क को उनके नाम से व्यक्तिगत संदेश और आपकी Share ID लिंक के साथ भेजें।
             </div>
           </div>
-          <span id="ucas-marketing-match-counter" style="font-size:0.85rem;font-weight:800;color:var(--primary);background:var(--primary-subtle);padding:4px 10px;border-radius:var(--radius-full);">
-            🎯 0 Matching Contacts Found
-          </span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button type="button" id="mkt_btn_export_csv" class="ucas-btn ucas-btn-sm" style="background:#059669;color:#fff;font-weight:700;padding:6px 12px;display:inline-flex;align-items:center;gap:5px;" onclick="UCAS_MARKETING.exportContactsCSV()">
+              <i class="fa-solid fa-file-csv"></i> 📥 Export CSV
+            </button>
+            <span id="ucas-marketing-match-counter" style="font-size:0.85rem;font-weight:800;color:var(--primary);background:var(--primary-subtle);padding:4px 10px;border-radius:var(--radius-full);">
+              🎯 0 Matching Contacts Found
+            </span>
+          </div>
         </div>
 
         <!-- Compact Area-wise + Category-wise Filter -->
@@ -939,22 +1160,6 @@
               </div>
             </div>
 
-            <!-- Optional Custom Thumbnail Section for Video/Link posts -->
-            <div id="lp_section_custom_thumb_upload" style="display:none;margin-top:10px;background:#F8FAFC;border:1px dashed #CBD5E1;border-radius:var(--radius-sm);padding:8px 10px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <label class="ucas-label" style="font-size:0.8rem;margin:0;">
-                  🖼️ कस्टम थंबनेल पोस्टर (Optional Custom Thumbnail):
-                </label>
-                <button type="button" id="lp_btn_clear_custom_thumb" class="ucas-btn ucas-btn-sm" style="display:none;padding:1px 6px;font-size:0.72rem;background:#FEE2E2;color:#DC2626;border:none;">
-                  हटाएं (Remove)
-                </button>
-              </div>
-              <input type="file" id="lp_custom_thumb_file_input" class="ucas-input" accept="image/*" style="padding:4px 6px;font-size:0.8rem;margin-top:4px;">
-              <div style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;">
-                यदि आप अपना कस्टम थंबनेल पोस्टर लगाना चाहते हैं, तो यहाँ इमेज अपलोड करें (वैकल्पिक)। खाली छोड़ने पर वीडियो/डिफ़ॉल्ट थंबनेल स्वतः उपयोग होगा।
-              </div>
-            </div>
-
             <!-- Title & Category -->
             <div style="margin-top:10px;">
               <label class="ucas-label">कैम्पेन शीर्षक (Title):</label>
@@ -1023,10 +1228,17 @@
           </div>
         </div>
 
-        <!-- Message Box -->
-        <div style="margin-bottom:1rem;">
-          <label class="ucas-label">2. अपना संदेश / आमंत्रण विवरण लिखें (Invitation Message / Agenda): *</label>
-          <textarea id="lp_input_message" class="ucas-textarea" rows="3" placeholder="उदा. क्या आप आधुनिक कृषि तकनीक और रोग निवारण सीखना चाहते हैं? इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।"></textarea>
+        <!-- Mandatory Legal Terms & Conditions Disclaimer -->
+        <div style="margin-bottom:1.25rem;background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:var(--radius-md);padding:12px 14px;">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin:0;">
+            <input type="checkbox" id="lp_terms_checkbox" style="width:18px;height:18px;accent-color:#D97706;margin-top:2px;cursor:pointer;" checked />
+            <div style="font-size:0.78rem;color:#78350F;line-height:1.45;">
+              <strong style="color:#92400E;display:block;margin-bottom:3px;">
+                ⚖️ नियम, शर्तें एवं कानूनी घोषणा (Terms & Legal Disclaimer):
+              </strong>
+              मैं प्रमाणित करता हूँ कि इस पेज पर कोई भी असामाजिक, भड़काऊ, राजनीतिक, अश्लील या अनधिकृत सामग्री साझा नहीं की जाएगी। किसी भी प्रकार के प्रचार, दावे या वादे की 100% व्यक्तिगत कानूनी जवाबदारी मेरी (शेयर करने वाले यूज़र की) होगी; इसके लिए Aarogyam India किसी भी रूप में उत्तरदायी नहीं है। उल्लंघन पर मेरी आईडी तत्काल निरस्त (Suspend) की जा सकेगी।
+            </div>
+          </label>
         </div>
 
         <!-- Generate / Update Button -->
@@ -1084,7 +1296,201 @@
           </button>
         </div>
 
+        <!-- 🔍 Media Filter Pill Tabs -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding:8px 0;border-bottom:1px solid #E2E8F0;" id="ucas-lp-media-filters">
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-lp-filter-btn active" data-filter="all" onclick="UCAS_LANDING_BUILDER.filterMyLandingPages('all', this)">
+            <i class="fa-solid fa-list-check"></i> All (सभी)
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-lp-filter-btn" data-filter="image" onclick="UCAS_LANDING_BUILDER.filterMyLandingPages('image', this)">
+            <i class="fa-regular fa-image" style="color:#10B981;"></i> Image Post
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-lp-filter-btn" data-filter="youtube" onclick="UCAS_LANDING_BUILDER.filterMyLandingPages('youtube', this)">
+            <i class="fa-brands fa-youtube" style="color:#EF4444;"></i> YouTube Post
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-lp-filter-btn" data-filter="facebook" onclick="UCAS_LANDING_BUILDER.filterMyLandingPages('facebook', this)">
+            <i class="fa-brands fa-facebook" style="color:#2563EB;"></i> FB/Insta Post
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-lp-filter-btn" data-filter="other" onclick="UCAS_LANDING_BUILDER.filterMyLandingPages('other', this)">
+            <i class="fa-solid fa-globe" style="color:#64748B;"></i> Other / Web
+          </button>
+        </div>
+
         <div id="ucas-my-landing-pages-container">
+          <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW: DEDICATED PRODUCT LANDING PAGES & LEADS HUB
+         ----------------------------------------------------------------------- -->
+    <section id="view-product-landing" class="ucas-view">
+      <!-- Header Banner -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;background:linear-gradient(135deg, #B45309 0%, #D97706 50%, #F59E0B 100%);color:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:8px;">
+              <i class="fa-solid fa-cart-shopping"></i> 🛍️ प्रोडक्ट लैंडिंग पेज हब (Product Landing Pages & Leads Hub)
+            </div>
+            <p style="font-size:0.85rem;color:#FEF3C7;margin:4px 0 0 0;">
+              अपने उत्पादों का प्रचार करें, विशेष ऑफर/डिस्काउंट पेज बनाएं और सीधे ग्राहकों से पूछताछ व खरीदारी (Buy Now) प्राप्त करें।
+            </p>
+          </div>
+          <button type="button" class="ucas-btn" onclick="document.getElementById('prod_lp_creator_card').scrollIntoView({behavior:'smooth'})" style="background:#fff;color:#B45309;font-weight:800;">
+            <i class="fa-solid fa-plus"></i> नया प्रोडक्ट पेज बनाएं
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="ucas-kpi-grid" style="margin-bottom:1.25rem;">
+        <div class="ucas-kpi-card kpi-orange">
+          <div class="ucas-kpi-icon-wrap" style="background:rgba(245,158,11,0.15);color:#F59E0B;"><i class="fa-solid fa-box-open"></i></div>
+          <div class="ucas-kpi-val" id="ucas-prod-kpi-total">0</div>
+          <div class="ucas-kpi-label">My Product Pages</div>
+        </div>
+        <div class="ucas-kpi-card kpi-blue">
+          <div class="ucas-kpi-icon-wrap" style="background:#DBEAFE;color:#1D4ED8;"><i class="fa-solid fa-users"></i></div>
+          <div class="ucas-kpi-val" id="ucas-prod-kpi-leads">0</div>
+          <div class="ucas-kpi-label">Product Leads / Inquiries</div>
+        </div>
+        <div class="ucas-kpi-card kpi-green">
+          <div class="ucas-kpi-icon-wrap" style="background:#DCFCE7;color:#15803D;"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="ucas-kpi-val" id="ucas-prod-kpi-active">0</div>
+          <div class="ucas-kpi-label">Active Promotions</div>
+        </div>
+      </div>
+
+      <!-- Product Landing Page Creator Card -->
+      <div class="ucas-card" id="prod_lp_creator_card" style="margin-bottom:1.25rem;">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color:#D97706;"></i> 🛍️ नया प्रोडक्ट लैंडिंग पेज बनाएं (Create Product Landing Page)
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+          उत्पाद का नाम, फोटो, असली MRP, ऑफर प्राइस और 'Buy Now' लिंक भरें। ग्राहक 'Buy Now' या फॉर्म सबमिट करते ही आपकी लीड सुरक्षित हो जाएगी:
+        </p>
+
+        <form id="ucas-product-landing-form">
+          <div class="ucas-grid-2" style="gap:16px;margin-bottom:1rem;">
+            <!-- Left: Inputs -->
+            <div>
+              <div class="ucas-form-group" style="margin-bottom:10px;">
+                <label class="ucas-label">उत्पाद का नाम / शीर्षक (Product Title): *</label>
+                <input type="text" id="prod_input_title" class="ucas-input" placeholder="उदा. जैविक कृषि संपूर्ण पोषण किट या हर्बल हेल्थ सिरप" required>
+              </div>
+
+              <div class="ucas-grid-2" style="gap:10px;margin-bottom:10px;">
+                <div class="ucas-form-group">
+                  <label class="ucas-label">कैटेगरी चुनें (Category):</label>
+                  <select id="prod_select_category" class="ucas-select">
+                    <option value="agriculture">🌾 Agriculture (कृषि उत्पाद)</option>
+                    <option value="healthcare">❤️ Health Care (स्वास्थ्य उत्पाद)</option>
+                    <option value="beautycare">💄 Beauty Care (सौंदर्य)</option>
+                    <option value="cattlecare">🐄 Cattle Care (पशु पोषण)</option>
+                    <option value="organic">🥗 Organic Foods (जैविक खाद्य)</option>
+                    <option value="other">➕ अन्य उत्पाद (Other)</option>
+                  </select>
+                </div>
+                <div class="ucas-form-group">
+                  <label class="ucas-label">प्रोडक्ट इमेज (Product Image): *</label>
+                  <input type="file" id="prod_image_file_input" class="ucas-input" accept="image/*" style="padding:5px;">
+                </div>
+              </div>
+
+              <div class="ucas-grid-2" style="gap:10px;margin-bottom:10px;">
+                <div class="ucas-form-group">
+                  <label class="ucas-label">असली MRP (₹):</label>
+                  <input type="number" id="prod_input_mrp" class="ucas-input" placeholder="उदा. 1999">
+                </div>
+                <div class="ucas-form-group">
+                  <label class="ucas-label">ऑफर / डिस्काउंट प्राइस (₹): *</label>
+                  <input type="number" id="prod_input_offer_price" class="ucas-input" placeholder="उदा. 999" required>
+                </div>
+              </div>
+
+              <div class="ucas-form-group" style="margin-bottom:10px;">
+                <label class="ucas-label">🔗 थर्ड-पार्टी "Buy Now" लिंक (Store / Website URL): *</label>
+                <input type="url" id="prod_input_buynow_url" class="ucas-input" placeholder="https://aarogyamindia.in/product/..." required>
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-top:3px;">
+                  💡 ग्राहक द्वारा 'Buy Now' बटन क्लिक करते ही उसकी लीड UCAS में सेव होगी और वह इस वेबसाइट पर पहुंच जाएगा।
+                </div>
+              </div>
+
+              <div class="ucas-form-group">
+                <label class="ucas-label">उत्पाद के मुख्य लाभ / संदेश (Product Highlights / Message):</label>
+                <textarea id="prod_input_message" class="ucas-textarea" rows="3" placeholder="उदा. फसलों की पैदावार दोगुनी करने और मिट्टी को उपजाऊ बनाने के लिए 100% शुद्ध जैविक पोषण किट। विशेष 50% छूट पर अभी ऑर्डर करें!"></textarea>
+              </div>
+            </div>
+
+            <!-- Right: Product Card Live Preview -->
+            <div>
+              <label class="ucas-label">लाइव कार्ड पूर्वावलोकन (Live Product Preview):</label>
+              <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:var(--radius-md);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <div style="position:relative;height:180px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                  <img id="prod_preview_image" src="" alt="Product Preview" style="width:100%;height:100%;object-fit:cover;display:none;">
+                  <div id="prod_preview_placeholder" style="display:flex;flex-direction:column;align-items:center;color:#94A3B8;">
+                    <i class="fa-solid fa-image" style="font-size:2.5rem;margin-bottom:6px;"></i>
+                    <span style="font-size:0.85rem;">प्रोडक्ट फोटो अपलोड करें</span>
+                  </div>
+                  <span id="prod_preview_cat" style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.7);color:#fff;font-size:0.75rem;font-weight:700;padding:3px 8px;border-radius:4px;">
+                    AGRICULTURE
+                  </span>
+                  <span id="prod_preview_discount" style="position:absolute;top:10px;right:10px;background:#DC2626;color:#fff;font-size:0.75rem;font-weight:800;padding:3px 8px;border-radius:4px;">
+                    50% छूट (OFF)
+                  </span>
+                </div>
+                <div style="padding:14px;">
+                  <div id="prod_preview_title" style="font-weight:800;font-size:1.05rem;color:var(--text-main);margin-bottom:6px;">
+                    उत्पाद का नाम यहाँ दिखेगा
+                  </div>
+                  <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+                    <span id="prod_preview_offer" style="font-size:1.25rem;font-weight:900;color:#15803D;">₹999</span>
+                    <span id="prod_preview_mrp" style="font-size:0.88rem;color:#94A3B8;text-decoration:line-through;">₹1999</span>
+                  </div>
+                  <p id="prod_preview_msg" style="font-size:0.82rem;color:var(--text-muted);line-height:1.4;margin:0 0 12px 0;">
+                    इस उत्पाद के विशेष लाभ और विवरण यहाँ प्रदर्शित होंगे।
+                  </p>
+                  <div style="display:flex;gap:8px;">
+                    <button type="button" class="ucas-btn" style="flex:1;background:#2563EB;color:#fff;font-weight:800;font-size:0.85rem;padding:8px 12px;border-radius:6px;">
+                      <i class="fa-solid fa-clipboard-list"></i> इंक्वायरी फॉर्म
+                    </button>
+                    <button type="button" class="ucas-btn" style="flex:1;background:#15803D;color:#fff;font-weight:800;font-size:0.85rem;padding:8px 12px;border-radius:6px;">
+                      <i class="fa-solid fa-cart-shopping"></i> Buy Now (खरीदें)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button type="submit" id="prod_btn_submit" class="ucas-btn" style="background:#D97706;color:#fff;font-weight:800;padding:10px 20px;">
+              <i class="fa-solid fa-cart-plus"></i> 🛒 प्रोडक्ट लैंडिंग पेज बनाएं (Create Product Page)
+            </button>
+            <button type="button" id="prod_btn_cancel_edit" class="ucas-btn ucas-btn-outline" style="display:none;" onclick="UCAS_PRODUCT_LANDING.cancelEdit()">
+              रद्द करें (Cancel)
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- My Product Landing Pages List Container -->
+      <div class="ucas-card">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
+          <div class="ucas-card-title">
+            <span class="ucas-heading-pill" style="background:#FEF3C7;color:#B45309;">
+              <i class="fa-solid fa-boxes-stacked"></i> मेरे प्रोडक्ट लैंडिंग पेज (My Product Landing Pages)
+            </span>
+            <span id="ucas-my-product-lps-count" style="background:#FEF3C7;color:#B45309;font-weight:800;padding:2px 8px;border-radius:var(--radius-full);font-size:0.85rem;margin-left:6px;">0</span>
+          </div>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_PRODUCT_LANDING.loadProductLandingPages()">
+            <i class="fa-solid fa-rotate"></i> रीफ्रेश
+          </button>
+        </div>
+
+        <div id="ucas-my-product-lps-container" style="margin-top:12px;">
           <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
         </div>
       </div>
@@ -1243,10 +1649,10 @@
             <input type="text" id="wb_generated_share_url" class="ucas-input" readonly>
             <button type="button" id="wb_btn_copy_url" class="ucas-btn ucas-btn-sm ucas-btn-primary"><i class="fa-solid fa-copy"></i> कॉपी</button>
           </div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;">
-            <button type="button" id="wb_btn_wa_share" class="ucas-btn ucas-btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर</button>
-            <button type="button" id="wb_btn_fb_share" class="ucas-btn ucas-btn-outline" style="color:#1877F2;border-color:#1877F2;"><i class="fa-brands fa-facebook"></i> Facebook शेयर</button>
-            <button type="button" id="wb_btn_view_page" class="ucas-btn ucas-btn-outline"><i class="fa-solid fa-arrow-up-right-from-square"></i> लाइव पेज देखें</button>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">
+            <button type="button" id="wb_btn_wa_share" class="ucas-btn ucas-btn-whatsapp" style="justify-content:center;padding:9px 10px;"><i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर</button>
+            <button type="button" id="wb_btn_fb_share" class="ucas-btn ucas-btn-outline" style="color:#1877F2;border-color:#1877F2;justify-content:center;padding:9px 10px;"><i class="fa-brands fa-facebook"></i> Facebook शेयर</button>
+            <button type="button" id="wb_btn_view_page" class="ucas-btn ucas-btn-outline" style="justify-content:center;padding:9px 10px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> लाइव पेज देखें</button>
           </div>
         </div>
       </div>
@@ -1440,6 +1846,165 @@
               <tr><td colspan="6" style="text-align:center;padding:1rem;">लोड हो रहा है...</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW: AAROGYAM INDIA BROADCAST MESSAGES
+         ----------------------------------------------------------------------- -->
+    <section id="view-broadcast-messages" class="ucas-view">
+      <!-- Header Banner -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;background:linear-gradient(135deg, #BE123C 0%, #E11D48 50%, #FB7185 100%);color:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:8px;">
+              <i class="fa-solid fa-bullhorn"></i> 📢 आरोग्यम इंडिया का संदेश (Aarogyam India Messages)
+            </div>
+            <p style="font-size:0.85rem;color:#FFE4E6;margin:4px 0 0 0;">
+              आरोग्यम इंडिया प्रबंधन द्वारा जारी सभी आधिकारिक घोषणाएं, लाइव ऑफर्स, वेबिनार सूचनाएं और महत्वपूर्ण संदेश।
+            </p>
+          </div>
+          <button type="button" class="ucas-btn" onclick="window.USER_NOTIFICATIONS?.markAllAsRead(); UCAS_APP.renderBroadcastView(); UCAS_APP.showToast('✅ सभी संदेश पढ़े हुए मार्क किए गए।', 'success');" style="background:#fff;color:#BE123C;font-weight:800;">
+            ✓ सभी पढ़ें (Mark All Read)
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages List Container -->
+      <div class="ucas-card">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
+          <div class="ucas-card-title">
+            <span class="ucas-heading-pill" style="background:#FFE4E6;color:#BE123C;">
+              <i class="fa-solid fa-envelope-open-text"></i> प्राप्त संदेश सूची (Inbox)
+            </span>
+          </div>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="window.USER_NOTIFICATIONS?.loadUserNotifications(); UCAS_APP.renderBroadcastView();">
+            <i class="fa-solid fa-rotate"></i> रीफ्रेश
+          </button>
+        </div>
+
+        <div id="ucas-broadcast-view-container" style="margin-top:12px;">
+          <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         VIEW: HOOK TEMPLATES & SHAYARI HUB
+         ----------------------------------------------------------------------- -->
+    <section id="view-hook-templates" class="ucas-view">
+      <!-- Header Banner -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;background:linear-gradient(135deg, #6D28D9 0%, #8B5CF6 50%, #A78BFA 100%);color:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:8px;">
+              <i class="fa-solid fa-pen-nib"></i> ✍️ हुक टेम्पलेट्स एवं शायरी हब (Hook & Shayari Engine)
+            </div>
+            <p style="font-size:0.85rem;color:#EDE9FE;margin:4px 0 0 0;">
+              कृषि, स्वास्थ्य, प्रेरणा, व्यापार और त्यौहारों के लिए तैयार हुक व शायरी। 1-क्लिक में कॉपी करें, WhatsApp पर भेजें या मार्केटिंग मैसेज में लगाएं।
+            </p>
+          </div>
+          <button type="button" class="ucas-btn" onclick="document.getElementById('hook_creator_card')?.scrollIntoView({behavior:'smooth'})" style="background:#fff;color:#6D28D9;font-weight:800;">
+            <i class="fa-solid fa-plus"></i> नई शायरी / हुक बनाएं
+          </button>
+        </div>
+      </div>
+
+      <!-- Hook Creator Card -->
+      <div class="ucas-card" id="hook_creator_card" style="margin-bottom:1.25rem;">
+        <div class="ucas-card-header">
+          <div class="ucas-card-title">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color:#8B5CF6;"></i> ✍️ नई हुक या शायरी टेम्पलेट जोड़ें (Create Custom Hook / Shayari)
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+          अपनी पसंदीदा शायरी या मार्केटिंग हुक का शीर्षक, श्रेणी और विवरण लिखें। यह आपके व्यक्तिगत संग्रह में सुरक्षित हो जाएगी:
+        </p>
+
+        <form id="ucas-hook-template-form">
+          <div class="ucas-grid-2" style="gap:12px;margin-bottom:12px;">
+            <div class="ucas-form-group">
+              <label class="ucas-label">शीर्षक / हेडिंग (Title): *</label>
+              <input type="text" id="hook_input_title" class="ucas-input" placeholder="उदा. खरीफ स्पेशल शायरी या फसल सुरक्षा हुक" required>
+            </div>
+            <div class="ucas-grid-2" style="gap:10px;">
+              <div class="ucas-form-group">
+                <label class="ucas-label">श्रेणी (Category): *</label>
+                <select id="hook_select_category" class="ucas-select">
+                  <option value="agriculture">🌾 Agriculture (कृषि)</option>
+                  <option value="healthcare">❤️ Health Care (स्वास्थ्य)</option>
+                  <option value="motivation">🔥 Motivation (प्रेरणा)</option>
+                  <option value="business">💼 Business (व्यापार)</option>
+                  <option value="shayari">🎭 Shayari (शायरी)</option>
+                  <option value="festivals">🌺 Festivals (त्यौहार)</option>
+                </select>
+              </div>
+              <div class="ucas-form-group">
+                <label class="ucas-label">प्रकार (Type):</label>
+                <select id="hook_select_type" class="ucas-select">
+                  <option value="hook">🎯 Marketing Hook</option>
+                  <option value="shayari">📜 शायरी (Shayari)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="ucas-form-group" style="margin-bottom:12px;">
+            <label class="ucas-label">शायरी या हुक विवरण (Content / Message Description): *</label>
+            <textarea id="hook_input_content" class="ucas-textarea" rows="4" placeholder="यहाँ अपनी शायरी या मार्केटिंग हुक लिखें। आप {name}, {my_name}, {link} जैसे प्लेसहोल्डर भी लिख सकते हैं..." required></textarea>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:3px;">
+              💡 {link} आपके पर्सनल शेयर लिंक से, {name} ग्राहक के नाम से और {my_name} आपके नाम से स्वतः बदल जाएगा।
+            </div>
+          </div>
+
+          <button type="submit" class="ucas-btn" style="background:#7C3AED;color:#fff;font-weight:800;padding:10px 20px;">
+            <i class="fa-solid fa-floppy-disk"></i> 💾 टेम्पलेट सुरक्षित करें (Save Template)
+          </button>
+        </form>
+      </div>
+
+      <!-- Hook Catalog Card with Category Tabs & Search -->
+      <div class="ucas-card">
+        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.75rem;">
+          <div class="ucas-card-title">
+            <span class="ucas-heading-pill" style="background:#EDE9FE;color:#6D28D9;">
+              <i class="fa-solid fa-book-bookmark"></i> हुक व शायरी संग्रह (Catalog)
+            </span>
+            <span id="ucas-hooks-count-badge" style="background:#EDE9FE;color:#6D28D9;font-weight:800;padding:2px 8px;border-radius:var(--radius-full);font-size:0.85rem;margin-left:6px;">0</span>
+          </div>
+          <div style="min-width:200px;flex:1;max-width:320px;">
+            <input type="text" id="hook_search_input" class="ucas-input" placeholder="🔍 शायरी या हुक खोजें..." style="padding:6px 12px;font-size:0.82rem;width:100%;">
+          </div>
+        </div>
+
+        <!-- 🏷️ Category Filter Tabs -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding:8px 0;border-bottom:1px solid #E2E8F0;">
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-hook-filter-btn active" data-category="all" onclick="UCAS_HOOK_TEMPLATES.filterTemplates('all')">
+            <i class="fa-solid fa-list-check"></i> सभी (All)
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-hook-filter-btn" data-category="agriculture" onclick="UCAS_HOOK_TEMPLATES.filterTemplates('agriculture')">
+            🌾 कृषि
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-hook-filter-btn" data-category="healthcare" onclick="UCAS_HOOK_TEMPLATES.filterTemplates('healthcare')">
+            ❤️ स्वास्थ्य
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-hook-filter-btn" data-category="motivation" onclick="UCAS_HOOK_TEMPLATES.filterTemplates('motivation')">
+            🔥 प्रेरणा
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-hook-filter-btn" data-category="business" onclick="UCAS_HOOK_TEMPLATES.filterTemplates('business')">
+            💼 बिज़नेस
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-hook-filter-btn" data-category="shayari" onclick="UCAS_HOOK_TEMPLATES.filterTemplates('shayari')">
+            🎭 शायरी
+          </button>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-hook-filter-btn" data-category="festivals" onclick="UCAS_HOOK_TEMPLATES.filterTemplates('festivals')">
+            🌺 त्यौहार
+          </button>
+        </div>
+
+        <div id="ucas-hooks-list-container">
+          <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
         </div>
       </div>
     </section>
@@ -1754,9 +2319,69 @@
         </button>
       </div>
     </div>
-    <button type="button" onclick="document.getElementById('profile100NudgePopup').style.display='none'" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
+    <button type="button" onclick="sessionStorage.setItem('ai_profile_nudge_dismissed', 'true'); document.getElementById('profile100NudgePopup').style.display='none';" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
   </div>
 </div>
+
+<!-- UNIFIED AAROGYAM INDIA FOOTER -->
+<footer class="site-footer" style="background:#0f172a; color:#cbd5e1; padding:45px 20px 25px; margin-top:50px; border-top:3px solid transparent; border-image:linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;">
+  <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:30px; margin-bottom:30px;">
+    <div>
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:44px; width:auto; object-fit:contain;">
+        <div>
+          <div style="font-size:1.15rem; font-weight:800; color:#fff; line-height:1.2;">Aarogyam India</div>
+          <div style="font-size:0.75rem; color:#10B981; font-weight:700;">डिजिटल कृषि व ज्ञान मंच</div>
+        </div>
+      </div>
+      <p style="font-size:0.85rem; line-height:1.6; color:#94a3b8;">
+        Aarogyam India is a premier digital agriculture knowledge platform empowering farmers and users with smart digital tools, eBooks, and expert guidance.
+      </p>
+    </div>
+
+    <div>
+      <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #E86A17; display:inline-block; padding-bottom:4px;">Quick Links</h3>
+      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
+        <li><a href="/index.html" style="color:#cbd5e1; text-decoration:none;">🏠 Home</a></li>
+        <li><a href="/ucas/index.html" style="color:#cbd5e1; text-decoration:none;">👤 My Profile & UCAS</a></li>
+        <li><a href="/ebooks/my-library.html" style="color:#cbd5e1; text-decoration:none;">📚 Digital Library</a></li>
+        <li><a href="/subscription.html" style="color:#f59e0b; text-decoration:none; font-weight:700;">👑 VIP Pass / Subscription</a></li>
+        <li><a href="/purchases.html" style="color:#cbd5e1; text-decoration:none;">🧾 My Purchases & Invoices</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #10b981; display:inline-block; padding-bottom:4px;">Legal & Policies</h3>
+      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
+        <li><a href="/terms.html" style="color:#cbd5e1; text-decoration:none;">📄 Terms & Conditions</a></li>
+        <li><a href="/privacy-policy.html" style="color:#cbd5e1; text-decoration:none;">🔒 Privacy Policy</a></li>
+        <li><a href="/shipping-policy.html" style="color:#cbd5e1; text-decoration:none;">🚚 Shipping & Return Policy</a></li>
+        <li><a href="/faq.html" style="color:#cbd5e1; text-decoration:none;">❓ FAQ & Support</a></li>
+        <li><a href="/contact.html" style="color:#cbd5e1; text-decoration:none;">📞 Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #3b82f6; display:inline-block; padding-bottom:4px;">Contact & Helpline</h3>
+      <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">📍 Rewa, Madhya Pradesh, India</p>
+      <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">
+        📞 <a href="tel:917974422572" style="color:#38bdf8; text-decoration:none; font-weight:700;">+91 79744 22572</a>
+      </p>
+      <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 12px 0;">
+        ✉ <a href="mailto:info@aarogyamindia.in" style="color:#38bdf8; text-decoration:none;">info@aarogyamindia.in</a>
+      </p>
+      <div style="display:flex; gap:10px;">
+        <a href="https://wa.me/917974422572" target="_blank" style="background:#25d366; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="#" style="background:#1877f2; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#" style="background:#ff0000; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding-top:20px; border-top:1px solid #334155; font-size:0.82rem; color:#64748b;">
+    © 2026 Aarogyam India. All Rights Reserved. • ISO Certified Digital Platform
+  </div>
+</footer>
 
 <!-- =========================================================================
      7. SCRIPT INCLUDES (Safe Isolation & Zero Duplication)
@@ -1770,19 +2395,23 @@
 <script src="/js/share-engine-core.js"></script>
 
 <!-- UCAS Modular Engines -->
-<script src="/ucas/js/ucas-session.js?v=2.6"></script>
-<script src="/ucas/js/ucas-db.js?v=2.6"></script>
-<script src="/ucas/js/ucas-permissions.js?v=2.6"></script>
-<script src="/ucas/js/ucas-survey.js?v=2.6"></script>
-<script src="/ucas/js/ucas-phonebook.js?v=2.6"></script>
-<script src="/ucas/js/ucas-leads.js?v=2.6"></script>
-<script src="/ucas/js/ucas-marketing.js?v=2.6"></script>
-<script src="/ucas/js/ucas-landing-builder.js?v=2.6"></script>
-<script src="/ucas/js/ucas-webinars.js?v=2.6"></script>
-<script src="/ucas/js/ucas-admin.js?v=2.6"></script>
-<script src="/ucas/js/ucas-pwa.js?v=2.6"></script>
-<script src="/js/user-notifications.js"></script>
-<script src="/ucas/js/ucas-app.js?v=2.6"></script>
+<script src="/ucas/js/ucas-session.js?v=11.0"></script>
+<script src="/ucas/js/ucas-db.js?v=11.0"></script>
+<script src="/ucas/js/ucas-permissions.js?v=15.0"></script>
+<script src="/ucas/js/ucas-survey.js?v=15.0"></script>
+<script src="/ucas/js/ucas-phonebook.js?v=15.0"></script>
+<script src="/ucas/js/ucas-leads.js?v=15.0"></script>
+<script src="/ucas/js/ucas-marketing.js?v=15.0"></script>
+<script src="/ucas/js/ucas-landing-builder.js?v=15.0"></script>
+<script src="/ucas/js/ucas-product-landing.js?v=15.0"></script>
+<script src="/ucas/js/ucas-hook-templates.js?v=15.0"></script>
+<script src="/ucas/js/ucas-webinars.js?v=15.0"></script>
+<script src="/ucas/js/ucas-admin.js?v=15.0"></script>
+<script src="/ucas/js/ucas-pwa.js?v=15.0"></script>
+<script src="/js/global-guest-modal.js?v=15.0"></script>
+<script src="/js/book-promo-toast.js?v=15.0"></script>
+<script src="/js/user-notifications.js?v=15.0"></script>
+<script src="/ucas/js/ucas-app.js?v=15.0"></script>
 
 </body>
 </html>

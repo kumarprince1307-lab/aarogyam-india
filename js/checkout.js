@@ -151,35 +151,75 @@ function createReferrerSpanElement() {
 async function loadBook() {
     try {
         const params = new URLSearchParams(window.location.search);
-        // यहाँ URL से जो ID मिलेगी (जैसे id=BK002 या book_id=BK003) वही मुख्य होगी
-        const bookId = params.get("book_id") || params.get("id");
+        let rawId = (params.get("book_id") || params.get("id") || params.get("product") || params.get("slug") || "").toLowerCase().trim();
+        const customTitle = params.get("title") || params.get("name");
+        const customAmount = params.get("amount") || params.get("price");
 
-        const response = await fetch("../data/books.json");
-        const jsonResult = await response.json();
+        let booksArray = [];
+        try {
+            const response = await fetch("/data/books.json");
+            const jsonResult = await response.json();
+            booksArray = Array.isArray(jsonResult) ? jsonResult : (jsonResult.books || []);
+        } catch (e) {
+            try {
+                const response2 = await fetch("../data/books.json");
+                const jsonResult2 = await response2.json();
+                booksArray = Array.isArray(jsonResult2) ? jsonResult2 : (jsonResult2.books || []);
+            } catch (e2) {
+                console.warn("Local books.json fallback active");
+            }
+        }
 
-        const booksArray = Array.isArray(jsonResult) ? jsonResult : (jsonResult.books || []);
-        
-        // अगर URL में ID दी है तो उसे खोजें, नहीं तो एरे की पहली बुक को डिफ़ॉल्ट ले लें ताकि BK001 की गड़बड़ न हो
+        // Map common aliases
+        let targetId = rawId;
+        if (rawId.includes("sub") || rawId === "subscription" || rawId === "pro-subscription") {
+            targetId = "SUB001";
+        } else if (rawId.includes("kheti") || rawId === "fasal-ka-doctor") {
+            targetId = "BK002";
+        } else if (rawId.includes("kharif")) {
+            targetId = "BK001";
+        }
+
         let book = null;
-        if (bookId) {
-            book = booksArray.find(item => item.id === bookId || item.book_id === bookId);
-        }
-        if (!book && booksArray.length > 0) {
-            book = booksArray[0]; // पहली उपलब्ध बुक
+        if (targetId) {
+            book = booksArray.find(item => 
+                (item.id && item.id.toLowerCase() === targetId.toLowerCase()) || 
+                (item.slug && item.slug.toLowerCase() === targetId.toLowerCase())
+            );
         }
 
+        if (!book && booksArray.length > 0 && !customTitle) {
+            book = booksArray[0];
+        }
+
+        // If not found in JSON but custom params provided, build dynamic product
         if (!book) {
-            alert("Book Not Found");
-            return;
+            const isSub = targetId === "SUB001" || (customTitle && customTitle.toLowerCase().includes("vip"));
+            const defMrp = customAmount ? (parseInt(customAmount, 10) >= 999 ? 2999 : 299) : (isSub ? 2999 : 299);
+            const defPrice = customAmount ? parseInt(customAmount, 10) : (isSub ? 999 : 99);
+            const defTitle = customTitle || (isSub ? "👑 Aarogyam Pro VIP Annual Subscription" : "🌾 Aarogyam India ई-बुक मास्टरक्लास");
+
+            book = {
+                id: targetId || (isSub ? "SUB001" : "BK001"),
+                name: defTitle,
+                title: defTitle,
+                mrp: defMrp,
+                offerPrice: defPrice,
+                cover: isSub ? "/images/banners/farmer-community-banner.jpeg" : "/images/books/kharif-master-guide-2026-cover.webp"
+            };
         }
 
-        const bookCover = book.cover || book.cover_image || "";
-        const bookName = book.name || book.title || "";
-        const bookMrp = book.mrp || 0;
-        const bookOffer = book.offer_price || book.offerPrice || 0;
+        // Override with explicit URL custom params if provided
+        if (customTitle) book.name = customTitle;
+        if (customAmount) book.offerPrice = parseInt(customAmount, 10);
+
+        const bookCover = book.cover || book.thumbnail || book.cover_image || "/images/banners/farmer-community-banner.jpeg";
+        const bookName = book.name || book.title || "Aarogyam India Digital Product";
+        const bookMrp = book.mrp || (book.offerPrice ? book.offerPrice * 2 : 299);
+        const bookOffer = book.offerPrice || book.offer_price || 99;
 
         window.currentCheckoutBook = {
-            id: book.id || book.book_id,
+            id: book.id || targetId || "BK001",
             title: bookName,
             mrp: bookMrp,
             offerPrice: bookOffer,
@@ -214,7 +254,6 @@ async function loadBook() {
 
     } catch (error) {
         console.error("Book Load Error:", error);
-        alert("Unable to Load Book Data");
     }
 }
 
@@ -384,7 +423,55 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 "handler": async function (response) {
                     // 🎉 2. पेमेंट सफल होने पर 'success' लॉग दर्ज करें
                     await logCheckoutActivity(activeUserId, bookIdToBuy, 'success');
-                    window.location.href = `payment-success.html?payment_id=${response.razorpay_payment_id}&book_id=${bookIdToBuy}`;
+
+                    // Save purchase record immediately
+                    try {
+                        const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+                        const newPurchase = {
+                            book_id: bookIdToBuy,
+                            title: bookTitle,
+                            amount: bookPrice,
+                            payment_id: response.razorpay_payment_id,
+                            order_id: response.razorpay_order_id || ('ORD_' + Date.now()),
+                            created_at: new Date().toISOString()
+                        };
+                        localPurchases.push(newPurchase);
+                        localStorage.setItem('AI_PURCHASES', JSON.stringify(localPurchases));
+                        localStorage.setItem('purchases', JSON.stringify(localPurchases));
+
+                        // Activate Membership in local session
+                        const isSub = (bookIdToBuy === 'SUB001' || bookPrice >= 999);
+                        const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+                        userObj.is_active = true;
+                        if (isSub) userObj.is_subscriber = true;
+                        localStorage.setItem('AI_USER', JSON.stringify(userObj));
+                        localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
+                        localStorage.setItem('UCAS_USER', JSON.stringify(userObj));
+                        localStorage.setItem('user_is_active', 'true');
+                        if (isSub) localStorage.setItem('user_is_subscriber', 'true');
+
+                        // Save to Supabase
+                        const db = window.dbClient || window.supabase;
+                        if (db) {
+                            await db.from('purchases').insert([{
+                                profile_id: activeUserId || userObj.id,
+                                book_id: bookIdToBuy,
+                                amount: bookPrice,
+                                payment_id: response.razorpay_payment_id,
+                                status: 'completed'
+                            }]);
+                            if (activeUserId || userObj.id) {
+                                await db.from('profiles').update({
+                                    is_active: true,
+                                    is_subscriber: isSub ? true : userObj.is_subscriber
+                                }).eq('id', activeUserId || userObj.id);
+                            }
+                        }
+                    } catch (saveErr) {
+                        console.warn('Local purchase save note:', saveErr);
+                    }
+
+                    window.location.href = `/ebooks/payment-success.html?payment_id=${response.razorpay_payment_id}&book_id=${bookIdToBuy}&amount=${bookPrice}`;
                 },
                 "prefill": {
                     "name": name,

@@ -2298,19 +2298,27 @@ export async function fetchAllUserPermissions(params = {}) {
 
 export async function updateUserPermissionAdmin(userId, permissionKey, allowed) {
   try {
+    // Sync to local UCAS media cache if it is a media key
+    if (['image', 'youtube', 'facebook', 'other', 'export_csv'].includes(permissionKey)) {
+      try {
+        const local = JSON.parse(localStorage.getItem(`UCAS_MEDIA_PERMS_${userId}`) || '{}');
+        local[permissionKey] = allowed;
+        localStorage.setItem(`UCAS_MEDIA_PERMS_${userId}`, JSON.stringify(local));
+      } catch(e) {}
+    }
+
     const db = getAdminDb();
-    if (!db) throw new Error("Supabase client not available.");
+    if (db) {
+      await db
+        .from('permissions')
+        .upsert({
+          profile_id: userId,
+          permission_key: permissionKey,
+          allowed: allowed,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'profile_id,permission_key' });
+    }
 
-    const { error } = await db
-      .from('permissions')
-      .upsert({
-        profile_id: userId,
-        permission_key: permissionKey,
-        allowed: allowed,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'profile_id,permission_key' });
-
-    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error('Failed to update user permission:', error);
@@ -2332,5 +2340,37 @@ export async function updateUserStatusAdmin(userId, status) {
   } catch (error) {
     console.error('Failed to update user status:', error);
     return { success: false, error: error.message };
+  }
+}
+
+export async function fetchAllUsersAdmin() {
+  try {
+    const db = getAdminDb();
+    if (!db) return { success: false, data: [] };
+    const [profilesRes, purchasesRes] = await Promise.all([
+      db.from('profiles').select('*').order('created_at', { ascending: false }),
+      db.from('purchases').select('id, profile_id, book_id, amount, payment_status, purchase_date')
+    ]);
+    const profiles = profilesRes.data || [];
+    const purchases = purchasesRes.data || [];
+
+    const purchasesByProfile = {};
+    purchases.forEach(p => {
+      if (p.profile_id) {
+        if (!purchasesByProfile[p.profile_id]) purchasesByProfile[p.profile_id] = [];
+        purchasesByProfile[p.profile_id].push(p);
+      }
+    });
+
+    const enriched = profiles.map(p => ({
+      ...p,
+      purchases: purchasesByProfile[p.id] || [],
+      has_purchased: (purchasesByProfile[p.id] && purchasesByProfile[p.id].length > 0) || false
+    }));
+
+    return { success: true, data: enriched };
+  } catch (err) {
+    console.error('Failed to fetch all users for admin:', err);
+    return { success: false, data: [], error: err.message };
   }
 }

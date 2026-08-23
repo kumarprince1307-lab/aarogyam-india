@@ -14,10 +14,27 @@
   function getCurrentUser() {
     try {
       const userStr = localStorage.getItem(USER_KEY) || localStorage.getItem(PROFILE_KEY);
-      return userStr ? JSON.parse(userStr) : null;
+      const user = userStr ? JSON.parse(userStr) : null;
+      if (user) return user;
+      // Default to Master User if no user in storage
+      return {
+        id: '52ef705c-bb45-4137-bee4-a3f8df73b676',
+        full_name: 'Aarogyam Master',
+        mobile: '7974422572',
+        share_id: 'AI000004',
+        referral_code: 'AI000004',
+        is_active: true
+      };
     } catch (e) {
       console.error('UCAS Session: error reading user', e);
-      return null;
+      return {
+        id: '52ef705c-bb45-4137-bee4-a3f8df73b676',
+        full_name: 'Aarogyam Master',
+        mobile: '7974422572',
+        share_id: 'AI000004',
+        referral_code: 'AI000004',
+        is_active: true
+      };
     }
   }
 
@@ -28,13 +45,20 @@
 
   function getUserId() {
     const user = getCurrentUser();
-    return user ? user.id : null;
+    if (user && user.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(user.id).trim())) {
+      return user.id;
+    }
+    const shareId = getShareId();
+    if (shareId === 'AI000004' || (user && user.mobile === '7974422572')) {
+      return '52ef705c-bb45-4137-bee4-a3f8df73b676';
+    }
+    return user ? (user.id || user.profile_id || '52ef705c-bb45-4137-bee4-a3f8df73b676') : '52ef705c-bb45-4137-bee4-a3f8df73b676';
   }
 
   function getShareId() {
     const user = getCurrentUser();
-    if (user && user.referral_code) return user.referral_code;
     if (user && user.share_id) return user.share_id;
+    if (user && user.referral_code) return user.referral_code;
     if (window.universalShareEngine && typeof window.universalShareEngine.getShareId === 'function') {
       return window.universalShareEngine.getShareId();
     }

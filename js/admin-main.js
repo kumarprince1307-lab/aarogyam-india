@@ -306,6 +306,31 @@ function bootstrapAdminApp() {
   }
 }
 
+export function showToast(message, type = 'info') {
+  let container = document.getElementById('admin-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'admin-toast-container';
+    container.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:999999;display:flex;flex-direction:column;gap:8px;pointer-events:none;';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  const bg = type === 'error' ? '#EF4444' : (type === 'success' ? '#10B981' : '#2563EB');
+  toast.style.cssText = `background:${bg};color:#fff;font-weight:700;font-size:0.88rem;padding:10px 16px;border-radius:8px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.3);display:flex;align-items:center;gap:8px;pointer-events:auto;animation:aiSlideInRight 0.3s ease;`;
+  toast.innerHTML = `<span>${type === 'error' ? '✕' : (type === 'success' ? '✓' : 'ℹ')}</span> <span>${message}</span>`;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(30px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+window.showToast = showToast;
+
 export function formatDate(dateString) {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });

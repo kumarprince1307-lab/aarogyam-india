@@ -214,28 +214,74 @@
                 }
             }
 
-            // --- E. System Broadcasts & New Launch Notifications ---
-            list.push({
-                id: 'system_broadcast_01',
-                category: 'announcements',
-                icon: '📢',
-                iconClass: 'user-notif-icon-broadcast',
-                title: '🚀 Aarogyam UCAS V1 मार्केटिंग हब लाइव हुआ!',
-                desc: 'अब आप 1-क्लिक में अपने नाम व Share ID के साथ पर्सनल लैंडिंग पेज व वेबिनार इनविटेशन बना सकते हैं।',
-                timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
-                isRead: readStore.includes('system_broadcast_01')
-            });
+            // --- E. Dynamic Admin Broadcasts from Storage & Supabase ---
+            try {
+                const globalBroadcasts = JSON.parse(localStorage.getItem('AAROGYAM_GLOBAL_BROADCASTS') || '[]');
+                if (Array.isArray(globalBroadcasts)) {
+                    const today = new Date();
+                    const isUserBday = Boolean(user.dob && (() => {
+                        try {
+                            const b = new Date(user.dob);
+                            return b.getDate() === today.getDate() && b.getMonth() === today.getMonth();
+                        } catch (e) { return false; }
+                    })());
 
-            list.push({
-                id: 'system_broadcast_book_launch',
-                category: 'announcements',
-                icon: '📚',
-                iconClass: 'user-notif-icon-book',
-                title: '📖 नई ई-बुक: "खेती का डॉक्टर - खरीफ 2026"',
-                desc: 'जैविक कृषि और उन्नत फसल सुरक्षा की नई मास्टर गाइड ई-लाइब्रेरी में उपलब्ध है।',
-                timestamp: new Date(Date.now() - 3600000 * 24).toISOString(),
-                isRead: readStore.includes('system_broadcast_book_launch')
-            });
+                    const hasPurchased = Boolean(
+                        localStorage.getItem('AI_PURCHASES') || 
+                        localStorage.getItem('purchases') || 
+                        user.is_subscriber || 
+                        user.totalPurchases > 0
+                    );
+
+                    globalBroadcasts.forEach(bc => {
+                        let isEligible = false;
+                        if (!bc.target || bc.target === 'all') isEligible = true;
+                        else if (bc.target === 'birthday' && isUserBday) isEligible = true;
+                        else if (bc.target === 'active' && (user.is_active || user.is_subscriber)) isEligible = true;
+                        else if (bc.target === 'inactive' && !(user.is_active || user.is_subscriber)) isEligible = true;
+                        else if (bc.target === 'purchased' && hasPurchased) isEligible = true;
+                        else if (Array.isArray(bc.target_user_ids) && (bc.target === 'selected' || bc.target_user_ids.length > 0)) {
+                            if (bc.target_user_ids.includes(user.id) || bc.target_user_ids.includes(user.mobile) || bc.target_user_ids.includes(shareId)) {
+                                isEligible = true;
+                            }
+                        }
+
+                        if (isEligible) {
+                            const isRead = readStore.includes(bc.id);
+                            const catIcons = {
+                                birthday: '🎂',
+                                offer: '🎉',
+                                webinar: '🎥',
+                                update: '🚀',
+                                alert: '⚠️',
+                                announcement: '📢'
+                            };
+                            const bcIcon = catIcons[bc.category] || (bc.title && bc.title.match(/[\u{1F300}-\u{1F9FF}]/u) ? bc.title.match(/[\u{1F300}-\u{1F9FF}]/u)[0] : '📢');
+
+                            list.push({
+                                id: bc.id || `BC_${Date.now()}`,
+                                category: 'announcements',
+                                isBroadcast: true,
+                                icon: bcIcon,
+                                iconClass: 'user-notif-icon-broadcast',
+                                title: bc.title || 'आरोग्यम इंडिया संदेश',
+                                desc: bc.body || bc.desc || '',
+                                actionUrl: bc.action_url || null,
+                                priority: bc.priority || 'normal',
+                                timestamp: bc.created_at || new Date().toISOString(),
+                                isRead: isRead
+                            });
+
+                            // Auto trigger broadcast popup for unread urgent or birthday broadcasts
+                            if (!isRead && !sessionStorage.getItem(`AI_BC_POPUP_SHOWN_${bc.id}`)) {
+                                setTimeout(() => {
+                                    window.USER_NOTIFICATIONS?.showBroadcastPopup(bc);
+                                }, 1500);
+                            }
+                        }
+                    });
+                }
+            } catch (err) {}
 
             // Sort by timestamp descending
             list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -301,9 +347,12 @@
             }
         },
 
-        // 6. Update Badge Counters Across Header Bell Buttons
+        // 6. Update Badge Counters Across Header Bell & Aarogyam Messages Navigation
         updateBadgeCount: function () {
             const unreadCount = this.items.filter(n => !n.isRead).length;
+            const unreadBroadcasts = this.items.filter(n => (n.isBroadcast || String(n.id).startsWith('BC_') || String(n.id).startsWith('system_')) && !n.isRead).length;
+
+            // Update Bell Badges
             const badgeEls = document.querySelectorAll('.user-notif-badge');
             const pill = document.getElementById('userNotifUnreadPill');
 
@@ -320,6 +369,17 @@
                 pill.textContent = `${unreadCount} नई`;
                 pill.style.display = unreadCount > 0 ? 'inline-block' : 'none';
             }
+
+            // Update Dedicated "आरोग्यम संदेश" Navigation Badges (1, 2, 3...)
+            const broadcastBadges = document.querySelectorAll('#ucas-broadcast-unread-badge, #library-broadcast-unread-badge, .aarogyam-broadcast-badge, .broadcast-unread-badge');
+            broadcastBadges.forEach(bg => {
+                if (unreadBroadcasts > 0) {
+                    bg.textContent = unreadBroadcasts > 99 ? '99+' : unreadBroadcasts;
+                    bg.style.display = 'inline-flex';
+                } else {
+                    bg.style.display = 'none';
+                }
+            });
         },
 
         // 7. Render Items in Drawer List
@@ -451,6 +511,61 @@
         hideTopToast: function () {
             const toast = document.getElementById('userNotifTopToast');
             if (toast) toast.classList.remove('show');
+        },
+
+        // 11. Full Screen Broadcast Announcement Popup Modal
+        showBroadcastPopup: function (bc) {
+            if (!bc || !bc.id) return;
+            sessionStorage.setItem(`AI_BC_POPUP_SHOWN_${bc.id}`, 'true');
+
+            let popup = document.getElementById('ai-broadcast-popup-overlay');
+            if (!popup) {
+                popup = document.createElement('div');
+                popup.id = 'ai-broadcast-popup-overlay';
+                popup.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.8);backdrop-filter:blur(6px);z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;';
+                document.body.appendChild(popup);
+            }
+
+            const priorityColor = bc.priority === 'urgent' ? '#EF4444' : (bc.priority === 'important' ? '#F59E0B' : '#10B981');
+
+            popup.innerHTML = `
+                <div style="background:#ffffff;border-radius:16px;max-width:440px;width:100%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);overflow:hidden;border:2px solid ${priorityColor};">
+                    <div style="background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:1.3rem;">${bc.category === 'birthday' ? '🎂' : '📢'}</span>
+                            <strong style="font-size:1rem;color:#F8FAFC;">आरोग्यम इंडिया का संदेश</strong>
+                        </div>
+                        <button type="button" onclick="window.USER_NOTIFICATIONS.closeBroadcastPopup('${bc.id}')" style="background:transparent;border:none;color:#94A3B8;font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+                    </div>
+
+                    <div style="padding:20px;">
+                        <div style="font-weight:800;font-size:1.1rem;color:#0F172A;margin-bottom:8px;line-height:1.35;">
+                            ${bc.title}
+                        </div>
+                        <div style="font-size:0.9rem;color:#334155;line-height:1.5;margin-bottom:16px;white-space:pre-wrap;background:#F8FAFC;padding:12px;border-radius:8px;border:1px solid #E2E8F0;">
+${bc.body || bc.desc || ''}
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            ${bc.action_url ? `
+                                <a href="${bc.action_url}" target="_blank" onclick="window.USER_NOTIFICATIONS.markAsRead('${bc.id}'); window.USER_NOTIFICATIONS.closeBroadcastPopup('${bc.id}');" style="background:#2563EB;color:#fff;text-align:center;padding:10px 14px;border-radius:8px;font-weight:800;text-decoration:none;font-size:0.92rem;display:flex;align-items:center;justify-content:center;gap:6px;">
+                                    <span>🔗</span> <span>अभी देखें (View Now)</span>
+                                </a>
+                            ` : ''}
+                            <button type="button" onclick="window.USER_NOTIFICATIONS.markAsRead('${bc.id}'); window.USER_NOTIFICATIONS.closeBroadcastPopup('${bc.id}');" style="background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;padding:10px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.88rem;">
+                                ✓ धन्यवाद (Mark As Read)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            popup.style.display = 'flex';
+            this.playBellSound();
+        },
+
+        closeBroadcastPopup: function (bcId) {
+            const popup = document.getElementById('ai-broadcast-popup-overlay');
+            if (popup) popup.style.display = 'none';
         },
 
         // 11. Wire DOM Event Listeners

@@ -1,0 +1,26 @@
+<!-- Admin All User Permissions Matrix Page -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin - All User Permissions Matrix</title>
+  <link rel="stylesheet" href="../css/admin-panel.css?v=8.5">
+  <link rel="stylesheet" href="../css/admin-components.css?v=8.5">
+</head>
+<body>
+  <div id="admin-app" class="admin-app">
+    <div id="sidebar-placeholder"></div>
+    <main id="main-placeholder" class="admin-main">
+      <div id="header-placeholder"></div>
+      <div id="page-content"></div>
+    </main>
+  </div>
+  <script type="module" src="../js/admin-main.js?v=8.5"></script>
+  <script type="module" src="../js/admin-pages-user-permissions.js?v=9.0"></script>
+  <script type="module">
+    import { initUserPermissions } from '../js/admin-pages-user-permissions.js?v=9.0';
+    initUserPermissions();
+  </script>
+</body>
+</html>

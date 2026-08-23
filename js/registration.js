@@ -355,7 +355,7 @@ function completeRegistration(result) {
             if (returnUrl) {
                 window.location.href = returnUrl;
             } else {
-                window.location.href = "ebooks/my-library.html";
+                window.location.href = "/ucas/index.html";
             }
         }, 1000);
     }
