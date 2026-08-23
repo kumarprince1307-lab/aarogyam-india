@@ -139,12 +139,13 @@
     .pub-site-header {
       width: 100%;
       max-width: 780px;
-      padding: 14px 16px;
-      margin: 12px auto 8px auto;
+      padding: 10px 16px;
+      margin: 10px auto 10px auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(255, 255, 255, 0.88);
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-radius: var(--radius-md);
@@ -157,12 +158,14 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
+      min-width: 0;
     }
 
     .pub-site-logo {
-      height: 36px;
+      height: 38px;
       width: auto;
       object-fit: contain;
+      flex-shrink: 0;
     }
 
     .pub-site-title {
@@ -171,26 +174,50 @@
       color: var(--primary-dark);
       letter-spacing: -0.3px;
       line-height: 1.1;
+      white-space: nowrap;
     }
 
     .pub-site-tagline {
-      font-size: 0.72rem;
-      color: var(--text-light);
-      font-weight: 600;
+      font-size: 0.76rem;
+      color: #0B7A3E;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 1px;
+      letter-spacing: 0.3px;
     }
 
-    .pub-verified-pill {
+    .pub-btn-free-join {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      background: var(--primary-subtle);
-      color: var(--primary-dark);
-      border: 1px solid rgba(11,122,62,0.2);
-      padding: 5px 11px;
+      gap: 6px;
+      background: linear-gradient(135deg, #0B7A3E 0%, #159E52 100%);
+      color: #FFFFFF !important;
+      text-decoration: none;
+      padding: 8px 16px;
       border-radius: var(--radius-full);
-      font-size: 0.76rem;
-      font-weight: 700;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      box-shadow: 0 4px 14px rgba(11, 122, 62, 0.32);
+      border: 1.5px solid rgba(255, 255, 255, 0.5);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      animation: pulse-green 2.5s infinite;
+    }
+
+    .pub-btn-free-join:hover, .pub-btn-free-join:active {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(11, 122, 62, 0.5);
+      color: #FFFFFF !important;
+    }
+
+    @keyframes pulse-green {
+      0%, 100% { box-shadow: 0 4px 14px rgba(11, 122, 62, 0.32); }
+      50% { box-shadow: 0 4px 22px rgba(21, 158, 82, 0.65); transform: translateY(-1px); }
     }
 
     /* Main Public Post Container */
@@ -208,12 +235,10 @@
 
     /* Creator Meta Bar */
     .pub-creator-bar {
-      padding: 16px 20px 12px 20px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
+      justify-content: flex-start;
       border-bottom: 1px solid #F1F5F9;
       background: #FFFFFF;
     }
@@ -241,32 +266,10 @@
     }
 
     .pub-creator-name {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 800;
       color: var(--text-main);
       line-height: 1.2;
-    }
-
-    .pub-creator-sub {
-      font-size: 0.76rem;
-      color: var(--text-light);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 2px;
-    }
-
-    .pub-category-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--primary-subtle);
-      color: var(--primary-dark);
-      font-weight: 800;
-      font-size: 0.8rem;
-      padding: 6px 14px;
-      border-radius: var(--radius-full);
-      border: 1.5px solid rgba(11,122,62,0.2);
     }
 
     /* Media Wrapper */
@@ -460,37 +463,64 @@
 
     .pub-share-btn {
       flex: 1;
-      min-width: 120px;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      font-weight: 700;
+      min-width: 110px;
+      padding: 11px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 800;
       border: 1px solid var(--border);
       background: #FFFFFF;
       color: var(--text-main);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 7px;
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
     }
 
     .pub-share-btn:hover {
-      background: #F8FAFC;
-      border-color: #CBD5E1;
-      transform: translateY(-1px);
+      transform: translateY(-1.5px);
+      box-shadow: var(--shadow-md);
     }
 
-    .pub-share-btn-fb {
-      color: #1877F2;
-      border-color: rgba(24,119,242,0.3);
+    .pub-share-btn:active {
+      transform: scale(0.95);
     }
 
     .pub-share-btn-wa {
-      color: #15803D;
-      border-color: rgba(37,211,102,0.35);
+      background: linear-gradient(135deg, #25D366 0%, #15803D 100%);
+      color: #FFFFFF;
+      border: none;
+      box-shadow: 0 4px 12px rgba(37,211,102,0.3);
+    }
+    .pub-share-btn-wa:hover {
+      background: linear-gradient(135deg, #20BD5A 0%, #126E34 100%);
+      color: #FFFFFF;
+    }
+
+    .pub-share-btn-orange {
+      background: linear-gradient(135deg, #FF9800 0%, #EA580C 100%);
+      color: #FFFFFF;
+      border: none;
+      box-shadow: 0 4px 12px rgba(234,88,12,0.3);
+    }
+    .pub-share-btn-orange:hover {
+      background: linear-gradient(135deg, #F57C00 0%, #C2410C 100%);
+      color: #FFFFFF;
+    }
+
+    .pub-share-btn-copy {
+      background: #FFFFFF;
+      color: #0F172A;
+      border: 1.5px solid #CBD5E1;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .pub-share-btn-copy:hover {
+      background: #F8FAFC;
+      border-color: #94A3B8;
     }
 
     /* =========================================================================
@@ -770,17 +800,16 @@
        1. PUBLIC WEBSITE HEADER
        ========================================================================= -->
   <header class="pub-site-header">
-    <a href="https://aarogyamindia.in" class="pub-site-brand">
+    <a href="/index.html" class="pub-site-brand">
       <img src="/images/logo/logo.png" alt="Aarogyam India" class="pub-site-logo" onerror="this.style.display='none'">
       <div>
         <div class="pub-site-title">Aarogyam India</div>
-        <div class="pub-site-tagline">प्रामाणिक जानकारी एवं समाधान</div>
+        <div class="pub-site-tagline">🇮🇳 Jai Hind</div>
       </div>
     </a>
-    <div class="pub-verified-pill">
-      <i class="fa-solid fa-circle-check" style="color:var(--primary);"></i>
-      <span>विश्वसनीय जानकारी</span>
-    </div>
+    <a id="pub_btn_free_join" href="/index.html?src=survey" class="pub-btn-free-join" title="मुफ़्त रजिस्ट्रेशन करें">
+      <i class="fa-solid fa-user-plus"></i> Free Join
+    </a>
   </header>
 
   <!-- =========================================================================
@@ -856,22 +885,11 @@
        ========================================================================= -->
   <main class="pub-post-container" id="lp_main_content">
     
-    <!-- Creator Meta Bar -->
+    <!-- Creator Meta Bar (Clean Creator Name & Avatar Only) -->
     <div class="pub-creator-bar">
       <div class="pub-creator-info">
         <div class="pub-creator-avatar" id="lp_creator_avatar">A</div>
-        <div>
-          <div class="pub-creator-name" id="lp_creator_name">Aarogyam India Community</div>
-          <div class="pub-creator-sub">
-            <span id="lp_creator_sub_text">द्वारा साझा किया गया</span>
-            <span>•</span>
-            <span id="lp_post_date">22 अगस्त 2026</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="pub-category-badge" id="lp_category_badge">
-        <i class="fa-solid fa-tag"></i> <span>Aarogyam Special</span>
+        <div class="pub-creator-name" id="lp_creator_name">Aarogyam India Community</div>
       </div>
     </div>
 
@@ -958,11 +976,11 @@
           <button type="button" id="pub_btn_share_wa" class="pub-share-btn pub-share-btn-wa" title="WhatsApp पर शेयर करें">
             <i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर
           </button>
-          <button type="button" id="pub_btn_share_fb" class="pub-share-btn pub-share-btn-fb" title="Facebook पर शेयर करें">
-            <i class="fa-brands fa-facebook"></i> Facebook शेयर
-          </button>
-          <button type="button" id="pub_btn_share_native" class="pub-share-btn" title="शेयर या कॉपी करें">
+          <button type="button" id="pub_btn_share_native" class="pub-share-btn pub-share-btn-orange" title="शेयर करें">
             <i class="fa-solid fa-share-nodes"></i> शेयर करें
+          </button>
+          <button type="button" id="pub_btn_copy_link" class="pub-share-btn pub-share-btn-copy" title="लिंक कॉपी करें">
+            <i class="fa-regular fa-copy"></i> कॉपी लिंक
           </button>
         </div>
       </div>
@@ -979,17 +997,15 @@
        4. PUBLIC WEBSITE FOOTER
        ========================================================================= -->
   <footer class="pub-footer">
-    <div style="font-weight:700;color:var(--text-main);font-size:0.92rem;">Aarogyam India</div>
-    <div style="margin-top:2px;">विश्वसनीय जानकारी, सही दिशा</div>
-    <div style="margin-top:6px;font-size:0.76rem;">&copy; 2026 Aarogyam India • सर्वाधिकार सुरक्षित</div>
+    <div style="font-size:0.8rem;color:var(--text-light);">&copy; 2026 Aarogyam India • सर्वाधिकार सुरक्षित</div>
     <div class="pub-footer-links">
       <a href="/index.html">मुख्य वेबसाइट</a>
       <span>•</span>
+      <a href="/ebooks/my-library.html">My Library</a>
+      <span>•</span>
+      <a href="/my-profile.html">My Profile</a>
+      <span>•</span>
       <a href="/privacy-policy.html">गोपनीयता नीति</a>
-      <span>•</span>
-      <a href="/terms.html">नियम एवं शर्तें</a>
-      <span>•</span>
-      <a href="/contact.html">संपर्क करें</a>
     </div>
   </footer>
 
@@ -1306,23 +1322,24 @@
         if (waBtn) waBtn.href = waLink;
         if (floatWaBtn) floatWaBtn.href = waLink;
 
-        // Share Buttons
-        const currentUrl = window.location.href;
-        const shareWaBtn = document.getElementById('pub_btn_share_wa');
-        const shareFbBtn = document.getElementById('pub_btn_share_fb');
-        const shareNativeBtn = document.getElementById('pub_btn_share_native');
+        // Header Free Join dynamic attribution link
+        const freeJoinBtn = document.getElementById('pub_btn_free_join');
+        const joinShareId = targetShareId || lp.share_id || creator?.share_id || '';
+        if (freeJoinBtn) {
+          freeJoinBtn.href = `/index.html?ref=${encodeURIComponent(joinShareId)}&src=survey`;
+        }
 
-        const shareMsg = `🌟 *${finalTitle}*\n\n${(lp.message || '').slice(0, 150)}...\n\n👉 पूरी जानकारी यहाँ देखें:\n${currentUrl}`;
+        // Share Buttons
+        const cleanShareUrl = `https://aarogyamindia.online/api/share?id=${encodeURIComponent(lp.id || lpId)}${joinShareId ? '&share_id=' + encodeURIComponent(joinShareId) : ''}`;
+        const shareWaBtn = document.getElementById('pub_btn_share_wa');
+        const shareNativeBtn = document.getElementById('pub_btn_share_native');
+        const copyLinkBtn = document.getElementById('pub_btn_copy_link');
+
+        const shareMsg = `🌟 *${finalTitle}*\n\n${(lp.message || '').slice(0, 150)}...\n\n👉 पूरी जानकारी यहाँ देखें:\n${cleanShareUrl}`;
 
         if (shareWaBtn) {
           shareWaBtn.onclick = () => {
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`, '_blank');
-          };
-        }
-
-        if (shareFbBtn) {
-          shareFbBtn.onclick = () => {
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`, '_blank');
           };
         }
 
@@ -1333,12 +1350,30 @@
                 await navigator.share({
                   title: finalTitle,
                   text: lp.message ? lp.message.slice(0, 120) : finalTitle,
-                  url: currentUrl
+                  url: cleanShareUrl
                 });
               } catch (e) {}
             } else if (navigator.clipboard) {
-              await navigator.clipboard.writeText(currentUrl);
-              alert('✅ लिंक कॉपी हो गया!');
+              await navigator.clipboard.writeText(cleanShareUrl);
+              alert('✅ शेयर लिंक कॉपी हो गया:\n' + cleanShareUrl);
+            }
+          };
+        }
+
+        if (copyLinkBtn) {
+          copyLinkBtn.onclick = async () => {
+            if (navigator.clipboard) {
+              try {
+                await navigator.clipboard.writeText(cleanShareUrl);
+                copyLinkBtn.innerHTML = '<i class="fa-solid fa-check" style="color:#0B7A3E;"></i> कॉपी हो गया!';
+                setTimeout(() => {
+                  copyLinkBtn.innerHTML = '<i class="fa-regular fa-copy"></i> कॉपी लिंक';
+                }, 2200);
+              } catch (e) {
+                alert('✅ लिंक कॉपी हो गया:\n' + cleanShareUrl);
+              }
+            } else {
+              alert('✅ लिंक कॉपी हो गया:\n' + cleanShareUrl);
             }
           };
         }
