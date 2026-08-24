@@ -102,13 +102,13 @@ module.exports = async function handler(req, res) {
 
       res.setHeader('Content-Type', mimeType);
       res.setHeader('Content-Length', imgBuffer.length);
-      res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800');
+      res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
       return res.status(200).send(imgBuffer);
     }
 
     // 2. If stored as external HTTP/HTTPS URL
     if (rawImage.startsWith('http://') || rawImage.startsWith('https://')) {
-      res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
+      res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
       return res.redirect(302, rawImage);
     }
 

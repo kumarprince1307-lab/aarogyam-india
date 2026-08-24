@@ -2141,7 +2141,7 @@ export async function fetchAllSurveys(params = {}) {
     const db = getAdminDb();
     if (!db) throw new Error("Supabase client not available.");
 
-    let query = db.from('surveys').select('*').order('created_at', { ascending: false });
+    let query = db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false });
 
     if (params.userId && params.userId !== 'all') {
       query = query.eq('profile_id', params.userId);
@@ -2394,7 +2394,7 @@ export async function fetchAllUsersAdmin() {
     const db = getAdminDb();
     if (!db) return { success: false, data: [] };
     const [profilesRes, purchasesRes] = await Promise.all([
-      db.from('profiles').select('*').order('created_at', { ascending: false }),
+      db.from('profiles').select('id, full_name, mobile, email, gender, dob, State, district, address, occupation, interest, netsurf_id, registration_source, is_active, share_id, created_at').order('created_at', { ascending: false }),
       db.from('purchases').select('id, profile_id, book_id, amount, payment_status, purchase_date')
     ]);
     const profiles = profilesRes.data || [];

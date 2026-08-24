@@ -1278,10 +1278,9 @@ export async function initAllLandingPages() {
 
     // 2. Fetch Landing Pages & Surveys from Supabase
     if (db) {
-      try {
         const [lpRes, surveyRes] = await Promise.all([
-          db.from('landing_pages').select('*').order('created_at', { ascending: false }),
-          db.from('surveys').select('*').order('created_at', { ascending: false })
+          db.from('landing_pages').select('id, profile_id, share_id, title, message, category, content_type, status, mrp, offer_price, buynow_url, og_title, og_description, og_image_url, webinar_data, created_at').order('created_at', { ascending: false }),
+          db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false })
         ]);
 
         if (lpRes && lpRes.data) lpList = lpRes.data;
@@ -2147,9 +2146,19 @@ export async function initAllLandingPages() {
   // ==========================================
   // EDIT PAGE IN ADMIN BUILDER
   // ==========================================
-  function startEditPage(pageId) {
-    const page = allPages.find(p => p.id === pageId);
+  async function startEditPage(pageId) {
+    let page = allPages.find(p => p.id === pageId);
     if (!page) return;
+
+    if ((!page.media_url && !page.thumbnail_url) || page.content_type === 'image' || page.content_type === 'product') {
+      const db = getAdminDb();
+      if (db) {
+        try {
+          const { data: fullData } = await db.from('landing_pages').select('*').eq('id', pageId).single();
+          if (fullData) page = { ...page, ...fullData };
+        } catch (e) {}
+      }
+    }
 
     editingPageId = page.id;
     builderCard.style.display = 'block';

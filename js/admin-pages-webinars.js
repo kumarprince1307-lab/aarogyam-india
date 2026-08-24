@@ -158,8 +158,8 @@ export async function initWebinars() {
     try {
       // 1. Fetch Profiles, Landing Pages & Surveys in parallel
       const [lpRes, surveyRes, profRes] = await Promise.all([
-        db.from('landing_pages').select('*').order('created_at', { ascending: false }),
-        db.from('surveys').select('*').order('created_at', { ascending: false }),
+        db.from('landing_pages').select('id, profile_id, share_id, title, category, status, webinar_data, created_at').order('created_at', { ascending: false }),
+        db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false }),
         db.from('profiles').select('id, full_name, mobile, share_id')
       ]);
 

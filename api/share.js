@@ -266,11 +266,12 @@ module.exports = async function handler(req, res) {
 
   // 5. If Human Visitor, issue immediate 302 Redirect
   if (!isCrawler && !query.debug) {
-    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60');
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
     return res.redirect(302, destinationLandingUrl);
   }
 
   // 6. If Social Crawler (or in-app webview fallback), return Pre-Rendered RAW HTML with real OG tags + instant client redirect
+  res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
   const cleanTitle = finalTitle.includes('Aarogyam India') ? finalTitle : `${finalTitle} — Aarogyam India`;
 
   const html = `<!DOCTYPE html>
