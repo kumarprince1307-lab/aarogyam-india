@@ -4,7 +4,7 @@
    No private user data caching.
    ========================================================================== */
 
-const CACHE_NAME = 'ucas-v1-shell-v7';
+const CACHE_NAME = 'ucas-v1-shell-v8';
 const STATIC_ASSETS = [
   '/ucas/index.html',
   '/ucas/landing.html',
