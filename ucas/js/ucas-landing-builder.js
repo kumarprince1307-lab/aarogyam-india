@@ -957,7 +957,11 @@
     const targetPath = isProduction ? '/api/share' : '/ucas/landing.html';
     const url = new URL(targetPath, origin);
     url.searchParams.set('id', lp.id);
-    url.searchParams.set('share_id', lp.share_id || window.UCAS_SESSION.getShareId());
+    const currentUserId = window.UCAS_SESSION?.getUserId();
+    const currentUserShareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
+    const isBroadcastOrAdmin = Boolean(lp.created_by_admin || lp.is_admin_template || lp.share_id === 'ADMIN' || lp.profile_id === 'ALL_USERS' || (lp.profile_id && lp.profile_id !== currentUserId));
+    const shareId = isBroadcastOrAdmin ? currentUserShareId : (lp.share_id || currentUserShareId);
+    url.searchParams.set('share_id', shareId);
     return url.toString();
   }
 

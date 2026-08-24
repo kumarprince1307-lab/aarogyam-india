@@ -369,9 +369,12 @@
   }
 
   function getProductShareUrl(lp) {
-    const origin = window.location.origin;
-    const shareId = window.UCAS_SESSION?.getShareId() || lp.share_id || 'AI000004';
-    return `${origin}/ucas/landing.html?id=${lp.id}&ref=${shareId}`;
+    const origin = window.location.origin || 'https://aarogyamindia.online';
+    const currentUserId = window.UCAS_SESSION?.getUserId();
+    const currentUserShareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
+    const isBroadcastOrAdmin = Boolean(lp.created_by_admin || lp.is_admin_template || lp.share_id === 'ADMIN' || lp.profile_id === 'ALL_USERS' || (lp.profile_id && lp.profile_id !== currentUserId));
+    const shareId = isBroadcastOrAdmin ? currentUserShareId : (lp.share_id || currentUserShareId);
+    return `${origin}/ucas/landing.html?id=${encodeURIComponent(lp.id)}&share_id=${encodeURIComponent(shareId)}`;
   }
 
   async function handleProductFormSubmit(e) {

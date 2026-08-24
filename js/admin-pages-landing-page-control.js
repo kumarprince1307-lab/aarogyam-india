@@ -127,7 +127,7 @@ export async function initLandingPageControl() {
       // 2. Fetch Users (Profiles) to check Active / Inactive status
       const { data: userData, error: uErr } = await supabase
         .from('profiles')
-        .select('id, name, mobile, share_id, is_active, is_subscriber');
+        .select('id, full_name, mobile, share_id, is_active');
 
       // 3. Fetch Surveys / Leads for response counts
       const { data: surveyData, error: sErr } = await supabase
