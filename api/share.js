@@ -99,19 +99,36 @@ function fetchOpenGraphImage(targetUrl, maxRedirects = 2) {
   });
 }
 
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 25,
+  keepAliveMsecs: 60000
+});
+
+const _lpShareMemoryCache = new Map();
+const LP_SHARE_CACHE_TTL = 300000; // 5 minutes cache
+
 function fetchLandingPageFromSupabase(lpId) {
   return new Promise((resolve) => {
     if (!lpId) return resolve(null);
-    const cleanId = encodeURIComponent(String(lpId).trim());
-    const apiUrl = `${SUPABASE_URL}/rest/v1/landing_pages?id=eq.${cleanId}&select=id,title,category,content_type,media_url,thumbnail_url,message,share_id,status,og_title,og_description,og_image_url`;
+    const cleanId = String(lpId).trim();
+
+    // Check memory cache first
+    const cached = _lpShareMemoryCache.get(cleanId);
+    if (cached && (Date.now() - cached.timestamp < LP_SHARE_CACHE_TTL)) {
+      return resolve(cached.data);
+    }
+
+    const apiUrl = `${SUPABASE_URL}/rest/v1/landing_pages?id=eq.${encodeURIComponent(cleanId)}&select=id,title,category,content_type,media_url,thumbnail_url,message,share_id,status,og_title,og_description,og_image_url`;
 
     const options = {
+      agent: httpsAgent,
       headers: {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         'Accept': 'application/json'
       },
-      timeout: 5000
+      timeout: 3000
     };
 
     const req = https.get(apiUrl, options, (res) => {
@@ -122,7 +139,13 @@ function fetchLandingPageFromSupabase(lpId) {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             const parsed = JSON.parse(rawData);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              return resolve(parsed[0]);
+              const record = parsed[0];
+              _lpShareMemoryCache.set(cleanId, { data: record, timestamp: Date.now() });
+              if (_lpShareMemoryCache.size > 500) {
+                const firstKey = _lpShareMemoryCache.keys().next().value;
+                _lpShareMemoryCache.delete(firstKey);
+              }
+              return resolve(record);
             }
           }
           resolve(null);

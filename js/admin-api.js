@@ -1472,8 +1472,17 @@ function getRelativeTime(date) {
   return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 }
 
+let _adminNotificationsCache = null;
+let _adminNotificationsCacheTime = 0;
+const NOTIF_CACHE_TTL = 60000; // 60 seconds cache
+
 export async function fetchAdminNotifications(params = {}) {
-  await delay(80);
+  const now = Date.now();
+  if (!params.forceRefresh && _adminNotificationsCache && (now - _adminNotificationsCacheTime < NOTIF_CACHE_TTL)) {
+    return _adminNotificationsCache;
+  }
+
+  await delay(50);
   try {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
@@ -1735,12 +1744,19 @@ export async function fetchAdminNotifications(params = {}) {
 
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
-    return {
+    const result = {
       success: true,
       data: filtered,
       total: notifications.length,
       unreadCount: unreadCount
     };
+
+    if (!params.category || params.category === 'all') {
+      _adminNotificationsCache = result;
+      _adminNotificationsCacheTime = Date.now();
+    }
+
+    return result;
 
   } catch (error) {
     console.error('Failed to fetch admin notifications:', error);

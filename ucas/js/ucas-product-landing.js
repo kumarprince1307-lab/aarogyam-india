@@ -155,7 +155,7 @@
         const { data: dbPages } = await client
           .from('landing_pages')
           .select('*')
-          .eq('profile_id', profileId)
+          .or(`profile_id.eq.${profileId},share_id.eq.${shareId},share_id.eq.ADMIN,share_id.eq.ALL_USERS`)
           .eq('content_type', 'product')
           .order('created_at', { ascending: false });
 
@@ -372,7 +372,7 @@
     const origin = window.location.origin || 'https://aarogyamindia.online';
     const currentUserId = window.UCAS_SESSION?.getUserId();
     const currentUserShareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
-    const isBroadcastOrAdmin = Boolean(lp.created_by_admin || lp.is_admin_template || lp.share_id === 'ADMIN' || lp.profile_id === 'ALL_USERS' || (lp.profile_id && lp.profile_id !== currentUserId));
+    const isBroadcastOrAdmin = Boolean(lp.created_by_admin || lp.is_admin_template || lp.share_id === 'ADMIN' || lp.share_id === 'ALL_USERS' || lp.profile_id === 'ALL_USERS' || (lp.profile_id && lp.profile_id !== currentUserId));
     const shareId = isBroadcastOrAdmin ? currentUserShareId : (lp.share_id || currentUserShareId);
     return `${origin}/ucas/landing.html?id=${encodeURIComponent(lp.id)}&share_id=${encodeURIComponent(shareId)}`;
   }

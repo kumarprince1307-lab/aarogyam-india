@@ -258,13 +258,13 @@ async function initPushNotifications() {
   }
 }
 
-// Lightweight background polling for live admin notifications (every 30s)
+// Lightweight background polling for live admin notifications (every 3 minutes, tab active only)
 function initAdminNotificationPolling() {
   setInterval(() => {
-    if (!document.hidden) {
+    if (!document.hidden && document.hasFocus()) {
       document.dispatchEvent(new CustomEvent('admin:notifications-updated'));
     }
-  }, 30000);
+  }, 180000);
 }
 
 // Safely bootstrap admin layout and router once DOM is fully ready

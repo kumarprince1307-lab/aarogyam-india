@@ -5,19 +5,36 @@ const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
 const DEFAULT_FALLBACK_IMAGE = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
 
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 25,
+  keepAliveMsecs: 60000
+});
+
+const _lpImageMemoryCache = new Map();
+const LP_IMAGE_CACHE_TTL = 300000; // 5 minutes cache
+
 function fetchLandingPageFromSupabase(lpId) {
   return new Promise((resolve) => {
     if (!lpId) return resolve(null);
-    const cleanId = encodeURIComponent(String(lpId).trim());
-    const apiUrl = `${SUPABASE_URL}/rest/v1/landing_pages?id=eq.${cleanId}&select=id,media_url,thumbnail_url`;
+    const cleanId = String(lpId).trim();
+
+    // Check memory cache first
+    const cached = _lpImageMemoryCache.get(cleanId);
+    if (cached && (Date.now() - cached.timestamp < LP_IMAGE_CACHE_TTL)) {
+      return resolve(cached.data);
+    }
+
+    const apiUrl = `${SUPABASE_URL}/rest/v1/landing_pages?id=eq.${encodeURIComponent(cleanId)}&select=id,media_url,thumbnail_url`;
 
     const options = {
+      agent: httpsAgent,
       headers: {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         'Accept': 'application/json'
       },
-      timeout: 3500
+      timeout: 3000
     };
 
     const req = https.get(apiUrl, options, (res) => {
@@ -28,7 +45,13 @@ function fetchLandingPageFromSupabase(lpId) {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             const parsed = JSON.parse(rawData);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              return resolve(parsed[0]);
+              const record = parsed[0];
+              _lpImageMemoryCache.set(cleanId, { data: record, timestamp: Date.now() });
+              if (_lpImageMemoryCache.size > 500) {
+                const firstKey = _lpImageMemoryCache.keys().next().value;
+                _lpImageMemoryCache.delete(firstKey);
+              }
+              return resolve(record);
             }
           }
           resolve(null);

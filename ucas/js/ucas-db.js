@@ -411,17 +411,32 @@
   // 5. LANDING PAGES ENGINE QUERIES
   // ==========================================
 
-  async function getLandingPages(profileId) {
+  let _ucasLandingPagesCache = new Map();
+  const UCAS_LP_CACHE_TTL = 20000; // 20 seconds cache
+
+  function invalidateLandingPagesCache() {
+    _ucasLandingPagesCache.clear();
+  }
+
+  async function getLandingPages(profileId, forceRefresh = false) {
+    const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
+    const validId = profileId && isUuid(profileId) ? profileId : '52ef705c-bb45-4137-bee4-a3f8df73b676';
+    const shareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
+    const cacheKey = `${validId}_${shareId}`;
+
+    if (!forceRefresh) {
+      const cached = _ucasLandingPagesCache.get(cacheKey);
+      if (cached && (Date.now() - cached.timestamp < UCAS_LP_CACHE_TTL)) {
+        return { success: true, data: cached.data };
+      }
+    }
+
     const client = getDb();
     let pages = [];
 
     // 1. Try Supabase
     if (client) {
       try {
-        const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
-        const validId = profileId && isUuid(profileId) ? profileId : '52ef705c-bb45-4137-bee4-a3f8df73b676';
-        const shareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
-
         const { data, error } = await client
           .from('landing_pages')
           .select('*')
@@ -531,6 +546,7 @@
       }
     }
 
+    _ucasLandingPagesCache.set(cacheKey, { data: finalPages, timestamp: Date.now() });
     return { success: true, data: finalPages };
   }
 
@@ -571,6 +587,7 @@
   }
 
   async function createLandingPage(payload) {
+    invalidateLandingPagesCache();
     const client = getDb();
     const profileId = payload.profile_id || 'anonymous';
     const localStoreKey = `UCAS_LP_${profileId}`;
@@ -600,6 +617,7 @@
   }
 
   async function updateLandingPage(lpId, payload, profileId) {
+    invalidateLandingPagesCache();
     const client = getDb();
     const pid = profileId || payload.profile_id || 'anonymous';
     const localStoreKey = `UCAS_LP_${pid}`;
@@ -633,6 +651,7 @@
   }
 
   async function deleteLandingPage(lpId, profileId) {
+    invalidateLandingPagesCache();
     const client = getDb();
     const pid = profileId || 'anonymous';
     const localStoreKey = `UCAS_LP_${pid}`;

@@ -607,9 +607,10 @@ ${bc.body || bc.desc || ''}
             });
         },
 
-        // 12. Periodic Background Poll (Every 60s)
+        // 12. Periodic Background Poll (Every 5 minutes, active tab only)
         setupPeriodicCheck: function () {
             setInterval(async () => {
+                if (document.hidden || !document.hasFocus()) return;
                 const prevUnread = this.items.filter(n => !n.isRead).length;
                 await this.loadUserNotifications();
                 const newUnread = this.items.filter(n => !n.isRead).length;
@@ -618,7 +619,7 @@ ${bc.body || bc.desc || ''}
                     const topItem = this.items[0];
                     this.showTopToast(topItem.title, topItem.desc, topItem.icon || '🔔');
                 }
-            }, 60000);
+            }, 300000);
         },
 
         // 13. Relative Time Formatter
