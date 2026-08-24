@@ -628,8 +628,8 @@ export async function fetchUsers(params = {}) {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
 
-    // Step 1: Fetch all profiles with filtering (Safe standard columns)
-    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at, share_id, referred_by');
+    // Step 1: Fetch all profiles with filtering (Safe standard columns + Share IDs)
+    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at, share_id, referral_code, referral_mobile, referred_by');
 
     if (params.status && params.status !== 'all') {
       if (params.status === 'installed') {
@@ -642,8 +642,11 @@ export async function fetchUsers(params = {}) {
     }
 
     if (params.query) {
-      const q = `%${params.query}%`;
-      queryBuilder = queryBuilder.or(`full_name.ilike.${q},mobile.ilike.${q},email.ilike.${q}`);
+      const rawQ = String(params.query || '').trim();
+      if (rawQ) {
+        const q = `%${rawQ}%`;
+        queryBuilder = queryBuilder.or(`full_name.ilike.${q},mobile.ilike.${q},email.ilike.${q},share_id.ilike.${q},referral_code.ilike.${q}`);
+      }
     }
     
     if (params.registrationDate) {
@@ -663,7 +666,7 @@ export async function fetchUsers(params = {}) {
     if (!profiles || profiles.length === 0) return { success: true, data: [] };
 
     const profileIds = profiles.map(p => p.id).filter(Boolean);
-    const shareIds = profiles.map(p => p.share_id).filter(Boolean);
+    const shareIds = profiles.map(p => p.share_id || p.referral_code).filter(Boolean);
 
     // Step 2: Fetch all necessary aggregated data in parallel
     const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes] = await Promise.all([
@@ -732,7 +735,8 @@ export async function fetchUsers(params = {}) {
     // Step 4: Map profiles and merge with purchase summary
     const mappedData = profiles.map(user => {
         const ownPurchases = purchaseSummary[user.id] || { totalPurchases: 0, totalSpent: 0 };
-        const shareStats = shareStatsMap[user.share_id] || { shares: 0, clicks: 0, visitors: 0 };
+        const currentShareId = user.share_id || user.referral_code || 'N/A';
+        const shareStats = shareStatsMap[currentShareId] || { shares: 0, clicks: 0, visitors: 0 };
         return {
         id: user.id,
         name: user.full_name,
@@ -740,7 +744,7 @@ export async function fetchUsers(params = {}) {
         email: user.email,
         source: user.registration_source,
         status: user.is_active ? 'active' : 'inactive',
-        shareId: user.share_id,
+        shareId: currentShareId,
         directReferrals: directReferralCounts[user.id] || 0,
         totalShares: shareStats.shares,
         totalClicks: shareStats.clicks,

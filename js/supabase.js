@@ -195,7 +195,8 @@ async function createUserProfile(userData) {
         let referralCodeMobile = userData.referralMobile || attribution.referralCode || null; 
         let incomingReferralCode = userData.referralCode || attribution.shareToken || null;
 
-        let finalShareId = incomingReferralCode || ("AI" + Math.floor(100000 + Math.random() * 900000)); 
+        // Ensure every newly registered user ALWAYS gets their own unique new Share ID
+        const newUniqueShareId = "AI" + Math.floor(100000 + Math.random() * 900000); 
 
         if (!referrerProfileId && referralCodeMobile) {
             const referrer = await isMobileRegistered(referralCodeMobile);
@@ -225,7 +226,7 @@ async function createUserProfile(userData) {
                 gender: userData.gender || null,
                 State: userData.state || userData.State || null,
                 district: userData.district || null,
-                referral_code: finalShareId,          
+                referral_code: newUniqueShareId,          
                 referral_mobile: referralCodeMobile,     
                 referred_by: referrerProfileId || null,
                 registration_source: attribution.source || "direct",
@@ -241,7 +242,7 @@ async function createUserProfile(userData) {
             try {
                 await db.from("referrals").insert([{
                     referred_by: referrerProfileId || null,
-                    referral_code: finalShareId,          
+                    referral_code: incomingReferralCode || newUniqueShareId,          
                     status: "success",
                     joined_at: new Date().toISOString()
                 }]);

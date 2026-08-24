@@ -239,7 +239,7 @@ export async function initUsers() {
         </a>
       </div>
       <div class="admin-card admin-controls">
-        <input id="user-search" type="search" placeholder="Search by name, mobile, or email" class="admin-input" />
+        <input id="user-search" type="search" placeholder="🔍 नाम, मोबाइल, Share ID (e.g. AI639559), या ईमेल से खोजें..." class="admin-input" style="flex: 2; min-width: 260px;" />
         <input id="user-reg-date-filter" type="date" title="Filter by registration date" class="admin-input" />
         <select id="user-status-filter" class="admin-select">
           <option value="all">All statuses</option>
