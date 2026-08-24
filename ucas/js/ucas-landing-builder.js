@@ -585,8 +585,14 @@
         return;
       }
 
+      const cleanMid = meetingId.replace(/[^0-9]/g, '');
+      let directZoom = zoomLink;
+      if (cleanMid && (!directZoom || directZoom.includes('zoom.us/join'))) {
+        directZoom = `https://zoom.us/j/${cleanMid}${passcode ? '?pwd=' + encodeURIComponent(passcode) : ''}`;
+      }
+
       webinarData = {
-        zoom_link: zoomLink,
+        zoom_link: directZoom,
         meeting_id: meetingId,
         passcode: passcode,
         datetime: datetime,

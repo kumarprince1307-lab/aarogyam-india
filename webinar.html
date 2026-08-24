@@ -231,11 +231,13 @@
       box-shadow: 0 8px 25px rgba(45, 140, 255, 0.45);
       margin-bottom: 16px;
       transition: all 0.2s ease;
+      cursor: pointer;
     }
 
     .wb-zoom-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 30px rgba(45, 140, 255, 0.6);
+      color: #FFFFFF;
     }
 
     .wb-detail-box {
@@ -250,7 +252,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
+      padding: 10px 0;
     }
 
     .wb-detail-row:not(:last-child) {
@@ -258,9 +260,12 @@
     }
 
     .wb-detail-label {
-      font-size: 0.82rem;
+      font-size: 0.84rem;
       color: var(--text-muted);
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .wb-detail-val {
@@ -277,11 +282,12 @@
       background: #334155;
       color: #CBD5E1;
       border: none;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .wb-copy-btn:hover {
@@ -289,14 +295,25 @@
       color: #FFFFFF;
     }
 
-    .wb-wa-share-btn {
-      width: 100%;
-      background: #25D366;
+    .wb-copy-btn.copied {
+      background: #10B981;
       color: #FFFFFF;
+    }
+
+    /* Sharing Actions Grid */
+    .wb-share-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .wb-action-btn {
+      width: 100%;
       border: none;
       border-radius: 10px;
       padding: 12px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 800;
       cursor: pointer;
       display: flex;
@@ -304,7 +321,39 @@
       justify-content: center;
       gap: 8px;
       text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .wb-btn-wa {
+      background: #25D366;
+      color: #FFFFFF;
       box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    }
+    .wb-btn-wa:hover {
+      background: #1EBE5D;
+      color: #FFFFFF;
+    }
+
+    .wb-btn-native {
+      background: #3B82F6;
+      color: #FFFFFF;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+    .wb-btn-native:hover {
+      background: #2563EB;
+      color: #FFFFFF;
+    }
+
+    .wb-btn-copy-invite {
+      background: #334155;
+      color: #F8FAFC;
+      border: 1px solid #475569;
+      width: 100%;
+      padding: 10px;
+      font-size: 0.88rem;
+    }
+    .wb-btn-copy-invite:hover {
+      background: #475569;
     }
 
     .wb-footer {
@@ -325,10 +374,10 @@
         <div class="wb-badge">
           <i class="fa-solid fa-video"></i> Aarogyam India Live Zoom Session
         </div>
-        <h1 class="wb-title" id="wb_display_title">🌾 आधुनिक कृषि एवं फसल सुरक्षा लाइव वेबिनार</h1>
+        <h1 class="wb-title" id="wb_display_title">🌾 लाइव वेबिनार सत्र</h1>
         <div class="wb-datetime-pill">
           <i class="fa-regular fa-calendar-check"></i>
-          <span id="wb_display_datetime">25 अगस्त 2026, सायं 07:00 बजे</span>
+          <span id="wb_display_datetime">दिनांक व समय लोड हो रहा है…</span>
         </div>
         <p class="wb-desc" id="wb_display_desc">
           इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें। रजिस्ट्रेशन के तुरंत बाद Zoom लिंक और पासवर्ड मिल जाएगा।
@@ -381,13 +430,13 @@
       <div id="wb_unlocked_screen">
         <div class="wb-success-badge">
           <i class="fa-solid fa-circle-check" style="font-size: 1.2rem;"></i>
-          <span>🎉 आपकी उपस्थिति (Attendance) दर्ज हो गई है!</span>
+          <span>🎉 आपकी सीट आरक्षित हो गई है!</span>
         </div>
 
-        <!-- Big Join Button -->
+        <!-- Big Join Button (Direct One-Click Connect) -->
         <a id="wb_zoom_join_btn" href="#" target="_blank" class="wb-zoom-btn">
           <i class="fa-solid fa-video"></i>
-          <span>Join Zoom Meeting Now</span>
+          <span>Join Zoom Meeting Now (सीधे जुड़ें)</span>
         </a>
 
         <!-- Meeting ID & Passcode Card -->
@@ -395,30 +444,41 @@
           <div class="wb-detail-row">
             <span class="wb-detail-label">🆔 Meeting ID:</span>
             <div class="wb-detail-val">
-              <span id="wb_val_meeting_id">823 4567 8901</span>
+              <span id="wb_val_meeting_id">-</span>
               <button type="button" class="wb-copy-btn" id="btn_copy_mid">📋 Copy</button>
             </div>
           </div>
           <div class="wb-detail-row">
             <span class="wb-detail-label">🔑 Passcode / Password:</span>
             <div class="wb-detail-val">
-              <span id="wb_val_passcode" style="color: #34D399;">123456</span>
+              <span id="wb_val_passcode" style="color: #34D399;">-</span>
               <button type="button" class="wb-copy-btn" id="btn_copy_pwd">📋 Copy</button>
             </div>
           </div>
           <div class="wb-detail-row">
             <span class="wb-detail-label">📅 दिनांक व समय:</span>
             <div class="wb-detail-val" style="font-size: 0.88rem; color: #FCD34D;">
-              <span id="wb_val_datetime">आज का लाइव सत्र</span>
+              <span id="wb_val_datetime">-</span>
             </div>
           </div>
         </div>
 
-        <!-- WhatsApp Share Button -->
-        <a id="wb_wa_save_btn" href="#" target="_blank" class="wb-wa-share-btn">
-          <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i>
-          <span>व्हाट्सएप पर विवरण सुरक्षित करें (Save to WhatsApp)</span>
-        </a>
+        <!-- Share Actions Grid -->
+        <div class="wb-share-grid">
+          <a id="wb_wa_save_btn" href="#" target="_blank" class="wb-action-btn wb-btn-wa">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i>
+            <span>WhatsApp Share</span>
+          </a>
+          <button type="button" id="wb_native_share_btn" class="wb-action-btn wb-btn-native">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span>शेयर (Share)</span>
+          </button>
+        </div>
+
+        <button type="button" id="wb_copy_invite_btn" class="wb-action-btn wb-btn-copy-invite">
+          <i class="fa-regular fa-copy"></i>
+          <span>पूरा वेबिनार संदेश कॉपी करें (Copy Full Message)</span>
+        </button>
       </div>
 
       <div class="wb-footer">
@@ -454,20 +514,77 @@
       const customPwd = urlParams.get('pwd') || urlParams.get('passcode');
       const customDesc = urlParams.get('desc') || urlParams.get('msg');
 
-      // Webinar State
+      // Webinar State (Default clean state, no hardcoded fake passcodes)
       let webinarData = {
         id: webinarId,
         title: customTitle || '🌾 आधुनिक जैविक कृषि एवं फसल सुरक्षा लाइव वेबिनार',
         datetime: customDatetime || '25 अगस्त 2026, सायं 07:00 बजे',
-        zoom_link: customZoom || 'https://zoom.us/join',
-        meeting_id: customMid || '823 4567 8901',
-        passcode: customPwd || '123456',
+        zoom_link: customZoom || '',
+        meeting_id: customMid || '',
+        passcode: customPwd || '',
         desc: customDesc || 'इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें। रजिस्ट्रेशन के तुरंत बाद Zoom लिंक और पासवर्ड मिल जाएगा।'
       };
 
-      // Load DB Details if webinar ID provided (Text only, lightweight ~0.2 KB)
+      /**
+       * Construct a direct 1-click Zoom meeting join URL with embedded password
+       */
+      function getDirectZoomJoinUrl(zoomLink, meetingId, passcode) {
+        const rawLink = (zoomLink || '').trim();
+        const rawMid = (meetingId || '').trim();
+        const rawPass = (passcode || '').trim();
+        const cleanMid = rawMid.replace(/[^0-9]/g, '');
+
+        // If a direct join link is already provided
+        if (rawLink && !rawLink.includes('zoom.us/join') && (rawLink.includes('/j/') || rawLink.includes('/my/') || rawLink.includes('zoom.us'))) {
+          // If password is not embedded in the link, append it
+          if (rawPass && !rawLink.includes('pwd=')) {
+            const sep = rawLink.includes('?') ? '&' : '?';
+            return `${rawLink}${sep}pwd=${encodeURIComponent(rawPass)}`;
+          }
+          return rawLink;
+        }
+
+        // If numeric meeting ID is available, construct direct https://zoom.us/j/<id>?pwd=<passcode>
+        if (cleanMid) {
+          return `https://zoom.us/j/${cleanMid}${rawPass ? '?pwd=' + encodeURIComponent(rawPass) : ''}`;
+        }
+
+        // Fallback to link or standard join
+        return rawLink || 'https://zoom.us/join';
+      }
+
+      function getFullInviteText() {
+        const directZoom = getDirectZoomJoinUrl(webinarData.zoom_link, webinarData.meeting_id, webinarData.passcode);
+        const mId = webinarData.meeting_id || 'लाइव लिंक पर क्लिक करें';
+        const mPass = webinarData.passcode || 'पासवर्ड की आवश्यकता नहीं';
+
+        return `🎥 *${webinarData.title}*\n\n📅 दिनांक व समय: ${webinarData.datetime}\n\n👉 *Zoom मीटिंग लिंक (Direct Join):* ${directZoom}\n🆔 *Meeting ID:* ${mId}\n🔑 *Passcode:* ${mPass}\n\nसादर,\nAarogyam India`;
+      }
+
+      // Check LocalStorage fallback for webinar data
+      function findWebinarInLocalStorage(wbId) {
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith('UCAS_LP_') || key === 'UCAS_LOCAL_LANDING_PAGES')) {
+              try {
+                const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+                const arr = Array.isArray(parsed) ? parsed : [parsed];
+                const found = arr.find(p => p && p.id === wbId);
+                if (found) return found;
+              } catch (e) {}
+            }
+          }
+        } catch (e) {}
+        return null;
+      }
+
+      // Load DB Details if webinar ID provided
       async function loadWebinarConfig() {
-        if (db && webinarId && webinarId !== 'WB0001') {
+        let foundData = null;
+
+        // 1. Try Supabase first
+        if (db && webinarId) {
           try {
             const { data, error } = await db
               .from('landing_pages')
@@ -476,20 +593,35 @@
               .maybeSingle();
 
             if (!error && data) {
-              const wData = data.webinar_data || {};
-              webinarData.title = data.title || webinarData.title;
-              webinarData.desc = data.message || webinarData.desc;
-              if (wData.zoom_link) webinarData.zoom_link = wData.zoom_link;
-              if (wData.meeting_id) webinarData.meeting_id = wData.meeting_id;
-              if (wData.passcode) webinarData.passcode = wData.passcode;
-              if (wData.datetime) webinarData.datetime = wData.datetime;
+              foundData = data;
             }
           } catch (e) {
-            console.warn('Webinar config load notice:', e);
+            console.warn('Supabase webinar lookup notice:', e);
           }
         }
 
+        // 2. Fallback to LocalStorage
+        if (!foundData && webinarId) {
+          const localRecord = findWebinarInLocalStorage(webinarId);
+          if (localRecord) {
+            foundData = localRecord;
+          }
+        }
+
+        // 3. Apply found data to state
+        if (foundData) {
+          const wData = foundData.webinar_data || {};
+          webinarData.title = foundData.title || webinarData.title;
+          webinarData.desc = foundData.message || webinarData.desc;
+          if (wData.zoom_link) webinarData.zoom_link = wData.zoom_link;
+          if (wData.meeting_id) webinarData.meeting_id = wData.meeting_id;
+          if (wData.passcode) webinarData.passcode = wData.passcode;
+          if (wData.datetime) webinarData.datetime = wData.datetime;
+        }
+
+        // Update Header and Unlocked Views
         renderHeaderDetails();
+        renderUnlockedDetails();
       }
 
       function renderHeaderDetails() {
@@ -501,6 +633,54 @@
         if (dtEl) dtEl.textContent = webinarData.datetime;
         if (descEl) descEl.textContent = webinarData.desc;
         document.title = `${webinarData.title} — Aarogyam India`;
+      }
+
+      function renderUnlockedDetails() {
+        const joinBtn = document.getElementById('wb_zoom_join_btn');
+        const midEl = document.getElementById('wb_val_meeting_id');
+        const pwdEl = document.getElementById('wb_val_passcode');
+        const dtValEl = document.getElementById('wb_val_datetime');
+        const waBtn = document.getElementById('wb_wa_save_btn');
+
+        const directZoom = getDirectZoomJoinUrl(webinarData.zoom_link, webinarData.meeting_id, webinarData.passcode);
+
+        if (joinBtn) {
+          joinBtn.href = directZoom;
+          // Add smooth direct click handling
+          joinBtn.onclick = function (e) {
+            const cleanMid = (webinarData.meeting_id || '').replace(/[^0-9]/g, '');
+            const pass = encodeURIComponent(webinarData.passcode || '');
+            if (cleanMid) {
+              // Attempt Zoom app protocol launcher
+              const zoomAppUrl = `zoomus://zoom.us/join?confno=${cleanMid}${pass ? '&pwd=' + pass : ''}`;
+              window.location.href = zoomAppUrl;
+              setTimeout(() => {
+                window.open(directZoom, '_blank');
+              }, 600);
+              e.preventDefault();
+            }
+          };
+        }
+
+        if (midEl) midEl.textContent = webinarData.meeting_id || 'लाइव लिंक पर क्लिक करें';
+        if (pwdEl) pwdEl.textContent = webinarData.passcode || 'पासवर्ड नहीं चाहिए';
+        if (dtValEl) dtValEl.textContent = webinarData.datetime || 'आज का लाइव सत्र';
+
+        // Update WhatsApp Share Link
+        const inviteText = getFullInviteText();
+        if (waBtn) {
+          waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(inviteText)}`;
+        }
+      }
+
+      function showUnlockedDetails() {
+        const formScreen = document.getElementById('wb_form_screen');
+        const unlockedScreen = document.getElementById('wb_unlocked_screen');
+
+        if (formScreen) formScreen.style.display = 'none';
+        if (unlockedScreen) unlockedScreen.style.display = 'block';
+
+        renderUnlockedDetails();
       }
 
       // Check if user already registered in this session/browser
@@ -530,7 +710,7 @@
         submitBtn.innerHTML = '<span>⏳ उपस्थिति दर्ज हो रही है...</span>';
 
         const attendeePayload = {
-          profile_id: refShareId !== 'AI000004' ? refShareId : null,
+          profile_id: refShareId !== 'AI000004' && refShareId !== 'ADMIN' && refShareId !== 'ALL_USERS' ? refShareId : null,
           name: name,
           mobile: mobile,
           state: state || 'Not Specified',
@@ -538,8 +718,11 @@
           village: district || 'Not Specified',
           occupation: occupation,
           category_answers: {
+            landing_page_id: webinarData.id,
             webinar_id: webinarData.id,
             webinar_title: webinarData.title,
+            creator_share_id: refShareId,
+            source: 'webinar_landing_page',
             event_type: 'webinar_attendance',
             registered_at: new Date().toISOString()
           },
@@ -564,43 +747,74 @@
         showUnlockedDetails();
       });
 
-      function showUnlockedDetails() {
-        const formScreen = document.getElementById('wb_form_screen');
-        const unlockedScreen = document.getElementById('wb_unlocked_screen');
+      // Copy Meeting ID Handlers
+      document.getElementById('btn_copy_mid')?.addEventListener('click', function () {
+        const midVal = webinarData.meeting_id;
+        if (!midVal) return;
+        if (navigator.clipboard) navigator.clipboard.writeText(midVal);
+        const btn = this;
+        const origText = btn.innerHTML;
+        btn.innerHTML = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = origText;
+          btn.classList.remove('copied');
+        }, 2000);
+      });
 
-        if (formScreen) formScreen.style.display = 'none';
-        if (unlockedScreen) unlockedScreen.style.display = 'block';
+      // Copy Passcode Handlers
+      document.getElementById('btn_copy_pwd')?.addEventListener('click', function () {
+        const pwdVal = webinarData.passcode;
+        if (!pwdVal) return;
+        if (navigator.clipboard) navigator.clipboard.writeText(pwdVal);
+        const btn = this;
+        const origText = btn.innerHTML;
+        btn.innerHTML = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = origText;
+          btn.classList.remove('copied');
+        }, 2000);
+      });
 
-        // Populate Zoom Details
-        const joinBtn = document.getElementById('wb_zoom_join_btn');
-        const midEl = document.getElementById('wb_val_meeting_id');
-        const pwdEl = document.getElementById('wb_val_passcode');
-        const dtValEl = document.getElementById('wb_val_datetime');
-
-        if (joinBtn) joinBtn.href = webinarData.zoom_link;
-        if (midEl) midEl.textContent = webinarData.meeting_id;
-        if (pwdEl) pwdEl.textContent = webinarData.passcode;
-        if (dtValEl) dtValEl.textContent = webinarData.datetime;
-
-        // WhatsApp Share Generator
-        const inviteText = `🎥 *${webinarData.title}*\n\n📅 दिनांक व समय: ${webinarData.datetime}\n\n👉 *Zoom मीटिंग लिंक:* ${webinarData.zoom_link}\n🆔 *Meeting ID:* ${webinarData.meeting_id}\n🔑 *Passcode:* ${webinarData.passcode}\n\nसादर,\nAarogyam India`;
-        const waBtn = document.getElementById('wb_wa_save_btn');
-        if (waBtn) {
-          waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(inviteText)}`;
+      // Native Share Button Handler
+      document.getElementById('wb_native_share_btn')?.addEventListener('click', async function () {
+        const inviteText = getFullInviteText();
+        const directZoom = getDirectZoomJoinUrl(webinarData.zoom_link, webinarData.meeting_id, webinarData.passcode);
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: webinarData.title,
+              text: inviteText,
+              url: directZoom
+            });
+          } catch (err) {
+            console.log('Share dismissed');
+          }
+        } else if (navigator.clipboard) {
+          navigator.clipboard.writeText(inviteText);
+          const btn = this;
+          const origHtml = btn.innerHTML;
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>संदेश कॉपी हुआ!</span>';
+          setTimeout(() => { btn.innerHTML = origHtml; }, 2000);
         }
+      });
 
-        // Copy Event Handlers
-        document.getElementById('btn_copy_mid')?.addEventListener('click', () => {
-          if (navigator.clipboard) navigator.clipboard.writeText(webinarData.meeting_id);
-          alert('Meeting ID कॉपी हो गई: ' + webinarData.meeting_id);
-        });
+      // Copy Full Message Handler
+      document.getElementById('wb_copy_invite_btn')?.addEventListener('click', function () {
+        const inviteText = getFullInviteText();
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(inviteText);
+        } else {
+          prompt('संदेश कॉपी करें:', inviteText);
+        }
+        const btn = this;
+        const origHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#10B981;"></i> <span style="color:#10B981;font-weight:800;">पूरा संदेश सफलतापूर्वक कॉपी हो गया!</span>';
+        setTimeout(() => { btn.innerHTML = origHtml; }, 2200);
+      });
 
-        document.getElementById('btn_copy_pwd')?.addEventListener('click', () => {
-          if (navigator.clipboard) navigator.clipboard.writeText(webinarData.passcode);
-          alert('Passcode कॉपी हो गया: ' + webinarData.passcode);
-        });
-      }
-
+      // Initial Load
       loadWebinarConfig();
     })();
   </script>

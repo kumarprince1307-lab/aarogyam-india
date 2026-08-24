@@ -1,6 +1,7 @@
 /* Admin Webinars & Live Events Management Module */
 
 import { initAdminLayout } from './admin-main.js';
+
 function getAdminDb() {
   if (window.dbClient) return window.dbClient;
   if (window.supabaseClient) return window.supabaseClient;
@@ -17,6 +18,71 @@ function getAdminDb() {
 
 const PAGE_SIZE = 20;
 
+/**
+ * Format Date (YYYY-MM-DD) and Time (HH:mm) into readable Hindi/English string
+ */
+function formatHindiDateTime(dateVal, timeVal) {
+  if (!dateVal) return '';
+  const hindiMonths = [
+    'जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून',
+    'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'
+  ];
+
+  try {
+    const parts = dateVal.split('-');
+    const year = parts[0];
+    const monthIdx = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    const monthName = hindiMonths[monthIdx] || parts[1];
+
+    let timeString = '';
+    if (timeVal) {
+      const [hh, mm] = timeVal.split(':');
+      const hNum = parseInt(hh, 10);
+      const isPM = hNum >= 12;
+      const h12 = hNum % 12 || 12;
+      const padM = String(mm).padStart(2, '0');
+      const padH = String(h12).padStart(2, '0');
+      const ampm = isPM ? 'PM' : 'AM';
+
+      let prahar = 'सायं';
+      if (hNum < 12) prahar = 'सुबह';
+      else if (hNum >= 12 && hNum < 16) prahar = 'दोपहर';
+      else prahar = 'सायं';
+
+      timeString = `, ${prahar} ${padH}:${padM} बजे (${padH}:${padM} ${ampm})`;
+    }
+
+    return `${day} ${monthName} ${year}${timeString}`;
+  } catch (e) {
+    return `${dateVal} ${timeVal || ''}`;
+  }
+}
+
+/**
+ * Construct Direct 1-Click Zoom Join Link
+ */
+function getDirectZoomJoinUrl(zoomLink, meetingId, passcode) {
+  const zLink = (zoomLink || '').trim();
+  const mId = (meetingId || '').trim();
+  const pass = (passcode || '').trim();
+  const cleanId = mId.replace(/[^0-9]/g, '');
+
+  if (zLink && !zLink.includes('zoom.us/join') && (zLink.includes('/j/') || zLink.includes('/my/') || zLink.includes('zoom.us'))) {
+    if (pass && !zLink.includes('pwd=') && cleanId) {
+      const sep = zLink.includes('?') ? '&' : '?';
+      return `${zLink}${sep}pwd=${encodeURIComponent(pass)}`;
+    }
+    return zLink;
+  }
+
+  if (cleanId) {
+    return `https://zoom.us/j/${cleanId}${pass ? '?pwd=' + encodeURIComponent(pass) : ''}`;
+  }
+
+  return zLink || 'https://zoom.us/join';
+}
+
 export async function initWebinars() {
   initAdminLayout('All Webinars & Live Events', 'Manage Zoom and webinar invitation landing pages and registered attendees.');
 
@@ -28,6 +94,7 @@ export async function initWebinars() {
   let allWebinars = [];
   let allRegistrations = [];
   let allProfiles = [];
+  let editingWebinarId = null;
 
   content.innerHTML = `
     <!-- Top Action Row -->
@@ -36,68 +103,84 @@ export async function initWebinars() {
         <div>
           <div class="admin-section-title" style="display: flex; align-items: center; gap: 8px;">
             <span>🎥 All Webinars & Live Events Management</span>
-            <span style="font-size: 0.75rem; background: rgba(37,99,235,0.15); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Zero-Image Pure Zoom & Survey Gate</span>
+            <span style="font-size: 0.75rem; background: rgba(37,99,235,0.15); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Direct 1-Click Zoom Connect</span>
           </div>
           <p style="font-size: 0.85rem; color: var(--admin-muted); margin: 0;">
-            ज़ूम मीटिंग लिंक, पासवर्ड और सर्वे फॉर्म के माध्यम से रजिस्टर्ड अटेंडेंट्स (Leads) को ट्रैक करें।
+            ज़ूम मीटिंग लिंक, पासवर्ड और इनबिल्ट डेट-टाइम पिकर के साथ वेबिनार बनाएं और रजिस्टर्ड लीड्स को ट्रैक करें।
           </p>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <button id="btn-toggle-create-webinar" class="admin-button" style="background:#2563eb; color:#fff; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
-            <span>➕</span> <span>नया ज़ूम वेबिनार बनाएं</span>
+            <span>➕</span> <span id="btn-create-label">नया ज़ूम वेबिनार बनाएं</span>
           </button>
           <button id="btn-refresh-webinars" class="admin-button small-button">🔄 Refresh Data</button>
         </div>
       </div>
 
-      <!-- Create Zoom Webinar Form Card (Zero Image, Pure Text) -->
+      <!-- Create / Edit Zoom Webinar Form Card -->
       <div id="admin-create-webinar-card" class="admin-card" style="display:none; background: #0f172a; border: 1.5px solid #2563eb; border-radius: 14px; padding: 20px; margin-top: 14px; box-shadow: 0 10px 30px rgba(37,99,235,0.2);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
-          <h3 style="font-size: 1.05rem; font-weight: 800; color: #60a5fa; display:flex; align-items:center; gap:8px;">
-            <span>🎥</span> नया ज़ूम वेबिनार तैयार करें (No Image / Fast Zoom Session)
+          <h3 id="form-card-title" style="font-size: 1.05rem; font-weight: 800; color: #60a5fa; display:flex; align-items:center; gap:8px;">
+            <span>🎥</span> नया ज़ूम वेबिनार तैयार करें (Fast Zoom Session)
           </h3>
           <button type="button" id="btn-close-create-webinar" class="admin-button small-button" style="background:transparent; color:#94a3b8; border:none; font-size:1.2rem; cursor:pointer;">&times;</button>
         </div>
 
         <form id="form-admin-create-webinar">
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 12px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 12px;">
             <div>
-              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">वेबिनार शीर्षक / Topic: *</label>
-              <input type="text" id="adm_wb_title" class="admin-input" placeholder="उदा. आधुनिक जैविक कृषि एवं कीट नियंत्रण लाइव सत्र" required style="width:100%;" />
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">वेबिनार शीर्षक / Topic: *</label>
+              <input type="text" id="adm_wb_title" class="admin-input" placeholder="उदा. आधुनिक जैविक कृषि एवं फसल सुरक्षा लाइव वेबिनार" required style="width:100%;" />
             </div>
+
+            <!-- Inbuilt Date & Time Selector -->
             <div>
-              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">दिनांक व समय (Date & Time Text): *</label>
-              <input type="text" id="adm_wb_datetime" class="admin-input" placeholder="उदा. 25 अगस्त 2026, सायं 07:00 बजे" required style="width:100%;" />
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">
+                📅 दिनांक व समय चुनें (Built-in Date & Time Picker): *
+              </label>
+              <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap: 8px;">
+                <input type="date" id="adm_wb_date" class="admin-input" required style="width:100%; padding:8px 10px; color-scheme:dark; font-weight:700;" title="दिनांक चुनें" />
+                <input type="time" id="adm_wb_time" class="admin-input" required style="width:100%; padding:8px 10px; color-scheme:dark; font-weight:700;" title="समय चुनें" />
+              </div>
+              <input type="text" id="adm_wb_datetime" class="admin-input" placeholder="ऑटो-फॉर्मेटेड दिनांक व समय यहाँ दिखेगा" style="width:100%; margin-top:6px; font-size:0.82rem; color:#60a5fa; font-weight:700; background:rgba(255,255,255,0.05);" />
             </div>
           </div>
 
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px;">
             <div>
-              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">Zoom Meeting Join Link: *</label>
-              <input type="url" id="adm_wb_zoom_link" class="admin-input" placeholder="https://us02web.zoom.us/j/82345678901?pwd=..." required style="width:100%;" />
-            </div>
-            <div>
-              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">Meeting ID: *</label>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">Meeting ID: *</label>
               <input type="text" id="adm_wb_meeting_id" class="admin-input" placeholder="उदा. 823 4567 8901" required style="width:100%;" />
             </div>
             <div>
-              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">Passcode / Password: *</label>
-              <input type="text" id="adm_wb_passcode" class="admin-input" placeholder="उदा. 123456 या AI2026" required style="width:100%;" />
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">Passcode / Password: *</label>
+              <input type="text" id="adm_wb_passcode" class="admin-input" placeholder="उदा. AI2026 या 889900" required style="width:100%;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">
+                Zoom Direct Join Link: *
+                <span style="font-size:0.72rem; color:#10b981; font-weight:600;">(ऑटो-जनरेटेड)</span>
+              </label>
+              <input type="url" id="adm_wb_zoom_link" class="admin-input" placeholder="https://zoom.us/j/82345678901?pwd=..." required style="width:100%;" />
             </div>
           </div>
 
           <div style="margin-bottom: 12px;">
-            <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">वेबिनार संदेश / विवरण (Description):</label>
+            <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">वेबिनार संदेश / विवरण (Description):</label>
             <textarea id="adm_wb_desc" class="admin-input" rows="2" placeholder="इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें। रजिस्ट्रेशन के तुरंत बाद Zoom लिंक और पासवर्ड मिल जाएगा।" style="width:100%;"></textarea>
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px;">
             <div style="font-size:0.82rem; color:#94a3b8;">
-              ℹ️ <strong>Zero Media Egress:</strong> कोई इमेज अपलोड नहीं होगी। केवल हल्का ज़ूम टेक्स्ट डेटाबेस में जाएगा।
+              ℹ️ <strong>1-Click Connect:</strong> Zoom लिंक में पासवर्ड स्वतः जोड़ दिया जाएगा ताकि यूज़र सीधे जुड़ सके।
             </div>
-            <button type="submit" id="btn-submit-webinar" class="admin-button" style="background:#10b981; color:#fff; font-weight:800; padding:10px 20px; font-size:0.92rem;">
-              🚀 ज़ूम वेबिनार प्रकाशित करें (Publish Webinar)
-            </button>
+            <div style="display:flex; gap:8px;">
+              <button type="button" id="btn-cancel-edit-webinar" class="admin-button" style="display:none; background:transparent; border:1px solid #475569; color:#cbd5e1;">
+                रद्द करें (Cancel)
+              </button>
+              <button type="submit" id="btn-submit-webinar" class="admin-button" style="background:#10b981; color:#fff; font-weight:800; padding:10px 20px; font-size:0.92rem;">
+                🚀 ज़ूम वेबिनार प्रकाशित करें (Publish Webinar)
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -128,7 +211,7 @@ export async function initWebinars() {
         </button>
       </div>
 
-      <!-- Multi-Filter Bar: User Filter + Date Filter + Search -->
+      <!-- Multi-Filter Bar -->
       <div class="admin-card admin-controls" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; background: var(--admin-surface-2, #0f172a);">
         <input id="webinar-search-box" type="search" placeholder="🔍 नाम, मोबाइल, शीर्षक, क्रिएटर से खोजें..." class="admin-input" style="flex: 2; min-width: 220px;" />
 
@@ -174,80 +257,196 @@ export async function initWebinars() {
   const btnCloseCreate = document.getElementById('btn-close-create-webinar');
   const createCard = document.getElementById('admin-create-webinar-card');
   const formCreateWebinar = document.getElementById('form-admin-create-webinar');
+  const formCardTitle = document.getElementById('form-card-title');
+  const btnSubmitWebinar = document.getElementById('btn-submit-webinar');
+  const btnCancelEdit = document.getElementById('btn-cancel-edit-webinar');
+
+  const wbDateInput = document.getElementById('adm_wb_date');
+  const wbTimeInput = document.getElementById('adm_wb_time');
+  const wbDatetimeInput = document.getElementById('adm_wb_datetime');
+  const wbMeetingIdInput = document.getElementById('adm_wb_meeting_id');
+  const wbPasscodeInput = document.getElementById('adm_wb_passcode');
+  const wbZoomLinkInput = document.getElementById('adm_wb_zoom_link');
+
+  // Initialize Default Date to Today and Time to 19:00 (7 PM)
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (wbDateInput) wbDateInput.value = todayStr;
+  if (wbTimeInput) wbTimeInput.value = '19:00';
+  if (wbDatetimeInput) wbDatetimeInput.value = formatHindiDateTime(todayStr, '19:00');
+
+  // Sync Date & Time pickers to formatted text
+  function updateAutoDatetime() {
+    const d = wbDateInput?.value || '';
+    const t = wbTimeInput?.value || '';
+    if (d && wbDatetimeInput) {
+      wbDatetimeInput.value = formatHindiDateTime(d, t);
+    }
+  }
+
+  wbDateInput?.addEventListener('change', updateAutoDatetime);
+  wbTimeInput?.addEventListener('change', updateAutoDatetime);
+
+  // Auto-generate Zoom Direct Join link when meeting ID and passcode are entered
+  function autoFillZoomLink() {
+    const mid = (wbMeetingIdInput?.value || '').trim();
+    const pass = (wbPasscodeInput?.value || '').trim();
+    const cleanId = mid.replace(/[^0-9]/g, '');
+    const currentLink = (wbZoomLinkInput?.value || '').trim();
+
+    if (cleanId && (!currentLink || currentLink === 'https://zoom.us/join' || currentLink.includes('zoom.us/j/'))) {
+      wbZoomLinkInput.value = `https://zoom.us/j/${cleanId}${pass ? '?pwd=' + encodeURIComponent(pass) : ''}`;
+    }
+  }
+
+  wbMeetingIdInput?.addEventListener('input', autoFillZoomLink);
+  wbPasscodeInput?.addEventListener('input', autoFillZoomLink);
+
+  function resetWebinarForm() {
+    editingWebinarId = null;
+    formCreateWebinar?.reset();
+    if (wbDateInput) wbDateInput.value = todayStr;
+    if (wbTimeInput) wbTimeInput.value = '19:00';
+    if (wbDatetimeInput) wbDatetimeInput.value = formatHindiDateTime(todayStr, '19:00');
+    if (formCardTitle) formCardTitle.innerHTML = '<span>🎥</span> नया ज़ूम वेबिनार तैयार करें (Fast Zoom Session)';
+    if (btnSubmitWebinar) btnSubmitWebinar.innerHTML = '🚀 ज़ूम वेबिनार प्रकाशित करें (Publish Webinar)';
+    if (btnCancelEdit) btnCancelEdit.style.display = 'none';
+  }
 
   btnToggleCreate?.addEventListener('click', () => {
-    if (createCard) createCard.style.display = createCard.style.display === 'none' ? 'block' : 'none';
+    if (createCard) {
+      if (createCard.style.display === 'none') {
+        resetWebinarForm();
+        createCard.style.display = 'block';
+        createCard.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        createCard.style.display = 'none';
+      }
+    }
   });
 
   btnCloseCreate?.addEventListener('click', () => {
+    if (createCard) createCard.style.display = 'none';
+    resetWebinarForm();
+  });
+
+  btnCancelEdit?.addEventListener('click', () => {
+    resetWebinarForm();
     if (createCard) createCard.style.display = 'none';
   });
 
   formCreateWebinar?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = (document.getElementById('adm_wb_title')?.value || '').trim();
-    const datetime = (document.getElementById('adm_wb_datetime')?.value || '').trim();
-    const zoomLink = (document.getElementById('adm_wb_zoom_link')?.value || '').trim();
-    const meetingId = (document.getElementById('adm_wb_meeting_id')?.value || '').trim();
-    const passcode = (document.getElementById('adm_wb_passcode')?.value || '').trim();
-    const desc = (document.getElementById('adm_wb_desc')?.value || '').trim();
-    const submitBtn = document.getElementById('btn-submit-webinar');
+    const rawDate = wbDateInput?.value || '';
+    const rawTime = wbTimeInput?.value || '';
+    let datetime = (wbDatetimeInput?.value || '').trim();
+    if (!datetime && rawDate) {
+      datetime = formatHindiDateTime(rawDate, rawTime);
+    }
 
-    if (!title || !zoomLink || !meetingId) {
-      alert('कृपया शीर्षक, ज़ूम लिंक और मीटिंग आईडी अवश्य भरें।');
+    const meetingId = (wbMeetingIdInput?.value || '').trim();
+    const passcode = (wbPasscodeInput?.value || '').trim();
+    let zoomLink = (wbZoomLinkInput?.value || '').trim();
+    if (!zoomLink && meetingId) {
+      zoomLink = getDirectZoomJoinUrl('', meetingId, passcode);
+    }
+    const desc = (document.getElementById('adm_wb_desc')?.value || '').trim();
+
+    if (!title || !meetingId) {
+      alert('कृपया शीर्षक और मीटिंग आईडी अवश्य भरें।');
       return;
     }
 
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = '⏳ प्रकाशित हो रहा है...';
+    if (btnSubmitWebinar) {
+      btnSubmitWebinar.disabled = true;
+      btnSubmitWebinar.textContent = '⏳ सेव हो रहा है...';
     }
-
-    const randomSuffix = Math.floor(100000 + Math.random() * 900000);
-    const newWbId = `WB${randomSuffix}`;
-
-    const newRecord = {
-      id: newWbId,
-      profile_id: 'ALL_USERS',
-      share_id: 'ALL_USERS',
-      title: title,
-      message: desc || 'इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।',
-      category: 'webinar',
-      content_type: 'webinar',
-      status: 'active',
-      webinar_data: {
-        zoom_link: zoomLink,
-        meeting_id: meetingId,
-        passcode: passcode,
-        datetime: datetime
-      },
-      created_at: new Date().toISOString()
-    };
 
     const db = getAdminDb();
-    try {
-      if (db) {
-        await db.from('landing_pages').insert([newRecord]);
+
+    if (editingWebinarId) {
+      // UPDATE EXISTING WEBINAR
+      const updatedData = {
+        title: title,
+        message: desc || 'इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।',
+        webinar_data: {
+          zoom_link: zoomLink,
+          meeting_id: meetingId,
+          passcode: passcode,
+          datetime: datetime,
+          date: rawDate,
+          time: rawTime
+        }
+      };
+
+      try {
+        if (db) {
+          await db.from('landing_pages').update(updatedData).eq('id', editingWebinarId);
+        }
+      } catch (err) {
+        console.warn('Webinar update notice:', err);
       }
-    } catch (err) {
-      console.warn('Webinar insert notice:', err);
+
+      // Update LocalStorage
+      try {
+        const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
+        const idx = stored.findIndex(w => w.id === editingWebinarId);
+        if (idx !== -1) {
+          stored[idx] = { ...stored[idx], ...updatedData };
+          localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(stored));
+        }
+      } catch (err) {}
+
+      alert(`✅ वेबिनार (${editingWebinarId}) सफलतापूर्वक अपडेट हो गया!`);
+    } else {
+      // CREATE NEW WEBINAR
+      const randomSuffix = Math.floor(100000 + Math.random() * 900000);
+      const newWbId = `WB${randomSuffix}`;
+
+      const newRecord = {
+        id: newWbId,
+        profile_id: 'ALL_USERS',
+        share_id: 'ALL_USERS',
+        title: title,
+        message: desc || 'इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।',
+        category: 'webinar',
+        content_type: 'webinar',
+        status: 'active',
+        webinar_data: {
+          zoom_link: zoomLink,
+          meeting_id: meetingId,
+          passcode: passcode,
+          datetime: datetime,
+          date: rawDate,
+          time: rawTime
+        },
+        created_at: new Date().toISOString()
+      };
+
+      try {
+        if (db) {
+          await db.from('landing_pages').insert([newRecord]);
+        }
+      } catch (err) {
+        console.warn('Webinar insert notice:', err);
+      }
+
+      // Save in LocalStorage fallback
+      try {
+        const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
+        stored.unshift(newRecord);
+        localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(stored));
+      } catch (err) {}
+
+      alert(`🎉 ज़ूम वेबिनार सफलतापूर्वक प्रकाशित हो गया!\n\nलिंक: https://aarogyamindia.online/webinar.html?id=${newWbId}`);
     }
 
-    // Save in LocalStorage fallback
-    try {
-      const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
-      stored.unshift(newRecord);
-      localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(stored));
-    } catch (err) {}
-
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = '🚀 ज़ूम वेबिनार प्रकाशित करें (Publish Webinar)';
+    if (btnSubmitWebinar) {
+      btnSubmitWebinar.disabled = false;
     }
 
     if (createCard) createCard.style.display = 'none';
-    formCreateWebinar.reset();
-    alert(`🎉 ज़ूम वेबिनार सफलतापूर्वक प्रकाशित हो गया!\n\nलिंक: https://aarogyamindia.online/webinar.html?id=${newWbId}`);
+    resetWebinarForm();
     loadWebinarData();
   });
 
@@ -296,7 +495,7 @@ export async function initWebinars() {
     try {
       // 1. Fetch Profiles, Landing Pages & Surveys in parallel
       const [lpRes, surveyRes, profRes] = await Promise.all([
-        db.from('landing_pages').select('id, profile_id, share_id, title, category, status, webinar_data, created_at').order('created_at', { ascending: false }),
+        db.from('landing_pages').select('id, profile_id, share_id, title, message, category, status, webinar_data, created_at').order('created_at', { ascending: false }),
         db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false }),
         db.from('profiles').select('id, full_name, mobile, share_id')
       ]);
@@ -339,7 +538,7 @@ export async function initWebinars() {
       allRegistrations = allSurveys.filter(s => {
         const cat = String(s.selected_categories || '');
         const src = s.category_answers?.source || '';
-        const lpId = s.category_answers?.landing_page_id || '';
+        const lpId = s.category_answers?.landing_page_id || s.category_answers?.webinar_id || '';
         return cat.includes('webinar') || src.includes('webinar') || allWebinars.some(w => w.id === lpId);
       });
 
@@ -364,7 +563,7 @@ export async function initWebinars() {
       // Calculate KPI Stats
       document.getElementById('kpi-total-webinars').textContent = allWebinars.length;
       document.getElementById('kpi-total-attendees').textContent = allRegistrations.length;
-      const activeZoomCount = allWebinars.filter(w => w.webinar_data?.zoom_link).length;
+      const activeZoomCount = allWebinars.filter(w => w.webinar_data?.zoom_link || w.webinar_data?.meeting_id).length;
       document.getElementById('kpi-active-sessions').textContent = activeZoomCount;
 
       const tabCountWb = document.getElementById('tab-count-webinars');
@@ -451,7 +650,7 @@ export async function initWebinars() {
         const name = (att.name || '').toLowerCase();
         const mob = (att.mobile || '').toLowerCase();
         const place = (att.village || '').toLowerCase();
-        const aLpId = att.category_answers?.landing_page_id || '';
+        const aLpId = att.category_answers?.landing_page_id || att.category_answers?.webinar_id || '';
         const lp = allWebinars.find(w => w.id === aLpId);
         const title = (lp?.title || '').toLowerCase();
         const prof = allProfiles.find(p => p.id === att.profile_id);
@@ -506,7 +705,7 @@ export async function initWebinars() {
                 <td colspan="7" style="text-align:center;padding:2.5rem;color:var(--admin-muted);">
                   <div style="font-size: 2.2rem; margin-bottom: 8px;">🎥</div>
                   <div style="font-size:1rem;font-weight:700;color:var(--admin-text);margin-bottom:4px;">कोई वेबिनार नहीं मिला (No Webinars Found)</div>
-                  <span style="font-size: 0.85rem; color: var(--admin-muted);">UCAS पोर्टल में 'Webinars' टैब पर जाकर 'Create Webinar' से नया वेबिनार बनाएं।</span>
+                  <span style="font-size: 0.85rem; color: var(--admin-muted);">ऊपर 'नया ज़ूम वेबिनार बनाएं' बटन से नया सत्र प्रकाशित करें।</span>
                 </td>
               </tr>
             </tbody>
@@ -531,7 +730,7 @@ export async function initWebinars() {
               <th>Date & Time</th>
               <th>Zoom Link & Passcode</th>
               <th>Registered Attendees</th>
-              <th style="text-align: right;">Action</th>
+              <th style="text-align: right; min-width: 240px;">Action (Share / Edit)</th>
             </tr>
           </thead>
           <tbody>
@@ -542,7 +741,12 @@ export async function initWebinars() {
               const attendeesCount = attendees.length;
               const dateStr = w.created_at ? new Date(w.created_at).toLocaleDateString('hi-IN') : '-';
               const publicLpUrl = `/webinar.html?id=${encodeURIComponent(w.id)}&ref=${encodeURIComponent(w.share_id || 'ADMIN')}`;
+              const fullPublicUrl = `https://aarogyamindia.online${publicLpUrl}`;
               const creator = allProfiles.find(p => p.id === w.profile_id);
+              const directZoom = getDirectZoomJoinUrl(wData.zoom_link, wData.meeting_id, wData.passcode);
+
+              const waInviteText = `🎥 *${w.title || 'Aarogyam India Live Webinar'}*\n\n📅 दिनांक व समय: ${wData.datetime || 'लाइव सत्र'}\n\n👉 *Zoom मीटिंग लिंक:* ${directZoom}\n🆔 *Meeting ID:* ${wData.meeting_id || '-'}\n🔑 *Passcode:* ${wData.passcode || '-'}\n\n🔗 *वेबिनार रजिस्ट्रेशन पेज:* ${fullPublicUrl}\n\nसादर,\nAarogyam India`;
+              const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(waInviteText)}`;
 
               return `
                 <tr>
@@ -580,9 +784,9 @@ export async function initWebinars() {
                   </td>
                   <td>
                     <div>
-                      ${wData.zoom_link ? `
-                        <a href="${wData.zoom_link}" target="_blank" class="admin-subtle-link" style="color: #3b82f6; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px;">
-                          <span>🔗 Zoom Link</span>
+                      ${wData.zoom_link || wData.meeting_id ? `
+                        <a href="${directZoom}" target="_blank" class="admin-subtle-link" style="color: #3b82f6; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px;">
+                          <span>🔗 Direct Zoom Link</span>
                         </a>
                       ` : '<span style="color: var(--admin-muted); font-size: 0.75rem;">-</span>'}
                       <div style="font-size: 0.72rem; color: var(--admin-muted); margin-top: 2px;">
@@ -597,15 +801,24 @@ export async function initWebinars() {
                     </button>
                   </td>
                   <td style="text-align: right;">
-                    <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
-                      <a href="${publicLpUrl}" target="_blank" class="admin-button small-button" style="background: rgba(37,99,235,0.15); color: #3b82f6; border: 1px solid rgba(37,99,235,0.3); font-weight: 700; font-size: 0.75rem; padding: 4px 8px; text-decoration:none;" title="Open Clean Webinar Page">
+                    <div style="display: flex; gap: 5px; justify-content: flex-end; align-items: center; flex-wrap: wrap;">
+                      <a href="${publicLpUrl}" target="_blank" class="admin-button small-button" style="background: rgba(37,99,235,0.15); color: #3b82f6; border: 1px solid rgba(37,99,235,0.3); font-weight: 700; font-size: 0.75rem; padding: 4px 7px; text-decoration:none;" title="Open Clean Webinar Page">
                         🔗 खोलें
                       </a>
-                      <button type="button" class="btn-copy-webinar-link admin-button small-button" data-url="https://aarogyamindia.online${publicLpUrl}" style="background: var(--admin-surface); color: var(--admin-text); border: 1px solid var(--admin-border); font-size:0.75rem; font-weight:700; padding:4px 8px;">
+                      <button type="button" class="btn-copy-webinar-link admin-button small-button" data-url="${fullPublicUrl}" style="background: var(--admin-surface); color: var(--admin-text); border: 1px solid var(--admin-border); font-size:0.75rem; font-weight:700; padding:4px 7px;" title="Copy Link">
                         📋 कॉपी
                       </button>
-                      <button type="button" class="btn-view-attendees admin-button small-button" data-webinar-id="${w.id}" style="background: #10b981; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 4px 10px;">
-                        Attendees
+                      <a href="${waUrl}" target="_blank" class="admin-button small-button" style="background: #25D366; color: #fff; text-decoration:none; font-size:0.75rem; font-weight:700; padding:4px 7px;" title="WhatsApp Share With Message">
+                        💬 WA
+                      </a>
+                      <button type="button" class="btn-native-share-webinar admin-button small-button" data-title="${encodeURIComponent(w.title || '')}" data-text="${encodeURIComponent(waInviteText)}" data-url="${fullPublicUrl}" style="background: #3b82f6; color: #fff; font-size:0.75rem; font-weight:700; padding:4px 7px;" title="Share via Mobile Apps">
+                        📲 शेयर
+                      </button>
+                      <button type="button" class="btn-edit-webinar admin-button small-button" data-webinar-id="${w.id}" style="background: #f59e0b; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 4px 7px;" title="Edit Webinar">
+                        ✏️ एडिट
+                      </button>
+                      <button type="button" class="btn-delete-webinar admin-button small-button" data-webinar-id="${w.id}" style="background: #ef4444; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 4px 7px;" title="Delete Webinar">
+                        🗑️
                       </button>
                     </div>
                   </td>
@@ -702,7 +915,7 @@ export async function initWebinars() {
               const rowNum = startIndex + idx + 1;
               const sMob = String(att.mobile || '').replace(/\D/g, '');
               const clean10Mob = sMob.length === 10 ? sMob : sMob.slice(-10);
-              const aLpId = att.category_answers?.landing_page_id || '';
+              const aLpId = att.category_answers?.landing_page_id || att.category_answers?.webinar_id || '';
               const lp = allWebinars.find(w => w.id === aLpId);
               const webinarTitle = lp?.title || 'लाइव वेबिनार सत्र';
               const regDate = att.created_at ? new Date(att.created_at).toLocaleString('hi-IN') : '-';
@@ -817,6 +1030,44 @@ export async function initWebinars() {
       });
     });
 
+    // Native Share Button in Table
+    tableContainer.querySelectorAll('.btn-native-share-webinar').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const title = decodeURIComponent(btn.dataset.title || 'Aarogyam India Live Webinar');
+        const text = decodeURIComponent(btn.dataset.text || '');
+        const url = btn.dataset.url || '';
+
+        if (navigator.share) {
+          try {
+            await navigator.share({ title, text, url });
+          } catch (e) {}
+        } else if (navigator.clipboard) {
+          navigator.clipboard.writeText(text);
+          const orig = btn.innerHTML;
+          btn.innerHTML = '✓ संदेश कॉपी!';
+          setTimeout(() => { btn.innerHTML = orig; }, 1800);
+        }
+      });
+    });
+
+    // Edit Webinar Click
+    tableContainer.querySelectorAll('.btn-edit-webinar').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const wId = btn.dataset.webinarId;
+        const webinar = allWebinars.find(w => w.id === wId);
+        if (!webinar) return;
+        openEditWebinar(webinar);
+      });
+    });
+
+    // Delete Webinar Click
+    tableContainer.querySelectorAll('.btn-delete-webinar').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const wId = btn.dataset.webinarId;
+        deleteWebinar(wId);
+      });
+    });
+
     // View Recipients Click in Webinars List
     tableContainer.querySelectorAll('.btn-view-wb-recipients').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -826,6 +1077,57 @@ export async function initWebinars() {
         openWebinarRecipientsDrawer(webinar);
       });
     });
+  }
+
+  function openEditWebinar(webinar) {
+    editingWebinarId = webinar.id;
+    const wData = webinar.webinar_data || {};
+
+    const titleInput = document.getElementById('adm_wb_title');
+    const descInput = document.getElementById('adm_wb_desc');
+
+    if (titleInput) titleInput.value = webinar.title || '';
+    if (descInput) descInput.value = webinar.message || '';
+
+    if (wbDateInput) wbDateInput.value = wData.date || todayStr;
+    if (wbTimeInput) wbTimeInput.value = wData.time || '19:00';
+    if (wbDatetimeInput) wbDatetimeInput.value = wData.datetime || formatHindiDateTime(wbDateInput?.value, wbTimeInput?.value);
+
+    if (wbMeetingIdInput) wbMeetingIdInput.value = wData.meeting_id || '';
+    if (wbPasscodeInput) wbPasscodeInput.value = wData.passcode || '';
+    if (wbZoomLinkInput) wbZoomLinkInput.value = wData.zoom_link || '';
+
+    if (formCardTitle) formCardTitle.innerHTML = `<span>✏️</span> वेबिनार एडिट करें: <code style="color:#38bdf8;">${webinar.id}</code>`;
+    if (btnSubmitWebinar) btnSubmitWebinar.innerHTML = '💾 वेबिनार अपडेट करें (Update Webinar)';
+    if (btnCancelEdit) btnCancelEdit.style.display = 'inline-block';
+
+    if (createCard) {
+      createCard.style.display = 'block';
+      createCard.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  async function deleteWebinar(webinarId) {
+    const webinar = allWebinars.find(w => w.id === webinarId);
+    if (!confirm(`क्या आप वाकई वेबिनार "${webinar ? webinar.title : webinarId}" को हटाना चाहते हैं?`)) return;
+
+    const db = getAdminDb();
+    try {
+      if (db) {
+        await db.from('landing_pages').delete().eq('id', webinarId);
+      }
+    } catch (e) {
+      console.warn('Webinar delete error:', e);
+    }
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
+      const filtered = stored.filter(w => w.id !== webinarId);
+      localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(filtered));
+    } catch (e) {}
+
+    alert(`🗑️ वेबिनार (${webinarId}) सफलतापूर्वक हटा दिया गया।`);
+    loadWebinarData();
   }
 
   function openWebinarRecipientsDrawer(webinar) {
@@ -884,8 +1186,8 @@ export async function initWebinars() {
 
       listWrap.innerHTML = filtered.map(u => {
         const uShareId = u.share_id || u.referral_code || 'AI000000';
-        const userShareUrl = `https://aarogyamindia.online/ucas/landing.html?id=${encodeURIComponent(webinar.id)}&share_id=${encodeURIComponent(uShareId)}`;
-        const waText = `नमस्ते ${u.name || u.full_name || 'जी'}! आपका लाइव वेबिनार लिंक तैयार है:\n${userShareUrl}`;
+        const userShareUrl = `https://aarogyamindia.online/webinar.html?id=${encodeURIComponent(webinar.id)}&ref=${encodeURIComponent(uShareId)}`;
+        const waText = `🎥 *${webinar.title || 'Aarogyam India Live Webinar'}*\n\nनमस्ते ${u.name || u.full_name || 'जी'}! आपका व्यक्तिगत वेबिनार शेयरिंग लिंक तैयार है:\n${userShareUrl}`;
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
 
         return `
@@ -933,8 +1235,9 @@ export async function initWebinars() {
   function openAttendeesDrawer(webinar) {
     if (!drawerOverlay || !drawerTitle || !drawerBody) return;
 
-    const attendees = allRegistrations.filter(r => r.category_answers?.landing_page_id === webinar.id);
+    const attendees = allRegistrations.filter(r => r.category_answers?.landing_page_id === webinar.id || r.category_answers?.webinar_id === webinar.id);
     const wData = webinar.webinar_data || {};
+    const directZoom = getDirectZoomJoinUrl(wData.zoom_link, wData.meeting_id, wData.passcode);
 
     drawerTitle.innerHTML = `
       <div style="display: flex; align-items: center; gap: 8px;">
@@ -946,8 +1249,8 @@ export async function initWebinars() {
     drawerBody.innerHTML = `
       <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border, #334155); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
         <div style="font-weight: 700; color: var(--admin-text);">${webinar.title}</div>
-        <div style="font-size: 0.8rem; color: var(--admin-muted); margin-top: 2px;">
-          📅 ${wData.datetime || '-'} • Zoom: <a href="${wData.zoom_link || '#'}" target="_blank" style="color:#3b82f6;">Join Link</a> • ID: <code>${wData.meeting_id || '-'}</code> • Pass: <code>${wData.passcode || '-'}</code>
+        <div style="font-size: 0.8rem; color: var(--admin-muted); margin-top: 4px;">
+          📅 ${wData.datetime || '-'} • Zoom: <a href="${directZoom}" target="_blank" style="color:#3b82f6; font-weight:700;">Direct Join Link</a> • ID: <code>${wData.meeting_id || '-'}</code> • Pass: <code>${wData.passcode || '-'}</code>
         </div>
       </div>
 

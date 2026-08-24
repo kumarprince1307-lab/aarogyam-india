@@ -955,11 +955,14 @@
         </div>
 
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-          <button type="button" id="btn_copy_full_invite" class="pub-share-btn" style="padding:8px 14px;font-size:0.82rem;">
-            <i class="fa-solid fa-clipboard"></i> निमंत्रण कॉपी करें
-          </button>
-          <button type="button" id="webinar_btn_wa_save" class="pub-share-btn pub-share-btn-wa" style="padding:8px 14px;font-size:0.82rem;">
+          <button type="button" id="webinar_btn_wa_save" class="pub-share-btn pub-share-btn-wa" style="padding:10px 16px;font-size:0.88rem;font-weight:800;">
             <i class="fa-brands fa-whatsapp"></i> WhatsApp पर भेजें
+          </button>
+          <button type="button" id="webinar_btn_native_share" class="pub-share-btn" style="padding:10px 16px;font-size:0.88rem;font-weight:800;background:#2563EB;color:#fff;">
+            <i class="fa-solid fa-share-nodes"></i> शेयर (Share)
+          </button>
+          <button type="button" id="btn_copy_full_invite" class="pub-share-btn" style="padding:10px 16px;font-size:0.88rem;width:100%;font-weight:700;">
+            <i class="fa-solid fa-clipboard"></i> पूरा निमंत्रण संदेश कॉपी करें
           </button>
         </div>
       </div>
@@ -1890,6 +1893,27 @@
         }
       }
 
+      function getDirectZoomJoinUrl(zoomLink, meetingId, passcode) {
+        const rawLink = (zoomLink || '').trim();
+        const rawMid = (meetingId || '').trim();
+        const rawPass = (passcode || '').trim();
+        const cleanMid = rawMid.replace(/[^0-9]/g, '');
+
+        if (rawLink && !rawLink.includes('zoom.us/join') && (rawLink.includes('/j/') || rawLink.includes('/my/') || rawLink.includes('zoom.us'))) {
+          if (rawPass && !rawLink.includes('pwd=') && cleanMid) {
+            const sep = rawLink.includes('?') ? '&' : '?';
+            return `${rawLink}${sep}pwd=${encodeURIComponent(rawPass)}`;
+          }
+          return rawLink;
+        }
+
+        if (cleanMid) {
+          return `https://zoom.us/j/${cleanMid}${rawPass ? '?pwd=' + encodeURIComponent(rawPass) : ''}`;
+        }
+
+        return rawLink || 'https://zoom.us/join';
+      }
+
       function showWebinarDetails(lp) {
         const wData = lp.webinar_data || {};
         const unlockedScreen = document.getElementById('lp_webinar_unlocked_screen');
@@ -1904,11 +1928,22 @@
         if (unDt) unDt.textContent = wData.datetime || 'आज का लाइव वेबिनार सत्र';
         if (unMsg && wData.success_msg) unMsg.textContent = wData.success_msg;
 
-        const zoomUrl = wData.zoom_link || '#';
-        if (btnJoin) btnJoin.href = zoomUrl;
-
         const mId = wData.meeting_id || '-';
         const mPass = wData.passcode || '-';
+        const directZoom = getDirectZoomJoinUrl(wData.zoom_link, wData.meeting_id, wData.passcode);
+
+        if (btnJoin) {
+          btnJoin.href = directZoom;
+          btnJoin.onclick = function (e) {
+            const cleanMid = mId.replace(/[^0-9]/g, '');
+            if (cleanMid) {
+              window.location.href = `zoomus://zoom.us/join?confno=${cleanMid}${mPass ? '&pwd=' + encodeURIComponent(mPass) : ''}`;
+              setTimeout(() => { window.open(directZoom, '_blank'); }, 600);
+              e.preventDefault();
+            }
+          };
+        }
+
         if (meetingIdEl) meetingIdEl.textContent = mId;
         if (passcodeEl) passcodeEl.textContent = mPass;
 
@@ -1923,7 +1958,7 @@
           alert('Passcode कॉपी हो गया: ' + mPass);
         });
 
-        const fullInvite = `🎥 *${lp.title || 'Aarogyam India Live Webinar'}*\n\n📅 समय: ${wData.datetime || 'लाइव सत्र'}\n🔗 Zoom लिंक: ${zoomUrl}\n🆔 Meeting ID: ${mId}\n🔑 Passcode: ${mPass}\n\n👉 अभी जुड़ें: ${zoomUrl}`;
+        const fullInvite = `🎥 *${lp.title || 'Aarogyam India Live Webinar'}*\n\n📅 दिनांक व समय: ${wData.datetime || 'लाइव सत्र'}\n\n👉 *Zoom मीटिंग लिंक (Direct Join):* ${directZoom}\n🆔 *Meeting ID:* ${mId}\n🔑 *Passcode:* ${mPass}\n\nसादर,\nAarogyam India`;
 
         document.getElementById('btn_copy_full_invite')?.addEventListener('click', () => {
           if (navigator.clipboard) navigator.clipboard.writeText(fullInvite);
@@ -1932,6 +1967,21 @@
 
         document.getElementById('webinar_btn_wa_save')?.addEventListener('click', () => {
           window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(fullInvite)}`, '_blank');
+        });
+
+        document.getElementById('webinar_btn_native_share')?.addEventListener('click', async () => {
+          if (navigator.share) {
+            try {
+              await navigator.share({
+                title: lp.title || 'Aarogyam India Live Webinar',
+                text: fullInvite,
+                url: directZoom
+              });
+            } catch (e) {}
+          } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(fullInvite);
+            alert('संदेश कॉपी हो गया!');
+          }
         });
 
         if (unlockedScreen) {

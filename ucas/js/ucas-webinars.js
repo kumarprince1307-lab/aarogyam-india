@@ -270,11 +270,19 @@
       btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> सेव हो रहा है...';
     }
 
+    const cleanMid = meetingId.replace(/[^0-9]/g, '');
+    let directZoom = zoomLink;
+    if (cleanMid && (!directZoom || directZoom.includes('zoom.us/join'))) {
+      directZoom = `https://zoom.us/j/${cleanMid}${passcode ? '?pwd=' + encodeURIComponent(passcode) : ''}`;
+    }
+
     const webinarData = {
-      zoom_link: zoomLink,
+      zoom_link: directZoom,
       meeting_id: meetingId,
       passcode: passcode,
       datetime: datetime,
+      date: rawDate,
+      time: rawTime,
       success_msg: successMsg
     };
 
@@ -831,7 +839,8 @@
       return;
     }
     const shareUrl = getWebinarShareUrl(wb);
-    const text = `🎥 *${wb.title}*\n\n${wb.message}\n\n👉 अपनी सीट बुक करें (नाम व मोबाइल भरने के तुरंत बाद Zoom लिंक मिल जाएगा):\n${shareUrl}`;
+    const wData = wb.webinar_data || {};
+    const text = `🎥 *${wb.title}*\n\n📅 दिनांक व समय: ${wData.datetime || 'लाइव सत्र'}\n\n${wb.message || ''}\n\n👉 अपनी सीट बुक करें (रजिस्ट्रेशन के तुरंत बाद Zoom लिंक मिल जाएगा):\n${shareUrl}\n\nसादर,\nAarogyam India`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   }
 
@@ -970,10 +979,12 @@
     const wb = userWebinarsList.find(item => item.id === wbId);
     if (!wb) return;
     const shareUrl = getWebinarShareUrl(wb);
+    const wData = wb.webinar_data || {};
+    const text = `🎥 *${wb.title}*\n\n📅 दिनांक व समय: ${wData.datetime || 'लाइव सत्र'}\n\n${wb.message || ''}\n\n👉 अपनी सीट बुक करें (रजिस्ट्रेशन के तुरंत बाद Zoom लिंक मिल जाएगा):\n${shareUrl}\n\nसादर,\nAarogyam India`;
     if (navigator.share) {
       navigator.share({
         title: wb.title,
-        text: wb.message,
+        text: text,
         url: shareUrl
       }).catch(() => {});
     } else {

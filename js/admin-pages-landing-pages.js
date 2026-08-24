@@ -312,12 +312,12 @@ export async function initAllLandingPages() {
             </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
               <div>
-                <label class="admin-label" style="font-size:0.8rem; font-weight:700;">📅 दिनांक व समय (Date & Time)</label>
-                <input type="text" id="adm_wb_datetime" class="admin-input" placeholder="उदा. 25 अगस्त 2026, शाम 7:00 बजे" style="width:100%;" />
-              </div>
-              <div>
-                <label class="admin-label" style="font-size:0.8rem; font-weight:700;">🔗 Zoom Join Link</label>
-                <input type="url" id="adm_wb_zoom_link" class="admin-input" placeholder="https://us05web.zoom.us/j/..." style="width:100%;" />
+                <label class="admin-label" style="font-size:0.8rem; font-weight:700;">📅 दिनांक व समय (Built-in Date & Time Picker)</label>
+                <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
+                  <input type="date" id="adm_wb_date" class="admin-input" style="padding:6px 8px; font-size:0.82rem;" title="तारीख चुनें" />
+                  <input type="time" id="adm_wb_time" class="admin-input" style="padding:6px 8px; font-size:0.82rem;" title="समय चुनें" />
+                </div>
+                <input type="text" id="adm_wb_datetime" class="admin-input" placeholder="उदा. 25 अगस्त 2026, सायं 07:00 बजे" style="width:100%; margin-top:4px; font-size:0.8rem;" />
               </div>
               <div>
                 <label class="admin-label" style="font-size:0.8rem; font-weight:700;">🆔 Meeting ID</label>
@@ -326,6 +326,10 @@ export async function initAllLandingPages() {
               <div>
                 <label class="admin-label" style="font-size:0.8rem; font-weight:700;">🔑 Passcode / Password</label>
                 <input type="text" id="adm_wb_passcode" class="admin-input" placeholder="889900" style="width:100%;" />
+              </div>
+              <div>
+                <label class="admin-label" style="font-size:0.8rem; font-weight:700;">🔗 Direct Zoom Join Link</label>
+                <input type="url" id="adm_wb_zoom_link" class="admin-input" placeholder="https://zoom.us/j/..." style="width:100%;" />
               </div>
               <div style="grid-column: 1 / -1;">
                 <label class="admin-label" style="font-size:0.8rem; font-weight:700;">💬 अनलॉक होने पर बधाई संदेश</label>
@@ -551,11 +555,65 @@ export async function initAllLandingPages() {
   const saveBtn = document.getElementById('adm_btn_save_lp');
 
   const webinarFieldsWrap = document.getElementById('adm_webinar_fields_wrap');
+  const wbDateInput = document.getElementById('adm_wb_date');
+  const wbTimeInput = document.getElementById('adm_wb_time');
   const wbDatetime = document.getElementById('adm_wb_datetime');
   const wbZoomLink = document.getElementById('adm_wb_zoom_link');
   const wbMeetingId = document.getElementById('adm_wb_meeting_id');
   const wbPasscode = document.getElementById('adm_wb_passcode');
   const wbSuccessMsg = document.getElementById('adm_wb_success_msg');
+
+  function formatHindiDateTimeLp(dateVal, timeVal) {
+    if (!dateVal) return '';
+    const hindiMonths = ['जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'];
+    try {
+      const parts = dateVal.split('-');
+      const year = parts[0];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const monthName = hindiMonths[monthIdx] || parts[1];
+      let timeString = '';
+      if (timeVal) {
+        const [hh, mm] = timeVal.split(':');
+        const hNum = parseInt(hh, 10);
+        const isPM = hNum >= 12;
+        const h12 = hNum % 12 || 12;
+        const padM = String(mm).padStart(2, '0');
+        const padH = String(h12).padStart(2, '0');
+        const ampm = isPM ? 'PM' : 'AM';
+        const prahar = hNum < 12 ? 'सुबह' : hNum < 16 ? 'दोपहर' : 'सायं';
+        timeString = `, ${prahar} ${padH}:${padM} बजे (${padH}:${padM} ${ampm})`;
+      }
+      return `${day} ${monthName} ${year}${timeString}`;
+    } catch (e) {
+      return `${dateVal} ${timeVal || ''}`;
+    }
+  }
+
+  function syncLpWebinarDateTime() {
+    const d = wbDateInput?.value || '';
+    const t = wbTimeInput?.value || '';
+    if (d && wbDatetime) {
+      wbDatetime.value = formatHindiDateTimeLp(d, t);
+    }
+  }
+
+  wbDateInput?.addEventListener('change', syncLpWebinarDateTime);
+  wbTimeInput?.addEventListener('change', syncLpWebinarDateTime);
+
+  function autoFillLpZoomLink() {
+    const mid = (wbMeetingId?.value || '').trim();
+    const pass = (wbPasscode?.value || '').trim();
+    const cleanId = mid.replace(/[^0-9]/g, '');
+    const currentLink = (wbZoomLink?.value || '').trim();
+
+    if (cleanId && (!currentLink || currentLink === 'https://zoom.us/join' || currentLink.includes('zoom.us/j/'))) {
+      wbZoomLink.value = `https://zoom.us/j/${cleanId}${pass ? '?pwd=' + encodeURIComponent(pass) : ''}`;
+    }
+  }
+
+  wbMeetingId?.addEventListener('input', autoFillLpZoomLink);
+  wbPasscode?.addEventListener('input', autoFillLpZoomLink);
 
   const btnMediaImg = document.getElementById('adm_btn_media_image');
   const btnMediaYt = document.getElementById('adm_btn_media_youtube');
@@ -2209,6 +2267,8 @@ export async function initAllLandingPages() {
 
     if (isWb) {
       const wData = page.webinar_data || {};
+      if (wbDateInput) wbDateInput.value = wData.date || '';
+      if (wbTimeInput) wbTimeInput.value = wData.time || '';
       wbDatetime.value = wData.datetime || '';
       wbZoomLink.value = wData.zoom_link || '';
       wbMeetingId.value = wData.meeting_id || '';
@@ -2379,11 +2439,24 @@ export async function initAllLandingPages() {
 
     let webinarData = null;
     if (isWb) {
+      const rawDate = wbDateInput ? wbDateInput.value : '';
+      const rawTime = wbTimeInput ? wbTimeInput.value : '';
+      const mId = wbMeetingId.value.trim();
+      const mPass = wbPasscode.value.trim();
+      let zLink = wbZoomLink.value.trim();
+      const cleanMid = mId.replace(/[^0-9]/g, '');
+
+      if (cleanMid && (!zLink || zLink.includes('zoom.us/join'))) {
+        zLink = `https://zoom.us/j/${cleanMid}${mPass ? '?pwd=' + encodeURIComponent(mPass) : ''}`;
+      }
+
       webinarData = {
-        datetime: wbDatetime.value.trim(),
-        zoom_link: wbZoomLink.value.trim(),
-        meeting_id: wbMeetingId.value.trim(),
-        passcode: wbPasscode.value.trim(),
+        datetime: wbDatetime.value.trim() || (rawDate ? formatHindiDateTimeLp(rawDate, rawTime) : ''),
+        date: rawDate,
+        time: rawTime,
+        zoom_link: zLink,
+        meeting_id: mId,
+        passcode: mPass,
         success_msg: wbSuccessMsg.value.trim()
       };
     }
