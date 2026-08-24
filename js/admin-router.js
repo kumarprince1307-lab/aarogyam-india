@@ -6,27 +6,27 @@
 */
 
 const ROUTES = {
- 'dashboard': () => import('./admin-pages-dashboard.js?v=24.0').then(m => m.initDashboard()),
- 'users': () => import('./admin-pages-users.js?v=24.0').then(m => m.initUsers()),
- 'user-details': () => import('./admin-pages-user-details.js?v=24.0').then(m => m.initUserDetails()),
- 'user-permissions': () => import('./admin-pages-user-permissions.js?v=24.0').then(m => m.initUserPermissions()),
- 'all-phonebook': () => import('./admin-pages-phonebook.js?v=24.0').then(m => m.initAllPhonebook()),
- 'all-surveys': () => import('./admin-pages-surveys.js?v=24.0').then(m => m.initAllSurveys()),
- 'all-landing-pages': () => import('./admin-pages-landing-pages.js?v=24.0').then(m => m.initAllLandingPages()),
- 'book-landing-pages': () => import('./admin-pages-book-landing.js?v=24.0').then(m => m.initBookLandingPages()),
- 'product-landing-pages': () => import('./admin-pages-product-landing.js?v=24.0').then(m => m.initProductLandingPages()),
- 'marketing-templates': () => import('./admin-pages-marketing-templates.js?v=24.0').then(m => m.initMarketingTemplatesPage()),
- 'purchases': () => import('./admin-pages-purchases.js?v=24.0').then(m => m.initPurchases()),
- 'checkout-funnel': () => import('./admin-pages-checkout-funnel.js?v=24.0').then(m => m.initCheckoutFunnel()),
- 'downloads': () => import('./admin-pages-downloads.js?v=24.0').then(m => m.initDownloads()),
- 'reports': () => import('./admin-pages-reports.js?v=24.0').then(m => m.initReports()),
- 'notifications': () => import('./admin-pages-notifications.js?v=24.0').then(m => m.initNotifications()),
- 'broadcast': () => import('./admin-pages-broadcast.js?v=24.0').then(m => m.initAdminBroadcast()),
- 'all-webinars': () => import('./admin-pages-webinars.js?v=24.0').then(m => m.initWebinars()),
- 'webinars': () => import('./admin-pages-webinars.js?v=24.0').then(m => m.initWebinars()),
- 'landing-page-control': () => import('./admin-pages-landing-pages.js?v=24.0').then(m => m.initAllLandingPages()),
- 'admin-app': () => import('./admin-pages-admin-app.js?v=24.0').then(m => m.initAdminApp()),
- 'settings': () => import('./admin-pages-settings.js?v=24.0').then(m => m.initSettings()).catch(() => { /* settings may be placeholder */ })
+ 'dashboard': () => import('./admin-pages-dashboard.js?v=25.0').then(m => m.initDashboard()),
+ 'users': () => import('./admin-pages-users.js?v=25.0').then(m => m.initUsers()),
+ 'user-details': () => import('./admin-pages-user-details.js?v=25.0').then(m => m.initUserDetails()),
+ 'user-permissions': () => import('./admin-pages-user-permissions.js?v=25.0').then(m => m.initUserPermissions()),
+ 'all-phonebook': () => import('./admin-pages-phonebook.js?v=25.0').then(m => m.initAllPhonebook()),
+ 'all-surveys': () => import('./admin-pages-surveys.js?v=25.0').then(m => m.initAllSurveys()),
+ 'all-landing-pages': () => import('./admin-pages-landing-pages.js?v=25.0').then(m => m.initAllLandingPages()),
+ 'book-landing-pages': () => import('./admin-pages-book-landing.js?v=25.0').then(m => m.initBookLandingPages()),
+ 'product-landing-pages': () => import('./admin-pages-product-landing.js?v=25.0').then(m => m.initProductLandingPages()),
+ 'marketing-templates': () => import('./admin-pages-marketing-templates.js?v=25.0').then(m => m.initMarketingTemplatesPage()),
+ 'purchases': () => import('./admin-pages-purchases.js?v=25.0').then(m => m.initPurchases()),
+ 'checkout-funnel': () => import('./admin-pages-checkout-funnel.js?v=25.0').then(m => m.initCheckoutFunnel()),
+ 'downloads': () => import('./admin-pages-downloads.js?v=25.0').then(m => m.initDownloads()),
+ 'reports': () => import('./admin-pages-reports.js?v=25.0').then(m => m.initReports()),
+ 'notifications': () => import('./admin-pages-notifications.js?v=25.0').then(m => m.initNotifications()),
+ 'broadcast': () => import('./admin-pages-broadcast.js?v=25.0').then(m => m.initAdminBroadcast()),
+ 'all-webinars': () => import('./admin-pages-webinars.js?v=25.0').then(m => m.initWebinars()),
+ 'webinars': () => import('./admin-pages-webinars.js?v=25.0').then(m => m.initWebinars()),
+ 'landing-page-control': () => import('./admin-pages-landing-pages.js?v=25.0').then(m => m.initAllLandingPages()),
+ 'admin-app': () => import('./admin-pages-admin-app.js?v=25.0').then(m => m.initAdminApp()),
+ 'settings': () => import('./admin-pages-settings.js?v=25.0').then(m => m.initSettings()).catch(() => { /* settings may be placeholder */ })
 };
 
 export async function navigateTo(routeName) {
