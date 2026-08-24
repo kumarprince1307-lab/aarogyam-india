@@ -215,58 +215,113 @@ function renderActivitySection(activityLogs) {
   `;
 }
 
-function renderPermissionsSection(userId, userPerms) {
-  const permKeys = [
-    { key: 'profile_view', label: 'Profile View', defaultOff: false },
-    { key: 'profile_edit', label: 'Profile Edit', defaultOff: false },
-    { key: 'survey_access', label: 'Survey Access', defaultOff: false },
-    { key: 'survey_create', label: 'Survey Create', defaultOff: false },
-    { key: 'survey_view', label: 'Survey View', defaultOff: false },
-    { key: 'phonebook_view', label: 'Phonebook View', defaultOff: false },
-    { key: 'phonebook_add', label: 'Phonebook Add', defaultOff: false },
-    { key: 'phonebook_import', label: 'Phonebook Import', defaultOff: false },
-    { key: 'marketing_view', label: 'Marketing View', defaultOff: false },
-    { key: 'marketing_create', label: 'Marketing Create', defaultOff: false },
-    { key: 'landing_page_view', label: 'Landing Page View', defaultOff: false },
-    { key: 'landing_page_create', label: 'Landing Page Create', defaultOff: false },
-    { key: 'landing_page_share', label: 'Landing Page Share', defaultOff: false },
-    { key: 'library_view', label: 'Library View', defaultOff: false },
-    { key: 'subscription_view', label: 'Subscription View', defaultOff: false },
-    { key: 'user_name_visible', label: 'User Name Visible', defaultOff: true },
-    { key: 'directory_visible', label: 'Directory Visible', defaultOff: true },
-    { key: 'referral_mobile_visible', label: 'Direct Referral Mobile Visible', defaultOff: false },
-    { key: 'admin_center_visible', label: 'Admin Center Page Visible', defaultOff: true },
-    { key: 'admin_permissions_manage', label: 'Admin Perms Manage Ability', defaultOff: true }
-  ];
+export const ALL_PERMISSIONS_26 = [
+  // 🌟 1. UCAS Media & Marketing Services Permissions (6 Core Services)
+  { key: 'image', label: '🖼️ Image Landing Page Post', short: '🖼️ Image', desc: 'इमेज लैंडिंग पेज बनाने की अनुमति', defaultOff: false, isMedia: true, category: 'Media Services' },
+  { key: 'youtube', label: '🎥 YouTube Video Post', short: '🎥 YouTube', desc: 'यूट्यूब वीडियो लैंडिंग पेज बनाने की अनुमति', defaultOff: true, isMedia: true, category: 'Media Services' },
+  { key: 'facebook', label: '📸 FB/Insta Reel Post', short: '📸 FB/Insta', desc: 'फेसबुक व इंस्टाग्राम रील पोस्ट की अनुमति', defaultOff: true, isMedia: true, category: 'Media Services' },
+  { key: 'product_landing', label: '🛒 Product Landing Page', short: '🛒 Product', desc: 'प्रोडक्ट लैंडिंग पेज बनाने व प्रबंधित करने की अनुमति', defaultOff: false, isMedia: true, category: 'Media Services' },
+  { key: 'webinar_landing', label: '🎥 Webinar & Live Events', short: '🎥 Webinar', desc: 'वेबिनार लैंडिंग पेज व ज़ूम इवेंट्स की अनुमति', defaultOff: true, isMedia: true, category: 'Media Services' },
+  { key: 'hook_templates', label: '✍️ Hook & Shayari Templates', short: '✍️ Shayari', desc: 'हुक व शायरी टेम्पलेट्स का उपयोग करने की अनुमति', defaultOff: false, isMedia: true, category: 'Media Services' },
 
+  // 🛡️ 2. Standard Platform & Profile Permissions (20 Platform Permissions)
+  { key: 'profile_view', label: 'Profile View', short: 'Profile View', desc: 'प्रोफाइल देखने की अनुमति', defaultOff: false, category: 'Platform' },
+  { key: 'profile_edit', label: 'Profile Edit', short: 'Profile Edit', desc: 'प्रोफाइल एडिट करने की अनुमति', defaultOff: false, category: 'Platform' },
+  { key: 'survey_access', label: 'Survey Access', short: 'Survey Acc', desc: 'सर्वे मॉड्यूल एक्सेस', defaultOff: false, category: 'Platform' },
+  { key: 'survey_create', label: 'Survey Create', short: 'Survey Add', desc: 'नया सर्वे सबमिट करना', defaultOff: false, category: 'Platform' },
+  { key: 'survey_view', label: 'Survey View', short: 'Survey View', desc: 'सर्वे रिकॉर्ड देखना', defaultOff: false, category: 'Platform' },
+  { key: 'phonebook_view', label: 'Phonebook View', short: 'Phone View', desc: 'फोनबुक संपर्क देखना', defaultOff: false, category: 'Platform' },
+  { key: 'phonebook_add', label: 'Phonebook Add', short: 'Phone Add', desc: 'नया संपर्क जोड़ना', defaultOff: false, category: 'Platform' },
+  { key: 'phonebook_import', label: 'Phonebook Import', short: 'Phone Imp', desc: 'फोन व CSV इम्पोर्ट', defaultOff: false, category: 'Platform' },
+  { key: 'marketing_view', label: 'Marketing View', short: 'Mktg View', desc: 'मार्केटिंग सेंटर देखना', defaultOff: false, category: 'Platform' },
+  { key: 'marketing_create', label: 'Marketing Create', short: 'Mktg Create', desc: 'मैसेज और कैंपेन बनाना', defaultOff: false, category: 'Platform' },
+  { key: 'landing_page_view', label: 'Landing Page View', short: 'LP View', desc: 'लैंडिंग पेज सूची देखना', defaultOff: false, category: 'Platform' },
+  { key: 'landing_page_create', label: 'Landing Page Create', short: 'LP Create', desc: 'नया लैंडिंग पेज बनाना', defaultOff: false, category: 'Platform' },
+  { key: 'landing_page_share', label: 'Landing Page Share', short: 'LP Share', desc: 'लैंडिंग पेज शेयर करना', defaultOff: false, category: 'Platform' },
+  { key: 'library_view', label: 'Library View', short: 'Library', desc: 'डिजिटल लाइब्रेरी एक्सेस', defaultOff: false, category: 'Platform' },
+  { key: 'subscription_view', label: 'Subscription View', short: 'Sub View', desc: 'सब्सक्रिप्शन विवरण देखना', defaultOff: false, category: 'Platform' },
+  { key: 'user_name_visible', label: 'User Name Visible', short: 'Name Vis.', desc: 'सार्वजनिक नाम प्रदर्शन (Default OFF)', defaultOff: true, category: 'Platform' },
+  { key: 'directory_visible', label: 'Directory Visible', short: 'Dir Vis.', desc: 'सार्वजनिक डायरेक्टरी लिस्टिंग (Default OFF)', defaultOff: true, category: 'Platform' },
+  { key: 'referral_mobile_visible', label: 'Ref. Mobile Visible', short: 'Ref. Mob Vis', desc: 'डायरेक्ट रेफरल मोबाइल नंबर दिखाना', defaultOff: false, category: 'Platform' },
+  { key: 'admin_center_visible', label: 'Admin Center Page', short: 'Admin Center', desc: 'My Profile में Admin Center पेज दिखना (Default OFF)', defaultOff: true, category: 'Platform' },
+  { key: 'admin_permissions_manage', label: 'Admin Perms Manage', short: 'Admin Perms', desc: 'My Profile Admin Center में परमिशन ऑन/ऑफ की अनुमति (Default OFF)', defaultOff: true, category: 'Platform' }
+];
+
+function renderPermissionsSection(userId, userPerms) {
   const map = {};
   (userPerms || []).forEach(p => {
     if (p.permission_key) map[p.permission_key] = Boolean(p.allowed);
   });
 
+  // Check local UCAS media cache
+  try {
+    const local = JSON.parse(localStorage.getItem(`UCAS_MEDIA_PERMS_${userId}`) || '{}');
+    Object.keys(local).forEach(k => {
+      if (typeof local[k] !== 'undefined') map[k] = Boolean(local[k]);
+    });
+  } catch(e) {}
+
+  const mediaPerms = ALL_PERMISSIONS_26.filter(p => p.isMedia);
+  const standardPerms = ALL_PERMISSIONS_26.filter(p => !p.isMedia);
+
+  function renderCard(p) {
+    const isAllowed = typeof map[p.key] !== 'undefined' ? map[p.key] : !p.defaultOff;
+    return `
+      <div class="admin-data-card" style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-left: 3px solid ${p.isMedia ? '#10b981' : '#3b82f6'};">
+        <div style="flex: 1; padding-right: 8px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+            <code style="font-size:0.82rem;font-weight:700;color:var(--admin-text);">${p.key}</code>
+            ${p.isMedia ? '<span style="font-size:0.68rem;background:rgba(16,185,129,0.15);color:#10b981;padding:1px 5px;border-radius:4px;font-weight:700;">Media</span>' : ''}
+            ${p.defaultOff ? '<span style="font-size:0.68rem;background:rgba(245,158,11,0.15);color:#f59e0b;padding:1px 5px;border-radius:4px;font-weight:700;">Def OFF</span>' : ''}
+          </div>
+          <div style="font-size:0.75rem;color:var(--admin-muted);">${p.label}</div>
+        </div>
+        <label style="display:inline-flex;align-items:center;cursor:pointer;gap:6px;flex-shrink:0;">
+          <input type="checkbox" class="user-perm-toggle" data-user-id="${userId}" data-perm-key="${p.key}" ${isAllowed ? 'checked' : ''} style="transform:scale(1.25);cursor:pointer;">
+          <span class="perm-status-label" style="font-size:0.82rem;font-weight:800;min-width:28px;color:${isAllowed ? '#10b981' : '#ef4444'};">${isAllowed ? 'ON' : 'OFF'}</span>
+        </label>
+      </div>
+    `;
+  }
+
   return `
     <div class="admin-section">
-      <div class="admin-section-header">
-        <div class="admin-section-title">🛡️ User Permissions Matrix (20 Permissions)</div>
-        <span style="font-size:0.75rem;color:var(--admin-muted);">4 Permissions default OFF: Name, Directory, Admin Page, Admin Perms</span>
+      <div class="admin-section-header" style="flex-wrap: wrap; gap: 10px;">
+        <div>
+          <div class="admin-section-title" style="margin-bottom: 2px;">🛡️ User Permissions Matrix (Total 26 Permissions)</div>
+          <span style="font-size:0.78rem;color:var(--admin-muted);">6 Media & Marketing Services + 20 Platform Permissions (Live Supabase & Cache Sync)</span>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btn-detail-perm-safe" class="admin-button small-button" style="background:#3b82f6;color:#fff;font-weight:700;">
+            🛡️ Safe Default
+          </button>
+          <button type="button" id="btn-detail-perm-all-on" class="admin-button small-button" style="background:#10b981;color:#fff;font-weight:700;">
+            👑 All 26 ON
+          </button>
+          <button type="button" id="btn-detail-perm-all-off" class="admin-button small-button" style="background:#ef4444;color:#fff;font-weight:700;">
+            ✕ All 26 OFF
+          </button>
+        </div>
       </div>
-      <div class="admin-data-grid" style="grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));gap:12px;">
-        ${permKeys.map(p => {
-          const isAllowed = typeof map[p.key] !== 'undefined' ? map[p.key] : !p.defaultOff;
-          return `
-            <div class="admin-data-card" style="display:flex;justify-content:space-between;align-items:center;padding:12px;">
-              <div>
-                <h4 style="margin:0 0 2px 0;font-size:0.85rem;"><code>${p.key}</code></h4>
-                <div style="font-size:0.75rem;color:var(--admin-text);font-weight:600;">${p.label}</div>
-                ${p.defaultOff ? '<small style="color:#f59e0b;font-size:0.7rem;">Default OFF</small>' : ''}
-              </div>
-              <label style="display:inline-flex;align-items:center;cursor:pointer;gap:6px;">
-                <input type="checkbox" class="user-perm-toggle" data-user-id="${userId}" data-perm-key="${p.key}" ${isAllowed ? 'checked' : ''} style="transform:scale(1.2);">
-                <span class="perm-status-label" style="font-size:0.8rem;font-weight:700;color:${isAllowed ? '#10b981' : '#ef4444'};">${isAllowed ? 'ON' : 'OFF'}</span>
-              </label>
-            </div>
-          `;
-        }).join('')}
+
+      <!-- 1. Media & Marketing Services (6 Permissions) -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 0.85rem; font-weight: 800; color: #10b981; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+          <span>🌟 1. UCAS Media & Marketing Services (6 Permissions)</span>
+        </div>
+        <div class="admin-data-grid" style="grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:10px;">
+          ${mediaPerms.map(renderCard).join('')}
+        </div>
+      </div>
+
+      <!-- 2. Core Profile & Standard Platform (20 Permissions) -->
+      <div>
+        <div style="font-size: 0.85rem; font-weight: 800; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+          <span>🛡️ 2. Core Profile & Platform Controls (20 Permissions)</span>
+        </div>
+        <div class="admin-data-grid" style="grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:10px;">
+          ${standardPerms.map(renderCard).join('')}
+        </div>
       </div>
     </div>
   `;
@@ -661,7 +716,55 @@ export async function initUserDetails() {
       });
     });
 
-    // 4. Bind View Answers button
+    // 4. Bind Quick Preset Buttons in Permissions Header
+    const btnSafePreset = document.getElementById('btn-detail-perm-safe');
+    const btnAllOn = document.getElementById('btn-detail-perm-all-on');
+    const btnAllOff = document.getElementById('btn-detail-perm-all-off');
+
+    async function applyPresetToAll(predicate) {
+      const inputs = container.querySelectorAll('.user-perm-toggle');
+      for (const input of inputs) {
+        const key = input.dataset.permKey;
+        const permObj = ALL_PERMISSIONS_26.find(p => p.key === key);
+        const shouldBeOn = predicate(permObj || { key, defaultOff: false });
+        input.checked = shouldBeOn;
+        const label = input.closest('label')?.querySelector('.perm-status-label');
+        if (label) {
+          label.textContent = shouldBeOn ? 'ON' : 'OFF';
+          label.style.color = shouldBeOn ? '#10b981' : '#ef4444';
+        }
+        await updateUserPermissionAdmin(userId, key, shouldBeOn);
+      }
+    }
+
+    btnSafePreset?.addEventListener('click', async () => {
+      btnSafePreset.disabled = true;
+      btnSafePreset.textContent = 'Applying...';
+      await applyPresetToAll(p => !p.defaultOff);
+      btnSafePreset.disabled = false;
+      btnSafePreset.textContent = '🛡️ Safe Default';
+      alert('✅ सुरक्षित डिफ़ॉल्ट (Safe Default) 26 अनुमतियां लागू कर दी गई हैं!');
+    });
+
+    btnAllOn?.addEventListener('click', async () => {
+      btnAllOn.disabled = true;
+      btnAllOn.textContent = 'Applying...';
+      await applyPresetToAll(() => true);
+      btnAllOn.disabled = false;
+      btnAllOn.textContent = '👑 All 26 ON';
+      alert('✅ सभी 26 अनुमतियां चालू (ON) कर दी गई हैं!');
+    });
+
+    btnAllOff?.addEventListener('click', async () => {
+      btnAllOff.disabled = true;
+      btnAllOff.textContent = 'Applying...';
+      await applyPresetToAll(() => false);
+      btnAllOff.disabled = false;
+      btnAllOff.textContent = '✕ All 26 OFF';
+      alert('✅ सभी 26 अनुमतियां बंद (OFF) कर दी गई हैं!');
+    });
+
+    // 5. Bind View Answers button
     container.querySelectorAll('.btn-view-survey-json').forEach(btn => {
       btn.addEventListener('click', () => {
         try {
