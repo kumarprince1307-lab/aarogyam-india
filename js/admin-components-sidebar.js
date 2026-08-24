@@ -9,7 +9,12 @@ const MENU = [
     { label: 'All Phonebook', href: 'all-phonebook.html' },
     { label: 'All Survey List', href: 'all-surveys.html' }
   ] },
-  { label: 'Books', icon: '📚', children: [ { label: 'Categories', href: '#' }, { label: 'Books', href: '#' }, { label: 'Demo Books', href: '#' } ] },
+  { label: 'Books', icon: '📚', children: [ 
+    { label: 'Book Landing Pages (बुक पेज)', href: 'book-landing-pages.html' },
+    { label: 'Categories', href: '#' }, 
+    { label: 'Books', href: '#' }, 
+    { label: 'Demo Books', href: '#' } 
+  ] },
   { label: 'Products', icon: '🛍️', children: [ { label: 'Product Landing Pages', href: 'product-landing-pages.html' }, { label: 'Categories', href: '#' }, { label: 'Products', href: '#' } ] },
   { label: 'Diseases', href: '#', icon: '🧾' },
   { label: 'Orders', icon: '🧾', children: [ { label: 'Purchases', href: 'purchases.html' }, { label: 'Checkout Funnel', href: 'checkout-funnel.html' }, { label: 'Downloads', href: 'downloads.html' } ] },

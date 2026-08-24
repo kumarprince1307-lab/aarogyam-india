@@ -1,0 +1,1078 @@
+<!-- ==========================================================
+     AAROGYAM INDIA — UNIVERSAL DYNAMIC BOOK LANDING PAGE (ULTIMATE PRO)
+     100% Pixel-Perfect Match with kharif-master-guide-2026 & kheti-dr
+     Enhanced with:
+     - Multi-Video Player (16:9 Landscape & 9:16 Shorts/Reels)
+     - Interactive Pinch-to-Zoom Lightbox for Demo Pages
+     - Suggested Books Multi-Cart Add-on & Live Price Calculator
+     - Upcoming Books Showcase
+     - Advanced Reviews with Male/Female Avatars (👨/👩)
+     - Aarogyam Pro VIP Subscriber Perk Box
+     - Customizable Sticky Action Bar
+     - Full Social SEO OpenGraph Support
+     ========================================================== -->
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  
+  <title id="page-seo-title">Aarogyam India | Official eBook Practical Guide</title>
+  
+  <meta name="description" id="page-seo-desc" content="Aarogyam India Digital Library Practical Guide. सम्पूर्ण वैज्ञानिक एवं Practical समाधान।">
+  <meta name="keywords" id="page-seo-keywords" content="Agriculture eBook, Farming PDF, Aarogyam India">
+  <meta name="author" content="Aarogyam India">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta http-equiv="Content-Language" content="hi-IN">
+  <meta name="theme-color" id="page-theme-color-meta" content="#2E7D32">
+
+  <!-- OPEN GRAPH / SOCIAL META (DYNAMICALLY UPDATED) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Aarogyam India">
+  <meta property="og:title" id="og-title-meta" content="Aarogyam India eBook Practical Guide">
+  <meta property="og:description" id="og-desc-meta" content="सम्पूर्ण Practical Guide। अभी विशेष छूट पर उपलब्ध।">
+  <meta property="og:image" id="og-image-meta" content="https://aarogyamindia.online/images/books/kharif-fasal-og.webp">
+  <meta property="og:url" id="og-url-meta" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" id="twitter-title-meta" content="Aarogyam India eBook">
+  <meta name="twitter:description" id="twitter-desc-meta" content="सम्पूर्ण Practical Guide">
+  <meta name="twitter:image" id="twitter-image-meta" content="https://aarogyamindia.online/images/books/kharif-fasal-og.webp">
+
+  <!-- Favicon & PWA -->
+  <link rel="icon" type="image/png" href="../images/logo/fevicon.png">
+  <link rel="apple-touch-icon" href="../images/logo/fevicon.png">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Aarogyam">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- EXACT STYLESHEETS FROM KHARIF GUIDE & KHETI DR -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/ebook.css">
+  <link rel="stylesheet" href="../css/book-landing.css">
+
+  <style>
+    /* ==========================================================================
+       PRO DYNAMIC STYLING & ANIMATIONS
+       ========================================================================== */
+    @keyframes ublPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .ubl-pulse-badge {
+      animation: ublPulse 2.5s infinite;
+    }
+    .faq-item h3 {
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-item h3::after {
+      content: '▾';
+      font-size: 1.1rem;
+      color: var(--primary);
+      transition: transform 0.25s ease;
+    }
+    .faq-item.active h3::after {
+      transform: rotate(180deg);
+    }
+    
+    /* MULTI-VIDEO GRID (16:9 & 9:16) */
+    .ubl-video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 25px;
+    }
+    .ubl-video-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+    }
+    .ubl-video-frame-wrap-16-9 {
+      position: relative;
+      padding-top: 56.25%; /* 16:9 */
+      background: #000;
+    }
+    .ubl-video-frame-wrap-9-16 {
+      position: relative;
+      padding-top: 177.77%; /* 9:16 Vertical Shorts/Reels */
+      background: #000;
+      max-width: 320px;
+      margin: 0 auto;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .ubl-video-frame-wrap-16-9 iframe,
+    .ubl-video-frame-wrap-9-16 iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .ubl-video-card-info {
+      padding: 14px;
+    }
+    .ubl-video-card-info h4 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .ubl-video-card-info p {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin: 0;
+    }
+
+    /* PINCH-TO-ZOOM LIGHTBOX MODAL */
+    .ubl-pinch-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.94);
+      z-index: 999999;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+    }
+    .ubl-pinch-lightbox-content {
+      position: relative;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ubl-pinch-img {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      transform-origin: center center;
+      transition: transform 0.15s ease-out;
+      cursor: zoom-in;
+    }
+    .ubl-lightbox-toolbar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      padding: 8px 16px;
+      border-radius: 30px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      color: #fff;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .ubl-lightbox-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .ubl-lightbox-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      color: #fff;
+      font-size: 2rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    /* SUGGESTED BOOKS CROSS-SELL & MULTI-CART */
+    .ubl-suggested-section {
+      padding: 60px 0;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .ubl-suggested-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 25px;
+    }
+    .ubl-suggested-card {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    .ubl-suggested-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      transform: translateY(-3px);
+    }
+    .ubl-suggested-card.selected {
+      border-color: var(--primary);
+      background: #f0fdf4;
+    }
+    .ubl-suggested-thumb {
+      width: 65px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      flex-shrink: 0;
+    }
+    .ubl-suggested-info h4 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .ubl-suggested-info .price {
+      font-weight: 900;
+      color: var(--primary);
+      font-size: 1.05rem;
+    }
+    .ubl-suggested-info .mrp {
+      text-decoration: line-through;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      margin-left: 6px;
+    }
+
+    /* MULTI-CART BUNDLE SUMMARY BOX */
+    .ubl-bundle-summary-box {
+      margin-top: 30px;
+      background: linear-gradient(135deg, #052e16 0%, #14532d 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 12px 30px rgba(5, 46, 22, 0.35);
+    }
+
+    /* UPCOMING BOOKS GRID */
+    .ubl-upcoming-section {
+      padding: 60px 0;
+      background: #ffffff;
+    }
+    .ubl-upcoming-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+      margin-top: 25px;
+    }
+    .ubl-upcoming-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      position: relative;
+    }
+    .ubl-upcoming-thumb {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .ubl-upcoming-badge {
+      display: inline-block;
+      background: #ea580c;
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
+    /* REVIEWS AVATARS */
+    .ubl-review-avatar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .ubl-review-avatar-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+    .ubl-review-avatar-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      border: 2px solid var(--primary);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================================
+       EBOOK HEADER START (EXACT SAME AS KHARIF GUIDE)
+       ========================================== -->
+  <header class="ebook-header">
+    <div class="header-container">
+      <!-- Logo -->
+      <div class="logo">
+        <a href="../index.html">
+          <img src="../images/logo/logo.png" alt="Aarogyam India Logo">
+        </a>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="ebook-navigation">
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li class="mega-menu">
+            <a href="#">Categories</a>
+            <div class="mega-category-menu">
+              <a href="agriculture.html">Agriculture</a>
+              <a href="health.html">Health</a>
+              <a href="business.html">Business</a>
+              <a href="netsurf.html">NETSURF</a>
+              <a href="education.html">Education</a>
+              <a href="digital-ai.html">Digital AI</a>
+            </div>
+          </li>
+          <li><a id="nav-demo-link" href="#sample-book">Free Demo</a></li>
+          <li><a href="#offers">Offers</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#">Wishlist</a></li>
+          <li><a href="my-library.html">My Library</a></li>
+        </ul>
+      </nav>
+
+      <!-- Header Right -->
+      <div class="header-right">
+        <!-- Search -->
+        <a href="search.html" class="header-icon">
+          <img src="../images/icons/search.png" alt="Search">
+        </a>
+        <!-- Wishlist -->
+        <a href="#" class="header-icon">
+          <img src="../images/ui/bookmark.png" alt="Wishlist">
+        </a>
+        <!-- Login -->
+        <a href="#" class="header-icon">
+          <img src="../images/icons/login.png" alt="Login">
+        </a>
+        <!-- Cart -->
+        <a href="cart.html" class="header-icon cart-icon">
+          <img src="../images/icons/cart.png" alt="Cart">
+          <span id="cart-count-badge" class="cart-count">0</span>
+        </a>
+        <!-- Desktop Install Button -->
+        <button id="desktop-pwa-install-btn" class="pwa-install-btn" style="display: none; margin-right: 8px;" title="Install Aarogyam India App">
+          <span>📱</span> Install App
+        </button>
+        <!-- Mobile Menu Hamburger -->
+        <button class="menu-button">
+          <img src="../images/icons/menu.png" alt="Menu">
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================================
+       MOBILE MENU (EXACT SAME DRAWER)
+       ====================================== -->
+  <div class="mobile-overlay"></div>
+  <nav class="mobile-menu">
+    <div class="mobile-menu-header">
+      <img src="../images/logo/logo.png" alt="Aarogyam India">
+      <button class="menu-close">✕</button>
+    </div>
+    <!-- Mobile Menu PWA Install Button -->
+    <div style="padding: 10px 15px;">
+      <button id="mobile-pwa-install-btn" class="mobile-pwa-install-btn" style="display: flex;">
+        <span>📱</span> Install App
+      </button>
+    </div>
+    <ul>
+      <li><a href="../index.html">🏠 Home</a></li>
+      <li><a href="agriculture.html">🌾 Agriculture</a></li>
+      <li><a href="health.html">❤️ Health</a></li>
+      <li><a href="business.html">💼 Business</a></li>
+      <li><a href="netsurf.html">🌿 NETSURF</a></li>
+      <li><a href="education.html">📘 Education</a></li>
+      <li><a href="digital-ai.html">🤖 Digital AI</a></li>
+      <li><a id="mobile-demo-link" href="#sample-book">🎁 Free Demo</a></li>
+      <li><a href="my-library.html">📚 My Library</a></li>
+      <li><a href="cart.html">🛒 Cart</a></li>
+      <li><a href="#">❤️ Wishlist</a></li>
+      <li><a href="#">👤 Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- ==========================================================
+       PART 1.1: HERO SELLING SECTION (EXACT CSS CLASSES)
+       ========================================================== -->
+  <section class="book-hero" id="offers">
+    <!-- Hero Background Banner -->
+    <img id="hero-banner-img" src="../images/banners/kharif-master-guide-2026-hero-banner.webp" alt="Hero Banner" class="hero-banner-bg">
+    <!-- Dark Overlay -->
+    <div class="hero-overlay"></div>
+
+    <!-- Hero Content -->
+    <div class="hero-container">
+      <!-- LEFT : BOOK COVER -->
+      <div class="hero-book">
+        <img id="hero-book-cover" src="../images/books/kharif-master-guide-2026-cover.webp" alt="Book Cover" class="hero-book-cover">
+      </div>
+
+      <!-- RIGHT : BOOK DETAILS -->
+      <div class="hero-details">
+        <span id="hero-tag" class="hero-tag">
+          🌾 Bestseller Agriculture eBook
+        </span>
+
+        <h1 id="hero-title" class="hero-title">
+          खरीफ फसल मास्टर गाइड 2026
+        </h1>
+
+        <h2 id="hero-subtitle" class="hero-subtitle">
+          धान • सोयाबीन • मक्का की सम्पूर्ण Practical Guide
+        </h2>
+
+        <!-- Rating -->
+        <div class="hero-rating">
+          <span class="stars">★★★★★</span>
+          <span id="hero-rating-text" class="rating-text">4.9 (120+ Ratings)</span>
+        </div>
+
+        <!-- Short Description -->
+        <p id="hero-desc" class="hero-description">
+          बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी। रोग, कीट, खरपतवार, पोषण प्रबंधन और अधिक उत्पादन के वैज्ञानिक एवं Practical समाधान।
+        </p>
+
+        <!-- Price Box -->
+        <div class="hero-price-box">
+          <span id="hero-old-price" class="old-price">₹299</span>
+          <span id="hero-new-price" class="new-price">₹99</span>
+          <span id="hero-offer-badge" class="offer-badge">Launch Offer</span>
+        </div>
+
+        <!-- HERO ACTION BUTTONS -->
+        <div class="hero-action-buttons">
+          <!-- Free Sample -->
+          <a id="hero-sample-btn" href="#sample-book" class="sample-btn">
+            <i class="fa-solid fa-book-open"></i> Free Sample
+          </a>
+          <!-- Buy Now -->
+          <a id="hero-buy-btn" href="checkout.html?id=BK001" class="buy-btn">
+            <i class="fa-solid fa-cart-shopping"></i> Buy Now
+          </a>
+          <!-- Share Now -->
+          <button type="button" id="hero-share-btn" class="share-now-btn" data-share-button="true">
+            <i class="fa-solid fa-share-nodes"></i> Share Now
+          </button>
+        </div>
+
+        <!-- Hero Features Grid -->
+        <div id="hero-features-wrap" class="hero-features">
+          <div class="hero-feature">
+            <i class="fa-solid fa-seedling"></i>
+            <span>150+ रंगीन पेज</span>
+          </div>
+          <div class="hero-feature">
+            <i class="fa-solid fa-camera"></i>
+            <span>300+ फोटो</span>
+          </div>
+          <div class="hero-feature">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Scientific Guide</span>
+          </div>
+          <div class="hero-feature">
+            <i class="fa-solid fa-gift"></i>
+            <span>Free Bonus PDF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       TRUST BAR (EXACT CSS CLASSES)
+       ========================================================== -->
+  <section class="trust-bar">
+    <div class="trust-container">
+      <div class="trust-item">
+        <i class="fa-solid fa-download"></i>
+        <span>Instant Download</span>
+      </div>
+      <div class="trust-item">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Secure Payment</span>
+      </div>
+      <div class="trust-item">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <span>Mobile Friendly PDF</span>
+      </div>
+      <div class="trust-item">
+        <i class="fa-solid fa-award"></i>
+        <span>100% Satisfaction</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       ANIMATED WHATSAPP PHOTO DIAGNOSIS FEATURE
+       ========================================================== -->
+  <section id="photo-diagnosis-section" style="background: linear-gradient(135deg, #052e16 0%, #14532d 100%); color: #fff; padding: 50px 0; border-top: 3px solid #22c55e; border-bottom: 3px solid #22c55e;">
+    <div class="container" style="text-align: center;">
+      <span class="ubl-pulse-badge" style="background: #22c55e; color: #000; font-weight: 900; font-size: 0.85rem; padding: 6px 18px; border-radius: 50px; text-transform: uppercase; display: inline-block; margin-bottom: 14px;">
+        📸 लाइव व्हाट्सएप फोटो डायग्नोसिस सहायता
+      </span>
+      <h2 style="font-size: 2.2rem; font-weight: 900; color: #fff; margin-bottom: 12px;">
+        फसल या पौधे की फोटो खींचकर WhatsApp पर भेजें!
+      </h2>
+      <p style="font-size: 1.05rem; color: #bbf7d0; max-width: 750px; margin: 0 auto 30px auto; line-height: 1.6;">
+        पत्ती का पीलापन हो, कीट/इल्ली का प्रकोप या पोषक तत्व की कमी — फोटो भेजते ही हमारे कृषि विशेषज्ञ और AI डॉक्टर आपको तुरंत सटीक दवा, स्प्रे व उपाय बताएंगे।
+      </p>
+
+      <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 30px;">
+        <div style="background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 16px 22px; display: flex; align-items: center; gap: 12px; font-weight: 700;">
+          <span style="font-size: 2rem;">📸</span>
+          <span style="text-align: left;"><small style="display:block;color:#86efac;font-size:0.78rem;">स्टेप 1</small>पत्ती/रोग की फोटो खींचें</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 16px 22px; display: flex; align-items: center; gap: 12px; font-weight: 700;">
+          <span style="font-size: 2rem;">💬</span>
+          <span style="text-align: left;"><small style="display:block;color:#86efac;font-size:0.78rem;">स्टेप 2</small>WhatsApp पर भेजें</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 16px 22px; display: flex; align-items: center; gap: 12px; font-weight: 700;">
+          <span style="font-size: 2rem;">🔬</span>
+          <span style="text-align: left;"><small style="display:block;color:#86efac;font-size:0.78rem;">स्टेप 3</small>सटीक इलाज व डोज पाएं</span>
+        </div>
+      </div>
+
+      <a id="photo-diag-wa-btn" href="https://wa.me/917974422572?text=नमस्ते,%20मैंने%20फसल%20की%20फोटो%20ली%20है,%20कृपया%20रोग%20पहचान%20व%20समाधान%20बताएं।" target="_blank" style="background: #25D366; color: #fff; font-size: 1.15rem; font-weight: 900; padding: 16px 36px; border-radius: 50px; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(37,211,102,0.4); text-decoration: none;">
+        <i class="fa-brands fa-whatsapp" style="font-size: 1.6rem;"></i> अभी WhatsApp पर फोटो भेजें &rarr;
+      </a>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PART 1.2: WHY BUY THIS BOOK (EXACT CSS CLASSES)
+       ========================================================== -->
+  <section class="why-book">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Why This Book?</span>
+        <h2 id="why-title">यह पुस्तक क्यों खरीदें?</h2>
+        <p id="why-desc">
+          यह केवल एक eBook नहीं, बल्कि सम्पूर्ण Practical Guide है, जो किसान, कृषि विद्यार्थी, कृषि सलाहकार एवं कृषि व्यवसाय से जुड़े लोगों के लिए तैयार की गई है।
+        </p>
+      </div>
+
+      <div id="why-cards-grid" class="why-grid">
+        <div class="why-card">
+          <div class="why-icon">🌱</div>
+          <h3>वैज्ञानिक जानकारी</h3>
+          <p>कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">📷</div>
+          <h3>300+ वास्तविक फोटो</h3>
+          <p>रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">📘</div>
+          <h3>Step by Step Guide</h3>
+          <p>बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🎁</div>
+          <h3>Free Bonus PDF</h3>
+          <p>इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PART 1.3: BOOK PREVIEW GALLERY & PINCH-ZOOM
+       ========================================================== -->
+  <section class="preview-gallery" id="sample-book">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Book Preview</span>
+        <h2>पुस्तक के अंदर क्या है?</h2>
+        <p>खरीदने से पहले पुस्तक के वास्तविक पृष्ठ देखें (क्लिक करके बड़ा व ज़ूम करें):</p>
+      </div>
+
+      <div class="preview-banner" id="preview-banner-wrap">
+        <img id="preview-banner-img" src="../images/banners/kharif-master-guide-2026-preview-banner.webp" alt="Book Preview Banner" style="cursor:zoom-in;">
+      </div>
+
+      <div id="preview-gallery-grid" class="preview-grid">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="preview-action">
+        <a id="preview-buy-btn" href="#buy-now" class="preview-buy-btn">
+          🛒 अभी खरीदें मात्र ₹99 में
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       MULTI-VIDEO PLAYER (16:9 & 9:16 SHORTS/REELS)
+       ========================================================== -->
+  <section id="book-video-section" class="why-book" style="display:none;background:#f8fafc;padding-top:40px;padding-bottom:40px;">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Video Overview</span>
+        <h2 id="video-section-title">🎥 वीडियो अवलोकन व लाइव डेमो (Video Overview)</h2>
+        <p id="video-section-desc">देखें विशेषज्ञों द्वारा इस पुस्तक की उपयोगिता और लाइव गाइडेंस:</p>
+      </div>
+
+      <div id="video-grid-container" class="ubl-video-grid">
+        <!-- Rendered dynamically (16:9 & 9:16 Shorts) -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PART 1.4: FREE BONUS PDF + WHATSAPP SUPPORT
+       ========================================================== -->
+  <section class="bonus-section" id="bonus-section-wrapper">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Free Bonus</span>
+        <h2 id="bonus-heading">पुस्तक के साथ बिल्कुल FREE</h2>
+        <p id="bonus-subheading">किताब खरीदें, साथ में पाएं FREE कृषि सहायता! 📲</p>
+      </div>
+
+      <div class="bonus-wrapper">
+        <!-- Left Image -->
+        <div class="bonus-image">
+          <img id="bonus-cover-img" src="../images/books/kharif-fasal-hero-2.webp" alt="Bonus PDF">
+        </div>
+
+        <!-- Right Content -->
+        <div class="bonus-content">
+          <h3 id="bonus-title">🌾 FREE AI WHATSAPP SUPPORT 🎁</h3>
+          <p id="bonus-desc">
+            किताब पढ़ते समय अगर कोई बात समझ न आए, पोषक तत्वों की पहचान, महत्वपूर्ण कृषि टिप्स या फसल की समस्या हो, तो परेशान होने की जरूरत नहीं। बस WhatsApp Help बटन पर क्लिक करें और अपनी समस्या बताएं।
+          </p>
+
+          <ul id="bonus-list-items" class="bonus-list">
+            <li>✅ 24×7 WhatsApp Support</li>
+            <li>✅ 💬 आपका सवाल → हमारी मदद → आसान समाधान</li>
+            <li>✅ 📖 किताब की जानकारी समझने में सहायता</li>
+            <li>✅ 🌱 फसल संबंधी सवाल</li>
+            <li>✅ Mobile Friendly PDF</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       AAROGYAM PRO VIP SUBSCRIBER BENEFIT BOX (INBUILT FEATURE)
+       ========================================================== -->
+  <section id="subscriber-vip-section" style="padding: 40px 0; background: #fff;">
+    <div class="container">
+      <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #fff; border-radius: 16px; padding: 25px; border: 2px solid #fbbf24; box-shadow: 0 10px 25px rgba(49,46,129,0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span style="font-size: 1.5rem;">👑</span>
+            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #fbbf24;">Aarogyam Pro VIP मेंबर्स के लिए विशेष लाभ</h3>
+          </div>
+          <p id="vip-perk-text" style="font-size: 0.95rem; color: #e0e7ff; margin: 0;">
+            यदि आपके पास Aarogyam Pro सदस्यता है, तो यह ई-बुक आपके प्लान में 100% मुफ्त शामिल है।
+          </p>
+        </div>
+        <a href="../subscription.html" style="background: #fbbf24; color: #000; font-weight: 900; padding: 12px 24px; border-radius: 50px; text-decoration: none; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 6px;">
+          👑 VIP सदस्यता देखें &rarr;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       BOOK HIGHLIGHTS (EXACT CSS CLASSES)
+       ========================================================== -->
+  <section class="book-highlights">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Highlights</span>
+        <h2>इस पुस्तक में क्या मिलेगा?</h2>
+      </div>
+
+      <div id="highlights-grid" class="highlight-grid">
+        <div class="highlight-card">🌾 फसल की सम्पूर्ण जानकारी</div>
+        <div class="highlight-card">🌱 विशेषज्ञ प्रैक्टिकल गाइड</div>
+        <div class="highlight-card">🌽 उत्पादन व पैदावार तकनीक</div>
+        <div class="highlight-card">🦠 रोग एवं कीट पहचान</div>
+        <div class="highlight-card">🌿 संतुलित पोषण व खाद प्रबंधन</div>
+        <div class="highlight-card">💧 खरपतवार एवं स्प्रे नियंत्रण</div>
+        <div class="highlight-card">🤖 WhatsApp AI कृषि सहायता</div>
+        <div class="highlight-card">📱 मोबाइल Reader में सीधे पढ़ें — PDF खोजने की जरूरत नहीं</div>
+        <div class="highlight-card">🚜 आधुनिक वैज्ञानिक खेती तकनीक</div>
+        <div class="highlight-card">📸 300+ वास्तविक रंगीन फोटो</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       SUGGESTED BOOKS / RELATED BOOKS & MULTI-CART UPSELL
+       ========================================================== -->
+  <section id="suggested-books-section" class="ubl-suggested-section">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Recommended Bundles</span>
+        <h2>साथ में ये पुस्तकें भी खरीदें (Frequently Bought Together)</h2>
+        <p>अपनी लाइब्रेरी को पूरा करें और एक साथ ऑर्डर करके समय व लागत बचाएं:</p>
+      </div>
+
+      <div id="suggested-books-grid" class="ubl-suggested-grid">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Live Multi-Cart Calculation Box -->
+      <div id="multi-cart-summary-box" class="ubl-bundle-summary-box" style="display:none;">
+        <div>
+          <div style="font-size:1.15rem;font-weight:900;color:#86efac;margin-bottom:4px;">
+            🛒 बंडल चेकआउट (Bundle Cart Summary)
+          </div>
+          <div id="multi-cart-items-text" style="font-size:0.9rem;color:#e2e8f0;">
+            1 मुख्य पुस्तक + 0 सुझाई गई पुस्तकें
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <div style="text-align:right;">
+            <div style="font-size:0.8rem;color:#bbf7d0;">कुल देय राशि:</div>
+            <div id="multi-cart-total-price" style="font-size:1.8rem;font-weight:900;color:#fbbf24;">₹99</div>
+          </div>
+          <button type="button" id="btn-buy-multi-bundle" style="background:#fbbf24;color:#000;font-weight:900;padding:14px 28px;border-radius:50px;font-size:1rem;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+            <i class="fa-solid fa-cart-shopping"></i> सभी एक साथ खरीदें &rarr;
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PART 1.5: BOOK DETAILS + TABLE OF CONTENTS
+       ========================================================== -->
+  <section class="book-details-section">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Book Information</span>
+        <h2>पुस्तक की सम्पूर्ण जानकारी</h2>
+        <p>खरीदने से पहले इस पुस्तक के बारे में सभी महत्वपूर्ण जानकारी देखें।</p>
+      </div>
+
+      <div class="book-details-wrapper">
+        <!-- Left: Specification Table -->
+        <div class="book-specification">
+          <h3>📘 Book Details</h3>
+          <table class="book-table">
+            <tr><th>Book Name</th><td id="spec-name">खरीफ फसल मास्टर गाइड 2026</td></tr>
+            <tr><th>Language</th><td id="spec-lang">Hindi</td></tr>
+            <tr><th>Format</th><td>PDF (Digital eBook) & Mobile Reader</td></tr>
+            <tr><th>Pages</th><td id="spec-pages">150+ Pages</td></tr>
+            <tr><th>Images</th><td id="spec-images">300+ Real Images</td></tr>
+            <tr><th>Bonus</th><td id="spec-bonus">Free Bonus PDF + WhatsApp Support</td></tr>
+            <tr><th>Author</th><td id="spec-author">Aarogyam India</td></tr>
+            <tr><th>Version</th><td id="spec-version">2026 Edition</td></tr>
+          </table>
+        </div>
+
+        <!-- Right: Table of Contents -->
+        <div class="table-of-content">
+          <h3>📑 इस पुस्तक में क्या-क्या है?</h3>
+          <ul id="toc-list">
+            <li>✅ बीज उपचार</li>
+            <li>✅ खेत की तैयारी</li>
+            <li>✅ बुवाई की वैज्ञानिक विधि</li>
+            <li>✅ उर्वरक प्रबंधन</li>
+            <li>✅ खरपतवार नियंत्रण</li>
+            <li>✅ रोग एवं कीट प्रबंधन</li>
+            <li>✅ पोषक तत्वों की कमी</li>
+            <li>✅ स्प्रे चार्ट</li>
+            <li>✅ IPM तकनीक</li>
+            <li>✅ अधिक उत्पादन के उपाय</li>
+            <li>✅ विशेषज्ञ सुझाव</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       UPCOMING BOOKS SHOWCASE SECTION
+       ========================================================== -->
+  <section id="upcoming-books-section" class="ubl-upcoming-section">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Coming Soon</span>
+        <h2>आगामी डिजिटल पुस्तकें (Upcoming Releases)</h2>
+        <p>जल्द ही आरोग्यम इंडिया डिजिटल लाइब्रेरी में शामिल होने वाली नई पुस्तकें:</p>
+      </div>
+
+      <div id="upcoming-books-grid" class="ubl-upcoming-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PART 1.6: FAQ SECTION
+       ========================================================== -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Frequently Asked Questions</span>
+        <h2>अक्सर पूछे जाने वाले प्रश्न</h2>
+        <p>खरीदने से पहले आपके सभी महत्वपूर्ण प्रश्नों के उत्तर।</p>
+      </div>
+
+      <div id="faq-list-wrapper" class="faq-wrapper">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       CUSTOMER REVIEWS (WITH AVATAR SUPPORT 👨/👩)
+       ========================================================== -->
+  <section class="customer-reviews">
+    <div class="container">
+      <div class="section-heading">
+        <span class="section-tag">Customer Reviews</span>
+        <h2>पाठकों की राय</h2>
+        <p>इस पुस्तक को पढ़ने वाले पाठकों की वास्तविक प्रतिक्रिया:</p>
+      </div>
+
+      <div id="reviews-grid" class="review-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       PART 1.7: FINAL BUY SECTION
+       ========================================================== -->
+  <section class="final-buy-section" id="buy-now">
+    <div class="container">
+      <div class="final-buy-wrapper">
+        <!-- Left Content -->
+        <div class="final-buy-content">
+          <span class="section-tag">Limited Time Offer</span>
+          <h2 id="final-title">खरीफ फसल मास्टर गाइड 2026</h2>
+          <p id="final-desc">
+            फसलों में कोई भी समस्या है? 🌾🌱🌽 समस्या खोजने में समय नहीं—सही समाधान जानिए, एक ही Practical Guide में! वैज्ञानिक खेती, रोग पहचान, कीट नियंत्रण, पोषण प्रबंधन और अधिक उत्पादन की सम्पूर्ण Practical Guide अब विशेष Launch Offer में।
+          </p>
+
+          <div class="final-price">
+            <span id="final-old-price" class="old-price">₹299</span>
+            <span id="final-new-price" class="new-price">₹99</span>
+          </div>
+
+          <div class="final-buttons">
+            <a id="final-sample-btn" href="#sample-book" class="sample-btn">
+              📖 Sample Book
+            </a>
+            <a id="final-buy-btn" href="checkout.html?id=BK001" class="buy-btn">
+              🛒 Buy Now
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Benefits -->
+        <div class="purchase-benefits">
+          <h3>खरीदने पर आपको मिलेगा</h3>
+          <ul id="final-benefits-list">
+            <li>✅ Full PDF eBook</li>
+            <li>✅ 📱 मोबाइल में कभी भी पढ़ें</li>
+            <li>✅ Instant Download</li>
+            <li>✅ Mobile Friendly</li>
+            <li>✅ Lifetime Access</li>
+            <li>✅ 🎁 Share करें और Surprise Gift जीतें</li>
+            <li>✅ 💬 पढ़ते समय सवाल हो? WhatsApp Help से पूछें</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       HELP & SUPPORT
+       ========================================================== -->
+  <section class="help-support">
+    <div class="container">
+      <div class="support-box">
+        <h2>सहायता चाहिए?</h2>
+        <p>यदि खरीदने में किसी प्रकार की समस्या आती है, तो हमारी Support Team आपकी सहायता करेगी।</p>
+        <div class="support-buttons">
+          <a id="wa-help-link" href="https://wa.me/917974422572?text=नमस्ते,%20मुझे%20पुस्तक%20के%20बारे%20में%20और%20जानकारी%20चाहिए।" class="contact-btn" target="_blank">
+            💬 WhatsApp Support
+          </a>
+          <a href="../faq.html" class="faq-btn">
+            ❓ FAQ
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       MASTER DESKTOP STICKY SHARE SYSTEM
+       ========================================================== -->
+  <div class="desktop-share-bar">
+    <div class="share-title">
+      <i class="fa-solid fa-share-nodes"></i>
+      <span>Share</span>
+    </div>
+    <button class="desktop-share-btn share-whatsapp" type="button" data-share-button="true" data-share-target="whatsapp">
+      <i class="fa-brands fa-whatsapp"></i>
+      <span>WhatsApp</span>
+    </button>
+    <button class="desktop-share-btn share-facebook" type="button" data-share-button="true" data-share-target="facebook">
+      <i class="fa-brands fa-facebook-f"></i>
+      <span>Facebook</span>
+    </button>
+    <button class="desktop-share-btn share-copy" type="button" data-share-button="true" data-share-target="copy">
+      <i class="fa-solid fa-link"></i>
+      <span>Copy Link</span>
+    </button>
+  </div>
+
+  <!-- BOOK SHARE INFORMATION (HIDDEN) -->
+  <div id="book-share-data"
+       data-title="Aarogyam India Guide"
+       data-description="सम्पूर्ण Practical Guide"
+       data-price="₹99"
+       data-mrp="₹299"
+       data-url=""
+       data-image="">
+  </div>
+
+  <!-- ==========================================================
+       MASTER MOBILE STICKY BUY BAR (CUSTOMIZABLE VIA ADMIN)
+       ========================================================== -->
+  <div id="ubl-mobile-sticky-bar" class="mobile-sticky-bar">
+    <a id="sticky-help-btn" href="https://wa.me/917974422572" target="_blank" class="sticky-help-btn">
+      HELP
+    </a>
+    <div class="mobile-book-preview">
+      <img id="sticky-thumb-img" src="../images/books/kharif-master-guide-2026-cover.webp" alt="Thumbnail">
+      <div class="sticky-price-wrap">
+        <div id="sticky-price-val" class="sticky-new-price" style="color:#2E7D32;font-weight:900;font-size:1.1rem;">₹99</div>
+        <div id="sticky-mrp-val" class="sticky-old-price" style="color:#888;font-size:0.75rem;text-decoration:line-through;">₹299</div>
+      </div>
+    </div>
+    <a id="sticky-buy-btn" href="checkout.html?id=BK001" class="mobile-buy-btn" style="background:#2E7D32;color:#fff;font-weight:800;padding:10px 18px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+      🛒 खरीदें
+    </a>
+  </div>
+
+  <!-- ==========================================================
+       FULL AAROGYAM FOOTER
+       ========================================================== -->
+  <footer class="ebook-footer">
+    <div class="footer-container">
+      <div class="footer-column">
+        <div class="footer-logo">
+          <img src="../images/logo/logo.png" alt="Aarogyam India Logo">
+        </div>
+        <p>Aarogyam India — Digital Library & Empowerment Hub for Agriculture, Health and Skills.</p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Categories</h3>
+        <a href="agriculture.html">Agriculture</a>
+        <a href="health.html">Health</a>
+        <a href="business.html">Business</a>
+        <a href="netsurf.html">NETSURF</a>
+        <a href="digital-ai.html">Digital AI</a>
+        <a href="education.html">Education</a>
+      </div>
+
+      <div class="footer-column">
+        <h3>Customer</h3>
+        <a href="#">Login</a>
+        <a href="my-library.html">My Library</a>
+        <a href="#">Wishlist</a>
+        <a href="../faq.html">FAQ</a>
+      </div>
+
+      <div class="footer-column">
+        <h3>Support</h3>
+        <a href="../contact.html">Contact</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+        <a href="../terms.html">Terms & Conditions</a>
+        <a href="../return-refund.html">Refund Policy</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Aarogyam India. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ==========================================================
+       PINCH-TO-ZOOM INTERACTIVE LIGHTBOX MODAL
+       ========================================================== -->
+  <div id="ubl-pinch-lightbox" class="ubl-pinch-lightbox">
+    <button type="button" id="ubl-lightbox-close" class="ubl-lightbox-close">&times;</button>
+    <div id="ubl-lightbox-container" class="ubl-pinch-lightbox-content">
+      <img id="ubl-pinch-img" src="" alt="Fullscreen Demo Page" class="ubl-pinch-img">
+    </div>
+    <div class="ubl-lightbox-toolbar">
+      <button type="button" id="btn-zoom-out" class="ubl-lightbox-btn">🔍 -</button>
+      <span id="zoom-level-text" style="font-family:monospace;">100%</span>
+      <button type="button" id="btn-zoom-in" class="ubl-lightbox-btn">🔍 +</button>
+      <button type="button" id="btn-zoom-reset" class="ubl-lightbox-btn" style="font-size:0.8rem;border-left:1px solid #666;padding-left:10px;">Reset</button>
+    </div>
+  </div>
+
+  <!-- Common JS & Share Engine -->
+  <script src="../session.js"></script>
+  <script src="../js/ebook.js"></script>
+  <script src="../js/share-engine-core.js"></script>
+  <script type="module" src="/js/public-pwa.js"></script>
+
+  <!-- Universal Dynamic Engine Controller -->
+  <script src="../js/universal-book-landing.js?v=20.0"></script>
+</body>
+</html>
