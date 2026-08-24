@@ -747,6 +747,7 @@ export async function initProductLandingPages() {
 
     // 2. Fetch Product Landing Pages & Leads
     if (db) {
+      try {
         const [regLpRes, surveysRes] = await Promise.all([
           db.from('landing_pages').select('id, profile_id, share_id, title, message, category, content_type, status, mrp, offer_price, buynow_url, created_at').or('content_type.eq.product,category.eq.product').order('created_at', { ascending: false }),
           db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false })

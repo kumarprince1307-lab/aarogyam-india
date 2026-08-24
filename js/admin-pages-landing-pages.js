@@ -1278,6 +1278,7 @@ export async function initAllLandingPages() {
 
     // 2. Fetch Landing Pages & Surveys from Supabase
     if (db) {
+      try {
         const [lpRes, surveyRes] = await Promise.all([
           db.from('landing_pages').select('id, profile_id, share_id, title, message, category, content_type, status, mrp, offer_price, buynow_url, og_title, og_description, og_image_url, webinar_data, created_at').order('created_at', { ascending: false }),
           db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false })
