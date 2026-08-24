@@ -2235,8 +2235,13 @@ export async function initAllLandingPages() {
         let ogImg = '';
         if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
           ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
-        } else if (activeContentType === 'youtube' && detectedYoutubeId) {
-          ogImg = `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+        } else if (activeContentType === 'youtube' && (detectedYoutubeId || extractYoutubeVideoId(mediaUrl))) {
+          const yId = detectedYoutubeId || extractYoutubeVideoId(mediaUrl);
+          ogImg = `https://img.youtube.com/vi/${yId}/hqdefault.jpg`;
+        } else if (thumbUrl && (thumbUrl.startsWith('http://') || thumbUrl.startsWith('https://'))) {
+          ogImg = thumbUrl;
+        } else {
+          ogImg = defaultBanner;
         }
 
         const prodMrp = (document.getElementById('adm_prod_mrp')?.value || '').trim();
@@ -2322,10 +2327,13 @@ export async function initAllLandingPages() {
           let ogImg = '';
           if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
             ogImg = `https://aarogyamindia.online/api/image?id=${masterLpId}`;
-          } else if (activeContentType === 'youtube' && detectedYoutubeId) {
-            ogImg = `https://img.youtube.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+          } else if (activeContentType === 'youtube' && (detectedYoutubeId || extractYoutubeVideoId(mediaUrl))) {
+            const yId = detectedYoutubeId || extractYoutubeVideoId(mediaUrl);
+            ogImg = `https://img.youtube.com/vi/${yId}/hqdefault.jpg`;
           } else if (thumbUrl && (thumbUrl.startsWith('http://') || thumbUrl.startsWith('https://'))) {
             ogImg = thumbUrl;
+          } else {
+            ogImg = defaultBanner;
           }
 
           const masterRecord = {
@@ -2369,10 +2377,13 @@ export async function initAllLandingPages() {
             let ogImg = '';
             if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
               ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
-            } else if (activeContentType === 'youtube' && detectedYoutubeId) {
-              ogImg = `https://img.youtube.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+            } else if (activeContentType === 'youtube' && (detectedYoutubeId || extractYoutubeVideoId(mediaUrl))) {
+              const yId = detectedYoutubeId || extractYoutubeVideoId(mediaUrl);
+              ogImg = `https://img.youtube.com/vi/${yId}/hqdefault.jpg`;
             } else if (thumbUrl && (thumbUrl.startsWith('http://') || thumbUrl.startsWith('https://'))) {
               ogImg = thumbUrl;
+            } else {
+              ogImg = defaultBanner;
             }
 
             const p = {

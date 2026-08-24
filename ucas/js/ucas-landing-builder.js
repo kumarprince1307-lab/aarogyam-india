@@ -663,8 +663,13 @@
         let ogImg = '';
         if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
           ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
-        } else if (activeContentType === 'youtube' && detectedYoutubeId) {
-          ogImg = `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+        } else if (activeContentType === 'youtube' && (detectedYoutubeId || extractYoutubeVideoId(finalMediaUrl))) {
+          const yId = detectedYoutubeId || extractYoutubeVideoId(finalMediaUrl);
+          ogImg = `https://img.youtube.com/vi/${yId}/hqdefault.jpg`;
+        } else if (finalThumbnailUrl && (finalThumbnailUrl.startsWith('http://') || finalThumbnailUrl.startsWith('https://'))) {
+          ogImg = finalThumbnailUrl;
+        } else {
+          ogImg = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
         }
 
         const updatePayload = {
@@ -709,8 +714,13 @@
         let ogImg = '';
         if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
           ogImg = `https://aarogyamindia.online/api/image?id=${lpId}`;
-        } else if (activeContentType === 'youtube' && detectedYoutubeId) {
-          ogImg = `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+        } else if (activeContentType === 'youtube' && (detectedYoutubeId || extractYoutubeVideoId(finalMediaUrl))) {
+          const yId = detectedYoutubeId || extractYoutubeVideoId(finalMediaUrl);
+          ogImg = `https://img.youtube.com/vi/${yId}/hqdefault.jpg`;
+        } else if (finalThumbnailUrl && (finalThumbnailUrl.startsWith('http://') || finalThumbnailUrl.startsWith('https://'))) {
+          ogImg = finalThumbnailUrl;
+        } else {
+          ogImg = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
         }
 
         const payload = {
