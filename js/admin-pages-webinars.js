@@ -216,7 +216,9 @@ export async function initWebinars() {
           const prof = allProfiles.find(p => p.id === pId);
           const opt = document.createElement('option');
           opt.value = pId;
-          opt.textContent = prof ? `${prof.full_name || 'User'} (${prof.share_id || pId.slice(0, 8)})` : pId.slice(0, 8);
+          opt.textContent = pId === 'ALL_USERS'
+            ? '🌐 सभी यूजर्स (All Users Broadcast)'
+            : prof ? `${prof.full_name || 'User'} (${prof.share_id || pId.slice(0, 8)})` : pId.slice(0, 8);
           userFilter.appendChild(opt);
         });
       }
@@ -415,10 +417,10 @@ export async function initWebinars() {
                   </td>
                   <td>
                     <div style="font-weight:700; color:var(--admin-text); font-size:0.85rem;">
-                      ${creator?.full_name || 'Community'}
+                      ${w.profile_id === 'ALL_USERS' ? '🌐 सभी 100% यूजर्स (Broadcast)' : (creator?.full_name || 'Community')}
                     </div>
                     <span style="font-size: 0.75rem; font-weight: 700; color: var(--admin-primary);">
-                      <code>${w.share_id || creator?.share_id || 'AI000000'}</code>
+                      <code>${w.profile_id === 'ALL_USERS' ? 'ALL_USERS' : (w.share_id || creator?.share_id || 'AI000000')}</code>
                     </span>
                   </td>
                   <td>

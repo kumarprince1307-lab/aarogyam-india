@@ -425,7 +425,7 @@
         const { data, error } = await client
           .from('landing_pages')
           .select('*')
-          .or(`profile_id.eq.${validId},share_id.eq.${shareId},is_admin_template.eq.true,created_by_admin.eq.true,profile_id.eq.ALL_USERS`)
+          .or(`profile_id.eq.${validId},share_id.eq.${shareId},profile_id.eq.ALL_USERS`)
           .order('created_at', { ascending: false });
 
         if (!error && Array.isArray(data)) {
@@ -436,7 +436,7 @@
       }
     }
 
-    // 2. Sync / Fallback with all LocalStorage stores
+    // 2. Sync / Fallback with LocalStorage stores
     const combinedMap = new Map();
     (pages || []).forEach(p => {
       if (p && p.id) combinedMap.set(p.id, p);
@@ -451,8 +451,8 @@
             const arr = Array.isArray(list) ? list : [list];
             arr.forEach(p => {
               if (p && p.id && !combinedMap.has(p.id)) {
-                // Attach to user if created by user or global template
-                if (!p.profile_id || p.profile_id === profileId || p.is_admin_template || p.created_by_admin) {
+                // Attach to user if created by user or master broadcast
+                if (p.profile_id === profileId || p.profile_id === validId || p.profile_id === 'ALL_USERS') {
                   combinedMap.set(p.id, p);
                 }
               }
