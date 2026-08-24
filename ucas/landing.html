@@ -1026,6 +1026,34 @@
     (async function () {
       'use strict';
 
+      // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
+      const LANDING_PAGES_ENABLED = false;
+
+      if (!LANDING_PAGES_ENABLED) {
+        // Safe Maintenance View: 0 DB Queries, 0 Base64 Media Transfers
+        const gate = document.getElementById('lp_survey_gate_overlay');
+        if (gate) gate.remove();
+        const mainContent = document.getElementById('lp_main_content') || document.body;
+        mainContent.style.opacity = '1';
+        mainContent.style.filter = 'none';
+        mainContent.innerHTML = `
+          <div style="text-align:center;padding:4rem 1.5rem;max-width:540px;margin:0 auto;font-family:'Plus Jakarta Sans',sans-serif;">
+            <div style="font-size:3.5rem;color:#0B7A3E;margin-bottom:14px;"><i class="fa-solid fa-seedling"></i></div>
+            <h2 style="font-size:1.4rem;font-weight:800;color:#0F172A;margin-bottom:10px;">Aarogyam India</h2>
+            <div style="background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:12px;padding:16px;margin-bottom:20px;color:#92400E;font-size:0.92rem;line-height:1.6;font-weight:600;">
+              ⚠️ यह लैंडिंग पेज सेवा रखरखाव (System Maintenance) के अंतर्गत अस्थायी रूप से बंद है।
+            </div>
+            <p style="font-size:0.88rem;color:#64748B;line-height:1.6;margin-bottom:24px;">
+              हमारी मुख्य वेबसाइट, ई-बुक्स लाइब्रेरी एवं अन्य सेवाएं सामान्य रूप से सक्रिय हैं।
+            </p>
+            <a href="/index.html" class="pub-btn-cta" style="background:#0B7A3E;color:#fff;display:inline-flex;width:auto;padding:12px 28px;text-decoration:none;border-radius:10px;font-weight:700;gap:8px;align-items:center;margin:0 auto;">
+              <i class="fa-solid fa-house"></i> मुख्य वेबसाइट पर जाएं
+            </a>
+          </div>
+        `;
+        return;
+      }
+
       const urlParams = new URLSearchParams(window.location.search);
       const lpId = urlParams.get('id') || 'LP000001';
       const shareId = urlParams.get('share_id') || urlParams.get('ref') || '';

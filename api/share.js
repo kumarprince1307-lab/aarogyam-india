@@ -171,12 +171,37 @@ function isBotScraper(userAgent) {
   return CRAWLER_USER_AGENTS.test(userAgent);
 }
 
+// Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
+const LANDING_PAGES_ENABLED = false;
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  // 1. If Landing Pages are temporarily OFF, immediately serve lightweight fallback metadata with ZERO DB query
+  if (!LANDING_PAGES_ENABLED) {
+    const userAgent = req.headers['user-agent'] || '';
+    const isBot = isBotScraper(userAgent);
+
+    if (isBot) {
+      const fallbackHtml = generateCrawlerMetaHtml({
+        title: 'Aarogyam India — उन्नत कृषि एवं स्वास्थ्य समाधान',
+        description: 'Aarogyam India के साथ जुड़ें और प्रामाणिक जैविक कृषि व स्वास्थ्य परामर्श प्राप्त करें।',
+        imageUrl: DEFAULT_FALLBACK_IMAGE,
+        canonicalUrl: 'https://aarogyamindia.online/index.html',
+        isWebinar: false
+      });
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400');
+      return res.status(200).send(fallbackHtml);
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400');
+      return res.redirect(302, '/index.html');
+    }
   }
 
   const query = req.query || {};

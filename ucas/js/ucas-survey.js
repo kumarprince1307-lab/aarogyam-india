@@ -524,23 +524,6 @@
     return userSurveysList;
   }
 
-  function renderSurveysTable(surveys) {
-    const tbody = document.getElementById('ucas-survey-history-body');
-    const countEl = document.getElementById('ucas-survey-history-count');
-    if (countEl) countEl.textContent = surveys.length;
-    if (!tbody) return;
-
-    if (surveys.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">
-            📝 अभी तक कोई सर्वे रिकॉर्ड नहीं है। ऊपर दिए गए फॉर्म से पहला सर्वे जोड़ें।
-          </td>
-        </tr>
-      `;
-      return;
-    }
-
   const CATEGORY_NAMES_MAP = {
     agriculture: { name: 'कृषि (Agriculture)', icon: '🌾', color: '#15803D', bg: '#DCFCE7' },
     healthcare: { name: 'स्वास्थ्य (Healthcare)', icon: '❤️', color: '#B91C1C', bg: '#FEE2E2' },

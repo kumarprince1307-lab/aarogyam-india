@@ -58,8 +58,26 @@
   function isUserActiveSubscriber() {
     try {
       if (localStorage.getItem('user_is_subscriber') === 'true') return true;
+      if (localStorage.getItem('user_status') === 'active') return true;
+      if (localStorage.getItem('aim_user_status') === 'active') return true;
+      if (localStorage.getItem('AI_LOGIN_STATUS') === 'ACTIVE') return true;
+
       const user = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-      if (user.is_subscriber) return true;
+      if (user.is_subscriber || user.is_active || user.status === 'active') return true;
+
+      const ucasUser = JSON.parse(localStorage.getItem('UCAS_USER') || '{}');
+      if (ucasUser.is_subscriber || ucasUser.is_active || ucasUser.status === 'active') return true;
+
+      if (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function') {
+        const sessUser = window.V1_SESSION.getCurrentUser();
+        if (sessUser && (sessUser.is_active || sessUser.is_subscriber || sessUser.status === 'active')) return true;
+      }
+
+      if (window.UCAS_SESSION && typeof window.UCAS_SESSION.getUser === 'function') {
+        const ucasSess = window.UCAS_SESSION.getUser();
+        if (ucasSess && (ucasSess.is_active || ucasSess.is_subscriber || ucasSess.status === 'active')) return true;
+      }
+
       const purchased = getUserPurchasedBookIds();
       if (purchased.has('SUB001') || purchased.has('SUBSCRIPTION')) return true;
     } catch (e) {}
@@ -359,20 +377,14 @@
   // Initialize
   document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname.toLowerCase();
-    if (path.includes('admin') || path.includes('checkout') || path.includes('payment')) return;
+    if (path.includes('admin') || path.includes('checkout') || path.includes('payment') || path.includes('share')) return;
 
-    if (isUserLoggedIn()) {
-      // For Logged-in user: Show VIP Subscriber offer modal after 2.5 seconds if unpurchased
-      setTimeout(checkAndShowSubscriberModal, 2500);
-      // Show unpurchased book toast after 8 seconds
-      setTimeout(showPromoToast, 8000);
-    } else {
-      // For Guest user: Show unpurchased book promo toast after 10 seconds
-      setTimeout(showPromoToast, 10000);
-    }
-
-    // Recurring rotation every 60 seconds
-    setInterval(showPromoToast, 60000);
+    // Show promo toast strictly once 10 seconds after page load for non-subscribers
+    setTimeout(() => {
+      if (!isUserActiveSubscriber()) {
+        showPromoToast();
+      }
+    }, 10000);
   });
 
 })();

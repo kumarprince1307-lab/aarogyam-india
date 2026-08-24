@@ -420,8 +420,8 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         <!-- Stats Counter Row -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1; text-align: center;">
             <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <span style="display: block; font-size: 0.75rem; color: #64748b;">📖 Read Free</span>
-                <strong style="font-size: 1rem; color: #0284c7;">1</strong>
+                <span style="display: block; font-size: 0.75rem; color: #64748b;">📖 Read Demo</span>
+                <strong id="kpiDemoCount" style="font-size: 1rem; color: #0284c7;">0</strong>
             </div>
             <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <span style="display: block; font-size: 0.75rem; color: #64748b;">📚 Purchased</span>
@@ -429,11 +429,11 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
             </div>
             <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <span style="display: block; font-size: 0.75rem; color: #64748b;">🎁 Bonus</span>
-                <strong style="font-size: 1rem; color: #d97706;">2</strong>
+                <strong id="kpiBonusCount" style="font-size: 1rem; color: #d97706;">0</strong>
             </div>
             <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <span style="display: block; font-size: 0.75rem; color: #64748b;">❤️ Wishlist</span>
-                <strong style="font-size: 1rem; color: #e11d48;">0</strong>
+                <strong id="kpiWishlistCount" style="font-size: 1rem; color: #e11d48;">0</strong>
             </div>
         </div>
 
@@ -498,27 +498,27 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <!-- Section 3: Bonus Books -->
+        <!-- Section 3: Bonus Books (Appears when books have bonus or after purchase) -->
         <div id="section-bonus" class="book-section" style="display: none;">
-            <div class="section-title"><span>फ्री बोनस पुस्तकें</span></div>
-            <div class="book-grid-2col">
-                <p style="font-size: 0.85rem; color: #666; grid-column: span 2; text-align: center; padding: 30px; background: #fff; border-radius: 8px; border: 1px dashed #cbd5e1;">Bonus books will appear after purchase.</p>
+            <div class="section-title"><span>🎁 फ्री बोनस पुस्तकें व सामग्री (Bonus Books)</span></div>
+            <div class="book-grid-2col" id="bonusBooksGrid">
+                <!-- Dynamically loaded via JS -->
             </div>
         </div>
 
         <!-- Section 4: Demo Books -->
         <div id="section-demo" class="book-section" style="display: none;">
-            <div class="section-title"><span>डेमो ई-बुक्स प्रिव्यू</span></div>
-            <div class="book-grid-2col">
-                <p style="font-size: 0.85rem; color: #666; grid-column: span 2; text-align: center; padding: 30px; background: #fff; border-radius: 8px; border: 1px dashed #cbd5e1;">Demo books will appear here.</p>
+            <div class="section-title"><span>📖 डेमो ई-बुक्स प्रिव्यू (Read Free Demo)</span></div>
+            <div class="book-grid-2col" id="demoBooksGrid">
+                <!-- Dynamically loaded via JS -->
             </div>
         </div>
 
-        <!-- Section 5: Coming Soon Books (No Buy Now Rule Applied) -->
+        <!-- Section 5: Coming Soon Books -->
         <div id="section-coming" class="book-section" style="display: none;">
             <div class="section-title"><span>आने वाली प्रीमियम बुक्स (Coming Soon & Wishlist)</span></div>
             <div class="book-grid-2col" id="comingSoonGrid">
-                <!-- Dynamically loaded via JS: Coming Soon Badge, Notify Me, Wishlist, Preview Image -->
+                <!-- Dynamically loaded via JS -->
             </div>
         </div>
 

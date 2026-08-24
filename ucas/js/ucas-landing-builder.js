@@ -55,7 +55,28 @@
     }
   }
 
+  // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
+  const LANDING_PAGES_ENABLED = false;
+
   function initLandingBuilder() {
+    if (!LANDING_PAGES_ENABLED) {
+      const cardMain = document.getElementById('lp_builder_card_main');
+      if (cardMain) {
+        cardMain.innerHTML = `
+          <div style="padding:1.75rem;text-align:center;background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:12px;margin-top:10px;">
+            <div style="font-size:2rem;color:#D97706;margin-bottom:8px;">⚙️</div>
+            <h3 style="font-size:1.05rem;font-weight:800;color:#92400E;margin-bottom:6px;">
+              लैंडिंग पेज बिल्डर सेवा अस्थायी रखरखाव में है (Maintenance Mode)
+            </h3>
+            <p style="font-size:0.85rem;color:#78350F;margin:0 auto;max-width:480px;line-height:1.5;">
+              सिस्टम अपग्रेड के कारण नए कस्टम लैंडिंग पेज बनाने की सुविधा अस्थायी रूप से रोकी गई है। आपका पूर्व डेटा सुरक्षित है।
+            </p>
+          </div>
+        `;
+      }
+      return;
+    }
+
     populateLandingCategories();
     bindBuilderEvents();
     loadMyLandingPages();

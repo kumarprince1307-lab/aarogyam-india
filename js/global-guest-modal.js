@@ -98,41 +98,49 @@
             ✨ मुफ़्त रजिस्टर करके अपनी <strong>डिजिटल ई-बुक्स, My Profile व UCAS Marketing Tools</strong> का उपयोग करें।
           </div>
 
-          <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;">
             <a href="/registration.html" style="
               display: flex;
+              flex-direction: column;
               align-items: center;
               justify-content: center;
-              gap: 8px;
+              gap: 6px;
               background: #059669;
               color: #ffffff;
-              padding: 13px 16px;
-              border-radius: 10px;
+              padding: 12px 10px;
+              border-radius: 12px;
               font-weight: 800;
-              font-size: 0.96rem;
+              font-size: 0.88rem;
               text-decoration: none;
               box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
               transition: all 0.2s;
+              text-align: center;
             ">
-              <span>👤</span> <span>मुफ़्त रजिस्ट्रेशन करें (Free Sign Up)</span>
+              <span style="font-size: 1.3rem;">👤</span>
+              <span>रजिस्ट्रेशन करें<br><small style="font-weight:600;font-size:0.75rem;opacity:0.9;">(New User)</small></span>
             </a>
 
-            <a href="/registration.html?mode=login" style="
+            <a href="/registration.html?mode=login" id="ai-btn-guest-login-action" style="
               display: flex;
+              flex-direction: column;
               align-items: center;
               justify-content: center;
-              gap: 8px;
-              background: #ffffff;
-              color: #0f172a;
-              padding: 11px 16px;
-              border-radius: 10px;
-              font-weight: 700;
-              font-size: 0.92rem;
+              gap: 6px;
+              background: #1E40AF;
+              color: #ffffff;
+              padding: 12px 10px;
+              border-radius: 12px;
+              font-weight: 800;
+              font-size: 0.88rem;
               text-decoration: none;
-              border: 1.5px solid #cbd5e1;
+              box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
               transition: all 0.2s;
+              text-align: center;
+              border: none;
+              cursor: pointer;
             ">
-              <span>🔑</span> <span>लॉगिन करें (Existing User Login)</span>
+              <span style="font-size: 1.3rem;">🔑</span>
+              <span>लॉगिन करें<br><small style="font-weight:600;font-size:0.75rem;opacity:0.9;">(Existing User)</small></span>
             </a>
           </div>
 
@@ -161,6 +169,7 @@
     // Event listeners
     const closeBtn = document.getElementById('ai-btn-close-guest-modal');
     const guestBtn = document.getElementById('ai-btn-continue-guest');
+    const loginActionBtn = document.getElementById('ai-btn-guest-login-action');
 
     function dismissModal() {
       try {
@@ -168,6 +177,21 @@
       } catch (e) {}
       window.closeGuestLoginModal();
     }
+
+    loginActionBtn?.addEventListener('click', (e) => {
+      const universalModal = document.getElementById('universalLoginModal');
+      if (universalModal) {
+        e.preventDefault();
+        dismissModal();
+        universalModal.style.display = 'flex';
+        const mobileInp = document.getElementById('universalLoginMobile');
+        if (mobileInp) mobileInp.focus();
+      } else if (typeof window.openLoginModal === 'function') {
+        e.preventDefault();
+        dismissModal();
+        window.openLoginModal(e);
+      }
+    });
 
     closeBtn?.addEventListener('click', dismissModal);
     guestBtn?.addEventListener('click', dismissModal);

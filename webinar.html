@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aarogyam India — लाइव ज़ूम वेबिनार रजिस्ट्रेशन</title>
+  
+  <!-- SEO & Social Meta (Text & Standard Logo only, Zero Base64) -->
+  <meta name="description" content="Aarogyam India लाइव ज़ूम वेबिनार में भाग लेने के लिए अपना रजिस्ट्रेशन पूरा करें और ज़ूम लिंक प्राप्त करें।">
+  <meta property="og:title" id="og_title" content="🎥 Aarogyam India लाइव ज़ूम वेबिनार">
+  <meta property="og:description" id="og_desc" content="लाइव वेबिनार में भाग लेने के लिए रजिस्ट्रेशन करें और सीधे ज़ूम से जुड़ें।">
+  <meta property="og:image" content="https://aarogyamindia.online/images/logo/logo.png">
+  <meta property="og:type" content="website">
+
+  <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #0B7A3E;
+      --primary-dark: #065028;
+      --primary-light: #159E52;
+      --zoom-blue: #2D8CFF;
+      --zoom-dark: #0E71EB;
+      --bg-page: #0F172A;
+      --bg-card: #1E293B;
+      --bg-subtle: #334155;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border: #334155;
+      --accent-gold: #F59E0B;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background-image: radial-gradient(circle at 50% 0%, #1e3a8a 0%, #0f172a 75%);
+    }
+
+    .wb-container {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .wb-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wb-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0B7A3E, #2D8CFF, #F59E0B);
+    }
+
+    .wb-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .wb-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(45, 140, 255, 0.15);
+      color: #60A5FA;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      border: 1px solid rgba(45, 140, 255, 0.3);
+    }
+
+    .wb-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
+    .wb-datetime-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      color: #FCD34D;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .wb-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    /* Form Styles */
+    .wb-form-group {
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .wb-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #CBD5E1;
+      margin-bottom: 6px;
+    }
+
+    .wb-input, .wb-select {
+      width: 100%;
+      background: #0F172A;
+      border: 1.5px solid #334155;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: #FFFFFF;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .wb-input:focus, .wb-select:focus {
+      border-color: var(--zoom-blue);
+      box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.2);
+    }
+
+    .wb-btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #0B7A3E 0%, #159E52 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(11, 122, 62, 0.4);
+      transition: all 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .wb-btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(11, 122, 62, 0.5);
+    }
+
+    .wb-btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Unlocked Screen Styles */
+    #wb_unlocked_screen {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .wb-success-badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1.5px solid #10B981;
+      color: #34D399;
+      padding: 12px 16px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .wb-zoom-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #2D8CFF 0%, #0E71EB 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 8px 25px rgba(45, 140, 255, 0.45);
+      margin-bottom: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .wb-zoom-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(45, 140, 255, 0.6);
+    }
+
+    .wb-detail-box {
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .wb-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .wb-detail-row:not(:last-child) {
+      border-bottom: 1px solid #1E293B;
+    }
+
+    .wb-detail-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .wb-detail-val {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .wb-copy-btn {
+      background: #334155;
+      color: #CBD5E1;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .wb-copy-btn:hover {
+      background: #475569;
+      color: #FFFFFF;
+    }
+
+    .wb-wa-share-btn {
+      width: 100%;
+      background: #25D366;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    }
+
+    .wb-footer {
+      text-align: center;
+      font-size: 0.76rem;
+      color: #64748B;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wb-container">
+    <div class="wb-card">
+
+      <!-- Header Section -->
+      <div class="wb-header">
+        <div class="wb-badge">
+          <i class="fa-solid fa-video"></i> Aarogyam India Live Zoom Session
+        </div>
+        <h1 class="wb-title" id="wb_display_title">🌾 आधुनिक कृषि एवं फसल सुरक्षा लाइव वेबिनार</h1>
+        <div class="wb-datetime-pill">
+          <i class="fa-regular fa-calendar-check"></i>
+          <span id="wb_display_datetime">25 अगस्त 2026, सायं 07:00 बजे</span>
+        </div>
+        <p class="wb-desc" id="wb_display_desc">
+          इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें। रजिस्ट्रेशन के तुरंत बाद Zoom लिंक और पासवर्ड मिल जाएगा।
+        </p>
+      </div>
+
+      <!-- Step 1: Attendee Registration Form -->
+      <div id="wb_form_screen">
+        <form id="wb_survey_form">
+          <div class="wb-form-group">
+            <label class="wb-label">1. आपका पूरा नाम (Full Name): *</label>
+            <input type="text" id="wb_user_name" class="wb-input" placeholder="उदा. राहुल शर्मा या राजेश पटेल" required>
+          </div>
+
+          <div class="wb-form-group">
+            <label class="wb-label">2. व्हाट्सएप मोबाइल नंबर (WhatsApp Number): *</label>
+            <input type="tel" id="wb_user_mobile" class="wb-input" placeholder="उदा. 9876543210" maxlength="10" pattern="[0-9]{10}" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="wb-form-group">
+              <label class="wb-label">3. राज्य (State):</label>
+              <input type="text" id="wb_user_state" class="wb-input" placeholder="उदा. मध्य प्रदेश / राजस्थान">
+            </div>
+            <div class="wb-form-group">
+              <label class="wb-label">4. जिला / गाँव (District):</label>
+              <input type="text" id="wb_user_district" class="wb-input" placeholder="उदा. इंदौर या उज्जैन">
+            </div>
+          </div>
+
+          <div class="wb-form-group">
+            <label class="wb-label">5. व्यवसाय (Occupation):</label>
+            <select id="wb_user_occupation" class="wb-select">
+              <option value="farmer">🌾 किसान भाई (Farmer)</option>
+              <option value="student">🎓 छात्र (Student)</option>
+              <option value="business">💼 व्यापारी / उद्यमी (Business)</option>
+              <option value="job">👔 नौकरीपेशा (Job / Service)</option>
+              <option value="other">📦 अन्य (Other)</option>
+            </select>
+          </div>
+
+          <button type="submit" id="wb_btn_submit" class="wb-btn-submit">
+            <span>🚀 रजिस्ट्रेशन करें और Zoom लिंक देखें</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- Step 2: Unlocked Zoom Details Screen -->
+      <div id="wb_unlocked_screen">
+        <div class="wb-success-badge">
+          <i class="fa-solid fa-circle-check" style="font-size: 1.2rem;"></i>
+          <span>🎉 आपकी उपस्थिति (Attendance) दर्ज हो गई है!</span>
+        </div>
+
+        <!-- Big Join Button -->
+        <a id="wb_zoom_join_btn" href="#" target="_blank" class="wb-zoom-btn">
+          <i class="fa-solid fa-video"></i>
+          <span>Join Zoom Meeting Now</span>
+        </a>
+
+        <!-- Meeting ID & Passcode Card -->
+        <div class="wb-detail-box">
+          <div class="wb-detail-row">
+            <span class="wb-detail-label">🆔 Meeting ID:</span>
+            <div class="wb-detail-val">
+              <span id="wb_val_meeting_id">823 4567 8901</span>
+              <button type="button" class="wb-copy-btn" id="btn_copy_mid">📋 Copy</button>
+            </div>
+          </div>
+          <div class="wb-detail-row">
+            <span class="wb-detail-label">🔑 Passcode / Password:</span>
+            <div class="wb-detail-val">
+              <span id="wb_val_passcode" style="color: #34D399;">123456</span>
+              <button type="button" class="wb-copy-btn" id="btn_copy_pwd">📋 Copy</button>
+            </div>
+          </div>
+          <div class="wb-detail-row">
+            <span class="wb-detail-label">📅 दिनांक व समय:</span>
+            <div class="wb-detail-val" style="font-size: 0.88rem; color: #FCD34D;">
+              <span id="wb_val_datetime">आज का लाइव सत्र</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Share Button -->
+        <a id="wb_wa_save_btn" href="#" target="_blank" class="wb-wa-share-btn">
+          <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i>
+          <span>व्हाट्सएप पर विवरण सुरक्षित करें (Save to WhatsApp)</span>
+        </a>
+      </div>
+
+      <div class="wb-footer">
+        © 2026 Aarogyam India • सुरक्षित व अधिकृत ज़ूम वेबिनार
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN (Official) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      let db = null;
+      try {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+      } catch (e) {}
+
+      // URL Query Parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const webinarId = urlParams.get('id') || 'WB0001';
+      const refShareId = urlParams.get('ref') || urlParams.get('share_id') || 'AI000004';
+      const customTitle = urlParams.get('title');
+      const customDatetime = urlParams.get('dt') || urlParams.get('datetime');
+      const customZoom = urlParams.get('zoom') || urlParams.get('link');
+      const customMid = urlParams.get('mid') || urlParams.get('meeting_id');
+      const customPwd = urlParams.get('pwd') || urlParams.get('passcode');
+      const customDesc = urlParams.get('desc') || urlParams.get('msg');
+
+      // Webinar State
+      let webinarData = {
+        id: webinarId,
+        title: customTitle || '🌾 आधुनिक जैविक कृषि एवं फसल सुरक्षा लाइव वेबिनार',
+        datetime: customDatetime || '25 अगस्त 2026, सायं 07:00 बजे',
+        zoom_link: customZoom || 'https://zoom.us/join',
+        meeting_id: customMid || '823 4567 8901',
+        passcode: customPwd || '123456',
+        desc: customDesc || 'इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें। रजिस्ट्रेशन के तुरंत बाद Zoom लिंक और पासवर्ड मिल जाएगा।'
+      };
+
+      // Load DB Details if webinar ID provided (Text only, lightweight ~0.2 KB)
+      async function loadWebinarConfig() {
+        if (db && webinarId && webinarId !== 'WB0001') {
+          try {
+            const { data, error } = await db
+              .from('landing_pages')
+              .select('id, title, message, webinar_data')
+              .eq('id', webinarId)
+              .maybeSingle();
+
+            if (!error && data) {
+              const wData = data.webinar_data || {};
+              webinarData.title = data.title || webinarData.title;
+              webinarData.desc = data.message || webinarData.desc;
+              if (wData.zoom_link) webinarData.zoom_link = wData.zoom_link;
+              if (wData.meeting_id) webinarData.meeting_id = wData.meeting_id;
+              if (wData.passcode) webinarData.passcode = wData.passcode;
+              if (wData.datetime) webinarData.datetime = wData.datetime;
+            }
+          } catch (e) {
+            console.warn('Webinar config load notice:', e);
+          }
+        }
+
+        renderHeaderDetails();
+      }
+
+      function renderHeaderDetails() {
+        const titleEl = document.getElementById('wb_display_title');
+        const dtEl = document.getElementById('wb_display_datetime');
+        const descEl = document.getElementById('wb_display_desc');
+
+        if (titleEl) titleEl.textContent = webinarData.title;
+        if (dtEl) dtEl.textContent = webinarData.datetime;
+        if (descEl) descEl.textContent = webinarData.desc;
+        document.title = `${webinarData.title} — Aarogyam India`;
+      }
+
+      // Check if user already registered in this session/browser
+      const isAlreadyRegistered = Boolean(sessionStorage.getItem(`wb_reg_${webinarId}`) || localStorage.getItem(`wb_reg_${webinarId}`));
+      if (isAlreadyRegistered) {
+        showUnlockedDetails();
+      }
+
+      // Handle Attendee Form Submit
+      const form = document.getElementById('wb_survey_form');
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('wb_btn_submit');
+        const name = (document.getElementById('wb_user_name')?.value || '').trim();
+        const mobile = (document.getElementById('wb_user_mobile')?.value || '').trim();
+        const state = (document.getElementById('wb_user_state')?.value || '').trim();
+        const district = (document.getElementById('wb_user_district')?.value || '').trim();
+        const occupation = (document.getElementById('wb_user_occupation')?.value || 'farmer').trim();
+
+        if (!name || mobile.length !== 10) {
+          alert('कृपया 10 अंकों का मान्य मोबाइल नंबर और नाम दर्ज करें।');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>⏳ उपस्थिति दर्ज हो रही है...</span>';
+
+        const attendeePayload = {
+          profile_id: refShareId !== 'AI000004' ? refShareId : null,
+          name: name,
+          mobile: mobile,
+          state: state || 'Not Specified',
+          district: district || 'Not Specified',
+          village: district || 'Not Specified',
+          occupation: occupation,
+          category_answers: {
+            webinar_id: webinarData.id,
+            webinar_title: webinarData.title,
+            event_type: 'webinar_attendance',
+            registered_at: new Date().toISOString()
+          },
+          created_at: new Date().toISOString()
+        };
+
+        // 1. Record Attendance to Supabase surveys table
+        try {
+          if (db) {
+            await db.from('surveys').insert([attendeePayload]);
+          }
+        } catch (err) {
+          console.warn('Attendance DB sync notice:', err);
+        }
+
+        // 2. Mark locally as registered
+        sessionStorage.setItem(`wb_reg_${webinarId}`, 'true');
+        localStorage.setItem(`wb_reg_${webinarId}`, 'true');
+        localStorage.setItem('aim_user_name', name);
+        localStorage.setItem('aim_user_mobile', mobile);
+
+        showUnlockedDetails();
+      });
+
+      function showUnlockedDetails() {
+        const formScreen = document.getElementById('wb_form_screen');
+        const unlockedScreen = document.getElementById('wb_unlocked_screen');
+
+        if (formScreen) formScreen.style.display = 'none';
+        if (unlockedScreen) unlockedScreen.style.display = 'block';
+
+        // Populate Zoom Details
+        const joinBtn = document.getElementById('wb_zoom_join_btn');
+        const midEl = document.getElementById('wb_val_meeting_id');
+        const pwdEl = document.getElementById('wb_val_passcode');
+        const dtValEl = document.getElementById('wb_val_datetime');
+
+        if (joinBtn) joinBtn.href = webinarData.zoom_link;
+        if (midEl) midEl.textContent = webinarData.meeting_id;
+        if (pwdEl) pwdEl.textContent = webinarData.passcode;
+        if (dtValEl) dtValEl.textContent = webinarData.datetime;
+
+        // WhatsApp Share Generator
+        const inviteText = `🎥 *${webinarData.title}*\n\n📅 दिनांक व समय: ${webinarData.datetime}\n\n👉 *Zoom मीटिंग लिंक:* ${webinarData.zoom_link}\n🆔 *Meeting ID:* ${webinarData.meeting_id}\n🔑 *Passcode:* ${webinarData.passcode}\n\nसादर,\nAarogyam India`;
+        const waBtn = document.getElementById('wb_wa_save_btn');
+        if (waBtn) {
+          waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(inviteText)}`;
+        }
+
+        // Copy Event Handlers
+        document.getElementById('btn_copy_mid')?.addEventListener('click', () => {
+          if (navigator.clipboard) navigator.clipboard.writeText(webinarData.meeting_id);
+          alert('Meeting ID कॉपी हो गई: ' + webinarData.meeting_id);
+        });
+
+        document.getElementById('btn_copy_pwd')?.addEventListener('click', () => {
+          if (navigator.clipboard) navigator.clipboard.writeText(webinarData.passcode);
+          alert('Passcode कॉपी हो गया: ' + webinarData.passcode);
+        });
+      }
+
+      loadWebinarConfig();
+    })();
+  </script>
+</body>
+</html>

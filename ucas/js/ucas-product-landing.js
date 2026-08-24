@@ -14,6 +14,7 @@
   let productPages = [];
   let editingProductId = null;
   let previewProductImageBase64 = '';
+  const LANDING_PAGES_ENABLED = false;
 
   function getLandingCategories() {
     try {
@@ -47,7 +48,9 @@
   function init() {
     populateProductCategories();
     bindFormEvents();
-    loadProductLandingPages();
+    if (LANDING_PAGES_ENABLED) {
+      loadProductLandingPages();
+    }
   }
 
   function bindFormEvents() {
@@ -146,6 +149,12 @@
     }
     const shareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
     const client = window.UCAS_DB?.getDb();
+
+    // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
+    const LANDING_PAGES_ENABLED = false;
+    if (!LANDING_PAGES_ENABLED) {
+      return [];
+    }
 
     let fetched = [];
 

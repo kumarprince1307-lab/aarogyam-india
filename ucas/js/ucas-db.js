@@ -40,7 +40,7 @@
     try {
       let query = client
         .from('surveys')
-        .select('*')
+        .select('id, profile_id, name, mobile, age, sex, state, district, area, village, occupation, selected_categories, category_answers, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (profileId) {
@@ -104,7 +104,7 @@
     try {
       let query = client
         .from('phonebook')
-        .select('*')
+        .select('id, profile_id, name, mobile, place, source, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (profileId) {
@@ -273,10 +273,19 @@
     }
   }
 
+  const _referralsCache = new Map();
+  const REF_CACHE_TTL = 30000; // 30 seconds cache to prevent repeated database hits
+
   async function getDirectReferralsWithPurchases(referrerId, referralCode, startDate, endDate) {
     const client = getDb();
     if (!client) {
       return { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 } };
+    }
+
+    const cacheKey = `${referrerId || ''}_${referralCode || ''}_${startDate || ''}_${endDate || ''}`;
+    const cached = _referralsCache.get(cacheKey);
+    if (cached && (Date.now() - cached.time < REF_CACHE_TTL)) {
+      return { success: true, data: cached.data };
     }
 
     try {
@@ -303,11 +312,17 @@
 
       // 2. Fetch all registered referred members from profiles table
       let userList = [];
+      const lookupCode = referralCode || referrerId || 'AI000004';
       try {
         let query = client
           .from('profiles')
-          .select('id, full_name, mobile, email, created_at, State, district, referral_code, registration_source, is_active, share_id, referred_by')
-          .eq('referred_by', targetProfileId);
+          .select('id, full_name, mobile, email, created_at, State, district, referral_code, registration_source, is_active, share_id, referred_by');
+
+        if (targetProfileId) {
+          query = query.eq('referred_by', targetProfileId);
+        } else {
+          query = query.eq('referral_code', lookupCode);
+        }
 
         if (startDate) {
           query = query.gte('created_at', new Date(startDate).toISOString());
@@ -330,56 +345,73 @@
         console.warn('Referred profiles query error:', err);
       }
 
+      // Fallback to referral_code if referred_by returned 0
+      if (userList.length === 0 && lookupCode) {
+        try {
+          let altQuery = client
+            .from('profiles')
+            .select('id, full_name, mobile, email, created_at, State, district, referral_code, registration_source, is_active, share_id, referred_by')
+            .eq('referral_code', lookupCode)
+            .order('created_at', { ascending: false });
+          const { data: altUsers } = await altQuery;
+          if (Array.isArray(altUsers) && altUsers.length > 0) {
+            userList = altUsers;
+          }
+        } catch (e) {}
+      }
+
       if (userList.length === 0) {
         return {
           success: true,
-          data: {
-            referrals: [],
-            totalReferrals: 0,
-            totalPurchaseAmount: 0
-          }
+          data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 }
         };
       }
 
-      // 3. Fetch purchases for these referred users
-      const profileIds = userList.map(u => u.id);
+      // 3. Fetch purchases for these referred users in safe batches of 30
+      const profileIds = userList.map(u => u.id).filter(Boolean);
       const userPurchasesMap = {};
       let totalAmount = 0;
 
-      try {
-        let purchaseQuery = client
-          .from('purchases')
-          .select('id, profile_id, book_id, amount, payment_status, purchase_date, created_at')
-          .in('profile_id', profileIds)
-          .eq('payment_status', 'success');
+      if (profileIds.length > 0) {
+        try {
+          const chunkSize = 30;
+          for (let i = 0; i < profileIds.length; i += chunkSize) {
+            const chunk = profileIds.slice(i, i + chunkSize);
+            let purchaseQuery = client
+              .from('purchases')
+              .select('id, profile_id, book_id, amount, payment_status, purchase_date, created_at')
+              .in('profile_id', chunk)
+              .eq('payment_status', 'success');
 
-        if (startDate) {
-          purchaseQuery = purchaseQuery.gte('created_at', new Date(startDate).toISOString());
-        }
-        if (endDate) {
-          const endD = new Date(endDate);
-          endD.setHours(23, 59, 59, 999);
-          purchaseQuery = purchaseQuery.lte('created_at', endD.toISOString());
-        }
+            if (startDate) {
+              purchaseQuery = purchaseQuery.gte('created_at', new Date(startDate).toISOString());
+            }
+            if (endDate) {
+              const endD = new Date(endDate);
+              endD.setHours(23, 59, 59, 999);
+              purchaseQuery = purchaseQuery.lte('created_at', endD.toISOString());
+            }
 
-        const { data: purchases, error: purErr } = await purchaseQuery;
-        const purchasesList = purchases || [];
+            const { data: purchases, error: purErr } = await purchaseQuery;
+            const purchasesList = purchases || [];
 
-        purchasesList.forEach(p => {
-          const amt = parseFloat(p.amount) || 0;
-          totalAmount += amt;
-          if (!userPurchasesMap[p.profile_id]) {
-            userPurchasesMap[p.profile_id] = { count: 0, totalSpent: 0, purchases: [] };
+            purchasesList.forEach(p => {
+              const amt = parseFloat(p.amount) || 0;
+              totalAmount += amt;
+              if (!userPurchasesMap[p.profile_id]) {
+                userPurchasesMap[p.profile_id] = { count: 0, totalSpent: 0, purchases: [] };
+              }
+              userPurchasesMap[p.profile_id].count++;
+              userPurchasesMap[p.profile_id].totalSpent += amt;
+              userPurchasesMap[p.profile_id].purchases.push(p);
+            });
           }
-          userPurchasesMap[p.profile_id].count++;
-          userPurchasesMap[p.profile_id].totalSpent += amt;
-          userPurchasesMap[p.profile_id].purchases.push(p);
-        });
-      } catch (purErr) {
-        console.warn('Purchases query notice:', purErr);
+        } catch (purErr) {
+          console.warn('Purchases query notice:', purErr);
+        }
       }
 
-      // 4. Map detailed referral info for all 80+ members
+      // 4. Map detailed referral info for all members
       const detailedReferrals = userList.map(u => {
         const purData = userPurchasesMap[u.id] || { count: 0, totalSpent: 0, purchases: [] };
         const hasPurchases = purData.totalSpent > 0;
@@ -393,13 +425,17 @@
         };
       });
 
+      const finalResult = {
+        referrals: detailedReferrals,
+        totalReferrals: detailedReferrals.length,
+        totalPurchaseAmount: totalAmount
+      };
+
+      _referralsCache.set(cacheKey, { time: Date.now(), data: finalResult });
+
       return {
         success: true,
-        data: {
-          referrals: detailedReferrals,
-          totalReferrals: detailedReferrals.length,
-          totalPurchaseAmount: totalAmount
-        }
+        data: finalResult
       };
     } catch (e) {
       console.error('UCAS DB: getDirectReferralsWithPurchases error', e);
@@ -418,7 +454,14 @@
     _ucasLandingPagesCache.clear();
   }
 
+  // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
+  const LANDING_PAGES_ENABLED = false;
+
   async function getLandingPages(profileId, forceRefresh = false) {
+    if (!LANDING_PAGES_ENABLED) {
+      return { success: true, data: [] };
+    }
+
     const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
     const validId = profileId && isUuid(profileId) ? profileId : '52ef705c-bb45-4137-bee4-a3f8df73b676';
     const shareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
@@ -551,6 +594,10 @@
   }
 
   async function getLandingPageById(landingPageId) {
+    if (!LANDING_PAGES_ENABLED) {
+      return { success: false, data: null, maintenance: true };
+    }
+
     const client = getDb();
     if (!landingPageId) return { success: false, data: null };
 

@@ -66,12 +66,21 @@ function fetchLandingPageFromSupabase(lpId) {
   });
 }
 
+// Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
+const LANDING_PAGES_ENABLED = false;
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  // 1. If Landing Pages are temporarily OFF, immediately serve the fallback banner with ZERO DB query
+  if (!LANDING_PAGES_ENABLED) {
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
+    return res.redirect(302, DEFAULT_FALLBACK_IMAGE);
   }
 
   const { id } = req.query || {};

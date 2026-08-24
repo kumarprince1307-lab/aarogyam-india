@@ -36,13 +36,70 @@ export async function initWebinars() {
         <div>
           <div class="admin-section-title" style="display: flex; align-items: center; gap: 8px;">
             <span>🎥 All Webinars & Live Events Management</span>
-            <span style="font-size: 0.75rem; background: rgba(37,99,235,0.15); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Live Zoom & Attendees Tracking</span>
+            <span style="font-size: 0.75rem; background: rgba(37,99,235,0.15); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Zero-Image Pure Zoom & Survey Gate</span>
           </div>
           <p style="font-size: 0.85rem; color: var(--admin-muted); margin: 0;">
-            Track webinar landing pages, Zoom meeting links, passcodes, and registered attendee leads.
+            ज़ूम मीटिंग लिंक, पासवर्ड और सर्वे फॉर्म के माध्यम से रजिस्टर्ड अटेंडेंट्स (Leads) को ट्रैक करें।
           </p>
         </div>
-        <button id="btn-refresh-webinars" class="admin-button small-button">🔄 Refresh Data</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button id="btn-toggle-create-webinar" class="admin-button" style="background:#2563eb; color:#fff; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+            <span>➕</span> <span>नया ज़ूम वेबिनार बनाएं</span>
+          </button>
+          <button id="btn-refresh-webinars" class="admin-button small-button">🔄 Refresh Data</button>
+        </div>
+      </div>
+
+      <!-- Create Zoom Webinar Form Card (Zero Image, Pure Text) -->
+      <div id="admin-create-webinar-card" class="admin-card" style="display:none; background: #0f172a; border: 1.5px solid #2563eb; border-radius: 14px; padding: 20px; margin-top: 14px; box-shadow: 0 10px 30px rgba(37,99,235,0.2);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #60a5fa; display:flex; align-items:center; gap:8px;">
+            <span>🎥</span> नया ज़ूम वेबिनार तैयार करें (No Image / Fast Zoom Session)
+          </h3>
+          <button type="button" id="btn-close-create-webinar" class="admin-button small-button" style="background:transparent; color:#94a3b8; border:none; font-size:1.2rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <form id="form-admin-create-webinar">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">वेबिनार शीर्षक / Topic: *</label>
+              <input type="text" id="adm_wb_title" class="admin-input" placeholder="उदा. आधुनिक जैविक कृषि एवं कीट नियंत्रण लाइव सत्र" required style="width:100%;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">दिनांक व समय (Date & Time Text): *</label>
+              <input type="text" id="adm_wb_datetime" class="admin-input" placeholder="उदा. 25 अगस्त 2026, सायं 07:00 बजे" required style="width:100%;" />
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">Zoom Meeting Join Link: *</label>
+              <input type="url" id="adm_wb_zoom_link" class="admin-input" placeholder="https://us02web.zoom.us/j/82345678901?pwd=..." required style="width:100%;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">Meeting ID: *</label>
+              <input type="text" id="adm_wb_meeting_id" class="admin-input" placeholder="उदा. 823 4567 8901" required style="width:100%;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">Passcode / Password: *</label>
+              <input type="text" id="adm_wb_passcode" class="admin-input" placeholder="उदा. 123456 या AI2026" required style="width:100%;" />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label class="admin-label" style="font-weight:700; font-size:0.8rem; color:#cbd5e1;">वेबिनार संदेश / विवरण (Description):</label>
+            <textarea id="adm_wb_desc" class="admin-input" rows="2" placeholder="इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें। रजिस्ट्रेशन के तुरंत बाद Zoom लिंक और पासवर्ड मिल जाएगा।" style="width:100%;"></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px;">
+            <div style="font-size:0.82rem; color:#94a3b8;">
+              ℹ️ <strong>Zero Media Egress:</strong> कोई इमेज अपलोड नहीं होगी। केवल हल्का ज़ूम टेक्स्ट डेटाबेस में जाएगा।
+            </div>
+            <button type="submit" id="btn-submit-webinar" class="admin-button" style="background:#10b981; color:#fff; font-weight:800; padding:10px 20px; font-size:0.92rem;">
+              🚀 ज़ूम वेबिनार प्रकाशित करें (Publish Webinar)
+            </button>
+          </div>
+        </form>
       </div>
 
       <!-- KPI Summary Cards -->
@@ -112,6 +169,87 @@ export async function initWebinars() {
   const userFilter = document.getElementById('webinar-user-filter');
   const dateDropdown = document.getElementById('webinar-date-dropdown');
   const refreshBtn = document.getElementById('btn-refresh-webinars');
+
+  const btnToggleCreate = document.getElementById('btn-toggle-create-webinar');
+  const btnCloseCreate = document.getElementById('btn-close-create-webinar');
+  const createCard = document.getElementById('admin-create-webinar-card');
+  const formCreateWebinar = document.getElementById('form-admin-create-webinar');
+
+  btnToggleCreate?.addEventListener('click', () => {
+    if (createCard) createCard.style.display = createCard.style.display === 'none' ? 'block' : 'none';
+  });
+
+  btnCloseCreate?.addEventListener('click', () => {
+    if (createCard) createCard.style.display = 'none';
+  });
+
+  formCreateWebinar?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = (document.getElementById('adm_wb_title')?.value || '').trim();
+    const datetime = (document.getElementById('adm_wb_datetime')?.value || '').trim();
+    const zoomLink = (document.getElementById('adm_wb_zoom_link')?.value || '').trim();
+    const meetingId = (document.getElementById('adm_wb_meeting_id')?.value || '').trim();
+    const passcode = (document.getElementById('adm_wb_passcode')?.value || '').trim();
+    const desc = (document.getElementById('adm_wb_desc')?.value || '').trim();
+    const submitBtn = document.getElementById('btn-submit-webinar');
+
+    if (!title || !zoomLink || !meetingId) {
+      alert('कृपया शीर्षक, ज़ूम लिंक और मीटिंग आईडी अवश्य भरें।');
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ प्रकाशित हो रहा है...';
+    }
+
+    const randomSuffix = Math.floor(100000 + Math.random() * 900000);
+    const newWbId = `WB${randomSuffix}`;
+
+    const newRecord = {
+      id: newWbId,
+      profile_id: 'ALL_USERS',
+      share_id: 'ALL_USERS',
+      title: title,
+      message: desc || 'इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।',
+      category: 'webinar',
+      content_type: 'webinar',
+      status: 'active',
+      webinar_data: {
+        zoom_link: zoomLink,
+        meeting_id: meetingId,
+        passcode: passcode,
+        datetime: datetime
+      },
+      created_at: new Date().toISOString()
+    };
+
+    const db = getAdminDb();
+    try {
+      if (db) {
+        await db.from('landing_pages').insert([newRecord]);
+      }
+    } catch (err) {
+      console.warn('Webinar insert notice:', err);
+    }
+
+    // Save in LocalStorage fallback
+    try {
+      const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
+      stored.unshift(newRecord);
+      localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(stored));
+    } catch (err) {}
+
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '🚀 ज़ूम वेबिनार प्रकाशित करें (Publish Webinar)';
+    }
+
+    if (createCard) createCard.style.display = 'none';
+    formCreateWebinar.reset();
+    alert(`🎉 ज़ूम वेबिनार सफलतापूर्वक प्रकाशित हो गया!\n\nलिंक: https://aarogyamindia.online/webinar.html?id=${newWbId}`);
+    loadWebinarData();
+  });
 
   const tabBtnWebinars = document.getElementById('tab-btn-webinars');
   const tabBtnAttendees = document.getElementById('tab-btn-attendees');
@@ -400,10 +538,10 @@ export async function initWebinars() {
             ${pageItems.map((w, idx) => {
               const rowNum = startIndex + idx + 1;
               const wData = w.webinar_data || {};
-              const attendees = allRegistrations.filter(r => r.category_answers?.landing_page_id === w.id);
+              const attendees = allRegistrations.filter(r => r.category_answers?.webinar_id === w.id || r.category_answers?.landing_page_id === w.id);
               const attendeesCount = attendees.length;
               const dateStr = w.created_at ? new Date(w.created_at).toLocaleDateString('hi-IN') : '-';
-              const publicLpUrl = `/ucas/landing.html?id=${w.id}&share_id=${w.share_id || ''}`;
+              const publicLpUrl = `/webinar.html?id=${encodeURIComponent(w.id)}&ref=${encodeURIComponent(w.share_id || 'ADMIN')}`;
               const creator = allProfiles.find(p => p.id === w.profile_id);
 
               return `
@@ -459,11 +597,14 @@ export async function initWebinars() {
                     </button>
                   </td>
                   <td style="text-align: right;">
-                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                      <a href="${publicLpUrl}" target="_blank" class="admin-button small-button icon-button" title="View Public Landing Page" style="background: var(--admin-surface); color: var(--admin-text); border: 1px solid var(--admin-border);">
-                        👁️
+                    <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+                      <a href="${publicLpUrl}" target="_blank" class="admin-button small-button" style="background: rgba(37,99,235,0.15); color: #3b82f6; border: 1px solid rgba(37,99,235,0.3); font-weight: 700; font-size: 0.75rem; padding: 4px 8px; text-decoration:none;" title="Open Clean Webinar Page">
+                        🔗 खोलें
                       </a>
-                      <button type="button" class="btn-view-attendees admin-button small-button" data-webinar-id="${w.id}" style="background: var(--admin-primary); color: #fff; font-weight: 700; font-size: 0.75rem; padding: 4px 10px;">
+                      <button type="button" class="btn-copy-webinar-link admin-button small-button" data-url="https://aarogyamindia.online${publicLpUrl}" style="background: var(--admin-surface); color: var(--admin-text); border: 1px solid var(--admin-border); font-size:0.75rem; font-weight:700; padding:4px 8px;">
+                        📋 कॉपी
+                      </button>
+                      <button type="button" class="btn-view-attendees admin-button small-button" data-webinar-id="${w.id}" style="background: #10b981; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 4px 10px;">
                         Attendees
                       </button>
                     </div>
@@ -658,6 +799,21 @@ export async function initWebinars() {
         const webinar = allWebinars.find(w => w.id === wId);
         if (!webinar) return;
         openAttendeesDrawer(webinar);
+      });
+    });
+
+    // Copy Webinar Link Click
+    tableContainer.querySelectorAll('.btn-copy-webinar-link').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.dataset.url;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(url);
+          const orig = btn.innerHTML;
+          btn.innerHTML = '✓ कॉपी हुआ!';
+          setTimeout(() => { btn.innerHTML = orig; }, 1800);
+        } else {
+          prompt('लिंक कॉपी करें:', url);
+        }
       });
     });
 

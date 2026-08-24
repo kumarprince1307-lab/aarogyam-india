@@ -217,37 +217,6 @@
       "accessType": "Lifetime"
     },
     {
-      "id": "BK002",
-      "slug": "fasal-ka-doctor",
-      "heading": "फसल का डॉक्टर",
-      "name": "फसल का डॉक्टर",
-      "category": "Agriculture",
-      "language": "Hindi",
-      "author": "Aarogyam India",
-      "version": "1.0",
-      "status": "active",
-      "cover": "/images/books/fasal-ka-doctor-cover.webp",
-      "thumbnail": "/images/books/fasal-ka-doctor-cover.webp",
-      "mrp": 299,
-      "offerPrice": 99,
-      "currency": "INR",
-      "demoImages": [
-        "/images/books/kheti-dr-demo-1.webp",
-        "/images/books/kheti-dr-demo-2.webp",
-        "/images/books/kheti-dr-demo-3.webp",
-        "/images/books/kheti-dr-demo-4.webp",
-        "/images/books/kheti-dr-demo-5.webp"
-      ],
-      "demoAvailable": false,
-      "readEnabled": true,
-      "downloadEnabled": true,
-      "downloadLimit": 3,
-      "mainPdf": "/pdf/full/BK002.pdf",
-      "fileSize": "19.4 MB",
-      "totalPages": 150,
-      "accessType": "Lifetime"
-    },
-    {
       "id": "BK007",
       "slug": "gehu-master-guide",
       "heading": "गेहूं मास्टर गाइड",
@@ -384,30 +353,6 @@
       "mainPdf": "",
       "fileSize": "25.0 MB",
       "accessType": "Lifetime"
-    },
-    {
-      "id": "SUB001",
-      "slug": "subscription",
-      "heading": "Aarogyam Pro VIP Annual Subscription",
-      "shortTitle": "VIP Annual Pass",
-      "name": "Aarogyam Pro VIP Annual Subscription (365 Days Pass)",
-      "title": "Aarogyam Pro VIP Annual Subscription",
-      "category": "Membership",
-      "language": "Hindi",
-      "author": "Aarogyam India",
-      "version": "1.0",
-      "status": "active",
-      "cover": "/images/banners/farmer-community-banner.jpeg",
-      "thumbnail": "/images/banners/farmer-community-banner.jpeg",
-      "landingPage": "/subscription.html",
-      "checkoutPage": "/ebooks/checkout.html",
-      "mrp": 2999,
-      "offerPrice": 999,
-      "currency": "INR",
-      "demoAvailable": false,
-      "readEnabled": true,
-      "downloadEnabled": true,
-      "accessType": "Annual (365 Days)"
     }
   ]
 }

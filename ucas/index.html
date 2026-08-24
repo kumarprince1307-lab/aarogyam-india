@@ -1341,56 +1341,55 @@
               अपने उत्पादों का प्रचार करें, विशेष ऑफर/डिस्काउंट पेज बनाएं और सीधे ग्राहकों से पूछताछ व खरीदारी (Buy Now) प्राप्त करें।
             </p>
           </div>
-          <button type="button" class="ucas-btn" onclick="document.getElementById('prod_lp_creator_card').scrollIntoView({behavior:'smooth'})" style="background:#fff;color:#B45309;font-weight:800;">
-            <i class="fa-solid fa-plus"></i> नया प्रोडक्ट पेज बनाएं
-          </button>
         </div>
       </div>
 
-      <!-- KPI Summary Cards -->
-      <div class="ucas-kpi-grid" style="margin-bottom:1.25rem;">
-        <div class="ucas-kpi-card kpi-orange">
-          <div class="ucas-kpi-icon-wrap" style="background:rgba(245,158,11,0.15);color:#F59E0B;"><i class="fa-solid fa-box-open"></i></div>
-          <div class="ucas-kpi-val" id="ucas-prod-kpi-total">0</div>
-          <div class="ucas-kpi-label">My Product Pages</div>
-        </div>
-        <div class="ucas-kpi-card kpi-blue">
-          <div class="ucas-kpi-icon-wrap" style="background:#DBEAFE;color:#1D4ED8;"><i class="fa-solid fa-users"></i></div>
-          <div class="ucas-kpi-val" id="ucas-prod-kpi-leads">0</div>
-          <div class="ucas-kpi-label">Product Leads / Inquiries</div>
-        </div>
-        <div class="ucas-kpi-card kpi-green">
-          <div class="ucas-kpi-icon-wrap" style="background:#DCFCE7;color:#15803D;"><i class="fa-solid fa-circle-check"></i></div>
-          <div class="ucas-kpi-val" id="ucas-prod-kpi-active">0</div>
-          <div class="ucas-kpi-label">Active Promotions</div>
+      <!-- Prominent Coming Soon Notice Banner -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;background:#FFFBEB;border:2px solid #FCD34D;border-radius:14px;padding:16px 20px;box-shadow:0 4px 15px rgba(245,158,11,0.12);">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <div style="font-size:2.2rem;color:#D97706;flex-shrink:0;">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+          </div>
+          <div style="flex:1;min-width:240px;">
+            <div style="font-size:1.1rem;font-weight:800;color:#92400E;margin-bottom:3px;display:flex;align-items:center;gap:8px;">
+              <span>⚠️ यह सेवा जल्द शुरू होने वाली है (Coming Soon)</span>
+              <span style="font-size:0.75rem;background:#FEF3C7;color:#B45309;padding:2px 8px;border-radius:12px;font-weight:800;border:1px solid #FCD34D;">Under Upgrade</span>
+            </div>
+            <div style="font-size:0.85rem;color:#78350F;line-height:1.45;font-weight:600;">
+              प्रोडक्ट लैंडिंग पेज निर्माण सेवा अपग्रेड के अंतर्गत है। नीचे दिए गए फ़ीचर्स केवल अवलोकन (Preview) के लिए हैं; यह सुविधा बहुत जल्द चालू हो जाएगी।
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Product Landing Page Creator Card -->
-      <div class="ucas-card" id="prod_lp_creator_card" style="margin-bottom:1.25rem;">
+      <!-- Product Landing Page Creator Card (Visible Preview, Clicks Disabled) -->
+      <div class="ucas-card" id="prod_lp_creator_card" style="margin-bottom:1.25rem;position:relative;">
         <div class="ucas-card-header">
           <div class="ucas-card-title">
             <i class="fa-solid fa-wand-magic-sparkles" style="color:#D97706;"></i> 🛍️ नया प्रोडक्ट लैंडिंग पेज बनाएं (Create Product Landing Page)
           </div>
+          <span style="font-size:0.75rem;background:#FEF3C7;color:#92400E;padding:3px 10px;border-radius:12px;font-weight:800;border:1px solid #FCD34D;">
+            🔒 Preview Mode (Coming Soon)
+          </span>
         </div>
         <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
           उत्पाद का नाम, फोटो, असली MRP, ऑफर प्राइस और 'Buy Now' लिंक भरें। ग्राहक 'Buy Now' या फॉर्म सबमिट करते ही आपकी लीड सुरक्षित हो जाएगी:
         </p>
 
-        <form id="ucas-product-landing-form">
+        <form id="ucas-product-landing-form" style="pointer-events:none;opacity:0.82;user-select:none;">
           <div class="ucas-grid-2" style="gap:16px;margin-bottom:1rem;">
             <!-- Left: Inputs -->
             <div>
               <div class="ucas-form-group" style="margin-bottom:10px;">
                 <label class="ucas-label">उत्पाद का नाम / शीर्षक (Product Title): *</label>
-                <input type="text" id="prod_input_title" class="ucas-input" placeholder="उदा. जैविक कृषि संपूर्ण पोषण किट या हर्बल हेल्थ सिरप" required>
+                <input type="text" id="prod_input_title" class="ucas-input" placeholder="उदा. जैविक कृषि संपूर्ण पोषण किट या हर्बल हेल्थ सिरप" value="जैविक कृषि संपूर्ण पोषण किट" disabled>
               </div>
 
               <div class="ucas-grid-2" style="gap:10px;margin-bottom:10px;">
                 <div class="ucas-form-group">
                   <label class="ucas-label">कैटेगरी चुनें (Category):</label>
-                  <select id="prod_select_category" class="ucas-select">
-                    <option value="agriculture">🌾 Agriculture (कृषि उत्पाद)</option>
+                  <select id="prod_select_category" class="ucas-select" disabled>
+                    <option value="agriculture" selected>🌾 Agriculture (कृषि उत्पाद)</option>
                     <option value="healthcare">❤️ Health Care (स्वास्थ्य उत्पाद)</option>
                     <option value="beautycare">💄 Beauty Care (सौंदर्य)</option>
                     <option value="cattlecare">🐄 Cattle Care (पशु पोषण)</option>
@@ -1400,24 +1399,24 @@
                 </div>
                 <div class="ucas-form-group">
                   <label class="ucas-label">प्रोडक्ट इमेज (Product Image): *</label>
-                  <input type="file" id="prod_image_file_input" class="ucas-input" accept="image/*" style="padding:5px;">
+                  <input type="file" id="prod_image_file_input" class="ucas-input" accept="image/*" style="padding:5px;" disabled>
                 </div>
               </div>
 
               <div class="ucas-grid-2" style="gap:10px;margin-bottom:10px;">
                 <div class="ucas-form-group">
                   <label class="ucas-label">असली MRP (₹):</label>
-                  <input type="number" id="prod_input_mrp" class="ucas-input" placeholder="उदा. 1999">
+                  <input type="number" id="prod_input_mrp" class="ucas-input" placeholder="उदा. 1999" value="1999" disabled>
                 </div>
                 <div class="ucas-form-group">
                   <label class="ucas-label">ऑफर / डिस्काउंट प्राइस (₹): *</label>
-                  <input type="number" id="prod_input_offer_price" class="ucas-input" placeholder="उदा. 999" required>
+                  <input type="number" id="prod_input_offer_price" class="ucas-input" placeholder="उदा. 999" value="999" disabled>
                 </div>
               </div>
 
               <div class="ucas-form-group" style="margin-bottom:10px;">
                 <label class="ucas-label">🔗 थर्ड-पार्टी "Buy Now" लिंक (Store / Website URL): *</label>
-                <input type="url" id="prod_input_buynow_url" class="ucas-input" placeholder="https://aarogyamindia.in/product/..." required>
+                <input type="url" id="prod_input_buynow_url" class="ucas-input" placeholder="https://aarogyamindia.in/product/..." value="https://aarogyamindia.online/product/nutrition-kit" disabled>
                 <div style="font-size:0.75rem;color:var(--text-muted);margin-top:3px;">
                   💡 ग्राहक द्वारा 'Buy Now' बटन क्लिक करते ही उसकी लीड UCAS में सेव होगी और वह इस वेबसाइट पर पहुंच जाएगा।
                 </div>
@@ -1425,7 +1424,7 @@
 
               <div class="ucas-form-group">
                 <label class="ucas-label">उत्पाद के मुख्य लाभ / संदेश (Product Highlights / Message):</label>
-                <textarea id="prod_input_message" class="ucas-textarea" rows="3" placeholder="उदा. फसलों की पैदावार दोगुनी करने और मिट्टी को उपजाऊ बनाने के लिए 100% शुद्ध जैविक पोषण किट। विशेष 50% छूट पर अभी ऑर्डर करें!"></textarea>
+                <textarea id="prod_input_message" class="ucas-textarea" rows="3" placeholder="उदा. फसलों की पैदावार दोगुनी करने और मिट्टी को उपजाऊ बनाने के लिए 100% शुद्ध जैविक पोषण किट।" disabled>फसलों की पैदावार बढ़ाने और मिट्टी को उपजाऊ बनाने के लिए 100% शुद्ध जैविक पोषण किट। विशेष 50% छूट पर अभी ऑर्डर करें!</textarea>
               </div>
             </div>
 
@@ -1448,20 +1447,20 @@
                 </div>
                 <div style="padding:14px;">
                   <div id="prod_preview_title" style="font-weight:800;font-size:1.05rem;color:var(--text-main);margin-bottom:6px;">
-                    उत्पाद का नाम यहाँ दिखेगा
+                    जैविक कृषि संपूर्ण पोषण किट
                   </div>
                   <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
                     <span id="prod_preview_offer" style="font-size:1.25rem;font-weight:900;color:#15803D;">₹999</span>
                     <span id="prod_preview_mrp" style="font-size:0.88rem;color:#94A3B8;text-decoration:line-through;">₹1999</span>
                   </div>
                   <p id="prod_preview_msg" style="font-size:0.82rem;color:var(--text-muted);line-height:1.4;margin:0 0 12px 0;">
-                    इस उत्पाद के विशेष लाभ और विवरण यहाँ प्रदर्शित होंगे।
+                    फसलों की पैदावार बढ़ाने और मिट्टी को उपजाऊ बनाने के लिए 100% शुद्ध जैविक पोषण किट।
                   </p>
                   <div style="display:flex;gap:8px;">
-                    <button type="button" class="ucas-btn" style="flex:1;background:#2563EB;color:#fff;font-weight:800;font-size:0.85rem;padding:8px 12px;border-radius:6px;">
+                    <button type="button" class="ucas-btn" style="flex:1;background:#2563EB;color:#fff;font-weight:800;font-size:0.85rem;padding:8px 12px;border-radius:6px;" disabled>
                       <i class="fa-solid fa-clipboard-list"></i> इंक्वायरी फॉर्म
                     </button>
-                    <button type="button" class="ucas-btn" style="flex:1;background:#15803D;color:#fff;font-weight:800;font-size:0.85rem;padding:8px 12px;border-radius:6px;">
+                    <button type="button" class="ucas-btn" style="flex:1;background:#15803D;color:#fff;font-weight:800;font-size:0.85rem;padding:8px 12px;border-radius:6px;" disabled>
                       <i class="fa-solid fa-cart-shopping"></i> Buy Now (खरीदें)
                     </button>
                   </div>
@@ -1470,12 +1469,9 @@
             </div>
           </div>
 
-          <div style="display:flex;gap:10px;align-items:center;">
-            <button type="submit" id="prod_btn_submit" class="ucas-btn" style="background:#D97706;color:#fff;font-weight:800;padding:10px 20px;">
-              <i class="fa-solid fa-cart-plus"></i> 🛒 प्रोडक्ट लैंडिंग पेज बनाएं (Create Product Page)
-            </button>
-            <button type="button" id="prod_btn_cancel_edit" class="ucas-btn ucas-btn-outline" style="display:none;" onclick="UCAS_PRODUCT_LANDING.cancelEdit()">
-              रद्द करें (Cancel)
+          <div style="display:flex;gap:10px;align-items:center;margin-top:8px;">
+            <button type="button" class="ucas-btn" style="background:#CBD5E1;color:#64748B;cursor:not-allowed;font-weight:800;padding:12px 24px;border-radius:10px;" disabled>
+              <i class="fa-solid fa-lock"></i> 🔒 यह सेवा जल्द शुरू होगी (Coming Soon)
             </button>
           </div>
         </form>
@@ -1496,211 +1492,40 @@
         </div>
 
         <div id="ucas-my-product-lps-container" style="margin-top:12px;">
-          <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
+          <div style="text-align:center;padding:1.5rem;color:#78350F;background:#FFFBEB;border:1px dashed #FCD34D;border-radius:10px;font-size:0.88rem;font-weight:600;">
+            ℹ️ प्रोडक्ट लैंडिंग पेज सेवा जल्द ही सक्रिय होने वाली है। आपका पूर्व डेटा डेटाबेस में पूर्णतः सुरक्षित है।
+          </div>
         </div>
       </div>
     </section>
 
     <!-- -----------------------------------------------------------------------
-         VIEW 6: WEBINARS & LIVE ZOOM EVENTS
+         VIEW 6: WEBINARS & LIVE ZOOM EVENTS (COMING SOON)
          ----------------------------------------------------------------------- -->
     <section id="view-webinars" class="ucas-view">
       <!-- Header Banner -->
-      <div class="ucas-card" style="margin-bottom:1.25rem;background:linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%);color:#fff;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-          <div>
-            <div style="font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:8px;">
-              <i class="fa-solid fa-video"></i> वेबिनार एवं लाइव ज़ूम इवेंट्स (Webinars & Zoom Events)
-            </div>
-            <p style="font-size:0.85rem;color:#DBEAFE;margin:4px 0 0 0;">
-              अपने Zoom वेबिनार का प्रचार करें, विज़िटर्स का नाम व मोबाइल नंबर लें, और ज़ूम लिंक अनलॉक कराएं।
-            </p>
-          </div>
-          <button type="button" class="ucas-btn" onclick="document.getElementById('wb_creator_card').scrollIntoView({behavior:'smooth'})" style="background:#fff;color:#1D4ED8;font-weight:800;">
-            <i class="fa-solid fa-plus"></i> नया वेबिनार बनाएं
-          </button>
+      <div class="ucas-card" style="margin-bottom:1.25rem;background:linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%);color:#fff;border-radius:16px;">
+        <div style="font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-video"></i> वेबिनार एवं लाइव ज़ूम इवेंट्स (Webinars & Live Events)
         </div>
-      </div>
-
-      <!-- KPI Summary Cards -->
-      <div class="ucas-kpi-grid" style="margin-bottom:1.25rem;">
-        <div class="ucas-kpi-card kpi-blue">
-          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-video"></i></div>
-          <div class="ucas-kpi-val" id="ucas-wb-kpi-total">0</div>
-          <div class="ucas-kpi-label">My Webinars</div>
-        </div>
-        <div class="ucas-kpi-card kpi-green">
-          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-users"></i></div>
-          <div class="ucas-kpi-val" id="ucas-wb-kpi-attendees">0</div>
-          <div class="ucas-kpi-label">Registered Attendees</div>
-        </div>
-        <div class="ucas-kpi-card kpi-purple">
-          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-link"></i></div>
-          <div class="ucas-kpi-val" id="ucas-wb-kpi-active">0</div>
-          <div class="ucas-kpi-label">Active Zoom Sessions</div>
-        </div>
-      </div>
-
-      <!-- Webinar Creator Card -->
-      <div class="ucas-card" id="wb_creator_card" style="margin-bottom:1.25rem;">
-        <div class="ucas-card-header">
-          <div class="ucas-card-title">
-            <i class="fa-solid fa-wand-magic-sparkles" style="color:#2563EB;"></i> 🎥 वेबिनार लैंडिंग पेज बनाएं (Create Webinar Landing Page)
-          </div>
-        </div>
-        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
-          शीर्षक, बैनर इमेज/वीडियो, दिनांक/समय और Zoom मीटिंग विवरण भरें। विज़िटर को केवल नाम व मोबाइल नंबर भरने के बाद Zoom लिंक दिखेगा:
+        <p style="font-size:0.85rem;color:#DBEAFE;margin:4px 0 0 0;">
+          Aarogyam India लाइव ज़ूम वेबिनार एवं ऑनलाइन ट्रेनिंग सत्र।
         </p>
-
-        <!-- Media Selector: Image vs YouTube -->
-        <div style="margin-bottom:1rem;">
-          <label class="ucas-label">1. बैनर मीडिया चुनें (Media Type):</label>
-          <div style="display:flex;gap:8px;margin-bottom:10px;">
-            <button type="button" id="wb_btn_mode_image" class="ucas-btn ucas-btn-sm ucas-btn-primary">
-              <i class="fa-regular fa-image"></i> Image Upload
-            </button>
-            <button type="button" id="wb_btn_mode_youtube" class="ucas-btn ucas-btn-sm ucas-btn-outline">
-              <i class="fa-brands fa-youtube"></i> YouTube Video Link
-            </button>
-          </div>
-
-          <div class="ucas-grid-2" style="gap:12px;">
-            <!-- Left: Inputs -->
-            <div>
-              <div id="wb_section_image_upload">
-                <input type="file" id="wb_image_file_input" class="ucas-input" accept="image/*">
-                <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;display:block;">अनुशंसित आकार: 1200x630 या 800x450 (JPG, PNG)</span>
-              </div>
-
-              <div id="wb_section_youtube_input" style="display:none;">
-                <input type="url" id="wb_youtube_url_input" class="ucas-input" placeholder="https://www.youtube.com/watch?v=...">
-                <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;display:block;">YouTube वीडियो या Shorts का लिंक पेस्ट करें</span>
-              </div>
-
-              <div style="margin-top:10px;">
-                <label class="ucas-label">वेबिनार शीर्षक / हेडिंग (Title / Heading): *</label>
-                <input type="text" id="wb_input_title" class="ucas-input" placeholder="उदा. आधुनिक कृषि व स्वास्थ्य सुरक्षा — विशेष लाइव वेबिनार">
-              </div>
-            </div>
-
-            <!-- Right: Preview -->
-            <div>
-              <label class="ucas-label">मीडिया पूर्वावलोकन (Preview):</label>
-              <div id="wb_preview_media_container">
-                <div style="background:#F1F5F9;border:2px dashed #CBD5E1;border-radius:var(--radius-md);padding:1.5rem;text-align:center;color:var(--text-muted);">
-                  <i class="fa-solid fa-video" style="font-size:2rem;margin-bottom:6px;display:block;color:#3B82F6;"></i>
-                  <span style="font-size:0.85rem;">बैनर इमेज या YouTube लिंक का पूर्वावलोकन</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Zoom Settings Box -->
-        <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:var(--radius-md);padding:14px;margin-bottom:1rem;">
-          <div style="font-weight:800;color:#1D4ED8;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-            <i class="fa-solid fa-video"></i> Zoom मीटिंग एवं समय सेटिंग्स (Registration के बाद अनलॉक होगा)
-          </div>
-          <div class="ucas-grid-2" style="gap:10px;">
-            <div>
-              <label class="ucas-label" style="font-size:0.8rem;">📅 दिनांक व समय (Date & Time): *</label>
-              <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:6px;">
-                <input type="date" id="wb_input_date" class="ucas-input" style="padding:6px 8px;font-size:0.84rem;" title="दिनांक चुनें">
-                <input type="time" id="wb_input_time" class="ucas-input" style="padding:6px 8px;font-size:0.84rem;" title="समय चुनें">
-              </div>
-              <input type="hidden" id="wb_input_datetime">
-            </div>
-            <div>
-              <label class="ucas-label" style="font-size:0.8rem;">🔗 Zoom / Meeting Join Link: *</label>
-              <input type="url" id="wb_input_zoom_link" class="ucas-input" placeholder="https://us02web.zoom.us/j/82345678901?pwd=...">
-            </div>
-            <div>
-              <label class="ucas-label" style="font-size:0.8rem;">🆔 Meeting ID (मीटिंग आईडी):</label>
-              <input type="text" id="wb_input_meeting_id" class="ucas-input" placeholder="उदा. 823 4567 8901">
-            </div>
-            <div>
-              <label class="ucas-label" style="font-size:0.8rem;">🔑 Passcode / Password (पासवर्ड):</label>
-              <input type="text" id="wb_input_passcode" class="ucas-input" placeholder="उदा. 123456 या AI2026">
-            </div>
-          </div>
-          <div style="margin-top:10px;">
-            <label class="ucas-label" style="font-size:0.8rem;">💬 अनलॉक होने पर संदेश (Unlock Notice):</label>
-            <input type="text" id="wb_input_success_msg" class="ucas-input" placeholder="उदा. धन्यवाद! आपका रजिस्ट्रेशन सफल हुआ। नीचे दिए गए Zoom लिंक से जुड़ें।">
-          </div>
-        </div>
-
-        <!-- Invitation Message -->
-        <div style="margin-bottom:1rem;">
-          <label class="ucas-label">आमंत्रण विवरण / विषय सूची (Invitation Message / Agenda): *</label>
-          <textarea id="wb_input_message" class="ucas-textarea" rows="3" placeholder="उदा. क्या आप आधुनिक कृषि तकनीक, जैविक समाधान और स्वास्थ्य पर आयोजित लाइव वेबिनार में भाग लेना चाहते हैं? अपनी सीट सुरक्षित करने के लिए नीचे अपना नाम व मोबाइल नंबर दर्ज करें।"></textarea>
-        </div>
-
-        <!-- Generate Buttons -->
-        <div style="display:flex;gap:8px;">
-          <button type="button" id="wb_btn_generate" class="ucas-btn ucas-btn-primary" style="flex:1;padding:12px;font-size:1rem;justify-content:center;background:linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> 🔗 Generate Webinar Page
-          </button>
-          <button type="button" id="wb_btn_cancel_edit" class="ucas-btn ucas-btn-outline" style="display:none;padding:12px 18px;font-size:1rem;justify-content:center;color:var(--text-muted);">
-            रद्द करें (Cancel)
-          </button>
-        </div>
-
-        <!-- Result Box -->
-        <div id="wb_generated_result_card" style="display:none;margin-top:1.25rem;background:#F0FDF4;border:2px solid #86EFAC;border-radius:var(--radius-md);padding:1rem;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <span style="font-weight:800;color:#15803D;font-size:0.95rem;">🎉 वेबिनार लैंडिंग पेज तैयार है!</span>
-          </div>
-          <div class="ucas-copy-box" style="margin-bottom:10px;">
-            <input type="text" id="wb_generated_share_url" class="ucas-input" readonly>
-            <button type="button" id="wb_btn_copy_url" class="ucas-btn ucas-btn-sm ucas-btn-primary"><i class="fa-solid fa-copy"></i> कॉपी</button>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">
-            <button type="button" id="wb_btn_wa_share" class="ucas-btn ucas-btn-whatsapp" style="justify-content:center;padding:9px 10px;"><i class="fa-brands fa-whatsapp"></i> WhatsApp शेयर</button>
-            <button type="button" id="wb_btn_fb_share" class="ucas-btn ucas-btn-outline" style="color:#1877F2;border-color:#1877F2;justify-content:center;padding:9px 10px;"><i class="fa-brands fa-facebook"></i> Facebook शेयर</button>
-            <button type="button" id="wb_btn_view_page" class="ucas-btn ucas-btn-outline" style="justify-content:center;padding:9px 10px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> लाइव पेज देखें</button>
-          </div>
-        </div>
       </div>
 
-      <!-- My Webinars Single Unified Container -->
-      <div class="ucas-card">
-        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
-          <div class="ucas-card-title">
-            <span class="ucas-heading-pill"><i class="fa-solid fa-video"></i> मेरे लाइव वेबिनार (My Webinars)</span>
-            <span id="ucas-my-webinars-count" style="background:var(--primary-subtle);color:var(--primary-dark);font-weight:800;padding:2px 8px;border-radius:var(--radius-full);font-size:0.85rem;margin-left:6px;">0</span>
-          </div>
-          <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_WEBINARS.loadWebinars()">
-            <i class="fa-solid fa-rotate"></i> रीफ्रेश
-          </button>
+      <!-- Coming Soon Notice Card -->
+      <div class="ucas-card" style="margin-bottom:1.25rem;text-align:center;padding:3.5rem 1.5rem;background:#FFFBEB;border:2px solid #FCD34D;border-radius:18px;box-shadow:0 4px 20px rgba(245,158,11,0.12);">
+        <div style="font-size:3.5rem;color:#D97706;margin-bottom:14px;">
+          <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
-
-        <div id="ucas-my-webinars-container">
-          <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
-        </div>
-      </div>
-
-      <!-- All Webinar Attendees Live Attendance Report Table with WhatsApp Followup & Call -->
-      <div class="ucas-card" style="margin-top:1.25rem;">
-        <div class="ucas-card-header" style="flex-wrap:wrap;gap:0.5rem;">
-          <div class="ucas-card-title">
-            <span class="ucas-heading-pill" style="background:linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%);">
-              <i class="fa-solid fa-users"></i> वेबिनार अटेंडेंस रिपोर्ट (Webinar Attendees Report)
-            </span>
-            <span id="ucas-webinar-attendees-total-count" style="background:#DBEAFE;color:#1E40AF;font-weight:800;padding:2px 8px;border-radius:var(--radius-full);font-size:0.85rem;margin-left:6px;">0</span>
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-            <input type="search" id="ucas-wb-attendee-search" class="ucas-input" placeholder="🔍 नाम या मोबाइल खोजें..." style="padding:4px 8px;font-size:0.8rem;width:160px;">
-            <select id="ucas-wb-attendee-filter-wb" class="ucas-select" style="padding:4px 8px;font-size:0.8rem;max-width:180px;">
-              <option value="all">सभी वेबिनार (All)</option>
-            </select>
-            <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_WEBINARS.loadWebinars()">
-              <i class="fa-solid fa-rotate"></i> रीफ्रेश
-            </button>
-          </div>
-        </div>
-
-        <div id="ucas-webinar-all-attendees-list">
-          <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">लोड हो रहा है...</div>
+        <h2 style="font-size:1.5rem;font-weight:800;color:#92400E;margin-bottom:10px;">
+          यह सेवा जल्द शुरू होने वाली है
+        </h2>
+        <p style="font-size:0.95rem;color:#78350F;max-width:540px;margin:0 auto 20px;line-height:1.6;font-weight:600;">
+          नया और फास्ट ज़ूम वेबिनार रजिस्ट्रेशन सिस्टम अपग्रेड किया जा रहा है। यह सुविधा आपके लिए बहुत जल्द सक्रिय होगी।
+        </p>
+        <div style="display:inline-flex;align-items:center;gap:8px;background:#FEF3C7;color:#92400E;padding:10px 24px;border-radius:50px;font-size:0.9rem;font-weight:800;border:1.5px solid #FDE68A;">
+          <i class="fa-solid fa-sparkles"></i> Coming Soon • ज़ूम वेबिनार सेवा जल्द प्रारंभ होगी
         </div>
       </div>
     </section>
@@ -2400,23 +2225,23 @@
 <script src="/js/share-engine-core.js"></script>
 
 <!-- UCAS Modular Engines -->
-<script src="/ucas/js/ucas-session.js?v=11.0"></script>
-<script src="/ucas/js/ucas-db.js?v=11.0"></script>
-<script src="/ucas/js/ucas-permissions.js?v=15.0"></script>
-<script src="/ucas/js/ucas-survey.js?v=15.0"></script>
-<script src="/ucas/js/ucas-phonebook.js?v=15.0"></script>
-<script src="/ucas/js/ucas-leads.js?v=15.0"></script>
-<script src="/ucas/js/ucas-marketing.js?v=15.0"></script>
-<script src="/ucas/js/ucas-landing-builder.js?v=15.0"></script>
-<script src="/ucas/js/ucas-product-landing.js?v=15.0"></script>
-<script src="/ucas/js/ucas-hook-templates.js?v=15.0"></script>
-<script src="/ucas/js/ucas-webinars.js?v=15.0"></script>
-<script src="/ucas/js/ucas-admin.js?v=15.0"></script>
-<script src="/ucas/js/ucas-pwa.js?v=15.0"></script>
-<script src="/js/global-guest-modal.js?v=15.0"></script>
-<script src="/js/book-promo-toast.js?v=15.0"></script>
-<script src="/js/user-notifications.js?v=15.0"></script>
-<script src="/ucas/js/ucas-app.js?v=15.0"></script>
+<script src="/ucas/js/ucas-session.js?v=19.0"></script>
+<script src="/ucas/js/ucas-db.js?v=19.0"></script>
+<script src="/ucas/js/ucas-permissions.js?v=19.0"></script>
+<script src="/ucas/js/ucas-survey.js?v=19.0"></script>
+<script src="/ucas/js/ucas-phonebook.js?v=19.0"></script>
+<script src="/ucas/js/ucas-leads.js?v=19.0"></script>
+<script src="/ucas/js/ucas-marketing.js?v=19.0"></script>
+<script src="/ucas/js/ucas-landing-builder.js?v=19.0"></script>
+<script src="/ucas/js/ucas-product-landing.js?v=19.0"></script>
+<script src="/ucas/js/ucas-hook-templates.js?v=19.0"></script>
+<script src="/ucas/js/ucas-webinars.js?v=19.0"></script>
+<script src="/ucas/js/ucas-admin.js?v=19.0"></script>
+<script src="/ucas/js/ucas-pwa.js?v=19.0"></script>
+<script src="/js/global-guest-modal.js?v=19.0"></script>
+<script src="/js/book-promo-toast.js?v=19.0"></script>
+<script src="/js/user-notifications.js?v=19.0"></script>
+<script src="/ucas/js/ucas-app.js?v=19.0"></script>
 
 </body>
 </html>

@@ -276,7 +276,7 @@
         const sid = user.share_id || user.referral_code || 'AI000004';
         const uid = user.id;
 
-        let query = db.from('profiles').select('*');
+        let query = db.from('profiles').select('id, full_name, mobile, email, gender, State, district, address, occupation, interest, dob, netsurf_id, share_id, referral_code, is_active, role, created_at');
         if (mob) query = query.eq('mobile', mob);
         else if (sid) query = query.eq('share_id', sid);
         else if (uid) query = query.eq('id', uid);
@@ -551,22 +551,40 @@
     }
   };
 
+  let _isRefreshingKPIs = false;
+  let _pendingRefresh = false;
+
   async function refreshDashboardKPIs(startDate = '', endDate = '') {
+    if (_isRefreshingKPIs) {
+      _pendingRefresh = true;
+      return;
+    }
+    _isRefreshingKPIs = true;
+    _pendingRefresh = false;
+
     let profileId = window.UCAS_SESSION.getUserId();
     const shareId = window.UCAS_SESSION.getShareId() || 'AI000004';
     const user = window.UCAS_SESSION.getCurrentUser() || {};
 
     const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
     if (!profileId || !isUuid(profileId)) {
-      profileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
+      if (user.id && isUuid(user.id)) {
+        profileId = user.id;
+      } else {
+        profileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
+      }
     }
 
     try {
-      const [surveysRes, phonebookRes, refRes] = await Promise.all([
+      const results = await Promise.allSettled([
         window.UCAS_DB.getSurveys(profileId),
         window.UCAS_DB.getPhonebook(profileId),
         window.UCAS_DB.getDirectReferralsWithPurchases(profileId, shareId, startDate, endDate)
       ]);
+
+      const surveysRes = results[0].status === 'fulfilled' ? results[0].value : { success: false, data: [] };
+      const phonebookRes = results[1].status === 'fulfilled' ? results[1].value : { success: false, data: [] };
+      const refRes = results[2].status === 'fulfilled' ? results[2].value : { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 } };
 
       const surveys = surveysRes?.data || [];
       const contacts = phonebookRes?.data || [];
@@ -602,6 +620,12 @@
         return cat.includes('webinar') || src.includes('webinar');
       }).length;
 
+      const totalProductLeads = surveys.filter(s => {
+        const cat = String(s.selected_categories || '').toLowerCase();
+        const src = String(s.category_answers?.source || '').toLowerCase();
+        return cat.includes('product') || cat.includes('crop') || src.includes('product');
+      }).length;
+
       // Update KPI Counter DOM Elements
       animateCounter('kpi_total_surveys', totalSurveys);
       animateCounter('kpi_total_contacts', totalContacts);
@@ -609,6 +633,13 @@
       animateCounter('kpi_total_interested', interested);
       animateCounter('kpi_total_converted', converted);
       animateCounter('kpi_total_webinar_attendees', totalWebinarAttendees);
+      animateCounter('ucas-kpi-product-leads', totalProductLeads);
+
+      const mktSentEl = document.getElementById('ucas-kpi-marketing-sent');
+      if (mktSentEl) {
+        const localSent = parseInt(localStorage.getItem('UCAS_MARKETING_SENT_COUNT') || '0', 10);
+        animateCounter('ucas-kpi-marketing-sent', localSent);
+      }
 
       // Direct Referrals & Purchases Data
       allLoadedReferrals = refData.referrals || [];
@@ -618,6 +649,12 @@
       renderRecentActivity(surveys, contacts);
     } catch (e) {
       console.warn('Dashboard KPI refresh error', e);
+    } finally {
+      _isRefreshingKPIs = false;
+      if (_pendingRefresh) {
+        _pendingRefresh = false;
+        setTimeout(() => refreshDashboardKPIs(startDate, endDate), 100);
+      }
     }
   }
 

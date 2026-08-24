@@ -709,7 +709,28 @@ export async function initProductLandingPages() {
   // ==========================================
   // LOAD DATA
   // ==========================================
+  // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
+  const LANDING_PAGES_ENABLED = false;
+
   async function loadData() {
+    if (!LANDING_PAGES_ENABLED) {
+      tableContainer.innerHTML = `
+        <div class="admin-card" style="text-align:center;padding:2.5rem 1.5rem;background:rgba(234,179,8,0.08);border:1.5px solid #eab308;border-radius:12px;margin-top:12px;">
+          <div style="font-size:2.2rem;margin-bottom:8px;">🛡️</div>
+          <h3 style="color:#eab308;font-size:1.15rem;font-weight:800;margin-bottom:6px;">
+            Product Landing Pages — Egress Safe Mode (Controlled OFF)
+          </h3>
+          <p style="color:var(--admin-muted);max-width:550px;margin:0 auto 12px;font-size:0.88rem;line-height:1.5;">
+            Supabase Egress नियंत्रण के तहत प्रोडक्ट लैंडिंग पेज क्वेरीज़ को अस्थायी रूप से रोका गया है। डेटाबेस में आपका सारा डेटा 100% सुरक्षित है।
+          </p>
+          <div style="font-size:0.8rem;color:#22c55e;font-weight:700;">
+            ✅ Core Selling System (Books, Checkout, Purchases, My Library) पूर्ण रूप से सक्रिय है।
+          </div>
+        </div>
+      `;
+      return;
+    }
+
     tableContainer.innerHTML = '<div class="admin-loading">डेटाबेस से प्रोडक्ट लैंडिंग पेज लोड हो रहे हैं…</div>';
 
     const db = getAdminDb();

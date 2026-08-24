@@ -459,15 +459,14 @@
 
   function getWebinarShareUrl(lp) {
     const origin = window.location.origin || 'https://aarogyamindia.online';
-    const isProduction = !window.location.port;
-    const targetPath = isProduction ? '/api/share' : '/ucas/landing.html';
+    const targetPath = '/webinar.html';
     const url = new URL(targetPath, origin);
     url.searchParams.set('id', lp.id);
     const currentUserId = window.UCAS_SESSION?.getUserId();
     const currentUserShareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
     const isBroadcastOrAdmin = Boolean(lp.created_by_admin || lp.is_admin_template || lp.share_id === 'ADMIN' || lp.profile_id === 'ALL_USERS' || (lp.profile_id && lp.profile_id !== currentUserId));
     const shareId = isBroadcastOrAdmin ? currentUserShareId : (lp.share_id || currentUserShareId);
-    url.searchParams.set('share_id', shareId);
+    url.searchParams.set('ref', shareId);
     return url.toString();
   }
 
@@ -554,6 +553,9 @@
   }
 
   async function loadWebinars() {
+    const container = document.getElementById('ucas-my-webinars-container');
+    if (!container) return;
+
     const profileId = window.UCAS_SESSION.getUserId();
     if (!profileId) return;
 
