@@ -1559,9 +1559,9 @@ section{
 
 .preview-grid{
 
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:1fr;
 
-    gap:16px;
+    gap:20px;
 
 }
 
@@ -1915,6 +1915,8 @@ section{
     color:var(--text-light);
 
     line-height:1.8;
+
+    display:block !important;
 
 }
 

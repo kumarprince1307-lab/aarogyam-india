@@ -248,57 +248,16 @@ Full Screen Preview
 ========================================================== */
 
 /* =========================================
-            FAQ ACCORDION
+            FAQ STATIC CARDS (NO ACCORDION)
 ========================================= */
 
-const faqItems=document.querySelectorAll(".faq-item");
+const faqItems = document.querySelectorAll(".faq-item");
 
-faqItems.forEach((item)=>{
-
-const answer=item.querySelector("p");
-
-if(answer){
-
-answer.style.display="none";
-
-}
-
-item.addEventListener("click",()=>{
-
-const opened=item.classList.contains("active");
-
-/* Close All */
-
-faqItems.forEach((faq)=>{
-
-faq.classList.remove("active");
-
-const p=faq.querySelector("p");
-
-if(p){
-
-p.style.display="none";
-
-}
-
-});
-
-/* Open Selected */
-
-if(!opened){
-
-item.classList.add("active");
-
-if(answer){
-
-answer.style.display="block";
-
-}
-
-}
-
-});
-
+faqItems.forEach((item) => {
+    const answer = item.querySelector("p");
+    if (answer) {
+        answer.style.display = "block";
+    }
 });
 
 /* =========================================

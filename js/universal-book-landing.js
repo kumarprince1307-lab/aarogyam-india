@@ -132,6 +132,16 @@
     setElemText('hero-new-price', `₹${offer}`);
     setElemText('hero-offer-badge', badge);
     
+    // Value Stack Card
+    const stack = l.value_stack || {};
+    const bookMrpVal = stack.book_mrp || mrp;
+    const vipVal = stack.vip_value || 1999;
+    const bonusVal = stack.bonus_value || 199;
+    const totalStackMrp = bookMrpVal + vipVal + bonusVal;
+    setElemText('stack-card-book-mrp', `₹${bookMrpVal}`);
+    setElemText('stack-card-total-mrp', `₹${totalStackMrp}`);
+    setElemText('stack-card-offer-price', `आज मात्र ₹${offer}`);
+
     setElemSrc('hero-banner-img', banner);
     setElemSrc('hero-book-cover', cover);
 
@@ -159,6 +169,10 @@
       const btn = document.getElementById(id);
       if (btn) btn.href = checkoutUrl;
     });
+
+    // Update Cart Badge
+    updateCartCountBadge();
+    injectTrackingPixels();
 
     // 4. WhatsApp Links
     const waPrompt = l.whatsapp_prompt || `नमस्ते, मुझे '${title}' पुस्तक के बारे में और जानकारी चाहिए।`;
@@ -387,78 +401,92 @@
   function renderSuggestedBooksSection() {
     const section = document.getElementById('suggested-books-section');
     const grid = document.getElementById('suggested-books-grid');
-    const summaryBox = document.getElementById('multi-cart-summary-box');
-    const buyBundleBtn = document.getElementById('btn-buy-multi-bundle');
 
     if (!section || !grid) return;
 
-    // Filter available other books from library
-    const otherBooks = allBooks.filter(b => b.id !== currentBookData.id && (b.status === 'active' || !b.status));
+    const l = currentLandingData || {};
+    let otherBooks = [];
+    
+    // Check if custom suggested books list was saved in Admin
+    if (l.suggested_books_list && l.suggested_books_list.length > 0) {
+      otherBooks = l.suggested_books_list.map(sb => {
+        return {
+          id: sb.link || sb.id || 'BK002',
+          heading: sb.title || 'संबंधित ई-बुक',
+          cover: sb.image || '../images/books/kharif-master-guide-2026-cover.webp',
+          offerPrice: sb.offerPrice || 99,
+          mrp: sb.mrp || 299,
+          link: sb.link || sb.id || '#'
+        };
+      });
+    } else if (l.suggested_books && l.suggested_books.length > 0) {
+      l.suggested_books.forEach(sId => {
+        const cleanId = sId.replace(/https?:\/\/[^\/]+\/.*[?&]id=/, '').trim();
+        const found = allBooks.find(b => b.id === cleanId || (b.slug && b.slug.toLowerCase() === cleanId.toLowerCase()));
+        if (found && found.id !== currentBookData.id && !otherBooks.some(x => x.id === found.id)) {
+          otherBooks.push(found);
+        }
+      });
+    }
+
+    if (otherBooks.length === 0) {
+      otherBooks = allBooks.filter(b => b.id !== currentBookData.id && (b.status === 'active' || !b.status));
+    }
+
     if (otherBooks.length === 0) {
       section.style.display = 'none';
       return;
     }
 
     section.style.display = 'block';
-    selectedSuggestedBookIds = [];
 
-    grid.innerHTML = otherBooks.slice(0, 4).map(b => `
-      <div class="ubl-suggested-card" id="sug_card_${b.id}" onclick="window.toggleSuggestedBook('${b.id}', ${b.offerPrice || 99})">
-        <input type="checkbox" id="sug_chk_${b.id}" style="accent-color:var(--primary);width:20px;height:20px;cursor:pointer;" onclick="event.stopPropagation(); window.toggleSuggestedBook('${b.id}', ${b.offerPrice || 99})" />
-        <img src="${b.cover || b.thumbnail || '../images/books/kharif-master-guide-2026-cover.webp'}" alt="${escapeHtml(b.heading || b.name)}" class="ubl-suggested-thumb">
+    grid.innerHTML = otherBooks.slice(0, 6).map(b => `
+      <div class="ubl-suggested-card">
+        <img src="${b.cover || b.thumbnail || '../images/books/kharif-master-guide-2026-cover.webp'}" alt="${escapeHtml(b.heading || b.name || b.title)}" class="ubl-suggested-thumb">
         <div class="ubl-suggested-info">
-          <h4>${escapeHtml(b.heading || b.name)}</h4>
-          <div>
-            <span class="price">+ ₹${b.offerPrice || 99}</span>
+          <h4>${escapeHtml(b.heading || b.name || b.title)}</h4>
+          <div class="price-row">
+            <span class="price">₹${b.offerPrice || 99}</span>
             <span class="mrp">₹${b.mrp || 299}</span>
           </div>
-          <small style="color:#16a34a;font-weight:700;display:block;margin-top:4px;">+ साथ में जोड़ें</small>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button type="button" class="ubl-btn-add-cart-mini" onclick="window.addSuggestedBookToCart('${b.id || b.link || 'BK002'}', '${escapeHtml(b.heading || b.name || b.title)}', ${b.offerPrice || 99})">
+              <i class="fa-solid fa-cart-plus"></i> कार्ट में जोड़ें
+            </button>
+            <a href="${(b.link && b.link.startsWith('http')) ? b.link : `book-landing.html?id=${encodeURIComponent(b.id || b.link || 'BK002')}`}" style="font-size:0.78rem;color:#2E7D32;font-weight:700;text-decoration:underline;">
+              विवरण देखें &rarr;
+            </a>
+          </div>
         </div>
       </div>
     `).join('');
 
-    window.toggleSuggestedBook = function (bId, price) {
-      const chk = document.getElementById(`sug_chk_${bId}`);
-      const card = document.getElementById(`sug_card_${bId}`);
-      
-      const idx = selectedSuggestedBookIds.indexOf(bId);
-      if (idx >= 0) {
-        selectedSuggestedBookIds.splice(idx, 1);
-        if (chk) chk.checked = false;
-        if (card) card.classList.remove('selected');
-      } else {
-        selectedSuggestedBookIds.push(bId);
-        if (chk) chk.checked = true;
-        if (card) card.classList.add('selected');
-      }
-
-      updateMultiCartSummary();
-    };
-
-    function updateMultiCartSummary() {
-      const basePrice = currentLandingData.hero?.offer_price || currentBookData.offerPrice || 99;
-      let total = basePrice;
-      
-      selectedSuggestedBookIds.forEach(bId => {
-        const bk = allBooks.find(x => x.id === bId);
-        if (bk) total += (bk.offerPrice || 99);
-      });
-
-      if (summaryBox) {
-        if (selectedSuggestedBookIds.length > 0) {
-          summaryBox.style.display = 'flex';
-          setElemText('multi-cart-items-text', `1 मुख्य पुस्तक + ${selectedSuggestedBookIds.length} सुझाई गई पुस्तकें (${selectedSuggestedBookIds.length + 1} कुल)`);
-          setElemText('multi-cart-total-price', `₹${total}`);
-        } else {
-          summaryBox.style.display = 'none';
+    window.addSuggestedBookToCart = function(bId, bTitle, bPrice) {
+      try {
+        const raw = localStorage.getItem('AI_CART_ITEMS');
+        let items = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(items)) items = [];
+        const cleanId = (bId || 'BK002').toUpperCase();
+        if (!items.includes(cleanId)) {
+          items.push(cleanId);
+          localStorage.setItem('AI_CART_ITEMS', JSON.stringify(items));
         }
-      }
-    }
+        updateCartCountBadge();
 
-    buyBundleBtn?.addEventListener('click', () => {
-      const allIds = [currentBookData.id, ...selectedSuggestedBookIds].join(',');
-      window.location.href = `checkout.html?ids=${encodeURIComponent(allIds)}&bundle=true`;
-    });
+        if (typeof window.fbq === 'function') {
+          window.fbq('track', 'AddToCart', {
+            content_name: bTitle || 'Suggested Book',
+            content_ids: [cleanId],
+            value: bPrice || 99,
+            currency: 'INR'
+          });
+        }
+
+        if (confirm(`🛒 '${bTitle || cleanId}' कार्ट में जोड़ दी गई है!\n\nक्या आप अभी कार्ट देखना चाहते हैं?`)) {
+          window.location.href = 'cart.html';
+        }
+      } catch (e) {}
+    };
   }
 
   // ==========================================================
@@ -617,6 +645,93 @@
         });
       }
     });
+
+    // Add to Cart Button
+    const addCartBtn = document.getElementById('hero-add-cart-btn');
+    addCartBtn?.addEventListener('click', () => {
+      try {
+        const raw = localStorage.getItem('AI_CART_ITEMS');
+        let items = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(items)) items = [];
+        const bId = (currentBookData.id || currentBookId || 'BK001').toUpperCase();
+        if (!items.includes(bId)) {
+          items.push(bId);
+          localStorage.setItem('AI_CART_ITEMS', JSON.stringify(items));
+        }
+        updateCartCountBadge();
+        
+        // Track AddToCart in Pixel
+        if (typeof window.fbq === 'function') {
+          window.fbq('track', 'AddToCart', {
+            content_name: currentBookData.name || currentBookData.heading,
+            content_ids: [bId],
+            value: currentBookData.offerPrice || 99,
+            currency: 'INR'
+          });
+        }
+
+        if (confirm('🛒 पुस्तक आपके कार्ट में जोड़ दी गई है!\n\nक्या आप अभी कार्ट देखना चाहते हैं?')) {
+          window.location.href = 'cart.html';
+        }
+      } catch (e) {}
+    });
+  }
+
+  function updateCartCountBadge() {
+    try {
+      const raw = localStorage.getItem('AI_CART_ITEMS');
+      const items = raw ? JSON.parse(raw) : [];
+      const badge = document.getElementById('cart-count-badge');
+      if (badge && Array.isArray(items)) {
+        badge.textContent = items.length;
+      }
+    } catch (e) {}
+  }
+
+  function injectTrackingPixels() {
+    const l = currentLandingData || {};
+    const pixelId = l.facebook_pixel_id || '1671873500553134';
+
+    // Facebook Pixel Injection
+    if (pixelId && !window._fb_pixel_injected) {
+      window._fb_pixel_injected = true;
+      try {
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        
+        window.fbq('init', pixelId);
+        window.fbq('track', 'PageView');
+        window.fbq('track', 'ViewContent', {
+          content_name: currentBookData.name || currentBookData.heading || 'Aarogyam India eBook',
+          content_ids: [currentBookData.id || currentBookId],
+          value: currentLandingData.hero?.offer_price || currentBookData.offerPrice || 99,
+          currency: 'INR'
+        });
+      } catch (e) {}
+    }
+
+    // Google Analytics Injection
+    const gaId = l.google_analytics_id;
+    if (gaId && !window._ga_injected) {
+      window._ga_injected = true;
+      try {
+        const s = document.createElement('script');
+        s.async = true;
+        s.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+        document.head.appendChild(s);
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){window.dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', gaId);
+      } catch (e) {}
+    }
   }
 
   function extractYouTubeId(url) {
@@ -651,11 +766,65 @@
       .replace(/'/g, '&#039;');
   }
 
+  // Global Menu and Login Helpers (Identical to my-library.html)
+  window.toggleMenu = function () {
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('sideMenuOverlay');
+    if (sideMenu) {
+      const isActive = sideMenu.classList.toggle('active');
+      if (overlay) overlay.style.display = isActive ? 'block' : 'none';
+    }
+  };
+
+  window.openLoginPopup = function () {
+    const popup = document.getElementById('login-popup-overlay');
+    if (popup) popup.style.display = 'flex';
+  };
+
+  window.closeLoginPopup = function () {
+    const popup = document.getElementById('login-popup-overlay');
+    if (popup) popup.style.display = 'none';
+  };
+
+  window.logoutUser = function () {
+    localStorage.removeItem('AI_USER');
+    localStorage.removeItem('AI_PROFILE');
+    window.location.reload();
+  };
+
+  // Check login state on load
+  function checkLoginHeaderState() {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      const isLoggedIn = storedUser.id || storedUser.mobile;
+      const menuName = document.getElementById('menuUserName');
+      const memberStatus = document.getElementById('mobileMemberStatus');
+      const mobilePhone = document.getElementById('mobileUserPhone');
+      const loginBtn = document.getElementById('mobile-login-btn');
+      const logoutBtn = document.getElementById('mobile-logout-btn');
+
+      if (isLoggedIn) {
+        if (menuName) menuName.textContent = storedUser.full_name || storedUser.name || 'प्रिय पाठक';
+        if (memberStatus) memberStatus.textContent = storedUser.is_subscriber ? 'VIP Pro Member' : 'Active Reader';
+        if (mobilePhone && storedUser.mobile) mobilePhone.textContent = `(${storedUser.mobile})`;
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'flex';
+      } else {
+        if (loginBtn) loginBtn.style.display = 'flex';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+      }
+    } catch (e) {}
+  }
+
   // DOM Ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => {
+      init();
+      checkLoginHeaderState();
+    });
   } else {
     init();
+    checkLoginHeaderState();
   }
 
 })(window);

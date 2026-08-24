@@ -106,10 +106,26 @@
       },
       "video": {
         "enabled": true,
-        "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "title": "🎥 फसल का डॉक्टर - लाइव डायग्नोसिस डेमो",
+        "youtube_url": "https://youtube.com/shorts/ew5tDJgGTK8?si=GdD8pJRqoJ50THeJ",
+        "title": "🎥 खेती का डॉक्टर — लाइव वीडियो डेमो व एक झलक",
         "description": "देखें कैसे किसान पत्तियों के रंग और धब्बों से बीमारी पहचानते हैं।"
       },
+      "videos": [
+        {
+          "url": "https://youtube.com/shorts/ew5tDJgGTK8?si=GdD8pJRqoJ50THeJ",
+          "title": "🎥 खेती का डॉक्टर - वीडियो डेमो",
+          "ratio": "9:16"
+        }
+      ],
+      "suggested_books_list": [
+        {
+          "image": "/images/books/kharif-master-guide-2026-cover.webp",
+          "title": "खरीफ फसल मास्टर गाइड 2026",
+          "offerPrice": 99,
+          "mrp": 299,
+          "link": "BK001"
+        }
+      ],
       "value_stack": {
         "title": "🎁 इस संपूर्ण क्लिनिकल किट में आपको क्या मिलेगा?",
         "items": [

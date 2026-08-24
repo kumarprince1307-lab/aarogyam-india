@@ -732,7 +732,9 @@ body {
         box-sizing: border-box !important;
     }
 
-    .site-footer {
+    body:has(.library-sidebar) .site-footer,
+    .has-sidebar .site-footer,
+    .library-layout .site-footer {
         margin-left: 260px !important;
         width: calc(100% - 260px) !important;
         box-sizing: border-box !important;

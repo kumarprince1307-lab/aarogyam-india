@@ -152,6 +152,7 @@ async function loadBook() {
     try {
         const params = new URLSearchParams(window.location.search);
         let rawId = (params.get("book_id") || params.get("id") || params.get("product") || params.get("slug") || "").toLowerCase().trim();
+        const rawIds = params.get("ids") || params.get("bundle_ids");
         const customTitle = params.get("title") || params.get("name");
         const customAmount = params.get("amount") || params.get("price");
 
@@ -170,7 +171,64 @@ async function loadBook() {
             }
         }
 
-        // Map common aliases
+        // Multi-Book Bundle Check
+        if (rawIds) {
+            const idList = rawIds.split(",").map(x => x.trim()).filter(Boolean);
+            const matchedBooks = [];
+            let totalMrp = 0;
+            let totalOffer = 0;
+
+            idList.forEach(id => {
+                const b = booksArray.find(item => item.id && item.id.toLowerCase() === id.toLowerCase()) || {
+                    id: id,
+                    name: id === 'BK001' ? 'खरीफ फसल मास्टर गाइड 2026' : (id === 'BK002' ? 'खेती का डॉक्टर (Pocket Doctor)' : 'Aarogyam India eBook'),
+                    mrp: 299,
+                    offerPrice: 99,
+                    cover: "/images/books/kharif-master-guide-2026-cover.webp"
+                };
+                matchedBooks.push(b);
+                totalMrp += (b.mrp || 299);
+                totalOffer += (b.offerPrice || 99);
+            });
+
+            window.currentCheckoutBookList = matchedBooks;
+            window.currentCheckoutBook = {
+                id: idList.join(","),
+                title: `${matchedBooks.length} डिजिटल पुस्तकें बंडल`,
+                mrp: totalMrp,
+                offerPrice: totalOffer,
+                cover: matchedBooks[0]?.cover || "/images/books/kharif-master-guide-2026-cover.webp"
+            };
+
+            const coverEl = document.getElementById("bookCover");
+            if (coverEl) coverEl.src = window.currentCheckoutBook.cover;
+            
+            const nameEl = document.getElementById("bookName");
+            if (nameEl) nameEl.innerHTML = `${matchedBooks.length} पुस्तकें बंडल <small style="display:block;font-size:0.8rem;color:#16a34a;font-weight:700;">(${matchedBooks.map(b => b.name || b.id).join(" + ")})</small>`;
+            
+            const mrpEl = document.getElementById("bookMrp");
+            if (mrpEl) mrpEl.textContent = "₹" + totalMrp;
+            
+            const priceEl = document.getElementById("bookPrice");
+            if (priceEl) priceEl.textContent = "₹" + totalOffer;
+
+            const sumBook = document.getElementById("summaryBook");
+            if (sumBook) sumBook.textContent = `${matchedBooks.length} ई-बुक्स कॉम्बो`;
+            
+            const sumMrp = document.getElementById("summaryMrp");
+            if (sumMrp) sumMrp.textContent = "₹" + totalMrp;
+            
+            const sumPrice = document.getElementById("summaryPrice");
+            if (sumPrice) sumPrice.textContent = "₹" + totalOffer;
+            
+            const totPrice = document.getElementById("totalPrice");
+            if (totPrice) totPrice.textContent = "₹" + totalOffer;
+
+            autoFillUserData();
+            return;
+        }
+
+        // Single Book Lookup
         let targetId = rawId;
         if (rawId.includes("sub") || rawId === "subscription" || rawId === "pro-subscription") {
             targetId = "SUB001";
@@ -218,6 +276,7 @@ async function loadBook() {
         const bookMrp = book.mrp || (book.offerPrice ? book.offerPrice * 2 : 299);
         const bookOffer = book.offerPrice || book.offer_price || 99;
 
+        window.currentCheckoutBookList = [book];
         window.currentCheckoutBook = {
             id: book.id || targetId || "BK001",
             title: bookName,
@@ -424,24 +483,50 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                     // 🎉 2. पेमेंट सफल होने पर 'success' लॉग दर्ज करें
                     await logCheckoutActivity(activeUserId, bookIdToBuy, 'success');
 
-                    // Save purchase record immediately
+                    // Save purchase records for ALL books in bundle
                     try {
                         const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
-                        const newPurchase = {
-                            book_id: bookIdToBuy,
-                            title: bookTitle,
-                            amount: bookPrice,
-                            payment_id: response.razorpay_payment_id,
-                            order_id: response.razorpay_order_id || ('ORD_' + Date.now()),
-                            created_at: new Date().toISOString()
-                        };
-                        localPurchases.push(newPurchase);
+                        const myPurchasedIds = JSON.parse(localStorage.getItem('my_purchased_book_ids') || '[]');
+                        const booksToUnlock = (window.currentCheckoutBookList && window.currentCheckoutBookList.length > 0) 
+                            ? window.currentCheckoutBookList 
+                            : [{ id: bookIdToBuy, name: bookTitle, offerPrice: bookPrice }];
+
+                        const db = window.dbClient || window.supabase;
+                        const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+
+                        for (const b of booksToUnlock) {
+                            const bId = b.id || bookIdToBuy;
+                            const bAmt = b.offerPrice || (bookPrice / booksToUnlock.length);
+
+                            const newPurchase = {
+                                book_id: bId,
+                                title: b.name || b.title || bookTitle,
+                                amount: bAmt,
+                                payment_id: response.razorpay_payment_id,
+                                order_id: response.razorpay_order_id || ('ORD_' + Date.now()),
+                                created_at: new Date().toISOString()
+                            };
+                            localPurchases.push(newPurchase);
+                            if (!myPurchasedIds.includes(bId)) myPurchasedIds.push(bId);
+
+                            if (db) {
+                                await db.from('purchases').insert([{
+                                    profile_id: activeUserId || userObj.id,
+                                    book_id: bId,
+                                    amount: bAmt,
+                                    payment_id: response.razorpay_payment_id,
+                                    status: 'completed'
+                                }]);
+                            }
+                        }
+
                         localStorage.setItem('AI_PURCHASES', JSON.stringify(localPurchases));
                         localStorage.setItem('purchases', JSON.stringify(localPurchases));
+                        localStorage.setItem('my_purchased_book_ids', JSON.stringify(myPurchasedIds));
+                        localStorage.removeItem('AI_CART_ITEMS');
 
                         // Activate Membership in local session
-                        const isSub = (bookIdToBuy === 'SUB001' || bookPrice >= 999);
-                        const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+                        const isSub = (bookIdToBuy.includes('SUB') || bookPrice >= 999);
                         userObj.is_active = true;
                         if (isSub) userObj.is_subscriber = true;
                         localStorage.setItem('AI_USER', JSON.stringify(userObj));
@@ -450,22 +535,11 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         localStorage.setItem('user_is_active', 'true');
                         if (isSub) localStorage.setItem('user_is_subscriber', 'true');
 
-                        // Save to Supabase
-                        const db = window.dbClient || window.supabase;
-                        if (db) {
-                            await db.from('purchases').insert([{
-                                profile_id: activeUserId || userObj.id,
-                                book_id: bookIdToBuy,
-                                amount: bookPrice,
-                                payment_id: response.razorpay_payment_id,
-                                status: 'completed'
-                            }]);
-                            if (activeUserId || userObj.id) {
-                                await db.from('profiles').update({
-                                    is_active: true,
-                                    is_subscriber: isSub ? true : userObj.is_subscriber
-                                }).eq('id', activeUserId || userObj.id);
-                            }
+                        if (db && (activeUserId || userObj.id)) {
+                            await db.from('profiles').update({
+                                is_active: true,
+                                is_subscriber: isSub ? true : userObj.is_subscriber
+                            }).eq('id', activeUserId || userObj.id);
                         }
                     } catch (saveErr) {
                         console.warn('Local purchase save note:', saveErr);

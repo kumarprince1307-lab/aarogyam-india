@@ -1,16 +1,16 @@
 /* ==========================================================================
-   AAROGYAM INDIA — ULTIMATE ADMIN BOOK LANDING PAGES HUB
+   AAROGYAM INDIA — ULTIMATE ADMIN BOOK LANDING PAGES HUB (V21.0)
    Comprehensive features:
    - Auto Book Code Generator (BK008, BK009, etc.)
+   - Facebook Pixel ID & Google Analytics ID Tracker
    - Category Selection (Agriculture, Health, Business, NETSURF, Education, Digital AI)
-   - Visual Image Uploader with Dimension Frame Guides (Banner 1734x907, Cover 600x800, OG Image 1200x630)
-   - Dynamic Theme Color System (Forest Green, Royal Orange, Blue, Red, Purple, Custom)
-   - Website Multi-Placement Selectors (Home, Category, Library, Checkout, UCAS)
+   - Visual Image Uploader with Dimension Frame Guides (Banner 1734x907, Cover 600x800, OG Image 1200x630, VIP Banner 1200x400)
+   - Total Value Stack Calculator (₹1999 VIP Free + ₹99 Book = ₹2098+ Value for ₹99)
    - Multi-Video Manager (16:9 Landscape & 9:16 Vertical Shorts/Reels)
    - Advanced Customer Reviews Manager with Male/Female Avatar Selectors (👨/👩)
    - OpenGraph & Social SEO Meta Manager (OG Title, Desc, Image)
    - Customizable Sticky Action Bar (Button Text & Color)
-   - Aarogyam Pro VIP Subscriber Perk Customizer
+   - Aarogyam Pro VIP Subscriber Perk Customizer with Banner Uploader
    - Dynamic KPIs & Feature Badges Builder
    - Demo Pages Gallery Uploader
    - Free Bonus Books & Bundles Manager
@@ -21,7 +21,7 @@
 import { initAdminLayout, showToast } from './admin-main.js';
 
 export async function initBookLandingPages() {
-  initAdminLayout('Book Landing Pages Hub', 'Create and manage rich high-converting dynamic book landing pages with multi-video, avatar reviews, OG tags, and custom themes.');
+  initAdminLayout('Book Landing Pages Hub', 'Create and manage rich high-converting dynamic book landing pages with FB Pixel, Google ID, Total Value Stack, multi-video, avatar reviews, and custom themes.');
 
   const content = document.getElementById('page-content');
   if (!content) return;
@@ -37,6 +37,7 @@ export async function initBookLandingPages() {
   let currentVideos = [];
   let currentReviews = [];
   let currentFaqs = [];
+  let currentSuggestedBooks = [];
   let selectedThemePrimary = '#2E7D32';
   let selectedThemeDark = '#1B5E20';
 
@@ -47,17 +48,20 @@ export async function initBookLandingPages() {
         <div>
           <div class="admin-section-title" style="display: flex; align-items: center; gap: 8px;">
             <span>📚 Universal Book Landing Pages Hub</span>
-            <span style="font-size: 0.75rem; background: rgba(46,125,50,0.15); color: #16a34a; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Ultimate PRO</span>
+            <span style="font-size: 0.75rem; background: rgba(46,125,50,0.15); color: #16a34a; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Ultimate PRO V21</span>
           </div>
           <p style="font-size: 0.85rem; color: var(--admin-muted); margin: 0;">
-            मल्टी-वीडियो (16:9 & 9:16 Shorts), अवतार रिव्यूज, OG सोशल मेटा, स्टिकी बार व थीम कस्टमाइजर के साथ संपूर्ण बुक लैंडिंग पेज बनाएं।
+            FB Pixel, Google ID, ₹1999 VIP वैल्यू स्टैक, मल्टी-वीडियो, अवतार रिव्यूज व कार्ट इंटीग्रेशन के साथ संपूर्ण बुक लैंडिंग पेज बनाएं।
           </p>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button id="btn-toggle-book-builder" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22,163,74,0.3);">
             <span>✨</span> <span>+ नया बुक लैंडिंग पेज बनाएं</span>
           </button>
-          <button id="book-lp-refresh-btn" class="admin-button small-button">🔄 Refresh Data</button>
+          <a href="/ebooks/cart.html" target="_blank" class="admin-button small-button" style="background: #2563eb; color: #fff; text-decoration: none; font-weight: 700;">
+            🛒 लाइव कार्ट देखें
+          </a>
+          <button id="book-lp-refresh-btn" class="admin-button small-button">🔄 Refresh</button>
         </div>
       </div>
 
@@ -137,7 +141,42 @@ export async function initBookLandingPages() {
           </div>
         </div>
 
-        <!-- SECTION 2: HERO DETAILS & PRICING -->
+        <!-- SECTION 2: MARKETING & TRACKING (FIXED BUILT-IN ON/OFF TOGGLES) -->
+        <div style="background: rgba(37,99,235,0.08); border: 1.5px solid rgba(37,99,235,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="font-weight: 800; color: #60a5fa; font-size: 0.95rem; margin-bottom: 8px;">
+            📊 2. मार्केटिंग ट्रैकिंग एवं पिक्सल (One-Click Active Toggles)
+          </div>
+          <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
+              <input type="checkbox" id="blp_fb_pixel_enabled" checked style="accent-color: #2563eb; width: 18px; height: 18px;" />
+              <span>🔵 Facebook Pixel (ID: 1671873500553134) चालू रखें</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
+              <input type="checkbox" id="blp_ga_enabled" checked style="accent-color: #2563eb; width: 18px; height: 18px;" />
+              <span>🔴 Google Analytics व Ads Conversion चालू रखें</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- SECTION 2.1: SUGGESTED / RELATED BOOKS (IMAGE, TITLE, PRICE, LINK & ADD TO CART) -->
+        <div style="background: rgba(245,158,11,0.08); border: 1.5px solid rgba(245,158,11,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="font-weight: 800; color: #f59e0b; font-size: 0.95rem;">
+              🛒 2.1 संबंधित / सुझाई गई पुस्तकें (Suggested Books with Image, Title, Price & Cart)
+            </div>
+            <button type="button" id="btn_add_suggested_book_item" class="admin-button small-button" style="background: #f59e0b; color: #000; font-weight: 800;">
+              + संबंधित पुस्तक जोड़ें
+            </button>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--admin-muted); margin: 0 0 10px 0;">
+            पेज के नीचे दिखने वाली पुस्तकें जोड़ें। इसमें कवर फोटो, शीर्षक, मूल्य, लिंक और "Add to Cart" बटन स्वतः सक्रिय रहेगा:
+          </p>
+          <div id="blp_suggested_books_list_wrap" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- SECTION 3: HERO DETAILS & PRICING -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 16px;">
           <div>
             <label class="admin-label" style="font-weight: 700;">बैज टैग (Hero Tag):</label>
@@ -176,10 +215,10 @@ export async function initBookLandingPages() {
           </div>
         </div>
 
-        <!-- SECTION 3: IMAGE UPLOADERS WITH DIMENSION FRAME GUIDES -->
+        <!-- SECTION 4: IMAGE UPLOADERS WITH DIMENSION FRAME GUIDES -->
         <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; margin-bottom: 12px;">
-            🖼️ 2. इमेज अपलोडर व साइज/फ्रेम गाइडलाइन (Dimension Frames & Upload)
+            🖼️ 3. इमेज अपलोडर व साइज/फ्रेम गाइडलाइन (Dimension Frames & Upload)
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -219,10 +258,53 @@ export async function initBookLandingPages() {
           </div>
         </div>
 
-        <!-- SECTION 4: THEME COLOR CUSTOMIZER -->
+        <!-- SECTION 5: TOTAL VALUE STACK CALCULATION (₹1999 Free + ₹99 Book) -->
+        <div style="background: linear-gradient(135deg, rgba(5,46,22,0.15) 0%, rgba(20,83,45,0.15) 100%); border: 2px solid #22c55e; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="font-weight: 900; color: #4ade80; font-size: 0.95rem; margin-bottom: 8px;">
+            💎 4. टोटल वैल्यू स्टैक कैलकुलेशन (Total Value Stack - ₹1999 VIP Free)
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem;">मुख्य ई-बुक MRP:</label>
+              <input type="number" id="blp_stack_book_mrp" value="299" class="admin-input" style="width:100%;padding:6px 10px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem;">1 वर्ष VIP Pro मेंबरशिप वैल्यू:</label>
+              <input type="number" id="blp_stack_vip_val" value="1999" class="admin-input" style="width:100%;padding:6px 10px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem;">बोनस चार्ट्स व गिफ्ट्स वैल्यू:</label>
+              <input type="number" id="blp_stack_bonus_val" value="199" class="admin-input" style="width:100%;padding:6px 10px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem;color:#4ade80;font-weight:800;">आज का ऑफर मूल्य:</label>
+              <input type="number" id="blp_stack_offer_val" value="99" class="admin-input" style="width:100%;padding:6px 10px;font-weight:800;color:#16a34a;" />
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 6: VIP SUBSCRIBER BENEFIT CARD WITH BANNER UPLOADER -->
+        <div style="background: rgba(250,204,21,0.08); border: 1.5px solid rgba(250,204,21,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="font-weight: 800; color: #facc15; font-size: 0.95rem; margin-bottom: 10px;">
+            👑 5. Aarogyam Pro VIP सब्सक्राइबर लाभ कार्ड (VIP Perks & Banner)
+          </div>
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin-bottom: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem;">VIP बैनर इमेज URL / Upload (1200 × 400 px):</label>
+              <input type="file" id="blp_file_vip_banner" accept="image/*" class="admin-input" style="width:100%;padding:4px;font-size:0.75rem;margin-bottom:4px;" />
+              <input type="text" id="blp_vip_banner_url" class="admin-input" placeholder="या VIP बैनर URL दर्ज करें" style="width:100%;padding:6px 10px;font-size:0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem;">VIP मुख्य संदेश (Heading):</label>
+              <input type="text" id="blp_vip_perk_text" class="admin-input" placeholder="👑 VIP मेंबर्स के लिए यह गाइड 100% मुफ्त शामिल है।" style="width:100%;padding:6px 10px;" />
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 7: THEME COLOR CUSTOMIZER -->
         <div style="background: rgba(139,92,246,0.08); border: 1.5px solid rgba(139,92,246,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <label style="font-weight: 800; color: #a78bfa; font-size: 0.95rem; display: block; margin-bottom: 8px;">
-            🎨 3. थीम कलर कस्टमाइजर (Theme Color Palette System)
+            🎨 6. थीम कलर कस्टमाइजर (Theme Color Palette System)
           </label>
           <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
             <button type="button" class="admin-button small-button theme-color-btn" data-color="#2E7D32" data-dark="#1B5E20" style="background: #2E7D32; color: #fff; font-weight: 700;">🟢 Forest Green</button>
@@ -238,15 +320,12 @@ export async function initBookLandingPages() {
           </div>
         </div>
 
-        <!-- SECTION 5: MULTI-VIDEO MANAGER (16:9 & 9:16 SHORTS) -->
+        <!-- SECTION 8: MULTI-VIDEO MANAGER -->
         <div style="background: rgba(59,130,246,0.08); border: 1.5px solid rgba(59,130,246,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div>
               <div style="font-weight: 800; color: #3b82f6; font-size: 0.95rem;">
-                🎥 4. मल्टी-वीडियो मैनेजर (16:9 Landscape & 9:16 Shorts/Reels)
-              </div>
-              <div style="font-size: 0.75rem; color: var(--admin-muted);">
-                एक से अधिक वीडियो जोड़ें और फॉर्मेट चुनें (16:9 यूट्यूब या 9:16 वर्टिकल शॉर्ट्स)।
+                🎥 7. मल्टी-वीडियो मैनेजर (16:9 Landscape & 9:16 Shorts/Reels)
               </div>
             </div>
             <button type="button" id="btn_add_video_item" class="admin-button small-button" style="background: #2563eb; color: #fff; font-weight: 700;">
@@ -258,15 +337,12 @@ export async function initBookLandingPages() {
           </div>
         </div>
 
-        <!-- SECTION 6: ADVANCED REVIEWS & AVATARS (👨/👩) -->
+        <!-- SECTION 9: ADVANCED REVIEWS & AVATARS -->
         <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div>
               <div style="font-weight: 800; color: #f59e0b; font-size: 0.95rem;">
-                ⭐ 5. कस्टमर रिव्यूज व ऑटो मेल/फीमेल अवतार (Customer Reviews & Avatars)
-              </div>
-              <div style="font-size: 0.75rem; color: var(--admin-muted);">
-                फोटो उपलब्ध न होने पर स्वतः 👨 Male या 👩 Female अवतार प्रदर्शित होगा।
+                ⭐ 8. कस्टमर रिव्यूज व ऑटो मेल/फीमेल अवतार (👨/👩)
               </div>
             </div>
             <button type="button" id="btn_add_review_item" class="admin-button small-button" style="background: #d97706; color: #fff; font-weight: 700;">
@@ -278,64 +354,41 @@ export async function initBookLandingPages() {
           </div>
         </div>
 
-        <!-- SECTION 7: OPENGRAPH & SOCIAL SEO META (OG Image 1200x630) -->
+        <!-- SECTION 10: OPENGRAPH & SOCIAL SEO META -->
         <div style="background: rgba(16,185,129,0.08); border: 1.5px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="font-weight: 800; color: #10b981; font-size: 0.95rem; margin-bottom: 10px;">
-            🌐 6. सोशल मीडिया शेयरिंग एवं OpenGraph Meta (WhatsApp / FB Sharing)
+            🌐 9. सोशल मीडिया शेयरिंग एवं OpenGraph Meta (1200 × 630 px)
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
             <div>
-              <label class="admin-label" style="font-size: 0.78rem;">OG Title (सोशल शेयर शीर्षक):</label>
+              <label class="admin-label" style="font-size: 0.78rem;">OG Title:</label>
               <input type="text" id="blp_og_title" class="admin-input" placeholder="खरीफ फसल मास्टर गाइड 2026" style="width:100%;padding:6px 10px;" />
             </div>
             <div>
-              <label class="admin-label" style="font-size: 0.78rem;">OG Image URL (1200 × 630 px Frame):</label>
+              <label class="admin-label" style="font-size: 0.78rem;">OG Image URL (1200 × 630 px):</label>
               <input type="text" id="blp_og_image" class="admin-input" placeholder="https://aarogyamindia.online/images/books/kharif-fasal-og.webp" style="width:100%;padding:6px 10px;" />
             </div>
           </div>
           <div>
-            <label class="admin-label" style="font-size: 0.78rem;">OG Description (सोशल शेयर विवरण):</label>
+            <label class="admin-label" style="font-size: 0.78rem;">OG Description:</label>
             <input type="text" id="blp_og_desc" class="admin-input" placeholder="सम्पूर्ण Practical Guide। अभी ₹299 की जगह ₹99 में उपलब्ध।" style="width:100%;padding:6px 10px;" />
           </div>
         </div>
 
-        <!-- SECTION 8: STICKY BAR & VIP PERKS CUSTOMIZATION -->
-        <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
-          <div style="font-weight: 800; color: #facc15; font-size: 0.95rem; margin-bottom: 10px;">
-            📌 7. कस्टमाइजेबल स्टिकी बाय बार एवं VIP लाभ (Sticky Bar & VIP Perks)
-          </div>
-          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin-bottom: 10px;">
-            <div>
-              <label class="admin-label" style="font-size: 0.78rem;">स्टिकी बाय बटन टेक्स्ट (Sticky Button Text):</label>
-              <input type="text" id="blp_sticky_btn_text" class="admin-input" placeholder="अभी खरीदें मात्र ₹99 में" style="width:100%;padding:6px 10px;" />
-            </div>
-            <div>
-              <label class="admin-label" style="font-size: 0.78rem;">VIP सब्सक्राइबर लाभ टेक्स्ट:</label>
-              <input type="text" id="blp_vip_perk_text" class="admin-input" placeholder="👑 VIP मेंबर्स के लिए 100% मुफ्त शामिल।" style="width:100%;padding:6px 10px;" />
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 9: DEMO GALLERY & BONUSES -->
+        <!-- SECTION 11: DEMO GALLERY & BONUSES -->
         <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div>
-              <div style="font-weight: 800; color: #fbbf24; font-size: 0.95rem;">
-                📖 8. डेमो/सैंपल पेजेस गैलरी (Interactive Zoom Lightbox)
-              </div>
-              <div style="font-size: 0.75rem; color: var(--admin-muted);">
-                📐 800 × 1100 px (Portrait Pages)
-              </div>
+            <div style="font-weight: 800; color: #fbbf24; font-size: 0.95rem;">
+              📖 10. डेमो पेजेस व बोनस पुस्तकें
             </div>
             <button type="button" id="btn_add_demo_image" class="admin-button small-button" style="background: #d97706; color: #fff; font-weight: 700;">
-              + नया पेज जोड़ें / अपलोड करें
+              + नया डेमो पेज जोड़ें
             </button>
           </div>
           <div id="blp_demo_images_wrap" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
             <!-- Rendered dynamically -->
           </div>
 
-          <!-- Free Bonus Books -->
           <div style="border-top: 1px dashed var(--admin-border); padding-top: 14px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <div style="font-weight: 800; color: #f59e0b; font-size: 0.92rem;">
@@ -351,34 +404,33 @@ export async function initBookLandingPages() {
           </div>
         </div>
 
-        <!-- SECTION 10: FAQS MANAGER -->
+        <!-- SECTION 12: FAQS & WHATSAPP PROMPT -->
         <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem;">
-              ❓ 9. अक्सर पूछे जाने वाले सवाल (FAQs Manager)
+              ❓ 11. अक्सर पूछे जाने वाले सवाल (FAQs Manager)
             </div>
             <button type="button" id="btn_add_faq_item" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
               + नया FAQ जोड़ें
             </button>
           </div>
-          <div id="blp_faqs_list_wrap" style="display: flex; flex-direction: column; gap: 8px;">
+          <div id="blp_faqs_list_wrap" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
             <!-- Rendered dynamically -->
           </div>
-        </div>
 
-        <!-- SECTION 11: WHATSAPP PROMPT & STATUS -->
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 16px;">
-          <div>
-            <label class="admin-label" style="font-weight: 700;">💬 10. WhatsApp हेल्पडेस्क प्रॉम्प्ट मैसेज:</label>
-            <input type="text" id="blp_wa_prompt" class="admin-input" placeholder="नमस्ते, मुझे पुस्तक के बारे में और जानकारी चाहिए।" style="width: 100%; padding: 8px 12px;" />
-          </div>
-          <div>
-            <label class="admin-label" style="font-weight: 700;">लाइव / ऑफलाइन स्टेटस (Status):</label>
-            <select id="blp_status" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 800;">
-              <option value="active">🟢 Live / Online</option>
-              <option value="draft">⏳ Draft / Offline</option>
-              <option value="disabled">🔴 Disabled</option>
-            </select>
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+            <div>
+              <label class="admin-label" style="font-weight: 700;">💬 WhatsApp हेल्पडेस्क प्रॉम्प्ट मैसेज:</label>
+              <input type="text" id="blp_wa_prompt" class="admin-input" placeholder="नमस्ते, मुझे पुस्तक के बारे में और जानकारी चाहिए।" style="width: 100%; padding: 8px 12px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight: 700;">लाइव / ऑफलाइन स्टेटस:</label>
+              <select id="blp_status" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 800;">
+                <option value="active">🟢 Live / Online</option>
+                <option value="draft">⏳ Draft / Offline</option>
+                <option value="disabled">🔴 Disabled</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -400,7 +452,7 @@ export async function initBookLandingPages() {
         <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--admin-text);">
           📋 सक्रिय बुक लैंडिंग पेज सूची (All Book Landing Pages)
         </h3>
-        <input type="text" id="blp_search_input" class="admin-input" placeholder="🔍 शीर्षक, Book ID या Category से खोजें..." style="max-width: 280px; padding: 6px 10px; font-size: 0.82rem;" />
+        <input type="text" id="blp_search_input" class="admin-input" placeholder="🔍 खोजें..." style="max-width: 280px; padding: 6px 10px; font-size: 0.82rem;" />
       </div>
 
       <div id="blp_table_container" class="admin-table-wrapper">
@@ -420,9 +472,9 @@ export async function initBookLandingPages() {
   const genCodeBtn = document.getElementById('btn_generate_book_code');
   const searchInput = document.getElementById('blp_search_input');
 
-  // File Preview Handlers
   setupImagePreview('blp_file_banner', 'blp_banner_url', 'blp_preview_banner_img');
   setupImagePreview('blp_file_cover', 'blp_cover_url', 'blp_preview_cover_img');
+  setupImagePreview('blp_file_vip_banner', 'blp_vip_banner_url', null);
 
   // Theme Color Buttons
   document.querySelectorAll('.theme-color-btn').forEach(btn => {
@@ -473,23 +525,12 @@ export async function initBookLandingPages() {
   });
 
   document.getElementById('btn_add_video_item')?.addEventListener('click', () => {
-    currentVideos.push({
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      title: '🎥 नया वीडियो डेमो',
-      ratio: '16:9',
-      description: 'वीडियो विवरण'
-    });
+    currentVideos.push({ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: '🎥 नया वीडियो डेमो', ratio: '16:9' });
     renderVideosInBuilder();
   });
 
   document.getElementById('btn_add_review_item')?.addEventListener('click', () => {
-    currentReviews.push({
-      name: 'संतुष्ट ग्राहक',
-      location: 'भारत',
-      rating: 5,
-      gender: 'male',
-      comment: 'बहुत ही उपयोगी व व्यावहारिक पुस्तक है।'
-    });
+    currentReviews.push({ name: 'संतुष्ट पाठक', location: 'भारत', rating: 5, gender: 'male', comment: 'बहुत ही उपयोगी व व्यावहारिक पुस्तक है।' });
     renderReviewsInBuilder();
   });
 
@@ -499,12 +540,7 @@ export async function initBookLandingPages() {
   });
 
   document.getElementById('btn_add_bonus_item')?.addEventListener('click', () => {
-    currentBonuses.push({
-      title: 'नई बोनस ई-बुक / स्प्रे चार्ट',
-      description: 'मुफ्त प्रैक्टिकल गाइड',
-      mrp: 199,
-      image: '../images/books/kharif-fasal-hero-2.webp'
-    });
+    currentBonuses.push({ title: 'नई बोनस ई-बुक', description: 'मुफ्त प्रैक्टिकल गाइड', mrp: 199, image: '../images/books/kharif-fasal-hero-2.webp' });
     renderBonusesInBuilder();
   });
 
@@ -513,11 +549,19 @@ export async function initBookLandingPages() {
     renderFaqsInBuilder();
   });
 
+  document.getElementById('btn_add_suggested_book_item')?.addEventListener('click', () => {
+    currentSuggestedBooks.push({
+      image: '../images/books/kharif-master-guide-2026-cover.webp',
+      title: 'संबंधित ई-बुक गाइड',
+      offerPrice: 99,
+      mrp: 299,
+      link: 'BK002'
+    });
+    renderSuggestedBooksInBuilder();
+  });
+
   await loadAllData();
 
-  // ==========================================================================
-  // AUTO GENERATE BOOK ID
-  // ==========================================================================
   function autoGenerateBookId() {
     let maxNum = 0;
     const combined = [...allBooks, ...allLandingPages];
@@ -532,13 +576,10 @@ export async function initBookLandingPages() {
     showToast(`⚡ नया Book Code जनरेट हुआ: ${nextCode}`, 'success');
   }
 
-  // ==========================================================================
-  // IMAGE PREVIEW & LOCAL UPLOADER
-  // ==========================================================================
   function setupImagePreview(fileInputId, urlInputId, previewImgId) {
     const fileInput = document.getElementById(fileInputId);
     const urlInput = document.getElementById(urlInputId);
-    const previewImg = document.getElementById(previewImgId);
+    const previewImg = previewImgId ? document.getElementById(previewImgId) : null;
 
     urlInput?.addEventListener('input', () => {
       if (urlInput.value && previewImg) previewImg.src = urlInput.value;
@@ -559,14 +600,10 @@ export async function initBookLandingPages() {
     });
   }
 
-  // ==========================================================================
-  // DATA LOADING & RENDERING
-  // ==========================================================================
   async function loadAllData() {
     const tableWrap = document.getElementById('blp_table_container');
     if (tableWrap) tableWrap.innerHTML = '<div class="admin-loading">डेटा लोड हो रहा है...</div>';
 
-    // 1. Fetch books.json
     try {
       const res = await fetch('/data/books.json?v=' + Date.now());
       if (res.ok) {
@@ -575,13 +612,11 @@ export async function initBookLandingPages() {
       }
     } catch (e) {}
 
-    // Populate book dropdown
     if (bookSelect) {
       bookSelect.innerHTML = '<option value="">-- लाइब्रेरी से ई-बुक चुनें (Auto-Fill) --</option>' +
         allBooks.map(b => `<option value="${b.id}">${b.id}: ${b.heading || b.name} (₹${b.offerPrice || 99})</option>`).join('');
     }
 
-    // 2. Fetch universal-book-landing-pages.json
     allLandingPages = [];
     try {
       const res = await fetch('/data/universal-book-landing-pages.json?v=' + Date.now());
@@ -591,7 +626,6 @@ export async function initBookLandingPages() {
       }
     } catch (e) {}
 
-    // 3. Scan LocalStorage for latest Admin Edits
     try {
       const stored = localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES');
       if (stored) {
@@ -652,7 +686,7 @@ export async function initBookLandingPages() {
             <th>कवर</th>
             <th>शीर्षक व कैटेगरी</th>
             <th>मूल्य</th>
-            <th>वीडियो / बोनस</th>
+            <th>ट्रैकिंग</th>
             <th>थीम</th>
             <th>स्टेटस</th>
             <th>एक्शन</th>
@@ -660,8 +694,7 @@ export async function initBookLandingPages() {
         </thead>
         <tbody>
           ${filtered.map(p => {
-            const bCount = (p.bonuses || p.bonus_books || []).length;
-            const vCount = (p.videos || []).length || (p.video?.enabled ? 1 : 0);
+            const hasPixel = !!p.facebook_pixel_id;
             const liveUrl = `/ebooks/book-landing.html?id=${encodeURIComponent(p.id)}`;
             const isLive = (p.status || 'active') === 'active';
             const themeCol = p.theme_primary || '#2E7D32';
@@ -681,10 +714,9 @@ export async function initBookLandingPages() {
                   <span style="font-size:0.75rem;color:var(--admin-muted);text-decoration:line-through;margin-left:4px;">₹${p.hero?.mrp || 299}</span>
                 </td>
                 <td>
-                  <div style="font-size:0.72rem;display:flex;gap:4px;flex-wrap:wrap;">
-                    <span style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 6px;border-radius:4px;font-weight:700;">🎁 ${bCount} Bonuses</span>
-                    <span style="background:rgba(59,130,246,0.15);color:#3b82f6;padding:2px 6px;border-radius:4px;font-weight:700;">🎥 ${vCount} Videos</span>
-                  </div>
+                  <span style="font-size:0.72rem;background:${hasPixel ? 'rgba(37,99,235,0.15)' : 'rgba(100,116,139,0.15)'};color:${hasPixel ? '#3b82f6' : '#64748b'};padding:2px 6px;border-radius:4px;font-weight:700;">
+                    ${hasPixel ? '📊 Pixel ON' : 'No Pixel'}
+                  </span>
                 </td>
                 <td>
                   <div style="width:14px;height:14px;border-radius:50%;background:${themeCol};"></div>
@@ -718,7 +750,6 @@ export async function initBookLandingPages() {
     `;
   }
 
-  // Renderers for Multi-Video & Avatar Reviews
   function renderVideosInBuilder() {
     const wrap = document.getElementById('blp_videos_list_wrap');
     if (!wrap) return;
@@ -750,7 +781,7 @@ export async function initBookLandingPages() {
       <div style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:10px;margin-bottom:8px;">
         <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:6px;">
           <input type="text" placeholder="ग्राहक का नाम" value="${escapeHtml(r.name)}" onchange="window.updateReviewField(${idx}, 'name', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.82rem;font-weight:700;" />
-          <input type="text" placeholder="स्थान (उदा. सागर, MP)" value="${escapeHtml(r.location || '')}" onchange="window.updateReviewField(${idx}, 'location', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.82rem;" />
+          <input type="text" placeholder="स्थान" value="${escapeHtml(r.location || '')}" onchange="window.updateReviewField(${idx}, 'location', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.82rem;" />
           <select onchange="window.updateReviewField(${idx}, 'gender', this.value)" class="admin-select" style="padding:4px 8px;font-size:0.8rem;font-weight:700;">
             <option value="male" ${r.gender === 'male' ? 'selected' : ''}>👨 Male Avatar</option>
             <option value="female" ${r.gender === 'female' ? 'selected' : ''}>👩 Female Avatar</option>
@@ -809,15 +840,52 @@ export async function initBookLandingPages() {
     wrap.innerHTML = currentFaqs.map((f, idx) => `
       <div style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:10px;margin-bottom:6px;">
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
-          <input type="text" placeholder="प्रश्न (Question)" value="${escapeHtml(f.q)}" onchange="window.updateFaqField(${idx}, 'q', this.value)" class="admin-input" style="width:100%;padding:4px 8px;font-size:0.85rem;font-weight:700;" />
+          <input type="text" placeholder="प्रश्न" value="${escapeHtml(f.q)}" onchange="window.updateFaqField(${idx}, 'q', this.value)" class="admin-input" style="width:100%;padding:4px 8px;font-size:0.85rem;font-weight:700;" />
           <button type="button" onclick="window.removeFaqItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:3px 8px;">&times;</button>
         </div>
-        <textarea placeholder="उत्तर (Answer)" onchange="window.updateFaqField(${idx}, 'a', this.value)" class="admin-textarea" rows="2" style="width:100%;padding:4px 8px;font-size:0.82rem;">${escapeHtml(f.a)}</textarea>
+        <textarea placeholder="उत्तर" onchange="window.updateFaqField(${idx}, 'a', this.value)" class="admin-textarea" rows="2" style="width:100%;padding:4px 8px;font-size:0.82rem;">${escapeHtml(f.a)}</textarea>
       </div>
     `).join('');
   }
 
-  // Window Field Mutators
+  function renderSuggestedBooksInBuilder() {
+    const wrap = document.getElementById('blp_suggested_books_list_wrap');
+    if (!wrap) return;
+    if (currentSuggestedBooks.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:8px;">कोई संबंधित पुस्तक नहीं जोड़ी गई। "+ संबंधित पुस्तक जोड़ें" पर क्लिक करें।</div>';
+      return;
+    }
+    wrap.innerHTML = currentSuggestedBooks.map((sb, idx) => `
+      <div style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:10px;margin-bottom:6px;">
+        <div style="display:grid;grid-template-columns:1.5fr 1.5fr 1fr 1fr 1fr auto;gap:8px;align-items:center;">
+          <div>
+            <label style="font-size:0.72rem;color:var(--admin-muted);display:block;">📸 कवर इमेज URL:</label>
+            <input type="text" placeholder="../images/books/cover.webp" value="${escapeHtml(sb.image || '')}" onchange="window.updateSuggestedBookField(${idx}, 'image', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.8rem;" />
+          </div>
+          <div>
+            <label style="font-size:0.72rem;color:var(--admin-muted);display:block;">📘 पुस्तक का नाम:</label>
+            <input type="text" placeholder="पुस्तक का शीर्षक" value="${escapeHtml(sb.title || '')}" onchange="window.updateSuggestedBookField(${idx}, 'title', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.8rem;font-weight:700;" />
+          </div>
+          <div>
+            <label style="font-size:0.72rem;color:var(--admin-muted);display:block;">💰 ऑफर मूल्य ₹:</label>
+            <input type="number" placeholder="99" value="${sb.offerPrice || 99}" onchange="window.updateSuggestedBookField(${idx}, 'offerPrice', parseInt(this.value,10))" class="admin-input" style="padding:4px 8px;font-size:0.8rem;font-weight:800;color:#22c55e;" />
+          </div>
+          <div>
+            <label style="font-size:0.72rem;color:var(--admin-muted);display:block;">🏷️ MRP ₹:</label>
+            <input type="number" placeholder="299" value="${sb.mrp || 299}" onchange="window.updateSuggestedBookField(${idx}, 'mrp', parseInt(this.value,10))" class="admin-input" style="padding:4px 8px;font-size:0.8rem;" />
+          </div>
+          <div>
+            <label style="font-size:0.72rem;color:var(--admin-muted);display:block;">🔗 लिंक / ID:</label>
+            <input type="text" placeholder="BK002 या URL" value="${escapeHtml(sb.link || sb.id || '')}" onchange="window.updateSuggestedBookField(${idx}, 'link', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.8rem;" />
+          </div>
+          <div style="padding-top:14px;">
+            <button type="button" onclick="window.removeSuggestedBookItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:4px 8px;" title="हटाएं">&times;</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
   window.updateVideoField = (idx, field, val) => { if (currentVideos[idx]) currentVideos[idx][field] = val; };
   window.removeVideoItem = (idx) => { currentVideos.splice(idx, 1); renderVideosInBuilder(); };
   window.updateReviewField = (idx, field, val) => { if (currentReviews[idx]) currentReviews[idx][field] = val; };
@@ -838,6 +906,8 @@ export async function initBookLandingPages() {
   window.removeBonusItem = (idx) => { currentBonuses.splice(idx, 1); renderBonusesInBuilder(); };
   window.updateFaqField = (idx, field, val) => { if (currentFaqs[idx]) currentFaqs[idx][field] = val; };
   window.removeFaqItem = (idx) => { currentFaqs.splice(idx, 1); renderFaqsInBuilder(); };
+  window.updateSuggestedBookField = (idx, field, val) => { if (currentSuggestedBooks[idx]) currentSuggestedBooks[idx][field] = val; };
+  window.removeSuggestedBookItem = (idx) => { currentSuggestedBooks.splice(idx, 1); renderSuggestedBooksInBuilder(); };
 
   window.toggleLiveStatus = function(bId) {
     const page = allLandingPages.find(p => p.id === bId);
@@ -859,6 +929,7 @@ export async function initBookLandingPages() {
     currentReviews = [];
     currentDemoImages = [];
     currentFaqs = [];
+    currentSuggestedBooks = [];
     selectedThemePrimary = '#2E7D32';
     selectedThemeDark = '#1B5E20';
 
@@ -872,6 +943,7 @@ export async function initBookLandingPages() {
     renderDemoImagesInBuilder();
     renderBonusesInBuilder();
     renderFaqsInBuilder();
+    renderSuggestedBooksInBuilder();
   }
 
   window.editBookLandingPage = function(bId) {
@@ -901,6 +973,40 @@ export async function initBookLandingPages() {
     if (hero.cover_image) document.getElementById('blp_preview_cover_img').src = hero.cover_image;
     if (hero.banner_image) document.getElementById('blp_preview_banner_img').src = hero.banner_image;
 
+    // Tracking Toggles
+    const fbPixelEnabled = document.getElementById('blp_fb_pixel_enabled');
+    if (fbPixelEnabled) fbPixelEnabled.checked = page.facebook_pixel_id !== false && page.facebook_pixel_id !== 'disabled';
+    const gaEnabled = document.getElementById('blp_ga_enabled');
+    if (gaEnabled) gaEnabled.checked = page.google_analytics_id !== false && page.google_analytics_id !== 'disabled';
+
+    // Suggested Books List
+    currentSuggestedBooks = page.suggested_books_list || [];
+    if (!currentSuggestedBooks || currentSuggestedBooks.length === 0) {
+      const sugs = page.suggested_books || [];
+      currentSuggestedBooks = sugs.map(s => {
+        if (typeof s === 'object') return s;
+        const b = allBooks.find(x => x.id === s);
+        return {
+          image: b?.cover || b?.thumbnail || '../images/books/kharif-master-guide-2026-cover.webp',
+          title: b?.heading || b?.name || s,
+          offerPrice: b?.offerPrice || 99,
+          mrp: b?.mrp || 299,
+          link: s
+        };
+      });
+    }
+
+    // Value stack
+    const stack = page.value_stack || {};
+    document.getElementById('blp_stack_book_mrp').value = stack.book_mrp || hero.mrp || 299;
+    document.getElementById('blp_stack_vip_val').value = stack.vip_value || 1999;
+    document.getElementById('blp_stack_bonus_val').value = stack.bonus_value || 199;
+    document.getElementById('blp_stack_offer_val').value = stack.offer_price || hero.offer_price || 99;
+
+    // VIP banner
+    document.getElementById('blp_vip_banner_url').value = stack.vip_banner || '';
+    document.getElementById('blp_vip_perk_text').value = stack.subscriber_perk || '';
+
     // Theme Color
     selectedThemePrimary = page.theme_primary || '#2E7D32';
     selectedThemeDark = page.theme_dark || '#1B5E20';
@@ -911,14 +1017,10 @@ export async function initBookLandingPages() {
     document.getElementById('blp_og_desc').value = page.og_description || hero.description || '';
     document.getElementById('blp_og_image').value = page.og_image || hero.banner_image || '';
 
-    // Sticky & VIP
-    document.getElementById('blp_sticky_btn_text').value = page.sticky_button_text || '';
-    document.getElementById('blp_vip_perk_text').value = page.value_stack?.subscriber_perk || '';
-
     document.getElementById('blp_wa_prompt').value = page.whatsapp_prompt || '';
     document.getElementById('blp_status').value = page.status || 'active';
 
-    currentVideos = page.videos || (page.video?.enabled ? [{ url: page.video.youtube_url, title: page.video.title, ratio: '16:9' }] : []);
+    currentVideos = page.videos || [];
     currentReviews = page.testimonials || [];
     currentDemoImages = page.demo_images || [];
     currentBonuses = page.bonuses || page.bonus_books || [];
@@ -929,6 +1031,7 @@ export async function initBookLandingPages() {
     renderDemoImagesInBuilder();
     renderBonusesInBuilder();
     renderFaqsInBuilder();
+    renderSuggestedBooksInBuilder();
 
     builderCard.style.display = 'block';
     builderCard.scrollIntoView({ behavior: 'smooth' });
@@ -967,17 +1070,31 @@ export async function initBookLandingPages() {
 
     const mrp = parseInt(document.getElementById('blp_hero_mrp')?.value, 10) || 299;
 
+    const isFbPixelOn = document.getElementById('blp_fb_pixel_enabled')?.checked !== false;
+    const isGaOn = document.getElementById('blp_ga_enabled')?.checked !== false;
+
     const pageData = {
       id: bId,
       slug: bId.toLowerCase(),
       category: category,
       status: document.getElementById('blp_status')?.value || 'active',
+      facebook_pixel_id: isFbPixelOn ? '1671873500553134' : 'disabled',
+      google_analytics_id: isGaOn ? 'G-DEFAULT' : 'disabled',
+      suggested_books_list: currentSuggestedBooks,
+      suggested_books: currentSuggestedBooks.map(x => x.link || x.id || x.title).filter(Boolean),
       theme_primary: selectedThemePrimary,
       theme_dark: selectedThemeDark,
       og_title: document.getElementById('blp_og_title')?.value || title,
       og_description: document.getElementById('blp_og_desc')?.value || document.getElementById('blp_hero_desc')?.value,
       og_image: document.getElementById('blp_og_image')?.value || document.getElementById('blp_banner_url')?.value,
-      sticky_button_text: document.getElementById('blp_sticky_btn_text')?.value || 'अभी खरीदें',
+      value_stack: {
+        book_mrp: parseInt(document.getElementById('blp_stack_book_mrp')?.value, 10) || mrp,
+        vip_value: parseInt(document.getElementById('blp_stack_vip_val')?.value, 10) || 1999,
+        bonus_value: parseInt(document.getElementById('blp_stack_bonus_val')?.value, 10) || 199,
+        offer_price: offerPrice,
+        vip_banner: document.getElementById('blp_vip_banner_url')?.value || '',
+        subscriber_perk: document.getElementById('blp_vip_perk_text')?.value || '👑 VIP मेंबर्स के लिए 1 वर्ष का Pro सब्सक्रिप्शन 100% मुफ्त शामिल है।'
+      },
       hero: {
         tag: document.getElementById('blp_hero_tag')?.value || '🌾 Bestseller Agriculture eBook',
         title: title,
@@ -1001,24 +1118,16 @@ export async function initBookLandingPages() {
       bonuses: currentBonuses,
       bonus_books: currentBonuses,
       faqs: currentFaqs.length > 0 ? currentFaqs : undefined,
-      value_stack: {
-        subscriber_perk: document.getElementById('blp_vip_perk_text')?.value || '👑 VIP मेंबर्स के लिए यह गाइड उनके प्लान में शामिल है।'
-      },
       whatsapp_prompt: document.getElementById('blp_wa_prompt')?.value || `नमस्ते, मुझे '${title}' पुस्तक के बारे में और जानकारी चाहिए।`
     };
 
-    // Save into allLandingPages
     const existingIdx = allLandingPages.findIndex(p => p.id === bId);
-    if (existingIdx >= 0) {
-      allLandingPages[existingIdx] = pageData;
-    } else {
-      allLandingPages.unshift(pageData);
-    }
+    if (existingIdx >= 0) allLandingPages[existingIdx] = pageData;
+    else allLandingPages.unshift(pageData);
 
     try {
       localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
       
-      // Also register into global custom books cache so it's instantly available everywhere
       const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
       const bIdx = customBooks.findIndex(x => x.id === bId);
       const newBookObj = {
@@ -1041,7 +1150,7 @@ export async function initBookLandingPages() {
       localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
     } catch (e) {}
 
-    showToast(`✅ बुक लैंडिंग पेज (${bId}) सफलतापूर्वक सुरक्षित व लाइव हो गया!`, 'success');
+    showToast(`✅ बुक लैंडिंग पेज (${bId}) सुरक्षित हो गया!`, 'success');
     builderCard.style.display = 'none';
     resetBookBuilder();
     updateKPIs();
@@ -1059,11 +1168,6 @@ export async function initBookLandingPages() {
 
   function escapeHtml(str) {
     if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
 }
