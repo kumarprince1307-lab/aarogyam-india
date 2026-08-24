@@ -416,12 +416,24 @@ export async function initWebinars() {
                     </div>
                   </td>
                   <td>
-                    <div style="font-weight:700; color:var(--admin-text); font-size:0.85rem;">
-                      ${w.profile_id === 'ALL_USERS' ? '🌐 सभी 100% यूजर्स (Broadcast)' : (creator?.full_name || 'Community')}
-                    </div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--admin-primary);">
-                      <code>${w.profile_id === 'ALL_USERS' ? 'ALL_USERS' : (w.share_id || creator?.share_id || 'AI000000')}</code>
-                    </span>
+                    ${w.profile_id === 'ALL_USERS' || w.share_id === 'ALL_USERS' || w.share_id === 'ADMIN' ? `
+                      <div style="font-weight: 800; color: #3b82f6; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+                        <span>🌐</span> <span>सभी ${allProfiles.length || 103} यूज़र्स (Broadcast)</span>
+                      </div>
+                      <div style="font-size: 0.73rem; color: #10b981; font-weight: 700; margin-top: 2px;">
+                        ✓ 100% Reach (सभी को डिलीवर)
+                      </div>
+                      <button type="button" class="btn-view-wb-recipients admin-button small-button" data-webinar-id="${w.id}" style="font-size: 0.72rem; padding: 2px 7px; margin-top: 4px; background: rgba(59,130,246,0.15); color: #2563eb; border: 1px solid rgba(59,130,246,0.3); font-weight: 700;">
+                        👥 प्राप्तकर्ता लिस्ट देखें
+                      </button>
+                    ` : `
+                      <div style="font-weight:700; color:var(--admin-text); font-size:0.85rem;">
+                        ${creator?.full_name || 'Community'}
+                      </div>
+                      <span style="font-size: 0.75rem; font-weight: 700; color: var(--admin-primary);">
+                        <code>${w.share_id || creator?.share_id || 'AI000000'}</code>
+                      </span>
+                    `}
                   </td>
                   <td>
                     <div style="font-size: 0.85rem; font-weight: 600; color: var(--admin-text);">
@@ -648,6 +660,118 @@ export async function initWebinars() {
         openAttendeesDrawer(webinar);
       });
     });
+
+    // View Recipients Click in Webinars List
+    tableContainer.querySelectorAll('.btn-view-wb-recipients').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const wId = btn.dataset.webinarId;
+        const webinar = allWebinars.find(w => w.id === wId);
+        if (!webinar) return;
+        openWebinarRecipientsDrawer(webinar);
+      });
+    });
+  }
+
+  function openWebinarRecipientsDrawer(webinar) {
+    if (!drawerOverlay || !drawerTitle || !drawerBody) return;
+    drawerTitle.innerHTML = `🌐 वेबिनार प्राप्तकर्ता: <span style="color:#3b82f6;">${webinar.title || webinar.id}</span>`;
+
+    const totalCount = allProfiles.length;
+    const activeCount = allProfiles.filter(u => u.is_active || u.is_subscriber).length;
+
+    drawerBody.innerHTML = `
+      <div style="background: rgba(59,130,246,0.08); border: 1.5px solid #3b82f6; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--admin-text); margin-bottom: 6px; display:flex; align-items:center; justify-content:space-between;">
+          <span>📢 100% Universal Broadcast Status</span>
+          <span style="background:#10b981; color:#fff; font-size:0.72rem; padding:3px 10px; border-radius:12px; font-weight:800;">🟢 लाइव व सक्रिय</span>
+        </div>
+        <p style="font-size: 0.84rem; color: var(--admin-muted); margin: 0 0 10px 0; line-height: 1.45;">
+          यह वेबिनार सिस्टम में मौजूद सभी <strong>${totalCount} यूज़र्स</strong> (और भविष्य में जुड़ने वाले हर नए यूजर) के <strong>My Profile / UCAS Hub</strong> में स्वतः उनके व्यक्तिगत रेफरल लिंक के साथ उपलब्ध है।
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; font-size:0.8rem; font-weight:700;">
+          <div style="background:var(--admin-surface); padding:6px 12px; border-radius:6px; border:1px solid var(--admin-border);">
+            👥 कुल प्राप्तकर्ता: <strong style="color:#3b82f6;">${totalCount} यूज़र्स</strong>
+          </div>
+          <div style="background:var(--admin-surface); padding:6px 12px; border-radius:6px; border:1px solid var(--admin-border);">
+            🟢 सक्रिय यूज़र्स: <strong style="color:#10b981;">${activeCount}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <input type="search" id="wb-rcpt-drawer-search" class="admin-input" placeholder="🔍 यूज़र का नाम, मोबाइल नंबर या Share ID से खोजें..." style="width:100%; padding:10px 12px; font-size:0.88rem;" />
+      </div>
+
+      <div id="wb-rcpt-drawer-list-wrap" style="max-height: 460px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+        <!-- User rows populated below -->
+      </div>
+    `;
+
+    const listWrap = document.getElementById('wb-rcpt-drawer-list-wrap');
+    const searchBox = document.getElementById('wb-rcpt-drawer-search');
+
+    function renderRecipientUserList(query = '') {
+      if (!listWrap) return;
+      const q = query.toLowerCase().trim();
+      const filtered = allProfiles.filter(u => {
+        if (!q) return true;
+        const name = (u.name || u.full_name || '').toLowerCase();
+        const mobile = (u.mobile || '').toLowerCase();
+        const shareId = (u.share_id || u.referral_code || '').toLowerCase();
+        return name.includes(q) || mobile.includes(q) || shareId.includes(q);
+      });
+
+      if (filtered.length === 0) {
+        listWrap.innerHTML = '<div style="text-align:center; padding:20px; color:var(--admin-muted);">कोई यूज़र नहीं मिला।</div>';
+        return;
+      }
+
+      listWrap.innerHTML = filtered.map(u => {
+        const uShareId = u.share_id || u.referral_code || 'AI000000';
+        const userShareUrl = `https://aarogyamindia.online/ucas/landing.html?id=${encodeURIComponent(webinar.id)}&share_id=${encodeURIComponent(uShareId)}`;
+        const waText = `नमस्ते ${u.name || u.full_name || 'जी'}! आपका लाइव वेबिनार लिंक तैयार है:\n${userShareUrl}`;
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
+
+        return `
+          <div style="background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+            <div>
+              <div style="font-weight: 700; color: var(--admin-text); font-size: 0.9rem;">
+                ${u.name || u.full_name || 'Aarogyam User'}
+                ${u.is_active || u.is_subscriber ? '<span style="color:#10b981; font-size:0.72rem; font-weight:700; margin-left:6px;">🟢 Active</span>' : '<span style="color:#ef4444; font-size:0.72rem; font-weight:700; margin-left:6px;">🔴 Inactive</span>'}
+              </div>
+              <div style="font-size: 0.78rem; color: var(--admin-muted); margin-top: 2px;">
+                📞 ${u.mobile || 'N/A'} • Share ID: <code style="color:var(--admin-primary); font-weight:800;">${uShareId}</code>
+              </div>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button type="button" class="admin-button small-button btn-copy-user-link" data-url="${userShareUrl}" style="background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); font-size: 0.75rem; font-weight: 700; padding: 4px 8px;">
+                📋 लिंक कॉपी
+              </button>
+              <a href="${waUrl}" target="_blank" class="admin-button small-button" style="background: #25D366; color: #fff; text-decoration: none; font-size: 0.75rem; font-weight: 700; padding: 4px 8px;">
+                💬 WhatsApp
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      listWrap.querySelectorAll('.btn-copy-user-link').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const url = btn.dataset.url;
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(url);
+            const origText = btn.innerHTML;
+            btn.innerHTML = '✓ कॉपी हो गया!';
+            setTimeout(() => { btn.innerHTML = origText; }, 1800);
+          }
+        });
+      });
+    }
+
+    searchBox?.addEventListener('input', (e) => renderRecipientUserList(e.target.value));
+    renderRecipientUserList();
+
+    drawerOverlay.classList.add('active');
   }
 
   function openAttendeesDrawer(webinar) {

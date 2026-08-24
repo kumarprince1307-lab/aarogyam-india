@@ -425,7 +425,7 @@
         const { data, error } = await client
           .from('landing_pages')
           .select('*')
-          .or(`profile_id.eq.${validId},share_id.eq.${shareId},profile_id.eq.ALL_USERS`)
+          .or(`profile_id.eq.${validId},share_id.eq.${shareId},share_id.eq.ADMIN,share_id.eq.ALL_USERS`)
           .order('created_at', { ascending: false });
 
         if (!error && Array.isArray(data)) {

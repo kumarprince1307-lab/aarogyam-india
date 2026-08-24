@@ -1437,10 +1437,6 @@ export async function initAllLandingPages() {
         } else if (dateVal === '7days') {
           if ((now - pDate) / (1000 * 60 * 60 * 24) > 7) return false;
         } else if (dateVal === '30days') {
-          if ((now - pDate) / (1000 * 60 * 60 * 24) > 30) return false;
-        }
-      }
-
       // Search Query
       if (query) {
         const title = (p.title || '').toLowerCase();
@@ -1537,9 +1533,12 @@ export async function initAllLandingPages() {
               const pStatus = p.status || 'active';
               const dateStr = p.created_at ? new Date(p.created_at).toLocaleDateString('hi-IN') : '-';
               
+              const isBroadcast = p.share_id === 'ALL_USERS' || p.share_id === 'ADMIN' || p.profile_id === 'ALL_USERS' || p.is_broadcast || p.is_admin_template;
               const creator = allUsers.find(u => u.id === p.profile_id);
-              const creatorName = creator ? (creator.name || creator.full_name) : (p.owner_name || 'Aarogyam User');
-              const creatorShareId = p.share_id || creator?.share_id || 'ADMIN';
+              const creatorName = isBroadcast
+                ? `🌐 सभी ${allUsers.length || 103} यूज़र्स (Universal 100% Broadcast)`
+                : (creator ? (creator.name || creator.full_name) : (p.owner_name || 'Aarogyam User'));
+              const creatorShareId = isBroadcast ? 'ALL_USERS' : (p.share_id || creator?.share_id || 'ADMIN');
               const isCreatorActive = creator ? (creator.is_active || creator.is_subscriber) : true;
 
               // Ensure thumbnail URL & YouTube ID exist
@@ -1608,13 +1607,25 @@ export async function initAllLandingPages() {
                     </div>
                   </td>
                   <td>
-                    <div style="font-weight: 700; color: var(--admin-text); font-size: 0.85rem;">${creatorName}</div>
-                    <div style="font-size: 0.75rem; color: var(--admin-muted);">
-                      Share ID: <code style="color:var(--admin-primary); font-weight:700;">${creatorShareId}</code>
-                    </div>
-                    <div style="margin-top:2px;">
-                      ${isCreatorActive ? '<span style="color:#10b981;font-size:0.7rem;font-weight:700;">🟢 Active User</span>' : '<span style="color:#ef4444;font-size:0.7rem;font-weight:700;">🔴 Inactive User</span>'}
-                    </div>
+                    ${isBroadcast ? `
+                      <div style="font-weight: 800; color: #3b82f6; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+                        <span>🌐</span> <span>सभी ${allUsers.length || 103} यूज़र्स (Broadcast)</span>
+                      </div>
+                      <div style="font-size: 0.73rem; color: #10b981; font-weight: 700; margin-top: 2px;">
+                        ✓ 100% Reach (सभी को डिलीवर)
+                      </div>
+                      <button type="button" class="btn-view-recipients admin-button small-button" data-page-id="${p.id}" style="font-size: 0.72rem; padding: 2px 7px; margin-top: 4px; background: rgba(59,130,246,0.15); color: #2563eb; border: 1px solid rgba(59,130,246,0.3); font-weight: 700;">
+                        👥 प्राप्तकर्ता लिस्ट देखें
+                      </button>
+                    ` : `
+                      <div style="font-weight: 700; color: var(--admin-text); font-size: 0.85rem;">${creatorName}</div>
+                      <div style="font-size: 0.75rem; color: var(--admin-muted);">
+                        Share ID: <code style="color:var(--admin-primary); font-weight:700;">${creatorShareId}</code>
+                      </div>
+                      <div style="margin-top:2px;">
+                        ${isCreatorActive ? '<span style="color:#10b981;font-size:0.7rem;font-weight:700;">🟢 Active User</span>' : '<span style="color:#ef4444;font-size:0.7rem;font-weight:700;">🔴 Inactive User</span>'}
+                      </div>
+                    `}
                   </td>
                   <td>
                     <button type="button" class="btn-view-responses admin-button small-button" data-page-id="${p.id}" style="background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25); font-weight: 800; font-size: 0.8rem; padding: 3px 8px; border-radius: 12px;">
@@ -1736,6 +1747,13 @@ export async function initAllLandingPages() {
       btn.addEventListener('click', () => {
         const page = allPages.find(p => p.id === btn.dataset.pageId);
         if (page) openResponsesDrawer(page);
+      });
+    });
+
+    tableContainer.querySelectorAll('.btn-view-recipients').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const page = allPages.find(p => p.id === btn.dataset.pageId);
+        if (page) openRecipientsDrawer(page);
       });
     });
   }
@@ -1968,6 +1986,162 @@ export async function initAllLandingPages() {
     allPages = allPages.filter(x => x.id !== pageId);
     selectedLandingPageIds.delete(pageId);
     updateKPIs();
+  }
+
+  // ==========================================
+  // RECIPIENTS & RESPONSES DRAWERS
+  // ==========================================
+  function openRecipientsDrawer(page) {
+    if (!drawerOverlay || !drawerTitle || !drawerBody) return;
+    const isWb = page.category === 'webinar' || Boolean(page.webinar_data);
+    drawerTitle.innerHTML = `🌐 प्राप्तकर्ता यूज़र्स: <span style="color:#3b82f6;">${page.title || page.id}</span>`;
+
+    const totalCount = allUsers.length;
+    const activeCount = allUsers.filter(u => u.is_active || u.is_subscriber).length;
+
+    drawerBody.innerHTML = `
+      <div style="background: rgba(59,130,246,0.08); border: 1.5px solid #3b82f6; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--admin-text); margin-bottom: 6px; display:flex; align-items:center; justify-content:space-between;">
+          <span>📢 100% Universal Broadcast Status</span>
+          <span style="background:#10b981; color:#fff; font-size:0.72rem; padding:3px 10px; border-radius:12px; font-weight:800;">🟢 लाइव व सक्रिय</span>
+        </div>
+        <p style="font-size: 0.84rem; color: var(--admin-muted); margin: 0 0 10px 0; line-height: 1.45;">
+          यह ${isWb ? 'वेबिनार' : 'लैंडिंग पेज'} सिस्टम में मौजूद सभी <strong>${totalCount} यूज़र्स</strong> (और भविष्य में जुड़ने वाले हर नए यूजर) के <strong>My Profile / UCAS Hub</strong> में स्वतः उनके व्यक्तिगत रेफरल लिंक के साथ उपलब्ध है।
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; font-size:0.8rem; font-weight:700;">
+          <div style="background:var(--admin-surface); padding:6px 12px; border-radius:6px; border:1px solid var(--admin-border);">
+            👥 कुल प्राप्तकर्ता: <strong style="color:#3b82f6;">${totalCount} यूज़र्स</strong>
+          </div>
+          <div style="background:var(--admin-surface); padding:6px 12px; border-radius:6px; border:1px solid var(--admin-border);">
+            🟢 सक्रिय यूज़र्स: <strong style="color:#10b981;">${activeCount}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <input type="search" id="rcpt-drawer-search" class="admin-input" placeholder="🔍 यूज़र का नाम, मोबाइल नंबर या Share ID से खोजें..." style="width:100%; padding:10px 12px; font-size:0.88rem;" />
+      </div>
+
+      <div id="rcpt-drawer-list-wrap" style="max-height: 460px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+        <!-- User rows populated below -->
+      </div>
+    `;
+
+    const listWrap = document.getElementById('rcpt-drawer-list-wrap');
+    const searchBox = document.getElementById('rcpt-drawer-search');
+
+    function renderRecipientUserList(query = '') {
+      if (!listWrap) return;
+      const q = query.toLowerCase().trim();
+      const filtered = allUsers.filter(u => {
+        if (!q) return true;
+        const name = (u.name || u.full_name || '').toLowerCase();
+        const mobile = (u.mobile || '').toLowerCase();
+        const shareId = (u.share_id || u.referral_code || '').toLowerCase();
+        return name.includes(q) || mobile.includes(q) || shareId.includes(q);
+      });
+
+      if (filtered.length === 0) {
+        listWrap.innerHTML = '<div style="text-align:center; padding:20px; color:var(--admin-muted);">कोई यूज़र नहीं मिला।</div>';
+        return;
+      }
+
+      listWrap.innerHTML = filtered.map(u => {
+        const uShareId = u.share_id || u.referral_code || 'AI000000';
+        const userShareUrl = `https://aarogyamindia.online/ucas/landing.html?id=${encodeURIComponent(page.id)}&share_id=${encodeURIComponent(uShareId)}`;
+        const waText = `नमस्ते ${u.name || u.full_name || 'जी'}! आपका ${isWb ? 'वेबिनार' : 'पेज'} लिंक तैयार है:\n${userShareUrl}`;
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
+
+        return `
+          <div style="background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+            <div>
+              <div style="font-weight: 700; color: var(--admin-text); font-size: 0.9rem;">
+                ${u.name || u.full_name || 'Aarogyam User'}
+                ${u.is_active || u.is_subscriber ? '<span style="color:#10b981; font-size:0.72rem; font-weight:700; margin-left:6px;">🟢 Active</span>' : '<span style="color:#ef4444; font-size:0.72rem; font-weight:700; margin-left:6px;">🔴 Inactive</span>'}
+              </div>
+              <div style="font-size: 0.78rem; color: var(--admin-muted); margin-top: 2px;">
+                📞 ${u.mobile || 'N/A'} • Share ID: <code style="color:var(--admin-primary); font-weight:800;">${uShareId}</code>
+              </div>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button type="button" class="admin-button small-button btn-copy-user-link" data-url="${userShareUrl}" style="background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); font-size: 0.75rem; font-weight: 700; padding: 4px 8px;">
+                📋 लिंक कॉपी
+              </button>
+              <a href="${waUrl}" target="_blank" class="admin-button small-button" style="background: #25D366; color: #fff; text-decoration: none; font-size: 0.75rem; font-weight: 700; padding: 4px 8px;">
+                💬 WhatsApp
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      listWrap.querySelectorAll('.btn-copy-user-link').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const url = btn.dataset.url;
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(url);
+            const origText = btn.innerHTML;
+            btn.innerHTML = '✓ कॉपी हो गया!';
+            setTimeout(() => { btn.innerHTML = origText; }, 1800);
+          }
+        });
+      });
+    }
+
+    searchBox?.addEventListener('input', (e) => renderRecipientUserList(e.target.value));
+    renderRecipientUserList();
+
+    drawerOverlay.classList.add('active');
+  }
+
+  function openResponsesDrawer(page) {
+    if (!drawerOverlay || !drawerTitle || !drawerBody) return;
+    drawerTitle.innerHTML = `📋 प्राप्त सर्वे रिस्पॉन्स / Leads: <span style="color:#10b981;">${page.title || page.id}</span>`;
+
+    const responses = allSurveys.filter(s => s.category_answers?.landing_page_id === page.id);
+
+    if (responses.length === 0) {
+      drawerBody.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: var(--admin-muted);">
+          <div style="font-size: 2.4rem; margin-bottom: 8px;">📭</div>
+          <div style="font-weight: 700; font-size: 1rem; color: var(--admin-text);">अभी तक कोई रिस्पॉन्स / लीड दर्ज नहीं हुई है</div>
+          <p style="font-size: 0.85rem; margin-top: 4px;">जब कोई आगंतुक इस पेज पर आकर फॉर्म भरेगा, तो उसका पूरा विवरण यहाँ दिखाई देगा।</p>
+        </div>
+      `;
+    } else {
+      drawerBody.innerHTML = `
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--admin-text); margin-bottom: 12px;">
+          कुल रिस्पॉन्स: <span style="color:#10b981;">${responses.length} लीड्स</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px; max-height:500px; overflow-y:auto;">
+          ${responses.map((s, idx) => {
+            const dateStr = s.created_at ? new Date(s.created_at).toLocaleString('hi-IN') : '-';
+            const ans = s.category_answers || {};
+            const answersList = Object.entries(ans)
+              .filter(([k]) => k !== 'landing_page_id' && k !== 'source' && k !== 'category')
+              .map(([k, v]) => `<div><strong>${k}:</strong> ${v}</div>`)
+              .join('');
+
+            return `
+              <div style="background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px 14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <div style="font-weight:700; color:var(--admin-text); font-size:0.95rem;">
+                    #${idx + 1} ${s.name || s.full_name || 'अज्ञात आगंतुक'}
+                  </div>
+                  <span style="font-size:0.72rem; color:var(--admin-muted);">${dateStr}</span>
+                </div>
+                <div style="font-size:0.82rem; color:var(--admin-muted); margin-bottom:6px;">
+                  📞 <strong>${s.mobile || 'N/A'}</strong> • Share ID: <code>${s.share_id || page.share_id || 'N/A'}</code>
+                </div>
+                ${answersList ? `<div style="background:var(--admin-surface-2, #0f172a); padding:8px 10px; border-radius:6px; font-size:0.8rem; color:var(--admin-text); margin-top:6px;">${answersList}</div>` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    drawerOverlay.classList.add('active');
   }
 
   // ==========================================
