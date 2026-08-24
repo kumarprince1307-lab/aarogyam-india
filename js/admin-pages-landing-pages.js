@@ -2313,6 +2313,46 @@ export async function initAllLandingPages() {
           image: mediaUrl
         } : null;
 
+        // 1. If targeting All Users, create a master universal broadcast template first
+        if (targetUserMode === 'all') {
+          const masterRandomNum = Math.floor(100000 + Math.random() * 900000);
+          const masterLpId = `${prefix}${masterRandomNum}`;
+          const ogTitle = title.includes('Aarogyam India') ? title : `${title} | Aarogyam India`;
+          const ogDesc = message.slice(0, 160).trim();
+          let ogImg = '';
+          if (uploadedCustomThumbData || (activeContentType === 'image' && uploadedImageData)) {
+            ogImg = `https://aarogyamindia.online/api/image?id=${masterLpId}`;
+          } else if (activeContentType === 'youtube' && detectedYoutubeId) {
+            ogImg = `https://i.ytimg.com/vi/${detectedYoutubeId}/hqdefault.jpg`;
+          }
+
+          const masterRecord = {
+            id: masterLpId,
+            profile_id: 'ALL_USERS',
+            share_id: 'ADMIN',
+            title: title,
+            category: category,
+            content_type: activeContentType,
+            media_url: mediaUrl,
+            thumbnail_url: thumbUrl,
+            message: message,
+            webinar_data: webinarData,
+            product_data: productData,
+            mrp: prodMrp ? Number(prodMrp) : null,
+            offer_price: prodOffer ? Number(prodOffer) : null,
+            buynow_url: prodBuyUrl || null,
+            status: status,
+            og_title: ogTitle,
+            og_description: ogDesc,
+            og_image_url: ogImg,
+            created_by_admin: true,
+            is_admin_template: true,
+            created_at: nowIso
+          };
+          batchPayloads.push(masterRecord);
+        }
+
+        // 2. Generate for every individual user in the selection
         targetUsers.forEach(u => {
           const randomNum = Math.floor(100000 + Math.random() * 900000);
           const lpId = `${prefix}${randomNum}`;
@@ -2350,39 +2390,46 @@ export async function initAllLandingPages() {
           };
           batchPayloads.push(p);
 
-          // Sync each user's LocalStorage store
+          // Safe user LocalStorage sync
           try {
             const localKey = `UCAS_LP_${u.id}`;
             const list = JSON.parse(localStorage.getItem(localKey) || '[]');
             list.unshift(p);
-            localStorage.setItem(localKey, JSON.stringify(list));
+            // Cap at latest 30 to prevent quota errors
+            localStorage.setItem(localKey, JSON.stringify(list.slice(0, 30)));
           } catch (e) {}
         });
 
-        // Sync Global Store
+        // Global Store Sync
         try {
           const gList = JSON.parse(localStorage.getItem('UCAS_LP_global') || '[]');
-          batchPayloads.forEach(p => gList.unshift(p));
-          localStorage.setItem('UCAS_LP_global', JSON.stringify(gList));
+          batchPayloads.slice(0, 30).forEach(p => gList.unshift(p));
+          localStorage.setItem('UCAS_LP_global', JSON.stringify(gList.slice(0, 50)));
         } catch (e) {}
 
-        // Database Batch Insert
+        // Database Batch Insert in Safe Chunks (25 per chunk)
         if (db) {
           try {
-            await db
-              .from('landing_pages')
-              .insert(batchPayloads);
+            const chunkSize = 25;
+            for (let i = 0; i < batchPayloads.length; i += chunkSize) {
+              const chunk = batchPayloads.slice(i, i + chunkSize);
+              const { error: insErr } = await db.from('landing_pages').insert(chunk);
+              if (insErr) {
+                console.warn('DB chunk insert notice:', insErr.message);
+              }
+            }
           } catch (err) {
             console.warn('DB batch insert notice:', err);
           }
         }
 
-        if (batchPayloads.length === 1) {
+        const userCount = targetUsers.length;
+        if (userCount === 1) {
           alert(`🎉 नया पेज (${batchPayloads[0].id}) सफलतापूर्वक यूजर "${targetUsers[0].name || targetUsers[0].full_name}" के लिए बन गया!`);
           showAdminResult(batchPayloads[0], 1);
         } else {
-          alert(`🎉 कुल ${batchPayloads.length} यूजर्स के लिए लैंडिंग पेज / वेबिनार सफलतापूर्वक बन गया!\n\nसभी यूजर्स के My Profile UCAS में उनके रेफरल लिंक के साथ दिखना शुरू हो गया है।`);
-          showAdminResult(batchPayloads[0], batchPayloads.length);
+          alert(`🎉 कुल ${userCount} यूजर्स के लिए लैंडिंग पेज / वेबिनार सफलतापूर्वक बन गया!\n\nसभी 100% यूजर्स के My Profile UCAS में उनके व्यक्तिगत रेफरल लिंक के साथ दिखना शुरू हो गया है।`);
+          showAdminResult(batchPayloads[0], userCount);
         }
 
         await loadData();

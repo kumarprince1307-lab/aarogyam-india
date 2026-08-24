@@ -463,7 +463,11 @@
     const targetPath = isProduction ? '/api/share' : '/ucas/landing.html';
     const url = new URL(targetPath, origin);
     url.searchParams.set('id', lp.id);
-    url.searchParams.set('share_id', lp.share_id || window.UCAS_SESSION.getShareId());
+    const currentUserId = window.UCAS_SESSION?.getUserId();
+    const currentUserShareId = window.UCAS_SESSION?.getShareId() || 'AI000004';
+    const isBroadcastOrAdmin = Boolean(lp.created_by_admin || lp.is_admin_template || lp.share_id === 'ADMIN' || lp.profile_id === 'ALL_USERS' || (lp.profile_id && lp.profile_id !== currentUserId));
+    const shareId = isBroadcastOrAdmin ? currentUserShareId : (lp.share_id || currentUserShareId);
+    url.searchParams.set('share_id', shareId);
     return url.toString();
   }
 
@@ -735,6 +739,9 @@
         ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-ban"></i> Blocked</span>'
         : '<span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:800;"><i class="fa-solid fa-circle-check"></i> Live</span>';
 
+      const currentUserId = window.UCAS_SESSION?.getUserId();
+      const isAdminCreated = Boolean(wb.created_by_admin || wb.is_admin_template || wb.share_id === 'ADMIN' || wb.profile_id === 'ALL_USERS' || (wb.profile_id && wb.profile_id !== currentUserId));
+
       return `
         <div class="ucas-post-elevated-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -743,7 +750,9 @@
                 ${idx + 1}
               </span>
               <div>
-                <div style="font-weight:800;font-size:1.02rem;color:var(--text-main);line-height:1.3;">${wb.title}</div>
+                <div style="font-weight:800;font-size:1.02rem;color:var(--text-main);line-height:1.3;">
+                  ${wb.title} ${isAdminCreated ? '<span style="font-size:0.7rem;background:#FEF3C7;color:#B45309;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;">👑 एडमिन जारी</span>' : ''}
+                </div>
                 <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">
                   ID: <strong style="color:var(--primary-dark);font-family:monospace;">${wb.id}</strong> • 📅 ${dateStr}
                 </div>
@@ -786,12 +795,21 @@
               <button class="ucas-btn-act ucas-btn-act-view" onclick="window.open('${shareUrl}', '_blank')" title="पेज देखें">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i> देखें
               </button>
-              <button class="ucas-btn-act ucas-btn-act-edit" onclick="UCAS_WEBINARS.editWebinar('${wb.id}')" title="एडिट करें">
-                <i class="fa-solid fa-pen-to-square"></i> एडिट
-              </button>
-              <button class="ucas-btn-act ucas-btn-act-delete" onclick="UCAS_WEBINARS.deleteWebinar('${wb.id}')" title="हटाएं">
-                <i class="fa-solid fa-trash-can"></i> हटाएं
-              </button>
+              ${isAdminCreated ? `
+                <button class="ucas-btn-act ucas-btn-act-edit" style="opacity:0.7;background:#F1F5F9;color:#64748B;cursor:not-allowed;" onclick="window.UCAS_APP.showToast('🔒 यह वेबिनार एडमिन द्वारा जारी किया गया है। आप इसे सीधे शेयर कर सकते हैं, पर एडिट नहीं कर सकते।', 'info')" title="एडमिन द्वारा सुरक्षित">
+                  <i class="fa-solid fa-lock"></i> एडमिन पेज
+                </button>
+                <button class="ucas-btn-act ucas-btn-act-delete" style="opacity:0.7;background:#F1F5F9;color:#64748B;cursor:not-allowed;" onclick="window.UCAS_APP.showToast('🔒 एडमिन द्वारा जारी वेबिनार हटाया नहीं जा सकता।', 'info')" title="हटाया नहीं जा सकता">
+                  <i class="fa-solid fa-lock"></i> सुरक्षित
+                </button>
+              ` : `
+                <button class="ucas-btn-act ucas-btn-act-edit" onclick="UCAS_WEBINARS.editWebinar('${wb.id}')" title="एडिट करें">
+                  <i class="fa-solid fa-pen-to-square"></i> एडिट
+                </button>
+                <button class="ucas-btn-act ucas-btn-act-delete" onclick="UCAS_WEBINARS.deleteWebinar('${wb.id}')" title="हटाएं">
+                  <i class="fa-solid fa-trash-can"></i> हटाएं
+                </button>
+              `}
             </div>
           </div>
         </div>
