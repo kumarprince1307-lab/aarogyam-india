@@ -514,6 +514,80 @@ export async function initUserDetails() {
     return;
   }
 
+  // --- Purchase Modal Controls & Form Logic ---
+  const modalOverlay = document.getElementById('add-purchase-modal-overlay');
+  const modalCloseBtn = document.getElementById('btn-close-purchase-modal');
+  const modalCancelBtn = document.getElementById('btn-cancel-purchase-modal');
+  const modalForm = document.getElementById('manual-purchase-form');
+  const modalBookSelect = document.getElementById('modal-book-id');
+  const modalPaymentId = document.getElementById('modal-payment-id');
+  const modalAmount = document.getElementById('modal-amount');
+  const modalPurchaseDate = document.getElementById('modal-purchase-date');
+  const modalError = document.getElementById('modal-form-error');
+
+  function closePurchaseModal() {
+    if (modalOverlay) modalOverlay.style.display = 'none';
+    if (modalError) {
+      modalError.style.display = 'none';
+      modalError.textContent = '';
+    }
+  }
+
+  modalCloseBtn?.addEventListener('click', closePurchaseModal);
+  modalCancelBtn?.addEventListener('click', closePurchaseModal);
+  modalOverlay?.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closePurchaseModal();
+  });
+
+  // Auto-fill price when book is selected
+  modalBookSelect?.addEventListener('change', (e) => {
+    const selectedOption = e.target.options[e.target.selectedIndex];
+    if (selectedOption && selectedOption.dataset.price) {
+      modalAmount.value = selectedOption.dataset.price;
+    }
+  });
+
+  // Form Submit Handler
+  modalForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById('btn-submit-purchase');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+    }
+    if (modalError) modalError.style.display = 'none';
+
+    const paymentId = modalPaymentId.value.trim();
+    const bookId = modalBookSelect.value.trim();
+    const amount = Number(modalAmount.value);
+    const purchaseDate = modalPurchaseDate.value;
+
+    const res = await addManualPurchase({
+      profileId: userId,
+      paymentId,
+      bookId,
+      amount,
+      purchaseDate
+    });
+
+    if (res.success) {
+      closePurchaseModal();
+      modalForm.reset();
+      alert('✅ पुस्तक / खरीद सफलतापूर्वक जोड़ दी गई है!');
+      await loadAndRender();
+    } else {
+      if (modalError) {
+        modalError.textContent = '❌ ' + (res.error || 'Failed to add purchase.');
+        modalError.style.display = 'block';
+      }
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Save Purchase';
+    }
+  });
+
   async function loadAndRender() {
     container.innerHTML = '<div class="admin-loading">Loading user details & real UCAS records…</div>';
     const [result, ucasRes] = await Promise.all([
@@ -529,7 +603,48 @@ export async function initUserDetails() {
     const ucasData = ucasRes.success ? ucasRes.data : null;
     container.innerHTML = renderProfile(result.data, ucasData);
 
-    // Bind permissions toggles
+    // 1. Bind Open "Add Purchase" Button
+    const openAddPurchaseBtn = document.getElementById('btn-open-add-purchase');
+    openAddPurchaseBtn?.addEventListener('click', async () => {
+      if (modalPaymentId) modalPaymentId.value = 'PAY_MANUAL_' + Date.now();
+      if (modalPurchaseDate) modalPurchaseDate.value = new Date().toISOString().split('T')[0];
+      if (modalAmount) modalAmount.value = '';
+      if (modalError) modalError.style.display = 'none';
+
+      // Populate books list
+      if (modalBookSelect) {
+        modalBookSelect.innerHTML = '<option value="">-- लोड हो रहा है... --</option>';
+        const booksRes = await fetchAvailableBooks();
+        const booksList = booksRes.success ? booksRes.data : [];
+        modalBookSelect.innerHTML = '<option value="">-- पुस्तक चुनें --</option>' + 
+          booksList.map(b => `<option value="${b.id}" data-price="${b.offerPrice || 99}">${b.title || b.name || b.id} (${b.id}) — ₹${b.offerPrice || 99}</option>`).join('');
+      }
+
+      if (modalOverlay) modalOverlay.style.display = 'flex';
+    });
+
+    // 2. Bind Delete Purchase Buttons
+    container.querySelectorAll('.admin-delete-purchase-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const pId = btn.dataset.purchaseId;
+        const bName = btn.dataset.bookName || 'this book';
+        if (confirm(`क्या आप "${bName}" की खरीद को हटाना चाहते हैं?`)) {
+          btn.disabled = true;
+          btn.textContent = '...';
+          const res = await deletePurchase(pId, userId);
+          if (res.success) {
+            alert('✅ खरीद सफलतापूर्वक हटा दी गई है।');
+            await loadAndRender();
+          } else {
+            alert('❌ खरीद हटाने में त्रुटि: ' + (res.error || 'Unknown error'));
+            btn.disabled = false;
+            btn.textContent = 'Delete';
+          }
+        }
+      });
+    });
+
+    // 3. Bind permissions toggles
     container.querySelectorAll('.user-perm-toggle').forEach(input => {
       input.addEventListener('change', async (e) => {
         const uId = e.target.dataset.userId;
@@ -546,7 +661,7 @@ export async function initUserDetails() {
       });
     });
 
-    // Bind View Answers button
+    // 4. Bind View Answers button
     container.querySelectorAll('.btn-view-survey-json').forEach(btn => {
       btn.addEventListener('click', () => {
         try {
