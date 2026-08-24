@@ -748,19 +748,19 @@ export async function initProductLandingPages() {
     // 2. Fetch Product Landing Pages & Leads
     if (db) {
       try {
-        const [prodLpRes, regLpRes, leadsRes] = await Promise.all([
-          db.from('product_landing_pages').select('*').order('created_at', { ascending: false }),
+        const [regLpRes, surveysRes] = await Promise.all([
           db.from('landing_pages').select('*').or('content_type.eq.product,category.eq.product').order('created_at', { ascending: false }),
-          db.from('leads').select('*').eq('source', 'product_landing_page').order('created_at', { ascending: false })
+          db.from('surveys').select('*').order('created_at', { ascending: false })
         ]);
 
-        if (prodLpRes && prodLpRes.data) pagesList.push(...prodLpRes.data);
         if (regLpRes && regLpRes.data) {
           regLpRes.data.forEach(p => {
             if (!pagesList.some(x => x.id === p.id)) pagesList.push(p);
           });
         }
-        if (leadsRes && leadsRes.data) allProductLeads = leadsRes.data;
+        if (surveysRes && surveysRes.data) {
+          allProductLeads = surveysRes.data.filter(s => s.category_answers?.landing_page_id || s.category === 'product');
+        }
       } catch (err) {
         console.warn('Supabase product pages query notice:', err);
       }
@@ -1051,10 +1051,7 @@ export async function initProductLandingPages() {
     const db = getAdminDb();
     if (db) {
       try {
-        await Promise.all([
-          db.from('product_landing_pages').delete().eq('id', pageId),
-          db.from('landing_pages').delete().eq('id', pageId)
-        ]);
+        await db.from('landing_pages').delete().eq('id', pageId);
       } catch (e) {}
     }
 

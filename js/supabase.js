@@ -131,21 +131,6 @@ window.dbClient = window.dbClient || window.supabase.createClient(
 
 const db = window.dbClient;
 
-console.log("DB CLIENT INITIALIZED SUCCESSFULLY");
-
-(async () => {
-    const { error } = await db
-        .from("profiles")
-        .select("id")
-        .limit(1);
-
-    if (error) {
-        console.error("❌ Database Connection Failed:", error.message);
-    } else {
-        console.log("✅ Database Connected Successfully");
-    }
-})();
-
 
 /* ===========================================================
    ENGINE 1: VALIDATION & REGISTRATION FUNCTIONS

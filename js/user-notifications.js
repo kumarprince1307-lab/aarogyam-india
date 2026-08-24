@@ -82,8 +82,19 @@
             return null;
         },
 
+        _cache: null,
+        _cacheTime: 0,
+
         // 4. Load User's Personal Real-time & Stored Notifications
-        loadUserNotifications: async function () {
+        loadUserNotifications: async function (forceRefresh = false) {
+            const now = Date.now();
+            if (!forceRefresh && this._cache && (now - this._cacheTime < 90000)) {
+                this.items = this._cache;
+                this.updateBadgeCount();
+                this.renderList();
+                return;
+            }
+
             const user = this.getUser();
             const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${user.id || user.mobile || 'guest'}`) || '[]');
             const list = [];
@@ -287,6 +298,8 @@
             list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
             this.items = list;
+            this._cache = list;
+            this._cacheTime = Date.now();
             this.updateBadgeCount();
             this.renderList();
         },
