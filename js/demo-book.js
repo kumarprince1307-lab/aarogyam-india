@@ -73,6 +73,17 @@ window.currentReferrerData = {
 
 async function lookupReferrerName(identifier) {
     if (!identifier) return;
+
+    if (identifier === "AI000004") {
+        window.currentReferrerData = {
+            uuid: "52ef705c-bb45-4137-bee4-a3f8df73b676",
+            name: "Aarogyam India",
+            mobile: "7974422572",
+            shareId: "AI000004"
+        };
+        showReferrerGreen(`✔ Master Partner: Aarogyam India (7974422572)`);
+        return;
+    }
     
     try {
         const activeDb = window.dbClient || window.supabase;

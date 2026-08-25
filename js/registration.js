@@ -28,7 +28,55 @@ const formMessage = document.getElementById("formMessage");
 const backBtn = document.getElementById("backBtn");
 let referrerDisplay = document.getElementById("referrerDisplayName");
 
+// Auth Mode Tabs & Quick Login Form Elements
+const tabRegisterBtn = document.getElementById("tabRegisterBtn");
+const tabLoginBtn = document.getElementById("tabLoginBtn");
+const switchLoginLink = document.getElementById("switchLoginLink");
+const switchRegisterLink = document.getElementById("switchRegisterLink");
+const quickLoginForm = document.getElementById("quickLoginForm");
+const loginMobileInput = document.getElementById("loginMobileInput");
+const quickLoginSubmitBtn = document.getElementById("quickLoginSubmitBtn");
+const authTitle = document.getElementById("authTitle");
+const authSubtitle = document.getElementById("authSubtitle");
+
 document.addEventListener("DOMContentLoaded", initializePage);
+
+// [1.5] टैब स्विचिंग फंक्शन (रजिस्ट्रेशन vs लॉगिन)
+function switchAuthTab(mode) {
+    clearMessage();
+    if (mode === "login") {
+        if (form) form.style.display = "none";
+        if (quickLoginForm) quickLoginForm.style.display = "block";
+        if (tabLoginBtn) {
+            tabLoginBtn.style.background = "#1E40AF";
+            tabLoginBtn.style.color = "#ffffff";
+        }
+        if (tabRegisterBtn) {
+            tabRegisterBtn.style.background = "transparent";
+            tabRegisterBtn.style.color = "#475569";
+        }
+        if (authTitle) authTitle.textContent = "Account Login";
+        if (authSubtitle) authSubtitle.textContent = "Enter your registered 10-digit mobile number to login.";
+        if (loginMobileInput) {
+            if (mobile && mobile.value) loginMobileInput.value = mobile.value;
+            loginMobileInput.focus();
+        }
+    } else {
+        if (form) form.style.display = "block";
+        if (quickLoginForm) quickLoginForm.style.display = "none";
+        if (tabRegisterBtn) {
+            tabRegisterBtn.style.background = "#169c55";
+            tabRegisterBtn.style.color = "#ffffff";
+        }
+        if (tabLoginBtn) {
+            tabLoginBtn.style.background = "transparent";
+            tabLoginBtn.style.color = "#475569";
+        }
+        if (authTitle) authTitle.textContent = "Free Registration";
+        if (authSubtitle) authSubtitle.textContent = "Register once and access Demo Books, eBooks and My Library.";
+        if (mobile) mobile.focus();
+    }
+}
 
 // [2] URL से शेयर आईडी लाना और इनपुट को Read-Only बनाना (Organic पर AI000004 और User पर उसकी Share ID)
 function syncShareContextFromUrl() {
@@ -37,7 +85,7 @@ function syncShareContextFromUrl() {
     const sessionReferralId = (window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function') 
         ? window.V1_SESSION.getReferralId() : null;
 
-    const shareTokenFromUrl = urlParams.get('share_token') || urlParams.get('share_id') || urlParams.get('tracking_token');
+    const shareTokenFromUrl = urlParams.get('share_token') || urlParams.get('share_id') || urlParams.get('ref') || urlParams.get('tracking_token');
     const referralMobileParam = urlParams.get('referral_mobile') || urlParams.get('referral');
 
     // प्राथमिकता: 1. URL की शेयर आईडी, 2. Session/Storage की शेयर आईडी, 3. डिफ़ॉल्ट ऑर्गेनिक मास्टर आईडी (AI000004)
@@ -85,12 +133,21 @@ async function initializePage() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
         const mobileParam = urlParams.get('mobile');
+        const modeParam = urlParams.get('mode');
         returnUrl = urlParams.get('return');
 
         syncShareContextFromUrl();
 
-        if (mobileParam && mobile) mobile.value = mobileParam;
+        if (mobileParam) {
+            if (mobile) mobile.value = mobileParam;
+            if (loginMobileInput) loginMobileInput.value = mobileParam;
+        }
+
         bindEvents();
+
+        if (modeParam === "login") {
+            switchAuthTab("login");
+        }
     } catch (error) {
         console.error("Initialization Error :", error);
     }
@@ -98,9 +155,21 @@ async function initializePage() {
 
 function bindEvents() {
     if (form) form.addEventListener("submit", registerAccount);
+    if (quickLoginForm) quickLoginForm.addEventListener("submit", handleQuickLogin);
     if (backBtn) backBtn.addEventListener("click", () => history.back());
     if (mobile) mobile.addEventListener('blur', checkExistingUser);
     
+    if (tabRegisterBtn) tabRegisterBtn.addEventListener("click", () => switchAuthTab("register"));
+    if (tabLoginBtn) tabLoginBtn.addEventListener("click", () => switchAuthTab("login"));
+    if (switchLoginLink) switchLoginLink.addEventListener("click", (e) => { e.preventDefault(); switchAuthTab("login"); });
+    if (switchRegisterLink) switchRegisterLink.addEventListener("click", (e) => { e.preventDefault(); switchAuthTab("register"); });
+
+    if (loginMobileInput) {
+        loginMobileInput.addEventListener("input", () => {
+            loginMobileInput.value = loginMobileInput.value.replace(/\D/g, "").slice(0, 10);
+        });
+    }
+
     if (referralMobile) {
         referralMobile.addEventListener("input", debounce(async function() {
             const query = referralMobile.value.trim();
@@ -114,9 +183,72 @@ function bindEvents() {
     }
 }
 
-// [3] डेटाबेस में Share_ID और Mobile से सर्च करने वाला मुख्य फंक्शन
+// [2.5] क्विक मोबाइल लॉगिन सबमिशन
+async function handleQuickLogin(event) {
+    event.preventDefault();
+    clearMessage();
+
+    const mobileNum = loginMobileInput ? loginMobileInput.value.trim() : "";
+    if (!/^[6-9]\d{9}$/.test(mobileNum)) {
+        showMessage("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।");
+        if (loginMobileInput) loginMobileInput.focus();
+        return;
+    }
+
+    if (quickLoginSubmitBtn) {
+        quickLoginSubmitBtn.disabled = true;
+        quickLoginSubmitBtn.textContent = "लॉगिन हो रहा है...";
+    }
+
+    try {
+        if (typeof isMobileRegistered !== "function") {
+            throw new Error("Database engine not loaded properly.");
+        }
+
+        const user = await isMobileRegistered(mobileNum);
+        if (user) {
+            if (typeof createLoginSession === "function") {
+                createLoginSession(user);
+            }
+            if (typeof showToast === "function") showToast("लॉगिन सफल!");
+            showMessage("लॉगिन सफल! रीडायरेक्ट किया जा रहा है...");
+            setTimeout(() => completeRegistration({ success: true, profile: user }), 600);
+        } else {
+            showMessage("यह मोबाइल नंबर रजिस्टर्ड नहीं है। कृपया नया अकाउंट बनाएं।");
+            if (quickLoginSubmitBtn) {
+                quickLoginSubmitBtn.disabled = false;
+                quickLoginSubmitBtn.textContent = "लॉगिन करें (LOGIN)";
+            }
+            setTimeout(() => {
+                switchAuthTab("register");
+                if (mobile) mobile.value = mobileNum;
+            }, 1200);
+        }
+    } catch (err) {
+        console.error("Quick Login Error:", err);
+        showMessage(err.message || "लॉगिन में समस्या आई, पुनः प्रयास करें।");
+        if (quickLoginSubmitBtn) {
+            quickLoginSubmitBtn.disabled = false;
+            quickLoginSubmitBtn.textContent = "लॉगिन करें (LOGIN)";
+        }
+    }
+}
+
+// [3] डेटाबेस में Share_ID और Mobile से सर्च करने वाला मुख्य फंक्शन (With Master Account Fallback)
 async function lookupReferrerName(identifier) {
     if (!identifier) return;
+
+    // यदि AI000004 है, तो सीधे मास्टर अकाउंट से बाइंड करें (Zero Egress DB query)
+    if (identifier === "AI000004") {
+        window.currentReferrerData = {
+            uuid: "52ef705c-bb45-4137-bee4-a3f8df73b676",
+            name: "Aarogyam India",
+            mobile: "7974422572",
+            shareId: "AI000004"
+        };
+        showReferrerGreen(`✔ Master Partner: Aarogyam India (7974422572)`);
+        return;
+    }
     
     try {
         const activeDb = window.dbClient || window.supabase;
@@ -211,17 +343,17 @@ async function checkExistingUser() {
         try {
             const userExists = await isMobileRegistered(mobileNo);
             if (userExists) {
-                showMessage("This mobile number is already registered. Please login.");
-                if(registerBtn) registerBtn.disabled = true;
+                showMessage("यह मोबाइल नंबर पहले से रजिस्टर्ड है। लॉगिन करने के लिए ऊपर 'लॉगिन' टैब दबाएं।");
+                if (registerBtn) registerBtn.disabled = true;
             } else {
-                if (formMessage.textContent === "This mobile number is already registered. Please login.") {
+                if (formMessage.textContent.includes("पहले से रजिस्टर्ड") || formMessage.textContent.includes("already registered")) {
                     clearMessage();
                 }
-                if(registerBtn) registerBtn.disabled = false;
+                if (registerBtn) registerBtn.disabled = false;
             }
         } catch (error) {
             console.error("Error checking user:", error);
-            if(registerBtn) registerBtn.disabled = false;
+            if (registerBtn) registerBtn.disabled = false;
         }
     }
 }
@@ -294,8 +426,12 @@ async function registerAccount(event) {
         const mobileNo = mobile.value.trim();
         const userExists = await isMobileRegistered(mobileNo);
         if (userExists) {
-            showMessage("This mobile number is already registered. Please login.");
+            showMessage("यह मोबाइल नंबर पहले से रजिस्टर्ड है। कृपया लॉगिन करें।");
             setLoading(false);
+            setTimeout(() => {
+                switchAuthTab("login");
+                if (loginMobileInput) loginMobileInput.value = mobileNo;
+            }, 800);
             return;
         }
 
@@ -345,19 +481,28 @@ async function registerAccount(event) {
     }
 }
 
-// [6] रजिस्ट्रेशन पूरा होने के बाद पेज रीडायरेक्ट करने वाला फंक्शन
+// [6] रजिस्ट्रेशन / लॉगिन पूरा होने के बाद पेज रीडायरेक्ट करने वाला फंक्शन
+// Direct Registration -> My Profile (/ucas/index.html)
+// Checkout Registration -> My Library (/ebooks/my-library.html)
 function completeRegistration(result) {
     try {
-        showMessage("Registration completed successfully.");
+        showMessage("Success! Redirecting...");
         setLoading(false);
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const sourceParam = urlParams.get('source') || '';
+        const isFromCheckout = sourceParam.includes('checkout') || (returnUrl && (returnUrl.includes('checkout') || returnUrl.includes('my-library')));
+
         setTimeout(() => {
-            if (returnUrl) {
+            if (isFromCheckout) {
+                window.location.href = "/ebooks/my-library.html";
+            } else if (returnUrl && !returnUrl.includes('registration')) {
                 window.location.href = returnUrl;
             } else {
+                // डिफ़ॉल्ट डायरेक्ट रजिस्ट्रेशन -> My Profile
                 window.location.href = "/ucas/index.html";
             }
-        }, 1000);
+        }, 800);
     }
     catch (error) {
         console.error("Complete Registration Error :", error);

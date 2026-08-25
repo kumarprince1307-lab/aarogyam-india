@@ -40,13 +40,24 @@
             alt="Aarogyam India"
             class="logo">
 
-        <h1>Free Registration</h1>
+        <h1 id="authTitle">Free Registration</h1>
 
-        <p>
+        <p id="authSubtitle">
             Register once and access Demo Books,
             eBooks and My Library.
         </p>
 
+        <!-- Auth Mode Toggle Tabs -->
+        <div class="auth-tabs" style="display: flex; background: #f1f5f9; border-radius: 12px; padding: 4px; margin-bottom: 16px;">
+            <button type="button" id="tabRegisterBtn" style="flex: 1; padding: 10px 8px; border: none; border-radius: 9px; font-weight: 700; font-size: 14px; cursor: pointer; background: #169c55; color: #fff; transition: all 0.2s;">
+                रजिस्ट्रेशन (Sign Up)
+            </button>
+            <button type="button" id="tabLoginBtn" style="flex: 1; padding: 10px 8px; border: none; border-radius: 9px; font-weight: 700; font-size: 14px; cursor: pointer; background: transparent; color: #475569; transition: all 0.2s;">
+                लॉगिन (Login)
+            </button>
+        </div>
+
+        <!-- 1. Registration Form -->
         <form id="registrationForm">
 
             <div class="form-group">
@@ -130,6 +141,40 @@
                 CREATE FREE ACCOUNT
 
             </button>
+
+            <div style="text-align: center; margin-top: 14px; font-size: 13px; color: #64748b;">
+                पहले से अकाउंट है? <a href="#" id="switchLoginLink" style="color: #1E40AF; font-weight: 700; text-decoration: none;">यहाँ लॉगिन करें</a>
+            </div>
+
+        </form>
+
+        <!-- 2. Quick Login Form -->
+        <form id="quickLoginForm" style="display: none;">
+
+            <div class="form-group">
+                <label for="loginMobileInput">
+                    Mobile Number (10 डिजिट मोबाइल नंबर) *
+                </label>
+                <input
+                    id="loginMobileInput"
+                    name="loginMobile"
+                    type="tel"
+                    maxlength="10"
+                    placeholder="उदा. 9876543210"
+                    inputmode="numeric"
+                    required>
+            </div>
+
+            <button
+                id="quickLoginSubmitBtn"
+                type="submit"
+                style="width:100%; height:48px; border:none; border-radius:12px; background:#1E40AF; color:#fff; font-size:16px; font-weight:700; cursor:pointer; margin-top: 6px;">
+                लॉगिन करें (LOGIN)
+            </button>
+
+            <div style="text-align: center; margin-top: 14px; font-size: 13px; color: #64748b;">
+                नया अकाउंट बनाना है? <a href="#" id="switchRegisterLink" style="color: #169c55; font-weight: 700; text-decoration: none;">यहाँ रजिस्ट्रेशन करें</a>
+            </div>
 
         </form>
 

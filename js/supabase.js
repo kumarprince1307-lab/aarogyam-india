@@ -166,6 +166,12 @@ async function isEmailRegistered(email) {
     }
 }
 
+const MASTER_ACCOUNT = {
+    UUID: "52ef705c-bb45-4137-bee4-a3f8df73b676",
+    SHARE_ID: "AI000004",
+    MOBILE: "7974422572"
+};
+
 async function createUserProfile(userData) {
     try {
         const attribution = resolveProfileAttribution(userData);
@@ -180,27 +186,49 @@ async function createUserProfile(userData) {
         let referralCodeMobile = userData.referralMobile || attribution.referralCode || null; 
         let incomingReferralCode = userData.referralCode || attribution.shareToken || null;
 
-        // Ensure every newly registered user ALWAYS gets their own unique new Share ID
-        const newUniqueShareId = "AI" + Math.floor(100000 + Math.random() * 900000); 
-
-        if (!referrerProfileId && referralCodeMobile) {
+        // 1. यदि रेफरल कोड AI000004 है या डायरेक्ट विज़िटर है, तो बिना DB क्वेरी किए मास्टर अकाउंट से मैप करें (Zero Egress)
+        if (incomingReferralCode === 'AI000004' || incomingReferralCode === MASTER_ACCOUNT.SHARE_ID) {
+            referrerProfileId = MASTER_ACCOUNT.UUID;
+            referralCodeMobile = referralCodeMobile || MASTER_ACCOUNT.MOBILE;
+            incomingReferralCode = MASTER_ACCOUNT.SHARE_ID;
+        } 
+        // 2. यदि किसी अन्य यूजर का मोबाइल नंबर दिया गया है
+        else if (!referrerProfileId && referralCodeMobile && /^[6-9]\d{9}$/.test(referralCodeMobile)) {
             const referrer = await isMobileRegistered(referralCodeMobile);
             if (referrer) {
                 referrerProfileId = referrer.id;
-                if (referrer.referral_code) incomingReferralCode = referrer.referral_code;
+                incomingReferralCode = referrer.share_id || referrer.referral_code || incomingReferralCode;
             }
         } 
+        // 3. यदि किसी अन्य यूजर का Share ID दिया गया है
         else if (!referrerProfileId && incomingReferralCode) {
-            const { data: refUser } = await db
-                .from("profiles")
-                .select("id, mobile, referral_code")
-                .eq("referral_code", incomingReferralCode)
-                .maybeSingle();
-            if (refUser) {
-                referrerProfileId = refUser.id;
-                referralCodeMobile = refUser.mobile;
+            try {
+                const { data: refUser } = await db
+                    .from("profiles")
+                    .select("id, mobile, share_id, referral_code")
+                    .or(`share_id.eq.${incomingReferralCode},referral_code.eq.${incomingReferralCode}`)
+                    .limit(1)
+                    .maybeSingle();
+                if (refUser) {
+                    referrerProfileId = refUser.id;
+                    referralCodeMobile = refUser.mobile;
+                    incomingReferralCode = refUser.share_id || refUser.referral_code || incomingReferralCode;
+                }
+            } catch (queryErr) {
+                console.warn("Referrer share_id query notice:", queryErr);
             }
         }
+
+        // 4. डिफ़ॉल्ट फॉलबैक: यदि कोई भी स्पॉन्सर नहीं मिला (Direct/Organic Traffic), तो मास्टर अकाउंट (AI000004) को स्पॉन्सर बनाएं
+        if (!referrerProfileId) {
+            referrerProfileId = MASTER_ACCOUNT.UUID;
+            incomingReferralCode = MASTER_ACCOUNT.SHARE_ID;
+            referralCodeMobile = referralCodeMobile || MASTER_ACCOUNT.MOBILE;
+        }
+
+        const sponsorShareCode = incomingReferralCode || MASTER_ACCOUNT.SHARE_ID;
+        // प्रत्येक नए यूजर की अपनी यूनिक Share ID होगी (ताकि Postgres UNIQUE constraint "profiles_share_id_idx" वायलेट न हो)
+        const userUniqueShareId = "AI" + Math.floor(100000 + Math.random() * 900000);
 
         const { data, error } = await db
             .from("profiles")
@@ -211,10 +239,11 @@ async function createUserProfile(userData) {
                 gender: userData.gender || null,
                 State: userData.state || userData.State || null,
                 district: userData.district || null,
-                referral_code: newUniqueShareId,          
+                share_id: userUniqueShareId,
+                referral_code: sponsorShareCode,          
                 referral_mobile: referralCodeMobile,     
-                referred_by: referrerProfileId || null,
-                registration_source: attribution.source || "direct",
+                referred_by: referrerProfileId,
+                registration_source: attribution.source || userData.source || "direct",
                 profile_complete: false,
                 is_active: false
             }])
@@ -226,8 +255,8 @@ async function createUserProfile(userData) {
         if (data && data.id) {
             try {
                 await db.from("referrals").insert([{
-                    referred_by: referrerProfileId || null,
-                    referral_code: incomingReferralCode || newUniqueShareId,          
+                    referred_by: referrerProfileId,
+                    referral_code: sponsorShareCode,          
                     status: "success",
                     joined_at: new Date().toISOString()
                 }]);
@@ -237,14 +266,18 @@ async function createUserProfile(userData) {
             }
         }
 
-        await trackAttributionEvent({
-            event_type: "registration",
-            profile_id: data?.id || null,
-            mobile: userData.mobile,
-            email: userData.email || null,
-            referral_code: finalShareId,
-            source: attribution.source || "direct"
-        });
+        try {
+            await trackAttributionEvent({
+                event_type: "registration",
+                profile_id: data?.id || null,
+                mobile: userData.mobile,
+                email: userData.email || null,
+                referral_code: sponsorShareCode,
+                source: attribution.source || userData.source || "direct"
+            });
+        } catch (trackErr) {
+            console.warn("Attribution track notice:", trackErr);
+        }
 
         return data;
     } catch (error) {
@@ -255,14 +288,23 @@ async function createUserProfile(userData) {
 
 function createLoginSession(profile) {
     const session = {
-        id: crypto.randomUUID(),
+        id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : ('SES_' + Date.now()),
         userId: profile.id,
+        user_id: profile.id,
         mobile: profile.mobile,
+        share_id: profile.share_id || profile.referral_code || 'AI000004',
         loginTime: new Date().toISOString(),
         active: true
     };
-    localStorage.setItem("AI_SESSION", JSON.stringify(session));
-    localStorage.setItem("AI_USER", JSON.stringify(profile));
+    try {
+        localStorage.setItem("AI_SESSION", JSON.stringify(session));
+        localStorage.setItem("AI_USER", JSON.stringify(profile));
+        localStorage.setItem("AI_PROFILE", JSON.stringify(profile));
+        localStorage.setItem("UCAS_USER", JSON.stringify(profile));
+        localStorage.setItem("aim_user_mobile", profile.mobile || '');
+    } catch (e) {
+        console.warn("Storage save notice:", e);
+    }
     return session;
 }
 
