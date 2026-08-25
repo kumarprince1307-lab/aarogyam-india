@@ -481,7 +481,7 @@ async function renderLibrarySections(booksArray) {
                 <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
                 <h4>${bookName}</h4>
                 <div class="book-btn-group" style="display:flex;gap:8px;margin-top:10px;">
-                    <a href="/reader.html?book=${bookId}" class="btn-read" style="flex:1;padding:10px;background:#138A36;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Read Now</a>
+                    <a href="/ebooks/reader.html?book=${bookId}" class="btn-read" style="flex:1;padding:10px;background:#138A36;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Read Now</a>
                     <a href="/pdf/full/${bookId}.pdf" target="_blank" class="btn-buy" style="flex:1;padding:10px;background:#E86A17;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Download PDF</a>
                 </div>
             `;

@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("====================================");
 
     const urlParams = new URLSearchParams(window.location.search);
-    aoiBookId = urlParams.get("book") || urlParams.get("id") || "BK001";
+    aoiBookId = (urlParams.get("book") || urlParams.get("id") || "BK001").trim();
 
     console.log("Target Book ID:", aoiBookId);
 
@@ -79,7 +79,12 @@ async function verifyUserAccessAndSession(targetBookId) {
     if (!res.ok) throw new Error("books.json not found");
     const json = await res.json();
     
-    aoiCurrentBookData = json.books.find(b => b.id === targetBookId || b.book_id === targetBookId);
+    const targetKey = String(targetBookId).toUpperCase();
+    aoiCurrentBookData = json.books.find(b => 
+        (b.id && b.id.toUpperCase() === targetKey) || 
+        (b.book_id && b.book_id.toUpperCase() === targetKey) ||
+        (b.slug && b.slug.toLowerCase() === String(targetBookId).toLowerCase())
+    );
 
     if (!aoiCurrentBookData) {
         showErrorScreen();

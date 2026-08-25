@@ -1516,6 +1516,10 @@ export async function initAllLandingPages() {
         } else if (dateVal === '7days') {
           if ((now - pDate) / (1000 * 60 * 60 * 24) > 7) return false;
         } else if (dateVal === '30days') {
+          if ((now - pDate) / (1000 * 60 * 60 * 24) > 30) return false;
+        }
+      }
+
       // Search Query
       if (query) {
         const title = (p.title || '').toLowerCase();
