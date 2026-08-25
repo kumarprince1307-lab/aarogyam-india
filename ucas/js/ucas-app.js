@@ -267,24 +267,27 @@
   // ==========================================
 
   async function loadUserProfileAndPermissions() {
-    let user = window.UCAS_SESSION.getCurrentUser() || {};
+    let user = window.UCAS_SESSION.getCurrentUser();
+    if (!user) return;
     const db = window.UCAS_DB?.getDb();
 
     if (db) {
       try {
-        const mob = user.mobile || '7974422572';
-        const sid = user.share_id || user.referral_code || 'AI000004';
+        const mob = user.mobile;
+        const sid = user.share_id || user.referral_code;
         const uid = user.id;
 
-        let query = db.from('profiles').select('id, full_name, mobile, email, gender, State, district, address, occupation, interest, dob, netsurf_id, share_id, referral_code, is_active, role, created_at');
-        if (mob) query = query.eq('mobile', mob);
-        else if (sid) query = query.eq('share_id', sid);
-        else if (uid) query = query.eq('id', uid);
+        if (mob || sid || uid) {
+          let query = db.from('profiles').select('id, full_name, mobile, email, gender, State, district, address, occupation, interest, dob, netsurf_id, share_id, referral_code, is_active, role, created_at');
+          if (mob) query = query.eq('mobile', mob);
+          else if (sid) query = query.eq('share_id', sid);
+          else if (uid) query = query.eq('id', uid);
 
-        const { data: dbProfile } = await query.maybeSingle();
-        if (dbProfile) {
-          user = { ...user, ...dbProfile };
-          window.UCAS_SESSION.saveUser(user);
+          const { data: dbProfile } = await query.maybeSingle();
+          if (dbProfile) {
+            user = { ...user, ...dbProfile };
+            window.UCAS_SESSION.saveUser(user);
+          }
         }
       } catch (e) {
         console.warn('Profile sync notice:', e);
