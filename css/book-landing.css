@@ -50,6 +50,9 @@
 html{
 
     scroll-behavior:smooth;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 
 }
 
@@ -63,6 +66,8 @@ body{
 
     line-height:1.6;
 
+    width: 100%;
+    max-width: 100%;
     overflow-x:hidden;
 
 }
@@ -74,6 +79,7 @@ body{
 img{
 
     width:100%;
+    max-width: 100%;
 
     display:block;
 
@@ -1594,7 +1600,7 @@ section{
 ========================================================== */
 /* ==========================================================
                 PART 1.7 START
-      BONUS + HIGHLIGHTS + BOOK DETAILS CSS
+    BONUS + HIGHLIGHTS + BOOK DETAILS CSS
 ========================================================== */
 
 /*==============================
@@ -2192,7 +2198,7 @@ section{
 ========================================================== */
 
 /* ===============================
-   DESKTOP SHARE BAR
+    DESKTOP SHARE BAR
 ================================ */
 
 .desktop-share-bar{
@@ -2216,7 +2222,7 @@ section{
 }
 
 /* ===============================
-   SHARE BUTTON
+    SHARE BUTTON
 ================================ */
 
 .desktop-share-btn{
@@ -2258,7 +2264,7 @@ section{
 }
 
 /* ===============================
-   COLORS
+    COLORS
 ================================ */
 
 .share-whatsapp{
@@ -2280,7 +2286,7 @@ section{
 }
 
 /* ===============================
-   SHARE TITLE
+    SHARE TITLE
 ================================ */
 
 .share-title{
@@ -2302,7 +2308,7 @@ section{
 }
 
 /* ===============================
-   MOBILE STICKY BAR
+    MOBILE STICKY BAR
 ================================ */
 
 .mobile-sticky-bar{
