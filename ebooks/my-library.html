@@ -1,162 +1,178 @@
 <!DOCTYPE html>
 <html lang="hi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Library - Aarogyam India</title>
-    <!-- Favicon & PWA Manifest -->
-    <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
-    <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#28a745">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Aarogyam">
-    <!-- CSS Link -->
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/my-library.css">
-    <link rel="stylesheet" href="/css/user-notifications.css">
-    <!-- FontAwesome for Icons & Heart -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1671873500553134');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Library - Aarogyam India</title>
+  <!-- Favicon & PWA Manifest -->
+  <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+  <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#28a745">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Aarogyam">
+  <!-- CSS Link -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/my-library.css">
+  <link rel="stylesheet" href="/css/user-notifications.css">
+  <!-- FontAwesome for Icons & Heart -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Meta Pixel Code -->
+  <script>
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () {
+        n.callMethod ?
+          n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+      n.queue = []; t = b.createElement(e); t.async = !0;
+      t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1671873500553134');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1" /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
+
 <body>
 
-<!-- 1. Login Popup (Overlay Design with Close Button) -->
-<div id="login-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; display: none; justify-content: center; align-items: center;">
-    <div style="background: #ffffff; padding: 30px; width: 100%; max-width: 380px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; font-family: sans-serif; position: relative;">
-        <!-- Close Button -->
-        <button onclick="closeLoginPopup()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 20px; color: #888; cursor: pointer; line-height: 1;">&times;</button>
-        
-        <h2 style="margin-bottom: 10px; color: #333; font-size: 22px;">लॉगिन करें</h2>
-        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">अपनी लाइब्रेरी देखने के लिए रजिस्टर्ड मोबाइल नंबर दर्ज करें</p>
-        
-        <input type="tel" id="login-mobile" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; outline: none;">
-        
-        <button onclick="checkUserLogin()" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">लॉगिन करें</button>
-        
-        <p style="margin-top: 20px; font-size: 14px; color: #555;">नया यूजर हैं? <a href="/registration.html" style="color: #007bff; text-decoration: none; font-weight: bold;">यहाँ साइन अप करें</a></p>
-    </div>
-</div>
+  <!-- 1. Login Popup (Overlay Design with Close Button) -->
+  <div id="login-popup-overlay"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; display: none; justify-content: center; align-items: center;">
+    <div
+      style="background: #ffffff; padding: 30px; width: 100%; max-width: 380px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; font-family: sans-serif; position: relative;">
+      <!-- Close Button -->
+      <button onclick="closeLoginPopup()"
+        style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 20px; color: #888; cursor: pointer; line-height: 1;">&times;</button>
 
-<script>
+      <h2 style="margin-bottom: 10px; color: #333; font-size: 22px;">लॉगिन करें</h2>
+      <p style="font-size: 14px; color: #666; margin-bottom: 20px;">अपनी लाइब्रेरी देखने के लिए रजिस्टर्ड मोबाइल नंबर
+        दर्ज करें</p>
+
+      <input type="tel" id="login-mobile" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10"
+        style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; outline: none;">
+
+      <button onclick="checkUserLogin()"
+        style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">लॉगिन
+        करें</button>
+
+      <p style="margin-top: 20px; font-size: 14px; color: #555;">नया यूजर हैं? <a href="/registration.html"
+          style="color: #007bff; text-decoration: none; font-weight: bold;">यहाँ साइन अप करें</a></p>
+    </div>
+  </div>
+
+  <script>
     // --- Popup and Button Logic ---
 
     // Function to open the login popup
     function openLoginPopup() {
-        const popup = document.getElementById('login-popup-overlay');
-        if (popup) popup.style.display = 'flex';
+      const popup = document.getElementById('login-popup-overlay');
+      if (popup) popup.style.display = 'flex';
     }
 
     // Global Sidebar Menu Toggle Function
     function toggleMenu() {
-        const sideMenu = document.getElementById('sideMenu');
-        const overlay = document.getElementById('sideMenuOverlay');
-        if (sideMenu) {
-            const isActive = sideMenu.classList.toggle('active');
-            if (overlay) {
-                overlay.style.display = isActive ? 'block' : 'none';
-            }
+      const sideMenu = document.getElementById('sideMenu');
+      const overlay = document.getElementById('sideMenuOverlay');
+      if (sideMenu) {
+        const isActive = sideMenu.classList.toggle('active');
+        if (overlay) {
+          overlay.style.display = isActive ? 'block' : 'none';
         }
+      }
     }
     window.toggleMenu = toggleMenu;
 
     // Function to close the login popup
     function closeLoginPopup() {
-        const popup = document.getElementById('login-popup-overlay');
-        if (popup) popup.style.display = 'none';
+      const popup = document.getElementById('login-popup-overlay');
+      if (popup) popup.style.display = 'none';
     }
 
     // Helper function for mobile menu: opens login and closes menu
     function openLoginPopupAndToggleMenu() {
-        openLoginPopup();
-        if (typeof toggleMenu === 'function') {
-            toggleMenu();
-        }
+      openLoginPopup();
+      if (typeof toggleMenu === 'function') {
+        toggleMenu();
+      }
     }
 
     // Helper function for mobile menu: opens profile and closes menu
     function openLeadModalAndToggleMenu() {
-        if (typeof openLeadModal === 'function') {
-            openLeadModal();
-        }
-        if (typeof toggleMenu === 'function') {
-            toggleMenu();
-        }
+      if (typeof openLeadModal === 'function') {
+        openLeadModal();
+      }
+      if (typeof toggleMenu === 'function') {
+        toggleMenu();
+      }
     }
 
     // This script runs when the page is loaded to set button visibility
     document.addEventListener('DOMContentLoaded', () => {
-        const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-        const isLoggedIn = storedUser.id || storedUser.mobile;
+      const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      const isLoggedIn = storedUser.id || storedUser.mobile;
 
-        // Get all button elements
-        const desktopLoginBtn = document.getElementById('desktop-login-btn');
-        const desktopLogoutBtn = document.getElementById('desktop-logout-btn'); // New Logout button
-        const mobileLoginBtn = document.getElementById('mobile-login-btn');
-        const mobileLogoutBtn = document.getElementById('mobile-logout-btn'); // New Logout button
-        const welcomeCard = document.querySelector('.welcome-card-soft');
+      // Get all button elements
+      const desktopLoginBtn = document.getElementById('desktop-login-btn');
+      const desktopLogoutBtn = document.getElementById('desktop-logout-btn'); // New Logout button
+      const mobileLoginBtn = document.getElementById('mobile-login-btn');
+      const mobileLogoutBtn = document.getElementById('mobile-logout-btn'); // New Logout button
+      const welcomeCard = document.querySelector('.welcome-card-soft');
 
-        if (isLoggedIn) {
-            // User is logged in: show logout buttons, hide login buttons
-            if (desktopLogoutBtn) desktopLogoutBtn.style.display = 'inline-flex';
-            if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'flex';
-            if (welcomeCard) welcomeCard.style.display = 'block';
-            
-            if (desktopLoginBtn) desktopLoginBtn.style.display = 'none';
-            if (mobileLoginBtn) mobileLoginBtn.style.display = 'none';
+      if (isLoggedIn) {
+        // User is logged in: show logout buttons, hide login buttons
+        if (desktopLogoutBtn) desktopLogoutBtn.style.display = 'inline-flex';
+        if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'flex';
+        if (welcomeCard) welcomeCard.style.display = 'block';
 
-        } else {
-            // User is not logged in: show login buttons, hide logout buttons
-            if (desktopLoginBtn) desktopLoginBtn.style.display = 'inline-flex';
-            if (mobileLoginBtn) mobileLoginBtn.style.display = 'flex';
-            if (welcomeCard) welcomeCard.style.display = 'none';
+        if (desktopLoginBtn) desktopLoginBtn.style.display = 'none';
+        if (mobileLoginBtn) mobileLoginBtn.style.display = 'none';
 
-            if (desktopLogoutBtn) desktopLogoutBtn.style.display = 'none';
-            if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'none';
-        }
+      } else {
+        // User is not logged in: show login buttons, hide logout buttons
+        if (desktopLoginBtn) desktopLoginBtn.style.display = 'inline-flex';
+        if (mobileLoginBtn) mobileLoginBtn.style.display = 'flex';
+        if (welcomeCard) welcomeCard.style.display = 'none';
+
+        if (desktopLogoutBtn) desktopLogoutBtn.style.display = 'none';
+        if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'none';
+      }
     });
-</script>
+  </script>
 
-<!-- 2. Premium Desktop & Mobile Header (Upgraded) -->
-<header class="library-header">
+  <!-- 2. Premium Desktop & Mobile Header (Upgraded) -->
+  <header class="library-header">
     <div class="header-logo-title">
-        <img src="/images/logo/logo.png" alt="Logo" class="site-logo">
-        <h1>My Library</h1>
+      <img src="/images/logo/logo.png" alt="Logo" class="site-logo">
+      <h1>My Library</h1>
     </div>
 
     <!-- Clean Header (Navigation lives cleanly inside Side Drawer) -->
 
     <div style="display: flex; align-items: center; gap: 10px;">
-        <!-- Personal Notification Bell Button (Green as requested) -->
-        <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1.5px solid #10B981; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.15rem; transition: transform 0.2s; position: relative;">
-            <i class="fa-solid fa-bell" style="color: #10B981;"></i>
-            <span class="user-notif-badge" style="display: none; position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.7rem; font-weight: 800; padding: 2px 6px;">0</span>
-        </button>
-        <button class="back-btn" onclick="window.location.href='/index.html'"><i class="fa-solid fa-arrow-left"></i></button>
-        <button class="menu-btn" onclick="toggleMenu()" title="मेनू खोलें" aria-label="Toggle Menu"><i class="fa-solid fa-bars"></i></button>
+      <!-- Personal Notification Bell Button (Green as requested) -->
+      <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications"
+        style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1.5px solid #10B981; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.15rem; transition: transform 0.2s; position: relative;">
+        <i class="fa-solid fa-bell" style="color: #10B981;"></i>
+        <span class="user-notif-badge"
+          style="display: none; position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.7rem; font-weight: 800; padding: 2px 6px;">0</span>
+      </button>
+      <button class="back-btn" onclick="window.location.href='/index.html'"><i
+          class="fa-solid fa-arrow-left"></i></button>
+      <button class="menu-btn" onclick="toggleMenu()" title="मेनू खोलें" aria-label="Toggle Menu"><i
+          class="fa-solid fa-bars"></i></button>
     </div>
-</header>
+  </header>
 
-<!-- 2.1 DESKTOP LEFT SIDEBAR (>= 768px - Identical to My Profile / UCAS) -->
-<aside class="library-sidebar" id="libraryDesktopSidebar">
+  <!-- 2.1 DESKTOP LEFT SIDEBAR (>= 768px - Identical to My Profile / UCAS) -->
+  <aside class="library-sidebar" id="libraryDesktopSidebar">
     <div>
       <div class="library-nav-section-title">Library Destinations</div>
       <ul class="library-nav-list">
@@ -230,7 +246,8 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
           <a href="/ucas/index.html?tab=broadcast-messages" style="display:flex;align-items:center;">
             <i class="fa-solid fa-bullhorn library-nav-icon" style="color:#E11D48;"></i>
             <span>आरोग्यम संदेश</span>
-            <span id="library-broadcast-unread-badge" style="background:#E11D48;color:#fff;font-size:0.75rem;font-weight:800;padding:2px 7px;border-radius:12px;margin-left:auto;display:none;">0</span>
+            <span id="library-broadcast-unread-badge"
+              style="background:#E11D48;color:#fff;font-size:0.75rem;font-weight:800;padding:2px 7px;border-radius:12px;margin-left:auto;display:none;">0</span>
           </a>
         </li>
         <li class="library-nav-item">
@@ -282,408 +299,533 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     <div style="padding:0.75rem 0.5rem;border-top:1px solid #ECECEC;font-size:0.75rem;color:#64748B;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <span>🔒 Aarogyam Library</span>
-        <button onclick="logoutUser()" style="padding:3px 8px;font-size:0.72rem;color:#EF4444;background:#FEE2E2;border:none;border-radius:6px;cursor:pointer;font-weight:700;">
+        <button onclick="logoutUser()"
+          style="padding:3px 8px;font-size:0.72rem;color:#EF4444;background:#FEE2E2;border:none;border-radius:6px;cursor:pointer;font-weight:700;">
           <i class="fa-solid fa-right-from-bracket"></i> Logout
         </button>
       </div>
       <div style="margin-top:4px;">Aarogyam India &copy; 2026</div>
     </div>
-</aside>
+  </aside>
 
-<!-- 3. Backdrop Overlay & Slide-out Quick Menu Drawer (Right Side - Upgraded) -->
-<div class="side-menu-overlay" id="sideMenuOverlay" onclick="toggleMenu()" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 99998; display: none;"></div>
-<div class="side-menu" id="sideMenu">
-        <button class="close-menu" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; padding: 15px 10px; border-bottom: 1px solid #eee; margin-bottom: 10px; background: #f8fafc; border-radius: 8px;">
-            <div style="width: 45px; height: 45px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto 6px;">
-                <i class="fa-solid fa-user"></i>
-            </div>
-            <!-- यहाँ ID 'menuUserName' से असली यूजर का नाम आ जाएगा -->
-            <h3 style="font-size: 0.95rem; color: #1e293b; margin-bottom: 2px;">नमस्ते, <span id="menuUserName">प्रिय पाठक</span></h3>
-            
-            <!-- यहाँ प्रोग्रेस और मेंबरशिप के लिए ID जोड़ दी गई है -->
-            <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">
-                👑 <span id="mobileMemberStatus">Premium Member</span> <span id="mobileUserPhone"></span>
-            </p>
-        </div>
+  <!-- 3. Backdrop Overlay & Slide-out Quick Menu Drawer (Right Side - Upgraded) -->
+  <div class="side-menu-overlay" id="sideMenuOverlay" onclick="toggleMenu()"
+    style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 99998; display: none;">
+  </div>
+  <div class="side-menu" id="sideMenu">
+    <button class="close-menu" onclick="toggleMenu()">&times;</button>
+    <div
+      style="text-align: center; padding: 15px 10px; border-bottom: 1px solid #eee; margin-bottom: 10px; background: #f8fafc; border-radius: 8px;">
+      <div
+        style="width: 45px; height: 45px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto 6px;">
+        <i class="fa-solid fa-user"></i>
+      </div>
+      <!-- यहाँ ID 'menuUserName' से असली यूजर का नाम आ जाएगा -->
+      <h3 style="font-size: 0.95rem; color: #1e293b; margin-bottom: 2px;">नमस्ते, <span id="menuUserName">प्रिय
+          पाठक</span></h3>
+
+      <!-- यहाँ प्रोग्रेस और मेंबरशिप के लिए ID जोड़ दी गई है -->
+      <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">
+        👑 <span id="mobileMemberStatus">Premium Member</span> <span id="mobileUserPhone"></span>
+      </p>
+    </div>
 
     <!-- मोबाइल मेनू के अंदर स्मार्ट बटन -->
-     
+
     <div style="padding: 0 15px 10px 15px;">
-        <!-- SEPARATE LOGIN/PROFILE BUTTONS FOR MOBILE -->
-        <button id="mobile-login-btn" onclick="openLoginPopupAndToggleMenu()" style="background: #28a745; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px; margin-bottom: 5px;">
-            <i class="fa-solid fa-right-to-bracket"></i> लॉगिन करें
-        </button>
-        <button id="mobile-logout-btn" onclick="logoutUser()" style="background: #e81717; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px;">
-            <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट
-        </button>
-        <!-- Mobile PWA Install Button -->
-        <button id="mobile-pwa-install-btn" class="mobile-pwa-install-btn" style="display: none;">
-            <span>📱</span> Install App
-        </button>
+      <!-- SEPARATE LOGIN/PROFILE BUTTONS FOR MOBILE -->
+      <button id="mobile-login-btn" onclick="openLoginPopupAndToggleMenu()"
+        style="background: #28a745; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px; margin-bottom: 5px;">
+        <i class="fa-solid fa-right-to-bracket"></i> लॉगिन करें
+      </button>
+      <button id="mobile-logout-btn" onclick="logoutUser()"
+        style="background: #e81717; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px;">
+        <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट
+      </button>
+      <!-- Mobile PWA Install Button -->
+      <button id="mobile-pwa-install-btn" class="mobile-pwa-install-btn" style="display: none;">
+        <span>📱</span> Install App
+      </button>
     </div>
 
     <ul>
-        <li><a href="/index.html"><i class="fa-solid fa-house" style="color:#10B981;"></i> Home</a></li>
-        <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> UCAS / My Profile</a></li>
-        <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a></li>
-        <li><a href="/subscription.html"><i class="fa-solid fa-crown" style="color:#F59E0B;"></i> VIP Pass (Subscription)</a></li>
-        <li><a href="/purchases.html"><i class="fa-solid fa-file-invoice" style="color:#10B981;"></i> My Purchases & Invoices</a></li>
-        <li><a href="/ucas/index.html#survey"><i class="fa-solid fa-clipboard-list" style="color:#0284C7;"></i> Smart Survey</a></li>
-        <li><a href="/ucas/index.html#phonebook"><i class="fa-solid fa-address-book" style="color:#8B5CF6;"></i> My Phonebook</a></li>
-        <li><a href="/ucas/index.html#leads"><i class="fa-solid fa-user-group" style="color:#EA580C;"></i> My Share Leads</a></li>
-        <li><a href="/ucas/index.html#marketing"><i class="fa-solid fa-rocket" style="color:#EC4899;"></i> Marketing Engine</a></li>
-        <li><a href="/ucas/index.html#marketing"><i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> Product Landing Page</a></li>
-        <li><a href="/ucas/index.html#webinars"><i class="fa-solid fa-video" style="color:#3B82F6;"></i> Webinars & Live</a></li>
-        <li><a href="/ucas/index.html#permissions"><i class="fa-solid fa-shield-halved" style="color:#64748B;"></i> Permissions</a></li>
-        <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart" style="color:#EF4444;"></i> Wishlist</a></li>
-        <li><a href="/faq.html"><i class="fa-solid fa-circle-question" style="color:#64748B;"></i> FAQ</a></li>
-        <li><a href="/terms.html"><i class="fa-solid fa-file-contract" style="color:#64748B;"></i> Terms & Conditions</a></li>
-        <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck" style="color:#64748B;"></i> Shipping Policy</a></li>
-        <li><a href="/privacy-policy.html"><i class="fa-solid fa-shield-halved" style="color:#64748B;"></i> Privacy Policy</a></li>
+      <li><a href="/index.html"><i class="fa-solid fa-house" style="color:#10B981;"></i> Home</a></li>
+      <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> UCAS / My Profile</a>
+      </li>
+      <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a>
+      </li>
+      <li><a href="/subscription.html"><i class="fa-solid fa-crown" style="color:#F59E0B;"></i> VIP Pass
+          (Subscription)</a></li>
+      <li><a href="/purchases.html"><i class="fa-solid fa-file-invoice" style="color:#10B981;"></i> My Purchases &
+          Invoices</a></li>
+      <li><a href="/ucas/index.html#survey"><i class="fa-solid fa-clipboard-list" style="color:#0284C7;"></i> Smart
+          Survey</a></li>
+      <li><a href="/ucas/index.html#phonebook"><i class="fa-solid fa-address-book" style="color:#8B5CF6;"></i> My
+          Phonebook</a></li>
+      <li><a href="/ucas/index.html#leads"><i class="fa-solid fa-user-group" style="color:#EA580C;"></i> My Share
+          Leads</a></li>
+      <li><a href="/ucas/index.html#marketing"><i class="fa-solid fa-rocket" style="color:#EC4899;"></i> Marketing
+          Engine</a></li>
+      <li><a href="/ucas/index.html#marketing"><i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> Product
+          Landing Page</a></li>
+      <li><a href="/ucas/index.html#webinars"><i class="fa-solid fa-video" style="color:#3B82F6;"></i> Webinars &
+          Live</a></li>
+      <li><a href="/ucas/index.html#permissions"><i class="fa-solid fa-shield-halved" style="color:#64748B;"></i>
+          Permissions</a></li>
+      <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart" style="color:#EF4444;"></i> Wishlist</a></li>
+      <li><a href="/faq.html"><i class="fa-solid fa-circle-question" style="color:#64748B;"></i> FAQ</a></li>
+      <li><a href="/terms.html"><i class="fa-solid fa-file-contract" style="color:#64748B;"></i> Terms & Conditions</a>
+      </li>
+      <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck" style="color:#64748B;"></i> Shipping Policy</a>
+      </li>
+      <li><a href="/privacy-policy.html"><i class="fa-solid fa-shield-halved" style="color:#64748B;"></i> Privacy
+          Policy</a></li>
     </ul>
-    <div style="text-align: center; padding: 15px 0; font-size: 0.75rem; color: #94a3b8; border-top: 1px solid #eee; margin-top: 15px;">
-        Aarogyam India V1.0<br>&copy; 2026 All Rights Reserved
+    <div
+      style="text-align: center; padding: 15px 0; font-size: 0.75rem; color: #94a3b8; border-top: 1px solid #eee; margin-top: 15px;">
+      Aarogyam India V1.0<br>&copy; 2026 All Rights Reserved
     </div>
-</div>
+  </div>
 
-    <!-- MAIN LIBRARY CONTENT CONTAINER (Pushes right of Left Sidebar on Desktop) -->
-    <main class="library-main" id="mainLibraryContent">
+  <!-- MAIN LIBRARY CONTENT CONTAINER (Pushes right of Left Sidebar on Desktop) -->
+  <main class="library-main" id="mainLibraryContent">
 
     <!-- 4. Dashboard Style Welcome Card (Digital Locker View) -->
-    <div class="welcome-card-soft" style="background: linear-gradient(135deg, #ffffff 0%, #f4fdf4 100%); border: 1px solid #d4edda; border-radius: 12px; padding: 20px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div class="welcome-card-soft"
+      style="background: linear-gradient(135deg, #ffffff 0%, #f4fdf4 100%); border: 1px solid #d4edda; border-radius: 12px; padding: 20px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 5px;">
+            <h2 style="font-size: 1.3rem; color: #2c3e50; margin: 0;">नमस्ते, <span id="userName">अविनाश मिश्रा</span>
+              जी! 👋</h2>
+            <span id="userStatusBadge"
+              style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; background: rgba(16,185,129,0.15); color: #059669; border: 1px solid rgba(16,185,129,0.3);">
+              <i class="fa-solid fa-circle-check"></i> <span id="userStatusText">🟢 Active Subscriber</span>
+            </span>
+          </div>
+          <p style="font-size: 0.9rem; color: #666; margin: 0;">आपकी पर्सनल डिजिटल लाइब्रेरी सुरक्षित है। सभी खरीदी गई
+            बुक्स यहाँ आजीवन उपलब्ध रहेंगी।</p>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="/ucas/index.html"
+            style="background: #0B7A3E; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-chart-pie"></i> UCAS Profile
+          </a>
+          <button onclick="openLeadModal()"
+            style="background: #28a745; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-user-pen"></i> Update Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- 365-Day Subscription Countdown Card (For Active Users) -->
+      <div id="activeSubscriptionCard"
+        style="display: none; background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); color: #ecfdf5; border-radius: 10px; padding: 12px 16px; margin-top: 14px; border: 1px solid #10b981; box-shadow: 0 4px 12px rgba(6,78,59,0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;">👑</span>
             <div>
-                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 5px;">
-                    <h2 style="font-size: 1.3rem; color: #2c3e50; margin: 0;">नमस्ते, <span id="userName">अविनाश मिश्रा</span> जी! 👋</h2>
-                    <span id="userStatusBadge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; background: rgba(16,185,129,0.15); color: #059669; border: 1px solid rgba(16,185,129,0.3);">
-                        <i class="fa-solid fa-circle-check"></i> <span id="userStatusText">🟢 Active Subscriber</span>
-                    </span>
-                </div>
-                <p style="font-size: 0.9rem; color: #666; margin: 0;">आपकी पर्सनल डिजिटल लाइब्रेरी सुरक्षित है। सभी खरीदी गई बुक्स यहाँ आजीवन उपलब्ध रहेंगी।</p>
+              <div
+                style="font-size: 0.92rem; font-weight: 800; color: #34d399; display: flex; align-items: center; gap: 6px;">
+                <span>Aarogyam VIP Annual Pass (365 Days Access)</span>
+                <span
+                  style="background: #059669; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px;">ACTIVE</span>
+              </div>
+              <div style="font-size: 0.78rem; color: #a7f3d0; margin-top: 2px;">
+                📅 आज की सब्सक्राइब डेट: <strong id="subStartDate">--/--/----</strong> &nbsp;•&nbsp; 🔄 अगला रिन्यूअल:
+                <strong id="subEndDate">--/--/----</strong>
+              </div>
             </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <a href="/ucas/index.html" style="background: #0B7A3E; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-chart-pie"></i> UCAS Profile
-                </a>
-                <button onclick="openLeadModal()" style="background: #28a745; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-user-pen"></i> Update Profile
-                </button>
+          </div>
+          <div
+            style="background: rgba(0,0,0,0.25); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 6px 14px; text-align: center;">
+            <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700;">वैधता शेष
             </div>
+            <div id="subDaysLeftBadge" style="font-size: 1.1rem; font-weight: 900; color: #fbbf24;">⏳ 365 दिन शेष</div>
+          </div>
         </div>
+      </div>
 
-        <!-- 365-Day Subscription Countdown Card (For Active Users) -->
-        <div id="activeSubscriptionCard" style="display: none; background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); color: #ecfdf5; border-radius: 10px; padding: 12px 16px; margin-top: 14px; border: 1px solid #10b981; box-shadow: 0 4px 12px rgba(6,78,59,0.15);">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 1.5rem;">👑</span>
-                    <div>
-                        <div style="font-size: 0.92rem; font-weight: 800; color: #34d399; display: flex; align-items: center; gap: 6px;">
-                            <span>Aarogyam VIP Annual Pass (365 Days Access)</span>
-                            <span style="background: #059669; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px;">ACTIVE</span>
-                        </div>
-                        <div style="font-size: 0.78rem; color: #a7f3d0; margin-top: 2px;">
-                            📅 आज की सब्सक्राइब डेट: <strong id="subStartDate">--/--/----</strong> &nbsp;•&nbsp; 🔄 अगला रिन्यूअल: <strong id="subEndDate">--/--/----</strong>
-                        </div>
-                    </div>
-                </div>
-                <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 6px 14px; text-align: center;">
-                    <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700;">वैधता शेष</div>
-                    <div id="subDaysLeftBadge" style="font-size: 1.1rem; font-weight: 900; color: #fbbf24;">⏳ 365 दिन शेष</div>
-                </div>
+      <!-- Dynamic Color-Changing Subscription Upgrade KPI Card (For Inactive Users) -->
+      <div id="inactiveSubscriptionBanner"
+        style="display: none; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fee2e2 100%); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin-top: 14px; box-shadow: 0 4px 14px rgba(245,158,11,0.15); cursor: pointer;"
+        onclick="window.location.href='/subscription.html'">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div style="flex: 2; min-width: 260px;">
+            <div
+              style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.96rem; color: #b45309;">
+              <span>🔥</span>
+              <span>Aarogyam VIP 365-Day Subscription Offer!</span>
+              <span
+                style="background: #ef4444; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; animation: pulse 2s infinite;">LIMITED
+                OFFER</span>
             </div>
+            <p style="font-size: 0.86rem; color: #451a03; margin: 4px 0 0 0; line-height: 1.4;">
+              <strong>₹999</strong> का वार्षिक VIP सब्सक्रिप्शन देखें और <strong>UCAS मार्केटिंग टूल्स + सभी
+                ई-बुक्स</strong> 365 दिनों के लिए एक्टिव करें।
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;" onclick="event.stopPropagation();">
+            <a href="/subscription.html"
+              style="background: #d97706; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(217,119,6,0.3);">
+              <span>👑</span> VIP सब्सक्रिप्शन प्लान देखें (₹999/yr)
+            </a>
+            <a href="/ebooks/checkout.html?product=kheti-dr&amount=99&title=Kheti%20Doctor%20Book"
+              style="background: #10b981; color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+              <span>📖</span> ₹99 बुक से एक्टिव करें
+            </a>
+          </div>
         </div>
+      </div>
 
-        <!-- Dynamic Color-Changing Subscription Upgrade KPI Card (For Inactive Users) -->
-        <div id="inactiveSubscriptionBanner" style="display: none; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fee2e2 100%); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin-top: 14px; box-shadow: 0 4px 14px rgba(245,158,11,0.15); cursor: pointer;" onclick="window.location.href='/subscription.html'">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                <div style="flex: 2; min-width: 260px;">
-                    <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.96rem; color: #b45309;">
-                        <span>🔥</span>
-                        <span>Aarogyam VIP 365-Day Subscription Offer!</span>
-                        <span style="background: #ef4444; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; animation: pulse 2s infinite;">LIMITED OFFER</span>
-                    </div>
-                    <p style="font-size: 0.86rem; color: #451a03; margin: 4px 0 0 0; line-height: 1.4;">
-                        <strong>₹999</strong> का वार्षिक VIP सब्सक्रिप्शन देखें और <strong>UCAS मार्केटिंग टूल्स + सभी ई-बुक्स</strong> 365 दिनों के लिए एक्टिव करें।
-                    </p>
-                </div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;" onclick="event.stopPropagation();">
-                    <a href="/subscription.html" style="background: #d97706; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(217,119,6,0.3);">
-                        <span>👑</span> VIP सब्सक्रिप्शन प्लान देखें (₹999/yr)
-                    </a>
-                    <a href="/ebooks/checkout.html?product=kheti-dr&amount=99&title=Kheti%20Doctor%20Book" style="background: #10b981; color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
-                        <span>📖</span> ₹99 बुक से एक्टिव करें
-                    </a>
-                </div>
-            </div>
+      <!-- Stats Counter Row -->
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1; text-align: center;">
+        <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <span style="display: block; font-size: 0.75rem; color: #64748b;">📖 Read Demo</span>
+          <strong id="kpiDemoCount" style="font-size: 1rem; color: #0284c7;">0</strong>
         </div>
+        <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <span style="display: block; font-size: 0.75rem; color: #64748b;">📚 Purchased</span>
+          <strong id="kpiPurchasedCount" style="font-size: 1rem; color: #28a745;">0</strong>
+        </div>
+        <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <span style="display: block; font-size: 0.75rem; color: #64748b;">🎁 Bonus</span>
+          <strong id="kpiBonusCount" style="font-size: 1rem; color: #d97706;">0</strong>
+        </div>
+        <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <span style="display: block; font-size: 0.75rem; color: #64748b;">❤️ Wishlist</span>
+          <strong id="kpiWishlistCount" style="font-size: 1rem; color: #e11d48;">0</strong>
+        </div>
+      </div>
 
-        <!-- Stats Counter Row -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1; text-align: center;">
-            <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <span style="display: block; font-size: 0.75rem; color: #64748b;">📖 Read Demo</span>
-                <strong id="kpiDemoCount" style="font-size: 1rem; color: #0284c7;">0</strong>
-            </div>
-            <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <span style="display: block; font-size: 0.75rem; color: #64748b;">📚 Purchased</span>
-                <strong id="kpiPurchasedCount" style="font-size: 1rem; color: #28a745;">0</strong>
-            </div>
-            <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <span style="display: block; font-size: 0.75rem; color: #64748b;">🎁 Bonus</span>
-                <strong id="kpiBonusCount" style="font-size: 1rem; color: #d97706;">0</strong>
-            </div>
-            <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <span style="display: block; font-size: 0.75rem; color: #64748b;">❤️ Wishlist</span>
-                <strong id="kpiWishlistCount" style="font-size: 1rem; color: #e11d48;">0</strong>
-            </div>
+      <!-- Profile Completion Progress Bar -->
+      <div
+        style="margin-top: 12px; background: #fff; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: #64748b; margin-bottom: 6px;">
+          <span><span>📊</span> <strong>प्रोफाइल पूर्णता (Profile Completion):</strong> <span id="profileStatusHint"
+              style="color:#d97706;">कृपया 100% पूरा करें</span></span>
+          <strong id="profileCompletionText" style="color: #28a745; font-size: 0.88rem;">0%</strong>
         </div>
-
-        <!-- Profile Completion Progress Bar -->
-        <div style="margin-top: 12px; background: #fff; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: #64748b; margin-bottom: 6px;">
-                <span><span>📊</span> <strong>प्रोफाइल पूर्णता (Profile Completion):</strong> <span id="profileStatusHint" style="color:#d97706;">कृपया 100% पूरा करें</span></span>
-                <strong id="profileCompletionText" style="color: #28a745; font-size: 0.88rem;">0%</strong>
-            </div>
-            <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                <div id="profileCompletionBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 4px; transition: width 0.4s ease;"></div>
-            </div>
+        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+          <div id="profileCompletionBar"
+            style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 4px; transition: width 0.4s ease;">
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- 4.1 PWA Digital Locker Install Banner Card -->
-    <div id="library-pwa-card" style="display: none; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px 22px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-            <div style="flex: 1; min-width: 260px;">
-                <h3 style="font-size: 1.15rem; color: #166534; margin: 0 0 6px 0; display: flex; align-items: center; gap: 8px;">
-                    <span>📱</span> Install Aarogyam India App
-                </h3>
-                <p style="font-size: 0.92rem; color: #334155; margin: 0; line-height: 1.5;">
-                    आप अपने मोबाइल में Aarogyam India App Install करें और Offline में भी अपनी जरूरी किताबें और सामग्री पढ़ें।
-                </p>
-            </div>
-            <button id="library-pwa-install-btn" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);">
-                <span>📱</span> Install App Now
-            </button>
+    <div id="library-pwa-card"
+      style="display: none; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px 22px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div style="flex: 1; min-width: 260px;">
+          <h3
+            style="font-size: 1.15rem; color: #166534; margin: 0 0 6px 0; display: flex; align-items: center; gap: 8px;">
+            <span>📱</span> Install Aarogyam India App
+          </h3>
+          <p style="font-size: 0.92rem; color: #334155; margin: 0; line-height: 1.5;">
+            आप अपने मोबाइल में Aarogyam India App Install करें और Offline में भी अपनी जरूरी किताबें और सामग्री पढ़ें।
+          </p>
         </div>
+        <button id="library-pwa-install-btn"
+          style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);">
+          <span>📱</span> Install App Now
+        </button>
+      </div>
     </div>
 
     <!-- 5. Category Pill Tabs -->
     <div class="category-tabs">
-        <button class="tab-btn active" onclick="switchTab('purchased')">मेरी पुस्तकें (MY BOOKS)</button>
-        <button class="tab-btn" onclick="switchTab('available')">उपलब्ध बुक्स (AVAILABLE)</button>
-        <button class="tab-btn" onclick="switchTab('bonus')">फ्री बोनस (BONUS)</button>
-        <button class="tab-btn" onclick="switchTab('demo')">डेमो बुक्स (DEMO)</button>
-        <button class="tab-btn" onclick="switchTab('coming')">आने वाली बुक्स (COMING SOON)</button>
+      <button class="tab-btn active" onclick="switchTab('purchased')">मेरी पुस्तकें (MY BOOKS)</button>
+      <button class="tab-btn" onclick="switchTab('available')">उपलब्ध बुक्स (AVAILABLE)</button>
+      <button class="tab-btn" onclick="switchTab('bonus')">फ्री बोनस (BONUS)</button>
+      <button class="tab-btn" onclick="switchTab('demo')">डेमो बुक्स (DEMO)</button>
+      <button class="tab-btn" onclick="switchTab('coming')">आने वाली बुक्स (COMING SOON)</button>
     </div>
 
-    <!-- 6. Main Container & Sections -->   
+    <!-- 6. Main Container & Sections -->
     <div class="library-container">
 
-        <!-- Section 1: Purchased / Active Books -->
-        <div id="section-purchased" class="book-section">
-            <div class="section-title">
-                <span>मेरी एक्टिव / खरीदी गई ई-बुक्स (Digital Locker)</span>
-            </div>
-            <div class="book-grid-2col" id="purchasedBooksGrid">
-                <!-- Dynamically loaded via JS: Read Now, Download PDF, Book Details, Purchased Badge -->
-            </div>
+      <!-- Section 1: Purchased / Active Books -->
+      <div id="section-purchased" class="book-section">
+        <div class="section-title">
+          <span>मेरी एक्टिव / खरीदी गई ई-बुक्स (Digital Locker)</span>
         </div>
+        <div class="book-grid-2col" id="purchasedBooksGrid">
+          <!-- Dynamically loaded via JS: Read Now, Download PDF, Book Details, Purchased Badge -->
+        </div>
+      </div>
 
-        <!-- Section 2: Available Books -->
-        <div id="section-available" class="book-section" style="display: none;">
-            <div class="section-title">
-                <span>खरीद के लिए उपलब्ध प्रमुख पुस्तकें (Available Books)</span>
-            </div>
-            <div class="book-grid-2col" id="availableBooksGrid">
-                <!-- Dynamically loaded via JS: Buy Now, Preview, Book Details, Offer Badge -->
-            </div>
+      <!-- Section 2: Available Books -->
+      <div id="section-available" class="book-section" style="display: none;">
+        <div class="section-title">
+          <span>खरीद के लिए उपलब्ध प्रमुख पुस्तकें (Available Books)</span>
         </div>
+        <div class="book-grid-2col" id="availableBooksGrid">
+          <!-- Dynamically loaded via JS: Buy Now, Preview, Book Details, Offer Badge -->
+        </div>
+      </div>
 
-        <!-- Section 3: Bonus Books (Appears when books have bonus or after purchase) -->
-        <div id="section-bonus" class="book-section" style="display: none;">
-            <div class="section-title"><span>🎁 फ्री बोनस पुस्तकें व सामग्री (Bonus Books)</span></div>
-            <div class="book-grid-2col" id="bonusBooksGrid">
-                <!-- Dynamically loaded via JS -->
-            </div>
+      <!-- Section 3: Bonus Books (Appears when books have bonus or after purchase) -->
+      <div id="section-bonus" class="book-section" style="display: none;">
+        <div class="section-title"><span>🎁 फ्री बोनस पुस्तकें व सामग्री (Bonus Books)</span></div>
+        <div class="book-grid-2col" id="bonusBooksGrid">
+          <!-- Dynamically loaded via JS -->
         </div>
+      </div>
 
-        <!-- Section 4: Demo Books -->
-        <div id="section-demo" class="book-section" style="display: none;">
-            <div class="section-title"><span>📖 डेमो ई-बुक्स प्रिव्यू (Read Free Demo)</span></div>
-            <div class="book-grid-2col" id="demoBooksGrid">
-                <!-- Dynamically loaded via JS -->
-            </div>
+      <!-- Section 4: Demo Books -->
+      <div id="section-demo" class="book-section" style="display: none;">
+        <div class="section-title"><span>📖 डेमो ई-बुक्स प्रिव्यू (Read Free Demo)</span></div>
+        <div class="book-grid-2col" id="demoBooksGrid">
+          <!-- Dynamically loaded via JS -->
         </div>
+      </div>
 
-        <!-- Section 5: Coming Soon Books -->
-        <div id="section-coming" class="book-section" style="display: none;">
-            <div class="section-title"><span>आने वाली प्रीमियम बुक्स (Coming Soon & Wishlist)</span></div>
-            <div class="book-grid-2col" id="comingSoonGrid">
-                <!-- Dynamically loaded via JS -->
-            </div>
+      <!-- Section 5: Coming Soon Books -->
+      <div id="section-coming" class="book-section" style="display: none;">
+        <div class="section-title"><span>आने वाली प्रीमियम बुक्स (Coming Soon & Wishlist)</span></div>
+        <div class="book-grid-2col" id="comingSoonGrid">
+          <!-- Dynamically loaded via JS -->
         </div>
+      </div>
 
     </div>
 
     <!-- 7. Full Detailed Profile Update Form Modal -->
     <div class="modal-overlay" id="leadModal">
-        <div class="modal-card">
-            <span class="close-modal" onclick="closeLeadModal()">&times;</span>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                <span style="font-size: 1.4rem;">👤</span>
-                <h3 style="margin: 0; color: #2c3e50;">पूर्ण प्रोफाइल जानकारी अपडेट करें</h3>
-            </div>
-            <form onsubmit="submitLeadForm(event)">
-                <input type="text" id="leadName" class="modal-input" placeholder="आपका पूरा नाम (Full Name) *" required>
-                <input type="tel" id="leadPhone" class="modal-input" placeholder="मोबाइल नंबर (Mobile) *" required>
-                
-                <!-- NetSurf ID Input (Requested by User) -->
-                <div style="margin-bottom: 12px;">
-                    <input type="text" id="leadNetsurfId" class="modal-input" placeholder="NetSurf ID (उदा. NS123456 / यदि उपलब्ध हो)" style="margin-bottom: 4px; border-color: #3b82f6; background: #f0f9ff;">
-                    <div style="font-size: 0.74rem; color: #0284c7; padding-left: 2px;">💼 NetSurf Distributor / Direct Seller ID</div>
-                </div>
-
-                <input type="email" id="leadEmail" class="modal-input" placeholder="ईमेल आईडी (Email Address)">
-                
-                <select id="leadGender" class="modal-input">
-                    <option value="" disabled selected>लिंग चुनें (Select Gender)</option>
-                    <option value="Male">पुरुष (Male)</option>
-                    <option value="Female">महिला (Female)</option>
-                    <option value="Other">अन्य (Other)</option>
-                </select>
-
-                <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-                    <input type="text" id="leadState" class="modal-input" placeholder="राज्य (State)" style="margin-bottom: 0;">
-                    <input type="date" id="leadDob" class="modal-input" placeholder="जन्म तिथि (Date of Birth)" style="margin-bottom: 0;" title="जन्म तिथि (DOB)">
-                </div>
-
-                <input type="text" id="leadCity" class="modal-input" placeholder="शहर / जिला (City / District)">
-                <input type="text" id="leadOccupation" class="modal-input" placeholder="व्यवसाय (Occupation)">
-                <input type="text" id="leadInterest" class="modal-input" placeholder="रुचि (Interest)">
-                <textarea id="leadAddress" class="modal-input" placeholder="पूरा पता (Full Address)" rows="2" style="resize: none;"></textarea>
-                
-                <button type="submit" id="leadSubmitBtn" class="modal-submit-btn">जानकारी सुरक्षित करें (Save Profile)</button>
-            </form>
+      <div class="modal-card">
+        <span class="close-modal" onclick="closeLeadModal()">&times;</span>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 1.4rem;">👤</span>
+          <h3 style="margin: 0; color: #2c3e50;">पूर्ण प्रोफाइल जानकारी अपडेट करें</h3>
         </div>
+        <form onsubmit="submitLeadForm(event)">
+          <input type="text" id="leadName" class="modal-input" placeholder="आपका पूरा नाम (Full Name) *" required>
+          <input type="tel" id="leadPhone" class="modal-input" placeholder="मोबाइल नंबर (Mobile) *" required>
+
+          <!-- NetSurf ID Input (Requested by User) -->
+          <div style="margin-bottom: 12px;">
+            <input type="text" id="leadNetsurfId" class="modal-input"
+              placeholder="NetSurf ID (उदा. NS123456 / यदि उपलब्ध हो)"
+              style="margin-bottom: 4px; border-color: #3b82f6; background: #f0f9ff;">
+            <div style="font-size: 0.74rem; color: #0284c7; padding-left: 2px;">💼 NetSurf Distributor / Direct Seller
+              ID</div>
+          </div>
+
+          <input type="email" id="leadEmail" class="modal-input" placeholder="ईमेल आईडी (Email Address)">
+
+          <select id="leadGender" class="modal-input">
+            <option value="" disabled selected>लिंग चुनें (Select Gender)</option>
+            <option value="Male">पुरुष (Male)</option>
+            <option value="Female">महिला (Female)</option>
+            <option value="Other">अन्य (Other)</option>
+          </select>
+
+          <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+            <input type="text" id="leadState" class="modal-input" placeholder="राज्य (State)" style="margin-bottom: 0;">
+            <input type="date" id="leadDob" class="modal-input" placeholder="जन्म तिथि (Date of Birth)"
+              style="margin-bottom: 0;" title="जन्म तिथि (DOB)">
+          </div>
+
+          <input type="text" id="leadCity" class="modal-input" placeholder="शहर / जिला (City / District)">
+          <input type="text" id="leadOccupation" class="modal-input" placeholder="व्यवसाय (Occupation)">
+          <input type="text" id="leadInterest" class="modal-input" placeholder="रुचि (Interest)">
+          <textarea id="leadAddress" class="modal-input" placeholder="पूरा पता (Full Address)" rows="2"
+            style="resize: none;"></textarea>
+
+          <button type="submit" id="leadSubmitBtn" class="modal-submit-btn">जानकारी सुरक्षित करें (Save
+            Profile)</button>
+        </form>
+      </div>
     </div>
 
     <!-- Persistent 100% Profile Incomplete Nudge Popup (Shown until 100% filled) -->
-    <div id="profile100NudgePopup" style="display: none; position: fixed; bottom: 85px; right: 20px; z-index: 999; max-width: 360px; background: #ffffff; border: 2px solid #f59e0b; border-radius: 12px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); animation: bounce 1s ease-in-out;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-            <div style="display: flex; gap: 10px;">
-                <span style="font-size: 1.6rem;">⚠️</span>
-                <div>
-                    <div style="font-weight: 800; font-size: 0.88rem; color: #b45309;">
-                        प्रोफाइल अधूरी है (<span id="nudgePercentText">0%</span>)
-                    </div>
-                    <p style="font-size: 0.78rem; color: #475569; margin: 4px 0 8px 0; line-height: 1.4;">
-                        रेफरल रिवॉर्ड्स और सभी VIP फीचर्स पाने के लिए 100% प्रोफाइल पूरी करना अनिवार्य है।
-                    </p>
-                    <button onclick="openLeadModal()" style="background: #f59e0b; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
-                        ✨ अभी 100% पूरी करें
-                    </button>
-                </div>
+    <div id="profile100NudgePopup"
+      style="display: none; position: fixed; bottom: 85px; right: 20px; z-index: 999; max-width: 360px; background: #ffffff; border: 2px solid #f59e0b; border-radius: 12px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); animation: bounce 1s ease-in-out;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+        <div style="display: flex; gap: 10px;">
+          <span style="font-size: 1.6rem;">⚠️</span>
+          <div>
+            <div style="font-weight: 800; font-size: 0.88rem; color: #b45309;">
+              प्रोफाइल अधूरी है (<span id="nudgePercentText">0%</span>)
             </div>
-            <button onclick="sessionStorage.setItem('ai_profile_nudge_dismissed', 'true'); document.getElementById('profile100NudgePopup').style.display='none';" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
-        </div>
-    </div>
-    </main>
-
-    <!-- 8. Sticky Bottom Timer & Deal Bar (Centered) -->
-    <div class="sticky-action-bar">
-        <div class="deal-timer-banner">
-            <span>⚡ Today's Offer Ends In:</span>
-            <span id="dealTimer">00:00:00</span>
-        </div>
-        <a href="https://wa.me/917974422572" id="whatsappDealBtn" target="_blank" class="sticky-deal-btn animate-bounce">
-            <i class="fa-brands fa-whatsapp"></i> Know Your Offer
-        </a>
-    </div>
-
-    <!-- WhatsApp Dynamic Message Script -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-            const currentUserName = storedUser.full_name || localStorage.getItem('aim_user_name') || 'ग्राहक';
-
-            const waMsg = `नमस्ते Aarogyam, मैंने अभी लाइब्रेरी पेज में ऑफर देखा, मेरा नाम ${currentUserName} है, मुझे आज के ऑफर के बारे में बताएं, मैं इंटरेस्टेड हूँ।`;
-            const waLink = `https://wa.me/917974422572?text=` + encodeURIComponent(waMsg);
-
-            const waBtn = document.getElementById('whatsappDealBtn');
-            if (waBtn) {
-                waBtn.href = waLink;
-            }
-        });
-    </script>
-
-    <!-- UNIFIED AAROGYAM INDIA FOOTER -->
-    <footer class="site-footer" style="background:#0f172a; color:#cbd5e1; padding:45px 20px 25px; margin-top:50px; border-top:3px solid transparent; border-image:linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;">
-      <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:30px; margin-bottom:30px;">
-        <div>
-          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-            <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:44px; width:auto; object-fit:contain;">
-            <div>
-              <div style="font-size:1.15rem; font-weight:800; color:#fff; line-height:1.2;">Aarogyam India</div>
-              <div style="font-size:0.75rem; color:#10B981; font-weight:700;">डिजिटल कृषि व ज्ञान मंच</div>
-            </div>
+            <p style="font-size: 0.78rem; color: #475569; margin: 4px 0 8px 0; line-height: 1.4;">
+              रेफरल रिवॉर्ड्स और सभी VIP फीचर्स पाने के लिए 100% प्रोफाइल पूरी करना अनिवार्य है।
+            </p>
+            <button onclick="openLeadModal()"
+              style="background: #f59e0b; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
+              ✨ अभी 100% पूरी करें
+            </button>
           </div>
-          <p style="font-size:0.85rem; line-height:1.6; color:#94a3b8;">
-            Aarogyam India is a premier digital agriculture knowledge platform empowering farmers and users with smart digital tools, eBooks, and expert guidance.
-          </p>
         </div>
-
+        <button
+          onclick="sessionStorage.setItem('ai_profile_nudge_dismissed', 'true'); document.getElementById('profile100NudgePopup').style.display='none';"
+          style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
+      </div>
+    </div>
+  </main>
+  <main class="library-main" id="mainLibraryContent">
+    <div class="welcome-card-soft"
+      style="background: linear-gradient(135deg, #040a09 0%, #416406 100%); color: #fff; border-radius: 14px; padding: 25px; margin: 20px auto; max-width: 1200px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
         <div>
-          <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #E86A17; display:inline-block; padding-bottom:4px;">Quick Links</h3>
-          <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
-            <li><a href="/index.html" style="color:#cbd5e1; text-decoration:none;">🏠 Home</a></li>
-            <li><a href="/ucas/index.html" style="color:#cbd5e1; text-decoration:none;">👤 My Profile & UCAS</a></li>
-            <li><a href="/ebooks/my-library.html" style="color:#cbd5e1; text-decoration:none;">📚 Digital Library</a></li>
-            <li><a href="/subscription.html" style="color:#f59e0b; text-decoration:none; font-weight:700;">👑 VIP Pass / Subscription</a></li>
-            <li><a href="/purchases.html" style="color:#cbd5e1; text-decoration:none;">🧾 My Purchases & Invoices</a></li>
-          </ul>
+          <h2 style="font-size: 1.5rem; margin: 0 0 5px 0;">🌤️ Aarogyam India मौसम केंद्र</h2>
+          <p style="font-size: 0.95rem; opacity: 0.95; margin: 0;">अपने शहर या खेती की लोकेशन का सटीक लाइव
+            तापमान और मौसम हाल देखें</p>
         </div>
-
-        <div>
-          <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #10b981; display:inline-block; padding-bottom:4px;">Legal & Policies</h3>
-          <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
-            <li><a href="/terms.html" style="color:#cbd5e1; text-decoration:none;">📄 Terms & Conditions</a></li>
-            <li><a href="/privacy-policy.html" style="color:#cbd5e1; text-decoration:none;">🔒 Privacy Policy</a></li>
-            <li><a href="/shipping-policy.html" style="color:#cbd5e1; text-decoration:none;">🚚 Shipping & Return Policy</a></li>
-            <li><a href="/faq.html" style="color:#cbd5e1; text-decoration:none;">❓ FAQ & Support</a></li>
-            <li><a href="/contact.html" style="color:#cbd5e1; text-decoration:none;">📞 Contact Us</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #3b82f6; display:inline-block; padding-bottom:4px;">Contact & Helpline</h3>
-          <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">📍 Rewa, Madhya Pradesh, India</p>
-          <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">
-            📞 <a href="tel:917974422572" style="color:#38bdf8; text-decoration:none; font-weight:700;">+91 79744 22572</a>
-          </p>
-          <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 12px 0;">
-            ✉ <a href="mailto:info@aarogyamindia.in" style="color:#38bdf8; text-decoration:none;">info@aarogyamindia.in</a>
-          </p>
-          <div style="display:flex; gap:10px;">
-            <a href="https://wa.me/917974422572" target="_blank" style="background:#25d366; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-whatsapp"></i></a>
-            <a href="#" style="background:#1877f2; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-facebook"></i></a>
-            <a href="#" style="background:#ff0000; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-youtube"></i></a>
-          </div>
+        <div style="display: flex; gap: 8px; width: 100%; max-width: 320px;">
+          <input type="text" id="citySearchInput" placeholder="शहर का नाम लिखें (जैसे - Rewa)..."
+            style="flex: 1; padding: 10px 14px; border: none; border-radius: 8px; outline: none; font-size: 0.9rem;">
+          <button id="citySearchBtn"
+            style="background: #081108; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">खोजें</button>
         </div>
       </div>
 
-      <div style="text-align:center; padding-top:20px; border-top:1px solid #334155; font-size:0.82rem; color:#64748b;">
-        © 2026 Aarogyam India. All Rights Reserved. • ISO Certified Digital Platform
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px; background: rgba(255, 255, 255, 0.2); padding: 20px; border-radius: 12px; backdrop-filter: blur(6px);">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <img id="weatherIconImg" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Icon"
+            style="width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%;">
+          <div>
+            <h3 id="displayCityName" style="font-size: 1.3rem; margin: 0;">--</h3>
+            <p id="displayCountry" style="font-size: 0.85rem; margin: 2px 0 0 0; opacity: 0.9;">India</p>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">तापमान (Temperature)</div>
+          <div id="displayTemp" style="font-size: 2.2rem; font-weight: bold; margin-top: 2px;">--°C</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">मौसम स्थिति</div>
+          <div id="displayCondition"
+            style="font-size: 1.1rem; font-weight: bold; margin-top: 4px; text-transform: capitalize;">--
+          </div>
+        </div>
       </div>
-    </footer>
+    </div>
+  </main>
+  <!-- 8. Sticky Bottom Timer & Deal Bar (Centered) -->
+  <div class="sticky-action-bar">
+    <div class="deal-timer-banner">
+      <span>⚡ Today's Offer Ends In:</span>
+      <span id="dealTimer">00:00:00</span>
+    </div>
+    <a href="https://wa.me/917974422572" id="whatsappDealBtn" target="_blank" class="sticky-deal-btn animate-bounce">
+      <i class="fa-brands fa-whatsapp"></i> Know Your Offer
+    </a>
+  </div>
 
-    <!-- 10. JavaScript Links -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script src="../js/supabase.js"></script>
-    <script src="../session.js"></script>
-    <script src="/js/user-notifications.js?v=12.0"></script>
-    <script src="/js/global-guest-modal.js?v=12.0"></script>
-    <script src="/js/book-promo-toast.js?v=12.0"></script>
-    <script src="/js/my-library.js"></script>
-    <script type="module" src="/js/public-pwa.js"></script>
+  <!-- WhatsApp Dynamic Message Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      const currentUserName = storedUser.full_name || localStorage.getItem('aim_user_name') || 'ग्राहक';
+
+      const waMsg = `नमस्ते Aarogyam, मैंने अभी लाइब्रेरी पेज में ऑफर देखा, मेरा नाम ${currentUserName} है, मुझे आज के ऑफर के बारे में बताएं, मैं इंटरेस्टेड हूँ।`;
+      const waLink = `https://wa.me/917974422572?text=` + encodeURIComponent(waMsg);
+
+      const waBtn = document.getElementById('whatsappDealBtn');
+      if (waBtn) {
+        waBtn.href = waLink;
+      }
+    });
+  </script>
+
+  <!-- UNIFIED AAROGYAM INDIA FOOTER -->
+  <footer class="site-footer"
+    style="background:#0f172a; color:#cbd5e1; padding:45px 20px 25px; margin-top:50px; border-top:3px solid transparent; border-image:linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;">
+    <div
+      style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:30px; margin-bottom:30px;">
+      <div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:44px; width:auto; object-fit:contain;">
+          <div>
+            <div style="font-size:1.15rem; font-weight:800; color:#fff; line-height:1.2;">Aarogyam India</div>
+            <div style="font-size:0.75rem; color:#10B981; font-weight:700;">डिजिटल कृषि व ज्ञान मंच</div>
+          </div>
+        </div>
+        <p style="font-size:0.85rem; line-height:1.6; color:#94a3b8;">
+          Aarogyam India is a premier digital agriculture knowledge platform empowering farmers and users with smart
+          digital tools, eBooks, and expert guidance.
+        </p>
+      </div>
+
+      <div>
+        <h3
+          style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #E86A17; display:inline-block; padding-bottom:4px;">
+          Quick Links</h3>
+        <ul
+          style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
+          <li><a href="/index.html" style="color:#cbd5e1; text-decoration:none;">🏠 Home</a></li>
+          <li><a href="/ucas/index.html" style="color:#cbd5e1; text-decoration:none;">👤 My Profile & UCAS</a></li>
+          <li><a href="/ebooks/my-library.html" style="color:#cbd5e1; text-decoration:none;">📚 Digital Library</a></li>
+          <li><a href="/subscription.html" style="color:#f59e0b; text-decoration:none; font-weight:700;">👑 VIP Pass /
+              Subscription</a></li>
+          <li><a href="/purchases.html" style="color:#cbd5e1; text-decoration:none;">🧾 My Purchases & Invoices</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3
+          style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #10b981; display:inline-block; padding-bottom:4px;">
+          Legal & Policies</h3>
+        <ul
+          style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
+          <li><a href="/terms.html" style="color:#cbd5e1; text-decoration:none;">📄 Terms & Conditions</a></li>
+          <li><a href="/privacy-policy.html" style="color:#cbd5e1; text-decoration:none;">🔒 Privacy Policy</a></li>
+          <li><a href="/shipping-policy.html" style="color:#cbd5e1; text-decoration:none;">🚚 Shipping & Return
+              Policy</a></li>
+          <li><a href="/faq.html" style="color:#cbd5e1; text-decoration:none;">❓ FAQ & Support</a></li>
+          <li><a href="/contact.html" style="color:#cbd5e1; text-decoration:none;">📞 Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3
+          style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #3b82f6; display:inline-block; padding-bottom:4px;">
+          Contact & Helpline</h3>
+        <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">📍 Rewa, Madhya Pradesh, India
+        </p>
+        <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">
+          📞 <a href="tel:917974422572" style="color:#38bdf8; text-decoration:none; font-weight:700;">+91 79744
+            22572</a>
+        </p>
+        <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 12px 0;">
+          ✉ <a href="mailto:info@aarogyamindia.in"
+            style="color:#38bdf8; text-decoration:none;">info@aarogyamindia.in</a>
+        </p>
+        <div style="display:flex; gap:10px;">
+          <a href="https://wa.me/917974422572" target="_blank"
+            style="background:#25d366; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i
+              class="fa-brands fa-whatsapp"></i></a>
+          <a href="#"
+            style="background:#1877f2; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i
+              class="fa-brands fa-facebook"></i></a>
+          <a href="#"
+            style="background:#ff0000; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i
+              class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center; padding-top:20px; border-top:1px solid #334155; font-size:0.82rem; color:#64748b;">
+      © 2026 Aarogyam India. All Rights Reserved. • ISO Certified Digital Platform
+    </div>
+  </footer>
+
+  <!-- 10. JavaScript Links -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../session.js"></script>
+  <script src="/js/user-notifications.js?v=12.0"></script>
+  <script src="/js/global-guest-modal.js?v=12.0"></script>
+  <script src="/js/book-promo-toast.js?v=12.0"></script>
+  <script src="/js/my-library.js"></script>
+  <script type="module" src="/js/public-pwa.js"></script>
+  <script src="/js/weather.js"></script> <!-- यहाँ हमने मौसम वाली जेएस फाइल जोड़ दी है -->
 </body>
+
 </html>
