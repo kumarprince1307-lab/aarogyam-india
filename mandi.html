@@ -1,395 +1,552 @@
-<!-- =========================================
-TOP BAR START
-========================================== -->
+<!DOCTYPE html>
+<html lang="hi">
 
-<div class="top-bar">
-
-    <div class="container">
-
-        <div class="top-left">
-
-            🇮🇳 Welcome to Aarogyam India
-
-        </div>
-
-        <div class="top-right">
-
-            <a href="tel:+917974422572">
-                📞 +91 79744 22572
-            </a>
-
-            <a href="mailto:info@aarogyamindia.in">
-                ✉ info@aarogyamindia.in
-            </a>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- =========================================
-TOP BAR END
-========================================== -->
-
-<!-- =========================================
-HEADER START
-========================================== -->
-
-<header class="header" id="header">
-    <div class="container">
-        <div class="logo">
-            <a href="index.html">
-                <img src="images/logo/logo.png" alt="Aarogyam India Logo">
-            </a>
-        </div>
-        <div id="header-user-info" style="display: none;">
-            <h3 id="header-user-name"></h3>
-            <p id="header-user-mobile"></p>
-        </div>
-        <div class="header-right">
-            <nav class="navbar">
-                <ul class="nav-menu">
-                    <li><a href="index.html" class="active">Home</a></li>
-                    <li class="dropdown">
-                        <a href="#">Services</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="ebooks/agriculture.html">Agriculture</a></li>
-                            <li><a href="crop-doctor.html">Crop Doctor</a></li>
-                            <li><a href="weather.html">Weather</a></li>
-                            <li><a href="mandi.html">Mandi Bhav</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#">eBooks</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="ebooks/ebook.html">All eBooks</a></li>
-                            <li><a href="ebooks/agriculture.html">Agriculture Books</a></li>
-                            <li><a href="pages/health.html">Health Books</a></li>
-                            <li><a href="pages/digital-training.html">Digital Training</a></li>
-                            <li><a href="pages/self-help.html">Self Help</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="ebooks/my-library.html">My Library</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="search-btn" id="searchBtn" aria-label="Search">
-                    <img src="images/icons/search.png" alt="Search">
-                </button>
-                <a href="#" id="universalLoginBtn" class="login-btn">
-                    <img src="images/icons/login.png" alt="Login">
-                    <span id="loginBtnText">Login</span>
-                </a>
-                <a href="ebooks/checkout.html" class="cart-btn">
-                    <img src="images/icons/cart.png" alt="Cart">
-                    <span class="cart-count" id="cartCount">0</span>
-                </a>
-                <button class="menu-btn" id="menuBtn" aria-label="Menu">
-                    <img src="images/icons/menu.png" alt="Menu">
-                </button>
-            </div>
-        </div>
-    </div>
-</header>
-
-<!-- =========================================
-MOBILE NAVIGATION START
-========================================== -->
-<div class="mobile-menu" id="mobileMenu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>कृषि मंडी भाव व मौसम - Aarogyam India</title>
+    <!-- Favicon & PWA Manifest -->
+    <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+    <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10B981">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Aarogyam">
     
-    <!-- User Profile Card (Visible when logged in) -->
-    <div id="mobile-user-card" class="mobile-user-card" style="display: none;">
-        <button id="closeMenu">
-            <img src="images/icons/close.png" alt="Close">
-        </button>
-        <img src="/images/logo/fevicon.png" alt="User" class="mobile-user-avatar">
-        <div class="mobile-user-info">
-            <h3 id="mobile-user-name">Guest User</h3>
-            <p id="mobile-user-meta">
-                <span id="mobile-member-status"</span><span id="mobile-user-mobile"></span>
-            </p>
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/my-library.css">
+    <link rel="stylesheet" href="/css/user-notifications.css">
+    <link rel="stylesheet" href="/css/mandi.css">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1671873500553134');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+</head>
+
+<body>
+
+    <!-- 1. Login Popup Overlay -->
+    <div id="login-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; display: none; justify-content: center; align-items: center;">
+        <div style="background: #1e293b; color: #fff; padding: 30px; width: 100%; max-width: 380px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; position: relative; border: 1px solid #334155;">
+            <button onclick="closeLoginPopup()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 20px; color: #aaa; cursor: pointer; line-height: 1;">&times;</button>
+            <h2 style="margin-bottom: 10px; color: #fff; font-size: 22px;">लॉगिन करें</h2>
+            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">अपनी लाइब्रेरी देखने के लिए रजिस्टर्ड मोबाइल नंबर दर्ज करें</p>
+            <input type="tel" id="login-mobile" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; box-sizing: border-box; font-size: 16px; color: #fff; outline: none;">
+            <button onclick="checkUserLogin()" style="width: 100%; padding: 12px; background: #10B981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">लॉगिन करें</button>
+            <p style="margin-top: 20px; font-size: 14px; color: #94a3b8;">नया यूजर हैं? <a href="/registration.html" style="color: #38bdf8; text-decoration: none; font-weight: bold;">यहाँ साइन अप करें</a></p>
         </div>
-        <a href="#" id="mobile-logout-btn" class="mobile-logout-btn">Logout</a>
     </div>
 
-    <!-- Login Prompt (Visible when logged out) -->
-    <div id="mobile-login-prompt" class="mobile-login-prompt">
-        <button class="close-btn-alt" id="altCloseMenu">
-            <img src="images/icons/close.png" alt="Close">
-        </button>
-        <a href="#" id="mobileLoginBtn" class="login-prompt-btn">
-            <img src="images/icons/login.png" alt="Login">
-            <span id="mobileLoginBtnText">Login / Register</span>
-        </a>
+    <script>
+        function openLoginPopup() {
+            const popup = document.getElementById('login-popup-overlay');
+            if (popup) popup.style.display = 'flex';
+        }
+
+        function toggleMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('sideMenuOverlay');
+            if (sideMenu) {
+                const isActive = sideMenu.classList.toggle('active');
+                if (overlay) {
+                    overlay.style.display = isActive ? 'block' : 'none';
+                }
+            }
+        }
+        window.toggleMenu = toggleMenu;
+
+        function closeLoginPopup() {
+            const popup = document.getElementById('login-popup-overlay');
+            if (popup) popup.style.display = 'none';
+        }
+    </script>
+
+    <!-- 2. Header -->
+    <header class="library-header">
+        <div class="header-logo-title">
+            <img src="/images/logo/logo.png" alt="Logo" class="site-logo">
+            <h1>कृषि मंडी भाव व मौसम</h1>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1.5px solid #10B981; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.15rem; position: relative;">
+                <i class="fa-solid fa-bell" style="color: #10B981;"></i>
+                <span class="user-notif-badge" style="display: none; position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.7rem; font-weight: 800; padding: 2px 6px;">0</span>
+            </button>
+            <button class="back-btn" onclick="window.location.href='/index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="menu-btn" onclick="toggleMenu()" title="मेनू खोलें" aria-label="Toggle Menu"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- 2.1 DESKTOP LEFT SIDEBAR (All 15+ Original Links) -->
+    <aside class="library-sidebar" id="libraryDesktopSidebar">
+        <div>
+            <div class="library-nav-section-title">Library Destinations</div>
+            <ul class="library-nav-list">
+                <li class="library-nav-item">
+                    <a href="/ebooks/my-library.html">
+                        <i class="fa-solid fa-book-open library-nav-icon" style="color:#2563EB;"></i>
+                        <span>My Library</span>
+                    </a>
+                </li>
+                <li class="library-nav-item active">
+                    <a href="/mandi.html">
+                        <i class="fa-solid fa-seedling library-nav-icon" style="color:#10B981;"></i>
+                        <span>मंडी भाव व मौसम</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ucas/index.html">
+                        <i class="fa-solid fa-user-gear library-nav-icon" style="color:#E86A17;"></i>
+                        <span>My Profile & UCAS</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/subscription.html">
+                        <i class="fa-solid fa-crown library-nav-icon" style="color:#F59E0B;"></i>
+                        <span>VIP Pass (Subscription)</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/purchases.html">
+                        <i class="fa-solid fa-file-invoice library-nav-icon" style="color:#10B981;"></i>
+                        <span>My Purchases</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ucas/index.html#survey">
+                        <i class="fa-solid fa-clipboard-list library-nav-icon" style="color:#0284C7;"></i>
+                        <span>Smart Survey</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ucas/index.html#phonebook">
+                        <i class="fa-solid fa-address-book library-nav-icon" style="color:#8B5CF6;"></i>
+                        <span>My Phonebook</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ucas/index.html#leads">
+                        <i class="fa-solid fa-user-group library-nav-icon" style="color:#EA580C;"></i>
+                        <span>My Share Leads</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ucas/index.html?tab=marketing">
+                        <i class="fa-solid fa-rocket library-nav-icon" style="color:#EC4899;"></i>
+                        <span>Marketing Engine</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ucas/index.html?tab=product-landing">
+                        <i class="fa-solid fa-cart-shopping library-nav-icon" style="color:#F59E0B;"></i>
+                        <span>Product Landing Page</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ucas/index.html?tab=hook-templates">
+                        <i class="fa-solid fa-pen-nib library-nav-icon" style="color:#8B5CF6;"></i>
+                        <span>हुक व शायरी (Hook & Shayari)</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ucas/index.html?tab=webinars">
+                        <i class="fa-solid fa-video library-nav-icon" style="color:#3B82F6;"></i>
+                        <span>Webinars & Live</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ucas/index.html?tab=broadcast-messages">
+                        <i class="fa-solid fa-bullhorn library-nav-icon" style="color:#E11D48;"></i>
+                        <span>आरोग्यम संदेश</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/index.html">
+                        <i class="fa-solid fa-house library-nav-icon" style="color:#10B981;"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/ebooks/wishlist.html">
+                        <i class="fa-solid fa-heart library-nav-icon" style="color:#EF4444;"></i>
+                        <span>Wishlist</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/faq.html">
+                        <i class="fa-solid fa-circle-question library-nav-icon" style="color:#64748B;"></i>
+                        <span>FAQ</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/terms.html">
+                        <i class="fa-solid fa-file-contract library-nav-icon" style="color:#64748B;"></i>
+                        <span>Terms & Conditions</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/shipping-policy.html">
+                        <i class="fa-solid fa-truck library-nav-icon" style="color:#64748B;"></i>
+                        <span>Shipping Policy</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/privacy-policy.html">
+                        <i class="fa-solid fa-shield-halved library-nav-icon" style="color:#64748B;"></i>
+                        <span>Privacy Policy</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- 2.2 MOBILE BOTTOM NAVIGATION BAR -->
+    <div class="mobile-bottom-nav">
+        <a href="/index.html" class="mobile-nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="/mandi.html" class="mobile-nav-item active"><i class="fa-solid fa-seedling"></i><span>मंडी भाव</span></a>
+        <a href="/ebooks/my-library.html" class="mobile-nav-item"><i class="fa-solid fa-book-open"></i><span>Library</span></a>
+        <a href="/ucas/index.html" class="mobile-nav-item"><i class="fa-solid fa-user-gear"></i><span>Profile</span></a>
+        <button class="mobile-nav-item menu-trigger-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i><span>More</span></button>
     </div>
 
-    <ul class="mobile-nav">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="ebooks/my-library.html">My Library</a></li>
-        <li><a href="purchases.html">My Purchases & Invoices</a></li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">Categories ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="ebooks/agriculture.html">Agriculture</a></li>
-                <li><a href="pages/health.html">Health</a></li>
-                <li><a href="categories/business.html">Business</a></li>
-                <li><a href="categories/netsurf.html">NetSurf</a></li>
-                <li><a href="categories/education.html">Education</a></li>
-                <li><a href="categories/digital-ai.html">Digital AI</a></li>
-            </ul>
-        </li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">Services ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="ebooks/agriculture.html">Agriculture</a></li>
-                <li><a href="crop-doctor.html">Crop Doctor</a></li>
-                <li><a href="weather.html">Weather</a></li>
-                <li><a href="mandi.html">Mandi Bhav</a></li>
-            </ul>
-        </li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">eBooks ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="ebooks/ebook.html">All eBooks</a></li>
-                <li><a href="ebooks/agriculture.html">Agriculture Books</a></li>
-                <li><a href="pages/health.html">Health Books</a></li>
-                <li><a href="pages/digital-training.html">Digital Training</a></li>
-                <li><a href="pages/self-help.html">Self Help</a></li>
-            </ul>
-        </li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">Support ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="faq.html">FAQ</a></li>
-                <li><a href="terms-conditions.html">Terms & Conditions</a></li>
-                <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                <li><a href="shipping-policy.html">Shipping & Return Policy</a></li>
-            </ul>
-        </li>
-    </ul>
-</div>
+    <!-- 3. MOBILE SIDE DRAWER (With User Name, Mobile No & Login/Logout Button) -->
+    <div class="side-menu-overlay" id="sideMenuOverlay" onclick="toggleMenu()" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 99998; display: none;"></div>
+    <div class="side-menu" id="sideMenu">
+        <button class="close-menu" onclick="toggleMenu()">&times;</button>
+        <div style="text-align: center; padding: 18px 12px; border-bottom: 1px solid #334155; margin-bottom: 12px; background: #0f172a; border-radius: 8px;">
+            <div style="width: 48px; height: 48px; background: #10B981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 8px;">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <h3 style="font-size: 1rem; color: #fff; margin-bottom: 4px;" id="sidebarUserName">नमस्ते, अवनीश मिश्रा</h3>
+            <p style="font-size: 0.8rem; color: #38bdf8; margin: 0 0 10px 0;" id="sidebarUserMobile">📱 +91 79744 22572</p>
+            <div id="sidebarAuthBtnContainer">
+                <!-- Dynamic Login / Logout button rendered by session.js -->
+                <button onclick="openLoginPopup()" class="sidebar-auth-btn" style="background: #10B981; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-size: 0.82rem; font-weight: 700; cursor: pointer;">लॉगिन करें</button>
+            </div>
+        </div>
 
-<!-- =========================================
-MOBILE NAVIGATION END
-========================================== -->
-<!-- =========================================
-FOOTER START
-========================================== -->
+        <ul>
+            <li><a href="/index.html"><i class="fa-solid fa-house" style="color:#10B981;"></i> Home</a></li>
+            <li><a href="/mandi.html"><i class="fa-solid fa-seedling" style="color:#10B981;"></i> कृषि मंडी भाव व मौसम</a></li>
+            <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a></li>
+            <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> My Profile & UCAS</a></li>
+            <li><a href="/subscription.html"><i class="fa-solid fa-crown" style="color:#F59E0B;"></i> VIP Pass (Subscription)</a></li>
+            <li><a href="/purchases.html"><i class="fa-solid fa-file-invoice" style="color:#10B981;"></i> My Purchases</a></li>
+            <li><a href="/ucas/index.html#survey"><i class="fa-solid fa-clipboard-list" style="color:#0284C7;"></i> Smart Survey</a></li>
+            <li><a href="/ucas/index.html#phonebook"><i class="fa-solid fa-address-book" style="color:#8B5CF6;"></i> My Phonebook</a></li>
+            <li><a href="/ucas/index.html#leads"><i class="fa-solid fa-user-group" style="color:#EA580C;"></i> My Share Leads</a></li>
+            <li><a href="/ucas/index.html?tab=marketing"><i class="fa-solid fa-rocket" style="color:#EC4899;"></i> Marketing Engine</a></li>
+            <li><a href="/ucas/index.html?tab=product-landing"><i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> Product Landing Page</a></li>
+            <li><a href="/ucas/index.html?tab=hook-templates"><i class="fa-solid fa-pen-nib" style="color:#8B5CF6;"></i> हुक व शायरी (Hook & Shayari)</a></li>
+            <li><a href="/ucas/index.html?tab=webinars"><i class="fa-solid fa-video" style="color:#3B82F6;"></i> Webinars & Live</a></li>
+            <li><a href="/ucas/index.html?tab=broadcast-messages"><i class="fa-solid fa-bullhorn" style="color:#E11D48;"></i> आरोग्यम संदेश</a></li>
+            <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart" style="color:#EF4444;"></i> Wishlist</a></li>
+            <li><a href="/faq.html"><i class="fa-solid fa-circle-question" style="color:#64748B;"></i> FAQ</a></li>
+            <li><a href="/terms.html"><i class="fa-solid fa-file-contract" style="color:#64748B;"></i> Terms & Conditions</a></li>
+            <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck" style="color:#64748B;"></i> Shipping Policy</a></li>
+            <li><a href="/privacy-policy.html"><i class="fa-solid fa-shield-halved" style="color:#64748B;"></i> Privacy Policy</a></li>
+        </ul>
+    </div>
 
-<footer class="footer">
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="library-main" id="mainLibraryContent">
+        <div class="mandi-dashboard-wrapper">
+            
+            <!-- Weather Box -->
+            <div class="weather-glass-box">
+                <div class="cloud cloud-1">☁</div>
+                <div class="cloud cloud-2">☁</div>
+                
+                <div class="weather-top-header">
+                    <div class="live-datetime" id="liveDateTimeDisplay">📅 लोड हो रहा है...</div>
+                    <div class="weather-city-search-inline">
+                        <input type="text" id="weatherCityInput" placeholder="शहर बदलें (उदा. Bhopal)...">
+                        <button id="weatherCitySearchBtn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </div>
+                    <div class="sun-timings">
+                        <span><i class="fa-solid fa-sun" style="color: #f6e05e;"></i> सूर्योदय: <strong id="sunriseTime">--:--</strong></span>
+                        <span><i class="fa-solid fa-moon" style="color: #cbd5e1;"></i> सूर्यास्त: <strong id="sunsetTime">--:--</strong></span>
+                    </div>
+                </div>
 
-    <div class="container">
-
-        <div class="footer-grid">
-
-            <!-- Company -->
-
-            <div class="footer-column">
-
-                <img
-                    src="images/logo/logo.png"
-                    alt="Aarogyam India Logo"
-                    class="footer-logo">
-
-                <p>
-
-                    Aarogyam India is a premium digital
-                    agriculture knowledge platform helping
-                    farmers with practical learning,
-                    eBooks and expert guidance.
-
-                </p>
-
+                <div class="weather-main-content">
+                    <div class="weather-left-info">
+                        <img id="weatherIconImg" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Weather Icon">
+                        <div>
+                            <h3 id="displayCityName">Rewa</h3>
+                            <p id="displayCondition">--</p>
+                        </div>
+                    </div>
+                    <div class="weather-right-info">
+                        <div id="displayTemp" class="temp-highlight">--°C</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Quick Links -->
+            <!-- Mandi Filters Hub -->
+            <div class="mandi-control-card">
+                <div class="mandi-card-title">
+                    <h2>🌾 कृषि मंडी भाव फिल्टर एवं खोज</h2>
+                    <p>भारत के सभी राज्यों, जिलों, फसलों और तारीख (From-To Date) के अनुसार थोक बाजार मूल्य देखें</p>
+                </div>
 
-            <div class="footer-column">
+                <div class="filters-grid-form">
+                    <div class="form-group-item">
+                        <label>State *</label>
+                        <select id="stateSelect">
+                            <option value="">सभी राज्य (All States)</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Manipur">Manipur</option>
+                            <option value="Meghalaya">Meghalaya</option>
+                            <option value="Mizoram">Mizoram</option>
+                            <option value="Nagaland">Nagaland</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Sikkim">Sikkim</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tripura">Tripura</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Uttarakhand">Uttarakhand</option>
+                            <option value="West Bengal">West Bengal</option>
+                            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                            <option value="Chandigarh">Chandigarh</option>
+                            <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra & Nagar Haveli and Daman & Diu</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                            <option value="Ladakh">Ladakh</option>
+                            <option value="Puducherry">Puducherry</option>
+                        </select>
+                    </div>
 
-                <h3>
+                    <div class="form-group-item">
+                        <label>District *</label>
+                        <select id="districtSelect">
+                            <option value="">पहले राज्य चुनें (Select State First)</option>
+                        </select>
+                    </div>
 
-                    Quick Links
+                    <div class="form-group-item">
+                        <label>Commodity (फसल) *</label>
+                        <select id="commoditySelect">
+                            <option value="">सभी फसलें (All Commodities)</option>
+                            <option value="Ajwan">Ajwan (अजवाइन)</option>
+                            <option value="Almond(Badam)">Almond (बादाम)</option>
+                            <option value="Arhar (Tur/Red Gram)(Whole)">Arhar / Tur (अरहर)</option>
+                            <option value="Arhar Dal(Tur Dal)">Arhar Dal (अरहर दाल)</option>
+                            <option value="Bajra(Pearl Millet/Cumbu)">Bajra (बाजरा)</option>
+                            <option value="Banana">Banana (केला)</option>
+                            <option value="Barley(Jau)">Barley / Jau (जौ)</option>
+                            <option value="Beans">Beans (बीन्स)</option>
+                            <option value="Beetroot">Beetroot (चुकंदर)</option>
+                            <option value="Bengal Gram Dal(Chana Dal)">Chana Dal (चना दाल)</option>
+                            <option value="Bengal Gram(Gram)(Whole)">Gram / Chana (चना)</option>
+                            <option value="Black Pepper">Black Pepper (काली मिर्च)</option>
+                            <option value="Black Gram (Urd Beans)(Whole)">Urd / Black Gram (उड़द)</option>
+                            <option value="Cocoa">Cocoa (कोको)</option>
+                            <option value="Coconut">Coconut (नारियल)</option>
+                            <option value="Coriander(Leaves)">Coriander Leaves (हरा धनिया)</option>
+                            <option value="Coriander seed">Coriander Seed (धनिया बीज)</option>
+                            <option value="Cotton">Cotton (कपास)</option>
+                            <option value="Cumin Seed(Jeera)">Cumin / Jeera (जीरा)</option>
+                            <option value="French Beans (Frasbean)">French Beans (फ्रेंचबीन्स)</option>
+                            <option value="Garlic">Garlic (लहसुन)</option>
+                            <option value="Ginger(Dry)">Ginger Dry (सोंठ)</option>
+                            <option value="Ginger(Green)">Ginger Green (अदरक)</option>
+                            <option value="Green Chilli">Green Chilli (हरी मिर्च)</option>
+                            <option value="Green Gram (Moong)(Whole)">Moong Whole (मूंग)</option>
+                            <option value="Green Peas">Green Peas (हरी मटर)</option>
+                            <option value="Groundnut">Groundnut (मूंगफली)</option>
+                            <option value="Gur(Jaggery)">Gur / Jaggery (गुड़)</option>
+                            <option value="Isabgul(Psyllium)">Isabgul (इसबगोल)</option>
+                            <option value="Lemon">Lemon (नींबू)</option>
+                            <option value="Maize">Maize (मक्का)</option>
+                            <option value="Masoor Dal">Masoor Dal (मसूर दाल)</option>
+                            <option value="Masoor(Whole)">Masoor Whole (मसूर)</option>
+                            <option value="Methi Seeds">Methi Seeds (मेथी)</option>
+                            <option value="Milk">Milk (दूध)</option>
+                            <option value="Onion">Onion (प्याज)</option>
+                            <option value="Paddy(Dhan)(Common)">Paddy / Dhan (धान)</option>
+                            <option value="Papaya">Papaya (पपीता)</option>
+                            <option value="Potato">Potato (आलू)</option>
+                            <option value="Ragi(Nachani)">Ragi (रागी)</option>
+                            <option value="Rice">Rice (चावल)</option>
+                            <option value="Sesamum(Til)">Sesamum / Til (तिल)</option>
+                            <option value="Soyabeen">Soyabeen (सोयाबीन)</option>
+                            <option value="Sunflower">Sunflower (सूरजमुखी)</option>
+                            <option value="Sweet Potato">Sweet Potato (शकरकंद)</option>
+                            <option value="Tomato">Tomato (टमाटर)</option>
+                            <option value="Turmeric">Turmeric (हल्दी)</option>
+                            <option value="Water Melon">Water Melon (तरबूज)</option>
+                            <option value="Wheat">Wheat (गेहूं)</option>
+                        </select>
+                    </div>
 
-                </h3>
+                    <div class="form-group-item">
+                        <label>From Date</label>
+                        <input type="date" id="fromDateInput">
+                    </div>
 
-                <ul>
+                    <div class="form-group-item">
+                        <label>To Date</label>
+                        <input type="date" id="toDateInput">
+                    </div>
 
-                    <li><a href="index.html">Home</a></li>
+                    <div class="form-group-item">
+                        <label>Sort By Field</label>
+                        <select id="sortFieldSelect">
+                            <option value="market">Market</option>
+                            <option value="modal_price">Modal Price</option>
+                            <option value="commodity">Commodity</option>
+                            <option value="district">District</option>
+                        </select>
+                    </div>
 
-                    <li><a href="about.html">About</a></li>
+                    <div class="form-group-item">
+                        <label>Sort Order</label>
+                        <select id="sortOrderSelect">
+                            <option value="asc">Ascending (आरोही)</option>
+                            <option value="desc">Descending (अवरोही)</option>
+                        </select>
+                    </div>
+                </div>
 
-                    <li><a href="blog.html">Blog</a></li>
-
-                    <li><a href="contact.html">Contact</a></li>
-
-                </ul>
-
+                <div class="mandi-action-buttons">
+                    <button id="resetBtn" class="btn-reset"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+                    <button id="previewBtn" class="btn-preview"><i class="fa-solid fa-magnifying-glass"></i> Preview & Search</button>
+                    <button id="csvDownloadBtn" class="btn-download"><i class="fa-solid fa-file-arrow-down"></i> CSV Download</button>
+                </div>
             </div>
 
-            <!-- Services -->
-
-            <div class="footer-column">
-
-                <h3>
-
-                    Services
-
-                </h3>
-
-                <ul>
-
-                    <li><a href="crop-doctor.html">Crop Doctor</a></li>
-
-                    <li><a href="weather.html">Weather</a></li>
-
-                    <li><a href="mandi.html">Mandi Bhav</a></li>
-
-                    <li><a href="ebooks/ebook.html">eBooks</a></li>
-
-                </ul>
-
+            <!-- 3. Results Data Display Container -->
+            <div class="mandi-results-wrapper">
+                <div class="table-head-row">
+                    <span>📦 Commodity</span>
+                    <span>📍 State / District</span>
+                    <span>🏛️ Market</span>
+                    <span>🌿 Variety / Grade</span>
+                    <span>📅 Arrival Date</span>
+                    <span>💰 Min / Max / Modal</span>
+                </div>
+                <div id="mandiDataGrid" class="table-body-container">
+                    <div class="mandi-placeholder-box">
+                        <i class="fa-solid fa-seedling fa-bounce" style="font-size: 2rem; color: #10B981; margin-bottom: 10px;"></i>
+                        <p>डेटा लोड हो रहा है...</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Contact -->
-
-            <div class="footer-column">
-
-                <h3>
-
-                    Contact
-
-                </h3>
-
-                <p>
-
-                    📍 Rewa, Madhya Pradesh
-
-                </p>
-
-                <p>
-
-                    📞 +91 79744 22572
-
-                </p>
-
-                <p>
-
-                    ✉ info@aarogyamindia.in
-
-                </p>
-
+            <!-- 4. Official Govt Disclaimer -->
+            <div class="govt-disclaimer-box">
+                <div class="govt-emblem-flex">
+                    <div style="font-size: 2rem;">🏛️</div>
+                    <div>
+                        <strong>भारत सरकार आधिकारिक डेटा स्रोत (Data Source Notice)</strong>
+                        <p>यह मंडी भाव डेटा भारत सरकार के ओपन गवर्नमेंट डेटा प्लेटफॉर्म (Data.gov.in) तथा AGMARKNET से अधिकृत रूप से लिया गया है।</p>
+                    </div>
+                </div>
             </div>
 
         </div>
+    </main>
 
-        <!-- =========================================
-        SOCIAL MEDIA
-        ========================================== -->
-
-        <div class="footer-social">
-
-            <a href="#">
-                <img src="images/icons/facebook.png"
-                     alt="Facebook">
-            </a>
-
-            <a href="#">
-                <img src="images/icons/instagram.png"
-                     alt="Instagram">
-            </a>
-
-            <a href="#">
-                <img src="images/icons/youtube.png"
-                     alt="YouTube">
-            </a>
-
-            <a href="#">
-                <img src="images/icons/telegram.png"
-                     alt="Telegram">
-            </a>
-
-            <a href="#">
-                <img src="images/icons/whatsapp.png"
-                     alt="WhatsApp">
-            </a>
-
-        </div>
-
-        <!-- =========================================
-        COPYRIGHT
-        ========================================== -->
-
-        <div class="copyright">
-
-            <p>
-
-                © 2026 Aarogyam India.
-                All Rights Reserved.
-
-            </p>
-
-        </div>
-
-    </div>
-
-</footer>
-
-<!-- =========================================
-FOOTER END
-========================================== -->
-
-<!-- =========================================
-WHATSAPP FLOATING BUTTON
-========================================== -->
-
-<a
-    href="https://wa.me/917974422572"
-    class="whatsapp-float"
-    target="_blank"
-    aria-label="WhatsApp">
-
-   <img src="images/icons/whatsapp.png" alt="WhatsApp">
-
-</a>
-
-<!-- =========================================
-JAVASCRIPT
-========================================== -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
-<script src="session.js"></script>
-<script src="js/script.js"></script>
-
-<!-- =========================================
-UNIVERSAL LOGIN MODAL
-========================================== -->
-<div id="universalLoginModal" class="login-modal-overlay" style="display: none;">
-    <div class="login-modal-card">
-        <button id="universalLoginCloseBtn" class="login-modal-close">&times;</button>
-        <img src="images/logo/logo.png" alt="Aarogyam India" class="login-modal-logo">
-        <h2 class="login-modal-title">Login or Register</h2>
-        <p class="login-modal-subtitle">Enter your mobile number to continue</p>
-        <form id="universalLoginForm">
-            <div class="login-modal-form-group">
-                <label for="universalLoginMobile">Mobile Number</label>
-                <input type="tel" id="universalLoginMobile" placeholder="10-digit mobile number" maxlength="10" required>
+    <!-- UNIFIED AAROGYAM INDIA FOOTER -->
+    <footer class="site-footer" style="background:#0f172a; color:#cbd5e1; padding:45px 20px 25px; margin-top:50px; border-top:3px solid transparent; border-image:linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;">
+      <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:30px; margin-bottom:30px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:44px; width:auto; object-fit:contain;">
+            <div>
+              <div style="font-size:1.15rem; font-weight:800; color:#fff; line-height:1.2;">Aarogyam India</div>
+              <div style="font-size:0.75rem; color:#10B981; font-weight:700;">डिजिटल कृषि व ज्ञान मंच</div>
             </div>
-            <button type="submit" id="universalLoginSubmitBtn" class="login-modal-submit">Login</button>
-        </form>
-        <p id="universalLoginMessage" class="login-modal-message"></p>
-        <p class="login-modal-footer">
-            New user? <a href="/registration.html" id="modalRegisterLink">Sign up here</a>
-        </p>
-    </div>
-</div>
+          </div>
+          <p style="font-size:0.85rem; line-height:1.6; color:#94a3b8;">
+            Aarogyam India is a premier digital agriculture knowledge platform empowering farmers and users with smart digital tools, eBooks, and expert guidance.
+          </p>
+        </div>
 
+        <div>
+          <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #E86A17; display:inline-block; padding-bottom:4px;">Quick Links</h3>
+          <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
+            <li><a href="/index.html" style="color:#cbd5e1; text-decoration:none;">🏠 Home</a></li>
+            <li><a href="/mandi.html" style="color:#cbd5e1; text-decoration:none;">🌾 कृषि मंडी भाव</a></li>
+            <li><a href="/ucas/index.html" style="color:#cbd5e1; text-decoration:none;">👤 My Profile & UCAS</a></li>
+            <li><a href="/ebooks/my-library.html" style="color:#cbd5e1; text-decoration:none;">📚 Digital Library</a></li>
+            <li><a href="/subscription.html" style="color:#f59e0b; text-decoration:none; font-weight:700;">👑 VIP Pass / Subscription</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #10b981; display:inline-block; padding-bottom:4px;">Legal & Policies</h3>
+          <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
+            <li><a href="/terms.html" style="color:#cbd5e1; text-decoration:none;">📄 Terms & Conditions</a></li>
+            <li><a href="/privacy-policy.html" style="color:#cbd5e1; text-decoration:none;">🔒 Privacy Policy</a></li>
+            <li><a href="/shipping-policy.html" style="color:#cbd5e1; text-decoration:none;">🚚 Shipping & Return Policy</a></li>
+            <li><a href="/faq.html" style="color:#cbd5e1; text-decoration:none;">❓ FAQ & Support</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #3b82f6; display:inline-block; padding-bottom:4px;">Contact & Helpline</h3>
+          <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">📍 Rewa, Madhya Pradesh, India</p>
+          <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">
+            📞 <a href="tel:917974422572" style="color:#38bdf8; text-decoration:none; font-weight:700;">+91 79744 22572</a>
+          </p>
+          <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 12px 0;">
+            ✉ <a href="mailto:info@aarogyamindia.in" style="color:#38bdf8; text-decoration:none;">info@aarogyamindia.in</a>
+          </p>
+        </div>
+      </div>
+
+      <div style="text-align:center; padding-top:20px; border-top:1px solid #334155; font-size:0.82rem; color:#64748b;">
+        © 2026 Aarogyam India. All Rights Reserved. • ISO Certified Digital Platform
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../session.js"></script>
+    <script src="/js/user-notifications.js?v=12.0"></script>
+    <script src="/js/mandi.js"></script>
 </body>
 
 </html>
-
