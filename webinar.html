@@ -2323,11 +2323,35 @@
       }
 
       /**
-       * 1. Load Master Webinar Configuration (Multi-Step Strategy)
+       * 1. Load Master Webinar Configuration (Zero-Egress Static Git JSON + Live Cloud Layer)
        */
       async function loadMasterWebinarConfig() {
+        // Step 1: Load Static Git Master JSON (Zero Supabase Egress)
+        try {
+          const gitResp = await fetch('/data/webinar-master.json');
+          if (gitResp.ok) {
+            const gitJson = await gitResp.json();
+            const master = gitJson.webinarMaster || {};
+            if (master.title) webinarData.title = master.title;
+            if (master.description) webinarData.desc = master.description;
+            if (master.cover_image) webinarData.cover_image = master.cover_image;
+            if (master.banners && master.banners.length) webinarData.banners = master.banners;
+            if (master.youtube_videos && master.youtube_videos.length) webinarData.youtube_links = master.youtube_videos;
+            if (master.kpis && master.kpis.length) webinarData.kpis = master.kpis;
+            if (master.faqs && master.faqs.length) webinarData.faqs = master.faqs;
+            if (master.default_zoom_link) webinarData.zoom_link = master.default_zoom_link;
+            if (master.default_meeting_id) webinarData.meeting_id = master.default_meeting_id;
+            if (master.default_passcode) webinarData.passcode = master.default_passcode;
+            if (master.default_date) {
+              webinarData.datetime = formatHindiDateTime(master.default_date, master.default_time);
+              webinarData.target_timestamp = computeTargetTimestamp(master.default_date, master.default_time);
+            }
+          }
+        } catch (e) {}
+
         let record = null;
 
+        // Step 2: Layer Live Supabase Dynamic Settings (Only a few bytes)
         if (db) {
           try {
             // Priority 1: Specific ID from query param (if not default WB_MASTER)
