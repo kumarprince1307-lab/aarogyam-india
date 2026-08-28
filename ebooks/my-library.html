@@ -183,6 +183,18 @@
           </a>
         </li>
         <li class="library-nav-item">
+          <a href="/mandi.html">
+            <i class="fa-solid fa-seedling library-nav-icon" style="color:#10B981;"></i>
+            <span>कृषि मंडी भाव</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
+          <a href="/weather.html">
+            <i class="fa-solid fa-cloud-sun library-nav-icon" style="color:#0284C7;"></i>
+            <span>मौसम अपडेट</span>
+          </a>
+        </li>
+        <li class="library-nav-item">
           <a href="/ucas/index.html">
             <i class="fa-solid fa-user-gear library-nav-icon" style="color:#E86A17;"></i>
             <span>My Profile & UCAS</span>
@@ -237,9 +249,9 @@
           </a>
         </li>
         <li class="library-nav-item">
-          <a href="/ucas/index.html?tab=webinars">
+          <a href="/webinar.html">
             <i class="fa-solid fa-video library-nav-icon" style="color:#3B82F6;"></i>
-            <span>Webinars & Live</span>
+            <span>🔴 लाइव ज़ूम वेबिनार</span>
           </a>
         </li>
         <li class="library-nav-item">
@@ -350,10 +362,10 @@
 
     <ul>
       <li><a href="/index.html"><i class="fa-solid fa-house" style="color:#10B981;"></i> Home</a></li>
-      <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> UCAS / My Profile</a>
-      </li>
-      <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a>
-      </li>
+      <li><a href="/mandi.html"><i class="fa-solid fa-seedling" style="color:#10B981;"></i> कृषि मंडी भाव</a></li>
+      <li><a href="/weather.html"><i class="fa-solid fa-cloud-sun" style="color:#0284C7;"></i> मौसम अपडेट</a></li>
+      <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a></li>
+      <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> UCAS / My Profile</a></li>
       <li><a href="/subscription.html"><i class="fa-solid fa-crown" style="color:#F59E0B;"></i> VIP Pass
           (Subscription)</a></li>
       <li><a href="/purchases.html"><i class="fa-solid fa-file-invoice" style="color:#10B981;"></i> My Purchases &
@@ -368,8 +380,7 @@
           Engine</a></li>
       <li><a href="/ucas/index.html#marketing"><i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> Product
           Landing Page</a></li>
-      <li><a href="/ucas/index.html#webinars"><i class="fa-solid fa-video" style="color:#3B82F6;"></i> Webinars &
-          Live</a></li>
+      <li><a href="/webinar.html"><i class="fa-solid fa-video" style="color:#3B82F6;"></i> 🔴 लाइव ज़ूम वेबिनार</a></li>
       <li><a href="/ucas/index.html#permissions"><i class="fa-solid fa-shield-halved" style="color:#64748B;"></i>
           Permissions</a></li>
       <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart" style="color:#EF4444;"></i> Wishlist</a></li>
@@ -666,15 +677,14 @@
           style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
       </div>
     </div>
-  </main>
-  <main class="library-main" id="mainLibraryContent">
+
+    <!-- Weather & Mandi Bhav Section inside Library Main -->
     <div class="welcome-card-soft"
       style="background: linear-gradient(135deg, #040a09 0%, #416406 100%); color: #fff; border-radius: 14px; padding: 25px; margin: 20px auto; max-width: 1200px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
         <div>
           <h2 style="font-size: 1.5rem; margin: 0 0 5px 0;">🌤️ Aarogyam India मौसम केंद्र</h2>
-          <p style="font-size: 0.95rem; opacity: 0.95; margin: 0;">अपने शहर या खेती की लोकेशन का सटीक लाइव
-            तापमान और मौसम हाल देखें</p>
+          <p style="font-size: 0.95rem; opacity: 0.95; margin: 0;">अपने शहर या खेती की लोकेशन का सटीक लाइव तापमान और मौसम हाल देखें</p>
         </div>
         <div style="display: flex; gap: 8px; width: 100%; max-width: 320px;">
           <input type="text" id="citySearchInput" placeholder="शहर का नाम लिखें (जैसे - Rewa)..."
@@ -706,29 +716,30 @@
         </div>
       </div>
     </div>
-  </main>
-  <!-- Mandi Quick Access KPI Card (Desktop Sidebar Fix) -->
-<div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 20px; color: #fff; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transition: all 0.3s ease; margin: 0 0 20px 0; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
-    
-    <!-- Background Watermark Icon -->
-    <div style="position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.1; pointer-events: none;">
-        <i class="fa-solid fa-seedling"></i>
-    </div>
 
-    <div style="display: flex; align-items: center; gap: 15px; z-index: 1; flex: 1; min-width: 0;">
-        <div style="width: 50px; height: 50px; min-width: 50px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #facc15;">
+    <!-- Mandi Quick Access KPI Card (Properly inside library-main) -->
+    <div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; padding: 18px 24px; color: #fff; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: all 0.3s ease; margin: 0 auto 25px auto; max-width: 1200px; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
+        
+        <!-- Background Watermark Icon -->
+        <div style="position: absolute; right: -10px; bottom: -15px; font-size: 4.5rem; opacity: 0.1; pointer-events: none;">
             <i class="fa-solid fa-seedling"></i>
         </div>
-        <div style="min-width: 0;">
-            <h3 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 700; color: #ffffff;">🌾 कृषि मंडी भाव व मौसम</h3>
-            <p style="margin: 0; font-size: 0.84rem; color: #a7f3d0;">लाइव थोक बाजार मूल्य और मौसम की जानकारी देखें</p>
+
+        <div style="display: flex; align-items: center; gap: 15px; z-index: 1; flex: 1; min-width: 0;">
+            <div style="width: 48px; height: 48px; min-width: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #facc15;">
+                <i class="fa-solid fa-seedling"></i>
+            </div>
+            <div style="min-width: 0;">
+                <h3 style="margin: 0 0 2px 0; font-size: 1.1rem; font-weight: 700; color: #ffffff;">🌾 कृषि मंडी भाव व मौसम</h3>
+                <p style="margin: 0; font-size: 0.82rem; color: #a7f3d0;">लाइव थोक बाजार मूल्य और मौसम की जानकारी देखें</p>
+            </div>
+        </div>
+
+        <div style="z-index: 1; background: #10B981; color: #fff; width: 36px; height: 36px; min-width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-left: 10px;">
+            <i class="fa-solid fa-arrow-right"></i>
         </div>
     </div>
-
-    <div style="z-index: 1; background: #10B981; color: #fff; width: 36px; height: 36px; min-width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-left: 10px;">
-        <i class="fa-solid fa-arrow-right"></i>
-    </div>
-</div>
+  </main>
 
 <style>
     .mandi-kpi-access-card:hover {

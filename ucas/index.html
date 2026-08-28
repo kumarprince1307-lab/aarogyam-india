@@ -117,6 +117,18 @@
           </button>
         </li>
         <li class="ucas-nav-item">
+          <button onclick="window.location.href='/mandi.html';">
+            <i class="fa-solid fa-seedling ucas-nav-icon" style="color:#10B981;"></i>
+            <span>कृषि मंडी भाव</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/weather.html';">
+            <i class="fa-solid fa-cloud-sun ucas-nav-icon" style="color:#0284C7;"></i>
+            <span>मौसम अपडेट</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
           <button onclick="window.location.href='/subscription.html';">
             <i class="fa-solid fa-crown ucas-nav-icon" style="color:#F59E0B;"></i>
             <span>VIP Pass (Subscription)</span>
@@ -165,9 +177,9 @@
           </button>
         </li>
         <li class="ucas-nav-item">
-          <button data-tab="webinars" onclick="UCAS_APP.switchView('webinars');">
+          <button onclick="window.location.href='/webinar.html';">
             <i class="fa-solid fa-video ucas-nav-icon" style="color:#3B82F6;"></i>
-            <span>Webinars & Live</span>
+            <span>🔴 लाइव ज़ूम वेबिनार</span>
           </button>
         </li>
         <li class="ucas-nav-item">
@@ -287,6 +299,18 @@
           </button>
         </li>
         <li class="ucas-nav-item">
+          <button onclick="window.location.href='/mandi.html';">
+            <i class="fa-solid fa-seedling ucas-nav-icon" style="color:#10B981;"></i>
+            <span>कृषि मंडी भाव</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
+          <button onclick="window.location.href='/weather.html';">
+            <i class="fa-solid fa-cloud-sun ucas-nav-icon" style="color:#0284C7;"></i>
+            <span>मौसम अपडेट</span>
+          </button>
+        </li>
+        <li class="ucas-nav-item">
           <button onclick="window.location.href='/subscription.html';">
             <i class="fa-solid fa-crown ucas-nav-icon" style="color:#F59E0B;"></i>
             <span>VIP Pass (Subscription)</span>
@@ -335,9 +359,9 @@
           </button>
         </li>
         <li class="ucas-nav-item">
-          <button data-tab="webinars" onclick="UCAS_APP.switchView('webinars'); UCAS_APP.closeUserDrawer();">
+          <button onclick="window.location.href='/webinar.html';">
             <i class="fa-solid fa-video ucas-nav-icon" style="color:#3B82F6;"></i>
-            <span>Webinars & Live Events</span>
+            <span>🔴 लाइव ज़ूम वेबिनार</span>
           </button>
         </li>
         <li class="ucas-nav-item">
@@ -669,6 +693,57 @@
         </div>
         <div id="ucas-dashboard-recent-activity">
           <div style="text-align:center;padding:1rem;color:var(--text-muted);">लोड हो रहा है...</div>
+        </div>
+      </div>
+
+      <!-- 🌤️ Aarogyam India Weather Center (Inside UCAS View Profile) -->
+      <div class="welcome-card-soft" style="background: linear-gradient(135deg, #040a09 0%, #416406 100%); color: #fff; border-radius: var(--radius-md, 14px); padding: 22px; margin: 1.25rem 0; box-shadow: var(--shadow-sm); border: 1px solid rgba(255,255,255,0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h3 style="font-size: 1.25rem; margin: 0 0 4px 0; color:#fff;">🌤️ Aarogyam India मौसम केंद्र</h3>
+            <p style="font-size: 0.85rem; opacity: 0.95; margin: 0; color:#e2e8f0;">अपने शहर या खेती की लोकेशन का सटीक लाइव तापमान और मौसम हाल देखें</p>
+          </div>
+          <div style="display: flex; gap: 8px; width: 100%; max-width: 320px;">
+            <input type="text" id="citySearchInput" placeholder="शहर का नाम लिखें (जैसे - Rewa)..." style="flex: 1; padding: 9px 12px; border: none; border-radius: 8px; outline: none; font-size: 0.85rem; background:#fff; color:#0f172a;">
+            <button id="citySearchBtn" style="background: #081108; color: #fff; border: none; padding: 9px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;">खोजें</button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 16px; background: rgba(255, 255, 255, 0.18); padding: 14px; border-radius: 12px; backdrop-filter: blur(6px);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img id="weatherIconImg" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Icon" style="width: 48px; height: 48px; background: rgba(255,255,255,0.3); border-radius: 50%;">
+            <div>
+              <h4 id="displayCityName" style="font-size: 1.1rem; margin: 0; color:#fff;">--</h4>
+              <p id="displayCountry" style="font-size: 0.78rem; margin: 2px 0 0 0; opacity: 0.9; color:#e2e8f0;">India</p>
+            </div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 0.78rem; opacity: 0.9; text-transform: uppercase; color:#e2e8f0;">तापमान (Temperature)</div>
+            <div id="displayTemp" style="font-size: 1.7rem; font-weight: bold; margin-top: 2px; color:#fff;">--°C</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.78rem; opacity: 0.9; text-transform: uppercase; color:#e2e8f0;">मौसम स्थिति</div>
+            <div id="displayCondition" style="font-size: 0.95rem; font-weight: bold; margin-top: 4px; text-transform: capitalize; color:#fff;">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🌾 Mandi Quick Access KPI Card (Properly inside UCAS view-profile) -->
+      <div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: var(--radius-md, 14px); padding: 16px 20px; color: #fff; cursor: pointer; box-shadow: 0 8px 24px rgba(6,78,59,0.2); transition: all 0.3s ease; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
+        <div style="position: absolute; right: -10px; bottom: -15px; font-size: 4.5rem; opacity: 0.1; pointer-events: none;">
+          <i class="fa-solid fa-seedling"></i>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px; z-index: 1; flex: 1; min-width: 0;">
+          <div style="width: 44px; height: 44px; min-width: 44px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #facc15;">
+            <i class="fa-solid fa-seedling"></i>
+          </div>
+          <div style="min-width: 0;">
+            <h4 style="margin: 0 0 2px 0; font-size: 1.05rem; font-weight: 700; color: #ffffff;">🌾 कृषि मंडी भाव व मौसम</h4>
+            <p style="margin: 0; font-size: 0.8rem; color: #a7f3d0;">लाइव थोक बाजार मूल्य और मौसम की जानकारी देखें</p>
+          </div>
+        </div>
+        <div style="z-index: 1; background: #10B981; color: #fff; width: 34px; height: 34px; min-width: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-left: 10px;">
+          <i class="fa-solid fa-arrow-right"></i>
         </div>
       </div>
     </section>
@@ -2153,76 +2228,7 @@
     <button type="button" onclick="sessionStorage.setItem('ai_profile_nudge_dismissed', 'true'); document.getElementById('profile100NudgePopup').style.display='none';" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
   </div>
 </div>
-  <main class="library-main" id="mainLibraryContent">
-    <div class="welcome-card-soft"
-      style="background: linear-gradient(135deg, #040a09 0%, #416406 100%); color: #fff; border-radius: 14px; padding: 25px; margin: 20px auto; max-width: 1200px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-        <div>
-          <h2 style="font-size: 1.5rem; margin: 0 0 5px 0;">🌤️ Aarogyam India मौसम केंद्र</h2>
-          <p style="font-size: 0.95rem; opacity: 0.95; margin: 0;">अपने शहर या खेती की लोकेशन का सटीक लाइव
-            तापमान और मौसम हाल देखें</p>
-        </div>
-        <div style="display: flex; gap: 8px; width: 100%; max-width: 320px;">
-          <input type="text" id="citySearchInput" placeholder="शहर का नाम लिखें (जैसे - Rewa)..."
-            style="flex: 1; padding: 10px 14px; border: none; border-radius: 8px; outline: none; font-size: 0.9rem;">
-          <button id="citySearchBtn"
-            style="background: #081108; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">खोजें</button>
-        </div>
-      </div>
-
-      <div
-        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px; background: rgba(255, 255, 255, 0.2); padding: 20px; border-radius: 12px; backdrop-filter: blur(6px);">
-        <div style="display: flex; align-items: center; gap: 15px;">
-          <img id="weatherIconImg" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Icon"
-            style="width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%;">
-          <div>
-            <h3 id="displayCityName" style="font-size: 1.3rem; margin: 0;">--</h3>
-            <p id="displayCountry" style="font-size: 0.85rem; margin: 2px 0 0 0; opacity: 0.9;">India</p>
-          </div>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">तापमान (Temperature)</div>
-          <div id="displayTemp" style="font-size: 2.2rem; font-weight: bold; margin-top: 2px;">--°C</div>
-        </div>
-        <div style="text-align: right;">
-          <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">मौसम स्थिति</div>
-          <div id="displayCondition"
-            style="font-size: 1.1rem; font-weight: bold; margin-top: 4px; text-transform: capitalize;">--
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-  <!-- Mandi Quick Access KPI Card (Desktop Sidebar Fix) -->
-<div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 20px; color: #fff; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transition: all 0.3s ease; margin: 0 0 20px 0; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
-    
-    <!-- Background Watermark Icon -->
-    <div style="position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.1; pointer-events: none;">
-        <i class="fa-solid fa-seedling"></i>
-    </div>
-
-    <div style="display: flex; align-items: center; gap: 15px; z-index: 1; flex: 1; min-width: 0;">
-        <div style="width: 50px; height: 50px; min-width: 50px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #facc15;">
-            <i class="fa-solid fa-seedling"></i>
-        </div>
-        <div style="min-width: 0;">
-            <h3 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 700; color: #ffffff;">🌾 कृषि मंडी भाव व मौसम</h3>
-            <p style="margin: 0; font-size: 0.84rem; color: #a7f3d0;">लाइव थोक बाजार मूल्य और मौसम की जानकारी देखें</p>
-        </div>
-    </div>
-
-    <div style="z-index: 1; background: #10B981; color: #fff; width: 36px; height: 36px; min-width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-left: 10px;">
-        <i class="fa-solid fa-arrow-right"></i>
-    </div>
-</div>
-
-<style>
-    .mandi-kpi-access-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
-        border-color: rgba(255, 255, 255, 0.4);
-    }
-</style>
+</main>
   
 <!-- UNIFIED AAROGYAM INDIA FOOTER -->
 <footer class="site-footer" style="background:#0f172a; color:#cbd5e1; padding:45px 20px 25px; margin-top:50px; border-top:3px solid transparent; border-image:linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;">

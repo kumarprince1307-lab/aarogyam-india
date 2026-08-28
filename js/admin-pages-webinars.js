@@ -164,14 +164,152 @@ export async function initWebinars() {
             </div>
           </div>
 
+          <!-- 9:16 3D FLOATING COVER SECTION -->
+          <div style="background: rgba(45,140,255,0.06); border: 1px solid rgba(45,140,255,0.25); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+            <label class="admin-label" style="font-weight:800; font-size:0.86rem; color:#60a5fa; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+              <span>✨</span> 3D फ्लोटिंग 9:16 कवर (Floating Hero Cover):
+            </label>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+              <div>
+                <label style="font-size:0.75rem; color:#cbd5e1; font-weight:700;">Git प्री-सेव्ड कवर चुनें:</label>
+                <select id="adm_wb_cover_preset" class="admin-select" style="width:100%;">
+                  <option value="">✨ डिफ़ॉल्ट 3D बैज (Default 3D Badge)</option>
+                  <option value="/images/books/fasal-ka-doctor-cover.webp">🌾 कवर 1: खेती का डॉक्टर</option>
+                  <option value="/images/books/kharif-master-guide-2026-cover.webp">📗 कवर 2: खरीफ फसल मास्टर गाइड 2026</option>
+                  <option value="/images/books/jaivik-kheti-guide-cover.webp">🌱 कवर 3: जैविक खेती संपूर्ण गाइड</option>
+                  <option value="/images/books/ai-website-guide-cover.webp">🤖 कवर 4: डिजिटल AI ट्रेनिंग</option>
+                  <option value="custom_url">🔗 कस्टम कवर इमेज URL डालें</option>
+                  <option value="custom_upload">📤 नया 9:16 कवर अपलोड करें (Upload Image)</option>
+                </select>
+              </div>
+              <div id="adm_wb_cover_url_wrapper" style="display:none;">
+                <label style="font-size:0.75rem; color:#cbd5e1; font-weight:700;">कवर इमेज URL:</label>
+                <input type="url" id="adm_wb_cover_url" class="admin-input" placeholder="https://.../cover.webp" style="width:100%;" />
+              </div>
+              <div id="adm_wb_cover_upload_wrapper" style="display:none;">
+                <label style="font-size:0.75rem; color:#cbd5e1; font-weight:700;">इमेज फाइल चुनें (Auto 9:16 WebP):</label>
+                <input type="file" id="adm_wb_cover_file" class="admin-input" accept="image/*" style="width:100%; padding:6px;" />
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">
+                रजिस्ट्रेशन शुल्क ₹ (टाइप करें - Any Amount):
+                <span style="font-size:0.72rem; color:#34d399; font-weight:700;">(0 = फ्री / निःशुल्क)</span>
+              </label>
+              <div style="position:relative; display:flex; align-items:center;">
+                <span style="position:absolute; left:12px; font-weight:800; color:#34d399; font-size:1.05rem;">₹</span>
+                <input type="number" id="adm_wb_price" class="admin-input" value="0" min="0" placeholder="0 (फ्री) या 1, 10, 49, 99..." style="width:100%; padding-left:28px; font-weight:800; font-size:1rem; color:#fff;" />
+              </div>
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">अवधि (Duration Minutes):</label>
+              <input type="number" id="adm_wb_duration" class="admin-input" value="90" placeholder="90 मिनट" style="width:100%;" />
+            </div>
+          </div>
+
+          <!-- MULTIPLE YOUTUBE VIDEOS SECTION -->
+          <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.25); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label class="admin-label" style="font-weight:800; font-size:0.86rem; color:#f87171; margin:0; display:flex; align-items:center; gap:6px;">
+                <span>▶️</span> यूट्यूब वीडियो / लाइव लिंक्स (YouTube URLs):
+              </label>
+              <button type="button" id="btn-add-yt-url" class="admin-button small-button" style="background:#ef4444; color:#fff; font-size:0.75rem; padding:3px 8px;">
+                ➕ और वीडियो जोड़ें
+              </button>
+            </div>
+            <div id="adm_yt_urls_container" style="display:flex; flex-direction:column; gap:8px;">
+              <div class="adm-yt-row" style="display:flex; gap:8px;">
+                <input type="url" class="admin-input adm-yt-input" placeholder="https://youtube.com/watch?v=..." style="flex:1;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- WEBINAR BANNERS (MULTI-SELECT / UPLOAD / FILE PICKER) -->
+          <div style="background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+              <label class="admin-label" style="font-weight:800; font-size:0.86rem; color:#fbbf24; margin:0; display:flex; align-items:center; gap:6px;">
+                <span>🖼️</span> वेबिनार पोस्टर्स व बैनर्स (Webinar Banners & Upload):
+              </label>
+              <div style="display:flex; gap:6px;">
+                <label for="adm_wb_banner_file" class="admin-button small-button" style="background:#3b82f6; color:#fff; font-weight:700; font-size:0.75rem; padding:3px 8px; cursor:pointer; margin:0;">
+                  📤 बैनर इमेज अपलोड करें
+                </label>
+                <input type="file" id="adm_wb_banner_file" accept="image/*" style="display:none;" />
+                <button type="button" id="btn-add-banner-url" class="admin-button small-button" style="background:#f59e0b; color:#000; font-weight:800; font-size:0.75rem; padding:3px 8px;">
+                  ➕ और बैनर लिंक जोड़ें
+                </button>
+              </div>
+            </div>
+
+            <!-- Uploaded Banners Thumbnail Strip -->
+            <div id="adm_uploaded_banners_preview" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;"></div>
+
+            <div id="adm_banners_container" style="display:flex; flex-direction:column; gap:8px;">
+              <div class="adm-banner-row" style="display:flex; gap:8px;">
+                <select class="admin-select adm-banner-select" style="flex:1;">
+                  <option value="/images/banners/webinar-live-banner.webp">बैनर 1: लाइव वेबिनार बैनर</option>
+                  <option value="/images/banners/agriculture-hero-banner-1.webp">बैनर 2: कृषि हीरो बैनर 1</option>
+                  <option value="/images/banners/kheti-dr-banner-1.webp">बैनर 3: खेती डॉक्टर बैनर</option>
+                  <option value="/images/banners/farmer-community-banner.jpeg">बैनर 4: किसान कम्युनिटी बैनर</option>
+                  <option value="custom">🔗 कस्टम बैनर URL डालें</option>
+                </select>
+                <input type="url" class="admin-input adm-banner-custom-url" placeholder="https://.../banner.jpg" style="flex:1; display:none;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- MULTI-LINE DESCRIPTION & FEATURE KPIS -->
+          <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label class="admin-label" style="font-weight:800; font-size:0.86rem; color:#34d399; margin:0; display:flex; align-items:center; gap:6px;">
+                <span>✨</span> विशेषताएँ व सीखने योग्य बातें (1-Line KPI Highlights):
+              </label>
+              <button type="button" id="btn-add-kpi-row" class="admin-button small-button" style="background:#10b981; color:#fff; font-size:0.75rem; padding:3px 8px;">
+                ➕ और KPI जोड़ें
+              </button>
+            </div>
+            <div id="adm_kpis_container" style="display:flex; flex-direction:column; gap:8px;">
+              <div class="adm-kpi-row" style="display:flex; gap:8px;">
+                <input type="text" class="admin-input adm-kpi-input" value="जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के गुर।" style="flex:1;" />
+              </div>
+              <div class="adm-kpi-row" style="display:flex; gap:8px;">
+                <input type="text" class="admin-input adm-kpi-input" value="फसल सुरक्षा, कीट-रोग व खरपतवार का संपूर्ण व व्यावहारिक समाधान।" style="flex:1;" />
+              </div>
+              <div class="adm-kpi-row" style="display:flex; gap:8px;">
+                <input type="text" class="admin-input adm-kpi-input" value="कृषि विशेषज्ञों के साथ सीधे लाइव सवाल-जवाब एवं परामर्श सत्र।" style="flex:1;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- FAQ ACCORDION MANAGEMENT -->
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label class="admin-label" style="font-weight:800; font-size:0.86rem; color:#cbd5e1; margin:0; display:flex; align-items:center; gap:6px;">
+                <span>❓</span> अक्सर पूछे जाने वाले प्रश्न (FAQ Items):
+              </label>
+              <button type="button" id="btn-add-faq-row" class="admin-button small-button" style="background:#334155; color:#cbd5e1; font-size:0.75rem; padding:3px 8px;">
+                ➕ नया FAQ जोड़ें
+              </button>
+            </div>
+            <div id="adm_faqs_container" style="display:flex; flex-direction:column; gap:10px;">
+              <div class="adm-faq-row" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
+                <input type="text" class="admin-input adm-faq-q" value="ज़ूम मीटिंग लिंक और पासवर्ड कब खुलेगा?" placeholder="प्रश्न लिखें..." style="width:100%; margin-bottom:6px;" />
+                <textarea class="admin-input adm-faq-a" rows="2" placeholder="उत्तर लिखें..." style="width:100%;">वेबिनार शुरू होने के ठीक 2 मिनट पहले ऊपर दिया गया 'Join Zoom Meeting' बटन स्वतः सक्रिय हो जाएगा।</textarea>
+              </div>
+            </div>
+          </div>
+
           <div style="margin-bottom: 12px;">
-            <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">वेबिनार संदेश / विवरण (Description):</label>
+            <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">मुख्य वेबिनार संदेश / विवरण (Description):</label>
             <textarea id="adm_wb_desc" class="admin-input" rows="2" placeholder="इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें। रजिस्ट्रेशन के तुरंत बाद Zoom लिंक और पासवर्ड मिल जाएगा।" style="width:100%;"></textarea>
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px;">
             <div style="font-size:0.82rem; color:#94a3b8;">
-              ℹ️ <strong>1-Click Connect:</strong> Zoom लिंक में पासवर्ड स्वतः जोड़ दिया जाएगा ताकि यूज़र सीधे जुड़ सके।
+              ℹ️ <strong>1-Click Connect & Zero Egress:</strong> ज़ूम लिंक व पासवर्ड तय समय से 2 मिनट पहले स्वतः अनलॉक होंगे।
             </div>
             <div style="display:flex; gap:8px;">
               <button type="button" id="btn-cancel-edit-webinar" class="admin-button" style="display:none; background:transparent; border:1px solid #475569; color:#cbd5e1;">
@@ -304,9 +442,20 @@ export async function initWebinars() {
   function resetWebinarForm() {
     editingWebinarId = null;
     formCreateWebinar?.reset();
+    uploadedCoverBase64 = '';
+    uploadedBannersArray = [];
+    renderUploadedBannersPreview();
+    if (coverUrlWrapper) coverUrlWrapper.style.display = 'none';
+    if (coverUploadWrapper) coverUploadWrapper.style.display = 'none';
+    const priceInput = document.getElementById('adm_wb_price');
+    if (priceInput) priceInput.value = '0';
     if (wbDateInput) wbDateInput.value = todayStr;
     if (wbTimeInput) wbTimeInput.value = '19:00';
-    if (wbDatetimeInput) wbDatetimeInput.value = formatHindiDateTime(todayStr, '19:00');
+    const ytCont = document.getElementById('adm_yt_urls_container');
+    if (ytCont) {
+      ytCont.innerHTML = '';
+      ytCont.appendChild(createYtRow(''));
+    }
     if (formCardTitle) formCardTitle.innerHTML = '<span>🎥</span> नया ज़ूम वेबिनार तैयार करें (Fast Zoom Session)';
     if (btnSubmitWebinar) btnSubmitWebinar.innerHTML = '🚀 ज़ूम वेबिनार प्रकाशित करें (Publish Webinar)';
     if (btnCancelEdit) btnCancelEdit.style.display = 'none';
@@ -334,6 +483,219 @@ export async function initWebinars() {
     if (createCard) createCard.style.display = 'none';
   });
 
+  // 3D Cover Selector Logic
+  const coverPresetSelect = document.getElementById('adm_wb_cover_preset');
+  const coverUrlWrapper = document.getElementById('adm_wb_cover_url_wrapper');
+  const coverUploadWrapper = document.getElementById('adm_wb_cover_upload_wrapper');
+  const coverUrlInput = document.getElementById('adm_wb_cover_url');
+  const coverFileInput = document.getElementById('adm_wb_cover_file');
+  let uploadedCoverBase64 = '';
+
+  coverPresetSelect?.addEventListener('change', () => {
+    const val = coverPresetSelect.value;
+    if (val === 'custom_url') {
+      if (coverUrlWrapper) coverUrlWrapper.style.display = 'block';
+      if (coverUploadWrapper) coverUploadWrapper.style.display = 'none';
+    } else if (val === 'custom_upload') {
+      if (coverUrlWrapper) coverUrlWrapper.style.display = 'none';
+      if (coverUploadWrapper) coverUploadWrapper.style.display = 'block';
+    } else {
+      if (coverUrlWrapper) coverUrlWrapper.style.display = 'none';
+      if (coverUploadWrapper) coverUploadWrapper.style.display = 'none';
+    }
+  });
+
+  coverFileInput?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width;
+        let h = img.height;
+        const maxW = 720;
+        if (w > maxW) {
+          h = Math.round((h * maxW) / w);
+          w = maxW;
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        uploadedCoverBase64 = canvas.toDataURL('image/jpeg', 0.85);
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Webinar Banner Image Upload Handler
+  let uploadedBannersArray = [];
+  const bannerFileInput = document.getElementById('adm_wb_banner_file');
+  const uploadedBannersPreview = document.getElementById('adm_uploaded_banners_preview');
+
+  bannerFileInput?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width;
+        let h = img.height;
+        const maxW = 1200;
+        if (w > maxW) {
+          h = Math.round((h * maxW) / w);
+          w = maxW;
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const b64 = canvas.toDataURL('image/jpeg', 0.85);
+        uploadedBannersArray.push(b64);
+        renderUploadedBannersPreview();
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function renderUploadedBannersPreview() {
+    if (!uploadedBannersPreview) return;
+    uploadedBannersPreview.innerHTML = uploadedBannersArray.map((url, idx) => `
+      <div style="position:relative; display:inline-block; margin-right:4px; margin-bottom:4px;">
+        <img src="${url}" style="width:75px; height:46px; object-fit:cover; border-radius:6px; border:1.5px solid #10b981;" />
+        <button type="button" style="position:absolute; top:-6px; right:-6px; background:#ef4444; color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center;" onclick="window.removeUploadedBanner(${idx})">&times;</button>
+      </div>
+    `).join('');
+  }
+
+  window.removeUploadedBanner = function (idx) {
+    uploadedBannersArray.splice(idx, 1);
+    renderUploadedBannersPreview();
+  };
+
+  function extractYoutubeVideoId(url) {
+    if (!url) return null;
+    const str = String(url).trim();
+    if (!str || str.startsWith('data:')) return null;
+    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
+    const patterns = [
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i,
+      /[?&]v=([a-zA-Z0-9_-]{11})/i,
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i
+    ];
+    for (const pattern of patterns) {
+      const match = str.match(pattern);
+      if (match && match[1] && match[1].length === 11) return match[1];
+    }
+    return null;
+  }
+
+  function updateYtPreview(row) {
+    const input = row.querySelector('.adm-yt-input');
+    const preview = row.querySelector('.adm-yt-preview');
+    const thumbImg = row.querySelector('.adm-yt-thumb-img');
+    const vidCode = row.querySelector('.adm-yt-vid');
+    if (!input || !preview || !thumbImg || !vidCode) return;
+    const ytid = extractYoutubeVideoId(input.value);
+    if (ytid) {
+      thumbImg.src = `https://img.youtube.com/vi/${ytid}/hqdefault.jpg`;
+      vidCode.textContent = ytid;
+      preview.style.display = 'flex';
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  function createYtRow(val = '') {
+    const row = document.createElement('div');
+    row.className = 'adm-yt-row';
+    row.style.background = 'rgba(0,0,0,0.2)';
+    row.style.padding = '8px';
+    row.style.borderRadius = '8px';
+    row.style.display = 'flex';
+    row.style.flexDirection = 'column';
+    row.style.gap = '6px';
+    row.innerHTML = `
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input type="url" class="admin-input adm-yt-input" value="${val}" placeholder="https://youtube.com/watch?v=... या youtu.be/..." style="flex:1;" />
+        <button type="button" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;" onclick="this.closest('.adm-yt-row').remove()">&times; हटाएं</button>
+      </div>
+      <div class="adm-yt-preview" style="display:none; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:6px; border-radius:6px;">
+        <img class="adm-yt-thumb-img" src="" style="width:80px; height:45px; object-fit:cover; border-radius:4px; border:1px solid #ef4444;" />
+        <span style="font-size:0.75rem; color:#34d399; font-weight:700;">✅ यूट्यूब वीडियो पहचाना गया (Video ID: <code class="adm-yt-vid" style="color:#38bdf8;"></code>)</span>
+      </div>
+    `;
+    const inp = row.querySelector('.adm-yt-input');
+    inp.addEventListener('input', () => updateYtPreview(row));
+    inp.addEventListener('change', () => updateYtPreview(row));
+    inp.addEventListener('paste', () => setTimeout(() => updateYtPreview(row), 50));
+    if (val) updateYtPreview(row);
+    return row;
+  }
+
+  // Dynamic YouTube URLs (+) Add Row
+  document.getElementById('btn-add-yt-url')?.addEventListener('click', () => {
+    const cont = document.getElementById('adm_yt_urls_container');
+    if (!cont) return;
+    cont.appendChild(createYtRow(''));
+  });
+
+  // Dynamic Banners (+) Add Row
+  document.getElementById('btn-add-banner-url')?.addEventListener('click', () => {
+    const cont = document.getElementById('adm_banners_container');
+    if (!cont) return;
+    const row = document.createElement('div');
+    row.className = 'adm-banner-row';
+    row.style.display = 'flex';
+    row.style.gap = '8px';
+    row.innerHTML = `
+      <input type="url" class="admin-input adm-banner-custom-url" placeholder="https://.../banner.jpg" style="flex:1;" />
+      <button type="button" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    cont.appendChild(row);
+  });
+
+  // Dynamic Feature KPIs (+) Add Row
+  document.getElementById('btn-add-kpi-row')?.addEventListener('click', () => {
+    const cont = document.getElementById('adm_kpis_container');
+    if (!cont) return;
+    const row = document.createElement('div');
+    row.className = 'adm-kpi-row';
+    row.style.display = 'flex';
+    row.style.gap = '8px';
+    row.innerHTML = `
+      <input type="text" class="admin-input adm-kpi-input" placeholder="नया लाभ या विशेषता लिखें..." style="flex:1;" />
+      <button type="button" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    cont.appendChild(row);
+  });
+
+  // Dynamic FAQ (+) Add Row
+  document.getElementById('btn-add-faq-row')?.addEventListener('click', () => {
+    const cont = document.getElementById('adm_faqs_container');
+    if (!cont) return;
+    const row = document.createElement('div');
+    row.className = 'adm-faq-row';
+    row.style.background = 'rgba(0,0,0,0.2)';
+    row.style.padding = '10px';
+    row.style.borderRadius = '8px';
+    row.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span style="font-size:0.75rem; color:#94a3b8; font-weight:700;">नया FAQ प्रश्न:</span>
+        <button type="button" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:2px 6px; font-size:0.7rem;" onclick="this.closest('.adm-faq-row').remove()">&times; हटाएं</button>
+      </div>
+      <input type="text" class="admin-input adm-faq-q" placeholder="प्रश्न लिखें..." style="width:100%; margin-bottom:6px;" />
+      <textarea class="admin-input adm-faq-a" rows="2" placeholder="उत्तर लिखें..." style="width:100%;"></textarea>
+    `;
+    cont.appendChild(row);
+  });
+
   formCreateWebinar?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = (document.getElementById('adm_wb_title')?.value || '').trim();
@@ -350,7 +712,50 @@ export async function initWebinars() {
     if (!zoomLink && meetingId) {
       zoomLink = getDirectZoomJoinUrl('', meetingId, passcode);
     }
+    const price = parseInt(document.getElementById('adm_wb_price')?.value || '0', 10);
+    const duration = parseInt(document.getElementById('adm_wb_duration')?.value || '90', 10);
     const desc = (document.getElementById('adm_wb_desc')?.value || '').trim();
+
+    // Resolve 3D Cover Image
+    let finalCoverImage = '';
+    const coverPreset = coverPresetSelect?.value || '';
+    if (coverPreset === 'custom_url') {
+      finalCoverImage = (coverUrlInput?.value || '').trim();
+    } else if (coverPreset === 'custom_upload') {
+      finalCoverImage = uploadedCoverBase64;
+    } else if (coverPreset) {
+      finalCoverImage = coverPreset;
+    }
+
+    // Resolve YouTube Links
+    const youtubeLinks = Array.from(document.querySelectorAll('.adm-yt-input'))
+      .map(el => (el.value || '').trim())
+      .filter(Boolean);
+
+    // Resolve Banners
+    const banners = [];
+    document.querySelectorAll('.adm-banner-row').forEach(row => {
+      const sel = row.querySelector('.adm-banner-select');
+      const cust = row.querySelector('.adm-banner-custom-url');
+      if (sel && sel.value && sel.value !== 'custom') banners.push(sel.value);
+      else if (cust && cust.value.trim()) banners.push(cust.value.trim());
+    });
+    if (uploadedBannersArray && uploadedBannersArray.length > 0) {
+      banners.push(...uploadedBannersArray);
+    }
+
+    // Resolve KPIs
+    const kpis = Array.from(document.querySelectorAll('.adm-kpi-input'))
+      .map(el => (el.value || '').trim())
+      .filter(Boolean);
+
+    // Resolve FAQs
+    const faqs = [];
+    document.querySelectorAll('.adm-faq-row').forEach(row => {
+      const q = (row.querySelector('.adm-faq-q')?.value || '').trim();
+      const a = (row.querySelector('.adm-faq-a')?.value || '').trim();
+      if (q && a) faqs.push({ q, a });
+    });
 
     if (!title || !meetingId) {
       alert('कृपया शीर्षक और मीटिंग आईडी अवश्य भरें।');
@@ -364,19 +769,31 @@ export async function initWebinars() {
 
     const db = getAdminDb();
 
+    const webinarPayload = {
+      zoom_link: zoomLink,
+      meeting_id: meetingId,
+      passcode: passcode,
+      datetime: datetime,
+      date: rawDate,
+      time: rawTime,
+      price: price,
+      duration_minutes: duration,
+      cover_image: finalCoverImage,
+      banners: banners,
+      youtube_links: youtubeLinks,
+      kpis: kpis,
+      faqs: faqs
+    };
+
     if (editingWebinarId) {
       // UPDATE EXISTING WEBINAR
       const updatedData = {
         title: title,
         message: desc || 'इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।',
-        webinar_data: {
-          zoom_link: zoomLink,
-          meeting_id: meetingId,
-          passcode: passcode,
-          datetime: datetime,
-          date: rawDate,
-          time: rawTime
-        }
+        content_type: youtubeLinks.length ? 'youtube' : 'webinar',
+        media_url: youtubeLinks[0] || finalCoverImage || '',
+        thumbnail_url: finalCoverImage || (banners[0] || ''),
+        webinar_data: webinarPayload
       };
 
       try {
@@ -387,13 +804,32 @@ export async function initWebinars() {
         console.warn('Webinar update notice:', err);
       }
 
-      // Update LocalStorage
+      // Also upsert master record for regular page
+      try {
+        if (db) {
+          await db.from('landing_pages').upsert([{ 
+            id: 'WB_MASTER', 
+            profile_id: 'ALL_USERS', 
+            share_id: 'ALL_USERS', 
+            category: 'webinar', 
+            offer_price: price,
+            status: 'active', 
+            ...updatedData 
+          }]);
+        }
+      } catch (e) {}
+
+      // Update LocalStorage & Purge Stale Caches
       try {
         const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
         const idx = stored.findIndex(w => w.id === editingWebinarId);
         if (idx !== -1) {
           stored[idx] = { ...stored[idx], ...updatedData };
           localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(stored));
+        }
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('AI_WB_CONFIG_')) localStorage.removeItem(k);
         }
       } catch (err) {}
 
@@ -410,35 +846,35 @@ export async function initWebinars() {
         title: title,
         message: desc || 'इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।',
         category: 'webinar',
-        content_type: 'webinar',
+        content_type: youtubeLinks.length ? 'youtube' : 'webinar',
+        media_url: youtubeLinks[0] || finalCoverImage || '',
+        thumbnail_url: finalCoverImage || (banners[0] || ''),
+        offer_price: price,
         status: 'active',
-        webinar_data: {
-          zoom_link: zoomLink,
-          meeting_id: meetingId,
-          passcode: passcode,
-          datetime: datetime,
-          date: rawDate,
-          time: rawTime
-        },
+        webinar_data: webinarPayload,
         created_at: new Date().toISOString()
       };
 
       try {
         if (db) {
           await db.from('landing_pages').insert([newRecord]);
+          await db.from('landing_pages').upsert([{ ...newRecord, id: 'WB_MASTER' }]);
         }
       } catch (err) {
         console.warn('Webinar insert notice:', err);
       }
 
-      // Save in LocalStorage fallback
       try {
         const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
         stored.unshift(newRecord);
         localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(stored));
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('AI_WB_CONFIG_')) localStorage.removeItem(k);
+        }
       } catch (err) {}
 
-      alert(`🎉 ज़ूम वेबिनार सफलतापूर्वक प्रकाशित हो गया!\n\nलिंक: https://aarogyamindia.online/webinar.html?id=${newWbId}`);
+      alert(`🎉 ज़ूम वेबिनार सफलतापूर्वक प्रकाशित हो गया!\n\nरेगुलर लिंक: https://aarogyamindia.online/webinar.html`);
     }
 
     if (btnSubmitWebinar) {
@@ -1096,6 +1532,77 @@ export async function initWebinars() {
     if (wbMeetingIdInput) wbMeetingIdInput.value = wData.meeting_id || '';
     if (wbPasscodeInput) wbPasscodeInput.value = wData.passcode || '';
     if (wbZoomLinkInput) wbZoomLinkInput.value = wData.zoom_link || '';
+
+    const priceSelect = document.getElementById('adm_wb_price');
+    if (priceSelect) priceSelect.value = String(wData.price || 0);
+
+    const durationInput = document.getElementById('adm_wb_duration');
+    if (durationInput) durationInput.value = String(wData.duration_minutes || 90);
+
+    // Populate Cover Image
+    if (wData.cover_image) {
+      if (coverPresetSelect) {
+        const matchingOpt = Array.from(coverPresetSelect.options).find(o => o.value === wData.cover_image);
+        if (matchingOpt) {
+          coverPresetSelect.value = wData.cover_image;
+          if (coverUrlWrapper) coverUrlWrapper.style.display = 'none';
+        } else {
+          coverPresetSelect.value = 'custom_url';
+          if (coverUrlWrapper) coverUrlWrapper.style.display = 'block';
+          if (coverUrlInput) coverUrlInput.value = wData.cover_image;
+        }
+      }
+    }
+
+    // Populate Banners
+    uploadedBannersArray = [];
+    const bArr = Array.isArray(wData.banners) ? wData.banners : (wData.banner_url ? [wData.banner_url] : []);
+    if (bArr.length > 0) {
+      bArr.forEach(b => {
+        if (b.startsWith('data:image') || b.includes('base64')) {
+          uploadedBannersArray.push(b);
+        }
+      });
+      renderUploadedBannersPreview();
+    }
+    const ytCont = document.getElementById('adm_yt_urls_container');
+    const yts = Array.isArray(wData.youtube_links) ? wData.youtube_links : (webinar.media_url && webinar.content_type === 'youtube' ? [webinar.media_url] : []);
+    if (ytCont) {
+      ytCont.innerHTML = '';
+      if (yts.length > 0) {
+        yts.forEach(url => ytCont.appendChild(createYtRow(url)));
+      } else {
+        ytCont.appendChild(createYtRow(''));
+      }
+    }
+
+    // Populate KPIs
+    const kpiCont = document.getElementById('adm_kpis_container');
+    const kpis = Array.isArray(wData.kpis) ? wData.kpis : [];
+    if (kpiCont && kpis.length > 0) {
+      kpiCont.innerHTML = kpis.map((kpi, i) => `
+        <div class="adm-kpi-row" style="display:flex; gap:8px;">
+          <input type="text" class="admin-input adm-kpi-input" value="${kpi}" style="flex:1;" />
+          ${i > 0 ? `<button type="button" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;" onclick="this.parentElement.remove()">&times;</button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Populate FAQs
+    const faqCont = document.getElementById('adm_faqs_container');
+    const faqs = Array.isArray(wData.faqs) ? wData.faqs : [];
+    if (faqCont && faqs.length > 0) {
+      faqCont.innerHTML = faqs.map(f => `
+        <div class="adm-faq-row" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-size:0.75rem; color:#94a3b8; font-weight:700;">FAQ प्रश्न:</span>
+            <button type="button" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:2px 6px; font-size:0.7rem;" onclick="this.closest('.adm-faq-row').remove()">&times; हटाएं</button>
+          </div>
+          <input type="text" class="admin-input adm-faq-q" value="${f.q || ''}" placeholder="प्रश्न लिखें..." style="width:100%; margin-bottom:6px;" />
+          <textarea class="admin-input adm-faq-a" rows="2" placeholder="उत्तर लिखें..." style="width:100%;">${f.a || ''}</textarea>
+        </div>
+      `).join('');
+    }
 
     if (formCardTitle) formCardTitle.innerHTML = `<span>✏️</span> वेबिनार एडिट करें: <code style="color:#38bdf8;">${webinar.id}</code>`;
     if (btnSubmitWebinar) btnSubmitWebinar.innerHTML = '💾 वेबिनार अपडेट करें (Update Webinar)';

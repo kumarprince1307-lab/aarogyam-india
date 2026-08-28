@@ -278,12 +278,23 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  const WEBINAR_FALLBACK_IMAGE = 'https://aarogyamindia.online/images/banners/universal-zoom-webinar-og.jpg';
+
+  if (!finalOgImage || finalOgImage === DEFAULT_FALLBACK_IMAGE) {
+    if (finalCategory === 'webinar' || lp?.category === 'webinar' || query.webinar || lpId === 'WB_MASTER' || (lpId && lpId.startsWith('WB'))) {
+      finalOgImage = WEBINAR_FALLBACK_IMAGE;
+    }
+  }
+
   // 4. Construct Clean Destination URL for Human Visitors
   const destParams = new URLSearchParams();
   if (lpId) destParams.set('id', lpId);
-  if (finalShareId) destParams.set('share_id', finalShareId);
+  if (finalShareId) destParams.set('ref', finalShareId);
 
-  const destinationLandingUrl = `${HOST_ORIGIN}/ucas/landing.html?${destParams.toString()}`;
+  const isWebinarPage = finalCategory === 'webinar' || lp?.category === 'webinar' || query.webinar || lpId === 'WB_MASTER' || (lpId && lpId.startsWith('WB'));
+  const destinationLandingUrl = isWebinarPage 
+    ? `${HOST_ORIGIN}/webinar.html?${destParams.toString()}`
+    : `${HOST_ORIGIN}/ucas/landing.html?${destParams.toString()}`;
   const canonicalShareUrl = `${HOST_ORIGIN}/api/share?id=${encodeURIComponent(lpId || '')}${finalShareId ? '&share_id=' + encodeURIComponent(finalShareId) : ''}`;
 
   const userAgent = String(req.headers['user-agent'] || '');

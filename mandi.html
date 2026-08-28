@@ -90,7 +90,25 @@
             <h1>कृषि मंडी भाव व मौसम</h1>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <!-- Logged Out Login Button -->
+            <button type="button" id="headerLoginBtn" onclick="openLoginPopup()" style="background: rgba(16, 185, 129, 0.15); border: 1.5px solid rgba(16, 185, 129, 0.4); color: #34D399; font-weight: 700; font-size: 0.82rem; padding: 6px 14px; border-radius: 50px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                <span>लॉगिन</span>
+            </button>
+
+            <!-- Logged In User Status & Logout Button -->
+            <div id="headerUserWrapper" style="display: none; align-items: center; gap: 8px;">
+                <a href="/ucas/index.html" style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); color: #38BDF8; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-user-check"></i>
+                    <span id="headerUserName">यूजर</span>
+                </a>
+                <button type="button" id="headerLogoutBtn" onclick="handleUserLogout()" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #F87171; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 50px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="लॉगआउट करें">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>लॉगआउट</span>
+                </button>
+            </div>
+
             <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1.5px solid #10B981; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.15rem; position: relative;">
                 <i class="fa-solid fa-bell" style="color: #10B981;"></i>
                 <span class="user-notif-badge" style="display: none; position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.7rem; font-weight: 800; padding: 2px 6px;">0</span>
@@ -114,7 +132,13 @@
                 <li class="library-nav-item active">
                     <a href="/mandi.html">
                         <i class="fa-solid fa-seedling library-nav-icon" style="color:#10B981;"></i>
-                        <span>मंडी भाव व मौसम</span>
+                        <span>कृषि मंडी भाव</span>
+                    </a>
+                </li>
+                <li class="library-nav-item">
+                    <a href="/weather.html">
+                        <i class="fa-solid fa-cloud-sun library-nav-icon" style="color:#0284C7;"></i>
+                        <span>मौसम अपडेट (Weather)</span>
                     </a>
                 </li>
                 <li class="library-nav-item">
@@ -172,9 +196,9 @@
                     </a>
                 </li>
                 <li class="library-nav-item">
-                    <a href="/ucas/index.html?tab=webinars">
+                    <a href="/webinar.html">
                         <i class="fa-solid fa-video library-nav-icon" style="color:#3B82F6;"></i>
-                        <span>Webinars & Live</span>
+                        <span>🔴 लाइव ज़ूम वेबिनार</span>
                     </a>
                 </li>
                 <li class="library-nav-item">
@@ -236,21 +260,28 @@
     <div class="side-menu-overlay" id="sideMenuOverlay" onclick="toggleMenu()" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 99998; display: none;"></div>
     <div class="side-menu" id="sideMenu">
         <button class="close-menu" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; padding: 18px 12px; border-bottom: 1px solid #334155; margin-bottom: 12px; background: #0f172a; border-radius: 8px;">
-            <div style="width: 48px; height: 48px; background: #10B981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 8px;">
+        <div style="text-align: center; padding: 16px 10px; border-bottom: 1px solid #334155; margin-bottom: 12px; background: #0f172a; border-radius: 8px;">
+            <div style="width: 46px; height: 46px; background: #10B981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto 6px;">
                 <i class="fa-solid fa-user"></i>
             </div>
-            <h3 style="font-size: 1rem; color: #fff; margin-bottom: 4px;" id="sidebarUserName">नमस्ते, अवनीश मिश्रा</h3>
-            <p style="font-size: 0.8rem; color: #38bdf8; margin: 0 0 10px 0;" id="sidebarUserMobile">📱 +91 79744 22572</p>
-            <div id="sidebarAuthBtnContainer">
-                <!-- Dynamic Login / Logout button rendered by session.js -->
-                <button onclick="openLoginPopup()" class="sidebar-auth-btn" style="background: #10B981; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-size: 0.82rem; font-weight: 700; cursor: pointer;">लॉगिन करें</button>
+            <h3 style="font-size: 0.95rem; color: #fff; margin-bottom: 2px;">नमस्ते, <span id="sidebarUserName">प्रिय पाठक</span></h3>
+            <p style="font-size: 0.75rem; color: #38BDF8; font-weight: bold; margin: 0 0 8px 0;">
+                👑 <span id="sidebarUserMobile">लॉगिन नहीं है</span>
+            </p>
+            <div id="drawerAuthActions" style="display: flex; justify-content: center; gap: 8px;">
+                <button type="button" id="drawerLoginBtn" onclick="openLoginPopup()" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #fff; background: #10B981; border: none; padding: 5px 14px; border-radius: 6px; font-weight: 700; cursor: pointer;">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> लॉगिन करें
+                </button>
+                <button type="button" id="drawerLogoutBtn" onclick="handleUserLogout()" style="display: none; align-items: center; gap: 4px; font-size: 0.75rem; color: #fff; background: #EF4444; border: none; padding: 5px 14px; border-radius: 6px; font-weight: 700; cursor: pointer;">
+                    <i class="fa-solid fa-right-from-bracket"></i> लॉगआउट
+                </button>
             </div>
         </div>
 
         <ul>
             <li><a href="/index.html"><i class="fa-solid fa-house" style="color:#10B981;"></i> Home</a></li>
-            <li><a href="/mandi.html"><i class="fa-solid fa-seedling" style="color:#10B981;"></i> कृषि मंडी भाव व मौसम</a></li>
+            <li><a href="/mandi.html"><i class="fa-solid fa-seedling" style="color:#10B981;"></i> कृषि मंडी भाव</a></li>
+            <li><a href="/weather.html"><i class="fa-solid fa-cloud-sun" style="color:#0284C7;"></i> मौसम अपडेट (Weather)</a></li>
             <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a></li>
             <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> My Profile & UCAS</a></li>
             <li><a href="/subscription.html"><i class="fa-solid fa-crown" style="color:#F59E0B;"></i> VIP Pass (Subscription)</a></li>
@@ -261,7 +292,7 @@
             <li><a href="/ucas/index.html?tab=marketing"><i class="fa-solid fa-rocket" style="color:#EC4899;"></i> Marketing Engine</a></li>
             <li><a href="/ucas/index.html?tab=product-landing"><i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> Product Landing Page</a></li>
             <li><a href="/ucas/index.html?tab=hook-templates"><i class="fa-solid fa-pen-nib" style="color:#8B5CF6;"></i> हुक व शायरी (Hook & Shayari)</a></li>
-            <li><a href="/ucas/index.html?tab=webinars"><i class="fa-solid fa-video" style="color:#3B82F6;"></i> Webinars & Live</a></li>
+            <li><a href="/webinar.html"><i class="fa-solid fa-video" style="color:#3B82F6;"></i> 🔴 लाइव ज़ूम वेबिनार</a></li>
             <li><a href="/ucas/index.html?tab=broadcast-messages"><i class="fa-solid fa-bullhorn" style="color:#E11D48;"></i> आरोग्यम संदेश</a></li>
             <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart" style="color:#EF4444;"></i> Wishlist</a></li>
             <li><a href="/faq.html"><i class="fa-solid fa-circle-question" style="color:#64748B;"></i> FAQ</a></li>
@@ -547,6 +578,72 @@
     <script src="../session.js"></script>
     <script src="/js/user-notifications.js?v=12.0"></script>
     <script src="/js/mandi.js"></script>
-</body>
 
+    <script>
+      function syncAuthStatus() {
+        let user = null;
+        if (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function') {
+          user = window.V1_SESSION.getCurrentUser();
+        }
+        if (!user) {
+          try {
+            user = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('currentUser') || 'null');
+          } catch(e) {}
+        }
+        if (!user) {
+          const m = localStorage.getItem('aim_user_mobile');
+          const n = localStorage.getItem('aim_user_name');
+          if (m && n) user = { name: n, mobile: m };
+        }
+
+        const hLogin = document.getElementById('headerLoginBtn');
+        const hUserWrap = document.getElementById('headerUserWrapper');
+        const hName = document.getElementById('headerUserName');
+        const sName = document.getElementById('sidebarUserName');
+        const sMobile = document.getElementById('sidebarUserMobile');
+        const dLogin = document.getElementById('drawerLoginBtn');
+        const dLogout = document.getElementById('drawerLogoutBtn');
+
+        if (user && (user.id || user.mobile || user.name || user.full_name)) {
+          const displayName = user.name || user.full_name || 'किसान साथी';
+          const displayMobile = user.mobile || user.phone || 'रजिस्टर्ड';
+
+          if (hLogin) hLogin.style.display = 'none';
+          if (hUserWrap) {
+            hUserWrap.style.display = 'inline-flex';
+            if (hName) hName.textContent = displayName;
+          }
+          if (sName) sName.textContent = displayName;
+          if (sMobile) sMobile.textContent = `📱 +91 ${displayMobile}`;
+          if (dLogin) dLogin.style.display = 'none';
+          if (dLogout) dLogout.style.display = 'inline-flex';
+        } else {
+          if (hLogin) hLogin.style.display = 'inline-flex';
+          if (hUserWrap) hUserWrap.style.display = 'none';
+          if (sName) sName.textContent = 'प्रिय पाठक';
+          if (sMobile) sMobile.textContent = 'लॉगिन नहीं है';
+          if (dLogin) dLogin.style.display = 'inline-flex';
+          if (dLogout) dLogout.style.display = 'none';
+        }
+      }
+
+      window.handleUserLogout = function () {
+        if (confirm('क्या आप सचमुच आरोग्यम इंडिया से लॉगआउट करना चाहते हैं?')) {
+          if (window.V1_SESSION && typeof window.V1_SESSION.logout === 'function') {
+            window.V1_SESSION.logout();
+          } else {
+            localStorage.removeItem('AI_USER');
+            localStorage.removeItem('AI_PROFILE');
+            localStorage.removeItem('AI_SESSION');
+            localStorage.removeItem('aim_user_mobile');
+            localStorage.removeItem('aim_user_name');
+            window.location.reload();
+          }
+        }
+      };
+
+      document.addEventListener('DOMContentLoaded', syncAuthStatus);
+      syncAuthStatus();
+    </script>
+</body>
 </html>
