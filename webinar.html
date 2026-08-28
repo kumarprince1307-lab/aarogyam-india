@@ -280,35 +280,27 @@
     .wb-hero-grid {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
       max-width: 1140px;
       margin: 0 auto;
     }
 
+    /* Mobile ordering (< 992px) - Native sibling ordering without display:contents */
     @media (max-width: 991px) {
-      .wb-left-column {
-        display: contents;
+      .wb-hero-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
       }
-      .wb-hero-cover-wrapper {
-        order: 1;
-      }
-      #wb_timer_box {
-        order: 2;
-      }
-      #wb_right_column {
-        order: 3;
-      }
-      #wb_kpi_card {
-        order: 4;
-      }
-      #wb_banners_section {
-        order: 5;
-      }
-      #wb_videos_section {
-        order: 6;
-      }
+      #wb_cover_container { order: 1; }
+      #wb_timer_box       { order: 2; }
+      #wb_right_column    { order: 3; }
+      #wb_kpi_card        { order: 4; }
+      #wb_banners_section { order: 5; }
+      #wb_videos_section  { order: 6; }
     }
 
+    /* Desktop (>= 992px) - 2 Column CSS Grid */
     @media (min-width: 992px) {
       .wb-hero-grid {
         display: grid;
@@ -317,15 +309,17 @@
         align-items: start;
       }
 
-      /* LEFT COLUMN: Visual Showcase & KPIs */
-      .wb-left-column {
-        display: flex;
-        flex-direction: column;
-        gap: 22px;
-      }
+      #wb_cover_container { grid-column: 1; grid-row: 1; }
+      #wb_timer_box       { grid-column: 1; grid-row: 2; }
+      #wb_kpi_card        { grid-column: 1; grid-row: 3; }
+      #wb_banners_section { grid-column: 1; grid-row: 4; }
+      #wb_videos_section  { grid-column: 1; grid-row: 5; }
 
       #wb_right_column {
-        order: initial;
+        grid-column: 2;
+        grid-row: 1 / span 5;
+        position: sticky;
+        top: 80px;
       }
     }
 
@@ -1543,103 +1537,90 @@
     <main class="wb-main-content-area">
       <div class="wb-hero-grid">
 
-        <!-- LEFT COLUMN: 3D Cover, Timer, Feature KPIs, Banners & Videos -->
-        <div class="wb-left-column">
+        <!-- 1. 3D FLOATING 9:16 COVER CONTAINER -->
+        <div class="wb-hero-cover-wrapper" id="wb_cover_container">
+          <img src="/images/banners/universal-zoom-webinar-og.jpg" alt="Aarogyam India Live Zoom Webinar" class="wb-floating-cover-9-16" onerror="this.src='/images/banners/webinar-live-banner.jpg'">
+        </div>
 
-          <!-- 3D FLOATING 9:16 COVER CONTAINER -->
-          <div class="wb-hero-cover-wrapper" id="wb_cover_container">
-            <div class="wb-floating-card-fallback" id="wb_fallback_card">
-              <div class="wb-floating-badge">
-                <span class="dot"></span>
-                <span>LIVE ZOOM WEBINAR</span>
-              </div>
-              <div>
-                <div class="wb-floating-icon">
-                  <i class="fa-solid fa-video"></i>
-                </div>
-                <div class="wb-floating-title" id="wb_card_mini_title">
-                  आधुनिक जैविक कृषि एवं फसल सुरक्षा
-                </div>
-              </div>
-              <div class="wb-floating-footer">
-                <i class="fa-solid fa-graduation-cap"></i> विशेष ऑनलाइन ट्रेनिंग
-              </div>
+        <!-- 2. BIG ANIMATED 00:00:00 DIGITAL COUNTDOWN TIMER -->
+        <div class="wb-timer-card" id="wb_timer_box">
+          <div class="wb-timer-header">
+            <span class="live-indicator"></span>
+            <span id="wb_timer_status_label">लाइव वेबिनार शुरू होने में बाकी समय</span>
+          </div>
+
+          <div class="wb-digital-clock-grid">
+            <div class="wb-digit-block">
+              <div class="wb-digit-box" id="timer_hours">00</div>
+              <div class="wb-digit-label">घंटे (Hrs)</div>
+            </div>
+            <div class="wb-digit-colon">:</div>
+            <div class="wb-digit-block">
+              <div class="wb-digit-box" id="timer_minutes">00</div>
+              <div class="wb-digit-label">मिनट (Min)</div>
+            </div>
+            <div class="wb-digit-colon">:</div>
+            <div class="wb-digit-block">
+              <div class="wb-digit-box" id="timer_seconds">00</div>
+              <div class="wb-digit-label">सेकंड (Sec)</div>
             </div>
           </div>
 
-          <!-- BIG ANIMATED 00:00:00 DIGITAL COUNTDOWN TIMER -->
-          <div class="wb-timer-card" id="wb_timer_box">
-            <div class="wb-timer-header">
-              <span class="live-indicator"></span>
-              <span id="wb_timer_status_label">लाइव वेबिनार शुरू होने में बाकी समय</span>
-            </div>
+          <div class="wb-timer-subtext" id="wb_timer_subtext">
+            🔒 ज़ूम मीटिंग लिंक व पासवर्ड <strong>2 मिनट पहले</strong> स्वतः अनलॉक होगा।
+          </div>
+        </div>
 
-            <div class="wb-digital-clock-grid">
-              <div class="wb-digit-block">
-                <div class="wb-digit-box" id="timer_hours">00</div>
-                <div class="wb-digit-label">घंटे (Hrs)</div>
-              </div>
-              <div class="wb-digit-colon">:</div>
-              <div class="wb-digit-block">
-                <div class="wb-digit-box" id="timer_minutes">00</div>
-                <div class="wb-digit-label">मिनट (Min)</div>
-              </div>
-              <div class="wb-digit-colon">:</div>
-              <div class="wb-digit-block">
-                <div class="wb-digit-box" id="timer_seconds">00</div>
-                <div class="wb-digit-label">सेकंड (Sec)</div>
-              </div>
+        <!-- 3. MULTI-LINE DESCRIPTION & FEATURE KPIS -->
+        <div class="wb-features-card" id="wb_kpi_card">
+          <div class="wb-section-heading">
+            <i class="fa-solid fa-circle-check" style="color:#10B981;"></i>
+            <span>इस वेबिनार में आप क्या सीखेंगे? (Key Highlights)</span>
+          </div>
+          <div class="wb-kpi-list" id="wb_kpi_container">
+            <div class="wb-kpi-item">
+              <i class="fa-solid fa-seedling"></i>
+              <span>जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के गुर।</span>
             </div>
-
-            <div class="wb-timer-subtext" id="wb_timer_subtext">
-              🔒 ज़ूम मीटिंग लिंक व पासवर्ड <strong>2 मिनट पहले</strong> स्वतः अनलॉक होगा।
+            <div class="wb-kpi-item">
+              <i class="fa-solid fa-shield-virus"></i>
+              <span>फसल सुरक्षा, कीट-रोग व खरपतवार का संपूर्ण व व्यावहारिक समाधान।</span>
+            </div>
+            <div class="wb-kpi-item">
+              <i class="fa-solid fa-comments"></i>
+              <span>कृषि विशेषज्ञों के साथ सीधे लाइव सवाल-जवाब एवं परामर्श सत्र।</span>
+            </div>
+            <div class="wb-kpi-item">
+              <i class="fa-solid fa-gift"></i>
+              <span>प्रतिभागियों के लिए विशेष गाइड और उपयोगी ट्रेनिंग सामग्री।</span>
             </div>
           </div>
+        </div>
 
-          <!-- MULTI-LINE DESCRIPTION & FEATURE KPIS -->
-          <div class="wb-features-card" id="wb_kpi_card">
-            <div class="wb-section-heading">
-              <i class="fa-solid fa-circle-check" style="color:#10B981;"></i>
-              <span>इस वेबिनार में आप क्या सीखेंगे? (Key Highlights)</span>
-            </div>
-            <div class="wb-kpi-list" id="wb_kpi_container">
-              <div class="wb-kpi-item">
-                <i class="fa-solid fa-seedling"></i>
-                <span>जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के गुर।</span>
-              </div>
-              <div class="wb-kpi-item">
-                <i class="fa-solid fa-shield-virus"></i>
-                <span>फसल सुरक्षा, कीट-रोग व खरपतवार का संपूर्ण व व्यावहारिक समाधान।</span>
-              </div>
-              <div class="wb-kpi-item">
-                <i class="fa-solid fa-comments"></i>
-                <span>कृषि विशेषज्ञों के साथ सीधे लाइव सवाल-जवाब एवं परामर्श सत्र।</span>
-              </div>
-              <div class="wb-kpi-item">
-                <i class="fa-solid fa-gift"></i>
-                <span>प्रतिभागियों के लिए विशेष गाइड और उपयोगी ट्रेनिंग सामग्री।</span>
-              </div>
+        <!-- 4. WEBINAR BANNERS GALLERY SECTION -->
+        <div class="wb-features-card" id="wb_banners_section" style="display:block;">
+          <div class="wb-section-heading">
+            <i class="fa-solid fa-images" style="color:#F59E0B;"></i>
+            <span>वेबिनार झलकियाँ व पोस्टर्स (Webinar Banners)</span>
+          </div>
+          <div class="wb-banners-slider" id="wb_banners_slider">
+            <img src="/images/banners/universal-zoom-webinar-og.jpg" alt="Webinar Banner 1" class="wb-banner-thumb">
+            <img src="/images/banners/agriculture-hero-banner-1.webp" alt="Webinar Banner 2" class="wb-banner-thumb" onerror="this.style.display='none'">
+            <img src="/images/banners/agriculture-hero-banner-2.webp" alt="Webinar Banner 3" class="wb-banner-thumb" onerror="this.style.display='none'">
+          </div>
+        </div>
+
+        <!-- 5. MULTIPLE YOUTUBE VIDEOS SECTION -->
+        <div class="wb-features-card" id="wb_videos_section" style="display:block;">
+          <div class="wb-section-heading">
+            <i class="fa-brands fa-youtube" style="color:#EF4444;"></i>
+            <span>ट्रेनिंग वीडियो व लाइव स्ट्रीम (Video Highlights)</span>
+          </div>
+          <div class="wb-youtube-grid" id="wb_youtube_grid">
+            <div class="wb-video-frame-box">
+              <iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
           </div>
-
-          <!-- WEBINAR BANNERS GALLERY SECTION -->
-          <div class="wb-features-card" id="wb_banners_section" style="display:none;">
-            <div class="wb-section-heading">
-              <i class="fa-solid fa-images" style="color:#F59E0B;"></i>
-              <span>वेबिनार झलकियाँ व पोस्टर्स (Webinar Banners)</span>
-            </div>
-            <div class="wb-banners-slider" id="wb_banners_slider"></div>
-          </div>
-
-          <!-- MULTIPLE YOUTUBE VIDEOS SECTION -->
-          <div class="wb-features-card" id="wb_videos_section" style="display:none;">
-            <div class="wb-section-heading">
-              <i class="fa-brands fa-youtube" style="color:#EF4444;"></i>
-              <span>ट्रेनिंग वीडियो व लाइव स्ट्रीम (Video Highlights)</span>
-            </div>
-            <div class="wb-youtube-grid" id="wb_youtube_grid"></div>
-          </div>
-
         </div>
 
         <!-- RIGHT COLUMN: Registration Pass & Unlocked Zoom Access Card -->
@@ -2037,11 +2018,26 @@
         passcode: '',
         price: 0,
         desc: 'इस विशेष लाइव वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें। ज़ूम लिंक और पासवर्ड मीटिंग समय से ठीक 2 मिनट पहले अनलॉक होगा।',
-        cover_image: '',
-        banners: [],
-        youtube_links: [],
-        kpis: [],
-        faqs: []
+        cover_image: '/images/banners/universal-zoom-webinar-og.jpg',
+        banners: [
+          '/images/banners/universal-zoom-webinar-og.jpg',
+          '/images/banners/agriculture-hero-banner-1.webp',
+          '/images/banners/agriculture-hero-banner-2.webp'
+        ],
+        youtube_links: [
+          'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        ],
+        kpis: [
+          'जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के गुर।',
+          'फसल सुरक्षा, कीट-रोग व खरपतवार का संपूर्ण व व्यावहारिक समाधान।',
+          'कृषि विशेषज्ञों के साथ सीधे लाइव सवाल-जवाब एवं परामर्श सत्र।',
+          'प्रतिभागियों के लिए विशेष गाइड और उपयोगी ट्रेनिंग सामग्री।'
+        ],
+        faqs: [
+          { q: 'क्या यह वेबिनार निशुल्क है?', a: 'हाँ, यह विशेष वेबिनार सत्र किसानों व सदस्यों के लिए पूर्णतः निःशुल्क (₹0) है।' },
+          { q: 'ज़ूम मीटिंग लिंक और पासवर्ड कब मिलेगा?', a: 'रजिस्ट्रेशन करने के बाद निर्धारित समय से 2 मिनट पहले लिंक इसी पेज पर अपने आप अनलॉक हो जाएगी।' },
+          { q: 'मीटिंग जॉइन करने के लिए क्या करना होगा?', a: 'आपको बस ऊपर दिए गए "ज़ूम से जुड़ें" बटन पर क्लिक करना होगा या ज़ूम ऐप में मीटिंग आईडी व पासवर्ड डालना होगा।' }
+        ]
       };
 
       let referrerProfile = null;
@@ -2092,14 +2088,10 @@
           if (drawerLogoutBtn) drawerLogoutBtn.style.display = 'inline-flex';
 
           // Pre-fill webinar form
-          const nameInp = document.getElementById('wb_user_name');
-          const mobInp = document.getElementById('wb_user_mobile');
-          const stateInp = document.getElementById('wb_user_state');
-          const distInp = document.getElementById('wb_user_district');
-          if (nameInp && !nameInp.value) nameInp.value = displayName;
-          if (mobInp && !mobInp.value && currentUser.mobile) mobInp.value = currentUser.mobile;
-          if (stateInp && !stateInp.value && currentUser.state) stateInp.value = currentUser.state;
-          if (distInp && !distInp.value && currentUser.district) distInp.value = currentUser.district;
+          const formName = document.getElementById('wb_user_name');
+          const formMobile = document.getElementById('wb_user_mobile');
+          if (formName && !formName.value) formName.value = currentUser.name || currentUser.full_name || '';
+          if (formMobile && !formMobile.value) formMobile.value = currentUser.mobile || currentUser.phone || '';
           return true;
         } else {
           if (headerLoginBtn) headerLoginBtn.style.display = 'inline-flex';
@@ -2116,10 +2108,11 @@
         const popup = document.getElementById('login-popup-overlay');
         if (popup) {
           popup.style.display = 'flex';
-          setTimeout(() => {
-            const inp = document.getElementById('login-mobile');
-            if (inp) inp.focus();
-          }, 100);
+          const input = document.getElementById('loginPhoneInput');
+          if (input) {
+            input.value = '';
+            input.focus();
+          }
         }
       };
 
@@ -2129,54 +2122,59 @@
       };
 
       window.checkUserLogin = async function () {
-        const inp = document.getElementById('login-mobile');
-        const rawInput = (inp?.value || '').trim();
-        const cleanMobile = rawInput.replace(/\D/g, '').slice(-10);
-        if (!cleanMobile || cleanMobile.length !== 10) {
-          alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।');
+        const phoneInput = document.getElementById('loginPhoneInput');
+        const phone = (phoneInput?.value || '').trim();
+        const alertBox = document.getElementById('loginAlertBox');
+        const submitBtn = document.getElementById('loginSubmitBtn');
+
+        if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+          if (alertBox) {
+            alertBox.textContent = '⚠️ कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!';
+            alertBox.style.display = 'block';
+          }
           return;
         }
 
-        const btn = document.getElementById('loginSubmitBtn');
-        if (btn) {
-          btn.disabled = true;
-          btn.innerHTML = '<span>⏳ लॉगिन हो रहा है...</span>';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'जांच हो रही है...';
         }
 
-        try {
-          if (db) {
-            const { data, error } = await db.from('profiles').select('*').eq('mobile', cleanMobile).limit(1);
-            if (data && data.length > 0) {
-              const user = data[0];
-              localStorage.setItem('AI_USER', JSON.stringify(user));
-              localStorage.setItem('AI_PROFILE', JSON.stringify(user));
-              localStorage.setItem('currentUser', JSON.stringify(user));
-              localStorage.setItem('aim_user_mobile', user.mobile);
-              localStorage.setItem('aim_user_name', user.full_name || user.name || 'यूजर');
-              localStorage.setItem('AI_SESSION', JSON.stringify({ mobile: user.mobile, name: user.full_name || user.name, active: true }));
-              window.closeLoginPopup();
-              alert(`नमस्ते ${user.full_name || user.name || ''} जी, आप सफलतापूर्वक लॉगिन हो गए हैं!`);
-              window.location.reload();
-              return;
-            }
-          }
+        let userFound = null;
+        if (db) {
+          try {
+            const { data, error } = await db.from('profiles').select('*').eq('mobile', phone).maybeSingle();
+            if (data && !error) userFound = data;
+          } catch(e) {}
+        }
 
-          // Fallback: If not in profiles yet, create user session and log them in
-          const tempUser = { mobile: cleanMobile, name: 'किसान साथी', full_name: 'किसान साथी', share_id: 'AI' + cleanMobile.slice(-6) };
-          localStorage.setItem('AI_USER', JSON.stringify(tempUser));
-          localStorage.setItem('AI_PROFILE', JSON.stringify(tempUser));
-          localStorage.setItem('aim_user_mobile', cleanMobile);
-          localStorage.setItem('aim_user_name', 'किसान साथी');
-          window.closeLoginPopup();
-          alert('नमस्ते साथी जी, आपका लॉगिन पूर्ण हुआ!');
-          window.location.reload();
-        } catch (e) {
-          console.error('Login error:', e);
-          alert('लॉगिन करने में त्रुटि आई। कृपया पुनः प्रयास करें।');
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> <span>लॉगिन करें</span>';
-          }
+        if (!userFound) {
+          userFound = {
+            id: 'AI_GUEST_' + phone,
+            name: 'किसान साथी',
+            full_name: 'किसान साथी',
+            mobile: phone,
+            phone: phone,
+            share_id: 'AI' + phone.slice(-6)
+          };
+        }
+
+        localStorage.setItem('AI_USER', JSON.stringify(userFound));
+        localStorage.setItem('AI_PROFILE', JSON.stringify(userFound));
+        localStorage.setItem('aim_user_mobile', userFound.mobile || phone);
+        localStorage.setItem('aim_user_name', userFound.name || userFound.full_name || 'किसान साथी');
+
+        if (window.V1_SESSION && typeof window.V1_SESSION.setCurrentUser === 'function') {
+          window.V1_SESSION.setCurrentUser(userFound);
+        }
+
+        closeLoginPopup();
+        syncAuthStatus();
+        window.location.reload();
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'लॉगिन करें';
         }
       };
 
@@ -2297,6 +2295,25 @@
         }
       }
 
+      function computeUpcomingSession() {
+        const now = new Date();
+        const today830 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 30, 0, 0);
+        if (now.getTime() < today830.getTime() - (2 * 60 * 1000)) {
+          const todayIso = now.toISOString().split('T')[0];
+          return {
+            timestamp: today830.getTime(),
+            datetime: formatHindiDateTime(todayIso, '20:30')
+          };
+        }
+        const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        const tomorrowIso = tomorrow.toISOString().split('T')[0];
+        const tomorrow830 = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 20, 30, 0, 0);
+        return {
+          timestamp: tomorrow830.getTime(),
+          datetime: formatHindiDateTime(tomorrowIso, '20:30')
+        };
+      }
+
       function getPersonalizedInviteText() {
         const userShare = currentUser?.share_id || refShareId;
         const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(userShare)}`;
@@ -2306,10 +2323,7 @@
       }
 
       /**
-       * 1. Load Master Webinar Configuration (Zero-Egress Strategy)
-       */
-      /**
-       * 1. Load Master Webinar Configuration (Multi-Step Robust Strategy)
+       * 1. Load Master Webinar Configuration (Multi-Step Strategy)
        */
       async function loadMasterWebinarConfig() {
         let record = null;
@@ -2397,14 +2411,10 @@
       function renderVisualsAndKPIs() {
         const coverContainer = document.getElementById('wb_cover_container');
         if (coverContainer) {
-          if (webinarData.cover_image) {
-            coverContainer.innerHTML = `
-              <img src="${webinarData.cover_image}" alt="${webinarData.title}" class="wb-floating-cover-9-16">
-            `;
-          } else {
-            const miniTitle = document.getElementById('wb_card_mini_title');
-            if (miniTitle) miniTitle.textContent = webinarData.title;
-          }
+          const coverImg = webinarData.cover_image || '/images/banners/universal-zoom-webinar-og.jpg';
+          coverContainer.innerHTML = `
+            <img src="${coverImg}" alt="${webinarData.title}" class="wb-floating-cover-9-16" onerror="this.src='/images/banners/universal-zoom-webinar-og.jpg'">
+          `;
         }
 
         if (webinarData.kpis && webinarData.kpis.length > 0) {
@@ -2421,18 +2431,25 @@
 
         const bannersSection = document.getElementById('wb_banners_section');
         const bannersSlider = document.getElementById('wb_banners_slider');
-        if (webinarData.banners && webinarData.banners.length > 0 && bannersSlider && bannersSection) {
+        const bannersList = (webinarData.banners && webinarData.banners.length > 0) 
+          ? webinarData.banners 
+          : ['/images/banners/universal-zoom-webinar-og.jpg', '/images/banners/agriculture-hero-banner-1.webp', '/images/banners/agriculture-hero-banner-2.webp'];
+
+        if (bannersSlider && bannersSection) {
           bannersSection.style.display = 'block';
-          bannersSlider.innerHTML = webinarData.banners.map(bUrl => `
-            <img src="${bUrl}" alt="Webinar Banner" class="wb-banner-thumb">
+          bannersSlider.innerHTML = bannersList.map(bUrl => `
+            <img src="${bUrl}" alt="Webinar Banner" class="wb-banner-thumb" onerror="this.style.display='none'">
           `).join('');
         }
 
         const videosSection = document.getElementById('wb_videos_section');
         const ytGrid = document.getElementById('wb_youtube_grid');
-        if (webinarData.youtube_links && webinarData.youtube_links.length > 0 && ytGrid && videosSection) {
-          const validEmbeds = webinarData.youtube_links.map(url => extractYoutubeVideoId(url)).filter(Boolean);
+        const ytList = (webinarData.youtube_links && webinarData.youtube_links.length > 0)
+          ? webinarData.youtube_links
+          : ['https://www.youtube.com/watch?v=dQw4w9WgXcQ'];
 
+        if (ytGrid && videosSection) {
+          const validEmbeds = ytList.map(url => extractYoutubeVideoId(url)).filter(Boolean);
           if (validEmbeds.length > 0) {
             videosSection.style.display = 'block';
             ytGrid.innerHTML = validEmbeds.map(ytId => `
