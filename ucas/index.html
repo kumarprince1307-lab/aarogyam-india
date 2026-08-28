@@ -2153,7 +2153,77 @@
     <button type="button" onclick="sessionStorage.setItem('ai_profile_nudge_dismissed', 'true'); document.getElementById('profile100NudgePopup').style.display='none';" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
   </div>
 </div>
+  <main class="library-main" id="mainLibraryContent">
+    <div class="welcome-card-soft"
+      style="background: linear-gradient(135deg, #040a09 0%, #416406 100%); color: #fff; border-radius: 14px; padding: 25px; margin: 20px auto; max-width: 1200px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div>
+          <h2 style="font-size: 1.5rem; margin: 0 0 5px 0;">🌤️ Aarogyam India मौसम केंद्र</h2>
+          <p style="font-size: 0.95rem; opacity: 0.95; margin: 0;">अपने शहर या खेती की लोकेशन का सटीक लाइव
+            तापमान और मौसम हाल देखें</p>
+        </div>
+        <div style="display: flex; gap: 8px; width: 100%; max-width: 320px;">
+          <input type="text" id="citySearchInput" placeholder="शहर का नाम लिखें (जैसे - Rewa)..."
+            style="flex: 1; padding: 10px 14px; border: none; border-radius: 8px; outline: none; font-size: 0.9rem;">
+          <button id="citySearchBtn"
+            style="background: #081108; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">खोजें</button>
+        </div>
+      </div>
 
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px; background: rgba(255, 255, 255, 0.2); padding: 20px; border-radius: 12px; backdrop-filter: blur(6px);">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <img id="weatherIconImg" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Icon"
+            style="width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%;">
+          <div>
+            <h3 id="displayCityName" style="font-size: 1.3rem; margin: 0;">--</h3>
+            <p id="displayCountry" style="font-size: 0.85rem; margin: 2px 0 0 0; opacity: 0.9;">India</p>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">तापमान (Temperature)</div>
+          <div id="displayTemp" style="font-size: 2.2rem; font-weight: bold; margin-top: 2px;">--°C</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">मौसम स्थिति</div>
+          <div id="displayCondition"
+            style="font-size: 1.1rem; font-weight: bold; margin-top: 4px; text-transform: capitalize;">--
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- Mandi Quick Access KPI Card (Desktop Sidebar Fix) -->
+<div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 20px; color: #fff; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transition: all 0.3s ease; margin: 0 0 20px 0; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
+    
+    <!-- Background Watermark Icon -->
+    <div style="position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.1; pointer-events: none;">
+        <i class="fa-solid fa-seedling"></i>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 15px; z-index: 1; flex: 1; min-width: 0;">
+        <div style="width: 50px; height: 50px; min-width: 50px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #facc15;">
+            <i class="fa-solid fa-seedling"></i>
+        </div>
+        <div style="min-width: 0;">
+            <h3 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 700; color: #ffffff;">🌾 कृषि मंडी भाव व मौसम</h3>
+            <p style="margin: 0; font-size: 0.84rem; color: #a7f3d0;">लाइव थोक बाजार मूल्य और मौसम की जानकारी देखें</p>
+        </div>
+    </div>
+
+    <div style="z-index: 1; background: #10B981; color: #fff; width: 36px; height: 36px; min-width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-left: 10px;">
+        <i class="fa-solid fa-arrow-right"></i>
+    </div>
+</div>
+
+<style>
+    .mandi-kpi-access-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+</style>
+  
 <!-- UNIFIED AAROGYAM INDIA FOOTER -->
 <footer class="site-footer" style="background:#0f172a; color:#cbd5e1; padding:45px 20px 25px; margin-top:50px; border-top:3px solid transparent; border-image:linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;">
   <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:30px; margin-bottom:30px;">
@@ -2243,6 +2313,6 @@
 <script src="/js/book-promo-toast.js?v=19.0"></script>
 <script src="/js/user-notifications.js?v=19.0"></script>
 <script src="/ucas/js/ucas-app.js?v=19.0"></script>
-
+<script src="/js/weather.js"></script> <!-- यहाँ हमने मौसम वाली जेएस फाइल जोड़ दी है -->
 </body>
 </html>

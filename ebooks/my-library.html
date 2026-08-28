@@ -707,25 +707,25 @@
       </div>
     </div>
   </main>
-  <!-- Aarogyam India - Mandi Quick Access KPI Card -->
-<div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 20px; color: #fff; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transition: all 0.3s ease; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden;">
+  <!-- Mandi Quick Access KPI Card (Desktop Sidebar Fix) -->
+<div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 20px; color: #fff; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transition: all 0.3s ease; margin: 0 0 20px 0; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
     
     <!-- Background Watermark Icon -->
     <div style="position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.1; pointer-events: none;">
         <i class="fa-solid fa-seedling"></i>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 15px; z-index: 1;">
-        <div style="width: 50px; height: 50px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #facc15;">
+    <div style="display: flex; align-items: center; gap: 15px; z-index: 1; flex: 1; min-width: 0;">
+        <div style="width: 50px; height: 50px; min-width: 50px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #facc15;">
             <i class="fa-solid fa-seedling"></i>
         </div>
-        <div>
+        <div style="min-width: 0;">
             <h3 style="margin: 0 0 4px 0; font-size: 1.15rem; font-weight: 700; color: #ffffff;">🌾 कृषि मंडी भाव व मौसम</h3>
             <p style="margin: 0; font-size: 0.84rem; color: #a7f3d0;">लाइव थोक बाजार मूल्य और मौसम की जानकारी देखें</p>
         </div>
     </div>
 
-    <div style="z-index: 1; background: #10B981; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+    <div style="z-index: 1; background: #10B981; color: #fff; width: 36px; height: 36px; min-width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-left: 10px;">
         <i class="fa-solid fa-arrow-right"></i>
     </div>
 </div>
@@ -737,6 +737,7 @@
         border-color: rgba(255, 255, 255, 0.4);
     }
 </style>
+  
   <!-- 8. Sticky Bottom Timer & Deal Bar (Centered) -->
   <div class="sticky-action-bar">
     <div class="deal-timer-banner">
