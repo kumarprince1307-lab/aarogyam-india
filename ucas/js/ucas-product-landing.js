@@ -14,7 +14,7 @@
   let productPages = [];
   let editingProductId = null;
   let previewProductImageBase64 = '';
-  const LANDING_PAGES_ENABLED = false;
+  const LANDING_PAGES_ENABLED = true;
 
   function getLandingCategories() {
     try {
@@ -151,10 +151,7 @@
     const client = window.UCAS_DB?.getDb();
 
     // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
-    const LANDING_PAGES_ENABLED = false;
-    if (!LANDING_PAGES_ENABLED) {
-      return [];
-    }
+    const LANDING_PAGES_ENABLED = true;
 
     let fetched = [];
 

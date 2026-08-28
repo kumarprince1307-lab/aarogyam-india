@@ -1281,7 +1281,7 @@ export async function initAllLandingPages() {
   // LOAD DATA & POPULATE (Supabase + LocalStorage)
   // ==========================================
   // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
-  const LANDING_PAGES_ENABLED = false;
+  const LANDING_PAGES_ENABLED = true;
 
   async function loadData() {
     if (!LANDING_PAGES_ENABLED) {

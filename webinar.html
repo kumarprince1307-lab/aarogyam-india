@@ -2369,18 +2369,18 @@
 
         if (record) {
           const wb = record.webinar_data || {};
-          webinarData.title = record.title || webinarData.title;
-          webinarData.desc = record.message || webinarData.desc;
-          webinarData.zoom_link = wb.zoom_link || '';
-          webinarData.meeting_id = wb.meeting_id || '';
-          webinarData.passcode = wb.passcode || '';
+          webinarData.title = record.title || wb.title || webinarData.title;
+          webinarData.desc = record.message || wb.desc || webinarData.desc;
+          webinarData.zoom_link = wb.zoom_link || webinarData.zoom_link;
+          webinarData.meeting_id = wb.meeting_id || webinarData.meeting_id;
+          webinarData.passcode = wb.passcode || webinarData.passcode;
           webinarData.price = Number(wb.price !== undefined ? wb.price : (record.offer_price || 0));
           webinarData.duration_minutes = Number(wb.duration_minutes || 90);
-          webinarData.cover_image = wb.cover_image || record.thumbnail_url || '';
-          webinarData.banners = Array.isArray(wb.banners) ? wb.banners : (wb.banner_url ? [wb.banner_url] : []);
-          webinarData.youtube_links = Array.isArray(wb.youtube_links) ? wb.youtube_links : (record.media_url ? [record.media_url] : []);
-          webinarData.kpis = Array.isArray(wb.kpis) && wb.kpis.length ? wb.kpis : webinarData.kpis;
-          webinarData.faqs = Array.isArray(wb.faqs) && wb.faqs.length ? wb.faqs : webinarData.faqs;
+          webinarData.cover_image = wb.cover_image || record.thumbnail_url || webinarData.cover_image;
+          webinarData.banners = (Array.isArray(wb.banners) && wb.banners.length) ? wb.banners : (wb.banner_url ? [wb.banner_url] : webinarData.banners);
+          webinarData.youtube_links = (Array.isArray(wb.youtube_links) && wb.youtube_links.length) ? wb.youtube_links : (record.media_url ? [record.media_url] : webinarData.youtube_links);
+          webinarData.kpis = (Array.isArray(wb.kpis) && wb.kpis.length) ? wb.kpis : webinarData.kpis;
+          webinarData.faqs = (Array.isArray(wb.faqs) && wb.faqs.length) ? wb.faqs : webinarData.faqs;
 
           if (wb.date) {
             webinarData.datetime = formatHindiDateTime(wb.date, wb.time);

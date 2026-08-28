@@ -455,12 +455,9 @@
   }
 
   // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
-  const LANDING_PAGES_ENABLED = false;
+  const LANDING_PAGES_ENABLED = true;
 
   async function getLandingPages(profileId, forceRefresh = false) {
-    if (!LANDING_PAGES_ENABLED) {
-      return { success: true, data: [] };
-    }
 
     const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
     const validId = profileId && isUuid(profileId) ? profileId : '52ef705c-bb45-4137-bee4-a3f8df73b676';

@@ -67,7 +67,7 @@ function fetchLandingPageFromSupabase(lpId) {
 }
 
 // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
-const LANDING_PAGES_ENABLED = false;
+const LANDING_PAGES_ENABLED = true;
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
