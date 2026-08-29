@@ -7,11 +7,18 @@
   "scope": "/",
   "display": "standalone",
   "display_override": [
+    "tabbed",
     "window-controls-overlay",
     "standalone",
     "minimal-ui",
     "browser"
   ],
+  "tab_strip": {
+    "home_tab": "auto",
+    "new_tab_button": {
+      "url": "/index.html"
+    }
+  },
   "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#16a34a",
@@ -29,7 +36,29 @@
   ],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "prefer_related_applications": false,
-  "related_applications": [],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.aarogyamindia.app",
+      "id": "com.aarogyamindia.app"
+    },
+    {
+      "platform": "windows",
+      "url": "https://www.microsoft.com/store/apps/9NBLGGH4NNS1",
+      "id": "AarogyamIndia.App"
+    }
+  ],
+  "scope_extensions": [
+    {
+      "origin": "https://aarogyamindia.online"
+    },
+    {
+      "origin": "https://www.aarogyamindia.online"
+    }
+  ],
+  "note_taking": {
+    "new_note_url": "/ebooks/reader.html?action=new-note"
+  },
   "handle_links": "preferred",
   "launch_handler": {
     "client_mode": "auto"
@@ -37,6 +66,33 @@
   "edge_side_panel": {
     "preferred_width": 480
   },
+  "widgets": [
+    {
+      "name": "Aarogyam Mandi & Weather",
+      "short_name": "Mandi Widget",
+      "description": "Daily Mandi Bhav and Weather Forecast Widget",
+      "tag": "aarogyam-mandi-widget",
+      "template": "widget-template",
+      "ms_ac_template": "widget-adaptive-card.json",
+      "data": "https://aarogyamindia.online/data/books.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/images/screenshots/screenshot-mobile-1.png",
+          "sizes": "750x1334",
+          "label": "Mandi Widget Preview"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/images/icons/pwa-icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ],
+      "auth": false,
+      "update": 86400
+    }
+  ],
   "icons": [
     {
       "src": "/images/icons/pwa-icon-16x16.png",
