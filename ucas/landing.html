@@ -996,11 +996,6 @@
     </div>
   </main>
 
-  <!-- Floating WhatsApp Support Button -->
-  <a id="pub_wa_floating_btn" href="#" target="_blank" class="pub-wa-float-btn" title="WhatsApp पर संपर्क करें">
-    <i class="fa-brands fa-whatsapp"></i>
-  </a>
-
   <!-- =========================================================================
        4. PUBLIC WEBSITE FOOTER
        ========================================================================= -->
@@ -1576,9 +1571,7 @@
         const waLink = `https://wa.me/${creatorPhone}?text=${encodeURIComponent(waText)}`;
 
         const waBtn = document.getElementById('lp_btn_whatsapp_cta');
-        const floatWaBtn = document.getElementById('pub_wa_floating_btn');
         if (waBtn) waBtn.href = waLink;
-        if (floatWaBtn) floatWaBtn.href = waLink;
 
         // Header Free Join dynamic attribution link
         const freeJoinBtn = document.getElementById('pub_btn_free_join');

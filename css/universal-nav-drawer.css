@@ -1,0 +1,839 @@
+/**
+ * ====================================================================
+ * AAROGYAM INDIA - ULTRA FAST 60FPS DRAWER & ACCORDION SYSTEM
+ * Version: 18.0 (Zero Lag, High Floating Stack, Ultra Smooth Accordions)
+ * ====================================================================
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+/* Backdrop Blur Overlay */
+#universal-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 9999998 !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+#universal-drawer-backdrop.open {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Base Drawer Card Structure */
+#universal-drawer-card {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 86vw;
+  height: 100vh;
+  height: 100dvh;
+  background: #ffffff;
+  color: #1e293b;
+  z-index: 9999999 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  font-family: 'Outfit', 'Noto Sans Devanagari', 'Poppins', sans-serif;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s ease;
+  pointer-events: none;
+  visibility: hidden;
+  will-change: transform;
+}
+
+/* DESKTOP (Width >= 768px): Slides in from LEFT */
+@media (min-width: 768px) {
+  #universal-drawer-card {
+    left: 0;
+    right: auto;
+    transform: translate3d(-100%, 0, 0);
+    border-right: 2px solid #0f172a;
+  }
+}
+
+/* MOBILE (Width < 768px): Slides in from RIGHT */
+@media (max-width: 767px) {
+  #universal-drawer-card {
+    right: 0;
+    left: auto;
+    transform: translate3d(100%, 0, 0);
+    border-left: 2px solid #0f172a;
+  }
+}
+
+/* Open State for Drawer Card */
+#universal-drawer-card.open {
+  transform: translate3d(0, 0, 0) !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+/* Sleek Black User Profile Header Area */
+.drawer-profile-header {
+  background: linear-gradient(135deg, #090d16 0%, #0f172a 60%, #1e293b 100%);
+  color: #ffffff;
+  padding: 20px 16px 16px 16px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+  border-bottom: 1.5px solid #334155;
+}
+
+.drawer-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.drawer-close-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  transform: rotate(90deg);
+}
+
+.drawer-avatar-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  border: 2px solid #fde047;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.drawer-user-meta {
+  flex: 1;
+  overflow: hidden;
+}
+
+.drawer-user-name {
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: #ffffff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.drawer-user-role {
+  font-size: 0.75rem;
+  color: #fef08a;
+  font-weight: 800;
+  display: inline-block;
+  margin-top: 3px;
+}
+
+/* Accordion Parent Main Menu Row */
+.drawer-menu-list {
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.drawer-nav-item-btn {
+  width: 100%;
+  background: transparent;
+  color: #334155;
+  border: none;
+  border-radius: 12px;
+  padding: 11px 12px;
+  font-size: 0.94rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+  text-align: left;
+  text-decoration: none;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.drawer-nav-item-btn * {
+  pointer-events: none;
+}
+
+.drawer-nav-item-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.drawer-nav-item-btn:active {
+  transform: scale(0.98);
+}
+
+/* Active Highlight Pill */
+.drawer-nav-item-btn.active-pill {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.35);
+}
+
+.drawer-nav-item-btn.active-pill .drawer-item-icon {
+  color: #ffffff !important;
+}
+
+.drawer-nav-item-btn.active-pill .drawer-accordion-arrow {
+  color: #ffffff !important;
+}
+
+/* Accordion Arrow with 3D Rotation */
+.drawer-accordion-arrow {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  transition: transform 0.22s ease, color 0.18s ease;
+}
+
+.drawer-nav-item-btn.accordion-open .drawer-accordion-arrow {
+  transform: rotate(180deg);
+  color: #0f172a;
+}
+
+/* Instant-Expand Submenu Panel */
+.drawer-submenu-panel {
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin: 3px 0 6px 0;
+  padding: 6px;
+  border: 1.5px solid #e2e8f0;
+  animation: drawerSubmenuIn 0.18s ease-out;
+}
+
+.drawer-submenu-panel.open {
+  display: flex !important;
+}
+
+@keyframes drawerSubmenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Submenu Links */
+.drawer-sub-link-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  color: #334155;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+}
+
+.drawer-sub-link-item:hover {
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 800;
+  padding-left: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.drawer-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drawer-item-icon {
+  font-size: 1.15rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.drawer-cat-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* -------------------------------------------------------------
+   STICKY FLOATING ACTIONS CONTAINER (FIXED RIGHT CORNER)
+   ------------------------------------------------------------- */
+.sticky-float-widget-container {
+  position: fixed;
+  right: 18px;
+  bottom: 28px;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 999990 !important;
+}
+
+.sticky-float-pill {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #ffffff !important;
+  padding: 10px 16px;
+  border-radius: 30px;
+  text-decoration: none !important;
+  font-weight: 900;
+  font-size: 0.85rem;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  user-select: none;
+}
+
+.sticky-float-pill:hover {
+  transform: translate3d(0, -3px, 0) scale(1.04);
+  box-shadow: 0 12px 28px rgba(37, 211, 102, 0.6);
+  color: #ffffff !important;
+}
+
+/* Red Sticky Install App Button */
+.sticky-float-install-pill {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.5) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+.sticky-float-install-pill:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  box-shadow: 0 12px 28px rgba(220, 38, 38, 0.7) !important;
+}
+
+/* Blue Share Referral Button */
+.sticky-float-share-pill {
+  background: #1d4ed8 !important;
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.45) !important;
+}
+
+.sticky-float-share-pill:hover {
+  box-shadow: 0 12px 28px rgba(29, 78, 216, 0.6) !important;
+}
+
+/* Mobile Screen Floating Stack (Lifted higher to eliminate bottom overlap) */
+@media (max-width: 768px) {
+  .sticky-float-widget-container {
+    right: 12px;
+    bottom: 74px !important; /* Safely floating above the 60px bottom sticky nav */
+    gap: 8px;
+  }
+  .sticky-float-pill {
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    border-radius: 25px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* =============================================================
+   UNIVERSAL MOBILE STICKY BOTTOM 8-TAB NAVIGATION BAR
+   ============================================================= */
+.universal-mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .universal-mobile-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: 60px !important;
+    background: #ffffff !important;
+    border-top: 1.5px solid #e2e8f0 !important;
+    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.08) !important;
+    z-index: 99999 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 3px 6px calc(3px + env(safe-area-inset-bottom)) 6px !important;
+    box-sizing: border-box !important;
+    gap: 3px !important;
+  }
+
+  .universal-mobile-bottom-nav::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .u-nav-tab {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #64748b !important;
+    text-decoration: none !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    flex-shrink: 0 !important;
+    min-width: 56px !important;
+    padding: 3px 5px !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    border: none !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+  }
+
+  .u-nav-tab .u-icon-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 24px !important;
+    border-radius: 8px !important;
+    margin-bottom: 2px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .u-nav-tab i {
+    font-size: 1.05rem !important;
+    color: #475569 !important;
+  }
+
+  .u-nav-tab span {
+    color: #475569 !important;
+    line-height: 1.1 !important;
+    font-size: 0.68rem !important;
+  }
+
+  /* Active Tab Soft Green Pill (Matches Screenshot) */
+  .u-nav-tab.active {
+    background: #e8f5e9 !important;
+  }
+
+  .u-nav-tab.active .u-icon-wrap {
+    background: #dcfce7 !important;
+  }
+
+  .u-nav-tab.active i {
+    color: #15803d !important;
+    transform: scale(1.08) !important;
+  }
+
+  .u-nav-tab.active span {
+    color: #15803d !important;
+    font-weight: 800 !important;
+  }
+
+  body {
+    padding-bottom: 75px !important;
+  }
+}
+
+/* ====================================================================
+   RECENT PURCHASE TOAST & NETFLIX-STYLE 3D MINI POPUP SYSTEM
+   ==================================================================== */
+#ai-live-purchase-toast-container {
+  position: fixed !important;
+  left: 20px !important;
+  bottom: 28px !important;
+  z-index: 999990 !important;
+  pointer-events: auto !important;
+  font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif !important;
+}
+
+@media (max-width: 768px) {
+  #ai-live-purchase-toast-container {
+    left: 12px !important;
+    bottom: 84px !important; /* Floats safely above the 8-tab bottom nav */
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+
+/* Netflix-Style 3D Mini Popup Card */
+.netflix-3d-popup-wrap {
+  position: fixed !important;
+  right: 24px !important;
+  bottom: 28px !important;
+  z-index: 999995 !important;
+  perspective: 1200px !important;
+  pointer-events: auto !important;
+  font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif !important;
+}
+
+@media (max-width: 768px) {
+  .netflix-3d-popup-wrap {
+    right: 12px !important;
+    left: 12px !important;
+    bottom: 84px !important; /* Safely floats above mobile 8-tab bottom nav */
+    display: flex !important;
+    justify-content: center !important;
+  }
+}
+
+.netflix-3d-popup-card {
+  background: linear-gradient(145deg, #111111 0%, #1c1917 40%, #090d16 100%) !important;
+  color: #ffffff !important;
+  border: 1.5px solid rgba(220, 38, 38, 0.45) !important;
+  border-top: 4px solid #dc2626 !important;
+  border-radius: 20px !important;
+  padding: 16px 18px !important;
+  width: 360px !important;
+  max-width: 100% !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 25px rgba(220, 38, 38, 0.25) !important;
+  position: relative !important;
+  transform: perspective(1000px) rotateX(16deg) scale3d(0.88, 0.88, 0.88) translateY(30px) !important;
+  opacity: 0 !important;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease !important;
+}
+
+.netflix-3d-popup-card.show {
+  transform: perspective(1000px) rotateX(0deg) scale3d(1, 1, 1) translateY(0) !important;
+  opacity: 1 !important;
+}
+
+.netflix-3d-popup-card.hide {
+  transform: perspective(1000px) rotateX(-16deg) scale3d(0.85, 0.85, 0.85) translateY(20px) !important;
+  opacity: 0 !important;
+}
+
+.netflix-popup-close-btn {
+  position: absolute !important;
+  top: 8px !important;
+  right: 10px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
+  color: #cbd5e1 !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.1rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.netflix-popup-close-btn:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  transform: rotate(90deg) !important;
+}
+
+.netflix-badge-tag {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  font-size: 0.68rem !important;
+  font-weight: 900 !important;
+  padding: 3px 8px !important;
+  border-radius: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.netflix-popup-btn-cta {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 25px !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.netflix-popup-btn-cta:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.6) !important;
+}
+
+/* ==========================================================================
+   PERMANENTLY SUPPRESS LEGACY FLOATING WHATSAPP BUTTONS
+   (Prevents duplicate buttons from hiding behind the 3 Universal Action Buttons)
+   ========================================================================== */
+.whatsapp-float,
+#whatsappFloatBtn,
+.whatsapp-float-btn {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* ==========================================================================
+   UNIVERSAL CARD ACTION BUTTONS (4 BUTTON GRID)
+   ========================================================================== */
+.card-actions-container {
+  margin-top: auto;
+  width: 100%;
+}
+.card-actions-grid-2x2 {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.btn-card-cart-blue {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.82rem !important;
+  padding: 10px 8px !important;
+  border-radius: 10px !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+}
+.btn-card-cart-blue:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45) !important;
+}
+
+.btn-card-buy-orange {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  font-size: 0.82rem !important;
+  padding: 10px 8px !important;
+  border-radius: 10px !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3) !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+}
+.btn-card-buy-orange:hover {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.45) !important;
+}
+
+.btn-card-share-green {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.78rem !important;
+  padding: 8px 6px !important;
+  border-radius: 10px !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  box-shadow: 0 3px 10px rgba(22, 163, 74, 0.25) !important;
+  transition: all 0.2s ease !important;
+}
+.btn-card-share-green:hover {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 14px rgba(22, 163, 74, 0.4) !important;
+}
+
+.btn-card-share-channels {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.78rem !important;
+  padding: 8px 6px !important;
+  border-radius: 10px !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  box-shadow: 0 3px 10px rgba(5, 150, 105, 0.25) !important;
+  transition: all 0.2s ease !important;
+}
+.btn-card-share-channels:hover {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 14px rgba(5, 150, 105, 0.4) !important;
+}
+
+/* ==========================================================================
+   5-BUTTON TRANSPARENT SOCIAL SHARE MODAL
+   ========================================================================== */
+.ai-share-drawer-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 99999999 !important;
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  opacity: 0;
+  transition: opacity 0.25s ease !important;
+}
+.ai-share-drawer-overlay.active {
+  opacity: 1 !important;
+}
+
+.ai-share-buttons-stack {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 400px !important;
+  transform: scale(0.92) translateY(20px) !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.ai-share-drawer-overlay.active .ai-share-buttons-stack {
+  transform: scale(1) translateY(0) !important;
+}
+
+.ai-share-btn-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 14px 18px !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
+  text-decoration: none !important;
+  color: #0f172a !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+}
+.ai-share-btn-item:hover, .ai-share-btn-item:active {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+.ai-share-btn-item.ch-whatsapp:hover { border-color: #25D366 !important; }
+.ai-share-btn-item.ch-facebook:hover { border-color: #1877F2 !important; }
+.ai-share-btn-item.ch-twitter:hover { border-color: #000000 !important; }
+.ai-share-btn-item.ch-telegram:hover { border-color: #229ED9 !important; }
+.ai-share-btn-item.ch-copylink:hover { border-color: #2563eb !important; }
+
+.ai-share-icon-wrap {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.35rem !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+.ai-share-btn-text {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+}
+.ai-share-btn-text strong {
+  font-size: 0.98rem !important;
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+}
+.ai-share-btn-text span {
+  font-size: 0.76rem !important;
+  color: #64748b !important;
+  margin-top: 2px !important;
+}
+
+.ai-share-arrow {
+  color: #94a3b8 !important;
+  font-size: 0.9rem !important;
+  transition: transform 0.2s !important;
+}
+.ai-share-btn-item:hover .ai-share-arrow {
+  transform: translateX(3px) !important;
+  color: #0f172a !important;
+}
+
+.ai-share-copy-badge {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 8px 14px !important;
+  font-weight: 800 !important;
+  font-size: 0.8rem !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3) !important;
+}
+.ai-share-copy-badge:hover {
+  background: #1d4ed8 !important;
+  transform: scale(1.04) !important;
+}
+
+
+
+

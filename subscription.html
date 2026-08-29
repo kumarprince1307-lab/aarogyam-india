@@ -12,6 +12,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/user-notifications.css">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css">
+  <link rel="stylesheet" href="/css/home-revamp.css">
 
   <style>
     :root {
@@ -55,66 +58,6 @@
         linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
       pointer-events: none;
       z-index: 0;
-    }
-
-    .container {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 0 20px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Navbar */
-    .navbar {
-      padding: 20px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: #fff;
-    }
-
-    .brand-logo img {
-      height: 44px;
-      filter: drop-shadow(0 2px 8px var(--primary-glow));
-    }
-
-    .brand-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .nav-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .btn-outline {
-      padding: 8px 18px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: transparent;
-      color: #fff;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    .btn-outline:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: #fff;
     }
 
     /* Hero Section */
@@ -430,21 +373,60 @@
   </style>
 </head>
 <body>
+
+  <!-- =========================================
+       1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
+  ========================================== -->
+  <div class="home-live-ticker-wrap">
+    <div class="container home-ticker-flex">
+      <div class="ticker-pulse-badge">
+        <span class="ticker-dot-pulse"></span>
+        <span>LIVE</span>
+      </div>
+      <div class="ticker-marquee-scroll">
+        ⚡ <span>किसान भाइयों का भरोसा!</span> &nbsp;•&nbsp; 📖 <span>आज 1,420+ ई-बुक्स डाउनलोड हुईं</span> &nbsp;•&nbsp; 🌾 <span>दैनिक मंडी भाव व मौसम अपडेट लाइव</span> &nbsp;•&nbsp; 👨‍🌾 <span>24×7 WhatsApp AI एक्सपर्ट परामर्श सक्रिय</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       2. ANIMATED INDIAN TIRANGA WAVING HEADER
+  ========================================== -->
+  <header class="header-tiranga-animated">
+    <div class="container header-container" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
+      
+      <!-- Brand Logo + Name + Active Page Badge -->
+      <a href="/index.html" class="header-brand-wrap" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+        <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:40px;width:auto;" />
+        <div style="display:flex;flex-direction:column;">
+          <span style="font-size:1.15rem;font-weight:900;color:#0f172a;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;line-height:1.1;">AAROGYAM <span style="color:#2563eb;">INDIA</span></span>
+          <span style="font-size:0.7rem;font-weight:700;color:#15803d;letter-spacing:0.5px;">डिजिटल क्रांति • समृद्ध किसान</span>
+        </div>
+        <span class="header-current-page-badge" style="background:#0f172a;color:#fde047;font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:12px;margin-left:6px;">👑 VIP पास</span>
+      </a>
+
+      <!-- Header Actions Right: Install App, Cart, 3-Line Menu -->
+      <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+          <span>📲</span> <span>Install App</span>
+        </button>
+
+        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
+          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
+        </a>
+
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
   <div class="bg-grid"></div>
 
   <div class="container">
-    <!-- Navbar -->
-    <header class="navbar">
-      <a href="/index.html" class="brand-logo">
-        <img src="/images/logo/logo.png" alt="Aarogyam India" onerror="this.style.display='none'">
-        <span class="brand-title">Aarogyam <span style="color:var(--primary);">India</span></span>
-      </a>
-      <div class="nav-actions">
-        <a href="/ucas/index.html" class="btn-outline">
-          <i class="fa-solid fa-house-user"></i> My Profile
-        </a>
-      </div>
-    </header>
 
     <!-- Hero -->
     <section class="hero">
@@ -626,15 +608,70 @@
       </table>
     </section>
 
-    <!-- Footer -->
-    <footer>
-      <p>© 2026 Aarogyam India. All rights reserved. | <a href="/terms.html" style="color:var(--text-muted);">Terms & Privacy</a></p>
+    <!-- =========================================
+         15. MODERN DARK FOOTER
+    ========================================== -->
+    <footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b; margin-top: 50px;">
+      <div class="container">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
+          
+          <!-- About Column -->
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:42px;width:auto;" />
+              <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#38bdf8;">INDIA</span></span>
+            </div>
+            <p style="font-size:0.85rem;color:#94a3b8;line-height:1.55;">
+              Aarogyam India - भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य, पशु पोषण और डायरेक्ट सेलिंग ज्ञान मंच।
+            </p>
+          </div>
+
+          <!-- Quick Links -->
+          <div>
+            <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">त्वरित लिंक्स</h3>
+            <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+              <li><a href="/index.html" style="color:#94a3b8;">🏠 मुख्य पृष्ठ</a></li>
+              <li><a href="/ebooks/ebook.html" style="color:#94a3b8;">📚 ई-बुक स्टोर</a></li>
+              <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;">🌱 कृषि हब</a></li>
+              <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;">🌾 खरीफ मास्टर गाइड 2026</a></li>
+              <li><a href="/ebooks/kheti-dr.html" style="color:#94a3b8;">🩺 खेती का डॉक्टर</a></li>
+            </ul>
+          </div>
+
+          <!-- Utilities -->
+          <div>
+            <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सेवाएं व टूल्स</h3>
+            <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+              <li><a href="/crop-doctor.html" style="color:#94a3b8;">🔬 फसल डॉक्टर AI</a></li>
+              <li><a href="/mandi.html" style="color:#94a3b8;">🌾 लाइव मंडी भाव</a></li>
+              <li><a href="/weather.html" style="color:#94a3b8;">⛅ मौसम पूर्वानुमान</a></li>
+              <li><a href="/webinar.html" style="color:#94a3b8;">📺 लाइव वेबिनार हब</a></li>
+              <li><a href="/subscription.html" style="color:#94a3b8;">👑 Pro VIP पास</a></li>
+            </ul>
+          </div>
+
+          <!-- Contact Support -->
+          <div>
+            <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सहायता केंद्र</h3>
+            <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
+            <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
+            <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
+            <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 सहायता')" class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;background:#dc2626;color:#fff;border:none;border-radius:20px;font-weight:800;cursor:pointer;">
+              <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
+            </button>
+          </div>
+
+        </div>
+
+        <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
+          © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+        </div>
+      </div>
     </footer>
   </div>
 
-  <script>
-    // Record interaction
-    console.log('✅ Subscription Page Loaded.');
-  </script>
+  <script src="/js/user-notifications.js"></script>
+  <script src="/js/universal-nav-drawer.js"></script>
+  <script src="/js/recent-purchase-toast.js"></script>
 </body>
 </html>

@@ -4,6 +4,27 @@
       "id": "BK001",
       "slug": "kharif-2026",
       "status": "active",
+      "category": "Agriculture",
+      "theme_primary": "#2E7D32",
+      "theme_dark": "#1B5E20",
+      "cover_effect": "3d_float",
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help"
+      ],
       "hero": {
         "tag": "🌾 Bestseller Agriculture eBook",
         "title": "खरीफ फसल मास्टर गाइड 2026",
@@ -17,10 +38,22 @@
         "banner_image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
         "cover_image": "/images/books/kharif-master-guide-2026-cover.webp",
         "features": [
-          { "icon": "fa-seedling", "text": "150+ रंगीन पेज" },
-          { "icon": "fa-camera", "text": "300+ वास्तविक फोटो" },
-          { "icon": "fa-circle-check", "text": "Scientific Guide" },
-          { "icon": "fa-gift", "text": "Free Bonus PDF" }
+          {
+            "icon": "fa-seedling",
+            "text": "150+ रंगीन पेज"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ वास्तविक फोटो"
+          },
+          {
+            "icon": "fa-circle-check",
+            "text": "Scientific Guide"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Bonus PDF"
+          }
         ]
       },
       "timer": {
@@ -34,29 +67,48 @@
         "title": "🎥 इस पुस्तक में आपको क्या-क्या मिलेगा? (Video Overview)",
         "description": "खरीफ फसलों की सुरक्षा और वैज्ञानिक खेती के गुर सीखें सीधे कृषि विशेषज्ञों से।"
       },
+      "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "🎥 खरीफ फसल मास्टर गाइड - वीडियो डेमो",
+          "ratio": "16:9"
+        }
+      ],
       "value_stack": {
-        "title": "🎁 इस विशेष ऑफर में आपको क्या-क्या मिल रहा है?",
-        "items": [
-          { "title": "📖 खरीफ फसल मास्टर गाइड 2026 (Full PDF)", "value": 499 },
-          { "title": "🌱 बीज उपचार व कीट नियंत्रण मास्टर चार्ट", "value": 299 },
-          { "title": "💧 जैविक स्प्रे शेड्यूल व पोषण फॉर्मूला", "value": 399 },
-          { "title": "🔄 लाइफटाइम फ्री डिजिटल अपडेट्स", "value": 499 },
-          { "title": "💬 1-on-1 कृषि WhatsApp हेल्पडेस्क सपोर्ट", "value": 499 }
-        ],
-        "total_market_value": 2195,
-        "today_price": 99,
+        "book_mrp": 299,
+        "vip_value": 1999,
+        "bonus_value": 199,
+        "offer_price": 99,
+        "vip_banner": "/images/banners/farmer-community-banner.jpeg",
         "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए यह गाइड उनके प्लान में 100% मुफ्त शामिल है।"
       },
       "why_read": {
-        "title": "यह पुस्तक क्यों पढ़ें?",
+        "title": "यह पुस्तक क्यों खरीदें?",
         "subtitle": "खेती की लागत 30% तक कम करें और पैदावार 25% तक बढ़ाएं।",
         "cards": [
-          { "icon": "fa-microscope", "title": "रोगों की तुरंत सटीक पहचान", "desc": "300+ रंगीन हाई-क्वालिटी फोटो की मदद से फसल के रोग और कीट को शुरुआती अवस्था में ही पहचानें।" },
-          { "icon": "fa-flask-vial", "title": "संतुलित पोषण व खाद प्रबंधन", "desc": "कब, कौन सी खाद और कितनी मात्रा में देनी है, इसकी संपूर्ण वैज्ञानिक तालिका।" },
-          { "icon": "fa-shield-halved", "title": "कीट व इल्ली का 100% नियंत्रण", "desc": "रासायनिक और जैविक दोनों पद्धतियों से बिना फसल नुकसान के रोकथाम के अचूक नुस्खे।" },
-          { "icon": "fa-indian-rupee-sign", "title": "लागत में भारी बचत", "desc": "दुकानदारों के अनावश्यक खर्चों से बचें और सही मात्रा में सही दवा का प्रयोग करें।" }
+          {
+            "icon": "🌱",
+            "title": "वैज्ञानिक जानकारी",
+            "desc": "300+ रंगीन हाई-क्वालिटी फोटो की मदद से फसल के रोग और कीट को शुरुआती अवस्था में ही पहचानें।"
+          },
+          {
+            "icon": "📷",
+            "title": "300+ वास्तविक फोटो",
+            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
+          },
+          {
+            "icon": "📘",
+            "title": "Step by Step Guide",
+            "desc": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।"
+          },
+          {
+            "icon": "🎁",
+            "title": "Free Bonus PDF",
+            "desc": "इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।"
+          }
         ]
       },
+      "preview_banner": "/images/banners/kharif-master-guide-2026-preview-banner.webp",
       "demo_images": [
         "/images/books/kharif-master-guide-2026-preview-01.webp",
         "/images/books/kharif-master-guide-2026-preview-02.webp",
@@ -64,22 +116,129 @@
         "/images/books/kharif-master-guide-2026-preview-04.webp",
         "/images/books/kharif-master-guide-2026-preview-05.webp"
       ],
+      "suggested_books_list": [
+        {
+          "image": "/images/books/fasal-ka-doctor-cover.webp",
+          "title": "खेती का डॉक्टर (Pocket Doctor)",
+          "offerPrice": 99,
+          "mrp": 299,
+          "link": "BK002"
+        }
+      ],
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help बटन पर क्लिक करें और तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_points": [
+        "24×7 WhatsApp Support",
+        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+        "📖 किताब की जानकारी समझने में सहायता",
+        "🌱 फसल संबंधी सवाल",
+        "📱 Mobile Friendly PDF & Lifetime Access"
+      ],
+      "table_of_contents": [
+        "बीज उपचार",
+        "खेत की तैयारी",
+        "बुवाई की वैज्ञानिक विधि",
+        "उर्वरक प्रबंधन",
+        "खरपतवार नियंत्रण",
+        "रोग एवं कीट प्रबंधन",
+        "पोषक तत्वों की कमी",
+        "स्प्रे चार्ट",
+        "IPM तकनीक",
+        "अधिक उत्पादन के उपाय",
+        "विशेषज्ञ सुझाव"
+      ],
       "testimonials": [
-        { "name": "पवन पांडे", "location": "सागर, मध्य प्रदेश", "rating": 5, "comment": "सरल भाषा और वास्तविक फोटो के कारण फसलों के रोग पहचानना बहुत आसान हो गया। मेरी सोयाबीन की फसल बच गई।" },
-        { "name": "तरुण कुमार मिश्रा", "location": "वाराणसी, उत्तर प्रदेश", "rating": 5, "comment": "कृषि विद्यार्थियों और प्रगतिशील किसानों के लिए यह एक बेहतरीन Practical Guide है।" },
-        { "name": "माखन दाऊ", "location": "गुना, मध्य प्रदेश", "rating": 5, "comment": "मात्र ₹99 में इतनी बहुमूल्य और प्रामाणिक जानकारी मिलना वास्तव में शानदार है।" }
+        {
+          "name": "पवन पांडे",
+          "location": "सागर, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "सरल भाषा और वास्तविक फोटो के कारण फसलों के रोग पहचानना बहुत आसान हो गया। मेरी सोयाबीन की फसल बच गई।"
+        },
+        {
+          "name": "अनिता शर्मा",
+          "location": "उदयपुर, राजस्थान",
+          "rating": 5,
+          "gender": "female",
+          "comment": "पौधों के पोषण और स्प्रे की सही मात्रा सीखने के लिए यह सबसे अच्छी किताब है।"
+        },
+        {
+          "name": "तरुण कुमार मिश्रा",
+          "location": "वाराणसी, उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "कृषि विद्यार्थियों और प्रगतिशील किसानों के लिए यह एक बेहतरीन Practical Guide है।"
+        },
+        {
+          "name": "माखन दाऊ",
+          "location": "गुना, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "मात्र ₹99 में इतनी बहुमूल्य और प्रामाणिक जानकारी मिलना वास्तव में शानदार है।"
+        }
       ],
       "faqs": [
-        { "q": "खरीदने के तुरंत बाद मुझे पुस्तक कैसे मिलेगी?", "a": "भुगतान पूरा होते ही आपको तुरंत Instant Download लिंक मिलेगा और यह आपके 'My Library' डैशबोर्ड में लाइफटाइम के लिए जुड़ जाएगी।" },
-        { "q": "क्या मैं इसे अपने मोबाइल में ऑफलाइन पढ़ सकता हूँ?", "a": "हाँ, यह एक Mobile Friendly PDF है जिसे आप डाउनलोड करके बिना इंटरनेट कभी भी पढ़ सकते हैं।" },
-        { "q": "क्या भविष्य में इस पुस्तक के नए संस्करण का अपडेट मिलेगा?", "a": "हाँ, आरोग्यम इंडिया द्वारा जारी किए जाने वाले सभी डिजिटल अपडेट्स आपको मुफ्त उपलब्ध कराए जाएंगे।" }
+        {
+          "q": "खरीदने के तुरंत बाद मुझे पुस्तक कैसे मिलेगी?",
+          "a": "भुगतान पूरा होते ही आपको तुरंत Instant Download लिंक मिलेगा और यह आपके 'My Library' डैशबोर्ड में लाइफटाइम के लिए जुड़ जाएगी।"
+        },
+        {
+          "q": "क्या मैं इसे अपने मोबाइल में ऑफलाइन पढ़ सकता हूँ?",
+          "a": "हाँ, यह एक Mobile Friendly PDF है जिसे आप डाउनलोड करके बिना इंटरनेट कभी भी पढ़ सकते हैं।"
+        },
+        {
+          "q": "क्या मुझे किताब बार-बार डाउनलोड करनी पड़ेगी?",
+          "a": "❌ नहीं। एक बार खरीदने के बाद आप Lifetime Access के साथ Reader में सीधे मोबाइल पर पढ़ सकते हैं।"
+        },
+        {
+          "q": "क्या भविष्य में इस पुस्तक के नए संस्करण का अपडेट मिलेगा?",
+          "a": "हाँ, आरोग्यम इंडिया द्वारा जारी किए जाने वाले सभी डिजिटल अपडेट्स आपको मुफ्त उपलब्ध कराए जाएंगे।"
+        }
       ],
-      "whatsapp_prompt": "नमस्ते, मुझे 'खरीफ फसल मास्टर गाइड 2026' के बारे में और जानकारी चाहिए।"
+      "whatsapp_prompt": "नमस्ते, मुझे 'खरीफ फसल मास्टर गाइड 2026' के बारे में और जानकारी चाहिए।",
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true
     },
     {
       "id": "BK002",
       "slug": "fasal-ka-doctor",
       "status": "active",
+      "category": "Agriculture",
+      "store_badge": "best_seller",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "theme_primary": "#2E7D32",
+      "theme_dark": "#1B5E20",
+      "cover_effect": "3d_float",
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help"
+      ],
       "hero": {
         "tag": "🩺 Agriculture Clinic & Diagnostic",
         "title": "खेती का डॉक्टर (Pocket Doctor)",
@@ -93,10 +252,22 @@
         "banner_image": "/images/banners/kheti-dr-banner-1.webp",
         "cover_image": "/images/books/fasal-ka-doctor-cover.webp",
         "features": [
-          { "icon": "fa-user-doctor", "text": "120 पेज पॉकेट डॉक्टर" },
-          { "icon": "fa-camera", "text": "300+ फोटो सहित" },
-          { "icon": "fa-vial", "text": "pH-EC व मिट्टी सुधार" },
-          { "icon": "fa-gift", "text": "फ्री स्प्रे चार्ट" }
+          {
+            "icon": "fa-seedling",
+            "text": "120 पेज की प्रीमियम"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ फोटो"
+          },
+          {
+            "icon": "fa-circle-check",
+            "text": "Spray Science"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Bonus PDF"
+          }
         ]
       },
       "timer": {
@@ -127,28 +298,40 @@
         }
       ],
       "value_stack": {
-        "title": "🎁 इस संपूर्ण क्लिनिकल किट में आपको क्या मिलेगा?",
-        "items": [
-          { "title": "📖 खेती का डॉक्टर संपूर्ण गाइड (Full PDF)", "value": 499 },
-          { "title": "🍂 पोषक तत्व कमी पहचान विजुअल एल्बम", "value": 299 },
-          { "title": "💧 वाटर pH-EC व स्प्रे अनुकूलता चार्ट", "value": 299 },
-          { "title": "🔄 लाइफटाइम फ्री डिजिटल अपडेट्स", "value": 499 },
-          { "title": "💬 व्हाट्सएप डॉक्टर हेल्पलाइन सपोर्ट", "value": 499 }
-        ],
-        "total_market_value": 2095,
-        "today_price": 99,
+        "book_mrp": 299,
+        "vip_value": 1999,
+        "bonus_value": 199,
+        "offer_price": 99,
+        "vip_banner": "/images/banners/farmer-community-banner.jpeg",
         "subscriber_perk": "👑 VIP सब्सक्राइबर्स के लिए अनलिमिटेड एक्सेस।"
       },
       "why_read": {
-        "title": "यह गाइड क्यों जरूरी है?",
+        "title": "यह पुस्तक क्यों खरीदें?",
         "subtitle": "दुकानदार पर निर्भरता खत्म करें और खुद सटीक इलाज करें।",
         "cards": [
-          { "icon": "fa-stethoscope", "title": "सटीक डायग्नोसिस", "desc": "पत्तियों के पीलेपन, काले धब्बों या मुड़ने के असली कारण को पहचानें।" },
-          { "icon": "fa-pills", "title": "सटीक दवा व सही खुराक", "desc": "कीटनाशक, फंगीसाइड व टॉनिक की सही मात्रा की प्रामाणिक जानकारी।" },
-          { "icon": "fa-droplet", "title": "पानी का pH व स्प्रे तकनीक", "desc": "दवा का 100% असर लेने के लिए पानी की गुणवत्ता सुधारने के टिप्स।" },
-          { "icon": "fa-shield-halved", "title": "जैविक एवं रसायनिक समाधान", "desc": "प्राकृतिक एवं आधुनिक दोनों पद्धतियों का संतुलित उपयोग।" }
+          {
+            "icon": "🌱",
+            "title": "फसल स्वास्थ्य",
+            "desc": "कीट पहचान, रोग पहचान, पोषक तत्व कमी पहचान और खरपतवार प्रबंधन।"
+          },
+          {
+            "icon": "💧",
+            "title": "Spray Science",
+            "desc": "सही दवा, सही मात्रा, सही समय, सही नोज़ल, पानी की गुणवत्ता, pH एवं EC।"
+          },
+          {
+            "icon": "📈",
+            "title": "उत्पादन बढ़ाने की तकनीक",
+            "desc": "वैज्ञानिक खेती, उत्पादन बढ़ाने के उपाय, लागत कम करने के तरीके और सही फसल प्रबंधन।"
+          },
+          {
+            "icon": "📚",
+            "title": "Quick Reference",
+            "desc": "त्वरित चार्ट, निर्णय तालिकाएँ, मौसम आधारित सुझाव और स्प्रे गाइड।"
+          }
         ]
       },
+      "preview_banner": "/images/banners/kheti-dr-banner-2.webp",
       "demo_images": [
         "/images/books/kheti-dr-demo-1.webp",
         "/images/books/kheti-dr-demo-2.webp",
@@ -156,20 +339,88 @@
         "/images/books/kheti-dr-demo-4.webp",
         "/images/books/kheti-dr-demo-5.webp"
       ],
+      "bonuses": [
+        {
+          "title": "FREE SPRAY SCIENCE & WHATSAPP SUPPORT",
+          "description": "रोग पहचान व स्प्रे चार्ट के साथ 24x7 कृषि डॉक्टर हेल्पलाइन सपोर्ट बिल्कुल फ्री।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_points": [
+        "24×7 WhatsApp Support",
+        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+        "📖 किताब की जानकारी समझने में सहायता",
+        "🌱 फसल संबंधी सवाल",
+        "📱 Mobile Friendly PDF & Lifetime Access"
+      ],
+      "table_of_contents": [
+        "कीट पहचान व निदान",
+        "रोग पहचान (फंगल, बैक्टीरियल, वायरल)",
+        "पोषक तत्वों की कमी के लक्षण",
+        "स्प्रे साइंस (सही दवा, सही मात्रा, सही समय)",
+        "वाटर क्वालिटी, pH एवं EC का महत्व",
+        "नोज़ल चयन व स्प्रे प्रेशर गाइड",
+        "IPM व जैविक कीट नियंत्रण",
+        "फसल सुरक्षा स्प्रे शेड्यूल"
+      ],
       "testimonials": [
-        { "name": "राजेश पटेल", "location": "उज्जैन, मध्य प्रदेश", "rating": 5, "comment": "इस किताब से मुझे पता चला कि मेरी मिर्च में वायरस नहीं बल्कि रस चूसक कीटों का प्रकोप था। समय पर सही दवा डालने से फसल बच गई।" },
-        { "name": "दिनेश यादव", "location": "जयपुर, राजस्थान", "rating": 5, "comment": "हर किसान के मोबाइल में यह किताब होनी चाहिए। बहुत ही आसान और काम की किताब है।" }
+        {
+          "name": "राजेश पटेल",
+          "location": "उज्जैन, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "इस किताब से मुझे पता चला कि मेरी मिर्च में वायरस नहीं बल्कि रस चूसक कीटों का प्रकोप था। समय पर सही दवा डालने से फसल बच गई।"
+        },
+        {
+          "name": "दिनेश यादव",
+          "location": "जयपुर, राजस्थान",
+          "rating": 5,
+          "gender": "male",
+          "comment": "हर किसान के मोबाइल में यह किताब होनी चाहिए। बहुत ही आसान और काम की किताब है।"
+        }
       ],
       "faqs": [
-        { "q": "क्या इसमें जैविक खेती के उपाय भी हैं?", "a": "हाँ, इसमें सभी प्रमुख रोगों और कीटों के लिए जैविक (Organic) और रासायनिक दोनों समाधान दिए गए हैं।" },
-        { "q": "डाउनलोड करने के बाद क्या प्रिंट निकाल सकते हैं?", "a": "हाँ, यह हाई क्वालिटी PDF है जिसे आप प्रिंट भी करवा सकते हैं।" }
+        {
+          "q": "क्या इसमें जैविक खेती के उपाय भी हैं?",
+          "a": "हाँ, इसमें सभी प्रमुख रोगों और कीटों के लिए जैविक (Organic) और रासायनिक दोनों समाधान दिए गए हैं।"
+        },
+        {
+          "q": "डाउनलोड करने के बाद क्या प्रिंट निकाल सकते हैं?",
+          "a": "हाँ, यह हाई क्वालिटी PDF है जिसे आप प्रिंट भी करवा सकते हैं।"
+        }
       ],
-      "whatsapp_prompt": "नमस्ते, मुझे 'खेती का डॉक्टर' पुस्तक के बारे में और जानकारी चाहिए।"
+      "whatsapp_prompt": "नमस्ते, मुझे 'खेती का डॉक्टर' पुस्तक के बारे में और जानकारी चाहिए।",
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true
     },
     {
       "id": "BK006",
       "slug": "ai-website-guide",
       "status": "active",
+      "category": "Digital AI",
+      "theme_primary": "#7C3AED",
+      "theme_dark": "#5B21B6",
+      "cover_effect": "3d_float",
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help"
+      ],
       "hero": {
         "tag": "🤖 Digital Skills & AI Mastery",
         "title": "AI वेबसाइट निर्माण गाइड 2026",
@@ -183,10 +434,22 @@
         "banner_image": "/images/banners/farmer-community-banner.jpeg",
         "cover_image": "/images/books/ai-website-guide-cover.webp",
         "features": [
-          { "icon": "fa-laptop-code", "text": "No Coding Required" },
-          { "icon": "fa-robot", "text": "Top 20+ AI Tools" },
-          { "icon": "fa-cloud-arrow-down", "text": "Ready Templates" },
-          { "icon": "fa-gift", "text": "Free Prompt Library" }
+          {
+            "icon": "fa-laptop-code",
+            "text": "No Coding Required"
+          },
+          {
+            "icon": "fa-robot",
+            "text": "Top 20+ AI Tools"
+          },
+          {
+            "icon": "fa-cloud-arrow-down",
+            "text": "Ready Templates"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Prompt Library"
+          }
         ]
       },
       "timer": {
@@ -201,40 +464,94 @@
         "description": "देखें कैसे एक प्रॉम्प्ट लिखकर पूरी वेबसाइट और पेमेंट गेटवे तैयार होता है।"
       },
       "value_stack": {
-        "title": "🎁 इस विशेष AI बंडल में आपको क्या-क्या मिल रहा है?",
-        "items": [
-          { "title": "📖 AI वेबसाइट निर्माण मास्टर गाइड (Full PDF)", "value": 999 },
-          { "title": "🤖 100+ रेडीमेड AI प्रॉम्प्ट्स चीटशीट", "value": 499 },
-          { "title": "💳 पेमेंट गेटवे व डोमेन सेटअप गाइड", "value": 399 },
-          { "title": "🔄 लाइफटाइम फ्री टेक अपडेट्स", "value": 499 },
-          { "title": "💬 व्हाट्सएप टेक हेल्प सपोर्ट", "value": 499 }
-        ],
-        "total_market_value": 2895,
-        "today_price": 199,
+        "book_mrp": 1299,
+        "vip_value": 1999,
+        "bonus_value": 499,
+        "offer_price": 199,
+        "vip_banner": "/images/banners/farmer-community-banner.jpeg",
         "subscriber_perk": "👑 VIP सब्सक्राइबर्स के लिए 100% फ्री एक्सेस।"
       },
       "why_read": {
         "title": "यह AI गाइड आपके लिए क्यों जरूरी है?",
         "subtitle": "वेबसाइट बनाने के लिए ₹15,000 - ₹50,000 खर्च करने की जरूरत नहीं।",
         "cards": [
-          { "icon": "fa-wand-magic-sparkles", "title": "शून्य कोडिंग ज्ञान", "desc": "आपको किसी प्रोग्रामिंग या कोडिंग की जरूरत नहीं, सब कुछ AI द्वारा किया जाता है।" },
-          { "icon": "fa-bolt", "title": "10 मिनट में लाइव वेबसाइट", "desc": "डोमेन, होस्टिंग, डिज़ाइन और पेमेंट गेटवे जोड़ने की आसान विधि।" },
-          { "icon": "fa-cart-shopping", "title": "ई-कॉमर्स व प्रोडक्ट स्टोर", "desc": "अपने उत्पादों या सेवाओं को ऑनलाइन बेचने के लिए सुंदर स्टोर तैयार करें।" },
-          { "icon": "fa-money-bill-trend-up", "title": "वेबसाइट बनाकर पैसे कमाएं", "desc": "दूसरों के लिए AI से वेबसाइट बनाकर ₹10,000 से ₹25,000 तक की कमाई करें।" }
+          {
+            "icon": "✨",
+            "title": "शून्य कोडिंग ज्ञान",
+            "desc": "आपको किसी प्रोग्रामिंग या कोडिंग की जरूरत नहीं, सब कुछ AI द्वारा किया जाता है।"
+          },
+          {
+            "icon": "⚡",
+            "title": "10 मिनट में लाइव वेबसाइट",
+            "desc": "डोमेन, होस्टिंग, डिज़ाइन और पेमेंट गेटवे जोड़ने की आसान विधि।"
+          },
+          {
+            "icon": "🛒",
+            "title": "ई-कॉमर्स व प्रोडक्ट स्टोर",
+            "desc": "अपने उत्पादों या सेवाओं को ऑनलाइन बेचने के लिए सुंदर स्टोर तैयार करें।"
+          },
+          {
+            "icon": "📈",
+            "title": "वेबसाइट बनाकर पैसे कमाएं",
+            "desc": "दूसरों के लिए AI से वेबसाइट बनाकर ₹10,000 से ₹25,000 तक की कमाई करें।"
+          }
         ]
       },
       "demo_images": [
         "/images/books/ai-website-guide-cover.webp"
       ],
+      "bonuses": [
+        {
+          "title": "100+ READYMADE AI PROMPT TEMPLATES",
+          "description": "वेबसाइट और लैंडिंग पेज बनाने के प्रीमियम AI प्रॉम्प्ट्स बंडल मुफ्त।",
+          "mrp": 499,
+          "image": "/images/books/ai-website-guide-cover.webp"
+        }
+      ],
+      "bonus_points": [
+        "100+ Ready Prompts",
+        "Step-by-step Setup Guide",
+        "Payment Gateway Integration",
+        "Lifetime Updates"
+      ],
+      "table_of_contents": [
+        "AI वेबसाइट बिल्डर का परिचय",
+        "डोमेन व होस्टिंग सेटअप",
+        "AI प्रॉम्प्ट्स द्वारा पेज डिजाइन",
+        "ई-कॉमर्स कार्ट व पेमेंट गेटवे",
+        "SEO एवं मोबाइल ऑप्टिमाइजेशन"
+      ],
       "testimonials": [
-        { "name": "आलोक वर्मा", "location": "भोपाल, मध्य प्रदेश", "rating": 5, "comment": "मैंने इस गाइड को पढ़कर 2 घंटे में अपनी खुद की ऑनलाइन दुकान की वेबसाइट बना ली। बहुत ही उपयोगी किताब है।" },
-        { "name": "संजय गुप्ता", "location": "इंदौर, मध्य प्रदेश", "rating": 5, "comment": "AI प्रॉम्प्ट्स बहुत शानदार हैं। कोई भी बिना कोडिंग के शानदार वेबसाइट बना सकता है।" }
+        {
+          "name": "आलोक वर्मा",
+          "location": "भोपाल, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "मैंने इस गाइड को पढ़कर 2 घंटे में अपनी खुद की ऑनलाइन दुकान की वेबसाइट बना ली। बहुत ही उपयोगी किताब है।"
+        },
+        {
+          "name": "संजय गुप्ता",
+          "location": "इंदौर, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "AI प्रॉम्प्ट्स बहुत शानदार हैं। कोई भी बिना कोडिंग के शानदार वेबसाइट बना सकता है।"
+        }
       ],
       "faqs": [
-        { "q": "क्या मुझे कोडिंग आनी चाहिए?", "a": "नहीं! यह गाइड विशेष रूप से गैर-तकनीकी (Non-Technical) लोगों के लिए बनाई गई है।" },
-        { "q": "क्या मोबाइल से वेबसाइट बन सकती है?", "a": "हाँ, इसमें बताए गए कई AI टूल्स मोबाइल ब्राउज़र से भी आसानी से काम करते हैं।" }
+        {
+          "q": "क्या मुझे कोडिंग आनी चाहिए?",
+          "a": "नहीं! यह गाइड विशेष रूप से गैर-तकनीकी (Non-Technical) लोगों के लिए बनाई गई है।"
+        },
+        {
+          "q": "क्या मोबाइल से वेबसाइट बन सकती है?",
+          "a": "हाँ, इसमें बताए गए कई AI टूल्स मोबाइल ब्राउज़र से भी आसानी से काम करते हैं।"
+        }
       ],
-      "whatsapp_prompt": "नमस्ते, मुझे 'AI वेबसाइट गाइड' के बारे में जानकारी चाहिए।"
+      "whatsapp_prompt": "नमस्ते, मुझे 'AI वेबसाइट गाइड' के बारे में जानकारी चाहिए।",
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true
     }
   ]
 }

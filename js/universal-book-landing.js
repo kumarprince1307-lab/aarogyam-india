@@ -1,5 +1,5 @@
 /* ==========================================================
-   AAROGYAM INDIA — UNIVERSAL DYNAMIC BOOK LANDING PAGE JS (PRO)
+   AAROGYAM INDIA — UNIVERSAL DYNAMIC BOOK LANDING PAGE JS (PRO V25.0)
    Full Dynamic Engine for ebooks/book-landing.html
    ========================================================== */
 
@@ -11,19 +11,20 @@
   let allLandingPages = [];
   let currentBookData = null;
   let currentLandingData = null;
-
-  // Multi-cart state
-  let selectedSuggestedBookIds = [];
   let currentZoom = 1;
+  let timerInterval = null;
 
   async function init() {
     extractQueryParameters();
     await loadBookAndLandingData();
+    applyThemeColors();
+    applyDynamicSectionOrdering();
     renderAllSections();
+    renderKpiHighlights();
+    renderCountdownTimer();
     renderMultiVideos();
     renderPinchZoomLightbox();
     renderSuggestedBooksSection();
-    renderUpcomingBooksSection();
     renderCustomCustomerReviews();
     renderVipPerkSection();
     renderCustomStickyBar();
@@ -53,6 +54,19 @@
       }
     } catch (e) {}
 
+    // Check custom books in localStorage
+    try {
+      const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+      if (Array.isArray(customBooks)) {
+        customBooks.forEach(cb => {
+          if (!cb || !cb.id) return;
+          const idx = allBooks.findIndex(x => x.id && x.id.toUpperCase() === cb.id.toUpperCase());
+          if (idx >= 0) allBooks[idx] = cb;
+          else allBooks.unshift(cb);
+        });
+      }
+    } catch (e) {}
+
     // 2. Fetch data/universal-book-landing-pages.json
     try {
       const res = await fetch('/data/universal-book-landing-pages.json?v=' + Date.now());
@@ -62,33 +76,161 @@
       }
     } catch (e) {}
 
-    // 3. Scan LocalStorage for latest Admin Edits
+    // 3. Scan LocalStorage for latest Admin Edits (ALWAYS OVERRIDE STATIC JSON)
     try {
       const stored = localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES');
       if (stored) {
         const localList = JSON.parse(stored);
         if (Array.isArray(localList)) {
           localList.forEach(item => {
-            const idx = allLandingPages.findIndex(x => x.id === item.id || (item.slug && x.slug === item.slug));
-            if (idx >= 0) allLandingPages[idx] = item;
-            else allLandingPages.push(item);
+            if (!item || !item.id) return;
+            const itemIdUpper = item.id.trim().toUpperCase();
+            const itemSlugLower = (item.slug || '').trim().toLowerCase();
+            const idx = allLandingPages.findIndex(x => 
+              (x.id && x.id.trim().toUpperCase() === itemIdUpper) || 
+              (x.slug && itemSlugLower && x.slug.trim().toLowerCase() === itemSlugLower)
+            );
+            if (idx >= 0) {
+              allLandingPages[idx] = item; // Override with latest admin edit
+            } else {
+              allLandingPages.unshift(item);
+            }
           });
         }
       }
     } catch (e) {}
 
-    // Match Book
-    currentBookData = allBooks.find(b => 
-      b.id === currentBookId || 
-      (b.slug && b.slug.toLowerCase() === currentBookId.toLowerCase())
-    ) || allBooks[0] || {};
+    // 4. Resolve Landing Page Data FIRST (by query key / slug)
+    const qKey = (currentBookId || 'BK001').trim().toUpperCase();
+    const qSlug = (currentBookId || 'BK001').trim().toLowerCase();
 
-    // Match Landing Data
     currentLandingData = allLandingPages.find(p => 
-      p.id === currentBookData.id || 
-      (p.slug && p.slug === currentBookData.slug) || 
-      p.id === currentBookId
+      (p.id && p.id.trim().toUpperCase() === qKey) || 
+      (p.slug && p.slug.trim().toLowerCase() === qSlug) ||
+      (p.id && p.id.trim().toUpperCase() === qKey)
     ) || allLandingPages[0] || {};
+
+    const landingId = (currentLandingData.id || qKey).trim().toUpperCase();
+    const landingSlug = (currentLandingData.slug || qSlug).trim().toLowerCase();
+
+    // 5. Resolve Book Data from allBooks OR synthesize directly from landing page
+    const matchedBook = allBooks.find(b => 
+      (b.id && b.id.trim().toUpperCase() === landingId) || 
+      (b.slug && b.slug.trim().toLowerCase() === landingSlug) ||
+      (b.id && b.id.trim().toUpperCase() === qKey)
+    );
+
+    if (matchedBook) {
+      currentBookData = matchedBook;
+    } else {
+      // Auto-synthesize new book object from landing data so it never falls back to BK001
+      const hero = currentLandingData.hero || {};
+      currentBookData = {
+        id: landingId,
+        slug: landingSlug,
+        heading: hero.title || 'ई-बुक प्रैक्टिकल गाइड',
+        name: hero.title || 'ई-बुक प्रैक्टिकल गाइड',
+        category: currentLandingData.category || 'Agriculture',
+        language: 'Hindi',
+        author: 'Aarogyam India',
+        version: '2026',
+        mrp: hero.mrp || 299,
+        offerPrice: hero.offer_price || 99,
+        cover: hero.cover_image || '/images/books/kharif-master-guide-2026-cover.webp',
+        thumbnail: hero.cover_image || '/images/books/kharif-master-guide-2026-cover.webp',
+        banner: hero.banner_image || '/images/banners/kharif-master-guide-2026-hero-banner.webp',
+        totalPages: 120,
+        status: currentLandingData.status || 'active'
+      };
+    }
+  }
+
+  function applyThemeColors() {
+    const l = currentLandingData || {};
+    const primary = l.theme_primary || '#2E7D32';
+    const dark = l.theme_dark || '#1B5E20';
+    document.documentElement.style.setProperty('--primary', primary);
+    document.documentElement.style.setProperty('--primary-dark', dark);
+    
+    const metaTheme = document.getElementById('page-theme-color-meta');
+    if (metaTheme) metaTheme.setAttribute('content', primary);
+  }
+
+  // ==========================================================
+  // DYNAMIC SECTION REORDERING ENGINE
+  // ==========================================================
+  function applyDynamicSectionOrdering() {
+    const container = document.getElementById('landing-sections-container');
+    if (!container) return;
+
+    const l = currentLandingData || {};
+    const defaultOrder = [
+      'sec_hero',
+      'sec_timer',
+      'sec_kpis',
+      'sec_trust',
+      'sec_why_buy',
+      'sec_vip_stack',
+      'sec_video',
+      'sec_preview',
+      'sec_suggested',
+      'sec_bonuses',
+      'sec_ai_support',
+      'sec_specs_toc',
+      'sec_reviews',
+      'sec_faqs',
+      'sec_final_buy',
+      'sec_help'
+    ];
+
+    const rawOrder = (l.sections_order && Array.isArray(l.sections_order) && l.sections_order.length > 0) ? 
+      l.sections_order : defaultOrder;
+
+    let finalOrder = [...rawOrder];
+    if (!finalOrder.includes('sec_ai_support')) {
+      const bonusIdx = finalOrder.indexOf('sec_bonuses');
+      if (bonusIdx >= 0) {
+        finalOrder.splice(bonusIdx + 1, 0, 'sec_ai_support');
+      } else {
+        finalOrder.push('sec_ai_support');
+      }
+    }
+
+    const sectionIdMap = {
+      'sec_hero': 'sec-hero',
+      'sec_timer': 'sec-offer-timer',
+      'sec_kpis': 'sec-kpis-highlights',
+      'sec_trust': 'sec-trust-bar',
+      'sec_why_buy': 'sec-why-book',
+      'sec_vip_stack': 'sec-vip-stack',
+      'sec_video': 'sec-book-video',
+      'sec_preview': 'sec-sample-book',
+      'sec_suggested': 'sec-suggested-books',
+      'sec_bonuses': 'sec-bonus-wrapper',
+      'sec_ai_support': 'sec-ai-support',
+      'sec_specs_toc': 'sec-book-details',
+      'sec_reviews': 'sec-customer-reviews',
+      'sec_faqs': 'sec-faq-section',
+      'sec_final_buy': 'sec-final-buy',
+      'sec_help': 'sec-help-support'
+    };
+
+    finalOrder.forEach(secKey => {
+      const elId = sectionIdMap[secKey] || secKey;
+      const el = document.getElementById(elId);
+      if (el && el.parentElement === container) {
+        container.appendChild(el);
+      }
+    });
+
+    // Check hidden sections
+    if (l.hidden_sections && Array.isArray(l.hidden_sections)) {
+      l.hidden_sections.forEach(secKey => {
+        const elId = sectionIdMap[secKey] || secKey;
+        const el = document.getElementById(elId);
+        if (el) el.style.display = 'none';
+      });
+    }
   }
 
   function renderAllSections() {
@@ -131,89 +273,150 @@
     setElemText('hero-old-price', `₹${mrp}`);
     setElemText('hero-new-price', `₹${offer}`);
     setElemText('hero-offer-badge', badge);
-    
-    // Value Stack Card
-    const stack = l.value_stack || {};
-    const bookMrpVal = stack.book_mrp || mrp;
-    const vipVal = stack.vip_value || 1999;
-    const bonusVal = stack.bonus_value || 199;
-    const totalStackMrp = bookMrpVal + vipVal + bonusVal;
-    setElemText('stack-card-book-mrp', `₹${bookMrpVal}`);
-    setElemText('stack-card-total-mrp', `₹${totalStackMrp}`);
-    setElemText('stack-card-offer-price', `आज मात्र ₹${offer}`);
 
+    const coverImg = document.getElementById('hero-book-cover');
+    if (coverImg) {
+      coverImg.src = cover;
+      if (l.cover_effect === 'static') {
+        coverImg.classList.add('static-cover');
+      } else {
+        coverImg.classList.remove('static-cover');
+      }
+    }
     setElemSrc('hero-banner-img', banner);
-    setElemSrc('hero-book-cover', cover);
 
-    // Hero Features / KPIs
+    // Universal Section Banners Injection (Only shows if banner is present)
+    const sb = l.section_banners || {};
+    renderSectionBanner('sec-hero', sb.sec_hero);
+    renderSectionBanner('sec-offer-timer', sb.sec_timer || l.timer?.banner_image);
+    renderSectionBanner('sec-kpis-highlights', sb.sec_kpis || l.kpis_banner);
+    renderSectionBanner('sec-trust-bar', sb.sec_trust || l.trust_banner);
+    renderSectionBanner('sec-why-book', sb.sec_why_buy || l.why_read?.banner_image);
+    renderSectionBanner('sec-vip-stack', sb.sec_vip_stack || l.value_stack?.vip_banner);
+    renderSectionBanner('sec-book-video', sb.sec_video || l.video_section_banner);
+    renderSectionBanner('sec-sample-book', sb.sec_preview || l.preview_banner);
+    renderSectionBanner('sec-suggested-books', sb.sec_suggested || l.suggested_banner);
+    renderSectionBanner('sec-bonus-wrapper', sb.sec_bonuses || l.bonuses_banner);
+    renderSectionBanner('sec-book-details', sb.sec_specs_toc || l.specs_banner);
+    renderSectionBanner('sec-customer-reviews', sb.sec_reviews || l.reviews_banner);
+    renderSectionBanner('sec-faq-section', sb.sec_faqs || l.faqs_banner);
+    renderSectionBanner('sec-final-buy', sb.sec_final_buy || l.final_buy_banner);
+    renderSectionBanner('sec-help-support', sb.sec_help || l.help_banner);
+
+    // Hero Features / Badges inside hero
     const featWrap = document.getElementById('hero-features-wrap');
     if (featWrap) {
-      const feats = hero.features || [
+      const feats = (hero.features && hero.features.length > 0) ? hero.features : [
         { icon: 'fa-seedling', text: `${b.totalPages || 120}+ रंगीन पेज` },
         { icon: 'fa-camera', text: '300+ फोटो' },
         { icon: 'fa-circle-check', text: 'Scientific Guide' },
         { icon: 'fa-gift', text: 'Free Bonus PDF' }
       ];
-      featWrap.innerHTML = feats.map(f => `
-        <div class="hero-feature">
-          <i class="fa-solid ${f.icon || 'fa-check'}"></i>
-          <span>${escapeHtml(f.text)}</span>
-        </div>
-      `).join('');
+      featWrap.innerHTML = feats.map(f => {
+        let fIconHtml = '<i class="fa-solid fa-check"></i>';
+        if (f.icon) {
+          if (f.icon.startsWith('fa-') || f.icon.startsWith('fa ')) {
+            fIconHtml = `<i class="fa-solid ${f.icon}"></i>`;
+          } else {
+            fIconHtml = `<span style="font-size:1.15rem;line-height:1;">${escapeHtml(f.icon)}</span>`;
+          }
+        }
+        return `
+          <div class="hero-feature">
+            ${fIconHtml}
+            <span>${escapeHtml(f.text)}</span>
+          </div>
+        `;
+      }).join('');
     }
 
-    // 3. Checkout Button URLs
+    // 3. Header, Checkout Button URLs, Share & Sticky Sync
     const checkoutUrl = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
-    const buyBtns = ['hero-buy-btn', 'preview-buy-btn', 'final-buy-btn'];
+    const buyBtns = ['hero-buy-btn', 'preview-buy-btn', 'final-buy-btn', 'vip-stack-unlock-btn', 'sticky-buy-btn'];
     buyBtns.forEach(id => {
       const btn = document.getElementById(id);
       if (btn) btn.href = checkoutUrl;
     });
 
-    // Update Cart Badge
+    setElemText('header-book-title', title);
+    setElemText('sticky-book-title', title);
+    setElemText('sticky-price-val', `₹${offer}`);
+    setElemText('sticky-mrp-val', `₹${mrp}`);
+    setElemSrc('sticky-thumb-img', cover);
+
+    // Update Book Share Data for Universal Share Engine
+    const shareDataEl = document.getElementById('book-share-data');
+    if (shareDataEl) {
+      shareDataEl.dataset.id = b.id || currentBookId;
+      shareDataEl.dataset.title = title;
+      shareDataEl.dataset.description = desc;
+      shareDataEl.dataset.price = `₹${offer}`;
+      shareDataEl.dataset.mrp = `₹${mrp}`;
+      shareDataEl.dataset.url = window.location.href;
+      shareDataEl.dataset.image = cover;
+    }
+
+    // Attach asset ID to all share buttons
+    document.querySelectorAll('[data-share-button="true"]').forEach(btn => {
+      btn.dataset.assetId = b.id || currentBookId;
+      btn.dataset.assetType = 'book';
+    });
+
     updateCartCountBadge();
     injectTrackingPixels();
 
-    // 4. WhatsApp Links
-    const waPrompt = l.whatsapp_prompt || `नमस्ते, मुझे '${title}' पुस्तक के बारे में और जानकारी चाहिए।`;
+    // 4. WhatsApp Links with Rich Book Details
+    const waPrompt = l.whatsapp_prompt || `🌾 नमस्ते Aarogyam India,\nमुझे '${title}' (मूल्य: ₹${offer}) ई-बुक के बारे में जानकारी चाहिए और इसे ऑर्डर करना है।\nलिंक: ${window.location.href}`;
     const waUrl = `https://wa.me/917974422572?text=${encodeURIComponent(waPrompt)}`;
     
     const waHelpLink = document.getElementById('wa-help-link');
     if (waHelpLink) waHelpLink.href = waUrl;
     const stickyHelpBtn = document.getElementById('sticky-help-btn');
     if (stickyHelpBtn) stickyHelpBtn.href = waUrl;
-    const photoDiagBtn = document.getElementById('photo-diag-wa-btn');
-    if (photoDiagBtn) {
-      photoDiagBtn.href = `https://wa.me/917974422572?text=${encodeURIComponent(`नमस्ते, मैंने '${title}' के संदर्भ में फसल की फोटो ली है, कृपया रोग पहचान व सही समाधान बताएं।`)}`;
-    }
 
-    // 5. Why Buy Section
+    // 5. Why Buy Section (Icon & Emoji rendering safety)
     const why = l.why_read;
+    const defaultWhyCards = [
+      { icon: '🌱', title: 'वैज्ञानिक जानकारी', desc: 'कृषि वैज्ञानिकों द्वारा तैयार 100% प्रमाणित एवं Practical जानकारी।' },
+      { icon: '📷', title: '300+ वास्तविक फोटो', desc: 'रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान करना बेहद आसान।' },
+      { icon: '📘', title: 'Step by Step Guide', desc: 'बीज उपचार, खाद शेड्यूल और स्प्रे फॉर्मूला की सम्पूर्ण जानकारी।' },
+      { icon: '🎁', title: 'Free Bonus Gift', desc: 'इस पुस्तक के साथ विशेष बोनस सामग्री और WhatsApp सपोर्ट मुफ्त।' }
+    ];
     if (why) {
       if (why.title) setElemText('why-title', why.title);
       if (why.subtitle || why.desc) setElemText('why-desc', why.subtitle || why.desc);
       const whyGrid = document.getElementById('why-cards-grid');
-      if (whyGrid && why.cards && why.cards.length > 0) {
-        whyGrid.innerHTML = why.cards.map(c => `
-          <div class="why-card">
-            <div class="why-icon">${c.icon || '🌱'}</div>
-            <h3>${escapeHtml(c.title)}</h3>
-            <p>${escapeHtml(c.desc)}</p>
-          </div>
-        `).join('');
+      const cards = (why.cards && why.cards.length > 0) ? why.cards : defaultWhyCards;
+      if (whyGrid) {
+        whyGrid.innerHTML = cards.map(c => {
+          let iconHtml = '🌱';
+          if (c.icon) {
+            if (c.icon.startsWith('fa-') || c.icon.startsWith('fa ')) {
+              iconHtml = `<i class="fa-solid ${c.icon}"></i>`;
+            } else {
+              iconHtml = `<span style="font-size:2.2rem;line-height:1;">${escapeHtml(c.icon)}</span>`;
+            }
+          }
+          return `
+            <div class="why-card">
+              <div class="why-icon">${iconHtml}</div>
+              <h3>${escapeHtml(c.title)}</h3>
+              <p>${escapeHtml(c.desc)}</p>
+            </div>
+          `;
+        }).join('');
       }
     }
 
-    // 6. Preview Gallery
+    // 6. Preview Gallery (Pinch-to-Zoom)
     const galleryGrid = document.getElementById('preview-gallery-grid');
-    const demoImages = l.demo_images || b.demoImages || [
+    const demoImages = (l.demo_images && l.demo_images.length > 0) ? l.demo_images : (b.demoImages && b.demoImages.length > 0 ? b.demoImages : [
       '../images/books/kharif-master-guide-2026-preview-01.webp',
       '../images/books/kharif-master-guide-2026-preview-02.webp',
       '../images/books/kharif-master-guide-2026-preview-03.webp',
-      '../images/books/kharif-master-guide-2026-preview-04.webp',
-      '../images/books/kharif-master-guide-2026-preview-05.webp'
-    ];
-    if (galleryGrid && demoImages.length > 0) {
+      '../images/books/kharif-master-guide-2026-preview-04.webp'
+    ]);
+    if (galleryGrid) {
       galleryGrid.innerHTML = demoImages.map((imgUrl, i) => `
         <div class="preview-card" onclick="window.openPinchZoomLightbox('${imgUrl}')">
           <img src="${imgUrl}" alt="Preview Page ${i + 1}" loading="lazy" style="cursor:zoom-in;">
@@ -221,32 +424,130 @@
       `).join('');
     }
 
-    const prevBanner = document.getElementById('preview-banner-img');
-    if (prevBanner) {
-      prevBanner.onclick = () => window.openPinchZoomLightbox(prevBanner.src);
+    const prevBannerWrap = document.getElementById('preview-banner-wrap');
+    const prevBannerImg = document.getElementById('preview-banner-img');
+    if (prevBannerWrap && prevBannerImg) {
+      if (l.preview_banner && l.preview_banner.trim()) {
+        prevBannerImg.src = l.preview_banner.trim();
+        prevBannerWrap.style.display = 'block';
+        prevBannerImg.onclick = () => window.openPinchZoomLightbox(prevBannerImg.src);
+      } else {
+        prevBannerWrap.style.display = 'none';
+      }
     }
 
-    // 7. Bonus Section
-    const bonusWrapper = document.getElementById('bonus-section-wrapper');
-    if (bonusWrapper) {
-      const bonuses = l.bonuses || l.bonus_books;
-      if (bonuses && bonuses.length > 0) {
-        bonusWrapper.style.display = 'block';
-        const b0 = bonuses[0];
-        setElemSrc('bonus-cover-img', b0.image || '../images/books/kharif-fasal-hero-2.webp');
-        setElemText('bonus-title', b0.title ? `🎁 ${b0.title}` : '🌾 FREE AI WHATSAPP SUPPORT 🎁');
-        if (b0.description) setElemText('bonus-desc', b0.description);
+    // 7. Separate AI Support Section
+    const aiSupportSec = document.getElementById('sec-ai-support');
+    if (aiSupportSec) {
+      aiSupportSec.style.display = 'block';
+      const aiTitle = l.ai_support_title || '🌾 FREE AI WHATSAPP SUPPORT & SPRAY FORMULA 🎁';
+      const aiDesc = l.ai_support_desc || 'किताब पढ़ते समय अगर कोई बात समझ न आए, पोषक तत्वों की पहचान, महत्वपूर्ण टिप्स या फसल की समस्या हो, तो परेशान होने की जरूरत नहीं। बस WhatsApp Help बटन पर क्लिक करें और अपनी समस्या बताएं।';
+      const aiCover = l.ai_support_cover || '/images/books/kharif-fasal-hero-2.webp';
 
-        const listEl = document.getElementById('bonus-list-items');
-        if (listEl) {
-          listEl.innerHTML = bonuses.map(item => `
-            <li>✅ <strong>${escapeHtml(item.title)}</strong> (मूल्य ₹${item.mrp || 199} - बिल्कुल FREE)</li>
-          `).join('') + `
-            <li>✅ 💬 24×7 WhatsApp Support</li>
-            <li>✅ 📱 मोबाइल Reader & PDF Lifetime Access</li>
-          `;
-        }
+      setElemSrc('ai-support-cover-img', aiCover);
+      setElemText('ai-support-title', aiTitle);
+      setElemText('ai-support-desc', aiDesc);
+
+      const aiListEl = document.getElementById('ai-support-list-items');
+      if (aiListEl) {
+        const points = (l.bonus_points && l.bonus_points.length > 0) ? l.bonus_points : [
+          '24×7 WhatsApp Priority Support',
+          '💬 आपका सवाल → हमारी मदद → आसान समाधान',
+          '📖 किताब की जानकारी समझने में सहायता',
+          '🌱 फसल संबंधी विशेष स्प्रे फॉर्मूला',
+          '📱 Mobile Friendly PDF & Lifetime Access'
+        ];
+        aiListEl.innerHTML = points.map(pt => `<li>✅ ${escapeHtml(pt)}</li>`).join('');
       }
+    }
+
+    // 8. Separate Free Bonus Books & Extra Gifts Grid
+    const bonusWrapper = document.getElementById('sec-bonus-wrapper');
+    const freeBooksGrid = document.getElementById('free-books-grid');
+    if (bonusWrapper && freeBooksGrid) {
+      const defaultBonuses = [
+        {
+          title: 'खरीफ फसल सुरक्षा व सम्पूर्ण स्प्रे गाइड 2026',
+          description: 'रोग, कीट, खरपतवार और पोषण प्रबंधन का वैज्ञानिक स्प्रे चार्ट।',
+          mrp: 199,
+          image: '/images/books/kharif-master-guide-2026-cover.webp',
+          features: ['120+ रंगीन पेज', '300+ फोटो', 'स्प्रे साइंस चार्ट', 'Mobile PDF']
+        },
+        {
+          title: 'खेती डॉक्टर पॉकेट गाइड (Quick Diagnosis)',
+          description: 'पौधों के पत्तों व जड़ों के रोगों की तुरंत पहचान और जैविक/रासायनिक उपचार।',
+          mrp: 299,
+          image: '/images/books/fasal-ka-doctor-cover.webp',
+          features: ['Instant Diagnosis', '100% Practical', 'विशेषज्ञ समाधान']
+        }
+      ];
+
+      const rawBonuses = (l.bonuses && l.bonuses.length > 0) ? l.bonuses : ((l.bonus_books && l.bonus_books.length > 0) ? l.bonus_books : defaultBonuses);
+      
+      // Filter out pure text/support items so only actual bonus books & files are in this grid
+      const bonusBooks = rawBonuses.filter(bn => bn && bn.title && !bn.title.toUpperCase().includes('WHATSAPP SUPPORT'));
+      const renderList = bonusBooks.length > 0 ? bonusBooks : rawBonuses;
+
+      bonusWrapper.style.display = 'block';
+      freeBooksGrid.innerHTML = renderList.map(bn => {
+        const bImg = bn.image || bn.cover || '/images/books/kharif-master-guide-2026-cover.webp';
+        const bTitle = bn.title || 'विशेष बोनस ई-बुक';
+        const bDesc = bn.description || 'इस मुख्य पुस्तक के साथ बिल्कुल फ्री लाइफटाइम एक्सेस।';
+        const bMrp = bn.mrp || 199;
+        
+        // Parse individual KPI features for this free book
+        let kpis = [];
+        if (Array.isArray(bn.features) && bn.features.length > 0) {
+          kpis = bn.features;
+        } else if (typeof bn.features === 'string' && bn.features.trim()) {
+          kpis = bn.features.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+        } else if (Array.isArray(bn.kpis) && bn.kpis.length > 0) {
+          kpis = bn.kpis;
+        } else {
+          kpis = ['120+ रंगीन पेज', '300+ फोटो', 'Free Lifetime Access'];
+        }
+
+        return `
+          <div class="free-book-card" style="background:#ffffff;border:2px solid #bbf7d0;border-radius:16px;padding:20px;box-shadow:0 10px 25px rgba(22,163,74,0.08);display:flex;flex-direction:column;justify-content:space-between;position:relative;transition:transform 0.3s ease;">
+            <div style="position:absolute;top:12px;right:12px;background:#16a34a;color:#ffffff;font-size:0.72rem;font-weight:800;padding:4px 10px;border-radius:20px;box-shadow:0 2px 6px rgba(22,163,74,0.3);">
+              🎁 100% FREE
+            </div>
+            <div>
+              <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;">
+                <img src="${bImg}" alt="${escapeHtml(bTitle)}" style="width:75px;height:105px;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);flex-shrink:0;">
+                <div style="flex:1;">
+                  <h4 style="margin:0 0 6px 0;font-size:1.05rem;font-weight:800;color:#065f46;line-height:1.3;">${escapeHtml(bTitle)}</h4>
+                  <div style="font-size:0.82rem;margin-bottom:6px;">
+                    <span style="color:#94a3b8;text-decoration:line-through;margin-right:6px;">मूल्य: ₹${bMrp}</span>
+                    <span style="color:#16a34a;font-weight:800;background:#dcfce7;padding:2px 8px;border-radius:6px;">₹0 मुफ़्त</span>
+                  </div>
+                  <p style="margin:0;font-size:0.8rem;color:#475569;line-height:1.4;">${escapeHtml(bDesc)}</p>
+                </div>
+              </div>
+
+              <!-- Individual KPI Features for this Free Book -->
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed #e2e8f0;">
+                ${kpis.map(feat => `
+                  <span style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:0.75rem;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;">
+                    🌱 ${escapeHtml(feat)}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+
+            <div style="margin-top:14px;padding-top:10px;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:0.78rem;color:#64748b;font-weight:600;">📱 Mobile Friendly PDF</span>
+              ${(bn.file_url || bn.pdf_url) ? `
+                <a href="${bn.file_url || bn.pdf_url}" target="_blank" style="background:#16a34a;color:#fff;font-size:0.75rem;font-weight:800;padding:4px 10px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+                  📥 डाउनलोड
+                </a>
+              ` : `
+                <span style="color:#16a34a;font-weight:800;font-size:0.8rem;">लाइब्रेरी में शामिल 🎁</span>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // 8. Book Specification & TOC
@@ -257,22 +558,33 @@
     setElemText('spec-author', b.author || 'Aarogyam India');
     setElemText('spec-version', `${b.version || '2026'} Edition`);
 
-    if (l.table_of_contents && l.table_of_contents.length > 0) {
-      const tocList = document.getElementById('toc-list');
-      if (tocList) {
-        tocList.innerHTML = l.table_of_contents.map(ch => `<li>✅ ${escapeHtml(ch)}</li>`).join('');
-      }
+    const tocList = document.getElementById('toc-list');
+    const defaultToc = [
+      'बीज उपचार एवं अंकुरण परीक्षण',
+      'खेत की गहरी जुताई व तैयारी',
+      'बुवाई की वैज्ञानिक विधि व समय',
+      'संतुलित खाद एवं उर्वरक प्रबंधन',
+      'खरपतवार नियंत्रण (Weed Control)',
+      'मुख्य रोग एवं कीट प्रबंधन (IPM)',
+      'सूक्ष्म पोषक तत्वों की कमी व पहचान',
+      'फसलवार सम्पूर्ण स्प्रे चार्ट 2026',
+      'फसल सुरक्षा व अधिक पैदावार के गुप्त उपाय',
+      'कृषि विशेषज्ञों के विशेष सुझाव'
+    ];
+    const tocPoints = (l.table_of_contents && l.table_of_contents.length > 0) ? l.table_of_contents : defaultToc;
+    if (tocList) {
+      tocList.innerHTML = tocPoints.map(ch => `<li>✅ ${escapeHtml(ch)}</li>`).join('');
     }
 
     // 9. FAQs
     const faqWrap = document.getElementById('faq-list-wrapper');
     const defaultFaqs = [
-      { q: 'यह पुस्तक किसके लिए है?', a: 'यह पुस्तक किसान, कृषि विद्यार्थी, कृषि सलाहकार और कृषि व्यवसाय से जुड़े लोगों के लिए उपयोगी है।' },
-      { q: 'क्या यह Printed Book है?', a: 'नहीं, यह एक Digital PDF eBook है जिसे मोबाइल, टैबलेट और कंप्यूटर पर कभी भी पढ़ा जा सकता है।' },
+      { q: 'यह पुस्तक किसके लिए है?', a: 'यह पुस्तक किसान, कृषि विद्यार्थी, कृषि सलाहकार और कृषि व्यवसाय से जुड़े लोगों के लिए अत्यंत उपयोगी है।' },
+      { q: 'क्या यह Printed Book है?', a: 'नहीं, यह एक Digital PDF eBook है जिसे मोबाइल, टैबलेट और कंप्यूटर पर कभी भी तुरंत पढ़ा जा सकता है।' },
       { q: 'भुगतान के बाद पुस्तक कब मिलेगी?', a: 'सफल भुगतान के तुरंत बाद आपकी Library में पुस्तक उपलब्ध होगी और Instant Download का लिंक भी मिलेगा।' },
-      { q: 'क्या मुझे किताब बार-बार डाउनलोड करनी पड़ेगी?', a: '❌ नहीं। एक बार खरीदने के बाद बार-बार डाउनलोड करने की जरूरत नहीं है। आप Lifetime Access के साथ Reader में सीधे मोबाइल पर किताब पढ़ सकते हैं।' },
+      { q: 'क्या मुझे किताब बार-बार डाउनलोड करनी पड़ेगी?', a: '❌ नहीं। एक बार खरीदने के बाद आप Lifetime Access के साथ Reader में सीधे मोबाइल पर पढ़ सकते हैं।' },
       { q: 'क्या बिना डाउनलोड किए भी किताब पढ़ सकता हूँ?', a: '✅ हाँ। Reader खोलिए और सीधे मोबाइल में पढ़ना शुरू कीजिए।' },
-      { q: 'यदि कोई समस्या हो तो संपर्क कैसे करें?', a: 'आप हमारी WhatsApp Support टीम से सीधे संपर्क कर सकते हैं।' }
+      { q: 'यदि कोई समस्या हो तो संपर्क कैसे करें?', a: 'आप हमारी 24×7 WhatsApp Support टीम से सीधे संपर्क कर सकते हैं।' }
     ];
     const faqs = (l.faqs && l.faqs.length > 0) ? l.faqs : defaultFaqs;
     if (faqWrap) {
@@ -291,10 +603,96 @@
   }
 
   // ==========================================================
-  // MULTI-VIDEO ENGINE (16:9 & 9:16 SHORTS/REELS)
+  // FEATURE HIGHLIGHTS / KPI BADGES BAR (KHETI DR. STYLE)
+  // ==========================================================
+  function renderKpiHighlights() {
+    const grid = document.getElementById('kpis-badges-grid');
+    if (!grid) return;
+
+    const l = currentLandingData || {};
+    const b = currentBookData || {};
+    const hero = l.hero || {};
+
+    const badges = (hero.features && hero.features.length > 0) ? hero.features : [
+      { icon: 'fa-seedling', text: `${b.totalPages || 120} पेज की प्रीमियम गाइड` },
+      { icon: 'fa-camera', text: '300+ वास्तविक रंगीन फोटो' },
+      { icon: 'fa-flask', text: 'स्प्रे साइंस व सटीक फॉर्मूला' },
+      { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
+    ];
+
+    grid.innerHTML = badges.map(badge => {
+      let iconHtml = '<i class="fa-solid fa-circle-check"></i>';
+      if (badge.icon) {
+        if (badge.icon.startsWith('fa-') || badge.icon.startsWith('fa ')) {
+          iconHtml = `<i class="fa-solid ${badge.icon}"></i>`;
+        } else {
+          iconHtml = `<span style="font-size:1.6rem;line-height:1;">${escapeHtml(badge.icon)}</span>`;
+        }
+      }
+      return `
+        <div class="ubl-kpi-badge-card">
+          <div class="ubl-kpi-icon-wrap">
+            ${iconHtml}
+          </div>
+          <div class="ubl-kpi-badge-text">
+            ${escapeHtml(badge.text)}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ==========================================================
+  // OFFER COUNTDOWN TIMER
+  // ==========================================================
+  function renderCountdownTimer() {
+    const section = document.getElementById('sec-offer-timer');
+    const l = currentLandingData || {};
+    const timerCfg = l.timer || {};
+
+    if (!section) return;
+
+    if (timerCfg.enabled === false) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = 'block';
+    if (timerCfg.text) {
+      setElemText('timer-message-text', timerCfg.text);
+    }
+
+    let minutes = timerCfg.minutes || 15;
+    let seconds = 0;
+
+    const minEl = document.getElementById('ubl-clock-minutes');
+    const secEl = document.getElementById('ubl-clock-seconds');
+
+    if (timerInterval) clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+      if (seconds === 0) {
+        if (minutes === 0) {
+          minutes = 14;
+          seconds = 59;
+        } else {
+          minutes--;
+          seconds = 59;
+        }
+      } else {
+        seconds--;
+      }
+
+      if (minEl) minEl.textContent = String(minutes).padStart(2, '0');
+      if (secEl) secEl.textContent = String(seconds).padStart(2, '0');
+    }, 1000);
+  }
+
+  // ==========================================================
+  // MULTI-VIDEO ENGINE (AUTO-RESPONSIVE 16:9 & 9:16 SHORTS/REELS)
   // ==========================================================
   function renderMultiVideos() {
-    const section = document.getElementById('book-video-section');
+    const section = document.getElementById('sec-book-video');
     const grid = document.getElementById('video-grid-container');
     const l = currentLandingData || {};
 
@@ -303,7 +701,7 @@
       videos = [{
         url: l.video.youtube_url,
         title: l.video.title || '🎥 पुस्तक वीडियो अवलोकन',
-        ratio: '16:9',
+        ratio: (l.video.youtube_url.includes('shorts') || l.video.isShorts) ? '9:16' : '16:9',
         description: l.video.description || 'देखें इस पुस्तक के मुख्य अध्याय व लाइव गाइडेंस।'
       }];
     }
@@ -315,17 +713,46 @@
     }
 
     section.style.display = 'block';
+
+    // If single video, render dedicated centered player
+    if (videos.length === 1) {
+      const v = videos[0];
+      const ytId = extractYouTubeId(v.url || v.youtube_url);
+      const isVertical = (v.url?.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
+      const playerClass = isVertical ? 'ubl-video-player-9-16' : 'ubl-video-player-16-9';
+
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; width: 100%;">
+          <div class="${playerClass}">
+            <div class="video-inner">
+              <iframe 
+                src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1" 
+                title="${escapeHtml(v.title || 'Video')}" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+          <div style="text-align: center; margin-top: 14px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin: 0 0 4px 0;">${escapeHtml(v.title || '🎥 वीडियो अवलोकन')}</h3>
+            ${v.description ? `<p style="font-size: 0.88rem; color: #64748b; margin: 0;">${escapeHtml(v.description)}</p>` : ''}
+          </div>
+        </div>
+      `;
+      return;
+    }
+
     grid.innerHTML = videos.map(v => {
       const ytId = extractYouTubeId(v.url || v.youtube_url);
       if (!ytId) return '';
-      const isVertical = (v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
+      const isVertical = (v.url?.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
       const frameClass = isVertical ? 'ubl-video-frame-wrap-9-16' : 'ubl-video-frame-wrap-16-9';
 
       return `
         <div class="ubl-video-card">
           <div class="${frameClass}">
             <iframe 
-              src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0" 
+              src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1" 
               title="${escapeHtml(v.title || 'Video')}" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               allowfullscreen>
@@ -396,72 +823,135 @@
   }
 
   // ==========================================================
-  // SUGGESTED BOOKS / RELATED BOOKS MULTI-CART
+  // SUGGESTED BOOKS / FREQUENTLY BOUGHT TOGETHER (2-BOOK COMBO)
   // ==========================================================
   function renderSuggestedBooksSection() {
-    const section = document.getElementById('suggested-books-section');
+    const section = document.getElementById('sec-suggested-books');
     const grid = document.getElementById('suggested-books-grid');
 
     if (!section || !grid) return;
 
     const l = currentLandingData || {};
-    let otherBooks = [];
-    
-    // Check if custom suggested books list was saved in Admin
+    let comboBooks = [];
+
+    // 1. Include primary book first
+    comboBooks.push({
+      id: currentBookData.id || currentBookId || 'BK001',
+      tag: '🌾 मुख्य पुस्तक',
+      heading: currentLandingData.hero?.title || currentBookData.heading || currentBookData.name || 'मुख्य ई-बुक गाइड',
+      cover: currentLandingData.hero?.cover_image || currentBookData.cover || '/images/books/kharif-master-guide-2026-cover.webp',
+      offerPrice: parseInt(currentLandingData.hero?.offer_price || currentBookData.offerPrice || 99, 10),
+      mrp: parseInt(currentLandingData.hero?.mrp || currentBookData.mrp || 299, 10),
+      desc: currentBookData.totalPages ? `${currentBookData.totalPages}+ रंगीन पेज • सम्पूर्ण Practical Guide` : '150+ पेज • 40+ फसलें • रोग व खाद प्रबंधन'
+    });
+
+    // 2. Determine 2nd book in combo
     if (l.suggested_books_list && l.suggested_books_list.length > 0) {
-      otherBooks = l.suggested_books_list.map(sb => {
-        return {
+      l.suggested_books_list.forEach(sb => {
+        comboBooks.push({
           id: sb.link || sb.id || 'BK002',
+          tag: '🏆 Bestseller Guide',
           heading: sb.title || 'संबंधित ई-बुक',
-          cover: sb.image || '../images/books/kharif-master-guide-2026-cover.webp',
-          offerPrice: sb.offerPrice || 99,
-          mrp: sb.mrp || 299,
-          link: sb.link || sb.id || '#'
-        };
+          cover: sb.image || '/images/books/fasal-ka-doctor-cover.webp',
+          offerPrice: parseInt(sb.offerPrice || 99, 10),
+          mrp: parseInt(sb.mrp || 299, 10),
+          desc: '120+ रंगीन पेज • 300+ फोटो • स्प्रे साइंस'
+        });
       });
-    } else if (l.suggested_books && l.suggested_books.length > 0) {
-      l.suggested_books.forEach(sId => {
-        const cleanId = sId.replace(/https?:\/\/[^\/]+\/.*[?&]id=/, '').trim();
-        const found = allBooks.find(b => b.id === cleanId || (b.slug && b.slug.toLowerCase() === cleanId.toLowerCase()));
-        if (found && found.id !== currentBookData.id && !otherBooks.some(x => x.id === found.id)) {
-          otherBooks.push(found);
-        }
+    } else {
+      // Pick alternative companion book from library
+      const primaryId = (currentBookData.id || currentBookId || 'BK001').toUpperCase();
+      const otherBook = allBooks.find(b => b.id && b.id.toUpperCase() !== primaryId && (b.status === 'active' || !b.status)) || {
+        id: primaryId === 'BK002' ? 'BK001' : 'BK002',
+        name: primaryId === 'BK002' ? 'खरीफ फसल मास्टर गाइड 2026' : 'खेती का डॉक्टर (Pocket Doctor)',
+        heading: primaryId === 'BK002' ? 'खरीफ फसल मास्टर गाइड 2026' : 'खेती का डॉक्टर (Pocket Doctor)',
+        cover: primaryId === 'BK002' ? '/images/books/kharif-master-guide-2026-cover.webp' : '/images/books/fasal-ka-doctor-cover.webp',
+        offerPrice: 99,
+        mrp: 299,
+        desc: '120+ रंगीन पेज • 300+ फोटो • स्प्रे साइंस'
+      };
+
+      comboBooks.push({
+        id: otherBook.id,
+        tag: otherBook.id === 'BK002' ? '🏆 Bestseller Guide' : '🌾 खरीफ मास्टर गाइड',
+        heading: otherBook.heading || otherBook.name,
+        cover: otherBook.cover || otherBook.thumbnail || '/images/books/fasal-ka-doctor-cover.webp',
+        offerPrice: parseInt(otherBook.offerPrice || 99, 10),
+        mrp: parseInt(otherBook.mrp || 299, 10),
+        desc: otherBook.desc || '120+ रंगीन पेज • 300+ फोटो • स्प्रे साइंस'
       });
     }
 
-    if (otherBooks.length === 0) {
-      otherBooks = allBooks.filter(b => b.id !== currentBookData.id && (b.status === 'active' || !b.status));
-    }
+    // Limit to top 2 for clean side-by-side combo like Kheti Dr
+    const displayBooks = comboBooks.slice(0, 2);
+    const totalPrice = displayBooks.reduce((sum, b) => sum + (parseInt(b.offerPrice, 10) || 99), 0);
 
-    if (otherBooks.length === 0) {
-      section.style.display = 'none';
-      return;
-    }
-
-    section.style.display = 'block';
-
-    grid.innerHTML = otherBooks.slice(0, 6).map(b => `
-      <div class="ubl-suggested-card">
-        <img src="${b.cover || b.thumbnail || '../images/books/kharif-master-guide-2026-cover.webp'}" alt="${escapeHtml(b.heading || b.name || b.title)}" class="ubl-suggested-thumb">
-        <div class="ubl-suggested-info">
-          <h4>${escapeHtml(b.heading || b.name || b.title)}</h4>
-          <div class="price-row">
-            <span class="price">₹${b.offerPrice || 99}</span>
-            <span class="mrp">₹${b.mrp || 299}</span>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <button type="button" class="ubl-btn-add-cart-mini" onclick="window.addSuggestedBookToCart('${b.id || b.link || 'BK002'}', '${escapeHtml(b.heading || b.name || b.title)}', ${b.offerPrice || 99})">
+    grid.innerHTML = displayBooks.map((b, idx) => `
+      <div class="ubl-combo-book-card">
+        <img src="${b.cover}" alt="${escapeHtml(b.heading)}" class="ubl-combo-book-thumb" style="animation: ublFloatBook3D 4.5s ease-in-out infinite ${idx * 1.5}s;">
+        <div style="text-align: left; flex: 1;">
+          <span class="ubl-combo-tag" style="background:${idx === 0 ? '#16a34a' : '#0284c7'};">${b.tag || '🏆 Bestseller Guide'}</span>
+          <h3 style="font-size: 1.05rem; font-weight: 900; color: #1e293b; margin: 4px 0 2px 0;">${escapeHtml(b.heading)}</h3>
+          <p style="font-size: 0.78rem; color: #64748b; margin: 0 0 8px 0;">${escapeHtml(b.desc || '120+ रंगीन पेज • 300+ फोटो')}</p>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="font-size: 1.25rem; font-weight: 900; color: #16a34a;">₹${b.offerPrice || 99}</span>
+            <span style="font-size: 0.82rem; text-decoration: line-through; color: #94a3b8;">₹${b.mrp || 299}</span>
+            <button type="button" class="ubl-btn-add-cart-mini" onclick="window.addSuggestedBookToCart('${b.id}', '${escapeHtml(b.heading)}', ${b.offerPrice || 99}, this)">
               <i class="fa-solid fa-cart-plus"></i> कार्ट में जोड़ें
             </button>
-            <a href="${(b.link && b.link.startsWith('http')) ? b.link : `book-landing.html?id=${encodeURIComponent(b.id || b.link || 'BK002')}`}" style="font-size:0.78rem;color:#2E7D32;font-weight:700;text-decoration:underline;">
-              विवरण देखें &rarr;
-            </a>
           </div>
         </div>
       </div>
     `).join('');
 
-    window.addSuggestedBookToCart = function(bId, bTitle, bPrice) {
+    // Setup Both Books Combo CTA Button (Dynamic Price Calculation e.g. ₹198)
+    const comboBtn = document.getElementById('btn-add-both-combo-books');
+    if (comboBtn) {
+      comboBtn.innerHTML = `📦 दोनों पुस्तकें कार्ट में जोड़ें (₹${totalPrice})`;
+      comboBtn.onclick = function() {
+        try {
+          const raw = localStorage.getItem('AI_CART_ITEMS');
+          let items = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(items)) items = [];
+          displayBooks.forEach(db => {
+            const cleanId = (db.id || 'BK001').toUpperCase();
+            if (!items.includes(cleanId)) items.push(cleanId);
+          });
+          localStorage.setItem('AI_CART_ITEMS', JSON.stringify(items));
+          updateCartCountBadge();
+
+          if (typeof window.fbq === 'function') {
+            window.fbq('track', 'AddToCart', {
+              content_name: `Combo: ${displayBooks.map(x => x.heading).join(' + ')}`,
+              content_ids: displayBooks.map(x => x.id),
+              value: totalPrice,
+              currency: 'INR'
+            });
+          }
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'add_to_cart', {
+              items: displayBooks.map(x => ({ item_id: x.id, item_name: x.heading, price: x.offerPrice })),
+              value: totalPrice,
+              currency: 'INR'
+            });
+          }
+
+          const originalHTML = comboBtn.innerHTML;
+          comboBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> दोनों पुस्तकें कार्ट में जुड़ गईं!';
+          comboBtn.style.background = '#15803d';
+          setTimeout(() => {
+            comboBtn.innerHTML = originalHTML;
+            comboBtn.style.background = '';
+          }, 2500);
+
+          showCartToast(`🛒 दोनों पुस्तकें कार्ट में जोड़ दी गई हैं! (कुल: ${items.length})`);
+        } catch (e) {
+          console.error('Add both books error:', e);
+        }
+      };
+    }
+
+    window.addSuggestedBookToCart = function(bId, bTitle, bPrice, btnElement) {
       try {
         const raw = localStorage.getItem('AI_CART_ITEMS');
         let items = raw ? JSON.parse(raw) : [];
@@ -481,41 +971,65 @@
             currency: 'INR'
           });
         }
-
-        if (confirm(`🛒 '${bTitle || cleanId}' कार्ट में जोड़ दी गई है!\n\nक्या आप अभी कार्ट देखना चाहते हैं?`)) {
-          window.location.href = 'cart.html';
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'add_to_cart', {
+            items: [{ item_id: cleanId, item_name: bTitle, price: bPrice }],
+            value: bPrice,
+            currency: 'INR'
+          });
         }
-      } catch (e) {}
+
+        if (btnElement) {
+          const originalHTML = btnElement.innerHTML;
+          btnElement.innerHTML = '<i class="fa-solid fa-check"></i> कार्ट में जुड़ा';
+          btnElement.style.background = '#15803d';
+          setTimeout(() => {
+            btnElement.innerHTML = originalHTML;
+            btnElement.style.background = '';
+          }, 2200);
+        }
+
+        showCartToast(`🛒 '${bTitle || "ई-बुक"}' कार्ट में जोड़ दी गई है! (कुल: ${items.length})`);
+      } catch (e) {
+        console.error('addSuggestedBookToCart error:', e);
+      }
     };
   }
 
-  // ==========================================================
-  // UPCOMING BOOKS SECTION
-  // ==========================================================
-  function renderUpcomingBooksSection() {
-    const section = document.getElementById('upcoming-books-section');
-    const grid = document.getElementById('upcoming-books-grid');
+  // Update Cart Counter Badge in Header
+  function updateCartCountBadge() {
+    try {
+      const raw = localStorage.getItem('AI_CART_ITEMS');
+      const items = raw ? JSON.parse(raw) : [];
+      const count = Array.isArray(items) ? items.length : 0;
+      const badges = document.querySelectorAll('#cart-count-badge, .cart-count-badge');
+      badges.forEach(b => {
+        b.textContent = count;
+        b.style.display = count > 0 ? 'flex' : 'flex';
+      });
+    } catch (e) {}
+  }
 
-    const comingSoonBooks = allBooks.filter(b => b.status === 'coming_soon');
-    if (!section || !grid) return;
-    if (comingSoonBooks.length === 0) {
-      section.style.display = 'none';
-      return;
-    }
+  // Non-blocking Cart Toast
+  function showCartToast(msg) {
+    const toast = document.getElementById('cart-toast-notif');
+    const msgEl = document.getElementById('cart-toast-msg');
+    if (!toast || !msgEl) return;
+    msgEl.textContent = msg;
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+    toast.style.pointerEvents = 'auto';
 
-    section.style.display = 'block';
-    grid.innerHTML = comingSoonBooks.slice(0, 4).map(b => `
-      <div class="ubl-upcoming-card">
-        <span class="ubl-upcoming-badge">⏳ जल्द आ रहा है (Coming Soon)</span>
-        <img src="${b.cover || b.thumbnail || '../images/books/kharif-master-guide-2026-cover.webp'}" alt="${escapeHtml(b.heading || b.name)}" class="ubl-upcoming-thumb">
-        <h4 style="font-size:0.95rem;font-weight:800;color:#0f172a;margin-bottom:6px;">${escapeHtml(b.heading || b.name)}</h4>
-        <div style="color:var(--primary);font-weight:700;font-size:0.85rem;">2026 Edition</div>
-      </div>
-    `).join('');
+    clearTimeout(window._ublCartToastTimer);
+    window._ublCartToastTimer = setTimeout(() => {
+      toast.style.transform = 'translateY(-30px)';
+      toast.style.opacity = '0';
+      toast.style.pointerEvents = 'none';
+    }, 3500);
   }
 
   // ==========================================================
-  // ADVANCED CUSTOMER REVIEWS WITH AVATARS (👨/👩)
+  // CUSTOMER REVIEWS WITH AVATARS (👨/👩)
   // ==========================================================
   function renderCustomCustomerReviews() {
     const grid = document.getElementById('reviews-grid');
@@ -553,13 +1067,32 @@
   }
 
   // ==========================================================
-  // AAROGYAM PRO VIP PERKS
+  // AAROGYAM PRO VIP PERKS & VALUE STACK
   // ==========================================================
   function renderVipPerkSection() {
     const l = currentLandingData || {};
+    const b = currentBookData || {};
+    const hero = l.hero || {};
+    const stack = l.value_stack || {};
+
+    const offerPrice = stack.offer_price || hero.offer_price || b.offerPrice || 99;
+    const bookMrp = stack.book_mrp || hero.mrp || b.mrp || 299;
+    const vipVal = stack.vip_value || 1999;
+    const bonusVal = stack.bonus_value || 199;
+    const totalVal = bookMrp + vipVal + bonusVal;
+
+    setElemText('stack-offer-price-val', `₹${offerPrice}`);
+    setElemText('stack-total-mrp-val', `₹${totalVal}`);
+
     const textEl = document.getElementById('vip-perk-text');
-    if (textEl && l.value_stack?.subscriber_perk) {
-      textEl.textContent = l.value_stack.subscriber_perk;
+    if (textEl && stack.subscriber_perk) {
+      textEl.textContent = stack.subscriber_perk;
+    }
+
+    const vipBannerImg = document.getElementById('vip-banner-img');
+    if (vipBannerImg && stack.vip_banner) {
+      vipBannerImg.src = stack.vip_banner;
+      vipBannerImg.style.display = 'block';
     }
   }
 
@@ -588,6 +1121,16 @@
     }
   }
 
+  function toAbsoluteUrl(url) {
+    if (!url || typeof url !== 'string') return 'https://aarogyamindia.online/images/books/kharif-fasal-og.webp';
+    const trimmed = url.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+    const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'https://aarogyamindia.online';
+    if (trimmed.startsWith('/')) return origin + trimmed;
+    if (trimmed.startsWith('../')) return origin + trimmed.replace(/^\.\./, '');
+    return origin + '/' + trimmed;
+  }
+
   // ==========================================================
   // DYNAMIC OPENGRAPH META INJECTION
   // ==========================================================
@@ -598,24 +1141,44 @@
 
     const title = l.og_title || hero.title || b.heading || 'Aarogyam India eBook';
     const desc = l.og_description || hero.description || b.description || 'सम्पूर्ण Practical Guide। अभी विशेष छूट पर उपलब्ध।';
-    const img = l.og_image || hero.banner_image || hero.cover_image || 'https://aarogyamindia.online/images/books/kharif-fasal-og.webp';
+    const rawImg = l.og_image || hero.banner_image || hero.cover_image || '/images/books/kharif-fasal-og.webp';
+    const absImg = toAbsoluteUrl(rawImg);
 
     setMetaProp('og-title-meta', title);
     setMetaProp('og-desc-meta', desc);
-    setMetaProp('og-image-meta', img);
+    setMetaProp('og-image-meta', absImg);
     setMetaProp('og-url-meta', window.location.href);
     setMetaProp('twitter-title-meta', title);
     setMetaProp('twitter-desc-meta', desc);
-    setMetaProp('twitter-image-meta', img);
+    setMetaProp('twitter-image-meta', absImg);
+  }
 
-    const shareData = document.getElementById('book-share-data');
-    if (shareData) {
-      shareData.setAttribute('data-title', title);
-      shareData.setAttribute('data-description', desc);
-      shareData.setAttribute('data-price', `₹${hero.offer_price || b.offerPrice || 99}`);
-      shareData.setAttribute('data-mrp', `₹${hero.mrp || b.mrp || 299}`);
-      shareData.setAttribute('data-url', window.location.href);
-      shareData.setAttribute('data-image', img);
+  // ==========================================================
+  // FACEBOOK PIXEL & GOOGLE ANALYTICS ENGINE (KHETI DR. MATCHED)
+  // ==========================================================
+  function injectTrackingPixels() {
+    const l = currentLandingData || {};
+    const b = currentBookData || {};
+    const hero = l.hero || {};
+    const title = hero.title || b.heading || b.name || 'Aarogyam India eBook';
+
+    // 1. Facebook Meta Pixel (Built-In ID: 1671873500553134)
+    const isFbEnabled = l.facebook_pixel_id !== 'disabled' && l.facebook_pixel_enabled !== false;
+    if (isFbEnabled && typeof window.fbq === 'function') {
+      try {
+        window.fbq('track', 'PageView');
+      } catch (e) {}
+    }
+
+    // 2. Google Tag / Analytics (Built-In ID: G-2BWPJVQWPK)
+    const isGaEnabled = l.google_analytics_id !== 'disabled' && l.google_analytics_enabled !== false;
+    if (isGaEnabled && typeof window.gtag === 'function') {
+      try {
+        window.gtag('event', 'page_view', {
+          page_title: title,
+          page_location: window.location.href
+        });
+      } catch (e) {}
     }
   }
 
@@ -669,11 +1232,41 @@
             currency: 'INR'
           });
         }
+        // Track AddToCart in Google Analytics
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'add_to_cart', {
+            currency: 'INR',
+            value: currentBookData.offerPrice || 99,
+            items: [{ item_id: bId, item_name: currentBookData.name || currentBookData.heading, price: currentBookData.offerPrice || 99 }]
+          });
+        }
 
         if (confirm('🛒 पुस्तक आपके कार्ट में जोड़ दी गई है!\n\nक्या आप अभी कार्ट देखना चाहते हैं?')) {
           window.location.href = 'cart.html';
         }
       } catch (e) {}
+    });
+
+    // Track InitiateCheckout on all Buy Now clicks
+    document.querySelectorAll('.buy-btn, .btn-primary, #sticky-buy-btn, #final-buy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bId = (currentBookData.id || currentBookId || 'BK001').toUpperCase();
+        if (typeof window.fbq === 'function') {
+          window.fbq('track', 'InitiateCheckout', {
+            content_name: currentBookData.name || currentBookData.heading,
+            content_ids: [bId],
+            value: currentBookData.offerPrice || 99,
+            currency: 'INR'
+          });
+        }
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'begin_checkout', {
+            currency: 'INR',
+            value: currentBookData.offerPrice || 99,
+            items: [{ item_id: bId, item_name: currentBookData.name || currentBookData.heading, price: currentBookData.offerPrice || 99 }]
+          });
+        }
+      });
     });
   }
 
@@ -693,7 +1286,7 @@
     const pixelId = l.facebook_pixel_id || '1671873500553134';
 
     // Facebook Pixel Injection
-    if (pixelId && !window._fb_pixel_injected) {
+    if (pixelId && !window._fb_pixel_injected && pixelId !== 'disabled') {
       window._fb_pixel_injected = true;
       try {
         !function(f,b,e,v,n,t,s)
@@ -718,7 +1311,7 @@
 
     // Google Analytics Injection
     const gaId = l.google_analytics_id;
-    if (gaId && !window._ga_injected) {
+    if (gaId && !window._ga_injected && gaId !== 'disabled') {
       window._ga_injected = true;
       try {
         const s = document.createElement('script');
@@ -735,10 +1328,58 @@
   }
 
   function extractYouTubeId(url) {
-    if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
+    if (!url || typeof url !== 'string') return null;
+    url = url.trim();
+    if (url.length === 11 && !url.includes('/') && !url.includes('.')) return url;
+
+    // Direct Shorts match (e.g. /shorts/ew5tDJgGTK8?si=...)
+    const shortsMatch = url.match(/shorts\/([a-zA-Z0-9_-]{11})/i);
+    if (shortsMatch && shortsMatch[1]) return shortsMatch[1];
+
+    // youtu.be match (e.g. youtu.be/ew5tDJgGTK8?si=...)
+    const youtuMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
+    if (youtuMatch && youtuMatch[1]) return youtuMatch[1];
+
+    // watch?v= or &v= match
+    const watchMatch = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+    if (watchMatch && watchMatch[1]) return watchMatch[1];
+
+    // embed or v match
+    const embedMatch = url.match(/(?:embed|v)\/([a-zA-Z0-9_-]{11})/i);
+    if (embedMatch && embedMatch[1]) return embedMatch[1];
+
+    // General fallback
+    const genMatch = url.match(/([a-zA-Z0-9_-]{11})/);
+    return genMatch ? genMatch[1] : null;
+  }
+
+  function renderSectionBanner(secId, bannerUrl) {
+    const secEl = document.getElementById(secId);
+    if (!secEl) return;
+
+    let bannerWrap = secEl.querySelector('.ubl-section-banner-wrap');
+    if (bannerUrl && typeof bannerUrl === 'string' && bannerUrl.trim().length > 0) {
+      if (!bannerWrap) {
+        bannerWrap = document.createElement('div');
+        bannerWrap.className = 'ubl-section-banner-wrap';
+        bannerWrap.innerHTML = `<img src="${escapeHtml(bannerUrl.trim())}" alt="Section Banner" class="ubl-section-banner-img" />`;
+        // Insert right after container heading or at top of section
+        const container = secEl.querySelector('.container') || secEl;
+        if (container.firstChild) {
+          container.insertBefore(bannerWrap, container.firstChild);
+        } else {
+          container.appendChild(bannerWrap);
+        }
+      } else {
+        const img = bannerWrap.querySelector('img');
+        if (img) img.src = bannerUrl.trim();
+        bannerWrap.style.display = 'block';
+      }
+    } else {
+      if (bannerWrap) {
+        bannerWrap.remove();
+      }
+    }
   }
 
   function setElemText(id, txt) {
@@ -766,7 +1407,7 @@
       .replace(/'/g, '&#039;');
   }
 
-  // Global Menu and Login Helpers (Identical to my-library.html)
+  // Global Menu and Login Helpers
   window.toggleMenu = function () {
     const sideMenu = document.getElementById('sideMenu');
     const overlay = document.getElementById('sideMenuOverlay');

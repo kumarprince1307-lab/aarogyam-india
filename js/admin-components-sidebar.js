@@ -1,30 +1,62 @@
 /* Admin Sidebar Component */
 
 const MENU = [
-  { label: 'Dashboard', href: 'dashboard.html', icon: '🏠' },
+  { label: 'Dashboard', href: 'dashboard.html', icon: '🏠', route: 'dashboard' },
   { label: 'Users', icon: '👥', children: [ 
-    { label: 'All Users', href: 'users.html' }, 
-    { label: 'User Details', href: 'user-details.html' },
-    { label: 'All User Permissions', href: 'user-permissions.html' },
-    { label: 'All Phonebook', href: 'all-phonebook.html' },
-    { label: 'All Survey List', href: 'all-surveys.html' }
+    { label: 'All Users', href: 'users.html', route: 'users' }, 
+    { label: 'User Details', href: 'user-details.html', route: 'user-details' },
+    { label: 'All User Permissions', href: 'user-permissions.html', route: 'user-permissions' },
+    { label: 'All Phonebook', href: 'all-phonebook.html', route: 'all-phonebook' },
+    { label: 'All Survey List', href: 'all-surveys.html', route: 'all-surveys' }
   ] },
   { label: 'Books', icon: '📚', children: [ 
-    { label: 'Book Landing Pages (बुक पेज)', href: 'book-landing-pages.html' },
-    { label: 'Categories', href: '#' }, 
-    { label: 'Books', href: '#' }, 
-    { label: 'Demo Books', href: '#' } 
+    { label: 'Book Landing Pages (बुक पेज)', href: 'book-landing-pages.html', route: 'book-landing-pages' },
+    { label: 'Categories', href: '#' },
+    { label: 'Books', href: '#' },
+    { label: 'Demo Books', href: '#' }
   ] },
-  { label: 'Products', icon: '🛍️', children: [ { label: 'Product Landing Pages', href: 'product-landing-pages.html' }, { label: 'Categories', href: '#' }, { label: 'Products', href: '#' } ] },
-  { label: 'Diseases', href: '#', icon: '🧾' },
-  { label: 'Orders', icon: '🧾', children: [ { label: 'Purchases', href: 'purchases.html' }, { label: 'Checkout Funnel', href: 'checkout-funnel.html' }, { label: 'Downloads', href: 'downloads.html' } ] },
-  { label: 'Reports', icon: '📈', children: [ { label: 'Daily', href: 'reports.html#daily-report' }, { label: 'Monthly', href: '#' }, { label: 'Sales', href: '#' }, { label: 'Referral', href: 'reports.html#share-report' }, { label: 'Source', href: 'reports.html#lead-report' } ] },
-  { label: 'Marketing', icon: '📣', children: [ { label: 'UCAS Landing Pages', href: 'all-landing-pages.html' }, { label: 'Hook Templates & Shayari', href: 'marketing-templates.html' }, { label: 'Share Links', href: '#' }, { label: 'Campaigns', href: '#' } ] },
-  { label: 'Webinars', href: 'all-webinars.html', icon: '🎥' },
-  { label: 'Wallet', href: '#', icon: '💰' },
-  { label: 'Notifications', icon: '🔔', children: [ { label: 'All Notifications', href: 'notifications.html' }, { label: '📢 Broadcast Center', href: 'broadcast.html' } ] },
-  { label: 'Admin App', href: 'admin-app.html', icon: '📱' },
-  { label: 'Settings', href: 'settings.html', icon: '⚙️' },
+  { label: 'Page Editor (पेज एडिटर)', icon: '📑', children: [
+    { label: 'All Site Pages (सभी पेज एडिटर)', href: 'page-editor.html', route: 'page-editor' },
+    { label: '🌾 खरीफ फसल गाइड लैंडिंग पेज', href: 'page-editor.html?page=page_kharif_guide', route: 'page-editor?page=page_kharif_guide' },
+    { label: '🩺 खेती का डॉक्टर लैंडिंग पेज', href: 'page-editor.html?page=page_kheti_dr', route: 'page-editor?page=page_kheti_dr' },
+    { label: '🏠 Home Page Editor', href: 'page-editor.html?page=home', route: 'page-editor?page=home' },
+    { label: '🌾 Agriculture Hub Editor', href: 'page-editor.html?page=agriculture', route: 'page-editor?page=agriculture' },
+    { label: '📚 eBook Store Editor', href: 'page-editor.html?page=ebook', route: 'page-editor?page=ebook' },
+    { label: '🛒 Shopping Cart Editor', href: 'page-editor.html?page=cart', route: 'page-editor?page=cart' },
+    { label: '📖 My Library Editor', href: 'page-editor.html?page=library', route: 'page-editor?page=library' },
+    { label: '🌾 Mandi & Weather Editor', href: 'page-editor.html?page=mandi', route: 'page-editor?page=mandi' }
+  ] },
+  { label: 'Products', icon: '🛍️', children: [ 
+    { label: 'Product Landing Pages', href: 'product-landing-pages.html', route: 'product-landing-pages' }, 
+    { label: 'Categories', href: '#' }, 
+    { label: 'Products', href: '#' } 
+  ] },
+  { label: 'Diseases', icon: '🩺', href: '#' },
+  { label: 'Orders', icon: '🧾', children: [ 
+    { label: 'Purchases', href: 'purchases.html', route: 'purchases' }, 
+    { label: 'Checkout Funnel', href: 'checkout-funnel.html', route: 'checkout-funnel' }, 
+    { label: 'Downloads', href: 'downloads.html', route: 'downloads' } 
+  ] },
+  { label: 'Reports', icon: '📈', children: [ 
+    { label: 'Daily', href: 'reports.html#daily-report', route: 'reports' }, 
+    { label: 'Monthly', href: '#' }, 
+    { label: 'Sales', href: '#' }, 
+    { label: 'Referral', href: 'reports.html#share-report', route: 'reports' }, 
+    { label: 'Source', href: 'reports.html#lead-report', route: 'reports' } 
+  ] },
+  { label: 'Marketing', icon: '📣', children: [ 
+    { label: 'UCAS Landing Pages', href: 'all-landing-pages.html', route: 'all-landing-pages' }, 
+    { label: 'Hook Templates & Shayari', href: 'marketing-templates.html', route: 'marketing-templates' }, 
+    { label: 'Share Links', href: '#' }, 
+    { label: 'Campaigns', href: '#' } 
+  ] },
+  { label: 'Webinars', href: 'all-webinars.html', icon: '🎥', route: 'all-webinars' },
+  { label: 'Notifications', icon: '🔔', children: [ 
+    { label: 'All Notifications', href: 'notifications.html', route: 'notifications' }, 
+    { label: '📢 Broadcast Center', href: 'broadcast.html', route: 'broadcast' } 
+  ] },
+  { label: 'Admin App', href: 'admin-app.html', icon: '📱', route: 'admin-app' },
+  { label: 'Settings', href: 'settings.html', icon: '⚙️', route: 'settings' },
   { label: 'Support', href: '#', icon: '🆘' },
   { label: 'Logout', href: '#', icon: '⛔' }
 ];
@@ -36,14 +68,17 @@ function createMenuItem(item) {
       <li class="menu-group">
         <button class="menu-toggle" data-target="${id}"><span class="menu-icon">${item.icon || ''}</span><span class="menu-label">${item.label}</span><span class="menu-caret">▸</span></button>
         <ul id="${id}" class="menu-children">
-          ${item.children.map(c => `<li><a href="#" data-route="${(c.href || '').split('.').shift()}">${c.label}</a></li>`).join('')}
+          ${item.children.map(c => {
+            const r = c.route || (c.href || '').split('.').shift();
+            return `<li><a href="${c.href || '#'}" data-route="${r}">${c.label}</a></li>`;
+          }).join('')}
         </ul>
       </li>
     `;
   }
-  // for top-level links map known pages to data-route for SPA
-  const routeName = ['dashboard','users','all-webinars','webinars','purchases','checkout-funnel','downloads','reports','notifications','broadcast','admin-app','settings'].includes((item.href||'').split('.').shift()) ? (item.href||'').split('.').shift() : '';
-  return `<li><a href="#" ${routeName?`data-route="${routeName}"`:''} class="menu-link"><span class="menu-icon">${item.icon || ''}</span><span class="menu-label">${item.label}</span></a></li>`;
+  // for top-level links map to data-route for SPA
+  const routeName = item.route || ((item.href || '').split('.').shift());
+  return `<li><a href="${item.href || '#'}" ${routeName ? `data-route="${routeName}"` : ''} class="menu-link"><span class="menu-icon">${item.icon || ''}</span><span class="menu-label">${item.label}</span></a></li>`;
 }
 
 export function renderSidebar(containerId = 'sidebar-placeholder') {
@@ -121,7 +156,6 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
     });
   });
 
-
   // --- Active Link Updater ---
   function updateActive(route) {
     c.querySelectorAll('.menu-link').forEach(a => a.classList.remove('active'));
@@ -135,16 +169,20 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
       if (parentSubMenu && !parentSubMenu.classList.contains('open')) {
         // Auto-open the accordion if the active link is inside
         const toggleBtn = parentSubMenu.previousElementSibling;
-        toggleBtn?.click();
+        if (toggleBtn) toggleBtn.classList.add('open');
+        parentSubMenu.classList.add('open');
+        parentSubMenu.style.maxHeight = parentSubMenu.scrollHeight + 'px';
       }
     }
   }
 
-  // Set initial active link
-  updateActive(currentHash || 'dashboard');
+  // Update on route changed event
+  document.addEventListener('admin:route-changed', (e) => {
+    if (e.detail && e.detail.route) {
+      updateActive(e.detail.route);
+    }
+  });
 
-  // Listen for route changes from the router to update active link
-  document.addEventListener('admin:route-changed', (e) => updateActive(e.detail.route));
+  // Initial active link sync
+  updateActive(currentHash);
 }
-
-// TODO: add permissions-aware items and icons in Phase-2

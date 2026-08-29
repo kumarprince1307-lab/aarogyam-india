@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/my-library.css">
     <link rel="stylesheet" href="/css/user-notifications.css">
+    <link rel="stylesheet" href="/css/universal-nav-drawer.css">
+    <link rel="stylesheet" href="/css/home-revamp.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Meta Pixel Code -->
@@ -70,6 +72,10 @@
         }
 
         function toggleMenu() {
+            if (typeof window.openUniversalDrawer === 'function') {
+                window.openUniversalDrawer();
+                return;
+            }
             const sideMenu = document.getElementById('sideMenu');
             const overlay = document.getElementById('sideMenuOverlay');
             if (sideMenu) {
@@ -87,229 +93,80 @@
         }
     </script>
 
-    <!-- 2. Header -->
-    <header class="library-header">
-        <div class="header-logo-title">
-            <img src="/images/logo/logo.png" alt="Logo" class="site-logo">
-            <h1>मौसम अपडेट</h1>
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <!-- Logged Out Login Button -->
-            <button type="button" id="headerLoginBtn" onclick="openLoginPopup()" style="background: rgba(16, 185, 129, 0.15); border: 1.5px solid rgba(16, 185, 129, 0.4); color: #34D399; font-weight: 700; font-size: 0.82rem; padding: 6px 14px; border-radius: 50px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                <span>लॉगिन</span>
-            </button>
-
-            <!-- Logged In User Status & Logout Button -->
-            <div id="headerUserWrapper" style="display: none; align-items: center; gap: 8px;">
-                <a href="/ucas/index.html" style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); color: #38BDF8; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-user-check"></i>
-                    <span id="headerUserName">यूजर</span>
-                </a>
-                <button type="button" id="headerLogoutBtn" onclick="handleUserLogout()" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #F87171; font-weight: 700; font-size: 0.8rem; padding: 5px 12px; border-radius: 50px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="लॉगआउट करें">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>लॉगआउट</span>
-                </button>
+    <!-- =========================================
+         1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
+    ========================================== -->
+    <div class="home-live-ticker-wrap">
+      <div class="container">
+        <div class="home-ticker-flex">
+          <div class="ticker-pulse-badge">
+            <span class="ticker-dot-pulse"></span>
+            <span>🚨 LIVE</span>
+          </div>
+          <div style="flex:1;overflow:hidden;">
+            <div class="ticker-marquee-scroll" id="home-live-ticker-track">
+              🌾 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 AI एक्सपर्ट सहायता उपलब्ध! ✦ सटीक 7-दिवसीय मौसम पूर्वानुमान
             </div>
-
-            <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications"
-                style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1.5px solid #10B981; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.15rem; position: relative;">
-                <i class="fa-solid fa-bell" style="color: #10B981;"></i>
-                <span class="user-notif-badge"
-                    style="display: none; position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.7rem; font-weight: 800; padding: 2px 6px;">0</span>
-            </button>
-            <button class="back-btn" onclick="window.location.href='/index.html'"><i
-                    class="fa-solid fa-arrow-left"></i></button>
-            <button class="menu-btn" onclick="toggleMenu()" title="मेनू खोलें" aria-label="Toggle Menu"><i
-                    class="fa-solid fa-bars"></i></button>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         2. ANIMATED INDIAN TIRANGA WAVING HEADER
+    ========================================== -->
+    <header class="header header-tiranga-animated" id="header">
+      <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:8px;">
+        
+        <!-- Brand Logo Left in Glass Pill + Active Page Badge -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <a href="/index.html" class="brand-logo-pill">
+            <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;">
+            <div style="display:flex;flex-direction:column;">
+              <span class="brand-title-text">
+                AAROGYAM <span style="color:#ff671f;">INDIA</span>
+              </span>
+              <span class="brand-sub-text">
+                Live Weather Forecast
+              </span>
+            </div>
+          </a>
+
+          <!-- Current Active Page Indicator Badge -->
+          <span class="header-current-page-badge" title="Current Page">
+            ⛅ Weather
+          </span>
+        </div>
+
+        <!-- Header Actions Right: Install App, Notification, Cart, 3-Line Menu -->
+        <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+          <!-- Install App Button (PWA) -->
+          <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+            <span>📲</span> <span>Install App</span>
+          </button>
+
+          <!-- Notification Bell Icon -->
+          <button type="button" class="user-notif-bell-btn" title="Notifications" aria-label="Notifications" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+            <i class="fa-regular fa-bell" style="font-size:1rem;"></i>
+            <span class="user-notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 5px;border-radius:10px;">0</span>
+          </button>
+
+          <!-- Shopping Cart Icon -->
+          <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+            <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
+            <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
+          </a>
+
+          <!-- 3-Line Menu Trigger Button (Desktop Left Drawer / Mobile Right Drawer) -->
+          <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+
+      </div>
     </header>
 
-    <!-- 2.1 DESKTOP LEFT SIDEBAR -->
-    <aside class="library-sidebar" id="libraryDesktopSidebar">
-        <div>
-            <div class="library-nav-section-title">Library Destinations</div>
-            <ul class="library-nav-list">
-                <li class="library-nav-item">
-                    <a href="/ebooks/my-library.html">
-                        <i class="fa-solid fa-book-open library-nav-icon" style="color:#2563EB;"></i>
-                        <span>My Library</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/mandi.html">
-                        <i class="fa-solid fa-seedling library-nav-icon" style="color:#10B981;"></i>
-                        <span>कृषि मंडी भाव</span>
-                    </a>
-                </li>
-                <li class="library-nav-item active">
-                    <a href="/weather.html">
-                        <i class="fa-solid fa-cloud-sun library-nav-icon" style="color:#0284C7;"></i>
-                        <span>मौसम अपडेट (Weather)</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/ucas/index.html">
-                        <i class="fa-solid fa-user-gear library-nav-icon" style="color:#E86A17;"></i>
-                        <span>My Profile & UCAS</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/subscription.html">
-                        <i class="fa-solid fa-crown library-nav-icon" style="color:#F59E0B;"></i>
-                        <span>VIP Pass (Subscription)</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/purchases.html">
-                        <i class="fa-solid fa-file-invoice library-nav-icon" style="color:#10B981;"></i>
-                        <span>My Purchases</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/ucas/index.html#survey">
-                        <i class="fa-solid fa-clipboard-list library-nav-icon" style="color:#0284C7;"></i>
-                        <span>Smart Survey</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/ucas/index.html#phonebook">
-                        <i class="fa-solid fa-address-book library-nav-icon" style="color:#8B5CF6;"></i>
-                        <span>My Phonebook</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/ucas/index.html#leads">
-                        <i class="fa-solid fa-user-group library-nav-icon" style="color:#EA580C;"></i>
-                        <span>My Share Leads</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/ucas/index.html?tab=marketing">
-                        <i class="fa-solid fa-rocket library-nav-icon" style="color:#EC4899;"></i>
-                        <span>Marketing Engine</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/ucas/index.html?tab=product-landing">
-                        <i class="fa-solid fa-cart-shopping library-nav-icon" style="color:#F59E0B;"></i>
-                        <span>Product Landing Page</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/ucas/index.html?tab=hook-templates">
-                        <i class="fa-solid fa-pen-nib library-nav-icon" style="color:#8B5CF6;"></i>
-                        <span>हुक व शायरी (Hook & Shayari)</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/webinar.html">
-                        <i class="fa-solid fa-video library-nav-icon" style="color:#3B82F6;"></i>
-                        <span>🔴 लाइव ज़ूम वेबिनार</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/ucas/index.html?tab=broadcast-messages">
-                        <i class="fa-solid fa-bullhorn library-nav-icon" style="color:#E11D48;"></i>
-                        <span>आरोग्यम संदेश</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/index.html">
-                        <i class="fa-solid fa-house library-nav-icon" style="color:#10B981;"></i>
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/ebooks/wishlist.html">
-                        <i class="fa-solid fa-heart library-nav-icon" style="color:#EF4444;"></i>
-                        <span>Wishlist</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/faq.html">
-                        <i class="fa-solid fa-circle-question library-nav-icon" style="color:#64748B;"></i>
-                        <span>FAQ</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/terms.html">
-                        <i class="fa-solid fa-file-contract library-nav-icon" style="color:#64748B;"></i>
-                        <span>Terms & Conditions</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/shipping-policy.html">
-                        <i class="fa-solid fa-truck library-nav-icon" style="color:#64748B;"></i>
-                        <span>Shipping Policy</span>
-                    </a>
-                </li>
-                <li class="library-nav-item">
-                    <a href="/privacy-policy.html">
-                        <i class="fa-solid fa-shield-halved library-nav-icon" style="color:#64748B;"></i>
-                        <span>Privacy Policy</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </aside>
-
-    <!-- 3. MOBILE SIDE DRAWER -->
-    <div class="side-menu-overlay" id="sideMenuOverlay" onclick="toggleMenu()"
-        style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 99998; display: none;">
-    </div>
-    <div class="side-menu" id="sideMenu">
-        <button class="close-menu" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; padding: 16px 10px; border-bottom: 1px solid #334155; margin-bottom: 12px; background: #0f172a; border-radius: 8px;">
-            <div style="width: 46px; height: 46px; background: #10B981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto 6px;">
-                <i class="fa-solid fa-user"></i>
-            </div>
-            <h3 style="font-size: 0.95rem; color: #fff; margin-bottom: 2px;">नमस्ते, <span id="sidebarUserName">प्रिय पाठक</span></h3>
-            <p style="font-size: 0.75rem; color: #38BDF8; font-weight: bold; margin: 0 0 8px 0;">
-                👑 <span id="sidebarUserMobile">लॉगिन नहीं है</span>
-            </p>
-            <div id="drawerAuthActions" style="display: flex; justify-content: center; gap: 8px;">
-                <button type="button" id="drawerLoginBtn" onclick="openLoginPopup()" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #fff; background: #10B981; border: none; padding: 5px 14px; border-radius: 6px; font-weight: 700; cursor: pointer;">
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i> लॉगिन करें
-                </button>
-                <button type="button" id="drawerLogoutBtn" onclick="handleUserLogout()" style="display: none; align-items: center; gap: 4px; font-size: 0.75rem; color: #fff; background: #EF4444; border: none; padding: 5px 14px; border-radius: 6px; font-weight: 700; cursor: pointer;">
-                    <i class="fa-solid fa-right-from-bracket"></i> लॉगआउट
-                </button>
-            </div>
-        </div>
-
-        <ul>
-            <li><a href="/index.html"><i class="fa-solid fa-house" style="color:#10B981;"></i> Home</a></li>
-            <li><a href="/mandi.html"><i class="fa-solid fa-seedling" style="color:#10B981;"></i> कृषि मंडी भाव</a></li>
-            <li><a href="/weather.html"><i class="fa-solid fa-cloud-sun" style="color:#0284C7;"></i> मौसम अपडेट (Weather)</a></li>
-            <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a></li>
-            <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> UCAS / My
-                    Profile</a></li>
-            <li><a href="/subscription.html"><i class="fa-solid fa-crown" style="color:#F59E0B;"></i> VIP Pass
-                    (Subscription)</a></li>
-            <li><a href="/purchases.html"><i class="fa-solid fa-file-invoice" style="color:#10B981;"></i> My
-                    Purchases</a></li>
-            <li><a href="/ucas/index.html#survey"><i class="fa-solid fa-clipboard-list" style="color:#0284C7;"></i>
-                    Smart Survey</a></li>
-            <li><a href="/ucas/index.html#phonebook"><i class="fa-solid fa-address-book" style="color:#8B5CF6;"></i> My
-                    Phonebook</a></li>
-            <li><a href="/ucas/index.html#leads"><i class="fa-solid fa-user-group" style="color:#EA580C;"></i> My Share
-                    Leads</a></li>
-            <li><a href="/ucas/index.html#marketing"><i class="fa-solid fa-rocket" style="color:#EC4899;"></i> Marketing
-                    Engine</a></li>
-            <li><a href="/webinar.html"><i class="fa-solid fa-video" style="color:#3B82F6;"></i> 🔴 लाइव ज़ूम वेबिनार</a></li>
-            <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart" style="color:#EF4444;"></i> Wishlist</a>
-            </li>
-            <li><a href="/faq.html"><i class="fa-solid fa-circle-question" style="color:#64748B;"></i> FAQ</a></li>
-            <li><a href="/terms.html"><i class="fa-solid fa-file-contract" style="color:#64748B;"></i> Terms &
-                    Conditions</a></li>
-            <li><a href="/privacy-policy.html"><i class="fa-solid fa-shield-halved" style="color:#64748B;"></i> Privacy
-                    Policy</a></li>
-        </ul>
-    </div>
-
-    <!-- MAIN CONTENT CONTAINER -->
+    <!-- MAIN WEATHER CONTENT CONTAINER (Full Width, Centered) -->
     <main class="library-main" id="mainLibraryContent">
         <div class="welcome-card-soft"
             style="background: linear-gradient(135deg, #050f0e 0%, #78b60e 100%); color: #fff; border-radius: 14px; padding: 25px; margin: 20px auto; max-width: 1200px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
@@ -352,89 +209,77 @@
         </div>
     </main>
 
-    <!-- UNIFIED AAROGYAM INDIA FOOTER (पूरा ओरिजिनल फुटर वापस जोड़ दिया गया है) -->
-    <footer class="site-footer"
-        style="background:#0f172a; color:#cbd5e1; padding:45px 20px 25px; margin-top:50px; border-top:3px solid transparent; border-image:linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;">
-        <div
-            style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:30px; margin-bottom:30px;">
-            <div>
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                    <img src="/images/logo/logo.png" alt="Aarogyam India"
-                        style="height:44px; width:auto; object-fit:contain;">
-                    <div>
-                        <div style="font-size:1.15rem; font-weight:800; color:#fff; line-height:1.2;">Aarogyam India
-                        </div>
-                        <div style="font-size:0.75rem; color:#10B981; font-weight:700;">डिजिटल कृषि व ज्ञान मंच</div>
-                    </div>
-                </div>
-                <p style="font-size:0.85rem; line-height:1.6; color:#94a3b8;">
-                    Aarogyam India is a premier digital agriculture knowledge platform empowering farmers and users with
-                    smart digital tools, eBooks, and expert guidance.
-                </p>
-            </div>
-
-            <div>
-                <h3
-                    style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #E86A17; display:inline-block; padding-bottom:4px;">
-                    Quick Links</h3>
-                <ul
-                    style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
-                    <li><a href="/index.html" style="color:#cbd5e1; text-decoration:none;">🏠 Home</a></li>
-                    <li><a href="/weather.html" style="color:#cbd5e1; text-decoration:none;">🌤️ मौसम अपडेट</a></li>
-                    <li><a href="/ucas/index.html" style="color:#cbd5e1; text-decoration:none;">👤 My Profile & UCAS</a>
-                    </li>
-                    <li><a href="/ebooks/my-library.html" style="color:#cbd5e1; text-decoration:none;">📚 Digital
-                            Library</a></li>
-                    <li><a href="/subscription.html" style="color:#f59e0b; text-decoration:none; font-weight:700;">👑
-                            VIP Pass / Subscription</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h3
-                    style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #10b981; display:inline-block; padding-bottom:4px;">
-                    Legal & Policies</h3>
-                <ul
-                    style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
-                    <li><a href="/terms.html" style="color:#cbd5e1; text-decoration:none;">📄 Terms & Conditions</a>
-                    </li>
-                    <li><a href="/privacy-policy.html" style="color:#cbd5e1; text-decoration:none;">🔒 Privacy
-                            Policy</a></li>
-                    <li><a href="/shipping-policy.html" style="color:#cbd5e1; text-decoration:none;">🚚 Shipping &
-                            Return Policy</a></li>
-                    <li><a href="/faq.html" style="color:#cbd5e1; text-decoration:none;">❓ FAQ & Support</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h3
-                    style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #3b82f6; display:inline-block; padding-bottom:4px;">
-                    Contact & Helpline</h3>
-                <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">📍 Rewa, Madhya Pradesh,
-                    India</p>
-                <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">
-                    📞 <a href="tel:917974422572" style="color:#38bdf8; text-decoration:none; font-weight:700;">+91
-                        79744 22572</a>
-                </p>
-                <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 12px 0;">
-                    ✉ <a href="mailto:info@aarogyamindia.in"
-                        style="color:#38bdf8; text-decoration:none;">info@aarogyamindia.in</a>
-                </p>
-            </div>
+        <!-- =========================================
+       15. MODERN DARK FOOTER
+  ========================================== -->
+  <footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b; margin-top: 40px;">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
+        
+        <!-- About Column -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:42px;width:auto;" />
+            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#38bdf8;">INDIA</span></span>
+          </div>
+          <p style="font-size:0.85rem;color:#94a3b8;line-height:1.55;">
+            Aarogyam India - भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य, पशु पोषण और डायरेक्ट सेलिंग ज्ञान मंच।
+          </p>
         </div>
 
-        <div
-            style="text-align:center; padding-top:20px; border-top:1px solid #334155; font-size:0.82rem; color:#64748b;">
-            © 2026 Aarogyam India. All Rights Reserved. • ISO Certified Digital Platform
+        <!-- Quick Links -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">त्वरित लिंक्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/index.html" style="color:#94a3b8;">🏠 मुख्य पृष्ठ</a></li>
+            <li><a href="/ebooks/ebook.html" style="color:#94a3b8;">📚 ई-बुक स्टोर</a></li>
+            <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;">🌱 कृषि हब</a></li>
+            <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;">🌾 खरीफ मास्टर गाइड 2026</a></li>
+            <li><a href="/ebooks/kheti-dr.html" style="color:#94a3b8;">🩺 खेती का डॉक्टर</a></li>
+          </ul>
         </div>
-    </footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script src="../js/supabase.js"></script>
-    <script src="../session.js"></script>
-    <script src="/js/user-notifications.js?v=12.0"></script>
-    <script src="/js/weather.js"></script>
+        <!-- Utilities -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सेवाएं व टूल्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/crop-doctor.html" style="color:#94a3b8;">🔬 फसल डॉक्टर AI</a></li>
+            <li><a href="/mandi.html" style="color:#94a3b8;">🌾 लाइव मंडी भाव</a></li>
+            <li><a href="/weather.html" style="color:#94a3b8;">⛅ मौसम पूर्वानुमान</a></li>
+            <li><a href="/webinar.html" style="color:#94a3b8;">📺 लाइव वेबिनार हब</a></li>
+            <li><a href="/subscription.html" style="color:#94a3b8;">👑 Pro VIP पास</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Support -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सहायता केंद्र</h3>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
+          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 मौसम सहायता')" class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;">
+            <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
+          </button>
+        </div>
+
+      </div>
+
+      <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
+        © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/session.js"></script>
+  <script src="/js/user-notifications.js?v=12.0"></script>
+  <script src="/js/recent-purchase-toast.js"></script>
+  <script src="/js/universal-nav-drawer.js"></script>
+  <script src="/js/global-guest-modal.js"></script>
+  <script type="module" src="/js/public-pwa.js"></script>
+  <script src="/js/weather.js"></script>
 
     <script>
       function syncAuthStatus() {
@@ -502,5 +347,6 @@
       document.addEventListener('DOMContentLoaded', syncAuthStatus);
       syncAuthStatus();
     </script>
+    <script src="/js/universal-nav-drawer.js"></script>
 </body>
 </html>

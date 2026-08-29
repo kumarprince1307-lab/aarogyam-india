@@ -169,18 +169,47 @@ async function loadBook() {
 
         let booksArray = [];
         try {
-            const response = await fetch("/data/books.json");
+            const response = await fetch("/data/books.json?v=" + Date.now());
             const jsonResult = await response.json();
             booksArray = Array.isArray(jsonResult) ? jsonResult : (jsonResult.books || []);
         } catch (e) {
             try {
-                const response2 = await fetch("../data/books.json");
+                const response2 = await fetch("../data/books.json?v=" + Date.now());
                 const jsonResult2 = await response2.json();
                 booksArray = Array.isArray(jsonResult2) ? jsonResult2 : (jsonResult2.books || []);
             } catch (e2) {
                 console.warn("Local books.json fallback active");
             }
         }
+
+        // Check custom books from localStorage
+        try {
+            const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+            if (Array.isArray(customBooks)) {
+                customBooks.forEach(cb => {
+                    if (!cb || !cb.id) return;
+                    const idx = booksArray.findIndex(x => x.id && x.id.toUpperCase() === cb.id.toUpperCase());
+                    if (idx >= 0) booksArray[idx] = cb;
+                    else booksArray.unshift(cb);
+                });
+            }
+            const landingList = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+            if (Array.isArray(landingList)) {
+                landingList.forEach(lp => {
+                    if (!lp || !lp.id) return;
+                    const idx = booksArray.findIndex(x => x.id && x.id.toUpperCase() === lp.id.toUpperCase());
+                    const synth = {
+                        id: lp.id,
+                        name: lp.hero?.title || lp.id,
+                        mrp: lp.hero?.mrp || 299,
+                        offerPrice: lp.hero?.offer_price || 99,
+                        cover: lp.hero?.cover_image || "/images/books/kharif-master-guide-2026-cover.webp"
+                    };
+                    if (idx >= 0) booksArray[idx] = Object.assign({}, booksArray[idx], synth);
+                    else booksArray.unshift(synth);
+                });
+            }
+        } catch (e) {}
 
         // Multi-Book Bundle Check
         if (rawIds) {

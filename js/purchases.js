@@ -123,13 +123,35 @@ async function fetchUserPurchases() {
             }
         }
 
-        // 3. Scan LocalStorage for any purchases or recent payments
+        // 3. Scan LocalStorage for any purchases or recent payments (Auto-Expand Multi-Book Cart Orders)
         try {
             const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
             if (Array.isArray(localPurchases)) {
                 localPurchases.forEach(p => {
-                    if (p && !purchases.some(existing => existing.id === p.id || (p.order_id && existing.order_id === p.order_id))) {
-                        purchases.push(p);
+                    if (!p) return;
+                    const rawBId = String(p.book_id || p.id || '').toUpperCase();
+                    
+                    // If comma-separated bundle, expand into individual items
+                    if (rawBId.includes(',')) {
+                        const splitIds = rawBId.split(',').map(x => x.trim()).filter(Boolean);
+                        splitIds.forEach((sId, sIdx) => {
+                            const expandedId = (p.id || p.order_id || 'pur') + '_' + sId;
+                            const isDup = purchases.some(existing => existing.id === expandedId || (existing.book_id === sId && existing.order_id === p.order_id));
+                            if (!isDup) {
+                                purchases.push({
+                                    ...p,
+                                    id: expandedId,
+                                    book_id: sId,
+                                    amount: Math.round((p.amount || 99) / splitIds.length) || 99,
+                                    invoice_number: p.invoice_number ? `${p.invoice_number}-${sIdx + 1}` : 'INV' + Math.floor(100000 + Math.random() * 900000)
+                                });
+                            }
+                        });
+                    } else {
+                        const isDup = purchases.some(existing => existing.id === p.id || (p.order_id && existing.order_id === p.order_id && existing.book_id === p.book_id));
+                        if (!isDup) {
+                            purchases.push(p);
+                        }
                     }
                 });
             }
@@ -137,19 +159,37 @@ async function fetchUserPurchases() {
             const currentOrder = JSON.parse(localStorage.getItem('AI_CURRENT_ORDER') || '{}');
             const currentPayment = localStorage.getItem('AI_CURRENT_PAYMENT');
             if ((currentOrder.bookId || currentOrder.amount || currentPayment) && purchases.length === 0) {
-                const bookId = currentOrder.bookId || 'BK002';
+                const rawBookId = String(currentOrder.bookId || 'BK002').toUpperCase();
                 const orderId = currentOrder.orderId || currentOrder.paymentId || 'TXN_16688688';
-                purchases.push({
-                    id: 'local_' + orderId,
-                    profile_id: user.id || 'usr_local',
-                    book_id: bookId,
-                    order_id: orderId,
-                    payment_id: currentOrder.paymentId || 'pay_live_TO6fvGk5e',
-                    amount: currentOrder.amount || 99,
-                    payment_status: 'success',
-                    purchase_date: new Date().toISOString(),
-                    invoice_number: 'INV000034'
-                });
+                
+                if (rawBookId.includes(',')) {
+                    const splitIds = rawBookId.split(',').map(x => x.trim()).filter(Boolean);
+                    splitIds.forEach((sId, sIdx) => {
+                        purchases.push({
+                            id: 'local_' + orderId + '_' + sId,
+                            profile_id: user.id || 'usr_local',
+                            book_id: sId,
+                            order_id: orderId,
+                            payment_id: currentOrder.paymentId || 'pay_live_TO6fvGk5e',
+                            amount: Math.round((currentOrder.amount || 99) / splitIds.length) || 99,
+                            payment_status: 'success',
+                            purchase_date: new Date().toISOString(),
+                            invoice_number: 'INV0000' + (34 + sIdx)
+                        });
+                    });
+                } else {
+                    purchases.push({
+                        id: 'local_' + orderId,
+                        profile_id: user.id || 'usr_local',
+                        book_id: rawBookId,
+                        order_id: orderId,
+                        payment_id: currentOrder.paymentId || 'pay_live_TO6fvGk5e',
+                        amount: currentOrder.amount || 99,
+                        payment_status: 'success',
+                        purchase_date: new Date().toISOString(),
+                        invoice_number: 'INV000034'
+                    });
+                }
             }
         } catch (e) {}
 

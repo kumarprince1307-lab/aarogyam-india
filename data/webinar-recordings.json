@@ -1,0 +1,64 @@
+{
+  "recordings": [
+    {
+      "id": "VID_001",
+      "title": "🌾 खरीफ फसलों में कीट एवं इल्ली नियंत्रण मास्टरक्लास",
+      "subject": "कीट नियंत्रण व फसल सुरक्षा",
+      "category": "Crop Protection",
+      "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "youtube_id": "dQw4w9WgXcQ",
+      "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      "duration": "45 मिनट",
+      "speaker": "डॉ. बी.के. शर्मा (वरिष्ठ कृषि विशेषज्ञ)",
+      "access_tier": "guest",
+      "status": "active",
+      "created_at": "2026-08-15T14:30:00Z",
+      "views_count": 348
+    },
+    {
+      "id": "VID_002",
+      "title": "🌱 प्राकृतिक व जैविक खाद निर्माण की सम्पूर्ण विधि",
+      "subject": "जैविक कृषि व मृदा सुधार",
+      "category": "Organic Farming",
+      "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "youtube_id": "dQw4w9WgXcQ",
+      "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      "duration": "58 मिनट",
+      "speaker": "श्री राजेश पटेल (मास्टर ट्रेनर)",
+      "access_tier": "registered",
+      "status": "active",
+      "created_at": "2026-08-18T18:00:00Z",
+      "views_count": 512
+    },
+    {
+      "id": "VID_003",
+      "title": "💧 ड्रिप इरीगेशन व फर्टिगेशन से 50% अधिक पैदावार",
+      "subject": "उन्नत सिंचाई व पोषण",
+      "category": "Irrigation Tech",
+      "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "youtube_id": "dQw4w9WgXcQ",
+      "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      "duration": "62 मिनट",
+      "speaker": "इंजीनियर आलोक वर्मा (सिंचाई विशेषज्ञ)",
+      "access_tier": "registered",
+      "status": "active",
+      "created_at": "2026-08-22T19:30:00Z",
+      "views_count": 289
+    },
+    {
+      "id": "VID_004",
+      "title": "👑 आरोग्यम VIP किसान प्राइम स्ट्रेटेजी व मंडी सीक्रेट्स",
+      "subject": "व्यापार व अधिक लाभ रणनीति",
+      "category": "VIP Secrets",
+      "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "youtube_id": "dQw4w9WgXcQ",
+      "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      "duration": "75 मिनट",
+      "speaker": "आरोग्यम कोर टीम & एग्री बिजनेस हेड",
+      "access_tier": "active_subscriber",
+      "status": "active",
+      "created_at": "2026-08-25T20:00:00Z",
+      "views_count": 174
+    }
+  ]
+}

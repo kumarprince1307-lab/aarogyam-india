@@ -5,6 +5,7 @@ const OFFLINE_FALLBACK = '/admin/offline.html';
 
 const APP_SHELL_ASSETS = [
   '/admin/index.html',
+  '/admin/all-webinars.html',
   '/admin/book-landing-pages.html',
   '/admin/offline.html',
   '/admin/admin-manifest.json',

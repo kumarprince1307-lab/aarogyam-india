@@ -106,15 +106,109 @@ export async function initWebinars() {
             <span style="font-size: 0.75rem; background: rgba(37,99,235,0.15); color: #3b82f6; padding: 2px 8px; border-radius: 12px; font-weight: 700;">Direct 1-Click Zoom Connect</span>
           </div>
           <p style="font-size: 0.85rem; color: var(--admin-muted); margin: 0;">
-            ज़ूम मीटिंग लिंक, पासवर्ड और इनबिल्ट डेट-टाइम पिकर के साथ वेबिनार बनाएं और रजिस्टर्ड लीड्स को ट्रैक करें।
+            ज़ूम मीटिंग लिंक, टाइमर, 3-टियर रिकॉर्डेड ट्रेनिंग गैलरी और अटेंडेंस लीड्स का पूर्ण प्रबंधन।
           </p>
         </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button id="btn-toggle-create-webinar" class="admin-button" style="background:#2563eb; color:#fff; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
-            <span>➕</span> <span id="btn-create-label">नया ज़ूम वेबिनार बनाएं</span>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <button id="btn-toggle-live-status" class="admin-button small-button" style="background:#10b981; color:#fff; font-weight:800;" title="Toggle Live Streaming vs Option B Off-Air Archive">
+            <span id="label-live-status">🟢 Live Streaming: ON</span>
           </button>
-          <button id="btn-refresh-webinars" class="admin-button small-button">🔄 Refresh Data</button>
+          <button id="btn-toggle-create-webinar" class="admin-button" style="background:#2563eb; color:#fff; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+            <span>➕</span> <span id="btn-create-label">नया ज़ूम वेबिनार</span>
+          </button>
+          <button id="btn-toggle-create-recording" class="admin-button" style="background:#059669; color:#fff; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+            <span>🎬</span> <span>+ रिकॉर्डेड वीडियो</span>
+          </button>
+          <button id="btn-refresh-webinars" class="admin-button small-button">🔄 Refresh</button>
         </div>
+      </div>
+
+      <!-- Create / Edit Recorded Training Video Form Card -->
+      <div id="admin-create-recording-card" class="admin-card" style="display:none; background: #0f172a; border: 1.5px solid #10b981; border-radius: 14px; padding: 20px; margin-top: 14px; box-shadow: 0 10px 30px rgba(16,185,129,0.2);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
+          <h3 id="form-recording-card-title" style="font-size: 1.05rem; font-weight: 800; color: #34d399; display:flex; align-items:center; gap:8px;">
+            <span>🎬</span> नई रिकॉर्डेड ट्रेनिंग क्लास जोड़ें (Add Recorded Video)
+          </h3>
+          <button type="button" id="btn-close-create-recording" class="admin-button small-button" style="background:transparent; color:#94a3b8; border:none; font-size:1.2rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <form id="form-admin-create-recording" onsubmit="return false;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 12px;">
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">वीडियो शीर्षक (Title): *</label>
+              <input type="text" id="adm_rec_title" class="admin-input" placeholder="उदा. 🌾 खरीफ फसलों में कीट एवं इल्ली नियंत्रण मास्टरक्लास" style="width:100%;" />
+            </div>
+
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">विषय / श्रेणी (Subject / Category): *</label>
+              <select id="adm_rec_category" class="admin-select" style="width:100%;">
+                <option value="Crop Protection">कीट नियंत्रण व फसल सुरक्षा</option>
+                <option value="Organic Farming">जैविक कृषि व मृदा सुधार</option>
+                <option value="Irrigation Tech">उन्नत सिंचाई व पोषण</option>
+                <option value="VIP Secrets">👑 VIP प्राइम सीक्रेट्स</option>
+                <option value="General">सामान्य कृषि परामर्श</option>
+                <option value="custom">➕ नई श्रेणी जोड़ें (+ Add New Category)</option>
+              </select>
+              <div id="adm_rec_custom_cat_wrapper" style="display:none; margin-top:6px;">
+                <input type="text" id="adm_rec_custom_cat_input" class="admin-input" placeholder="नई श्रेणी का नाम लिखें (उदा. मशरूम उत्पादन, बागवानी)" style="width:100%; font-size:0.82rem;" />
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">
+                YouTube Video URL / Link: *
+                <span style="font-size:0.72rem; color:#10b981; font-weight:600;">(ऑटो-थंबनेल)</span>
+              </label>
+              <input type="text" id="adm_rec_url" class="admin-input" placeholder="उदा. https://www.youtube.com/watch?v=... या youtu.be/..." style="width:100%;" />
+
+              <!-- Instant Live YouTube Thumbnail Preview Box -->
+              <div id="adm_rec_thumb_preview_box" style="display:flex; align-items:center; gap:12px; margin-top:8px; background:rgba(255,255,255,0.03); border:1px dashed #334155; border-radius:10px; padding:8px 12px;">
+                <img id="adm_rec_thumb_img" src="https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt="Preview" style="width:100px; aspect-ratio:16/9; border-radius:6px; object-fit:cover; border:1px solid #475569;" />
+                <div>
+                  <div id="adm_rec_thumb_status" style="font-size:0.78rem; font-weight:800; color:#10b981; display:flex; align-items:center; gap:4px;">
+                    <span>✓</span> <span>YouTube Thumbnail Live Preview</span>
+                  </div>
+                  <div id="adm_rec_thumb_id_label" style="font-size:0.72rem; color:#94a3b8; margin-top:2px;">
+                    Video ID: <code>dQw4w9WgXcQ</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">प्रशिक्षक / विशेषज्ञ (Speaker):</label>
+              <input type="text" id="adm_rec_speaker" class="admin-input" placeholder="उदा. डॉ. बी.के. शर्मा (वरिष्ठ कृषि विशेषज्ञ)" style="width:100%;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">अवधि / Duration:</label>
+              <input type="text" id="adm_rec_duration" class="admin-input" placeholder="उदा. 45 मिनट" style="width:100%;" />
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px;">
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">एक्सेस लेवल (Access Tier): *</label>
+              <select id="adm_rec_tier" class="admin-select" style="width:100%;">
+                <option value="guest">🟢 Guest (खुला - बिना रजिस्ट्रेशन कोई भी देख सकता है)</option>
+                <option value="registered">🟡 Registered (रजिस्ट्रेशन अनिवार्य - नाम व नंबर से खुलेगा)</option>
+                <option value="active_subscriber">🟣 Active Member Only (केवल VIP एक्टिव मेंबर्स)</option>
+              </select>
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight:700; font-size:0.82rem; color:#cbd5e1;">स्थिति (Status): *</label>
+              <select id="adm_rec_status" class="admin-select" style="width:100%;">
+                <option value="active">🟢 Active (गैलरी में दिखेगा)</option>
+                <option value="inactive">⚪ Inactive (छिपा रहेगा)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button type="button" id="btn-cancel-edit-recording" class="admin-button small-button" style="background:#475569; color:#fff;">रद्द करें</button>
+            <button type="button" id="btn-submit-recording" class="admin-button" style="background:#10b981; color:#fff; font-weight:800; cursor:pointer;">💾 वीडियो सेव करें</button>
+          </div>
+        </form>
       </div>
 
       <!-- Create / Edit Zoom Webinar Form Card -->
@@ -300,6 +394,24 @@ export async function initWebinars() {
                 <textarea class="admin-input adm-faq-a" rows="2" placeholder="उत्तर लिखें..." style="width:100%;">वेबिनार शुरू होने के ठीक 2 मिनट पहले ऊपर दिया गया 'Join Zoom Meeting' बटन स्वतः सक्रिय हो जाएगा।</textarea>
               </div>
             </div>
+          <!-- INTERACTIVE CURSOR DRAG & DROP SECTION REORDERING (DRAG ANYWHERE WITH MOUSE) -->
+          <div style="background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(99,102,241,0.12) 100%); border: 2px solid #8b5cf6; border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 8px 20px rgba(139,92,246,0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <div style="font-weight: 800; color: #c084fc; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                  <span>⠿</span> <span>पेज सेक्शन्स का क्रम व दृश्यता (Drag & Drop Section Reordering)</span>
+                </div>
+                <p style="font-size: 0.78rem; color: #e2e8f0; margin: 3px 0 0 0;">
+                  माउस से पकड़ कर क्रम बदलें अथवा <strong>🟢 चालू / 👁️ बंद</strong> बटन दबाकर किसी भी सेक्शन को छुपाएं या दिखाएं:
+                </p>
+              </div>
+              <button type="button" id="btn_reset_webinar_section_order" class="admin-button small-button" style="background: rgba(255,255,255,0.15); border: 1px solid var(--admin-border); color: #fff; font-weight: 700; font-size: 0.75rem;">
+                ↺ डिफ़ॉल्ट क्रम रीसेट करें
+              </button>
+            </div>
+            <div id="wb_sections_reorder_list_wrap" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+              <!-- Rendered with drag & drop handlers by JS -->
+            </div>
           </div>
 
           <div style="margin-bottom: 12px;">
@@ -337,15 +449,22 @@ export async function initWebinars() {
           <div style="font-size: 0.8rem; color: var(--admin-muted); font-weight: 700;">🔗 लाइव Zoom सेशंस (Active Zoom Links)</div>
           <div id="kpi-active-sessions" style="font-size: 1.6rem; font-weight: 800; color: #f59e0b; margin-top: 4px;">0</div>
         </div>
+        <div class="admin-card" style="padding: 14px; background: var(--admin-surface-2, #0f172a); border-left: 4px solid #8b5cf6;">
+          <div style="font-size: 0.8rem; color: var(--admin-muted); font-weight: 700;">🎬 रिकॉर्डेड ट्रेनिंग (Training Videos)</div>
+          <div id="kpi-total-recordings" style="font-size: 1.6rem; font-weight: 800; color: #a78bfa; margin-top: 4px;">0</div>
+        </div>
       </div>
 
       <!-- Tab Switcher -->
-      <div style="display:flex; gap:10px; margin-top:14px; border-bottom: 2px solid var(--admin-border, #334155); padding-bottom: 8px;">
+      <div style="display:flex; gap:10px; margin-top:14px; border-bottom: 2px solid var(--admin-border, #334155); padding-bottom: 8px; flex-wrap: wrap;">
         <button type="button" id="tab-btn-webinars" class="admin-button" style="background:#3b82f6; color:#fff; font-weight:800; font-size:0.88rem; padding:8px 16px;">
           🎥 Webinars List (<span id="tab-count-webinars">0</span>)
         </button>
         <button type="button" id="tab-btn-attendees" class="admin-button" style="background:var(--admin-surface-2, #0f172a); color:var(--admin-muted); font-weight:800; font-size:0.88rem; padding:8px 16px; border:1px solid var(--admin-border, #334155);">
           👥 Attendees Report (<span id="tab-count-attendees">0</span>)
+        </button>
+        <button type="button" id="tab-btn-recordings" class="admin-button" style="background:var(--admin-surface-2, #0f172a); color:var(--admin-muted); font-weight:800; font-size:0.88rem; padding:8px 16px; border:1px solid var(--admin-border, #334155);">
+          🎬 Recorded Trainings (<span id="tab-count-recordings">0</span>)
         </button>
       </div>
 
@@ -439,11 +558,166 @@ export async function initWebinars() {
   wbMeetingIdInput?.addEventListener('input', autoFillZoomLink);
   wbPasscodeInput?.addEventListener('input', autoFillZoomLink);
 
+  // -------------------------------------------------------------
+  // INTERACTIVE CURSOR DRAG & DROP SECTION REORDERING ENGINE
+  // -------------------------------------------------------------
+  const defaultWebinarSections = [
+    { key: 'cover', name: '✨ 3D फ्लोटिंग 9:16 कवर', desc: 'Floating 9:16 WebP Hero Cover Image' },
+    { key: 'timer', name: '⏱️ डिजिटल काउंटडाउन टाइमर व ज़ूम अनलॉक', desc: '00:00:00 Countdown Timer & 2-Min Lock Box' },
+    { key: 'registration', name: '📝 सीट बुकिंग फॉर्म व स्पॉन्सर सहायता', desc: 'Lead Registration Form & WhatsApp Support' },
+    { key: 'kpis', name: '🌟 मुख्य विशेषताएँ व लाभ (KPI Highlights)', desc: '1-Line Bullet Points & Key Takeaways' },
+    { key: 'banners', name: '🖼️ वेबिनार पोस्टर्स व इमेज बैनर्स', desc: 'Webinar Poster Strips & Carousel' },
+    { key: 'videos', name: '▶️ लाइव यूट्यूब वीडियोज व सेशंस', desc: 'YouTube Live / Demo Embedded Player' },
+    { key: 'tutorial', name: '📱 ज़ूम जॉइनिंग ट्यूटोरियल गाइड', desc: 'Step-by-Step 4-Step Zoom Tutorial' },
+    { key: 'faqs', name: '❓ अक्सर पूछे जाने वाले प्रश्न (FAQs)', desc: 'Interactive Accordion FAQ Questions' }
+  ];
+
+  let currentSectionsOrder = defaultWebinarSections.map(s => s.key);
+  let currentHiddenSections = [];
+  let draggedSectionIndex = null;
+
+  function renderWebinarSectionsReorderingList() {
+    const wrap = document.getElementById('wb_sections_reorder_list_wrap');
+    if (!wrap) return;
+
+    if (!currentSectionsOrder || currentSectionsOrder.length === 0) {
+      currentSectionsOrder = defaultWebinarSections.map(s => s.key);
+    }
+
+    wrap.innerHTML = currentSectionsOrder.map((secKey, idx) => {
+      const meta = defaultWebinarSections.find(s => s.key === secKey) || { key: secKey, name: secKey, desc: '' };
+      const isHidden = currentHiddenSections.includes(secKey);
+
+      return `
+        <div 
+          class="wb-drag-item"
+          id="wb_drag_sec_item_${idx}"
+          draggable="true"
+          ondragstart="window.handleWbDragStart(event, ${idx})"
+          ondragover="window.handleWbDragOver(event, ${idx})"
+          ondragenter="window.handleWbDragEnter(event, ${idx})"
+          ondragleave="window.handleWbDragLeave(event, ${idx})"
+          ondrop="window.handleWbDrop(event, ${idx})"
+          ondragend="window.handleWbDragEnd(event)"
+          style="background:var(--admin-surface, #1e293b); border:1.5px solid ${isHidden ? '#475569' : '#8b5cf6'}; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; opacity:${isHidden ? '0.6' : '1'}; box-shadow:0 2px 6px rgba(0,0,0,0.15); cursor:grab;"
+        >
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:1.2rem; color:#c084fc; cursor:grab; padding:2px;" title="माउस से पकड़ कर किसी भी जगह रखें">⠿</span>
+            <span style="font-size:0.75rem; background:#8b5cf6; color:#fff; font-weight:800; padding:2px 8px; border-radius:10px;">#${idx + 1}</span>
+            <div>
+              <div style="font-weight:800; font-size:0.92rem; color:var(--admin-text); display:flex; align-items:center; gap:6px;">
+                <span>${meta.name}</span>
+              </div>
+              <small style="color:var(--admin-muted); font-size:0.75rem;">${meta.desc}</small>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button type="button" onclick="window.moveWbSectionUp(${idx})" class="admin-button small-button" style="background:#3b82f6; color:#fff; padding:3px 8px;" title="ऊपर करें (Move Up)" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}>
+              ⬆️
+            </button>
+            <button type="button" onclick="window.moveWbSectionDown(${idx})" class="admin-button small-button" style="background:#3b82f6; color:#fff; padding:3px 8px;" title="नीचे करें (Move Down)" ${idx === currentSectionsOrder.length - 1 ? 'disabled style="opacity:0.4;"' : ''}>
+              ⬇️
+            </button>
+            <button type="button" onclick="window.toggleWbSectionVisibility('${secKey}')" class="admin-button small-button" style="background:${isHidden ? '#64748b' : '#16a34a'}; color:#fff; padding:3px 8px;" title="चालू / बंद">
+              ${isHidden ? '👁️ बंद' : '🟢 चालू'}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.handleWbDragStart = (e, index) => {
+    draggedSectionIndex = index;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index);
+    setTimeout(() => {
+      const el = document.getElementById(`wb_drag_sec_item_${index}`);
+      if (el) el.style.opacity = '0.4';
+    }, 0);
+  };
+
+  window.handleWbDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  window.handleWbDragEnter = (e, index) => {
+    e.preventDefault();
+    const el = document.getElementById(`wb_drag_sec_item_${index}`);
+    if (el && index !== draggedSectionIndex) {
+      el.style.border = '2px dashed #38bdf8';
+    }
+  };
+
+  window.handleWbDragLeave = (e, index) => {
+    const el = document.getElementById(`wb_drag_sec_item_${index}`);
+    if (el) {
+      const isHidden = currentHiddenSections.includes(currentSectionsOrder[index]);
+      el.style.border = `1.5px solid ${isHidden ? '#475569' : '#8b5cf6'}`;
+    }
+  };
+
+  window.handleWbDrop = (e, targetIndex) => {
+    e.preventDefault();
+    const sourceIndex = draggedSectionIndex;
+    if (sourceIndex !== null && sourceIndex !== targetIndex) {
+      const itemToMove = currentSectionsOrder.splice(sourceIndex, 1)[0];
+      currentSectionsOrder.splice(targetIndex, 0, itemToMove);
+    }
+    draggedSectionIndex = null;
+    renderWebinarSectionsReorderingList();
+  };
+
+  window.handleWbDragEnd = (e) => {
+    draggedSectionIndex = null;
+    renderWebinarSectionsReorderingList();
+  };
+
+  window.moveWbSectionUp = (idx) => {
+    if (idx > 0) {
+      const temp = currentSectionsOrder[idx];
+      currentSectionsOrder[idx] = currentSectionsOrder[idx - 1];
+      currentSectionsOrder[idx - 1] = temp;
+      renderWebinarSectionsReorderingList();
+    }
+  };
+
+  window.moveWbSectionDown = (idx) => {
+    if (idx < currentSectionsOrder.length - 1) {
+      const temp = currentSectionsOrder[idx];
+      currentSectionsOrder[idx] = currentSectionsOrder[idx + 1];
+      currentSectionsOrder[idx + 1] = temp;
+      renderWebinarSectionsReorderingList();
+    }
+  };
+
+  window.toggleWbSectionVisibility = (secKey) => {
+    const idx = currentHiddenSections.indexOf(secKey);
+    if (idx >= 0) {
+      currentHiddenSections.splice(idx, 1);
+    } else {
+      currentHiddenSections.push(secKey);
+    }
+    renderWebinarSectionsReorderingList();
+  };
+
+  window.resetWbSectionsOrder = () => {
+    currentSectionsOrder = defaultWebinarSections.map(s => s.key);
+    currentHiddenSections = [];
+    renderWebinarSectionsReorderingList();
+  };
+
+  document.getElementById('btn_reset_webinar_section_order')?.addEventListener('click', window.resetWbSectionsOrder);
+
   function resetWebinarForm() {
     editingWebinarId = null;
     formCreateWebinar?.reset();
     uploadedCoverBase64 = '';
     uploadedBannersArray = [];
+    currentSectionsOrder = defaultWebinarSections.map(s => s.key);
+    currentHiddenSections = [];
+    renderWebinarSectionsReorderingList();
     renderUploadedBannersPreview();
     if (coverUrlWrapper) coverUrlWrapper.style.display = 'none';
     if (coverUploadWrapper) coverUploadWrapper.style.display = 'none';
@@ -782,7 +1056,9 @@ export async function initWebinars() {
       banners: banners,
       youtube_links: youtubeLinks,
       kpis: kpis,
-      faqs: faqs
+      faqs: faqs,
+      section_order: currentSectionsOrder,
+      hidden_sections: currentHiddenSections
     };
 
     if (editingWebinarId) {
@@ -798,26 +1074,30 @@ export async function initWebinars() {
 
       try {
         if (db) {
-          await db.from('landing_pages').update(updatedData).eq('id', editingWebinarId);
+          await db.from('landing_pages').upsert([{
+            id: editingWebinarId,
+            profile_id: 'ALL_USERS',
+            share_id: 'ALL_USERS',
+            category: 'webinar',
+            offer_price: price,
+            status: 'active',
+            ...updatedData
+          }]);
+          if (editingWebinarId !== 'WB_MASTER') {
+            await db.from('landing_pages').upsert([{ 
+              id: 'WB_MASTER', 
+              profile_id: 'ALL_USERS', 
+              share_id: 'ALL_USERS', 
+              category: 'webinar', 
+              offer_price: price,
+              status: 'active', 
+              ...updatedData 
+            }]);
+          }
         }
       } catch (err) {
         console.warn('Webinar update notice:', err);
       }
-
-      // Also upsert master record for regular page
-      try {
-        if (db) {
-          await db.from('landing_pages').upsert([{ 
-            id: 'WB_MASTER', 
-            profile_id: 'ALL_USERS', 
-            share_id: 'ALL_USERS', 
-            category: 'webinar', 
-            offer_price: price,
-            status: 'active', 
-            ...updatedData 
-          }]);
-        }
-      } catch (e) {}
 
       // Update LocalStorage & Purge Stale Caches
       try {
@@ -825,8 +1105,17 @@ export async function initWebinars() {
         const idx = stored.findIndex(w => w.id === editingWebinarId);
         if (idx !== -1) {
           stored[idx] = { ...stored[idx], ...updatedData };
-          localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(stored));
+        } else {
+          stored.unshift({ id: editingWebinarId, profile_id: 'ALL_USERS', share_id: 'ALL_USERS', category: 'webinar', offer_price: price, status: 'active', ...updatedData });
         }
+        localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(stored));
+        // Clear from deleted IDs set
+        try {
+          const delArr = JSON.parse(localStorage.getItem('AI_DELETED_WEBINAR_IDS') || '[]');
+          const filteredDel = delArr.filter(id => id !== editingWebinarId);
+          localStorage.setItem('AI_DELETED_WEBINAR_IDS', JSON.stringify(filteredDel));
+        } catch (e) {}
+
         for (let i = localStorage.length - 1; i >= 0; i--) {
           const k = localStorage.key(i);
           if (k && k.startsWith('AI_WB_CONFIG_')) localStorage.removeItem(k);
@@ -857,7 +1146,7 @@ export async function initWebinars() {
 
       try {
         if (db) {
-          await db.from('landing_pages').insert([newRecord]);
+          await db.from('landing_pages').upsert([newRecord]);
           await db.from('landing_pages').upsert([{ ...newRecord, id: 'WB_MASTER' }]);
         }
       } catch (err) {
@@ -868,6 +1157,14 @@ export async function initWebinars() {
         const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
         stored.unshift(newRecord);
         localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(stored));
+
+        // Clear from deleted list
+        try {
+          const delArr = JSON.parse(localStorage.getItem('AI_DELETED_WEBINAR_IDS') || '[]');
+          const filteredDel = delArr.filter(id => id !== newWbId && id !== 'WB_MASTER');
+          localStorage.setItem('AI_DELETED_WEBINAR_IDS', JSON.stringify(filteredDel));
+        } catch (e) {}
+
         for (let i = localStorage.length - 1; i >= 0; i--) {
           const k = localStorage.key(i);
           if (k && k.startsWith('AI_WB_CONFIG_')) localStorage.removeItem(k);
@@ -888,6 +1185,239 @@ export async function initWebinars() {
 
   const tabBtnWebinars = document.getElementById('tab-btn-webinars');
   const tabBtnAttendees = document.getElementById('tab-btn-attendees');
+  const tabBtnRecordings = document.getElementById('tab-btn-recordings');
+
+  const btnToggleLiveStatus = document.getElementById('btn-toggle-live-status');
+  const labelLiveStatus = document.getElementById('label-live-status');
+
+  const btnToggleCreateRec = document.getElementById('btn-toggle-create-recording');
+  const btnCloseCreateRec = document.getElementById('btn-close-create-recording');
+  const btnCancelEditRec = document.getElementById('btn-cancel-edit-recording');
+  const createRecCard = document.getElementById('admin-create-recording-card');
+  const formCreateRec = document.getElementById('form-admin-create-recording');
+  const formRecTitle = document.getElementById('form-recording-card-title');
+
+  let allRecordings = [];
+  let editingRecordingId = null;
+
+  // Toggle Live Streaming Status (Live ON vs Option B Off-Air)
+  btnToggleLiveStatus?.addEventListener('click', () => {
+    let currentLive = localStorage.getItem('AI_WB_LIVE_ACTIVE');
+    if (currentLive === null) currentLive = 'true';
+    const newLive = currentLive === 'true' ? 'false' : 'true';
+    localStorage.setItem('AI_WB_LIVE_ACTIVE', newLive);
+    updateLiveStatusButtonUI(newLive === 'true');
+    alert(newLive === 'true'
+      ? '🟢 लाइव मोड सक्रिय किया गया (Live Webinar Mode Active)!\n\nयूजर को लाइव टाइमर व ज़ूम अनलॉक फॉर्म दिखेगा।'
+      : '📺 Option B (ऑफ-एयर मोड) सक्रिय किया गया!\n\nलाइव सत्र बंद रहेगा और यूजर को रिकॉर्डेड ट्रेनिंग गैलरी दिखेगी।');
+  });
+
+  function updateLiveStatusButtonUI(isLive) {
+    if (!btnToggleLiveStatus || !labelLiveStatus) return;
+    if (isLive) {
+      btnToggleLiveStatus.style.background = '#10b981';
+      labelLiveStatus.textContent = '🟢 Live Streaming: ON';
+    } else {
+      btnToggleLiveStatus.style.background = '#e11d48';
+      labelLiveStatus.textContent = '📺 Option B: Off-Air Archive';
+    }
+  }
+
+  // Create / Edit Recording Form Handlers
+  btnToggleCreateRec?.addEventListener('click', () => {
+    if (!createRecCard) return;
+    if (createRecCard.style.display === 'none') {
+      resetRecordingForm();
+      createRecCard.style.display = 'block';
+      if (formRecTitle) formRecTitle.innerHTML = '<span>🎬</span> नई रिकॉर्डेड ट्रेनिंग जोड़ें (Add Video)';
+      createRecCard.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      createRecCard.style.display = 'none';
+    }
+  });
+
+  btnCloseCreateRec?.addEventListener('click', () => {
+    if (createRecCard) createRecCard.style.display = 'none';
+  });
+
+  btnCancelEditRec?.addEventListener('click', () => {
+    if (createRecCard) createRecCard.style.display = 'none';
+    resetRecordingForm();
+  });
+
+  const recUrlInput = document.getElementById('adm_rec_url');
+  const recThumbImg = document.getElementById('adm_rec_thumb_img');
+  const recThumbStatus = document.getElementById('adm_rec_thumb_status');
+  const recThumbIdLabel = document.getElementById('adm_rec_thumb_id_label');
+  const recCatSelect = document.getElementById('adm_rec_category');
+  const recCustomCatWrapper = document.getElementById('adm_rec_custom_cat_wrapper');
+  const recCustomCatInput = document.getElementById('adm_rec_custom_cat_input');
+
+  function updateRecThumbPreview() {
+    const url = (recUrlInput?.value || '').trim();
+    const ytId = extractYoutubeVideoId(url);
+    if (ytId) {
+      if (recThumbImg) recThumbImg.src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+      if (recThumbStatus) recThumbStatus.innerHTML = '<span style="color:#10b981;font-weight:800;">✓ Live YouTube Thumbnail Loaded</span>';
+      if (recThumbIdLabel) recThumbIdLabel.innerHTML = `Video ID: <code>${ytId}</code>`;
+    } else {
+      if (recThumbImg) recThumbImg.src = 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg';
+      if (recThumbStatus) recThumbStatus.innerHTML = '<span style="color:#94a3b8;">YouTube Video URL डालें...</span>';
+      if (recThumbIdLabel) recThumbIdLabel.innerHTML = 'Video ID: <code>-</code>';
+    }
+  }
+
+  recUrlInput?.addEventListener('input', updateRecThumbPreview);
+  recUrlInput?.addEventListener('change', updateRecThumbPreview);
+
+  recCatSelect?.addEventListener('change', () => {
+    if (recCatSelect.value === 'custom') {
+      if (recCustomCatWrapper) recCustomCatWrapper.style.display = 'block';
+      recCustomCatInput?.focus();
+    } else {
+      if (recCustomCatWrapper) recCustomCatWrapper.style.display = 'none';
+    }
+  });
+
+  function resetRecordingForm() {
+    editingRecordingId = null;
+    formCreateRec?.reset();
+    if (recCustomCatWrapper) recCustomCatWrapper.style.display = 'none';
+    const statusSelect = document.getElementById('adm_rec_status');
+    const tierSelect = document.getElementById('adm_rec_tier');
+    if (statusSelect) statusSelect.value = 'active';
+    if (tierSelect) tierSelect.value = 'guest';
+    updateRecThumbPreview();
+  }
+
+  async function handleSaveRecording() {
+    const title = (document.getElementById('adm_rec_title')?.value || '').trim();
+    let category = recCatSelect?.value || 'General';
+    let subject = recCatSelect?.selectedOptions[0]?.text || category;
+
+    if (category === 'custom') {
+      const customVal = (recCustomCatInput?.value || '').trim();
+      if (!customVal) {
+        alert('कृपया नई श्रेणी / विषय का नाम लिखें।');
+        recCustomCatInput?.focus();
+        return;
+      }
+      category = customVal;
+      subject = customVal;
+    }
+
+    const url = (recUrlInput?.value || '').trim();
+    const speaker = (document.getElementById('adm_rec_speaker')?.value || '').trim() || 'आरोग्यम कृषि विशेषज्ञ';
+    const duration = (document.getElementById('adm_rec_duration')?.value || '').trim() || '45 मिनट';
+    const accessTier = document.getElementById('adm_rec_tier')?.value || 'guest';
+    const status = document.getElementById('adm_rec_status')?.value || 'active';
+
+    if (!title) {
+      alert('कृपया वीडियो का शीर्षक (Title) दर्ज करें।');
+      document.getElementById('adm_rec_title')?.focus();
+      return;
+    }
+    if (!url) {
+      alert('कृपया YouTube Video Link या Video ID दर्ज करें।');
+      recUrlInput?.focus();
+      return;
+    }
+
+    const ytId = extractYoutubeVideoId(url) || 'dQw4w9WgXcQ';
+    const thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+
+    let recId = editingRecordingId;
+    if (!recId) {
+      recId = 'VID_' + String(Date.now()).slice(-6);
+    }
+
+    const recObj = {
+      id: recId,
+      title: title,
+      subject: subject,
+      category: category,
+      youtube_url: url.startsWith('http') ? url : `https://www.youtube.com/watch?v=${ytId}`,
+      youtube_id: ytId,
+      thumbnail: thumb,
+      duration: duration,
+      speaker: speaker,
+      access_tier: accessTier,
+      status: status,
+      created_at: new Date().toISOString(),
+      views_count: 0
+    };
+
+    const btnSubmit = document.getElementById('btn-submit-recording');
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = '⏳ सुरक्षित हो रहा है...';
+    }
+
+    // 1. Local Persistence (Instant Guaranteed Response)
+    let localList = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
+    if (editingRecordingId) {
+      const idx = localList.findIndex(v => v.id === editingRecordingId);
+      if (idx !== -1) {
+        localList[idx] = recObj;
+      } else {
+        localList.unshift(recObj);
+      }
+    } else {
+      localList.unshift(recObj);
+    }
+    localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(localList));
+
+    // 2. Cloud Persistence (Supabase landing_pages)
+    if (db) {
+      try {
+        await db.from('landing_pages').upsert([{
+          id: recId,
+          profile_id: 'ALL_USERS',
+          share_id: 'ALL_USERS',
+          title: title,
+          message: subject,
+          category: 'recorded_video',
+          content_type: 'youtube',
+          media_url: recObj.youtube_url,
+          thumbnail_url: thumb,
+          offer_price: 0,
+          status: status,
+          webinar_data: {
+            type: 'recorded_video',
+            youtube_id: ytId,
+            duration: duration,
+            speaker: speaker,
+            access_tier: accessTier,
+            category_name: subject,
+            category_key: category,
+            status: status,
+            views_count: 0
+          }
+        }]);
+      } catch (err) {
+        console.warn('Supabase recording upsert warning:', err);
+      }
+    }
+
+    if (btnSubmit) {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = '💾 वीडियो सेव करें';
+    }
+    if (createRecCard) createRecCard.style.display = 'none';
+    resetRecordingForm();
+    alert(`🎉 रिकॉर्डेड ट्रेनिंग वीडियो सफलतापूर्वक सेव हो गया!\n\nशीर्षक: ${title}\nथंबनेल: YouTube CDN\nएक्सेस: ${accessTier}`);
+    loadWebinarData();
+  }
+
+  // Attach to both form submit and button click
+  formCreateRec?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleSaveRecording();
+  });
+  document.getElementById('btn-submit-recording')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    handleSaveRecording();
+  });
 
   const drawerOverlay = document.getElementById('webinar-drawer-overlay');
   const drawerCloseBtn = document.getElementById('webinar-drawer-close');
@@ -900,6 +1430,10 @@ export async function initWebinars() {
     tabBtnWebinars.style.color = '#fff';
     tabBtnAttendees.style.background = 'var(--admin-surface-2, #0f172a)';
     tabBtnAttendees.style.color = 'var(--admin-muted)';
+    if (tabBtnRecordings) {
+      tabBtnRecordings.style.background = 'var(--admin-surface-2, #0f172a)';
+      tabBtnRecordings.style.color = 'var(--admin-muted)';
+    }
     currentPage = 1;
     renderTable();
   });
@@ -910,6 +1444,22 @@ export async function initWebinars() {
     tabBtnAttendees.style.color = '#fff';
     tabBtnWebinars.style.background = 'var(--admin-surface-2, #0f172a)';
     tabBtnWebinars.style.color = 'var(--admin-muted)';
+    if (tabBtnRecordings) {
+      tabBtnRecordings.style.background = 'var(--admin-surface-2, #0f172a)';
+      tabBtnRecordings.style.color = 'var(--admin-muted)';
+    }
+    currentPage = 1;
+    renderTable();
+  });
+
+  tabBtnRecordings?.addEventListener('click', () => {
+    activeTab = 'recordings';
+    tabBtnRecordings.style.background = '#8b5cf6';
+    tabBtnRecordings.style.color = '#fff';
+    tabBtnWebinars.style.background = 'var(--admin-surface-2, #0f172a)';
+    tabBtnWebinars.style.color = 'var(--admin-muted)';
+    tabBtnAttendees.style.background = 'var(--admin-surface-2, #0f172a)';
+    tabBtnAttendees.style.color = 'var(--admin-muted)';
     currentPage = 1;
     renderTable();
   });
@@ -920,98 +1470,258 @@ export async function initWebinars() {
   });
 
   async function loadWebinarData() {
-    tableContainer.innerHTML = '<div class="admin-loading">Loading webinars from database…</div>';
+    tableContainer.innerHTML = '<div class="admin-loading">डेटाबेस से वेबिनार डेटा लोड हो रहा है…</div>';
+
+    const deletedWebinarIds = new Set(JSON.parse(localStorage.getItem('AI_DELETED_WEBINAR_IDS') || '[]'));
+
+    let masterJsonWebinar = null;
+    try {
+      const resp = await fetch('/data/webinar-master.json');
+      if (resp.ok) {
+        const j = await resp.json();
+        if (j && j.webinarMaster) {
+          const wm = j.webinarMaster;
+          masterJsonWebinar = {
+            id: wm.id || 'WB_MASTER',
+            profile_id: 'ALL_USERS',
+            share_id: 'ALL_USERS',
+            title: wm.title || '🌾 लाइव ज़ूम वेबिनार एवं फसल परामर्श सत्र',
+            message: wm.description || 'आरोग्यम इंडिया लाइव ज़ूम वेबिनार सत्र',
+            category: 'webinar',
+            content_type: (wm.youtube_videos && wm.youtube_videos.length) ? 'youtube' : 'webinar',
+            media_url: (wm.youtube_videos && wm.youtube_videos[0]) || wm.cover_image || '',
+            thumbnail_url: wm.cover_image || (wm.banners && wm.banners[0]) || '',
+            offer_price: wm.default_price || 0,
+            status: 'active',
+            created_at: new Date().toISOString(),
+            webinar_data: {
+              zoom_link: wm.default_zoom_link || 'https://zoom.us/join',
+              meeting_id: wm.default_meeting_id || '812 3456 7890',
+              passcode: wm.default_passcode || 'AI2026',
+              datetime: formatHindiDateTime(wm.default_date, wm.default_time),
+              date: wm.default_date || todayStr,
+              time: wm.default_time || '20:30',
+              price: wm.default_price || 0,
+              duration_minutes: wm.duration_minutes || 90,
+              cover_image: wm.cover_image || '/images/banners/universal-zoom-webinar-og.jpg',
+              banners: wm.banners || ['/images/banners/universal-zoom-webinar-og.jpg'],
+              youtube_links: wm.youtube_videos || ['https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
+              kpis: wm.kpis || ['जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के गुर।'],
+              faqs: wm.faqs || [{ q: 'क्या यह वेबिनार निशुल्क है?', a: 'हाँ, यह विशेष वेबिनार सत्र किसानों व सदस्यों के लिए पूर्णतः निःशुल्क (₹0) है।' }]
+            }
+          };
+        }
+      }
+    } catch (e) {
+      console.warn('webinar-master.json fetch notice:', e);
+    }
+
+    let allLps = [];
+    let allSurveys = [];
+    allProfiles = [];
 
     const db = getAdminDb();
-    if (!db) {
-      tableContainer.innerHTML = '<div class="admin-error"><strong>Supabase client is initializing. Please click Refresh.</strong></div>';
-      return;
+    if (db) {
+      try {
+        const [lpRes, surveyRes, profRes] = await Promise.all([
+          db.from('landing_pages').select('id, profile_id, share_id, title, message, category, status, webinar_data, created_at').order('created_at', { ascending: false }),
+          db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false }),
+          db.from('profiles').select('id, full_name, mobile, share_id')
+        ]);
+
+        if (lpRes.data) allLps = lpRes.data;
+        if (surveyRes.data) allSurveys = surveyRes.data;
+        if (profRes.data) allProfiles = profRes.data;
+      } catch (err) {
+        console.warn('Supabase webinar fetch notice:', err);
+      }
+    }
+
+    // Scan LocalStorage for local testing & caching
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('UCAS_LP_') || key === 'UCAS_LOCAL_LANDING_PAGES')) {
+          try {
+            const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+            const arr = Array.isArray(parsed) ? parsed : [parsed];
+            arr.forEach(p => {
+              if (p && p.id && !deletedWebinarIds.has(p.id) && !allLps.some(existing => existing.id === p.id)) {
+                allLps.push(p);
+              }
+            });
+          } catch (e) {}
+        }
+        if (key && key.startsWith('UCAS_SURVEYS_')) {
+          try {
+            const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+            const arr = Array.isArray(parsed) ? parsed : [parsed];
+            arr.forEach(s => {
+              if (s && s.id && !allSurveys.some(existing => existing.id === s.id)) {
+                allSurveys.push(s);
+              }
+            });
+          } catch (e) {}
+        }
+      }
+    } catch (e) {}
+
+    // Filter only webinar landing pages (and exclude explicitly deleted IDs)
+    allWebinars = allLps.filter(lp => !deletedWebinarIds.has(lp.id) && (lp.category === 'webinar' || Boolean(lp.webinar_data)));
+
+    // Ensure Master Webinar from JSON is in allWebinars ONLY IF not deleted by admin
+    if (masterJsonWebinar && !deletedWebinarIds.has(masterJsonWebinar.id) && !deletedWebinarIds.has('WB_MASTER')) {
+      if (!allWebinars.some(w => w.id === 'WB_MASTER' || w.id === masterJsonWebinar.id)) {
+        allWebinars.unshift(masterJsonWebinar);
+      }
+    }
+
+    // Filter all registrations
+    allRegistrations = allSurveys.filter(s => {
+      const cat = String(s.selected_categories || '');
+      const src = s.category_answers?.source || '';
+      const lpId = s.category_answers?.landing_page_id || s.category_answers?.webinar_id || '';
+      return cat.includes('webinar') || src.includes('webinar') || allWebinars.some(w => w.id === lpId);
+    });
+
+    // Populate User Filter Dropdown
+    if (userFilter) {
+      userFilter.innerHTML = '<option value="all">👥 All Creators (सभी यूजर्स)</option>';
+      const creatorIds = new Set();
+      allWebinars.forEach(w => { if (w.profile_id) creatorIds.add(w.profile_id); });
+      allRegistrations.forEach(r => { if (r.profile_id) creatorIds.add(r.profile_id); });
+
+      creatorIds.forEach(pId => {
+        const prof = allProfiles.find(p => p.id === pId);
+        const opt = document.createElement('option');
+        opt.value = pId;
+        opt.textContent = pId === 'ALL_USERS'
+          ? '🌐 सभी यूजर्स (All Users Broadcast)'
+          : prof ? `${prof.full_name || 'User'} (${prof.share_id || pId.slice(0, 8)})` : pId.slice(0, 8);
+        userFilter.appendChild(opt);
+      });
+    }
+
+    // Load Recorded Training Videos (1. Git JSON + 2. Supabase DB + 3. Local Storage)
+    allRecordings = [];
+    try {
+      const recResp = await fetch('/data/webinar-recordings.json');
+      if (recResp.ok) {
+        const recJson = await recResp.json();
+        if (Array.isArray(recJson.recordings)) {
+          allRecordings = recJson.recordings;
+        }
+      }
+    } catch (e) {}
+
+    // Fetch from Supabase Cloud Table
+    if (db) {
+      try {
+        const { data: supaRecs } = await db.from('landing_pages').select('*').eq('category', 'recorded_video').order('created_at', { ascending: false });
+        if (supaRecs && supaRecs.length > 0) {
+          supaRecs.forEach(sr => {
+            const wData = sr.webinar_data || {};
+            const ytId = wData.youtube_id || extractYoutubeVideoId(sr.media_url) || 'dQw4w9WgXcQ';
+            const mapped = {
+              id: sr.id,
+              title: sr.title,
+              subject: sr.message || wData.category_name || 'General',
+              category: wData.category_key || sr.message || 'General',
+              youtube_url: sr.media_url || `https://www.youtube.com/watch?v=${ytId}`,
+              youtube_id: ytId,
+              thumbnail: sr.thumbnail_url || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
+              duration: wData.duration || '45 मिनट',
+              speaker: wData.speaker || 'आरोग्यम कृषि विशेषज्ञ',
+              access_tier: wData.access_tier || 'guest',
+              status: sr.status || 'active',
+              created_at: sr.created_at || new Date().toISOString(),
+              views_count: wData.views_count || 0
+            };
+            const existingIdx = allRecordings.findIndex(x => x.id === sr.id);
+            if (existingIdx !== -1) {
+              allRecordings[existingIdx] = mapped;
+            } else {
+              allRecordings.unshift(mapped);
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Supabase recordings fetch notice:', err);
+      }
     }
 
     try {
-      // 1. Fetch Profiles, Landing Pages & Surveys in parallel
-      const [lpRes, surveyRes, profRes] = await Promise.all([
-        db.from('landing_pages').select('id, profile_id, share_id, title, message, category, status, webinar_data, created_at').order('created_at', { ascending: false }),
-        db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false }),
-        db.from('profiles').select('id, full_name, mobile, share_id')
-      ]);
-
-      let allLps = lpRes.data || [];
-      let allSurveys = surveyRes.data || [];
-      allProfiles = profRes.data || [];
-
-      // Scan LocalStorage for local testing
-      try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && (key.startsWith('UCAS_LP_') || key === 'UCAS_LOCAL_LANDING_PAGES')) {
-            try {
-              const parsed = JSON.parse(localStorage.getItem(key) || '[]');
-              const arr = Array.isArray(parsed) ? parsed : [parsed];
-              arr.forEach(p => {
-                if (p && p.id && !allLps.some(existing => existing.id === p.id)) {
-                  allLps.push(p);
-                }
-              });
-            } catch (e) {}
+      const localRecs = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
+      if (Array.isArray(localRecs) && localRecs.length > 0) {
+        localRecs.forEach(lr => {
+          if (lr && lr.id && !allRecordings.some(x => x.id === lr.id)) {
+            allRecordings.unshift(lr);
           }
-          if (key && key.startsWith('UCAS_SURVEYS_')) {
-            try {
-              const parsed = JSON.parse(localStorage.getItem(key) || '[]');
-              const arr = Array.isArray(parsed) ? parsed : [parsed];
-              arr.forEach(s => {
-                if (s && s.id && !allSurveys.some(existing => existing.id === s.id)) {
-                  allSurveys.push(s);
-                }
-              });
-            } catch (e) {}
-          }
-        }
-      } catch (e) {}
-
-      // Filter only webinar landing pages (or pages with webinar_data)
-      allWebinars = allLps.filter(lp => lp.category === 'webinar' || Boolean(lp.webinar_data));
-      allRegistrations = allSurveys.filter(s => {
-        const cat = String(s.selected_categories || '');
-        const src = s.category_answers?.source || '';
-        const lpId = s.category_answers?.landing_page_id || s.category_answers?.webinar_id || '';
-        return cat.includes('webinar') || src.includes('webinar') || allWebinars.some(w => w.id === lpId);
-      });
-
-      // Populate User Filter Dropdown
-      if (userFilter) {
-        userFilter.innerHTML = '<option value="all">👥 All Creators (सभी यूजर्स)</option>';
-        const creatorIds = new Set();
-        allWebinars.forEach(w => { if (w.profile_id) creatorIds.add(w.profile_id); });
-        allRegistrations.forEach(r => { if (r.profile_id) creatorIds.add(r.profile_id); });
-
-        creatorIds.forEach(pId => {
-          const prof = allProfiles.find(p => p.id === pId);
-          const opt = document.createElement('option');
-          opt.value = pId;
-          opt.textContent = pId === 'ALL_USERS'
-            ? '🌐 सभी यूजर्स (All Users Broadcast)'
-            : prof ? `${prof.full_name || 'User'} (${prof.share_id || pId.slice(0, 8)})` : pId.slice(0, 8);
-          userFilter.appendChild(opt);
         });
       }
+    } catch (e) {}
 
-      // Calculate KPI Stats
-      document.getElementById('kpi-total-webinars').textContent = allWebinars.length;
-      document.getElementById('kpi-total-attendees').textContent = allRegistrations.length;
-      const activeZoomCount = allWebinars.filter(w => w.webinar_data?.zoom_link || w.webinar_data?.meeting_id).length;
-      document.getElementById('kpi-active-sessions').textContent = activeZoomCount;
+    // Populate Dynamic Category Options in Form Dropdown
+    if (recCatSelect) {
+      const standardCats = [
+        { key: 'Crop Protection', label: 'कीट नियंत्रण व फसल सुरक्षा' },
+        { key: 'Organic Farming', label: 'जैविक कृषि व मृदा सुधार' },
+        { key: 'Irrigation Tech', label: 'उन्नत सिंचाई व पोषण' },
+        { key: 'VIP Secrets', label: '👑 VIP प्राइम सीक्रेट्स' },
+        { key: 'General', label: 'सामान्य कृषि परामर्श' }
+      ];
+      const customCats = new Set();
+      allRecordings.forEach(v => {
+        const cKey = v.category || v.subject;
+        if (cKey && !standardCats.some(s => s.key === cKey || s.label === cKey)) {
+          customCats.add(cKey);
+        }
+      });
 
-      const tabCountWb = document.getElementById('tab-count-webinars');
-      const tabCountAtt = document.getElementById('tab-count-attendees');
-      if (tabCountWb) tabCountWb.textContent = allWebinars.length;
-      if (tabCountAtt) tabCountAtt.textContent = allRegistrations.length;
+      let catOptionsHtml = standardCats.map(c => `<option value="${c.key}">${c.label}</option>`).join('');
+      customCats.forEach(c => {
+        catOptionsHtml += `<option value="${c}">📂 ${c}</option>`;
+      });
+      catOptionsHtml += `<option value="custom">➕ नई श्रेणी जोड़ें (+ Add New Category)</option>`;
+      recCatSelect.innerHTML = catOptionsHtml;
+    }
 
-      currentPage = 1;
-      renderTable();
-    } catch (e) {
-      console.error('Webinar loading error', e);
-      tableContainer.innerHTML = '<div class="admin-error"><strong>Unable to load webinars.</strong></div>';
+    // Check Live Webinar ON/OFF State
+    let isLiveSetting = localStorage.getItem('AI_WB_LIVE_ACTIVE');
+    if (isLiveSetting === null) {
+      isLiveSetting = (masterJsonWebinar?.status === 'active' || Boolean(masterJsonWebinar)) ? 'true' : 'false';
+    }
+    updateLiveStatusButtonUI(isLiveSetting === 'true');
+
+    // Calculate KPI Stats
+    const totalWebinarsEl = document.getElementById('kpi-total-webinars');
+    const totalAttendeesEl = document.getElementById('kpi-total-attendees');
+    const activeSessionsEl = document.getElementById('kpi-active-sessions');
+    const totalRecordingsEl = document.getElementById('kpi-total-recordings');
+    if (totalWebinarsEl) totalWebinarsEl.textContent = allWebinars.length;
+    if (totalAttendeesEl) totalAttendeesEl.textContent = allRegistrations.length;
+    const activeZoomCount = allWebinars.filter(w => w.webinar_data?.zoom_link || w.webinar_data?.meeting_id).length;
+    if (activeSessionsEl) activeSessionsEl.textContent = activeZoomCount;
+    if (totalRecordingsEl) totalRecordingsEl.textContent = allRecordings.length;
+
+    const tabCountWb = document.getElementById('tab-count-webinars');
+    const tabCountAtt = document.getElementById('tab-count-attendees');
+    const tabCountRec = document.getElementById('tab-count-recordings');
+    if (tabCountWb) tabCountWb.textContent = allWebinars.length;
+    if (tabCountAtt) tabCountAtt.textContent = allRegistrations.length;
+    if (tabCountRec) tabCountRec.textContent = allRecordings.length;
+
+    currentPage = 1;
+    renderTable();
+  }
+
+  function renderTable() {
+    if (activeTab === 'attendees') {
+      renderAttendeesReportTable();
+    } else if (activeTab === 'recordings') {
+      renderRecordingsTable();
+    } else {
+      renderWebinarsListTable();
     }
   }
 
@@ -1430,13 +2140,263 @@ export async function initWebinars() {
     bindPaginationAndActionEvents();
   }
 
+  function renderRecordingsTable() {
+    const query = (searchInput?.value || '').toLowerCase().trim();
+    let filtered = allRecordings;
+    if (query) {
+      filtered = filtered.filter(v => {
+        const title = (v.title || '').toLowerCase();
+        const subj = (v.subject || '').toLowerCase();
+        const speaker = (v.speaker || '').toLowerCase();
+        return title.includes(query) || subj.includes(query) || speaker.includes(query);
+      });
+    }
+
+    const total = filtered.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = Math.min(startIndex + PAGE_SIZE, total);
+    const pageItems = filtered.slice(startIndex, endIndex);
+
+    if (total === 0) {
+      tableContainer.innerHTML = `
+        <div class="admin-table-wrapper sticky-header-table">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th style="width: 100px;">Thumbnail</th>
+                <th>Video Title & Subject</th>
+                <th>Speaker</th>
+                <th>Duration</th>
+                <th>Access Tier</th>
+                <th>Status</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="8" style="text-align:center;padding:2.5rem;color:var(--admin-muted);">
+                  <div style="font-size: 2.2rem; margin-bottom: 8px;">🎬</div>
+                  <div style="font-size:1rem;font-weight:700;color:var(--admin-text);margin-bottom:4px;">कोई रिकॉर्डेड ट्रेनिंग नहीं मिली</div>
+                  <span style="font-size: 0.85rem; color: var(--admin-muted);">ऊपर '+ रिकॉर्डेड वीडियो' बटन से नई क्लास जोड़ें।</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+      return;
+    }
+
+    tableContainer.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--admin-muted);margin-bottom:8px;">
+        <span>दिखा रहे हैं <strong>${startIndex + 1}-${endIndex}</strong> of <strong>${total}</strong> रिकॉर्डेड वीडियो</span>
+      </div>
+
+      <div class="admin-table-wrapper sticky-header-table">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">#</th>
+              <th style="width: 100px;">Thumbnail</th>
+              <th>Video Title & Subject</th>
+              <th>Speaker</th>
+              <th>Duration</th>
+              <th>Access Tier</th>
+              <th>Status</th>
+              <th style="text-align: right; min-width: 200px;">Action (Share / Edit)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pageItems.map((v, idx) => {
+              const rowNum = startIndex + idx + 1;
+              const ytId = v.youtube_id || extractYoutubeVideoId(v.youtube_url) || 'dQw4w9WgXcQ';
+              const thumbUrl = v.thumbnail || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+              const publicVidUrl = `/webinar.html?vid=${encodeURIComponent(v.id)}&ref=ADMIN`;
+              const fullPublicVidUrl = `https://aarogyamindia.online${publicVidUrl}`;
+
+              let tierLabel = '<span style="background:rgba(16,185,129,0.2);color:#10b981;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:800;">🟢 Guest (Free)</span>';
+              if (v.access_tier === 'registered') {
+                tierLabel = '<span style="background:rgba(245,158,11,0.2);color:#f59e0b;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:800;">🟡 Registered</span>';
+              } else if (v.access_tier === 'active_subscriber') {
+                tierLabel = '<span style="background:rgba(139,92,246,0.2);color:#8b5cf6;padding:2px 8px;border-radius:10px;font-size:0.75rem;font-weight:800;">🟣 VIP Active</span>';
+              }
+
+              const statusBadge = v.status === 'active'
+                ? '<span style="color:#10b981;font-weight:800;font-size:0.75rem;">🟢 Active</span>'
+                : '<span style="color:#94a3b8;font-weight:800;font-size:0.75rem;">⚪ Inactive</span>';
+
+              const waShareMsg = `🎬 *${v.title}*\n\n📌 विषय: ${v.subject || 'विशेष कृषि ट्रेनिंग'}\n👤 विशेषज्ञ: ${v.speaker || 'आरोग्यम टीम'}\n\n👉 *यह ट्रेनिंग वीडियो देखने के लिए यहाँ क्लिक करें:*\n${fullPublicVidUrl}\n\nसादर,\nAarogyam India`;
+              const waLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(waShareMsg)}`;
+
+              return `
+                <tr>
+                  <td><strong>#${rowNum}</strong></td>
+                  <td>
+                    <div style="width: 80px; aspect-ratio: 16/9; border-radius: 6px; overflow: hidden; background: #0f172a; border: 1px solid #334155;">
+                      <img src="${thumbUrl}" alt="Thumb" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://img.youtube.com/vi/${ytId}/hqdefault.jpg'">
+                    </div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 700; color: var(--admin-text); font-size: 0.92rem;">${v.title}</div>
+                    <div style="font-size: 0.76rem; color: #38bdf8; margin-top: 2px;">
+                      ID: <code>${v.id}</code> • <span>${v.subject || v.category || 'General'}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div style="font-size: 0.85rem; font-weight: 700; color: var(--admin-text);">${v.speaker || 'आरोग्यम टीम'}</div>
+                  </td>
+                  <td>
+                    <div style="font-size: 0.82rem; color: var(--admin-muted);">${v.duration || '45 मिनट'}</div>
+                  </td>
+                  <td>${tierLabel}</td>
+                  <td>${statusBadge}</td>
+                  <td style="text-align: right;">
+                    <div style="display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">
+                      <a href="${publicVidUrl}" target="_blank" class="admin-button small-button" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-size: 0.75rem; font-weight: 700; padding: 4px 7px; text-decoration: none;" title="Open Video Link">
+                        👁️ देखें
+                      </a>
+                      <a href="${waLink}" target="_blank" class="admin-button small-button" style="background: #25d366; color: #fff; font-size:0.75rem; font-weight:700; padding:4px 7px; text-decoration: none;" title="Share Video via WhatsApp">
+                        📲 WA
+                      </a>
+                      <button type="button" class="btn-edit-recording admin-button small-button" data-recording-id="${v.id}" style="background: #f59e0b; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 4px 7px;" title="Edit Video">
+                        ✏️ एडिट
+                      </button>
+                      <button type="button" class="btn-delete-recording admin-button small-button" data-recording-id="${v.id}" style="background: #ef4444; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 4px 7px;" title="Delete Video">
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border, #334155); border-radius: 10px; padding: 12px 16px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div style="font-size: 0.85rem; color: var(--admin-muted);">
+          Total Recordings: <strong style="color: var(--admin-text);">${total}</strong>
+        </div>
+
+        <div class="admin-pagination-controls">
+          <button type="button" id="webinar-prev-page" class="admin-button small-button" ${currentPage <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+            ◀ Previous
+          </button>
+          <span style="font-weight:700;font-size:0.85rem;padding:0 6px;">Page ${currentPage} of ${totalPages} (20 Items/Page)</span>
+          <button type="button" id="webinar-next-page" class="admin-button small-button" ${currentPage >= totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+            Next ▶
+          </button>
+        </div>
+      </div>
+    `;
+
+    bindRecordingActionEvents();
+  }
+
+  function bindRecordingActionEvents() {
+    // Pagination Listeners
+    document.getElementById('webinar-prev-page')?.addEventListener('click', () => {
+      if (currentPage > 1) { currentPage--; renderTable(); }
+    });
+    document.getElementById('webinar-next-page')?.addEventListener('click', () => {
+      const totalPages = Math.ceil(allRecordings.length / PAGE_SIZE) || 1;
+      if (currentPage < totalPages) { currentPage++; renderTable(); }
+    });
+
+    // Edit Recording Click
+    tableContainer.querySelectorAll('.btn-edit-recording').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const rId = btn.dataset.recordingId;
+        const rec = allRecordings.find(r => r.id === rId);
+        if (!rec) return;
+        openEditRecording(rec);
+      });
+    });
+
+    // Delete Recording Click
+    tableContainer.querySelectorAll('.btn-delete-recording').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const rId = btn.dataset.recordingId;
+        deleteRecording(rId);
+      });
+    });
+  }
+
+  function openEditRecording(rec) {
+    editingRecordingId = rec.id;
+    if (createRecCard) createRecCard.style.display = 'block';
+    if (formRecTitle) formRecTitle.innerHTML = `<span>✏️</span> एडिट रिकॉर्डेड ट्रेनिंग: <span style="color:#60a5fa;">${rec.id}</span>`;
+
+    const titleInput = document.getElementById('adm_rec_title');
+    const catSelect = document.getElementById('adm_rec_category');
+    const urlInput = document.getElementById('adm_rec_url');
+    const speakerInput = document.getElementById('adm_rec_speaker');
+    const durationInput = document.getElementById('adm_rec_duration');
+    const tierSelect = document.getElementById('adm_rec_tier');
+    const statusSelect = document.getElementById('adm_rec_status');
+    const customCatWrapper = document.getElementById('adm_rec_custom_cat_wrapper');
+    const customCatInput = document.getElementById('adm_rec_custom_cat_input');
+
+    if (titleInput) titleInput.value = rec.title || '';
+    if (urlInput) urlInput.value = rec.youtube_url || (rec.youtube_id ? `https://www.youtube.com/watch?v=${rec.youtube_id}` : '');
+    if (speakerInput) speakerInput.value = rec.speaker || '';
+    if (durationInput) durationInput.value = rec.duration || '45 मिनट';
+    if (tierSelect) tierSelect.value = rec.access_tier || 'guest';
+    if (statusSelect) statusSelect.value = rec.status || 'active';
+
+    if (catSelect) {
+      const matchOpt = Array.from(catSelect.options).find(o => o.value === rec.category || o.value === rec.subject);
+      if (matchOpt) {
+        catSelect.value = matchOpt.value;
+        if (customCatWrapper) customCatWrapper.style.display = 'none';
+      } else {
+        catSelect.value = 'custom';
+        if (customCatWrapper) customCatWrapper.style.display = 'block';
+        if (customCatInput) customCatInput.value = rec.category || rec.subject || '';
+      }
+    }
+
+    updateRecThumbPreview();
+    createRecCard?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  async function deleteRecording(recId) {
+    if (!confirm(`क्या आप रिकॉर्डेड ट्रेनिंग (${recId}) को हटाना चाहते हैं?`)) return;
+
+    // 1. Delete from Supabase Database
+    if (db) {
+      try {
+        await db.from('landing_pages').delete().eq('id', recId);
+      } catch (e) {
+        console.warn('Supabase recording delete error:', e);
+      }
+    }
+
+    // 2. Delete from localStorage
+    let localList = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
+    localList = localList.filter(v => v.id !== recId);
+    localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(localList));
+
+    allRecordings = allRecordings.filter(v => v.id !== recId);
+    alert('🗑️ रिकॉर्डेड ट्रेनिंग सफलतापूर्वक हटा दी गई।');
+    loadWebinarData();
+  }
+
   function bindPaginationAndActionEvents() {
     // Pagination Listeners
     document.getElementById('webinar-prev-page')?.addEventListener('click', () => {
       if (currentPage > 1) { currentPage--; renderTable(); }
     });
     document.getElementById('webinar-next-page')?.addEventListener('click', () => {
-      const filtered = activeTab === 'attendees' ? getFilteredAttendees() : getFilteredWebinars();
+      let filtered = getFilteredWebinars();
+      if (activeTab === 'attendees') filtered = getFilteredAttendees();
+      else if (activeTab === 'recordings') filtered = allRecordings;
       const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
       if (currentPage < totalPages) { currentPage++; renderTable(); }
     });
@@ -1604,6 +2564,19 @@ export async function initWebinars() {
       `).join('');
     }
 
+    // Populate Section Reordering & Visibility
+    if (Array.isArray(wData.section_order) && wData.section_order.length > 0) {
+      currentSectionsOrder = [...wData.section_order];
+    } else {
+      currentSectionsOrder = defaultWebinarSections.map(s => s.key);
+    }
+    if (Array.isArray(wData.hidden_sections)) {
+      currentHiddenSections = [...wData.hidden_sections];
+    } else {
+      currentHiddenSections = [];
+    }
+    renderWebinarSectionsReorderingList();
+
     if (formCardTitle) formCardTitle.innerHTML = `<span>✏️</span> वेबिनार एडिट करें: <code style="color:#38bdf8;">${webinar.id}</code>`;
     if (btnSubmitWebinar) btnSubmitWebinar.innerHTML = '💾 वेबिनार अपडेट करें (Update Webinar)';
     if (btnCancelEdit) btnCancelEdit.style.display = 'inline-block';
@@ -1618,23 +2591,59 @@ export async function initWebinars() {
     const webinar = allWebinars.find(w => w.id === webinarId);
     if (!confirm(`क्या आप वाकई वेबिनार "${webinar ? webinar.title : webinarId}" को हटाना चाहते हैं?`)) return;
 
+    // 1. Add to permanent deleted list in localStorage
+    try {
+      const deletedArr = JSON.parse(localStorage.getItem('AI_DELETED_WEBINAR_IDS') || '[]');
+      if (!deletedArr.includes(webinarId)) {
+        deletedArr.push(webinarId);
+      }
+      localStorage.setItem('AI_DELETED_WEBINAR_IDS', JSON.stringify(deletedArr));
+    } catch (e) {}
+
+    // 2. Delete from Supabase database
     const db = getAdminDb();
     try {
       if (db) {
         await db.from('landing_pages').delete().eq('id', webinarId);
+        if (webinarId === 'WB_MASTER') {
+          await db.from('landing_pages').delete().eq('category', 'webinar');
+        }
       }
     } catch (e) {
       console.warn('Webinar delete error:', e);
     }
 
+    // 3. Purge from ALL localStorage caches and keys
     try {
       const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
-      const filtered = stored.filter(w => w.id !== webinarId);
+      const filtered = stored.filter(w => w.id !== webinarId && (webinarId !== 'WB_MASTER' || w.category !== 'webinar'));
       localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(filtered));
+
+      localStorage.removeItem(`UCAS_LP_${webinarId}`);
+      localStorage.removeItem(`AI_WB_CONFIG_${webinarId}`);
+      if (webinarId === 'WB_MASTER') {
+        localStorage.removeItem('UCAS_LP_WB_MASTER');
+        localStorage.removeItem('AI_WB_CONFIG_WB_MASTER');
+      }
+
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && (k.includes(webinarId) || (webinarId === 'WB_MASTER' && (k.startsWith('AI_WB_') || k.startsWith('UCAS_LP_'))))) {
+          try {
+            const val = localStorage.getItem(k);
+            if (val && (val.includes(webinarId) || val.includes('"category":"webinar"'))) {
+              localStorage.removeItem(k);
+            }
+          } catch (e) {}
+        }
+      }
     } catch (e) {}
 
+    // 4. Update memory state immediately
+    allWebinars = allWebinars.filter(w => w.id !== webinarId);
+
     alert(`🗑️ वेबिनार (${webinarId}) सफलतापूर्वक हटा दिया गया।`);
-    loadWebinarData();
+    await loadWebinarData();
   }
 
   function openWebinarRecipientsDrawer(webinar) {

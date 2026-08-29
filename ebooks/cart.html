@@ -1,13 +1,10 @@
-<!-- ==========================================================
-     AAROGYAM INDIA — INTERACTIVE MULTI-BOOK CART ENGINE
-     Version: 3.0
-     ========================================================== -->
 <!DOCTYPE html>
 <html lang="hi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>शॉपिंग कार्ट (Shopping Cart) | Aarogyam India</title>
+  <title>शॉपिंग कार्ट (Shopping Cart) | Aarogyam India (Kindle Edition)</title>
   <meta name="description" content="Aarogyam India Digital Library Cart. अपनी चुनी हुई डिजिटल ई-बुक्स व VIP मेंबरशिप देखें और सुरक्षित चेकआउट करें।">
   <meta name="robots" content="noindex,nofollow">
 
@@ -15,11 +12,14 @@
   <link rel="icon" type="image/png" href="../images/logo/fevicon.png">
   <link rel="apple-touch-icon" href="../images/logo/fevicon.png">
   <link rel="manifest" href="../manifest.json">
-  <meta name="theme-color" content="#2E7D32">
+  <meta name="theme-color" content="#15803d">
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <!-- CSS -->
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/ebook.css">
@@ -27,7 +27,7 @@
 
   <style>
     .cart-page-wrapper {
-      padding: 40px 0 80px 0;
+      padding: 30px 0 80px 0;
       background: #f8fafc;
       min-height: 80vh;
     }
@@ -35,7 +35,7 @@
       display: grid;
       grid-template-columns: 1.8fr 1.2fr;
       gap: 25px;
-      margin-top: 20px;
+      margin-top: 15px;
     }
     @media (max-width: 900px) {
       .cart-grid {
@@ -44,10 +44,10 @@
     }
     .cart-items-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
       padding: 24px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
     }
     .cart-item-row {
       display: grid;
@@ -65,7 +65,7 @@
       height: 105px;
       object-fit: cover;
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     }
     .cart-item-title {
       font-size: 1.05rem;
@@ -81,7 +81,7 @@
     .cart-item-price {
       font-size: 1.2rem;
       font-weight: 900;
-      color: #2E7D32;
+      color: #15803d;
     }
     .cart-item-mrp {
       font-size: 0.8rem;
@@ -104,265 +104,311 @@
       background: #ef4444;
       color: #fff;
     }
-    
-    /* Value Stack Card */
-    .value-stack-box {
-      background: linear-gradient(135deg, #052e16 0%, #14532d 100%);
-      color: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 12px 30px rgba(5,46,22,0.35);
-      border: 2px solid #22c55e;
-    }
-    .value-stack-title {
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: #facc15;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      padding-bottom: 10px;
-    }
-    .value-stack-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 0.9rem;
-      color: #e2e8f0;
-    }
-    .value-stack-row.free-badge span:last-child {
-      color: #4ade80;
-      font-weight: 800;
-      background: rgba(34,197,94,0.2);
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-    .value-stack-total {
-      border-top: 2px dashed rgba(255,255,255,0.25);
-      padding-top: 14px;
-      margin-top: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .value-stack-total-price {
-      font-size: 2rem;
-      font-weight: 900;
-      color: #facc15;
-    }
-    .btn-checkout-proceed {
-      background: #facc15;
-      color: #000;
-      width: 100%;
-      font-size: 1.15rem;
-      font-weight: 900;
-      padding: 16px;
-      border-radius: 50px;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-top: 18px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      transition: all 0.25s ease;
-      text-decoration: none;
-    }
-    .btn-checkout-proceed:hover {
-      background: #eab308;
-      transform: translateY(-2px);
-    }
-    .vip-free-inclusion-banner {
-      background: rgba(250,204,21,0.12);
-      border: 1.5px dashed #facc15;
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
   </style>
+  <link rel="stylesheet" href="/css/user-notifications.css">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css">
+  <link rel="stylesheet" href="/css/home-revamp.css">
 </head>
 
 <body>
+  <!-- =========================================
+       1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
+  ========================================== -->
+  <div class="home-live-ticker-wrap">
+    <div class="container home-ticker-flex">
+      <div class="ticker-pulse-badge">
+        <span class="ticker-dot-pulse"></span>
+        <span>LIVE</span>
+      </div>
+      <div class="ticker-marquee-scroll">
+        ⚡ <span>किसान भाइयों का भरोसा!</span> &nbsp;•&nbsp; 📖 <span>आज 1,420+ ई-बुक्स डाउनलोड हुईं</span> &nbsp;•&nbsp; 🌾 <span>दैनिक मंडी भाव व मौसम अपडेट लाइव</span> &nbsp;•&nbsp; 👨‍🌾 <span>24×7 WhatsApp AI एक्सपर्ट परामर्श सक्रिय</span>
+      </div>
+    </div>
+  </div>
 
   <!-- =========================================
-       HEADER
-       ========================================== -->
-  <header class="ebook-header">
+       2. ANIMATED INDIAN TIRANGA WAVING HEADER
+  ========================================== -->
+  <header class="header-tiranga-animated">
+    <div class="container header-container" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
+      
+      <!-- Brand Logo + Name + Active Page Badge -->
+      <a href="/index.html" class="header-brand-wrap" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+        <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:40px;width:auto;" />
+        <div style="display:flex;flex-direction:column;">
+          <span style="font-size:1.15rem;font-weight:900;color:#0f172a;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;line-height:1.1;">AAROGYAM <span style="color:#2563eb;">INDIA</span></span>
+          <span style="font-size:0.7rem;font-weight:700;color:#15803d;letter-spacing:0.5px;">डिजिटल क्रांति • समृद्ध किसान</span>
+        </div>
+        <span class="header-current-page-badge" style="background:#0f172a;color:#fde047;font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:12px;margin-left:6px;">🛒 कार्ट</span>
+      </a>
+
+      <!-- Header Actions Right: Install App, Cart, 3-Line Menu -->
+      <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+          <span>📲</span> <span>Install App</span>
+        </button>
+
+        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
+          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
+        </a>
+
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- =========================================
+       1. BREAKING NEWS LIVE TICKER BAR
+  ========================================== -->
+  <div class="news-ticker-container">
+    <div class="ticker-badge-wrap">
+      <span class="ticker-pulse"></span>
+      <span>🚨 SPECIAL OFFERS</span>
+    </div>
+    <div class="ticker-content-track">
+      <div class="ticker-marquee-text">
+        🛒 आज ही आर्डर करें और ₹1,999 की VIP Pro मेम्बरशिप व 24×7 WhatsApp AI डॉक्टर सहायता 100% बिल्कुल FREE पाएं!   ✦   📢 10,000+ किसानों का पहला भरोसेमंद मंच!
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       2. UNIVERSAL STORE HEADER
+  ========================================== -->
+  <header class="ebook-header" style="background: linear-gradient(90deg, #14532d 0%, #15803d 50%, #166534 100%);">
     <div class="header-container">
+      <!-- Universal Left Drawer Trigger (Desktop & Mobile) -->
+      <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="मेनू खोलें" style="background:transparent;border:none;color:#ffffff;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:6px;margin-right:10px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <!-- Logo -->
       <div class="logo">
-        <a href="../index.html">
-          <img src="../images/logo/logo.png" alt="Aarogyam India Logo">
+        <a href="ebook.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+          <img src="../images/logo/logo.png" alt="Aarogyam India Logo" style="height:44px;width:auto;">
+          <span style="color:#ffffff;font-weight:900;font-size:1.15rem;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;">
+            AAROGYAM <span style="color:#fde047;">CART</span>
+          </span>
         </a>
       </div>
 
+      <!-- Navigation Links (Desktop) -->
       <nav class="ebook-navigation">
         <ul>
-          <li><a href="../index.html">Home</a></li>
-          <li><a href="agriculture.html">Agriculture</a></li>
-          <li><a href="health.html">Health</a></li>
-          <li><a href="business.html">Business</a></li>
-          <li><a href="digital-ai.html">Digital AI</a></li>
-          <li><a href="my-library.html">My Library</a></li>
+          <li><a href="../index.html">🏠 मुख्य पृष्ठ</a></li>
+          <li><a href="ebook.html">📚 ई-बुक स्टोर</a></li>
+          <li><a href="agriculture.html">🌱 कृषि गाइड</a></li>
+          <li><a href="wishlist.html">❤️ विशलिस्ट</a></li>
+          <li><a href="my-library.html">📖 मेरी लाइब्रेरी</a></li>
         </ul>
       </nav>
 
+      <!-- Header Right (Icons & User Profile) -->
       <div class="header-right">
-        <a href="search.html" class="header-icon"><img src="../images/icons/search.png" alt="Search"></a>
-        <a href="cart.html" class="header-icon cart-icon">
-          <img src="../images/icons/cart.png" alt="Cart">
-          <span id="cart-count-badge" class="cart-count">0</span>
+        <!-- User Profile Box / Login -->
+        <div id="header-user-profile-box">
+          <a href="/pages/profile.html" class="header-icon" title="यूजर प्रोफ़ाइल">
+            <i class="fa-solid fa-user" style="color:#fff;"></i>
+          </a>
+        </div>
+
+        <!-- Wishlist Icon with Live Counter -->
+        <a href="wishlist.html" class="header-icon" title="विशलिस्ट" style="position:relative;">
+          <i class="fa-solid fa-heart" style="color:#fff;"></i>
+          <span id="wishlist-count-badge" class="cart-count" style="display:none;background:#ef4444;">0</span>
         </a>
-        <a href="javascript:history.back()" class="admin-button small-button" style="background:#2E7D32;color:#fff;text-decoration:none;padding:6px 14px;border-radius:20px;font-weight:700;">
-          &larr; पीछे जाएं
+
+        <!-- Cart Icon with Live Counter -->
+        <a href="cart.html" class="header-icon" title="शॉपिंग कार्ट" style="position:relative;">
+          <i class="fa-solid fa-cart-shopping" style="color:#fff;"></i>
+          <span id="cart-count-badge" class="cart-count">0</span>
         </a>
       </div>
     </div>
   </header>
 
   <!-- =========================================
-       MAIN CART BODY
-       ========================================== -->
+       3. MAIN CART SECTION
+  ========================================== -->
   <main class="cart-page-wrapper">
     <div class="container">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
-        <h1 style="font-size: 1.7rem; font-weight: 900; color: #0f172a; margin: 0;">
-          🛒 आपका शॉपिंग कार्ट (Shopping Cart)
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+        <h1 style="font-size:1.6rem; font-weight:900; color:#0f172a; margin:0;">
+          🛒 आपकी शॉपिंग कार्ट (<span id="cart-items-count-text">0 पुस्तकें</span>)
         </h1>
-        <a href="agriculture.html" style="color: #2E7D32; font-weight: 700; text-decoration: none; font-size: 0.9rem;">
-          + और पुस्तकें लाइब्रेरी में देखें &rarr;
+        <a href="ebook.html" style="color:#16a34a; font-weight:800; font-size:0.88rem; text-decoration:none;">
+          + और पुस्तकें जोड़ें (Explore Store)
         </a>
       </div>
 
       <div class="cart-grid">
-        
-        <!-- LEFT COLUMN: CART ITEMS LIST -->
+        <!-- Left: Cart Items List -->
+        <div class="cart-items-card">
+          <div id="cart-items-container">
+            <!-- Dynamically populated by js/cart.js -->
+            <div style="text-align:center; padding:40px; color:#64748b;">
+              <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem; color:#16a34a;"></i>
+              <p style="margin-top:10px; font-weight:600;">आपकी कार्ट लोड हो रही है...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Order Value Stack & Checkout -->
         <div>
-          <div class="cart-items-card">
-            <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin-top: 0; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-              📚 चयनित पुस्तकें (<span id="cart-items-count-text">0 पुस्तकें</span>)
+          <div style="background:#ffffff; border:1.5px solid #86efac; border-radius:18px; padding:24px; box-shadow:0 8px 25px rgba(22,163,74,0.08); position:sticky; top:90px;">
+            <span style="background:#dcfce7; color:#15803d; font-weight:800; font-size:0.75rem; padding:4px 10px; border-radius:20px; text-transform:uppercase;">
+              💎 VALUE SUMMARY
+            </span>
+            <h3 style="font-size:1.25rem; font-weight:900; color:#0f172a; margin:10px 0 16px 0;">
+              ऑर्डर विवरण (Payment Summary)
             </h3>
 
-            <div id="cart-items-container">
-              <!-- Rendered dynamically -->
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:#64748b; margin-bottom:8px;">
+              <span>कुल MRP मूल्य:</span>
+              <span id="stack-mrp-total" style="text-decoration:line-through; font-weight:700;">₹0</span>
             </div>
 
-            <!-- VIP Membership Free Inclusion Box -->
-            <div class="vip-free-inclusion-banner">
-              <span style="font-size: 2rem;">👑</span>
-              <div>
-                <strong style="color: #b45309; display: block; font-size: 0.95rem;">
-                  Aarogyam Pro VIP Annual Subscription (मूल्य ₹1,999) — 100% FREE शामिल!
-                </strong>
-                <span style="font-size: 0.8rem; color: #64748b;">
-                  किताब खरीदने पर आपको 1 वर्ष का VIP सब्सक्रिप्शन और व्हाट्सएप AI कृषि सहायता बिल्कुल मुफ्त मिलेगी।
-                </span>
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:#16a34a; margin-bottom:8px;">
+              <span>विशेष लॉन्च छूट (Discount):</span>
+              <span id="stack-discount-total" style="font-weight:800;">- ₹0</span>
+            </div>
+
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px 12px; margin:12px 0;">
+              <div style="font-size:0.8rem; font-weight:700; color:#166534; display:flex; align-items:center; gap:6px;">
+                <span>👑 VIP Bonus Included:</span>
+                <span style="margin-left:auto; color:#15803d; font-weight:800;">100% FREE</span>
               </div>
-            </div>
-          </div>
-
-          <div style="margin-top: 16px; text-align: left;">
-            <button type="button" id="btn-clear-cart" class="admin-button small-button" style="background: transparent; border: 1px solid #cbd5e1; color: #64748b; font-size: 0.8rem;">
-              🗑️ पूरा कार्ट खाली करें (Clear Cart)
-            </button>
-          </div>
-        </div>
-
-        <!-- RIGHT COLUMN: TOTAL VALUE CALCULATION STACK -->
-        <div>
-          <div class="value-stack-box">
-            <div class="value-stack-title">
-              <span>💎</span> <span>पैकेज वैल्यू एवं बचत (Total Value Stack)</span>
+              <small style="color:#64748b; font-size:0.72rem; display:block; margin-top:2px;">
+                24×7 WhatsApp AI डॉक्टर सहायता व बोनस ई-बुक्स शामिल
+              </small>
             </div>
 
-            <div class="value-stack-row">
-              <span>📘 चयनित पुस्तकें कुल MRP:</span>
-              <span id="stack-mrp-total">₹299</span>
+            <div style="border-top:2px dashed #cbd5e1; padding-top:14px; margin-top:14px; display:flex; justify-content:space-between; align-items:baseline;">
+              <span style="font-size:1.1rem; font-weight:900; color:#0f172a;">कुल देय राशि:</span>
+              <span id="stack-payable-total" style="font-size:1.7rem; font-weight:900; color:#15803d;">₹0</span>
             </div>
 
-            <div class="value-stack-row free-badge">
-              <span>👑 1 वर्ष VIP Pro मेंबरशिप (मूल्य ₹1,999):</span>
-              <span>100% FREE</span>
-            </div>
-
-            <div class="value-stack-row free-badge">
-              <span>🎁 बोनस स्प्रे व रोग पहचान चार्ट:</span>
-              <span>100% FREE</span>
-            </div>
-
-            <div class="value-stack-row free-badge">
-              <span>💬 24×7 WhatsApp AI डॉक्टर सहायता:</span>
-              <span>100% FREE</span>
-            </div>
-
-            <div class="value-stack-row" style="color: #86efac; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
-              <span>🏷️ कुल ऑफर डिस्काउंट:</span>
-              <span id="stack-discount-total">- ₹2,398</span>
-            </div>
-
-            <div class="value-stack-total">
-              <div>
-                <span style="font-size: 0.82rem; color: #bbf7d0; display: block;">कुल देय राशि:</span>
-                <span style="font-size: 0.75rem; color: #86efac;">(Instant Download & Lifetime Access)</span>
-              </div>
-              <div id="stack-payable-total" class="value-stack-total-price">₹99</div>
-            </div>
-
-            <button type="button" id="btn-proceed-checkout" class="btn-checkout-proceed">
-              <i class="fa-solid fa-shield-halved"></i> सुरक्षित चेकआउट करें &rarr;
+            <button id="btn-proceed-checkout" style="width:100%; background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:900; font-size:1.05rem; padding:14px; border-radius:14px; border:none; cursor:pointer; margin-top:18px; box-shadow:0 8px 20px rgba(22,163,74,0.35); transition:all 0.2s;">
+              ⚡ सुरक्षित भुगतान के लिए आगे बढ़ें
             </button>
 
-            <div style="margin-top: 14px; text-align: center; font-size: 0.78rem; color: #bbf7d0;">
-              🔒 100% Secure Checkout Powered by Razorpay
+            <div style="text-align:center; margin-top:14px; display:flex; justify-content:center; gap:16px; font-size:0.75rem; color:#64748b;">
+              <span>🔒 256-Bit SSL Secured</span>
+              <span>⚡ Instant PDF Download</span>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </main>
 
   <!-- =========================================
-       FOOTER
-       ========================================== -->
-  <footer class="ebook-footer">
-    <div class="footer-container">
-      <div class="footer-column">
-        <div class="footer-logo">
-          <img src="../images/logo/logo.png" alt="Aarogyam India Logo">
+       4. UNIVERSAL FOOTER
+  ========================================== -->
+    <!-- =========================================
+       15. MODERN DARK FOOTER
+  ========================================== -->
+  <footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b; margin-top: 50px;">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
+        
+        <!-- About Column -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:42px;width:auto;" />
+            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#38bdf8;">INDIA</span></span>
+          </div>
+          <p style="font-size:0.85rem;color:#94a3b8;line-height:1.55;">
+            Aarogyam India - भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य, पशु पोषण और डायरेक्ट सेलिंग ज्ञान मंच।
+          </p>
         </div>
-        <p>Aarogyam India — Digital Library & Empowerment Hub.</p>
+
+        <!-- Quick Links -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">त्वरित लिंक्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/index.html" style="color:#94a3b8;">🏠 मुख्य पृष्ठ</a></li>
+            <li><a href="/ebooks/ebook.html" style="color:#94a3b8;">📚 ई-बुक स्टोर</a></li>
+            <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;">🌱 कृषि हब</a></li>
+            <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;">🌾 खरीफ मास्टर गाइड 2026</a></li>
+            <li><a href="/ebooks/kheti-dr.html" style="color:#94a3b8;">🩺 खेती का डॉक्टर</a></li>
+          </ul>
+        </div>
+
+        <!-- Utilities -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सेवाएं व टूल्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/crop-doctor.html" style="color:#94a3b8;">🔬 फसल डॉक्टर AI</a></li>
+            <li><a href="/mandi.html" style="color:#94a3b8;">🌾 लाइव मंडी भाव</a></li>
+            <li><a href="/weather.html" style="color:#94a3b8;">⛅ मौसम पूर्वानुमान</a></li>
+            <li><a href="/webinar.html" style="color:#94a3b8;">📺 लाइव वेबिनार हब</a></li>
+            <li><a href="/subscription.html" style="color:#94a3b8;">👑 Pro VIP पास</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Support -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सहायता केंद्र</h3>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
+          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 सहायता')" class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;background:#dc2626;color:#fff;border:none;border-radius:20px;font-weight:800;cursor:pointer;">
+            <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
+          </button>
+        </div>
+
       </div>
 
-      <div class="footer-column">
-        <h3>Categories</h3>
-        <a href="agriculture.html">Agriculture</a>
-        <a href="health.html">Health</a>
-        <a href="business.html">Business</a>
-        <a href="my-library.html">My Library</a>
+      <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
+        © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
       </div>
-
-      <div class="footer-column">
-        <h3>Support</h3>
-        <a href="../faq.html">FAQ</a>
-        <a href="../contact.html">Contact Us</a>
-        <a href="../privacy-policy.html">Privacy Policy</a>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p>© 2026 Aarogyam India. All Rights Reserved.</p>
     </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="../session.js"></script>
-  <script src="../js/cart.js?v=21.0"></script>
+  <script src="/js/user-notifications.js"></script>
+  <script src="/js/universal-nav-drawer.js"></script>
+  <script src="/js/recent-purchase-toast.js"></script>
 </body>
+</html>
+
+  <!-- =========================================
+       5. UNIVERSAL MOBILE BOTTOM NAVIGATION
+  ========================================== -->
+  <nav class="mobile-bottom-nav">
+    <a href="../index.html" class="nav-tab-item">
+      <i class="fa-solid fa-house nav-tab-icon"></i>
+      <span>होम</span>
+    </a>
+    <a href="ebook.html" class="nav-tab-item">
+      <i class="fa-solid fa-book-open nav-tab-icon"></i>
+      <span>ई-बुक्स</span>
+    </a>
+    <a href="wishlist.html" class="nav-tab-item" style="position:relative;">
+      <i class="fa-solid fa-heart nav-tab-icon"></i>
+      <span>विशलिस्ट</span>
+      <span class="nav-badge wishlist-count-badge" style="display:none;">0</span>
+    </a>
+    <a href="my-library.html" class="nav-tab-item">
+      <i class="fa-solid fa-bookmark nav-tab-icon"></i>
+      <span>लाइब्रेरी</span>
+    </a>
+    <a href="/pages/profile.html" class="nav-tab-item">
+      <i class="fa-solid fa-user nav-tab-icon"></i>
+      <span>प्रोफ़ाइल</span>
+    </a>
+  </nav>
+
+  
+
+  <!-- JavaScript Modules -->
+  <script src="../js/book-marketing-card.js"></script>
+  <script src="../js/universal-nav-drawer.js"></script>
+  <script src="../js/cart.js"></script>
+</body>
+
 </html>

@@ -6,19 +6,22 @@
    ========================================================== */
 
 /* ==========================================================
-   GOOGLE FONT
+   GOOGLE FONTS (DEVANAGARI + ENGLISH)
    ========================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
 /* ==========================================================
-   CSS RESET
+   CSS RESET & CRISP FONT RENDERING
    ========================================================== */
 
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 html{
@@ -26,17 +29,11 @@ html{
 }
 
 body{
-
-    font-family:'Poppins',sans-serif;
-
+    font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background:#f7f8fa;
-
-    color:#222;
-
+    color:#1e293b;
     line-height:1.6;
-
     overflow-x:hidden;
-
 }
 
 /* ==========================================================
@@ -2437,45 +2434,10 @@ color: #fff;
 ========================================================== */
 
 .whatsapp-float{
-
-    position:fixed;
-
-    right:22px;
-
-    bottom:22px;
-
-    width:65px;
-
-    height:65px;
-
-    background:#25D366;
-
-    border-radius:50%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.25);
-
-    z-index:999;
-
-    transition:var(--transition);
-
-}
-
-.whatsapp-float img{
-
-    width:34px;
-
-}
-
-.whatsapp-float:hover{
-
-    transform:scale(1.12);
-
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
 
 /* ==========================================================

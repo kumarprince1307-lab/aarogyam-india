@@ -124,10 +124,16 @@ async function trackAttributionEvent(eventPayload) {
     return { success: true, queued: true, payload };
 }
 
-window.dbClient = window.dbClient || window.supabase.createClient(
-    SUPABASE_CONFIG.URL,
-    SUPABASE_CONFIG.KEY
-);
+try {
+    if (!window.dbClient && typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+        window.dbClient = window.supabase.createClient(
+            SUPABASE_CONFIG.URL,
+            SUPABASE_CONFIG.KEY
+        );
+    }
+} catch (e) {
+    console.warn("Supabase client init notice:", e);
+}
 
 const db = window.dbClient;
 

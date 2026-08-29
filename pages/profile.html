@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>मेरी प्रोफ़ाइल (User Profile) | Aarogyam India</title>
+  <meta name="description" content="Aarogyam India सदस्य प्रोफ़ाइल - अपनी खरीदी गई ई-बुक्स, सदस्यता विवरण, विशलिस्ट और रेफ़रल पुरस्कार देखें।">
+
+  <!-- Favicon & PWA -->
+  <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+  <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ff671f">
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/ebook.css">
+  <link rel="stylesheet" href="/css/user-notifications.css">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css">
+  <link rel="stylesheet" href="/css/home-revamp.css">
+
+  <style>
+    .profile-page-wrap {
+      background: #f8fafc;
+      min-height: 80vh;
+      padding: 30px 0 80px 0;
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+      margin-top: 20px;
+    }
+    @media (max-width: 860px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .profile-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+    }
+    .profile-stat-box {
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+    .profile-link-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #1e293b;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    .profile-link-btn:hover {
+      background: #f0fdf4;
+      border-color: #86efac;
+      color: #15803d;
+      transform: translateX(4px);
+    }
+  </style>
+</head>
+
+<body style="background:#ffffff;color:#1e293b;">
+
+  <!-- =========================================
+       1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
+  ========================================== -->
+  <div class="home-live-ticker-wrap">
+    <div class="container">
+      <div class="home-ticker-flex">
+        <div class="ticker-pulse-badge">
+          <span class="ticker-dot-pulse"></span>
+          <span>🚨 LIVE</span>
+        </div>
+        <div style="flex:1;overflow:hidden;">
+          <div class="ticker-marquee-scroll" id="home-live-ticker-track">
+            🌾 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 AI एक्सपर्ट सहायता उपलब्ध! ✦ मेरी प्रोफाइल व सदस्यता
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       2. ANIMATED INDIAN TIRANGA WAVING HEADER
+  ========================================== -->
+  <header class="header header-tiranga-animated" id="header">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:8px;">
+      
+      <!-- Brand Logo Left in Glass Pill + Active Page Badge -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <a href="/index.html" class="brand-logo-pill">
+          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;">
+          <div style="display:flex;flex-direction:column;">
+            <span class="brand-title-text">
+              AAROGYAM <span style="color:#ff671f;">INDIA</span>
+            </span>
+            <span class="brand-sub-text">
+              User Profile Hub
+            </span>
+          </div>
+        </a>
+
+        <!-- Current Active Page Indicator Badge -->
+        <span class="header-current-page-badge" title="Current Page">
+          👤 My Profile
+        </span>
+      </div>
+
+      <!-- Header Actions Right: Install App, Notification, Cart, 3-Line Menu -->
+      <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+        <!-- Install App Button (PWA) -->
+        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+          <span>📲</span> <span>Install App</span>
+        </button>
+
+        <!-- Notification Bell Icon -->
+        <button type="button" class="user-notif-bell-btn" title="Notifications" aria-label="Notifications" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-regular fa-bell" style="font-size:1rem;"></i>
+          <span class="user-notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 5px;border-radius:10px;">0</span>
+        </button>
+
+        <!-- Shopping Cart Icon -->
+        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
+          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
+        </a>
+
+        <!-- 3-Line Menu Trigger Button (Desktop Left Drawer / Mobile Right Drawer) -->
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- =========================================
+       3. PROFILE PAGE CONTENT
+  ========================================== -->
+  <main class="profile-page-wrap">
+    <div class="container">
+      
+      <!-- Welcome Header Banner -->
+      <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 28px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <div style="width: 72px; height: 72px; border-radius: 50%; background: #22c55e; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 900; border: 3px solid #86efac; box-shadow: 0 4px 15px rgba(34,197,94,0.4);">
+            🌱
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h1 id="profile-user-name" style="font-size: 1.5rem; font-weight: 900; margin: 0; color: #fff;">प्रिय किसान मित्र</h1>
+              <span id="profile-user-role" style="background: #eab308; color: #000; font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 12px; text-transform: uppercase;">
+                🌱 किसान सदस्य
+              </span>
+            </div>
+            <p id="profile-user-phone" style="font-size: 0.88rem; color: #94a3b8; margin: 4px 0 0 0;">गेस्ट मोड (लॉगिन करें)</p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <a href="/ucas/index.html" class="btn" style="background: #38bdf8; color: #000; font-weight: 800; font-size: 0.85rem; padding: 10px 18px; border-radius: 30px; text-decoration: none;">
+            ⚙️ UCAS प्रोफाइल सेटिंग्स
+          </a>
+          <a href="/ebooks/my-library.html" class="btn" style="background: #22c55e; color: #fff; font-weight: 800; font-size: 0.85rem; padding: 10px 18px; border-radius: 30px; text-decoration: none;">
+            📚 मेरी लाइब्रेरी देखें
+          </a>
+        </div>
+      </div>
+
+      <!-- Profile Grid -->
+      <div class="profile-grid">
+        
+        <!-- Left Column: Quick Stats -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="profile-card">
+            <h3 style="font-size: 1.1rem; font-weight: 900; color: #0f172a; margin-bottom: 16px;">📊 मेरी गतिविधि (Activity)</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="profile-stat-box">
+                <div style="font-size: 1.5rem; font-weight: 900; color: #15803d;" id="profile-stat-books">2</div>
+                <div style="font-size: 0.78rem; color: #475569; font-weight: 700;">ई-बुक्स उपलब्ध</div>
+              </div>
+              <div class="profile-stat-box" style="background: #eff6ff; border-color: #bfdbfe;">
+                <div style="font-size: 1.5rem; font-weight: 900; color: #1d4ed8;" id="profile-stat-wishlist">0</div>
+                <div style="font-size: 0.78rem; color: #475569; font-weight: 700;">विशलिस्ट बुक्स</div>
+              </div>
+              <div class="profile-stat-box" style="background: #fefce8; border-color: #fef08a;">
+                <div style="font-size: 1.5rem; font-weight: 900; color: #a16207;">24×7</div>
+                <div style="font-size: 0.78rem; color: #475569; font-weight: 700;">AI एक्सपर्ट सपोर्ट</div>
+              </div>
+              <div class="profile-stat-box" style="background: #faf5ff; border-color: #e9d5ff;">
+                <div style="font-size: 1.5rem; font-weight: 900; color: #7e22ce;">लाइफटाइम</div>
+                <div style="font-size: 0.78rem; color: #475569; font-weight: 700;">एक्सेस वैधता</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Membership Pass Card -->
+          <div class="profile-card" style="background: linear-gradient(135deg, #1e1b4b 0%, #1e3a8a 100%); color: #fff; border: 1.5px solid #3b82f6;">
+            <span style="background: #facc15; color: #000; font-weight: 900; font-size: 0.72rem; padding: 3px 10px; border-radius: 20px;">
+              👑 VIP PASS
+            </span>
+            <h4 style="font-size: 1.15rem; font-weight: 900; margin: 10px 0 6px 0; color: #ffffff;">आरोग्यम प्राइम वीआईपी पास</h4>
+            <p style="font-size: 0.82rem; color: #bfdbfe; margin-bottom: 14px;">सभी कृषि ई-बुक्स, लाइव वेबिनार और 24×7 AI एक्सपर्ट सहायता का अनलिमिटेड एक्सेस।</p>
+            <a href="/subscription.html" class="btn" style="background: #facc15; color: #000; font-weight: 900; font-size: 0.84rem; padding: 8px 18px; border-radius: 20px; text-decoration: none; display: inline-block;">
+              👑 VIP पास देखें
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column: Navigation Shortcuts -->
+        <div class="profile-card">
+          <h3 style="font-size: 1.1rem; font-weight: 900; color: #0f172a; margin-bottom: 16px;">🚀 त्वरित डैशबोर्ड लिंक्स</h3>
+          
+          <div style="display: flex; flex-direction: column;">
+            <a href="/ebooks/my-library.html" class="profile-link-btn">
+              <span style="display:flex;align-items:center;gap:10px;">
+                <span>📚</span> <span>मेरी डिजिटल लाइब्रेरी (My eBooks)</span>
+              </span>
+              <span>→</span>
+            </a>
+
+            <a href="/purchases.html" class="profile-link-btn">
+              <span style="display:flex;align-items:center;gap:10px;">
+                <span>🧾</span> <span>खरीदी गई पुस्तकें व इनवॉइस (My Purchases)</span>
+              </span>
+              <span>→</span>
+            </a>
+
+            <a href="/ebooks/ebook.html" class="profile-link-btn">
+              <span style="display:flex;align-items:center;gap:10px;">
+                <span>🛒</span> <span>ई-बुक स्टोर (Explore All eBooks)</span>
+              </span>
+              <span>→</span>
+            </a>
+
+            <a href="/mandi.html" class="profile-link-btn">
+              <span style="display:flex;align-items:center;gap:10px;">
+                <span>🌾</span> <span>दैनिक लाइव मंडी भाव (Live Mandi Bhav)</span>
+              </span>
+              <span>→</span>
+            </a>
+
+            <a href="/weather.html" class="profile-link-btn">
+              <span style="display:flex;align-items:center;gap:10px;">
+                <span>⛅</span> <span>मौसम पूर्वानुमान (Weather Updates)</span>
+              </span>
+              <span>→</span>
+            </a>
+
+            <a href="/webinar.html" class="profile-link-btn">
+              <span style="display:flex;align-items:center;gap:10px;">
+                <span>📺</span> <span>लाइव ज़ूम वेबिनार एवं ट्रेनिंग (Live Webinars)</span>
+              </span>
+              <span>→</span>
+            </a>
+
+            <a href="/ucas/index.html" class="profile-link-btn">
+              <span style="display:flex;align-items:center;gap:10px;">
+                <span>🎯</span> <span>UCAS मार्केटिंग व रेफरल इंजन (UCAS Hub)</span>
+              </span>
+              <span>→</span>
+            </a>
+
+            <a href="https://api.whatsapp.com/send?phone=917974422572&text=Namaste" target="_blank" class="profile-link-btn" style="background:#f0fdf4;border-color:#86efac;color:#15803d;">
+              <span style="display:flex;align-items:center;gap:10px;">
+                <span>💬</span> <span>24×7 WhatsApp AI एक्सपर्ट सहायता</span>
+              </span>
+              <span>📱</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================
+       4. MODERN DARK FOOTER
+  ========================================== -->
+  <footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b;">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
+        
+        <!-- About Column -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:42px;width:auto;" />
+            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#38bdf8;">INDIA</span></span>
+          </div>
+          <p style="font-size:0.85rem;color:#94a3b8;line-height:1.55;">
+            Aarogyam India - भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य, पशु पोषण और डायरेक्ट सेलिंग ज्ञान मंच।
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">त्वरित लिंक्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/index.html" style="color:#94a3b8;">🏠 मुख्य पृष्ठ</a></li>
+            <li><a href="/ebooks/ebook.html" style="color:#94a3b8;">📚 ई-बुक स्टोर</a></li>
+            <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;">🌱 कृषि हब</a></li>
+            <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;">🌾 खरीफ मास्टर गाइड 2026</a></li>
+            <li><a href="/ebooks/kheti-dr.html" style="color:#94a3b8;">🩺 खेती का डॉक्टर</a></li>
+          </ul>
+        </div>
+
+        <!-- Utilities -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सेवाएं व टूल्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/crop-doctor.html" style="color:#94a3b8;">🔬 फसल डॉक्टर AI</a></li>
+            <li><a href="/mandi.html" style="color:#94a3b8;">🌾 लाइव मंडी भाव</a></li>
+            <li><a href="/weather.html" style="color:#94a3b8;">⛅ मौसम पूर्वानुमान</a></li>
+            <li><a href="/webinar.html" style="color:#94a3b8;">📺 लाइव वेबिनार हब</a></li>
+            <li><a href="/subscription.html" style="color:#94a3b8;">👑 Pro VIP पास</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Support -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सहायता केंद्र</h3>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
+          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 प्रोफाइल सहायता')" class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;">
+            <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
+          </button>
+        </div>
+
+      </div>
+
+      <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
+        © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/session.js"></script>
+  <script src="/js/book-marketing-card.js"></script>
+  <script src="/js/universal-nav-drawer.js"></script>
+  <script src="/js/recent-purchase-toast.js"></script>
+  <script src="/js/global-guest-modal.js"></script>
+  <script type="module" src="/js/public-pwa.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let savedUser = {};
+      try {
+        savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('aarogyam_user') || localStorage.getItem('CURRENT_USER') || '{}');
+      } catch (e) {}
+
+      const nameEl = document.getElementById('profile-user-name');
+      const phoneEl = document.getElementById('profile-user-phone');
+      const roleEl = document.getElementById('profile-user-role');
+
+      if (nameEl) nameEl.textContent = savedUser.full_name || savedUser.name || savedUser.fullName || 'प्रिय किसान मित्र';
+      if (phoneEl) phoneEl.textContent = savedUser.mobile || savedUser.phone ? `📱 +91 ${savedUser.mobile || savedUser.phone}` : 'गेस्ट मोड (लॉगिन करें)';
+      if (roleEl) roleEl.textContent = savedUser.role === 'admin' ? '👑 Admin' : (savedUser.isVip ? '👑 VIP Pro Member' : '🌱 किसान सदस्य');
+
+      // Update wishlist count
+      try {
+        const w = JSON.parse(localStorage.getItem('AAROGYAM_WISHLIST') || '[]');
+        const wEl = document.getElementById('profile-stat-wishlist');
+        if (wEl) wEl.textContent = Array.isArray(w) ? w.length : 0;
+      } catch (e) {}
+    });
+  </script>
+</body>
+
+</html>

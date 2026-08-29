@@ -26,6 +26,8 @@
   <!-- UCAS Design System -->
   <link rel="stylesheet" href="/ucas/ucas.css?v=2.6">
   <link rel="stylesheet" href="/css/user-notifications.css">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css">
+  <link rel="stylesheet" href="/css/home-revamp.css">
 </head>
 <body>
 
@@ -65,366 +67,80 @@
      ========================================================================= -->
 <div class="ucas-app" id="ucas-app-authenticated" style="display:none;">
 
-  <!-- 1. TOP APP HEADER (Clean, Identical to My Library) -->
-  <header class="ucas-header">
-    <a href="/ucas/index.html" class="ucas-brand">
-      <img src="/images/logo/logo.png" alt="Aarogyam India" class="ucas-brand-logo">
-      <div class="ucas-brand-text">
-        <div class="ucas-brand-title">Aarogyam India</div>
-        <div class="ucas-brand-sub" style="font-size:0.75rem;font-weight:700;color:var(--primary);">My Profile & UCAS</div>
-      </div>
-    </a>
-
-    <div class="ucas-header-actions">
-      <!-- PWA Install Button -->
-      <button id="ucas-pwa-install-btn" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="display:none;" onclick="UCAS_PWA.triggerInstall()">
-        <i class="fa-solid fa-mobile-screen-button"></i> Install App
-      </button>
-
-      <!-- User Personal Notification Bell Button (Green) -->
-      <button class="user-notif-bell-btn ucas-bell-styled" title="सूचनाएं (Notifications)" aria-label="Notifications">
-        <i class="fa-solid fa-bell"></i>
-        <span class="user-notif-badge" style="display: none;">0</span>
-      </button>
-
-      <!-- Back Button -->
-      <button class="ucas-menu-toggle-btn" onclick="window.location.href='/index.html'" title="मुख्य वेबसाइट होम (Home)">
-        <i class="fa-solid fa-arrow-left"></i>
-      </button>
-
-      <!-- Hamburger Menu Button (Drawer Toggle) -->
-      <button class="ucas-menu-toggle-btn" onclick="UCAS_APP.toggleUserDrawer()" title="मेनू खोलें" aria-label="Toggle Menu">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- 2. DESKTOP / TABLET SIDEBAR (>= 768px) -->
-  <aside class="ucas-sidebar" id="ucas-desktop-sidebar">
-    <div>
-      <div class="ucas-nav-section-title">UCAS Destinations</div>
-      <ul class="ucas-nav-list">
-        <li class="ucas-nav-item active">
-          <button data-tab="profile">
-            <i class="fa-solid fa-user-gear ucas-nav-icon"></i>
-            <span>My Profile</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/ebooks/my-library.html';">
-            <i class="fa-solid fa-book-open ucas-nav-icon" style="color:#2563EB;"></i>
-            <span>My Library</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/mandi.html';">
-            <i class="fa-solid fa-seedling ucas-nav-icon" style="color:#10B981;"></i>
-            <span>कृषि मंडी भाव</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/weather.html';">
-            <i class="fa-solid fa-cloud-sun ucas-nav-icon" style="color:#0284C7;"></i>
-            <span>मौसम अपडेट</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/subscription.html';">
-            <i class="fa-solid fa-crown ucas-nav-icon" style="color:#F59E0B;"></i>
-            <span>VIP Pass (Subscription)</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/purchases.html';">
-            <i class="fa-solid fa-file-invoice ucas-nav-icon" style="color:#10B981;"></i>
-            <span>My Purchases</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="survey">
-            <i class="fa-solid fa-clipboard-list ucas-nav-icon" style="color:#0284C7;"></i>
-            <span>Smart Survey</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="phonebook">
-            <i class="fa-solid fa-address-book ucas-nav-icon" style="color:#8B5CF6;"></i>
-            <span>My Phonebook</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="leads">
-            <i class="fa-solid fa-user-group ucas-nav-icon" style="color:#EA580C;"></i>
-            <span>My Share Leads</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="marketing">
-            <i class="fa-solid fa-rocket ucas-nav-icon" style="color:#EC4899;"></i>
-            <span>Marketing Engine</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="product-landing" onclick="UCAS_APP.switchView('product-landing');">
-            <i class="fa-solid fa-cart-shopping ucas-nav-icon" style="color:#F59E0B;"></i>
-            <span>Product Landing Page</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="hook-templates" onclick="UCAS_APP.switchView('hook-templates');">
-            <i class="fa-solid fa-pen-nib ucas-nav-icon" style="color:#8B5CF6;"></i>
-            <span>हुक व शायरी (Hook & Shayari)</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/webinar.html';">
-            <i class="fa-solid fa-video ucas-nav-icon" style="color:#3B82F6;"></i>
-            <span>🔴 लाइव ज़ूम वेबिनार</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="broadcast-messages" onclick="UCAS_APP.switchView('broadcast-messages');" style="display:flex;align-items:center;width:100%;">
-            <i class="fa-solid fa-bullhorn ucas-nav-icon" style="color:#E11D48;"></i>
-            <span>आरोग्यम संदेश</span>
-            <span id="ucas-broadcast-unread-badge" style="background:#E11D48;color:#fff;font-size:0.75rem;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:auto;display:none;">0</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="permissions" onclick="UCAS_APP.switchView('permissions');">
-            <i class="fa-solid fa-shield-halved ucas-nav-icon" style="color:#64748B;"></i>
-            <span>Permissions</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/index.html';">
-            <i class="fa-solid fa-house ucas-nav-icon" style="color:#10B981;"></i>
-            <span>Home</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/ebooks/wishlist.html';">
-            <i class="fa-solid fa-heart ucas-nav-icon" style="color:#EF4444;"></i>
-            <span>Wishlist</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/faq.html';">
-            <i class="fa-solid fa-circle-question ucas-nav-icon" style="color:#64748B;"></i>
-            <span>FAQ</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/terms.html';">
-            <i class="fa-solid fa-file-contract ucas-nav-icon" style="color:#64748B;"></i>
-            <span>Terms & Conditions</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/shipping-policy.html';">
-            <i class="fa-solid fa-truck ucas-nav-icon" style="color:#64748B;"></i>
-            <span>Shipping Policy</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/privacy-policy.html';">
-            <i class="fa-solid fa-shield-halved ucas-nav-icon" style="color:#64748B;"></i>
-            <span>Privacy Policy</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item ucas-nav-admin-only" style="display:none;">
-          <button data-tab="admin" style="color:var(--secondary-dark);">
-            <i class="fa-solid fa-screwdriver-wrench ucas-nav-icon"></i>
-            <span>Admin Center</span>
-          </button>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Sidebar Footer -->
-    <div style="padding:0.75rem 0.5rem;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span>🔒 Aarogyam UCAS</span>
-        <button class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_SESSION.logout()" style="padding:3px 8px;font-size:0.72rem;color:var(--danger);">
-          <i class="fa-solid fa-right-from-bracket"></i> Logout
-        </button>
-      </div>
-      <div style="margin-top:4px;">Aarogyam India &copy; 2026</div>
-    </div>
-  </aside>
-
-  <!-- 3. SLIDE-OUT USER MENU DRAWER (MOBILE & DESKTOP OVERLAY) -->
-  <div class="ucas-drawer-overlay" id="ucas-drawer-overlay" onclick="UCAS_APP.closeUserDrawer()"></div>
-  <div class="ucas-drawer" id="ucas-user-drawer">
-    <div>
-      <div class="ucas-drawer-header">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="ucas-user-avatar" style="width:38px;height:38px;font-size:1.1rem;">A</div>
-          <div>
-            <div class="ucas-user-name" style="font-size:0.95rem;font-weight:700;">Loading...</div>
-            <div style="font-size:0.75rem;color:var(--text-muted);display:flex;gap:6px;align-items:center;">
-              <span class="ucas-user-shareid">ID: ---</span>
-              <span>•</span>
-              <span id="ucas-drawer-user-phone" style="color:var(--primary);font-weight:700;">+91 ----------</span>
-            </div>
+  <!-- =========================================
+       1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
+  ========================================== -->
+  <div class="home-live-ticker-wrap">
+    <div class="container">
+      <div class="home-ticker-flex">
+        <div class="ticker-pulse-badge">
+          <span class="ticker-dot-pulse"></span>
+          <span>🚨 LIVE</span>
+        </div>
+        <div style="flex:1;overflow:hidden;">
+          <div class="ticker-marquee-scroll" id="home-live-ticker-track">
+            🌾 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 AI एक्सपर्ट सहायता उपलब्ध! ✦ मेरी प्रोफाइल व UCAS
           </div>
         </div>
-        <button class="ucas-drawer-close" onclick="UCAS_APP.closeUserDrawer()">&times;</button>
       </div>
-
-      <!-- Mobile Drawer App Install Action -->
-      <div style="padding: 10px 14px 6px; display: flex; flex-direction: column; gap: 8px;">
-        <button id="ucas-drawer-pwa-btn" class="ucas-btn ucas-btn-sm" style="display: none; width: 100%; background: #10B981; color: #fff; font-weight: 700; border-radius: 8px; padding: 8px 12px; justify-content: center; gap: 8px;" onclick="UCAS_PWA.triggerInstall()">
-          <i class="fa-solid fa-mobile-screen-button"></i> 📱 Install Aarogyam App
-        </button>
-      </div>
-
-      <div class="ucas-nav-section-title">USER MENU / NAVIGATION</div>
-      <ul class="ucas-nav-list">
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/index.html';">
-            <i class="fa-solid fa-house ucas-nav-icon" style="color:#10B981;"></i>
-            <span>Home</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item active">
-          <button data-tab="profile" onclick="UCAS_APP.switchView('profile'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-user-gear ucas-nav-icon"></i>
-            <span>My Profile</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/ebooks/my-library.html';">
-            <i class="fa-solid fa-book-open ucas-nav-icon" style="color:#2563EB;"></i>
-            <span>My Library</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/mandi.html';">
-            <i class="fa-solid fa-seedling ucas-nav-icon" style="color:#10B981;"></i>
-            <span>कृषि मंडी भाव</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/weather.html';">
-            <i class="fa-solid fa-cloud-sun ucas-nav-icon" style="color:#0284C7;"></i>
-            <span>मौसम अपडेट</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/subscription.html';">
-            <i class="fa-solid fa-crown ucas-nav-icon" style="color:#F59E0B;"></i>
-            <span>VIP Pass (Subscription)</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/purchases.html';">
-            <i class="fa-solid fa-file-invoice ucas-nav-icon" style="color:#10B981;"></i>
-            <span>My Purchases & Invoices</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="survey" onclick="UCAS_APP.switchView('survey'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-clipboard-list ucas-nav-icon"></i>
-            <span>Smart Survey</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="phonebook" onclick="UCAS_APP.switchView('phonebook'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-address-book ucas-nav-icon"></i>
-            <span>My Phonebook</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="leads" onclick="UCAS_APP.switchView('leads'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-user-group ucas-nav-icon"></i>
-            <span>My Share Leads</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="marketing" onclick="UCAS_APP.switchView('marketing'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-rocket ucas-nav-icon"></i>
-            <span>Marketing Engine</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="product-landing" onclick="UCAS_APP.switchView('product-landing'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-cart-shopping ucas-nav-icon" style="color:#F59E0B;"></i>
-            <span>Product Landing Page</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="hook-templates" onclick="UCAS_APP.switchView('hook-templates'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-pen-nib ucas-nav-icon" style="color:#8B5CF6;"></i>
-            <span>हुक व शायरी (Hook & Shayari)</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/webinar.html';">
-            <i class="fa-solid fa-video ucas-nav-icon" style="color:#3B82F6;"></i>
-            <span>🔴 लाइव ज़ूम वेबिनार</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="broadcast-messages" onclick="UCAS_APP.switchView('broadcast-messages'); UCAS_APP.closeUserDrawer();" style="display:flex;align-items:center;width:100%;">
-            <i class="fa-solid fa-bullhorn ucas-nav-icon" style="color:#E11D48;"></i>
-            <span>आरोग्यम संदेश</span>
-            <span id="ucas-drawer-broadcast-unread-badge" class="broadcast-unread-badge" style="background:#E11D48;color:#fff;font-size:0.75rem;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:auto;display:none;">0</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button data-tab="permissions" onclick="UCAS_APP.switchView('permissions'); UCAS_APP.closeUserDrawer();">
-            <i class="fa-solid fa-shield-halved ucas-nav-icon"></i>
-            <span>Permissions</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/ebooks/wishlist.html';">
-            <i class="fa-solid fa-heart ucas-nav-icon" style="color:#EF4444;"></i>
-            <span>Wishlist</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/faq.html';">
-            <i class="fa-solid fa-circle-question ucas-nav-icon"></i>
-            <span>FAQ</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/terms.html';">
-            <i class="fa-solid fa-file-contract ucas-nav-icon"></i>
-            <span>Terms & Conditions</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/shipping-policy.html';">
-            <i class="fa-solid fa-truck ucas-nav-icon"></i>
-            <span>Shipping Policy</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item">
-          <button onclick="window.location.href='/privacy-policy.html';">
-            <i class="fa-solid fa-shield-halved ucas-nav-icon"></i>
-            <span>Privacy Policy</span>
-          </button>
-        </li>
-        <li class="ucas-nav-item ucas-nav-admin-only" style="display:none;">
-          <button data-tab="admin" onclick="UCAS_APP.switchView('admin'); UCAS_APP.closeUserDrawer();" style="color:var(--secondary-dark);">
-            <i class="fa-solid fa-screwdriver-wrench ucas-nav-icon"></i>
-            <span>Admin Center</span>
-          </button>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Drawer Logout -->
-    <div style="padding-top:1rem;border-top:1px solid var(--border);">
-      <button class="ucas-btn ucas-btn-outline ucas-btn-block" onclick="UCAS_SESSION.logout()" style="color:var(--danger);justify-content:center;">
-        <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट (Logout)
-      </button>
     </div>
   </div>
 
-  <!-- 4. MAIN CONTENT VIEWS -->
+  <!-- =========================================
+       2. ANIMATED INDIAN TIRANGA WAVING HEADER
+  ========================================== -->
+  <header class="header header-tiranga-animated" id="header">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:8px;">
+      
+      <!-- Brand Logo Left in Glass Pill + Active Page Badge -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <a href="/index.html" class="brand-logo-pill">
+          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;">
+          <div style="display:flex;flex-direction:column;">
+            <span class="brand-title-text">
+              AAROGYAM <span style="color:#ff671f;">INDIA</span>
+            </span>
+            <span class="brand-sub-text">
+              My Profile & UCAS
+            </span>
+          </div>
+        </a>
+
+        <!-- Current Active Page Indicator Badge -->
+        <span class="header-current-page-badge" title="Current Page">
+          👤 My Profile
+        </span>
+      </div>
+
+      <!-- Header Actions Right: Install App, Notification, Cart, 3-Line Menu -->
+      <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+        <!-- Install App Button (PWA) -->
+        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+          <span>📲</span> <span>Install App</span>
+        </button>
+
+        <!-- Notification Bell Icon -->
+        <button type="button" class="user-notif-bell-btn" title="Notifications" aria-label="Notifications" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-regular fa-bell" style="font-size:1rem;"></i>
+          <span class="user-notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 5px;border-radius:10px;">0</span>
+        </button>
+
+        <!-- Shopping Cart Icon -->
+        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
+          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
+        </a>
+
+        <!-- 3-Line Menu Trigger Button (Desktop Left Drawer / Mobile Right Drawer) -->
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 4. MAIN CONTENT VIEWS (Full Width, Centered) -->
   <main class="ucas-main">
 
     <!-- -----------------------------------------------------------------------
@@ -455,46 +171,48 @@
         </div>
       </div>
 
-      <!-- 365-Day Subscription Countdown Card (For Active Users in UCAS) -->
-      <div id="ucas-active-subscription-card" style="display: none; background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); color: #ecfdf5; border-radius: var(--radius-md, 10px); padding: 12px 18px; margin-bottom: 1.25rem; border: 1px solid #10b981; box-shadow: 0 4px 14px rgba(6,78,59,0.15);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 1.5rem;">👑</span>
+      <!-- 365-Day Subscription Countdown Card (For Active Users in UCAS) (Netflix Luxury Style) -->
+      <div id="ucas-active-subscription-card" style="display: none; background: linear-gradient(135deg, #091a13 0%, #0d281e 50%, #08140f 100%); color: #ecfdf5; border-radius: 18px; padding: 14px 20px; margin-bottom: 1.25rem; border: 1.5px solid rgba(16, 185, 129, 0.4); border-top: 3px solid #10b981; box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 20px rgba(16,185,129,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+              👑
+            </div>
             <div>
-              <div style="font-size: 0.92rem; font-weight: 800; color: #34d399; display: flex; align-items: center; gap: 6px;">
+              <div style="font-size: 0.96rem; font-weight: 900; color: #ffffff; display: flex; align-items: center; gap: 8px;">
                 <span>Aarogyam VIP Annual Pass (365 Days Access)</span>
-                <span style="background: #059669; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px;">ACTIVE</span>
+                <span style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; box-shadow: 0 0 10px rgba(16,185,129,0.5);">ACTIVE</span>
               </div>
-              <div style="font-size: 0.78rem; color: #a7f3d0; margin-top: 2px;">
-                📅 आज की सब्सक्राइब डेट: <strong id="ucas-sub-start-date">--/--/----</strong> &nbsp;•&nbsp; 🔄 अगला रिन्यूअल: <strong id="ucas-sub-end-date">--/--/----</strong>
+              <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 3px;">
+                📅 एक्टिवेशन डेट: <strong id="ucas-sub-start-date" style="color: #f8fafc;">--/--/----</strong> &nbsp;•&nbsp; 🔄 अगला रिन्यूअल: <strong id="ucas-sub-end-date" style="color: #f8fafc;">--/--/----</strong>
               </div>
             </div>
           </div>
-          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 6px 14px; text-align: center;">
-            <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700;">वैधता शेष</div>
-            <div id="ucas-sub-days-badge" style="font-size: 1.1rem; font-weight: 900; color: #fbbf24;">⏳ 365 दिन शेष</div>
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(52,211,153,0.3); border-radius: 12px; padding: 8px 16px; text-align: center;">
+            <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">वैधता शेष</div>
+            <div id="ucas-sub-days-badge" style="font-size: 1.15rem; font-weight: 900; color: #fbbf24; text-shadow: 0 0 10px rgba(251,191,36,0.5);">⏳ 365 दिन शेष</div>
           </div>
         </div>
       </div>
 
-      <!-- Dynamic Color-Changing Subscription Upgrade KPI Card (For Inactive Users in UCAS) -->
-      <div id="ucas-inactive-subscription-banner" style="display: none; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fee2e2 100%); border: 1.5px solid #f59e0b; border-radius: var(--radius-md, 10px); padding: 14px 18px; margin-bottom: 1.25rem; box-shadow: 0 4px 14px rgba(245,158,11,0.15);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <!-- Netflix Luxury Subscription Upgrade KPI Card (For Inactive Users in UCAS) -->
+      <div id="ucas-inactive-subscription-banner" style="display: none; background: linear-gradient(135deg, #180909 0%, #1c1313 50%, #0d0e14 100%); border: 1.5px solid rgba(220, 38, 38, 0.5); border-left: 4px solid #dc2626; border-radius: 18px; padding: 16px 20px; margin-bottom: 1.25rem; box-shadow: 0 14px 35px rgba(0, 0, 0, 0.55), 0 0 25px rgba(220, 38, 38, 0.25);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
           <div style="flex: 2; min-width: 260px;">
-            <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.96rem; color: #b45309;">
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 1rem; color: #ffffff;">
               <span>🔥</span>
               <span>Aarogyam VIP 365-Day Subscription Offer!</span>
-              <span style="background: #ef4444; color: #fff; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px;">LIMITED OFFER</span>
+              <span style="background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 0 10px rgba(220,38,38,0.6);">⚡ LIMITED OFFER</span>
             </div>
-            <p style="font-size: 0.86rem; color: #451a03; margin: 4px 0 0 0; line-height: 1.4;">
-              <strong>₹999</strong> का वार्षिक सब्सक्रिप्शन अभी <strong>मात्र ₹99 में!</strong> कोई भी 1 ई-बुक लेकर तुरंत VIP सब्सक्रिप्शन + UCAS मार्केटिंग टूल्स 365 दिनों के लिए एक्टिव करें।
+            <p style="font-size: 0.88rem; color: #e2e8f0; margin: 6px 0 0 0; line-height: 1.5;">
+              <strong>₹999</strong> का वार्षिक सब्सक्रिप्शन अभी <strong style="color: #fde047; font-size: 1.05rem; text-shadow: 0 0 8px rgba(253,224,71,0.5);">मात्र ₹99 में!</strong> कोई भी 1 ई-बुक लेकर तुरंत VIP सब्सक्रिप्शन + UCAS मार्केटिंग टूल्स 365 दिनों के लिए एक्टिव करें।
             </p>
           </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <a href="/ebooks/my-library.html" style="background: #d97706; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(217,119,6,0.3);">
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="/ebooks/my-library.html" style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 12px; font-size: 0.86rem; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(234,88,12,0.4); transition: transform 0.2s;">
               <span>📚</span> My Library से ₹99 में एक्टिव करें
             </a>
-            <a href="https://wa.me/917974422572?text=नमस्ते%20Aarogyam%20India,%20मुझे%20₹99%20वाले%20VIP%20सब्सक्रिप्शन%20ऑफर%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" style="background: #25D366; color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+            <a href="https://wa.me/917974422572?text=नमस्ते%20Aarogyam%20India,%20मुझे%20₹99%20वाले%20VIP%20सब्सक्रिप्शन%20ऑफर%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 12px; font-size: 0.86rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(22,163,74,0.4);">
               <i class="fa-brands fa-whatsapp"></i> पूछताछ
             </a>
           </div>
@@ -1944,11 +1662,6 @@
       <span>Webinar</span>
     </button>
   </nav>
-
-  <!-- WhatsApp Sticky Floating Button for User Support (7974422572) -->
-  <a href="https://wa.me/917974422572?text=नमस्ते%20Aarogyam%20India,%20मुझे%20UCAS%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" id="ucasWhatsappFloatingBtn" style="position:fixed;bottom:75px;right:18px;z-index:9998;background:#25D366;color:#ffffff;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(37,211,102,0.45);text-decoration:none;font-size:1.75rem;transition:all 0.3s ease;border:2.5px solid #ffffff;" title="WhatsApp Support (7974422572)">
-    <i class="fa-brands fa-whatsapp"></i>
-  </a>
 </div>
 
 <!-- =========================================================================
@@ -2208,85 +1921,70 @@
   </div>
 </div>
 
-<!-- Persistent 100% Profile Incomplete Nudge Popup in UCAS (Shown until 100% filled) -->
-<div id="profile100NudgePopup" style="display: none; position: fixed; bottom: 85px; right: 20px; z-index: 999; max-width: 360px; background: #ffffff; border: 2px solid #f59e0b; border-radius: 12px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); animation: bounce 1s ease-in-out;">
-  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-    <div style="display: flex; gap: 10px;">
-      <span style="font-size: 1.6rem;">⚠️</span>
-      <div>
-        <div style="font-weight: 800; font-size: 0.88rem; color: #b45309;">
-          प्रोफाइल अधूरी है (<span id="nudgePercentText">0%</span>)
-        </div>
-        <p style="font-size: 0.78rem; color: #475569; margin: 4px 0 8px 0; line-height: 1.4;">
-          रेफरल रिवॉर्ड्स और सभी VIP फीचर्स पाने के लिए 100% प्रोफाइल पूरी करना अनिवार्य है।
-        </p>
-        <button type="button" onclick="openLeadModal()" style="background: #f59e0b; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
-          ✨ अभी 100% पूरी करें
-        </button>
-      </div>
-    </div>
+
     <button type="button" onclick="sessionStorage.setItem('ai_profile_nudge_dismissed', 'true'); document.getElementById('profile100NudgePopup').style.display='none';" style="background: transparent; border: none; font-size: 16px; color: #94a3b8; cursor: pointer;">&times;</button>
   </div>
 </div>
 </main>
   
-<!-- UNIFIED AAROGYAM INDIA FOOTER -->
-<footer class="site-footer" style="background:#0f172a; color:#cbd5e1; padding:45px 20px 25px; margin-top:50px; border-top:3px solid transparent; border-image:linear-gradient(90deg, #E86A17, #ffffff, #138A36) 1;">
-  <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:30px; margin-bottom:30px;">
-    <div>
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-        <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:44px; width:auto; object-fit:contain;">
-        <div>
-          <div style="font-size:1.15rem; font-weight:800; color:#fff; line-height:1.2;">Aarogyam India</div>
-          <div style="font-size:0.75rem; color:#10B981; font-weight:700;">डिजिटल कृषि व ज्ञान मंच</div>
+<!-- =========================================
+     15. MODERN DARK FOOTER
+========================================== -->
+<footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b; margin-top: 40px;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
+      
+      <!-- About Column -->
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:42px;width:auto;" />
+          <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#38bdf8;">INDIA</span></span>
         </div>
+        <p style="font-size:0.85rem;color:#94a3b8;line-height:1.55;">
+          Aarogyam India - भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य, पशु पोषण और डायरेक्ट सेलिंग ज्ञान मंच।
+        </p>
       </div>
-      <p style="font-size:0.85rem; line-height:1.6; color:#94a3b8;">
-        Aarogyam India is a premier digital agriculture knowledge platform empowering farmers and users with smart digital tools, eBooks, and expert guidance.
-      </p>
-    </div>
 
-    <div>
-      <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #E86A17; display:inline-block; padding-bottom:4px;">Quick Links</h3>
-      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
-        <li><a href="/index.html" style="color:#cbd5e1; text-decoration:none;">🏠 Home</a></li>
-        <li><a href="/ucas/index.html" style="color:#cbd5e1; text-decoration:none;">👤 My Profile & UCAS</a></li>
-        <li><a href="/ebooks/my-library.html" style="color:#cbd5e1; text-decoration:none;">📚 Digital Library</a></li>
-        <li><a href="/subscription.html" style="color:#f59e0b; text-decoration:none; font-weight:700;">👑 VIP Pass / Subscription</a></li>
-        <li><a href="/purchases.html" style="color:#cbd5e1; text-decoration:none;">🧾 My Purchases & Invoices</a></li>
-      </ul>
-    </div>
-
-    <div>
-      <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #10b981; display:inline-block; padding-bottom:4px;">Legal & Policies</h3>
-      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
-        <li><a href="/terms.html" style="color:#cbd5e1; text-decoration:none;">📄 Terms & Conditions</a></li>
-        <li><a href="/privacy-policy.html" style="color:#cbd5e1; text-decoration:none;">🔒 Privacy Policy</a></li>
-        <li><a href="/shipping-policy.html" style="color:#cbd5e1; text-decoration:none;">🚚 Shipping & Return Policy</a></li>
-        <li><a href="/faq.html" style="color:#cbd5e1; text-decoration:none;">❓ FAQ & Support</a></li>
-        <li><a href="/contact.html" style="color:#cbd5e1; text-decoration:none;">📞 Contact Us</a></li>
-      </ul>
-    </div>
-
-    <div>
-      <h3 style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:14px; border-bottom:2px solid #3b82f6; display:inline-block; padding-bottom:4px;">Contact & Helpline</h3>
-      <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">📍 Rewa, Madhya Pradesh, India</p>
-      <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 8px 0;">
-        📞 <a href="tel:917974422572" style="color:#38bdf8; text-decoration:none; font-weight:700;">+91 79744 22572</a>
-      </p>
-      <p style="font-size:0.86rem; color:#94a3b8; line-height:1.6; margin:0 0 12px 0;">
-        ✉ <a href="mailto:info@aarogyamindia.in" style="color:#38bdf8; text-decoration:none;">info@aarogyamindia.in</a>
-      </p>
-      <div style="display:flex; gap:10px;">
-        <a href="https://wa.me/917974422572" target="_blank" style="background:#25d366; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="#" style="background:#1877f2; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-facebook"></i></a>
-        <a href="#" style="background:#ff0000; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:1.1rem;"><i class="fa-brands fa-youtube"></i></a>
+      <!-- Quick Links -->
+      <div>
+        <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">त्वरित लिंक्स</h3>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+          <li><a href="/index.html" style="color:#94a3b8;">🏠 मुख्य पृष्ठ</a></li>
+          <li><a href="/ebooks/ebook.html" style="color:#94a3b8;">📚 ई-बुक स्टोर</a></li>
+          <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;">🌱 कृषि हब</a></li>
+          <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;">🌾 खरीफ मास्टर गाइड 2026</a></li>
+          <li><a href="/ebooks/kheti-dr.html" style="color:#94a3b8;">🩺 खेती का डॉक्टर</a></li>
+        </ul>
       </div>
-    </div>
-  </div>
 
-  <div style="text-align:center; padding-top:20px; border-top:1px solid #334155; font-size:0.82rem; color:#64748b;">
-    © 2026 Aarogyam India. All Rights Reserved. • ISO Certified Digital Platform
+      <!-- Utilities -->
+      <div>
+        <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सेवाएं व टूल्स</h3>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+          <li><a href="/crop-doctor.html" style="color:#94a3b8;">🔬 फसल डॉक्टर AI</a></li>
+          <li><a href="/mandi.html" style="color:#94a3b8;">🌾 लाइव मंडी भाव</a></li>
+          <li><a href="/weather.html" style="color:#94a3b8;">⛅ मौसम पूर्वानुमान</a></li>
+          <li><a href="/webinar.html" style="color:#94a3b8;">📺 लाइव वेबिनार हब</a></li>
+          <li><a href="/subscription.html" style="color:#94a3b8;">👑 Pro VIP पास</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Support -->
+      <div>
+        <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सहायता केंद्र</h3>
+        <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
+        <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
+        <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
+        <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 प्रोफाइल सहायता')" class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;">
+          <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
+        </button>
+      </div>
+
+    </div>
+
+    <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
+      © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+    </div>
   </div>
 </footer>
 
@@ -2300,6 +1998,8 @@
 <script src="/session.js"></script>
 <script src="/js/supabase.js"></script>
 <script src="/js/share-engine-core.js"></script>
+<script src="/js/universal-nav-drawer.js"></script>
+<script src="/js/recent-purchase-toast.js"></script>
 
 <!-- UCAS Modular Engines -->
 <script src="/ucas/js/ucas-session.js?v=19.0"></script>
@@ -2316,7 +2016,6 @@
 <script src="/ucas/js/ucas-admin.js?v=19.0"></script>
 <script src="/ucas/js/ucas-pwa.js?v=19.0"></script>
 <script src="/js/global-guest-modal.js?v=19.0"></script>
-<script src="/js/book-promo-toast.js?v=19.0"></script>
 <script src="/js/user-notifications.js?v=19.0"></script>
 <script src="/ucas/js/ucas-app.js?v=19.0"></script>
 <script src="/js/weather.js"></script> <!-- यहाँ हमने मौसम वाली जेएस फाइल जोड़ दी है -->

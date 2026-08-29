@@ -247,9 +247,7 @@ section{padding:55px 0;}
 /*=========================================================
         FLOATING BUTTONS & OVERLAP FIX (DESKTOP & MOBILE)
 =========================================================*/
-.whatsapp-float{position:fixed;left:20px;bottom:20px;width:55px;height:55px;background:#25D366;border-radius:50%;display:flex;justify-content:center;align-items:center;box-shadow:0 10px 25px rgba(0,0,0,.25);z-index:999;transition:.35s;}
-.whatsapp-float:hover{transform:scale(1.1);}
-.whatsapp-float img{width:30px;height:30px;}
+.whatsapp-float{display:none !important;pointer-events:none !important;visibility:hidden !important;opacity:0 !important;}
 
 .sticky-buy{position:fixed;right:20px;bottom:20px;background:linear-gradient(135deg,#ff7a00,#ffb347);color:#ffffff;text-decoration:none;padding:16px 30px;border-radius:50px;font-weight:700;box-shadow:0 12px 30px rgba(255,122,0,.35);z-index:999;transition:.35s;}
 .sticky-buy:hover{transform:translateY(-4px);}
@@ -327,10 +325,684 @@ section{padding:55px 0;}
         display: inline-flex !important;
         position: fixed !important;
         bottom: 20px !important;
-        left: 50% !important;     /* स्क्रीन के बिल्कुल बीच से शुरुआत करो */
-        transform: translateX(-160px) !important; /* और अपनी मर्जी से थोड़ा बाईं तरफ शिफ्ट कर लो */
+        left: 50% !important;
+        transform: translateX(-160px) !important;
         right: auto !important;
         top: auto !important;
         z-index: 2147483647 !important;
     }
 }
+
+/* =========================================================
+   AMAZON / KINDLE / FLIPKART STYLE DIGITAL STORE ENGINE
+   VERSION 2.0 (BREAKING TICKER, 3D CARDS, UNIVERSAL NAV)
+========================================================= */
+
+/* 1. BREAKING NEWS LIVE TICKER BAR */
+.news-ticker-container {
+    width: 100%;
+    background: #0f172a;
+    color: #ffffff;
+    border-bottom: 1.5px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    height: 42px;
+    font-size: 0.84rem;
+    position: relative;
+    z-index: 999;
+}
+.ticker-badge-wrap {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #ffffff;
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    z-index: 2;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.3);
+}
+.ticker-pulse {
+    width: 8px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 50%;
+    animation: tickerPulseAnim 1.2s infinite ease-in-out;
+}
+@keyframes tickerPulseAnim {
+    0%, 100% { transform: scale(0.8); opacity: 0.5; }
+    50% { transform: scale(1.4); opacity: 1; }
+}
+.ticker-content-track {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
+.ticker-marquee-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: tickerMarquee 28s linear infinite;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+.ticker-marquee-text:hover {
+    animation-play-state: paused;
+}
+@keyframes tickerMarquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+/* 2. CATEGORY QUICK-FILTER CARDS */
+.category-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin: 20px 0 35px 0;
+}
+.cat-quick-card {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #1e293b;
+}
+.cat-quick-card:hover, .cat-quick-card.active {
+    border-color: #16a34a;
+    background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(22,163,74,0.15);
+}
+.cat-quick-card.active {
+    border-width: 2px;
+    color: #16a34a;
+    font-weight: 800;
+}
+.cat-icon-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(22,163,74,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+.cat-title-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* 3. AMAZON / KINDLE STYLE PRODUCT MARKETING CARD */
+.kindle-book-card {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 16px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+.kindle-book-card:hover {
+    transform: translateY(-6px);
+    border-color: #86efac;
+    box-shadow: 0 18px 36px rgba(22,163,74,0.12);
+}
+
+.card-badge-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.card-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+.badge-bestseller { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
+.badge-new { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.badge-trending { background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+.badge-coming-soon { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.badge-discount, .badge-offer { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+.card-wishlist-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+.card-wishlist-btn:hover {
+    transform: scale(1.15);
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+.card-wishlist-btn.in-wishlist {
+    background: #fee2e2;
+    border-color: #ef4444;
+}
+
+/* 3D Cover Display */
+.card-cover-wrap {
+    width: 100%;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 14px;
+    padding: 18px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    margin-bottom: 14px;
+    overflow: hidden;
+}
+.card-3d-book {
+    width: 140px;
+    height: 190px;
+    perspective: 800px;
+    transition: transform 0.4s ease;
+}
+.card-cover-wrap:hover .card-3d-book {
+    transform: scale(1.05) rotateY(-8deg);
+}
+.card-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px 12px 12px 6px;
+    box-shadow: -4px 6px 16px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1);
+}
+.card-category-pill {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(15,23,42,0.85);
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+}
+
+/* Body & Typography */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.card-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+.card-stars { color: #f59e0b; font-size: 0.85rem; }
+.card-rating-score { font-weight: 800; font-size: 0.82rem; color: #1e293b; }
+.card-rating-count { color: #64748b; font-size: 0.75rem; }
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4px;
+    line-height: 1.35;
+    cursor: pointer;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.2s;
+}
+.card-title:hover { color: #16a34a; }
+
+.card-subtitle {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* KPI Badges List */
+.card-kpi-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+.card-kpi-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+
+/* Price & Savings */
+.card-price-block {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+}
+.card-prices {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.card-offer-price {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #16a34a;
+}
+.card-mrp {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    text-decoration: line-through;
+    font-weight: 600;
+}
+.card-save-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    background: #dcfce7;
+    color: #15803d;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.card-savings-text {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #15803d;
+    margin-top: 2px;
+}
+
+/* Action Buttons Bar & Grid */
+.card-actions-container {
+    margin-top: auto;
+    width: 100%;
+}
+
+.card-actions-grid-2x2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+}
+
+/* 1. Add to Cart (Blue Button) */
+.btn-card-cart-blue {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800;
+    font-size: 0.82rem;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+}
+.btn-card-cart-blue:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+}
+
+/* 2. Buy Now (Orange Button) */
+.btn-card-buy-orange {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;
+    color: #ffffff !important;
+    font-weight: 900;
+    font-size: 0.82rem;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+}
+.btn-card-buy-orange:hover {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.45);
+}
+
+/* 3. Share Now (WhatsApp Green - Native Direct Share) */
+.btn-card-share-green {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 8px 6px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    box-shadow: 0 3px 10px rgba(22, 163, 74, 0.25);
+    transition: all 0.2s ease;
+}
+.btn-card-share-green:hover {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(22, 163, 74, 0.4);
+}
+
+/* 4. Share By (Channels Drawer Button) */
+.btn-card-share-channels {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 8px 6px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    box-shadow: 0 3px 10px rgba(5, 150, 105, 0.25);
+    transition: all 0.2s ease;
+}
+.btn-card-share-channels:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(5, 150, 105, 0.4);
+}
+
+.btn-pre-interest {
+    width: 100%;
+    background: #f1f5f9;
+    border: 1.5px dashed #94a3b8;
+    color: #475569;
+    font-weight: 800;
+    font-size: 0.82rem;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+.btn-pre-interest:hover {
+    background: #fee2e2;
+    border-color: #ef4444;
+}
+
+/* ==========================================================================
+   5-BUTTON TRANSPARENT SOCIAL SHARE MODAL
+   ========================================================================== */
+.ai-share-drawer-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    z-index: 99999999 !important;
+    display: none;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+    opacity: 0;
+    transition: opacity 0.25s ease !important;
+}
+.ai-share-drawer-overlay.active {
+    opacity: 1 !important;
+}
+
+.ai-share-buttons-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: 400px !important;
+    transform: scale(0.92) translateY(20px) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.ai-share-drawer-overlay.active .ai-share-buttons-stack {
+    transform: scale(1) translateY(0) !important;
+}
+
+.ai-share-btn-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 14px 18px !important;
+    border-radius: 18px !important;
+    background: #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
+    text-decoration: none !important;
+    color: #0f172a !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+}
+.ai-share-btn-item:hover, .ai-share-btn-item:active {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+.ai-share-btn-item.ch-whatsapp:hover { border-color: #25D366 !important; }
+.ai-share-btn-item.ch-facebook:hover { border-color: #1877F2 !important; }
+.ai-share-btn-item.ch-twitter:hover { border-color: #000000 !important; }
+.ai-share-btn-item.ch-telegram:hover { border-color: #229ED9 !important; }
+.ai-share-btn-item.ch-copylink:hover { border-color: #2563eb !important; }
+
+.ai-share-icon-wrap {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.35rem !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+.ai-share-btn-text {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+}
+.ai-share-btn-text strong {
+    font-size: 0.98rem !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+}
+.ai-share-btn-text span {
+    font-size: 0.76rem !important;
+    color: #64748b !important;
+    margin-top: 2px !important;
+}
+
+.ai-share-arrow {
+    color: #94a3b8 !important;
+    font-size: 0.9rem !important;
+    transition: transform 0.2s !important;
+}
+.ai-share-btn-item:hover .ai-share-arrow {
+    transform: translateX(3px) !important;
+    color: #0f172a !important;
+}
+
+.ai-share-copy-badge {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 8px 14px !important;
+    font-weight: 800 !important;
+    font-size: 0.8rem !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    transition: all 0.2s !important;
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3) !important;
+}
+.ai-share-copy-badge:hover {
+    background: #1d4ed8 !important;
+    transform: scale(1.04) !important;
+}
+
+/* 4. CURATED SHELF SECTION (AMAZON KINDLE STYLE) */
+.shelf-section {
+    margin: 40px 0;
+}
+.shelf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 12px;
+}
+.shelf-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.shelf-icon {
+    font-size: 1.6rem;
+}
+.shelf-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+}
+.shelf-subtitle {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-top: 3px;
+}
+.shelf-view-all {
+    color: #16a34a;
+    font-weight: 800;
+    font-size: 0.88rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.2s;
+}
+.shelf-view-all:hover {
+    transform: translateX(4px);
+}
+.shelf-books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+/* 5. UNIVERSAL MOBILE BOTTOM NAVIGATION */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 60px;
+    background: #ffffff;
+    border-top: 1.5px solid #e2e8f0;
+    z-index: 99999;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+}
+@media(max-width: 768px) {
+    .mobile-bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+    body {
+        padding-bottom: 70px;
+    }
+}
+.nav-tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 700;
+    position: relative;
+    flex: 1;
+    height: 100%;
+    transition: color 0.2s;
+}
+.nav-tab-item.active, .nav-tab-item:hover {
+    color: #16a34a;
+}
+.nav-tab-icon {
+    font-size: 1.25rem;
+    margin-bottom: 2px;
+}
+.nav-badge {
+    position: absolute;
+    top: 6px;
+    right: 25%;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -1,3 +1,5 @@
+@import url('/css/ebook.css');
+
 /* ==========================================================================
    AAROGYAM INDIA - MY LIBRARY ULTIMATE PREMIUM CSS (AIM V1 - FINAL)
    ========================================================================== */
@@ -32,8 +34,8 @@ body {
     background-color: var(--bg-warm-white);
     color: var(--text-charcoal);
     min-height: 100vh;
-    padding-bottom: 90px; /* Safe space for sticky action bar */
-    overflow-x: hidden;
+    padding-bottom: 90px;
+    overflow-x: clip;
 }
 
 /* ==========================================================================
@@ -332,22 +334,30 @@ body {
 
 .book-grid-2col {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    width: 100%;
 }
 
-@media(min-width: 768px) {
+@media(min-width: 640px) {
     .book-grid-2col {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 22px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
     }
 }
 
-.book-card, .ebook-card, [id*="Grid"] > div {
+@media(min-width: 1024px) {
+    .book-grid-2col {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+}
+
+.book-card, .ebook-card {
     background: var(--card-pure-white);
     border-radius: var(--radius-card);
-    border: 1px solid var(--border-light);
-    padding: 14px;
+    border: 1.5px solid var(--border-light);
+    padding: 18px;
     box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
@@ -445,103 +455,129 @@ body {
 }
 
 /* ==========================================================================
-   7. STICKY TIMER & TODAY DEAL BAR (Fixed Desktop Overlap Position)
+   7. STICKY TIMER & TODAY DEAL BAR (Red & Green Eye-Catching Design)
    ========================================================================== */
-/* New Sticky Banner */
 .sticky-action-bar {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 998;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92%;
+    max-width: 650px;
+    z-index: 999990;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); /* iOS Safe Area */
-    background: linear-gradient(135deg, #1e3a8a, #1e40af, #1d4ed8);
-    box-shadow: 0 -5px 25px rgba(29, 78, 216, 0.4);
-    border-top: 2px solid #3b82f6;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #090d16 0%, #1c1917 50%, #0f172a 100%);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(220, 38, 38, 0.3);
+    border: 1.5px solid rgba(220, 38, 38, 0.4);
+    border-top: 3px solid #dc2626;
+    border-radius: 50px;
+    gap: 12px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-.deal-timer-banner, .sticky-deal-btn {
-    position: relative;
-    z-index: 2;
+@media (max-width: 768px) {
+    .sticky-action-bar {
+        bottom: 66px !important; /* Floats right above the 60px mobile 8-tab bottom nav */
+        left: 8px !important;
+        right: auto !important;
+        width: auto !important;
+        max-width: calc(100% - 128px) !important; /* Shrinks cleanly to the left, leaving right space for 3 action buttons */
+        transform: none !important;
+        padding: 6px 10px !important;
+        border-radius: 30px !important;
+        z-index: 99990 !important;
+        gap: 6px !important;
+    }
+
+    .deal-timer-banner {
+        font-size: 0.76rem !important;
+        gap: 4px !important;
+    }
+
+    .deal-timer-banner span:first-child {
+        display: none !important; /* Hide long label on mobile to keep bar super compact */
+    }
+
+    #dealTimer {
+        font-size: 0.8rem !important;
+        padding: 3px 8px !important;
+    }
+
+    .sticky-deal-btn {
+        padding: 5px 10px !important;
+        font-size: 0.76rem !important;
+        border-radius: 20px !important;
+        white-space: nowrap !important;
+    }
 }
+
 .deal-timer-banner {
-    color: #f3f4f6;
-    font-size: 0.85rem;
-    font-weight: 600;
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: nowrap;
+    min-width: 0;
 }
 
-/* New Timer Pill/Badge Style */
+/* Red Hot Timer Badge */
 #dealTimer {
-    background: #ffffff;
-    color: #1e40af;
-    padding: 5px 12px;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #fde047;
+    padding: 4px 10px;
     border-radius: 20px;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Outfit', monospace;
     font-weight: 900;
-    font-size: 1rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    border: 2px solid #93c5fd;
+    font-size: 0.88rem;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: timerPulseGlow 1.8s infinite alternate;
 }
 
+@keyframes timerPulseGlow {
+    0% { transform: scale(1); box-shadow: 0 0 8px rgba(220, 38, 38, 0.5); }
+    100% { transform: scale(1.04); box-shadow: 0 0 16px rgba(220, 38, 38, 0.85); }
+}
+
+/* Vibrant Emerald Green WhatsApp Deal Button */
 .sticky-deal-btn {
-    background: linear-gradient(135deg, #facc15, #eab308);
-    color: white;
-    padding: 10px 22px;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: #ffffff !important;
+    padding: 8px 18px;
     border-radius: 50px;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 800;
-    color: #422006;
-    box-shadow: 0 5px 20px rgba(250, 204, 21, 0.5);
+    text-decoration: none !important;
+    font-size: 0.86rem;
+    font-weight: 900;
+    box-shadow: 0 4px 18px rgba(22, 163, 74, 0.5);
     display: flex;
     align-items: center;
     gap: 6px;
-    animation: breathingGlow 3s ease-in-out infinite;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: greenButtonPulse 2.5s infinite ease-in-out;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-@keyframes breathingGlow {
-    0%, 100% { transform: scale(1); box-shadow: 0 5px 20px rgba(250, 204, 21, 0.5); }
-    50% { transform: scale(1.05); box-shadow: 0 8px 30px rgba(250, 204, 21, 0.7); }
+.sticky-deal-btn:hover {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    transform: scale(1.06);
+    box-shadow: 0 6px 25px rgba(34, 197, 94, 0.7);
 }
 
-/* ==========================================================================
-   FINAL OVERRIDE: AVAILABLE BOOKS LINKS TO PREMIUM BUTTONS
-   ========================================================================== */
-#availableBooksGrid a, 
-#section-available a,
-.book-card a[href*="buy"], 
-.book-card a[href*="detail"],
-.book-card a[onclick],
-.book-card p a {
-    display: block !important;
-    width: 100% !important;
-    padding: 12px 16px !important;
-    margin-top: 12px !important;
-    border-radius: 16px !important;
-    font-size: 0.9rem !important;
-    font-weight: 700 !important;
-    text-align: center !important;
-    text-decoration: none !important;
-    background: linear-gradient(135deg, #E86A17, #c75610) !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 15px rgba(232, 106, 23, 0.3) !important;
-    transition: all 0.25s ease !important;
+@keyframes greenButtonPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 18px rgba(22, 163, 74, 0.5); }
+    50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(22, 163, 74, 0.75); }
 }
 
-#availableBooksGrid a:hover, 
-#section-available a:hover,
-.book-card a[href*="buy"]:hover, 
-.book-card a[href*="detail"]:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(232, 106, 23, 0.45) !important;
-    background: linear-gradient(135deg, #f07422, #E86A17) !important;
-    color: #ffffff !important;
+/* Ensure Library Container has clean bottom scroll padding */
+.library-container, .library-page-body {
+    padding-bottom: 160px !important;
 }
 /* ==========================================================================
    PERFECT PROFILE UPDATE POPUP & CLOSE BUTTON FIX (CSS)
@@ -710,14 +746,15 @@ body {
 
 @media(min-width: 768px) {
     .library-sidebar {
-        display: flex !important;
+        display: none !important;
     }
 
     .library-main {
-        margin-left: 260px !important;
-        width: calc(100% - 260px) !important;
-        max-width: calc(100% - 260px) !important;
-        padding: 1.25rem 2rem 90px 2rem !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        width: 100% !important;
+        max-width: 1200px !important;
+        padding: 1.25rem 1rem 90px 1rem !important;
         box-sizing: border-box !important;
     }
 
@@ -734,25 +771,12 @@ body {
 
     body:has(.library-sidebar) .site-footer,
     .has-sidebar .site-footer,
-    .library-layout .site-footer {
-        margin-left: 260px !important;
-        width: calc(100% - 260px) !important;
+    .library-layout .site-footer,
+    .site-footer,
+    .footer {
+        margin-left: 0 !important;
+        width: 100% !important;
         box-sizing: border-box !important;
-    }
-
-    .sticky-action-bar {
-        left: 260px !important;
-        width: calc(100% - 260px) !important;
-        max-width: calc(100% - 260px) !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 30px !important;
-        transform: none !important;
-        bottom: 0 !important;
-        border-radius: 0 !important;
-        box-sizing: border-box !important;
-        padding: 12px 20px !important;
     }
 }
 
@@ -766,28 +790,148 @@ body {
         margin-right: auto !important;
         width: 100% !important;
         max-width: 100% !important;
-        padding: 0.85rem 0.85rem 90px 0.85rem !important;
+        padding: 0.85rem 0.85rem 120px 0.85rem !important;
         box-sizing: border-box !important;
     }
 
-    .site-footer {
+    .site-footer,
+    .footer {
         margin-left: 0 !important;
         width: 100% !important;
-        padding-bottom: 90px !important;
-        box-sizing: border-box !important;
-    }
-
-    .sticky-action-bar {
-        left: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        display: flex !important;
-        justify-content: space-around !important;
-        align-items: center !important;
-        gap: 10px !important;
-        transform: none !important;
-        bottom: 0 !important;
-        padding: 10px 14px calc(10px + env(safe-area-inset-bottom)) !important;
+        padding-bottom: 120px !important;
         box-sizing: border-box !important;
     }
 }
+
+/* ==========================================================================
+   KINDLE BOOK CARD FULL RESPONSIVE OVERRIDES FOR MY LIBRARY
+   ========================================================================== */
+.kindle-book-card {
+    background: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 20px !important;
+    padding: 16px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+.kindle-book-card:hover {
+    transform: translateY(-4px) !important;
+    border-color: #86efac !important;
+    box-shadow: 0 16px 32px rgba(22, 163, 74, 0.12) !important;
+}
+
+.kindle-book-card .card-cover-wrap {
+    width: 100% !important;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    border-radius: 14px !important;
+    padding: 18px 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    cursor: pointer !important;
+    margin-bottom: 14px !important;
+    overflow: hidden !important;
+}
+
+.kindle-book-card .card-3d-book {
+    width: 140px !important;
+    height: 190px !important;
+    perspective: 800px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.kindle-book-card .card-cover-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 6px 12px 12px 6px !important;
+    box-shadow: -4px 6px 16px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.kindle-book-card .card-rating-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-bottom: 6px !important;
+}
+.kindle-book-card .card-stars { color: #f59e0b !important; font-size: 0.9rem !important; }
+.kindle-book-card .card-rating-score { font-weight: 800 !important; font-size: 0.84rem !important; color: #1e293b !important; }
+.kindle-book-card .card-rating-count { color: #64748b !important; font-size: 0.78rem !important; }
+
+.kindle-book-card .card-title {
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin-bottom: 6px !important;
+    line-height: 1.35 !important;
+    display: block !important;
+}
+
+.kindle-book-card .card-subtitle {
+    font-size: 0.82rem !important;
+    color: #64748b !important;
+    margin-bottom: 10px !important;
+    display: block !important;
+}
+
+.kindle-book-card .card-kpi-badges {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-bottom: 12px !important;
+}
+.kindle-book-card .card-kpi-tag {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    background: #f0fdf4 !important;
+    color: #166534 !important;
+    border: 1px solid #bbf7d0 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+}
+
+.kindle-book-card .card-price-block {
+    background: #f8fafc !important;
+    border-radius: 10px !important;
+    padding: 8px 12px !important;
+    margin-bottom: 12px !important;
+}
+.kindle-book-card .card-prices {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+}
+.kindle-book-card .card-offer-price {
+    font-size: 1.3rem !important;
+    font-weight: 900 !important;
+    color: #16a34a !important;
+}
+.kindle-book-card .card-mrp {
+    font-size: 0.88rem !important;
+    color: #94a3b8 !important;
+    text-decoration: line-through !important;
+    font-weight: 600 !important;
+}
+.kindle-book-card .card-save-badge {
+    font-size: 0.75rem !important;
+    font-weight: 800 !important;
+    background: #dcfce7 !important;
+    color: #15803d !important;
+    padding: 2px 8px !important;
+    border-radius: 4px !important;
+}
+.kindle-book-card .card-savings-text {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    color: #15803d !important;
+    margin-top: 2px !important;
+}

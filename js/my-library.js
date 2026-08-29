@@ -470,8 +470,16 @@ async function renderLibrarySections(booksArray) {
         const bookName = book.title || book.heading || book.name;
         const bookCover = book.cover_image || book.cover || '/images/banners/farmer-community-banner.jpeg';
 
-        // 1. Purchased / My Books (Unique per Book ID)
-        const isPurchased = userPurchases.some(p => (p.book_id && p.book_id.toUpperCase() === rawId) || (p.id && p.id.toUpperCase() === rawId));
+        // 1. Purchased / My Books (Unique per Book ID - Supports individual and bundle cart purchases)
+        const isPurchased = userPurchases.some(p => {
+            if (!p) return false;
+            const bIdStr = String(p.book_id || p.id || '').toUpperCase();
+            if (bIdStr === rawId) return true;
+            if (bIdStr.includes(',')) {
+                return bIdStr.split(',').map(x => x.trim()).includes(rawId);
+            }
+            return false;
+        });
         if (isPurchased && !seenPurchasedIds.has(rawId)) {
             seenPurchasedIds.add(rawId);
             purchasedCount++;
@@ -487,43 +495,78 @@ async function renderLibrarySections(booksArray) {
             `;
             if (purchasedGrid) purchasedGrid.appendChild(card);
 
-            // Check if purchased book has specific bonus books in JSON
-            if (book.bonusBooks && Array.isArray(book.bonusBooks) && book.bonusBooks.length > 0 && bonusGrid) {
-                book.bonusBooks.forEach((bonusFile, bIdx) => {
+            // Check if purchased book has specific bonus books in Landing Pages or JSON
+            let bonusList = [];
+            if (book.bonusBooks && Array.isArray(book.bonusBooks)) {
+                bonusList = book.bonusBooks.map((f, i) => ({ title: `${bookName} — VIP बोनस #${i+1}`, file_url: f, image: bookCover }));
+            }
+            if (book.bonuses && Array.isArray(book.bonuses)) {
+                bonusList = [...bonusList, ...book.bonuses];
+            }
+            try {
+                const landingList = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+                const lp = landingList.find(p => p.id && p.id.toUpperCase() === rawId);
+                if (lp && (lp.bonuses || lp.bonus_books)) {
+                    const lBonuses = lp.bonuses || lp.bonus_books || [];
+                    lBonuses.forEach(bn => {
+                        if (!bonusList.some(bItem => bItem.title === bn.title)) {
+                            bonusList.push(bn);
+                        }
+                    });
+                }
+            } catch (e) {}
+
+            if (bonusList.length > 0 && bonusGrid) {
+                bonusList.forEach((bn, bIdx) => {
                     bonusCount++;
                     const bonusCard = document.createElement('div');
                     bonusCard.className = 'book-card';
-                    bonusCard.style.cssText = 'background:#fff;border-radius:12px;padding:14px;border:1.5px solid #10b981;box-shadow:0 4px 12px rgba(0,0,0,0.05);';
+                    bonusCard.style.cssText = 'background:#fff;border-radius:12px;padding:14px;border:1.5px solid #10b981;box-shadow:0 4px 12px rgba(0,0,0,0.05);display:flex;flex-direction:column;justify-content:space-between;';
+                    const bImg = bn.image || bn.cover || '/images/books/kharif-master-guide-2026-cover.webp';
+                    const bTitle = bn.title || `${bookName} — बोनस #${bIdx+1}`;
+                    const bUrl = bn.file_url || bn.pdf_url || `/pdf/bonus/${bookId}-bonus.pdf`;
                     bonusCard.innerHTML = `
-                        <div style="font-size:2rem;text-align:center;margin-bottom:6px;">🎁</div>
-                        <h4 style="color:#065f46;margin-bottom:6px;">${bookName} — VIP बोनस सामग्री #${bIdx + 1}</h4>
-                        <p style="font-size:0.8rem;color:#64748b;margin-bottom:12px;">आपकी ${bookName} खरीद के साथ मुफ़्त उपलब्ध।</p>
-                        <a href="${bonusFile}" target="_blank" style="display:block;text-align:center;background:#10b981;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;">📥 बोनस फाइल डाउनलोड</a>
+                        <div>
+                            <div style="text-align:center;margin-bottom:8px;">
+                                <img src="${bImg}" style="width:70px;height:95px;object-fit:cover;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.12);" />
+                            </div>
+                            <span style="background:#16a34a;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:4px;">🎁 100% FREE BONUS</span>
+                            <h4 style="color:#065f46;margin:0 0 6px 0;font-size:0.95rem;">${bTitle}</h4>
+                            <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;">आपकी ${bookName} खरीद के साथ मुफ़्त उपलब्ध।</p>
+                        </div>
+                        <a href="${bUrl}" target="_blank" style="display:block;text-align:center;background:#10b981;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;">📥 बोनस PDF पढ़ें / डाउनलोड</a>
                     `;
                     bonusGrid.appendChild(bonusCard);
                 });
             }
         }
 
-        // 2. Available Books (Unique per Book ID)
-        if ((book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'SUB001') && !seenAvailableIds.has(rawId)) {
+        // 2. Available Books (Strictly Kharif Master Guide, Kheti Ka Doctor and VIP Subscription)
+        const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001') && book.status !== 'coming_soon';
+        if (isLiveAgri && !seenAvailableIds.has(rawId)) {
             seenAvailableIds.add(rawId);
-            const availCard = document.createElement('div');
-            availCard.className = 'book-card';
-            let targetUrl = rawId === 'SUB001' ? '/subscription.html' : `/ebooks/checkout.html?id=${bookId}`;
+            if (window.renderUniversalBookMarketingCard && typeof window.renderUniversalBookMarketingCard === 'function') {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = window.renderUniversalBookMarketingCard(book);
+                if (availableGrid && tempDiv.firstElementChild) availableGrid.appendChild(tempDiv.firstElementChild);
+            } else {
+                const availCard = document.createElement('div');
+                availCard.className = 'book-card';
+                let targetUrl = rawId === 'SUB001' ? '/subscription.html' : (rawId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (rawId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/checkout.html?id=${bookId}`));
 
-            availCard.innerHTML = `
-                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
-                <h4>${bookName}</h4>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0;">
-                    <span style="font-weight:800;color:#138A36;font-size:1.05rem;">₹${book.offerPrice || 99}</span>
-                    <span style="text-decoration:line-through;color:#94a3b8;font-size:0.85rem;">₹${book.mrp || 299}</span>
-                </div>
-                <div class="book-btn-group" style="margin-top: 6px;">
-                    <a href="${targetUrl}" class="btn-available" style="width:100%;text-align:center;display:block;padding:10px;background:#E86A17;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;">Buy Now / Details</a>
-                </div>
-            `;
-            if (availableGrid) availableGrid.appendChild(availCard);
+                availCard.innerHTML = `
+                    <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
+                    <h4>${bookName}</h4>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0;">
+                        <span style="font-weight:800;color:#138A36;font-size:1.05rem;">₹${book.offerPrice || 99}</span>
+                        <span style="text-decoration:line-through;color:#94a3b8;font-size:0.85rem;">₹${book.mrp || 299}</span>
+                    </div>
+                    <div class="book-btn-group" style="margin-top: 6px;">
+                        <a href="${targetUrl}" class="btn-available" style="width:100%;text-align:center;display:block;padding:10px;background:#E86A17;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;">Buy Now / Details</a>
+                    </div>
+                `;
+                if (availableGrid) availableGrid.appendChild(availCard);
+            }
         }
 
         // 3. Demo Books (Read Free Samples)
@@ -543,8 +586,8 @@ async function renderLibrarySections(booksArray) {
             if (demoGrid) demoGrid.appendChild(demoCard);
         }
 
-        // 4. Coming Soon Books (Unique per Book ID)
-        if ((book.status === 'coming_soon' || (rawId !== 'BK001' && rawId !== 'BK002' && rawId !== 'BK006' && rawId !== 'SUB001')) && !seenComingSoonIds.has(rawId) && !seenAvailableIds.has(rawId)) {
+        // 4. Coming Soon Books (All other Books)
+        if ((book.status === 'coming_soon' || (!isLiveAgri && rawId !== 'BK001' && rawId !== 'BK002' && rawId !== 'SUB001')) && !seenComingSoonIds.has(rawId) && !seenAvailableIds.has(rawId)) {
             seenComingSoonIds.add(rawId);
             const comingCard = document.createElement('div');
             comingCard.className = 'book-card';

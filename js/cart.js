@@ -31,6 +31,36 @@
     } catch (e) {
       console.warn('Could not fetch books.json', e);
     }
+
+    try {
+      const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+      if (Array.isArray(customBooks)) {
+        customBooks.forEach(cb => {
+          if (!cb || !cb.id) return;
+          const idx = allBooks.findIndex(x => x.id && x.id.toUpperCase() === cb.id.toUpperCase());
+          if (idx >= 0) allBooks[idx] = cb;
+          else allBooks.unshift(cb);
+        });
+      }
+      const landingList = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+      if (Array.isArray(landingList)) {
+        landingList.forEach(lp => {
+          if (!lp || !lp.id) return;
+          const idx = allBooks.findIndex(x => x.id && x.id.toUpperCase() === lp.id.toUpperCase());
+          const synth = {
+            id: lp.id,
+            heading: lp.hero?.title || lp.id,
+            name: lp.hero?.title || lp.id,
+            category: lp.category || 'Agriculture',
+            mrp: lp.hero?.mrp || 299,
+            offerPrice: lp.hero?.offer_price || 99,
+            cover: lp.hero?.cover_image || "/images/books/kharif-master-guide-2026-cover.webp"
+          };
+          if (idx >= 0) allBooks[idx] = Object.assign({}, allBooks[idx], synth);
+          else allBooks.unshift(synth);
+        });
+      }
+    } catch (e) {}
   }
 
   function loadCartFromStorage() {

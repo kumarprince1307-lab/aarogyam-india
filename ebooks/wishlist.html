@@ -1,505 +1,360 @@
-
-
-<!--
-=========================================================
-AAROGYAM INDIA WEBSITE
-INDEX.HTML
-VERSION : 2.0
-PART : 1 / 12
-STATUS : AI BIBLE V2 LOCKED
-=========================================================
--->
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 
 <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- =========================================
-    BASIC META
-    ========================================== -->
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2BWPJVQWPK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-2BWPJVQWPK');
+  </script>
 
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Meta Tags -->
+  <title>मेरी विशलिस्ट (Wishlist) | Aarogyam India</title>
+  <meta name="description" content="Aarogyam India Digital Wishlist - आपकी पसंदीदा पुस्तकें एवं ई-बुक्स।">
+  <meta name="robots" content="index, follow">
 
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+  <!-- Favicon & PWA -->
+  <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+  <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#15803d">
 
-    <!-- =========================================
-    SEO
-    ========================================== -->
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-   <title>
-Aarogyam India | One Platform • Multiple Missions
-</title>
-    <link rel="icon" type="image/png" href="images/logo/favicon.png">
-
-    <meta name="description"
-        content="Aarogyam India Official Website. Agriculture eBooks, Crop Doctor, Weather, Mandi Bhav, Digital Training, Health Knowledge and Premium Learning Platform.">
-
-    <meta name="keywords"
-        content="Agriculture, Farming, Crop Doctor, eBook, Digital Training, Weather, Mandi Bhav, Aarogyam India">
-
-    <meta name="author"
-        content="Aarogyam India">
-
-    <meta name="robots"
-        content="index,follow">
-
-    <!-- =========================================
-    OPEN GRAPH
-    ========================================== -->
-
-    <meta property="og:title"
-        content="Aarogyam India">
-
-    <meta property="og:description"
-        content="Premium Digital Agriculture Platform">
-
-    <meta property="og:type"
-        content="website">
-
-    <meta property="og:image"
-        content="images/logo/logo.png">
-
-    <!-- Favicon & PWA -->
-    <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
-    <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#28a745">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Aarogyam">
-
-    <!-- =========================================
-    GOOGLE FONT
-    ========================================== -->
-
-    <link rel="preconnect"
-        href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-    <!-- =========================================
-    CSS
-    ========================================== -->
-
-    <link rel="stylesheet"
-        href="css/style.css">
-
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/ebook.css">
+  <link rel="stylesheet" href="/css/user-notifications.css">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css">
+  <link rel="stylesheet" href="/css/home-revamp.css">
 </head>
 
 <body>
-
-<!-- =========================================
-TOP BAR START
-========================================== -->
-
-<div class="top-bar">
-
-    <div class="container">
-
-        <div class="top-left">
-
-            🇮🇳 Welcome to Aarogyam India
-
-        </div>
-
-        <div class="top-right">
-
-            <a href="tel:+917974422572">
-                📞 +91 79744 22572
-            </a>
-
-            <a href="mailto:info@aarogyamindia.in">
-                ✉ info@aarogyamindia.in
-            </a>
-
-        </div>
-
+  <!-- =========================================
+       1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
+  ========================================== -->
+  <div class="home-live-ticker-wrap">
+    <div class="container home-ticker-flex">
+      <div class="ticker-pulse-badge">
+        <span class="ticker-dot-pulse"></span>
+        <span>LIVE</span>
+      </div>
+      <div class="ticker-marquee-scroll">
+        ⚡ <span>किसान भाइयों का भरोसा!</span> &nbsp;•&nbsp; 📖 <span>आज 1,420+ ई-बुक्स डाउनलोड हुईं</span> &nbsp;•&nbsp; 🌾 <span>दैनिक मंडी भाव व मौसम अपडेट लाइव</span> &nbsp;•&nbsp; 👨‍🌾 <span>24×7 WhatsApp AI एक्सपर्ट परामर्श सक्रिय</span>
+      </div>
     </div>
+  </div>
 
-</div>
-
-<!-- =========================================
-TOP BAR END
-========================================== -->
-
-<!-- =========================================
-HEADER START
-========================================== -->
-
-<header class="header" id="header">
-    <div class="container">
-        <div class="logo">
-            <a href="index.html">
-                <img src="images/logo/logo.png" alt="Aarogyam India Logo">
-            </a>
+  <!-- =========================================
+       2. ANIMATED INDIAN TIRANGA WAVING HEADER
+  ========================================== -->
+  <header class="header-tiranga-animated">
+    <div class="container header-container" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
+      
+      <!-- Brand Logo + Name + Active Page Badge -->
+      <a href="/index.html" class="header-brand-wrap" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+        <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:40px;width:auto;" />
+        <div style="display:flex;flex-direction:column;">
+          <span style="font-size:1.15rem;font-weight:900;color:#0f172a;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;line-height:1.1;">AAROGYAM <span style="color:#2563eb;">INDIA</span></span>
+          <span style="font-size:0.7rem;font-weight:700;color:#15803d;letter-spacing:0.5px;">डिजिटल क्रांति • समृद्ध किसान</span>
         </div>
-        <div id="header-user-info" style="display: none;">
-            <h3 id="header-user-name"></h3>
-            <p id="header-user-mobile"></p>
-        </div>
-        <div class="header-right">
-            <nav class="navbar">
-                <ul class="nav-menu">
-                    <li><a href="index.html" class="active">Home</a></li>
-                    <li class="dropdown">
-                        <a href="#">Services</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="ebooks/agriculture.html">Agriculture</a></li>
-                            <li><a href="crop-doctor.html">Crop Doctor</a></li>
-                            <li><a href="weather.html">Weather</a></li>
-                            <li><a href="mandi.html">Mandi Bhav</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#">eBooks</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="ebooks/ebook.html">All eBooks</a></li>
-                            <li><a href="ebooks/agriculture.html">Agriculture Books</a></li>
-                            <li><a href="pages/health.html">Health Books</a></li>
-                            <li><a href="pages/digital-training.html">Digital Training</a></li>
-                            <li><a href="pages/self-help.html">Self Help</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="ebooks/my-library.html">My Library</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="search-btn" id="searchBtn" aria-label="Search">
-                    <img src="../images/icons/search.png" alt="Search">
-                </button>
-                <button id="desktop-pwa-install-btn" class="pwa-install-btn" style="display: none; margin-right: 8px;" title="Install Aarogyam India App">
-                    <span>📱</span> Install App
-                </button>
-                <a href="#" id="universalLoginBtn" class="login-btn">
-                    <img src="images/icons/login.png" alt="Login">
-                    <span id="loginBtnText">Login</span>
-                </a>
-                <a href="ebooks/checkout.html" class="cart-btn">
-                    <img src="images/icons/cart.png" alt="Cart">
-                    <span class="cart-count" id="cartCount">0</span>
-                </a>
-                <button class="menu-btn" id="menuBtn" aria-label="Menu">
-                    <img src="images/icons/menu.png" alt="Menu">
-                </button>
-            </div>
-        </div>
-    </div>
-</header>
+        <span class="header-current-page-badge" style="background:#0f172a;color:#fde047;font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:12px;margin-left:6px;">❤️ विशलिस्ट</span>
+      </a>
 
-<!-- =========================================
-MOBILE NAVIGATION START
-========================================== -->
-<div class="mobile-menu" id="mobileMenu">
-    
-    <!-- User Profile Card (Visible when logged in) -->
-    <div id="mobile-user-card" class="mobile-user-card" style="display: none;">
-        <button id="closeMenu">
-            <img src="images/icons/close.png" alt="Close">
+      <!-- Header Actions Right: Install App, Cart, 3-Line Menu -->
+      <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+          <span>📲</span> <span>Install App</span>
         </button>
-        <img src="/images/logo/fevicon.png" alt="User" class="mobile-user-avatar">
-        <div class="mobile-user-info">
-            <h3 id="mobile-user-name">Guest User</h3>
-            <p id="mobile-user-meta">
-                <span id="mobile-member-status"</span><span id="mobile-user-mobile"></span>
-            </p>
-        </div>
-        <a href="#" id="mobile-logout-btn" class="mobile-logout-btn">Logout</a>
-    </div>
 
-    <!-- Login Prompt (Visible when logged out) -->
-    <div id="mobile-login-prompt" class="mobile-login-prompt">
-        <button class="close-btn-alt" id="altCloseMenu">
-            <img src="../images/icons/close.png" alt="Close">
-        </button>
-        <a href="#" id="mobileLoginBtn" class="login-prompt-btn">
-            <img src="images/icons/login.png" alt="Login">
-            <span id="mobileLoginBtnText">Login / Register</span>
+        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
+          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
         </a>
-    </div>
 
-    <!-- Mobile Menu PWA Install Button -->
-    <div style="padding: 0 15px 10px 15px;">
-        <button id="mobile-pwa-install-btn" class="mobile-pwa-install-btn" style="display: flex;">
-            <span>📱</span> Install App
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+          <i class="fa-solid fa-bars"></i>
         </button>
+      </div>
+
     </div>
+  </header>
 
-    <ul class="mobile-nav">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="ebooks/my-library.html">My Library</a></li>
-        <li><a href="purchases.html">My Purchases & Invoices</a></li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">Categories ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="ebooks/agriculture.html">Agriculture</a></li>
-                <li><a href="pages/health.html">Health</a></li>
-                <li><a href="categories/business.html">Business</a></li>
-                <li><a href="categories/netsurf.html">NetSurf</a></li>
-                <li><a href="categories/education.html">Education</a></li>
-                <li><a href="categories/digital-ai.html">Digital AI</a></li>
-            </ul>
-        </li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">Services ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="ebooks/agriculture.html">Agriculture</a></li>
-                <li><a href="crop-doctor.html">Crop Doctor</a></li>
-                <li><a href="weather.html">Weather</a></li>
-                <li><a href="mandi.html">Mandi Bhav</a></li>
-            </ul>
-        </li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">eBooks ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="ebooks/ebook.html">All eBooks</a></li>
-                <li><a href="ebooks/agriculture.html">Agriculture Books</a></li>
-                <li><a href="pages/health.html">Health Books</a></li>
-                <li><a href="pages/digital-training.html">Digital Training</a></li>
-                <li><a href="pages/self-help.html">Self Help</a></li>
-            </ul>
-        </li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">Support ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="faq.html">FAQ</a></li>
-                <li><a href="terms-conditions.html">Terms & Conditions</a></li>
-                <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                <li><a href="shipping-policy.html">Shipping & Return Policy</a></li>
-            </ul>
-        </li>
-    </ul>
-</div>
+  <!-- =========================================
+       1. UNIVERSAL STORE HEADER
+  ========================================== -->
+  <header class="ebook-header" style="background: linear-gradient(90deg, #14532d 0%, #15803d 50%, #166534 100%);">
+    <div class="header-container">
+      <!-- Universal Left Drawer Trigger (Desktop & Mobile) -->
+      <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="मेनू खोलें" style="background:transparent;border:none;color:#ffffff;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:6px;margin-right:10px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
 
-<!-- =========================================
-MOBILE NAVIGATION END
-========================================== -->
-<!-- =========================================
-FOOTER START
-========================================== -->
+      <!-- Logo -->
+      <div class="logo">
+        <a href="ebook.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+          <img src="../images/logo/logo.png" alt="Aarogyam India Logo" style="height:44px;width:auto;">
+          <span style="color:#ffffff;font-weight:900;font-size:1.15rem;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;">
+            AAROGYAM <span style="color:#fde047;">WISHLIST</span>
+          </span>
+        </a>
+      </div>
 
-<footer class="footer">
+      <!-- Navigation Links (Desktop) -->
+      <nav class="ebook-navigation">
+        <ul>
+          <li><a href="../index.html">🏠 मुख्य पृष्ठ</a></li>
+          <li><a href="ebook.html">📚 ई-बुक स्टोर</a></li>
+          <li><a href="agriculture.html">🌱 कृषि गाइड</a></li>
+          <li><a href="wishlist.html" style="color:#fde047;">❤️ विशलिस्ट</a></li>
+          <li><a href="my-library.html">📖 मेरी लाइब्रेरी</a></li>
+        </ul>
+      </nav>
 
+      <!-- Header Right (Icons & User Profile) -->
+      <div class="header-right">
+        <!-- User Profile Box / Login -->
+        <div id="header-user-profile-box">
+          <a href="/pages/profile.html" class="header-icon" title="यूजर प्रोफ़ाइल" onclick="if (!localStorage.getItem('AI_USER') && !localStorage.getItem('aarogyam_user')) { event.preventDefault(); window.openGuestLoginModal?.(); }">
+            <i class="fa-solid fa-user" style="color:#fff;"></i>
+          </a>
+        </div>
+
+        <!-- Wishlist Icon with Live Counter -->
+        <a href="wishlist.html" class="header-icon" title="विशलिस्ट" style="position:relative;">
+          <i class="fa-solid fa-heart" style="color:#fff;"></i>
+          <span id="wishlist-count-badge" class="cart-count" style="display:none;background:#ef4444;">0</span>
+        </a>
+
+        <!-- Cart Icon with Live Counter -->
+        <a href="cart.html" class="header-icon" title="शॉपिंग कार्ट" style="position:relative;">
+          <i class="fa-solid fa-cart-shopping" style="color:#fff;"></i>
+          <span id="cart-count-badge" class="cart-count">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================
+       2. WISHLIST BANNER & HEADER
+  ========================================== -->
+  <section style="padding: 30px 0 15px 0;">
     <div class="container">
+      <div style="background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); border: 2px solid #fbcfe8; border-radius: 20px; padding: 26px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <span style="background: #db2777; color: #fff; font-weight: 800; font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; text-transform: uppercase;">
+            ❤️ MY SAVED WISHLIST
+          </span>
+          <h1 style="font-size: 1.8rem; font-weight: 900; color: #831843; margin: 8px 0 4px 0;">
+            आपकी पसंदीदा पुस्तकें (Saved eBooks)
+          </h1>
+          <p style="color: #9d174d; font-size: 0.88rem;">
+            यहाँ से आप 1-क्लिक में अपनी पसंदीदा पुस्तकें कार्ट में जोड़ सकते हैं या सीधे खरीद सकते हैं।
+          </p>
+        </div>
+        <div>
+          <a href="ebook.html" class="btn" style="background: #db2777; color: #fff; font-weight: 800; font-size: 0.88rem; padding: 10px 22px; border-radius: 25px;">
+            + और पुस्तकें खोजें
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="footer-grid">
+  <!-- =========================================
+       3. WISHLIST BOOKS GRID
+  ========================================== -->
+  <section class="shelf-section" style="margin-top: 10px;">
+    <div class="container">
+      <div class="shelf-books-grid" id="wishlist-books-grid">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </div>
+  </section>
 
-            <!-- Company -->
-
-            <div class="footer-column">
-
-                <img
-                    src="images/logo/logo.png"
-                    alt="Aarogyam India Logo"
-                    class="footer-logo">
-
-                <p>
-
-                    Aarogyam India is a premium digital
-                    agriculture knowledge platform helping
-                    farmers with practical learning,
-                    eBooks and expert guidance.
-
-                </p>
-
-            </div>
-
-            <!-- Quick Links -->
-
-            <div class="footer-column">
-
-                <h3>
-
-                    Quick Links
-
-                </h3>
-
-                <ul>
-
-                    <li><a href="index.html">Home</a></li>
-
-                    <li><a href="about.html">About</a></li>
-
-                    <li><a href="blog.html">Blog</a></li>
-
-                    <li><a href="contact.html">Contact</a></li>
-
-                </ul>
-
-            </div>
-
-            <!-- Services -->
-
-            <div class="footer-column">
-
-                <h3>
-
-                    Services
-
-                </h3>
-
-                <ul>
-
-                    <li><a href="crop-doctor.html">Crop Doctor</a></li>
-
-                    <li><a href="weather.html">Weather</a></li>
-
-                    <li><a href="mandi.html">Mandi Bhav</a></li>
-
-                    <li><a href="ebooks/ebook.html">eBooks</a></li>
-
-                </ul>
-
-            </div>
-
-            <!-- Contact -->
-
-            <div class="footer-column">
-
-                <h3>
-
-                    Contact
-
-                </h3>
-
-                <p>
-
-                    📍 Rewa, Madhya Pradesh
-
-                </p>
-
-                <p>
-
-                    📞 +91 79744 22572
-
-                </p>
-
-                <p>
-
-                    ✉ info@aarogyamindia.in
-
-                </p>
-
-            </div>
-
+  <!-- =========================================
+       4. UNIVERSAL FOOTER
+  ========================================== -->
+    <!-- =========================================
+       15. MODERN DARK FOOTER
+  ========================================== -->
+  <footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b; margin-top: 50px;">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
+        
+        <!-- About Column -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:42px;width:auto;" />
+            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#38bdf8;">INDIA</span></span>
+          </div>
+          <p style="font-size:0.85rem;color:#94a3b8;line-height:1.55;">
+            Aarogyam India - भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य, पशु पोषण और डायरेक्ट सेलिंग ज्ञान मंच।
+          </p>
         </div>
 
-        <!-- =========================================
-        SOCIAL MEDIA
-        ========================================== -->
-
-        <div class="footer-social">
-
-            <a href="#">
-                <img src="images/icons/facebook.png"
-                     alt="Facebook">
-            </a>
-
-            <a href="#">
-                <img src="images/icons/instagram.png"
-                     alt="Instagram">
-            </a>
-
-            <a href="#">
-                <img src="images/icons/youtube.png"
-                     alt="YouTube">
-            </a>
-
-            <a href="#">
-                <img src="images/icons/telegram.png"
-                     alt="Telegram">
-            </a>
-
-            <a href="#">
-                <img src="images/icons/whatsapp.png"
-                     alt="WhatsApp">
-            </a>
-
+        <!-- Quick Links -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">त्वरित लिंक्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/index.html" style="color:#94a3b8;">🏠 मुख्य पृष्ठ</a></li>
+            <li><a href="/ebooks/ebook.html" style="color:#94a3b8;">📚 ई-बुक स्टोर</a></li>
+            <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;">🌱 कृषि हब</a></li>
+            <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;">🌾 खरीफ मास्टर गाइड 2026</a></li>
+            <li><a href="/ebooks/kheti-dr.html" style="color:#94a3b8;">🩺 खेती का डॉक्टर</a></li>
+          </ul>
         </div>
 
-        <!-- =========================================
-        COPYRIGHT
-        ========================================== -->
+        <!-- Utilities -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सेवाएं व टूल्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/crop-doctor.html" style="color:#94a3b8;">🔬 फसल डॉक्टर AI</a></li>
+            <li><a href="/mandi.html" style="color:#94a3b8;">🌾 लाइव मंडी भाव</a></li>
+            <li><a href="/weather.html" style="color:#94a3b8;">⛅ मौसम पूर्वानुमान</a></li>
+            <li><a href="/webinar.html" style="color:#94a3b8;">📺 लाइव वेबिनार हब</a></li>
+            <li><a href="/subscription.html" style="color:#94a3b8;">👑 Pro VIP पास</a></li>
+          </ul>
+        </div>
 
-        <div class="copyright">
+        <!-- Contact Support -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सहायता केंद्र</h3>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
+          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 सहायता')" class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;background:#dc2626;color:#fff;border:none;border-radius:20px;font-weight:800;cursor:pointer;">
+            <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
+          </button>
+        </div>
 
-            <p>
+      </div>
 
-                © 2026 Aarogyam India.
-                All Rights Reserved.
+      <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
+        © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+      </div>
+    </div>
+  </footer>
 
+  <script src="/js/user-notifications.js"></script>
+  <script src="/js/universal-nav-drawer.js"></script>
+  <script src="/js/recent-purchase-toast.js"></script>
+</body>
+</html>
+
+  <!-- =========================================
+       5. UNIVERSAL MOBILE BOTTOM NAVIGATION
+  ========================================== -->
+  <nav class="mobile-bottom-nav">
+    <a href="../index.html" class="nav-tab-item">
+      <i class="fa-solid fa-house nav-tab-icon"></i>
+      <span>होम</span>
+    </a>
+    <a href="ebook.html" class="nav-tab-item">
+      <i class="fa-solid fa-book-open nav-tab-icon"></i>
+      <span>ई-बुक्स</span>
+    </a>
+    <a href="wishlist.html" class="nav-tab-item active" style="position:relative;">
+      <i class="fa-solid fa-heart nav-tab-icon"></i>
+      <span>विशलिस्ट</span>
+      <span class="nav-badge wishlist-count-badge" style="display:none;">0</span>
+    </a>
+    <a href="my-library.html" class="nav-tab-item">
+      <i class="fa-solid fa-bookmark nav-tab-icon"></i>
+      <span>लाइब्रेरी</span>
+    </a>
+    <a href="/pages/profile.html" class="nav-tab-item">
+      <i class="fa-solid fa-user nav-tab-icon"></i>
+      <span>प्रोफ़ाइल</span>
+    </a>
+  </nav>
+
+  <!-- =========================================
+       6. UNIVERSAL SIDE DRAWER MENU (MOBILE)
+  ========================================== -->
+  <div class="mobile-overlay" onclick="document.body.classList.remove('menu-open')"></div>
+  <div class="mobile-menu">
+    <div class="mobile-menu-header">
+      <img src="../images/logo/logo.png" alt="Aarogyam India">
+      <button class="menu-close" onclick="document.body.classList.remove('menu-open')">&times;</button>
+    </div>
+    <ul>
+      <li><a href="../index.html">🏠 मुख्य पृष्ठ (Home)</a></li>
+      <li><a href="ebook.html">📚 ई-बुक स्टोर (All eBooks)</a></li>
+      <li><a href="agriculture.html">🌱 कृषि पुस्तकें (Agriculture)</a></li>
+      <li><a href="wishlist.html" style="color:#db2777;font-weight:800;">❤️ मेरी विशलिस्ट (Wishlist)</a></li>
+      <li><a href="my-library.html">📖 मेरी लाइब्रेरी (My Library)</a></li>
+      <li><a href="cart.html">🛒 शॉपिंग कार्ट (Cart)</a></li>
+      <li><a href="/pages/profile.html">👤 मेरी प्रोफ़ाइल (Profile)</a></li>
+      <li><a href="https://api.whatsapp.com/send?phone=919876543210&text=Namaste" target="_blank" style="color: #16a34a;">💬 24×7 WhatsApp सहायता</a></li>
+    </ul>
+  </div>
+
+  
+
+  <!-- JavaScript Modules -->
+  <script src="../js/book-marketing-card.js"></script>
+  <script src="../js/universal-nav-drawer.js"></script>
+  <script src="../js/global-guest-modal.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      renderWishlistPage();
+    });
+
+    async function renderWishlistPage() {
+      const grid = document.getElementById('wishlist-books-grid');
+      if (!grid) return;
+
+      const rawItems = window.AarogyamWishlist.getItems();
+      if (!rawItems || rawItems.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #fff; border-radius: 20px; border: 2px dashed #cbd5e1;">
+            <span style="font-size: 3rem;">💔</span>
+            <h3 style="font-size: 1.3rem; margin: 12px 0 6px 0; color: #1e293b;">आपकी विशलिस्ट अभी खाली है</h3>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">
+              अपनी पसंद की ई-बुक्स को विशलिस्ट में सुरक्षित करने के लिए स्टोर पर ❤️ बटन दबाएं।
             </p>
+            <a href="ebook.html" class="btn" style="background: #16a34a; color: #fff; font-weight: 800; padding: 12px 28px; border-radius: 30px;">
+              📚 ई-बुक स्टोर देखें
+            </a>
+          </div>
+        `;
+        return;
+      }
 
-        </div>
+      // Fetch books database to ensure latest details
+      let allBooks = [];
+      try {
+        const res = await fetch('/data/books.json').then(r => r.json());
+        allBooks = Array.isArray(res) ? res : (res.books || []);
+      } catch (e) {}
 
-    </div>
+      let customBooks = [];
+      try {
+        customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+      } catch (e) {}
+      const combined = [...customBooks, ...allBooks];
 
-</footer>
+      const fullBooks = rawItems.map(it => {
+        const itId = typeof it === 'string' ? it : (it.id || it.link || '');
+        const found = combined.find(b => b.id && b.id.toUpperCase() === String(itId).toUpperCase());
+        return found || (typeof it === 'object' ? it : { id: itId, heading: itId });
+      });
 
-<!-- =========================================
-FOOTER END
-========================================== -->
-
-<!-- =========================================
-WHATSAPP FLOATING BUTTON
-========================================== -->
-
-<a
-    href="https://wa.me/917974422572"
-    class="whatsapp-float"
-    target="_blank"
-    aria-label="WhatsApp">
-
-   <img src="images/icons/whatsapp.png" alt="WhatsApp">
-
-</a>
-
-<!-- =========================================
-JAVASCRIPT
-========================================== -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/js/supabase.js"></script>
-<script src="/session.js"></script>
-<script src="/js/script.js"></script>
-<script type="module" src="/js/public-pwa.js"></script>
-
-<!-- =========================================
-UNIVERSAL LOGIN MODAL
-========================================== -->
-<div id="universalLoginModal" class="login-modal-overlay" style="display: none;">
-    <div class="login-modal-card">
-        <button id="universalLoginCloseBtn" class="login-modal-close">&times;</button>
-        <img src="images/logo/logo.png" alt="Aarogyam India" class="login-modal-logo">
-        <h2 class="login-modal-title">Login or Register</h2>
-        <p class="login-modal-subtitle">Enter your mobile number to continue</p>
-        <form id="universalLoginForm">
-            <div class="login-modal-form-group">
-                <label for="universalLoginMobile">Mobile Number</label>
-                <input type="tel" id="universalLoginMobile" placeholder="10-digit mobile number" maxlength="10" required>
-            </div>
-            <button type="submit" id="universalLoginSubmitBtn" class="login-modal-submit">Login</button>
-        </form>
-        <p id="universalLoginMessage" class="login-modal-message"></p>
-        <p class="login-modal-footer">
-            New user? <a href="/registration.html" id="modalRegisterLink">Sign up here</a>
-        </p>
-    </div>
-</div>
-
+      grid.innerHTML = fullBooks.map(b => window.renderUniversalBookMarketingCard(b)).join('');
+    }
+  </script>
 </body>
 
 </html>
-
-
