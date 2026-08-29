@@ -2,7 +2,7 @@
   "id": "/?source=pwa",
   "name": "Aarogyam India - Digital Agriculture & Healthcare Hub",
   "short_name": "Aarogyam",
-  "description": "Aarogyam India - One Platform, Multiple Missions. Agriculture eBooks, Crop Doctor, Health, Weather, Mandi Bhav, Digital Training & Marketing Engine.",
+  "description": "Aarogyam India - भारत का सम्पूर्ण डिजिटल मंच। कृषि ई-बुक्स, फसल सुरक्षा, मौसम, मंडी भाव, स्वास्थ्य परामर्श, पशु पालन और Netsurf डायरेक्ट बिज़नेस ग्रोथ।",
   "start_url": "/index.html?source=pwa",
   "scope": "/",
   "display": "standalone",
@@ -24,8 +24,10 @@
     "business",
     "shopping",
     "health",
-    "lifestyle"
+    "lifestyle",
+    "news"
   ],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "prefer_related_applications": false,
   "related_applications": [],
   "handle_links": "preferred",
@@ -36,6 +38,30 @@
     "preferred_width": 480
   },
   "icons": [
+    {
+      "src": "/images/icons/pwa-icon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icons/pwa-icon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icons/pwa-icon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icons/pwa-icon-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/images/icons/pwa-icon-72x72.png",
       "sizes": "72x72",
@@ -79,6 +105,12 @@
       "purpose": "any"
     },
     {
+      "src": "/images/icons/pwa-icon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/images/icons/pwa-icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
@@ -91,6 +123,12 @@
       "purpose": "any"
     },
     {
+      "src": "/images/icons/pwa-icon-1024x1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/images/icons/pwa-maskable-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
@@ -99,6 +137,12 @@
     {
       "src": "/images/icons/pwa-maskable-512x512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/icons/pwa-maskable-1024x1024.png",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "maskable"
     }
@@ -159,18 +203,36 @@
   ],
   "screenshots": [
     {
-      "src": "/images/screenshots/screenshot-desktop.png",
+      "src": "/images/screenshots/screenshot-desktop-1.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Aarogyam India Desktop Store"
+      "platform": "windows",
+      "label": "Aarogyam India Desktop Store & eBook Hub"
     },
     {
-      "src": "/images/screenshots/screenshot-mobile.png",
-      "sizes": "540x720",
+      "src": "/images/screenshots/screenshot-desktop-2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "platform": "windows",
+      "label": "Aarogyam India Live Webinar & Agriculture Library"
+    },
+    {
+      "src": "/images/screenshots/screenshot-mobile-1.png",
+      "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Aarogyam India Mobile View"
+      "platform": "android",
+      "label": "Aarogyam India Mobile View - Agriculture Hub"
+    },
+    {
+      "src": "/images/screenshots/screenshot-mobile-2.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "platform": "android",
+      "label": "Aarogyam India Mobile Store & 3D Kindle Library"
     }
   ],
   "share_target": {
