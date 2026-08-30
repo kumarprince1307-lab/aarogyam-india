@@ -642,13 +642,28 @@ export async function initWebinars() {
       };
       if (exIdx !== -1) localPages[exIdx] = payload;
       else localPages.unshift(payload);
+    // 1. LocalStorage Persistence
+    try {
+      let localPages = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
+      const exIdx = localPages.findIndex(p => p.id === 'WB_MASTER');
+      const payload = {
+        id: 'WB_MASTER',
+        title: masterWebinar.title,
+        message: masterWebinar.description,
+        category: 'webinar',
+        status: 'active',
+        webinar_data: masterWebinar
+      };
+      if (exIdx !== -1) localPages[exIdx] = payload;
+      else localPages.unshift(payload);
       localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(localPages));
     } catch (e) {}
 
-    // 2. Supabase Cloud Sync (Optional)
-    if (window.supabaseClient) {
+    // 2. Permanent Supabase Cloud Sync
+    const db = getSupabaseDb();
+    if (db) {
       try {
-        await window.supabaseClient.from('landing_pages').upsert([{
+        await db.from('landing_pages').upsert([{
           id: 'WB_MASTER',
           title: masterWebinar.title,
           message: masterWebinar.description,
@@ -656,7 +671,9 @@ export async function initWebinars() {
           status: 'active',
           webinar_data: masterWebinar
         }]);
-      } catch (err) {}
+      } catch (err) {
+        console.warn('Supabase webinar sync notice:', err);
+      }
     }
 
     if (btn) {
@@ -664,8 +681,7 @@ export async function initWebinars() {
       btn.textContent = '💾 वेबिनार सेटिंग्स सेव करें (Save & Sync)';
     }
 
-    exportWebinarMasterJson();
-    showToast('✅ वेबिनार सेटिंग्स सुरक्षित हो गईं व JSON डाउनलोड हो गया!', 'success');
+    showToast('✅ वेबिनार सेटिंग्स सुरक्षित हो गईं!', 'success');
   });
 
   function exportWebinarMasterJson() {
@@ -731,7 +747,7 @@ export async function initWebinars() {
     }).join('');
   }
 
-  window.deleteRecordingItem = function(rId) {
+  window.deleteRecordingItem = async function(rId) {
     if (!confirm('क्या आप वाकई इस वीडियो / रील को हटाना चाहते हैं?')) return;
     allRecordings = allRecordings.filter(x => x.id !== rId);
     
@@ -740,8 +756,15 @@ export async function initWebinars() {
       localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
     } catch (e) {}
 
+    // Delete from Supabase Cloud
+    const db = getSupabaseDb();
+    if (db) {
+      try {
+        await db.from('landing_pages').delete().eq('id', rId);
+      } catch (err) {}
+    }
+
     renderRecordingsTable();
-    exportWebinarRecordingsJson();
     showToast('🗑️ वीडियो हटा दिया गया!', 'info');
   };
 
@@ -759,7 +782,7 @@ export async function initWebinars() {
   });
 
   // Video Form Submit
-  document.getElementById('form-video-editor')?.addEventListener('submit', (e) => {
+  document.getElementById('form-video-editor')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const format = document.getElementById('modal_rec_format')?.value || 'short_reel';
     const platform = document.getElementById('modal_rec_platform')?.value || 'youtube';
@@ -802,16 +825,50 @@ export async function initWebinars() {
 
     allRecordings.unshift(recObj);
 
-    // Save LocalStorage
+    // 1. Save LocalStorage
     try {
       localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
     } catch (e) {}
 
+    // 2. Permanent Supabase Cloud Save
+    const db = getSupabaseDb();
+    if (db) {
+      try {
+        await db.from('landing_pages').upsert([{
+          id: recObj.id,
+          profile_id: 'ALL_USERS',
+          share_id: 'ALL_USERS',
+          title: recObj.title,
+          message: recObj.subject,
+          category: 'recorded_video',
+          content_type: platform === 'youtube' ? 'youtube' : (platform === 'instagram' ? 'instagram' : 'facebook'),
+          media_url: recObj.video_url,
+          thumbnail_url: recObj.thumbnail,
+          offer_price: 0,
+          status: 'active',
+          webinar_data: recObj
+        }]);
+      } catch (err) {}
+    }
+
     if (videoModal) videoModal.style.display = 'none';
     renderRecordingsTable();
-    exportWebinarRecordingsJson();
     showToast(`🎉 ${format === 'short_reel' ? 'रील' : 'मास्टरक्लास वीडियो'} सफलतापूर्वक सेव हो गया!`, 'success');
   });
+
+  function getSupabaseDb() {
+    if (window.supabaseClient) return window.supabaseClient;
+    if (window.dbClient) return window.dbClient;
+    if (window.supabase && typeof window.supabase.from === 'function') return window.supabase;
+    if (window.supabase && typeof window.supabase.createClient === 'function') {
+      window.supabaseClient = window.supabase.createClient(
+        'https://qjhjrzsnrtahmhswxyvb.supabase.co',
+        'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU'
+      );
+      return window.supabaseClient;
+    }
+    return null;
+  }
 
   function exportWebinarRecordingsJson() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ recordings: allRecordings }, null, 2));

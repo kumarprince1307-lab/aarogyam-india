@@ -1401,6 +1401,16 @@
             masterData = { ...masterData, ...match.webinar_data, title: match.title || masterData.title };
           }
         } catch (e) {}
+
+        // Step 3: Permanent Supabase Cloud Sync (Data NEVER lost even when browser cache is cleared)
+        if (db) {
+          try {
+            const { data } = await db.from('landing_pages').select('*').eq('id', webinarId === 'WB_MASTER' ? 'WB_MASTER' : webinarId).maybeSingle();
+            if (data && data.webinar_data) {
+              masterData = { ...masterData, ...data.webinar_data, title: data.title || masterData.title };
+            }
+          } catch (e) {}
+        }
       }
 
       async function loadRecordingsData() {
@@ -1426,6 +1436,30 @@
             });
           }
         } catch (e) {}
+
+        // Step 3: Permanent Supabase Cloud Sync (Merges new recordings from cloud)
+        if (db) {
+          try {
+            const { data } = await db.from('landing_pages').select('*').eq('category', 'recorded_video').eq('status', 'active');
+            if (Array.isArray(data) && data.length > 0) {
+              data.forEach(row => {
+                const rec = row.webinar_data || {
+                  id: row.id,
+                  title: row.title,
+                  subject: row.message,
+                  category: row.message || 'Shorts & Reels',
+                  video_url: row.media_url,
+                  thumbnail: row.thumbnail_url,
+                  platform: row.content_type || 'youtube',
+                  format: row.id?.startsWith('VID_S') ? 'short_reel' : 'full_video'
+                };
+                const exIdx = allRecordings.findIndex(x => x.id === rec.id);
+                if (exIdx !== -1) allRecordings[exIdx] = rec;
+                else allRecordings.unshift(rec);
+              });
+            }
+          } catch (e) {}
+        }
       }
 
       // -------------------------------------------------------------
