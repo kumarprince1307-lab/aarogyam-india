@@ -669,11 +669,12 @@ export async function fetchUsers(params = {}) {
     const shareIds = profiles.map(p => p.share_id || p.referral_code).filter(Boolean);
 
     // Step 2: Fetch all necessary aggregated data in parallel
-    const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes] = await Promise.all([
+    const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes, surveysRes] = await Promise.all([
         db.from('purchases').select('profile_id, amount').or('payment_status.eq.success,payment_status.is.null'),
         db.from('share_logs').select('share_token, event_type').in('share_token', shareIds),
         db.from('profiles').select('id, referred_by'), // Fetch all referral relationships
-        db.from('download_logs').select('profile_id').in('profile_id', profileIds)
+        db.from('download_logs').select('profile_id').in('profile_id', profileIds),
+        db.from('surveys').select('id, profile_id, name, mobile, state, district, occupation, category_answers, created_at')
     ]);
 
     if (purchasesRes.error) console.error('Error fetching purchases for user aggregation:', purchasesRes.error.message);
@@ -686,8 +687,37 @@ export async function fetchUsers(params = {}) {
     const allShareLogs = shareLogsRes.data || [];
     const allProfileRelations = allProfileRelationsRes.data || [];
     const allDownloads = downloadLogsRes.data || [];
+    const allSurveys = surveysRes.data || [];
 
     // Step 3: Create lookup maps from the fetched data
+    const webinarStatsMap = {};
+    allSurveys.forEach(surv => {
+      const cAns = surv.category_answers || {};
+      const refId = surv.profile_id || cAns.referrer_share_id || '';
+      const isWb = cAns.event_type === 'webinar_registration' || cAns.event_type === 'webinar_attendance' || surv.occupation === 'attendee' || surv.selected_categories === 'webinar_lead';
+      if (!isWb && !cAns.webinar_id) return;
+
+      if (!webinarStatsMap[refId]) {
+        webinarStatsMap[refId] = { leads: 0, joined: 0, attendees: [] };
+      }
+      
+      const isJoined = cAns.event_type === 'webinar_attendance' || Boolean(cAns.joined_at);
+      if (isJoined) webinarStatsMap[refId].joined++;
+      else webinarStatsMap[refId].leads++;
+
+      webinarStatsMap[refId].attendees.push({
+        id: surv.id,
+        name: surv.name || 'किसान साथी',
+        mobile: surv.mobile || 'N/A',
+        state: surv.state || '',
+        district: surv.district || '',
+        registeredAt: cAns.registered_at || surv.created_at,
+        joinedAt: cAns.joined_at || null,
+        isJoined: isJoined,
+        webinarTitle: cAns.webinar_title || 'लाइव वेबिनार'
+      });
+    });
+
     // Use all profile relations to build a complete map, not just filtered profiles
     const directReferralMap = allProfileRelations.reduce((acc, profile) => {
         if (profile.referred_by) {
@@ -737,6 +767,8 @@ export async function fetchUsers(params = {}) {
         const ownPurchases = purchaseSummary[user.id] || { totalPurchases: 0, totalSpent: 0 };
         const currentShareId = user.share_id || user.referral_code || 'N/A';
         const shareStats = shareStatsMap[currentShareId] || { shares: 0, clicks: 0, visitors: 0 };
+        const wbStats = webinarStatsMap[user.id] || webinarStatsMap[currentShareId] || webinarStatsMap[user.mobile] || { leads: 0, joined: 0, attendees: [] };
+
         return {
         id: user.id,
         name: user.full_name,
@@ -755,7 +787,10 @@ export async function fetchUsers(params = {}) {
         totalDownloads: downloadCounts[user.id] || 0,
         downloadLimit: (ownPurchases.totalPurchases || 0) * 3,
         appInstalled: user.app_installed === true || String(user.registration_source || '').toLowerCase().includes('pwa') || String(user.registration_source || '').toLowerCase().includes('app'),
-        appInstalledAt: user.app_installed_at ? new Date(user.app_installed_at).toLocaleDateString('en-GB') : null
+        appInstalledAt: user.app_installed_at ? new Date(user.app_installed_at).toLocaleDateString('en-GB') : null,
+        webinarLeads: (wbStats.leads || 0) + (wbStats.joined || 0),
+        webinarJoined: wbStats.joined || 0,
+        webinarAttendees: wbStats.attendees || []
         };
     });
 

@@ -7,8 +7,8 @@
 
 const ROUTES = {
   'dashboard': () => import('./admin-pages-dashboard.js').then(m => m.initDashboard()),
-  'users': () => import('./admin-pages-users.js').then(m => m.initUsers()),
-  'user-details': () => import('./admin-pages-user-details.js').then(m => m.initUserDetails()),
+  'users': () => import('./admin-pages-users.js?v=27.3').then(m => m.initUsers()),
+  'user-details': () => import('./admin-pages-user-details.js?v=27.3').then(m => m.initUserDetails()),
   'user-permissions': () => import('./admin-pages-user-permissions.js').then(m => m.initUserPermissions()),
   'all-phonebook': () => import('./admin-pages-phonebook.js').then(m => m.initAllPhonebook()),
   'all-surveys': () => import('./admin-pages-surveys.js').then(m => m.initAllSurveys()),
@@ -23,8 +23,10 @@ const ROUTES = {
   'reports': () => import('./admin-pages-reports.js').then(m => m.initReports()),
   'notifications': () => import('./admin-pages-notifications.js').then(m => m.initNotifications()),
   'broadcast': () => import('./admin-pages-broadcast.js').then(m => m.initAdminBroadcast()),
-  'all-webinars': () => import('./admin-pages-webinars.js').then(m => m.initWebinars()),
-  'webinars': () => import('./admin-pages-webinars.js').then(m => m.initWebinars()),
+  'all-webinars': () => import(`./admin-pages-webinars.js?v=28.8`).then(m => m.initWebinars()),
+  'webinars': () => import(`./admin-pages-webinars.js?v=28.8`).then(m => m.initWebinars()),
+  'webinar-reports': () => import('./admin-pages-webinar-reports.js?v=27.6').then(m => m.initWebinarReports()),
+  'webinar-leads': () => import('./admin-pages-webinar-reports.js?v=27.6').then(m => m.initWebinarReports()),
   'landing-page-control': () => import('./admin-pages-landing-pages.js').then(m => m.initAllLandingPages()),
   'admin-app': () => import('./admin-pages-admin-app.js').then(m => m.initAdminApp()),
   'settings': () => import('./admin-pages-settings.js').then(m => m.initSettings()).catch(() => {})

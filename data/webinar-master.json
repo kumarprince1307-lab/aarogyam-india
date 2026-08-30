@@ -3,7 +3,7 @@
     "id": "WB_MASTER",
     "slug": "live-zoom-webinar",
     "status": "active",
-    "is_live_active": false,
+    "is_live_active": true,
     "offair_title": "📺 अगला लाइव वेबिनार सत्र जल्द घोषित होगा (Stay Tuned)",
     "offair_message": "वर्तमान में कोई लाइव वेबिनार प्रसारित नहीं हो रहा है। आप नीचे दी गई हमारी पिछली विशेष रिकॉर्डेड ट्रेनिंग क्लासेज देख सकते हैं:",
     "title": "🌾 लाइव ज़ूम वेबिनार एवं फसल परामर्श सत्र",

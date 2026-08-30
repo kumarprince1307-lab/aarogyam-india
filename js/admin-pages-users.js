@@ -46,6 +46,19 @@ function renderUserRow(user) {
       </td>
       <td>${user.source || 'N/A'}</td>
       <td><a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-subtle-link"><strong>${user.shareId || 'N/A'}</strong></a></td>
+      <td>
+        <button 
+          type="button" 
+          class="admin-button small-button btn-user-wb-report" 
+          data-user-id="${user.id}" 
+          style="background:rgba(37,99,235,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.35); font-weight:800; font-size:0.75rem; padding:4px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;"
+          title="वेबिनार रिपोर्ट और रजिस्टर्ड किसान देखें"
+        >
+          <span>🎥</span>
+          <span>${user.webinarLeads || 0} Leads</span>
+          ${user.webinarJoined > 0 ? `<span style="background:#10b981; color:#fff; border-radius:10px; padding:1px 5px; font-size:0.68rem; font-weight:800;">${user.webinarJoined} Live</span>` : ''}
+        </button>
+      </td>
       <td>${user.directReferrals || 0}</td>
       <td>${user.totalShares || 0}</td>
       <td>${user.totalClicks || 0}</td>
@@ -112,6 +125,7 @@ function renderUsersTable(users) {
             <th>App Status</th>
             <th>Reg. Source</th>
             <th>Share ID</th>
+            <th style="background: rgba(37,99,235,0.15); color: #60a5fa; white-space: nowrap;">🎥 Webinar Report</th>
             <th>Direct Referrals</th>
             <th>Total Shares</th>
             <th>Total Clicks</th>
@@ -169,6 +183,19 @@ function renderUsersTable(users) {
                 </td>
                 <td>${u.source || 'N/A'}</td>
                 <td><a href="#user-details?id=${u.id}" data-route="user-details" data-id="${u.id}" class="admin-subtle-link"><strong>${u.shareId || 'N/A'}</strong></a></td>
+                <td>
+                  <button 
+                    type="button" 
+                    class="admin-button small-button btn-user-wb-report" 
+                    data-user-id="${u.id}" 
+                    style="background:rgba(37,99,235,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.35); font-weight:800; font-size:0.75rem; padding:4px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;"
+                    title="वेबिनार रिपोर्ट और रजिस्टर्ड किसान देखें"
+                  >
+                    <span>🎥</span>
+                    <span>${u.webinarLeads || 0} Leads</span>
+                    ${u.webinarJoined > 0 ? `<span style="background:#10b981; color:#fff; border-radius:10px; padding:1px 5px; font-size:0.68rem; font-weight:800;">${u.webinarJoined} Live</span>` : ''}
+                  </button>
+                </td>
                 <td>${u.directReferrals || 0}</td>
                 <td>${u.totalShares || 0}</td>
                 <td>${u.totalClicks || 0}</td>
@@ -373,8 +400,18 @@ export async function initUsers() {
   // Listen to global admin search
   document.addEventListener('admin:global-search', (e) => reload(e.detail?.query || ''));
 
-  // Handle clicks on data-route links and status toggles inside the table
+  // Handle clicks on data-route links, webinar report drawers, and status toggles inside the table
   container.addEventListener('click', async (e) => {
+    const wbReportBtn = e.target.closest('.btn-user-wb-report');
+    if (wbReportBtn) {
+      const uId = wbReportBtn.dataset.userId;
+      const targetUser = currentUsersData.find(u => u.id === uId);
+      if (targetUser) {
+        openUserWebinarReportDrawer(targetUser);
+      }
+      return;
+    }
+
     const link = e.target.closest('[data-route="user-details"]');
     if (link && link.dataset.id) {
         window.location.hash = `user-details?id=${link.dataset.id}`;
@@ -406,6 +443,192 @@ export async function initUsers() {
         toggleBtn.disabled = false;
     }
   });
+
+function openUserWebinarReportDrawer(user) {
+  let drawer = document.getElementById('adm-user-webinar-drawer');
+  if (!drawer) {
+    drawer = document.createElement('div');
+    drawer.id = 'adm-user-webinar-drawer';
+    drawer.style.cssText = `
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 600px;
+      background: #0f172a;
+      border-left: 2px solid #3b82f6;
+      box-shadow: -10px 0 35px rgba(0,0,0,0.85);
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    `;
+    document.body.appendChild(drawer);
+  }
+
+  const sanitizedMobile = String(user.mobile || '').replace(/\D/g, '');
+  const userShareId = user.shareId || 'AI000004';
+  const webinarShareUrl = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(userShareId)}`;
+  const attendees = user.webinarAttendees || [];
+  const leadsCount = user.webinarLeads || 0;
+  const joinedCount = user.webinarJoined || 0;
+  const conversionRate = leadsCount ? Math.round((joinedCount / leadsCount) * 100) : 0;
+
+  drawer.innerHTML = `
+    <!-- Header -->
+    <div style="padding: 16px 20px; background: #1e293b; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 1.05rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px;">
+          <span>🎥</span> <span>वेबिनार रिपोर्ट (Webinar Performance)</span>
+        </div>
+        <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 3px;">
+          👤 <strong>${user.name}</strong> • <code>${userShareId}</code> • 📞 ${user.mobile}
+        </div>
+      </div>
+      <button type="button" id="close-user-wb-drawer" style="background:transparent; border:none; color:#94a3b8; font-size:1.5rem; cursor:pointer; line-height:1;">✕</button>
+    </div>
+
+    <!-- Body Content -->
+    <div style="flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px;">
+      
+      <!-- Referral Link Box -->
+      <div style="background: rgba(37,99,235,0.08); border: 1.5px dashed #3b82f6; border-radius: 12px; padding: 12px 14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:0.75rem; font-weight:700; color:#93c5fd;">🌐 इस यूजर का व्यक्तिगत वेबिनार आमंत्रण लिंक:</span>
+          <span class="admin-pill" style="font-size:0.7rem; background:#10b981; color:#fff;">Active Link</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" readonly value="${webinarShareUrl}" id="user-wb-link-input" style="flex:1; background:#0b0f19; border:1px solid #1e293b; border-radius:6px; color:#60a5fa; padding:6px 10px; font-size:0.8rem; font-weight:700; outline:none;" />
+          <button type="button" id="btn-copy-user-wb-link" class="admin-button small-button" style="background:#2563eb; color:#fff; font-weight:700; font-size:0.75rem; white-space:nowrap;">
+            📋 कॉपी
+          </button>
+          <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(`🌾 *आरोग्यम इंडिया लाइव कृषि वेबिनार*\n\n👉 *मुफ्त रजिस्ट्रेशन व ज़ूम लिंक:*\n${webinarShareUrl}`)}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; font-weight:700; font-size:0.75rem; white-space:nowrap; text-decoration:none;">
+            💬 शेयर
+          </a>
+        </div>
+      </div>
+
+      <!-- 3 Metrics KPI Cards -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; text-align: center;">
+          <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">कुल रजिस्ट्रेशन</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #60a5fa; margin-top: 2px;">${leadsCount}</div>
+          <div style="font-size: 0.68rem; color: #64748b;">Registered Leads</div>
+        </div>
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; text-align: center;">
+          <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">ज़ूम अटेंडेंस</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #34d399; margin-top: 2px;">${joinedCount}</div>
+          <div style="font-size: 0.68rem; color: #64748b;">Live Attended</div>
+        </div>
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; text-align: center;">
+          <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">अटेंडेंस दर</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #fbbf24; margin-top: 2px;">${conversionRate}%</div>
+          <div style="font-size: 0.68rem; color: #64748b;">Turnout Ratio</div>
+        </div>
+      </div>
+
+      <!-- Attendees Table -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size: 0.9rem; font-weight: 800; color: #fff;">
+            👥 रजिस्टर्ड किसानों की सूची (${attendees.length})
+          </div>
+          ${attendees.length > 0 ? `
+            <button type="button" id="btn-export-user-wb-csv" class="admin-button small-button" style="font-size:0.72rem; padding:3px 8px;">
+              📥 CSV डाउनलोड
+            </button>
+          ` : ''}
+        </div>
+
+        ${attendees.length === 0 ? `
+          <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 24px; text-align: center; color: #94a3b8; font-size: 0.85rem;">
+            <span style="font-size: 1.8rem; display: block; margin-bottom: 6px;">🌾</span>
+            इस यूजर के रेफरल लिंक से अभी कोई वेबिनार रजिस्ट्रेशन नहीं हुआ है।<br>
+            <span style="font-size: 0.75rem; color: #64748b;">रेफरल लिंक शेयर करते ही आने वाले किसान यहाँ स्वतः दिखेंगे।</span>
+          </div>
+        ` : `
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            ${attendees.map((att, idx) => {
+              const attMob = String(att.mobile || '').replace(/\D/g, '');
+              const waMob = attMob.length === 10 ? '91' + attMob : attMob;
+              const waMsg = encodeURIComponent(`नमस्ते ${att.name} जी! मैं आरोग्यम इंडिया से बात कर रहा हूँ। आपने हमारे लाइव वेबिनार में भाग लिया था...`);
+              const regDate = att.registeredAt ? new Date(att.registeredAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-';
+
+              return `
+                <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                  <div>
+                    <div style="font-weight: 800; font-size: 0.88rem; color: #fff; display: flex; align-items: center; gap: 6px;">
+                      <span>#${idx + 1}</span>
+                      <span>${att.name}</span>
+                      ${att.isJoined 
+                        ? `<span style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid rgba(16,185,129,0.4); font-size:0.65rem; font-weight:800; padding:1px 6px; border-radius:10px;">🟢 Live Joined</span>` 
+                        : `<span style="background:rgba(148,163,184,0.15); color:#cbd5e1; font-size:0.65rem; font-weight:700; padding:1px 6px; border-radius:10px;">⏳ Registered</span>`
+                      }
+                    </div>
+                    <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">
+                      📍 ${att.district || att.state || 'स्थान उपलब्ध नहीं'} • 📅 ${regDate}
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <a href="tel:${attMob}" class="admin-button small-button" style="background:#0f172a; border:1px solid #475569; color:#94a3b8; font-size:0.75rem; padding:3px 8px; text-decoration:none;" title="Direct Call">
+                      📞 Call
+                    </a>
+                    <a href="https://wa.me/${waMob}?text=${waMsg}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; border-color:#22c55e; font-size:0.75rem; padding:3px 8px; text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="WhatsApp Follow-up">
+                      💬 WhatsApp
+                    </a>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `}
+      </div>
+
+    </div>
+  `;
+
+  // Animate Open
+  requestAnimationFrame(() => {
+    drawer.style.transform = 'translateX(0)';
+  });
+
+  // Attach Close & Copy handlers
+  document.getElementById('close-user-wb-drawer')?.addEventListener('click', () => {
+    drawer.style.transform = 'translateX(100%)';
+  });
+
+  document.getElementById('btn-copy-user-wb-link')?.addEventListener('click', function () {
+    const input = document.getElementById('user-wb-link-input');
+    if (input) {
+      navigator.clipboard.writeText(input.value);
+      const btn = this;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => { btn.textContent = '📋 कॉपी'; }, 2000);
+    }
+  });
+
+  document.getElementById('btn-export-user-wb-csv')?.addEventListener('click', () => {
+    const headers = ["#", "Name", "Mobile", "District", "State", "Registration Date", "Live Joined Status"];
+    const rows = attendees.map((att, i) => [
+      i + 1,
+      `"${(att.name || '').replace(/"/g, '""')}"`,
+      `"${att.mobile || ''}"`,
+      `"${att.district || ''}"`,
+      `"${att.state || ''}"`,
+      `"${att.registeredAt ? new Date(att.registeredAt).toISOString() : ''}"`,
+      att.isJoined ? "Joined Live" : "Registered Only"
+    ].join(','));
+    const csv = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+    const link = document.createElement("a");
+    link.href = encodeURI(csv);
+    link.download = `webinar_leads_${user.shareId || 'user'}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
 
   // Automatically sync statuses on page load to correct any discrepancies.
   container.innerHTML = '<div class="admin-loading">Syncing user statuses...</div>';

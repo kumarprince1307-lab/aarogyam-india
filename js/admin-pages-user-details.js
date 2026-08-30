@@ -192,6 +192,117 @@ function renderSharingSection(landingPages, detail) {
   `;
 }
 
+function renderUserWebinarSection(surveys, detail) {
+  const wbAttendees = (surveys || []).filter(s => {
+    const cAns = s.category_answers || {};
+    return cAns.event_type === 'webinar_registration' || cAns.event_type === 'webinar_attendance' || s.occupation === 'attendee' || s.selected_categories === 'webinar_lead' || Boolean(cAns.webinar_id);
+  });
+
+  const origin = window.location.origin || 'https://aarogyamindia.online';
+  const userWebinarLink = `${origin}/webinar.html?ref=${encodeURIComponent(detail.shareId || detail.referralToken || detail.mobile || 'AI000004')}`;
+  const joinedCount = wbAttendees.filter(a => (a.category_answers?.event_type === 'webinar_attendance' || Boolean(a.category_answers?.joined_at))).length;
+  const leadsCount = wbAttendees.length;
+  const turnoutRate = leadsCount ? Math.round((joinedCount / leadsCount) * 100) : 0;
+
+  return `
+    <div class="admin-section" style="border: 1.5px solid rgba(59,130,246,0.35); background: rgba(15,23,42,0.65);">
+      <div class="admin-section-header" style="flex-wrap:wrap; gap:10px;">
+        <div class="admin-section-title" style="display:flex; align-items:center; gap:8px;">
+          <span>🎥</span>
+          <span>User Webinar Performance & Leads (${leadsCount} Leads)</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <a href="${userWebinarLink}" target="_blank" class="admin-button small-button" style="background:#2563eb; color:#fff; font-weight:700; text-decoration:none;">
+            🔗 Open Webinar Page
+          </a>
+        </div>
+      </div>
+
+      <!-- Personal Webinar Referral Link Bar -->
+      <div style="background: rgba(37,99,235,0.08); border: 1.5px dashed #3b82f6; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          <span style="font-size:0.75rem; font-weight:700; color:#93c5fd; display:block;">🌐 इस यूजर का व्यक्तिगत वेबिनार आमंत्रण लिंक:</span>
+          <code style="font-size:0.85rem; font-weight:700; color:#60a5fa;">${userWebinarLink}</code>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button type="button" class="admin-button small-button" onclick="navigator.clipboard.writeText('${userWebinarLink}'); alert('लिंक कॉपी हो गया!');" style="background:#0f172a; border:1px solid #3b82f6; color:#93c5fd; font-weight:700;">
+            📋 कॉपी लिंक
+          </button>
+          <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(`🌾 *आरोग्यम इंडिया लाइव कृषि वेबिनार*\n\n👉 *मुफ्त रजिस्ट्रेशन व ज़ूम लिंक:*\n${userWebinarLink}`)}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; font-weight:700; text-decoration:none;">
+            💬 WhatsApp शेयर
+          </a>
+        </div>
+      </div>
+
+      <!-- 3 Metrics Grid -->
+      <div class="admin-data-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:14px;">
+        <div class="admin-data-card" style="border-left: 3px solid #3b82f6;">
+          <h4>कुल वेबिनार रजिस्ट्रेशन</h4>
+          <p><strong style="font-size:1.3rem; color:#60a5fa;">${leadsCount}</strong> <span style="font-size:0.8rem; color:#94a3b8;">Leads</span></p>
+        </div>
+        <div class="admin-data-card" style="border-left: 3px solid #10b981;">
+          <h4>ज़ूम में शामिल हुए (Live Joined)</h4>
+          <p><strong style="font-size:1.3rem; color:#34d399;">${joinedCount}</strong> <span style="font-size:0.8rem; color:#94a3b8;">Attendees</span></p>
+        </div>
+        <div class="admin-data-card" style="border-left: 3px solid #f59e0b;">
+          <h4>टर्नआउट कन्वर्जन दर</h4>
+          <p><strong style="font-size:1.3rem; color:#fbbf24;">${turnoutRate}%</strong></p>
+        </div>
+      </div>
+
+      <!-- Attendees Table -->
+      ${wbAttendees.length === 0 ? `
+        <div class="admin-empty-sm">इस यूजर के रेफरल लिंक से अभी कोई वेबिनार रजिस्ट्रेशन दर्ज नहीं हुआ है।</div>
+      ` : `
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>किसान का नाम</th>
+                <th>मोबाइल नंबर</th>
+                <th>स्थान / जिला</th>
+                <th>रजिस्ट्रेशन तारीख</th>
+                <th>अटेंडेंस स्थिति</th>
+                <th>फॉलो-अप</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${wbAttendees.map((att, i) => {
+                const sMob = String(att.mobile || '').replace(/\D/g, '');
+                const waMob = sMob.length === 10 ? '91' + sMob : sMob;
+                const waMsg = encodeURIComponent(`नमस्ते ${att.name} जी! मैं आरोग्यम इंडिया से बात कर रहा हूँ। आपने हमारे लाइव वेबिनार में भाग लिया था...`);
+                const isJoined = att.category_answers?.event_type === 'webinar_attendance' || Boolean(att.category_answers?.joined_at);
+                const regDate = att.category_answers?.registered_at || att.created_at;
+                return `
+                  <tr>
+                    <td><strong>#${i + 1}</strong></td>
+                    <td><strong>${att.name}</strong></td>
+                    <td><a href="tel:${sMob}" class="admin-subtle-link" style="font-weight:700;">📞 ${att.mobile}</a></td>
+                    <td>${att.district || att.village || att.state || '-'}</td>
+                    <td>${regDate ? new Date(regDate).toLocaleDateString('en-GB') : '-'}</td>
+                    <td>
+                      ${isJoined 
+                        ? `<span class="admin-pill active" style="font-weight:800; font-size:0.72rem;">🟢 Live Joined</span>` 
+                        : `<span class="admin-pill" style="font-weight:700; font-size:0.72rem; opacity:0.8;">⏳ Registered</span>`
+                      }
+                    </td>
+                    <td>
+                      <a href="https://wa.me/${waMob}?text=${waMsg}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; padding:2px 8px; font-weight:700; font-size:0.75rem; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                        <span>💬</span> <span>WhatsApp</span>
+                      </a>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
 function renderActivitySection(activityLogs) {
   return `
     <div class="admin-section">
@@ -406,10 +517,13 @@ function renderProfile(detail, ucasData) {
     <!-- 4. Sharing & Landing Pages Section -->
     ${renderSharingSection(landingPages, detail)}
 
-    <!-- 5. Real Activity Section -->
+    <!-- 5. User Webinar Performance & Leads Report Section -->
+    ${renderUserWebinarSection(surveys, detail)}
+
+    <!-- 6. Real Activity Section -->
     ${renderActivitySection(activityLogs)}
 
-    <!-- 6. Direct Referral Summary Section -->
+    <!-- 7. Direct Referral Summary Section -->
     ${renderReferralInformation(detail)}
 
     <!-- 7. Purchases Section -->

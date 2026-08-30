@@ -2407,7 +2407,11 @@ export async function initAllLandingPages() {
     if (editingPageId) {
       // Editing is single page update
       const selId = userSelect.value;
-      const selUser = allUsers.find(u => u.id === selId);
+      let selUser = allUsers.find(u => u.id === selId);
+      if (!selUser && (selId === 'ALL_USERS' || selId === '' || !selId)) {
+        // Fallback for broadcast/universal pages
+        selUser = { id: 'ALL_USERS', name: 'सभी यूजर्स (Broadcast / Master)', full_name: 'सभी यूजर्स', share_id: 'ALL_USERS', is_active: true };
+      }
       if (!selUser) {
         alert('कृपया यूजर अवश्य चुनें।');
         return;

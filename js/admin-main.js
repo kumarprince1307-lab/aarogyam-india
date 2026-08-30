@@ -16,7 +16,7 @@
 
 import './supabase.js'; // CRITICAL: Initialize Supabase client globally
 import { renderHeader } from './admin-components-header.js';
-import { renderSidebar } from './admin-components-sidebar.js';
+import { renderSidebar } from './admin-components-sidebar.js?v=27.5';
 import { initRouter } from './admin-router.js';
 import { initAdminPwa } from './admin-pwa.js';
 

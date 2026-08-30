@@ -4,6 +4,7 @@ const MENU = [
   { label: 'Dashboard', href: 'dashboard.html', icon: '🏠', route: 'dashboard' },
   { label: 'Users', icon: '👥', children: [ 
     { label: 'All Users', href: 'users.html', route: 'users' }, 
+    { label: '🎥 Webinar Reports (वेबिनार रिपोर्ट)', href: 'webinar-reports.html', route: 'webinar-reports' },
     { label: 'User Details', href: 'user-details.html', route: 'user-details' },
     { label: 'All User Permissions', href: 'user-permissions.html', route: 'user-permissions' },
     { label: 'All Phonebook', href: 'all-phonebook.html', route: 'all-phonebook' },
@@ -50,7 +51,7 @@ const MENU = [
     { label: 'Share Links', href: '#' }, 
     { label: 'Campaigns', href: '#' } 
   ] },
-  { label: 'Webinars', href: 'all-webinars.html', icon: '🎥', route: 'all-webinars' },
+  { label: 'Webinars (वेबिनार)', href: 'all-webinars.html', icon: '🎥', route: 'all-webinars' },
   { label: 'Notifications', icon: '🔔', children: [ 
     { label: 'All Notifications', href: 'notifications.html', route: 'notifications' }, 
     { label: '📢 Broadcast Center', href: 'broadcast.html', route: 'broadcast' } 
