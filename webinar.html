@@ -3227,25 +3227,6 @@
         }
       }
 
-      function computeUpcomingSession() {
-        const now = new Date();
-        const today830 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 30, 0, 0);
-        if (now.getTime() < today830.getTime() - (2 * 60 * 1000)) {
-          const todayIso = now.toISOString().split('T')[0];
-          return {
-            timestamp: today830.getTime(),
-            datetime: formatHindiDateTime(todayIso, '20:30')
-          };
-        }
-        const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-        const tomorrowIso = tomorrow.toISOString().split('T')[0];
-        const tomorrow830 = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 20, 30, 0, 0);
-        return {
-          timestamp: tomorrow830.getTime(),
-          datetime: formatHindiDateTime(tomorrowIso, '20:30')
-        };
-      }
-
       function getPersonalizedInviteText() {
         const userShare = currentUser?.share_id || refShareId;
         const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(userShare)}`;
@@ -3361,12 +3342,6 @@
           } else if (wb.datetime) {
             webinarData.datetime = wb.datetime;
           }
-        }
-
-        if (!webinarData.target_timestamp || webinarData.target_timestamp < (Date.now() - 90 * 60 * 1000)) {
-          const upcoming = computeUpcomingSession();
-          webinarData.datetime = upcoming.datetime;
-          webinarData.target_timestamp = upcoming.timestamp;
         }
 
         const deletedWebinarIds = new Set(JSON.parse(localStorage.getItem('AI_DELETED_WEBINAR_IDS') || '[]'));
@@ -4324,8 +4299,6 @@
 
         function updateClock() {
           const now = Date.now();
-          const target = webinarData.target_timestamp || now;
-          const diffMs = target - now;
 
           const hoursEl = document.getElementById('timer_hours');
           const minEl = document.getElementById('timer_minutes');
@@ -4341,6 +4314,29 @@
           const pwdEl = document.getElementById('wb_val_passcode');
           const copyMidBtn = document.getElementById('btn_copy_mid');
           const copyPwdBtn = document.getElementById('btn_copy_pwd');
+
+          if (!webinarData.target_timestamp) {
+            if (hoursEl) hoursEl.textContent = '--';
+            if (minEl) minEl.textContent = '--';
+            if (secEl) secEl.textContent = '--';
+            if (statusLabel) statusLabel.textContent = '📺 लाइव वेबिनार की तिथि व समय जल्द घोषित होगा';
+            if (timerBox) timerBox.classList.remove('is-live');
+            if (timerSubtext) timerSubtext.innerHTML = 'ℹ️ नया लाइव सत्र शेड्यूल होते ही यहाँ टाइमर व लिंक स्वतः सक्रिय हो जाएगी।';
+            if (joinBtn) {
+              joinBtn.className = 'wb-zoom-btn locked';
+              joinBtn.disabled = true;
+            }
+            if (joinBtnText) joinBtnText.textContent = 'वेबिनार जल्द घोषित होगा (Upcoming)';
+            if (joinIcon) joinIcon.className = 'fa-solid fa-calendar-plus';
+            if (midEl) midEl.textContent = 'घोषित नहीं';
+            if (pwdEl) pwdEl.textContent = 'घोषित नहीं';
+            if (copyMidBtn) copyMidBtn.style.display = 'none';
+            if (copyPwdBtn) copyPwdBtn.style.display = 'none';
+            return;
+          }
+
+          const target = webinarData.target_timestamp;
+          const diffMs = target - now;
 
           const twoMinBeforeMs = 2 * 60 * 1000;
           const durationMs = (webinarData.duration_minutes || 90) * 60 * 1000;

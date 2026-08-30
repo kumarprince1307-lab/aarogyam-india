@@ -1848,8 +1848,10 @@ export async function initWebinars() {
       }
     };
 
-    if (!allWebinars.some(w => w.id === 'WB_MASTER' || (masterJsonWebinar && w.id === masterJsonWebinar.id))) {
-      allWebinars.unshift(masterJsonWebinar || defaultMasterWebinar);
+    if (!deletedWebinarIds.has('WB_MASTER')) {
+      if (masterJsonWebinar && masterJsonWebinar.title && !allWebinars.some(w => w.id === 'WB_MASTER')) {
+        allWebinars.unshift(masterJsonWebinar);
+      }
     }
 
     // Filter all registrations
@@ -2948,6 +2950,26 @@ export async function initWebinars() {
         await db.from('landing_pages').delete().eq('id', webinarId);
         if (webinarId === 'WB_MASTER') {
           await db.from('landing_pages').delete().eq('category', 'webinar');
+          await db.from('landing_pages').upsert([{
+            id: 'WB_MASTER',
+            title: '',
+            message: '',
+            category: 'webinar',
+            status: 'inactive',
+            webinar_data: {
+              zoom_link: '',
+              meeting_id: '',
+              passcode: '',
+              date: '',
+              time: '',
+              datetime: '',
+              cover_image: '',
+              banners: [],
+              youtube_links: [],
+              kpis: [],
+              faqs: []
+            }
+          }]);
         }
       }
     } catch (e) {
