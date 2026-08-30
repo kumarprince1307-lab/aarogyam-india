@@ -3300,44 +3300,31 @@
 
         let record = null;
 
-        // Step 2: Live Supabase Layer (Ensures 100% Cross-Device & Cache-Clearing Sync)
-        if (db) {
+        // Step 2: LocalStorage fallback (for offline admin draft preview on current device)
+        try {
+          const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
+          const localWb = stored.find(p => p.id === webinarId || p.id === 'WB_MASTER' || p.category === 'webinar' || Boolean(p.webinar_data));
+          if (localWb) record = localWb;
+        } catch (e) {}
+
+        // Step 3: Zero-Egress Guard: Only query Supabase IF neither Git JSON nor LocalStorage has active data
+        const hasMasterData = Boolean(master && (master.title || master.default_meeting_id || master.meeting_id || master.default_date));
+        if (!hasMasterData && !record && db) {
           try {
-            // Priority 1: Specific ID if in query params
+            // Specific ID if in query params
             if (webinarId && webinarId !== 'WB_MASTER') {
-              const res1 = await db.from('landing_pages').select('*').eq('id', webinarId).maybeSingle();
+              const res1 = await db.from('landing_pages').select('id, title, message, category, media_url, thumbnail_url, offer_price, webinar_data').eq('id', webinarId).maybeSingle();
               if (res1.data) record = res1.data;
             }
 
-            // Priority 2: WB_MASTER record in Supabase
+            // WB_MASTER or latest active webinar in Supabase
             if (!record) {
-              const res2 = await db.from('landing_pages').select('*').eq('id', 'WB_MASTER').maybeSingle();
-              if (res2.data) record = res2.data;
-            }
-
-            // Priority 3: Latest active webinar record
-            if (!record) {
-              const res3 = await db.from('landing_pages').select('*').eq('category', 'webinar').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
-              if (res3.data && res3.data.length > 0) record = res3.data[0];
-            }
-
-            // Priority 4: Any active landing page containing webinar_data
-            if (!record) {
-              const res4 = await db.from('landing_pages').select('*').not('webinar_data', 'is', null).eq('status', 'active').order('created_at', { ascending: false }).limit(1);
-              if (res4.data && res4.data.length > 0) record = res4.data[0];
+              const res2 = await db.from('landing_pages').select('id, title, message, category, media_url, thumbnail_url, offer_price, webinar_data').eq('category', 'webinar').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
+              if (res2.data && res2.data.length > 0) record = res2.data[0];
             }
           } catch (err) {
-            console.warn('Supabase live webinar fetch notice:', err);
+            console.warn('Supabase webinar fetch notice:', err);
           }
-        }
-
-        // Step 3: LocalStorage fallback (for offline admin draft preview on current device)
-        if (!record) {
-          try {
-            const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
-            const localWb = stored.find(p => p.id === webinarId || p.id === 'WB_MASTER' || p.category === 'webinar' || Boolean(p.webinar_data));
-            if (localWb) record = localWb;
-          } catch (e) {}
         }
 
         if (record) {
@@ -3414,49 +3401,7 @@
           console.warn('Error loading webinar-recordings.json:', e);
         }
 
-        // 2. Fetch from Supabase Cloud Table (Ensures cross-device & cache-cleared permanent availability)
-        if (db) {
-          try {
-            const { data: supaRecs } = await db.from('landing_pages').select('*').eq('category', 'recorded_video').order('created_at', { ascending: false });
-            if (supaRecs && supaRecs.length > 0) {
-              supaRecs.forEach(sr => {
-                const wData = sr.webinar_data || {};
-                const ytId = wData.youtube_id || extractYoutubeVideoId(sr.media_url) || 'dQw4w9WgXcQ';
-                const fmt = wData.format || (sr.id.startsWith('VID_S') ? 'short_reel' : 'full_video');
-                const plat = wData.platform || (sr.media_url?.includes('instagram') ? 'instagram' : sr.media_url?.includes('facebook') ? 'facebook' : 'youtube');
-
-                const mapped = {
-                  id: sr.id,
-                  format: fmt,
-                  platform: plat,
-                  title: sr.title,
-                  subject: sr.message || wData.category_name || (fmt === 'short_reel' ? 'Shorts & Reels' : 'General'),
-                  category: wData.category_key || sr.message || (fmt === 'short_reel' ? 'Shorts & Reels' : 'General'),
-                  video_url: sr.media_url || `https://www.youtube.com/watch?v=${ytId}`,
-                  youtube_url: sr.media_url || `https://www.youtube.com/watch?v=${ytId}`,
-                  youtube_id: ytId,
-                  thumbnail: sr.thumbnail_url || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
-                  duration: wData.duration || (fmt === 'short_reel' ? '0:58' : '45 मिनट'),
-                  speaker: wData.speaker || 'आरोग्यम कृषि विशेषज्ञ',
-                  access_tier: wData.access_tier || 'guest',
-                  status: sr.status || 'active',
-                  created_at: sr.created_at || new Date().toISOString(),
-                  views_count: wData.views_count || 0
-                };
-                const existingIdx = allRecordings.findIndex(x => x.id === sr.id);
-                if (existingIdx !== -1) {
-                  allRecordings[existingIdx] = mapped;
-                } else {
-                  allRecordings.unshift(mapped);
-                }
-              });
-            }
-          } catch (e) {
-            console.warn('Supabase recordings fetch notice:', e);
-          }
-        }
-
-        // Also check localStorage for custom added recorded videos (offline drafts)
+        // 2. Overlay LocalStorage Drafts (Admin's Device, zero network overhead)
         try {
           const localVideos = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
           if (Array.isArray(localVideos) && localVideos.length > 0) {
@@ -3470,6 +3415,43 @@
             });
           }
         } catch (e) {}
+
+        // 3. Zero-Egress Guard: Only query Supabase IF static JSON and LocalStorage are both empty
+        if (allRecordings.length === 0 && db) {
+          try {
+            const { data: supaRecs } = await db.from('landing_pages').select('id, title, message, category, media_url, thumbnail_url, webinar_data').eq('category', 'recorded_video').order('created_at', { ascending: false }).limit(20);
+            if (supaRecs && supaRecs.length > 0) {
+              supaRecs.forEach(sr => {
+                const wData = sr.webinar_data || {};
+                const ytId = wData.youtube_id || extractYoutubeVideoId(sr.media_url) || '';
+                const fmt = wData.format || (sr.id.startsWith('VID_S') ? 'short_reel' : 'full_video');
+                const plat = wData.platform || (sr.media_url?.includes('instagram') ? 'instagram' : sr.media_url?.includes('facebook') ? 'facebook' : 'youtube');
+
+                const mapped = {
+                  id: sr.id,
+                  format: fmt,
+                  platform: plat,
+                  title: sr.title,
+                  subject: sr.message || wData.category_name || (fmt === 'short_reel' ? 'Shorts & Reels' : 'General'),
+                  category: wData.category_key || sr.message || (fmt === 'short_reel' ? 'Shorts & Reels' : 'General'),
+                  video_url: sr.media_url || (ytId ? `https://www.youtube.com/watch?v=${ytId}` : ''),
+                  youtube_url: sr.media_url || (ytId ? `https://www.youtube.com/watch?v=${ytId}` : ''),
+                  youtube_id: ytId,
+                  thumbnail: sr.thumbnail_url || (plat === 'instagram' ? '/images/banners/agriculture-hero-banner-2.webp' : '/images/banners/agriculture-hero-banner-1.webp'),
+                  duration: wData.duration || (fmt === 'short_reel' ? '0:58' : '45 मिनट'),
+                  speaker: wData.speaker || 'आरोग्यम कृषि विशेषज्ञ',
+                  access_tier: wData.access_tier || 'guest',
+                  status: sr.status || 'active',
+                  created_at: sr.created_at || new Date().toISOString(),
+                  views_count: wData.views_count || 0
+                };
+                allRecordings.push(mapped);
+              });
+            }
+          } catch (e) {
+            console.warn('Supabase recordings fetch notice:', e);
+          }
+        }
 
         const gallerySec = document.getElementById('wb_recorded_gallery_section');
         if (gallerySec) gallerySec.style.display = 'block';
