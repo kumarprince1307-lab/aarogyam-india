@@ -3313,13 +3313,34 @@
 
         let record = null;
 
-        // Step 2: Check Supabase only if query param specifies a specific custom webinar ID
-        if (db && webinarId && webinarId !== 'WB_MASTER') {
+        // Step 2: Live Supabase Layer (Ensures 100% Cross-Device & Cache-Clearing Sync)
+        if (db) {
           try {
-            const res1 = await db.from('landing_pages').select('*').eq('id', webinarId).maybeSingle();
-            if (res1.data) record = res1.data;
+            // Priority 1: Specific ID if in query params
+            if (webinarId && webinarId !== 'WB_MASTER') {
+              const res1 = await db.from('landing_pages').select('*').eq('id', webinarId).maybeSingle();
+              if (res1.data) record = res1.data;
+            }
+
+            // Priority 2: WB_MASTER record in Supabase
+            if (!record) {
+              const res2 = await db.from('landing_pages').select('*').eq('id', 'WB_MASTER').maybeSingle();
+              if (res2.data) record = res2.data;
+            }
+
+            // Priority 3: Latest active webinar record
+            if (!record) {
+              const res3 = await db.from('landing_pages').select('*').eq('category', 'webinar').eq('status', 'active').order('created_at', { ascending: false }).limit(1);
+              if (res3.data && res3.data.length > 0) record = res3.data[0];
+            }
+
+            // Priority 4: Any active landing page containing webinar_data
+            if (!record) {
+              const res4 = await db.from('landing_pages').select('*').not('webinar_data', 'is', null).eq('status', 'active').order('created_at', { ascending: false }).limit(1);
+              if (res4.data && res4.data.length > 0) record = res4.data[0];
+            }
           } catch (err) {
-            console.warn('Supabase custom webinar fetch notice:', err);
+            console.warn('Supabase live webinar fetch notice:', err);
           }
         }
 
@@ -3327,24 +3348,8 @@
         if (!record) {
           try {
             const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
-            const localWb = stored.find(p => p.id === webinarId || p.id === 'WB_MASTER');
-            if (localWb && localWb.webinar_data) {
-              // Apply local draft overrides if recently edited
-              const wb = localWb.webinar_data || {};
-              if (wb.meeting_id) webinarData.meeting_id = wb.meeting_id;
-              if (wb.passcode) webinarData.passcode = wb.passcode;
-              if (wb.zoom_link) webinarData.zoom_link = wb.zoom_link;
-              if (wb.cover_image) webinarData.cover_image = wb.cover_image;
-              if (wb.title) webinarData.title = localWb.title || wb.title;
-              if (wb.desc || localWb.message) webinarData.desc = localWb.message || wb.desc;
-              if (wb.kpis && wb.kpis.length) webinarData.kpis = wb.kpis;
-              if (wb.faqs && wb.faqs.length) webinarData.faqs = wb.faqs;
-              if (wb.youtube_links && wb.youtube_links.length) webinarData.youtube_links = wb.youtube_links;
-              if (wb.date) {
-                webinarData.datetime = formatHindiDateTime(wb.date, wb.time);
-                webinarData.target_timestamp = computeTargetTimestamp(wb.date, wb.time);
-              }
-            }
+            const localWb = stored.find(p => p.id === webinarId || p.id === 'WB_MASTER' || p.category === 'webinar' || Boolean(p.webinar_data));
+            if (localWb) record = localWb;
           } catch (e) {}
         }
 
@@ -3539,6 +3544,7 @@
        */
       async function loadRecordedTrainings() {
         allRecordings = [...DEFAULT_RECORDINGS];
+        // 1. Static Git JSON Base
         try {
           let resp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
           if (!resp.ok) resp = await fetch('data/webinar-recordings.json?v=' + Date.now());
@@ -3552,6 +3558,48 @@
           }
         } catch (e) {
           console.warn('Error loading webinar-recordings.json:', e);
+        }
+
+        // 2. Fetch from Supabase Cloud Table (Ensures cross-device & cache-cleared permanent availability)
+        if (db) {
+          try {
+            const { data: supaRecs } = await db.from('landing_pages').select('*').eq('category', 'recorded_video').order('created_at', { ascending: false });
+            if (supaRecs && supaRecs.length > 0) {
+              supaRecs.forEach(sr => {
+                const wData = sr.webinar_data || {};
+                const ytId = wData.youtube_id || extractYoutubeVideoId(sr.media_url) || 'dQw4w9WgXcQ';
+                const fmt = wData.format || (sr.id.startsWith('VID_S') ? 'short_reel' : 'full_video');
+                const plat = wData.platform || (sr.media_url?.includes('instagram') ? 'instagram' : sr.media_url?.includes('facebook') ? 'facebook' : 'youtube');
+
+                const mapped = {
+                  id: sr.id,
+                  format: fmt,
+                  platform: plat,
+                  title: sr.title,
+                  subject: sr.message || wData.category_name || (fmt === 'short_reel' ? 'Shorts & Reels' : 'General'),
+                  category: wData.category_key || sr.message || (fmt === 'short_reel' ? 'Shorts & Reels' : 'General'),
+                  video_url: sr.media_url || `https://www.youtube.com/watch?v=${ytId}`,
+                  youtube_url: sr.media_url || `https://www.youtube.com/watch?v=${ytId}`,
+                  youtube_id: ytId,
+                  thumbnail: sr.thumbnail_url || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
+                  duration: wData.duration || (fmt === 'short_reel' ? '0:58' : '45 मिनट'),
+                  speaker: wData.speaker || 'आरोग्यम कृषि विशेषज्ञ',
+                  access_tier: wData.access_tier || 'guest',
+                  status: sr.status || 'active',
+                  created_at: sr.created_at || new Date().toISOString(),
+                  views_count: wData.views_count || 0
+                };
+                const existingIdx = allRecordings.findIndex(x => x.id === sr.id);
+                if (existingIdx !== -1) {
+                  allRecordings[existingIdx] = mapped;
+                } else {
+                  allRecordings.unshift(mapped);
+                }
+              });
+            }
+          } catch (e) {
+            console.warn('Supabase recordings fetch notice:', e);
+          }
         }
 
         // Also check localStorage for custom added recorded videos (offline drafts)

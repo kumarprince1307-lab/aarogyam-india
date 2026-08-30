@@ -1207,15 +1207,14 @@ export async function initWebinars() {
             status: 'active',
             ...updatedData
           }]);
-          if (editingWebinarId === 'WB_MASTER' || currentTargetPolicy === 'master' || currentTargetPolicy === 'broadcast') {
-            await db.from('landing_pages').upsert([{ 
-              id: 'WB_MASTER', 
-              status: 'active', 
-              profile_id: 'ALL_USERS',
-              share_id: 'ALL_USERS',
-              ...updatedData 
-            }]);
-          }
+          // Always update WB_MASTER so any device opening /webinar.html gets this webinar live!
+          await db.from('landing_pages').upsert([{ 
+            id: 'WB_MASTER', 
+            status: 'active', 
+            profile_id: 'ALL_USERS',
+            share_id: 'ALL_USERS',
+            ...updatedData 
+          }]);
         }
       } catch (err) {
         console.warn('Webinar update notice:', err);
@@ -1313,9 +1312,13 @@ export async function initWebinars() {
       try {
         if (db) {
           await db.from('landing_pages').upsert([newRecord]);
-          if (currentTargetPolicy === 'master' || currentTargetPolicy === 'broadcast') {
-            await db.from('landing_pages').upsert([{ ...newRecord, id: 'WB_MASTER', profile_id: 'ALL_USERS', share_id: 'ALL_USERS' }]);
-          }
+          // Always update WB_MASTER so any device opening /webinar.html gets this webinar live!
+          await db.from('landing_pages').upsert([{ 
+            ...newRecord, 
+            id: 'WB_MASTER', 
+            profile_id: 'ALL_USERS', 
+            share_id: 'ALL_USERS' 
+          }]);
         }
       } catch (err) {
         console.warn('Webinar insert notice:', err);
