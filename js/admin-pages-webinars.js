@@ -472,7 +472,7 @@ export async function initWebinars() {
         const wm = json.webinarMaster || json || {};
         if (wm.title) masterWebinar = { ...masterWebinar, ...wm };
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Overlay Direct LocalStorage (Instant Live Binding)
     try {
@@ -481,7 +481,7 @@ export async function initWebinars() {
         const parsed = JSON.parse(directStored);
         if (parsed && parsed.title) masterWebinar = { ...masterWebinar, ...parsed };
       }
-    } catch (e) {}
+    } catch (e) { }
 
     try {
       const localStored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
@@ -489,7 +489,7 @@ export async function initWebinars() {
       if (match && match.webinar_data) {
         masterWebinar = { ...masterWebinar, ...match.webinar_data, title: match.title || masterWebinar.title };
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 2. Recordings JSON
     try {
@@ -499,7 +499,7 @@ export async function initWebinars() {
         const list = Array.isArray(rJson.recordings) ? rJson.recordings : (Array.isArray(rJson) ? rJson : []);
         if (list.length > 0) allRecordings = list;
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Overlay LocalStorage recordings
     try {
@@ -511,7 +511,7 @@ export async function initWebinars() {
           else allRecordings.unshift(dr);
         });
       }
-    } catch (e) {}
+    } catch (e) { }
 
     try {
       const localRecs = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
@@ -522,7 +522,7 @@ export async function initWebinars() {
           else allRecordings.unshift(lr);
         });
       }
-    } catch (e) {}
+    } catch (e) { }
 
     populateMasterWebinarForm();
     renderSectionsList();
@@ -686,7 +686,7 @@ export async function initWebinars() {
     }).join('');
   }
 
-  window.moveWbSection = function(idx, delta) {
+  window.moveWbSection = function (idx, delta) {
     const order = masterWebinar.section_order || defaultSections.map(s => s.key);
     const targetIdx = idx + delta;
     if (targetIdx < 0 || targetIdx >= order.length) return;
@@ -878,7 +878,7 @@ export async function initWebinars() {
       if (exIdx !== -1) localPages[exIdx] = payload;
       else localPages.unshift(payload);
       localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(localPages));
-    } catch (e) {}
+    } catch (e) { }
 
     // 2. Permanent Supabase Cloud Sync
     const db = getSupabaseDb();
@@ -977,7 +977,7 @@ export async function initWebinars() {
     }).join('');
   }
 
-  window.editRecordingItem = function(rId) {
+  window.editRecordingItem = function (rId) {
     const item = allRecordings.find(x => x.id === rId);
     if (!item) return;
     editingRecordingId = rId;
@@ -995,7 +995,7 @@ export async function initWebinars() {
     const catSelect = document.getElementById('modal_rec_category');
     const customCatInput = document.getElementById('modal_rec_custom_category');
     const existingOptions = Array.from(catSelect.options).map(o => o.value);
-    
+
     if (existingOptions.includes(item.category)) {
       catSelect.value = item.category;
       if (customCatInput) customCatInput.style.display = 'none';
@@ -1025,7 +1025,7 @@ export async function initWebinars() {
 
     const previewImg = document.getElementById('modal_rec_preview_img');
     if (previewImg) previewImg.src = item.thumbnail || '/images/banners/aarogyamtube-default-thumb.svg';
-    
+
     const previewTitle = document.getElementById('modal_rec_preview_title');
     if (previewTitle) previewTitle.textContent = item.title || '';
 
@@ -1035,21 +1035,21 @@ export async function initWebinars() {
     if (videoModal) videoModal.style.display = 'flex';
   };
 
-  window.deleteRecordingItem = async function(rId) {
+  window.deleteRecordingItem = async function (rId) {
     if (!confirm('क्या आप वाकई इस वीडियो / रील को हटाना चाहते हैं?')) return;
     allRecordings = allRecordings.filter(x => x.id !== rId);
-    
+
     // Update LocalStorage
     try {
       localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
-    } catch (e) {}
+    } catch (e) { }
 
     // Delete from Supabase Cloud
     const db = getSupabaseDb();
     if (db) {
       try {
         await db.from('landing_pages').delete().eq('id', rId);
-      } catch (err) {}
+      } catch (err) { }
     }
 
     renderRecordingsTable();
@@ -1140,7 +1140,7 @@ export async function initWebinars() {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = function(evt) {
+      reader.onload = function (evt) {
         if (recPreviewImg) recPreviewImg.src = evt.target.result;
       };
       reader.readAsDataURL(file);
@@ -1170,7 +1170,7 @@ export async function initWebinars() {
     const url = (document.getElementById('modal_rec_url')?.value || '').trim();
     const title = (document.getElementById('modal_rec_title')?.value || '').trim();
     const desc = (document.getElementById('modal_rec_desc')?.value || '').trim();
-    
+
     let category = document.getElementById('modal_rec_category')?.value || 'Shorts & Reels';
     if (category === 'custom') {
       const customCat = (document.getElementById('modal_rec_custom_category')?.value || '').trim();
@@ -1224,29 +1224,21 @@ export async function initWebinars() {
     // 1. Save LocalStorage
     try {
       localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
-    } catch (e) {}
+    } catch (e) { }
 
-    // 2. Permanent Supabase Cloud Save
-    const db = getSupabaseDb();
-    if (db) {
-      try {
-        await db.from('landing_pages').upsert([{
-          id: recObj.id,
-          profile_id: 'ALL_USERS',
-          share_id: 'ALL_USERS',
-          title: recObj.title,
-          message: recObj.subject,
-          category: 'recorded_video',
-          content_type: platform === 'youtube' ? 'youtube' : (platform === 'instagram' ? 'instagram' : 'facebook'),
-          media_url: recObj.video_url,
-          thumbnail_url: recObj.thumbnail,
-          offer_price: 0,
-          status: 'active',
-          webinar_data: recObj
-        }]);
-      } catch (err) {}
-    }
-
+    // Direct server save (replaces Supabase & manual export)
+    fetch('/save-recordings.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recordings: allRecordings })
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.status !== 'ok') {
+        console.error('Server save failed', res);
+      }
+    })
+    .catch(err => console.error('Error saving recordings', err));
     if (videoModal) videoModal.style.display = 'none';
     renderRecordingsTable();
     showToast(`🎉 ${format === 'short_reel' ? 'रील' : 'मास्टरक्लास वीडियो'} सफलतापूर्वक सेव हो गया!`, 'success');
