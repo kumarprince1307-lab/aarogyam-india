@@ -4,19 +4,27 @@
     "slug": "live-zoom-webinar",
     "status": "active",
     "is_live_active": true,
-    "title": "प्राकृतिक एवं जैविक खेती से 3x मुनाफा लाइव वेबिनार 2026",
+    "title": "💼 NetSurf Career Plan + Digital Marketing Training अगर आप सीखना चाहते हैं:",
     "description": "इस विशेष लाइव ज़ूम वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें और ज़ूम लिंक प्राप्त करें।",
-    "date": "",
-    "time": "",
+    "date": "2026-08-30",
+    "time": "20:00",
     "duration_minutes": 90,
     "price": 0,
-    "zoom_link": "",
-    "meeting_id": "",
-    "passcode": "",
+    "zoom_link": "https://zoom.us/j/84313338881?pwd=NDM5MDI0",
+    "meeting_id": "843 1333 8881",
+    "passcode": "439024",
     "cover_image": "/images/banners/agriculture-hero-banner-1.webp",
+    "posters_title": "🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स",
+    "posters_subtitle": "नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स",
     "banners": [
-      "/images/banners/agriculture-hero-banner-1.webp",
-      "/images/banners/agriculture-hero-banner-2.webp"
+      {
+        "title": "खरीफ फसल मास्टर गाइड 2026",
+        "url": "/images/banners/agriculture-hero-banner-1.webp"
+      },
+      {
+        "title": "AI के साथ Professional Website बनाना सीखें",
+        "url": "/images/banners/agriculture-hero-banner-2.webp"
+      }
     ],
     "youtube_videos": [],
     "kpis": [
@@ -47,13 +55,14 @@
       "sec_hero_zoom",
       "sec_timer",
       "sec_kpis",
+      "sec_banners",
       "sec_aarogyamtube_shorts",
       "sec_aarogyamtube_videos",
       "sec_tutorial",
       "sec_faqs"
     ],
     "hidden_sections": [],
-    "og_title": "🔴 Aarogyam India — लाइव ज़ूम वेबिनार एवं AarogyamTube रील्स",
+    "og_title": "🔴 NetSurf Career Plan + Digital Marketing Live Zoom Training",
     "og_description": "लाइव ज़ूम ट्रेनिंग में भाग लें और 1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स देखें।",
     "og_image": "/images/banners/universal-zoom-webinar-og.jpg"
   }

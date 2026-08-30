@@ -232,6 +232,33 @@ export async function initWebinars() {
             </div>
           </div>
 
+          <!-- Multi-Banners / Posters Section Manager -->
+          <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="font-weight: 800; font-size: 0.95rem; color: #38bdf8;">
+                <i class="fa-solid fa-images"></i> 🖼️ मल्टी-बैनर एवं पोस्टर्स प्रबंधक (Banners & Posters)
+              </span>
+              <button type="button" id="btn-add-banner-item" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800;">
+                + नया पोस्टर / बैनर जोड़ें
+              </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+              <div>
+                <label class="admin-label">सेक्शन मुख्य शीर्षक:</label>
+                <input type="text" id="adm_posters_title" class="admin-input" placeholder="उदा. 🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स" style="width: 100%; font-weight:700;" />
+              </div>
+              <div>
+                <label class="admin-label">सेक्शन उप-शीर्षक (Subtitle):</label>
+                <input type="text" id="adm_posters_subtitle" class="admin-input" placeholder="उदा. नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स" style="width: 100%;" />
+              </div>
+            </div>
+
+            <div id="adm_banners_container" style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Dynamic Banner Rows Rendered by JS -->
+            </div>
+          </div>
+
           <!-- Drag & Drop Section Placement Manager -->
           <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 14px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -453,6 +480,7 @@ export async function initWebinars() {
 
     populateMasterWebinarForm();
     renderSectionsList();
+    renderBannersList();
     renderKpisList();
     renderFaqsList();
     renderRecordingsTable();
@@ -468,6 +496,12 @@ export async function initWebinars() {
     document.getElementById('adm_wb_meeting_id').value = masterWebinar.meeting_id || '';
     document.getElementById('adm_wb_passcode').value = masterWebinar.passcode || '';
     document.getElementById('adm_wb_zoom_link').value = masterWebinar.zoom_link || '';
+
+    // Posters / Multi-Banners Section Metadata
+    const pTitle = document.getElementById('adm_posters_title');
+    const pSub = document.getElementById('adm_posters_subtitle');
+    if (pTitle) pTitle.value = masterWebinar.posters_title || '🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स';
+    if (pSub) pSub.value = masterWebinar.posters_subtitle || 'नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स';
 
     // Cover Image
     const coverUrl = masterWebinar.cover_image || '/images/banners/agriculture-hero-banner-1.webp';
@@ -625,6 +659,62 @@ export async function initWebinars() {
   });
 
   // -------------------------------------------------------------
+  // MULTI-BANNERS / POSTERS MANAGER
+  // -------------------------------------------------------------
+  function renderBannersList() {
+    const cont = document.getElementById('adm_banners_container');
+    if (!cont) return;
+
+    const list = Array.isArray(masterWebinar.banners) ? masterWebinar.banners : [];
+
+    if (list.length === 0) {
+      cont.innerHTML = `
+        <div style="text-align:center; padding:12px; color:var(--admin-muted); font-size:0.8rem; background:#0f172a; border-radius:6px;">
+          कोई पोस्टर नहीं है। ऊपर दिए '+ नया पोस्टर / बैनर जोड़ें' बटन से जोड़ें।
+        </div>
+      `;
+      return;
+    }
+
+    cont.innerHTML = list.map((b, idx) => {
+      const bUrl = typeof b === 'object' ? (b.url || b.image || '') : b;
+      const bTitle = typeof b === 'object' ? (b.title || '') : '';
+
+      return `
+        <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:10px; display:grid; grid-template-columns:80px 1fr auto; gap:10px; align-items:center;">
+          <div style="width:80px; height:50px; background:#1e293b; border-radius:6px; overflow:hidden; border:1px solid rgba(255,255,255,0.1);">
+            <img src="${bUrl}" alt="Banner" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-hero-banner-1.webp'" />
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <input type="text" class="admin-input adm-banner-title" placeholder="पोस्टर शीर्षक (उदा. खरीफ फसल मास्टर गाइड 2026)" value="${bTitle}" style="font-size:0.82rem; font-weight:700; width:100%;" />
+            <input type="text" class="admin-input adm-banner-url" placeholder="इमेज URL या पाथ (/images/banners/...)" value="${bUrl}" style="font-size:0.75rem; width:100%;" />
+          </div>
+          <div>
+            <button type="button" onclick="window.removeBannerItem(${idx})" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;">
+              &times;
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.removeBannerItem = (idx) => {
+    if (!masterWebinar.banners) return;
+    masterWebinar.banners.splice(idx, 1);
+    renderBannersList();
+  };
+
+  document.getElementById('btn-add-banner-item')?.addEventListener('click', () => {
+    if (!masterWebinar.banners) masterWebinar.banners = [];
+    masterWebinar.banners.push({
+      title: 'नया कृषि पोस्टर',
+      url: '/images/banners/agriculture-hero-banner-1.webp'
+    });
+    renderBannersList();
+  });
+
+  // -------------------------------------------------------------
   // KPIS & FAQS MANAGERS
   // -------------------------------------------------------------
   function renderKpisList() {
@@ -699,6 +789,21 @@ export async function initWebinars() {
     masterWebinar.og_title = (document.getElementById('adm_og_title')?.value || '').trim() || masterWebinar.title;
     masterWebinar.og_description = (document.getElementById('adm_og_desc')?.value || '').trim() || masterWebinar.description;
 
+    // Read Posters metadata
+    masterWebinar.posters_title = (document.getElementById('adm_posters_title')?.value || '').trim() || '🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स';
+    masterWebinar.posters_subtitle = (document.getElementById('adm_posters_subtitle')?.value || '').trim() || 'नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स';
+
+    // Read Posters / Banners list
+    const banners = [];
+    document.querySelectorAll('#adm_banners_container > div').forEach(row => {
+      const bTitle = (row.querySelector('.adm-banner-title')?.value || '').trim();
+      const bUrl = (row.querySelector('.adm-banner-url')?.value || '').trim();
+      if (bUrl) {
+        banners.push({ title: bTitle, url: bUrl });
+      }
+    });
+    if (banners.length > 0) masterWebinar.banners = banners;
+
     // Read KPIs
     masterWebinar.kpis = Array.from(document.querySelectorAll('.adm-kpi-input')).map(el => el.value.trim()).filter(Boolean);
 
@@ -751,7 +856,7 @@ export async function initWebinars() {
       btn.textContent = '💾 वेबिनार सेटिंग्स सेव करें (Save & Sync)';
     }
 
-    showToast('✅ वेबिनार सेटिंग्स सुरक्षित हो गईं!', 'success');
+    showToast('✅ वेबिनार व पोस्टर्स सेटिंग्स सुरक्षित हो गईं!', 'success');
   });
 
   function exportWebinarMasterJson() {

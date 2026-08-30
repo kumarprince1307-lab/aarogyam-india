@@ -1104,6 +1104,26 @@
             <span>Join Zoom Meeting</span>
           </a>
 
+          <!-- Social Share Suite -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+            <button type="button" id="wb_btn_share_wa" class="wb-btn-primary" style="background:#25D366; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.shareWbWhatsApp()">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>व्हाट्सएप शेयर</span>
+            </button>
+            <button type="button" id="wb_btn_share_fb" class="wb-btn-primary" style="background:#1877F2; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.shareWbFacebook()">
+              <i class="fa-brands fa-facebook"></i>
+              <span>फेसबुक शेयर</span>
+            </button>
+            <button type="button" id="wb_btn_copy_link" class="wb-btn-primary" style="background:#334155; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.copyWbShareLink()">
+              <i class="fa-solid fa-link"></i>
+              <span>लिंक कॉपी करें</span>
+            </button>
+            <button type="button" id="wb_btn_native_share" class="wb-btn-primary" style="background:#6366F1; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.shareWbNative()">
+              <i class="fa-solid fa-share-nodes"></i>
+              <span>अन्य ऐप्स पर शेयर</span>
+            </button>
+          </div>
+
         </div>
 
       </div>
@@ -1113,14 +1133,14 @@
     <section id="sec_banners" class="wb-tube-section" style="display:none;">
       <div class="wb-tube-header">
         <div class="wb-tube-brand">
-          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #10B981, #059669);"><i class="fa-solid fa-images"></i></div>
+          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #2D8CFF, #0E71EB);"><i class="fa-solid fa-images"></i></div>
           <div>
-            <div class="wb-tube-title">🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स</div>
-            <div class="wb-tube-subtitle">नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स</div>
+            <div id="wb_posters_title" class="wb-tube-title" style="color:#FFFFFF; font-size:1.35rem; font-weight:900;">🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स</div>
+            <div id="wb_posters_subtitle" class="wb-tube-subtitle" style="color:#94A3B8; font-weight:600;">नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स</div>
           </div>
         </div>
       </div>
-      <div id="wb_banners_slider" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+      <div id="wb_banners_slider" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
         <!-- Dynamic Banners Rendered by JS -->
       </div>
     </section>
@@ -1389,6 +1409,9 @@
       // -------------------------------------------------------------
       // 1. DATA INITIALIZATION (ZERO-EGRESS ARCHITECTURE)
       // -------------------------------------------------------------
+      // Instant Synchronous Check on Script Startup (0 Milliseconds)
+      checkUserSessionStatus();
+
       async function initWebinarHub() {
         await loadMasterWebinarData();
         await loadRecordingsData();
@@ -1513,21 +1536,34 @@
         
         if (masterData.cover_image) {
           const coverEl = document.getElementById('wb_cover_img');
-          coverEl.src = masterData.cover_image;
+          if (coverEl) coverEl.src = masterData.cover_image;
         }
 
-        // Render Multi-Banners Slider
+        // Render Multi-Banners & Posters Section
         const bannersSection = document.getElementById('sec_banners');
         const bannersSlider = document.getElementById('wb_banners_slider');
+        const postersTitleEl = document.getElementById('wb_posters_title');
+        const postersSubEl = document.getElementById('wb_posters_subtitle');
+
+        if (postersTitleEl && masterData.posters_title) postersTitleEl.textContent = masterData.posters_title;
+        if (postersSubEl && masterData.posters_subtitle) postersSubEl.textContent = masterData.posters_subtitle;
+
         const bannersList = Array.isArray(masterData.banners) ? masterData.banners.filter(Boolean) : [];
         if (bannersSection && bannersSlider) {
           if (bannersList.length > 0) {
             bannersSection.style.display = 'block';
-            bannersSlider.innerHTML = bannersList.map(bUrl => `
-              <div style="border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:1.5px solid rgba(45,140,255,0.25); aspect-ratio:16/9; background:#0f172a;">
-                <img src="${bUrl}" alt="Banner" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
-              </div>
-            `).join('');
+            bannersSlider.innerHTML = bannersList.map(bItem => {
+              const bUrl = typeof bItem === 'object' ? (bItem.url || bItem.image) : bItem;
+              const bTitle = typeof bItem === 'object' ? (bItem.title || bItem.name || '') : '';
+              return `
+                <div style="background:#131E36; border:1.5px solid rgba(45,140,255,0.3); border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.4); display:flex; flex-direction:column;">
+                  <div style="aspect-ratio:16/9; background:#0f172a; overflow:hidden;">
+                    <img src="${bUrl}" alt="${bTitle || 'Banner'}" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.3s ease;" onerror="this.parentElement.parentElement.style.display='none'">
+                  </div>
+                  ${bTitle ? `<div style="padding:10px 14px; font-weight:800; font-size:0.88rem; color:#FFFFFF; background:#0F172A; border-top:1px solid rgba(255,255,255,0.08);">${bTitle}</div>` : ''}
+                </div>
+              `;
+            }).join('');
           } else {
             bannersSection.style.display = 'none';
           }
@@ -1616,9 +1652,9 @@
       }
 
       // -------------------------------------------------------------
-      // 3. REGISTRATION & UNLOCKED ZOOM ACCESS
+      // 3. REGISTRATION & UNLOCKED ZOOM ACCESS (0ms INSTANT UNLOCK)
       // -------------------------------------------------------------
-      document.getElementById('wb_reg_form')?.addEventListener('submit', async (e) => {
+      document.getElementById('wb_reg_form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const name = (document.getElementById('wb_input_name')?.value || '').trim();
         const mobile = (document.getElementById('wb_input_mobile')?.value || '').trim();
@@ -1628,13 +1664,7 @@
           return;
         }
 
-        const btn = document.getElementById('wb_btn_submit_reg');
-        if (btn) {
-          btn.disabled = true;
-          btn.textContent = '⏳ सीट सुरक्षित हो रही है...';
-        }
-
-        // Save session locally so user stays on page unlocked
+        // Save session locally so user stays on page unlocked INSTANTLY
         const userObj = {
           name: name,
           mobile: mobile,
@@ -1647,22 +1677,28 @@
         localStorage.setItem('AI_USER', JSON.stringify(userObj));
         sessionStorage.setItem(`wb_reg_${webinarId}`, 'true');
 
-        // Async background lead registration to Supabase
-        if (db) {
-          try {
-            await db.from('surveys').insert([{
-              phone_number: mobile,
-              name: name,
-              source: 'webinar',
-              source_of_registration: 'webinar',
-              occupation: 'webinar_attendee',
-              notes: `Registered for Webinar: ${masterData.title}`,
-              event_type: 'webinar_registration'
-            }]);
-          } catch (err) {}
-        }
+        const lbl = document.getElementById('headerUserLabel');
+        if (lbl) lbl.textContent = name.split(' ')[0];
 
+        // Instantly unlock UI without network delay
         showUnlockedScreen();
+
+        // Background asynchronous registration log (non-blocking)
+        if (db) {
+          setTimeout(async () => {
+            try {
+              await db.from('surveys').insert([{
+                phone_number: mobile,
+                name: name,
+                source: 'webinar',
+                source_of_registration: 'webinar',
+                occupation: 'webinar_attendee',
+                notes: `Registered for Webinar: ${masterData.title}`,
+                event_type: 'webinar_registration'
+              }]);
+            } catch (err) {}
+          }, 50);
+        }
       });
 
       function checkUserSessionStatus() {
@@ -1703,11 +1739,37 @@
         });
       };
 
-      document.getElementById('wb_btn_share_invite')?.addEventListener('click', () => {
+      // Social Share Handlers
+      window.shareWbWhatsApp = function() {
         const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
         const msg = `🔴 *${masterData.title}*\n\n📅 समय: ${document.getElementById('wb_date_label')?.textContent || 'आज का लाइव सत्र'}\n\n👉 *मुफ्त ज़ूम लिंक व सीट बुकिंग के लिए यहाँ क्लिक करें:*\n${shareLink}\n\n(ज़ूम लिंक और पासवर्ड समय पर खुलेगा)\n\nसादर,\n${localStorage.getItem('aim_user_name') || 'Aarogyam India'}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
-      });
+      };
+
+      window.shareWbFacebook = function() {
+        const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`, '_blank', 'width=600,height=400');
+      };
+
+      window.copyWbShareLink = function() {
+        const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
+        navigator.clipboard.writeText(shareLink).then(() => {
+          alert('📋 रेफरल शेयर लिंक कॉपी हो गया:\n' + shareLink);
+        });
+      };
+
+      window.shareWbNative = function() {
+        const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
+        if (navigator.share) {
+          navigator.share({
+            title: masterData.title,
+            text: masterData.description || 'Aarogyam India Live Zoom Masterclass',
+            url: shareLink
+          }).catch(() => {});
+        } else {
+          window.shareWbWhatsApp();
+        }
+      };
 
       // -------------------------------------------------------------
       // 4. AAROGYAMTUBE SHORTS & REELS (CONTINUOUS PLAY & INFINITE LOOP)
