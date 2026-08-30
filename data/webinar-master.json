@@ -4,33 +4,57 @@
     "slug": "live-zoom-webinar",
     "status": "active",
     "is_live_active": true,
-    "offair_title": "📺 अगला लाइव वेबिनार सत्र जल्द घोषित होगा (Stay Tuned)",
-    "offair_message": "वर्तमान में कोई लाइव वेबिनार प्रसारित नहीं हो रहा है। आप नीचे दी गई हमारी पिछली विशेष रिकॉर्डेड ट्रेनिंग क्लासेज देख सकते हैं:",
-    "title": "",
-    "description": "",
-    "default_date": "",
-    "default_time": "",
+    "title": "प्राकृतिक एवं जैविक खेती से 3x मुनाफा लाइव वेबिनार 2026",
+    "description": "इस विशेष लाइव ज़ूम वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें और ज़ूम लिंक प्राप्त करें।",
+    "date": "",
+    "time": "",
     "duration_minutes": 90,
-    "default_price": 0,
-    "default_zoom_link": "",
-    "default_meeting_id": "",
-    "default_passcode": "",
-    "cover_image": "",
-    "banners": [],
+    "price": 0,
+    "zoom_link": "",
+    "meeting_id": "",
+    "passcode": "",
+    "cover_image": "/images/banners/agriculture-hero-banner-1.webp",
+    "banners": [
+      "/images/banners/agriculture-hero-banner-1.webp",
+      "/images/banners/agriculture-hero-banner-2.webp"
+    ],
     "youtube_videos": [],
+    "kpis": [
+      "🔴 100% लाइव इंटरएक्टिव ज़ूम क्लास",
+      "🌱 जैविक खाद एवं वैज्ञानिक स्प्रे फॉर्मूला",
+      "🎁 फ्री ई-बुक एवं स्टडी नोट्स बंडल",
+      "💬 लाइव सवाल-जवाब एवं समाधान सत्र"
+    ],
+    "faqs": [
+      {
+        "q": "ज़ूम मीटिंग लिंक और पासवर्ड कब खुलेगा?",
+        "a": "वेबिनार शुरू होने के ठीक 2 मिनट पहले 'Join Zoom Meeting' बटन सक्रिय हो जाएगा और Meeting ID व पासवर्ड भी दिखाई देने लगेगा।"
+      },
+      {
+        "q": "क्या यह वेबिनार फ्री है?",
+        "a": "हाँ, यह वेबिनार पूरी तरह निःशुल्क है। अपना नाम और मोबाइल नंबर डालकर सीट सुरक्षित कर सकते हैं।"
+      },
+      {
+        "q": "ज़ूम में आवाज़ नहीं आ रही है तो क्या करें?",
+        "a": "ज़ूम में जुड़ते ही नीचे बाईं तरफ 'Join Audio' दबाकर 'Wifi or Cellular Data' (या Call over Internet) को चुनें।"
+      },
+      {
+        "q": "क्या मुझे वेबिनार की रिकॉर्डिंग मिलेगी?",
+        "a": "हाँ, रजिस्टर्ड प्रतिभागियों को वेबिनार के बाद AarogyamTube सेक्शन में रिकॉर्डिंग और व्हाट्सएप पर स्टडी नोट्स उपलब्ध कराई जाएंगी।"
+      }
+    ],
     "section_order": [
-      "cover",
-      "timer",
-      "registration",
-      "kpis",
-      "banners",
-      "videos",
-      "tutorial",
-      "faqs"
+      "sec_hero_zoom",
+      "sec_timer",
+      "sec_kpis",
+      "sec_aarogyamtube_shorts",
+      "sec_aarogyamtube_videos",
+      "sec_tutorial",
+      "sec_faqs"
     ],
     "hidden_sections": [],
-    "kpis": [],
-    "tutorial_steps": [],
-    "faqs": []
+    "og_title": "🔴 Aarogyam India — लाइव ज़ूम वेबिनार एवं AarogyamTube रील्स",
+    "og_description": "लाइव ज़ूम ट्रेनिंग में भाग लें और 1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स देखें।",
+    "og_image": "/images/banners/universal-zoom-webinar-og.jpg"
   }
 }
