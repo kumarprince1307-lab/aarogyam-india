@@ -4625,14 +4625,18 @@
 
         try {
           if (db) {
+            // 1. Record in surveys table with source = 'webinar'
             db.from('surveys').insert([{
               profile_id: refShareId !== 'AI000004' ? refShareId : null,
               name: name,
               mobile: mobile,
               state: state || 'Not Specified',
               district: district || 'Not Specified',
-              occupation: 'attendee',
+              occupation: 'webinar_attendee',
+              selected_categories: 'webinar',
               category_answers: {
+                source: 'webinar',
+                source_of_registration: 'webinar',
                 event_type: 'webinar_registration',
                 webinar_id: webinarData.id,
                 webinar_title: webinarData.title,
@@ -4641,9 +4645,23 @@
               },
               created_at: new Date().toISOString()
             }]).then(() => {});
+
+            // 2. Upsert profile with source = 'webinar'
+            db.from('profiles').upsert([{
+              full_name: name,
+              name: name,
+              mobile: mobile,
+              phone: mobile,
+              share_id: 'AI' + String(mobile).slice(-6),
+              state: state || null,
+              district: district || null,
+              category: 'webinar',
+              source: 'webinar'
+            }], { onConflict: 'mobile' }).then(() => {});
           }
         } catch (err) {}
 
+        syncAuthStatus();
         showUnlockedScreen();
       });
 
