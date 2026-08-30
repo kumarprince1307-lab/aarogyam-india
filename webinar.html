@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="hi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title id="page_title">Aarogyam India — लाइव ज़ूम वेबिनार एवं AarogyamTube</title>
-  
+
   <!-- SEO & Dynamic OpenGraph Meta -->
-  <meta name="description" id="meta_desc" content="Aarogyam India लाइव ज़ूम वेबिनार में भाग लें और AarogyamTube पर 1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स देखें।">
+  <meta name="description" id="meta_desc"
+    content="Aarogyam India लाइव ज़ूम वेबिनार में भाग लें और AarogyamTube पर 1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स देखें।">
   <meta property="og:site_name" content="Aarogyam India">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://aarogyamindia.online/webinar.html">
   <meta property="og:title" id="og_title" content="🔴 Aarogyam India — लाइव ज़ूम वेबिनार एवं AarogyamTube">
-  <meta property="og:description" id="og_desc" content="लाइव ज़ूम ट्रेनिंग में भाग लें और 1-मिनट के कृषि शॉर्ट्स देखें।">
-  <meta property="og:image" id="og_image" content="https://aarogyamindia.online/images/banners/universal-zoom-webinar-og.jpg">
+  <meta property="og:description" id="og_desc"
+    content="लाइव ज़ूम ट्रेनिंग में भाग लें और 1-मिनट के कृषि शॉर्ट्स देखें।">
+  <meta property="og:image" id="og_image"
+    content="https://aarogyamindia.online/images/banners/universal-zoom-webinar-og.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
@@ -28,10 +32,12 @@
   <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Outfit:wght@600;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
-  <!-- Universal Site Stylesheets -->
+
+  <!-- Universal Site Stylesheets (Matches Homepage) -->
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/my-library.css">
   <link rel="stylesheet" href="/css/universal-nav-drawer.css">
@@ -74,7 +80,7 @@
       flex-direction: column;
       line-height: 1.5;
       overflow-x: hidden;
-      padding-bottom: 75px; /* space for universal mobile bottom nav */
+      padding-bottom: 75px;
     }
 
     /* Ambient Background Glows */
@@ -88,9 +94,35 @@
       filter: blur(120px);
       opacity: 0.16;
     }
-    .glow-1 { top: -100px; left: -100px; background: var(--zoom-blue); }
-    .glow-2 { top: 35%; right: -150px; background: #6366F1; }
-    .glow-3 { bottom: 10%; left: 20%; background: #10B981; }
+
+    .glow-1 {
+      top: -100px;
+      left: -100px;
+      background: var(--zoom-blue);
+    }
+
+    .glow-2 {
+      top: 35%;
+      right: -150px;
+      background: #6366F1;
+    }
+
+    .glow-3 {
+      bottom: 10%;
+      left: 20%;
+      background: #10B981;
+    }
+
+    /* Hide 3 floating action buttons and bottom nav when Reels Player modal is active */
+    body.wb-reels-open .sticky-float-pill-container,
+    body.wb-reels-open .sticky-float-pill,
+    body.wb-reels-open .universal-mobile-bottom-nav,
+    body.wb-reels-open #universal-mobile-bottom-nav,
+    body.wb-reels-open .user-notifications-float {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
 
     /* Main Container */
     .wb-container {
@@ -112,47 +144,96 @@
       gap: 24px;
       margin-bottom: 28px;
       align-items: start;
-    }
-    @media (min-width: 900px) {
-      .wb-hero-grid {
-        grid-template-columns: 440px 1fr;
-        gap: 32px;
-      }
+      background: transparent; /* remove default white background */
     }
 
-    /* Left Column: 3D Book Cover (Uncropped Natural Aspect Ratio) */
+    /* Hide the unused fullscreen wrapper if present */
+    .wb-hero-fullscreen {
+      display: none;
+    }
+
     .wb-hero-book-wrap {
       display: flex;
       justify-content: center;
       align-items: center;
       perspective: 1200px;
-      padding: 6px 0;
+      width: 100%;
+      background: transparent !important;
     }
+
+    @media (max-width: 899px) {
+  .wb-hero-book-wrap {
+    height: 100vh; /* fill mobile screen */
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+/* Mobile Reels layout */
+@media (max-width: 899px) {
+  .wb-reels-slider-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .wb-reels-arrow { display: none; }
+  .wb-shorts-grid {
+    max-height: 300px; /* show approx 3 items */
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+  }
+  .wb-shorts-grid.expanded { max-height: none; }
+  #wb_shorts_see_more { display: block; }
+}
+
+  .wb-hero-book-cover {
+    width: 100%;
+    height: 100vh !important;
+    max-width: none;
+    object-fit: cover !important;
+  }
+}
+
     .wb-hero-book-cover {
       width: 100%;
-      max-width: 440px;
+      max-width: 100%;
       height: auto;
-      object-fit: contain;
-      border-radius: 18px;
-      border: 2px solid rgba(45, 140, 255, 0.45);
-      box-shadow: -15px 20px 50px rgba(0, 0, 0, 0.65), 0 0 35px rgba(45, 140, 255, 0.35);
-      transform: perspective(1000px) rotateY(-8deg) rotateX(3deg);
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      transition: .45s ease;
       display: block;
-      background: #0f172a;
+      background: transparent;
+      object-fit: contain;
+      transform-style: preserve-3d;
+      /* subtle floating animation */
+      animation: subtleFloat 8s ease-in-out infinite alternate;
     }
-    .wb-hero-book-cover:hover {
-      transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.03);
-      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.8), 0 0 50px rgba(45, 140, 255, 0.5);
+
+    /* Subtle floating keyframes */
+    @keyframes subtleFloat {
+      0% { transform: rotateY(2deg) rotateX(1deg) translateY(0px); }
+      50% { transform: rotateY(-2deg) rotateX(-1deg) translateY(-5px); }
+      100% { transform: rotateY(2deg) rotateX(1deg) translateY(0px); }
+    }
+
+    /* Hover effect removed – only subtle floating animation applies */
+
+    @keyframes heroSpin {
+      from { transform: rotateY(0deg) rotateX(5deg); }
+      to { transform: rotateY(360deg) rotateX(5deg); }
+    }
+      .wb-hero-3d { animation: none; }
     }
     @media (max-width: 899px) {
       .wb-hero-book-cover {
-        max-width: 380px;
-        transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: 100vh;
+        object-fit: contain;
       }
     }
 
-    /* Right Column / Universal Cards in Deep Blue */
+    /* Universal Deep Blue Card Styling */
     .wb-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border-card);
@@ -177,6 +258,7 @@
       font-weight: 800;
       margin-bottom: 12px;
     }
+
     .wb-live-pulse-dot {
       width: 8px;
       height: 8px;
@@ -185,9 +267,19 @@
       box-shadow: 0 0 8px #EF4444;
       animation: pulse 1.5s infinite;
     }
+
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(1.3); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(1.3);
+      }
     }
 
     .wb-hero-title {
@@ -197,8 +289,11 @@
       color: #FFFFFF;
       margin-bottom: 10px;
     }
+
     @media (min-width: 768px) {
-      .wb-hero-title { font-size: 1.8rem; }
+      .wb-hero-title {
+        font-size: 1.8rem;
+      }
     }
 
     .wb-hero-desc {
@@ -216,12 +311,14 @@
       padding: 14px;
       margin-bottom: 16px;
     }
+
     .wb-timer-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
     }
+
     .wb-timer-label {
       font-size: 0.85rem;
       font-weight: 800;
@@ -230,11 +327,13 @@
       align-items: center;
       gap: 6px;
     }
+
     .wb-timer-digits {
       display: flex;
       gap: 8px;
       justify-content: center;
     }
+
     .wb-digit-box {
       background: #0B1120;
       border: 1px solid rgba(45, 140, 255, 0.35);
@@ -243,6 +342,7 @@
       min-width: 54px;
       text-align: center;
     }
+
     .wb-digit-val {
       font-size: 1.35rem;
       font-weight: 900;
@@ -250,6 +350,7 @@
       font-family: 'Outfit', monospace;
       line-height: 1.1;
     }
+
     .wb-digit-lbl {
       font-size: 0.65rem;
       color: var(--text-dim);
@@ -257,6 +358,7 @@
       font-weight: 700;
       margin-top: 2px;
     }
+
     .wb-timer-pending-text {
       text-align: center;
       padding: 8px;
@@ -272,6 +374,7 @@
       gap: 10px;
       margin-bottom: 16px;
     }
+
     .wb-meta-badge {
       background: #1E293B;
       border: 1px solid rgba(45, 140, 255, 0.25);
@@ -292,6 +395,7 @@
       gap: 10px;
       margin-bottom: 20px;
     }
+
     .wb-kpi-item {
       display: flex;
       align-items: center;
@@ -303,8 +407,9 @@
       font-size: 0.85rem;
       font-weight: 800;
       color: #FFFFFF;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
+
     .wb-kpi-item i {
       color: var(--emerald);
       font-size: 0.95rem;
@@ -320,14 +425,17 @@
       align-items: center;
       gap: 8px;
     }
+
     .wb-form-subtitle {
       font-size: 0.82rem;
       color: var(--text-muted);
       margin-bottom: 14px;
     }
+
     .wb-input-group {
       margin-bottom: 12px;
     }
+
     .wb-label {
       display: block;
       font-size: 0.78rem;
@@ -335,6 +443,7 @@
       color: #CBD5E1;
       margin-bottom: 4px;
     }
+
     .wb-input {
       width: 100%;
       background: #0B1120;
@@ -346,10 +455,12 @@
       outline: none;
       transition: all 0.2s ease;
     }
+
     .wb-input:focus {
       border-color: var(--zoom-blue);
       box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.25);
     }
+
     .wb-btn-primary {
       background: linear-gradient(135deg, #2D8CFF 0%, #0E71EB 100%);
       color: #fff;
@@ -367,6 +478,7 @@
       box-shadow: 0 4px 18px rgba(45, 140, 255, 0.4);
       transition: all 0.2s ease;
     }
+
     .wb-btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(45, 140, 255, 0.55);
@@ -380,6 +492,7 @@
       padding: 16px;
       margin-top: 14px;
     }
+
     .wb-unlocked-title {
       font-size: 0.92rem;
       font-weight: 800;
@@ -389,6 +502,7 @@
       gap: 6px;
       margin-bottom: 12px;
     }
+
     .wb-cred-row {
       display: flex;
       justify-content: space-between;
@@ -399,12 +513,14 @@
       padding: 10px 14px;
       margin-bottom: 8px;
     }
+
     .wb-cred-val {
       font-family: 'Outfit', monospace;
       font-weight: 800;
       font-size: 1.05rem;
       color: #60A5FA;
     }
+
     .wb-btn-copy {
       background: rgba(45, 140, 255, 0.15);
       color: #93C5FD;
@@ -415,6 +531,7 @@
       font-weight: 700;
       cursor: pointer;
     }
+
     .wb-btn-join-zoom {
       background: linear-gradient(135deg, #10B981, #059669);
       color: #fff;
@@ -431,6 +548,7 @@
       margin-top: 12px;
       transition: all 0.2s ease;
     }
+
     .wb-btn-join-zoom:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(16, 185, 129, 0.6);
@@ -443,8 +561,9 @@
       border-radius: 16px;
       padding: 22px;
       margin-bottom: 24px;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
     }
+
     .wb-tube-header {
       display: flex;
       justify-content: space-between;
@@ -453,11 +572,13 @@
       flex-wrap: wrap;
       gap: 10px;
     }
+
     .wb-tube-brand {
       display: flex;
       align-items: center;
       gap: 12px;
     }
+
     .wb-tube-icon {
       width: 44px;
       height: 44px;
@@ -470,15 +591,34 @@
       font-size: 1.25rem;
       box-shadow: 0 4px 16px rgba(244, 63, 94, 0.4);
     }
+
     .wb-tube-title {
       font-size: 1.25rem;
       font-weight: 900;
       color: #FFFFFF;
     }
+
     .wb-tube-subtitle {
       font-size: 0.82rem;
       color: var(--text-muted);
       font-weight: 600;
+    }
+
+    /* Multi-Banners Poster Card Animation */
+    .wb-poster-card {
+      background: #131E36;
+      border: 1.5px solid rgba(45, 140, 255, 0.3);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .wb-poster-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(45, 140, 255, 0.35);
     }
 
     /* Filter Chips */
@@ -490,7 +630,11 @@
       margin-bottom: 14px;
       scrollbar-width: none;
     }
-    .wb-filter-bar::-webkit-scrollbar { display: none; }
+
+    .wb-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
     .wb-chip {
       background: #0B1120;
       border: 1px solid #334155;
@@ -506,7 +650,9 @@
       gap: 6px;
       transition: all 0.2s ease;
     }
-    .wb-chip:hover, .wb-chip.active {
+
+    .wb-chip:hover,
+    .wb-chip.active {
       background: var(--zoom-blue);
       border-color: var(--zoom-blue);
       color: #fff;
@@ -517,6 +663,7 @@
     .wb-reels-slider-wrap {
       position: relative;
     }
+
     .wb-shorts-grid {
       display: flex;
       gap: 16px;
@@ -527,7 +674,11 @@
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
-    .wb-shorts-grid::-webkit-scrollbar { display: none; }
+
+    .wb-shorts-grid::-webkit-scrollbar {
+      display: none;
+    }
+
     .wb-reel-card {
       flex: 0 0 220px;
       scroll-snap-align: start;
@@ -538,14 +689,19 @@
       cursor: pointer;
       transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
+
     .wb-reel-card:hover {
       transform: translateY(-6px);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
       border-color: var(--zoom-blue);
     }
+
     @media (max-width: 600px) {
-      .wb-reel-card { flex: 0 0 170px; }
+      .wb-reel-card {
+        flex: 0 0 170px;
+      }
     }
+
     .wb-reels-arrow {
       position: absolute;
       top: 45%;
@@ -561,17 +717,27 @@
       justify-content: center;
       cursor: pointer;
       z-index: 10;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
       transition: all 0.2s ease;
     }
+
     .wb-reels-arrow:hover {
       background: #2D8CFF;
       transform: translateY(-50%) scale(1.1);
     }
-    .wb-reels-arrow-left { left: -14px; }
-    .wb-reels-arrow-right { right: -14px; }
+
+    .wb-reels-arrow-left {
+      left: -14px;
+    }
+
+    .wb-reels-arrow-right {
+      right: -14px;
+    }
+
     @media (max-width: 768px) {
-      .wb-reels-arrow { display: none; }
+      .wb-reels-arrow {
+        display: none;
+      }
     }
 
     .wb-reel-thumb-wrap {
@@ -580,6 +746,7 @@
       background: #0f172a;
       overflow: hidden;
     }
+
     .wb-reel-thumb-img {
       width: 100%;
       height: 100%;
@@ -587,9 +754,11 @@
       display: block;
       transition: transform 0.3s ease;
     }
+
     .wb-reel-card:hover .wb-reel-thumb-img {
       transform: scale(1.05);
     }
+
     .wb-reel-plat-badge {
       position: absolute;
       top: 8px;
@@ -605,9 +774,18 @@
       backdrop-filter: blur(8px);
       z-index: 2;
     }
-    .plat-youtube { background: rgba(239, 68, 68, 0.85); }
-    .plat-instagram { background: rgba(225, 48, 108, 0.85); }
-    .plat-facebook { background: rgba(24, 119, 242, 0.85); }
+
+    .plat-youtube {
+      background: rgba(239, 68, 68, 0.85);
+    }
+
+    .plat-instagram {
+      background: rgba(225, 48, 108, 0.85);
+    }
+
+    .plat-facebook {
+      background: rgba(24, 119, 242, 0.85);
+    }
 
     .wb-reel-duration-badge {
       position: absolute;
@@ -621,6 +799,7 @@
       font-weight: 700;
       z-index: 2;
     }
+
     .wb-reel-play-overlay {
       position: absolute;
       inset: 0;
@@ -631,7 +810,11 @@
       opacity: 0;
       transition: opacity 0.2s ease;
     }
-    .wb-reel-card:hover .wb-reel-play-overlay { opacity: 1; }
+
+    .wb-reel-card:hover .wb-reel-play-overlay {
+      opacity: 1;
+    }
+
     .wb-reel-play-icon {
       width: 44px;
       height: 44px;
@@ -644,9 +827,11 @@
       font-size: 1.1rem;
       box-shadow: 0 4px 16px rgba(45, 140, 255, 0.6);
     }
+
     .wb-reel-card-info {
       padding: 10px 12px;
     }
+
     .wb-reel-card-title {
       font-size: 0.82rem;
       font-weight: 700;
@@ -658,6 +843,7 @@
       line-height: 1.35;
       margin-bottom: 4px;
     }
+
     .wb-reel-card-speaker {
       font-size: 0.7rem;
       color: var(--text-dim);
@@ -672,6 +858,7 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px;
     }
+
     .wb-vcard {
       background: #131E36;
       border: 1px solid rgba(45, 140, 255, 0.25);
@@ -680,17 +867,20 @@
       cursor: pointer;
       transition: all 0.25s ease;
     }
+
     .wb-vcard:hover {
       transform: translateY(-4px);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       border-color: var(--zoom-blue);
     }
+
     .wb-vcard-thumb-wrap {
       aspect-ratio: 16/9;
       position: relative;
       background: #0f172a;
       overflow: hidden;
     }
+
     .wb-vcard-img {
       width: 100%;
       height: 100%;
@@ -706,6 +896,7 @@
       margin-bottom: 8px;
       overflow: hidden;
     }
+
     .wb-accordion-q {
       padding: 12px 16px;
       font-weight: 700;
@@ -716,6 +907,7 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .wb-accordion-a {
       padding: 0 16px 12px 16px;
       font-size: 0.85rem;
@@ -723,51 +915,72 @@
       line-height: 1.5;
       display: none;
     }
-    .wb-accordion-item.active .wb-accordion-a { display: block; }
-    .wb-accordion-item.active .wb-accordion-q i { transform: rotate(180deg); }
+
+    .wb-accordion-item.active .wb-accordion-a {
+      display: block;
+    }
+
+    .wb-accordion-item.active .wb-accordion-q i {
+      transform: rotate(180deg);
+    }
 
     /* In-App Vertical Reels Modal Player */
     .wb-reels-modal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.95);
-      z-index: 9999;
+      background: rgba(0, 0, 0, 0.96);
+      z-index: 99999;
       display: none;
       align-items: center;
       justify-content: center;
+      touch-action: none;
     }
-    .wb-reels-modal.active { display: flex; }
+
+    .wb-reels-modal.active {
+      display: flex;
+    }
+
     .wb-reels-container {
       width: 100%;
-      max-width: 420px;
-      height: 94vh;
-      max-height: 820px;
+      max-width: 440px;
+      height: 96vh;
+      max-height: 840px;
       background: #000;
-      border-radius: 16px;
+      border-radius: 18px;
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 0 50px rgba(45, 140, 255, 0.3);
+      box-shadow: 0 0 50px rgba(45, 140, 255, 0.35);
     }
+
+    @media (max-width: 600px) {
+      .wb-reels-container {
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+      }
+    }
+
     .wb-reels-top {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      z-index: 10;
-      padding: 12px 16px;
+      z-index: 20;
+      padding: 14px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
     }
+
     .wb-reels-close-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       color: #fff;
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       font-size: 1.3rem;
       cursor: pointer;
@@ -775,29 +988,70 @@
       align-items: center;
       justify-content: center;
     }
+
     .wb-reels-body {
       flex: 1;
       width: 100%;
       height: 100%;
       position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
     .wb-reels-iframe {
       width: 100%;
       height: 100%;
       border: none;
     }
-    .wb-reels-rail {
+
+    /* Vertical Navigation Controls */
+    .wb-reels-vertical-nav {
       position: absolute;
-      right: 12px;
-      bottom: 80px;
+      right: 14px;
+      top: 40%;
+      transform: translateY(-50%);
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      z-index: 10;
+      gap: 12px;
+      z-index: 25;
+    }
+
+    .wb-vnav-btn {
+      width: 44px;
+      height: 44px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid rgba(45, 140, 255, 0.5);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    }
+
+    .wb-vnav-btn:hover {
+      background: var(--zoom-blue);
+    }
+
+    .wb-reels-rail {
+      position: absolute;
+      right: 14px;
+      bottom: 85px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 20;
       align-items: center;
     }
+
     .wb-rail-btn {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
       width: 44px;
@@ -808,64 +1062,42 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
+
     .wb-rail-count {
       font-size: 0.65rem;
       font-weight: 700;
       margin-top: 1px;
     }
+
     .wb-reels-caption {
       position: absolute;
       bottom: 0;
       left: 0;
-      right: 65px;
+      right: 70px;
       padding: 16px;
-      background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
-      z-index: 10;
+      background: linear-gradient(0deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.6) 70%, transparent 100%);
+      z-index: 20;
     }
+
     .wb-reels-caption-title {
       font-weight: 800;
       font-size: 0.95rem;
       color: #fff;
       margin-bottom: 4px;
+      line-height: 1.3;
     }
+
     .wb-reels-caption-speaker {
       font-size: 0.75rem;
       color: #93C5FD;
     }
-    .wb-reels-nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 15;
-    }
-    .wb-reels-nav-prev { left: 8px; }
-    .wb-reels-nav-next { right: 8px; }
-
-    /* Footer */
-    .wb-footer {
-      background: #080D1A;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 24px 16px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      margin-top: auto;
-    }
   </style>
 </head>
+
 <body>
 
   <div class="wb-ambient-glow glow-1"></div>
@@ -873,94 +1105,104 @@
   <div class="wb-ambient-glow glow-3"></div>
 
   <!-- =========================================
-       1. UNIVERSAL LOGIN POPUP
+       1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
        ========================================== -->
-  <div id="login-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; display: none; justify-content: center; align-items: center;">
-      <div style="background: #ffffff; padding: 30px; width: 100%; max-width: 380px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; font-family: sans-serif; position: relative;">
-          <button onclick="closeLoginPopup()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 20px; color: #888; cursor: pointer; line-height: 1;">&times;</button>
-          <h2 style="margin-bottom: 10px; color: #333; font-size: 22px;">लॉगिन करें</h2>
-          <p style="font-size: 14px; color: #666; margin-bottom: 20px;">अपनी डिजिटल प्रोफाइल देखने के लिए मोबाइल नंबर दर्ज करें</p>
-          <input type="tel" id="login-mobile" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; outline: none; color:#000;">
-          <button onclick="checkUserLogin()" style="width: 100%; padding: 12px; background: #2E7D32; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">लॉगिन करें</button>
-          <p style="margin-top: 20px; font-size: 14px; color: #555;">नया यूजर हैं? <a href="/registration.html" style="color: #007bff; text-decoration: none; font-weight: bold;">यहाँ साइन अप करें</a></p>
+  <div class="home-live-ticker-wrap">
+    <div class="container" style="max-width:1200px; margin:0 auto;">
+      <div class="home-ticker-flex">
+        <div class="ticker-pulse-badge">
+          <span class="ticker-dot-pulse"></span>
+          <span>🚨 LIVE</span>
+        </div>
+        <div style="flex:1;overflow:hidden;">
+          <div class="ticker-marquee-scroll" id="home-live-ticker-track">
+            🌾 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 AI एक्सपर्ट सहायता उपलब्ध! ✦ प्रमाणित ई-बुक्स व लाइव वेबिनार
+            हब
+          </div>
+        </div>
       </div>
+    </div>
   </div>
 
   <!-- =========================================
-       2. UNIVERSAL TOP HEADER (MATCHES BOOK LANDING)
+       2. ANIMATED INDIAN TIRANGA WAVING HEADER (EXACT HOMEPAGE MATCH)
        ========================================== -->
-  <header class="library-header" style="background:#ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;">
-      <div class="header-logo-title" style="display: flex; align-items: center; gap: 10px;">
-          <a href="/index.html"><img src="/images/logo/logo.png" alt="Logo" class="site-logo" style="height: 38px; width: auto; display: block;"></a>
-          <div>
-            <h1 id="header-book-title" style="font-size: 1.05rem; font-weight: 800; color: #1e293b; margin: 0; line-height: 1.2;">Aarogyam India Live Webinar</h1>
-            <div style="font-size:0.72rem; color:#64748b; font-weight:600;">लाइव ज़ूम ट्रेनिंग एवं AarogyamTube</div>
+  <header class="header header-tiranga-animated" id="header" style="position:sticky; top:0; z-index:1000;">
+    <div class="container"
+      style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;gap:8px;max-width:1200px;margin:0 auto;">
+
+      <!-- Brand Logo Left in Glass Pill + Active Page Badge -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <a href="/index.html" class="brand-logo-pill"
+          style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;display:block;">
+          <div style="display:flex;flex-direction:column;">
+            <span class="brand-title-text" style="font-weight:900;font-size:1.05rem;color:#1e293b;line-height:1.1;">
+              AAROGYAM <span style="color:#ff671f;">INDIA</span>
+            </span>
+            <span class="brand-sub-text" style="font-size:0.68rem;color:#64748b;font-weight:700;">
+              Digital Ecosystem Hub
+            </span>
           </div>
+        </a>
+
+        <!-- Current Active Page Indicator Badge -->
+        <span class="header-current-page-badge" title="Current Page"
+          style="background:rgba(45,140,255,0.12);color:#0284c7;border:1px solid rgba(45,140,255,0.3);padding:3px 8px;border-radius:12px;font-size:0.72rem;font-weight:800;">
+          🎥 Webinar
+        </span>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 8px;">
-          <!-- Cart Icon -->
-          <a href="/ebooks/cart.html" style="position: relative; width: 38px; height: 38px; background: rgba(37,99,235,0.12); color: #2563eb; border: 1.5px solid #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1rem;" title="Cart">
-              <i class="fa-solid fa-cart-shopping"></i>
-              <span id="cart-count-badge" style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.68rem; font-weight: 800; padding: 2px 5px;">0</span>
-          </a>
-          <!-- Notification Bell -->
-          <button class="user-notif-bell-btn" onclick="window.location.href='/ucas/index.html?tab=notifications'" title="सूचनाएं (Notifications)" aria-label="Notifications" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1.5px solid #10B981; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; position: relative;">
-              <i class="fa-solid fa-bell" style="color: #10B981;"></i>
-              <span class="user-notif-badge" style="display: none; position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.68rem; font-weight: 800; padding: 2px 5px;">0</span>
-          </button>
-          <button class="back-btn" onclick="window.location.href='/index.html'" style="width: 38px; height: 38px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;"><i class="fa-solid fa-arrow-left"></i></button>
-          <button class="menu-btn" onclick="toggleMenu()" title="मेनू खोलें" aria-label="Toggle Menu" style="width: 38px; height: 38px; background: #2E7D32; color: #fff; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem;"><i class="fa-solid fa-bars" style="pointer-events: none;"></i></button>
+      <!-- Header Actions Right: Install App, Notification, Cart, 3-Line Menu -->
+      <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+        <!-- Install App Button (PWA) -->
+        <button type="button" onclick="window.triggerPwaInstall?.() || window.triggerPWAInstall?.()"
+          class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App"
+          style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+          <span>📲</span> <span>Install App</span>
+        </button>
+
+        <!-- Notification Bell Icon -->
+        <button type="button" class="user-notif-bell-btn"
+          onclick="window.location.href='/ucas/index.html?tab=notifications'" title="Notifications"
+          aria-label="Notifications"
+          style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-regular fa-bell" style="font-size:1rem;color:#10B981;"></i>
+          <span class="user-notif-badge"
+            style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 5px;border-radius:10px;">0</span>
+        </button>
+
+        <!-- Shopping Cart Icon -->
+        <a href="/ebooks/cart.html" title="Shopping Cart"
+          style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-solid fa-cart-shopping" style="font-size:1rem;color:#2563eb;"></i>
+          <span class="cart-count" id="cartCount"
+            style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
+        </a>
+
+        <!-- 3-Line Menu Trigger Button (Desktop Left Drawer / Mobile Right Drawer) -->
+        <button type="button" class="menu-button"
+          onclick="window.openUniversalDrawer?.() || window.openUniversalNavDrawer?.()" title="Open Menu"
+          style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+          <i class="fa-solid fa-bars"></i>
+        </button>
       </div>
+
+    </div>
   </header>
-
-  <!-- =========================================
-       3. UNIVERSAL SIDE-OUT MENU DRAWER
-       ========================================== -->
-  <div class="side-menu-overlay" id="sideMenuOverlay" onclick="toggleMenu()"></div>
-  <div class="side-menu" id="sideMenu">
-      <button class="close-menu" onclick="toggleMenu()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 24px; color: #64748b; cursor: pointer;">&times;</button>
-      <div style="text-align: center; padding: 15px 10px; border-bottom: 1px solid #eee; margin-bottom: 10px; background: #f8fafc; border-radius: 8px;">
-          <div style="width: 45px; height: 45px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto 6px;">
-              <i class="fa-solid fa-user"></i>
-          </div>
-          <h3 style="font-size: 0.95rem; color: #1e293b; margin-bottom: 2px;">नमस्ते, <span id="menuUserName">प्रिय प्रतिभागी</span></h3>
-          <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">
-              👑 <span id="mobileMemberStatus">Member</span> <span id="mobileUserPhone"></span>
-          </p>
-      </div>
-
-      <div style="padding: 0 10px 10px 10px;">
-          <button id="mobile-login-btn" onclick="openLoginPopup()" style="background: #28a745; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; gap: 8px; margin-bottom: 5px;">
-              <i class="fa-solid fa-right-to-bracket"></i> लॉगिन करें
-          </button>
-          <button id="mobile-logout-btn" onclick="logoutUniversalUser()" style="background: #e81717; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px;">
-              <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट
-          </button>
-      </div>
-
-      <ul style="list-style: none; padding: 0; margin: 10px 0;">
-          <li><a href="/index.html"><i class="fa-solid fa-house" style="color:#10B981;"></i> Home</a></li>
-          <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> UCAS / My Profile</a></li>
-          <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a></li>
-          <li><a href="/ebooks/cart.html"><i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> Shopping Cart</a></li>
-          <li><a href="/subscription.html"><i class="fa-solid fa-crown" style="color:#F59E0B;"></i> VIP Pass (Subscription)</a></li>
-          <li><a href="/webinar.html"><i class="fa-solid fa-video" style="color:#2D8CFF;"></i> Live Zoom Webinar</a></li>
-          <li><a href="/mandi.html"><i class="fa-solid fa-seedling" style="color:#16a34a;"></i> Mandi Bhav</a></li>
-          <li><a href="/purchases.html"><i class="fa-solid fa-file-invoice" style="color:#10B981;"></i> My Purchases & Invoices</a></li>
-      </ul>
-  </div>
 
   <main class="wb-container">
 
     <!-- =========================================
-         4. HERO 2-COLUMN SECTION (BOOK LANDING EXACT)
+         3. HERO 2-COLUMN SECTION (BOOK LANDING EXACT)
          ========================================== -->
     <section id="sec_hero_zoom" class="wb-hero-grid">
-      
-      <!-- LEFT COLUMN: 3D FLOATING COVER (UNCROPPED NATURAL ASPECT RATIO) -->
+
+      <!-- LEFT COLUMN: 3D FLOATING COVER (UNCROPPED NATURAL ASPECT RATIO, NO WHITE BOX) -->
       <div class="wb-hero-book-wrap">
-        <img id="wb_cover_img" src="/images/banners/agriculture-hero-banner-1.webp" alt="Webinar Cover" class="wb-hero-book-cover" onerror="this.onerror=null; this.src='/images/banners/universal-zoom-webinar-og.jpg'">
+        <img id="wb_cover_img" src="/images/banners/agriculture-hero-banner-1.webp?v=3.0" alt="Webinar Cover"
+          class="wb-hero-book-cover"
+          onerror="this.onerror=null; this.src='/images/banners/universal-zoom-webinar-og.jpg'">
       </div>
 
       <!-- RIGHT COLUMN: WEBINAR DETAILS & REGISTRATION / UNLOCKED ZOOM CARD -->
@@ -984,7 +1226,8 @@
             <div class="wb-timer-label">
               <i class="fa-solid fa-stopwatch"></i> <span>लाइव वेबिनार काउंटडाउन</span>
             </div>
-            <span id="wb_price_badge" style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:#34D399; padding:2px 8px; border-radius:6px; font-weight:800;">
+            <span id="wb_price_badge"
+              style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:#34D399; padding:2px 8px; border-radius:6px; font-weight:800;">
               🟢 100% निःशुल्क
             </span>
           </div>
@@ -1063,7 +1306,8 @@
             </div>
             <div class="wb-input-group">
               <label class="wb-label">10 अंकों का व्हाट्सएप मोबाइल नंबर: *</label>
-              <input type="tel" id="wb_input_mobile" class="wb-input" placeholder="उदा. 9876543210" maxlength="10" pattern="[0-9]{10}" required>
+              <input type="tel" id="wb_input_mobile" class="wb-input" placeholder="उदा. 9876543210" maxlength="10"
+                pattern="[0-9]{10}" required>
             </div>
             <button type="submit" id="wb_btn_submit_reg" class="wb-btn-primary">
               <span>🟢 सीट बुक करें व ज़ूम लिंक देखें</span>
@@ -1102,19 +1346,26 @@
 
           <!-- Social Share Suite -->
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
-            <button type="button" id="wb_btn_share_wa" class="wb-btn-primary" style="background:#25D366; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.shareWbWhatsApp()">
+            <button type="button" id="wb_btn_share_wa" class="wb-btn-primary"
+              style="background:#25D366; color:#fff; font-size:0.82rem; padding:10px;"
+              onclick="window.shareWbWhatsApp()">
               <i class="fa-brands fa-whatsapp"></i>
               <span>व्हाट्सएप शेयर</span>
             </button>
-            <button type="button" id="wb_btn_share_fb" class="wb-btn-primary" style="background:#1877F2; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.shareWbFacebook()">
+            <button type="button" id="wb_btn_share_fb" class="wb-btn-primary"
+              style="background:#1877F2; color:#fff; font-size:0.82rem; padding:10px;"
+              onclick="window.shareWbFacebook()">
               <i class="fa-brands fa-facebook"></i>
               <span>फेसबुक शेयर</span>
             </button>
-            <button type="button" id="wb_btn_copy_link" class="wb-btn-primary" style="background:#334155; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.copyWbShareLink()">
+            <button type="button" id="wb_btn_copy_link" class="wb-btn-primary"
+              style="background:#334155; color:#fff; font-size:0.82rem; padding:10px;"
+              onclick="window.copyWbShareLink()">
               <i class="fa-solid fa-link"></i>
               <span>लिंक कॉपी करें</span>
             </button>
-            <button type="button" id="wb_btn_native_share" class="wb-btn-primary" style="background:#6366F1; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.shareWbNative()">
+            <button type="button" id="wb_btn_native_share" class="wb-btn-primary"
+              style="background:#6366F1; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.shareWbNative()">
               <i class="fa-solid fa-share-nodes"></i>
               <span>अन्य ऐप्स पर शेयर</span>
             </button>
@@ -1126,25 +1377,27 @@
     </section>
 
     <!-- =========================================
-         5. HERO MULTI-BANNERS & POSTERS SECTION
+         4. HERO MULTI-BANNERS & POSTERS SECTION
          ========================================== -->
     <section id="sec_banners" class="wb-tube-section" style="display:none;">
       <div class="wb-tube-header">
         <div class="wb-tube-brand">
-          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #2D8CFF, #0E71EB);"><i class="fa-solid fa-images"></i></div>
+          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #2D8CFF, #0E71EB);"><i
+              class="fa-solid fa-images"></i></div>
           <div>
-            <div id="wb_posters_title" class="wb-tube-title" style="color:#FFFFFF; font-size:1.35rem; font-weight:900;">🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स</div>
-            <div id="wb_posters_subtitle" class="wb-tube-subtitle" style="color:#94A3B8; font-weight:600;">नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स</div>
+            <div id="wb_posters_title" class="wb-tube-title">🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स</div>
+            <div id="wb_posters_subtitle" class="wb-tube-subtitle">नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स</div>
           </div>
         </div>
       </div>
-      <div id="wb_banners_slider" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+      <div id="wb_banners_slider"
+        style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
         <!-- Dynamic Banners Rendered by JS -->
       </div>
     </section>
 
     <!-- =========================================
-         6. AAROGYAMTUBE 9:16 SHORTS & REELS SECTION
+         5. AAROGYAMTUBE 9:16 SHORTS & REELS SECTION
          ========================================== -->
     <section id="sec_aarogyamtube_shorts" class="wb-tube-section">
       <div class="wb-tube-header">
@@ -1152,7 +1405,8 @@
           <div class="wb-tube-icon"><i class="fa-solid fa-play"></i></div>
           <div>
             <div class="wb-tube-title">🎬 AarogyamTube — रील्स एवं शॉर्ट्स</div>
-            <div class="wb-tube-subtitle">1-मिनट के प्रैक्टिकल कृषि, जैविक खाद व फसल सुरक्षा शॉर्ट्स (YouTube, Instagram, Facebook)</div>
+            <div class="wb-tube-subtitle">1-मिनट के प्रैक्टिकल कृषि, जैविक खाद व फसल सुरक्षा शॉर्ट्स (YouTube,
+              Instagram, Facebook)</div>
           </div>
         </div>
       </div>
@@ -1160,32 +1414,39 @@
       <!-- Platform Filter Chips -->
       <div class="wb-filter-bar" id="wb_shorts_filter_bar">
         <button type="button" class="wb-chip active" data-platform="all">🌟 सभी रील्स (All)</button>
-        <button type="button" class="wb-chip" data-platform="youtube"><i class="fa-brands fa-youtube" style="color:#EF4444;"></i> YouTube Shorts</button>
-        <button type="button" class="wb-chip" data-platform="instagram"><i class="fa-brands fa-instagram" style="color:#E1306C;"></i> Instagram Reels</button>
-        <button type="button" class="wb-chip" data-platform="facebook"><i class="fa-brands fa-facebook" style="color:#1877F2;"></i> Facebook Reels</button>
+        <button type="button" class="wb-chip" data-platform="youtube"><i class="fa-brands fa-youtube"
+            style="color:#EF4444;"></i> YouTube Shorts</button>
+        <button type="button" class="wb-chip" data-platform="instagram"><i class="fa-brands fa-instagram"
+            style="color:#E1306C;"></i> Instagram Reels</button>
+        <button type="button" class="wb-chip" data-platform="facebook"><i class="fa-brands fa-facebook"
+            style="color:#1877F2;"></i> Facebook Reels</button>
       </div>
 
       <!-- Shorts Carousel with Desktop Left/Right Buttons -->
       <div class="wb-reels-slider-wrap">
-        <button type="button" class="wb-reels-arrow wb-reels-arrow-left" onclick="window.scrollReelsRow(-1)" aria-label="Previous">
+        <button type="button" class="wb-reels-arrow wb-reels-arrow-left" onclick="window.scrollReelsRow(-1)"
+          aria-label="Previous">
           <i class="fa-solid fa-chevron-left"></i>
         </button>
         <div id="wb_shorts_grid" class="wb-shorts-grid">
           <!-- Rendered by JS -->
         </div>
-        <button type="button" class="wb-reels-arrow wb-reels-arrow-right" onclick="window.scrollReelsRow(1)" aria-label="Next">
+        <button type="button" class="wb-reels-arrow wb-reels-arrow-right" onclick="window.scrollReelsRow(1)"
+          aria-label="Next">
           <i class="fa-solid fa-chevron-right"></i>
         </button>
       </div>
+        <button id="wb_shorts_see_more" class="wb-btn-primary" style="margin-top:8px; width:100%; display:none;" aria-expanded="false">See More ▼</button>
     </section>
 
     <!-- =========================================
-         7. AAROGYAMTUBE 16:9 MASTERCLASS VIDEOS SECTION
+         6. AAROGYAMTUBE 16:9 MASTERCLASS VIDEOS SECTION
          ========================================== -->
     <section id="sec_aarogyamtube_videos" class="wb-tube-section">
       <div class="wb-tube-header">
         <div class="wb-tube-brand">
-          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #2D8CFF, #0E71EB);"><i class="fa-solid fa-chalkboard-user"></i></div>
+          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #2D8CFF, #0E71EB);"><i
+              class="fa-solid fa-chalkboard-user"></i></div>
           <div>
             <div class="wb-tube-title">📚 AarogyamTube — रिकॉर्डेड मास्टरक्लास</div>
             <div class="wb-tube-subtitle">विशेषज्ञों द्वारा रिकॉर्ड की गई संपूर्ण कृषि मास्टरक्लास लाइब्रेरी</div>
@@ -1208,38 +1469,46 @@
     </section>
 
     <!-- =========================================
-         8. STEP-BY-STEP ZOOM TUTORIAL
+         7. STEP-BY-STEP ZOOM TUTORIAL
          ========================================== -->
     <section id="sec_tutorial" class="wb-tube-section">
       <div class="wb-card">
-        <div style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+        <div
+          style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
           <i class="fa-solid fa-chalkboard-user" style="color:#2D8CFF;"></i>
           <span>Zoom मीटिंग से कैसे जुड़ें? (सरल गाइड)</span>
         </div>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
-          <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
+          <div
+            style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
             <div style="font-weight:800; color:#93C5FD; margin-bottom:4px;">1. Zoom App डाउनलोड करें</div>
-            <p style="font-size:0.78rem; color:#94A3B8;">अगर आपके फोन में Zoom App नहीं है, तो Play Store या App Store से डाउनलोड करें।</p>
+            <p style="font-size:0.78rem; color:#94A3B8;">अगर आपके फोन में Zoom App नहीं है, तो Play Store या App Store
+              से डाउनलोड करें।</p>
           </div>
-          <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
+          <div
+            style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
             <div style="font-weight:800; color:#93C5FD; margin-bottom:4px;">2. Join Meeting दबाएं</div>
-            <p style="font-size:0.78rem; color:#94A3B8;">वेबिनार समय पर ऊपर दिए <strong>Join Zoom Meeting</strong> बटन पर क्लिक करें।</p>
+            <p style="font-size:0.78rem; color:#94A3B8;">वेबिनार समय पर ऊपर दिए <strong>Join Zoom Meeting</strong> बटन
+              पर क्लिक करें।</p>
           </div>
-          <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
+          <div
+            style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
             <div style="font-weight:800; color:#93C5FD; margin-bottom:4px;">3. Audio चालू करें</div>
-            <p style="font-size:0.78rem; color:#94A3B8;">Zoom में जुड़ते ही नीचे बाईं तरफ <strong>'Join Audio'</strong> दबाकर <strong>'Wifi or Cellular Data'</strong> चुनें।</p>
+            <p style="font-size:0.78rem; color:#94A3B8;">Zoom में जुड़ते ही नीचे बाईं तरफ <strong>'Join Audio'</strong>
+              दबाकर <strong>'Wifi or Cellular Data'</strong> चुनें।</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- =========================================
-         9. FAQS ACCORDION
+         8. FAQS ACCORDION
          ========================================== -->
     <section id="sec_faqs" class="wb-tube-section">
       <div class="wb-card">
-        <div style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+        <div
+          style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
           <i class="fa-solid fa-circle-question" style="color:#F59E0B;"></i>
           <span>अक्सर पूछे जाने वाले सवाल (FAQs)</span>
         </div>
@@ -1252,30 +1521,40 @@
   </main>
 
   <!-- =========================================
-       IN-APP VERTICAL REELS SWIPE PLAYER MODAL
+       IN-APP VERTICAL REELS SWIPE PLAYER MODAL (UP/DOWN GESTURE & SCREEN FIT)
        ========================================== -->
   <div id="wb_reels_modal" class="wb-reels-modal">
-    <div class="wb-reels-container">
+    <div class="wb-reels-container" id="wb_reels_swipe_container">
       <div class="wb-reels-top">
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="width:8px; height:8px; background:#F43F5E; border-radius:50%;"></span>
           <span style="font-size:0.85rem; font-weight:800; color:#fff;">AarogyamTube Reels</span>
-          <span id="wb_reel_counter_badge" style="font-size:0.7rem; color:#94A3B8; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">1 / 1</span>
+          <span id="wb_reel_counter_badge"
+            style="font-size:0.7rem; color:#94A3B8; background:rgba(255,255,255,0.15); padding:2px 6px; border-radius:4px;">1
+            / 1</span>
         </div>
         <button type="button" class="wb-reels-close-btn" onclick="window.closeReelsModal()">&times;</button>
       </div>
 
       <div class="wb-reels-body" id="wb_reels_body">
-        <iframe id="wb_reel_iframe" class="wb-reels-iframe" src="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen="true"></iframe>
+        <!-- Main Iframe / Player Container -->
+        <iframe id="wb_reel_iframe" class="wb-reels-iframe" src=""
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowfullscreen="true"></iframe>
       </div>
 
-      <!-- Left / Right Nav Arrows -->
-      <button type="button" class="wb-reels-nav-btn wb-reels-nav-prev" onclick="window.navReel(-1)" title="पिछली रील">
-        <i class="fa-solid fa-chevron-left"></i>
-      </button>
-      <button type="button" class="wb-reels-nav-btn wb-reels-nav-next" onclick="window.navReel(1)" title="अगली रील">
-        <i class="fa-solid fa-chevron-right"></i>
-      </button>
+      <!-- Vertical Up / Down Scroll Arrow Controls -->
+      <div class="wb-reels-vertical-nav">
+        <button type="button" class="wb-vnav-btn" onclick="window.navReel(-1)" title="पिछली रील (Swipe Down)">
+          <i class="fa-solid fa-chevron-up"></i>
+          <span style="font-size:0.6rem;">Prev</span>
+        </button>
+        <button type="button" class="wb-vnav-btn" onclick="window.navReel(1)" title="अगली रील (Swipe Up)"
+          style="background:#F43F5E;border-color:#F43F5E;">
+          <i class="fa-solid fa-chevron-down"></i>
+          <span style="font-size:0.6rem;">Next</span>
+        </button>
+      </div>
 
       <!-- Right Floating Action Rail -->
       <div class="wb-reels-rail">
@@ -1304,17 +1583,76 @@
       <div class="wb-reels-caption">
         <div id="wb_reel_caption_title" class="wb-reels-caption-title">रील शीर्षक</div>
         <div id="wb_reel_caption_speaker" class="wb-reels-caption-speaker">आरोग्यम कृषि विशेषज्ञ</div>
-        <a id="wb_reel_direct_app_btn" href="#" target="_blank" style="display:none; margin-top:6px; background:#1877F2; color:#fff; padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:700; text-decoration:none; width:fit-content;">
+        <a id="wb_reel_direct_app_btn" href="#" target="_blank"
+          style="display:none; margin-top:6px; background:#1877F2; color:#fff; padding:6px 12px; border-radius:6px; font-size:0.75rem; font-weight:800; text-decoration:none; width:fit-content; box-shadow:0 3px 10px rgba(24,119,242,0.4);">
           ▶️ Open in App
         </a>
       </div>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="wb-footer">
-    <div style="max-width:1200px; margin:0 auto;">
-      © 2026 Aarogyam India. All Rights Reserved. • सुरक्षित, अधिकृत व लाइव ज़ूम ट्रेनिंग एवं AarogyamTube हब
+  <!-- =========================================
+       UNIVERSAL HOMEPAGE FOOTER (MATCHES INDEX.HTML)
+       ========================================== -->
+  <footer style="background:#090d16;color:#ffffff;padding:45px 0 25px 0;margin-top:40px;border-top:2px solid #1e293b;">
+    <div class="container" style="max-width:1200px;margin:0 auto;padding:0 16px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;margin-bottom:30px;">
+
+        <!-- Brand Info -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:42px;width:auto;">
+            <span style="font-weight:900;font-size:1.2rem;letter-spacing:-0.5px;">AAROGYAM <span
+                style="color:#ff671f;">INDIA</span></span>
+          </div>
+          <p style="font-size:0.86rem;color:#94a3b8;line-height:1.6;">
+            किसानों, युवाओं और परिवारों के लिए भारत का अग्रणी डिजिटल ई-कॉमर्स एवं लाइव ट्रेनिंग लर्निंग प्लेटफॉर्म।
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">त्वरित नेविगेशन</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/index.html" style="color:#94a3b8;text-decoration:none;">🏠 मुख्य पृष्ठ</a></li>
+            <li><a href="/ebooks/ebook.html" style="color:#94a3b8;text-decoration:none;">📚 ई-बुक स्टोर</a></li>
+            <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;text-decoration:none;">🌱 कृषि हब</a></li>
+            <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;text-decoration:none;">🌾 खरीफ
+                मास्टर गाइड 2026</a></li>
+            <li><a href="/ebooks/kheti-dr.html" style="color:#94a3b8;text-decoration:none;">🩺 खेती का डॉक्टर</a></li>
+          </ul>
+        </div>
+
+        <!-- Utilities -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सेवाएं व टूल्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/crop-doctor.html" style="color:#94a3b8;text-decoration:none;">🔬 फसल डॉक्टर AI</a></li>
+            <li><a href="/mandi.html" style="color:#94a3b8;text-decoration:none;">🌾 लाइव मंडी भाव</a></li>
+            <li><a href="/weather.html" style="color:#94a3b8;text-decoration:none;">⛅ मौसम पूर्वानुमान</a></li>
+            <li><a href="/webinar.html" style="color:#94a3b8;text-decoration:none;">📺 लाइव वेबिनार हब</a></li>
+            <li><a href="/subscription.html" style="color:#94a3b8;text-decoration:none;">👑 Pro VIP पास</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Support -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सहायता केंद्र</h3>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
+          <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%2C%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20Aarogyam%20India%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F"
+            target="_blank"
+            style="background:#25D366;color:#fff;padding:8px 16px;border-radius:20px;text-decoration:none;font-weight:800;font-size:0.82rem;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
+          </a>
+        </div>
+
+      </div>
+
+      <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
+        © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+      </div>
     </div>
   </footer>
 
@@ -1328,53 +1666,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // Universal Menu & Login Handlers
-    window.toggleMenu = function () {
-      const overlay = document.getElementById('sideMenuOverlay');
-      const menu = document.getElementById('sideMenu');
-      if (menu) menu.classList.toggle('active');
-      if (overlay) overlay.classList.toggle('active');
-    };
-
-    window.openLoginPopup = function () {
-      if (typeof window.openGuestLoginModal === 'function') {
-        window.openGuestLoginModal();
-        return;
-      }
-      const overlay = document.getElementById('login-popup-overlay');
-      if (overlay) overlay.style.display = 'flex';
-    };
-
-    window.closeLoginPopup = function () {
-      const overlay = document.getElementById('login-popup-overlay');
-      if (overlay) overlay.style.display = 'none';
-      if (typeof window.closeGuestLoginModal === 'function') {
-        window.closeGuestLoginModal();
-      }
-    };
-
-    window.checkUserLogin = function () {
-      const mob = (document.getElementById('login-mobile')?.value || '').trim();
-      if (mob.length === 10) {
-        localStorage.setItem('aim_user_mobile', mob);
-        localStorage.setItem('aim_user_name', 'प्रतिभागी ' + mob.slice(-4));
-        closeLoginPopup();
-        window.location.reload();
-      } else {
-        alert('कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें।');
-      }
-    };
-
-    window.logoutUniversalUser = function () {
-      if (confirm('क्या आप सचमुच लॉगआउट करना चाहते हैं?')) {
-        localStorage.removeItem('aim_user_name');
-        localStorage.removeItem('aim_user_mobile');
-        localStorage.removeItem('AI_USER');
-        localStorage.removeItem('AI_PROFILE');
-        window.location.reload();
-      }
-    };
-
     // Horizontal Scroll for Reels Row
     window.scrollReelsRow = function (dir) {
       const grid = document.getElementById('wb_shorts_grid');
@@ -1384,6 +1675,8 @@
     (function () {
       'use strict';
 
+      const DEFAULT_AAROGYAMTUBE_THUMB = '/images/banners/aarogyamtube-default-thumb.svg';
+
       const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
       const SUPABASE_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
       let db = null;
@@ -1391,7 +1684,7 @@
         if (window.supabase && typeof window.supabase.createClient === 'function') {
           db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         }
-      } catch (e) {}
+      } catch (e) { }
 
       const urlParams = new URLSearchParams(window.location.search);
       const webinarId = urlParams.get('id') || urlParams.get('wb') || 'WB_MASTER';
@@ -1461,6 +1754,7 @@
         renderFaqs();
         startLiveCountdown();
         checkUserSessionStatus();
+        setupReelsSwipeGestures();
 
         if (specificVid) {
           openSpecificVideoOrReel(specificVid);
@@ -1476,7 +1770,7 @@
             const wm = json.webinarMaster || json || {};
             if (wm.title) masterData = { ...masterData, ...wm };
           }
-        } catch (e) {}
+        } catch (e) { }
 
         // Step 2: Overlay LocalStorage draft on admin device (Book landing exact pattern)
         try {
@@ -1485,7 +1779,7 @@
             const parsed = JSON.parse(directStored);
             if (parsed && parsed.title) masterData = { ...masterData, ...parsed };
           }
-        } catch (e) {}
+        } catch (e) { }
 
         try {
           const localStored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
@@ -1493,7 +1787,7 @@
           if (match && match.webinar_data) {
             masterData = { ...masterData, ...match.webinar_data, title: match.title || masterData.title };
           }
-        } catch (e) {}
+        } catch (e) { }
 
         // Step 3: Permanent Supabase Cloud Sync
         if (db) {
@@ -1502,7 +1796,7 @@
             if (data && data.webinar_data) {
               masterData = { ...masterData, ...data.webinar_data, title: data.title || masterData.title };
             }
-          } catch (e) {}
+          } catch (e) { }
         }
       }
 
@@ -1516,7 +1810,7 @@
             const list = Array.isArray(json.recordings) ? json.recordings : (Array.isArray(json) ? json : []);
             if (list.length > 0) allRecordings = list;
           }
-        } catch (e) {}
+        } catch (e) { }
 
         // Step 2: Overlay LocalStorage drafts on admin device
         try {
@@ -1528,7 +1822,7 @@
               else allRecordings.unshift(dr);
             });
           }
-        } catch (e) {}
+        } catch (e) { }
 
         try {
           const localVideos = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
@@ -1539,7 +1833,7 @@
               else allRecordings.unshift(lv);
             });
           }
-        } catch (e) {}
+        } catch (e) { }
 
         // Step 3: Permanent Supabase Cloud Sync
         if (db) {
@@ -1550,6 +1844,7 @@
                 const rec = row.webinar_data || {
                   id: row.id,
                   title: row.title,
+                  description: row.message,
                   subject: row.message,
                   category: row.message || 'Shorts & Reels',
                   video_url: row.media_url,
@@ -1562,7 +1857,7 @@
                 else allRecordings.unshift(rec);
               });
             }
-          } catch (e) {}
+          } catch (e) { }
         }
       }
 
@@ -1573,10 +1868,10 @@
         document.getElementById('wb_title').textContent = masterData.title;
         document.getElementById('wb_desc').textContent = masterData.description || masterData.desc || '';
         document.getElementById('wb_duration_label').textContent = `${masterData.duration_minutes || 90} मिनट`;
-        
+
         if (masterData.cover_image) {
           const coverEl = document.getElementById('wb_cover_img');
-          if (coverEl) coverEl.src = masterData.cover_image;
+          if (coverEl) coverEl.src = masterData.cover_image.includes('?') ? masterData.cover_image : (masterData.cover_image + '?v=' + Date.now());
         }
 
         // Render Multi-Banners & Posters Section
@@ -1596,11 +1891,11 @@
               const bUrl = typeof bItem === 'object' ? (bItem.url || bItem.image) : bItem;
               const bTitle = typeof bItem === 'object' ? (bItem.title || bItem.name || '') : '';
               return `
-                <div style="background:#131E36; border:1.5px solid rgba(45,140,255,0.3); border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.4); display:flex; flex-direction:column;">
+                <div class="wb-poster-card">
                   <div style="aspect-ratio:16/9; background:#0f172a; overflow:hidden;">
-                    <img src="${bUrl}" alt="${bTitle || 'Banner'}" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.parentElement.parentElement.style.display='none'">
+                    <img src="${bUrl}" alt="${bTitle || 'Banner'}" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease;" onerror="this.parentElement.parentElement.style.display='none'">
                   </div>
-                  ${bTitle ? `<div style="padding:10px 14px; font-weight:800; font-size:0.88rem; color:#FFFFFF; background:#0F172A; border-top:1px solid rgba(255,255,255,0.08);">${bTitle}</div>` : ''}
+                  ${bTitle ? `<div style="padding:12px 14px; font-weight:800; font-size:0.9rem; color:#FFFFFF; background:#0F172A; border-top:1px solid rgba(255,255,255,0.08);">${bTitle}</div>` : ''}
                 </div>
               `;
             }).join('');
@@ -1717,9 +2012,6 @@
         localStorage.setItem('AI_USER', JSON.stringify(userObj));
         sessionStorage.setItem(`wb_reg_${webinarId}`, 'true');
 
-        const menuName = document.getElementById('menuUserName');
-        if (menuName) menuName.textContent = name;
-
         // Instantly unlock UI without network delay
         showUnlockedScreen();
 
@@ -1736,7 +2028,7 @@
                 notes: `Registered for Webinar: ${masterData.title}`,
                 event_type: 'webinar_registration'
               }]);
-            } catch (err) {}
+            } catch (err) { }
           }, 50);
         }
       });
@@ -1747,8 +2039,6 @@
         const isReg = sessionStorage.getItem(`wb_reg_${webinarId}`);
 
         if (uName || uMobile || isReg) {
-          const menuName = document.getElementById('menuUserName');
-          if (menuName && uName) menuName.textContent = uName;
           showUnlockedScreen();
         }
       }
@@ -1771,7 +2061,7 @@
         document.getElementById('wb_direct_join_btn').href = joinUrl || 'https://zoom.us/join';
       }
 
-      window.copyWbCred = function(type) {
+      window.copyWbCred = function (type) {
         const val = type === 'mid' ? masterData.meeting_id : masterData.passcode;
         if (!val) { alert('डिटेल अभी उपलब्ध नहीं है।'); return; }
         navigator.clipboard.writeText(val).then(() => {
@@ -1780,32 +2070,32 @@
       };
 
       // Social Share Handlers
-      window.shareWbWhatsApp = function() {
+      window.shareWbWhatsApp = function () {
         const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
-        const msg = `🔴 *${masterData.title}*\n\n📅 समय: ${document.getElementById('wb_date_label')?.textContent || 'आज का लाइव सत्र'}\n\n👉 *मुफ्त ज़ूम लिंक व सीट बुकिंग के लिए यहाँ क्लिक करें:*\n${shareLink}\n\n(ज़ूम लिंक और पासवर्ड समय पर खुलेगा)\n\nसादर,\n${localStorage.getItem('aim_user_name') || 'Aarogyam India'}`;
+        const msg = `🔴 *${masterData.title}*\n\n📅 समय: ${document.getElementById('wb_date_label')?.textContent || 'आज का लाइव सत्र'}\n\n👉 *मुफ्त ज़ूम लिंक व सीट बुकिंग के लिए यहाँ क्लिक करें:*\n${shareLink}\n\n(ज़ूम लिंक और पासवर्ड समय पर खुलेगा)\n\n सादर,\n${localStorage.getItem('aim_user_name') || 'Aarogyam India'}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
       };
 
-      window.shareWbFacebook = function() {
+      window.shareWbFacebook = function () {
         const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`, '_blank', 'width=600,height=400');
       };
 
-      window.copyWbShareLink = function() {
+      window.copyWbShareLink = function () {
         const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
         navigator.clipboard.writeText(shareLink).then(() => {
           alert('📋 रेफरल शेयर लिंक कॉपी हो गया:\n' + shareLink);
         });
       };
 
-      window.shareWbNative = function() {
+      window.shareWbNative = function () {
         const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
         if (navigator.share) {
           navigator.share({
             title: masterData.title,
             text: masterData.description || 'Aarogyam India Live Zoom Masterclass',
             url: shareLink
-          }).catch(() => {});
+          }).catch(() => { });
         } else {
           window.shareWbWhatsApp();
         }
@@ -1818,8 +2108,8 @@
         const grid = document.getElementById('wb_shorts_grid');
         if (!grid) return;
 
-        let shortsList = allRecordings.filter(v => 
-          v.status !== 'inactive' && 
+        let shortsList = allRecordings.filter(v =>
+          v.status !== 'inactive' &&
           (v.format === 'short_reel' || v.id.startsWith('VID_S') || v.category === 'Shorts & Reels' || v.platform === 'instagram' || v.platform === 'facebook')
         );
 
@@ -1840,13 +2130,12 @@
           if (plat === 'instagram') platIcon = '<i class="fa-brands fa-instagram"></i> Reel';
           if (plat === 'facebook') platIcon = '<i class="fa-brands fa-facebook"></i> Reel';
 
-          const fallbackCover = plat === 'instagram' ? '/images/banners/agriculture-hero-banner-2.webp' : '/images/banners/agriculture-hero-banner-1.webp';
-          const thumb = r.thumbnail || fallbackCover;
+          const thumb = r.thumbnail || DEFAULT_AAROGYAMTUBE_THUMB;
 
           return `
             <div class="wb-reel-card" onclick="window.openReelPlayer(${idx})">
               <div class="wb-reel-thumb-wrap">
-                <img src="${thumb}" alt="${r.title}" class="wb-reel-thumb-img" onerror="this.onerror=null; this.src='${fallbackCover}'">
+                <img src="${thumb}" alt="${r.title}" class="wb-reel-thumb-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
                 <span class="wb-reel-plat-badge plat-${plat}">${platIcon}</span>
                 <span class="wb-reel-duration-badge">⏱️ ${r.duration || '0:58'}</span>
                 <div class="wb-reel-play-overlay">
@@ -1874,24 +2163,40 @@
         activeShortsFilter = chip.dataset.platform || 'all';
         renderShortsAndReels();
       });
+// See More toggle for Shorts grid
+const wbShortsSeeMoreBtn = document.getElementById('wb_shorts_see_more');
+if (wbShortsSeeMoreBtn) {
+  wbShortsSeeMoreBtn.addEventListener('click', () => {
+    const grid = document.getElementById('wb_shorts_grid');
+    if (!grid) return;
+    const expanded = grid.classList.toggle('expanded');
+    wbShortsSeeMoreBtn.setAttribute('aria-expanded', expanded);
+    wbShortsSeeMoreBtn.textContent = expanded ? 'Show Less ▲' : 'See More ▼';
+  });
+}
+
 
       // -------------------------------------------------------------
-      // 5. IN-APP REELS PLAYER ENGINE (LIKE, COMMENT, INFINITE LOOP)
+      // 5. IN-APP REELS PLAYER ENGINE (SWIPE GESTURE, FULLSCREEN FIT & BUTTON HIDING)
       // -------------------------------------------------------------
-      window.openReelPlayer = function(idx) {
+      window.openReelPlayer = function (idx) {
         if (!activeReelsList || activeReelsList.length === 0) return;
         currentReelIndex = idx;
         loadReelAtIndex(currentReelIndex);
+
         document.getElementById('wb_reels_modal')?.classList.add('active');
+        // Hide floating action buttons & bottom nav
+        document.body.classList.add('wb-reels-open');
       };
 
-      window.closeReelsModal = function() {
+      window.closeReelsModal = function () {
         document.getElementById('wb_reels_modal')?.classList.remove('active');
+        document.body.classList.remove('wb-reels-open');
         const ifr = document.getElementById('wb_reel_iframe');
         if (ifr) ifr.src = '';
       };
 
-      window.navReel = function(delta) {
+      window.navReel = function (delta) {
         if (!activeReelsList || activeReelsList.length === 0) return;
         currentReelIndex += delta;
         // Infinite Loop
@@ -1948,7 +2253,54 @@
         document.getElementById('wb_reel_wa_btn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`;
       }
 
-      window.likeCurrentReel = function() {
+      // Vertical Touch Gesture Swipe & Scroll Wheel for YouTube Shorts experience
+      function setupReelsSwipeGestures() {
+        const modal = document.getElementById('wb_reels_modal');
+        if (!modal) return;
+
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        modal.addEventListener('touchstart', (e) => {
+          touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        modal.addEventListener('touchend', (e) => {
+          touchEndY = e.changedTouches[0].screenY;
+          const diff = touchStartY - touchEndY;
+          // Swipe Up -> Next Reel
+          if (diff > 60) {
+            window.navReel(1);
+          }
+          // Swipe Down -> Prev Reel
+          else if (diff < -60) {
+            window.navReel(-1);
+          }
+        }, { passive: true });
+
+        // Mouse Wheel Scroll up/down
+        let wheelTimeout = null;
+        modal.addEventListener('wheel', (e) => {
+          if (wheelTimeout) return;
+          if (e.deltaY > 50) {
+            window.navReel(1);
+            wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 400);
+          } else if (e.deltaY < -50) {
+            window.navReel(-1);
+            wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 400);
+          }
+        }, { passive: true });
+
+        // Keyboard Arrow Keys (Up/Down)
+        window.addEventListener('keydown', (e) => {
+          if (!document.getElementById('wb_reels_modal')?.classList.contains('active')) return;
+          if (e.key === 'ArrowDown') { window.navReel(1); e.preventDefault(); }
+          if (e.key === 'ArrowUp') { window.navReel(-1); e.preventDefault(); }
+          if (e.key === 'Escape') { window.closeReelsModal(); }
+        });
+      }
+
+      window.likeCurrentReel = function () {
         const icon = document.getElementById('wb_reel_like_icon');
         const countEl = document.getElementById('wb_reel_like_count');
         if (icon) {
@@ -1958,14 +2310,14 @@
         if (countEl) countEl.textContent = 'Liked ❤️';
       };
 
-      window.openReelComments = function() {
+      window.openReelComments = function () {
         const comment = prompt('इस रील पर अपनी प्रतिक्रिया (Comment) लिखें:');
         if (comment && comment.trim()) {
           alert('✅ आपकी प्रतिक्रिया पोस्ट हो गई है! धन्यवाद।');
         }
       };
 
-      window.copyReelLink = function() {
+      window.copyReelLink = function () {
         const currentReel = activeReelsList[currentReelIndex];
         if (!currentReel) return;
         const link = `https://aarogyamindia.online/webinar.html?vid=${encodeURIComponent(currentReel.id)}&ref=${encodeURIComponent(refShareId)}`;
@@ -1989,10 +2341,10 @@
         const grid = document.getElementById('wb_videos_grid');
         if (!grid) return;
 
-        let vList = allRecordings.filter(v => 
-          v.status !== 'inactive' && 
-          v.format !== 'short_reel' && 
-          !v.id.startsWith('VID_S') && 
+        let vList = allRecordings.filter(v =>
+          v.status !== 'inactive' &&
+          v.format !== 'short_reel' &&
+          !v.id.startsWith('VID_S') &&
           v.category !== 'Shorts & Reels'
         );
 
@@ -2007,13 +2359,12 @@
 
         grid.innerHTML = vList.map(v => {
           const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url) || '';
-          const fallback = '/images/banners/agriculture-hero-banner-1.webp';
-          const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : fallback);
+          const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : DEFAULT_AAROGYAMTUBE_THUMB);
 
           return `
             <div class="wb-vcard" onclick="window.openVideoModal('${v.id}')">
               <div class="wb-vcard-thumb-wrap">
-                <img src="${thumb}" alt="${v.title}" class="wb-vcard-img" onerror="this.onerror=null; this.src='${fallback}'">
+                <img src="${thumb}" alt="${v.title}" class="wb-vcard-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
                 <span class="wb-reel-duration-badge">⏱️ ${v.duration || '45 मिनट'}</span>
                 <div class="wb-reel-play-overlay">
                   <div class="wb-reel-play-icon"><i class="fa-solid fa-play"></i></div>
@@ -2040,7 +2391,7 @@
         renderMasterclassVideos();
       });
 
-      window.openVideoModal = function(vId) {
+      window.openVideoModal = function (vId) {
         const match = allRecordings.find(x => x.id === vId);
         if (!match) return;
         const ytId = match.youtube_id || extractYoutubeVideoId(match.video_url);
@@ -2084,4 +2435,5 @@
     })();
   </script>
 </body>
+
 </html>

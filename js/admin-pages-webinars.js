@@ -343,13 +343,13 @@ export async function initWebinars() {
     </div>
 
     <!-- MODAL: ADD / EDIT VIDEO OR REEL -->
-    <div id="modal-video-editor" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 16px;">
-      <div style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; max-width: 540px; width: 100%; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+    <div id="modal-video-editor" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 16px; overflow-y: auto;">
+      <div style="background: #1e293b; border: 1.5px solid #334155; border-radius: 14px; max-width: 600px; width: 100%; padding: 24px; box-shadow: 0 10px 45px rgba(0,0,0,0.7); max-height: 90vh; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h4 style="font-weight: 800; font-size: 1.1rem; color: #fff;" id="modal-video-title">
+          <h4 style="font-weight: 800; font-size: 1.15rem; color: #fff;" id="modal-video-title">
             🎬 नई रील / वीडियो जोड़ें
           </h4>
-          <button type="button" id="btn-close-video-modal" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;">&times;</button>
+          <button type="button" id="btn-close-video-modal" style="background: none; border: none; color: #fff; font-size: 1.3rem; cursor: pointer;">&times;</button>
         </div>
 
         <form id="form-video-editor">
@@ -382,6 +382,36 @@ export async function initWebinars() {
               <input type="text" id="modal_rec_title" class="admin-input" placeholder="उदा. सोयाबीन में इल्ली का 1-स्प्रे रामबाण इलाज" required style="width: 100%;" />
             </div>
 
+            <div>
+              <label class="admin-label">विवरण (Description / Caption):</label>
+              <textarea id="modal_rec_desc" class="admin-input" rows="2" placeholder="वीडियो या रील के बारे में संक्षिप्त जानकारी..." style="width: 100%;"></textarea>
+            </div>
+
+            <!-- Thumbnail Options -->
+            <div>
+              <label class="admin-label">थंबनेल (Thumbnail Cover):</label>
+              <select id="modal_rec_thumb_type" class="admin-select" style="width: 100%; margin-bottom: 6px;">
+                <option value="auto">⚡ Auto (Video URL से स्वतः लें)</option>
+                <option value="aarogyamtube_mono">🛡️ AarogyamTube Official Default Mono</option>
+                <option value="custom_url">🔗 Custom Image URL</option>
+                <option value="custom_upload">📤 नई फोटो अपलोड करें</option>
+              </select>
+              <input type="text" id="modal_rec_custom_thumb_url" class="admin-input" placeholder="https://..." style="width: 100%; display: none; margin-bottom: 6px;" />
+              <input type="file" id="modal_rec_custom_thumb_file" class="admin-input" accept="image/*" style="width: 100%; display: none;" />
+            </div>
+
+            <!-- Live Card Preview -->
+            <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; display: flex; gap: 12px; align-items: center;">
+              <div style="width: 70px; height: 100px; background: #000; border-radius: 6px; overflow: hidden; position: relative;">
+                <img id="modal_rec_preview_img" src="/images/banners/aarogyamtube-default-thumb.svg" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" />
+              </div>
+              <div style="flex: 1;">
+                <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 800;">📺 Live Card Preview:</div>
+                <div id="modal_rec_preview_title" style="font-size: 0.85rem; font-weight: 700; color: #fff; line-height: 1.3;">शीर्षक यहाँ दिखेगा...</div>
+                <div id="modal_rec_preview_meta" style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">आरोग्यम विशेषज्ञ • 0:58</div>
+              </div>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div>
                 <label class="admin-label">विषय / श्रेणी (Category):</label>
@@ -390,7 +420,9 @@ export async function initWebinars() {
                   <option value="Organic Farming">जैविक कृषि</option>
                   <option value="Irrigation Tech">सिंचाई व पोषण</option>
                   <option value="Shorts & Reels">Shorts & Reels</option>
+                  <option value="custom">+ नई श्रेणी जोड़ें (Add Custom)</option>
                 </select>
+                <input type="text" id="modal_rec_custom_category" class="admin-input" placeholder="नई श्रेणी का नाम लिखें..." style="width: 100%; display: none; margin-top: 6px;" />
               </div>
               <div>
                 <label class="admin-label">अवधि (Duration):</label>
@@ -398,16 +430,30 @@ export async function initWebinars() {
               </div>
             </div>
 
-            <div>
-              <label class="admin-label">विशेषज्ञ / वक्ता (Speaker):</label>
-              <input type="text" id="modal_rec_speaker" class="admin-input" placeholder="उदा. डॉ. बी.के. शर्मा (फसल डॉक्टर)" value="आरोग्यम कृषि विशेषज्ञ" style="width: 100%;" />
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label class="admin-label">विशेषज्ञ / वक्ता (Speaker):</label>
+                <input type="text" id="modal_rec_speaker" class="admin-input" placeholder="उदा. डॉ. बी.के. शर्मा" value="आरोग्यम कृषि विशेषज्ञ" style="width: 100%;" />
+              </div>
+              <div>
+                <label class="admin-label">विजिबिलिटी / एक्सेस (Access):</label>
+                <select id="modal_rec_access" class="admin-select" style="width: 100%;">
+                  <option value="all">🌟 सभी के लिए (All Users - Public)</option>
+                  <option value="registration_only">🔒 केवल रजिस्टर्ड यूजर (Only Registered)</option>
+                  <option value="active_only">🟢 केवल एक्टिव यूजर (Only Active)</option>
+                </select>
+              </div>
             </div>
 
             <div style="margin-top: 8px;">
-              <button type="submit" id="btn-save-video-entry" class="admin-button" style="background: #F43F5E; color: #fff; width: 100%; font-weight: 800; padding: 12px;">
-                <span>💾 वीडियो सेव करें (Save Video)</span>
+              <button type="submit" id="btn-save-video-entry" class="admin-button" style="background: #F43F5E; color: #fff; width: 100%; font-weight: 800; padding: 13px; font-size: 0.95rem; box-shadow: 0 4px 16px rgba(244,63,94,0.4);">
+                <span>💾 वीडियो / रील सेव करें (Save Video)</span>
               </button>
             </div>
+          </div>
+        </form>
+      </div>
+    </div>
           </div>
         </form>
       </div>
@@ -901,18 +947,27 @@ export async function initWebinars() {
             <span style="font-weight: 800; font-size: 0.75rem; background: ${isShort ? '#F43F5E' : '#2D8CFF'}; color: #fff; padding: 2px 6px; border-radius: 4px;">
               ${isShort ? '9:16 Reel' : '16:9 Video'}
             </span>
-            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px;">
+            <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px;">
               ${r.platform || 'YouTube'}
+            </span>
+            <div style="margin-top: 4px;">
+              <span style="font-size: 0.65rem; background: ${r.access_tier === 'registration_only' ? '#F59E0B' : (r.access_tier === 'active_only' ? '#10B981' : '#64748B')}; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">
+                ${r.access_tier === 'registration_only' ? '🔒 Registered' : (r.access_tier === 'active_only' ? '🟢 Active' : '🌟 All Users')}
+              </span>
             </div>
           </td>
           <td style="padding: 10px;">
             <div style="font-weight: 700; color: #f8fafc;">${r.title}</div>
             <div style="font-size: 0.75rem; color: #64748b;">${r.speaker || 'आरोग्यम विशेषज्ञ'} • ${r.category || 'General'}</div>
+            ${r.description ? `<div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px; display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">${r.description}</div>` : ''}
           </td>
           <td style="padding: 10px; color: #94a3b8; font-family: monospace;">
             ${r.duration || '0:58'}
           </td>
-          <td style="padding: 10px; text-align: right;">
+          <td style="padding: 10px; text-align: right; white-space: nowrap;">
+            <button type="button" onclick="window.editRecordingItem('${r.id}')" class="admin-button small-button" style="background: rgba(45,140,255,0.15); color: #60a5fa; border: 1px solid #60a5fa; padding: 4px 8px; font-weight: 800; margin-right: 4px;">
+              ✏️ एडिट
+            </button>
             <button type="button" onclick="window.deleteRecordingItem('${r.id}')" class="admin-button small-button" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid #ef4444; padding: 4px 8px; font-weight: 800;">
               &times; हटाएं
             </button>
@@ -921,6 +976,64 @@ export async function initWebinars() {
       `;
     }).join('');
   }
+
+  window.editRecordingItem = function(rId) {
+    const item = allRecordings.find(x => x.id === rId);
+    if (!item) return;
+    editingRecordingId = rId;
+
+    document.getElementById('modal-video-title').textContent = '✏️ वीडियो / रील एडिट करें';
+    document.getElementById('modal_rec_format').value = item.format || (item.id.startsWith('VID_S') ? 'short_reel' : 'full_video');
+    document.getElementById('modal_rec_platform').value = item.platform || 'youtube';
+    document.getElementById('modal_rec_url').value = item.video_url || item.youtube_url || '';
+    document.getElementById('modal_rec_title').value = item.title || '';
+    document.getElementById('modal_rec_desc').value = item.description || '';
+    document.getElementById('modal_rec_duration').value = item.duration || '0:58';
+    document.getElementById('modal_rec_speaker').value = item.speaker || 'आरोग्यम कृषि विशेषज्ञ';
+    document.getElementById('modal_rec_access').value = item.access_tier || 'all';
+
+    const catSelect = document.getElementById('modal_rec_category');
+    const customCatInput = document.getElementById('modal_rec_custom_category');
+    const existingOptions = Array.from(catSelect.options).map(o => o.value);
+    
+    if (existingOptions.includes(item.category)) {
+      catSelect.value = item.category;
+      if (customCatInput) customCatInput.style.display = 'none';
+    } else {
+      catSelect.value = 'custom';
+      if (customCatInput) {
+        customCatInput.style.display = 'block';
+        customCatInput.value = item.category || '';
+      }
+    }
+
+    const thumbTypeSelect = document.getElementById('modal_rec_thumb_type');
+    const customThumbUrlInput = document.getElementById('modal_rec_custom_thumb_url');
+    if (item.thumbnail && item.thumbnail.includes('aarogyamtube-default-thumb')) {
+      thumbTypeSelect.value = 'aarogyamtube_mono';
+      if (customThumbUrlInput) customThumbUrlInput.style.display = 'none';
+    } else if (item.thumbnail && (item.thumbnail.startsWith('http') || item.thumbnail.startsWith('data:'))) {
+      thumbTypeSelect.value = 'custom_url';
+      if (customThumbUrlInput) {
+        customThumbUrlInput.style.display = 'block';
+        customThumbUrlInput.value = item.thumbnail;
+      }
+    } else {
+      thumbTypeSelect.value = 'auto';
+      if (customThumbUrlInput) customThumbUrlInput.style.display = 'none';
+    }
+
+    const previewImg = document.getElementById('modal_rec_preview_img');
+    if (previewImg) previewImg.src = item.thumbnail || '/images/banners/aarogyamtube-default-thumb.svg';
+    
+    const previewTitle = document.getElementById('modal_rec_preview_title');
+    if (previewTitle) previewTitle.textContent = item.title || '';
+
+    const previewMeta = document.getElementById('modal_rec_preview_meta');
+    if (previewMeta) previewMeta.textContent = `${item.speaker || 'आरोग्यम विशेषज्ञ'} • ${item.duration || '0:58'}`;
+
+    if (videoModal) videoModal.style.display = 'flex';
+  };
 
   window.deleteRecordingItem = async function(rId) {
     if (!confirm('क्या आप वाकई इस वीडियो / रील को हटाना चाहते हैं?')) return;
@@ -943,12 +1056,105 @@ export async function initWebinars() {
     showToast('🗑️ वीडियो हटा दिया गया!', 'info');
   };
 
-  // Video Modal Triggers
+  // Video Modal Triggers & Live Previews
   const videoModal = document.getElementById('modal-video-editor');
+  const recUrlInput = document.getElementById('modal_rec_url');
+  const recTitleInput = document.getElementById('modal_rec_title');
+  const recSpeakerInput = document.getElementById('modal_rec_speaker');
+  const recDurationInput = document.getElementById('modal_rec_duration');
+  const recCategorySelect = document.getElementById('modal_rec_category');
+  const recCustomCategoryInput = document.getElementById('modal_rec_custom_category');
+  const recThumbTypeSelect = document.getElementById('modal_rec_thumb_type');
+  const recCustomThumbUrl = document.getElementById('modal_rec_custom_thumb_url');
+  const recCustomThumbFile = document.getElementById('modal_rec_custom_thumb_file');
+  const recPreviewImg = document.getElementById('modal_rec_preview_img');
+  const recPreviewTitle = document.getElementById('modal_rec_preview_title');
+  const recPreviewMeta = document.getElementById('modal_rec_preview_meta');
+
+  function updateVideoModalLivePreview() {
+    const url = (recUrlInput?.value || '').trim();
+    const title = (recTitleInput?.value || '').trim() || 'शीर्षक यहाँ दिखेगा...';
+    const speaker = (recSpeakerInput?.value || '').trim() || 'आरोग्यम विशेषज्ञ';
+    const duration = (recDurationInput?.value || '').trim() || '0:58';
+    const thumbType = recThumbTypeSelect?.value || 'auto';
+
+    if (recPreviewTitle) recPreviewTitle.textContent = title;
+    if (recPreviewMeta) recPreviewMeta.textContent = `${speaker} • ${duration}`;
+
+    let resolvedThumb = '/images/banners/aarogyamtube-default-thumb.svg';
+
+    if (thumbType === 'aarogyamtube_mono') {
+      resolvedThumb = '/images/banners/aarogyamtube-default-thumb.svg';
+    } else if (thumbType === 'custom_url' && recCustomThumbUrl?.value?.trim()) {
+      resolvedThumb = recCustomThumbUrl.value.trim();
+    } else if (thumbType === 'auto') {
+      const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
+      if (ytMatch && ytMatch[1]) {
+        resolvedThumb = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
+      } else if (url.includes('instagram.com')) {
+        resolvedThumb = '/images/banners/agriculture-hero-banner-2.webp';
+      } else {
+        resolvedThumb = '/images/banners/aarogyamtube-default-thumb.svg';
+      }
+    }
+
+    if (recPreviewImg) recPreviewImg.src = resolvedThumb;
+  }
+
+  recUrlInput?.addEventListener('input', () => {
+    const url = recUrlInput.value.trim();
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      document.getElementById('modal_rec_platform').value = 'youtube';
+      if (url.includes('/shorts/')) document.getElementById('modal_rec_format').value = 'short_reel';
+    } else if (url.includes('instagram.com')) {
+      document.getElementById('modal_rec_platform').value = 'instagram';
+      document.getElementById('modal_rec_format').value = 'short_reel';
+    } else if (url.includes('facebook.com') || url.includes('fb.watch')) {
+      document.getElementById('modal_rec_platform').value = 'facebook';
+      document.getElementById('modal_rec_format').value = 'short_reel';
+    }
+    updateVideoModalLivePreview();
+  });
+
+  recTitleInput?.addEventListener('input', updateVideoModalLivePreview);
+  recSpeakerInput?.addEventListener('input', updateVideoModalLivePreview);
+  recDurationInput?.addEventListener('input', updateVideoModalLivePreview);
+
+  recCategorySelect?.addEventListener('change', () => {
+    if (recCategorySelect.value === 'custom') {
+      if (recCustomCategoryInput) recCustomCategoryInput.style.display = 'block';
+    } else {
+      if (recCustomCategoryInput) recCustomCategoryInput.style.display = 'none';
+    }
+  });
+
+  recThumbTypeSelect?.addEventListener('change', () => {
+    const val = recThumbTypeSelect.value;
+    if (recCustomThumbUrl) recCustomThumbUrl.style.display = val === 'custom_url' ? 'block' : 'none';
+    if (recCustomThumbFile) recCustomThumbFile.style.display = val === 'custom_upload' ? 'block' : 'none';
+    updateVideoModalLivePreview();
+  });
+
+  recCustomThumbUrl?.addEventListener('input', updateVideoModalLivePreview);
+  recCustomThumbFile?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        if (recPreviewImg) recPreviewImg.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
   document.getElementById('btn-open-add-video-modal')?.addEventListener('click', () => {
     editingRecordingId = null;
     document.getElementById('form-video-editor')?.reset();
     document.getElementById('modal-video-title').textContent = '🎬 नई रील / वीडियो जोड़ें';
+    if (recCustomCategoryInput) recCustomCategoryInput.style.display = 'none';
+    if (recCustomThumbUrl) recCustomThumbUrl.style.display = 'none';
+    if (recCustomThumbFile) recCustomThumbFile.style.display = 'none';
+    updateVideoModalLivePreview();
     if (videoModal) videoModal.style.display = 'flex';
   });
 
@@ -963,9 +1169,18 @@ export async function initWebinars() {
     const platform = document.getElementById('modal_rec_platform')?.value || 'youtube';
     const url = (document.getElementById('modal_rec_url')?.value || '').trim();
     const title = (document.getElementById('modal_rec_title')?.value || '').trim();
-    const category = document.getElementById('modal_rec_category')?.value || 'Shorts & Reels';
+    const desc = (document.getElementById('modal_rec_desc')?.value || '').trim();
+    
+    let category = document.getElementById('modal_rec_category')?.value || 'Shorts & Reels';
+    if (category === 'custom') {
+      const customCat = (document.getElementById('modal_rec_custom_category')?.value || '').trim();
+      if (customCat) category = customCat;
+      else category = 'General';
+    }
+
     const duration = (document.getElementById('modal_rec_duration')?.value || '').trim() || '0:58';
     const speaker = (document.getElementById('modal_rec_speaker')?.value || '').trim() || 'आरोग्यम कृषि विशेषज्ञ';
+    const accessTier = document.getElementById('modal_rec_access')?.value || 'all';
 
     if (!url || !title) {
       alert('कृपया URL लिंक और शीर्षक भरें।');
@@ -975,16 +1190,17 @@ export async function initWebinars() {
     const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
     const ytId = ytMatch ? ytMatch[1] : '';
 
-    let thumb = platform === 'instagram' ? '/images/banners/agriculture-hero-banner-2.webp' : '/images/banners/agriculture-hero-banner-1.webp';
-    if (platform === 'youtube' && ytId) {
-      thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+    let thumb = recPreviewImg?.src || '/images/banners/aarogyamtube-default-thumb.svg';
+    if (thumb.startsWith('data:') === false && !thumb.includes('http') && !thumb.startsWith('/')) {
+      thumb = '/images/banners/aarogyamtube-default-thumb.svg';
     }
 
     const recObj = {
-      id: (format === 'short_reel' ? 'VID_S' : 'VID_') + String(Date.now()).slice(-6),
+      id: editingRecordingId || ((format === 'short_reel' ? 'VID_S' : 'VID_') + String(Date.now()).slice(-6)),
       format: format,
       platform: platform,
       title: title,
+      description: desc,
       subject: category,
       category: category,
       video_url: url,
@@ -993,12 +1209,17 @@ export async function initWebinars() {
       thumbnail: thumb,
       duration: duration,
       speaker: speaker,
-      access_tier: 'guest',
+      access_tier: accessTier,
       status: 'active',
       created_at: new Date().toISOString()
     };
 
-    allRecordings.unshift(recObj);
+    const exIdx = allRecordings.findIndex(x => x.id === recObj.id);
+    if (exIdx !== -1) {
+      allRecordings[exIdx] = recObj;
+    } else {
+      allRecordings.unshift(recObj);
+    }
 
     // 1. Save LocalStorage
     try {
