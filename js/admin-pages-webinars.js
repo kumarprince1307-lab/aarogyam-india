@@ -185,9 +185,9 @@ export async function initWebinars() {
 
             <!-- Live Cover Preview Box -->
             <div style="text-align: center;">
-              <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">Live Cover Preview:</span>
-              <div style="width: 100%; height: 110px; background: #0f172a; border-radius: 8px; overflow: hidden; border: 1px solid var(--admin-border); display: flex; align-items: center; justify-content: center;">
-                <img id="adm_cover_live_preview" src="/images/banners/agriculture-hero-banner-1.webp" alt="Cover Preview" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/banners/universal-zoom-webinar-og.jpg'" />
+              <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">Live 3D Cover Preview:</span>
+              <div style="width: 100%; height: 130px; background: #0f172a; border-radius: 8px; overflow: hidden; border: 1px solid var(--admin-border); display: flex; align-items: center; justify-content: center; perspective: 800px; padding: 6px;">
+                <img id="adm_cover_live_preview" src="/images/banners/agriculture-hero-banner-1.webp" alt="Cover Preview" style="width: 90%; height: 90%; object-fit: cover; border-radius: 8px; transform: rotateY(-8deg) rotateX(4deg); box-shadow: 0 10px 20px rgba(0,0,0,0.5);" onerror="this.src='/images/banners/universal-zoom-webinar-og.jpg'" />
               </div>
             </div>
           </div>
@@ -195,20 +195,38 @@ export async function initWebinars() {
           <!-- Social Share / OpenGraph Live Preview -->
           <div style="background: rgba(0,0,0,0.25); border-radius: 8px; padding: 14px;">
             <div style="font-weight: 800; font-size: 0.95rem; color: #F59E0B; margin-bottom: 10px;">
-              <i class="fa-solid fa-share-nodes"></i> WhatsApp & Social Share (OG Preview)
+              <i class="fa-solid fa-share-nodes"></i> WhatsApp & Social Share (OG Title, Description & Image)
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 14px;">
               <div>
-                <label class="admin-label">Share Title:</label>
+                <label class="admin-label">WhatsApp Share Title:</label>
                 <input type="text" id="adm_og_title" class="admin-input" placeholder="🔴 Aarogyam India — लाइव ज़ूम वेबिनार" style="width: 100%; margin-bottom: 8px;" />
-                <label class="admin-label">Share Description:</label>
-                <textarea id="adm_og_desc" class="admin-input" rows="2" placeholder="लाइव ज़ूम ट्रेनिंग में भाग लें..." style="width: 100%;"></textarea>
+                
+                <label class="admin-label">WhatsApp Share Description:</label>
+                <textarea id="adm_og_desc" class="admin-input" rows="2" placeholder="लाइव ज़ूम ट्रेनिंग में भाग लें और 1-मिनट के कृषि शॉर्ट्स देखें..." style="width: 100%; margin-bottom: 8px;"></textarea>
+                
+                <label class="admin-label">🖼️ WhatsApp शेयर इमेज (OG Image):</label>
+                <select id="adm_og_image_preset" class="admin-select" style="width: 100%; margin-bottom: 6px;">
+                  <option value="/images/banners/universal-zoom-webinar-og.jpg">📺 Official Live Zoom Webinar OG (1200x630)</option>
+                  <option value="/images/banners/agriculture-hero-banner-1.webp">🌾 Agriculture Hero Banner 1</option>
+                  <option value="/images/banners/agriculture-hero-banner-2.webp">🌿 Agriculture Hero Banner 2</option>
+                  <option value="custom_url">🔗 Custom Image URL दर्ज करें</option>
+                  <option value="custom_upload">📤 नई फोटो अपलोड करें</option>
+                </select>
+                <input type="text" id="adm_og_image_url" class="admin-input" placeholder="https://..." style="width: 100%; display: none; margin-bottom: 6px;" />
+                <input type="file" id="adm_og_image_file" class="admin-input" accept="image/*" style="width: 100%; display: none;" />
               </div>
-              <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px;">
-                <span style="font-size: 0.72rem; color: #64748b; font-weight: 800;">व्हाट्सएप कार्ड प्रीव्यू:</span>
-                <div id="adm_og_card_preview" style="margin-top: 6px; font-size: 0.8rem;">
-                  <div style="font-weight: 800; color: #38bdf8;" id="adm_og_preview_title">🔴 Aarogyam India — लाइव ज़ूम वेबिनार</div>
-                  <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 2px;" id="adm_og_preview_desc">लाइव ज़ूम ट्रेनिंग में भाग लें...</div>
+
+              <!-- Live WhatsApp Card Preview -->
+              <div style="background: #0B141A; border: 1px solid #1f2c34; border-radius: 10px; padding: 10px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.5);">
+                <div style="font-size: 0.72rem; color: #25D366; font-weight: 800; margin-bottom: 6px;">📱 Live WhatsApp Card Preview:</div>
+                <div style="background: #111B21; border-radius: 8px; overflow: hidden; border: 1px solid #202c33;">
+                  <img id="adm_og_preview_img" src="/images/banners/universal-zoom-webinar-og.jpg" alt="OG Image" style="width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;" onerror="this.src='/images/banners/agriculture-hero-banner-1.webp'" />
+                  <div style="padding: 8px 10px;">
+                    <div style="font-size: 0.68rem; color: #8696a0; text-transform: uppercase; letter-spacing: 0.5px;">aarogyamindia.online</div>
+                    <div style="font-weight: 700; color: #e9edef; font-size: 0.82rem; margin: 2px 0;" id="adm_og_preview_title">🔴 Aarogyam India — लाइव ज़ूम वेबिनार</div>
+                    <div style="color: #8696a0; font-size: 0.72rem; line-height: 1.3;" id="adm_og_preview_desc">लाइव ज़ूम ट्रेनिंग में भाग लें...</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -383,7 +401,15 @@ export async function initWebinars() {
       }
     } catch (e) {}
 
-    // Overlay LocalStorage
+    // Overlay Direct LocalStorage (Instant Live Binding)
+    try {
+      const directStored = localStorage.getItem('AAROGYAM_WEBINAR_MASTER');
+      if (directStored) {
+        const parsed = JSON.parse(directStored);
+        if (parsed && parsed.title) masterWebinar = { ...masterWebinar, ...parsed };
+      }
+    } catch (e) {}
+
     try {
       const localStored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
       const match = localStored.find(p => p.id === 'WB_MASTER' || p.category === 'webinar');
@@ -403,6 +429,17 @@ export async function initWebinars() {
     } catch (e) {}
 
     // Overlay LocalStorage recordings
+    try {
+      const directRecs = JSON.parse(localStorage.getItem('AAROGYAM_WEBINAR_RECORDINGS') || '[]');
+      if (Array.isArray(directRecs) && directRecs.length > 0) {
+        directRecs.forEach(dr => {
+          const exIdx = allRecordings.findIndex(x => x.id === dr.id);
+          if (exIdx !== -1) allRecordings[exIdx] = dr;
+          else allRecordings.unshift(dr);
+        });
+      }
+    } catch (e) {}
+
     try {
       const localRecs = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
       if (Array.isArray(localRecs) && localRecs.length > 0) {
@@ -449,11 +486,57 @@ export async function initWebinars() {
     const pt = document.getElementById('adm_og_preview_title');
     const pd = document.getElementById('adm_og_preview_desc');
     if (pt) pt.textContent = t;
+    const ogImg = masterWebinar.og_image || '/images/banners/universal-zoom-webinar-og.jpg';
+    const ogPreviewImg = document.getElementById('adm_og_preview_img');
+    if (ogPreviewImg) ogPreviewImg.src = ogImg;
+
     if (pd) pd.textContent = d;
   }
 
   document.getElementById('adm_og_title')?.addEventListener('input', updateOgPreview);
   document.getElementById('adm_og_desc')?.addEventListener('input', updateOgPreview);
+
+  // OG Image Selector & Uploader
+  const ogPresetSel = document.getElementById('adm_og_image_preset');
+  const ogUrlInp = document.getElementById('adm_og_image_url');
+  const ogFileInp = document.getElementById('adm_og_image_file');
+  const ogPreviewImg = document.getElementById('adm_og_preview_img');
+
+  ogPresetSel?.addEventListener('change', () => {
+    const val = ogPresetSel.value;
+    if (val === 'custom_url') {
+      ogUrlInp.style.display = 'block';
+      ogFileInp.style.display = 'none';
+    } else if (val === 'custom_upload') {
+      ogUrlInp.style.display = 'none';
+      ogFileInp.style.display = 'block';
+    } else {
+      ogUrlInp.style.display = 'none';
+      ogFileInp.style.display = 'none';
+      masterWebinar.og_image = val;
+      if (ogPreviewImg) ogPreviewImg.src = val;
+    }
+  });
+
+  ogUrlInp?.addEventListener('input', () => {
+    if (ogUrlInp.value.trim()) {
+      masterWebinar.og_image = ogUrlInp.value.trim();
+      if (ogPreviewImg) ogPreviewImg.src = ogUrlInp.value.trim();
+    }
+  });
+
+  ogFileInp?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (re) => {
+        masterWebinar.og_image = re.target.result;
+        if (ogPreviewImg) ogPreviewImg.src = re.target.result;
+        showToast('📸 WhatsApp शेयर इमेज लोड हो गई!', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
   // Cover Image Selector & Uploader
   const presetSel = document.getElementById('adm_wb_cover_preset');
@@ -491,7 +574,7 @@ export async function initWebinars() {
       reader.onload = (re) => {
         masterWebinar.cover_image = re.target.result;
         if (previewImg) previewImg.src = re.target.result;
-        showToast('📸 कवर इमेज लोड हो गई!', 'success');
+        showToast('📸 3D कवर इमेज लोड हो गई!', 'success');
       };
       reader.readAsDataURL(file);
     }
@@ -628,22 +711,9 @@ export async function initWebinars() {
     });
     masterWebinar.faqs = faqs;
 
-    // 1. LocalStorage Persistence
+    // 1. Direct LocalStorage Persistence (Instant Live Binding)
     try {
-      let localPages = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
-      const exIdx = localPages.findIndex(p => p.id === 'WB_MASTER');
-      const payload = {
-        id: 'WB_MASTER',
-        title: masterWebinar.title,
-        message: masterWebinar.description,
-        category: 'webinar',
-        status: 'active',
-        webinar_data: masterWebinar
-      };
-      if (exIdx !== -1) localPages[exIdx] = payload;
-      else localPages.unshift(payload);
-    // 1. LocalStorage Persistence
-    try {
+      localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterWebinar));
       let localPages = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
       const exIdx = localPages.findIndex(p => p.id === 'WB_MASTER');
       const payload = {

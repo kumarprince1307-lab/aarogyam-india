@@ -357,22 +357,44 @@
     }
     .wb-kpi-item i { color: var(--emerald); font-size: 0.9rem; }
 
-    /* Hero Right Column: 3D Cover & Registration Form */
+    /* Hero Right Column: 3D Floating Cover */
     .wb-cover-wrap {
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
+      perspective: 1200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 6px 0;
       margin-bottom: 16px;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
-      aspect-ratio: 16/9;
-      background: #0f172a;
+    }
+    @keyframes wbFloat3D {
+      0% {
+        transform: perspective(1200px) rotateY(-8deg) rotateX(4deg) translateY(0px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(45, 140, 255, 0.25);
+      }
+      50% {
+        transform: perspective(1200px) rotateY(-3deg) rotateX(1deg) translateY(-10px);
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.7), 0 0 35px rgba(45, 140, 255, 0.45);
+      }
+      100% {
+        transform: perspective(1200px) rotateY(-8deg) rotateX(4deg) translateY(0px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(45, 140, 255, 0.25);
+      }
     }
     .wb-cover-img {
       width: 100%;
-      height: 100%;
+      max-width: 440px;
+      aspect-ratio: 16/9;
       object-fit: cover;
       display: block;
-      transition: transform 0.4s ease;
+      border-radius: 14px;
+      border: 1.5px solid rgba(45, 140, 255, 0.4);
+      animation: wbFloat3D 5s ease-in-out infinite;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      background: #0f172a;
+    }
+    .wb-cover-img:hover {
+      transform: perspective(1200px) rotateY(0deg) scale(1.03);
+      animation-play-state: paused;
     }
 
     /* Registration Form Card */
@@ -1393,7 +1415,15 @@
           }
         } catch (e) {}
 
-        // Step 2: Overlay LocalStorage draft on admin device
+        // Step 2: Overlay LocalStorage draft on admin device (Book landing exact pattern)
+        try {
+          const directStored = localStorage.getItem('AAROGYAM_WEBINAR_MASTER');
+          if (directStored) {
+            const parsed = JSON.parse(directStored);
+            if (parsed && parsed.title) masterData = { ...masterData, ...parsed };
+          }
+        } catch (e) {}
+
         try {
           const localStored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
           const match = localStored.find(p => p.id === webinarId || p.id === 'WB_MASTER' || p.category === 'webinar');
@@ -1426,6 +1456,17 @@
         } catch (e) {}
 
         // Step 2: Overlay LocalStorage drafts on admin device
+        try {
+          const directRecs = JSON.parse(localStorage.getItem('AAROGYAM_WEBINAR_RECORDINGS') || '[]');
+          if (Array.isArray(directRecs) && directRecs.length > 0) {
+            directRecs.forEach(dr => {
+              const exIdx = allRecordings.findIndex(x => x.id === dr.id);
+              if (exIdx !== -1) allRecordings[exIdx] = dr;
+              else allRecordings.unshift(dr);
+            });
+          }
+        } catch (e) {}
+
         try {
           const localVideos = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
           if (Array.isArray(localVideos) && localVideos.length > 0) {
