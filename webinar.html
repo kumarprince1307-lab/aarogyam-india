@@ -1082,12 +1082,24 @@
             <span>Join Zoom Meeting</span>
           </a>
 
-          <button type="button" id="wb_btn_share_invite" class="wb-btn-primary" style="margin-top:8px; background:rgba(37,211,102,0.15); border:1px solid #25D366; color:#25D366;">
-            <i class="fa-brands fa-whatsapp"></i>
-            <span>व्हाट्सएप पर इनवाइट भेजें</span>
-          </button>
         </div>
 
+      </div>
+    </section>
+
+    <!-- HERO MULTI-BANNERS SECTION -->
+    <section id="sec_banners" class="wb-tube-section" style="display:none;">
+      <div class="wb-tube-header">
+        <div class="wb-tube-brand">
+          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #10B981, #059669);"><i class="fa-solid fa-images"></i></div>
+          <div>
+            <div class="wb-tube-title">🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स</div>
+            <div class="wb-tube-subtitle">नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स</div>
+          </div>
+        </div>
+      </div>
+      <div id="wb_banners_slider" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+        <!-- Dynamic Banners Rendered by JS -->
       </div>
     </section>
 
@@ -1238,6 +1250,32 @@
     </div>
   </div>
 
+  <!-- IN-PAGE LOGIN / REGISTRATION MODAL -->
+  <div id="wb_login_popup_modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:16px;">
+    <div style="background:#1e293b; border:1.5px solid #334155; border-radius:16px; max-width:400px; width:100%; padding:24px; box-shadow:0 20px 50px rgba(0,0,0,0.6); position:relative;">
+      <button type="button" onclick="window.closeLoginPopup()" style="position:absolute; top:14px; right:14px; background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer;">&times;</button>
+      <div style="text-align:center; margin-bottom:16px;">
+        <div style="font-size:2.2rem; margin-bottom:6px;">🔑</div>
+        <h3 style="font-size:1.15rem; font-weight:800; color:#fff; margin-bottom:4px;">Aarogyam India में लॉगिन करें</h3>
+        <p style="font-size:0.8rem; color:#94a3b8; margin:0;">अपना नाम और मोबाइल नंबर डालकर तुरंत लॉगिन करें:</p>
+      </div>
+      <form id="wb_modal_login_form">
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:0.78rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">आपका नाम: *</label>
+          <input type="text" id="wb_modal_login_name" class="wb-input" placeholder="उदा. राहुल शर्मा" required />
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:0.78rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">10 अंकों का मोबाइल नंबर: *</label>
+          <input type="tel" id="wb_modal_login_mobile" class="wb-input" placeholder="उदा. 9876543210" pattern="[0-9]{10}" maxlength="10" required />
+        </div>
+        <button type="submit" class="wb-btn-primary" style="width:100%;">
+          <span>लॉगिन / जारी रखें</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="wb-footer">
     <div style="max-width:1200px; margin:0 auto;">
@@ -1247,6 +1285,7 @@
 
   <!-- Scripts -->
   <script src="/session.js"></script>
+  <script src="/js/global-guest-modal.js"></script>
   <script src="/js/user-notifications.js?v=12.0"></script>
   <script src="/js/recent-purchase-toast.js"></script>
   <script src="/js/universal-nav-drawer.js"></script>
@@ -1254,6 +1293,34 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
+    // Global Login / Modal Hooks
+    window.openLoginPopup = function () {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal();
+        return;
+      }
+      const modal = document.getElementById('wb_login_popup_modal');
+      if (modal) modal.style.display = 'flex';
+    };
+
+    window.closeLoginPopup = function () {
+      const modal = document.getElementById('wb_login_popup_modal');
+      if (modal) modal.style.display = 'none';
+      if (typeof window.closeGuestLoginModal === 'function') {
+        window.closeGuestLoginModal();
+      }
+    };
+
+    window.logoutUniversalUser = function () {
+      if (confirm('क्या आप सचमुच लॉगआउट करना चाहते हैं?')) {
+        localStorage.removeItem('aim_user_name');
+        localStorage.removeItem('aim_user_mobile');
+        localStorage.removeItem('AI_USER');
+        localStorage.removeItem('AI_PROFILE');
+        window.location.reload();
+      }
+    };
+
     (function () {
       'use strict';
 
@@ -1280,6 +1347,10 @@
         meeting_id: '',
         passcode: '',
         cover_image: '/images/banners/agriculture-hero-banner-1.webp',
+        banners: [
+          '/images/banners/agriculture-hero-banner-1.webp',
+          '/images/banners/agriculture-hero-banner-2.webp'
+        ],
         price: 0,
         duration_minutes: 90,
         kpis: [],
@@ -1358,7 +1429,7 @@
       }
 
       // -------------------------------------------------------------
-      // 2. RENDER WEBINAR DETAILS & TIMER
+      // 2. RENDER WEBINAR DETAILS, BANNERS & TIMER
       // -------------------------------------------------------------
       function renderWebinarDetails() {
         document.getElementById('wb_title').textContent = masterData.title;
@@ -1368,6 +1439,23 @@
         if (masterData.cover_image) {
           const coverEl = document.getElementById('wb_cover_img');
           coverEl.src = masterData.cover_image;
+        }
+
+        // Render Multi-Banners Slider
+        const bannersSection = document.getElementById('sec_banners');
+        const bannersSlider = document.getElementById('wb_banners_slider');
+        const bannersList = Array.isArray(masterData.banners) ? masterData.banners.filter(Boolean) : [];
+        if (bannersSection && bannersSlider) {
+          if (bannersList.length > 0) {
+            bannersSection.style.display = 'block';
+            bannersSlider.innerHTML = bannersList.map(bUrl => `
+              <div style="border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:1.5px solid rgba(45,140,255,0.25); aspect-ratio:16/9; background:#0f172a;">
+                <img src="${bUrl}" alt="Banner" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
+              </div>
+            `).join('');
+          } else {
+            bannersSection.style.display = 'none';
+          }
         }
 
         if (masterData.kpis && masterData.kpis.length > 0) {
