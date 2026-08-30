@@ -3270,74 +3270,81 @@
       }
 
       /**
-       * 1. Load Master Webinar Configuration (Zero-Egress Static Git JSON + Live Cloud Layer)
+       * 1. Load Master Webinar Configuration (Zero-Egress Static Git JSON + Cache Busting)
        */
       async function loadMasterWebinarConfig() {
         let master = {};
-        // Step 1: Load Static Git Master JSON (Zero Supabase Egress)
+        // Step 1: Load Static Git Master JSON with Cache Busting
         try {
-          const gitResp = await fetch('/data/webinar-master.json');
+          let gitResp = await fetch('/data/webinar-master.json?v=' + Date.now());
+          if (!gitResp.ok) gitResp = await fetch('data/webinar-master.json?v=' + Date.now());
+          if (!gitResp.ok) gitResp = await fetch('../data/webinar-master.json?v=' + Date.now());
           if (gitResp.ok) {
             const gitJson = await gitResp.json();
-            master = gitJson.webinarMaster || {};
+            master = gitJson.webinarMaster || gitJson || {};
             if (master.title) webinarData.title = master.title;
-            if (master.description) webinarData.desc = master.description;
+            if (master.description || master.desc) webinarData.desc = master.description || master.desc;
             if (master.cover_image) webinarData.cover_image = master.cover_image;
             if (master.banners && master.banners.length) webinarData.banners = master.banners;
             if (master.youtube_videos && master.youtube_videos.length) webinarData.youtube_links = master.youtube_videos;
+            else if (master.youtube_links && master.youtube_links.length) webinarData.youtube_links = master.youtube_links;
             if (master.section_order && master.section_order.length) webinarData.section_order = master.section_order;
             if (master.hidden_sections) webinarData.hidden_sections = master.hidden_sections;
             if (master.kpis && master.kpis.length) webinarData.kpis = master.kpis;
             if (master.faqs && master.faqs.length) webinarData.faqs = master.faqs;
-            if (master.default_zoom_link) webinarData.zoom_link = master.default_zoom_link;
-            if (master.default_meeting_id) webinarData.meeting_id = master.default_meeting_id;
-            if (master.default_passcode) webinarData.passcode = master.default_passcode;
-            if (master.default_date) {
-              webinarData.datetime = formatHindiDateTime(master.default_date, master.default_time);
-              webinarData.target_timestamp = computeTargetTimestamp(master.default_date, master.default_time);
+            if (master.default_zoom_link || master.zoom_link) webinarData.zoom_link = master.default_zoom_link || master.zoom_link;
+            if (master.default_meeting_id || master.meeting_id) webinarData.meeting_id = master.default_meeting_id || master.meeting_id;
+            if (master.default_passcode || master.passcode) webinarData.passcode = master.default_passcode || master.passcode;
+            if (master.default_price !== undefined || master.price !== undefined) webinarData.price = Number(master.default_price !== undefined ? master.default_price : master.price);
+            if (master.duration_minutes) webinarData.duration_minutes = Number(master.duration_minutes);
+
+            const mDate = master.default_date || master.date;
+            const mTime = master.default_time || master.time;
+            if (mDate) {
+              webinarData.datetime = formatHindiDateTime(mDate, mTime);
+              webinarData.target_timestamp = computeTargetTimestamp(mDate, mTime);
+            } else if (master.datetime) {
+              webinarData.datetime = master.datetime;
             }
           }
-        } catch (e) {}
+        } catch (e) {
+          console.warn('Error loading webinar-master.json:', e);
+        }
 
         let record = null;
 
-        // Step 2: Layer Live Supabase Dynamic Settings (Only a few bytes)
-        if (db) {
+        // Step 2: Check Supabase only if query param specifies a specific custom webinar ID
+        if (db && webinarId && webinarId !== 'WB_MASTER') {
           try {
-            // Priority 1: Specific ID from query param (if not default WB_MASTER)
-            if (webinarId && webinarId !== 'WB_MASTER') {
-              const res1 = await db.from('landing_pages').select('*').eq('id', webinarId).maybeSingle();
-              if (res1.data) record = res1.data;
-            }
-
-            // Priority 2: Master configuration record (WB_MASTER)
-            if (!record) {
-              const res2 = await db.from('landing_pages').select('*').eq('id', 'WB_MASTER').maybeSingle();
-              if (res2.data) record = res2.data;
-            }
-
-            // Priority 3: Latest active record where category = 'webinar'
-            if (!record) {
-              const res3 = await db.from('landing_pages').select('*').eq('category', 'webinar').order('created_at', { ascending: false }).limit(1);
-              if (res3.data && res3.data.length > 0) record = res3.data[0];
-            }
-
-            // Priority 4: Any landing page containing webinar_data
-            if (!record) {
-              const res4 = await db.from('landing_pages').select('*').not('webinar_data', 'is', null).order('created_at', { ascending: false }).limit(1);
-              if (res4.data && res4.data.length > 0) record = res4.data[0];
-            }
+            const res1 = await db.from('landing_pages').select('*').eq('id', webinarId).maybeSingle();
+            if (res1.data) record = res1.data;
           } catch (err) {
-            console.warn('Supabase webinar fetch notice:', err);
+            console.warn('Supabase custom webinar fetch notice:', err);
           }
         }
 
-        // Priority 5: LocalStorage fallback (for offline or local admin testing)
+        // Step 3: LocalStorage fallback (for offline admin draft preview on current device)
         if (!record) {
           try {
             const stored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
-            const localWb = stored.find(p => p.id === 'WB_MASTER' || p.category === 'webinar' || Boolean(p.webinar_data));
-            if (localWb) record = localWb;
+            const localWb = stored.find(p => p.id === webinarId || p.id === 'WB_MASTER');
+            if (localWb && localWb.webinar_data) {
+              // Apply local draft overrides if recently edited
+              const wb = localWb.webinar_data || {};
+              if (wb.meeting_id) webinarData.meeting_id = wb.meeting_id;
+              if (wb.passcode) webinarData.passcode = wb.passcode;
+              if (wb.zoom_link) webinarData.zoom_link = wb.zoom_link;
+              if (wb.cover_image) webinarData.cover_image = wb.cover_image;
+              if (wb.title) webinarData.title = localWb.title || wb.title;
+              if (wb.desc || localWb.message) webinarData.desc = localWb.message || wb.desc;
+              if (wb.kpis && wb.kpis.length) webinarData.kpis = wb.kpis;
+              if (wb.faqs && wb.faqs.length) webinarData.faqs = wb.faqs;
+              if (wb.youtube_links && wb.youtube_links.length) webinarData.youtube_links = wb.youtube_links;
+              if (wb.date) {
+                webinarData.datetime = formatHindiDateTime(wb.date, wb.time);
+                webinarData.target_timestamp = computeTargetTimestamp(wb.date, wb.time);
+              }
+            }
           } catch (e) {}
         }
 
@@ -3400,10 +3407,10 @@
           title: "⚡ सोयाबीन में इल्ली का 1-स्प्रे रामबाण इलाज #Shorts #Farming",
           subject: "कीट नियंत्रण",
           category: "Shorts & Reels",
-          video_url: "https://www.youtube.com/shorts/dQw4w9WgXcQ",
-          youtube_url: "https://www.youtube.com/shorts/dQw4w9WgXcQ",
-          youtube_id: "dQw4w9WgXcQ",
-          thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+          video_url: "https://www.youtube.com/shorts/dQw4w9XcQ",
+          youtube_url: "https://www.youtube.com/shorts/dQw4w9XcQ",
+          youtube_id: "dQw4w9XcQ",
+          thumbnail: "https://img.youtube.com/vi/dQw4w9XcQ/hqdefault.jpg",
           duration: "0:58",
           speaker: "डॉ. बी.के. शर्मा (फसल डॉक्टर)",
           access_tier: "guest",
@@ -3454,10 +3461,10 @@
           title: "🌾 खरीफ फसलों में कीट एवं इल्ली नियंत्रण सम्पूर्ण मास्टरक्लास",
           subject: "कीट नियंत्रण व फसल सुरक्षा",
           category: "Crop Protection",
-          video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          youtube_id: "dQw4w9WgXcQ",
-          thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+          video_url: "https://www.youtube.com/watch?v=dQw4w9XcQ",
+          youtube_url: "https://www.youtube.com/watch?v=dQw4w9XcQ",
+          youtube_id: "dQw4w9XcQ",
+          thumbnail: "https://img.youtube.com/vi/dQw4w9XcQ/hqdefault.jpg",
           duration: "45 मिनट",
           speaker: "डॉ. बी.के. शर्मा (वरिष्ठ कृषि विशेषज्ञ)",
           access_tier: "guest",
@@ -3472,10 +3479,10 @@
           title: "🌱 प्राकृतिक व जैविक खाद निर्माण की सम्पूर्ण विधि व प्रयोग",
           subject: "जैविक कृषि व मृदा सुधार",
           category: "Organic Farming",
-          video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          youtube_id: "dQw4w9WgXcQ",
-          thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+          video_url: "https://www.youtube.com/watch?v=dQw4w9XcQ",
+          youtube_url: "https://www.youtube.com/watch?v=dQw4w9XcQ",
+          youtube_id: "dQw4w9XcQ",
+          thumbnail: "https://img.youtube.com/vi/dQw4w9XcQ/hqdefault.jpg",
           duration: "58 मिनट",
           speaker: "श्री राजेश पटेल (मास्टर ट्रेनर)",
           access_tier: "registered",
@@ -3490,10 +3497,10 @@
           title: "💧 ड्रिप इरीगेशन व फर्टिगेशन से 50% अधिक पैदावार तकनीक",
           subject: "उन्नत सिंचाई व पोषण",
           category: "Irrigation Tech",
-          video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          youtube_id: "dQw4w9WgXcQ",
-          thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+          video_url: "https://www.youtube.com/watch?v=dQw4w9XcQ",
+          youtube_url: "https://www.youtube.com/watch?v=dQw4w9XcQ",
+          youtube_id: "dQw4w9XcQ",
+          thumbnail: "https://img.youtube.com/vi/dQw4w9XcQ/hqdefault.jpg",
           duration: "62 मिनट",
           speaker: "इंजीनियर आलोक वर्मा (सिंचाई विशेषज्ञ)",
           access_tier: "registered",
@@ -3508,10 +3515,10 @@
           title: "👑 आरोग्यम VIP किसान प्राइम स्ट्रेटेजी व मंडी सीक्रेट्स",
           subject: "व्यापार व अधिक लाभ रणनीति",
           category: "VIP Secrets",
-          video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          youtube_id: "dQw4w9WgXcQ",
-          thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+          video_url: "https://www.youtube.com/watch?v=dQw4w9XcQ",
+          youtube_url: "https://www.youtube.com/watch?v=dQw4w9XcQ",
+          youtube_id: "dQw4w9XcQ",
+          thumbnail: "https://img.youtube.com/vi/dQw4w9XcQ/hqdefault.jpg",
           duration: "75 मिनट",
           speaker: "आरोग्यम कोर टीम & एग्री बिजनेस हेड",
           access_tier: "active_subscriber",
@@ -3533,62 +3540,21 @@
       async function loadRecordedTrainings() {
         allRecordings = [...DEFAULT_RECORDINGS];
         try {
-          let resp = await fetch('data/webinar-recordings.json');
-          if (!resp.ok) resp = await fetch('/data/webinar-recordings.json');
+          let resp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
+          if (!resp.ok) resp = await fetch('data/webinar-recordings.json?v=' + Date.now());
+          if (!resp.ok) resp = await fetch('../data/webinar-recordings.json?v=' + Date.now());
           if (resp.ok) {
             const data = await resp.json();
-            if (Array.isArray(data.recordings) && data.recordings.length > 0) {
-              data.recordings.forEach(rec => {
-                const idx = allRecordings.findIndex(x => x.id === rec.id);
-                if (idx !== -1) allRecordings[idx] = rec;
-                else allRecordings.push(rec);
-              });
+            const list = Array.isArray(data.recordings) ? data.recordings : (Array.isArray(data) ? data : []);
+            if (list.length > 0) {
+              allRecordings = list;
             }
           }
-        } catch (e) {}
-
-        // Fetch from Supabase Cloud Table (Ensures cross-device permanent availability)
-        if (db) {
-          try {
-            const { data: supaRecs } = await db.from('landing_pages').select('*').eq('category', 'recorded_video').order('created_at', { ascending: false });
-            if (supaRecs && supaRecs.length > 0) {
-              supaRecs.forEach(sr => {
-                const wData = sr.webinar_data || {};
-                const ytId = wData.youtube_id || extractYoutubeVideoId(sr.media_url) || 'dQw4w9WgXcQ';
-                const fmt = wData.format || (sr.id.startsWith('VID_S') ? 'short_reel' : 'full_video');
-                const plat = wData.platform || (sr.media_url?.includes('instagram') ? 'instagram' : sr.media_url?.includes('facebook') ? 'facebook' : 'youtube');
-
-                const mapped = {
-                  id: sr.id,
-                  format: fmt,
-                  platform: plat,
-                  title: sr.title,
-                  subject: sr.message || wData.category_name || (fmt === 'short_reel' ? 'Shorts & Reels' : 'General'),
-                  category: wData.category_key || sr.message || (fmt === 'short_reel' ? 'Shorts & Reels' : 'General'),
-                  video_url: sr.media_url || `https://www.youtube.com/watch?v=${ytId}`,
-                  youtube_url: sr.media_url || `https://www.youtube.com/watch?v=${ytId}`,
-                  youtube_id: ytId,
-                  thumbnail: sr.thumbnail_url || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
-                  duration: wData.duration || (fmt === 'short_reel' ? '0:58' : '45 मिनट'),
-                  speaker: wData.speaker || 'आरोग्यम कृषि विशेषज्ञ',
-                  access_tier: wData.access_tier || 'guest',
-                  status: sr.status || 'active',
-                  created_at: sr.created_at || new Date().toISOString(),
-                  views_count: wData.views_count || 0
-                };
-                const existingIdx = allRecordings.findIndex(x => x.id === sr.id);
-                if (existingIdx !== -1) {
-                  allRecordings[existingIdx] = mapped;
-                } else {
-                  allRecordings.unshift(mapped);
-                }
-              });
-            }
-          } catch (e) {
-            console.warn('Supabase recordings fetch error:', e);
-          }
+        } catch (e) {
+          console.warn('Error loading webinar-recordings.json:', e);
         }
-        // Also check localStorage for custom added recorded videos
+
+        // Also check localStorage for custom added recorded videos (offline drafts)
         try {
           const localVideos = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
           if (Array.isArray(localVideos) && localVideos.length > 0) {

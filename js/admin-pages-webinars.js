@@ -119,6 +119,12 @@ export async function initWebinars() {
           <button id="btn-toggle-create-recording" class="admin-button" style="background:#059669; color:#fff; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
             <span>🎬</span> <span>+ रिकॉर्डेड वीडियो</span>
           </button>
+          <button type="button" id="btn-export-webinar-master" class="admin-button small-button" style="background:#0284c7; color:#fff; font-weight:800; display:inline-flex; align-items:center; gap:6px;" title="webinar-master.json डाउनलोड करें">
+            <span>📥</span> <span>1-Click Master JSON Export</span>
+          </button>
+          <button type="button" id="btn-export-webinar-recordings" class="admin-button small-button" style="background:#7c3aed; color:#fff; font-weight:800; display:inline-flex; align-items:center; gap:6px;" title="webinar-recordings.json डाउनलोड करें">
+            <span>📥</span> <span>1-Click Recordings JSON Export</span>
+          </button>
           <button id="btn-refresh-webinars" class="admin-button small-button">🔄 Refresh</button>
         </div>
       </div>
@@ -1238,7 +1244,52 @@ export async function initWebinars() {
         }
       } catch (err) {}
 
-      alert(`✅ वेबिनार (${editingWebinarId}) सफलतापूर्वक अपडेट हो गया!`);
+      // Build & Export Master JSON file (just like Book Landing Page Hub)
+      const masterJsonPayload = {
+        webinarMaster: {
+          id: "WB_MASTER",
+          slug: "live-zoom-webinar",
+          status: "active",
+          is_live_active: true,
+          offair_title: "📺 अगला लाइव वेबिनार सत्र जल्द घोषित होगा (Stay Tuned)",
+          offair_message: "वर्तमान में कोई लाइव वेबिनार प्रसारित नहीं हो रहा है। आप नीचे दी गई हमारी पिछली विशेष रिकॉर्डेड ट्रेनिंग क्लासेज देख सकते हैं:",
+          title: title,
+          description: desc || 'आरोग्यम इंडिया के डिजिटल कृषि प्रशिक्षण सत्र में आपका स्वागत है। कृषि विशेषज्ञों से सीधे रूबरू हों और अपनी फसलों की पैदावार, कीट-रोग प्रबंधन और उन्नत जैविक तकनीकों के सटीक समाधान पाएं।',
+          default_date: rawDate || todayStr,
+          default_time: rawTime || '20:30',
+          duration_minutes: duration,
+          default_price: price,
+          default_zoom_link: zoomLink,
+          default_meeting_id: meetingId,
+          default_passcode: passcode,
+          cover_image: finalCoverImage || '/images/banners/universal-zoom-webinar-og.jpg',
+          banners: banners.length ? banners : ['/images/banners/universal-zoom-webinar-og.jpg'],
+          youtube_videos: youtubeLinks.length ? youtubeLinks : ['https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
+          section_order: currentSectionsOrder,
+          hidden_sections: currentHiddenSections,
+          kpis: kpis.length ? kpis : [
+            'जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के व्यावहारिक गुर।',
+            'फसल सुरक्षा, कीट-रोग व खरपतवार का संपूर्ण, किफ़ायती व सटीक समाधान।',
+            'कृषि वैज्ञानिकों एवं फसल डॉक्टरों के साथ सीधे लाइव सवाल-जवाब एवं परामर्श।',
+            'प्रतिभागियों के लिए विशेष गाइड, स्प्रे चार्ट्स और उपयोगी ट्रेनिंग सामग्री।'
+          ],
+          tutorial_steps: [
+            { step: 1, title: 'Zoom App डाउनलोड करें', desc: 'अगर आपके फोन में Zoom App नहीं है, तो प्ले स्टोर या ऐप स्टोर से निःशुल्क इंस्टॉल करें।' },
+            { step: 2, title: "'Join Meeting' दबाएं", desc: "वेबिनार समय से 2 मिनट पहले ऊपर दिए गए 'ज़ूम से जुड़ें' बटन पर क्लिक करें।" },
+            { step: 3, title: 'ऑडियो (आवाज़) चालू करें', desc: "ज़ूम में जुड़ने के बाद 'Join Audio' दबाकर 'Wifi or Cellular Data' चुनें।" },
+            { step: 4, title: 'अपना नाम लिखकर जुड़ें', desc: 'अपना सही नाम दर्ज करें ताकि विशेषज्ञ आपके सवालों का लाइव जवाब दे सकें।' }
+          ],
+          faqs: faqs.length ? faqs : [
+            { q: "क्या यह वेबिनार निशुल्क है?", a: "हाँ, यह विशेष वेबिनार सत्र किसानों व सदस्यों के लिए पूर्णतः निःशुल्क (₹0) है।" },
+            { q: "ज़ूम मीटिंग लिंक और पासवर्ड कब मिलेगा?", a: "रजिस्ट्रेशन करने के बाद निर्धारित समय से ठीक 2 मिनट पहले लिंक इसी पेज पर अपने आप अनलॉक हो जाएगी।" },
+            { q: "मीटिंग जॉइन करने के लिए क्या करना होगा?", a: "आपको बस ऊपर दिए गए 'ज़ूम से जुड़ें' बटन पर क्लिक करना होगा या ज़ूम ऐप में मीटिंग आईडी व पासवर्ड डालना होगा।" },
+            { q: "क्या मैं लाइव सवाल पूछ सकता हूँ?", a: "हाँ, लाइव सत्र के दौरान आप चैट या माइक ऑन करके कृषि विशेषज्ञ से सीधे सवाल पूछ सकते हैं।" }
+          ]
+        }
+      };
+
+      exportWebinarMasterJson(masterJsonPayload);
+      alert(`✅ वेबिनार (${editingWebinarId}) सुरक्षित हो गया और 'webinar-master.json' डाउनलोड हो गया!`);
     } else {
       // CREATE NEW WEBINAR
       let newWbId = (currentTargetPolicy === 'master') ? 'WB_MASTER' : `WB${Math.floor(100000 + Math.random() * 900000)}`;
@@ -1288,7 +1339,52 @@ export async function initWebinars() {
         }
       } catch (err) {}
 
-      alert(`🎉 ज़ूम वेबिनार सफलतापूर्वक प्रकाशित हो गया!\n\nरेगुलर लिंक: https://aarogyamindia.online/webinar.html`);
+      // Build & Export Master JSON file
+      const masterJsonPayload = {
+        webinarMaster: {
+          id: "WB_MASTER",
+          slug: "live-zoom-webinar",
+          status: "active",
+          is_live_active: true,
+          offair_title: "📺 अगला लाइव वेबिनार सत्र जल्द घोषित होगा (Stay Tuned)",
+          offair_message: "वर्तमान में कोई लाइव वेबिनार प्रसारित नहीं हो रहा है। आप नीचे दी गई हमारी पिछली विशेष रिकॉर्डेड ट्रेनिंग क्लासेज देख सकते हैं:",
+          title: title,
+          description: desc || 'आरोग्यम इंडिया के डिजिटल कृषि प्रशिक्षण सत्र में आपका स्वागत है। कृषि विशेषज्ञों से सीधे रूबरू हों और अपनी फसलों की पैदावार, कीट-रोग प्रबंधन और उन्नत जैविक तकनीकों के सटीक समाधान पाएं।',
+          default_date: rawDate || todayStr,
+          default_time: rawTime || '20:30',
+          duration_minutes: duration,
+          default_price: price,
+          default_zoom_link: zoomLink,
+          default_meeting_id: meetingId,
+          default_passcode: passcode,
+          cover_image: finalCoverImage || '/images/banners/universal-zoom-webinar-og.jpg',
+          banners: banners.length ? banners : ['/images/banners/universal-zoom-webinar-og.jpg'],
+          youtube_videos: youtubeLinks.length ? youtubeLinks : ['https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
+          section_order: currentSectionsOrder,
+          hidden_sections: currentHiddenSections,
+          kpis: kpis.length ? kpis : [
+            'जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के व्यावहारिक गुर।',
+            'फसल सुरक्षा, कीट-रोग व खरपतवार का संपूर्ण, किफ़ायती व सटीक समाधान।',
+            'कृषि वैज्ञानिकों एवं फसल डॉक्टरों के साथ सीधे लाइव सवाल-जवाब एवं परामर्श।',
+            'प्रतिभागियों के लिए विशेष गाइड, स्प्रे चार्ट्स और उपयोगी ट्रेनिंग सामग्री।'
+          ],
+          tutorial_steps: [
+            { step: 1, title: 'Zoom App डाउनलोड करें', desc: 'अगर आपके फोन में Zoom App नहीं है, तो प्ले स्टोर या ऐप स्टोर से निःशुल्क इंस्टॉल करें।' },
+            { step: 2, title: "'Join Meeting' दबाएं", desc: "वेबिनार समय से 2 मिनट पहले ऊपर दिए गए 'ज़ूम से जुड़ें' बटन पर क्लिक करें।" },
+            { step: 3, title: 'ऑडियो (आवाज़) चालू करें', desc: "ज़ूम में जुड़ने के बाद 'Join Audio' दबाकर 'Wifi or Cellular Data' चुनें।" },
+            { step: 4, title: 'अपना नाम लिखकर जुड़ें', desc: 'अपना सही नाम दर्ज करें ताकि विशेषज्ञ आपके सवालों का लाइव जवाब दे सकें।' }
+          ],
+          faqs: faqs.length ? faqs : [
+            { q: "क्या यह वेबिनार निशुल्क है?", a: "हाँ, यह विशेष वेबिनार सत्र किसानों व सदस्यों के लिए पूर्णतः निःशुल्क (₹0) है।" },
+            { q: "ज़ूम मीटिंग लिंक और पासवर्ड कब मिलेगा?", a: "रजिस्ट्रेशन करने के बाद निर्धारित समय से ठीक 2 मिनट पहले लिंक इसी पेज पर अपने आप अनलॉक हो जाएगी।" },
+            { q: "मीटिंग जॉइन करने के लिए क्या करना होगा?", a: "आपको बस ऊपर दिए गए 'ज़ूम से जुड़ें' बटन पर क्लिक करना होगा या ज़ूम ऐप में मीटिंग आईडी व पासवर्ड डालना होगा।" },
+            { q: "क्या मैं लाइव सवाल पूछ सकता हूँ?", a: "हाँ, लाइव सत्र के दौरान आप चैट या माइक ऑन करके कृषि विशेषज्ञ से सीधे सवाल पूछ सकते हैं।" }
+          ]
+        }
+      };
+
+      exportWebinarMasterJson(masterJsonPayload);
+      alert(`🎉 ज़ूम वेबिनार प्रकाशित हो गया और 'webinar-master.json' डाउनलोड हो गया!\n\nरेगुलर लिंक: https://aarogyamindia.online/webinar.html`);
     }
 
     if (btnSubmitWebinar) {
@@ -1705,7 +1801,17 @@ export async function initWebinars() {
     }
     if (createRecCard) createRecCard.style.display = 'none';
     resetRecordingForm();
-    alert(`🎉 ${format === 'short_reel' ? 'शॉर्ट / रील' : 'मास्टरक्लास वीडियो'} सफलतापूर्वक सेव हो गया!\n\nशीर्षक: ${title}\nप्लेटफ़ॉर्म: ${platform.toUpperCase()}\nफॉर्मेट: ${format === 'short_reel' ? '9:16 Short/Reel' : '16:9 Full Video'}`);
+
+    // Auto-update allRecordings memory state & Trigger 1-Click JSON Export
+    const exIdx = allRecordings.findIndex(v => v.id === recId);
+    if (exIdx !== -1) {
+      allRecordings[exIdx] = recObj;
+    } else {
+      allRecordings.unshift(recObj);
+    }
+    exportWebinarRecordingsJson();
+
+    alert(`🎉 ${format === 'short_reel' ? 'शॉर्ट / रील' : 'मास्टरक्लास वीडियो'} सेव हो गया और 'webinar-recordings.json' डाउनलोड हो गया!\n\nशीर्षक: ${title}\nफॉर्मेट: ${format === 'short_reel' ? '9:16 Short/Reel' : '16:9 Full Video'}`);
     
     // Auto-switch to Recordings tab and reload data
     switchAdminWebinarTab('recordings');
@@ -1740,7 +1846,9 @@ export async function initWebinars() {
 
     let masterJsonWebinar = null;
     try {
-      const resp = await fetch('/data/webinar-master.json');
+      let resp = await fetch('/data/webinar-master.json?v=' + Date.now());
+      if (!resp.ok) resp = await fetch('data/webinar-master.json?v=' + Date.now());
+      if (!resp.ok) resp = await fetch('../data/webinar-master.json?v=' + Date.now());
       if (resp.ok) {
         const j = await resp.json();
         if (j && j.webinarMaster) {
@@ -1909,9 +2017,9 @@ export async function initWebinars() {
     // Load Recorded Training Videos (1. Defaults + 2. Git JSON + 3. Supabase DB + 4. Local Storage)
     allRecordings = [...DEFAULT_RECORDINGS];
     try {
-      let recResp = await fetch('data/webinar-recordings.json');
-      if (!recResp.ok) recResp = await fetch('/data/webinar-recordings.json');
-      if (!recResp.ok) recResp = await fetch('../data/webinar-recordings.json');
+      let recResp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
+      if (!recResp.ok) recResp = await fetch('data/webinar-recordings.json?v=' + Date.now());
+      if (!recResp.ok) recResp = await fetch('../data/webinar-recordings.json?v=' + Date.now());
       if (recResp.ok) {
         const recJson = await recResp.json();
         if (Array.isArray(recJson.recordings)) {
@@ -2726,8 +2834,10 @@ export async function initWebinars() {
     localList = localList.filter(v => v.id !== recId);
     localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(localList));
 
+    // 3. Update memory state & trigger export
     allRecordings = allRecordings.filter(v => v.id !== recId);
-    alert('🗑️ रिकॉर्डेड ट्रेनिंग सफलतापूर्वक हटा दी गई।');
+    exportWebinarRecordingsJson();
+    alert('🗑️ रिकॉर्डेड ट्रेनिंग सफलतापूर्वक हटा दी गई और webinar-recordings.json डाउनलोड हो गया।');
     loadWebinarData();
   }
 
@@ -3174,6 +3284,84 @@ export async function initWebinars() {
 
     drawerOverlay.classList.add('active');
   }
+
+  function exportWebinarMasterJson(customData = null) {
+    let masterObj = customData;
+    if (!masterObj) {
+      const activeMaster = allWebinars.find(w => w.id === 'WB_MASTER') || allWebinars[0];
+      const wData = activeMaster?.webinar_data || {};
+      masterObj = {
+        webinarMaster: {
+          id: "WB_MASTER",
+          slug: "live-zoom-webinar",
+          status: activeMaster?.status || "active",
+          is_live_active: true,
+          offair_title: "📺 अगला लाइव वेबिनार सत्र जल्द घोषित होगा (Stay Tuned)",
+          offair_message: "वर्तमान में कोई लाइव वेबिनार प्रसारित नहीं हो रहा है। आप नीचे दी गई हमारी पिछली विशेष रिकॉर्डेड ट्रेनिंग क्लासेज देख सकते हैं:",
+          title: activeMaster?.title || "🌾 लाइव ज़ूम वेबिनार एवं फसल परामर्श सत्र",
+          description: activeMaster?.message || "आरोग्यम इंडिया के डिजिटल कृषि प्रशिक्षण सत्र में आपका स्वागत है। कृषि विशेषज्ञों से सीधे रूबरू हों और अपनी फसलों की पैदावार, कीट-रोग प्रबंधन और उन्नत जैविक तकनीकों के सटीक समाधान पाएं।",
+          default_date: wData.date || todayStr,
+          default_time: wData.time || "20:30",
+          duration_minutes: Number(wData.duration_minutes || 90),
+          default_price: Number(wData.price || 0),
+          default_zoom_link: wData.zoom_link || "https://zoom.us/join",
+          default_meeting_id: wData.meeting_id || "812 3456 7890",
+          default_passcode: wData.passcode || "AI2026",
+          cover_image: wData.cover_image || "/images/banners/universal-zoom-webinar-og.jpg",
+          banners: Array.isArray(wData.banners) && wData.banners.length ? wData.banners : [
+            "/images/banners/universal-zoom-webinar-og.jpg",
+            "/images/banners/agriculture-hero-banner-1.webp",
+            "/images/banners/agriculture-hero-banner-2.webp"
+          ],
+          youtube_videos: Array.isArray(wData.youtube_links) && wData.youtube_links.length ? wData.youtube_links : [
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+          ],
+          section_order: Array.isArray(wData.section_order) && wData.section_order.length ? wData.section_order : [
+            "cover", "timer", "registration", "kpis", "banners", "videos", "tutorial", "faqs"
+          ],
+          hidden_sections: Array.isArray(wData.hidden_sections) ? wData.hidden_sections : [],
+          kpis: Array.isArray(wData.kpis) && wData.kpis.length ? wData.kpis : [
+            "जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के व्यावहारिक गुर।",
+            "फसल सुरक्षा, कीट-रोग व खरपतवार का संपूर्ण, किफ़ायती व सटीक समाधान।",
+            "कृषि वैज्ञानिकों एवं फसल डॉक्टरों के साथ सीधे लाइव सवाल-जवाब एवं परामर्श।",
+            "प्रतिभागियों के लिए विशेष गाइड, स्प्रे चार्ट्स और उपयोगी ट्रेनिंग सामग्री।"
+          ],
+          tutorial_steps: [
+            { step: 1, title: "Zoom App डाउनलोड करें", desc: "अगर आपके फोन में Zoom App नहीं है, तो प्ले स्टोर या ऐप स्टोर से निःशुल्क इंस्टॉल करें।" },
+            { step: 2, title: "'Join Meeting' दबाएं", desc: "वेबिनार समय से 2 मिनट पहले ऊपर दिए गए 'ज़ूम से जुड़ें' बटन पर क्लिक करें।" },
+            { step: 3, title: "ऑडियो (आवाज़) चालू करें", desc: "ज़ूम में जुड़ने के बाद 'Join Audio' दबाकर 'Wifi or Cellular Data' चुनें।" },
+            { step: 4, title: "अपना नाम लिखकर जुड़ें", desc: "अपना सही नाम दर्ज करें ताकि विशेषज्ञ आपके सवालों का लाइव जवाब दे सकें।" }
+          ],
+          faqs: Array.isArray(wData.faqs) && wData.faqs.length ? wData.faqs : [
+            { q: "क्या यह वेबिनार निशुल्क है?", a: "हाँ, यह विशेष वेबिनार सत्र किसानों व सदस्यों के लिए पूर्णतः निःशुल्क (₹0) है।" },
+            { q: "ज़ूम मीटिंग लिंक और पासवर्ड कब मिलेगा?", a: "रजिस्ट्रेशन करने के बाद निर्धारित समय से ठीक 2 मिनट पहले लिंक इसी पेज पर अपने आप अनलॉक हो जाएगी।" },
+            { q: "मीटिंग जॉइन करने के लिए क्या करना होगा?", a: "आपको बस ऊपर दिए गए 'ज़ूम से जुड़ें' बटन पर क्लिक करना होगा या ज़ूम ऐप में मीटिंग आईडी व पासवर्ड डालना होगा।" },
+            { q: "क्या मैं लाइव सवाल पूछ सकता हूँ?", a: "हाँ, लाइव सत्र के दौरान आप चैट या माइक ऑन करके कृषि विशेषज्ञ से सीधे सवाल पूछ सकते हैं।" }
+          ]
+        }
+      };
+    }
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(masterObj, null, 2));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", "webinar-master.json");
+    dlAnchorElem.click();
+  }
+
+  function exportWebinarRecordingsJson() {
+    const dataObj = {
+      recordings: allRecordings
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataObj, null, 2));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", "webinar-recordings.json");
+    dlAnchorElem.click();
+  }
+
+  document.getElementById('btn-export-webinar-master')?.addEventListener('click', () => exportWebinarMasterJson());
+  document.getElementById('btn-export-webinar-recordings')?.addEventListener('click', () => exportWebinarRecordingsJson());
 
   searchInput?.addEventListener('input', () => { currentPage = 1; renderTable(); });
   userFilter?.addEventListener('change', () => { currentPage = 1; renderTable(); });
