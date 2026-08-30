@@ -2135,7 +2135,8 @@
       </div>
       <h2 style="margin-bottom: 6px; color: #fff; font-size: 20px; font-weight: 800;">आरोग्यम इंडिया लॉगिन</h2>
       <p style="font-size: 13px; color: #94A3B8; margin-bottom: 18px; line-height: 1.4;">अपना 10 अंकों का रजिस्टर्ड मोबाइल नंबर दर्ज करें</p>
-      <input type="tel" id="login-mobile" placeholder="10 अंकों का मोबाइल नंबर दर्ज करें" maxlength="10" style="width: 100%; padding: 12px 14px; margin-bottom: 14px; background: #0F172A; border: 1.5px solid #475569; border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #fff; outline: none; text-align: center; font-weight: 700; letter-spacing: 1px;">
+      <div id="loginAlertBox" style="display:none; color:#f87171; font-size:0.82rem; font-weight:700; margin-bottom:12px; background:rgba(239,68,68,0.15); padding:8px 12px; border-radius:6px;"></div>
+      <input type="tel" id="login-mobile" placeholder="10 अंकों का मोबाइल नंबर दर्ज करें" maxlength="10" onkeydown="if(event.key==='Enter') checkUserLogin()" style="width: 100%; padding: 12px 14px; margin-bottom: 14px; background: #0F172A; border: 1.5px solid #475569; border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #fff; outline: none; text-align: center; font-weight: 700; letter-spacing: 1px;">
       <button type="button" id="loginSubmitBtn" onclick="checkUserLogin()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #10B981, #059669); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">
         <i class="fa-solid fa-right-to-bracket"></i>
         <span>लॉगिन करें</span>
@@ -3040,11 +3041,13 @@
         const popup = document.getElementById('login-popup-overlay');
         if (popup) {
           popup.style.display = 'flex';
-          const input = document.getElementById('loginPhoneInput');
+          const input = document.getElementById('login-mobile') || document.getElementById('loginPhoneInput');
           if (input) {
             input.value = '';
             input.focus();
           }
+          const alertBox = document.getElementById('loginAlertBox');
+          if (alertBox) alertBox.style.display = 'none';
         }
       };
 
@@ -3054,7 +3057,7 @@
       };
 
       window.checkUserLogin = async function () {
-        const phoneInput = document.getElementById('loginPhoneInput');
+        const phoneInput = document.getElementById('login-mobile') || document.getElementById('loginPhoneInput');
         const phone = (phoneInput?.value || '').trim();
         const alertBox = document.getElementById('loginAlertBox');
         const submitBtn = document.getElementById('loginSubmitBtn');
@@ -3063,13 +3066,17 @@
           if (alertBox) {
             alertBox.textContent = '⚠️ कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!';
             alertBox.style.display = 'block';
+          } else {
+            alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।');
           }
           return;
         }
 
+        if (alertBox) alertBox.style.display = 'none';
+
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.textContent = 'जांच हो रही है...';
+          submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>जांच हो रही है...</span>';
         }
 
         let userFound = null;
