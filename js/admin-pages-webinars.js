@@ -1439,134 +1439,7 @@ export async function initWebinars() {
   const formCreateRec = document.getElementById('form-admin-create-recording');
   const formRecTitle = document.getElementById('form-recording-card-title');
 
-  const DEFAULT_RECORDINGS = [
-    {
-      id: "VID_S01",
-      format: "short_reel",
-      platform: "youtube",
-      title: "🌾 सोयाबीन में इल्ली का 1-स्प्रे रामबाण इलाज #Shorts",
-      subject: "फसल सुरक्षा टिप्स",
-      category: "Shorts & Reels",
-      video_url: "https://www.youtube.com/shorts/5i09Z5_R5q4",
-      youtube_url: "https://www.youtube.com/shorts/5i09Z5_R5q4",
-      youtube_id: "5i09Z5_R5q4",
-      thumbnail: "https://img.youtube.com/vi/5i09Z5_R5q4/hqdefault.jpg",
-      duration: "0:58",
-      speaker: "डॉ. बी.के. शर्मा (फसल डॉक्टर)",
-      access_tier: "guest",
-      status: "active",
-      created_at: "2026-08-28T10:00:00Z",
-      views_count: 1240
-    },
-    {
-      id: "VID_S02",
-      format: "short_reel",
-      platform: "instagram",
-      title: "🌱 घर पर 5 दिनों में बनाएं जीवामृत खाद #Reels",
-      subject: "जैविक कृषि सीक्रेट्स",
-      category: "Shorts & Reels",
-      video_url: "https://www.instagram.com/reel/C3zY5vXN9aB/",
-      youtube_url: "https://www.youtube.com/shorts/dQw4w9WgXcQ",
-      youtube_id: "dQw4w9WgXcQ",
-      thumbnail: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=300&auto=format&fit=crop&q=60",
-      duration: "0:45",
-      speaker: "श्री राजेश पटेल (मास्टर ट्रेनर)",
-      access_tier: "guest",
-      status: "active",
-      created_at: "2026-08-27T12:30:00Z",
-      views_count: 890
-    },
-    {
-      id: "VID_S03",
-      format: "short_reel",
-      platform: "facebook",
-      title: "💧 ड्रिप सिंचाई से खाद कैसे दें (फर्टिगेशन ट्रिक) #FBReels",
-      subject: "उन्नत सिंचाई टिप्स",
-      category: "Shorts & Reels",
-      video_url: "https://www.facebook.com/reel/1029384756",
-      youtube_url: "https://www.youtube.com/shorts/dQw4w9WgXcQ",
-      youtube_id: "dQw4w9WgXcQ",
-      thumbnail: "https://images.unsplash.com/photo-1611162616091-2da5b6540fae?w=300&auto=format&fit=crop&q=60",
-      duration: "0:52",
-      speaker: "इंजीनियर आलोक वर्मा",
-      access_tier: "guest",
-      status: "active",
-      created_at: "2026-08-26T15:00:00Z",
-      views_count: 670
-    },
-    {
-      id: "VID_001",
-      format: "full_video",
-      platform: "youtube",
-      title: "🌾 खरीफ फसलों में कीट एवं इल्ली नियंत्रण मास्टरक्लास",
-      subject: "कीट नियंत्रण व फसल सुरक्षा",
-      category: "Crop Protection",
-      video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      youtube_id: "dQw4w9WgXcQ",
-      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-      duration: "45 मिनट",
-      speaker: "डॉ. बी.के. शर्मा (वरिष्ठ कृषि विशेषज्ञ)",
-      access_tier: "guest",
-      status: "active",
-      created_at: "2026-08-15T14:30:00Z",
-      views_count: 348
-    },
-    {
-      id: "VID_002",
-      format: "full_video",
-      platform: "youtube",
-      title: "🌱 प्राकृतिक व जैविक खाद निर्माण की सम्पूर्ण विधि",
-      subject: "जैविक कृषि व मृदा सुधार",
-      category: "Organic Farming",
-      video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      youtube_id: "dQw4w9WgXcQ",
-      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-      duration: "58 मिनट",
-      speaker: "श्री राजेश पटेल (मास्टर ट्रेनर)",
-      access_tier: "registered",
-      status: "active",
-      created_at: "2026-08-18T18:00:00Z",
-      views_count: 512
-    },
-    {
-      id: "VID_003",
-      format: "full_video",
-      platform: "youtube",
-      title: "💧 ड्रिप इरीगेशन व फर्टिगेशन से 50% अधिक पैदावार",
-      subject: "उन्नत सिंचाई व पोषण",
-      category: "Irrigation Tech",
-      video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      youtube_id: "dQw4w9WgXcQ",
-      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-      duration: "62 मिनट",
-      speaker: "इंजीनियर आलोक वर्मा",
-      access_tier: "registered",
-      status: "active",
-      created_at: "2026-08-22T19:30:00Z",
-      views_count: 289
-    },
-    {
-      id: "VID_004",
-      format: "full_video",
-      platform: "youtube",
-      title: "👑 आरोग्यम VIP किसान प्राइम सीक्रेट्स",
-      subject: "व्यापार व अधिक लाभ रणनीति",
-      category: "VIP Secrets",
-      video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      youtube_id: "dQw4w9WgXcQ",
-      thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-      duration: "75 मिनट",
-      speaker: "आरोग्यम कोर टीम",
-      access_tier: "active_subscriber",
-      status: "active",
-      created_at: "2026-08-25T20:00:00Z",
-      views_count: 174
-    }
-  ];
+  const DEFAULT_RECORDINGS = [];
 
   let allRecordings = [...DEFAULT_RECORDINGS];
   let editingRecordingId = null;
@@ -1870,19 +1743,19 @@ export async function initWebinars() {
             status: 'active',
             created_at: new Date().toISOString(),
             webinar_data: {
-              zoom_link: wm.default_zoom_link || 'https://zoom.us/join',
-              meeting_id: wm.default_meeting_id || '812 3456 7890',
-              passcode: wm.default_passcode || 'AI2026',
-              datetime: formatHindiDateTime(wm.default_date, wm.default_time),
+              zoom_link: wm.default_zoom_link || '',
+              meeting_id: wm.default_meeting_id || '',
+              passcode: wm.default_passcode || '',
+              datetime: wm.default_date ? formatHindiDateTime(wm.default_date, wm.default_time) : '',
               date: wm.default_date || todayStr,
               time: wm.default_time || '20:30',
               price: wm.default_price || 0,
               duration_minutes: wm.duration_minutes || 90,
-              cover_image: wm.cover_image || '/images/banners/universal-zoom-webinar-og.jpg',
-              banners: wm.banners || ['/images/banners/universal-zoom-webinar-og.jpg'],
-              youtube_links: wm.youtube_videos || ['https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
-              kpis: wm.kpis || ['जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के गुर।'],
-              faqs: wm.faqs || [{ q: 'क्या यह वेबिनार निशुल्क है?', a: 'हाँ, यह विशेष वेबिनार सत्र किसानों व सदस्यों के लिए पूर्णतः निःशुल्क (₹0) है।' }]
+              cover_image: wm.cover_image || '',
+              banners: wm.banners || [],
+              youtube_links: wm.youtube_videos || [],
+              kpis: wm.kpis || [],
+              faqs: wm.faqs || []
             }
           };
         }
@@ -1949,29 +1822,29 @@ export async function initWebinars() {
       id: 'WB_MASTER',
       profile_id: 'ALL_USERS',
       share_id: 'ALL_USERS',
-      title: '🌾 लाइव ज़ूम वेबिनार एवं फसल परामर्श सत्र (Universal Master)',
+      title: '🌾 लाइव ज़ूम वेबिनार',
       message: 'आरोग्यम इंडिया लाइव ज़ूम वेबिनार सत्र',
       category: 'webinar',
       content_type: 'webinar',
-      media_url: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200',
-      thumbnail_url: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600',
+      media_url: '',
+      thumbnail_url: '',
       offer_price: 0,
       status: 'active',
       created_at: new Date().toISOString(),
       webinar_data: {
-        zoom_link: 'https://zoom.us/join',
-        meeting_id: '812 3456 7890',
-        passcode: 'AI2026',
-        datetime: 'आज, सायं 08:30 बजे (08:30 PM)',
+        zoom_link: '',
+        meeting_id: '',
+        passcode: '',
+        datetime: '',
         date: todayStr,
         time: '20:30',
         price: 0,
         duration_minutes: 90,
-        cover_image: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200',
-        banners: ['https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200'],
-        youtube_links: ['https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
-        kpis: ['जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के गुर।'],
-        faqs: [{ q: 'क्या यह वेबिनार निशुल्क है?', a: 'हाँ, यह विशेष वेबिनार सत्र किसानों व सदस्यों के लिए पूर्णतः निःशुल्क (₹0) है।' }]
+        cover_image: '',
+        banners: [],
+        youtube_links: [],
+        kpis: [],
+        faqs: []
       }
     };
 
@@ -3034,7 +2907,9 @@ export async function initWebinars() {
     if (Array.isArray(wData.section_order) && wData.section_order.length > 0) {
       currentSectionsOrder = [...wData.section_order];
     } else {
-      currentSectionsOrder = defaultWebinarSections.map(s => s.key);
+      currentSectionsOrder = [
+        "cover", "timer", "registration", "kpis", "banners", "videos", "tutorial", "faqs"
+      ];
     }
     if (Array.isArray(wData.hidden_sections)) {
       currentHiddenSections = [...wData.hidden_sections];
@@ -3301,46 +3176,25 @@ export async function initWebinars() {
           is_live_active: true,
           offair_title: "📺 अगला लाइव वेबिनार सत्र जल्द घोषित होगा (Stay Tuned)",
           offair_message: "वर्तमान में कोई लाइव वेबिनार प्रसारित नहीं हो रहा है। आप नीचे दी गई हमारी पिछली विशेष रिकॉर्डेड ट्रेनिंग क्लासेज देख सकते हैं:",
-          title: activeMaster?.title || "🌾 लाइव ज़ूम वेबिनार एवं फसल परामर्श सत्र",
-          description: activeMaster?.message || "आरोग्यम इंडिया के डिजिटल कृषि प्रशिक्षण सत्र में आपका स्वागत है। कृषि विशेषज्ञों से सीधे रूबरू हों और अपनी फसलों की पैदावार, कीट-रोग प्रबंधन और उन्नत जैविक तकनीकों के सटीक समाधान पाएं।",
+          title: activeMaster?.title || "",
+          description: activeMaster?.message || "",
           default_date: wData.date || todayStr,
           default_time: wData.time || "20:30",
           duration_minutes: Number(wData.duration_minutes || 90),
           default_price: Number(wData.price || 0),
-          default_zoom_link: wData.zoom_link || "https://zoom.us/join",
-          default_meeting_id: wData.meeting_id || "812 3456 7890",
-          default_passcode: wData.passcode || "AI2026",
-          cover_image: wData.cover_image || "/images/banners/universal-zoom-webinar-og.jpg",
-          banners: Array.isArray(wData.banners) && wData.banners.length ? wData.banners : [
-            "/images/banners/universal-zoom-webinar-og.jpg",
-            "/images/banners/agriculture-hero-banner-1.webp",
-            "/images/banners/agriculture-hero-banner-2.webp"
-          ],
-          youtube_videos: Array.isArray(wData.youtube_links) && wData.youtube_links.length ? wData.youtube_links : [
-            "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-          ],
+          default_zoom_link: wData.zoom_link || "",
+          default_meeting_id: wData.meeting_id || "",
+          default_passcode: wData.passcode || "",
+          cover_image: wData.cover_image || "",
+          banners: Array.isArray(wData.banners) ? wData.banners : [],
+          youtube_videos: Array.isArray(wData.youtube_links) ? wData.youtube_links : [],
           section_order: Array.isArray(wData.section_order) && wData.section_order.length ? wData.section_order : [
             "cover", "timer", "registration", "kpis", "banners", "videos", "tutorial", "faqs"
           ],
           hidden_sections: Array.isArray(wData.hidden_sections) ? wData.hidden_sections : [],
-          kpis: Array.isArray(wData.kpis) && wData.kpis.length ? wData.kpis : [
-            "जैविक एवं वैज्ञानिक कृषि की आधुनिक तकनीक और पैदावार बढ़ाने के व्यावहारिक गुर।",
-            "फसल सुरक्षा, कीट-रोग व खरपतवार का संपूर्ण, किफ़ायती व सटीक समाधान।",
-            "कृषि वैज्ञानिकों एवं फसल डॉक्टरों के साथ सीधे लाइव सवाल-जवाब एवं परामर्श।",
-            "प्रतिभागियों के लिए विशेष गाइड, स्प्रे चार्ट्स और उपयोगी ट्रेनिंग सामग्री।"
-          ],
-          tutorial_steps: [
-            { step: 1, title: "Zoom App डाउनलोड करें", desc: "अगर आपके फोन में Zoom App नहीं है, तो प्ले स्टोर या ऐप स्टोर से निःशुल्क इंस्टॉल करें।" },
-            { step: 2, title: "'Join Meeting' दबाएं", desc: "वेबिनार समय से 2 मिनट पहले ऊपर दिए गए 'ज़ूम से जुड़ें' बटन पर क्लिक करें।" },
-            { step: 3, title: "ऑडियो (आवाज़) चालू करें", desc: "ज़ूम में जुड़ने के बाद 'Join Audio' दबाकर 'Wifi or Cellular Data' चुनें।" },
-            { step: 4, title: "अपना नाम लिखकर जुड़ें", desc: "अपना सही नाम दर्ज करें ताकि विशेषज्ञ आपके सवालों का लाइव जवाब दे सकें।" }
-          ],
-          faqs: Array.isArray(wData.faqs) && wData.faqs.length ? wData.faqs : [
-            { q: "क्या यह वेबिनार निशुल्क है?", a: "हाँ, यह विशेष वेबिनार सत्र किसानों व सदस्यों के लिए पूर्णतः निःशुल्क (₹0) है।" },
-            { q: "ज़ूम मीटिंग लिंक और पासवर्ड कब मिलेगा?", a: "रजिस्ट्रेशन करने के बाद निर्धारित समय से ठीक 2 मिनट पहले लिंक इसी पेज पर अपने आप अनलॉक हो जाएगी।" },
-            { q: "मीटिंग जॉइन करने के लिए क्या करना होगा?", a: "आपको बस ऊपर दिए गए 'ज़ूम से जुड़ें' बटन पर क्लिक करना होगा या ज़ूम ऐप में मीटिंग आईडी व पासवर्ड डालना होगा।" },
-            { q: "क्या मैं लाइव सवाल पूछ सकता हूँ?", a: "हाँ, लाइव सत्र के दौरान आप चैट या माइक ऑन करके कृषि विशेषज्ञ से सीधे सवाल पूछ सकते हैं।" }
-          ]
+          kpis: Array.isArray(wData.kpis) ? wData.kpis : [],
+          tutorial_steps: [],
+          faqs: Array.isArray(wData.faqs) ? wData.faqs : []
         }
       };
     }
