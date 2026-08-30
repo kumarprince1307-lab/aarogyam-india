@@ -1587,8 +1587,8 @@ export async function initWebinars() {
       return;
     }
 
-    const ytId = extractYoutubeVideoId(url) || (platform === 'youtube' ? 'dQw4w9WgXcQ' : '');
-    let thumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (platform === 'instagram' ? 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=300&auto=format&fit=crop&q=60' : 'https://images.unsplash.com/photo-1611162616091-2da5b6540fae?w=300&auto=format&fit=crop&q=60');
+    const ytId = extractYoutubeVideoId(url) || '';
+    let thumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (platform === 'instagram' ? '/images/banners/agriculture-hero-banner-2.webp' : (platform === 'facebook' ? '/images/banners/agriculture-hero-banner-1.webp' : '/images/banners/universal-zoom-webinar-og.jpg'));
 
     let recId = editingRecordingId;
     if (!recId) {
@@ -1604,7 +1604,7 @@ export async function initWebinars() {
       subject: subject,
       category: category,
       video_url: url,
-      youtube_url: url.startsWith('http') ? url : `https://www.youtube.com/watch?v=${ytId}`,
+      youtube_url: url.startsWith('http') ? url : (ytId ? `https://www.youtube.com/watch?v=${ytId}` : url),
       youtube_id: ytId,
       thumbnail: thumb,
       duration: duration,
@@ -1639,7 +1639,7 @@ export async function initWebinars() {
     const db = getAdminDb();
     if (db) {
       try {
-        await db.from('landing_pages').upsert([{
+        const { error } = await db.from('landing_pages').upsert([{
           id: recId,
           profile_id: 'ALL_USERS',
           share_id: 'ALL_USERS',
@@ -1666,6 +1666,7 @@ export async function initWebinars() {
             views_count: 0
           }
         }]);
+        if (error) console.error('Supabase recording upsert error:', error);
       } catch (err) {
         console.warn('Supabase recording upsert warning:', err);
       }

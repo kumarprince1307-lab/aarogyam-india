@@ -3524,12 +3524,16 @@
         const userShare = currentUser?.share_id || refShareId || 'AI000004';
 
         grid.innerHTML = activeReelsList.map((s, idx) => {
-          const ytId = s.youtube_id || extractYoutubeVideoId(s.video_url || s.youtube_url) || 'dQw4w9WgXcQ';
+          const ytId = s.youtube_id || extractYoutubeVideoId(s.video_url || s.youtube_url) || '';
           const plat = s.platform || (s.video_url?.includes('instagram') ? 'instagram' : s.video_url?.includes('facebook') ? 'facebook' : 'youtube');
           
+          let fallbackCover = '/images/banners/agriculture-hero-banner-1.webp';
+          if (plat === 'instagram') fallbackCover = '/images/banners/agriculture-hero-banner-2.webp';
+          else if (plat === 'youtube') fallbackCover = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '/images/banners/universal-zoom-webinar-og.jpg';
+
           let thumb = s.thumbnail;
-          if (!thumb || thumb.includes('dQw4w9WgXcQ')) {
-            thumb = plat === 'youtube' && ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (plat === 'instagram' ? 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=300&auto=format&fit=crop&q=60' : 'https://images.unsplash.com/photo-1611162616091-2da5b6540fae?w=300&auto=format&fit=crop&q=60');
+          if (!thumb || thumb.includes('undefined') || thumb.includes('dQw4w9WgXcQ')) {
+            thumb = fallbackCover;
           }
 
           let platIcon = '<i class="fa-brands fa-youtube"></i> Shorts';
@@ -3537,13 +3541,13 @@
           if (plat === 'facebook') platIcon = '<i class="fa-brands fa-facebook"></i> Reel';
 
           const reelShareUrl = `https://aarogyamindia.online/webinar.html?vid=${encodeURIComponent(s.id)}&ref=${encodeURIComponent(userShare)}`;
-          const shareMsg = `📱 *${s.title}*\n\n👉 *यह रील्स / शॉर्ट्स इन-ऐप देखने के लिए लिंक खोलें:*\n${reelShareUrl}\n\nसादर,\n${currentUser?.name || 'Aarogyam India'}`;
+          const shareMsg = `📱 *${s.title}*\n\n👉 *यह रील्स / शॉर्ट्स इन-ऐप देखने के लिए लिंक खोलें:*\n${reelShareUrl}\n\n सादर,\n${currentUser?.name || 'Aarogyam India'}`;
           const waReelShareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`;
 
           return `
             <div class="wb-short-card" onclick="window.wbOpenReelPlayer(${idx})">
               <div class="wb-short-thumb-wrap">
-                <img src="${thumb}" alt="${s.title}" class="wb-short-thumb-img" onerror="this.src='https://img.youtube.com/vi/${ytId}/hqdefault.jpg'">
+                <img src="${thumb}" alt="${s.title}" class="wb-short-thumb-img" onerror="this.onerror=null; this.src='${fallbackCover}'">
                 <span class="wb-short-platform-pill ${plat}">${platIcon}</span>
                 <span class="wb-short-duration-badge">⏱️ ${s.duration || '0:58'}</span>
                 <div class="wb-short-play-btn">
@@ -3928,8 +3932,16 @@
         const userShare = currentUser?.share_id || refShareId || 'AI000004';
 
         grid.innerHTML = filtered.map(v => {
-          const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url || v.youtube_url) || 'dQw4w9WgXcQ';
-          const ytThumb = v.thumbnail || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+          const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url || v.youtube_url) || '';
+          const plat = v.platform || (v.video_url?.includes('instagram') ? 'instagram' : v.video_url?.includes('facebook') ? 'facebook' : 'youtube');
+          let fallbackCover = '/images/banners/agriculture-hero-banner-1.webp';
+          if (plat === 'youtube' && ytId) fallbackCover = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+          else if (plat === 'instagram') fallbackCover = '/images/banners/agriculture-hero-banner-2.webp';
+
+          let ytThumb = v.thumbnail;
+          if (!ytThumb || ytThumb.includes('undefined') || ytThumb.includes('dQw4w9WgXcQ')) {
+            ytThumb = fallbackCover;
+          }
           
           let tierBadgeHtml = '';
           if (v.access_tier === 'guest') {
@@ -3949,7 +3961,7 @@
           return `
             <div class="wb-video-card" data-video-id="${v.id}">
               <div class="wb-video-thumb-wrap" onclick="window.wbOpenVideoModal('${v.id}')">
-                <img src="${ytThumb}" alt="${v.title}" class="wb-video-thumb-img" onerror="this.src='https://img.youtube.com/vi/${ytId}/hqdefault.jpg'">
+                <img src="${ytThumb}" alt="${v.title}" class="wb-video-thumb-img" onerror="this.onerror=null; this.src='${fallbackCover}'">
                 ${tierBadgeHtml}
                 <div class="wb-duration-pill">⏱️ ${v.duration || '45 मिनट'}</div>
                 <div class="wb-play-overlay">
