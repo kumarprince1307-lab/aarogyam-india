@@ -3619,6 +3619,8 @@
           return;
         }
 
+        const userShare = currentUser?.share_id || refShareId || 'AI000004';
+
         grid.innerHTML = activeReelsList.map((s, idx) => {
           const ytId = s.youtube_id || extractYoutubeVideoId(s.video_url || s.youtube_url) || 'dQw4w9WgXcQ';
           const plat = s.platform || (s.video_url?.includes('instagram') ? 'instagram' : s.video_url?.includes('facebook') ? 'facebook' : 'youtube');
@@ -3632,6 +3634,10 @@
           if (plat === 'instagram') platIcon = '<i class="fa-brands fa-instagram"></i> Reel';
           if (plat === 'facebook') platIcon = '<i class="fa-brands fa-facebook"></i> Reel';
 
+          const reelShareUrl = `https://aarogyamindia.online/webinar.html?vid=${encodeURIComponent(s.id)}&ref=${encodeURIComponent(userShare)}`;
+          const shareMsg = `📱 *${s.title}*\n\n👉 *यह रील्स / शॉर्ट्स इन-ऐप देखने के लिए लिंक खोलें:*\n${reelShareUrl}\n\nसादर,\n${currentUser?.name || 'Aarogyam India'}`;
+          const waReelShareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`;
+
           return `
             <div class="wb-short-card" onclick="window.wbOpenReelPlayer(${idx})">
               <div class="wb-short-thumb-wrap">
@@ -3644,7 +3650,12 @@
               </div>
               <div class="wb-short-info">
                 <div class="wb-short-card-title" title="${s.title}">${s.title}</div>
-                <div class="wb-short-speaker">${s.speaker || 'आरोग्यम विशेषज्ञ'}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                  <div class="wb-short-speaker">${s.speaker || 'आरोग्यम विशेषज्ञ'}</div>
+                  <a href="${waReelShareLink}" target="_blank" onclick="event.stopPropagation();" class="wb-action-btn wb-btn-wa" style="width:auto; padding:3px 8px; font-size:0.72rem; border-radius:6px; font-weight:700; text-decoration:none;" title="WhatsApp पर शेयर करें">
+                    <i class="fa-brands fa-whatsapp"></i> शेयर
+                  </a>
+                </div>
               </div>
             </div>
           `;
