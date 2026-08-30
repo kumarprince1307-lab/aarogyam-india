@@ -21,17 +21,21 @@
   <meta name="twitter:image" content="https://aarogyamindia.online/images/banners/universal-zoom-webinar-og.jpg">
 
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0B1120">
+  <meta name="theme-color" content="#2E7D32">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="/css/user-notifications.css">
+  
+  <!-- Universal Site Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/my-library.css">
   <link rel="stylesheet" href="/css/universal-nav-drawer.css">
+  <link rel="stylesheet" href="/css/user-notifications.css">
   <link rel="stylesheet" href="/css/home-revamp.css">
 
   <style>
@@ -44,8 +48,8 @@
       --zoom-dark: #0E71EB;
       --bg-page: #0B1120;
       --bg-surface: #131E36;
-      --bg-card: rgba(19, 30, 54, 0.75);
-      --border-card: rgba(45, 140, 255, 0.18);
+      --bg-card: #0F172A;
+      --border-card: rgba(45, 140, 255, 0.35);
       --text-main: #FFFFFF;
       --text-muted: #94A3B8;
       --text-dim: #64748B;
@@ -70,6 +74,7 @@
       flex-direction: column;
       line-height: 1.5;
       overflow-x: hidden;
+      padding-bottom: 75px; /* space for universal mobile bottom nav */
     }
 
     /* Ambient Background Glows */
@@ -81,100 +86,11 @@
       pointer-events: none;
       z-index: 0;
       filter: blur(120px);
-      opacity: 0.18;
+      opacity: 0.16;
     }
     .glow-1 { top: -100px; left: -100px; background: var(--zoom-blue); }
     .glow-2 { top: 35%; right: -150px; background: #6366F1; }
     .glow-3 { bottom: 10%; left: 20%; background: #10B981; }
-
-    /* Top Universal Header */
-    .wb-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(11, 17, 32, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 10px 16px;
-    }
-    .wb-header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .wb-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-    .wb-brand-logo {
-      height: 38px;
-      width: auto;
-      object-fit: contain;
-    }
-    .wb-brand-text {
-      display: flex;
-      flex-direction: column;
-    }
-    .wb-brand-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: #FFFFFF;
-      letter-spacing: -0.3px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .wb-brand-badge {
-      font-size: 0.68rem;
-      background: rgba(45, 140, 255, 0.2);
-      color: var(--zoom-blue);
-      border: 1px solid rgba(45, 140, 255, 0.35);
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-    .wb-brand-tagline {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-    }
-    .wb-header-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .wb-btn-login {
-      background: rgba(45, 140, 255, 0.15);
-      color: #93C5FD;
-      border: 1px solid rgba(45, 140, 255, 0.3);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-    .wb-btn-login:hover {
-      background: var(--zoom-blue);
-      color: #fff;
-    }
-    .wb-hamburger-btn {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1.1rem;
-    }
 
     /* Main Container */
     .wb-container {
@@ -187,29 +103,62 @@
       width: 100%;
     }
 
-    /* Hero 2-Column Section */
+    /* =========================================
+       HERO 2-COLUMN SECTION (BOOK LANDING EXACT)
+       ========================================= */
     .wb-hero-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 20px;
-      margin-bottom: 24px;
+      gap: 24px;
+      margin-bottom: 28px;
+      align-items: start;
     }
     @media (min-width: 900px) {
       .wb-hero-grid {
-        grid-template-columns: 1.15fr 0.85fr;
-        gap: 28px;
+        grid-template-columns: 440px 1fr;
+        gap: 32px;
       }
     }
 
-    /* Card Styling */
+    /* Left Column: 3D Book Cover (Uncropped Natural Aspect Ratio) */
+    .wb-hero-book-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1200px;
+      padding: 6px 0;
+    }
+    .wb-hero-book-cover {
+      width: 100%;
+      max-width: 440px;
+      height: auto;
+      object-fit: contain;
+      border-radius: 18px;
+      border: 2px solid rgba(45, 140, 255, 0.45);
+      box-shadow: -15px 20px 50px rgba(0, 0, 0, 0.65), 0 0 35px rgba(45, 140, 255, 0.35);
+      transform: perspective(1000px) rotateY(-8deg) rotateX(3deg);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      display: block;
+      background: #0f172a;
+    }
+    .wb-hero-book-cover:hover {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.03);
+      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.8), 0 0 50px rgba(45, 140, 255, 0.5);
+    }
+    @media (max-width: 899px) {
+      .wb-hero-book-cover {
+        max-width: 380px;
+        transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+      }
+    }
+
+    /* Right Column / Universal Cards in Deep Blue */
     .wb-card {
       background: var(--bg-card);
-      border: 1px solid var(--border-card);
+      border: 1.5px solid var(--border-card);
       border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      padding: 22px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
       position: relative;
       overflow: hidden;
     }
@@ -219,12 +168,12 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      color: #F87171;
-      padding: 4px 12px;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #FCA5A5;
+      padding: 4px 14px;
       border-radius: 20px;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 800;
       margin-bottom: 12px;
     }
@@ -249,7 +198,7 @@
       margin-bottom: 10px;
     }
     @media (min-width: 768px) {
-      .wb-hero-title { font-size: 1.85rem; }
+      .wb-hero-title { font-size: 1.8rem; }
     }
 
     .wb-hero-desc {
@@ -259,13 +208,13 @@
       margin-bottom: 18px;
     }
 
-    /* Countdown Timer Bar */
+    /* Countdown Timer Box */
     .wb-timer-card {
-      background: linear-gradient(135deg, rgba(45, 140, 255, 0.12), rgba(15, 23, 42, 0.8));
-      border: 1.5px solid rgba(45, 140, 255, 0.3);
+      background: #131E36;
+      border: 1px solid rgba(45, 140, 255, 0.3);
       border-radius: 12px;
       padding: 14px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .wb-timer-header {
       display: flex;
@@ -274,7 +223,7 @@
       margin-bottom: 10px;
     }
     .wb-timer-label {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 800;
       color: #93C5FD;
       display: flex;
@@ -290,42 +239,44 @@
       background: #0B1120;
       border: 1px solid rgba(45, 140, 255, 0.35);
       border-radius: 8px;
-      padding: 6px 10px;
+      padding: 6px 12px;
+      min-width: 54px;
       text-align: center;
-      min-width: 52px;
     }
     .wb-digit-val {
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       font-weight: 900;
-      color: #FFFFFF;
-      font-family: 'Outfit', sans-serif;
+      color: #60A5FA;
+      font-family: 'Outfit', monospace;
+      line-height: 1.1;
     }
     .wb-digit-lbl {
-      font-size: 0.62rem;
-      color: var(--text-muted);
+      font-size: 0.65rem;
+      color: var(--text-dim);
       text-transform: uppercase;
       font-weight: 700;
+      margin-top: 2px;
     }
     .wb-timer-pending-text {
-      font-size: 0.88rem;
-      color: #FCD34D;
       text-align: center;
+      padding: 8px;
       font-weight: 700;
-      padding: 6px 0;
+      font-size: 0.9rem;
+      color: var(--gold);
     }
 
-    /* Date & Time Badges */
+    /* Meta Badges */
     .wb-meta-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 18px;
+      gap: 10px;
+      margin-bottom: 16px;
     }
     .wb-meta-badge {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
+      background: #1E293B;
+      border: 1px solid rgba(45, 140, 255, 0.25);
       padding: 6px 12px;
+      border-radius: 8px;
       font-size: 0.82rem;
       font-weight: 700;
       color: #E2E8F0;
@@ -334,73 +285,35 @@
       gap: 6px;
     }
 
-    /* KPI Highlights */
+    /* KPI Grid */
     .wb-kpi-grid {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-    @media (min-width: 600px) {
-      .wb-kpi-grid { grid-template-columns: 1fr 1fr; }
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
     }
     .wb-kpi-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #1E293B;
+      border: 1px solid rgba(45, 140, 255, 0.3);
       border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #E2E8F0;
-    }
-    .wb-kpi-item i { color: var(--emerald); font-size: 0.9rem; }
-
-    /* Hero Right Column: 3D Floating Cover */
-    .wb-cover-wrap {
-      perspective: 1200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 6px 0;
-      margin-bottom: 16px;
-    }
-    @keyframes wbFloat3D {
-      0% {
-        transform: perspective(1200px) rotateY(-8deg) rotateX(4deg) translateY(0px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(45, 140, 255, 0.25);
-      }
-      50% {
-        transform: perspective(1200px) rotateY(-3deg) rotateX(1deg) translateY(-10px);
-        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.7), 0 0 35px rgba(45, 140, 255, 0.45);
-      }
-      100% {
-        transform: perspective(1200px) rotateY(-8deg) rotateX(4deg) translateY(0px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(45, 140, 255, 0.25);
-      }
-    }
-    .wb-cover-img {
-      width: 100%;
-      max-width: 440px;
-      aspect-ratio: 16/9;
-      object-fit: cover;
-      display: block;
-      border-radius: 14px;
-      border: 1.5px solid rgba(45, 140, 255, 0.4);
-      animation: wbFloat3D 5s ease-in-out infinite;
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-      background: #0f172a;
-    }
-    .wb-cover-img:hover {
-      transform: perspective(1200px) rotateY(0deg) scale(1.03);
-      animation-play-state: paused;
-    }
-
-    /* Registration Form Card */
-    .wb-form-title {
-      font-size: 1.1rem;
+      padding: 10px 14px;
+      font-size: 0.85rem;
       font-weight: 800;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .wb-kpi-item i {
+      color: var(--emerald);
+      font-size: 0.95rem;
+    }
+
+    /* Registration Form & Input Fields */
+    .wb-form-title {
+      font-size: 1.15rem;
+      font-weight: 900;
       color: #FFFFFF;
       margin-bottom: 4px;
       display: flex;
@@ -408,7 +321,7 @@
       gap: 8px;
     }
     .wb-form-subtitle {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       margin-bottom: 14px;
     }
@@ -424,210 +337,246 @@
     }
     .wb-input {
       width: 100%;
-      background: rgba(11, 17, 32, 0.8);
-      border: 1.5px solid rgba(45, 140, 255, 0.3);
+      background: #0B1120;
+      border: 1px solid #334155;
       border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 0.9rem;
-      color: #FFFFFF;
-      font-family: inherit;
+      padding: 12px 14px;
+      color: #fff;
+      font-size: 0.92rem;
       outline: none;
-      transition: border-color 0.2s ease;
+      transition: all 0.2s ease;
     }
     .wb-input:focus {
       border-color: var(--zoom-blue);
-      box-shadow: 0 0 10px var(--zoom-blue-glow);
+      box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.25);
     }
     .wb-btn-primary {
-      width: 100%;
-      background: linear-gradient(135deg, var(--zoom-blue), var(--zoom-dark));
-      color: #FFFFFF;
+      background: linear-gradient(135deg, #2D8CFF 0%, #0E71EB 100%);
+      color: #fff;
       border: none;
-      border-radius: 8px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 13px 20px;
       font-size: 0.95rem;
       font-weight: 800;
       cursor: pointer;
+      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 16px var(--zoom-blue-glow);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 18px rgba(45, 140, 255, 0.4);
+      transition: all 0.2s ease;
     }
     .wb-btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(45, 140, 255, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(45, 140, 255, 0.55);
     }
-    .wb-btn-primary:active { transform: translateY(0); }
 
-    /* Unlocked Zoom Access Card */
+    /* Unlocked Screen */
     .wb-unlocked-card {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(15, 23, 42, 0.9));
-      border: 1.5px solid rgba(16, 185, 129, 0.35);
+      background: #131E36;
+      border: 1.5px solid rgba(16, 185, 129, 0.4);
       border-radius: 12px;
       padding: 16px;
-      margin-top: 12px;
+      margin-top: 14px;
     }
     .wb-unlocked-title {
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-weight: 800;
       color: #34D399;
-      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 6px;
+      margin-bottom: 12px;
     }
     .wb-cred-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 8px 12px;
+      background: #0B1120;
+      border: 1px solid #1E293B;
       border-radius: 8px;
+      padding: 10px 14px;
       margin-bottom: 8px;
-      font-size: 0.85rem;
     }
     .wb-cred-val {
+      font-family: 'Outfit', monospace;
       font-weight: 800;
-      color: #FFFFFF;
-      font-family: 'Outfit', sans-serif;
-      letter-spacing: 0.5px;
+      font-size: 1.05rem;
+      color: #60A5FA;
     }
     .wb-btn-copy {
-      background: rgba(45, 140, 255, 0.2);
-      border: 1px solid rgba(45, 140, 255, 0.35);
+      background: rgba(45, 140, 255, 0.15);
       color: #93C5FD;
-      padding: 3px 8px;
+      border: 1px solid rgba(45, 140, 255, 0.35);
       border-radius: 6px;
-      font-size: 0.75rem;
-      cursor: pointer;
+      padding: 4px 10px;
+      font-size: 0.72rem;
       font-weight: 700;
+      cursor: pointer;
     }
     .wb-btn-join-zoom {
-      width: 100%;
-      background: #2D8CFF;
+      background: linear-gradient(135deg, #10B981, #059669);
       color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 0.95rem;
-      font-weight: 900;
       text-decoration: none;
+      border-radius: 10px;
+      padding: 14px;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
-      margin-top: 10px;
-      box-shadow: 0 4px 16px rgba(45, 140, 255, 0.5);
+      font-weight: 800;
+      font-size: 1rem;
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.4);
+      margin-top: 12px;
+      transition: all 0.2s ease;
+    }
+    .wb-btn-join-zoom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.6);
     }
 
-    /* AarogyamTube Section Styling */
+    /* Section Wrappers */
     .wb-tube-section {
-      margin-top: 32px;
-      margin-bottom: 28px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-card);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.35);
     }
     .wb-tube-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 18px;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 16px;
     }
     .wb-tube-brand {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
     }
     .wb-tube-icon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, #EF4444, #F43F5E);
-      border-radius: 8px;
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #F43F5E, #E11D48);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
-      font-size: 1rem;
-      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.4);
+      font-size: 1.25rem;
+      box-shadow: 0 4px 16px rgba(244, 63, 94, 0.4);
     }
     .wb-tube-title {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 900;
       color: #FFFFFF;
     }
     .wb-tube-subtitle {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
+      font-weight: 600;
     }
 
-    /* Filter Chips Bar */
+    /* Filter Chips */
     .wb-filter-bar {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 16px;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
       scrollbar-width: none;
     }
     .wb-filter-bar::-webkit-scrollbar { display: none; }
     .wb-chip {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #CBD5E1;
-      padding: 6px 14px;
+      background: #0B1120;
+      border: 1px solid #334155;
+      color: var(--text-muted);
+      padding: 7px 16px;
       border-radius: 20px;
       font-size: 0.8rem;
       font-weight: 700;
-      white-space: nowrap;
       cursor: pointer;
-      display: inline-flex;
+      white-space: nowrap;
+      display: flex;
       align-items: center;
       gap: 6px;
       transition: all 0.2s ease;
     }
-    .wb-chip.active {
+    .wb-chip:hover, .wb-chip.active {
       background: var(--zoom-blue);
-      color: #fff;
       border-color: var(--zoom-blue);
-      box-shadow: 0 2px 10px var(--zoom-blue-glow);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(45, 140, 255, 0.35);
     }
 
-    /* 9:16 Shorts & Reels Grid */
+    /* Horizontal Reels Slider with Desktop Scroll Buttons */
+    .wb-reels-slider-wrap {
+      position: relative;
+    }
     .wb-shorts-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      padding: 10px 4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
-    @media (min-width: 600px) {
-      .wb-shorts-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    }
-    @media (min-width: 900px) {
-      .wb-shorts-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    }
-    @media (min-width: 1100px) {
-      .wb-shorts-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; }
-    }
-
+    .wb-shorts-grid::-webkit-scrollbar { display: none; }
     .wb-reel-card {
+      flex: 0 0 220px;
+      scroll-snap-align: start;
       background: #131E36;
-      border: 1px solid rgba(45, 140, 255, 0.18);
-      border-radius: 12px;
+      border: 1px solid rgba(45, 140, 255, 0.25);
+      border-radius: 14px;
       overflow: hidden;
       cursor: pointer;
-      position: relative;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
     .wb-reel-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(45, 140, 255, 0.3);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
       border-color: var(--zoom-blue);
     }
+    @media (max-width: 600px) {
+      .wb-reel-card { flex: 0 0 170px; }
+    }
+    .wb-reels-arrow {
+      position: absolute;
+      top: 45%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid #2D8CFF;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      transition: all 0.2s ease;
+    }
+    .wb-reels-arrow:hover {
+      background: #2D8CFF;
+      transform: translateY(-50%) scale(1.1);
+    }
+    .wb-reels-arrow-left { left: -14px; }
+    .wb-reels-arrow-right { right: -14px; }
+    @media (max-width: 768px) {
+      .wb-reels-arrow { display: none; }
+    }
+
     .wb-reel-thumb-wrap {
-      position: relative;
-      width: 100%;
       aspect-ratio: 9/16;
+      position: relative;
       background: #0f172a;
       overflow: hidden;
     }
@@ -636,34 +585,41 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      transition: transform 0.3s ease;
+    }
+    .wb-reel-card:hover .wb-reel-thumb-img {
+      transform: scale(1.05);
     }
     .wb-reel-plat-badge {
       position: absolute;
       top: 8px;
       left: 8px;
+      padding: 3px 8px;
+      border-radius: 6px;
       font-size: 0.68rem;
       font-weight: 800;
-      padding: 2px 8px;
-      border-radius: 6px;
+      color: #fff;
       display: flex;
       align-items: center;
       gap: 4px;
-      color: #fff;
+      backdrop-filter: blur(8px);
+      z-index: 2;
     }
-    .plat-youtube { background: #EF4444; }
-    .plat-instagram { background: linear-gradient(45deg, #F58529, #DD2A7B, #8134AF); }
-    .plat-facebook { background: #1877F2; }
+    .plat-youtube { background: rgba(239, 68, 68, 0.85); }
+    .plat-instagram { background: rgba(225, 48, 108, 0.85); }
+    .plat-facebook { background: rgba(24, 119, 242, 0.85); }
 
     .wb-reel-duration-badge {
       position: absolute;
-      top: 8px;
+      bottom: 8px;
       right: 8px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.75);
       color: #fff;
-      font-size: 0.65rem;
       padding: 2px 6px;
       border-radius: 4px;
+      font-size: 0.65rem;
       font-weight: 700;
+      z-index: 2;
     }
     .wb-reel-play-overlay {
       position: absolute;
@@ -672,23 +628,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0.85;
+      opacity: 0;
       transition: opacity 0.2s ease;
     }
+    .wb-reel-card:hover .wb-reel-play-overlay { opacity: 1; }
     .wb-reel-play-icon {
       width: 44px;
       height: 44px;
-      border-radius: 50%;
-      background: rgba(45, 140, 255, 0.9);
+      background: var(--zoom-blue);
       color: #fff;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.1rem;
-      box-shadow: 0 0 16px var(--zoom-blue-glow);
+      box-shadow: 0 4px 16px rgba(45, 140, 255, 0.6);
     }
     .wb-reel-card-info {
-      padding: 10px;
+      padding: 10px 12px;
     }
     .wb-reel-card-title {
       font-size: 0.82rem;
@@ -698,46 +655,41 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      margin-bottom: 4px;
       line-height: 1.35;
+      margin-bottom: 4px;
     }
     .wb-reel-card-speaker {
-      font-size: 0.72rem;
-      color: var(--text-muted);
+      font-size: 0.7rem;
+      color: var(--text-dim);
       display: flex;
       align-items: center;
       gap: 4px;
     }
 
-    /* 16:9 Masterclasses Video Grid */
+    /* Masterclass Videos Grid */
     .wb-video-grid {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px;
-    }
-    @media (min-width: 600px) {
-      .wb-video-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 950px) {
-      .wb-video-grid { grid-template-columns: repeat(3, 1fr); }
     }
     .wb-vcard {
       background: #131E36;
-      border: 1px solid rgba(45, 140, 255, 0.18);
+      border: 1px solid rgba(45, 140, 255, 0.25);
       border-radius: 12px;
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      transition: all 0.25s ease;
     }
     .wb-vcard:hover {
-      transform: translateY(-3px);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       border-color: var(--zoom-blue);
     }
     .wb-vcard-thumb-wrap {
-      position: relative;
-      width: 100%;
       aspect-ratio: 16/9;
+      position: relative;
       background: #0f172a;
+      overflow: hidden;
     }
     .wb-vcard-img {
       width: 100%;
@@ -746,111 +698,106 @@
       display: block;
     }
 
-    /* FAQs & Tutorial Accordion */
+    /* Accordion FAQs */
     .wb-accordion-item {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #131E36;
+      border: 1px solid rgba(45, 140, 255, 0.2);
       border-radius: 8px;
       margin-bottom: 8px;
       overflow: hidden;
     }
     .wb-accordion-q {
       padding: 12px 16px;
-      font-size: 0.88rem;
       font-weight: 700;
-      color: #F1F5F9;
+      font-size: 0.9rem;
+      color: #FFFFFF;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .wb-accordion-a {
-      padding: 0 16px 12px;
-      font-size: 0.82rem;
+      padding: 0 16px 12px 16px;
+      font-size: 0.85rem;
       color: var(--text-muted);
       line-height: 1.5;
       display: none;
     }
     .wb-accordion-item.active .wb-accordion-a { display: block; }
-    .wb-accordion-item.active .wb-accordion-q i { transform: rotate(180deg); color: var(--zoom-blue); }
+    .wb-accordion-item.active .wb-accordion-q i { transform: rotate(180deg); }
 
-    /* IN-APP REELS MODAL PLAYER (TIKTOK / INSTA STYLE WITH ENGAGEMENT & INFINITE LOOP) */
+    /* In-App Vertical Reels Modal Player */
     .wb-reels-modal {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.95);
-      z-index: 1000;
+      z-index: 9999;
       display: none;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
     }
     .wb-reels-modal.active { display: flex; }
     .wb-reels-container {
       width: 100%;
-      max-width: 440px;
-      height: 100%;
-      max-height: 90vh;
+      max-width: 420px;
+      height: 94vh;
+      max-height: 820px;
       background: #000;
       border-radius: 16px;
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 0 40px rgba(45, 140, 255, 0.3);
-    }
-    @media (max-width: 480px) {
-      .wb-reels-container { max-height: 100vh; border-radius: 0; }
+      box-shadow: 0 0 50px rgba(45, 140, 255, 0.3);
     }
     .wb-reels-top {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      padding: 12px 16px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
       z-index: 10;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
     }
     .wb-reels-close-btn {
       background: rgba(255, 255, 255, 0.2);
       border: none;
       color: #fff;
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       cursor: pointer;
-    }
-    .wb-reels-body {
-      flex: 1;
-      position: relative;
-      background: #000;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    .wb-reels-body {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
     }
     .wb-reels-iframe {
       width: 100%;
       height: 100%;
       border: none;
     }
-
-    /* Reels Right Action Rail */
     .wb-reels-rail {
       position: absolute;
       right: 12px;
-      bottom: 90px;
-      z-index: 20;
+      bottom: 80px;
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 14px;
+      z-index: 10;
+      align-items: center;
     }
     .wb-rail-btn {
       background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
       width: 44px;
@@ -860,31 +807,27 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
       cursor: pointer;
+      font-size: 1.1rem;
       text-decoration: none;
-      transition: transform 0.2s ease;
     }
-    .wb-rail-btn:active { transform: scale(0.9); }
     .wb-rail-count {
       font-size: 0.65rem;
       font-weight: 700;
-      margin-top: 2px;
+      margin-top: 1px;
     }
-
-    /* Reels Bottom Caption */
     .wb-reels-caption {
       position: absolute;
       bottom: 0;
       left: 0;
-      right: 60px;
+      right: 65px;
       padding: 16px;
-      background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+      background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
       z-index: 10;
     }
     .wb-reels-caption-title {
-      font-size: 0.88rem;
-      font-weight: 700;
+      font-weight: 800;
+      font-size: 0.95rem;
       color: #fff;
       margin-bottom: 4px;
     }
@@ -892,8 +835,6 @@
       font-size: 0.75rem;
       color: #93C5FD;
     }
-
-    /* Reels Up / Down Nav Buttons */
     .wb-reels-nav-btn {
       position: absolute;
       top: 50%;
@@ -931,36 +872,98 @@
   <div class="wb-ambient-glow glow-2"></div>
   <div class="wb-ambient-glow glow-3"></div>
 
-  <!-- Header Bar -->
-  <header class="wb-header">
-    <div class="wb-header-inner">
-      <a href="/index.html" class="wb-brand">
-        <img src="/images/logo/fevicon.png" alt="Aarogyam India" class="wb-brand-logo">
-        <div class="wb-brand-text">
-          <div class="wb-brand-title">
-            <span>Aarogyam India</span>
-            <span class="wb-brand-badge">Live</span>
-          </div>
-          <div class="wb-brand-tagline">वेबिनार एवं AarogyamTube हब</div>
-        </div>
-      </a>
-      <div class="wb-header-actions">
-        <button type="button" id="headerLoginBtn" class="wb-btn-login" onclick="window.openLoginPopup()">
-          <i class="fa-solid fa-user-check"></i> <span id="headerUserLabel">लॉगिन</span>
-        </button>
-        <button type="button" class="wb-hamburger-btn" onclick="window.openUniversalNavDrawer?.()" aria-label="Menu">
-          <i class="fa-solid fa-bars"></i>
-        </button>
+  <!-- =========================================
+       1. UNIVERSAL LOGIN POPUP
+       ========================================== -->
+  <div id="login-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; display: none; justify-content: center; align-items: center;">
+      <div style="background: #ffffff; padding: 30px; width: 100%; max-width: 380px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; font-family: sans-serif; position: relative;">
+          <button onclick="closeLoginPopup()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 20px; color: #888; cursor: pointer; line-height: 1;">&times;</button>
+          <h2 style="margin-bottom: 10px; color: #333; font-size: 22px;">लॉगिन करें</h2>
+          <p style="font-size: 14px; color: #666; margin-bottom: 20px;">अपनी डिजिटल प्रोफाइल देखने के लिए मोबाइल नंबर दर्ज करें</p>
+          <input type="tel" id="login-mobile" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; outline: none; color:#000;">
+          <button onclick="checkUserLogin()" style="width: 100%; padding: 12px; background: #2E7D32; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">लॉगिन करें</button>
+          <p style="margin-top: 20px; font-size: 14px; color: #555;">नया यूजर हैं? <a href="/registration.html" style="color: #007bff; text-decoration: none; font-weight: bold;">यहाँ साइन अप करें</a></p>
       </div>
-    </div>
+  </div>
+
+  <!-- =========================================
+       2. UNIVERSAL TOP HEADER (MATCHES BOOK LANDING)
+       ========================================== -->
+  <header class="library-header" style="background:#ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;">
+      <div class="header-logo-title" style="display: flex; align-items: center; gap: 10px;">
+          <a href="/index.html"><img src="/images/logo/logo.png" alt="Logo" class="site-logo" style="height: 38px; width: auto; display: block;"></a>
+          <div>
+            <h1 id="header-book-title" style="font-size: 1.05rem; font-weight: 800; color: #1e293b; margin: 0; line-height: 1.2;">Aarogyam India Live Webinar</h1>
+            <div style="font-size:0.72rem; color:#64748b; font-weight:600;">लाइव ज़ूम ट्रेनिंग एवं AarogyamTube</div>
+          </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+          <!-- Cart Icon -->
+          <a href="/ebooks/cart.html" style="position: relative; width: 38px; height: 38px; background: rgba(37,99,235,0.12); color: #2563eb; border: 1.5px solid #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1rem;" title="Cart">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span id="cart-count-badge" style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.68rem; font-weight: 800; padding: 2px 5px;">0</span>
+          </a>
+          <!-- Notification Bell -->
+          <button class="user-notif-bell-btn" onclick="window.location.href='/ucas/index.html?tab=notifications'" title="सूचनाएं (Notifications)" aria-label="Notifications" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1.5px solid #10B981; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; position: relative;">
+              <i class="fa-solid fa-bell" style="color: #10B981;"></i>
+              <span class="user-notif-badge" style="display: none; position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.68rem; font-weight: 800; padding: 2px 5px;">0</span>
+          </button>
+          <button class="back-btn" onclick="window.location.href='/index.html'" style="width: 38px; height: 38px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;"><i class="fa-solid fa-arrow-left"></i></button>
+          <button class="menu-btn" onclick="toggleMenu()" title="मेनू खोलें" aria-label="Toggle Menu" style="width: 38px; height: 38px; background: #2E7D32; color: #fff; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem;"><i class="fa-solid fa-bars" style="pointer-events: none;"></i></button>
+      </div>
   </header>
+
+  <!-- =========================================
+       3. UNIVERSAL SIDE-OUT MENU DRAWER
+       ========================================== -->
+  <div class="side-menu-overlay" id="sideMenuOverlay" onclick="toggleMenu()"></div>
+  <div class="side-menu" id="sideMenu">
+      <button class="close-menu" onclick="toggleMenu()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 24px; color: #64748b; cursor: pointer;">&times;</button>
+      <div style="text-align: center; padding: 15px 10px; border-bottom: 1px solid #eee; margin-bottom: 10px; background: #f8fafc; border-radius: 8px;">
+          <div style="width: 45px; height: 45px; background: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto 6px;">
+              <i class="fa-solid fa-user"></i>
+          </div>
+          <h3 style="font-size: 0.95rem; color: #1e293b; margin-bottom: 2px;">नमस्ते, <span id="menuUserName">प्रिय प्रतिभागी</span></h3>
+          <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">
+              👑 <span id="mobileMemberStatus">Member</span> <span id="mobileUserPhone"></span>
+          </p>
+      </div>
+
+      <div style="padding: 0 10px 10px 10px;">
+          <button id="mobile-login-btn" onclick="openLoginPopup()" style="background: #28a745; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; gap: 8px; margin-bottom: 5px;">
+              <i class="fa-solid fa-right-to-bracket"></i> लॉगिन करें
+          </button>
+          <button id="mobile-logout-btn" onclick="logoutUniversalUser()" style="background: #e81717; color: white; display: none; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; gap: 8px;">
+              <i class="fa-solid fa-right-from-bracket"></i> लॉग आउट
+          </button>
+      </div>
+
+      <ul style="list-style: none; padding: 0; margin: 10px 0;">
+          <li><a href="/index.html"><i class="fa-solid fa-house" style="color:#10B981;"></i> Home</a></li>
+          <li><a href="/ucas/index.html"><i class="fa-solid fa-user-gear" style="color:#E86A17;"></i> UCAS / My Profile</a></li>
+          <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library</a></li>
+          <li><a href="/ebooks/cart.html"><i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> Shopping Cart</a></li>
+          <li><a href="/subscription.html"><i class="fa-solid fa-crown" style="color:#F59E0B;"></i> VIP Pass (Subscription)</a></li>
+          <li><a href="/webinar.html"><i class="fa-solid fa-video" style="color:#2D8CFF;"></i> Live Zoom Webinar</a></li>
+          <li><a href="/mandi.html"><i class="fa-solid fa-seedling" style="color:#16a34a;"></i> Mandi Bhav</a></li>
+          <li><a href="/purchases.html"><i class="fa-solid fa-file-invoice" style="color:#10B981;"></i> My Purchases & Invoices</a></li>
+      </ul>
+  </div>
 
   <main class="wb-container">
 
-    <!-- HERO LIVE WEBINAR SECTION -->
+    <!-- =========================================
+         4. HERO 2-COLUMN SECTION (BOOK LANDING EXACT)
+         ========================================== -->
     <section id="sec_hero_zoom" class="wb-hero-grid">
       
-      <!-- Left Column: Details & Countdown -->
+      <!-- LEFT COLUMN: 3D FLOATING COVER (UNCROPPED NATURAL ASPECT RATIO) -->
+      <div class="wb-hero-book-wrap">
+        <img id="wb_cover_img" src="/images/banners/agriculture-hero-banner-1.webp" alt="Webinar Cover" class="wb-hero-book-cover" onerror="this.onerror=null; this.src='/images/banners/universal-zoom-webinar-og.jpg'">
+      </div>
+
+      <!-- RIGHT COLUMN: WEBINAR DETAILS & REGISTRATION / UNLOCKED ZOOM CARD -->
       <div class="wb-card">
         <div class="wb-host-pill">
           <span class="wb-live-pulse-dot"></span>
@@ -1044,13 +1047,6 @@
             <span>💬 लाइव सवाल-जवाब एवं समाधान</span>
           </div>
         </div>
-      </div>
-
-      <!-- Right Column: 3D Cover & Registration / Unlocked Zoom Card -->
-      <div class="wb-card">
-        <div class="wb-cover-wrap">
-          <img id="wb_cover_img" src="/images/banners/agriculture-hero-banner-1.webp" alt="Webinar Cover" class="wb-cover-img" onerror="this.onerror=null; this.src='/images/banners/universal-zoom-webinar-og.jpg'">
-        </div>
 
         <!-- Registration Form (Visible when not joined) -->
         <div id="wb_reg_box">
@@ -1129,7 +1125,9 @@
       </div>
     </section>
 
-    <!-- HERO MULTI-BANNERS SECTION -->
+    <!-- =========================================
+         5. HERO MULTI-BANNERS & POSTERS SECTION
+         ========================================== -->
     <section id="sec_banners" class="wb-tube-section" style="display:none;">
       <div class="wb-tube-header">
         <div class="wb-tube-brand">
@@ -1145,7 +1143,9 @@
       </div>
     </section>
 
-    <!-- AAROGYAMTUBE 9:16 SHORTS & REELS SECTION -->
+    <!-- =========================================
+         6. AAROGYAMTUBE 9:16 SHORTS & REELS SECTION
+         ========================================== -->
     <section id="sec_aarogyamtube_shorts" class="wb-tube-section">
       <div class="wb-tube-header">
         <div class="wb-tube-brand">
@@ -1165,13 +1165,23 @@
         <button type="button" class="wb-chip" data-platform="facebook"><i class="fa-brands fa-facebook" style="color:#1877F2;"></i> Facebook Reels</button>
       </div>
 
-      <!-- Shorts Grid -->
-      <div id="wb_shorts_grid" class="wb-shorts-grid">
-        <!-- Rendered by JS -->
+      <!-- Shorts Carousel with Desktop Left/Right Buttons -->
+      <div class="wb-reels-slider-wrap">
+        <button type="button" class="wb-reels-arrow wb-reels-arrow-left" onclick="window.scrollReelsRow(-1)" aria-label="Previous">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div id="wb_shorts_grid" class="wb-shorts-grid">
+          <!-- Rendered by JS -->
+        </div>
+        <button type="button" class="wb-reels-arrow wb-reels-arrow-right" onclick="window.scrollReelsRow(1)" aria-label="Next">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
     </section>
 
-    <!-- AAROGYAMTUBE 16:9 MASTERCLASS VIDEOS SECTION -->
+    <!-- =========================================
+         7. AAROGYAMTUBE 16:9 MASTERCLASS VIDEOS SECTION
+         ========================================== -->
     <section id="sec_aarogyamtube_videos" class="wb-tube-section">
       <div class="wb-tube-header">
         <div class="wb-tube-brand">
@@ -1197,7 +1207,9 @@
       </div>
     </section>
 
-    <!-- STEP-BY-STEP ZOOM TUTORIAL -->
+    <!-- =========================================
+         8. STEP-BY-STEP ZOOM TUTORIAL
+         ========================================== -->
     <section id="sec_tutorial" class="wb-tube-section">
       <div class="wb-card">
         <div style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
@@ -1222,7 +1234,9 @@
       </div>
     </section>
 
-    <!-- FAQS ACCORDION -->
+    <!-- =========================================
+         9. FAQS ACCORDION
+         ========================================== -->
     <section id="sec_faqs" class="wb-tube-section">
       <div class="wb-card">
         <div style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
@@ -1237,7 +1251,9 @@
 
   </main>
 
-  <!-- IN-APP VERTICAL REELS SWIPE PLAYER MODAL (WITH LIKE, COMMENT, SHARE & INFINITE LOOP) -->
+  <!-- =========================================
+       IN-APP VERTICAL REELS SWIPE PLAYER MODAL
+       ========================================== -->
   <div id="wb_reels_modal" class="wb-reels-modal">
     <div class="wb-reels-container">
       <div class="wb-reels-top">
@@ -1250,7 +1266,7 @@
       </div>
 
       <div class="wb-reels-body" id="wb_reels_body">
-        <iframe id="wb_reel_iframe" class="wb-reels-iframe" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="wb_reel_iframe" class="wb-reels-iframe" src="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen="true"></iframe>
       </div>
 
       <!-- Left / Right Nav Arrows -->
@@ -1284,37 +1300,14 @@
         </button>
       </div>
 
-      <!-- Bottom Caption -->
+      <!-- Bottom Caption & Direct App Button -->
       <div class="wb-reels-caption">
         <div id="wb_reel_caption_title" class="wb-reels-caption-title">रील शीर्षक</div>
         <div id="wb_reel_caption_speaker" class="wb-reels-caption-speaker">आरोग्यम कृषि विशेषज्ञ</div>
+        <a id="wb_reel_direct_app_btn" href="#" target="_blank" style="display:none; margin-top:6px; background:#1877F2; color:#fff; padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:700; text-decoration:none; width:fit-content;">
+          ▶️ Open in App
+        </a>
       </div>
-    </div>
-  </div>
-
-  <!-- IN-PAGE LOGIN / REGISTRATION MODAL -->
-  <div id="wb_login_popup_modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:16px;">
-    <div style="background:#1e293b; border:1.5px solid #334155; border-radius:16px; max-width:400px; width:100%; padding:24px; box-shadow:0 20px 50px rgba(0,0,0,0.6); position:relative;">
-      <button type="button" onclick="window.closeLoginPopup()" style="position:absolute; top:14px; right:14px; background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer;">&times;</button>
-      <div style="text-align:center; margin-bottom:16px;">
-        <div style="font-size:2.2rem; margin-bottom:6px;">🔑</div>
-        <h3 style="font-size:1.15rem; font-weight:800; color:#fff; margin-bottom:4px;">Aarogyam India में लॉगिन करें</h3>
-        <p style="font-size:0.8rem; color:#94a3b8; margin:0;">अपना नाम और मोबाइल नंबर डालकर तुरंत लॉगिन करें:</p>
-      </div>
-      <form id="wb_modal_login_form">
-        <div style="margin-bottom:12px;">
-          <label style="display:block; font-size:0.78rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">आपका नाम: *</label>
-          <input type="text" id="wb_modal_login_name" class="wb-input" placeholder="उदा. राहुल शर्मा" required />
-        </div>
-        <div style="margin-bottom:16px;">
-          <label style="display:block; font-size:0.78rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">10 अंकों का मोबाइल नंबर: *</label>
-          <input type="tel" id="wb_modal_login_mobile" class="wb-input" placeholder="उदा. 9876543210" pattern="[0-9]{10}" maxlength="10" required />
-        </div>
-        <button type="submit" class="wb-btn-primary" style="width:100%;">
-          <span>लॉगिन / जारी रखें</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-      </form>
     </div>
   </div>
 
@@ -1335,21 +1328,40 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // Global Login / Modal Hooks
+    // Universal Menu & Login Handlers
+    window.toggleMenu = function () {
+      const overlay = document.getElementById('sideMenuOverlay');
+      const menu = document.getElementById('sideMenu');
+      if (menu) menu.classList.toggle('active');
+      if (overlay) overlay.classList.toggle('active');
+    };
+
     window.openLoginPopup = function () {
       if (typeof window.openGuestLoginModal === 'function') {
         window.openGuestLoginModal();
         return;
       }
-      const modal = document.getElementById('wb_login_popup_modal');
-      if (modal) modal.style.display = 'flex';
+      const overlay = document.getElementById('login-popup-overlay');
+      if (overlay) overlay.style.display = 'flex';
     };
 
     window.closeLoginPopup = function () {
-      const modal = document.getElementById('wb_login_popup_modal');
-      if (modal) modal.style.display = 'none';
+      const overlay = document.getElementById('login-popup-overlay');
+      if (overlay) overlay.style.display = 'none';
       if (typeof window.closeGuestLoginModal === 'function') {
         window.closeGuestLoginModal();
+      }
+    };
+
+    window.checkUserLogin = function () {
+      const mob = (document.getElementById('login-mobile')?.value || '').trim();
+      if (mob.length === 10) {
+        localStorage.setItem('aim_user_mobile', mob);
+        localStorage.setItem('aim_user_name', 'प्रतिभागी ' + mob.slice(-4));
+        closeLoginPopup();
+        window.location.reload();
+      } else {
+        alert('कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें।');
       }
     };
 
@@ -1361,6 +1373,12 @@
         localStorage.removeItem('AI_PROFILE');
         window.location.reload();
       }
+    };
+
+    // Horizontal Scroll for Reels Row
+    window.scrollReelsRow = function (dir) {
+      const grid = document.getElementById('wb_shorts_grid');
+      if (grid) grid.scrollBy({ left: dir * 300, behavior: 'smooth' });
     };
 
     (function () {
@@ -1381,22 +1399,44 @@
       const specificVid = urlParams.get('vid');
 
       let masterData = {
-        title: 'प्राकृतिक एवं जैविक खेती से 3x मुनाफा लाइव वेबिनार 2026',
-        description: 'इस विशेष लाइव ज़ूम वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।',
-        date: '',
-        time: '',
-        zoom_link: '',
-        meeting_id: '',
-        passcode: '',
+        title: '💼 NetSurf Career Plan + Digital Marketing Training अगर आप सीखना चाहते हैं:',
+        description: 'इस विशेष लाइव ज़ूम वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें और ज़ूम लिंक प्राप्त करें।',
+        date: '2026-08-30',
+        time: '20:00',
+        zoom_link: 'https://zoom.us/j/84313338881?pwd=NDM5MDI0',
+        meeting_id: '843 1333 8881',
+        passcode: '439024',
         cover_image: '/images/banners/agriculture-hero-banner-1.webp',
+        posters_title: '🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स',
+        posters_subtitle: 'नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स',
         banners: [
-          '/images/banners/agriculture-hero-banner-1.webp',
-          '/images/banners/agriculture-hero-banner-2.webp'
+          {
+            title: 'खरीफ फसल मास्टर गाइड 2026',
+            url: '/images/banners/agriculture-hero-banner-1.webp'
+          },
+          {
+            title: 'AI के साथ Professional Website बनाना सीखें',
+            url: '/images/banners/agriculture-hero-banner-2.webp'
+          }
         ],
         price: 0,
         duration_minutes: 90,
-        kpis: [],
-        faqs: []
+        kpis: [
+          '🔴 100% लाइव इंटरएक्टिव ज़ूम क्लास',
+          '🌱 जैविक खाद एवं वैज्ञानिक स्प्रे फॉर्मूला',
+          '🎁 फ्री ई-बुक एवं स्टडी नोट्स बंडल',
+          '💬 लाइव सवाल-जवाब एवं समाधान सत्र'
+        ],
+        faqs: [
+          {
+            q: 'ज़ूम मीटिंग लिंक और पासवर्ड कब खुलेगा?',
+            a: 'वेबिनार शुरू होने के ठीक 2 मिनट पहले Join Zoom Meeting बटन सक्रिय हो जाएगा और Meeting ID व पासवर्ड भी दिखाई देने लगेगा।'
+          },
+          {
+            q: 'क्या यह वेबिनार फ्री है?',
+            a: 'हाँ, यह वेबिनार पूरी तरह निःशुल्क है। अपना नाम और मोबाइल नंबर डालकर सीट सुरक्षित कर सकते हैं।'
+          }
+        ]
       };
 
       let allRecordings = [];
@@ -1455,7 +1495,7 @@
           }
         } catch (e) {}
 
-        // Step 3: Permanent Supabase Cloud Sync (Data NEVER lost even when browser cache is cleared)
+        // Step 3: Permanent Supabase Cloud Sync
         if (db) {
           try {
             const { data } = await db.from('landing_pages').select('*').eq('id', webinarId === 'WB_MASTER' ? 'WB_MASTER' : webinarId).maybeSingle();
@@ -1501,7 +1541,7 @@
           }
         } catch (e) {}
 
-        // Step 3: Permanent Supabase Cloud Sync (Merges new recordings from cloud)
+        // Step 3: Permanent Supabase Cloud Sync
         if (db) {
           try {
             const { data } = await db.from('landing_pages').select('*').eq('category', 'recorded_video').eq('status', 'active');
@@ -1558,7 +1598,7 @@
               return `
                 <div style="background:#131E36; border:1.5px solid rgba(45,140,255,0.3); border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.4); display:flex; flex-direction:column;">
                   <div style="aspect-ratio:16/9; background:#0f172a; overflow:hidden;">
-                    <img src="${bUrl}" alt="${bTitle || 'Banner'}" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.3s ease;" onerror="this.parentElement.parentElement.style.display='none'">
+                    <img src="${bUrl}" alt="${bTitle || 'Banner'}" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.parentElement.parentElement.style.display='none'">
                   </div>
                   ${bTitle ? `<div style="padding:10px 14px; font-weight:800; font-size:0.88rem; color:#FFFFFF; background:#0F172A; border-top:1px solid rgba(255,255,255,0.08);">${bTitle}</div>` : ''}
                 </div>
@@ -1677,8 +1717,8 @@
         localStorage.setItem('AI_USER', JSON.stringify(userObj));
         sessionStorage.setItem(`wb_reg_${webinarId}`, 'true');
 
-        const lbl = document.getElementById('headerUserLabel');
-        if (lbl) lbl.textContent = name.split(' ')[0];
+        const menuName = document.getElementById('menuUserName');
+        if (menuName) menuName.textContent = name;
 
         // Instantly unlock UI without network delay
         showUnlockedScreen();
@@ -1707,8 +1747,8 @@
         const isReg = sessionStorage.getItem(`wb_reg_${webinarId}`);
 
         if (uName || uMobile || isReg) {
-          const lbl = document.getElementById('headerUserLabel');
-          if (lbl) lbl.textContent = uName ? uName.split(' ')[0] : 'प्रोफाइल';
+          const menuName = document.getElementById('menuUserName');
+          if (menuName && uName) menuName.textContent = uName;
           showUnlockedScreen();
         }
       }
@@ -1790,7 +1830,7 @@
         activeReelsList = shortsList;
 
         if (shortsList.length === 0) {
-          grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:2rem; color:#94a3b8;">इस श्रेणी में अभी कोई रील उपलब्ध नहीं है।</div>';
+          grid.innerHTML = '<div style="width:100%; text-align:center; padding:2rem; color:#94a3b8;">इस श्रेणी में अभी कोई रील उपलब्ध नहीं है।</div>';
           return;
         }
 
@@ -1871,17 +1911,33 @@
         const ifr = document.getElementById('wb_reel_iframe');
         let embedSrc = '';
         const url = reel.video_url || reel.youtube_url || '';
+        const appBtn = document.getElementById('wb_reel_direct_app_btn');
 
         if (reel.platform === 'instagram' || url.includes('instagram.com')) {
           const igMatch = url.match(/(?:reel|p)\/([a-zA-Z0-9_-]+)/);
           const igId = igMatch ? igMatch[1] : '';
           embedSrc = `https://www.instagram.com/reel/${igId}/embed/`;
+          if (appBtn) {
+            appBtn.style.display = 'inline-block';
+            appBtn.href = url;
+            appBtn.textContent = '📸 Open Instagram Reel';
+            appBtn.style.background = '#E1306C';
+          }
         } else if (reel.platform === 'facebook' || url.includes('facebook.com') || url.includes('fb.watch')) {
-          embedSrc = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0`;
+          embedSrc = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&width=500`;
+          if (appBtn) {
+            appBtn.style.display = 'inline-block';
+            appBtn.href = url;
+            appBtn.textContent = '👥 Open Facebook Reel';
+            appBtn.style.background = '#1877F2';
+          }
         } else {
           // YouTube Shorts / Video
           const ytId = reel.youtube_id || extractYoutubeVideoId(url) || 'dQw4w9WgXcQ';
           embedSrc = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
+          if (appBtn) {
+            appBtn.style.display = 'none';
+          }
         }
 
         if (ifr) ifr.src = embedSrc;
