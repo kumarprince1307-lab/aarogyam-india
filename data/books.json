@@ -458,23 +458,37 @@
       ]
     },
     {
-      "banner": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
-      "badge": "best_seller",
-      "cover": "/images/books/kharif-master-guide-2026-cover.webp",
+      "id": "BK015",
+      "slug": "bk015",
+      "heading": "सब्जी खेती गाइड PART 1",
+      "name": "सब्जी खेती गाइड PART 1",
       "category": "Agriculture",
-      "readerPage": "/ebooks/reader.html",
-      "thumbnail": "/images/books/kharif-master-guide-2026-cover.webp",
-      "mrp": 299,
       "language": "Hindi",
-      "status": "active",
+      "mrp": 299,
       "offerPrice": 149,
+      "cover": "/images/books/kharif-master-guide-2026-cover.webp",
+      "thumbnail": "/images/books/kharif-master-guide-2026-cover.webp",
+      "banner": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+      "status": "active",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "features": [
+        "120+ रंगीन पेज",
+        "रोग व कीट पहचान",
+        "स्प्रे चार्ट",
+        "आजीवन डिजिटल एक्सेस"
+      ],
+      "totalPages": 120,
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
-      "store_badge": "best_seller",
-      "heading": "à¤¸à¤¬à¥à¤œà¥€ à¤–à¥‡à¤¤à¥€ à¤—à¤¾à¤‡à¤¡ PART 1",
-      "slug": "bk015",
-      "name": "à¤¸à¤¬à¥à¤œà¥€ à¤–à¥‡à¤¤à¥€ à¤—à¤¾à¤‡à¤¡ PART 1",
-      "id": "BK015"
+      "readerPage": "/ebooks/reader.html"
     }
   ]
 }

@@ -18,7 +18,7 @@ function sendJson(res, statusCode, data) {
   const jsonStr = JSON.stringify(data);
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
-    'Content-Length': Buffer.byteLength(jsonStr),
+    'Content-Length': Buffer.byteLength(jsonStr, 'utf8'),
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type'
@@ -32,11 +32,13 @@ function parseBody(req) {
       if (typeof req.body === 'object') return resolve(req.body);
       try { return resolve(JSON.parse(req.body)); } catch (e) { return resolve({}); }
     }
-    let bodyData = '';
-    req.on('data', chunk => { bodyData += chunk; });
+    const chunks = [];
+    req.on('data', chunk => { chunks.push(chunk); });
     req.on('end', () => {
       try {
-        resolve(bodyData ? JSON.parse(bodyData) : {});
+        const bodyBuffer = Buffer.concat(chunks);
+        const bodyStr = bodyBuffer.toString('utf8');
+        resolve(bodyStr ? JSON.parse(bodyStr) : {});
       } catch (e) {
         resolve({});
       }
@@ -68,9 +70,9 @@ function githubRequest(endpoint, method, token, body = null) {
 
       let postData = null;
       if (body) {
-        postData = JSON.stringify(body);
-        headers['Content-Type'] = 'application/json';
-        headers['Content-Length'] = Buffer.byteLength(postData);
+        postData = Buffer.from(JSON.stringify(body), 'utf8');
+        headers['Content-Type'] = 'application/json; charset=utf-8';
+        headers['Content-Length'] = postData.length;
       }
 
       const options = {
@@ -83,14 +85,15 @@ function githubRequest(endpoint, method, token, body = null) {
       };
 
       const req = https.request(options, (res) => {
-        let data = '';
-        res.on('data', (chunk) => { data += chunk; });
+        const resChunks = [];
+        res.on('data', (chunk) => { resChunks.push(chunk); });
         res.on('end', () => {
           let parsed = null;
           try {
-            parsed = data ? JSON.parse(data) : {};
+            const rawStr = Buffer.concat(resChunks).toString('utf8');
+            parsed = rawStr ? JSON.parse(rawStr) : {};
           } catch (e) {
-            parsed = { raw: data };
+            parsed = {};
           }
 
           if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -128,7 +131,8 @@ async function getFileContent(filePath, token) {
   try {
     const res = await githubRequest(`contents/${encodeURIComponent(filePath).replace(/%2F/g, '/')}?ref=${GITHUB_BRANCH}`, 'GET', token);
     if (res.data?.content) {
-      const decoded = Buffer.from(res.data.content, 'base64').toString('utf8');
+      const cleanBase64 = String(res.data.content).replace(/\s+/g, '');
+      const decoded = Buffer.from(cleanBase64, 'base64').toString('utf8');
       return { content: decoded, sha: res.data.sha };
     }
   } catch (e) { }

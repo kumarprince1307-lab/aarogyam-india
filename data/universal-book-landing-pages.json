@@ -913,44 +913,103 @@
       "google_analytics_enabled": true
     },
     {
-      "cover_effect": "3d_float",
-      "slug": "bk015",
       "id": "BK015",
-      "hero": {
-        "rating_score": "4.9",
-        "description": "à¤µà¥ˆà¤œà¥à¤žà¤¾à¤¨à¤¿à¤• à¤¤à¤°à¥€à¤•à¥‹à¤‚ à¤¸à¥‡ à¤¸à¤¬à¥à¤œà¥€ à¤‰à¤¤à¥à¤ªà¤¾à¤¦à¤¨, à¤•à¥€à¤Ÿ à¤µ à¤°à¥‹à¤— à¤¨à¤¿à¤¯à¤‚à¤¤à¥à¤°à¤£ à¤•à¥€ à¤¸à¤‚à¤ªà¥‚à¤°à¥à¤£ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¿à¤•à¤¾à¥¤",
-        "cover_image": "/images/books/kharif-master-guide-2026-cover.webp",
-        "subtitle": "à¤‰à¤¨à¥à¤¨à¤¤ à¤µ à¤µà¥ˆà¤œà¥à¤žà¤¾à¤¨à¤¿à¤• à¤¸à¤¬à¥à¤œà¥€ à¤‰à¤¤à¥à¤ªà¤¾à¤¦à¤¨ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¿à¤•à¤¾",
-        "rating_count": "120+ Ratings",
-        "offer_badge": "Launch Offer",
-        "banner_image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
-        "features": [
-          {
-            "icon": "fa-seedling",
-            "text": "120 à¤ªà¥‡à¤œ à¤•à¥€ à¤¸à¤®à¥à¤ªà¥‚à¤°à¥à¤£ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€"
-          },
-          {
-            "icon": "fa-camera",
-            "text": "300+ à¤°à¤‚à¤—à¥€à¤¨ à¤«à¥‹à¤Ÿà¥‹"
-          }
-        ],
-        "tag": "ðŸŒ¾ Bestseller Agriculture Guide",
-        "title": "à¤¸à¤¬à¥à¤œà¥€ à¤–à¥‡à¤¤à¥€ à¤—à¤¾à¤‡à¤¡ PART 1",
-        "offer_price": 149,
-        "mrp": 299
-      },
-      "theme_primary": "#15803d",
-      "store_badge": "best_seller",
+      "slug": "bk015",
       "category": "Agriculture",
-      "theme_dark": "#0e5227",
-      "sticky_button_text": "à¤…à¤­à¥€ à¤†à¤°à¥à¤¡à¤° à¤•à¤°à¥‡à¤‚",
       "status": "active",
+      "store_badge": "best_seller",
+      "theme_primary": "#15803d",
+      "theme_dark": "#0e5227",
+      "cover_effect": "3d_float",
+      "sticky_button_text": "अभी ऑर्डर करें",
       "publish_targets": [
         "ebook_store",
         "category_page",
         "my_library",
         "home_page"
-      ]
+      ],
+      "hero": {
+        "tag": "🌾 Bestseller Agriculture Guide",
+        "title": "सब्जी खेती गाइड PART 1",
+        "subtitle": "उन्नत व वैज्ञानिक सब्जी उत्पादन मार्गदर्शिका",
+        "description": "वैज्ञानिक तरीकों से सब्जी उत्पादन, कीट व रोग नियंत्रण की संपूर्ण मार्गदर्शिका।",
+        "mrp": 299,
+        "offer_price": 149,
+        "offer_badge": "Launch Offer",
+        "rating_score": "4.9",
+        "rating_count": "120+ Ratings",
+        "cover_image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "banner_image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+        "features": [
+          {
+            "icon": "fa-seedling",
+            "text": "120 पेज की सम्पूर्ण जानकारी"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ रंगीन फोटो"
+          },
+          {
+            "icon": "fa-flask",
+            "text": "रोग व कीट पहचान एवं स्प्रे चार्ट"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "आजीवन डिजिटल एक्सेस"
+          }
+        ]
+      },
+      "value_stack": {
+        "book_mrp": 299,
+        "vip_value": 1999,
+        "bonus_value": 199,
+        "offer_price": 149,
+        "subscriber_perk": "👑 VIP मेंबर्स के लिए विशेष कृषि समाधान गाइड 100% मुफ्त शामिल है।"
+      },
+      "why_read": {
+        "title": "यह पुस्तक क्यों खरीदें?",
+        "subtitle": "सब्जी की उन्नत खेती और सही रोग-कीट प्रबंधन से पाएं रिकॉर्ड तोड़ उत्पादन",
+        "cards": [
+          {
+            "icon": "🌱",
+            "title": "वैज्ञानिक जानकारी",
+            "desc": "सब्जी विशेषज्ञों द्वारा तैयार प्रमाणित एवं व्यावहारिक फसल प्रबंधन।"
+          },
+          {
+            "icon": "📷",
+            "title": "300+ वास्तविक फोटो",
+            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
+          },
+          {
+            "icon": "📘",
+            "title": "Step by Step Guide",
+            "desc": "नर्सरी तैयारी से लेकर तुड़ाई और मंडी प्रबंधन तक सम्पूर्ण गाइड।"
+          },
+          {
+            "icon": "🎁",
+            "title": "Free Spray Chart",
+            "desc": "इस पुस्तक के साथ सटीक स्प्रे फॉर्मूला चार्ट बिल्कुल निःशुल्क।"
+          }
+        ]
+      },
+      "table_of_contents": [
+        "नर्सरी प्रबंधन एवं उन्नत बीज चुनाव",
+        "खेत की वैज्ञानिक तैयारी एवं बेसल डोज",
+        "टमाटर, मिर्च, बैंगन, गोभी फसल प्रबंधन",
+        "ड्रिप सिंचाई एवं फर्टिगेशन शेड्यूल",
+        "प्रमुख कीट एवं रोग नियंत्रण",
+        "स्प्रे चार्ट व पोषक तत्व प्रबंधन",
+        "उत्पादन व मंडी भाव बढ़ाने के नुस्खे"
+      ],
+      "timer": {
+        "enabled": true,
+        "minutes": 15,
+        "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!"
+      },
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true
     }
   ]
 }
