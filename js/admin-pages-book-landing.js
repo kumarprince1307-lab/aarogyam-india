@@ -2737,16 +2737,30 @@ export async function initBookLandingPages() {
     showToast(`🗑️ बुक लैंडिंग पेज (${bId}) तुरंत हटा दिया गया।`, 'info');
   };
 
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function saveBookLandingPage() {
     const bId = (document.getElementById('blp_input_book_id')?.value || '').trim().toUpperCase();
     const category = document.getElementById('blp_category_select')?.value || 'Agriculture';
     const title = (document.getElementById('blp_hero_title')?.value || '').trim();
     const offerPrice = parseInt(document.getElementById('blp_hero_offer_price')?.value, 10) || 99;
-    const coverUrl = (document.getElementById('blp_cover_url')?.value || '').trim();
+    const coverUrlInput = (document.getElementById('blp_cover_url')?.value || '').trim();
 
     if (!bId) { showToast('कृपया Book ID दर्ज करें।', 'error'); return; }
     if (!title) { showToast('कृपया पुस्तक का शीर्षक दर्ज करें।', 'error'); return; }
-    if (!coverUrl) { showToast('कृपया बुक कवर इमेज दर्ज/अपलोड करें।', 'error'); return; }
+
+    // Strict guard for BK001 & BK002
+    if (bId === 'BK001' || bId === 'BK002') {
+      showToast(`⚠️ सुरक्षा नियम: ${bId} सुरक्षित मुख्य बुक है और इसे संशोधित नहीं किया जा सकता।`, 'error');
+      return;
+    }
 
     const mrp = parseInt(document.getElementById('blp_hero_mrp')?.value, 10) || 299;
     const coverEffect = document.getElementById('blp_cover_effect')?.value || '3d_float';
@@ -2766,7 +2780,6 @@ export async function initBookLandingPages() {
 
     const ogTitle = (document.getElementById('blp_og_title')?.value || '').trim() || title;
     const ogDesc = (document.getElementById('blp_og_description')?.value || '').trim() || (document.getElementById('blp_hero_desc')?.value || `${title} - सम्पूर्ण Practical Guide।`);
-    const ogImg = (document.getElementById('blp_og_image')?.value || '').trim() || coverUrl;
 
     const publishTargets = [];
     if (document.getElementById('blp_pub_ebook_store')?.checked) publishTargets.push('ebook_store');
@@ -2777,8 +2790,82 @@ export async function initBookLandingPages() {
     const storeBadge = document.getElementById('blp_store_badge')?.value || 'best_seller';
     const isComingSoon = document.getElementById('blp_is_coming_soon')?.value === 'true';
 
-    const mainPdfUrl = (document.getElementById('blp_main_pdf_url')?.value || '').trim();
-    const freePdfUrl = (document.getElementById('blp_free_pdf_url')?.value || '').trim();
+    // File Upload Packaging & 25MB Limit Check
+    const uploadedFiles = [];
+    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+
+    // 1. Cover Image
+    const coverFileInput = document.getElementById('blp_file_cover');
+    let finalCoverPath = coverUrlInput || `/images/books/${bId.toLowerCase()}-cover.webp`;
+    if (coverFileInput?.files?.[0]) {
+      const cFile = coverFileInput.files[0];
+      if (cFile.size > MAX_FILE_SIZE) {
+        showToast(`❌ कवर इमेज 25MB से बड़ी है (${(cFile.size/(1024*1024)).toFixed(1)}MB)। कृपया छोटी इमेज चुनें।`, 'error');
+        return;
+      }
+      const b64 = await fileToBase64(cFile);
+      const ext = cFile.name.split('.').pop() || 'webp';
+      finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.${ext}`;
+      uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.${ext}`, base64: b64 });
+    }
+
+    // 2. Banner Image
+    const bannerFileInput = document.getElementById('blp_file_banner');
+    let finalBannerPath = (document.getElementById('blp_banner_url')?.value || '').trim() || `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
+    if (bannerFileInput?.files?.[0]) {
+      const bFile = bannerFileInput.files[0];
+      if (bFile.size > MAX_FILE_SIZE) {
+        showToast(`❌ बैनर इमेज 25MB से बड़ी है (${(bFile.size/(1024*1024)).toFixed(1)}MB)।`, 'error');
+        return;
+      }
+      const b64 = await fileToBase64(bFile);
+      const ext = bFile.name.split('.').pop() || 'webp';
+      finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.${ext}`;
+      uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.${ext}`, base64: b64 });
+    }
+
+    // 3. Main Paid PDF
+    const mainPdfFileInput = document.getElementById('blp_file_main_pdf');
+    let finalMainPdfPath = (document.getElementById('blp_main_pdf_url')?.value || '').trim();
+    if (mainPdfFileInput?.files?.[0]) {
+      const pdfFile = mainPdfFileInput.files[0];
+      if (pdfFile.size > MAX_FILE_SIZE) {
+        showToast(`❌ मुख्य PDF 25MB से बड़ी है (${(pdfFile.size/(1024*1024)).toFixed(1)}MB)। कृपया इसे Part 1 और Part 2 में बांटें या Compress करें।`, 'error');
+        return;
+      }
+      const b64 = await fileToBase64(pdfFile);
+      finalMainPdfPath = `/uploads/books/${bId}_main.pdf`;
+      uploadedFiles.push({ path: `uploads/books/${bId}_main.pdf`, base64: b64 });
+    }
+
+    // 4. Free Demo PDF
+    const freePdfFileInput = document.getElementById('blp_file_free_pdf');
+    let finalFreePdfPath = (document.getElementById('blp_free_pdf_url')?.value || '').trim();
+    if (freePdfFileInput?.files?.[0]) {
+      const fPdfFile = freePdfFileInput.files[0];
+      if (fPdfFile.size > MAX_FILE_SIZE) {
+        showToast(`❌ फ्री PDF 25MB से बड़ी है (${(fPdfFile.size/(1024*1024)).toFixed(1)}MB)।`, 'error');
+        return;
+      }
+      const b64 = await fileToBase64(fPdfFile);
+      finalFreePdfPath = `/uploads/books/${bId}_free.pdf`;
+      uploadedFiles.push({ path: `uploads/books/${bId}_free.pdf`, base64: b64 });
+    }
+
+    // 5. Demo Images (if base64)
+    const cleanedDemoImages = [];
+    for (let i = 0; i < currentDemoImages.length; i++) {
+      const dImg = currentDemoImages[i];
+      if (typeof dImg === 'string' && dImg.startsWith('data:image/')) {
+        const dPath = `images/books/${bId.toLowerCase()}-preview-${i + 1}.webp`;
+        uploadedFiles.push({ path: dPath, base64: dImg });
+        cleanedDemoImages.push(`/${dPath}`);
+      } else if (dImg) {
+        cleanedDemoImages.push(dImg);
+      }
+    }
+
+    const ogImg = (document.getElementById('blp_og_image')?.value || '').trim() || finalCoverPath;
 
     const pageData = {
       id: bId,
@@ -2799,11 +2886,11 @@ export async function initBookLandingPages() {
       og_title: ogTitle,
       og_description: ogDesc,
       og_image: ogImg,
-      mainPdf: mainPdfUrl,
-      main_pdf: mainPdfUrl,
-      freePdf: freePdfUrl,
-      free_pdf: freePdfUrl,
-      demoPdf: freePdfUrl,
+      mainPdf: finalMainPdfPath,
+      main_pdf: finalMainPdfPath,
+      freePdf: finalFreePdfPath,
+      free_pdf: finalFreePdfPath,
+      demoPdf: finalFreePdfPath,
       ai_support_title: (document.getElementById('blp_ai_support_title')?.value || '').trim(),
       ai_support_cover: (document.getElementById('blp_ai_support_cover')?.value || '').trim(),
       ai_support_desc: (document.getElementById('blp_ai_support_desc')?.value || '').trim(),
@@ -2826,8 +2913,8 @@ export async function initBookLandingPages() {
         offer_badge: document.getElementById('blp_hero_badge')?.value || 'Launch Offer',
         rating_score: document.getElementById('blp_rating_score')?.value || '4.9',
         rating_count: document.getElementById('blp_rating_count')?.value || '120+ Ratings',
-        cover_image: coverUrl,
-        banner_image: document.getElementById('blp_banner_url')?.value || '/images/banners/kharif-master-guide-2026-hero-banner.webp',
+        cover_image: finalCoverPath,
+        banner_image: finalBannerPath,
         features: currentKpis
       },
       value_stack: {
@@ -2845,7 +2932,7 @@ export async function initBookLandingPages() {
         cards: currentWhyCards
       },
       preview_banner: cleanSectionBanners.sec_preview || undefined,
-      demo_images: currentDemoImages.length > 0 ? currentDemoImages : undefined,
+      demo_images: cleanedDemoImages.length > 0 ? cleanedDemoImages : undefined,
       suggested_books_list: currentSuggestedBooks,
       suggested_books: currentSuggestedBooks.map(x => x.link || x.id || x.title).filter(Boolean),
       bonuses: currentBonuses,
@@ -2871,29 +2958,27 @@ export async function initBookLandingPages() {
       language: 'Hindi',
       mrp: mrp,
       offerPrice: offerPrice,
-      cover: coverUrl,
-      thumbnail: coverUrl,
-      banner: pageData.hero.banner_image,
+      cover: finalCoverPath,
+      thumbnail: finalCoverPath,
+      banner: finalBannerPath,
       status: pageData.status,
       publish_targets: publishTargets,
       store_badge: storeBadge,
       badge: storeBadge,
       isComingSoon: isComingSoon,
-      mainPdf: mainPdfUrl,
-      pdf_url: mainPdfUrl,
-      freePdf: freePdfUrl,
-      demoPdf: freePdfUrl,
+      mainPdf: finalMainPdfPath,
+      pdf_url: finalMainPdfPath,
+      freePdf: finalFreePdfPath,
+      demoPdf: finalFreePdfPath,
       features: currentKpis.map(k => (typeof k === 'object' ? k.text : k)).filter(Boolean),
       totalPages: 120,
-      landingPage: bId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (bId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${bId}`),
+      landingPage: `/ebooks/book-landing.html?id=${bId}`,
       checkoutPage: '/ebooks/checkout.html',
       readerPage: '/ebooks/reader.html'
     };
 
     try {
       localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
-      
-      // Save New Book to Library / books.json state
       const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
       const bIdx = customBooks.findIndex(x => x.id === bId);
       if (bIdx >= 0) customBooks[bIdx] = newBookObj;
@@ -2905,36 +2990,61 @@ export async function initBookLandingPages() {
       else allBooks.unshift(newBookObj);
     } catch (e) {}
 
-    // Server Persistence with Verified Response
-    let serverSuccess = false;
-    let serverMsg = '';
+    // Trigger Secure Auto Git Sync API
+    const saveButtonEl = document.getElementById('btn_save_book_lp');
+    const origSaveText = saveButtonEl ? saveButtonEl.innerHTML : '';
+    if (saveButtonEl) {
+      saveButtonEl.disabled = true;
+      saveButtonEl.innerHTML = '⏳ GitHub पर लाइव सिंक हो रहा है...';
+    }
+
+    showToast(`⏳ बुक (${bId}) को GitHub पर सिंक किया जा रहा है...`, 'info');
+
+    let syncSuccess = false;
+    let syncErrorMsg = '';
+
     try {
-      const sRes = await fetch('/api/save_book_landing.php', {
+      const syncRes = await fetch('/api/auto-sync-book.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pageData, bookData: newBookObj })
+        body: JSON.stringify({
+          pageData,
+          bookData: newBookObj,
+          uploadedFiles: uploadedFiles
+        })
       });
-      const sData = await sRes.json();
-      if (sRes.ok && sData.success) {
-        serverSuccess = true;
-        serverMsg = sData.message || 'Saved';
-      } else {
-        serverMsg = sData.error || 'Server error';
+
+      let syncData = {};
+      try {
+        syncData = await syncRes.json();
+      } catch (pe) {
+        syncData = { error: `Server HTTP ${syncRes.status}: ${syncRes.statusText}` };
       }
-    } catch (err) {
-      serverMsg = err.message || 'Server offline';
+
+      if (syncRes.ok && syncData.success) {
+        syncSuccess = true;
+      } else {
+        syncErrorMsg = syncData.error || 'Unknown server error';
+      }
+    } catch (netErr) {
+      syncErrorMsg = netErr.message || 'Network error connecting to /api/auto-sync-book.js';
+    } finally {
+      if (saveButtonEl) {
+        saveButtonEl.disabled = false;
+        saveButtonEl.innerHTML = origSaveText;
+      }
     }
 
-    if (serverSuccess) {
-      showToast(`✅ बुक लैंडिंग पेज (${bId}) सुरक्षित हो गया!`, 'success');
+    if (syncSuccess) {
+      showToast(`🎉 बुक (${bId}) 100% लाइव सिंक हो गई! (GitHub Commit सफल, 20-30s में लाइव)`, 'success');
+      builderCard.style.display = 'none';
+      resetBookBuilder();
+      updateKPIs();
+      renderTable();
     } else {
-      showToast(`⚠️ बुक (${bId}) लोकल में सुरक्षित है। (सर्वर: ${serverMsg})`, 'warning');
+      showToast(`❌ लाइव सिंक विफल: ${syncErrorMsg}`, 'error');
+      // Keep builder card open so user does not lose input
     }
-
-    builderCard.style.display = 'none';
-    resetBookBuilder();
-    updateKPIs();
-    renderTable();
   }
 
   function exportJsonFiles() {
