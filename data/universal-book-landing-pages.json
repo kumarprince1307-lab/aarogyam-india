@@ -913,180 +913,44 @@
       "google_analytics_enabled": true
     },
     {
+      "cover_effect": "3d_float",
+      "slug": "bk015",
       "id": "BK015",
-      "slug": "sabji-kheti-guide-part-1",
-      "status": "active",
-      "category": "Agriculture",
+      "hero": {
+        "rating_score": "4.9",
+        "description": "à¤µà¥ˆà¤œà¥à¤žà¤¾à¤¨à¤¿à¤• à¤¤à¤°à¥€à¤•à¥‹à¤‚ à¤¸à¥‡ à¤¸à¤¬à¥à¤œà¥€ à¤‰à¤¤à¥à¤ªà¤¾à¤¦à¤¨, à¤•à¥€à¤Ÿ à¤µ à¤°à¥‹à¤— à¤¨à¤¿à¤¯à¤‚à¤¤à¥à¤°à¤£ à¤•à¥€ à¤¸à¤‚à¤ªà¥‚à¤°à¥à¤£ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¿à¤•à¤¾à¥¤",
+        "cover_image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "subtitle": "à¤‰à¤¨à¥à¤¨à¤¤ à¤µ à¤µà¥ˆà¤œà¥à¤žà¤¾à¤¨à¤¿à¤• à¤¸à¤¬à¥à¤œà¥€ à¤‰à¤¤à¥à¤ªà¤¾à¤¦à¤¨ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¿à¤•à¤¾",
+        "rating_count": "120+ Ratings",
+        "offer_badge": "Launch Offer",
+        "banner_image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+        "features": [
+          {
+            "icon": "fa-seedling",
+            "text": "120 à¤ªà¥‡à¤œ à¤•à¥€ à¤¸à¤®à¥à¤ªà¥‚à¤°à¥à¤£ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ à¤°à¤‚à¤—à¥€à¤¨ à¤«à¥‹à¤Ÿà¥‹"
+          }
+        ],
+        "tag": "ðŸŒ¾ Bestseller Agriculture Guide",
+        "title": "à¤¸à¤¬à¥à¤œà¥€ à¤–à¥‡à¤¤à¥€ à¤—à¤¾à¤‡à¤¡ PART 1",
+        "offer_price": 149,
+        "mrp": 299
+      },
+      "theme_primary": "#15803d",
       "store_badge": "best_seller",
+      "category": "Agriculture",
+      "theme_dark": "#0e5227",
+      "sticky_button_text": "à¤…à¤­à¥€ à¤†à¤°à¥à¤¡à¤° à¤•à¤°à¥‡à¤‚",
+      "status": "active",
       "publish_targets": [
         "ebook_store",
         "category_page",
         "my_library",
         "home_page"
-      ],
-      "theme_primary": "#2E7D32",
-      "theme_dark": "#1B5E20",
-      "cover_effect": "3d_float",
-      "sticky_button_text": "खरीदें",
-      "mainPdf": "/uploads/books/BK015_main.pdf",
-      "main_pdf": "/uploads/books/BK015_main.pdf",
-      "freePdf": "/uploads/books/BK015_free.pdf",
-      "free_pdf": "/uploads/books/BK015_free.pdf",
-      "demoPdf": "/uploads/books/BK015_free.pdf",
-      "sections_order": [
-        "sec_hero",
-        "sec_timer",
-        "sec_kpis",
-        "sec_trust",
-        "sec_why_buy",
-        "sec_vip_stack",
-        "sec_video",
-        "sec_preview",
-        "sec_suggested",
-        "sec_bonuses",
-        "sec_ai_support",
-        "sec_specs_toc",
-        "sec_reviews",
-        "sec_faqs",
-        "sec_final_buy",
-        "sec_help",
-        "sec_pdf_main",
-        "sec_pdf_free"
-      ],
-      "hero": {
-        "tag": "🌾 Bestseller Agriculture eBook",
-        "title": "सब्जी खेती गाइड PART 1",
-        "subtitle": "सब्जी खेती गाइड PART 1",
-        "rating_score": "4.9",
-        "rating_count": "120+ Ratings",
-        "description": "सब्जी फसलों की सुरक्षा, रोग-कीट प्रबंधन, पोषण और अधिक उत्पादन की सम्पूर्ण Practical गाइड।",
-        "mrp": 299,
-        "offer_price": 149,
-        "offer_badge": "Launch Offer",
-        "banner_image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
-        "cover_image": "/images/books/kharif-master-guide-2026-cover.webp",
-        "features": [
-          {
-            "icon": "fa-seedling",
-            "text": "120 पेज की प्रीमियम"
-          },
-          {
-            "icon": "fa-camera",
-            "text": "300+ फोटो"
-          },
-          {
-            "icon": "fa-circle-check",
-            "text": "Spray Science"
-          },
-          {
-            "icon": "fa-gift",
-            "text": "Free Bonus PDF"
-          }
-        ]
-      },
-      "timer": {
-        "enabled": true,
-        "minutes": 15,
-        "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!"
-      },
-      "value_stack": {
-        "book_mrp": 299,
-        "vip_value": 1999,
-        "bonus_value": 199,
-        "offer_price": 149,
-        "vip_banner": "/images/banners/farmer-community-banner.jpeg",
-        "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए 1 वर्ष का Pro सब्सक्रिप्शन 100% मुफ्त शामिल है।"
-      },
-      "why_read": {
-        "title": "यह पुस्तक क्यों खरीदें?",
-        "subtitle": "सब्जी खेती में लागत कम करें और भरपूर मुनाफा कमाएं।",
-        "cards": [
-          {
-            "icon": "🌱",
-            "title": "वैज्ञानिक जानकारी",
-            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।"
-          },
-          {
-            "icon": "📷",
-            "title": "300+ वास्तविक फोटो",
-            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
-          },
-          {
-            "icon": "📘",
-            "title": "Step by Step Guide",
-            "desc": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।"
-          },
-          {
-            "icon": "🎁",
-            "title": "Free Bonus PDF",
-            "desc": "इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।"
-          }
-        ]
-      },
-      "preview_banner": "/images/banners/kharif-master-guide-2026-preview-banner.webp",
-      "demo_images": [],
-      "suggested_books_list": [
-        {
-          "image": "/images/books/kharif-master-guide-2026-cover.webp",
-          "title": "खरीफ फसल मास्टर गाइड 2026",
-          "offerPrice": 99,
-          "mrp": 299,
-          "link": "BK001"
-        }
-      ],
-      "suggested_books": [
-        "BK001"
-      ],
-      "bonuses": [
-        {
-          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
-          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
-          "mrp": 199,
-          "image": "/images/books/kharif-fasal-hero-2.webp"
-        }
-      ],
-      "bonus_points": [
-        "24×7 WhatsApp Support",
-        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
-        "📖 किताब की जानकारी समझने में सहायता",
-        "🌱 फसल संबंधी सवाल",
-        "📱 Mobile Friendly PDF & Lifetime Access"
-      ],
-      "table_of_contents": [
-        "बीज उपचार",
-        "खेत की तैयारी",
-        "बुवाई की वैज्ञानिक विधि",
-        "उर्वरक प्रबंधन",
-        "खरपतवार नियंत्रण",
-        "रोग एवं कीट प्रबंधन",
-        "पोषक तत्वों की कमी",
-        "स्प्रे चार्ट"
-      ],
-      "videos": [],
-      "testimonials": [
-        {
-          "name": "राजेश पटेल",
-          "location": "उज्जैन, मध्य प्रदेश",
-          "rating": 5,
-          "gender": "male",
-          "comment": "बहुत ही उपयोगी और आसान भाषा में लिखी गई पुस्तक है।"
-        }
-      ],
-      "faqs": [
-        {
-          "q": "खरीदने के तुरंत बाद मुझे पुस्तक कैसे मिलेगी?",
-          "a": "भुगतान पूरा होते ही आपको तुरंत Instant Download लिंक मिलेगा और यह आपके 'My Library' डैशबोर्ड में जुड़ जाएगी।"
-        },
-        {
-          "q": "क्या मैं इसे अपने मोबाइल में ऑफलाइन पढ़ सकता हूँ?",
-          "a": "हाँ, यह एक Mobile Friendly PDF है जिसे आप डाउनलोड करके बिना इंटरनेट कभी भी पढ़ सकते हैं।"
-        }
-      ],
-      "whatsapp_prompt": "नमस्ते, मुझे 'सब्जी खेती गाइड PART 1' पुस्तक के बारे में और जानकारी चाहिए।",
-      "facebook_pixel_id": "1671873500553134",
-      "google_analytics_id": "G-2BWPJVQWPK",
-      "facebook_pixel_enabled": true,
-      "google_analytics_enabled": true
+      ]
     }
   ]
 }
