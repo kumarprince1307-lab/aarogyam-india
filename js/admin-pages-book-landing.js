@@ -3029,7 +3029,7 @@ export async function initBookLandingPages() {
     let syncErrorMsg = '';
 
     try {
-      const syncRes = await fetch('/api/auto-sync-book.js', {
+      const syncRes = await fetch('/api/auto-sync-book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
