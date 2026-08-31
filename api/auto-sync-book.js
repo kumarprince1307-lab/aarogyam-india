@@ -14,6 +14,37 @@ const httpsAgent = new https.Agent({
   keepAliveMsecs: 60000
 });
 
+function sendJson(res, statusCode, data) {
+  const jsonStr = JSON.stringify(data);
+  res.writeHead(statusCode, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Content-Length': Buffer.byteLength(jsonStr),
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  });
+  res.end(jsonStr);
+}
+
+function parseBody(req) {
+  return new Promise((resolve) => {
+    if (req.body) {
+      if (typeof req.body === 'object') return resolve(req.body);
+      try { return resolve(JSON.parse(req.body)); } catch (e) { return resolve({}); }
+    }
+    let bodyData = '';
+    req.on('data', chunk => { bodyData += chunk; });
+    req.on('end', () => {
+      try {
+        resolve(bodyData ? JSON.parse(bodyData) : {});
+      } catch (e) {
+        resolve({});
+      }
+    });
+    req.on('error', () => resolve({}));
+  });
+}
+
 function githubRequest(endpoint, method, token, body = null) {
   return new Promise((resolve, reject) => {
     try {
@@ -24,9 +55,14 @@ function githubRequest(endpoint, method, token, body = null) {
 
       const url = new URL(fullUrl);
 
+      const cleanToken = String(token || '').trim();
+      const authHeader = cleanToken.startsWith('github_pat_') || cleanToken.startsWith('ghp_')
+        ? `Bearer ${cleanToken}`
+        : `token ${cleanToken}`;
+
       const headers = {
         'User-Agent': 'Aarogyam-Auto-Sync/1.0',
-        'Authorization': `token ${token.trim()}`,
+        'Authorization': authHeader,
         'Accept': 'application/vnd.github.v3+json'
       };
 
@@ -115,19 +151,19 @@ async function commitFile(filePath, base64Content, commitMessage, token) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Content-Type', 'application/json');
-
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    return res.end();
   }
 
   try {
     const token = process.env.GITHUB_TOKEN;
     if (!token) {
-      return res.status(500).json({
+      return sendJson(res, 500, {
         success: false,
         connected: false,
         error: 'GITHUB_TOKEN environment variable is not configured in Vercel. Please add GITHUB_TOKEN in Vercel Project Settings.'
@@ -138,7 +174,7 @@ module.exports = async function handler(req, res) {
     if (req.method === 'GET') {
       try {
         const testRes = await githubRequest('', 'GET', token);
-        return res.status(200).json({
+        return sendJson(res, 200, {
           success: true,
           connected: true,
           repository: GITHUB_OWNER_REPO,
@@ -149,7 +185,7 @@ module.exports = async function handler(req, res) {
           permissions: testRes.data?.permissions || { push: true }
         });
       } catch (testErr) {
-        return res.status(500).json({
+        return sendJson(res, 500, {
           success: false,
           connected: false,
           error: `GitHub API connection failed: ${testErr.message || 'Unknown error'}`
@@ -158,12 +194,12 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method !== 'POST') {
-      return res.status(405).json({ success: false, error: 'Method not allowed. Use GET or POST.' });
+      return sendJson(res, 405, { success: false, error: 'Method not allowed. Use GET or POST.' });
     }
 
-    const payload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const payload = await parseBody(req);
     if (!payload || !payload.pageData || !payload.pageData.id) {
-      return res.status(400).json({ success: false, error: 'Invalid payload: pageData and Book ID are required.' });
+      return sendJson(res, 400, { success: false, error: 'Invalid payload: pageData and Book ID are required.' });
     }
 
     const bookId = String(payload.pageData.id).trim().toUpperCase();
@@ -173,7 +209,7 @@ module.exports = async function handler(req, res) {
 
     // STRICT PROTECTION FOR BK001 & BK002
     if (bookId === 'BK001' || bookId === 'BK002') {
-      return res.status(403).json({
+      return sendJson(res, 403, {
         success: false,
         error: `Security Rule Violation: ${bookId} is a protected core landing page and cannot be overwritten via auto-sync.`
       });
@@ -190,7 +226,7 @@ module.exports = async function handler(req, res) {
       const byteSize = Buffer.from(rawBase64, 'base64').length;
 
       if (byteSize > MAX_FILE_SIZE_BYTES) {
-        return res.status(400).json({
+        return sendJson(res, 400, {
           success: false,
           error: `File ${cleanPath} exceeds GitHub 25MB limit (${(byteSize / (1024 * 1024)).toFixed(1)} MB). Please split the PDF into Part 1 / Part 2 or compress below 25MB.`
         });
@@ -242,7 +278,7 @@ module.exports = async function handler(req, res) {
     await commitFile('data/books.json', updatedBooksBase64, `Update catalog for book ${bookId} [Auto-Sync]`, token);
     commitLog.push('data/books.json');
 
-    return res.status(200).json({
+    return sendJson(res, 200, {
       success: true,
       message: `Book ${bookId} published to GitHub repository. Vercel auto-deployment triggered.`,
       bookId: bookId,
@@ -251,7 +287,7 @@ module.exports = async function handler(req, res) {
 
   } catch (err) {
     console.error('Auto-Sync handler error:', err);
-    return res.status(500).json({
+    return sendJson(res, 500, {
       success: false,
       error: `GitHub Auto-Sync failed: ${err.message || 'Unknown error'}`
     });
