@@ -647,6 +647,13 @@ export async function initBookLandingPages() {
             <div>
               <label class="admin-label" style="font-weight: 700; font-size: 0.78rem;">⏳ प्री-लॉन्च / कमिंग सून स्थिति:</label>
               <select id="blp_is_coming_soon" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
+                <option value="false">🟢 Live / Ready to Buy (तुरंत खरीदने योग्य)</option>
+                <option value="true">⏳ Coming Soon (प्री-लॉन्च / लीड्स मोड)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         <!-- SECTION 17: BOOK PDF / DOC FILE MANAGEMENT (PAID BOOK FULL PDF/DOC) -->
         <div style="background: rgba(14,165,233,0.08); border: 1.5px solid rgba(14,165,233,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
@@ -1021,15 +1028,29 @@ export async function initBookLandingPages() {
             <span style="color: #4ade80; font-weight: 800;">✅ फाइल सेट है:</span>
             <code style="color: #38bdf8; font-size: 0.8rem; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">${escapeHtml(cleanUrl)}</code>
           </div>
-          <a href="${cleanUrl}" target="_blank" class="admin-button small-button" style="background: #16a34a; color: #fff; padding: 3px 10px; font-size: 0.75rem; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-            <span>📥</span> <span>टेस्ट डाउनलोड / देखें</span>
-          </a>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <a href="${cleanUrl}" target="_blank" class="admin-button small-button" style="background: #16a34a; color: #fff; padding: 4px 10px; font-size: 0.75rem; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+              <span>📥</span> <span>टेस्ट डाउनलोड / देखें</span>
+            </a>
+            <button type="button" onclick="window.removeBookPdf('${sectionType}')" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 4px 10px; font-size: 0.75rem; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="इस फाइल का लिंक हटाएं">
+              <span>🗑️</span> <span>हटाएं</span>
+            </button>
+          </div>
         </div>
       `;
     } else {
       wrap.style.display = 'none';
       wrap.innerHTML = '';
     }
+  };
+
+  window.removeBookPdf = function(sectionType) {
+    const input = document.getElementById(sectionType === 'main' ? 'blp_main_pdf_url' : 'blp_free_pdf_url');
+    const fileInput = document.getElementById(sectionType === 'main' ? 'blp_file_main_pdf' : 'blp_file_free_pdf');
+    if (input) input.value = '';
+    if (fileInput) fileInput.value = '';
+    window.updatePdfStatusPreview(sectionType, '');
+    showToast(`🗑️ ${sectionType === 'main' ? 'मुख्य' : 'मुफ़्त/डेमो'} PDF फाइल पाथ हटा दिया गया।`, 'info');
   };
 
   window.handleBookPdfSelect = async function(sectionType, event) {
@@ -1074,7 +1095,13 @@ export async function initBookLandingPages() {
         body: formData
       });
 
-      const data = await res.json();
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (pe) {
+        data = { error: `Server HTTP ${res.status}: ${res.statusText}` };
+      }
+
       if (res.ok && data.success && data.fileUrl) {
         const urlInput = document.getElementById(sectionType === 'main' ? 'blp_main_pdf_url' : 'blp_free_pdf_url');
         if (urlInput) {
@@ -1087,7 +1114,7 @@ export async function initBookLandingPages() {
       }
     } catch (err) {
       console.error('PDF upload error:', err);
-      showToast('❌ सर्वर से कनेक्ट नहीं हो सका।', 'error');
+      showToast(`❌ अपलोड एरर: ${err.message || 'सर्वर से कनेक्ट नहीं हो सका'}`, 'error');
     } finally {
       if (btn) {
         btn.disabled = false;
@@ -2466,8 +2493,31 @@ export async function initBookLandingPages() {
   }
 
   window.editBookLandingPage = function(bId) {
-    const page = allLandingPages.find(p => p.id === bId);
-    if (!page) return;
+    if (!bId) return;
+    const cleanId = String(bId).trim().toUpperCase();
+    const page = allLandingPages.find(p => p && p.id && p.id.trim().toUpperCase() === cleanId);
+    
+    if (!page) {
+      const bObj = allBooks.find(b => b && b.id && b.id.trim().toUpperCase() === cleanId);
+      if (bObj) {
+        resetBookBuilder();
+        editingBookId = bObj.id;
+        document.getElementById('admin-book-builder-title').textContent = `✏️ एडिट बुक: ${bObj.id}`;
+        document.getElementById('blp_input_book_id').value = bObj.id;
+        document.getElementById('blp_hero_title').value = bObj.heading || bObj.name || '';
+        document.getElementById('blp_category_select').value = bObj.category || 'Agriculture';
+        document.getElementById('blp_hero_mrp').value = bObj.mrp || 299;
+        document.getElementById('blp_hero_offer_price').value = bObj.offerPrice || 99;
+        document.getElementById('blp_cover_url').value = bObj.cover || bObj.thumbnail || '';
+        if (bObj.cover) document.getElementById('blp_preview_cover_img').src = bObj.cover;
+        builderCard.style.display = 'block';
+        window.scrollTo({ top: builderCard.offsetTop - 50, behavior: 'smooth' });
+        showToast(`✏️ कैटलॉग से बुक (${cleanId}) लोड की गई`, 'info');
+        return;
+      }
+      showToast(`पेज (${bId}) नहीं मिला।`, 'error');
+      return;
+    }
 
     editingBookId = page.id;
     document.getElementById('admin-book-builder-title').textContent = `✏️ एडिट बुक लैंडिंग पेज: ${page.id}`;
@@ -2687,7 +2737,7 @@ export async function initBookLandingPages() {
     showToast(`🗑️ बुक लैंडिंग पेज (${bId}) तुरंत हटा दिया गया।`, 'info');
   };
 
-  function saveBookLandingPage() {
+  async function saveBookLandingPage() {
     const bId = (document.getElementById('blp_input_book_id')?.value || '').trim().toUpperCase();
     const category = document.getElementById('blp_category_select')?.value || 'Agriculture';
     const title = (document.getElementById('blp_hero_title')?.value || '').trim();
@@ -2855,20 +2905,32 @@ export async function initBookLandingPages() {
       else allBooks.unshift(newBookObj);
     } catch (e) {}
 
-    // Async Server Persistence (JSON file & Git safe sync)
-    fetch('/api/save_book_landing.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pageData, bookData: newBookObj })
-    }).then(r => r.json()).then(res => {
-      if (res.success) {
-        console.log('✅ Server JSON synced successfully:', res.message);
+    // Server Persistence with Verified Response
+    let serverSuccess = false;
+    let serverMsg = '';
+    try {
+      const sRes = await fetch('/api/save_book_landing.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pageData, bookData: newBookObj })
+      });
+      const sData = await sRes.json();
+      if (sRes.ok && sData.success) {
+        serverSuccess = true;
+        serverMsg = sData.message || 'Saved';
+      } else {
+        serverMsg = sData.error || 'Server error';
       }
-    }).catch(err => {
-      console.warn('Server sync note (saved locally):', err);
-    });
+    } catch (err) {
+      serverMsg = err.message || 'Server offline';
+    }
 
-    showToast(`✅ बुक लैंडिंग पेज (${bId}) सुरक्षित हो गया!`, 'success');
+    if (serverSuccess) {
+      showToast(`✅ बुक लैंडिंग पेज (${bId}) सुरक्षित हो गया!`, 'success');
+    } else {
+      showToast(`⚠️ बुक (${bId}) लोकल में सुरक्षित है। (सर्वर: ${serverMsg})`, 'warning');
+    }
+
     builderCard.style.display = 'none';
     resetBookBuilder();
     updateKPIs();

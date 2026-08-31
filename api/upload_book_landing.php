@@ -2,6 +2,10 @@
 // api/upload_book_landing.php
 // Handles PDF/DOC uploads for book landing pages with safe JSON update and backup.
 
+@ini_set('upload_max_filesize', '100M');
+@ini_set('post_max_size', '100M');
+@ini_set('memory_limit', '256M');
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -35,7 +39,22 @@ if (!$bookId || !in_array($section, ['main', 'free'])) {
 $bookId = strtoupper(trim($bookId));
 
 $fileUrl = '';
-if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+if (isset($_FILES['file'])) {
+    $errCode = $_FILES['file']['error'];
+    if ($errCode !== UPLOAD_ERR_OK) {
+        $uploadErrors = [
+            UPLOAD_ERR_INI_SIZE   => 'The uploaded file exceeds the PHP server upload_max_filesize limit.',
+            UPLOAD_ERR_FORM_SIZE  => 'The uploaded file exceeds the form MAX_FILE_SIZE limit.',
+            UPLOAD_ERR_PARTIAL    => 'The uploaded file was only partially uploaded.',
+            UPLOAD_ERR_NO_FILE    => 'No file was uploaded.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary upload directory in PHP.',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write uploaded file to disk.',
+            UPLOAD_ERR_EXTENSION  => 'A PHP server extension stopped the file upload.',
+        ];
+        $msg = $uploadErrors[$errCode] ?? "Upload error code: {$errCode}";
+        json_resp(400, ['error' => $msg]);
+    }
+
     $tmp = $_FILES['file']['tmp_name'];
     $origName = basename($_FILES['file']['name']);
     $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
@@ -50,7 +69,7 @@ if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
     $newName = $bookId . '_' . $section . '_' . $timestamp . '.' . $ext;
     $dest = $UPLOAD_DIR . '/' . $newName;
     if (!move_uploaded_file($tmp, $dest)) {
-        json_resp(500, ['error' => 'Failed to move uploaded file to server directory']);
+        json_resp(500, ['error' => 'Failed to move uploaded file to uploads/books directory. Check server folder permissions.']);
     }
     $fileUrl = '/uploads/books/' . $newName;
 } elseif (!empty($_POST['url'])) {

@@ -396,14 +396,67 @@ function closeImageZoom() {
 // 9. Load Books Data and Render Dynamic Library Sections & Dynamic Counts
 async function loadLibraryData() {
     try {
-        const books = typeof getAllBooks === 'function' ? await getAllBooks() : [];
-        if (books.length === 0) {
-            const res = await fetch('/data/books.json');
-            const data = await res.json();
-            renderLibrarySections(data.books || data);
-        } else {
-            renderLibrarySections(books);
-        }
+        let jsonBooks = [];
+        try {
+            const res = await fetch('/data/books.json?v=' + Date.now());
+            if (res.ok) {
+                const data = await res.json();
+                jsonBooks = data.books || [];
+            }
+        } catch (e) {}
+
+        let customBooks = [];
+        let customLp = [];
+        let deletedIds = [];
+        try {
+            customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+            customLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+            deletedIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');
+        } catch (e) {}
+
+        const bookMap = new Map();
+        jsonBooks.forEach(b => {
+            if (b && b.id) bookMap.set(b.id.toUpperCase(), b);
+        });
+        customBooks.forEach(b => {
+            if (b && b.id) bookMap.set(b.id.toUpperCase(), Object.assign({}, bookMap.get(b.id.toUpperCase()) || {}, b));
+        });
+        customLp.forEach(lp => {
+            if (!lp || !lp.id) return;
+            const bId = lp.id.toUpperCase();
+            const existing = bookMap.get(bId) || {};
+            const hero = lp.hero || {};
+            bookMap.set(bId, {
+                id: bId,
+                slug: lp.slug || bId.toLowerCase(),
+                heading: hero.title || existing.heading || existing.name || bId,
+                name: hero.title || existing.heading || existing.name || bId,
+                category: lp.category || existing.category || 'Agriculture',
+                status: lp.status || existing.status || 'active',
+                isComingSoon: (lp.is_coming_soon === true || lp.is_coming_soon === 'true' || (lp.is_coming_soon === undefined && (existing.isComingSoon === true || existing.status === 'coming_soon'))),
+                publish_targets: lp.publish_targets || existing.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page'],
+                store_badge: lp.store_badge || existing.store_badge || 'best_seller',
+                badge: lp.store_badge || existing.badge || 'best_seller',
+                mrp: hero.mrp || existing.mrp || 299,
+                offerPrice: hero.offer_price || existing.offerPrice || 99,
+                cover: hero.cover_image || existing.cover || existing.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
+                thumbnail: hero.cover_image || existing.thumbnail || existing.cover || '/images/books/kharif-master-guide-2026-cover.webp',
+                banner: hero.banner_image || existing.banner,
+                mainPdf: lp.mainPdf || lp.main_pdf || existing.mainPdf || '',
+                freePdf: lp.freePdf || lp.free_pdf || lp.demoPdf || existing.freePdf || '',
+                demoPdf: lp.demoPdf || lp.freePdf || existing.demoPdf || '',
+                landingPage: bId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (bId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`)
+            });
+        });
+
+        const finalBooks = Array.from(bookMap.values()).filter(b => {
+            const bIdUpper = String(b.id || '').toUpperCase();
+            if (bIdUpper === 'BK001' || bIdUpper === 'BK002' || bIdUpper === 'SUB001') return true;
+            if (deletedIds.includes(bIdUpper)) return false;
+            return true;
+        });
+
+        renderLibrarySections(finalBooks);
     } catch (error) {
         console.error('Error loading library books:', error);
     }

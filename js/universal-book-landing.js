@@ -127,7 +127,7 @@
             tag: '🌾 Agriculture Practical Guide',
             title: bookInLib.heading || bookInLib.name || 'ई-बुक प्रैक्टिकल गाइड',
             subtitle: bookInLib.subtitle || '',
-            description: bookInLib.description || 'बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।',
+            description: bookInLib.description || 'सम्पूर्ण प्रैक्टिकल जानकारी।',
             mrp: bookInLib.mrp || 299,
             offer_price: bookInLib.offerPrice || 99,
             offer_badge: 'Launch Offer',
@@ -143,6 +143,10 @@
             ]
           }
         };
+      } else if (currentBookId && qKey !== 'BK001') {
+        // Stop silent fallback to BK001 - Show proper Not Found state
+        renderBookNotFound(currentBookId);
+        return;
       } else {
         currentLandingData = allLandingPages[0] || {};
       }
@@ -447,19 +451,20 @@
     }
 
     // 6. Preview Gallery (Pinch-to-Zoom)
+    const previewSection = document.getElementById('sec-sample-book');
     const galleryGrid = document.getElementById('preview-gallery-grid');
-    const demoImages = (l.demo_images && l.demo_images.length > 0) ? l.demo_images : (b.demoImages && b.demoImages.length > 0 ? b.demoImages : [
-      '../images/books/kharif-master-guide-2026-preview-01.webp',
-      '../images/books/kharif-master-guide-2026-preview-02.webp',
-      '../images/books/kharif-master-guide-2026-preview-03.webp',
-      '../images/books/kharif-master-guide-2026-preview-04.webp'
-    ]);
+    const demoImages = (l.demo_images && Array.isArray(l.demo_images) && l.demo_images.length > 0) ? l.demo_images : (b.demoImages && Array.isArray(b.demoImages) && b.demoImages.length > 0 ? b.demoImages : []);
+    
     if (galleryGrid) {
-      galleryGrid.innerHTML = demoImages.map((imgUrl, i) => `
-        <div class="preview-card" onclick="window.openPinchZoomLightbox('${imgUrl}')">
-          <img src="${imgUrl}" alt="Preview Page ${i + 1}" loading="lazy" style="cursor:zoom-in;">
-        </div>
-      `).join('');
+      if (demoImages.length > 0) {
+        galleryGrid.innerHTML = demoImages.map((imgUrl, i) => `
+          <div class="preview-card" onclick="window.openPinchZoomLightbox('${imgUrl}')">
+            <img src="${imgUrl}" alt="Preview Page ${i + 1}" loading="lazy" style="cursor:zoom-in;">
+          </div>
+        `).join('');
+      } else {
+        galleryGrid.innerHTML = '';
+      }
     }
 
     const prevBannerWrap = document.getElementById('preview-banner-wrap');
@@ -472,6 +477,10 @@
       } else {
         prevBannerWrap.style.display = 'none';
       }
+    }
+
+    if (previewSection && demoImages.length === 0 && (!l.preview_banner || !l.preview_banner.trim())) {
+      previewSection.style.display = 'none';
     }
 
     // 7. Separate AI Support Section
@@ -1471,6 +1480,31 @@
     window.location.reload();
   };
 
+  function renderBookNotFound(bookId) {
+    const container = document.getElementById('landing-sections-container');
+    const stickyBar = document.querySelector('.mobile-sticky-bar');
+    if (stickyBar) stickyBar.style.display = 'none';
+    if (container) {
+      container.innerHTML = `
+        <div style="max-width: 600px; margin: 80px auto; padding: 40px 24px; text-align: center; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
+          <div style="font-size: 3.5rem; margin-bottom: 16px;">📚</div>
+          <h2 style="font-size: 1.6rem; color: #1e293b; margin-bottom: 8px;">पुस्तक उपलब्ध नहीं है (Book Not Found)</h2>
+          <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 24px; line-height: 1.6;">
+            Book ID: <strong style="color:#ef4444;">${escapeHtml(bookId)}</strong> का विवरण अभी प्रकाशित नहीं हुआ है या लिंक अमान्य है।
+          </p>
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="/ebooks/ebook.html" style="background: #16a34a; color: #fff; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none;">
+              📖 सभी ई-बुक्स देखें
+            </a>
+            <a href="/index.html" style="background: #f1f5f9; color: #475569; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none;">
+              🏠 होम पेज
+            </a>
+          </div>
+        </div>
+      `;
+    }
+  }
+
   // Check login state on load
   function checkLoginHeaderState() {
     try {
@@ -1494,6 +1528,32 @@
       }
     } catch (e) {}
   }
+
+  // Side Menu Toggle Controller
+  window.toggleMenu = function() {
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('sideMenuOverlay');
+    if (sideMenu) {
+      if (sideMenu.classList.contains('active')) {
+        sideMenu.classList.remove('active');
+        sideMenu.style.right = '-320px';
+      } else {
+        sideMenu.classList.add('active');
+        sideMenu.style.right = '0px';
+      }
+    }
+    if (overlay) {
+      if (overlay.classList.contains('active')) {
+        overlay.classList.remove('active');
+        overlay.style.display = 'none';
+        overlay.style.opacity = '0';
+      } else {
+        overlay.classList.add('active');
+        overlay.style.display = 'block';
+        overlay.style.opacity = '1';
+      }
+    }
+  };
 
   // DOM Ready
   if (document.readyState === 'loading') {

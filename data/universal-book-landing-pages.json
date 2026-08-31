@@ -739,6 +739,178 @@
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
       "google_analytics_enabled": true
+    },
+    {
+      "id": "BK014",
+      "slug": "prakritik-kheti-master-guide",
+      "status": "active",
+      "category": "Agriculture",
+      "store_badge": "best_seller",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "theme_primary": "#2E7D32",
+      "theme_dark": "#1B5E20",
+      "cover_effect": "3d_float",
+      "sticky_button_text": "खरीदें",
+      "mainPdf": "/uploads/books/BK014_main.pdf",
+      "main_pdf": "/uploads/books/BK014_main.pdf",
+      "freePdf": "/uploads/books/BK014_free.pdf",
+      "free_pdf": "/uploads/books/BK014_free.pdf",
+      "demoPdf": "/uploads/books/BK014_free.pdf",
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_ai_support",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help",
+        "sec_pdf_main",
+        "sec_pdf_free"
+      ],
+      "hero": {
+        "tag": "🌾 Bestseller Agriculture eBook",
+        "title": "प्राकृतिक खेती एवं जैविक कीटनाशक मास्टर गाइड 2026",
+        "subtitle": "जीवामृत, बीजामृत, दशपर्णी अर्क व प्राकृतिक कीट नियंत्रण की सम्पूर्ण वैज्ञानिक विधि",
+        "rating_score": "4.9",
+        "rating_count": "115+ Ratings",
+        "description": "रासायनिक खादों व कीटनाशकों के खर्च से मुक्ति पाकर प्राकृतिक तरीकों से भरपूर उत्पादन लेने की सम्पूर्ण सचित्र एवं प्रमाणित प्रैक्टिकल गाइड।",
+        "mrp": 299,
+        "offer_price": 99,
+        "offer_badge": "Launch Offer 67% Off",
+        "banner_image": "/images/banners/farmer-community-banner.jpeg",
+        "cover_image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "features": [
+          {
+            "icon": "fa-seedling",
+            "text": "120+ रंगीन पेज"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ फोटो"
+          },
+          {
+            "icon": "fa-circle-check",
+            "text": "100% Organic & Practical"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Bonus PDF"
+          }
+        ]
+      },
+      "timer": {
+        "enabled": true,
+        "minutes": 15,
+        "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!"
+      },
+      "value_stack": {
+        "book_mrp": 299,
+        "vip_value": 1999,
+        "bonus_value": 199,
+        "offer_price": 99,
+        "vip_banner": "/images/banners/farmer-community-banner.jpeg",
+        "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए 1 वर्ष का Pro सब्सक्रिप्शन 100% मुफ्त शामिल है।"
+      },
+      "why_read": {
+        "title": "यह पुस्तक क्यों खरीदें?",
+        "subtitle": "लागत कम करके शुद्ध और अधिक उत्पादन लेने की वैज्ञानिक विधि।",
+        "cards": [
+          {
+            "icon": "🌱",
+            "title": "वैज्ञानिक एवं प्रमाणित जानकारी",
+            "desc": "कृषि विशेषज्ञों द्वारा तैयार 100% प्रमाणित एवं Practical गाइड।"
+          },
+          {
+            "icon": "📷",
+            "title": "300+ वास्तविक फोटो",
+            "desc": "रोग, कीट व जैविक उपचार की सचित्र पहचान।"
+          },
+          {
+            "icon": "📘",
+            "title": "Step by Step विधि",
+            "desc": "घर पर ही जीवामृत व नीमास्त्र बनाने की आसान विधि।"
+          },
+          {
+            "icon": "🎁",
+            "title": "Free Bonus PDF",
+            "desc": "इस पुस्तक के साथ विशेष बोनस सामग्री बिल्कुल निःशुल्क।"
+          }
+        ]
+      },
+      "preview_banner": "/images/banners/kharif-master-guide-2026-preview-banner.webp",
+      "demo_images": [],
+      "suggested_books_list": [
+        {
+          "image": "/images/books/kharif-master-guide-2026-cover.webp",
+          "title": "खरीफ फसल मास्टर गाइड 2026",
+          "offerPrice": 99,
+          "mrp": 299,
+          "link": "BK001"
+        }
+      ],
+      "suggested_books": [
+        "BK001"
+      ],
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_points": [
+        "24×7 WhatsApp Support",
+        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+        "📖 किताब की जानकारी समझने में सहायता",
+        "📱 Mobile Friendly PDF & Lifetime Access"
+      ],
+      "table_of_contents": [
+        "प्राकृतिक खेती के मूल सिद्धांत",
+        "जीवामृत एवं बीजामृत निर्माण विधि",
+        "दशपर्णी अर्क एवं नीमास्त्र",
+        "मृदा स्वास्थ्य व केंचुआ खाद",
+        "फसल सुरक्षा एवं कीट नियंत्रण"
+      ],
+      "videos": [],
+      "testimonials": [
+        {
+          "name": "दिनेश पाटीदार",
+          "location": "शाजापुर, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "प्राकृतिक कीटनाशक बनाने की ऐसी स्पष्ट जानकारी पहली बार मिली है। बहुत शानदार किताब है।"
+        }
+      ],
+      "faqs": [
+        {
+          "q": "खरीदने के तुरंत बाद मुझे पुस्तक कैसे मिलेगी?",
+          "a": "भुगतान पूरा होते ही आपको तुरंत Instant Download लिंक मिलेगा और यह आपके 'My Library' डैशबोर्ड में जुड़ जाएगी।"
+        },
+        {
+          "q": "क्या मैं इसे अपने मोबाइल में ऑफलाइन पढ़ सकता हूँ?",
+          "a": "हाँ, यह एक Mobile Friendly PDF है जिसे आप डाउनलोड करके बिना इंटरनेट कभी भी पढ़ सकते हैं।"
+        }
+      ],
+      "whatsapp_prompt": "नमस्ते, मुझे 'प्राकृतिक खेती मास्टर गाइड 2026' पुस्तक के बारे में और जानकारी चाहिए।",
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true
     }
   ]
 }
