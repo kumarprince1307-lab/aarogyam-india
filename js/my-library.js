@@ -541,8 +541,8 @@ async function renderLibrarySections(booksArray) {
             }
         }
 
-        // 2. Available Books (Strictly Kharif Master Guide, Kheti Ka Doctor and VIP Subscription)
-        const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001') && book.status !== 'coming_soon';
+        // 2. Available Books (All live active published books)
+        const isLiveAgri = (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001') && book.status !== 'coming_soon' && !book.isComingSoon && (book.publish_targets ? book.publish_targets.includes('my_library') : true);
         if (isLiveAgri && !seenAvailableIds.has(rawId)) {
             seenAvailableIds.add(rawId);
             if (window.renderUniversalBookMarketingCard && typeof window.renderUniversalBookMarketingCard === 'function') {
@@ -552,7 +552,7 @@ async function renderLibrarySections(booksArray) {
             } else {
                 const availCard = document.createElement('div');
                 availCard.className = 'book-card';
-                let targetUrl = rawId === 'SUB001' ? '/subscription.html' : (rawId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (rawId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/checkout.html?id=${bookId}`));
+                let targetUrl = book.landingPage || (rawId === 'SUB001' ? '/subscription.html' : (rawId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (rawId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${bookId}`)));
 
                 availCard.innerHTML = `
                     <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
@@ -570,12 +570,12 @@ async function renderLibrarySections(booksArray) {
         }
 
         // 3. Demo Books (Read Free Samples)
-        if ((book.demoAvailable || book.demoPdf || rawId === 'BK001' || rawId === 'BK002') && !seenDemoIds.has(rawId)) {
+        if ((book.demoAvailable || book.demoPdf || book.freePdf || rawId === 'BK001' || rawId === 'BK002') && !seenDemoIds.has(rawId)) {
             seenDemoIds.add(rawId);
             demoCount++;
             const demoCard = document.createElement('div');
             demoCard.className = 'book-card';
-            const demoPdfUrl = book.demoPdf || `/pdf/sample/${bookId}-demo.pdf`;
+            const demoPdfUrl = book.demoPdf || book.freePdf || `/pdf/sample/${bookId}-demo.pdf`;
             demoCard.innerHTML = `
                 <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
                 <h4>${bookName} (Free Demo)</h4>
@@ -586,8 +586,9 @@ async function renderLibrarySections(booksArray) {
             if (demoGrid) demoGrid.appendChild(demoCard);
         }
 
-        // 4. Coming Soon Books (All other Books)
-        if ((book.status === 'coming_soon' || (!isLiveAgri && rawId !== 'BK001' && rawId !== 'BK002' && rawId !== 'SUB001')) && !seenComingSoonIds.has(rawId) && !seenAvailableIds.has(rawId)) {
+        // 4. Coming Soon Books (Books with coming_soon status)
+        const isComingSoonBook = (book.status === 'coming_soon' || book.isComingSoon === true || book.is_coming_soon === true) && !isLiveAgri;
+        if (isComingSoonBook && !seenComingSoonIds.has(rawId) && !seenAvailableIds.has(rawId)) {
             seenComingSoonIds.add(rawId);
             const comingCard = document.createElement('div');
             comingCard.className = 'book-card';

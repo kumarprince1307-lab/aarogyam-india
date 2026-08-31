@@ -106,9 +106,47 @@
 
     currentLandingData = allLandingPages.find(p => 
       (p.id && p.id.trim().toUpperCase() === qKey) || 
-      (p.slug && p.slug.trim().toLowerCase() === qSlug) ||
-      (p.id && p.id.trim().toUpperCase() === qKey)
-    ) || allLandingPages[0] || {};
+      (p.slug && p.slug.trim().toLowerCase() === qSlug)
+    );
+
+    if (!currentLandingData) {
+      const bookInLib = allBooks.find(b => 
+        (b.id && b.id.trim().toUpperCase() === qKey) ||
+        (b.slug && b.slug.trim().toLowerCase() === qSlug)
+      );
+      if (bookInLib) {
+        currentLandingData = {
+          id: bookInLib.id,
+          slug: bookInLib.slug || bookInLib.id.toLowerCase(),
+          category: bookInLib.category || 'Agriculture',
+          status: bookInLib.status || 'active',
+          theme_primary: '#2E7D32',
+          theme_dark: '#1B5E20',
+          cover_effect: '3d_float',
+          hero: {
+            tag: '🌾 Agriculture Practical Guide',
+            title: bookInLib.heading || bookInLib.name || 'ई-बुक प्रैक्टिकल गाइड',
+            subtitle: bookInLib.subtitle || '',
+            description: bookInLib.description || 'बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।',
+            mrp: bookInLib.mrp || 299,
+            offer_price: bookInLib.offerPrice || 99,
+            offer_badge: 'Launch Offer',
+            rating_score: '4.9',
+            rating_count: '120+ Ratings',
+            cover_image: bookInLib.cover || bookInLib.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
+            banner_image: bookInLib.banner || '/images/banners/kharif-master-guide-2026-hero-banner.webp',
+            features: [
+              { icon: 'fa-seedling', text: `${bookInLib.totalPages || 120}+ रंगीन पेज` },
+              { icon: 'fa-camera', text: '300+ फोटो' },
+              { icon: 'fa-flask', text: 'स्प्रे साइंस' },
+              { icon: 'fa-gift', text: 'Free Bonus' }
+            ]
+          }
+        };
+      } else {
+        currentLandingData = allLandingPages[0] || {};
+      }
+    }
 
     const landingId = (currentLandingData.id || qKey).trim().toUpperCase();
     const landingSlug = (currentLandingData.slug || qSlug).trim().toLowerCase();

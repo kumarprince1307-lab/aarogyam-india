@@ -781,11 +781,11 @@
   // -------------------------------------------------------------
   // 7. KINDLE 3D BEST SELLERS SHELVES (KHARIF + KHETI KA DOCTOR)
   // -------------------------------------------------------------
-  function loadKindleBestsellers() {
+  async function loadKindleBestsellers() {
     const grid = document.getElementById('home-kindle-bestsellers-grid');
     if (!grid) return;
 
-    const bestsellers = [
+    let bestsellers = [
       {
         id: 'BK001',
         title: 'खरीफ फसल मास्टर गाइड 2026',
@@ -807,6 +807,41 @@
         tag: '🩺 किसान का डॉक्टर'
       }
     ];
+
+    try {
+      let customBooks = [];
+      let customLp = [];
+      try {
+        customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+        customLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+      } catch (e) {}
+
+      const allActive = [...customBooks, ...customLp].filter(b => {
+        if (!b || !b.id) return false;
+        const bIdUpper = b.id.toUpperCase();
+        if (bIdUpper === 'BK001' || bIdUpper === 'BK002') return false;
+        if (b.status === 'draft' || b.status === 'inactive' || b.isComingSoon || b.is_coming_soon) return false;
+        if (b.publish_targets && Array.isArray(b.publish_targets) && !b.publish_targets.includes('home_page')) return false;
+        return true;
+      });
+
+      allActive.forEach(b => {
+        const hero = b.hero || {};
+        const bId = b.id.toUpperCase();
+        if (!bestsellers.some(x => x.id === bId)) {
+          bestsellers.push({
+            id: bId,
+            title: hero.title || b.heading || b.name || bId,
+            subtitle: hero.subtitle || b.subtitle || 'सम्पूर्ण प्रैक्टिकल गाइड',
+            price: `₹${hero.offer_price || b.offerPrice || 99}`,
+            oldPrice: `₹${hero.mrp || b.mrp || 299}`,
+            image: hero.cover_image || b.cover || b.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
+            link: `/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`,
+            tag: b.store_badge === 'new_arrival' ? '🆕 New Arrival' : '⭐ Bestseller'
+          });
+        }
+      });
+    } catch (e) {}
 
     grid.innerHTML = bestsellers.map(book => `
       <div class="shelf-book-card" style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;gap:18px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,0.06);flex-wrap:wrap;">

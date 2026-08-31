@@ -68,7 +68,9 @@ export async function initBookLandingPages() {
     { key: 'sec_reviews', name: '⭐ 13. Customer Reviews & Ratings', desc: 'पाठकों की राय व 👨/👩 अवतार' },
     { key: 'sec_faqs', name: '❓ 14. FAQs Accordion', desc: 'अक्सर पूछे जाने वाले सवाल' },
     { key: 'sec_final_buy', name: '🚀 15. Final CTA Buy Box & Benefits', desc: 'अंतिम आर्डर बॉक्स व लाभ सूची' },
-    { key: 'sec_help', name: '💬 16. Help & WhatsApp Support', desc: 'हेल्पलाइन लिंक व सहायता बॉक्स' }
+    { key: 'sec_help', name: '💬 16. Help & WhatsApp Support', desc: 'हेल्पलाइन लिंक व सहायता बॉक्स' },
+    { key: 'sec_pdf_main', name: '📄 17. Book PDF / DOC Upload & File Management', desc: 'Paid book PDF/DOC upload and management' },
+    { key: 'sec_pdf_free', name: '📄 18. Free Book PDF / DOC Upload & File Management', desc: 'Free book PDF/DOC upload and management' }
   ];
 
   content.innerHTML = `
@@ -645,17 +647,88 @@ export async function initBookLandingPages() {
             <div>
               <label class="admin-label" style="font-weight: 700; font-size: 0.78rem;">⏳ प्री-लॉन्च / कमिंग सून स्थिति:</label>
               <select id="blp_is_coming_soon" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
-                <option value="false">🟢 Live / Ready to Buy (तुरंत खरीदने योग्य)</option>
-                <option value="true">⏳ Coming Soon / Pre-Launch (नोटिफाई / कमिंग सून)</option>
-              </select>
+        <!-- SECTION 17: BOOK PDF / DOC FILE MANAGEMENT (PAID BOOK FULL PDF/DOC) -->
+        <div style="background: rgba(14,165,233,0.08); border: 1.5px solid rgba(14,165,233,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                <span>📄</span> <span>17. मुख्य ई-बुक PDF / DOC फाइल प्रबंधन (Paid Book PDF/DOC Upload)</span>
+              </div>
+              <small style="color: var(--admin-muted);">भुगतान के बाद पाठक को मिलने वाली मुख्य सम्पूर्ण ई-बुक फाइल (PDF, DOC, DOCX - Max 100MB)</small>
+            </div>
+            <span style="font-size: 0.72rem; background: #0284c7; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
+              🔒 Paid Full Book Access
+            </span>
+          </div>
+
+          <!-- Optional Section Banner for Main PDF -->
+          ${renderSectionBannerUploaderBlock('sec_pdf_main', '📄 मुख्य PDF सेक्शन बैनर (वैकल्पिक)')}
+
+          <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #0284c7; border-radius: 8px; padding: 14px; margin-top: 10px;">
+            <div style="display: grid; grid-template-columns: 1.3fr 2fr auto; gap: 10px; align-items: center;">
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">फाइल चुनें (PDF/DOC/DOCX):</label>
+                <input type="file" id="blp_file_main_pdf" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="window.handleBookPdfSelect('main', event)" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem;" />
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">या डायरेक्ट फाइल URL / Path:</label>
+                <input type="text" id="blp_main_pdf_url" placeholder="उदा. /pdf/full/BK013.pdf या /uploads/books/..." oninput="window.updatePdfStatusPreview('main', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
+              </div>
+              <div style="padding-top: 16px;">
+                <button type="button" id="btn_upload_main_pdf" onclick="window.triggerBookPdfUpload('main')" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; white-space: nowrap; padding: 7px 14px;">
+                  ⬆️ अपलोड करें
+                </button>
+              </div>
+            </div>
+            <div id="blp_main_pdf_status_wrap" style="margin-top: 8px; font-size: 0.8rem; color: #94a3b8; display: none;">
+              <!-- Current file status indicator -->
             </div>
           </div>
         </div>
 
-        <!-- SECTION 15: SEO, OPENGRAPH (OG) & WHATSAPP SOCIAL SHARE LIVE PREVIEW -->
+        <!-- SECTION 18: FREE / DEMO BOOK PDF / DOC FILE MANAGEMENT -->
+        <div style="background: rgba(16,185,129,0.08); border: 1.5px solid rgba(16,185,129,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <div style="font-weight: 800; color: #34d399; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                <span>🎁</span> <span>18. मुफ़्त / डेमो ई-बुक PDF / DOC फाइल प्रबंधन (Free/Demo Book PDF/DOC Upload)</span>
+              </div>
+              <small style="color: var(--admin-muted);">पाठकों के लिए निःशुल्क सैंपल या बोनस ई-बुक फाइल (PDF, DOC, DOCX - Max 100MB)</small>
+            </div>
+            <span style="font-size: 0.72rem; background: #059669; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
+              🎁 100% Free Demo Access
+            </span>
+          </div>
+
+          <!-- Optional Section Banner for Free PDF -->
+          ${renderSectionBannerUploaderBlock('sec_pdf_free', '🎁 फ्री PDF सेक्शन बैनर (वैकल्पिक)')}
+
+          <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #059669; border-radius: 8px; padding: 14px; margin-top: 10px;">
+            <div style="display: grid; grid-template-columns: 1.3fr 2fr auto; gap: 10px; align-items: center;">
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #34d399;">फाइल चुनें (PDF/DOC/DOCX):</label>
+                <input type="file" id="blp_file_free_pdf" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="window.handleBookPdfSelect('free', event)" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem;" />
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">या डायरेक्ट फाइल URL / Path:</label>
+                <input type="text" id="blp_free_pdf_url" placeholder="उदा. /pdf/sample/BK013-demo.pdf या /uploads/books/..." oninput="window.updatePdfStatusPreview('free', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
+              </div>
+              <div style="padding-top: 16px;">
+                <button type="button" id="btn_upload_free_pdf" onclick="window.triggerBookPdfUpload('free')" class="admin-button small-button" style="background: #059669; color: #fff; font-weight: 800; white-space: nowrap; padding: 7px 14px;">
+                  ⬆️ अपलोड करें
+                </button>
+              </div>
+            </div>
+            <div id="blp_free_pdf_status_wrap" style="margin-top: 8px; font-size: 0.8rem; color: #94a3b8; display: none;">
+              <!-- Current file status indicator -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 19: SEO, OPENGRAPH (OG) & WHATSAPP SOCIAL SHARE LIVE PREVIEW -->
         <div style="background: rgba(34,197,94,0.08); border: 1.5px solid rgba(34,197,94,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="font-weight: 800; color: #22c55e; font-size: 0.95rem; margin-bottom: 6px;">
-            🌐 15. SEO, OpenGraph (OG) व WhatsApp शेयर प्रीव्यू (Social Media Thumbnail & Title)
+            🌐 19. SEO, OpenGraph (OG) व WhatsApp शेयर प्रीव्यू (Social Media Thumbnail & Title)
           </div>
           <p style="font-size: 0.8rem; color: var(--admin-muted); margin-bottom: 12px;">
             जब आप इस पुस्तक का लिंक WhatsApp, Facebook या सोशल मीडिया पर शेयर करेंगे, तो यह थंबनेल, शीर्षक और विवरण कार्ड दिखाई देगा:
@@ -933,6 +1006,94 @@ export async function initBookLandingPages() {
     if (input) input.value = '';
     if (wrap) wrap.style.display = 'none';
     showToast('🗑️ सेक्शन बैनर हटा दिया गया', 'info');
+  };
+
+  // PDF / DOC Uploader Functions
+  window.updatePdfStatusPreview = function(sectionType, url) {
+    const wrap = document.getElementById(sectionType === 'main' ? 'blp_main_pdf_status_wrap' : 'blp_free_pdf_status_wrap');
+    if (!wrap) return;
+    if (url && url.trim().length > 0) {
+      const cleanUrl = url.trim();
+      wrap.style.display = 'block';
+      wrap.innerHTML = `
+        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="color: #4ade80; font-weight: 800;">✅ फाइल सेट है:</span>
+            <code style="color: #38bdf8; font-size: 0.8rem; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">${escapeHtml(cleanUrl)}</code>
+          </div>
+          <a href="${cleanUrl}" target="_blank" class="admin-button small-button" style="background: #16a34a; color: #fff; padding: 3px 10px; font-size: 0.75rem; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+            <span>📥</span> <span>टेस्ट डाउनलोड / देखें</span>
+          </a>
+        </div>
+      `;
+    } else {
+      wrap.style.display = 'none';
+      wrap.innerHTML = '';
+    }
+  };
+
+  window.handleBookPdfSelect = async function(sectionType, event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    await window.executeBookPdfUpload(sectionType, file);
+  };
+
+  window.triggerBookPdfUpload = async function(sectionType) {
+    const fileInput = document.getElementById(sectionType === 'main' ? 'blp_file_main_pdf' : 'blp_file_free_pdf');
+    const file = fileInput?.files?.[0];
+    if (!file) {
+      showToast('कृपया पहले फाइल चुनें।', 'error');
+      return;
+    }
+    await window.executeBookPdfUpload(sectionType, file);
+  };
+
+  window.executeBookPdfUpload = async function(sectionType, file) {
+    const bookId = (document.getElementById('blp_input_book_id')?.value || 'BK013').trim().toUpperCase();
+    if (!bookId) {
+      showToast('कृपया पहले Book ID (जैसे BK013) दर्ज करें।', 'error');
+      return;
+    }
+
+    const btn = document.getElementById(sectionType === 'main' ? 'btn_upload_main_pdf' : 'btn_upload_free_pdf');
+    const origText = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '⏳ अपलोड हो रहा है...';
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('bookId', bookId);
+      formData.append('section', sectionType);
+
+      showToast(`⏳ ${file.name} अपलोड हो रही है...`, 'info');
+      const res = await fetch('/api/upload_book_landing.php', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.fileUrl) {
+        const urlInput = document.getElementById(sectionType === 'main' ? 'blp_main_pdf_url' : 'blp_free_pdf_url');
+        if (urlInput) {
+          urlInput.value = data.fileUrl;
+        }
+        window.updatePdfStatusPreview(sectionType, data.fileUrl);
+        showToast(`✅ ${file.name} सफलतापूर्वक अपलोड हो गई!`, 'success');
+      } else {
+        showToast(`❌ अपलोड विफल: ${data.error || 'Server error'}`, 'error');
+      }
+    } catch (err) {
+      console.error('PDF upload error:', err);
+      showToast('❌ सर्वर से कनेक्ट नहीं हो सका।', 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
   };
 
   // Theme Color Buttons
@@ -2276,6 +2437,13 @@ export async function initBookLandingPages() {
     if (document.getElementById('blp_is_coming_soon')) document.getElementById('blp_is_coming_soon').value = 'false';
     window.updateSocialSharePreview();
 
+    if (document.getElementById('blp_main_pdf_url')) document.getElementById('blp_main_pdf_url').value = '';
+    if (document.getElementById('blp_free_pdf_url')) document.getElementById('blp_free_pdf_url').value = '';
+    if (document.getElementById('blp_file_main_pdf')) document.getElementById('blp_file_main_pdf').value = '';
+    if (document.getElementById('blp_file_free_pdf')) document.getElementById('blp_file_free_pdf').value = '';
+    window.updatePdfStatusPreview('main', '');
+    window.updatePdfStatusPreview('free', '');
+
     // Clear all section banner previews
     defaultSectionsList.forEach(s => {
       const input = document.getElementById(`blp_sec_banner_${s.key}`);
@@ -2307,6 +2475,14 @@ export async function initBookLandingPages() {
     document.getElementById('blp_input_book_id').value = page.id || '';
     if (bookSelect) bookSelect.value = page.id || '';
     document.getElementById('blp_category_select').value = page.category || 'Agriculture';
+
+    // PDF / DOC files
+    const mainPdfUrl = page.mainPdf || page.main_pdf || page.hero?.mainPdf || '';
+    const freePdfUrl = page.freePdf || page.free_pdf || page.demoPdf || page.hero?.demoPdf || '';
+    if (document.getElementById('blp_main_pdf_url')) document.getElementById('blp_main_pdf_url').value = mainPdfUrl;
+    if (document.getElementById('blp_free_pdf_url')) document.getElementById('blp_free_pdf_url').value = freePdfUrl;
+    window.updatePdfStatusPreview('main', mainPdfUrl);
+    window.updatePdfStatusPreview('free', freePdfUrl);
 
     const hero = page.hero || {};
     document.getElementById('blp_hero_tag').value = hero.tag || '';
@@ -2551,6 +2727,9 @@ export async function initBookLandingPages() {
     const storeBadge = document.getElementById('blp_store_badge')?.value || 'best_seller';
     const isComingSoon = document.getElementById('blp_is_coming_soon')?.value === 'true';
 
+    const mainPdfUrl = (document.getElementById('blp_main_pdf_url')?.value || '').trim();
+    const freePdfUrl = (document.getElementById('blp_free_pdf_url')?.value || '').trim();
+
     const pageData = {
       id: bId,
       slug: bId.toLowerCase(),
@@ -2570,6 +2749,11 @@ export async function initBookLandingPages() {
       og_title: ogTitle,
       og_description: ogDesc,
       og_image: ogImg,
+      mainPdf: mainPdfUrl,
+      main_pdf: mainPdfUrl,
+      freePdf: freePdfUrl,
+      free_pdf: freePdfUrl,
+      demoPdf: freePdfUrl,
       ai_support_title: (document.getElementById('blp_ai_support_title')?.value || '').trim(),
       ai_support_cover: (document.getElementById('blp_ai_support_cover')?.value || '').trim(),
       ai_support_desc: (document.getElementById('blp_ai_support_desc')?.value || '').trim(),
@@ -2628,35 +2812,40 @@ export async function initBookLandingPages() {
     if (existingIdx >= 0) allLandingPages[existingIdx] = pageData;
     else allLandingPages.unshift(pageData);
 
+    const newBookObj = {
+      id: bId,
+      slug: bId.toLowerCase(),
+      heading: title,
+      name: title,
+      category: category,
+      language: 'Hindi',
+      mrp: mrp,
+      offerPrice: offerPrice,
+      cover: coverUrl,
+      thumbnail: coverUrl,
+      banner: pageData.hero.banner_image,
+      status: pageData.status,
+      publish_targets: publishTargets,
+      store_badge: storeBadge,
+      badge: storeBadge,
+      isComingSoon: isComingSoon,
+      mainPdf: mainPdfUrl,
+      pdf_url: mainPdfUrl,
+      freePdf: freePdfUrl,
+      demoPdf: freePdfUrl,
+      features: currentKpis.map(k => (typeof k === 'object' ? k.text : k)).filter(Boolean),
+      totalPages: 120,
+      landingPage: bId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (bId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${bId}`),
+      checkoutPage: '/ebooks/checkout.html',
+      readerPage: '/ebooks/reader.html'
+    };
+
     try {
       localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
       
       // Save New Book to Library / books.json state
       const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
       const bIdx = customBooks.findIndex(x => x.id === bId);
-      const newBookObj = {
-        id: bId,
-        slug: bId.toLowerCase(),
-        heading: title,
-        name: title,
-        category: category,
-        language: 'Hindi',
-        mrp: mrp,
-        offerPrice: offerPrice,
-        cover: coverUrl,
-        thumbnail: coverUrl,
-        banner: pageData.hero.banner_image,
-        status: pageData.status,
-        publish_targets: publishTargets,
-        store_badge: storeBadge,
-        badge: storeBadge,
-        isComingSoon: isComingSoon,
-        features: currentKpis.map(k => (typeof k === 'object' ? k.text : k)).filter(Boolean),
-        totalPages: 120,
-        landingPage: bId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (bId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${bId}`),
-        checkoutPage: '/ebooks/checkout.html',
-        readerPage: '/ebooks/reader.html'
-      };
       if (bIdx >= 0) customBooks[bIdx] = newBookObj;
       else customBooks.unshift(newBookObj);
       localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
@@ -2665,6 +2854,19 @@ export async function initBookLandingPages() {
       if (existingBookIdx >= 0) allBooks[existingBookIdx] = newBookObj;
       else allBooks.unshift(newBookObj);
     } catch (e) {}
+
+    // Async Server Persistence (JSON file & Git safe sync)
+    fetch('/api/save_book_landing.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pageData, bookData: newBookObj })
+    }).then(r => r.json()).then(res => {
+      if (res.success) {
+        console.log('✅ Server JSON synced successfully:', res.message);
+      }
+    }).catch(err => {
+      console.warn('Server sync note (saved locally):', err);
+    });
 
     showToast(`✅ बुक लैंडिंग पेज (${bId}) सुरक्षित हो गया!`, 'success');
     builderCard.style.display = 'none';

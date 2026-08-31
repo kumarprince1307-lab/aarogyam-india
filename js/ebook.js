@@ -83,7 +83,7 @@
         publish_targets: lp.publish_targets || existing.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page'],
         store_badge: lp.store_badge || existing.store_badge || 'best_seller',
         badge: lp.store_badge || existing.badge || 'best_seller',
-        isComingSoon: (bId !== 'BK001' && bId !== 'BK002') || lp.is_coming_soon === true || existing.isComingSoon === true || existing.status === 'coming_soon',
+        isComingSoon: (lp.is_coming_soon === true || lp.is_coming_soon === 'true' || (lp.is_coming_soon === undefined && (existing.isComingSoon === true || existing.status === 'coming_soon'))),
         features: hero.features || existing.features || ['120+ रंगीन पेज', '300+ फोटो', 'स्प्रे साइंस', 'Mobile PDF'],
         landingPage: bId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (bId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`),
         checkoutPage: '/ebooks/checkout.html',
