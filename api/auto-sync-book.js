@@ -8,58 +8,74 @@ const GITHUB_OWNER_REPO = process.env.GITHUB_REPO || 'kumarprince1307-lab/aarogy
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
 const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB limit for GitHub Contents API
 
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 25,
+  keepAliveMsecs: 60000
+});
+
 function githubRequest(endpoint, method, token, body = null) {
   return new Promise((resolve, reject) => {
-    const url = new URL(endpoint.startsWith('http') ? endpoint : `https://api.github.com/repos/${GITHUB_OWNER_REPO}/${endpoint.replace(/^\//, '')}`);
-    
-    const headers = {
-      'User-Agent': 'Aarogyam-Auto-Sync/1.0',
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/vnd.github.v3+json'
-    };
+    try {
+      const cleanEndpoint = endpoint ? String(endpoint).replace(/^\/+/, '') : '';
+      const fullUrl = cleanEndpoint.startsWith('http')
+        ? cleanEndpoint
+        : `https://api.github.com/repos/${GITHUB_OWNER_REPO}${cleanEndpoint ? '/' + cleanEndpoint : ''}`;
 
-    let postData = null;
-    if (body) {
-      postData = JSON.stringify(body);
-      headers['Content-Type'] = 'application/json';
-      headers['Content-Length'] = Buffer.byteLength(postData);
-    }
+      const url = new URL(fullUrl);
 
-    const options = {
-      hostname: url.hostname,
-      path: url.pathname + url.search,
-      method: method,
-      headers: headers,
-      timeout: 30000
-    };
+      const headers = {
+        'User-Agent': 'Aarogyam-Auto-Sync/1.0',
+        'Authorization': `token ${token.trim()}`,
+        'Accept': 'application/vnd.github.v3+json'
+      };
 
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        let parsed = null;
-        try {
-          parsed = data ? JSON.parse(data) : {};
-        } catch (e) {
-          parsed = { raw: data };
-        }
+      let postData = null;
+      if (body) {
+        postData = JSON.stringify(body);
+        headers['Content-Type'] = 'application/json';
+        headers['Content-Length'] = Buffer.byteLength(postData);
+      }
 
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve({ status: res.statusCode, data: parsed });
-        } else {
-          const errMsg = parsed.message || `GitHub API error (HTTP ${res.statusCode})`;
-          reject(new Error(errMsg));
-        }
+      const options = {
+        agent: httpsAgent,
+        hostname: url.hostname,
+        path: url.pathname + url.search,
+        method: method,
+        headers: headers,
+        timeout: 25000
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => { data += chunk; });
+        res.on('end', () => {
+          let parsed = null;
+          try {
+            parsed = data ? JSON.parse(data) : {};
+          } catch (e) {
+            parsed = { raw: data };
+          }
+
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve({ status: res.statusCode, data: parsed });
+          } else {
+            const errMsg = parsed?.message || `GitHub HTTP ${res.statusCode}`;
+            reject(new Error(errMsg));
+          }
+        });
       });
-    });
 
-    req.on('error', (err) => reject(err));
-    req.on('timeout', () => { req.destroy(); reject(new Error('GitHub API request timed out')); });
+      req.on('error', (err) => reject(err));
+      req.on('timeout', () => { req.destroy(); reject(new Error('GitHub API request timed out')); });
 
-    if (postData) {
-      req.write(postData);
+      if (postData) {
+        req.write(postData);
+      }
+      req.end();
+    } catch (err) {
+      reject(err);
     }
-    req.end();
   });
 }
 
@@ -68,7 +84,7 @@ async function getFileSha(filePath, token) {
     const res = await githubRequest(`contents/${encodeURIComponent(filePath).replace(/%2F/g, '/')}?ref=${GITHUB_BRANCH}`, 'GET', token);
     return res.data?.sha || null;
   } catch (e) {
-    return null; // File does not exist yet
+    return null;
   }
 }
 
@@ -102,48 +118,49 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) {
-    return res.status(500).json({
-      success: false,
-      connected: false,
-      error: 'GITHUB_TOKEN environment variable is not configured in Vercel. Please add GITHUB_TOKEN in Vercel Project Settings.'
-    });
-  }
-
-  // 1. HEALTH CHECK / TEST CONNECTION (GET request)
-  if (req.method === 'GET') {
-    try {
-      const testRes = await githubRequest('', 'GET', token);
-      return res.status(200).json({
-        success: true,
-        connected: true,
-        repository: GITHUB_OWNER_REPO,
-        branch: GITHUB_BRANCH,
-        repoFullName: testRes.data?.full_name || GITHUB_OWNER_REPO,
-        defaultBranch: testRes.data?.default_branch || 'main',
-        private: testRes.data?.private ?? false,
-        permissions: testRes.data?.permissions || { push: true }
-      });
-    } catch (testErr) {
+  try {
+    const token = process.env.GITHUB_TOKEN;
+    if (!token) {
       return res.status(500).json({
         success: false,
         connected: false,
-        error: `GitHub API connection failed: ${testErr.message || 'Unknown error'}`
+        error: 'GITHUB_TOKEN environment variable is not configured in Vercel. Please add GITHUB_TOKEN in Vercel Project Settings.'
       });
     }
-  }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed. Use GET or POST.' });
-  }
+    // 1. HEALTH CHECK / TEST CONNECTION (GET request)
+    if (req.method === 'GET') {
+      try {
+        const testRes = await githubRequest('', 'GET', token);
+        return res.status(200).json({
+          success: true,
+          connected: true,
+          repository: GITHUB_OWNER_REPO,
+          branch: GITHUB_BRANCH,
+          repoFullName: testRes.data?.full_name || GITHUB_OWNER_REPO,
+          defaultBranch: testRes.data?.default_branch || 'main',
+          private: testRes.data?.private ?? false,
+          permissions: testRes.data?.permissions || { push: true }
+        });
+      } catch (testErr) {
+        return res.status(500).json({
+          success: false,
+          connected: false,
+          error: `GitHub API connection failed: ${testErr.message || 'Unknown error'}`
+        });
+      }
+    }
 
-  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ success: false, error: 'Method not allowed. Use GET or POST.' });
+    }
+
     const payload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     if (!payload || !payload.pageData || !payload.pageData.id) {
       return res.status(400).json({ success: false, error: 'Invalid payload: pageData and Book ID are required.' });
