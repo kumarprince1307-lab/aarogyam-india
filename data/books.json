@@ -451,6 +451,54 @@
         "जीवामृत व नीमास्त्र फॉर्मूला",
         "Mobile PDF"
       ]
+    },
+    {
+      "id": "BK015",
+      "slug": "sabji-kheti-guide-part-1",
+      "heading": "सब्जी खेती गाइड PART 1",
+      "shortTitle": "सब्जी खेती गाइड",
+      "name": "सब्जी खेती गाइड PART 1",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "author": "Aarogyam India",
+      "version": "1.0",
+      "status": "active",
+      "isComingSoon": false,
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "cover": "/images/books/kharif-master-guide-2026-cover.webp",
+      "thumbnail": "/images/books/kharif-master-guide-2026-cover.webp",
+      "banner": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+      "landingPage": "/ebooks/book-landing.html?id=BK015",
+      "demoPage": "/ebooks/book-landing.html?id=BK015",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "mrp": 299,
+      "offerPrice": 149,
+      "currency": "INR",
+      "demoAvailable": true,
+      "readEnabled": true,
+      "downloadEnabled": true,
+      "downloadLimit": 3,
+      "mainPdf": "/uploads/books/BK015_main.pdf",
+      "demoPdf": "/uploads/books/BK015_free.pdf",
+      "freePdf": "/uploads/books/BK015_free.pdf",
+      "pdf_url": "/uploads/books/BK015_main.pdf",
+      "fileSize": "22.0 MB",
+      "totalPages": 120,
+      "accessType": "Lifetime",
+      "features": [
+        "120 पेज की सम्पूर्ण जानकारी",
+        "300+ फोटो",
+        "स्प्रे साइंस",
+        "Mobile PDF"
+      ]
     }
   ]
 }
