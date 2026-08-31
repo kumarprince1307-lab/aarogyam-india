@@ -2794,7 +2794,7 @@ export async function initBookLandingPages() {
     const uploadedFiles = [];
     const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
 
-    // 1. Cover Image
+    // 1. Cover Image (File or Data URL)
     const coverFileInput = document.getElementById('blp_file_cover');
     let finalCoverPath = coverUrlInput || `/images/books/${bId.toLowerCase()}-cover.webp`;
     if (coverFileInput?.files?.[0]) {
@@ -2807,11 +2807,17 @@ export async function initBookLandingPages() {
       const ext = cFile.name.split('.').pop() || 'webp';
       finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.${ext}`;
       uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.${ext}`, base64: b64 });
+    } else if (coverUrlInput && coverUrlInput.startsWith('data:image/')) {
+      const extMatch = coverUrlInput.match(/data:image\/([a-zA-Z0-9]+);base64,/);
+      const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'webp';
+      finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.${ext}`;
+      uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.${ext}`, base64: coverUrlInput });
     }
 
-    // 2. Banner Image
+    // 2. Banner Image (File or Data URL)
     const bannerFileInput = document.getElementById('blp_file_banner');
-    let finalBannerPath = (document.getElementById('blp_banner_url')?.value || '').trim() || `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
+    const bannerUrlInput = (document.getElementById('blp_banner_url')?.value || '').trim();
+    let finalBannerPath = bannerUrlInput || `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
     if (bannerFileInput?.files?.[0]) {
       const bFile = bannerFileInput.files[0];
       if (bFile.size > MAX_FILE_SIZE) {
@@ -2822,9 +2828,26 @@ export async function initBookLandingPages() {
       const ext = bFile.name.split('.').pop() || 'webp';
       finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.${ext}`;
       uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.${ext}`, base64: b64 });
+    } else if (bannerUrlInput && bannerUrlInput.startsWith('data:image/')) {
+      const extMatch = bannerUrlInput.match(/data:image\/([a-zA-Z0-9]+);base64,/);
+      const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'webp';
+      finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.${ext}`;
+      uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.${ext}`, base64: bannerUrlInput });
     }
 
-    // 3. Main Paid PDF
+    // 3. Section Banners (Handle any uploaded Base64 section banners)
+    Object.keys(cleanSectionBanners).forEach((secKey, idx) => {
+      const sUrl = cleanSectionBanners[secKey];
+      if (sUrl && sUrl.startsWith('data:image/')) {
+        const extMatch = sUrl.match(/data:image\/([a-zA-Z0-9]+);base64,/);
+        const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'webp';
+        const sPath = `images/banners/${bId.toLowerCase()}-${secKey}-banner.${ext}`;
+        uploadedFiles.push({ path: sPath, base64: sUrl });
+        cleanSectionBanners[secKey] = `/${sPath}`;
+      }
+    });
+
+    // 4. Main Paid PDF
     const mainPdfFileInput = document.getElementById('blp_file_main_pdf');
     let finalMainPdfPath = (document.getElementById('blp_main_pdf_url')?.value || '').trim();
     if (mainPdfFileInput?.files?.[0]) {
@@ -2838,7 +2861,7 @@ export async function initBookLandingPages() {
       uploadedFiles.push({ path: `uploads/books/${bId}_main.pdf`, base64: b64 });
     }
 
-    // 4. Free Demo PDF
+    // 5. Free Demo PDF
     const freePdfFileInput = document.getElementById('blp_file_free_pdf');
     let finalFreePdfPath = (document.getElementById('blp_free_pdf_url')?.value || '').trim();
     if (freePdfFileInput?.files?.[0]) {
@@ -2852,12 +2875,14 @@ export async function initBookLandingPages() {
       uploadedFiles.push({ path: `uploads/books/${bId}_free.pdf`, base64: b64 });
     }
 
-    // 5. Demo Images (if base64)
+    // 6. Demo Images (if base64)
     const cleanedDemoImages = [];
     for (let i = 0; i < currentDemoImages.length; i++) {
       const dImg = currentDemoImages[i];
       if (typeof dImg === 'string' && dImg.startsWith('data:image/')) {
-        const dPath = `images/books/${bId.toLowerCase()}-preview-${i + 1}.webp`;
+        const extMatch = dImg.match(/data:image\/([a-zA-Z0-9]+);base64,/);
+        const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'webp';
+        const dPath = `images/books/${bId.toLowerCase()}-preview-${i + 1}.${ext}`;
         uploadedFiles.push({ path: dPath, base64: dImg });
         cleanedDemoImages.push(`/${dPath}`);
       } else if (dImg) {
