@@ -2689,6 +2689,26 @@ export async function initBookLandingPages() {
   window.removeVideoItem = (idx) => { currentVideos.splice(idx, 1); renderVideosInBuilder(); };
   window.updateReviewField = (idx, field, val) => { if (currentReviews[idx]) currentReviews[idx][field] = val; };
   window.removeReviewItem = (idx) => { currentReviews.splice(idx, 1); renderReviewsInBuilder(); };
+  window.uploadOgImage = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('❌ इमेज 5MB से छोटी होनी चाहिए!', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (re) => {
+      const dataUrl = re.target.result;
+      const input = document.getElementById('blp_og_image');
+      if (input) {
+        input.value = dataUrl;
+        window.updateSocialSharePreview();
+      }
+      showToast('✅ OG शेयर थंबनेल अपलोड हो गया!', 'success');
+    };
+    reader.readAsDataURL(file);
+  };
+
   window.uploadDemoImage = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -3332,7 +3352,15 @@ export async function initBookLandingPages() {
       }
     }
 
-    const ogImg = (document.getElementById('blp_og_image')?.value || '').trim() || finalCoverPath;
+    // 7. OG Social Image
+    let finalOgImg = (document.getElementById('blp_og_image')?.value || '').trim();
+    if (finalOgImg.startsWith('data:image/')) {
+      const ogPath = `images/books/${bId.toLowerCase()}-og.webp`;
+      uploadedFiles.push({ path: ogPath, base64: finalOgImg });
+      finalOgImg = `/${ogPath}`;
+    } else if (!finalOgImg) {
+      finalOgImg = finalCoverPath;
+    }
 
     const pageData = {
       id: bId,
@@ -3352,7 +3380,7 @@ export async function initBookLandingPages() {
       section_banners: cleanSectionBanners,
       og_title: ogTitle,
       og_description: ogDesc,
-      og_image: ogImg,
+      og_image: finalOgImg,
       mainPdf: finalMainPdfPath,
       main_pdf: finalMainPdfPath,
       freePdf: finalFreePdfPath,
