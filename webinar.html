@@ -2040,12 +2040,19 @@
       });
 
       function checkUserSessionStatus() {
-        const uName = localStorage.getItem('aim_user_name');
-        const uMobile = localStorage.getItem('aim_user_mobile');
-        const isReg = sessionStorage.getItem(`wb_reg_${webinarId}`);
+        let aiUser = {};
+        try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+        const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name || localStorage.getItem('user_name');
+        const uMobile = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone || localStorage.getItem('user_phone') || localStorage.getItem('farmer_mobile');
+        const isReg = sessionStorage.getItem(`wb_reg_${webinarId}`) || localStorage.getItem('wb_registered');
 
         if (uName || uMobile || isReg) {
           showUnlockedScreen();
+        } else {
+          const regBox = document.getElementById('wb_reg_box');
+          const unlockBox = document.getElementById('wb_unlocked_box');
+          if (regBox) regBox.style.display = 'block';
+          if (unlockBox) unlockBox.style.display = 'none';
         }
       }
 

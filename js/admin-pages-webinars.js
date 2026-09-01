@@ -607,21 +607,73 @@ export async function initWebinars() {
     }
   });
 
-  fileInp?.addEventListener('change', (e) => {
+  async function compressFileToWebP(file, maxDimension = 1200, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const webpBase64 = canvas.toDataURL('image/webp', quality);
+          resolve(webpBase64);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  fileInp?.addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (re) => {
-        masterWebinar.cover_image = re.target.result;
-        if (previewImg) previewImg.src = re.target.result;
-        showToast('📸 3D कवर इमेज लोड हो गई!', 'success');
-      };
-      reader.readAsDataURL(file);
+      showToast('⏳ 3D कवर इमेज WebP में कन्वर्ट हो रही है...', 'info');
+      try {
+        const webpBase64 = await compressFileToWebP(file, 1200, 0.85);
+        if (previewImg) previewImg.src = webpBase64;
+        
+        showToast('⏳ Git में अपलोड हो रही है...', 'info');
+        const resp = await fetch('/api/auto-sync-book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'upload_asset',
+            path: 'images/banners/webinar-cover-live.webp',
+            base64: webpBase64
+          })
+        });
+        const resJson = await resp.json();
+        if (resJson.success) {
+          masterWebinar.cover_image = resJson.path || resJson.url || '/images/banners/webinar-cover-live.webp';
+          showToast('✅ 3D कवर इमेज Git में सुरक्षित हो गई!', 'success');
+        } else {
+          masterWebinar.cover_image = webpBase64;
+          showToast('⚠️ लोकल प्रीव्यू सेट (सिंक पर सेव होगा)', 'warning');
+        }
+      } catch (err) {
+        showToast('❌ इमेज अपलोड विफल: ' + err.message, 'error');
+      }
     }
   });
 
   // -------------------------------------------------------------
-  // SECTIONS REORDERING (DRAG & UP/DOWN BUTTONS)
+  // SECTIONS REORDERING (HTML5 DRAG & DROP + UP/DOWN BUTTONS)
   // -------------------------------------------------------------
   function renderSectionsList() {
     const cont = document.getElementById('adm_sections_order_container');
@@ -632,18 +684,64 @@ export async function initWebinars() {
     cont.innerHTML = order.map((sKey, idx) => {
       const meta = defaultSections.find(s => s.key === sKey) || { key: sKey, name: sKey, desc: '' };
       return `
-        <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px;">
-          <div>
-            <div style="font-weight: 700; font-size: 0.85rem; color: #e2e8f0;">${meta.name}</div>
-            <div style="font-size: 0.72rem; color: #64748b;">${meta.desc}</div>
+        <div class="adm-section-drag-item" draggable="true" data-index="${idx}" style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; padding: 10px 14px; margin-bottom: 6px; cursor: grab; user-select: none; transition: all 0.2s ease;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.1rem; color: #64748b; cursor: grab;">☰</span>
+            <div>
+              <div style="font-weight: 700; font-size: 0.88rem; color: #e2e8f0;">${meta.name}</div>
+              <div style="font-size: 0.72rem; color: #64748b;">${meta.desc}</div>
+            </div>
           </div>
           <div style="display: flex; gap: 4px;">
-            <button type="button" onclick="window.moveWbSection(${idx}, -1)" class="admin-button small-button" style="background: rgba(255,255,255,0.1); padding: 2px 8px;" title="ऊपर करें">⬆️</button>
-            <button type="button" onclick="window.moveWbSection(${idx}, 1)" class="admin-button small-button" style="background: rgba(255,255,255,0.1); padding: 2px 8px;" title="नीचे करें">⬇️</button>
+            <button type="button" onclick="window.moveWbSection(${idx}, -1)" class="admin-button small-button" style="background: rgba(255,255,255,0.1); padding: 4px 10px;" title="ऊपर करें">⬆️</button>
+            <button type="button" onclick="window.moveWbSection(${idx}, 1)" class="admin-button small-button" style="background: rgba(255,255,255,0.1); padding: 4px 10px;" title="नीचे करें">⬇️</button>
           </div>
         </div>
       `;
     }).join('');
+
+    // Attach HTML5 Drag & Drop Event Listeners
+    let dragSrcIndex = null;
+    const items = cont.querySelectorAll('.adm-section-drag-item');
+    items.forEach(item => {
+      item.addEventListener('dragstart', (e) => {
+        dragSrcIndex = Number(item.dataset.index);
+        e.dataTransfer.effectAllowed = 'move';
+        item.style.opacity = '0.4';
+        item.style.borderColor = '#3b82f6';
+      });
+
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        item.style.background = '#1e293b';
+        item.style.borderColor = '#60a5fa';
+      });
+
+      item.addEventListener('dragleave', () => {
+        item.style.background = '#0f172a';
+        item.style.borderColor = '#334155';
+      });
+
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const targetIndex = Number(item.dataset.index);
+        if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+          const currentOrder = [...(masterWebinar.section_order || defaultSections.map(s => s.key))];
+          const [movedItem] = currentOrder.splice(dragSrcIndex, 1);
+          currentOrder.splice(targetIndex, 0, movedItem);
+          masterWebinar.section_order = currentOrder;
+          renderSectionsList();
+          showToast('✅ सेक्शन क्रम अपडेट हुआ', 'success');
+        }
+      });
+
+      item.addEventListener('dragend', () => {
+        item.style.opacity = '1';
+        item.style.background = '#0f172a';
+        item.style.borderColor = '#334155';
+      });
+    });
   }
 
   window.moveWbSection = function (idx, delta) {
