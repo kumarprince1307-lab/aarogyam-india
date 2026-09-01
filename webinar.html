@@ -2195,7 +2195,7 @@
         if (navigator.share) {
           navigator.share({
             title: vidTitle,
-            text: promoText,
+            text: `🎬 *${vidTitle}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:`,
             url: shareUrl
           }).catch(() => { });
         } else {
@@ -2371,7 +2371,7 @@ if (wbShortsSeeMoreBtn) {
         if (navigator.share) {
           navigator.share({
             title: reel.title,
-            text: promoText,
+            text: `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:`,
             url: shareUrl
           }).catch(() => { });
         } else {
