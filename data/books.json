@@ -380,8 +380,8 @@
         "my_library",
         "home_page"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
+      "store_badge": "new_arrival",
+      "badge": "new_arrival",
       "isComingSoon": false,
       "mainPdf": "/uploads/books/BK015_main.pdf",
       "pdf_url": "/uploads/books/BK015_main.pdf",
