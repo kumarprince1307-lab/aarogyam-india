@@ -55,30 +55,32 @@ function getWebinarOrVideoData(id, type, query) {
   const cleanType = String(type || '').trim().toLowerCase();
 
   // 1. Specific AarogyamTube Video / Short
-  if (cleanType === 'video' || cleanType === 'short' || cleanId.startsWith('VID_') || cleanId.startsWith('REC_') || query.vid) {
+  if (cleanType === 'video' || cleanType === 'short' || cleanId.startsWith('VID_') || cleanId.startsWith('REC_') || query.vid || query.yt || query.v) {
     const vidId = query.vid || cleanId;
+    let found = null;
     try {
       const recsPath = path.join(process.cwd(), 'data', 'webinar-recordings.json');
       if (fs.existsSync(recsPath)) {
         const content = fs.readFileSync(recsPath, 'utf8');
         const json = JSON.parse(content);
         const list = json.recordings || [];
-        const found = list.find(r => r.id === vidId || (r.video_url && r.video_url.includes(vidId)));
-        if (found) {
-          const ytId = extractYoutubeVideoId(found.video_url);
-          let thumb = found.thumbnail;
-          if (!thumb && ytId) thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
-          return {
-            is_video: true,
-            id: found.id,
-            title: found.title || 'AarogyamTube Video',
-            description: found.description || `${found.speaker || 'आरोग्यम विशेषज्ञ'} — 1-मिनट प्रैक्टिकल गाइड। AarogyamTube पर अभी देखें।`,
-            image: thumb || '/images/banners/aarogyamtube-default-thumb.svg',
-            destUrl: `${HOST_ORIGIN}/webinar.html?vid=${encodeURIComponent(found.id)}`
-          };
-        }
+        found = list.find(r => r.id === vidId || (r.video_url && r.video_url.includes(vidId)));
       }
     } catch (e) {}
+
+    const ytId = extractYoutubeVideoId(found?.video_url || query.yt || query.v || vidId);
+    let thumb = found?.thumbnail || query.thumb || query.img;
+    if (!thumb && ytId) thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+    if (!thumb) thumb = '/images/banners/aarogyamtube-default-thumb.svg';
+
+    return {
+      is_video: true,
+      id: found?.id || vidId || 'video',
+      title: found?.title || query.title || 'AarogyamTube Video',
+      description: found?.description || query.desc || `${found?.speaker || 'आरोग्यम विशेषज्ञ'} — 1-मिनट प्रैक्टिकल गाइड। AarogyamTube पर अभी देखें।`,
+      image: thumb,
+      destUrl: `${HOST_ORIGIN}/webinar.html?vid=${encodeURIComponent(found?.id || vidId)}`
+    };
   }
 
   // 2. Master Webinar / Live Zoom

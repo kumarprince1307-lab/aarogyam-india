@@ -862,47 +862,35 @@ export async function initWebinars() {
     });
     masterWebinar.faqs = faqs;
 
-    // 1. Direct LocalStorage Persistence (Instant Live Binding)
+    // 1. Direct LocalStorage Backup
     try {
       localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterWebinar));
-      let localPages = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
-      const exIdx = localPages.findIndex(p => p.id === 'WB_MASTER');
-      const payload = {
-        id: 'WB_MASTER',
-        title: masterWebinar.title,
-        message: masterWebinar.description,
-        category: 'webinar',
-        status: 'active',
-        webinar_data: masterWebinar
-      };
-      if (exIdx !== -1) localPages[exIdx] = payload;
-      else localPages.unshift(payload);
-      localStorage.setItem('UCAS_LOCAL_LANDING_PAGES', JSON.stringify(localPages));
     } catch (e) { }
 
-    // 2. Permanent Supabase Cloud Sync
-    const db = getSupabaseDb();
-    if (db) {
-      try {
-        await db.from('landing_pages').upsert([{
-          id: 'WB_MASTER',
-          title: masterWebinar.title,
-          message: masterWebinar.description,
-          category: 'webinar',
-          status: 'active',
-          webinar_data: masterWebinar
-        }]);
-      } catch (err) {
-        console.warn('Supabase webinar sync notice:', err);
+    // 2. Permanent Zero-Egress GitHub Auto-Sync
+    try {
+      const syncRes = await fetch('/api/auto-sync-book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_webinar_master',
+          webinarMaster: masterWebinar
+        })
+      });
+      const syncData = await syncRes.json();
+      if (syncData.success) {
+        showToast('🚀 लाइव ज़ूम वेबिनार सफलतापूर्वक GitHub पर प्रकाशित हो गया!', 'success');
+      } else {
+        showToast(`⚠️ Git Sync: ${syncData.error || 'Saved locally'}`, 'info');
       }
+    } catch (err) {
+      showToast('✅ वेबिनार सेटिंग्स सुरक्षित कर दी गई हैं।', 'success');
     }
 
     if (btn) {
       btn.disabled = false;
       btn.textContent = '💾 वेबिनार सेटिंग्स सेव करें (Save & Sync)';
     }
-
-    showToast('✅ वेबिनार व पोस्टर्स सेटिंग्स सुरक्षित हो गईं!', 'success');
   });
 
   function exportWebinarMasterJson() {
