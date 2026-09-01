@@ -3112,6 +3112,10 @@ export async function initBookLandingPages() {
     const offerPrice = parseInt(document.getElementById('blp_hero_offer_price')?.value, 10) || 99;
     const coverUrlInput = (document.getElementById('blp_cover_url')?.value || '').trim();
     const coverFileInput = document.getElementById('blp_file_cover');
+    const bannerFileInput = document.getElementById('blp_file_banner');
+    const bannerUrlInput = (document.getElementById('blp_banner_url')?.value || '').trim();
+    const mainPdfFileInput = document.getElementById('blp_file_main_pdf');
+    const freePdfFileInput = document.getElementById('blp_file_free_pdf');
 
     // SECTION-BY-SECTION VALIDATION WITH EXACT SECTION LOCATOR
     if (!bId) { 
@@ -3134,14 +3138,12 @@ export async function initBookLandingPages() {
     }
 
     // Check PDF size in Section 17 & 18 before proceeding (25MB GitHub limit)
-    const mainPdfFileInput = document.getElementById('blp_file_main_pdf');
     if (mainPdfFileInput?.files?.[0] && mainPdfFileInput.files[0].size > 25 * 1024 * 1024) {
       const mb = (mainPdfFileInput.files[0].size / (1024 * 1024)).toFixed(1);
       highlightSectionError('sec_box_main_pdf', `❌ [सेक्शन 17: मुख्य PDF] फ़ाइल (${mb}MB) 25MB से बड़ी है। कृपया इसे 25MB से कम करें।`);
       return;
     }
 
-    const freePdfFileInput = document.getElementById('blp_file_free_pdf');
     if (freePdfFileInput?.files?.[0] && freePdfFileInput.files[0].size > 25 * 1024 * 1024) {
       const mb = (freePdfFileInput.files[0].size / (1024 * 1024)).toFixed(1);
       highlightSectionError('sec_box_free_pdf', `❌ [सेक्शन 18: फ्री PDF] फ़ाइल (${mb}MB) 25MB से बड़ी है। कृपया इसे 25MB से कम करें।`);
@@ -3181,7 +3183,6 @@ export async function initBookLandingPages() {
     const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
 
     // 1. Cover Image (File or Data URL with auto-compression)
-    const coverFileInput = document.getElementById('blp_file_cover');
     let finalCoverPath = coverUrlInput || `/images/books/${bId.toLowerCase()}-cover.webp`;
     if (coverFileInput?.files?.[0]) {
       const cFile = coverFileInput.files[0];
@@ -3198,8 +3199,6 @@ export async function initBookLandingPages() {
     }
 
     // 2. Banner Image (File or Data URL with auto-compression)
-    const bannerFileInput = document.getElementById('blp_file_banner');
-    const bannerUrlInput = (document.getElementById('blp_banner_url')?.value || '').trim();
     let finalBannerPath = bannerUrlInput || `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
     if (bannerFileInput?.files?.[0]) {
       const bFile = bannerFileInput.files[0];
@@ -3226,12 +3225,11 @@ export async function initBookLandingPages() {
     });
 
     // 4. Main Paid PDF
-    const mainPdfFileInput = document.getElementById('blp_file_main_pdf');
     let finalMainPdfPath = (document.getElementById('blp_main_pdf_url')?.value || '').trim();
     if (mainPdfFileInput?.files?.[0]) {
       const pdfFile = mainPdfFileInput.files[0];
       if (pdfFile.size > MAX_FILE_SIZE) {
-        showToast(`❌ मुख्य PDF 25MB से बड़ी है (${(pdfFile.size/(1024*1024)).toFixed(1)}MB)। कृपया इसे Part 1 और Part 2 में बांटें।`, 'error');
+        showToast(`❌ मुख्य PDF 25MB से बड़ी है (${(pdfFile.size/(1024*1024)).toFixed(1)}MB)। कृपया इसे 25MB से कम करें।`, 'error');
         return;
       }
       const b64 = await fileToBase64(pdfFile);
@@ -3240,7 +3238,6 @@ export async function initBookLandingPages() {
     }
 
     // 5. Free Demo PDF
-    const freePdfFileInput = document.getElementById('blp_file_free_pdf');
     let finalFreePdfPath = (document.getElementById('blp_free_pdf_url')?.value || '').trim();
     if (freePdfFileInput?.files?.[0]) {
       const fPdfFile = freePdfFileInput.files[0];
