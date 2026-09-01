@@ -1617,14 +1617,14 @@
           <span class="wb-rail-count" id="wb_reel_comment_count">24</span>
         </button>
 
-        <a href="#" id="wb_reel_wa_btn" target="_blank" class="wb-rail-btn" style="color:#25D366;">
+        <button type="button" class="wb-rail-btn" onclick="window.shareCurrentReelWhatsApp()" style="color:#25D366;" title="WhatsApp पर शेयर करें">
           <i class="fa-brands fa-whatsapp"></i>
-          <span class="wb-rail-count">Share</span>
-        </a>
+          <span class="wb-rail-count">WhatsApp</span>
+        </button>
 
-        <button type="button" class="wb-rail-btn" onclick="window.copyReelLink()">
-          <i class="fa-solid fa-link" style="color:#FCD34D;"></i>
-          <span class="wb-rail-count">Copy</span>
+        <button type="button" class="wb-rail-btn" onclick="window.shareCurrentReelNative()" style="color:#60A5FA;" title="अन्य ऐप्स पर शेयर करें">
+          <i class="fa-solid fa-share-nodes"></i>
+          <span class="wb-rail-count">Share</span>
         </button>
       </div>
 
@@ -2305,13 +2305,35 @@ if (wbShortsSeeMoreBtn) {
           }
         }
 
-        if (ifr) ifr.src = embedSrc;
+      window.shareCurrentReelWhatsApp = function () {
+        const reel = activeReelsList[currentReelIndex];
+        if (!reel) return;
+        window.shareIndividualVideo(reel.id, reel.title);
+      };
 
-        // Setup WhatsApp Share link for current reel
-        const reelShareUrl = `https://aarogyamindia.online/webinar.html?vid=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(refShareId)}`;
-        const shareMsg = `📱 *${reel.title}*\n\n👉 *यह रील्स AarogyamTube पर देखने के लिए क्लिक करें:*\n${reelShareUrl}\n\nसादर,\n${localStorage.getItem('aim_user_name') || 'Aarogyam India'}`;
-        document.getElementById('wb_reel_wa_btn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMsg)}`;
-      }
+      window.shareCurrentReelNative = function () {
+        const reel = activeReelsList[currentReelIndex];
+        if (!reel) return;
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const ytId = extractYoutubeVideoId(reel.video_url || '');
+        const ytParam = ytId ? `&yt=${encodeURIComponent(ytId)}` : '';
+        const thumbParam = reel.thumbnail && !reel.thumbnail.startsWith('data:') ? `&thumb=${encodeURIComponent(reel.thumbnail)}` : '';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&title=${encodeURIComponent(reel.title)}${ytParam}${thumbParam}&share_id=${encodeURIComponent(userShare)}`;
+        const promoText = `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+
+        if (navigator.share) {
+          navigator.share({
+            title: reel.title,
+            text: promoText,
+            url: shareUrl
+          }).catch(() => {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+          });
+        } else {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+        }
+      };
 
       // Vertical Touch Gesture Swipe & Scroll Wheel for YouTube Shorts experience
       function setupReelsSwipeGestures() {

@@ -446,9 +446,14 @@ module.exports = async function handler(req, res) {
   <meta property="og:image" content="${escapeHtml(finalOgImage)}">
   <meta property="og:image:secure_url" content="${escapeHtml(finalOgImage)}">
   <meta property="og:image:type" content="${imgMime}">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="720">
   <meta property="og:image:alt" content="${escapeHtml(finalTitle)}">
   <meta property="og:url" content="${escapeHtml(canonicalShareUrl)}">
   <link rel="image_src" href="${escapeHtml(finalOgImage)}">
+  <meta itemprop="name" content="${escapeHtml(finalTitle)}">
+  <meta itemprop="description" content="${escapeHtml(finalDesc)}">
+  <meta itemprop="image" content="${escapeHtml(finalOgImage)}">
 
   <!-- Twitter Card Tags -->
   <meta name="twitter:card" content="summary_large_image">
