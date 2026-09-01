@@ -1,6 +1,24 @@
 {
   "recordings": [
     {
+      "id": "VID_S691508",
+      "format": "short_reel",
+      "platform": "youtube",
+      "title": "सब्जियों का ज़हर कैसे साफ करें? ⚠️",
+      "description": "⚠️ बाजार की सब्जियों को घर लाते ही ऐसे साफ करें! 🥬🍅\nसब्जियों पर लगे कीटनाशक अवशेषों को कम करने के लिए सही तरीके से सफाई करना क्यों जरूरी है? जानिए इस वीडियो में।\n🥦 सही सफाई • 🧼 सुरक्षित भोजन • 👨‍👩‍👧‍👦 स्वस्थ परिवार",
+      "subject": "Crop Protection",
+      "category": "Crop Protection",
+      "video_url": "https://youtube.com/shorts/39P15VvLneA?si=FwiGhY9OZpCmudj8",
+      "youtube_url": "https://youtube.com/shorts/39P15VvLneA?si=FwiGhY9OZpCmudj8",
+      "youtube_id": "39P15VvLneA",
+      "thumbnail": "https://img.youtube.com/vi/39P15VvLneA/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "registration_only",
+      "status": "active",
+      "created_at": "2026-09-01T17:44:51.508Z"
+    },
+    {
       "id": "VID_S475456",
       "format": "short_reel",
       "platform": "youtube",
