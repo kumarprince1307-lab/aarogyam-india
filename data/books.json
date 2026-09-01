@@ -360,54 +360,6 @@
       "mainPdf": "",
       "fileSize": "25.0 MB",
       "accessType": "Lifetime"
-    },
-    {
-      "id": "BK013",
-      "slug": "ai-website-nirman-master-guide",
-      "heading": "AI वेबसाइट निर्माण मास्टर गाइड 2026",
-      "shortTitle": "AI वेबसाइट गाइड",
-      "name": "AI वेबसाइट निर्माण मास्टर गाइड 2026",
-      "category": "Agriculture",
-      "language": "Hindi",
-      "author": "Aarogyam India",
-      "version": "1.0",
-      "status": "active",
-      "isComingSoon": false,
-      "store_badge": "best_seller",
-      "badge": "best_seller",
-      "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page"
-      ],
-      "cover": "/images/books/ai-website-guide-cover.webp",
-      "thumbnail": "/images/books/ai-website-guide-cover.webp",
-      "banner": "/images/banners/farmer-community-banner.jpeg",
-      "landingPage": "/ebooks/book-landing.html?id=BK013",
-      "demoPage": "/ebooks/book-landing.html?id=BK013",
-      "checkoutPage": "/ebooks/checkout.html",
-      "readerPage": "/ebooks/reader.html",
-      "mrp": 299,
-      "offerPrice": 99,
-      "currency": "INR",
-      "demoAvailable": true,
-      "readEnabled": true,
-      "downloadEnabled": true,
-      "downloadLimit": 3,
-      "mainPdf": "/uploads/books/BK013_main.pdf",
-      "demoPdf": "/uploads/books/BK013_free.pdf",
-      "freePdf": "/uploads/books/BK013_free.pdf",
-      "pdf_url": "/uploads/books/BK013_main.pdf",
-      "fileSize": "18.5 MB",
-      "totalPages": 120,
-      "accessType": "Lifetime",
-      "features": [
-        "120+ रंगीन पेज",
-        "300+ फोटो",
-        "स्प्रे साइंस",
-        "Mobile PDF"
-      ]
     }
   ]
 }
