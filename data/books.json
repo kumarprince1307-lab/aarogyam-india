@@ -360,6 +360,43 @@
       "mainPdf": "",
       "fileSize": "25.0 MB",
       "accessType": "Lifetime"
+    },
+    {
+      "id": "BK015",
+      "slug": "bk015",
+      "heading": "🌱 सब्जी खेती मास्टर PART 1",
+      "name": "🌱 सब्जी खेती मास्टर PART 1",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 1999,
+      "offerPrice": 1,
+      "cover": "/images/books/bk015-cover.webp",
+      "thumbnail": "/images/books/bk015-cover.webp",
+      "banner": "/images/banners/bk015-hero-banner.webp",
+      "status": "active",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "mainPdf": "/uploads/books/BK015_main.pdf",
+      "pdf_url": "/uploads/books/BK015_main.pdf",
+      "freePdf": "/uploads/books/BK002_free.pdf",
+      "demoPdf": "/uploads/books/BK002_free.pdf",
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो",
+        "Spray Science",
+        "Free Bonus PDF"
+      ],
+      "totalPages": 120,
+      "landingPage": "/ebooks/book-landing.html?id=BK015",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html"
     }
   ]
 }
