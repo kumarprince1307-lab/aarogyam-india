@@ -698,9 +698,9 @@ export async function initBookLandingPages() {
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
-                <span>📄</span> <span>17. मुख्य ई-बुक PDF / DOC फाइल प्रबंधन (Paid Book PDF/DOC Upload)</span>
+                <span>📄</span> <span>17. मुख्य ई-बुक PDF / DOC फाइल प्रबंधन (Paid Book Full PDF)</span>
               </div>
-              <small style="color: var(--admin-muted);">भुगतान के बाद पाठक को मिलने वाली मुख्य सम्पूर्ण ई-बुक फाइल (Max 4.5MB for Vercel)</small>
+              <small style="color: var(--admin-muted);">भुगतान के बाद पाठक को मिलने वाली मुख्य सम्पूर्ण ई-बुक फाइल (GitHub Limit: 25 MB)</small>
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
               <span style="font-size: 0.72rem; background: #0284c7; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
@@ -716,14 +716,39 @@ export async function initBookLandingPages() {
           ${renderSectionBannerUploaderBlock('sec_pdf_main', '📄 मुख्य PDF सेक्शन बैनर (वैकल्पिक)')}
 
           <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #0284c7; border-radius: 8px; padding: 14px; margin-top: 10px;">
-            <div style="display: grid; grid-template-columns: 1.3fr 2fr; gap: 12px; align-items: center;">
+            <div style="display: grid; grid-template-columns: 1.3fr 1.2fr 1fr; gap: 12px; align-items: start;">
+              <!-- Option A: GitHub Repository Dropdown -->
               <div>
-                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">Option A: कंप्यूटर से फ़ाइल चुनें (PDF/DOC/DOCX - Max 4.5MB):</label>
-                <input type="file" id="blp_file_main_pdf" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="window.handleBookPdfSelect('main', event)" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem;" />
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">Option A: GitHub रिपॉजिटरी से PDF चुनें:</label>
+                <select id="blp_select_git_main_pdf" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.8rem; font-weight: 600;">
+                  <option value="">-- GitHub से PDF चुनें --</option>
+                  <option value="/uploads/books/BK001_main.pdf">📄 BK001: खरीफ फसल मास्टर गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK002_main.pdf">📄 BK002: खेती का डॉक्टर (Full PDF)</option>
+                  <option value="/uploads/books/BK003_main.pdf">📄 BK003: धान मास्टर गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK004_main.pdf">📄 BK004: गेहूँ मास्टर गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK005_main.pdf">📄 BK005: सोयाबीन मास्टर गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK006_main.pdf">📄 BK006: मक्का मास्टर गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK007_main.pdf">📄 BK007: जैविक खेती गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK008_main.pdf">📄 BK008: सब्जी खेती गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK009_main.pdf">📄 BK009: फूल खेती गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK010_main.pdf">📄 BK010: पॉलीहाउस व नेटहाउस गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK011_main.pdf">📄 BK011: अनाज भंडारण गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK012_main.pdf">📄 BK012: चावल प्रोसेसिंग गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK013_main.pdf">📄 BK013: AI वेबसाइट गाइड (Full PDF)</option>
+                  <option value="/uploads/books/BK015_main.pdf">📄 BK015: सब्जी खेती गाइड Part 1 (24.7MB)</option>
+                </select>
               </div>
+
+              <!-- Option B: Direct Path / Link -->
               <div>
-                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">Option B: या डायरेक्ट फ़ाइल लिंक / Path:</label>
-                <input type="text" id="blp_main_pdf_url" placeholder="उदा. /uploads/books/BK013_main.pdf या Google Drive/CDN Link" oninput="window.updatePdfStatusPreview('main', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">Option B: या डायरेक्ट फ़ाइल Path / URL:</label>
+                <input type="text" id="blp_main_pdf_url" placeholder="उदा. /uploads/books/BK015_main.pdf" oninput="window.updatePdfStatusPreview('main', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
+              </div>
+
+              <!-- Option C: File Upload -->
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">Option C: कंप्यूटर से PDF (Max 25MB):</label>
+                <input type="file" id="blp_file_main_pdf" accept=".pdf,.doc,.docx,application/pdf" onchange="window.handleBookPdfSelect('main', event)" class="admin-input" style="width: 100%; padding: 5px; font-size: 0.75rem;" />
               </div>
             </div>
             <div id="blp_main_pdf_status_wrap" style="margin-top: 10px; font-size: 0.8rem; color: #94a3b8; display: none;">
@@ -737,9 +762,9 @@ export async function initBookLandingPages() {
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #34d399; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
-                <span>🎁</span> <span>18. मुफ़्त / डेमो ई-बुक PDF / DOC फाइल प्रबंधन (Free/Demo Book PDF/DOC Upload)</span>
+                <span>🎁</span> <span>18. मुफ़्त / डेमो ई-बुक PDF / DOC फाइल प्रबंधन (Free/Demo Book PDF)</span>
               </div>
-              <small style="color: var(--admin-muted);">पाठकों के लिए निःशुल्क सैंपल या बोनस ई-बुक फाइल (Max 4.5MB for Vercel)</small>
+              <small style="color: var(--admin-muted);">पाठकों के लिए निःशुल्क सैंपल या बोनस ई-बुक फाइल (GitHub Limit: 25 MB)</small>
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
               <span style="font-size: 0.72rem; background: #059669; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
@@ -755,14 +780,39 @@ export async function initBookLandingPages() {
           ${renderSectionBannerUploaderBlock('sec_pdf_free', '🎁 फ्री PDF सेक्शन बैनर (वैकल्पिक)')}
 
           <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #059669; border-radius: 8px; padding: 14px; margin-top: 10px;">
-            <div style="display: grid; grid-template-columns: 1.3fr 2fr; gap: 12px; align-items: center;">
+            <div style="display: grid; grid-template-columns: 1.3fr 1.2fr 1fr; gap: 12px; align-items: start;">
+              <!-- Option A: GitHub Repository Dropdown -->
               <div>
-                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #34d399;">Option A: कंप्यूटर से फ़ाइल चुनें (PDF/DOC/DOCX - Max 4.5MB):</label>
-                <input type="file" id="blp_file_free_pdf" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="window.handleBookPdfSelect('free', event)" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem;" />
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #34d399;">Option A: GitHub रिपॉजिटरी से PDF चुनें:</label>
+                <select id="blp_select_git_free_pdf" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.8rem; font-weight: 600;">
+                  <option value="">-- GitHub से फ्री PDF चुनें --</option>
+                  <option value="/uploads/books/BK001_free.pdf">🎁 BK001: खरीफ फसल मास्टर गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK002_free.pdf">🎁 BK002: खेती का डॉक्टर (Free Demo)</option>
+                  <option value="/uploads/books/BK003_free.pdf">🎁 BK003: धान मास्टर गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK004_free.pdf">🎁 BK004: गेहूँ मास्टर गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK005_free.pdf">🎁 BK005: सोयाबीन मास्टर गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK006_free.pdf">🎁 BK006: मक्का मास्टर गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK007_free.pdf">🎁 BK007: जैविक खेती गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK008_free.pdf">🎁 BK008: सब्जी खेती गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK009_free.pdf">🎁 BK009: फूल खेती गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK010_free.pdf">🎁 BK010: पॉलीहाउस व नेटहाउस गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK011_free.pdf">🎁 BK011: अनाज भंडारण गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK012_free.pdf">🎁 BK012: चावल प्रोसेसिंग गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK013_free.pdf">🎁 BK013: AI वेबसाइट गाइड (Free Demo)</option>
+                  <option value="/uploads/books/BK015_free.pdf">🎁 BK015: सब्जी खेती गाइड Free Demo (PDF)</option>
+                </select>
               </div>
+
+              <!-- Option B: Direct Path / Link -->
               <div>
-                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">Option B: या डायरेक्ट फ़ाइल लिंक / Path:</label>
-                <input type="text" id="blp_free_pdf_url" placeholder="उदा. /uploads/books/BK013_free.pdf या Google Drive/CDN Link" oninput="window.updatePdfStatusPreview('free', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">Option B: या डायरेक्ट फ़ाइल Path / URL:</label>
+                <input type="text" id="blp_free_pdf_url" placeholder="उदा. /uploads/books/BK015_free.pdf" oninput="window.updatePdfStatusPreview('free', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
+              </div>
+
+              <!-- Option C: File Upload -->
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #34d399;">Option C: कंप्यूटर से PDF (Max 25MB):</label>
+                <input type="file" id="blp_file_free_pdf" accept=".pdf,.doc,.docx,application/pdf" onchange="window.handleBookPdfSelect('free', event)" class="admin-input" style="width: 100%; padding: 5px; font-size: 0.75rem;" />
               </div>
             </div>
             <div id="blp_free_pdf_status_wrap" style="margin-top: 10px; font-size: 0.8rem; color: #94a3b8; display: none;">
@@ -1284,6 +1334,32 @@ export async function initBookLandingPages() {
       if (urlInput) urlInput.value = val;
       if (prevImg) prevImg.src = val;
       showToast(`🖼️ GitHub बैनर चुना गया (डुप्लिकेट अपलोड नहीं होगा): ${val}`, 'info');
+    }
+  });
+
+  // GitHub Main Paid PDF Dropdown Sync (Mutual Exclusion: Clears File Input)
+  document.getElementById('blp_select_git_main_pdf')?.addEventListener('change', (e) => {
+    if (e.target.value) {
+      const val = e.target.value;
+      const urlInput = document.getElementById('blp_main_pdf_url');
+      const fileInput = document.getElementById('blp_file_main_pdf');
+      if (fileInput) fileInput.value = ''; // Clear file input so no duplicate upload
+      if (urlInput) urlInput.value = val;
+      window.updatePdfStatusPreview('main', val);
+      showToast(`📄 GitHub मुख्य PDF चुनी गई (री-अपलोड नहीं होगा): ${val}`, 'info');
+    }
+  });
+
+  // GitHub Free Demo PDF Dropdown Sync (Mutual Exclusion: Clears File Input)
+  document.getElementById('blp_select_git_free_pdf')?.addEventListener('change', (e) => {
+    if (e.target.value) {
+      const val = e.target.value;
+      const urlInput = document.getElementById('blp_free_pdf_url');
+      const fileInput = document.getElementById('blp_file_free_pdf');
+      if (fileInput) fileInput.value = ''; // Clear file input so no duplicate upload
+      if (urlInput) urlInput.value = val;
+      window.updatePdfStatusPreview('free', val);
+      showToast(`🎁 GitHub फ्री PDF चुनी गई (री-अपलोड नहीं होगा): ${val}`, 'info');
     }
   });
 
@@ -2470,19 +2546,18 @@ export async function initBookLandingPages() {
     if (!file) return;
 
     const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-    if (file.size > 4.5 * 1024 * 1024) {
+    if (file.size > 25 * 1024 * 1024) {
       if (statusWrap) {
         statusWrap.style.display = 'block';
         statusWrap.innerHTML = `
           <div style="background: rgba(239,68,68,0.15); border: 1.5px solid #ef4444; border-radius: 8px; padding: 12px; color: #fca5a5; font-size: 0.84rem; line-height: 1.5;">
-            <strong>❌ [सेक्शन ${type === 'main' ? '17' : '18'}] फ़ाइल साइज़ बड़ी है (${sizeMB} MB):</strong><br/>
-            Vercel सर्वरलेस फ़ाइल अपलोड लिमिट <strong>4.5 MB</strong> है।<br/>
-            💡 <strong>समाधान 1:</strong> इसे फ्री में <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:700;">iLovePDF Compress Tool</a> पर जाकर 4MB से कम करें।<br/>
-            💡 <strong>समाधान 2:</strong> या फ़ाइल को Google Drive / CDN पर अपलोड करके direct लिंक Right वाले बॉक्स में दर्ज करें।
+            <strong>❌ [सेक्शन ${type === 'main' ? '17' : '18'}] फ़ाइल 25MB से बड़ी है (${sizeMB} MB):</strong><br/>
+            GitHub रिपॉजिटरी की अधिकतम फ़ाइल लिमिट <strong>25 MB</strong> है।<br/>
+            💡 <strong>समाधान:</strong> कृपया इसे <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:700;">iLovePDF Compress Tool</a> से 25MB से कम करें या Part 1 / Part 2 में बांटें।
           </div>
         `;
       }
-      showToast(`⚠️ [सेक्शन ${type === 'main' ? '17' : '18'}] PDF फ़ाइल (${sizeMB}MB) 4.5MB से बड़ी है। कृपया कंप्रेस करें।`, 'error');
+      showToast(`⚠️ [सेक्शन ${type === 'main' ? '17' : '18'}] PDF फ़ाइल (${sizeMB}MB) 25MB से बड़ी है।`, 'error');
     } else {
       if (statusWrap) {
         statusWrap.style.display = 'block';
@@ -2493,6 +2568,9 @@ export async function initBookLandingPages() {
           </div>
         `;
       }
+      // Clear GitHub dropdown if computer file is picked
+      const sel = document.getElementById(type === 'main' ? 'blp_select_git_main_pdf' : 'blp_select_git_free_pdf');
+      if (sel) sel.value = '';
       showToast(`📄 PDF फ़ाइल (${file.name} - ${sizeMB}MB) चुनी गई!`, 'info');
     }
   };
@@ -2500,9 +2578,11 @@ export async function initBookLandingPages() {
   window.clearBookPdf = function(type) {
     const input = document.getElementById(type === 'main' ? 'blp_file_main_pdf' : 'blp_file_free_pdf');
     const urlInput = document.getElementById(type === 'main' ? 'blp_main_pdf_url' : 'blp_free_pdf_url');
+    const gitSelect = document.getElementById(type === 'main' ? 'blp_select_git_main_pdf' : 'blp_select_git_free_pdf');
     const statusWrap = document.getElementById(type === 'main' ? 'blp_main_pdf_status_wrap' : 'blp_free_pdf_status_wrap');
     if (input) input.value = '';
     if (urlInput) urlInput.value = '';
+    if (gitSelect) gitSelect.value = '';
     if (statusWrap) {
       statusWrap.innerHTML = '';
       statusWrap.style.display = 'none';
@@ -3053,18 +3133,18 @@ export async function initBookLandingPages() {
       return;
     }
 
-    // Check PDF size in Section 17 & 18 before proceeding
+    // Check PDF size in Section 17 & 18 before proceeding (25MB GitHub limit)
     const mainPdfFileInput = document.getElementById('blp_file_main_pdf');
-    if (mainPdfFileInput?.files?.[0] && mainPdfFileInput.files[0].size > 4.5 * 1024 * 1024) {
+    if (mainPdfFileInput?.files?.[0] && mainPdfFileInput.files[0].size > 25 * 1024 * 1024) {
       const mb = (mainPdfFileInput.files[0].size / (1024 * 1024)).toFixed(1);
-      highlightSectionError('sec_box_main_pdf', `❌ [सेक्शन 17: मुख्य PDF] फ़ाइल (${mb}MB) 4.5MB से बड़ी है। कृपया इसे iLovePDF से कंप्रेस करें।`);
+      highlightSectionError('sec_box_main_pdf', `❌ [सेक्शन 17: मुख्य PDF] फ़ाइल (${mb}MB) 25MB से बड़ी है। कृपया इसे 25MB से कम करें।`);
       return;
     }
 
     const freePdfFileInput = document.getElementById('blp_file_free_pdf');
-    if (freePdfFileInput?.files?.[0] && freePdfFileInput.files[0].size > 4.5 * 1024 * 1024) {
+    if (freePdfFileInput?.files?.[0] && freePdfFileInput.files[0].size > 25 * 1024 * 1024) {
       const mb = (freePdfFileInput.files[0].size / (1024 * 1024)).toFixed(1);
-      highlightSectionError('sec_box_free_pdf', `❌ [सेक्शन 18: फ्री PDF] फ़ाइल (${mb}MB) 4.5MB से बड़ी है। कृपया इसे iLovePDF से कंप्रेस करें।`);
+      highlightSectionError('sec_box_free_pdf', `❌ [सेक्शन 18: फ्री PDF] फ़ाइल (${mb}MB) 25MB से बड़ी है। कृपया इसे 25MB से कम करें।`);
       return;
     }
 
