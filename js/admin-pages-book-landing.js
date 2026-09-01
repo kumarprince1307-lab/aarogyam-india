@@ -713,10 +713,30 @@ export async function initBookLandingPages() {
           </div>
 
           <!-- Optional Section Banner for Main PDF -->
+        <!-- SECTION 17: BOOK PDF / DOC FILE MANAGEMENT (PAID BOOK FULL PDF/DOC) -->
+        <div id="sec_box_main_pdf" style="background: rgba(14,165,233,0.08); border: 1.5px solid rgba(14,165,233,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                <span>📄</span> <span>17. मुख्य ई-बुक PDF / DOC फाइल प्रबंधन (Paid Book Full PDF)</span>
+              </div>
+              <small style="color: var(--admin-muted);">भुगतान के बाद पाठक को मिलने वाली मुख्य सम्पूर्ण ई-बुक फाइल (GitHub Limit: 25 MB)</small>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span style="font-size: 0.72rem; background: #0284c7; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
+                🔒 Paid Full Book Access
+              </span>
+              <button type="button" onclick="window.clearBookPdf('main')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; font-size: 0.72rem; border-radius: 4px;">
+                🗑️ PDF हटाएं
+              </button>
+            </div>
+          </div>
+
+          <!-- Optional Section Banner for Main PDF -->
           ${renderSectionBannerUploaderBlock('sec_pdf_main', '📄 मुख्य PDF सेक्शन बैनर (वैकल्पिक)')}
 
           <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #0284c7; border-radius: 8px; padding: 14px; margin-top: 10px;">
-            <div style="display: grid; grid-template-columns: 1.3fr 1.2fr 1fr; gap: 12px; align-items: start;">
+            <div style="display: grid; grid-template-columns: 1.2fr 1.2fr 1fr; gap: 12px; align-items: start;">
               <!-- Option A: GitHub Repository Dropdown -->
               <div>
                 <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">Option A: GitHub रिपॉजिटरी से PDF चुनें:</label>
@@ -751,6 +771,17 @@ export async function initBookLandingPages() {
                 <input type="file" id="blp_file_main_pdf" accept=".pdf,.doc,.docx,application/pdf" onchange="window.handleBookPdfSelect('main', event)" class="admin-input" style="width: 100%; padding: 5px; font-size: 0.75rem;" />
               </div>
             </div>
+
+            <!-- Option D: Manual Git Path Copy Helper -->
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(56,189,248,0.25); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 0.76rem; color: #94a3b8;">
+                💡 <strong>Option D (Git में मैन्युअल अपलोड):</strong> अगर आप Git में सीधे PDF डालना चाहते हैं, तो इस बटन पर क्लिक करें:
+              </span>
+              <button type="button" onclick="window.copyGitPdfPath('main')" class="admin-button small-button" style="background: rgba(14,165,233,0.25); border: 1px solid #38bdf8; color: #38bdf8; padding: 4px 10px; font-size: 0.76rem; border-radius: 6px; font-weight: 700; cursor: pointer;">
+                📋 Option D: Git मैन्युअल अपलोड पाथ कॉपी करें
+              </button>
+            </div>
+
             <div id="blp_main_pdf_status_wrap" style="margin-top: 10px; font-size: 0.8rem; color: #94a3b8; display: none;">
               <!-- Current file status indicator -->
             </div>
@@ -780,7 +811,7 @@ export async function initBookLandingPages() {
           ${renderSectionBannerUploaderBlock('sec_pdf_free', '🎁 फ्री PDF सेक्शन बैनर (वैकल्पिक)')}
 
           <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #059669; border-radius: 8px; padding: 14px; margin-top: 10px;">
-            <div style="display: grid; grid-template-columns: 1.3fr 1.2fr 1fr; gap: 12px; align-items: start;">
+            <div style="display: grid; grid-template-columns: 1.2fr 1.2fr 1fr; gap: 12px; align-items: start;">
               <!-- Option A: GitHub Repository Dropdown -->
               <div>
                 <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #34d399;">Option A: GitHub रिपॉजिटरी से PDF चुनें:</label>
@@ -815,6 +846,17 @@ export async function initBookLandingPages() {
                 <input type="file" id="blp_file_free_pdf" accept=".pdf,.doc,.docx,application/pdf" onchange="window.handleBookPdfSelect('free', event)" class="admin-input" style="width: 100%; padding: 5px; font-size: 0.75rem;" />
               </div>
             </div>
+
+            <!-- Option D: Manual Git Path Copy Helper -->
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(52,211,153,0.25); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 0.76rem; color: #94a3b8;">
+                💡 <strong>Option D (Git में मैन्युअल अपलोड):</strong> अगर आप Git में सीधे फ्री PDF डालना चाहते हैं, तो इस बटन पर क्लिक करें:
+              </span>
+              <button type="button" onclick="window.copyGitPdfPath('free')" class="admin-button small-button" style="background: rgba(16,185,129,0.25); border: 1px solid #34d399; color: #34d399; padding: 4px 10px; font-size: 0.76rem; border-radius: 6px; font-weight: 700; cursor: pointer;">
+                📋 Option D: Git फ्री PDF पाथ कॉपी करें
+              </button>
+            </div>
+
             <div id="blp_free_pdf_status_wrap" style="margin-top: 10px; font-size: 0.8rem; color: #94a3b8; display: none;">
               <!-- Current file status indicator -->
             </div>
@@ -2591,6 +2633,25 @@ export async function initBookLandingPages() {
     } else {
       statusWrap.style.display = 'none';
     }
+  };
+
+  window.copyGitPdfPath = function(type) {
+    const bId = (document.getElementById('blp_input_book_id')?.value || 'BK015').trim().toUpperCase() || 'BK015';
+    const filename = `${bId}_${type === 'main' ? 'main' : 'free'}.pdf`;
+    const fullPath = `/uploads/books/${filename}`;
+    const gitFolder = `uploads/books/${filename}`;
+
+    const urlInput = document.getElementById(type === 'main' ? 'blp_main_pdf_url' : 'blp_free_pdf_url');
+    const fileInput = document.getElementById(type === 'main' ? 'blp_file_main_pdf' : 'blp_file_free_pdf');
+    const gitSelect = document.getElementById(type === 'main' ? 'blp_select_git_main_pdf' : 'blp_select_git_free_pdf');
+
+    if (urlInput) urlInput.value = fullPath;
+    if (fileInput) fileInput.value = '';
+    if (gitSelect) gitSelect.value = '';
+    window.updatePdfStatusPreview(type, fullPath);
+
+    navigator.clipboard?.writeText(fullPath).catch(() => {});
+    showToast(`📋 पाथ कॉपी हुआ: ${fullPath} | Git फोल्डर '${gitFolder}' में इस नाम से PDF अपलोड करें!`, 'success');
   };
 
   window.triggerBookPdfUpload = function(type) {
