@@ -2185,15 +2185,11 @@
         }
       };
 
-      // Individual Video / Short Sharing
+      // Individual Video / Short Sharing (Short URL + Native Mobile Share)
       window.shareIndividualVideo = function (vidId, vidTitle) {
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
-        const rec = (allRecordings || []).find(x => x.id === vidId);
-        const ytId = extractYoutubeVideoId(rec?.video_url || '');
-        const ytParam = ytId ? `&yt=${encodeURIComponent(ytId)}` : '';
-        const thumbParam = rec?.thumbnail && !rec.thumbnail.startsWith('data:') ? `&thumb=${encodeURIComponent(rec.thumbnail)}` : '';
-        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vidId)}&title=${encodeURIComponent(vidTitle)}${ytParam}${thumbParam}&share_id=${encodeURIComponent(userShare)}`;
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vidId)}&ref=${encodeURIComponent(userShare)}`;
         const promoText = `🎬 *${vidTitle}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
 
         if (navigator.share) {
@@ -2201,13 +2197,10 @@
             title: vidTitle,
             text: promoText,
             url: shareUrl
-          }).catch(() => {
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
-          });
-          return;
+          }).catch(() => { });
+        } else {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
         }
-
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
       // -------------------------------------------------------------
@@ -2372,10 +2365,7 @@ if (wbShortsSeeMoreBtn) {
         if (!reel) return;
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
-        const ytId = extractYoutubeVideoId(reel.video_url || '');
-        const ytParam = ytId ? `&yt=${encodeURIComponent(ytId)}` : '';
-        const thumbParam = reel.thumbnail && !reel.thumbnail.startsWith('data:') ? `&thumb=${encodeURIComponent(reel.thumbnail)}` : '';
-        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&title=${encodeURIComponent(reel.title)}${ytParam}${thumbParam}&share_id=${encodeURIComponent(userShare)}`;
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(userShare)}`;
         const promoText = `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
 
         if (navigator.share) {
@@ -2383,9 +2373,7 @@ if (wbShortsSeeMoreBtn) {
             title: reel.title,
             text: promoText,
             url: shareUrl
-          }).catch(() => {
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
-          });
+          }).catch(() => { });
         } else {
           window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
         }
