@@ -474,23 +474,6 @@ export async function initWebinars() {
       }
     } catch (e) { }
 
-    // Overlay Direct LocalStorage (Instant Live Binding)
-    try {
-      const directStored = localStorage.getItem('AAROGYAM_WEBINAR_MASTER');
-      if (directStored) {
-        const parsed = JSON.parse(directStored);
-        if (parsed && parsed.title) masterWebinar = { ...masterWebinar, ...parsed };
-      }
-    } catch (e) { }
-
-    try {
-      const localStored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
-      const match = localStored.find(p => p.id === 'WB_MASTER' || p.category === 'webinar');
-      if (match && match.webinar_data) {
-        masterWebinar = { ...masterWebinar, ...match.webinar_data, title: match.title || masterWebinar.title };
-      }
-    } catch (e) { }
-
     // 2. Recordings JSON
     try {
       const rResp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
@@ -498,29 +481,6 @@ export async function initWebinars() {
         const rJson = await rResp.json();
         const list = Array.isArray(rJson.recordings) ? rJson.recordings : (Array.isArray(rJson) ? rJson : []);
         if (list.length > 0) allRecordings = list;
-      }
-    } catch (e) { }
-
-    // Overlay LocalStorage recordings
-    try {
-      const directRecs = JSON.parse(localStorage.getItem('AAROGYAM_WEBINAR_RECORDINGS') || '[]');
-      if (Array.isArray(directRecs) && directRecs.length > 0) {
-        directRecs.forEach(dr => {
-          const exIdx = allRecordings.findIndex(x => x.id === dr.id);
-          if (exIdx !== -1) allRecordings[exIdx] = dr;
-          else allRecordings.unshift(dr);
-        });
-      }
-    } catch (e) { }
-
-    try {
-      const localRecs = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
-      if (Array.isArray(localRecs) && localRecs.length > 0) {
-        localRecs.forEach(lr => {
-          const exIdx = allRecordings.findIndex(x => x.id === lr.id);
-          if (exIdx !== -1) allRecordings[exIdx] = lr;
-          else allRecordings.unshift(lr);
-        });
       }
     } catch (e) { }
 
@@ -834,6 +794,19 @@ export async function initWebinars() {
     masterWebinar.zoom_link = (document.getElementById('adm_wb_zoom_link')?.value || '').trim();
     masterWebinar.og_title = (document.getElementById('adm_og_title')?.value || '').trim() || masterWebinar.title;
     masterWebinar.og_description = (document.getElementById('adm_og_desc')?.value || '').trim() || masterWebinar.description;
+
+    // Read Cover Image
+    const presetVal = document.getElementById('adm_wb_cover_preset')?.value;
+    const urlVal = document.getElementById('adm_wb_cover_url')?.value?.trim();
+    const livePreviewSrc = document.getElementById('adm_cover_live_preview')?.src;
+
+    if (presetVal && presetVal !== 'custom_url' && presetVal !== 'custom_upload') {
+      masterWebinar.cover_image = presetVal;
+    } else if (urlVal) {
+      masterWebinar.cover_image = urlVal;
+    } else if (livePreviewSrc && !livePreviewSrc.startsWith('data:')) {
+      masterWebinar.cover_image = livePreviewSrc;
+    }
 
     // Read Posters metadata
     masterWebinar.posters_title = (document.getElementById('adm_posters_title')?.value || '').trim() || '🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स';
