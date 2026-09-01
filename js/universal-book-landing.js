@@ -50,24 +50,38 @@
     // 4. Mobile WhatsApp / WebShare Trigger
     const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
-    if (navigator.share && isMobile) {
-      navigator.share({
-        title: title,
-        text: promoText,
-        url: shareUrl
-      }).catch(() => {
-        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`;
-        window.location.href = waUrl;
-      });
-      return;
+    // Show visual confirmation toast
+    const toast = document.getElementById('cart-toast-notif');
+    const toastMsg = document.getElementById('cart-toast-msg');
+    if (toast && toastMsg) {
+      toastMsg.textContent = '📲 WhatsApp शेयर खुल रहा है...';
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+      toast.style.pointerEvents = 'auto';
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-30px)';
+        toast.style.pointerEvents = 'none';
+      }, 3000);
+    }
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(promoText).catch(() => {});
     }
 
     const waUrl = isMobile 
       ? `https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}` 
       : `https://web.whatsapp.com/send?text=${encodeURIComponent(promoText)}`;
 
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(promoText).catch(() => {});
+    if (navigator.share && isMobile) {
+      navigator.share({
+        title: title,
+        text: promoText,
+        url: shareUrl
+      }).catch(() => {
+        window.location.href = waUrl;
+      });
+      return;
     }
 
     const win = window.open(waUrl, '_blank');

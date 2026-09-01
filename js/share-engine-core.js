@@ -258,3 +258,10 @@ class UniversalShareEngine {
         }, duration);
     }
 }
+
+// Auto-initialize UniversalShareEngine immediately on script load
+if (typeof window !== 'undefined') {
+    if (!window.universalShareEngine) {
+        window.universalShareEngine = new UniversalShareEngine();
+    }
+}
