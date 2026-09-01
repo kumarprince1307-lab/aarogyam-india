@@ -254,17 +254,17 @@ export async function initBookLandingPages() {
 
           <div style="display: grid; grid-template-columns: 1.2fr 1.5fr; gap: 16px;">
             <!-- 3D Book Cover -->
-            <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #16a34a; border-radius: 8px; padding: 14px;">
+            <div id="sec_box_cover" style="background: rgba(0,0,0,0.25); border: 1.5px dashed #16a34a; border-radius: 8px; padding: 14px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <label style="font-weight: 700; font-size: 0.84rem; color: #4ade80;">
                   📸 3D बुक कवर (Cover Mockup) *
                 </label>
-                <span style="font-size: 0.72rem; background: #15803d; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 800;">
-                  📐 600 × 800 px (3:4)
-                </span>
+                <button type="button" onclick="window.clearImageField('cover')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; font-size: 0.72rem; border-radius: 4px;">
+                  🗑️ कवर हटाएं
+                </button>
               </div>
               <div style="margin-bottom: 8px;">
-                <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted);">Option A: GitHub रिपॉजिटरी की इमेज चुनें:</label>
+                <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted);">Option A: GitHub रिपॉजिटरी की इमेज चुनें (No Re-upload):</label>
                 <select id="blp_select_git_cover" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;">
                   <option value="">-- GitHub से कवर इमेज चुनें --</option>
                   <option value="/images/books/sabji-kheti-guide-cover.webp">🌾 सब्जी खेती गाइड (सब्जियों की वैज्ञानिक खेती)</option>
@@ -293,17 +293,17 @@ export async function initBookLandingPages() {
             </div>
 
             <!-- Hero Background Banner -->
-            <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #0284c7; border-radius: 8px; padding: 14px;">
+            <div id="sec_box_banner" style="background: rgba(0,0,0,0.25); border: 1.5px dashed #0284c7; border-radius: 8px; padding: 14px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <label style="font-weight: 700; font-size: 0.84rem; color: #38bdf8;">
                   🖼️ बैकग्राउंड बैनर (Hero Background Banner)
                 </label>
-                <span style="font-size: 0.72rem; background: #0369a1; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 800;">
-                  📐 1734 × 907 px (16:9)
-                </span>
+                <button type="button" onclick="window.clearImageField('banner')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; font-size: 0.72rem; border-radius: 4px;">
+                  🗑️ बैनर हटाएं
+                </button>
               </div>
               <div style="margin-bottom: 8px;">
-                <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted);">Option A: GitHub रिपॉजिटरी का बैनर चुनें:</label>
+                <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted);">Option A: GitHub रिपॉजिटरी का बैनर चुनें (No Re-upload):</label>
                 <select id="blp_select_git_banner" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;">
                   <option value="">-- GitHub से बैनर चुनें --</option>
                   <option value="/images/banners/kharif-master-guide-2026-hero-banner.webp">🌾 खरीफ मास्टर गाइड 2026 हीरो बैनर</option>
@@ -694,78 +694,78 @@ export async function initBookLandingPages() {
         </div>
 
         <!-- SECTION 17: BOOK PDF / DOC FILE MANAGEMENT (PAID BOOK FULL PDF/DOC) -->
-        <div style="background: rgba(14,165,233,0.08); border: 1.5px solid rgba(14,165,233,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+        <div id="sec_box_main_pdf" style="background: rgba(14,165,233,0.08); border: 1.5px solid rgba(14,165,233,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
                 <span>📄</span> <span>17. मुख्य ई-बुक PDF / DOC फाइल प्रबंधन (Paid Book PDF/DOC Upload)</span>
               </div>
-              <small style="color: var(--admin-muted);">भुगतान के बाद पाठक को मिलने वाली मुख्य सम्पूर्ण ई-बुक फाइल (PDF, DOC, DOCX - Max 100MB)</small>
+              <small style="color: var(--admin-muted);">भुगतान के बाद पाठक को मिलने वाली मुख्य सम्पूर्ण ई-बुक फाइल (Max 4.5MB for Vercel)</small>
             </div>
-            <span style="font-size: 0.72rem; background: #0284c7; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
-              🔒 Paid Full Book Access
-            </span>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span style="font-size: 0.72rem; background: #0284c7; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
+                🔒 Paid Full Book Access
+              </span>
+              <button type="button" onclick="window.clearBookPdf('main')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; font-size: 0.72rem; border-radius: 4px;">
+                🗑️ PDF हटाएं
+              </button>
+            </div>
           </div>
 
           <!-- Optional Section Banner for Main PDF -->
           ${renderSectionBannerUploaderBlock('sec_pdf_main', '📄 मुख्य PDF सेक्शन बैनर (वैकल्पिक)')}
 
           <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #0284c7; border-radius: 8px; padding: 14px; margin-top: 10px;">
-            <div style="display: grid; grid-template-columns: 1.3fr 2fr auto; gap: 10px; align-items: center;">
+            <div style="display: grid; grid-template-columns: 1.3fr 2fr; gap: 12px; align-items: center;">
               <div>
-                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">फाइल चुनें (PDF/DOC/DOCX):</label>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">Option A: कंप्यूटर से फ़ाइल चुनें (PDF/DOC/DOCX - Max 4.5MB):</label>
                 <input type="file" id="blp_file_main_pdf" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="window.handleBookPdfSelect('main', event)" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem;" />
               </div>
               <div>
-                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">या डायरेक्ट फाइल URL / Path:</label>
-                <input type="text" id="blp_main_pdf_url" placeholder="उदा. /pdf/full/BK013.pdf या /uploads/books/..." oninput="window.updatePdfStatusPreview('main', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
-              </div>
-              <div style="padding-top: 16px;">
-                <button type="button" id="btn_upload_main_pdf" onclick="window.triggerBookPdfUpload('main')" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; white-space: nowrap; padding: 7px 14px;">
-                  ⬆️ अपलोड करें
-                </button>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">Option B: या डायरेक्ट फ़ाइल लिंक / Path:</label>
+                <input type="text" id="blp_main_pdf_url" placeholder="उदा. /uploads/books/BK013_main.pdf या Google Drive/CDN Link" oninput="window.updatePdfStatusPreview('main', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
               </div>
             </div>
-            <div id="blp_main_pdf_status_wrap" style="margin-top: 8px; font-size: 0.8rem; color: #94a3b8; display: none;">
+            <div id="blp_main_pdf_status_wrap" style="margin-top: 10px; font-size: 0.8rem; color: #94a3b8; display: none;">
               <!-- Current file status indicator -->
             </div>
           </div>
         </div>
 
         <!-- SECTION 18: FREE / DEMO BOOK PDF / DOC FILE MANAGEMENT -->
-        <div style="background: rgba(16,185,129,0.08); border: 1.5px solid rgba(16,185,129,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+        <div id="sec_box_free_pdf" style="background: rgba(16,185,129,0.08); border: 1.5px solid rgba(16,185,129,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #34d399; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
                 <span>🎁</span> <span>18. मुफ़्त / डेमो ई-बुक PDF / DOC फाइल प्रबंधन (Free/Demo Book PDF/DOC Upload)</span>
               </div>
-              <small style="color: var(--admin-muted);">पाठकों के लिए निःशुल्क सैंपल या बोनस ई-बुक फाइल (PDF, DOC, DOCX - Max 100MB)</small>
+              <small style="color: var(--admin-muted);">पाठकों के लिए निःशुल्क सैंपल या बोनस ई-बुक फाइल (Max 4.5MB for Vercel)</small>
             </div>
-            <span style="font-size: 0.72rem; background: #059669; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
-              🎁 100% Free Demo Access
-            </span>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span style="font-size: 0.72rem; background: #059669; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
+                🎁 100% Free Demo Access
+              </span>
+              <button type="button" onclick="window.clearBookPdf('free')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; font-size: 0.72rem; border-radius: 4px;">
+                🗑️ PDF हटाएं
+              </button>
+            </div>
           </div>
 
           <!-- Optional Section Banner for Free PDF -->
           ${renderSectionBannerUploaderBlock('sec_pdf_free', '🎁 फ्री PDF सेक्शन बैनर (वैकल्पिक)')}
 
           <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #059669; border-radius: 8px; padding: 14px; margin-top: 10px;">
-            <div style="display: grid; grid-template-columns: 1.3fr 2fr auto; gap: 10px; align-items: center;">
+            <div style="display: grid; grid-template-columns: 1.3fr 2fr; gap: 12px; align-items: center;">
               <div>
-                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #34d399;">फाइल चुनें (PDF/DOC/DOCX):</label>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #34d399;">Option A: कंप्यूटर से फ़ाइल चुनें (PDF/DOC/DOCX - Max 4.5MB):</label>
                 <input type="file" id="blp_file_free_pdf" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="window.handleBookPdfSelect('free', event)" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem;" />
               </div>
               <div>
-                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">या डायरेक्ट फाइल URL / Path:</label>
-                <input type="text" id="blp_free_pdf_url" placeholder="उदा. /pdf/sample/BK013-demo.pdf या /uploads/books/..." oninput="window.updatePdfStatusPreview('free', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
-              </div>
-              <div style="padding-top: 16px;">
-                <button type="button" id="btn_upload_free_pdf" onclick="window.triggerBookPdfUpload('free')" class="admin-button small-button" style="background: #059669; color: #fff; font-weight: 800; white-space: nowrap; padding: 7px 14px;">
-                  ⬆️ अपलोड करें
-                </button>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">Option B: या डायरेक्ट फ़ाइल लिंक / Path:</label>
+                <input type="text" id="blp_free_pdf_url" placeholder="उदा. /uploads/books/BK013_free.pdf या Google Drive/CDN Link" oninput="window.updatePdfStatusPreview('free', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-family: monospace;" />
               </div>
             </div>
-            <div id="blp_free_pdf_status_wrap" style="margin-top: 8px; font-size: 0.8rem; color: #94a3b8; display: none;">
+            <div id="blp_free_pdf_status_wrap" style="margin-top: 10px; font-size: 0.8rem; color: #94a3b8; display: none;">
               <!-- Current file status indicator -->
             </div>
           </div>
@@ -1259,27 +1259,31 @@ export async function initBookLandingPages() {
     renderTocPointsInBuilder();
   });
 
-  // GitHub Cover Image Dropdown Sync
+  // GitHub Cover Image Dropdown Sync (Mutual Exclusion: Clears File Input)
   document.getElementById('blp_select_git_cover')?.addEventListener('change', (e) => {
     if (e.target.value) {
       const val = e.target.value;
       const urlInput = document.getElementById('blp_cover_url');
       const prevImg = document.getElementById('blp_preview_cover_img');
+      const fileInput = document.getElementById('blp_file_cover');
+      if (fileInput) fileInput.value = ''; // Clear file input so no duplicate upload
       if (urlInput) urlInput.value = val;
       if (prevImg) prevImg.src = val;
-      showToast(`📸 GitHub कवर इमेज चुनी गई: ${val}`, 'info');
+      showToast(`📸 GitHub कवर चुना गया (डुप्लिकेट अपलोड नहीं होगा): ${val}`, 'info');
     }
   });
 
-  // GitHub Hero Banner Dropdown Sync
+  // GitHub Hero Banner Dropdown Sync (Mutual Exclusion: Clears File Input)
   document.getElementById('blp_select_git_banner')?.addEventListener('change', (e) => {
     if (e.target.value) {
       const val = e.target.value;
       const urlInput = document.getElementById('blp_banner_url');
       const prevImg = document.getElementById('blp_preview_banner_img');
+      const fileInput = document.getElementById('blp_file_banner');
+      if (fileInput) fileInput.value = ''; // Clear file input so no duplicate upload
       if (urlInput) urlInput.value = val;
       if (prevImg) prevImg.src = val;
-      showToast(`🖼️ GitHub बैनर चुना गया: ${val}`, 'info');
+      showToast(`🖼️ GitHub बैनर चुना गया (डुप्लिकेट अपलोड नहीं होगा): ${val}`, 'info');
     }
   });
 
@@ -1331,6 +1335,14 @@ export async function initBookLandingPages() {
     fileInput?.addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if (file) {
+        if (fileInputId === 'blp_file_cover') {
+          const s = document.getElementById('blp_select_git_cover');
+          if (s) s.value = '';
+        }
+        if (fileInputId === 'blp_file_banner') {
+          const s = document.getElementById('blp_select_git_banner');
+          if (s) s.value = '';
+        }
         const reader = new FileReader();
         reader.onload = (re) => {
           const dataUrl = re.target.result;
@@ -2428,20 +2440,109 @@ export async function initBookLandingPages() {
     if (pImg && imgUrl) pImg.src = imgUrl;
   };
 
-  window.uploadOgImage = function(e) {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (re) => {
-        const url = re.target.result;
-        const input = document.getElementById('blp_og_image');
-        if (input) input.value = url;
-        window.updateSocialSharePreview();
-        showToast('📸 सोशल शेयर इमेज लोड हो गई!', 'success');
-      };
-      reader.readAsDataURL(file);
+  window.clearImageField = function(type) {
+    if (type === 'cover') {
+      const fileInput = document.getElementById('blp_file_cover');
+      const gitSelect = document.getElementById('blp_select_git_cover');
+      const urlInput = document.getElementById('blp_cover_url');
+      const prevImg = document.getElementById('blp_preview_cover_img');
+      if (fileInput) fileInput.value = '';
+      if (gitSelect) gitSelect.value = '';
+      if (urlInput) urlInput.value = '';
+      if (prevImg) prevImg.src = '/images/books/kharif-master-guide-2026-cover.webp';
+      showToast('🗑️ कवर इमेज हटा दी गई', 'info');
+    } else if (type === 'banner') {
+      const fileInput = document.getElementById('blp_file_banner');
+      const gitSelect = document.getElementById('blp_select_git_banner');
+      const urlInput = document.getElementById('blp_banner_url');
+      const prevImg = document.getElementById('blp_preview_banner_img');
+      if (fileInput) fileInput.value = '';
+      if (gitSelect) gitSelect.value = '';
+      if (urlInput) urlInput.value = '';
+      if (prevImg) prevImg.src = '/images/banners/kharif-master-guide-2026-hero-banner.webp';
+      showToast('🗑️ बैनर इमेज हटा दी गई', 'info');
     }
   };
+
+  window.handleBookPdfSelect = function(type, e) {
+    const file = e.target.files?.[0];
+    const statusWrap = document.getElementById(type === 'main' ? 'blp_main_pdf_status_wrap' : 'blp_free_pdf_status_wrap');
+    if (!file) return;
+
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    if (file.size > 4.5 * 1024 * 1024) {
+      if (statusWrap) {
+        statusWrap.style.display = 'block';
+        statusWrap.innerHTML = `
+          <div style="background: rgba(239,68,68,0.15); border: 1.5px solid #ef4444; border-radius: 8px; padding: 12px; color: #fca5a5; font-size: 0.84rem; line-height: 1.5;">
+            <strong>❌ [सेक्शन ${type === 'main' ? '17' : '18'}] फ़ाइल साइज़ बड़ी है (${sizeMB} MB):</strong><br/>
+            Vercel सर्वरलेस फ़ाइल अपलोड लिमिट <strong>4.5 MB</strong> है।<br/>
+            💡 <strong>समाधान 1:</strong> इसे फ्री में <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" style="color:#38bdf8;text-decoration:underline;font-weight:700;">iLovePDF Compress Tool</a> पर जाकर 4MB से कम करें।<br/>
+            💡 <strong>समाधान 2:</strong> या फ़ाइल को Google Drive / CDN पर अपलोड करके direct लिंक Right वाले बॉक्स में दर्ज करें।
+          </div>
+        `;
+      }
+      showToast(`⚠️ [सेक्शन ${type === 'main' ? '17' : '18'}] PDF फ़ाइल (${sizeMB}MB) 4.5MB से बड़ी है। कृपया कंप्रेस करें।`, 'error');
+    } else {
+      if (statusWrap) {
+        statusWrap.style.display = 'block';
+        statusWrap.innerHTML = `
+          <div style="background: rgba(34,197,94,0.15); border: 1px solid #22c55e; border-radius: 6px; padding: 8px 12px; color: #86efac; font-size: 0.82rem; display: flex; justify-content: space-between; align-items: center;">
+            <span>✅ <strong>${file.name}</strong> (${sizeMB} MB) - लाइव अपलोड के लिए तैयार</span>
+            <button type="button" onclick="window.clearBookPdf('${type}')" style="background:#ef4444;color:#fff;border:none;border-radius:4px;padding:3px 8px;font-size:0.75rem;cursor:pointer;font-weight:700;">🗑️ हटाएं</button>
+          </div>
+        `;
+      }
+      showToast(`📄 PDF फ़ाइल (${file.name} - ${sizeMB}MB) चुनी गई!`, 'info');
+    }
+  };
+
+  window.clearBookPdf = function(type) {
+    const input = document.getElementById(type === 'main' ? 'blp_file_main_pdf' : 'blp_file_free_pdf');
+    const urlInput = document.getElementById(type === 'main' ? 'blp_main_pdf_url' : 'blp_free_pdf_url');
+    const statusWrap = document.getElementById(type === 'main' ? 'blp_main_pdf_status_wrap' : 'blp_free_pdf_status_wrap');
+    if (input) input.value = '';
+    if (urlInput) urlInput.value = '';
+    if (statusWrap) {
+      statusWrap.innerHTML = '';
+      statusWrap.style.display = 'none';
+    }
+    showToast(`🗑️ ${type === 'main' ? 'मुख्य' : 'फ्री'} PDF हटा दी गई`, 'info');
+  };
+
+  window.updatePdfStatusPreview = function(type, url) {
+    const statusWrap = document.getElementById(type === 'main' ? 'blp_main_pdf_status_wrap' : 'blp_free_pdf_status_wrap');
+    if (!statusWrap) return;
+    if (url && url.trim()) {
+      statusWrap.style.display = 'block';
+      statusWrap.innerHTML = `
+        <div style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; border-radius: 6px; padding: 6px 10px; color: #bae6fd; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+          <span>🔗 <strong>लिंक्ड PDF:</strong> ${url.trim()}</span>
+          <button type="button" onclick="window.clearBookPdf('${type}')" style="background:#ef4444;color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:0.72rem;cursor:pointer;">🗑️ हटाएं</button>
+        </div>
+      `;
+    } else {
+      statusWrap.style.display = 'none';
+    }
+  };
+
+  window.triggerBookPdfUpload = function(type) {
+    showToast(`💡 PDF फ़ाइल नीचे "💾 Save Page" बटन दबाते ही ऑटोमैटिक अपलोड व लिंक हो जाएगी!`, 'info');
+  };
+
+  function highlightSectionError(elementId, message) {
+    const el = document.getElementById(elementId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+      el.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.7)';
+      el.style.borderColor = '#ef4444';
+      setTimeout(() => {
+        if (el) el.style.boxShadow = '';
+      }, 4500);
+    }
+    showToast(message, 'error');
+  }
 
   window.removeVideoItem = (idx) => { currentVideos.splice(idx, 1); renderVideosInBuilder(); };
   window.updateReviewField = (idx, field, val) => { if (currentReviews[idx]) currentReviews[idx][field] = val; };
@@ -2930,13 +3031,40 @@ export async function initBookLandingPages() {
     const title = (document.getElementById('blp_hero_title')?.value || '').trim();
     const offerPrice = parseInt(document.getElementById('blp_hero_offer_price')?.value, 10) || 99;
     const coverUrlInput = (document.getElementById('blp_cover_url')?.value || '').trim();
+    const coverFileInput = document.getElementById('blp_file_cover');
 
-    if (!bId) { showToast('कृपया Book ID दर्ज करें।', 'error'); return; }
-    if (!title) { showToast('कृपया पुस्तक का शीर्षक दर्ज करें।', 'error'); return; }
+    // SECTION-BY-SECTION VALIDATION WITH EXACT SECTION LOCATOR
+    if (!bId) { 
+      highlightSectionError('blp_input_book_id', '❌ [सेक्शन 1: ई-बुक पहचान] कृपया Book ID दर्ज करें (उदा. BK016)'); 
+      return; 
+    }
+    if (!title) { 
+      highlightSectionError('blp_hero_title', '❌ [सेक्शन 2: मुख्य शीर्षक] कृपया पुस्तक का नाम/टाइटल दर्ज करें'); 
+      return; 
+    }
+    if (!coverUrlInput && (!coverFileInput || coverFileInput.files.length === 0)) {
+      highlightSectionError('sec_box_cover', '❌ [सेक्शन 3: 3D कवर इमेज] कृपया 3D कवर इमेज चुनें या अपलोड करें');
+      return;
+    }
 
     // Strict guard for BK001 & BK002
     if (bId === 'BK001' || bId === 'BK002') {
-      showToast(`⚠️ सुरक्षा नियम: ${bId} सुरक्षित मुख्य बुक है और इसे संशोधित नहीं किया जा सकता।`, 'error');
+      highlightSectionError('blp_input_book_id', `⚠️ सुरक्षा नियम: ${bId} सुरक्षित मुख्य बुक है और इसे संशोधित नहीं किया जा सकता।`);
+      return;
+    }
+
+    // Check PDF size in Section 17 & 18 before proceeding
+    const mainPdfFileInput = document.getElementById('blp_file_main_pdf');
+    if (mainPdfFileInput?.files?.[0] && mainPdfFileInput.files[0].size > 4.5 * 1024 * 1024) {
+      const mb = (mainPdfFileInput.files[0].size / (1024 * 1024)).toFixed(1);
+      highlightSectionError('sec_box_main_pdf', `❌ [सेक्शन 17: मुख्य PDF] फ़ाइल (${mb}MB) 4.5MB से बड़ी है। कृपया इसे iLovePDF से कंप्रेस करें।`);
+      return;
+    }
+
+    const freePdfFileInput = document.getElementById('blp_file_free_pdf');
+    if (freePdfFileInput?.files?.[0] && freePdfFileInput.files[0].size > 4.5 * 1024 * 1024) {
+      const mb = (freePdfFileInput.files[0].size / (1024 * 1024)).toFixed(1);
+      highlightSectionError('sec_box_free_pdf', `❌ [सेक्शन 18: फ्री PDF] फ़ाइल (${mb}MB) 4.5MB से बड़ी है। कृपया इसे iLovePDF से कंप्रेस करें।`);
       return;
     }
 
