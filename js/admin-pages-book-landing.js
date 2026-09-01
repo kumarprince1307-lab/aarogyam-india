@@ -1274,19 +1274,6 @@ export async function initBookLandingPages() {
     selectedThemeDark = adjustColorBrightness(e.target.value, -30);
   });
 
-  const builderCard = document.getElementById('admin-book-builder-card');
-  const toggleBtn = document.getElementById('btn-toggle-book-builder');
-  const closeBtn = document.getElementById('btn-close-book-builder');
-  const cancelBtn = document.getElementById('btn_cancel_book_lp');
-  const refreshBtn = document.getElementById('book-lp-refresh-btn');
-  const saveBtn = document.getElementById('btn_save_book_lp');
-  const searchInput = document.getElementById('blp_search_input');
-  const genCodeBtn = document.getElementById('btn_generate_book_code');
-  const newCatBtn = document.getElementById('btn_add_new_category');
-  const exportBtn = document.getElementById('btn_export_json_files');
-  const resetOrderBtn = document.getElementById('btn_reset_sections_order');
-  const bookSelect = document.getElementById('blp_select_existing_book');
-
   toggleBtn?.addEventListener('click', () => {
     if (builderCard && builderCard.style.display === 'none') {
       resetBookBuilder();
