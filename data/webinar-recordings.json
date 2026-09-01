@@ -35,42 +35,6 @@
       "access_tier": "all",
       "status": "active",
       "created_at": "2026-09-01T11:10:37.883Z"
-    },
-    {
-      "id": "VID_M00101",
-      "format": "full_video",
-      "platform": "youtube",
-      "title": "🌾 प्राकृतिक एवं जैविक खेती से 3x मुनाफा मास्टरक्लास",
-      "description": "जैविक खाद, जीवामृत, बीज उपचार और संपूर्ण फसल सुरक्षा की पूरी ट्रेनिंग।",
-      "subject": "कृषि मास्टरक्लास",
-      "category": "Organic Farming",
-      "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "youtube_id": "dQw4w9WgXcQ",
-      "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-      "duration": "45 मिनट",
-      "speaker": "डॉ. रमेश पाटिल (वरिष्ठ कृषि वैज्ञानिक)",
-      "access_tier": "all",
-      "status": "active",
-      "created_at": "2026-09-01T11:30:00.000Z"
-    },
-    {
-      "id": "VID_M00102",
-      "format": "full_video",
-      "platform": "youtube",
-      "title": "🐛 कीट एवं फंगस रोग नियंत्रण के 5 अचूक वैज्ञानिक फॉर्मूले",
-      "description": "फसलों में सुंडी, इल्ली, माहू और फंगस से 100% सुरक्षा का आसान समाधान।",
-      "subject": "फसल सुरक्षा",
-      "category": "Pest Management",
-      "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "youtube_id": "dQw4w9WgXcQ",
-      "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-      "duration": "35 मिनट",
-      "speaker": "आरोग्यम फसल डॉक्टर",
-      "access_tier": "all",
-      "status": "active",
-      "created_at": "2026-09-01T11:40:00.000Z"
     }
   ]
 }
