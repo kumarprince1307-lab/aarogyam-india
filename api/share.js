@@ -260,8 +260,7 @@ module.exports = async function handler(req, res) {
   // 1. Check if ID represents an eBook Landing Page (e.g. BK015, BK001, etc.)
   const bookData = getBookLandingPageData(lpId);
   if (bookData) {
-    const rawTitle = (bookData.og_title || bookData.hero?.title || queryTitle || 'Aarogyam India eBook Practical Guide').trim();
-    const finalTitle = rawTitle.includes('Aarogyam India') ? rawTitle : `${rawTitle} | Aarogyam India`;
+    const finalTitle = (bookData.og_title || bookData.hero?.title || queryTitle || 'Aarogyam India eBook Practical Guide').trim();
     const finalDesc = (bookData.og_description || bookData.hero?.description || queryDesc || 'सम्पूर्ण Practical Guide। अभी विशेष छूट पर उपलब्ध।').slice(0, 200).trim();
     const rawImg = bookData.og_image || bookData.hero?.cover_image || bookData.hero?.banner_image || '/images/books/kharif-master-guide-2026-cover.webp';
     const finalOgImage = rawImg.startsWith('http') ? rawImg : `${HOST_ORIGIN}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`;
@@ -281,7 +280,7 @@ module.exports = async function handler(req, res) {
     }
 
     res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400');
-    const cleanTitle = finalTitle.includes('Aarogyam India') ? finalTitle : `${finalTitle} — Aarogyam India`;
+    const cleanTitle = finalTitle;
 
     const isWebp = finalOgImage.toLowerCase().endsWith('.webp');
     const isPng = finalOgImage.toLowerCase().endsWith('.png');
@@ -303,12 +302,7 @@ module.exports = async function handler(req, res) {
   <meta property="og:image" content="${escapeHtml(finalOgImage)}">
   <meta property="og:image:secure_url" content="${escapeHtml(finalOgImage)}">
   <meta property="og:image:type" content="${imgMime}">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${escapeHtml(finalTitle)}">
-  <!-- Fallback JPEG image for legacy crawlers -->
-  <meta property="og:image" content="https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg">
-  <meta property="og:image:type" content="image/jpeg">
   <meta property="og:url" content="${escapeHtml(canonicalShareUrl)}">
   <link rel="image_src" href="${escapeHtml(finalOgImage)}">
 
@@ -364,7 +358,7 @@ module.exports = async function handler(req, res) {
 
   // 2. Resolve Content Details
   const rawTitle = (lp?.title || queryTitle || 'Aarogyam India विशेष जानकारी').trim();
-  const finalTitle = lp?.og_title || (rawTitle.includes('Aarogyam India') ? rawTitle : `${rawTitle} | Aarogyam India`);
+  const finalTitle = (lp?.og_title || rawTitle).trim();
   const finalDesc = (lp?.og_description || lp?.message || queryDesc || 'Aarogyam India में आपका स्वागत है। प्रामाणिक जानकारी, समाधान और परामर्श के लिए अभी देखें।').slice(0, 160).trim();
   const finalShareId = lp?.share_id || queryShareId || '';
   const finalCategory = lp?.category || queryCat || 'agriculture';
