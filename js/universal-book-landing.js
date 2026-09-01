@@ -14,6 +14,68 @@
   let currentZoom = 1;
   let timerInterval = null;
 
+  // Universal Smart Book Sharing Handler (Available globally)
+  window.handleUniversalBookShare = function(e) {
+    if (e) {
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const bId = (currentBookData?.id || currentBookId || urlParams.get('id') || 'BK001').toUpperCase();
+    const l = currentLandingData || {};
+    const hero = l.hero || {};
+    const b = currentBookData || {};
+    const title = l.og_title || hero.title || b.heading || b.name || document.title || 'Aarogyam India eBook';
+
+    // 1. Resolve User Share / Affiliate ID
+    let userShareId = 'AI000004';
+    try {
+      const userObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+      if (userObj && (userObj.share_id || userObj.ref_code || userObj.phone)) {
+        userShareId = userObj.share_id || userObj.ref_code || userObj.phone;
+      }
+    } catch (err) {}
+
+    // 2. Resolve Smart Serverless Share URL
+    const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'https://aarogyamindia.online';
+    const shareUrl = `${origin}/api/share?id=${encodeURIComponent(bId)}&share_id=${encodeURIComponent(userShareId)}`;
+
+    // 3. Resolve Custom Promo Text
+    const customPromo = (l.whatsapp_share_message || l.whatsapp_share_text || '').trim();
+    const promoText = customPromo 
+      ? `${customPromo}\n\n👉 अभी पुस्तक देखें और ऑर्डर करें:\n${shareUrl}`
+      : `🌾 *${title}*\n${hero.subtitle || hero.description || 'सम्पूर्ण वैज्ञानिक एवं Practical समाधान।'}\n\n👉 विशेष छूट पर अभी देखें:\n${shareUrl}`;
+
+    // 4. Mobile WhatsApp / WebShare Trigger
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+    if (navigator.share && isMobile) {
+      navigator.share({
+        title: title,
+        text: promoText,
+        url: shareUrl
+      }).catch(() => {
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`;
+        window.location.href = waUrl;
+      });
+      return;
+    }
+
+    const waUrl = isMobile 
+      ? `https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}` 
+      : `https://web.whatsapp.com/send?text=${encodeURIComponent(promoText)}`;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(promoText).catch(() => {});
+    }
+
+    const win = window.open(waUrl, '_blank');
+    if (!win || win.closed || typeof win.closed === 'undefined') {
+      window.location.href = waUrl;
+    }
+  };
+
   async function init() {
     extractQueryParameters();
     await loadBookAndLandingData();
