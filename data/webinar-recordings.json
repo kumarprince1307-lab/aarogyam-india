@@ -1,6 +1,24 @@
 {
   "recordings": [
     {
+      "id": "VID_S363050",
+      "format": "short_reel",
+      "platform": "youtube",
+      "title": "बीज संस्कार: मजबूत फसल का राज 🌱",
+      "description": "🌾 बुवाई से पहले बीज संस्कार जरूर करें!\nधान, मक्का और सोयाबीन के बीजों को सही तरीके से तैयार करने से अच्छे अंकुरण और स्वस्थ फसल में मदद मिल सकती है।\n👉 बीज संस्कार का सही तरीका जानें और बुवाई की शुरुआत सही करें।\n@AAROGYAMINDIA",
+      "subject": "Organic Farming",
+      "category": "Organic Farming",
+      "video_url": "https://youtube.com/shorts/Ae9E-arA8lo?si=MJcPQzkUxP8YDedp",
+      "youtube_url": "https://youtube.com/shorts/Ae9E-arA8lo?si=MJcPQzkUxP8YDedp",
+      "youtube_id": "Ae9E-arA8lo",
+      "thumbnail": "https://img.youtube.com/vi/Ae9E-arA8lo/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "registration_only",
+      "status": "active",
+      "created_at": "2026-09-01T16:49:23.050Z"
+    },
+    {
       "id": "VID_S261730",
       "format": "short_reel",
       "platform": "youtube",
