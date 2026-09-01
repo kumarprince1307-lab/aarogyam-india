@@ -35,16 +35,20 @@
   <meta name="theme-color" id="page-theme-color-meta" content="#2E7D32">
 
   <!-- OPEN GRAPH / SOCIAL META -->
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
   <meta property="og:site_name" content="Aarogyam India">
   <meta property="og:title" id="og-title-meta" content="Aarogyam India eBook Practical Guide">
   <meta property="og:description" id="og-desc-meta" content="सम्पूर्ण Practical Guide। अभी विशेष छूट पर उपलब्ध।">
-  <meta property="og:image" id="og-image-meta" content="https://aarogyamindia.online/images/books/kharif-fasal-og.webp">
+  <meta property="og:image" id="og-image-meta" content="https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg">
+  <meta property="og:image:secure_url" content="https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:url" id="og-url-meta" content="">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" id="twitter-title-meta" content="Aarogyam India eBook">
   <meta name="twitter:description" id="twitter-desc-meta" content="सम्पूर्ण Practical Guide">
-  <meta name="twitter:image" id="twitter-image-meta" content="https://aarogyamindia.online/images/books/kharif-fasal-og.webp">
+  <meta name="twitter:image" id="twitter-image-meta" content="https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg">
 
   <!-- Favicon & PWA -->
   <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
@@ -246,7 +250,7 @@
             <a id="hero-buy-btn" href="checkout.html?id=BK001" class="buy-btn">
               <i class="fa-solid fa-cart-shopping"></i> Buy Now
             </a>
-            <button type="button" id="hero-share-btn" class="share-now-btn" data-share-button="true">
+            <button type="button" id="hero-share-btn" onclick="window.handleUniversalBookShare(event)" class="share-now-btn" style="cursor:pointer;">
               <i class="fa-solid fa-share-nodes"></i> Share Now
             </button>
           </div>

@@ -893,6 +893,11 @@ export async function initBookLandingPages() {
                   </label>
                 </div>
               </div>
+              <div>
+                <label class="admin-label" style="font-weight: 700; color: #22c55e;">📲 WhatsApp / सोशल शेयर कस्टम संदेश (Custom Promo Text):</label>
+                <textarea id="blp_whatsapp_share_msg" class="admin-textarea" rows="3" placeholder="उदा. 🌾 *सब्जी खेती मास्टर PART 1* — 11 प्रमुख सब्जियों की वैज्ञानिक खेती। विशेष छूट पर अभी प्राप्त करें!" style="width: 100%; padding: 8px 12px; font-size: 0.85rem;"></textarea>
+                <small style="color: var(--admin-muted); font-size: 0.72rem;">यह संदेश यूजर के WhatsApp पर शेयर करते समय ऑटोमैटिक उसके Referral Link के साथ जाएगा।</small>
+              </div>
             </div>
 
             <!-- WhatsApp Social Card Live Preview Box -->
@@ -1269,18 +1274,31 @@ export async function initBookLandingPages() {
     selectedThemeDark = adjustColorBrightness(e.target.value, -30);
   });
 
+  const builderCard = document.getElementById('admin-book-builder-card');
+  const toggleBtn = document.getElementById('btn-toggle-book-builder');
+  const closeBtn = document.getElementById('btn-close-book-builder');
+  const cancelBtn = document.getElementById('btn_cancel_book_lp');
+  const refreshBtn = document.getElementById('book-lp-refresh-btn');
+  const saveBtn = document.getElementById('btn_save_book_lp');
+  const searchInput = document.getElementById('blp_search_input');
+  const genCodeBtn = document.getElementById('btn_generate_book_code');
+  const newCatBtn = document.getElementById('btn_add_new_category');
+  const exportBtn = document.getElementById('btn_export_json_files');
+  const resetOrderBtn = document.getElementById('btn_reset_sections_order');
+  const bookSelect = document.getElementById('blp_select_existing_book');
+
   toggleBtn?.addEventListener('click', () => {
-    if (builderCard.style.display === 'none') {
+    if (builderCard && builderCard.style.display === 'none') {
       resetBookBuilder();
       builderCard.style.display = 'block';
       builderCard.scrollIntoView({ behavior: 'smooth' });
-    } else {
+    } else if (builderCard) {
       builderCard.style.display = 'none';
     }
   });
 
-  closeBtn?.addEventListener('click', () => { builderCard.style.display = 'none'; resetBookBuilder(); });
-  cancelBtn?.addEventListener('click', () => { builderCard.style.display = 'none'; resetBookBuilder(); });
+  closeBtn?.addEventListener('click', () => { if (builderCard) builderCard.style.display = 'none'; resetBookBuilder(); });
+  cancelBtn?.addEventListener('click', () => { if (builderCard) builderCard.style.display = 'none'; resetBookBuilder(); });
   refreshBtn?.addEventListener('click', loadAllData);
   saveBtn?.addEventListener('click', saveBookLandingPage);
   searchInput?.addEventListener('input', renderTable);
@@ -2977,6 +2995,9 @@ export async function initBookLandingPages() {
     document.getElementById('blp_custom_theme_color').value = selectedThemePrimary;
 
     document.getElementById('blp_wa_prompt').value = page.whatsapp_prompt || '';
+    if (document.getElementById('blp_whatsapp_share_msg')) {
+      document.getElementById('blp_whatsapp_share_msg').value = page.whatsapp_share_message || page.whatsapp_share_text || '';
+    }
     document.getElementById('blp_status').value = page.status || 'active';
     document.getElementById('blp_sticky_btn_text').value = page.sticky_button_text || 'खरीदें';
 
@@ -3392,6 +3413,8 @@ export async function initBookLandingPages() {
       videos: currentVideos,
       testimonials: currentReviews,
       faqs: currentFaqs.length > 0 ? currentFaqs : undefined,
+      whatsapp_share_message: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
+      whatsapp_share_text: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
       whatsapp_prompt: document.getElementById('blp_wa_prompt')?.value || `नमस्ते, मुझे '${title}' पुस्तक के बारे में और जानकारी चाहिए।`
     };
 

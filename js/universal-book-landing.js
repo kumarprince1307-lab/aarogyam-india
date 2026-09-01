@@ -1238,23 +1238,58 @@
       });
     });
 
-    // Native Share
-    const shareBtn = document.getElementById('hero-share-btn');
-    shareBtn?.addEventListener('click', () => {
-      const title = document.title;
-      const url = window.location.href;
-      if (navigator.share) {
-        navigator.share({
-          title: title,
-          text: `🌾 *${title}* — सम्पूर्ण प्रैक्टिकल गाइड आज ही विशेष ऑफर में प्राप्त करें!`,
-          url: url
-        }).catch(() => {});
-      } else {
-        navigator.clipboard.writeText(url).then(() => {
-          alert('📋 लिंक कॉपी हो गया! आप इसे WhatsApp पर शेयर कर सकते हैं।');
-        });
+    // Universal Smart Book Sharing Handler
+    window.handleUniversalBookShare = function(e) {
+      if (e) {
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (typeof e.preventDefault === 'function') e.preventDefault();
       }
-    });
+
+      const l = currentLandingData || {};
+      const hero = l.hero || {};
+      const b = currentBookData || {};
+      const bId = (b.id || currentBookId || 'BK001').toUpperCase();
+      const title = l.og_title || hero.title || b.heading || b.name || 'Aarogyam India eBook';
+      
+      // 1. Resolve User Share / Affiliate ID
+      let userShareId = 'AI000004';
+      try {
+        const userObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        if (userObj && (userObj.share_id || userObj.ref_code || userObj.phone)) {
+          userShareId = userObj.share_id || userObj.ref_code || userObj.phone;
+        }
+      } catch (err) {}
+
+      // 2. Resolve Smart Serverless Share URL
+      const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'https://aarogyamindia.online';
+      const shareUrl = `${origin}/api/share?id=${encodeURIComponent(bId)}&share_id=${encodeURIComponent(userShareId)}`;
+
+      // 3. Resolve Custom Promo Text
+      const customPromo = l.whatsapp_share_message || l.whatsapp_share_text || '';
+      const promoText = customPromo 
+        ? `${customPromo}\n\n👉 अभी पुस्तक देखें और ऑर्डर करें:\n${shareUrl}`
+        : `🌾 *${title}*\n${hero.subtitle || hero.description || 'सम्पूर्ण वैज्ञानिक एवं Practical समाधान।'}\n\n👉 विशेष छूट पर अभी देखें:\n${shareUrl}`;
+
+      // 4. Mobile WhatsApp / WebShare Trigger
+      const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        // Direct 1-Click WhatsApp Launch on Mobile
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`;
+        window.open(waUrl, '_blank');
+      } else {
+        // Desktop: Copy to clipboard and launch WhatsApp Web or Share dialog
+        navigator.clipboard?.writeText(promoText).then(() => {
+          showCartToast(`📲 WhatsApp शेयर संदेश व लिंक कॉपी हो गया! WhatsApp Web पर पेस्ट करें।`);
+        }).catch(() => {
+          prompt('WhatsApp पर शेयर करने के लिए संदेश कॉपी करें:', promoText);
+        });
+
+        // Also open WhatsApp Web in new tab
+        const waWebUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(promoText)}`;
+        window.open(waWebUrl, '_blank');
+      }
+    };
 
     // Add to Cart Button
     const addCartBtn = document.getElementById('hero-add-cart-btn');

@@ -283,6 +283,10 @@ module.exports = async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400');
     const cleanTitle = finalTitle.includes('Aarogyam India') ? finalTitle : `${finalTitle} — Aarogyam India`;
 
+    const isWebp = finalOgImage.toLowerCase().endsWith('.webp');
+    const isPng = finalOgImage.toLowerCase().endsWith('.png');
+    const imgMime = isWebp ? 'image/webp' : (isPng ? 'image/png' : 'image/jpeg');
+
     const html = `<!DOCTYPE html>
 <html lang="hi" prefix="og: https://ogp.me/ns#">
 <head>
@@ -298,10 +302,13 @@ module.exports = async function handler(req, res) {
   <meta property="og:description" content="${escapeHtml(finalDesc)}">
   <meta property="og:image" content="${escapeHtml(finalOgImage)}">
   <meta property="og:image:secure_url" content="${escapeHtml(finalOgImage)}">
-  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:type" content="${imgMime}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${escapeHtml(finalTitle)}">
+  <!-- Fallback JPEG image for legacy crawlers -->
+  <meta property="og:image" content="https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg">
+  <meta property="og:image:type" content="image/jpeg">
   <meta property="og:url" content="${escapeHtml(canonicalShareUrl)}">
   <link rel="image_src" href="${escapeHtml(finalOgImage)}">
 
