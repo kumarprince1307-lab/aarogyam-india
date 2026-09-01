@@ -1226,22 +1226,21 @@ export async function initWebinars() {
       localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
     } catch (e) { }
 
-    // Direct server save (replaces Supabase & manual export)
-    fetch('/save-recordings.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recordings: allRecordings })
-    })
-    .then(r => r.json())
-    .then(res => {
-      if (res.status !== 'ok') {
-        console.error('Server save failed', res);
-      }
-    })
-    .catch(err => console.error('Error saving recordings', err));
+    // 2. Sync to GitHub (Zero Egress)
+    try {
+      await fetch('/api/auto-sync-book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_webinar_recordings',
+          recordings: allRecordings
+        })
+      });
+    } catch (err) { }
+
     if (videoModal) videoModal.style.display = 'none';
     renderRecordingsTable();
-    showToast(`🎉 ${format === 'short_reel' ? 'रील' : 'मास्टरक्लास वीडियो'} सफलतापूर्वक सेव हो गया!`, 'success');
+    showToast(`🎉 ${format === 'short_reel' ? 'रील' : 'मास्टरक्लास वीडियो'} सफलतापूर्वक GitHub पर प्रकाशित हो गया!`, 'success');
   });
 
   function getSupabaseDb() {

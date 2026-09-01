@@ -800,6 +800,72 @@
       z-index: 2;
     }
 
+    .wb-card-share-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(45, 140, 255, 0.4);
+      color: #38bdf8;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .wb-card-share-badge:hover {
+      background: #2563eb;
+      color: #fff;
+      transform: scale(1.15);
+      box-shadow: 0 0 15px rgba(37, 99, 235, 0.8);
+    }
+
+    /* AarogyamTube Global Floating Pill */
+    .at-floating-pill {
+      position: fixed;
+      bottom: 24px;
+      left: 16px;
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.5), 0 0 12px rgba(239, 68, 68, 0.4);
+      z-index: 999;
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .at-floating-pill:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 30px rgba(220, 38, 38, 0.7);
+    }
+
+    .at-pill-live-dot {
+      width: 8px;
+      height: 8px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: atPulse 1.5s infinite;
+    }
+
+    @keyframes atPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+    }
+
     .wb-reel-play-overlay {
       position: absolute;
       inset: 0;
@@ -1927,35 +1993,67 @@
         const pendingWrap = document.getElementById('wb_timer_pending');
 
         if (!masterData.date) {
-          digitWrap.style.display = 'none';
-          pendingWrap.style.display = 'block';
+          if (digitWrap) digitWrap.style.display = 'none';
+          if (pendingWrap) pendingWrap.style.display = 'block';
           return;
         }
 
-        digitWrap.style.display = 'flex';
-        pendingWrap.style.display = 'none';
+        if (digitWrap) digitWrap.style.display = 'flex';
+        if (pendingWrap) pendingWrap.style.display = 'none';
 
         const tTime = masterData.time || '20:00';
         const [y, m, d] = masterData.date.split('-').map(Number);
         const [hh, mm] = tTime.split(':').map(Number);
         const targetTs = new Date(y, m - 1, d, hh, mm, 0).getTime();
+        const durationMins = masterData.duration_minutes || 90;
+        const endTs = targetTs + (durationMins * 60 * 1000);
 
         function updateTimer() {
           const now = Date.now();
-          const diff = targetTs - now;
+          const diffToStart = targetTs - now;
+          const diffToEnd = endTs - now;
+          const isTwoMinBefore = diffToStart <= (2 * 60 * 1000);
 
-          if (diff <= 0) {
+          const joinBtn = document.getElementById('wb_direct_join_btn');
+          const timerStatusLabel = document.getElementById('wb_timer_status_label');
+
+          // STAGE 3: Session Ended
+          if (diffToEnd <= 0) {
             document.getElementById('wb_days').textContent = '00';
             document.getElementById('wb_hours').textContent = '00';
             document.getElementById('wb_mins').textContent = '00';
             document.getElementById('wb_secs').textContent = '00';
+            if (timerStatusLabel) timerStatusLabel.innerHTML = '⏰ <strong>आज का लाइव सत्र समाप्त हो चुका है। नीचे रिकॉर्डेड वीडियो व शॉर्ट्स देखें।</strong>';
+            if (joinBtn) {
+              joinBtn.style.background = '#475569';
+              joinBtn.textContent = '🎬 AarogyamTube वीडियो देखें';
+              joinBtn.href = '#wb_shorts_section';
+              joinBtn.onclick = null;
+            }
             return;
           }
 
-          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          const secs = Math.floor((diff % (1000 * 60)) / 1000);
+          // STAGE 2: Live Now (or 2 Min Before Start)
+          if (isTwoMinBefore) {
+            document.getElementById('wb_days').textContent = '00';
+            document.getElementById('wb_hours').textContent = '00';
+            document.getElementById('wb_mins').textContent = '00';
+            document.getElementById('wb_secs').textContent = '00';
+            if (timerStatusLabel) timerStatusLabel.innerHTML = '🟢 <strong>लाइव क्लास चालू है! नीचे बटन दबाकर ज़ूम से जुड़ें।</strong>';
+            if (joinBtn) {
+              joinBtn.style.background = 'linear-gradient(135deg, #16a34a, #22c55e)';
+              joinBtn.innerHTML = '🟢 Join Zoom Meeting Now <i class="fa-solid fa-arrow-right"></i>';
+              joinBtn.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.6)';
+            }
+            return;
+          }
+
+          // STAGE 1: Upcoming Countdown
+          if (timerStatusLabel) timerStatusLabel.innerHTML = '⏳ <strong>लाइव ज़ूम वेबिनार प्रारंभ होने में शेष समय:</strong>';
+          const days = Math.floor(diffToStart / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diffToStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const mins = Math.floor((diffToStart % (1000 * 60 * 60)) / (1000 * 60));
+          const secs = Math.floor((diffToStart % (1000 * 60)) / 1000);
 
           document.getElementById('wb_days').textContent = String(days).padStart(2, '0');
           document.getElementById('wb_hours').textContent = String(hours).padStart(2, '0');
@@ -2015,7 +2113,7 @@
         // Instantly unlock UI without network delay
         showUnlockedScreen();
 
-        // Background asynchronous registration log (non-blocking)
+        // Background asynchronous registration log (non-blocking zero-egress)
         if (db) {
           setTimeout(async () => {
             try {
@@ -2025,8 +2123,9 @@
                 source: 'webinar',
                 source_of_registration: 'webinar',
                 occupation: 'webinar_attendee',
-                notes: `Registered for Webinar: ${masterData.title}`,
-                event_type: 'webinar_registration'
+                notes: `Registered for AarogyamTube Webinar: ${masterData.title}`,
+                event_type: 'webinar_registration',
+                category_answers: { referrer_share_id: refShareId, webinar_id: masterData.id || 'WB_MASTER' }
               }]);
             } catch (err) { }
           }, 50);
@@ -2058,8 +2157,32 @@
         if (!joinUrl && masterData.meeting_id) {
           joinUrl = `https://zoom.us/j/${masterData.meeting_id.replace(/[^0-9]/g, '')}${masterData.passcode ? '?pwd=' + encodeURIComponent(masterData.passcode) : ''}`;
         }
-        document.getElementById('wb_direct_join_btn').href = joinUrl || 'https://zoom.us/join';
+        const directBtn = document.getElementById('wb_direct_join_btn');
+        if (directBtn) {
+          directBtn.href = joinUrl || 'https://zoom.us/join';
+          directBtn.onclick = function() {
+            window.trackZoomAttendance();
+          };
+        }
       }
+
+      // Track Live Attendance upon clicking Join Zoom
+      window.trackZoomAttendance = function() {
+        const mobile = localStorage.getItem('aim_user_mobile') || 'guest';
+        const name = localStorage.getItem('aim_user_name') || 'किसान साथी';
+        if (db) {
+          db.from('surveys').insert([{
+            phone_number: mobile,
+            name: name,
+            source: 'webinar',
+            source_of_registration: 'webinar',
+            occupation: 'webinar_attendee',
+            notes: `Joined Zoom Meeting: ${masterData.title}`,
+            event_type: 'webinar_attendance',
+            category_answers: { webinar_id: masterData.id || 'WB_MASTER', joined_at: new Date().toISOString() }
+          }]).catch(() => {});
+        }
+      };
 
       window.copyWbCred = function (type) {
         const val = type === 'mid' ? masterData.meeting_id : masterData.passcode;
@@ -2071,34 +2194,55 @@
 
       // Social Share Handlers
       window.shareWbWhatsApp = function () {
-        const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
+        const shareLink = `https://aarogyamindia.online/api/share?type=webinar&share_id=${encodeURIComponent(refShareId)}`;
         const msg = `🔴 *${masterData.title}*\n\n📅 समय: ${document.getElementById('wb_date_label')?.textContent || 'आज का लाइव सत्र'}\n\n👉 *मुफ्त ज़ूम लिंक व सीट बुकिंग के लिए यहाँ क्लिक करें:*\n${shareLink}\n\n(ज़ूम लिंक और पासवर्ड समय पर खुलेगा)\n\n सादर,\n${localStorage.getItem('aim_user_name') || 'Aarogyam India'}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
       };
 
       window.shareWbFacebook = function () {
-        const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
+        const shareLink = `https://aarogyamindia.online/api/share?type=webinar&share_id=${encodeURIComponent(refShareId)}`;
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`, '_blank', 'width=600,height=400');
       };
 
       window.copyWbShareLink = function () {
-        const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
+        const shareLink = `https://aarogyamindia.online/api/share?type=webinar&share_id=${encodeURIComponent(refShareId)}`;
         navigator.clipboard.writeText(shareLink).then(() => {
           alert('📋 रेफरल शेयर लिंक कॉपी हो गया:\n' + shareLink);
         });
       };
 
       window.shareWbNative = function () {
-        const shareLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(refShareId)}`;
+        const shareLink = `https://aarogyamindia.online/api/share?type=webinar&share_id=${encodeURIComponent(refShareId)}`;
         if (navigator.share) {
           navigator.share({
             title: masterData.title,
-            text: masterData.description || 'Aarogyam India Live Zoom Masterclass',
+            text: masterData.description || 'AarogyamTube Live Zoom Masterclass',
             url: shareLink
           }).catch(() => { });
         } else {
           window.shareWbWhatsApp();
         }
+      };
+
+      // Individual Video / Short Sharing
+      window.shareIndividualVideo = function (vidId, vidTitle) {
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vidId)}&share_id=${encodeURIComponent(userShare)}`;
+        const promoText = `🎬 *${vidTitle}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+
+        if (navigator.share) {
+          navigator.share({
+            title: vidTitle,
+            text: promoText,
+            url: shareUrl
+          }).catch(() => {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+          });
+          return;
+        }
+
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
       // -------------------------------------------------------------
@@ -2141,6 +2285,9 @@
                 <div class="wb-reel-play-overlay">
                   <div class="wb-reel-play-icon"><i class="fa-solid fa-play"></i></div>
                 </div>
+                <button type="button" class="wb-card-share-badge" onclick="event.stopPropagation(); window.shareIndividualVideo('${r.id}', '${r.title.replace(/'/g, "\\'")}')" title="WhatsApp पर शेयर करें">
+                  <i class="fa-solid fa-share-nodes"></i>
+                </button>
               </div>
               <div class="wb-reel-card-info">
                 <div class="wb-reel-card-title">${r.title}</div>
@@ -2185,13 +2332,15 @@ if (wbShortsSeeMoreBtn) {
         loadReelAtIndex(currentReelIndex);
 
         document.getElementById('wb_reels_modal')?.classList.add('active');
-        // Hide floating action buttons & bottom nav
+        // Hide floating action buttons & bottom nav & lock background scroll
         document.body.classList.add('wb-reels-open');
+        document.body.style.overflow = 'hidden';
       };
 
       window.closeReelsModal = function () {
         document.getElementById('wb_reels_modal')?.classList.remove('active');
         document.body.classList.remove('wb-reels-open');
+        document.body.style.overflow = '';
         const ifr = document.getElementById('wb_reel_iframe');
         if (ifr) ifr.src = '';
       };
@@ -2369,6 +2518,9 @@ if (wbShortsSeeMoreBtn) {
                 <div class="wb-reel-play-overlay">
                   <div class="wb-reel-play-icon"><i class="fa-solid fa-play"></i></div>
                 </div>
+                <button type="button" class="wb-card-share-badge" onclick="event.stopPropagation(); window.shareIndividualVideo('${v.id}', '${v.title.replace(/'/g, "\\'")}')" title="WhatsApp पर शेयर करें">
+                  <i class="fa-solid fa-share-nodes"></i>
+                </button>
               </div>
               <div class="wb-reel-card-info">
                 <div class="wb-reel-card-title">${v.title}</div>

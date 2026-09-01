@@ -293,6 +293,41 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------
+    // ACTION: SAVE WEBINAR MASTER CONFIGURATION (AarogyamTube Live Zoom)
+    // -------------------------------------------------------------
+    if (action === 'save_webinar_master') {
+      if (!payload.webinarMaster) {
+        return sendJson(res, 400, { success: false, error: 'webinarMaster object is required.' });
+      }
+      const webinarMasterData = { webinarMaster: payload.webinarMaster };
+      const updatedWebinarBase64 = Buffer.from(JSON.stringify(webinarMasterData, null, 2), 'utf8').toString('base64');
+      await commitFile('data/webinar-master.json', updatedWebinarBase64, `Update Webinar Master [Auto-Sync]`, token);
+
+      return sendJson(res, 200, {
+        success: true,
+        message: 'Webinar Master successfully published to GitHub.',
+        updatedFiles: ['data/webinar-master.json']
+      });
+    }
+
+    // -------------------------------------------------------------
+    // ACTION: SAVE WEBINAR RECORDINGS & AAROGYAMTUBE VIDEOS / SHORTS
+    // -------------------------------------------------------------
+    if (action === 'save_webinar_recordings') {
+      const recordings = Array.isArray(payload.recordings) ? payload.recordings : [];
+      const recordingsData = { recordings: recordings };
+      const updatedRecsBase64 = Buffer.from(JSON.stringify(recordingsData, null, 2), 'utf8').toString('base64');
+      await commitFile('data/webinar-recordings.json', updatedRecsBase64, `Update AarogyamTube Videos & Recordings (${recordings.length} items) [Auto-Sync]`, token);
+
+      return sendJson(res, 200, {
+        success: true,
+        message: 'AarogyamTube videos and recordings successfully published to GitHub.',
+        total: recordings.length,
+        updatedFiles: ['data/webinar-recordings.json']
+      });
+    }
+
+    // -------------------------------------------------------------
     // ACTION: SAVE / PUBLISH BOOK CATALOG & LANDING PAGE
     // -------------------------------------------------------------
     if (!payload || !payload.pageData || !payload.pageData.id) {

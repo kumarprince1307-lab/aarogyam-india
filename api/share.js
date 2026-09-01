@@ -50,6 +50,60 @@ function getBookLandingPageData(bId) {
   return null;
 }
 
+function getWebinarOrVideoData(id, type, query) {
+  const cleanId = String(id || '').trim();
+  const cleanType = String(type || '').trim().toLowerCase();
+
+  // 1. Specific AarogyamTube Video / Short
+  if (cleanType === 'video' || cleanType === 'short' || cleanId.startsWith('VID_') || cleanId.startsWith('REC_') || query.vid) {
+    const vidId = query.vid || cleanId;
+    try {
+      const recsPath = path.join(process.cwd(), 'data', 'webinar-recordings.json');
+      if (fs.existsSync(recsPath)) {
+        const content = fs.readFileSync(recsPath, 'utf8');
+        const json = JSON.parse(content);
+        const list = json.recordings || [];
+        const found = list.find(r => r.id === vidId || (r.video_url && r.video_url.includes(vidId)));
+        if (found) {
+          const ytId = extractYoutubeVideoId(found.video_url);
+          let thumb = found.thumbnail;
+          if (!thumb && ytId) thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+          return {
+            is_video: true,
+            id: found.id,
+            title: found.title || 'AarogyamTube Video',
+            description: found.description || `${found.speaker || 'आरोग्यम विशेषज्ञ'} — 1-मिनट प्रैक्टिकल गाइड। AarogyamTube पर अभी देखें।`,
+            image: thumb || '/images/banners/aarogyamtube-default-thumb.svg',
+            destUrl: `${HOST_ORIGIN}/webinar.html?vid=${encodeURIComponent(found.id)}`
+          };
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 2. Master Webinar / Live Zoom
+  if (cleanType === 'webinar' || cleanId === 'WB_MASTER' || cleanId === 'webinar' || cleanId === 'zoom') {
+    try {
+      const wbPath = path.join(process.cwd(), 'data', 'webinar-master.json');
+      if (fs.existsSync(wbPath)) {
+        const content = fs.readFileSync(wbPath, 'utf8');
+        const json = JSON.parse(content);
+        const wm = json.webinarMaster || json || {};
+        return {
+          is_webinar: true,
+          id: wm.id || 'WB_MASTER',
+          title: wm.og_title || wm.title || '🔴 AarogyamTube — लाइव ज़ूम वेबिनार',
+          description: wm.og_description || wm.description || 'लाइव ज़ूम ट्रेनिंग में भाग लें और 1-मिनट के कृषि शॉर्ट्स देखें।',
+          image: wm.og_image || wm.cover_image || '/images/banners/universal-zoom-webinar-og.jpg',
+          destUrl: `${HOST_ORIGIN}/webinar.html`
+        };
+      }
+    } catch (e) {}
+  }
+
+  return null;
+}
+
 function extractYoutubeVideoId(url) {
   if (!url) return null;
   const str = String(url).trim();
@@ -346,7 +400,97 @@ module.exports = async function handler(req, res) {
     return res.status(200).send(html);
   }
 
-  // 2. Fetch record from Supabase if ID provided
+  // 2. Check if ID or Type represents a Webinar or AarogyamTube Video / Reel
+  const wbOrVid = getWebinarOrVideoData(lpId, query.type || query.format, query);
+  if (wbOrVid) {
+    const finalTitle = (wbOrVid.title || queryTitle || 'AarogyamTube').trim();
+    const finalDesc = (wbOrVid.description || queryDesc || 'AarogyamTube पर 1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स देखें।').slice(0, 200).trim();
+    const rawImg = wbOrVid.image || '/images/banners/aarogyamtube-default-thumb.svg';
+    const finalOgImage = rawImg.startsWith('http') ? rawImg : `${HOST_ORIGIN}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`;
+    
+    let destUrl = wbOrVid.destUrl || `${HOST_ORIGIN}/webinar.html`;
+    if (queryShareId) {
+      destUrl += (destUrl.includes('?') ? '&' : '?') + `ref=${encodeURIComponent(queryShareId)}`;
+    }
+    
+    const canonicalShareUrl = `${HOST_ORIGIN}/api/share?${wbOrVid.is_video ? 'type=video&id=' + encodeURIComponent(wbOrVid.id) : 'type=webinar'}${queryShareId ? '&share_id=' + encodeURIComponent(queryShareId) : ''}`;
+
+    const userAgent = String(req.headers['user-agent'] || '');
+    const isCrawler = isBotScraper(userAgent);
+
+    if (!isCrawler && !query.debug) {
+      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
+      return res.redirect(302, destUrl);
+    }
+
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400');
+    const isWebp = finalOgImage.toLowerCase().endsWith('.webp');
+    const isPng = finalOgImage.toLowerCase().endsWith('.png');
+    const imgMime = isWebp ? 'image/webp' : (isPng ? 'image/png' : 'image/jpeg');
+
+    const html = `<!DOCTYPE html>
+<html lang="hi" prefix="og: https://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(finalTitle)}</title>
+
+  <!-- Open Graph / WhatsApp & Facebook Crawlers -->
+  <meta property="fb:app_id" content="966242223397117">
+  <meta property="og:type" content="video.other">
+  <meta property="og:site_name" content="AarogyamTube">
+  <meta property="og:title" content="${escapeHtml(finalTitle)}">
+  <meta property="og:description" content="${escapeHtml(finalDesc)}">
+  <meta property="og:image" content="${escapeHtml(finalOgImage)}">
+  <meta property="og:image:secure_url" content="${escapeHtml(finalOgImage)}">
+  <meta property="og:image:type" content="${imgMime}">
+  <meta property="og:image:alt" content="${escapeHtml(finalTitle)}">
+  <meta property="og:url" content="${escapeHtml(canonicalShareUrl)}">
+  <link rel="image_src" href="${escapeHtml(finalOgImage)}">
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@AarogyamIndia">
+  <meta name="twitter:title" content="${escapeHtml(finalTitle)}">
+  <meta name="twitter:description" content="${escapeHtml(finalDesc)}">
+  <meta name="twitter:image" content="${escapeHtml(finalOgImage)}">
+  <link rel="canonical" href="${escapeHtml(canonicalShareUrl)}">
+
+  <!-- Instant Client-Side Redirection for human visitors -->
+  <script>
+    (function() {
+      try {
+        window.location.replace("${destUrl}");
+      } catch (e) {}
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=${escapeHtml(destUrl)}">
+  </noscript>
+</head>
+<body style="margin:0;padding:0;background:#0B1120;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <div style="background:#131E36;max-width:440px;width:90%;margin:20px auto;padding:28px 20px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.5);text-align:center;border:1px solid #334155;">
+    <div style="display:inline-flex;align-items:center;gap:6px;background:#FF0000;color:#fff;padding:4px 12px;border-radius:8px;font-weight:900;font-size:0.85rem;margin-bottom:12px;">
+      <span>▶</span> <span>AarogyamTube</span>
+    </div>
+    <h2 style="font-size:1.15rem;font-weight:800;color:#F8FAFC;margin:0 0 10px 0;line-height:1.35;">${escapeHtml(finalTitle)}</h2>
+    <p style="font-size:0.88rem;color:#94A3B8;margin:0 0 20px 0;line-height:1.45;">${escapeHtml(finalDesc)}</p>
+    <a href="${escapeHtml(destUrl)}" style="display:block;padding:14px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:800;font-size:1rem;box-shadow:0 4px 12px rgba(37,99,235,0.4);">AarogyamTube पर वीडियो देखें →</a>
+    <div style="margin-top:16px;font-size:0.75rem;color:#64748B;">AarogyamTube • लाइव कृषि व डिजिटल लर्निंग</div>
+  </div>
+  <script>
+    setTimeout(function() {
+      try { window.location.href = "${destUrl}"; } catch(e) {}
+    }, 150);
+  </script>
+</body>
+</html>`;
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(html);
+  }
+
+  // 3. Fetch record from Supabase if ID provided
   let lp = null;
   if (lpId) {
     try {
