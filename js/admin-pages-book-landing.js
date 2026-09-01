@@ -1495,19 +1495,6 @@ export async function initBookLandingPages() {
       }
     } catch (e) {}
 
-    // Filter out permanently deleted pages (except core ad books BK001 and BK002)
-    try {
-      const deletedIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');
-      if (Array.isArray(deletedIds) && deletedIds.length > 0) {
-        allLandingPages = allLandingPages.filter(p => {
-          if (!p || !p.id) return false;
-          const idUpper = p.id.trim().toUpperCase();
-          if (idUpper === 'BK001' || idUpper === 'BK002') return true;
-          return !deletedIds.includes(idUpper);
-        });
-      }
-    } catch (e) {}
-
     updateKPIs();
     renderTable();
   }
@@ -3460,11 +3447,16 @@ export async function initBookLandingPages() {
     }
 
     if (syncSuccess) {
+      try {
+        let deletedIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');
+        deletedIds = deletedIds.filter(id => id !== bId);
+        localStorage.setItem('AAROGYAM_DELETED_LANDING_PAGES', JSON.stringify(deletedIds));
+      } catch (e) {}
+
       showToast(`🎉 बुक (${bId}) 100% लाइव सिंक हो गई! (GitHub Commit सफल, 20-30s में लाइव)`, 'success');
       builderCard.style.display = 'none';
       resetBookBuilder();
-      updateKPIs();
-      renderTable();
+      await loadAllData();
     } else {
       showToast(`❌ लाइव सिंक विफल: ${syncErrorMsg}`, 'error');
       // Keep builder card open so user does not lose input
