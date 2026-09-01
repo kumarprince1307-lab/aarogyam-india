@@ -177,11 +177,9 @@ class UniversalShareEngine {
         return url.toString();
     }
 
-    // Use the Web Share API for a native mobile sharing experience (With 100% WhatsApp Fallback)
+    // Use the Web Share API for a native mobile sharing experience (With 100% Fallback)
     nativeShare(title, text, url, button) {
-        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-
-        if (navigator.share && isMobile) {
+        if (navigator.share) {
             if (UniversalShareEngine.isSharing) return;
             UniversalShareEngine.isSharing = true;
 
@@ -194,8 +192,7 @@ class UniversalShareEngine {
                 this._showConfirmation(button, '✅ Shared!');
             })
             .catch((error) => {
-                if (error.name !== 'AbortError') {
-                    // If native share fails or canceled with error, fallback to WhatsApp
+                if (error && error.name !== 'AbortError') {
                     this.whatsAppShare(text, url, button);
                 }
             })
@@ -207,8 +204,16 @@ class UniversalShareEngine {
             return;
         }
 
-        // On desktop or when native share is unavailable, immediately trigger WhatsApp
-        this.whatsAppShare(text, url, button);
+        // On desktop browsers without Web Share API, copy link & open WhatsApp Web
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (isMobile) {
+            this.whatsAppShare(text, url, button);
+        } else {
+            this.copyToClipboard(url, button);
+            const fullMsg = (text && text.includes(url)) ? text : `${text}\n\n👉 अभी ऑर्डर करें:\n${url}`;
+            const waWebUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(fullMsg)}`;
+            window.open(waWebUrl, '_blank');
+        }
     }
 
     // Open WhatsApp share link (Mobile & Desktop Web)

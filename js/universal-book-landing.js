@@ -47,14 +47,35 @@
       ? `${customPromo}\n\n👉 अभी पुस्तक देखें और ऑर्डर करें:\n${shareUrl}`
       : `🌾 *${title}*\n${hero.subtitle || hero.description || 'सम्पूर्ण वैज्ञानिक एवं Practical समाधान।'}\n\n👉 विशेष छूट पर अभी देखें:\n${shareUrl}`;
 
-    // 4. Mobile WhatsApp / WebShare Trigger
+    // 4. Native Share Trigger (Mobile / Supported Browsers)
+    if (navigator.share) {
+      navigator.share({
+        title: title,
+        text: promoText,
+        url: shareUrl
+      }).catch((err) => {
+        if (err && err.name !== 'AbortError') {
+          const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+          const waUrl = isMobile 
+            ? `https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}` 
+            : `https://web.whatsapp.com/send?text=${encodeURIComponent(promoText)}`;
+          window.open(waUrl, '_blank');
+        }
+      });
+      return;
+    }
+
+    // 5. Fallback for Desktop without Native Share API
     const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    const waUrl = isMobile 
+      ? `https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}` 
+      : `https://web.whatsapp.com/send?text=${encodeURIComponent(promoText)}`;
 
     // Show visual confirmation toast
     const toast = document.getElementById('cart-toast-notif');
     const toastMsg = document.getElementById('cart-toast-msg');
     if (toast && toastMsg) {
-      toastMsg.textContent = '📲 WhatsApp शेयर खुल रहा है...';
+      toastMsg.textContent = isMobile ? '📲 WhatsApp शेयर खुल रहा है...' : '📋 शेयर लिंक व संदेश कॉपी हो गया!';
       toast.style.opacity = '1';
       toast.style.transform = 'translateY(0)';
       toast.style.pointerEvents = 'auto';
@@ -67,21 +88,6 @@
 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(promoText).catch(() => {});
-    }
-
-    const waUrl = isMobile 
-      ? `https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}` 
-      : `https://web.whatsapp.com/send?text=${encodeURIComponent(promoText)}`;
-
-    if (navigator.share && isMobile) {
-      navigator.share({
-        title: title,
-        text: promoText,
-        url: shareUrl
-      }).catch(() => {
-        window.location.href = waUrl;
-      });
-      return;
     }
 
     const win = window.open(waUrl, '_blank');
