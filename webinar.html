@@ -2358,6 +2358,8 @@ if (wbShortsSeeMoreBtn) {
             appBtn.style.display = 'none';
           }
         }
+        if (ifr) ifr.src = embedSrc;
+      }
 
       window.shareCurrentReelWhatsApp = function () {
         const reel = activeReelsList[currentReelIndex];
