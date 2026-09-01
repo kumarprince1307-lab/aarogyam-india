@@ -202,6 +202,68 @@ module.exports = async function handler(req, res) {
     }
 
     const payload = await parseBody(req);
+    const action = payload.action || 'save';
+
+    // -------------------------------------------------------------
+    // DELETE ACTION
+    // -------------------------------------------------------------
+    if (action === 'delete') {
+      const deleteBookId = String(payload.bookId || payload.pageData?.id || '').trim().toUpperCase();
+      if (!deleteBookId) {
+        return sendJson(res, 400, { success: false, error: 'Book ID is required for delete.' });
+      }
+
+      // STRICT PROTECTION FOR BK001 & BK002
+      if (deleteBookId === 'BK001' || deleteBookId === 'BK002') {
+        return sendJson(res, 403, {
+          success: false,
+          error: `Security Rule Violation: ${deleteBookId} is a protected core landing page and cannot be deleted.`
+        });
+      }
+
+      const deleteCommitLog = [];
+
+      // 1. Remove from data/universal-book-landing-pages.json
+      const landingFile = await getFileContent('data/universal-book-landing-pages.json', token);
+      let landingJson = { bookLandingPages: [] };
+      if (landingFile && landingFile.content) {
+        try { landingJson = JSON.parse(landingFile.content); } catch (e) {}
+      }
+      if (Array.isArray(landingJson.bookLandingPages)) {
+        landingJson.bookLandingPages = landingJson.bookLandingPages.filter(
+          p => p && p.id && String(p.id).trim().toUpperCase() !== deleteBookId
+        );
+      }
+      const updatedLandingBase64 = Buffer.from(JSON.stringify(landingJson, null, 2), 'utf8').toString('base64');
+      await commitFile('data/universal-book-landing-pages.json', updatedLandingBase64, `Delete landing page ${deleteBookId} [Auto-Sync]`, token);
+      deleteCommitLog.push('data/universal-book-landing-pages.json');
+
+      // 2. Remove from data/books.json
+      const booksFile = await getFileContent('data/books.json', token);
+      let booksJson = { books: [] };
+      if (booksFile && booksFile.content) {
+        try { booksJson = JSON.parse(booksFile.content); } catch (e) {}
+      }
+      if (Array.isArray(booksJson.books)) {
+        booksJson.books = booksJson.books.filter(
+          b => b && b.id && String(b.id).trim().toUpperCase() !== deleteBookId
+        );
+      }
+      const updatedBooksBase64 = Buffer.from(JSON.stringify(booksJson, null, 2), 'utf8').toString('base64');
+      await commitFile('data/books.json', updatedBooksBase64, `Delete book ${deleteBookId} from catalog [Auto-Sync]`, token);
+      deleteCommitLog.push('data/books.json');
+
+      return sendJson(res, 200, {
+        success: true,
+        message: `Book ${deleteBookId} deleted from GitHub repository. Vercel auto-deployment triggered.`,
+        bookId: deleteBookId,
+        updatedFiles: deleteCommitLog
+      });
+    }
+
+    // -------------------------------------------------------------
+    // SAVE / PUBLISH ACTION
+    // -------------------------------------------------------------
     if (!payload || !payload.pageData || !payload.pageData.id) {
       return sendJson(res, 400, { success: false, error: 'Invalid payload: pageData and Book ID are required.' });
     }

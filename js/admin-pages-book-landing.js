@@ -263,8 +263,30 @@ export async function initBookLandingPages() {
                   📐 600 × 800 px (3:4)
                 </span>
               </div>
-              <input type="file" id="blp_file_cover" accept="image/*" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem; margin-bottom: 6px;" />
-              <input type="text" id="blp_cover_url" class="admin-input" placeholder="या इमेज URL / Path दर्ज करें" required style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+              <div style="margin-bottom: 8px;">
+                <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted);">Option A: GitHub रिपॉजिटरी की इमेज चुनें:</label>
+                <select id="blp_select_git_cover" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;">
+                  <option value="">-- GitHub से कवर इमेज चुनें --</option>
+                  <option value="/images/books/sabji-kheti-guide-cover.webp">🌾 सब्जी खेती गाइड (सब्जियों की वैज्ञानिक खेती)</option>
+                  <option value="/images/books/kharif-master-guide-2026-cover.webp">🌾 खरीफ फसल मास्टर गाइड 2026</option>
+                  <option value="/images/books/fasal-ka-doctor-cover.webp">🌿 खेती का डॉक्टर (Pocket Doctor)</option>
+                  <option value="/images/books/dhan-master-guide-cover.webp">🌾 धान मास्टर गाइड</option>
+                  <option value="/images/books/gehu-master-guide-cover.webp">🌾 गेहूँ मास्टर गाइड</option>
+                  <option value="/images/books/soyabean-master-guide-cover.webp">🌾 सोयाबीन मास्टर गाइड</option>
+                  <option value="/images/books/makka-master-guide-cover.webp">🌾 मक्का मास्टर गाइड</option>
+                  <option value="/images/books/jaivik-kheti-guide-cover.webp">🌱 जैविक खेती गाइड</option>
+                  <option value="/images/books/phool-kheti-guide-cover.webp">🌸 फूल खेती गाइड</option>
+                  <option value="/images/books/polyhouse-nethouse-guide-cover.webp">🏡 पॉलीहाउस व नेटहाउस गाइड</option>
+                  <option value="/images/books/anaj-bhandaran-guide-cover.webp">🌾 अनाज भंडारण गाइड</option>
+                  <option value="/images/books/chawal-processing-guide-cover.webp">🍚 चावल प्रोसेसिंग गाइड</option>
+                  <option value="/images/books/ai-website-guide-cover.webp">🤖 AI वेबसाइट गाइड</option>
+                </select>
+              </div>
+              <div style="margin-bottom: 6px;">
+                <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted);">Option B: कंप्यूटर से नई फ़ाइल अपलोड करें:</label>
+                <input type="file" id="blp_file_cover" accept="image/*" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem; margin-bottom: 6px;" />
+              </div>
+              <input type="text" id="blp_cover_url" class="admin-input" placeholder="इमेज URL / Path दर्ज करें" required style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
               <div style="margin-top: 10px; text-align: center; background: rgba(0,0,0,0.4); padding: 14px; border-radius: 8px;">
                 <img id="blp_preview_cover_img" src="/images/books/kharif-master-guide-2026-cover.webp" alt="Cover Preview" style="height: 180px; width: auto; max-width: 140px; object-fit: contain; margin: 0 auto; border-radius: 10px; box-shadow: -8px 15px 30px rgba(0,0,0,0.5);" />
               </div>
@@ -280,8 +302,25 @@ export async function initBookLandingPages() {
                   📐 1734 × 907 px (16:9)
                 </span>
               </div>
-              <input type="file" id="blp_file_banner" accept="image/*" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem; margin-bottom: 6px;" />
-              <input type="text" id="blp_banner_url" class="admin-input" placeholder="या इमेज URL / Path दर्ज करें" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+              <div style="margin-bottom: 8px;">
+                <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted);">Option A: GitHub रिपॉजिटरी का बैनर चुनें:</label>
+                <select id="blp_select_git_banner" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;">
+                  <option value="">-- GitHub से बैनर चुनें --</option>
+                  <option value="/images/banners/kharif-master-guide-2026-hero-banner.webp">🌾 खरीफ मास्टर गाइड 2026 हीरो बैनर</option>
+                  <option value="/images/banners/agriculture-hero-banner-1.webp">🌾 कृषि हीरो बैनर 1</option>
+                  <option value="/images/banners/agriculture-hero-banner-2.webp">🌾 कृषि हीरो बैनर 2</option>
+                  <option value="/images/banners/agriculture-hero-banner-3.webp">🌾 कृषि हीरो बैनर 3</option>
+                  <option value="/images/banners/digital-training-banner.jpeg">💻 डिजिटल ट्रेनिंग व करियर प्लान बैनर (Zoom)</option>
+                  <option value="/images/banners/webinar-live-banner.webp">🎥 लाइव वेबिनार बैनर</option>
+                  <option value="/images/banners/achievers-banner.jpeg">🏆 अचीवर्स बैनर</option>
+                  <option value="/images/banners/offer-banner-kharif-2026.webp">⚡ खरीफ स्पेशल ऑफर बैनर</option>
+                </select>
+              </div>
+              <div style="margin-bottom: 6px;">
+                <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted);">Option B: कंप्यूटर से नया बैनर अपलोड करें:</label>
+                <input type="file" id="blp_file_banner" accept="image/*" class="admin-input" style="width: 100%; padding: 6px; font-size: 0.78rem; margin-bottom: 6px;" />
+              </div>
+              <input type="text" id="blp_banner_url" class="admin-input" placeholder="इमेज URL / Path दर्ज करें" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
               <div style="margin-top: 10px; text-align: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px;">
                 <img id="blp_preview_banner_img" src="/images/banners/kharif-master-guide-2026-hero-banner.webp" alt="Banner Preview" style="height: 140px; width: 100%; object-fit: cover; border-radius: 6px; border: 1px solid var(--admin-border);" />
               </div>
@@ -1220,10 +1259,33 @@ export async function initBookLandingPages() {
     renderTocPointsInBuilder();
   });
 
-  document.getElementById('btn_add_faq_item')?.addEventListener('click', () => {
-    currentFaqs.push({ q: 'नया प्रश्न यहाँ लिखें?', a: 'उत्तर यहाँ लिखें।' });
-    renderFaqsInBuilder();
+  // GitHub Cover Image Dropdown Sync
+  document.getElementById('blp_select_git_cover')?.addEventListener('change', (e) => {
+    if (e.target.value) {
+      const val = e.target.value;
+      const urlInput = document.getElementById('blp_cover_url');
+      const prevImg = document.getElementById('blp_preview_cover_img');
+      if (urlInput) urlInput.value = val;
+      if (prevImg) prevImg.src = val;
+      showToast(`📸 GitHub कवर इमेज चुनी गई: ${val}`, 'info');
+    }
   });
+
+  // GitHub Hero Banner Dropdown Sync
+  document.getElementById('blp_select_git_banner')?.addEventListener('change', (e) => {
+    if (e.target.value) {
+      const val = e.target.value;
+      const urlInput = document.getElementById('blp_banner_url');
+      const prevImg = document.getElementById('blp_preview_banner_img');
+      if (urlInput) urlInput.value = val;
+      if (prevImg) prevImg.src = val;
+      showToast(`🖼️ GitHub बैनर चुना गया: ${val}`, 'info');
+    }
+  });
+
+  // Wire up Live Image Preview & FileReader for Cover & Banner
+  setupImagePreview('blp_file_cover', 'blp_cover_url', 'blp_preview_cover_img');
+  setupImagePreview('blp_file_banner', 'blp_banner_url', 'blp_preview_banner_img');
 
   await loadAllData();
 
@@ -2711,11 +2773,16 @@ export async function initBookLandingPages() {
     });
   };
 
-  window.deleteBookLandingPage = function(bId) {
+  window.deleteBookLandingPage = async function(bId) {
     if (!bId) return;
-    if (!confirm(`क्या आप वाकई बुक लैंडिंग पेज (${bId}) को हटाना चाहते हैं?`)) return;
+    if (!confirm(`क्या आप वाकई बुक लैंडिंग पेज (${bId}) को सर्वर व GitHub से हमेशा के लिए हटाना चाहते हैं?`)) return;
 
     const bIdUpper = bId.trim().toUpperCase();
+    if (bIdUpper === 'BK001' || bIdUpper === 'BK002') {
+      showToast(`⚠️ सुरक्षा नियम: ${bIdUpper} मुख्य सुरक्षित बुक है और इसे हटाया नहीं जा सकता।`, 'error');
+      return;
+    }
+
     allLandingPages = allLandingPages.filter(p => p.id && p.id.trim().toUpperCase() !== bIdUpper);
     try {
       localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
@@ -2734,7 +2801,26 @@ export async function initBookLandingPages() {
 
     updateKPIs();
     renderTable();
-    showToast(`🗑️ बुक लैंडिंग पेज (${bId}) तुरंत हटा दिया गया।`, 'info');
+    showToast(`⏳ बुक (${bIdUpper}) को GitHub सर्वर से हटाया जा रहा है...`, 'info');
+
+    try {
+      const delRes = await fetch('/api/auto-sync-book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete',
+          bookId: bIdUpper
+        })
+      });
+      const delData = await delRes.json();
+      if (delRes.ok && delData.success) {
+        showToast(`🗑️ बुक (${bIdUpper}) GitHub सर्वर से 100% डिलीट हो गई! (लाइव अपडेट 20s में)`, 'success');
+      } else {
+        showToast(`⚠️ सर्वर से हटाने में समस्या: ${delData.error || 'Unknown error'}`, 'error');
+      }
+    } catch (err) {
+      showToast(`⚠️ नेटवर्क त्रुटि: ${err.message}`, 'error');
+    }
   };
 
   function fileToBase64(file) {
