@@ -1,6 +1,24 @@
 {
   "recordings": [
     {
+      "id": "VID_S218514",
+      "format": "short_reel",
+      "platform": "youtube",
+      "title": "चना बीज उपचार: सही तरीका 🌱",
+      "description": "🌱 चना की बुवाई से पहले बीज उपचार जरूर करें!\nजानिए जैविक तरीके से चने के बीजों का उपचार कैसे करें, ताकि बीजों का अंकुरण बेहतर हो और फसल को स्वस्थ शुरुआत मिले।\n👉 सही बीज उपचार • स्वस्थ फसल • बेहतर उत्पादन\n@AAROGYAMINDIA",
+      "subject": "Crop Protection",
+      "category": "Crop Protection",
+      "video_url": "https://youtube.com/shorts/mHRWuIRq604?si=9fMrz_evXwzAXp3i",
+      "youtube_url": "https://youtube.com/shorts/mHRWuIRq604?si=9fMrz_evXwzAXp3i",
+      "youtube_id": "mHRWuIRq604",
+      "thumbnail": "https://img.youtube.com/vi/mHRWuIRq604/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "all",
+      "status": "active",
+      "created_at": "2026-09-01T18:26:58.514Z"
+    },
+    {
       "id": "VID_S214954",
       "format": "short_reel",
       "platform": "youtube",
