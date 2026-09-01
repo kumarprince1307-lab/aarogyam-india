@@ -1542,6 +1542,33 @@ export async function initBookLandingPages() {
       }
     } catch (e) {}
 
+    // Auto-merge all catalog books from books.json so every single book appears in table
+    allBooks.forEach(b => {
+      if (b && b.id) {
+        const cleanId = String(b.id).trim().toUpperCase();
+        const found = allLandingPages.find(p => p && p.id && String(p.id).trim().toUpperCase() === cleanId);
+        if (!found) {
+          allLandingPages.push({
+            id: b.id,
+            category: b.category || 'Agriculture',
+            status: b.isComingSoon ? 'draft' : 'active',
+            store_badge: b.isComingSoon ? 'coming_soon' : (b.badge || 'best_seller'),
+            is_coming_soon: Boolean(b.isComingSoon),
+            theme_primary: '#2E7D32',
+            publish_targets: ['ebook_store', 'category_page', 'my_library', 'home_page'],
+            hero: {
+              title: b.heading || b.name || b.id,
+              subtitle: b.subheading || '',
+              description: b.description || '',
+              mrp: b.mrp || 299,
+              offer_price: b.offerPrice || 99,
+              cover_image: b.cover || b.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp'
+            }
+          });
+        }
+      }
+    });
+
     updateKPIs();
     renderTable();
   }
@@ -1569,8 +1596,9 @@ export async function initBookLandingPages() {
 
     const q = (searchInput?.value || '').toLowerCase().trim();
     const filtered = allLandingPages.filter(p => {
+      if (!p) return false;
       const id = (p.id || '').toLowerCase();
-      const title = (p.hero?.title || '').toLowerCase();
+      const title = (p.hero?.title || p.heading || p.name || '').toLowerCase();
       const cat = (p.category || '').toLowerCase();
       return id.includes(q) || title.includes(q) || cat.includes(q);
     });
@@ -1603,16 +1631,17 @@ export async function initBookLandingPages() {
             const isComingSoon = p.is_coming_soon === true || p.store_badge === 'coming_soon';
             const themeCol = p.theme_primary || '#2E7D32';
             const badgeText = p.store_badge || 'best_seller';
-            const targets = p.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page'];
+            const rawTargets = p.publish_targets;
+            const targets = Array.isArray(rawTargets) ? rawTargets : (typeof rawTargets === 'string' ? rawTargets.split(',') : ['ebook_store', 'category_page', 'my_library', 'home_page']);
 
             return `
               <tr>
                 <td><strong style="font-family:monospace;color:${themeCol};font-size:1rem;">${p.id}</strong></td>
                 <td>
-                  <img src="${p.hero?.cover_image || '/images/books/kharif-master-guide-2026-cover.webp'}" alt="Cover" style="width:42px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--admin-border);" />
+                  <img src="${p.hero?.cover_image || p.cover || '/images/books/kharif-master-guide-2026-cover.webp'}" alt="Cover" style="width:42px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--admin-border);" />
                 </td>
                 <td>
-                  <div style="font-weight:800;color:var(--admin-text);font-size:0.92rem;">${p.hero?.title || 'Untitled'}</div>
+                  <div style="font-weight:800;color:var(--admin-text);font-size:0.92rem;">${p.hero?.title || p.heading || p.name || 'Untitled'}</div>
                   <div style="font-size:0.75rem;color:#16a34a;font-weight:700;">📁 ${p.category || 'Agriculture'}</div>
                 </td>
                 <td>
@@ -1622,12 +1651,12 @@ export async function initBookLandingPages() {
                     </span>
                   </div>
                   <div style="font-size:0.7rem;color:var(--admin-muted);">
-                    ${targets.map(t => `<span style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;margin-right:3px;">${t.replace('_', ' ')}</span>`).join('')}
+                    ${targets.map(t => `<span style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;margin-right:3px;">${String(t).replace('_', ' ')}</span>`).join('')}
                   </div>
                 </td>
                 <td>
-                  <strong style="color:#16a34a;font-size:1rem;">₹${p.hero?.offer_price || 99}</strong>
-                  <span style="font-size:0.75rem;color:var(--admin-muted);text-decoration:line-through;margin-left:4px;">₹${p.hero?.mrp || 299}</span>
+                  <strong style="color:#16a34a;font-size:1rem;">₹${p.hero?.offer_price || p.offerPrice || 99}</strong>
+                  <span style="font-size:0.75rem;color:var(--admin-muted);text-decoration:line-through;margin-left:4px;">₹${p.hero?.mrp || p.mrp || 299}</span>
                 </td>
                 <td>
                   <div style="display:flex;flex-direction:column;gap:4px;">
