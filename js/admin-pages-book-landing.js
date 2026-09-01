@@ -2832,6 +2832,49 @@ export async function initBookLandingPages() {
     });
   }
 
+  function compressImageFile(file, maxWidth = 1400, quality = 0.85) {
+    return new Promise((resolve) => {
+      if (!file || !file.type || !file.type.startsWith('image/')) {
+        if (file) {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result);
+          r.onerror = () => resolve(null);
+          r.readAsDataURL(file);
+        } else {
+          resolve(null);
+        }
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            let w = img.width;
+            let h = img.height;
+            if (w > maxWidth) {
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/webp', quality);
+            resolve(dataUrl);
+          } catch (err) {
+            resolve(e.target.result);
+          }
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function saveBookLandingPage() {
     const bId = (document.getElementById('blp_input_book_id')?.value || '').trim().toUpperCase();
     const category = document.getElementById('blp_category_select')?.value || 'Agriculture';
@@ -2880,27 +2923,24 @@ export async function initBookLandingPages() {
     const uploadedFiles = [];
     const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
 
-    // 1. Cover Image (File or Data URL)
+    // 1. Cover Image (File or Data URL with auto-compression)
     const coverFileInput = document.getElementById('blp_file_cover');
     let finalCoverPath = coverUrlInput || `/images/books/${bId.toLowerCase()}-cover.webp`;
     if (coverFileInput?.files?.[0]) {
       const cFile = coverFileInput.files[0];
       if (cFile.size > MAX_FILE_SIZE) {
-        showToast(`❌ कवर इमेज 25MB से बड़ी है (${(cFile.size/(1024*1024)).toFixed(1)}MB)। कृपया छोटी इमेज चुनें।`, 'error');
+        showToast(`❌ कवर इमेज 25MB से बड़ी है (${(cFile.size/(1024*1024)).toFixed(1)}MB)।`, 'error');
         return;
       }
-      const b64 = await fileToBase64(cFile);
-      const ext = cFile.name.split('.').pop() || 'webp';
-      finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.${ext}`;
-      uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.${ext}`, base64: b64 });
+      const b64 = await compressImageFile(cFile, 1200, 0.85);
+      finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.webp`;
+      uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.webp`, base64: b64 });
     } else if (coverUrlInput && coverUrlInput.startsWith('data:image/')) {
-      const extMatch = coverUrlInput.match(/data:image\/([a-zA-Z0-9]+);base64,/);
-      const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'webp';
-      finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.${ext}`;
-      uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.${ext}`, base64: coverUrlInput });
+      finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.webp`;
+      uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.webp`, base64: coverUrlInput });
     }
 
-    // 2. Banner Image (File or Data URL)
+    // 2. Banner Image (File or Data URL with auto-compression)
     const bannerFileInput = document.getElementById('blp_file_banner');
     const bannerUrlInput = (document.getElementById('blp_banner_url')?.value || '').trim();
     let finalBannerPath = bannerUrlInput || `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
@@ -2910,24 +2950,19 @@ export async function initBookLandingPages() {
         showToast(`❌ बैनर इमेज 25MB से बड़ी है (${(bFile.size/(1024*1024)).toFixed(1)}MB)।`, 'error');
         return;
       }
-      const b64 = await fileToBase64(bFile);
-      const ext = bFile.name.split('.').pop() || 'webp';
-      finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.${ext}`;
-      uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.${ext}`, base64: b64 });
+      const b64 = await compressImageFile(bFile, 1600, 0.85);
+      finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
+      uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.webp`, base64: b64 });
     } else if (bannerUrlInput && bannerUrlInput.startsWith('data:image/')) {
-      const extMatch = bannerUrlInput.match(/data:image\/([a-zA-Z0-9]+);base64,/);
-      const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'webp';
-      finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.${ext}`;
-      uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.${ext}`, base64: bannerUrlInput });
+      finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
+      uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.webp`, base64: bannerUrlInput });
     }
 
-    // 3. Section Banners (Handle any uploaded Base64 section banners)
-    Object.keys(cleanSectionBanners).forEach((secKey, idx) => {
+    // 3. Section Banners
+    Object.keys(cleanSectionBanners).forEach((secKey) => {
       const sUrl = cleanSectionBanners[secKey];
       if (sUrl && sUrl.startsWith('data:image/')) {
-        const extMatch = sUrl.match(/data:image\/([a-zA-Z0-9]+);base64,/);
-        const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'webp';
-        const sPath = `images/banners/${bId.toLowerCase()}-${secKey}-banner.${ext}`;
+        const sPath = `images/banners/${bId.toLowerCase()}-${secKey}-banner.webp`;
         uploadedFiles.push({ path: sPath, base64: sUrl });
         cleanSectionBanners[secKey] = `/${sPath}`;
       }
@@ -2939,7 +2974,7 @@ export async function initBookLandingPages() {
     if (mainPdfFileInput?.files?.[0]) {
       const pdfFile = mainPdfFileInput.files[0];
       if (pdfFile.size > MAX_FILE_SIZE) {
-        showToast(`❌ मुख्य PDF 25MB से बड़ी है (${(pdfFile.size/(1024*1024)).toFixed(1)}MB)। कृपया इसे Part 1 और Part 2 में बांटें या Compress करें।`, 'error');
+        showToast(`❌ मुख्य PDF 25MB से बड़ी है (${(pdfFile.size/(1024*1024)).toFixed(1)}MB)। कृपया इसे Part 1 और Part 2 में बांटें।`, 'error');
         return;
       }
       const b64 = await fileToBase64(pdfFile);
@@ -2961,14 +2996,12 @@ export async function initBookLandingPages() {
       uploadedFiles.push({ path: `uploads/books/${bId}_free.pdf`, base64: b64 });
     }
 
-    // 6. Demo Images (if base64)
+    // 6. Demo Images
     const cleanedDemoImages = [];
     for (let i = 0; i < currentDemoImages.length; i++) {
       const dImg = currentDemoImages[i];
       if (typeof dImg === 'string' && dImg.startsWith('data:image/')) {
-        const extMatch = dImg.match(/data:image\/([a-zA-Z0-9]+);base64,/);
-        const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'webp';
-        const dPath = `images/books/${bId.toLowerCase()}-preview-${i + 1}.${ext}`;
+        const dPath = `images/books/${bId.toLowerCase()}-preview-${i + 1}.webp`;
         uploadedFiles.push({ path: dPath, base64: dImg });
         cleanedDemoImages.push(`/${dPath}`);
       } else if (dImg) {
@@ -3101,7 +3134,7 @@ export async function initBookLandingPages() {
       else allBooks.unshift(newBookObj);
     } catch (e) {}
 
-    // Trigger Secure Auto Git Sync API
+    // Trigger Secure Modular Auto Git Sync API (Eliminates 413 by uploading files individually)
     const saveButtonEl = document.getElementById('btn_save_book_lp');
     const origSaveText = saveButtonEl ? saveButtonEl.innerHTML : '';
     if (saveButtonEl) {
@@ -3115,13 +3148,39 @@ export async function initBookLandingPages() {
     let syncErrorMsg = '';
 
     try {
+      // Step 1: Upload individual media files (Images, PDFs) separately to stay far below 4.5MB
+      for (let i = 0; i < uploadedFiles.length; i++) {
+        const fileItem = uploadedFiles[i];
+        if (saveButtonEl) {
+          saveButtonEl.innerHTML = `⏳ फ़ाइल (${i + 1}/${uploadedFiles.length}) अपलोड हो रही है...`;
+        }
+        const fileRes = await fetch('/api/auto-sync-book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'upload_asset',
+            path: fileItem.path,
+            base64: fileItem.base64
+          })
+        });
+        const fileData = await fileRes.json().catch(() => ({}));
+        if (!fileRes.ok || !fileData.success) {
+          throw new Error(fileData.error || `फ़ाइल (${fileItem.path}) अपलोड विफल (HTTP ${fileRes.status})`);
+        }
+      }
+
+      // Step 2: Save metadata JSON (Catalog & Landing Page)
+      if (saveButtonEl) {
+        saveButtonEl.innerHTML = '⏳ कैटलॉग व लैंडिंग डेटा सुरक्षित हो रहा है...';
+      }
       const syncRes = await fetch('/api/auto-sync-book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'save',
           pageData,
           bookData: newBookObj,
-          uploadedFiles: uploadedFiles
+          uploadedFiles: [] // Already uploaded in Step 1
         })
       });
 
@@ -3138,7 +3197,7 @@ export async function initBookLandingPages() {
         syncErrorMsg = syncData.error || 'Unknown server error';
       }
     } catch (netErr) {
-      syncErrorMsg = netErr.message || 'Network error connecting to /api/auto-sync-book.js';
+      syncErrorMsg = netErr.message || 'Network error connecting to /api/auto-sync-book';
     } finally {
       if (saveButtonEl) {
         saveButtonEl.disabled = false;

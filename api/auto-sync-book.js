@@ -1,8 +1,11 @@
 // api/auto-sync-book.js
 // Vercel Serverless Function: Zero-Egress Auto Git Sync for Books, Images, and PDFs.
 // Directly commits targeted updates to GitHub without Supabase or exposing secrets.
+// Supports single file upload, chunked large file uploads (<25MB), catalog saving, and deletion.
 
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
 
 const GITHUB_OWNER_REPO = process.env.GITHUB_REPO || 'kumarprince1307-lab/aarogyam-india';
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
@@ -81,7 +84,7 @@ function githubRequest(endpoint, method, token, body = null) {
         path: url.pathname + url.search,
         method: method,
         headers: headers,
-        timeout: 25000
+        timeout: 30000
       };
 
       const req = https.request(options, (res) => {
@@ -205,7 +208,35 @@ module.exports = async function handler(req, res) {
     const action = payload.action || 'save';
 
     // -------------------------------------------------------------
-    // DELETE ACTION
+    // ACTION: UPLOAD SINGLE ASSET (Cover, Banner, Demo Image, Small PDF)
+    // -------------------------------------------------------------
+    if (action === 'upload_asset') {
+      const filePath = String(payload.path || '').replace(/^\/+/, '');
+      const rawBase64 = String(payload.base64 || '').replace(/^data:[^;]+;base64,/, '');
+
+      if (!filePath || !rawBase64) {
+        return sendJson(res, 400, { success: false, error: 'filePath and base64 content are required for upload_asset.' });
+      }
+
+      const byteSize = Buffer.from(rawBase64, 'base64').length;
+      if (byteSize > MAX_FILE_SIZE_BYTES) {
+        return sendJson(res, 400, {
+          success: false,
+          error: `File exceeds GitHub 25MB limit (${(byteSize / (1024 * 1024)).toFixed(1)} MB). Please compress or split.`
+        });
+      }
+
+      const commitRes = await commitFile(filePath, rawBase64, `Upload ${filePath} [Auto-Sync Asset]`, token);
+      return sendJson(res, 200, {
+        success: true,
+        message: `Asset ${filePath} successfully committed to GitHub.`,
+        path: `/${filePath}`,
+        commit: commitRes
+      });
+    }
+
+    // -------------------------------------------------------------
+    // ACTION: DELETE BOOK
     // -------------------------------------------------------------
     if (action === 'delete') {
       const deleteBookId = String(payload.bookId || payload.pageData?.id || '').trim().toUpperCase();
@@ -262,7 +293,7 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------
-    // SAVE / PUBLISH ACTION
+    // ACTION: SAVE / PUBLISH BOOK CATALOG & LANDING PAGE
     // -------------------------------------------------------------
     if (!payload || !payload.pageData || !payload.pageData.id) {
       return sendJson(res, 400, { success: false, error: 'Invalid payload: pageData and Book ID are required.' });
@@ -283,7 +314,7 @@ module.exports = async function handler(req, res) {
 
     const commitLog = [];
 
-    // 1. UPLOAD MEDIA FILES (Images, PDFs)
+    // 1. UPLOAD ANY EMBEDDED MEDIA FILES
     for (const f of uploadedFiles) {
       if (!f || !f.path || !f.base64) continue;
       
