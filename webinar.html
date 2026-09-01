@@ -1722,7 +1722,7 @@
     };
 
     (function () {
-      'use strict';
+'use strict';
 
       const DEFAULT_AAROGYAMTUBE_THUMB = '/images/banners/aarogyamtube-default-thumb.svg';
 
@@ -1811,7 +1811,7 @@
       }
 
       async function loadMasterWebinarData() {
-        // Step 1: Static Git JSON (0 Egress)
+        // Static Git JSON (Zero Egress - Single Source of Truth)
         try {
           const resp = await fetch('/data/webinar-master.json?v=' + Date.now());
           if (resp.ok) {
@@ -1820,38 +1820,10 @@
             if (wm.title) masterData = { ...masterData, ...wm };
           }
         } catch (e) { }
-
-        // Step 2: Overlay LocalStorage draft on admin device (Book landing exact pattern)
-        try {
-          const directStored = localStorage.getItem('AAROGYAM_WEBINAR_MASTER');
-          if (directStored) {
-            const parsed = JSON.parse(directStored);
-            if (parsed && parsed.title) masterData = { ...masterData, ...parsed };
-          }
-        } catch (e) { }
-
-        try {
-          const localStored = JSON.parse(localStorage.getItem('UCAS_LOCAL_LANDING_PAGES') || '[]');
-          const match = localStored.find(p => p.id === webinarId || p.id === 'WB_MASTER' || p.category === 'webinar');
-          if (match && match.webinar_data) {
-            masterData = { ...masterData, ...match.webinar_data, title: match.title || masterData.title };
-          }
-        } catch (e) { }
-
-        // Step 3: Permanent Supabase Cloud Sync
-        if (db) {
-          try {
-            const { data } = await db.from('landing_pages').select('*').eq('id', webinarId === 'WB_MASTER' ? 'WB_MASTER' : webinarId).maybeSingle();
-            if (data && data.webinar_data) {
-              masterData = { ...masterData, ...data.webinar_data, title: data.title || masterData.title };
-            }
-          } catch (e) { }
-        }
       }
 
       async function loadRecordingsData() {
-        allRecordings = [];
-        // Step 1: Static Git JSON (0 Egress)
+        // Static Git JSON (Zero Egress - Single Source of Truth)
         try {
           const resp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
           if (resp.ok) {
@@ -1860,54 +1832,6 @@
             if (list.length > 0) allRecordings = list;
           }
         } catch (e) { }
-
-        // Step 2: Overlay LocalStorage drafts on admin device
-        try {
-          const directRecs = JSON.parse(localStorage.getItem('AAROGYAM_WEBINAR_RECORDINGS') || '[]');
-          if (Array.isArray(directRecs) && directRecs.length > 0) {
-            directRecs.forEach(dr => {
-              const exIdx = allRecordings.findIndex(x => x.id === dr.id);
-              if (exIdx !== -1) allRecordings[exIdx] = dr;
-              else allRecordings.unshift(dr);
-            });
-          }
-        } catch (e) { }
-
-        try {
-          const localVideos = JSON.parse(localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS') || '[]');
-          if (Array.isArray(localVideos) && localVideos.length > 0) {
-            localVideos.forEach(lv => {
-              const exIdx = allRecordings.findIndex(x => x.id === lv.id);
-              if (exIdx !== -1) allRecordings[exIdx] = lv;
-              else allRecordings.unshift(lv);
-            });
-          }
-        } catch (e) { }
-
-        // Step 3: Permanent Supabase Cloud Sync
-        if (db) {
-          try {
-            const { data } = await db.from('landing_pages').select('*').eq('category', 'recorded_video').eq('status', 'active');
-            if (Array.isArray(data) && data.length > 0) {
-              data.forEach(row => {
-                const rec = row.webinar_data || {
-                  id: row.id,
-                  title: row.title,
-                  description: row.message,
-                  subject: row.message,
-                  category: row.message || 'Shorts & Reels',
-                  video_url: row.media_url,
-                  thumbnail: row.thumbnail_url,
-                  platform: row.content_type || 'youtube',
-                  format: row.id?.startsWith('VID_S') ? 'short_reel' : 'full_video'
-                };
-                const exIdx = allRecordings.findIndex(x => x.id === rec.id);
-                if (exIdx !== -1) allRecordings[exIdx] = rec;
-                else allRecordings.unshift(rec);
-              });
-            }
-          } catch (e) { }
-        }
       }
 
       // -------------------------------------------------------------
