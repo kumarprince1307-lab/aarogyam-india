@@ -1,6 +1,24 @@
 {
   "recordings": [
     {
+      "id": "VID_S872947",
+      "format": "short_reel",
+      "platform": "youtube",
+      "title": "आयुर्वेदिक मिल्क शेक कैसे बनाएं? 🌿🥛",
+      "description": "🌿🥛 स्वादिष्ट और पौष्टिक आयुर्वेदिक मिल्क शेक बनाने की आसान विधि!\nजानिए घर पर प्राकृतिक सामग्री से हेल्दी मिल्क शेक कैसे तैयार करें।\n👉 स्वाद भी • पोषण भी • सेहत भी",
+      "subject": "Crop Protection",
+      "category": "Crop Protection",
+      "video_url": "https://youtube.com/shorts/hRq2OvN8aiA?si=X-t1wWc-RD7BRypX",
+      "youtube_url": "https://youtube.com/shorts/hRq2OvN8aiA?si=X-t1wWc-RD7BRypX",
+      "youtube_id": "hRq2OvN8aiA",
+      "thumbnail": "https://img.youtube.com/vi/hRq2OvN8aiA/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "registration_only",
+      "status": "active",
+      "created_at": "2026-09-01T17:47:52.947Z"
+    },
+    {
       "id": "VID_S691508",
       "format": "short_reel",
       "platform": "youtube",
