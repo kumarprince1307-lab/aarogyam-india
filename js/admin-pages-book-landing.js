@@ -1931,40 +1931,65 @@ export async function initBookLandingPages() {
   function extractYouTubeId(url) {
     if (!url || typeof url !== 'string') return null;
     url = url.trim();
-    if (url.length === 11 && !url.includes('/') && !url.includes('.')) return url;
-    const shortsMatch = url.match(/shorts\/([a-zA-Z0-9_-]{11})/i);
+    if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+    
+    // Standard watch URL: youtube.com/watch?v=ID
+    const vMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+    if (vMatch && vMatch[1]) return vMatch[1];
+    
+    // Shorts URL: youtube.com/shorts/ID
+    const shortsMatch = url.match(/youtube\.com\/shorts\/([^"&?\/\s]{11})/i);
     if (shortsMatch && shortsMatch[1]) return shortsMatch[1];
-    const youtuMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
-    if (youtuMatch && youtuMatch[1]) return youtuMatch[1];
-    const watchMatch = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
-    if (watchMatch && watchMatch[1]) return watchMatch[1];
-    const embedMatch = url.match(/(?:embed|v)\/([a-zA-Z0-9_-]{11})/i);
-    if (embedMatch && embedMatch[1]) return embedMatch[1];
-    const genMatch = url.match(/([a-zA-Z0-9_-]{11})/);
-    return genMatch ? genMatch[1] : null;
+
+    // Live URL: youtube.com/live/ID
+    const liveMatch = url.match(/youtube\.com\/live\/([^"&?\/\s]{11})/i);
+    if (liveMatch && liveMatch[1]) return liveMatch[1];
+
+    return null;
   }
 
   function renderVideosInBuilder() {
     const wrap = document.getElementById('blp_videos_list_wrap');
     if (!wrap) return;
     if (currentVideos.length === 0) {
-      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:8px;">कोई वीडियो नहीं है। "+ नया वीडियो जोड़ें" पर क्लिक करें।</div>';
+      wrap.innerHTML = `
+        <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #3b82f6; border-radius: 8px; padding: 14px; text-align: center; color: var(--admin-muted); font-size: 0.84rem;">
+          🎥 कोई वीडियो नहीं जोड़ा गया है।
+          <div style="margin-top: 8px; display: flex; gap: 8px; justify-content: center;">
+            <button type="button" onclick="window.addNewVideoTemplate('landscape')" class="admin-button small-button" style="background:#2563eb;color:#fff;font-weight:700;">+ 📺 Landscape वीडियो (16:9)</button>
+            <button type="button" onclick="window.addNewVideoTemplate('shorts')" class="admin-button small-button" style="background:#7c3aed;color:#fff;font-weight:700;">+ 📱 Shorts / Reels (9:16)</button>
+          </div>
+        </div>
+      `;
       return;
     }
     wrap.innerHTML = currentVideos.map((v, idx) => {
       const ytId = extractYouTubeId(v.url || '');
       return `
-        <div style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:10px;display:grid;grid-template-columns:48px 2fr 1.5fr 1fr auto;gap:8px;align-items:center;">
-          <div id="video_thumb_preview_${idx}" style="width:48px;height:36px;border-radius:4px;background:#0f172a;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid var(--admin-border);">
-            ${ytId ? `<img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" style="width:100%;height:100%;object-fit:cover;" title="YouTube Thumbnail Live" />` : '<span style="font-size:0.75rem;">🎥</span>'}
+        <div style="background:var(--admin-surface, #1e293b);border:1.5px solid var(--admin-border);border-radius:10px;padding:12px;display:grid;grid-template-columns:56px 1.8fr 1.4fr 120px auto;gap:10px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+          <div id="video_thumb_preview_${idx}" style="width:56px;height:42px;border-radius:6px;background:#0f172a;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid var(--admin-border);">
+            ${ytId ? `<img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" style="width:100%;height:100%;object-fit:cover;" title="YouTube Thumbnail" />` : '<span style="font-size:1rem;">🎥</span>'}
           </div>
-          <input type="url" placeholder="YouTube URL (watch/shorts/embed)" value="${escapeHtml(v.url || '')}" oninput="window.updateVideoField(${idx}, 'url', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.82rem;" />
-          <input type="text" placeholder="वीडियो शीर्षक" value="${escapeHtml(v.title || '')}" oninput="window.updateVideoField(${idx}, 'title', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.82rem;" />
-          <select onchange="window.updateVideoField(${idx}, 'ratio', this.value)" class="admin-select" style="padding:4px 8px;font-size:0.8rem;font-weight:700;">
-            <option value="16:9" ${v.ratio === '16:9' ? 'selected' : ''}>📺 16:9 Landscape</option>
-            <option value="9:16" ${v.ratio === '9:16' ? 'selected' : ''}>📱 9:16 Shorts/Reels</option>
-          </select>
-          <button type="button" onclick="window.removeVideoItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:3px 8px;">&times;</button>
+          <div>
+            <label style="font-size:0.72rem;color:var(--admin-muted);font-weight:700;display:block;margin-bottom:2px;">YouTube Link (Watch / Shorts / Embed):</label>
+            <input type="url" placeholder="उदा. https://youtu.be/... या https://youtube.com/shorts/..." value="${escapeHtml(v.url || '')}" oninput="window.updateVideoField(${idx}, 'url', this.value)" class="admin-input" style="width:100%;padding:6px 8px;font-size:0.82rem;font-family:monospace;" />
+          </div>
+          <div>
+            <label style="font-size:0.72rem;color:var(--admin-muted);font-weight:700;display:block;margin-bottom:2px;">वीडियो शीर्षक (Title):</label>
+            <input type="text" placeholder="उदा. फसल स्प्रे डेमो वीडियो" value="${escapeHtml(v.title || '')}" oninput="window.updateVideoField(${idx}, 'title', this.value)" class="admin-input" style="width:100%;padding:6px 8px;font-size:0.82rem;font-weight:700;" />
+          </div>
+          <div>
+            <label style="font-size:0.72rem;color:var(--admin-muted);font-weight:700;display:block;margin-bottom:2px;">फॉर्मेट / रेशियो:</label>
+            <select onchange="window.updateVideoField(${idx}, 'ratio', this.value)" class="admin-select" style="width:100%;padding:6px 8px;font-size:0.8rem;font-weight:700;">
+              <option value="16:9" ${v.ratio === '16:9' ? 'selected' : ''}>📺 16:9 TV</option>
+              <option value="9:16" ${v.ratio === '9:16' ? 'selected' : ''}>📱 9:16 Shorts</option>
+            </select>
+          </div>
+          <div style="padding-top:16px;">
+            <button type="button" onclick="window.removeVideoItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;font-weight:800;padding:6px 12px;border-radius:6px;" title="वीडियो हटाएं">
+              🗑️ हटाएं
+            </button>
+          </div>
         </div>
       `;
     }).join('');
@@ -2352,6 +2377,24 @@ export async function initBookLandingPages() {
     if (sel) sel.value = '';
   };
 
+  window.addNewVideoTemplate = function(type = 'landscape') {
+    if (type === 'shorts') {
+      currentVideos.push({
+        url: 'https://youtube.com/shorts/sample',
+        title: '📱 फसल रील्स व शॉर्ट्स डेमो',
+        ratio: '9:16'
+      });
+    } else {
+      currentVideos.push({
+        url: 'https://www.youtube.com/watch?v=sample',
+        title: '📺 मुख्य पुस्तक व परिणाम वीडियो डेमो',
+        ratio: '16:9'
+      });
+    }
+    renderVideosInBuilder();
+    showToast(`🎥 नया ${type === 'shorts' ? 'Shorts (9:16)' : 'Landscape (16:9)'} वीडियो जोड़ा गया!`, 'info');
+  };
+
   window.updateVideoField = (idx, field, val) => { 
     if (currentVideos[idx]) {
       currentVideos[idx][field] = val;
@@ -2359,10 +2402,16 @@ export async function initBookLandingPages() {
         const ytId = extractYouTubeId(val);
         const thumbEl = document.getElementById(`video_thumb_preview_${idx}`);
         if (thumbEl) {
-          thumbEl.innerHTML = ytId ? `<img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" style="width:100%;height:100%;object-fit:cover;" title="YouTube Thumbnail Live" />` : '<span style="font-size:0.75rem;">🎥</span>';
+          thumbEl.innerHTML = ytId ? `<img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" style="width:100%;height:100%;object-fit:cover;" title="YouTube Thumbnail Live" />` : '<span style="font-size:1rem;">🎥</span>';
         }
       }
     }
+  };
+
+  window.removeVideoItem = (idx) => { 
+    currentVideos.splice(idx, 1); 
+    renderVideosInBuilder(); 
+    showToast('🗑️ वीडियो हटा दिया गया', 'info');
   };
 
   window.updateSocialSharePreview = function() {
