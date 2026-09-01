@@ -1,10 +1,54 @@
 // Vercel Serverless Function: Social Share & Open Graph Pre-Renderer for UCAS Landing Pages
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
 
 const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
 const DEFAULT_FALLBACK_IMAGE = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
 const HOST_ORIGIN = 'https://aarogyamindia.online';
+
+function getBookLandingPageData(bId) {
+  if (!bId) return null;
+  const cleanId = String(bId).trim().toUpperCase();
+  const cleanSlug = String(bId).trim().toLowerCase();
+
+  try {
+    const dataPath = path.join(process.cwd(), 'data', 'universal-book-landing-pages.json');
+    if (fs.existsSync(dataPath)) {
+      const content = fs.readFileSync(dataPath, 'utf8');
+      const json = JSON.parse(content);
+      const list = json.bookLandingPages || [];
+      const found = list.find(p => (p.id && p.id.toUpperCase() === cleanId) || (p.slug && p.slug.toLowerCase() === cleanSlug));
+      if (found) return found;
+    }
+  } catch (e) {}
+
+  try {
+    const booksPath = path.join(process.cwd(), 'data', 'books.json');
+    if (fs.existsSync(booksPath)) {
+      const content = fs.readFileSync(booksPath, 'utf8');
+      const json = JSON.parse(content);
+      const list = json.books || [];
+      const found = list.find(p => (p.id && p.id.toUpperCase() === cleanId) || (p.slug && p.slug.toLowerCase() === cleanSlug));
+      if (found) {
+        return {
+          id: found.id,
+          og_title: found.heading || found.name,
+          og_description: found.description || `${found.heading || found.name} - सम्पूर्ण वैज्ञानिक एवं Practical गाइड।`,
+          og_image: found.cover || found.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
+          hero: {
+            title: found.heading || found.name,
+            description: found.description,
+            cover_image: found.cover || found.thumbnail
+          }
+        };
+      }
+    }
+  } catch (e) {}
+
+  return null;
+}
 
 function extractYoutubeVideoId(url) {
   if (!url) return null;
@@ -205,7 +249,7 @@ module.exports = async function handler(req, res) {
   }
 
   const query = req.query || {};
-  const lpId = (query.id || query.lp || '').trim();
+  const lpId = (query.id || query.lp || query.book || query.book_id || '').trim();
   const queryShareId = (query.share_id || query.ref || '').trim();
   const queryYt = (query.yt || query.v || query.video || '').trim();
   const queryThumb = (query.thumb || query.img || query.thumbnail || '').trim();
@@ -213,7 +257,95 @@ module.exports = async function handler(req, res) {
   const queryDesc = (query.desc || query.msg || query.message || '').trim();
   const queryCat = (query.cat || query.category || '').trim();
 
-  // 1. Fetch record from Supabase if ID provided
+  // 1. Check if ID represents an eBook Landing Page (e.g. BK015, BK001, etc.)
+  const bookData = getBookLandingPageData(lpId);
+  if (bookData) {
+    const rawTitle = (bookData.og_title || bookData.hero?.title || queryTitle || 'Aarogyam India eBook Practical Guide').trim();
+    const finalTitle = rawTitle.includes('Aarogyam India') ? rawTitle : `${rawTitle} | Aarogyam India`;
+    const finalDesc = (bookData.og_description || bookData.hero?.description || queryDesc || 'सम्पूर्ण Practical Guide। अभी विशेष छूट पर उपलब्ध।').slice(0, 200).trim();
+    const rawImg = bookData.og_image || bookData.hero?.cover_image || bookData.hero?.banner_image || '/images/books/kharif-master-guide-2026-cover.webp';
+    const finalOgImage = rawImg.startsWith('http') ? rawImg : `${HOST_ORIGIN}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`;
+    
+    let destUrl = `${HOST_ORIGIN}/ebooks/book-landing.html?id=${encodeURIComponent(bookData.id || lpId)}`;
+    if (bookData.id === 'BK001') destUrl = `${HOST_ORIGIN}/ebooks/kharif-master-guide-2026.html`;
+    else if (bookData.id === 'BK002') destUrl = `${HOST_ORIGIN}/ebooks/kheti-dr.html`;
+    
+    const canonicalShareUrl = `${HOST_ORIGIN}/api/share?id=${encodeURIComponent(bookData.id || lpId)}`;
+
+    const userAgent = String(req.headers['user-agent'] || '');
+    const isCrawler = isBotScraper(userAgent);
+
+    if (!isCrawler && !query.debug) {
+      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
+      return res.redirect(302, destUrl);
+    }
+
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400');
+    const cleanTitle = finalTitle.includes('Aarogyam India') ? finalTitle : `${finalTitle} — Aarogyam India`;
+
+    const html = `<!DOCTYPE html>
+<html lang="hi" prefix="og: https://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(cleanTitle)}</title>
+
+  <!-- Open Graph / WhatsApp & Facebook Crawlers -->
+  <meta property="fb:app_id" content="966242223397117">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aarogyam India">
+  <meta property="og:title" content="${escapeHtml(finalTitle)}">
+  <meta property="og:description" content="${escapeHtml(finalDesc)}">
+  <meta property="og:image" content="${escapeHtml(finalOgImage)}">
+  <meta property="og:image:secure_url" content="${escapeHtml(finalOgImage)}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${escapeHtml(finalTitle)}">
+  <meta property="og:url" content="${escapeHtml(canonicalShareUrl)}">
+  <link rel="image_src" href="${escapeHtml(finalOgImage)}">
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@AarogyamIndia">
+  <meta name="twitter:title" content="${escapeHtml(finalTitle)}">
+  <meta name="twitter:description" content="${escapeHtml(finalDesc)}">
+  <meta name="twitter:image" content="${escapeHtml(finalOgImage)}">
+  <link rel="canonical" href="${escapeHtml(canonicalShareUrl)}">
+
+  <!-- Instant Client-Side Redirection for human visitors -->
+  <script>
+    (function() {
+      try {
+        window.location.replace("${destUrl}");
+      } catch (e) {}
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=${escapeHtml(destUrl)}">
+  </noscript>
+</head>
+<body style="margin:0;padding:0;background:#F1F5F9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <div style="background:#FFFFFF;max-width:440px;width:90%;margin:20px auto;padding:28px 20px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.08);text-align:center;border:1px solid #E2E8F0;">
+    <img src="https://aarogyamindia.online/images/logo/logo.png" alt="Aarogyam India" style="height:44px;margin-bottom:14px;object-fit:contain;">
+    <h2 style="font-size:1.15rem;font-weight:800;color:#0F172A;margin:0 0 10px 0;line-height:1.35;">${escapeHtml(cleanTitle)}</h2>
+    <p style="font-size:0.88rem;color:#475569;margin:0 0 20px 0;line-height:1.45;">${escapeHtml(finalDesc)}</p>
+    <a href="${escapeHtml(destUrl)}" style="display:block;padding:14px;background:#0B7A3E;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:800;font-size:1rem;box-shadow:0 4px 12px rgba(11,122,62,0.3);">यहाँ क्लिक करके पूरी जानकारी देखें →</a>
+    <div style="margin-top:16px;font-size:0.75rem;color:#94A3B8;">Aarogyam India • सुरक्षित व प्रामाणिक जानकारी</div>
+  </div>
+  <script>
+    setTimeout(function() {
+      try { window.location.href = "${destUrl}"; } catch(e) {}
+    }, 150);
+  </script>
+</body>
+</html>`;
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(html);
+  }
+
+  // 2. Fetch record from Supabase if ID provided
   let lp = null;
   if (lpId) {
     try {

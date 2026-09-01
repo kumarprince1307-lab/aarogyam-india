@@ -3043,11 +3043,15 @@ export async function initBookLandingPages() {
 
   window.copyBookLandingUrl = function(bId) {
     const rawId = String(bId || '').toUpperCase();
-    let url = `${window.location.origin}/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`;
-    if (rawId === 'BK001') url = `${window.location.origin}/ebooks/kharif-master-guide-2026.html`;
-    else if (rawId === 'BK002') url = `${window.location.origin}/ebooks/kheti-dr.html`;
-    navigator.clipboard.writeText(url).then(() => {
-      showToast('📋 बुक लैंडिंग पेज लिंक कॉपी हो गया!', 'success');
+    const shareUrl = `${window.location.origin}/api/share?id=${encodeURIComponent(bId)}`;
+    let liveUrl = `${window.location.origin}/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`;
+    if (rawId === 'BK001') liveUrl = `${window.location.origin}/ebooks/kharif-master-guide-2026.html`;
+    else if (rawId === 'BK002') liveUrl = `${window.location.origin}/ebooks/kheti-dr.html`;
+
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      showToast(`📲 WhatsApp/सोशल शेयर लिंक कॉपी हुआ: ${shareUrl}`, 'success');
+    }).catch(() => {
+      prompt('WhatsApp सोशल शेयर लिंक कॉपी करें:', shareUrl);
     });
   };
 
