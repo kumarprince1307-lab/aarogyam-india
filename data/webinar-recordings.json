@@ -1,6 +1,24 @@
 {
   "recordings": [
     {
+      "id": "VID_S261730",
+      "format": "short_reel",
+      "platform": "youtube",
+      "title": "मित्र जीवाणुओं का बड़ा फैसला! 🦠🌱",
+      "description": "🚨 क्या खेत अब बंजर हो रहे हैं?\nमिट्टी के मित्र जीवाणु क्यों कम हो रहे हैं और इसका फसल पर क्या असर पड़ता है? जानिए इस वीडियो में। 🌾\n👉 Soil Health का यह जरूरी सच हर किसान को जानना चाहिए।\n@AAROGYAMINDIA",
+      "subject": "Crop Protection",
+      "category": "Crop Protection",
+      "video_url": "https://youtube.com/shorts/jxu9W_s-C70?si=fO-5zc90_uKlsqGG",
+      "youtube_url": "https://youtube.com/shorts/jxu9W_s-C70?si=fO-5zc90_uKlsqGG",
+      "youtube_id": "jxu9W_s-C70",
+      "thumbnail": "https://img.youtube.com/vi/jxu9W_s-C70/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "registration_only",
+      "status": "active",
+      "created_at": "2026-09-01T16:47:41.730Z"
+    },
+    {
       "id": "VID_S169791",
       "format": "short_reel",
       "platform": "youtube",
