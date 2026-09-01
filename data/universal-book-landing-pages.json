@@ -565,7 +565,7 @@
       "theme_primary": "#EA580C",
       "theme_dark": "#C2410C",
       "cover_effect": "3d_float",
-      "sticky_button_text": "खरीदें",
+      "sticky_button_text": "BYE NOW ",
       "sections_order": [
         "sec_hero",
         "sec_timer",
