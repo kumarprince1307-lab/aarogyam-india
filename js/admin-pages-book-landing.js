@@ -713,26 +713,6 @@ export async function initBookLandingPages() {
           </div>
 
           <!-- Optional Section Banner for Main PDF -->
-        <!-- SECTION 17: BOOK PDF / DOC FILE MANAGEMENT (PAID BOOK FULL PDF/DOC) -->
-        <div id="sec_box_main_pdf" style="background: rgba(14,165,233,0.08); border: 1.5px solid rgba(14,165,233,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-            <div>
-              <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
-                <span>📄</span> <span>17. मुख्य ई-बुक PDF / DOC फाइल प्रबंधन (Paid Book Full PDF)</span>
-              </div>
-              <small style="color: var(--admin-muted);">भुगतान के बाद पाठक को मिलने वाली मुख्य सम्पूर्ण ई-बुक फाइल (GitHub Limit: 25 MB)</small>
-            </div>
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <span style="font-size: 0.72rem; background: #0284c7; color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 800;">
-                🔒 Paid Full Book Access
-              </span>
-              <button type="button" onclick="window.clearBookPdf('main')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; font-size: 0.72rem; border-radius: 4px;">
-                🗑️ PDF हटाएं
-              </button>
-            </div>
-          </div>
-
-          <!-- Optional Section Banner for Main PDF -->
           ${renderSectionBannerUploaderBlock('sec_pdf_main', '📄 मुख्य PDF सेक्शन बैनर (वैकल्पिक)')}
 
           <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed #0284c7; border-radius: 8px; padding: 14px; margin-top: 10px;">
