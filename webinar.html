@@ -1795,18 +1795,19 @@
       checkUserSessionStatus();
 
       async function initWebinarHub() {
-        await loadMasterWebinarData();
-        await loadRecordingsData();
-        renderWebinarDetails();
-        renderShortsAndReels();
-        renderMasterclassVideos();
-        renderFaqs();
-        startLiveCountdown();
-        checkUserSessionStatus();
-        setupReelsSwipeGestures();
+        try { await loadMasterWebinarData(); } catch (e) { console.error('masterData err:', e); }
+        try { await loadRecordingsData(); } catch (e) { console.error('recordings err:', e); }
+        try { renderWebinarDetails(); } catch (e) { console.error('webinar details err:', e); }
+        try { reorderSectionsDOM(); } catch (e) { console.error('reorder err:', e); }
+        try { renderShortsAndReels(); } catch (e) { console.error('shorts err:', e); }
+        try { renderMasterclassVideos(); } catch (e) { console.error('videos err:', e); }
+        try { renderFaqs(); } catch (e) { console.error('faqs err:', e); }
+        try { startLiveCountdown(); } catch (e) { console.error('timer err:', e); }
+        try { checkUserSessionStatus(); } catch (e) { console.error('session err:', e); }
+        try { setupReelsSwipeGestures(); } catch (e) { console.error('gestures err:', e); }
 
         if (specificVid) {
-          openSpecificVideoOrReel(specificVid);
+          try { openSpecificVideoOrReel(specificVid); } catch (e) { }
         }
       }
 
@@ -1834,17 +1835,43 @@
         } catch (e) { }
       }
 
+      function parseDateSafe(dateStr) {
+        if (!dateStr) return null;
+        try {
+          if (dateStr.includes('-')) {
+            const parts = dateStr.split('-').map(Number);
+            if (parts[0] > 1000) return { y: parts[0], m: parts[1], d: parts[2] };
+            return { d: parts[0], m: parts[1], y: parts[2] };
+          } else if (dateStr.includes('/')) {
+            const parts = dateStr.split('/').map(Number);
+            if (parts[2] > 1000) {
+              const d = parts[0] > 12 ? parts[0] : (parts[1] > 12 ? parts[1] : parts[0]);
+              const m = parts[0] > 12 ? parts[1] : (parts[1] > 12 ? parts[0] : parts[1]);
+              return { y: parts[2], m: m, d: d };
+            }
+            return { y: parts[0], m: parts[1], d: parts[2] };
+          }
+        } catch (e) { }
+        return null;
+      }
+
       // -------------------------------------------------------------
       // 2. RENDER WEBINAR DETAILS, BANNERS & TIMER
       // -------------------------------------------------------------
       function renderWebinarDetails() {
-        document.getElementById('wb_title').textContent = masterData.title;
+        document.getElementById('wb_title').textContent = masterData.title || 'लाइव ज़ूम मास्टरक्लास';
         document.getElementById('wb_desc').textContent = masterData.description || masterData.desc || '';
         document.getElementById('wb_duration_label').textContent = `${masterData.duration_minutes || 90} मिनट`;
 
         if (masterData.cover_image) {
           const coverEl = document.getElementById('wb_cover_img');
-          if (coverEl) coverEl.src = masterData.cover_image.includes('?') ? masterData.cover_image : (masterData.cover_image + '?v=' + Date.now());
+          if (coverEl) {
+            if (masterData.cover_image.startsWith('data:')) {
+              coverEl.src = masterData.cover_image;
+            } else {
+              coverEl.src = masterData.cover_image.includes('?') ? masterData.cover_image : (masterData.cover_image + '?v=' + Date.now());
+            }
+          }
         }
 
         // Render Multi-Banners & Posters Section
@@ -1893,13 +1920,27 @@
         }
       }
 
+      function reorderSectionsDOM() {
+        if (!masterData.section_order || !Array.isArray(masterData.section_order)) return;
+        const main = document.querySelector('.wb-container');
+        if (!main) return;
+
+        masterData.section_order.forEach(sKey => {
+          const el = document.getElementById(sKey);
+          if (el && el.parentElement === main) {
+            main.appendChild(el);
+          }
+        });
+      }
+
       function startLiveCountdown() {
         if (countdownTimerInterval) clearInterval(countdownTimerInterval);
 
         const digitWrap = document.getElementById('wb_timer_digits');
         const pendingWrap = document.getElementById('wb_timer_pending');
 
-        if (!masterData.date) {
+        const parsedDate = parseDateSafe(masterData.date);
+        if (!parsedDate) {
           if (digitWrap) digitWrap.style.display = 'none';
           if (pendingWrap) pendingWrap.style.display = 'block';
           return;
@@ -1909,9 +1950,14 @@
         if (pendingWrap) pendingWrap.style.display = 'none';
 
         const tTime = masterData.time || '20:00';
-        const [y, m, d] = masterData.date.split('-').map(Number);
-        const [hh, mm] = tTime.split(':').map(Number);
-        const targetTs = new Date(y, m - 1, d, hh, mm, 0).getTime();
+        let hh = 20, mm = 0;
+        try {
+          const tParts = tTime.split(':').map(Number);
+          hh = tParts[0] || 20;
+          mm = tParts[1] || 0;
+        } catch(e) {}
+
+        const targetTs = new Date(parsedDate.y, parsedDate.m - 1, parsedDate.d, hh, mm, 0).getTime();
         const durationMins = masterData.duration_minutes || 90;
         const endTs = targetTs + (durationMins * 60 * 1000);
 
@@ -1957,10 +2003,10 @@
 
           // STAGE 1: Upcoming Countdown
           if (timerStatusLabel) timerStatusLabel.innerHTML = '⏳ <strong>लाइव ज़ूम वेबिनार प्रारंभ होने में शेष समय:</strong>';
-          const days = Math.floor(diffToStart / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((diffToStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const mins = Math.floor((diffToStart % (1000 * 60 * 60)) / (1000 * 60));
-          const secs = Math.floor((diffToStart % (1000 * 60)) / 1000);
+          const days = Math.max(0, Math.floor(diffToStart / (1000 * 60 * 60 * 24)));
+          const hours = Math.max(0, Math.floor((diffToStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+          const mins = Math.max(0, Math.floor((diffToStart % (1000 * 60 * 60)) / (1000 * 60)));
+          const secs = Math.max(0, Math.floor((diffToStart % (1000 * 60)) / 1000));
 
           document.getElementById('wb_days').textContent = String(days).padStart(2, '0');
           document.getElementById('wb_hours').textContent = String(hours).padStart(2, '0');
@@ -1976,16 +2022,17 @@
         if (!dateStr) return '';
         const months = ['जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'];
         try {
-          const [y, m, d] = dateStr.split('-').map(Number);
-          const mName = months[m - 1] || m;
+          const p = parseDateSafe(dateStr);
+          if (!p) return dateStr;
+          const mName = months[p.m - 1] || p.m;
           let timeFmt = '';
           if (timeStr) {
             const [h, min] = timeStr.split(':').map(Number);
             const isPM = h >= 12;
             const h12 = h % 12 || 12;
-            timeFmt = `, ${isPM ? 'सायं' : 'सुबह'} ${String(h12).padStart(2, '0')}:${String(min).padStart(2, '0')} बजे`;
+            timeFmt = `, ${isPM ? 'सायं' : 'सुबह'} ${String(h12).padStart(2, '0')}:${String(min || 0).padStart(2, '0')} बजे`;
           }
-          return `${d} ${mName} ${y}${timeFmt}`;
+          return `${p.d} ${mName} ${p.y}${timeFmt}`;
         } catch (e) {
           return `${dateStr} ${timeStr || ''}`;
         }
