@@ -552,6 +552,182 @@
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
       "google_analytics_enabled": true
+    },
+    {
+      "id": "BK015",
+      "slug": "bk015",
+      "category": "Agriculture",
+      "status": "active",
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true,
+      "theme_primary": "#EA580C",
+      "theme_dark": "#C2410C",
+      "cover_effect": "3d_float",
+      "sticky_button_text": "खरीदें",
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_ai_support",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help",
+        "sec_pdf_main",
+        "sec_pdf_free"
+      ],
+      "hidden_sections": [],
+      "section_banners": {
+        "sec_specs_toc": "/images/banners/bk015-sec_specs_toc-banner.webp"
+      },
+      "og_title": "🌱 सब्जी खेती मास्टर PART 1",
+      "og_description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू",
+      "og_image": "/images/books/bk015-cover.webp",
+      "mainPdf": "/uploads/books/BK015_main.pdf",
+      "main_pdf": "/uploads/books/BK015_main.pdf",
+      "freePdf": "/uploads/books/BK002_free.pdf",
+      "free_pdf": "/uploads/books/BK002_free.pdf",
+      "demoPdf": "/uploads/books/BK002_free.pdf",
+      "ai_support_title": "",
+      "ai_support_cover": "",
+      "ai_support_desc": "",
+      "bonuses": [],
+      "bonus_books": [],
+      "bonus_points": [
+        "24×7 WhatsApp Support",
+        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+        "📖 किताब की जानकारी समझने में सहायता",
+        "🌱 फसल संबंधी सवाल",
+        "📱 Mobile Friendly PDF & Lifetime Access"
+      ],
+      "timer": {
+        "enabled": true,
+        "minutes": 15,
+        "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!"
+      },
+      "hero": {
+        "tag": "🌾 Bestseller Agriculture eBook",
+        "title": "🌱 सब्जी खेती मास्टर PART 1",
+        "subtitle": "11 प्रमुख सब्जियों की खेती — बीज से बाजार तक व्यावहारिक मार्गदर्शन | 154 पेज",
+        "description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू\n",
+        "mrp": 1999,
+        "offer_price": 1,
+        "offer_badge": "Launch Offer",
+        "rating_score": "4.9",
+        "rating_count": "120+ Ratings",
+        "cover_image": "/images/books/bk015-cover.webp",
+        "banner_image": "/images/banners/bk015-hero-banner.webp",
+        "features": [
+          {
+            "icon": "fa-seedling",
+            "text": "120 पेज की प्रीमियम"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ फोटो"
+          },
+          {
+            "icon": "fa-flask",
+            "text": "Spray Science"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Bonus PDF"
+          }
+        ]
+      },
+      "value_stack": {
+        "book_mrp": 299,
+        "vip_value": 1999,
+        "bonus_value": 199,
+        "offer_price": 1,
+        "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए यह गाइड उनके प्लान में 100% मुफ्त शामिल है।"
+      },
+      "why_read": {
+        "title": "यह पुस्तक क्यों खरीदें?",
+        "subtitle": "",
+        "cards": [
+          {
+            "icon": "🌱",
+            "title": "वैज्ञानिक जानकारी",
+            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।"
+          },
+          {
+            "icon": "📷",
+            "title": "300+ वास्तविक फोटो",
+            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
+          },
+          {
+            "icon": "📘",
+            "title": "Step by Step Guide",
+            "desc": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।"
+          },
+          {
+            "icon": "🎁",
+            "title": "Free Bonus PDF",
+            "desc": "इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।"
+          }
+        ]
+      },
+      "demo_images": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp"
+      ],
+      "suggested_books_list": [
+        {
+          "id": "BK001",
+          "link": "BK001",
+          "title": "खरीफ फसल मास्टर गाइड 2026",
+          "image": "/images/books/kharif-master-guide-2026-cover.webp",
+          "offerPrice": 99,
+          "mrp": 299
+        },
+        {
+          "id": "BK002",
+          "link": "BK002",
+          "title": "खेती का डॉक्टर",
+          "image": "/images/books/fasal-ka-doctor-cover.webp",
+          "offerPrice": 99,
+          "mrp": 299
+        }
+      ],
+      "suggested_books": [
+        "BK001",
+        "BK002"
+      ],
+      "table_of_contents": [
+        "बीज उपचार",
+        "खेत की तैयारी",
+        "बुवाई की वैज्ञानिक विधि",
+        "उर्वरक प्रबंधन",
+        "खरपतवार नियंत्रण",
+        "रोग एवं कीट प्रबंधन",
+        "पोषक तत्वों की कमी",
+        "स्प्रे चार्ट",
+        "IPM तकनीक",
+        "अधिक उत्पादन के उपाय",
+        "विशेषज्ञ सुझाव"
+      ],
+      "videos": [
+        {
+          "url": "https://youtube.com/shorts/ew5tDJgGTK8?si=uVHuFbNH0L31qUc7",
+          "title": "🎥 नया वीडियो डेमो",
+          "ratio": "9:16"
+        }
+      ],
+      "testimonials": [],
+      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।"
     }
   ]
 }
