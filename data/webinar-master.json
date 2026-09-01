@@ -11,22 +11,13 @@
     "meeting_id": "843 1333 8881",
     "passcode": "439024",
     "cover_image": "/images/banners/webinar-cover-live.webp",
-    "section_order": [
-      "sec_hero_zoom",
-      "sec_timer",
-      "sec_kpis",
-      "sec_banners",
-      "sec_aarogyamtube_shorts",
-      "sec_aarogyamtube_videos",
-      "sec_tutorial",
-      "sec_faqs"
-    ],
     "banners": [
       {
         "title": "विशेष कृषि पोस्टर",
         "url": "/images/banners/webinar-cover-live.webp"
       }
     ],
+    "youtube_videos": [],
     "kpis": [
       "🔴 100% लाइव इंटरएक्टिव ज़ूम क्लास",
       "🌱 जैविक खाद एवं स्प्रे फॉर्मूला",
@@ -42,6 +33,21 @@
         "q": "क्या यह वेबिनार फ्री है?",
         "a": "हाँ, यह वेबिनार पूरी तरह निःशुल्क है। अपना नाम और मोबाइल नंबर डालकर सीट सुरक्षित कर सकते हैं।"
       }
-    ]
+    ],
+    "section_order": [
+      "sec_hero_zoom",
+      "sec_timer",
+      "sec_kpis",
+      "sec_banners",
+      "sec_aarogyamtube_shorts",
+      "sec_aarogyamtube_videos",
+      "sec_tutorial",
+      "sec_faqs"
+    ],
+    "og_title": "🔴 Aarogyam India — लाइव ज़ूम वेबिनार एवं AarogyamTube",
+    "og_description": "लाइव ज़ूम ट्रेनिंग में भाग लें और 1-मिनट के कृषि शॉर्ट्स देखें।",
+    "og_image": "/images/banners/universal-zoom-webinar-og.jpg",
+    "posters_title": "🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स",
+    "posters_subtitle": "नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स"
   }
 }
