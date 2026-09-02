@@ -1,6 +1,24 @@
 {
   "recordings": [
     {
+      "id": "VID_S730902",
+      "format": "short_reel",
+      "platform": "youtube",
+      "title": "किसान की परेशानी, किसान का दर्द 😢🌾",
+      "description": "🌾 किसान फसल बचाने के लिए दिन-रात मेहनत करता है, लेकिन फसल खराब होने पर उसकी सारी उम्मीदें टूट जाती हैं। 😢💔\nइस वीडियो में देखिए किसान की असली परेशानी और उसकी मेहनत के पीछे छुपा दर्द।",
+      "subject": "Crop Protection",
+      "category": "Crop Protection",
+      "video_url": "https://youtube.com/shorts/GEN9mJfsiIY?si=77kBTeTdCHsboVim",
+      "youtube_url": "https://youtube.com/shorts/GEN9mJfsiIY?si=77kBTeTdCHsboVim",
+      "youtube_id": "GEN9mJfsiIY",
+      "thumbnail": "https://img.youtube.com/vi/GEN9mJfsiIY/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "registration_only",
+      "status": "active",
+      "created_at": "2026-09-02T01:48:50.902Z"
+    },
+    {
       "id": "VID_S218514",
       "format": "short_reel",
       "platform": "youtube",
