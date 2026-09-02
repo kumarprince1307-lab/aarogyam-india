@@ -849,6 +849,161 @@
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
     }
 
+    /* AarogyamTube Share Registration Modal */
+    .at-reg-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: atFadeIn 0.3s ease;
+    }
+
+    @keyframes atFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .at-reg-modal-card {
+      background: #111c35;
+      border: 1.5px solid rgba(220, 38, 38, 0.4);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 25px rgba(220, 38, 38, 0.2);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 410px;
+      padding: 26px 22px;
+      position: relative;
+      color: #ffffff;
+      animation: atScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes atScaleIn {
+      from { transform: scale(0.92) translateY(12px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .at-reg-close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .at-reg-close-btn:hover {
+      background: rgba(220, 38, 38, 0.3);
+      color: #ffffff;
+    }
+
+    .at-reg-modal-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .at-reg-logo {
+      height: 48px;
+      margin-bottom: 8px;
+      object-fit: contain;
+    }
+
+    .at-reg-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.01em;
+    }
+
+    .at-reg-subtitle {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .at-reg-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .at-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .at-input-group label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .at-input-group input {
+      background: #0b1120;
+      border: 1.5px solid #334155;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .at-input-group input:focus {
+      border-color: #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .at-reg-submit-btn {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      color: #ffffff;
+      border: none;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4);
+      margin-top: 4px;
+      transition: all 0.2s;
+    }
+
+    .at-reg-submit-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.6);
+    }
+
+    .at-reg-footer-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
     .wb-reel-play-overlay {
       position: absolute;
       inset: 0;
@@ -1355,36 +1510,32 @@
           </div>
         </div>
 
-        <!-- Registration Form (Visible when not joined) -->
-        <div id="wb_reg_box">
-          <div class="wb-form-title">
-            <i class="fa-solid fa-ticket" style="color:#2D8CFF;"></i>
-            <span>निःशुल्क सीट बुक करें</span>
+        <!-- Guest CTA Card (Opens Zoom Registration Popup Modal) -->
+        <div id="wb_reg_box" class="wb-guest-cta-card" style="background: rgba(15, 23, 42, 0.75); border: 1.5px solid rgba(45, 140, 255, 0.35); border-radius: 16px; padding: 20px; text-align: center; margin-top: 16px;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px;">
+            <span style="display: inline-block; width: 10px; height: 10px; background: #10B981; border-radius: 50%; animation: atPulse 1.5s infinite;"></span>
+            <span style="font-size: 0.88rem; font-weight: 700; color: #60A5FA;">सीमित सीटें उपलब्ध हैं • 100% निःशुल्क</span>
           </div>
-          <p class="wb-form-subtitle">नाम और व्हाट्सएप नंबर दर्ज करके ज़ूम लिंक तुरंत प्राप्त करें:</p>
-
-          <form id="wb_reg_form">
-            <div class="wb-input-group">
-              <label class="wb-label">आपका पूरा नाम: *</label>
-              <input type="text" id="wb_input_name" class="wb-input" placeholder="उदा. राहुल शर्मा" required>
-            </div>
-            <div class="wb-input-group">
-              <label class="wb-label">10 अंकों का व्हाट्सएप मोबाइल नंबर: *</label>
-              <input type="tel" id="wb_input_mobile" class="wb-input" placeholder="उदा. 9876543210" maxlength="10"
-                pattern="[0-9]{10}" required>
-            </div>
-            <button type="submit" id="wb_btn_submit_reg" class="wb-btn-primary">
-              <span>🟢 सीट बुक करें व ज़ूम लिंक देखें</span>
-              <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </form>
+          <h3 style="font-size: 1.15rem; font-weight: 900; color: #ffffff; margin: 0 0 12px 0;">लाइव ज़ूम क्लास से जुड़ें</h3>
+          <button type="button" id="wb_btn_open_zoom_popup" class="wb-btn-primary" onclick="window.openZoomRegModal()" style="width: 100%; font-size: 1.05rem; padding: 14px 20px; box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45); cursor: pointer;">
+            <span>🎟️ निःशुल्क सीट बुक करें (Get Zoom Pass)</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <div style="display: flex; justify-content: center; gap: 16px; margin-top: 12px; font-size: 0.78rem; color: #94a3b8;">
+            <span>⚡ 10 सेकंड में ज़ूम लिंक</span>
+            <span>🔒 सुरक्षित एक्सेस</span>
+          </div>
         </div>
 
         <!-- Unlocked Screen (Visible after registration / login) -->
         <div id="wb_unlocked_box" class="wb-unlocked-card" style="display:none;">
-          <div class="wb-unlocked-title">
+          <div id="wb_user_greeting_badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.15); color:#34D399; border:1px solid rgba(16,185,129,0.3); padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:800; margin-bottom:12px;">
             <i class="fa-solid fa-circle-check"></i>
-            <span>सीट सुरक्षित! आपकी ज़ूम मीटिंग डिटेल:</span>
+            <span id="wb_user_greeting_name">स्वागत है, किसान साथी!</span>
+          </div>
+          <div class="wb-unlocked-title" style="margin-top:0;">
+            <i class="fa-solid fa-key" style="color:#F59E0B;"></i>
+            <span>आपकी ज़ूम मीटिंग डिटेल (Zoom Pass):</span>
           </div>
 
           <div class="wb-cred-row">
@@ -1654,6 +1805,70 @@
           ▶️ Open in App
         </a>
       </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       ZOOM WEBINAR REGISTRATION POPUP MODAL
+       ========================================== -->
+  <div id="wb_zoom_modal" class="at-reg-modal-overlay" style="display:none;">
+    <div class="at-reg-modal-card" style="border-color:rgba(37,99,235,0.5); box-shadow:0 25px 50px -12px rgba(0,0,0,0.7), 0 0 25px rgba(37,99,235,0.25);">
+      <button type="button" class="at-reg-close-btn" id="wb_zoom_modal_close_btn" onclick="window.closeZoomRegModal()" title="बंद करें">&times;</button>
+      <div class="at-reg-modal-header">
+        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(37,99,235,0.15); color:#60A5FA; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:800; margin-bottom:10px; border:1px solid rgba(59,130,246,0.3);">
+          <span>🔴 LIVE ZOOM MASTERCLASS</span>
+        </div>
+        <h3 class="at-reg-title">निःशुल्क सीट बुक करें</h3>
+        <p class="at-reg-subtitle">अपना नाम और व्हाट्सएप नंबर दर्ज करके ज़ूम लिंक व पासवर्ड तुरंत प्राप्त करें:</p>
+      </div>
+      <form id="wb_popup_reg_form" class="at-reg-form">
+        <div class="at-input-group">
+          <label for="wb_popup_input_name"><i class="fa-solid fa-user"></i> आपका पूरा नाम (Full Name)</label>
+          <input type="text" id="wb_popup_input_name" placeholder="उदा. राहुल शर्मा" required autocomplete="name">
+        </div>
+        <div class="at-input-group">
+          <label for="wb_popup_input_mobile"><i class="fa-solid fa-phone"></i> 10 अंकों का व्हाट्सएप मोबाइल नंबर</label>
+          <input type="tel" id="wb_popup_input_mobile" placeholder="उदा. 9876543210" maxlength="10" pattern="[6-9][0-9]{9}" required autocomplete="tel">
+        </div>
+        <button type="submit" id="wb_popup_submit_btn" class="at-reg-submit-btn" style="background:linear-gradient(135deg, #16a34a, #15803d); box-shadow:0 6px 18px rgba(22,163,74,0.4);">
+          <span>🟢 सीट बुक करें व ज़ूम लिंक देखें</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <div class="at-reg-footer-note">
+          <i class="fa-solid fa-shield-halved"></i> 100% निःशुल्क • ज़ूम पास तुरंत स्क्रीन पर दिखेगा
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================
+       AAROGYAMTUBE SHARE REGISTRATION POPUP MODAL
+       ========================================== -->
+  <div id="at_reg_modal" class="at-reg-modal-overlay" style="display:none;">
+    <div class="at-reg-modal-card">
+      <button type="button" class="at-reg-close-btn" id="at_reg_close_btn" title="बंद करें">&times;</button>
+      <div class="at-reg-modal-header">
+        <img src="/images/logo/aarogyamtube-logo.png" alt="AarogyamTube" class="at-reg-logo" onerror="this.src='/images/logo/logo.png'">
+        <h3 class="at-reg-title">Welcome to Aarogyam Parivar</h3>
+        <p class="at-reg-subtitle">🎬 1-मिनट कृषि शॉर्ट्स एवं वीडियो देखने के लिए अपना नाम और नंबर दर्ज करें</p>
+      </div>
+      <form id="at_reg_form" class="at-reg-form">
+        <div class="at-input-group">
+          <label for="at_input_name"><i class="fa-solid fa-user"></i> आपका नाम (Full Name)</label>
+          <input type="text" id="at_input_name" placeholder="उदा. रमेश कुमार" required autocomplete="name">
+        </div>
+        <div class="at-input-group">
+          <label for="at_input_mobile"><i class="fa-solid fa-phone"></i> व्हाट्सएप मोबाइल नंबर (Mobile No.)</label>
+          <input type="tel" id="at_input_mobile" placeholder="10 अंकों का व्हाट्सएप नंबर" maxlength="10" pattern="[6-9][0-9]{9}" required autocomplete="tel">
+        </div>
+        <button type="submit" id="at_reg_submit_btn" class="at-reg-submit-btn">
+          <span>वीडियो देखें (Continue)</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <div class="at-reg-footer-note">
+          <i class="fa-solid fa-shield-halved"></i> 100% सुरक्षित • कोई पासवर्ड की जरूरत नहीं
+        </div>
+      </form>
     </div>
   </div>
 
@@ -2058,19 +2273,58 @@
       // -------------------------------------------------------------
       // 3. REGISTRATION & UNLOCKED ZOOM ACCESS (0ms INSTANT UNLOCK)
       // -------------------------------------------------------------
-      document.getElementById('wb_reg_form')?.addEventListener('submit', (e) => {
+      function isUserLoggedIn() {
+        try {
+          const aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+          const uMobile = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone;
+          const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name;
+          const hasSession = localStorage.getItem('AI_SESSION') !== null;
+          return Boolean((uMobile && String(uMobile).replace(/\D/g, '').length === 10) || (uName && uMobile) || hasSession);
+        } catch (e) {
+          return Boolean(localStorage.getItem('aim_user_mobile'));
+        }
+      }
+
+      window.openZoomRegModal = function() {
+        const modal = document.getElementById('wb_zoom_modal');
+        if (modal) {
+          modal.style.display = 'flex';
+          const nameInput = document.getElementById('wb_popup_input_name');
+          if (nameInput) setTimeout(() => nameInput.focus(), 100);
+        }
+      };
+
+      window.closeZoomRegModal = function() {
+        const modal = document.getElementById('wb_zoom_modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      document.getElementById('wb_zoom_modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'wb_zoom_modal') {
+          window.closeZoomRegModal();
+        }
+      });
+
+      document.getElementById('wb_popup_reg_form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const name = (document.getElementById('wb_input_name')?.value || '').trim();
-        const mobile = (document.getElementById('wb_input_mobile')?.value || '').trim();
+        const submitBtn = document.getElementById('wb_popup_submit_btn');
+        const name = (document.getElementById('wb_popup_input_name')?.value || '').trim();
+        const mobile = (document.getElementById('wb_popup_input_mobile')?.value || '').trim().replace(/\D/g, '').slice(-10);
 
         if (!name || mobile.length !== 10) {
           alert('कृपया सही नाम और 10 अंकों का व्हाट्सएप नंबर दर्ज करें।');
           return;
         }
 
-        // Save session locally so user stays on page unlocked INSTANTLY
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>सत्यापित हो रहा है...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+        }
+
+        // Save session locally so user stays on page unlocked INSTANTLY (0ms)
         const userObj = {
           name: name,
+          full_name: name,
           mobile: mobile,
           share_id: 'AI' + mobile.slice(-6),
           registered_at: new Date().toISOString(),
@@ -2079,27 +2333,64 @@
         localStorage.setItem('aim_user_name', name);
         localStorage.setItem('aim_user_mobile', mobile);
         localStorage.setItem('AI_USER', JSON.stringify(userObj));
+        localStorage.setItem('AI_SESSION', JSON.stringify({ mobile: mobile, active: true, loginTime: new Date().toISOString() }));
         sessionStorage.setItem(`wb_reg_${webinarId}`, 'true');
 
-        // Instantly unlock UI without network delay
+        // Close modal and unlock screen
+        window.closeZoomRegModal();
         showUnlockedScreen();
 
-        // Background asynchronous registration log (non-blocking zero-egress)
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>🟢 सीट बुक करें व ज़ूम लिंक देखें</span> <i class="fa-solid fa-arrow-right"></i>';
+        }
+
+        // Background asynchronous registration log (Zero-Egress non-blocking)
         if (db) {
-          setTimeout(async () => {
-            try {
-              await db.from('surveys').insert([{
-                phone_number: mobile,
-                name: name,
-                source: 'webinar',
-                source_of_registration: 'webinar',
-                occupation: 'webinar_attendee',
-                notes: `Registered for AarogyamTube Webinar: ${masterData.title}`,
-                event_type: 'webinar_registration',
-                category_answers: { referrer_share_id: refShareId, webinar_id: masterData.id || 'WB_MASTER' }
+          try {
+            // 1. Check/Insert in profiles
+            const { data: existingUser } = await db.from('profiles').select('id, share_id').eq('mobile', mobile).limit(1).maybeSingle();
+            let sponsorProfileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
+            if (refShareId && refShareId !== 'AI000004') {
+              try {
+                const { data: refUser } = await db.from('profiles').select('id').eq('share_id', refShareId).limit(1).maybeSingle();
+                if (refUser) sponsorProfileId = refUser.id;
+              } catch(e) {}
+            }
+
+            if (!existingUser) {
+              const userUniqueShareId = 'AI' + Math.floor(100000 + Math.random() * 900000);
+              await db.from('profiles').insert([{
+                full_name: name,
+                mobile: mobile,
+                share_id: userUniqueShareId,
+                referral_code: refShareId || 'AI000004',
+                referral_mobile: refShareId === 'AI000004' ? '7974422572' : null,
+                referred_by: sponsorProfileId,
+                registration_source: 'webinar',
+                profile_complete: false,
+                is_active: false
               }]);
-            } catch (err) { }
-          }, 50);
+            }
+
+            // 2. Insert into surveys for attendance & webinar reports
+            await db.from('surveys').insert([{
+              phone_number: mobile,
+              name: name,
+              source: 'webinar',
+              source_of_registration: 'webinar',
+              occupation: 'webinar_attendee',
+              notes: `Registered for AarogyamTube Webinar: ${masterData.title}`,
+              event_type: 'webinar_registration',
+              category_answers: {
+                referrer_share_id: refShareId,
+                webinar_id: masterData.id || 'WB_MASTER',
+                registered_at: new Date().toISOString()
+              }
+            }]);
+          } catch (err) {
+            console.warn('Webinar background sync notice:', err);
+          }
         }
       });
 
@@ -2125,6 +2416,14 @@
         const unlockBox = document.getElementById('wb_unlocked_box');
         if (regBox) regBox.style.display = 'none';
         if (unlockBox) unlockBox.style.display = 'block';
+
+        let aiUser = {};
+        try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+        const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name || 'किसान साथी';
+        const greetingNameEl = document.getElementById('wb_user_greeting_name');
+        if (greetingNameEl) {
+          greetingNameEl.textContent = `स्वागत है, ${uName} जी • सीट सुरक्षित ✅`;
+        }
 
         const mid = masterData.meeting_id || 'लाइव सत्र में जारी होगी';
         const pass = masterData.passcode || 'वेबिनार समय पर सक्रिय होगा';
@@ -2157,10 +2456,161 @@
             occupation: 'webinar_attendee',
             notes: `Joined Zoom Meeting: ${masterData.title}`,
             event_type: 'webinar_attendance',
-            category_answers: { webinar_id: masterData.id || 'WB_MASTER', joined_at: new Date().toISOString() }
+            category_answers: {
+              webinar_id: masterData.id || 'WB_MASTER',
+              joined_at: new Date().toISOString(),
+              referrer_share_id: refShareId
+            }
           }]).catch(() => {});
         }
       };
+
+      // -------------------------------------------------------------
+      // 3.1 AAROGYAMTUBE SHARE REGISTRATION POPUP ENGINE
+      // -------------------------------------------------------------
+      let pendingAarogyamTubeCallback = null;
+      let pendingAarogyamTubeVidInfo = { id: '', title: '' };
+
+      window.checkAarogyamTubeAccess = function(callback, vidId, vidTitle) {
+        if (isUserLoggedIn()) {
+          if (typeof callback === 'function') callback();
+          return true;
+        }
+
+        openAarogyamTubeRegModal(vidId, vidTitle, callback);
+        return false;
+      };
+
+      function openAarogyamTubeRegModal(vidId, vidTitle, callback) {
+        pendingAarogyamTubeCallback = callback;
+        pendingAarogyamTubeVidInfo = { id: vidId || 'AarogyamTube', title: vidTitle || 'AarogyamTube Video' };
+        
+        const modal = document.getElementById('at_reg_modal');
+        if (modal) {
+          modal.style.display = 'flex';
+          const nameInput = document.getElementById('at_input_name');
+          if (nameInput) setTimeout(() => nameInput.focus(), 100);
+        }
+      }
+
+      window.closeAarogyamTubeRegModal = function() {
+        const modal = document.getElementById('at_reg_modal');
+        if (modal) modal.style.display = 'none';
+        pendingAarogyamTubeCallback = null;
+      };
+
+      document.getElementById('at_reg_close_btn')?.addEventListener('click', () => {
+        window.closeAarogyamTubeRegModal();
+      });
+
+      document.getElementById('at_reg_modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'at_reg_modal') {
+          window.closeAarogyamTubeRegModal();
+        }
+      });
+
+      document.getElementById('at_reg_form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('at_reg_submit_btn');
+        const name = (document.getElementById('at_input_name')?.value || '').trim();
+        const mobile = (document.getElementById('at_input_mobile')?.value || '').trim().replace(/\D/g, '').slice(-10);
+
+        if (!name || mobile.length !== 10) {
+          alert('कृपया सही नाम और 10 अंकों का व्हाट्सएप मोबाइल नंबर दर्ज करें।');
+          return;
+        }
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>सत्यापित हो रहा है...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+        }
+
+        // 1. Instant local storage session (0ms)
+        const userObj = {
+          name: name,
+          full_name: name,
+          mobile: mobile,
+          share_id: 'AI' + mobile.slice(-6),
+          registered_at: new Date().toISOString(),
+          source: 'AarogyamTube'
+        };
+        localStorage.setItem('aim_user_name', name);
+        localStorage.setItem('aim_user_mobile', mobile);
+        localStorage.setItem('AI_USER', JSON.stringify(userObj));
+        localStorage.setItem('AI_SESSION', JSON.stringify({ mobile: mobile, active: true, loginTime: new Date().toISOString() }));
+
+        // 2. Background Zero-Egress Database Sync
+        if (db) {
+          try {
+            const { data: existingUser } = await db
+              .from('profiles')
+              .select('id, full_name, mobile, share_id')
+              .eq('mobile', mobile)
+              .limit(1)
+              .maybeSingle();
+
+            let sponsorProfileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
+            let sponsorShareCode = refShareId || 'AI000004';
+
+            if (sponsorShareCode !== 'AI000004') {
+              try {
+                const { data: refUser } = await db.from('profiles').select('id').eq('share_id', sponsorShareCode).limit(1).maybeSingle();
+                if (refUser) sponsorProfileId = refUser.id;
+              } catch(e) {}
+            }
+
+            if (!existingUser) {
+              const userUniqueShareId = 'AI' + Math.floor(100000 + Math.random() * 900000);
+              await db.from('profiles').insert([{
+                full_name: name,
+                mobile: mobile,
+                share_id: userUniqueShareId,
+                referral_code: sponsorShareCode,
+                referral_mobile: sponsorShareCode === 'AI000004' ? '7974422572' : null,
+                referred_by: sponsorProfileId,
+                registration_source: 'AarogyamTube',
+                profile_complete: false,
+                is_active: false
+              }]);
+            }
+
+            // Survey Log for Video Viewers & Leads
+            await db.from('surveys').insert([{
+              phone_number: mobile,
+              name: name,
+              source: 'AarogyamTube',
+              source_of_registration: 'AarogyamTube',
+              occupation: 'video_viewer',
+              notes: `Registered via AarogyamTube: ${pendingAarogyamTubeVidInfo.title || pendingAarogyamTubeVidInfo.id}`,
+              event_type: 'recorded_video_view',
+              category_answers: {
+                referrer_share_id: refShareId,
+                video_id: pendingAarogyamTubeVidInfo.id,
+                video_title: pendingAarogyamTubeVidInfo.title,
+                registered_at: new Date().toISOString()
+              }
+            }]);
+          } catch(err) {
+            console.warn('AarogyamTube profile sync notice:', err);
+          }
+        }
+
+        // Close modal and execute pending video callback
+        const modal = document.getElementById('at_reg_modal');
+        if (modal) modal.style.display = 'none';
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>वीडियो देखें (Continue)</span> <i class="fa-solid fa-arrow-right"></i>';
+        }
+
+        // Also unlock webinar session if present
+        showUnlockedScreen();
+
+        if (typeof pendingAarogyamTubeCallback === 'function') {
+          pendingAarogyamTubeCallback();
+        }
+      });
 
       window.copyWbCred = function (type) {
         const val = type === 'mid' ? masterData.meeting_id : masterData.passcode;
@@ -2303,13 +2753,17 @@ if (wbShortsSeeMoreBtn) {
       // -------------------------------------------------------------
       window.openReelPlayer = function (idx) {
         if (!activeReelsList || activeReelsList.length === 0) return;
-        currentReelIndex = idx;
-        loadReelAtIndex(currentReelIndex);
+        const targetReel = activeReelsList[idx];
 
-        document.getElementById('wb_reels_modal')?.classList.add('active');
-        // Hide floating action buttons & bottom nav & lock background scroll
-        document.body.classList.add('wb-reels-open');
-        document.body.style.overflow = 'hidden';
+        window.checkAarogyamTubeAccess(() => {
+          currentReelIndex = idx;
+          loadReelAtIndex(currentReelIndex);
+
+          document.getElementById('wb_reels_modal')?.classList.add('active');
+          // Hide floating action buttons & bottom nav & lock background scroll
+          document.body.classList.add('wb-reels-open');
+          document.body.style.overflow = 'hidden';
+        }, targetReel?.id, targetReel?.title);
       };
 
       window.closeReelsModal = function () {
@@ -2562,12 +3016,15 @@ if (wbShortsSeeMoreBtn) {
       window.openVideoModal = function (vId) {
         const match = allRecordings.find(x => x.id === vId);
         if (!match) return;
-        const ytId = match.youtube_id || extractYoutubeVideoId(match.video_url);
-        if (ytId) {
-          window.open(`https://www.youtube.com/watch?v=${ytId}`, '_blank');
-        } else if (match.video_url) {
-          window.open(match.video_url, '_blank');
-        }
+
+        window.checkAarogyamTubeAccess(() => {
+          const ytId = match.youtube_id || extractYoutubeVideoId(match.video_url);
+          if (ytId) {
+            window.open(`https://www.youtube.com/watch?v=${ytId}`, '_blank');
+          } else if (match.video_url) {
+            window.open(match.video_url, '_blank');
+          }
+        }, match.id, match.title);
       };
 
       function openSpecificVideoOrReel(vid) {

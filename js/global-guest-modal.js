@@ -229,6 +229,7 @@
         currentPath.includes('ucas') || 
         currentPath.includes('checkout') || 
         currentPath.includes('payment') || 
+        currentPath.includes('webinar') || 
         currentPath.includes('share')) {
       return;
     }
