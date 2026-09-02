@@ -7,8 +7,8 @@
 
 const ROUTES = {
   'dashboard': () => import('./admin-pages-dashboard.js').then(m => m.initDashboard()),
-  'users': () => import('./admin-pages-users.js?v=27.3').then(m => m.initUsers()),
-  'user-details': () => import('./admin-pages-user-details.js?v=27.3').then(m => m.initUserDetails()),
+  'users': () => import('./admin-pages-users.js?v=27.4').then(m => m.initUsers()),
+  'user-details': () => import('./admin-pages-user-details.js?v=27.4').then(m => m.initUserDetails()),
   'user-permissions': () => import('./admin-pages-user-permissions.js').then(m => m.initUserPermissions()),
   'all-phonebook': () => import('./admin-pages-phonebook.js').then(m => m.initAllPhonebook()),
   'all-surveys': () => import('./admin-pages-surveys.js').then(m => m.initAllSurveys()),
@@ -47,12 +47,20 @@ const ROUTE_ALIASES = {
 };
 
 export async function navigateTo(routeName) {
-  // 1. Clean route name from #, query params, leading paths, and .html
-  let raw = (routeName || '').replace(/^#\/?/, '').split('?')[0].trim();
-  raw = raw.split('/').pop().replace(/\.html$/i, '');
+  // 1. Separate query parameters if any (e.g. user-details?id=UUID)
+  let fullRoute = (routeName || '').replace(/^#\/?/, '').trim();
+  let query = '';
+  if (fullRoute.includes('?')) {
+    const qIndex = fullRoute.indexOf('?');
+    query = fullRoute.substring(qIndex);
+    fullRoute = fullRoute.substring(0, qIndex);
+  }
+
+  // 2. Clean route name from leading paths and .html
+  let raw = fullRoute.split('/').pop().replace(/\.html$/i, '').trim();
   let name = raw || 'dashboard';
 
-  // 2. Check Aliases
+  // 3. Check Aliases
   if (ROUTE_ALIASES[name]) {
     name = ROUTE_ALIASES[name];
   }
@@ -70,9 +78,10 @@ export async function navigateTo(routeName) {
   if (compactTitle) compactTitle.textContent = pretty;
   if (breadcrumb) breadcrumb.textContent = `Home / ${pretty}`;
 
-  // Update history hash
+  // Update history hash with full target route and query params
+  const targetHash = `${name}${query}`;
   try {
-    history.pushState(null, '', `#${routeName}`);
+    history.pushState(null, '', `#${targetHash}`);
   } catch (e) {}
 
   const loader = document.getElementById('page-content');
@@ -91,7 +100,7 @@ export async function navigateTo(routeName) {
 
   try {
     await route();
-    document.dispatchEvent(new CustomEvent('admin:route-changed', { detail: { route: name } }));
+    document.dispatchEvent(new CustomEvent('admin:route-changed', { detail: { route: name, query: query } }));
   } catch (err) {
     console.error('navigateTo route error for [' + name + ']:', err);
     if (loader) {
@@ -99,7 +108,7 @@ export async function navigateTo(routeName) {
         <div class="admin-error" style="padding:20px;text-align:center;">
           <h3 style="color:#ef4444;margin:0 0 8px 0;">पेज लोड नहीं हो सका (Unable to load page)</h3>
           <p style="color:var(--admin-muted);font-size:0.88rem;margin:0 0 14px 0;">${err?.message || 'अज्ञात त्रुटि'}</p>
-          <button type="button" onclick="window.navigateTo('${name}')" class="admin-button" style="background:#16a34a;color:#fff;font-weight:700;">
+          <button type="button" onclick="window.navigateTo('${name}${query}')" class="admin-button" style="background:#16a34a;color:#fff;font-weight:700;">
             🔄 पुनः प्रयास करें (Retry)
           </button>
         </div>
@@ -111,7 +120,7 @@ window.navigateTo = navigateTo;
 
 function getDefaultRouteFromUrl() {
   if (location.hash && location.hash.length > 1) {
-    const h = location.hash.replace(/^#\/?/, '').split('?')[0];
+    const h = location.hash.replace(/^#\/?/, '').trim();
     if (h) return h;
   }
   const p = location.pathname.toLowerCase();
@@ -137,7 +146,16 @@ export function initRouter() {
     const target = e.target.closest('[data-route]');
     if (target) {
       e.preventDefault();
-      const route = target.dataset.route || target.getAttribute('href') || 'dashboard';
+      let route = target.dataset.route || target.getAttribute('href') || 'dashboard';
+      const href = target.getAttribute('href') || '';
+      
+      // If element has data-id and route doesn't already have query params, append ?id=...
+      if (target.dataset.id && !route.includes('?')) {
+        route = `${route}?id=${encodeURIComponent(target.dataset.id)}`;
+      } else if (href.includes('?') && !route.includes('?')) {
+        const qs = href.substring(href.indexOf('?'));
+        route = `${route}${qs}`;
+      }
       navigateTo(route);
     }
   });

@@ -45,7 +45,7 @@ function renderUserRow(user) {
         }
       </td>
       <td>${user.source || 'N/A'}</td>
-      <td><a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-subtle-link"><strong>${user.shareId || 'N/A'}</strong></a></td>
+      <td><a href="#user-details?id=${user.id}" data-route="user-details?id=${user.id}" data-id="${user.id}" class="admin-subtle-link"><strong>${user.shareId || 'N/A'}</strong></a></td>
       <td>
         <button 
           type="button" 
@@ -85,7 +85,7 @@ function renderUserRow(user) {
       </td>
       <td>
         <div style="display: flex; gap: 8px; align-items: center;">
-            <a href="#user-details?id=${user.id}" data-route="user-details" data-id="${user.id}" class="admin-button small-button">View</a>
+            <a href="#user-details?id=${user.id}" data-route="user-details?id=${user.id}" data-id="${user.id}" class="admin-button small-button">View</a>
         </div>
       </td>
     </tr>
@@ -182,7 +182,7 @@ function renderUsersTable(users) {
                   }
                 </td>
                 <td>${u.source || 'N/A'}</td>
-                <td><a href="#user-details?id=${u.id}" data-route="user-details" data-id="${u.id}" class="admin-subtle-link"><strong>${u.shareId || 'N/A'}</strong></a></td>
+                <td><a href="#user-details?id=${u.id}" data-route="user-details?id=${u.id}" data-id="${u.id}" class="admin-subtle-link"><strong>${u.shareId || 'N/A'}</strong></a></td>
                 <td>
                   <button 
                     type="button" 
@@ -222,7 +222,7 @@ function renderUsersTable(users) {
                 </td>
                 <td>
                   <div style="display: flex; gap: 6px; align-items: center;">
-                      <a href="#user-details?id=${u.id}" data-route="user-details" data-id="${u.id}" class="admin-button small-button">View</a>
+                      <a href="#user-details?id=${u.id}" data-route="user-details?id=${u.id}" data-id="${u.id}" class="admin-button small-button">View</a>
                       <a href="#user-permissions?userId=${u.id}" data-route="user-permissions" data-id="${u.id}" class="admin-button small-button" style="background:#0F172A;color:#FBBF24;border:1px solid #F59E0B;" title="Manage Granular Media & Platform Permissions">🔒 Perms</a>
                   </div>
                 </td>
@@ -412,10 +412,17 @@ export async function initUsers() {
       return;
     }
 
-    const link = e.target.closest('[data-route="user-details"]');
-    if (link && link.dataset.id) {
-        window.location.hash = `user-details?id=${link.dataset.id}`;
-        return; // It's a navigation link, stop here.
+    const link = e.target.closest('[data-route^="user-details"]');
+    if (link) {
+      const uId = link.dataset.id || (link.getAttribute('href') ? new URLSearchParams(link.getAttribute('href').substring(link.getAttribute('href').indexOf('?'))).get('id') : null);
+      if (uId) {
+        if (typeof window.navigateTo === 'function') {
+          window.navigateTo(`user-details?id=${uId}`);
+        } else {
+          window.location.hash = `user-details?id=${uId}`;
+        }
+        return;
+      }
     }
 
     const toggleBtn = e.target.closest('.admin-status-toggle');

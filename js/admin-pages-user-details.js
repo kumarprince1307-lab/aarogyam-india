@@ -662,10 +662,22 @@ export async function initUserDetails() {
   const content = document.getElementById('page-content');
   if (!content) return;
 
+  // Multi-source extraction of user ID (Hash, URL Search, or SessionStorage)
+  let userId = null;
   const hash = window.location.hash || '';
-  const queryString = hash.substring(hash.indexOf('?'));
-  const params = new URLSearchParams(queryString);
-  const userId = params.get('id');
+  if (hash.includes('?')) {
+    const hashParams = new URLSearchParams(hash.substring(hash.indexOf('?')));
+    userId = hashParams.get('id') || hashParams.get('userId') || hashParams.get('user_id');
+  }
+  if (!userId) {
+    const searchParams = new URLSearchParams(window.location.search || '');
+    userId = searchParams.get('id') || searchParams.get('userId') || searchParams.get('user_id');
+  }
+  if (userId) {
+    sessionStorage.setItem('admin_last_viewed_user_id', userId);
+  } else {
+    userId = sessionStorage.getItem('admin_last_viewed_user_id');
+  }
 
   content.innerHTML = `
     <div class="admin-action-row" style="margin-bottom:16px;">
