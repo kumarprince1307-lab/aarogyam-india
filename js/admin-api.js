@@ -4,6 +4,18 @@
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+// Intelligent Admin In-Memory Cache (2.5 Minutes TTL to eliminate redundant egress on tab switches)
+const _adminMemoryCache = new Map();
+const ADMIN_CACHE_TTL = 150000; // 2.5 minutes
+
+export function clearAdminCache() {
+  _adminMemoryCache.clear();
+}
+
+if (typeof window !== 'undefined') {
+  window.clearAdminCache = clearAdminCache;
+}
+
 // Mock data for other admin pages (Users, Purchases, Downloads, Reports) - NOT part of Dashboard scope for this task.
 // These will be addressed in their respective modules in future phases.
 const USERS = [
@@ -53,7 +65,13 @@ const USER_DETAILS = {
 };
 
 export async function fetchShareEngineSummaryData() {
-  await delay(200); // Simulate network latency
+  const cacheKey = 'share_engine_summary';
+  const cached = _adminMemoryCache.get(cacheKey);
+  if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+    return cached.data;
+  }
+
+  await delay(100);
   try {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
@@ -140,7 +158,9 @@ export async function fetchShareEngineSummaryData() {
       conversionRate: `${conversionRate}%`,
     };
 
-    return { success: true, data: summary };
+    const result = { success: true, data: summary };
+    _adminMemoryCache.set(cacheKey, { data: result, ts: Date.now() });
+    return result;
   } catch (error) {
     console.error("Failed to fetch Share Engine Summary Data:", error);
     return { success: false, data: null, error: error.message };
@@ -623,6 +643,12 @@ export async function fetchCheckoutLogs(params = {}) {
 }
 
 export async function fetchUsers(params = {}) {
+  const cacheKey = 'users_' + JSON.stringify(params);
+  const cached = _adminMemoryCache.get(cacheKey);
+  if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+    return cached.data;
+  }
+
   await delay(100);
   try {
     const db = window.dbClient;
@@ -794,7 +820,9 @@ export async function fetchUsers(params = {}) {
         };
     });
 
-    return { success: true, data: mappedData };
+    const response = { success: true, data: mappedData };
+    _adminMemoryCache.set(cacheKey, { data: response, ts: Date.now() });
+    return response;
 
   } catch (error) {
     console.error('Failed to fetch users:', error);
@@ -1269,6 +1297,7 @@ export async function updateUserStatus(userId, isActive) {
       .single();
 
     if (error) throw error;
+    clearAdminCache();
     return { success: true, data };
   } catch (error) {
     console.error('Failed to update user status:', error);
@@ -1318,6 +1347,7 @@ export async function batchUpdateUserStatuses() {
     const results = await Promise.all(updatePromises);
     results.forEach(res => { if (res.error) console.error('A batch update failed:', res.error); });
 
+    clearAdminCache();
     return { success: true, activated: idsToActivate.length, deactivated: idsToDeactivate.length };
 
   } catch (error) {
