@@ -1210,8 +1210,11 @@
       left: 0;
       right: 70px;
       bottom: 120px;
-      z-index: 5;
-      pointer-events: none;
+      z-index: 10;
+      pointer-events: auto;
+      touch-action: pan-y;
+      background: transparent;
+      cursor: grab;
     }
 
     .wb-reels-iframe {
@@ -1905,7 +1908,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const webinarId = urlParams.get('id') || urlParams.get('wb') || 'WB_MASTER';
       const refShareId = urlParams.get('ref') || urlParams.get('share_id') || 'AI000004';
-      const specificVid = urlParams.get('vid');
+      const specificVid = urlParams.get('vid') || urlParams.get('video') || urlParams.get('video_id') || urlParams.get('reel') || urlParams.get('short') || (urlParams.get('type') === 'video' ? urlParams.get('id') : null);
 
       let masterData = {
         title: '💼 NetSurf Career Plan + Digital Marketing Training अगर आप सीखना चाहते हैं:',
@@ -1974,7 +1977,20 @@
         try { setupReelsSwipeGestures(); } catch (e) { console.error('gestures err:', e); }
 
         if (specificVid) {
-          try { openSpecificVideoOrReel(specificVid); } catch (e) { }
+          setTimeout(() => {
+            if (isUserLoggedIn()) {
+              window.openSpecificVideoOrReel(specificVid);
+            } else if (typeof window.openGuestLoginModal === 'function') {
+              window.openGuestLoginModal(() => {
+                window.openSpecificVideoOrReel(specificVid);
+              }, {
+                source: 'AarogyamTubeSharedLink',
+                title: 'Welcome to AarogyamTube',
+                subtitle: 'वीडियो देखने के लिए अपना नाम व व्हाट्सएप मोबाइल नंबर दर्ज करें',
+                meta: { video_id: specificVid }
+              });
+            }
+          }, 350);
         }
       }
 
@@ -2665,27 +2681,57 @@ if (wbShortsSeeMoreBtn) {
       // Vertical Touch Gesture Swipe & Scroll Wheel for YouTube Shorts experience
       function setupReelsSwipeGestures() {
         const modal = document.getElementById('wb_reels_modal');
-        const touchSurface = document.getElementById('wb_reels_swipe_container') || modal;
+        const touchSurface = document.getElementById('wb_reel_touch_surface') || document.getElementById('wb_reels_swipe_container') || modal;
         if (!modal) return;
 
         let startY = 0;
+        let startX = 0;
+        let startTime = 0;
         let isSwiping = false;
 
-        // Mobile Touch Events (Swipe Up/Down)
+        // Mobile Touch Events (Swipe Up/Down & Tap to Toggle Pause)
         touchSurface?.addEventListener('touchstart', (e) => {
+          if (!e.touches || !e.touches[0]) return;
           startY = e.touches[0].clientY;
+          startX = e.touches[0].clientX;
+          startTime = Date.now();
           isSwiping = true;
         }, { passive: true });
 
         touchSurface?.addEventListener('touchend', (e) => {
           if (!isSwiping) return;
           isSwiping = false;
-          const endY = e.changedTouches[0].clientY;
-          const diff = startY - endY;
-          if (diff > 45) {
-            window.navReel(1); // Swipe Up -> Next
-          } else if (diff < -45) {
-            window.navReel(-1); // Swipe Down -> Prev
+          const touch = e.changedTouches ? e.changedTouches[0] : null;
+          if (!touch) return;
+
+          const endY = touch.clientY;
+          const endX = touch.clientX;
+          const diffY = startY - endY;
+          const diffX = startX - endX;
+          const duration = Date.now() - startTime;
+
+          // Single Tap to Play / Pause Video
+          if (Math.abs(diffY) < 15 && Math.abs(diffX) < 15 && duration < 300) {
+            if (ytReelPlayer && typeof ytReelPlayer.getPlayerState === 'function') {
+              try {
+                const state = ytReelPlayer.getPlayerState();
+                if (state === 1) { // Playing -> Pause
+                  ytReelPlayer.pauseVideo();
+                } else { // Paused -> Play
+                  ytReelPlayer.playVideo();
+                }
+              } catch(err) {}
+            }
+            return;
+          }
+
+          // Vertical Swipe Up / Down (Swipe Threshold 35px)
+          if (Math.abs(diffY) > Math.abs(diffX)) {
+            if (diffY > 35) {
+              window.navReel(1); // Swipe Up -> Next Reel
+            } else if (diffY < -35) {
+              window.navReel(-1); // Swipe Down -> Prev Reel
+            }
           }
         }, { passive: true });
 
@@ -2694,10 +2740,10 @@ if (wbShortsSeeMoreBtn) {
         window.addEventListener('wheel', (e) => {
           if (!document.getElementById('wb_reels_modal')?.classList.contains('active')) return;
           if (wheelThrottle) return;
-          if (e.deltaY > 30) {
+          if (e.deltaY > 25) {
             window.navReel(1);
             wheelThrottle = setTimeout(() => { wheelThrottle = null; }, 350);
-          } else if (e.deltaY < -30) {
+          } else if (e.deltaY < -25) {
             window.navReel(-1);
             wheelThrottle = setTimeout(() => { wheelThrottle = null; }, 350);
           }
@@ -2711,6 +2757,39 @@ if (wbShortsSeeMoreBtn) {
           if (e.key === 'Escape') { window.closeReelsModal(); }
         });
       }
+
+      window.openSpecificVideoOrReel = function (vidId) {
+        if (!vidId) return;
+        const cleanVid = String(vidId).trim().toLowerCase();
+
+        if (!activeReelsList || activeReelsList.length === 0) {
+          renderShortsAndReels();
+        }
+
+        let targetIdx = activeReelsList.findIndex(r => 
+          String(r.id || '').toLowerCase() === cleanVid || 
+          String(r.video_url || '').toLowerCase().includes(cleanVid) ||
+          String(r.youtube_id || '').toLowerCase() === cleanVid
+        );
+
+        if (targetIdx < 0 && allRecordings && allRecordings.length > 0) {
+          const found = allRecordings.find(r => 
+            String(r.id || '').toLowerCase() === cleanVid || 
+            String(r.video_url || '').toLowerCase().includes(cleanVid) ||
+            String(r.youtube_id || '').toLowerCase() === cleanVid
+          );
+          if (found) {
+            activeReelsList.unshift(found);
+            targetIdx = 0;
+          }
+        }
+
+        if (targetIdx >= 0) {
+          window.openReelPlayer(targetIdx);
+        } else if (activeReelsList.length > 0) {
+          window.openReelPlayer(0);
+        }
+      };
 
       window.likeCurrentReel = function () {
         const icon = document.getElementById('wb_reel_like_icon');
