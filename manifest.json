@@ -19,7 +19,7 @@
       "url": "/index.html"
     }
   },
-  "orientation": "any",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#16a34a",
   "dir": "ltr",

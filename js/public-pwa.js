@@ -24,6 +24,15 @@ export function initPublicPwa() {
   ensureMobileMenuInstallButton();
   bindInstallButtons();
   setupMenuEventListeners();
+  lockScreenOrientationPortrait();
+}
+
+function lockScreenOrientationPortrait() {
+  try {
+    if (window.screen && window.screen.orientation && typeof window.screen.orientation.lock === 'function') {
+      window.screen.orientation.lock('portrait').catch(() => {});
+    }
+  } catch (e) {}
 }
 
 function setupMenuEventListeners() {

@@ -277,19 +277,77 @@
   // -------------------------------------------------------------
   // 7. INJECT UNIVERSAL RESPONSIVE DRAWER & STICKY FLOATING STACK
   // -------------------------------------------------------------
-  function injectUniversalSideDrawer() {
-    if (document.getElementById('universal-side-drawer-wrap')) return;
-
+  function generateDrawerProfileHeaderHtml() {
     let savedUser = {};
     try {
-      savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('aarogyam_user') || localStorage.getItem('CURRENT_USER') || '{}');
+      savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
     } catch (e) {}
 
-    const isLogged = Boolean(savedUser.id || savedUser.mobile || savedUser.phone || savedUser.full_name || savedUser.name);
-    const userName = savedUser.full_name || savedUser.name || savedUser.fullName || 'Guest User';
-    const userPhone = savedUser.mobile || savedUser.phone || '';
+    const isLogged = typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : Boolean(savedUser.mobile || savedUser.phone || localStorage.getItem('aim_user_mobile'));
+    const userName = localStorage.getItem('aim_user_name') || savedUser.full_name || savedUser.name || savedUser.fullName || 'Guest User';
+    const userPhone = localStorage.getItem('aim_user_mobile') || savedUser.mobile || savedUser.phone || '';
     const userRole = savedUser.isVip ? '👑 Pro VIP Member' : (isLogged ? '🌱 Verified Member' : 'Guest Mode');
     const shareId = window.getUserShareId();
+
+    return `
+      <button type="button" class="drawer-close-btn" onclick="window.closeUniversalDrawer()" title="Close Menu">&times;</button>
+      
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="drawer-avatar-wrap">
+          ${isLogged ? (savedUser.isVip ? '👑' : '👨‍🌾') : '👤'}
+        </div>
+        <div class="drawer-user-meta">
+          <h3 class="drawer-user-name">${userName}</h3>
+          <span class="drawer-user-role">${userRole}</span>
+          ${userPhone ? `<div style="font-size:0.72rem;color:#cbd5e1;font-weight:600;">📱 +91 ${userPhone}</div>` : ''}
+          <div style="font-size:0.7rem;color:#fde047;font-weight:800;margin-top:2px;">🎯 Share ID: ${shareId}</div>
+        </div>
+      </div>
+
+      <!-- Profile & Login / Logout Action -->
+      <div style="margin-top:14px;display:flex;gap:8px;align-items:center;">
+        ${isLogged ? `
+          <a href="/ucas/index.html" style="background:#fde047;color:#000;font-size:0.78rem;font-weight:800;padding:5px 14px;border-radius:20px;text-decoration:none;box-shadow:0 3px 10px rgba(0,0,0,0.2);">
+            👤 My Profile
+          </a>
+          <button type="button" onclick="window.logoutUniversalUser()" style="background:rgba(239,68,68,0.25);color:#fff;border:1px solid #ef4444;font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;">
+            Logout
+        ` : `
+          <button type="button" onclick="window.openUniversalLoginHandler()" style="background:#fde047;color:#000;font-size:0.8rem;font-weight:900;padding:6px 16px;border-radius:20px;border:none;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.2);">
+            🔑 Login / Register
+          </button>
+        `}
+      </div>
+    `;
+  }
+
+  window.openUniversalLoginHandler = function() {
+    if (typeof window.closeUniversalDrawer === 'function') {
+      window.closeUniversalDrawer();
+    }
+    if (typeof window.openGuestLoginModal === 'function') {
+      window.openGuestLoginModal(null, { force: true });
+    } else {
+      window.location.href = '/registration.html';
+    }
+  };
+
+  window.updateUniversalDrawerProfile = function() {
+    const headerEl = document.querySelector('#universal-drawer-card .drawer-profile-header');
+    if (headerEl) {
+      headerEl.innerHTML = generateDrawerProfileHeaderHtml();
+    }
+  };
+
+  window.addEventListener('ai:user-logged-in', () => {
+    window.updateUniversalDrawerProfile();
+  });
+
+  function injectUniversalSideDrawer() {
+    if (document.getElementById('universal-side-drawer-wrap')) {
+      window.updateUniversalDrawerProfile();
+      return;
+    }
 
     let cartCount = 0;
     try {
@@ -316,35 +374,7 @@
           
           <!-- Sleek Black User Profile Header Banner -->
           <div class="drawer-profile-header">
-            <button type="button" class="drawer-close-btn" onclick="window.closeUniversalDrawer()" title="Close Menu">&times;</button>
-            
-            <div style="display:flex;align-items:center;gap:12px;">
-              <div class="drawer-avatar-wrap">
-                ${isLogged ? (savedUser.isVip ? '👑' : '👨‍🌾') : '👤'}
-              </div>
-              <div class="drawer-user-meta">
-                <h3 class="drawer-user-name">${userName}</h3>
-                <span class="drawer-user-role">${userRole}</span>
-                ${userPhone ? `<div style="font-size:0.72rem;color:#cbd5e1;font-weight:600;">📱 +91 ${userPhone}</div>` : ''}
-                <div style="font-size:0.7rem;color:#fde047;font-weight:800;margin-top:2px;">🎯 Share ID: ${shareId}</div>
-              </div>
-            </div>
-
-            <!-- Profile & Login / Logout Action -->
-            <div style="margin-top:14px;display:flex;gap:8px;align-items:center;">
-              ${isLogged ? `
-                <a href="/ucas/index.html" style="background:#fde047;color:#000;font-size:0.78rem;font-weight:800;padding:5px 14px;border-radius:20px;text-decoration:none;box-shadow:0 3px 10px rgba(0,0,0,0.2);">
-                  👤 My Profile
-                </a>
-                <button type="button" onclick="window.logoutUniversalUser()" style="background:rgba(239,68,68,0.25);color:#fff;border:1px solid #ef4444;font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;">
-                  Logout
-                </button>
-              ` : `
-                <button type="button" onclick="window.openGuestLoginModal?.(); window.closeUniversalDrawer();" style="background:#fde047;color:#000;font-size:0.8rem;font-weight:900;padding:6px 16px;border-radius:20px;border:none;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.2);">
-                  🔑 Login / Register
-                </button>
-              `}
-            </div>
+            ${generateDrawerProfileHeaderHtml()}
           </div>
 
           <!-- Pure White Canvas Menu List -->
@@ -702,10 +732,17 @@
 
   window.logoutUniversalUser = function () {
     localStorage.removeItem('AI_USER');
+    localStorage.removeItem('AI_PROFILE');
+    localStorage.removeItem('UCAS_USER');
+    localStorage.removeItem('aim_user_name');
+    localStorage.removeItem('aim_user_mobile');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_phone');
     localStorage.removeItem('aarogyam_user');
     localStorage.removeItem('CURRENT_USER');
-    localStorage.removeItem('AI_PROFILE');
-    alert('You have logged out successfully.');
+    localStorage.removeItem('wb_registered');
+    sessionStorage.removeItem('ai_guest_dismissed');
+    alert('आप सफलतापूर्वक लॉगआउट हो चुके हैं। (Logged out successfully)');
     window.location.reload();
   };
 

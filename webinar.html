@@ -1208,15 +1208,10 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: calc(100% - 75px);
-      height: calc(100% - 90px);
-      z-index: 15;
-      cursor: grab;
-      touch-action: none;
-    }
-
-    .wb-reels-touch-surface:active {
-      cursor: grabbing;
+      right: 70px;
+      bottom: 120px;
+      z-index: 5;
+      pointer-events: none;
     }
 
     .wb-reels-iframe {
@@ -1752,12 +1747,14 @@
       </div>
 
       <div class="wb-reels-body" id="wb_reels_body">
-        <!-- Touch & Drag Swipe Surface -->
-        <div id="wb_reel_touch_surface" class="wb-reels-touch-surface"></div>
-        <!-- Main Iframe / Player Container -->
+        <!-- Main YouTube Player API Container (Zero-Lag Engine) -->
+        <div id="wb_reel_yt_container" class="wb-reels-iframe" style="width:100%;height:100%;"></div>
+        <!-- Fallback Iframe for Instagram / Facebook -->
         <iframe id="wb_reel_iframe" class="wb-reels-iframe" src=""
           allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-          allowfullscreen="true"></iframe>
+          allowfullscreen="true" style="display:none;"></iframe>
+        <!-- Touch & Drag Swipe Surface -->
+        <div id="wb_reel_touch_surface" class="wb-reels-touch-surface"></div>
       </div>
 
       <!-- Vertical Up / Down Scroll Arrow Controls -->
@@ -1808,69 +1805,7 @@
     </div>
   </div>
 
-  <!-- =========================================
-       ZOOM WEBINAR REGISTRATION POPUP MODAL
-       ========================================== -->
-  <div id="wb_zoom_modal" class="at-reg-modal-overlay" style="display:none;">
-    <div class="at-reg-modal-card" style="border-color:rgba(37,99,235,0.5); box-shadow:0 25px 50px -12px rgba(0,0,0,0.7), 0 0 25px rgba(37,99,235,0.25);">
-      <button type="button" class="at-reg-close-btn" id="wb_zoom_modal_close_btn" onclick="window.closeZoomRegModal()" title="बंद करें">&times;</button>
-      <div class="at-reg-modal-header">
-        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(37,99,235,0.15); color:#60A5FA; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:800; margin-bottom:10px; border:1px solid rgba(59,130,246,0.3);">
-          <span>🔴 LIVE ZOOM MASTERCLASS</span>
-        </div>
-        <h3 class="at-reg-title">निःशुल्क सीट बुक करें</h3>
-        <p class="at-reg-subtitle">अपना नाम और व्हाट्सएप नंबर दर्ज करके ज़ूम लिंक व पासवर्ड तुरंत प्राप्त करें:</p>
-      </div>
-      <form id="wb_popup_reg_form" class="at-reg-form">
-        <div class="at-input-group">
-          <label for="wb_popup_input_name"><i class="fa-solid fa-user"></i> आपका पूरा नाम (Full Name)</label>
-          <input type="text" id="wb_popup_input_name" placeholder="उदा. राहुल शर्मा" required autocomplete="name">
-        </div>
-        <div class="at-input-group">
-          <label for="wb_popup_input_mobile"><i class="fa-solid fa-phone"></i> 10 अंकों का व्हाट्सएप मोबाइल नंबर</label>
-          <input type="tel" id="wb_popup_input_mobile" placeholder="उदा. 9876543210" maxlength="10" pattern="[6-9][0-9]{9}" required autocomplete="tel">
-        </div>
-        <button type="submit" id="wb_popup_submit_btn" class="at-reg-submit-btn" style="background:linear-gradient(135deg, #16a34a, #15803d); box-shadow:0 6px 18px rgba(22,163,74,0.4);">
-          <span>🟢 सीट बुक करें व ज़ूम लिंक देखें</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-        <div class="at-reg-footer-note">
-          <i class="fa-solid fa-shield-halved"></i> 100% निःशुल्क • ज़ूम पास तुरंत स्क्रीन पर दिखेगा
-        </div>
-      </form>
-    </div>
-  </div>
 
-  <!-- =========================================
-       AAROGYAMTUBE SHARE REGISTRATION POPUP MODAL
-       ========================================== -->
-  <div id="at_reg_modal" class="at-reg-modal-overlay" style="display:none;">
-    <div class="at-reg-modal-card">
-      <button type="button" class="at-reg-close-btn" id="at_reg_close_btn" title="बंद करें">&times;</button>
-      <div class="at-reg-modal-header">
-        <img src="/images/logo/aarogyamtube-logo.png" alt="AarogyamTube" class="at-reg-logo" onerror="this.src='/images/logo/logo.png'">
-        <h3 class="at-reg-title">Welcome to Aarogyam Parivar</h3>
-        <p class="at-reg-subtitle">🎬 1-मिनट कृषि शॉर्ट्स एवं वीडियो देखने के लिए अपना नाम और नंबर दर्ज करें</p>
-      </div>
-      <form id="at_reg_form" class="at-reg-form">
-        <div class="at-input-group">
-          <label for="at_input_name"><i class="fa-solid fa-user"></i> आपका नाम (Full Name)</label>
-          <input type="text" id="at_input_name" placeholder="उदा. रमेश कुमार" required autocomplete="name">
-        </div>
-        <div class="at-input-group">
-          <label for="at_input_mobile"><i class="fa-solid fa-phone"></i> व्हाट्सएप मोबाइल नंबर (Mobile No.)</label>
-          <input type="tel" id="at_input_mobile" placeholder="10 अंकों का व्हाट्सएप नंबर" maxlength="10" pattern="[6-9][0-9]{9}" required autocomplete="tel">
-        </div>
-        <button type="submit" id="at_reg_submit_btn" class="at-reg-submit-btn">
-          <span>वीडियो देखें (Continue)</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-        <div class="at-reg-footer-note">
-          <i class="fa-solid fa-shield-halved"></i> 100% सुरक्षित • कोई पासवर्ड की जरूरत नहीं
-        </div>
-      </form>
-    </div>
-  </div>
 
   <!-- =========================================
        UNIVERSAL HOMEPAGE FOOTER (MATCHES INDEX.HTML)
@@ -2277,121 +2212,36 @@
         try {
           const aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
           const uMobile = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone;
-          const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name;
-          const hasSession = localStorage.getItem('AI_SESSION') !== null;
-          return Boolean((uMobile && String(uMobile).replace(/\D/g, '').length === 10) || (uName && uMobile) || hasSession);
+          const cleanMobile = uMobile ? String(uMobile).replace(/\D/g, '').slice(-10) : '';
+          return cleanMobile.length === 10;
         } catch (e) {
-          return Boolean(localStorage.getItem('aim_user_mobile'));
+          const m = localStorage.getItem('aim_user_mobile');
+          return Boolean(m && String(m).replace(/\D/g, '').slice(-10).length === 10);
         }
       }
 
+      // Unified Registration Hook via Universal Modal
       window.openZoomRegModal = function() {
-        const modal = document.getElementById('wb_zoom_modal');
-        if (modal) {
-          modal.style.display = 'flex';
-          const nameInput = document.getElementById('wb_popup_input_name');
-          if (nameInput) setTimeout(() => nameInput.focus(), 100);
+        if (typeof window.openGuestLoginModal === 'function') {
+          window.openGuestLoginModal(() => {
+            showUnlockedScreen();
+          }, {
+            source: 'WebinarZoomPass',
+            title: 'निःशुल्क सीट बुक करें',
+            subtitle: 'ज़ूम लिंक व पासवर्ड तुरंत प्राप्त करने के लिए विवरण दर्ज करें'
+          });
         }
       };
 
       window.closeZoomRegModal = function() {
-        const modal = document.getElementById('wb_zoom_modal');
-        if (modal) modal.style.display = 'none';
+        if (typeof window.closeGuestLoginModal === 'function') {
+          window.closeGuestLoginModal();
+        }
       };
 
-      document.getElementById('wb_zoom_modal')?.addEventListener('click', (e) => {
-        if (e.target.id === 'wb_zoom_modal') {
-          window.closeZoomRegModal();
-        }
-      });
-
-      document.getElementById('wb_popup_reg_form')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitBtn = document.getElementById('wb_popup_submit_btn');
-        const name = (document.getElementById('wb_popup_input_name')?.value || '').trim();
-        const mobile = (document.getElementById('wb_popup_input_mobile')?.value || '').trim().replace(/\D/g, '').slice(-10);
-
-        if (!name || mobile.length !== 10) {
-          alert('कृपया सही नाम और 10 अंकों का व्हाट्सएप नंबर दर्ज करें।');
-          return;
-        }
-
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = '<span>सत्यापित हो रहा है...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
-        }
-
-        // Save session locally so user stays on page unlocked INSTANTLY (0ms)
-        const userObj = {
-          name: name,
-          full_name: name,
-          mobile: mobile,
-          share_id: 'AI' + mobile.slice(-6),
-          registered_at: new Date().toISOString(),
-          source: 'webinar'
-        };
-        localStorage.setItem('aim_user_name', name);
-        localStorage.setItem('aim_user_mobile', mobile);
-        localStorage.setItem('AI_USER', JSON.stringify(userObj));
-        localStorage.setItem('AI_SESSION', JSON.stringify({ mobile: mobile, active: true, loginTime: new Date().toISOString() }));
-        sessionStorage.setItem(`wb_reg_${webinarId}`, 'true');
-
-        // Close modal and unlock screen
-        window.closeZoomRegModal();
+      // Listen for Global Universal Login Event to unlock webinar screen instantly
+      window.addEventListener('ai:user-logged-in', () => {
         showUnlockedScreen();
-
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span>🟢 सीट बुक करें व ज़ूम लिंक देखें</span> <i class="fa-solid fa-arrow-right"></i>';
-        }
-
-        // Background asynchronous registration log (Zero-Egress non-blocking)
-        if (db) {
-          try {
-            // 1. Check/Insert in profiles
-            const { data: existingUser } = await db.from('profiles').select('id, share_id').eq('mobile', mobile).limit(1).maybeSingle();
-            let sponsorProfileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
-            if (refShareId && refShareId !== 'AI000004') {
-              try {
-                const { data: refUser } = await db.from('profiles').select('id').eq('share_id', refShareId).limit(1).maybeSingle();
-                if (refUser) sponsorProfileId = refUser.id;
-              } catch(e) {}
-            }
-
-            if (!existingUser) {
-              const userUniqueShareId = 'AI' + Math.floor(100000 + Math.random() * 900000);
-              await db.from('profiles').insert([{
-                full_name: name,
-                mobile: mobile,
-                share_id: userUniqueShareId,
-                referral_code: refShareId || 'AI000004',
-                referral_mobile: refShareId === 'AI000004' ? '7974422572' : null,
-                referred_by: sponsorProfileId,
-                registration_source: 'webinar',
-                profile_complete: false,
-                is_active: false
-              }]);
-            }
-
-            // 2. Insert into surveys for attendance & webinar reports
-            await db.from('surveys').insert([{
-              phone_number: mobile,
-              name: name,
-              source: 'webinar',
-              source_of_registration: 'webinar',
-              occupation: 'webinar_attendee',
-              notes: `Registered for AarogyamTube Webinar: ${masterData.title}`,
-              event_type: 'webinar_registration',
-              category_answers: {
-                referrer_share_id: refShareId,
-                webinar_id: masterData.id || 'WB_MASTER',
-                registered_at: new Date().toISOString()
-              }
-            }]);
-          } catch (err) {
-            console.warn('Webinar background sync notice:', err);
-          }
-        }
       });
 
       function checkUserSessionStatus() {
@@ -2466,151 +2316,27 @@
       };
 
       // -------------------------------------------------------------
-      // 3.1 AAROGYAMTUBE SHARE REGISTRATION POPUP ENGINE
+      // 3.1 AAROGYAMTUBE SHARE REGISTRATION POPUP ENGINE (UNIVERSAL HOOK)
       // -------------------------------------------------------------
-      let pendingAarogyamTubeCallback = null;
-      let pendingAarogyamTubeVidInfo = { id: '', title: '' };
-
       window.checkAarogyamTubeAccess = function(callback, vidId, vidTitle) {
-        if (isUserLoggedIn()) {
+        if (typeof window.isUserLoggedIn === 'function' && window.isUserLoggedIn()) {
           if (typeof callback === 'function') callback();
           return true;
         }
 
-        openAarogyamTubeRegModal(vidId, vidTitle, callback);
+        if (typeof window.openGuestLoginModal === 'function') {
+          window.openGuestLoginModal(callback, {
+            source: 'AarogyamTube',
+            title: 'Welcome to Aarogyam Parivar',
+            subtitle: '1-मिनट कृषि शॉर्ट्स एवं वीडियो देखने के लिए नाम व नंबर दर्ज करें',
+            meta: {
+              video_id: vidId || 'AarogyamTube',
+              video_title: vidTitle || 'AarogyamTube Video'
+            }
+          });
+        }
         return false;
       };
-
-      function openAarogyamTubeRegModal(vidId, vidTitle, callback) {
-        pendingAarogyamTubeCallback = callback;
-        pendingAarogyamTubeVidInfo = { id: vidId || 'AarogyamTube', title: vidTitle || 'AarogyamTube Video' };
-        
-        const modal = document.getElementById('at_reg_modal');
-        if (modal) {
-          modal.style.display = 'flex';
-          const nameInput = document.getElementById('at_input_name');
-          if (nameInput) setTimeout(() => nameInput.focus(), 100);
-        }
-      }
-
-      window.closeAarogyamTubeRegModal = function() {
-        const modal = document.getElementById('at_reg_modal');
-        if (modal) modal.style.display = 'none';
-        pendingAarogyamTubeCallback = null;
-      };
-
-      document.getElementById('at_reg_close_btn')?.addEventListener('click', () => {
-        window.closeAarogyamTubeRegModal();
-      });
-
-      document.getElementById('at_reg_modal')?.addEventListener('click', (e) => {
-        if (e.target.id === 'at_reg_modal') {
-          window.closeAarogyamTubeRegModal();
-        }
-      });
-
-      document.getElementById('at_reg_form')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitBtn = document.getElementById('at_reg_submit_btn');
-        const name = (document.getElementById('at_input_name')?.value || '').trim();
-        const mobile = (document.getElementById('at_input_mobile')?.value || '').trim().replace(/\D/g, '').slice(-10);
-
-        if (!name || mobile.length !== 10) {
-          alert('कृपया सही नाम और 10 अंकों का व्हाट्सएप मोबाइल नंबर दर्ज करें।');
-          return;
-        }
-
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = '<span>सत्यापित हो रहा है...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
-        }
-
-        // 1. Instant local storage session (0ms)
-        const userObj = {
-          name: name,
-          full_name: name,
-          mobile: mobile,
-          share_id: 'AI' + mobile.slice(-6),
-          registered_at: new Date().toISOString(),
-          source: 'AarogyamTube'
-        };
-        localStorage.setItem('aim_user_name', name);
-        localStorage.setItem('aim_user_mobile', mobile);
-        localStorage.setItem('AI_USER', JSON.stringify(userObj));
-        localStorage.setItem('AI_SESSION', JSON.stringify({ mobile: mobile, active: true, loginTime: new Date().toISOString() }));
-
-        // 2. Background Zero-Egress Database Sync
-        if (db) {
-          try {
-            const { data: existingUser } = await db
-              .from('profiles')
-              .select('id, full_name, mobile, share_id')
-              .eq('mobile', mobile)
-              .limit(1)
-              .maybeSingle();
-
-            let sponsorProfileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
-            let sponsorShareCode = refShareId || 'AI000004';
-
-            if (sponsorShareCode !== 'AI000004') {
-              try {
-                const { data: refUser } = await db.from('profiles').select('id').eq('share_id', sponsorShareCode).limit(1).maybeSingle();
-                if (refUser) sponsorProfileId = refUser.id;
-              } catch(e) {}
-            }
-
-            if (!existingUser) {
-              const userUniqueShareId = 'AI' + Math.floor(100000 + Math.random() * 900000);
-              await db.from('profiles').insert([{
-                full_name: name,
-                mobile: mobile,
-                share_id: userUniqueShareId,
-                referral_code: sponsorShareCode,
-                referral_mobile: sponsorShareCode === 'AI000004' ? '7974422572' : null,
-                referred_by: sponsorProfileId,
-                registration_source: 'AarogyamTube',
-                profile_complete: false,
-                is_active: false
-              }]);
-            }
-
-            // Survey Log for Video Viewers & Leads
-            await db.from('surveys').insert([{
-              phone_number: mobile,
-              name: name,
-              source: 'AarogyamTube',
-              source_of_registration: 'AarogyamTube',
-              occupation: 'video_viewer',
-              notes: `Registered via AarogyamTube: ${pendingAarogyamTubeVidInfo.title || pendingAarogyamTubeVidInfo.id}`,
-              event_type: 'recorded_video_view',
-              category_answers: {
-                referrer_share_id: refShareId,
-                video_id: pendingAarogyamTubeVidInfo.id,
-                video_title: pendingAarogyamTubeVidInfo.title,
-                registered_at: new Date().toISOString()
-              }
-            }]);
-          } catch(err) {
-            console.warn('AarogyamTube profile sync notice:', err);
-          }
-        }
-
-        // Close modal and execute pending video callback
-        const modal = document.getElementById('at_reg_modal');
-        if (modal) modal.style.display = 'none';
-
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span>वीडियो देखें (Continue)</span> <i class="fa-solid fa-arrow-right"></i>';
-        }
-
-        // Also unlock webinar session if present
-        showUnlockedScreen();
-
-        if (typeof pendingAarogyamTubeCallback === 'function') {
-          pendingAarogyamTubeCallback();
-        }
-      });
 
       window.copyWbCred = function (type) {
         const val = type === 'mid' ? masterData.meeting_id : masterData.passcode;
@@ -2652,22 +2378,13 @@
         }
       };
 
-      // Individual Video / Short Sharing (Short URL + Native Mobile Share)
+      // Individual Video / Short WhatsApp Sharing (Direct WhatsApp Chat)
       window.shareIndividualVideo = function (vidId, vidTitle) {
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vidId)}&ref=${encodeURIComponent(userShare)}`;
         const promoText = `🎬 *${vidTitle}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
-
-        if (navigator.share) {
-          navigator.share({
-            title: vidTitle,
-            text: `🎬 *${vidTitle}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:`,
-            url: shareUrl
-          }).catch(() => { });
-        } else {
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
-        }
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
       // -------------------------------------------------------------
@@ -2749,8 +2466,89 @@ if (wbShortsSeeMoreBtn) {
 
 
       // -------------------------------------------------------------
-      // 5. IN-APP REELS PLAYER ENGINE (SWIPE GESTURE, FULLSCREEN FIT & BUTTON HIDING)
+      // 5. HIGH-PERFORMANCE REELS PLAYER (YOUTUBE API, AUTO-ADVANCE & DIRECT WHATSAPP)
       // -------------------------------------------------------------
+      let ytReelPlayer = null;
+      let isYtApiReady = false;
+
+      // Load YouTube IFrame API dynamically
+      if (!window.YT) {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      }
+
+      window.onYouTubeIframeAPIReady = function() {
+        isYtApiReady = true;
+      };
+
+      function initOrLoadYtPlayer(ytId) {
+        const playerDiv = document.getElementById('wb_reel_yt_container');
+        const ifr = document.getElementById('wb_reel_iframe');
+        if (ifr) ifr.style.display = 'none';
+        if (playerDiv) playerDiv.style.display = 'block';
+
+        if (ytReelPlayer && typeof ytReelPlayer.loadVideoById === 'function') {
+          try {
+            ytReelPlayer.loadVideoById({
+              videoId: ytId,
+              startSeconds: 0
+            });
+            ytReelPlayer.playVideo();
+            return;
+          } catch(e) {
+            console.warn('YT Player load exception:', e);
+          }
+        }
+
+        if (window.YT && window.YT.Player) {
+          try {
+            ytReelPlayer = new YT.Player('wb_reel_yt_container', {
+              videoId: ytId,
+              playerVars: {
+                autoplay: 1,
+                controls: 1,
+                rel: 0,
+                modestbranding: 1,
+                playsinline: 1,
+                enablejsapi: 1,
+                origin: window.location.origin
+              },
+              events: {
+                onReady: (event) => {
+                  event.target.playVideo();
+                },
+                onStateChange: (event) => {
+                  // State 0 = ENDED -> Auto-Advance to Next Reel!
+                  if (event.data === 0) {
+                    setTimeout(() => {
+                      window.navReel(1);
+                    }, 400);
+                  }
+                },
+                onError: () => {
+                  // Fallback on embed error
+                  if (ifr) {
+                    ifr.style.display = 'block';
+                    ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
+                  }
+                }
+              }
+            });
+          } catch(err) {
+            console.warn('YT Player init fallback:', err);
+            if (ifr) {
+              ifr.style.display = 'block';
+              ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
+            }
+          }
+        } else if (ifr) {
+          ifr.style.display = 'block';
+          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
+        }
+      }
+
       window.openReelPlayer = function (idx) {
         if (!activeReelsList || activeReelsList.length === 0) return;
         const targetReel = activeReelsList[idx];
@@ -2760,7 +2558,6 @@ if (wbShortsSeeMoreBtn) {
           loadReelAtIndex(currentReelIndex);
 
           document.getElementById('wb_reels_modal')?.classList.add('active');
-          // Hide floating action buttons & bottom nav & lock background scroll
           document.body.classList.add('wb-reels-open');
           document.body.style.overflow = 'hidden';
         }, targetReel?.id, targetReel?.title);
@@ -2770,6 +2567,9 @@ if (wbShortsSeeMoreBtn) {
         document.getElementById('wb_reels_modal')?.classList.remove('active');
         document.body.classList.remove('wb-reels-open');
         document.body.style.overflow = '';
+        if (ytReelPlayer && typeof ytReelPlayer.stopVideo === 'function') {
+          try { ytReelPlayer.stopVideo(); } catch(e) {}
+        }
         const ifr = document.getElementById('wb_reel_iframe');
         if (ifr) ifr.src = '';
       };
@@ -2777,7 +2577,6 @@ if (wbShortsSeeMoreBtn) {
       window.navReel = function (delta) {
         if (!activeReelsList || activeReelsList.length === 0) return;
         currentReelIndex += delta;
-        // Infinite Loop
         if (currentReelIndex >= activeReelsList.length) currentReelIndex = 0;
         if (currentReelIndex < 0) currentReelIndex = activeReelsList.length - 1;
         loadReelAtIndex(currentReelIndex);
@@ -2792,14 +2591,21 @@ if (wbShortsSeeMoreBtn) {
         document.getElementById('wb_reel_caption_speaker').textContent = `👤 ${reel.speaker || 'आरोग्यम कृषि विशेषज्ञ'}`;
 
         const ifr = document.getElementById('wb_reel_iframe');
-        let embedSrc = '';
+        const playerDiv = document.getElementById('wb_reel_yt_container');
         const url = reel.video_url || reel.youtube_url || '';
         const appBtn = document.getElementById('wb_reel_direct_app_btn');
 
         if (reel.platform === 'instagram' || url.includes('instagram.com')) {
-          const igMatch = url.match(/(?:reel|p)\/([a-zA-Z0-9_-]+)/);
-          const igId = igMatch ? igMatch[1] : '';
-          embedSrc = `https://www.instagram.com/reel/${igId}/embed/`;
+          if (ytReelPlayer && typeof ytReelPlayer.stopVideo === 'function') {
+            try { ytReelPlayer.stopVideo(); } catch(e) {}
+          }
+          if (playerDiv) playerDiv.style.display = 'none';
+          if (ifr) {
+            ifr.style.display = 'block';
+            const igMatch = url.match(/(?:reel|p)\/([a-zA-Z0-9_-]+)/);
+            const igId = igMatch ? igMatch[1] : '';
+            ifr.src = `https://www.instagram.com/reel/${igId}/embed/`;
+          }
           if (appBtn) {
             appBtn.style.display = 'inline-block';
             appBtn.href = url;
@@ -2807,7 +2613,14 @@ if (wbShortsSeeMoreBtn) {
             appBtn.style.background = '#E1306C';
           }
         } else if (reel.platform === 'facebook' || url.includes('facebook.com') || url.includes('fb.watch')) {
-          embedSrc = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&width=500`;
+          if (ytReelPlayer && typeof ytReelPlayer.stopVideo === 'function') {
+            try { ytReelPlayer.stopVideo(); } catch(e) {}
+          }
+          if (playerDiv) playerDiv.style.display = 'none';
+          if (ifr) {
+            ifr.style.display = 'block';
+            ifr.src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&width=500`;
+          }
           if (appBtn) {
             appBtn.style.display = 'inline-block';
             appBtn.href = url;
@@ -2815,22 +2628,21 @@ if (wbShortsSeeMoreBtn) {
             appBtn.style.background = '#1877F2';
           }
         } else {
-          // YouTube Shorts / Video
+          // YouTube Shorts / Video (Zero-Lag API Engine)
+          if (appBtn) appBtn.style.display = 'none';
           const ytId = reel.youtube_id || extractYoutubeVideoId(url) || 'dQw4w9WgXcQ';
-          embedSrc = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
-          if (appBtn) {
-            appBtn.style.display = 'none';
-          }
+          initOrLoadYtPlayer(ytId);
         }
-        if (ifr) ifr.src = embedSrc;
       }
 
+      // Direct WhatsApp Chat Sharing (100% Reliable, Opens WhatsApp App / Web)
       window.shareCurrentReelWhatsApp = function () {
         const reel = activeReelsList[currentReelIndex];
         if (!reel) return;
         window.shareIndividualVideo(reel.id, reel.title);
       };
 
+      // Native Device Share (Only on other share button)
       window.shareCurrentReelNative = function () {
         const reel = activeReelsList[currentReelIndex];
         if (!reel) return;
@@ -2853,7 +2665,7 @@ if (wbShortsSeeMoreBtn) {
       // Vertical Touch Gesture Swipe & Scroll Wheel for YouTube Shorts experience
       function setupReelsSwipeGestures() {
         const modal = document.getElementById('wb_reels_modal');
-        const touchSurface = document.getElementById('wb_reel_touch_surface') || modal;
+        const touchSurface = document.getElementById('wb_reels_swipe_container') || modal;
         if (!modal) return;
 
         let startY = 0;
@@ -2870,31 +2682,12 @@ if (wbShortsSeeMoreBtn) {
           isSwiping = false;
           const endY = e.changedTouches[0].clientY;
           const diff = startY - endY;
-          if (diff > 40) {
+          if (diff > 45) {
             window.navReel(1); // Swipe Up -> Next
-          } else if (diff < -40) {
+          } else if (diff < -45) {
             window.navReel(-1); // Swipe Down -> Prev
           }
         }, { passive: true });
-
-        // Desktop / Touch Pointer Dragging
-        let pointerStartY = 0;
-        let isPointerActive = false;
-        touchSurface?.addEventListener('pointerdown', (e) => {
-          pointerStartY = e.clientY;
-          isPointerActive = true;
-        });
-
-        window.addEventListener('pointerup', (e) => {
-          if (!isPointerActive) return;
-          isPointerActive = false;
-          const diff = pointerStartY - e.clientY;
-          if (diff > 45) {
-            window.navReel(1);
-          } else if (diff < -45) {
-            window.navReel(-1);
-          }
-        });
 
         // Mouse Wheel Scroll (Desktop)
         let wheelThrottle = null;
