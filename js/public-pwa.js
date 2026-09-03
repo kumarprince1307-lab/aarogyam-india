@@ -28,11 +28,22 @@ export function initPublicPwa() {
 }
 
 function lockScreenOrientationPortrait() {
-  try {
-    if (window.screen && window.screen.orientation && typeof window.screen.orientation.lock === 'function') {
-      window.screen.orientation.lock('portrait').catch(() => {});
-    }
-  } catch (e) {}
+  const tryLock = () => {
+    try {
+      if (window.screen && window.screen.orientation && typeof window.screen.orientation.lock === 'function') {
+        window.screen.orientation.lock('portrait-primary')
+          .catch(() => window.screen.orientation.lock('portrait').catch(() => {}));
+      }
+    } catch (e) {}
+  };
+
+  tryLock();
+
+  // Retry locking upon first user interaction and fullscreen changes
+  window.addEventListener('orientationchange', tryLock, { passive: true });
+  document.addEventListener('fullscreenchange', tryLock, { passive: true });
+  document.addEventListener('touchstart', tryLock, { once: true, passive: true });
+  document.addEventListener('click', tryLock, { once: true, passive: true });
 }
 
 function setupMenuEventListeners() {
