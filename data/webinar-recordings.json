@@ -1,6 +1,24 @@
 {
   "recordings": [
     {
+      "id": "VID_378682",
+      "format": "full_video",
+      "platform": "youtube",
+      "title": "Netsurf Biofit Complete Training | सभी कृषि Products की सम्पूर्ण जानकारी | किसान जरूर देखें",
+      "description": "🌱 NETSURF BIOFIT COMPLETE PRODUCT TRAINING\n\nइस Live Training में NETSURF BIOFIT के सभी Products की पूरी जानकारी, उपयोग और फायदे जानें।\n\n#Netsurf #Biofit #ProductTraining #LiveTraining",
+      "subject": "Organic Farming",
+      "category": "Organic Farming",
+      "video_url": "https://www.youtube.com/live/xH2ajyEm_G0?si=RB-xBWnNYovO56NF",
+      "youtube_url": "https://www.youtube.com/live/xH2ajyEm_G0?si=RB-xBWnNYovO56NF",
+      "youtube_id": "xH2ajyEm_G0",
+      "thumbnail": "https://img.youtube.com/vi/xH2ajyEm_G0/hqdefault.jpg",
+      "duration": "41:25",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "all",
+      "status": "active",
+      "created_at": "2026-09-08T18:32:58.682Z"
+    },
+    {
       "id": "VID_S730902",
       "format": "short_reel",
       "platform": "youtube",
