@@ -954,10 +954,12 @@
       margin: 0 !important;
       padding: 0 !important;
       display: flex !important;
+      flex-direction: column !important;
       align-items: center !important;
       justify-content: center !important;
       box-shadow: none !important;
       transform: none !important;
+      box-sizing: border-box !important;
     }
 
     body.cinema-fullscreen-mode #at_player_frame_wrap .at-aspect-16-9,
@@ -973,10 +975,9 @@
       max-height: 100dvh !important;
       aspect-ratio: 16 / 9 !important;
       background: #000000 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      margin: auto !important;
+      display: block !important;
+      margin: auto 0 !important;
+      flex-shrink: 0 !important;
     }
 
     body.cinema-fullscreen-mode #at_player_frame_wrap iframe,
@@ -1517,19 +1518,21 @@
     /* Bottom Floating Action Rail in Fullscreen */
     .at-fs-bottom-rail {
       display: none;
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      z-index: 2147483647;
-      align-items: center;
-      gap: 10px;
-      background: rgba(15, 23, 42, 0.88);
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(14px);
-      padding: 8px 14px;
-      border-radius: 30px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
-      pointer-events: auto;
+      position: absolute !important;
+      bottom: 40px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      z-index: 2147483647 !important;
+      align-items: center !important;
+      gap: 10px !important;
+      background: rgba(15, 23, 42, 0.92) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+      backdrop-filter: blur(14px) !important;
+      padding: 8px 16px !important;
+      border-radius: 30px !important;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85) !important;
+      pointer-events: auto !important;
+      white-space: nowrap !important;
     }
 
     body.cinema-fullscreen-mode .at-fs-bottom-rail,
@@ -1580,16 +1583,16 @@
 
     @media (max-width: 640px) {
       .at-fs-bottom-rail {
-        bottom: 12px;
-        right: 10px;
-        left: 10px;
-        justify-content: space-around;
-        padding: 6px 10px;
-        gap: 6px;
+        bottom: 50px !important;
+        width: 92% !important;
+        max-width: 380px !important;
+        justify-content: space-around !important;
+        padding: 8px 10px !important;
+        gap: 6px !important;
       }
       .at-fs-bottom-btn {
-        padding: 6px 10px;
-        font-size: 0.72rem;
+        padding: 6px 10px !important;
+        font-size: 0.74rem !important;
       }
     }
 
@@ -2170,6 +2173,13 @@
             </div>
           </div>
 
+          <div class="at-aspect-16-9">
+            <iframe id="at_master_iframe_main" src=""
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"
+              style="width:100%; height:100%; border:none;"></iframe>
+          </div>
+
           <!-- Fullscreen Bottom Floating Action Rail -->
           <div class="at-fs-bottom-rail" id="at_fs_bottom_rail">
             <button type="button" class="at-fs-bottom-btn at-fs-btn-like" id="at_fs_like_btn" onclick="window.likeMasterclassVideo(event)" title="लाइक करें (Floating Hearts)">
@@ -2188,13 +2198,6 @@
               <i class="fa-solid fa-comment-dots" style="color:#60a5fa;"></i>
               <span>कमेंट</span>
             </button>
-          </div>
-
-          <div class="at-aspect-16-9">
-            <iframe id="at_master_iframe_main" src=""
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-              allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"
-              style="width:100%; height:100%; border:none;"></iframe>
           </div>
         </div>
 
