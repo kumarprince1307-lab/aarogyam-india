@@ -108,7 +108,7 @@ export async function initWebinars() {
     { key: 'sec_faqs', name: '❓ 7. FAQs Accordion', desc: 'अक्सर पूछे जाने वाले प्रश्न' }
   ];
 
-  content.innerHTML = \`
+  content.innerHTML = `
     <style>
       .adm-section-drag-item {
         transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -774,7 +774,7 @@ export async function initWebinars() {
         </div>
       </div>
     </div>
-  \`;
+  `;
 
   // -------------------------------------------------------------
   // INITIALIZE DATA & EVENT BINDINGS
@@ -980,21 +980,21 @@ export async function initWebinars() {
     const currentOrder = masterWebinar.section_order || defaultSections.map(s => s.key);
     cont.innerHTML = currentOrder.map((sKey, idx) => {
       const secMeta = defaultSections.find(s => s.key === sKey) || { name: sKey, desc: '' };
-      return \`
-        <div class="adm-section-drag-item" draggable="true" data-index="\${idx}" style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px 14px; cursor: grab;">
+      return `
+        <div class="adm-section-drag-item" draggable="true" data-index="${idx}" style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px 14px; cursor: grab;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 1.1rem; color: #60a5fa;" class="adm-drag-handle">☰</span>
             <div>
-              <div style="font-weight: 700; font-size: 0.85rem; color: #fff;">\${secMeta.name}</div>
-              <div style="font-size: 0.72rem; color: #94a3b8;">\${secMeta.desc}</div>
+              <div style="font-weight: 700; font-size: 0.85rem; color: #fff;">${secMeta.name}</div>
+              <div style="font-size: 0.72rem; color: #94a3b8;">${secMeta.desc}</div>
             </div>
           </div>
           <div style="display: flex; gap: 4px; align-items: center;">
-            <button type="button" onclick="window.moveSectionPlacement(\${idx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800;" \${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
-            <button type="button" onclick="window.moveSectionPlacement(\${idx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800;" \${idx === currentOrder.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
+            <button type="button" onclick="window.moveSectionPlacement(${idx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800;" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
+            <button type="button" onclick="window.moveSectionPlacement(${idx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800;" ${idx === currentOrder.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
           </div>
         </div>
-      \`;
+      `;
     }).join('');
   }
 
@@ -1019,24 +1019,24 @@ export async function initWebinars() {
     if (!cont) return;
     const list = masterWebinar.banners || [];
     cont.innerHTML = list.map((b, idx) => {
-      const bTitle = typeof b === 'object' ? (b.title || '') : \`पोस्टर #\${idx + 1}\`;
+      const bTitle = typeof b === 'object' ? (b.title || '') : `पोस्टर #${idx + 1}`;
       const bUrl = typeof b === 'object' ? (b.url || '') : b;
-      return \`
+      return `
         <div style="display: grid; grid-template-columns: 60px 1fr auto; gap: 10px; align-items: center; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px;">
           <div style="width:60px; height:38px; background:#000; border-radius:4px; overflow:hidden;">
-            <img src="\${bUrl}" alt="Banner" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-hero-banner-1.webp'" />
+            <img src="${bUrl}" alt="Banner" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-hero-banner-1.webp'" />
           </div>
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <input type="text" class="admin-input adm-banner-title" placeholder="पोस्टर शीर्षक" value="\${bTitle}" style="font-size:0.82rem; font-weight:700; width:100%;" />
-            <input type="text" class="admin-input adm-banner-url" placeholder="इमेज URL" value="\${bUrl}" style="font-size:0.75rem; width:100%;" />
+            <input type="text" class="admin-input adm-banner-title" placeholder="पोस्टर शीर्षक" value="${bTitle}" style="font-size:0.82rem; font-weight:700; width:100%;" />
+            <input type="text" class="admin-input adm-banner-url" placeholder="इमेज URL" value="${bUrl}" style="font-size:0.75rem; width:100%;" />
           </div>
           <div style="display: flex; gap: 4px; align-items: center;">
-            <button type="button" onclick="window.moveBannerItem(\${idx}, -1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" \${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
-            <button type="button" onclick="window.moveBannerItem(\${idx}, 1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" \${idx === list.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
-            <button type="button" onclick="window.removeBannerItem(\${idx})" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;">&times;</button>
+            <button type="button" onclick="window.moveBannerItem(${idx}, -1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
+            <button type="button" onclick="window.moveBannerItem(${idx}, 1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" ${idx === list.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
+            <button type="button" onclick="window.removeBannerItem(${idx})" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;">&times;</button>
           </div>
         </div>
-      \`;
+      `;
     }).join('');
   }
 
@@ -1065,12 +1065,12 @@ export async function initWebinars() {
   function renderKpisList() {
     const cont = document.getElementById('adm_kpi_container');
     if (!cont) return;
-    cont.innerHTML = (masterWebinar.kpis || []).map((kpi, idx) => \`
+    cont.innerHTML = (masterWebinar.kpis || []).map((kpi, idx) => `
       <div style="display: flex; gap: 6px; align-items: center;">
-        <input type="text" class="admin-input adm-kpi-input" value="\${kpi}" style="flex: 1;" />
-        <button type="button" onclick="window.removeKpiItem(\${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff;">&times;</button>
+        <input type="text" class="admin-input adm-kpi-input" value="${kpi}" style="flex: 1;" />
+        <button type="button" onclick="window.removeKpiItem(${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff;">&times;</button>
       </div>
-    \`).join('');
+    `).join('');
   }
 
   window.removeKpiItem = (idx) => {
@@ -1087,16 +1087,16 @@ export async function initWebinars() {
   function renderFaqsList() {
     const cont = document.getElementById('adm_faqs_container');
     if (!cont) return;
-    cont.innerHTML = (masterWebinar.faqs || []).map((faq, idx) => \`
+    cont.innerHTML = (masterWebinar.faqs || []).map((faq, idx) => `
       <div style="background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-          <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700;">प्रश्न #\${idx + 1}:</span>
-          <button type="button" onclick="window.removeFaqItem(\${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times; हटाएं</button>
+          <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700;">प्रश्न #${idx + 1}:</span>
+          <button type="button" onclick="window.removeFaqItem(${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times; हटाएं</button>
         </div>
-        <input type="text" class="admin-input adm-faq-q" value="\${faq.q}" placeholder="प्रश्न लिखें..." style="width: 100%; margin-bottom: 6px;" />
-        <textarea class="admin-input adm-faq-a" rows="2" placeholder="उत्तर लिखें..." style="width: 100%;">\${faq.a}</textarea>
+        <input type="text" class="admin-input adm-faq-q" value="${faq.q}" placeholder="प्रश्न लिखें..." style="width: 100%; margin-bottom: 6px;" />
+        <textarea class="admin-input adm-faq-a" rows="2" placeholder="उत्तर लिखें..." style="width: 100%;">${faq.a}</textarea>
       </div>
-    \`).join('');
+    `).join('');
   }
 
   window.removeFaqItem = (idx) => {
@@ -1188,47 +1188,47 @@ export async function initWebinars() {
     // 1. Drawer Channel selector
     const chSel = document.getElementById('drawer_rec_channel');
     if (chSel) {
-      chSel.innerHTML = allChannels.map(ch => \`
-        <option value="\${ch.id}">\${ch.name} (\${ch.handle}) \${ch.is_default ? '🌟 Default' : ''}</option>
-      \`).join('');
+      chSel.innerHTML = allChannels.map(ch => `
+        <option value="${ch.id}">${ch.name} (${ch.handle}) ${ch.is_default ? '🌟 Default' : ''}</option>
+      `).join('');
     }
 
     // 2. Drawer Category selector
     const catSel = document.getElementById('drawer_rec_category');
     if (catSel) {
       const distinctCats = Array.from(new Set([...masterCategories, ...allRecordings.map(v => v.category).filter(Boolean)]));
-      catSel.innerHTML = \`
-        \${distinctCats.map(c => \`<option value="\${c}">\${c}</option>\`).join('')}
+      catSel.innerHTML = `
+        ${distinctCats.map(c => `<option value="${c}">${c}</option>`).join('')}
         <option value="custom">➕ नई श्रेणी जोड़ें (Add Custom)</option>
-      \`;
+      `;
     }
 
     // 3. Drawer Playlist selector
     const plSel = document.getElementById('drawer_rec_playlist');
     if (plSel) {
-      plSel.innerHTML = \`
+      plSel.innerHTML = `
         <option value="">(कोई प्लेलिस्ट नहीं)</option>
-        \${allPlaylists.map(p => \`<option value="\${p.id}">\${p.title}</option>\`).join('')}
-      \`;
+        ${allPlaylists.map(p => `<option value="${p.id}">${p.title}</option>`).join('')}
+      `;
     }
 
     // 4. Filter Toolbar Category dropdown
     const fCatSel = document.getElementById('adm_filter_category');
     if (fCatSel) {
       const distinctCats = Array.from(new Set([...masterCategories, ...allRecordings.map(v => v.category).filter(Boolean)]));
-      fCatSel.innerHTML = \`
+      fCatSel.innerHTML = `
         <option value="all">📁 सभी श्रेणियां (All Categories)</option>
-        \${distinctCats.map(c => \`<option value="\${c}">\${c}</option>\`).join('')}
-      \`;
+        ${distinctCats.map(c => `<option value="${c}">${c}</option>`).join('')}
+      `;
     }
 
     // 5. Filter Toolbar Playlist dropdown
     const fPlSel = document.getElementById('adm_filter_playlist');
     if (fPlSel) {
-      fPlSel.innerHTML = \`
+      fPlSel.innerHTML = `
         <option value="all">📑 सभी प्लेलिस्ट्स (All Playlists)</option>
-        \${allPlaylists.map(p => \`<option value="\${p.id}">\${p.title}</option>\`).join('')}
-      \`;
+        ${allPlaylists.map(p => `<option value="${p.id}">${p.title}</option>`).join('')}
+      `;
     }
   }
 
@@ -1281,16 +1281,16 @@ export async function initWebinars() {
     if (!tbody) return;
 
     const filteredList = getFilteredRecordings();
-    if (fBadge) fBadge.textContent = \`दिखाए गए: \${filteredList.length} / कुल: \${allRecordings.length}\`;
+    if (fBadge) fBadge.textContent = `दिखाए गए: ${filteredList.length} / कुल: ${allRecordings.length}`;
 
     if (filteredList.length === 0) {
-      tbody.innerHTML = \`
+      tbody.innerHTML = `
         <tr>
           <td colspan="6" style="text-align: center; padding: 26px; color: var(--admin-muted);">
-            \${allRecordings.length === 0 ? 'लाइब्रेरी में अभी कोई वीडियो नहीं है।' : '🔍 खोजे गए फ़िल्टर के अनुसार कोई वीडियो नहीं मिला।'}
+            ${allRecordings.length === 0 ? 'लाइब्रेरी में अभी कोई वीडियो नहीं है।' : '🔍 खोजे गए फ़िल्टर के अनुसार कोई वीडियो नहीं मिला।'}
           </td>
         </tr>
-      \`;
+      `;
       return;
     }
 
@@ -1303,49 +1303,49 @@ export async function initWebinars() {
 
       const chObj = allChannels.find(c => c.id === r.channel_id) || allChannels[0];
 
-      return \`
-        <tr class="adm-rec-drag-row" draggable="true" data-index="\${actualIdx}" style="border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; transition: all 0.2s ease;">
+      return `
+        <tr class="adm-rec-drag-row" draggable="true" data-index="${actualIdx}" style="border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; transition: all 0.2s ease;">
           <td style="padding: 10px; text-align: center; cursor: grab; user-select: none;" class="adm-drag-handle" title="ऊपर-नीचे ड्रैग करके क्रम बदलें">
             <span style="font-size: 1.2rem; color: #60a5fa; cursor: grab;">☰</span>
-            <div style="font-size: 0.68rem; color: #94a3b8; font-weight: 800;">#\${actualIdx + 1}</div>
+            <div style="font-size: 0.68rem; color: #94a3b8; font-weight: 800;">#${actualIdx + 1}</div>
           </td>
           <td style="padding: 10px;">
-            <img src="\${thumb}" alt="Thumb" style="width: 48px; height: \${isShort ? '64px' : '30px'}; object-fit: cover; border-radius: 4px;" onerror="this.onerror=null; this.src='\${fallback}'" />
+            <img src="${thumb}" alt="Thumb" style="width: 48px; height: ${isShort ? '64px' : '30px'}; object-fit: cover; border-radius: 4px;" onerror="this.onerror=null; this.src='${fallback}'" />
           </td>
           <td style="padding: 10px;">
-            <span style="font-weight: 800; font-size: 0.72rem; background: \${isBoth ? 'linear-gradient(135deg, #10B981, #2563EB)' : (isShort ? '#F43F5E' : '#2D8CFF')}; color: #fff; padding: 2px 6px; border-radius: 4px;">
-              \${isBoth ? '🌟 Both (16:9 & 9:16)' : (isShort ? '📱 9:16 Reel' : '🖥️ 16:9 Video')}
+            <span style="font-weight: 800; font-size: 0.72rem; background: ${isBoth ? 'linear-gradient(135deg, #10B981, #2563EB)' : (isShort ? '#F43F5E' : '#2D8CFF')}; color: #fff; padding: 2px 6px; border-radius: 4px;">
+              ${isBoth ? '🌟 Both (16:9 & 9:16)' : (isShort ? '📱 9:16 Reel' : '🖥️ 16:9 Video')}
             </span>
             <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; display: flex; align-items: center; gap: 4px;">
-              <span>\${r.platform || 'YouTube'}</span>
-              \${chObj ? \`<span style="color:#ef4444;font-weight:700;">• \${chObj.handle}</span>\` : ''}
+              <span>${r.platform || 'YouTube'}</span>
+              ${chObj ? `<span style="color:#ef4444;font-weight:700;">• ${chObj.handle}</span>` : ''}
             </div>
             <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px;">
-              \${r.pinned ? '<span style="font-size: 0.65rem; background: #3b82f6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 800;">📌 Pinned</span>' : ''}
-              \${r.priority ? \`<span style="font-size: 0.65rem; background: #8b5cf6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">🔢 P:\${r.priority}</span>\` : ''}
+              ${r.pinned ? '<span style="font-size: 0.65rem; background: #3b82f6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 800;">📌 Pinned</span>' : ''}
+              ${r.priority ? `<span style="font-size: 0.65rem; background: #8b5cf6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">🔢 P:${r.priority}</span>` : ''}
             </div>
           </td>
           <td style="padding: 10px;">
-            <div style="font-weight: 700; color: #f8fafc; font-size: 0.88rem;">\${r.title}</div>
-            <div style="font-size: 0.74rem; color: #64748b;">\${r.speaker || 'आरोग्यम विशेषज्ञ'}</div>
-            \${r.description ? \`<div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px; display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">\${r.description}</div>\` : ''}
+            <div style="font-weight: 700; color: #f8fafc; font-size: 0.88rem;">${r.title}</div>
+            <div style="font-size: 0.74rem; color: #64748b;">${r.speaker || 'आरोग्यम विशेषज्ञ'}</div>
+            ${r.description ? `<div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px; display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">${r.description}</div>` : ''}
           </td>
           <td style="padding: 10px;">
             <span style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.74rem; color: #cbd5e1; font-weight: 700;">
-              \${r.category || 'General'}
+              ${r.category || 'General'}
             </span>
             <div style="color: #94a3b8; font-family: monospace; font-size: 0.75rem; margin-top: 4px;">
-              ⏱️ \${r.duration || '0:58'}
+              ⏱️ ${r.duration || '0:58'}
             </div>
           </td>
           <td style="padding: 10px; text-align: right; white-space: nowrap;">
-            <button type="button" onclick="window.moveRecordingItem(\${actualIdx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 3px;" title="ऊपर ले जाएं" \${actualIdx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
-            <button type="button" onclick="window.moveRecordingItem(\${actualIdx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 6px;" title="नीचे ले जाएं" \${actualIdx === allRecordings.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
-            <button type="button" onclick="window.editRecordingItem('\${r.id}')" class="admin-button small-button" style="background: rgba(45,140,255,0.15); color: #60a5fa; border: 1px solid #60a5fa; padding: 4px 8px; font-weight: 800; margin-right: 4px;">✏️ एडिट</button>
-            <button type="button" onclick="window.deleteRecordingItem('\${r.id}')" class="admin-button small-button" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid #ef4444; padding: 4px 8px; font-weight: 800;">&times; हटाएं</button>
+            <button type="button" onclick="window.moveRecordingItem(${actualIdx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 3px;" title="ऊपर ले जाएं" ${actualIdx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
+            <button type="button" onclick="window.moveRecordingItem(${actualIdx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 6px;" title="नीचे ले जाएं" ${actualIdx === allRecordings.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
+            <button type="button" onclick="window.editRecordingItem('${r.id}')" class="admin-button small-button" style="background: rgba(45,140,255,0.15); color: #60a5fa; border: 1px solid #60a5fa; padding: 4px 8px; font-weight: 800; margin-right: 4px;">✏️ एडिट</button>
+            <button type="button" onclick="window.deleteRecordingItem('${r.id}')" class="admin-button small-button" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid #ef4444; padding: 4px 8px; font-weight: 800;">&times; हटाएं</button>
           </td>
         </tr>
-      \`;
+      `;
     }).join('');
 
     // Attach Drag & Drop Listeners
@@ -1486,7 +1486,7 @@ export async function initWebinars() {
     const thumbType = recThumbTypeSelect?.value || 'auto';
 
     if (recPreviewTitle) recPreviewTitle.textContent = title;
-    if (recPreviewMeta) recPreviewMeta.textContent = \`\${speaker} • \${duration}\`;
+    if (recPreviewMeta) recPreviewMeta.textContent = `${speaker} • ${duration}`;
 
     let resolvedThumb = '/images/banners/aarogyamtube-default-thumb.svg';
     if (thumbType === 'aarogyamtube_mono') {
@@ -1496,7 +1496,7 @@ export async function initWebinars() {
     } else if (thumbType === 'auto') {
       const ytMatch = url.match(/(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|shorts\\/|live\\/|watch\\?v=|watch\\?.+&v=))([a-zA-Z0-9_-]{11})/i);
       if (ytMatch && ytMatch[1]) {
-        resolvedThumb = \`https://img.youtube.com/vi/\${ytMatch[1]}/hqdefault.jpg\`;
+        resolvedThumb = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
       } else if (url.includes('instagram.com')) {
         resolvedThumb = '/images/banners/agriculture-hero-banner-2.webp';
       }
@@ -1741,7 +1741,7 @@ export async function initWebinars() {
     renderRecordingsTable();
 
     if (videoDrawer) videoDrawer.classList.remove('active');
-    showToast(\`🎉 \${format === 'both' ? 'Dual-Format वीडियो' : (format === 'short_reel' ? 'रील' : 'मास्टरक्लास')} सफलतापूर्वक सुरक्षित हो गई!\`, 'success');
+    showToast(`🎉 ${format === 'both' ? 'Dual-Format वीडियो' : (format === 'short_reel' ? 'रील' : 'मास्टरक्लास')} सफलतापूर्वक सुरक्षित हो गई!`, 'success');
   });
 
   // -------------------------------------------------------------
@@ -1753,31 +1753,31 @@ export async function initWebinars() {
     const cont = document.getElementById('adm_channels_list_container');
     if (!cont) return;
 
-    cont.innerHTML = allChannels.map((ch, idx) => \`
+    cont.innerHTML = allChannels.map((ch, idx) => `
       <div style="background: #1e293b; border: 1.5px solid #334155; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <strong style="color: #fff; font-size: 0.9rem;">\${ch.name}</strong>
+          <strong style="color: #fff; font-size: 0.9rem;">${ch.name}</strong>
           <div style="display: flex; gap: 6px; align-items: center;">
-            \${ch.is_default ? '<span style="font-size:0.7rem; background:#10B981; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700;">🌟 Default</span>' : \`<button type="button" onclick="window.setDefaultChannel('\${ch.id}')" class="admin-button small-button" style="background:rgba(255,255,255,0.1); color:#94a3b8; font-size:0.7rem;">Make Default</button>\`}
-            <button type="button" onclick="window.removeChannelPreset(\${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times;</button>
+            ${ch.is_default ? '<span style="font-size:0.7rem; background:#10B981; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700;">🌟 Default</span>' : `<button type="button" onclick="window.setDefaultChannel('${ch.id}')" class="admin-button small-button" style="background:rgba(255,255,255,0.1); color:#94a3b8; font-size:0.7rem;">Make Default</button>`}
+            <button type="button" onclick="window.removeChannelPreset(${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times;</button>
           </div>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
           <div>
             <label class="admin-label">चैनल का नाम:</label>
-            <input type="text" class="admin-input ch-name-inp" data-idx="\${idx}" value="\${ch.name}" style="width: 100%; font-size: 0.8rem;" />
+            <input type="text" class="admin-input ch-name-inp" data-idx="${idx}" value="${ch.name}" style="width: 100%; font-size: 0.8rem;" />
           </div>
           <div>
             <label class="admin-label">Handle (उदा. @AAROGYAMINDIA):</label>
-            <input type="text" class="admin-input ch-handle-inp" data-idx="\${idx}" value="\${ch.handle}" style="width: 100%; font-size: 0.8rem; font-weight:700; color:#ef4444;" />
+            <input type="text" class="admin-input ch-handle-inp" data-idx="${idx}" value="${ch.handle}" style="width: 100%; font-size: 0.8rem; font-weight:700; color:#ef4444;" />
           </div>
         </div>
         <div>
           <label class="admin-label">Direct Channel Subscribe URL:</label>
-          <input type="url" class="admin-input ch-sub-inp" data-idx="\${idx}" value="\${ch.subscribe_url || \`https://www.youtube.com/\${ch.handle}?sub_confirmation=1\`}" style="width: 100%; font-size: 0.78rem;" />
+          <input type="url" class="admin-input ch-sub-inp" data-idx="${idx}" value="${ch.subscribe_url || `https://www.youtube.com/${ch.handle}?sub_confirmation=1`}" style="width: 100%; font-size: 0.78rem;" />
         </div>
       </div>
-    \`).join('');
+    `).join('');
   }
 
   window.setDefaultChannel = (chId) => {
@@ -1857,29 +1857,29 @@ export async function initWebinars() {
 
     cont.innerHTML = allPlaylists.map((pl, idx) => {
       const count = pl.video_ids ? pl.video_ids.length : 0;
-      return \`
+      return `
         <div style="background: #1e293b; border: 1.5px solid #8b5cf6; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong style="color: #c4b5fd; font-size: 0.95rem;">\${pl.title}</strong>
+            <strong style="color: #c4b5fd; font-size: 0.95rem;">${pl.title}</strong>
             <div style="display: flex; gap: 6px; align-items: center;">
-              <span style="font-size:0.72rem; background:rgba(139,92,246,0.3); color:#fff; padding:2px 6px; border-radius:4px;">\${count} Videos</span>
-              <button type="button" onclick="window.removePlaylistPreset(\${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times;</button>
+              <span style="font-size:0.72rem; background:rgba(139,92,246,0.3); color:#fff; padding:2px 6px; border-radius:4px;">${count} Videos</span>
+              <button type="button" onclick="window.removePlaylistPreset(${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times;</button>
             </div>
           </div>
           <div>
             <label class="admin-label">प्लेलिस्ट का शीर्षक:</label>
-            <input type="text" class="admin-input pl-title-inp" data-idx="\${idx}" value="\${pl.title}" style="width: 100%; font-size: 0.85rem; font-weight:700;" />
+            <input type="text" class="admin-input pl-title-inp" data-idx="${idx}" value="${pl.title}" style="width: 100%; font-size: 0.85rem; font-weight:700;" />
           </div>
           <div>
             <label class="admin-label">संक्षिप्त विवरण (Description):</label>
-            <textarea class="admin-input pl-desc-inp" data-idx="\${idx}" rows="2" style="width: 100%; font-size: 0.8rem;">\${pl.description || ''}</textarea>
+            <textarea class="admin-input pl-desc-inp" data-idx="${idx}" rows="2" style="width: 100%; font-size: 0.8rem;">${pl.description || ''}</textarea>
           </div>
           <div>
             <label class="admin-label">कवर थंबनेल URL:</label>
-            <input type="url" class="admin-input pl-cover-inp" data-idx="\${idx}" value="\${pl.cover || ''}" placeholder="https://..." style="width: 100%; font-size: 0.78rem;" />
+            <input type="url" class="admin-input pl-cover-inp" data-idx="${idx}" value="${pl.cover || ''}" placeholder="https://..." style="width: 100%; font-size: 0.78rem;" />
           </div>
         </div>
-      \`;
+      `;
     }).join('');
   }
 
