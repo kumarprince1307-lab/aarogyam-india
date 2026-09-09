@@ -1494,7 +1494,7 @@ export async function initWebinars() {
     } else if (thumbType === 'custom_url' && recCustomThumbUrl?.value?.trim()) {
       resolvedThumb = recCustomThumbUrl.value.trim();
     } else if (thumbType === 'auto') {
-      const ytMatch = url.match(/(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|shorts\\/|live\\/|watch\\?v=|watch\\?.+&v=))([a-zA-Z0-9_-]{11})/i);
+      const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
       if (ytMatch && ytMatch[1]) {
         resolvedThumb = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
       } else if (url.includes('instagram.com')) {
@@ -1685,7 +1685,7 @@ export async function initWebinars() {
       return;
     }
 
-    const ytMatch = url.match(/(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|shorts\\/|live\\/|watch\\?v=|watch\\?.+&v=))([a-zA-Z0-9_-]{11})/i);
+    const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
     const ytId = ytMatch ? ytMatch[1] : '';
 
     let thumb = recPreviewImg?.src || '/images/banners/aarogyamtube-default-thumb.svg';
