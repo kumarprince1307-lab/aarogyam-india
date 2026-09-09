@@ -959,6 +959,38 @@
       box-shadow: none !important;
     }
 
+    /* Smart YouTube-Style Mobile Portrait -> True Landscape 90-degree Rotation */
+    @media (max-width: 900px) and (orientation: portrait) {
+      body.cinema-fullscreen-mode #at_player_frame_wrap,
+      #at_player_frame_wrap.fullscreen-active,
+      #at_player_frame_wrap.pure-css-fullscreen {
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 100vh !important;
+        width: 100dvh !important;
+        height: 100vw !important;
+        height: 100dvw !important;
+        transform: translate(-50%, -50%) rotate(90deg) !important;
+        transform-origin: center center !important;
+      }
+    }
+
+    @media (orientation: landscape) {
+      body.cinema-fullscreen-mode #at_player_frame_wrap,
+      #at_player_frame_wrap.fullscreen-active,
+      #at_player_frame_wrap.pure-css-fullscreen {
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        width: 100dvw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        transform: none !important;
+      }
+    }
+
     body.cinema-fullscreen-mode #at_player_frame_wrap .at-aspect-16-9,
     #at_player_frame_wrap.fullscreen-active .at-aspect-16-9,
     #at_player_frame_wrap.pure-css-fullscreen .at-aspect-16-9,
@@ -2898,45 +2930,32 @@
       // -------------------------------------------------------------
       // 6. TRUE FULLSCREEN ENGINE (NATIVE + CSS FALLBACK)
       // -------------------------------------------------------------
-      window.toggleCinemaFullscreen = async function() {
+      window.toggleCinemaFullscreen = function() {
         const playerWrap = document.getElementById('at_player_frame_wrap');
         const modal = document.getElementById('wb_master_cinema_modal');
         if (!playerWrap) return;
 
         const isFull = document.body.classList.contains('cinema-fullscreen-mode') ||
-                       playerWrap.classList.contains('fullscreen-active') ||
-                       Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+                       playerWrap.classList.contains('fullscreen-active');
 
         if (!isFull) {
-          // 1. Enter pure CSS fullscreen overlay immediately
+          // 1. Enter pure CSS fullscreen + Landscape transform (100% reliable on all phones)
           document.body.classList.add('cinema-fullscreen-mode');
           document.documentElement.classList.add('cinema-fullscreen-mode');
           if (modal) modal.classList.add('cinema-modal-fullscreen');
           playerWrap.classList.add('fullscreen-active', 'pure-css-fullscreen');
 
-          // 2. Request native device fullscreen
-          const targetEl = playerWrap.requestFullscreen ? playerWrap : document.documentElement;
-          const req = targetEl.requestFullscreen ||
-                      targetEl.webkitRequestFullscreen ||
-                      targetEl.webkitEnterFullscreen ||
-                      targetEl.mozRequestFullScreen ||
-                      targetEl.msRequestFullscreen;
-
-          if (req) {
-            try {
-              const p = req.call(targetEl);
-              if (p && p.then) {
-                await p.catch(() => {});
-              }
-            } catch(e) {}
-          }
-
-          // 3. Lock orientation to landscape after entering fullscreen
-          if (window.screen && window.screen.orientation && typeof window.screen.orientation.lock === 'function') {
-            try {
-              await window.screen.orientation.lock('landscape').catch(() => {});
-            } catch(e) {}
-          }
+          // 2. Request native fullscreen if available on desktop/tablet
+          try {
+            const req = document.documentElement.requestFullscreen ||
+                        document.documentElement.webkitRequestFullscreen ||
+                        playerWrap.requestFullscreen ||
+                        playerWrap.webkitRequestFullscreen;
+            if (req) {
+              const p = req.call(document.documentElement);
+              if (p && p.catch) p.catch(() => {});
+            }
+          } catch(e) {}
         } else {
           // Exit Fullscreen
           document.body.classList.remove('cinema-fullscreen-mode');
@@ -2944,21 +2963,12 @@
           if (modal) modal.classList.remove('cinema-modal-fullscreen');
           playerWrap.classList.remove('fullscreen-active', 'pure-css-fullscreen');
 
-          // Unlock orientation back to default
-          if (window.screen && window.screen.orientation && typeof window.screen.orientation.unlock === 'function') {
-            try { window.screen.orientation.unlock(); } catch(e) {}
-          }
-
-          const exit = document.exitFullscreen ||
-                       document.webkitExitFullscreen ||
-                       document.mozCancelFullScreen ||
-                       document.msExitFullscreen;
-          if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
-            try {
-              const p = exit.call(document);
-              if (p && p.catch) p.catch(() => {});
-            } catch(e) {}
-          }
+          try {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+              const exit = document.exitFullscreen || document.webkitExitFullscreen;
+              if (exit) exit.call(document).catch(() => {});
+            }
+          } catch(e) {}
         }
       };
 
@@ -3003,8 +3013,10 @@
       };
 
       function handleNativeFullscreenChange() {
-        const isFull = Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
-        if (!isFull) {
+        const isNativeFull = Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+        // On mobile, never let native fullscreen exit event cancel the pure CSS overlay
+        if (!isNativeFull && !isMobile) {
           document.body.classList.remove('cinema-fullscreen-mode', 'reels-fullscreen-mode');
           document.querySelectorAll('.pure-css-fullscreen, .fullscreen-active').forEach(el => {
             el.classList.remove('pure-css-fullscreen', 'fullscreen-active');
