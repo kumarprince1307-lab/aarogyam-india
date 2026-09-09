@@ -69,6 +69,50 @@ export async function initWebinars() {
   ];
 
   content.innerHTML = `
+    <style>
+      .adm-section-drag-item {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      }
+      .adm-section-drag-item:hover {
+        border-color: #60a5fa !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+      }
+      .adm-section-drag-item.adm-dragging {
+        opacity: 0.45 !important;
+        border: 2px dashed #3b82f6 !important;
+        background: #1e293b !important;
+        transform: scale(0.98);
+      }
+      .adm-section-drag-item.adm-drag-over {
+        border-top: 3.5px solid #38bdf8 !important;
+        background: rgba(56, 189, 248, 0.18) !important;
+        transform: translateY(3px);
+      }
+      .adm-rec-drag-row {
+        transition: all 0.2s ease;
+      }
+      .adm-rec-drag-row:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+      }
+      .adm-rec-drag-row.adm-rec-row-dragging {
+        opacity: 0.45 !important;
+        background: #1e293b !important;
+        border: 2px dashed #38bdf8 !important;
+      }
+      .adm-rec-drag-row.adm-rec-row-dragover {
+        border-top: 3.5px solid #38bdf8 !important;
+        background: rgba(56, 189, 248, 0.22) !important;
+      }
+      .adm-drag-handle {
+        cursor: grab;
+        user-select: none;
+      }
+      .adm-drag-handle:active {
+        cursor: grabbing;
+      }
+    </style>
+
     <!-- Top Action Header -->
     <div class="admin-section" style="margin-bottom: 14px;">
       <div class="admin-section-header" style="flex-wrap: wrap; gap: 10px;">
@@ -328,6 +372,7 @@ export async function initWebinars() {
         <table class="admin-table" style="width: 100%; border-collapse: collapse;">
           <thead>
             <tr style="border-bottom: 1px solid var(--admin-border); text-align: left; font-size: 0.8rem; color: var(--admin-muted);">
+              <th style="padding: 10px; width: 45px; text-align: center;">क्रम (Drag)</th>
               <th style="padding: 10px;">थंबनेल</th>
               <th style="padding: 10px;">फॉर्मेट / प्लेटफॉर्म</th>
               <th style="padding: 10px;">शीर्षक एवं विषय</th>
@@ -538,9 +583,31 @@ export async function initWebinars() {
     if (pSub) pSub.value = masterWebinar.posters_subtitle || 'नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स';
 
     // Cover Image
-    const coverUrl = masterWebinar.cover_image || '/images/banners/agriculture-hero-banner-1.webp';
+    const coverUrl = masterWebinar.cover_image || '/images/banners/webinar-cover-live.webp';
     const previewEl = document.getElementById('adm_cover_live_preview');
     if (previewEl) previewEl.src = coverUrl;
+
+    const coverPresetSel = document.getElementById('adm_wb_cover_preset');
+    const coverUrlInp = document.getElementById('adm_wb_cover_url');
+    if (coverPresetSel) {
+      let matched = false;
+      for (let opt of coverPresetSel.options) {
+        if (opt.value === coverUrl) {
+          coverPresetSel.value = coverUrl;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        coverPresetSel.value = 'custom_url';
+        if (coverUrlInp) {
+          coverUrlInp.value = coverUrl;
+          coverUrlInp.style.display = 'block';
+        }
+      } else {
+        if (coverUrlInp) coverUrlInp.style.display = 'none';
+      }
+    }
 
     // OG Metadata
     document.getElementById('adm_og_title').value = masterWebinar.og_title || masterWebinar.title || '';
@@ -714,15 +781,18 @@ export async function initWebinars() {
       return `
         <div class="adm-section-drag-item" draggable="true" data-index="${idx}" style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; padding: 10px 14px; margin-bottom: 6px; cursor: grab; user-select: none; transition: all 0.2s ease;">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 1.1rem; color: #64748b; cursor: grab;">☰</span>
+            <span style="font-size: 1.2rem; color: #60a5fa; cursor: grab;" title="ड्रैग करके ऊपर-नीचे ले जाएं">☰</span>
             <div>
-              <div style="font-weight: 700; font-size: 0.88rem; color: #e2e8f0;">${meta.name}</div>
-              <div style="font-size: 0.72rem; color: #64748b;">${meta.desc}</div>
+              <div style="font-weight: 700; font-size: 0.88rem; color: #e2e8f0; display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.72rem; background: #2563eb; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">#${idx + 1}</span>
+                <span>${meta.name}</span>
+              </div>
+              <div style="font-size: 0.72rem; color: #94a3b8;">${meta.desc}</div>
             </div>
           </div>
           <div style="display: flex; gap: 4px;">
-            <button type="button" onclick="window.moveWbSection(${idx}, -1)" class="admin-button small-button" style="background: rgba(255,255,255,0.1); padding: 4px 10px;" title="ऊपर करें">⬆️</button>
-            <button type="button" onclick="window.moveWbSection(${idx}, 1)" class="admin-button small-button" style="background: rgba(255,255,255,0.1); padding: 4px 10px;" title="नीचे करें">⬇️</button>
+            <button type="button" onclick="window.moveWbSection(${idx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 10px; font-weight: 800;" title="ऊपर करें" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
+            <button type="button" onclick="window.moveWbSection(${idx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 10px; font-weight: 800;" title="नीचे करें" ${idx === order.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
           </div>
         </div>
       `;
@@ -735,39 +805,42 @@ export async function initWebinars() {
       item.addEventListener('dragstart', (e) => {
         dragSrcIndex = Number(item.dataset.index);
         e.dataTransfer.effectAllowed = 'move';
-        item.style.opacity = '0.4';
-        item.style.borderColor = '#3b82f6';
+        item.classList.add('adm-dragging');
       });
 
       item.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        item.style.background = '#1e293b';
-        item.style.borderColor = '#60a5fa';
+        item.classList.add('adm-drag-over');
       });
 
       item.addEventListener('dragleave', () => {
-        item.style.background = '#0f172a';
-        item.style.borderColor = '#334155';
+        item.classList.remove('adm-drag-over');
       });
 
       item.addEventListener('drop', (e) => {
         e.preventDefault();
+        item.classList.remove('adm-drag-over');
         const targetIndex = Number(item.dataset.index);
         if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
           const currentOrder = [...(masterWebinar.section_order || defaultSections.map(s => s.key))];
           const [movedItem] = currentOrder.splice(dragSrcIndex, 1);
           currentOrder.splice(targetIndex, 0, movedItem);
           masterWebinar.section_order = currentOrder;
+
+          // Auto-save
+          try {
+            localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterWebinar));
+          } catch (err) {}
+
           renderSectionsList();
-          showToast('✅ सेक्शन क्रम अपडेट हुआ', 'success');
+          showToast('✅ सेक्शन क्रम सफलतापूर्वक बदल गया!', 'success');
         }
       });
 
       item.addEventListener('dragend', () => {
-        item.style.opacity = '1';
-        item.style.background = '#0f172a';
-        item.style.borderColor = '#334155';
+        item.classList.remove('adm-dragging');
+        items.forEach(it => it.classList.remove('adm-drag-over'));
       });
     });
   }
@@ -780,12 +853,21 @@ export async function initWebinars() {
     order[idx] = order[targetIdx];
     order[targetIdx] = temp;
     masterWebinar.section_order = order;
+
+    // Auto-save
+    try {
+      localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterWebinar));
+    } catch (err) {}
+
     renderSectionsList();
-    showToast('↕️ सेक्शन का क्रम बदला गया', 'info');
+    showToast('↕️ सेक्शन का क्रम बदला गया!', 'info');
   };
 
   document.getElementById('btn-reset-sections-order')?.addEventListener('click', () => {
     masterWebinar.section_order = defaultSections.map(s => s.key);
+    try {
+      localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterWebinar));
+    } catch (err) {}
     renderSectionsList();
     showToast('↺ डिफ़ॉल्ट सेक्शन क्रम रीसेट हो गया!', 'info');
   });
@@ -821,7 +903,9 @@ export async function initWebinars() {
             <input type="text" class="admin-input adm-banner-title" placeholder="पोस्टर शीर्षक (उदा. खरीफ फसल मास्टर गाइड 2026)" value="${bTitle}" style="font-size:0.82rem; font-weight:700; width:100%;" />
             <input type="text" class="admin-input adm-banner-url" placeholder="इमेज URL या पाथ (/images/banners/...)" value="${bUrl}" style="font-size:0.75rem; width:100%;" />
           </div>
-          <div>
+          <div style="display: flex; gap: 4px; align-items: center;">
+            <button type="button" onclick="window.moveBannerItem(${idx}, -1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" title="ऊपर करें" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
+            <button type="button" onclick="window.moveBannerItem(${idx}, 1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" title="नीचे करें" ${idx === list.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
             <button type="button" onclick="window.removeBannerItem(${idx})" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;">
               &times;
             </button>
@@ -830,6 +914,16 @@ export async function initWebinars() {
       `;
     }).join('');
   }
+
+  window.moveBannerItem = (idx, delta) => {
+    if (!masterWebinar.banners) return;
+    const targetIdx = idx + delta;
+    if (targetIdx < 0 || targetIdx >= masterWebinar.banners.length) return;
+    const temp = masterWebinar.banners[idx];
+    masterWebinar.banners[idx] = masterWebinar.banners[targetIdx];
+    masterWebinar.banners[targetIdx] = temp;
+    renderBannersList();
+  };
 
   window.removeBannerItem = (idx) => {
     if (!masterWebinar.banners) return;
@@ -926,10 +1020,12 @@ export async function initWebinars() {
     const urlVal = document.getElementById('adm_wb_cover_url')?.value?.trim();
     const livePreviewSrc = document.getElementById('adm_cover_live_preview')?.src;
 
-    if (presetVal && presetVal !== 'custom_url' && presetVal !== 'custom_upload') {
-      masterWebinar.cover_image = presetVal;
-    } else if (urlVal) {
+    if (presetVal === 'custom_url' && urlVal) {
       masterWebinar.cover_image = urlVal;
+    } else if (presetVal && presetVal !== 'custom_url' && presetVal !== 'custom_upload') {
+      masterWebinar.cover_image = presetVal;
+    } else if (masterWebinar.cover_image) {
+      // Keep existing custom uploaded image / base64 or path
     } else if (livePreviewSrc && !livePreviewSrc.startsWith('data:')) {
       masterWebinar.cover_image = livePreviewSrc;
     }
@@ -1012,7 +1108,7 @@ export async function initWebinars() {
     if (allRecordings.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="5" style="text-align: center; padding: 20px; color: var(--admin-muted);">
+          <td colspan="6" style="text-align: center; padding: 20px; color: var(--admin-muted);">
             लाइब्रेरी में अभी कोई वीडियो या रील नहीं है। ऊपर दिए '+ नई रील / वीडियो जोड़ें' बटन से जोड़ें।
           </td>
         </tr>
@@ -1026,7 +1122,11 @@ export async function initWebinars() {
       const isShort = r.format === 'short_reel' || r.id.startsWith('VID_S');
 
       return `
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem;">
+        <tr class="adm-rec-drag-row" draggable="true" data-index="${idx}" style="border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; transition: all 0.2s ease;">
+          <td style="padding: 10px; text-align: center; cursor: grab; user-select: none;" class="adm-drag-handle" title="ऊपर-नीचे ड्रैग करके क्रम बदलें">
+            <span style="font-size: 1.2rem; color: #60a5fa; cursor: grab;">☰</span>
+            <div style="font-size: 0.68rem; color: #94a3b8; font-weight: 800;">#${idx + 1}</div>
+          </td>
           <td style="padding: 10px;">
             <img src="${thumb}" alt="Thumb" style="width: 44px; height: ${isShort ? '60px' : '28px'}; object-fit: cover; border-radius: 4px;" onerror="this.onerror=null; this.src='${fallback}'" />
           </td>
@@ -1055,6 +1155,12 @@ export async function initWebinars() {
             ${r.duration || '0:58'}
           </td>
           <td style="padding: 10px; text-align: right; white-space: nowrap;">
+            <button type="button" onclick="window.moveRecordingItem(${idx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 3px;" title="ऊपर ले जाएं" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>
+              ▲
+            </button>
+            <button type="button" onclick="window.moveRecordingItem(${idx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 6px;" title="नीचे ले जाएं" ${idx === allRecordings.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>
+              ▼
+            </button>
             <button type="button" onclick="window.editRecordingItem('${r.id}')" class="admin-button small-button" style="background: rgba(45,140,255,0.15); color: #60a5fa; border: 1px solid #60a5fa; padding: 4px 8px; font-weight: 800; margin-right: 4px;">
               ✏️ एडिट
             </button>
@@ -1065,7 +1171,93 @@ export async function initWebinars() {
         </tr>
       `;
     }).join('');
+
+    // Attach Drag & Drop Listeners for Videos Table
+    let dragRecSrcIdx = null;
+    const rows = tbody.querySelectorAll('.adm-rec-drag-row');
+    rows.forEach(row => {
+      row.addEventListener('dragstart', (e) => {
+        dragRecSrcIdx = Number(row.dataset.index);
+        e.dataTransfer.effectAllowed = 'move';
+        row.classList.add('adm-rec-row-dragging');
+      });
+
+      row.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        row.classList.add('adm-rec-row-dragover');
+      });
+
+      row.addEventListener('dragleave', () => {
+        row.classList.remove('adm-rec-row-dragover');
+      });
+
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        row.classList.remove('adm-rec-row-dragover');
+        const targetIdx = Number(row.dataset.index);
+        if (dragRecSrcIdx !== null && dragRecSrcIdx !== targetIdx) {
+          const [movedItem] = allRecordings.splice(dragRecSrcIdx, 1);
+          allRecordings.splice(targetIdx, 0, movedItem);
+          
+          // 1. Direct LocalStorage Save
+          try {
+            localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
+          } catch(e) {}
+
+          // 2. Background Sync
+          try {
+            fetch('/save-recordings.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ recordings: allRecordings })
+            });
+            fetch('/api/auto-sync-book', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'save_webinar_recordings', recordings: allRecordings })
+            });
+          } catch(err) {}
+
+          renderRecordingsTable();
+          showToast('✅ वीडियो का क्रम सफलतापूर्वक बदल गया और सेव हो गया!', 'success');
+        }
+      });
+
+      row.addEventListener('dragend', () => {
+        row.classList.remove('adm-rec-row-dragging');
+        rows.forEach(r => r.classList.remove('adm-rec-row-dragover'));
+      });
+    });
   }
+
+  window.moveRecordingItem = function(idx, delta) {
+    const targetIdx = idx + delta;
+    if (targetIdx < 0 || targetIdx >= allRecordings.length) return;
+    const temp = allRecordings[idx];
+    allRecordings[idx] = allRecordings[targetIdx];
+    allRecordings[targetIdx] = temp;
+
+    // Save
+    try {
+      localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
+    } catch(e) {}
+    try {
+      fetch('/save-recordings.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recordings: allRecordings })
+      });
+      fetch('/api/auto-sync-book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save_webinar_recordings', recordings: allRecordings })
+      });
+    } catch(err) {}
+
+    renderRecordingsTable();
+    showToast('↕️ वीडियो का क्रम अपडेट हो गया!', 'info');
+  };
 
   window.editRecordingItem = function (rId) {
     const item = allRecordings.find(x => x.id === rId);
