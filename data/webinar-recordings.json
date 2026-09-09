@@ -1,6 +1,27 @@
 {
   "recordings": [
     {
+      "id": "VID_291096",
+      "format": "full_video",
+      "platform": "youtube",
+      "title": "जानिए Naturamore और Biofit प्रोडक्ट्स की Manufacturing की पूरी कहानी | Netsurf की Factory के अंदर!",
+      "description": "इस वीडियो में हम आपको Netsurf कंपनी की मैन्युफैक्चरिंग यूनिट की अंदरूनी झलक दिखा रहे हैं। जानें Naturamore और Biofit जैसे प्रोडक्ट्स कैसे बनाए जाते हैं और उनकी क्वालिटी को कैसे सुनिश्चित किया जाता है। यह वीडियो आपको Netsurf की तकनीक और उनके उत्पादों की गुणवत्ता के पीछे की पूरी कहानी बताएगा। इसे मिस न करें\n________________________________________________\nIn this video, we take you inside the manufacturing unit of Netsurf. Discover how products like Naturamore and Biofit are made and how their quality is ensured. Learn about the technology and processes behind Netsurf's high-quality products. Don't miss this exclusive tour!",
+      "subject": "NETSURF",
+      "category": "NETSURF",
+      "video_url": "https://youtu.be/bk2bxcHeKsM?si=vGsmUMjuaCGBFd4f",
+      "youtube_url": "https://youtu.be/bk2bxcHeKsM?si=vGsmUMjuaCGBFd4f",
+      "youtube_id": "bk2bxcHeKsM",
+      "thumbnail": "https://img.youtube.com/vi/bk2bxcHeKsM/hqdefault.jpg",
+      "duration": "5:35",
+      "speaker": "DADA AVNISH",
+      "access_tier": "all",
+      "pinned": false,
+      "priority": 50,
+      "order_type": "normal",
+      "status": "active",
+      "created_at": "2026-09-09T14:31:31.096Z"
+    },
+    {
       "id": "VID_S102593",
       "format": "full_video",
       "platform": "youtube",
