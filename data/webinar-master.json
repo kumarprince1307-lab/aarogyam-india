@@ -10,7 +10,7 @@
     "zoom_link": "https://us06web.zoom.us/j/82823316040?pwd=cdZlJpFbYi3yKIkuoRy0Ep9VgaEtun.1",
     "meeting_id": "828 2331 6040",
     "passcode": "638417",
-    "cover_image": "/images/banners/webinar-cover-live.webp",
+    "cover_image": "/images/banners/agriculture-hero-banner-1.webp",
     "banners": [],
     "youtube_videos": [],
     "kpis": [
@@ -30,13 +30,13 @@
       }
     ],
     "section_order": [
-      "sec_hero_zoom",
       "sec_timer",
+      "sec_hero_zoom",
+      "sec_tutorial",
       "sec_kpis",
       "sec_banners",
       "sec_aarogyamtube_shorts",
       "sec_aarogyamtube_videos",
-      "sec_tutorial",
       "sec_faqs"
     ],
     "og_title": "🔴 Aarogyam India — लाइव ज़ूम वेबिनार एवं AarogyamTube",
