@@ -1011,8 +1011,7 @@
       }
     }
 
-    .at-fs-hud-overlay,
-    .at-fs-bottom-rail {
+    .at-fs-hud-overlay {
       opacity: 1 !important;
       visibility: visible !important;
       pointer-events: auto !important;
@@ -1561,7 +1560,7 @@
       transform: scale(1.06) !important;
     }
 
-    /* Bottom Floating Action Rail in Fullscreen */
+    /* Bottom Floating Action Rail in Fullscreen (Auto-hides after 3s, reappears on touch/mouse) */
     .at-fs-bottom-rail {
       display: none;
       position: absolute !important;
@@ -1579,6 +1578,16 @@
       box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85) !important;
       pointer-events: auto !important;
       white-space: nowrap !important;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease !important;
+    }
+
+    .at-fs-bottom-rail.at-rail-hidden {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      transform: translateX(-50%) translateY(14px) !important;
     }
 
     body.cinema-fullscreen-mode .at-fs-bottom-rail,
@@ -2536,7 +2545,7 @@
         try { renderShortsAndReels(); } catch (e) { console.error('shorts err:', e); }
         try { renderMasterclassVideos(); } catch (e) { console.error('videos err:', e); }
         try { setupReelsGesturesAndScroll(); } catch (e) { console.error('gestures err:', e); }
-        try { setupFullscreenAutoHideListeners(); } catch (e) { console.error('autohide err:', e); }
+        try { setupBottomRailAutoHide(); } catch (e) { console.error('rail autohide err:', e); }
         try { updateLiveTicker(); } catch (e) { console.error('ticker err:', e); }
 
         if (specificVid) {
@@ -3110,9 +3119,55 @@
       // -------------------------------------------------------------
       // 6. TRUE FULLSCREEN ENGINE (NATIVE + CSS FALLBACK)
       // -------------------------------------------------------------
+      let bottomRailTimer = null;
+
+      function resetBottomRailTimer() {
+        const rail = document.getElementById('at_fs_bottom_rail');
+        if (!rail) return;
+
+        // Immediately reveal bottom rail
+        rail.classList.remove('at-rail-hidden');
+        clearTimeout(bottomRailTimer);
+
+        const isFull = document.body.classList.contains('cinema-fullscreen-mode') ||
+                       document.getElementById('at_player_frame_wrap')?.classList.contains('fullscreen-active');
+
+        // Only start the 3-second fadeout timer when currently in fullscreen
+        if (isFull) {
+          bottomRailTimer = setTimeout(() => {
+            rail.classList.add('at-rail-hidden');
+          }, 3000);
+        }
+      }
+
+      function setupBottomRailAutoHide() {
+        const wrap = document.getElementById('at_player_frame_wrap');
+        const rail = document.getElementById('at_fs_bottom_rail');
+
+        // Any mousemove, touch, or click anywhere on screen / player / HUD wakes up the bottom rail
+        ['mousemove', 'touchstart', 'touchmove', 'pointerdown', 'click'].forEach(evt => {
+          document.addEventListener(evt, () => {
+            const isFull = document.body.classList.contains('cinema-fullscreen-mode') ||
+                           wrap?.classList.contains('fullscreen-active');
+            if (isFull) resetBottomRailTimer();
+          }, { passive: true });
+        });
+
+        if (rail) {
+          rail.addEventListener('mouseenter', () => {
+            clearTimeout(bottomRailTimer);
+            rail.classList.remove('at-rail-hidden');
+          });
+          rail.addEventListener('mouseleave', () => {
+            resetBottomRailTimer();
+          });
+        }
+      }
+
       window.toggleCinemaFullscreen = function() {
         const playerWrap = document.getElementById('at_player_frame_wrap');
         const modal = document.getElementById('wb_master_cinema_modal');
+        const rail = document.getElementById('at_fs_bottom_rail');
         if (!playerWrap) return;
 
         const isFull = document.body.classList.contains('cinema-fullscreen-mode') ||
@@ -3124,6 +3179,9 @@
           document.documentElement.classList.add('cinema-fullscreen-mode');
           if (modal) modal.classList.add('cinema-modal-fullscreen');
           playerWrap.classList.add('fullscreen-active', 'pure-css-fullscreen');
+
+          // Initialize bottom rail timer (visible first, fades in 3s)
+          resetBottomRailTimer();
 
           const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
           if (!isMobile) {
@@ -3138,6 +3196,8 @@
           document.documentElement.classList.remove('cinema-fullscreen-mode');
           if (modal) modal.classList.remove('cinema-modal-fullscreen');
           playerWrap.classList.remove('fullscreen-active', 'pure-css-fullscreen');
+          clearTimeout(bottomRailTimer);
+          if (rail) rail.classList.remove('at-rail-hidden');
 
           try {
             if (document.fullscreenElement || document.webkitFullscreenElement) {
