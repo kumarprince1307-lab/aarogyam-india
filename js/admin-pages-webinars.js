@@ -1285,7 +1285,7 @@ export async function initWebinars() {
       localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
     } catch (e) { }
 
-    // 2. Sync to GitHub (Zero Egress)
+    // 2. Sync to GitHub & Local PHP Sync (Zero Egress)
     try {
       await fetch('/api/auto-sync-book', {
         method: 'POST',
@@ -1294,6 +1294,14 @@ export async function initWebinars() {
           action: 'save_webinar_recordings',
           recordings: allRecordings
         })
+      });
+    } catch (err) { }
+
+    try {
+      await fetch('/save-recordings.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recordings: allRecordings })
       });
     } catch (err) { }
 

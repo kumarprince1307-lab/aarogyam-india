@@ -453,6 +453,15 @@
               <span class="drawer-cat-badge" style="background:#fee2e2;color:#dc2626;font-weight:900;">LIVE</span>
             </a>
 
+            <!-- 4.1 AAROGYAM TUBE (Shorts & Masterclass Hub) -->
+            <a href="/tube.html" class="drawer-nav-item-btn ${currentPath.includes('tube') ? 'active-pill' : ''}" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(185, 28, 28, 0.2) 100%); border: 1px solid rgba(239, 68, 68, 0.35);">
+              <div class="drawer-item-left">
+                <i class="fa-brands fa-youtube drawer-item-icon" style="color:#ef4444;font-size:1.15rem;"></i>
+                <span style="font-weight: 800; color: #ef4444;">🎬 AarogyamTube Hub</span>
+              </div>
+              <span class="drawer-cat-badge" style="background:#fee2e2;color:#ef4444;font-weight:900;">VIDEOS</span>
+            </a>
+
             <!-- 5. EBOOKS ▼ (Accordion) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-ebooks" onclick="window.toggleDrawerAccordion('ebooks', event)">
               <div class="drawer-item-left">
@@ -546,6 +555,10 @@
               <a href="/webinar.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-video" style="color:#dc2626;"></i><span>🔴 लाइव ज़ूम वेबिनार</span></div>
                 <span class="drawer-cat-badge" style="background:#fee2e2;color:#dc2626;">Live</span>
+              </a>
+              <a href="/tube.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><i class="fa-brands fa-youtube" style="color:#ef4444;"></i><span>🎬 AarogyamTube (Videos & Reels)</span></div>
+                <span class="drawer-cat-badge" style="background:#fee2e2;color:#ef4444;">HD</span>
               </a>
               <a href="javascript:void(0)" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 AI Expert Consultation'); window.closeUniversalDrawer();" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-brands fa-whatsapp" style="color:#25d366;"></i><span>AI Expert Consultation</span></div>
