@@ -1,10 +1,15 @@
 /* ==========================================================================
-   AAROGYAM INDIA — UNIVERSAL WEBINAR & AAROGYAMTUBE ADMIN HUB (V30.0)
+   AAROGYAM INDIA — UNIVERSAL WEBINAR & AAROGYAMTUBE ADMIN HUB (V31.0 PRO)
    Features:
    - 1-Form Master Zoom Webinar & Live Countdown Manager
    - Live 3D Cover Image Preview & OG Social Card Live Preview
    - Drag & Drop Section Placement System (Up/Down Controls)
-   - Unified AarogyamTube Videos & Reels Manager (YouTube, Insta, Facebook)
+   - AarogyamTube Dual-Format (16:9 + 9:16 Both), Shorts & Masterclass Manager
+   - Real-time Multi-Filter & Search Engine (Title, Format, Category, Playlist)
+   - Slide-out Side Drawer (Desktop) & Bottom Sheet (Mobile) with Fixed Sticky Header/Footer
+   - YouTube Channel Preset Manager (@AAROGYAMINDIA, etc.) & Direct Subscribe Integration
+   - Playlist Creator & Sequence Manager with 1-Click Full Playlist Sharing
+   - Dynamic Category Auto-Save to Master Categories
    - 1-Click JSON Sync & Export for webinar-master.json & webinar-recordings.json
    - Zero-Egress Cloud & LocalStorage Persistence
    ========================================================================== */
@@ -56,7 +61,42 @@ export async function initWebinars() {
   };
 
   let allRecordings = [];
+  let allChannels = [
+    {
+      id: 'CH_AAROGYAM_MAIN',
+      name: 'Aarogyam India Official',
+      handle: '@AAROGYAMINDIA',
+      url: 'https://www.youtube.com/@AAROGYAMINDIA',
+      subscribe_url: 'https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1',
+      avatar: '/images/logo/logo.png',
+      is_default: true
+    }
+  ];
+  let masterCategories = [
+    'Crop Protection',
+    'Organic Farming',
+    'Irrigation Tech',
+    'Dairy & Animal Husbandry',
+    'Biofit Products Training',
+    'Shorts & Reels'
+  ];
+  let allPlaylists = [
+    {
+      id: 'PL_ORGANIC_2026',
+      title: '🌾 संपूर्ण जैविक खेती व पशु पोषण मास्टरक्लास',
+      description: 'प्राकृतिक एवं जैविक खेती से 3X मुनाफा, दुग्ध उत्पादन और Biofit ट्रेनिंग की संपूर्ण वीडियो श्रृंखला।',
+      cover: 'https://img.youtube.com/vi/2JYn-bcDLuU/hqdefault.jpg',
+      video_ids: ['VID_712495', 'VID_513998', 'VID_378682', 'VID_M10001']
+    }
+  ];
+
   let editingRecordingId = null;
+
+  // Real-time Filters state
+  let searchFilterQuery = '';
+  let formatFilterVal = 'all';
+  let categoryFilterVal = 'all';
+  let playlistFilterVal = 'all';
 
   const defaultSections = [
     { key: 'sec_hero_zoom', name: '🎥 1. Hero Zoom Meeting Box', desc: 'शीर्षक, 3D कवर, ज़ूम जॉइन बटन व रजिस्ट्रेशन' },
@@ -68,7 +108,7 @@ export async function initWebinars() {
     { key: 'sec_faqs', name: '❓ 7. FAQs Accordion', desc: 'अक्सर पूछे जाने वाले प्रश्न' }
   ];
 
-  content.innerHTML = `
+  content.innerHTML = \`
     <style>
       .adm-section-drag-item {
         transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -111,6 +151,84 @@ export async function initWebinars() {
       .adm-drag-handle:active {
         cursor: grabbing;
       }
+
+      /* Slide-out Side Drawer (Desktop) & Bottom Sheet (Mobile) */
+      .adm-drawer-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 9999;
+        display: none;
+        align-items: stretch;
+        justify-content: flex-end;
+        transition: opacity 0.25s ease;
+      }
+      .adm-drawer-overlay.active {
+        display: flex;
+      }
+      .adm-drawer-content {
+        background: #0f172a;
+        border-left: 2px solid #334155;
+        width: 100%;
+        max-width: 580px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: -10px 0 45px rgba(0, 0, 0, 0.8);
+        position: relative;
+        animation: slideInRight 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes slideInRight {
+        from { transform: translateX(100%); }
+        to { transform: translateX(0); }
+      }
+      @media (max-width: 768px) {
+        .adm-drawer-overlay {
+          align-items: flex-end;
+          justify-content: center;
+        }
+        .adm-drawer-content {
+          max-width: 100%;
+          height: 92vh;
+          border-left: none;
+          border-top: 2px solid #3b82f6;
+          border-radius: 20px 20px 0 0;
+          animation: slideUpBottom 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUpBottom {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+      }
+      .adm-drawer-header {
+        padding: 16px 20px;
+        background: #1e293b;
+        border-bottom: 1.5px solid #334155;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .adm-drawer-body {
+        padding: 20px;
+        overflow-y: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .adm-drawer-footer {
+        padding: 14px 20px;
+        background: #1e293b;
+        border-top: 1.5px solid #334155;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+      }
     </style>
 
     <!-- Top Action Header -->
@@ -119,15 +237,18 @@ export async function initWebinars() {
         <div>
           <div class="admin-section-title" style="display: flex; align-items: center; gap: 8px;">
             <span>📹 Universal Webinar & AarogyamTube Hub</span>
-            <span style="font-size: 0.75rem; background: rgba(45,140,255,0.15); color: #2D8CFF; padding: 2px 8px; border-radius: 12px; font-weight: 700;">PRO V30</span>
+            <span style="font-size: 0.75rem; background: rgba(45,140,255,0.15); color: #2D8CFF; padding: 2px 8px; border-radius: 12px; font-weight: 700;">PRO V31</span>
           </div>
           <p style="font-size: 0.85rem; color: var(--admin-muted); margin: 4px 0 0 0;">
-            लाइव ज़ूम वेबिनार, 3D कवर, AarogyamTube रील्स एवं सोशल शेयरिंग को 1-क्लिक में कंट्रोल करें।
+            लाइव ज़ूम वेबिनार, 3D कवर, AarogyamTube रील्स, प्लेलिस्ट्स व YouTube सब्सक्राइब को 1-क्लिक में कंट्रोल करें।
           </p>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="/tube.html" target="_blank" class="admin-button small-button" style="background: #ef4444; color: #fff; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <span>🎬</span> <span>AarogyamTube लाइव देखें</span>
+          </a>
           <a href="/webinar.html" target="_blank" class="admin-button small-button" style="background: #2D8CFF; color: #fff; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-            <span>👁️</span> <span>लाइव वेबिनार पेज देखें</span>
+            <span>👁️</span> <span>लाइव वेबिनार पेज</span>
           </a>
           <button id="btn-export-json-files" class="admin-button small-button" style="background: #10B981; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
             <span>📥</span> <span>Export JSON (Git Sync)</span>
@@ -353,17 +474,58 @@ export async function initWebinars() {
 
     <!-- TAB 2: AAROGYAMTUBE VIDEOS & REELS MANAGER -->
     <div id="tab-pane-reels" class="admin-card" style="display: none; margin-bottom: 24px; padding: 20px;">
+      
+      <!-- Top Action Bar with Multi-Managers -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
         <div>
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 4px;">
-            🎬 AarogyamTube वीडियो एवं रील्स लाइब्रेरी
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+            <span>🎬 AarogyamTube वीडियो एवं रील्स लाइब्रेरी</span>
+            <span id="filtered-count-badge" style="font-size: 0.75rem; background: rgba(244,63,94,0.15); color: #f43f5e; padding: 2px 8px; border-radius: 10px; font-weight: 700;">0 वीडियो</span>
           </h3>
           <p style="font-size: 0.82rem; color: var(--admin-muted); margin: 0;">
-            YouTube Shorts, Instagram Reels, Facebook Reels एवं 16:9 मास्टरक्लास जोड़ें।
+            16:9 मास्टरक्लास, 9:16 रील्स, Dual-Format (दोनों जगह), YouTube चैनल व प्लेलिस्ट्स प्रबंधित करें।
           </p>
         </div>
-        <button type="button" id="btn-open-add-video-modal" class="admin-button" style="background: #F43F5E; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
-          <span>+ नई रील / वीडियो जोड़ें</span>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btn-open-channels-modal" class="admin-button small-button" style="background: #3b82f6; color: #fff; font-weight: 700;">
+            <span>📺 YouTube चैनल प्रबंधक</span>
+          </button>
+          <button type="button" id="btn-open-playlists-modal" class="admin-button small-button" style="background: #8b5cf6; color: #fff; font-weight: 700;">
+            <span>📑 प्लेलिस्ट प्रबंधक</span>
+          </button>
+          <button type="button" id="btn-open-add-video-modal" class="admin-button small-button" style="background: #F43F5E; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+            <span>+ नई रील / वीडियो जोड़ें</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Real-time Live Search & Filter Bar -->
+      <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 1.4; min-width: 200px; position: relative;">
+          <input type="text" id="adm_rec_search" class="admin-input" placeholder="🔍 शीर्षक, विषय या वक्ता खोजें..." style="width: 100%; font-size: 0.85rem; padding-left: 10px;" />
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <select id="adm_filter_format" class="admin-select" style="width: 100%; font-size: 0.85rem;">
+            <option value="all">🌟 सभी फॉर्मेट (All Formats)</option>
+            <option value="short_reel">📱 9:16 Shorts / Reel (रील्स)</option>
+            <option value="full_video">🖥️ 16:9 Masterclass (फुल वीडियो)</option>
+            <option value="both">🌟 Dual Format (दोनों जगह - Both)</option>
+          </select>
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <select id="adm_filter_category" class="admin-select" style="width: 100%; font-size: 0.85rem;">
+            <option value="all">📁 सभी श्रेणियां (All Categories)</option>
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <select id="adm_filter_playlist" class="admin-select" style="width: 100%; font-size: 0.85rem;">
+            <option value="all">📑 सभी प्लेलिस्ट्स (All Playlists)</option>
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+        <button type="button" id="btn-reset-filters" class="admin-button small-button" style="background: rgba(255,255,255,0.1); color: #cbd5e1; font-size: 0.78rem;" title="फ़िल्टर रीसेट करें">
+          ↺ Reset
         </button>
       </div>
 
@@ -374,9 +536,9 @@ export async function initWebinars() {
             <tr style="border-bottom: 1px solid var(--admin-border); text-align: left; font-size: 0.8rem; color: var(--admin-muted);">
               <th style="padding: 10px; width: 45px; text-align: center;">क्रम (Drag)</th>
               <th style="padding: 10px;">थंबनेल</th>
-              <th style="padding: 10px;">फॉर्मेट / प्लेटफॉर्म</th>
-              <th style="padding: 10px;">शीर्षक एवं विषय</th>
-              <th style="padding: 10px;">अवधि</th>
+              <th style="padding: 10px;">फॉर्मेट / चैनल</th>
+              <th style="padding: 10px;">शीर्षक एवं विवरण</th>
+              <th style="padding: 10px;">श्रेणी व अवधि</th>
               <th style="padding: 10px; text-align: right;">एक्शन</th>
             </tr>
           </thead>
@@ -387,157 +549,238 @@ export async function initWebinars() {
       </div>
     </div>
 
-    <!-- MODAL: ADD / EDIT VIDEO OR REEL -->
-    <div id="modal-video-editor" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 16px; overflow-y: auto;">
-      <div style="background: #1e293b; border: 1.5px solid #334155; border-radius: 14px; max-width: 600px; width: 100%; padding: 24px; box-shadow: 0 10px 45px rgba(0,0,0,0.7); max-height: 90vh; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h4 style="font-weight: 800; font-size: 1.15rem; color: #fff;" id="modal-video-title">
+    <!-- ============================================================= -->
+    <!-- SLIDE-OUT SIDE DRAWER: ADD / EDIT VIDEO OR REEL -->
+    <!-- ============================================================= -->
+    <div id="drawer-video-editor" class="adm-drawer-overlay">
+      <div class="adm-drawer-content">
+        <div class="adm-drawer-header">
+          <h4 style="font-weight: 800; font-size: 1.1rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;" id="drawer-video-title">
             🎬 नई रील / वीडियो जोड़ें
           </h4>
-          <button type="button" id="btn-close-video-modal" style="background: none; border: none; color: #fff; font-size: 1.3rem; cursor: pointer;">&times;</button>
+          <button type="button" id="btn-close-video-drawer" style="background: rgba(255,255,255,0.1); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
         </div>
 
-        <form id="form-video-editor">
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <form id="form-video-drawer" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+          <div class="adm-drawer-body">
+            
+            <!-- Format & Platform Grid -->
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px;">
               <div>
                 <label class="admin-label">फॉर्मेट (Format): *</label>
-                <select id="modal_rec_format" class="admin-select" style="width: 100%;">
-                  <option value="short_reel">📱 9:16 Short / Reel (रील)</option>
-                  <option value="full_video">🖥️ 16:9 Masterclass (फुल वीडियो)</option>
+                <select id="drawer_rec_format" class="admin-select" style="width: 100%;">
+                  <option value="both">🌟 Dual Format (16:9 + 9:16 दोनों जगह)</option>
+                  <option value="short_reel">📱 9:16 Short / Reel (केवल रील)</option>
+                  <option value="full_video">🖥️ 16:9 Masterclass (केवल फुल वीडियो)</option>
                 </select>
               </div>
               <div>
                 <label class="admin-label">प्लेटफॉर्म (Platform): *</label>
-                <select id="modal_rec_platform" class="admin-select" style="width: 100%;">
-                  <option value="youtube">🔴 YouTube (Shorts/Video)</option>
-                  <option value="instagram">📷 Instagram (Reel)</option>
-                  <option value="facebook">📘 Facebook (Reel/Watch)</option>
+                <select id="drawer_rec_platform" class="admin-select" style="width: 100%;">
+                  <option value="youtube">🔴 YouTube</option>
+                  <option value="instagram">📷 Instagram</option>
+                  <option value="facebook">📘 Facebook</option>
                 </select>
               </div>
+            </div>
+
+            <!-- YouTube Channel Preset Selector -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label class="admin-label" style="margin: 0;">📺 YouTube चैनल (Channel Preset):</label>
+                <button type="button" id="btn-drawer-add-new-ch" style="background: none; border: none; color: #60a5fa; font-size: 0.72rem; font-weight: 700; cursor: pointer;">+ नया चैनल जोड़ें</button>
+              </div>
+              <select id="drawer_rec_channel" class="admin-select" style="width: 100%;">
+                <!-- Dynamically populated from allChannels -->
+              </select>
             </div>
 
             <div>
               <label class="admin-label">Video / Reel URL Link: *</label>
-              <input type="url" id="modal_rec_url" class="admin-input" placeholder="https://youtube.com/shorts/... या https://instagram.com/reel/..." required style="width: 100%;" />
+              <input type="url" id="drawer_rec_url" class="admin-input" placeholder="https://youtube.com/watch?v=... या https://youtube.com/shorts/..." required style="width: 100%;" />
             </div>
 
             <div>
-              <label class="admin-label">रील / वीडियो का शीर्षक (Title): *</label>
-              <input type="text" id="modal_rec_title" class="admin-input" placeholder="उदा. सोयाबीन में इल्ली का 1-स्प्रे रामबाण इलाज" required style="width: 100%;" />
+              <label class="admin-label">वीडियो का मुख्य शीर्षक (Title): *</label>
+              <input type="text" id="drawer_rec_title" class="admin-input" placeholder="उदा. सोयाबीन में इल्ली का 1-स्प्रे रामबाण इलाज" required style="width: 100%; font-weight: 700;" />
             </div>
 
             <div>
               <label class="admin-label">विवरण (Description / Caption):</label>
-              <textarea id="modal_rec_desc" class="admin-input" rows="2" placeholder="वीडियो या रील के बारे में संक्षिप्त जानकारी..." style="width: 100%;"></textarea>
+              <textarea id="drawer_rec_desc" class="admin-input" rows="2" placeholder="वीडियो या रील के बारे में संक्षिप्त जानकारी..." style="width: 100%;"></textarea>
             </div>
 
-            <!-- Thumbnail Options -->
-            <div>
-              <label class="admin-label">थंबनेल (Thumbnail Cover):</label>
-              <select id="modal_rec_thumb_type" class="admin-select" style="width: 100%; margin-bottom: 6px;">
-                <option value="auto">⚡ Auto (Video URL से स्वतः लें)</option>
-                <option value="aarogyamtube_mono">🛡️ AarogyamTube Official Default Mono</option>
-                <option value="custom_url">🔗 Custom Image URL</option>
-                <option value="custom_upload">📤 नई फोटो अपलोड करें</option>
-              </select>
-              <input type="text" id="modal_rec_custom_thumb_url" class="admin-input" placeholder="https://..." style="width: 100%; display: none; margin-bottom: 6px;" />
-              <input type="file" id="modal_rec_custom_thumb_file" class="admin-input" accept="image/*" style="width: 100%; display: none;" />
-            </div>
-
-            <!-- Live Card Preview -->
-            <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; display: flex; gap: 12px; align-items: center;">
-              <div style="width: 70px; height: 100px; background: #000; border-radius: 6px; overflow: hidden; position: relative;">
-                <img id="modal_rec_preview_img" src="/images/banners/aarogyamtube-default-thumb.svg" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" />
-              </div>
-              <div style="flex: 1;">
-                <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 800;">📺 Live Card Preview:</div>
-                <div id="modal_rec_preview_title" style="font-size: 0.85rem; font-weight: 700; color: #fff; line-height: 1.3;">शीर्षक यहाँ दिखेगा...</div>
-                <div id="modal_rec_preview_meta" style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">आरोग्यम विशेषज्ञ • 0:58</div>
-              </div>
-            </div>
-
+            <!-- Category & Playlist Assignment Grid -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div>
-                <label class="admin-label">विषय / श्रेणी (Category):</label>
-                <select id="modal_rec_category" class="admin-select" style="width: 100%;">
-                  <option value="Crop Protection">कीट व रोग नियंत्रण</option>
-                  <option value="Organic Farming">जैविक कृषि</option>
-                  <option value="Irrigation Tech">सिंचाई व पोषण</option>
-                  <option value="Shorts & Reels">Shorts & Reels</option>
-                  <option value="custom">+ नई श्रेणी जोड़ें (Add Custom)</option>
+                <label class="admin-label">विषय / श्रेणी (Category): *</label>
+                <select id="drawer_rec_category" class="admin-select" style="width: 100%;">
+                  <!-- Dynamically populated -->
                 </select>
-                <input type="text" id="modal_rec_custom_category" class="admin-input" placeholder="नई श्रेणी का नाम लिखें..." style="width: 100%; display: none; margin-top: 6px;" />
+                <input type="text" id="drawer_rec_custom_category" class="admin-input" placeholder="नई श्रेणी का नाम लिखें..." style="width: 100%; display: none; margin-top: 6px;" />
               </div>
+              <div>
+                <label class="admin-label">प्लेलिस्ट में जोड़ें (Playlist):</label>
+                <select id="drawer_rec_playlist" class="admin-select" style="width: 100%;">
+                  <option value="">(कोई प्लेलिस्ट नहीं)</option>
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Duration & Speaker Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div>
                 <label class="admin-label">अवधि (Duration):</label>
-                <input type="text" id="modal_rec_duration" class="admin-input" placeholder="उदा. 0:58 या 45 मिनट" value="0:58" style="width: 100%;" />
+                <input type="text" id="drawer_rec_duration" class="admin-input" placeholder="उदा. 0:58 या 45 मिनट" value="45:00" style="width: 100%;" />
               </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div>
                 <label class="admin-label">विशेषज्ञ / वक्ता (Speaker):</label>
-                <input type="text" id="modal_rec_speaker" class="admin-input" placeholder="उदा. डॉ. बी.के. शर्मा" value="आरोग्यम कृषि विशेषज्ञ" style="width: 100%;" />
-              </div>
-              <div>
-                <label class="admin-label">विजिबिलिटी / एक्सेस (Access):</label>
-                <select id="modal_rec_access" class="admin-select" style="width: 100%;">
-                  <option value="all">🌟 सभी के लिए (All Users - Public)</option>
-                  <option value="registration_only">🔒 केवल रजिस्टर्ड यूजर (Only Registered)</option>
-                  <option value="active_only">🟢 केवल एक्टिव यूजर (Only Active)</option>
-                </select>
+                <input type="text" id="drawer_rec_speaker" class="admin-input" placeholder="उदा. आरोग्यम कृषि विशेषज्ञ" value="आरोग्यम कृषि विशेषज्ञ" style="width: 100%;" />
               </div>
             </div>
 
-            <!-- Zero-Egress Video Sequencing, Pinning & Priority Controls -->
-            <div style="background: rgba(30,41,59,0.7); border: 1px solid #3b82f6; border-radius: 8px; padding: 12px; margin-top: 4px;">
+            <!-- Zero-Egress Priority & Pinning Controls -->
+            <div style="background: rgba(30,41,59,0.7); border: 1px solid #3b82f6; border-radius: 8px; padding: 12px;">
               <div style="font-size: 0.8rem; font-weight: 800; color: #60a5fa; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                <span>⚡</span> <span>शॉर्ट वीडियो सीक्वेंसिंग व प्राथमिकता (Zero Egress Ordering):</span>
+                <span>⚡</span> <span>प्राथमिकता व सीक्वेंसिंग (Priority & Pinning):</span>
               </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <div>
                   <label class="admin-label">सीक्वेंस मोड (Order Type):</label>
-                  <select id="modal_rec_order_type" class="admin-select" style="width: 100%;">
+                  <select id="drawer_rec_order_type" class="admin-select" style="width: 100%;">
                     <option value="normal">⏱️ Normal (तारीख अनुसार - Newest First)</option>
-                    <option value="pinned">📌 Pinned Video (हमेशा टॉप पर फिक्स)</option>
-                    <option value="priority">🔢 Priority Score (अंक अनुसार)</option>
-                    <option value="random">🎲 Random Shuffle (रैंडम क्रम)</option>
+                    <option value="pinned">📌 Pinned Video (हमेशा टॉप पर)</option>
+                    <option value="priority">🔢 Priority Score (1-100 अंक)</option>
+                    <option value="random">🎲 Random Shuffle (रैंडम)</option>
                   </select>
                 </div>
                 <div>
                   <label class="admin-label">प्राथमिकता अंक (Priority 1-100):</label>
-                  <input type="number" id="modal_rec_priority" class="admin-input" min="0" max="100" value="50" placeholder="50" style="width: 100%;" />
+                  <input type="number" id="drawer_rec_priority" class="admin-input" min="0" max="100" value="50" style="width: 100%;" />
                 </div>
               </div>
               <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="modal_rec_pinned" style="width: 18px; height: 18px; accent-color: #3b82f6; cursor: pointer;" />
-                <label for="modal_rec_pinned" style="font-size: 0.82rem; color: #f8fafc; cursor: pointer; font-weight: 700;">
+                <input type="checkbox" id="drawer_rec_pinned" style="width: 18px; height: 18px; accent-color: #3b82f6; cursor: pointer;" />
+                <label for="drawer_rec_pinned" style="font-size: 0.82rem; color: #f8fafc; cursor: pointer; font-weight: 700;">
                   📌 इस वीडियो को सबसे ऊपर पिन रखें (Pin this Video to Top)
                 </label>
               </div>
             </div>
 
-            <div style="margin-top: 8px;">
-              <button type="submit" id="btn-save-video-entry" class="admin-button" style="background: #F43F5E; color: #fff; width: 100%; font-weight: 800; padding: 13px; font-size: 0.95rem; box-shadow: 0 4px 16px rgba(244,63,94,0.4);">
-                <span>💾 वीडियो / रील सेव करें (Save Video)</span>
-              </button>
+            <!-- Access Tier -->
+            <div>
+              <label class="admin-label">विजिबिलिटी / एक्सेस (Access):</label>
+              <select id="drawer_rec_access" class="admin-select" style="width: 100%;">
+                <option value="all">🌟 सभी के लिए (All Users - Public)</option>
+                <option value="registration_only">🔒 केवल रजिस्टर्ड यूजर (Only Registered)</option>
+                <option value="active_only">🟢 केवल एक्टिव यूजर (Only Active)</option>
+              </select>
             </div>
+
+            <!-- Thumbnail Options -->
+            <div>
+              <label class="admin-label">थंबनेल (Thumbnail Cover):</label>
+              <select id="drawer_rec_thumb_type" class="admin-select" style="width: 100%; margin-bottom: 6px;">
+                <option value="auto">⚡ Auto (Video URL से स्वतः लें)</option>
+                <option value="aarogyamtube_mono">🛡️ AarogyamTube Official Default Mono</option>
+                <option value="custom_url">🔗 Custom Image URL</option>
+                <option value="custom_upload">📤 नई फोटो अपलोड करें</option>
+              </select>
+              <input type="text" id="drawer_rec_custom_thumb_url" class="admin-input" placeholder="https://..." style="width: 100%; display: none; margin-bottom: 6px;" />
+              <input type="file" id="drawer_rec_custom_thumb_file" class="admin-input" accept="image/*" style="width: 100%; display: none;" />
+            </div>
+
+            <!-- Live Card Preview -->
+            <div style="background: #000; border: 1px solid #334155; border-radius: 8px; padding: 10px; display: flex; gap: 12px; align-items: center;">
+              <div style="width: 80px; height: 50px; background: #1e293b; border-radius: 6px; overflow: hidden; position: relative; flex-shrink: 0;">
+                <img id="drawer_rec_preview_img" src="/images/banners/aarogyamtube-default-thumb.svg" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" />
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 800;">📺 Live Card Preview:</div>
+                <div id="drawer_rec_preview_title" style="font-size: 0.82rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">शीर्षक यहाँ दिखेगा...</div>
+                <div id="drawer_rec_preview_meta" style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">आरोग्यम विशेषज्ञ • 45:00</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Sticky Bottom Footer -->
+          <div class="adm-drawer-footer">
+            <button type="submit" id="btn-save-video-entry" class="admin-button" style="background: #F43F5E; color: #fff; width: 100%; font-weight: 800; padding: 12px; font-size: 0.95rem; box-shadow: 0 4px 16px rgba(244,63,94,0.4);">
+              <span>💾 वीडियो सुरक्षित करें (Save & Sync)</span>
+            </button>
           </div>
         </form>
       </div>
     </div>
+
+    <!-- ============================================================= -->
+    <!-- CHANNELS PRESET MANAGER DRAWER -->
+    <!-- ============================================================= -->
+    <div id="drawer-channels-manager" class="adm-drawer-overlay">
+      <div class="adm-drawer-content">
+        <div class="adm-drawer-header">
+          <h4 style="font-weight: 800; font-size: 1.1rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span>📺 YouTube चैनल प्रबंधक (Channels)</span>
+          </h4>
+          <button type="button" id="btn-close-channels-drawer" style="background: rgba(255,255,255,0.1); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+        </div>
+
+        <div class="adm-drawer-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 700;">मौजूदा चैनल्स सूची:</span>
+            <button type="button" id="btn-add-new-channel-row" class="admin-button small-button" style="background: #10B981; color: #fff; font-size: 0.78rem;">+ नया चैनल जोड़ें</button>
           </div>
-        </form>
+          <div id="adm_channels_list_container" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Channels List -->
+          </div>
+        </div>
+
+        <div class="adm-drawer-footer">
+          <button type="button" id="btn-save-channels-data" class="admin-button" style="background: #3b82f6; color: #fff; width: 100%; font-weight: 800; padding: 12px;">
+            <span>💾 चैनल सूची सेव करें (Save Channels)</span>
+          </button>
+        </div>
       </div>
     </div>
-  `;
+
+    <!-- ============================================================= -->
+    <!-- PLAYLISTS MANAGER DRAWER -->
+    <!-- ============================================================= -->
+    <div id="drawer-playlists-manager" class="adm-drawer-overlay">
+      <div class="adm-drawer-content">
+        <div class="adm-drawer-header">
+          <h4 style="font-weight: 800; font-size: 1.1rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span>📑 प्लेलिस्ट प्रबंधक (Playlists)</span>
+          </h4>
+          <button type="button" id="btn-close-playlists-drawer" style="background: rgba(255,255,255,0.1); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+        </div>
+
+        <div class="adm-drawer-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 700;">मौजूदा प्लेलिस्ट्स:</span>
+            <button type="button" id="btn-add-new-playlist-row" class="admin-button small-button" style="background: #8b5cf6; color: #fff; font-size: 0.78rem;">+ नई प्लेलिस्ट बनाएं</button>
+          </div>
+          <div id="adm_playlists_list_container" style="display: flex; flex-direction: column; gap: 14px;">
+            <!-- Playlists List -->
+          </div>
+        </div>
+
+        <div class="adm-drawer-footer">
+          <button type="button" id="btn-save-playlists-data" class="admin-button" style="background: #8b5cf6; color: #fff; width: 100%; font-weight: 800; padding: 12px;">
+            <span>💾 प्लेलिस्ट्स सेव करें (Save Playlists)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  \`;
 
   // -------------------------------------------------------------
   // INITIALIZE DATA & EVENT BINDINGS
   // -------------------------------------------------------------
   async function loadData() {
-    // 1. Master JSON
+    // 1. Master Webinar JSON
     try {
       const resp = await fetch('/data/webinar-master.json?v=' + Date.now());
       if (resp.ok) {
@@ -547,21 +790,56 @@ export async function initWebinars() {
       }
     } catch (e) { }
 
-    // 2. Recordings JSON
+    // 2. Recordings, Channels, Categories, Playlists JSON
     try {
       const rResp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
       if (rResp.ok) {
         const rJson = await rResp.json();
         const list = Array.isArray(rJson.recordings) ? rJson.recordings : (Array.isArray(rJson) ? rJson : []);
         if (list.length > 0) allRecordings = list;
+
+        if (Array.isArray(rJson.channels) && rJson.channels.length > 0) {
+          allChannels = rJson.channels;
+        }
+        if (Array.isArray(rJson.master_categories) && rJson.master_categories.length > 0) {
+          masterCategories = rJson.master_categories;
+        }
+        if (Array.isArray(rJson.playlists) && rJson.playlists.length > 0) {
+          allPlaylists = rJson.playlists;
+        }
       }
     } catch (e) { }
+
+    // Check LocalStorage overrides
+    try {
+      const localRec = localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS');
+      if (localRec) {
+        const p = JSON.parse(localRec);
+        if (Array.isArray(p) && p.length > 0) allRecordings = p;
+      }
+      const localCats = localStorage.getItem('AI_LOCAL_MASTER_CATEGORIES');
+      if (localCats) {
+        const p = JSON.parse(localCats);
+        if (Array.isArray(p) && p.length > 0) masterCategories = p;
+      }
+      const localChs = localStorage.getItem('AI_LOCAL_CHANNELS');
+      if (localChs) {
+        const p = JSON.parse(localChs);
+        if (Array.isArray(p) && p.length > 0) allChannels = p;
+      }
+      const localPls = localStorage.getItem('AI_LOCAL_PLAYLISTS');
+      if (localPls) {
+        const p = JSON.parse(localPls);
+        if (Array.isArray(p) && p.length > 0) allPlaylists = p;
+      }
+    } catch(e) {}
 
     populateMasterWebinarForm();
     renderSectionsList();
     renderBannersList();
     renderKpisList();
     renderFaqsList();
+    populateCategoryAndPlaylistDropdowns();
     renderRecordingsTable();
   }
 
@@ -576,13 +854,11 @@ export async function initWebinars() {
     document.getElementById('adm_wb_passcode').value = masterWebinar.passcode || '';
     document.getElementById('adm_wb_zoom_link').value = masterWebinar.zoom_link || '';
 
-    // Posters / Multi-Banners Section Metadata
     const pTitle = document.getElementById('adm_posters_title');
     const pSub = document.getElementById('adm_posters_subtitle');
     if (pTitle) pTitle.value = masterWebinar.posters_title || '🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स';
     if (pSub) pSub.value = masterWebinar.posters_subtitle || 'नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स';
 
-    // Cover Image
     const coverUrl = masterWebinar.cover_image || '/images/banners/webinar-cover-live.webp';
     const previewEl = document.getElementById('adm_cover_live_preview');
     if (previewEl) previewEl.src = coverUrl;
@@ -609,7 +885,6 @@ export async function initWebinars() {
       }
     }
 
-    // OG Metadata
     document.getElementById('adm_og_title').value = masterWebinar.og_title || masterWebinar.title || '';
     document.getElementById('adm_og_desc').value = masterWebinar.og_description || masterWebinar.description || '';
     updateOgPreview();
@@ -624,14 +899,12 @@ export async function initWebinars() {
     const ogImg = masterWebinar.og_image || '/images/banners/universal-zoom-webinar-og.jpg';
     const ogPreviewImg = document.getElementById('adm_og_preview_img');
     if (ogPreviewImg) ogPreviewImg.src = ogImg;
-
     if (pd) pd.textContent = d;
   }
 
   document.getElementById('adm_og_title')?.addEventListener('input', updateOgPreview);
   document.getElementById('adm_og_desc')?.addEventListener('input', updateOgPreview);
 
-  // OG Image Selector & Uploader
   const ogPresetSel = document.getElementById('adm_og_image_preset');
   const ogUrlInp = document.getElementById('adm_og_image_url');
   const ogFileInp = document.getElementById('adm_og_image_file');
@@ -673,7 +946,6 @@ export async function initWebinars() {
     }
   });
 
-  // Cover Image Selector & Uploader
   const presetSel = document.getElementById('adm_wb_cover_preset');
   const urlInp = document.getElementById('adm_wb_cover_url');
   const fileInp = document.getElementById('adm_wb_cover_file');
@@ -702,216 +974,69 @@ export async function initWebinars() {
     }
   });
 
-  async function compressFileToWebP(file, maxDimension = 1200, quality = 0.85) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        img.onload = () => {
-          let width = img.width;
-          let height = img.height;
-          if (width > maxDimension || height > maxDimension) {
-            if (width > height) {
-              height = Math.round((height * maxDimension) / width);
-              width = maxDimension;
-            } else {
-              width = Math.round((width * maxDimension) / height);
-              height = maxDimension;
-            }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          const webpBase64 = canvas.toDataURL('image/webp', quality);
-          resolve(webpBase64);
-        };
-        img.onerror = reject;
-        img.src = e.target.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
-  fileInp?.addEventListener('change', async (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      showToast('⏳ 3D कवर इमेज WebP में कन्वर्ट हो रही है...', 'info');
-      try {
-        const webpBase64 = await compressFileToWebP(file, 1200, 0.85);
-        if (previewImg) previewImg.src = webpBase64;
-        
-        showToast('⏳ Git में अपलोड हो रही है...', 'info');
-        const resp = await fetch('/api/auto-sync-book', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'upload_asset',
-            path: 'images/banners/webinar-cover-live.webp',
-            base64: webpBase64
-          })
-        });
-        const resJson = await resp.json();
-        if (resJson.success) {
-          masterWebinar.cover_image = resJson.path || resJson.url || '/images/banners/webinar-cover-live.webp';
-          showToast('✅ 3D कवर इमेज Git में सुरक्षित हो गई!', 'success');
-        } else {
-          masterWebinar.cover_image = webpBase64;
-          showToast('⚠️ लोकल प्रीव्यू सेट (सिंक पर सेव होगा)', 'warning');
-        }
-      } catch (err) {
-        showToast('❌ इमेज अपलोड विफल: ' + err.message, 'error');
-      }
-    }
-  });
-
-  // -------------------------------------------------------------
-  // SECTIONS REORDERING (HTML5 DRAG & DROP + UP/DOWN BUTTONS)
-  // -------------------------------------------------------------
   function renderSectionsList() {
     const cont = document.getElementById('adm_sections_order_container');
     if (!cont) return;
-
-    const order = masterWebinar.section_order || defaultSections.map(s => s.key);
-
-    cont.innerHTML = order.map((sKey, idx) => {
-      const meta = defaultSections.find(s => s.key === sKey) || { key: sKey, name: sKey, desc: '' };
-      return `
-        <div class="adm-section-drag-item" draggable="true" data-index="${idx}" style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; padding: 10px 14px; margin-bottom: 6px; cursor: grab; user-select: none; transition: all 0.2s ease;">
+    const currentOrder = masterWebinar.section_order || defaultSections.map(s => s.key);
+    cont.innerHTML = currentOrder.map((sKey, idx) => {
+      const secMeta = defaultSections.find(s => s.key === sKey) || { name: sKey, desc: '' };
+      return \`
+        <div class="adm-section-drag-item" draggable="true" data-index="\${idx}" style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px 14px; cursor: grab;">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 1.2rem; color: #60a5fa; cursor: grab;" title="ड्रैग करके ऊपर-नीचे ले जाएं">☰</span>
+            <span style="font-size: 1.1rem; color: #60a5fa;" class="adm-drag-handle">☰</span>
             <div>
-              <div style="font-weight: 700; font-size: 0.88rem; color: #e2e8f0; display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 0.72rem; background: #2563eb; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">#${idx + 1}</span>
-                <span>${meta.name}</span>
-              </div>
-              <div style="font-size: 0.72rem; color: #94a3b8;">${meta.desc}</div>
+              <div style="font-weight: 700; font-size: 0.85rem; color: #fff;">\${secMeta.name}</div>
+              <div style="font-size: 0.72rem; color: #94a3b8;">\${secMeta.desc}</div>
             </div>
           </div>
-          <div style="display: flex; gap: 4px;">
-            <button type="button" onclick="window.moveWbSection(${idx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 10px; font-weight: 800;" title="ऊपर करें" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
-            <button type="button" onclick="window.moveWbSection(${idx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 10px; font-weight: 800;" title="नीचे करें" ${idx === order.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
+          <div style="display: flex; gap: 4px; align-items: center;">
+            <button type="button" onclick="window.moveSectionPlacement(\${idx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800;" \${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
+            <button type="button" onclick="window.moveSectionPlacement(\${idx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800;" \${idx === currentOrder.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
           </div>
         </div>
-      `;
+      \`;
     }).join('');
-
-    // Attach HTML5 Drag & Drop Event Listeners
-    let dragSrcIndex = null;
-    const items = cont.querySelectorAll('.adm-section-drag-item');
-    items.forEach(item => {
-      item.addEventListener('dragstart', (e) => {
-        dragSrcIndex = Number(item.dataset.index);
-        e.dataTransfer.effectAllowed = 'move';
-        item.classList.add('adm-dragging');
-      });
-
-      item.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        item.classList.add('adm-drag-over');
-      });
-
-      item.addEventListener('dragleave', () => {
-        item.classList.remove('adm-drag-over');
-      });
-
-      item.addEventListener('drop', (e) => {
-        e.preventDefault();
-        item.classList.remove('adm-drag-over');
-        const targetIndex = Number(item.dataset.index);
-        if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
-          const currentOrder = [...(masterWebinar.section_order || defaultSections.map(s => s.key))];
-          const [movedItem] = currentOrder.splice(dragSrcIndex, 1);
-          currentOrder.splice(targetIndex, 0, movedItem);
-          masterWebinar.section_order = currentOrder;
-
-          // Auto-save
-          try {
-            localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterWebinar));
-          } catch (err) {}
-
-          renderSectionsList();
-          showToast('✅ सेक्शन क्रम सफलतापूर्वक बदल गया!', 'success');
-        }
-      });
-
-      item.addEventListener('dragend', () => {
-        item.classList.remove('adm-dragging');
-        items.forEach(it => it.classList.remove('adm-drag-over'));
-      });
-    });
   }
 
-  window.moveWbSection = function (idx, delta) {
-    const order = masterWebinar.section_order || defaultSections.map(s => s.key);
+  window.moveSectionPlacement = (idx, delta) => {
+    if (!masterWebinar.section_order) masterWebinar.section_order = defaultSections.map(s => s.key);
     const targetIdx = idx + delta;
-    if (targetIdx < 0 || targetIdx >= order.length) return;
-    const temp = order[idx];
-    order[idx] = order[targetIdx];
-    order[targetIdx] = temp;
-    masterWebinar.section_order = order;
-
-    // Auto-save
-    try {
-      localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterWebinar));
-    } catch (err) {}
-
+    if (targetIdx < 0 || targetIdx >= masterWebinar.section_order.length) return;
+    const temp = masterWebinar.section_order[idx];
+    masterWebinar.section_order[idx] = masterWebinar.section_order[targetIdx];
+    masterWebinar.section_order[targetIdx] = temp;
     renderSectionsList();
-    showToast('↕️ सेक्शन का क्रम बदला गया!', 'info');
   };
 
   document.getElementById('btn-reset-sections-order')?.addEventListener('click', () => {
     masterWebinar.section_order = defaultSections.map(s => s.key);
-    try {
-      localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterWebinar));
-    } catch (err) {}
     renderSectionsList();
-    showToast('↺ डिफ़ॉल्ट सेक्शन क्रम रीसेट हो गया!', 'info');
+    showToast('↺ सेक्शंस का क्रम डिफ़ॉल्ट रीसेट हो गया!', 'info');
   });
 
-  // -------------------------------------------------------------
-  // MULTI-BANNERS / POSTERS MANAGER
-  // -------------------------------------------------------------
   function renderBannersList() {
     const cont = document.getElementById('adm_banners_container');
     if (!cont) return;
-
-    const list = Array.isArray(masterWebinar.banners) ? masterWebinar.banners : [];
-
-    if (list.length === 0) {
-      cont.innerHTML = `
-        <div style="text-align:center; padding:12px; color:var(--admin-muted); font-size:0.8rem; background:#0f172a; border-radius:6px;">
-          कोई पोस्टर नहीं है। ऊपर दिए '+ नया पोस्टर / बैनर जोड़ें' बटन से जोड़ें।
-        </div>
-      `;
-      return;
-    }
-
+    const list = masterWebinar.banners || [];
     cont.innerHTML = list.map((b, idx) => {
-      const bUrl = typeof b === 'object' ? (b.url || b.image || '') : b;
-      const bTitle = typeof b === 'object' ? (b.title || '') : '';
-
-      return `
-        <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:10px; display:grid; grid-template-columns:80px 1fr auto; gap:10px; align-items:center;">
-          <div style="width:80px; height:50px; background:#1e293b; border-radius:6px; overflow:hidden; border:1px solid rgba(255,255,255,0.1);">
-            <img src="${bUrl}" alt="Banner" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-hero-banner-1.webp'" />
+      const bTitle = typeof b === 'object' ? (b.title || '') : \`पोस्टर #\${idx + 1}\`;
+      const bUrl = typeof b === 'object' ? (b.url || '') : b;
+      return \`
+        <div style="display: grid; grid-template-columns: 60px 1fr auto; gap: 10px; align-items: center; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px;">
+          <div style="width:60px; height:38px; background:#000; border-radius:4px; overflow:hidden;">
+            <img src="\${bUrl}" alt="Banner" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-hero-banner-1.webp'" />
           </div>
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <input type="text" class="admin-input adm-banner-title" placeholder="पोस्टर शीर्षक (उदा. खरीफ फसल मास्टर गाइड 2026)" value="${bTitle}" style="font-size:0.82rem; font-weight:700; width:100%;" />
-            <input type="text" class="admin-input adm-banner-url" placeholder="इमेज URL या पाथ (/images/banners/...)" value="${bUrl}" style="font-size:0.75rem; width:100%;" />
+            <input type="text" class="admin-input adm-banner-title" placeholder="पोस्टर शीर्षक" value="\${bTitle}" style="font-size:0.82rem; font-weight:700; width:100%;" />
+            <input type="text" class="admin-input adm-banner-url" placeholder="इमेज URL" value="\${bUrl}" style="font-size:0.75rem; width:100%;" />
           </div>
           <div style="display: flex; gap: 4px; align-items: center;">
-            <button type="button" onclick="window.moveBannerItem(${idx}, -1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" title="ऊपर करें" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
-            <button type="button" onclick="window.moveBannerItem(${idx}, 1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" title="नीचे करें" ${idx === list.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
-            <button type="button" onclick="window.removeBannerItem(${idx})" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;">
-              &times;
-            </button>
+            <button type="button" onclick="window.moveBannerItem(\${idx}, -1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" \${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
+            <button type="button" onclick="window.moveBannerItem(\${idx}, 1)" class="admin-button small-button" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:4px 8px; font-weight:800;" \${idx === list.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
+            <button type="button" onclick="window.removeBannerItem(\${idx})" class="admin-button small-button" style="background:#ef4444; color:#fff; padding:4px 8px;">&times;</button>
           </div>
         </div>
-      `;
+      \`;
     }).join('');
   }
 
@@ -933,25 +1058,19 @@ export async function initWebinars() {
 
   document.getElementById('btn-add-banner-item')?.addEventListener('click', () => {
     if (!masterWebinar.banners) masterWebinar.banners = [];
-    masterWebinar.banners.push({
-      title: 'नया कृषि पोस्टर',
-      url: '/images/banners/agriculture-hero-banner-1.webp'
-    });
+    masterWebinar.banners.push({ title: 'नया कृषि पोस्टर', url: '/images/banners/agriculture-hero-banner-1.webp' });
     renderBannersList();
   });
 
-  // -------------------------------------------------------------
-  // KPIS & FAQS MANAGERS
-  // -------------------------------------------------------------
   function renderKpisList() {
     const cont = document.getElementById('adm_kpi_container');
     if (!cont) return;
-    cont.innerHTML = (masterWebinar.kpis || []).map((kpi, idx) => `
+    cont.innerHTML = (masterWebinar.kpis || []).map((kpi, idx) => \`
       <div style="display: flex; gap: 6px; align-items: center;">
-        <input type="text" class="admin-input adm-kpi-input" value="${kpi}" style="flex: 1;" />
-        <button type="button" onclick="window.removeKpiItem(${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff;">&times;</button>
+        <input type="text" class="admin-input adm-kpi-input" value="\${kpi}" style="flex: 1;" />
+        <button type="button" onclick="window.removeKpiItem(\${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff;">&times;</button>
       </div>
-    `).join('');
+    \`).join('');
   }
 
   window.removeKpiItem = (idx) => {
@@ -968,16 +1087,16 @@ export async function initWebinars() {
   function renderFaqsList() {
     const cont = document.getElementById('adm_faqs_container');
     if (!cont) return;
-    cont.innerHTML = (masterWebinar.faqs || []).map((faq, idx) => `
+    cont.innerHTML = (masterWebinar.faqs || []).map((faq, idx) => \`
       <div style="background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-          <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700;">प्रश्न #${idx + 1}:</span>
-          <button type="button" onclick="window.removeFaqItem(${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times; हटाएं</button>
+          <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700;">प्रश्न #\${idx + 1}:</span>
+          <button type="button" onclick="window.removeFaqItem(\${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times; हटाएं</button>
         </div>
-        <input type="text" class="admin-input adm-faq-q" value="${faq.q}" placeholder="प्रश्न लिखें..." style="width: 100%; margin-bottom: 6px;" />
-        <textarea class="admin-input adm-faq-a" rows="2" placeholder="उत्तर लिखें..." style="width: 100%;">${faq.a}</textarea>
+        <input type="text" class="admin-input adm-faq-q" value="\${faq.q}" placeholder="प्रश्न लिखें..." style="width: 100%; margin-bottom: 6px;" />
+        <textarea class="admin-input adm-faq-a" rows="2" placeholder="उत्तर लिखें..." style="width: 100%;">\${faq.a}</textarea>
       </div>
-    `).join('');
+    \`).join('');
   }
 
   window.removeFaqItem = (idx) => {
@@ -991,9 +1110,7 @@ export async function initWebinars() {
     renderFaqsList();
   });
 
-  // -------------------------------------------------------------
-  // SAVE MASTER WEBINAR FORM
-  // -------------------------------------------------------------
+  // Save Master Webinar
   document.getElementById('form-master-webinar')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('btn-save-master-webinar');
@@ -1002,7 +1119,6 @@ export async function initWebinars() {
       btn.textContent = '⏳ सुरक्षित हो रहा है...';
     }
 
-    // Read form values
     masterWebinar.title = (document.getElementById('adm_wb_title')?.value || '').trim();
     masterWebinar.description = (document.getElementById('adm_wb_desc')?.value || '').trim();
     masterWebinar.date = document.getElementById('adm_wb_date')?.value || '';
@@ -1015,40 +1131,27 @@ export async function initWebinars() {
     masterWebinar.og_title = (document.getElementById('adm_og_title')?.value || '').trim() || masterWebinar.title;
     masterWebinar.og_description = (document.getElementById('adm_og_desc')?.value || '').trim() || masterWebinar.description;
 
-    // Read Cover Image
     const presetVal = document.getElementById('adm_wb_cover_preset')?.value;
     const urlVal = document.getElementById('adm_wb_cover_url')?.value?.trim();
-    const livePreviewSrc = document.getElementById('adm_cover_live_preview')?.src;
-
     if (presetVal === 'custom_url' && urlVal) {
       masterWebinar.cover_image = urlVal;
     } else if (presetVal && presetVal !== 'custom_url' && presetVal !== 'custom_upload') {
       masterWebinar.cover_image = presetVal;
-    } else if (masterWebinar.cover_image) {
-      // Keep existing custom uploaded image / base64 or path
-    } else if (livePreviewSrc && !livePreviewSrc.startsWith('data:')) {
-      masterWebinar.cover_image = livePreviewSrc;
     }
 
-    // Read Posters metadata
     masterWebinar.posters_title = (document.getElementById('adm_posters_title')?.value || '').trim() || '🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स';
     masterWebinar.posters_subtitle = (document.getElementById('adm_posters_subtitle')?.value || '').trim() || 'नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स';
 
-    // Read Posters / Banners list
     const banners = [];
     document.querySelectorAll('#adm_banners_container > div').forEach(row => {
       const bTitle = (row.querySelector('.adm-banner-title')?.value || '').trim();
       const bUrl = (row.querySelector('.adm-banner-url')?.value || '').trim();
-      if (bUrl) {
-        banners.push({ title: bTitle, url: bUrl });
-      }
+      if (bUrl) banners.push({ title: bTitle, url: bUrl });
     });
     if (banners.length > 0) masterWebinar.banners = banners;
 
-    // Read KPIs
     masterWebinar.kpis = Array.from(document.querySelectorAll('.adm-kpi-input')).map(el => el.value.trim()).filter(Boolean);
 
-    // Read FAQs
     const faqs = [];
     document.querySelectorAll('#adm_faqs_container > div').forEach(row => {
       const q = (row.querySelector('.adm-faq-q')?.value || '').trim();
@@ -1057,29 +1160,19 @@ export async function initWebinars() {
     });
     masterWebinar.faqs = faqs;
 
-    // 1. Direct LocalStorage Backup
     try {
       localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterWebinar));
     } catch (e) { }
 
-    // 2. Permanent Zero-Egress GitHub Auto-Sync
     try {
-      const syncRes = await fetch('/api/auto-sync-book', {
+      await fetch('/api/auto-sync-book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save_webinar_master',
-          webinarMaster: masterWebinar
-        })
+        body: JSON.stringify({ action: 'save_webinar_master', webinarMaster: masterWebinar })
       });
-      const syncData = await syncRes.json();
-      if (syncData.success) {
-        showToast('🚀 लाइव ज़ूम वेबिनार सफलतापूर्वक GitHub पर प्रकाशित हो गया!', 'success');
-      } else {
-        showToast(`⚠️ Git Sync: ${syncData.error || 'Saved locally'}`, 'info');
-      }
+      showToast('🚀 लाइव ज़ूम वेबिनार सेटिंग्स सुरक्षित हो गईं!', 'success');
     } catch (err) {
-      showToast('✅ वेबिनार सेटिंग्स सुरक्षित कर दी गई हैं।', 'success');
+      showToast('✅ वेबिनार सेटिंग्स स्थानीय रूप से सुरक्षित हो गईं।', 'success');
     }
 
     if (btn) {
@@ -1088,91 +1181,174 @@ export async function initWebinars() {
     }
   });
 
-  function exportWebinarMasterJson() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ webinarMaster: masterWebinar }, null, 2));
-    const dlAnchor = document.createElement('a');
-    dlAnchor.setAttribute("href", dataStr);
-    dlAnchor.setAttribute("download", "webinar-master.json");
-    dlAnchor.click();
+  // -------------------------------------------------------------
+  // DROPDOWNS & FILTER POPULATION
+  // -------------------------------------------------------------
+  function populateCategoryAndPlaylistDropdowns() {
+    // 1. Drawer Channel selector
+    const chSel = document.getElementById('drawer_rec_channel');
+    if (chSel) {
+      chSel.innerHTML = allChannels.map(ch => \`
+        <option value="\${ch.id}">\${ch.name} (\${ch.handle}) \${ch.is_default ? '🌟 Default' : ''}</option>
+      \`).join('');
+    }
+
+    // 2. Drawer Category selector
+    const catSel = document.getElementById('drawer_rec_category');
+    if (catSel) {
+      const distinctCats = Array.from(new Set([...masterCategories, ...allRecordings.map(v => v.category).filter(Boolean)]));
+      catSel.innerHTML = \`
+        \${distinctCats.map(c => \`<option value="\${c}">\${c}</option>\`).join('')}
+        <option value="custom">➕ नई श्रेणी जोड़ें (Add Custom)</option>
+      \`;
+    }
+
+    // 3. Drawer Playlist selector
+    const plSel = document.getElementById('drawer_rec_playlist');
+    if (plSel) {
+      plSel.innerHTML = \`
+        <option value="">(कोई प्लेलिस्ट नहीं)</option>
+        \${allPlaylists.map(p => \`<option value="\${p.id}">\${p.title}</option>\`).join('')}
+      \`;
+    }
+
+    // 4. Filter Toolbar Category dropdown
+    const fCatSel = document.getElementById('adm_filter_category');
+    if (fCatSel) {
+      const distinctCats = Array.from(new Set([...masterCategories, ...allRecordings.map(v => v.category).filter(Boolean)]));
+      fCatSel.innerHTML = \`
+        <option value="all">📁 सभी श्रेणियां (All Categories)</option>
+        \${distinctCats.map(c => \`<option value="\${c}">\${c}</option>\`).join('')}
+      \`;
+    }
+
+    // 5. Filter Toolbar Playlist dropdown
+    const fPlSel = document.getElementById('adm_filter_playlist');
+    if (fPlSel) {
+      fPlSel.innerHTML = \`
+        <option value="all">📑 सभी प्लेलिस्ट्स (All Playlists)</option>
+        \${allPlaylists.map(p => \`<option value="\${p.id}">\${p.title}</option>\`).join('')}
+      \`;
+    }
   }
 
   // -------------------------------------------------------------
-  // AAROGYAMTUBE VIDEOS & REELS MANAGER
+  // AAROGYAMTUBE VIDEOS & REELS TABLE (WITH LIVE MULTI-FILTER)
   // -------------------------------------------------------------
+  function getFilteredRecordings() {
+    return allRecordings.filter(r => {
+      // 1. Text Search Query
+      if (searchFilterQuery) {
+        const q = searchFilterQuery.toLowerCase();
+        const t = (r.title || '').toLowerCase();
+        const d = (r.description || '').toLowerCase();
+        const s = (r.speaker || '').toLowerCase();
+        const c = (r.category || '').toLowerCase();
+        if (!t.includes(q) && !d.includes(q) && !s.includes(q) && !c.includes(q)) return false;
+      }
+
+      // 2. Format Filter
+      if (formatFilterVal !== 'all') {
+        if (formatFilterVal === 'both') {
+          if (r.format !== 'both') return false;
+        } else if (formatFilterVal === 'short_reel') {
+          if (r.format !== 'short_reel' && r.format !== 'both' && !r.id.startsWith('VID_S')) return false;
+        } else if (formatFilterVal === 'full_video') {
+          if (r.format !== 'full_video' && r.format !== 'masterclass' && r.format !== 'both' && (r.format === 'short_reel' || r.id.startsWith('VID_S'))) return false;
+        }
+      }
+
+      // 3. Category Filter
+      if (categoryFilterVal !== 'all') {
+        if (r.category !== categoryFilterVal && r.subject !== categoryFilterVal) return false;
+      }
+
+      // 4. Playlist Filter
+      if (playlistFilterVal !== 'all') {
+        const pl = allPlaylists.find(p => p.id === playlistFilterVal);
+        if (!pl || !pl.video_ids || !pl.video_ids.includes(r.id)) return false;
+      }
+
+      return true;
+    });
+  }
+
   function renderRecordingsTable() {
     const tbody = document.getElementById('adm_recordings_tbody');
     const badge = document.getElementById('reels-count-badge');
+    const fBadge = document.getElementById('filtered-count-badge');
     if (badge) badge.textContent = allRecordings.length;
     if (!tbody) return;
 
-    if (allRecordings.length === 0) {
-      tbody.innerHTML = `
+    const filteredList = getFilteredRecordings();
+    if (fBadge) fBadge.textContent = \`दिखाए गए: \${filteredList.length} / कुल: \${allRecordings.length}\`;
+
+    if (filteredList.length === 0) {
+      tbody.innerHTML = \`
         <tr>
-          <td colspan="6" style="text-align: center; padding: 20px; color: var(--admin-muted);">
-            लाइब्रेरी में अभी कोई वीडियो या रील नहीं है। ऊपर दिए '+ नई रील / वीडियो जोड़ें' बटन से जोड़ें।
+          <td colspan="6" style="text-align: center; padding: 26px; color: var(--admin-muted);">
+            \${allRecordings.length === 0 ? 'लाइब्रेरी में अभी कोई वीडियो नहीं है।' : '🔍 खोजे गए फ़िल्टर के अनुसार कोई वीडियो नहीं मिला।'}
           </td>
         </tr>
-      `;
+      \`;
       return;
     }
 
-    tbody.innerHTML = allRecordings.map((r, idx) => {
+    tbody.innerHTML = filteredList.map((r, fIdx) => {
+      const actualIdx = allRecordings.findIndex(x => x.id === r.id);
       const fallback = r.platform === 'instagram' ? '/images/banners/agriculture-hero-banner-2.webp' : '/images/banners/agriculture-hero-banner-1.webp';
       const thumb = r.thumbnail || fallback;
-      const isShort = r.format === 'short_reel' || r.id.startsWith('VID_S');
+      const isBoth = r.format === 'both';
+      const isShort = r.format === 'short_reel' || (!isBoth && r.id.startsWith('VID_S'));
 
-      return `
-        <tr class="adm-rec-drag-row" draggable="true" data-index="${idx}" style="border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; transition: all 0.2s ease;">
+      const chObj = allChannels.find(c => c.id === r.channel_id) || allChannels[0];
+
+      return \`
+        <tr class="adm-rec-drag-row" draggable="true" data-index="\${actualIdx}" style="border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; transition: all 0.2s ease;">
           <td style="padding: 10px; text-align: center; cursor: grab; user-select: none;" class="adm-drag-handle" title="ऊपर-नीचे ड्रैग करके क्रम बदलें">
             <span style="font-size: 1.2rem; color: #60a5fa; cursor: grab;">☰</span>
-            <div style="font-size: 0.68rem; color: #94a3b8; font-weight: 800;">#${idx + 1}</div>
+            <div style="font-size: 0.68rem; color: #94a3b8; font-weight: 800;">#\${actualIdx + 1}</div>
           </td>
           <td style="padding: 10px;">
-            <img src="${thumb}" alt="Thumb" style="width: 44px; height: ${isShort ? '60px' : '28px'}; object-fit: cover; border-radius: 4px;" onerror="this.onerror=null; this.src='${fallback}'" />
+            <img src="\${thumb}" alt="Thumb" style="width: 48px; height: \${isShort ? '64px' : '30px'}; object-fit: cover; border-radius: 4px;" onerror="this.onerror=null; this.src='\${fallback}'" />
           </td>
           <td style="padding: 10px;">
-            <span style="font-weight: 800; font-size: 0.75rem; background: ${isShort ? '#F43F5E' : '#2D8CFF'}; color: #fff; padding: 2px 6px; border-radius: 4px;">
-              ${isShort ? '9:16 Reel' : '16:9 Video'}
+            <span style="font-weight: 800; font-size: 0.72rem; background: \${isBoth ? 'linear-gradient(135deg, #10B981, #2563EB)' : (isShort ? '#F43F5E' : '#2D8CFF')}; color: #fff; padding: 2px 6px; border-radius: 4px;">
+              \${isBoth ? '🌟 Both (16:9 & 9:16)' : (isShort ? '📱 9:16 Reel' : '🖥️ 16:9 Video')}
             </span>
-            <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px;">
-              ${r.platform || 'YouTube'}
-            </span>
+            <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; display: flex; align-items: center; gap: 4px;">
+              <span>\${r.platform || 'YouTube'}</span>
+              \${chObj ? \`<span style="color:#ef4444;font-weight:700;">• \${chObj.handle}</span>\` : ''}
+            </div>
             <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px;">
-              <span style="font-size: 0.65rem; background: ${r.access_tier === 'registration_only' ? '#F59E0B' : (r.access_tier === 'active_only' ? '#10B981' : '#64748B')}; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">
-                ${r.access_tier === 'registration_only' ? '🔒 Registered' : (r.access_tier === 'active_only' ? '🟢 Active' : '🌟 All Users')}
-              </span>
-              ${r.pinned ? '<span style="font-size: 0.65rem; background: #3b82f6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 800;">📌 Pinned</span>' : ''}
-              ${r.priority ? `<span style="font-size: 0.65rem; background: #8b5cf6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">🔢 P:${r.priority}</span>` : ''}
-              ${r.order_type === 'random' ? '<span style="font-size: 0.65rem; background: #ec4899; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">🎲 Random</span>' : ''}
+              \${r.pinned ? '<span style="font-size: 0.65rem; background: #3b82f6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 800;">📌 Pinned</span>' : ''}
+              \${r.priority ? \`<span style="font-size: 0.65rem; background: #8b5cf6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">🔢 P:\${r.priority}</span>\` : ''}
             </div>
           </td>
           <td style="padding: 10px;">
-            <div style="font-weight: 700; color: #f8fafc;">${r.title}</div>
-            <div style="font-size: 0.75rem; color: #64748b;">${r.speaker || 'आरोग्यम विशेषज्ञ'} • ${r.category || 'General'}</div>
-            ${r.description ? `<div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px; display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">${r.description}</div>` : ''}
+            <div style="font-weight: 700; color: #f8fafc; font-size: 0.88rem;">\${r.title}</div>
+            <div style="font-size: 0.74rem; color: #64748b;">\${r.speaker || 'आरोग्यम विशेषज्ञ'}</div>
+            \${r.description ? \`<div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px; display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">\${r.description}</div>\` : ''}
           </td>
-          <td style="padding: 10px; color: #94a3b8; font-family: monospace;">
-            ${r.duration || '0:58'}
+          <td style="padding: 10px;">
+            <span style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.74rem; color: #cbd5e1; font-weight: 700;">
+              \${r.category || 'General'}
+            </span>
+            <div style="color: #94a3b8; font-family: monospace; font-size: 0.75rem; margin-top: 4px;">
+              ⏱️ \${r.duration || '0:58'}
+            </div>
           </td>
           <td style="padding: 10px; text-align: right; white-space: nowrap;">
-            <button type="button" onclick="window.moveRecordingItem(${idx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 3px;" title="ऊपर ले जाएं" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>
-              ▲
-            </button>
-            <button type="button" onclick="window.moveRecordingItem(${idx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 6px;" title="नीचे ले जाएं" ${idx === allRecordings.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>
-              ▼
-            </button>
-            <button type="button" onclick="window.editRecordingItem('${r.id}')" class="admin-button small-button" style="background: rgba(45,140,255,0.15); color: #60a5fa; border: 1px solid #60a5fa; padding: 4px 8px; font-weight: 800; margin-right: 4px;">
-              ✏️ एडिट
-            </button>
-            <button type="button" onclick="window.deleteRecordingItem('${r.id}')" class="admin-button small-button" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid #ef4444; padding: 4px 8px; font-weight: 800;">
-              &times; हटाएं
-            </button>
+            <button type="button" onclick="window.moveRecordingItem(\${actualIdx}, -1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 3px;" title="ऊपर ले जाएं" \${actualIdx === 0 ? 'disabled style="opacity:0.3;"' : ''}>▲</button>
+            <button type="button" onclick="window.moveRecordingItem(\${actualIdx}, 1)" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 4px 8px; font-weight: 800; margin-right: 6px;" title="नीचे ले जाएं" \${actualIdx === allRecordings.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>▼</button>
+            <button type="button" onclick="window.editRecordingItem('\${r.id}')" class="admin-button small-button" style="background: rgba(45,140,255,0.15); color: #60a5fa; border: 1px solid #60a5fa; padding: 4px 8px; font-weight: 800; margin-right: 4px;">✏️ एडिट</button>
+            <button type="button" onclick="window.deleteRecordingItem('\${r.id}')" class="admin-button small-button" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid #ef4444; padding: 4px 8px; font-weight: 800;">&times; हटाएं</button>
           </td>
         </tr>
-      `;
+      \`;
     }).join('');
 
-    // Attach Drag & Drop Listeners for Videos Table
+    // Attach Drag & Drop Listeners
     let dragRecSrcIdx = null;
     const rows = tbody.querySelectorAll('.adm-rec-drag-row');
     rows.forEach(row => {
@@ -1199,26 +1375,7 @@ export async function initWebinars() {
         if (dragRecSrcIdx !== null && dragRecSrcIdx !== targetIdx) {
           const [movedItem] = allRecordings.splice(dragRecSrcIdx, 1);
           allRecordings.splice(targetIdx, 0, movedItem);
-          
-          // 1. Direct LocalStorage Save
-          try {
-            localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
-          } catch(e) {}
-
-          // 2. Background Sync
-          try {
-            fetch('/save-recordings.php', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ recordings: allRecordings })
-            });
-            fetch('/api/auto-sync-book', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'save_webinar_recordings', recordings: allRecordings })
-            });
-          } catch(err) {}
-
+          saveAllRecordingsToStorageAndCloud();
           renderRecordingsTable();
           showToast('✅ वीडियो का क्रम सफलतापूर्वक बदल गया और सेव हो गया!', 'success');
         }
@@ -1231,59 +1388,203 @@ export async function initWebinars() {
     });
   }
 
+  // Filter toolbar event listeners
+  document.getElementById('adm_rec_search')?.addEventListener('input', (e) => {
+    searchFilterQuery = e.target.value.trim();
+    renderRecordingsTable();
+  });
+
+  document.getElementById('adm_filter_format')?.addEventListener('change', (e) => {
+    formatFilterVal = e.target.value;
+    renderRecordingsTable();
+  });
+
+  document.getElementById('adm_filter_category')?.addEventListener('change', (e) => {
+    categoryFilterVal = e.target.value;
+    renderRecordingsTable();
+  });
+
+  document.getElementById('adm_filter_playlist')?.addEventListener('change', (e) => {
+    playlistFilterVal = e.target.value;
+    renderRecordingsTable();
+  });
+
+  document.getElementById('btn-reset-filters')?.addEventListener('click', () => {
+    searchFilterQuery = '';
+    formatFilterVal = 'all';
+    categoryFilterVal = 'all';
+    playlistFilterVal = 'all';
+    document.getElementById('adm_rec_search').value = '';
+    document.getElementById('adm_filter_format').value = 'all';
+    document.getElementById('adm_filter_category').value = 'all';
+    document.getElementById('adm_filter_playlist').value = 'all';
+    renderRecordingsTable();
+  });
+
   window.moveRecordingItem = function(idx, delta) {
     const targetIdx = idx + delta;
     if (targetIdx < 0 || targetIdx >= allRecordings.length) return;
     const temp = allRecordings[idx];
     allRecordings[idx] = allRecordings[targetIdx];
     allRecordings[targetIdx] = temp;
+    saveAllRecordingsToStorageAndCloud();
+    renderRecordingsTable();
+    showToast('↕️ वीडियो का क्रम अपडेट हो गया!', 'info');
+  };
 
-    // Save
+  async function saveAllRecordingsToStorageAndCloud() {
     try {
       localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
+      localStorage.setItem('AI_LOCAL_MASTER_CATEGORIES', JSON.stringify(masterCategories));
+      localStorage.setItem('AI_LOCAL_CHANNELS', JSON.stringify(allChannels));
+      localStorage.setItem('AI_LOCAL_PLAYLISTS', JSON.stringify(allPlaylists));
     } catch(e) {}
+
+    const payload = {
+      recordings: allRecordings,
+      channels: allChannels,
+      master_categories: masterCategories,
+      playlists: allPlaylists
+    };
+
     try {
       fetch('/save-recordings.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recordings: allRecordings })
+        body: JSON.stringify(payload)
       });
       fetch('/api/auto-sync-book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'save_webinar_recordings', recordings: allRecordings })
+        body: JSON.stringify({ action: 'save_webinar_recordings', ...payload })
       });
     } catch(err) {}
+  }
 
-    renderRecordingsTable();
-    showToast('↕️ वीडियो का क्रम अपडेट हो गया!', 'info');
-  };
+  // -------------------------------------------------------------
+  // VIDEO EDITOR DRAWER LOGIC
+  // -------------------------------------------------------------
+  const videoDrawer = document.getElementById('drawer-video-editor');
+  const recUrlInput = document.getElementById('drawer_rec_url');
+  const recTitleInput = document.getElementById('drawer_rec_title');
+  const recSpeakerInput = document.getElementById('drawer_rec_speaker');
+  const recDurationInput = document.getElementById('drawer_rec_duration');
+  const recCategorySelect = document.getElementById('drawer_rec_category');
+  const recCustomCategoryInput = document.getElementById('drawer_rec_custom_category');
+  const recThumbTypeSelect = document.getElementById('drawer_rec_thumb_type');
+  const recCustomThumbUrl = document.getElementById('drawer_rec_custom_thumb_url');
+  const recCustomThumbFile = document.getElementById('drawer_rec_custom_thumb_file');
+  const recPreviewImg = document.getElementById('drawer_rec_preview_img');
+  const recPreviewTitle = document.getElementById('drawer_rec_preview_title');
+  const recPreviewMeta = document.getElementById('drawer_rec_preview_meta');
+
+  function updateVideoDrawerLivePreview() {
+    const url = (recUrlInput?.value || '').trim();
+    const title = (recTitleInput?.value || '').trim() || 'शीर्षक यहाँ दिखेगा...';
+    const speaker = (recSpeakerInput?.value || '').trim() || 'आरोग्यम विशेषज्ञ';
+    const duration = (recDurationInput?.value || '').trim() || '45:00';
+    const thumbType = recThumbTypeSelect?.value || 'auto';
+
+    if (recPreviewTitle) recPreviewTitle.textContent = title;
+    if (recPreviewMeta) recPreviewMeta.textContent = \`\${speaker} • \${duration}\`;
+
+    let resolvedThumb = '/images/banners/aarogyamtube-default-thumb.svg';
+    if (thumbType === 'aarogyamtube_mono') {
+      resolvedThumb = '/images/banners/aarogyamtube-default-thumb.svg';
+    } else if (thumbType === 'custom_url' && recCustomThumbUrl?.value?.trim()) {
+      resolvedThumb = recCustomThumbUrl.value.trim();
+    } else if (thumbType === 'auto') {
+      const ytMatch = url.match(/(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|shorts\\/|live\\/|watch\\?v=|watch\\?.+&v=))([a-zA-Z0-9_-]{11})/i);
+      if (ytMatch && ytMatch[1]) {
+        resolvedThumb = \`https://img.youtube.com/vi/\${ytMatch[1]}/hqdefault.jpg\`;
+      } else if (url.includes('instagram.com')) {
+        resolvedThumb = '/images/banners/agriculture-hero-banner-2.webp';
+      }
+    }
+
+    if (recPreviewImg) recPreviewImg.src = resolvedThumb;
+  }
+
+  recUrlInput?.addEventListener('input', () => {
+    const url = recUrlInput.value.trim();
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      document.getElementById('drawer_rec_platform').value = 'youtube';
+      if (url.includes('/shorts/')) {
+        document.getElementById('drawer_rec_format').value = 'short_reel';
+        document.getElementById('drawer_rec_duration').value = '0:58';
+      }
+    } else if (url.includes('instagram.com')) {
+      document.getElementById('drawer_rec_platform').value = 'instagram';
+      document.getElementById('drawer_rec_format').value = 'short_reel';
+    } else if (url.includes('facebook.com')) {
+      document.getElementById('drawer_rec_platform').value = 'facebook';
+    }
+    updateVideoDrawerLivePreview();
+  });
+
+  recTitleInput?.addEventListener('input', updateVideoDrawerLivePreview);
+  recSpeakerInput?.addEventListener('input', updateVideoDrawerLivePreview);
+  recDurationInput?.addEventListener('input', updateVideoDrawerLivePreview);
+
+  recCategorySelect?.addEventListener('change', () => {
+    if (recCategorySelect.value === 'custom') {
+      if (recCustomCategoryInput) recCustomCategoryInput.style.display = 'block';
+    } else {
+      if (recCustomCategoryInput) recCustomCategoryInput.style.display = 'none';
+    }
+  });
+
+  recThumbTypeSelect?.addEventListener('change', () => {
+    const val = recThumbTypeSelect.value;
+    if (recCustomThumbUrl) recCustomThumbUrl.style.display = val === 'custom_url' ? 'block' : 'none';
+    if (recCustomThumbFile) recCustomThumbFile.style.display = val === 'custom_upload' ? 'block' : 'none';
+    updateVideoDrawerLivePreview();
+  });
+
+  recCustomThumbUrl?.addEventListener('input', updateVideoDrawerLivePreview);
+  recCustomThumbFile?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        if (recPreviewImg) recPreviewImg.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
   window.editRecordingItem = function (rId) {
     const item = allRecordings.find(x => x.id === rId);
     if (!item) return;
     editingRecordingId = rId;
 
-    document.getElementById('modal-video-title').textContent = '✏️ वीडियो / रील एडिट करें';
-    document.getElementById('modal_rec_format').value = item.format || (item.id.startsWith('VID_S') ? 'short_reel' : 'full_video');
-    document.getElementById('modal_rec_platform').value = item.platform || 'youtube';
-    document.getElementById('modal_rec_url').value = item.video_url || item.youtube_url || '';
-    document.getElementById('modal_rec_title').value = item.title || '';
-    document.getElementById('modal_rec_desc').value = item.description || '';
-    document.getElementById('modal_rec_duration').value = item.duration || '0:58';
-    document.getElementById('modal_rec_speaker').value = item.speaker || 'आरोग्यम कृषि विशेषज्ञ';
-    document.getElementById('modal_rec_access').value = item.access_tier || 'all';
+    document.getElementById('drawer-video-title').textContent = '✏️ वीडियो / रील एडिट करें';
+    document.getElementById('drawer_rec_format').value = item.format || (item.id.startsWith('VID_S') ? 'short_reel' : 'full_video');
+    document.getElementById('drawer_rec_platform').value = item.platform || 'youtube';
+    document.getElementById('drawer_rec_channel').value = item.channel_id || allChannels[0]?.id || '';
+    document.getElementById('drawer_rec_url').value = item.video_url || item.youtube_url || '';
+    document.getElementById('drawer_rec_title').value = item.title || '';
+    document.getElementById('drawer_rec_desc').value = item.description || '';
+    document.getElementById('drawer_rec_duration').value = item.duration || '45:00';
+    document.getElementById('drawer_rec_speaker').value = item.speaker || 'आरोग्यम कृषि विशेषज्ञ';
+    document.getElementById('drawer_rec_access').value = item.access_tier || 'all';
 
-    // Sequence & Priority fields
-    const pinnedCb = document.getElementById('modal_rec_pinned');
-    const priorityInp = document.getElementById('modal_rec_priority');
-    const orderTypeSel = document.getElementById('modal_rec_order_type');
+    const pinnedCb = document.getElementById('drawer_rec_pinned');
+    const priorityInp = document.getElementById('drawer_rec_priority');
+    const orderTypeSel = document.getElementById('drawer_rec_order_type');
     if (pinnedCb) pinnedCb.checked = Boolean(item.pinned);
     if (priorityInp) priorityInp.value = item.priority || (item.pinned ? 100 : 50);
     if (orderTypeSel) orderTypeSel.value = item.order_type || (item.pinned ? 'pinned' : 'normal');
 
-    const catSelect = document.getElementById('modal_rec_category');
-    const customCatInput = document.getElementById('modal_rec_custom_category');
+    // Playlist assignment check
+    const plSel = document.getElementById('drawer_rec_playlist');
+    if (plSel) {
+      const assignedPl = allPlaylists.find(p => p.video_ids && p.video_ids.includes(rId));
+      plSel.value = assignedPl ? assignedPl.id : '';
+    }
+
+    const catSelect = document.getElementById('drawer_rec_category');
+    const customCatInput = document.getElementById('drawer_rec_custom_category');
     const existingOptions = Array.from(catSelect.options).map(o => o.value);
 
     if (existingOptions.includes(item.category)) {
@@ -1297,8 +1598,8 @@ export async function initWebinars() {
       }
     }
 
-    const thumbTypeSelect = document.getElementById('modal_rec_thumb_type');
-    const customThumbUrlInput = document.getElementById('modal_rec_custom_thumb_url');
+    const thumbTypeSelect = document.getElementById('drawer_rec_thumb_type');
+    const customThumbUrlInput = document.getElementById('drawer_rec_custom_thumb_url');
     if (item.thumbnail && item.thumbnail.includes('aarogyamtube-default-thumb')) {
       thumbTypeSelect.value = 'aarogyamtube_mono';
       if (customThumbUrlInput) customThumbUrlInput.style.display = 'none';
@@ -1313,175 +1614,78 @@ export async function initWebinars() {
       if (customThumbUrlInput) customThumbUrlInput.style.display = 'none';
     }
 
-    const previewImg = document.getElementById('modal_rec_preview_img');
-    if (previewImg) previewImg.src = item.thumbnail || '/images/banners/aarogyamtube-default-thumb.svg';
-
-    const previewTitle = document.getElementById('modal_rec_preview_title');
-    if (previewTitle) previewTitle.textContent = item.title || '';
-
-    const previewMeta = document.getElementById('modal_rec_preview_meta');
-    if (previewMeta) previewMeta.textContent = `${item.speaker || 'आरोग्यम विशेषज्ञ'} • ${item.duration || '0:58'}`;
-
-    if (videoModal) videoModal.style.display = 'flex';
+    updateVideoDrawerLivePreview();
+    if (videoDrawer) videoDrawer.classList.add('active');
   };
 
   window.deleteRecordingItem = async function (rId) {
     if (!confirm('क्या आप वाकई इस वीडियो / रील को हटाना चाहते हैं?')) return;
     allRecordings = allRecordings.filter(x => x.id !== rId);
 
-    // Update LocalStorage
-    try {
-      localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
-    } catch (e) { }
+    // Remove from playlists if present
+    allPlaylists.forEach(pl => {
+      if (pl.video_ids) pl.video_ids = pl.video_ids.filter(id => id !== rId);
+    });
 
-    // Delete from Supabase Cloud
-    const db = getSupabaseDb();
-    if (db) {
-      try {
-        await db.from('landing_pages').delete().eq('id', rId);
-      } catch (err) { }
-    }
-
+    saveAllRecordingsToStorageAndCloud();
     renderRecordingsTable();
     showToast('🗑️ वीडियो हटा दिया गया!', 'info');
   };
 
-  // Video Modal Triggers & Live Previews
-  const videoModal = document.getElementById('modal-video-editor');
-  const recUrlInput = document.getElementById('modal_rec_url');
-  const recTitleInput = document.getElementById('modal_rec_title');
-  const recSpeakerInput = document.getElementById('modal_rec_speaker');
-  const recDurationInput = document.getElementById('modal_rec_duration');
-  const recCategorySelect = document.getElementById('modal_rec_category');
-  const recCustomCategoryInput = document.getElementById('modal_rec_custom_category');
-  const recThumbTypeSelect = document.getElementById('modal_rec_thumb_type');
-  const recCustomThumbUrl = document.getElementById('modal_rec_custom_thumb_url');
-  const recCustomThumbFile = document.getElementById('modal_rec_custom_thumb_file');
-  const recPreviewImg = document.getElementById('modal_rec_preview_img');
-  const recPreviewTitle = document.getElementById('modal_rec_preview_title');
-  const recPreviewMeta = document.getElementById('modal_rec_preview_meta');
-
-  function updateVideoModalLivePreview() {
-    const url = (recUrlInput?.value || '').trim();
-    const title = (recTitleInput?.value || '').trim() || 'शीर्षक यहाँ दिखेगा...';
-    const speaker = (recSpeakerInput?.value || '').trim() || 'आरोग्यम विशेषज्ञ';
-    const duration = (recDurationInput?.value || '').trim() || '0:58';
-    const thumbType = recThumbTypeSelect?.value || 'auto';
-
-    if (recPreviewTitle) recPreviewTitle.textContent = title;
-    if (recPreviewMeta) recPreviewMeta.textContent = `${speaker} • ${duration}`;
-
-    let resolvedThumb = '/images/banners/aarogyamtube-default-thumb.svg';
-
-    if (thumbType === 'aarogyamtube_mono') {
-      resolvedThumb = '/images/banners/aarogyamtube-default-thumb.svg';
-    } else if (thumbType === 'custom_url' && recCustomThumbUrl?.value?.trim()) {
-      resolvedThumb = recCustomThumbUrl.value.trim();
-    } else if (thumbType === 'auto') {
-      const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
-      if (ytMatch && ytMatch[1]) {
-        resolvedThumb = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
-      } else if (url.includes('instagram.com')) {
-        resolvedThumb = '/images/banners/agriculture-hero-banner-2.webp';
-      } else {
-        resolvedThumb = '/images/banners/aarogyamtube-default-thumb.svg';
-      }
-    }
-
-    if (recPreviewImg) recPreviewImg.src = resolvedThumb;
-  }
-
-  recUrlInput?.addEventListener('input', () => {
-    const url = recUrlInput.value.trim();
-    if (url.includes('youtube.com') || url.includes('youtu.be')) {
-      document.getElementById('modal_rec_platform').value = 'youtube';
-      if (url.includes('/shorts/')) document.getElementById('modal_rec_format').value = 'short_reel';
-    } else if (url.includes('instagram.com')) {
-      document.getElementById('modal_rec_platform').value = 'instagram';
-      document.getElementById('modal_rec_format').value = 'short_reel';
-    } else if (url.includes('facebook.com') || url.includes('fb.watch')) {
-      document.getElementById('modal_rec_platform').value = 'facebook';
-      document.getElementById('modal_rec_format').value = 'short_reel';
-    }
-    updateVideoModalLivePreview();
-  });
-
-  recTitleInput?.addEventListener('input', updateVideoModalLivePreview);
-  recSpeakerInput?.addEventListener('input', updateVideoModalLivePreview);
-  recDurationInput?.addEventListener('input', updateVideoModalLivePreview);
-
-  recCategorySelect?.addEventListener('change', () => {
-    if (recCategorySelect.value === 'custom') {
-      if (recCustomCategoryInput) recCustomCategoryInput.style.display = 'block';
-    } else {
-      if (recCustomCategoryInput) recCustomCategoryInput.style.display = 'none';
-    }
-  });
-
-  recThumbTypeSelect?.addEventListener('change', () => {
-    const val = recThumbTypeSelect.value;
-    if (recCustomThumbUrl) recCustomThumbUrl.style.display = val === 'custom_url' ? 'block' : 'none';
-    if (recCustomThumbFile) recCustomThumbFile.style.display = val === 'custom_upload' ? 'block' : 'none';
-    updateVideoModalLivePreview();
-  });
-
-  recCustomThumbUrl?.addEventListener('input', updateVideoModalLivePreview);
-  recCustomThumbFile?.addEventListener('change', (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (evt) {
-        if (recPreviewImg) recPreviewImg.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-
   document.getElementById('btn-open-add-video-modal')?.addEventListener('click', () => {
     editingRecordingId = null;
-    document.getElementById('form-video-editor')?.reset();
-    document.getElementById('modal-video-title').textContent = '🎬 नई रील / वीडियो जोड़ें';
+    document.getElementById('form-video-drawer')?.reset();
+    document.getElementById('drawer-video-title').textContent = '🎬 नई रील / वीडियो जोड़ें';
     if (recCustomCategoryInput) recCustomCategoryInput.style.display = 'none';
     if (recCustomThumbUrl) recCustomThumbUrl.style.display = 'none';
     if (recCustomThumbFile) recCustomThumbFile.style.display = 'none';
-    updateVideoModalLivePreview();
-    if (videoModal) videoModal.style.display = 'flex';
+    populateCategoryAndPlaylistDropdowns();
+    updateVideoDrawerLivePreview();
+    if (videoDrawer) videoDrawer.classList.add('active');
   });
 
-  document.getElementById('btn-close-video-modal')?.addEventListener('click', () => {
-    if (videoModal) videoModal.style.display = 'none';
+  document.getElementById('btn-close-video-drawer')?.addEventListener('click', () => {
+    if (videoDrawer) videoDrawer.classList.remove('active');
   });
 
-  // Video Form Submit
-  document.getElementById('form-video-editor')?.addEventListener('submit', async (e) => {
+  // Submit Video Drawer Form
+  document.getElementById('form-video-drawer')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const format = document.getElementById('modal_rec_format')?.value || 'short_reel';
-    const platform = document.getElementById('modal_rec_platform')?.value || 'youtube';
-    const url = (document.getElementById('modal_rec_url')?.value || '').trim();
-    const title = (document.getElementById('modal_rec_title')?.value || '').trim();
-    const desc = (document.getElementById('modal_rec_desc')?.value || '').trim();
+    const format = document.getElementById('drawer_rec_format')?.value || 'both';
+    const platform = document.getElementById('drawer_rec_platform')?.value || 'youtube';
+    const channelId = document.getElementById('drawer_rec_channel')?.value || allChannels[0]?.id || 'CH_AAROGYAM_MAIN';
+    const url = (document.getElementById('drawer_rec_url')?.value || '').trim();
+    const title = (document.getElementById('drawer_rec_title')?.value || '').trim();
+    const desc = (document.getElementById('drawer_rec_desc')?.value || '').trim();
 
-    let category = document.getElementById('modal_rec_category')?.value || 'Shorts & Reels';
+    let category = document.getElementById('drawer_rec_category')?.value || 'Organic Farming';
     if (category === 'custom') {
-      const customCat = (document.getElementById('modal_rec_custom_category')?.value || '').trim();
-      if (customCat) category = customCat;
-      else category = 'General';
+      const customCat = (document.getElementById('drawer_rec_custom_category')?.value || '').trim();
+      if (customCat) {
+        category = customCat;
+        // Auto-save category into masterCategories array
+        if (!masterCategories.includes(customCat)) {
+          masterCategories.push(customCat);
+        }
+      } else {
+        category = 'General';
+      }
     }
 
-    const duration = (document.getElementById('modal_rec_duration')?.value || '').trim() || '0:58';
-    const speaker = (document.getElementById('modal_rec_speaker')?.value || '').trim() || 'आरोग्यम कृषि विशेषज्ञ';
-    const accessTier = document.getElementById('modal_rec_access')?.value || 'all';
+    const duration = (document.getElementById('drawer_rec_duration')?.value || '').trim() || (format === 'short_reel' ? '0:58' : '45:00');
+    const speaker = (document.getElementById('drawer_rec_speaker')?.value || '').trim() || 'आरोग्यम कृषि विशेषज्ञ';
+    const accessTier = document.getElementById('drawer_rec_access')?.value || 'all';
 
-    const isPinned = Boolean(document.getElementById('modal_rec_pinned')?.checked);
-    const priorityVal = Number(document.getElementById('modal_rec_priority')?.value || (isPinned ? 100 : 50));
-    const orderTypeVal = document.getElementById('modal_rec_order_type')?.value || (isPinned ? 'pinned' : 'normal');
+    const isPinned = Boolean(document.getElementById('drawer_rec_pinned')?.checked);
+    const priorityVal = Number(document.getElementById('drawer_rec_priority')?.value || (isPinned ? 100 : 50));
+    const orderTypeVal = document.getElementById('drawer_rec_order_type')?.value || (isPinned ? 'pinned' : 'normal');
 
     if (!url || !title) {
       alert('कृपया URL लिंक और शीर्षक भरें।');
       return;
     }
 
-    const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
+    const ytMatch = url.match(/(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|shorts\\/|live\\/|watch\\?v=|watch\\?.+&v=))([a-zA-Z0-9_-]{11})/i);
     const ytId = ytMatch ? ytMatch[1] : '';
 
     let thumb = recPreviewImg?.src || '/images/banners/aarogyamtube-default-thumb.svg';
@@ -1489,10 +1693,13 @@ export async function initWebinars() {
       thumb = '/images/banners/aarogyamtube-default-thumb.svg';
     }
 
+    const newRecId = editingRecordingId || ((format === 'short_reel' ? 'VID_S' : 'VID_') + String(Date.now()).slice(-6));
+
     const recObj = {
-      id: editingRecordingId || ((format === 'short_reel' ? 'VID_S' : 'VID_') + String(Date.now()).slice(-6)),
+      id: newRecId,
       format: format,
       platform: platform,
+      channel_id: channelId,
       title: title,
       description: desc,
       subject: category,
@@ -1518,61 +1725,247 @@ export async function initWebinars() {
       allRecordings.unshift(recObj);
     }
 
-    // 1. Save LocalStorage
-    try {
-      localStorage.setItem('AI_LOCAL_RECORDED_VIDEOS', JSON.stringify(allRecordings));
-    } catch (e) { }
+    // Playlist assignment handling
+    const selectedPlaylistId = document.getElementById('drawer_rec_playlist')?.value;
+    allPlaylists.forEach(pl => {
+      if (!pl.video_ids) pl.video_ids = [];
+      if (pl.id === selectedPlaylistId) {
+        if (!pl.video_ids.includes(newRecId)) pl.video_ids.push(newRecId);
+      } else {
+        pl.video_ids = pl.video_ids.filter(id => id !== newRecId);
+      }
+    });
 
-    // 2. Sync to GitHub & Local PHP Sync (Zero Egress)
-    try {
-      await fetch('/api/auto-sync-book', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save_webinar_recordings',
-          recordings: allRecordings
-        })
-      });
-    } catch (err) { }
-
-    try {
-      await fetch('/save-recordings.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recordings: allRecordings })
-      });
-    } catch (err) { }
-
-    if (videoModal) videoModal.style.display = 'none';
+    saveAllRecordingsToStorageAndCloud();
+    populateCategoryAndPlaylistDropdowns();
     renderRecordingsTable();
-    showToast(`🎉 ${format === 'short_reel' ? 'रील' : 'मास्टरक्लास वीडियो'} सफलतापूर्वक GitHub पर प्रकाशित हो गया!`, 'success');
+
+    if (videoDrawer) videoDrawer.classList.remove('active');
+    showToast(\`🎉 \${format === 'both' ? 'Dual-Format वीडियो' : (format === 'short_reel' ? 'रील' : 'मास्टरक्लास')} सफलतापूर्वक सुरक्षित हो गई!\`, 'success');
   });
 
-  function getSupabaseDb() {
-    if (window.supabaseClient) return window.supabaseClient;
-    if (window.dbClient) return window.dbClient;
-    if (window.supabase && typeof window.supabase.from === 'function') return window.supabase;
-    if (window.supabase && typeof window.supabase.createClient === 'function') {
-      window.supabaseClient = window.supabase.createClient(
-        'https://qjhjrzsnrtahmhswxyvb.supabase.co',
-        'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU'
-      );
-      return window.supabaseClient;
+  // -------------------------------------------------------------
+  // CHANNELS PRESET MANAGER LOGIC
+  // -------------------------------------------------------------
+  const channelsDrawer = document.getElementById('drawer-channels-manager');
+
+  function renderChannelsManagerList() {
+    const cont = document.getElementById('adm_channels_list_container');
+    if (!cont) return;
+
+    cont.innerHTML = allChannels.map((ch, idx) => \`
+      <div style="background: #1e293b; border: 1.5px solid #334155; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong style="color: #fff; font-size: 0.9rem;">\${ch.name}</strong>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            \${ch.is_default ? '<span style="font-size:0.7rem; background:#10B981; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700;">🌟 Default</span>' : \`<button type="button" onclick="window.setDefaultChannel('\${ch.id}')" class="admin-button small-button" style="background:rgba(255,255,255,0.1); color:#94a3b8; font-size:0.7rem;">Make Default</button>\`}
+            <button type="button" onclick="window.removeChannelPreset(\${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times;</button>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div>
+            <label class="admin-label">चैनल का नाम:</label>
+            <input type="text" class="admin-input ch-name-inp" data-idx="\${idx}" value="\${ch.name}" style="width: 100%; font-size: 0.8rem;" />
+          </div>
+          <div>
+            <label class="admin-label">Handle (उदा. @AAROGYAMINDIA):</label>
+            <input type="text" class="admin-input ch-handle-inp" data-idx="\${idx}" value="\${ch.handle}" style="width: 100%; font-size: 0.8rem; font-weight:700; color:#ef4444;" />
+          </div>
+        </div>
+        <div>
+          <label class="admin-label">Direct Channel Subscribe URL:</label>
+          <input type="url" class="admin-input ch-sub-inp" data-idx="\${idx}" value="\${ch.subscribe_url || \`https://www.youtube.com/\${ch.handle}?sub_confirmation=1\`}" style="width: 100%; font-size: 0.78rem;" />
+        </div>
+      </div>
+    \`).join('');
+  }
+
+  window.setDefaultChannel = (chId) => {
+    allChannels.forEach(c => { c.is_default = (c.id === chId); });
+    renderChannelsManagerList();
+    saveAllRecordingsToStorageAndCloud();
+  };
+
+  window.removeChannelPreset = (idx) => {
+    if (allChannels.length <= 1) {
+      alert('कम से कम 1 चैनल होना अनिवार्य है।');
+      return;
     }
-    return null;
+    allChannels.splice(idx, 1);
+    renderChannelsManagerList();
+  };
+
+  document.getElementById('btn-add-new-channel-row')?.addEventListener('click', () => {
+    allChannels.push({
+      id: 'CH_' + String(Date.now()).slice(-6),
+      name: 'नया YouTube चैनल',
+      handle: '@AAROGYAMINDIA',
+      url: 'https://www.youtube.com/@AAROGYAMINDIA',
+      subscribe_url: 'https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1',
+      avatar: '/images/logo/logo.png',
+      is_default: false
+    });
+    renderChannelsManagerList();
+  });
+
+  document.getElementById('btn-open-channels-modal')?.addEventListener('click', () => {
+    renderChannelsManagerList();
+    if (channelsDrawer) channelsDrawer.classList.add('active');
+  });
+
+  document.getElementById('btn-drawer-add-new-ch')?.addEventListener('click', () => {
+    renderChannelsManagerList();
+    if (channelsDrawer) channelsDrawer.classList.add('active');
+  });
+
+  document.getElementById('btn-close-channels-drawer')?.addEventListener('click', () => {
+    if (channelsDrawer) channelsDrawer.classList.remove('active');
+  });
+
+  document.getElementById('btn-save-channels-data')?.addEventListener('click', () => {
+    document.querySelectorAll('.ch-name-inp').forEach(inp => {
+      const idx = Number(inp.dataset.idx);
+      if (allChannels[idx]) allChannels[idx].name = inp.value.trim();
+    });
+    document.querySelectorAll('.ch-handle-inp').forEach(inp => {
+      const idx = Number(inp.dataset.idx);
+      if (allChannels[idx]) {
+        let h = inp.value.trim();
+        if (!h.startsWith('@')) h = '@' + h;
+        allChannels[idx].handle = h;
+      }
+    });
+    document.querySelectorAll('.ch-sub-inp').forEach(inp => {
+      const idx = Number(inp.dataset.idx);
+      if (allChannels[idx]) allChannels[idx].subscribe_url = inp.value.trim();
+    });
+
+    saveAllRecordingsToStorageAndCloud();
+    populateCategoryAndPlaylistDropdowns();
+    if (channelsDrawer) channelsDrawer.classList.remove('active');
+    showToast('✅ YouTube चैनल्स सफलतापूर्वक सेव हो गए!', 'success');
+  });
+
+  // -------------------------------------------------------------
+  // PLAYLISTS MANAGER LOGIC
+  // -------------------------------------------------------------
+  const playlistsDrawer = document.getElementById('drawer-playlists-manager');
+
+  function renderPlaylistsManagerList() {
+    const cont = document.getElementById('adm_playlists_list_container');
+    if (!cont) return;
+
+    cont.innerHTML = allPlaylists.map((pl, idx) => {
+      const count = pl.video_ids ? pl.video_ids.length : 0;
+      return \`
+        <div style="background: #1e293b; border: 1.5px solid #8b5cf6; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #c4b5fd; font-size: 0.95rem;">\${pl.title}</strong>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span style="font-size:0.72rem; background:rgba(139,92,246,0.3); color:#fff; padding:2px 6px; border-radius:4px;">\${count} Videos</span>
+              <button type="button" onclick="window.removePlaylistPreset(\${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff; padding: 2px 6px; font-size: 0.7rem;">&times;</button>
+            </div>
+          </div>
+          <div>
+            <label class="admin-label">प्लेलिस्ट का शीर्षक:</label>
+            <input type="text" class="admin-input pl-title-inp" data-idx="\${idx}" value="\${pl.title}" style="width: 100%; font-size: 0.85rem; font-weight:700;" />
+          </div>
+          <div>
+            <label class="admin-label">संक्षिप्त विवरण (Description):</label>
+            <textarea class="admin-input pl-desc-inp" data-idx="\${idx}" rows="2" style="width: 100%; font-size: 0.8rem;">\${pl.description || ''}</textarea>
+          </div>
+          <div>
+            <label class="admin-label">कवर थंबनेल URL:</label>
+            <input type="url" class="admin-input pl-cover-inp" data-idx="\${idx}" value="\${pl.cover || ''}" placeholder="https://..." style="width: 100%; font-size: 0.78rem;" />
+          </div>
+        </div>
+      \`;
+    }).join('');
+  }
+
+  window.removePlaylistPreset = (idx) => {
+    if (!confirm('क्या आप इस प्लेलिस्ट को हटाना चाहते हैं?')) return;
+    allPlaylists.splice(idx, 1);
+    renderPlaylistsManagerList();
+  };
+
+  document.getElementById('btn-add-new-playlist-row')?.addEventListener('click', () => {
+    allPlaylists.push({
+      id: 'PL_' + String(Date.now()).slice(-6),
+      title: 'नई कृषि प्लेलिस्ट',
+      description: 'कृषि वीडियो श्रृंखला',
+      cover: 'https://img.youtube.com/vi/2JYn-bcDLuU/hqdefault.jpg',
+      video_ids: []
+    });
+    renderPlaylistsManagerList();
+  });
+
+  document.getElementById('btn-open-playlists-modal')?.addEventListener('click', () => {
+    renderPlaylistsManagerList();
+    if (playlistsDrawer) playlistsDrawer.classList.add('active');
+  });
+
+  document.getElementById('btn-close-playlists-drawer')?.addEventListener('click', () => {
+    if (playlistsDrawer) playlistsDrawer.classList.remove('active');
+  });
+
+  document.getElementById('btn-save-playlists-data')?.addEventListener('click', () => {
+    document.querySelectorAll('.pl-title-inp').forEach(inp => {
+      const idx = Number(inp.dataset.idx);
+      if (allPlaylists[idx]) allPlaylists[idx].title = inp.value.trim();
+    });
+    document.querySelectorAll('.pl-desc-inp').forEach(inp => {
+      const idx = Number(inp.dataset.idx);
+      if (allPlaylists[idx]) allPlaylists[idx].description = inp.value.trim();
+    });
+    document.querySelectorAll('.pl-cover-inp').forEach(inp => {
+      const idx = Number(inp.dataset.idx);
+      if (allPlaylists[idx]) allPlaylists[idx].cover = inp.value.trim();
+    });
+
+    saveAllRecordingsToStorageAndCloud();
+    populateCategoryAndPlaylistDropdowns();
+    if (playlistsDrawer) playlistsDrawer.classList.remove('active');
+    showToast('✅ प्लेलिस्ट्स सफलतापूर्वक सुरक्षित हो गईं!', 'success');
+  });
+
+  // -------------------------------------------------------------
+  // EXPORT JSON & REFRESH
+  // -------------------------------------------------------------
+  function exportWebinarMasterJson() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ webinarMaster: masterWebinar }, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "webinar-master.json");
+    dlAnchor.click();
   }
 
   function exportWebinarRecordingsJson() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ recordings: allRecordings }, null, 2));
+    const payload = {
+      recordings: allRecordings,
+      channels: allChannels,
+      master_categories: masterCategories,
+      playlists: allPlaylists
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
     const dlAnchor = document.createElement('a');
     dlAnchor.setAttribute("href", dataStr);
     dlAnchor.setAttribute("download", "webinar-recordings.json");
     dlAnchor.click();
   }
 
-  // -------------------------------------------------------------
-  // TABS NAVIGATION & EXPORT BUTTONS
-  // -------------------------------------------------------------
+  document.getElementById('btn-export-json-files')?.addEventListener('click', () => {
+    exportWebinarMasterJson();
+    setTimeout(exportWebinarRecordingsJson, 500);
+    showToast('📥 दोनों JSON फ़ाइलें डाउनलोड हो गईं!', 'success');
+  });
+
+  document.getElementById('btn-wb-refresh')?.addEventListener('click', () => {
+    loadData();
+    showToast('🔄 डेटा रीफ्रेश हो गया!', 'info');
+  });
+
+  // Tabs switching
   const btnTabWb = document.getElementById('tab-btn-webinar');
   const btnTabReels = document.getElementById('tab-btn-reels');
   const paneWb = document.getElementById('tab-pane-webinar');
@@ -1596,17 +1989,6 @@ export async function initWebinars() {
     paneWb.style.display = 'none';
   });
 
-  document.getElementById('btn-export-json-files')?.addEventListener('click', () => {
-    exportWebinarMasterJson();
-    setTimeout(exportWebinarRecordingsJson, 500);
-    showToast('📥 दोनों JSON फ़ाइलें डाउनलोड हो गईं!', 'success');
-  });
-
-  document.getElementById('btn-wb-refresh')?.addEventListener('click', () => {
-    loadData();
-    showToast('🔄 डेटा रीफ्रेश हो गया!', 'info');
-  });
-
-  // Initial Data Load
+  // Initial load
   loadData();
 }

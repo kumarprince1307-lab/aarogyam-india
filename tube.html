@@ -2432,15 +2432,375 @@
     }
     .wb-reels-tray-form button {
       background: #2563eb;
+    /* =========================================
+       PLAYLISTS SHELF & CARDS STYLING
+       ========================================== */
+    .icon-playlist {
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
+    }
+    .at-playlists-scroll-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+    @media (max-width: 640px) {
+      .at-playlists-scroll-wrap {
+        display: flex;
+        overflow-x: auto;
+        gap: 14px;
+        padding: 4px 2px 14px 2px;
+        scrollbar-width: none;
+      }
+      .at-playlists-scroll-wrap::-webkit-scrollbar { display: none; }
+      .at-playlist-card {
+        flex: 0 0 260px;
+      }
+    }
+    .at-playlist-card {
+      background: var(--yt-surface);
+      border: 1.5px solid var(--yt-border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .at-playlist-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px var(--yt-shadow);
+      border-color: #8b5cf6;
+    }
+    .at-playlist-thumb-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      overflow: hidden;
+    }
+    .at-playlist-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .at-playlist-card:hover .at-playlist-img {
+      transform: scale(1.04);
+    }
+    .at-playlist-overlay-side {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 42%;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #ffffff;
+      border-left: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .at-playlist-overlay-side i {
+      font-size: 1.3rem;
+      color: #a78bfa;
+    }
+    .at-playlist-overlay-side span {
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .at-playlist-info {
+      padding: 12px 14px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .at-playlist-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--yt-text);
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .at-playlist-desc {
+      font-size: 0.76rem;
+      color: var(--yt-text-muted);
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .at-playlist-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .btn-play-all-playlist {
+      flex: 1;
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
       color: #fff;
       border: none;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-play-all-playlist:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+    }
+    .btn-share-playlist {
+      background: var(--yt-pill);
+      color: var(--yt-text);
+      border: 1.5px solid var(--yt-border);
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .btn-share-playlist:hover {
+      background: #25D366;
+      color: #fff;
+      border-color: #25D366;
+      transform: scale(1.08);
+    }
+
+    /* Playlist Queue in Cinema Player */
+    .at-playlist-queue-card {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1.5px solid rgba(139, 92, 246, 0.35);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .at-playlist-queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .at-playlist-queue-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #c4b5fd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .at-playlist-queue-count {
+      font-size: 0.74rem;
+      color: #e2e8f0;
+      background: rgba(139, 92, 246, 0.3);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    .at-playlist-queue-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .at-playlist-qitem {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .at-playlist-qitem:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: #8b5cf6;
+    }
+    .at-playlist-qitem.active {
+      background: rgba(139, 92, 246, 0.35);
+      border-color: #a78bfa;
+    }
+    .at-playlist-qitem-num {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #a78bfa;
+      width: 20px;
+      text-align: center;
+    }
+    .at-playlist-qitem-title {
+      flex: 1;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* YouTube Subscribe Buttons & Modal */
+    .btn-header-subscribe {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1.5px solid rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.76rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-header-subscribe:hover {
+      background: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.45);
+      transform: translateY(-1px);
+    }
+    .btn-header-subscribe:hover i {
+      color: #ffffff !important;
+    }
+
+    .at-subscribe-btn-inline {
+      background: #ef4444;
+      color: #ffffff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 18px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 10px;
+      box-shadow: 0 3px 10px rgba(239, 68, 68, 0.4);
+      transition: all 0.2s;
+    }
+    .at-subscribe-btn-inline:hover {
+      background: #dc2626;
+      transform: scale(1.05);
+      box-shadow: 0 5px 16px rgba(239, 68, 68, 0.6);
+    }
+
+    /* Subscribe Popup Modal */
+    .at-sub-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .at-sub-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .at-sub-modal-card {
+      background: #0f172a;
+      border: 1.5px solid rgba(239, 68, 68, 0.4);
+      border-radius: 20px;
+      max-width: 420px;
+      width: 100%;
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(239, 68, 68, 0.2);
+      transform: scale(0.92) translateY(14px);
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .at-sub-modal-overlay.active .at-sub-modal-card {
+      transform: scale(1) translateY(0);
+    }
+    .at-sub-modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .at-sub-modal-close:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+    .at-sub-channel-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 3px solid #ef4444;
+      margin: 0 auto 12px auto;
+      object-fit: cover;
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+      background: #1e293b;
+    }
+    .btn-modal-sub-yt {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 13px 20px;
+      border-radius: 28px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      box-shadow: 0 6px 22px rgba(239, 68, 68, 0.5);
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      margin-top: 14px;
+    }
+    .btn-modal-sub-yt:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(239, 68, 68, 0.7);
     }
   </style>
 </head>
@@ -2476,8 +2836,14 @@
           </span>
         </div>
 
-        <!-- Header Actions Right: Dark/Light Switcher, Zoom Live Pass, PWA, Cart, 3-Line Menu -->
+        <!-- Header Actions Right: Subscribe, Dark/Light Switcher, Zoom Live Pass, PWA, Cart, 3-Line Menu -->
         <div style="display:flex;align-items:center;gap:8px;">
+          <!-- YouTube Subscribe Button -->
+          <button type="button" class="btn-header-subscribe" onclick="window.openSubscribeModal()" title="🔴 YouTube चैनल सब्सक्राइब करें">
+            <i class="fa-brands fa-youtube" style="color:#ef4444;font-size:0.9rem;"></i>
+            <span>Subscribe</span>
+          </button>
+
           <!-- Theme Toggle Button -->
           <button type="button" class="btn-header-theme" id="btn_theme_toggle" onclick="window.toggleTubeTheme()" title="थीम बदलें (Dark / Light)">
             <i class="fa-solid fa-moon" id="theme_icon"></i>
@@ -2542,7 +2908,24 @@
       </div>
     </section>
 
-    <!-- 2. MASTERCLASS 16:9 VIDEOS SECTION -->
+    <!-- 2. PLAYLISTS SHELF SECTION -->
+    <section class="at-section" id="sec_playlists">
+      <div class="at-section-header">
+        <div class="at-section-brand">
+          <div class="at-section-icon icon-playlist"><i class="fa-solid fa-list-check"></i></div>
+          <div>
+            <div class="at-section-title">📑 विशेष प्लेलिस्ट्स (Playlists)</div>
+            <div class="at-section-subtitle">विषयवार संपूर्ण कृषि ट्रेनिंग श्रृंखलाएं — 1-क्लिक में पूरी प्लेलिस्ट चलाएं व शेयर करें</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="at-playlists-scroll-wrap" id="at_playlists_grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- 3. MASTERCLASS 16:9 VIDEOS SECTION -->
     <section class="at-section" id="sec_masterclasses">
       <div class="at-section-header">
         <div class="at-section-brand">
@@ -2555,10 +2938,7 @@
       </div>
 
       <div class="at-filter-bar" id="at_video_filter_bar">
-        <button type="button" class="at-chip active" data-category="all">सभी मास्टरक्लास (All)</button>
-        <button type="button" class="at-chip" data-category="Crop Protection">कीट व रोग नियंत्रण</button>
-        <button type="button" class="at-chip" data-category="Organic Farming">जैविक कृषि</button>
-        <button type="button" class="at-chip" data-category="Irrigation Tech">सिंचाई व पोषण</button>
+        <!-- Dynamically Populated Master Category Chips -->
       </div>
 
       <div class="at-videos-grid" id="at_videos_grid">
@@ -2645,7 +3025,12 @@
             <div class="at-channel-creator">
               <div class="at-channel-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
               <div>
-                <div id="at_current_speaker" class="at-channel-title">आरोग्यम कृषि विशेषज्ञ</div>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                  <span id="at_current_speaker" class="at-channel-title">आरोग्यम कृषि विशेषज्ञ</span>
+                  <button type="button" class="at-subscribe-btn-inline" onclick="window.openSubscribeModal()" title="चैनल सब्सक्राइब करें">
+                    <i class="fa-brands fa-youtube"></i> <span>Subscribe</span>
+                  </button>
+                </div>
                 <div id="at_current_time_tag" class="at-channel-tag">⏱️ 45 मिनट • सम्पूर्ण प्रैक्टिकल ट्रेनिंग</div>
               </div>
             </div>
@@ -2729,8 +3114,27 @@
         </div>
       </div>
 
-      <!-- Right Column: Suggested Videos Feed (Up Next) -->
+      <!-- Right Column: Suggested Videos Feed & Playlist Queue -->
       <div>
+        <!-- Active Playlist Queue Box (shown when playing from playlist) -->
+        <div id="at_playlist_queue_wrap" style="display:none;" class="at-playlist-queue-card">
+          <div class="at-playlist-queue-header">
+            <div class="at-playlist-queue-title">
+              <i class="fa-solid fa-list-ol"></i>
+              <span id="at_pl_q_title">प्लेलिस्ट कतार (Queue)</span>
+            </div>
+            <span class="at-playlist-queue-count" id="at_pl_q_count">1 / 4</span>
+          </div>
+          <div class="at-playlist-queue-items" id="at_pl_q_items">
+            <!-- Playlist items -->
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px;">
+            <button type="button" class="btn-play-all-playlist" onclick="window.shareCurrentPlaylistWhatsApp()" style="font-size:0.75rem;padding:6px 10px;">
+              <i class="fa-brands fa-whatsapp"></i> <span>पूरी प्लेलिस्ट शेयर करें</span>
+            </button>
+          </div>
+        </div>
+
         <div class="at-suggested-feed">
           <div class="at-suggested-header">
             <span>📺 सिफारिश किए गए वीडियो (Up Next)</span>
@@ -2889,6 +3293,28 @@
   </footer>
 
   <!-- =========================================
+       5. OFFICIAL YOUTUBE SUBSCRIBE POPUP MODAL
+       ========================================== -->
+  <div id="wb_youtube_subscribe_modal" class="at-sub-modal-overlay" role="dialog" aria-modal="true" aria-label="Subscribe Aarogyam India Official Channel">
+    <div class="at-sub-modal-card">
+      <button type="button" class="at-sub-modal-close" onclick="window.closeSubscribeModal()" title="बंद करें">&times;</button>
+      <img id="at_sub_modal_avatar" src="/images/logo/logo.png" alt="Aarogyam India" class="at-sub-channel-avatar" onerror="this.src='/images/logo/logo.png'">
+      <div style="font-size:1.15rem;font-weight:900;color:#fff;" id="at_sub_modal_name">Aarogyam India Official</div>
+      <div style="font-size:0.82rem;font-weight:700;color:#ef4444;margin-top:2px;" id="at_sub_modal_handle">@AAROGYAMINDIA • <i class="fa-solid fa-circle-check"></i> Official</div>
+      <p style="font-size:0.82rem;color:var(--yt-text-muted);margin:12px 0 6px 0;line-height:1.4;">
+        🔔 हमारे आधिकारिक YouTube चैनल को सब्सक्राइब करें और प्रतिदिन 1-मिनट कृषि शॉर्ट्स, लाइव वेबिनार अलर्ट व उन्नत जैविक खेती के वीडियो सबसे पहले पाएं!
+      </p>
+      <a id="at_sub_modal_btn" href="https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1" target="_blank" rel="noopener noreferrer" onclick="window.onSubscribeChannelClick()" class="btn-modal-sub-yt">
+        <i class="fa-brands fa-youtube" style="font-size:1.2rem;"></i>
+        <span>YouTube पर सब्सक्राइब करें (Subscribe)</span>
+      </a>
+      <div id="at_sub_confirmation_msg" style="display:none;font-size:0.75rem;color:#10b981;font-weight:700;margin-top:10px;">
+        🎉 धन्यवाद! यूट्यूब सब्सक्राइब टैब खुल गया है। आप यहाँ वीडियो देखना जारी रख सकते हैं।
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
        5. ULTRA-SLIM REGISTRATION / LOGIN GATEKEEPER MODAL
        ========================================== -->
   <div id="at_tube_gate_modal" class="at-tube-gate-overlay" role="dialog" aria-modal="true" aria-label="AarogyamTube Registration">
@@ -2949,13 +3375,45 @@
       const urlParams = new URLSearchParams(window.location.search);
       const refShareId = urlParams.get('ref') || urlParams.get('share_id') || 'AI000004';
       const specificVid = urlParams.get('vid') || urlParams.get('video') || urlParams.get('video_id') || urlParams.get('reel') || urlParams.get('short');
+      const specificPlaylist = urlParams.get('playlist') || urlParams.get('pl');
 
       let allRecordings = [];
+      let allChannels = [
+        {
+          id: 'CH_AAROGYAM_MAIN',
+          name: 'Aarogyam India Official',
+          handle: '@AAROGYAMINDIA',
+          url: 'https://www.youtube.com/@AAROGYAMINDIA',
+          subscribe_url: 'https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1',
+          avatar: '/images/logo/logo.png',
+          is_default: true
+        }
+      ];
+      let masterCategories = [
+        'Crop Protection',
+        'Organic Farming',
+        'Irrigation Tech',
+        'Dairy & Animal Husbandry',
+        'Biofit Products Training',
+        'Shorts & Reels'
+      ];
+      let allPlaylists = [
+        {
+          id: 'PL_ORGANIC_2026',
+          title: '🌾 संपूर्ण जैविक खेती व पशु पोषण मास्टरक्लास',
+          description: 'प्राकृतिक एवं जैविक खेती से 3X मुनाफा, दुग्ध उत्पादन और Biofit ट्रेनिंग की संपूर्ण वीडियो श्रृंखला।',
+          cover: 'https://img.youtube.com/vi/2JYn-bcDLuU/hqdefault.jpg',
+          video_ids: ['VID_712495', 'VID_513998', 'VID_378682', 'VID_M10001']
+        }
+      ];
+
       let activeVideoFilter = 'all';
       let currentReelIndex = 0;
       let activeReelsList = [];
       let currentMasterclassVideo = null;
       let currentSharerProfile = null;
+      let currentPlaylist = null;
+      let currentPlaylistVideoIndex = 0;
 
       // -------------------------------------------------------------
       // 1. COMPREHENSIVE THEME SWITCHER (DARK vs LIGHT MODE)
@@ -2995,13 +3453,19 @@
       async function initTubePlatform() {
         try { await loadRecordingsData(); } catch (e) { console.error('recordings err:', e); }
         try { await fetchSharerDetails(getActiveUplineShareId()); } catch (e) { console.error('sharer err:', e); }
+        try { renderDynamicCategories(); } catch (e) { console.error('categories err:', e); }
+        try { renderPlaylists(); } catch (e) { console.error('playlists err:', e); }
         try { renderShortsAndReels(); } catch (e) { console.error('shorts err:', e); }
         try { renderMasterclassVideos(); } catch (e) { console.error('videos err:', e); }
         try { setupReelsGesturesAndScroll(); } catch (e) { console.error('gestures err:', e); }
         try { setupBottomRailAutoHide(); } catch (e) { console.error('rail autohide err:', e); }
         try { updateLiveTicker(); } catch (e) { console.error('ticker err:', e); }
 
-        if (specificVid) {
+        if (specificPlaylist) {
+          setTimeout(() => {
+            window.playPlaylist(specificPlaylist, 0);
+          }, 400);
+        } else if (specificVid) {
           setTimeout(() => {
             openSpecificVideoOrReel(specificVid);
           }, 350);
@@ -3038,6 +3502,21 @@
               allRecordings = parsed;
             }
           }
+          const localCategories = localStorage.getItem('AI_LOCAL_MASTER_CATEGORIES');
+          if (localCategories) {
+            const cats = JSON.parse(localCategories);
+            if (Array.isArray(cats) && cats.length > 0) masterCategories = cats;
+          }
+          const localPlaylists = localStorage.getItem('AI_LOCAL_PLAYLISTS');
+          if (localPlaylists) {
+            const pls = JSON.parse(localPlaylists);
+            if (Array.isArray(pls) && pls.length > 0) allPlaylists = pls;
+          }
+          const localChannels = localStorage.getItem('AI_LOCAL_CHANNELS');
+          if (localChannels) {
+            const chs = JSON.parse(localChannels);
+            if (Array.isArray(chs) && chs.length > 0) allChannels = chs;
+          }
         } catch (e) { }
 
         // 2. Fetch Static Git JSON & Merge seamlessly
@@ -3051,6 +3530,21 @@
               localList.forEach(r => { if (r && r.id) map.set(r.id, r); });
               list.forEach(r => { if (r && r.id && !map.has(r.id)) map.set(r.id, r); });
               allRecordings = Array.from(map.values());
+            }
+            if (Array.isArray(json.master_categories) && json.master_categories.length > 0) {
+              masterCategories = Array.from(new Set([...masterCategories, ...json.master_categories]));
+            }
+            if (Array.isArray(json.playlists) && json.playlists.length > 0) {
+              const plMap = new Map();
+              allPlaylists.forEach(p => plMap.set(p.id, p));
+              json.playlists.forEach(p => plMap.set(p.id, p));
+              allPlaylists = Array.from(plMap.values());
+            }
+            if (Array.isArray(json.channels) && json.channels.length > 0) {
+              const chMap = new Map();
+              allChannels.forEach(c => chMap.set(c.id, c));
+              json.channels.forEach(c => chMap.set(c.id, c));
+              allChannels = Array.from(chMap.values());
             }
           }
         } catch (e) { }
@@ -3245,186 +3739,290 @@
 
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.style.opacity = '0.75';
-          submitBtn.innerHTML = '<span>सत्यापित हो रहा है...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+          submitBtn.innerHTML = '<span>⏳ सत्यापन हो रहा है...</span>';
         }
-
-        const uplineShareId = getActiveUplineShareId();
-        const myUniqueShareId = 'AI' + cleanMobile.slice(-6);
-
-        let finalOfficialName = inputName;
-        let isExistingUser = false;
-
-        // 1. Supabase Check: If user exists, protect their database name
-        if (db) {
-          try {
-            const { data: existingProf } = await db.from('profiles').select('id, full_name, mobile, share_id, sponsor_id').eq('mobile', cleanMobile).limit(1).maybeSingle();
-            if (existingProf) {
-              isExistingUser = true;
-              if (existingProf.full_name && existingProf.full_name.trim()) {
-                finalOfficialName = existingProf.full_name.trim();
-              }
-            } else {
-              // New user registration under upline
-              let sponsorUuid = '52ef705c-bb45-4137-bee4-a3f8df73b676';
-              if (uplineShareId && uplineShareId !== 'AI000004') {
-                try {
-                  const { data: refUser } = await db.from('profiles').select('id').eq('share_id', uplineShareId).limit(1).maybeSingle();
-                  if (refUser && refUser.id) sponsorUuid = refUser.id;
-                } catch(_) {}
-              }
-
-              await db.from('profiles').upsert([{
-                full_name: inputName,
-                mobile: cleanMobile,
-                share_id: myUniqueShareId,
-                sponsor_id: sponsorUuid,
-                role: 'farmer',
-                updated_at: new Date().toISOString()
-              }], { onConflict: 'mobile' });
-
-              try {
-                await db.from('leads').insert([{
-                  name: inputName,
-                  mobile: cleanMobile,
-                  source: 'AarogyamTube',
-                  sponsor_share_id: uplineShareId,
-                  created_at: new Date().toISOString()
-                }]);
-              } catch(_) {}
-            }
-          } catch(err) {
-            console.warn('DB auth notice:', err);
-          }
-        }
-
-        // 2. Instant Local Storage Session Save
-        const userObj = {
-          id: 'AI_' + cleanMobile,
-          name: finalOfficialName,
-          full_name: finalOfficialName,
-          mobile: cleanMobile,
-          phone: cleanMobile,
-          share_id: myUniqueShareId,
-          referral_code: uplineShareId,
-          registered_at: new Date().toISOString(),
-          source: 'AarogyamTube'
-        };
 
         try {
-          localStorage.setItem('aim_user_name', finalOfficialName);
-          localStorage.setItem('aim_user_mobile', cleanMobile);
-          localStorage.setItem('aim_upline_share_id', uplineShareId);
+          let userObj = {};
+          try { userObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(err) {}
+          userObj.full_name = inputName;
+          userObj.name = inputName;
+          userObj.mobile = cleanMobile;
+          userObj.phone = cleanMobile;
+          if (!userObj.share_id) userObj.share_id = 'AI' + cleanMobile.slice(-6);
+
           localStorage.setItem('AI_USER', JSON.stringify(userObj));
-          localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
-          localStorage.setItem('UCAS_USER', JSON.stringify(userObj));
-          localStorage.setItem('wb_registered', 'true');
-        } catch(e) {}
+          localStorage.setItem('aim_user_name', inputName);
+          localStorage.setItem('aim_user_mobile', cleanMobile);
 
-        // 3. Close Gatekeeper Modal
-        const modal = document.getElementById('at_tube_gate_modal');
-        if (modal) modal.classList.remove('active');
+          // Zero-Egress Cloud Registration
+          try {
+            if (db) {
+              await db.from('profiles').upsert({
+                mobile: cleanMobile,
+                full_name: inputName,
+                referral_code: getActiveUplineShareId(),
+                updated_at: new Date().toISOString()
+              }, { onConflict: 'mobile' });
+            }
+          } catch(dbErr) {}
 
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.style.opacity = '1';
-          submitBtn.innerHTML = '<span>🟢 वीडियो देखें (Watch Now)</span> <i class="fa-solid fa-arrow-right"></i>';
-        }
+          window.closeTubeGateModal();
 
-        // 4. Broadcast global event and execute pending playback callback
-        try { window.dispatchEvent(new CustomEvent('ai:user-logged-in', { detail: userObj })); } catch(_) {}
-
-        if (typeof pendingGateCallback === 'function') {
-          const cb = pendingGateCallback;
-          pendingGateCallback = null;
-          cb();
+          if (typeof pendingGateCallback === 'function') {
+            const cb = pendingGateCallback;
+            pendingGateCallback = null;
+            cb();
+          }
+        } catch(err) {
+          if (msgEl) {
+            msgEl.textContent = 'रजिस्ट्रेशन में त्रुटि, कृपया पुनः प्रयास करें।';
+            msgEl.style.display = 'block';
+          }
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>🟢 वीडियो देखें (Watch Now)</span> <i class="fa-solid fa-arrow-right"></i>';
+          }
         }
       };
 
       // -------------------------------------------------------------
-      // 3.1 ZERO-EGRESS ACTIVITY TRACKER & YOUTUBE STYLE COMMENTS ENGINE
+      // 4. DYNAMIC CATEGORIES RENDERER
       // -------------------------------------------------------------
-      function logVideoActivity(actionType, videoObj, extraData = {}) {
-        if (!db) return;
-        const uplineShareId = getActiveUplineShareId();
-        let uObj = {};
-        try { uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
-        const viewerName = localStorage.getItem('aim_user_name') || uObj.name || uObj.full_name || 'किसान साथी';
-        const viewerMobile = localStorage.getItem('aim_user_mobile') || uObj.mobile || uObj.phone || 'N/A';
-        const vidId = videoObj?.id || extraData?.videoId || 'VID_001';
-        const vidTitle = videoObj?.title || extraData?.videoTitle || 'AarogyamTube Video';
+      function renderDynamicCategories() {
+        const bar = document.getElementById('at_video_filter_bar');
+        if (!bar) return;
 
-        let profileUUID = null;
-        if (currentSharerProfile && currentSharerProfile.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(currentSharerProfile.id)) {
-          profileUUID = currentSharerProfile.id;
-        }
+        // Distinct categories from recorded videos & master categories
+        const distinctCats = Array.from(new Set([
+          ...masterCategories,
+          ...allRecordings.map(v => v.category).filter(Boolean)
+        ])).filter(c => c !== 'Shorts & Reels');
 
-        (async () => {
-          try {
-            const { error } = await db.from('surveys').insert([{
-              name: viewerName,
-              mobile: viewerMobile,
-              occupation: 'video_viewer',
-              selected_categories: ['webinar_video_view'],
-              profile_id: profileUUID,
-              category_answers: {
-                event_type: 'recorded_video_view',
-                action_type: actionType, // 'view' | 'like' | 'share' | 'comment'
-                video_id: vidId,
-                video_title: vidTitle,
-                comment: extraData?.comment || '',
-                referrer_share_id: uplineShareId,
-                viewed_at: new Date().toISOString()
-              }
-            }]);
-            if (error) console.warn('Activity log notice:', error.message);
-          } catch(err) {
-            console.warn('Activity log error:', err);
-          }
-        })();
+        bar.innerHTML = `
+          <button type="button" class="at-chip ${activeVideoFilter === 'all' ? 'active' : ''}" data-category="all">
+            🌟 सभी मास्टरक्लास (All)
+          </button>
+          ${distinctCats.map(cat => `
+            <button type="button" class="at-chip ${activeVideoFilter === cat ? 'active' : ''}" data-category="${cat}">
+              ${cat}
+            </button>
+          `).join('')}
+        `;
       }
 
-      // --- YouTube-Style Inline Comments (Masterclass) ---
-      function renderMasterclassComments(vidId) {
-        const listEl = document.getElementById('at_yt_comments_list');
-        const countTitle = document.getElementById('at_comments_count_title');
-        const userAvatar = document.getElementById('at_yt_user_avatar');
-        if (!listEl) return;
+      document.getElementById('at_video_filter_bar')?.addEventListener('click', (e) => {
+        const chip = e.target.closest('.at-chip');
+        if (!chip) return;
+        document.querySelectorAll('#at_video_filter_bar .at-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeVideoFilter = chip.dataset.category || 'all';
+        renderMasterclassVideos();
+      });
 
-        let uObj = {};
-        try { uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
-        const viewerName = localStorage.getItem('aim_user_name') || uObj.name || uObj.full_name || 'किसान साथी';
-        if (userAvatar) {
-          userAvatar.textContent = viewerName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'AI';
+      // -------------------------------------------------------------
+      // 5. PLAYLISTS SHELF RENDERER & PLAYER QUEUE
+      // -------------------------------------------------------------
+      function renderPlaylists() {
+        const grid = document.getElementById('at_playlists_grid');
+        const shelfSec = document.getElementById('sec_playlists');
+        if (!grid) return;
+
+        if (!allPlaylists || allPlaylists.length === 0) {
+          if (shelfSec) shelfSec.style.display = 'none';
+          return;
         }
+        if (shelfSec) shelfSec.style.display = 'block';
 
-        let comments = [];
-        try {
-          comments = JSON.parse(localStorage.getItem(`at_comments_${vidId}`) || '[]');
-        } catch(e) {}
+        grid.innerHTML = allPlaylists.map(pl => {
+          const count = pl.video_ids ? pl.video_ids.length : 0;
+          const cover = pl.cover || DEFAULT_AAROGYAMTUBE_THUMB;
 
-        if (countTitle) {
-          countTitle.textContent = `💬 ${comments.length} टिप्पणियां (Comments)`;
-        }
-
-        if (comments.length === 0) {
-          listEl.innerHTML = `
-            <div style="padding: 1.5rem 0; color: var(--yt-text-dim); font-size: 0.88rem;">
-              अभी तक कोई टिप्पणी नहीं है। इस मास्टरक्लास पर सबसे पहले अपनी प्रतिक्रिया लिखें!
+          return `
+            <div class="at-playlist-card" onclick="window.playPlaylist('${pl.id}', 0)">
+              <div class="at-playlist-thumb-wrap">
+                <img src="${cover}" alt="${pl.title}" class="at-playlist-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
+                <div class="at-playlist-overlay-side">
+                  <i class="fa-solid fa-list-ol"></i>
+                  <span>${count} Videos</span>
+                </div>
+              </div>
+              <div class="at-playlist-info">
+                <div>
+                  <div class="at-playlist-title">${pl.title}</div>
+                  <div class="at-playlist-desc">${pl.description || 'संपूर्ण वीडियो श्रृंखला'}</div>
+                </div>
+                <div class="at-playlist-actions" onclick="event.stopPropagation()">
+                  <button type="button" class="btn-play-all-playlist" onclick="window.playPlaylist('${pl.id}', 0)">
+                    <i class="fa-solid fa-play"></i> <span>Play All (${count})</span>
+                  </button>
+                  <button type="button" class="btn-share-playlist" onclick="window.sharePlaylist('${pl.id}')" title="WhatsApp पर पूरी प्लेलिस्ट शेयर करें">
+                    <i class="fa-brands fa-whatsapp"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           `;
+        }).join('');
+      }
+
+      window.playPlaylist = function (plId, startIdx = 0) {
+        const pl = allPlaylists.find(p => p.id === plId);
+        if (!pl || !pl.video_ids || pl.video_ids.length === 0) return;
+
+        if (!isTubeUserLoggedIn()) {
+          window.openTubeGateModal(() => window.playPlaylist(plId, startIdx));
           return;
         }
 
-        listEl.innerHTML = comments.map(c => `
+        currentPlaylist = pl;
+        currentPlaylistVideoIndex = Math.max(0, Math.min(startIdx, pl.video_ids.length - 1));
+
+        const targetVidId = pl.video_ids[currentPlaylistVideoIndex];
+        const vidObj = allRecordings.find(v => v.id === targetVidId) || {
+          id: targetVidId,
+          title: `${pl.title} — भाग ${currentPlaylistVideoIndex + 1}`,
+          video_url: 'https://www.youtube.com/watch?v=2JYn-bcDLuU',
+          youtube_id: '2JYn-bcDLuU',
+          speaker: 'आरोग्यम कृषि विशेषज्ञ',
+          duration: '45m'
+        };
+
+        loadMasterclassInPlayer(vidObj);
+        updatePlaylistQueueUI();
+
+        const modal = document.getElementById('wb_master_cinema_modal');
+        if (modal) {
+          modal.classList.add('active');
+          modal.scrollTop = 0;
+        }
+        document.body.classList.add('at-cinema-open');
+        document.documentElement.classList.add('wb-modal-active');
+      };
+
+      function updatePlaylistQueueUI() {
+        const queueWrap = document.getElementById('at_playlist_queue_wrap');
+        const titleEl = document.getElementById('at_pl_q_title');
+        const countEl = document.getElementById('at_pl_q_count');
+        const itemsEl = document.getElementById('at_pl_q_items');
+
+        if (!currentPlaylist || !queueWrap) {
+          if (queueWrap) queueWrap.style.display = 'none';
+          return;
+        }
+
+        queueWrap.style.display = 'block';
+        if (titleEl) titleEl.textContent = currentPlaylist.title;
+        if (countEl) countEl.textContent = `${currentPlaylistVideoIndex + 1} / ${currentPlaylist.video_ids.length}`;
+
+        if (itemsEl) {
+          itemsEl.innerHTML = currentPlaylist.video_ids.map((vId, idx) => {
+            const vObj = allRecordings.find(x => x.id === vId) || { title: `वीडियो #${idx + 1}` };
+            const isActive = idx === currentPlaylistVideoIndex;
+
+            return `
+              <div class="at-playlist-qitem ${isActive ? 'active' : ''}" onclick="window.playPlaylist('${currentPlaylist.id}', ${idx})">
+                <span class="at-playlist-qitem-num">${isActive ? '▶️' : (idx + 1)}</span>
+                <span class="at-playlist-qitem-title">${vObj.title}</span>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      window.playNextPlaylistVideo = function() {
+        if (!currentPlaylist || !currentPlaylist.video_ids) return;
+        if (currentPlaylistVideoIndex + 1 < currentPlaylist.video_ids.length) {
+          window.playPlaylist(currentPlaylist.id, currentPlaylistVideoIndex + 1);
+        }
+      };
+
+      window.sharePlaylist = function (plId) {
+        const pl = allPlaylists.find(p => p.id === plId);
+        if (!pl) return;
+
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/tube.html?playlist=${encodeURIComponent(pl.id)}&ref=${encodeURIComponent(userShare)}`;
+        const count = pl.video_ids ? pl.video_ids.length : 0;
+        const promoText = `📑 *${pl.title}* (${count} वीडियो श्रृंखला)\n${pl.description ? pl.description + '\n' : ''}AarogyamTube पर पूरी प्लेलिस्ट एक साथ देखें:\n${shareUrl}`;
+
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+      };
+
+      window.shareCurrentPlaylistWhatsApp = function() {
+        if (currentPlaylist) {
+          window.sharePlaylist(currentPlaylist.id);
+        }
+      };
+
+      // -------------------------------------------------------------
+      // 6. OFFICIAL YOUTUBE SUBSCRIBE MODAL
+      // -------------------------------------------------------------
+      window.openSubscribeModal = function() {
+        const modal = document.getElementById('wb_youtube_subscribe_modal');
+        const defaultChannel = allChannels.find(c => c.is_default) || allChannels[0] || {
+          name: 'Aarogyam India Official',
+          handle: '@AAROGYAMINDIA',
+          subscribe_url: 'https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1',
+          avatar: '/images/logo/logo.png'
+        };
+
+        const nameEl = document.getElementById('at_sub_modal_name');
+        const handleEl = document.getElementById('at_sub_modal_handle');
+        const avatarEl = document.getElementById('at_sub_modal_avatar');
+        const btnEl = document.getElementById('at_sub_modal_btn');
+        const msgEl = document.getElementById('at_sub_confirmation_msg');
+
+        if (nameEl) nameEl.textContent = defaultChannel.name;
+        if (handleEl) handleEl.innerHTML = `${defaultChannel.handle} • <i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Official`;
+        if (avatarEl) avatarEl.src = defaultChannel.avatar || '/images/logo/logo.png';
+        if (btnEl) btnEl.href = defaultChannel.subscribe_url || 'https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1';
+        if (msgEl) msgEl.style.display = 'none';
+
+        if (modal) modal.classList.add('active');
+      };
+
+      window.closeSubscribeModal = function() {
+        const modal = document.getElementById('wb_youtube_subscribe_modal');
+        if (modal) modal.classList.remove('active');
+      };
+
+      window.onSubscribeChannelClick = function() {
+        const msgEl = document.getElementById('at_sub_confirmation_msg');
+        if (msgEl) msgEl.style.display = 'block';
+        setTimeout(() => {
+          window.closeSubscribeModal();
+        }, 3500);
+      };
+
+      // -------------------------------------------------------------
+      // 7. COMMENTS SYSTEM (MASTERCLASS & REELS)
+      // -------------------------------------------------------------
+      function renderMasterclassComments(vidId) {
+        const listEl = document.getElementById('at_yt_comments_list');
+        const countTitle = document.getElementById('at_comments_count_title');
+        if (!listEl) return;
+
+        let comments = [];
+        try { comments = JSON.parse(localStorage.getItem(`at_comments_${vidId}`) || '[]'); } catch(e) {}
+
+        const defaultComments = [
+          { name: 'रामेश्वर पटेल', text: 'बहुत ही उपयोगी और प्रैक्टिकल जानकारी मिली। धन्यवाद सर!', time: '2 घंटे पहले' },
+          { name: 'डॉ. सुरेश वर्मा', text: 'जैविक खेती में यह विधि वाकई 3X उत्पादन बढ़ाती है।', time: '1 दिन पहले' }
+        ];
+
+        const allComms = [...comments, ...defaultComments];
+        if (countTitle) countTitle.textContent = `💬 टिप्पणियां (${allComms.length})`;
+
+        listEl.innerHTML = allComms.map(c => `
           <div class="at-yt-comment-item">
-            <div class="at-yt-comment-avatar">
-              ${(c.name || 'AI').slice(0, 2).toUpperCase()}
-            </div>
+            <div class="at-yt-comment-avatar">${(c.name || 'AI').slice(0, 2).toUpperCase()}</div>
             <div class="at-yt-comment-body">
               <div class="at-yt-comment-meta">
-                <span class="at-yt-comment-author">${c.name}</span>
-                <span class="at-yt-comment-time">${c.time}</span>
+                <span class="at-yt-author">${c.name || 'किसान साथी'}</span>
+                <span class="at-yt-time">${c.time || 'हाल ही में'}</span>
               </div>
               <div class="at-yt-comment-text">${c.text}</div>
             </div>
@@ -3435,68 +4033,73 @@
       window.handleInlineCommentSubmit = function(e) {
         if (e && e.preventDefault) e.preventDefault();
         const input = document.getElementById('at_yt_comment_input');
-        if (!input || !input.value.trim() || !currentMasterclassVideo) return;
+        const vid = currentMasterclassVideo;
+        if (!input || !input.value.trim() || !vid) return;
 
         const commentText = input.value.trim();
-        const vidId = currentMasterclassVideo.id || 'VID_001';
-
         let uObj = {};
         try { uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
         const name = localStorage.getItem('aim_user_name') || uObj.name || uObj.full_name || 'किसान साथी';
 
         let comments = [];
-        try { comments = JSON.parse(localStorage.getItem(`at_comments_${vidId}`) || '[]'); } catch(e) {}
+        try { comments = JSON.parse(localStorage.getItem(`at_comments_${vid.id}`) || '[]'); } catch(e) {}
         comments.unshift({
           name: name,
           text: commentText,
           time: new Date().toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' })
         });
-        try { localStorage.setItem(`at_comments_${vidId}`, JSON.stringify(comments)); } catch(e) {}
+        try { localStorage.setItem(`at_comments_${vid.id}`, JSON.stringify(comments)); } catch(e) {}
 
-        // Log zero-egress to Supabase for admin
-        logVideoActivity('comment', currentMasterclassVideo, { comment: commentText });
+        logVideoActivity('comment', vid, { comment: commentText });
 
         input.value = '';
-        renderMasterclassComments(vidId);
+        renderMasterclassComments(vid.id);
       };
 
-      // --- Reels Collapsible Tray Comments ---
+      function renderReelsComments(reelId) {
+        const listEl = document.getElementById('wb_reels_tray_list');
+        const titleEl = document.getElementById('wb_reels_tray_title');
+        if (!listEl) return;
+
+        let comments = [];
+        try { comments = JSON.parse(localStorage.getItem(`at_comments_${reelId}`) || '[]'); } catch(e) {}
+
+        const defaultComments = [
+          { name: 'मुकेश यादव', text: 'कमाल की रील है! बहुत बढ़िया जानकारी।', time: '1 घंटे पहले' },
+          { name: 'अनिल कुशवाहा', text: 'स्प्रे का सही समय बताने के लिए धन्यवाद।', time: '3 घंटे पहले' }
+        ];
+
+        const allComms = [...comments, ...defaultComments];
+        if (titleEl) titleEl.textContent = `💬 टिप्पणियां (${allComms.length})`;
+
+        listEl.innerHTML = allComms.map(c => `
+          <div style="display:flex; gap:8px; font-size:0.8rem;">
+            <div style="width:26px; height:26px; border-radius:50%; background:#3b82f6; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.65rem; flex-shrink:0;">
+              ${(c.name || 'AI').slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <div style="font-weight:700; color:#93c5fd;">${c.name || 'किसान साथी'} <span style="font-size:0.65rem; color:#64748b; font-weight:400;">• ${c.time || 'हाल ही में'}</span></div>
+              <div style="color:#f8fafc; margin-top:2px;">${c.text}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
       window.openReelComments = function() {
         const tray = document.getElementById('wb_reels_comments_tray');
         const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
         if (!tray || !reel) return;
         renderReelsComments(reel.id);
         tray.style.display = 'flex';
+        setTimeout(() => {
+          document.getElementById('wb_reels_comment_input')?.focus();
+        }, 150);
       };
 
       window.closeReelCommentsTray = function() {
         const tray = document.getElementById('wb_reels_comments_tray');
         if (tray) tray.style.display = 'none';
       };
-
-      function renderReelsComments(reelId) {
-        const listEl = document.getElementById('wb_reels_comments_list');
-        if (!listEl) return;
-        let comments = [];
-        try { comments = JSON.parse(localStorage.getItem(`at_comments_${reelId}`) || '[]'); } catch(e) {}
-
-        if (comments.length === 0) {
-          listEl.innerHTML = '<div style="color:#94a3b8; font-size:0.8rem; text-align:center; padding:12px;">इस रील पर पहली टिप्पणी करें!</div>';
-          return;
-        }
-
-        listEl.innerHTML = comments.map(c => `
-          <div style="display:flex; gap:8px; align-items:flex-start;">
-            <div style="width:26px; height:26px; border-radius:50%; background:#2563eb; color:#fff; font-weight:800; font-size:0.7rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              ${(c.name || 'AI').slice(0, 2).toUpperCase()}
-            </div>
-            <div>
-              <div style="font-size:0.75rem; font-weight:800; color:#fff;">${c.name} <span style="font-size:0.65rem; color:#94a3b8; font-weight:normal;">${c.time}</span></div>
-              <div style="font-size:0.8rem; color:#cbd5e1; margin-top:2px;">${c.text}</div>
-            </div>
-          </div>
-        `).join('');
-      }
 
       window.handleReelCommentSubmit = function(e) {
         if (e && e.preventDefault) e.preventDefault();
@@ -3525,36 +4128,36 @@
       };
 
       // -------------------------------------------------------------
-      // 4. SHORTS & REELS 9:16 RENDERER & PLAYER
+      // 8. SHORTS & REELS 9:16 RENDERER & PLAYER (WITH AUTO-PLAY NEXT)
       // -------------------------------------------------------------
+      function sortVideosByPriority(list) {
+        const pinnedList = list.filter(v => v.pinned || v.order_type === 'pinned');
+        const priorityList = list.filter(v => !v.pinned && v.order_type !== 'pinned' && (Number(v.priority || 0) > 0 || v.order_type === 'priority'));
+        const normalList = list.filter(v => !v.pinned && v.order_type !== 'pinned' && !v.priority && v.order_type !== 'random');
+        const randomList = list.filter(v => !v.pinned && v.order_type === 'random');
+
+        pinnedList.sort((a, b) => (Number(b.priority || 0) - Number(a.priority || 0)) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
+        priorityList.sort((a, b) => (Number(b.priority || 0) - Number(a.priority || 0)) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
+        normalList.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+        for (let i = randomList.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [randomList[i], randomList[j]] = [randomList[j], randomList[i]];
+        }
+
+        return [...pinnedList, ...priorityList, ...normalList, ...randomList];
+      }
+
       function renderShortsAndReels() {
         const grid = document.getElementById('at_shorts_grid');
         if (!grid) return;
 
         let shortsList = allRecordings.filter(v =>
           v.status !== 'inactive' &&
-          (v.format === 'short_reel' || v.id.startsWith('VID_S') || v.category === 'Shorts & Reels' || v.duration === '1:00' || v.duration === '0:58')
+          (v.format === 'short_reel' || v.format === 'both' || v.id.startsWith('VID_S') || v.category === 'Shorts & Reels' || v.duration === '1:00' || v.duration === '0:58')
         );
 
-        // Smart Zero-Egress Priority, Pinned & Random Ordering Algorithm
-        const pinnedList = shortsList.filter(v => v.pinned || v.order_type === 'pinned');
-        const priorityList = shortsList.filter(v => !v.pinned && v.order_type !== 'pinned' && (Number(v.priority || 0) > 0 || v.order_type === 'priority'));
-        const normalList = shortsList.filter(v => !v.pinned && v.order_type !== 'pinned' && !v.priority && v.order_type !== 'random');
-        const randomList = shortsList.filter(v => !v.pinned && v.order_type === 'random');
-
-        // 1. Sort pinned by priority then date
-        pinnedList.sort((a, b) => (Number(b.priority || 0) - Number(a.priority || 0)) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
-        // 2. Sort priority list descending
-        priorityList.sort((a, b) => (Number(b.priority || 0) - Number(a.priority || 0)) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
-        // 3. Sort normal list newest first
-        normalList.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-        // 4. Shuffle random list
-        for (let i = randomList.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [randomList[i], randomList[j]] = [randomList[j], randomList[i]];
-        }
-
-        shortsList = [...pinnedList, ...priorityList, ...normalList, ...randomList];
+        shortsList = sortVideosByPriority(shortsList);
         activeReelsList = shortsList;
 
         if (shortsList.length === 0) {
@@ -3604,7 +4207,7 @@
         document.getElementById('wb_reels_modal')?.classList.remove('active');
         document.body.classList.remove('wb-reels-open');
         document.documentElement.classList.remove('wb-modal-active');
-        closeReelCommentsTray();
+        window.closeReelCommentsTray();
         const ifr = document.getElementById('wb_reel_iframe_main');
         if (ifr) ifr.src = '';
         document.querySelectorAll('.pure-css-fullscreen, .fullscreen-active').forEach(el => {
@@ -3632,20 +4235,18 @@
         const reel = activeReelsList[idx];
         if (!reel) return;
 
-        closeReelCommentsTray();
+        window.closeReelCommentsTray();
 
         document.getElementById('wb_reel_counter_badge').textContent = `${idx + 1} / ${activeReelsList.length}`;
         document.getElementById('wb_reel_caption_title').textContent = reel.title;
         document.getElementById('wb_reel_caption_speaker').textContent = `👤 ${reel.speaker || 'आरोग्यम कृषि विशेषज्ञ'}`;
 
-        // Persistent Like state for this reel
         const isLiked = localStorage.getItem(`at_liked_${reel.id}`) === 'true';
         const likeIcon = document.getElementById('wb_reel_like_icon');
         const likeCount = document.getElementById('wb_reel_like_count');
         if (likeIcon) likeIcon.style.color = isLiked ? '#ef4444' : '#F43F5E';
         if (likeCount) likeCount.textContent = isLiked ? 'Liked ❤️' : (reel.likes || '1.2K');
 
-        // Comment count badge for this reel
         let comments = [];
         try { comments = JSON.parse(localStorage.getItem(`at_comments_${reel.id}`) || '[]'); } catch(e) {}
         const cCountEl = document.getElementById('wb_reel_comment_count');
@@ -3658,7 +4259,6 @@
         isReelPlaying = true;
         const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
 
-        // 0-Egress activity log
         logVideoActivity('view', reel);
 
         if (window.YT && window.YT.Player) {
@@ -3674,6 +4274,10 @@
                   'onStateChange': function(e) {
                     if (e.data === 1) isReelPlaying = true;
                     else if (e.data === 2) isReelPlaying = false;
+                    else if (e.data === 0) {
+                      // Video ended: AUTO ADVANCE TO NEXT REEL!
+                      window.navReel(1);
+                    }
                   }
                 }
               });
@@ -3734,7 +4338,7 @@
             if (state === 1) { // Playing -> Pause
               reelYTPlayer.pauseVideo();
               isReelPlaying = false;
-            } else { // Paused / Ended / Cued -> Play
+            } else { // Paused / Ended -> Play
               reelYTPlayer.playVideo();
               isReelPlaying = true;
             }
@@ -3743,7 +4347,6 @@
           } catch(err) {}
         }
 
-        // Direct postMessage fallback
         isReelPlaying = !isReelPlaying;
         const func = isReelPlaying ? 'playVideo' : 'pauseVideo';
         if (ifr && ifr.contentWindow) {
@@ -3808,13 +4411,11 @@
       };
 
 
-      // Full Touch Swipe + Tap Play/Pause + Mouse Wheel Scroll + Keyboard Space/Arrows
       function setupReelsGesturesAndScroll() {
         const modal = document.getElementById('wb_reels_modal');
         const touchSurface = document.getElementById('wb_reel_touch_surface');
         if (!touchSurface || !modal) return;
 
-        // 1. Touch Gestures (Mobile/Tablet Swipe + Tap)
         let startY = 0;
         let startX = 0;
         let startTime = 0;
@@ -3841,24 +4442,21 @@
 
           if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX)) {
             if (diffY > 0) {
-              window.navReel(1); // Swipe Up -> Next
+              window.navReel(1);
             } else {
-              window.navReel(-1); // Swipe Down -> Prev
+              window.navReel(-1);
             }
           } else if (Math.abs(diffY) < 15 && Math.abs(diffX) < 15 && duration < 350) {
-            // Quick Single Tap -> Toggle Play / Pause!
             window.toggleReelPlayPause();
           }
           isTouching = false;
         }, { passive: true });
 
-        // 2. Desktop Click on Video -> Toggle Play / Pause (ignoring touch-simulated clicks)
         touchSurface.addEventListener('click', () => {
-          if (Date.now() - lastTouchEndTime < 500) return; // Prevent double-trigger from touch
+          if (Date.now() - lastTouchEndTime < 500) return;
           window.toggleReelPlayPause();
         });
 
-        // 3. Mouse Wheel Scroll (Desktop)
         let isWheelLocked = false;
         modal.addEventListener('wheel', (e) => {
           if (!modal.classList.contains('active')) return;
@@ -3867,15 +4465,14 @@
           if (Math.abs(e.deltaY) > 25) {
             isWheelLocked = true;
             if (e.deltaY > 0) {
-              window.navReel(1); // Wheel Down -> Next Reel
+              window.navReel(1);
             } else {
-              window.navReel(-1); // Wheel Up -> Prev Reel
+              window.navReel(-1);
             }
             setTimeout(() => { isWheelLocked = false; }, 400);
           }
         }, { passive: true });
 
-        // 4. Keyboard Arrow & Spacebar Navigation
         window.addEventListener('keydown', (e) => {
           if (!modal.classList.contains('active')) return;
           if (e.code === 'Space' || e.key === ' ' || e.key === 'k' || e.key === 'K') {
@@ -3894,7 +4491,7 @@
       }
 
       // -------------------------------------------------------------
-      // 5. 16:9 MASTERCLASS VIDEOS RENDERER & CINEMA PLAYER
+      // 9. 16:9 MASTERCLASS VIDEOS RENDERER & CINEMA PLAYER
       // -------------------------------------------------------------
       function renderMasterclassVideos() {
         const grid = document.getElementById('at_videos_grid');
@@ -3902,14 +4499,15 @@
 
         let masterList = allRecordings.filter(v =>
           v.status !== 'inactive' &&
-          v.format !== 'short_reel' &&
-          !v.id.startsWith('VID_S') &&
+          (v.format === 'masterclass' || v.format === 'full_video' || v.format === 'both' || (!v.id.startsWith('VID_S') && v.format !== 'short_reel')) &&
           v.category !== 'Shorts & Reels'
         );
 
         if (activeVideoFilter !== 'all') {
           masterList = masterList.filter(v => v.category === activeVideoFilter);
         }
+
+        masterList = sortVideosByPriority(masterList);
 
         if (masterList.length === 0) {
           grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--yt-text-muted);">इस श्रेणी में अभी कोई मास्टरक्लास वीडियो उपलब्ध नहीं है।</div>';
@@ -3944,15 +4542,6 @@
         }).join('');
       }
 
-      document.getElementById('at_video_filter_bar')?.addEventListener('click', (e) => {
-        const chip = e.target.closest('.at-chip');
-        if (!chip) return;
-        document.querySelectorAll('#at_video_filter_bar .at-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        activeVideoFilter = chip.dataset.category || 'all';
-        renderMasterclassVideos();
-      });
-
       window.openVideoModal = function (vId) {
         const match = allRecordings.find(x => x.id === vId) || allRecordings.find(x => extractYoutubeVideoId(x.video_url) === vId);
         if (!match) return;
@@ -3961,6 +4550,10 @@
           window.openTubeGateModal(() => window.openVideoModal(vId));
           return;
         }
+
+        currentPlaylist = null;
+        const queueWrap = document.getElementById('at_playlist_queue_wrap');
+        if (queueWrap) queueWrap.style.display = 'none';
 
         loadMasterclassInPlayer(match);
         const modal = document.getElementById('wb_master_cinema_modal');
@@ -3996,10 +4589,10 @@
         }
       };
 
+      let masterclassYTPlayer = null;
+
       function loadMasterclassInPlayer(vidObj) {
         currentMasterclassVideo = vidObj;
-        
-        // 0-Egress activity log
         logVideoActivity('view', vidObj);
 
         const titleEl = document.getElementById('at_current_title');
@@ -4012,29 +4605,45 @@
         if (timeTagEl) timeTagEl.textContent = `⏱️ ${vidObj.duration || '45 मिनट'} • सम्पूर्ण प्रैक्टिकल ट्रेनिंग`;
         if (descEl) descEl.textContent = vidObj.description || `${vidObj.title} — विशेषज्ञों द्वारा तैयार संपूर्ण वैज्ञानिक एवं प्रैक्टिकल कृषि गाइड।`;
 
-        // Persistent Like state for this masterclass
         const isLiked = localStorage.getItem(`at_liked_${vidObj.id}`) === 'true';
-        const likeIcon = document.getElementById('at_like_icon');
-        const likeCount = document.getElementById('at_like_count');
-        const fsLikeIcon = document.getElementById('at_fs_like_icon');
-        const fsLikeCount = document.getElementById('at_fs_like_count');
-        if (likeIcon) likeIcon.style.color = isLiked ? '#ef4444' : '#ef4444';
-        if (likeCount) likeCount.textContent = isLiked ? 'Liked ❤️' : (vidObj.likes || '1.4K');
-        if (fsLikeIcon) fsLikeIcon.style.color = isLiked ? '#ef4444' : '#ef4444';
-        if (fsLikeCount) fsLikeCount.textContent = isLiked ? 'Liked ❤️' : (vidObj.likes || '1.4K');
+        const icon = document.getElementById('at_like_icon');
+        const countEl = document.getElementById('at_like_count');
+        const fsIcon = document.getElementById('at_fs_like_icon');
+        const fsCount = document.getElementById('at_fs_like_count');
+        if (icon) icon.style.color = isLiked ? '#ef4444' : '#ef4444';
+        if (countEl) countEl.textContent = isLiked ? 'Liked ❤️' : (vidObj.likes || '1.4K');
+        if (fsIcon) fsIcon.style.color = isLiked ? '#ef4444' : '#ef4444';
+        if (fsCount) fsCount.textContent = isLiked ? 'Liked ❤️' : (vidObj.likes || '1.4K');
 
         renderModalSuggestedVideos(vidObj.id);
         renderMasterclassComments(vidObj.id);
 
         const ytId = vidObj.youtube_id || extractYoutubeVideoId(vidObj.video_url) || 'aqz-KE-bpKQ';
         const ifr = document.getElementById('at_master_iframe_main');
+        const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+
         if (ifr) {
-          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=0&playsinline=1`;
+          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=0&playsinline=1&origin=${encodeURIComponent(origin)}`;
         }
       }
 
+      // Listen for message events from YouTube iframe
+      window.addEventListener('message', (event) => {
+        try {
+          const d = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+          if (d && (d.event === 'onStateChange' || d.info === 0) && (d.data === 0 || d.info === 0)) {
+            const reelsModal = document.getElementById('wb_reels_modal');
+            if (reelsModal && reelsModal.classList.contains('active')) {
+              window.navReel(1);
+            } else if (currentPlaylist && document.getElementById('wb_master_cinema_modal')?.classList.contains('active')) {
+              window.playNextPlaylistVideo();
+            }
+          }
+        } catch(e) {}
+      });
+
       // -------------------------------------------------------------
-      // 6. TRUE FULLSCREEN ENGINE (NATIVE + CSS FALLBACK)
+      // 10. FULLSCREEN HUD ENGINE
       // -------------------------------------------------------------
       let bottomRailTimer = null;
 
@@ -4042,14 +4651,12 @@
         const rail = document.getElementById('at_fs_bottom_rail');
         if (!rail) return;
 
-        // Immediately reveal bottom rail
         rail.classList.remove('at-rail-hidden');
         clearTimeout(bottomRailTimer);
 
         const isFull = document.body.classList.contains('cinema-fullscreen-mode') ||
                        document.getElementById('at_player_frame_wrap')?.classList.contains('fullscreen-active');
 
-        // Only start the 3-second fadeout timer when currently in fullscreen
         if (isFull) {
           bottomRailTimer = setTimeout(() => {
             rail.classList.add('at-rail-hidden');
@@ -4061,7 +4668,6 @@
         const wrap = document.getElementById('at_player_frame_wrap');
         const rail = document.getElementById('at_fs_bottom_rail');
 
-        // Any mousemove, touch, or click anywhere on screen / player / HUD wakes up the bottom rail
         ['mousemove', 'touchstart', 'touchmove', 'pointerdown', 'click'].forEach(evt => {
           document.addEventListener(evt, () => {
             const isFull = document.body.classList.contains('cinema-fullscreen-mode') ||
@@ -4091,13 +4697,10 @@
                        playerWrap.classList.contains('fullscreen-active');
 
         if (!isFull) {
-          // Pure CSS Cinema Fullscreen Mode: smooth, instant, zero-flicker on all devices
           document.body.classList.add('cinema-fullscreen-mode');
           document.documentElement.classList.add('cinema-fullscreen-mode');
           if (modal) modal.classList.add('cinema-modal-fullscreen');
           playerWrap.classList.add('fullscreen-active', 'pure-css-fullscreen');
-
-          // Initialize bottom rail timer (visible first, fades in 3s)
           resetBottomRailTimer();
 
           const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
@@ -4168,7 +4771,6 @@
       function handleNativeFullscreenChange() {
         const isNativeFull = Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
         const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
-        // On mobile, never let native fullscreen exit event cancel the pure CSS overlay
         if (!isNativeFull && !isMobile) {
           document.body.classList.remove('cinema-fullscreen-mode', 'reels-fullscreen-mode');
           document.querySelectorAll('.pure-css-fullscreen, .fullscreen-active').forEach(el => {
@@ -4182,28 +4784,18 @@
       document.addEventListener('mozfullscreenchange', handleNativeFullscreenChange);
       document.addEventListener('MSFullscreenChange', handleNativeFullscreenChange);
 
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          if (document.body.classList.contains('cinema-fullscreen-mode')) {
-            window.toggleCinemaFullscreen();
-          }
-          if (document.body.classList.contains('reels-fullscreen-mode')) {
-            window.toggleReelsFullscreen();
-          }
-        }
-      });
-
       function renderModalSuggestedVideos(currentId) {
         const listEl = document.getElementById('at_suggested_list');
         const countEl = document.getElementById('at_suggested_count');
         if (!listEl) return;
 
-        const masterList = allRecordings.filter(v =>
+        let masterList = allRecordings.filter(v =>
           v.status !== 'inactive' &&
-          v.format !== 'short_reel' &&
-          !v.id.startsWith('VID_S') &&
+          (v.format === 'masterclass' || v.format === 'full_video' || v.format === 'both' || (!v.id.startsWith('VID_S') && v.format !== 'short_reel')) &&
           v.category !== 'Shorts & Reels'
         );
+
+        masterList = sortVideosByPriority(masterList);
 
         if (countEl) countEl.textContent = `${masterList.length} वीडियो उपलब्ध`;
 
@@ -4256,7 +4848,7 @@
             heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
             
             const offsetX = (Math.random() - 0.5) * 80;
-            const size = Math.floor(Math.random() * 16) + 24; // 24px to 40px
+            const size = Math.floor(Math.random() * 16) + 24;
             const duration = (Math.random() * 0.6 + 1.2).toFixed(2);
             
             heart.style.left = `${Math.max(10, Math.min(window.innerWidth - 40, rect.left + 20 + offsetX))}px`;
@@ -4320,12 +4912,11 @@
       };
 
       // -------------------------------------------------------------
-      // 6. UNIVERSAL NATIVE & SOCIAL SHARING ENGINE
+      // 11. UNIVERSAL NATIVE & SOCIAL SHARING ENGINE
       // -------------------------------------------------------------
       window.executeUniversalShare = async function (title, promoText, shareUrl) {
         const fullMessage = `${promoText}\n${shareUrl}`;
 
-        // 1. Web Share API (Mobile Android/iOS, Modern Desktop Browsers)
         if (navigator.share) {
           try {
             await navigator.share({
@@ -4335,11 +4926,10 @@
             });
             return;
           } catch (err) {
-            if (err.name === 'AbortError') return; // User simply dismissed share sheet
+            if (err.name === 'AbortError') return;
           }
         }
 
-        // 2. Fallback: Copy to Clipboard & Alert
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(fullMessage);
@@ -4348,7 +4938,6 @@
           }
         } catch (e) {}
 
-        // 3. Fallback: Open WhatsApp directly
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(fullMessage)}`, '_blank');
       };
 
@@ -4435,6 +5024,21 @@
         if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
         const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
         return match ? match[1] : null;
+      }
+
+      function logVideoActivity(action, vidObj, extra = {}) {
+        try {
+          const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+          const mob = localStorage.getItem('aim_user_mobile') || uObj.mobile || '';
+          if (db && mob) {
+            db.from('user_activity').insert([{
+              mobile: mob,
+              action: `tube_${action}`,
+              meta: { video_id: vidObj?.id, title: vidObj?.title, ...extra },
+              created_at: new Date().toISOString()
+            }]).then(() => {}).catch(() => {});
+          }
+        } catch(e) {}
       }
 
       // Initialize Tube Platform

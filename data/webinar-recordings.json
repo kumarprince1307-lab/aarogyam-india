@@ -423,5 +423,49 @@
       "status": "active",
       "created_at": "2026-09-01T11:10:37.883Z"
     }
+  ],
+  "channels": [
+    {
+      "id": "CH_AAROGYAM_MAIN",
+      "name": "Aarogyam India Official",
+      "handle": "@AAROGYAMINDIA",
+      "url": "https://www.youtube.com/@AAROGYAMINDIA",
+      "subscribe_url": "https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1",
+      "avatar": "/images/logo/logo.png",
+      "is_default": true
+    },
+    {
+      "id": "CH_KHETI_DR",
+      "name": "खेती का डॉक्टर (Krishi Helpline)",
+      "handle": "@AarogyamKhetiDr",
+      "url": "https://www.youtube.com/@AAROGYAMINDIA",
+      "subscribe_url": "https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1",
+      "avatar": "/images/books/fasal-ka-doctor-cover.webp",
+      "is_default": false
+    }
+  ],
+  "master_categories": [
+    "Crop Protection",
+    "Organic Farming",
+    "Irrigation Tech",
+    "Dairy & Animal Husbandry",
+    "Biofit Products Training",
+    "Shorts & Reels"
+  ],
+  "playlists": [
+    {
+      "id": "PL_ORGANIC_2026",
+      "title": "🌾 संपूर्ण जैविक खेती व पशु पोषण मास्टरक्लास",
+      "description": "प्राकृतिक एवं जैविक खेती से 3X मुनाफा, दुग्ध उत्पादन और Biofit ट्रेनिंग की संपूर्ण वीडियो श्रृंखला।",
+      "cover": "https://img.youtube.com/vi/2JYn-bcDLuU/hqdefault.jpg",
+      "video_ids": ["VID_712495", "VID_513998", "VID_378682", "VID_M10001"]
+    },
+    {
+      "id": "PL_CROP_DOCTOR",
+      "title": "🔬 फसल रोग, कीट व स्प्रे साइंस समाधान",
+      "description": "रोग, कीट, फफूंद एवं पोषक तत्वों की कमी की वैज्ञानिक पहचान व सटीक उपचार।",
+      "cover": "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      "video_ids": ["VID_M10002", "VID_M10003"]
+    }
   ]
 }
