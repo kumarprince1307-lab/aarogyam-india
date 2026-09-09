@@ -1222,6 +1222,264 @@
       color: var(--yt-text);
     }
 
+    /* Prominent Sharer / Sponsor Card (Clean YouTube-Styled Channel Box) */
+    .at-sharer-sponsor-card {
+      margin-top: 14px;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);
+      border: 1.5px solid rgba(59, 130, 246, 0.35);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .at-sponsor-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .at-sponsor-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .at-sponsor-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .at-sponsor-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .at-sponsor-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--yt-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .at-sponsor-phone {
+      font-size: 0.78rem;
+      color: var(--yt-text-muted);
+      font-weight: 700;
+    }
+
+    .at-sponsor-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .at-sponsor-btn {
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .at-btn-sponsor-call {
+      background: rgba(37, 99, 235, 0.18);
+      border: 1.5px solid #3b82f6;
+      color: #3b82f6;
+    }
+
+    .at-btn-sponsor-call:hover {
+      background: #2563eb;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .at-btn-sponsor-wa {
+      background: rgba(37, 211, 102, 0.18);
+      border: 1.5px solid #25d366;
+      color: #25d366;
+    }
+
+    .at-btn-sponsor-wa:hover {
+      background: #25d366;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    /* Fullscreen HUD Overlay (Inside player wrap so visible during native fullscreen) */
+    .at-fs-hud-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2147483647;
+      padding: 12px 18px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.6) 60%, transparent 100%);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: opacity 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .fullscreen-active .at-fs-hud-overlay,
+    .cinema-fullscreen-mode .at-fs-hud-overlay,
+    #at_player_frame_wrap:fullscreen .at-fs-hud-overlay,
+    #at_player_frame_wrap:-webkit-full-screen .at-fs-hud-overlay {
+      display: flex !important;
+    }
+
+    .at-fs-hud-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .at-fs-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.8rem;
+      border: 1.5px solid rgba(255, 255, 255, 0.4);
+      flex-shrink: 0;
+    }
+
+    .at-fs-hud-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .at-fs-hud-tag {
+      font-size: 0.62rem;
+      color: #38bdf8;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .at-fs-hud-name {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .at-fs-hud-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .at-fs-hud-pill {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .at-fs-call {
+      background: rgba(37, 99, 235, 0.35);
+      border: 1px solid #3b82f6;
+      color: #ffffff;
+    }
+
+    .at-fs-wa {
+      background: rgba(37, 211, 102, 0.35);
+      border: 1px solid #25d366;
+      color: #ffffff;
+    }
+
+    .at-fs-exit {
+      background: rgba(239, 68, 68, 0.35);
+      border: 1px solid #ef4444;
+      color: #ffffff;
+    }
+
+    .at-topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .at-back-btn {
+      background: var(--yt-pill);
+      border: 1.5px solid var(--yt-border);
+      color: var(--yt-text);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .at-back-btn:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .at-topbar-logo-text {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: var(--yt-text);
+    }
+
     /* Suggested Feed */
     .at-suggested-feed {
       background: var(--yt-surface);
@@ -1704,25 +1962,20 @@
        3. 16:9 MASTERCLASS CINEMA PLAYER MODAL
        ========================================== -->
   <div id="wb_master_cinema_modal" class="at-cinema-modal" role="dialog" aria-modal="true" aria-label="AarogyamTube Video Player">
-    <!-- Top Sharer Minimal Header with Right-Aligned Contact & Fullscreen -->
+    <!-- Top Minimal Header with Brand Logo, Fullscreen & Close -->
     <div class="at-cinema-top-bar" id="at_cinema_top_sharer_bar">
-      <div class="at-sharer-left">
-        <div class="at-sharer-avatar" id="at_sharer_avatar">AI</div>
-        <div class="at-sharer-info">
-          <div class="at-sharer-label"><span class="dot"></span> शेयर किया गया:</div>
-          <div class="at-sharer-name-num" id="at_sharer_name_mobile">आरोग्यम किसान मित्र • 📞 +91 79744 22572</div>
+      <div class="at-topbar-brand">
+        <button type="button" class="at-back-btn" onclick="window.closeMasterclassModal()" title="वापस जाएं">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div class="at-topbar-title-wrap">
+          <span class="at-topbar-logo-text"><i class="fa-brands fa-youtube" style="color:#ef4444;margin-right:4px;"></i> Aarogyam<span style="color:#ef4444;">Tube</span></span>
         </div>
       </div>
 
       <div class="at-sharer-right-actions">
-        <a id="at_sharer_call_btn" href="tel:+917974422572" class="at-contact-btn at-btn-call" title="सीधे कॉल करें">
-          <i class="fa-solid fa-phone"></i> <span>कॉल</span>
-        </a>
-        <a id="at_sharer_wa_btn" href="https://api.whatsapp.com/send?phone=917974422572" target="_blank" class="at-contact-btn at-btn-wa" title="WhatsApp पर संपर्क करें">
-          <i class="fa-brands fa-whatsapp"></i> <span>चैट</span>
-        </a>
         <!-- Top Fullscreen Button -->
-        <button type="button" class="at-btn-fullscreen-top" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन करें (Fullscreen)">
+        <button type="button" class="at-btn-fullscreen-top" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन करें (Landscape)">
           <i class="fa-solid fa-expand"></i> <span>Full Screen</span>
         </button>
         <!-- Exit Fullscreen Button in Top Right (Visible during Fullscreen) -->
@@ -1738,9 +1991,22 @@
       <!-- Left Column: 16:9 Player & Actions -->
       <div>
         <div class="at-player-frame-wrap" id="at_player_frame_wrap">
-          <button type="button" class="at-exit-fs-floating-btn" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन से बाहर आएं">
-            <i class="fa-solid fa-compress"></i> <span>Exit Full Screen</span>
-          </button>
+          <!-- Fullscreen HUD Overlay (Always Visible on Mobile / Desktop Fullscreen) -->
+          <div class="at-fs-hud-overlay" id="at_fs_hud_overlay">
+            <div class="at-fs-hud-left">
+              <div class="at-fs-avatar" id="at_fs_hud_avatar">AI</div>
+              <div class="at-fs-hud-info">
+                <span class="at-fs-hud-tag"><i class="fa-solid fa-circle-check"></i> शेयरकर्ता</span>
+                <span class="at-fs-hud-name" id="at_fs_hud_name">आरोग्यम किसान मित्र • +91 79744 22572</span>
+              </div>
+            </div>
+            <div class="at-fs-hud-right">
+              <a id="at_fs_hud_call" href="tel:+917974422572" class="at-fs-hud-pill at-fs-call" title="सीधे कॉल करें"><i class="fa-solid fa-phone"></i> <span>कॉल</span></a>
+              <a id="at_fs_hud_wa" href="https://api.whatsapp.com/send?phone=917974422572" target="_blank" class="at-fs-hud-pill at-fs-wa" title="WhatsApp करें"><i class="fa-brands fa-whatsapp"></i> <span>WhatsApp</span></a>
+              <button type="button" class="at-fs-hud-pill at-fs-exit" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन से बाहर आएं"><i class="fa-solid fa-compress"></i> <span>Exit</span></button>
+            </div>
+          </div>
+
           <div class="at-aspect-16-9">
             <iframe id="at_master_iframe_main" src=""
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
@@ -1752,6 +2018,7 @@
         <div class="at-video-details-box">
           <div id="at_current_title" class="at-cinema-video-title">कृषि मास्टरक्लास शीर्षक</div>
 
+          <!-- Channel & Actions Row -->
           <div class="at-channel-bar">
             <div class="at-channel-creator">
               <div class="at-channel-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
@@ -1763,7 +2030,7 @@
 
             <div class="at-action-buttons-wrap">
               <!-- Full Screen Action Button -->
-              <button type="button" class="at-act-pill at-act-pill-fs" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन करें (Fullscreen)">
+              <button type="button" class="at-act-pill at-act-pill-fs" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन करें (Landscape)">
                 <i class="fa-solid fa-expand"></i>
                 <span>फुल स्क्रीन</span>
               </button>
@@ -1787,6 +2054,26 @@
                 <i class="fa-solid fa-share-nodes"></i>
                 <span>Share</span>
               </button>
+            </div>
+          </div>
+
+          <!-- Prominent YouTube-Style Sharer / Sponsor Card -->
+          <div class="at-sharer-sponsor-card" id="at_main_sharer_card">
+            <div class="at-sponsor-left">
+              <div class="at-sponsor-avatar" id="at_sponsor_avatar">AI</div>
+              <div class="at-sponsor-meta">
+                <div class="at-sponsor-badge"><i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> शेयरकर्ता / अधिकृत संपर्क</div>
+                <div class="at-sponsor-name" id="at_sponsor_name">आरोग्यम किसान मित्र</div>
+                <div class="at-sponsor-phone" id="at_sponsor_phone">📞 +91 79744 22572</div>
+              </div>
+            </div>
+            <div class="at-sponsor-actions">
+              <a id="at_sponsor_call_btn" href="tel:+917974422572" class="at-sponsor-btn at-btn-sponsor-call" title="सीधे कॉल करें">
+                <i class="fa-solid fa-phone"></i> <span>कॉल</span>
+              </a>
+              <a id="at_sponsor_wa_btn" href="https://api.whatsapp.com/send?phone=917974422572" target="_blank" class="at-sponsor-btn at-btn-sponsor-wa" title="WhatsApp करें">
+                <i class="fa-brands fa-whatsapp"></i> <span>WhatsApp चैट</span>
+              </a>
             </div>
           </div>
 
@@ -2133,28 +2420,43 @@
       }
 
       function updateSharerUI(prof) {
+        const fullName = prof.full_name || 'आरोग्यम किसान मित्र';
+        const cleanPhone = String(prof.mobile || '7974422572').replace(/\D/g, '').slice(-10) || '7974422572';
+        const formattedPhone = `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`;
+        const initials = fullName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'AI';
+        const waMsg = encodeURIComponent(`नमस्ते ${fullName} जी, मैंने आपका साझा किया हुआ AarogyamTube वीडियो देखा और अधिक जानकारी चाहता हूँ।`);
+
+        // 1. Top Header Bar (if present)
         const nameMobEl = document.getElementById('at_sharer_name_mobile');
         const avatarEl = document.getElementById('at_sharer_avatar');
         const callBtn = document.getElementById('at_sharer_call_btn');
         const waBtn = document.getElementById('at_sharer_wa_btn');
+        if (nameMobEl) nameMobEl.textContent = `${fullName} • 📞 ${formattedPhone}`;
+        if (avatarEl) avatarEl.textContent = initials;
+        if (callBtn) callBtn.href = `tel:+91${cleanPhone}`;
+        if (waBtn) waBtn.href = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${waMsg}`;
 
-        const fullName = prof.full_name || 'आरोग्यम किसान मित्र';
-        const cleanPhone = String(prof.mobile || '7974422572').replace(/\D/g, '').slice(-10) || '7974422572';
-        const formattedPhone = `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`;
+        // 2. In-Page Prominent Sharer / Sponsor Card
+        const sponsorAvatar = document.getElementById('at_sponsor_avatar');
+        const sponsorName = document.getElementById('at_sponsor_name');
+        const sponsorPhone = document.getElementById('at_sponsor_phone');
+        const sponsorCall = document.getElementById('at_sponsor_call_btn');
+        const sponsorWa = document.getElementById('at_sponsor_wa_btn');
+        if (sponsorAvatar) sponsorAvatar.textContent = initials;
+        if (sponsorName) sponsorName.textContent = fullName;
+        if (sponsorPhone) sponsorPhone.textContent = `📞 ${formattedPhone}`;
+        if (sponsorCall) sponsorCall.href = `tel:+91${cleanPhone}`;
+        if (sponsorWa) sponsorWa.href = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${waMsg}`;
 
-        if (nameMobEl) {
-          nameMobEl.textContent = `${fullName} • 📞 ${formattedPhone}`;
-        }
-        if (avatarEl) {
-          const initials = fullName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'AI';
-          avatarEl.textContent = initials;
-        }
-        if (callBtn) {
-          callBtn.href = `tel:+91${cleanPhone}`;
-        }
-        if (waBtn) {
-          waBtn.href = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(`नमस्ते ${fullName} जी, मैंने आपका साझा किया हुआ AarogyamTube वीडियो देखा और अधिक जानकारी चाहता हूँ।`)}`;
-        }
+        // 3. Fullscreen Floating HUD Overlay
+        const fsAvatar = document.getElementById('at_fs_hud_avatar');
+        const fsName = document.getElementById('at_fs_hud_name');
+        const fsCall = document.getElementById('at_fs_hud_call');
+        const fsWa = document.getElementById('at_fs_hud_wa');
+        if (fsAvatar) fsAvatar.textContent = initials;
+        if (fsName) fsName.textContent = `${fullName} • ${formattedPhone}`;
+        if (fsCall) fsCall.href = `tel:+91${cleanPhone}`;
+        if (fsWa) fsWa.href = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${waMsg}`;
       }
 
       // -------------------------------------------------------------
@@ -2286,7 +2588,11 @@
       window.shareCurrentReelWhatsApp = function () {
         const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
         if (!reel) return;
-        window.shareIndividualVideo(reel.id, reel.title);
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(userShare)}`;
+        const promoText = `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
       window.shareCurrentReelNative = function () {
@@ -2544,6 +2850,11 @@
           document.body.classList.add('cinema-fullscreen-mode');
           playerWrap.classList.add('fullscreen-active', 'pure-css-fullscreen');
 
+          // Auto-lock to landscape orientation on mobile devices for edge-to-edge viewing
+          if (window.screen && window.screen.orientation && typeof window.screen.orientation.lock === 'function') {
+            window.screen.orientation.lock('landscape').catch(() => {});
+          }
+
           const req = playerWrap.requestFullscreen ||
                       playerWrap.webkitRequestFullscreen ||
                       playerWrap.webkitEnterFullscreen ||
@@ -2561,6 +2872,11 @@
         } else {
           document.body.classList.remove('cinema-fullscreen-mode');
           playerWrap.classList.remove('fullscreen-active', 'pure-css-fullscreen');
+
+          // Unlock orientation back to default
+          if (window.screen && window.screen.orientation && typeof window.screen.orientation.unlock === 'function') {
+            try { window.screen.orientation.unlock(); } catch(e) {}
+          }
 
           const exit = document.exitFullscreen ||
                        document.webkitExitFullscreen ||
@@ -2796,18 +3112,7 @@
           ? `🎬 *${title}*\n1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`
           : `🎬 *${title}*\n${desc ? desc.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
 
-        if (navigator.share) {
-          navigator.share({
-            title: title,
-            text: promoText,
-            url: shareUrl
-          }).catch((err) => {
-            if (err && err.name === 'AbortError') return;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
-          });
-        } else {
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
-        }
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
       function openSpecificVideoOrReel(vid) {
