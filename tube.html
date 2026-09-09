@@ -1505,16 +1505,89 @@
       color: #ffffff;
     }
 
-    .at-fs-wa {
-      background: rgba(37, 211, 102, 0.35);
-      border: 1px solid #25d366;
-      color: #ffffff;
-    }
-
     .at-fs-exit {
       background: rgba(239, 68, 68, 0.35);
       border: 1px solid #ef4444;
       color: #ffffff;
+    }
+
+    /* Bottom Floating Action Rail in Fullscreen */
+    .at-fs-bottom-rail {
+      display: none;
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 2147483647;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(14px);
+      padding: 8px 14px;
+      border-radius: 30px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+      pointer-events: auto;
+    }
+
+    body.cinema-fullscreen-mode .at-fs-bottom-rail,
+    .fullscreen-active .at-fs-bottom-rail,
+    #at_player_frame_wrap:fullscreen .at-fs-bottom-rail,
+    #at_player_frame_wrap:-webkit-full-screen .at-fs-bottom-rail {
+      display: flex !important;
+    }
+
+    .at-fs-bottom-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .at-fs-bottom-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .at-fs-btn-like {
+      background: rgba(239, 68, 68, 0.25) !important;
+      border-color: #ef4444 !important;
+      color: #ffffff !important;
+    }
+
+    .at-fs-btn-wa {
+      background: rgba(37, 211, 102, 0.25) !important;
+      border-color: #25d366 !important;
+      color: #25d366 !important;
+    }
+
+    .at-fs-btn-share {
+      background: rgba(37, 99, 235, 0.25) !important;
+      border-color: #3b82f6 !important;
+      color: #38bdf8 !important;
+    }
+
+    @media (max-width: 640px) {
+      .at-fs-bottom-rail {
+        bottom: 12px;
+        right: 10px;
+        left: 10px;
+        justify-content: space-around;
+        padding: 6px 10px;
+        gap: 6px;
+      }
+      .at-fs-bottom-btn {
+        padding: 6px 10px;
+        font-size: 0.72rem;
+      }
     }
 
     /* Flying Hearts Upwards Floating Animation */
@@ -2069,14 +2142,6 @@
       </div>
 
       <div class="at-sharer-right-actions">
-        <!-- Top Fullscreen Button -->
-        <button type="button" class="at-btn-fullscreen-top" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन करें (Landscape)">
-          <i class="fa-solid fa-expand"></i> <span>Full Screen</span>
-        </button>
-        <!-- Exit Fullscreen Button in Top Right (Visible during Fullscreen) -->
-        <button type="button" class="at-exit-fs-top-btn" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन से बाहर आएं">
-          <i class="fa-solid fa-compress"></i> <span>Exit Full Screen</span>
-        </button>
         <button type="button" class="at-cinema-close-btn" onclick="window.closeMasterclassModal()" title="खिलाड़ी बंद करें">&times;</button>
       </div>
     </div>
@@ -2210,26 +2275,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Floating Actions Overlay (Available in standard & fullscreen mode) -->
-    <div class="at-floating-rail" id="at_cinema_floating_actions">
-      <button type="button" class="at-fs-act-pill" id="at_fs_like_btn" onclick="window.likeMasterclassVideo()" title="पसंद करें (Like)">
-        <i class="fa-solid fa-heart" id="at_fs_like_icon" style="color:#ef4444;"></i>
-        <span id="at_fs_like_count">1.4K</span>
-      </button>
-      <button type="button" class="at-fs-act-pill" onclick="window.commentMasterclassVideo()" title="कमेंट लिखें">
-        <i class="fa-solid fa-comment-dots" style="color:#60a5fa;"></i>
-        <span>कमेंट</span>
-      </button>
-      <button type="button" class="at-fs-act-pill at-fs-act-wa" onclick="window.shareCurrentMasterclassWhatsApp()" title="WhatsApp पर शेयर करें">
-        <i class="fa-brands fa-whatsapp"></i>
-        <span>WhatsApp</span>
-      </button>
-      <button type="button" class="at-fs-act-pill at-fs-act-share" onclick="window.shareCurrentMasterclassNative()" title="अन्य ऐप्स पर शेयर करें">
-        <i class="fa-solid fa-share-nodes"></i>
-        <span>Share</span>
-      </button>
     </div>
   </div>
 
@@ -2960,36 +3005,47 @@
         if (!playerWrap) return;
 
         const isFull = document.body.classList.contains('cinema-fullscreen-mode') ||
-                       playerWrap.classList.contains('fullscreen-active');
+                       playerWrap.classList.contains('fullscreen-active') ||
+                       Boolean(document.fullscreenElement || document.webkitFullscreenElement);
 
         if (!isFull) {
-          // 1. Enter pure CSS fullscreen + Landscape transform (100% reliable on all phones)
           document.body.classList.add('cinema-fullscreen-mode');
           document.documentElement.classList.add('cinema-fullscreen-mode');
           if (modal) modal.classList.add('cinema-modal-fullscreen');
           playerWrap.classList.add('fullscreen-active', 'pure-css-fullscreen');
 
-          // 2. Request native fullscreen if available on desktop/tablet
           try {
-            const req = document.documentElement.requestFullscreen ||
-                        document.documentElement.webkitRequestFullscreen ||
-                        playerWrap.requestFullscreen ||
-                        playerWrap.webkitRequestFullscreen;
+            const req = playerWrap.requestFullscreen ||
+                        playerWrap.webkitRequestFullscreen ||
+                        playerWrap.mozRequestFullScreen ||
+                        playerWrap.msRequestFullscreen ||
+                        document.documentElement.requestFullscreen;
             if (req) {
-              const p = req.call(document.documentElement);
-              if (p && p.catch) p.catch(() => {});
+              const res = req.call(playerWrap);
+              if (res && res.catch) res.catch(() => {});
+            }
+          } catch(e) {}
+
+          try {
+            if (screen.orientation && screen.orientation.lock) {
+              screen.orientation.lock('landscape').catch(() => {});
             }
           } catch(e) {}
         } else {
-          // Exit Fullscreen
           document.body.classList.remove('cinema-fullscreen-mode');
           document.documentElement.classList.remove('cinema-fullscreen-mode');
           if (modal) modal.classList.remove('cinema-modal-fullscreen');
           playerWrap.classList.remove('fullscreen-active', 'pure-css-fullscreen');
 
           try {
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-              const exit = document.exitFullscreen || document.webkitExitFullscreen;
+            if (screen.orientation && screen.orientation.unlock) {
+              screen.orientation.unlock();
+            }
+          } catch(e) {}
+
+          try {
+            if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+              const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
               if (exit) exit.call(document).catch(() => {});
             }
           } catch(e) {}
