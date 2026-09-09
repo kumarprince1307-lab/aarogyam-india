@@ -92,11 +92,13 @@ export async function initWebinars() {
 
   let editingRecordingId = null;
 
-  // Real-time Filters state
+  // Real-time Filters & Pagination state
   let searchFilterQuery = '';
   let formatFilterVal = 'all';
   let categoryFilterVal = 'all';
   let playlistFilterVal = 'all';
+  let currentRecPage = 1;
+  const REC_PER_PAGE = 20;
 
   const defaultSections = [
     { key: 'sec_hero_zoom', name: '🎥 1. Hero Zoom Meeting Box', desc: 'शीर्षक, 3D कवर, ज़ूम जॉइन बटन व रजिस्ट्रेशन' },
@@ -529,23 +531,33 @@ export async function initWebinars() {
         </button>
       </div>
 
-      <!-- Videos & Reels Table -->
-      <div style="overflow-x: auto; background: #0f172a; border-radius: 8px; border: 1px solid var(--admin-border);">
+      <!-- Videos & Reels Table with Fixed Sticky Header -->
+      <div id="adm_rec_table_container" style="overflow: auto; max-height: 720px; background: #0f172a; border-radius: 8px; border: 1px solid var(--admin-border); position: relative;">
         <table class="admin-table" style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="border-bottom: 1px solid var(--admin-border); text-align: left; font-size: 0.8rem; color: var(--admin-muted);">
-              <th style="padding: 10px; width: 45px; text-align: center;">क्रम (Drag)</th>
-              <th style="padding: 10px;">थंबनेल</th>
-              <th style="padding: 10px;">फॉर्मेट / चैनल</th>
-              <th style="padding: 10px;">शीर्षक एवं विवरण</th>
-              <th style="padding: 10px;">श्रेणी व अवधि</th>
-              <th style="padding: 10px; text-align: right;">एक्शन</th>
+          <thead style="position: sticky; top: 0; z-index: 6; background: #1e293b; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">
+            <tr style="border-bottom: 1.5px solid var(--admin-border); text-align: left; font-size: 0.82rem; color: #cbd5e1;">
+              <th style="padding: 12px 10px; width: 55px; text-align: center;">क्रम (Drag)</th>
+              <th style="padding: 12px 10px; width: 75px;">थंबनेल</th>
+              <th style="padding: 12px 10px; width: 140px;">फॉर्मेट / चैनल</th>
+              <th style="padding: 12px 10px;">शीर्षक एवं विवरण</th>
+              <th style="padding: 12px 10px; width: 130px;">श्रेणी व अवधि</th>
+              <th style="padding: 12px 10px; text-align: right; width: 180px;">एक्शन</th>
             </tr>
           </thead>
           <tbody id="adm_recordings_tbody">
             <!-- Rendered by JS -->
           </tbody>
         </table>
+      </div>
+
+      <!-- Modern 20-20 Video Pagination Bar -->
+      <div id="adm_recordings_pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 12px 16px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+        <div id="adm_pagination_info" style="font-size: 0.84rem; color: #94a3b8; font-weight: 700;">
+          कुल: 0 वीडियो
+        </div>
+        <div id="adm_pagination_controls" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+          <!-- Rendered by JS -->
+        </div>
       </div>
     </div>
 
@@ -1282,10 +1294,19 @@ export async function initWebinars() {
     });
   }
 
+  window.goToRecPage = function(pageNumber) {
+    currentRecPage = pageNumber;
+    renderRecordingsTable();
+    const cont = document.getElementById('adm_rec_table_container');
+    if (cont) cont.scrollTop = 0;
+  };
+
   function renderRecordingsTable() {
     const tbody = document.getElementById('adm_recordings_tbody');
     const badge = document.getElementById('reels-count-badge');
     const fBadge = document.getElementById('filtered-count-badge');
+    const pagInfo = document.getElementById('adm_pagination_info');
+    const pagControls = document.getElementById('adm_pagination_controls');
     if (badge) badge.textContent = allRecordings.length;
     if (!tbody) return;
 
@@ -1300,10 +1321,21 @@ export async function initWebinars() {
           </td>
         </tr>
       `;
+      if (pagInfo) pagInfo.textContent = 'कुल: 0 वीडियो';
+      if (pagControls) pagControls.innerHTML = '';
       return;
     }
 
-    tbody.innerHTML = filteredList.map((r, fIdx) => {
+    // 20-20 Video Pagination Calculation
+    const totalPages = Math.ceil(filteredList.length / REC_PER_PAGE) || 1;
+    if (currentRecPage > totalPages) currentRecPage = totalPages;
+    if (currentRecPage < 1) currentRecPage = 1;
+
+    const startIdx = (currentRecPage - 1) * REC_PER_PAGE;
+    const endIdx = Math.min(startIdx + REC_PER_PAGE, filteredList.length);
+    const pagedList = filteredList.slice(startIdx, endIdx);
+
+    tbody.innerHTML = pagedList.map((r, pIdx) => {
       const actualIdx = allRecordings.findIndex(x => x.id === r.id);
       const fallback = r.platform === 'instagram' ? '/images/banners/agriculture-hero-banner-2.webp' : '/images/banners/agriculture-hero-banner-1.webp';
       const thumb = r.thumbnail || fallback;
@@ -1357,6 +1389,47 @@ export async function initWebinars() {
       `;
     }).join('');
 
+    // Pagination Info and Buttons
+    if (pagInfo) {
+      pagInfo.innerHTML = `📄 पेज <strong>${currentRecPage}</strong> का <strong>${totalPages}</strong> (वीडियो <strong>${startIdx + 1}-${endIdx}</strong> / कुल <strong>${filteredList.length}</strong>)`;
+    }
+
+    if (pagControls) {
+      let pageButtons = '';
+
+      // Previous button
+      pageButtons += `<button type="button" onclick="window.goToRecPage(${currentRecPage - 1})" class="admin-button small-button" style="background: rgba(255,255,255,0.08); border: 1px solid #334155; color: #fff; padding: 5px 10px; font-size: 0.78rem;" ${currentRecPage <= 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>◀ पिछला</button>`;
+
+      // Page numbers (smart sliding window)
+      let startP = Math.max(1, currentRecPage - 2);
+      let endP = Math.min(totalPages, startP + 4);
+      if (endP - startP < 4) startP = Math.max(1, endP - 4);
+
+      if (startP > 1) {
+        pageButtons += `<button type="button" onclick="window.goToRecPage(1)" class="admin-button small-button" style="background: rgba(255,255,255,0.08); border: 1px solid #334155; color: #fff; padding: 5px 9px; font-size: 0.78rem;">1</button>`;
+        if (startP > 2) pageButtons += `<span style="color:#64748b; padding:0 2px;">...</span>`;
+      }
+
+      for (let p = startP; p <= endP; p++) {
+        const isActive = p === currentRecPage;
+        pageButtons += `
+          <button type="button" onclick="window.goToRecPage(${p})" class="admin-button small-button" style="background: ${isActive ? '#3b82f6' : 'rgba(255,255,255,0.08)'}; border: 1px solid ${isActive ? '#3b82f6' : '#334155'}; color: #fff; padding: 5px 9px; font-weight: ${isActive ? '800' : '500'}; font-size: 0.78rem;">
+            ${p}
+          </button>
+        `;
+      }
+
+      if (endP < totalPages) {
+        if (endP < totalPages - 1) pageButtons += `<span style="color:#64748b; padding:0 2px;">...</span>`;
+        pageButtons += `<button type="button" onclick="window.goToRecPage(${totalPages})" class="admin-button small-button" style="background: rgba(255,255,255,0.08); border: 1px solid #334155; color: #fff; padding: 5px 9px; font-size: 0.78rem;">${totalPages}</button>`;
+      }
+
+      // Next button
+      pageButtons += `<button type="button" onclick="window.goToRecPage(${currentRecPage + 1})" class="admin-button small-button" style="background: rgba(255,255,255,0.08); border: 1px solid #334155; color: #fff; padding: 5px 10px; font-size: 0.78rem;" ${currentRecPage >= totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>अगला ▶</button>`;
+
+      pagControls.innerHTML = pageButtons;
+    }
+
     // Attach Drag & Drop Listeners
     let dragRecSrcIdx = null;
     const rows = tbody.querySelectorAll('.adm-rec-drag-row');
@@ -1400,21 +1473,25 @@ export async function initWebinars() {
   // Filter toolbar event listeners
   document.getElementById('adm_rec_search')?.addEventListener('input', (e) => {
     searchFilterQuery = e.target.value.trim();
+    currentRecPage = 1;
     renderRecordingsTable();
   });
 
   document.getElementById('adm_filter_format')?.addEventListener('change', (e) => {
     formatFilterVal = e.target.value;
+    currentRecPage = 1;
     renderRecordingsTable();
   });
 
   document.getElementById('adm_filter_category')?.addEventListener('change', (e) => {
     categoryFilterVal = e.target.value;
+    currentRecPage = 1;
     renderRecordingsTable();
   });
 
   document.getElementById('adm_filter_playlist')?.addEventListener('change', (e) => {
     playlistFilterVal = e.target.value;
+    currentRecPage = 1;
     renderRecordingsTable();
   });
 
@@ -1423,6 +1500,7 @@ export async function initWebinars() {
     formatFilterVal = 'all';
     categoryFilterVal = 'all';
     playlistFilterVal = 'all';
+    currentRecPage = 1;
     document.getElementById('adm_rec_search').value = '';
     document.getElementById('adm_filter_format').value = 'all';
     document.getElementById('adm_filter_category').value = 'all';
