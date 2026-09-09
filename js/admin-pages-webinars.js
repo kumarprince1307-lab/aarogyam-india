@@ -445,6 +445,34 @@ export async function initWebinars() {
               </div>
             </div>
 
+            <!-- Zero-Egress Video Sequencing, Pinning & Priority Controls -->
+            <div style="background: rgba(30,41,59,0.7); border: 1px solid #3b82f6; border-radius: 8px; padding: 12px; margin-top: 4px;">
+              <div style="font-size: 0.8rem; font-weight: 800; color: #60a5fa; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                <span>⚡</span> <span>शॉर्ट वीडियो सीक्वेंसिंग व प्राथमिकता (Zero Egress Ordering):</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label class="admin-label">सीक्वेंस मोड (Order Type):</label>
+                  <select id="modal_rec_order_type" class="admin-select" style="width: 100%;">
+                    <option value="normal">⏱️ Normal (तारीख अनुसार - Newest First)</option>
+                    <option value="pinned">📌 Pinned Video (हमेशा टॉप पर फिक्स)</option>
+                    <option value="priority">🔢 Priority Score (अंक अनुसार)</option>
+                    <option value="random">🎲 Random Shuffle (रैंडम क्रम)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="admin-label">प्राथमिकता अंक (Priority 1-100):</label>
+                  <input type="number" id="modal_rec_priority" class="admin-input" min="0" max="100" value="50" placeholder="50" style="width: 100%;" />
+                </div>
+              </div>
+              <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="modal_rec_pinned" style="width: 18px; height: 18px; accent-color: #3b82f6; cursor: pointer;" />
+                <label for="modal_rec_pinned" style="font-size: 0.82rem; color: #f8fafc; cursor: pointer; font-weight: 700;">
+                  📌 इस वीडियो को सबसे ऊपर पिन रखें (Pin this Video to Top)
+                </label>
+              </div>
+            </div>
+
             <div style="margin-top: 8px;">
               <button type="submit" id="btn-save-video-entry" class="admin-button" style="background: #F43F5E; color: #fff; width: 100%; font-weight: 800; padding: 13px; font-size: 0.95rem; box-shadow: 0 4px 16px rgba(244,63,94,0.4);">
                 <span>💾 वीडियो / रील सेव करें (Save Video)</span>
@@ -1009,10 +1037,13 @@ export async function initWebinars() {
             <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; margin-top: 2px;">
               ${r.platform || 'YouTube'}
             </span>
-            <div style="margin-top: 4px;">
+            <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px;">
               <span style="font-size: 0.65rem; background: ${r.access_tier === 'registration_only' ? '#F59E0B' : (r.access_tier === 'active_only' ? '#10B981' : '#64748B')}; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">
                 ${r.access_tier === 'registration_only' ? '🔒 Registered' : (r.access_tier === 'active_only' ? '🟢 Active' : '🌟 All Users')}
               </span>
+              ${r.pinned ? '<span style="font-size: 0.65rem; background: #3b82f6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 800;">📌 Pinned</span>' : ''}
+              ${r.priority ? `<span style="font-size: 0.65rem; background: #8b5cf6; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">🔢 P:${r.priority}</span>` : ''}
+              ${r.order_type === 'random' ? '<span style="font-size: 0.65rem; background: #ec4899; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: 700;">🎲 Random</span>' : ''}
             </div>
           </td>
           <td style="padding: 10px;">
@@ -1050,6 +1081,14 @@ export async function initWebinars() {
     document.getElementById('modal_rec_duration').value = item.duration || '0:58';
     document.getElementById('modal_rec_speaker').value = item.speaker || 'आरोग्यम कृषि विशेषज्ञ';
     document.getElementById('modal_rec_access').value = item.access_tier || 'all';
+
+    // Sequence & Priority fields
+    const pinnedCb = document.getElementById('modal_rec_pinned');
+    const priorityInp = document.getElementById('modal_rec_priority');
+    const orderTypeSel = document.getElementById('modal_rec_order_type');
+    if (pinnedCb) pinnedCb.checked = Boolean(item.pinned);
+    if (priorityInp) priorityInp.value = item.priority || (item.pinned ? 100 : 50);
+    if (orderTypeSel) orderTypeSel.value = item.order_type || (item.pinned ? 'pinned' : 'normal');
 
     const catSelect = document.getElementById('modal_rec_category');
     const customCatInput = document.getElementById('modal_rec_custom_category');
@@ -1241,6 +1280,10 @@ export async function initWebinars() {
     const speaker = (document.getElementById('modal_rec_speaker')?.value || '').trim() || 'आरोग्यम कृषि विशेषज्ञ';
     const accessTier = document.getElementById('modal_rec_access')?.value || 'all';
 
+    const isPinned = Boolean(document.getElementById('modal_rec_pinned')?.checked);
+    const priorityVal = Number(document.getElementById('modal_rec_priority')?.value || (isPinned ? 100 : 50));
+    const orderTypeVal = document.getElementById('modal_rec_order_type')?.value || (isPinned ? 'pinned' : 'normal');
+
     if (!url || !title) {
       alert('कृपया URL लिंक और शीर्षक भरें।');
       return;
@@ -1269,6 +1312,9 @@ export async function initWebinars() {
       duration: duration,
       speaker: speaker,
       access_tier: accessTier,
+      pinned: isPinned,
+      priority: priorityVal,
+      order_type: orderTypeVal,
       status: 'active',
       created_at: new Date().toISOString()
     };

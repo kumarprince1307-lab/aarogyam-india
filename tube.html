@@ -3536,16 +3536,25 @@
           (v.format === 'short_reel' || v.id.startsWith('VID_S') || v.category === 'Shorts & Reels' || v.duration === '1:00' || v.duration === '0:58')
         );
 
-        // Smart Zero-Egress Priority & Chronological Order Algorithm
-        shortsList.sort((a, b) => {
-          if (a.pinned && !b.pinned) return -1;
-          if (!a.pinned && b.pinned) return 1;
-          const pA = Number(a.priority || a.order_index || 0);
-          const pB = Number(b.priority || b.order_index || 0);
-          if (pB !== pA) return pB - pA;
-          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-        });
+        // Smart Zero-Egress Priority, Pinned & Random Ordering Algorithm
+        const pinnedList = shortsList.filter(v => v.pinned || v.order_type === 'pinned');
+        const priorityList = shortsList.filter(v => !v.pinned && v.order_type !== 'pinned' && (Number(v.priority || 0) > 0 || v.order_type === 'priority'));
+        const normalList = shortsList.filter(v => !v.pinned && v.order_type !== 'pinned' && !v.priority && v.order_type !== 'random');
+        const randomList = shortsList.filter(v => !v.pinned && v.order_type === 'random');
 
+        // 1. Sort pinned by priority then date
+        pinnedList.sort((a, b) => (Number(b.priority || 0) - Number(a.priority || 0)) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
+        // 2. Sort priority list descending
+        priorityList.sort((a, b) => (Number(b.priority || 0) - Number(a.priority || 0)) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
+        // 3. Sort normal list newest first
+        normalList.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        // 4. Shuffle random list
+        for (let i = randomList.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [randomList[i], randomList[j]] = [randomList[j], randomList[i]];
+        }
+
+        shortsList = [...pinnedList, ...priorityList, ...normalList, ...randomList];
         activeReelsList = shortsList;
 
         if (shortsList.length === 0) {
