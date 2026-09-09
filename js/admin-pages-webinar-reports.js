@@ -216,12 +216,20 @@ export async function initWebinarReports() {
       allVideoViewsData = [];
 
       allSurveys.forEach(s => {
-        const cAns = s.category_answers || {};
-        const isVideo = cAns.event_type === 'recorded_video_view' || cAns.event_type === 'video_unlock' || s.occupation === 'video_viewer' || s.selected_categories === 'webinar_video_view';
-        const isWb = cAns.event_type === 'webinar_registration' || cAns.event_type === 'webinar_attendance' || s.occupation === 'attendee' || s.selected_categories === 'webinar_lead' || Boolean(cAns.webinar_id);
+        const isVideo = cAns.event_type === 'recorded_video_view' || 
+                        cAns.event_type === 'video_unlock' || 
+                        s.occupation === 'video_viewer' || 
+                        (Array.isArray(s.selected_categories) ? s.selected_categories.includes('webinar_video_view') : String(s.selected_categories || '').includes('webinar_video_view')) ||
+                        Boolean(cAns.video_id);
+
+        const isWb = !isVideo && (cAns.event_type === 'webinar_registration' || 
+                     cAns.event_type === 'webinar_attendance' || 
+                     s.occupation === 'attendee' || 
+                     (Array.isArray(s.selected_categories) ? s.selected_categories.includes('webinar_lead') : String(s.selected_categories || '').includes('webinar_lead')) || 
+                     Boolean(cAns.webinar_id));
 
         if (isVideo) {
-          const refId = s.profile_id || cAns.referrer_share_id || '';
+          const refId = cAns.referrer_share_id || s.profile_id || 'AI000004';
           const sponsor = allProfiles.find(p => p.id === refId || p.share_id === refId || p.referral_code === refId || p.mobile === refId);
           allVideoViewsData.push({
             id: s.id,

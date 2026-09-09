@@ -2671,6 +2671,29 @@
     </div>
   </div>
 
+  <!-- =========================================
+       6. INTERACTIVE COMMENTS DRAWER / MODAL
+       ========================================== -->
+  <div id="at_comments_drawer" class="at-tube-gate-overlay" style="z-index:999999;" role="dialog" aria-modal="true">
+    <div class="at-tube-gate-card" style="max-width:440px; max-height:85vh; display:flex; flex-direction:column; padding:0; overflow:hidden;">
+      <div class="at-tube-gate-header" style="padding:14px 18px; border-bottom:1px solid var(--yt-border); background:var(--yt-surface);">
+        <div class="at-tube-gate-title" style="font-size:1.02rem;">
+          <span>💬 कमेंट्स एवं प्रतिक्रियाएं</span>
+        </div>
+        <button type="button" class="at-tube-gate-close" onclick="window.closeCommentsDrawer()" title="बंद करें">&times;</button>
+      </div>
+      <div id="at_comments_list" style="flex:1; overflow-y:auto; padding:14px 18px; display:flex; flex-direction:column; gap:10px; min-height:180px; max-height:360px;">
+        <!-- Dynamic comment cards -->
+      </div>
+      <form id="at_comment_submit_form" onsubmit="window.handleCommentSubmit(event)" style="padding:12px 16px; background:var(--yt-surface); border-top:1px solid var(--yt-border); display:flex; gap:8px; align-items:center;">
+        <input type="text" id="at_new_comment_input" placeholder="अपनी प्रतिक्रिया या सवाल लिखें..." required style="flex:1; background:var(--yt-pill); border:1px solid var(--yt-border); border-radius:22px; color:#fff; padding:8px 14px; font-size:0.88rem; outline:none;" />
+        <button type="submit" style="background:#2563eb; color:#fff; border:none; border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
+          <i class="fa-solid fa-paper-plane" style="font-size:0.9rem;"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="/session.js"></script>
   <script src="/js/global-guest-modal.js"></script>
@@ -3090,8 +3113,10 @@
       };
 
       // -------------------------------------------------------------
-      // 3.1 ZERO-EGRESS ACTIVITY TRACKER (VIEW, LIKE, SHARE, COMMENT)
+      // 3.1 ZERO-EGRESS ACTIVITY TRACKER & INTERACTIVE COMMENTS ENGINE
       // -------------------------------------------------------------
+      let activeCommentVideoObj = null;
+
       function logVideoActivity(actionType, videoObj, extraData = {}) {
         if (!db) return;
         const uplineShareId = getActiveUplineShareId();
@@ -3102,26 +3127,120 @@
         const vidId = videoObj?.id || extraData?.videoId || 'VID_001';
         const vidTitle = videoObj?.title || extraData?.videoTitle || 'AarogyamTube Video';
 
+        // Check if sharer has a valid UUID profile_id
+        let profileUUID = null;
+        if (currentSharerProfile && currentSharerProfile.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(currentSharerProfile.id)) {
+          profileUUID = currentSharerProfile.id;
+        }
+
         (async () => {
           try {
-            await db.from('surveys').insert([{
+            const { error } = await db.from('surveys').insert([{
               name: viewerName,
               mobile: viewerMobile,
               occupation: 'video_viewer',
-              selected_categories: 'webinar_video_view',
-              profile_id: uplineShareId,
+              selected_categories: ['webinar_video_view'],
+              profile_id: profileUUID,
               category_answers: {
                 event_type: 'recorded_video_view',
                 action_type: actionType, // 'view' | 'like' | 'share' | 'comment'
                 video_id: vidId,
                 video_title: vidTitle,
                 comment: extraData?.comment || '',
+                referrer_share_id: uplineShareId,
                 viewed_at: new Date().toISOString()
               }
             }]);
-          } catch(_) {}
+            if (error) console.warn('Activity log notice:', error.message);
+          } catch(err) {
+            console.warn('Activity log error:', err);
+          }
         })();
       }
+
+      window.openCommentsDrawer = function (vidObj) {
+        activeCommentVideoObj = vidObj || currentMasterclassVideo || activeReelsList[currentReelIndex] || allRecordings[0];
+        const drawer = document.getElementById('at_comments_drawer');
+        if (!drawer) return;
+        
+        renderCommentsList();
+        drawer.classList.add('active');
+        document.body.classList.add('wb-modal-active');
+      };
+
+      window.closeCommentsDrawer = function () {
+        const drawer = document.getElementById('at_comments_drawer');
+        if (drawer) drawer.classList.remove('active');
+        document.body.classList.remove('wb-modal-active');
+      };
+
+      function renderCommentsList() {
+        const listEl = document.getElementById('at_comments_list');
+        if (!listEl || !activeCommentVideoObj) return;
+
+        const vidId = activeCommentVideoObj.id || 'VID_001';
+        let comments = [];
+        try {
+          comments = JSON.parse(localStorage.getItem(`at_comments_${vidId}`) || '[]');
+        } catch(e) {}
+
+        if (comments.length === 0) {
+          listEl.innerHTML = `
+            <div style="text-align:center; padding:2rem 1rem; color:var(--yt-text-dim);">
+              <div style="font-size:2rem; margin-bottom:6px;">💬</div>
+              <strong style="color:var(--yt-text-muted); font-size:0.9rem;">अभी तक कोई कमेंट नहीं है।</strong>
+              <p style="font-size:0.8rem; margin-top:4px;">सबसे पहले अपनी प्रतिक्रिया या सवाल साझा करें!</p>
+            </div>
+          `;
+          return;
+        }
+
+        listEl.innerHTML = comments.map(c => `
+          <div style="background:var(--yt-pill); border:1px solid var(--yt-border); border-radius:12px; padding:10px 12px; display:flex; gap:10px; align-items:flex-start;">
+            <div style="width:34px; height:34px; border-radius:50%; background:#2563eb; color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:0.82rem; flex-shrink:0;">
+              ${(c.name || 'AI').slice(0, 2).toUpperCase()}
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong style="font-size:0.86rem; color:#fff;">${c.name}</strong>
+                <span style="font-size:0.72rem; color:var(--yt-text-dim);">${c.time}</span>
+              </div>
+              <div style="font-size:0.84rem; color:var(--yt-text-muted); margin-top:3px; word-break:break-word;">
+                ${c.text}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      window.handleCommentSubmit = function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const input = document.getElementById('at_new_comment_input');
+        if (!input || !input.value.trim() || !activeCommentVideoObj) return;
+
+        const commentText = input.value.trim();
+        const vidId = activeCommentVideoObj.id || 'VID_001';
+
+        let uObj = {};
+        try { uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+        const name = localStorage.getItem('aim_user_name') || uObj.name || uObj.full_name || 'किसान साथी';
+
+        // 1. Save to Local Feed
+        let comments = [];
+        try { comments = JSON.parse(localStorage.getItem(`at_comments_${vidId}`) || '[]'); } catch(e) {}
+        comments.unshift({
+          name: name,
+          text: commentText,
+          time: new Date().toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' })
+        });
+        try { localStorage.setItem(`at_comments_${vidId}`, JSON.stringify(comments)); } catch(e) {}
+
+        // 2. Log to Zero-Egress Database (so Admin sees in Tab 4)
+        logVideoActivity('comment', activeCommentVideoObj, { comment: commentText });
+
+        input.value = '';
+        renderCommentsList();
+      };
 
       // -------------------------------------------------------------
       // 4. SHORTS & REELS 9:16 RENDERER & PLAYER
@@ -3358,11 +3477,8 @@
       };
 
       window.openReelComments = function () {
-        const comment = prompt('इस रील पर अपनी प्रतिक्रिया या सवाल (Comment) लिखें:');
-        if (comment && comment.trim()) {
-          logVideoActivity('comment', activeReelsList[currentReelIndex], { comment: comment.trim() });
-          alert('✅ आपकी प्रतिक्रिया सफलतापूर्वक सबमिट हो गई है! धन्यवाद।');
-        }
+        const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
+        window.openCommentsDrawer(reel);
       };
 
       // Full Touch Swipe + Tap Play/Pause + Mouse Wheel Scroll + Keyboard Space/Arrows
@@ -3840,12 +3956,8 @@
       };
 
       window.commentMasterclassVideo = function() {
-        const comment = prompt('इस मास्टरक्लास ट्रेनिंग पर अपनी प्रतिक्रिया या सवाल (Comment) लिखें:');
-        if (comment && comment.trim()) {
-          const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
-          if (vid) logVideoActivity('comment', vid, { comment: comment.trim() });
-          alert('✅ आपकी प्रतिक्रिया सफलतापूर्वक सबमिट हो गई है! धन्यवाद।');
-        }
+        const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
+        window.openCommentsDrawer(vid);
       };
 
       // -------------------------------------------------------------
