@@ -30,7 +30,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  <link rel="icon" type="image/png" href="/images/logo/aarogyamtube-logo.png">
+  <link rel="icon" type="image/png" href="/images/logo/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -38,12 +38,10 @@
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Universal Site Stylesheets -->
+  <!-- Universal Essential Stylesheets (Zero Redundant CSS) -->
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/my-library.css">
   <link rel="stylesheet" href="/css/universal-nav-drawer.css">
   <link rel="stylesheet" href="/css/user-notifications.css">
-  <link rel="stylesheet" href="/css/home-revamp.css">
 
   <style>
     :root {
@@ -136,9 +134,6 @@
 
     /* ==========================================================
        3D FLOATING HERO SECTION (LIKE BOOK LANDING PAGE)
-       - Standalone floating cover, no outer wrapper border
-       - Auto-adjusts cleanly for 9:16 vertical, 1:1, 16:9 banner
-       - Prominent, large, full-size display
        ========================================================== */
     @keyframes ublFloatBook3D {
       0% {
@@ -869,13 +864,15 @@
     <div class="wb-ambient-glow glow-2"></div>
   </div>
 
-  <!-- Universal Header -->
+  <!-- Universal Zero-Egress Header with Inline Vector Logo -->
   <header class="app-header" style="background:#0b1120;border-bottom:1.5px solid rgba(255,255,255,0.12);padding:10px 16px;position:sticky;top:0;z-index:900;backdrop-filter:blur(12px);">
     <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;">
       
-      <!-- Brand Logo -->
+      <!-- Brand Logo Badge (Zero Network Weight) -->
       <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-        <img src="/images/logo/aarogyamtube-logo.png" alt="Aarogyam India Logo" style="height:36px;width:auto;object-fit:contain;" onerror="this.src='/images/logo.png'">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,#2563EB,#10B981);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(37,99,235,0.4);border:1.5px solid #60A5FA;">
+          <i class="fa-solid fa-seedling" style="color:#ffffff;font-size:1.15rem;"></i>
+        </div>
         <span style="font-weight:900;font-size:1.15rem;background:linear-gradient(135deg,#38BDF8,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.02em;">
           AAROGYAM INDIA
         </span>
@@ -1176,14 +1173,18 @@
 
   </main>
 
-  <!-- Global Scripts -->
+  <!-- Global Scripts (Lightweight Core Only) -->
   <script src="/js/permissions-core.js"></script>
   <script src="/js/global-guest-modal.js"></script>
   <script src="/js/universal-nav-drawer.js"></script>
   <script src="/js/user-notifications.js"></script>
 
+  <!-- ==========================================================
+       ZERO-EGRESS CACHE & REALTIME ENGINE
+       ========================================================== -->
   <script>
     (function () {
+      // 1. Inlined Instant Default Data (0 Byte Network Roundtrip)
       let masterData = {
         id: "WB_MASTER",
         title: "🚀🔥 TEAM Aarogyam India PRESENTS 🔥🚀",
@@ -1213,14 +1214,21 @@
       let countdownTimerInterval = null;
 
       async function initWebinarHub() {
-        try { await loadMasterWebinarData(); } catch (e) { }
+        // Step 1: Render instantly from Local Memory/LocalStorage (0 Network Egress)
+        try { loadMasterWebinarFromLocal(); } catch (e) { }
         try { renderWebinarDetails(); } catch (e) { }
         try { renderFaqs(); } catch (e) { }
         try { startLiveCountdown(); } catch (e) { }
         try { checkUserSessionStatus(); } catch (e) { }
+
+        // Step 2: Background Stale-While-Revalidate (Non-blocking lightweight fetch)
+        try { await fetchMasterWebinarBackground(); } catch (e) { }
+
+        // Step 3: Register Service Worker for 0 Egress Offline Caching
+        try { registerZeroEgressSW(); } catch (e) { }
       }
 
-      async function loadMasterWebinarData() {
+      function loadMasterWebinarFromLocal() {
         try {
           const localSaved = localStorage.getItem('AAROGYAM_WEBINAR_MASTER');
           if (localSaved) {
@@ -1230,15 +1238,28 @@
             }
           }
         } catch (e) { }
+      }
 
+      async function fetchMasterWebinarBackground() {
         try {
-          const resp = await fetch('/data/webinar-master.json?v=' + Date.now());
+          const resp = await fetch('/data/webinar-master.json', { cache: 'default' });
           if (resp.ok) {
             const json = await resp.json();
             const wm = json.webinarMaster || json || {};
-            if (wm.title) masterData = { ...masterData, ...wm };
+            if (wm.title) {
+              masterData = { ...masterData, ...wm };
+              renderWebinarDetails();
+              renderFaqs();
+              localStorage.setItem('AAROGYAM_WEBINAR_MASTER', JSON.stringify(masterData));
+            }
           }
         } catch (e) { }
+      }
+
+      function registerZeroEgressSW() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
       }
 
       function renderWebinarDetails() {
@@ -1253,7 +1274,9 @@
 
         if (masterData.cover_image) {
           const imgEl = document.getElementById('wb_cover_img');
-          if (imgEl) imgEl.src = masterData.cover_image;
+          if (imgEl && imgEl.src !== masterData.cover_image) {
+            imgEl.src = masterData.cover_image;
+          }
         }
 
         if (masterData.duration_minutes) {
