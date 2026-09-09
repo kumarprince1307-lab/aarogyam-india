@@ -1,6 +1,27 @@
 {
   "recordings": [
     {
+      "id": "VID_729548",
+      "format": "full_video",
+      "platform": "youtube",
+      "title": "NetSurf की Nominee Facility ने उनके परिवार को आर्थिक सुरक्षा और निरंतर अवसर प्रदान किया।",
+      "description": "क्या आपके जाने के बाद भी आपकी मेहनत आपके परिवार का सहारा बन सकती है?\n\nयह सिर्फ एक सवाल नहीं, बल्कि एक सच्ची कहानी है।\n\nश्री अमित झा जी ने NetSurf के साथ एक मजबूत व्यवसाय और एक बेहतर भविष्य का सपना बनाया। समय ने करवट ली, लेकिन उनके द्वारा किए गए कार्य और बनाई गई विरासत का महत्व बना रहा।\n\nNetSurf की Nominee Facility ने उनके परिवार को आर्थिक सुरक्षा और निरंतर अवसर प्रदान किया।\n\nयह वीडियो हमें याद दिलाता है कि जीवन अनिश्चित है, लेकिन सही निर्णय हमारे परिवार का भविष्य सुरक्षित कर सकते हैं।\n\n🙏 इस वीडियो को पूरा देखें और अपने परिवार के भविष्य के बारे में अवश्य सोचें।\n\n📌 Nominee Facility की जानकारी के लिए अपने NetSurf Advisor से संपर्क करें।",
+      "subject": "NETSURF",
+      "category": "NETSURF",
+      "video_url": "https://youtu.be/OlX2t84-8Es?si=JDDUyDdjtr60UOO5",
+      "youtube_url": "https://youtu.be/OlX2t84-8Es?si=JDDUyDdjtr60UOO5",
+      "youtube_id": "OlX2t84-8Es",
+      "thumbnail": "https://img.youtube.com/vi/OlX2t84-8Es/hqdefault.jpg",
+      "duration": "5:37",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "all",
+      "pinned": false,
+      "priority": 50,
+      "order_type": "normal",
+      "status": "active",
+      "created_at": "2026-09-09T14:22:09.548Z"
+    },
+    {
       "id": "VID_617621",
       "format": "full_video",
       "platform": "youtube",
