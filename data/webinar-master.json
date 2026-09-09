@@ -1,27 +1,22 @@
 {
   "webinarMaster": {
     "id": "WB_MASTER",
-    "title": "💼 NetSurf Career Plan + Digital Marketing Training अगर आप सीखना चाहते हैं:",
-    "description": "इस विशेष लाइव ज़ूम वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें और ज़ूम लिंक प्राप्त करें।",
-    "date": "2026-09-03",
-    "time": "20:00",
-    "duration_minutes": 3,
+    "title": "🚀🔥 TEAM Aarogyam India PRESENTS 🔥🚀",
+    "description": "क्या आप अपने Business को अगले Level पर ले जाने के लिए तैयार हैं? 📈🚀\n\nतो जुड़िए एक खास और Powerful Online Meeting में, जहाँ हम बात करेंगे SUCCESS, GROWTH और BUSINESS OPPORTUNITIES की! 💼✨",
+    "date": "2026-09-09",
+    "time": "20:30",
+    "duration_minutes": 60,
     "price": 0,
-    "zoom_link": "https://zoom.us/j/84313338881?pwd=NDM5MDI0",
-    "meeting_id": "843 1333 8881",
-    "passcode": "439024",
-    "cover_image": "/images/banners/agriculture-hero-banner-1.webp",
-    "banners": [
-      {
-        "title": "विशेष कृषि पोस्टर",
-        "url": "/images/banners/webinar-cover-live.webp"
-      }
-    ],
+    "zoom_link": "https://us06web.zoom.us/j/82823316040?pwd=cdZlJpFbYi3yKIkuoRy0Ep9VgaEtun.1",
+    "meeting_id": "828 2331 6040",
+    "passcode": "638417",
+    "cover_image": "/images/banners/webinar-cover-live.webp",
+    "banners": [],
     "youtube_videos": [],
     "kpis": [
       "🔴 100% लाइव इंटरएक्टिव ज़ूम क्लास",
       "🌱 जैविक खाद एवं स्प्रे फॉर्मूला",
-      "🎁 फ्री ई-बुक एवं स्टडी नोट्स",
+      "🎁 फ्री BC TRAINING",
       "💬 लाइव सवाल-जवाब एवं समाधान"
     ],
     "faqs": [
