@@ -391,304 +391,55 @@ export async function initWebinarReports() {
     );
   }
 
+  let selectedVideoTitleFilter = 'all';
+  let selectedVideoActionFilter = 'all';
+
   function getFilteredVideoViews() {
     const q = (searchInput?.value || '').trim().toLowerCase();
-    if (!q) return allVideoViewsData;
-    return allVideoViewsData.filter(v => 
-      (v.name || '').toLowerCase().includes(q) ||
-      (v.mobile || '').includes(q) ||
-      (v.videoTitle || '').toLowerCase().includes(q) ||
-      (v.sponsorName || '').toLowerCase().includes(q) ||
-      (v.district || '').toLowerCase().includes(q) ||
-      (v.actionType || '').toLowerCase().includes(q) ||
-      (v.comment || '').toLowerCase().includes(q)
-    );
-  }
-
-  // TAB 1: User-Wise Reports Table
-  function renderUserReportsTable() {
-    const users = getFilteredUsers();
-    if (!users || users.length === 0) {
-      containerUsers.innerHTML = '<div class="admin-empty"><strong>कोई यूजर नहीं मिला।</strong><br>सर्च बदलकर प्रयास करें।</div>';
-      return;
-    }
-
-    const total = users.length;
-    const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
-    if (currentUsersPage > totalPages) currentUsersPage = totalPages;
-    if (currentUsersPage < 1) currentUsersPage = 1;
-
-    const start = (currentUsersPage - 1) * PAGE_SIZE;
-    const paginated = users.slice(start, start + PAGE_SIZE);
-
-    containerUsers.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--admin-muted);margin-bottom:8px;">
-        <span>Showing <strong>${start + 1}-${Math.min(start + PAGE_SIZE, total)}</strong> of <strong>${total}</strong> Users</span>
-      </div>
-
-      <div class="admin-table-wrapper sticky-header-table">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>यूजर का नाम (User)</th>
-              <th>मोबाइल नंबर</th>
-              <th>Share ID</th>
-              <th>व्यक्तिगत वेबिनार लिंक (Personal Link)</th>
-              <th style="color:#60a5fa;">कुल लीड्स (Leads)</th>
-              <th style="color:#34d399;">ज़ूम अटेंडेंस (Live)</th>
-              <th>टर्नआउट दर (%)</th>
-              <th>कार्रवाई (Action)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paginated.map((u, i) => {
-              const rowNum = start + i + 1;
-              const sMob = String(u.mobile || '').replace(/\D/g, '');
-              const waMob = sMob.length === 10 ? '91' + sMob : sMob;
-              const wbLink = `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(u.shareId || 'AI000004')}`;
-
-              return `
-                <tr>
-                  <td><strong>#${rowNum}</strong></td>
-                  <td>
-                    <div style="font-weight:800; color:#fff;">${u.name}</div>
-                    <div style="font-size:0.75rem; color:#94a3b8;">${u.status.toUpperCase()}</div>
-                  </td>
-                  <td>
-                    <div style="display:flex; align-items:center; gap:6px;">
-                      <a href="tel:${sMob}" class="admin-subtle-link" style="font-weight:700;">📞 ${u.mobile}</a>
-                      <a href="https://wa.me/${waMob}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; padding:2px 6px; font-size:0.75rem;" title="WhatsApp">💬</a>
-                    </div>
-                  </td>
-                  <td><code style="color:#60a5fa; font-weight:800;">${u.shareId}</code></td>
-                  <td>
-                    <div style="display:flex; align-items:center; gap:6px;">
-                      <input type="text" readonly value="${wbLink}" style="background:#0b0f19; border:1px solid #1e293b; border-radius:6px; color:#94a3b8; padding:3px 6px; font-size:0.75rem; width:160px;" />
-                      <button type="button" class="admin-button small-button btn-copy-link" data-url="${wbLink}" style="padding:2px 6px; font-size:0.75rem;" title="Copy Link">📋</button>
-                    </div>
-                  </td>
-                  <td><strong style="color:#60a5fa; font-size:1.05rem;">${u.webinarLeads}</strong></td>
-                  <td><strong style="color:#34d399; font-size:1.05rem;">${u.webinarJoined}</strong></td>
-                  <td>
-                    <span style="font-weight:800; color:${u.turnoutRate >= 50 ? '#34d399' : u.turnoutRate > 0 ? '#fbbf24' : '#94a3b8'};">
-                      ${u.turnoutRate}%
-                    </span>
-                  </td>
-                  <td>
-                    <button type="button" class="admin-button small-button btn-view-user-drawer" data-user-id="${u.id}" style="background:#2563eb; color:#fff; font-weight:700; display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; padding:4px 10px;">
-                      <span>👥 किसान सूची (${u.webinarLeads})</span>
-                    </button>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div class="admin-pagination-bar" style="margin-top:12px;">
-        <div class="admin-pagination-info">Page <strong>${currentUsersPage}</strong> of <strong>${totalPages}</strong></div>
-        <div class="admin-pagination-controls">
-          <button type="button" id="users-report-prev" class="admin-button small-button" ${currentUsersPage <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>◀ Previous</button>
-          <span style="font-weight:700;font-size:0.85rem;padding:0 6px;">${currentUsersPage} / ${totalPages}</span>
-          <button type="button" id="users-report-next" class="admin-button small-button" ${currentUsersPage >= totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>Next ▶</button>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('users-report-prev')?.addEventListener('click', () => {
-      if (currentUsersPage > 1) { currentUsersPage--; renderUserReportsTable(); }
-    });
-    document.getElementById('users-report-next')?.addEventListener('click', () => {
-      if (currentUsersPage < totalPages) { currentUsersPage++; renderUserReportsTable(); }
+    return allVideoViewsData.filter(v => {
+      if (selectedVideoTitleFilter !== 'all' && (v.videoTitle || '') !== selectedVideoTitleFilter && (v.videoId || '') !== selectedVideoTitleFilter) {
+        return false;
+      }
+      if (selectedVideoActionFilter !== 'all' && (v.actionType || 'view') !== selectedVideoActionFilter) {
+        return false;
+      }
+      if (q) {
+        const mName = (v.name || '').toLowerCase().includes(q);
+        const mMob = (v.mobile || '').includes(q);
+        const mTitle = (v.videoTitle || '').toLowerCase().includes(q);
+        const mSponsor = (v.sponsorName || '').toLowerCase().includes(q);
+        const mDistrict = (v.district || '').toLowerCase().includes(q);
+        const mAction = (v.actionType || '').toLowerCase().includes(q);
+        const mComment = (v.comment || '').toLowerCase().includes(q);
+        if (!mName && !mMob && !mTitle && !mSponsor && !mDistrict && !mAction && !mComment) return false;
+      }
+      return true;
     });
   }
 
-  // TAB 2: All Attendees Table
-  function renderAllAttendeesTable() {
-    const attendees = getFilteredAttendees();
-    if (!attendees || attendees.length === 0) {
-      containerAttendees.innerHTML = '<div class="admin-empty"><strong>कोई किसान/अटेंडी नहीं मिला।</strong><br>सर्च या फिल्टर बदलकर प्रयास करें।</div>';
-      return;
-    }
-
-    const total = attendees.length;
-    const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
-    if (currentAttendeesPage > totalPages) currentAttendeesPage = totalPages;
-    if (currentAttendeesPage < 1) currentAttendeesPage = 1;
-
-    const start = (currentAttendeesPage - 1) * PAGE_SIZE;
-    const paginated = attendees.slice(start, start + PAGE_SIZE);
-
-    containerAttendees.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--admin-muted);margin-bottom:8px;">
-        <span>Showing <strong>${start + 1}-${Math.min(start + PAGE_SIZE, total)}</strong> of <strong>${total}</strong> Registered Attendees</span>
-      </div>
-
-      <div class="admin-table-wrapper sticky-header-table">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>किसान का नाम (Farmer)</th>
-              <th>मोबाइल नंबर & संपर्क</th>
-              <th>स्थान (District / State)</th>
-              <th>स्पॉन्सर यूजर (Referrer)</th>
-              <th>वेबिनार शीर्षक</th>
-              <th>रजिस्ट्रेशन तारीख</th>
-              <th>स्थिति (Attendance)</th>
-              <th>कार्रवाई (Action)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paginated.map((att, i) => {
-              const rowNum = start + i + 1;
-              const sMob = String(att.mobile || '').replace(/\D/g, '');
-              const waMob = sMob.length === 10 ? '91' + sMob : sMob;
-              const waMsg = encodeURIComponent(`नमस्ते ${att.name} जी! मैं आरोग्यम इंडिया से बात कर रहा हूँ। आपने हमारे लाइव वेबिनार में भाग लिया था...`);
-              const regDate = att.registeredAt ? new Date(att.registeredAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
-
-              return `
-                <tr>
-                  <td><strong>#${rowNum}</strong></td>
-                  <td><div style="font-weight:800; color:#fff;">${att.name}</div></td>
-                  <td><a href="tel:${sMob}" class="admin-subtle-link" style="font-weight:700;">📞 ${att.mobile}</a></td>
-                  <td>${att.district || att.state || '-'}</td>
-                  <td>
-                    <div style="font-weight:700; color:#cbd5e1;">${att.sponsorName}</div>
-                    <code style="font-size:0.75rem; color:#60a5fa;">${att.sponsorId}</code>
-                  </td>
-                  <td><span style="font-size:0.8rem; color:#94a3b8;">${att.webinarTitle}</span></td>
-                  <td><span style="font-size:0.8rem;">${regDate}</span></td>
-                  <td>
-                    ${att.isJoined 
-                      ? `<span class="admin-pill active" style="font-weight:800; font-size:0.75rem; background:rgba(16,185,129,0.2); color:#34d399; border:1px solid rgba(16,185,129,0.4);">🟢 Live Joined</span>` 
-                      : `<span class="admin-pill" style="font-weight:700; font-size:0.75rem; opacity:0.8;">⏳ Registered</span>`
-                    }
-                  </td>
-                  <td>
-                    <div style="display:flex; gap:6px; align-items:center;">
-                      <a href="tel:${sMob}" class="admin-button small-button" style="background:#0f172a; border:1px solid #475569; color:#cbd5e1; padding:3px 8px; font-size:0.75rem;" title="Call">📞 Call</a>
-                      <a href="https://wa.me/${waMob}?text=${waMsg}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; padding:3px 8px; font-size:0.75rem; display:inline-flex; align-items:center; gap:4px;" title="WhatsApp">💬 WhatsApp</a>
-                    </div>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div class="admin-pagination-bar" style="margin-top:12px;">
-        <div class="admin-pagination-info">Page <strong>${currentAttendeesPage}</strong> of <strong>${totalPages}</strong></div>
-        <div class="admin-pagination-controls">
-          <button type="button" id="attendees-report-prev" class="admin-button small-button" ${currentAttendeesPage <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>◀ Previous</button>
-          <span style="font-weight:700;font-size:0.85rem;padding:0 6px;">${currentAttendeesPage} / ${totalPages}</span>
-          <button type="button" id="attendees-report-next" class="admin-button small-button" ${currentAttendeesPage >= totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>Next ▶</button>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('attendees-report-prev')?.addEventListener('click', () => {
-      if (currentAttendeesPage > 1) { currentAttendeesPage--; renderAllAttendeesTable(); }
-    });
-    document.getElementById('attendees-report-next')?.addEventListener('click', () => {
-      if (currentAttendeesPage < totalPages) { currentAttendeesPage++; renderAllAttendeesTable(); }
-    });
-  }
-
-  // TAB 3: Shares & Viral Traffic Table
-  function renderShareTrafficTable() {
-    const shares = getFilteredShares();
-    if (!shares || shares.length === 0) {
-      containerShares.innerHTML = '<div class="admin-empty"><strong>कोई शेयरिंग डेटा नहीं मिला।</strong></div>';
-      return;
-    }
-
-    const total = shares.length;
-    const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
-    if (currentSharesPage > totalPages) currentSharesPage = totalPages;
-    if (currentSharesPage < 1) currentSharesPage = 1;
-
-    const start = (currentSharesPage - 1) * PAGE_SIZE;
-    const paginated = shares.slice(start, start + PAGE_SIZE);
-
-    containerShares.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--admin-muted);margin-bottom:8px;">
-        <span>Showing <strong>${start + 1}-${Math.min(start + PAGE_SIZE, total)}</strong> Users by Sharing Performance</span>
-      </div>
-
-      <div class="admin-table-wrapper sticky-header-table">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>प्रमोटर यूजर (Promoter)</th>
-              <th>मोबाइल नंबर</th>
-              <th>Share ID</th>
-              <th style="color:#22d3ee;">📤 कुल शेयर (Shares)</th>
-              <th style="color:#60a5fa;">👆 लिंक क्लिक्स (Clicks)</th>
-              <th style="color:#a78bfa;">👁️ पेज विजिट्स (Visits)</th>
-              <th style="color:#34d399;">📝 जनरेटेड लीड्स (Leads)</th>
-              <th>वायरल कन्वर्जन दर (%)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paginated.map((u, i) => {
-              const rowNum = start + i + 1;
-              const conv = u.totalClicks ? Math.round((u.webinarLeads / u.totalClicks) * 100) : 0;
-
-              return `
-                <tr>
-                  <td><strong>#${rowNum}</strong></td>
-                  <td><strong>${u.name}</strong></td>
-                  <td>${u.mobile}</td>
-                  <td><code style="color:#60a5fa; font-weight:800;">${u.shareId}</code></td>
-                  <td><strong style="color:#22d3ee; font-size:1.1rem;">${u.totalShares}</strong></td>
-                  <td><strong style="color:#60a5fa; font-size:1.1rem;">${u.totalClicks}</strong></td>
-                  <td><strong style="color:#a78bfa; font-size:1.1rem;">${u.totalVisitors}</strong></td>
-                  <td><strong style="color:#34d399; font-size:1.1rem;">${u.webinarLeads}</strong></td>
-                  <td>
-                    <span style="font-weight:800; color:${conv > 20 ? '#34d399' : '#fbbf24'};">
-                      ${conv}%
-                    </span>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div class="admin-pagination-bar" style="margin-top:12px;">
-        <div class="admin-pagination-info">Page <strong>${currentSharesPage}</strong> of <strong>${totalPages}</strong></div>
-        <div class="admin-pagination-controls">
-          <button type="button" id="shares-report-prev" class="admin-button small-button" ${currentSharesPage <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>◀ Previous</button>
-          <span style="font-weight:700;font-size:0.85rem;padding:0 6px;">${currentSharesPage} / ${totalPages}</span>
-          <button type="button" id="shares-report-next" class="admin-button small-button" ${currentSharesPage >= totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>Next ▶</button>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('shares-report-prev')?.addEventListener('click', () => {
-      if (currentSharesPage > 1) { currentSharesPage--; renderShareTrafficTable(); }
-    });
-    document.getElementById('shares-report-next')?.addEventListener('click', () => {
-      if (currentSharesPage < totalPages) { currentSharesPage++; renderShareTrafficTable(); }
-    });
-  }
-
-  // TAB 4: Video Viewers Table
+  // TAB 4: Video Viewers Table & Video-Wise Performance Breakdown
   function renderVideoViewersTable() {
+    if (!containerVideos) return;
+
+    // 1. Calculate Video-wise Performance Aggregations
+    const videoStatsMap = {};
+    allVideoViewsData.forEach(v => {
+      const vKey = v.videoTitle || v.videoId || 'Unknown Video';
+      if (!videoStatsMap[vKey]) {
+        videoStatsMap[vKey] = { title: vKey, videoId: v.videoId, views: 0, likes: 0, shares: 0, comments: 0, total: 0 };
+      }
+      const act = v.actionType || 'view';
+      if (act === 'view') videoStatsMap[vKey].views++;
+      else if (act === 'like') videoStatsMap[vKey].likes++;
+      else if (act === 'share') videoStatsMap[vKey].shares++;
+      else if (act === 'comment') videoStatsMap[vKey].comments++;
+      videoStatsMap[vKey].total++;
+    });
+
+    const topVideosList = Object.values(videoStatsMap).sort((a, b) => b.total - a.total);
+    const uniqueTitles = Object.keys(videoStatsMap).sort();
+
     const views = getFilteredVideoViews();
-    if (!views || views.length === 0) {
-      containerVideos.innerHTML = '<div class="admin-empty"><strong>कोई रिकॉर्डेड वीडियो / रिल्स गतिविधि डेटा नहीं मिला।</strong><br>जैसे ही किसान वीडियो देखेंगे, लाइक या शेयर करेंगे, डेटा यहाँ दिखेगा।</div>';
-      return;
-    }
 
     const total = views.length;
     const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
@@ -699,83 +450,195 @@ export async function initWebinarReports() {
     const paginated = views.slice(start, start + PAGE_SIZE);
 
     containerVideos.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--admin-muted);margin-bottom:8px;">
-        <span>Showing <strong>${start + 1}-${Math.min(start + PAGE_SIZE, total)}</strong> of <strong>${total}</strong> Video & Reel Interactions</span>
-      </div>
+      <!-- 1. Top Performing Videos Leaderboard Summary -->
+      <div style="background:rgba(30,41,59,0.7); border:1px solid #334155; border-radius:12px; padding:16px; margin-bottom:16px;">
+        <div style="font-size:0.95rem; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <span>🏆</span> <span>टॉप लोकप्रिय वीडियो (Top Performing Videos)</span>
+          </span>
+          <span style="font-size:0.75rem; color:#94a3b8;">कुल ${topVideosList.length} वीडियो सक्रिय</span>
+        </div>
 
-      <div class="admin-table-wrapper sticky-header-table">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>दर्शक का नाम (Viewer)</th>
-              <th>मोबाइल नंबर & संपर्क</th>
-              <th>स्थान (District / State)</th>
-              <th>गतिविधि (Action)</th>
-              <th>वीडियो / रील शीर्षक (Video Title)</th>
-              <th>स्पॉन्सर मेंबर (Sponsor)</th>
-              <th>तारीख व समय</th>
-              <th>कार्रवाई (Action)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paginated.map((v, i) => {
-              const rowNum = start + i + 1;
-              const sMob = String(v.mobile || '').replace(/\D/g, '');
-              const waMob = sMob.length === 10 ? '91' + sMob : sMob;
-              const waMsg = encodeURIComponent(`नमस्ते ${v.name} जी! आपने आरोग्यम इंडिया पर "${v.videoTitle}" वीडियो देखा था...`);
-              const vDate = v.viewedAt ? new Date(v.viewedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
-
-              let actionBadge = `<span class="admin-pill" style="background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); font-size:0.75rem; font-weight:700;">👁️ देखा (View)</span>`;
-              if (v.actionType === 'like') {
-                actionBadge = `<span class="admin-pill" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); font-size:0.75rem; font-weight:700;">❤️ पसंद (Like)</span>`;
-              } else if (v.actionType === 'share') {
-                actionBadge = `<span class="admin-pill" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); font-size:0.75rem; font-weight:700;">📤 शेयर (Share)</span>`;
-              } else if (v.actionType === 'comment') {
-                actionBadge = `<span class="admin-pill" style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); font-size:0.75rem; font-weight:700;">💬 कमेंट (Comment)</span>`;
-              }
-
-              return `
+        ${topVideosList.length === 0 ? `
+          <div style="color:#94a3b8; font-size:0.85rem; text-align:center; padding:10px;">अभी तक कोई वीडियो इंटरैक्शन नहीं हुआ है।</div>
+        ` : `
+          <div class="admin-table-wrapper" style="max-height:220px; overflow-y:auto;">
+            <table class="admin-table" style="font-size:0.82rem;">
+              <thead>
                 <tr>
-                  <td><strong>#${rowNum}</strong></td>
-                  <td><strong style="color:#fff;">${v.name}</strong></td>
-                  <td><a href="tel:${sMob}" class="admin-subtle-link" style="font-weight:700;">📞 ${v.mobile}</a></td>
-                  <td>${v.district || v.state || '-'}</td>
-                  <td>${actionBadge}</td>
-                  <td>
-                    <div style="font-weight:700; color:#fff; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${v.videoTitle}">
-                      🎬 ${v.videoTitle}
-                    </div>
-                    ${v.comment ? `<div style="font-size:0.75rem; color:#cbd5e1; margin-top:2px; font-style:italic; max-width:240px; overflow:hidden; text-overflow:ellipsis;">💬 "${v.comment}"</div>` : ''}
-                  </td>
-                  <td>
-                    <div style="font-weight:700; color:#cbd5e1;">${v.sponsorName}</div>
-                    <code style="font-size:0.75rem; color:#60a5fa;">${v.sponsorId}</code>
-                  </td>
-                  <td><span style="font-size:0.8rem;">${vDate}</span></td>
-                  <td>
-                    <div style="display:flex; gap:6px; align-items:center;">
-                      <a href="tel:${sMob}" class="admin-button small-button" style="background:#0f172a; border:1px solid #475569; color:#cbd5e1; padding:3px 8px; font-size:0.75rem;" title="Call">📞 Call</a>
-                      <a href="https://wa.me/${waMob}?text=${waMsg}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; padding:3px 8px; font-size:0.75rem; display:inline-flex; align-items:center; gap:4px;" title="WhatsApp">💬 WhatsApp</a>
-                    </div>
-                  </td>
+                  <th>#</th>
+                  <th>वीडियो शीर्षक (Video Title)</th>
+                  <th style="color:#60a5fa;">👁️ व्यूज (Views)</th>
+                  <th style="color:#f87171;">❤️ लाइक्स (Likes)</th>
+                  <th style="color:#4ade80;">📤 शेयर (Shares)</th>
+                  <th style="color:#c084fc;">💬 कमेंट्स (Comments)</th>
+                  <th>कुल गतिविधि</th>
+                  <th>फिल्टर</th>
                 </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                ${topVideosList.slice(0, 10).map((tv, idx) => `
+                  <tr style="${selectedVideoTitleFilter === tv.title ? 'background:rgba(37,99,235,0.15);' : ''}">
+                    <td><strong>#${idx + 1}</strong></td>
+                    <td><strong style="color:#fff;">🎬 ${tv.title}</strong></td>
+                    <td><span style="color:#60a5fa; font-weight:700;">${tv.views}</span></td>
+                    <td><span style="color:#f87171; font-weight:700;">${tv.likes}</span></td>
+                    <td><span style="color:#4ade80; font-weight:700;">${tv.shares}</span></td>
+                    <td><span style="color:#c084fc; font-weight:700;">${tv.comments}</span></td>
+                    <td><strong style="color:#38bdf8;">${tv.total}</strong></td>
+                    <td>
+                      <button type="button" class="admin-button small-button btn-filter-this-video" data-vtitle="${tv.title}" style="background:${selectedVideoTitleFilter === tv.title ? '#2563eb' : '#1e293b'}; color:#fff; font-size:0.72rem; padding:2px 8px;">
+                        ${selectedVideoTitleFilter === tv.title ? '✓ चयनित' : '🔍 दर्शक देखें'}
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `}
       </div>
 
-      <!-- Pagination -->
-      <div class="admin-pagination-bar" style="margin-top:12px;">
-        <div class="admin-pagination-info">Page <strong>${currentViewersPage}</strong> of <strong>${totalPages}</strong></div>
-        <div class="admin-pagination-controls">
-          <button type="button" id="viewers-report-prev" class="admin-button small-button" ${currentViewersPage <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>◀ Previous</button>
-          <span style="font-weight:700;font-size:0.85rem;padding:0 6px;">${currentViewersPage} / ${totalPages}</span>
-          <button type="button" id="viewers-report-next" class="admin-button small-button" ${currentViewersPage >= totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>Next ▶</button>
+      <!-- 2. Dropdown Filter Bar -->
+      <div style="background:#0f172a; border:1px solid #1e293b; border-radius:10px; padding:10px 14px; margin-bottom:14px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <label style="font-size:0.75rem; font-weight:700; color:#94a3b8;">🎬 वीडियो चुनें:</label>
+            <select id="sel_filter_video_title" style="background:#1e293b; border:1px solid #334155; border-radius:6px; color:#fff; padding:5px 8px; font-size:0.8rem; max-width:240px;">
+              <option value="all" ${selectedVideoTitleFilter === 'all' ? 'selected' : ''}>सभी वीडियो (All Videos)</option>
+              ${uniqueTitles.map(t => `<option value="${t}" ${selectedVideoTitleFilter === t ? 'selected' : ''}>${t.slice(0, 40)}</option>`).join('')}
+            </select>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:6px;">
+            <label style="font-size:0.75rem; font-weight:700; color:#94a3b8;">⚡ गतिविधि:</label>
+            <select id="sel_filter_video_action" style="background:#1e293b; border:1px solid #334155; border-radius:6px; color:#fff; padding:5px 8px; font-size:0.8rem;">
+              <option value="all" ${selectedVideoActionFilter === 'all' ? 'selected' : ''}>सभी गतिविधियां (All Actions)</option>
+              <option value="view" ${selectedVideoActionFilter === 'view' ? 'selected' : ''}>👁️ केवल देखे गए (Views)</option>
+              <option value="like" ${selectedVideoActionFilter === 'like' ? 'selected' : ''}>❤️ केवल पसंद (Likes)</option>
+              <option value="share" ${selectedVideoActionFilter === 'share' ? 'selected' : ''}>📤 केवल शेयर (Shares)</option>
+              <option value="comment" ${selectedVideoActionFilter === 'comment' ? 'selected' : ''}>💬 केवल कमेंट्स (Comments)</option>
+            </select>
+          </div>
+
+          ${(selectedVideoTitleFilter !== 'all' || selectedVideoActionFilter !== 'all') ? `
+            <button type="button" id="btn_reset_video_filters" class="admin-button small-button" style="background:#334155; color:#cbd5e1; font-size:0.75rem; padding:4px 8px;">
+              ✕ फिल्टर हटाएं
+            </button>
+          ` : ''}
+        </div>
+
+        <div style="font-size:0.82rem; color:#94a3b8;">
+          Showing <strong>${views.length}</strong> Results
         </div>
       </div>
+
+      <!-- 3. Detailed Viewers & Likers Table -->
+      ${views.length === 0 ? `
+        <div class="admin-empty"><strong>इस फिल्टर में कोई दर्शक या गतिविधि नहीं मिली।</strong><br>फिल्टर बदलकर देखें।</div>
+      ` : `
+        <div class="admin-table-wrapper sticky-header-table">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>दर्शक का नाम (Viewer)</th>
+                <th>मोबाइल नंबर & संपर्क</th>
+                <th>स्थान (District / State)</th>
+                <th>गतिविधि (Action)</th>
+                <th>वीडियो / रील शीर्षक (Video Title)</th>
+                <th>स्पॉन्सर मेंबर (Sponsor)</th>
+                <th>तारीख व समय</th>
+                <th>कार्रवाई (Action)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${paginated.map((v, i) => {
+                const rowNum = start + i + 1;
+                const sMob = String(v.mobile || '').replace(/\D/g, '');
+                const waMob = sMob.length === 10 ? '91' + sMob : sMob;
+                const waMsg = encodeURIComponent(`नमस्ते ${v.name} जी! आपने आरोग्यम इंडिया पर "${v.videoTitle}" वीडियो देखा था...`);
+                const vDate = v.viewedAt ? new Date(v.viewedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+
+                let actionBadge = `<span class="admin-pill" style="background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); font-size:0.75rem; font-weight:700;">👁️ देखा (View)</span>`;
+                if (v.actionType === 'like') {
+                  actionBadge = `<span class="admin-pill" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); font-size:0.75rem; font-weight:700;">❤️ पसंद (Like)</span>`;
+                } else if (v.actionType === 'share') {
+                  actionBadge = `<span class="admin-pill" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); font-size:0.75rem; font-weight:700;">📤 शेयर (Share)</span>`;
+                } else if (v.actionType === 'comment') {
+                  actionBadge = `<span class="admin-pill" style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); font-size:0.75rem; font-weight:700;">💬 कमेंट (Comment)</span>`;
+                }
+
+                return `
+                  <tr>
+                    <td><strong>#${rowNum}</strong></td>
+                    <td><strong style="color:#fff;">${v.name}</strong></td>
+                    <td><a href="tel:${sMob}" class="admin-subtle-link" style="font-weight:700;">📞 ${v.mobile}</a></td>
+                    <td>${v.district || v.state || '-'}</td>
+                    <td>${actionBadge}</td>
+                    <td>
+                      <div style="font-weight:700; color:#fff; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${v.videoTitle}">
+                        🎬 ${v.videoTitle}
+                      </div>
+                      ${v.comment ? `<div style="font-size:0.75rem; color:#cbd5e1; margin-top:2px; font-style:italic; max-width:240px; overflow:hidden; text-overflow:ellipsis;">💬 "${v.comment}"</div>` : ''}
+                    </td>
+                    <td>
+                      <div style="font-weight:700; color:#cbd5e1;">${v.sponsorName}</div>
+                      <code style="font-size:0.75rem; color:#60a5fa;">${v.sponsorId}</code>
+                    </td>
+                    <td><span style="font-size:0.8rem;">${vDate}</span></td>
+                    <td>
+                      <div style="display:flex; gap:6px; align-items:center;">
+                        <a href="tel:${sMob}" class="admin-button small-button" style="background:#0f172a; border:1px solid #475569; color:#cbd5e1; padding:3px 8px; font-size:0.75rem;" title="Call">📞 Call</a>
+                        <a href="https://wa.me/${waMob}?text=${waMsg}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; padding:3px 8px; font-size:0.75rem; display:inline-flex; align-items:center; gap:4px;" title="WhatsApp">💬 WhatsApp</a>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="admin-pagination-bar" style="margin-top:12px;">
+          <div class="admin-pagination-info">Page <strong>${currentViewersPage}</strong> of <strong>${totalPages}</strong></div>
+          <div class="admin-pagination-controls">
+            <button type="button" id="viewers-report-prev" class="admin-button small-button" ${currentViewersPage <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>◀ Previous</button>
+            <span style="font-weight:700;font-size:0.85rem;padding:0 6px;">${currentViewersPage} / ${totalPages}</span>
+            <button type="button" id="viewers-report-next" class="admin-button small-button" ${currentViewersPage >= totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>Next ▶</button>
+          </div>
+        </div>
+      `}
     `;
+
+    // Bind Filter Dropdown Events
+    document.getElementById('sel_filter_video_title')?.addEventListener('change', (e) => {
+      selectedVideoTitleFilter = e.target.value;
+      currentViewersPage = 1;
+      renderVideoViewersTable();
+    });
+
+    document.getElementById('sel_filter_video_action')?.addEventListener('change', (e) => {
+      selectedVideoActionFilter = e.target.value;
+      currentViewersPage = 1;
+      renderVideoViewersTable();
+    });
+
+    document.getElementById('btn_reset_video_filters')?.addEventListener('click', () => {
+      selectedVideoTitleFilter = 'all';
+      selectedVideoActionFilter = 'all';
+      currentViewersPage = 1;
+      renderVideoViewersTable();
+    });
+
+    document.querySelectorAll('.btn-filter-this-video').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedVideoTitleFilter = btn.dataset.vtitle || 'all';
+        currentViewersPage = 1;
+        renderVideoViewersTable();
+      });
+    });
 
     document.getElementById('viewers-report-prev')?.addEventListener('click', () => {
       if (currentViewersPage > 1) { currentViewersPage--; renderVideoViewersTable(); }

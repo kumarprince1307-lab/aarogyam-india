@@ -3536,6 +3536,16 @@
           (v.format === 'short_reel' || v.id.startsWith('VID_S') || v.category === 'Shorts & Reels' || v.duration === '1:00' || v.duration === '0:58')
         );
 
+        // Smart Zero-Egress Priority & Chronological Order Algorithm
+        shortsList.sort((a, b) => {
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          const pA = Number(a.priority || a.order_index || 0);
+          const pB = Number(b.priority || b.order_index || 0);
+          if (pB !== pA) return pB - pA;
+          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        });
+
         activeReelsList = shortsList;
 
         if (shortsList.length === 0) {
@@ -3585,6 +3595,7 @@
         document.getElementById('wb_reels_modal')?.classList.remove('active');
         document.body.classList.remove('wb-reels-open');
         document.documentElement.classList.remove('wb-modal-active');
+        closeReelCommentsTray();
         const ifr = document.getElementById('wb_reel_iframe_main');
         if (ifr) ifr.src = '';
         document.querySelectorAll('.pure-css-fullscreen, .fullscreen-active').forEach(el => {
@@ -3617,6 +3628,19 @@
         document.getElementById('wb_reel_counter_badge').textContent = `${idx + 1} / ${activeReelsList.length}`;
         document.getElementById('wb_reel_caption_title').textContent = reel.title;
         document.getElementById('wb_reel_caption_speaker').textContent = `👤 ${reel.speaker || 'आरोग्यम कृषि विशेषज्ञ'}`;
+
+        // Persistent Like state for this reel
+        const isLiked = localStorage.getItem(`at_liked_${reel.id}`) === 'true';
+        const likeIcon = document.getElementById('wb_reel_like_icon');
+        const likeCount = document.getElementById('wb_reel_like_count');
+        if (likeIcon) likeIcon.style.color = isLiked ? '#ef4444' : '#F43F5E';
+        if (likeCount) likeCount.textContent = isLiked ? 'Liked ❤️' : (reel.likes || '1.2K');
+
+        // Comment count badge for this reel
+        let comments = [];
+        try { comments = JSON.parse(localStorage.getItem(`at_comments_${reel.id}`) || '[]'); } catch(e) {}
+        const cCountEl = document.getElementById('wb_reel_comment_count');
+        if (cCountEl) cCountEl.textContent = comments.length > 0 ? comments.length : (reel.comments_count || '24');
 
         const ifr = document.getElementById('wb_reel_iframe_main');
         const url = reel.video_url || reel.youtube_url || '';
@@ -3662,6 +3686,31 @@
           ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=0&playsinline=1&origin=${encodeURIComponent(origin)}`;
         }
       }
+
+      window.likeCurrentReel = function () {
+        const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
+        if (!reel) return;
+        const isLiked = localStorage.getItem(`at_liked_${reel.id}`) === 'true';
+        const icon = document.getElementById('wb_reel_like_icon');
+        const count = document.getElementById('wb_reel_like_count');
+
+        if (isLiked) {
+          if (icon) {
+            icon.style.transform = 'scale(1.2)';
+            setTimeout(() => { icon.style.transform = 'scale(1)'; }, 150);
+          }
+          return;
+        }
+
+        localStorage.setItem(`at_liked_${reel.id}`, 'true');
+        if (icon) {
+          icon.style.transform = 'scale(1.4)';
+          icon.style.color = '#ef4444';
+          setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
+        }
+        if (count) count.textContent = 'Liked ❤️';
+        logVideoActivity('like', reel);
+      };
 
       window.toggleReelPlayPause = function() {
         const now = Date.now();
@@ -3749,21 +3798,6 @@
         }
       };
 
-      window.likeCurrentReel = function () {
-        const icon = document.getElementById('wb_reel_like_icon');
-        const count = document.getElementById('wb_reel_like_count');
-        if (icon) {
-          icon.style.transform = 'scale(1.4)';
-          setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
-        }
-        if (count) count.textContent = 'Liked ❤️';
-        logVideoActivity('like', activeReelsList[currentReelIndex]);
-      };
-
-      window.openReelComments = function () {
-        const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
-        window.openCommentsDrawer(reel);
-      };
 
       // Full Touch Swipe + Tap Play/Pause + Mouse Wheel Scroll + Keyboard Space/Arrows
       function setupReelsGesturesAndScroll() {
@@ -3968,6 +4002,17 @@
         if (speakerEl) speakerEl.textContent = vidObj.speaker || 'आरोग्यम कृषि विशेषज्ञ';
         if (timeTagEl) timeTagEl.textContent = `⏱️ ${vidObj.duration || '45 मिनट'} • सम्पूर्ण प्रैक्टिकल ट्रेनिंग`;
         if (descEl) descEl.textContent = vidObj.description || `${vidObj.title} — विशेषज्ञों द्वारा तैयार संपूर्ण वैज्ञानिक एवं प्रैक्टिकल कृषि गाइड।`;
+
+        // Persistent Like state for this masterclass
+        const isLiked = localStorage.getItem(`at_liked_${vidObj.id}`) === 'true';
+        const likeIcon = document.getElementById('at_like_icon');
+        const likeCount = document.getElementById('at_like_count');
+        const fsLikeIcon = document.getElementById('at_fs_like_icon');
+        const fsLikeCount = document.getElementById('at_fs_like_count');
+        if (likeIcon) likeIcon.style.color = isLiked ? '#ef4444' : '#ef4444';
+        if (likeCount) likeCount.textContent = isLiked ? 'Liked ❤️' : (vidObj.likes || '1.4K');
+        if (fsLikeIcon) fsLikeIcon.style.color = isLiked ? '#ef4444' : '#ef4444';
+        if (fsLikeCount) fsLikeCount.textContent = isLiked ? 'Liked ❤️' : (vidObj.likes || '1.4K');
 
         renderModalSuggestedVideos(vidObj.id);
         renderMasterclassComments(vidObj.id);
@@ -4218,23 +4263,37 @@
 
       window.likeMasterclassVideo = function(e) {
         const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
-        if (vid) logVideoActivity('like', vid);
+        if (!vid) return;
 
+        const isLiked = localStorage.getItem(`at_liked_${vid.id}`) === 'true';
         const icon = document.getElementById('at_like_icon');
         const countEl = document.getElementById('at_like_count');
         const fsIcon = document.getElementById('at_fs_like_icon');
         const fsCount = document.getElementById('at_fs_like_count');
 
+        if (isLiked) {
+          if (icon) {
+            icon.style.transform = 'scale(1.2)';
+            setTimeout(() => { icon.style.transform = 'scale(1)'; }, 150);
+          }
+          return;
+        }
+
+        localStorage.setItem(`at_liked_${vid.id}`, 'true');
         if (icon) {
           icon.style.transform = 'scale(1.4)';
+          icon.style.color = '#ef4444';
           setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
         }
         if (countEl) countEl.textContent = 'Liked ❤️';
         if (fsIcon) {
           fsIcon.style.transform = 'scale(1.4)';
+          fsIcon.style.color = '#ef4444';
           setTimeout(() => { fsIcon.style.transform = 'scale(1)'; }, 200);
         }
         if (fsCount) fsCount.textContent = 'Liked ❤️';
+
+        logVideoActivity('like', vid);
 
         const targetBtn = (e && e.currentTarget) || document.getElementById('at_like_btn') || document.getElementById('at_fs_like_btn');
         window.triggerFloatingHearts(targetBtn);
