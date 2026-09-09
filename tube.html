@@ -2229,6 +2229,219 @@
       text-align: center;
       display: none;
     }
+
+    /* YouTube Style Inline Comments Section */
+    .at-yt-comments-section {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1.5px solid var(--yt-border);
+    }
+    .at-yt-comments-header {
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .at-yt-comment-form {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: flex-start;
+    }
+    .at-yt-user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.88rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.4);
+    }
+    .at-yt-input-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .at-yt-input-wrap input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--yt-border);
+      color: var(--yt-text);
+      padding: 6px 0;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    .at-yt-input-wrap input:focus {
+      border-bottom-color: #3b82f6;
+    }
+    .at-yt-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .at-yt-cancel-btn {
+      background: transparent;
+      border: none;
+      color: var(--yt-text-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 16px;
+    }
+    .at-yt-cancel-btn:hover {
+      background: var(--yt-pill);
+      color: var(--yt-text);
+    }
+    .at-yt-submit-btn {
+      background: #2563eb;
+      border: none;
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 6px 16px;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .at-yt-submit-btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+    .at-yt-comments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .at-yt-comment-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .at-yt-comment-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 1px solid var(--yt-border);
+      color: #93c5fd;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .at-yt-comment-body {
+      flex: 1;
+    }
+    .at-yt-comment-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .at-yt-comment-author {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .at-yt-comment-time {
+      font-size: 0.72rem;
+      color: var(--yt-text-dim);
+    }
+    .at-yt-comment-text {
+      font-size: 0.88rem;
+      color: var(--yt-text-muted);
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    /* Reels Slide-up Comments Tray */
+    .wb-reels-comments-tray {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 60%;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px 16px 0 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.6);
+      transition: transform 0.25s ease;
+    }
+    .wb-reels-tray-header {
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .wb-reels-tray-close {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.3rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .wb-reels-tray-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 220px;
+    }
+    .wb-reels-tray-form {
+      padding: 8px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      gap: 8px;
+      background: rgba(11, 17, 32, 0.9);
+    }
+    .wb-reels-tray-form input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      outline: none;
+    }
+    .wb-reels-tray-form button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -2489,6 +2702,30 @@
           <div class="at-video-desc-box" id="at_current_desc">
             विशेषज्ञों द्वारा रिकॉर्ड की गई संपूर्ण कृषि मास्टरक्लास लाइब्रेरी।
           </div>
+
+          <!-- YouTube Style Inline Comments Section -->
+          <div class="at-yt-comments-section" id="at_master_comments_sec">
+            <div class="at-yt-comments-header">
+              <span id="at_comments_count_title" style="font-size: 1.05rem; font-weight: 800; color: #fff;">💬 टिप्पणियां (Comments)</span>
+            </div>
+            
+            <!-- Comment Input Box -->
+            <form id="at_yt_inline_comment_form" onsubmit="window.handleInlineCommentSubmit(event)" class="at-yt-comment-form">
+              <div class="at-yt-user-avatar" id="at_yt_user_avatar">AI</div>
+              <div class="at-yt-input-wrap">
+                <input type="text" id="at_yt_comment_input" placeholder="एक सार्वजनिक टिप्पणी (Comment) जोड़ें..." required autocomplete="off" />
+                <div class="at-yt-form-actions">
+                  <button type="button" class="at-yt-cancel-btn" onclick="document.getElementById('at_yt_comment_input').value=''">रद्द करें</button>
+                  <button type="submit" class="at-yt-submit-btn">टिप्पणी पोस्ट करें</button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Comments List -->
+            <div id="at_yt_comments_list" class="at-yt-comments-list">
+              <!-- Dynamically populated comments -->
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2573,6 +2810,19 @@
       <div class="wb-reels-caption">
         <div id="wb_reel_caption_title" class="wb-reels-caption-title">रील शीर्षक</div>
         <div id="wb_reel_caption_speaker" class="wb-reels-caption-speaker">आरोग्यम कृषि विशेषज्ञ</div>
+      </div>
+
+      <!-- Reels Collapsible Comments Tray (Slide-up, easy close) -->
+      <div id="wb_reels_comments_tray" class="wb-reels-comments-tray" style="display:none;">
+        <div class="wb-reels-tray-header">
+          <span>💬 रील टिप्पणियां</span>
+          <button type="button" class="wb-reels-tray-close" onclick="window.closeReelCommentsTray()">&times;</button>
+        </div>
+        <div id="wb_reels_comments_list" class="wb-reels-tray-list"></div>
+        <form id="wb_reels_comment_form" onsubmit="window.handleReelCommentSubmit(event)" class="wb-reels-tray-form">
+          <input type="text" id="wb_reels_comment_input" placeholder="टिप्पणी लिखें..." required />
+          <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
       </div>
     </div>
   </div>
@@ -2671,28 +2921,7 @@
     </div>
   </div>
 
-  <!-- =========================================
-       6. INTERACTIVE COMMENTS DRAWER / MODAL
-       ========================================== -->
-  <div id="at_comments_drawer" class="at-tube-gate-overlay" style="z-index:999999;" role="dialog" aria-modal="true">
-    <div class="at-tube-gate-card" style="max-width:440px; max-height:85vh; display:flex; flex-direction:column; padding:0; overflow:hidden;">
-      <div class="at-tube-gate-header" style="padding:14px 18px; border-bottom:1px solid var(--yt-border); background:var(--yt-surface);">
-        <div class="at-tube-gate-title" style="font-size:1.02rem;">
-          <span>💬 कमेंट्स एवं प्रतिक्रियाएं</span>
-        </div>
-        <button type="button" class="at-tube-gate-close" onclick="window.closeCommentsDrawer()" title="बंद करें">&times;</button>
-      </div>
-      <div id="at_comments_list" style="flex:1; overflow-y:auto; padding:14px 18px; display:flex; flex-direction:column; gap:10px; min-height:180px; max-height:360px;">
-        <!-- Dynamic comment cards -->
-      </div>
-      <form id="at_comment_submit_form" onsubmit="window.handleCommentSubmit(event)" style="padding:12px 16px; background:var(--yt-surface); border-top:1px solid var(--yt-border); display:flex; gap:8px; align-items:center;">
-        <input type="text" id="at_new_comment_input" placeholder="अपनी प्रतिक्रिया या सवाल लिखें..." required style="flex:1; background:var(--yt-pill); border:1px solid var(--yt-border); border-radius:22px; color:#fff; padding:8px 14px; font-size:0.88rem; outline:none;" />
-        <button type="submit" style="background:#2563eb; color:#fff; border:none; border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
-          <i class="fa-solid fa-paper-plane" style="font-size:0.9rem;"></i>
-        </button>
-      </form>
-    </div>
-  </div>
+
 
   <!-- Scripts -->
   <script src="/session.js"></script>
@@ -3113,10 +3342,8 @@
       };
 
       // -------------------------------------------------------------
-      // 3.1 ZERO-EGRESS ACTIVITY TRACKER & INTERACTIVE COMMENTS ENGINE
+      // 3.1 ZERO-EGRESS ACTIVITY TRACKER & YOUTUBE STYLE COMMENTS ENGINE
       // -------------------------------------------------------------
-      let activeCommentVideoObj = null;
-
       function logVideoActivity(actionType, videoObj, extraData = {}) {
         if (!db) return;
         const uplineShareId = getActiveUplineShareId();
@@ -3127,7 +3354,6 @@
         const vidId = videoObj?.id || extraData?.videoId || 'VID_001';
         const vidTitle = videoObj?.title || extraData?.videoTitle || 'AarogyamTube Video';
 
-        // Check if sharer has a valid UUID profile_id
         let profileUUID = null;
         if (currentSharerProfile && currentSharerProfile.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(currentSharerProfile.id)) {
           profileUUID = currentSharerProfile.id;
@@ -3158,74 +3384,66 @@
         })();
       }
 
-      window.openCommentsDrawer = function (vidObj) {
-        activeCommentVideoObj = vidObj || currentMasterclassVideo || activeReelsList[currentReelIndex] || allRecordings[0];
-        const drawer = document.getElementById('at_comments_drawer');
-        if (!drawer) return;
-        
-        renderCommentsList();
-        drawer.classList.add('active');
-        document.body.classList.add('wb-modal-active');
-      };
+      // --- YouTube-Style Inline Comments (Masterclass) ---
+      function renderMasterclassComments(vidId) {
+        const listEl = document.getElementById('at_yt_comments_list');
+        const countTitle = document.getElementById('at_comments_count_title');
+        const userAvatar = document.getElementById('at_yt_user_avatar');
+        if (!listEl) return;
 
-      window.closeCommentsDrawer = function () {
-        const drawer = document.getElementById('at_comments_drawer');
-        if (drawer) drawer.classList.remove('active');
-        document.body.classList.remove('wb-modal-active');
-      };
+        let uObj = {};
+        try { uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+        const viewerName = localStorage.getItem('aim_user_name') || uObj.name || uObj.full_name || 'किसान साथी';
+        if (userAvatar) {
+          userAvatar.textContent = viewerName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'AI';
+        }
 
-      function renderCommentsList() {
-        const listEl = document.getElementById('at_comments_list');
-        if (!listEl || !activeCommentVideoObj) return;
-
-        const vidId = activeCommentVideoObj.id || 'VID_001';
         let comments = [];
         try {
           comments = JSON.parse(localStorage.getItem(`at_comments_${vidId}`) || '[]');
         } catch(e) {}
 
+        if (countTitle) {
+          countTitle.textContent = `💬 ${comments.length} टिप्पणियां (Comments)`;
+        }
+
         if (comments.length === 0) {
           listEl.innerHTML = `
-            <div style="text-align:center; padding:2rem 1rem; color:var(--yt-text-dim);">
-              <div style="font-size:2rem; margin-bottom:6px;">💬</div>
-              <strong style="color:var(--yt-text-muted); font-size:0.9rem;">अभी तक कोई कमेंट नहीं है।</strong>
-              <p style="font-size:0.8rem; margin-top:4px;">सबसे पहले अपनी प्रतिक्रिया या सवाल साझा करें!</p>
+            <div style="padding: 1.5rem 0; color: var(--yt-text-dim); font-size: 0.88rem;">
+              अभी तक कोई टिप्पणी नहीं है। इस मास्टरक्लास पर सबसे पहले अपनी प्रतिक्रिया लिखें!
             </div>
           `;
           return;
         }
 
         listEl.innerHTML = comments.map(c => `
-          <div style="background:var(--yt-pill); border:1px solid var(--yt-border); border-radius:12px; padding:10px 12px; display:flex; gap:10px; align-items:flex-start;">
-            <div style="width:34px; height:34px; border-radius:50%; background:#2563eb; color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:0.82rem; flex-shrink:0;">
+          <div class="at-yt-comment-item">
+            <div class="at-yt-comment-avatar">
               ${(c.name || 'AI').slice(0, 2).toUpperCase()}
             </div>
-            <div style="flex:1;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong style="font-size:0.86rem; color:#fff;">${c.name}</strong>
-                <span style="font-size:0.72rem; color:var(--yt-text-dim);">${c.time}</span>
+            <div class="at-yt-comment-body">
+              <div class="at-yt-comment-meta">
+                <span class="at-yt-comment-author">${c.name}</span>
+                <span class="at-yt-comment-time">${c.time}</span>
               </div>
-              <div style="font-size:0.84rem; color:var(--yt-text-muted); margin-top:3px; word-break:break-word;">
-                ${c.text}
-              </div>
+              <div class="at-yt-comment-text">${c.text}</div>
             </div>
           </div>
         `).join('');
       }
 
-      window.handleCommentSubmit = function (e) {
+      window.handleInlineCommentSubmit = function(e) {
         if (e && e.preventDefault) e.preventDefault();
-        const input = document.getElementById('at_new_comment_input');
-        if (!input || !input.value.trim() || !activeCommentVideoObj) return;
+        const input = document.getElementById('at_yt_comment_input');
+        if (!input || !input.value.trim() || !currentMasterclassVideo) return;
 
         const commentText = input.value.trim();
-        const vidId = activeCommentVideoObj.id || 'VID_001';
+        const vidId = currentMasterclassVideo.id || 'VID_001';
 
         let uObj = {};
         try { uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
         const name = localStorage.getItem('aim_user_name') || uObj.name || uObj.full_name || 'किसान साथी';
 
-        // 1. Save to Local Feed
         let comments = [];
         try { comments = JSON.parse(localStorage.getItem(`at_comments_${vidId}`) || '[]'); } catch(e) {}
         comments.unshift({
@@ -3235,11 +3453,75 @@
         });
         try { localStorage.setItem(`at_comments_${vidId}`, JSON.stringify(comments)); } catch(e) {}
 
-        // 2. Log to Zero-Egress Database (so Admin sees in Tab 4)
-        logVideoActivity('comment', activeCommentVideoObj, { comment: commentText });
+        // Log zero-egress to Supabase for admin
+        logVideoActivity('comment', currentMasterclassVideo, { comment: commentText });
 
         input.value = '';
-        renderCommentsList();
+        renderMasterclassComments(vidId);
+      };
+
+      // --- Reels Collapsible Tray Comments ---
+      window.openReelComments = function() {
+        const tray = document.getElementById('wb_reels_comments_tray');
+        const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
+        if (!tray || !reel) return;
+        renderReelsComments(reel.id);
+        tray.style.display = 'flex';
+      };
+
+      window.closeReelCommentsTray = function() {
+        const tray = document.getElementById('wb_reels_comments_tray');
+        if (tray) tray.style.display = 'none';
+      };
+
+      function renderReelsComments(reelId) {
+        const listEl = document.getElementById('wb_reels_comments_list');
+        if (!listEl) return;
+        let comments = [];
+        try { comments = JSON.parse(localStorage.getItem(`at_comments_${reelId}`) || '[]'); } catch(e) {}
+
+        if (comments.length === 0) {
+          listEl.innerHTML = '<div style="color:#94a3b8; font-size:0.8rem; text-align:center; padding:12px;">इस रील पर पहली टिप्पणी करें!</div>';
+          return;
+        }
+
+        listEl.innerHTML = comments.map(c => `
+          <div style="display:flex; gap:8px; align-items:flex-start;">
+            <div style="width:26px; height:26px; border-radius:50%; background:#2563eb; color:#fff; font-weight:800; font-size:0.7rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              ${(c.name || 'AI').slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <div style="font-size:0.75rem; font-weight:800; color:#fff;">${c.name} <span style="font-size:0.65rem; color:#94a3b8; font-weight:normal;">${c.time}</span></div>
+              <div style="font-size:0.8rem; color:#cbd5e1; margin-top:2px;">${c.text}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      window.handleReelCommentSubmit = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const input = document.getElementById('wb_reels_comment_input');
+        const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
+        if (!input || !input.value.trim() || !reel) return;
+
+        const commentText = input.value.trim();
+        let uObj = {};
+        try { uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+        const name = localStorage.getItem('aim_user_name') || uObj.name || uObj.full_name || 'किसान साथी';
+
+        let comments = [];
+        try { comments = JSON.parse(localStorage.getItem(`at_comments_${reel.id}`) || '[]'); } catch(e) {}
+        comments.unshift({
+          name: name,
+          text: commentText,
+          time: new Date().toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' })
+        });
+        try { localStorage.setItem(`at_comments_${reel.id}`, JSON.stringify(comments)); } catch(e) {}
+
+        logVideoActivity('comment', reel, { comment: commentText });
+
+        input.value = '';
+        renderReelsComments(reel.id);
       };
 
       // -------------------------------------------------------------
@@ -3329,6 +3611,8 @@
       function loadReelAtIndex(idx) {
         const reel = activeReelsList[idx];
         if (!reel) return;
+
+        closeReelCommentsTray();
 
         document.getElementById('wb_reel_counter_badge').textContent = `${idx + 1} / ${activeReelsList.length}`;
         document.getElementById('wb_reel_caption_title').textContent = reel.title;
@@ -3686,6 +3970,7 @@
         if (descEl) descEl.textContent = vidObj.description || `${vidObj.title} — विशेषज्ञों द्वारा तैयार संपूर्ण वैज्ञानिक एवं प्रैक्टिकल कृषि गाइड।`;
 
         renderModalSuggestedVideos(vidObj.id);
+        renderMasterclassComments(vidObj.id);
 
         const ytId = vidObj.youtube_id || extractYoutubeVideoId(vidObj.video_url) || 'aqz-KE-bpKQ';
         const ifr = document.getElementById('at_master_iframe_main');
@@ -3956,8 +4241,14 @@
       };
 
       window.commentMasterclassVideo = function() {
-        const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
-        window.openCommentsDrawer(vid);
+        const commentSection = document.getElementById('at_master_comments_sec');
+        const input = document.getElementById('at_yt_comment_input');
+        if (commentSection) {
+          commentSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        if (input) {
+          setTimeout(() => input.focus(), 350);
+        }
       };
 
       // -------------------------------------------------------------
