@@ -3010,32 +3010,23 @@
         if (!playerWrap) return;
 
         const isFull = document.body.classList.contains('cinema-fullscreen-mode') ||
-                       playerWrap.classList.contains('fullscreen-active') ||
-                       Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+                       playerWrap.classList.contains('fullscreen-active');
 
         if (!isFull) {
+          // Pure CSS Cinema Fullscreen Mode: smooth, instant, zero-flicker on all devices
           document.body.classList.add('cinema-fullscreen-mode');
           document.documentElement.classList.add('cinema-fullscreen-mode');
           if (modal) modal.classList.add('cinema-modal-fullscreen');
           playerWrap.classList.add('fullscreen-active', 'pure-css-fullscreen');
 
-          try {
-            const req = playerWrap.requestFullscreen ||
-                        playerWrap.webkitRequestFullscreen ||
-                        playerWrap.mozRequestFullScreen ||
-                        playerWrap.msRequestFullscreen ||
-                        document.documentElement.requestFullscreen;
-            if (req) {
-              const res = req.call(playerWrap);
-              if (res && res.catch) res.catch(() => {});
-            }
-          } catch(e) {}
-
-          try {
-            if (screen.orientation && screen.orientation.lock) {
-              screen.orientation.lock('landscape').catch(() => {});
-            }
-          } catch(e) {}
+          const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+          if (!isMobile) {
+            try {
+              if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+              }
+            } catch(e) {}
+          }
         } else {
           document.body.classList.remove('cinema-fullscreen-mode');
           document.documentElement.classList.remove('cinema-fullscreen-mode');
@@ -3043,14 +3034,8 @@
           playerWrap.classList.remove('fullscreen-active', 'pure-css-fullscreen');
 
           try {
-            if (screen.orientation && screen.orientation.unlock) {
-              screen.orientation.unlock();
-            }
-          } catch(e) {}
-
-          try {
-            if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-              const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+              const exit = document.exitFullscreen || document.webkitExitFullscreen;
               if (exit) exit.call(document).catch(() => {});
             }
           } catch(e) {}
