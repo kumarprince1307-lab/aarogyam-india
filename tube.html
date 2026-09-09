@@ -1010,16 +1010,36 @@
       }
     }
 
-    /* Fullscreen Auto-Hide Controls (Fade out when watching) */
-    .at-fs-autohide .at-fs-hud-overlay,
+    /* Fullscreen Auto-Hide Controls (Fade out when watching, BUT EXIT BUTTON ALWAYS STAYS VISIBLE) */
+    .at-fs-autohide .at-fs-hud-overlay {
+      background: transparent !important;
+    }
+
+    .at-fs-autohide .at-fs-hud-left,
+    .at-fs-autohide .at-fs-hud-right .at-fs-call,
+    .at-fs-autohide .at-fs-hud-right .at-fs-wa,
     .at-fs-autohide .at-fs-bottom-rail {
       opacity: 0 !important;
       pointer-events: none !important;
       transition: opacity 0.4s ease !important;
     }
 
+    /* ALWAYS KEEP EXIT & CLOSE BUTTONS VISIBLE IN FULLSCREEN */
+    .at-fs-hud-overlay .at-fs-exit,
+    .at-fs-autohide .at-fs-hud-overlay .at-fs-exit,
+    .at-exit-fs-top-btn,
+    .at-fs-autohide .at-exit-fs-top-btn {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+      display: inline-flex !important;
+    }
+
     .at-fs-hud-overlay,
-    .at-fs-bottom-rail {
+    .at-fs-bottom-rail,
+    .at-fs-hud-left,
+    .at-fs-hud-right .at-fs-call,
+    .at-fs-hud-right .at-fs-wa {
       transition: opacity 0.25s ease !important;
     }
 
@@ -2756,24 +2776,32 @@
 
         isReelPlaying = true;
         if (ifr) {
-          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=1&playsinline=1`;
+          const origin = encodeURIComponent(window.location.origin || (window.location.protocol + '//' + window.location.host));
+          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=1&playsinline=1&origin=${origin}&widgetid=1`;
         }
       }
 
       let isReelPlaying = true;
+      let lastReelToggleTime = 0;
 
       window.toggleReelPlayPause = function() {
+        const now = Date.now();
+        if (now - lastReelToggleTime < 320) return; // Prevent double-trigger on mobile
+        lastReelToggleTime = now;
+
         const ifr = document.getElementById('wb_reel_iframe_main');
         if (!ifr || !ifr.contentWindow) return;
 
         isReelPlaying = !isReelPlaying;
         const func = isReelPlaying ? 'playVideo' : 'pauseVideo';
+        
         try {
           ifr.contentWindow.postMessage(JSON.stringify({
             event: 'command',
             func: func,
             args: []
           }), '*');
+          ifr.contentWindow.postMessage('{"event":"command","func":"' + func + '","args":""}', '*');
         } catch(e) {}
 
         showReelPlayPauseBadge(isReelPlaying);
@@ -2852,6 +2880,7 @@
         let startX = 0;
         let startTime = 0;
         let isTouching = false;
+        let lastTouchEndTime = 0;
 
         touchSurface.addEventListener('touchstart', (e) => {
           if (e.touches.length > 0) {
@@ -2869,6 +2898,7 @@
           const diffY = startY - endY;
           const diffX = startX - endX;
           const duration = Date.now() - startTime;
+          lastTouchEndTime = Date.now();
 
           if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX)) {
             if (diffY > 0) {
@@ -2883,8 +2913,9 @@
           isTouching = false;
         }, { passive: true });
 
-        // 2. Desktop Click on Video -> Toggle Play / Pause
+        // 2. Desktop Click on Video -> Toggle Play / Pause (ignoring touch-simulated clicks)
         touchSurface.addEventListener('click', () => {
+          if (Date.now() - lastTouchEndTime < 500) return; // Prevent double-trigger from touch
           window.toggleReelPlayPause();
         });
 
