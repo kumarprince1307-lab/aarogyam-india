@@ -23,7 +23,8 @@
 
   async function fetchBooks() {
     try {
-      const res = await fetch('/data/books.json?v=' + Date.now());
+      const cacheTime = Math.floor(Date.now() / 300000);
+      const res = await fetch('/data/books.json?v=' + cacheTime);
       if (res.ok) {
         const json = await res.json();
         allBooks = json.books || [];

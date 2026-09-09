@@ -801,9 +801,10 @@ export async function initWebinars() {
   // INITIALIZE DATA & EVENT BINDINGS
   // -------------------------------------------------------------
   async function loadData() {
+    const cacheTime = Math.floor(Date.now() / 300000);
     // 1. Master Webinar JSON
     try {
-      const resp = await fetch('/data/webinar-master.json?v=' + Date.now());
+      const resp = await fetch('/data/webinar-master.json?v=' + cacheTime);
       if (resp.ok) {
         const json = await resp.json();
         const wm = json.webinarMaster || json || {};
@@ -813,7 +814,7 @@ export async function initWebinars() {
 
     // 2. Recordings, Channels, Categories, Playlists JSON
     try {
-      const rResp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
+      const rResp = await fetch('/data/webinar-recordings.json?v=' + cacheTime);
       if (rResp.ok) {
         const rJson = await rResp.json();
         const list = Array.isArray(rJson.recordings) ? rJson.recordings : (Array.isArray(rJson) ? rJson : []);

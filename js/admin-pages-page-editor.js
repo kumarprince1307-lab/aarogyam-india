@@ -525,10 +525,11 @@ export async function initPageEditor() {
     localStorage.setItem('AAROGYAM_SITE_PAGES_CONFIG', JSON.stringify(allPages));
   } catch (e) {}
 
-  // Load books for marketing card select dropdown
+  // Load books for marketing card select dropdown (Zero-Egress 5-Min Rolling HTTP Cache)
   let availableBooks = [];
   try {
-    const res = await fetch('/data/books.json?v=' + Date.now());
+    const cacheTime = Math.floor(Date.now() / 300000);
+    const res = await fetch('/data/books.json?v=' + cacheTime);
     if (res.ok) {
       const j = await res.json();
       availableBooks = j.books || [];

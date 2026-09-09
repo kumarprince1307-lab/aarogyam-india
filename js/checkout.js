@@ -168,13 +168,14 @@ async function loadBook() {
         const customAmount = params.get("amount") || params.get("price");
 
         let booksArray = [];
+        const cacheTime = Math.floor(Date.now() / 300000);
         try {
-            const response = await fetch("/data/books.json?v=" + Date.now());
+            const response = await fetch("/data/books.json?v=" + cacheTime);
             const jsonResult = await response.json();
             booksArray = Array.isArray(jsonResult) ? jsonResult : (jsonResult.books || []);
         } catch (e) {
             try {
-                const response2 = await fetch("../data/books.json?v=" + Date.now());
+                const response2 = await fetch("../data/books.json?v=" + cacheTime);
                 const jsonResult2 = await response2.json();
                 booksArray = Array.isArray(jsonResult2) ? jsonResult2 : (jsonResult2.books || []);
             } catch (e2) {

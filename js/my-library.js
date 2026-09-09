@@ -398,7 +398,8 @@ async function loadLibraryData() {
     try {
         let jsonBooks = [];
         try {
-            const res = await fetch('/data/books.json?v=' + Date.now());
+            const cacheTime = Math.floor(Date.now() / 300000);
+            const res = await fetch('/data/books.json?v=' + cacheTime);
             if (res.ok) {
                 const data = await res.json();
                 jsonBooks = data.books || [];
@@ -477,26 +478,51 @@ async function renderLibrarySections(booksArray) {
 
     if (!booksArray) return;
 
-    // 1. Gather all purchases (LocalStorage + Supabase)
+    // 1. Gather all purchases (LocalStorage + Zero-Egress Session/Supabase Cache)
     const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
     let userPurchases = [...localPurchases];
 
     const localUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     if (localUser.id) {
+        let cachedSupabasePurchases = null;
         try {
-            const activeDb = window.dbClient || window.supabase || (typeof db !== 'undefined' ? db : null);
-            if (activeDb) {
-                const { data } = await activeDb.from('purchases').select('*').eq('profile_id', localUser.id);
-                if (data && data.length) {
-                    data.forEach(p => {
-                        if (!userPurchases.some(up => up.book_id === p.book_id)) {
-                            userPurchases.push(p);
-                        }
-                    });
+            const rawCached = sessionStorage.getItem('AIM_PURCHASES_CACHE_' + localUser.id);
+            if (rawCached) {
+                const parsed = JSON.parse(rawCached);
+                if (parsed && (Date.now() - (parsed._ts || 0) < 300000) && Array.isArray(parsed.data)) {
+                    cachedSupabasePurchases = parsed.data;
                 }
             }
-        } catch (e) {
-            console.log("Purchases fetch note:", e);
+        } catch (e) {}
+
+        if (cachedSupabasePurchases) {
+            cachedSupabasePurchases.forEach(p => {
+                if (!userPurchases.some(up => up.book_id === p.book_id)) {
+                    userPurchases.push(p);
+                }
+            });
+        } else {
+            try {
+                const activeDb = window.dbClient || window.supabase || (typeof db !== 'undefined' ? db : null);
+                if (activeDb) {
+                    const { data } = await activeDb
+                        .from('purchases')
+                        .select('id, book_id, amount, payment_status, purchase_date, created_at')
+                        .eq('profile_id', localUser.id);
+                    if (data && data.length) {
+                        try {
+                            sessionStorage.setItem('AIM_PURCHASES_CACHE_' + localUser.id, JSON.stringify({ data: data, _ts: Date.now() }));
+                        } catch (e) {}
+                        data.forEach(p => {
+                            if (!userPurchases.some(up => up.book_id === p.book_id)) {
+                                userPurchases.push(p);
+                            }
+                        });
+                    }
+                }
+            } catch (e) {
+                console.log("Purchases fetch note:", e);
+            }
         }
     }
 

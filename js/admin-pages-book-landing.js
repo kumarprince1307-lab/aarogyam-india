@@ -1462,8 +1462,9 @@ export async function initBookLandingPages() {
     const tableWrap = document.getElementById('blp_table_container');
     if (tableWrap) tableWrap.innerHTML = '<div class="admin-loading">डेटा लोड हो रहा है...</div>';
 
+    const cacheTime = Math.floor(Date.now() / 300000);
     try {
-      const res = await fetch('/data/books.json?v=' + Date.now());
+      const res = await fetch('/data/books.json?v=' + cacheTime);
       if (res.ok) {
         const json = await res.json();
         allBooks = json.books || [];
@@ -1501,7 +1502,7 @@ export async function initBookLandingPages() {
 
     allLandingPages = [];
     try {
-      const res = await fetch('/data/universal-book-landing-pages.json?v=' + Date.now());
+      const res = await fetch('/data/universal-book-landing-pages.json?v=' + cacheTime);
       if (res.ok) {
         const json = await res.json();
         allLandingPages = json.bookLandingPages || [];

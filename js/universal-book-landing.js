@@ -127,9 +127,10 @@
   }
 
   async function loadBookAndLandingData() {
-    // 1. Fetch data/books.json
+    const cacheTime = Math.floor(Date.now() / 300000);
+    // 1. Fetch data/books.json (Zero-Egress 5-Min Rolling HTTP Cache)
     try {
-      const res = await fetch('/data/books.json?v=' + Date.now());
+      const res = await fetch('/data/books.json?v=' + cacheTime);
       if (res.ok) {
         const json = await res.json();
         allBooks = json.books || [];
@@ -149,9 +150,9 @@
       }
     } catch (e) {}
 
-    // 2. Fetch data/universal-book-landing-pages.json
+    // 2. Fetch data/universal-book-landing-pages.json (Zero-Egress 5-Min Rolling HTTP Cache)
     try {
-      const res = await fetch('/data/universal-book-landing-pages.json?v=' + Date.now());
+      const res = await fetch('/data/universal-book-landing-pages.json?v=' + cacheTime);
       if (res.ok) {
         const json = await res.json();
         allLandingPages = json.bookLandingPages || [];

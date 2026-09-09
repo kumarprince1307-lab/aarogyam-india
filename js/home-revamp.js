@@ -471,10 +471,11 @@
       if (Array.isArray(config.health_diseases) && config.health_diseases.length > 0) {
         list = config.health_diseases;
       } else {
+        const cacheTime = Math.floor(Date.now() / 300000);
         const urls = ['data/health-diseases.json', '/data/health-diseases.json', '../data/health-diseases.json'];
         for (const url of urls) {
           try {
-            const res = await fetch(url + '?v=' + Date.now());
+            const res = await fetch(url + '?v=' + cacheTime);
             if (res.ok) {
               const data = await res.json();
               if (Array.isArray(data.diseases) && data.diseases.length > 0) {
@@ -563,10 +564,11 @@
       if (Array.isArray(config.crops) && config.crops.length > 0) {
         list = config.crops;
       } else {
+        const cacheTime = Math.floor(Date.now() / 300000);
         const urls = ['data/crop-cards.json', '/data/crop-cards.json', '../data/crop-cards.json'];
         for (const url of urls) {
           try {
-            const res = await fetch(url + '?v=' + Date.now());
+            const res = await fetch(url + '?v=' + cacheTime);
             if (res.ok) {
               const data = await res.json();
               if (Array.isArray(data.crops) && data.crops.length > 0) {
@@ -637,10 +639,11 @@
       if (Array.isArray(config.pashu_cards) && config.pashu_cards.length > 0) {
         list = config.pashu_cards;
       } else {
+        const cacheTime = Math.floor(Date.now() / 300000);
         const urls = ['data/pashu-cards.json', '/data/pashu-cards.json', '../data/pashu-cards.json'];
         for (const url of urls) {
           try {
-            const res = await fetch(url + '?v=' + Date.now());
+            const res = await fetch(url + '?v=' + cacheTime);
             if (res.ok) {
               const data = await res.json();
               const pashuList = data.livestock || data.pashu || [];
@@ -712,10 +715,11 @@
       if (Array.isArray(config.achievers) && config.achievers.length > 0) {
         list = config.achievers;
       } else {
+        const cacheTime = Math.floor(Date.now() / 300000);
         const urls = ['data/achievers.json', '/data/achievers.json', '../data/achievers.json'];
         for (const url of urls) {
           try {
-            const res = await fetch(url + '?v=' + Date.now());
+            const res = await fetch(url + '?v=' + cacheTime);
             if (res.ok) {
               const data = await res.json();
               if (Array.isArray(data.achievers) && data.achievers.length > 0) {

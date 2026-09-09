@@ -674,10 +674,11 @@ export async function initAdminBroadcast() {
       history = JSON.parse(localStorage.getItem('AAROGYAM_GLOBAL_BROADCASTS') || '[]');
     } catch (e) {}
 
-    // If local history is empty, fetch static JSON from server
+    // If local history is empty, fetch static JSON from server (Zero-Egress 5-Min Rolling HTTP Cache)
     if (history.length === 0) {
       try {
-        const resp = await fetch('/data/broadcast-notifications.json?v=' + Date.now());
+        const cacheTime = Math.floor(Date.now() / 300000);
+        const resp = await fetch('/data/broadcast-notifications.json?v=' + cacheTime);
         if (resp.ok) {
           const json = await resp.json();
           if (Array.isArray(json.broadcasts) && json.broadcasts.length > 0) {

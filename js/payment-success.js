@@ -35,15 +35,16 @@ async function loadSuccessPage() {
         amount = amount || storedOrder.amount || storedOrder.offerPrice || "99";
         orderId = orderId || storedOrder.orderId || storedOrder.paymentId || ("TXN_" + Math.floor(100000000 + Math.random() * 900000000));
 
-        // 2. Load Book Catalog to resolve metadata
+        // 2. Load Book Catalog to resolve metadata (Zero-Egress 5-Min Rolling HTTP Cache)
         let booksCatalog = [];
+        const cacheTime = Math.floor(Date.now() / 300000);
         try {
-            const response = await fetch("/data/books.json?v=" + Date.now());
+            const response = await fetch("/data/books.json?v=" + cacheTime);
             const data = await response.json();
             booksCatalog = data.books || data || [];
         } catch (e) {
             try {
-                const response2 = await fetch("../data/books.json?v=" + Date.now());
+                const response2 = await fetch("../data/books.json?v=" + cacheTime);
                 const data2 = await response2.json();
                 booksCatalog = data2.books || data2 || [];
             } catch (e2) {}
@@ -110,13 +111,14 @@ async function loadSuccessPage() {
             }
         }
 
-        document.getElementById("amountPaid").textContent = "₹" + amount;
-        document.getElementById("orderId").textContent = orderId;
+        const amountPaidEl = document.getElementById("amountPaid");
+        if (amountPaidEl) amountPaidEl.textContent = "₹" + amount;
+        const orderIdDisplayEl = document.getElementById("orderId");
+        if (orderIdDisplayEl) orderIdDisplayEl.textContent = orderId;
 
-        // Welcome user message
         const welcomeMsgEl = document.getElementById("welcomeUserMsg");
-        if (welcomeMsgEl && (currentUser.full_name || currentUser.name)) {
-            const userName = currentUser.full_name || currentUser.name;
+        const userName = currentUser.full_name || currentUser.name;
+        if (welcomeMsgEl && userName) {
             welcomeMsgEl.innerHTML = `📌 बधाई हो, ${userName} जी! आपका पेमेंट सफल रहा।`;
         }
 
@@ -126,6 +128,14 @@ async function loadSuccessPage() {
             const myPurchasedIds = JSON.parse(localStorage.getItem('my_purchased_book_ids') || '[]');
             const activeDb = window.dbClient || window.supabase;
             const profileId = currentUser.id || null;
+
+            // Invalidate session purchase caches so next visit gets fresh data immediately
+            try {
+                if (profileId) sessionStorage.removeItem('AIM_PURCHASES_CACHE_' + profileId);
+                Object.keys(sessionStorage).forEach(k => {
+                    if (k.startsWith('AIM_PURCHASES_CACHE_')) sessionStorage.removeItem(k);
+                });
+            } catch (e) {}
 
             for (const b of resolvedBooks) {
                 // Check if this book for this order is already added

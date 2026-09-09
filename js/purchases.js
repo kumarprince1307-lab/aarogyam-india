@@ -72,11 +72,12 @@ async function fetchUserPurchases() {
         let user = getPurchasesCurrentUser();
         const client = getPurchasesClient();
 
-        // 1. Fetch Book Master Data safely
+        // 1. Fetch Book Master Data safely (Zero-Egress 5-Min Rolling HTTP Cache)
         let booksMap = new Map();
         try {
-            let res = await fetch('/data/books.json');
-            if (!res.ok) res = await fetch('../data/books.json');
+            const cacheTime = Math.floor(Date.now() / 300000);
+            let res = await fetch('/data/books.json?v=' + cacheTime);
+            if (!res.ok) res = await fetch('../data/books.json?v=' + cacheTime);
             if (res.ok) {
                 const data = await res.json();
                 const list = data.books || data;
@@ -90,7 +91,7 @@ async function fetchUserPurchases() {
 
         let purchases = [];
 
-        // 2. Fetch from Supabase Database
+        // 2. Fetch from Supabase Database (Zero-Egress Cache First)
         if (client) {
             try {
                 // If user doesn't have an ID but has mobile, fetch profile from Supabase first
@@ -108,14 +109,33 @@ async function fetchUserPurchases() {
                 }
 
                 if (user.id) {
-                    const { data: dbPurchases, error: purErr } = await client
-                        .from('purchases')
-                        .select('*')
-                        .eq('profile_id', user.id)
-                        .order('purchase_date', { ascending: false });
+                    // Check Session Cache
+                    let cachedData = null;
+                    try {
+                        const raw = sessionStorage.getItem('AIM_PURCHASES_CACHE_' + user.id);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (parsed && (Date.now() - (parsed._ts || 0) < 300000) && Array.isArray(parsed.data)) {
+                                cachedData = parsed.data;
+                            }
+                        }
+                    } catch (e) {}
 
-                    if (!purErr && dbPurchases) {
-                        purchases = dbPurchases;
+                    if (cachedData) {
+                        purchases = cachedData;
+                    } else {
+                        const { data: dbPurchases, error: purErr } = await client
+                            .from('purchases')
+                            .select('id, book_id, amount, payment_status, payment_id, order_id, purchase_date, created_at')
+                            .eq('profile_id', user.id)
+                            .order('purchase_date', { ascending: false });
+
+                        if (!purErr && dbPurchases) {
+                            purchases = dbPurchases;
+                            try {
+                                sessionStorage.setItem('AIM_PURCHASES_CACHE_' + user.id, JSON.stringify({ data: dbPurchases, _ts: Date.now() }));
+                            } catch (e) {}
+                        }
                     }
                 }
             } catch (dbErr) {

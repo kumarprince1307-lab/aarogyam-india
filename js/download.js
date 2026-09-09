@@ -148,10 +148,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 // --- DATA FETCHING FUNCTIONS ---
 
 async function fetchBookData(bookId) {
-    const response = await fetch("../data/books.json");
+    const cacheTime = Math.floor(Date.now() / 300000);
+    const response = await fetch("../data/books.json?v=" + cacheTime);
     if (!response.ok) throw new Error("Failed to load book master file.");
     const data = await response.json();
-    return data.books.find(book => book.id === bookId || book.book_id === bookId);
+    const list = Array.isArray(data.books) ? data.books : (Array.isArray(data) ? data : []);
+    return list.find(book => (book.id && book.id.toUpperCase() === String(bookId).toUpperCase()) || (book.book_id && book.book_id.toUpperCase() === String(bookId).toUpperCase()));
 }
 
 async function fetchPurchaseRecord(userId, bookId) {
@@ -160,10 +162,10 @@ async function fetchPurchaseRecord(userId, bookId) {
 
     const { data, error } = await client
         .from("purchases")
-        .select('*')
+        .select('id, profile_id, book_id, amount, payment_status, download_count, created_at')
         .eq("profile_id", userId)
         .eq("book_id", bookId)
-        .single();
+        .maybeSingle();
         
     if (error) {
         console.warn("Purchase record fetch warning:", error.message);

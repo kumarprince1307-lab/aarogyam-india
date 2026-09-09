@@ -3636,9 +3636,10 @@
           }
         } catch (e) { }
 
-        // 2. Fetch Static Git JSON & Merge seamlessly
+        // 2. Fetch Static Git JSON & Merge seamlessly (Zero-Egress 5-Min Rolling HTTP Cache)
         try {
-          const resp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
+          const cacheTime = Math.floor(Date.now() / 300000);
+          const resp = await fetch('/data/webinar-recordings.json?v=' + cacheTime);
           if (resp.ok) {
             const json = await resp.json();
             const list = Array.isArray(json.recordings) ? json.recordings : (Array.isArray(json) ? json : []);
@@ -3670,7 +3671,7 @@
       }
 
       // -------------------------------------------------------------
-      // 3. SHARER INFO & PROFILE LOOKUP & AUTH GATEKEEPER
+      // 3. SHARER INFO & PROFILE LOOKUP & AUTH GATEKEEPER (ZERO-EGRESS)
       // -------------------------------------------------------------
       function isTubeUserLoggedIn() {
         if (typeof window.isUserLoggedIn === 'function' && window.isUserLoggedIn()) {
@@ -3716,11 +3717,28 @@
 
       async function fetchSharerDetails(sId) {
         const cleanId = String(sId || getActiveUplineShareId()).trim();
+
+        // Check 10-Minute Session Cache to prevent repeat Supabase egress
+        try {
+          const cachedSharer = sessionStorage.getItem('aim_sharer_prof_' + cleanId);
+          if (cachedSharer) {
+            const parsed = JSON.parse(cachedSharer);
+            if (parsed && (Date.now() - (parsed._ts || 0) < 600000) && parsed.data) {
+              currentSharerProfile = parsed.data;
+              updateSharerUI(parsed.data);
+              return;
+            }
+          }
+        } catch(e) {}
+
         try {
           if (db) {
             const { data } = await db.from('profiles').select('id, full_name, mobile, share_id').eq('share_id', cleanId).limit(1).maybeSingle();
             if (data && (data.full_name || data.mobile)) {
               currentSharerProfile = data;
+              try {
+                sessionStorage.setItem('aim_sharer_prof_' + cleanId, JSON.stringify({ data: data, _ts: Date.now() }));
+              } catch(e) {}
               updateSharerUI(data);
               return;
             }

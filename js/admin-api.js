@@ -1982,17 +1982,23 @@ export async function fetchUcasDashboardSummary() {
 }
 
 export async function fetchUserUcasDetail(userId) {
+  const cacheKey = 'ucas_user_detail_' + userId;
+  const cached = _adminMemoryCache.get(cacheKey);
+  if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+    return cached.data;
+  }
+
   try {
     const db = getAdminDb();
     if (!db) throw new Error("Supabase client not available.");
 
     const [profileRes, purchasesRes, phonebookRes, surveysRes, lpsRes, permsRes] = await Promise.all([
-      db.from('profiles').select('*').eq('id', userId).single(),
-      db.from('purchases').select('*').eq('profile_id', userId).order('purchase_date', { ascending: false }),
-      db.from('phonebook').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
-      db.from('surveys').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
-      db.from('landing_pages').select('*').eq('profile_id', userId).order('created_at', { ascending: false }),
-      db.from('permissions').select('*').eq('profile_id', userId)
+      db.from('profiles').select('id, full_name, mobile, share_id, email, city, state, occupation, created_at, is_active').eq('id', userId).maybeSingle(),
+      db.from('purchases').select('id, book_id, amount, payment_status, payment_id, order_id, purchase_date, created_at').eq('profile_id', userId).order('purchase_date', { ascending: false }),
+      db.from('phonebook').select('id, profile_id, name, mobile, place, source, created_at').eq('profile_id', userId).order('created_at', { ascending: false }),
+      db.from('surveys').select('id, profile_id, name, mobile, category_answers, created_at').eq('profile_id', userId).order('created_at', { ascending: false }),
+      db.from('landing_pages').select('id, profile_id, share_id, title, category, status, webinar_data, created_at').eq('profile_id', userId).order('created_at', { ascending: false }),
+      db.from('permissions').select('id, profile_id, role, permissions, status').eq('profile_id', userId)
     ]);
 
     const profile = profileRes.data || {};
@@ -2130,7 +2136,7 @@ export async function fetchUserUcasDetail(userId) {
 
     activityLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    return {
+    const result = {
       success: true,
       data: {
         profile,
@@ -2143,6 +2149,9 @@ export async function fetchUserUcasDetail(userId) {
         activityLogs
       }
     };
+
+    _adminMemoryCache.set(cacheKey, { ts: Date.now(), data: result });
+    return result;
   } catch (error) {
     console.error('Failed to fetch user UCAS detail:', error);
     return { success: false, data: null, error: error.message };
