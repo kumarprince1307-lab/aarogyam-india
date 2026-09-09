@@ -928,13 +928,10 @@
       display: none !important;
     }
 
-    /* Fullscreen Player Canvas - 100% Viewport Edge-to-Edge Without Distortion */
+    /* Fullscreen Player Canvas - 100% Viewport Edge-to-Edge */
     body.cinema-fullscreen-mode #at_player_frame_wrap,
     #at_player_frame_wrap.fullscreen-active,
-    #at_player_frame_wrap.pure-css-fullscreen,
-    #at_player_frame_wrap:fullscreen,
-    #at_player_frame_wrap:-webkit-full-screen,
-    #at_player_frame_wrap:-moz-full-screen {
+    #at_player_frame_wrap.pure-css-fullscreen {
       position: fixed !important;
       inset: 0 !important;
       top: 0 !important;
@@ -960,13 +957,12 @@
       box-shadow: none !important;
       transform: none !important;
       box-sizing: border-box !important;
+      overflow: hidden !important;
     }
 
     body.cinema-fullscreen-mode #at_player_frame_wrap .at-aspect-16-9,
     #at_player_frame_wrap.fullscreen-active .at-aspect-16-9,
-    #at_player_frame_wrap.pure-css-fullscreen .at-aspect-16-9,
-    #at_player_frame_wrap:fullscreen .at-aspect-16-9,
-    #at_player_frame_wrap:-webkit-full-screen .at-aspect-16-9 {
+    #at_player_frame_wrap.pure-css-fullscreen .at-aspect-16-9 {
       position: relative !important;
       width: 100% !important;
       height: auto !important;
@@ -976,8 +972,55 @@
       aspect-ratio: 16 / 9 !important;
       background: #000000 !important;
       display: block !important;
-      margin: auto 0 !important;
+      margin: auto !important;
       flex-shrink: 0 !important;
+    }
+
+    /* Force Mobile Fullscreen to 100% Landscape even if phone is in portrait */
+    @media (orientation: portrait) and (max-width: 900px) {
+      body.cinema-fullscreen-mode #at_player_frame_wrap,
+      #at_player_frame_wrap.fullscreen-active,
+      #at_player_frame_wrap.pure-css-fullscreen {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 100vh !important;
+        width: 100dvh !important;
+        height: 100vw !important;
+        height: 100dvw !important;
+        max-width: 100dvh !important;
+        max-height: 100dvw !important;
+        transform: translate(-50%, -50%) rotate(90deg) !important;
+        transform-origin: center center !important;
+        z-index: 2147483647 !important;
+      }
+
+      body.cinema-fullscreen-mode #at_player_frame_wrap .at-aspect-16-9,
+      #at_player_frame_wrap.fullscreen-active .at-aspect-16-9,
+      #at_player_frame_wrap.pure-css-fullscreen .at-aspect-16-9 {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        aspect-ratio: auto !important;
+        position: absolute !important;
+        inset: 0 !important;
+      }
+    }
+
+    /* Fullscreen Auto-Hide Controls (Fade out when watching) */
+    .at-fs-autohide .at-fs-hud-overlay,
+    .at-fs-autohide .at-fs-bottom-rail {
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: opacity 0.4s ease !important;
+    }
+
+    .at-fs-hud-overlay,
+    .at-fs-bottom-rail {
+      transition: opacity 0.25s ease !important;
     }
 
     body.cinema-fullscreen-mode #at_player_frame_wrap iframe,
@@ -1414,13 +1457,11 @@
       left: 0;
       right: 0;
       z-index: 2147483647;
-      padding: 12px 18px;
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.6) 60%, transparent 100%);
-      backdrop-filter: blur(8px);
+      padding: 10px 16px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      transition: opacity 0.3s ease;
       pointer-events: auto;
     }
 
@@ -2490,6 +2531,7 @@
         try { renderShortsAndReels(); } catch (e) { console.error('shorts err:', e); }
         try { renderMasterclassVideos(); } catch (e) { console.error('videos err:', e); }
         try { setupReelsGesturesAndScroll(); } catch (e) { console.error('gestures err:', e); }
+        try { setupFullscreenAutoHideListeners(); } catch (e) { console.error('autohide err:', e); }
         try { updateLiveTicker(); } catch (e) { console.error('ticker err:', e); }
 
         if (specificVid) {
@@ -3004,6 +3046,33 @@
       // -------------------------------------------------------------
       // 6. TRUE FULLSCREEN ENGINE (NATIVE + CSS FALLBACK)
       // -------------------------------------------------------------
+      let fsControlsTimer = null;
+
+      function resetFullscreenControlsTimer() {
+        const wrap = document.getElementById('at_player_frame_wrap');
+        if (!wrap) return;
+
+        wrap.classList.remove('at-fs-autohide');
+        clearTimeout(fsControlsTimer);
+
+        if (document.body.classList.contains('cinema-fullscreen-mode') || wrap.classList.contains('fullscreen-active')) {
+          fsControlsTimer = setTimeout(() => {
+            wrap.classList.add('at-fs-autohide');
+          }, 3200);
+        }
+      }
+
+      function setupFullscreenAutoHideListeners() {
+        const wrap = document.getElementById('at_player_frame_wrap');
+        if (!wrap) return;
+
+        ['mousemove', 'touchstart', 'touchmove', 'click'].forEach(evtName => {
+          wrap.addEventListener(evtName, () => {
+            resetFullscreenControlsTimer();
+          }, { passive: true });
+        });
+      }
+
       window.toggleCinemaFullscreen = function() {
         const playerWrap = document.getElementById('at_player_frame_wrap');
         const modal = document.getElementById('wb_master_cinema_modal');
@@ -3019,6 +3088,8 @@
           if (modal) modal.classList.add('cinema-modal-fullscreen');
           playerWrap.classList.add('fullscreen-active', 'pure-css-fullscreen');
 
+          resetFullscreenControlsTimer();
+
           const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
           if (!isMobile) {
             try {
@@ -3031,7 +3102,8 @@
           document.body.classList.remove('cinema-fullscreen-mode');
           document.documentElement.classList.remove('cinema-fullscreen-mode');
           if (modal) modal.classList.remove('cinema-modal-fullscreen');
-          playerWrap.classList.remove('fullscreen-active', 'pure-css-fullscreen');
+          playerWrap.classList.remove('fullscreen-active', 'pure-css-fullscreen', 'at-fs-autohide');
+          clearTimeout(fsControlsTimer);
 
           try {
             if (document.fullscreenElement || document.webkitFullscreenElement) {
