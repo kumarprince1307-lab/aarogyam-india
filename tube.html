@@ -1,0 +1,2863 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title id="page_title">AarogyamTube — कृषि रील्स, शॉर्ट्स एवं मास्टरक्लास वीडियो</title>
+
+  <!-- SEO & Open Graph Meta Tags -->
+  <meta name="description" id="page_desc"
+    content="AarogyamTube पर 1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स एवं विशेषज्ञों द्वारा रिकॉर्ड की गई संपूर्ण कृषि मास्टरक्लास देखें।">
+  <meta property="og:site_name" content="AarogyamTube">
+  <meta property="og:type" content="website">
+  <meta property="og:title" id="og_title" content="🎬 AarogyamTube — कृषि शॉर्ट्स एवं वीडियो हब">
+  <meta property="og:description" id="og_desc"
+    content="1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स और संपूर्ण मास्टरक्लास लाइब्रेरी। अभी देखें।">
+  <meta property="og:image" id="og_img" content="/images/banners/agriculture-hero-banner-1.webp">
+  <meta property="og:url" id="og_url" content="https://aarogyamindia.online/tube.html">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="🎬 AarogyamTube — कृषि शॉर्ट्स एवं वीडियो हब">
+  <meta name="twitter:description" content="1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स और संपूर्ण मास्टरक्लास लाइब्रेरी।">
+  <meta name="twitter:image" content="/images/banners/agriculture-hero-banner-1.webp">
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0b1120" id="meta_theme_color">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="icon" type="image/png" href="/images/logo/aarogyamtube-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&family=Outfit:wght@600;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/my-library.css">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css">
+  <link rel="stylesheet" href="/css/user-notifications.css">
+
+  <style>
+    /* =========================================
+       CSS VARIABLES & COMPREHENSIVE THEME SYSTEM
+       ========================================== */
+    :root, [data-theme="dark"], body[data-theme="dark"] {
+      --yt-bg: #0b1120;
+      --yt-surface: #131e36;
+      --yt-card: #0f172a;
+      --yt-pill: #1e293b;
+      --yt-pill-hover: #334155;
+      --yt-text: #ffffff;
+      --yt-text-muted: #94a3b8;
+      --yt-text-dim: #64748b;
+      --yt-border: rgba(255, 255, 255, 0.12);
+      --yt-border-active: #3b82f6;
+      --yt-header-bg: #0b1120;
+      --yt-modal-bg: #0b1120;
+      --yt-shadow: rgba(0, 0, 0, 0.6);
+      --yt-footer-bg: #070d19;
+      --yt-footer-text: #94a3b8;
+      --yt-footer-head: #ffffff;
+      --yt-card-head: #ffffff;
+      --yt-desc-bg: #131e36;
+    }
+
+    [data-theme="light"], body[data-theme="light"] {
+      --yt-bg: #f8fafc;
+      --yt-surface: #ffffff;
+      --yt-card: #ffffff;
+      --yt-pill: #f1f5f9;
+      --yt-pill-hover: #e2e8f0;
+      --yt-text: #0f172a;
+      --yt-text-muted: #475569;
+      --yt-text-dim: #64748b;
+      --yt-border: #e2e8f0;
+      --yt-border-active: #2563eb;
+      --yt-header-bg: #ffffff;
+      --yt-modal-bg: #ffffff;
+      --yt-shadow: rgba(0, 0, 0, 0.08);
+      --yt-footer-bg: #0f172a;
+      --yt-footer-text: #cbd5e1;
+      --yt-footer-head: #ffffff;
+      --yt-card-head: #0f172a;
+      --yt-desc-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      background-color: var(--yt-bg) !important;
+      color: var(--yt-text) !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      height: 100% !important;
+    }
+
+    body {
+      background-color: var(--yt-bg) !important;
+      color: var(--yt-text) !important;
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden !important;
+      overflow-y: visible !important;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      padding-bottom: 70px;
+    }
+
+    /* Modal active state on root */
+    html.wb-modal-active,
+    body.wb-reels-open,
+    body.at-cinema-open {
+      overflow: hidden !important;
+      height: 100vh !important;
+    }
+
+    /* Completely hide background elements when Reel or Cinema modal is open */
+    body.wb-reels-open .at-top-sticky-unit,
+    body.wb-reels-open header,
+    body.wb-reels-open .home-live-ticker-wrap,
+    body.wb-reels-open .universal-mobile-bottom-nav,
+    body.wb-reels-open #universal-mobile-bottom-nav,
+    body.wb-reels-open .sticky-float-widget-container,
+    body.wb-reels-open .at-floating-rail,
+    body.wb-reels-open .recent-purchase-toast-wrap,
+    body.wb-reels-open #toast-container,
+    body.wb-reels-open .universal-nav-drawer,
+    body.at-cinema-open .at-top-sticky-unit,
+    body.at-cinema-open header,
+    body.at-cinema-open .home-live-ticker-wrap,
+    body.at-cinema-open .universal-mobile-bottom-nav,
+    body.at-cinema-open #universal-mobile-bottom-nav,
+    body.at-cinema-open .sticky-float-widget-container,
+    body.at-cinema-open .at-floating-rail,
+    body.at-cinema-open .recent-purchase-toast-wrap,
+    body.at-cinema-open #toast-container,
+    body.at-cinema-open .universal-nav-drawer {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* Sticky Top Unit (Header on top, Ticker underneath, Never overlapping) */
+    .at-top-sticky-unit {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 1000 !important;
+      background: var(--yt-header-bg) !important;
+      border-bottom: 1.5px solid var(--yt-border) !important;
+      box-shadow: 0 4px 18px var(--yt-shadow) !important;
+      transition: all 0.25s ease;
+      width: 100% !important;
+    }
+
+    .at-top-sticky-unit header,
+    .at-top-sticky-unit .header {
+      position: relative !important;
+      top: auto !important;
+      z-index: 2 !important;
+    }
+
+    /* Live proof continuous marquee ticker - Always underneath header */
+    .home-live-ticker-wrap,
+    .at-top-sticky-unit .home-live-ticker-wrap {
+      position: relative !important;
+      top: auto !important;
+      z-index: 1 !important;
+      background: linear-gradient(90deg, #1e3a8a 0%, #1d4ed8 50%, #1e40af 100%) !important;
+      color: #ffffff !important;
+      padding: 6px 12px !important;
+      font-size: 0.78rem !important;
+      font-weight: 700 !important;
+      overflow: hidden !important;
+      display: flex !important;
+      align-items: center !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .home-ticker-flex {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .ticker-pulse-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ef4444;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 900;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+
+    .ticker-dot-pulse {
+      width: 6px;
+      height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      animation: pulseDot 1.4s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    .ticker-marquee-scroll {
+      display: inline-block;
+      white-space: nowrap;
+      padding-left: 100%;
+      animation: tickerContinuousScroll 30s linear infinite;
+    }
+
+    .ticker-marquee-scroll:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes tickerContinuousScroll {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    .brand-logo-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .brand-title-text {
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: var(--yt-text);
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.1;
+    }
+
+    .brand-sub-text {
+      font-size: 0.65rem;
+      color: var(--yt-text-muted);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .header-current-page-badge {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+      font-size: 0.74rem;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+      .header-current-page-badge {
+        display: none;
+      }
+    }
+
+    /* Action buttons in header */
+    .btn-header-theme {
+      background: var(--yt-pill);
+      border: 1.5px solid var(--yt-border);
+      color: var(--yt-text);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .btn-header-theme:hover {
+      background: var(--yt-pill-hover);
+      transform: scale(1.08);
+    }
+
+    .btn-header-zoom {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff !important;
+      padding: 6px 13px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.76rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 3px 10px rgba(239, 68, 68, 0.35);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-header-zoom:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 14px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Main Container */
+    .at-main-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 16px 40px 16px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Section Headers */
+    .at-section {
+      margin-bottom: 36px;
+    }
+
+    .at-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .at-section-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .at-section-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .icon-shorts {
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+    }
+
+    .icon-video {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+
+    .at-section-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--yt-text);
+      line-height: 1.2;
+    }
+
+    .at-section-subtitle {
+      font-size: 0.82rem;
+      color: var(--yt-text-muted);
+      margin-top: 3px;
+      font-weight: 600;
+    }
+
+    /* Filter Bar */
+    .at-filter-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+
+    .at-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .at-chip {
+      background: var(--yt-pill);
+      color: var(--yt-text);
+      border: 1.5px solid var(--yt-border);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .at-chip:hover {
+      background: var(--yt-pill-hover);
+      transform: translateY(-1px);
+    }
+
+    .at-chip.active {
+      background: var(--yt-text);
+      color: var(--yt-bg);
+      border-color: var(--yt-text);
+      box-shadow: 0 4px 12px var(--yt-shadow);
+    }
+
+    /* 9:16 Shorts Grid & Cards */
+    .at-shorts-scroll-wrap {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 6px 2px 14px 2px;
+      scrollbar-width: none;
+    }
+
+    .at-shorts-scroll-wrap::-webkit-scrollbar {
+      display: none;
+    }
+
+    .at-short-card {
+      flex: 0 0 175px;
+      background: var(--yt-surface);
+      border: 1.5px solid var(--yt-border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      position: relative;
+      box-shadow: 0 6px 18px var(--yt-shadow);
+    }
+
+    @media (min-width: 640px) {
+      .at-short-card {
+        flex: 0 0 210px;
+      }
+    }
+
+    .at-short-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px var(--yt-shadow);
+      border-color: #f43f5e;
+    }
+
+    .at-short-thumb-wrap {
+      width: 100%;
+      aspect-ratio: 9/16;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .at-short-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .at-short-card:hover .at-short-img {
+      transform: scale(1.05);
+    }
+
+    .at-short-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(244, 63, 94, 0.92);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      backdrop-filter: blur(6px);
+      z-index: 2;
+    }
+
+    .at-short-time {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    .at-short-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 3;
+    }
+
+    .at-short-card:hover .at-short-play-overlay {
+      opacity: 1;
+    }
+
+    .at-short-play-icon {
+      width: 48px;
+      height: 48px;
+      background: #f43f5e;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.5);
+    }
+
+    .at-short-info {
+      padding: 12px;
+      background: var(--yt-surface);
+    }
+
+    .at-short-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--yt-text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.35;
+      margin-bottom: 5px;
+    }
+
+    .at-short-speaker {
+      font-size: 0.74rem;
+      color: var(--yt-text-muted);
+      font-weight: 600;
+    }
+
+    /* 16:9 Masterclasses Grid & Cards */
+    .at-videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 20px;
+    }
+
+    .at-vcard {
+      background: var(--yt-surface);
+      border: 1.5px solid var(--yt-border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      box-shadow: 0 6px 18px var(--yt-shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .at-vcard:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 30px var(--yt-shadow);
+      border-color: #2563eb;
+    }
+
+    .at-vcard-thumb-wrap {
+      width: 100%;
+      aspect-ratio: 16/9;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .at-vcard-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .at-vcard:hover .at-vcard-img {
+      transform: scale(1.05);
+    }
+
+    .at-vcard-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .at-vcard:hover .at-vcard-play-overlay {
+      opacity: 1;
+    }
+
+    .at-vcard-play-icon {
+      width: 52px;
+      height: 52px;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.5);
+    }
+
+    .at-card-share-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(45, 140, 255, 0.5);
+      color: #38bdf8;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3;
+      transition: all 0.2s ease;
+    }
+
+    .at-card-share-btn:hover {
+      background: #2563eb;
+      color: #fff;
+      transform: scale(1.12);
+    }
+
+    .at-vcard-info {
+      padding: 14px;
+      background: var(--yt-surface);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .at-vcard-title {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: var(--yt-text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .at-vcard-speaker {
+      font-size: 0.78rem;
+      color: var(--yt-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    /* =========================================
+       16:9 MASTERCLASS CINEMA PLAYER MODAL
+       ========================================== */
+    .at-cinema-modal {
+      position: fixed !important;
+      inset: 0 !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: var(--yt-modal-bg) !important;
+      color: var(--yt-text) !important;
+      z-index: 2147483646 !important;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .at-cinema-modal.active {
+      display: flex !important;
+    }
+
+    /* Top Sharer & Contact Minimal Bar */
+    .at-cinema-top-bar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: var(--yt-header-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1.5px solid var(--yt-border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 4px 20px var(--yt-shadow);
+    }
+
+    .at-sharer-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .at-sharer-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.95rem;
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+    }
+
+    .at-sharer-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .at-sharer-label {
+      font-size: 0.68rem;
+      color: var(--yt-text-muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .at-sharer-label .dot {
+      width: 6px;
+      height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+
+    .at-sharer-name-num {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--yt-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .at-sharer-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .at-contact-btn {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .at-btn-call {
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid #3b82f6;
+      color: #3b82f6;
+    }
+
+    .at-btn-call:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .at-btn-wa {
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid #25d366;
+      color: #25d366;
+    }
+
+    .at-btn-wa:hover {
+      background: #25d366;
+      color: #fff;
+    }
+
+    .at-btn-fullscreen-top {
+      background: var(--yt-pill);
+      border: 1.5px solid var(--yt-border);
+      color: var(--yt-text);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .at-btn-fullscreen-top:hover {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+
+    .at-cinema-close-btn {
+      background: var(--yt-pill);
+      border: 1.5px solid var(--yt-border);
+      color: var(--yt-text);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+
+    .at-cinema-close-btn:hover {
+      background: #ef4444;
+      color: #fff;
+      border-color: #ef4444;
+    }
+
+    /* Cinema Layout (Video + Suggested Feed) */
+    .at-cinema-layout {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 16px 16px 70px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    @media (min-width: 1024px) {
+      .at-cinema-layout {
+        display: grid;
+        grid-template-columns: 1fr 390px;
+        gap: 28px;
+        padding-top: 20px;
+      }
+    }
+
+    .at-player-frame-wrap {
+      width: 100%;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px var(--yt-shadow);
+      border: 1.5px solid var(--yt-border);
+      position: relative;
+    }
+
+    /* =========================================
+       BULLETPROOF CINEMA FULLSCREEN OVERLAY MODE
+       ========================================== */
+    body.cinema-fullscreen-mode .at-video-details-box,
+    body.cinema-fullscreen-mode .at-suggested-feed {
+      display: none !important;
+    }
+
+    body.cinema-fullscreen-mode .at-cinema-layout {
+      padding: 0 !important;
+      margin: 0 !important;
+      max-width: 100vw !important;
+      display: block !important;
+    }
+
+    /* Fullscreen Player Canvas */
+    body.cinema-fullscreen-mode #at_player_frame_wrap,
+    #at_player_frame_wrap.fullscreen-active,
+    #at_player_frame_wrap.pure-css-fullscreen,
+    #at_player_frame_wrap:fullscreen,
+    #at_player_frame_wrap:-webkit-full-screen,
+    #at_player_frame_wrap:-moz-full-screen {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      z-index: 2147483640 !important;
+      background: #000000 !important;
+      border-radius: 0 !important;
+      border: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-shadow: none !important;
+    }
+
+    body.cinema-fullscreen-mode #at_player_frame_wrap .at-aspect-16-9,
+    #at_player_frame_wrap.fullscreen-active .at-aspect-16-9,
+    #at_player_frame_wrap.pure-css-fullscreen .at-aspect-16-9,
+    #at_player_frame_wrap:fullscreen .at-aspect-16-9,
+    #at_player_frame_wrap:-webkit-full-screen .at-aspect-16-9 {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      aspect-ratio: auto !important;
+      background: #000000 !important;
+    }
+
+    body.cinema-fullscreen-mode #at_player_frame_wrap iframe,
+    #at_player_frame_wrap.fullscreen-active iframe,
+    #at_player_frame_wrap.pure-css-fullscreen iframe,
+    #at_player_frame_wrap:fullscreen iframe,
+    #at_player_frame_wrap:-webkit-full-screen iframe {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+      background: #000000 !important;
+    }
+
+    /* Top Sharer Overlay Bar in Fullscreen */
+    body.cinema-fullscreen-mode .at-cinema-top-bar {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100vw !important;
+      z-index: 2147483647 !important;
+      background: linear-gradient(180deg, rgba(11, 17, 32, 0.95) 0%, rgba(11, 17, 32, 0.7) 60%, transparent 100%) !important;
+      backdrop-filter: blur(8px) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+      padding: 12px 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+    }
+
+    body.cinema-fullscreen-mode .at-btn-fullscreen-top {
+      display: none !important;
+    }
+
+    body.cinema-fullscreen-mode .at-cinema-close-btn {
+      display: none !important;
+    }
+
+    .at-exit-fs-top-btn {
+      background: rgba(239, 68, 68, 0.25);
+      border: 1.5px solid #ef4444;
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .at-exit-fs-top-btn:hover {
+      background: #ef4444;
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    body.cinema-fullscreen-mode .at-exit-fs-top-btn {
+      display: inline-flex !important;
+    }
+
+    /* Bottom Floating Actions Overlay in Fullscreen (Like, Comment, WhatsApp, Share) */
+    body.cinema-fullscreen-mode .at-floating-rail {
+      display: flex !important;
+      position: fixed !important;
+      bottom: 24px !important;
+      right: 20px !important;
+      flex-direction: row !important;
+      gap: 10px !important;
+      z-index: 2147483647 !important;
+      background: rgba(15, 23, 42, 0.88) !important;
+      padding: 8px 14px !important;
+      border-radius: 30px !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+      backdrop-filter: blur(12px) !important;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.75) !important;
+    }
+
+    .at-fs-act-pill {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .at-fs-act-pill:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .at-fs-act-wa {
+      background: #25d366 !important;
+      border-color: #25d366 !important;
+      color: #ffffff !important;
+    }
+
+    .at-fs-act-share {
+      background: #2563eb !important;
+      border-color: #2563eb !important;
+      color: #ffffff !important;
+    }
+
+    /* Reels Fullscreen */
+    body.reels-fullscreen-mode #wb_reels_swipe_container,
+    #wb_reels_swipe_container.fullscreen-active,
+    #wb_reels_swipe_container.pure-css-fullscreen,
+    #wb_reels_swipe_container:fullscreen,
+    #wb_reels_swipe_container:-webkit-full-screen {
+      position: fixed !important;
+      inset: 0 !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      z-index: 2147483647 !important;
+      background: #000000 !important;
+      border-radius: 0 !important;
+      border: none !important;
+    }
+
+    .at-aspect-16-9 {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+    }
+
+    .at-player-frame-wrap iframe,
+    .at-aspect-16-9 iframe {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+    }
+
+    /* Floating Exit Fullscreen Button */
+    .at-exit-fs-floating-btn {
+      display: none !important; /* Managed seamlessly by top bar and overlay */
+    }
+
+    /* Video Details & Actions */
+    .at-video-details-box {
+      padding: 16px 2px 0 2px;
+    }
+
+    .at-cinema-video-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--yt-text);
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
+    .at-channel-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid var(--yt-border);
+    }
+
+    .at-channel-creator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .at-channel-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .at-channel-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--yt-text);
+    }
+
+    .at-channel-tag {
+      font-size: 0.74rem;
+      color: var(--yt-text-muted);
+      font-weight: 600;
+    }
+
+    .at-action-buttons-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .at-act-pill {
+      background: var(--yt-pill);
+      border: 1.5px solid var(--yt-border);
+      color: var(--yt-text);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .at-act-pill:hover {
+      background: var(--yt-pill-hover);
+      transform: translateY(-1px);
+    }
+
+    .at-act-pill-fs {
+      background: rgba(37, 99, 235, 0.15);
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    .at-act-pill-fs:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .at-act-pill-wa {
+      background: rgba(37, 211, 102, 0.15);
+      border-color: #25d366;
+      color: #25d366;
+    }
+
+    .at-act-pill-wa:hover {
+      background: #25d366;
+      color: #fff;
+    }
+
+    .at-video-desc-box {
+      margin-top: 14px;
+      background: var(--yt-desc-bg);
+      border: 1px solid var(--yt-border);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--yt-text);
+    }
+
+    /* Suggested Feed */
+    .at-suggested-feed {
+      background: var(--yt-surface);
+      border: 1.5px solid var(--yt-border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 6px 20px var(--yt-shadow);
+    }
+
+    .at-suggested-header {
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: var(--yt-text);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--yt-border);
+    }
+
+    .at-suggested-card {
+      display: flex;
+      gap: 12px;
+      padding: 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 6px;
+      background: var(--yt-surface);
+      border: 1px solid transparent;
+    }
+
+    .at-suggested-card:hover {
+      background: var(--yt-pill);
+      border-color: var(--yt-border);
+      transform: translateX(4px);
+    }
+
+    .at-suggested-card.active-playing {
+      background: rgba(37, 99, 235, 0.15);
+      border-color: #2563eb;
+    }
+
+    .at-suggested-thumb {
+      width: 110px;
+      aspect-ratio: 16/9;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background: #000;
+      flex-shrink: 0;
+    }
+
+    .at-suggested-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .at-suggested-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .at-suggested-title {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: var(--yt-text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.35;
+      margin-bottom: 4px;
+    }
+
+    .at-suggested-speaker {
+      font-size: 0.72rem;
+      color: var(--yt-text-muted);
+      font-weight: 600;
+    }
+
+    /* Floating Share Rail */
+    .at-floating-rail {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .at-float-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.25rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .at-float-btn:hover {
+      transform: scale(1.12);
+    }
+
+    .at-float-wa {
+      background: #25d366;
+    }
+
+    .at-float-share {
+      background: #2563eb;
+    }
+
+    /* =========================================
+       IN-APP 9:16 VERTICAL REELS SWIPE MODAL
+       ========================================== */
+    .wb-reels-modal {
+      position: fixed !important;
+      inset: 0 !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: #000000 !important;
+      z-index: 2147483646 !important;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .wb-reels-modal.active {
+      display: flex !important;
+    }
+
+    .wb-reels-container {
+      width: 100%;
+      height: 100%;
+      max-width: 480px;
+      position: relative;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .wb-reels-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
+      z-index: 35;
+    }
+
+    .wb-reels-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .wb-reels-fs-btn,
+    .wb-reels-close-btn {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .wb-reels-fs-btn:hover {
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+
+    .wb-reels-close-btn:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .wb-reels-body {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wb-reels-touch-surface {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 70px;
+      bottom: 120px;
+      z-index: 25;
+      pointer-events: auto;
+      touch-action: pan-y;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .wb-reel-play-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      width: 76px;
+      height: 76px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 2.2rem;
+      z-index: 32;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    }
+
+    .wb-reel-play-badge.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.15);
+    }
+
+    .wb-reels-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .wb-reels-vertical-nav {
+      position: absolute;
+      right: 14px;
+      top: 40%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 30;
+    }
+
+    .wb-vnav-btn {
+      width: 44px;
+      height: 44px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid rgba(45, 140, 255, 0.5);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s;
+    }
+
+    .wb-vnav-btn:hover {
+      transform: scale(1.1);
+      background: #2563eb;
+    }
+
+    .wb-reels-rail {
+      position: absolute;
+      right: 14px;
+      bottom: 85px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 30;
+      align-items: center;
+    }
+
+    .wb-rail-btn {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.05rem;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s;
+    }
+
+    .wb-rail-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .wb-rail-count {
+      font-size: 0.65rem;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    .wb-reels-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 70px;
+      padding: 16px;
+      background: linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.6) 70%, transparent 100%);
+      z-index: 30;
+    }
+
+    .wb-reels-caption-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #fff;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .wb-reels-caption-speaker {
+      font-size: 0.75rem;
+      color: #93C5FD;
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+
+  <!-- =========================================
+       1. STICKY TOP UNIT (BRAND HEADER + CONTINUOUS LIVE TICKER)
+       ========================================== -->
+  <div class="at-top-sticky-unit">
+    
+    <!-- Brand Header -->
+    <header class="header" id="header" style="background:transparent;border:none;">
+      <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:8px;max-width:1280px;margin:0 auto;">
+        
+        <!-- Brand Logo Left -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <a href="/index.html" class="brand-logo-pill">
+            <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;">
+            <div style="display:flex;flex-direction:column;">
+              <span class="brand-title-text">
+                AAROGYAM <span style="color:#ef4444;">TUBE</span>
+              </span>
+              <span class="brand-sub-text">
+                Video & Shorts Hub
+              </span>
+            </div>
+          </a>
+
+          <!-- Current Active Page Indicator Badge -->
+          <span class="header-current-page-badge">
+            🎬 AarogyamTube
+          </span>
+        </div>
+
+        <!-- Header Actions Right: Dark/Light Switcher, Zoom Live Pass, PWA, Cart, 3-Line Menu -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <!-- Theme Toggle Button -->
+          <button type="button" class="btn-header-theme" id="btn_theme_toggle" onclick="window.toggleTubeTheme()" title="थीम बदलें (Dark / Light)">
+            <i class="fa-solid fa-moon" id="theme_icon"></i>
+          </button>
+
+          <!-- Direct Link to Live Zoom Webinar -->
+          <a href="/webinar.html" class="btn-header-zoom" title="🔴 लाइव ज़ूम वेबिनार खोलें">
+            <i class="fa-solid fa-video"></i> <span>ज़ूम मीटिंग</span>
+          </a>
+
+          <!-- Shopping Cart Icon -->
+          <a href="/ebooks/cart.html" title="Shopping Cart" style="background:var(--yt-pill);border:1.5px solid var(--yt-border);color:var(--yt-text);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;">
+            <i class="fa-solid fa-cart-shopping" style="font-size:0.95rem;"></i>
+            <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.65rem;font-weight:900;padding:2px 5px;border-radius:10px;">0</span>
+          </a>
+
+          <!-- 3-Line Universal Drawer Menu Trigger Button -->
+          <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Continuous Running Live Ticker -->
+    <div class="home-live-ticker-wrap">
+      <div class="home-ticker-flex">
+        <div class="ticker-pulse-badge">
+          <span class="ticker-dot-pulse"></span>
+          <span>🚨 LIVE</span>
+        </div>
+        <div style="flex:1;overflow:hidden;position:relative;">
+          <div class="ticker-marquee-scroll" id="tube_live_ticker_track">
+            🌾 AarogyamTube — 1-मिनट कृषि शॉर्ट्स एवं सम्पूर्ण मास्टरक्लास वीडियो हब ✦ 24×7 किसान सहायता
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- =========================================
+       2. MAIN CONTENT AREA
+       ========================================== -->
+  <main class="at-main-container">
+
+    <!-- 1. SHORTS & REELS 9:16 SECTION -->
+    <section class="at-section" id="sec_shorts_reels">
+      <div class="at-section-header">
+        <div class="at-section-brand">
+          <div class="at-section-icon icon-shorts"><i class="fa-solid fa-bolt"></i></div>
+          <div>
+            <div class="at-section-title">🎬 AarogyamTube — रील्स एवं शॉर्ट्स</div>
+            <div class="at-section-subtitle">1-मिनट के प्रैक्टिकल कृषि, जैविक खाद व फसल सुरक्षा शॉर्ट्स</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="at-shorts-scroll-wrap" id="at_shorts_grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- 2. MASTERCLASS 16:9 VIDEOS SECTION -->
+    <section class="at-section" id="sec_masterclasses">
+      <div class="at-section-header">
+        <div class="at-section-brand">
+          <div class="at-section-icon icon-video"><i class="fa-solid fa-chalkboard-user"></i></div>
+          <div>
+            <div class="at-section-title">📚 AarogyamTube — संपूर्ण मास्टरक्लास लाइब्रेरी</div>
+            <div class="at-section-subtitle">कृषि विशेषज्ञों द्वारा तैयार संपूर्ण वैज्ञानिक एवं प्रैक्टिकल ट्रेनिंग वीडियो</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="at-filter-bar" id="at_video_filter_bar">
+        <button type="button" class="at-chip active" data-category="all">सभी मास्टरक्लास (All)</button>
+        <button type="button" class="at-chip" data-category="Crop Protection">कीट व रोग नियंत्रण</button>
+        <button type="button" class="at-chip" data-category="Organic Farming">जैविक कृषि</button>
+        <button type="button" class="at-chip" data-category="Irrigation Tech">सिंचाई व पोषण</button>
+      </div>
+
+      <div class="at-videos-grid" id="at_videos_grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================
+       3. 16:9 MASTERCLASS CINEMA PLAYER MODAL
+       ========================================== -->
+  <div id="wb_master_cinema_modal" class="at-cinema-modal" role="dialog" aria-modal="true" aria-label="AarogyamTube Video Player">
+    <!-- Top Sharer Minimal Header with Right-Aligned Contact & Fullscreen -->
+    <div class="at-cinema-top-bar" id="at_cinema_top_sharer_bar">
+      <div class="at-sharer-left">
+        <div class="at-sharer-avatar" id="at_sharer_avatar">AI</div>
+        <div class="at-sharer-info">
+          <div class="at-sharer-label"><span class="dot"></span> शेयर किया गया:</div>
+          <div class="at-sharer-name-num" id="at_sharer_name_mobile">आरोग्यम किसान मित्र • 📞 +91 79744 22572</div>
+        </div>
+      </div>
+
+      <div class="at-sharer-right-actions">
+        <a id="at_sharer_call_btn" href="tel:+917974422572" class="at-contact-btn at-btn-call" title="सीधे कॉल करें">
+          <i class="fa-solid fa-phone"></i> <span>कॉल</span>
+        </a>
+        <a id="at_sharer_wa_btn" href="https://api.whatsapp.com/send?phone=917974422572" target="_blank" class="at-contact-btn at-btn-wa" title="WhatsApp पर संपर्क करें">
+          <i class="fa-brands fa-whatsapp"></i> <span>चैट</span>
+        </a>
+        <!-- Top Fullscreen Button -->
+        <button type="button" class="at-btn-fullscreen-top" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन करें (Fullscreen)">
+          <i class="fa-solid fa-expand"></i> <span>Full Screen</span>
+        </button>
+        <!-- Exit Fullscreen Button in Top Right (Visible during Fullscreen) -->
+        <button type="button" class="at-exit-fs-top-btn" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन से बाहर आएं">
+          <i class="fa-solid fa-compress"></i> <span>Exit Full Screen</span>
+        </button>
+        <button type="button" class="at-cinema-close-btn" onclick="window.closeMasterclassModal()" title="खिलाड़ी बंद करें">&times;</button>
+      </div>
+    </div>
+
+    <!-- YouTube Cinema Content Layout (Video + Suggested Feed) -->
+    <div class="at-cinema-layout">
+      <!-- Left Column: 16:9 Player & Actions -->
+      <div>
+        <div class="at-player-frame-wrap" id="at_player_frame_wrap">
+          <button type="button" class="at-exit-fs-floating-btn" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन से बाहर आएं">
+            <i class="fa-solid fa-compress"></i> <span>Exit Full Screen</span>
+          </button>
+          <div class="at-aspect-16-9">
+            <iframe id="at_master_iframe_main" src=""
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"
+              style="width:100%; height:100%; border:none;"></iframe>
+          </div>
+        </div>
+
+        <div class="at-video-details-box">
+          <div id="at_current_title" class="at-cinema-video-title">कृषि मास्टरक्लास शीर्षक</div>
+
+          <div class="at-channel-bar">
+            <div class="at-channel-creator">
+              <div class="at-channel-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+              <div>
+                <div id="at_current_speaker" class="at-channel-title">आरोग्यम कृषि विशेषज्ञ</div>
+                <div id="at_current_time_tag" class="at-channel-tag">⏱️ 45 मिनट • सम्पूर्ण प्रैक्टिकल ट्रेनिंग</div>
+              </div>
+            </div>
+
+            <div class="at-action-buttons-wrap">
+              <!-- Full Screen Action Button -->
+              <button type="button" class="at-act-pill at-act-pill-fs" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन करें (Fullscreen)">
+                <i class="fa-solid fa-expand"></i>
+                <span>फुल स्क्रीन</span>
+              </button>
+
+              <button type="button" class="at-act-pill" id="at_like_btn" onclick="window.likeMasterclassVideo()">
+                <i class="fa-solid fa-heart" id="at_like_icon" style="color:#ef4444;"></i>
+                <span id="at_like_count">1.4K</span>
+              </button>
+
+              <button type="button" class="at-act-pill" onclick="window.commentMasterclassVideo()">
+                <i class="fa-solid fa-comment-dots" style="color:#60a5fa;"></i>
+                <span>कमेंट</span>
+              </button>
+
+              <button type="button" class="at-act-pill at-act-pill-wa" onclick="window.shareCurrentMasterclassWhatsApp()" title="WhatsApp पर शेयर करें">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>WhatsApp</span>
+              </button>
+
+              <button type="button" class="at-act-pill" onclick="window.shareCurrentMasterclassNative()" title="शेयर करें (Native Share)">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="at-video-desc-box" id="at_current_desc">
+            विशेषज्ञों द्वारा रिकॉर्ड की गई संपूर्ण कृषि मास्टरक्लास लाइब्रेरी।
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Suggested Videos Feed (Up Next) -->
+      <div>
+        <div class="at-suggested-feed">
+          <div class="at-suggested-header">
+            <span>📺 सिफारिश किए गए वीडियो (Up Next)</span>
+            <span id="at_suggested_count" style="font-size:0.75rem; color:var(--yt-text-muted); font-weight:700;">12 वीडियो</span>
+          </div>
+          <div id="at_suggested_list">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Actions Overlay (Available in standard & fullscreen mode) -->
+    <div class="at-floating-rail" id="at_cinema_floating_actions">
+      <button type="button" class="at-fs-act-pill" id="at_fs_like_btn" onclick="window.likeMasterclassVideo()" title="पसंद करें (Like)">
+        <i class="fa-solid fa-heart" id="at_fs_like_icon" style="color:#ef4444;"></i>
+        <span id="at_fs_like_count">1.4K</span>
+      </button>
+      <button type="button" class="at-fs-act-pill" onclick="window.commentMasterclassVideo()" title="कमेंट लिखें">
+        <i class="fa-solid fa-comment-dots" style="color:#60a5fa;"></i>
+        <span>कमेंट</span>
+      </button>
+      <button type="button" class="at-fs-act-pill at-fs-act-wa" onclick="window.shareCurrentMasterclassWhatsApp()" title="WhatsApp पर शेयर करें">
+        <i class="fa-brands fa-whatsapp"></i>
+        <span>WhatsApp</span>
+      </button>
+      <button type="button" class="at-fs-act-pill at-fs-act-share" onclick="window.shareCurrentMasterclassNative()" title="अन्य ऐप्स पर शेयर करें">
+        <i class="fa-solid fa-share-nodes"></i>
+        <span>Share</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================
+       4. IN-APP 9:16 VERTICAL REELS SWIPE MODAL
+       ========================================== -->
+  <div id="wb_reels_modal" class="wb-reels-modal">
+    <div class="wb-reels-container" id="wb_reels_swipe_container">
+      <button type="button" class="at-exit-fs-floating-btn" onclick="window.toggleReelsFullscreen()" title="फुल स्क्रीन से बाहर आएं">
+        <i class="fa-solid fa-compress"></i> <span>Exit Full Screen</span>
+      </button>
+      <div class="wb-reels-top">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="width:8px; height:8px; background:#F43F5E; border-radius:50%;"></span>
+          <span style="font-size:0.85rem; font-weight:800; color:#fff;">AarogyamTube Reels</span>
+          <span id="wb_reel_counter_badge" style="font-size:0.7rem; color:#94A3B8; background:rgba(255,255,255,0.15); padding:2px 6px; border-radius:4px;">1 / 1</span>
+        </div>
+        <div class="wb-reels-top-actions">
+          <button type="button" class="wb-reels-fs-btn" onclick="window.toggleReelsFullscreen()" title="फुल स्क्रीन (Fullscreen)">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+          <button type="button" class="wb-reels-close-btn" onclick="window.closeReelsModal()">&times;</button>
+        </div>
+      </div>
+
+      <div class="wb-reels-body" id="wb_reels_body">
+        <iframe id="wb_reel_iframe_main" class="wb-reels-iframe" src="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen" allowfullscreen="true" style="width:100%; height:100%; border:none;"></iframe>
+        <div id="wb_reel_touch_surface" class="wb-reels-touch-surface" title="टैप करके प्ले/पॉज़ करें, स्वाइप करके अगली रील देखें"></div>
+        <div id="wb_reel_play_badge" class="wb-reel-play-badge">
+          <i class="fa-solid fa-play" id="wb_reel_badge_icon"></i>
+        </div>
+      </div>
+
+      <div class="wb-reels-vertical-nav">
+        <button type="button" class="wb-vnav-btn" onclick="window.navReel(-1)" title="पिछली रील (Swipe Down / Wheel Up)">
+          <i class="fa-solid fa-chevron-up"></i>
+          <span style="font-size:0.6rem;">Prev</span>
+        </button>
+        <button type="button" class="wb-vnav-btn" onclick="window.navReel(1)" title="अगली रील (Swipe Up / Wheel Down)" style="background:#F43F5E;border-color:#F43F5E;">
+          <i class="fa-solid fa-chevron-down"></i>
+          <span style="font-size:0.6rem;">Next</span>
+        </button>
+      </div>
+
+      <div class="wb-reels-rail">
+        <button type="button" class="wb-rail-btn" id="wb_reel_like_btn" onclick="window.likeCurrentReel()">
+          <i class="fa-solid fa-heart" id="wb_reel_like_icon" style="color:#F43F5E;"></i>
+          <span class="wb-rail-count" id="wb_reel_like_count">1.2K</span>
+        </button>
+
+        <button type="button" class="wb-rail-btn" onclick="window.openReelComments()">
+          <i class="fa-solid fa-comment-dots" style="color:#60A5FA;"></i>
+          <span class="wb-rail-count" id="wb_reel_comment_count">24</span>
+        </button>
+
+        <button type="button" class="wb-rail-btn" onclick="window.shareCurrentReelWhatsApp()" style="color:#25D366;" title="WhatsApp पर शेयर करें">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span class="wb-rail-count">WhatsApp</span>
+        </button>
+
+        <button type="button" class="wb-rail-btn" onclick="window.shareCurrentReelNative()" style="color:#60A5FA;" title="अन्य ऐप्स पर शेयर करें">
+          <i class="fa-solid fa-share-nodes"></i>
+          <span class="wb-rail-count">Share</span>
+        </button>
+      </div>
+
+      <div class="wb-reels-caption">
+        <div id="wb_reel_caption_title" class="wb-reels-caption-title">रील शीर्षक</div>
+        <div id="wb_reel_caption_speaker" class="wb-reels-caption-speaker">आरोग्यम कृषि विशेषज्ञ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       5. UNIVERSAL MODERN FOOTER
+       ========================================== -->
+  <footer class="footer" style="background: var(--yt-footer-bg); color: var(--yt-footer-text); padding: 50px 0 25px 0; border-top: 1.5px solid var(--yt-border);">
+    <div class="container" style="max-width: 1280px; margin: 0 auto; padding: 0 16px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 35px;">
+        
+        <!-- About Column -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:40px;width:auto;" />
+            <span style="font-size:1.15rem;font-weight:900;color:var(--yt-footer-head);font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#ef4444;">INDIA</span></span>
+          </div>
+          <p style="font-size:0.85rem;color:var(--yt-footer-text);line-height:1.55;">
+            Aarogyam India — भारत का सम्पूर्ण डिजिटल कृषि, ई-बुक्स, लाइव वेबिनार, स्वास्थ्य परामर्श और AarogyamTube वीडियो ज्ञान मंच।
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h3 style="font-size:0.95rem;font-weight:900;color:var(--yt-footer-head);margin-bottom:14px;">मुख्य नेविगेशन</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/index.html" style="color:var(--yt-footer-text);text-decoration:none;">🏠 मुख्य पृष्ठ (Home)</a></li>
+            <li><a href="/webinar.html" style="color:#ef4444;font-weight:800;text-decoration:none;">🔴 लाइव ज़ूम वेबिनार</a></li>
+            <li><a href="/tube.html" style="color:#38bdf8;font-weight:800;text-decoration:none;">🎬 AarogyamTube हब</a></li>
+            <li><a href="/ebooks/ebook.html" style="color:var(--yt-footer-text);text-decoration:none;">📚 ई-बुक स्टोर</a></li>
+            <li><a href="/ebooks/my-library.html" style="color:var(--yt-footer-text);text-decoration:none;">📖 मेरी लाइब्रेरी</a></li>
+          </ul>
+        </div>
+
+        <!-- Services & Tools -->
+        <div>
+          <h3 style="font-size:0.95rem;font-weight:900;color:var(--yt-footer-head);margin-bottom:14px;">सेवाएं व टूल्स</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/crop-doctor.html" style="color:var(--yt-footer-text);text-decoration:none;">🔬 फसल डॉक्टर AI</a></li>
+            <li><a href="/mandi.html" style="color:var(--yt-footer-text);text-decoration:none;">🌾 लाइव मंडी भाव</a></li>
+            <li><a href="/weather.html" style="color:var(--yt-footer-text);text-decoration:none;">⛅ मौसम पूर्वानुमान</a></li>
+            <li><a href="/subscription.html" style="color:var(--yt-footer-text);text-decoration:none;">👑 Pro VIP पास</a></li>
+            <li><a href="/ucas/index.html" style="color:var(--yt-footer-text);text-decoration:none;">👤 माय प्रोफाइल & UCAS</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Support -->
+        <div>
+          <h3 style="font-size:0.95rem;font-weight:900;color:var(--yt-footer-head);margin-bottom:14px;">किसान सहायता केंद्र</h3>
+          <p style="font-size:0.85rem;color:var(--yt-footer-text);margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
+          <p style="font-size:0.85rem;color:var(--yt-footer-text);margin-bottom:6px;">📞 +91 79744 22572</p>
+          <p style="font-size:0.85rem;color:var(--yt-footer-text);margin-bottom:14px;">✉ info@aarogyamindia.in</p>
+          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 AarogyamTube सहायता')" style="background:#25d366;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:0.82rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
+          </button>
+        </div>
+
+      </div>
+
+      <div style="border-top:1.5px solid var(--yt-border);padding-top:18px;text-align:center;font-size:0.8rem;color:var(--yt-text-dim);">
+        © 2026 Aarogyam India. All Rights Reserved. | Designed for Indian Farmers & Families.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/session.js"></script>
+  <script src="/js/global-guest-modal.js"></script>
+  <script src="/js/user-notifications.js?v=12.0"></script>
+  <script src="/js/recent-purchase-toast.js"></script>
+  <script src="/js/universal-nav-drawer.js"></script>
+  <script type="module" src="/js/public-pwa.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const DEFAULT_AAROGYAMTUBE_THUMB = '/images/banners/aarogyamtube-default-thumb.svg';
+      const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      let db = null;
+      try {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+      } catch (e) { }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const refShareId = urlParams.get('ref') || urlParams.get('share_id') || 'AI000004';
+      const specificVid = urlParams.get('vid') || urlParams.get('video') || urlParams.get('video_id') || urlParams.get('reel') || urlParams.get('short');
+
+      let allRecordings = [];
+      let activeVideoFilter = 'all';
+      let currentReelIndex = 0;
+      let activeReelsList = [];
+      let currentMasterclassVideo = null;
+      let currentSharerProfile = null;
+
+      // -------------------------------------------------------------
+      // 1. COMPREHENSIVE THEME SWITCHER (DARK vs LIGHT MODE)
+      // -------------------------------------------------------------
+      window.initTubeTheme = function() {
+        const savedTheme = localStorage.getItem('aarogyam_tube_theme') || 'dark';
+        applyTheme(savedTheme);
+      };
+
+      window.toggleTubeTheme = function() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        localStorage.setItem('aarogyam_tube_theme', nextTheme);
+      };
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        document.body.setAttribute('data-theme', theme);
+        
+        const icon = document.getElementById('theme_icon');
+        if (icon) {
+          icon.className = theme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+        }
+
+        const metaColor = document.getElementById('meta_theme_color');
+        if (metaColor) {
+          metaColor.setAttribute('content', theme === 'dark' ? '#0b1120' : '#ffffff');
+        }
+      }
+
+      window.initTubeTheme();
+
+      // -------------------------------------------------------------
+      // 2. DATA INITIALIZATION & LOCAL STORAGE SYNC (0ms Instant)
+      // -------------------------------------------------------------
+      async function initTubePlatform() {
+        try { await loadRecordingsData(); } catch (e) { console.error('recordings err:', e); }
+        try { await fetchSharerDetails(refShareId); } catch (e) { console.error('sharer err:', e); }
+        try { renderShortsAndReels(); } catch (e) { console.error('shorts err:', e); }
+        try { renderMasterclassVideos(); } catch (e) { console.error('videos err:', e); }
+        try { setupReelsGesturesAndScroll(); } catch (e) { console.error('gestures err:', e); }
+        try { setupOrientationAutoFullscreen(); } catch (e) { console.error('orientation err:', e); }
+        try { updateLiveTicker(); } catch (e) { console.error('ticker err:', e); }
+
+        if (specificVid) {
+          setTimeout(() => {
+            openSpecificVideoOrReel(specificVid);
+          }, 350);
+        }
+      }
+
+      function updateLiveTicker() {
+        const tickerTrack = document.getElementById('tube_live_ticker_track');
+        if (!tickerTrack) return;
+
+        if (allRecordings && allRecordings.length > 0) {
+          const stream = allRecordings
+            .filter(v => v.status !== 'inactive')
+            .slice(0, 15)
+            .map(v => {
+              const icon = (v.format === 'short_reel' || v.id.startsWith('VID_S')) ? '⚡' : '🎬';
+              return `${icon} ${v.title}`;
+            })
+            .join(' ✦ ');
+
+          tickerTrack.textContent = `🚨 लाइव AarogyamTube अपडेट्स: ${stream} ✦ 24×7 किसान सहायता उपलब्ध!`;
+        }
+      }
+
+      async function loadRecordingsData() {
+        // 1. Instant LocalStorage check (0ms admin sync)
+        let localList = [];
+        try {
+          const localStr = localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS');
+          if (localStr) {
+            const parsed = JSON.parse(localStr);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              localList = parsed;
+              allRecordings = parsed;
+            }
+          }
+        } catch (e) { }
+
+        // 2. Fetch Static Git JSON & Merge seamlessly
+        try {
+          const resp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
+          if (resp.ok) {
+            const json = await resp.json();
+            const list = Array.isArray(json.recordings) ? json.recordings : (Array.isArray(json) ? json : []);
+            if (list.length > 0) {
+              const map = new Map();
+              localList.forEach(r => { if (r && r.id) map.set(r.id, r); });
+              list.forEach(r => { if (r && r.id && !map.has(r.id)) map.set(r.id, r); });
+              allRecordings = Array.from(map.values());
+            }
+          }
+        } catch (e) { }
+
+        updateLiveTicker();
+      }
+
+      // -------------------------------------------------------------
+      // 3. SHARER INFO & PROFILE LOOKUP
+      // -------------------------------------------------------------
+      async function fetchSharerDetails(sId) {
+        const cleanId = String(sId || refShareId || 'AI000004').trim();
+        try {
+          if (db) {
+            const { data } = await db.from('profiles').select('id, full_name, mobile, share_id').eq('share_id', cleanId).limit(1).maybeSingle();
+            if (data && (data.full_name || data.mobile)) {
+              currentSharerProfile = data;
+              updateSharerUI(data);
+              return;
+            }
+          }
+        } catch(e) {}
+
+        try {
+          const aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+          const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name;
+          const uMobile = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone;
+          if (uName && uMobile) {
+            const localData = { full_name: uName, mobile: uMobile, share_id: aiUser.share_id || cleanId };
+            currentSharerProfile = localData;
+            updateSharerUI(localData);
+            return;
+          }
+        } catch(e) {}
+
+        updateSharerUI({
+          full_name: 'आरोग्यम किसान सहायता केंद्र',
+          mobile: '7974422572',
+          share_id: cleanId
+        });
+      }
+
+      function updateSharerUI(prof) {
+        const nameMobEl = document.getElementById('at_sharer_name_mobile');
+        const avatarEl = document.getElementById('at_sharer_avatar');
+        const callBtn = document.getElementById('at_sharer_call_btn');
+        const waBtn = document.getElementById('at_sharer_wa_btn');
+
+        const fullName = prof.full_name || 'आरोग्यम किसान मित्र';
+        const cleanPhone = String(prof.mobile || '7974422572').replace(/\D/g, '').slice(-10) || '7974422572';
+        const formattedPhone = `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`;
+
+        if (nameMobEl) {
+          nameMobEl.textContent = `${fullName} • 📞 ${formattedPhone}`;
+        }
+        if (avatarEl) {
+          const initials = fullName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'AI';
+          avatarEl.textContent = initials;
+        }
+        if (callBtn) {
+          callBtn.href = `tel:+91${cleanPhone}`;
+        }
+        if (waBtn) {
+          waBtn.href = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(`नमस्ते ${fullName} जी, मैंने आपका साझा किया हुआ AarogyamTube वीडियो देखा और अधिक जानकारी चाहता हूँ।`)}`;
+        }
+      }
+
+      // -------------------------------------------------------------
+      // 4. SHORTS & REELS 9:16 RENDERER & PLAYER
+      // -------------------------------------------------------------
+      function renderShortsAndReels() {
+        const grid = document.getElementById('at_shorts_grid');
+        if (!grid) return;
+
+        let shortsList = allRecordings.filter(v =>
+          v.status !== 'inactive' &&
+          (v.format === 'short_reel' || v.id.startsWith('VID_S') || v.category === 'Shorts & Reels' || v.duration === '1:00' || v.duration === '0:58')
+        );
+
+        activeReelsList = shortsList;
+
+        if (shortsList.length === 0) {
+          grid.innerHTML = '<div style="width:100%; text-align:center; padding:2rem; color:var(--yt-text-muted);">अभी कोई रील उपलब्ध नहीं है।</div>';
+          return;
+        }
+
+        grid.innerHTML = shortsList.map((r, idx) => {
+          const thumb = r.thumbnail || DEFAULT_AAROGYAMTUBE_THUMB;
+
+          return `
+            <div class="at-short-card" onclick="window.openReelPlayer(${idx})">
+              <div class="at-short-thumb-wrap">
+                <img src="${thumb}" alt="${r.title}" class="at-short-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
+                <span class="at-short-badge">⚡ Shorts</span>
+                <span class="at-short-time">⏱️ ${r.duration || '0:58'}</span>
+                <div class="at-short-play-overlay">
+                  <div class="at-short-play-icon"><i class="fa-solid fa-play"></i></div>
+                </div>
+                <button type="button" class="at-card-share-btn" onclick="event.stopPropagation(); window.shareIndividualVideo('${r.id}', '${r.title.replace(/'/g, "\\'")}')" title="WhatsApp पर शेयर करें">
+                  <i class="fa-solid fa-share-nodes"></i>
+                </button>
+              </div>
+              <div class="at-short-info">
+                <div class="at-short-title">${r.title}</div>
+                <div class="at-short-speaker">👤 ${r.speaker || 'आरोग्यम विशेषज्ञ'}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.openReelPlayer = function (idx) {
+        if (!activeReelsList || activeReelsList.length === 0) return;
+        currentReelIndex = idx;
+        loadReelAtIndex(currentReelIndex);
+        document.getElementById('wb_reels_modal')?.classList.add('active');
+        document.body.classList.add('wb-reels-open');
+        document.documentElement.classList.add('wb-modal-active');
+      };
+
+      window.closeReelsModal = function () {
+        document.getElementById('wb_reels_modal')?.classList.remove('active');
+        document.body.classList.remove('wb-reels-open');
+        document.documentElement.classList.remove('wb-modal-active');
+        const ifr = document.getElementById('wb_reel_iframe_main');
+        if (ifr) ifr.src = '';
+        document.querySelectorAll('.pure-css-fullscreen, .fullscreen-active').forEach(el => {
+          el.classList.remove('pure-css-fullscreen', 'fullscreen-active');
+        });
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+      };
+
+      window.navReel = function (delta) {
+        if (!activeReelsList || activeReelsList.length === 0) return;
+        currentReelIndex += delta;
+        if (currentReelIndex >= activeReelsList.length) currentReelIndex = 0;
+        if (currentReelIndex < 0) currentReelIndex = activeReelsList.length - 1;
+        loadReelAtIndex(currentReelIndex);
+      };
+
+      function loadReelAtIndex(idx) {
+        const reel = activeReelsList[idx];
+        if (!reel) return;
+
+        document.getElementById('wb_reel_counter_badge').textContent = `${idx + 1} / ${activeReelsList.length}`;
+        document.getElementById('wb_reel_caption_title').textContent = reel.title;
+        document.getElementById('wb_reel_caption_speaker').textContent = `👤 ${reel.speaker || 'आरोग्यम कृषि विशेषज्ञ'}`;
+
+        const ifr = document.getElementById('wb_reel_iframe_main');
+        const url = reel.video_url || reel.youtube_url || '';
+        const ytId = reel.youtube_id || extractYoutubeVideoId(url) || 'dQw4w9WgXcQ';
+
+        isReelPlaying = true;
+        if (ifr) {
+          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=1&playsinline=1`;
+        }
+      }
+
+      let isReelPlaying = true;
+
+      window.toggleReelPlayPause = function() {
+        const ifr = document.getElementById('wb_reel_iframe_main');
+        if (!ifr || !ifr.contentWindow) return;
+
+        isReelPlaying = !isReelPlaying;
+        const func = isReelPlaying ? 'playVideo' : 'pauseVideo';
+        try {
+          ifr.contentWindow.postMessage(JSON.stringify({
+            event: 'command',
+            func: func,
+            args: []
+          }), '*');
+        } catch(e) {}
+
+        showReelPlayPauseBadge(isReelPlaying);
+      };
+
+      function showReelPlayPauseBadge(playing) {
+        const badge = document.getElementById('wb_reel_play_badge');
+        const icon = document.getElementById('wb_reel_badge_icon');
+        if (!badge || !icon) return;
+
+        icon.className = playing ? 'fa-solid fa-play' : 'fa-solid fa-pause';
+        badge.classList.add('show');
+        clearTimeout(badge._timer);
+        badge._timer = setTimeout(() => {
+          badge.classList.remove('show');
+        }, 650);
+      }
+
+      window.shareCurrentReelWhatsApp = function () {
+        const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
+        if (!reel) return;
+        window.shareIndividualVideo(reel.id, reel.title);
+      };
+
+      window.shareCurrentReelNative = function () {
+        const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
+        if (!reel) return;
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(userShare)}`;
+        const promoText = `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+
+        if (navigator.share) {
+          navigator.share({
+            title: reel.title,
+            text: promoText,
+            url: shareUrl
+          }).catch((err) => {
+            if (err && err.name === 'AbortError') return;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+          });
+        } else {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+        }
+      };
+
+      window.likeCurrentReel = function () {
+        const icon = document.getElementById('wb_reel_like_icon');
+        const count = document.getElementById('wb_reel_like_count');
+        if (icon) {
+          icon.style.transform = 'scale(1.4)';
+          setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
+        }
+        if (count) count.textContent = 'Liked ❤️';
+      };
+
+      window.openReelComments = function () {
+        const comment = prompt('इस रील पर अपनी प्रतिक्रिया या सवाल (Comment) लिखें:');
+        if (comment && comment.trim()) {
+          alert('✅ आपकी प्रतिक्रिया सफलतापूर्वक सबमिट हो गई है! धन्यवाद।');
+        }
+      };
+
+      // Full Touch Swipe + Tap Play/Pause + Mouse Wheel Scroll + Keyboard Space/Arrows
+      function setupReelsGesturesAndScroll() {
+        const modal = document.getElementById('wb_reels_modal');
+        const touchSurface = document.getElementById('wb_reel_touch_surface');
+        if (!touchSurface || !modal) return;
+
+        // 1. Touch Gestures (Mobile/Tablet Swipe + Tap)
+        let startY = 0;
+        let startX = 0;
+        let startTime = 0;
+        let isTouching = false;
+
+        touchSurface.addEventListener('touchstart', (e) => {
+          if (e.touches.length > 0) {
+            startY = e.touches[0].clientY;
+            startX = e.touches[0].clientX;
+            startTime = Date.now();
+            isTouching = true;
+          }
+        }, { passive: true });
+
+        touchSurface.addEventListener('touchend', (e) => {
+          if (!isTouching || !e.changedTouches.length) return;
+          const endY = e.changedTouches[0].clientY;
+          const endX = e.changedTouches[0].clientX;
+          const diffY = startY - endY;
+          const diffX = startX - endX;
+          const duration = Date.now() - startTime;
+
+          if (Math.abs(diffY) > 40 && Math.abs(diffY) > Math.abs(diffX)) {
+            if (diffY > 0) {
+              window.navReel(1); // Swipe Up -> Next
+            } else {
+              window.navReel(-1); // Swipe Down -> Prev
+            }
+          } else if (Math.abs(diffY) < 15 && Math.abs(diffX) < 15 && duration < 350) {
+            // Quick Single Tap -> Toggle Play / Pause!
+            window.toggleReelPlayPause();
+          }
+          isTouching = false;
+        }, { passive: true });
+
+        // 2. Desktop Click on Video -> Toggle Play / Pause
+        touchSurface.addEventListener('click', () => {
+          window.toggleReelPlayPause();
+        });
+
+        // 3. Mouse Wheel Scroll (Desktop)
+        let isWheelLocked = false;
+        modal.addEventListener('wheel', (e) => {
+          if (!modal.classList.contains('active')) return;
+          if (isWheelLocked) return;
+
+          if (Math.abs(e.deltaY) > 25) {
+            isWheelLocked = true;
+            if (e.deltaY > 0) {
+              window.navReel(1); // Wheel Down -> Next Reel
+            } else {
+              window.navReel(-1); // Wheel Up -> Prev Reel
+            }
+            setTimeout(() => { isWheelLocked = false; }, 400);
+          }
+        }, { passive: true });
+
+        // 4. Keyboard Arrow & Spacebar Navigation
+        window.addEventListener('keydown', (e) => {
+          if (!modal.classList.contains('active')) return;
+          if (e.code === 'Space' || e.key === ' ' || e.key === 'k' || e.key === 'K') {
+            e.preventDefault();
+            window.toggleReelPlayPause();
+          } else if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+            e.preventDefault();
+            window.navReel(1);
+          } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault();
+            window.navReel(-1);
+          } else if (e.key === 'Escape') {
+            window.closeReelsModal();
+          }
+        });
+      }
+
+      // -------------------------------------------------------------
+      // 5. 16:9 MASTERCLASS VIDEOS RENDERER & CINEMA PLAYER
+      // -------------------------------------------------------------
+      function renderMasterclassVideos() {
+        const grid = document.getElementById('at_videos_grid');
+        if (!grid) return;
+
+        let masterList = allRecordings.filter(v =>
+          v.status !== 'inactive' &&
+          v.format !== 'short_reel' &&
+          !v.id.startsWith('VID_S') &&
+          v.category !== 'Shorts & Reels'
+        );
+
+        if (activeVideoFilter !== 'all') {
+          masterList = masterList.filter(v => v.category === activeVideoFilter);
+        }
+
+        if (masterList.length === 0) {
+          grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--yt-text-muted);">इस श्रेणी में अभी कोई मास्टरक्लास वीडियो उपलब्ध नहीं है।</div>';
+          return;
+        }
+
+        grid.innerHTML = masterList.map(v => {
+          const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url) || '';
+          const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : DEFAULT_AAROGYAMTUBE_THUMB);
+
+          return `
+            <div class="at-vcard" onclick="window.openVideoModal('${v.id}')">
+              <div class="at-vcard-thumb-wrap">
+                <img src="${thumb}" alt="${v.title}" class="at-vcard-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
+                <span class="at-short-time">⏱️ ${v.duration || '45m'}</span>
+                <div class="at-vcard-play-overlay">
+                  <div class="at-vcard-play-icon"><i class="fa-solid fa-play"></i></div>
+                </div>
+                <button type="button" class="at-card-share-btn" onclick="event.stopPropagation(); window.shareIndividualVideo('${v.id}', '${v.title.replace(/'/g, "\\'")}')" title="WhatsApp पर शेयर करें">
+                  <i class="fa-solid fa-share-nodes"></i>
+                </button>
+              </div>
+              <div class="at-vcard-info">
+                <div class="at-vcard-title">${v.title}</div>
+                <div class="at-vcard-speaker">
+                  <i class="fa-solid fa-chalkboard-user"></i>
+                  <span>${v.speaker || 'आरोग्यम कृषि विशेषज्ञ'}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('at_video_filter_bar')?.addEventListener('click', (e) => {
+        const chip = e.target.closest('.at-chip');
+        if (!chip) return;
+        document.querySelectorAll('#at_video_filter_bar .at-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeVideoFilter = chip.dataset.category || 'all';
+        renderMasterclassVideos();
+      });
+
+      window.openVideoModal = function (vId) {
+        const match = allRecordings.find(x => x.id === vId) || allRecordings.find(x => extractYoutubeVideoId(x.video_url) === vId);
+        if (!match) return;
+
+        loadMasterclassInPlayer(match);
+        const modal = document.getElementById('wb_master_cinema_modal');
+        if (modal) {
+          modal.classList.add('active');
+          modal.scrollTop = 0;
+        }
+        document.body.classList.add('at-cinema-open');
+        document.documentElement.classList.add('wb-modal-active');
+
+        try {
+          const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+          const userShare = uObj.share_id || refShareId || 'AI000004';
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.set('vid', match.id);
+          newUrl.searchParams.set('ref', userShare);
+          window.history.replaceState({}, '', newUrl.toString());
+        } catch(e) {}
+      };
+
+      window.closeMasterclassModal = function() {
+        document.getElementById('wb_master_cinema_modal')?.classList.remove('active');
+        document.body.classList.remove('at-cinema-open');
+        document.documentElement.classList.remove('wb-modal-active');
+        const ifr = document.getElementById('at_master_iframe_main');
+        if (ifr) ifr.src = '';
+        document.querySelectorAll('.pure-css-fullscreen, .fullscreen-active').forEach(el => {
+          el.classList.remove('pure-css-fullscreen', 'fullscreen-active');
+        });
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+      };
+
+      function loadMasterclassInPlayer(vidObj) {
+        currentMasterclassVideo = vidObj;
+        
+        const titleEl = document.getElementById('at_current_title');
+        const speakerEl = document.getElementById('at_current_speaker');
+        const timeTagEl = document.getElementById('at_current_time_tag');
+        const descEl = document.getElementById('at_current_desc');
+
+        if (titleEl) titleEl.textContent = vidObj.title || 'कृषि मास्टरक्लास';
+        if (speakerEl) speakerEl.textContent = vidObj.speaker || 'आरोग्यम कृषि विशेषज्ञ';
+        if (timeTagEl) timeTagEl.textContent = `⏱️ ${vidObj.duration || '45 मिनट'} • सम्पूर्ण प्रैक्टिकल ट्रेनिंग`;
+        if (descEl) descEl.textContent = vidObj.description || `${vidObj.title} — विशेषज्ञों द्वारा तैयार संपूर्ण वैज्ञानिक एवं प्रैक्टिकल कृषि गाइड।`;
+
+        renderModalSuggestedVideos(vidObj.id);
+
+        const ytId = vidObj.youtube_id || extractYoutubeVideoId(vidObj.video_url) || 'aqz-KE-bpKQ';
+        const ifr = document.getElementById('at_master_iframe_main');
+        if (ifr) {
+          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=1&playsinline=1`;
+        }
+      }
+
+      // -------------------------------------------------------------
+      // 6. TRUE FULLSCREEN ENGINE (NATIVE + CSS FALLBACK)
+      // -------------------------------------------------------------
+      window.toggleCinemaFullscreen = function() {
+        const playerWrap = document.getElementById('at_player_frame_wrap');
+        if (!playerWrap) return;
+
+        const isFull = document.body.classList.contains('cinema-fullscreen-mode') ||
+                       Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+
+        if (!isFull) {
+          document.body.classList.add('cinema-fullscreen-mode');
+          playerWrap.classList.add('fullscreen-active', 'pure-css-fullscreen');
+
+          const req = playerWrap.requestFullscreen ||
+                      playerWrap.webkitRequestFullscreen ||
+                      playerWrap.webkitEnterFullscreen ||
+                      playerWrap.mozRequestFullScreen ||
+                      playerWrap.msRequestFullscreen ||
+                      document.documentElement.requestFullscreen ||
+                      document.documentElement.webkitRequestFullscreen;
+
+          if (req) {
+            try {
+              const p = req.call(playerWrap);
+              if (p && p.catch) p.catch(() => {});
+            } catch(e) {}
+          }
+        } else {
+          document.body.classList.remove('cinema-fullscreen-mode');
+          playerWrap.classList.remove('fullscreen-active', 'pure-css-fullscreen');
+
+          const exit = document.exitFullscreen ||
+                       document.webkitExitFullscreen ||
+                       document.mozCancelFullScreen ||
+                       document.msExitFullscreen;
+          if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+            try {
+              const p = exit.call(document);
+              if (p && p.catch) p.catch(() => {});
+            } catch(e) {}
+          }
+        }
+      };
+
+      window.toggleReelsFullscreen = function() {
+        const reelContainer = document.getElementById('wb_reels_swipe_container');
+        if (!reelContainer) return;
+
+        const isFull = document.body.classList.contains('reels-fullscreen-mode') ||
+                       Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+
+        if (!isFull) {
+          document.body.classList.add('reels-fullscreen-mode');
+          reelContainer.classList.add('fullscreen-active', 'pure-css-fullscreen');
+
+          const req = reelContainer.requestFullscreen ||
+                      reelContainer.webkitRequestFullscreen ||
+                      reelContainer.webkitEnterFullscreen ||
+                      reelContainer.mozRequestFullScreen ||
+                      reelContainer.msRequestFullscreen;
+
+          if (req) {
+            try {
+              const p = req.call(reelContainer);
+              if (p && p.catch) p.catch(() => {});
+            } catch(e) {}
+          }
+        } else {
+          document.body.classList.remove('reels-fullscreen-mode');
+          reelContainer.classList.remove('fullscreen-active', 'pure-css-fullscreen');
+
+          const exit = document.exitFullscreen ||
+                       document.webkitExitFullscreen ||
+                       document.mozCancelFullScreen ||
+                       document.msExitFullscreen;
+          if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+            try {
+              const p = exit.call(document);
+              if (p && p.catch) p.catch(() => {});
+            } catch(e) {}
+          }
+        }
+      };
+
+      function handleNativeFullscreenChange() {
+        const isFull = Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        if (!isFull) {
+          document.body.classList.remove('cinema-fullscreen-mode', 'reels-fullscreen-mode');
+          document.querySelectorAll('.pure-css-fullscreen, .fullscreen-active').forEach(el => {
+            el.classList.remove('pure-css-fullscreen', 'fullscreen-active');
+          });
+        }
+      }
+
+      document.addEventListener('fullscreenchange', handleNativeFullscreenChange);
+      document.addEventListener('webkitfullscreenchange', handleNativeFullscreenChange);
+      document.addEventListener('mozfullscreenchange', handleNativeFullscreenChange);
+      document.addEventListener('MSFullscreenChange', handleNativeFullscreenChange);
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (document.body.classList.contains('cinema-fullscreen-mode')) {
+            window.toggleCinemaFullscreen();
+          }
+          if (document.body.classList.contains('reels-fullscreen-mode')) {
+            window.toggleReelsFullscreen();
+          }
+        }
+      });
+
+      function renderModalSuggestedVideos(currentId) {
+        const listEl = document.getElementById('at_suggested_list');
+        const countEl = document.getElementById('at_suggested_count');
+        if (!listEl) return;
+
+        const masterList = allRecordings.filter(v =>
+          v.status !== 'inactive' &&
+          v.format !== 'short_reel' &&
+          !v.id.startsWith('VID_S') &&
+          v.category !== 'Shorts & Reels'
+        );
+
+        if (countEl) countEl.textContent = `${masterList.length} वीडियो उपलब्ध`;
+
+        listEl.innerHTML = masterList.map(v => {
+          const isCurrent = v.id === currentId;
+          const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url) || '';
+          const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : DEFAULT_AAROGYAMTUBE_THUMB);
+
+          return `
+            <div class="at-suggested-card ${isCurrent ? 'active-playing' : ''}" onclick="window.playSuggestedMasterclass('${v.id}')">
+              <div class="at-suggested-thumb">
+                <img src="${thumb}" alt="${v.title}" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
+                <span class="at-short-time">⏱️ ${v.duration || '45m'}</span>
+              </div>
+              <div class="at-suggested-details">
+                <div class="at-suggested-title">${v.title}</div>
+                <div class="at-suggested-speaker">👤 ${v.speaker || 'आरोग्यम विशेषज्ञ'}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.playSuggestedMasterclass = function(vId) {
+        const match = allRecordings.find(x => x.id === vId);
+        if (!match) return;
+        loadMasterclassInPlayer(match);
+        try {
+          const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+          const userShare = uObj.share_id || refShareId || 'AI000004';
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.set('vid', match.id);
+          newUrl.searchParams.set('ref', userShare);
+          window.history.replaceState({}, '', newUrl.toString());
+        } catch(e) {}
+      };
+
+      window.likeMasterclassVideo = function() {
+        const icon = document.getElementById('at_like_icon');
+        const countEl = document.getElementById('at_like_count');
+        if (icon) {
+          icon.style.transform = 'scale(1.4)';
+          setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
+        }
+        if (countEl) countEl.textContent = 'Liked ❤️';
+      };
+
+      window.commentMasterclassVideo = function() {
+        const comment = prompt('इस मास्टरक्लास ट्रेनिंग पर अपनी प्रतिक्रिया या सवाल (Comment) लिखें:');
+        if (comment && comment.trim()) {
+          alert('✅ आपकी प्रतिक्रिया सफलतापूर्वक सबमिट हो गई है! धन्यवाद।');
+        }
+      };
+
+      // -------------------------------------------------------------
+      // 6. UNIVERSAL NATIVE & SOCIAL SHARING ENGINE
+      // -------------------------------------------------------------
+      window.executeUniversalShare = async function (title, promoText, shareUrl) {
+        const fullMessage = `${promoText}\n${shareUrl}`;
+
+        // 1. Web Share API (Mobile Android/iOS, Modern Desktop Browsers)
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: title || 'AarogyamTube Video',
+              text: promoText ? `${promoText}\n` : '',
+              url: shareUrl
+            });
+            return;
+          } catch (err) {
+            if (err.name === 'AbortError') return; // User simply dismissed share sheet
+          }
+        }
+
+        // 2. Fallback: Copy to Clipboard & Alert
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(fullMessage);
+            alert(`📋 वीडियो शेयर लिंक कॉपी हो गया है!\n\n${shareUrl}\n\nअब आप इसे WhatsApp, Facebook, Instagram या कहीं भी शेयर कर सकते हैं।`);
+            return;
+          }
+        } catch (e) {}
+
+        // 3. Fallback: Open WhatsApp directly
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(fullMessage)}`, '_blank');
+      };
+
+      window.shareCurrentMasterclassWhatsApp = function() {
+        const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
+        if (!vid) return;
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
+        const promoText = `🎬 *${vid.title}*\n${vid.description ? vid.description.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+      };
+
+      window.shareCurrentMasterclassNative = function() {
+        const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
+        if (!vid) return;
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
+        const promoText = `🎬 *${vid.title}*\n${vid.description ? vid.description.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+
+        if (navigator.share) {
+          navigator.share({
+            title: vid.title,
+            text: promoText,
+            url: shareUrl
+          }).catch((err) => {
+            if (err && err.name === 'AbortError') return;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+          });
+        } else {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+        }
+      };
+
+      window.copyMasterclassLink = function() {
+        const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
+        if (!vid) return;
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert('📋 मास्टरक्लास वीडियो शेयर लिंक कॉपी हो गया!\n' + shareUrl);
+        });
+      };
+
+      window.shareIndividualVideo = function (vidId, vidTitle) {
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const match = allRecordings.find(x => x.id === vidId) || allRecordings.find(x => extractYoutubeVideoId(x.video_url) === vidId);
+        const title = vidTitle || match?.title || 'AarogyamTube Video';
+        const desc = match?.description || '';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vidId)}&ref=${encodeURIComponent(userShare)}`;
+        
+        const isShort = match?.format === 'short_reel' || String(vidId).startsWith('VID_S') || match?.category === 'Shorts & Reels';
+
+        const promoText = isShort
+          ? `🎬 *${title}*\n1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`
+          : `🎬 *${title}*\n${desc ? desc.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+
+        if (navigator.share) {
+          navigator.share({
+            title: title,
+            text: promoText,
+            url: shareUrl
+          }).catch((err) => {
+            if (err && err.name === 'AbortError') return;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+          });
+        } else {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+        }
+      };
+
+      function openSpecificVideoOrReel(vid) {
+        const match = allRecordings.find(x => x.id === vid);
+        if (match) {
+          if (match.format === 'short_reel' || match.id.startsWith('VID_S')) {
+            const idx = activeReelsList.findIndex(x => x.id === vid);
+            window.openReelPlayer(idx !== -1 ? idx : 0);
+          } else {
+            window.openVideoModal(vid);
+          }
+        }
+      }
+
+      function extractYoutubeVideoId(url) {
+        if (!url) return null;
+        const str = String(url).trim();
+        if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
+        const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
+        return match ? match[1] : null;
+      }
+
+      // -------------------------------------------------------------
+      // 7. MOBILE AUTO-FULLSCREEN ON LANDSCAPE ROTATION (Mobile Only)
+      // -------------------------------------------------------------
+      function setupOrientationAutoFullscreen() {
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+        if (!isMobile) return;
+
+        function handleMobileOrientation() {
+          const modal = document.getElementById('wb_master_cinema_modal');
+          const isModalOpen = modal && modal.classList.contains('active');
+          if (!isModalOpen) return;
+
+          const isLandscape = window.innerWidth > window.innerHeight;
+          if (isLandscape && !document.body.classList.contains('cinema-fullscreen-mode')) {
+            window.toggleCinemaFullscreen();
+          }
+        }
+
+        window.addEventListener('orientationchange', () => {
+          setTimeout(handleMobileOrientation, 300);
+        });
+      }
+
+      // Initialize Tube Platform
+      initTubePlatform();
+
+    })();
+  </script>
+</body>
+
+</html>

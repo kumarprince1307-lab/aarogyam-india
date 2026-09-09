@@ -1312,6 +1312,457 @@
       font-size: 0.75rem;
       color: #93C5FD;
     }
+
+    /* =========================================
+       AAROGYAMTUBE 16:9 MASTERCLASS CINEMA PLAYER (YOUTUBE DARK THEME)
+       ========================================== */
+    .wb-yt-modal {
+      position: fixed;
+      inset: 0;
+      background: #0f0f0f;
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      color: #ffffff;
+    }
+
+    .wb-yt-modal.active {
+      display: flex;
+    }
+
+    /* Top Minimal Sharer Header */
+    .wb-yt-top-sharer {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(15, 15, 15, 0.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .wb-yt-sharer-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .wb-yt-sharer-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      flex-shrink: 0;
+    }
+
+    .wb-yt-sharer-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .wb-yt-sharer-tag {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .wb-yt-sharer-tag span.badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .wb-yt-sharer-name-mobile {
+      font-size: 0.86rem;
+      font-weight: 800;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wb-yt-sharer-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .wb-yt-btn-contact {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .wb-yt-btn-call {
+      background: rgba(37, 99, 235, 0.2);
+      border: 1px solid #3b82f6;
+      color: #93c5fd;
+    }
+
+    .wb-yt-btn-call:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .wb-yt-btn-wa {
+      background: rgba(37, 211, 102, 0.2);
+      border: 1px solid #25d366;
+      color: #4ade80;
+    }
+
+    .wb-yt-btn-wa:hover {
+      background: #25d366;
+      color: #fff;
+    }
+
+    .wb-yt-close-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .wb-yt-close-btn:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    /* Video Frame & Layout */
+    .wb-yt-content-layout {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 12px 14px 70px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-sizing: border-box;
+    }
+
+    @media (min-width: 1024px) {
+      .wb-yt-content-layout {
+        display: grid;
+        grid-template-columns: 1fr 390px;
+        gap: 24px;
+        padding-top: 18px;
+      }
+    }
+
+    .wb-yt-player-sticky-wrap {
+      width: 100%;
+      background: #000;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .wb-yt-video-aspect {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+    }
+
+    .wb-yt-video-aspect iframe,
+    .wb-yt-video-aspect #wb_master_yt_container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Video Meta & Actions */
+    .wb-yt-meta-box {
+      padding: 12px 2px 0 2px;
+    }
+
+    .wb-yt-video-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .wb-yt-channel-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .wb-yt-channel-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wb-yt-channel-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .wb-yt-channel-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .wb-yt-channel-sub {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    .wb-yt-actions-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .wb-yt-action-pill {
+      background: #272727;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .wb-yt-action-pill:hover {
+      background: #383838;
+      transform: translateY(-1px);
+    }
+
+    .wb-yt-action-pill.active {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .wb-yt-pill-wa {
+      background: rgba(37, 211, 102, 0.2);
+      border-color: #25d366;
+      color: #4ade80;
+    }
+
+    .wb-yt-pill-wa:hover {
+      background: #25d366;
+      color: #fff;
+    }
+
+    .wb-yt-desc-box {
+      background: #212121;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 14px;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    /* Floating Share Icons on Bottom */
+    .wb-yt-floating-rail {
+      position: fixed;
+      bottom: 24px;
+      right: 16px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .wb-yt-float-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.25rem;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .wb-yt-float-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .wb-yt-float-wa {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+    }
+
+    .wb-yt-float-share {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Suggested Videos Feed (YouTube Style) */
+    .wb-yt-suggested-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .wb-yt-suggested-header {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 2px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .wb-yt-card {
+      display: flex;
+      gap: 10px;
+      background: #181818;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 6px;
+    }
+
+    .wb-yt-card:hover {
+      background: #242424;
+      border-color: rgba(45, 140, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .wb-yt-card.active-playing {
+      border: 1.5px solid #2563eb;
+      background: rgba(37, 99, 235, 0.15);
+    }
+
+    .wb-yt-thumb-box {
+      width: 120px;
+      aspect-ratio: 16/9;
+      position: relative;
+      border-radius: 6px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #000;
+    }
+
+    @media (min-width: 480px) {
+      .wb-yt-thumb-box {
+        width: 135px;
+      }
+    }
+
+    .wb-yt-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .wb-yt-time-badge {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.62rem;
+      font-weight: 700;
+    }
+
+    .wb-yt-card-details {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .wb-yt-card-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.35;
+      margin-bottom: 3px;
+    }
+
+    .wb-yt-card-speaker {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
   </style>
 </head>
 
@@ -1370,8 +1821,14 @@
         </span>
       </div>
 
-      <!-- Header Actions Right: Install App, Notification, Cart, 3-Line Menu -->
+      <!-- Header Actions Right: AarogyamTube, Install App, Notification, Cart, 3-Line Menu -->
       <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+        <!-- AarogyamTube Hub Link -->
+        <a href="/tube.html" title="🎬 AarogyamTube वीडियो व शॉर्ट्स हब"
+          style="background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);color:#ffffff;padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;text-decoration:none;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(239,68,68,0.35);white-space:nowrap;">
+          <i class="fa-brands fa-youtube"></i> <span>AarogyamTube</span>
+        </a>
+
         <!-- Install App Button (PWA) -->
         <button type="button" onclick="window.triggerPwaInstall?.() || window.triggerPWAInstall?.()"
           class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App"
@@ -1609,80 +2066,10 @@
       </div>
     </section>
 
-    <!-- =========================================
-         5. AAROGYAMTUBE 9:16 SHORTS & REELS SECTION
-         ========================================== -->
-    <section id="sec_aarogyamtube_shorts" class="wb-tube-section">
-      <div class="wb-tube-header">
-        <div class="wb-tube-brand">
-          <div class="wb-tube-icon"><i class="fa-solid fa-play"></i></div>
-          <div>
-            <div class="wb-tube-title">🎬 AarogyamTube — रील्स एवं शॉर्ट्स</div>
-            <div class="wb-tube-subtitle">1-मिनट के प्रैक्टिकल कृषि, जैविक खाद व फसल सुरक्षा शॉर्ट्स (YouTube,
-              Instagram, Facebook)</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Platform Filter Chips -->
-      <div class="wb-filter-bar" id="wb_shorts_filter_bar">
-        <button type="button" class="wb-chip active" data-platform="all">🌟 सभी रील्स (All)</button>
-        <button type="button" class="wb-chip" data-platform="youtube"><i class="fa-brands fa-youtube"
-            style="color:#EF4444;"></i> YouTube Shorts</button>
-        <button type="button" class="wb-chip" data-platform="instagram"><i class="fa-brands fa-instagram"
-            style="color:#E1306C;"></i> Instagram Reels</button>
-        <button type="button" class="wb-chip" data-platform="facebook"><i class="fa-brands fa-facebook"
-            style="color:#1877F2;"></i> Facebook Reels</button>
-      </div>
-
-      <!-- Shorts Carousel with Desktop Left/Right Buttons -->
-      <div class="wb-reels-slider-wrap">
-        <button type="button" class="wb-reels-arrow wb-reels-arrow-left" onclick="window.scrollReelsRow(-1)"
-          aria-label="Previous">
-          <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <div id="wb_shorts_grid" class="wb-shorts-grid">
-          <!-- Rendered by JS -->
-        </div>
-        <button type="button" class="wb-reels-arrow wb-reels-arrow-right" onclick="window.scrollReelsRow(1)"
-          aria-label="Next">
-          <i class="fa-solid fa-chevron-right"></i>
-        </button>
-      </div>
-        <button id="wb_shorts_see_more" class="wb-btn-primary" style="margin-top:8px; width:100%; display:none;" aria-expanded="false">See More ▼</button>
-    </section>
 
     <!-- =========================================
-         6. AAROGYAMTUBE 16:9 MASTERCLASS VIDEOS SECTION
-         ========================================== -->
-    <section id="sec_aarogyamtube_videos" class="wb-tube-section">
-      <div class="wb-tube-header">
-        <div class="wb-tube-brand">
-          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #2D8CFF, #0E71EB);"><i
-              class="fa-solid fa-chalkboard-user"></i></div>
-          <div>
-            <div class="wb-tube-title">📚 AarogyamTube — रिकॉर्डेड मास्टरक्लास</div>
-            <div class="wb-tube-subtitle">विशेषज्ञों द्वारा रिकॉर्ड की गई संपूर्ण कृषि मास्टरक्लास लाइब्रेरी</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Category Filter Chips -->
-      <div class="wb-filter-bar" id="wb_video_filter_bar">
-        <button type="button" class="wb-chip active" data-category="all">सभी मास्टरक्लास (All)</button>
-        <button type="button" class="wb-chip" data-category="Crop Protection">कीट व रोग नियंत्रण</button>
-        <button type="button" class="wb-chip" data-category="Organic Farming">जैविक कृषि</button>
-        <button type="button" class="wb-chip" data-category="Irrigation Tech">सिंचाई व पोषण</button>
-      </div>
-
-      <!-- Videos Grid -->
-      <div id="wb_videos_grid" class="wb-video-grid">
-        <!-- Rendered by JS -->
-      </div>
-    </section>
-
-    <!-- =========================================
-         7. STEP-BY-STEP ZOOM TUTORIAL
+         6. STEP-BY-STEP ZOOM TUTORIAL
          ========================================== -->
     <section id="sec_tutorial" class="wb-tube-section">
       <div class="wb-card">
@@ -1716,7 +2103,7 @@
     </section>
 
     <!-- =========================================
-         8. FAQS ACCORDION
+         7. FAQS ACCORDION
          ========================================== -->
     <section id="sec_faqs" class="wb-tube-section">
       <div class="wb-card">
@@ -1732,81 +2119,6 @@
     </section>
 
   </main>
-
-  <!-- =========================================
-       IN-APP VERTICAL REELS SWIPE PLAYER MODAL (UP/DOWN GESTURE & SCREEN FIT)
-       ========================================== -->
-  <div id="wb_reels_modal" class="wb-reels-modal">
-    <div class="wb-reels-container" id="wb_reels_swipe_container">
-      <div class="wb-reels-top">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="width:8px; height:8px; background:#F43F5E; border-radius:50%;"></span>
-          <span style="font-size:0.85rem; font-weight:800; color:#fff;">AarogyamTube Reels</span>
-          <span id="wb_reel_counter_badge"
-            style="font-size:0.7rem; color:#94A3B8; background:rgba(255,255,255,0.15); padding:2px 6px; border-radius:4px;">1
-            / 1</span>
-        </div>
-        <button type="button" class="wb-reels-close-btn" onclick="window.closeReelsModal()">&times;</button>
-      </div>
-
-      <div class="wb-reels-body" id="wb_reels_body">
-        <!-- Main YouTube Player API Container (Zero-Lag Engine) -->
-        <div id="wb_reel_yt_container" class="wb-reels-iframe" style="width:100%;height:100%;"></div>
-        <!-- Fallback Iframe for Instagram / Facebook -->
-        <iframe id="wb_reel_iframe" class="wb-reels-iframe" src=""
-          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-          allowfullscreen="true" style="display:none;"></iframe>
-        <!-- Touch & Drag Swipe Surface -->
-        <div id="wb_reel_touch_surface" class="wb-reels-touch-surface"></div>
-      </div>
-
-      <!-- Vertical Up / Down Scroll Arrow Controls -->
-      <div class="wb-reels-vertical-nav">
-        <button type="button" class="wb-vnav-btn" onclick="window.navReel(-1)" title="पिछली रील (Swipe Down)">
-          <i class="fa-solid fa-chevron-up"></i>
-          <span style="font-size:0.6rem;">Prev</span>
-        </button>
-        <button type="button" class="wb-vnav-btn" onclick="window.navReel(1)" title="अगली रील (Swipe Up)"
-          style="background:#F43F5E;border-color:#F43F5E;">
-          <i class="fa-solid fa-chevron-down"></i>
-          <span style="font-size:0.6rem;">Next</span>
-        </button>
-      </div>
-
-      <!-- Right Floating Action Rail -->
-      <div class="wb-reels-rail">
-        <button type="button" class="wb-rail-btn" id="wb_reel_like_btn" onclick="window.likeCurrentReel()">
-          <i class="fa-solid fa-heart" id="wb_reel_like_icon" style="color:#F43F5E;"></i>
-          <span class="wb-rail-count" id="wb_reel_like_count">1.2K</span>
-        </button>
-
-        <button type="button" class="wb-rail-btn" onclick="window.openReelComments()">
-          <i class="fa-solid fa-comment-dots" style="color:#60A5FA;"></i>
-          <span class="wb-rail-count" id="wb_reel_comment_count">24</span>
-        </button>
-
-        <button type="button" class="wb-rail-btn" onclick="window.shareCurrentReelWhatsApp()" style="color:#25D366;" title="WhatsApp पर शेयर करें">
-          <i class="fa-brands fa-whatsapp"></i>
-          <span class="wb-rail-count">WhatsApp</span>
-        </button>
-
-        <button type="button" class="wb-rail-btn" onclick="window.shareCurrentReelNative()" style="color:#60A5FA;" title="अन्य ऐप्स पर शेयर करें">
-          <i class="fa-solid fa-share-nodes"></i>
-          <span class="wb-rail-count">Share</span>
-        </button>
-      </div>
-
-      <!-- Bottom Caption & Direct App Button -->
-      <div class="wb-reels-caption">
-        <div id="wb_reel_caption_title" class="wb-reels-caption-title">रील शीर्षक</div>
-        <div id="wb_reel_caption_speaker" class="wb-reels-caption-speaker">आरोग्यम कृषि विशेषज्ञ</div>
-        <a id="wb_reel_direct_app_btn" href="#" target="_blank"
-          style="display:none; margin-top:6px; background:#1877F2; color:#fff; padding:6px 12px; border-radius:6px; font-size:0.75rem; font-weight:800; text-decoration:none; width:fit-content; box-shadow:0 3px 10px rgba(24,119,242,0.4);">
-          ▶️ Open in App
-        </a>
-      </div>
-    </div>
-  </div>
 
 
 
@@ -1834,6 +2146,7 @@
           <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">त्वरित नेविगेशन</h3>
           <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
             <li><a href="/index.html" style="color:#94a3b8;text-decoration:none;">🏠 मुख्य पृष्ठ</a></li>
+            <li><a href="/tube.html" style="color:#38bdf8;font-weight:800;text-decoration:none;">🎬 AarogyamTube हब</a></li>
             <li><a href="/ebooks/ebook.html" style="color:#94a3b8;text-decoration:none;">📚 ई-बुक स्टोर</a></li>
             <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;text-decoration:none;">🌱 कृषि हब</a></li>
             <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;text-decoration:none;">🌾 खरीफ
@@ -1967,6 +2280,7 @@
       async function initWebinarHub() {
         try { await loadMasterWebinarData(); } catch (e) { console.error('masterData err:', e); }
         try { await loadRecordingsData(); } catch (e) { console.error('recordings err:', e); }
+        try { await fetchSharerDetails(refShareId); } catch (e) { console.error('sharer err:', e); }
         try { renderWebinarDetails(); } catch (e) { console.error('webinar details err:', e); }
         try { reorderSectionsDOM(); } catch (e) { console.error('reorder err:', e); }
         try { renderShortsAndReels(); } catch (e) { console.error('shorts err:', e); }
@@ -2007,13 +2321,33 @@
       }
 
       async function loadRecordingsData() {
-        // Static Git JSON (Zero Egress - Single Source of Truth)
+        // 1. Instant LocalStorage check (0ms admin sync)
+        let localList = [];
+        try {
+          const localStr = localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS');
+          if (localStr) {
+            const parsed = JSON.parse(localStr);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              localList = parsed;
+              allRecordings = parsed;
+            }
+          }
+        } catch (e) { }
+
+        // 2. Fetch Static Git JSON & Merge seamlessly
         try {
           const resp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
           if (resp.ok) {
             const json = await resp.json();
             const list = Array.isArray(json.recordings) ? json.recordings : (Array.isArray(json) ? json : []);
-            if (list.length > 0) allRecordings = list;
+            if (list.length > 0) {
+              const map = new Map();
+              // Add local first (so recent admin additions take precedence)
+              localList.forEach(r => { if (r && r.id) map.set(r.id, r); });
+              // Merge remote
+              list.forEach(r => { if (r && r.id && !map.has(r.id)) map.set(r.id, r); });
+              allRecordings = Array.from(map.values());
+            }
           }
         } catch (e) { }
       }
@@ -2399,7 +2733,14 @@
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vidId)}&ref=${encodeURIComponent(userShare)}`;
-        const promoText = `🎬 *${vidTitle}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+        
+        const match = allRecordings.find(x => x.id === vidId);
+        const isShort = match?.format === 'short_reel' || String(vidId).startsWith('VID_S') || match?.category === 'Shorts & Reels';
+
+        const promoText = isShort
+          ? `🎬 *${vidTitle}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`
+          : `🎬 *${vidTitle}*\nविशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
@@ -2885,18 +3226,294 @@ if (wbShortsSeeMoreBtn) {
         renderMasterclassVideos();
       });
 
+      // -------------------------------------------------------------
+      // 6.1 MASTERCLASS CINEMA PLAYER ENGINE (YOUTUBE DARK THEME & SUGGESTED FEED)
+      // -------------------------------------------------------------
+      let ytMasterPlayer = null;
+      let currentMasterclassVideo = null;
+      let currentSharerProfile = null;
+
+      async function fetchSharerDetails(sId) {
+        const cleanId = String(sId || refShareId || 'AI000004').trim();
+        try {
+          if (db) {
+            const { data, error } = await db.from('profiles').select('id, full_name, mobile, share_id').eq('share_id', cleanId).limit(1).maybeSingle();
+            if (data && (data.full_name || data.mobile)) {
+              currentSharerProfile = data;
+              updateSharerUI(data);
+              return;
+            }
+          }
+        } catch(e) {}
+
+        // Fallback to local storage or Helpline
+        try {
+          const aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+          const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name;
+          const uMobile = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone;
+          if (uName && uMobile) {
+            const localData = { full_name: uName, mobile: uMobile, share_id: aiUser.share_id || cleanId };
+            currentSharerProfile = localData;
+            updateSharerUI(localData);
+            return;
+          }
+        } catch(e) {}
+
+        // Default Helpline
+        updateSharerUI({
+          full_name: 'आरोग्यम किसान सहायता केंद्र',
+          mobile: '7974422572',
+          share_id: cleanId
+        });
+      }
+
+      function updateSharerUI(prof) {
+        const nameMobEl = document.getElementById('wb_yt_sharer_name_mobile');
+        const avatarEl = document.getElementById('wb_yt_sharer_avatar');
+        const callBtn = document.getElementById('wb_yt_sharer_call_btn');
+        const waBtn = document.getElementById('wb_yt_sharer_wa_btn');
+
+        const fullName = prof.full_name || 'आरोग्यम किसान मित्र';
+        const cleanPhone = String(prof.mobile || '7974422572').replace(/\D/g, '').slice(-10) || '7974422572';
+        const formattedPhone = `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`;
+
+        if (nameMobEl) {
+          nameMobEl.textContent = `${fullName} • 📞 ${formattedPhone}`;
+        }
+        if (avatarEl) {
+          const initials = fullName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'AI';
+          avatarEl.textContent = initials;
+        }
+        if (callBtn) {
+          callBtn.href = `tel:+91${cleanPhone}`;
+        }
+        if (waBtn) {
+          waBtn.href = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(`नमस्ते ${fullName} जी, मैंने आपका साझा किया हुआ AarogyamTube वीडियो देखा और अधिक जानकारी चाहता हूँ।`)}`;
+        }
+      }
+
       window.openVideoModal = function (vId) {
-        const match = allRecordings.find(x => x.id === vId);
+        const match = allRecordings.find(x => x.id === vId) || allRecordings.find(x => extractYoutubeVideoId(x.video_url) === vId);
         if (!match) return;
 
         window.checkAarogyamTubeAccess(() => {
-          const ytId = match.youtube_id || extractYoutubeVideoId(match.video_url);
-          if (ytId) {
-            window.open(`https://www.youtube.com/watch?v=${ytId}`, '_blank');
-          } else if (match.video_url) {
-            window.open(match.video_url, '_blank');
-          }
+          loadMasterclassInPlayer(match);
+          document.getElementById('wb_master_cinema_modal')?.classList.add('active');
+          document.body.classList.add('wb-master-modal-open');
+          document.body.style.overflow = 'hidden';
+
+          // Update URL query state smoothly without page refresh
+          try {
+            const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+            const userShare = uObj.share_id || refShareId || 'AI000004';
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('vid', match.id);
+            newUrl.searchParams.set('ref', userShare);
+            window.history.replaceState({}, '', newUrl.toString());
+          } catch(e) {}
         }, match.id, match.title);
+      };
+
+      window.closeMasterclassModal = function() {
+        document.getElementById('wb_master_cinema_modal')?.classList.remove('active');
+        document.body.classList.remove('wb-master-modal-open');
+        document.body.style.overflow = '';
+        if (ytMasterPlayer && typeof ytMasterPlayer.pauseVideo === 'function') {
+          try { ytMasterPlayer.pauseVideo(); } catch(e) {}
+        }
+        const ifr = document.getElementById('wb_master_iframe_fallback');
+        if (ifr) ifr.src = '';
+      };
+
+      function loadMasterclassInPlayer(vidObj) {
+        currentMasterclassVideo = vidObj;
+        
+        // Set Metadata
+        const titleEl = document.getElementById('wb_yt_current_title');
+        const speakerEl = document.getElementById('wb_yt_current_speaker');
+        const timeTagEl = document.getElementById('wb_yt_current_time_tag');
+        const descEl = document.getElementById('wb_yt_current_desc');
+
+        if (titleEl) titleEl.textContent = vidObj.title || 'कृषि मास्टरक्लास';
+        if (speakerEl) speakerEl.textContent = vidObj.speaker || 'आरोग्यम कृषि विशेषज्ञ';
+        if (timeTagEl) timeTagEl.textContent = `⏱️ ${vidObj.duration || '45 मिनट'} • सम्पूर्ण प्रैक्टिकल ट्रेनिंग`;
+        if (descEl) descEl.textContent = vidObj.description || `${vidObj.title} — विशेषज्ञों द्वारा तैयार संपूर्ण वैज्ञानिक एवं प्रैक्टिकल कृषि गाइड।`;
+
+        // Render Suggested Feed inside Modal
+        renderModalSuggestedVideos(vidObj.id);
+
+        // Play YouTube Video
+        const ytId = vidObj.youtube_id || extractYoutubeVideoId(vidObj.video_url) || '';
+        initOrLoadMasterPlayer(ytId, vidObj.video_url);
+
+        // Scroll Modal to top
+        const modal = document.getElementById('wb_master_cinema_modal');
+        if (modal) modal.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function initOrLoadMasterPlayer(ytId, fallbackUrl) {
+        const container = document.getElementById('wb_master_yt_container');
+        const ifr = document.getElementById('wb_master_iframe_fallback');
+
+        if (!ytId) {
+          if (container) container.style.display = 'none';
+          if (ifr) {
+            ifr.style.display = 'block';
+            ifr.src = fallbackUrl || '';
+          }
+          return;
+        }
+
+        if (ifr) ifr.style.display = 'none';
+        if (container) container.style.display = 'block';
+
+        if (ytMasterPlayer && typeof ytMasterPlayer.loadVideoById === 'function') {
+          try {
+            ytMasterPlayer.loadVideoById({ videoId: ytId, startSeconds: 0 });
+            ytMasterPlayer.playVideo();
+            return;
+          } catch(e) {
+            console.warn('ytMasterPlayer loadVideoById err:', e);
+          }
+        }
+
+        if (window.YT && window.YT.Player) {
+          try {
+            ytMasterPlayer = new YT.Player('wb_master_yt_container', {
+              videoId: ytId,
+              playerVars: {
+                autoplay: 1,
+                controls: 1,
+                rel: 0,
+                modestbranding: 1,
+                playsinline: 1,
+                enablejsapi: 1,
+                origin: window.location.origin
+              },
+              events: {
+                onReady: (event) => {
+                  event.target.playVideo();
+                },
+                onError: () => {
+                  if (ifr) {
+                    ifr.style.display = 'block';
+                    ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
+                  }
+                }
+              }
+            });
+          } catch(err) {
+            if (ifr) {
+              ifr.style.display = 'block';
+              ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
+            }
+          }
+        } else if (ifr) {
+          ifr.style.display = 'block';
+          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
+        }
+      }
+
+      function renderModalSuggestedVideos(currentId) {
+        const listEl = document.getElementById('wb_yt_suggested_list');
+        const countEl = document.getElementById('wb_yt_suggested_count');
+        if (!listEl) return;
+
+        const masterList = allRecordings.filter(v =>
+          v.status !== 'inactive' &&
+          v.format !== 'short_reel' &&
+          !v.id.startsWith('VID_S') &&
+          v.category !== 'Shorts & Reels'
+        );
+
+        if (countEl) countEl.textContent = `${masterList.length} वीडियो उपलब्ध`;
+
+        listEl.innerHTML = masterList.map(v => {
+          const isCurrent = v.id === currentId;
+          const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url) || '';
+          const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : DEFAULT_AAROGYAMTUBE_THUMB);
+
+          return `
+            <div class="wb-yt-card ${isCurrent ? 'active-playing' : ''}" onclick="window.playSuggestedMasterclass('${v.id}')">
+              <div class="wb-yt-thumb-box">
+                <img src="${thumb}" alt="${v.title}" class="wb-yt-thumb-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
+                <span class="wb-yt-time-badge">⏱️ ${v.duration || '45m'}</span>
+              </div>
+              <div class="wb-yt-card-details">
+                <div class="wb-yt-card-title">${v.title}</div>
+                <div class="wb-yt-card-speaker">👤 ${v.speaker || 'आरोग्यम विशेषज्ञ'}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.playSuggestedMasterclass = function(vId) {
+        const match = allRecordings.find(x => x.id === vId);
+        if (!match) return;
+        loadMasterclassInPlayer(match);
+        try {
+          const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+          const userShare = uObj.share_id || refShareId || 'AI000004';
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.set('vid', match.id);
+          newUrl.searchParams.set('ref', userShare);
+          window.history.replaceState({}, '', newUrl.toString());
+        } catch(e) {}
+      };
+
+      window.likeMasterclassVideo = function() {
+        const icon = document.getElementById('wb_yt_like_icon');
+        const countEl = document.getElementById('wb_yt_like_count');
+        if (icon) {
+          icon.style.transform = 'scale(1.4)';
+          setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
+        }
+        if (countEl) countEl.textContent = 'Liked ❤️';
+      };
+
+      window.commentMasterclassVideo = function() {
+        const comment = prompt('इस मास्टरक्लास ट्रेनिंग पर अपनी प्रतिक्रिया या सवाल (Comment) लिखें:');
+        if (comment && comment.trim()) {
+          alert('✅ आपकी प्रतिक्रिया सफलतापूर्वक सबमिट हो गई है! धन्यवाद।');
+        }
+      };
+
+      window.shareCurrentMasterclassWhatsApp = function() {
+        if (!currentMasterclassVideo) return;
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(currentMasterclassVideo.id)}&ref=${encodeURIComponent(userShare)}`;
+        const promoText = `🎬 *${currentMasterclassVideo.title}*\n${currentMasterclassVideo.description ? currentMasterclassVideo.description.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText + '\n' + shareUrl)}`, '_blank');
+      };
+
+      window.shareCurrentMasterclassNative = function() {
+        if (!currentMasterclassVideo) return;
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(currentMasterclassVideo.id)}&ref=${encodeURIComponent(userShare)}`;
+        const promoText = `🎬 *${currentMasterclassVideo.title}*\n${currentMasterclassVideo.description ? currentMasterclassVideo.description.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:`;
+
+        if (navigator.share) {
+          navigator.share({
+            title: currentMasterclassVideo.title,
+            text: promoText ? `${promoText}\n` : '',
+            url: shareUrl
+          }).catch(() => {});
+        } else {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText + '\n' + shareUrl)}`, '_blank');
+        }
+      };
+
+      window.copyMasterclassLink = function() {
+        if (!currentMasterclassVideo) return;
+        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const shareUrl = `https://aarogyamindia.online/webinar.html?vid=${encodeURIComponent(currentMasterclassVideo.id)}&ref=${encodeURIComponent(userShare)}`;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert('📋 मास्टरक्लास वीडियो लिंक कॉपी हो गया!\n' + shareUrl);
+        });
       };
 
       function openSpecificVideoOrReel(vid) {

@@ -54,32 +54,61 @@ function getWebinarOrVideoData(id, type, query) {
   const cleanId = String(id || '').trim();
   const cleanType = String(type || '').trim().toLowerCase();
 
-  // 1. Specific AarogyamTube Video / Short
-  if (cleanType === 'video' || cleanType === 'short' || cleanId.startsWith('VID_') || cleanId.startsWith('REC_') || query.vid || query.yt || query.v) {
-    const vidId = query.vid || cleanId;
+  // 1. Specific AarogyamTube Video / Masterclass / Short
+  if (cleanType === 'video' || cleanType === 'short' || cleanType === 'masterclass' || cleanId.startsWith('VID_') || cleanId.startsWith('REC_') || query.vid || query.yt || query.v) {
+    const vidId = String(query.vid || query.id || cleanId).trim();
     let found = null;
-    try {
-      const recsPath = path.join(process.cwd(), 'data', 'webinar-recordings.json');
-      if (fs.existsSync(recsPath)) {
-        const content = fs.readFileSync(recsPath, 'utf8');
-        const json = JSON.parse(content);
-        const list = json.recordings || [];
-        found = list.find(r => r.id === vidId || (r.video_url && r.video_url.includes(vidId)));
-      }
-    } catch (e) {}
+    
+    const pathsToTry = [
+      path.join(process.cwd(), 'data', 'webinar-recordings.json'),
+      path.join(__dirname, '..', 'data', 'webinar-recordings.json')
+    ];
 
-    const ytId = extractYoutubeVideoId(found?.video_url || query.yt || query.v || vidId);
-    let thumb = found?.thumbnail || query.thumb || query.img;
+    for (const recsPath of pathsToTry) {
+      if (found) break;
+      try {
+        if (fs.existsSync(recsPath)) {
+          const content = fs.readFileSync(recsPath, 'utf8');
+          const json = JSON.parse(content);
+          const list = Array.isArray(json.recordings) ? json.recordings : (Array.isArray(json) ? json : []);
+          found = list.find(r => 
+            (r.id && r.id.toLowerCase() === vidId.toLowerCase()) || 
+            (r.youtube_id && r.youtube_id === vidId) ||
+            (r.video_url && r.video_url.includes(vidId)) ||
+            (extractYoutubeVideoId(r.video_url) && extractYoutubeVideoId(r.video_url) === extractYoutubeVideoId(vidId))
+          );
+        }
+      } catch (e) {}
+    }
+
+    const ytId = found?.youtube_id || extractYoutubeVideoId(found?.video_url || query.yt || query.v || query.thumb || vidId);
+    let thumb = query.thumb || query.img || query.thumbnail || found?.thumbnail;
     if (!thumb && ytId) thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
-    if (!thumb) thumb = '/images/banners/aarogyamtube-default-thumb.svg';
+    if (!thumb || thumb.includes('.svg')) {
+      thumb = `${HOST_ORIGIN}/images/banners/agriculture-hero-banner-1.webp`;
+    } else if (thumb.startsWith('//')) {
+      thumb = `https:${thumb}`;
+    } else if (thumb.startsWith('/')) {
+      thumb = `${HOST_ORIGIN}${thumb}`;
+    } else if (!thumb.startsWith('http')) {
+      thumb = `${HOST_ORIGIN}/${thumb}`;
+    }
+
+    const isShortFormat = found?.format === 'short_reel' || String(found?.id || vidId).startsWith('VID_S') || cleanType === 'short' || found?.category === 'Shorts & Reels';
+    const defaultDesc = isShortFormat
+      ? `${found?.speaker || 'आरोग्यम विशेषज्ञ'} — 1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें।`
+      : `${found?.speaker || 'आरोग्यम विशेषज्ञ'} — संपूर्ण कृषि मास्टरक्लास ट्रेनिंग गाइड। AarogyamTube पर अभी देखें।`;
+
+    const title = (query.title || found?.title || 'AarogyamTube — कृषि वीडियो').trim();
+    const description = (query.desc || query.msg || query.message || found?.description || defaultDesc).trim();
 
     return {
       is_video: true,
       id: found?.id || vidId || 'video',
-      title: found?.title || query.title || 'AarogyamTube Video',
-      description: found?.description || query.desc || `${found?.speaker || 'आरोग्यम विशेषज्ञ'} — 1-मिनट प्रैक्टिकल गाइड। AarogyamTube पर अभी देखें।`,
+      title: title,
+      description: description,
       image: thumb,
-      destUrl: `${HOST_ORIGIN}/webinar.html?vid=${encodeURIComponent(found?.id || vidId)}`
+      destUrl: `${HOST_ORIGIN}/tube.html?vid=${encodeURIComponent(found?.id || vidId)}`
     };
   }
 
@@ -94,8 +123,8 @@ function getWebinarOrVideoData(id, type, query) {
         return {
           is_webinar: true,
           id: wm.id || 'WB_MASTER',
-          title: wm.og_title || wm.title || '🔴 AarogyamTube — लाइव ज़ूम वेबिनार',
-          description: wm.og_description || wm.description || 'लाइव ज़ूम ट्रेनिंग में भाग लें और 1-मिनट के कृषि शॉर्ट्स देखें।',
+          title: wm.og_title || wm.title || '🔴 Aarogyam India — लाइव ज़ूम वेबिनार',
+          description: wm.og_description || wm.description || 'लाइव ज़ूम ट्रेनिंग में भाग लें और विशेषज्ञ मार्गदर्शन प्राप्त करें।',
           image: wm.og_image || wm.cover_image || '/images/banners/universal-zoom-webinar-og.jpg',
           destUrl: `${HOST_ORIGIN}/webinar.html`
         };
@@ -405,9 +434,9 @@ module.exports = async function handler(req, res) {
   // 2. Check if ID or Type represents a Webinar or AarogyamTube Video / Reel
   const wbOrVid = getWebinarOrVideoData(lpId, query.type || query.format, query);
   if (wbOrVid) {
-    const finalTitle = (wbOrVid.title || queryTitle || 'AarogyamTube').trim();
-    const finalDesc = (wbOrVid.description || queryDesc || 'AarogyamTube पर 1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स देखें।').slice(0, 200).trim();
-    const rawImg = wbOrVid.image || '/images/banners/aarogyamtube-default-thumb.svg';
+    const finalTitle = (wbOrVid.title || queryTitle || 'AarogyamTube — कृषि वीडियो').trim();
+    const finalDesc = (wbOrVid.description || queryDesc || 'AarogyamTube पर 1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स एवं संपूर्ण मास्टरक्लास देखें।').slice(0, 200).trim();
+    const rawImg = wbOrVid.image || `${HOST_ORIGIN}/images/banners/agriculture-hero-banner-1.webp`;
     const finalOgImage = rawImg.startsWith('http') ? rawImg : `${HOST_ORIGIN}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`;
     
     let destUrl = wbOrVid.destUrl || `${HOST_ORIGIN}/webinar.html`;
@@ -415,17 +444,9 @@ module.exports = async function handler(req, res) {
       destUrl += (destUrl.includes('?') ? '&' : '?') + `ref=${encodeURIComponent(queryShareId)}`;
     }
     
-    const canonicalShareUrl = `${HOST_ORIGIN}/api/share?${wbOrVid.is_video ? 'type=video&id=' + encodeURIComponent(wbOrVid.id) : 'type=webinar'}${queryShareId ? '&share_id=' + encodeURIComponent(queryShareId) : ''}`;
+    const canonicalShareUrl = `${HOST_ORIGIN}/api/share?${wbOrVid.is_video ? 'type=video&id=' + encodeURIComponent(wbOrVid.id) : 'type=webinar'}${queryShareId ? '&ref=' + encodeURIComponent(queryShareId) : ''}`;
 
-    const userAgent = String(req.headers['user-agent'] || '');
-    const isCrawler = isBotScraper(userAgent);
-
-    if (!isCrawler && !query.debug) {
-      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
-      return res.redirect(302, destUrl);
-    }
-
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     const isWebp = finalOgImage.toLowerCase().endsWith('.webp');
     const isPng = finalOgImage.toLowerCase().endsWith('.png');
     const imgMime = isWebp ? 'image/webp' : (isPng ? 'image/png' : 'image/jpeg');
@@ -439,7 +460,7 @@ module.exports = async function handler(req, res) {
 
   <!-- Open Graph / WhatsApp & Facebook Crawlers -->
   <meta property="fb:app_id" content="966242223397117">
-  <meta property="og:type" content="video.other">
+  <meta property="og:type" content="website">
   <meta property="og:site_name" content="AarogyamTube">
   <meta property="og:title" content="${escapeHtml(finalTitle)}">
   <meta property="og:description" content="${escapeHtml(finalDesc)}">
