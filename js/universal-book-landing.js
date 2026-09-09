@@ -455,12 +455,64 @@
     }
 
     // 3. Header, Checkout Button URLs, Share & Sticky Sync
-    const checkoutUrl = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
-    const buyBtns = ['hero-buy-btn', 'preview-buy-btn', 'final-buy-btn', 'vip-stack-unlock-btn', 'sticky-buy-btn'];
-    buyBtns.forEach(id => {
-      const btn = document.getElementById(id);
-      if (btn) btn.href = checkoutUrl;
-    });
+    const rawId = (b.id || currentBookId || 'BK001').trim().toUpperCase();
+    const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001');
+    const isComingSoon = !isLiveAgri && (
+      l.status === 'coming_soon' || 
+      l.is_coming_soon === true || 
+      l.is_coming_soon === 'true' || 
+      b.status === 'coming_soon' || 
+      b.isComingSoon === true || 
+      b.is_coming_soon === true ||
+      (l.status !== 'active' && b.status !== 'active')
+    );
+
+    if (isComingSoon) {
+      const heroBuy = document.getElementById('hero-buy-btn');
+      if (heroBuy) {
+        heroBuy.href = 'javascript:void(0)';
+        heroBuy.innerHTML = `<i class="fa-solid fa-bell"></i> <span>⏳ जल्द आ रही है • रुचि दर्ज करें (Notify Me)</span>`;
+        heroBuy.onclick = (e) => { e.preventDefault(); window.openComingSoonModal(rawId, title); };
+        heroBuy.style.background = 'linear-gradient(135deg, #16a34a 0%, #059669 100%)';
+      }
+
+      const stickyBuy = document.getElementById('sticky-buy-btn');
+      if (stickyBuy) {
+        stickyBuy.href = 'javascript:void(0)';
+        stickyBuy.innerHTML = `<span>⏳ रुचि दर्ज करें</span>`;
+        stickyBuy.onclick = (e) => { e.preventDefault(); window.openComingSoonModal(rawId, title); };
+        stickyBuy.style.background = 'linear-gradient(135deg, #16a34a 0%, #059669 100%)';
+      }
+
+      const previewBuy = document.getElementById('preview-buy-btn');
+      if (previewBuy) {
+        previewBuy.href = 'javascript:void(0)';
+        previewBuy.innerHTML = `<i class="fa-solid fa-bell"></i> <span>⏳ रिलीज़ होने पर सूचित करें</span>`;
+        previewBuy.onclick = (e) => { e.preventDefault(); window.openComingSoonModal(rawId, title); };
+        previewBuy.style.background = 'linear-gradient(135deg, #16a34a 0%, #059669 100%)';
+      }
+
+      const finalBuy = document.getElementById('final-buy-btn');
+      if (finalBuy) {
+        finalBuy.href = 'javascript:void(0)';
+        finalBuy.innerHTML = `<i class="fa-solid fa-bell"></i> <span>🔔 प्री-इंटरेस्ट दर्ज करें (Notify Me)</span>`;
+        finalBuy.onclick = (e) => { e.preventDefault(); window.openComingSoonModal(rawId, title); };
+        finalBuy.style.background = 'linear-gradient(135deg, #16a34a 0%, #059669 100%)';
+      }
+
+      const vipUnlock = document.getElementById('vip-stack-unlock-btn');
+      if (vipUnlock) {
+        vipUnlock.href = '/subscription.html';
+        vipUnlock.innerHTML = `<i class="fa-solid fa-crown"></i> <span>👑 VIP मेंबर्स को रिलीज़ पर फ्री मिलेगा</span>`;
+      }
+    } else {
+      const checkoutUrl = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
+      const buyBtns = ['hero-buy-btn', 'preview-buy-btn', 'final-buy-btn', 'vip-stack-unlock-btn', 'sticky-buy-btn'];
+      buyBtns.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.href = checkoutUrl;
+      });
+    }
 
     setElemText('header-book-title', title);
     setElemText('sticky-book-title', title);

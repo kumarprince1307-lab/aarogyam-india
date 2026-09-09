@@ -349,6 +349,34 @@ async function loadBook() {
         const totPrice = document.getElementById("totalPrice");
         if (totPrice) totPrice.textContent = "₹" + bookOffer;
 
+        // Safety Guard: Check if Book is Coming Soon
+        const bIdUpper = String(book.id || targetId || '').toUpperCase();
+        const isLiveAgri = (bIdUpper === 'BK001' || bIdUpper === 'BK002' || bIdUpper === 'SUB001');
+        const isBookComingSoon = !isLiveAgri && (
+            book.status === 'coming_soon' || 
+            book.isComingSoon === true || 
+            book.is_coming_soon === true ||
+            book.status !== 'active'
+        );
+
+        if (isBookComingSoon) {
+            const payBtn = document.getElementById("payNowBtn") || document.querySelector(".pay-btn");
+            if (payBtn) {
+                payBtn.disabled = true;
+                payBtn.style.background = "#94a3b8";
+                payBtn.style.cursor = "not-allowed";
+                payBtn.innerHTML = `⏳ आगामी पुस्तक (Coming Soon) - रिलीज होने पर उपलब्ध होगी`;
+            }
+            const orderSummary = document.querySelector(".order-summary");
+            if (orderSummary) {
+                const notice = document.createElement("div");
+                notice.style.cssText = "background:#fef3c7;border:1.5px solid #f59e0b;color:#92400e;padding:12px;border-radius:10px;font-size:0.88rem;margin-top:14px;font-weight:700;line-height:1.4;";
+                const safeName = String(bookName || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                notice.innerHTML = `🔔 <strong>सूचना:</strong> '${safeName}' अभी आगामी (Coming Soon) स्थिति में है। इसका भुगतान अभी सक्रिय नहीं है। लॉन्च होते ही सूचना पाने के लिए ई-बुक स्टोर पर रुचि दर्ज करें।`;
+                orderSummary.appendChild(notice);
+            }
+        }
+
         autoFillUserData();
 
     } catch (error) {

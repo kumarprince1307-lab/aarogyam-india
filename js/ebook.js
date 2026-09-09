@@ -319,8 +319,8 @@
   function renderNewArrivalsShelf() {
     const grid = document.getElementById('new-arrivals-grid');
     if (!grid) return;
-    const newItems = allStoreBooks.filter(b => b.badge === 'new_arrival' || b.badge === 'trending' || b.id === 'BK002' || b.id === 'BK006');
-    const displayList = newItems.length > 0 ? newItems : allStoreBooks.slice(0, 4);
+    const newItems = allStoreBooks.filter(b => (b.badge === 'new_arrival' || b.badge === 'trending' || b.id === 'BK002') && !b.isComingSoon && b.id !== 'BK006');
+    const displayList = newItems.length > 0 ? newItems : allStoreBooks.filter(b => !b.isComingSoon);
     grid.innerHTML = displayList.map(b => window.renderUniversalBookMarketingCard(b)).join('');
   }
 

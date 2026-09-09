@@ -356,7 +356,15 @@
     } else {
       landingUrl = book.landingPage || `/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`;
     }
-    const isComingSoon = book.isComingSoon === true || book.is_coming_soon === true || book.badge === 'coming_soon' || book.status === 'coming_soon';
+    const isLiveAgri = (bId === 'BK001' || bId === 'BK002' || bId === 'SUB001');
+    const isComingSoon = !isLiveAgri && (
+      book.isComingSoon === true || 
+      book.is_coming_soon === true || 
+      book.badge === 'coming_soon' || 
+      book.store_badge === 'coming_soon' || 
+      book.status === 'coming_soon' || 
+      book.status !== 'active'
+    );
     
     // Store Badge Calculation
     let badgeText = 'Launch Offer';
@@ -450,12 +458,28 @@
             <div class="card-savings-text">आप बचाएंगे ₹${mrp - offerPrice}</div>
           </div>
 
-          <!-- Modern Action Buttons Bar (Add Cart Blue, Buy Now Orange, Share Now Native & Share Drawer) -->
+          <!-- Action Buttons Bar: Coming Soon Wishlist / Buy Now Controls -->
           <div class="card-actions-container">
             ${isComingSoon ? `
-              <button type="button" class="btn-pre-interest" onclick="window.openComingSoonModal('${bId}', '${title}')">
-                🔔 Pre-Interest / Notify
-              </button>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button 
+                  type="button" 
+                  class="btn-pre-interest" 
+                  style="flex:1;background:linear-gradient(135deg, #16a34a, #059669);color:#fff;font-weight:800;border:none;border-radius:10px;padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.84rem;box-shadow:0 4px 12px rgba(22,163,74,0.25);transition:all 0.2s;" 
+                  onclick="window.openComingSoonModal('${bId}', '${escapeHtml(title)}')"
+                >
+                  <i class="fa-solid fa-bell"></i> <span>जल्द आ रही है (रुचि दर्ज करें)</span>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn-card-share-green" 
+                  style="width:42px;height:42px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#25d366;color:#fff;border:none;cursor:pointer;flex-shrink:0;" 
+                  onclick="window.nativeDirectShare('${bId}', '${escapeHtml(title)}', ${offerPrice})" 
+                  title="शेयर करें"
+                >
+                  <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i>
+                </button>
+              </div>
             ` : `
               <div class="card-actions-grid-2x2">
                 <!-- 1. Add to Cart (Blue Button) -->
@@ -477,7 +501,7 @@
                 <button 
                   type="button" 
                   class="btn-card-share-green" 
-                  onclick="window.nativeDirectShare('${bId}', '${title}', ${offerPrice})"
+                  onclick="window.nativeDirectShare('${bId}', '${escapeHtml(title)}', ${offerPrice})"
                   title="सीधे मोबाइल में शेयर करें"
                 >
                   <i class="fa-brands fa-whatsapp"></i> <span>Share Now</span>
@@ -487,7 +511,7 @@
                 <button 
                   type="button" 
                   class="btn-card-share-channels" 
-                  onclick="window.openShareDrawer('${bId}', '${title}', ${offerPrice})"
+                  onclick="window.openShareDrawer('${bId}', '${escapeHtml(title)}', ${offerPrice})"
                   title="सोशल मीडिया ऑप्शंस खोलें"
                 >
                   <i class="fa-solid fa-share-nodes"></i> <span>Share By</span>
@@ -498,6 +522,102 @@
         </div>
       </div>
     `;
+  };
+
+  // -------------------------------------------------------------
+  // UNIVERSAL COMING SOON LEAD / INTEREST CAPTURE MODAL
+  // -------------------------------------------------------------
+  window.openComingSoonModal = function (bookId, bookTitle) {
+    const existingModal = document.getElementById('ai-coming-soon-modal-overlay');
+    if (existingModal) existingModal.remove();
+
+    let defaultName = '';
+    let defaultPhone = '';
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      if (u.name || u.full_name) defaultName = u.name || u.full_name;
+      if (u.phone || u.mobile) defaultPhone = u.phone || u.mobile;
+    } catch (e) {}
+
+    const modalHtml = `
+      <div id="ai-coming-soon-modal-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.75);backdrop-filter:blur(4px);z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;">
+        <div style="background:#ffffff;border-radius:20px;max-width:420px;width:100%;padding:28px 24px;box-shadow:0 25px 50px rgba(0,0,0,0.25);position:relative;animation:aiModalFadeIn 0.25s ease-out;font-family:inherit;">
+          <button type="button" onclick="document.getElementById('ai-coming-soon-modal-overlay').remove()" style="position:absolute;top:14px;right:14px;background:#f1f5f9;border:none;width:32px;height:32px;border-radius:50%;font-size:1.1rem;cursor:pointer;color:#64748b;display:flex;align-items:center;justify-content:center;">&times;</button>
+          
+          <div style="text-align:center;margin-bottom:18px;">
+            <div style="width:54px;height:54px;background:#dcfce7;color:#16a34a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 12px;">
+              🔔
+            </div>
+            <h3 style="margin:0 0 6px 0;font-size:1.25rem;font-weight:900;color:#0f172a;">आगामी पुस्तक — रुचि दर्ज करें</h3>
+            <p style="margin:0;font-size:0.85rem;color:#64748b;line-height:1.4;">
+              <strong style="color:#16a34a;">${escapeHtml(bookTitle)}</strong> जल्द ही लॉन्च हो रही है। लॉन्च होते ही WhatsApp पर सूचना व स्पेशल डिस्काउंट पाने के लिए अपना नंबर दर्ज करें।
+            </p>
+          </div>
+
+          <form id="ai-cs-lead-form" onsubmit="window.handleComingSoonLeadSubmit(event, '${escapeHtml(bookId)}', '${escapeHtml(bookTitle)}')">
+            <div style="margin-bottom:12px;">
+              <label style="display:block;font-size:0.78rem;font-weight:700;color:#334155;margin-bottom:4px;">👤 आपका नाम</label>
+              <input type="text" id="ai-cs-name" value="${escapeHtml(defaultName)}" placeholder="अपना नाम दर्ज करें" style="width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:0.9rem;box-sizing:border-box;outline:none;" />
+            </div>
+
+            <div style="margin-bottom:18px;">
+              <label style="display:block;font-size:0.78rem;font-weight:700;color:#334155;margin-bottom:4px;">📱 WhatsApp मोबाइल नंबर *</label>
+              <input type="tel" id="ai-cs-phone" required maxlength="10" value="${escapeHtml(defaultPhone)}" placeholder="10 अंकों का WhatsApp नंबर" style="width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:0.95rem;font-weight:700;letter-spacing:1px;box-sizing:border-box;outline:none;" />
+            </div>
+
+            <button type="submit" style="width:100%;background:linear-gradient(135deg, #16a34a 0%, #059669 100%);color:#fff;font-weight:900;font-size:0.95rem;padding:12px;border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 16px rgba(22,163,74,0.35);">
+              ✅ मुझे WhatsApp पर सूचित करें (Notify Me)
+            </button>
+          </form>
+
+          <div style="margin-top:14px;text-align:center;">
+            <a href="https://wa.me/917974422572?text=${encodeURIComponent('नमस्ते Aarogyam India, मुझे ' + bookTitle + ' पुस्तक के बारे में जानकारी चाहिए।')}" target="_blank" style="font-size:0.8rem;color:#16a34a;font-weight:700;text-decoration:none;">
+              💬 सीधे WhatsApp पर पूछें →
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+
+  window.handleComingSoonLeadSubmit = function (e, bookId, bookTitle) {
+    if (e) e.preventDefault();
+    const nameInput = document.getElementById('ai-cs-name');
+    const phoneInput = document.getElementById('ai-cs-phone');
+    const name = (nameInput?.value || 'किसान पाठक').trim();
+    const phone = (phoneInput?.value || '').replace(/[^0-9]/g, '');
+
+    if (!phone || phone.length < 10) {
+      alert('कृपया सही 10-अंकों का WhatsApp मोबाइल नंबर दर्ज करें।');
+      return;
+    }
+
+    try {
+      let leads = JSON.parse(localStorage.getItem('AAROGYAM_COMING_SOON_LEADS') || '[]');
+      leads.unshift({
+        userName: name,
+        userPhone: phone,
+        bookId: bookId,
+        bookTitle: bookTitle,
+        registeredAt: new Date().toLocaleString('hi-IN')
+      });
+      localStorage.setItem('AAROGYAM_COMING_SOON_LEADS', JSON.stringify(leads));
+
+      // Also add to Wishlist automatically
+      window.AarogyamWishlist.toggle({
+        id: bookId,
+        heading: bookTitle,
+        name: bookTitle,
+        category: 'Agriculture'
+      });
+    } catch (err) {}
+
+    const overlay = document.getElementById('ai-coming-soon-modal-overlay');
+    if (overlay) overlay.remove();
+
+    window.AarogyamWishlist.showToast('✅ आपकी रुचि दर्ज कर ली गई है! लॉन्च होते ही आपको WhatsApp पर सूचित किया जाएगा।', 'success');
   };
 
   function escapeHtml(str) {
