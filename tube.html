@@ -1505,10 +1505,129 @@
       color: #ffffff;
     }
 
+    .at-fs-rotate {
+      background: rgba(168, 85, 247, 0.35);
+      border: 1px solid #a855f7;
+      color: #ffffff;
+    }
+
     .at-fs-exit {
       background: rgba(239, 68, 68, 0.35);
       border: 1px solid #ef4444;
       color: #ffffff;
+    }
+
+    /* Bottom Floating Action Rail in Fullscreen */
+    .at-fs-bottom-rail {
+      display: none;
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      z-index: 2147483647;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(14px);
+      padding: 8px 14px;
+      border-radius: 30px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .fullscreen-active .at-fs-bottom-rail,
+    .cinema-fullscreen-mode .at-fs-bottom-rail,
+    #at_player_frame_wrap:fullscreen .at-fs-bottom-rail,
+    #at_player_frame_wrap:-webkit-full-screen .at-fs-bottom-rail {
+      display: flex !important;
+    }
+
+    .at-fs-bottom-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 6px 13px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .at-fs-bottom-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .at-fs-btn-like {
+      background: rgba(239, 68, 68, 0.25) !important;
+      border-color: #ef4444 !important;
+      color: #ffffff !important;
+    }
+
+    .at-fs-btn-wa {
+      background: rgba(37, 211, 102, 0.25) !important;
+      border-color: #25d366 !important;
+      color: #25d366 !important;
+    }
+
+    .at-fs-btn-share {
+      background: rgba(37, 99, 235, 0.25) !important;
+      border-color: #3b82f6 !important;
+      color: #38bdf8 !important;
+    }
+
+    /* 90-Degree Landscape Rotate Transform */
+    #at_player_frame_wrap.cinema-rotate-90 {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100vh !important;
+      width: 100dvh !important;
+      height: 100vw !important;
+      height: 100dvw !important;
+      transform: translate(-50%, -50%) rotate(90deg) !important;
+      transform-origin: center center !important;
+      z-index: 2147483647 !important;
+      background: #000000 !important;
+    }
+
+    #at_player_frame_wrap.cinema-rotate-90 .at-aspect-16-9 {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      aspect-ratio: auto !important;
+    }
+
+    /* Flying Hearts Upwards Floating Animation */
+    @keyframes atFloatHeartUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.6) rotate(0deg);
+      }
+      50% {
+        opacity: 0.95;
+        transform: translateY(-90px) scale(1.35) rotate(15deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-210px) scale(1.6) rotate(-25deg);
+      }
+    }
+
+    .at-floating-heart {
+      position: fixed;
+      pointer-events: none;
+      z-index: 2147483647;
+      user-select: none;
+      animation: atFloatHeartUp 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      filter: drop-shadow(0 2px 10px rgba(239, 68, 68, 0.6));
     }
 
     .at-topbar-brand {
@@ -2067,8 +2186,29 @@
             <div class="at-fs-hud-right">
               <a id="at_fs_hud_call" href="tel:+917974422572" class="at-fs-hud-pill at-fs-call" title="सीधे कॉल करें"><i class="fa-solid fa-phone"></i> <span>कॉल</span></a>
               <a id="at_fs_hud_wa" href="https://api.whatsapp.com/send?phone=917974422572" target="_blank" class="at-fs-hud-pill at-fs-wa" title="WhatsApp करें"><i class="fa-brands fa-whatsapp"></i> <span>WhatsApp</span></a>
+              <button type="button" class="at-fs-hud-pill at-fs-rotate" onclick="window.toggleRotateLandscape()" title="90° लैंडस्केप घुमाएं"><i class="fa-solid fa-rotate"></i> <span>90° Rotate</span></button>
               <button type="button" class="at-fs-hud-pill at-fs-exit" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन से बाहर आएं"><i class="fa-solid fa-compress"></i> <span>Exit</span></button>
             </div>
+          </div>
+
+          <!-- Fullscreen Bottom Floating Action Rail -->
+          <div class="at-fs-bottom-rail" id="at_fs_bottom_rail">
+            <button type="button" class="at-fs-bottom-btn at-fs-btn-like" id="at_fs_like_btn" onclick="window.likeMasterclassVideo(event)" title="लाइक करें (Floating Hearts)">
+              <i class="fa-solid fa-heart" id="at_fs_like_icon" style="color:#ef4444;"></i>
+              <span id="at_fs_like_count">1.4K</span>
+            </button>
+            <button type="button" class="at-fs-bottom-btn at-fs-btn-wa" onclick="window.shareCurrentMasterclassWhatsApp()" title="WhatsApp शेयर">
+              <i class="fa-brands fa-whatsapp" style="color:#25d366;"></i>
+              <span>WhatsApp</span>
+            </button>
+            <button type="button" class="at-fs-bottom-btn at-fs-btn-share" onclick="window.shareCurrentMasterclassNative()" title="अन्य ऐप्स पर शेयर करें">
+              <i class="fa-solid fa-share-nodes" style="color:#38bdf8;"></i>
+              <span>Share</span>
+            </button>
+            <button type="button" class="at-fs-bottom-btn" onclick="window.commentMasterclassVideo()" title="कमेंट करें">
+              <i class="fa-solid fa-comment-dots" style="color:#60a5fa;"></i>
+              <span>कमेंट</span>
+            </button>
           </div>
 
           <div class="at-aspect-16-9">
@@ -3068,14 +3208,56 @@
         } catch(e) {}
       };
 
-      window.likeMasterclassVideo = function() {
+      window.triggerFloatingHearts = function(btnEl) {
+        const hearts = ['❤️', '💖', '💗', '💕', '🔥', '✨', '💐'];
+        const rect = btnEl && btnEl.getBoundingClientRect ? btnEl.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight - 80 };
+
+        for (let i = 0; i < 8; i++) {
+          setTimeout(() => {
+            const heart = document.createElement('div');
+            heart.className = 'at-floating-heart';
+            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            
+            const offsetX = (Math.random() - 0.5) * 80;
+            const size = Math.floor(Math.random() * 16) + 24; // 24px to 40px
+            const duration = (Math.random() * 0.6 + 1.2).toFixed(2);
+            
+            heart.style.left = `${Math.max(10, Math.min(window.innerWidth - 40, rect.left + 20 + offsetX))}px`;
+            heart.style.top = `${rect.top - 10}px`;
+            heart.style.fontSize = `${size}px`;
+            heart.style.animationDuration = `${duration}s`;
+            
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, duration * 1000 + 100);
+          }, i * 80);
+        }
+      };
+
+      window.toggleRotateLandscape = function() {
+        const wrap = document.getElementById('at_player_frame_wrap');
+        if (!wrap) return;
+        wrap.classList.toggle('cinema-rotate-90');
+      };
+
+      window.likeMasterclassVideo = function(e) {
         const icon = document.getElementById('at_like_icon');
         const countEl = document.getElementById('at_like_count');
+        const fsIcon = document.getElementById('at_fs_like_icon');
+        const fsCount = document.getElementById('at_fs_like_count');
+
         if (icon) {
           icon.style.transform = 'scale(1.4)';
           setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
         }
         if (countEl) countEl.textContent = 'Liked ❤️';
+        if (fsIcon) {
+          fsIcon.style.transform = 'scale(1.4)';
+          setTimeout(() => { fsIcon.style.transform = 'scale(1)'; }, 200);
+        }
+        if (fsCount) fsCount.textContent = 'Liked ❤️';
+
+        const targetBtn = (e && e.currentTarget) || document.getElementById('at_like_btn') || document.getElementById('at_fs_like_btn');
+        window.triggerFloatingHearts(targetBtn);
       };
 
       window.commentMasterclassVideo = function() {
