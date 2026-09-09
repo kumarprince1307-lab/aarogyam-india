@@ -1196,14 +1196,17 @@
     }
 
     .at-act-pill-fs {
-      background: rgba(37, 99, 235, 0.15);
-      border-color: #3b82f6;
-      color: #3b82f6;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+      border: 1.5px solid #ef4444 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35) !important;
     }
 
     .at-act-pill-fs:hover {
-      background: #2563eb;
-      color: #fff;
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+      color: #ffffff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(239, 68, 68, 0.5) !important;
     }
 
     .at-act-pill-wa {
@@ -2484,7 +2487,6 @@
         try { renderShortsAndReels(); } catch (e) { console.error('shorts err:', e); }
         try { renderMasterclassVideos(); } catch (e) { console.error('videos err:', e); }
         try { setupReelsGesturesAndScroll(); } catch (e) { console.error('gestures err:', e); }
-        try { setupOrientationAutoFullscreen(); } catch (e) { console.error('orientation err:', e); }
         try { updateLiveTicker(); } catch (e) { console.error('ticker err:', e); }
 
         if (specificVid) {
@@ -3332,29 +3334,6 @@
         if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
         const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
         return match ? match[1] : null;
-      }
-
-      // -------------------------------------------------------------
-      // 7. MOBILE AUTO-FULLSCREEN ON LANDSCAPE ROTATION (Mobile Only)
-      // -------------------------------------------------------------
-      function setupOrientationAutoFullscreen() {
-        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
-        if (!isMobile) return;
-
-        function handleMobileOrientation() {
-          const modal = document.getElementById('wb_master_cinema_modal');
-          const isModalOpen = modal && modal.classList.contains('active');
-          if (!isModalOpen) return;
-
-          const isLandscape = window.innerWidth > window.innerHeight;
-          if (isLandscape && !document.body.classList.contains('cinema-fullscreen-mode')) {
-            window.toggleCinemaFullscreen();
-          }
-        }
-
-        window.addEventListener('orientationchange', () => {
-          setTimeout(handleMobileOrientation, 300);
-        });
       }
 
       // Initialize Tube Platform
