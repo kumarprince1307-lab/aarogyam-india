@@ -3090,6 +3090,40 @@
       };
 
       // -------------------------------------------------------------
+      // 3.1 ZERO-EGRESS ACTIVITY TRACKER (VIEW, LIKE, SHARE, COMMENT)
+      // -------------------------------------------------------------
+      function logVideoActivity(actionType, videoObj, extraData = {}) {
+        if (!db) return;
+        const uplineShareId = getActiveUplineShareId();
+        let uObj = {};
+        try { uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+        const viewerName = localStorage.getItem('aim_user_name') || uObj.name || uObj.full_name || 'किसान साथी';
+        const viewerMobile = localStorage.getItem('aim_user_mobile') || uObj.mobile || uObj.phone || 'N/A';
+        const vidId = videoObj?.id || extraData?.videoId || 'VID_001';
+        const vidTitle = videoObj?.title || extraData?.videoTitle || 'AarogyamTube Video';
+
+        (async () => {
+          try {
+            await db.from('surveys').insert([{
+              name: viewerName,
+              mobile: viewerMobile,
+              occupation: 'video_viewer',
+              selected_categories: 'webinar_video_view',
+              profile_id: uplineShareId,
+              category_answers: {
+                event_type: 'recorded_video_view',
+                action_type: actionType, // 'view' | 'like' | 'share' | 'comment'
+                video_id: vidId,
+                video_title: vidTitle,
+                comment: extraData?.comment || '',
+                viewed_at: new Date().toISOString()
+              }
+            }]);
+          } catch(_) {}
+        })();
+      }
+
+      // -------------------------------------------------------------
       // 4. SHORTS & REELS 9:16 RENDERER & PLAYER
       // -------------------------------------------------------------
       function renderShortsAndReels() {
@@ -3188,6 +3222,9 @@
         isReelPlaying = true;
         const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
 
+        // 0-Egress activity log
+        logVideoActivity('view', reel);
+
         if (window.YT && window.YT.Player) {
           if (!reelYTPlayer) {
             if (ifr) ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=0&playsinline=1&origin=${encodeURIComponent(origin)}`;
@@ -3278,6 +3315,7 @@
       window.shareCurrentReelWhatsApp = function () {
         const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
         if (!reel) return;
+        logVideoActivity('share', reel);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(userShare)}`;
@@ -3288,6 +3326,7 @@
       window.shareCurrentReelNative = function () {
         const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
         if (!reel) return;
+        logVideoActivity('share', reel);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(userShare)}`;
@@ -3315,11 +3354,13 @@
           setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
         }
         if (count) count.textContent = 'Liked ❤️';
+        logVideoActivity('like', activeReelsList[currentReelIndex]);
       };
 
       window.openReelComments = function () {
         const comment = prompt('इस रील पर अपनी प्रतिक्रिया या सवाल (Comment) लिखें:');
         if (comment && comment.trim()) {
+          logVideoActivity('comment', activeReelsList[currentReelIndex], { comment: comment.trim() });
           alert('✅ आपकी प्रतिक्रिया सफलतापूर्वक सबमिट हो गई है! धन्यवाद।');
         }
       };
@@ -3515,6 +3556,9 @@
       function loadMasterclassInPlayer(vidObj) {
         currentMasterclassVideo = vidObj;
         
+        // 0-Egress activity log
+        logVideoActivity('view', vidObj);
+
         const titleEl = document.getElementById('at_current_title');
         const speakerEl = document.getElementById('at_current_speaker');
         const timeTagEl = document.getElementById('at_current_time_tag');
@@ -3772,6 +3816,9 @@
       };
 
       window.likeMasterclassVideo = function(e) {
+        const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
+        if (vid) logVideoActivity('like', vid);
+
         const icon = document.getElementById('at_like_icon');
         const countEl = document.getElementById('at_like_count');
         const fsIcon = document.getElementById('at_fs_like_icon');
@@ -3795,6 +3842,8 @@
       window.commentMasterclassVideo = function() {
         const comment = prompt('इस मास्टरक्लास ट्रेनिंग पर अपनी प्रतिक्रिया या सवाल (Comment) लिखें:');
         if (comment && comment.trim()) {
+          const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
+          if (vid) logVideoActivity('comment', vid, { comment: comment.trim() });
           alert('✅ आपकी प्रतिक्रिया सफलतापूर्वक सबमिट हो गई है! धन्यवाद।');
         }
       };
@@ -3835,6 +3884,7 @@
       window.shareCurrentMasterclassWhatsApp = function() {
         const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
         if (!vid) return;
+        logVideoActivity('share', vid);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
@@ -3845,6 +3895,7 @@
       window.shareCurrentMasterclassNative = function() {
         const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
         if (!vid) return;
+        logVideoActivity('share', vid);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
@@ -3867,6 +3918,7 @@
       window.copyMasterclassLink = function() {
         const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
         if (!vid) return;
+        logVideoActivity('share', vid);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
@@ -3883,6 +3935,8 @@
         const desc = match?.description || '';
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vidId)}&ref=${encodeURIComponent(userShare)}`;
         
+        logVideoActivity('share', match || { id: vidId, title: title });
+
         const isShort = match?.format === 'short_reel' || String(vidId).startsWith('VID_S') || match?.category === 'Shorts & Reels';
 
         const promoText = isShort

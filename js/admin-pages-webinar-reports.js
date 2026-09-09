@@ -229,6 +229,8 @@ export async function initWebinarReports() {
             mobile: s.mobile || 'N/A',
             state: s.state || '',
             district: s.district || '',
+            actionType: cAns.action_type || 'view',
+            comment: cAns.comment || '',
             videoTitle: cAns.video_title || 'रिकॉर्डेड ट्रेनिंग क्लास',
             videoId: cAns.video_id || 'VID_001',
             viewedAt: cAns.viewed_at || cAns.unlocked_at || s.created_at,
@@ -389,7 +391,9 @@ export async function initWebinarReports() {
       (v.mobile || '').includes(q) ||
       (v.videoTitle || '').toLowerCase().includes(q) ||
       (v.sponsorName || '').toLowerCase().includes(q) ||
-      (v.district || '').toLowerCase().includes(q)
+      (v.district || '').toLowerCase().includes(q) ||
+      (v.actionType || '').toLowerCase().includes(q) ||
+      (v.comment || '').toLowerCase().includes(q)
     );
   }
 
@@ -674,7 +678,7 @@ export async function initWebinarReports() {
   function renderVideoViewersTable() {
     const views = getFilteredVideoViews();
     if (!views || views.length === 0) {
-      containerVideos.innerHTML = '<div class="admin-empty"><strong>कोई रिकॉर्डेड वीडियो दर्शक डेटा नहीं मिला।</strong><br>जैसे ही किसान रिकॉर्डेड ट्रेनिंग अनलॉक करेंगे, डेटा यहाँ दिखेगा।</div>';
+      containerVideos.innerHTML = '<div class="admin-empty"><strong>कोई रिकॉर्डेड वीडियो / रिल्स गतिविधि डेटा नहीं मिला।</strong><br>जैसे ही किसान वीडियो देखेंगे, लाइक या शेयर करेंगे, डेटा यहाँ दिखेगा।</div>';
       return;
     }
 
@@ -688,7 +692,7 @@ export async function initWebinarReports() {
 
     containerVideos.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--admin-muted);margin-bottom:8px;">
-        <span>Showing <strong>${start + 1}-${Math.min(start + PAGE_SIZE, total)}</strong> of <strong>${total}</strong> Video Viewers</span>
+        <span>Showing <strong>${start + 1}-${Math.min(start + PAGE_SIZE, total)}</strong> of <strong>${total}</strong> Video & Reel Interactions</span>
       </div>
 
       <div class="admin-table-wrapper sticky-header-table">
@@ -699,10 +703,11 @@ export async function initWebinarReports() {
               <th>दर्शक का नाम (Viewer)</th>
               <th>मोबाइल नंबर & संपर्क</th>
               <th>स्थान (District / State)</th>
-              <th>देखा गया वीडियो / रील (Video Title)</th>
+              <th>गतिविधि (Action)</th>
+              <th>वीडियो / रील शीर्षक (Video Title)</th>
               <th>स्पॉन्सर मेंबर (Sponsor)</th>
-              <th>देखे जाने की तारीख</th>
-              <th>कार्रवाई</th>
+              <th>तारीख व समय</th>
+              <th>कार्रवाई (Action)</th>
             </tr>
           </thead>
           <tbody>
@@ -710,29 +715,40 @@ export async function initWebinarReports() {
               const rowNum = start + i + 1;
               const sMob = String(v.mobile || '').replace(/\D/g, '');
               const waMob = sMob.length === 10 ? '91' + sMob : sMob;
-              const waMsg = encodeURIComponent(`नमस्ते ${v.name} जी! आपने आरोग्यम इंडिया की रिकॉर्डेड वीडियो ट्रेनिंग देखी थी...`);
-              const vDate = v.viewedAt ? new Date(v.viewedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-';
+              const waMsg = encodeURIComponent(`नमस्ते ${v.name} जी! आपने आरोग्यम इंडिया पर "${v.videoTitle}" वीडियो देखा था...`);
+              const vDate = v.viewedAt ? new Date(v.viewedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+
+              let actionBadge = `<span class="admin-pill" style="background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); font-size:0.75rem; font-weight:700;">👁️ देखा (View)</span>`;
+              if (v.actionType === 'like') {
+                actionBadge = `<span class="admin-pill" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); font-size:0.75rem; font-weight:700;">❤️ पसंद (Like)</span>`;
+              } else if (v.actionType === 'share') {
+                actionBadge = `<span class="admin-pill" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3); font-size:0.75rem; font-weight:700;">📤 शेयर (Share)</span>`;
+              } else if (v.actionType === 'comment') {
+                actionBadge = `<span class="admin-pill" style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); font-size:0.75rem; font-weight:700;">💬 कमेंट (Comment)</span>`;
+              }
 
               return `
                 <tr>
                   <td><strong>#${rowNum}</strong></td>
-                  <td><strong>${v.name}</strong></td>
+                  <td><strong style="color:#fff;">${v.name}</strong></td>
                   <td><a href="tel:${sMob}" class="admin-subtle-link" style="font-weight:700;">📞 ${v.mobile}</a></td>
                   <td>${v.district || v.state || '-'}</td>
+                  <td>${actionBadge}</td>
                   <td>
-                    <div style="font-weight:700; color:#fff; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <div style="font-weight:700; color:#fff; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${v.videoTitle}">
                       🎬 ${v.videoTitle}
                     </div>
+                    ${v.comment ? `<div style="font-size:0.75rem; color:#cbd5e1; margin-top:2px; font-style:italic; max-width:240px; overflow:hidden; text-overflow:ellipsis;">💬 "${v.comment}"</div>` : ''}
                   </td>
                   <td>
-                    <div>${v.sponsorName}</div>
+                    <div style="font-weight:700; color:#cbd5e1;">${v.sponsorName}</div>
                     <code style="font-size:0.75rem; color:#60a5fa;">${v.sponsorId}</code>
                   </td>
                   <td><span style="font-size:0.8rem;">${vDate}</span></td>
                   <td>
                     <div style="display:flex; gap:6px; align-items:center;">
-                      <a href="tel:${sMob}" class="admin-button small-button" style="background:#0f172a; border:1px solid #475569; color:#cbd5e1; padding:3px 8px; font-size:0.75rem;">📞 Call</a>
-                      <a href="https://wa.me/${waMob}?text=${waMsg}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; padding:3px 8px; font-size:0.75rem; display:inline-flex; align-items:center; gap:4px;">💬 WhatsApp</a>
+                      <a href="tel:${sMob}" class="admin-button small-button" style="background:#0f172a; border:1px solid #475569; color:#cbd5e1; padding:3px 8px; font-size:0.75rem;" title="Call">📞 Call</a>
+                      <a href="https://wa.me/${waMob}?text=${waMsg}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; padding:3px 8px; font-size:0.75rem; display:inline-flex; align-items:center; gap:4px;" title="WhatsApp">💬 WhatsApp</a>
                     </div>
                   </td>
                 </tr>

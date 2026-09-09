@@ -668,8 +668,15 @@
     container.innerHTML = `
       <div style="display:flex;flex-direction:column;gap:10px;">
         ${filtered.map((att, idx) => {
+          const uObj = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser) ? window.UCAS_SESSION.getCurrentUser() : JSON.parse(localStorage.getItem('AI_USER') || '{}');
+          const isUserActive = Boolean(uObj?.is_active || uObj?.is_subscriber || uObj?.status === 'active' || localStorage.getItem('user_is_active') === 'true');
+
           const sMob = String(att.mobile || '').replace(/\D/g, '');
           const clean10Mob = sMob.length === 10 ? sMob : sMob.slice(-10);
+          const displayMob = isUserActive 
+            ? clean10Mob 
+            : (clean10Mob ? clean10Mob.slice(0, 5) + ' XXXXX' : 'XXXXX XXXXX');
+
           const aLpId = att.category_answers?.landing_page_id || '';
           const lp = webinars.find(w => w.id === aLpId);
           const webinarTitle = lp?.title || 'लाइव वेबिनार सत्र';
@@ -679,6 +686,22 @@
           const attendeeName = att.name || 'मित्र';
           const waMsg = `नमस्ते ${attendeeName} जी! आपने हमारे लाइव वेबिनार "${webinarTitle}" में भाग लिया था। आपको वेबिनार कैसा लगा और क्या-क्या समझ में आया? अब आइए आगे का प्लान करते हैं और इस पर विस्तार से बात करते हैं।`;
           const waLink = `https://wa.me/91${clean10Mob}?text=${encodeURIComponent(waMsg)}`;
+
+          const callBtnHtml = isUserActive
+            ? `<a href="tel:${clean10Mob}" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="justify-content:center;font-weight:700;border-color:#3B82F6;color:#1D4ED8;padding:7px 10px;font-size:0.82rem;text-decoration:none;">
+                 <i class="fa-solid fa-phone"></i> कॉल करें (${clean10Mob})
+               </a>`
+            : `<button type="button" onclick="alert('⚠️ आप इस लीड का नंबर देखने व संपर्क करने के लिए पात्र नहीं हैं (You are not eligible). कृपया अपनी ID एक्टिवेट करें या कस्टमर केयर से संपर्क करें!');" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="justify-content:center;font-weight:700;border-color:#94a3b8;color:#64748b;padding:7px 10px;font-size:0.82rem;cursor:pointer;">
+                 <i class="fa-solid fa-lock"></i> कॉल (${displayMob})
+               </button>`;
+
+          const waBtnHtml = isUserActive
+            ? `<a href="${waLink}" target="_blank" class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" style="justify-content:center;font-weight:700;padding:7px 10px;font-size:0.82rem;text-decoration:none;" title="वेबिनार फॉलो-अप मैसेज भेजें">
+                 <i class="fa-brands fa-whatsapp"></i> चर्चा करें (WhatsApp)
+               </a>`
+            : `<button type="button" onclick="alert('⚠️ आप इस लीड का नंबर देखने व संपर्क करने के लिए पात्र नहीं हैं (You are not eligible). कृपया अपनी ID एक्टिवेट करें या कस्टमर केयर से संपर्क करें!');" class="ucas-btn ucas-btn-sm" style="justify-content:center;font-weight:700;padding:7px 10px;font-size:0.82rem;background:#94a3b8;color:#fff;border:none;cursor:pointer;" title="एक्टिवेशन आवश्यक">
+                 <i class="fa-solid fa-lock"></i> WhatsApp (Locked)
+               </button>`;
 
           return `
             <div style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:var(--radius-md);padding:12px 14px;box-shadow:0 2px 6px rgba(0,0,0,0.03);display:flex;flex-direction:column;gap:8px;">
@@ -701,12 +724,8 @@
 
               <!-- Action Buttons: Direct Call & Customized WhatsApp Discussion -->
               <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:8px;margin-top:2px;">
-                <a href="tel:${clean10Mob}" class="ucas-btn ucas-btn-sm ucas-btn-outline" style="justify-content:center;font-weight:700;border-color:#3B82F6;color:#1D4ED8;padding:7px 10px;font-size:0.82rem;text-decoration:none;">
-                  <i class="fa-solid fa-phone"></i> कॉल करें (${clean10Mob})
-                </a>
-                <a href="${waLink}" target="_blank" class="ucas-btn ucas-btn-sm ucas-btn-whatsapp" style="justify-content:center;font-weight:700;padding:7px 10px;font-size:0.82rem;text-decoration:none;" title="वेबिनार फॉलो-अप मैसेज भेजें">
-                  <i class="fa-brands fa-whatsapp"></i> चर्चा करें (WhatsApp)
-                </a>
+                ${callBtnHtml}
+                ${waBtnHtml}
               </div>
             </div>
           `;
