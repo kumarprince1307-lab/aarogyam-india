@@ -1,11 +1,12 @@
-/* Aarogyam India Admin - Isolated Service Worker (V31) */
+/* Aarogyam India Admin - Isolated Service Worker (V33) */
 
-const CACHE_NAME = 'aarogyam-admin-shell-v31';
+const CACHE_NAME = 'aarogyam-admin-shell-v33';
 const OFFLINE_FALLBACK = '/admin/offline.html';
 
 const APP_SHELL_ASSETS = [
   '/admin/index.html',
   '/admin/all-webinars.html',
+  '/admin/webinar-reports.html',
   '/admin/book-landing-pages.html',
   '/admin/offline.html',
   '/admin/admin-manifest.json',
@@ -24,6 +25,7 @@ const APP_SHELL_ASSETS = [
   '/js/admin-pages-marketing-templates.js',
   '/js/admin-pages-product-landing.js',
   '/js/admin-pages-webinars.js',
+  '/js/admin-pages-webinar-reports.js',
   '/js/admin-pages-users.js',
   '/js/admin-pages-user-details.js',
   '/js/admin-pages-user-permissions.js',

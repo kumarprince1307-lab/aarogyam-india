@@ -53,11 +53,16 @@ export async function initReports() {
 
     content.innerHTML = `
         <div class="admin-section">
-            <div class="admin-tabs">
-                <button class="tab-link active" data-tab="daily">Daily Summary</button>
-                <button class="tab-link" data-tab="sales">By Book</button>
-                <button class="tab-link" data-tab="referrals">By Referrer</button>
-                <button class="tab-link" data-tab="sources">By Source</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                <div class="admin-tabs" style="margin-bottom: 0;">
+                    <button class="tab-link active" data-tab="daily">Daily Summary</button>
+                    <button class="tab-link" data-tab="sales">By Book</button>
+                    <button class="tab-link" data-tab="referrals">By Referrer</button>
+                    <button class="tab-link" data-tab="sources">By Source</button>
+                </div>
+                <a href="#webinar-reports" data-route="webinar-reports" class="admin-button small-button" style="background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px;">
+                    <span>🎥</span> <span>वेबिनार व AarogyamTube दर्शक रिपोर्ट (5 Tabs)</span> <span>➔</span>
+                </a>
             </div>
             <div class="admin-card admin-controls">
                 <input type="date" id="start-date-filter" class="admin-input" title="Start Date">
