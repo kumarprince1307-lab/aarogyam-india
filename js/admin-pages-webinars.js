@@ -706,8 +706,11 @@ export async function initWebinars() {
           </div>
 
           <!-- Sticky Bottom Footer -->
-          <div class="adm-drawer-footer">
-            <button type="submit" id="btn-save-video-entry" class="admin-button" style="background: #F43F5E; color: #fff; width: 100%; font-weight: 800; padding: 12px; font-size: 0.95rem; box-shadow: 0 4px 16px rgba(244,63,94,0.4);">
+          <div class="adm-drawer-footer" style="display: flex; gap: 10px; padding: 14px 20px; border-top: 1.5px solid rgba(255,255,255,0.1); background: var(--admin-surface, #1e293b); position: sticky; bottom: 0;">
+            <button type="button" id="btn-cancel-video-drawer" class="admin-button" style="background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15); color: #fff; flex: 1; font-weight: 700; padding: 12px; cursor: pointer;">
+              <span>❌ रद्द करें (Cancel)</span>
+            </button>
+            <button type="submit" id="btn-save-video-entry" class="admin-button" style="background: #F43F5E; color: #fff; flex: 2; font-weight: 800; padding: 12px; font-size: 0.95rem; box-shadow: 0 4px 16px rgba(244,63,94,0.4); border: none; cursor: pointer;">
               <span>💾 वीडियो सुरक्षित करें (Save & Sync)</span>
             </button>
           </div>
@@ -737,8 +740,11 @@ export async function initWebinars() {
           </div>
         </div>
 
-        <div class="adm-drawer-footer">
-          <button type="button" id="btn-save-channels-data" class="admin-button" style="background: #3b82f6; color: #fff; width: 100%; font-weight: 800; padding: 12px;">
+        <div class="adm-drawer-footer" style="display: flex; gap: 10px; padding: 14px 20px; border-top: 1.5px solid rgba(255,255,255,0.1); background: var(--admin-surface, #1e293b); position: sticky; bottom: 0;">
+          <button type="button" id="btn-cancel-channels-drawer" class="admin-button" style="background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15); color: #fff; flex: 1; font-weight: 700; padding: 12px; cursor: pointer;">
+            <span>❌ रद्द करें (Cancel)</span>
+          </button>
+          <button type="button" id="btn-save-channels-data" class="admin-button" style="background: #3b82f6; color: #fff; flex: 2; font-weight: 800; padding: 12px; border: none; cursor: pointer;">
             <span>💾 चैनल सूची सेव करें (Save Channels)</span>
           </button>
         </div>
@@ -767,8 +773,11 @@ export async function initWebinars() {
           </div>
         </div>
 
-        <div class="adm-drawer-footer">
-          <button type="button" id="btn-save-playlists-data" class="admin-button" style="background: #8b5cf6; color: #fff; width: 100%; font-weight: 800; padding: 12px;">
+        <div class="adm-drawer-footer" style="display: flex; gap: 10px; padding: 14px 20px; border-top: 1.5px solid rgba(255,255,255,0.1); background: var(--admin-surface, #1e293b); position: sticky; bottom: 0;">
+          <button type="button" id="btn-cancel-playlists-drawer" class="admin-button" style="background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15); color: #fff; flex: 1; font-weight: 700; padding: 12px; cursor: pointer;">
+            <span>❌ रद्द करें (Cancel)</span>
+          </button>
+          <button type="button" id="btn-save-playlists-data" class="admin-button" style="background: #8b5cf6; color: #fff; flex: 2; font-weight: 800; padding: 12px; border: none; cursor: pointer;">
             <span>💾 प्लेलिस्ट्स सेव करें (Save Playlists)</span>
           </button>
         </div>
@@ -1900,13 +1909,40 @@ export async function initWebinars() {
     renderPlaylistsManagerList();
   });
 
+  // Universal Drawer Closing Engine
+  function closeAllDrawers() {
+    if (videoDrawer) videoDrawer.classList.remove('active');
+    if (channelsDrawer) channelsDrawer.classList.remove('active');
+    if (playlistsDrawer) playlistsDrawer.classList.remove('active');
+  }
+
+  // Backdrop Overlay Click Listeners
+  videoDrawer?.addEventListener('click', (e) => {
+    if (e.target === videoDrawer) closeAllDrawers();
+  });
+  channelsDrawer?.addEventListener('click', (e) => {
+    if (e.target === channelsDrawer) closeAllDrawers();
+  });
+  playlistsDrawer?.addEventListener('click', (e) => {
+    if (e.target === playlistsDrawer) closeAllDrawers();
+  });
+
+  // Cancel & Close Buttons
+  document.getElementById('btn-close-video-drawer')?.addEventListener('click', closeAllDrawers);
+  document.getElementById('btn-cancel-video-drawer')?.addEventListener('click', closeAllDrawers);
+  document.getElementById('btn-close-channels-drawer')?.addEventListener('click', closeAllDrawers);
+  document.getElementById('btn-cancel-channels-drawer')?.addEventListener('click', closeAllDrawers);
+  document.getElementById('btn-close-playlists-drawer')?.addEventListener('click', closeAllDrawers);
+  document.getElementById('btn-cancel-playlists-drawer')?.addEventListener('click', closeAllDrawers);
+
+  // Escape key support
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllDrawers();
+  });
+
   document.getElementById('btn-open-playlists-modal')?.addEventListener('click', () => {
     renderPlaylistsManagerList();
     if (playlistsDrawer) playlistsDrawer.classList.add('active');
-  });
-
-  document.getElementById('btn-close-playlists-drawer')?.addEventListener('click', () => {
-    if (playlistsDrawer) playlistsDrawer.classList.remove('active');
   });
 
   document.getElementById('btn-save-playlists-data')?.addEventListener('click', () => {

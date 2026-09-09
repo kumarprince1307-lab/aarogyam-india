@@ -2814,6 +2814,90 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 28px rgba(239, 68, 68, 0.7);
     }
+
+    /* Non-Intrusive Floating Subscribe Toast (3-sec auto-fade) */
+    .at-floating-sub-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(30px);
+      z-index: 99999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 92vw;
+      width: 360px;
+    }
+    .at-floating-sub-toast.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+    .at-floating-sub-inner {
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(239, 68, 68, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(239, 68, 68, 0.25);
+      border-radius: 50px;
+      padding: 6px 12px 6px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .at-floating-sub-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .at-floating-sub-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+      min-width: 0;
+    }
+    .at-floating-sub-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .btn-sub-toast-pill {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-sub-toast-pill:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+    }
+    .btn-close-sub-toast {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #94a3b8;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .btn-close-sub-toast:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+    }
   </style>
 </head>
 
@@ -3303,6 +3387,27 @@
       </div>
     </div>
   </footer>
+
+  <!-- =========================================
+       5. NON-INTRUSIVE FLOATING SUBSCRIBE TOAST (3-SEC AUTO-FADE)
+       ========================================== -->
+  <div id="at_floating_sub_toast" class="at-floating-sub-toast" style="display:none;" role="status" aria-live="polite">
+    <div class="at-floating-sub-inner">
+      <div class="at-floating-sub-left">
+        <i class="fa-brands fa-youtube" style="color:#ef4444; font-size:1.35rem;"></i>
+        <div class="at-floating-sub-text">
+          <span style="font-weight:800; color:#fff; font-size:0.84rem; line-height:1.2;">Aarogyam India</span>
+          <span style="font-size:0.7rem; color:#94a3b8; line-height:1.1;">कृषि शॉर्ट्स व वीडियो</span>
+        </div>
+      </div>
+      <div class="at-floating-sub-actions">
+        <a id="at_toast_sub_btn" href="https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1" target="_blank" rel="noopener noreferrer" onclick="window.onSubscribeToastClick(event)" class="btn-sub-toast-pill">
+          <i class="fa-brands fa-youtube" style="margin-right:4px;"></i> <span>Subscribe</span>
+        </a>
+        <button type="button" class="btn-close-sub-toast" onclick="window.hideFloatingSubscribeToast()" title="बंद करें">&times;</button>
+      </div>
+    </div>
+  </div>
 
   <!-- =========================================
        5. OFFICIAL YOUTUBE SUBSCRIBE POPUP MODAL
@@ -4010,6 +4115,64 @@
       };
 
       // -------------------------------------------------------------
+      // 6B. NON-INTRUSIVE FLOATING SUBSCRIBE TOAST (3-SEC AUTO-FADE)
+      // -------------------------------------------------------------
+      let floatSubToastTimer = null;
+
+      window.showFloatingSubscribeToast = function() {
+        const toastEl = document.getElementById('at_floating_sub_toast');
+        if (!toastEl) return;
+
+        const defaultChannel = allChannels.find(c => c.is_default) || allChannels[0] || {
+          name: 'Aarogyam India Official',
+          handle: '@AAROGYAMINDIA',
+          subscribe_url: 'https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1'
+        };
+
+        const toastBtn = document.getElementById('at_toast_sub_btn');
+        if (toastBtn) toastBtn.href = defaultChannel.subscribe_url || `https://www.youtube.com/${defaultChannel.handle}?sub_confirmation=1`;
+
+        toastEl.style.display = 'block';
+        setTimeout(() => {
+          toastEl.classList.add('active');
+        }, 30);
+
+        clearTimeout(floatSubToastTimer);
+        floatSubToastTimer = setTimeout(() => {
+          window.hideFloatingSubscribeToast();
+        }, 3200); // 3.2 seconds auto-fade!
+      };
+
+      window.hideFloatingSubscribeToast = function() {
+        const toastEl = document.getElementById('at_floating_sub_toast');
+        if (!toastEl) return;
+        toastEl.classList.remove('active');
+        clearTimeout(floatSubToastTimer);
+        setTimeout(() => {
+          if (!toastEl.classList.contains('active')) toastEl.style.display = 'none';
+        }, 320);
+      };
+
+      window.onSubscribeToastClick = function(event) {
+        window.hideFloatingSubscribeToast();
+      };
+
+      // Overlay click to close Subscribe Modal & Gate Modal
+      document.getElementById('wb_youtube_subscribe_modal')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('wb_youtube_subscribe_modal')) window.closeSubscribeModal();
+      });
+      document.getElementById('at_tube_gate_modal')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('at_tube_gate_modal')) window.closeTubeGateModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          window.closeSubscribeModal();
+          window.closeTubeGateModal();
+          window.hideFloatingSubscribeToast();
+        }
+      });
+
+      // -------------------------------------------------------------
       // 7. COMMENTS SYSTEM (MASTERCLASS & REELS)
       // -------------------------------------------------------------
       function renderMasterclassComments(vidId) {
@@ -4272,6 +4435,7 @@
         const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
 
         logVideoActivity('view', reel);
+        window.showFloatingSubscribeToast();
 
         if (window.YT && window.YT.Player) {
           if (!reelYTPlayer) {
@@ -4606,6 +4770,7 @@
       function loadMasterclassInPlayer(vidObj) {
         currentMasterclassVideo = vidObj;
         logVideoActivity('view', vidObj);
+        window.showFloatingSubscribeToast();
 
         const titleEl = document.getElementById('at_current_title');
         const speakerEl = document.getElementById('at_current_speaker');
