@@ -1505,9 +1505,9 @@
       color: #ffffff;
     }
 
-    .at-fs-rotate {
-      background: rgba(168, 85, 247, 0.35);
-      border: 1px solid #a855f7;
+    .at-fs-wa {
+      background: rgba(37, 211, 102, 0.35);
+      border: 1px solid #25d366;
       color: #ffffff;
     }
 
@@ -1515,94 +1515,6 @@
       background: rgba(239, 68, 68, 0.35);
       border: 1px solid #ef4444;
       color: #ffffff;
-    }
-
-    /* Bottom Floating Action Rail in Fullscreen */
-    .at-fs-bottom-rail {
-      display: none;
-      position: absolute;
-      bottom: 24px;
-      right: 20px;
-      z-index: 2147483647;
-      align-items: center;
-      gap: 10px;
-      background: rgba(15, 23, 42, 0.88);
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(14px);
-      padding: 8px 14px;
-      border-radius: 30px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
-    }
-
-    .fullscreen-active .at-fs-bottom-rail,
-    .cinema-fullscreen-mode .at-fs-bottom-rail,
-    #at_player_frame_wrap:fullscreen .at-fs-bottom-rail,
-    #at_player_frame_wrap:-webkit-full-screen .at-fs-bottom-rail {
-      display: flex !important;
-    }
-
-    .at-fs-bottom-btn {
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      padding: 6px 13px;
-      border-radius: 20px;
-      font-size: 0.76rem;
-      font-weight: 800;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .at-fs-bottom-btn:hover {
-      transform: translateY(-2px);
-      background: rgba(255, 255, 255, 0.25);
-    }
-
-    .at-fs-btn-like {
-      background: rgba(239, 68, 68, 0.25) !important;
-      border-color: #ef4444 !important;
-      color: #ffffff !important;
-    }
-
-    .at-fs-btn-wa {
-      background: rgba(37, 211, 102, 0.25) !important;
-      border-color: #25d366 !important;
-      color: #25d366 !important;
-    }
-
-    .at-fs-btn-share {
-      background: rgba(37, 99, 235, 0.25) !important;
-      border-color: #3b82f6 !important;
-      color: #38bdf8 !important;
-    }
-
-    /* 90-Degree Landscape Rotate Transform */
-    #at_player_frame_wrap.cinema-rotate-90 {
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: 100vh !important;
-      width: 100dvh !important;
-      height: 100vw !important;
-      height: 100dvw !important;
-      transform: translate(-50%, -50%) rotate(90deg) !important;
-      transform-origin: center center !important;
-      z-index: 2147483647 !important;
-      background: #000000 !important;
-    }
-
-    #at_player_frame_wrap.cinema-rotate-90 .at-aspect-16-9 {
-      width: 100% !important;
-      height: 100% !important;
-      max-width: 100% !important;
-      max-height: 100% !important;
-      aspect-ratio: auto !important;
     }
 
     /* Flying Hearts Upwards Floating Animation */
@@ -2186,7 +2098,6 @@
             <div class="at-fs-hud-right">
               <a id="at_fs_hud_call" href="tel:+917974422572" class="at-fs-hud-pill at-fs-call" title="सीधे कॉल करें"><i class="fa-solid fa-phone"></i> <span>कॉल</span></a>
               <a id="at_fs_hud_wa" href="https://api.whatsapp.com/send?phone=917974422572" target="_blank" class="at-fs-hud-pill at-fs-wa" title="WhatsApp करें"><i class="fa-brands fa-whatsapp"></i> <span>WhatsApp</span></a>
-              <button type="button" class="at-fs-hud-pill at-fs-rotate" onclick="window.toggleRotateLandscape()" title="90° लैंडस्केप घुमाएं"><i class="fa-solid fa-rotate"></i> <span>90° Rotate</span></button>
               <button type="button" class="at-fs-hud-pill at-fs-exit" onclick="window.toggleCinemaFullscreen()" title="फुल स्क्रीन से बाहर आएं"><i class="fa-solid fa-compress"></i> <span>Exit</span></button>
             </div>
           </div>
@@ -2993,13 +2904,6 @@
         document.body.classList.add('at-cinema-open');
         document.documentElement.classList.add('wb-modal-active');
 
-        // Automatically start in Fullscreen on video click/play
-        setTimeout(() => {
-          if (!document.body.classList.contains('cinema-fullscreen-mode')) {
-            window.toggleCinemaFullscreen();
-          }
-        }, 120);
-
         try {
           const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
           const userShare = uObj.share_id || refShareId || 'AI000004';
@@ -3231,12 +3135,6 @@
             setTimeout(() => { heart.remove(); }, duration * 1000 + 100);
           }, i * 80);
         }
-      };
-
-      window.toggleRotateLandscape = function() {
-        const wrap = document.getElementById('at_player_frame_wrap');
-        if (!wrap) return;
-        wrap.classList.toggle('cinema-rotate-90');
       };
 
       window.likeMasterclassVideo = function(e) {
