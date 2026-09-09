@@ -1,0 +1,56 @@
+{
+  "updated_at": "2026-09-10T00:05:00.000Z",
+  "version": "1.0",
+  "categories": [
+    { "id": "announcement", "name": "📢 महत्वपूर्ण घोषणा (Announcement)", "icon": "📢", "color": "#2563EB" },
+    { "id": "webinar", "name": "🎥 लाइव वेबिनार (Live Webinar)", "icon": "🎥", "color": "#EF4444" },
+    { "id": "offer", "name": "🎉 विशेष ऑफर व डिस्काउंट (Special Offer)", "icon": "🎉", "color": "#10B981" },
+    { "id": "birthday", "name": "🎂 जन्मदिन की शुभकामनाएं (Birthday Wish)", "icon": "🎂", "color": "#F59E0B" },
+    { "id": "update", "name": "🚀 नया फीचर व अपडेट (App Update)", "icon": "🚀", "color": "#8B5CF6" },
+    { "id": "alert", "name": "⚠️ जरूरी सूचना व अलर्ट (Urgent Alert)", "icon": "⚠️", "color": "#DC2626" }
+  ],
+  "broadcasts": [
+    {
+      "id": "BC_2026_KHARIF_AWARENESS",
+      "title": "🌾 खरीफ 2026 विशेष किसान जागरूकता अभियान",
+      "body": "प्रिय किसान भाई, आधुनिक जैविक कृषि, कीट नियंत्रण व फसलों की सुरक्षा पर हमारी विशेष ई-बुक्स एवं लाइव मास्टरक्लास अब डिजिटल लाइब्रेरी में उपलब्ध हैं। अभी पढ़ें और 3X उत्पादन पाएं।",
+      "category": "announcement",
+      "priority": "high",
+      "target": "all",
+      "target_user_ids": [],
+      "action_url": "/tube.html",
+      "action_text": "🎬 AarogyamTube देखें",
+      "created_at": "2026-09-09T18:00:00.000Z",
+      "expires_at": "2026-12-31T23:59:59.000Z",
+      "sender": "Aarogyam India Team"
+    },
+    {
+      "id": "BC_2026_BIRTHDAY_WISH",
+      "title": "🎂 जन्मदिन की हार्दिक शुभकामनाएं!",
+      "body": "आरोग्यम इंडिया परिवार की ओर से आपके जन्मदिन पर हार्दिक शुभकामनाएं! आज के इस विशेष दिन पर डिजिटल लाइब्रेरी की सभी ई-बुक्स पर 50% विशेष छूट का लाभ लें।",
+      "category": "birthday",
+      "priority": "urgent",
+      "target": "birthday",
+      "target_user_ids": [],
+      "action_url": "/ebooks/ebook.html",
+      "action_text": "🎁 अपना बर्थडे गिफ्ट देखें",
+      "created_at": "2026-09-01T00:00:00.000Z",
+      "expires_at": "2027-12-31T23:59:59.000Z",
+      "sender": "Aarogyam India Family"
+    },
+    {
+      "id": "BC_2026_LIVE_ZOOM_WEBINAR",
+      "title": "🔴 लाइव ज़ूम वेबिनार: जैविक खेती से 3x मुनाफा",
+      "body": "रविवार को दोपहर 12:00 बजे विशेष लाइव ज़ूम वेबिनार आयोजित किया जा रहा है। लाइव सवाल-जवाब एवं जैविक खाद निर्माण की सम्पूर्ण ट्रेनिंग दी जाएगी।",
+      "category": "webinar",
+      "priority": "high",
+      "target": "all",
+      "target_user_ids": [],
+      "action_url": "/webinar.html",
+      "action_text": "🔴 वेबिनार में भाग लें",
+      "created_at": "2026-09-08T10:00:00.000Z",
+      "expires_at": "2026-12-31T23:59:59.000Z",
+      "sender": "Aarogyam Agriculture Experts"
+    }
+  ]
+}

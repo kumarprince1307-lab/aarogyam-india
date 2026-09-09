@@ -38,8 +38,11 @@ export async function initAdminBroadcast() {
           </p>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btn_export_broadcast_json" class="admin-button" style="background: #10B981; border-color: #059669; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;" title="Zero-Egress JSON फ़ाइल डाउनलोड व सिंक करें">
+            <i class="fa-solid fa-file-arrow-down"></i> 📥 1-Click JSON Sync & Export
+          </button>
           <button type="button" id="btn_admin_manage_bc_categories" class="admin-button" style="background: #0d9488; border-color: #0f766e; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-folder-plus"></i> 📁 श्रेणियां जोड़ें / एडिट करें (Categories)
+            <i class="fa-solid fa-folder-plus"></i> 📁 श्रेणियां (Categories)
           </button>
           <button type="button" class="admin-button" onclick="document.getElementById('broadcast-composer-card')?.scrollIntoView({behavior:'smooth'})" style="background: #E11D48; border-color: #BE123C; color: #fff; font-weight: 800;">
             <i class="fa-solid fa-plus"></i> नया संदेश भेजें
@@ -622,7 +625,47 @@ export async function initAdminBroadcast() {
     loadBroadcastHistory();
   }
 
-  function loadBroadcastHistory() {
+  window.deleteBroadcastItem = function(bcId) {
+    if (!confirm('क्या आप इस ब्रॉडकास्ट संदेश को हटाना चाहते हैं?')) return;
+    let history = JSON.parse(localStorage.getItem('AAROGYAM_GLOBAL_BROADCASTS') || '[]');
+    history = history.filter(x => x.id !== bcId);
+    localStorage.setItem('AAROGYAM_GLOBAL_BROADCASTS', JSON.stringify(history));
+    loadBroadcastHistory();
+    showToast('🗑️ ब्रॉडकास्ट संदेश हटा दिया गया!', 'info');
+  };
+
+  function exportBroadcastsJson() {
+    let history = JSON.parse(localStorage.getItem('AAROGYAM_GLOBAL_BROADCASTS') || '[]');
+    let categories = JSON.parse(localStorage.getItem('AAROGYAM_BROADCAST_CATEGORIES') || '[]');
+    if (categories.length === 0) {
+      categories = [
+        { id: "announcement", name: "📢 महत्वपूर्ण घोषणा (Announcement)", icon: "📢", color: "#2563EB" },
+        { id: "webinar", name: "🎥 लाइव वेबिनार (Live Webinar)", icon: "🎥", color: "#EF4444" },
+        { id: "offer", name: "🎉 विशेष ऑफर व डिस्काउंट (Special Offer)", icon: "🎉", color: "#10B981" },
+        { id: "birthday", name: "🎂 जन्मदिन की शुभकामनाएं (Birthday Wish)", icon: "🎂", color: "#F59E0B" },
+        { id: "update", name: "🚀 नया फीचर व अपडेट (App Update)", icon: "🚀", color: "#8B5CF6" },
+        { id: "alert", name: "⚠️ जरूरी सूचना व अलर्ट (Urgent Alert)", icon: "⚠️", color: "#DC2626" }
+      ];
+    }
+
+    const payload = {
+      updated_at: new Date().toISOString(),
+      version: "1.0",
+      categories: categories,
+      broadcasts: history
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "broadcast-notifications.json");
+    dlAnchor.click();
+    showToast('📥 broadcast-notifications.json सफलतापूर्वक डाउनलोड हो गई!', 'success');
+  }
+
+  document.getElementById('btn_export_broadcast_json')?.addEventListener('click', exportBroadcastsJson);
+
+  async function loadBroadcastHistory() {
     const container = document.getElementById('bc_history_container');
     if (!container) return;
 
@@ -631,22 +674,18 @@ export async function initAdminBroadcast() {
       history = JSON.parse(localStorage.getItem('AAROGYAM_GLOBAL_BROADCASTS') || '[]');
     } catch (e) {}
 
+    // If local history is empty, fetch static JSON from server
     if (history.length === 0) {
-      history = [
-        {
-          id: 'BC_SAMPLE_01',
-          title: '🌾 खरीफ 2026 विशेष किसान जागरूकता अभियान',
-          body: 'प्रिय सदस्यों, आधुनिक जैविक कृषि व फसलों की सुरक्षा पर हमारी विशेष ई-बुक अब डिजिटल लाइब्रेरी में उपलब्ध है। अभी पढ़ें और लाभ लें।',
-          category: 'announcement',
-          priority: 'normal',
-          target: 'all',
-          action_url: '/ebooks/my-library.html',
-          created_at: new Date(Date.now() - 3600000).toISOString()
-        }
-      ];
       try {
-        localStorage.setItem('AAROGYAM_GLOBAL_BROADCASTS', JSON.stringify(history));
-      } catch (e) {}
+        const resp = await fetch('/data/broadcast-notifications.json?v=' + Date.now());
+        if (resp.ok) {
+          const json = await resp.json();
+          if (Array.isArray(json.broadcasts) && json.broadcasts.length > 0) {
+            history = json.broadcasts;
+            localStorage.setItem('AAROGYAM_GLOBAL_BROADCASTS', JSON.stringify(history));
+          }
+        }
+      } catch(e) {}
     }
 
     const priorityColors = {
@@ -664,29 +703,38 @@ export async function initAdminBroadcast() {
       selected: '🎯 Specific Selected Users'
     };
 
+    if (history.length === 0) {
+      container.innerHTML = '<div style="color:#94A3B8;font-size:0.85rem;padding:20px;text-align:center;">अभी कोई ब्रॉडकास्ट संदेश नहीं भेजा गया है।</div>';
+      return;
+    }
+
     container.innerHTML = history.map(item => {
       const pInfo = priorityColors[item.priority] || priorityColors.normal;
-      const dateStr = new Date(item.created_at).toLocaleString('hi-IN', { dateStyle: 'short', timeStyle: 'short' });
+      const dateStr = item.created_at ? new Date(item.created_at).toLocaleString('hi-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'हाल ही में';
       const targetTxt = targetLabels[item.target] || item.target;
 
       return `
-        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid ${pInfo.color}; border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid ${pInfo.color}; border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px;">
             <div style="font-weight: 800; font-size: 0.95rem; color: #0F172A;">${item.title}</div>
-            <span style="font-size: 0.7rem; font-weight: 800; background: ${pInfo.bg}; color: ${pInfo.color}; padding: 2px 6px; border-radius: 4px; white-space: nowrap;">
-              ${pInfo.label}
-            </span>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span style="font-size: 0.7rem; font-weight: 800; background: ${pInfo.bg}; color: ${pInfo.color}; padding: 2px 6px; border-radius: 4px; white-space: nowrap;">
+                ${pInfo.label}
+              </span>
+              <button type="button" onclick="window.deleteBroadcastItem('${item.id}')" style="background: transparent; border: none; color: #EF4444; font-size: 1rem; cursor: pointer; padding: 0 4px;" title="हटाएं">&times;</button>
+            </div>
           </div>
-          <div style="font-size: 0.82rem; color: #334155; line-height: 1.4; margin-bottom: 6px; white-space: pre-wrap;">
+          <div style="font-size: 0.82rem; color: #334155; line-height: 1.45; margin-bottom: 6px; white-space: pre-wrap; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #E2E8F0;">
 ${item.body}
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #64748B; border-top: 1px dashed #CBD5E1; padding-top: 6px; flex-wrap: wrap; gap: 4px;">
             <span>🎯 ${targetTxt} ${item.target_user_ids?.length ? `(${item.target_user_ids.length} reach)` : ''}</span>
             <span>📅 ${dateStr}</span>
-            ${item.action_url ? `<a href="${item.action_url}" target="_blank" style="color: #2563EB; font-weight: 700; text-decoration: none;">🔗 लिंक देखें</a>` : ''}
+            ${item.action_url ? `<a href="${item.action_url}" target="_blank" style="color: #2563EB; font-weight: 700; text-decoration: none;">🔗 ${item.action_text || 'लिंक देखें'}</a>` : ''}
           </div>
         </div>
       `;
     }).join('');
   }
 }
+

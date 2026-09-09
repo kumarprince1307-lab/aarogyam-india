@@ -1539,7 +1539,7 @@ function getRelativeTime(date) {
 
 let _adminNotificationsCache = null;
 let _adminNotificationsCacheTime = 0;
-const NOTIF_CACHE_TTL = 60000; // 60 seconds cache
+const NOTIF_CACHE_TTL = 180000; // 3 minutes Zero-Egress cache
 
 export async function fetchAdminNotifications(params = {}) {
   const now = Date.now();

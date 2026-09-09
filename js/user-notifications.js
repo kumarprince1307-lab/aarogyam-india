@@ -225,10 +225,30 @@
                 }
             }
 
-            // --- E. Dynamic Admin Broadcasts from Storage & Supabase ---
+            // --- E. Dynamic Admin Broadcasts from Static JSON (Zero-Egress) & Storage ---
             try {
-                const globalBroadcasts = JSON.parse(localStorage.getItem('AAROGYAM_GLOBAL_BROADCASTS') || '[]');
-                if (Array.isArray(globalBroadcasts)) {
+                let globalBroadcasts = [];
+                try {
+                    const localBc = JSON.parse(localStorage.getItem('AAROGYAM_GLOBAL_BROADCASTS') || '[]');
+                    if (Array.isArray(localBc)) globalBroadcasts = localBc;
+                } catch(e) {}
+
+                // Fetch static Zero-Egress broadcast JSON from GitHub/CDN
+                try {
+                    const bcResp = await fetch('/data/broadcast-notifications.json?v=' + (Math.floor(Date.now() / 300000))); // 5-minute HTTP cache
+                    if (bcResp.ok) {
+                        const bcData = await bcResp.json();
+                        const staticList = Array.isArray(bcData.broadcasts) ? bcData.broadcasts : (Array.isArray(bcData) ? bcData : []);
+                        if (staticList.length > 0) {
+                            const bcMap = new Map();
+                            globalBroadcasts.forEach(b => { if (b && b.id) bcMap.set(b.id, b); });
+                            staticList.forEach(b => { if (b && b.id && !bcMap.has(b.id)) bcMap.set(b.id, b); });
+                            globalBroadcasts = Array.from(bcMap.values());
+                        }
+                    }
+                } catch(netErr) {}
+
+                if (Array.isArray(globalBroadcasts) && globalBroadcasts.length > 0) {
                     const today = new Date();
                     const isUserBday = Boolean(user.dob && (() => {
                         try {
