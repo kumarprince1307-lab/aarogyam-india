@@ -26,9 +26,9 @@
   <meta name="twitter:image" content="https://aarogyamindia.online/images/banners/universal-zoom-webinar-og.jpg">
 
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0B1120">
+  <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <link rel="icon" type="image/png" href="/images/logo/aarogyamtube-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,22 +47,27 @@
 
   <style>
     :root {
-      --primary: #0B7A3E;
-      --primary-dark: #065028;
-      --primary-light: #159E52;
-      --zoom-blue: #2D8CFF;
-      --zoom-blue-glow: rgba(45, 140, 255, 0.4);
-      --zoom-dark: #0E71EB;
-      --bg-page: #0B1120;
-      --bg-surface: #131E36;
-      --bg-card: #0F172A;
-      --border-card: rgba(45, 140, 255, 0.35);
-      --text-main: #FFFFFF;
-      --text-muted: #94A3B8;
+      --primary: #059669;
+      --primary-dark: #047857;
+      --primary-light: #10B981;
+      --primary-soft: #ECFDF5;
+      --zoom-blue: #2563EB;
+      --zoom-blue-glow: rgba(37, 99, 235, 0.25);
+      --zoom-dark: #1D4ED8;
+      --zoom-soft: #EFF6FF;
+      --bg-page: #F8FAFC;
+      --bg-surface: #FFFFFF;
+      --bg-card: #FFFFFF;
+      --border-card: #E2E8F0;
+      --border-focus: #3B82F6;
+      --text-main: #0F172A;
+      --text-muted: #475569;
       --text-dim: #64748B;
-      --gold: #F59E0B;
-      --emerald: #10B981;
-      --rose: #F43F5E;
+      --gold: #D97706;
+      --gold-soft: #FEF3C7;
+      --emerald: #059669;
+      --rose: #E11D48;
+      --rose-soft: #FFE4E6;
     }
 
     * {
@@ -73,8 +78,8 @@
     }
 
     html, body {
-      background-color: #0B1120 !important;
-      color: #FFFFFF !important;
+      background-color: #F8FAFC !important;
+      color: #0F172A !important;
       font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', sans-serif;
       min-height: 100vh;
       display: flex;
@@ -84,45 +89,54 @@
       padding-bottom: 75px;
     }
 
-    /* Ambient Background Glows */
-    .wb-ambient-glow {
+    /* Ambient Colorful Animated Mesh Background Glows */
+    .wb-ambient-mesh-wrap {
       position: fixed;
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
+      inset: 0;
       pointer-events: none;
       z-index: 0;
-      filter: blur(120px);
-      opacity: 0.16;
+      overflow: hidden;
+    }
+
+    .wb-ambient-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.45;
+      animation: wbMeshFloat 16s ease-in-out infinite alternate;
     }
 
     .glow-1 {
-      top: -100px;
+      width: 500px;
+      height: 500px;
+      top: -120px;
       left: -100px;
-      background: var(--zoom-blue);
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(37, 99, 235, 0.04) 70%);
+      animation-duration: 18s;
     }
 
     .glow-2 {
-      top: 35%;
-      right: -150px;
-      background: #6366F1;
+      width: 450px;
+      height: 450px;
+      top: 30%;
+      right: -120px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(5, 150, 105, 0.03) 70%);
+      animation-duration: 22s;
     }
 
     .glow-3 {
-      bottom: 10%;
-      left: 20%;
-      background: #10B981;
+      width: 550px;
+      height: 550px;
+      bottom: 5%;
+      left: 15%;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.02) 70%);
+      animation-duration: 20s;
     }
 
-    /* Hide 3 floating action buttons and bottom nav when Reels Player modal is active */
-    body.wb-reels-open .sticky-float-pill-container,
-    body.wb-reels-open .sticky-float-pill,
-    body.wb-reels-open .universal-mobile-bottom-nav,
-    body.wb-reels-open #universal-mobile-bottom-nav,
-    body.wb-reels-open .user-notifications-float {
-      display: none !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
+    @keyframes wbMeshFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, -30px) scale(1.08); }
+      100% { transform: translate(-30px, 35px) scale(0.95); }
     }
 
     /* Main Container */
@@ -137,217 +151,283 @@
     }
 
     /* =========================================
-       HERO 2-COLUMN SECTION (BOOK LANDING EXACT)
+       HERO 2-COLUMN SECTION (WHITE & COLORFUL AESTHETIC)
        ========================================= */
     .wb-hero-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 24px;
       margin-bottom: 28px;
-      align-items: center;
-      background: transparent;
+      align-items: start;
     }
 
-    @media (min-width: 900px) {
+    @media (min-width: 960px) {
       .wb-hero-grid {
-        grid-template-columns: 0.85fr 1.15fr;
-        gap: 36px;
-        align-items: start;
+        grid-template-columns: 1.05fr 1fr;
+        gap: 32px;
       }
     }
 
-    /* Hide the unused fullscreen wrapper if present */
-    .wb-hero-fullscreen {
-      display: none;
+    /* GRAND RESPONSIVE COVER BANNER CARD */
+    .wb-hero-banner-card {
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.07), 0 2px 8px rgba(15, 23, 42, 0.03);
+      position: relative;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease;
     }
 
-    /* 3D FLOATING BOOK / WEBINAR COVER ANIMATION (EXACT BOOK LANDING 3D) */
-    @keyframes ublFloatBook3D {
-      0% {
-        transform: perspective(1200px) rotateY(-12deg) rotateX(4deg) translateY(0px);
-        box-shadow: -15px 25px 45px rgba(0, 0, 0, 0.55);
-      }
-      50% {
-        transform: perspective(1200px) rotateY(-6deg) rotateX(2deg) translateY(-14px);
-        box-shadow: -20px 35px 60px rgba(0, 0, 0, 0.75);
-      }
-      100% {
-        transform: perspective(1200px) rotateY(-12deg) rotateX(4deg) translateY(0px);
-        box-shadow: -15px 25px 45px rgba(0, 0, 0, 0.55);
-      }
+    .wb-hero-banner-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 45px rgba(15, 23, 42, 0.12), 0 6px 16px rgba(37, 99, 235, 0.08);
+      border-color: #CBD5E1;
     }
 
-    .wb-hero-book-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      perspective: 1200px;
+    .wb-hero-banner-img-wrap {
+      position: relative;
       width: 100%;
-      padding: 16px 8px;
-      background: transparent !important;
+      aspect-ratio: 16/9;
+      background: #F1F5F9;
+      overflow: hidden;
+    }
+
+    @media (min-width: 960px) {
+      .wb-hero-banner-img-wrap {
+        aspect-ratio: 16/10;
+        max-height: 440px;
+      }
     }
 
     .wb-hero-book-cover {
       width: 100%;
-      max-width: 380px;
-      height: auto;
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      animation: ublFloatBook3D 4.5s ease-in-out infinite;
-      transform-style: preserve-3d;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      display: block;
+      height: 100%;
       object-fit: cover;
-      box-shadow: -15px 25px 45px rgba(0, 0, 0, 0.55);
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .wb-hero-book-cover:hover {
-      animation-play-state: paused;
-      transform: perspective(1200px) rotateY(0deg) scale(1.03);
-      box-shadow: 0 25px 55px rgba(0, 0, 0, 0.85);
+    .wb-hero-banner-card:hover .wb-hero-book-cover {
+      transform: scale(1.03);
     }
 
-    @media (max-width: 899px) {
-      .wb-hero-book-wrap {
-        padding: 10px 0;
-      }
-      .wb-hero-book-cover {
-        max-width: 320px;
-      }
+    .wb-banner-overlay-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(10px);
+      color: #FFFFFF;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      z-index: 2;
     }
 
-    /* Universal Deep Blue Card Styling */
+    .wb-banner-trust-badge {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      color: #065F46;
+      border: 1.5px solid #A7F3D0;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      z-index: 2;
+    }
+
+    /* Universal Pure White Card Styling */
     .wb-card {
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-card);
-      border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 12px 35px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.02);
       position: relative;
-      overflow: hidden;
     }
 
-    /* Hero Left Details */
+    @media (max-width: 600px) {
+      .wb-card {
+        padding: 18px 16px;
+      }
+    }
+
+    /* Hero Badges & Header */
     .wb-host-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(239, 68, 68, 0.2);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #FCA5A5;
-      padding: 4px 14px;
+      background: #FEE2E2;
+      border: 1px solid #FECACA;
+      color: #DC2626;
+      padding: 5px 14px;
       border-radius: 20px;
       font-size: 0.8rem;
       font-weight: 800;
       margin-bottom: 12px;
+      letter-spacing: 0.3px;
     }
 
     .wb-live-pulse-dot {
       width: 8px;
       height: 8px;
-      background: #EF4444;
+      background: #DC2626;
       border-radius: 50%;
-      box-shadow: 0 0 8px #EF4444;
+      box-shadow: 0 0 8px #DC2626;
       animation: pulse 1.5s infinite;
     }
 
     @keyframes pulse {
-
-      0%,
-      100% {
+      0%, 100% {
         opacity: 1;
         transform: scale(1);
       }
-
       50% {
         opacity: 0.4;
-        transform: scale(1.3);
+        transform: scale(1.35);
       }
     }
 
     .wb-hero-title {
-      font-size: 1.45rem;
+      font-size: 1.5rem;
       font-weight: 900;
       line-height: 1.35;
-      color: #FFFFFF;
+      color: #0F172A;
       margin-bottom: 10px;
+      letter-spacing: -0.02em;
     }
 
     @media (min-width: 768px) {
       .wb-hero-title {
-        font-size: 1.8rem;
+        font-size: 1.85rem;
       }
     }
 
     .wb-hero-desc {
-      font-size: 0.92rem;
-      color: var(--text-muted);
+      font-size: 0.95rem;
+      color: #475569;
       line-height: 1.6;
       margin-bottom: 18px;
     }
 
-    /* Countdown Timer Box */
+    /* Vibrant Light Countdown Timer Box */
     .wb-timer-card {
-      background: #131E36;
-      border: 1px solid rgba(45, 140, 255, 0.3);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 16px;
+      background: linear-gradient(135deg, #F0FDF4 0%, #EFF6FF 100%);
+      border: 1.5px solid #BFDBFE;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.05);
     }
 
     .wb-timer-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .wb-timer-label {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       font-weight: 800;
-      color: #93C5FD;
+      color: #1E40AF;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
+    .wb-price-badge {
+      font-size: 0.78rem;
+      background: #DCFCE7;
+      color: #15803D;
+      border: 1px solid #86EFAC;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 800;
+    }
+
     .wb-timer-digits {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       justify-content: center;
     }
 
     .wb-digit-box {
-      background: #0B1120;
-      border: 1px solid rgba(45, 140, 255, 0.35);
-      border-radius: 8px;
-      padding: 6px 12px;
-      min-width: 54px;
+      background: #FFFFFF;
+      border: 1.5px solid #93C5FD;
+      border-radius: 12px;
+      padding: 8px 14px;
+      min-width: 60px;
       text-align: center;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.08);
+      transition: transform 0.2s ease;
+    }
+
+    .wb-digit-box:hover {
+      transform: translateY(-2px);
     }
 
     .wb-digit-val {
-      font-size: 1.35rem;
+      font-size: 1.45rem;
       font-weight: 900;
-      color: #60A5FA;
-      font-family: 'Outfit', monospace;
+      color: #1D4ED8;
+      font-family: 'Outfit', sans-serif;
       line-height: 1.1;
     }
 
     .wb-digit-lbl {
-      font-size: 0.65rem;
-      color: var(--text-dim);
+      font-size: 0.68rem;
+      color: #64748B;
       text-transform: uppercase;
       font-weight: 700;
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
-    .wb-timer-pending-text {
+    .wb-timer-status-notice {
       text-align: center;
-      padding: 8px;
+      padding: 10px;
       font-weight: 700;
-      font-size: 0.9rem;
-      color: var(--gold);
+      font-size: 0.88rem;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .wb-timer-status-upcoming {
+      background: #EFF6FF;
+      color: #1E40AF;
+      border: 1px solid #BFDBFE;
+    }
+
+    .wb-timer-status-live {
+      background: #DCFCE7;
+      color: #15803D;
+      border: 1px solid #86EFAC;
+      animation: pulseGreen 2s infinite;
+    }
+
+    .wb-timer-status-ended {
+      background: #F1F5F9;
+      color: #475569;
+      border: 1px solid #CBD5E1;
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
     }
 
     /* Meta Badges */
@@ -355,26 +435,26 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     .wb-meta-badge {
-      background: #1E293B;
-      border: 1px solid rgba(45, 140, 255, 0.25);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.82rem;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 0.84rem;
       font-weight: 700;
-      color: #E2E8F0;
+      color: #334155;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
     }
 
     /* KPI Grid */
     .wb-kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 10px;
       margin-bottom: 20px;
     }
@@ -382,75 +462,36 @@
     .wb-kpi-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: #1E293B;
-      border: 1px solid rgba(45, 140, 255, 0.3);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 0.85rem;
+      gap: 9px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+      border: 1.5px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 0.86rem;
       font-weight: 800;
-      color: #FFFFFF;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      color: #0F172A;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.03);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .wb-kpi-item:hover {
+      transform: translateY(-2px);
+      border-color: #38BDF8;
     }
 
     .wb-kpi-item i {
-      color: var(--emerald);
-      font-size: 0.95rem;
+      color: #059669;
+      font-size: 1rem;
     }
 
-    /* Registration Form & Input Fields */
-    .wb-form-title {
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: #FFFFFF;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .wb-form-subtitle {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-    }
-
-    .wb-input-group {
-      margin-bottom: 12px;
-    }
-
-    .wb-label {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #CBD5E1;
-      margin-bottom: 4px;
-    }
-
-    .wb-input {
-      width: 100%;
-      background: #0B1120;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 12px 14px;
-      color: #fff;
-      font-size: 0.92rem;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    .wb-input:focus {
-      border-color: var(--zoom-blue);
-      box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.25);
-    }
-
+    /* Buttons */
     .wb-btn-primary {
-      background: linear-gradient(135deg, #2D8CFF 0%, #0E71EB 100%);
-      color: #fff;
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      color: #FFFFFF;
       border: none;
-      border-radius: 10px;
-      padding: 13px 20px;
-      font-size: 0.95rem;
+      border-radius: 12px;
+      padding: 14px 22px;
+      font-size: 1rem;
       font-weight: 800;
       cursor: pointer;
       width: 100%;
@@ -458,93 +499,197 @@
       justify-content: center;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 18px rgba(45, 140, 255, 0.4);
-      transition: all 0.2s ease;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .wb-btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(45, 140, 255, 0.55);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
     }
 
-    /* Unlocked Screen */
+    /* Guest CTA Card */
+    .wb-guest-cta-card {
+      background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%);
+      border: 1.5px solid #BFDBFE;
+      border-radius: 18px;
+      padding: 22px;
+      text-align: center;
+      margin-top: 16px;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.06);
+    }
+
+    /* UNLOCKED CREDENTIALS CARD (TIME-AWARE LOCK/UNLOCK SYSTEM) */
     .wb-unlocked-card {
-      background: #131E36;
-      border: 1.5px solid rgba(16, 185, 129, 0.4);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 14px;
+      background: #FFFFFF;
+      border: 1.5px solid #10B981;
+      border-radius: 18px;
+      padding: 20px;
+      margin-top: 16px;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.08);
+      position: relative;
     }
 
-    .wb-unlocked-title {
-      font-size: 0.92rem;
-      font-weight: 800;
-      color: #34D399;
-      display: flex;
+    .wb-user-greeting-badge {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 12px;
+      background: #ECFDF5;
+      color: #047857;
+      border: 1.5px solid #A7F3D0;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    /* Time-Aware Status Notice Box Inside Unlocked Screen */
+    .wb-cred-time-notice {
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      line-height: 1.45;
+    }
+
+    .wb-cred-notice-locked {
+      background: #FEF3C7;
+      border: 1.5px solid #FDE68A;
+      color: #92400E;
+    }
+
+    .wb-cred-notice-live {
+      background: #DCFCE7;
+      border: 1.5px solid #86EFAC;
+      color: #15803D;
+    }
+
+    .wb-cred-notice-ended {
+      background: #F1F5F9;
+      border: 1.5px solid #E2E8F0;
+      color: #475569;
     }
 
     .wb-cred-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #0B1120;
-      border: 1px solid #1E293B;
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      transition: border-color 0.2s;
+    }
+
+    .wb-cred-row:hover {
+      border-color: #93C5FD;
+    }
+
+    .wb-cred-label {
+      font-size: 0.78rem;
+      color: #64748B;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 2px;
     }
 
     .wb-cred-val {
       font-family: 'Outfit', monospace;
       font-weight: 800;
-      font-size: 1.05rem;
-      color: #60A5FA;
+      font-size: 1.15rem;
+      color: #1D4ED8;
+      letter-spacing: 0.5px;
+    }
+
+    .wb-cred-val.locked {
+      color: #94A3B8;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    .wb-cred-val.ended {
+      color: #DC2626;
+      font-size: 0.95rem;
+      font-family: inherit;
     }
 
     .wb-btn-copy {
-      background: rgba(45, 140, 255, 0.15);
-      color: #93C5FD;
-      border: 1px solid rgba(45, 140, 255, 0.35);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 0.72rem;
-      font-weight: 700;
+      background: #EFF6FF;
+      color: #2563EB;
+      border: 1.5px solid #BFDBFE;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.76rem;
+      font-weight: 800;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .wb-btn-copy:hover:not(:disabled) {
+      background: #2563EB;
+      color: #FFFFFF;
+      border-color: #2563EB;
+    }
+
+    .wb-btn-copy:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      background: #F1F5F9;
+      color: #94A3B8;
+      border-color: #CBD5E1;
     }
 
     .wb-btn-join-zoom {
-      background: linear-gradient(135deg, #10B981, #059669);
-      color: #fff;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: #FFFFFF;
       text-decoration: none;
-      border-radius: 10px;
-      padding: 14px;
+      border-radius: 12px;
+      padding: 15px;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 8px;
-      font-weight: 800;
-      font-size: 1rem;
-      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.4);
-      margin-top: 12px;
-      transition: all 0.2s ease;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 1.05rem;
+      box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+      margin-top: 14px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .wb-btn-join-zoom:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.6);
+      box-shadow: 0 10px 25px rgba(5, 150, 105, 0.45);
+    }
+
+    .wb-btn-join-zoom.btn-disabled {
+      background: #64748B;
+      opacity: 0.75;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .wb-btn-join-zoom.btn-ended {
+      background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
+      box-shadow: 0 6px 20px rgba(225, 29, 72, 0.3);
     }
 
     /* Section Wrappers */
     .wb-tube-section {
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-card);
-      border-radius: 16px;
-      padding: 22px;
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 24px;
       margin-bottom: 24px;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
     }
 
     .wb-tube-header {
@@ -565,559 +710,78 @@
     .wb-tube-icon {
       width: 44px;
       height: 44px;
-      background: linear-gradient(135deg, #F43F5E, #E11D48);
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
       font-size: 1.25rem;
-      box-shadow: 0 4px 16px rgba(244, 63, 94, 0.4);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
     }
 
     .wb-tube-title {
       font-size: 1.25rem;
       font-weight: 900;
-      color: #FFFFFF;
+      color: #0F172A;
     }
 
     .wb-tube-subtitle {
-      font-size: 0.82rem;
-      color: var(--text-muted);
+      font-size: 0.85rem;
+      color: #64748B;
       font-weight: 600;
     }
 
-    /* Multi-Banners Poster Card Animation */
+    /* Multi-Banners Poster Card */
     .wb-poster-card {
-      background: #131E36;
-      border: 1.5px solid rgba(45, 140, 255, 0.3);
-      border-radius: 14px;
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
       display: flex;
       flex-direction: column;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .wb-poster-card:hover {
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(45, 140, 255, 0.35);
-    }
-
-    /* Filter Chips */
-    .wb-filter-bar {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-      scrollbar-width: none;
-    }
-
-    .wb-filter-bar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .wb-chip {
-      background: #0B1120;
-      border: 1px solid #334155;
-      color: var(--text-muted);
-      padding: 7px 16px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .wb-chip:hover,
-    .wb-chip.active {
-      background: var(--zoom-blue);
-      border-color: var(--zoom-blue);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(45, 140, 255, 0.35);
-    }
-
-    /* Horizontal Reels Slider with Desktop Scroll Buttons */
-    .wb-reels-slider-wrap {
-      position: relative;
-    }
-
-    .wb-shorts-grid {
-      display: flex;
-      gap: 16px;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
-      padding: 10px 4px;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-
-    .wb-shorts-grid::-webkit-scrollbar {
-      display: none;
-    }
-
-    .wb-reel-card {
-      flex: 0 0 220px;
-      scroll-snap-align: start;
-      background: #131E36;
-      border: 1px solid rgba(45, 140, 255, 0.25);
-      border-radius: 14px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .wb-reel-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-      border-color: var(--zoom-blue);
-    }
-
-    @media (max-width: 600px) {
-      .wb-reel-card {
-        flex: 0 0 170px;
-      }
-    }
-
-    .wb-reels-arrow {
-      position: absolute;
-      top: 45%;
-      transform: translateY(-50%);
-      width: 44px;
-      height: 44px;
-      background: rgba(15, 23, 42, 0.95);
-      border: 1.5px solid #2D8CFF;
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-      transition: all 0.2s ease;
-    }
-
-    .wb-reels-arrow:hover {
-      background: #2D8CFF;
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    .wb-reels-arrow-left {
-      left: -14px;
-    }
-
-    .wb-reels-arrow-right {
-      right: -14px;
-    }
-
-    @media (max-width: 768px) {
-      .wb-reels-arrow {
-        display: none;
-      }
-    }
-
-    .wb-reel-thumb-wrap {
-      aspect-ratio: 9/16;
-      position: relative;
-      background: #0f172a;
-      overflow: hidden;
-    }
-
-    .wb-reel-thumb-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.3s ease;
-    }
-
-    .wb-reel-card:hover .wb-reel-thumb-img {
-      transform: scale(1.05);
-    }
-
-    .wb-reel-plat-badge {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.68rem;
-      font-weight: 800;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      backdrop-filter: blur(8px);
-      z-index: 2;
-    }
-
-    .plat-youtube {
-      background: rgba(239, 68, 68, 0.85);
-    }
-
-    .plat-instagram {
-      background: rgba(225, 48, 108, 0.85);
-    }
-
-    .plat-facebook {
-      background: rgba(24, 119, 242, 0.85);
-    }
-
-    .wb-reel-duration-badge {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      background: rgba(0, 0, 0, 0.75);
-      color: #fff;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.65rem;
-      font-weight: 700;
-      z-index: 2;
-    }
-
-    .wb-card-share-badge {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(45, 140, 255, 0.4);
-      color: #38bdf8;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 3;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .wb-card-share-badge:hover {
-      background: #2563eb;
-      color: #fff;
-      transform: scale(1.15);
-      box-shadow: 0 0 15px rgba(37, 99, 235, 0.8);
-    }
-
-    /* AarogyamTube Global Floating Pill */
-    .at-floating-pill {
-      position: fixed;
-      bottom: 24px;
-      left: 16px;
-      background: linear-gradient(135deg, #dc2626, #b91c1c);
-      color: #ffffff;
-      padding: 10px 18px;
-      border-radius: 30px;
-      font-weight: 800;
-      font-size: 0.88rem;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.5), 0 0 12px rgba(239, 68, 68, 0.4);
-      z-index: 999;
-      border: 1.5px solid rgba(255, 255, 255, 0.3);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .at-floating-pill:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 12px 30px rgba(220, 38, 38, 0.7);
-    }
-
-    .at-pill-live-dot {
-      width: 8px;
-      height: 8px;
-      background: #4ade80;
-      border-radius: 50%;
-      animation: atPulse 1.5s infinite;
-    }
-
-    @keyframes atPulse {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
-    }
-
-    /* AarogyamTube Share Registration Modal */
-    .at-reg-modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 100000;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      animation: atFadeIn 0.3s ease;
-    }
-
-    @keyframes atFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .at-reg-modal-card {
-      background: #111c35;
-      border: 1.5px solid rgba(220, 38, 38, 0.4);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 25px rgba(220, 38, 38, 0.2);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 410px;
-      padding: 26px 22px;
-      position: relative;
-      color: #ffffff;
-      animation: atScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes atScaleIn {
-      from { transform: scale(0.92) translateY(12px); opacity: 0; }
-      to { transform: scale(1) translateY(0); opacity: 1; }
-    }
-
-    .at-reg-close-btn {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: #94a3b8;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      font-size: 1.3rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .at-reg-close-btn:hover {
-      background: rgba(220, 38, 38, 0.3);
-      color: #ffffff;
-    }
-
-    .at-reg-modal-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .at-reg-logo {
-      height: 48px;
-      margin-bottom: 8px;
-      object-fit: contain;
-    }
-
-    .at-reg-title {
-      font-size: 1.25rem;
-      font-weight: 900;
-      color: #ffffff;
-      margin: 0 0 6px 0;
-      letter-spacing: -0.01em;
-    }
-
-    .at-reg-subtitle {
-      font-size: 0.82rem;
-      color: #94a3b8;
-      margin: 0;
-      line-height: 1.45;
-    }
-
-    .at-reg-form {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .at-input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      text-align: left;
-    }
-
-    .at-input-group label {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #cbd5e1;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .at-input-group input {
-      background: #0b1120;
-      border: 1.5px solid #334155;
-      border-radius: 12px;
-      color: #ffffff;
-      font-size: 0.95rem;
-      padding: 12px 14px;
-      font-family: inherit;
-      outline: none;
-      transition: all 0.2s;
-    }
-
-    .at-input-group input:focus {
-      border-color: #ef4444;
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
-    }
-
-    .at-reg-submit-btn {
-      background: linear-gradient(135deg, #dc2626, #b91c1c);
-      color: #ffffff;
-      border: none;
-      padding: 14px 18px;
-      border-radius: 12px;
-      font-weight: 800;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4);
-      margin-top: 4px;
-      transition: all 0.2s;
-    }
-
-    .at-reg-submit-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.6);
-    }
-
-    .at-reg-footer-note {
-      text-align: center;
-      font-size: 0.75rem;
-      color: #64748b;
-      margin-top: 4px;
-    }
-
-    .wb-reel-play-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .wb-reel-card:hover .wb-reel-play-overlay {
-      opacity: 1;
-    }
-
-    .wb-reel-play-icon {
-      width: 44px;
-      height: 44px;
-      background: var(--zoom-blue);
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 16px rgba(45, 140, 255, 0.6);
-    }
-
-    .wb-reel-card-info {
-      padding: 10px 12px;
-    }
-
-    .wb-reel-card-title {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #FFFFFF;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      line-height: 1.35;
-      margin-bottom: 4px;
-    }
-
-    .wb-reel-card-speaker {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* Masterclass Videos Grid */
-    .wb-video-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-
-    .wb-vcard {
-      background: #131E36;
-      border: 1px solid rgba(45, 140, 255, 0.25);
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .wb-vcard:hover {
       transform: translateY(-4px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      border-color: var(--zoom-blue);
-    }
-
-    .wb-vcard-thumb-wrap {
-      aspect-ratio: 16/9;
-      position: relative;
-      background: #0f172a;
-      overflow: hidden;
-    }
-
-    .wb-vcard-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+      border-color: #93C5FD;
     }
 
     /* Accordion FAQs */
     .wb-accordion-item {
-      background: #131E36;
-      border: 1px solid rgba(45, 140, 255, 0.2);
-      border-radius: 8px;
-      margin-bottom: 8px;
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 12px;
+      margin-bottom: 10px;
       overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .wb-accordion-item:hover {
+      border-color: #93C5FD;
     }
 
     .wb-accordion-q {
-      padding: 12px 16px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      color: #FFFFFF;
+      padding: 14px 18px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #0F172A;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: #F8FAFC;
     }
 
     .wb-accordion-a {
-      padding: 0 16px 12px 16px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.5;
+      padding: 0 18px 14px 18px;
+      font-size: 0.88rem;
+      color: #475569;
+      line-height: 1.6;
       display: none;
+      background: #FFFFFF;
     }
 
     .wb-accordion-item.active .wb-accordion-a {
@@ -1126,651 +790,34 @@
 
     .wb-accordion-item.active .wb-accordion-q i {
       transform: rotate(180deg);
+      color: #2563EB;
     }
 
-    /* In-App Vertical Reels Modal Player */
-    .wb-reels-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.96);
-      z-index: 99999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      touch-action: none;
-    }
-
-    .wb-reels-modal.active {
-      display: flex;
-    }
-
-    .wb-reels-container {
-      width: 100%;
-      max-width: 440px;
-      height: 96vh;
-      max-height: 840px;
-      background: #000;
-      border-radius: 18px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 0 50px rgba(45, 140, 255, 0.35);
-    }
-
-    @media (max-width: 600px) {
-      .wb-reels-container {
-        height: 100vh;
-        max-height: 100vh;
-        border-radius: 0;
-      }
-    }
-
-    .wb-reels-top {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 20;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
-    }
-
-    .wb-reels-close-btn {
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      font-size: 1.3rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .wb-reels-body {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      position: relative;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .wb-reels-touch-surface {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 70px;
-      bottom: 120px;
-      z-index: 10;
-      pointer-events: auto;
-      touch-action: pan-y;
-      background: transparent;
-      cursor: grab;
-    }
-
-    .wb-reels-iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* Vertical Navigation Controls */
-    .wb-reels-vertical-nav {
-      position: absolute;
-      right: 14px;
-      top: 40%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 25;
-    }
-
-    .wb-vnav-btn {
-      width: 44px;
-      height: 44px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1.5px solid rgba(45, 140, 255, 0.5);
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 800;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-    }
-
-    .wb-vnav-btn:hover {
-      background: var(--zoom-blue);
-    }
-
-    .wb-reels-rail {
-      position: absolute;
-      right: 14px;
-      bottom: 85px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 20;
-      align-items: center;
-    }
-
-    .wb-rail-btn {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1.05rem;
-      text-decoration: none;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-    }
-
-    .wb-rail-count {
-      font-size: 0.65rem;
-      font-weight: 700;
-      margin-top: 1px;
-    }
-
-    .wb-reels-caption {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 70px;
-      padding: 16px;
-      background: linear-gradient(0deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.6) 70%, transparent 100%);
-      z-index: 20;
-    }
-
-    .wb-reels-caption-title {
-      font-weight: 800;
-      font-size: 0.95rem;
-      color: #fff;
-      margin-bottom: 4px;
-      line-height: 1.3;
-    }
-
-    .wb-reels-caption-speaker {
-      font-size: 0.75rem;
-      color: #93C5FD;
-    }
-
-    /* =========================================
-       AAROGYAMTUBE 16:9 MASTERCLASS CINEMA PLAYER (YOUTUBE DARK THEME)
-       ========================================== */
-    .wb-yt-modal {
-      position: fixed;
-      inset: 0;
-      background: #0f0f0f;
-      z-index: 99999;
-      display: none;
-      flex-direction: column;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      color: #ffffff;
-    }
-
-    .wb-yt-modal.active {
-      display: flex;
-    }
-
-    /* Top Minimal Sharer Header */
-    .wb-yt-top-sharer {
-      position: sticky;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      background: rgba(15, 15, 15, 0.94);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    }
-
-    .wb-yt-sharer-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-      flex: 1;
-    }
-
-    .wb-yt-sharer-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.9rem;
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-      flex-shrink: 0;
-    }
-
-    .wb-yt-sharer-info {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .wb-yt-sharer-tag {
-      font-size: 0.65rem;
-      color: #94a3b8;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .wb-yt-sharer-tag span.badge-dot {
-      width: 6px;
-      height: 6px;
-      background: #22c55e;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .wb-yt-sharer-name-mobile {
-      font-size: 0.86rem;
-      font-weight: 800;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .wb-yt-sharer-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .wb-yt-btn-contact {
-      padding: 6px 12px;
+    /* AarogyamTube Hub Promo Card */
+    .wb-tube-promo-card {
+      background: linear-gradient(135deg, #FFF1F2 0%, #EFF6FF 100%);
+      border: 2px solid #FECDD3;
       border-radius: 20px;
-      font-size: 0.76rem;
-      font-weight: 800;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.2s;
-    }
-
-    .wb-yt-btn-call {
-      background: rgba(37, 99, 235, 0.2);
-      border: 1px solid #3b82f6;
-      color: #93c5fd;
-    }
-
-    .wb-yt-btn-call:hover {
-      background: #2563eb;
-      color: #fff;
-    }
-
-    .wb-yt-btn-wa {
-      background: rgba(37, 211, 102, 0.2);
-      border: 1px solid #25d366;
-      color: #4ade80;
-    }
-
-    .wb-yt-btn-wa:hover {
-      background: #25d366;
-      color: #fff;
-    }
-
-    .wb-yt-close-btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1.1rem;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-
-    .wb-yt-close-btn:hover {
-      background: #ef4444;
-      border-color: #ef4444;
-    }
-
-    /* Video Frame & Layout */
-    .wb-yt-content-layout {
-      width: 100%;
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 12px 14px 70px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      box-sizing: border-box;
-    }
-
-    @media (min-width: 1024px) {
-      .wb-yt-content-layout {
-        display: grid;
-        grid-template-columns: 1fr 390px;
-        gap: 24px;
-        padding-top: 18px;
-      }
-    }
-
-    .wb-yt-player-sticky-wrap {
-      width: 100%;
-      background: #000;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .wb-yt-video-aspect {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: #000;
-    }
-
-    .wb-yt-video-aspect iframe,
-    .wb-yt-video-aspect #wb_master_yt_container {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* Video Meta & Actions */
-    .wb-yt-meta-box {
-      padding: 12px 2px 0 2px;
-    }
-
-    .wb-yt-video-title {
-      font-size: 1.12rem;
-      font-weight: 800;
-      color: #ffffff;
-      line-height: 1.4;
-      margin-bottom: 8px;
-    }
-
-    .wb-yt-channel-row {
+      padding: 24px;
+      margin-bottom: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .wb-yt-channel-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .wb-yt-channel-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 1rem;
-    }
-
-    .wb-yt-channel-title {
-      font-size: 0.88rem;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    .wb-yt-channel-sub {
-      font-size: 0.72rem;
-      color: #94a3b8;
-    }
-
-    .wb-yt-actions-pills {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .wb-yt-action-pill {
-      background: #272727;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-      padding: 7px 14px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
-
-    .wb-yt-action-pill:hover {
-      background: #383838;
-      transform: translateY(-1px);
-    }
-
-    .wb-yt-action-pill.active {
-      background: #ef4444;
-      border-color: #ef4444;
-    }
-
-    .wb-yt-pill-wa {
-      background: rgba(37, 211, 102, 0.2);
-      border-color: #25d366;
-      color: #4ade80;
-    }
-
-    .wb-yt-pill-wa:hover {
-      background: #25d366;
-      color: #fff;
-    }
-
-    .wb-yt-desc-box {
-      background: #212121;
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-top: 14px;
-      font-size: 0.85rem;
-      color: #e2e8f0;
-      line-height: 1.5;
-    }
-
-    /* Floating Share Icons on Bottom */
-    .wb-yt-floating-rail {
-      position: fixed;
-      bottom: 24px;
-      right: 16px;
-      z-index: 60;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .wb-yt-float-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      font-size: 1.25rem;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .wb-yt-float-btn:hover {
-      transform: scale(1.1);
-    }
-
-    .wb-yt-float-wa {
-      background: linear-gradient(135deg, #25D366, #128C7E);
-      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-    }
-
-    .wb-yt-float-share {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-    }
-
-    /* Suggested Videos Feed (YouTube Style) */
-    .wb-yt-suggested-feed {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .wb-yt-suggested-header {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 2px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .wb-yt-card {
-      display: flex;
-      gap: 10px;
-      background: #181818;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      padding: 6px;
-    }
-
-    .wb-yt-card:hover {
-      background: #242424;
-      border-color: rgba(45, 140, 255, 0.4);
-      transform: translateY(-2px);
-    }
-
-    .wb-yt-card.active-playing {
-      border: 1.5px solid #2563eb;
-      background: rgba(37, 99, 235, 0.15);
-    }
-
-    .wb-yt-thumb-box {
-      width: 120px;
-      aspect-ratio: 16/9;
-      position: relative;
-      border-radius: 6px;
-      overflow: hidden;
-      flex-shrink: 0;
-      background: #000;
-    }
-
-    @media (min-width: 480px) {
-      .wb-yt-thumb-box {
-        width: 135px;
-      }
-    }
-
-    .wb-yt-thumb-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .wb-yt-time-badge {
-      position: absolute;
-      bottom: 4px;
-      right: 4px;
-      background: rgba(0, 0, 0, 0.85);
-      color: #fff;
-      padding: 1px 5px;
-      border-radius: 3px;
-      font-size: 0.62rem;
-      font-weight: 700;
-    }
-
-    .wb-yt-card-details {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .wb-yt-card-title {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #ffffff;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      line-height: 1.35;
-      margin-bottom: 3px;
-    }
-
-    .wb-yt-card-speaker {
-      font-size: 0.72rem;
-      color: #94a3b8;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(225, 29, 72, 0.06);
     }
   </style>
 </head>
 
 <body>
 
-  <div class="wb-ambient-glow glow-1"></div>
-  <div class="wb-ambient-glow glow-2"></div>
-  <div class="wb-ambient-glow glow-3"></div>
+  <!-- Background Animated Mesh Glows -->
+  <div class="wb-ambient-mesh-wrap">
+    <div class="wb-ambient-glow glow-1"></div>
+    <div class="wb-ambient-glow glow-2"></div>
+    <div class="wb-ambient-glow glow-3"></div>
+  </div>
 
   <!-- =========================================
        1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
@@ -1784,8 +831,7 @@
         </div>
         <div style="flex:1;overflow:hidden;">
           <div class="ticker-marquee-scroll" id="home-live-ticker-track">
-            🌾 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 AI एक्सपर्ट सहायता उपलब्ध! ✦ प्रमाणित ई-बुक्स व लाइव वेबिनार
-            हब
+            🌾 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 AI एक्सपर्ट सहायता उपलब्ध! ✦ प्रमाणित ई-बुक्स व लाइव वेबिनार हब
           </div>
         </div>
       </div>
@@ -1795,7 +841,7 @@
   <!-- =========================================
        2. ANIMATED INDIAN TIRANGA WAVING HEADER (EXACT HOMEPAGE MATCH)
        ========================================== -->
-  <header class="header header-tiranga-animated" id="header" style="position:sticky; top:0; z-index:1000;">
+  <header class="header header-tiranga-animated" id="header" style="position:sticky; top:0; z-index:1000; background:#FFFFFF;">
     <div class="container"
       style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;gap:8px;max-width:1200px;margin:0 auto;">
 
@@ -1816,8 +862,8 @@
 
         <!-- Current Active Page Indicator Badge -->
         <span class="header-current-page-badge" title="Current Page"
-          style="background:rgba(45,140,255,0.12);color:#0284c7;border:1px solid rgba(45,140,255,0.3);padding:3px 8px;border-radius:12px;font-size:0.72rem;font-weight:800;">
-          🎥 Webinar
+          style="background:rgba(37,99,235,0.08);color:#2563eb;border:1px solid rgba(37,99,235,0.25);padding:3px 8px;border-radius:12px;font-size:0.72rem;font-weight:800;">
+          🎥 Live Webinar
         </span>
       </div>
 
@@ -1825,22 +871,22 @@
       <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
         <!-- AarogyamTube Hub Link -->
         <a href="/tube.html" title="🎬 AarogyamTube वीडियो व शॉर्ट्स हब"
-          style="background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);color:#ffffff;padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;text-decoration:none;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(239,68,68,0.35);white-space:nowrap;">
+          style="background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);color:#ffffff;padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;text-decoration:none;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(239,68,68,0.25);white-space:nowrap;">
           <i class="fa-brands fa-youtube"></i> <span>AarogyamTube</span>
         </a>
 
         <!-- Install App Button (PWA) -->
         <button type="button" onclick="window.triggerPwaInstall?.() || window.triggerPWAInstall?.()"
           class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App"
-          style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
-          <span>📲</span> <span>Install App</span>
+          style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.15);">
+          <span>📲</span> <span>App</span>
         </button>
 
         <!-- Notification Bell Icon -->
         <button type="button" class="user-notif-bell-btn"
           onclick="window.location.href='/ucas/index.html?tab=notifications'" title="Notifications"
           aria-label="Notifications"
-          style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
           <i class="fa-regular fa-bell" style="font-size:1rem;color:#10B981;"></i>
           <span class="user-notif-badge"
             style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 5px;border-radius:10px;">0</span>
@@ -1848,7 +894,7 @@
 
         <!-- Shopping Cart Icon -->
         <a href="/ebooks/cart.html" title="Shopping Cart"
-          style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
           <i class="fa-solid fa-cart-shopping" style="font-size:1rem;color:#2563eb;"></i>
           <span class="cart-count" id="cartCount"
             style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
@@ -1857,7 +903,7 @@
         <!-- 3-Line Menu Trigger Button (Desktop Left Drawer / Mobile Right Drawer) -->
         <button type="button" class="menu-button"
           onclick="window.openUniversalDrawer?.() || window.openUniversalNavDrawer?.()" title="Open Menu"
-          style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+          style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.15);">
           <i class="fa-solid fa-bars"></i>
         </button>
       </div>
@@ -1868,15 +914,25 @@
   <main class="wb-container">
 
     <!-- =========================================
-         3. HERO 2-COLUMN SECTION (BOOK LANDING EXACT)
+         3. HERO 2-COLUMN SECTION (WHITE & COLORFUL THEME)
          ========================================== -->
     <section id="sec_hero_zoom" class="wb-hero-grid">
 
-      <!-- LEFT COLUMN: 3D FLOATING COVER (UNCROPPED NATURAL ASPECT RATIO, NO WHITE BOX) -->
-      <div class="wb-hero-book-wrap">
-        <img id="wb_cover_img" src="/images/banners/agriculture-hero-banner-1.webp?v=3.0" alt="Webinar Cover"
-          class="wb-hero-book-cover"
-          onerror="this.onerror=null; this.src='/images/banners/universal-zoom-webinar-og.jpg'">
+      <!-- LEFT COLUMN: GRAND RESPONSIVE 16:9 COVER BANNER CARD -->
+      <div class="wb-hero-banner-card">
+        <div class="wb-hero-banner-img-wrap">
+          <span class="wb-banner-overlay-badge">
+            <span class="wb-live-pulse-dot" style="background:#ef4444; box-shadow:0 0 8px #ef4444;"></span>
+            <span>🔴 LIVE WEBINAR 2026</span>
+          </span>
+          <img id="wb_cover_img" src="/images/banners/agriculture-hero-banner-1.webp?v=3.0" alt="Webinar Cover"
+            class="wb-hero-book-cover"
+            onerror="this.onerror=null; this.src='/images/banners/universal-zoom-webinar-og.jpg'">
+          <span class="wb-banner-trust-badge">
+            <i class="fa-solid fa-shield-check" style="color:#059669;"></i>
+            <span>प्रमाणित कृषि ट्रेनिंग</span>
+          </span>
+        </div>
       </div>
 
       <!-- RIGHT COLUMN: WEBINAR DETAILS & REGISTRATION / UNLOCKED ZOOM CARD -->
@@ -1894,14 +950,14 @@
           इस विशेष लाइव ज़ूम वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें और ज़ूम लिंक प्राप्त करें।
         </p>
 
-        <!-- Live Countdown Timer -->
+        <!-- Live Countdown Timer Box -->
         <div class="wb-timer-card">
           <div class="wb-timer-header">
             <div class="wb-timer-label">
-              <i class="fa-solid fa-stopwatch"></i> <span>लाइव वेबिनार काउंटडाउन</span>
+              <i class="fa-solid fa-stopwatch" style="color:#2563EB;"></i>
+              <span>लाइव वेबिनार काउंटडाउन</span>
             </div>
-            <span id="wb_price_badge"
-              style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:#34D399; padding:2px 8px; border-radius:6px; font-weight:800;">
+            <span id="wb_price_badge" class="wb-price-badge">
               🟢 100% निःशुल्क
             </span>
           </div>
@@ -1924,7 +980,13 @@
               <div class="wb-digit-lbl">सेकंड</div>
             </div>
           </div>
-          <div id="wb_timer_pending" class="wb-timer-pending-text" style="display:none;">
+
+          <!-- Dynamic Status Banner under Timer -->
+          <div id="wb_timer_status_label" class="wb-timer-status-notice wb-timer-status-upcoming">
+            ⏳ लाइव ज़ूम वेबिनार प्रारंभ होने में शेष समय
+          </div>
+
+          <div id="wb_timer_pending" class="wb-timer-pending-text" style="display:none; text-align:center; padding:10px; color:#D97706; font-weight:800;">
             📺 लाइव वेबिनार की तिथि व समय जल्द घोषित होगा
           </div>
         </div>
@@ -1932,15 +994,15 @@
         <!-- Meta Badges -->
         <div class="wb-meta-row">
           <div class="wb-meta-badge">
-            <i class="fa-regular fa-calendar" style="color:#60A5FA;"></i>
+            <i class="fa-regular fa-calendar" style="color:#2563EB;"></i>
             <span id="wb_date_label">शीघ्र घोषित</span>
           </div>
           <div class="wb-meta-badge">
-            <i class="fa-solid fa-video" style="color:#2D8CFF;"></i>
+            <i class="fa-solid fa-video" style="color:#059669;"></i>
             <span>Zoom Workplace App</span>
           </div>
           <div class="wb-meta-badge">
-            <i class="fa-solid fa-clock" style="color:#F59E0B;"></i>
+            <i class="fa-solid fa-clock" style="color:#D97706;"></i>
             <span id="wb_duration_label">90 मिनट</span>
           </div>
         </div>
@@ -1949,7 +1011,7 @@
         <div id="wb_kpi_grid" class="wb-kpi-grid">
           <div class="wb-kpi-item">
             <i class="fa-solid fa-circle-check"></i>
-            <span>🔴 100% लाइव इंटरएक्टिव ज़ूम क्लास</span>
+            <span>🔴 100% लाइव इंटरएक्टिव क्लास</span>
           </div>
           <div class="wb-kpi-item">
             <i class="fa-solid fa-circle-check"></i>
@@ -1965,77 +1027,93 @@
           </div>
         </div>
 
-        <!-- Guest CTA Card (Opens Zoom Registration Popup Modal) -->
-        <div id="wb_reg_box" class="wb-guest-cta-card" style="background: rgba(15, 23, 42, 0.75); border: 1.5px solid rgba(45, 140, 255, 0.35); border-radius: 16px; padding: 20px; text-align: center; margin-top: 16px;">
+        <!-- Guest CTA Card (Visible for new guests) -->
+        <div id="wb_reg_box" class="wb-guest-cta-card">
           <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px;">
-            <span style="display: inline-block; width: 10px; height: 10px; background: #10B981; border-radius: 50%; animation: atPulse 1.5s infinite;"></span>
-            <span style="font-size: 0.88rem; font-weight: 700; color: #60A5FA;">सीमित सीटें उपलब्ध हैं • 100% निःशुल्क</span>
+            <span class="wb-live-pulse-dot" style="background:#059669; box-shadow:0 0 8px #059669;"></span>
+            <span style="font-size: 0.88rem; font-weight: 800; color: #047857;">सीमित सीटें उपलब्ध हैं • 100% निःशुल्क</span>
           </div>
-          <h3 style="font-size: 1.15rem; font-weight: 900; color: #ffffff; margin: 0 0 12px 0;">लाइव ज़ूम क्लास से जुड़ें</h3>
-          <button type="button" id="wb_btn_open_zoom_popup" class="wb-btn-primary" onclick="window.openZoomRegModal()" style="width: 100%; font-size: 1.05rem; padding: 14px 20px; box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45); cursor: pointer;">
+          <h3 style="font-size: 1.2rem; font-weight: 900; color: #0F172A; margin: 0 0 14px 0;">लाइव ज़ूम क्लास से जुड़ें</h3>
+          <button type="button" id="wb_btn_open_zoom_popup" class="wb-btn-primary" onclick="window.openZoomRegModal()">
             <span>🎟️ निःशुल्क सीट बुक करें (Get Zoom Pass)</span>
             <i class="fa-solid fa-arrow-right"></i>
           </button>
-          <div style="display: flex; justify-content: center; gap: 16px; margin-top: 12px; font-size: 0.78rem; color: #94a3b8;">
-            <span>⚡ 10 सेकंड में ज़ूम लिंक</span>
+          <div style="display: flex; justify-content: center; gap: 16px; margin-top: 12px; font-size: 0.8rem; color: #64748B; font-weight: 600;">
+            <span>⚡ 10 सेकंड में ज़ूम पास</span>
             <span>🔒 सुरक्षित एक्सेस</span>
           </div>
         </div>
 
         <!-- Unlocked Screen (Visible after registration / login) -->
         <div id="wb_unlocked_box" class="wb-unlocked-card" style="display:none;">
-          <div id="wb_user_greeting_badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.15); color:#34D399; border:1px solid rgba(16,185,129,0.3); padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:800; margin-bottom:12px;">
-            <i class="fa-solid fa-circle-check"></i>
-            <span id="wb_user_greeting_name">स्वागत है, किसान साथी!</span>
+          <div class="wb-user-greeting-badge">
+            <i class="fa-solid fa-circle-check" style="color:#059669;"></i>
+            <span id="wb_user_greeting_name">स्वागत है, किसान साथी! • सीट सुरक्षित ✅</span>
           </div>
-          <div class="wb-unlocked-title" style="margin-top:0;">
-            <i class="fa-solid fa-key" style="color:#F59E0B;"></i>
+
+          <!-- Time-Aware Dynamic Notice -->
+          <div id="wb_cred_time_notice" class="wb-cred-time-notice wb-cred-notice-locked">
+            <i id="wb_cred_time_icon" class="fa-solid fa-lock"></i>
+            <span id="wb_cred_time_text">ज़ूम मीटिंग ID, पासवर्ड एवं डायरेक्ट लिंक वेबिनार प्रारंभ होने से 15 मिनट पहले यहाँ लाइव अनलॉक होगा।</span>
+          </div>
+
+          <div style="font-weight: 800; font-size: 0.95rem; color: #0F172A; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-key" style="color: #D97706;"></i>
             <span>आपकी ज़ूम मीटिंग डिटेल (Zoom Pass):</span>
           </div>
 
+          <!-- Meeting ID Row -->
           <div class="wb-cred-row">
             <div>
-              <span style="font-size:0.75rem; color:#94a3b8;">Meeting ID:</span>
-              <div id="wb_unlocked_mid" class="wb-cred-val">--</div>
+              <div class="wb-cred-label">Meeting ID:</div>
+              <div id="wb_unlocked_mid" class="wb-cred-val locked">🔒 समय पर अनलॉक होगा</div>
             </div>
-            <button type="button" class="wb-btn-copy" onclick="window.copyWbCred('mid')">Copy ID</button>
+            <button type="button" id="wb_btn_copy_mid" class="wb-btn-copy" onclick="window.copyWbCred('mid')" disabled>
+              <i class="fa-regular fa-copy"></i>
+              <span>Copy ID</span>
+            </button>
           </div>
 
+          <!-- Passcode Row -->
           <div class="wb-cred-row">
             <div>
-              <span style="font-size:0.75rem; color:#94a3b8;">Passcode:</span>
-              <div id="wb_unlocked_pass" class="wb-cred-val">--</div>
+              <div class="wb-cred-label">Passcode:</div>
+              <div id="wb_unlocked_pass" class="wb-cred-val locked">🔒 समय पर अनलॉक होगा</div>
             </div>
-            <button type="button" class="wb-btn-copy" onclick="window.copyWbCred('pass')">Copy Passcode</button>
+            <button type="button" id="wb_btn_copy_pass" class="wb-btn-copy" onclick="window.copyWbCred('pass')" disabled>
+              <i class="fa-regular fa-copy"></i>
+              <span>Copy Passcode</span>
+            </button>
           </div>
 
-          <a id="wb_direct_join_btn" href="#" target="_blank" class="wb-btn-join-zoom">
-            <i class="fa-solid fa-video"></i>
-            <span>Join Zoom Meeting</span>
+          <!-- Direct Join Button (Time-Aware) -->
+          <a id="wb_direct_join_btn" href="#" class="wb-btn-join-zoom btn-disabled">
+            <i class="fa-solid fa-lock" id="wb_join_btn_icon"></i>
+            <span id="wb_join_btn_text">⏳ ज़ूम लिंक वेबिनार समय पर सक्रिय होगा</span>
           </a>
 
           <!-- Social Share Suite -->
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:16px;">
             <button type="button" id="wb_btn_share_wa" class="wb-btn-primary"
-              style="background:#25D366; color:#fff; font-size:0.82rem; padding:10px;"
+              style="background:#25D366; color:#fff; font-size:0.84rem; padding:11px; box-shadow:0 4px 14px rgba(37,211,102,0.3);"
               onclick="window.shareWbWhatsApp()">
               <i class="fa-brands fa-whatsapp"></i>
               <span>व्हाट्सएप शेयर</span>
             </button>
             <button type="button" id="wb_btn_share_fb" class="wb-btn-primary"
-              style="background:#1877F2; color:#fff; font-size:0.82rem; padding:10px;"
+              style="background:#1877F2; color:#fff; font-size:0.84rem; padding:11px; box-shadow:0 4px 14px rgba(24,119,242,0.3);"
               onclick="window.shareWbFacebook()">
               <i class="fa-brands fa-facebook"></i>
               <span>फेसबुक शेयर</span>
             </button>
             <button type="button" id="wb_btn_copy_link" class="wb-btn-primary"
-              style="background:#334155; color:#fff; font-size:0.82rem; padding:10px;"
+              style="background:#475569; color:#fff; font-size:0.84rem; padding:11px; box-shadow:0 4px 14px rgba(71,85,105,0.25);"
               onclick="window.copyWbShareLink()">
               <i class="fa-solid fa-link"></i>
               <span>लिंक कॉपी करें</span>
             </button>
             <button type="button" id="wb_btn_native_share" class="wb-btn-primary"
-              style="background:#6366F1; color:#fff; font-size:0.82rem; padding:10px;" onclick="window.shareWbNative()">
+              style="background:#6366F1; color:#fff; font-size:0.84rem; padding:11px; box-shadow:0 4px 14px rgba(99,102,241,0.3);" onclick="window.shareWbNative()">
               <i class="fa-solid fa-share-nodes"></i>
               <span>अन्य ऐप्स पर शेयर</span>
             </button>
@@ -2047,13 +1125,33 @@
     </section>
 
     <!-- =========================================
-         4. HERO MULTI-BANNERS & POSTERS SECTION
+         4. AAROGYAMTUBE PROMO BRIDGE BANNER
+         ========================================== -->
+    <section class="wb-tube-promo-card">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div style="width:54px; height:54px; background:linear-gradient(135deg, #EF4444, #DC2626); border-radius:14px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.6rem; box-shadow:0 6px 18px rgba(239,68,68,0.35); flex-shrink:0;">
+          <i class="fa-brands fa-youtube"></i>
+        </div>
+        <div>
+          <h3 style="font-size:1.15rem; font-weight:900; color:#0F172A; margin-bottom:4px;">AarogyamTube — 1-मिनट कृषि शॉर्ट्स एवं वीडियो</h3>
+          <p style="font-size:0.88rem; color:#475569; margin:0;">विशेषज्ञों के प्रैक्टिकल वीडियो, जैविक फॉर्मूले और रिकॉर्डेड वेबिनार कभी भी देखें।</p>
+        </div>
+      </div>
+      <a href="/tube.html" style="background:linear-gradient(135deg, #EF4444, #DC2626); color:#fff; text-decoration:none; font-weight:900; font-size:0.92rem; padding:12px 24px; border-radius:12px; display:inline-flex; align-items:center; gap:8px; box-shadow:0 6px 18px rgba(239,68,68,0.3); white-space:nowrap;">
+        <span>🎬 AarogyamTube हब खोलें</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </section>
+
+    <!-- =========================================
+         5. HERO MULTI-BANNERS & POSTERS SECTION
          ========================================== -->
     <section id="sec_banners" class="wb-tube-section" style="display:none;">
       <div class="wb-tube-header">
         <div class="wb-tube-brand">
-          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #2D8CFF, #0E71EB);"><i
-              class="fa-solid fa-images"></i></div>
+          <div class="wb-tube-icon" style="background:linear-gradient(135deg, #2563EB, #1D4ED8);">
+            <i class="fa-solid fa-images"></i>
+          </div>
           <div>
             <div id="wb_posters_title" class="wb-tube-title">🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स</div>
             <div id="wb_posters_subtitle" class="wb-tube-subtitle">नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स</div>
@@ -2066,61 +1164,59 @@
       </div>
     </section>
 
-
-
     <!-- =========================================
-         6. STEP-BY-STEP ZOOM TUTORIAL
+         6. STEP-BY-STEP ZOOM TUTORIAL (CLEAN WHITE)
          ========================================== -->
     <section id="sec_tutorial" class="wb-tube-section">
-      <div class="wb-card">
-        <div
-          style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-          <i class="fa-solid fa-chalkboard-user" style="color:#2D8CFF;"></i>
-          <span>Zoom मीटिंग से कैसे जुड़ें? (सरल गाइड)</span>
-        </div>
+      <div
+        style="font-size:1.15rem; font-weight:900; color:#0F172A; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-chalkboard-user" style="color:#2563EB;"></i>
+        <span>Zoom मीटिंग से कैसे जुड़ें? (सरल गाइड)</span>
+      </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
-          <div
-            style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
-            <div style="font-weight:800; color:#93C5FD; margin-bottom:4px;">1. Zoom App डाउनलोड करें</div>
-            <p style="font-size:0.78rem; color:#94A3B8;">अगर आपके फोन में Zoom App नहीं है, तो Play Store या App Store
-              से डाउनलोड करें।</p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
+        <div
+          style="background:#F8FAFC; border:1.5px solid #E2E8F0; border-radius:12px; padding:16px;">
+          <div style="display:flex; align-items:center; gap:8px; font-weight:900; color:#1D4ED8; margin-bottom:6px; font-size:0.95rem;">
+            <span style="background:#DBEAFE; color:#1E40AF; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem;">1</span>
+            <span>Zoom App डाउनलोड करें</span>
           </div>
-          <div
-            style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
-            <div style="font-weight:800; color:#93C5FD; margin-bottom:4px;">2. Join Meeting दबाएं</div>
-            <p style="font-size:0.78rem; color:#94A3B8;">वेबिनार समय पर ऊपर दिए <strong>Join Zoom Meeting</strong> बटन
-              पर क्लिक करें।</p>
+          <p style="font-size:0.84rem; color:#64748B; line-height:1.5;">अगर आपके फोन में Zoom App नहीं है, तो Play Store या App Store से Zoom Workplace ऐप डाउनलोड करें।</p>
+        </div>
+        <div
+          style="background:#F8FAFC; border:1.5px solid #E2E8F0; border-radius:12px; padding:16px;">
+          <div style="display:flex; align-items:center; gap:8px; font-weight:900; color:#059669; margin-bottom:6px; font-size:0.95rem;">
+            <span style="background:#DCFCE7; color:#15803D; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem;">2</span>
+            <span>Join Meeting दबाएं</span>
           </div>
-          <div
-            style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
-            <div style="font-weight:800; color:#93C5FD; margin-bottom:4px;">3. Audio चालू करें</div>
-            <p style="font-size:0.78rem; color:#94A3B8;">Zoom में जुड़ते ही नीचे बाईं तरफ <strong>'Join Audio'</strong>
-              दबाकर <strong>'Wifi or Cellular Data'</strong> चुनें।</p>
+          <p style="font-size:0.84rem; color:#64748B; line-height:1.5;">वेबिनार समय से 15 मिनट पहले ऊपर दिए <strong>Join Zoom Meeting</strong> बटन पर क्लिक करें।</p>
+        </div>
+        <div
+          style="background:#F8FAFC; border:1.5px solid #E2E8F0; border-radius:12px; padding:16px;">
+          <div style="display:flex; align-items:center; gap:8px; font-weight:900; color:#D97706; margin-bottom:6px; font-size:0.95rem;">
+            <span style="background:#FEF3C7; color:#B45309; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem;">3</span>
+            <span>Audio चालू करें</span>
           </div>
+          <p style="font-size:0.84rem; color:#64748B; line-height:1.5;">Zoom में जुड़ते ही नीचे बाईं तरफ <strong>'Join Audio'</strong> दबाकर <strong>'Wifi or Cellular Data'</strong> चुनें।</p>
         </div>
       </div>
     </section>
 
     <!-- =========================================
-         7. FAQS ACCORDION
+         7. FAQS ACCORDION (CLEAN WHITE)
          ========================================== -->
     <section id="sec_faqs" class="wb-tube-section">
-      <div class="wb-card">
-        <div
-          style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-          <i class="fa-solid fa-circle-question" style="color:#F59E0B;"></i>
-          <span>अक्सर पूछे जाने वाले सवाल (FAQs)</span>
-        </div>
-        <div id="wb_faqs_container">
-          <!-- Rendered by JS -->
-        </div>
+      <div
+        style="font-size:1.15rem; font-weight:900; color:#0F172A; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-circle-question" style="color:#D97706;"></i>
+        <span>अक्सर पूछे जाने वाले सवाल (FAQs)</span>
+      </div>
+      <div id="wb_faqs_container">
+        <!-- Rendered by JS -->
       </div>
     </section>
 
   </main>
-
-
 
   <!-- =========================================
        UNIVERSAL HOMEPAGE FOOTER (MATCHES INDEX.HTML)
@@ -2149,8 +1245,7 @@
             <li><a href="/tube.html" style="color:#38bdf8;font-weight:800;text-decoration:none;">🎬 AarogyamTube हब</a></li>
             <li><a href="/ebooks/ebook.html" style="color:#94a3b8;text-decoration:none;">📚 ई-बुक स्टोर</a></li>
             <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;text-decoration:none;">🌱 कृषि हब</a></li>
-            <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;text-decoration:none;">🌾 खरीफ
-                मास्टर गाइड 2026</a></li>
+            <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;text-decoration:none;">🌾 खरीफ मास्टर गाइड 2026</a></li>
             <li><a href="/ebooks/kheti-dr.html" style="color:#94a3b8;text-decoration:none;">🩺 खेती का डॉक्टर</a></li>
           </ul>
         </div>
@@ -2173,7 +1268,7 @@
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
-          <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%2C%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20Aarogyam%20India%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F"
+          <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%2C%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20Aarogyam%20India%20%E0%A4%B8%E0%A4%B9%E0%A4%AE%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F"
             target="_blank"
             style="background:#25D366;color:#fff;padding:8px 16px;border-radius:20px;text-decoration:none;font-weight:800;font-size:0.82rem;display:inline-flex;align-items:center;gap:6px;">
             <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
@@ -2198,16 +1293,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // Horizontal Scroll for Reels Row
-    window.scrollReelsRow = function (dir) {
-      const grid = document.getElementById('wb_shorts_grid');
-      if (grid) grid.scrollBy({ left: dir * 300, behavior: 'smooth' });
-    };
-
     (function () {
-'use strict';
-
-      const DEFAULT_AAROGYAMTUBE_THUMB = '/images/banners/aarogyamtube-default-thumb.svg';
+      'use strict';
 
       const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
       const SUPABASE_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
@@ -2221,10 +1308,9 @@
       const urlParams = new URLSearchParams(window.location.search);
       const webinarId = urlParams.get('id') || urlParams.get('wb') || 'WB_MASTER';
       const refShareId = urlParams.get('ref') || urlParams.get('share_id') || 'AI000004';
-      const specificVid = urlParams.get('vid') || urlParams.get('video') || urlParams.get('video_id') || urlParams.get('reel') || urlParams.get('short') || (urlParams.get('type') === 'video' ? urlParams.get('id') : null);
 
       let masterData = {
-        title: '💼 NetSurf Career Plan + Digital Marketing Training अगर आप सीखना चाहते हैं:',
+        title: 'प्राकृतिक एवं जैविक खेती से 3x मुनाफा लाइव वेबिनार 2026',
         description: 'इस विशेष लाइव ज़ूम वेबिनार में भाग लेने के लिए अपना नाम और मोबाइल नंबर दर्ज करें और ज़ूम लिंक प्राप्त करें।',
         date: '2026-08-30',
         time: '20:00',
@@ -2247,7 +1333,7 @@
         price: 0,
         duration_minutes: 90,
         kpis: [
-          '🔴 100% लाइव इंटरएक्टिव ज़ूम क्लास',
+          '🔴 100% लाइव इंटरएक्टिव क्लास',
           '🌱 जैविक खाद एवं वैज्ञानिक स्प्रे फॉर्मूला',
           '🎁 फ्री ई-बुक एवं स्टडी नोट्स बंडल',
           '💬 लाइव सवाल-जवाब एवं समाधान सत्र'
@@ -2255,99 +1341,41 @@
         faqs: [
           {
             q: 'ज़ूम मीटिंग लिंक और पासवर्ड कब खुलेगा?',
-            a: 'वेबिनार शुरू होने के ठीक 2 मिनट पहले Join Zoom Meeting बटन सक्रिय हो जाएगा और Meeting ID व पासवर्ड भी दिखाई देने लगेगा।'
+            a: 'वेबिनार शुरू होने के ठीक 15 मिनट पहले Join Zoom Meeting बटन सक्रिय हो जाएगा और Meeting ID व पासवर्ड भी यहाँ लाइव दिखाई देने लगेगा।'
           },
           {
             q: 'क्या यह वेबिनार फ्री है?',
             a: 'हाँ, यह वेबिनार पूरी तरह निःशुल्क है। अपना नाम और मोबाइल नंबर डालकर सीट सुरक्षित कर सकते हैं।'
+          },
+          {
+            q: 'वेबिनार खत्म होने के बाद क्या रिकॉर्डिंग मिलेगी?',
+            a: 'हाँ, लाइव सत्र समाप्त होने के बाद आप AarogyamTube सेक्शन में जाकर रिकॉर्डिंग एवं 1-मिनट के शॉर्ट्स वीडियो देख सकते हैं।'
           }
         ]
       };
 
-      let allRecordings = [];
-      let activeShortsFilter = 'all';
-      let activeVideoFilter = 'all';
-      let currentReelIndex = 0;
-      let activeReelsList = [];
       let countdownTimerInterval = null;
+      let currentStage = 1; // 1: Upcoming (Locked), 2: Live (Unlocked), 3: Ended (Disabled)
 
-      // -------------------------------------------------------------
-      // 1. DATA INITIALIZATION (ZERO-EGRESS ARCHITECTURE)
-      // -------------------------------------------------------------
-      // Instant Synchronous Check on Script Startup (0 Milliseconds)
+      // Synchronous Initial Check (0ms)
       checkUserSessionStatus();
 
       async function initWebinarHub() {
         try { await loadMasterWebinarData(); } catch (e) { console.error('masterData err:', e); }
-        try { await loadRecordingsData(); } catch (e) { console.error('recordings err:', e); }
-        try { await fetchSharerDetails(refShareId); } catch (e) { console.error('sharer err:', e); }
         try { renderWebinarDetails(); } catch (e) { console.error('webinar details err:', e); }
-        try { reorderSectionsDOM(); } catch (e) { console.error('reorder err:', e); }
-        try { renderShortsAndReels(); } catch (e) { console.error('shorts err:', e); }
-        try { renderMasterclassVideos(); } catch (e) { console.error('videos err:', e); }
         try { renderFaqs(); } catch (e) { console.error('faqs err:', e); }
         try { startLiveCountdown(); } catch (e) { console.error('timer err:', e); }
         try { checkUserSessionStatus(); } catch (e) { console.error('session err:', e); }
-        try { setupReelsSwipeGestures(); } catch (e) { console.error('gestures err:', e); }
-
-        if (specificVid) {
-          setTimeout(() => {
-            if (isUserLoggedIn()) {
-              window.openSpecificVideoOrReel(specificVid);
-            } else if (typeof window.openGuestLoginModal === 'function') {
-              window.openGuestLoginModal(() => {
-                window.openSpecificVideoOrReel(specificVid);
-              }, {
-                source: 'AarogyamTubeSharedLink',
-                title: 'Welcome to AarogyamTube',
-                subtitle: 'वीडियो देखने के लिए अपना नाम व व्हाट्सएप मोबाइल नंबर दर्ज करें',
-                meta: { video_id: specificVid }
-              });
-            }
-          }, 350);
-        }
       }
 
       async function loadMasterWebinarData() {
-        // Static Git JSON (Zero Egress - Single Source of Truth)
+        // Zero-Egress Static JSON Source
         try {
           const resp = await fetch('/data/webinar-master.json?v=' + Date.now());
           if (resp.ok) {
             const json = await resp.json();
             const wm = json.webinarMaster || json || {};
             if (wm.title) masterData = { ...masterData, ...wm };
-          }
-        } catch (e) { }
-      }
-
-      async function loadRecordingsData() {
-        // 1. Instant LocalStorage check (0ms admin sync)
-        let localList = [];
-        try {
-          const localStr = localStorage.getItem('AI_LOCAL_RECORDED_VIDEOS');
-          if (localStr) {
-            const parsed = JSON.parse(localStr);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              localList = parsed;
-              allRecordings = parsed;
-            }
-          }
-        } catch (e) { }
-
-        // 2. Fetch Static Git JSON & Merge seamlessly
-        try {
-          const resp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
-          if (resp.ok) {
-            const json = await resp.json();
-            const list = Array.isArray(json.recordings) ? json.recordings : (Array.isArray(json) ? json : []);
-            if (list.length > 0) {
-              const map = new Map();
-              // Add local first (so recent admin additions take precedence)
-              localList.forEach(r => { if (r && r.id) map.set(r.id, r); });
-              // Merge remote
-              list.forEach(r => { if (r && r.id && !map.has(r.id)) map.set(r.id, r); });
-              allRecordings = Array.from(map.values());
-            }
           }
         } catch (e) { }
       }
@@ -2373,7 +1401,7 @@
       }
 
       // -------------------------------------------------------------
-      // 2. RENDER WEBINAR DETAILS, BANNERS & TIMER
+      // 2. RENDER DETAILS & BANNERS
       // -------------------------------------------------------------
       function renderWebinarDetails() {
         document.getElementById('wb_title').textContent = masterData.title || 'लाइव ज़ूम मास्टरक्लास';
@@ -2391,7 +1419,7 @@
           }
         }
 
-        // Render Multi-Banners & Posters Section
+        // Render Multi-Banners
         const bannersSection = document.getElementById('sec_banners');
         const bannersSlider = document.getElementById('wb_banners_slider');
         const postersTitleEl = document.getElementById('wb_posters_title');
@@ -2409,10 +1437,10 @@
               const bTitle = typeof bItem === 'object' ? (bItem.title || bItem.name || '') : '';
               return `
                 <div class="wb-poster-card">
-                  <div style="aspect-ratio:16/9; background:#0f172a; overflow:hidden;">
+                  <div style="aspect-ratio:16/9; background:#f1f5f9; overflow:hidden;">
                     <img src="${bUrl}" alt="${bTitle || 'Banner'}" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease;" onerror="this.parentElement.parentElement.style.display='none'">
                   </div>
-                  ${bTitle ? `<div style="padding:12px 14px; font-weight:800; font-size:0.9rem; color:#FFFFFF; background:#0F172A; border-top:1px solid rgba(255,255,255,0.08);">${bTitle}</div>` : ''}
+                  ${bTitle ? `<div style="padding:12px 14px; font-weight:800; font-size:0.9rem; color:#0F172A; background:#FFFFFF; border-top:1px solid #E2E8F0;">${bTitle}</div>` : ''}
                 </div>
               `;
             }).join('');
@@ -2437,19 +1465,9 @@
         }
       }
 
-      function reorderSectionsDOM() {
-        if (!masterData.section_order || !Array.isArray(masterData.section_order)) return;
-        const main = document.querySelector('.wb-container');
-        if (!main) return;
-
-        masterData.section_order.forEach(sKey => {
-          const el = document.getElementById(sKey);
-          if (el && el.parentElement === main) {
-            main.appendChild(el);
-          }
-        });
-      }
-
+      // -------------------------------------------------------------
+      // 3. TIME-AWARE LOCK / UNLOCK / EXPIRED ENGINE
+      // -------------------------------------------------------------
       function startLiveCountdown() {
         if (countdownTimerInterval) clearInterval(countdownTimerInterval);
 
@@ -2460,6 +1478,7 @@
         if (!parsedDate) {
           if (digitWrap) digitWrap.style.display = 'none';
           if (pendingWrap) pendingWrap.style.display = 'block';
+          updateCredentialsLockState(1); // Default lock
           return;
         }
 
@@ -2472,7 +1491,7 @@
           const tParts = tTime.split(':').map(Number);
           hh = tParts[0] || 20;
           mm = tParts[1] || 0;
-        } catch(e) {}
+        } catch (e) { }
 
         const targetTs = new Date(parsedDate.y, parsedDate.m - 1, parsedDate.d, hh, mm, 0).getTime();
         const durationMins = masterData.duration_minutes || 90;
@@ -2482,44 +1501,44 @@
           const now = Date.now();
           const diffToStart = targetTs - now;
           const diffToEnd = endTs - now;
-          const isTwoMinBefore = diffToStart <= (2 * 60 * 1000);
+          const is15MinBefore = diffToStart <= (15 * 60 * 1000);
 
-          const joinBtn = document.getElementById('wb_direct_join_btn');
           const timerStatusLabel = document.getElementById('wb_timer_status_label');
 
-          // STAGE 3: Session Ended
+          // STAGE 3: Session Ended (diffToEnd <= 0)
           if (diffToEnd <= 0) {
+            currentStage = 3;
             document.getElementById('wb_days').textContent = '00';
             document.getElementById('wb_hours').textContent = '00';
             document.getElementById('wb_mins').textContent = '00';
             document.getElementById('wb_secs').textContent = '00';
-            if (timerStatusLabel) timerStatusLabel.innerHTML = '⏰ <strong>आज का लाइव सत्र समाप्त हो चुका है। नीचे रिकॉर्डेड वीडियो व शॉर्ट्स देखें।</strong>';
-            if (joinBtn) {
-              joinBtn.style.background = '#475569';
-              joinBtn.textContent = '🎬 AarogyamTube वीडियो देखें';
-              joinBtn.href = '#wb_shorts_section';
-              joinBtn.onclick = null;
+
+            if (timerStatusLabel) {
+              timerStatusLabel.className = 'wb-timer-status-notice wb-timer-status-ended';
+              timerStatusLabel.innerHTML = '🏁 <strong>आज का लाइव वेबिनार समाप्त हो चुका है।</strong>';
             }
+            updateCredentialsLockState(3);
             return;
           }
 
-          // STAGE 2: Live Now (or 2 Min Before Start)
-          if (isTwoMinBefore) {
+          // STAGE 2: Live Window (Within 15 Mins of Start Until End)
+          if (is15MinBefore) {
+            currentStage = 2;
             document.getElementById('wb_days').textContent = '00';
             document.getElementById('wb_hours').textContent = '00';
             document.getElementById('wb_mins').textContent = '00';
             document.getElementById('wb_secs').textContent = '00';
-            if (timerStatusLabel) timerStatusLabel.innerHTML = '🟢 <strong>लाइव क्लास चालू है! नीचे बटन दबाकर ज़ूम से जुड़ें।</strong>';
-            if (joinBtn) {
-              joinBtn.style.background = 'linear-gradient(135deg, #16a34a, #22c55e)';
-              joinBtn.innerHTML = '🟢 Join Zoom Meeting Now <i class="fa-solid fa-arrow-right"></i>';
-              joinBtn.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.6)';
+
+            if (timerStatusLabel) {
+              timerStatusLabel.className = 'wb-timer-status-notice wb-timer-status-live';
+              timerStatusLabel.innerHTML = '🟢 <strong>लाइव क्लास चालू है! नीचे दिए ज़ूम बटन से तुरंत जुड़ें।</strong>';
             }
+            updateCredentialsLockState(2);
             return;
           }
 
-          // STAGE 1: Upcoming Countdown
-          if (timerStatusLabel) timerStatusLabel.innerHTML = '⏳ <strong>लाइव ज़ूम वेबिनार प्रारंभ होने में शेष समय:</strong>';
+          // STAGE 1: Upcoming (diffToStart > 15 mins)
+          currentStage = 1;
           const days = Math.max(0, Math.floor(diffToStart / (1000 * 60 * 60 * 24)));
           const hours = Math.max(0, Math.floor((diffToStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
           const mins = Math.max(0, Math.floor((diffToStart % (1000 * 60 * 60)) / (1000 * 60)));
@@ -2529,10 +1548,140 @@
           document.getElementById('wb_hours').textContent = String(hours).padStart(2, '0');
           document.getElementById('wb_mins').textContent = String(mins).padStart(2, '0');
           document.getElementById('wb_secs').textContent = String(secs).padStart(2, '0');
+
+          if (timerStatusLabel) {
+            timerStatusLabel.className = 'wb-timer-status-notice wb-timer-status-upcoming';
+            timerStatusLabel.innerHTML = '⏳ <strong>लाइव ज़ूम वेबिनार प्रारंभ होने में शेष समय:</strong>';
+          }
+          updateCredentialsLockState(1);
         }
 
         updateTimer();
         countdownTimerInterval = setInterval(updateTimer, 1000);
+      }
+
+      // Enforce lock/unlock state across all UI elements
+      function updateCredentialsLockState(stage) {
+        const timeNoticeEl = document.getElementById('wb_cred_time_notice');
+        const timeIconEl = document.getElementById('wb_cred_time_icon');
+        const timeTextEl = document.getElementById('wb_cred_time_text');
+
+        const midEl = document.getElementById('wb_unlocked_mid');
+        const passEl = document.getElementById('wb_unlocked_pass');
+        const copyMidBtn = document.getElementById('wb_btn_copy_mid');
+        const copyPassBtn = document.getElementById('wb_btn_copy_pass');
+
+        const joinBtn = document.getElementById('wb_direct_join_btn');
+        const joinIcon = document.getElementById('wb_join_btn_icon');
+        const joinText = document.getElementById('wb_join_btn_text');
+
+        const guestCtaBtn = document.getElementById('wb_btn_open_zoom_popup');
+
+        // STAGE 1: UPCOMING (LOCKED)
+        if (stage === 1) {
+          if (timeNoticeEl) timeNoticeEl.className = 'wb-cred-time-notice wb-cred-notice-locked';
+          if (timeIconEl) timeIconEl.className = 'fa-solid fa-lock';
+          if (timeTextEl) timeTextEl.textContent = '🔒 ज़ूम मीटिंग ID, पासवर्ड एवं डायरेक्ट लिंक वेबिनार प्रारंभ होने से 15 मिनट पहले यहाँ लाइव अनलॉक होगा।';
+
+          if (midEl) {
+            midEl.className = 'wb-cred-val locked';
+            midEl.textContent = '🔒 समय पर अनलॉक होगा';
+          }
+          if (passEl) {
+            passEl.className = 'wb-cred-val locked';
+            passEl.textContent = '🔒 समय पर अनलॉक होगा';
+          }
+          if (copyMidBtn) copyMidBtn.disabled = true;
+          if (copyPassBtn) copyPassBtn.disabled = true;
+
+          if (joinBtn) {
+            joinBtn.className = 'wb-btn-join-zoom btn-disabled';
+            joinBtn.href = '#';
+            joinBtn.onclick = function (e) {
+              e.preventDefault();
+              alert('⏳ ज़ूम लिंक वेबिनार प्रारंभ होने से 15 मिनट पहले सक्रिय होगा। कृपया काउंटडाउन टाइमर का इंतज़ार करें।');
+            };
+          }
+          if (joinIcon) joinIcon.className = 'fa-solid fa-lock';
+          if (joinText) joinText.textContent = '⏳ ज़ूम लिंक वेबिनार समय पर सक्रिय होगा';
+
+          if (guestCtaBtn) {
+            guestCtaBtn.innerHTML = '<span>🎟️ निःशुल्क सीट बुक करें (Get Zoom Pass)</span> <i class="fa-solid fa-arrow-right"></i>';
+            guestCtaBtn.onclick = window.openZoomRegModal;
+          }
+        }
+        // STAGE 2: LIVE WINDOW (UNLOCKED & ACTIVE)
+        else if (stage === 2) {
+          if (timeNoticeEl) timeNoticeEl.className = 'wb-cred-time-notice wb-cred-notice-live';
+          if (timeIconEl) timeIconEl.className = 'fa-solid fa-circle-play';
+          if (timeTextEl) timeTextEl.textContent = '🟢 लाइव क्लास चालू है! नीचे दिए ज़ूम क्रेडेंशियल्स का उपयोग करें या डायरेक्ट जॉइन करें।';
+
+          const mid = masterData.meeting_id || '843 1333 8881';
+          const pass = masterData.passcode || '439024';
+
+          if (midEl) {
+            midEl.className = 'wb-cred-val';
+            midEl.textContent = mid;
+          }
+          if (passEl) {
+            passEl.className = 'wb-cred-val';
+            passEl.textContent = pass;
+          }
+          if (copyMidBtn) copyMidBtn.disabled = false;
+          if (copyPassBtn) copyPassBtn.disabled = false;
+
+          let joinUrl = masterData.zoom_link;
+          if (!joinUrl && masterData.meeting_id) {
+            joinUrl = `https://zoom.us/j/${masterData.meeting_id.replace(/[^0-9]/g, '')}${masterData.passcode ? '?pwd=' + encodeURIComponent(masterData.passcode) : ''}`;
+          }
+
+          if (joinBtn) {
+            joinBtn.className = 'wb-btn-join-zoom';
+            joinBtn.href = joinUrl || 'https://zoom.us/join';
+            joinBtn.target = '_blank';
+            joinBtn.onclick = function () {
+              window.trackZoomAttendance();
+            };
+          }
+          if (joinIcon) joinIcon.className = 'fa-solid fa-video';
+          if (joinText) joinText.textContent = '🚀 अभी ज़ूम क्लास से जुड़ें (Join Zoom Live Now)';
+
+          if (guestCtaBtn) {
+            guestCtaBtn.innerHTML = '<span>🟢 अभी जुड़ें — लाइव क्लास चालू है</span> <i class="fa-solid fa-arrow-right"></i>';
+            guestCtaBtn.onclick = window.openZoomRegModal;
+          }
+        }
+        // STAGE 3: SESSION ENDED (DISABLED & REDIRECT)
+        else if (stage === 3) {
+          if (timeNoticeEl) timeNoticeEl.className = 'wb-cred-time-notice wb-cred-notice-ended';
+          if (timeIconEl) timeIconEl.className = 'fa-solid fa-circle-xmark';
+          if (timeTextEl) timeTextEl.textContent = '⏰ आज का लाइव सत्र समाप्त हो चुका है। नीचे दिए गए AarogyamTube वीडियो एवं रील्स देखें।';
+
+          if (midEl) {
+            midEl.className = 'wb-cred-val ended';
+            midEl.textContent = '⛔ सत्र समाप्त';
+          }
+          if (passEl) {
+            passEl.className = 'wb-cred-val ended';
+            passEl.textContent = '⛔ सत्र समाप्त';
+          }
+          if (copyMidBtn) copyMidBtn.disabled = true;
+          if (copyPassBtn) copyPassBtn.disabled = true;
+
+          if (joinBtn) {
+            joinBtn.className = 'wb-btn-join-zoom btn-ended';
+            joinBtn.href = '/tube.html';
+            joinBtn.target = '_self';
+            joinBtn.onclick = null;
+          }
+          if (joinIcon) joinIcon.className = 'fa-solid fa-clapperboard';
+          if (joinText) joinText.textContent = '🎬 AarogyamTube वीडियो व रील्स देखें';
+
+          if (guestCtaBtn) {
+            guestCtaBtn.innerHTML = '<span>🎬 वेबिनार समाप्त — AarogyamTube वीडियो देखें</span> <i class="fa-solid fa-arrow-right"></i>';
+            guestCtaBtn.onclick = function () { window.location.href = '/tube.html'; };
+          }
+        }
       }
 
       function formatHindiDate(dateStr, timeStr) {
@@ -2556,7 +1705,7 @@
       }
 
       // -------------------------------------------------------------
-      // 3. REGISTRATION & UNLOCKED ZOOM ACCESS (0ms INSTANT UNLOCK)
+      // 4. REGISTRATION & UNLOCKED ZOOM ACCESS (0ms INSTANT UNLOCK)
       // -------------------------------------------------------------
       function isUserLoggedIn() {
         try {
@@ -2571,32 +1720,26 @@
       }
 
       // Unified Registration Hook via Universal Modal
-      window.openZoomRegModal = function() {
+      window.openZoomRegModal = function () {
         if (typeof window.openGuestLoginModal === 'function') {
           window.openGuestLoginModal(() => {
             showUnlockedScreen();
           }, {
             source: 'WebinarZoomPass',
             title: 'निःशुल्क सीट बुक करें',
-            subtitle: 'ज़ूम लिंक व पासवर्ड तुरंत प्राप्त करने के लिए विवरण दर्ज करें'
+            subtitle: 'ज़ूम लिंक व पासवर्ड प्राप्त करने के लिए विवरण दर्ज करें'
           });
         }
       };
 
-      window.closeZoomRegModal = function() {
-        if (typeof window.closeGuestLoginModal === 'function') {
-          window.closeGuestLoginModal();
-        }
-      };
-
-      // Listen for Global Universal Login Event to unlock webinar screen instantly
+      // Listen for Global Universal Login Event
       window.addEventListener('ai:user-logged-in', () => {
         showUnlockedScreen();
       });
 
       function checkUserSessionStatus() {
         let aiUser = {};
-        try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+        try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch (e) { }
         const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name || localStorage.getItem('user_name');
         const uMobile = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone || localStorage.getItem('user_phone') || localStorage.getItem('farmer_mobile');
         const isReg = sessionStorage.getItem(`wb_reg_${webinarId}`) || localStorage.getItem('wb_registered');
@@ -2618,33 +1761,19 @@
         if (unlockBox) unlockBox.style.display = 'block';
 
         let aiUser = {};
-        try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+        try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch (e) { }
         const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name || 'किसान साथी';
         const greetingNameEl = document.getElementById('wb_user_greeting_name');
         if (greetingNameEl) {
           greetingNameEl.textContent = `स्वागत है, ${uName} जी • सीट सुरक्षित ✅`;
         }
 
-        const mid = masterData.meeting_id || 'लाइव सत्र में जारी होगी';
-        const pass = masterData.passcode || 'वेबिनार समय पर सक्रिय होगा';
-        document.getElementById('wb_unlocked_mid').textContent = mid;
-        document.getElementById('wb_unlocked_pass').textContent = pass;
-
-        let joinUrl = masterData.zoom_link;
-        if (!joinUrl && masterData.meeting_id) {
-          joinUrl = `https://zoom.us/j/${masterData.meeting_id.replace(/[^0-9]/g, '')}${masterData.passcode ? '?pwd=' + encodeURIComponent(masterData.passcode) : ''}`;
-        }
-        const directBtn = document.getElementById('wb_direct_join_btn');
-        if (directBtn) {
-          directBtn.href = joinUrl || 'https://zoom.us/join';
-          directBtn.onclick = function() {
-            window.trackZoomAttendance();
-          };
-        }
+        // Enforce lock state on unlocked screen
+        updateCredentialsLockState(currentStage);
       }
 
       // Track Live Attendance upon clicking Join Zoom
-      window.trackZoomAttendance = function() {
+      window.trackZoomAttendance = function () {
         const mobile = localStorage.getItem('aim_user_mobile') || 'guest';
         const name = localStorage.getItem('aim_user_name') || 'किसान साथी';
         if (db) {
@@ -2661,34 +1790,21 @@
               joined_at: new Date().toISOString(),
               referrer_share_id: refShareId
             }
-          }]).catch(() => {});
+          }]).catch(() => { });
         }
       };
 
-      // -------------------------------------------------------------
-      // 3.1 AAROGYAMTUBE SHARE REGISTRATION POPUP ENGINE (UNIVERSAL HOOK)
-      // -------------------------------------------------------------
-      window.checkAarogyamTubeAccess = function(callback, vidId, vidTitle) {
-        if (typeof window.isUserLoggedIn === 'function' && window.isUserLoggedIn()) {
-          if (typeof callback === 'function') callback();
-          return true;
-        }
-
-        if (typeof window.openGuestLoginModal === 'function') {
-          window.openGuestLoginModal(callback, {
-            source: 'AarogyamTube',
-            title: 'Welcome to Aarogyam Parivar',
-            subtitle: '1-मिनट कृषि शॉर्ट्स एवं वीडियो देखने के लिए नाम व नंबर दर्ज करें',
-            meta: {
-              video_id: vidId || 'AarogyamTube',
-              video_title: vidTitle || 'AarogyamTube Video'
-            }
-          });
-        }
-        return false;
-      };
-
+      // Copy Credentials
       window.copyWbCred = function (type) {
+        if (currentStage === 1) {
+          alert('🔒 यह डिटेल वेबिनार शुरू होने से 15 मिनट पहले लाइव अनलॉक होगी।');
+          return;
+        }
+        if (currentStage === 3) {
+          alert('⛔ आज का लाइव सत्र समाप्त हो चुका है।');
+          return;
+        }
+
         const val = type === 'mid' ? masterData.meeting_id : masterData.passcode;
         if (!val) { alert('डिटेल अभी उपलब्ध नहीं है।'); return; }
         navigator.clipboard.writeText(val).then(() => {
@@ -2728,806 +1844,6 @@
         }
       };
 
-      // Individual Video / Short WhatsApp Sharing (Direct WhatsApp Chat)
-      window.shareIndividualVideo = function (vidId, vidTitle) {
-        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
-        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vidId)}&ref=${encodeURIComponent(userShare)}`;
-        
-        const match = allRecordings.find(x => x.id === vidId);
-        const isShort = match?.format === 'short_reel' || String(vidId).startsWith('VID_S') || match?.category === 'Shorts & Reels';
-
-        const promoText = isShort
-          ? `🎬 *${vidTitle}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`
-          : `🎬 *${vidTitle}*\nविशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
-
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
-      };
-
-      // -------------------------------------------------------------
-      // 4. AAROGYAMTUBE SHORTS & REELS (CONTINUOUS PLAY & INFINITE LOOP)
-      // -------------------------------------------------------------
-      function renderShortsAndReels() {
-        const grid = document.getElementById('wb_shorts_grid');
-        if (!grid) return;
-
-        let shortsList = allRecordings.filter(v =>
-          v.status !== 'inactive' &&
-          (v.format === 'short_reel' || v.id.startsWith('VID_S') || v.category === 'Shorts & Reels' || v.platform === 'instagram' || v.platform === 'facebook')
-        );
-
-        if (activeShortsFilter !== 'all') {
-          shortsList = shortsList.filter(v => v.platform === activeShortsFilter);
-        }
-
-        activeReelsList = shortsList;
-
-        if (shortsList.length === 0) {
-          grid.innerHTML = '<div style="width:100%; text-align:center; padding:2rem; color:#94a3b8;">इस श्रेणी में अभी कोई रील उपलब्ध नहीं है।</div>';
-          return;
-        }
-
-        grid.innerHTML = shortsList.map((r, idx) => {
-          const plat = r.platform || (r.video_url?.includes('instagram') ? 'instagram' : r.video_url?.includes('facebook') ? 'facebook' : 'youtube');
-          let platIcon = '<i class="fa-brands fa-youtube"></i> Shorts';
-          if (plat === 'instagram') platIcon = '<i class="fa-brands fa-instagram"></i> Reel';
-          if (plat === 'facebook') platIcon = '<i class="fa-brands fa-facebook"></i> Reel';
-
-          const thumb = r.thumbnail || DEFAULT_AAROGYAMTUBE_THUMB;
-
-          return `
-            <div class="wb-reel-card" onclick="window.openReelPlayer(${idx})">
-              <div class="wb-reel-thumb-wrap">
-                <img src="${thumb}" alt="${r.title}" class="wb-reel-thumb-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
-                <span class="wb-reel-plat-badge plat-${plat}">${platIcon}</span>
-                <span class="wb-reel-duration-badge">⏱️ ${r.duration || '0:58'}</span>
-                <div class="wb-reel-play-overlay">
-                  <div class="wb-reel-play-icon"><i class="fa-solid fa-play"></i></div>
-                </div>
-                <button type="button" class="wb-card-share-badge" onclick="event.stopPropagation(); window.shareIndividualVideo('${r.id}', '${r.title.replace(/'/g, "\\'")}')" title="WhatsApp पर शेयर करें">
-                  <i class="fa-solid fa-share-nodes"></i>
-                </button>
-              </div>
-              <div class="wb-reel-card-info">
-                <div class="wb-reel-card-title">${r.title}</div>
-                <div class="wb-reel-card-speaker">
-                  <i class="fa-solid fa-chalkboard-user"></i>
-                  <span>${r.speaker || 'आरोग्यम विशेषज्ञ'}</span>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-
-      // Filter Chips Event Listener
-      document.getElementById('wb_shorts_filter_bar')?.addEventListener('click', (e) => {
-        const chip = e.target.closest('.wb-chip');
-        if (!chip) return;
-        document.querySelectorAll('#wb_shorts_filter_bar .wb-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        activeShortsFilter = chip.dataset.platform || 'all';
-        renderShortsAndReels();
-      });
-// See More toggle for Shorts grid
-const wbShortsSeeMoreBtn = document.getElementById('wb_shorts_see_more');
-if (wbShortsSeeMoreBtn) {
-  wbShortsSeeMoreBtn.addEventListener('click', () => {
-    const grid = document.getElementById('wb_shorts_grid');
-    if (!grid) return;
-    const expanded = grid.classList.toggle('expanded');
-    wbShortsSeeMoreBtn.setAttribute('aria-expanded', expanded);
-    wbShortsSeeMoreBtn.textContent = expanded ? 'Show Less ▲' : 'See More ▼';
-  });
-}
-
-
-      // -------------------------------------------------------------
-      // 5. HIGH-PERFORMANCE REELS PLAYER (YOUTUBE API, AUTO-ADVANCE & DIRECT WHATSAPP)
-      // -------------------------------------------------------------
-      let ytReelPlayer = null;
-      let isYtApiReady = false;
-
-      // Load YouTube IFrame API dynamically
-      if (!window.YT) {
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      }
-
-      window.onYouTubeIframeAPIReady = function() {
-        isYtApiReady = true;
-      };
-
-      function initOrLoadYtPlayer(ytId) {
-        const playerDiv = document.getElementById('wb_reel_yt_container');
-        const ifr = document.getElementById('wb_reel_iframe');
-        if (ifr) ifr.style.display = 'none';
-        if (playerDiv) playerDiv.style.display = 'block';
-
-        if (ytReelPlayer && typeof ytReelPlayer.loadVideoById === 'function') {
-          try {
-            ytReelPlayer.loadVideoById({
-              videoId: ytId,
-              startSeconds: 0
-            });
-            ytReelPlayer.playVideo();
-            return;
-          } catch(e) {
-            console.warn('YT Player load exception:', e);
-          }
-        }
-
-        if (window.YT && window.YT.Player) {
-          try {
-            ytReelPlayer = new YT.Player('wb_reel_yt_container', {
-              videoId: ytId,
-              playerVars: {
-                autoplay: 1,
-                controls: 1,
-                rel: 0,
-                modestbranding: 1,
-                playsinline: 1,
-                enablejsapi: 1,
-                origin: window.location.origin
-              },
-              events: {
-                onReady: (event) => {
-                  event.target.playVideo();
-                },
-                onStateChange: (event) => {
-                  // State 0 = ENDED -> Auto-Advance to Next Reel!
-                  if (event.data === 0) {
-                    setTimeout(() => {
-                      window.navReel(1);
-                    }, 400);
-                  }
-                },
-                onError: () => {
-                  // Fallback on embed error
-                  if (ifr) {
-                    ifr.style.display = 'block';
-                    ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
-                  }
-                }
-              }
-            });
-          } catch(err) {
-            console.warn('YT Player init fallback:', err);
-            if (ifr) {
-              ifr.style.display = 'block';
-              ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
-            }
-          }
-        } else if (ifr) {
-          ifr.style.display = 'block';
-          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
-        }
-      }
-
-      window.openReelPlayer = function (idx) {
-        if (!activeReelsList || activeReelsList.length === 0) return;
-        const targetReel = activeReelsList[idx];
-
-        window.checkAarogyamTubeAccess(() => {
-          currentReelIndex = idx;
-          loadReelAtIndex(currentReelIndex);
-
-          document.getElementById('wb_reels_modal')?.classList.add('active');
-          document.body.classList.add('wb-reels-open');
-          document.body.style.overflow = 'hidden';
-        }, targetReel?.id, targetReel?.title);
-      };
-
-      window.closeReelsModal = function () {
-        document.getElementById('wb_reels_modal')?.classList.remove('active');
-        document.body.classList.remove('wb-reels-open');
-        document.body.style.overflow = '';
-        if (ytReelPlayer && typeof ytReelPlayer.stopVideo === 'function') {
-          try { ytReelPlayer.stopVideo(); } catch(e) {}
-        }
-        const ifr = document.getElementById('wb_reel_iframe');
-        if (ifr) ifr.src = '';
-      };
-
-      window.navReel = function (delta) {
-        if (!activeReelsList || activeReelsList.length === 0) return;
-        currentReelIndex += delta;
-        if (currentReelIndex >= activeReelsList.length) currentReelIndex = 0;
-        if (currentReelIndex < 0) currentReelIndex = activeReelsList.length - 1;
-        loadReelAtIndex(currentReelIndex);
-      };
-
-      function loadReelAtIndex(idx) {
-        const reel = activeReelsList[idx];
-        if (!reel) return;
-
-        document.getElementById('wb_reel_counter_badge').textContent = `${idx + 1} / ${activeReelsList.length}`;
-        document.getElementById('wb_reel_caption_title').textContent = reel.title;
-        document.getElementById('wb_reel_caption_speaker').textContent = `👤 ${reel.speaker || 'आरोग्यम कृषि विशेषज्ञ'}`;
-
-        const ifr = document.getElementById('wb_reel_iframe');
-        const playerDiv = document.getElementById('wb_reel_yt_container');
-        const url = reel.video_url || reel.youtube_url || '';
-        const appBtn = document.getElementById('wb_reel_direct_app_btn');
-
-        if (reel.platform === 'instagram' || url.includes('instagram.com')) {
-          if (ytReelPlayer && typeof ytReelPlayer.stopVideo === 'function') {
-            try { ytReelPlayer.stopVideo(); } catch(e) {}
-          }
-          if (playerDiv) playerDiv.style.display = 'none';
-          if (ifr) {
-            ifr.style.display = 'block';
-            const igMatch = url.match(/(?:reel|p)\/([a-zA-Z0-9_-]+)/);
-            const igId = igMatch ? igMatch[1] : '';
-            ifr.src = `https://www.instagram.com/reel/${igId}/embed/`;
-          }
-          if (appBtn) {
-            appBtn.style.display = 'inline-block';
-            appBtn.href = url;
-            appBtn.textContent = '📸 Open Instagram Reel';
-            appBtn.style.background = '#E1306C';
-          }
-        } else if (reel.platform === 'facebook' || url.includes('facebook.com') || url.includes('fb.watch')) {
-          if (ytReelPlayer && typeof ytReelPlayer.stopVideo === 'function') {
-            try { ytReelPlayer.stopVideo(); } catch(e) {}
-          }
-          if (playerDiv) playerDiv.style.display = 'none';
-          if (ifr) {
-            ifr.style.display = 'block';
-            ifr.src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&width=500`;
-          }
-          if (appBtn) {
-            appBtn.style.display = 'inline-block';
-            appBtn.href = url;
-            appBtn.textContent = '👥 Open Facebook Reel';
-            appBtn.style.background = '#1877F2';
-          }
-        } else {
-          // YouTube Shorts / Video (Zero-Lag API Engine)
-          if (appBtn) appBtn.style.display = 'none';
-          const ytId = reel.youtube_id || extractYoutubeVideoId(url) || 'dQw4w9WgXcQ';
-          initOrLoadYtPlayer(ytId);
-        }
-      }
-
-      // Direct WhatsApp Chat Sharing (100% Reliable, Opens WhatsApp App / Web)
-      window.shareCurrentReelWhatsApp = function () {
-        const reel = activeReelsList[currentReelIndex];
-        if (!reel) return;
-        window.shareIndividualVideo(reel.id, reel.title);
-      };
-
-      // Native Device Share (Only on other share button)
-      window.shareCurrentReelNative = function () {
-        const reel = activeReelsList[currentReelIndex];
-        if (!reel) return;
-        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
-        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(userShare)}`;
-        const promoText = `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
-
-        if (navigator.share) {
-          navigator.share({
-            title: reel.title,
-            text: `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल वीडियो। AarogyamTube पर अभी देखें:`,
-            url: shareUrl
-          }).catch(() => { });
-        } else {
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
-        }
-      };
-
-      // Vertical Touch Gesture Swipe & Scroll Wheel for YouTube Shorts experience
-      function setupReelsSwipeGestures() {
-        const modal = document.getElementById('wb_reels_modal');
-        const touchSurface = document.getElementById('wb_reel_touch_surface') || document.getElementById('wb_reels_swipe_container') || modal;
-        if (!modal) return;
-
-        let startY = 0;
-        let startX = 0;
-        let startTime = 0;
-        let isSwiping = false;
-
-        // Mobile Touch Events (Swipe Up/Down & Tap to Toggle Pause)
-        touchSurface?.addEventListener('touchstart', (e) => {
-          if (!e.touches || !e.touches[0]) return;
-          startY = e.touches[0].clientY;
-          startX = e.touches[0].clientX;
-          startTime = Date.now();
-          isSwiping = true;
-        }, { passive: true });
-
-        touchSurface?.addEventListener('touchend', (e) => {
-          if (!isSwiping) return;
-          isSwiping = false;
-          const touch = e.changedTouches ? e.changedTouches[0] : null;
-          if (!touch) return;
-
-          const endY = touch.clientY;
-          const endX = touch.clientX;
-          const diffY = startY - endY;
-          const diffX = startX - endX;
-          const duration = Date.now() - startTime;
-
-          // Single Tap to Play / Pause Video
-          if (Math.abs(diffY) < 15 && Math.abs(diffX) < 15 && duration < 300) {
-            if (ytReelPlayer && typeof ytReelPlayer.getPlayerState === 'function') {
-              try {
-                const state = ytReelPlayer.getPlayerState();
-                if (state === 1) { // Playing -> Pause
-                  ytReelPlayer.pauseVideo();
-                } else { // Paused -> Play
-                  ytReelPlayer.playVideo();
-                }
-              } catch(err) {}
-            }
-            return;
-          }
-
-          // Vertical Swipe Up / Down (Swipe Threshold 35px)
-          if (Math.abs(diffY) > Math.abs(diffX)) {
-            if (diffY > 35) {
-              window.navReel(1); // Swipe Up -> Next Reel
-            } else if (diffY < -35) {
-              window.navReel(-1); // Swipe Down -> Prev Reel
-            }
-          }
-        }, { passive: true });
-
-        // Mouse Wheel Scroll (Desktop)
-        let wheelThrottle = null;
-        window.addEventListener('wheel', (e) => {
-          if (!document.getElementById('wb_reels_modal')?.classList.contains('active')) return;
-          if (wheelThrottle) return;
-          if (e.deltaY > 25) {
-            window.navReel(1);
-            wheelThrottle = setTimeout(() => { wheelThrottle = null; }, 350);
-          } else if (e.deltaY < -25) {
-            window.navReel(-1);
-            wheelThrottle = setTimeout(() => { wheelThrottle = null; }, 350);
-          }
-        }, { passive: true });
-
-        // Keyboard Arrow Keys (Up/Down) & Space & PageUp/PageDown
-        window.addEventListener('keydown', (e) => {
-          if (!document.getElementById('wb_reels_modal')?.classList.contains('active')) return;
-          if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'j') { window.navReel(1); e.preventDefault(); }
-          if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'k') { window.navReel(-1); e.preventDefault(); }
-          if (e.key === 'Escape') { window.closeReelsModal(); }
-        });
-      }
-
-      window.openSpecificVideoOrReel = function (vidId) {
-        if (!vidId) return;
-        const cleanVid = String(vidId).trim().toLowerCase();
-
-        if (!activeReelsList || activeReelsList.length === 0) {
-          renderShortsAndReels();
-        }
-
-        let targetIdx = activeReelsList.findIndex(r => 
-          String(r.id || '').toLowerCase() === cleanVid || 
-          String(r.video_url || '').toLowerCase().includes(cleanVid) ||
-          String(r.youtube_id || '').toLowerCase() === cleanVid
-        );
-
-        if (targetIdx < 0 && allRecordings && allRecordings.length > 0) {
-          const found = allRecordings.find(r => 
-            String(r.id || '').toLowerCase() === cleanVid || 
-            String(r.video_url || '').toLowerCase().includes(cleanVid) ||
-            String(r.youtube_id || '').toLowerCase() === cleanVid
-          );
-          if (found) {
-            activeReelsList.unshift(found);
-            targetIdx = 0;
-          }
-        }
-
-        if (targetIdx >= 0) {
-          window.openReelPlayer(targetIdx);
-        } else if (activeReelsList.length > 0) {
-          window.openReelPlayer(0);
-        }
-      };
-
-      window.likeCurrentReel = function () {
-        const icon = document.getElementById('wb_reel_like_icon');
-        const countEl = document.getElementById('wb_reel_like_count');
-        if (icon) {
-          icon.style.transform = 'scale(1.4)';
-          setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
-        }
-        if (countEl) countEl.textContent = 'Liked ❤️';
-      };
-
-      window.openReelComments = function () {
-        const comment = prompt('इस रील पर अपनी प्रतिक्रिया (Comment) लिखें:');
-        if (comment && comment.trim()) {
-          alert('✅ आपकी प्रतिक्रिया पोस्ट हो गई है! धन्यवाद।');
-        }
-      };
-
-      window.copyReelLink = function () {
-        const currentReel = activeReelsList[currentReelIndex];
-        if (!currentReel) return;
-        const link = `https://aarogyamindia.online/webinar.html?vid=${encodeURIComponent(currentReel.id)}&ref=${encodeURIComponent(refShareId)}`;
-        navigator.clipboard.writeText(link).then(() => {
-          alert('📋 रील लिंक कॉपी हो गया!');
-        });
-      };
-
-      function extractYoutubeVideoId(url) {
-        if (!url) return null;
-        const str = String(url).trim();
-        if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
-        const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/i);
-        return match ? match[1] : null;
-      }
-
-      // -------------------------------------------------------------
-      // 6. 16:9 MASTERCLASS VIDEOS & FAQS
-      // -------------------------------------------------------------
-      function renderMasterclassVideos() {
-        const grid = document.getElementById('wb_videos_grid');
-        if (!grid) return;
-
-        let vList = allRecordings.filter(v =>
-          v.status !== 'inactive' &&
-          v.format !== 'short_reel' &&
-          !v.id.startsWith('VID_S') &&
-          v.category !== 'Shorts & Reels'
-        );
-
-        if (activeVideoFilter !== 'all') {
-          vList = vList.filter(v => v.category === activeVideoFilter || v.subject === activeVideoFilter);
-        }
-
-        if (vList.length === 0) {
-          grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:2rem; color:#94a3b8;">इस श्रेणी में अभी कोई मास्टरक्लास उपलब्ध नहीं है।</div>';
-          return;
-        }
-
-        grid.innerHTML = vList.map(v => {
-          const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url) || '';
-          const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : DEFAULT_AAROGYAMTUBE_THUMB);
-
-          return `
-            <div class="wb-vcard" onclick="window.openVideoModal('${v.id}')">
-              <div class="wb-vcard-thumb-wrap">
-                <img src="${thumb}" alt="${v.title}" class="wb-vcard-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
-                <span class="wb-reel-duration-badge">⏱️ ${v.duration || '45 मिनट'}</span>
-                <div class="wb-reel-play-overlay">
-                  <div class="wb-reel-play-icon"><i class="fa-solid fa-play"></i></div>
-                </div>
-                <button type="button" class="wb-card-share-badge" onclick="event.stopPropagation(); window.shareIndividualVideo('${v.id}', '${v.title.replace(/'/g, "\\'")}')" title="WhatsApp पर शेयर करें">
-                  <i class="fa-solid fa-share-nodes"></i>
-                </button>
-              </div>
-              <div class="wb-reel-card-info">
-                <div class="wb-reel-card-title">${v.title}</div>
-                <div class="wb-reel-card-speaker">
-                  <i class="fa-solid fa-chalkboard-user"></i>
-                  <span>${v.speaker || 'आरोग्यम कृषि विशेषज्ञ'}</span>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-
-      document.getElementById('wb_video_filter_bar')?.addEventListener('click', (e) => {
-        const chip = e.target.closest('.wb-chip');
-        if (!chip) return;
-        document.querySelectorAll('#wb_video_filter_bar .wb-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        activeVideoFilter = chip.dataset.category || 'all';
-        renderMasterclassVideos();
-      });
-
-      // -------------------------------------------------------------
-      // 6.1 MASTERCLASS CINEMA PLAYER ENGINE (YOUTUBE DARK THEME & SUGGESTED FEED)
-      // -------------------------------------------------------------
-      let ytMasterPlayer = null;
-      let currentMasterclassVideo = null;
-      let currentSharerProfile = null;
-
-      async function fetchSharerDetails(sId) {
-        const cleanId = String(sId || refShareId || 'AI000004').trim();
-        try {
-          if (db) {
-            const { data, error } = await db.from('profiles').select('id, full_name, mobile, share_id').eq('share_id', cleanId).limit(1).maybeSingle();
-            if (data && (data.full_name || data.mobile)) {
-              currentSharerProfile = data;
-              updateSharerUI(data);
-              return;
-            }
-          }
-        } catch(e) {}
-
-        // Fallback to local storage or Helpline
-        try {
-          const aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-          const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name;
-          const uMobile = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone;
-          if (uName && uMobile) {
-            const localData = { full_name: uName, mobile: uMobile, share_id: aiUser.share_id || cleanId };
-            currentSharerProfile = localData;
-            updateSharerUI(localData);
-            return;
-          }
-        } catch(e) {}
-
-        // Default Helpline
-        updateSharerUI({
-          full_name: 'आरोग्यम किसान सहायता केंद्र',
-          mobile: '7974422572',
-          share_id: cleanId
-        });
-      }
-
-      function updateSharerUI(prof) {
-        const nameMobEl = document.getElementById('wb_yt_sharer_name_mobile');
-        const avatarEl = document.getElementById('wb_yt_sharer_avatar');
-        const callBtn = document.getElementById('wb_yt_sharer_call_btn');
-        const waBtn = document.getElementById('wb_yt_sharer_wa_btn');
-
-        const fullName = prof.full_name || 'आरोग्यम किसान मित्र';
-        const cleanPhone = String(prof.mobile || '7974422572').replace(/\D/g, '').slice(-10) || '7974422572';
-        const formattedPhone = `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`;
-
-        if (nameMobEl) {
-          nameMobEl.textContent = `${fullName} • 📞 ${formattedPhone}`;
-        }
-        if (avatarEl) {
-          const initials = fullName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'AI';
-          avatarEl.textContent = initials;
-        }
-        if (callBtn) {
-          callBtn.href = `tel:+91${cleanPhone}`;
-        }
-        if (waBtn) {
-          waBtn.href = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(`नमस्ते ${fullName} जी, मैंने आपका साझा किया हुआ AarogyamTube वीडियो देखा और अधिक जानकारी चाहता हूँ।`)}`;
-        }
-      }
-
-      window.openVideoModal = function (vId) {
-        const match = allRecordings.find(x => x.id === vId) || allRecordings.find(x => extractYoutubeVideoId(x.video_url) === vId);
-        if (!match) return;
-
-        window.checkAarogyamTubeAccess(() => {
-          loadMasterclassInPlayer(match);
-          document.getElementById('wb_master_cinema_modal')?.classList.add('active');
-          document.body.classList.add('wb-master-modal-open');
-          document.body.style.overflow = 'hidden';
-
-          // Update URL query state smoothly without page refresh
-          try {
-            const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-            const userShare = uObj.share_id || refShareId || 'AI000004';
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set('vid', match.id);
-            newUrl.searchParams.set('ref', userShare);
-            window.history.replaceState({}, '', newUrl.toString());
-          } catch(e) {}
-        }, match.id, match.title);
-      };
-
-      window.closeMasterclassModal = function() {
-        document.getElementById('wb_master_cinema_modal')?.classList.remove('active');
-        document.body.classList.remove('wb-master-modal-open');
-        document.body.style.overflow = '';
-        if (ytMasterPlayer && typeof ytMasterPlayer.pauseVideo === 'function') {
-          try { ytMasterPlayer.pauseVideo(); } catch(e) {}
-        }
-        const ifr = document.getElementById('wb_master_iframe_fallback');
-        if (ifr) ifr.src = '';
-      };
-
-      function loadMasterclassInPlayer(vidObj) {
-        currentMasterclassVideo = vidObj;
-        
-        // Set Metadata
-        const titleEl = document.getElementById('wb_yt_current_title');
-        const speakerEl = document.getElementById('wb_yt_current_speaker');
-        const timeTagEl = document.getElementById('wb_yt_current_time_tag');
-        const descEl = document.getElementById('wb_yt_current_desc');
-
-        if (titleEl) titleEl.textContent = vidObj.title || 'कृषि मास्टरक्लास';
-        if (speakerEl) speakerEl.textContent = vidObj.speaker || 'आरोग्यम कृषि विशेषज्ञ';
-        if (timeTagEl) timeTagEl.textContent = `⏱️ ${vidObj.duration || '45 मिनट'} • सम्पूर्ण प्रैक्टिकल ट्रेनिंग`;
-        if (descEl) descEl.textContent = vidObj.description || `${vidObj.title} — विशेषज्ञों द्वारा तैयार संपूर्ण वैज्ञानिक एवं प्रैक्टिकल कृषि गाइड।`;
-
-        // Render Suggested Feed inside Modal
-        renderModalSuggestedVideos(vidObj.id);
-
-        // Play YouTube Video
-        const ytId = vidObj.youtube_id || extractYoutubeVideoId(vidObj.video_url) || '';
-        initOrLoadMasterPlayer(ytId, vidObj.video_url);
-
-        // Scroll Modal to top
-        const modal = document.getElementById('wb_master_cinema_modal');
-        if (modal) modal.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      function initOrLoadMasterPlayer(ytId, fallbackUrl) {
-        const container = document.getElementById('wb_master_yt_container');
-        const ifr = document.getElementById('wb_master_iframe_fallback');
-
-        if (!ytId) {
-          if (container) container.style.display = 'none';
-          if (ifr) {
-            ifr.style.display = 'block';
-            ifr.src = fallbackUrl || '';
-          }
-          return;
-        }
-
-        if (ifr) ifr.style.display = 'none';
-        if (container) container.style.display = 'block';
-
-        if (ytMasterPlayer && typeof ytMasterPlayer.loadVideoById === 'function') {
-          try {
-            ytMasterPlayer.loadVideoById({ videoId: ytId, startSeconds: 0 });
-            ytMasterPlayer.playVideo();
-            return;
-          } catch(e) {
-            console.warn('ytMasterPlayer loadVideoById err:', e);
-          }
-        }
-
-        if (window.YT && window.YT.Player) {
-          try {
-            ytMasterPlayer = new YT.Player('wb_master_yt_container', {
-              videoId: ytId,
-              playerVars: {
-                autoplay: 1,
-                controls: 1,
-                rel: 0,
-                modestbranding: 1,
-                playsinline: 1,
-                enablejsapi: 1,
-                origin: window.location.origin
-              },
-              events: {
-                onReady: (event) => {
-                  event.target.playVideo();
-                },
-                onError: () => {
-                  if (ifr) {
-                    ifr.style.display = 'block';
-                    ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
-                  }
-                }
-              }
-            });
-          } catch(err) {
-            if (ifr) {
-              ifr.style.display = 'block';
-              ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
-            }
-          }
-        } else if (ifr) {
-          ifr.style.display = 'block';
-          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`;
-        }
-      }
-
-      function renderModalSuggestedVideos(currentId) {
-        const listEl = document.getElementById('wb_yt_suggested_list');
-        const countEl = document.getElementById('wb_yt_suggested_count');
-        if (!listEl) return;
-
-        const masterList = allRecordings.filter(v =>
-          v.status !== 'inactive' &&
-          v.format !== 'short_reel' &&
-          !v.id.startsWith('VID_S') &&
-          v.category !== 'Shorts & Reels'
-        );
-
-        if (countEl) countEl.textContent = `${masterList.length} वीडियो उपलब्ध`;
-
-        listEl.innerHTML = masterList.map(v => {
-          const isCurrent = v.id === currentId;
-          const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url) || '';
-          const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : DEFAULT_AAROGYAMTUBE_THUMB);
-
-          return `
-            <div class="wb-yt-card ${isCurrent ? 'active-playing' : ''}" onclick="window.playSuggestedMasterclass('${v.id}')">
-              <div class="wb-yt-thumb-box">
-                <img src="${thumb}" alt="${v.title}" class="wb-yt-thumb-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
-                <span class="wb-yt-time-badge">⏱️ ${v.duration || '45m'}</span>
-              </div>
-              <div class="wb-yt-card-details">
-                <div class="wb-yt-card-title">${v.title}</div>
-                <div class="wb-yt-card-speaker">👤 ${v.speaker || 'आरोग्यम विशेषज्ञ'}</div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-
-      window.playSuggestedMasterclass = function(vId) {
-        const match = allRecordings.find(x => x.id === vId);
-        if (!match) return;
-        loadMasterclassInPlayer(match);
-        try {
-          const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-          const userShare = uObj.share_id || refShareId || 'AI000004';
-          const newUrl = new URL(window.location.href);
-          newUrl.searchParams.set('vid', match.id);
-          newUrl.searchParams.set('ref', userShare);
-          window.history.replaceState({}, '', newUrl.toString());
-        } catch(e) {}
-      };
-
-      window.likeMasterclassVideo = function() {
-        const icon = document.getElementById('wb_yt_like_icon');
-        const countEl = document.getElementById('wb_yt_like_count');
-        if (icon) {
-          icon.style.transform = 'scale(1.4)';
-          setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
-        }
-        if (countEl) countEl.textContent = 'Liked ❤️';
-      };
-
-      window.commentMasterclassVideo = function() {
-        const comment = prompt('इस मास्टरक्लास ट्रेनिंग पर अपनी प्रतिक्रिया या सवाल (Comment) लिखें:');
-        if (comment && comment.trim()) {
-          alert('✅ आपकी प्रतिक्रिया सफलतापूर्वक सबमिट हो गई है! धन्यवाद।');
-        }
-      };
-
-      window.shareCurrentMasterclassWhatsApp = function() {
-        if (!currentMasterclassVideo) return;
-        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
-        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(currentMasterclassVideo.id)}&ref=${encodeURIComponent(userShare)}`;
-        const promoText = `🎬 *${currentMasterclassVideo.title}*\n${currentMasterclassVideo.description ? currentMasterclassVideo.description.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:`;
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText + '\n' + shareUrl)}`, '_blank');
-      };
-
-      window.shareCurrentMasterclassNative = function() {
-        if (!currentMasterclassVideo) return;
-        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
-        const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(currentMasterclassVideo.id)}&ref=${encodeURIComponent(userShare)}`;
-        const promoText = `🎬 *${currentMasterclassVideo.title}*\n${currentMasterclassVideo.description ? currentMasterclassVideo.description.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:`;
-
-        if (navigator.share) {
-          navigator.share({
-            title: currentMasterclassVideo.title,
-            text: promoText ? `${promoText}\n` : '',
-            url: shareUrl
-          }).catch(() => {});
-        } else {
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText + '\n' + shareUrl)}`, '_blank');
-        }
-      };
-
-      window.copyMasterclassLink = function() {
-        if (!currentMasterclassVideo) return;
-        const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
-        const shareUrl = `https://aarogyamindia.online/webinar.html?vid=${encodeURIComponent(currentMasterclassVideo.id)}&ref=${encodeURIComponent(userShare)}`;
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          alert('📋 मास्टरक्लास वीडियो लिंक कॉपी हो गया!\n' + shareUrl);
-        });
-      };
-
-      function openSpecificVideoOrReel(vid) {
-        const match = allRecordings.find(x => x.id === vid);
-        if (match) {
-          if (match.format === 'short_reel' || match.id.startsWith('VID_S')) {
-            const idx = activeReelsList.findIndex(x => x.id === vid);
-            window.openReelPlayer(idx !== -1 ? idx : 0);
-          } else {
-            window.openVideoModal(vid);
-          }
-        }
-      }
-
       function renderFaqs() {
         const cont = document.getElementById('wb_faqs_container');
         if (!cont || !masterData.faqs || masterData.faqs.length === 0) return;
@@ -3543,7 +1859,7 @@ if (wbShortsSeeMoreBtn) {
         `).join('');
       }
 
-      // Initialize
+      // Initialize Hub
       initWebinarHub();
 
     })();
