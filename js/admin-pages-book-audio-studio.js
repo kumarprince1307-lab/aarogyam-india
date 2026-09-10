@@ -1352,9 +1352,10 @@ function saveCurrentPageText() {
         studioAudioScripts.pages[String(studioCurrentPage)].text = text;
     }
 
+    audioScriptsModified = true;
     markUnsaved(true);
     renderPageChipGrid();
-    alert(`✅ Page ${studioCurrentPage} का टेक्स्ट सेव हो गया! "Save All" दबाकर सुरक्षित करें।`);
+    alert(`✅ Page ${studioCurrentPage} का टेक्स्ट सेव हो गया!\n"1-Click Push to Git" दबाने पर सिर्फ 0.5 सेकंड में ऑडियो स्क्रिप्ट Git पर लाइव हो जाएगी।`);
 }
 
 function testCurrentPageTts() {
@@ -1451,9 +1452,10 @@ function saveCurrentPageAudio() {
             studioAudioScripts.pages[String(studioCurrentPage)].audio = base64data;
         }
 
+        audioScriptsModified = true;
         markUnsaved(true);
         renderPageChipGrid();
-        alert(`✅ Page ${studioCurrentPage} की ऑडियो रिकॉर्डिंग सेव हो गई! "Save All" दबाकर सुरक्षित करें।`);
+        alert(`✅ Page ${studioCurrentPage} की ऑडियो रिकॉर्डिंग सेव हो गई!\n"1-Click Push to Git" दबाने पर सिर्फ 0.5 सेकंड में ऑडियो स्क्रिप्ट Git पर लाइव हो जाएगी।`);
     };
 }
 
@@ -1466,6 +1468,7 @@ function deleteCurrentPageAudio() {
         }
         const box = document.getElementById('audioPlaybackBox');
         if (box) box.style.display = 'none';
+        audioScriptsModified = true;
         markUnsaved(true);
         renderPageChipGrid();
         alert(`🗑️ Page ${studioCurrentPage} की ऑडियो हटा दी गई।`);
