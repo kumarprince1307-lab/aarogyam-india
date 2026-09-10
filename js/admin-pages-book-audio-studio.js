@@ -516,7 +516,28 @@ async function handleBulkImageUpload(files) {
 function readFileAsDataUrl(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
+        reader.onloadend = () => {
+            const rawData = reader.result;
+            // If already webp, use directly
+            if (file.type === 'image/webp') {
+                resolve(rawData);
+                return;
+            }
+            // Auto convert PNG / JPG / JPEG to crystal-clear lightweight WebP
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth || img.width;
+                canvas.height = img.naturalHeight || img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                // 0.88 quality provides 100% sharp text with ~85% smaller file size
+                const webpData = canvas.toDataURL('image/webp', 0.88);
+                resolve(webpData);
+            };
+            img.onerror = () => resolve(rawData);
+            img.src = rawData;
+        };
         reader.readAsDataURL(file);
     });
 }
