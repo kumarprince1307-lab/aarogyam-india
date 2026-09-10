@@ -52,7 +52,10 @@ class UniversalAudioBookEngine {
         const urlParams = new URLSearchParams(window.location.search);
         const bookId = (window.aoiBookId || urlParams.get('book') || urlParams.get('id') || 'BK001').trim().toUpperCase();
         try {
-            const res = await fetch(`../data/audio-scripts/${bookId}.json`);
+            let res = await fetch(`../data/audio-scripts/${bookId}.json`);
+            if (!res.ok) {
+                res = await fetch(`/data/audio-scripts/${bookId}.json`);
+            }
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.pages) {

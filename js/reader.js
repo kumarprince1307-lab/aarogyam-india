@@ -117,45 +117,62 @@ async function verifyUserAccessAndSession(targetBookId) {
 }
 
 // =======================================================
-// LOAD PDF VIA PDF.JS
+// LOAD PDF VIA PDF.JS (ROBUST MULTI-PATH FALLBACK)
 // =======================================================
 function loadPdfFile(pdfUrl) {
-    console.log("Loading PDF from:", pdfUrl);
+    // Generate candidate paths
+    let primaryPath = pdfUrl;
+    let fallbackPath = pdfUrl.startsWith('/') ? ('..' + pdfUrl) : ('../' + pdfUrl);
+    if (pdfUrl.startsWith('../')) {
+        fallbackPath = pdfUrl.replace(/^\.\.\//, '/');
+    }
 
-    pdfjsLib.getDocument(pdfUrl).promise.then(pdfDoc_ => {
-        aoiPdfDoc = pdfDoc_;
-        aoiTotalPages = aoiPdfDoc.numPages;
-        window.aoiPdfDoc = aoiPdfDoc;
-        window.aoiTotalPages = aoiTotalPages;
-        window.aoiCurrentBookData = aoiCurrentBookData;
-        console.log("PDF Loaded Successfully. Total Pages:", aoiTotalPages);
+    console.log("Loading PDF primary attempt:", primaryPath);
 
-        if (pageSlider) pageSlider.max = aoiTotalPages;
+    function attemptLoad(urlToTry, isFallback = false) {
+        pdfjsLib.getDocument(urlToTry).promise.then(pdfDoc_ => {
+            aoiPdfDoc = pdfDoc_;
+            aoiTotalPages = aoiPdfDoc.numPages;
+            window.aoiPdfDoc = aoiPdfDoc;
+            window.aoiTotalPages = aoiTotalPages;
+            window.aoiCurrentBookData = aoiCurrentBookData;
+            console.log("PDF Loaded Successfully from", urlToTry, "Total Pages:", aoiTotalPages);
 
-        let savedData = JSON.parse(localStorage.getItem("AOI_READ_PROGRESS") || "{}");
-        let savedPage = savedData[aoiBookId] || 1;
+            if (pageSlider) pageSlider.max = aoiTotalPages;
 
-        if (savedPage > 1 && savedPage <= aoiTotalPages) {
-            if (lastSavedPageText) lastSavedPageText.textContent = `Page ${savedPage}`;
-            if (continueReadingModal) continueReadingModal.style.display = "flex";
+            let savedData = JSON.parse(localStorage.getItem("AOI_READ_PROGRESS") || "{}");
+            let savedPage = savedData[aoiBookId] || 1;
 
-            document.getElementById("confirmContinueBtn").onclick = () => {
-                continueReadingModal.style.display = "none";
-                initReaderAtPage(savedPage);
-            };
+            if (savedPage > 1 && savedPage <= aoiTotalPages) {
+                if (lastSavedPageText) lastSavedPageText.textContent = `Page ${savedPage}`;
+                if (continueReadingModal) continueReadingModal.style.display = "flex";
 
-            document.getElementById("startAgainBtn").onclick = () => {
-                continueReadingModal.style.display = "none";
+                document.getElementById("confirmContinueBtn").onclick = () => {
+                    continueReadingModal.style.display = "none";
+                    initReaderAtPage(savedPage);
+                };
+
+                document.getElementById("startAgainBtn").onclick = () => {
+                    continueReadingModal.style.display = "none";
+                    initReaderAtPage(1);
+                };
+            } else {
                 initReaderAtPage(1);
-            };
-        } else {
-            initReaderAtPage(1);
-        }
+            }
 
-    }).catch(err => {
-        console.error("PDF Load Error:", err);
-        showErrorScreen();
-    });
+        }).catch(err => {
+            console.warn(`PDF load failed for [${urlToTry}]:`, err);
+            if (!isFallback) {
+                console.log("Retrying with fallback path:", fallbackPath);
+                attemptLoad(fallbackPath, true);
+            } else {
+                console.error("All PDF load paths failed.");
+                showErrorScreen();
+            }
+        });
+    }
+
+    attemptLoad(primaryPath);
 }
 
 function initReaderAtPage(startPage) {
