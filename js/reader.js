@@ -114,11 +114,18 @@ async function verifyUserAccessAndSession(targetBookId) {
     }
 
     // Check for WebP / Image Pages first (Smart HD Fast Engine)
-    const localPagesKey = `AOI_BOOK_PAGES_${targetBookId.toUpperCase()}`;
-    const localStudioKey = `AOI_AUDIO_SCRIPTS_${targetBookId.toUpperCase()}`;
     let pageImages = (aoiCurrentBookData && aoiCurrentBookData.pageImages) ? aoiCurrentBookData.pageImages : null;
     
+    // Check IndexedDB Studio Cache
     if (!pageImages || !pageImages.length) {
+        try {
+            pageImages = await loadPagesFromIndexedDb(targetBookId.toUpperCase());
+        } catch (e) {}
+    }
+
+    if (!pageImages || !pageImages.length) {
+        const localPagesKey = `AOI_BOOK_PAGES_${targetBookId.toUpperCase()}`;
+        const localStudioKey = `AOI_AUDIO_SCRIPTS_${targetBookId.toUpperCase()}`;
         try {
             const rawPages = localStorage.getItem(localPagesKey);
             if (rawPages) pageImages = JSON.parse(rawPages);
@@ -141,6 +148,26 @@ async function verifyUserAccessAndSession(targetBookId) {
         console.log("📄 Standard PDF Engine Activated for:", targetBookId);
         loadPdfFile(aoiCurrentBookData.mainPdf || "pdf/full/" + targetBookId + ".pdf");
     }
+}
+
+function loadPagesFromIndexedDb(bookId) {
+    return new Promise((resolve) => {
+        try {
+            const req = indexedDB.open('AoiStudioDB', 1);
+            req.onsuccess = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('bookPages')) return resolve(null);
+                const tx = db.transaction('bookPages', 'readonly');
+                const store = tx.objectStore('bookPages');
+                const getReq = store.get(bookId);
+                getReq.onsuccess = () => resolve(getReq.result || null);
+                getReq.onerror = () => resolve(null);
+            };
+            req.onerror = () => resolve(null);
+        } catch (err) {
+            resolve(null);
+        }
+    });
 }
 
 // =======================================================

@@ -1,15 +1,13 @@
 /**
  * =================================================================
- * AAROGYAM INDIA - PRO EBOOK & AUDIO STUDIO (ALL-IN-ONE ENGINE)
+ * AAROGYAM INDIA - PRO EBOOK & AUDIO STUDIO (ALL-IN-ONE ENGINE v5.0)
  * =================================================================
- * Features:
- * 1. Book / Demo Code Selector & Creator (BK001, BK002, DEMO001, etc.)
- * 2. Bulk WebP / PNG / JPG Image Uploader (Auto sorted, fast HD)
- * 3. 1-Click "PDF to WebP" Converter
- * 4. Page Manager: Add, Reorder, Delete Pages
- * 5. Page Audio Recording: 24kbps Opus Real Voice
- * 6. Page Text Editor: Crisp Natural Female TTS Mode
- * 7. Live Sync + Export Manifest JSON
+ * 1. IndexedDB Storage: Handles 150+ Full HD WebP pages (No 5MB quota crash)
+ * 2. Real-Time Upload & Conversion Progress Bar with KB/MB stats
+ * 3. Staging & Discard Protection (Save / Discard Drafts)
+ * 4. 1-Click ZIP Export for Git (images/books/BK001/1.webp to N.webp)
+ * 5. Single Page Replace vs Bulk Replace Detection
+ * 6. 24kbps Opus Original Mic Voice Recording + Female TTS Mode
  */
 
 import { initAdminLayout } from './admin-main.js';
@@ -19,13 +17,16 @@ if (typeof pdfjsLib !== 'undefined') {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
+// Global Studio State
 let studioPdfDoc = null;
 let studioCurrentBookId = 'BK001';
 let studioCurrentPage = 1;
 let studioTotalPages = 152;
 let studioBookData = null;
 let studioAudioScripts = { pages: {} };
-let studioPageImages = [];
+let studioPageImages = []; // Array of Data URLs / Blobs
+let studioOriginalBackup = null; // Backup for Discard feature
+let hasUnsavedChanges = false;
 
 // Media Recorder
 let mediaRecorder = null;
@@ -33,6 +34,54 @@ let audioChunks = [];
 let recordedAudioBlob = null;
 let recordedAudioUrl = null;
 
+// =======================================================
+// 1. INDEXEDDB ENGINE (100MB+ SAFE LOCAL STORAGE)
+// =======================================================
+function openStudioDb() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open('AoiStudioDB', 1);
+        req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('bookPages')) {
+                db.createObjectStore('bookPages');
+            }
+        };
+        req.onsuccess = (e) => resolve(e.target.result);
+        req.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function savePagesToDb(bookId, imagesArray) {
+    try {
+        const db = await openStudioDb();
+        const tx = db.transaction('bookPages', 'readwrite');
+        const store = tx.objectStore('bookPages');
+        store.put(imagesArray, bookId);
+        return new Promise((res) => { tx.oncomplete = () => res(true); });
+    } catch (e) {
+        console.warn("IndexedDB Save Warning:", e);
+        return false;
+    }
+}
+
+async function loadPagesFromDb(bookId) {
+    try {
+        const db = await openStudioDb();
+        const tx = db.transaction('bookPages', 'readonly');
+        const store = tx.objectStore('bookPages');
+        const req = store.get(bookId);
+        return new Promise((res) => {
+            req.onsuccess = () => res(req.result || null);
+            req.onerror = () => res(null);
+        });
+    } catch (e) {
+        return null;
+    }
+}
+
+// =======================================================
+// 2. MAIN STUDIO UI INITIALIZATION
+// =======================================================
 export async function initBookAudioStudio() {
     initAdminLayout('eBook Voice & Audio Studio', 'WebP इमेज अपलोड करें, पेज क्रम सेट करें और माइक से आवाज़ या टेक्स्ट जोड़ें।');
     
@@ -46,7 +95,7 @@ export async function initBookAudioStudio() {
             <div>
               <h2 style="margin:0; font-size:1.3rem; color:#f8fafc;">🎧 All-in-One eBook & Audio Studio</h2>
               <p style="margin:4px 0 0; font-size:0.85rem; color:#94a3b8;">
-                WebP पेज इमेज अपलोड करें, पेज क्रम सेट करें और माइक से आवाज़ या टेक्स्ट जोड़ें।
+                पेज-वाइज़ WebP इमेज अपलोड करें, मूल आवाज़ रिकॉर्ड करें या टेक्स्ट जोड़ें।
               </p>
             </div>
             
@@ -68,7 +117,7 @@ export async function initBookAudioStudio() {
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div>
               <span style="font-weight:700; color:#34d399; font-size:0.95rem; display:block;">📁 Bulk WebP / PNG पेज अपलोडर</span>
-              <span style="font-size:0.8rem; color:#94a3b8;">एक साथ 150+ पेज की WebP/PNG/JPG इमेज चुनें। सिस्टम अपने आप क्रम में लगा देगा।</span>
+              <span style="font-size:0.8rem; color:#94a3b8;">एक साथ 150+ पेज चुनें। सिस्टम अपने आप नाम (1, 2, 3...) के हिसाब से सजा देगा।</span>
             </div>
 
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
@@ -79,8 +128,42 @@ export async function initBookAudioStudio() {
               <button id="convertPdfToWebpBtn" class="admin-btn admin-btn-secondary" style="padding:8px 12px; font-size:12px;" title="मौजूदा PDF के सारे पेजों को WebP इमेज में बदलें">
                 ⚡ Convert PDF to WebP
               </button>
+              <button id="downloadZipBtn" class="admin-btn" style="background:#8b5cf6; color:#fff; padding:8px 12px; font-size:12px;" title="Git फोल्डर (images/books/BK001/) के लिए ZIP डाउनलोड करें">
+                📦 Download WebP ZIP
+              </button>
               <button id="exportJsonBtn" class="admin-btn" style="background:#3b82f6; color:#fff; padding:8px 12px; font-size:12px;">
-                💾 Export JSON Manifest
+                💾 Export JSON
+              </button>
+            </div>
+          </div>
+
+          <!-- Real-Time Progress Bar & Metrics -->
+          <div id="uploadProgressSection" style="display:none; margin-top:14px; background:#1e293b; padding:12px; border-radius:8px; border:1px solid #334155;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span id="progressStatusLabel" style="font-size:0.85rem; font-weight:700; color:#38bdf8;">प्रगति: 0 / 0 पेजेस</span>
+              <span id="progressSizeLabel" style="font-size:0.8rem; color:#94a3b8;">कुल साइज: 0 KB</span>
+            </div>
+            <div style="width:100%; height:8px; background:#0f172a; border-radius:4px; overflow:hidden;">
+              <div id="progressFillBar" style="width:0%; height:100%; background:linear-gradient(90deg, #10b981, #38bdf8); transition:width 0.2s;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Staging / Save / Discard Bar -->
+        <div id="stagingActionBar" class="admin-card" style="margin-bottom: 16px; background:#1e1b4b; border:1px solid #6366f1; display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.2rem;">⚠️</span>
+              <span style="font-size:0.85rem; color:#c7d2fe; font-weight:600;">
+                आपके पास बिना सेव किए गए बदलाव (Draft Changes) मौजूद हैं।
+              </span>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button id="discardChangesBtn" class="admin-btn" style="background:#64748b; color:#fff; padding:6px 14px;">
+                ❌ रद्द करें (Discard)
+              </button>
+              <button id="saveAllChangesBtn" class="admin-btn admin-btn-primary" style="padding:6px 18px; font-weight:700;">
+                💾 सभी बदलाव सेव करें (Save All)
               </button>
             </div>
           </div>
@@ -92,6 +175,7 @@ export async function initBookAudioStudio() {
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="font-weight:700; font-size:0.9rem; color:#e2e8f0;">पृष्ठ चुनें (Page Selector):</span>
               <span id="pageCountStatus" style="font-size:0.85rem; color:#10b981; font-weight:700;">1 / 152 Pages</span>
+              <span id="currentPageSizeTag" style="font-size:0.75rem; background:#334155; color:#94a3b8; padding:2px 6px; border-radius:4px;">Size: -- KB</span>
             </div>
             
             <!-- Page Management Buttons -->
@@ -191,6 +275,9 @@ export async function initBookAudioStudio() {
     await loadBookStudio(studioCurrentBookId);
 }
 
+// =======================================================
+// 3. STUDIO EVENTS & WORKFLOW
+// =======================================================
 function setupStudioEvents() {
     const bookSelect = document.getElementById('bookSelect');
     if (bookSelect) {
@@ -223,7 +310,7 @@ function setupStudioEvents() {
     const bulkInput = document.getElementById('bulkImageInput');
     if (triggerBtn && bulkInput) {
         triggerBtn.addEventListener('click', () => bulkInput.click());
-        bulkInput.addEventListener('change', (e) => handleBulkImageUpload(e.target.files));
+        bulkInput.addEventListener('change', (e) => handleImageUpload(e.target.files));
     }
 
     // Convert PDF to WebP
@@ -232,13 +319,30 @@ function setupStudioEvents() {
         convertBtn.addEventListener('click', () => convertCurrentPdfToWebp());
     }
 
+    // Download ZIP
+    const zipBtn = document.getElementById('downloadZipBtn');
+    if (zipBtn) {
+        zipBtn.addEventListener('click', () => downloadWebpPagesZip());
+    }
+
     // Export JSON
     const exportBtn = document.getElementById('exportJsonBtn');
     if (exportBtn) {
         exportBtn.addEventListener('click', () => exportStudioJsonManifest());
     }
 
-    // Page Reordering & Addition
+    // Staging Actions
+    const saveAllBtn = document.getElementById('saveAllChangesBtn');
+    if (saveAllBtn) {
+        saveAllBtn.addEventListener('click', () => commitAllChanges());
+    }
+
+    const discardBtn = document.getElementById('discardChangesBtn');
+    if (discardBtn) {
+        discardBtn.addEventListener('click', () => discardDraftChanges());
+    }
+
+    // Page Management
     const addPageBtn = document.getElementById('addPageBtn');
     if (addPageBtn) {
         addPageBtn.addEventListener('click', () => addNewBlankPage());
@@ -291,41 +395,46 @@ function setupStudioEvents() {
     }
 }
 
+// =======================================================
+// 4. LOAD BOOK STUDIO (INDEXEDDB + GIT + PDF)
+// =======================================================
 async function loadBookStudio(bookId) {
     studioPdfDoc = null;
     studioPageImages = [];
     studioAudioScripts = { bookId: bookId, pages: {} };
+    markUnsaved(false);
 
-    // 1. Load book data from books.json
+    // 1. Fetch from books.json
     try {
         const res = await fetch('../data/books.json');
         const json = await res.json();
         studioBookData = json.books.find(b => b.id === bookId || b.id === bookId.toUpperCase());
     } catch (e) {}
 
-    // 2. Load Audio & Page Manifest
+    // 2. Try loading from IndexedDB first (Cached/Staged WebP Pages)
+    const dbImages = await loadPagesFromDb(bookId);
+    if (dbImages && dbImages.length > 0) {
+        studioPageImages = dbImages;
+        studioTotalPages = dbImages.length;
+    }
+
+    // 3. Load Audio Scripts
     try {
         const localData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${bookId}`);
         if (localData) {
             studioAudioScripts = JSON.parse(localData);
-            if (studioAudioScripts.pageImages && studioAudioScripts.pageImages.length) {
-                studioPageImages = studioAudioScripts.pageImages;
-            }
         } else {
             let res = await fetch(`../data/audio-scripts/${bookId}.json`);
             if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json`);
             if (res.ok) {
                 studioAudioScripts = await res.json();
-                if (studioAudioScripts.pageImages && studioAudioScripts.pageImages.length) {
-                    studioPageImages = studioAudioScripts.pageImages;
-                }
             }
         }
     } catch (e) {
         studioAudioScripts = { bookId: bookId, pages: {} };
     }
 
-    // 3. If no images yet, load PDF
+    // 4. Fallback to PDF if no WebP images yet
     if (!studioPageImages.length) {
         const pdfUrl = (studioBookData && studioBookData.mainPdf) 
             ? ('..' + studioBookData.mainPdf) 
@@ -335,12 +444,19 @@ async function loadBookStudio(bookId) {
             studioPdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
             studioTotalPages = studioPdfDoc.numPages;
         } catch (err) {
-            console.warn("Studio PDF Load warning:", err);
+            console.warn("PDF Load warning:", err);
             studioTotalPages = 1;
         }
     } else {
         studioTotalPages = studioPageImages.length;
     }
+
+    // Create a pristine backup for Discard
+    studioOriginalBackup = {
+        images: [...studioPageImages],
+        scripts: JSON.parse(JSON.stringify(studioAudioScripts)),
+        totalPages: studioTotalPages
+    };
 
     renderPageChipGrid();
     selectPage(1);
@@ -411,6 +527,7 @@ async function selectPage(pageNum) {
     const pageTag = document.getElementById('previewPageNumberTag');
     if (pageTag) pageTag.textContent = `Page ${pageNum}`;
 
+    const sizeTag = document.getElementById('currentPageSizeTag');
     const previewCanvas = document.getElementById('previewCanvas');
     const previewImage = document.getElementById('previewImage');
     const loadingText = document.getElementById('previewLoadingText');
@@ -423,6 +540,11 @@ async function selectPage(pageNum) {
         if (previewImage) {
             previewImage.style.display = 'block';
             previewImage.src = studioPageImages[pageNum - 1];
+            
+            // Calculate approximate size
+            const base64Str = studioPageImages[pageNum - 1];
+            const sizeKb = Math.round((base64Str.length * (3/4)) / 1024);
+            if (sizeTag) sizeTag.textContent = `Size: ${sizeKb} KB (WebP HD)`;
         }
     } 
     // 2. Render PDF Canvas Fallback
@@ -430,6 +552,7 @@ async function selectPage(pageNum) {
         if (previewImage) previewImage.style.display = 'none';
         if (previewCanvas) {
             previewCanvas.style.display = 'block';
+            if (sizeTag) sizeTag.textContent = `Mode: PDF Vector Page`;
             try {
                 const page = await studioPdfDoc.getPage(pageNum);
                 const ctx = previewCanvas.getContext('2d');
@@ -453,6 +576,7 @@ async function selectPage(pageNum) {
             loadingText.style.display = 'block';
             loadingText.textContent = `पृष्ठ ${pageNum} खाली है। ऊपर से इमेज अपलोड करें।`;
         }
+        if (sizeTag) sizeTag.textContent = `Empty Page`;
     }
 
     // Populate Right Form
@@ -480,50 +604,74 @@ async function selectPage(pageNum) {
     }
 }
 
-// Bulk Upload Handler
-async function handleBulkImageUpload(files) {
+// =======================================================
+// 5. BULK UPLOAD WITH PROGRESS BAR & SIZE METRICS
+// =======================================================
+async function handleImageUpload(files) {
     if (!files || !files.length) return;
 
     const fileList = Array.from(files);
-    // Natural Sort by filename (e.g. 1.webp, 2.webp, 10.webp or page_1.png)
-    fileList.sort((a, b) => {
-        return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
-    });
 
-    const waveBox = document.getElementById('recStatusWave');
-    if (waveBox) waveBox.innerHTML = `⏳ ${fileList.length} इमेज प्रोसेस हो रही हैं...`;
+    // Case A: Single File Upload -> Check whether user wants to replace ONLY current page
+    if (fileList.length === 1 && studioTotalPages > 1) {
+        const replaceSingle = confirm(`क्या आप सिर्फ वर्तमान पृष्ठ (Page ${studioCurrentPage}) को बदलना चाहते हैं?\n(OK = केवल Page ${studioCurrentPage} बदलें | Cancel = सभी पेजों को 1 पेज से बदलें)`);
+        if (replaceSingle) {
+            const webpData = await readFileAsWebp(fileList[0]);
+            if (!studioPageImages.length) studioPageImages = new Array(studioTotalPages).fill('');
+            studioPageImages[studioCurrentPage - 1] = webpData;
+            markUnsaved(true);
+            selectPage(studioCurrentPage);
+            alert(`✅ पृष्ठ ${studioCurrentPage} सफलतापूर्वक बदल दिया गया है! "Save All" दबाकर सुरक्षित करें।`);
+            return;
+        }
+    }
 
-    const imagesBase64 = [];
+    // Case B: Bulk Upload
+    fileList.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+
+    const progressSection = document.getElementById('uploadProgressSection');
+    const progressLabel = document.getElementById('progressStatusLabel');
+    const sizeLabel = document.getElementById('progressSizeLabel');
+    const fillBar = document.getElementById('progressFillBar');
+
+    if (progressSection) progressSection.style.display = 'block';
+
+    const processedImages = [];
+    let totalBytes = 0;
 
     for (let i = 0; i < fileList.length; i++) {
         const file = fileList[i];
-        const dataUrl = await readFileAsDataUrl(file);
-        imagesBase64.push(dataUrl);
+        const webpData = await readFileAsWebp(file);
+        processedImages.push(webpData);
+
+        const currentBytes = Math.round(webpData.length * (3/4));
+        totalBytes += currentBytes;
+
+        const percent = Math.round(((i + 1) / fileList.length) * 100);
+        if (progressLabel) progressLabel.textContent = `कनवर्ट हो रहा है: ${i + 1} / ${fileList.length} पेजेस (${percent}%)`;
+        if (sizeLabel) sizeLabel.textContent = `वर्तमान फाइल: ${file.name} (${Math.round(currentBytes / 1024)} KB) • कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
+        if (fillBar) fillBar.style.width = `${percent}%`;
+
+        // Small yield to let UI breathe smoothly
+        if (i % 5 === 0) await new Promise(r => setTimeout(r, 10));
     }
 
-    studioPageImages = imagesBase64;
-    studioTotalPages = imagesBase64.length;
-    studioAudioScripts.pageImages = imagesBase64;
+    studioPageImages = processedImages;
+    studioTotalPages = processedImages.length;
 
-    saveScriptsDataToLocal();
+    markUnsaved(true);
     renderPageChipGrid();
     selectPage(1);
 
-    if (waveBox) waveBox.innerHTML = `✅ ${fileList.length} पेज सफलतापूर्वक लोड हो गए!`;
-    alert(`🎉 ${fileList.length} WebP/PNG पेज सफलतापूर्वक लोड हो गए हैं!`);
+    if (progressLabel) progressLabel.textContent = `🎉 पूरे ${fileList.length} पेज सफलतापूर्वक WebP में तैयार! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
+    alert(`🎉 बधाई हो! सभी ${fileList.length} पेज 100% HD WebP में तैयार हो गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nकृपया ऊपर दिए गए "💾 सभी बदलाव सेव करें" बटन पर क्लिक करके सुरक्षित करें।`);
 }
 
-function readFileAsDataUrl(file) {
+function readFileAsWebp(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => {
             const rawData = reader.result;
-            // If already webp, use directly
-            if (file.type === 'image/webp') {
-                resolve(rawData);
-                return;
-            }
-            // Auto convert PNG / JPG / JPEG to crystal-clear lightweight WebP
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
@@ -531,7 +679,6 @@ function readFileAsDataUrl(file) {
                 canvas.height = img.naturalHeight || img.height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
-                // 0.88 quality provides 100% sharp text with ~85% smaller file size
                 const webpData = canvas.toDataURL('image/webp', 0.88);
                 resolve(webpData);
             };
@@ -551,14 +698,19 @@ async function convertCurrentPdfToWebp() {
 
     if (!confirm(`क्या आप इस PDF के सभी ${studioTotalPages} पेजों को WebP इमेज में बदलना चाहते हैं?`)) return;
 
-    const waveBox = document.getElementById('recStatusWave');
-    const images = [];
+    const progressSection = document.getElementById('uploadProgressSection');
+    const progressLabel = document.getElementById('progressStatusLabel');
+    const sizeLabel = document.getElementById('progressSizeLabel');
+    const fillBar = document.getElementById('progressFillBar');
 
+    if (progressSection) progressSection.style.display = 'block';
+
+    const images = [];
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
+    let totalBytes = 0;
 
     for (let p = 1; p <= studioPdfDoc.numPages; p++) {
-        if (waveBox) waveBox.innerHTML = `⏳ कनवर्ट हो रहा है: Page ${p} / ${studioPdfDoc.numPages}...`;
         const page = await studioPdfDoc.getPage(p);
         const viewport = page.getViewport({ scale: 1.5 });
 
@@ -572,22 +724,140 @@ async function convertCurrentPdfToWebp() {
 
         const webpData = tempCanvas.toDataURL('image/webp', 0.88);
         images.push(webpData);
+
+        const currentBytes = Math.round(webpData.length * (3/4));
+        totalBytes += currentBytes;
+
+        const percent = Math.round((p / studioPdfDoc.numPages) * 100);
+        if (progressLabel) progressLabel.textContent = `PDF पेज कनवर्ट हो रहा है: ${p} / ${studioPdfDoc.numPages} (${percent}%)`;
+        if (sizeLabel) sizeLabel.textContent = `कुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
+        if (fillBar) fillBar.style.width = `${percent}%`;
+
+        if (p % 4 === 0) await new Promise(r => setTimeout(r, 10));
     }
 
     studioPageImages = images;
     studioTotalPages = images.length;
-    studioAudioScripts.pageImages = images;
 
-    saveScriptsDataToLocal();
+    markUnsaved(true);
     renderPageChipGrid();
     selectPage(1);
 
-    if (waveBox) waveBox.innerHTML = `✅ ${images.length} पेज WebP में बदल गए!`;
-    alert(`🎉 बधाई हो! ${images.length} पेज 100% HD WebP में बदल गए हैं!`);
+    if (progressLabel) progressLabel.textContent = `🎉 PDF के सभी ${images.length} पेज WebP में तैयार! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
+    alert(`🎉 बधाई हो! PDF के सभी ${images.length} पेज 100% HD WebP में बदल गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nकृपया "💾 सभी बदलाव सेव करें" बटन दबाकर सुरक्षित करें।`);
 }
 
+// =======================================================
+// 6. STAGING & COMMIT / DISCARD SYSTEM
+// =======================================================
+function markUnsaved(isUnsaved) {
+    hasUnsavedChanges = isUnsaved;
+    const bar = document.getElementById('stagingActionBar');
+    if (bar) bar.style.display = isUnsaved ? 'block' : 'none';
+}
+
+async function commitAllChanges() {
+    // 1. Save images to IndexedDB
+    if (studioPageImages && studioPageImages.length > 0) {
+        await savePagesToDb(studioCurrentBookId, studioPageImages);
+    }
+
+    // 2. Save script data to localStorage
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+
+    // 3. Update backup
+    studioOriginalBackup = {
+        images: [...studioPageImages],
+        scripts: JSON.parse(JSON.stringify(studioAudioScripts)),
+        totalPages: studioTotalPages
+    };
+
+    markUnsaved(false);
+    alert(`✅ पुस्तक [${studioCurrentBookId}] के सभी ${studioTotalPages} पेज और ऑडियो सफलतापूर्वक सेव हो गए हैं!`);
+}
+
+function discardDraftChanges() {
+    if (!confirm("क्या आप सभी बिना सेव किए गए बदलाव रद्द करके पहले जैसा करना चाहते हैं?")) return;
+
+    if (studioOriginalBackup) {
+        studioPageImages = [...studioOriginalBackup.images];
+        studioAudioScripts = JSON.parse(JSON.stringify(studioOriginalBackup.scripts));
+        studioTotalPages = studioOriginalBackup.totalPages;
+    }
+
+    markUnsaved(false);
+    renderPageChipGrid();
+    selectPage(1);
+    alert("↩️ सभी बदलाव रद्द कर दिए गए हैं। पिछला सेव किया हुआ डेटा लोड हो गया है।");
+}
+
+// =======================================================
+// 7. 1-CLICK ZIP EXPORT FOR GIT REPOSITORY
+// =======================================================
+async function downloadWebpPagesZip() {
+    if (!studioPageImages || !studioPageImages.length) {
+        alert("डाउनलोड करने के लिए कोई WebP इमेज उपलब्ध नहीं है। कृपया पहले इमेज अपलोड करें या PDF कनवर्ट करें।");
+        return;
+    }
+
+    if (typeof JSZip === 'undefined') {
+        alert("JSZip लाइब्रेरी लोड नहीं हो पाई। कृपया इंटरनेट कनेक्शन जांचें।");
+        return;
+    }
+
+    const zip = new JSZip();
+    const folder = zip.folder(studioCurrentBookId);
+
+    const progressLabel = document.getElementById('progressStatusLabel');
+    const progressSection = document.getElementById('uploadProgressSection');
+    if (progressSection) progressSection.style.display = 'block';
+
+    for (let i = 0; i < studioPageImages.length; i++) {
+        const base64Data = studioPageImages[i];
+        // Strip out data URL prefix to get clean base64
+        const cleanBase64 = base64Data.replace(/^data:image\/(webp|png|jpeg);base64,/, '');
+        folder.file(`${i + 1}.webp`, cleanBase64, { base64: true });
+        
+        if (progressLabel) progressLabel.textContent = `📦 ZIP फाइल तैयार हो रही है: ${i + 1} / ${studioPageImages.length} पेजेस...`;
+    }
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${studioCurrentBookId}_WebP_Pages.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    if (progressLabel) progressLabel.textContent = `✅ ${studioCurrentBookId}_WebP_Pages.zip डाउनलोड हो गई!`;
+    alert(`📦 ${studioCurrentBookId}_WebP_Pages.zip डाउनलोड हो गई है!\n\n💡 इसे आप अपने प्रोजेक्ट के "images/books/${studioCurrentBookId}/" फोल्डर में एक्सट्रैक्ट करके Git पर पुश कर सकते हैं। फिर पूरी दुनिया के मोबाइलों में यह 0.1s में लाइव दिखेगा!`);
+}
+
+function exportStudioJsonManifest() {
+    const jsonStr = JSON.stringify(studioAudioScripts, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${studioCurrentBookId}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert(`📥 ${studioCurrentBookId}.json सफलतापूर्वक डाउनलोड हो गया! इसे data/audio-scripts/ में रख सकते हैं।`);
+}
+
+// =======================================================
+// 8. PAGE MANAGEMENT & AUDIO RECORDING
+// =======================================================
 function addNewBlankPage() {
     studioTotalPages++;
+    studioPageImages.push('');
+    markUnsaved(true);
     renderPageChipGrid();
     selectPage(studioTotalPages);
     alert(`✅ नया पृष्ठ ${studioTotalPages} जुड़ गया है।`);
@@ -602,12 +872,11 @@ function deleteCurrentPage() {
     if (confirm(`क्या आप पृष्ठ ${studioCurrentPage} को हटाना चाहते हैं?`)) {
         if (studioPageImages.length >= studioCurrentPage) {
             studioPageImages.splice(studioCurrentPage - 1, 1);
-            studioAudioScripts.pageImages = studioPageImages;
         }
         delete studioAudioScripts.pages[String(studioCurrentPage)];
         studioTotalPages--;
         studioCurrentPage = Math.min(studioCurrentPage, studioTotalPages);
-        saveScriptsDataToLocal();
+        markUnsaved(true);
         renderPageChipGrid();
         selectPage(studioCurrentPage);
     }
@@ -621,7 +890,6 @@ function moveCurrentPage(direction) {
         const temp = studioPageImages[studioCurrentPage - 1];
         studioPageImages[studioCurrentPage - 1] = studioPageImages[target - 1];
         studioPageImages[target - 1] = temp;
-        studioAudioScripts.pageImages = studioPageImages;
     }
 
     // Swap scripts
@@ -630,7 +898,7 @@ function moveCurrentPage(direction) {
     studioAudioScripts.pages[String(studioCurrentPage)] = targetScript;
     studioAudioScripts.pages[String(target)] = curScript;
 
-    saveScriptsDataToLocal();
+    markUnsaved(true);
     selectPage(target);
 }
 
@@ -649,9 +917,9 @@ function saveCurrentPageText() {
         studioAudioScripts.pages[String(studioCurrentPage)].text = text;
     }
 
-    saveScriptsDataToLocal();
+    markUnsaved(true);
     renderPageChipGrid();
-    alert(`✅ Page ${studioCurrentPage} का टेक्स्ट सफलतापूर्वक सेव हो गया!`);
+    alert(`✅ Page ${studioCurrentPage} का टेक्स्ट सेव हो गया! "Save All" दबाकर सुरक्षित करें।`);
 }
 
 function testCurrentPageTts() {
@@ -748,9 +1016,9 @@ function saveCurrentPageAudio() {
             studioAudioScripts.pages[String(studioCurrentPage)].audio = base64data;
         }
 
-        saveScriptsDataToLocal();
+        markUnsaved(true);
         renderPageChipGrid();
-        alert(`✅ Page ${studioCurrentPage} की ऑडियो रिकॉर्डिंग सफलतापूर्वक सेव हो गई!`);
+        alert(`✅ Page ${studioCurrentPage} की ऑडियो रिकॉर्डिंग सेव हो गई! "Save All" दबाकर सुरक्षित करें।`);
     };
 }
 
@@ -763,28 +1031,8 @@ function deleteCurrentPageAudio() {
         }
         const box = document.getElementById('audioPlaybackBox');
         if (box) box.style.display = 'none';
-        saveScriptsDataToLocal();
+        markUnsaved(true);
         renderPageChipGrid();
         alert(`🗑️ Page ${studioCurrentPage} की ऑडियो हटा दी गई।`);
     }
-}
-
-function exportStudioJsonManifest() {
-    const jsonStr = JSON.stringify(studioAudioScripts, null, 2);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${studioCurrentBookId}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    alert(`📥 ${studioCurrentBookId}.json सफलतापूर्वक डाउनलोड हो गया! इसे data/audio-scripts/ में रख सकते हैं।`);
-}
-
-function saveScriptsDataToLocal() {
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 }
