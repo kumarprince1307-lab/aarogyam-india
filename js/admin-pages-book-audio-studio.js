@@ -27,6 +27,7 @@ let studioAudioScripts = { pages: {} };
 let studioPageImages = []; // Array of Data URLs / Blobs
 let studioOriginalBackup = null; // Backup for Discard feature
 let hasUnsavedChanges = false;
+let isSyncInProgress = false; // Anti-duplicate click lock
 
 // Media Recorder
 let mediaRecorder = null;
@@ -145,13 +146,43 @@ export async function initBookAudioStudio() {
           </div>
 
           <!-- Real-Time Progress Bar & Metrics -->
-          <div id="uploadProgressSection" style="display:none; margin-top:14px; background:#1e293b; padding:12px; border-radius:8px; border:1px solid #334155;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <span id="progressStatusLabel" style="font-size:0.85rem; font-weight:700; color:#38bdf8;">प्रगति: 0 / 0 पेजेस</span>
-              <span id="progressSizeLabel" style="font-size:0.8rem; color:#94a3b8;">कुल साइज: 0 KB</span>
+          <div id="uploadProgressSection" style="display:none; margin-top:14px; background:#0b1329; padding:16px; border-radius:10px; border:2px solid #38bdf8; box-shadow:0 0 20px rgba(56,189,248,0.25);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981;"></span>
+                <span id="progressStatusLabel" style="font-size:0.92rem; font-weight:800; color:#38bdf8;">प्रगति: 0 / 0 पेजेस (0%)</span>
+              </div>
+              <span id="progressSizeLabel" style="font-size:0.85rem; color:#94a3b8; font-weight:600;">कुल साइज: 0 KB</span>
             </div>
-            <div style="width:100%; height:8px; background:#0f172a; border-radius:4px; overflow:hidden;">
-              <div id="progressFillBar" style="width:0%; height:100%; background:linear-gradient(90deg, #10b981, #38bdf8); transition:width 0.2s;"></div>
+            <div style="width:100%; height:12px; background:#0f172a; border-radius:6px; overflow:hidden; border:1px solid #334155; padding:1px;">
+              <div id="progressFillBar" style="width:0%; height:100%; border-radius:5px; background:linear-gradient(90deg, #10b981, #06b6d4, #3b82f6); transition:width 0.25s ease-out;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sync Success Modal Popup -->
+        <div id="syncSuccessModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); z-index:999999; justify-content:center; align-items:center; padding:16px;">
+          <div class="admin-card" style="max-width:520px; width:100%; background:#0f172a; border:2px solid #10b981; border-radius:14px; padding:24px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.6);">
+            <div style="font-size:3.2rem; margin-bottom:8px; line-height:1;">🎉</div>
+            <h3 style="margin:0 0 6px; font-size:1.4rem; color:#34d399; font-weight:800;">1-Click Git Sync सफल!</h3>
+            <p style="color:#cbd5e1; font-size:0.9rem; margin:0 0 16px;">
+              आपकी पुस्तक के सभी पेजेस और ऑडियो डेटा GitHub API से 100% लाइव पुश हो गए हैं।
+            </p>
+            
+            <div style="background:#1e293b; border-radius:8px; padding:14px; margin-bottom:20px; text-align:left; font-size:0.85rem; color:#e2e8f0; display:flex; flex-direction:column; gap:8px; border:1px solid #334155;">
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">पुस्तक कोड:</span> <strong id="successModalBookId" style="color:#38bdf8;">BK001</strong></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">कुल पेजेस:</span> <strong id="successModalPages" style="color:#34d399;">152 Pages (HD WebP)</strong></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">कुल डेटा साइज:</span> <strong id="successModalSize" style="color:#fbbf24;">11.8 MB</strong></div>
+              <div style="display:flex; justify-content:space-between;"><span style="color:#94a3b8;">Git स्टोरेज पाथ:</span> <span style="font-family:monospace; font-size:0.75rem; color:#a7f3d0;" id="successModalPath">images/books/BK001/</span></div>
+            </div>
+
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+              <a id="successModalReaderLink" href="../ebooks/reader.html?book=BK001" target="_blank" class="admin-btn" style="background:linear-gradient(135deg, #0284c7, #2563eb); color:#fff; padding:10px 20px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                <span>📖</span> लाइव रीडर में टेस्ट करें
+              </a>
+              <button id="closeSuccessModalBtn" class="admin-btn admin-btn-secondary" style="padding:10px 20px; font-weight:700;">
+                ✅ ठीक है (Done)
+              </button>
             </div>
           </div>
         </div>
@@ -371,6 +402,15 @@ async function setupStudioEvents() {
     const gitPushStagingBtn = document.getElementById('gitPushStagingBtn');
     if (gitPushStagingBtn) {
         gitPushStagingBtn.addEventListener('click', () => syncStudioToGitHub());
+    }
+
+    // Modal Close
+    const closeSuccessBtn = document.getElementById('closeSuccessModalBtn');
+    const syncModal = document.getElementById('syncSuccessModal');
+    if (closeSuccessBtn && syncModal) {
+        closeSuccessBtn.addEventListener('click', () => {
+            syncModal.style.display = 'none';
+        });
     }
 
     // Download ZIP
@@ -923,17 +963,26 @@ function discardDraftChanges() {
 // 7. 1-CLICK DIRECT GITHUB API AUTO-SYNC (ZERO-EGRESS)
 // =======================================================
 async function syncStudioToGitHub() {
+    if (isSyncInProgress) {
+        console.warn("Sync already in progress. Ignoring duplicate click.");
+        return;
+    }
+
     if (!studioPageImages || !studioPageImages.length) {
         alert("पुश करने के लिए कोई WebP पेज उपलब्ध नहीं हैं।\nकृपया पहले 'Upload Pages' या 'Upload Direct PDF' से पेज लोड करें।");
         return;
     }
 
     const total = studioPageImages.length;
-    const isConfirmed = confirm(`🚀 क्या आप पुस्तक [${studioCurrentBookId}] के सभी ${total} पेज (WebP) और ऑडियो स्क्रिप्ट सीधे GitHub पर 1-Click में लाइव पुश करना चाहते हैं?\n\n- सभी पेज 'images/books/${studioCurrentBookId}/' में सुरक्षित सेव होंगे\n- ऑडियो स्क्रिप्ट 'data/audio-scripts/${studioCurrentBookId}.json' में सेव होगी\n- कोई मैन्युअल फोल्डर बनाने की आवश्यकता नहीं है!`);
+    const isConfirmed = confirm(`🚀 क्या आप पुस्तक [${studioCurrentBookId}] के सभी ${total} पेज (WebP) और ऑडियो स्क्रिप्ट सीधे GitHub पर 1-Click में लाइव पुश करना चाहते हैं?\n\n- सभी पेज 'images/books/${studioCurrentBookId}/' में सुरक्षित सेव होंगे\n- ऑडियो स्क्रिप्ट 'data/audio-scripts/${studioCurrentBookId}.json' में सेव होगी\n- कोई डुप्लीकेट फाइल या मैन्युअल फोल्डर बनाने की आवश्यकता नहीं है!`);
     if (!isConfirmed) return;
+
+    isSyncInProgress = true;
 
     const gitSyncBtn = document.getElementById('gitAutoSyncBtn');
     const gitPushStagingBtn = document.getElementById('gitPushStagingBtn');
+    const triggerBulkBtn = document.getElementById('triggerBulkUploadBtn');
+    const triggerPdfBtn = document.getElementById('triggerDirectPdfBtn');
     const progressSection = document.getElementById('uploadProgressSection');
     const progressLabel = document.getElementById('progressStatusLabel');
     const sizeLabel = document.getElementById('progressSizeLabel');
@@ -948,8 +997,13 @@ async function syncStudioToGitHub() {
         gitPushStagingBtn.disabled = true;
         gitPushStagingBtn.innerHTML = `<span>⏳</span> Git Push...`;
     }
+    if (triggerBulkBtn) triggerBulkBtn.disabled = true;
+    if (triggerPdfBtn) triggerPdfBtn.disabled = true;
 
-    if (progressSection) progressSection.style.display = 'block';
+    if (progressSection) {
+        progressSection.style.display = 'block';
+        progressSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
     let uploadedCount = 0;
     let totalBytes = 0;
@@ -1053,12 +1107,29 @@ async function syncStudioToGitHub() {
         if (fillBar) fillBar.style.width = `100%`;
         if (progressLabel) progressLabel.textContent = `🎉 पुस्तक [${studioCurrentBookId}] के सभी ${total} पेज Git पर 100% सफलतापूर्वक लाइव हो गए!`;
 
-        alert(`🎉 बधाई हो!\n\nपुस्तक [${studioCurrentBookId}] के सभी ${total} पेज और ऑडियो स्क्रिप्ट GitHub API से 1-Click में सफलतापूर्वक पुश हो गए हैं!\n\n📁 पाथ: images/books/${studioCurrentBookId}/1.webp से ${total}.webp\n📄 स्क्रिप्ट: data/audio-scripts/${studioCurrentBookId}.json\n\nअब दुनिया के किसी भी मोबाइल/कंप्यूटर में यह बुक 0.1 सेकंड में सुपरफास्ट लाइव खुलेगी!`);
+        // Display Rich Celebration Modal
+        const modal = document.getElementById('syncSuccessModal');
+        if (modal) {
+            const bIdEl = document.getElementById('successModalBookId');
+            const pagesEl = document.getElementById('successModalPages');
+            const sizeEl = document.getElementById('successModalSize');
+            const pathEl = document.getElementById('successModalPath');
+            const linkEl = document.getElementById('successModalReaderLink');
+
+            if (bIdEl) bIdEl.textContent = studioCurrentBookId;
+            if (pagesEl) pagesEl.textContent = `${total} Pages (HD WebP)`;
+            if (sizeEl) sizeEl.textContent = `${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
+            if (pathEl) pathEl.textContent = `images/books/${studioCurrentBookId}/1.webp - ${total}.webp`;
+            if (linkEl) linkEl.href = `../ebooks/reader.html?book=${studioCurrentBookId}`;
+
+            modal.style.display = 'flex';
+        }
 
     } catch (netErr) {
         console.error("Auto Sync Error:", netErr);
         alert(`❌ Git Auto-Sync में त्रुटि:\n${netErr.message || 'नेटवर्क कनेक्शन जांचें'}`);
     } finally {
+        isSyncInProgress = false;
         if (gitSyncBtn) {
             gitSyncBtn.disabled = false;
             gitSyncBtn.innerHTML = origText;
@@ -1067,6 +1138,8 @@ async function syncStudioToGitHub() {
             gitPushStagingBtn.disabled = false;
             gitPushStagingBtn.innerHTML = `🚀 1-Click Push to Git`;
         }
+        if (triggerBulkBtn) triggerBulkBtn.disabled = false;
+        if (triggerPdfBtn) triggerPdfBtn.disabled = false;
     }
 }
 
