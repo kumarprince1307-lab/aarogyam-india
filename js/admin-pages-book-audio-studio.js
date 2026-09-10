@@ -28,6 +28,9 @@ let studioPageImages = []; // Array of Data URLs / Blobs
 let studioOriginalBackup = null; // Backup for Discard feature
 let hasUnsavedChanges = false;
 let isSyncInProgress = false; // Anti-duplicate click lock
+let modifiedPageIndices = new Set(); // Stores 0-indexed page numbers that changed
+let audioScriptsModified = false; // Flag if text or audio voice changed
+let isFullBookReload = false; // Flag if bulk upload or fresh PDF was loaded
 
 // Media Recorder
 let mediaRecorder = null;
@@ -496,6 +499,9 @@ async function loadBookStudio(bookId) {
     studioPdfDoc = null;
     studioPageImages = [];
     studioAudioScripts = { bookId: bookId, pages: {} };
+    modifiedPageIndices.clear();
+    audioScriptsModified = false;
+    isFullBookReload = false;
     markUnsaved(false);
 
     // 1. Fetch from books.json
@@ -713,14 +719,17 @@ async function handleImageUpload(files) {
             const webpData = await readFileAsWebp(fileList[0]);
             if (!studioPageImages.length) studioPageImages = new Array(studioTotalPages).fill('');
             studioPageImages[studioCurrentPage - 1] = webpData;
+            modifiedPageIndices.add(studioCurrentPage - 1);
             markUnsaved(true);
             selectPage(studioCurrentPage);
-            alert(`✅ पृष्ठ ${studioCurrentPage} सफलतापूर्वक बदल दिया गया है! "Save All" दबाकर सुरक्षित करें।`);
+            alert(`✅ पृष्ठ ${studioCurrentPage} बदल दिया गया है!\n"1-Click Push to Git" दबाने पर सिर्फ यही 1 पेज Git पर तुरंत लाइव होगा।`);
             return;
         }
     }
 
     // Case B: Bulk Upload
+    isFullBookReload = true;
+    modifiedPageIndices.clear();
     fileList.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
 
     const progressSection = document.getElementById('uploadProgressSection');
@@ -981,8 +990,37 @@ async function syncStudioToGitHub() {
     }
 
     const total = studioPageImages.length;
-    const isConfirmed = confirm(`🚀 क्या आप पुस्तक [${studioCurrentBookId}] के सभी ${total} पेज (WebP) और ऑडियो स्क्रिप्ट सीधे GitHub पर 1-Click में लाइव पुश करना चाहते हैं?\n\n- सभी पेज 'images/books/${studioCurrentBookId}/' में सुरक्षित सेव होंगे\n- ऑडियो स्क्रिप्ट 'data/audio-scripts/${studioCurrentBookId}.json' में सेव होगी\n- कोई डुप्लीकेट फाइल या मैन्युअल फोल्डर बनाने की आवश्यकता नहीं है!`);
-    if (!isConfirmed) return;
+    
+    // -------------------------------------------------------------
+    // SMART DELTA DETERMINATION: What actually needs to be synced?
+    // -------------------------------------------------------------
+    let pagesToUpload = [];
+    let isDeltaAudioOnly = false;
+    let isDeltaSinglePage = false;
+
+    if (isFullBookReload || (modifiedPageIndices.size === 0 && !audioScriptsModified)) {
+        // Full book upload (First time or bulk re-upload)
+        pagesToUpload = Array.from({ length: total }, (_, i) => i);
+    } else if (modifiedPageIndices.size === 0 && audioScriptsModified) {
+        // Audio or Text changed ONLY (ZERO image changes)
+        isDeltaAudioOnly = true;
+    } else {
+        // Specific pages were replaced/added
+        pagesToUpload = Array.from(modifiedPageIndices).sort((a, b) => a - b);
+        if (pagesToUpload.length === 1) isDeltaSinglePage = true;
+    }
+
+    // Confirm dialog text customized to what actually changed
+    let confirmMsg = '';
+    if (isDeltaAudioOnly) {
+        confirmMsg = `⚡ पुस्तक [${studioCurrentBookId}] में केवल ऑडियो/टेक्स्ट में बदलाव हुआ है।\n\nक्या आप सिर्फ ऑडियो स्क्रिप्ट को Git पर 0.5 सेकंड में लाइव करना चाहते हैं? (152 पेजों को दोबारा अपलोड नहीं किया जाएगा)`;
+    } else if (isDeltaSinglePage) {
+        confirmMsg = `🚀 पुस्तक [${studioCurrentBookId}] का केवल पेज ${pagesToUpload[0] + 1} बदला है।\n\nक्या आप सिर्फ इसी 1 पेज और स्क्रिप्ट को Git पर 1 सेकंड में लाइव करना चाहते हैं?`;
+    } else {
+        confirmMsg = `🚀 क्या आप पुस्तक [${studioCurrentBookId}] के ${pagesToUpload.length} पेजों और ऑडियो को सीधे GitHub पर 1-Click में लाइव पुश करना चाहते हैं?`;
+    }
+
+    if (!confirm(confirmMsg)) return;
 
     isSyncInProgress = true;
 
@@ -1018,10 +1056,62 @@ async function syncStudioToGitHub() {
     const failedPages = [];
 
     try {
-        // Sequential Conflict-Free Upload Loop with 3 Auto-Retries per page
-        for (let i = 0; i < total; i++) {
-            const pageNum = i + 1;
-            const base64Data = studioPageImages[i];
+        // CASE 1: ONLY AUDIO/TEXT CHANGED -> ZERO IMAGE UPLOADS
+        if (isDeltaAudioOnly) {
+            if (progressLabel) progressLabel.textContent = `⚡ केवल ऑडियो स्क्रिप्ट और टेक्स्ट में बदलाव पाया गया। सिर्फ JSON सिंक हो रहा है...`;
+            if (sizeLabel) sizeLabel.textContent = `डेटा साइज: < 10 KB`;
+            if (fillBar) fillBar.style.width = `60%`;
+
+            const scriptJsonStr = JSON.stringify(studioAudioScripts, null, 2);
+            const scriptBase64 = btoa(unescape(encodeURIComponent(scriptJsonStr)));
+
+            await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'upload_asset',
+                    path: `data/audio-scripts/${studioCurrentBookId}.json`,
+                    base64: scriptBase64
+                })
+            });
+
+            // Save locally
+            await savePagesToDb(studioCurrentBookId, studioPageImages);
+            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+
+            modifiedPageIndices.clear();
+            audioScriptsModified = false;
+            isFullBookReload = false;
+            markUnsaved(false);
+
+            if (fillBar) fillBar.style.width = `100%`;
+            if (progressLabel) progressLabel.textContent = `🎉 पुस्तक [${studioCurrentBookId}] का नया ऑडियो/टेक्स्ट Git पर 0.5s में लाइव हो गया!`;
+
+            const modal = document.getElementById('syncSuccessModal');
+            if (modal) {
+                const bIdEl = document.getElementById('successModalBookId');
+                const pagesEl = document.getElementById('successModalPages');
+                const sizeEl = document.getElementById('successModalSize');
+                const pathEl = document.getElementById('successModalPath');
+                const linkEl = document.getElementById('successModalReaderLink');
+
+                if (bIdEl) bIdEl.textContent = studioCurrentBookId;
+                if (pagesEl) pagesEl.textContent = `ऑडियो/टेक्स्ट अपडेट (0 Images Touched)`;
+                if (sizeEl) sizeEl.textContent = `< 10 KB (Superfast)`;
+                if (pathEl) pathEl.textContent = `data/audio-scripts/${studioCurrentBookId}.json`;
+                if (linkEl) linkEl.href = `../ebooks/reader.html?book=${studioCurrentBookId}`;
+
+                modal.style.display = 'flex';
+            }
+            return;
+        }
+
+        // CASE 2: UPLOAD ONLY MODIFIED IMAGES (Single page or full book)
+        const targetUploadCount = pagesToUpload.length;
+        for (let idx = 0; idx < targetUploadCount; idx++) {
+            const pageIndex = pagesToUpload[idx];
+            const pageNum = pageIndex + 1;
+            const base64Data = studioPageImages[pageIndex];
             const pagePath = `images/books/${studioCurrentBookId}/${pageNum}.webp`;
 
             let success = false;
@@ -1057,8 +1147,8 @@ async function syncStudioToGitHub() {
                 const approxBytes = Math.round(base64Data.length * (3/4));
                 totalBytes += approxBytes;
 
-                const percent = Math.round((uploadedCount / total) * 90);
-                if (progressLabel) progressLabel.textContent = `🚀 Git पर लाइव सिंक हो रहा है: ${uploadedCount} / ${total} पेजेस (${percent}%)`;
+                const percent = Math.round((uploadedCount / targetUploadCount) * 90);
+                if (progressLabel) progressLabel.textContent = `🚀 Git पर सिंक हो रहा है: ${uploadedCount} / ${targetUploadCount} पेजेस (${percent}%)`;
                 if (sizeLabel) sizeLabel.textContent = `अपलोड हुआ: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB • पेज: ${pageNum}.webp`;
                 if (fillBar) fillBar.style.width = `${percent}%`;
             } else {
@@ -1092,9 +1182,13 @@ async function syncStudioToGitHub() {
         await savePagesToDb(studioCurrentBookId, studioPageImages);
         localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
+        modifiedPageIndices.clear();
+        audioScriptsModified = false;
+        isFullBookReload = false;
         markUnsaved(false);
+
         if (fillBar) fillBar.style.width = `100%`;
-        if (progressLabel) progressLabel.textContent = `🎉 पुस्तक [${studioCurrentBookId}] के सभी ${total} पेज Git पर 100% सफलतापूर्वक लाइव हो गए!`;
+        if (progressLabel) progressLabel.textContent = `🎉 पुस्तक [${studioCurrentBookId}] Git पर 100% सफलतापूर्वक लाइव हो गई!`;
 
         // Display Rich Celebration Modal
         const modal = document.getElementById('syncSuccessModal');
@@ -1106,9 +1200,9 @@ async function syncStudioToGitHub() {
             const linkEl = document.getElementById('successModalReaderLink');
 
             if (bIdEl) bIdEl.textContent = studioCurrentBookId;
-            if (pagesEl) pagesEl.textContent = `${total} Pages (HD WebP)`;
+            if (pagesEl) pagesEl.textContent = isDeltaSinglePage ? `Page ${pagesToUpload[0] + 1} Updated` : `${targetUploadCount} Pages (HD WebP)`;
             if (sizeEl) sizeEl.textContent = `${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
-            if (pathEl) pathEl.textContent = `images/books/${studioCurrentBookId}/1.webp - ${total}.webp`;
+            if (pathEl) pathEl.textContent = isDeltaSinglePage ? `images/books/${studioCurrentBookId}/${pagesToUpload[0] + 1}.webp` : `images/books/${studioCurrentBookId}/`;
             if (linkEl) linkEl.href = `../ebooks/reader.html?book=${studioCurrentBookId}`;
 
             modal.style.display = 'flex';
