@@ -959,6 +959,13 @@ function discardDraftChanges() {
     alert("↩️ सभी बदलाव रद्द कर दिए गए हैं। पिछला सेव किया हुआ डेटा लोड हो गया है।");
 }
 
+function getAutoSyncApiUrl() {
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+        return 'https://aarogyamindia.online/api/auto-sync-book';
+    }
+    return '/api/auto-sync-book';
+}
+
 // =======================================================
 // 7. 1-CLICK DIRECT GITHUB API AUTO-SYNC (ZERO-EGRESS)
 // =======================================================
@@ -987,6 +994,7 @@ async function syncStudioToGitHub() {
     const progressLabel = document.getElementById('progressStatusLabel');
     const sizeLabel = document.getElementById('progressSizeLabel');
     const fillBar = document.getElementById('progressFillBar');
+    const apiUrl = getAutoSyncApiUrl();
 
     const origText = gitSyncBtn ? gitSyncBtn.innerHTML : '';
     if (gitSyncBtn) {
@@ -1007,16 +1015,11 @@ async function syncStudioToGitHub() {
 
     let uploadedCount = 0;
     let totalBytes = 0;
-    const treeItems = new Array(total);
     const failedPages = [];
 
-    // Concurrency Worker Pool for Git Blobs (Fast & Conflict-Free)
-    const concurrency = 4;
-    const pageIndices = Array.from({ length: total }, (_, i) => i);
-
-    async function uploadWorker() {
-        while (pageIndices.length > 0) {
-            const i = pageIndices.shift();
+    try {
+        // Sequential Conflict-Free Upload Loop with 3 Auto-Retries per page
+        for (let i = 0; i < total; i++) {
             const pageNum = i + 1;
             const base64Data = studioPageImages[i];
             const pagePath = `images/books/${studioCurrentBookId}/${pageNum}.webp`;
@@ -1024,22 +1027,17 @@ async function syncStudioToGitHub() {
             let success = false;
             for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
-                    const res = await fetch('/api/auto-sync-book', {
+                    const res = await fetch(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            action: 'create_blob',
+                            action: 'upload_asset',
+                            path: pagePath,
                             base64: base64Data
                         })
                     });
                     const data = await res.json().catch(() => ({}));
-                    if (res.ok && data.success && data.sha) {
-                        treeItems[i] = {
-                            path: pagePath,
-                            sha: data.sha,
-                            mode: '100644',
-                            type: 'blob'
-                        };
+                    if (res.ok && data.success) {
                         success = true;
                         break;
                     } else {
@@ -1047,7 +1045,7 @@ async function syncStudioToGitHub() {
                     }
                 } catch (err) {
                     if (attempt === 3) {
-                        console.error(`Page ${pageNum} failed after 3 attempts:`, err);
+                        console.error(`Page ${pageNum} upload failed:`, err);
                     } else {
                         await new Promise(r => setTimeout(r, 300 * attempt));
                     }
@@ -1059,45 +1057,36 @@ async function syncStudioToGitHub() {
                 const approxBytes = Math.round(base64Data.length * (3/4));
                 totalBytes += approxBytes;
 
-                const percent = Math.round((uploadedCount / total) * 85);
-                if (progressLabel) progressLabel.textContent = `🚀 Git Blobs तैयार हो रहे हैं: ${uploadedCount} / ${total} पेजेस (${percent}%)`;
-                if (sizeLabel) sizeLabel.textContent = `तैयार हुआ: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB • पेज: ${pageNum}.webp`;
+                const percent = Math.round((uploadedCount / total) * 90);
+                if (progressLabel) progressLabel.textContent = `🚀 Git पर लाइव सिंक हो रहा है: ${uploadedCount} / ${total} पेजेस (${percent}%)`;
+                if (sizeLabel) sizeLabel.textContent = `अपलोड हुआ: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB • पेज: ${pageNum}.webp`;
                 if (fillBar) fillBar.style.width = `${percent}%`;
             } else {
                 failedPages.push(pageNum);
             }
         }
-    }
-
-    try {
-        const workers = Array.from({ length: Math.min(concurrency, total) }, () => uploadWorker());
-        await Promise.all(workers);
 
         if (failedPages.length > 0) {
             alert(`⚠️ कुछ पेजों (${failedPages.join(', ')}) को अपलोड करने में समस्या आई। कृपया दोबारा पुश दबाएं।`);
             return;
         }
 
-        // Final Step: Atomic Git Commit of all 150+ Blobs + Audio Scripts + books.json
-        if (progressLabel) progressLabel.textContent = `⏳ GitHub पर 1-Click में कमिट और डिप्लॉय हो रहा है...`;
-        if (fillBar) fillBar.style.width = `92%`;
+        // Final Step: Commit data/audio-scripts/{bookId}.json
+        if (progressLabel) progressLabel.textContent = `⏳ ऑडियो स्क्रिप्ट Git पर सुरक्षित हो रहा है...`;
+        if (fillBar) fillBar.style.width = `95%`;
 
-        const commitRes = await fetch('/api/auto-sync-book', {
+        const scriptJsonStr = JSON.stringify(studioAudioScripts, null, 2);
+        const scriptBase64 = btoa(unescape(encodeURIComponent(scriptJsonStr)));
+
+        await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                action: 'commit_studio_tree',
-                bookId: studioCurrentBookId,
-                totalPages: total,
-                audioScripts: studioAudioScripts,
-                tree: treeItems
+                action: 'upload_asset',
+                path: `data/audio-scripts/${studioCurrentBookId}.json`,
+                base64: scriptBase64
             })
         });
-
-        const commitData = await commitRes.json().catch(() => ({}));
-        if (!commitRes.ok || !commitData.success) {
-            throw new Error(commitData.error || `Commit Failed (HTTP ${commitRes.status})`);
-        }
 
         // Save locally to IndexedDB & localStorage
         await savePagesToDb(studioCurrentBookId, studioPageImages);
