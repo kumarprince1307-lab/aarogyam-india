@@ -1,14 +1,115 @@
 /**
  * =================================================================
- * AAROGYAM INDIA - PRO HYBRID AUDIO BOOK ENGINE v3.1 (OPTIMIZED)
+ * AAROGYAM INDIA - PRO HYBRID AUDIO BOOK ENGINE v3.2 (ROCK SOLID)
  * =================================================================
- * Fixes:
- * - Clean User Name Extraction (Never speaks phone number digits)
- * - Guaranteed Welcome Greeting Audio Trigger
- * - Crystal Clear Natural Voices (Zero Trembling/Shaking)
- * - Distinct Deep Male vs Natural Sweet Female Pitch Modulation
- * - Polite Notice on Unrecorded Pages + Auto Advance
+ * 1. Admin Recorded Audio: Plays real recorded human voice directly
+ * 2. Text Script: Plays crisp Natural Female TTS or Warm Male TTS
+ * 3. Soothing Ambient BGM: Zero-Egress Web Audio Indian Ambient Pad
+ * 4. Welcome Audio: Greets user by name from profile
+ * 5. Unrecorded Pages: Polite audio notice + auto page turn
  */
+
+class SoothingBgmEngine {
+    constructor() {
+        this.ctx = null;
+        this.isPlaying = false;
+        this.gainNode = null;
+        this.oscillators = [];
+        this.volume = 0.12; // Audible and soothing ambient background
+        this.isMuted = false;
+    }
+
+    initContext() {
+        if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
+    }
+
+    start() {
+        if (this.isMuted) return;
+        try {
+            this.initContext();
+            if (!this.ctx) return;
+            if (this.isPlaying) return;
+
+            // Master BGM Gain
+            this.gainNode = this.ctx.createGain();
+            this.gainNode.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+            this.gainNode.connect(this.ctx.destination);
+
+            // Rich Meditative Indian Ambient Tanpura & Flute Drone (Sa-Pa-Sa: C3, G3, C4, G4, C5)
+            const freqs = [130.81, 196.00, 261.63, 392.00, 523.25];
+            this.oscillators = freqs.map((f, i) => {
+                const osc = this.ctx.createOscillator();
+                osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+                osc.frequency.setValueAtTime(f, this.ctx.currentTime);
+
+                // Gentle acoustic warmth filter
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(450 + (i * 50), this.ctx.currentTime);
+
+                // Subtle individual gain for balanced blend
+                const oscGain = this.ctx.createGain();
+                const branchVol = i === 0 ? 0.35 : (i === 1 ? 0.25 : 0.15);
+                oscGain.gain.setValueAtTime(branchVol, this.ctx.currentTime);
+
+                osc.connect(filter);
+                filter.connect(oscGain);
+                oscGain.connect(this.gainNode);
+                osc.start();
+                return osc;
+            });
+
+            this.isPlaying = true;
+            this.updateBgmUi();
+        } catch (e) {
+            console.warn("BGM start notice:", e);
+        }
+    }
+
+    stop() {
+        if (!this.isPlaying) return;
+        try {
+            this.oscillators.forEach(osc => {
+                try { osc.stop(); osc.disconnect(); } catch (e) {}
+            });
+            this.oscillators = [];
+            this.isPlaying = false;
+            this.updateBgmUi();
+        } catch (e) {}
+    }
+
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.isMuted) {
+            this.stop();
+        } else {
+            this.start();
+        }
+        this.updateBgmUi();
+        return !this.isMuted;
+    }
+
+    updateBgmUi() {
+        const btn = document.getElementById('abBgmToggleBtn');
+        if (btn) {
+            if (this.isPlaying && !this.isMuted) {
+                btn.classList.add('bgm-active');
+                btn.style.opacity = '1';
+                btn.title = 'BGM चालू है (क्लिक करके बंद करें)';
+            } else {
+                btn.classList.remove('bgm-active');
+                btn.style.opacity = '0.4';
+                btn.title = 'BGM बंद है (क्लिक करके चालू करें)';
+            }
+        }
+    }
+}
 
 class ProAudioBookEngine {
     constructor() {
@@ -16,18 +117,19 @@ class ProAudioBookEngine {
         this.voices = [];
         this.maleVoice = null;
         this.femaleVoice = null;
-        this.activeGender = 'male'; // 'male' | 'female'
+        this.activeGender = 'female'; // Default to female (cleanest Hindi TTS)
         this.isPlaying = false;
         this.isPaused = false;
         this.playbackRate = 1.0;
         this.currentUtterance = null;
         this.audioElement = new Audio();
-        this.bgmAudioElement = new Audio();
+        this.bgm = new SoothingBgmEngine();
         this.autoNextPage = true;
         this.pageScripts = {};
         this.metadata = {};
         this.userName = "किसान मित्र";
         this.welcomePlayed = false;
+        this.isPageRecordedAudio = false;
 
         this.init();
     }
@@ -40,10 +142,10 @@ class ProAudioBookEngine {
                 speechSynthesis.onvoiceschanged = () => this.loadVoices();
             }
         }
-        this.setupAudioElements();
+        this.setupAudioElement();
         this.injectUI();
         await this.loadBookAudioScripts();
-        console.log("✅ Pro AudioBookEngine v3.1 Ready for:", this.userName);
+        console.log("✅ Pro AudioBookEngine v3.3 Initialized for:", this.userName);
     }
 
     getUserProfileName() {
@@ -55,7 +157,7 @@ class ProAudioBookEngine {
             
             if (user) {
                 let name = (user.name || user.fullName || user.first_name || "").trim();
-                // If name is missing or contains phone number digits, speak polite respectful title
+                // If name has digits or is missing, use respectful title
                 if (!name || /\d/.test(name) || name.length < 2) {
                     this.userName = "किसान मित्र";
                 } else {
@@ -72,20 +174,28 @@ class ProAudioBookEngine {
     loadVoices() {
         if (!this.synth) return;
         this.voices = this.synth.getVoices() || [];
-        
-        // 1. Clean Female Voice (Kalpana / Google Hindi Female / Natural)
-        this.femaleVoice = this.voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')) && (v.name.toLowerCase().includes('kalpana') || v.name.toLowerCase().includes('google') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira')))
-            || this.voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')))
-            || this.voices.find(v => v.lang && v.lang.startsWith('en-IN'))
-            || this.voices[0] || null;
+        if (!this.voices.length) return;
 
-        // 2. Male Voice (Hemant / David / Ravi / Masculine)
-        this.maleVoice = this.voices.find(v => (v.name.toLowerCase().includes('hemant') || v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('ravi') || v.name.toLowerCase().includes('mark')))
-            || this.voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')))
-            || this.femaleVoice;
+        // Hindi voices pool
+        const hindiVoices = this.voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
+        
+        // 1. Female Voice Search: Kalpana, Swara, Heera, Google हिन्दी, Zira
+        this.femaleVoice = hindiVoices.find(v => {
+            const name = v.name.toLowerCase();
+            return name.includes('kalpana') || name.includes('swara') || name.includes('heera') || name.includes('female') || name.includes('google') || name.includes('zira');
+        }) || hindiVoices[0] || this.voices.find(v => v.lang && v.lang.startsWith('en-IN')) || this.voices[0];
+
+        // 2. Male Voice Search: Hemant, Madhur, Ravi, David, Mark, Prabhat, Male
+        this.maleVoice = hindiVoices.find(v => {
+            const name = v.name.toLowerCase();
+            return name.includes('hemant') || name.includes('madhur') || name.includes('ravi') || name.includes('prabhat') || name.includes('male');
+        }) || this.voices.find(v => {
+            const name = v.name.toLowerCase();
+            return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('mark');
+        }) || (hindiVoices.length > 1 ? hindiVoices[1] : hindiVoices[0]) || this.femaleVoice;
     }
 
-    setupAudioElements() {
+    setupAudioElement() {
         this.audioElement.preload = 'metadata';
         this.audioElement.addEventListener('ended', () => {
             this.setPlayingState(false);
@@ -98,9 +208,6 @@ class ProAudioBookEngine {
         });
         this.audioElement.addEventListener('play', () => this.setPlayingState(true));
         this.audioElement.addEventListener('pause', () => this.setPlayingState(false));
-
-        this.bgmAudioElement.loop = true;
-        this.bgmAudioElement.volume = 0.12;
     }
 
     async loadBookAudioScripts() {
@@ -137,13 +244,29 @@ class ProAudioBookEngine {
     updateNarratorDisplay() {
         const nameEl = document.getElementById('abNarratorName');
         const avatarEl = document.getElementById('abNarratorAvatar');
-        
+        const genderToggle = document.querySelector('.ab-gender-toggle');
+
+        if (this.isPageRecordedAudio) {
+            if (nameEl) nameEl.textContent = 'आपकी मूल आवाज़ (Admin Voice)';
+            if (avatarEl) avatarEl.src = '/images/logo/logo.png';
+            if (genderToggle) {
+                genderToggle.style.opacity = '0.5';
+                genderToggle.title = 'यह पेज आपकी अपनी रिकॉर्ड की गई आवाज़ में है';
+            }
+            return;
+        }
+
+        if (genderToggle) {
+            genderToggle.style.opacity = '1';
+            genderToggle.title = 'आवाज़ का चयन करें (महिला / पुरुष)';
+        }
+
         if (this.activeGender === 'male') {
-            const male = this.metadata.maleNarrator || { name: 'दादा अविनाश', avatar: '/images/logo/logo.png' };
+            const male = this.metadata.maleNarrator || { name: 'दादा अविनाश (पुरुष स्वर)', avatar: '/images/logo/logo.png' };
             if (nameEl) nameEl.textContent = male.name;
             if (avatarEl) avatarEl.src = male.avatar;
         } else {
-            const female = this.metadata.femaleNarrator || { name: 'कृषि सखी', avatar: '/images/logo/fevicon.png' };
+            const female = this.metadata.femaleNarrator || { name: 'कृषि सखी (महिला स्वर)', avatar: '/images/logo/fevicon.png' };
             if (nameEl) nameEl.textContent = female.name;
             if (avatarEl) avatarEl.src = female.avatar;
         }
@@ -165,7 +288,7 @@ class ProAudioBookEngine {
             }
         }
 
-        if (this.isPlaying) {
+        if (this.isPlaying && !this.isPageRecordedAudio) {
             this.playCurrentPage();
         }
     }
@@ -177,10 +300,13 @@ class ProAudioBookEngine {
         const currentPage = window.aoiPageNum || 1;
         this.getUserProfileName();
 
-        // 1. Play Welcome Greeting Once on First Play
+        // Start Soothing BGM in background
+        this.bgm.start();
+
+        // 1. Play Welcome Greeting Once on First Start
         if (!this.welcomePlayed) {
             this.welcomePlayed = true;
-            this.stop();
+            this.stopAudioSources();
             const welcomeText = `${this.userName} जी, आरोग्यम इंडिया डिजिटल लाइब्रेरी में आपका हार्दिक स्वागत है। आइए अध्ययन शुरू करते हैं।`;
             this.updateStatusDisplay(`🌸 ${this.userName} जी, स्वागत है!`);
             this.speakText(welcomeText, currentPage, true);
@@ -194,9 +320,9 @@ class ProAudioBookEngine {
             return;
         }
 
-        this.stop(); // Stop previous audio
+        this.stopAudioSources();
 
-        // 2. Lookup Page Script or Recorded Audio
+        // 2. Check Page Script or Recorded Audio
         const pageKey = String(currentPage);
         const pageEntry = this.pageScripts[pageKey];
 
@@ -211,19 +337,27 @@ class ProAudioBookEngine {
             }
         }
 
-        // Case A: Admin Recorded Audio exists
+        // Case A: Real Admin Recorded Audio exists (Plays original human voice directly)
         if (pageAudio && pageAudio.trim().length > 0) {
-            this.updateStatusDisplay(`🎙️ पृष्ठ ${currentPage} - रिकॉर्डेड आवाज़`);
+            this.isPageRecordedAudio = true;
+            this.updateNarratorDisplay();
+            this.updateStatusDisplay(`🎙️ पृष्ठ ${currentPage} - रिकॉर्डेड आवाज़ चल रही है`);
             this.audioElement.src = pageAudio;
             this.audioElement.playbackRate = this.playbackRate;
-            this.audioElement.play();
+            this.audioElement.play().catch(e => {
+                console.warn("Audio play gesture required:", e);
+            });
             this.setPlayingState(true);
             return;
         }
 
-        // Case B: Text Script exists
+        this.isPageRecordedAudio = false;
+        this.updateNarratorDisplay();
+
+        // Case B: Text Script exists -> Plays Male or Female TTS
         if (pageText && pageText.trim().length > 0) {
-            this.updateStatusDisplay(`📖 पृष्ठ ${currentPage} सुनाया जा रहा है`);
+            const genderLabel = this.activeGender === 'male' ? 'पुरुष स्वर' : 'महिला स्वर';
+            this.updateStatusDisplay(`📖 पृष्ठ ${currentPage} (${genderLabel}) सुनाया जा रहा है`);
             this.speakText(pageText, currentPage);
             return;
         }
@@ -237,18 +371,21 @@ class ProAudioBookEngine {
     speakText(text, currentPage, isWelcome = false) {
         if (!this.synth) return;
 
-        this.synth.cancel(); // Stop any pending speech
+        this.synth.cancel();
+        this.loadVoices(); // Ensure fresh voice list
+
         this.currentUtterance = new SpeechSynthesisUtterance(text);
         
-        // Voice & Pitch Setting (Clean, Natural & Sweet - No Trembling!)
+        // Accurate Voice & Tone Assignment
         if (this.activeGender === 'female') {
             if (this.femaleVoice) this.currentUtterance.voice = this.femaleVoice;
-            this.currentUtterance.pitch = 1.0; // 100% natural pure pitch (No trembling/shaking!)
-            this.currentUtterance.rate = 0.95 * this.playbackRate; // Sweet, relaxed flow
+            this.currentUtterance.pitch = 1.0; // Clear, crystal natural female tone
+            this.currentUtterance.rate = 0.95 * this.playbackRate;
         } else {
             if (this.maleVoice) this.currentUtterance.voice = this.maleVoice;
-            this.currentUtterance.pitch = 0.85; // Deep, warm, clear masculine tone
-            this.currentUtterance.rate = 0.92 * this.playbackRate;
+            // Warm male tone: if device voice is same, lower pitch slightly for distinct male resonance
+            this.currentUtterance.pitch = 0.84;
+            this.currentUtterance.rate = 0.90 * this.playbackRate;
         }
         
         this.currentUtterance.lang = 'hi-IN';
@@ -260,7 +397,7 @@ class ProAudioBookEngine {
         this.currentUtterance.onend = () => {
             this.setPlayingState(false);
             
-            // If welcome audio finished, immediately transition to reading current page!
+            // If welcome audio finished, immediately start reading the current page
             if (isWelcome) {
                 setTimeout(() => {
                     this.isPlaying = true;
@@ -269,7 +406,7 @@ class ProAudioBookEngine {
                 return;
             }
 
-            // Auto Turn Page on speech completion
+            // Auto Turn Page
             if (this.autoNextPage && window.aoiPageNum < (window.aoiTotalPages || 999)) {
                 if (typeof window.onNextPage === 'function') {
                     window.onNextPage();
@@ -291,6 +428,16 @@ class ProAudioBookEngine {
         this.isPlaying = true;
     }
 
+    stopAudioSources() {
+        if (this.audioElement) {
+            this.audioElement.pause();
+            this.audioElement.currentTime = 0;
+        }
+        if (this.synth) {
+            this.synth.cancel();
+        }
+    }
+
     pause() {
         if (!this.audioElement.paused) {
             this.audioElement.pause();
@@ -304,13 +451,8 @@ class ProAudioBookEngine {
     }
 
     stop() {
-        if (this.audioElement) {
-            this.audioElement.pause();
-            this.audioElement.currentTime = 0;
-        }
-        if (this.synth) {
-            this.synth.cancel();
-        }
+        this.stopAudioSources();
+        this.bgm.stop();
         this.isPaused = false;
         this.setPlayingState(false);
         this.updateStatusDisplay(`⏹️ ऑडियो बंद है`);
@@ -369,10 +511,10 @@ class ProAudioBookEngine {
                 <!-- Narrator Avatar & Info -->
                 <div class="ab-left">
                     <div class="ab-avatar-box" id="abNarratorAvatarBox">
-                        <img id="abNarratorAvatar" src="/images/logo/logo.png" alt="Narrator" class="ab-avatar-img" />
+                        <img id="abNarratorAvatar" src="/images/logo/fevicon.png" alt="Narrator" class="ab-avatar-img" />
                     </div>
                     <div class="ab-info">
-                        <span class="ab-title" id="abNarratorName">दादा अविनाश</span>
+                        <span class="ab-title" id="abNarratorName">कृषि सखी</span>
                         <span class="ab-status" id="abStatusText">तैयार है • "सुनें" दबाएं</span>
                     </div>
                 </div>
@@ -384,13 +526,16 @@ class ProAudioBookEngine {
                     <button class="ab-ctrl-btn" id="abNextBtn" title="अगला पृष्ठ">⏭️</button>
                 </div>
 
-                <!-- Gender Toggle & Speed & Close -->
+                <!-- Gender Toggle & BGM & Speed & Close -->
                 <div class="ab-right">
                     <!-- Male / Female Switcher -->
                     <div class="ab-gender-toggle">
-                        <button id="abGenderMale" class="ab-gender-btn active" title="पुरुष स्वर">👨 पुरुष</button>
-                        <button id="abGenderFemale" class="ab-gender-btn" title="महिला स्वर">👩 महिला</button>
+                        <button id="abGenderFemale" class="ab-gender-btn active" title="महिला स्वर">👩 महिला</button>
+                        <button id="abGenderMale" class="ab-gender-btn" title="पुरुष स्वर">👨 पुरुष</button>
                     </div>
+
+                    <!-- BGM Toggle Button -->
+                    <button id="abBgmToggleBtn" class="ab-ctrl-btn" title="बैकग्राउंड म्यूजिक चालू/बंद" style="width:28px; height:28px; font-size:12px;">🎵</button>
 
                     <select id="abSpeedSelect" class="ab-select" title="गति">
                         <option value="0.75">0.75x</option>
@@ -434,10 +579,17 @@ class ProAudioBookEngine {
         document.getElementById('abSpeedSelect').addEventListener('change', (e) => this.setSpeed(e.target.value));
         document.getElementById('abGenderMale').addEventListener('click', () => this.setGender('male'));
         document.getElementById('abGenderFemale').addEventListener('click', () => this.setGender('female'));
+        
+        document.getElementById('abBgmToggleBtn').addEventListener('click', () => {
+            const active = this.bgm.toggleMute();
+            document.getElementById('abBgmToggleBtn').style.opacity = active ? '1' : '0.4';
+        });
+
         document.getElementById('abCloseBtn').addEventListener('click', () => {
             this.stop();
             bar.classList.remove('open');
         });
+
         floatBtn.addEventListener('click', () => {
             bar.classList.toggle('open');
             if (bar.classList.contains('open') && !this.isPlaying) {
