@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin - Audio Book & Voice Studio (ऑडियो स्टूडियो)</title>
+  
+  <link rel="icon" type="image/png" href="../images/logo/fevicon.png">
+  <link rel="apple-touch-icon" href="../images/logo/fevicon.png">
+  <link rel="manifest" href="admin-manifest.json">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- Security Check -->
+  <script>
+    const adminSession = localStorage.getItem('admin_session');
+    if (!adminSession) {
+      window.location.replace('login.html');
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/admin-panel.css?v=26.0">
+  <link rel="stylesheet" href="../css/admin-components.css?v=26.0">
+  
+  <!-- PDF.js for Live Page Preview in Studio -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    .studio-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 16px;
+    }
+    @media (max-width: 900px) {
+      .studio-container { grid-template-columns: 1fr; }
+    }
+    .studio-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .page-chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 160px;
+      overflow-y: auto;
+      padding: 10px;
+      background: #0f172a;
+      border-radius: 8px;
+      border: 1px solid #334155;
+    }
+    .page-chip {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: #334155;
+      color: #cbd5e1;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .page-chip.active {
+      background: #10b981;
+      color: #fff;
+      font-weight: 700;
+      border-color: #34d399;
+    }
+    .page-chip.has-content {
+      border-color: #10b981;
+      color: #6ee7b7;
+    }
+    .record-ctrl-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      padding: 14px;
+      background: #0f172a;
+      border-radius: 8px;
+    }
+    .rec-btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rec-btn-red {
+      background: #ef4444;
+      color: #fff;
+    }
+    .rec-btn-green {
+      background: #10b981;
+      color: #fff;
+    }
+    .rec-btn-dark {
+      background: #475569;
+      color: #fff;
+    }
+    .audio-wave-live {
+      height: 30px;
+      flex: 1;
+      background: #1e293b;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 11px;
+    }
+    .preview-canvas-box {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    #previewCanvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+  <div id="admin-app" class="admin-app">
+    <div id="sidebar-placeholder"></div>
+    <div id="sidebar-backdrop"></div>
+    <div id="main-area" class="admin-main">
+      <div id="header-placeholder"></div>
+      <div style="height:8px"></div>
+      
+      <div id="page-content" class="admin-container">
+        
+        <!-- Header Controls Bar -->
+        <div class="admin-card" style="margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h2 style="margin:0; font-size:1.3rem; color:#f8fafc;">🎧 eBook Voice & Audio Studio</h2>
+              <p style="margin:4px 0 0; font-size:0.85rem; color:#94a3b8;">
+                पेज-वाइज़ टेक्स्ट टाइप/पेस्ट करें या सीधे माइक से आवाज़ रिकॉर्ड करें।
+              </p>
+            </div>
+            
+            <div style="display:flex; gap:10px; align-items:center;">
+              <label style="font-size:0.85rem; color:#cbd5e1; font-weight:600;">पुस्तक चुनें:</label>
+              <select id="bookSelect" class="admin-input" style="padding:6px 12px; width:220px; font-weight:700;">
+                <option value="BK001">BK001: खरीफ फसल मास्टर गाइड 2026</option>
+                <option value="BK002">BK002: खेती का डॉक्टर</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Global Settings Bar (BGM + Narrator Setup) -->
+        <div class="admin-card" style="margin-bottom: 16px; background:#0f172a;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; align-items:center;">
+            <div>
+              <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:4px;">🎵 बैकग्राउंड म्यूजिक (BGM):</label>
+              <select id="bgmSelect" class="admin-input" style="padding:4px 8px; width:100%;">
+                <option value="flute" selected>बांसुरी संगीत (Soothing Flute)</option>
+                <option value="tanpura">तानपुरा धुन (Meditative Tanpura)</option>
+                <option value="acoustic">शांत गिटार (Acoustic Calm)</option>
+                <option value="none">कोई म्यूजिक नहीं (Mute BGM)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:4px;">👨 पुरुष नरेटर का नाम:</label>
+              <input type="text" id="maleNarratorName" value="दादा अविनाश" class="admin-input" style="padding:4px 8px; width:100%;">
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:4px;">👩 महिला नरेटर का नाम:</label>
+              <input type="text" id="femaleNarratorName" value="कृषि सखी" class="admin-input" style="padding:4px 8px; width:100%;">
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:4px;">💾 ग्लोबल सेटिंग:</label>
+              <button id="saveGlobalBtn" class="rec-btn rec-btn-green" style="padding:6px 14px; width:100%; justify-content:center;">
+                सेव सेटिंग्स
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Page Selector Bar -->
+        <div class="admin-card" style="margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-weight:700; font-size:0.9rem; color:#e2e8f0;">पृष्ठ चुनें (Page Selector):</span>
+            <span id="pageCountStatus" style="font-size:0.8rem; color:#10b981;">1 / 152 Pages</span>
+          </div>
+          <div id="pageChipGrid" class="page-chip-grid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Main Studio Split View -->
+        <div class="studio-container">
+          
+          <!-- LEFT: LIVE PAGE PREVIEW CANVAS -->
+          <div class="studio-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h3 style="margin:0; font-size:1rem; color:#38bdf8;">📄 पेज प्रिव्यू (Page Preview)</h3>
+              <span id="previewPageNumberTag" style="background:#0284c7; color:#fff; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;">Page 1</span>
+            </div>
+            <div class="preview-canvas-box">
+              <canvas id="previewCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- RIGHT: AUDIO & TEXT EDITOR STUDIO -->
+          <div class="studio-card">
+            <h3 style="margin:0 0 12px; font-size:1rem; color:#34d399;">🎙️ पेज वॉइस एवं टेक्स्ट कंट्रोल</h3>
+            
+            <!-- OPTION A: TEXT EDITOR (TTS MODE) -->
+            <div style="margin-bottom: 18px;">
+              <label style="font-weight:700; font-size:0.85rem; color:#e2e8f0; display:block; margin-bottom:6px;">
+                🟢 विकल्प A: इस पेज का हिंदी टेक्स्ट (Type / Paste Text):
+              </label>
+              <textarea id="pageTextInput" rows="6" class="admin-input" style="width:100%; resize:vertical; font-size:0.9rem; line-height:1.5;" placeholder="इस पेज पर लिखा हुआ टेक्स्ट यहाँ पेस्ट करें या टाइप करें..."></textarea>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <button id="testTtsBtn" class="rec-btn rec-btn-dark" style="padding:6px 12px; font-size:12px;">
+                  🔊 टेक्स्ट बोलकर सुनें (TTS Test)
+                </button>
+                <button id="savePageTextBtn" class="rec-btn rec-btn-green" style="padding:6px 14px; font-size:12px;">
+                  💾 टेक्स्ट सेव करें (Save Text)
+                </button>
+              </div>
+            </div>
+
+            <hr style="border:none; border-top:1px solid #334155; margin:16px 0;">
+
+            <!-- OPTION B: LIVE MIC RECORDER -->
+            <div>
+              <label style="font-weight:700; font-size:0.85rem; color:#e2e8f0; display:block; margin-bottom:6px;">
+                🎙️ विकल्प B: सीधे माइक से अपनी आवाज़ रिकॉर्ड करें:
+              </label>
+              <p style="margin:0 0 10px; font-size:0.75rem; color:#94a3b8;">
+                माइक ऑन करें, पेज को देखकर बोलें। यह सीधे 24kbps Opus में कंप्रेस होकर सेव होगा (सिर्फ 15-25 KB per page)।
+              </p>
+
+              <div class="record-ctrl-box">
+                <button id="startRecBtn" class="rec-btn rec-btn-red">
+                  <span>🔴</span> रिकॉर्ड शुरू करें
+                </button>
+                <button id="stopRecBtn" class="rec-btn rec-btn-dark" style="display:none;">
+                  <span>⏹️</span> रोकें (Stop)
+                </button>
+                <div id="recStatusWave" class="audio-wave-live">
+                  माइक तैयार है
+                </div>
+              </div>
+
+              <!-- Audio Playback Preview Box -->
+              <div id="audioPlaybackBox" style="margin-top:12px; display:none; background:#0f172a; padding:12px; border-radius:8px;">
+                <div style="font-size:0.8rem; color:#34d399; font-weight:700; margin-bottom:6px;">रिकॉर्ड की गई ऑडियो:</div>
+                <audio id="recordedAudioPlayer" controls style="width:100%; height:36px;"></audio>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                  <button id="saveRecordedAudioBtn" class="rec-btn rec-btn-green" style="flex:1; justify-content:center;">
+                    💾 यह ऑडियो सेव करें
+                  </button>
+                  <button id="deleteRecordedAudioBtn" class="rec-btn rec-btn-red" style="padding:6px 12px;">
+                    🗑️ डिलीट
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <footer id="admin-footer" class="admin-card" style="margin:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>© 2026 Aarogyam India</div>
+          <div class="admin-muted">eBook Voice & Audio Studio — Pro Edition</div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="../js/admin-main.js?v=26.0"></script>
+  <script src="../js/admin-audio-studio.js"></script>
+</body>
+</html>

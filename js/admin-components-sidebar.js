@@ -12,6 +12,7 @@ const MENU = [
   ] },
   { label: 'Books', icon: '📚', children: [ 
     { label: 'Book Landing Pages (बुक पेज)', href: 'book-landing-pages.html', route: 'book-landing-pages' },
+    { label: '🎧 Audio Book Studio (वॉइस रिकॉर्डर)', href: 'book-audio-studio.html', route: 'book-audio-studio' },
     { label: 'Categories', href: '#' },
     { label: 'Books', href: '#' },
     { label: 'Demo Books', href: '#' }
