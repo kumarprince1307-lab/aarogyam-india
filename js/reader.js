@@ -113,7 +113,68 @@ async function verifyUserAccessAndSession(targetBookId) {
         }
     }
 
-    loadPdfFile(aoiCurrentBookData.mainPdf || "pdf/full/" + targetBookId + ".pdf");
+    // Check for WebP / Image Pages first (Smart HD Fast Engine)
+    const localPagesKey = `AOI_BOOK_PAGES_${targetBookId.toUpperCase()}`;
+    const localStudioKey = `AOI_AUDIO_SCRIPTS_${targetBookId.toUpperCase()}`;
+    let pageImages = (aoiCurrentBookData && aoiCurrentBookData.pageImages) ? aoiCurrentBookData.pageImages : null;
+    
+    if (!pageImages || !pageImages.length) {
+        try {
+            const rawPages = localStorage.getItem(localPagesKey);
+            if (rawPages) pageImages = JSON.parse(rawPages);
+            else {
+                const rawStudio = localStorage.getItem(localStudioKey);
+                if (rawStudio) {
+                    const parsedStudio = JSON.parse(rawStudio);
+                    if (parsedStudio && parsedStudio.pageImages && parsedStudio.pageImages.length) {
+                        pageImages = parsedStudio.pageImages;
+                    }
+                }
+            }
+        } catch (e) {}
+    }
+
+    if (pageImages && pageImages.length > 0) {
+        console.log("⚡ Fast HD Image Engine Activated. Total Pages:", pageImages.length);
+        initImageModeReader(pageImages);
+    } else {
+        console.log("📄 Standard PDF Engine Activated for:", targetBookId);
+        loadPdfFile(aoiCurrentBookData.mainPdf || "pdf/full/" + targetBookId + ".pdf");
+    }
+}
+
+// =======================================================
+// FAST HD IMAGE MODE READER (WEBP / PNG / ZERO-CRASH)
+// =======================================================
+let aoiPageImagesList = null;
+
+function initImageModeReader(images) {
+    aoiPageImagesList = images;
+    aoiTotalPages = images.length;
+    window.aoiTotalPages = aoiTotalPages;
+    window.aoiCurrentBookData = aoiCurrentBookData;
+
+    if (pageSlider) pageSlider.max = aoiTotalPages;
+
+    let savedData = JSON.parse(localStorage.getItem("AOI_READ_PROGRESS") || "{}");
+    let savedPage = savedData[aoiBookId] || 1;
+
+    if (savedPage > 1 && savedPage <= aoiTotalPages) {
+        if (lastSavedPageText) lastSavedPageText.textContent = `Page ${savedPage}`;
+        if (continueReadingModal) continueReadingModal.style.display = "flex";
+
+        document.getElementById("confirmContinueBtn").onclick = () => {
+            continueReadingModal.style.display = "none";
+            initReaderAtPage(savedPage);
+        };
+
+        document.getElementById("startAgainBtn").onclick = () => {
+            continueReadingModal.style.display = "none";
+            initReaderAtPage(1);
+        };
+    } else {
+        initReaderAtPage(1);
+    }
 }
 
 // =======================================================
@@ -177,14 +238,47 @@ function loadPdfFile(pdfUrl) {
 
 function initReaderAtPage(startPage) {
     aoiPageNum = startPage;
+    window.aoiPageNum = aoiPageNum;
     renderPage(aoiPageNum);
     if (loadingIndicator) loadingIndicator.style.display = "none";
 }
 
 // =======================================================
-// RENDER SINGLE PAGE (AUTO-FIT RESPONSIVE FIX)
+// RENDER SINGLE PAGE (HYBRID WEBP IMAGE & PDF CANVAS)
 // =======================================================
 function renderPage(num) {
+    const pageImgEl = document.getElementById('pageImage');
+
+    // Case 1: Fast HD WebP Image Mode
+    if (aoiPageImagesList && aoiPageImagesList.length >= num) {
+        if (aoiCanvas) aoiCanvas.style.display = 'none';
+        if (pageImgEl) {
+            pageImgEl.style.display = 'block';
+            pageImgEl.src = aoiPageImagesList[num - 1];
+            pageImgEl.style.transform = `scale(${aoiScale / 1.2})`;
+            pageImgEl.style.transformOrigin = 'center top';
+            pageImgEl.style.transition = 'transform 0.15s ease';
+
+            // Instant Background Preload next/prev pages
+            if (num < aoiTotalPages) {
+                const preloadNext = new Image();
+                preloadNext.src = aoiPageImagesList[num];
+            }
+            if (num > 1) {
+                const preloadPrev = new Image();
+                preloadPrev.src = aoiPageImagesList[num - 2];
+            }
+        }
+        updateUIControls(num);
+        saveProgress(num);
+        return;
+    }
+
+    // Case 2: PDF Mode via PDF.js
+    if (!aoiPdfDoc) return;
+    if (pageImgEl) pageImgEl.style.display = 'none';
+    if (aoiCanvas) aoiCanvas.style.display = 'block';
+
     aoiPageRendering = true;
     
     aoiPdfDoc.getPage(num).then(page => {

@@ -114,10 +114,7 @@ class SoothingBgmEngine {
 class ProAudioBookEngine {
     constructor() {
         this.synth = window.speechSynthesis || null;
-        this.voices = [];
-        this.maleVoice = null;
         this.femaleVoice = null;
-        this.activeGender = 'female'; // Default to female (cleanest Hindi TTS)
         this.isPlaying = false;
         this.isPaused = false;
         this.playbackRate = 1.0;
@@ -145,7 +142,7 @@ class ProAudioBookEngine {
         this.setupAudioElement();
         this.injectUI();
         await this.loadBookAudioScripts();
-        console.log("✅ Pro AudioBookEngine v3.3 Initialized for:", this.userName);
+        console.log("✅ Pro AudioBookEngine v4.0 (Smart Clean Voice) Initialized for:", this.userName);
     }
 
     getUserProfileName() {
@@ -173,26 +170,16 @@ class ProAudioBookEngine {
 
     loadVoices() {
         if (!this.synth) return;
-        this.voices = this.synth.getVoices() || [];
-        if (!this.voices.length) return;
+        const voices = this.synth.getVoices() || [];
+        if (!voices.length) return;
 
-        // Hindi voices pool
-        const hindiVoices = this.voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
+        // Hindi natural female voices pool (Kalpana, Swara, Heera, Google हिन्दी, Zira)
+        const hindiVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
         
-        // 1. Female Voice Search: Kalpana, Swara, Heera, Google हिन्दी, Zira
         this.femaleVoice = hindiVoices.find(v => {
             const name = v.name.toLowerCase();
             return name.includes('kalpana') || name.includes('swara') || name.includes('heera') || name.includes('female') || name.includes('google') || name.includes('zira');
-        }) || hindiVoices[0] || this.voices.find(v => v.lang && v.lang.startsWith('en-IN')) || this.voices[0];
-
-        // 2. Male Voice Search: Hemant, Madhur, Ravi, David, Mark, Prabhat, Male
-        this.maleVoice = hindiVoices.find(v => {
-            const name = v.name.toLowerCase();
-            return name.includes('hemant') || name.includes('madhur') || name.includes('ravi') || name.includes('prabhat') || name.includes('male');
-        }) || this.voices.find(v => {
-            const name = v.name.toLowerCase();
-            return name.includes('male') || name.includes('david') || name.includes('george') || name.includes('mark');
-        }) || (hindiVoices.length > 1 ? hindiVoices[1] : hindiVoices[0]) || this.femaleVoice;
+        }) || hindiVoices[0] || voices.find(v => v.lang && v.lang.startsWith('en-IN')) || voices[0];
     }
 
     setupAudioElement() {
@@ -244,52 +231,14 @@ class ProAudioBookEngine {
     updateNarratorDisplay() {
         const nameEl = document.getElementById('abNarratorName');
         const avatarEl = document.getElementById('abNarratorAvatar');
-        const genderToggle = document.querySelector('.ab-gender-toggle');
 
         if (this.isPageRecordedAudio) {
             if (nameEl) nameEl.textContent = 'आपकी मूल आवाज़ (Admin Voice)';
             if (avatarEl) avatarEl.src = '/images/logo/logo.png';
-            if (genderToggle) {
-                genderToggle.style.opacity = '0.5';
-                genderToggle.title = 'यह पेज आपकी अपनी रिकॉर्ड की गई आवाज़ में है';
-            }
-            return;
-        }
-
-        if (genderToggle) {
-            genderToggle.style.opacity = '1';
-            genderToggle.title = 'आवाज़ का चयन करें (महिला / पुरुष)';
-        }
-
-        if (this.activeGender === 'male') {
-            const male = this.metadata.maleNarrator || { name: 'दादा अविनाश (पुरुष स्वर)', avatar: '/images/logo/logo.png' };
-            if (nameEl) nameEl.textContent = male.name;
-            if (avatarEl) avatarEl.src = male.avatar;
         } else {
-            const female = this.metadata.femaleNarrator || { name: 'कृषि सखी (महिला स्वर)', avatar: '/images/logo/fevicon.png' };
+            const female = this.metadata.femaleNarrator || { name: 'कृषि सखी (आवाज)', avatar: '/images/logo/fevicon.png' };
             if (nameEl) nameEl.textContent = female.name;
             if (avatarEl) avatarEl.src = female.avatar;
-        }
-    }
-
-    setGender(gender) {
-        this.activeGender = gender;
-        this.updateNarratorDisplay();
-        
-        const maleBtn = document.getElementById('abGenderMale');
-        const femaleBtn = document.getElementById('abGenderFemale');
-        if (maleBtn && femaleBtn) {
-            if (gender === 'male') {
-                maleBtn.classList.add('active');
-                femaleBtn.classList.remove('active');
-            } else {
-                femaleBtn.classList.add('active');
-                maleBtn.classList.remove('active');
-            }
-        }
-
-        if (this.isPlaying && !this.isPageRecordedAudio) {
-            this.playCurrentPage();
         }
     }
 
@@ -354,10 +303,9 @@ class ProAudioBookEngine {
         this.isPageRecordedAudio = false;
         this.updateNarratorDisplay();
 
-        // Case B: Text Script exists -> Plays Male or Female TTS
+        // Case B: Text Script exists -> Plays Crisp Female TTS
         if (pageText && pageText.trim().length > 0) {
-            const genderLabel = this.activeGender === 'male' ? 'पुरुष स्वर' : 'महिला स्वर';
-            this.updateStatusDisplay(`📖 पृष्ठ ${currentPage} (${genderLabel}) सुनाया जा रहा है`);
+            this.updateStatusDisplay(`📖 पृष्ठ ${currentPage} सुनाया जा रहा है`);
             this.speakText(pageText, currentPage);
             return;
         }
@@ -376,18 +324,10 @@ class ProAudioBookEngine {
 
         this.currentUtterance = new SpeechSynthesisUtterance(text);
         
-        // Accurate Voice & Tone Assignment
-        if (this.activeGender === 'female') {
-            if (this.femaleVoice) this.currentUtterance.voice = this.femaleVoice;
-            this.currentUtterance.pitch = 1.0; // Clear, crystal natural female tone
-            this.currentUtterance.rate = 0.95 * this.playbackRate;
-        } else {
-            if (this.maleVoice) this.currentUtterance.voice = this.maleVoice;
-            // Warm male tone: if device voice is same, lower pitch slightly for distinct male resonance
-            this.currentUtterance.pitch = 0.84;
-            this.currentUtterance.rate = 0.90 * this.playbackRate;
-        }
-        
+        // Clean, Natural Female Tone (Google / Kalpana / Swara)
+        if (this.femaleVoice) this.currentUtterance.voice = this.femaleVoice;
+        this.currentUtterance.pitch = 1.0;
+        this.currentUtterance.rate = 0.95 * this.playbackRate;
         this.currentUtterance.lang = 'hi-IN';
 
         this.currentUtterance.onstart = () => {
@@ -476,15 +416,10 @@ class ProAudioBookEngine {
     setPlayingState(playing) {
         this.isPlaying = playing;
         const playBtn = document.getElementById('abPlayBtn');
-        const waveBox = document.getElementById('abWaveAnimation');
         const floatAbBtn = document.getElementById('floatingAudioTrigger');
         const avatarBox = document.getElementById('abNarratorAvatarBox');
 
         if (playBtn) playBtn.innerHTML = playing ? '⏸️' : '▶️';
-        if (waveBox) {
-            if (playing) waveBox.classList.add('active');
-            else waveBox.classList.remove('active');
-        }
         if (avatarBox) {
             if (playing) avatarBox.classList.add('pulse-avatar');
             else avatarBox.classList.remove('pulse-avatar');
@@ -526,16 +461,10 @@ class ProAudioBookEngine {
                     <button class="ab-ctrl-btn" id="abNextBtn" title="अगला पृष्ठ">⏭️</button>
                 </div>
 
-                <!-- Gender Toggle & BGM & Speed & Close -->
+                <!-- BGM & Speed & Close Controls -->
                 <div class="ab-right">
-                    <!-- Male / Female Switcher -->
-                    <div class="ab-gender-toggle">
-                        <button id="abGenderFemale" class="ab-gender-btn active" title="महिला स्वर">👩 महिला</button>
-                        <button id="abGenderMale" class="ab-gender-btn" title="पुरुष स्वर">👨 पुरुष</button>
-                    </div>
-
                     <!-- BGM Toggle Button -->
-                    <button id="abBgmToggleBtn" class="ab-ctrl-btn" title="बैकग्राउंड म्यूजिक चालू/बंद" style="width:28px; height:28px; font-size:12px;">🎵</button>
+                    <button id="abBgmToggleBtn" class="ab-ctrl-btn" title="बैकग्राउंड म्यूजिक चालू/बंद" style="width:32px; height:32px; font-size:14px;">🎵</button>
 
                     <select id="abSpeedSelect" class="ab-select" title="गति">
                         <option value="0.75">0.75x</option>
@@ -577,12 +506,9 @@ class ProAudioBookEngine {
             }
         });
         document.getElementById('abSpeedSelect').addEventListener('change', (e) => this.setSpeed(e.target.value));
-        document.getElementById('abGenderMale').addEventListener('click', () => this.setGender('male'));
-        document.getElementById('abGenderFemale').addEventListener('click', () => this.setGender('female'));
         
         document.getElementById('abBgmToggleBtn').addEventListener('click', () => {
-            const active = this.bgm.toggleMute();
-            document.getElementById('abBgmToggleBtn').style.opacity = active ? '1' : '0.4';
+            this.bgm.toggleMute();
         });
 
         document.getElementById('abCloseBtn').addEventListener('click', () => {
@@ -603,3 +529,4 @@ class ProAudioBookEngine {
 window.addEventListener('DOMContentLoaded', () => {
     window.aoiAudioBookEngine = new ProAudioBookEngine();
 });
+
