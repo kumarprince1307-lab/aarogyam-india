@@ -773,6 +773,22 @@ async function convertCurrentPdfToWebp() {
         if (sizeLabel) sizeLabel.textContent = `कुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
         if (fillBar) fillBar.style.width = `${percent}%`;
 
+        if (p % 4 === 0) await new Promise(r => setTimeout(r, 10));
+    }
+
+    studioPageImages = images;
+    studioTotalPages = images.length;
+
+    await savePagesToDb(studioCurrentBookId, studioPageImages);
+
+    markUnsaved(false);
+    renderPageChipGrid();
+    selectPage(1);
+
+    if (progressLabel) progressLabel.textContent = `🎉 PDF के सभी ${images.length} पेज WebP में तैयार! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
+    alert(`🎉 बधाई हो! PDF के सभी ${images.length} पेज 100% HD WebP में बदल गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nअब आप तुरंत रीडर में पूरे ${images.length} पेज देख सकते हैं!`);
+}
+
 // Direct PDF File Upload Handler (Auto converts any PDF file to WebP pages)
 async function handleDirectPdfUpload(file) {
     if (!file || file.type !== 'application/pdf') {
