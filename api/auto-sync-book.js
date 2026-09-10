@@ -236,6 +236,54 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------
+    // ACTION: SAVE AUDIO STUDIO CONFIG & MANIFEST
+    // -------------------------------------------------------------
+    if (action === 'save_audio_studio') {
+      const bookId = String(payload.bookId || '').trim().toUpperCase();
+      if (!bookId) {
+        return sendJson(res, 400, { success: false, error: 'Book ID is required for save_audio_studio.' });
+      }
+
+      const totalPages = parseInt(payload.totalPages, 10) || 0;
+      const audioScripts = payload.audioScripts || { bookId: bookId, pages: {} };
+      const commitLog = [];
+
+      // 1. Commit data/audio-scripts/${bookId}.json
+      const audioScriptPath = `data/audio-scripts/${bookId}.json`;
+      const scriptBase64 = Buffer.from(JSON.stringify(audioScripts, null, 2), 'utf8').toString('base64');
+      await commitFile(audioScriptPath, scriptBase64, `Update audio scripts for ${bookId} [Studio Auto-Sync]`, token);
+      commitLog.push(audioScriptPath);
+
+      // 2. Update data/books.json
+      const booksFile = await getFileContent('data/books.json', token);
+      let booksJson = { books: [] };
+      if (booksFile && booksFile.content) {
+        try { booksJson = JSON.parse(booksFile.content); } catch (e) {}
+      }
+      if (!Array.isArray(booksJson.books)) booksJson.books = [];
+
+      const existingBook = booksJson.books.find(b => b && b.id && String(b.id).trim().toUpperCase() === bookId);
+      if (existingBook) {
+        if (totalPages > 0) existingBook.totalPages = totalPages;
+        existingBook.hasWebpPages = true;
+        existingBook.pageImagesPath = `images/books/${bookId}`;
+        existingBook.audioScriptPath = audioScriptPath;
+      }
+
+      const updatedBooksBase64 = Buffer.from(JSON.stringify(booksJson, null, 2), 'utf8').toString('base64');
+      await commitFile('data/books.json', updatedBooksBase64, `Update ${bookId} WebP manifest [Studio Auto-Sync]`, token);
+      commitLog.push('data/books.json');
+
+      return sendJson(res, 200, {
+        success: true,
+        message: `Studio manifest for ${bookId} committed to GitHub repository.`,
+        bookId: bookId,
+        totalPages: totalPages,
+        updatedFiles: commitLog
+      });
+    }
+
+    // -------------------------------------------------------------
     // ACTION: DELETE BOOK
     // -------------------------------------------------------------
     if (action === 'delete') {

@@ -132,6 +132,9 @@ export async function initBookAudioStudio() {
               <button id="convertPdfToWebpBtn" class="admin-btn admin-btn-secondary" style="padding:8px 12px; font-size:12px;" title="मौजूदा PDF के सारे पेजों को WebP इमेज में बदलें">
                 ⚡ Convert Existing PDF
               </button>
+              <button id="gitAutoSyncBtn" class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:8px 16px; font-weight:800; font-size:12px; box-shadow:0 4px 12px rgba(16,185,129,0.35); display:inline-flex; align-items:center; gap:6px;" title="सभी WebP पेजों और ऑडियो को 1-Click में सीधे GitHub पर पुश करें (Vercel ऑटोमैटिक लाइव)">
+                <span>🚀</span> 1-Click Push to Git (Live Sync)
+              </button>
               <button id="downloadZipBtn" class="admin-btn" style="background:#8b5cf6; color:#fff; padding:8px 12px; font-size:12px;" title="Git फोल्डर (images/books/BK001/) के लिए ZIP डाउनलोड करें">
                 📦 Download WebP ZIP
               </button>
@@ -167,7 +170,10 @@ export async function initBookAudioStudio() {
                 ❌ रद्द करें (Discard)
               </button>
               <button id="saveAllChangesBtn" class="admin-btn admin-btn-primary" style="padding:6px 18px; font-weight:700;">
-                💾 सभी बदलाव सेव करें (Save All)
+                💾 लोकल सेव (Save Local)
+              </button>
+              <button id="gitPushStagingBtn" class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:6px 16px; font-weight:800; font-size:12px;">
+                🚀 1-Click Push to Git
               </button>
             </div>
           </div>
@@ -354,6 +360,17 @@ async function setupStudioEvents() {
     const convertBtn = document.getElementById('convertPdfToWebpBtn');
     if (convertBtn) {
         convertBtn.addEventListener('click', () => convertCurrentPdfToWebp());
+    }
+
+    // 1-Click Push to Git Live Sync
+    const gitSyncBtn = document.getElementById('gitAutoSyncBtn');
+    if (gitSyncBtn) {
+        gitSyncBtn.addEventListener('click', () => syncStudioToGitHub());
+    }
+
+    const gitPushStagingBtn = document.getElementById('gitPushStagingBtn');
+    if (gitPushStagingBtn) {
+        gitPushStagingBtn.addEventListener('click', () => syncStudioToGitHub());
     }
 
     // Download ZIP
@@ -903,7 +920,139 @@ function discardDraftChanges() {
 }
 
 // =======================================================
-// 7. 1-CLICK ZIP EXPORT FOR GIT REPOSITORY
+// 7. 1-CLICK DIRECT GITHUB API AUTO-SYNC (ZERO-EGRESS)
+// =======================================================
+async function syncStudioToGitHub() {
+    if (!studioPageImages || !studioPageImages.length) {
+        alert("पुश करने के लिए कोई WebP पेज उपलब्ध नहीं हैं।\nकृपया पहले 'Upload Pages' या 'Upload Direct PDF' से पेज लोड करें।");
+        return;
+    }
+
+    const total = studioPageImages.length;
+    const isConfirmed = confirm(`🚀 क्या आप पुस्तक [${studioCurrentBookId}] के सभी ${total} पेज (WebP) और ऑडियो स्क्रिप्ट सीधे GitHub पर 1-Click में लाइव पुश करना चाहते हैं?\n\n- सभी पेज 'images/books/${studioCurrentBookId}/' में सुरक्षित सेव होंगे\n- ऑडियो स्क्रिप्ट 'data/audio-scripts/${studioCurrentBookId}.json' में सेव होगी\n- कोई मैन्युअल फोल्डर बनाने की आवश्यकता नहीं है!`);
+    if (!isConfirmed) return;
+
+    const gitSyncBtn = document.getElementById('gitAutoSyncBtn');
+    const gitPushStagingBtn = document.getElementById('gitPushStagingBtn');
+    const progressSection = document.getElementById('uploadProgressSection');
+    const progressLabel = document.getElementById('progressStatusLabel');
+    const sizeLabel = document.getElementById('progressSizeLabel');
+    const fillBar = document.getElementById('progressFillBar');
+
+    const origText = gitSyncBtn ? gitSyncBtn.innerHTML : '';
+    if (gitSyncBtn) {
+        gitSyncBtn.disabled = true;
+        gitSyncBtn.innerHTML = `<span>⏳</span> Git पर पुश हो रहा है...`;
+    }
+    if (gitPushStagingBtn) {
+        gitPushStagingBtn.disabled = true;
+        gitPushStagingBtn.innerHTML = `<span>⏳</span> Git Push...`;
+    }
+
+    if (progressSection) progressSection.style.display = 'block';
+
+    let uploadedCount = 0;
+    let totalBytes = 0;
+    const failedPages = [];
+
+    // Concurrency Worker Pool (Batch of 3 parallel uploads for high speed & zero timeouts)
+    const concurrency = 3;
+    const pageIndices = Array.from({ length: total }, (_, i) => i);
+
+    async function uploadWorker() {
+        while (pageIndices.length > 0) {
+            const i = pageIndices.shift();
+            const pageNum = i + 1;
+            const base64Data = studioPageImages[i];
+            const pagePath = `images/books/${studioCurrentBookId}/${pageNum}.webp`;
+
+            try {
+                const res = await fetch('/api/auto-sync-book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'upload_asset',
+                        path: pagePath,
+                        base64: base64Data
+                    })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || `HTTP ${res.status}`);
+                }
+
+                uploadedCount++;
+                const approxBytes = Math.round(base64Data.length * (3/4));
+                totalBytes += approxBytes;
+
+                const percent = Math.round((uploadedCount / total) * 90);
+                if (progressLabel) progressLabel.textContent = `🚀 Git पर सिंक हो रहा है: ${uploadedCount} / ${total} पेजेस (${percent}%)`;
+                if (sizeLabel) sizeLabel.textContent = `अपलोड हुआ: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB • पेज: ${pageNum}.webp`;
+                if (fillBar) fillBar.style.width = `${percent}%`;
+
+            } catch (err) {
+                console.error(`Error uploading page ${pageNum}:`, err);
+                failedPages.push(pageNum);
+            }
+        }
+    }
+
+    try {
+        const workers = Array.from({ length: Math.min(concurrency, total) }, () => uploadWorker());
+        await Promise.all(workers);
+
+        if (failedPages.length > 0) {
+            alert(`⚠️ कुछ पेजों (${failedPages.join(', ')}) को अपलोड करने में समस्या आई। कृपया दोबारा पुश दबाएं।`);
+            return;
+        }
+
+        // Final Step: Commit data/audio-scripts/{bookId}.json & update catalog manifest
+        if (progressLabel) progressLabel.textContent = `⏳ ऑडियो स्क्रिप्ट और कैटलॉग Git पर सुरक्षित हो रहा है...`;
+        if (fillBar) fillBar.style.width = `95%`;
+
+        const manifestRes = await fetch('/api/auto-sync-book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'save_audio_studio',
+                bookId: studioCurrentBookId,
+                totalPages: total,
+                audioScripts: studioAudioScripts
+            })
+        });
+
+        const manifestData = await manifestRes.json().catch(() => ({}));
+        if (!manifestRes.ok || !manifestData.success) {
+            throw new Error(manifestData.error || `Manifest Save Failed (HTTP ${manifestRes.status})`);
+        }
+
+        // Save locally to IndexedDB as well
+        await savePagesToDb(studioCurrentBookId, studioPageImages);
+        localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+
+        markUnsaved(false);
+        if (fillBar) fillBar.style.width = `100%`;
+        if (progressLabel) progressLabel.textContent = `🎉 पुस्तक [${studioCurrentBookId}] के सभी ${total} पेज Git पर सफलतापूर्वक लाइव हो गए!`;
+
+        alert(`🎉 बधाई हो!\n\nपुस्तक [${studioCurrentBookId}] के सभी ${total} पेज और ऑडियो स्क्रिप्ट GitHub API से 1-Click में सफलतापूर्वक पुश हो गए हैं!\n\n📁 पाथ: images/books/${studioCurrentBookId}/1.webp से ${total}.webp\n📄 स्क्रिप्ट: data/audio-scripts/${studioCurrentBookId}.json\n\nअब दुनिया के किसी भी मोबाइल/कंप्यूटर में यह बुक 0.1 सेकंड में सुपरफास्ट लाइव खुलेगी!`);
+
+    } catch (netErr) {
+        console.error("Auto Sync Error:", netErr);
+        alert(`❌ Git Auto-Sync में त्रुटि:\n${netErr.message || 'नेटवर्क कनेक्शन जांचें'}`);
+    } finally {
+        if (gitSyncBtn) {
+            gitSyncBtn.disabled = false;
+            gitSyncBtn.innerHTML = origText;
+        }
+        if (gitPushStagingBtn) {
+            gitPushStagingBtn.disabled = false;
+            gitPushStagingBtn.innerHTML = `🚀 1-Click Push to Git`;
+        }
+    }
+}
+
+// =======================================================
+// 8. 1-CLICK ZIP EXPORT FOR GIT REPOSITORY
 // =======================================================
 async function downloadWebpPagesZip() {
     if (!studioPageImages || !studioPageImages.length) {

@@ -141,6 +141,30 @@ async function verifyUserAccessAndSession(targetBookId) {
         } catch (e) {}
     }
 
+    // Check if book has hasWebpPages flag or totalPages in Git repository
+    if (!pageImages || !pageImages.length) {
+        const total = aoiCurrentBookData.totalPages || 0;
+        const basePath = aoiCurrentBookData.pageImagesPath || `images/books/${targetBookId.toUpperCase()}`;
+        if (aoiCurrentBookData.hasWebpPages && total > 0) {
+            pageImages = [];
+            for (let i = 1; i <= total; i++) {
+                pageImages.push(`../${basePath}/${i}.webp`);
+            }
+        } else {
+            // Probe static WebP image in Git repository
+            try {
+                const probeRes = await fetch(`../images/books/${targetBookId.toUpperCase()}/1.webp`, { method: 'HEAD' });
+                if (probeRes.ok) {
+                    const count = total > 0 ? total : 152;
+                    pageImages = [];
+                    for (let i = 1; i <= count; i++) {
+                        pageImages.push(`../images/books/${targetBookId.toUpperCase()}/${i}.webp`);
+                    }
+                }
+            } catch (e) {}
+        }
+    }
+
     if (pageImages && pageImages.length > 0) {
         console.log("⚡ Fast HD Image Engine Activated. Total Pages:", pageImages.length);
         initImageModeReader(pageImages);
