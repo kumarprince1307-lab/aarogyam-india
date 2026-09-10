@@ -393,6 +393,9 @@
     if (book.features && Array.isArray(book.features) && book.features.length > 0) {
       featuresList = book.features.map(f => typeof f === 'object' ? (f.text || '') : f).filter(Boolean);
     }
+    if (book.hasAudioBook) {
+      featuresList.unshift('🎧 ऑडियो बुक उपलब्ध');
+    }
 
     const jsonPayload = JSON.stringify({
       id: bId,

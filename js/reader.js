@@ -125,6 +125,9 @@ function loadPdfFile(pdfUrl) {
     pdfjsLib.getDocument(pdfUrl).promise.then(pdfDoc_ => {
         aoiPdfDoc = pdfDoc_;
         aoiTotalPages = aoiPdfDoc.numPages;
+        window.aoiPdfDoc = aoiPdfDoc;
+        window.aoiTotalPages = aoiTotalPages;
+        window.aoiCurrentBookData = aoiCurrentBookData;
         console.log("PDF Loaded Successfully. Total Pages:", aoiTotalPages);
 
         if (pageSlider) pageSlider.max = aoiTotalPages;
@@ -231,14 +234,21 @@ function queueRenderPage(num) {
 function onPrevPage() {
     if (aoiPageNum <= 1) return;
     aoiPageNum--;
+    window.aoiPageNum = aoiPageNum;
     queueRenderPage(aoiPageNum);
 }
 
 function onNextPage() {
     if (aoiPageNum >= aoiTotalPages) return;
     aoiPageNum++;
+    window.aoiPageNum = aoiPageNum;
     queueRenderPage(aoiPageNum);
 }
+
+// Global Hooks for Audio Engine and Controls
+window.onPrevPage = onPrevPage;
+window.onNextPage = onNextPage;
+window.renderPage = renderPage;
 
 // =======================================================
 // UI & PROGRESS UPDATES
