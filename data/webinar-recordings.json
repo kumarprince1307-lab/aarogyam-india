@@ -88,8 +88,9 @@
     },
     {
       "id": "VID_S843947",
-      "format": "full_video",
+      "format": "both",
       "platform": "youtube",
+      "channel_id": "CH_AAROGYAM_MAIN",
       "title": "बैंगन की खेती में रिकॉर्ड तोड़ पैदावार | #SHET, #Stimrich & #Bio99 का कमाल! #biofit_result",
       "description": "बैंगन की खेती में जबरदस्त बढ़ोतरी! इस वीडियो में देखें कैसे Netsurf Biofit, Stimrich Bio99, Wrap Up और Shet के इस्तेमाल से बैंगन की फसल को फंगस जनित रोग (उग्र/उख्था रोग) से बचाया गया और पैदावार को कई गुना बढ़ाया गया।\n\n✅ फंगस और रोगों से बचाव: Stimrich Bio99 और Wrap Up\n✅ पैदावार बढ़ाने के लिए: Stimrich Bio99 और Shet",
       "subject": "Crop Protection",
@@ -105,7 +106,7 @@
       "priority": 50,
       "order_type": "normal",
       "status": "active",
-      "created_at": "2026-09-09T14:29:40.409Z"
+      "created_at": "2026-09-10T13:40:26.034Z"
     },
     {
       "id": "VID_742716",
