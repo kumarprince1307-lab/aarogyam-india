@@ -142,6 +142,15 @@ async function getFileContent(filePath, token) {
   return null;
 }
 
+async function createBlob(base64Content, token) {
+  const cleanBase64 = String(base64Content || '').replace(/^data:[^;]+;base64,/, '');
+  const res = await githubRequest('git/blobs', 'POST', token, {
+    content: cleanBase64,
+    encoding: 'base64'
+  });
+  return res.data?.sha;
+}
+
 async function commitFile(filePath, base64Content, commitMessage, token) {
   const existingSha = await getFileSha(filePath, token);
   const body = {
@@ -206,6 +215,121 @@ module.exports = async function handler(req, res) {
 
     const payload = await parseBody(req);
     const action = payload.action || 'save';
+
+    // -------------------------------------------------------------
+    // ACTION: CREATE BLOB (Parallel Conflict-Free Fast Blob Upload)
+    // -------------------------------------------------------------
+    if (action === 'create_blob' || action === 'upload_blob') {
+      const rawBase64 = String(payload.base64 || '').replace(/^data:[^;]+;base64,/, '');
+      if (!rawBase64) {
+        return sendJson(res, 400, { success: false, error: 'base64 is required for create_blob.' });
+      }
+      const blobSha = await createBlob(rawBase64, token);
+      return sendJson(res, 200, { success: true, sha: blobSha });
+    }
+
+    // -------------------------------------------------------------
+    // ACTION: COMMIT STUDIO TREE (1-Click Atomic Commit for 150+ Pages)
+    // -------------------------------------------------------------
+    if (action === 'commit_studio_tree') {
+      const bookId = String(payload.bookId || '').trim().toUpperCase();
+      const totalPages = parseInt(payload.totalPages, 10) || 0;
+      const audioScripts = payload.audioScripts || { bookId: bookId, pages: {} };
+      const treeItems = Array.isArray(payload.tree) ? payload.tree : [];
+
+      if (!bookId) {
+        return sendJson(res, 400, { success: false, error: 'Book ID is required for commit_studio_tree.' });
+      }
+
+      // 1. Get latest commit on target branch
+      const refRes = await githubRequest(`git/ref/heads/${GITHUB_BRANCH}`, 'GET', token);
+      const latestCommitSha = refRes.data?.object?.sha;
+      if (!latestCommitSha) throw new Error(`Could not fetch HEAD for branch ${GITHUB_BRANCH}`);
+
+      // 2. Add audio script blob
+      const scriptJsonStr = JSON.stringify(audioScripts, null, 2);
+      const scriptBlobSha = await createBlob(Buffer.from(scriptJsonStr, 'utf8').toString('base64'), token);
+      treeItems.push({
+        path: `data/audio-scripts/${bookId}.json`,
+        mode: '100644',
+        type: 'blob',
+        sha: scriptBlobSha
+      });
+
+      // 3. Update data/books.json blob
+      const booksFile = await getFileContent('data/books.json', token);
+      let booksJson = { books: [] };
+      if (booksFile && booksFile.content) {
+        try { booksJson = JSON.parse(booksFile.content); } catch (e) {}
+      }
+      if (!Array.isArray(booksJson.books)) booksJson.books = [];
+
+      const existingBook = booksJson.books.find(b => b && b.id && String(b.id).trim().toUpperCase() === bookId);
+      if (existingBook) {
+        if (totalPages > 0) existingBook.totalPages = totalPages;
+        existingBook.hasWebpPages = true;
+        existingBook.pageImagesPath = `images/books/${bookId}`;
+        existingBook.audioScriptPath = `data/audio-scripts/${bookId}.json`;
+      } else {
+        booksJson.books.push({
+          id: bookId,
+          slug: bookId.toLowerCase(),
+          heading: `${bookId} eBook`,
+          shortTitle: `${bookId}`,
+          name: `${bookId} eBook`,
+          status: 'active',
+          totalPages: totalPages || 1,
+          hasWebpPages: true,
+          pageImagesPath: `images/books/${bookId}`,
+          audioScriptPath: `data/audio-scripts/${bookId}.json`,
+          readEnabled: true,
+          downloadEnabled: true
+        });
+      }
+
+      const updatedBooksStr = JSON.stringify(booksJson, null, 2);
+      const booksBlobSha = await createBlob(Buffer.from(updatedBooksStr, 'utf8').toString('base64'), token);
+      treeItems.push({
+        path: 'data/books.json',
+        mode: '100644',
+        type: 'blob',
+        sha: booksBlobSha
+      });
+
+      // 4. Create Git Tree
+      const treeRes = await githubRequest('git/trees', 'POST', token, {
+        base_tree: latestCommitSha,
+        tree: treeItems.map(item => ({
+          path: String(item.path).replace(/^\/+/, ''),
+          mode: item.mode || '100644',
+          type: 'blob',
+          sha: item.sha
+        }))
+      });
+      const newTreeSha = treeRes.data?.sha;
+
+      // 5. Create Git Commit
+      const commitRes = await githubRequest('git/commits', 'POST', token, {
+        message: `Publish ${totalPages} WebP pages & audio scripts for ${bookId} [Studio 1-Click Sync]`,
+        tree: newTreeSha,
+        parents: [latestCommitSha]
+      });
+      const newCommitSha = commitRes.data?.sha;
+
+      // 6. Update Branch Reference
+      await githubRequest(`git/refs/heads/${GITHUB_BRANCH}`, 'PATCH', token, {
+        sha: newCommitSha,
+        force: false
+      });
+
+      return sendJson(res, 200, {
+        success: true,
+        message: `Successfully pushed ${treeItems.length} files in 1 atomic commit to ${GITHUB_BRANCH}.`,
+        commitSha: newCommitSha,
+        bookId: bookId,
+        totalPages: totalPages
+      });
+    }
 
     // -------------------------------------------------------------
     // ACTION: UPLOAD SINGLE ASSET (Cover, Banner, Demo Image, Small PDF)

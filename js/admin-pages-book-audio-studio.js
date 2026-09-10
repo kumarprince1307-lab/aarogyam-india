@@ -953,10 +953,11 @@ async function syncStudioToGitHub() {
 
     let uploadedCount = 0;
     let totalBytes = 0;
+    const treeItems = new Array(total);
     const failedPages = [];
 
-    // Concurrency Worker Pool (Batch of 3 parallel uploads for high speed & zero timeouts)
-    const concurrency = 3;
+    // Concurrency Worker Pool for Git Blobs (Fast & Conflict-Free)
+    const concurrency = 4;
     const pageIndices = Array.from({ length: total }, (_, i) => i);
 
     async function uploadWorker() {
@@ -966,32 +967,49 @@ async function syncStudioToGitHub() {
             const base64Data = studioPageImages[i];
             const pagePath = `images/books/${studioCurrentBookId}/${pageNum}.webp`;
 
-            try {
-                const res = await fetch('/api/auto-sync-book', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'upload_asset',
-                        path: pagePath,
-                        base64: base64Data
-                    })
-                });
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok || !data.success) {
-                    throw new Error(data.error || `HTTP ${res.status}`);
+            let success = false;
+            for (let attempt = 1; attempt <= 3; attempt++) {
+                try {
+                    const res = await fetch('/api/auto-sync-book', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'create_blob',
+                            base64: base64Data
+                        })
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok && data.success && data.sha) {
+                        treeItems[i] = {
+                            path: pagePath,
+                            sha: data.sha,
+                            mode: '100644',
+                            type: 'blob'
+                        };
+                        success = true;
+                        break;
+                    } else {
+                        throw new Error(data.error || `HTTP ${res.status}`);
+                    }
+                } catch (err) {
+                    if (attempt === 3) {
+                        console.error(`Page ${pageNum} failed after 3 attempts:`, err);
+                    } else {
+                        await new Promise(r => setTimeout(r, 300 * attempt));
+                    }
                 }
+            }
 
+            if (success) {
                 uploadedCount++;
                 const approxBytes = Math.round(base64Data.length * (3/4));
                 totalBytes += approxBytes;
 
-                const percent = Math.round((uploadedCount / total) * 90);
-                if (progressLabel) progressLabel.textContent = `🚀 Git पर सिंक हो रहा है: ${uploadedCount} / ${total} पेजेस (${percent}%)`;
-                if (sizeLabel) sizeLabel.textContent = `अपलोड हुआ: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB • पेज: ${pageNum}.webp`;
+                const percent = Math.round((uploadedCount / total) * 85);
+                if (progressLabel) progressLabel.textContent = `🚀 Git Blobs तैयार हो रहे हैं: ${uploadedCount} / ${total} पेजेस (${percent}%)`;
+                if (sizeLabel) sizeLabel.textContent = `तैयार हुआ: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB • पेज: ${pageNum}.webp`;
                 if (fillBar) fillBar.style.width = `${percent}%`;
-
-            } catch (err) {
-                console.error(`Error uploading page ${pageNum}:`, err);
+            } else {
                 failedPages.push(pageNum);
             }
         }
@@ -1006,33 +1024,34 @@ async function syncStudioToGitHub() {
             return;
         }
 
-        // Final Step: Commit data/audio-scripts/{bookId}.json & update catalog manifest
-        if (progressLabel) progressLabel.textContent = `⏳ ऑडियो स्क्रिप्ट और कैटलॉग Git पर सुरक्षित हो रहा है...`;
-        if (fillBar) fillBar.style.width = `95%`;
+        // Final Step: Atomic Git Commit of all 150+ Blobs + Audio Scripts + books.json
+        if (progressLabel) progressLabel.textContent = `⏳ GitHub पर 1-Click में कमिट और डिप्लॉय हो रहा है...`;
+        if (fillBar) fillBar.style.width = `92%`;
 
-        const manifestRes = await fetch('/api/auto-sync-book', {
+        const commitRes = await fetch('/api/auto-sync-book', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                action: 'save_audio_studio',
+                action: 'commit_studio_tree',
                 bookId: studioCurrentBookId,
                 totalPages: total,
-                audioScripts: studioAudioScripts
+                audioScripts: studioAudioScripts,
+                tree: treeItems
             })
         });
 
-        const manifestData = await manifestRes.json().catch(() => ({}));
-        if (!manifestRes.ok || !manifestData.success) {
-            throw new Error(manifestData.error || `Manifest Save Failed (HTTP ${manifestRes.status})`);
+        const commitData = await commitRes.json().catch(() => ({}));
+        if (!commitRes.ok || !commitData.success) {
+            throw new Error(commitData.error || `Commit Failed (HTTP ${commitRes.status})`);
         }
 
-        // Save locally to IndexedDB as well
+        // Save locally to IndexedDB & localStorage
         await savePagesToDb(studioCurrentBookId, studioPageImages);
         localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
         markUnsaved(false);
         if (fillBar) fillBar.style.width = `100%`;
-        if (progressLabel) progressLabel.textContent = `🎉 पुस्तक [${studioCurrentBookId}] के सभी ${total} पेज Git पर सफलतापूर्वक लाइव हो गए!`;
+        if (progressLabel) progressLabel.textContent = `🎉 पुस्तक [${studioCurrentBookId}] के सभी ${total} पेज Git पर 100% सफलतापूर्वक लाइव हो गए!`;
 
         alert(`🎉 बधाई हो!\n\nपुस्तक [${studioCurrentBookId}] के सभी ${total} पेज और ऑडियो स्क्रिप्ट GitHub API से 1-Click में सफलतापूर्वक पुश हो गए हैं!\n\n📁 पाथ: images/books/${studioCurrentBookId}/1.webp से ${total}.webp\n📄 स्क्रिप्ट: data/audio-scripts/${studioCurrentBookId}.json\n\nअब दुनिया के किसी भी मोबाइल/कंप्यूटर में यह बुक 0.1 सेकंड में सुपरफास्ट लाइव खुलेगी!`);
 
