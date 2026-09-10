@@ -282,8 +282,13 @@ function renderPage(num) {
         if (pageImgEl) {
             pageImgEl.style.display = 'block';
             pageImgEl.src = aoiPageImagesList[num - 1];
-            pageImgEl.style.transform = `scale(${aoiScale / 1.2})`;
-            pageImgEl.style.transformOrigin = 'center top';
+            
+            if (aoiScale === 1.2) {
+                pageImgEl.style.transform = 'none';
+            } else {
+                pageImgEl.style.transform = `scale(${aoiScale / 1.2})`;
+                pageImgEl.style.transformOrigin = 'center center';
+            }
             pageImgEl.style.transition = 'transform 0.15s ease';
 
             // Instant Background Preload next/prev pages

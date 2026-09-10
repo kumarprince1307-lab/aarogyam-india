@@ -659,12 +659,15 @@ async function handleImageUpload(files) {
     studioPageImages = processedImages;
     studioTotalPages = processedImages.length;
 
-    markUnsaved(true);
+    // Auto save immediately to IndexedDB so reader gets full 152 pages instantly
+    await savePagesToDb(studioCurrentBookId, studioPageImages);
+
+    markUnsaved(false);
     renderPageChipGrid();
     selectPage(1);
 
-    if (progressLabel) progressLabel.textContent = `🎉 पूरे ${fileList.length} पेज सफलतापूर्वक WebP में तैयार! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
-    alert(`🎉 बधाई हो! सभी ${fileList.length} पेज 100% HD WebP में तैयार हो गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nकृपया ऊपर दिए गए "💾 सभी बदलाव सेव करें" बटन पर क्लिक करके सुरक्षित करें।`);
+    if (progressLabel) progressLabel.textContent = `🎉 पूरे ${fileList.length} पेज सुरक्षित रूप से सेव हो गए! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
+    alert(`🎉 बधाई हो! सभी ${fileList.length} पेज सफलतापूर्वक WebP में बदलकर सुरक्षित सेव हो गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nआप तुरंत रीडर में जाकर पूरे ${fileList.length} पेज देख सकते हैं!`);
 }
 
 function readFileAsWebp(file) {
