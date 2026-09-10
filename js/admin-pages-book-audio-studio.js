@@ -122,11 +122,15 @@ export async function initBookAudioStudio() {
 
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
               <input type="file" id="bulkImageInput" multiple accept="image/webp,image/png,image/jpeg" style="display:none;">
+              <input type="file" id="directPdfInput" accept="application/pdf" style="display:none;">
               <button id="triggerBulkUploadBtn" class="admin-btn admin-btn-primary" style="padding:8px 14px;">
                 📤 Bulk Images चुनें (Upload Pages)
               </button>
+              <button id="triggerDirectPdfBtn" class="admin-btn admin-btn-secondary" style="padding:8px 12px; font-size:12px;" title="सीधे PDF फाइल अपलोड करें (ऑटोमैटिक WebP में बदल जाएगी)">
+                📄 Upload Direct PDF
+              </button>
               <button id="convertPdfToWebpBtn" class="admin-btn admin-btn-secondary" style="padding:8px 12px; font-size:12px;" title="मौजूदा PDF के सारे पेजों को WebP इमेज में बदलें">
-                ⚡ Convert PDF to WebP
+                ⚡ Convert Existing PDF
               </button>
               <button id="downloadZipBtn" class="admin-btn" style="background:#8b5cf6; color:#fff; padding:8px 12px; font-size:12px;" title="Git फोल्डर (images/books/BK001/) के लिए ZIP डाउनलोड करें">
                 📦 Download WebP ZIP
@@ -278,9 +282,30 @@ export async function initBookAudioStudio() {
 // =======================================================
 // 3. STUDIO EVENTS & WORKFLOW
 // =======================================================
-function setupStudioEvents() {
+async function setupStudioEvents() {
     const bookSelect = document.getElementById('bookSelect');
     if (bookSelect) {
+        try {
+            const res = await fetch('../data/books.json');
+            if (res.ok) {
+                const json = await res.json();
+                if (json.books && json.books.length) {
+                    bookSelect.innerHTML = '';
+                    json.books.forEach(b => {
+                        const opt = document.createElement('option');
+                        opt.value = b.id || b.slug;
+                        opt.textContent = `${b.id}: ${b.heading || b.name || b.shortTitle}`;
+                        if (opt.value === studioCurrentBookId) opt.selected = true;
+                        bookSelect.appendChild(opt);
+                    });
+                    const newOpt = document.createElement('option');
+                    newOpt.value = '__NEW__';
+                    newOpt.textContent = '➕ नया बुक / डेमो कोड जोड़ें...';
+                    bookSelect.appendChild(newOpt);
+                }
+            }
+        } catch (e) {}
+
         bookSelect.addEventListener('change', (e) => {
             if (e.target.value === '__NEW__') {
                 const newCode = prompt("नया बुक / डेमो कोड दर्ज करें (उदा. BK003 या DEMO002):");
@@ -311,6 +336,18 @@ function setupStudioEvents() {
     if (triggerBtn && bulkInput) {
         triggerBtn.addEventListener('click', () => bulkInput.click());
         bulkInput.addEventListener('change', (e) => handleImageUpload(e.target.files));
+    }
+
+    // Direct PDF Upload
+    const directPdfBtn = document.getElementById('triggerDirectPdfBtn');
+    const directPdfInput = document.getElementById('directPdfInput');
+    if (directPdfBtn && directPdfInput) {
+        directPdfBtn.addEventListener('click', () => directPdfInput.click());
+        directPdfInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleDirectPdfUpload(e.target.files[0]);
+            }
+        });
     }
 
     // Convert PDF to WebP
@@ -736,18 +773,73 @@ async function convertCurrentPdfToWebp() {
         if (sizeLabel) sizeLabel.textContent = `कुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
         if (fillBar) fillBar.style.width = `${percent}%`;
 
-        if (p % 4 === 0) await new Promise(r => setTimeout(r, 10));
+// Direct PDF File Upload Handler (Auto converts any PDF file to WebP pages)
+async function handleDirectPdfUpload(file) {
+    if (!file || file.type !== 'application/pdf') {
+        alert("कृपया एक वैध PDF फाइल चुनें।");
+        return;
     }
 
-    studioPageImages = images;
-    studioTotalPages = images.length;
+    const progressSection = document.getElementById('uploadProgressSection');
+    const progressLabel = document.getElementById('progressStatusLabel');
+    const sizeLabel = document.getElementById('progressSizeLabel');
+    const fillBar = document.getElementById('progressFillBar');
 
-    markUnsaved(true);
-    renderPageChipGrid();
-    selectPage(1);
+    if (progressSection) progressSection.style.display = 'block';
+    if (progressLabel) progressLabel.textContent = `⏳ PDF फाइल लोड हो रही है (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
 
-    if (progressLabel) progressLabel.textContent = `🎉 PDF के सभी ${images.length} पेज WebP में तैयार! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
-    alert(`🎉 बधाई हो! PDF के सभी ${images.length} पेज 100% HD WebP में बदल गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nकृपया "💾 सभी बदलाव सेव करें" बटन दबाकर सुरक्षित करें।`);
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const total = pdfDoc.numPages;
+
+        const images = [];
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        let totalBytes = 0;
+
+        for (let p = 1; p <= total; p++) {
+            const page = await pdfDoc.getPage(p);
+            const viewport = page.getViewport({ scale: 1.5 });
+
+            tempCanvas.width = viewport.width;
+            tempCanvas.height = viewport.height;
+
+            await page.render({
+                canvasContext: tempCtx,
+                viewport: viewport
+            }).promise;
+
+            const webpData = tempCanvas.toDataURL('image/webp', 0.88);
+            images.push(webpData);
+
+            const currentBytes = Math.round(webpData.length * (3/4));
+            totalBytes += currentBytes;
+
+            const percent = Math.round((p / total) * 100);
+            if (progressLabel) progressLabel.textContent = `PDF पेज कनवर्ट हो रहा है: ${p} / ${total} (${percent}%)`;
+            if (sizeLabel) sizeLabel.textContent = `कुल WebP साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
+            if (fillBar) fillBar.style.width = `${percent}%`;
+
+            if (p % 4 === 0) await new Promise(r => setTimeout(r, 10));
+        }
+
+        studioPageImages = images;
+        studioTotalPages = images.length;
+        studioPdfDoc = pdfDoc;
+
+        await savePagesToDb(studioCurrentBookId, studioPageImages);
+
+        markUnsaved(false);
+        renderPageChipGrid();
+        selectPage(1);
+
+        if (progressLabel) progressLabel.textContent = `🎉 PDF के सभी ${images.length} पेज WebP में तैयार! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
+        alert(`🎉 बधाई हो! आपकी PDF के सभी ${images.length} पेज 100% HD WebP में बदलकर सुरक्षित सेव हो गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nअब आप तुरंत रीडर में पूरे ${images.length} पेज देख सकते हैं!`);
+    } catch (err) {
+        console.error("Direct PDF Parse Error:", err);
+        alert("PDF फाइल प्रोसेस करने में समस्या आई। कृपया फाइल जांचें।");
+    }
 }
 
 // =======================================================
