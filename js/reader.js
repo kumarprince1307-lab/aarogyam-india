@@ -283,11 +283,14 @@ function renderPage(num) {
             pageImgEl.style.display = 'block';
             pageImgEl.src = aoiPageImagesList[num - 1];
             
+            const container = document.getElementById('canvasContainer');
             if (aoiScale === 1.2) {
                 pageImgEl.style.transform = 'none';
+                if (container) container.style.overflow = 'hidden';
             } else {
                 pageImgEl.style.transform = `scale(${aoiScale / 1.2})`;
                 pageImgEl.style.transformOrigin = 'center center';
+                if (container) container.style.overflow = 'auto';
             }
             pageImgEl.style.transition = 'transform 0.15s ease';
 
