@@ -1,15 +1,13 @@
 /**
  * =================================================================
- * AAROGYAM INDIA - PRO HYBRID AUDIO BOOK ENGINE v3.0
+ * AAROGYAM INDIA - PRO HYBRID AUDIO BOOK ENGINE v3.1 (OPTIMIZED)
  * =================================================================
- * Features:
- * 1. Personalized User Welcome Audio (with Profile Name)
- * 2. Personalized Polite Notice on Unrecorded Pages + Auto Advance
- * 3. Exact Page-by-Page Audio & Text Script Integration
- * 4. Male / Female Voice Switcher (Realtime Pitch Filter & TTS)
- * 5. Soothing Ambient Background Music (BGM)
- * 6. Dynamic Narrator Avatar with Waveform Pulse
- * 7. Zero-Cost & Zero-Egress Architecture (Client-Side)
+ * Fixes:
+ * - Clean User Name Extraction (Never speaks phone number digits)
+ * - Guaranteed Welcome Greeting Audio Trigger
+ * - Crystal Clear Natural Voices (Zero Trembling/Shaking)
+ * - Distinct Deep Male vs Natural Sweet Female Pitch Modulation
+ * - Polite Notice on Unrecorded Pages + Auto Advance
  */
 
 class ProAudioBookEngine {
@@ -45,7 +43,7 @@ class ProAudioBookEngine {
         this.setupAudioElements();
         this.injectUI();
         await this.loadBookAudioScripts();
-        console.log("✅ Pro AudioBookEngine v3.0 Initialized for user:", this.userName);
+        console.log("✅ Pro AudioBookEngine v3.1 Ready for:", this.userName);
     }
 
     getUserProfileName() {
@@ -56,7 +54,15 @@ class ProAudioBookEngine {
                 : null;
             
             if (user) {
-                this.userName = user.name || user.first_name || user.mobile || "किसान मित्र";
+                let name = (user.name || user.fullName || user.first_name || "").trim();
+                // If name is missing or contains phone number digits, speak polite respectful title
+                if (!name || /\d/.test(name) || name.length < 2) {
+                    this.userName = "किसान मित्र";
+                } else {
+                    this.userName = name;
+                }
+            } else {
+                this.userName = "किसान मित्र";
             }
         } catch (e) {
             this.userName = "किसान मित्र";
@@ -65,16 +71,18 @@ class ProAudioBookEngine {
 
     loadVoices() {
         if (!this.synth) return;
-        this.voices = this.synth.getVoices();
+        this.voices = this.synth.getVoices() || [];
         
-        // Find Male & Female Hindi/Indian voices
-        this.femaleVoice = this.voices.find(v => (v.lang.includes('hi') || v.lang.includes('HI')) && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('kalpana') || v.name.toLowerCase().includes('zira')))
-            || this.voices.find(v => v.lang.includes('hi') || v.lang.includes('HI'))
+        // 1. Clean Female Voice (Kalpana / Google Hindi Female / Natural)
+        this.femaleVoice = this.voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')) && (v.name.toLowerCase().includes('kalpana') || v.name.toLowerCase().includes('google') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira')))
+            || this.voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')))
+            || this.voices.find(v => v.lang && v.lang.startsWith('en-IN'))
             || this.voices[0] || null;
 
-        this.maleVoice = this.voices.find(v => (v.lang.includes('hi') || v.lang.includes('HI')) && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('hemant') || v.name.toLowerCase().includes('david')))
-            || this.voices.find(v => v.lang.includes('hi') || v.lang.includes('HI'))
-            || this.voices[0] || null;
+        // 2. Male Voice (Hemant / David / Ravi / Masculine)
+        this.maleVoice = this.voices.find(v => (v.name.toLowerCase().includes('hemant') || v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('ravi') || v.name.toLowerCase().includes('mark')))
+            || this.voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')))
+            || this.femaleVoice;
     }
 
     setupAudioElements() {
@@ -91,7 +99,6 @@ class ProAudioBookEngine {
         this.audioElement.addEventListener('play', () => this.setPlayingState(true));
         this.audioElement.addEventListener('pause', () => this.setPlayingState(false));
 
-        // BGM Setup (Gentle Ambient Loop)
         this.bgmAudioElement.loop = true;
         this.bgmAudioElement.volume = 0.12;
     }
@@ -100,20 +107,19 @@ class ProAudioBookEngine {
         const urlParams = new URLSearchParams(window.location.search);
         const bookId = (window.aoiBookId || urlParams.get('book') || urlParams.get('id') || 'BK001').trim().toUpperCase();
         
-        // Check localStorage first (Admin studio edits)
+        // 1. Check local studio edits
         const localData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${bookId}`);
         if (localData) {
             try {
                 const parsed = JSON.parse(localData);
                 this.metadata = parsed;
                 this.pageScripts = parsed.pages || {};
-                console.log(`✅ Loaded ${Object.keys(this.pageScripts).length} scripts from Admin Studio for ${bookId}`);
                 this.updateNarratorDisplay();
                 return;
             } catch (e) {}
         }
 
-        // Fetch from file system
+        // 2. Fetch from files
         try {
             let res = await fetch(`../data/audio-scripts/${bookId}.json`);
             if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json`);
@@ -121,7 +127,6 @@ class ProAudioBookEngine {
                 const data = await res.json();
                 this.metadata = data;
                 this.pageScripts = data.pages || {};
-                console.log(`✅ Loaded ${Object.keys(this.pageScripts).length} page scripts for ${bookId}`);
                 this.updateNarratorDisplay();
             }
         } catch (e) {
@@ -189,9 +194,9 @@ class ProAudioBookEngine {
             return;
         }
 
-        this.stop(); // Stop previous utterance
+        this.stop(); // Stop previous audio
 
-        // 2. Check Page Script / Audio Record
+        // 2. Lookup Page Script or Recorded Audio
         const pageKey = String(currentPage);
         const pageEntry = this.pageScripts[pageKey];
 
@@ -206,9 +211,9 @@ class ProAudioBookEngine {
             }
         }
 
-        // A. If Admin Recorded Audio exists
+        // Case A: Admin Recorded Audio exists
         if (pageAudio && pageAudio.trim().length > 0) {
-            this.updateStatusDisplay(`🎙️ पृष्ठ ${currentPage} - रिकॉर्डेड आवाज़ चल रही है`);
+            this.updateStatusDisplay(`🎙️ पृष्ठ ${currentPage} - रिकॉर्डेड आवाज़`);
             this.audioElement.src = pageAudio;
             this.audioElement.playbackRate = this.playbackRate;
             this.audioElement.play();
@@ -216,14 +221,14 @@ class ProAudioBookEngine {
             return;
         }
 
-        // B. If Text exists -> Speak with TTS
+        // Case B: Text Script exists
         if (pageText && pageText.trim().length > 0) {
             this.updateStatusDisplay(`📖 पृष्ठ ${currentPage} सुनाया जा रहा है`);
             this.speakText(pageText, currentPage);
             return;
         }
 
-        // C. If Page has NO recording and NO text -> Polite Notice + Auto Next
+        // Case C: Unrecorded Page -> Polite Notice + Auto Next
         const politeNotice = `${this.userName} जी, पृष्ठ संख्या ${currentPage} की ऑडियो रिकॉर्डिंग जल्द ही उपलब्ध करा दी जाएगी। आइए अगले पृष्ठ पर चलते हैं।`;
         this.updateStatusDisplay(`⏳ पृष्ठ ${currentPage} की ऑडियो जल्द उपलब्ध होगी...`);
         this.speakText(politeNotice, currentPage);
@@ -232,19 +237,21 @@ class ProAudioBookEngine {
     speakText(text, currentPage, isWelcome = false) {
         if (!this.synth) return;
 
+        this.synth.cancel(); // Stop any pending speech
         this.currentUtterance = new SpeechSynthesisUtterance(text);
         
-        // Voice Selection
-        if (this.activeGender === 'female' && this.femaleVoice) {
-            this.currentUtterance.voice = this.femaleVoice;
-            this.currentUtterance.pitch = 1.2; // Pleasant sweeter tone
-        } else if (this.maleVoice) {
-            this.currentUtterance.voice = this.maleVoice;
-            this.currentUtterance.pitch = 0.95; // Warm male tone
+        // Voice & Pitch Setting (Clean, Natural & Sweet - No Trembling!)
+        if (this.activeGender === 'female') {
+            if (this.femaleVoice) this.currentUtterance.voice = this.femaleVoice;
+            this.currentUtterance.pitch = 1.0; // 100% natural pure pitch (No trembling/shaking!)
+            this.currentUtterance.rate = 0.95 * this.playbackRate; // Sweet, relaxed flow
+        } else {
+            if (this.maleVoice) this.currentUtterance.voice = this.maleVoice;
+            this.currentUtterance.pitch = 0.85; // Deep, warm, clear masculine tone
+            this.currentUtterance.rate = 0.92 * this.playbackRate;
         }
         
         this.currentUtterance.lang = 'hi-IN';
-        this.currentUtterance.rate = this.playbackRate;
 
         this.currentUtterance.onstart = () => {
             this.setPlayingState(true);
@@ -253,15 +260,16 @@ class ProAudioBookEngine {
         this.currentUtterance.onend = () => {
             this.setPlayingState(false);
             
-            // If it was just the welcome message, immediately read the actual current page!
+            // If welcome audio finished, immediately transition to reading current page!
             if (isWelcome) {
                 setTimeout(() => {
-                    if (this.isPlaying) this.playCurrentPage();
+                    this.isPlaying = true;
+                    this.playCurrentPage();
                 }, 400);
                 return;
             }
 
-            // Auto Turn Page
+            // Auto Turn Page on speech completion
             if (this.autoNextPage && window.aoiPageNum < (window.aoiTotalPages || 999)) {
                 if (typeof window.onNextPage === 'function') {
                     window.onNextPage();
@@ -275,7 +283,7 @@ class ProAudioBookEngine {
         };
 
         this.currentUtterance.onerror = (e) => {
-            console.warn("TTS Utterance Error:", e);
+            console.warn("TTS Error:", e);
             this.setPlayingState(false);
         };
 
