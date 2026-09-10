@@ -27,6 +27,7 @@ class UniversalAudioBookEngine {
         this.currentUtterance = null;
         this.audioElement = new Audio();
         this.autoNextPage = true;
+        this.pageScripts = {};
         this.pageTextCache = new Map();
         this.ocrCache = new Map();
         this.isOcrRunning = false;
@@ -34,7 +35,7 @@ class UniversalAudioBookEngine {
         this.init();
     }
 
-    init() {
+    async init() {
         if (this.synth) {
             this.loadVoices();
             if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -43,7 +44,25 @@ class UniversalAudioBookEngine {
         }
         this.setupAudioElement();
         this.injectUI();
+        await this.loadBookAudioScripts();
         console.log("✅ Universal 4-Layer AudioBookEngine v2.0 Initialized");
+    }
+
+    async loadBookAudioScripts() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = (window.aoiBookId || urlParams.get('book') || urlParams.get('id') || 'BK001').trim().toUpperCase();
+        try {
+            const res = await fetch(`../data/audio-scripts/${bookId}.json`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.pages) {
+                    this.pageScripts = data.pages;
+                    console.log(`✅ Loaded ${Object.keys(this.pageScripts).length} page scripts for ${bookId}`);
+                }
+            }
+        } catch (e) {
+            console.warn("Audio script fetch:", e);
+        }
     }
 
     loadVoices() {
@@ -214,7 +233,18 @@ class UniversalAudioBookEngine {
         const bookCategory = (bookData && bookData.category) || "कृषि एवं स्वास्थ्य";
 
         // ----------------------------------------------------
-        // LAYER 1: CHECK CHAPTER VOICE SCRIPT
+        // LAYER 1: EXACT PAGE SCRIPT LOOKUP (Highest Precision)
+        // ----------------------------------------------------
+        const pageKey = String(currentPage);
+        if (this.pageScripts && this.pageScripts[pageKey] && this.pageScripts[pageKey].trim().length > 0) {
+            this.currentLayer = 'page_script';
+            this.updateStatusDisplay(`📖 पृष्ठ ${currentPage} का सटीक पाठ सुनाया जा रहा है`);
+            this.speakText(this.pageScripts[pageKey], currentPage);
+            return;
+        }
+
+        // ----------------------------------------------------
+        // LAYER 1B: CHECK CHAPTER VOICE SCRIPT
         // ----------------------------------------------------
         const chapterScript = this.getChapterScript(currentPage, bookData);
         if (chapterScript && chapterScript.text.trim().length > 0) {
