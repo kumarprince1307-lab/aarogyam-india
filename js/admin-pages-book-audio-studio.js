@@ -194,31 +194,31 @@ export async function initBookAudioStudio() {
         </div>
 
         <!-- Cross-Book Page & Audio Assembler Modal -->
-        <div id="importPagesModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:999999; justify-content:center; align-items:center; padding:16px;">
-          <div class="admin-card" style="max-width:980px; width:100%; max-height:92vh; background:#0f172a; border:2px solid #6366f1; border-radius:14px; padding:20px; display:flex; flex-direction:column; box-shadow:0 25px 50px rgba(0,0,0,0.7); overflow:hidden;">
+        <div id="importPagesModal" style="display:none; position:fixed; inset:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:999999; justify-content:center; align-items:center; padding:12px; box-sizing:border-box;">
+          <div class="admin-card" style="max-width:1050px; width:100%; height:94vh; max-height:94vh; background:#0f172a; border:2px solid #6366f1; border-radius:14px; padding:14px 18px; display:flex; flex-direction:column; box-shadow:0 25px 60px rgba(0,0,0,0.85); overflow:hidden; box-sizing:border-box;">
             
-            <!-- Modal Header -->
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; border-bottom:1px solid #334155; padding-bottom:12px;">
+            <!-- Modal Header (Compact) -->
+            <div style="flex-shrink:0; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:8px;">
               <div>
-                <h3 style="margin:0; font-size:1.25rem; color:#818cf8; font-weight:800; display:flex; align-items:center; gap:8px;">
+                <h3 style="margin:0; font-size:1.15rem; color:#818cf8; font-weight:800; display:flex; align-items:center; gap:8px;">
                   <span>📚</span> अन्य पुस्तक से पेज और ऑडियो जोड़ें (Page & Audio Assembler)
                 </h3>
-                <p style="margin:4px 0 0; font-size:0.8rem; color:#94a3b8;">
-                  किसी भी मौजूदा पुस्तक (जैसे BK001, BK002, COMMON) से पेजेस चुनें। उनका <strong>ऑडियो और टेक्स्ट</strong> अपने आप इस नई किताब में कॉपी हो जाएगा!
+                <p style="margin:2px 0 0; font-size:0.75rem; color:#94a3b8;">
+                  किसी भी मौजूदा पुस्तक से पेजेस चुनें। उनका <strong>ऑडियो और टेक्स्ट</strong> अपने आप इस नई किताब में कॉपी हो जाएगा!
                 </p>
               </div>
-              <button id="closeImportModalBtn" class="admin-btn" style="background:#334155; color:#fff; padding:4px 10px; font-size:14px; border-radius:6px; line-height:1; cursor:pointer;">✕</button>
+              <button id="closeImportModalBtn" class="admin-btn" style="background:#334155; color:#fff; padding:4px 10px; font-size:14px; border-radius:6px; line-height:1; cursor:pointer;" title="बंद करें">✕</button>
             </div>
 
-            <!-- Controls Row: Source Book & Placement -->
-            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; background:#1e293b; padding:12px; border-radius:8px; border:1px solid #334155;">
-              <div style="flex:1; min-width:220px;">
-                <label style="font-size:0.8rem; font-weight:700; color:#cbd5e1; display:block; margin-bottom:4px;">1. सोर्स पुस्तक चुनें (जहाँ से पेज लेने हैं):</label>
-                <select id="importSourceBookSelect" class="admin-input" style="width:100%; padding:6px 10px; font-weight:700;"></select>
+            <!-- Controls Row: Source Book & Placement (Compact) -->
+            <div style="flex-shrink:0; display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px; background:#1e293b; padding:8px 12px; border-radius:8px; border:1px solid #334155;">
+              <div style="flex:1; min-width:200px;">
+                <label style="font-size:0.75rem; font-weight:700; color:#cbd5e1; display:block; margin-bottom:2px;">1. सोर्स पुस्तक चुनें (जहाँ से पेज लेने हैं):</label>
+                <select id="importSourceBookSelect" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.85rem; font-weight:700;"></select>
               </div>
-              <div style="flex:1; min-width:220px;">
-                <label style="font-size:0.8rem; font-weight:700; color:#cbd5e1; display:block; margin-bottom:4px;">2. कहाँ जोड़ना है (Placement):</label>
-                <select id="importPlacementSelect" class="admin-input" style="width:100%; padding:6px 10px; font-weight:700;">
+              <div style="flex:1; min-width:200px;">
+                <label style="font-size:0.75rem; font-weight:700; color:#cbd5e1; display:block; margin-bottom:2px;">2. कहाँ जोड़ना है (Placement):</label>
+                <select id="importPlacementSelect" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.85rem; font-weight:700;">
                   <option value="END">📌 सबसे आखिर में जोड़ें (End of Book)</option>
                   <option value="AFTER_CURRENT">📍 वर्तमान पेज के बाद जोड़ें</option>
                   <option value="BEGINNING">🔝 सबसे शुरुआत में जोड़ें (Beginning)</option>
@@ -226,43 +226,49 @@ export async function initBookAudioStudio() {
               </div>
             </div>
 
-            <!-- Audio Option & Notice -->
-            <div style="margin-bottom:12px; background:linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1)); border:1px solid #10b981; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.88rem; font-weight:700; color:#34d399;">
-                <input type="checkbox" id="importIncludeAudioCheck" checked style="width:18px; height:18px; accent-color:#10b981;">
+            <!-- Audio Option & Notice Banner (Super Compact) -->
+            <div style="flex-shrink:0; margin-bottom:8px; background:linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1)); border:1px solid #10b981; border-radius:8px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.82rem; font-weight:700; color:#34d399;">
+                <input type="checkbox" id="importIncludeAudioCheck" checked style="width:16px; height:16px; accent-color:#10b981;">
                 🎙️ ऑडियो और टेक्स्ट स्क्रिप्ट भी साथ लाएं (Include Voice & Script)
               </label>
-              <div style="font-size:0.75rem; color:#a7f3d0;">
-                💡 <strong>स्वतंत्र संपादन (Independent Editing):</strong> नई किताब में आप किसी भी पेज की आवाज़ या टेक्स्ट बदल सकते हैं—मूल किताब पर कोई असर नहीं पड़ेगा!
+              <div style="font-size:0.72rem; color:#a7f3d0;">
+                💡 <strong>स्वतंत्र संपादन:</strong> नई किताब में आप किसी भी पेज की आवाज़ या टेक्स्ट बदल सकते हैं—मूल किताब सुरक्षित रहेगी!
               </div>
             </div>
 
-            <!-- Range Filter & Multi Select Actions -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-              <div style="display:flex; align-items:center; gap:6px;">
-                <input type="text" id="importRangeInput" placeholder="पेज रेंज (उदा. 1-20, 25, 30-50)" class="admin-input" style="width:220px; padding:5px 10px; font-size:0.8rem;">
-                <button id="importApplyRangeBtn" class="admin-btn admin-btn-secondary" style="padding:5px 10px; font-size:12px;">✅ रेंज चुनें</button>
+            <!-- Range Filter & Multi Select Toolbar (With Top Quick Import Button) -->
+            <div style="flex-shrink:0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px; background:#0b1329; padding:6px 10px; border-radius:8px; border:1px solid #1e293b;">
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <input type="text" id="importRangeInput" placeholder="पेज रेंज (उदा. 1-20, 25, 30-50)" class="admin-input" style="width:180px; padding:4px 8px; font-size:0.8rem;">
+                <button id="importApplyRangeBtn" class="admin-btn admin-btn-secondary" style="padding:4px 8px; font-size:11px;">✅ रेंज चुनें</button>
+                <button id="importSelectAllBtn" class="admin-btn admin-btn-secondary" style="padding:4px 8px; font-size:11px;">Select All</button>
+                <button id="importClearBtn" class="admin-btn admin-btn-secondary" style="padding:4px 8px; font-size:11px;">Clear All</button>
               </div>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <button id="importSelectAllBtn" class="admin-btn admin-btn-secondary" style="padding:5px 10px; font-size:11px;">Select All</button>
-                <button id="importClearBtn" class="admin-btn admin-btn-secondary" style="padding:5px 10px; font-size:11px;">Clear All</button>
-                <span id="importSelectedCountTag" style="background:#6366f1; color:#fff; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:800;">चयनित: 0 पेज</span>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <span id="importSelectedCountTag" style="background:#6366f1; color:#fff; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:800;">चयनित: 0 पेज</span>
+                <button id="quickImportBtn" class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:5px 12px; font-weight:800; font-size:11px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(16,185,129,0.3);">
+                  <span>✨</span> <span id="quickImportBtnText">इंपोर्ट करें</span>
+                </button>
               </div>
             </div>
 
-            <!-- Visual Page Grid -->
-            <div id="importSourcePageGrid" style="flex:1; overflow-y:auto; min-height:280px; max-height:420px; background:#0b1329; border:1px solid #334155; border-radius:8px; padding:12px; display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:12px;">
+            <!-- Scrollable Visual Page Grid (Fills available space) -->
+            <div id="importSourcePageGrid" style="flex:1 1 auto; min-height:0; overflow-y:auto; background:#070d1e; border:1px solid #1e293b; border-radius:8px; padding:10px; display:grid; grid-template-columns:repeat(auto-fill, minmax(135px, 1fr)); gap:10px;">
               <div style="color:#94a3b8; font-size:13px; grid-column:1/-1; text-align:center; padding:40px;">सोर्स पुस्तक के पेजेस लोड हो रहे हैं...</div>
             </div>
 
-            <!-- Modal Footer Actions -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; border-top:1px solid #334155; padding-top:12px; flex-wrap:wrap; gap:10px;">
-              <button id="cancelImportModalBtn" class="admin-btn admin-btn-secondary" style="padding:8px 16px;">
-                रद्द करें (Cancel)
+            <!-- Modal Bottom Action Bar (Fixed & Always Visible) -->
+            <div style="flex-shrink:0; display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid #334155; background:#0f172a; flex-wrap:wrap; gap:8px;">
+              <button id="cancelImportModalBtn" class="admin-btn admin-btn-secondary" style="padding:6px 14px; font-size:12px;">
+                ❌ रद्द करें (Cancel)
               </button>
-              <button id="executeImportBtn" class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:8px 22px; font-weight:800; font-size:13px; box-shadow:0 4px 14px rgba(16,185,129,0.4); display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
-                <span>✨</span> <span id="executeImportBtnText">0 पेजेस और ऑडियो इंपोर्ट करें</span>
-              </button>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span id="importFooterSummary" style="font-size:0.8rem; color:#94a3b8;">कोई पेज चयनित नहीं है</span>
+                <button id="executeImportBtn" class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:8px 22px; font-weight:800; font-size:13px; box-shadow:0 4px 14px rgba(16,185,129,0.4); display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+                  <span>🚀</span> <span id="executeImportBtnText">0 पेजेस और ऑडियो जोड़ें</span>
+                </button>
+              </div>
             </div>
 
           </div>
@@ -612,6 +618,11 @@ async function setupStudioEvents() {
     const executeImportBtn = document.getElementById('executeImportBtn');
     if (executeImportBtn) {
         executeImportBtn.addEventListener('click', () => executeImportPages());
+    }
+
+    const quickImportBtn = document.getElementById('quickImportBtn');
+    if (quickImportBtn) {
+        quickImportBtn.addEventListener('click', () => executeImportPages());
     }
 }
 
@@ -1724,18 +1735,18 @@ async function loadSourceBookForImport(sourceBookId) {
         const card = document.createElement('div');
         card.className = 'import-page-card';
         card.dataset.page = p;
-        card.style.cssText = 'background:#1e293b; border:1px solid #334155; border-radius:8px; padding:8px; display:flex; flex-direction:column; align-items:center; position:relative; cursor:pointer; transition:all 0.2s; user-select:none;';
+        card.style.cssText = 'background:#1e293b; border:2px solid #334155; border-radius:8px; padding:6px; display:flex; flex-direction:column; align-items:center; position:relative; cursor:pointer; transition:all 0.18s ease-in-out; user-select:none;';
         
         card.innerHTML = `
-            <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:11px; font-weight:800; color:#38bdf8; background:#0f172a; padding:2px 6px; border-radius:4px;">Pg ${p}</span>
-                <input type="checkbox" class="import-page-cb" data-page="${p}" style="width:16px; height:16px; accent-color:#6366f1; cursor:pointer;">
+            <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <span style="font-size:11px; font-weight:800; color:#38bdf8; background:#0f172a; padding:2px 6px; border-radius:4px; border:1px solid #334155;">Pg ${p}</span>
+                <input type="checkbox" class="import-page-cb" data-page="${p}" style="width:18px; height:18px; accent-color:#10b981; cursor:pointer;">
             </div>
-            <div style="width:100%; height:130px; background:#0f172a; border-radius:6px; overflow:hidden; display:flex; justify-content:center; align-items:center; margin-bottom:6px;">
-                <img src="${thumbSrc}" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" style="max-width:100%; max-height:100%; object-fit:contain;" alt="Pg ${p}">
+            <div style="width:100%; height:155px; background:#000; border-radius:6px; overflow:hidden; display:flex; justify-content:center; align-items:center; margin-bottom:4px; border:1px solid #1e293b;">
+                <img src="${thumbSrc}" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" style="max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain;" alt="Pg ${p}">
                 <div style="display:none; color:#64748b; font-size:11px; text-align:center; padding:10px; width:100%; height:100%; align-items:center; justify-content:center;">Pg ${p}</div>
             </div>
-            <div style="width:100%; display:flex; gap:4px; flex-wrap:wrap; justify-content:center; margin-bottom:4px;">
+            <div style="width:100%; display:flex; gap:3px; flex-wrap:wrap; justify-content:center; margin-bottom:2px;">
                 ${hasAudio ? '<span style="font-size:9px; background:#1e3a8a; color:#93c5fd; padding:1px 5px; border-radius:4px; font-weight:700;">🎙️ ऑडियो</span>' : ''}
                 ${hasText ? '<span style="font-size:9px; background:#064e3b; color:#6ee7b7; padding:1px 5px; border-radius:4px; font-weight:700;">📄 टेक्स्ट</span>' : ''}
                 ${(!hasAudio && !hasText) ? '<span style="font-size:9px; color:#64748b;">(नो ऑडियो)</span>' : ''}
@@ -1777,12 +1788,14 @@ async function loadSourceBookForImport(sourceBookId) {
 function updateCardSelectionState(card, isChecked) {
     if (isChecked) {
         card.style.borderColor = '#10b981';
-        card.style.background = 'rgba(16, 185, 129, 0.12)';
-        card.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.3)';
+        card.style.background = 'linear-gradient(180deg, rgba(16, 185, 129, 0.22), #0f172a)';
+        card.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.4)';
+        card.style.transform = 'scale(1.02)';
     } else {
         card.style.borderColor = '#334155';
         card.style.background = '#1e293b';
         card.style.boxShadow = 'none';
+        card.style.transform = 'none';
     }
 }
 
@@ -1790,9 +1803,21 @@ function updateImportCountBadge() {
     const checked = document.querySelectorAll('.import-page-cb:checked');
     const count = checked ? checked.length : 0;
     const tag = document.getElementById('importSelectedCountTag');
+    const quickBtnText = document.getElementById('quickImportBtnText');
     const btnText = document.getElementById('executeImportBtnText');
+    const summaryEl = document.getElementById('importFooterSummary');
+    const sourceSelect = document.getElementById('importSourceBookSelect');
+    const srcBook = sourceSelect ? sourceSelect.value : '';
+
     if (tag) tag.textContent = `चयनित: ${count} पेज`;
-    if (btnText) btnText.textContent = `${count} पेजेस और ऑडियो इंपोर्ट करें`;
+    if (quickBtnText) quickBtnText.textContent = count > 0 ? `${count} पेज जोड़ें` : `इंपोर्ट करें`;
+    if (btnText) btnText.textContent = `${count} पेजेस और ऑडियो जोड़ें`;
+    if (summaryEl) {
+        summaryEl.textContent = count > 0 
+            ? `✅ ${count} पेज चुने गए (सोर्स: ${srcBook})`
+            : `कोई पेज चयनित नहीं है`;
+        summaryEl.style.color = count > 0 ? '#34d399' : '#94a3b8';
+    }
 }
 
 function setAllImportCheckboxes(select) {
