@@ -1419,6 +1419,15 @@
   }
 
   // -------------------------------------------------------------
+  // 14. STORAGE & CLOUD SYNC (Midnight Auto-Sync)
+  // -------------------------------------------------------------
+  function getMsUntilMidnight() {
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+    return midnight.getTime() - now.getTime();
+  }
+
+  function setupMidnightAutoSyncSchedule() {
     setTimeout(function runMidnightSync() {
       syncVaultToCloud(true);
       setInterval(() => syncVaultToCloud(true), 24 * 60 * 60 * 1000);
@@ -1469,6 +1478,91 @@
     t.textContent = msg;
     t.style.display = 'block';
     setTimeout(() => { t.style.display = 'none'; }, 3000);
+  }
+
+  // -------------------------------------------------------------
+  // 14.1 SMART DEEP LINK & LEAD CAPTURE ENGINE (ZERO EGRESS)
+  // -------------------------------------------------------------
+  function handleDeepLinkedAudio(audioId) {
+    const allLessons = (publishedAudioLessons && publishedAudioLessons.length) ? publishedAudioLessons : DEFAULT_AUDIO_LESSONS;
+    const lesson = allLessons.find(l => l.id === audioId) || allLessons[0];
+    if (!lesson) return;
+
+    // Check if user is already registered or captured
+    const guestInfo = JSON.parse(localStorage.getItem('AI_GUEST_INFO') || 'null');
+    const isRegistered = Boolean(vault.user_mobile || (guestInfo && guestInfo.phone));
+
+    if (isRegistered) {
+      window.AarogyamETailer.playAudioWithProgressBar(lesson.id, lesson.title, lesson.speaker || 'आरोग्यम लीडर', lesson.summary, lesson.audio_url);
+    } else {
+      pendingAudioLesson = lesson;
+      const modal = document.getElementById('leadCaptureAudioModal');
+      const titleEl = document.getElementById('leadModalAudioTitle');
+      const spkEl = document.getElementById('leadModalAudioSpeaker');
+      if (titleEl) titleEl.textContent = lesson.title;
+      if (spkEl) spkEl.textContent = `🎙️ ${lesson.speaker || 'आरोग्यम लीडर'} • ⏱️ ${lesson.duration || '3:00 Min'}`;
+      if (modal) modal.classList.add('show');
+    }
+  }
+
+  async function submitLeadAndPlayAudio(event) {
+    if (event) event.preventDefault();
+    const nameEl = document.getElementById('leadGuestName');
+    const phoneEl = document.getElementById('leadGuestPhone');
+    const name = nameEl ? nameEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+
+    if (!name || !phone || phone.length < 10) {
+      alert("कृपया सही 10 अंकों का व्हाट्सएप नंबर दर्ज करें!");
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const refCode = params.get('ref') || vault.share_id || 'DIRECT';
+
+    // 1. Save Locally (Zero Latency & Egress-free Instant Unlock)
+    const guestData = {
+      name: name,
+      phone: phone,
+      referral_code: refCode,
+      captured_at: new Date().toISOString(),
+      audio_requested: pendingAudioLesson ? pendingAudioLesson.id : ''
+    };
+    localStorage.setItem('AI_GUEST_INFO', JSON.stringify(guestData));
+    vault.user_mobile = phone;
+    vault.distributor_name = name;
+    saveLocalVault();
+
+    // 2. Write-Only Zero Egress Sync to Supabase (Non-blocking async)
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        client.from('retail_leads').insert([{
+          lead_name: name,
+          mobile: phone,
+          referral_code: refCode,
+          source: 'smart_etailer_audio_deeplink',
+          details_json: { audio_id: pendingAudioLesson ? pendingAudioLesson.id : '' },
+          created_at: new Date().toISOString()
+        }]).then(() => {}).catch(() => {});
+      }
+    } catch (e) {}
+
+    // 3. Close Modal
+    const modal = document.getElementById('leadCaptureAudioModal');
+    if (modal) modal.classList.remove('show');
+    showToast(`🎉 स्वागत है ${name} जी! ऑडियो शुरू हो रहा है...`, "success");
+
+    // 4. Play Audio Immediately
+    if (pendingAudioLesson) {
+      window.AarogyamETailer.playAudioWithProgressBar(
+        pendingAudioLesson.id,
+        pendingAudioLesson.title,
+        pendingAudioLesson.speaker || 'आरोग्यम लीडर',
+        pendingAudioLesson.summary,
+        pendingAudioLesson.audio_url
+      );
+    }
   }
 
   // -------------------------------------------------------------
@@ -1944,91 +2038,6 @@
         if (btnEl) btnEl.classList.remove('listening');
       }
     },
-
-  // -------------------------------------------------------------
-  // 15. SMART DEEP LINK & LEAD CAPTURE ENGINE (ZERO EGRESS)
-  // -------------------------------------------------------------
-  function handleDeepLinkedAudio(audioId) {
-    const allLessons = (publishedAudioLessons && publishedAudioLessons.length) ? publishedAudioLessons : DEFAULT_AUDIO_LESSONS;
-    const lesson = allLessons.find(l => l.id === audioId) || allLessons[0];
-    if (!lesson) return;
-
-    // Check if user is already registered or captured
-    const guestInfo = JSON.parse(localStorage.getItem('AI_GUEST_INFO') || 'null');
-    const isRegistered = Boolean(vault.user_mobile || (guestInfo && guestInfo.phone));
-
-    if (isRegistered) {
-      window.AarogyamETailer.playAudioWithProgressBar(lesson.id, lesson.title, lesson.speaker || 'आरोग्यम लीडर', lesson.summary, lesson.audio_url);
-    } else {
-      pendingAudioLesson = lesson;
-      const modal = document.getElementById('leadCaptureAudioModal');
-      const titleEl = document.getElementById('leadModalAudioTitle');
-      const spkEl = document.getElementById('leadModalAudioSpeaker');
-      if (titleEl) titleEl.textContent = lesson.title;
-      if (spkEl) spkEl.textContent = `🎙️ ${lesson.speaker || 'आरोग्यम लीडर'} • ⏱️ ${lesson.duration || '3:00 Min'}`;
-      if (modal) modal.classList.add('show');
-    }
-  }
-
-  async function submitLeadAndPlayAudio(event) {
-    if (event) event.preventDefault();
-    const nameEl = document.getElementById('leadGuestName');
-    const phoneEl = document.getElementById('leadGuestPhone');
-    const name = nameEl ? nameEl.value.trim() : '';
-    const phone = phoneEl ? phoneEl.value.trim() : '';
-
-    if (!name || !phone || phone.length < 10) {
-      alert("कृपया सही 10 अंकों का व्हाट्सएप नंबर दर्ज करें!");
-      return;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    const refCode = params.get('ref') || vault.share_id || 'DIRECT';
-
-    // 1. Save Locally (Zero Latency & Egress-free Instant Unlock)
-    const guestData = {
-      name: name,
-      phone: phone,
-      referral_code: refCode,
-      captured_at: new Date().toISOString(),
-      audio_requested: pendingAudioLesson ? pendingAudioLesson.id : ''
-    };
-    localStorage.setItem('AI_GUEST_INFO', JSON.stringify(guestData));
-    vault.user_mobile = phone;
-    vault.distributor_name = name;
-    saveLocalVault();
-
-    // 2. Write-Only Zero Egress Sync to Supabase (Non-blocking async)
-    try {
-      if (window.supabase && typeof window.supabase.createClient === 'function') {
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        client.from('retail_leads').insert([{
-          lead_name: name,
-          mobile: phone,
-          referral_code: refCode,
-          source: 'smart_etailer_audio_deeplink',
-          details_json: { audio_id: pendingAudioLesson ? pendingAudioLesson.id : '' },
-          created_at: new Date().toISOString()
-        }]).then(() => {}).catch(() => {});
-      }
-    } catch (e) {}
-
-    // 3. Close Modal
-    const modal = document.getElementById('leadCaptureAudioModal');
-    if (modal) modal.classList.remove('show');
-    showToast(`🎉 स्वागत है ${name} जी! ऑडियो शुरू हो रहा है...`, "success");
-
-    // 4. Play Audio Immediately
-    if (pendingAudioLesson) {
-      window.AarogyamETailer.playAudioWithProgressBar(
-        pendingAudioLesson.id,
-        pendingAudioLesson.title,
-        pendingAudioLesson.speaker || 'आरोग्यम लीडर',
-        pendingAudioLesson.summary,
-        pendingAudioLesson.audio_url
-      );
-    }
-  }
 
     filterTrainingHub: function (cat) {
       renderTrainingHub(cat);
