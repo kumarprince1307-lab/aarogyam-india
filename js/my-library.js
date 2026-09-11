@@ -393,74 +393,61 @@ function closeImageZoom() {
     }
 }
 
+function getLibrarySupabaseClient() {
+    if (window.dbClient && typeof window.dbClient.from === 'function') return window.dbClient;
+    if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+        try {
+            window.dbClient = window.supabase.createClient(
+                "https://qjhjrzsnrtahmhswxyvb.supabase.co",
+                "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU"
+            );
+            return window.dbClient;
+        } catch (e) {}
+    }
+    if (typeof db !== 'undefined' && db && typeof db.from === 'function') return db;
+    return null;
+}
+
 // 9. Load Books Data and Render Dynamic Library Sections & Dynamic Counts
 async function loadLibraryData() {
     try {
         let jsonBooks = [];
+        const cacheTime = Date.now();
+        
         try {
-            const cacheTime = Math.floor(Date.now() / 300000);
             const res = await fetch('/data/books.json?v=' + cacheTime);
             if (res.ok) {
                 const data = await res.json();
-                jsonBooks = data.books || [];
+                jsonBooks = data.books || data || [];
             }
-        } catch (e) {}
-
-        let customBooks = [];
-        let customLp = [];
-        let deletedIds = [];
-        try {
-            customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
-            customLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
-            deletedIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');
-        } catch (e) {}
+        } catch (e) {
+            try {
+                const res2 = await fetch('../data/books.json?v=' + cacheTime);
+                if (res2.ok) {
+                    const data2 = await res2.json();
+                    jsonBooks = data2.books || data2 || [];
+                }
+            } catch (e2) {
+                console.warn("books.json fetch note:", e2);
+            }
+        }
 
         const bookMap = new Map();
         jsonBooks.forEach(b => {
-            if (b && b.id) bookMap.set(b.id.toUpperCase(), b);
-        });
-        customBooks.forEach(b => {
-            if (b && b.id) bookMap.set(b.id.toUpperCase(), Object.assign({}, bookMap.get(b.id.toUpperCase()) || {}, b));
-        });
-        customLp.forEach(lp => {
-            if (!lp || !lp.id) return;
-            const bId = lp.id.toUpperCase();
-            const existing = bookMap.get(bId) || {};
-            const hero = lp.hero || {};
-            const isComingSoon = (lp.is_coming_soon === true || lp.is_coming_soon === 'true' || lp.status === 'coming_soon' || (lp.is_coming_soon === undefined && (existing.isComingSoon === true || existing.status === 'coming_soon')));
-            const bookStatus = isComingSoon ? 'coming_soon' : (lp.status || existing.status || 'active');
-
-            bookMap.set(bId, {
-                id: bId,
-                slug: lp.slug || bId.toLowerCase(),
-                heading: hero.title || existing.heading || existing.name || bId,
-                name: hero.title || existing.heading || existing.name || bId,
-                category: lp.category || existing.category || 'Agriculture',
-                status: bookStatus,
-                isComingSoon: isComingSoon,
-                publish_targets: lp.publish_targets || existing.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page'],
-                store_badge: isComingSoon ? 'coming_soon' : (lp.store_badge || existing.store_badge || 'best_seller'),
-                badge: isComingSoon ? 'coming_soon' : (lp.store_badge || existing.badge || 'best_seller'),
-                mrp: hero.mrp || existing.mrp || 299,
-                offerPrice: hero.offer_price || existing.offerPrice || 99,
-                cover: hero.cover_image || existing.cover || existing.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
-                thumbnail: hero.cover_image || existing.thumbnail || existing.cover || '/images/books/kharif-master-guide-2026-cover.webp',
-                banner: hero.banner_image || existing.banner,
-                mainPdf: lp.mainPdf || lp.main_pdf || existing.mainPdf || '',
-                freePdf: lp.freePdf || lp.free_pdf || lp.demoPdf || existing.freePdf || '',
-                demoPdf: lp.demoPdf || lp.freePdf || existing.demoPdf || '',
-                landingPage: bId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (bId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`)
-            });
+            if (b && b.id) {
+                const bId = b.id.toUpperCase().trim();
+                const isComing = (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true);
+                bookMap.set(bId, {
+                    ...b,
+                    id: bId,
+                    status: isComing ? 'coming_soon' : (b.status || 'active'),
+                    isComingSoon: isComing
+                });
+            }
         });
 
-        const finalBooks = Array.from(bookMap.values()).filter(b => {
-            const bIdUpper = String(b.id || '').toUpperCase();
-            if (bIdUpper === 'BK001' || bIdUpper === 'BK002' || bIdUpper === 'SUB001') return true;
-            if (deletedIds.includes(bIdUpper)) return false;
-            return true;
-        });
-
-        renderLibrarySections(finalBooks);
+        const finalBooks = Array.from(bookMap.values());
+        await renderLibrarySections(finalBooks);
     } catch (error) {
         console.error('Error loading library books:', error);
     }
@@ -479,58 +466,97 @@ async function renderLibrarySections(booksArray) {
     if (demoGrid) demoGrid.innerHTML = '';
     if (comingSoonGrid) comingSoonGrid.innerHTML = '';
 
-    if (!booksArray) return;
+    if (!booksArray || booksArray.length === 0) return;
 
-    // 1. Gather all purchases (LocalStorage + Zero-Egress Session/Supabase Cache)
+    // 1. Gather all purchases (LocalStorage + Supabase Remote Multi-Profile Sync)
     const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
-    let userPurchases = [...localPurchases];
+    let userPurchases = Array.isArray(localPurchases) ? [...localPurchases] : [];
 
     const localUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-    if (localUser.id) {
-        let cachedSupabasePurchases = null;
-        try {
-            const rawCached = sessionStorage.getItem('AIM_PURCHASES_CACHE_' + localUser.id);
-            if (rawCached) {
-                const parsed = JSON.parse(rawCached);
-                if (parsed && (Date.now() - (parsed._ts || 0) < 300000) && Array.isArray(parsed.data)) {
-                    cachedSupabasePurchases = parsed.data;
-                }
-            }
-        } catch (e) {}
+    let profileId = localUser.id || null;
+    const rawMobile = localUser.mobile || localUser.phone || '';
+    const cleanMobile = rawMobile ? String(rawMobile).replace(/\D/g, '').slice(-10) : '';
 
-        if (cachedSupabasePurchases) {
-            cachedSupabasePurchases.forEach(p => {
-                if (!userPurchases.some(up => up.book_id === p.book_id)) {
-                    userPurchases.push(p);
-                }
-            });
-        } else {
-            try {
-                const activeDb = window.dbClient || window.supabase || (typeof db !== 'undefined' ? db : null);
-                if (activeDb) {
-                    const { data } = await activeDb
-                        .from('purchases')
-                        .select('id, book_id, amount, payment_status, purchase_date, created_at')
-                        .eq('profile_id', localUser.id);
-                    if (data && data.length) {
-                        try {
-                            sessionStorage.setItem('AIM_PURCHASES_CACHE_' + localUser.id, JSON.stringify({ data: data, _ts: Date.now() }));
-                        } catch (e) {}
-                        data.forEach(p => {
-                            if (!userPurchases.some(up => up.book_id === p.book_id)) {
-                                userPurchases.push(p);
+    try {
+        const activeDb = getLibrarySupabaseClient();
+        if (activeDb) {
+            let profileIds = [];
+            if (profileId) profileIds.push(profileId);
+
+            // If mobile number exists, query Supabase profiles to get all associated profile IDs
+            if (cleanMobile && cleanMobile.length === 10) {
+                try {
+                    const { data: pList } = await activeDb
+                        .from('profiles')
+                        .select('id, full_name, mobile, is_active, is_subscriber')
+                        .or(`mobile.eq.${cleanMobile},mobile.eq.+91${cleanMobile},mobile.eq.91${cleanMobile}`);
+
+                    if (Array.isArray(pList) && pList.length > 0) {
+                        pList.forEach(p => {
+                            if (p && p.id && !profileIds.includes(p.id)) {
+                                profileIds.push(p.id);
                             }
                         });
+                        if (!localUser.id && pList[0].id) {
+                            localUser.id = pList[0].id;
+                            if (pList[0].full_name && !localUser.full_name) localUser.full_name = pList[0].full_name;
+                            if (pList[0].is_active) localUser.is_active = true;
+                            if (pList[0].is_subscriber) localUser.is_subscriber = true;
+                            localStorage.setItem('AI_USER', JSON.stringify(localUser));
+                        }
                     }
+                } catch (pe) {
+                    console.warn("Profile query note:", pe);
                 }
-            } catch (e) {
-                console.log("Purchases fetch note:", e);
+            }
+
+            // If profile ID(s) exist, query Supabase purchases table
+            if (profileIds.length > 0) {
+                const { data: dbPurchases, error: purErr } = await activeDb
+                    .from('purchases')
+                    .select('id, profile_id, book_id, amount, payment_status, payment_id, order_id, purchase_date, created_at')
+                    .in('profile_id', profileIds);
+
+                if (!purErr && Array.isArray(dbPurchases) && dbPurchases.length > 0) {
+                    dbPurchases.forEach(p => {
+                        const rawBId = String(p.book_id || '').toUpperCase().trim();
+                        if (rawBId) {
+                            const bIds = rawBId.includes(',') ? rawBId.split(',').map(s => s.trim().toUpperCase()) : [rawBId];
+                            bIds.forEach(singleId => {
+                                if (singleId && !userPurchases.some(up => String(up.book_id || up.id || '').toUpperCase() === singleId)) {
+                                    userPurchases.push({
+                                        id: p.id || ('pur_' + singleId),
+                                        book_id: singleId,
+                                        amount: p.amount,
+                                        payment_status: p.payment_status || 'success',
+                                        purchase_date: p.purchase_date || p.created_at || new Date().toISOString()
+                                    });
+                                }
+                            });
+                        }
+                    });
+                    localStorage.setItem('AI_PURCHASES', JSON.stringify(userPurchases));
+                    localStorage.setItem('purchases', JSON.stringify(userPurchases));
+                }
             }
         }
+    } catch (dbErr) {
+        console.warn("Supabase purchases sync exception:", dbErr);
     }
 
-    const testPaymentDone = localStorage.getItem('AI_CURRENT_PAYMENT');
-    let hasBoughtAny = userPurchases.length > 0 || Boolean(testPaymentDone);
+    // Filter valid purchased book IDs (Coming Soon books e.g. BK015 can NEVER be purchased)
+    const activePurchasedBookIds = new Set();
+    userPurchases.forEach(p => {
+        if (!p) return;
+        const bId = String(p.book_id || p.id || '').toUpperCase().trim();
+        if (bId) {
+            const matchedBook = booksArray.find(b => (b.id && b.id.toUpperCase() === bId) || (b.book_id && b.book_id.toUpperCase() === bId));
+            const isComing = matchedBook ? (matchedBook.status === 'coming_soon' || matchedBook.isComingSoon === true) : (bId !== 'BK001' && bId !== 'BK002' && bId !== 'SUB001');
+            if (!isComing) {
+                activePurchasedBookIds.add(bId);
+            }
+        }
+    });
 
     let purchasedCount = 0;
     let bonusCount = 0;
@@ -547,7 +573,7 @@ async function renderLibrarySections(booksArray) {
 
     // Render Books across all active sections (Deduplicated)
     booksArray.forEach(book => {
-        const rawId = (book.book_id || book.id || '').toUpperCase();
+        const rawId = (book.book_id || book.id || '').toUpperCase().trim();
         if (!rawId) return;
 
         const bookId = book.book_id || book.id;
@@ -562,15 +588,7 @@ async function renderLibrarySections(booksArray) {
         }
 
         // 1. Purchased / My Books (Coming soon unreleased books can NEVER appear in purchased locker)
-        const isPurchased = !isComingSoonBook && userPurchases.some(p => {
-            if (!p) return false;
-            const bIdStr = String(p.book_id || p.id || '').toUpperCase();
-            if (bIdStr === rawId) return true;
-            if (bIdStr.includes(',')) {
-                return bIdStr.split(',').map(x => x.trim()).includes(rawId);
-            }
-            return false;
-        });
+        const isPurchased = !isComingSoonBook && activePurchasedBookIds.has(rawId);
 
         if (isPurchased && !seenPurchasedIds.has(rawId)) {
             seenPurchasedIds.add(rawId);
@@ -593,24 +611,12 @@ async function renderLibrarySections(booksArray) {
 
             // Check if purchased book has specific bonus books in Landing Pages or JSON
             let bonusList = [];
-            if (book.bonusBooks && Array.isArray(book.bonusBooks)) {
+            if (book.bonusBooks && Array.isArray(book.bonusBooks) && book.bonusBooks.length > 0) {
                 bonusList = book.bonusBooks.map((f, i) => ({ title: `${bookName} — VIP बोनस #${i+1}`, file_url: f, image: bookCover }));
             }
-            if (book.bonuses && Array.isArray(book.bonuses)) {
+            if (book.bonuses && Array.isArray(book.bonuses) && book.bonuses.length > 0) {
                 bonusList = [...bonusList, ...book.bonuses];
             }
-            try {
-                const landingList = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
-                const lp = landingList.find(p => p.id && p.id.toUpperCase() === rawId);
-                if (lp && (lp.bonuses || lp.bonus_books)) {
-                    const lBonuses = lp.bonuses || lp.bonus_books || [];
-                    lBonuses.forEach(bn => {
-                        if (!bonusList.some(bItem => bItem.title === bn.title)) {
-                            bonusList.push(bn);
-                        }
-                    });
-                }
-            } catch (e) {}
 
             if (bonusList.length > 0 && bonusGrid) {
                 bonusList.forEach((bn, bIdx) => {
@@ -638,7 +644,7 @@ async function renderLibrarySections(booksArray) {
         }
 
         // 2. Available Books (All live active published books)
-        const isLiveAgri = !isComingSoonBook && (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001') && (book.publish_targets ? book.publish_targets.includes('my_library') : true);
+        const isLiveAgri = !isComingSoonBook && (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001');
         if (isLiveAgri && !seenAvailableIds.has(rawId)) {
             seenAvailableIds.add(rawId);
             if (window.renderUniversalBookMarketingCard && typeof window.renderUniversalBookMarketingCard === 'function') {
@@ -665,8 +671,8 @@ async function renderLibrarySections(booksArray) {
             }
         }
 
-        // 3. Demo Books (Read Free Samples)
-        if (!isComingSoonBook && (book.demoAvailable || book.demoPdf || book.freePdf || rawId === 'BK001' || rawId === 'BK002') && !seenDemoIds.has(rawId)) {
+        // 3. Demo Books (Read Free Samples - only live books with demos)
+        if (!isComingSoonBook && (book.demoAvailable === true || rawId === 'BK001' || rawId === 'BK002') && !seenDemoIds.has(rawId)) {
             seenDemoIds.add(rawId);
             demoCount++;
             const demoCard = document.createElement('div');
@@ -682,7 +688,7 @@ async function renderLibrarySections(booksArray) {
             if (demoGrid) demoGrid.appendChild(demoCard);
         }
 
-        // 4. Coming Soon Books (All unreleased books)
+        // 4. Coming Soon Books (All 11 unreleased books)
         if (isComingSoonBook && !seenComingSoonIds.has(rawId)) {
             seenComingSoonIds.add(rawId);
             const comingCard = document.createElement('div');
@@ -727,6 +733,7 @@ async function renderLibrarySections(booksArray) {
         `;
         bonusGrid.appendChild(genBonusCard2);
     } else if (bonusGrid && purchasedCount === 0) {
+        bonusCount = 0;
         bonusGrid.innerHTML = `
             <div style="grid-column: span 2; text-align: center; padding: 30px; color: #666; background:#fff; border-radius:12px; border:1px dashed #cbd5e1;">
                 <p style="font-size: 0.95rem; font-weight: 700; color:#1e293b;">🎁 अभी कोई मुफ़्त बोनस अनलॉक नहीं है।</p>
