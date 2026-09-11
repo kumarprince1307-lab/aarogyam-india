@@ -185,12 +185,20 @@ class ProAudioBookEngine {
     setupAudioElement() {
         this.audioElement.preload = 'metadata';
         this.audioElement.addEventListener('ended', () => {
-            this.setPlayingState(false);
-            if (this.autoNextPage && typeof window.onNextPage === 'function') {
-                window.onNextPage();
+            const totalPages = window.aoiTotalPages || 152;
+            const curPage = window.aoiPageNum || 1;
+            if (this.autoNextPage && curPage < totalPages) {
+                this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
+                if (typeof window.onNextPage === 'function') {
+                    window.onNextPage();
+                }
                 setTimeout(() => {
-                    if (this.isPlaying) this.playCurrentPage();
-                }, 600);
+                    this.isPlaying = true;
+                    this.playCurrentPage();
+                }, 500);
+            } else {
+                this.setPlayingState(false);
+                this.updateStatusDisplay(`✅ पुस्तक वाचन समाप्त हुआ`);
             }
         });
         this.audioElement.addEventListener('play', () => this.setPlayingState(true));
@@ -248,9 +256,6 @@ class ProAudioBookEngine {
     async playCurrentPage() {
         const currentPage = window.aoiPageNum || 1;
         this.getUserProfileName();
-
-        // Start Soothing BGM in background
-        this.bgm.start();
 
         // 1. Play Welcome Greeting Once on First Start
         if (!this.welcomePlayed) {
@@ -335,29 +340,41 @@ class ProAudioBookEngine {
         };
 
         this.currentUtterance.onend = () => {
-            this.setPlayingState(false);
-            
             // If welcome audio finished, immediately start reading the current page
             if (isWelcome) {
                 setTimeout(() => {
                     this.isPlaying = true;
                     this.playCurrentPage();
-                }, 400);
+                }, 300);
                 return;
             }
 
-            // Auto Turn Page
-            if (this.autoNextPage && window.aoiPageNum < (window.aoiTotalPages || 999)) {
+            // Auto Turn Page & Continue Playing
+            const totalPages = window.aoiTotalPages || 152;
+            const curPage = window.aoiPageNum || 1;
+            if (this.autoNextPage && curPage < totalPages) {
+                this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
                 if (typeof window.onNextPage === 'function') {
                     window.onNextPage();
-                    setTimeout(() => {
-                        if (this.isPlaying) this.playCurrentPage();
-                    }, 600);
                 }
+                setTimeout(() => {
+                    this.isPlaying = true;
+                    this.playCurrentPage();
+                }, 500);
             } else {
-                this.updateStatusDisplay(`✅ पृष्ठ ${currentPage} समाप्त हुआ`);
+                this.setPlayingState(false);
+                this.updateStatusDisplay(`✅ पृष्ठ ${curPage} समाप्त हुआ`);
             }
         };
+
+        this.currentUtterance.onerror = (e) => {
+            console.warn("TTS Error:", e);
+            this.setPlayingState(false);
+        };
+
+        this.synth.speak(this.currentUtterance);
+        this.isPlaying = true;
+    }
 
         this.currentUtterance.onerror = (e) => {
             console.warn("TTS Error:", e);
@@ -522,6 +539,81 @@ class ProAudioBookEngine {
                 this.playCurrentPage();
             }
         });
+
+        // 4-Second Marketing Audio Feature Announcement Toast
+        setTimeout(() => {
+            this.showMarketingAudioToast();
+        }, 1000);
+    }
+
+    showMarketingAudioToast() {
+        if (sessionStorage.getItem('AIM_AUDIO_TOAST_SHOWN')) return;
+        sessionStorage.setItem('AIM_AUDIO_TOAST_SHOWN', 'true');
+
+        const toast = document.createElement('div');
+        toast.id = 'abMarketingToast';
+        toast.style.cssText = `
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            z-index: 999999;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid #10b981;
+            border-radius: 50px;
+            padding: 8px 16px 8px 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(16,185,129,0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            font-family: 'Inter', system-ui, sans-serif;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 90vw;
+        `;
+
+        toast.innerHTML = `
+            <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg, #10b981, #059669); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; box-shadow:0 0 10px #10b981;">
+                🎧
+            </div>
+            <div>
+                <div style="font-size:0.85rem; font-weight:800; color:#34d399; line-height:1.2;">
+                    खुशखबरी! इस पुस्तक का ऑडियो उपलब्ध है
+                </div>
+                <div style="font-size:0.72rem; color:#cbd5e1;">
+                    पढ़ने के साथ-साथ पूरी किताब की आवाज़ भी सुनें
+                </div>
+            </div>
+            <button id="toastPlayAudioBtn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; border-radius:25px; padding:6px 14px; font-size:0.78rem; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 4px 12px rgba(16,185,129,0.4);">
+                ▶️ ऑडियो सुनें
+            </button>
+        `;
+
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => {
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+        });
+
+        const playBtn = toast.querySelector('#toastPlayAudioBtn');
+        if (playBtn) {
+            playBtn.addEventListener('click', () => {
+                const bar = document.getElementById('abBottomBar');
+                if (bar) bar.classList.add('open');
+                this.playCurrentPage();
+                toast.style.transform = 'translateX(-50%) translateY(-120px)';
+                setTimeout(() => toast.remove(), 400);
+            });
+        }
+
+        // Auto hide after exactly 4 seconds (4000ms)
+        setTimeout(() => {
+            if (toast && toast.parentNode) {
+                toast.style.transform = 'translateX(-50%) translateY(-120px)';
+                setTimeout(() => toast.remove(), 400);
+            }
+        }, 4000);
     }
 }
 

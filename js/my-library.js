@@ -532,6 +532,7 @@ async function renderLibrarySections(booksArray) {
     let purchasedCount = 0;
     let bonusCount = 0;
     let demoCount = 0;
+    let audioCount = 0;
     let wishlistItems = JSON.parse(localStorage.getItem('AI_WISHLIST') || '[]');
     let wishlistCount = wishlistItems.length;
 
@@ -539,6 +540,7 @@ async function renderLibrarySections(booksArray) {
     const seenAvailableIds = new Set();
     const seenDemoIds = new Set();
     const seenComingSoonIds = new Set();
+    const seenAudioIds = new Set();
 
     // Render Books across all active sections (Deduplicated)
     booksArray.forEach(book => {
@@ -548,6 +550,12 @@ async function renderLibrarySections(booksArray) {
         const bookId = book.book_id || book.id;
         const bookName = book.title || book.heading || book.name;
         const bookCover = book.cover_image || book.cover || '/images/banners/farmer-community-banner.jpeg';
+        const hasAudioBook = Boolean(book.hasAudioBook || book.has_audio || rawId === 'BK001' || rawId === 'BK002' || rawId === 'DEMO001' || rawId === 'FREE001');
+
+        if (hasAudioBook && !seenAudioIds.has(rawId)) {
+            seenAudioIds.add(rawId);
+            audioCount++;
+        }
 
         // 1. Purchased / My Books (Unique per Book ID - Supports individual and bundle cart purchases)
         const isPurchased = userPurchases.some(p => {
@@ -565,11 +573,15 @@ async function renderLibrarySections(booksArray) {
             const card = document.createElement('div');
             card.className = 'book-card';
             card.innerHTML = `
-                <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
+                <div style="position:relative;">
+                    <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
+                    ${hasAudioBook ? '<span style="position:absolute; bottom:8px; left:8px; background:linear-gradient(135deg, #8b5cf6, #6366f1); color:#fff; font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.3);">🎧 ऑडियो उपलब्ध</span>' : ''}
+                </div>
                 <h4>${bookName}</h4>
-                <div class="book-btn-group" style="display:flex;gap:8px;margin-top:10px;">
-                    <a href="/ebooks/reader.html?book=${bookId}" class="btn-read" style="flex:1;padding:10px;background:#138A36;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Read Now</a>
-                    <a href="/pdf/full/${bookId}.pdf" target="_blank" class="btn-buy" style="flex:1;padding:10px;background:#E86A17;color:#fff;text-align:center;border-radius:12px;font-weight:700;text-decoration:none;cursor:pointer;">Download PDF</a>
+                <div class="book-btn-group" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+                    <a href="/ebooks/reader.html?book=${bookId}" class="btn-read" style="flex:1;min-width:90px;padding:8px;background:#138A36;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;">📖 Read</a>
+                    ${hasAudioBook ? `<a href="/ebooks/reader.html?book=${bookId}&audio=1" class="btn-audio" style="flex:1;min-width:90px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;" title="ऑडियो बुक सुनें">🎧 ऑडियो</a>` : ''}
+                    <a href="/pdf/full/${bookId}.pdf" target="_blank" class="btn-buy" style="flex:1;min-width:90px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;">📥 PDF</a>
                 </div>
             `;
             if (purchasedGrid) purchasedGrid.appendChild(card);
@@ -713,7 +725,7 @@ async function renderLibrarySections(booksArray) {
     }
 
     // Update Welcome Card Stats
-    updateWelcomeStatsCounts(purchasedCount, bonusCount, wishlistCount, demoCount);
+    updateWelcomeStatsCounts(purchasedCount, bonusCount, wishlistCount, demoCount, audioCount);
 
     if (purchasedCount === 0 && purchasedGrid) {
         purchasedGrid.innerHTML = `
@@ -729,7 +741,7 @@ async function renderLibrarySections(booksArray) {
 }
 
 // वेलकम कार्ड के काउंट्स को वास्तविक वैल्यू से अपडेट करने का फंक्शन
-function updateWelcomeStatsCounts(purchased, bonus, wishlist, demo) {
+function updateWelcomeStatsCounts(purchased, bonus, wishlist, demo, audio) {
     const kpiPurchased = document.getElementById('kpiPurchasedCount');
     if (kpiPurchased) kpiPurchased.textContent = purchased;
 
@@ -738,6 +750,9 @@ function updateWelcomeStatsCounts(purchased, bonus, wishlist, demo) {
 
     const kpiDemo = document.getElementById('kpiDemoCount');
     if (kpiDemo) kpiDemo.textContent = demo || 0;
+
+    const kpiAudio = document.getElementById('kpiAudioCount');
+    if (kpiAudio) kpiAudio.textContent = audio || 0;
 
     const kpiWishlist = document.getElementById('kpiWishlistCount');
     if (kpiWishlist) kpiWishlist.textContent = wishlist;

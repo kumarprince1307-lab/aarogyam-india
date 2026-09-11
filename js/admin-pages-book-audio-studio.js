@@ -384,10 +384,10 @@ export async function initBookAudioStudio() {
                       🎧 कानों को प्यारा इको (Sweet Studio Echo):
                     </label>
                     <select id="studioEchoPresetSelect" class="admin-input" style="width:100%; padding:4px 8px; font-size:0.8rem; font-weight:700;">
-                      <option value="sweet" selected>✨ हल्का मधुर इको (Sweet Echo - 15%)</option>
-                      <option value="medium">🎙️ मीडियम पॉडकास्ट इको (Medium - 25%)</option>
-                      <option value="rich">🏛️ रिच कॉन्सर्ट इको (Rich Presence - 35%)</option>
-                      <option value="none">🔇 इको बंद (Pure Direct Voice - 0%)</option>
+                      <option value="sweet" selected>✨ हल्का मधुर इको (Sweet Echo - 35%)</option>
+                      <option value="medium">🎙️ मीडियम पॉडकास्ट इको (Medium Echo - 50%)</option>
+                      <option value="rich">🏛️ रिच कॉन्सर्ट इको (Rich Presence - 65%)</option>
+                      <option value="none">🔇 इको बंद (Direct Mic - 0%)</option>
                     </select>
                   </div>
 
@@ -404,14 +404,17 @@ export async function initBookAudioStudio() {
                 </div>
               </div>
 
-              <div style="display:flex; align-items:center; gap:12px; margin-top:10px; padding:14px; background:#0f172a; border-radius:8px;">
-                <button id="startRecBtn" class="admin-btn" style="background:#ef4444; color:#fff;">
+              <div style="display:flex; align-items:center; gap:8px; margin-top:10px; padding:12px; background:#0f172a; border-radius:8px; flex-wrap:wrap;">
+                <button id="startRecBtn" class="admin-btn" style="background:#ef4444; color:#fff; padding:8px 16px; font-weight:700;">
                   <span>🔴</span> रिकॉर्ड शुरू करें
                 </button>
-                <button id="stopRecBtn" class="admin-btn" style="background:#475569; color:#fff; display:none;">
+                <button id="stopRecBtn" class="admin-btn" style="background:#475569; color:#fff; display:none; padding:8px 16px; font-weight:700;">
                   <span>⏹️</span> रोकें (Stop)
                 </button>
-                <div id="recStatusWave" style="height:34px; flex:1; background:#1e293b; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">
+                <button id="testLiveMicBtn" class="admin-btn admin-btn-secondary" style="padding:8px 12px; font-size:12px;" title="ईयरफोन लगाकर अपनी आवाज़ और मधुर इको तुरंत लाइव सुनें">
+                  <span>🎧</span> लाइव टेस्ट (Live Echo Test)
+                </button>
+                <div id="recStatusWave" style="height:34px; flex:1; min-width:180px; background:#1e293b; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">
                   माइक तैयार है (🛡️ नॉइज़ फ़िल्टर + 🎧 मधुर इको)
                 </div>
               </div>
@@ -610,6 +613,11 @@ async function setupStudioEvents() {
     const deleteRecordedAudioBtn = document.getElementById('deleteRecordedAudioBtn');
     if (deleteRecordedAudioBtn) {
         deleteRecordedAudioBtn.addEventListener('click', () => deleteCurrentPageAudio());
+    }
+
+    const testLiveMicBtn = document.getElementById('testLiveMicBtn');
+    if (testLiveMicBtn) {
+        testLiveMicBtn.addEventListener('click', () => toggleLiveMicMonitoring());
     }
 
     // Import / Cross-Book Assembler Events
@@ -1551,9 +1559,153 @@ function testCurrentPageTts() {
 
 let studioAudioCtx = null;
 let studioMicStream = null;
+let isLiveMicMonitoring = false;
+let liveMonitorStream = null;
+let liveMonitorCtx = null;
+
+async function toggleLiveMicMonitoring() {
+    const btn = document.getElementById('testLiveMicBtn');
+    if (isLiveMicMonitoring) {
+        // Stop Live Monitoring
+        if (liveMonitorStream) {
+            liveMonitorStream.getTracks().forEach(t => t.stop());
+            liveMonitorStream = null;
+        }
+        if (liveMonitorCtx && liveMonitorCtx.state !== 'closed') {
+            liveMonitorCtx.close().catch(() => {});
+            liveMonitorCtx = null;
+        }
+        isLiveMicMonitoring = false;
+        if (btn) {
+            btn.innerHTML = `<span>🎧</span> लाइव टेस्ट (Live Echo Test)`;
+            btn.style.background = '#334155';
+            btn.style.color = '#e2e8f0';
+        }
+        const waveBox = document.getElementById('recStatusWave');
+        if (waveBox) waveBox.innerHTML = `माइक तैयार है (🛡️ नॉइज़ फ़िल्टर + 🎧 मधुर इको)`;
+        return;
+    }
+
+    try {
+        if (btn) {
+            btn.innerHTML = `<span>⏳</span> शुरू हो रहा है...`;
+        }
+
+        const noiseFilterSetting = document.getElementById('studioNoiseFilterSelect')?.value || 'high';
+        const useBrowserDSP = noiseFilterSetting !== 'off';
+
+        const constraints = {
+            audio: {
+                channelCount: 1,
+                sampleRate: 48000,
+                echoCancellation: useBrowserDSP,
+                noiseSuppression: useBrowserDSP,
+                autoGainControl: useBrowserDSP
+            }
+        };
+
+        liveMonitorStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        liveMonitorCtx = new AudioCtx({ sampleRate: 48000 });
+        if (liveMonitorCtx.state === 'suspended') {
+            await liveMonitorCtx.resume();
+        }
+
+        const source = liveMonitorCtx.createMediaStreamSource(liveMonitorStream);
+
+        // 1. High-Pass Filter (Low-cut rumble filter)
+        const highPass = liveMonitorCtx.createBiquadFilter();
+        highPass.type = 'highpass';
+        highPass.frequency.setValueAtTime(noiseFilterSetting === 'high' ? 90 : 70, liveMonitorCtx.currentTime);
+        highPass.Q.setValueAtTime(0.7, liveMonitorCtx.currentTime);
+
+        // 2. Low-Pass Filter (De-hiss filter)
+        const lowPass = liveMonitorCtx.createBiquadFilter();
+        lowPass.type = 'lowpass';
+        lowPass.frequency.setValueAtTime(noiseFilterSetting === 'high' ? 11500 : 13000, liveMonitorCtx.currentTime);
+        lowPass.Q.setValueAtTime(0.7, liveMonitorCtx.currentTime);
+
+        // 3. Compressor
+        const comp = liveMonitorCtx.createDynamicsCompressor();
+        comp.threshold.setValueAtTime(noiseFilterSetting === 'high' ? -42 : -36, liveMonitorCtx.currentTime);
+        comp.knee.setValueAtTime(12, liveMonitorCtx.currentTime);
+        comp.ratio.setValueAtTime(6, liveMonitorCtx.currentTime);
+        comp.attack.setValueAtTime(0.003, liveMonitorCtx.currentTime);
+        comp.release.setValueAtTime(0.15, liveMonitorCtx.currentTime);
+
+        source.connect(highPass);
+        highPass.connect(lowPass);
+        lowPass.connect(comp);
+
+        // Direct dry sound
+        const dryGain = liveMonitorCtx.createGain();
+        dryGain.gain.setValueAtTime(0.95, liveMonitorCtx.currentTime);
+        comp.connect(dryGain);
+        dryGain.connect(liveMonitorCtx.destination);
+
+        // Echo wet loop
+        const echoPreset = document.getElementById('studioEchoPresetSelect')?.value || 'sweet';
+        let echoGainLevel = 0.35;
+        let delayTimeVal = 0.080;
+
+        if (echoPreset === 'medium') {
+            echoGainLevel = 0.50;
+            delayTimeVal = 0.110;
+        } else if (echoPreset === 'rich') {
+            echoGainLevel = 0.65;
+            delayTimeVal = 0.140;
+        } else if (echoPreset === 'none') {
+            echoGainLevel = 0.0;
+        }
+
+        if (echoGainLevel > 0) {
+            const delay = liveMonitorCtx.createDelay();
+            delay.delayTime.setValueAtTime(delayTimeVal, liveMonitorCtx.currentTime);
+
+            const tone = liveMonitorCtx.createBiquadFilter();
+            tone.type = 'lowpass';
+            tone.frequency.setValueAtTime(2800, liveMonitorCtx.currentTime);
+
+            const feedback = liveMonitorCtx.createGain();
+            feedback.gain.setValueAtTime(echoGainLevel * 0.45, liveMonitorCtx.currentTime);
+
+            const wetGain = liveMonitorCtx.createGain();
+            wetGain.gain.setValueAtTime(echoGainLevel, liveMonitorCtx.currentTime);
+
+            comp.connect(delay);
+            delay.connect(tone);
+            tone.connect(feedback);
+            feedback.connect(delay);
+            tone.connect(wetGain);
+            wetGain.connect(liveMonitorCtx.destination);
+        }
+
+        isLiveMicMonitoring = true;
+        if (btn) {
+            btn.innerHTML = `<span>🟢</span> लाइव मॉनिटर चालू (बंद करें)`;
+            btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            btn.style.color = '#fff';
+        }
+
+        const waveBox = document.getElementById('recStatusWave');
+        if (waveBox) waveBox.innerHTML = `🎧 लाइव हेडफ़ोन मॉनिटरिंग सक्रिय! बोलकर टेस्ट करें।`;
+    } catch (err) {
+        console.error("Live mic test error:", err);
+        alert("माइक एक्सेस नहीं मिल पाया। कृपया ब्राउज़र में माइक्रोफ़ोन की अनुमति दें।");
+        if (btn) {
+            btn.innerHTML = `<span>🎧</span> लाइव टेस्ट (Live Echo Test)`;
+            btn.style.background = '#334155';
+        }
+    }
+}
 
 async function startRecording() {
     try {
+        // Stop live monitoring if active
+        if (isLiveMicMonitoring) {
+            await toggleLiveMicMonitoring();
+        }
+
         const noiseFilterSetting = document.getElementById('studioNoiseFilterSelect')?.value || 'high';
         const useBrowserDSP = noiseFilterSetting !== 'off';
 
@@ -1606,15 +1758,15 @@ async function startRecording() {
 
         // 4. Sweet Acoustic Echo & Presence Branch
         const echoPreset = document.getElementById('studioEchoPresetSelect')?.value || 'sweet';
-        let echoGainLevel = 0.15; // default 15% sweet acoustic echo
-        let delayTimeVal = 0.055; // 55ms warm slapback
+        let echoGainLevel = 0.35; // 35% sweet acoustic echo
+        let delayTimeVal = 0.080; // 80ms warm slapback
 
         if (echoPreset === 'medium') {
-            echoGainLevel = 0.25;
-            delayTimeVal = 0.075;
+            echoGainLevel = 0.50;
+            delayTimeVal = 0.110;
         } else if (echoPreset === 'rich') {
-            echoGainLevel = 0.35;
-            delayTimeVal = 0.095;
+            echoGainLevel = 0.65;
+            delayTimeVal = 0.140;
         } else if (echoPreset === 'none') {
             echoGainLevel = 0.0;
         }
@@ -1623,7 +1775,7 @@ async function startRecording() {
 
         // Direct Voice (Dry)
         const dryGain = studioAudioCtx.createGain();
-        dryGain.gain.setValueAtTime(0.92, studioAudioCtx.currentTime);
+        dryGain.gain.setValueAtTime(0.95, studioAudioCtx.currentTime);
         compressor.connect(dryGain);
         dryGain.connect(destNode);
 
@@ -1635,19 +1787,19 @@ async function startRecording() {
             // Warm tone filter for echo (softens high frequencies so echo feels natural, not metallic)
             const echoToneFilter = studioAudioCtx.createBiquadFilter();
             echoToneFilter.type = 'lowpass';
-            echoToneFilter.frequency.setValueAtTime(3200, studioAudioCtx.currentTime);
+            echoToneFilter.frequency.setValueAtTime(2800, studioAudioCtx.currentTime);
 
             const feedbackGain = studioAudioCtx.createGain();
-            feedbackGain.gain.setValueAtTime(echoGainLevel, studioAudioCtx.currentTime);
+            feedbackGain.gain.setValueAtTime(echoGainLevel * 0.45, studioAudioCtx.currentTime);
 
             const echoOutputGain = studioAudioCtx.createGain();
-            echoOutputGain.gain.setValueAtTime(echoGainLevel * 0.9, studioAudioCtx.currentTime);
+            echoOutputGain.gain.setValueAtTime(echoGainLevel, studioAudioCtx.currentTime);
 
             // Connect echo loop
             compressor.connect(delayNode);
             delayNode.connect(echoToneFilter);
             echoToneFilter.connect(feedbackGain);
-            feedbackGain.connect(delayNode); // feedback
+            feedbackGain.connect(delayNode); // feedback loop
 
             echoToneFilter.connect(echoOutputGain);
             echoOutputGain.connect(destNode);
@@ -1676,7 +1828,7 @@ async function startRecording() {
             }
 
             const waveBox = document.getElementById('recStatusWave');
-            if (waveBox) waveBox.innerHTML = `✅ रिकॉर्डिंग पूरी हुई (${Math.round(recordedAudioBlob.size / 1024)} KB) • 🎧 स्टूडियो साउंड सक्रिय`;
+            if (waveBox) waveBox.innerHTML = `✅ रिकॉर्डिंग पूरी हुई (${Math.round(recordedAudioBlob.size / 1024)} KB) • 🎧 मधुर इको स्टूडियो साउंड सक्रिय`;
 
             if (studioAudioCtx && studioAudioCtx.state !== 'closed') {
                 studioAudioCtx.close().catch(() => {});
