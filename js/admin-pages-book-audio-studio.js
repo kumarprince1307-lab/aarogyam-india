@@ -358,10 +358,13 @@ export async function initBookAudioStudio() {
                     🔊 महिला आवाज़ में सुनें (TTS Test)
                   </button>
                 </div>
-                <div style="display:flex; gap:8px; align-items:center;">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                   <span id="autoSaveBadge" style="font-size:0.75rem; color:#34d399; font-weight:700; background:#064e3b; padding:3px 8px; border-radius:4px; display:none;">✅ स्वतः सेव हुआ</span>
                   <button id="savePageTextBtn" class="admin-btn admin-btn-primary" style="padding:6px 14px; font-size:12px;">
                     💾 सेव करें (Save)
+                  </button>
+                  <button id="gitPushEditorBtn" class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:6px 14px; font-weight:800; font-size:12px; box-shadow:0 4px 12px rgba(16,185,129,0.35); display:inline-flex; align-items:center; gap:4px;" title="ऑडियो और टेक्स्ट को सीधे Git पर पुश करें">
+                    <span>🚀</span> 1-Click Git Push
                   </button>
                 </div>
               </div>
@@ -624,6 +627,11 @@ async function setupStudioEvents() {
     const gitPushStagingBtn = document.getElementById('gitPushStagingBtn');
     if (gitPushStagingBtn) {
         gitPushStagingBtn.addEventListener('click', () => syncStudioToGitHub());
+    }
+
+    const gitPushEditorBtn = document.getElementById('gitPushEditorBtn');
+    if (gitPushEditorBtn) {
+        gitPushEditorBtn.addEventListener('click', () => syncStudioToGitHub());
     }
 
     // Modal Close
