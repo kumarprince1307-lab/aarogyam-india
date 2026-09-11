@@ -1712,16 +1712,17 @@ function saveCurrentPageText() {
     const text = textInput ? textInput.value.trim() : '';
 
     if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
-    if (!studioAudioScripts.pages[String(studioCurrentPage)]) {
-        studioAudioScripts.pages[String(studioCurrentPage)] = {};
-    }
+    const pageKey = String(studioCurrentPage);
 
-    if (typeof studioAudioScripts.pages[String(studioCurrentPage)] === 'string') {
-        studioAudioScripts.pages[String(studioCurrentPage)] = { text: text, audio: '' };
+    if (!studioAudioScripts.pages[pageKey]) {
+        studioAudioScripts.pages[pageKey] = { text: text, audio: '' };
+    } else if (typeof studioAudioScripts.pages[pageKey] === 'string') {
+        studioAudioScripts.pages[pageKey] = { text: text, audio: '' };
     } else {
-        studioAudioScripts.pages[String(studioCurrentPage)].text = text;
+        studioAudioScripts.pages[pageKey].text = text;
     }
 
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
     audioScriptsModified = true;
     markUnsaved(true);
     renderPageChipGrid();
@@ -2052,59 +2053,6 @@ function stopRecording() {
     }
     document.getElementById('startRecBtn').style.display = 'inline-flex';
     document.getElementById('stopRecBtn').style.display = 'none';
-}
-
-function saveCurrentPageText() {
-    const textInput = document.getElementById('pageTextInput');
-    const textVal = textInput ? textInput.value.trim() : '';
-
-    if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
-    const pageKey = String(studioCurrentPage);
-
-    if (!studioAudioScripts.pages[pageKey]) {
-        studioAudioScripts.pages[pageKey] = { text: textVal, audio: '' };
-    } else if (typeof studioAudioScripts.pages[pageKey] === 'string') {
-        studioAudioScripts.pages[pageKey] = { text: textVal, audio: '' };
-    } else {
-        studioAudioScripts.pages[pageKey].text = textVal;
-    }
-
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
-    audioScriptsModified = true;
-    markUnsaved(true);
-    renderPageChipGrid();
-    alert(`✅ पृष्ठ ${studioCurrentPage} का टेक्स्ट स्क्रिप्ट सेव हो गया!\nअब "1-Click Push to Git" दबाने पर यह तुरंत Git और लाइव रीडर पर अपडेट हो जाएगा।`);
-}
-
-function testCurrentPageTts() {
-    const textInput = document.getElementById('pageTextInput');
-    const text = textInput ? textInput.value.trim() : '';
-    if (!text) {
-        alert("कृपया पहले टेक्स्ट बॉक्स में कुछ लिखें या पेस्ट करें।");
-        return;
-    }
-
-    if (!('speechSynthesis' in window)) {
-        alert("आपके ब्राउज़र में स्पीच सिंथेसिस सपोर्ट नहीं है।");
-        return;
-    }
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'hi-IN';
-    utterance.rate = 0.95;
-    utterance.pitch = 1.0;
-
-    const voices = window.speechSynthesis.getVoices() || [];
-    const hindiVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
-    const femaleVoice = hindiVoices.find(v => {
-        const name = v.name.toLowerCase();
-        return name.includes('kalpana') || name.includes('swara') || name.includes('heera') || name.includes('female') || name.includes('google') || name.includes('zira');
-    }) || hindiVoices[0] || voices.find(v => v.lang && v.lang.startsWith('en-IN')) || voices[0];
-
-    if (femaleVoice) utterance.voice = femaleVoice;
-
-    window.speechSynthesis.speak(utterance);
 }
 
 function saveCurrentPageAudio() {
