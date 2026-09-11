@@ -802,7 +802,64 @@ async function loadBookStudio(bookId) {
         studioTotalPages = studioPageImages.length;
     }
 
-    // 4. Load Audio Scripts
+    // 4. Try loading from LocalStorage
+    if (!studioPageImages.length) {
+        try {
+            const localPages = localStorage.getItem(`AOI_BOOK_PAGES_${bookId.toUpperCase()}`);
+            if (localPages) {
+                const parsedPages = JSON.parse(localPages);
+                if (Array.isArray(parsedPages) && parsedPages.length > 0) {
+                    studioPageImages = parsedPages;
+                    studioTotalPages = parsedPages.length;
+                }
+            }
+        } catch (e) {}
+    }
+
+    // 5. Try loading from Static WebP images in Repository / books.json
+    if (!studioPageImages.length) {
+        const cleanId = String(bookId).toUpperCase();
+        const total = (studioBookData && studioBookData.totalPages) 
+            ? studioBookData.totalPages 
+            : (cleanId === 'BK001' ? 152 : (cleanId === 'BK002' ? 118 : 0));
+        const basePath = (studioBookData && studioBookData.pageImagesPath) 
+            ? studioBookData.pageImagesPath 
+            : `images/books/${cleanId}`;
+
+        if (total > 0 && (studioBookData?.hasWebpPages || cleanId === 'BK001' || cleanId === 'BK002')) {
+            studioPageImages = [];
+            for (let p = 1; p <= total; p++) {
+                studioPageImages.push(`../${basePath}/${p}.webp`);
+            }
+            studioTotalPages = total;
+        } else {
+            // Probe static file in repository
+            try {
+                const probe = await fetch(`../images/books/${cleanId}/1.webp`, { method: 'HEAD' });
+                if (probe.ok) {
+                    const count = total > 0 ? total : 100;
+                    studioPageImages = [];
+                    for (let p = 1; p <= count; p++) {
+                        studioPageImages.push(`../images/books/${cleanId}/${p}.webp`);
+                    }
+                    studioTotalPages = count;
+                }
+            } catch (e) {}
+        }
+    }
+
+    // 6. Check custom book pageImages/demoImages in JSON
+    if (!studioPageImages.length && studioBookData) {
+        if (Array.isArray(studioBookData.pageImages) && studioBookData.pageImages.length > 0) {
+            studioPageImages = studioBookData.pageImages.map(img => img.startsWith('/') ? ('..' + img) : img);
+            studioTotalPages = studioPageImages.length;
+        } else if (Array.isArray(studioBookData.demoImages) && studioBookData.demoImages.length > 0) {
+            studioPageImages = studioBookData.demoImages.map(img => img.startsWith('/') ? ('..' + img) : img);
+            studioTotalPages = studioPageImages.length;
+        }
+    }
+
+    // 7. Load Audio Scripts
     try {
         const localData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${bookId}`);
         if (localData) {
@@ -825,7 +882,7 @@ async function loadBookStudio(bookId) {
         studioAudioScripts = { bookId: bookId, pages: {} };
     }
 
-    // 5. Fallback to PDF if no WebP images yet
+    // 8. Fallback to PDF if no WebP images yet
     if (!studioPageImages.length) {
         const pdfUrl = (studioBookData && (studioBookData.mainPdf || studioBookData.pdf_url || studioBookData.demoPdf || studioBookData.freePdf)) 
             ? ('..' + (studioBookData.mainPdf || studioBookData.pdf_url || studioBookData.demoPdf || studioBookData.freePdf)) 
@@ -933,9 +990,13 @@ async function selectPage(pageNum) {
             previewImage.src = studioPageImages[pageNum - 1];
             
             // Calculate approximate size
-            const base64Str = studioPageImages[pageNum - 1];
-            const sizeKb = Math.round((base64Str.length * (3/4)) / 1024);
-            if (sizeTag) sizeTag.textContent = `Size: ${sizeKb} KB (WebP HD)`;
+            const imgSrc = studioPageImages[pageNum - 1];
+            if (typeof imgSrc === 'string' && imgSrc.startsWith('data:')) {
+                const sizeKb = Math.round((imgSrc.length * (3/4)) / 1024);
+                if (sizeTag) sizeTag.textContent = `Size: ${sizeKb} KB (WebP HD)`;
+            } else {
+                if (sizeTag) sizeTag.textContent = `Mode: WebP HD Page Asset`;
+            }
         }
     } 
     // 2. Render PDF Canvas Fallback
