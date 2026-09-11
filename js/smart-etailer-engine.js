@@ -1579,25 +1579,58 @@
   // -------------------------------------------------------------
   // 14.1 SMART DEEP LINK & LEAD CAPTURE ENGINE (ZERO EGRESS)
   // -------------------------------------------------------------
+  function getPublicShareBaseUrl() {
+    const origin = window.location.origin || '';
+    if (origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('file:')) {
+      return 'https://aarogyam-india.pages.dev/pages/smart-etailer.html';
+    }
+    return `${origin}${window.location.pathname}`;
+  }
+
   function handleDeepLinkedAudio(audioId) {
     const allLessons = (publishedAudioLessons && publishedAudioLessons.length) ? publishedAudioLessons : DEFAULT_AUDIO_LESSONS;
     const lesson = allLessons.find(l => l.id === audioId) || allLessons[0];
     if (!lesson) return;
 
+    pendingAudioLesson = lesson;
+    const modal = document.getElementById('leadCaptureAudioModal');
+    const titleEl = document.getElementById('leadModalAudioTitle');
+    const spkEl = document.getElementById('leadModalAudioSpeaker');
+    const formView = document.getElementById('leadModalFormView');
+    const directView = document.getElementById('leadModalDirectPlayView');
+    const welcomeEl = document.getElementById('leadModalWelcomeUser');
+
+    if (titleEl) titleEl.textContent = lesson.title;
+    if (spkEl) spkEl.textContent = `🎙️ ${lesson.speaker || 'आरोग्यम लीडर'} • ⏱️ ${lesson.duration || '3:00 Min'}`;
+
     // Check if user is already registered or captured
     const guestInfo = JSON.parse(localStorage.getItem('AI_GUEST_INFO') || 'null');
     const isRegistered = Boolean(vault.user_mobile || (guestInfo && guestInfo.phone));
+    const userName = vault.distributor_name || (guestInfo && guestInfo.name) || 'साथी';
 
     if (isRegistered) {
-      window.AarogyamETailer.playAudioWithProgressBar(lesson.id, lesson.title, lesson.speaker || 'आरोग्यम लीडर', lesson.summary, lesson.audio_url);
+      if (formView) formView.style.display = 'none';
+      if (directView) directView.style.display = 'block';
+      if (welcomeEl) welcomeEl.textContent = `🎉 स्वागत है ${userName} जी! ऑडियो सुनने के लिए नीचे टैप करें:`;
     } else {
-      pendingAudioLesson = lesson;
-      const modal = document.getElementById('leadCaptureAudioModal');
-      const titleEl = document.getElementById('leadModalAudioTitle');
-      const spkEl = document.getElementById('leadModalAudioSpeaker');
-      if (titleEl) titleEl.textContent = lesson.title;
-      if (spkEl) spkEl.textContent = `🎙️ ${lesson.speaker || 'आरोग्यम लीडर'} • ⏱️ ${lesson.duration || '3:00 Min'}`;
-      if (modal) modal.classList.add('show');
+      if (formView) formView.style.display = 'block';
+      if (directView) directView.style.display = 'none';
+    }
+
+    if (modal) modal.classList.add('show');
+  }
+
+  function startPendingAudioPlay() {
+    const modal = document.getElementById('leadCaptureAudioModal');
+    if (modal) modal.classList.remove('show');
+    if (pendingAudioLesson) {
+      window.AarogyamETailer.playAudioWithProgressBar(
+        pendingAudioLesson.id,
+        pendingAudioLesson.title,
+        pendingAudioLesson.speaker || 'आरोग्यम लीडर',
+        pendingAudioLesson.summary || pendingAudioLesson.title,
+        pendingAudioLesson.audio_url || ''
+      );
     }
   }
 
@@ -1655,8 +1688,8 @@
         pendingAudioLesson.id,
         pendingAudioLesson.title,
         pendingAudioLesson.speaker || 'आरोग्यम लीडर',
-        pendingAudioLesson.summary,
-        pendingAudioLesson.audio_url
+        pendingAudioLesson.summary || pendingAudioLesson.title,
+        pendingAudioLesson.audio_url || ''
       );
     }
   }
@@ -2172,7 +2205,7 @@
 
     shareTrainingWhatsApp: function (title, summary, lessonId) {
       const id = lessonId || currentPlayingLessonId || 'al_company_profile';
-      const baseUrl = window.location.origin + window.location.pathname;
+      const baseUrl = getPublicShareBaseUrl();
       const shareUrl = `${baseUrl}?audio=${encodeURIComponent(id)}&ref=${encodeURIComponent(vault.share_id || 'AI000004')}`;
       const msg = `🎧 *आरोग्यम लीडरशिप मास्टरक्लास*\n\n📌 *${title || 'आरोग्यम मास्टरक्लास'}*\n\n${summary || ''}\n\n👉 *यहाँ क्लिक करके सीधे फ्री ऑडियो सुनें:*\n${shareUrl}`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
@@ -2180,7 +2213,7 @@
 
     shareTrainingNative: function (title, summary, lessonId) {
       const id = lessonId || currentPlayingLessonId || 'al_company_profile';
-      const baseUrl = window.location.origin + window.location.pathname;
+      const baseUrl = getPublicShareBaseUrl();
       const shareUrl = `${baseUrl}?audio=${encodeURIComponent(id)}&ref=${encodeURIComponent(vault.share_id || 'AI000004')}`;
       const msg = `🎧 *आरोग्यम लीडरशिप मास्टरक्लास*\n\n📌 *${title || 'आरोग्यम मास्टरक्लास'}*\n\n${summary || ''}\n\n👉 *यहाँ क्लिक करके सीधे फ्री ऑडियो सुनें:*\n${shareUrl}`;
       if (navigator.share) {
@@ -2197,7 +2230,7 @@
     sendSolutionNative: function (probId) {
       if (!selectedProblem) return;
       const msg = selectedProblem.whatsapp_msg || `${selectedProblem.title}\n${(selectedProblem.products || []).join(' + ')}`;
-      const shareUrl = window.location.origin + window.location.pathname;
+      const shareUrl = getPublicShareBaseUrl();
       if (navigator.share) {
         navigator.share({
           title: selectedProblem.title || 'आरोग्यम नुस्खा',
@@ -2207,6 +2240,10 @@
       } else {
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
       }
+    },
+
+    startPendingAudioPlay: function () {
+      startPendingAudioPlay();
     },
 
     submitLeadAndPlayAudio: function (event) {

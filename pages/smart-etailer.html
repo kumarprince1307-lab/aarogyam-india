@@ -720,15 +720,21 @@
   <!-- =========================================
        5.3 MODAL: INSTANT LEAD CAPTURE (AAROGYAMTUBE STYLE)
   ========================================== -->
+  <!-- =========================================
+       5.3 MODAL: INSTANT LEAD CAPTURE & 1-TAP PLAYBACK
+  ========================================== -->
   <div class="game-modal-overlay" id="leadCaptureAudioModal">
-    <div class="game-modal-card" style="max-width:440px;text-align:center;">
+    <div class="game-modal-card" style="max-width:440px;text-align:center;position:relative;">
+      <button type="button" onclick="window.AarogyamETailer.closeLeadCaptureModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#94a3b8;font-size:1.4rem;cursor:pointer;line-height:1;">✕</button>
+      
       <div style="background:linear-gradient(135deg, #1d4ed8, #2563eb);color:#fff;padding:16px;border-radius:12px;margin-bottom:14px;">
         <span style="font-size:2rem;display:block;margin-bottom:4px;">🎧</span>
         <h3 style="font-size:1.1rem;margin:0 0 4px 0;font-weight:900;" id="leadModalAudioTitle">फ्री ऑडियो मास्टरक्लास</h3>
         <p style="font-size:0.78rem;margin:0;color:#e0e7ff;" id="leadModalAudioSpeaker">आरोग्यम लीडरशिप गाइड</p>
       </div>
 
-      <div style="margin-bottom:14px;text-align:left;">
+      <!-- View A: Non-registered Lead Capture Form -->
+      <div id="leadModalFormView" style="margin-bottom:14px;text-align:left;">
         <p style="font-size:0.82rem;color:var(--text-main);margin:0 0 10px 0;line-height:1.4;">
           ✨ इस 3-मिनट पावरफुल ऑडियो को सुनने के लिए कृपया अपना नाम व व्हाट्सएप नंबर दर्ज करें:
         </p>
@@ -740,10 +746,20 @@
           <label style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">व्हाट्सएप मोबाइल नंबर *</label>
           <input type="tel" id="leadGuestPhone" class="game-input" placeholder="10 अंकों का व्हाट्सएप नंबर" pattern="[0-9]{10}" maxlength="10" required style="margin-bottom:14px;">
 
-          <button type="submit" class="btn-royal-blue" style="width:100%;padding:11px;font-size:0.95rem;font-weight:900;">
+          <button type="submit" class="btn-royal-blue" style="width:100%;padding:11px;font-size:0.95rem;font-weight:900;justify-content:center;">
             <span>▶️ तुरंत ऑडियो सुनें</span>
           </button>
         </form>
+      </div>
+
+      <!-- View B: 1-Tap Play for Registered Users (Bypasses Mobile Autoplay Restriction) -->
+      <div id="leadModalDirectPlayView" style="display:none;margin-bottom:14px;text-align:center;">
+        <p style="font-size:0.88rem;color:#34d399;margin:0 0 12px 0;font-weight:800;" id="leadModalWelcomeUser">
+          🎉 आपका स्वागत है! ऑडियो सुनने के लिए नीचे टैप करें:
+        </p>
+        <button type="button" class="btn-action-green" style="width:100%;padding:14px;font-size:1.05rem;font-weight:900;justify-content:center;box-shadow:0 4px 16px rgba(16,185,129,0.4);" onclick="window.AarogyamETailer.startPendingAudioPlay()">
+          <span>▶️ अभी ऑडियो सुनें (Play Now)</span>
+        </button>
       </div>
 
       <span style="font-size:0.7rem;color:var(--text-muted);display:block;">🔒 100% सुरक्षित • कोई पासवर्ड की ज़रूरत नहीं</span>
