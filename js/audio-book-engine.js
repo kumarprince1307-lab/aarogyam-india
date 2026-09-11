@@ -209,31 +209,38 @@ class ProAudioBookEngine {
         const urlParams = new URLSearchParams(window.location.search);
         const bookId = (window.aoiBookId || urlParams.get('book') || urlParams.get('id') || 'BK001').trim().toUpperCase();
         
-        // 1. Check local studio edits
-        const localData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${bookId}`);
-        if (localData) {
-            try {
-                const parsed = JSON.parse(localData);
-                this.metadata = parsed;
-                this.pageScripts = parsed.pages || {};
-                this.updateNarratorDisplay();
-                return;
-            } catch (e) {}
-        }
+        let serverScripts = {};
+        let serverMeta = {};
 
-        // 2. Fetch from files
+        // 1. Fetch from server files first (with timestamp cache buster)
         try {
             let res = await fetch(`../data/audio-scripts/${bookId}.json?v=${Date.now()}`);
             if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json?v=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
-                this.metadata = data;
-                this.pageScripts = data.pages || {};
-                this.updateNarratorDisplay();
+                serverMeta = data || {};
+                serverScripts = data.pages || {};
             }
         } catch (e) {
-            console.warn("Audio script fetch:", e);
+            console.warn("Audio script server fetch warning:", e);
         }
+
+        // 2. Check local studio edits & merge
+        let localScripts = {};
+        try {
+            const localData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${bookId}`);
+            if (localData) {
+                const parsed = JSON.parse(localData);
+                if (parsed && parsed.pages) {
+                    localScripts = parsed.pages;
+                }
+                serverMeta = { ...serverMeta, ...parsed };
+            }
+        } catch (e) {}
+
+        this.metadata = serverMeta;
+        this.pageScripts = { ...serverScripts, ...localScripts };
+        this.updateNarratorDisplay();
     }
 
     updateNarratorDisplay() {
@@ -308,7 +315,7 @@ class ProAudioBookEngine {
         this.isPageRecordedAudio = false;
         this.updateNarratorDisplay();
 
-        // Case B: Text Script exists -> Plays Crisp Female TTS
+        // Case B: Text Script exists -> Plays Crisp Natural Female TTS with Chunking
         if (pageText && pageText.trim().length > 0) {
             this.updateStatusDisplay(`📖 पृष्ठ ${currentPage} सुनाया जा रहा है`);
             this.speakText(pageText, currentPage);
@@ -321,62 +328,119 @@ class ProAudioBookEngine {
         this.speakText(politeNotice, currentPage);
     }
 
+    splitTextIntoChunks(text) {
+        if (!text) return [];
+        // Split by lines, Hindi purna viram (।), period, question mark, exclamation
+        const rawSegments = text.split(/[\r\n।\.?!]+/);
+        const chunks = [];
+        let currentChunk = '';
+
+        for (const seg of rawSegments) {
+            const clean = seg.trim();
+            if (!clean) continue;
+
+            if ((currentChunk + ' ' + clean).length > 140) {
+                if (currentChunk.trim()) chunks.push(currentChunk.trim());
+                currentChunk = clean;
+            } else {
+                currentChunk = currentChunk ? (currentChunk + ' । ' + clean) : clean;
+            }
+        }
+        if (currentChunk.trim()) {
+            chunks.push(currentChunk.trim());
+        }
+        return chunks.length ? chunks : [text.trim()];
+    }
+
     speakText(text, currentPage, isWelcome = false) {
         if (!this.synth) return;
 
-        this.synth.cancel();
+        this.stopAudioSources();
         this.loadVoices(); // Ensure fresh voice list
 
-        this.currentUtterance = new SpeechSynthesisUtterance(text);
-        
-        // Clean, Natural Female Tone (Google / Kalpana / Swara)
-        if (this.femaleVoice) this.currentUtterance.voice = this.femaleVoice;
-        this.currentUtterance.pitch = 1.0;
-        this.currentUtterance.rate = 0.95 * this.playbackRate;
-        this.currentUtterance.lang = 'hi-IN';
+        const chunks = this.splitTextIntoChunks(text);
+        let chunkIndex = 0;
 
-        this.currentUtterance.onstart = () => {
-            this.setPlayingState(true);
-        };
+        // Keep-Alive interval for Chrome TTS garbage collection bug
+        if (this.ttsKeepAlive) clearInterval(this.ttsKeepAlive);
+        this.ttsKeepAlive = setInterval(() => {
+            if (this.isPlaying && this.synth && this.synth.speaking && !this.isPaused) {
+                this.synth.pause();
+                this.synth.resume();
+            }
+        }, 8000);
 
-        this.currentUtterance.onend = () => {
-            // If welcome audio finished, immediately start reading the current page
-            if (isWelcome) {
-                setTimeout(() => {
-                    this.isPlaying = true;
-                    this.playCurrentPage();
-                }, 300);
+        const speakNextChunk = () => {
+            if (!this.isPlaying) return;
+
+            if (chunkIndex >= chunks.length) {
+                if (this.ttsKeepAlive) clearInterval(this.ttsKeepAlive);
+
+                // If welcome audio finished, immediately start reading current page
+                if (isWelcome) {
+                    setTimeout(() => {
+                        this.isPlaying = true;
+                        this.playCurrentPage();
+                    }, 300);
+                    return;
+                }
+
+                // Auto Turn Page & Continue Playing
+                const totalPages = window.aoiTotalPages || 152;
+                const curPage = window.aoiPageNum || 1;
+                if (this.autoNextPage && curPage < totalPages) {
+                    this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
+                    if (typeof window.onNextPage === 'function') {
+                        window.onNextPage();
+                    }
+                    setTimeout(() => {
+                        this.isPlaying = true;
+                        this.playCurrentPage();
+                    }, 500);
+                } else {
+                    this.setPlayingState(false);
+                    this.updateStatusDisplay(`✅ पृष्ठ ${curPage} समाप्त हुआ`);
+                }
                 return;
             }
 
-            // Auto Turn Page & Continue Playing
-            const totalPages = window.aoiTotalPages || 152;
-            const curPage = window.aoiPageNum || 1;
-            if (this.autoNextPage && curPage < totalPages) {
-                this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
-                if (typeof window.onNextPage === 'function') {
-                    window.onNextPage();
-                }
-                setTimeout(() => {
-                    this.isPlaying = true;
-                    this.playCurrentPage();
-                }, 500);
-            } else {
-                this.setPlayingState(false);
-                this.updateStatusDisplay(`✅ पृष्ठ ${curPage} समाप्त हुआ`);
-            }
+            const currentTextChunk = chunks[chunkIndex];
+            const ut = new SpeechSynthesisUtterance(currentTextChunk);
+            this.currentUtterance = ut; // Store globally to prevent garbage collection
+
+            if (this.femaleVoice) ut.voice = this.femaleVoice;
+            ut.pitch = 1.0;
+            ut.rate = 0.95 * this.playbackRate;
+            ut.lang = 'hi-IN';
+
+            ut.onstart = () => {
+                this.setPlayingState(true);
+            };
+
+            ut.onend = () => {
+                chunkIndex++;
+                speakNextChunk();
+            };
+
+            ut.onerror = (e) => {
+                console.warn("TTS Chunk Error:", e);
+                chunkIndex++;
+                speakNextChunk();
+            };
+
+            this.synth.speak(ut);
         };
 
-        this.currentUtterance.onerror = (e) => {
-            console.warn("TTS Error:", e);
-            this.setPlayingState(false);
-        };
-
-        this.synth.speak(this.currentUtterance);
         this.isPlaying = true;
+        this.setPlayingState(true);
+        speakNextChunk();
     }
 
     stopAudioSources() {
+        if (this.ttsKeepAlive) {
+            clearInterval(this.ttsKeepAlive);
+            this.ttsKeepAlive = null;
+        }
         if (this.audioElement) {
             this.audioElement.pause();
             this.audioElement.currentTime = 0;

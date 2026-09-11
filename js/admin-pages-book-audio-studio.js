@@ -767,24 +767,26 @@ async function loadBookStudio(bookId) {
     isFullBookReload = false;
     markUnsaved(false);
 
+    const cleanId = String(bookId).toUpperCase();
+
     // 1. Check in Free Demo books list
     let freeDemoBook = null;
     try {
         const fList = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
-        freeDemoBook = fList.find(b => b.id && b.id.toUpperCase() === bookId.toUpperCase());
+        freeDemoBook = fList.find(b => b.id && b.id.toUpperCase() === cleanId);
     } catch (e) {}
 
     // 2. Fetch from books.json / custom books
     try {
-        const res = await fetch('../data/books.json');
+        const res = await fetch('../data/books.json?v=' + Date.now());
         const json = await res.json();
-        studioBookData = json.books.find(b => b.id === bookId || b.id === bookId.toUpperCase());
+        studioBookData = json.books.find(b => b.id === bookId || b.id === cleanId);
     } catch (e) {}
 
     if (!studioBookData) {
         try {
             const customList = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
-            studioBookData = customList.find(b => b.id && b.id.toUpperCase() === bookId.toUpperCase());
+            studioBookData = customList.find(b => b.id && b.id.toUpperCase() === cleanId);
         } catch (e) {}
     }
 
@@ -792,20 +794,36 @@ async function loadBookStudio(bookId) {
         studioBookData = freeDemoBook;
     }
 
-    // 3. Try loading from IndexedDB first (Cached/Staged WebP Pages)
-    const dbImages = await loadPagesFromDb(bookId);
-    if (dbImages && dbImages.length > 0) {
-        studioPageImages = dbImages;
-        studioTotalPages = dbImages.length;
-    } else if (freeDemoBook && (freeDemoBook.demoImages?.length || freeDemoBook.pageImages?.length)) {
-        studioPageImages = freeDemoBook.demoImages || freeDemoBook.pageImages || [];
-        studioTotalPages = studioPageImages.length;
+    // Determine target total pages from repository / metadata
+    const repoTotal = (studioBookData && studioBookData.totalPages) 
+        ? studioBookData.totalPages 
+        : (cleanId === 'BK001' ? 152 : (cleanId === 'BK002' ? 118 : 0));
+    const basePath = (studioBookData && studioBookData.pageImagesPath) 
+        ? studioBookData.pageImagesPath 
+        : `images/books/${cleanId}`;
+
+    // 3. Static WebP images in Repository (Priority for BK001, BK002, and books with WebP pages)
+    if (repoTotal > 0 && (studioBookData?.hasWebpPages || cleanId === 'BK001' || cleanId === 'BK002')) {
+        studioPageImages = [];
+        for (let p = 1; p <= repoTotal; p++) {
+            studioPageImages.push(`../${basePath}/${p}.webp`);
+        }
+        studioTotalPages = repoTotal;
     }
 
-    // 4. Try loading from LocalStorage
+    // 4. If not static WebP, try loading from IndexedDB
+    if (!studioPageImages.length) {
+        const dbImages = await loadPagesFromDb(bookId);
+        if (dbImages && dbImages.length > 0) {
+            studioPageImages = dbImages;
+            studioTotalPages = dbImages.length;
+        }
+    }
+
+    // 5. Try loading from LocalStorage
     if (!studioPageImages.length) {
         try {
-            const localPages = localStorage.getItem(`AOI_BOOK_PAGES_${bookId.toUpperCase()}`);
+            const localPages = localStorage.getItem(`AOI_BOOK_PAGES_${cleanId}`);
             if (localPages) {
                 const parsedPages = JSON.parse(localPages);
                 if (Array.isArray(parsedPages) && parsedPages.length > 0) {
@@ -814,38 +832,6 @@ async function loadBookStudio(bookId) {
                 }
             }
         } catch (e) {}
-    }
-
-    // 5. Try loading from Static WebP images in Repository / books.json
-    if (!studioPageImages.length) {
-        const cleanId = String(bookId).toUpperCase();
-        const total = (studioBookData && studioBookData.totalPages) 
-            ? studioBookData.totalPages 
-            : (cleanId === 'BK001' ? 152 : (cleanId === 'BK002' ? 118 : 0));
-        const basePath = (studioBookData && studioBookData.pageImagesPath) 
-            ? studioBookData.pageImagesPath 
-            : `images/books/${cleanId}`;
-
-        if (total > 0 && (studioBookData?.hasWebpPages || cleanId === 'BK001' || cleanId === 'BK002')) {
-            studioPageImages = [];
-            for (let p = 1; p <= total; p++) {
-                studioPageImages.push(`../${basePath}/${p}.webp`);
-            }
-            studioTotalPages = total;
-        } else {
-            // Probe static file in repository
-            try {
-                const probe = await fetch(`../images/books/${cleanId}/1.webp`, { method: 'HEAD' });
-                if (probe.ok) {
-                    const count = total > 0 ? total : 100;
-                    studioPageImages = [];
-                    for (let p = 1; p <= count; p++) {
-                        studioPageImages.push(`../images/books/${cleanId}/${p}.webp`);
-                    }
-                    studioTotalPages = count;
-                }
-            } catch (e) {}
-        }
     }
 
     // 6. Check custom book pageImages/demoImages in JSON
@@ -859,34 +845,51 @@ async function loadBookStudio(bookId) {
         }
     }
 
-    // 7. Load Audio Scripts
+    // 7. Load Audio Scripts (Fetch server first, then merge local edits)
+    let serverScripts = {};
+    let serverMeta = { bookId: cleanId, pages: {} };
     try {
-        const localData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${bookId}`);
-        if (localData) {
-            studioAudioScripts = JSON.parse(localData);
-        } else {
-            let res = await fetch(`../data/audio-scripts/${bookId}.json`);
-            if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json`);
-            if (res.ok) {
-                studioAudioScripts = await res.json();
-            } else if (freeDemoBook && freeDemoBook.audioUrl) {
-                studioAudioScripts = {
-                    bookId: bookId,
-                    pages: {
-                        "1": { text: freeDemoBook.subtitle || freeDemoBook.name || '', audio: freeDemoBook.audioUrl }
-                    }
-                };
-            }
+        let res = await fetch(`../data/audio-scripts/${cleanId}.json?v=${Date.now()}`);
+        if (!res.ok) res = await fetch(`/data/audio-scripts/${cleanId}.json?v=${Date.now()}`);
+        if (res.ok) {
+            serverMeta = await res.json();
+            serverScripts = serverMeta.pages || {};
+        } else if (freeDemoBook && freeDemoBook.audioUrl) {
+            serverMeta = {
+                bookId: cleanId,
+                pages: {
+                    "1": { text: freeDemoBook.subtitle || freeDemoBook.name || '', audio: freeDemoBook.audioUrl }
+                }
+            };
+            serverScripts = serverMeta.pages;
         }
     } catch (e) {
-        studioAudioScripts = { bookId: bookId, pages: {} };
+        console.warn("Studio audio scripts fetch warning:", e);
     }
+
+    let localScripts = {};
+    try {
+        const localData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${cleanId}`);
+        if (localData) {
+            const parsed = JSON.parse(localData);
+            if (parsed && parsed.pages) {
+                localScripts = parsed.pages;
+            }
+            serverMeta = { ...serverMeta, ...parsed };
+        }
+    } catch (e) {}
+
+    studioAudioScripts = {
+        ...serverMeta,
+        bookId: cleanId,
+        pages: { ...serverScripts, ...localScripts }
+    };
 
     // 8. Fallback to PDF if no WebP images yet
     if (!studioPageImages.length) {
         const pdfUrl = (studioBookData && (studioBookData.mainPdf || studioBookData.pdf_url || studioBookData.demoPdf || studioBookData.freePdf)) 
             ? ('..' + (studioBookData.mainPdf || studioBookData.pdf_url || studioBookData.demoPdf || studioBookData.freePdf)) 
-            : `../pdf/full/${bookId}.pdf`;
+            : `../pdf/full/${cleanId}.pdf`;
 
         try {
             studioPdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
@@ -980,19 +983,39 @@ async function selectPage(pageNum) {
     const previewImage = document.getElementById('previewImage');
     const loadingText = document.getElementById('previewLoadingText');
 
-    if (loadingText) loadingText.style.display = 'none';
+    if (loadingText) {
+        loadingText.style.display = 'block';
+        loadingText.textContent = `पृष्ठ ${pageNum} लोड हो रहा है...`;
+    }
 
     // 1. Render WebP Image if available
     if (studioPageImages.length >= pageNum && studioPageImages[pageNum - 1]) {
         if (previewCanvas) previewCanvas.style.display = 'none';
         if (previewImage) {
-            previewImage.style.display = 'block';
-            previewImage.src = studioPageImages[pageNum - 1];
+            const rawSrc = studioPageImages[pageNum - 1];
+            previewImage.onload = () => {
+                if (loadingText) loadingText.style.display = 'none';
+                previewImage.style.display = 'block';
+            };
+            previewImage.onerror = () => {
+                // Fallback attempt: if ../images failed, try /images or direct
+                if (rawSrc.startsWith('../')) {
+                    previewImage.src = rawSrc.replace('../', '/');
+                } else if (rawSrc.startsWith('/')) {
+                    previewImage.src = '..' + rawSrc;
+                } else {
+                    if (loadingText) {
+                        loadingText.style.display = 'block';
+                        loadingText.textContent = `पृष्ठ ${pageNum} लोड नहीं हो सका।`;
+                    }
+                }
+            };
+
+            previewImage.src = rawSrc;
             
             // Calculate approximate size
-            const imgSrc = studioPageImages[pageNum - 1];
-            if (typeof imgSrc === 'string' && imgSrc.startsWith('data:')) {
-                const sizeKb = Math.round((imgSrc.length * (3/4)) / 1024);
+            if (typeof rawSrc === 'string' && rawSrc.startsWith('data:')) {
+                const sizeKb = Math.round((rawSrc.length * (3/4)) / 1024);
                 if (sizeTag) sizeTag.textContent = `Size: ${sizeKb} KB (WebP HD)`;
             } else {
                 if (sizeTag) sizeTag.textContent = `Mode: WebP HD Page Asset`;
@@ -1017,8 +1040,13 @@ async function selectPage(pageNum) {
                     canvasContext: ctx,
                     viewport: viewport
                 }).promise;
+                if (loadingText) loadingText.style.display = 'none';
             } catch (e) {
                 console.error("Error rendering preview page:", e);
+                if (loadingText) {
+                    loadingText.style.display = 'block';
+                    loadingText.textContent = `PDF पेज लोड त्रुटि: ${e.message}`;
+                }
             }
         }
     } else {
