@@ -17,7 +17,7 @@ const ROUTES = {
   'book-audio-studio': () => import('./admin-pages-book-audio-studio.js?v=1.0').then(m => m.initBookAudioStudio()),
   'page-editor': () => import('./admin-pages-page-editor.js?v=30.1').then(m => m.initPageEditor()),
   'product-landing-pages': () => import('./admin-pages-product-landing.js').then(m => m.initProductLandingPages()),
-  'marketing-templates': () => import('./admin-pages-marketing-templates.js').then(m => m.initMarketingTemplatesPage()),
+  'marketing-templates': () => import('./admin-pages-smart-etailer.js?v=4.2').then(m => m.initSmartEtailerAdmin('adm-sec-marketing')),
   'purchases': () => import('./admin-pages-purchases.js').then(m => m.initPurchases()),
   'checkout-funnel': () => import('./admin-pages-checkout-funnel.js').then(m => m.initCheckoutFunnel()),
   'downloads': () => import('./admin-pages-downloads.js').then(m => m.initDownloads()),
@@ -30,6 +30,7 @@ const ROUTES = {
   'webinar-leads': () => import('./admin-pages-webinar-reports.js?v=33.5').then(m => m.initWebinarReports()),
   'landing-page-control': () => import('./admin-pages-landing-pages.js').then(m => m.initAllLandingPages()),
   'admin-app': () => import('./admin-pages-admin-app.js').then(m => m.initAdminApp()),
+  'smart-etailer': () => import('./admin-pages-smart-etailer.js?v=1.0').then(m => m.initSmartEtailerAdmin()),
   'settings': () => import('./admin-pages-settings.js').then(m => m.initSettings()).catch(() => {})
 };
 

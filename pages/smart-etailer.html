@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>मिशन ₹8,19,250 — स्मार्ट ई-टेलर (Smart eTailer) गेमिंग कमांड सेंटर | Aarogyam India</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+  <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+
+  <!-- PWA Manifest & Meta -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#090d16">
+  <meta name="description" content="स्मार्ट ई-टेलर खाता बुक, 15-दिवसीय क्लोजिंग, ऑटोशिप 6th मंथ फ्री रडार और डायरेक्ट सेलिंग गेमिंग कमांड सेंटर">
+
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+
+  <!-- Universal Nav Drawer CSS (CRITICAL for proper drawer/bottom nav overlay) -->
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css">
+  
+  <!-- Home Revamp CSS (Animated Waving Tiranga Header & Brand Pills) -->
+  <link rel="stylesheet" href="/css/home-revamp.css?v=5.0">
+  
+  <!-- Core CSS -->
+  <link rel="stylesheet" href="/css/smart-etailer.css?v=20260911_v4">
+</head>
+
+<body>
+
+  <!-- =========================================
+       1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
+  ========================================== -->
+  <div class="home-live-ticker-wrap">
+    <div class="container">
+      <div class="home-ticker-flex">
+        <div class="ticker-pulse-badge">
+          <span class="ticker-dot-pulse"></span>
+          <span>🚨 LIVE</span>
+        </div>
+        <div style="flex:1;overflow:hidden;">
+          <div class="ticker-marquee-scroll" id="home-live-ticker-track">
+            ⚡ 15-दिवसीय मेगा साइकिल क्लोजिंग एक्टिव! शुक्रवार रिटेल 15% बोनस अनलॉक हेतु न्यूनतम ₹8,000 टर्नओवर लक्ष्य प्राप्त करें। ✦ 1-टैप DSR व ₹1Cr सक्सेस पाथ
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       2. ANIMATED INDIAN TIRANGA WAVING HEADER
+  ========================================== -->
+  <header class="header header-tiranga-animated" id="header" style="position:sticky;top:0;z-index:99999;">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;gap:8px;max-width:1200px;margin:0 auto;">
+      
+      <!-- Brand Logo Left in Glass Pill + Active Page Badge -->
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <a href="/index.html" class="brand-logo-pill" style="text-decoration:none;">
+          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;">
+          <div style="display:flex;flex-direction:column;">
+            <span class="brand-title-text">
+              AAROGYAM <span style="color:#ff671f;">INDIA</span>
+            </span>
+            <span class="brand-sub-text">
+              Digital Ecosystem Hub
+            </span>
+          </div>
+        </a>
+
+        <!-- Current Active Page Indicator Badge with High Contrast -->
+        <span class="header-current-page-badge" title="Smart eTailer Command Center" style="background:#0f172a !important;color:#fde047 !important;border:1.5px solid #fde047 !important;font-weight:900 !important;padding:4px 10px;border-radius:20px;font-size:0.75rem;box-shadow:0 2px 8px rgba(0,0,0,0.25);display:inline-flex;align-items:center;gap:4px;">
+          👑 स्मार्ट ई-टेलर (₹8.19L)
+        </span>
+      </div>
+
+      <!-- Header Actions Right: Tutorial, Theme, Sync, 3-Line Menu -->
+      <div class="header-actions" style="display:flex;align-items:center;gap:6px;">
+        <button type="button" class="btn-royal-blue btn-royal-blue-sm" onclick="window.AarogyamETailer.openTutorialModal()" title="ट्यूटोरियल वीडियो व गाइड" style="box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+          <span>🎥 ट्यूटोरियल</span>
+        </button>
+
+        <button type="button" class="btn-hud-theme" id="btnThemeToggle" onclick="window.AarogyamETailer.toggleTheme()" title="थीम बदलें (Dark / Light)" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;padding:5px 10px;border-radius:20px;font-size:0.75rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <span id="themeToggleIcon">🌓</span>
+          <span id="themeToggleLabel">Mode</span>
+        </button>
+
+        <button type="button" class="btn-hud-sync" id="hudSyncBtn" onclick="window.AarogyamETailer.manualSyncNow()" title="क्लाउड पर सुरक्षित करें" style="background:#10b981;border:none;color:#000;padding:5px 12px;border-radius:20px;font-size:0.75rem;font-weight:900;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+          <span>⚡ सिंक</span>
+        </button>
+
+        <!-- 3-Line Menu Trigger Button on Far Right -->
+        <button type="button" class="menu-button" id="btn-drawer-toggle" onclick="if(window.openUniversalDrawer){window.openUniversalDrawer(event);}else{window.location.href='/ucas/index.html';}" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);margin-left:4px;">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- =========================================
+       2. DUAL CLOSING COUNTDOWN ENGINE
+  ========================================== -->
+  <section class="closing-command-strip">
+    
+    <!-- 1. Weekly Friday Retail Closing -->
+    <div class="closing-card friday-card">
+      <div class="closing-card-header">
+        <span class="closing-tag friday-tag">🛒 शुक्रवार वीकली रिटेल</span>
+        <span class="closing-countdown-digits friday-countdown" id="fridayCountdownDisplay">00d : 00h : 00m : 00s</span>
+      </div>
+      <div class="closing-stat-row">
+        <span class="closing-stat-label">इस हफ्ते का रिटेल:</span>
+        <span class="closing-stat-value" id="fridayRetailTotalVal" style="color:#34d399;">₹0</span>
+      </div>
+      <div class="closing-progress-track">
+        <div class="closing-progress-bar-green" id="fridayProgressBar" style="width: 5%;"></div>
+      </div>
+      <div class="slab-indicator">
+        <span id="fridayCurrentSlabBadge">5% स्टार्टर</span>
+        <span id="fridayNextSlabHint" style="color:#fbbf24;">अगले स्लैब के लिए ₹2,001 शेष</span>
+      </div>
+    </div>
+
+    <!-- 2. 15-Day Mega Cycle Closing (₹8,19,250 Cap) -->
+    <div class="closing-card mega-cycle-card">
+      <div class="closing-card-header">
+        <span class="closing-tag mega-tag">⏳ 15-दिवसीय टर्नओवर साइकल</span>
+        <span class="closing-countdown-digits mega-countdown" id="megaCycleCountdownDisplay">00d : 00h : 00m : 00s</span>
+      </div>
+      <div class="closing-stat-row">
+        <span class="closing-stat-label">15-दिन कुल टर्नओवर:</span>
+        <span class="closing-stat-value" id="fortnightTurnoverVal" style="color:#fbbf24;">₹0</span>
+      </div>
+      <div class="closing-progress-track">
+        <div class="closing-progress-bar-gold" id="megaCycleProgressBar" style="width: 2%;"></div>
+      </div>
+      <div class="slab-indicator">
+        <span id="megaCycleCapText" style="color:#f59e0b;">लक्ष्य: ₹8,19,250</span>
+        <label style="font-size:0.68rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;cursor:pointer;">
+          <span>📅 क्लोजिंग:</span>
+          <input type="date" id="customCycleDateInput" onchange="window.AarogyamETailer.setCustomCycleDate(this.value)" style="background:var(--bg-input);color:var(--text-gold);border:1px solid var(--border-card);border-radius:4px;padding:2px 4px;font-size:0.68rem;">
+        </label>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- =========================================
+       3. 7 NAVIGATION TABS (TOUCH OPTIMIZED)
+  ========================================== -->
+  <nav class="gaming-tabs-nav">
+    <button type="button" class="g-tab-btn active" id="tab-btn-survey" data-tab="tab-survey" onclick="window.AarogyamETailer.switchTab('tab-survey')">
+      <span>🌾</span> <span>कंज्यूमर सर्वे & समाधान</span>
+    </button>
+    <button type="button" class="g-tab-btn" id="tab-btn-marketing" data-tab="tab-marketing" onclick="window.AarogyamETailer.switchTab('tab-marketing')">
+      <span>🚀</span> <span>मार्केटिंग इंजन & WhatsApp हुक्स</span>
+    </button>
+    <button type="button" class="g-tab-btn" id="tab-btn-khata" data-tab="tab-khata" onclick="window.AarogyamETailer.switchTab('tab-khata')">
+      <span>📖</span> <span>ई-टेलर खाता बुक</span>
+    </button>
+    <button type="button" class="g-tab-btn" id="tab-btn-autoship" data-tab="tab-autoship" onclick="window.AarogyamETailer.switchTab('tab-autoship')">
+      <span>🔄</span> <span>ऑटोशिप 6th मंथ रडार</span>
+    </button>
+    <button type="button" class="g-tab-btn" id="tab-btn-dsr" data-tab="tab-dsr" onclick="window.AarogyamETailer.switchTab('tab-dsr')">
+      <span>🎯</span> <span>1-टैप DSR व टारगेट</span>
+    </button>
+    <button type="button" class="g-tab-btn" id="tab-btn-success-path" data-tab="tab-success-path" onclick="window.AarogyamETailer.switchTab('tab-success-path')">
+      <span>🏆</span> <span>सक्सेस पाथ & ₹1Cr डेट</span>
+    </button>
+    <button type="button" class="g-tab-btn" id="tab-btn-training" data-tab="tab-training" onclick="window.AarogyamETailer.switchTab('tab-training')">
+      <span>🎧</span> <span>लीडरशिप ट्रेनिंग हब</span>
+    </button>
+  </nav>
+
+  <!-- =========================================
+       4. TAB CONTENT CONTAINER
+  ========================================== -->
+  <main class="tab-content-container">
+
+    <!-- -------------------------------------------------------------
+         TAB 1: 30-SEC CONSUMER SURVEY & PRODUCT DIAGNOSIS
+    -------------------------------------------------------------- -->
+    <section id="tab-survey" class="tab-pane active" style="display:block;">
+      <div class="survey-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="font-size:1.05rem;font-weight:800;display:flex;align-items:center;gap:6px;">
+            <span>⚡</span> <span>30-सेकंड स्मार्ट कंज्यूमर सर्वे</span>
+          </h3>
+          <span style="font-size:0.72rem;background:var(--bg-card-inner);color:#38bdf8;padding:2px 8px;border-radius:6px;font-weight:800;">1-TAP DIAGNOSIS</span>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin:4px 0 10px 0;">
+          किसान या ग्राहक की श्रेणी चुनें और समस्या पर टैप करें — सटीक प्रोडक्ट कॉम्बो व WhatsApp नुस्खा तुरंत तैयार होगा!
+        </p>
+
+        <!-- Category Pickers -->
+        <div class="category-selection-grid" id="surveyCategoryList">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <!-- Voice Search & Quick Problem Filter -->
+        <div style="display:flex; gap:8px; align-items:center; margin:12px 0 6px 0;">
+          <input type="text" id="surveyVoiceSearchInput" class="game-input" placeholder="🔍 फसल / बीमारी / ब्यूटी समस्या बोलें या खोजें..." style="margin:0;flex:1;" oninput="window.AarogyamETailer.filterSurveyProblems(this.value)">
+          <button type="button" class="btn-voice-mic" id="btnMicSurveySearch" onclick="window.AarogyamETailer.startVoiceInput('surveyVoiceSearchInput', 'btnMicSurveySearch')" title="बोलकर खोजें">
+            <span>🎙️ बोलें</span>
+          </button>
+        </div>
+
+        <!-- Problems Pickers -->
+        <div style="font-size:0.82rem;font-weight:800;margin-top:10px;">
+          👇 मुख्य समस्या / जरूरत चुनें:
+        </div>
+        <div class="problem-selection-grid" id="surveyProblemList">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <!-- Diagnosis Solution Result Box -->
+        <div id="surveyDiagnosisResultBox" style="display:none;">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- -------------------------------------------------------------
+         TAB 1.5: INTEGRATED MARKETING ENGINE & WHATSAPP HOOKS
+    -------------------------------------------------------------- -->
+    <section id="tab-marketing" class="tab-pane">
+      <div class="survey-card" style="border-color:#3b82f6;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+          <h3 style="font-size:1.05rem;font-weight:800;display:flex;align-items:center;gap:6px;margin:0;">
+            <span>🚀</span> <span>स्मार्ट मार्केटिंग इंजन & WhatsApp हुक्स</span>
+          </h3>
+          <span style="font-size:0.72rem;background:linear-gradient(135deg, #1d4ed8, #2563eb);color:#fff;padding:3px 10px;border-radius:20px;font-weight:800;">
+            🎯 RE-TARGETING & 1-CLICK SHARE
+          </span>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin:4px 0 12px 0;">
+          प्रमाणित लैंडिंग पेज चुनें, दमदार शायरी व हुक चुनें और अपनी डिस्ट्रीब्यूटर रेफरल लिंक के साथ WhatsApp ब्रॉडकास्ट करें!
+        </p>
+
+        <!-- 1. LANDING PAGE CATALOG SELECTOR -->
+        <div style="font-size:0.85rem;font-weight:800;color:var(--text-title);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+          <span>1️⃣ लैंडिंग पेज चुनें (Landing Page):</span>
+          <span id="mktActiveLpBadge" style="font-size:0.72rem;color:#38bdf8;font-weight:700;">🌾 खरीफ मास्टर गाइड 2026</span>
+        </div>
+        <div class="mkt-landing-grid" id="mktLandingPagesGrid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- 2. CATEGORIZED HOOK & SHAYARI SELECTOR -->
+        <div style="background:var(--bg-card-inner);border:1px solid var(--border-card);border-radius:12px;padding:12px;margin:12px 0;">
+          <div style="font-size:0.85rem;font-weight:800;color:var(--text-title);margin-bottom:8px;">
+            2️⃣ हुक व शायरी टेम्पलेट चुनें (Hook & Shayari):
+          </div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+            <div>
+              <label style="font-size:0.72rem;color:var(--text-muted);font-weight:700;">कैटेगरी:</label>
+              <select id="mktHookCategorySelect" class="game-input" style="padding:6px 8px;font-size:0.8rem;margin:2px 0 0 0;" onchange="window.AarogyamETailer.onMktCategoryChange(this.value)">
+                <!-- JS populated -->
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.72rem;color:var(--text-muted);font-weight:700;">टेम्पलेट हुक:</label>
+              <select id="mktHookTemplateSelect" class="game-input" style="padding:6px 8px;font-size:0.8rem;margin:2px 0 0 0;" onchange="window.AarogyamETailer.onMktTemplateSelect(this.value)">
+                <!-- JS populated -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. LIVE MESSAGE BOX (CUSTOMIZABLE & EXPANDABLE) -->
+        <div class="mkt-preview-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:0.85rem;font-weight:800;color:var(--text-gold);">3️⃣ मैसेज प्रीव्यू (WhatsApp Message):</span>
+            <button type="button" class="btn-voice-mic" id="btnMicMktMsg" onclick="window.AarogyamETailer.startVoiceInput('mktMessageBox', 'btnMicMktMsg')" style="padding:3px 8px;font-size:0.72rem;" title="बोलकर जोड़ें">
+              <span>🎙️ बोलें</span>
+            </button>
+          </div>
+          <textarea id="mktMessageBox" class="game-input" rows="7" style="font-size:0.84rem;line-height:1.5;margin:0 0 8px 0;width:100%;font-family:inherit;" placeholder="संदेश यहाँ लोड होगा..."></textarea>
+          
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="text" id="mktReferralLinkDisplay" class="game-input" readonly style="margin:0;font-size:0.75rem;color:#38bdf8;font-weight:700;flex:1;" placeholder="आपकी रेफरल लिंक...">
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="flex-shrink:0;padding:6px 12px;" onclick="window.AarogyamETailer.copyMktReferralLink()">
+              <span>📋 लिंक कॉपी</span>
+            </button>
+          </div>
+
+          <!-- Action Stack -->
+          <div class="mkt-action-grid">
+            <button type="button" class="btn-mkt-wa" onclick="window.AarogyamETailer.shareMktWhatsAppBroadcast()">
+              <i class="fa-brands fa-whatsapp"></i> <span>WhatsApp भेजें</span>
+            </button>
+            <button type="button" class="btn-mkt-share" onclick="window.AarogyamETailer.shareMktNative()">
+              <i class="fa-solid fa-share-nodes"></i> <span>सभी ऐप्स पर शेयर</span>
+            </button>
+            <button type="button" class="btn-mkt-copy" onclick="window.AarogyamETailer.copyMktFullMessage()">
+              <i class="fa-regular fa-copy"></i> <span>पूरा मैसेज कॉपी</span>
+            </button>
+            <button type="button" class="btn-mkt-copy" onclick="window.AarogyamETailer.previewMktLandingPage()">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>पेज देखें</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. RECIPIENTS / AUDIENCE LIST -->
+        <div style="margin-top:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+            <div style="font-size:0.85rem;font-weight:800;color:var(--text-title);">
+              4️⃣ ग्राहक व किसान ऑडियंस (Target Recipients):
+            </div>
+            <select id="mktAudienceFilter" class="game-input" style="padding:4px 8px;font-size:0.76rem;margin:0;max-width:180px;" onchange="window.AarogyamETailer.filterMktRecipients(this.value)">
+              <option value="all">👥 सभी ग्राहक (All)</option>
+              <option value="agriculture">🌾 किसान (Agri)</option>
+              <option value="cattle">🐄 डेयरी पशुपालक (CFC)</option>
+              <option value="health">💊 हेल्थ कस्टमर्स</option>
+              <option value="netsurf">🏢 नेटसर्फ प्रोस्पेक्ट्स</option>
+            </select>
+          </div>
+
+          <div id="mktRecipientsList" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- -------------------------------------------------------------
+         TAB 2: eTAILER KHATA BOOK (CASH / UDHAR LEDGER)
+    -------------------------------------------------------------- -->
+    <section id="tab-khata" class="tab-pane">
+      
+      <!-- Khata KPI Summary Cards -->
+      <div class="khata-header-stats">
+        <div class="khata-kpi-card total">
+          <div class="khata-kpi-title">कुल रिटेल बिक्री</div>
+          <div class="khata-kpi-amount" id="khataTotalSalesVal">₹0</div>
+        </div>
+        <div class="khata-kpi-card cash">
+          <div class="khata-kpi-title">प्राप्त नकद (Cash)</div>
+          <div class="khata-kpi-amount" id="khataTotalCashVal" style="color:#34d399;">₹0</div>
+        </div>
+        <div class="khata-kpi-card udhar">
+          <div class="khata-kpi-title">बाकी उधार (Credit)</div>
+          <div class="khata-kpi-amount" id="khataTotalUdharVal" style="color:#ef4444;">₹0</div>
+        </div>
+      </div>
+
+      <!-- Action Bar -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="font-size:1.05rem;font-weight:800;">📖 किसान व ग्राहक बहीखाता</h3>
+        <button type="button" class="btn-royal-blue btn-royal-blue-sm" onclick="window.AarogyamETailer.openManualKhataModal()">
+          ➕ नई एंट्री जोड़ें
+        </button>
+      </div>
+
+      <!-- Khata Customer Records List -->
+      <div class="khata-records-list" id="khataRecordsList">
+        <!-- Dynamically populated via JS -->
+      </div>
+
+    </section>
+
+    <!-- -------------------------------------------------------------
+         TAB 3: AUTOSHIP 6TH MONTH FREE RADAR
+    -------------------------------------------------------------- -->
+    <section id="tab-autoship" class="tab-pane">
+      <div class="survey-card" style="border-color:#f59e0b;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.8rem;">🎁</span>
+          <div>
+            <h3 style="color:#f59e0b;font-size:1.05rem;margin:0;font-weight:800;">नेटसर्फ ऑटोशिप 6th मंथ मुफ़्त प्रोडक्ट रडार</h3>
+            <p style="font-size:0.78rem;color:var(--text-muted);margin:3px 0 0 0;">
+              नियम: लगातार 5 महीने प्रोडक्ट लेने वाले ग्राहक को 6वें महीने 100% मुफ़्त प्रोडक्ट उपहार मिलता है।
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Autoship Customer Tracker List -->
+      <div id="autoshipTrackerList">
+        <!-- Dynamically populated via JS -->
+      </div>
+    </section>
+
+    <!-- -------------------------------------------------------------
+         TAB 4: 1-TAP DSR & GOAL REVERSE CALCULATOR
+    -------------------------------------------------------------- -->
+    <section id="tab-dsr" class="tab-pane">
+      
+      <div class="survey-card">
+        <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:10px;">📋 आज का फील्ड स्कोर (DSR)</h3>
+        
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:10px;margin-bottom:14px;">
+          
+          <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:0.75rem;color:var(--text-muted);">👨‍🌾 किसान मुलाकात</div>
+            <div style="font-size:1.3rem;font-weight:900;color:var(--text-main);margin:4px 0;" id="dsrCountFarmers">0</div>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="width:100%;padding:4px;" onclick="window.AarogyamETailer.incrementDsr('farmers_met', 1)">+1 मिले</button>
+          </div>
+
+          <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:0.75rem;color:var(--text-muted);">💼 STP प्लान</div>
+            <div style="font-size:1.3rem;font-weight:900;color:var(--text-main);margin:4px 0;" id="dsrCountStp">0</div>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="width:100%;padding:4px;" onclick="window.AarogyamETailer.incrementDsr('plans_shown', 1)">+1 प्लान</button>
+          </div>
+
+          <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:0.75rem;color:var(--text-muted);">🛍️ आर्डर (₹)</div>
+            <div style="font-size:1.3rem;font-weight:900;color:#34d399;margin:4px 0;" id="dsrCountOrder">₹0</div>
+            <button type="button" class="btn-action-green" style="width:100%;padding:4px;font-size:0.75rem;" onclick="window.AarogyamETailer.openManualKhataModal()">+ आर्डर</button>
+          </div>
+
+          <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:0.75rem;color:var(--text-muted);">📞 फॉलो-अप</div>
+            <div style="font-size:1.3rem;font-weight:900;color:var(--text-main);margin:4px 0;" id="dsrCountDemo">0</div>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="width:100%;padding:4px;" onclick="window.AarogyamETailer.incrementDsr('followups_done', 1)">+1 कॉल</button>
+          </div>
+
+        </div>
+
+        <!-- Interactive To-Do List Engine -->
+        <div style="border-top:1px solid var(--border-subtle);padding-top:12px;margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h4 style="font-size:0.92rem;font-weight:800;">📝 आज की To-Do लिस्ट & फॉलो-अप</h4>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" onclick="window.AarogyamETailer.addTodoPrompt()">+ नया टास्क</button>
+          </div>
+          <div id="dsrTodoListContainer">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Visual Growth Analytics & Graph -->
+        <div style="border-top:1px solid var(--border-subtle);padding-top:12px;margin-top:14px;">
+          <h4 style="font-size:0.92rem;font-weight:800;color:#f59e0b;margin-bottom:8px;">📈 4-साइकिल ग्रोथ ट्रेंड (Analytics)</h4>
+          <canvas id="growthAnalyticsCanvas" style="width:100%;height:160px;"></canvas>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- -------------------------------------------------------------
+         TAB 5: SUCCESS PATH & DYNAMIC TARGET DATE CALCULATOR
+    -------------------------------------------------------------- -->
+    <section id="tab-success-path" class="tab-pane">
+      
+      <!-- Top Target Dates Summary Dashboard -->
+      <div class="corporate-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <div>
+            <span style="background:rgba(59,130,246,0.2);color:#3b82f6;font-size:0.72rem;font-weight:800;padding:2px 6px;border-radius:4px;">AI TARGET ENGINE</span>
+            <h2 style="font-size:1.15rem;margin:2px 0 0 0;font-weight:900;">सक्सेस पाथ & ₹1Cr सफलता तिथि</h2>
+          </div>
+          <button type="button" class="btn-royal-blue btn-royal-blue-sm" onclick="window.AarogyamETailer.openIncomeLogModal()">
+            <span>💰 + 15-दिन कमाई दर्ज करें</span>
+          </button>
+        </div>
+
+        <div class="success-predictors-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;margin-bottom:14px;">
+          <div class="predictor-card predictor-card-blue">
+            <div class="predictor-badge">अगला मुकाम</div>
+            <div class="predictor-title">⭐ Rock Star Achiever</div>
+            <div class="predictor-date">अनुमानित: <strong>15 सितम्बर 2026</strong></div>
+          </div>
+          <div class="predictor-card predictor-card-gold">
+            <div class="predictor-badge">₹8,19,250 15-दिन कैप</div>
+            <div class="predictor-title">🎖️ Cap Summit</div>
+            <div class="predictor-date">अनुमानित: <strong>14 जुलाई 2028</strong></div>
+          </div>
+          <div class="predictor-card predictor-card-emerald">
+            <div class="predictor-badge">₹1 करोड़ कुल कमाई</div>
+            <div class="predictor-title">💎 1 Crore Hall of Fame</div>
+            <div class="predictor-date">अनुमानित: <strong>13 जुलाई 2030</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Business Plans & Fast Track Contests from Admin -->
+      <div class="corporate-card" style="border-color:#f59e0b;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div>
+            <h3 style="color:#f59e0b;font-size:1.05rem;margin:0;font-weight:800;">🔥 विशेष सक्रिय योजनाएं व फास्ट ट्रैक ऑफर्स</h3>
+            <span style="font-size:0.75rem;color:var(--text-muted);">कंपनी व लीडरशिप द्वारा जारी विशेष नेशनल ट्रिप्स व कार फंड क्लब</span>
+          </div>
+          <span style="background:rgba(245,158,11,0.2);color:#f59e0b;font-size:0.7rem;padding:2px 8px;border-radius:12px;font-weight:800;">LIVE PROMOTIONS</span>
+        </div>
+
+        <div id="userCustomPlansContainer" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:10px;">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+
+      <!-- Career Ladder Milestones & Reward Points -->
+      <div class="corporate-card">
+        <h3 style="font-size:1.05rem;margin:0 0 10px 0;font-weight:800;">🎖️ 8-स्तरीय करियर लैडर मुकाम</h3>
+        <div id="careerLadderNodesContainer">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- -------------------------------------------------------------
+         TAB 6: AUDIO TRAINING & OBJECTION HANDLING STUDIO
+    -------------------------------------------------------------- -->
+    <section id="tab-training" class="tab-pane">
+      <div class="corporate-card">
+        <h3 style="font-size:1.05rem;margin:0 0 10px 0;font-weight:800;">🎧 लीडरशिप ऑडियो पॉडकास्ट (2-3 मिनट टिप्स)</h3>
+        <div id="audioTrainingLessonsList">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================
+       5. MODAL: ADD / EDIT KHATA ENTRY
+  ========================================== -->
+  <div class="game-modal-overlay" id="addKhataModal">
+    <div class="game-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="font-size:1.1rem;margin:0;font-weight:800;">📝 नई खाता / सेल एंट्री दर्ज करें</h3>
+        <button type="button" onclick="window.AarogyamETailer.closeKhataModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;">&times;</button>
+      </div>
+
+      <form id="khataEntryForm" onsubmit="window.AarogyamETailer.saveKhataEntry(event)">
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+          <label style="font-size:0.78rem;color:var(--text-muted);font-weight:700;">किसान / ग्राहक का नाम *</label>
+          <button type="button" class="btn-voice-mic" id="btnMicKhataName" onclick="window.AarogyamETailer.startVoiceInput('khataModalName', 'btnMicKhataName')" title="बोलकर नाम लिखें">
+            <span>🎙️ बोलें</span>
+          </button>
+        </div>
+        <input type="text" id="khataModalName" class="game-input" placeholder="उदा. रामलाल पाटीदार" required>
+
+        <label style="font-size:0.78rem;color:var(--text-muted);font-weight:700;">मोबाइल नंबर</label>
+        <input type="tel" id="khataModalPhone" class="game-input" placeholder="10 अंकों का व्हाट्सएप नंबर">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; margin-bottom:2px;">
+          <label style="font-size:0.78rem;color:var(--text-muted);font-weight:700;">दिए गए प्रोडक्ट (विवरण)</label>
+          <button type="button" class="btn-voice-mic" id="btnMicKhataProds" onclick="window.AarogyamETailer.startVoiceInput('khataModalProducts', 'btnMicKhataProds')" title="बोलकर प्रोडक्ट लिखें">
+            <span>🎙️ बोलें</span>
+          </button>
+        </div>
+        <input type="text" id="khataModalProducts" class="game-input" placeholder="उदा. Stimrich + Bio99 + Set">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;">
+          <div>
+            <label style="font-size:0.78rem;color:var(--text-muted);font-weight:700;">कुल बिल राशि (₹) *</label>
+            <input type="number" id="khataModalBill" class="game-input" placeholder="₹2400" required>
+          </div>
+          <div>
+            <label style="font-size:0.78rem;color:#34d399;font-weight:700;">नकद मिला (₹)</label>
+            <input type="number" id="khataModalCash" class="game-input" placeholder="₹1500" value="0">
+          </div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <button type="submit" class="btn-action-green" style="width:100%;padding:11px;font-size:0.92rem;box-shadow:0 4px 14px rgba(16,185,129,0.3);">
+            <span>💾 खाता में सुरक्षित करें & क्लोजिंग में जोड़ें</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================
+       5.1 MODAL: LOG 15-DAY ACTUAL INCOME
+  ========================================== -->
+  <div class="game-modal-overlay" id="addIncomeLogModal">
+    <div class="game-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div>
+          <h3 style="font-size:1.05rem;margin:0;font-weight:800;">💰 15-दिन की कमाई दर्ज करें</h3>
+          <span style="font-size:0.72rem;color:var(--text-muted);">इससे आपकी सफलता तिथि स्वतः अपडेट होगी</span>
+        </div>
+        <button type="button" onclick="window.AarogyamETailer.closeIncomeLogModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;">&times;</button>
+      </div>
+
+      <form id="incomeLogForm" onsubmit="window.AarogyamETailer.saveIncomeLogEntry(event)">
+        <label style="font-size:0.78rem;color:var(--text-muted);">साइकल विवरण *</label>
+        <input type="text" id="incomeLogCycleName" class="game-input" placeholder="उदा. 1-15 सितम्बर 2026" required>
+
+        <label style="font-size:0.78rem;color:#fbbf24;">15-दिन की कुल कमाई (₹) *</label>
+        <input type="number" id="incomeLogTotal" class="game-input" placeholder="₹7000" style="color:#fbbf24;font-weight:800;" required>
+
+        <div style="margin-top:14px;">
+          <button type="submit" class="btn-royal-blue" style="width:100%;padding:10px;font-size:0.9rem;">
+            <span>🚀 कमाई सेव करें</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================
+       5.2 MODAL: IN-DEPTH TUTORIAL & AUDIO MASTER GUIDE
+  ========================================== -->
+  <div class="game-modal-overlay" id="smartETailerTutorialModal">
+    <div class="game-modal-card" style="max-width:620px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid var(--border-subtle);padding-bottom:8px;">
+        <div>
+          <h3 style="font-size:1.15rem;margin:0;font-weight:900;color:var(--text-title);display:flex;align-items:center;gap:6px;">
+            <span>🎥</span> <span>स्मार्ट ई-टेलर ट्यूटोरियल & बिज़नेस गाइड</span>
+          </h3>
+          <span style="font-size:0.75rem;color:var(--text-muted);">ऑडियो सुनें या विस्तार से पढ़ें — सब कुछ 100% हिंदी में</span>
+        </div>
+        <button type="button" onclick="window.AarogyamETailer.closeTutorialModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.6rem;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+
+      <!-- Quick Audio Guide Bar -->
+      <div style="background:linear-gradient(135deg, #1d4ed8, #2563eb);color:#fff;padding:12px;border-radius:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div>
+          <strong style="font-size:0.88rem;display:block;">🎙️ मास्टर ऑडियो गाइड (3 मिनट में सब समझें)</strong>
+          <span style="font-size:0.72rem;color:#e0e7ff;">AI वॉयस द्वारा पूरे पेज और प्लान की संपूर्ण जानकारी</span>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="background:#ffffff !important;color:#1d4ed8 !important;font-weight:900;" onclick="window.AarogyamETailer.playTutorialMasterAudio()">
+            <span>▶️ ऑडियो सुनें</span>
+          </button>
+          <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="background:rgba(0,0,0,0.3) !important;" onclick="window.AarogyamETailer.stopAllAudio()">
+            <span>⏹️ स्टॉप</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Video Embed -->
+      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;margin-bottom:14px;background:#000;">
+        <iframe id="tutorialVideoIframe" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>
+      </div>
+
+      <!-- Comprehensive Feature Explanation Accordion -->
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:0.84rem;color:var(--text-main);">
+        
+        <!-- Section 1: Company Profile & Heritage -->
+        <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <h4 style="font-size:0.95rem;font-weight:800;color:var(--text-title);margin:0;">🏢 1. नेटसर्फ कंपनी प्रोफाइल (25 साल की विरासत)</h4>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:3px 8px;font-size:0.72rem;" onclick="window.AarogyamETailer.playCustomAudio('al_company_profile')">
+              <span>🔊 प्रोफाइल ऑडियो</span>
+            </button>
+          </div>
+          <p style="margin:0;line-height:1.5;font-size:0.8rem;">
+            सन 2000 से स्थापित 25 साल पुरानी डायरेक्ट सेलिंग कंपनी, खुद का DSIR अप्रूव्ड R&D सेंटर, GMP फैक्ट्रियां और 100% केमिकल-मुक्त प्रोडक्ट्स।
+          </p>
+        </div>
+
+        <!-- Section 2: Smart eTailer Guide -->
+        <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <h4 style="font-size:0.95rem;font-weight:800;color:var(--text-title);margin:0;">👑 2. स्मार्ट ई-टेलर क्या है और इसका क्या फायदा है?</h4>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:3px 8px;font-size:0.72rem;" onclick="window.AarogyamETailer.playCustomAudio('al_smart_guide')">
+              <span>🔊 गाइड ऑडियो</span>
+            </button>
+          </div>
+          <p style="margin:0 0 6px 0;line-height:1.5;">
+            स्मार्ट ई-टेलर हर नेटसर्फ लीडर की <strong>डिजिटल फील्ड डायरी</strong> है। इसके 4 मुख्य फायदे हैं:
+          </p>
+          <ul style="padding-left:18px;margin:0;line-height:1.6;font-size:0.8rem;">
+            <li><strong>30-सेकंड सर्वे:</strong> किसान की फसल समस्या चुनकर 1-क्लिक में सही नुस्खा भेजें।</li>
+            <li><strong>खाता बुक & 15% शुक्रवार:</strong> नकद व उधारी दर्ज करें, जो स्वतः आपके शुक्रवार रिटेल बोनस में जुड़ती है।</li>
+            <li><strong>6th Month Free Autoship:</strong> 5 महीने लगातार लेने वाले ग्राहक को 6वें महीने फ्री गिफ्ट अलर्ट भेजें।</li>
+            <li><strong>DSR & ₹1Cr डेट:</strong> रोज 5 किसानों से मिलकर अपने ₹8,19,250 15-दिन कैप तक पहुंचने की सटीक तारीख देखें।</li>
+          </ul>
+        </div>
+
+        <!-- Section 3: Business Plan -->
+        <div style="background:var(--bg-card-inner);border:1.5px solid #f59e0b;border-radius:10px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <h4 style="font-size:0.95rem;font-weight:800;color:#f59e0b;margin:0;">💼 3. नेटसर्फ 15% शुक्रवार व ₹8,19,250 बिज़नेस प्लान</h4>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:3px 8px;font-size:0.72rem;" onclick="window.AarogyamETailer.playCustomAudio('al_netsurf_plan')">
+              <span>🔊 प्लान ऑडियो</span>
+            </button>
+          </div>
+          <ul style="padding-left:18px;margin:0;line-height:1.6;font-size:0.8rem;">
+            <li><strong>शुक्रवार रिटेल बोनस:</strong> हफ्ते में ₹8,000 की सेल पर 15% मैक्सिमम रिटेल बोनस अनलॉक होता है।</li>
+            <li><strong>15-दिन टर्नओवर मैचिंग:</strong> Team 1 व Team 2 से टर्नओवर मैचिंग पर 3% से 5% बाइनरी इनकम मिलती है।</li>
+            <li><strong>₹8,19,250 कैपिंग:</strong> दोनों टीमों से 81.92 लाख मैचिंग पर 15 दिन का ₹8.19L उच्चतम पे-आउट मिलता है।</li>
+          </ul>
+        </div>
+
+        <!-- Section 3 -->
+        <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <h4 style="font-size:0.95rem;font-weight:800;color:var(--text-title);margin:0;">3. 4 मुख्य प्रोडक्ट कैटेगरीज (Agriculture, Cattle, Health & Beauty)</h4>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="font-size:0.74rem;" onclick="window.AarogyamETailer.playCustomAudio('al_biofit_agri')">
+              <span>🌾 Biofit Agri ऑडियो</span>
+            </button>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="font-size:0.74rem;" onclick="window.AarogyamETailer.playCustomAudio('al_cfc_dairy')">
+              <span>🐄 CFC Dairy ऑडियो</span>
+            </button>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="font-size:0.74rem;" onclick="window.AarogyamETailer.playCustomAudio('al_naturamore_health')">
+              <span>💊 Naturamore ऑडियो</span>
+            </button>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="font-size:0.74rem;" onclick="window.AarogyamETailer.playCustomAudio('al_herbs_cosmetics')">
+              <span>💄 Cosmetics ऑडियो</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:14px;">
+        <button type="button" class="btn-royal-blue" style="width:100%;" onclick="window.AarogyamETailer.closeTutorialModal()">
+          <span>✅ समझ गया! काम शुरू करें</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       6. SCRIPTS
+  ========================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/session.js"></script>
+  <script src="/js/universal-nav-drawer.js"></script>
+  <script src="/js/smart-etailer-engine.js?v=20260911_v4"></script>
+</body>
+
+</html>

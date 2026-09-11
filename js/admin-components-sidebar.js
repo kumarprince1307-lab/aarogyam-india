@@ -28,6 +28,7 @@ const MENU = [
     { label: '📖 My Library Editor', href: 'page-editor.html?page=library', route: 'page-editor?page=library' },
     { label: '🌾 Mandi & Weather Editor', href: 'page-editor.html?page=mandi', route: 'page-editor?page=mandi' }
   ] },
+  { label: '👑 Smart eTailer (₹8.19L)', icon: '👑', href: 'smart-etailer.html', route: 'smart-etailer' },
   { label: 'Products', icon: '🛍️', children: [ 
     { label: 'Product Landing Pages', href: 'product-landing-pages.html', route: 'product-landing-pages' }, 
     { label: 'Categories', href: '#' }, 
@@ -48,7 +49,7 @@ const MENU = [
   ] },
   { label: 'Marketing', icon: '📣', children: [ 
     { label: 'UCAS Landing Pages', href: 'all-landing-pages.html', route: 'all-landing-pages' }, 
-    { label: 'Hook Templates & Shayari', href: 'marketing-templates.html', route: 'marketing-templates' }, 
+    { label: 'Hook Templates & Shayari (हुक व शायरी)', href: 'smart-etailer.html?tab=adm-sec-marketing', route: 'marketing-templates' }, 
     { label: 'Share Links', href: '#' }, 
     { label: 'Campaigns', href: '#' } 
   ] },

@@ -388,7 +388,16 @@
               </div>
             </a>
 
-            <!-- 2. MY PROFILE ▼ (Accordion) -->
+            <!-- 2. SMART eTAILER / MISSION 8,19,250 (Direct Super Link) -->
+            <a href="/pages/smart-etailer.html" class="drawer-nav-item-btn ${currentPath.includes('smart-etailer') ? 'active-pill' : ''}">
+              <div class="drawer-item-left">
+                <i class="fa-solid fa-crown drawer-item-icon" style="color:#10b981;"></i>
+                <span style="font-weight: 800;">स्मार्ट ई-टेलर (₹8.19L)</span>
+              </div>
+              <span class="drawer-cat-badge" style="background:#dcfce7;color:#15803d;font-weight:900;">NEW 🔥</span>
+            </a>
+
+            <!-- 2.1 MY PROFILE ▼ (Accordion) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-profile" onclick="window.toggleDrawerAccordion('profile', event)">
               <div class="drawer-item-left">
                 <i class="fa-solid fa-user-gear drawer-item-icon" style="color:#0ea5e9;"></i>
@@ -397,6 +406,10 @@
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-profile">
+              <a href="/pages/smart-etailer.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><i class="fa-solid fa-crown" style="color:#10b981;"></i><span>स्मार्ट ई-टेलर खाता (₹8.19L)</span></div>
+                <span class="drawer-cat-badge" style="background:#10b981;color:#fff;">HOT</span>
+              </a>
               <a href="/ucas/index.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-user-gear" style="color:#0ea5e9;"></i><span>My Profile & UCAS</span></div>
               </a>
@@ -407,23 +420,18 @@
               <a href="/purchases.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-file-invoice" style="color:#10b981;"></i><span>My Purchases & Invoices</span></div>
               </a>
-              <a href="/ucas/index.html?tab=survey" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-clipboard-list" style="color:#0284c7;"></i><span>Smart Survey</span></div>
+              <a href="/pages/smart-etailer.html?tab=survey" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><i class="fa-solid fa-clipboard-list" style="color:#0284c7;"></i><span>30-Sec Smart Survey</span></div>
+              </a>
+              <a href="/pages/smart-etailer.html?tab=marketing" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><i class="fa-solid fa-rocket" style="color:#ec4899;"></i><span>Marketing Engine & Hooks</span></div>
+                <span class="drawer-cat-badge" style="background:#dbeafe;color:#1d4ed8;font-weight:800;">SHARE</span>
               </a>
               <a href="/ucas/index.html?tab=phonebook" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-address-book" style="color:#8b5cf6;"></i><span>My Phonebook</span></div>
               </a>
               <a href="/ucas/index.html?tab=leads" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-user-group" style="color:#ea580c;"></i><span>My Share Leads</span></div>
-              </a>
-              <a href="/ucas/index.html?tab=marketing" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-rocket" style="color:#ec4899;"></i><span>Marketing Engine</span></div>
-              </a>
-              <a href="/ucas/index.html?tab=product-landing" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-cart-shopping" style="color:#f59e0b;"></i><span>Product Landing Page</span></div>
-              </a>
-              <a href="/ucas/index.html?tab=hook-templates" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-pen-nib" style="color:#8b5cf6;"></i><span>हुक व शायरी (Hook & Shayari)</span></div>
               </a>
               <a href="/ucas/index.html?tab=sandesh" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-bullhorn" style="color:#ef4444;"></i><span>आरोग्यम संदेश</span></div>
@@ -445,19 +453,19 @@
             </a>
 
             <!-- 4. LIVE ZOOM WEBINAR (Prominent Top-Level Link) -->
-            <a href="/webinar.html" class="drawer-nav-item-btn ${currentPath.includes('webinar') ? 'active-pill' : ''}" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.18) 100%); border: 1px solid rgba(239, 68, 68, 0.3);">
+            <a href="/webinar.html" class="drawer-nav-item-btn ${currentPath.includes('webinar') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
                 <i class="fa-solid fa-video drawer-item-icon" style="color:#dc2626;"></i>
-                <span style="font-weight: 800; color: #dc2626;">🔴 लाइव ज़ूम वेबिनार</span>
+                <span>लाइव ज़ूम वेबिनार</span>
               </div>
-              <span class="drawer-cat-badge" style="background:#fee2e2;color:#dc2626;font-weight:900;">LIVE</span>
+              <span class="drawer-cat-badge" style="background:#fee2e2;color:#dc2626;font-weight:900;">LIVE 🔴</span>
             </a>
 
             <!-- 4.1 AAROGYAM TUBE (Shorts & Masterclass Hub) -->
-            <a href="/tube.html" class="drawer-nav-item-btn ${currentPath.includes('tube') ? 'active-pill' : ''}" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(185, 28, 28, 0.2) 100%); border: 1px solid rgba(239, 68, 68, 0.35);">
+            <a href="/tube.html" class="drawer-nav-item-btn ${currentPath.includes('tube') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
                 <i class="fa-brands fa-youtube drawer-item-icon" style="color:#ef4444;font-size:1.15rem;"></i>
-                <span style="font-weight: 800; color: #ef4444;">🎬 AarogyamTube Hub</span>
+                <span>AarogyamTube Hub</span>
               </div>
               <span class="drawer-cat-badge" style="background:#fee2e2;color:#ef4444;font-weight:900;">VIDEOS</span>
             </a>
@@ -648,14 +656,14 @@
       <!-- Universal Sticky Mobile Bottom 8-Tab Navigation Bar (Mobile & Tablet) -->
       <nav class="universal-mobile-bottom-nav" id="universal-mobile-bottom-nav">
         <!-- 1. Home -->
-        <a href="/index.html" class="u-nav-tab ${(currentPath === '/' || currentPath.endsWith('index.html')) && !currentPath.includes('ucas') ? 'active' : ''}">
+        <a href="/index.html" class="u-nav-tab ${(currentPath === '/' || currentPath.endsWith('index.html')) && !currentPath.includes('ucas') && !currentPath.includes('smart-etailer') && !currentPath.includes('tube') ? 'active' : ''}">
           <div class="u-icon-wrap"><i class="fa-solid fa-house"></i></div>
           <span>Home</span>
         </a>
-        <!-- 2. Survey -->
-        <a href="/ucas/index.html?tab=survey" class="u-nav-tab ${currentSearch.includes('tab=survey') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-clipboard-list"></i></div>
-          <span>Survey</span>
+        <!-- 2. AarogyamTube (RED ICON) -->
+        <a href="/tube.html" class="u-nav-tab ${currentPath.includes('tube') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-brands fa-youtube" style="color:#ef4444;font-size:1.15rem;"></i></div>
+          <span style="color:#ef4444;font-weight:800;">Tube</span>
         </a>
         <!-- 3. Library -->
         <a href="/ebooks/my-library.html" class="u-nav-tab ${currentPath.includes('my-library') ? 'active' : ''}">
@@ -672,10 +680,10 @@
           <div class="u-icon-wrap"><i class="fa-solid fa-seedling"></i></div>
           <span>Mandi</span>
         </a>
-        <!-- 6. Marketing Engine -->
-        <a href="/ucas/index.html?tab=marketing" class="u-nav-tab ${currentSearch.includes('tab=marketing') || currentPath.includes('marketing') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-bullhorn"></i></div>
-          <span>Marketing</span>
+        <!-- 6. Marketing (Smart eTailer) -->
+        <a href="/pages/smart-etailer.html" class="u-nav-tab ${currentPath.includes('smart-etailer') || currentPath.includes('marketing') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-solid fa-crown" style="color:#10b981;"></i></div>
+          <span style="color:#10b981;font-weight:800;">eTailer</span>
         </a>
         <!-- 7. Webinar -->
         <a href="/webinar.html" class="u-nav-tab ${currentPath.includes('webinar') ? 'active' : ''}">
@@ -683,7 +691,7 @@
           <span>Webinar</span>
         </a>
         <!-- 8. Profile -->
-        <a href="/ucas/index.html" class="u-nav-tab ${(currentPath.includes('ucas') || currentPath.includes('profile')) && !currentSearch.includes('tab=survey') ? 'active' : ''}">
+        <a href="/ucas/index.html" class="u-nav-tab ${(currentPath.includes('ucas') || currentPath.includes('profile')) && !currentPath.includes('smart-etailer') ? 'active' : ''}">
           <div class="u-icon-wrap"><i class="fa-solid fa-user"></i></div>
           <span>Profile</span>
         </a>

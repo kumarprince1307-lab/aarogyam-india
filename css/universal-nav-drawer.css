@@ -464,6 +464,23 @@
     font-weight: 800 !important;
   }
 
+  /* YouTube Red Special Tab */
+  .u-nav-tab i.fa-youtube {
+    color: #ef4444 !important;
+  }
+
+  .u-nav-tab.active:has(i.fa-youtube) {
+    background: #fef2f2 !important;
+  }
+
+  .u-nav-tab.active:has(i.fa-youtube) .u-icon-wrap {
+    background: #fee2e2 !important;
+  }
+
+  .u-nav-tab.active:has(i.fa-youtube) span {
+    color: #dc2626 !important;
+  }
+
   body {
     padding-bottom: 75px !important;
   }

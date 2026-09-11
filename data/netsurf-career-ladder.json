@@ -1,0 +1,133 @@
+{
+  "version": "2026.1",
+  "career_ladder": [
+    {
+      "level": 1,
+      "id": "rank_pro_etailer",
+      "name": "प्रो ई-टेलर (Pro eTailer)",
+      "badge": "🌱 PRO eTAILER",
+      "color": "#38bdf8",
+      "target_desc": "₹5,000 की प्रोडक्ट परचेज या ID एक्टिवेशन",
+      "personal_target": 5000,
+      "team_matching_target": 0,
+      "max_duration_days": 7,
+      "reward_xp": 100,
+      "perks": "5%-10% रिटेल डिस्काउंट + डिस्ट्रीब्यूटर राइट्स",
+      "icon": "🌱"
+    },
+    {
+      "level": 2,
+      "id": "rank_rock_star",
+      "name": "रॉक स्टार अचीवर (Rock Star)",
+      "badge": "⭐ ROCK STAR",
+      "color": "#f59e0b",
+      "target_desc": "साइकल में ₹8,000 का डायरेक्ट पर्सनल रिटेल टर्नओवर",
+      "personal_target": 8000,
+      "team_matching_target": 0,
+      "max_duration_days": 15,
+      "reward_xp": 250,
+      "perks": "🔥 15% मैक्सिमम शुक्रवार रिटेल कमिशन अनलॉक",
+      "icon": "⭐"
+    },
+    {
+      "level": 3,
+      "id": "rank_bc",
+      "name": "बिज़नेस कंसलटेंट (Business Consultant - BC)",
+      "badge": "💼 BC LEADER",
+      "color": "#10b981",
+      "target_desc": "Team 1: ₹10,000 | Team 2: ₹10,000 टर्नओवर मैचिंग",
+      "personal_target": 2000,
+      "team_matching_target": 10000,
+      "max_duration_days": 30,
+      "reward_xp": 500,
+      "perks": "3% बाइनरी टर्नओवर मैचिंग + G1 रेफरल 3%",
+      "icon": "💼"
+    },
+    {
+      "level": 4,
+      "id": "rank_sbc",
+      "name": "सीनियर बिज़नेस कंसलटेंट (Senior BC - SBC)",
+      "badge": "🏆 SENIOR BC",
+      "color": "#8b5cf6",
+      "target_desc": "3 महीने (6 साइकल) में Team 1: ₹1,00,000 | Team 2: ₹1,00,000 मैचिंग",
+      "personal_target": 4000,
+      "team_matching_target": 100000,
+      "max_duration_days": 90,
+      "reward_xp": 1200,
+      "perks": "4% बाइनरी मैचिंग + लीडरशिप पिन व रिकॉग्निशन",
+      "icon": "🏆"
+    },
+    {
+      "level": 5,
+      "id": "rank_fastrack",
+      "name": "फास्ट ट्रैक अचीवर (Fast Track Champion)",
+      "badge": "🚀 FAST TRACK",
+      "color": "#ec4899",
+      "target_desc": "Team 1: ₹3,00,000 | Team 2: ₹3,00,000 प्रति साइकल मैचिंग",
+      "personal_target": 6000,
+      "team_matching_target": 300000,
+      "max_duration_days": 180,
+      "reward_xp": 2500,
+      "perks": "5% बाइनरी मैचिंग + नेशनल रेजिडेंशियल ट्रेनिंग ट्रिप",
+      "icon": "🚀"
+    },
+    {
+      "level": 6,
+      "id": "rank_club_elite",
+      "name": "क्लब एलीट लीडर (Club Elite)",
+      "badge": "👑 CLUB ELITE",
+      "color": "#06b6d4",
+      "target_desc": "Team 1: ₹15,00,000 | Team 2: ₹15,00,000 प्रति साइकल मैचिंग",
+      "personal_target": 10000,
+      "team_matching_target": 1500000,
+      "max_duration_days": 365,
+      "reward_xp": 5000,
+      "perks": "5% मैचिंग + कार फंड + इंटरनेशनल ट्रिप क्वालीफिकेशन",
+      "icon": "👑"
+    },
+    {
+      "level": 7,
+      "id": "rank_cap_summit",
+      "name": "₹8,19,250 मेगा साइकल कैप अचीवर (Cap Achiever)",
+      "badge": "🎖️ ₹8.19L CAP SUMMIT",
+      "color": "#fbbf24",
+      "target_desc": "Team 1: ₹81,92,500 | Team 2: ₹81,92,500 प्रति 15-दिन साइकल मैचिंग",
+      "personal_target": 15000,
+      "team_matching_target": 8192500,
+      "max_duration_days": 730,
+      "reward_xp": 10000,
+      "perks": "₹8,19,250 प्रति 15 दिन (₹16.38 Lakh प्रति माह उच्चतम सीमा)",
+      "icon": "🎖️"
+    },
+    {
+      "level": 8,
+      "id": "rank_crore_legend",
+      "name": "₹1 करोड़ लेजेंडरी समिट क्लब (₹1 Crore Summit Club)",
+      "badge": "💎 ₹1 CRORE LEGEND",
+      "color": "#e0e7ff",
+      "target_desc": "क्युमुलेटिव (कुल) कमाई ₹1,00,00,000 पार करना",
+      "personal_target": 50000,
+      "team_matching_target": 20000000,
+      "max_duration_days": 1200,
+      "reward_xp": 25000,
+      "perks": "आरोग्यम हॉल ऑफ़ फेम लेजेंड ट्रॉफी + आजीवन रॉयल्टी क्लब",
+      "icon": "💎"
+    }
+  ],
+  "cap_team_formula": {
+    "target_matching_per_cycle": 8192500,
+    "max_cycle_payout": 819250,
+    "ratios": {
+      "active_consumers_each_side": 2000,
+      "consumer_avg_monthly_purchase": 2000,
+      "pro_etailers_each_side": 500,
+      "etailer_avg_retail_per_cycle": 8000,
+      "bc_leaders_each_side": 200,
+      "bc_avg_matching_per_cycle": 20000,
+      "sbc_leaders_each_side": 20,
+      "sbc_avg_matching_per_cycle": 200000,
+      "fastrack_champions_each_side": 7,
+      "fastrack_avg_matching_per_cycle": 600000
+    }
+  }
+}
