@@ -116,20 +116,24 @@ async function verifyUserAccessAndSession(targetBookId) {
         (b.slug && b.slug.toLowerCase() === String(targetBookId).toLowerCase())
     );
 
+    const canonicalBookId = (aoiCurrentBookData?.id || (targetKey.includes('KHARIF') ? 'BK001' : (targetKey.includes('KHETI') ? 'BK002' : targetKey))).toUpperCase();
+    aoiBookId = canonicalBookId;
+    window.aoiBookId = canonicalBookId;
+
     // Fallback if not found: create a fallback book object so reader never throws 404
     if (!aoiCurrentBookData) {
         aoiCurrentBookData = {
-            id: targetKey,
-            heading: `Aarogyam India eBook (${targetKey})`,
-            name: `Aarogyam India eBook (${targetKey})`,
+            id: canonicalBookId,
+            heading: `Aarogyam India eBook (${canonicalBookId})`,
+            name: `Aarogyam India eBook (${canonicalBookId})`,
             demoImages: [
                 '../images/books/kharif-master-guide-2026-preview-01.webp',
                 '../images/books/kharif-master-guide-2026-preview-02.webp',
                 '../images/books/kharif-master-guide-2026-preview-03.webp',
                 '../images/books/kharif-master-guide-2026-preview-04.webp'
             ],
-            targetMainBook: 'BK001',
-            isDemo: true,
+            targetMainBook: canonicalBookId === 'BK002' ? 'BK002' : 'BK001',
+            isDemo: false,
             readEnabled: true
         };
     }
@@ -140,9 +144,9 @@ async function verifyUserAccessAndSession(targetBookId) {
                        aoiCurrentBookData.type === 'demo' || 
                        aoiCurrentBookData.type === 'bonus_free' || 
                        Boolean(aoiCurrentBookData.isBonus) || 
-                       targetKey.startsWith('DEMO') || 
-                       targetKey.startsWith('BONUS') || 
-                       targetKey.startsWith('FREE');
+                       canonicalBookId.startsWith('DEMO') || 
+                       canonicalBookId.startsWith('BONUS') || 
+                       canonicalBookId.startsWith('FREE');
 
     const bookTitle = aoiCurrentBookData.heading || aoiCurrentBookData.name || "Aarogyam India eBook";
     if (bookHeading) bookHeading.textContent = bookTitle + (isDemoMode ? " (Demo)" : "");
@@ -151,7 +155,7 @@ async function verifyUserAccessAndSession(targetBookId) {
     // Sticky Top Bar for Demo / Bonus Mode
     if (isDemoMode) {
         if (watermarkUser) watermarkUser.textContent = "Free Demo Preview";
-        const targetMain = aoiCurrentBookData.targetMainBook || (targetKey === 'BK002' ? 'BK002' : 'BK001');
+        const targetMain = aoiCurrentBookData.targetMainBook || (canonicalBookId === 'BK002' ? 'BK002' : 'BK001');
         const checkoutUrl = `/ebooks/checkout.html?product=${encodeURIComponent(targetMain)}`;
         
         let demoBar = document.getElementById('demoReaderStickyBar');
@@ -198,7 +202,7 @@ async function verifyUserAccessAndSession(targetBookId) {
                 .from("purchases")
                 .select("id")
                 .eq("profile_id", userId)
-                .eq("book_id", targetBookId)
+                .eq("book_id", canonicalBookId)
                 .single();
 
             if (error || !data) {
@@ -209,69 +213,76 @@ async function verifyUserAccessAndSession(targetBookId) {
 
     // Check for WebP / Image Pages first (Smart HD Fast Engine)
     let pageImages = null;
-    if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
-        pageImages = aoiCurrentBookData.demoImages;
-    } else if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
-        pageImages = aoiCurrentBookData.pageImages;
-    }
-    
-    // Check IndexedDB Studio Cache
-    if (!pageImages || !pageImages.length) {
-        try {
-            pageImages = await loadPagesFromIndexedDb(targetBookId.toUpperCase());
-        } catch (e) {}
-    }
 
-    if (!pageImages || !pageImages.length) {
-        const localPagesKey = `AOI_BOOK_PAGES_${targetBookId.toUpperCase()}`;
-        const localStudioKey = `AOI_AUDIO_SCRIPTS_${targetBookId.toUpperCase()}`;
-        try {
-            const rawPages = localStorage.getItem(localPagesKey);
-            if (rawPages) pageImages = JSON.parse(rawPages);
-            else {
-                const rawStudio = localStorage.getItem(localStudioKey);
-                if (rawStudio) {
-                    const parsedStudio = JSON.parse(rawStudio);
-                    if (parsedStudio && parsedStudio.pageImages && parsedStudio.pageImages.length) {
-                        pageImages = parsedStudio.pageImages;
-                    }
-                }
-            }
-        } catch (e) {}
-    }
-
-    // Check if book has hasWebpPages flag or totalPages in Git repository
-    if (!pageImages || !pageImages.length) {
-        const total = aoiCurrentBookData.totalPages || 0;
-        const basePath = aoiCurrentBookData.pageImagesPath || `images/books/${targetBookId.toUpperCase()}`;
-        if (aoiCurrentBookData.hasWebpPages && total > 0) {
-            pageImages = [];
-            for (let i = 1; i <= total; i++) {
-                pageImages.push(`../${basePath}/${i}.webp`);
-            }
+    if (isDemoMode) {
+        // DEMO MODE: load demo preview pages
+        if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
+            pageImages = aoiCurrentBookData.demoImages;
+        } else if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
+            pageImages = aoiCurrentBookData.pageImages.slice(0, 5);
         } else {
-            // Probe static WebP image in Git repository
+            pageImages = [
+                '../images/books/kharif-master-guide-2026-preview-01.webp',
+                '../images/books/kharif-master-guide-2026-preview-02.webp',
+                '../images/books/kharif-master-guide-2026-preview-03.webp',
+                '../images/books/kharif-master-guide-2026-preview-04.webp'
+            ];
+        }
+    } else {
+        // MAIN BOOK MODE: load FULL book pages (152 pages for BK001, 118 pages for BK002, etc.)
+        if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
+            pageImages = aoiCurrentBookData.pageImages;
+        }
+
+        // Check IndexedDB Studio Cache
+        if (!pageImages || !pageImages.length) {
             try {
-                const probeRes = await fetch(`../images/books/${targetBookId.toUpperCase()}/1.webp`, { method: 'HEAD' });
-                if (probeRes.ok) {
-                    const count = total > 0 ? total : 152;
-                    pageImages = [];
-                    for (let i = 1; i <= count; i++) {
-                        pageImages.push(`../images/books/${targetBookId.toUpperCase()}/${i}.webp`);
+                pageImages = await loadPagesFromIndexedDb(canonicalBookId);
+            } catch (e) {}
+        }
+
+        if (!pageImages || !pageImages.length) {
+            const localPagesKey = `AOI_BOOK_PAGES_${canonicalBookId}`;
+            const localStudioKey = `AOI_AUDIO_SCRIPTS_${canonicalBookId}`;
+            try {
+                const rawPages = localStorage.getItem(localPagesKey);
+                if (rawPages) pageImages = JSON.parse(rawPages);
+                else {
+                    const rawStudio = localStorage.getItem(localStudioKey);
+                    if (rawStudio) {
+                        const parsedStudio = JSON.parse(rawStudio);
+                        if (parsedStudio && parsedStudio.pageImages && parsedStudio.pageImages.length) {
+                            pageImages = parsedStudio.pageImages;
+                        }
                     }
                 }
             } catch (e) {}
         }
-    }
 
-    // Default Fallback demo pages if still empty
-    if ((!pageImages || !pageImages.length) && isDemoMode) {
-        pageImages = [
-            '../images/books/kharif-master-guide-2026-preview-01.webp',
-            '../images/books/kharif-master-guide-2026-preview-02.webp',
-            '../images/books/kharif-master-guide-2026-preview-03.webp',
-            '../images/books/kharif-master-guide-2026-preview-04.webp'
-        ];
+        // Check if book has hasWebpPages flag or totalPages in repository
+        if (!pageImages || !pageImages.length) {
+            const defaultTotal = canonicalBookId === 'BK001' ? 152 : (canonicalBookId === 'BK002' ? 118 : 0);
+            const total = aoiCurrentBookData.totalPages || defaultTotal;
+            const basePath = aoiCurrentBookData.pageImagesPath || `images/books/${canonicalBookId}`;
+            if ((aoiCurrentBookData.hasWebpPages || canonicalBookId === 'BK001' || canonicalBookId === 'BK002') && total > 0) {
+                pageImages = [];
+                for (let i = 1; i <= total; i++) {
+                    pageImages.push(`../${basePath}/${i}.webp`);
+                }
+            } else {
+                // Probe static WebP image in repository
+                try {
+                    const probeRes = await fetch(`../images/books/${canonicalBookId}/1.webp`, { method: 'HEAD' });
+                    if (probeRes.ok) {
+                        const count = total > 0 ? total : (canonicalBookId === 'BK001' ? 152 : (canonicalBookId === 'BK002' ? 118 : 100));
+                        pageImages = [];
+                        for (let i = 1; i <= count; i++) {
+                            pageImages.push(`../images/books/${canonicalBookId}/${i}.webp`);
+                        }
+                    }
+                } catch (e) {}
+            }
+        }
     }
 
     if (pageImages && pageImages.length > 0) {
