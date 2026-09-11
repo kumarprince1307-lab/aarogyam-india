@@ -366,10 +366,21 @@
       book.status !== 'active'
     );
     
+    const isStudioDemo = !isLiveAgri && ((book.type === 'demo' || book.isDemo === true || bId.startsWith('DEMO')) && !bId.startsWith('BONUS') && !bId.startsWith('FREE'));
+    const isStudioBonus = !isLiveAgri && ((book.type === 'bonus_free' || book.isBonus === true || bId.startsWith('BONUS') || bId.startsWith('FREE')) && !bId.startsWith('DEMO'));
+    const isFreeOrDemo = isStudioDemo || isStudioBonus;
+
+    if (isFreeOrDemo) {
+      landingUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
+    }
+
     // Store Badge Calculation
     let badgeText = 'Launch Offer';
     let badgeClass = 'badge-offer';
-    if (isComingSoon) {
+    if (isFreeOrDemo) {
+      badgeText = isStudioBonus ? '🎁 100% Free Bonus' : '📖 Free Demo Sample';
+      badgeClass = isStudioBonus ? 'badge-bestseller' : 'badge-discount';
+    } else if (isComingSoon) {
       badgeText = '⏳ Coming Soon';
       badgeClass = 'badge-coming-soon';
     } else if (book.badge === 'best_seller' || book.store_badge === 'best_seller' || bId === 'BK001') {
@@ -401,8 +412,8 @@
       id: bId,
       heading: title,
       name: title,
-      offerPrice: offerPrice,
-      mrp: mrp,
+      offerPrice: isFreeOrDemo ? 0 : offerPrice,
+      mrp: isFreeOrDemo ? 0 : mrp,
       cover: cover,
       category: category,
       landingPage: landingUrl
@@ -438,7 +449,7 @@
           <div class="card-rating-row">
             <div class="card-stars">★★★★★</div>
             <span class="card-rating-score">4.9</span>
-            <span class="card-rating-count">(120+ रिव्यूज)</span>
+            <span class="card-rating-count">(${isFreeOrDemo ? 'डेमो / फ्री प्रिव्यू' : '120+ रिव्यूज'})</span>
           </div>
 
           <h3 class="card-title" onclick="window.location.href='${landingUrl}'" title="${title}">
@@ -452,16 +463,26 @@
           </div>
 
           <!-- Price & Savings Block -->
-          <div class="card-price-block">
-            <div class="card-prices">
-              <span class="card-offer-price">₹${offerPrice}</span>
-              <span class="card-mrp">₹${mrp}</span>
-              <span class="card-save-badge">${discountPercent}% छूट</span>
+          ${isFreeOrDemo ? `
+            <div class="card-price-block" style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:8px 12px;margin:8px 0;">
+              <div class="card-prices" style="display:flex;align-items:center;justify-content:space-between;">
+                <span class="card-offer-price" style="color:#16a34a;font-size:1.05rem;font-weight:900;">100% मुफ़्त (FREE)</span>
+                <span class="card-save-badge" style="background:#16a34a;color:#fff;font-weight:800;font-size:0.75rem;padding:2px 8px;border-radius:6px;">No Cost</span>
+              </div>
+              <div class="card-savings-text" style="color:#15803d;font-size:0.78rem;margin-top:2px;">सीधे ऑनलाइन पढ़ें या डिजिटल लाइब्रेरी में देखें</div>
             </div>
-            <div class="card-savings-text">आप बचाएंगे ₹${mrp - offerPrice}</div>
-          </div>
+          ` : `
+            <div class="card-price-block">
+              <div class="card-prices">
+                <span class="card-offer-price">₹${offerPrice}</span>
+                <span class="card-mrp">₹${mrp}</span>
+                <span class="card-save-badge">${discountPercent}% छूट</span>
+              </div>
+              <div class="card-savings-text">आप बचाएंगे ₹${mrp - offerPrice}</div>
+            </div>
+          `}
 
-          <!-- Action Buttons Bar: Coming Soon Wishlist / Buy Now Controls -->
+          <!-- Action Buttons Bar: Coming Soon Wishlist / Buy Now / Free Demo Controls -->
           <div class="card-actions-container">
             ${isComingSoon ? `
               <div style="display:flex;gap:8px;align-items:center;">
@@ -482,6 +503,44 @@
                 >
                   <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i>
                 </button>
+              </div>
+            ` : isFreeOrDemo ? `
+              <div class="card-actions-grid-2x2">
+                <!-- 1. Read Free / Demo Online (Green Button) -->
+                <a href="${landingUrl}" class="btn-card-buy-orange" style="background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 4px 12px rgba(22,163,74,0.3);text-decoration:none;" title="मुफ़्त ऑनलाइन पढ़ें">
+                  <i class="fa-solid fa-book-open"></i> <span>मुफ़्त पढ़ें</span>
+                </a>
+
+                <!-- 2. My Library (Blue Button) -->
+                <a href="/ebooks/my-library.html" class="btn-card-cart-blue" style="background:linear-gradient(135deg,#0284c7,#0369a1);box-shadow:0 4px 12px rgba(2,132,199,0.3);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px;" title="लाइब्रेरी खोलें">
+                  <i class="fa-solid fa-book-bookmark"></i> <span>My Library</span>
+                </a>
+
+                <!-- 3. Share Now (Green Native Direct Share) -->
+                <button 
+                  type="button" 
+                  class="btn-card-share-green" 
+                  onclick="window.nativeDirectShare('${bId}', '${escapeHtml(title)}', 0)"
+                  title="सीधे मोबाइल में शेयर करें"
+                >
+                  <i class="fa-brands fa-whatsapp"></i> <span>Share Now</span>
+                </button>
+
+                <!-- 4. Audio Demo or Share Drawer -->
+                ${book.hasAudioBook ? `
+                  <a href="/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1&audio=1" class="btn-card-share-channels" style="background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px;" title="ऑडियो डेमो सुनें">
+                    <i class="fa-solid fa-headphones"></i> <span>ऑडियो</span>
+                  </a>
+                ` : `
+                  <button 
+                    type="button" 
+                    class="btn-card-share-channels" 
+                    onclick="window.openShareDrawer('${bId}', '${escapeHtml(title)}', 0)"
+                    title="सोशल मीडिया ऑप्शंस खोलें"
+                  >
+                    <i class="fa-solid fa-share-nodes"></i> <span>Share By</span>
+                  </button>
+                `}
               </div>
             ` : `
               <div class="card-actions-grid-2x2">
@@ -623,6 +682,121 @@
     window.AarogyamWishlist.showToast('✅ आपकी रुचि दर्ज कर ली गई है! लॉन्च होते ही आपको WhatsApp पर सूचित किया जाएगा।', 'success');
   };
 
+  // -------------------------------------------------------------
+  // 6. UNIVERSAL YOUTUBE VIDEO MODAL ENGINE (MULTI-VIDEO PLAYLIST)
+  // -------------------------------------------------------------
+  window.extractYoutubeEmbedUrl = function (url) {
+    if (!url) return '';
+    let str = String(url).trim();
+    if (str.includes('embed/')) return str;
+    
+    // Match standard youtube.com/watch?v=ID or youtu.be/ID or youtube.com/shorts/ID
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+    const match = str.match(regExp);
+    if (match && match[2].length === 11) {
+      return `https://www.youtube-nocookie.com/embed/${match[2]}?autoplay=1&rel=0&modestbranding=1`;
+    }
+    return str;
+  };
+
+  window.openBookVideoModal = function (bookTitle, videos) {
+    let old = document.getElementById('ai-book-video-modal-overlay');
+    if (old) old.remove();
+
+    let list = [];
+    if (Array.isArray(videos)) {
+      list = videos.map((v, i) => typeof v === 'string' ? { title: `वीडियो #${i + 1}`, url: v } : v).filter(v => v && v.url);
+    } else if (typeof videos === 'string' && videos.trim()) {
+      list = [{ title: '📺 पुस्तक वीडियो डेमो', url: videos.trim() }];
+    }
+
+    if (list.length === 0) {
+      alert('इस पुस्तक के लिए कोई वीडियो लिंक उपलब्ध नहीं है।');
+      return;
+    }
+
+    const firstUrl = window.extractYoutubeEmbedUrl(list[0].url);
+
+    const modalHtml = `
+      <div id="ai-book-video-modal-overlay" class="ai-coming-soon-modal-overlay" style="display:flex;align-items:center;justify-content:center;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:9999999;padding:16px;">
+        <div style="background:#0f172a;border:1.5px solid #334155;border-radius:20px;max-width:700px;width:100%;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,0.6);position:relative;animation:modalScale 0.25s cubic-bezier(0.4,0,0.2,1);color:#fff;">
+          
+          <!-- Header -->
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:#1e293b;border-bottom:1px solid #334155;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:1.2rem;color:#ef4444;">🎬</span>
+              <h3 style="margin:0;font-size:1.05rem;font-weight:900;color:#f8fafc;">
+                ${escapeHtml(bookTitle)} — वीडियो डेमो
+              </h3>
+            </div>
+            <button onclick="document.getElementById('ai-book-video-modal-overlay').remove()" style="background:transparent;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;line-height:1;padding:4px 8px;">&times;</button>
+          </div>
+
+          <!-- Video Player Iframe Container -->
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;">
+            <iframe 
+              id="ai-active-video-frame" 
+              src="${firstUrl}" 
+              title="${escapeHtml(bookTitle)}" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen 
+              style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;">
+            </iframe>
+          </div>
+
+          <!-- Multi-Video Playlist Selector (If more than 1 video) -->
+          ${list.length > 1 ? `
+            <div style="padding:14px 18px;background:#0b1329;border-top:1px solid #1e293b;">
+              <div style="font-size:0.78rem;font-weight:800;color:#94a3b8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">
+                📺 वीडियो प्लेलिस्ट (${list.length} उपलब्ध):
+              </div>
+              <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;">
+                ${list.map((v, idx) => `
+                  <button 
+                    type="button" 
+                    onclick="window.switchActiveVideoModal('${window.extractYoutubeEmbedUrl(v.url)}', this)" 
+                    class="ai-video-playlist-btn ${idx === 0 ? 'active' : ''}" 
+                    style="padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;background:${idx === 0 ? '#ef4444' : '#1e293b'};color:#fff;border:1px solid ${idx === 0 ? '#ef4444' : '#334155'};transition:all 0.2s;"
+                  >
+                    <span>▶</span> <span>${escapeHtml(v.title || `भाग #${idx + 1}`)}</span>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Footer Actions -->
+          <div style="padding:12px 18px;display:flex;justify-content:space-between;align-items:center;background:#0f172a;flex-wrap:wrap;gap:10px;">
+            <div style="font-size:0.8rem;color:#94a3b8;">
+              🌾 Aarogyam India Digital Video Hub
+            </div>
+            <button onclick="document.getElementById('ai-book-video-modal-overlay').remove()" style="background:#334155;color:#fff;border:none;padding:6px 16px;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;">
+              बंद करें (Close)
+            </button>
+          </div>
+
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+
+  window.switchActiveVideoModal = function (url, btn) {
+    const frame = document.getElementById('ai-active-video-frame');
+    if (frame && url) {
+      frame.src = url;
+    }
+    document.querySelectorAll('.ai-video-playlist-btn').forEach(b => {
+      b.style.background = '#1e293b';
+      b.style.borderColor = '#334155';
+    });
+    if (btn) {
+      btn.style.background = '#ef4444';
+      btn.style.borderColor = '#ef4444';
+    }
+  };
+
   function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -634,3 +808,4 @@
     window.AarogyamCart.updateBadges();
   });
 })();
+

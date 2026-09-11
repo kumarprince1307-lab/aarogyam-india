@@ -39,10 +39,12 @@
     // Merge LocalStorage custom books and deleted IDs
     let customBooks = [];
     let customLp = [];
+    let freeDemoBooks = [];
     let deletedIds = [];
     try {
       customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
       customLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+      freeDemoBooks = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
       deletedIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');
     } catch (e) {}
 
@@ -54,8 +56,11 @@
       if (b && b.id) bookMap.set(b.id.toUpperCase(), b);
     });
 
-    // 2. Overlay from custom books
+    // 2. Overlay from custom books & free demo studio
     customBooks.forEach(b => {
+      if (b && b.id) bookMap.set(b.id.toUpperCase(), Object.assign({}, bookMap.get(b.id.toUpperCase()) || {}, b));
+    });
+    freeDemoBooks.forEach(b => {
       if (b && b.id) bookMap.set(b.id.toUpperCase(), Object.assign({}, bookMap.get(b.id.toUpperCase()) || {}, b));
     });
 

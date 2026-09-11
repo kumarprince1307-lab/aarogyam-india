@@ -75,46 +75,145 @@ async function verifyUserAccessAndSession(targetBookId) {
 
     if (watermarkUser) watermarkUser.textContent = userIdentifier;
 
-    const res = await fetch("../data/books.json");
-    if (!res.ok) throw new Error("books.json not found");
-    const json = await res.json();
-    
+    let jsonBooks = [];
+    try {
+        const res = await fetch("../data/books.json?v=" + Date.now());
+        if (res.ok) {
+            const json = await res.json();
+            jsonBooks = json.books || [];
+        }
+    } catch (e) {
+        console.warn("books.json fetch note:", e);
+    }
+
+    // Merge custom books & studio free demo books
+    try {
+        const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+        if (Array.isArray(customBooks)) {
+            customBooks.forEach(cb => {
+                const idx = jsonBooks.findIndex(x => x && x.id && x.id.toUpperCase() === cb.id.toUpperCase());
+                if (idx >= 0) jsonBooks[idx] = { ...jsonBooks[idx], ...cb };
+                else jsonBooks.push(cb);
+            });
+        }
+    } catch (e) {}
+
+    try {
+        const freeDemoBooks = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
+        if (Array.isArray(freeDemoBooks)) {
+            freeDemoBooks.forEach(fb => {
+                const idx = jsonBooks.findIndex(x => x && x.id && x.id.toUpperCase() === fb.id.toUpperCase());
+                if (idx >= 0) jsonBooks[idx] = { ...jsonBooks[idx], ...fb };
+                else jsonBooks.push(fb);
+            });
+        }
+    } catch (e) {}
+
     const targetKey = String(targetBookId).toUpperCase();
-    aoiCurrentBookData = json.books.find(b => 
+    aoiCurrentBookData = jsonBooks.find(b => 
         (b.id && b.id.toUpperCase() === targetKey) || 
         (b.book_id && b.book_id.toUpperCase() === targetKey) ||
         (b.slug && b.slug.toLowerCase() === String(targetBookId).toLowerCase())
     );
 
+    // Fallback if not found: create a fallback book object so reader never throws 404
     if (!aoiCurrentBookData) {
-        showErrorScreen();
-        return;
+        aoiCurrentBookData = {
+            id: targetKey,
+            heading: `Aarogyam India eBook (${targetKey})`,
+            name: `Aarogyam India eBook (${targetKey})`,
+            demoImages: [
+                '../images/books/kharif-master-guide-2026-preview-01.webp',
+                '../images/books/kharif-master-guide-2026-preview-02.webp',
+                '../images/books/kharif-master-guide-2026-preview-03.webp',
+                '../images/books/kharif-master-guide-2026-preview-04.webp'
+            ],
+            targetMainBook: 'BK001',
+            isDemo: true,
+            readEnabled: true
+        };
     }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDemoMode = urlParams.get("demo") === "1" || 
+                       Boolean(aoiCurrentBookData.isDemo) || 
+                       aoiCurrentBookData.type === 'demo' || 
+                       aoiCurrentBookData.type === 'bonus_free' || 
+                       Boolean(aoiCurrentBookData.isBonus) || 
+                       targetKey.startsWith('DEMO') || 
+                       targetKey.startsWith('BONUS') || 
+                       targetKey.startsWith('FREE');
 
     const bookTitle = aoiCurrentBookData.heading || aoiCurrentBookData.name || "Aarogyam India eBook";
-    if (bookHeading) bookHeading.textContent = bookTitle;
+    if (bookHeading) bookHeading.textContent = bookTitle + (isDemoMode ? " (Demo)" : "");
     if (loaderBookTitle) loaderBookTitle.textContent = bookTitle;
 
-    if (aoiCurrentBookData.readEnabled === false) {
-        accessDeniedModal.style.display = "flex";
-        return;
-    }
+    // Sticky Top Bar for Demo / Bonus Mode
+    if (isDemoMode) {
+        if (watermarkUser) watermarkUser.textContent = "Free Demo Preview";
+        const targetMain = aoiCurrentBookData.targetMainBook || (targetKey === 'BK002' ? 'BK002' : 'BK001');
+        const checkoutUrl = `/ebooks/checkout.html?product=${encodeURIComponent(targetMain)}`;
+        
+        let demoBar = document.getElementById('demoReaderStickyBar');
+        if (!demoBar) {
+            demoBar = document.createElement('div');
+            demoBar.id = 'demoReaderStickyBar';
+            demoBar.style.cssText = "background:linear-gradient(135deg, #0f172a, #1e293b);border-bottom:2px solid #f59e0b;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,0.5);flex-wrap:wrap;gap:8px;";
+            
+            const videos = Array.isArray(aoiCurrentBookData.videos) ? aoiCurrentBookData.videos : [];
+            const hasVideos = videos.length > 0;
 
-    if (userId && typeof supabaseClient !== "undefined") {
-        const { data, error } = await supabaseClient
-            .from("purchases")
-            .select("id")
-            .eq("profile_id", userId)
-            .eq("book_id", targetBookId)
-            .single();
+            demoBar.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;color:#f8fafc;font-size:0.86rem;font-weight:700;">
+                    <span style="background:#f59e0b;color:#000;font-size:0.7rem;font-weight:900;padding:2px 6px;border-radius:4px;">FREE DEMO</span>
+                    <span>⚡ यह निःशुल्क डेमो प्रिव्यू है • सम्पूर्ण मुख्य पुस्तक मात्र ₹99 में प्राप्त करें</span>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    ${hasVideos ? `<button type="button" id="readerVideoBtn" style="background:#ef4444;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:0.8rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"><span>🎬</span> <span>वीडियो देखें</span></button>` : ''}
+                    <a href="${checkoutUrl}" style="background:#16a34a;color:#fff;text-decoration:none;padding:6px 14px;border-radius:6px;font-size:0.82rem;font-weight:800;box-shadow:0 2px 8px rgba(22,163,74,0.4);display:inline-flex;align-items:center;gap:4px;">
+                        <span>⚡</span> <span>पूरी मुख्य किताब खरीदें (₹99)</span>
+                    </a>
+                </div>
+            `;
+            document.body.prepend(demoBar);
 
-        if (error || !data) {
-            console.warn("No purchase record in DB, proceeding with local access...");
+            if (hasVideos) {
+                document.getElementById('readerVideoBtn')?.addEventListener('click', () => {
+                    if (window.openBookVideoModal) {
+                        window.openBookVideoModal(bookTitle, videos);
+                    } else {
+                        alert(`Video URL: ${videos[0].url}`);
+                    }
+                });
+            }
+        }
+    } else {
+        if (aoiCurrentBookData.readEnabled === false) {
+            accessDeniedModal.style.display = "flex";
+            return;
+        }
+
+        if (userId && typeof supabaseClient !== "undefined") {
+            const { data, error } = await supabaseClient
+                .from("purchases")
+                .select("id")
+                .eq("profile_id", userId)
+                .eq("book_id", targetBookId)
+                .single();
+
+            if (error || !data) {
+                console.warn("No purchase record in DB, proceeding with local access...");
+            }
         }
     }
 
     // Check for WebP / Image Pages first (Smart HD Fast Engine)
-    let pageImages = (aoiCurrentBookData && aoiCurrentBookData.pageImages) ? aoiCurrentBookData.pageImages : null;
+    let pageImages = null;
+    if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
+        pageImages = aoiCurrentBookData.demoImages;
+    } else if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
+        pageImages = aoiCurrentBookData.pageImages;
+    }
     
     // Check IndexedDB Studio Cache
     if (!pageImages || !pageImages.length) {
@@ -163,6 +262,16 @@ async function verifyUserAccessAndSession(targetBookId) {
                 }
             } catch (e) {}
         }
+    }
+
+    // Default Fallback demo pages if still empty
+    if ((!pageImages || !pageImages.length) && isDemoMode) {
+        pageImages = [
+            '../images/books/kharif-master-guide-2026-preview-01.webp',
+            '../images/books/kharif-master-guide-2026-preview-02.webp',
+            '../images/books/kharif-master-guide-2026-preview-03.webp',
+            '../images/books/kharif-master-guide-2026-preview-04.webp'
+        ];
     }
 
     if (pageImages && pageImages.length > 0) {

@@ -131,6 +131,9 @@ export async function initBookLandingPages() {
       <button type="button" id="tab-btn-coming-soon-leads" onclick="window.switchAdminSubTab('leads')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); color: var(--admin-text); font-weight: 800;">
         🔔 3. कमिंग सून इंटरेस्ट लीड्स (Farmer Leads)
       </button>
+      <button type="button" id="tab-btn-free-demo-mgr" onclick="window.switchAdminSubTab('free_demo')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #f59e0b; color: #f59e0b; font-weight: 800;">
+        🎁 4. डेमो व फ्री ई-बुक्स स्टूडियो (Demo & Free Books Studio)
+      </button>
     </div>
 
     <!-- =========================================================================
@@ -1050,6 +1053,225 @@ export async function initBookLandingPages() {
         <!-- Rendered dynamically -->
       </div>
     </div>
+
+    <!-- SUB-TAB 4: Quick Demo & Free Book Studio Manager -->
+    <div id="admin-free-demo-subtab-container" class="admin-card" style="display: none; margin-bottom: 20px; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.3rem;">🎁</span>
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #f59e0b;">
+              डेमो व फ्री ई-बुक्स स्टूडियो (Quick Demo & Free Books Studio)
+            </h3>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--admin-muted); margin: 3px 0 0 0;">
+            यहाँ से फ्री डेमो व बोनस बुक्स बनाएं (कवर, 📖 रीडर पेजेस, 🎧 ऑडियो, 🎬 यूट्यूब वीडियो व ⚡ पूरी किताब खरीदें बटन सहित) जो My Library व अन्य ट्रे में बिना 404 के तुरंत लाइव हो जाएंगी।
+          </p>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btn-open-demo-book-builder" onclick="window.openFreeDemoBuilderModal('demo')" class="admin-button" style="background: #3b82f6; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(59,130,246,0.35); cursor: pointer;">
+            <span>📖</span> <span>+ नई डेमो बुक जोड़ें (Demo Book)</span>
+          </button>
+          <button type="button" id="btn-open-bonus-book-builder" onclick="window.openFreeDemoBuilderModal('bonus_free')" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22,163,74,0.35); cursor: pointer;">
+            <span>🎁</span> <span>+ नई फ्री बोनस बुक जोड़ें (Free Bonus)</span>
+          </button>
+          <button type="button" onclick="window.renderFreeDemoStudioTab()" class="admin-button small-button" style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); color: #fff; cursor: pointer;">
+            <span>🔄</span> <span>Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- FREE / DEMO BOOK BUILDER FORM MODAL / CARD -->
+      <div id="admin-free-demo-builder-card" style="display: none; background: rgba(0,0,0,0.45); border: 2px solid #f59e0b; border-radius: 12px; padding: 18px; margin-bottom: 18px; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden; position: relative; z-index: 20; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(245,158,11,0.3); padding-bottom: 10px; margin-bottom: 14px;">
+          <h4 id="fd_builder_title" style="margin: 0; color: #f59e0b; font-size: 1.05rem; font-weight: 800;">
+            ✨ नई डेमो / फ्री बुक बनाएं
+          </h4>
+          <button type="button" id="btn-close-free-demo-builder" onclick="window.toggleFreeDemoBuilder(false)" class="admin-button small-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted); cursor: pointer;">
+            &times; बंद करें
+          </button>
+        </div>
+
+        <form id="admin-free-demo-form" onsubmit="return false;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px;">
+            <!-- Book Type -->
+            <div>
+              <label class="admin-label" style="font-weight: 700; color: #f59e0b;">प्रकार (Book Type): *</label>
+              <select id="fd_input_type" onchange="window.handleFdTypeChange(this.value)" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 700;">
+                <option value="demo">📖 Demo Book (मुफ़्त डेमो पुस्तक)</option>
+                <option value="bonus_free">🎁 Free Bonus Book (मुफ़्त बोनस सामग्री)</option>
+              </select>
+            </div>
+
+            <!-- Book ID / Code -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label class="admin-label" style="font-weight: 700; margin: 0;">बुक कोड (Book Code): *</label>
+                <button type="button" id="btn_gen_fd_code" class="admin-button small-button" style="background: #16a34a; color: #fff; padding: 2px 8px; font-size: 0.72rem;">
+                  ⚡ Auto Code
+                </button>
+              </div>
+              <input type="text" id="fd_input_id" class="admin-input" placeholder="उदा. DEMO001" style="width: 100%; padding: 8px 10px; font-family: monospace; font-weight: 800; color: #16a34a;" required />
+            </div>
+
+            <!-- Category -->
+            <div>
+              <label class="admin-label" style="font-weight: 700;">कैटेगरी (Category): *</label>
+              <select id="fd_input_category" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 700;">
+                <option value="Agriculture">🌾 Agriculture (कृषि)</option>
+                <option value="Health">❤️ Health (स्वास्थ्य)</option>
+                <option value="Business">💼 Business (व्यापार)</option>
+                <option value="NETSURF">🌿 NETSURF (नेटसर्फ)</option>
+                <option value="Education">📘 Education (शिक्षा)</option>
+                <option value="Digital AI">🤖 Digital AI (डिजिटल कौशल)</option>
+              </select>
+            </div>
+
+            <!-- Target Paid Main Book (For Buy Now Button in Reader) -->
+            <div>
+              <label class="admin-label" style="font-weight: 700; color: #38bdf8;">⚡ मुख्य पेड बुक लिंक (Buy Full Book @ ₹99):</label>
+              <select id="fd_target_main_book" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 700;">
+                <option value="BK001">🌾 BK001: खरीफ फसल मास्टर गाइड 2026</option>
+                <option value="BK002">🩺 BK002: खेती का डॉक्टर (Pocket Doctor)</option>
+                <option value="BK003">🌾 BK003: अनाज भंडारण गाइड</option>
+                <option value="BK004">🍚 BK004: चावल प्रोसेसिंग गाइड</option>
+                <option value="BK005">🌾 BK005: धान मास्टर गाइड</option>
+                <option value="BK006">🤖 BK006: AI वेबसाइट गाइड</option>
+                <option value="BK007">🌾 BK007: गेहूं मास्टर गाइड</option>
+                <option value="BK008">🌱 BK008: जैविक खेती गाइड</option>
+                <option value="BK009">🌾 BK009: मक्का मास्टर गाइड</option>
+                <option value="BK010">🌸 BK010: फूल खेती गाइड</option>
+                <option value="BK011">🏡 BK011: पॉलीहाउस नेटहाउस गाइड</option>
+                <option value="BK012">🌱 BK012: सब्जी खेती गाइड</option>
+                <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Title & Subtitle -->
+          <div style="display: grid; grid-template-columns: 1.5fr 1.5fr; gap: 12px; margin-bottom: 14px;">
+            <div>
+              <label class="admin-label" style="font-weight: 700;">पुस्तक का शीर्षक (Title): *</label>
+              <input type="text" id="fd_input_title" class="admin-input" placeholder="उदा. खरीफ फसल मास्टर गाइड (Free Demo)" required style="width: 100%; padding: 8px 12px; font-weight: 700;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight: 700;">उप-शीर्षक / संक्षिप्त विवरण (Subtitle):</label>
+              <input type="text" id="fd_input_subtitle" class="admin-input" placeholder="5 प्रमुख पृष्ठों का सचित्र डेमो प्रिव्यू" style="width: 100%; padding: 8px 12px;" />
+            </div>
+          </div>
+
+          <!-- Cover Image Selector -->
+          <div style="background: rgba(0,0,0,0.2); border: 1.5px dashed rgba(245,158,11,0.4); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label style="font-weight: 700; font-size: 0.86rem; color: #f59e0b;">📸 3D कवर फोटो (Cover Image) *</label>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; align-items: center;">
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem;">GitHub से चुनें:</label>
+                <select id="fd_select_git_cover" onchange="window.handleFdCoverSelect(this.value)" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.8rem;">
+                  <option value="">-- GitHub से कवर चुनें --</option>
+                  <option value="/images/books/kharif-master-guide-2026-cover.webp">🌾 खरीफ मास्टर गाइड 2026</option>
+                  <option value="/images/books/fasal-ka-doctor-cover.webp">🌿 खेती का डॉक्टर (Pocket Doctor)</option>
+                  <option value="/images/books/sabji-kheti-guide-cover.webp">🌾 सब्जी खेती गाइड</option>
+                  <option value="/images/books/dhan-master-guide-cover.webp">🌾 धान मास्टर गाइड</option>
+                  <option value="/images/books/gehu-master-guide-cover.webp">🌾 गेहूं मास्टर गाइड</option>
+                  <option value="/images/books/jaivik-kheti-guide-cover.webp">🌱 जैविक खेती गाइड</option>
+                  <option value="/images/books/ai-website-guide-cover.webp">🤖 AI वेबसाइट गाइड</option>
+                </select>
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem;">या कंप्यूटर से अपलोड करें:</label>
+                <input type="file" id="fd_file_cover" accept="image/*" onchange="window.handleFdCoverFile(event)" class="admin-input" style="width: 100%; padding: 5px; font-size: 0.75rem;" />
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem;">इमेज Path / URL:</label>
+                <input type="text" id="fd_input_cover_url" placeholder="/images/books/..." class="admin-input" style="width: 100%; padding: 6px 8px; font-size: 0.8rem;" required />
+              </div>
+            </div>
+            <div style="margin-top: 10px; text-align: center;">
+              <img id="fd_preview_cover_img" src="/images/books/kharif-master-guide-2026-cover.webp" style="height: 120px; width: auto; object-fit: contain; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" />
+            </div>
+          </div>
+
+          <!-- Audio Link (Optional) -->
+          <div style="background: rgba(139,92,246,0.08); border: 1.5px solid rgba(139,92,246,0.3); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="font-weight: 700; font-size: 0.85rem; color: #a78bfa;">🎧 ऑडियो नरेशन लिंक (Audio Book Narration Link - Optional):</label>
+              <small style="color: var(--admin-muted);">रीडर में ऑडियो सुनने के लिए</small>
+            </div>
+            <input type="text" id="fd_input_audio_url" placeholder="उदा. https://.../audio.mp3 या Studio Voice" class="admin-input" style="width: 100%; padding: 8px 12px;" />
+          </div>
+
+          <!-- Multi-YouTube Video Links (Dynamic List) -->
+          <div style="background: rgba(239,68,68,0.08); border: 1.5px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+              <div>
+                <label style="font-weight: 800; font-size: 0.88rem; color: #ef4444;">🎬 यूट्यूब वीडियो लिंक्स (YouTube Video Demos / Shorts):</label>
+                <small style="color: var(--admin-muted); display: block;">1 या अधिक वीडियो लिंक डालें, जो कार्ड व रीडर में वीडियो प्लेयर के रूप में चलेंगे</small>
+              </div>
+              <button type="button" onclick="window.addFdVideoRow()" class="admin-button small-button" style="background: #ef4444; color: #fff; font-weight: 700;">
+                + नया वीडियो जोड़ें
+              </button>
+            </div>
+            <div id="fd_videos_list_wrap" style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Unlimited Demo Preview Pages (Pinch-to-Zoom Image Pages) -->
+          <div style="background: rgba(16,185,129,0.08); border: 1.5px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+              <div>
+                <label style="font-weight: 800; font-size: 0.88rem; color: #10b981;">📖 रीडर डेमो पेजेस (Sample Preview Pages - Unlimited):</label>
+                <small style="color: var(--admin-muted); display: block;">किताब के 5, 8, 10 या जितने चाहें उतने डेमो पेज जोड़ें (रीडर में बिना 404 के तुरंत खुलेंगे)</small>
+              </div>
+              <button type="button" onclick="window.addFdDemoPageRow()" class="admin-button small-button" style="background: #10b981; color: #fff; font-weight: 700;">
+                + नया डेमो पेज जोड़ें
+              </button>
+            </div>
+            <div id="fd_demo_pages_list_wrap" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Publishing Targets -->
+          <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+            <label style="font-weight: 700; font-size: 0.82rem; color: #38bdf8; display: block; margin-bottom: 6px;">
+              📍 पब्लिशिंग टार्गेट्स (Publish Everywhere Instantly):
+            </label>
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #fff;">
+                <input type="checkbox" id="fd_pub_library" checked style="accent-color: #10b981;" />
+                <span>📖 My Library (डेमो व बोनस टैब)</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #fff;">
+                <input type="checkbox" id="fd_pub_store" checked style="accent-color: #10b981;" />
+                <span>🏪 eBook Store</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #fff;">
+                <input type="checkbox" id="fd_pub_category" checked style="accent-color: #10b981;" />
+                <span>🌾 Category Hub</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <div style="display: flex; gap: 10px;">
+            <button type="button" onclick="window.saveFreeDemoBook()" class="admin-button" style="background: #f59e0b; color: #000; font-weight: 800; padding: 10px 24px; box-shadow: 0 4px 14px rgba(245,158,11,0.4);">
+              💾 सुरक्षित करें व तुरंत पब्लिश करें (Save & Publish)
+            </button>
+            <button type="button" id="btn-cancel-free-demo" class="admin-button small-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted);">
+              रद्द करें
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- FREE & DEMO BOOKS LIST TABLE -->
+      <div id="admin-free-demo-table-container">
+        <div class="admin-loading">डेटा लोड हो रहा है...</div>
+      </div>
+    </div>
   `;
 
   // Helper to render section banner uploader blocks in HTML
@@ -1672,36 +1894,714 @@ export async function initBookLandingPages() {
   }
 
   // -------------------------------------------------------------
-  // SUB-TAB SWITCHING LOGIC (Pages vs Shelves vs Leads)
+  // SUB-TAB SWITCHING LOGIC (Pages vs Shelves vs Leads vs Free Demo)
   // -------------------------------------------------------------
   window.switchAdminSubTab = function(tab) {
     const pagesCard = document.getElementById('admin-pages-subtab-container');
     const shelvesCard = document.getElementById('admin-shelves-subtab-container');
     const leadsCard = document.getElementById('admin-leads-subtab-container');
+    const freeDemoCard = document.getElementById('admin-free-demo-subtab-container');
 
     const btnPages = document.getElementById('tab-btn-landing-pages');
     const btnShelves = document.getElementById('tab-btn-shelves-mgr');
     const btnLeads = document.getElementById('tab-btn-coming-soon-leads');
+    const btnFreeDemo = document.getElementById('tab-btn-free-demo-mgr');
 
     if (pagesCard) pagesCard.style.display = tab === 'pages' ? 'block' : 'none';
     if (shelvesCard) shelvesCard.style.display = tab === 'shelves' ? 'block' : 'none';
     if (leadsCard) leadsCard.style.display = tab === 'leads' ? 'block' : 'none';
+    if (freeDemoCard) freeDemoCard.style.display = tab === 'free_demo' ? 'block' : 'none';
 
-    if (btnPages) btnPages.style.background = tab === 'pages' ? '#16a34a' : 'var(--admin-surface, #1e293b)';
-    if (btnPages) btnPages.style.color = tab === 'pages' ? '#fff' : 'var(--admin-text)';
+    if (btnPages) {
+      btnPages.style.background = tab === 'pages' ? '#16a34a' : 'var(--admin-surface, #1e293b)';
+      btnPages.style.color = tab === 'pages' ? '#fff' : 'var(--admin-text)';
+      btnPages.style.borderColor = tab === 'pages' ? '#16a34a' : 'var(--admin-border)';
+    }
 
-    if (btnShelves) btnShelves.style.background = tab === 'shelves' ? '#a855f7' : 'var(--admin-surface, #1e293b)';
-    if (btnShelves) btnShelves.style.color = tab === 'shelves' ? '#fff' : 'var(--admin-text)';
+    if (btnShelves) {
+      btnShelves.style.background = tab === 'shelves' ? '#a855f7' : 'var(--admin-surface, #1e293b)';
+      btnShelves.style.color = tab === 'shelves' ? '#fff' : 'var(--admin-text)';
+      btnShelves.style.borderColor = tab === 'shelves' ? '#a855f7' : 'var(--admin-border)';
+    }
 
-    if (btnLeads) btnLeads.style.background = tab === 'leads' ? '#0284c7' : 'var(--admin-surface, #1e293b)';
-    if (btnLeads) btnLeads.style.color = tab === 'leads' ? '#fff' : 'var(--admin-text)';
+    if (btnLeads) {
+      btnLeads.style.background = tab === 'leads' ? '#0284c7' : 'var(--admin-surface, #1e293b)';
+      btnLeads.style.color = tab === 'leads' ? '#fff' : 'var(--admin-text)';
+      btnLeads.style.borderColor = tab === 'leads' ? '#0284c7' : 'var(--admin-border)';
+    }
+
+    if (btnFreeDemo) {
+      btnFreeDemo.style.background = tab === 'free_demo' ? '#f59e0b' : 'var(--admin-surface, #1e293b)';
+      btnFreeDemo.style.color = tab === 'free_demo' ? '#000' : '#f59e0b';
+      btnFreeDemo.style.borderColor = '#f59e0b';
+    }
 
     if (tab === 'shelves') window.renderStoreShelvesTab();
     if (tab === 'leads') window.renderComingSoonLeadsTab();
+    if (tab === 'free_demo') window.renderFreeDemoStudioTab();
   };
 
   // -------------------------------------------------------------
-  // RENDER STORE SHELVES & SEGMENTS MANAGER
+  // QUICK DEMO & FREE BOOKS STUDIO CONTROLLERS
+  // -------------------------------------------------------------
+  let currentFdVideos = [];
+  let currentFdDemoPages = [];
+  let editingFdBookId = null;
+
+  function getStoredFreeDemoBooks() {
+    try {
+      const stored = localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+
+    // Default Starter Free/Demo Books
+    const defaultList = [
+      {
+        id: 'DEMO001',
+        type: 'demo',
+        name: 'खरीफ फसल मास्टर गाइड 2026 (Free Demo)',
+        heading: 'खरीफ फसल मास्टर गाइड 2026 (Free Demo)',
+        subtitle: '5 प्रमुख पृष्ठों का सचित्र डेमो प्रिव्यू',
+        category: 'Agriculture',
+        targetMainBook: 'BK001',
+        cover: '/images/books/kharif-master-guide-2026-cover.webp',
+        audioUrl: '',
+        hasAudioBook: true,
+        videos: [
+          { title: '📺 खरीफ फसल गाइड परिचय एवं डेमो', url: 'https://www.youtube.com/watch?v=sample1' }
+        ],
+        demoImages: [
+          '/images/books/kharif-master-guide-2026-preview-01.webp',
+          '/images/books/kharif-master-guide-2026-preview-02.webp',
+          '/images/books/kharif-master-guide-2026-preview-03.webp',
+          '/images/books/kharif-master-guide-2026-preview-04.webp'
+        ],
+        pageImages: [
+          '/images/books/kharif-master-guide-2026-preview-01.webp',
+          '/images/books/kharif-master-guide-2026-preview-02.webp',
+          '/images/books/kharif-master-guide-2026-preview-03.webp',
+          '/images/books/kharif-master-guide-2026-preview-04.webp'
+        ],
+        publish_targets: ['my_library', 'ebook_store', 'category_page'],
+        status: 'active',
+        offerPrice: 0,
+        mrp: 299,
+        isDemo: true,
+        readEnabled: true
+      },
+      {
+        id: 'BONUS001',
+        type: 'bonus_free',
+        name: 'ऑर्गेनिक स्प्रे एवं फसल सुरक्षा फॉर्मूला (Free Bonus)',
+        heading: 'ऑर्गेनिक स्प्रे एवं फसल सुरक्षा फॉर्मूला (Free Bonus)',
+        subtitle: 'घर पर प्राकृतिक कीटनाशक और टॉनिक बनाने की सम्पूर्ण विधि',
+        category: 'Agriculture',
+        targetMainBook: 'BK001',
+        cover: '/images/books/kharif-master-guide-2026-cover.webp',
+        audioUrl: '',
+        hasAudioBook: false,
+        videos: [],
+        demoImages: [
+          '/images/books/kharif-master-guide-2026-preview-01.webp',
+          '/images/books/kharif-master-guide-2026-preview-02.webp'
+        ],
+        pageImages: [
+          '/images/books/kharif-master-guide-2026-preview-01.webp',
+          '/images/books/kharif-master-guide-2026-preview-02.webp'
+        ],
+        publish_targets: ['my_library', 'ebook_store', 'category_page'],
+        status: 'active',
+        offerPrice: 0,
+        mrp: 199,
+        isBonus: true,
+        readEnabled: true
+      }
+    ];
+
+    try {
+      localStorage.setItem('AAROGYAM_FREE_DEMO_BOOKS', JSON.stringify(defaultList));
+    } catch (e) {}
+    return defaultList;
+  }
+
+  let freeDemoCurrentFilter = 'all';
+
+  window.filterFreeDemoTable = function(filterType) {
+    freeDemoCurrentFilter = filterType;
+    window.renderFreeDemoStudioTab();
+  };
+
+  window.renderFreeDemoStudioTab = function() {
+    const wrap = document.getElementById('admin-free-demo-table-container');
+    if (!wrap) return;
+
+    const allBooks = getStoredFreeDemoBooks();
+    const demoCount = allBooks.filter(b => b.type === 'demo' || b.isDemo).length;
+    const bonusCount = allBooks.filter(b => b.type === 'bonus_free' || b.isBonus).length;
+    const allCount = allBooks.length;
+
+    let filteredBooks = allBooks;
+    if (freeDemoCurrentFilter === 'demo') {
+      filteredBooks = allBooks.filter(b => b.type === 'demo' || b.isDemo);
+    } else if (freeDemoCurrentFilter === 'bonus_free') {
+      filteredBooks = allBooks.filter(b => b.type === 'bonus_free' || b.isBonus);
+    }
+
+    const filterTabsHtml = `
+      <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--admin-border); padding-bottom: 10px;">
+        <span style="font-size: 0.8rem; color: var(--admin-muted); font-weight: 700;">फ़िल्टर करें:</span>
+        <button type="button" onclick="window.filterFreeDemoTable('all')" class="admin-button small-button" style="background: ${freeDemoCurrentFilter === 'all' ? '#f59e0b' : 'var(--admin-surface, #1e293b)'}; color: ${freeDemoCurrentFilter === 'all' ? '#000' : 'var(--admin-text)'}; font-weight: 800; cursor: pointer; border: 1px solid var(--admin-border);">
+          🔘 सभी बुक्स (${allCount})
+        </button>
+        <button type="button" onclick="window.filterFreeDemoTable('demo')" class="admin-button small-button" style="background: ${freeDemoCurrentFilter === 'demo' ? '#3b82f6' : 'var(--admin-surface, #1e293b)'}; color: ${freeDemoCurrentFilter === 'demo' ? '#fff' : '#60a5fa'}; font-weight: 800; cursor: pointer; border: 1px solid ${freeDemoCurrentFilter === 'demo' ? '#3b82f6' : 'var(--admin-border)'};">
+          📖 केवल डेमो बुक्स (${demoCount})
+        </button>
+        <button type="button" onclick="window.filterFreeDemoTable('bonus_free')" class="admin-button small-button" style="background: ${freeDemoCurrentFilter === 'bonus_free' ? '#16a34a' : 'var(--admin-surface, #1e293b)'}; color: ${freeDemoCurrentFilter === 'bonus_free' ? '#fff' : '#4ade80'}; font-weight: 800; cursor: pointer; border: 1px solid ${freeDemoCurrentFilter === 'bonus_free' ? '#16a34a' : 'var(--admin-border)'};">
+          🎁 केवल फ्री बोनस बुक्स (${bonusCount})
+        </button>
+      </div>
+    `;
+
+    if (!filteredBooks || filteredBooks.length === 0) {
+      wrap.innerHTML = `
+        ${filterTabsHtml}
+        <div style="text-align:center;padding:40px;background:#0f172a;border-radius:12px;color:var(--admin-muted);border:1px dashed var(--admin-border);">
+          <span style="font-size:2.5rem;">🎁</span>
+          <h4 style="color:#f8fafc;margin:10px 0 4px 0;">इस श्रेणी में कोई ई-बुक नहीं है</h4>
+          <p style="font-size:0.82rem;margin:0 0 14px 0;">ऊपर दिए गए "+ नई डेमो बुक जोड़ें" या "+ नई फ्री बोनस बुक जोड़ें" बटन पर क्लिक करें।</p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button type="button" onclick="window.openFreeDemoBuilderModal('demo')" class="admin-button" style="background:#3b82f6;color:#fff;font-weight:800;">
+              📖 + नई डेमो बुक जोड़ें
+            </button>
+            <button type="button" onclick="window.openFreeDemoBuilderModal('bonus_free')" class="admin-button" style="background:#16a34a;color:#fff;font-weight:800;">
+              🎁 + नई फ्री बोनस बुक जोड़ें
+            </button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    wrap.innerHTML = `
+      ${filterTabsHtml}
+      <div style="width: 100%; overflow-x: auto;">
+        <table class="admin-table" style="min-width: 750px;">
+          <thead>
+            <tr>
+              <th style="width: 50px;">कवर</th>
+              <th>बुक कोड व प्रकार</th>
+              <th>शीर्षक व उप-शीर्षक</th>
+              <th>कैटेगरी</th>
+              <th>⚡ मुख्य पेड बुक लिंक</th>
+              <th>📖 डेमो पेजेस</th>
+              <th>🎧 / 🎬 मीडिया</th>
+              <th>एक्शन</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filteredBooks.map((b) => {
+              const isDemo = b.type === 'demo' || b.isDemo;
+              const pageCount = (b.demoImages || b.pageImages || []).length;
+              const videoCount = (b.videos || []).length;
+              const hasAudio = Boolean(b.hasAudioBook || b.audioUrl);
+              const targetBookId = b.targetMainBook || 'BK001';
+              const readerUrl = `/ebooks/reader.html?book=${encodeURIComponent(b.id)}&demo=1`;
+
+              return `
+                <tr>
+                  <td>
+                    <img src="${escapeHtml(b.cover || '/images/books/kharif-master-guide-2026-cover.webp')}" alt="Cover" style="width:38px;height:50px;object-fit:cover;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,0.3);" />
+                  </td>
+                  <td>
+                    <div style="font-weight:800;font-family:monospace;color:#f59e0b;font-size:0.9rem;">${escapeHtml(b.id)}</div>
+                    <span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:800;background:${isDemo ? 'rgba(59,130,246,0.2)' : 'rgba(22,163,74,0.2)'};color:${isDemo ? '#60a5fa' : '#4ade80'};margin-top:2px;">
+                      ${isDemo ? '📖 DEMO' : '🎁 FREE BONUS'}
+                    </span>
+                  </td>
+                  <td>
+                    <div style="font-weight:700;color:#f8fafc;font-size:0.88rem;">${escapeHtml(b.heading || b.name)}</div>
+                    <small style="color:var(--admin-muted);font-size:0.75rem;">${escapeHtml(b.subtitle || 'सचित्र प्रिव्यू')}</small>
+                  </td>
+                  <td>
+                    <span style="font-size:0.78rem;background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;">${escapeHtml(b.category || 'Agriculture')}</span>
+                  </td>
+                  <td>
+                    <a href="/ebooks/checkout.html?product=${encodeURIComponent(targetBookId)}" target="_blank" style="color:#38bdf8;text-decoration:none;font-weight:700;font-size:0.8rem;display:inline-flex;align-items:center;gap:4px;" title="रीडर में इस बुक का 'Buy Full Book @ ₹99' बटन खुलेगा">
+                      <span>⚡ [${escapeHtml(targetBookId)}]</span> <span>Buy Link</span>
+                    </a>
+                  </td>
+                  <td>
+                    <span style="font-size:0.82rem;font-weight:800;color:#10b981;background:rgba(16,185,129,0.12);padding:3px 8px;border-radius:6px;">
+                      📖 ${pageCount} पेजेस
+                    </span>
+                  </td>
+                  <td>
+                    <div style="display:flex;gap:4px;flex-direction:column;">
+                      <span style="font-size:0.72rem;color:${hasAudio ? '#a78bfa' : 'var(--admin-muted)'};font-weight:700;">
+                        ${hasAudio ? '🎧 ऑडियो सक्षम' : '🎧 ऑडियो नहीं'}
+                      </span>
+                      ${videoCount > 0 ? `
+                        <button type="button" onclick="window.testFdVideoModal('${escapeHtml(b.id)}')" class="admin-button small-button" style="background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid #ef4444;padding:1px 6px;font-size:0.72rem;font-weight:700;cursor:pointer;">
+                          🎬 ${videoCount} वीडियो चलाएं
+                        </button>
+                      ` : '<span style="font-size:0.72rem;color:var(--admin-muted);">🎬 0 वीडियो</span>'}
+                    </div>
+                  </td>
+                  <td>
+                    <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                      <a href="${readerUrl}" target="_blank" class="admin-button small-button" style="background:#16a34a;color:#fff;text-decoration:none;padding:4px 8px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:4px;" title="रीडर खोलें (बिना 404 के लाइव टेस्ट)">
+                        <span>👁️</span> <span>रीडर</span>
+                      </a>
+                      <button type="button" onclick="window.editFreeDemoBook('${escapeHtml(b.id)}')" class="admin-button small-button" style="background:#0284c7;color:#fff;padding:4px 8px;font-size:0.75rem;" title="एडिट करें">
+                        ✏️
+                      </button>
+                      <button type="button" onclick="window.deleteFreeDemoBook('${escapeHtml(b.id)}')" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:4px 8px;font-size:0.75rem;" title="हटाएं">
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  };
+
+  window.openFreeDemoBuilderModal = function(type = 'demo') {
+    // Automatically close mobile sidebar if open to prevent screen overlap
+    if (typeof window.toggleMobileDrawer === 'function') {
+      window.toggleMobileDrawer(false);
+    }
+    document.body.classList.remove('mobile-drawer-open');
+
+    const card = document.getElementById('admin-free-demo-builder-card');
+    if (!card) return;
+
+    window.resetFreeDemoBuilder();
+
+    const inputType = document.getElementById('fd_input_type');
+    if (inputType) inputType.value = type;
+
+    const titleEl = document.getElementById('fd_builder_title');
+    if (titleEl) {
+      titleEl.textContent = type === 'demo' ? '📖 नई डेमो पुस्तक बनाएं (Demo Book Builder)' : '🎁 नई फ्री बोनस पुस्तक बनाएं (Free Bonus Book Builder)';
+    }
+
+    const titleInput = document.getElementById('fd_input_title');
+    if (titleInput) {
+      titleInput.placeholder = type === 'demo' ? 'उदा. खरीफ फसल मास्टर गाइड (Free Demo)' : 'उदा. ऑर्गेनिक स्प्रे एवं फसल सुरक्षा फॉर्मूला (Free Bonus)';
+    }
+
+    // Auto-generate code for selected type
+    window.autoGenerateFdCode();
+
+    card.style.display = 'block';
+
+    setTimeout(() => {
+      const rect = card.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      window.scrollTo({ top: Math.max(0, rect.top + scrollTop - 90), behavior: 'smooth' });
+    }, 50);
+  };
+
+  window.handleFdTypeChange = function(type) {
+    const titleEl = document.getElementById('fd_builder_title');
+    if (titleEl && !editingFdBookId) {
+      titleEl.textContent = type === 'demo' ? '📖 नई डेमो पुस्तक बनाएं (Demo Book Builder)' : '🎁 नई फ्री बोनस पुस्तक बनाएं (Free Bonus Book Builder)';
+    }
+    const titleInput = document.getElementById('fd_input_title');
+    if (titleInput && !editingFdBookId && !titleInput.value) {
+      titleInput.placeholder = type === 'demo' ? 'उदा. खरीफ फसल मास्टर गाइड (Free Demo)' : 'उदा. ऑर्गेनिक स्प्रे एवं फसल सुरक्षा फॉर्मूला (Free Bonus)';
+    }
+    if (!editingFdBookId) {
+      window.autoGenerateFdCode();
+    }
+  };
+
+  window.toggleFreeDemoBuilder = function(show = null) {
+    const card = document.getElementById('admin-free-demo-builder-card');
+    if (!card) return;
+    const isVisible = card.style.display !== 'none';
+    const shouldShow = show !== null ? show : !isVisible;
+    if (shouldShow) {
+      if (!editingFdBookId) window.resetFreeDemoBuilder();
+      card.style.display = 'block';
+      setTimeout(() => {
+        const rect = card.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        window.scrollTo({ top: Math.max(0, rect.top + scrollTop - 90), behavior: 'smooth' });
+      }, 50);
+    } else {
+      card.style.display = 'none';
+      window.resetFreeDemoBuilder();
+    }
+  };
+
+  window.resetFreeDemoBuilder = function() {
+    editingFdBookId = null;
+    currentFdVideos = [];
+    currentFdDemoPages = [
+      '/images/books/kharif-master-guide-2026-preview-01.webp',
+      '/images/books/kharif-master-guide-2026-preview-02.webp',
+      '/images/books/kharif-master-guide-2026-preview-03.webp',
+      '/images/books/kharif-master-guide-2026-preview-04.webp'
+    ];
+    const titleEl = document.getElementById('fd_builder_title');
+    if (titleEl) titleEl.textContent = '✨ नई डेमो / फ्री बुक बनाएं';
+
+    const inputId = document.getElementById('fd_input_id');
+    if (inputId) {
+      inputId.value = '';
+      inputId.disabled = false;
+    }
+    const inputType = document.getElementById('fd_input_type');
+    if (inputType) inputType.value = 'demo';
+    const inputCat = document.getElementById('fd_input_category');
+    if (inputCat) inputCat.value = 'Agriculture';
+    const targetBook = document.getElementById('fd_target_main_book');
+    if (targetBook) targetBook.value = 'BK001';
+    const inputTitle = document.getElementById('fd_input_title');
+    if (inputTitle) inputTitle.value = '';
+    const inputSub = document.getElementById('fd_input_subtitle');
+    if (inputSub) inputSub.value = '';
+    const inputCover = document.getElementById('fd_input_cover_url');
+    if (inputCover) inputCover.value = '/images/books/kharif-master-guide-2026-cover.webp';
+    const prevCover = document.getElementById('fd_preview_cover_img');
+    if (prevCover) prevCover.src = '/images/books/kharif-master-guide-2026-cover.webp';
+    const inputAudio = document.getElementById('fd_input_audio_url');
+    if (inputAudio) inputAudio.value = '';
+
+    window.renderFdVideosList();
+    window.renderFdDemoPagesList();
+  };
+
+  window.autoGenerateFdCode = function() {
+    const books = getStoredFreeDemoBooks();
+    const type = document.getElementById('fd_input_type')?.value || 'demo';
+    const prefix = type === 'demo' ? 'DEMO' : 'FREE';
+    let maxNum = 0;
+    books.forEach(b => {
+      if (b.id && b.id.toUpperCase().startsWith(prefix)) {
+        const num = parseInt(b.id.replace(prefix, ''), 10);
+        if (!isNaN(num) && num > maxNum) maxNum = num;
+      }
+    });
+    const nextCode = `${prefix}${String(maxNum + 1).padStart(3, '0')}`;
+    const idInput = document.getElementById('fd_input_id');
+    if (idInput) idInput.value = nextCode;
+    showToast(`⚡ नया कोड सेट हुआ: ${nextCode}`, 'info');
+  };
+
+  window.handleFdCoverSelect = function(val) {
+    if (!val) return;
+    const urlInput = document.getElementById('fd_input_cover_url');
+    const prevImg = document.getElementById('fd_preview_cover_img');
+    const fileInput = document.getElementById('fd_file_cover');
+    if (fileInput) fileInput.value = '';
+    if (urlInput) urlInput.value = val;
+    if (prevImg) prevImg.src = val;
+    showToast(`📸 कवर चुना गया: ${val}`, 'info');
+  };
+
+  window.handleFdCoverFile = function(event) {
+    const file = event.target?.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        const urlInput = document.getElementById('fd_input_cover_url');
+        const prevImg = document.getElementById('fd_preview_cover_img');
+        const gitSel = document.getElementById('fd_select_git_cover');
+        if (gitSel) gitSel.value = '';
+        if (urlInput) urlInput.value = dataUrl;
+        if (prevImg) prevImg.src = dataUrl;
+        showToast(`📸 ${file.name} कवर लोड हो गया!`, 'info');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Video Repeaters for Free Demo
+  window.addFdVideoRow = function(url = '', title = '') {
+    currentFdVideos.push({
+      url: url || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      title: title || `📺 वीडियो भाग #${currentFdVideos.length + 1}`
+    });
+    window.renderFdVideosList();
+  };
+
+  window.removeFdVideoRow = function(idx) {
+    currentFdVideos.splice(idx, 1);
+    window.renderFdVideosList();
+  };
+
+  window.updateFdVideoField = function(idx, field, val) {
+    if (currentFdVideos[idx]) {
+      currentFdVideos[idx][field] = val;
+    }
+  };
+
+  window.renderFdVideosList = function() {
+    const wrap = document.getElementById('fd_videos_list_wrap');
+    if (!wrap) return;
+    if (currentFdVideos.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;padding:6px;">कोई वीडियो नहीं जोड़ा गया है। ऊपर "+ नया वीडियो जोड़ें" पर क्लिक करें।</div>';
+      return;
+    }
+    wrap.innerHTML = currentFdVideos.map((v, idx) => `
+      <div style="display:grid;grid-template-columns:1.5fr 2fr auto;gap:8px;align-items:center;background:rgba(0,0,0,0.2);padding:6px 10px;border-radius:6px;border:1px solid rgba(239,68,68,0.2);">
+        <input type="text" value="${escapeHtml(v.title)}" oninput="window.updateFdVideoField(${idx}, 'title', this.value)" placeholder="वीडियो शीर्षक (उदा. भाग 1)" class="admin-input" style="padding:4px 8px;font-size:0.8rem;" />
+        <input type="text" value="${escapeHtml(v.url)}" oninput="window.updateFdVideoField(${idx}, 'url', this.value)" placeholder="https://www.youtube.com/watch?v=..." class="admin-input" style="padding:4px 8px;font-size:0.8rem;" />
+        <button type="button" onclick="window.removeFdVideoRow(${idx})" style="background:#ef4444;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-weight:700;">🗑️</button>
+      </div>
+    `).join('');
+  };
+
+  // Demo Pages Repeaters
+  window.addFdDemoPageRow = function(imgUrl = '') {
+    const nextNum = currentFdDemoPages.length + 1;
+    currentFdDemoPages.push(imgUrl || `/images/books/kharif-master-guide-2026-preview-0${Math.min(4, nextNum)}.webp`);
+    window.renderFdDemoPagesList();
+  };
+
+  window.removeFdDemoPageRow = function(idx) {
+    currentFdDemoPages.splice(idx, 1);
+    window.renderFdDemoPagesList();
+  };
+
+  window.updateFdDemoPageField = function(idx, val) {
+    if (currentFdDemoPages[idx] !== undefined) {
+      currentFdDemoPages[idx] = val;
+      const img = document.getElementById(`fd_page_thumb_${idx}`);
+      if (img && val) img.src = val;
+    }
+  };
+
+  window.handleFdPageFile = function(idx, event) {
+    const file = event.target?.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        currentFdDemoPages[idx] = dataUrl;
+        const input = document.getElementById(`fd_page_url_${idx}`);
+        const img = document.getElementById(`fd_page_thumb_${idx}`);
+        if (input) input.value = dataUrl;
+        if (img) img.src = dataUrl;
+        showToast(`📄 पेज #${idx + 1} (${file.name}) लोड हुआ!`, 'info');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  window.renderFdDemoPagesList = function() {
+    const wrap = document.getElementById('fd_demo_pages_list_wrap');
+    if (!wrap) return;
+    if (currentFdDemoPages.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;padding:8px;grid-column:1/-1;">कोई डेमो पेज नहीं है। ऊपर "+ नया डेमो पेज जोड़ें" पर क्लिक करें।</div>';
+      return;
+    }
+    wrap.innerHTML = currentFdDemoPages.map((pUrl, idx) => `
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:8px;position:relative;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-weight:800;font-size:0.75rem;color:#10b981;">📄 पेज #${idx + 1}</span>
+          <button type="button" onclick="window.removeFdDemoPageRow(${idx})" style="background:#ef4444;color:#fff;border:none;border-radius:4px;padding:1px 5px;font-size:0.7rem;cursor:pointer;">&times;</button>
+        </div>
+        <div style="text-align:center;margin-bottom:6px;">
+          <img id="fd_page_thumb_${idx}" src="${escapeHtml(pUrl)}" style="height:90px;width:auto;max-width:100%;object-fit:contain;border-radius:4px;background:#000;" />
+        </div>
+        <input type="text" id="fd_page_url_${idx}" value="${escapeHtml(pUrl)}" oninput="window.updateFdDemoPageField(${idx}, this.value)" placeholder="/images/books/..." class="admin-input" style="width:100%;padding:3px 6px;font-size:0.72rem;margin-bottom:4px;" />
+        <input type="file" accept="image/*" onchange="window.handleFdPageFile(${idx}, event)" style="font-size:0.68rem;width:100%;" />
+      </div>
+    `).join('');
+  };
+
+  window.saveFreeDemoBook = function() {
+    const idInput = document.getElementById('fd_input_id');
+    const bId = (idInput?.value || '').trim().toUpperCase();
+    const type = document.getElementById('fd_input_type')?.value || 'demo';
+    const category = document.getElementById('fd_input_category')?.value || 'Agriculture';
+    const targetMainBook = document.getElementById('fd_target_main_book')?.value || 'BK001';
+    const title = (document.getElementById('fd_input_title')?.value || '').trim();
+    const subtitle = (document.getElementById('fd_input_subtitle')?.value || '').trim();
+    const cover = (document.getElementById('fd_input_cover_url')?.value || '').trim();
+    const audioUrl = (document.getElementById('fd_input_audio_url')?.value || '').trim();
+
+    if (!bId) {
+      showToast('❌ कृपया Book Code दर्ज करें (उदा. DEMO001)', 'error');
+      idInput?.focus();
+      return;
+    }
+    if (!title) {
+      showToast('❌ कृपया पुस्तक का शीर्षक दर्ज करें', 'error');
+      document.getElementById('fd_input_title')?.focus();
+      return;
+    }
+    if (!cover) {
+      showToast('❌ कृपया 3D कवर इमेज चुनें या अपलोड करें', 'error');
+      return;
+    }
+
+    const pubLibrary = document.getElementById('fd_pub_library')?.checked !== false;
+    const pubStore = document.getElementById('fd_pub_store')?.checked !== false;
+    const pubCategory = document.getElementById('fd_pub_category')?.checked !== false;
+    const publishTargets = [];
+    if (pubLibrary) publishTargets.push('my_library');
+    if (pubStore) publishTargets.push('ebook_store');
+    if (pubCategory) publishTargets.push('category_page');
+
+    const cleanPages = currentFdDemoPages.filter(p => p && p.trim().length > 0);
+    const cleanVideos = currentFdVideos.filter(v => v && v.url && v.url.trim().length > 0);
+
+    const newFdBook = {
+      id: bId,
+      type: type, // 'demo' or 'bonus_free'
+      name: title,
+      heading: title,
+      subtitle: subtitle || 'सचित्र प्रिव्यू',
+      category: category,
+      targetMainBook: targetMainBook,
+      cover: cover,
+      thumbnail: cover,
+      cover_image: cover,
+      audioUrl: audioUrl,
+      hasAudioBook: Boolean(audioUrl),
+      has_audio: Boolean(audioUrl),
+      videos: cleanVideos,
+      demoImages: cleanPages,
+      pageImages: cleanPages,
+      totalPages: cleanPages.length,
+      publish_targets: publishTargets,
+      status: 'active',
+      offerPrice: 0,
+      mrp: type === 'demo' ? 299 : 199,
+      isDemo: type === 'demo',
+      isBonus: type === 'bonus_free',
+      demoAvailable: true,
+      readEnabled: true,
+      allowDownload: false // Strictly no direct PDF download
+    };
+
+    let list = getStoredFreeDemoBooks();
+    const existingIdx = list.findIndex(x => x.id === bId);
+    if (existingIdx >= 0) {
+      list[existingIdx] = newFdBook;
+    } else {
+      list.unshift(newFdBook);
+    }
+
+    try {
+      localStorage.setItem('AAROGYAM_FREE_DEMO_BOOKS', JSON.stringify(list));
+
+      // Also overlay into AAROGYAM_CUSTOM_BOOKS for universal store/library awareness
+      const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+      const cbIdx = customBooks.findIndex(x => x.id === bId);
+      if (cbIdx >= 0) customBooks[cbIdx] = newFdBook;
+      else customBooks.unshift(newFdBook);
+      localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
+    } catch (e) {
+      console.warn('Storage save exception:', e);
+    }
+
+    showToast(`🎉 ${type === 'demo' ? 'डेमो' : 'फ्री बोनस'} बुक (${bId}) तुरंत पब्लिश हो गई!`, 'success');
+    window.toggleFreeDemoBuilder(false);
+    window.renderFreeDemoStudioTab();
+  };
+
+  window.editFreeDemoBook = function(id) {
+    const list = getStoredFreeDemoBooks();
+    const found = list.find(b => b.id === id);
+    if (!found) {
+      showToast(`बुक (${id}) नहीं मिली`, 'error');
+      return;
+    }
+
+    editingFdBookId = found.id;
+    const titleEl = document.getElementById('fd_builder_title');
+    if (titleEl) titleEl.textContent = `✏️ एडिट डेमो / फ्री बुक: ${found.id}`;
+
+    const inputId = document.getElementById('fd_input_id');
+    if (inputId) {
+      inputId.value = found.id;
+      inputId.disabled = true;
+    }
+    const inputType = document.getElementById('fd_input_type');
+    if (inputType) inputType.value = found.type || 'demo';
+    const inputCat = document.getElementById('fd_input_category');
+    if (inputCat) inputCat.value = found.category || 'Agriculture';
+    const targetBook = document.getElementById('fd_target_main_book');
+    if (targetBook) targetBook.value = found.targetMainBook || 'BK001';
+    const inputTitle = document.getElementById('fd_input_title');
+    if (inputTitle) inputTitle.value = found.heading || found.name || '';
+    const inputSub = document.getElementById('fd_input_subtitle');
+    if (inputSub) inputSub.value = found.subtitle || '';
+    const inputCover = document.getElementById('fd_input_cover_url');
+    if (inputCover) inputCover.value = found.cover || '';
+    const prevCover = document.getElementById('fd_preview_cover_img');
+    if (prevCover && found.cover) prevCover.src = found.cover;
+    const inputAudio = document.getElementById('fd_input_audio_url');
+    if (inputAudio) inputAudio.value = found.audioUrl || '';
+
+    currentFdVideos = Array.isArray(found.videos) ? [...found.videos] : [];
+    currentFdDemoPages = Array.isArray(found.demoImages) ? [...found.demoImages] : (Array.isArray(found.pageImages) ? [...found.pageImages] : []);
+
+    window.renderFdVideosList();
+    window.renderFdDemoPagesList();
+
+    const card = document.getElementById('admin-free-demo-builder-card');
+    if (card) {
+      if (typeof window.toggleMobileDrawer === 'function') window.toggleMobileDrawer(false);
+      document.body.classList.remove('mobile-drawer-open');
+      card.style.display = 'block';
+      setTimeout(() => {
+        const rect = card.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        window.scrollTo({ top: Math.max(0, rect.top + scrollTop - 90), behavior: 'smooth' });
+      }, 50);
+    }
+  };
+
+  window.deleteFreeDemoBook = function(id) {
+    if (!confirm(`क्या आप वाकई डेमो / फ्री बुक (${id}) को हटाना चाहते हैं?`)) return;
+
+    let list = getStoredFreeDemoBooks();
+    list = list.filter(b => b.id !== id);
+    try {
+      localStorage.setItem('AAROGYAM_FREE_DEMO_BOOKS', JSON.stringify(list));
+      const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+      const filteredCustom = customBooks.filter(x => x.id !== id);
+      localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(filteredCustom));
+    } catch (e) {}
+
+    showToast(`🗑️ बुक (${id}) हटा दी गई।`, 'info');
+    window.renderFreeDemoStudioTab();
+  };
+
+  window.testFdVideoModal = function(bookId) {
+    const list = getStoredFreeDemoBooks();
+    const found = list.find(b => b.id === bookId);
+    if (!found || !found.videos || found.videos.length === 0) {
+      showToast('इस पुस्तक में कोई वीडियो लिंक नहीं है', 'info');
+      return;
+    }
+    if (window.openBookVideoModal) {
+      window.openBookVideoModal(found.heading || found.name, found.videos);
+    } else {
+      alert(`Video URL: ${found.videos[0].url}`);
+    }
+  };
+
+  // Wire up Top Listeners for Free Demo Studio
+  document.getElementById('btn-toggle-free-demo-builder')?.addEventListener('click', () => window.toggleFreeDemoBuilder());
+  document.getElementById('btn-close-free-demo-builder')?.addEventListener('click', () => window.toggleFreeDemoBuilder(false));
+  document.getElementById('btn-cancel-free-demo')?.addEventListener('click', () => window.toggleFreeDemoBuilder(false));
+  document.getElementById('btn_gen_fd_code')?.addEventListener('click', window.autoGenerateFdCode);
+
   // -------------------------------------------------------------
   // RENDER STORE SHELVES & SEGMENTS MANAGER
   // -------------------------------------------------------------
@@ -3075,8 +3975,14 @@ export async function initBookLandingPages() {
     renderSuggestedBooksInBuilder();
     renderSectionsReorderingList();
 
+    if (typeof window.toggleMobileDrawer === 'function') window.toggleMobileDrawer(false);
+    document.body.classList.remove('mobile-drawer-open');
     builderCard.style.display = 'block';
-    builderCard.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      const rect = builderCard.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      window.scrollTo({ top: Math.max(0, rect.top + scrollTop - 90), behavior: 'smooth' });
+    }, 50);
   };
 
   window.copyBookLandingUrl = function(bId) {

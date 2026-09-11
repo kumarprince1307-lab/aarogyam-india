@@ -143,49 +143,100 @@ function showReferrerRed(text) {
 }
 
 /*==================================================
-  1. LOAD BOOK DATA FROM books.json BASED ON URL ID
+  1. LOAD BOOK DATA FROM books.json & STUDIO STORAGE
 ==================================================*/
 async function loadBookData() {
     try {
         const params = new URLSearchParams(window.location.search);
-        const bookId = params.get("id") || "BK001";
+        const bookId = (params.get("book") || params.get("id") || "BK001").trim();
 
-        const response = await fetch("../data/books.json");
-        const jsonResult = await response.json();
-        const booksArray = Array.isArray(jsonResult) ? jsonResult : (jsonResult.books || []);
-        
-        currentBookData = booksArray.find(item => item.id === bookId || item.book_id === bookId);
+        let booksArray = [];
+        try {
+            const response = await fetch("../data/books.json?v=" + Date.now());
+            const jsonResult = await response.json();
+            booksArray = Array.isArray(jsonResult) ? jsonResult : (jsonResult.books || []);
+        } catch (fe) {}
+
+        // Overlay custom and studio demo books
+        try {
+            const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+            if (Array.isArray(customBooks)) {
+                customBooks.forEach(cb => {
+                    const idx = booksArray.findIndex(x => x && x.id && x.id.toUpperCase() === cb.id.toUpperCase());
+                    if (idx >= 0) booksArray[idx] = { ...booksArray[idx], ...cb };
+                    else booksArray.push(cb);
+                });
+            }
+        } catch (e) {}
+
+        try {
+            const freeDemoBooks = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
+            if (Array.isArray(freeDemoBooks)) {
+                freeDemoBooks.forEach(fb => {
+                    const idx = booksArray.findIndex(x => x && x.id && x.id.toUpperCase() === fb.id.toUpperCase());
+                    if (idx >= 0) booksArray[idx] = { ...booksArray[idx], ...fb };
+                    else booksArray.push(fb);
+                });
+            }
+        } catch (e) {}
+
+        const targetKey = String(bookId).toUpperCase();
+        currentBookData = booksArray.find(item => 
+            (item.id && item.id.toUpperCase() === targetKey) || 
+            (item.book_id && item.book_id.toUpperCase() === targetKey) ||
+            (item.slug && item.slug.toLowerCase() === String(bookId).toLowerCase())
+        );
 
         if (!currentBookData) {
-            alert("Book Demo Not Found");
-            window.location.href = "../ebooks/agriculture.html";
-            return;
+            currentBookData = {
+                id: targetKey,
+                name: `Aarogyam Demo Book (${targetKey})`,
+                heading: `Aarogyam Demo Book (${targetKey})`,
+                cover: '/images/books/kharif-master-guide-2026-cover.webp',
+                mrp: 299,
+                offerPrice: 99,
+                targetMainBook: 'BK001',
+                demoImages: [
+                    '../images/books/kharif-master-guide-2026-preview-01.webp',
+                    '../images/books/kharif-master-guide-2026-preview-02.webp',
+                    '../images/books/kharif-master-guide-2026-preview-03.webp',
+                    '../images/books/kharif-master-guide-2026-preview-04.webp'
+                ]
+            };
         }
 
-        document.title = `${currentBookData.name} | Aarogyam India`;
+        document.title = `${currentBookData.heading || currentBookData.name} | Aarogyam India`;
         
         const coverEl = document.getElementById("bookCover");
-        if (coverEl) coverEl.src = currentBookData.cover || currentBookData.thumbnail;
+        if (coverEl) coverEl.src = currentBookData.cover || currentBookData.thumbnail || currentBookData.cover_image || '/images/books/kharif-master-guide-2026-cover.webp';
 
         const titleEl = document.getElementById("bookTitle");
-        if (titleEl) titleEl.textContent = currentBookData.name;
+        if (titleEl) titleEl.textContent = currentBookData.heading || currentBookData.name;
+
+        const subTitleEl = document.getElementById("bookSubtitle");
+        if (subTitleEl && currentBookData.subtitle) subTitleEl.textContent = currentBookData.subtitle;
 
         const mrpEl = document.getElementById("bookMrp");
-        if (mrpEl) mrpEl.textContent = "₹" + currentBookData.mrp;
+        if (mrpEl) mrpEl.textContent = "₹" + (currentBookData.mrp || 299);
 
         const priceEl = document.getElementById("bookPrice");
-        if (priceEl) priceEl.textContent = "₹" + currentBookData.offerPrice;
+        if (priceEl) priceEl.textContent = "₹" + (currentBookData.offerPrice || 99);
 
         const barMrp = document.getElementById("barMrp");
-        if (barMrp) barMrp.textContent = "₹" + currentBookData.mrp;
+        if (barMrp) barMrp.textContent = "₹" + (currentBookData.mrp || 299);
 
         const barOffer = document.getElementById("barOffer");
-        if (barOffer) barOffer.textContent = "₹" + currentBookData.offerPrice;
+        if (barOffer) barOffer.textContent = "₹" + (currentBookData.offerPrice || 99);
 
         const sliderContainer = document.querySelector(".slider-container");
-        if (sliderContainer && currentBookData.demoImages && Array.isArray(currentBookData.demoImages)) {
+        const imagesToUse = currentBookData.demoImages || currentBookData.pageImages || [
+            '../images/books/kharif-master-guide-2026-preview-01.webp',
+            '../images/books/kharif-master-guide-2026-preview-02.webp'
+        ];
+
+        if (sliderContainer && Array.isArray(imagesToUse)) {
             sliderContainer.innerHTML = "";
-            currentBookData.demoImages.forEach((imgPath, index) => {
+            imagesToUse.forEach((imgPath, index) => {
                 let imgTag = document.createElement("img");
                 imgTag.src = imgPath;
                 imgTag.className = index === 0 ? "preview-image active" : "preview-image";
@@ -195,14 +246,15 @@ async function loadBookData() {
             });
         }
 
+        const targetMain = currentBookData.targetMainBook || (targetKey === 'BK002' ? 'BK002' : 'BK001');
         const buyBtn = document.getElementById("stickyBuyBtn");
         if(buyBtn) {
-            buyBtn.href = `../ebooks/checkout.html?id=${currentBookData.id}`;
+            buyBtn.href = `../ebooks/checkout.html?product=${encodeURIComponent(targetMain)}`;
         }
 
         const backBtn = document.getElementById("backBtn");
         if(backBtn) {
-            backBtn.href = "../ebooks/agriculture.html";
+            backBtn.href = "../ebooks/my-library.html";
         }
 
     } catch (error) {

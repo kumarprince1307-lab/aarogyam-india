@@ -445,34 +445,118 @@ export async function initBookAudioStudio() {
 
 // =======================================================
 // 3. STUDIO EVENTS & WORKFLOW
+async function populateStudioBookSelect(selectedId) {
+    const bookSelect = document.getElementById('bookSelect');
+    if (!bookSelect) return;
+
+    let mainBooks = [];
+    try {
+        const res = await fetch('../data/books.json');
+        if (res.ok) {
+            const json = await res.json();
+            if (json.books && json.books.length) mainBooks = json.books;
+        }
+    } catch (e) {}
+
+    let customBooks = [];
+    try {
+        customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+    } catch (e) {}
+
+    let landingPages = [];
+    try {
+        landingPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+    } catch (e) {}
+
+    let freeDemoBooks = [];
+    try {
+        freeDemoBooks = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
+    } catch (e) {}
+    if (!freeDemoBooks || freeDemoBooks.length === 0) {
+        freeDemoBooks = [
+            { id: 'DEMO001', name: 'खरीफ फसल मास्टर गाइड 2026 (Free Demo)', type: 'demo' },
+            { id: 'BONUS001', name: 'ऑर्गेनिक स्प्रे एवं फसल सुरक्षा फॉर्मूला (Free Bonus)', type: 'bonus_free' }
+        ];
+    }
+
+    const uniqueMainMap = new Map();
+    mainBooks.forEach(b => {
+        if (b && b.id) uniqueMainMap.set(b.id.toUpperCase(), { id: b.id.toUpperCase(), title: b.heading || b.name || b.id });
+    });
+    customBooks.forEach(b => {
+        if (b && b.id && !b.id.toUpperCase().startsWith('DEMO') && !b.id.toUpperCase().startsWith('FREE') && !b.id.toUpperCase().startsWith('BONUS') && !uniqueMainMap.has(b.id.toUpperCase())) {
+            uniqueMainMap.set(b.id.toUpperCase(), { id: b.id.toUpperCase(), title: b.heading || b.name || b.id });
+        }
+    });
+    landingPages.forEach(p => {
+        if (p && p.id && !uniqueMainMap.has(p.id.toUpperCase())) {
+            uniqueMainMap.set(p.id.toUpperCase(), { id: p.id.toUpperCase(), title: p.hero?.title || p.id });
+        }
+    });
+
+    const demoBooksList = freeDemoBooks.filter(b => b.type === 'demo' || b.isDemo || (b.id && b.id.toUpperCase().startsWith('DEMO')));
+    const bonusBooksList = freeDemoBooks.filter(b => b.type === 'bonus_free' || b.isBonus || (b.id && (b.id.toUpperCase().startsWith('FREE') || b.id.toUpperCase().startsWith('BONUS'))));
+
+    bookSelect.innerHTML = '';
+
+    // OptGroup 1: Main Books
+    const ogMain = document.createElement('optgroup');
+    ogMain.label = '📚 मुख्य सशुल्क पुस्तकें (Main Books)';
+    Array.from(uniqueMainMap.values()).forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.textContent = `${b.id}: ${b.title}`;
+        if (opt.value === selectedId) opt.selected = true;
+        ogMain.appendChild(opt);
+    });
+    bookSelect.appendChild(ogMain);
+
+    // OptGroup 2: Demo Books
+    if (demoBooksList.length > 0) {
+        const ogDemo = document.createElement('optgroup');
+        ogDemo.label = '📖 डेमो पुस्तकें (Demo Books)';
+        demoBooksList.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.id.toUpperCase();
+            opt.textContent = `${b.id.toUpperCase()}: ${b.heading || b.name || 'डेमो पुस्तक'}`;
+            if (opt.value === selectedId) opt.selected = true;
+            ogDemo.appendChild(opt);
+        });
+        bookSelect.appendChild(ogDemo);
+    }
+
+    // OptGroup 3: Free Bonus Books
+    if (bonusBooksList.length > 0) {
+        const ogBonus = document.createElement('optgroup');
+        ogBonus.label = '🎁 फ्री बोनस पुस्तकें (Free Bonus Books)';
+        bonusBooksList.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.id.toUpperCase();
+            opt.textContent = `${b.id.toUpperCase()}: ${b.heading || b.name || 'फ्री बोनस'}`;
+            if (opt.value === selectedId) opt.selected = true;
+            ogBonus.appendChild(opt);
+        });
+        bookSelect.appendChild(ogBonus);
+    }
+
+    // Option 4: Add New Book/Demo Code
+    const newOpt = document.createElement('option');
+    newOpt.value = '__NEW__';
+    newOpt.textContent = '➕ नया बुक / डेमो कोड जोड़ें...';
+    bookSelect.appendChild(newOpt);
+}
+
+// =======================================================
+// 3. STUDIO EVENTS & WORKFLOW
 // =======================================================
 async function setupStudioEvents() {
     const bookSelect = document.getElementById('bookSelect');
     if (bookSelect) {
-        try {
-            const res = await fetch('../data/books.json');
-            if (res.ok) {
-                const json = await res.json();
-                if (json.books && json.books.length) {
-                    bookSelect.innerHTML = '';
-                    json.books.forEach(b => {
-                        const opt = document.createElement('option');
-                        opt.value = b.id || b.slug;
-                        opt.textContent = `${b.id}: ${b.heading || b.name || b.shortTitle}`;
-                        if (opt.value === studioCurrentBookId) opt.selected = true;
-                        bookSelect.appendChild(opt);
-                    });
-                    const newOpt = document.createElement('option');
-                    newOpt.value = '__NEW__';
-                    newOpt.textContent = '➕ नया बुक / डेमो कोड जोड़ें...';
-                    bookSelect.appendChild(newOpt);
-                }
-            }
-        } catch (e) {}
+        await populateStudioBookSelect(studioCurrentBookId);
 
         bookSelect.addEventListener('change', (e) => {
             if (e.target.value === '__NEW__') {
-                const newCode = prompt("नया बुक / डेमो कोड दर्ज करें (उदा. BK003 या DEMO002):");
+                const newCode = prompt("नया बुक / डेमो कोड दर्ज करें (उदा. BK003 या DEMO002 या FREE002):");
                 if (newCode && newCode.trim()) {
                     const cleanCode = newCode.trim().toUpperCase();
                     const opt = document.createElement('option');
@@ -683,21 +767,42 @@ async function loadBookStudio(bookId) {
     isFullBookReload = false;
     markUnsaved(false);
 
-    // 1. Fetch from books.json
+    // 1. Check in Free Demo books list
+    let freeDemoBook = null;
+    try {
+        const fList = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
+        freeDemoBook = fList.find(b => b.id && b.id.toUpperCase() === bookId.toUpperCase());
+    } catch (e) {}
+
+    // 2. Fetch from books.json / custom books
     try {
         const res = await fetch('../data/books.json');
         const json = await res.json();
         studioBookData = json.books.find(b => b.id === bookId || b.id === bookId.toUpperCase());
     } catch (e) {}
 
-    // 2. Try loading from IndexedDB first (Cached/Staged WebP Pages)
+    if (!studioBookData) {
+        try {
+            const customList = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+            studioBookData = customList.find(b => b.id && b.id.toUpperCase() === bookId.toUpperCase());
+        } catch (e) {}
+    }
+
+    if (!studioBookData && freeDemoBook) {
+        studioBookData = freeDemoBook;
+    }
+
+    // 3. Try loading from IndexedDB first (Cached/Staged WebP Pages)
     const dbImages = await loadPagesFromDb(bookId);
     if (dbImages && dbImages.length > 0) {
         studioPageImages = dbImages;
         studioTotalPages = dbImages.length;
+    } else if (freeDemoBook && (freeDemoBook.demoImages?.length || freeDemoBook.pageImages?.length)) {
+        studioPageImages = freeDemoBook.demoImages || freeDemoBook.pageImages || [];
+        studioTotalPages = studioPageImages.length;
     }
 
-    // 3. Load Audio Scripts
+    // 4. Load Audio Scripts
     try {
         const localData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${bookId}`);
         if (localData) {
@@ -707,16 +812,23 @@ async function loadBookStudio(bookId) {
             if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json`);
             if (res.ok) {
                 studioAudioScripts = await res.json();
+            } else if (freeDemoBook && freeDemoBook.audioUrl) {
+                studioAudioScripts = {
+                    bookId: bookId,
+                    pages: {
+                        "1": { text: freeDemoBook.subtitle || freeDemoBook.name || '', audio: freeDemoBook.audioUrl }
+                    }
+                };
             }
         }
     } catch (e) {
         studioAudioScripts = { bookId: bookId, pages: {} };
     }
 
-    // 4. Fallback to PDF if no WebP images yet
+    // 5. Fallback to PDF if no WebP images yet
     if (!studioPageImages.length) {
-        const pdfUrl = (studioBookData && studioBookData.mainPdf) 
-            ? ('..' + studioBookData.mainPdf) 
+        const pdfUrl = (studioBookData && (studioBookData.mainPdf || studioBookData.pdf_url || studioBookData.demoPdf || studioBookData.freePdf)) 
+            ? ('..' + (studioBookData.mainPdf || studioBookData.pdf_url || studioBookData.demoPdf || studioBookData.freePdf)) 
             : `../pdf/full/${bookId}.pdf`;
 
         try {
@@ -724,7 +836,7 @@ async function loadBookStudio(bookId) {
             studioTotalPages = studioPdfDoc.numPages;
         } catch (err) {
             console.warn("PDF Load warning:", err);
-            studioTotalPages = 1;
+            studioTotalPages = (freeDemoBook && (freeDemoBook.demoImages?.length || freeDemoBook.pageImages?.length)) ? (freeDemoBook.demoImages?.length || freeDemoBook.pageImages?.length) : 1;
         }
     } else {
         studioTotalPages = studioPageImages.length;
@@ -1121,7 +1233,25 @@ async function commitAllChanges() {
     // 2. Save script data to localStorage
     localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
-    // 3. Update backup
+    // 3. If this is a Free/Demo book, sync audio & pages back to AAROGYAM_FREE_DEMO_BOOKS
+    try {
+        const freeDemoList = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
+        const fdIdx = freeDemoList.findIndex(b => b.id && b.id.toUpperCase() === studioCurrentBookId.toUpperCase());
+        if (fdIdx >= 0) {
+            const page1Audio = studioAudioScripts?.pages?.["1"]?.audio || Object.values(studioAudioScripts?.pages || {}).find(p => p && p.audio)?.audio || '';
+            freeDemoList[fdIdx].hasAudioBook = true;
+            freeDemoList[fdIdx].has_audio = true;
+            if (page1Audio) freeDemoList[fdIdx].audioUrl = page1Audio;
+            if (studioPageImages && studioPageImages.length > 0) {
+                freeDemoList[fdIdx].demoImages = studioPageImages;
+                freeDemoList[fdIdx].pageImages = studioPageImages;
+                freeDemoList[fdIdx].totalPages = studioPageImages.length;
+            }
+            localStorage.setItem('AAROGYAM_FREE_DEMO_BOOKS', JSON.stringify(freeDemoList));
+        }
+    } catch (e) {}
+
+    // 4. Update backup
     studioOriginalBackup = {
         images: [...studioPageImages],
         scripts: JSON.parse(JSON.stringify(studioAudioScripts)),
@@ -1923,32 +2053,54 @@ async function openImportModal() {
     const sourceSelect = document.getElementById('importSourceBookSelect');
     if (!modal || !sourceSelect) return;
 
-    // Populate source book dropdown (all books except currently open book if possible, or all books)
+    // Populate source book dropdown (all books including Main, Demo, Free)
     try {
+        let mainBooks = [];
         const res = await fetch('../data/books.json');
         if (res.ok) {
             const json = await res.json();
-            sourceSelect.innerHTML = '';
-            
-            // Add Common Bank option if not present
-            const commonOpt = document.createElement('option');
-            commonOpt.value = 'COMMON';
-            commonOpt.textContent = '🌟 COMMON: मास्टर कॉमन पेज बैंक';
-            sourceSelect.appendChild(commonOpt);
+            if (json.books && json.books.length) mainBooks = json.books;
+        }
 
-            json.books.forEach(b => {
-                const opt = document.createElement('option');
-                opt.value = b.id || b.slug;
-                opt.textContent = `${b.id}: ${b.heading || b.name || b.shortTitle}`;
-                sourceSelect.appendChild(opt);
-            });
+        let customBooks = [];
+        try {
+            customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+        } catch (e) {}
 
-            // Select default source book (e.g. BK001 if current is not BK001, else first option)
-            if (studioCurrentBookId !== 'BK001') {
-                sourceSelect.value = 'BK001';
-            } else if (sourceSelect.options.length > 1) {
-                sourceSelect.selectedIndex = 1;
-            }
+        let freeDemoBooks = [];
+        try {
+            freeDemoBooks = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
+        } catch (e) {}
+
+        sourceSelect.innerHTML = '';
+        
+        // Add Common Bank option
+        const commonOpt = document.createElement('option');
+        commonOpt.value = 'COMMON';
+        commonOpt.textContent = '🌟 COMMON: मास्टर कॉमन पेज बैंक';
+        sourceSelect.appendChild(commonOpt);
+
+        // Main Books
+        mainBooks.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.id || b.slug;
+            opt.textContent = `📚 ${b.id}: ${b.heading || b.name || b.shortTitle}`;
+            sourceSelect.appendChild(opt);
+        });
+
+        // Demo & Free Books
+        freeDemoBooks.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.id;
+            opt.textContent = `${b.type === 'demo' ? '📖' : '🎁'} ${b.id}: ${b.heading || b.name}`;
+            sourceSelect.appendChild(opt);
+        });
+
+        // Select default source book (e.g. BK001 if current is not BK001, else first option)
+        if (studioCurrentBookId !== 'BK001') {
+            sourceSelect.value = 'BK001';
+        } else if (sourceSelect.options.length > 1) {
+            sourceSelect.selectedIndex = 1;
         }
     } catch (e) {
         console.warn("Source book list load error:", e);
