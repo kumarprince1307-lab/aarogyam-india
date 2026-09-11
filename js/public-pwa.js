@@ -25,6 +25,150 @@ export function initPublicPwa() {
   bindInstallButtons();
   setupMenuEventListeners();
   lockScreenOrientationPortrait();
+  initFloatingInstallBar();
+}
+
+function initFloatingInstallBar() {
+  if (isStandalone || document.getElementById('pwa-floating-install-bar') || window.location.pathname.includes('/admin/')) return;
+
+  // Check if dismissed in last 7 days
+  try {
+    const dismissedTs = parseInt(localStorage.getItem('AIM_PWA_FLOATER_DISMISSED') || '0', 10);
+    if (Date.now() - dismissedTs < 7 * 24 * 60 * 60 * 1000) return;
+  } catch (e) {}
+
+  setTimeout(() => {
+    if (isStandalone || document.getElementById('pwa-floating-install-bar')) return;
+
+    const floater = document.createElement('div');
+    floater.id = 'pwa-floating-install-bar';
+    floater.className = 'pwa-floating-install-bar';
+    floater.innerHTML = `
+      <style>
+        .pwa-floating-install-bar {
+          position: fixed;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%) translateY(120px);
+          z-index: 9995;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          background: rgba(15, 23, 42, 0.95);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(34, 197, 94, 0.35);
+          border-radius: 50px;
+          padding: 8px 14px 8px 10px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 20px rgba(34, 197, 94, 0.2);
+          color: #ffffff;
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          max-width: 92vw;
+          width: auto;
+        }
+        .pwa-floating-install-bar.show {
+          transform: translateX(-50%) translateY(0);
+        }
+        .pwa-floater-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: #16a34a;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.1rem;
+          flex-shrink: 0;
+          box-shadow: 0 3px 10px rgba(22, 163, 74, 0.4);
+        }
+        .pwa-floater-text {
+          font-size: 0.82rem;
+          font-weight: 700;
+          color: #f8fafc;
+          line-height: 1.25;
+          white-space: nowrap;
+        }
+        .pwa-floater-text small {
+          display: block;
+          font-size: 0.7rem;
+          font-weight: 500;
+          color: #86efac;
+        }
+        .pwa-floater-install-btn {
+          background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+          color: #ffffff;
+          border: none;
+          border-radius: 30px;
+          padding: 6px 14px;
+          font-size: 0.8rem;
+          font-weight: 800;
+          cursor: pointer;
+          white-space: nowrap;
+          box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+          transition: transform 0.2s ease;
+        }
+        .pwa-floater-install-btn:hover {
+          transform: scale(1.05);
+        }
+        .pwa-floater-close-btn {
+          background: rgba(255,255,255,0.1);
+          color: #94a3b8;
+          border: none;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: background 0.2s ease, color 0.2s ease;
+        }
+        .pwa-floater-close-btn:hover {
+          background: rgba(239, 68, 68, 0.2);
+          color: #ef4444;
+        }
+        @media (max-width: 640px) {
+          .pwa-floating-install-bar {
+            bottom: 75px;
+          }
+        }
+      </style>
+      <div class="pwa-floater-icon">📱</div>
+      <div class="pwa-floater-text">
+        आरोग्यम इंडिया ऐप
+        <small>1-Click Fast Install</small>
+      </div>
+      <button type="button" class="pwa-floater-install-btn" id="pwa-floater-act-btn">इंस्टॉल करें</button>
+      <button type="button" class="pwa-floater-close-btn" id="pwa-floater-dismiss-btn" title="बंद करें">✕</button>
+    `;
+
+    document.body.appendChild(floater);
+    requestAnimationFrame(() => {
+      floater.classList.add('show');
+    });
+
+    const installActBtn = document.getElementById('pwa-floater-act-btn');
+    if (installActBtn) {
+      installActBtn.addEventListener('click', (e) => {
+        handleInstallClick(e);
+        floater.classList.remove('show');
+        setTimeout(() => floater.remove(), 400);
+      });
+    }
+
+    const dismissBtn = document.getElementById('pwa-floater-dismiss-btn');
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', () => {
+        try {
+          localStorage.setItem('AIM_PWA_FLOATER_DISMISSED', Date.now().toString());
+        } catch (e) {}
+        floater.classList.remove('show');
+        setTimeout(() => floater.remove(), 400);
+      });
+    }
+  }, 4000);
 }
 
 function lockScreenOrientationPortrait() {
