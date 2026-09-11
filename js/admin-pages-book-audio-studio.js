@@ -357,6 +357,9 @@ export async function initBookAudioStudio() {
                   <button id="testTtsBtn" class="admin-btn admin-btn-secondary" style="padding:6px 12px; font-size:12px;">
                     🔊 महिला आवाज़ में सुनें (TTS Test)
                   </button>
+                  <button id="stopTtsBtn" class="admin-btn" style="background:#ef4444; color:#fff; padding:6px 12px; font-size:12px; display:none; align-items:center; gap:4px;">
+                    <span>⏹️</span> आवाज़ रोकें (Stop)
+                  </button>
                 </div>
                 <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                   <span id="autoSaveBadge" style="font-size:0.75rem; color:#34d399; font-weight:700; background:#064e3b; padding:3px 8px; border-radius:4px; display:none;">✅ स्वतः सेव हुआ</span>
@@ -744,6 +747,11 @@ async function setupStudioEvents() {
         testTtsBtn.addEventListener('click', () => testCurrentPageTts());
     }
 
+    const stopTtsBtn = document.getElementById('stopTtsBtn');
+    if (stopTtsBtn) {
+        stopTtsBtn.addEventListener('click', () => stopCurrentPageTts());
+    }
+
     const startRecBtn = document.getElementById('startRecBtn');
     if (startRecBtn) {
         startRecBtn.addEventListener('click', () => startRecording());
@@ -1037,6 +1045,9 @@ function renderPageChipGrid() {
 }
 
 async function selectPage(pageNum) {
+    // Silence any ongoing TTS audio when page changes
+    stopCurrentPageTts();
+
     // Auto-save previous page text before switching
     if (studioCurrentPage && studioCurrentPage !== pageNum) {
         const currentTextInput = document.getElementById('pageTextInput');
@@ -1850,6 +1861,36 @@ function saveCurrentPageText() {
 }
 
 let studioTtsAudio = new Audio();
+let studioTtsIsPlaying = false;
+let studioTtsChunks = [];
+let studioTtsChunkIndex = 0;
+
+function stopCurrentPageTts() {
+    studioTtsIsPlaying = false;
+    studioTtsChunks = [];
+    studioTtsChunkIndex = 0;
+
+    if (studioTtsAudio) {
+        studioTtsAudio.pause();
+        studioTtsAudio.currentTime = 0;
+        studioTtsAudio.src = '';
+        studioTtsAudio.onended = null;
+        studioTtsAudio.onerror = null;
+    }
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+
+    const testBtn = document.getElementById('testTtsBtn');
+    const stopBtn = document.getElementById('stopTtsBtn');
+    if (testBtn) {
+        testBtn.textContent = '🔊 महिला आवाज़ में सुनें (TTS Test)';
+        testBtn.style.display = 'inline-flex';
+    }
+    if (stopBtn) {
+        stopBtn.style.display = 'none';
+    }
+}
 
 function testCurrentPageTts() {
     const textInput = document.getElementById('pageTextInput');
@@ -1859,16 +1900,13 @@ function testCurrentPageTts() {
         return;
     }
 
-    if (studioTtsAudio) {
-        studioTtsAudio.pause();
-        studioTtsAudio.currentTime = 0;
-    }
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-    }
+    stopCurrentPageTts();
+    studioTtsIsPlaying = true;
 
     const testBtn = document.getElementById('testTtsBtn');
+    const stopBtn = document.getElementById('stopTtsBtn');
     if (testBtn) testBtn.textContent = '🔊 आवाज़ चल रही है... (सुनें)';
+    if (stopBtn) stopBtn.style.display = 'inline-flex';
 
     // Check if browser has Hindi native voice
     let nativeHindiVoice = null;
@@ -1900,13 +1938,16 @@ function testCurrentPageTts() {
     if (curChunk.trim()) chunks.push(curChunk.trim());
     if (!chunks.length) chunks.push(text);
 
-    let idx = 0;
+    studioTtsChunks = chunks;
+    studioTtsChunkIndex = 0;
+
     const playNext = () => {
-        if (idx >= chunks.length) {
-            if (testBtn) testBtn.textContent = '🔊 महिला आवाज़ में सुनें (TTS Test)';
+        if (!studioTtsIsPlaying) return;
+        if (studioTtsChunkIndex >= studioTtsChunks.length) {
+            stopCurrentPageTts();
             return;
         }
-        const chunk = chunks[idx];
+        const chunk = studioTtsChunks[studioTtsChunkIndex];
 
         if (nativeHindiVoice && 'speechSynthesis' in window) {
             window.speechSynthesis.cancel();
@@ -1915,35 +1956,68 @@ function testCurrentPageTts() {
             ut.lang = 'hi-IN';
             ut.rate = 0.95;
             ut.pitch = 1.0;
-            ut.onend = () => { idx++; playNext(); };
-            ut.onerror = () => { playCloud(chunk); };
-            setTimeout(() => window.speechSynthesis.speak(ut), 30);
+            ut.onend = () => {
+                if (!studioTtsIsPlaying) return;
+                studioTtsChunkIndex++;
+                playNext();
+            };
+            ut.onerror = () => {
+                if (!studioTtsIsPlaying) return;
+                playCloud(chunk);
+            };
+            setTimeout(() => {
+                if (studioTtsIsPlaying) window.speechSynthesis.speak(ut);
+            }, 30);
         } else {
             playCloud(chunk);
         }
     };
 
     const playCloud = (chunk) => {
+        if (!studioTtsIsPlaying) return;
         const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=hi&q=${encodeURIComponent(chunk)}`;
         studioTtsAudio.src = url;
-        studioTtsAudio.onended = () => { idx++; playNext(); };
+        studioTtsAudio.onended = () => {
+            if (!studioTtsIsPlaying) return;
+            studioTtsChunkIndex++;
+            playNext();
+        };
         studioTtsAudio.onerror = () => {
+            if (!studioTtsIsPlaying) return;
             if ('speechSynthesis' in window) {
                 const ut = new SpeechSynthesisUtterance(chunk);
                 ut.lang = 'hi-IN';
-                ut.onend = () => { idx++; playNext(); };
-                ut.onerror = () => { idx++; playNext(); };
+                ut.onend = () => {
+                    if (!studioTtsIsPlaying) return;
+                    studioTtsChunkIndex++;
+                    playNext();
+                };
+                ut.onerror = () => {
+                    if (!studioTtsIsPlaying) return;
+                    studioTtsChunkIndex++;
+                    playNext();
+                };
                 window.speechSynthesis.speak(ut);
             } else {
-                idx++; playNext();
+                studioTtsChunkIndex++;
+                playNext();
             }
         };
         studioTtsAudio.play().catch(() => {
+            if (!studioTtsIsPlaying) return;
             if ('speechSynthesis' in window) {
                 const ut = new SpeechSynthesisUtterance(chunk);
                 ut.lang = 'hi-IN';
-                ut.onend = () => { idx++; playNext(); };
-                ut.onerror = () => { idx++; playNext(); };
+                ut.onend = () => {
+                    if (!studioTtsIsPlaying) return;
+                    studioTtsChunkIndex++;
+                    playNext();
+                };
+                ut.onerror = () => {
+                    if (!studioTtsIsPlaying) return;
+                    studioTtsChunkIndex++;
+                    playNext();
+                };
                 window.speechSynthesis.speak(ut);
             }
         });

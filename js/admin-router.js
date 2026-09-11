@@ -14,7 +14,7 @@ const ROUTES = {
   'all-surveys': () => import('./admin-pages-surveys.js').then(m => m.initAllSurveys()),
   'all-landing-pages': () => import('./admin-pages-landing-pages.js?v=31.4').then(m => m.initAllLandingPages()),
   'book-landing-pages': () => import('./admin-pages-book-landing.js?v=31.4').then(m => m.initBookLandingPages()),
-  'book-audio-studio': () => import('./admin-pages-book-audio-studio.js?v=3.3').then(m => m.initBookAudioStudio()),
+  'book-audio-studio': () => import('./admin-pages-book-audio-studio.js?v=3.4').then(m => m.initBookAudioStudio()),
   'page-editor': () => import('./admin-pages-page-editor.js?v=30.1').then(m => m.initPageEditor()),
   'product-landing-pages': () => import('./admin-pages-product-landing.js').then(m => m.initProductLandingPages()),
   'marketing-templates': () => import('./admin-pages-smart-etailer.js?v=4.2').then(m => m.initSmartEtailerAdmin('adm-sec-marketing')),
