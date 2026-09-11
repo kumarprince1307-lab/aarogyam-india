@@ -223,8 +223,8 @@ class ProAudioBookEngine {
 
         // 2. Fetch from files
         try {
-            let res = await fetch(`../data/audio-scripts/${bookId}.json`);
-            if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json`);
+            let res = await fetch(`../data/audio-scripts/${bookId}.json?v=${Date.now()}`);
+            if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json?v=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 this.metadata = data;
