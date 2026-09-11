@@ -427,17 +427,20 @@ async function loadLibraryData() {
             const bId = lp.id.toUpperCase();
             const existing = bookMap.get(bId) || {};
             const hero = lp.hero || {};
+            const isComingSoon = (lp.is_coming_soon === true || lp.is_coming_soon === 'true' || lp.status === 'coming_soon' || (lp.is_coming_soon === undefined && (existing.isComingSoon === true || existing.status === 'coming_soon')));
+            const bookStatus = isComingSoon ? 'coming_soon' : (lp.status || existing.status || 'active');
+
             bookMap.set(bId, {
                 id: bId,
                 slug: lp.slug || bId.toLowerCase(),
                 heading: hero.title || existing.heading || existing.name || bId,
                 name: hero.title || existing.heading || existing.name || bId,
                 category: lp.category || existing.category || 'Agriculture',
-                status: lp.status || existing.status || 'active',
-                isComingSoon: (lp.is_coming_soon === true || lp.is_coming_soon === 'true' || (lp.is_coming_soon === undefined && (existing.isComingSoon === true || existing.status === 'coming_soon'))),
+                status: bookStatus,
+                isComingSoon: isComingSoon,
                 publish_targets: lp.publish_targets || existing.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page'],
-                store_badge: lp.store_badge || existing.store_badge || 'best_seller',
-                badge: lp.store_badge || existing.badge || 'best_seller',
+                store_badge: isComingSoon ? 'coming_soon' : (lp.store_badge || existing.store_badge || 'best_seller'),
+                badge: isComingSoon ? 'coming_soon' : (lp.store_badge || existing.badge || 'best_seller'),
                 mrp: hero.mrp || existing.mrp || 299,
                 offerPrice: hero.offer_price || existing.offerPrice || 99,
                 cover: hero.cover_image || existing.cover || existing.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
@@ -550,6 +553,7 @@ async function renderLibrarySections(booksArray) {
         const bookId = book.book_id || book.id;
         const bookName = book.title || book.heading || book.name;
         const bookCover = book.cover_image || book.cover || '/images/banners/farmer-community-banner.jpeg';
+        const isComingSoonBook = (book.status === 'coming_soon' || book.isComingSoon === true || book.is_coming_soon === true);
         const hasAudioBook = Boolean(book.hasAudioBook || book.has_audio || rawId === 'BK001' || rawId === 'BK002' || rawId === 'DEMO001' || rawId === 'FREE001');
 
         if (hasAudioBook && !seenAudioIds.has(rawId)) {
@@ -557,8 +561,8 @@ async function renderLibrarySections(booksArray) {
             audioCount++;
         }
 
-        // 1. Purchased / My Books (Unique per Book ID - Supports individual and bundle cart purchases)
-        const isPurchased = userPurchases.some(p => {
+        // 1. Purchased / My Books (Coming soon unreleased books can NEVER appear in purchased locker)
+        const isPurchased = !isComingSoonBook && userPurchases.some(p => {
             if (!p) return false;
             const bIdStr = String(p.book_id || p.id || '').toUpperCase();
             if (bIdStr === rawId) return true;
@@ -567,6 +571,7 @@ async function renderLibrarySections(booksArray) {
             }
             return false;
         });
+
         if (isPurchased && !seenPurchasedIds.has(rawId)) {
             seenPurchasedIds.add(rawId);
             purchasedCount++;
@@ -633,7 +638,7 @@ async function renderLibrarySections(booksArray) {
         }
 
         // 2. Available Books (All live active published books)
-        const isLiveAgri = (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001') && book.status !== 'coming_soon' && !book.isComingSoon && (book.publish_targets ? book.publish_targets.includes('my_library') : true);
+        const isLiveAgri = !isComingSoonBook && (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001') && (book.publish_targets ? book.publish_targets.includes('my_library') : true);
         if (isLiveAgri && !seenAvailableIds.has(rawId)) {
             seenAvailableIds.add(rawId);
             if (window.renderUniversalBookMarketingCard && typeof window.renderUniversalBookMarketingCard === 'function') {
@@ -661,7 +666,7 @@ async function renderLibrarySections(booksArray) {
         }
 
         // 3. Demo Books (Read Free Samples)
-        if ((book.demoAvailable || book.demoPdf || book.freePdf || rawId === 'BK001' || rawId === 'BK002') && !seenDemoIds.has(rawId)) {
+        if (!isComingSoonBook && (book.demoAvailable || book.demoPdf || book.freePdf || rawId === 'BK001' || rawId === 'BK002') && !seenDemoIds.has(rawId)) {
             seenDemoIds.add(rawId);
             demoCount++;
             const demoCard = document.createElement('div');
@@ -677,9 +682,8 @@ async function renderLibrarySections(booksArray) {
             if (demoGrid) demoGrid.appendChild(demoCard);
         }
 
-        // 4. Coming Soon Books (Books with coming_soon status)
-        const isComingSoonBook = (book.status === 'coming_soon' || book.isComingSoon === true || book.is_coming_soon === true) && !isLiveAgri;
-        if (isComingSoonBook && !seenComingSoonIds.has(rawId) && !seenAvailableIds.has(rawId)) {
+        // 4. Coming Soon Books (All unreleased books)
+        if (isComingSoonBook && !seenComingSoonIds.has(rawId)) {
             seenComingSoonIds.add(rawId);
             const comingCard = document.createElement('div');
             comingCard.className = 'book-card';
@@ -698,9 +702,9 @@ async function renderLibrarySections(booksArray) {
         }
     });
 
-    // Default General Bonus Cards
-    if (bonusGrid) {
-        bonusCount += 2;
+    // Default General Bonus Cards: only show if user has purchased books and no book-specific bonuses exist
+    if (bonusGrid && purchasedCount > 0 && bonusCount === 0) {
+        bonusCount = 2;
         const genBonusCard1 = document.createElement('div');
         genBonusCard1.className = 'book-card';
         genBonusCard1.style.cssText = 'background:#fff;border-radius:12px;padding:14px;border:1.5px solid #10b981;box-shadow:0 4px 12px rgba(0,0,0,0.05);';
@@ -722,6 +726,13 @@ async function renderLibrarySections(booksArray) {
             <a href="/pdf/sample/BK001-demo.pdf" target="_blank" style="display:block;text-align:center;background:#f59e0b;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;">📥 बोनस PDF डाउनलोड</a>
         `;
         bonusGrid.appendChild(genBonusCard2);
+    } else if (bonusGrid && purchasedCount === 0) {
+        bonusGrid.innerHTML = `
+            <div style="grid-column: span 2; text-align: center; padding: 30px; color: #666; background:#fff; border-radius:12px; border:1px dashed #cbd5e1;">
+                <p style="font-size: 0.95rem; font-weight: 700; color:#1e293b;">🎁 अभी कोई मुफ़्त बोनस अनलॉक नहीं है।</p>
+                <p style="font-size: 0.82rem; margin-top: 6px; color:#64748b;">लाइब्रेरी की किसी भी ई-बुक खरीद के साथ विशेष VIP बोनस सामग्री अपने आप अनलॉक हो जाती है।</p>
+            </div>
+        `;
     }
 
     // Update Welcome Card Stats

@@ -554,40 +554,43 @@ class ProAudioBookEngine {
         toast.id = 'abMarketingToast';
         toast.style.cssText = `
             position: fixed;
-            top: 24px;
+            top: 16px;
             left: 50%;
-            transform: translateX(-50%) translateY(-120px);
+            transform: translateX(-50%) translateY(-150px);
             z-index: 999999;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid #10b981;
-            border-radius: 50px;
-            padding: 8px 16px 8px 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(16,185,129,0.4);
+            background: linear-gradient(135deg, #fef08a 0%, #fde047 45%, #eab308 100%);
+            border: 2px solid #ca8a04;
+            border-radius: 14px;
+            padding: 10px 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4), 0 0 25px rgba(234,179,8,0.55);
             display: flex;
             align-items: center;
-            gap: 12px;
-            color: #fff;
-            font-family: 'Inter', system-ui, sans-serif;
+            justify-content: space-between;
+            gap: 10px;
+            color: #78350f;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            max-width: 90vw;
+            width: calc(100% - 24px);
+            max-width: 440px;
+            box-sizing: border-box;
         `;
 
         toast.innerHTML = `
-            <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg, #10b981, #059669); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; box-shadow:0 0 10px #10b981;">
-                🎧
-            </div>
-            <div>
-                <div style="font-size:0.85rem; font-weight:800; color:#34d399; line-height:1.2;">
-                    खुशखबरी! इस पुस्तक का ऑडियो उपलब्ध है
+            <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+                <div style="width:34px; height:34px; border-radius:50%; background:#78350f; color:#fef08a; display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0; box-shadow:0 2px 8px rgba(120,53,15,0.35);">
+                    🎧
                 </div>
-                <div style="font-size:0.72rem; color:#cbd5e1;">
-                    पढ़ने के साथ-साथ पूरी किताब की आवाज़ भी सुनें
+                <div style="min-width:0; flex:1;">
+                    <div style="font-size:0.86rem; font-weight:800; color:#78350f; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        🎉 खुशखबरी! इस पुस्तक का ऑडियो उपलब्ध है
+                    </div>
+                    <div style="font-size:0.72rem; color:#854d0e; font-weight:600; line-height:1.2; margin-top:2px;">
+                        पढ़ने के साथ-साथ पूरी किताब की आवाज़ भी सुनें
+                    </div>
                 </div>
             </div>
-            <button id="toastPlayAudioBtn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; border-radius:25px; padding:6px 14px; font-size:0.78rem; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 4px 12px rgba(16,185,129,0.4);">
-                ▶️ ऑडियो सुनें
+            <button id="toastPlayAudioBtn" style="background:#78350f; color:#ffffff; border:1.5px solid #451a03; border-radius:20px; padding:6px 12px; font-size:0.76rem; font-weight:800; cursor:pointer; white-space:nowrap; flex-shrink:0; box-shadow:0 3px 10px rgba(120,53,15,0.4); display:inline-flex; align-items:center; gap:4px;">
+                <span>▶️</span> <span>सुनें</span>
             </button>
         `;
 
@@ -602,7 +605,7 @@ class ProAudioBookEngine {
                 const bar = document.getElementById('audioBookBar');
                 if (bar) bar.classList.add('open');
                 this.playCurrentPage();
-                toast.style.transform = 'translateX(-50%) translateY(-120px)';
+                toast.style.transform = 'translateX(-50%) translateY(-150px)';
                 setTimeout(() => toast.remove(), 400);
             });
         }
@@ -610,7 +613,7 @@ class ProAudioBookEngine {
         // Auto hide after exactly 4 seconds (4000ms)
         setTimeout(() => {
             if (toast && toast.parentNode) {
-                toast.style.transform = 'translateX(-50%) translateY(-120px)';
+                toast.style.transform = 'translateX(-50%) translateY(-150px)';
                 setTimeout(() => toast.remove(), 400);
             }
         }, 4000);
