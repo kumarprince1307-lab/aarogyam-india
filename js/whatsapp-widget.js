@@ -9,8 +9,8 @@
   'use strict';
 
   function initWhatsAppWidget() {
-    // Avoid duplicate initialization or in admin panel
-    if (document.getElementById('aim-whatsapp-floater') || window.location.pathname.includes('/admin/')) return;
+    // Avoid duplicate initialization, on home page or in admin panel
+    if (document.getElementById('aim-whatsapp-floater') || window.location.pathname.includes('/admin/') || window.location.pathname === '/' || window.location.pathname.endsWith('/index.html') || window.location.pathname.endsWith('index.html')) return;
 
     const widget = document.createElement('div');
     widget.id = 'aim-whatsapp-floater';
