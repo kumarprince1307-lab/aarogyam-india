@@ -130,6 +130,9 @@ export async function initBookAudioStudio() {
               <button id="triggerBulkUploadBtn" class="admin-btn admin-btn-primary" style="padding:8px 14px;">
                 📤 Bulk Images चुनें (Upload Pages)
               </button>
+              <button id="openImportModalBtn" class="admin-btn" style="background:linear-gradient(135deg, #6366f1, #4f46e5); color:#fff; padding:8px 14px; font-weight:700; font-size:12px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(99,102,241,0.3);" title="किसी भी अन्य पुस्तक से पेजेस और उनका ऑडियो सीधे इस नई पुस्तक में जोड़ें">
+                <span>📚</span> अन्य पुस्तक से जोड़ें (Import / Reuse Pages)
+              </button>
               <button id="triggerDirectPdfBtn" class="admin-btn admin-btn-secondary" style="padding:8px 12px; font-size:12px;" title="सीधे PDF फाइल अपलोड करें (ऑटोमैटिक WebP में बदल जाएगी)">
                 📄 Upload Direct PDF
               </button>
@@ -187,6 +190,81 @@ export async function initBookAudioStudio() {
                 ✅ ठीक है (Done)
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- Cross-Book Page & Audio Assembler Modal -->
+        <div id="importPagesModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:999999; justify-content:center; align-items:center; padding:16px;">
+          <div class="admin-card" style="max-width:980px; width:100%; max-height:92vh; background:#0f172a; border:2px solid #6366f1; border-radius:14px; padding:20px; display:flex; flex-direction:column; box-shadow:0 25px 50px rgba(0,0,0,0.7); overflow:hidden;">
+            
+            <!-- Modal Header -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; border-bottom:1px solid #334155; padding-bottom:12px;">
+              <div>
+                <h3 style="margin:0; font-size:1.25rem; color:#818cf8; font-weight:800; display:flex; align-items:center; gap:8px;">
+                  <span>📚</span> अन्य पुस्तक से पेज और ऑडियो जोड़ें (Page & Audio Assembler)
+                </h3>
+                <p style="margin:4px 0 0; font-size:0.8rem; color:#94a3b8;">
+                  किसी भी मौजूदा पुस्तक (जैसे BK001, BK002, COMMON) से पेजेस चुनें। उनका <strong>ऑडियो और टेक्स्ट</strong> अपने आप इस नई किताब में कॉपी हो जाएगा!
+                </p>
+              </div>
+              <button id="closeImportModalBtn" class="admin-btn" style="background:#334155; color:#fff; padding:4px 10px; font-size:14px; border-radius:6px; line-height:1; cursor:pointer;">✕</button>
+            </div>
+
+            <!-- Controls Row: Source Book & Placement -->
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; background:#1e293b; padding:12px; border-radius:8px; border:1px solid #334155;">
+              <div style="flex:1; min-width:220px;">
+                <label style="font-size:0.8rem; font-weight:700; color:#cbd5e1; display:block; margin-bottom:4px;">1. सोर्स पुस्तक चुनें (जहाँ से पेज लेने हैं):</label>
+                <select id="importSourceBookSelect" class="admin-input" style="width:100%; padding:6px 10px; font-weight:700;"></select>
+              </div>
+              <div style="flex:1; min-width:220px;">
+                <label style="font-size:0.8rem; font-weight:700; color:#cbd5e1; display:block; margin-bottom:4px;">2. कहाँ जोड़ना है (Placement):</label>
+                <select id="importPlacementSelect" class="admin-input" style="width:100%; padding:6px 10px; font-weight:700;">
+                  <option value="END">📌 सबसे आखिर में जोड़ें (End of Book)</option>
+                  <option value="AFTER_CURRENT">📍 वर्तमान पेज के बाद जोड़ें</option>
+                  <option value="BEGINNING">🔝 सबसे शुरुआत में जोड़ें (Beginning)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Audio Option & Notice -->
+            <div style="margin-bottom:12px; background:linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1)); border:1px solid #10b981; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.88rem; font-weight:700; color:#34d399;">
+                <input type="checkbox" id="importIncludeAudioCheck" checked style="width:18px; height:18px; accent-color:#10b981;">
+                🎙️ ऑडियो और टेक्स्ट स्क्रिप्ट भी साथ लाएं (Include Voice & Script)
+              </label>
+              <div style="font-size:0.75rem; color:#a7f3d0;">
+                💡 <strong>स्वतंत्र संपादन (Independent Editing):</strong> नई किताब में आप किसी भी पेज की आवाज़ या टेक्स्ट बदल सकते हैं—मूल किताब पर कोई असर नहीं पड़ेगा!
+              </div>
+            </div>
+
+            <!-- Range Filter & Multi Select Actions -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <input type="text" id="importRangeInput" placeholder="पेज रेंज (उदा. 1-20, 25, 30-50)" class="admin-input" style="width:220px; padding:5px 10px; font-size:0.8rem;">
+                <button id="importApplyRangeBtn" class="admin-btn admin-btn-secondary" style="padding:5px 10px; font-size:12px;">✅ रेंज चुनें</button>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <button id="importSelectAllBtn" class="admin-btn admin-btn-secondary" style="padding:5px 10px; font-size:11px;">Select All</button>
+                <button id="importClearBtn" class="admin-btn admin-btn-secondary" style="padding:5px 10px; font-size:11px;">Clear All</button>
+                <span id="importSelectedCountTag" style="background:#6366f1; color:#fff; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:800;">चयनित: 0 पेज</span>
+              </div>
+            </div>
+
+            <!-- Visual Page Grid -->
+            <div id="importSourcePageGrid" style="flex:1; overflow-y:auto; min-height:280px; max-height:420px; background:#0b1329; border:1px solid #334155; border-radius:8px; padding:12px; display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:12px;">
+              <div style="color:#94a3b8; font-size:13px; grid-column:1/-1; text-align:center; padding:40px;">सोर्स पुस्तक के पेजेस लोड हो रहे हैं...</div>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; border-top:1px solid #334155; padding-top:12px; flex-wrap:wrap; gap:10px;">
+              <button id="cancelImportModalBtn" class="admin-btn admin-btn-secondary" style="padding:8px 16px;">
+                रद्द करें (Cancel)
+              </button>
+              <button id="executeImportBtn" class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:8px 22px; font-weight:800; font-size:13px; box-shadow:0 4px 14px rgba(16,185,129,0.4); display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+                <span>✨</span> <span id="executeImportBtnText">0 पेजेस और ऑडियो इंपोर्ट करें</span>
+              </button>
+            </div>
+
           </div>
         </div>
 
@@ -489,6 +567,51 @@ async function setupStudioEvents() {
     const deleteRecordedAudioBtn = document.getElementById('deleteRecordedAudioBtn');
     if (deleteRecordedAudioBtn) {
         deleteRecordedAudioBtn.addEventListener('click', () => deleteCurrentPageAudio());
+    }
+
+    // Import / Cross-Book Assembler Events
+    const openImportBtn = document.getElementById('openImportModalBtn');
+    if (openImportBtn) {
+        openImportBtn.addEventListener('click', () => openImportModal());
+    }
+
+    const closeImportBtn = document.getElementById('closeImportModalBtn');
+    const cancelImportBtn = document.getElementById('cancelImportModalBtn');
+    const importModal = document.getElementById('importPagesModal');
+    if (closeImportBtn && importModal) {
+        closeImportBtn.addEventListener('click', () => { importModal.style.display = 'none'; });
+    }
+    if (cancelImportBtn && importModal) {
+        cancelImportBtn.addEventListener('click', () => { importModal.style.display = 'none'; });
+    }
+
+    const importSourceSelect = document.getElementById('importSourceBookSelect');
+    if (importSourceSelect) {
+        importSourceSelect.addEventListener('change', (e) => loadSourceBookForImport(e.target.value));
+    }
+
+    const applyRangeBtn = document.getElementById('importApplyRangeBtn');
+    const rangeInput = document.getElementById('importRangeInput');
+    if (applyRangeBtn && rangeInput) {
+        applyRangeBtn.addEventListener('click', () => applyImportRange(rangeInput.value));
+        rangeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') applyImportRange(rangeInput.value);
+        });
+    }
+
+    const selectAllBtn = document.getElementById('importSelectAllBtn');
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => setAllImportCheckboxes(true));
+    }
+
+    const clearBtn = document.getElementById('importClearBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => setAllImportCheckboxes(false));
+    }
+
+    const executeImportBtn = document.getElementById('executeImportBtn');
+    if (executeImportBtn) {
+        executeImportBtn.addEventListener('click', () => executeImportPages());
     }
 }
 
@@ -1474,3 +1597,427 @@ function deleteCurrentPageAudio() {
         alert(`🗑️ Page ${studioCurrentPage} की ऑडियो हटा दी गई।`);
     }
 }
+
+// =======================================================
+// 9. CROSS-BOOK PAGE & AUDIO ASSEMBLER (IMPORT SYSTEM)
+// =======================================================
+let sourceBookImagesCache = [];
+let sourceBookScriptsCache = { pages: {} };
+let modalAudioPlayer = null;
+
+async function openImportModal() {
+    const modal = document.getElementById('importPagesModal');
+    const sourceSelect = document.getElementById('importSourceBookSelect');
+    if (!modal || !sourceSelect) return;
+
+    // Populate source book dropdown (all books except currently open book if possible, or all books)
+    try {
+        const res = await fetch('../data/books.json');
+        if (res.ok) {
+            const json = await res.json();
+            sourceSelect.innerHTML = '';
+            
+            // Add Common Bank option if not present
+            const commonOpt = document.createElement('option');
+            commonOpt.value = 'COMMON';
+            commonOpt.textContent = '🌟 COMMON: मास्टर कॉमन पेज बैंक';
+            sourceSelect.appendChild(commonOpt);
+
+            json.books.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.id || b.slug;
+                opt.textContent = `${b.id}: ${b.heading || b.name || b.shortTitle}`;
+                sourceSelect.appendChild(opt);
+            });
+
+            // Select default source book (e.g. BK001 if current is not BK001, else first option)
+            if (studioCurrentBookId !== 'BK001') {
+                sourceSelect.value = 'BK001';
+            } else if (sourceSelect.options.length > 1) {
+                sourceSelect.selectedIndex = 1;
+            }
+        }
+    } catch (e) {
+        console.warn("Source book list load error:", e);
+    }
+
+    modal.style.display = 'flex';
+    const rangeInput = document.getElementById('importRangeInput');
+    if (rangeInput) rangeInput.value = '';
+
+    await loadSourceBookForImport(sourceSelect.value || 'BK001');
+}
+
+async function loadSourceBookForImport(sourceBookId) {
+    const grid = document.getElementById('importSourcePageGrid');
+    if (!grid) return;
+    grid.innerHTML = '<div style="color:#38bdf8; font-size:13px; grid-column:1/-1; text-align:center; padding:40px;">सोर्स पुस्तक के पेजेस और ऑडियो लोड हो रहे हैं...</div>';
+
+    sourceBookImagesCache = [];
+    sourceBookScriptsCache = { pages: {} };
+
+    // 1. Load Audio Scripts for Source Book
+    try {
+        const local = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${sourceBookId}`);
+        if (local) {
+            sourceBookScriptsCache = JSON.parse(local);
+        } else {
+            let res = await fetch(`../data/audio-scripts/${sourceBookId}.json`);
+            if (!res.ok) res = await fetch(`/data/audio-scripts/${sourceBookId}.json`);
+            if (res.ok) sourceBookScriptsCache = await res.json();
+        }
+    } catch (e) {
+        sourceBookScriptsCache = { pages: {} };
+    }
+
+    // 2. Load Images from DB
+    const dbImages = await loadPagesFromDb(sourceBookId);
+    let totalSrcPages = 0;
+    if (dbImages && dbImages.length > 0) {
+        sourceBookImagesCache = dbImages;
+        totalSrcPages = dbImages.length;
+    } else {
+        // Fallback: Check books.json totalPages
+        try {
+            const res = await fetch('../data/books.json');
+            const json = await res.json();
+            const b = json.books.find(x => x.id === sourceBookId);
+            if (b && b.totalPages) totalSrcPages = b.totalPages;
+            else if (sourceBookId === 'BK001') totalSrcPages = 152;
+            else if (sourceBookId === 'BK002') totalSrcPages = 150;
+            else totalSrcPages = 30;
+        } catch (e) {
+            totalSrcPages = (sourceBookId === 'BK001') ? 152 : 30;
+        }
+    }
+
+    if (totalSrcPages === 0) totalSrcPages = 1;
+
+    grid.innerHTML = '';
+    for (let p = 1; p <= totalSrcPages; p++) {
+        const pageData = (sourceBookScriptsCache.pages && sourceBookScriptsCache.pages[String(p)]) || null;
+        let hasAudio = false;
+        let hasText = false;
+        let audioSrc = '';
+        let textSrc = '';
+
+        if (pageData) {
+            if (typeof pageData === 'string') {
+                hasText = pageData.trim().length > 0;
+                textSrc = pageData;
+            } else if (typeof pageData === 'object') {
+                if (pageData.audio && pageData.audio.trim().length > 0) {
+                    hasAudio = true;
+                    audioSrc = pageData.audio;
+                }
+                if (pageData.text && pageData.text.trim().length > 0) {
+                    hasText = true;
+                    textSrc = pageData.text;
+                }
+            }
+        }
+
+        let thumbSrc = (sourceBookImagesCache.length >= p && sourceBookImagesCache[p - 1]) 
+            ? sourceBookImagesCache[p - 1] 
+            : `../images/books/${sourceBookId}/${p}.webp`;
+
+        const card = document.createElement('div');
+        card.className = 'import-page-card';
+        card.dataset.page = p;
+        card.style.cssText = 'background:#1e293b; border:1px solid #334155; border-radius:8px; padding:8px; display:flex; flex-direction:column; align-items:center; position:relative; cursor:pointer; transition:all 0.2s; user-select:none;';
+        
+        card.innerHTML = `
+            <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-size:11px; font-weight:800; color:#38bdf8; background:#0f172a; padding:2px 6px; border-radius:4px;">Pg ${p}</span>
+                <input type="checkbox" class="import-page-cb" data-page="${p}" style="width:16px; height:16px; accent-color:#6366f1; cursor:pointer;">
+            </div>
+            <div style="width:100%; height:130px; background:#0f172a; border-radius:6px; overflow:hidden; display:flex; justify-content:center; align-items:center; margin-bottom:6px;">
+                <img src="${thumbSrc}" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" style="max-width:100%; max-height:100%; object-fit:contain;" alt="Pg ${p}">
+                <div style="display:none; color:#64748b; font-size:11px; text-align:center; padding:10px; width:100%; height:100%; align-items:center; justify-content:center;">Pg ${p}</div>
+            </div>
+            <div style="width:100%; display:flex; gap:4px; flex-wrap:wrap; justify-content:center; margin-bottom:4px;">
+                ${hasAudio ? '<span style="font-size:9px; background:#1e3a8a; color:#93c5fd; padding:1px 5px; border-radius:4px; font-weight:700;">🎙️ ऑडियो</span>' : ''}
+                ${hasText ? '<span style="font-size:9px; background:#064e3b; color:#6ee7b7; padding:1px 5px; border-radius:4px; font-weight:700;">📄 टेक्स्ट</span>' : ''}
+                ${(!hasAudio && !hasText) ? '<span style="font-size:9px; color:#64748b;">(नो ऑडियो)</span>' : ''}
+            </div>
+            ${(hasAudio || hasText) ? `
+                <button type="button" class="preview-audio-btn" style="background:#334155; border:none; color:#e2e8f0; font-size:10px; padding:3px 6px; border-radius:4px; cursor:pointer; width:100%; margin-top:2px;">
+                    ▶️ आवाज़ सुनें
+                </button>
+            ` : ''}
+        `;
+
+        const cb = card.querySelector('.import-page-cb');
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('.preview-audio-btn')) return;
+            if (e.target !== cb) cb.checked = !cb.checked;
+            updateCardSelectionState(card, cb.checked);
+            updateImportCountBadge();
+        });
+
+        cb.addEventListener('change', () => {
+            updateCardSelectionState(card, cb.checked);
+            updateImportCountBadge();
+        });
+
+        const previewBtn = card.querySelector('.preview-audio-btn');
+        if (previewBtn) {
+            previewBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playSourceAudioPreview(audioSrc, textSrc);
+            });
+        }
+
+        grid.appendChild(card);
+    }
+
+    updateImportCountBadge();
+}
+
+function updateCardSelectionState(card, isChecked) {
+    if (isChecked) {
+        card.style.borderColor = '#10b981';
+        card.style.background = 'rgba(16, 185, 129, 0.12)';
+        card.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.3)';
+    } else {
+        card.style.borderColor = '#334155';
+        card.style.background = '#1e293b';
+        card.style.boxShadow = 'none';
+    }
+}
+
+function updateImportCountBadge() {
+    const checked = document.querySelectorAll('.import-page-cb:checked');
+    const count = checked ? checked.length : 0;
+    const tag = document.getElementById('importSelectedCountTag');
+    const btnText = document.getElementById('executeImportBtnText');
+    if (tag) tag.textContent = `चयनित: ${count} पेज`;
+    if (btnText) btnText.textContent = `${count} पेजेस और ऑडियो इंपोर्ट करें`;
+}
+
+function setAllImportCheckboxes(select) {
+    const cards = document.querySelectorAll('.import-page-card');
+    cards.forEach(card => {
+        const cb = card.querySelector('.import-page-cb');
+        if (cb) {
+            cb.checked = select;
+            updateCardSelectionState(card, select);
+        }
+    });
+    updateImportCountBadge();
+}
+
+function applyImportRange(rangeStr) {
+    if (!rangeStr || !rangeStr.trim()) return;
+    const cards = document.querySelectorAll('.import-page-card');
+    const targetPages = new Set();
+
+    const parts = rangeStr.split(/[,;\s]+/);
+    parts.forEach(p => {
+        const trimmed = p.trim();
+        if (trimmed.includes('-')) {
+            const [startStr, endStr] = trimmed.split('-');
+            const start = parseInt(startStr, 10);
+            const end = parseInt(endStr, 10);
+            if (!isNaN(start) && !isNaN(end)) {
+                for (let i = Math.min(start, end); i <= Math.max(start, end); i++) {
+                    targetPages.add(i);
+                }
+            }
+        } else {
+            const num = parseInt(trimmed, 10);
+            if (!isNaN(num)) targetPages.add(num);
+        }
+    });
+
+    cards.forEach(card => {
+        const pageNum = parseInt(card.dataset.page, 10);
+        const cb = card.querySelector('.import-page-cb');
+        if (cb) {
+            const isMatch = targetPages.has(pageNum);
+            cb.checked = isMatch;
+            updateCardSelectionState(card, isMatch);
+        }
+    });
+
+    updateImportCountBadge();
+}
+
+function playSourceAudioPreview(audioSrc, textSrc) {
+    if (modalAudioPlayer) {
+        modalAudioPlayer.pause();
+        modalAudioPlayer = null;
+    }
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+
+    if (audioSrc && audioSrc.trim().length > 0) {
+        modalAudioPlayer = new Audio(audioSrc);
+        modalAudioPlayer.play().catch(e => console.warn("Audio preview error:", e));
+    } else if (textSrc && textSrc.trim().length > 0 && ('speechSynthesis' in window)) {
+        const ut = new SpeechSynthesisUtterance(textSrc);
+        ut.lang = 'hi-IN';
+        ut.rate = 0.95;
+        ut.pitch = 1.0;
+        window.speechSynthesis.speak(ut);
+    } else {
+        alert("इस पेज पर कोई ऑडियो या टेक्स्ट उपलब्ध नहीं है।");
+    }
+}
+
+function convertImgUrlToWebpDataUrl(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth || img.width || 800;
+            canvas.height = img.naturalHeight || img.height || 1131;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            try {
+                const webp = canvas.toDataURL('image/webp', 0.88);
+                resolve(webp);
+            } catch (e) {
+                resolve(url);
+            }
+        };
+        img.onerror = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 1131;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, 800, 1131);
+            ctx.fillStyle = '#64748b';
+            ctx.font = '24px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Page (Source: ${url})`, 400, 565);
+            resolve(canvas.toDataURL('image/webp', 0.88));
+        };
+        img.src = url;
+    });
+}
+
+async function executeImportPages() {
+    const checkboxes = Array.from(document.querySelectorAll('.import-page-cb:checked'));
+    if (!checkboxes.length) {
+        alert("कृपया कम से कम 1 पेज चुनें जिसे आप इस पुस्तक में जोड़ना चाहते हैं।");
+        return;
+    }
+
+    const sourceBookSelect = document.getElementById('importSourceBookSelect');
+    const sourceBookId = sourceBookSelect ? sourceBookSelect.value : 'BK001';
+    const placementSelect = document.getElementById('importPlacementSelect');
+    const placement = placementSelect ? placementSelect.value : 'END';
+    const includeAudio = document.getElementById('importIncludeAudioCheck')?.checked ?? true;
+
+    const selectedPages = checkboxes.map(cb => parseInt(cb.dataset.page, 10)).sort((a, b) => a - b);
+
+    const executeBtn = document.getElementById('executeImportBtn');
+    if (executeBtn) {
+        executeBtn.disabled = true;
+        executeBtn.innerHTML = `<span>⏳</span> पेजेस इंपोर्ट हो रहे हैं...`;
+    }
+
+    const importedImages = [];
+    const importedScripts = [];
+
+    for (let p of selectedPages) {
+        // 1. Get Image
+        let imgData = (sourceBookImagesCache.length >= p && sourceBookImagesCache[p - 1])
+            ? sourceBookImagesCache[p - 1]
+            : `../images/books/${sourceBookId}/${p}.webp`;
+
+        if (!imgData.startsWith('data:image/')) {
+            imgData = await convertImgUrlToWebpDataUrl(imgData);
+        }
+        importedImages.push(imgData);
+
+        // 2. Clone Audio / Script Text
+        let scriptClone = { text: '', audio: '' };
+        if (includeAudio && sourceBookScriptsCache.pages && sourceBookScriptsCache.pages[String(p)]) {
+            const raw = sourceBookScriptsCache.pages[String(p)];
+            if (typeof raw === 'string') {
+                scriptClone = { text: raw, audio: '' };
+            } else if (typeof raw === 'object') {
+                scriptClone = {
+                    text: raw.text || '',
+                    audio: raw.audio || '' // Cloned Opus base64 audio
+                };
+            }
+        }
+        importedScripts.push(scriptClone);
+    }
+
+    // 3. Assemble Target Book arrays
+    let currentImages = [...studioPageImages];
+    let currentScripts = [];
+    for (let i = 1; i <= currentImages.length; i++) {
+        const s = studioAudioScripts.pages && studioAudioScripts.pages[String(i)];
+        if (s) {
+            currentScripts.push(typeof s === 'string' ? { text: s, audio: '' } : { text: s.text || '', audio: s.audio || '' });
+        } else {
+            currentScripts.push({ text: '', audio: '' });
+        }
+    }
+
+    let finalImages = [];
+    let finalScripts = [];
+
+    if (placement === 'BEGINNING') {
+        finalImages = [...importedImages, ...currentImages];
+        finalScripts = [...importedScripts, ...currentScripts];
+    } else if (placement === 'AFTER_CURRENT' && currentImages.length > 0) {
+        const insertIdx = Math.min(studioCurrentPage, currentImages.length);
+        finalImages = [
+            ...currentImages.slice(0, insertIdx),
+            ...importedImages,
+            ...currentImages.slice(insertIdx)
+        ];
+        finalScripts = [
+            ...currentScripts.slice(0, insertIdx),
+            ...importedScripts,
+            ...currentScripts.slice(insertIdx)
+        ];
+    } else {
+        // Default: END
+        finalImages = [...currentImages, ...importedImages];
+        finalScripts = [...currentScripts, ...importedScripts];
+    }
+
+    // Reconstruct studioPageImages & studioAudioScripts.pages
+    studioPageImages = finalImages;
+    studioTotalPages = finalImages.length;
+    studioAudioScripts.pages = {};
+
+    for (let i = 0; i < finalScripts.length; i++) {
+        const pgNum = String(i + 1);
+        studioAudioScripts.pages[pgNum] = finalScripts[i];
+    }
+
+    // Save to target book's IndexedDB & localStorage
+    await savePagesToDb(studioCurrentBookId, studioPageImages);
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+
+    audioScriptsModified = true;
+    isFullBookReload = true;
+    markUnsaved(true);
+
+    if (executeBtn) {
+        executeBtn.disabled = false;
+        executeBtn.innerHTML = `<span>✨</span> <span id="executeImportBtnText">0 पेजेस और ऑडियो इंपोर्ट करें</span>`;
+    }
+
+    // Close Modal
+    const modal = document.getElementById('importPagesModal');
+    if (modal) modal.style.display = 'none';
+
+    renderPageChipGrid();
+    const newFocusPage = (placement === 'BEGINNING') ? 1 : ((placement === 'AFTER_CURRENT') ? studioCurrentPage + 1 : (currentImages.length > 0 ? currentImages.length + 1 : 1));
+    selectPage(newFocusPage);
+
+    alert(`🎉 बधाई! पुस्तक [${sourceBookId}] से ${selectedPages.length} पेजेस और उनका ऑडियो [${studioCurrentBookId}] में सफलतापूर्वक जुड़ गए हैं!\n\n💡 स्वतंत्र संपादन (Independent Editing):\nअब आप किसी भी पेज पर जाकर उसकी आवाज़ दोबारा रिकॉर्ड कर सकते हैं या नया टेक्स्ट लिख सकते हैं। इससे मूल पुस्तक (${sourceBookId}) में कोई छेड़छाड़ नहीं होगी!\n\nसारे बदलाव फाइनल करने के लिए "🚀 1-Click Push to Git" बटन दबाएं।`);
+}
+
