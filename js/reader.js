@@ -438,6 +438,8 @@ function updateUIControls(num) {
     const nextBtn = document.getElementById("nextPageBtn");
     if (prevBtn) prevBtn.disabled = (num <= 1);
     if (nextBtn) nextBtn.disabled = (num >= aoiTotalPages);
+
+    updateWhatsAppHelpLink(num);
 }
 
 function saveProgress(num) {
@@ -519,16 +521,21 @@ function showErrorScreen() {
 }
 
 // =======================================================
-// WHATSAPP DYNAMIC USER LINK GENERATOR
+// WHATSAPP DYNAMIC USER LINK GENERATOR (7974422572)
 // =======================================================
+function updateWhatsAppHelpLink(page) {
+    const whatsappBtn = document.getElementById("whatsappFloatBtn");
+    if (!whatsappBtn) return;
+    const title = (aoiCurrentBookData && (aoiCurrentBookData.heading || aoiCurrentBookData.name || aoiCurrentBookData.title)) || document.getElementById('bookHeading')?.textContent || "ई-बुक";
+    const curPage = page || aoiPageNum || 1;
+    const message = `नमस्ते Aarogyam India, मैं '${title}' का पेज संख्या ${curPage} पढ़ रहा हूँ और मुझे सहायता/जानकारी चाहिए।`;
+    whatsappBtn.href = "https://wa.me/917974422572?text=" + encodeURIComponent(message);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
-        const whatsappBtn = document.getElementById("whatsappFloatBtn");
-        if (whatsappBtn) {
-            const message = "नमस्ते Aarogyam India, मैं आरोग्यम इंडिया की ई-बुक पढ़ रहा हूँ और मुझे सहायता चाहिए।";
-            whatsappBtn.href = "https://wa.me/917974422572?text=" + encodeURIComponent(message);
-        }
-    }, 1500);
+        updateWhatsAppHelpLink();
+    }, 1000);
 });
 
 // AI Ask Modal Toggle

@@ -404,6 +404,29 @@ body {
     transform: scale(1.1);
 }
 
+/* Audio Player Floating Trigger Button */
+.float-btn.audio-float-btn {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: #ffffff;
+    border: 1px solid #8b5cf6;
+    font-size: 20px;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.45);
+}
+
+.float-btn.audio-float-btn:hover {
+    background: linear-gradient(135deg, #6d28d9, #4338ca);
+    transform: scale(1.1);
+}
+
+.float-btn.audio-float-btn.playing-pulse {
+    animation: audioBtnPulse 1.5s infinite alternate;
+}
+
+@keyframes audioBtnPulse {
+    0% { box-shadow: 0 0 6px #8b5cf6, 0 4px 15px rgba(124, 58, 237, 0.45); }
+    100% { box-shadow: 0 0 18px #a855f7, 0 6px 20px rgba(168, 85, 247, 0.7); }
+}
+
 /* MODALS & ERRORS */
 .modal-overlay {
     position: fixed;

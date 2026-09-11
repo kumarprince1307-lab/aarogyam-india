@@ -376,15 +376,6 @@ class ProAudioBookEngine {
         this.isPlaying = true;
     }
 
-        this.currentUtterance.onerror = (e) => {
-            console.warn("TTS Error:", e);
-            this.setPlayingState(false);
-        };
-
-        this.synth.speak(this.currentUtterance);
-        this.isPlaying = true;
-    }
-
     stopAudioSources() {
         if (this.audioElement) {
             this.audioElement.pause();
@@ -540,6 +531,15 @@ class ProAudioBookEngine {
             }
         });
 
+        // Auto-open if redirected with ?audio=1
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('audio') === '1' || urlParams.get('audio') === 'true') {
+            setTimeout(() => {
+                bar.classList.add('open');
+                this.playCurrentPage();
+            }, 800);
+        }
+
         // 4-Second Marketing Audio Feature Announcement Toast
         setTimeout(() => {
             this.showMarketingAudioToast();
@@ -599,7 +599,7 @@ class ProAudioBookEngine {
         const playBtn = toast.querySelector('#toastPlayAudioBtn');
         if (playBtn) {
             playBtn.addEventListener('click', () => {
-                const bar = document.getElementById('abBottomBar');
+                const bar = document.getElementById('audioBookBar');
                 if (bar) bar.classList.add('open');
                 this.playCurrentPage();
                 toast.style.transform = 'translateX(-50%) translateY(-120px)';
