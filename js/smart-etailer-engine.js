@@ -669,12 +669,15 @@
           <strong>✨ लाभ:</strong> ${selectedProblem.benefits || ''}
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
-          <button type="button" class="btn-royal-blue btn-royal-blue-sm" onclick="window.AarogyamETailer.openAddToKhataModal('${selectedProblem.id}')">
-            <span>📖 खाता में जोड़ें</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px;">
+          <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:6px 6px;font-size:0.75rem;justify-content:center;" onclick="window.AarogyamETailer.openAddToKhataModal('${selectedProblem.id}')">
+            <span>📖 खाता</span>
           </button>
-          <button type="button" class="btn-action-green" style="padding:6px 10px;font-size:0.78rem;" onclick="window.AarogyamETailer.sendSolutionWhatsApp('${selectedProblem.id}')">
-            <span>📲 WhatsApp नुस्खा भेजें</span>
+          <button type="button" class="btn-action-green" style="padding:6px 6px;font-size:0.75rem;justify-content:center;" onclick="window.AarogyamETailer.sendSolutionWhatsApp('${selectedProblem.id}')">
+            <span>📲 WhatsApp</span>
+          </button>
+          <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:6px 6px;font-size:0.75rem;background:#3b82f6;justify-content:center;" onclick="window.AarogyamETailer.sendSolutionNative('${selectedProblem.id}')">
+            <span>🌐 अन्य शेयर</span>
           </button>
         </div>
       </div>
@@ -1303,6 +1306,83 @@
   // -------------------------------------------------------------
   // 13. TAB 6: AUDIO TRAINING & LIVE PROGRESS AUDIO PLAYER
   // -------------------------------------------------------------
+  function cleanTextForSpeech(text) {
+    if (!text) return '';
+    return text
+      .replace(/[*_#`~>]/g, '')
+      .replace(/[\[\]\(\)\{\}]/g, ' ')
+      .replace(/[•★✅👉🎧🎙️📌💡🔥🚀⚡💊🌾🐄🥛💰🎯]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function getHighConfidenceHindiVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices() || [];
+    const naturalHindi = voices.find(v => (v.lang.startsWith('hi') || v.lang === 'hi-IN') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Swara') || v.name.includes('Madhur') || v.name.includes('Neural') || v.name.includes('Female')));
+    if (naturalHindi) return naturalHindi;
+    const standardHi = voices.find(v => v.lang === 'hi-IN' || v.lang.startsWith('hi'));
+    if (standardHi) return standardHi;
+    return voices.find(v => v.lang === 'en-IN' || v.name.includes('India')) || null;
+  }
+
+  function getNextAudioLesson(currentId) {
+    let allLessons = (publishedAudioLessons && publishedAudioLessons.length) ? publishedAudioLessons : DEFAULT_AUDIO_LESSONS;
+    try {
+      const adminLessons = JSON.parse(localStorage.getItem('AI_ADMIN_AUDIO_LESSONS') || '[]');
+      if (Array.isArray(adminLessons) && adminLessons.length) allLessons = adminLessons;
+    } catch (e) {}
+    
+    const filteredList = activeAudioCategory === 'all' 
+      ? allLessons 
+      : allLessons.filter(l => l.category === activeAudioCategory);
+    
+    if (!filteredList || !filteredList.length) return null;
+    const idx = filteredList.findIndex(l => l.id === currentId);
+    if (idx !== -1 && idx < filteredList.length - 1) {
+      return filteredList[idx + 1];
+    }
+    return null;
+  }
+
+  function getPrevAudioLesson(currentId) {
+    let allLessons = (publishedAudioLessons && publishedAudioLessons.length) ? publishedAudioLessons : DEFAULT_AUDIO_LESSONS;
+    try {
+      const adminLessons = JSON.parse(localStorage.getItem('AI_ADMIN_AUDIO_LESSONS') || '[]');
+      if (Array.isArray(adminLessons) && adminLessons.length) allLessons = adminLessons;
+    } catch (e) {}
+    
+    const filteredList = activeAudioCategory === 'all' 
+      ? allLessons 
+      : allLessons.filter(l => l.category === activeAudioCategory);
+    
+    if (!filteredList || !filteredList.length) return null;
+    const idx = filteredList.findIndex(l => l.id === currentId);
+    if (idx > 0) {
+      return filteredList[idx - 1];
+    }
+    return null;
+  }
+
+  function autoPlayNextAudio() {
+    const nextLesson = getNextAudioLesson(currentPlayingLessonId);
+    if (nextLesson) {
+      showToast(`⏭️ अगला पाठ: ${nextLesson.title.slice(0, 24)}...`, "info");
+      setTimeout(() => {
+        window.AarogyamETailer.playAudioWithProgressBar(
+          nextLesson.id,
+          nextLesson.title,
+          nextLesson.speaker || 'आरोग्यम लीडर',
+          nextLesson.summary || nextLesson.title,
+          nextLesson.audio_url || ''
+        );
+      }, 1000);
+    } else {
+      window.AarogyamETailer.stopAllAudio();
+      showToast("🎉 सभी पाठ पूरे हुए!", "success");
+    }
+  }
+
   function renderTrainingHub(filterCat) {
     const audioWrap = document.getElementById('audioTrainingLessonsList');
     if (!audioWrap) return;
@@ -1361,16 +1441,29 @@
           <span id="audioTotalDurationDisplay">03:40</span>
         </div>
 
-        <div class="audio-controls-row" style="display:flex;justify-content:space-between;align-items:center;">
-          <div style="display:flex; gap:8px;">
+        <div class="audio-controls-row" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:5px 8px;" onclick="window.AarogyamETailer.playPrevAudio()" title="पिछला ऑडियो">
+              <span>⏮️</span>
+            </button>
             <button type="button" class="btn-royal-blue btn-royal-blue-sm" id="btnUniversalPlayPause" onclick="window.AarogyamETailer.togglePlayPauseAudio()">
               <span id="universalPlayPauseIcon">▶️ चलाएं</span>
             </button>
-            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="background:#475569 !important; border:none;" onclick="window.AarogyamETailer.stopAllAudio()">
-              <span>⏹️ स्टॉप</span>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:5px 8px;" onclick="window.AarogyamETailer.playNextAudio()" title="अगला ऑडियो">
+              <span>⏭️</span>
+            </button>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="background:#475569 !important; border:none; padding:5px 8px;" onclick="window.AarogyamETailer.stopAllAudio()" title="स्टॉप">
+              <span>⏹️</span>
             </button>
           </div>
-          <span style="font-size:0.75rem; color:#10b981; font-weight:800;">⚡ 100% नेचुरल हिंदी वॉयस AI</span>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn-action-green" style="padding:5px 10px;font-size:0.75rem;" onclick="window.AarogyamETailer.shareTrainingWhatsApp(audioState.currentTitle, audioState.currentSummary, currentPlayingLessonId)">
+              <span>📲 WhatsApp</span>
+            </button>
+            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:5px 10px;font-size:0.75rem;background:#3b82f6;" onclick="window.AarogyamETailer.shareTrainingNative(audioState.currentTitle, audioState.currentSummary, currentPlayingLessonId)">
+              <span>🌐 शेयर</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1385,7 +1478,7 @@
 
       <div style="font-size:0.88rem; font-weight:800; margin:6px 0 12px 0; color:var(--text-title); display:flex; justify-content:space-between; align-items:center;">
         <span>📚 उपलब्ध ऑडियो लेसन्स (${displayLessons.length}):</span>
-        <span style="font-size:0.72rem;color:var(--text-muted);">टैप करें और सुनें</span>
+        <span style="font-size:0.72rem;color:var(--text-muted);">ऑटो-प्ले प्लेलिस्ट सक्रिय</span>
       </div>
     `;
 
@@ -1406,12 +1499,15 @@
           ${l.summary || ''}
         </p>
         
-        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-          <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="flex:1;min-width:140px;justify-content:center;" onclick="window.AarogyamETailer.playAudioWithProgressBar('${l.id}', \`${(l.title).replace(/`/g, '\\`')}\`, '${l.speaker || 'ट्रेनर'}', \`${(l.summary || l.title).replace(/`/g, '\\`')}\`, '${l.audio_url || ''}')">
-            <span id="play-icon-${l.id}">▶️ ऑडियो सुनें</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px;">
+          <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:6px 6px;font-size:0.75rem;justify-content:center;" onclick="window.AarogyamETailer.playAudioWithProgressBar('${l.id}', \`${(l.title).replace(/`/g, '\\`')}\`, '${l.speaker || 'ट्रेनर'}', \`${(l.summary || l.title).replace(/`/g, '\\`')}\`, '${l.audio_url || ''}')">
+            <span id="play-icon-${l.id}">▶️ सुनें</span>
           </button>
-          <button type="button" class="btn-action-green" style="flex:1;min-width:140px;padding:6px 10px;font-size:0.75rem;justify-content:center;" onclick="window.AarogyamETailer.shareTrainingWhatsApp(\`${(l.title).replace(/`/g, '\\`')}\`, \`${(l.summary || '').replace(/`/g, '\\`')}\`)">
-            <span>📲 WhatsApp पर शेयर करें</span>
+          <button type="button" class="btn-action-green" style="padding:6px 6px;font-size:0.75rem;justify-content:center;" onclick="window.AarogyamETailer.shareTrainingWhatsApp(\`${(l.title).replace(/`/g, '\\`')}\`, \`${(l.summary || '').replace(/`/g, '\\`')}\`, '${l.id}')">
+            <span>📲 WhatsApp</span>
+          </button>
+          <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:6px 6px;font-size:0.75rem;background:#3b82f6;justify-content:center;" onclick="window.AarogyamETailer.shareTrainingNative(\`${(l.title).replace(/`/g, '\\`')}\`, \`${(l.summary || '').replace(/`/g, '\\`')}\`, '${l.id}')">
+            <span>🌐 अन्य शेयर</span>
           </button>
         </div>
       </div>
@@ -1735,9 +1831,10 @@
       audioState.currentSpeaker = speaker || 'आरोग्यम ट्रेनर';
       audioState.currentTime = 0;
       
-      // Estimate duration based on Hindi word count (approx 2.5 words per sec)
-      const wordCount = (text || '').trim().split(/\s+/).length;
-      audioState.totalDuration = Math.max(30, Math.round(wordCount / 2.2));
+      const cleanedText = cleanTextForSpeech(text || title || '');
+      // Estimate duration based on Hindi word count (approx 2.2 words per sec for steady confidence)
+      const wordCount = cleanedText.split(/\s+/).length;
+      audioState.totalDuration = Math.max(25, Math.round(wordCount / 2.2));
       audioState.isPlaying = true;
       audioState.isPaused = false;
 
@@ -1782,6 +1879,12 @@
           navigator.mediaSession.setActionHandler('stop', () => {
             window.AarogyamETailer.stopAllAudio();
           });
+          navigator.mediaSession.setActionHandler('nexttrack', () => {
+            window.AarogyamETailer.playNextAudio();
+          });
+          navigator.mediaSession.setActionHandler('previoustrack', () => {
+            window.AarogyamETailer.playPrevAudio();
+          });
           navigator.mediaSession.setActionHandler('seekbackward', () => {
             audioState.currentTime = Math.max(0, audioState.currentTime - 10);
             window.AarogyamETailer.updateAudioProgressUI();
@@ -1806,10 +1909,10 @@
           }
         };
         audioPlayer.onended = () => {
-          window.AarogyamETailer.stopAllAudio();
+          autoPlayNextAudio();
         };
-      } else if ('speechSynthesis' in window && text) {
-        // Background Audio Keep-Alive Channel (Prevents mobile browser from putting SpeechSynthesis to sleep)
+      } else if ('speechSynthesis' in window && cleanedText) {
+        // Continuous Background Audio Keep-Alive Channel (Locks audio session so OS does not sleep when screen locked)
         try {
           audioPlayer.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
           audioPlayer.loop = true;
@@ -1817,20 +1920,21 @@
           audioPlayer.play().catch(() => {});
         } catch (e) {}
 
-        // Natural Hindi Speech Synthesis with Progress Timer
-        const u = new SpeechSynthesisUtterance(text);
+        // High-Confidence Natural Hindi Speech Synthesis
+        const u = new SpeechSynthesisUtterance(cleanedText);
         u.lang = 'hi-IN';
-        u.rate = 0.95;
-        u.pitch = 1.0;
-        const voices = window.speechSynthesis.getVoices();
-        const hiVoice = voices.find(v => v.lang.includes('hi') || v.name.includes('Hindi'));
+        u.rate = 0.95; // Steady and assertive leadership tempo
+        u.pitch = 1.0; // Firm pitch to eliminate voice tremor/jitter
+        
+        const hiVoice = getHighConfidenceHindiVoice();
         if (hiVoice) u.voice = hiVoice;
 
         u.onend = () => {
-          window.AarogyamETailer.stopAllAudio();
+          autoPlayNextAudio();
         };
 
-        u.onerror = () => {
+        u.onerror = (err) => {
+          console.warn("Audio speech playback notice:", err);
           window.AarogyamETailer.stopAllAudio();
         };
 
@@ -2039,6 +2143,25 @@
       }
     },
 
+    playNextAudio: function () {
+      autoPlayNextAudio();
+    },
+
+    playPrevAudio: function () {
+      const prevLesson = getPrevAudioLesson(currentPlayingLessonId);
+      if (prevLesson) {
+        window.AarogyamETailer.playAudioWithProgressBar(
+          prevLesson.id,
+          prevLesson.title,
+          prevLesson.speaker || 'आरोग्यम लीडर',
+          prevLesson.summary || prevLesson.title,
+          prevLesson.audio_url || ''
+        );
+      } else {
+        showToast("ℹ️ यह पहला पाठ है", "info");
+      }
+    },
+
     filterTrainingHub: function (cat) {
       renderTrainingHub(cat);
     },
@@ -2048,11 +2171,42 @@
     },
 
     shareTrainingWhatsApp: function (title, summary, lessonId) {
-      const id = lessonId || 'al_company_profile';
+      const id = lessonId || currentPlayingLessonId || 'al_company_profile';
       const baseUrl = window.location.origin + window.location.pathname;
       const shareUrl = `${baseUrl}?audio=${encodeURIComponent(id)}&ref=${encodeURIComponent(vault.share_id || 'AI000004')}`;
-      const msg = `🎧 *आरोग्यम लीडरशिप मास्टरक्लास*\n\n📌 *${title}*\n\n${summary}\n\n👉 *यहाँ क्लिक करके सीधे फ्री ऑडियो सुनें:*\n${shareUrl}`;
+      const msg = `🎧 *आरोग्यम लीडरशिप मास्टरक्लास*\n\n📌 *${title || 'आरोग्यम मास्टरक्लास'}*\n\n${summary || ''}\n\n👉 *यहाँ क्लिक करके सीधे फ्री ऑडियो सुनें:*\n${shareUrl}`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    },
+
+    shareTrainingNative: function (title, summary, lessonId) {
+      const id = lessonId || currentPlayingLessonId || 'al_company_profile';
+      const baseUrl = window.location.origin + window.location.pathname;
+      const shareUrl = `${baseUrl}?audio=${encodeURIComponent(id)}&ref=${encodeURIComponent(vault.share_id || 'AI000004')}`;
+      const msg = `🎧 *आरोग्यम लीडरशिप मास्टरक्लास*\n\n📌 *${title || 'आरोग्यम मास्टरक्लास'}*\n\n${summary || ''}\n\n👉 *यहाँ क्लिक करके सीधे फ्री ऑडियो सुनें:*\n${shareUrl}`;
+      if (navigator.share) {
+        navigator.share({
+          title: title || 'आरोग्यम मास्टरक्लास',
+          text: msg,
+          url: shareUrl
+        }).catch(() => {});
+      } else {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+    },
+
+    sendSolutionNative: function (probId) {
+      if (!selectedProblem) return;
+      const msg = selectedProblem.whatsapp_msg || `${selectedProblem.title}\n${(selectedProblem.products || []).join(' + ')}`;
+      const shareUrl = window.location.origin + window.location.pathname;
+      if (navigator.share) {
+        navigator.share({
+          title: selectedProblem.title || 'आरोग्यम नुस्खा',
+          text: msg,
+          url: shareUrl
+        }).catch(() => {});
+      } else {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+      }
     },
 
     submitLeadAndPlayAudio: function (event) {
