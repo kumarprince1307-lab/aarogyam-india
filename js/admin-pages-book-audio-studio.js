@@ -1757,6 +1757,8 @@ function saveCurrentPageText() {
     alert(`✅ Page ${studioCurrentPage} का टेक्स्ट सेव हो गया!\n"1-Click Push to Git" दबाने पर सिर्फ 0.5 सेकंड में ऑडियो स्क्रिप्ट Git पर लाइव हो जाएगी।`);
 }
 
+let studioTtsAudio = new Audio();
+
 function testCurrentPageTts() {
     const textInput = document.getElementById('pageTextInput');
     const text = textInput ? textInput.value.trim() : '';
@@ -1765,16 +1767,97 @@ function testCurrentPageTts() {
         return;
     }
 
+    if (studioTtsAudio) {
+        studioTtsAudio.pause();
+        studioTtsAudio.currentTime = 0;
+    }
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const ut = new SpeechSynthesisUtterance(text);
-        ut.lang = 'hi-IN';
-        ut.rate = 0.95;
-        ut.pitch = 1.0;
-        window.speechSynthesis.speak(ut);
-    } else {
-        alert("ब्राउज़र में SpeechSynthesis उपलब्ध नहीं है।");
     }
+
+    const testBtn = document.getElementById('testTtsBtn');
+    if (testBtn) testBtn.textContent = '🔊 आवाज़ चल रही है... (सुनें)';
+
+    // Check if browser has Hindi native voice
+    let nativeHindiVoice = null;
+    if ('speechSynthesis' in window) {
+        const voices = window.speechSynthesis.getVoices() || [];
+        const hindiVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
+        if (hindiVoices.length > 0) {
+            nativeHindiVoice = hindiVoices.find(v => {
+                const name = v.name.toLowerCase();
+                return name.includes('kalpana') || name.includes('swara') || name.includes('heera') || name.includes('female') || name.includes('google') || name.includes('zira');
+            }) || hindiVoices[0];
+        }
+    }
+
+    // Split text into chunks
+    const rawSegs = text.split(/[\r\n।\.?!]+/);
+    const chunks = [];
+    let curChunk = '';
+    for (const seg of rawSegs) {
+        const cl = seg.trim();
+        if (!cl) continue;
+        if ((curChunk + ' ' + cl).length > 100) {
+            if (curChunk.trim()) chunks.push(curChunk.trim());
+            curChunk = cl;
+        } else {
+            curChunk = curChunk ? (curChunk + ' । ' + cl) : cl;
+        }
+    }
+    if (curChunk.trim()) chunks.push(curChunk.trim());
+    if (!chunks.length) chunks.push(text);
+
+    let idx = 0;
+    const playNext = () => {
+        if (idx >= chunks.length) {
+            if (testBtn) testBtn.textContent = '🔊 महिला आवाज़ में सुनें (TTS Test)';
+            return;
+        }
+        const chunk = chunks[idx];
+
+        if (nativeHindiVoice && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const ut = new SpeechSynthesisUtterance(chunk);
+            ut.voice = nativeHindiVoice;
+            ut.lang = 'hi-IN';
+            ut.rate = 0.95;
+            ut.pitch = 1.0;
+            ut.onend = () => { idx++; playNext(); };
+            ut.onerror = () => { playCloud(chunk); };
+            setTimeout(() => window.speechSynthesis.speak(ut), 30);
+        } else {
+            playCloud(chunk);
+        }
+    };
+
+    const playCloud = (chunk) => {
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=hi&q=${encodeURIComponent(chunk)}`;
+        studioTtsAudio.src = url;
+        studioTtsAudio.onended = () => { idx++; playNext(); };
+        studioTtsAudio.onerror = () => {
+            if ('speechSynthesis' in window) {
+                const ut = new SpeechSynthesisUtterance(chunk);
+                ut.lang = 'hi-IN';
+                ut.onend = () => { idx++; playNext(); };
+                ut.onerror = () => { idx++; playNext(); };
+                window.speechSynthesis.speak(ut);
+            } else {
+                idx++; playNext();
+            }
+        };
+        studioTtsAudio.play().catch(() => {
+            if ('speechSynthesis' in window) {
+                const ut = new SpeechSynthesisUtterance(chunk);
+                ut.lang = 'hi-IN';
+                ut.onend = () => { idx++; playNext(); };
+                ut.onerror = () => { idx++; playNext(); };
+                window.speechSynthesis.speak(ut);
+            }
+        });
+    };
+
+    playNext();
 }
 
 let studioAudioCtx = null;

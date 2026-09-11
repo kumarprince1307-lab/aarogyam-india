@@ -128,6 +128,9 @@ class ProAudioBookEngine {
         this.welcomePlayed = false;
         this.isPageRecordedAudio = false;
 
+        this.hasNativeHindiVoice = false;
+        this.ttsAudio = new Audio();
+
         this.init();
     }
 
@@ -140,9 +143,9 @@ class ProAudioBookEngine {
             }
         }
         this.setupAudioElement();
-        this.injectUI();
         await this.loadBookAudioScripts();
-        console.log("✅ Pro AudioBookEngine v4.0 (Smart Clean Voice) Initialized for:", this.userName);
+        this.injectUI();
+        console.log("✅ Pro AudioBookEngine v5.0 (Dual-Engine Rock Solid Voice) Initialized for:", this.userName);
     }
 
     getUserProfileName() {
@@ -176,29 +179,37 @@ class ProAudioBookEngine {
         // Hindi natural female voices pool (Kalpana, Swara, Heera, Google हिन्दी, Zira)
         const hindiVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
         
-        this.femaleVoice = hindiVoices.find(v => {
-            const name = v.name.toLowerCase();
-            return name.includes('kalpana') || name.includes('swara') || name.includes('heera') || name.includes('female') || name.includes('google') || name.includes('zira');
-        }) || hindiVoices[0] || voices.find(v => v.lang && v.lang.startsWith('en-IN')) || voices[0];
+        if (hindiVoices.length > 0) {
+            this.femaleVoice = hindiVoices.find(v => {
+                const name = v.name.toLowerCase();
+                return name.includes('kalpana') || name.includes('swara') || name.includes('heera') || name.includes('female') || name.includes('google') || name.includes('zira');
+            }) || hindiVoices[0];
+            this.hasNativeHindiVoice = true;
+        } else {
+            this.femaleVoice = null;
+            this.hasNativeHindiVoice = false;
+        }
     }
 
     setupAudioElement() {
         this.audioElement.preload = 'metadata';
         this.audioElement.addEventListener('ended', () => {
-            const totalPages = window.aoiTotalPages || 152;
-            const curPage = window.aoiPageNum || 1;
-            if (this.autoNextPage && curPage < totalPages) {
-                this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
-                if (typeof window.onNextPage === 'function') {
-                    window.onNextPage();
+            if (this.isPageRecordedAudio) {
+                const totalPages = window.aoiTotalPages || 152;
+                const curPage = window.aoiPageNum || 1;
+                if (this.autoNextPage && curPage < totalPages) {
+                    this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
+                    if (typeof window.onNextPage === 'function') {
+                        window.onNextPage();
+                    }
+                    setTimeout(() => {
+                        this.isPlaying = true;
+                        this.playCurrentPage();
+                    }, 500);
+                } else {
+                    this.setPlayingState(false);
+                    this.updateStatusDisplay(`✅ पुस्तक वाचन समाप्त हुआ`);
                 }
-                setTimeout(() => {
-                    this.isPlaying = true;
-                    this.playCurrentPage();
-                }, 500);
-            } else {
-                this.setPlayingState(false);
-                this.updateStatusDisplay(`✅ पुस्तक वाचन समाप्त हुआ`);
             }
         });
         this.audioElement.addEventListener('play', () => this.setPlayingState(true));
@@ -339,7 +350,7 @@ class ProAudioBookEngine {
             const clean = seg.trim();
             if (!clean) continue;
 
-            if ((currentChunk + ' ' + clean).length > 140) {
+            if ((currentChunk + ' ' + clean).length > 100) {
                 if (currentChunk.trim()) chunks.push(currentChunk.trim());
                 currentChunk = clean;
             } else {
@@ -353,97 +364,139 @@ class ProAudioBookEngine {
     }
 
     speakText(text, currentPage, isWelcome = false) {
-        if (!this.synth) return;
-
         this.stopAudioSources();
-        this.loadVoices(); // Ensure fresh voice list
+        this.loadVoices();
 
         const chunks = this.splitTextIntoChunks(text);
+        if (!chunks.length) return;
+
         let chunkIndex = 0;
+        this.isPlaying = true;
+        this.setPlayingState(true);
 
-        // Keep-Alive interval for Chrome TTS garbage collection bug
-        if (this.ttsKeepAlive) clearInterval(this.ttsKeepAlive);
-        this.ttsKeepAlive = setInterval(() => {
-            if (this.isPlaying && this.synth && this.synth.speaking && !this.isPaused) {
-                this.synth.pause();
-                this.synth.resume();
-            }
-        }, 8000);
-
-        const speakNextChunk = () => {
+        const onAllChunksFinished = () => {
             if (!this.isPlaying) return;
-
-            if (chunkIndex >= chunks.length) {
-                if (this.ttsKeepAlive) clearInterval(this.ttsKeepAlive);
-
-                // If welcome audio finished, immediately start reading current page
-                if (isWelcome) {
-                    setTimeout(() => {
-                        this.isPlaying = true;
-                        this.playCurrentPage();
-                    }, 300);
-                    return;
-                }
-
-                // Auto Turn Page & Continue Playing
-                const totalPages = window.aoiTotalPages || 152;
-                const curPage = window.aoiPageNum || 1;
-                if (this.autoNextPage && curPage < totalPages) {
-                    this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
-                    if (typeof window.onNextPage === 'function') {
-                        window.onNextPage();
-                    }
-                    setTimeout(() => {
-                        this.isPlaying = true;
-                        this.playCurrentPage();
-                    }, 500);
-                } else {
-                    this.setPlayingState(false);
-                    this.updateStatusDisplay(`✅ पृष्ठ ${curPage} समाप्त हुआ`);
-                }
+            if (isWelcome) {
+                setTimeout(() => {
+                    this.isPlaying = true;
+                    this.playCurrentPage();
+                }, 300);
                 return;
             }
 
-            const currentTextChunk = chunks[chunkIndex];
-            const ut = new SpeechSynthesisUtterance(currentTextChunk);
-            this.currentUtterance = ut; // Store globally to prevent garbage collection
-
-            if (this.femaleVoice) ut.voice = this.femaleVoice;
-            ut.pitch = 1.0;
-            ut.rate = 0.95 * this.playbackRate;
-            ut.lang = 'hi-IN';
-
-            ut.onstart = () => {
-                this.setPlayingState(true);
-            };
-
-            ut.onend = () => {
-                chunkIndex++;
-                speakNextChunk();
-            };
-
-            ut.onerror = (e) => {
-                console.warn("TTS Chunk Error:", e);
-                chunkIndex++;
-                speakNextChunk();
-            };
-
-            this.synth.speak(ut);
+            const totalPages = window.aoiTotalPages || 152;
+            const curPage = window.aoiPageNum || 1;
+            if (this.autoNextPage && curPage < totalPages) {
+                this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
+                if (typeof window.onNextPage === 'function') {
+                    window.onNextPage();
+                }
+                setTimeout(() => {
+                    this.isPlaying = true;
+                    this.playCurrentPage();
+                }, 500);
+            } else {
+                this.setPlayingState(false);
+                this.updateStatusDisplay(`✅ पृष्ठ ${curPage} समाप्त हुआ`);
+            }
         };
 
-        this.isPlaying = true;
-        this.setPlayingState(true);
-        speakNextChunk();
+        const playCloudChunk = (chunkText) => {
+            if (!this.isPlaying) return;
+            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=hi&q=${encodeURIComponent(chunkText)}`;
+            this.ttsAudio.src = ttsUrl;
+            this.ttsAudio.playbackRate = this.playbackRate;
+
+            const onChunkEnd = () => {
+                this.ttsAudio.removeEventListener('ended', onChunkEnd);
+                this.ttsAudio.removeEventListener('error', onChunkError);
+                chunkIndex++;
+                playNextChunk();
+            };
+
+            const onChunkError = () => {
+                this.ttsAudio.removeEventListener('ended', onChunkEnd);
+                this.ttsAudio.removeEventListener('error', onChunkError);
+                // Fallback to WebSpeech if Cloud TTS network blocked
+                if (this.synth) {
+                    this.synth.cancel();
+                    const ut = new SpeechSynthesisUtterance(chunkText);
+                    ut.lang = 'hi-IN';
+                    ut.onend = () => { chunkIndex++; playNextChunk(); };
+                    ut.onerror = () => { chunkIndex++; playNextChunk(); };
+                    this.synth.speak(ut);
+                } else {
+                    chunkIndex++;
+                    playNextChunk();
+                }
+            };
+
+            this.ttsAudio.addEventListener('ended', onChunkEnd);
+            this.ttsAudio.addEventListener('error', onChunkError);
+
+            const playPromise = this.ttsAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Fallback to WebSpeech on browser audio gesture restriction
+                    if (this.synth) {
+                        this.synth.cancel();
+                        const ut = new SpeechSynthesisUtterance(chunkText);
+                        ut.lang = 'hi-IN';
+                        ut.onend = () => { chunkIndex++; playNextChunk(); };
+                        ut.onerror = () => { chunkIndex++; playNextChunk(); };
+                        this.synth.speak(ut);
+                    }
+                });
+            }
+        };
+
+        const playNextChunk = () => {
+            if (!this.isPlaying) return;
+            if (chunkIndex >= chunks.length) {
+                onAllChunksFinished();
+                return;
+            }
+
+            const currentChunk = chunks[chunkIndex];
+
+            // If system has true Hindi voice installed (e.g. Android/Mac/Google Hindi)
+            if (this.synth && this.hasNativeHindiVoice && this.femaleVoice) {
+                this.synth.cancel();
+                const ut = new SpeechSynthesisUtterance(currentChunk);
+                this.currentUtterance = ut;
+                ut.voice = this.femaleVoice;
+                ut.lang = 'hi-IN';
+                ut.pitch = 1.0;
+                ut.rate = 0.95 * this.playbackRate;
+
+                ut.onend = () => {
+                    chunkIndex++;
+                    playNextChunk();
+                };
+                ut.onerror = () => {
+                    playCloudChunk(currentChunk);
+                };
+
+                setTimeout(() => {
+                    if (this.isPlaying && this.synth) this.synth.speak(ut);
+                }, 30);
+            } else {
+                // Windows / Systems without Hindi Voice pack: Use sweet Cloud Google Hindi
+                playCloudChunk(currentChunk);
+            }
+        };
+
+        playNextChunk();
     }
 
     stopAudioSources() {
-        if (this.ttsKeepAlive) {
-            clearInterval(this.ttsKeepAlive);
-            this.ttsKeepAlive = null;
-        }
         if (this.audioElement) {
             this.audioElement.pause();
             this.audioElement.currentTime = 0;
+        }
+        if (this.ttsAudio) {
+            this.ttsAudio.pause();
+            this.ttsAudio.currentTime = 0;
         }
         if (this.synth) {
             this.synth.cancel();
