@@ -346,13 +346,24 @@ export async function initBookAudioStudio() {
                 🟢 विकल्प A: इस पेज का हिंदी टेक्स्ट (मधुर महिला आवाज़ - कृषि सखी):
               </label>
               <textarea id="pageTextInput" rows="5" class="admin-input" style="width:100%; resize:vertical; font-size:0.9rem; line-height:1.5;" placeholder="इस पेज पर लिखा हुआ टेक्स्ट यहाँ पेस्ट करें या टाइप करें..."></textarea>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                <button id="testTtsBtn" class="admin-btn admin-btn-secondary" style="padding:6px 12px; font-size:12px;">
-                  🔊 महिला आवाज़ में सुनें (TTS Test)
-                </button>
-                <button id="savePageTextBtn" class="admin-btn admin-btn-primary" style="padding:6px 14px; font-size:12px;">
-                  💾 टेक्स्ट सेव करें (Save Text)
-                </button>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <button id="studioPrevPageBtn" class="admin-btn admin-btn-secondary" style="padding:6px 12px; font-size:12px;" title="पिछला पेज">
+                    ⏮️ पिछला (Prev)
+                  </button>
+                  <button id="studioNextPageBtn" class="admin-btn admin-btn-secondary" style="padding:6px 12px; font-size:12px;" title="अगला पेज">
+                    ⏭️ अगला (Next)
+                  </button>
+                  <button id="testTtsBtn" class="admin-btn admin-btn-secondary" style="padding:6px 12px; font-size:12px;">
+                    🔊 महिला आवाज़ में सुनें (TTS Test)
+                  </button>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <span id="autoSaveBadge" style="font-size:0.75rem; color:#34d399; font-weight:700; background:#064e3b; padding:3px 8px; border-radius:4px; display:none;">✅ स्वतः सेव हुआ</span>
+                  <button id="savePageTextBtn" class="admin-btn admin-btn-primary" style="padding:6px 14px; font-size:12px;">
+                    💾 सेव करें (Save)
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -669,6 +680,52 @@ async function setupStudioEvents() {
     }
 
     // Audio & Text Events
+    const pageTextInput = document.getElementById('pageTextInput');
+    if (pageTextInput) {
+        pageTextInput.addEventListener('input', (e) => {
+            const text = e.target.value;
+            const pageKey = String(studioCurrentPage);
+            if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
+            if (!studioAudioScripts.pages[pageKey]) {
+                studioAudioScripts.pages[pageKey] = { text: text, audio: '' };
+            } else if (typeof studioAudioScripts.pages[pageKey] === 'string') {
+                studioAudioScripts.pages[pageKey] = { text: text, audio: '' };
+            } else {
+                studioAudioScripts.pages[pageKey].text = text;
+            }
+            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            audioScriptsModified = true;
+            markUnsaved(true);
+            renderPageChipGrid();
+
+            const badge = document.getElementById('autoSaveBadge');
+            if (badge) {
+                badge.style.display = 'inline-block';
+                badge.textContent = `✅ Pg ${studioCurrentPage} स्वतः सेव हुआ`;
+                clearTimeout(badge._timer);
+                badge._timer = setTimeout(() => { badge.style.display = 'none'; }, 3000);
+            }
+        });
+    }
+
+    const studioPrevPageBtn = document.getElementById('studioPrevPageBtn');
+    if (studioPrevPageBtn) {
+        studioPrevPageBtn.addEventListener('click', () => {
+            if (studioCurrentPage > 1) {
+                selectPage(studioCurrentPage - 1);
+            }
+        });
+    }
+
+    const studioNextPageBtn = document.getElementById('studioNextPageBtn');
+    if (studioNextPageBtn) {
+        studioNextPageBtn.addEventListener('click', () => {
+            if (studioCurrentPage < studioTotalPages) {
+                selectPage(studioCurrentPage + 1);
+            }
+        });
+    }
+
     const savePageTextBtn = document.getElementById('savePageTextBtn');
     if (savePageTextBtn) {
         savePageTextBtn.addEventListener('click', () => saveCurrentPageText());
@@ -972,6 +1029,24 @@ function renderPageChipGrid() {
 }
 
 async function selectPage(pageNum) {
+    // Auto-save previous page text before switching
+    if (studioCurrentPage && studioCurrentPage !== pageNum) {
+        const currentTextInput = document.getElementById('pageTextInput');
+        if (currentTextInput) {
+            const currentText = currentTextInput.value;
+            const curKey = String(studioCurrentPage);
+            if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
+            if (!studioAudioScripts.pages[curKey]) {
+                studioAudioScripts.pages[curKey] = { text: currentText, audio: '' };
+            } else if (typeof studioAudioScripts.pages[curKey] === 'string') {
+                studioAudioScripts.pages[curKey] = { text: currentText, audio: '' };
+            } else {
+                studioAudioScripts.pages[curKey].text = currentText;
+            }
+            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+        }
+    }
+
     studioCurrentPage = pageNum;
     renderPageChipGrid();
 
@@ -1754,7 +1829,16 @@ function saveCurrentPageText() {
     audioScriptsModified = true;
     markUnsaved(true);
     renderPageChipGrid();
-    alert(`✅ Page ${studioCurrentPage} का टेक्स्ट सेव हो गया!\n"1-Click Push to Git" दबाने पर सिर्फ 0.5 सेकंड में ऑडियो स्क्रिप्ट Git पर लाइव हो जाएगी।`);
+
+    const badge = document.getElementById('autoSaveBadge');
+    if (badge) {
+        badge.style.display = 'inline-block';
+        badge.style.background = '#10b981';
+        badge.style.color = '#fff';
+        badge.textContent = `✅ Pg ${studioCurrentPage} सुरक्षित सेव हुआ!`;
+        clearTimeout(badge._timer);
+        badge._timer = setTimeout(() => { badge.style.display = 'none'; }, 3500);
+    }
 }
 
 let studioTtsAudio = new Audio();
