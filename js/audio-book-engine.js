@@ -15,8 +15,8 @@ class SoothingBgmEngine {
         this.isPlaying = false;
         this.gainNode = null;
         this.oscillators = [];
-        this.volume = 0.12; // Audible and soothing ambient background
-        this.isMuted = false;
+        this.volume = 0.0; // Completely muted background music
+        this.isMuted = true; // BGM disabled by default to keep voice 100% clean & clear
     }
 
     initContext() {
@@ -30,7 +30,7 @@ class SoothingBgmEngine {
     }
 
     start() {
-        if (this.isMuted) return;
+        if (this.isMuted || this.volume === 0) return;
         try {
             this.initContext();
             if (!this.ctx) return;

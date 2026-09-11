@@ -358,16 +358,53 @@ export async function initBookAudioStudio() {
 
             <hr style="border:none; border-top:1px solid #334155; margin:16px 0;">
 
-            <!-- OPTION B: LIVE MIC RECORDER -->
+            <!-- OPTION B: LIVE MIC RECORDER WITH STUDIO NOISE REMOVER & SWEET ECHO -->
             <div>
               <label style="font-weight:700; font-size:0.85rem; color:#e2e8f0; display:block; margin-bottom:6px;">
                 🎙️ विकल्प B: सीधे माइक से अपनी मूल आवाज़ रिकॉर्ड करें:
               </label>
               <p style="margin:0 0 10px; font-size:0.75rem; color:#94a3b8;">
-                माइक ऑन करें, पेज देखकर बोलें। यह आपकी असली आवाज़ में 24kbps Opus में सेव होगा।
+                माइक ऑन करें, पेज देखकर बोलें। <strong>नॉइज़ रिमूवर</strong> और <strong>मधुर इको</strong> के साथ असली आवाज़ 24kbps Opus में सेव होगी।
               </p>
 
-              <div style="display:flex; align-items:center; gap:12px; margin-top:14px; padding:14px; background:#0f172a; border-radius:8px;">
+              <!-- Studio Audio Quality & Sound Enhancer Settings -->
+              <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:10px 12px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                  <span style="font-size:0.82rem; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:6px;">
+                    <span>✨</span> स्टूडियो वॉइस फ़िल्टर (Noise Remover & Sweet Echo)
+                  </span>
+                  <span style="font-size:0.75rem; background:#064e3b; color:#6ee7b7; padding:2px 8px; border-radius:12px; font-weight:700;">
+                    🛡️ नॉइज़ फ़िल्टर सक्रिय
+                  </span>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                  <div>
+                    <label style="font-size:0.75rem; color:#cbd5e1; font-weight:600; display:block; margin-bottom:2px;">
+                      🎧 कानों को प्यारा इको (Sweet Studio Echo):
+                    </label>
+                    <select id="studioEchoPresetSelect" class="admin-input" style="width:100%; padding:4px 8px; font-size:0.8rem; font-weight:700;">
+                      <option value="sweet" selected>✨ हल्का मधुर इको (Sweet Echo - 15%)</option>
+                      <option value="medium">🎙️ मीडियम पॉडकास्ट इको (Medium - 25%)</option>
+                      <option value="rich">🏛️ रिच कॉन्सर्ट इको (Rich Presence - 35%)</option>
+                      <option value="none">🔇 इको बंद (Pure Direct Voice - 0%)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style="font-size:0.75rem; color:#cbd5e1; font-weight:600; display:block; margin-bottom:2px;">
+                      🛡️ बैकग्राउंड नॉइज़ फ़िल्टर (Noise Filter):
+                    </label>
+                    <select id="studioNoiseFilterSelect" class="admin-input" style="width:100%; padding:4px 8px; font-size:0.8rem; font-weight:700;">
+                      <option value="high" selected>🟢 हाई-क्वालिटी नॉइज़ रिमूवर (High DSP)</option>
+                      <option value="standard">🟡 स्टैंडर्ड नॉइज़ रिमूवर</option>
+                      <option value="off">⚪ डायरेक्ट माइक (No Filter)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:12px; margin-top:10px; padding:14px; background:#0f172a; border-radius:8px;">
                 <button id="startRecBtn" class="admin-btn" style="background:#ef4444; color:#fff;">
                   <span>🔴</span> रिकॉर्ड शुरू करें
                 </button>
@@ -375,7 +412,7 @@ export async function initBookAudioStudio() {
                   <span>⏹️</span> रोकें (Stop)
                 </button>
                 <div id="recStatusWave" style="height:34px; flex:1; background:#1e293b; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">
-                  माइक तैयार है
+                  माइक तैयार है (🛡️ नॉइज़ फ़िल्टर + 🎧 मधुर इको)
                 </div>
               </div>
 
@@ -1512,16 +1549,117 @@ function testCurrentPageTts() {
     }
 }
 
+let studioAudioCtx = null;
+let studioMicStream = null;
+
 async function startRecording() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const noiseFilterSetting = document.getElementById('studioNoiseFilterSelect')?.value || 'high';
+        const useBrowserDSP = noiseFilterSetting !== 'off';
+
+        const constraints = {
+            audio: {
+                channelCount: 1,
+                sampleRate: 48000,
+                echoCancellation: useBrowserDSP,
+                noiseSuppression: useBrowserDSP,
+                autoGainControl: useBrowserDSP
+            }
+        };
+
+        studioMicStream = await navigator.mediaDevices.getUserMedia(constraints);
         audioChunks = [];
+
+        // Initialize Web Audio DSP Engine for High-Quality Noise Removal & Sweet Echo
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        studioAudioCtx = new AudioCtx({ sampleRate: 48000 });
+        if (studioAudioCtx.state === 'suspended') {
+            await studioAudioCtx.resume();
+        }
+
+        const source = studioAudioCtx.createMediaStreamSource(studioMicStream);
+
+        // 1. High-Pass Filter (Low-cut rumble filter: cuts table vibration, wind pop, 50Hz electrical hum)
+        const highPassFilter = studioAudioCtx.createBiquadFilter();
+        highPassFilter.type = 'highpass';
+        highPassFilter.frequency.setValueAtTime(noiseFilterSetting === 'high' ? 90 : 70, studioAudioCtx.currentTime);
+        highPassFilter.Q.setValueAtTime(0.7, studioAudioCtx.currentTime);
+
+        // 2. Low-Pass Filter (De-hiss: cuts high-frequency electrical hiss & coil whine)
+        const lowPassFilter = studioAudioCtx.createBiquadFilter();
+        lowPassFilter.type = 'lowpass';
+        lowPassFilter.frequency.setValueAtTime(noiseFilterSetting === 'high' ? 11500 : 13000, studioAudioCtx.currentTime);
+        lowPassFilter.Q.setValueAtTime(0.7, studioAudioCtx.currentTime);
+
+        // 3. Studio Dynamics Compressor / Noise Gate
+        const compressor = studioAudioCtx.createDynamicsCompressor();
+        compressor.threshold.setValueAtTime(noiseFilterSetting === 'high' ? -42 : -36, studioAudioCtx.currentTime);
+        compressor.knee.setValueAtTime(12, studioAudioCtx.currentTime);
+        compressor.ratio.setValueAtTime(6, studioAudioCtx.currentTime);
+        compressor.attack.setValueAtTime(0.003, studioAudioCtx.currentTime);
+        compressor.release.setValueAtTime(0.15, studioAudioCtx.currentTime);
+
+        // Connect noise suppression chain
+        source.connect(highPassFilter);
+        highPassFilter.connect(lowPassFilter);
+        lowPassFilter.connect(compressor);
+
+        // 4. Sweet Acoustic Echo & Presence Branch
+        const echoPreset = document.getElementById('studioEchoPresetSelect')?.value || 'sweet';
+        let echoGainLevel = 0.15; // default 15% sweet acoustic echo
+        let delayTimeVal = 0.055; // 55ms warm slapback
+
+        if (echoPreset === 'medium') {
+            echoGainLevel = 0.25;
+            delayTimeVal = 0.075;
+        } else if (echoPreset === 'rich') {
+            echoGainLevel = 0.35;
+            delayTimeVal = 0.095;
+        } else if (echoPreset === 'none') {
+            echoGainLevel = 0.0;
+        }
+
+        const destNode = studioAudioCtx.createMediaStreamDestination();
+
+        // Direct Voice (Dry)
+        const dryGain = studioAudioCtx.createGain();
+        dryGain.gain.setValueAtTime(0.92, studioAudioCtx.currentTime);
+        compressor.connect(dryGain);
+        dryGain.connect(destNode);
+
+        // Sweet Echo (Wet Loop)
+        if (echoGainLevel > 0) {
+            const delayNode = studioAudioCtx.createDelay();
+            delayNode.delayTime.setValueAtTime(delayTimeVal, studioAudioCtx.currentTime);
+
+            // Warm tone filter for echo (softens high frequencies so echo feels natural, not metallic)
+            const echoToneFilter = studioAudioCtx.createBiquadFilter();
+            echoToneFilter.type = 'lowpass';
+            echoToneFilter.frequency.setValueAtTime(3200, studioAudioCtx.currentTime);
+
+            const feedbackGain = studioAudioCtx.createGain();
+            feedbackGain.gain.setValueAtTime(echoGainLevel, studioAudioCtx.currentTime);
+
+            const echoOutputGain = studioAudioCtx.createGain();
+            echoOutputGain.gain.setValueAtTime(echoGainLevel * 0.9, studioAudioCtx.currentTime);
+
+            // Connect echo loop
+            compressor.connect(delayNode);
+            delayNode.connect(echoToneFilter);
+            echoToneFilter.connect(feedbackGain);
+            feedbackGain.connect(delayNode); // feedback
+
+            echoToneFilter.connect(echoOutputGain);
+            echoOutputGain.connect(destNode);
+        }
+
+        const processedStream = destNode.stream;
 
         const options = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
             ? { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 24000 }
             : {};
 
-        mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorder = new MediaRecorder(processedStream, options);
         mediaRecorder.ondataavailable = (e) => {
             if (e.data.size > 0) audioChunks.push(e.data);
         };
@@ -1538,14 +1676,19 @@ async function startRecording() {
             }
 
             const waveBox = document.getElementById('recStatusWave');
-            if (waveBox) waveBox.innerHTML = `✅ रिकॉर्डिंग पूरी हुई (${Math.round(recordedAudioBlob.size / 1024)} KB)`;
+            if (waveBox) waveBox.innerHTML = `✅ रिकॉर्डिंग पूरी हुई (${Math.round(recordedAudioBlob.size / 1024)} KB) • 🎧 स्टूडियो साउंड सक्रिय`;
+
+            if (studioAudioCtx && studioAudioCtx.state !== 'closed') {
+                studioAudioCtx.close().catch(() => {});
+                studioAudioCtx = null;
+            }
         };
 
         mediaRecorder.start();
         document.getElementById('startRecBtn').style.display = 'none';
         document.getElementById('stopRecBtn').style.display = 'inline-flex';
         const waveBox = document.getElementById('recStatusWave');
-        if (waveBox) waveBox.innerHTML = `🔴 रिकॉर्डिंग जारी है... (माइक में बोलें)`;
+        if (waveBox) waveBox.innerHTML = `🔴 रिकॉर्डिंग जारी है... (🛡️ नॉइज़ फ़िल्टर + 🎧 मधुर इको)`;
     } catch (err) {
         console.error("Mic Access Error:", err);
         alert("माइक एक्सेस नहीं मिल पाया। कृपया ब्राउज़र में माइक्रोफ़ोन की अनुमति दें।");
@@ -1555,7 +1698,14 @@ async function startRecording() {
 function stopRecording() {
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.stop();
-        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    }
+    if (studioMicStream) {
+        studioMicStream.getTracks().forEach(track => track.stop());
+        studioMicStream = null;
+    }
+    if (studioAudioCtx && studioAudioCtx.state !== 'closed') {
+        studioAudioCtx.close().catch(() => {});
+        studioAudioCtx = null;
     }
     document.getElementById('startRecBtn').style.display = 'inline-flex';
     document.getElementById('stopRecBtn').style.display = 'none';
