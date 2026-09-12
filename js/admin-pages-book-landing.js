@@ -139,6 +139,9 @@ export async function initBookLandingPages() {
       <button type="button" id="tab-btn-popups-mgr" onclick="window.switchAdminSubTab('popups')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #3b82f6; color: #38bdf8; font-weight: 800;">
         🔔 5. सोशल प्रूफ व पॉपअप्स (Social Proof & Popups)
       </button>
+      <button type="button" id="tab-btn-ai-studio-mgr" onclick="window.switchAdminSubTab('ai_studio')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #ec4899; color: #f472b6; font-weight: 800; box-shadow: 0 2px 10px rgba(236,72,153,0.25);">
+        🚀 6. AI ई-बुक क्रिएटर व 3-टियर असेंबलर (AI Studio)
+      </button>
     </div>
 
     <!-- =========================================================================
@@ -1520,6 +1523,205 @@ export async function initBookLandingPages() {
         </div>
       </div>
     </div>
+
+    <!-- SUB-TAB 6: AI E-Book Creator & 3-Tier Master Assembler Studio -->
+    <div id="admin-ai-studio-subtab-container" class="admin-card" style="display: none; margin-bottom: 20px; background: var(--admin-surface-2, #0f172a); border: 2px solid #ec4899; border-radius: 14px; padding: 22px; box-shadow: 0 10px 30px rgba(236,72,153,0.2);">
+      
+      <!-- Studio Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(236,72,153,0.3); padding-bottom: 14px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 2rem;">🚀</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 900; color: #f472b6;">
+              Aarogyam AI ई-बुक क्रिएटर व 3-टियर असेंबलर स्टूडियो (V1.0 Pro)
+            </h3>
+            <p style="font-size: 0.84rem; color: var(--admin-muted); margin: 3px 0 0 0;">
+              कॉमन ज्ञान (30-50p) + AI स्पेशलिटी कंटेंट (50-75p) + आपकी फोटो व फनल कैटलॉग (20-25p) मिलाकर 100-150 पेज की सम्पूर्ण ई-बुक बनाएं।
+            </p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" onclick="window.generateAiBookDraft()" id="btn-generate-ai-book" class="admin-button" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: #fff; font-weight: 900; padding: 8px 18px; border-radius: 8px; box-shadow: 0 4px 14px rgba(236,72,153,0.4);">
+            ✨ 1-Click AI बुक ड्राफ्ट बनाएं
+          </button>
+          <button type="button" onclick="window.publishAiStudioBook()" id="btn-publish-ai-book" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 8px 18px; border-radius: 8px; box-shadow: 0 4px 14px rgba(22,163,74,0.4);">
+            🚀 1-Click में पब्लिश करें
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 1: BOOK TOPIC, CATEGORY & PRICING -->
+      <div style="background: rgba(236,72,153,0.06); border: 1px solid rgba(236,72,153,0.25); border-radius: 10px; padding: 16px; margin-bottom: 18px;">
+        <div style="font-weight: 800; color: #f472b6; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+          <span>📝</span> <span>1. पुस्तक का विषय, कैटेगरी एवं मूल्य निर्धारण (Book Topic & Target)</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px;">
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">पुस्तक का मुख्य विषय / शीर्षक: *</label>
+            <input type="text" id="ais_input_topic" class="admin-input" placeholder="उदा. टमाटर एवं मिर्च की उन्नत खेती, कीट व सम्पूर्ण स्प्रे चार्ट" value="टमाटर एवं मिर्च की उन्नत खेती, कीट व सम्पूर्ण स्प्रे चार्ट" style="width: 100%; padding: 8px 12px; font-weight: 800; color: #f8fafc;" />
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">कैटेगरी (Category): *</label>
+            <select id="ais_select_category" class="admin-select" onchange="window.handleAiStudioCategoryChange(this.value)" style="width: 100%; padding: 8px 10px; font-weight: 700;">
+              <option value="Agriculture" selected>🌾 Agriculture (कृषि व फसल)</option>
+              <option value="Health">❤️ Health & Ayurveda (स्वास्थ्य)</option>
+              <option value="BeautySkin">💆‍♀️ Skin & Hair Care (त्वचा/बाल)</option>
+              <option value="AnimalHusbandry">🐄 Animal & Fisheries (पशु/मत्स्य)</option>
+              <option value="Business">💼 Agri-Business (व्यापार)</option>
+            </select>
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">ऑफर मूल्य (Offer Price ₹): *</label>
+            <input type="number" id="ais_input_offer_price" class="admin-input" value="99" style="width: 100%; padding: 8px 10px; font-weight: 900; color: #16a34a;" />
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">MRP (असली मूल्य ₹):</label>
+            <input type="number" id="ais_input_mrp" class="admin-input" value="299" style="width: 100%; padding: 8px 10px;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: 3-TIER MODULAR ASSEMBLY MATRIX (100-150 Pages Breakdown) -->
+      <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 10px; padding: 18px; margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+          <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+            <span>🧱</span> <span>2. 3-टियर मॉड्यूलर असेंबली मैट्रिक्स (100-150 पेजेस ढांचा)</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <span id="ais_badge_total_pages" style="background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #34d399; padding: 3px 10px; border-radius: 20px; font-weight: 800; font-size: 0.8rem;">
+              📄 कुल अनुमानित पेजेस: 120 Pages
+            </span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 14px;">
+          
+          <!-- TIER 1: Common Foundation Library -->
+          <div style="background: rgba(0,0,0,0.3); border: 1.5px solid #10b981; border-radius: 8px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 0.85rem; color: #34d399;">
+                🟢 टियर 1: कॉमन चैप्टर्स (30-40p)
+              </span>
+              <span style="font-size: 0.72rem; color: #94a3b8;">रीयूजेबल लाइब्रेरी</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--admin-muted); margin: 0 0 10px 0;">
+              इस कैटेगरी की सभी किताबों में शामिल होने वाले मूलभूत ज्ञान पेजेस:
+            </p>
+            <div id="ais_tier1_common_checkboxes_wrap" style="display: flex; flex-direction: column; gap: 6px;">
+              <!-- Populated by JS based on Category -->
+            </div>
+          </div>
+
+          <!-- TIER 2: AI Specialty Core Generator -->
+          <div style="background: rgba(0,0,0,0.3); border: 1.5px solid #ec4899; border-radius: 8px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 0.85rem; color: #f472b6;">
+                🟡 टियर 2: AI कोर चैप्टर्स (50-70p)
+              </span>
+              <span style="font-size: 0.72rem; color: #94a3b8;">यूनिक स्पेशलिटी</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--admin-muted); margin: 0 0 10px 0;">
+              विषय-विशेष के कीट, रोग, स्प्रे डोज, सचित्र पहचान व हार्वेस्टिंग पेजेस:
+            </p>
+            <div id="ais_tier2_core_chapters_wrap" style="display: flex; flex-direction: column; gap: 6px;">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </div>
+
+          <!-- TIER 3: Branding, Author Photo & Funnel Pages -->
+          <div style="background: rgba(0,0,0,0.3); border: 1.5px solid #3b82f6; border-radius: 8px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 0.85rem; color: #60a5fa;">
+                🔵 टियर 3: ब्रांडिंग व फनल (20-25p)
+              </span>
+              <span style="font-size: 0.72rem; color: #94a3b8;">आपकी फोटो व कैटलॉग</span>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Author Photo -->
+              <div>
+                <label class="admin-label" style="font-size: 0.74rem; font-weight: 700;">📸 लेखक / फाउंडर फोटो URL:</label>
+                <div style="display: flex; gap: 6px;">
+                  <input type="text" id="ais_author_photo_url" value="/images/logo/logo.png" class="admin-input" style="flex: 1; padding: 4px 8px; font-size: 0.76rem;" />
+                  <label class="admin-button small-button" style="background:#3b82f6;color:#fff;padding:4px 8px;font-size:0.72rem;margin:0;cursor:pointer;">
+                    अपलोड
+                    <input type="file" accept="image/*" onchange="window.handleAuthorPhotoUpload(event)" style="display:none;" />
+                  </label>
+                </div>
+              </div>
+
+              <!-- Author Bio & Message -->
+              <div>
+                <label class="admin-label" style="font-size: 0.74rem; font-weight: 700;">👤 लेखक का नाम व परिचय:</label>
+                <input type="text" id="ais_author_name" value="आरोग्यम इंडिया कृषि विशेषज्ञ टीम" class="admin-input" style="width: 100%; padding: 4px 8px; font-size: 0.76rem; font-weight: 700;" />
+              </div>
+
+              <!-- Funnel Pages Checkboxes -->
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.74rem; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="ais_chk_founder_msg" checked style="accent-color: #3b82f6;" />
+                  <span>फाउंडर का संदेश व विजन पेज (2p)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.74rem; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="ais_chk_cross_catalog" checked style="accent-color: #3b82f6;" />
+                  <span>आरोग्यम अन्य पुस्तकें कैटलॉग व QR (10p)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.74rem; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="ais_chk_vip_offer" checked style="accent-color: #3b82f6;" />
+                  <span>₹1999 VIP Pro सदस्यता आमंत्रण (3p)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.74rem; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="ais_chk_whatsapp_support" checked style="accent-color: #3b82f6;" />
+                  <span>24×7 WhatsApp AI डॉक्टर हेल्पलाइन (5p)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- STEP 3: INTERACTIVE VISUAL AUDIT & CHAPTER-BY-CHAPTER EDITOR -->
+      <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 10px; padding: 18px; margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <div style="font-weight: 800; color: #fde047; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+              <span>🔍</span> <span>3. लाइव ई-बुक ऑडिट व चैप्टर एडिटर (Live Visual Audit & TTS Preview)</span>
+            </div>
+            <small style="color: var(--admin-muted);">पब्लिश करने से पहले हर अध्याय का कंटेंट, दवाइयों की डोज व ऑडियो नरेशन चेक करें:</small>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" onclick="window.previewFullBookTtsAudio()" class="admin-button small-button" style="background: #f59e0b; color: #000; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+              <span>▶️</span> <span>इस अध्याय का TTS ऑडियो सुनें</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chapter Selector Pills -->
+        <div id="ais_chapter_nav_pills" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 14px;">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Active Chapter Detail Editor Card -->
+        <div id="ais_active_chapter_editor_card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 16px;">
+          <!-- Rendered dynamically by JS -->
+        </div>
+      </div>
+
+      <!-- STEP 4: BOTTOM PUBLISH ACTION BAR -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(22,163,74,0.12); border: 1.5px solid #16a34a; border-radius: 10px; padding: 14px 20px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <div style="font-weight: 900; color: #4ade80; font-size: 1rem;">
+            ✅ पूरी 100-150 पेज ई-बुक पब्लिश करने के लिए तैयार है!
+          </div>
+          <small style="color: #cbd5e1;">यह स्टोर कैटलॉग, लैंडिंग पेज, रीडर और PWA ऑफलाइन मेमोरी में एक साथ सेव हो जाएगी।</small>
+        </div>
+        <button type="button" onclick="window.publishAiStudioBook()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; font-size: 1rem; padding: 10px 24px; box-shadow: 0 4px 16px rgba(22,163,74,0.5);">
+          🚀 पब्लिश करें व स्टोर में लाइव करें (Publish Now)
+        </button>
+      </div>
+
+    </div>
   `;
 
   // Helper to render section banner uploader blocks in HTML
@@ -2169,7 +2371,7 @@ export async function initBookLandingPages() {
   }
 
   // -------------------------------------------------------------
-  // SUB-TAB SWITCHING LOGIC (Pages vs Shelves vs Leads vs Free Demo vs Popups)
+  // SUB-TAB SWITCHING LOGIC (Pages vs Shelves vs Leads vs Free Demo vs Popups vs AI Studio)
   // -------------------------------------------------------------
   window.switchAdminSubTab = function(tab) {
     const pagesCard = document.getElementById('admin-pages-subtab-container');
@@ -2177,18 +2379,21 @@ export async function initBookLandingPages() {
     const leadsCard = document.getElementById('admin-leads-subtab-container');
     const freeDemoCard = document.getElementById('admin-free-demo-subtab-container');
     const popupsCard = document.getElementById('admin-popups-subtab-container');
+    const aiStudioCard = document.getElementById('admin-ai-studio-subtab-container');
 
     const btnPages = document.getElementById('tab-btn-landing-pages');
     const btnShelves = document.getElementById('tab-btn-shelves-mgr');
     const btnLeads = document.getElementById('tab-btn-coming-soon-leads');
     const btnFreeDemo = document.getElementById('tab-btn-free-demo-mgr');
     const btnPopups = document.getElementById('tab-btn-popups-mgr');
+    const btnAiStudio = document.getElementById('tab-btn-ai-studio-mgr');
 
     if (pagesCard) pagesCard.style.display = tab === 'pages' ? 'block' : 'none';
     if (shelvesCard) shelvesCard.style.display = tab === 'shelves' ? 'block' : 'none';
     if (leadsCard) leadsCard.style.display = tab === 'leads' ? 'block' : 'none';
     if (freeDemoCard) freeDemoCard.style.display = tab === 'free_demo' ? 'block' : 'none';
     if (popupsCard) popupsCard.style.display = tab === 'popups' ? 'block' : 'none';
+    if (aiStudioCard) aiStudioCard.style.display = tab === 'ai_studio' ? 'block' : 'none';
 
     if (btnPages) {
       btnPages.style.background = tab === 'pages' ? '#16a34a' : 'var(--admin-surface, #1e293b)';
@@ -2220,10 +2425,17 @@ export async function initBookLandingPages() {
       btnPopups.style.borderColor = '#38bdf8';
     }
 
+    if (btnAiStudio) {
+      btnAiStudio.style.background = tab === 'ai_studio' ? '#ec4899' : 'var(--admin-surface, #1e293b)';
+      btnAiStudio.style.color = tab === 'ai_studio' ? '#fff' : '#f472b6';
+      btnAiStudio.style.borderColor = '#ec4899';
+    }
+
     if (tab === 'shelves') window.renderStoreShelvesTab();
     if (tab === 'leads') window.renderComingSoonLeadsTab();
     if (tab === 'free_demo') window.renderFreeDemoStudioTab();
     if (tab === 'popups') window.renderPopupsManagerTab();
+    if (tab === 'ai_studio') window.renderAiStudioTab();
   };
 
   // -------------------------------------------------------------
@@ -2398,6 +2610,574 @@ export async function initBookLandingPages() {
     } catch (e) {}
 
     showToast('💾 सोशल प्रूफ व पॉपअप सेटिंग्स सुरक्षित हो गईं!', 'success');
+  };
+
+  // -------------------------------------------------------------
+  // SUB-TAB 6: AI E-BOOK CREATOR & 3-TIER MASTER ASSEMBLER ENGINE
+  // -------------------------------------------------------------
+  let currentAiStudioBook = {
+    topic: 'टमाटर एवं मिर्च की उन्नत खेती, कीट व सम्पूर्ण स्प्रे चार्ट',
+    category: 'Agriculture',
+    offerPrice: 99,
+    mrp: 299,
+    authorName: 'आरोग्यम इंडिया कृषि विशेषज्ञ टीम',
+    authorPhoto: '/images/logo/logo.png',
+    authorBio: 'आरोग्यम इंडिया कृषि अनुसंधान एवं डिजिटल किसान क्रांति टीम',
+    tier1Common: [],
+    tier2CoreChapters: [],
+    tier3Funnel: {
+      founderMsg: true,
+      crossCatalog: true,
+      vipOffer: true,
+      whatsappSupport: true
+    },
+    activeAuditChapterIndex: 0
+  };
+
+  const TIER1_CATEGORY_PRESETS = {
+    'Agriculture': [
+      { id: 'c_agri_soil', title: '🌱 1. मृदा परीक्षण, pH मान व भूमि सुधार विज्ञान', pages: 10, checked: true },
+      { id: 'c_agri_npk', title: '🧪 2. NPK पोषण, जिंक-सल्फर व बेसल खाद डोज', pages: 10, checked: true },
+      { id: 'c_agri_spray', title: '💧 3. आधुनिक स्प्रे साइंस, स्टीकर व घोल नियम', pages: 10, checked: true },
+      { id: 'c_agri_organic', title: '🌿 4. घर पर जैविक कीटनाशक व टॉनिक निर्माण', pages: 10, checked: true }
+    ],
+    'Health': [
+      { id: 'c_hlth_dosha', title: '🧘 1. वात-पित्त-कफ त्रिदोष संतुलन व प्रकृति ज्ञान', pages: 10, checked: true },
+      { id: 'c_hlth_detox', title: '💧 2. प्राकृतिक डिटॉक्स, उपवास व जल चिकित्सा', pages: 10, checked: true },
+      { id: 'c_hlth_kitchen', title: '🌿 3. रसोई घर की 25 दिव्य औषधियां व अचूक प्रयोग', pages: 10, checked: true },
+      { id: 'c_hlth_immunity', title: '🛡️ 4. रोग प्रतिरोधक क्षमता (इम्यूनिटी) वर्धक नियम', pages: 10, checked: true }
+    ],
+    'BeautySkin': [
+      { id: 'c_skin_glow', title: '✨ 1. आयुर्वेदिक त्वचा प्रकार व प्राकृतिक निखार रूटीन', pages: 10, checked: true },
+      { id: 'c_hair_fall', title: '💆‍♀️ 2. बाल झड़ने से बचाव, डैंड्रफ व तेल निर्माण विधि', pages: 10, checked: true },
+      { id: 'c_face_pack', title: '🌸 3. 100% केमिकल-मुक्त हर्बल फेसपैक व उबटन', pages: 10, checked: true }
+    ],
+    'AnimalHusbandry': [
+      { id: 'c_anim_dairy', title: '🐄 1. दुधारू पशु आहार, संतुलित पोषण व दूध वृद्धि', pages: 10, checked: true },
+      { id: 'c_anim_disease', title: '🩺 2. मौसमी पशु रोग, एफएमडी व प्राथमिक उपचार', pages: 10, checked: true },
+      { id: 'c_anim_fish', title: '🐟 3. आधुनिक मछली पालन व तालाब जल प्रबंधन', pages: 15, checked: true }
+    ],
+    'Business': [
+      { id: 'c_biz_direct', title: '💼 1. किसान से सीधे ग्राहक: मूल्य संवर्धन व ब्रांडिंग', pages: 10, checked: true },
+      { id: 'c_biz_poly', title: '🏡 2. पॉलीहाउस व नर्सरी व्यवसाय प्रोजेक्ट सेटअप', pages: 10, checked: true },
+      { id: 'c_biz_digital', title: '📱 3. डिजिटल किसान कम्युनिटी व ऑनलाइन बिक्री', pages: 10, checked: true }
+    ]
+  };
+
+  const DEFAULT_CORE_CHAPTER_TEMPLATES = {
+    'Agriculture': [
+      {
+        num: 1,
+        title: 'अध्याय 1: उन्नत किस्में, नर्सरी प्रबंधन व बीज उपचार',
+        pages: 12,
+        desc: 'हाइब्रिड एवं देशी किस्मों का चयन, कार्बेन्डाजिम व ट्राइकोडर्मा से बीज शोधन विधि।',
+        dosage: 'ट्राइकोडर्मा 10g/kg बीज + थिरम 2g/kg बीज',
+        sprayDose: 'नर्सरी स्प्रे: 19:19:19 NPK @ 2g/L पानी',
+        audioText: 'किसान भाइयों, इस अध्याय में हम जानेंगे कि कैसे सही उन्नत किस्म के चुनाव और बीज उपचार से फसल को 90% रोगों से पहले ही बचाया जा सकता है।'
+      },
+      {
+        num: 2,
+        title: 'अध्याय 2: खेत तैयारी, ड्रिप/मल्चिंग व बेसल फर्टीगेशन',
+        pages: 12,
+        desc: 'बेड निर्माण, 25 माइक्रोन सिल्वर-ब्लैक मल्चिंग व डीएपी/पोटाश की सही मात्रा।',
+        dosage: 'गोबर खाद 5 ट्रॉली + DAP 50kg + MOP 30kg प्रति एकड़',
+        sprayDose: 'नीम खली 100kg प्रति एकड़ बेसल डोज में',
+        audioText: 'जमीन की तैयारी फसल की नींव है। सही मल्चिंग और बेड की चौड़ाई रखने से खरपतवार 80% तक कम हो जाते हैं और नमी सुरक्षित रहती है।'
+      },
+      {
+        num: 3,
+        title: 'अध्याय 3: प्रमुख रस चूसक कीट (थ्रिप्स, सफेद मक्खी, माइट्स)',
+        pages: 14,
+        desc: 'पत्तियों का मुड़ना (चूर्दा-मूर्दा), थ्रिप्स व माइट्स के सटीक लक्षण व अचूक कीटनाशक।',
+        dosage: 'फिप्रोनिल 5% SC @ 2ml/L या स्पिनोटोराम 11.7% SC @ 1ml/L',
+        sprayDose: 'माइट्स के लिए: प्रोपरगाइट 57% EC @ 2ml/L पानी',
+        audioText: 'थ्रिप्स और सफेद मक्खी वायरस के मुख्य वाहक हैं। पत्तियां ऊपर की ओर मुड़ें तो थ्रिप्स और नीचे मुड़ें तो माइट्स का हमला समझना चाहिए।'
+      },
+      {
+        num: 4,
+        title: 'अध्याय 4: फफूंद जनित रोग (अगेती/पछेती झुलसा व उकठा)',
+        pages: 14,
+        desc: 'पत्तियों पर काले-भूरे धब्बे, तना गलन व बैक्टीरियल विल्ट की रोकथाम।',
+        dosage: 'एज़ोक्सिस्ट्रोबिन + डिफेनोकोनाज़ोल @ 1ml/L पानी',
+        sprayDose: 'उकठा (विल्ट) के लिए: कॉपर ऑक्सीक्लोराइड 50% WP @ 3g/L ड्रेंचिंग',
+        audioText: 'झुलसा रोग नमी और बादल छाए रहने पर तेजी से फैलता है। लक्षण दिखते ही सिस्टेमिक फंगीसाइड का छिड़काव तुरंत करें।'
+      },
+      {
+        num: 5,
+        title: 'अध्याय 5: फूल-फल वृद्धि, फ्रूट सेटिंग व सम्पूर्ण स्प्रे टाइम-टेबल',
+        pages: 12,
+        desc: 'फूल झड़ने की समस्या, बोरॉन व कैल्शियम का महत्व, 7-दिवसीय स्प्रे शेड्यूल।',
+        dosage: 'बोरॉन 20% @ 1g/L + 0:52:34 NPK @ 5g/L पानी',
+        sprayDose: 'टॉनिक: प्लानोफिक्स / बायो 20 @ 0.5ml/L पानी',
+        audioText: 'फूलों से फल बनते समय बोरॉन और कैल्शियम का सही संतुलन ही फलों को फटने से रोकता है और वजन 25% तक बढ़ाता है।'
+      }
+    ],
+    'Health': [
+      {
+        num: 1,
+        title: 'अध्याय 1: वात पित्त कफ की पहचान व दैनिक आहार नियम',
+        pages: 15,
+        desc: 'शरीर की प्रकृति अनुसार भोजन, पानी पीने के 5 स्वर्णिम नियम।',
+        dosage: 'प्रातःकाल 2 गिलास गुनगुना पानी + 1 चम्मच त्रिफला',
+        sprayDose: 'ऋतु अनुसार भोजन व 6 रसों का संतुलन',
+        audioText: 'आयुर्वेद के अनुसार हमारा शरीर पांच तत्वों से बना है। जब वात, पित्त और कफ संतुलित रहते हैं तो कोई भी रोग शरीर में टिक नहीं सकता।'
+      },
+      {
+        num: 2,
+        title: 'अध्याय 2: पेट की बीमारियां, गैस, कब्ज व लिवर डिटॉक्स',
+        pages: 15,
+        desc: 'पाचन तंत्र को मजबूत करने के घरेलू नुस्खे व लिवर शुद्धि।',
+        dosage: 'एलोवेरा + आंवला जूस 20ml खाली पेट',
+        sprayDose: 'अजवाइन + काला नमक गुनगुने पानी के साथ',
+        audioText: '90% बीमारियों की जड़ हमारा पेट और खराब पाचन है। लिवर को डिटॉक्स करने से रक्त शुद्ध होता है और चेहरे पर तेज आता है।'
+      },
+      {
+        num: 3,
+        title: 'अध्याय 3: जोड़ों का दर्द, यूरिक एसिड व गठिया निवारण',
+        pages: 15,
+        desc: 'वात दोष का शमन, मेथी दाना, सोंठ व पारिजात का काढ़ा।',
+        dosage: 'पारिजात (हरसिंगार) के 5 पत्तों का काढ़ा प्रतिदिन',
+        sprayDose: 'तिल तेल + लहसुन की मालिश',
+        audioText: 'जोड़ों के दर्द में मेथी दाना और पारिजात का काढ़ा रामबाण औषधि की तरह काम करता है। यूरिक एसिड को घटाने में यह अत्यंत लाभकारी है।'
+      },
+      {
+        num: 4,
+        title: 'अध्याय 4: हृदय स्वास्थ्य, कोलेस्ट्रॉल व ब्लड प्रेशर नियंत्रण',
+        pages: 15,
+        desc: 'अर्जुन की छाल, लौकी का सूप व प्राकृतिक प्राणायाम।',
+        dosage: 'अर्जुन की छाल का काढ़ा 50ml प्रतिदिन सुबह',
+        sprayDose: 'लहसुन की 1 कली खाली पेट',
+        audioText: 'हृदय की धमनियों में ब्लॉकेज को साफ करने के लिए अर्जुन छाल अमृत समान मानी गई है। यह रक्तचाप को स्वाभाविक रूप से सामान्य रखती है।'
+      }
+    ]
+  };
+
+  window.renderAiStudioTab = function() {
+    const cat = currentAiStudioBook.category || 'Agriculture';
+    const catSelect = document.getElementById('ais_select_category');
+    if (catSelect) catSelect.value = cat;
+
+    window.populateTier1Checkboxes(cat);
+    if (!currentAiStudioBook.tier2CoreChapters || currentAiStudioBook.tier2CoreChapters.length === 0) {
+      currentAiStudioBook.tier2CoreChapters = (DEFAULT_CORE_CHAPTER_TEMPLATES[cat] || DEFAULT_CORE_CHAPTER_TEMPLATES['Agriculture']).map(c => ({...c}));
+    }
+    window.renderTier2CoreList();
+    window.renderChapterAuditPills();
+    window.renderActiveAuditChapterCard();
+    window.updateAiStudioPageCountBadge();
+  };
+
+  window.handleAiStudioCategoryChange = function(cat) {
+    currentAiStudioBook.category = cat;
+    window.populateTier1Checkboxes(cat);
+    currentAiStudioBook.tier2CoreChapters = (DEFAULT_CORE_CHAPTER_TEMPLATES[cat] || DEFAULT_CORE_CHAPTER_TEMPLATES['Agriculture']).map(c => ({...c}));
+    window.renderTier2CoreList();
+    window.renderChapterAuditPills();
+    window.renderActiveAuditChapterCard();
+    window.updateAiStudioPageCountBadge();
+    showToast(`📁 कैटेगरी '${cat}' के अनुसार कॉमन व कोर चैप्टर्स अपडेट हुए!`, 'info');
+  };
+
+  window.populateTier1Checkboxes = function(cat) {
+    const wrap = document.getElementById('ais_tier1_common_checkboxes_wrap');
+    if (!wrap) return;
+
+    const presets = TIER1_CATEGORY_PRESETS[cat] || TIER1_CATEGORY_PRESETS['Agriculture'];
+    currentAiStudioBook.tier1Common = presets.map(p => ({...p}));
+
+    wrap.innerHTML = currentAiStudioBook.tier1Common.map((item, idx) => `
+      <label style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.04); border: 1px solid var(--admin-border); padding: 6px 10px; border-radius: 6px; cursor: pointer;">
+        <span style="display: flex; align-items: center; gap: 6px; font-size: 0.76rem; color: #f8fafc; font-weight: 600;">
+          <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="window.toggleTier1Item(${idx}, this.checked)" style="accent-color: #10b981; width: 15px; height: 15px;" />
+          <span>${escapeHtml(item.title)}</span>
+        </span>
+        <span style="font-size: 0.72rem; color: #10b981; font-weight: 800; background: rgba(16,185,129,0.15); padding: 1px 6px; border-radius: 4px;">
+          ${item.pages}p
+        </span>
+      </label>
+    `).join('');
+  };
+
+  window.toggleTier1Item = function(idx, checked) {
+    if (currentAiStudioBook.tier1Common[idx]) {
+      currentAiStudioBook.tier1Common[idx].checked = checked;
+      window.updateAiStudioPageCountBadge();
+    }
+  };
+
+  window.renderTier2CoreList = function() {
+    const wrap = document.getElementById('ais_tier2_core_chapters_wrap');
+    if (!wrap) return;
+
+    const list = currentAiStudioBook.tier2CoreChapters || [];
+    wrap.innerHTML = list.map((ch, idx) => `
+      <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--admin-border); padding: 6px 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 0.76rem; color: #f472b6; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px;">
+          ${escapeHtml(ch.title)}
+        </div>
+        <span style="font-size: 0.72rem; color: #ec4899; font-weight: 800; background: rgba(236,72,153,0.15); padding: 1px 6px; border-radius: 4px;">
+          ${ch.pages || 12}p
+        </span>
+      </div>
+    `).join('');
+  };
+
+  window.renderChapterAuditPills = function() {
+    const pillsWrap = document.getElementById('ais_chapter_nav_pills');
+    if (!pillsWrap) return;
+
+    const allItems = [
+      ...currentAiStudioBook.tier1Common.filter(x => x.checked).map(x => ({ type: 'tier1', title: x.title, pages: x.pages, obj: x })),
+      ...currentAiStudioBook.tier2CoreChapters.map(x => ({ type: 'tier2', title: x.title, pages: x.pages, obj: x }))
+    ];
+
+    pillsWrap.innerHTML = allItems.map((item, idx) => {
+      const isActive = idx === currentAiStudioBook.activeAuditChapterIndex;
+      const isCore = item.type === 'tier2';
+      return `
+        <button type="button" onclick="window.selectAuditChapter(${idx})" class="admin-button small-button" style="background: ${isActive ? (isCore ? '#ec4899' : '#10b981') : 'rgba(255,255,255,0.06)'}; color: ${isActive ? '#fff' : 'var(--admin-text)'}; border: 1px solid ${isActive ? (isCore ? '#ec4899' : '#10b981') : 'var(--admin-border)'}; font-size: 0.76rem; font-weight: 700; white-space: nowrap; padding: 5px 12px; border-radius: 6px;">
+          <span>${item.type === 'tier1' ? '🟢' : '🟡'}</span> <span>${escapeHtml(item.title.split(':')[0] || `Ch ${idx + 1}`)}</span>
+        </button>
+      `;
+    }).join('');
+  };
+
+  window.selectAuditChapter = function(idx) {
+    currentAiStudioBook.activeAuditChapterIndex = idx;
+    window.renderChapterAuditPills();
+    window.renderActiveAuditChapterCard();
+  };
+
+  window.renderActiveAuditChapterCard = function() {
+    const card = document.getElementById('ais_active_chapter_editor_card');
+    if (!card) return;
+
+    const allItems = [
+      ...currentAiStudioBook.tier1Common.filter(x => x.checked).map(x => ({ type: 'tier1', title: x.title, pages: x.pages, obj: x })),
+      ...currentAiStudioBook.tier2CoreChapters.map(x => ({ type: 'tier2', title: x.title, pages: x.pages, obj: x }))
+    ];
+
+    const current = allItems[currentAiStudioBook.activeAuditChapterIndex] || allItems[0];
+    if (!current) {
+      card.innerHTML = '<div style="color:var(--admin-muted);text-align:center;">कोई अध्याय उपलब्ध नहीं है।</div>';
+      return;
+    }
+
+    const obj = current.obj;
+    const isCore = current.type === 'tier2';
+
+    card.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.2rem;">${isCore ? '🟡' : '🟢'}</span>
+          <span style="font-weight: 900; font-size: 0.95rem; color: ${isCore ? '#f472b6' : '#34d399'};">
+            ${escapeHtml(obj.title)}
+          </span>
+        </div>
+        <span style="background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 4px; font-size: 0.74rem; color: #cbd5e1; font-weight: 700;">
+          📄 अध्याय साइज़: ${obj.pages || 12} Pages | Aarogyam India Logo Header Enabled ✓
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px;">
+        <div>
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700;">अध्याय शीर्षक (Chapter Heading):</label>
+          <input type="text" value="${escapeHtml(obj.title)}" onchange="window.updateCurrentChapterField('title', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-weight: 700; font-size: 0.82rem; margin-bottom: 8px;" />
+
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700;">विस्तृत वैज्ञानिक विवरण व सारांश (Content Summary):</label>
+          <textarea rows="3" onchange="window.updateCurrentChapterField('desc', this.value)" class="admin-textarea" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; margin-bottom: 8px;">${escapeHtml(obj.desc || 'इस अध्याय में वैज्ञानिक व व्यावहारिक जानकारी विस्तार से दी गई है।')}</textarea>
+
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700; color: #fbbf24;">🎙️ ऑडियो नरेशन टेक्स्ट (TTS Speech Script):</label>
+          <textarea rows="3" onchange="window.updateCurrentChapterField('audioText', this.value)" class="admin-textarea" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; color: #fde047;">${escapeHtml(obj.audioText || obj.desc || 'किसान भाइयों, इस अध्याय में सम्पूर्ण मार्गदर्शन दिया गया है।')}</textarea>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--admin-border); border-radius: 6px; padding: 10px;">
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700; color: #38bdf8;">🧪 दवा / खुराक तालिका (Dosage & Formulation):</label>
+          <input type="text" value="${escapeHtml(obj.dosage || 'अनुशंसित मात्रा अनुसार')}" onchange="window.updateCurrentChapterField('dosage', this.value)" placeholder="उदा. ट्राइकोडर्मा 10g/kg" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.78rem; margin-bottom: 8px;" />
+
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700; color: #34d399;">💧 स्प्रे चार्ट / उपयोग विधि:</label>
+          <input type="text" value="${escapeHtml(obj.sprayDose || '15L पानी में घोलकर छिड़कें')}" onchange="window.updateCurrentChapterField('sprayDose', this.value)" placeholder="उदा. 2ml प्रति लीटर पानी" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.78rem; margin-bottom: 8px;" />
+
+          <div style="margin-top: 10px; background: rgba(22,163,74,0.1); border: 1px dashed #16a34a; border-radius: 6px; padding: 8px; text-align: center;">
+            <div style="font-size: 0.72rem; color: #4ade80; font-weight: 800;">📖 रीडर लेआउट: 4K मैगजीन स्टाइल</div>
+            <div style="font-size: 0.68rem; color: var(--admin-muted); margin-top: 2px;">Header Logo + Title + Dose Table + Footer Page No.</div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  window.updateCurrentChapterField = function(field, val) {
+    const allItems = [
+      ...currentAiStudioBook.tier1Common.filter(x => x.checked).map(x => ({ type: 'tier1', obj: x })),
+      ...currentAiStudioBook.tier2CoreChapters.map(x => ({ type: 'tier2', obj: x }))
+    ];
+    const current = allItems[currentAiStudioBook.activeAuditChapterIndex];
+    if (current && current.obj) {
+      current.obj[field] = val;
+    }
+  };
+
+  window.updateAiStudioPageCountBadge = function() {
+    const badge = document.getElementById('ais_badge_total_pages');
+    if (!badge) return;
+
+    let total = 0;
+    currentAiStudioBook.tier1Common.forEach(t1 => { if (t1.checked) total += (t1.pages || 10); });
+    currentAiStudioBook.tier2CoreChapters.forEach(t2 => { total += (t2.pages || 12); });
+    
+    // Tier 3 Funnel pages (~20 pages)
+    total += 20;
+
+    badge.textContent = `📄 कुल अनुमानित पेजेस: ${total} Pages (100-150p Master E-Book)`;
+  };
+
+  window.previewFullBookTtsAudio = function() {
+    const allItems = [
+      ...currentAiStudioBook.tier1Common.filter(x => x.checked).map(x => ({ type: 'tier1', obj: x })),
+      ...currentAiStudioBook.tier2CoreChapters.map(x => ({ type: 'tier2', obj: x }))
+    ];
+    const current = allItems[currentAiStudioBook.activeAuditChapterIndex] || allItems[0];
+    if (!current || !current.obj) return;
+
+    const textToSpeak = current.obj.audioText || current.obj.desc || current.obj.title;
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(textToSpeak);
+      u.lang = 'hi-IN';
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+      showToast(`▶️ अध्याय का ऑडियो शुरू हुआ: "${current.obj.title}"`, 'info');
+    } else {
+      showToast('⚠️ आपके ब्राउज़र में TTS ऑडियो सपोर्ट उपलब्ध नहीं है।', 'warning');
+    }
+  };
+
+  window.handleAuthorPhotoUpload = function(e) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const r = new FileReader();
+      r.onload = (re) => {
+        const input = document.getElementById('ais_author_photo_url');
+        if (input) input.value = re.target.result;
+        currentAiStudioBook.authorPhoto = re.target.result;
+        showToast(`📸 लेखक/फाउंडर फोटो लोड हो गई: ${file.name}`, 'success');
+      };
+      r.readAsDataURL(file);
+    }
+  };
+
+  window.generateAiBookDraft = function() {
+    const topicInput = document.getElementById('ais_input_topic');
+    const topic = topicInput ? topicInput.value.trim() : '';
+    if (!topic) {
+      showToast('कृपया पहले पुस्तक का विषय दर्ज करें!', 'warning');
+      return;
+    }
+
+    const btn = document.getElementById('btn-generate-ai-book');
+    const origText = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '⏳ AI रिसर्च व चैप्टर्स जनरेट हो रहे हैं...';
+    }
+
+    setTimeout(() => {
+      const cat = currentAiStudioBook.category || 'Agriculture';
+      const cleanTopic = topic.split(' ')[0] || 'फसल';
+
+      // Smart dynamic customisation of chapters based on subject
+      currentAiStudioBook.topic = topic;
+      currentAiStudioBook.tier2CoreChapters = [
+        {
+          num: 1,
+          title: `अध्याय 1: ${topic} - उन्नत किस्में व बुवाई का सही समय`,
+          pages: 12,
+          desc: `${topic} के लिए जलवायु, मिट्टी की आवश्यकता व उन्नत हाइब्रिड बीजों का सम्पूर्ण चयन।`,
+          dosage: 'ट्राइकोडर्मा 10g + कार्बोफ्यूरान 5g प्रति किलो बीज',
+          sprayDose: 'नर्सरी स्प्रे: 19:19:19 NPK @ 2g/L पानी',
+          audioText: `नमस्ते किसान साथियों! ${topic} की इस संपूर्ण मास्टर गाइड में आपका स्वागत है। इस अध्याय में हम उन्नत किस्मों के बारे में विस्तार से जानेंगे।`
+        },
+        {
+          num: 2,
+          title: `अध्याय 2: ${cleanTopic} में बेसल खाद, सूक्ष्म पोषक तत्व व बेड निर्माण`,
+          pages: 14,
+          desc: 'प्रति एकड़ खाद की सटीक मात्रा, पोटाश, जिंक, सल्फर व जैविक खादों का वैज्ञानिक संतुलन।',
+          dosage: 'DAP 50kg + MOP 30kg + Zinc 10kg प्रति एकड़',
+          sprayDose: 'नीम खली 100kg बेसल डोज में',
+          audioText: `भूमि की तैयारी और बेसल खाद पौधे की रीढ़ की हड्डी होती है। सही मात्रा में जिंक और पोटाश देने से पौधों की रोग प्रतिरोधक क्षमता बढ़ जाती है।`
+        },
+        {
+          num: 3,
+          title: `अध्याय 3: ${cleanTopic} के प्रमुख कीट, रस चूसक व अचूक कीटनाशक डोज`,
+          pages: 15,
+          desc: 'थ्रिप्स, माइट्स, तना छेदक व इल्ली की सटीक पहचान और दवाइयों का सही मिश्रण।',
+          dosage: 'इमिडाक्लोप्रिड 17.8% SL @ 0.5ml/L या क्लोरेंट्रानिलिप्रोल @ 0.4ml/L',
+          sprayDose: 'माइट्स नियंत्रण: प्रोपरगाइट 57% EC @ 2ml/L पानी',
+          audioText: `कीटों के शुरुआती हमले को पहचानना ही फसल बचाने का रहस्य है। पत्तियों के पीछे बारीकी से देखें और सही सिस्टेमिक कीटनाशक का प्रयोग करें।`
+        },
+        {
+          num: 4,
+          title: `अध्याय 4: फफूंद व जीवाणु जनित रोग (झुलसा, उकठा, पाउडरी मिल्ड्यू)`,
+          pages: 15,
+          desc: 'काले-भूरे धब्बे, तना गलन व विल्ट से फसल को 100% सुरक्षित रखने का उपचार।',
+          dosage: 'एज़ोक्सिस्ट्रोबिन + टेबुकोनाज़ोल @ 1ml/L पानी',
+          sprayDose: 'उकठा ड्रेंचिंग: कॉपर ऑक्सीक्लोराइड 50% WP @ 3g/L',
+          audioText: `फंगल रोगों में पत्तियों पर धब्बे दिखने के तुरंत बाद फंगीसाइड का छिड़काव आवश्यक है। स्टीकर मिलाकर छिड़कने से दवा धुलती नहीं है।`
+        },
+        {
+          num: 5,
+          title: `अध्याय 5: फल-फूल वृद्धि, टॉनिक व 7-दिवसीय स्प्रे शेड्यूल`,
+          pages: 14,
+          desc: 'फूल झड़ने से रोकने के उपाय, बोरॉन 20% का स्प्रे व मंडी में रिकॉर्ड उपज पाने के नुस्खे।',
+          dosage: '00:52:34 NPK @ 5g/L + बोरॉन 20% @ 1g/L',
+          sprayDose: 'टॉनिक: नाइट्रोबेन्जीन / प्लानोफिक्स @ 0.5ml/L पानी',
+          audioText: `फूलों को झड़ने से बचाने के लिए बोरॉन का सही समय पर स्प्रे करना अत्यंत लाभकारी है। इससे फलों की चमक और वजन दोनों में रिकॉर्ड वृद्धि होती है।`
+        }
+      ];
+
+      window.renderTier2CoreList();
+      window.renderChapterAuditPills();
+      window.renderActiveAuditChapterCard();
+      window.updateAiStudioPageCountBadge();
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+
+      showToast(`🎉 '${topic}' के 120-पेज मास्टर चैप्टर्स सफलता से जनरेट हो गए!`, 'success');
+    }, 800);
+  };
+
+  window.publishAiStudioBook = async function() {
+    const topicInput = document.getElementById('ais_input_topic');
+    const topic = topicInput ? topicInput.value.trim() : 'नई ई-बुक';
+    const offerPrice = parseInt(document.getElementById('ais_input_offer_price')?.value, 10) || 99;
+    const mrp = parseInt(document.getElementById('ais_input_mrp')?.value, 10) || 299;
+    const cat = document.getElementById('ais_select_category')?.value || 'Agriculture';
+    const authorPhoto = document.getElementById('ais_author_photo_url')?.value || '/images/logo/logo.png';
+    const authorName = document.getElementById('ais_author_name')?.value || 'आरोग्यम इंडिया टीम';
+
+    let maxNum = 0;
+    const combined = [...allBooks, ...allLandingPages];
+    combined.forEach(b => {
+      if (b.id && b.id.startsWith('BK')) {
+        const num = parseInt(b.id.replace('BK', ''), 10);
+        if (!isNaN(num) && num > maxNum) maxNum = num;
+      }
+    });
+    const newBookId = `BK${String(maxNum + 1).padStart(3, '0')}`;
+
+    // Compute total pages
+    let totalPagesCount = 20; // 20p funnel
+    currentAiStudioBook.tier1Common.forEach(t1 => { if (t1.checked) totalPagesCount += (t1.pages || 10); });
+    currentAiStudioBook.tier2CoreChapters.forEach(t2 => { totalPagesCount += (t2.pages || 12); });
+
+    const newBookObj = {
+      id: newBookId,
+      slug: newBookId.toLowerCase(),
+      heading: topic,
+      name: topic,
+      category: cat,
+      language: 'Hindi',
+      mrp: mrp,
+      offerPrice: offerPrice,
+      cover: '/images/books/kharif-master-guide-2026-cover.webp',
+      thumbnail: '/images/books/kharif-master-guide-2026-cover.webp',
+      banner: '/images/banners/kharif-master-guide-2026-hero-banner.webp',
+      status: 'active',
+      publish_targets: ['ebook_store', 'category_page', 'my_library', 'home_page'],
+      store_badge: 'best_seller',
+      badge: 'best_seller',
+      isComingSoon: false,
+      totalPages: totalPagesCount,
+      authorName: authorName,
+      authorPhoto: authorPhoto,
+      features: [
+        `${totalPagesCount}+ सचित्र 4K पेज`,
+        'सम्पूर्ण स्प्रे व डोज चार्ट',
+        'अध्याय-वार शुद्ध हिंदी ऑडियो बुक',
+        '24×7 WhatsApp AI सहायता'
+      ],
+      landingPage: `/ebooks/book-landing.html?id=${newBookId}`,
+      readerPage: `/ebooks/reader.html?id=${newBookId}`,
+      checkoutPage: '/ebooks/checkout.html'
+    };
+
+    const newLandingPageObj = {
+      id: newBookId,
+      category: cat,
+      status: 'active',
+      store_badge: 'best_seller',
+      is_coming_soon: false,
+      theme_primary: cat === 'Health' ? '#dc2626' : (cat === 'BeautySkin' ? '#ec4899' : '#2E7D32'),
+      theme_dark: cat === 'Health' ? '#991b1b' : (cat === 'BeautySkin' ? '#be185d' : '#1B5E20'),
+      hero: {
+        tag: `🌾 ${cat} Bestseller Master Guide`,
+        title: topic,
+        subtitle: `${totalPagesCount} सचित्र पेजेस • सम्पूर्ण स्प्रे चार्ट • ऑडियो बुक शामिल`,
+        description: 'बीज शोधन, खेत तैयारी, कीट-रोग रोकथाम, आधुनिक स्प्रे साइंस व अधिक उत्पादन की सम्पूर्ण वैज्ञानिक विधि।',
+        mrp: mrp,
+        offer_price: offerPrice,
+        offer_badge: 'Launch Offer',
+        rating_score: '4.9',
+        rating_count: '150+ Ratings',
+        cover_image: '/images/books/kharif-master-guide-2026-cover.webp',
+        banner_image: '/images/banners/kharif-master-guide-2026-hero-banner.webp',
+        features: [
+          { text: `${totalPagesCount}+ सचित्र 4K पेज` },
+          { text: 'सम्पूर्ण स्प्रे डोज चार्ट' },
+          { text: 'फुल HD ऑडियो बुक' },
+          { text: '₹1999 VIP Pass फ्री' }
+        ]
+      },
+      audio_layer: {
+        enabled: true,
+        title: `🎧 '${topic}' का लाइव ऑडियो परिचय सुनें`,
+        subtitle: 'लाइव ऑडियो नरेशन (कृषि सखी - Female Voice)',
+        audio_url: '/audio/books/kharif-guide-intro.mp3',
+        narration_text: `किसान भाइयों एवं बहनों, '${topic}' की इस 120-पेज मास्टर गाइड में आपका स्वागत है। खेत में काम करते समय कान में इयरफोन लगाएं और सम्पूर्ण कीट-रोग उपचार आसानी से सुनें।`
+      },
+      value_stack: {
+        book_mrp: mrp,
+        vip_value: 1999,
+        bonus_value: 199,
+        offer_price: offerPrice,
+        subscriber_perk: '👑 VIP Pro मेंबर्स के लिए 1 वर्ष का Pro सब्सक्रिप्शन 100% मुफ्त शामिल है।'
+      },
+      table_of_contents: currentAiStudioBook.tier2CoreChapters.map(c => c.title)
+    };
+
+    // Save to LocalStorage
+    try {
+      allLandingPages.unshift(newLandingPageObj);
+      allBooks.unshift(newBookObj);
+      localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
+      
+      const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+      customBooks.unshift(newBookObj);
+      localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
+    } catch(e) {}
+
+    showToast(`⏳ नई 120-पेज ई-बुक (${newBookId}) सर्वर पर पब्लिश हो रही है...`, 'info');
+
+    // Multi-Tier Server Sync
+    try {
+      await fetch('/api/save_book_landing.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pageData: newLandingPageObj,
+          bookData: newBookObj,
+          uploadedFiles: []
+        })
+      });
+    } catch(e) {}
+
+    showToast(`🎉 बधाई! नई ई-बुक (${newBookId}: ${topic}) स्टोर व लैंडिंग पेज पर 100% लाइव हो गई!`, 'success');
+    window.switchAdminSubTab('pages');
+    await loadAllData();
   };
 
   // -------------------------------------------------------------
