@@ -56,21 +56,22 @@ export async function initBookLandingPages() {
     { key: 'sec_hero', name: '📖 1. Hero 3D Book & Main Pitch', desc: '3D कवर, शीर्षक, रेटिंग, मूल्य एवं एक्शन बटन' },
     { key: 'sec_timer', name: '⏳ 2. Offer Countdown Timer', desc: 'सीमित समय ऑफर काउंटडाउन बार' },
     { key: 'sec_kpis', name: '⚡ 3. Feature Highlights / KPI Badges', desc: '120 पेज, 300+ फोटो, स्प्रे साइंस बैजेस' },
-    { key: 'sec_trust', name: '🛡️ 4. Trust & Security Bar', desc: 'Instant Download, 100% Satisfaction' },
-    { key: 'sec_why_buy', name: '🌱 5. "यह पुस्तक क्यों खरीदें?"', desc: '4+ वैज्ञानिक व प्रैक्टिकल कारण कार्ड्स' },
-    { key: 'sec_vip_stack', name: '👑 6. VIP Subscriber Benefit & Value Stack', desc: '₹1999 VIP Pro Free + ₹99 Book' },
-    { key: 'sec_video', name: '🎥 7. YouTube Video Demo Section', desc: '16:9 Landscape व 9:16 Shorts/Reels' },
-    { key: 'sec_preview', name: '🔍 8. Book Inside Preview & Pinch Zoom', desc: 'डेमो पेजेस गैलरी विथ पिंच-ज़ूम' },
-    { key: 'sec_suggested', name: '🛒 9. Suggested / Related Books', desc: 'साथ में ये पुस्तकें भी खरीदें + 1-Click Cart' },
-    { key: 'sec_bonuses', name: '🎁 10. बंडल में शामिल अतिरिक्त मुफ्त पुस्तकें', desc: '100% Free Bonus Books + Key Feature KPIs' },
-    { key: 'sec_ai_support', name: '🤖 11. 24×7 WhatsApp AI कृषि डॉक्टर सहायता', desc: 'WhatsApp AI हेल्प व त्वरित समाधान' },
-    { key: 'sec_specs_toc', name: '📑 12. Book Specifications & TOC Points', desc: 'पुस्तक विवरण तालिका व अध्याय पॉइंट्स' },
-    { key: 'sec_reviews', name: '⭐ 13. Customer Reviews & Ratings', desc: 'पाठकों की राय व 👨/👩 अवतार' },
-    { key: 'sec_faqs', name: '❓ 14. FAQs Accordion', desc: 'अक्सर पूछे जाने वाले सवाल' },
-    { key: 'sec_final_buy', name: '🚀 15. Final CTA Buy Box & Benefits', desc: 'अंतिम आर्डर बॉक्स व लाभ सूची' },
-    { key: 'sec_help', name: '💬 16. Help & WhatsApp Support', desc: 'हेल्पलाइन लिंक व सहायता बॉक्स' },
-    { key: 'sec_pdf_main', name: '📄 17. Book PDF / DOC Upload & File Management', desc: 'Paid book PDF/DOC upload and management' },
-    { key: 'sec_pdf_free', name: '📄 18. Free Book PDF / DOC Upload & File Management', desc: 'Free book PDF/DOC upload and management' }
+    { key: 'sec_audio', name: '🎧 4. Audio Book Experience & Narration Layer', desc: 'लाइव ऑडियो प्लेयर, वॉइस स्विच (MP3/AI TTS), साउंड वेव एवं बैनर' },
+    { key: 'sec_trust', name: '🛡️ 5. Trust & Security Bar', desc: 'Instant Download, 100% Satisfaction' },
+    { key: 'sec_why_buy', name: '🌱 6. "यह पुस्तक क्यों खरीदें?"', desc: '4+ वैज्ञानिक व प्रैक्टिकल कारण कार्ड्स' },
+    { key: 'sec_vip_stack', name: '👑 7. VIP Subscriber Benefit & Value Stack', desc: '₹1999 VIP Pro Free + ₹99 Book' },
+    { key: 'sec_video', name: '🎥 8. YouTube Video Demo Section', desc: '16:9 Landscape व 9:16 Shorts/Reels' },
+    { key: 'sec_preview', name: '🔍 9. Book Inside Preview & Pinch Zoom', desc: 'डेमो पेजेस गैलरी विथ पिंच-ज़ूम' },
+    { key: 'sec_suggested', name: '🛒 10. Suggested / Related Books', desc: 'साथ में ये पुस्तकें भी खरीदें + 1-Click Cart' },
+    { key: 'sec_bonuses', name: '🎁 11. बंडल में शामिल अतिरिक्त मुफ्त पुस्तकें', desc: '100% Free Bonus Books + Key Feature KPIs' },
+    { key: 'sec_ai_support', name: '🤖 12. 24×7 WhatsApp AI कृषि डॉक्टर सहायता', desc: 'WhatsApp AI हेल्प व त्वरित समाधान' },
+    { key: 'sec_specs_toc', name: '📑 13. Book Specifications & TOC Points', desc: 'पुस्तक विवरण तालिका व अध्याय पॉइंट्स' },
+    { key: 'sec_reviews', name: '⭐ 14. Customer Reviews & Ratings', desc: 'पाठकों की राय व 👨/👩 अवतार' },
+    { key: 'sec_faqs', name: '❓ 15. FAQs Accordion', desc: 'अक्सर पूछे जाने वाले सवाल' },
+    { key: 'sec_final_buy', name: '🚀 16. Final CTA Buy Box & Benefits', desc: 'अंतिम आर्डर बॉक्स व लाभ सूची' },
+    { key: 'sec_help', name: '💬 17. Help & WhatsApp Support', desc: 'हेल्पलाइन लिंक व सहायता बॉक्स' },
+    { key: 'sec_pdf_main', name: '📄 18. Book PDF / DOC Upload & File Management', desc: 'Paid book PDF/DOC upload and management' },
+    { key: 'sec_pdf_free', name: '📄 19. Free Book PDF / DOC Upload & File Management', desc: 'Free book PDF/DOC upload and management' }
   ];
 
   content.innerHTML = `
@@ -350,6 +351,82 @@ export async function initBookLandingPages() {
 
           <div id="blp_kpi_badges_list_wrap" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
             <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- SECTION 4B: AUDIO BOOK EXPERIENCE & NARRATION LAYER (WITH SECTION BANNER & DUAL MP3/AI TTS MODES) -->
+        <div id="sec_box_audio_layer" style="background: radial-gradient(circle at 50% 30%, rgba(69,10,10,0.2) 0%, rgba(42,4,4,0.3) 100%); border: 2px solid #f59e0b; border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(245,158,11,0.15);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.3rem;">🎧</span>
+              <div>
+                <div style="font-weight: 800; color: #fbbf24; font-size: 0.95rem;">
+                  ऑडियो बुक अनुभव व लाइव नरेशन लेयर (Audio Book Experience Layer)
+                </div>
+                <small style="color: var(--admin-muted);">लाइव ऑडियो परिचय, स्टूडियो MP3 / AI TTS वॉइस नरेशन व साउंड वेव</small>
+              </div>
+            </div>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--admin-text); background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px; border: 1px solid #f59e0b;">
+              <input type="checkbox" id="blp_audio_enabled" checked style="accent-color: #f59e0b; width: 16px; height: 16px;" />
+              <span>ऑडियो प्लेयर चालू रखें</span>
+            </label>
+          </div>
+
+          <!-- Optional Section Banner for Audio -->
+          ${renderSectionBannerUploaderBlock('sec_audio', '🎧 ऑडियो अनुभव सेक्शन बैनर (वैकल्पिक - अपलोड करने पर दिखेगा)')}
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">ऑडियो कार्ड शीर्षक (Title):</label>
+              <input type="text" id="blp_audio_title" class="admin-input" placeholder="उदा. पुस्तक का लाइव ऑडियो परिचय सुनें" value="पुस्तक का लाइव ऑडियो परिचय सुनें" style="width: 100%; padding: 6px 10px; font-weight: 700;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">सब-शीर्षक / वॉइस टैग (Subtitle):</label>
+              <input type="text" id="blp_audio_subtitle" class="admin-input" placeholder="उदा. लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)" value="लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)" style="width: 100%; padding: 6px 10px;" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; margin-top: 10px; align-items: start;">
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #fbbf24;">ऑडियो मोड (Audio Mode):</label>
+              <select id="blp_audio_mode" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;" onchange="window.toggleAudioModeFields(this.value)">
+                <option value="mp3">🎙️ Mode 1: स्टूडियो रिकॉर्डेड MP3 ऑडियो (Instant Zero-Delay)</option>
+                <option value="tts">🤖 Mode 2: AI हिंदी वॉइस नरेशन (TTS Text-to-Speech)</option>
+              </select>
+
+              <div style="margin-top: 10px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; color: #fde047;">
+                  <input type="checkbox" id="blp_audio_bgm_enabled" checked style="accent-color: #f59e0b; width: 16px; height: 16px;" />
+                  <span>🎧 बैकग्राउंड एम्बिएंस म्यूजिक (BGM) चालू रखें</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Mode 1: MP3 Controls -->
+            <div id="blp_audio_mp3_controls_wrap" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 10px;">
+              <label class="admin-label" style="font-size: 0.76rem; color: #fbbf24; font-weight: 700;">MP3 ऑडियो फ़ाइल / URL:</label>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <select id="blp_select_git_audio_mp3" onchange="if(this.value){document.getElementById('blp_audio_mp3_url').value=this.value;}" class="admin-select" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;">
+                  <option value="">-- GitHub से ऑडियो चुनें --</option>
+                  <option value="/audio/books/kheti-dr-intro.mp3">🎙️ kheti-dr-intro.mp3 (खेती का डॉक्टर)</option>
+                  <option value="/audio/books/kharif-guide-intro.mp3">🎙️ kharif-guide-intro.mp3 (खरीफ फसल गाइड)</option>
+                </select>
+                <div style="display: flex; gap: 6px;">
+                  <input type="text" id="blp_audio_mp3_url" placeholder="/audio/books/example.mp3 या CDN URL" class="admin-input" style="flex: 1; padding: 5px 8px; font-size: 0.78rem; font-family: monospace;" />
+                  <label class="admin-button small-button" style="background: #f59e0b; color: #000; font-weight: 800; cursor: pointer; margin: 0; padding: 4px 8px; font-size: 0.75rem; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                    📁 अपलोड
+                    <input type="file" accept="audio/*" onchange="window.uploadAudioFile(event)" style="display: none;" />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mode 2: TTS Textarea -->
+          <div id="blp_audio_tts_controls_wrap" style="margin-top: 10px; display: none;">
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #fbbf24;">हिंदी नरेशन स्क्रिप्ट (AI Text-to-Speech Hindi Script):</label>
+            <textarea id="blp_audio_tts_text" class="admin-textarea" rows="4" placeholder="क्या आप फसल में लगने वाले अज्ञात रोगों, कीटों के हमलों और खाद पर होने वाले खर्चों से परेशान हैं?..." style="width: 100%; padding: 8px 10px; font-size: 0.84rem; line-height: 1.5;"></textarea>
+            <small style="color: var(--admin-muted); font-size: 0.72rem;">💡 टिप्स: धाराप्रवाह हिंदी वॉइस के लिए अल्पविराम (,) की जगह पूर्णविराम (।) या पैराग्राफ का उपयोग करें।</small>
           </div>
         </div>
 
@@ -867,14 +944,25 @@ export async function initBookLandingPages() {
                 <textarea id="blp_og_description" oninput="window.updateSocialSharePreview()" class="admin-textarea" rows="2" placeholder="सम्पूर्ण Practical Guide। अभी 67% विशेष छूट पर उपलब्ध।" style="width: 100%; padding: 8px 12px; font-size: 0.85rem;"></textarea>
               </div>
               <div>
-                <label class="admin-label" style="font-weight: 700;">OG Image (शेयर थंबनेल URL):</label>
+                <label class="admin-label" style="font-weight: 700; color: #22c55e;">🖼️ 16:9 Landscape Social Share / OG Image (1200×630px): *</label>
+                <div style="margin-bottom: 6px;">
+                  <select id="blp_select_git_og_image" onchange="if(this.value){document.getElementById('blp_og_image').value=this.value;window.updateSocialSharePreview();}" class="admin-select" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;">
+                    <option value="">-- GitHub से 16:9 OG इमेज चुनें --</option>
+                    <option value="/images/books/kgarid-fasal-og.webp">🌾 खरीफ फसल 16:9 OG बैनर (kgarid-fasal-og.webp)</option>
+                    <option value="/images/books/kheti-dr-og.webp">🌿 खेती का डॉक्टर 16:9 OG बैनर (kheti-dr-og.webp)</option>
+                    <option value="/images/banners/agriculture-hero-banner-1.webp">🌾 कृषि बैनर 1 (agriculture-hero-banner-1.webp)</option>
+                    <option value="/images/banners/farmer-community-banner.jpeg">👨‍🌾 फार्मर कम्युनिटी बैनर (1200x630)</option>
+                    <option value="/images/banners/digital-training-banner.jpeg">💻 डिजिटल ट्रेनिंग बैनर (Zoom)</option>
+                  </select>
+                </div>
                 <div style="display: flex; gap: 8px;">
-                  <input type="text" id="blp_og_image" oninput="window.updateSocialSharePreview()" class="admin-input" placeholder="/images/books/cover.webp" style="flex: 1; padding: 8px 12px;" />
+                  <input type="text" id="blp_og_image" oninput="window.updateSocialSharePreview()" class="admin-input" placeholder="/images/books/your-book-og.webp" style="flex: 1; padding: 8px 12px; font-size: 0.82rem;" />
                   <label class="admin-button small-button" style="background:#22c55e;color:#000;font-weight:700;cursor:pointer;white-space:nowrap;margin:0;display:flex;align-items:center;">
                     📁 अपलोड
                     <input type="file" accept="image/*" onchange="window.uploadOgImage(event)" style="display:none;" />
                   </label>
                 </div>
+                <small style="color: var(--admin-muted); font-size: 0.72rem;">💡 Facebook और WhatsApp पर कभी भी इमेज नहीं कटेगी यदि आप 16:9 लैंडस्केप इमेज (1200×630 px) चुनते हैं।</small>
               </div>
               <div>
                 <label class="admin-label" style="font-weight: 700; color: #22c55e;">📲 WhatsApp / सोशल शेयर कस्टम संदेश (Custom Promo Text):</label>
@@ -1351,6 +1439,33 @@ export async function initBookLandingPages() {
     if (input) input.value = '';
     if (wrap) wrap.style.display = 'none';
     showToast('🗑️ सेक्शन बैनर हटा दिया गया', 'info');
+  };
+
+  // Audio Experience Layer Helpers
+  window.toggleAudioModeFields = function(mode) {
+    const mp3Wrap = document.getElementById('blp_audio_mp3_controls_wrap');
+    const ttsWrap = document.getElementById('blp_audio_tts_controls_wrap');
+    if (mode === 'tts') {
+      if (mp3Wrap) mp3Wrap.style.display = 'none';
+      if (ttsWrap) ttsWrap.style.display = 'block';
+    } else {
+      if (mp3Wrap) mp3Wrap.style.display = 'block';
+      if (ttsWrap) ttsWrap.style.display = 'none';
+    }
+  };
+
+  window.uploadAudioFile = function(event) {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (re) => {
+        const dataUrl = re.target.result;
+        const input = document.getElementById('blp_audio_mp3_url');
+        if (input) input.value = dataUrl;
+        showToast(`🎙️ ${file.name} ऑडियो लोड हो गया!`, 'info');
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // PDF / DOC Uploader Functions
@@ -3746,6 +3861,16 @@ export async function initBookLandingPages() {
     window.updatePdfStatusPreview('main', '');
     window.updatePdfStatusPreview('free', '');
 
+    // Reset Audio Experience Layer
+    if (document.getElementById('blp_audio_enabled')) document.getElementById('blp_audio_enabled').checked = true;
+    if (document.getElementById('blp_audio_title')) document.getElementById('blp_audio_title').value = 'पुस्तक का लाइव ऑडियो परिचय सुनें';
+    if (document.getElementById('blp_audio_subtitle')) document.getElementById('blp_audio_subtitle').value = 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
+    if (document.getElementById('blp_audio_mode')) document.getElementById('blp_audio_mode').value = 'mp3';
+    if (document.getElementById('blp_audio_mp3_url')) document.getElementById('blp_audio_mp3_url').value = '';
+    if (document.getElementById('blp_audio_tts_text')) document.getElementById('blp_audio_tts_text').value = '';
+    if (document.getElementById('blp_audio_bgm_enabled')) document.getElementById('blp_audio_bgm_enabled').checked = true;
+    if (window.toggleAudioModeFields) window.toggleAudioModeFields('mp3');
+
     // Clear all section banner previews
     defaultSectionsList.forEach(s => {
       const input = document.getElementById(`blp_sec_banner_${s.key}`);
@@ -3829,8 +3954,20 @@ export async function initBookLandingPages() {
     // OG Tags
     if (document.getElementById('blp_og_title')) document.getElementById('blp_og_title').value = page.og_title || hero.title || '';
     if (document.getElementById('blp_og_description')) document.getElementById('blp_og_description').value = page.og_description || hero.description || '';
-    if (document.getElementById('blp_og_image')) document.getElementById('blp_og_image').value = page.og_image || hero.cover_image || '';
+    if (document.getElementById('blp_og_image')) document.getElementById('blp_og_image').value = page.og_image || page.og_image_landscape || hero.banner_image || hero.cover_image || '';
     window.updateSocialSharePreview();
+
+    // Audio Book Experience Layer
+    const audioLayer = page.audio_layer || page.audio || {};
+    if (document.getElementById('blp_audio_enabled')) document.getElementById('blp_audio_enabled').checked = audioLayer.enabled !== false;
+    if (document.getElementById('blp_audio_title')) document.getElementById('blp_audio_title').value = audioLayer.title || 'पुस्तक का लाइव ऑडियो परिचय सुनें';
+    if (document.getElementById('blp_audio_subtitle')) document.getElementById('blp_audio_subtitle').value = audioLayer.subtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
+    const audioMode = audioLayer.mode || (audioLayer.mp3_url ? 'mp3' : (audioLayer.tts_text ? 'tts' : 'mp3'));
+    if (document.getElementById('blp_audio_mode')) document.getElementById('blp_audio_mode').value = audioMode;
+    if (document.getElementById('blp_audio_mp3_url')) document.getElementById('blp_audio_mp3_url').value = audioLayer.mp3_url || '';
+    if (document.getElementById('blp_audio_tts_text')) document.getElementById('blp_audio_tts_text').value = audioLayer.tts_text || '';
+    if (document.getElementById('blp_audio_bgm_enabled')) document.getElementById('blp_audio_bgm_enabled').checked = audioLayer.bgm_enabled !== false;
+    if (window.toggleAudioModeFields) window.toggleAudioModeFields(audioMode);
 
     // Publishing Targets & Badges
     const targets = page.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page'];
@@ -4269,6 +4406,21 @@ export async function initBookLandingPages() {
       finalOgImg = finalCoverPath;
     }
 
+    // 8. Audio Book File / URL / Text
+    let finalAudioMp3Path = (document.getElementById('blp_audio_mp3_url')?.value || '').trim();
+    const isAudioOn = document.getElementById('blp_audio_enabled')?.checked ?? true;
+    const audioMode = document.getElementById('blp_audio_mode')?.value || 'mp3';
+    const audioTitle = (document.getElementById('blp_audio_title')?.value || '').trim();
+    const audioSubtitle = (document.getElementById('blp_audio_subtitle')?.value || '').trim();
+    const audioTtsText = (document.getElementById('blp_audio_tts_text')?.value || '').trim();
+    const isAudioBgmOn = document.getElementById('blp_audio_bgm_enabled')?.checked ?? true;
+
+    if (finalAudioMp3Path.startsWith('data:audio/')) {
+      const audioPath = `audio/books/${bId.toLowerCase()}-intro.mp3`;
+      uploadedFiles.push({ path: audioPath, base64: finalAudioMp3Path });
+      finalAudioMp3Path = `/${audioPath}`;
+    }
+
     const pageData = {
       id: bId,
       slug: bId.toLowerCase(),
@@ -4288,6 +4440,17 @@ export async function initBookLandingPages() {
       og_title: ogTitle,
       og_description: ogDesc,
       og_image: finalOgImg,
+      og_image_landscape: finalOgImg,
+      audio_layer: {
+        enabled: isAudioOn,
+        title: audioTitle || 'पुस्तक का लाइव ऑडियो परिचय सुनें',
+        subtitle: audioSubtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)',
+        mode: audioMode,
+        mp3_url: finalAudioMp3Path,
+        tts_text: audioTtsText,
+        bgm_enabled: isAudioBgmOn,
+        banner_image: cleanSectionBanners.sec_audio || undefined
+      },
       mainPdf: finalMainPdfPath,
       main_pdf: finalMainPdfPath,
       freePdf: finalFreePdfPath,
@@ -4374,6 +4537,9 @@ export async function initBookLandingPages() {
       pdf_url: finalMainPdfPath,
       freePdf: finalFreePdfPath,
       demoPdf: finalFreePdfPath,
+      og_image: finalOgImg,
+      og_image_landscape: finalOgImg,
+      audio_layer: pageData.audio_layer,
       features: currentKpis.map(k => (typeof k === 'object' ? k.text : k)).filter(Boolean),
       totalPages: 120,
       landingPage: `/ebooks/book-landing.html?id=${bId}`,

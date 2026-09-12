@@ -293,6 +293,7 @@
       'sec_hero',
       'sec_timer',
       'sec_kpis',
+      'sec_audio',
       'sec_trust',
       'sec_why_buy',
       'sec_vip_stack',
@@ -320,11 +321,20 @@
         finalOrder.push('sec_ai_support');
       }
     }
+    if (!finalOrder.includes('sec_audio')) {
+      const kpisIdx = finalOrder.indexOf('sec_kpis');
+      if (kpisIdx >= 0) {
+        finalOrder.splice(kpisIdx + 1, 0, 'sec_audio');
+      } else {
+        finalOrder.push('sec_audio');
+      }
+    }
 
     const sectionIdMap = {
       'sec_hero': 'sec-hero',
       'sec_timer': 'sec-offer-timer',
       'sec_kpis': 'sec-kpis-highlights',
+      'sec_audio': 'sec-audio-experience',
       'sec_trust': 'sec-trust-bar',
       'sec_why_buy': 'sec-why-book',
       'sec_vip_stack': 'sec-vip-stack',
@@ -415,6 +425,7 @@
     renderSectionBanner('sec-hero', sb.sec_hero);
     renderSectionBanner('sec-offer-timer', sb.sec_timer || l.timer?.banner_image);
     renderSectionBanner('sec-kpis-highlights', sb.sec_kpis || l.kpis_banner);
+    renderSectionBanner('sec-audio-experience', sb.sec_audio || l.audio_layer?.banner_image);
     renderSectionBanner('sec-trust-bar', sb.sec_trust || l.trust_banner);
     renderSectionBanner('sec-why-book', sb.sec_why_buy || l.why_read?.banner_image);
     renderSectionBanner('sec-vip-stack', sb.sec_vip_stack || l.value_stack?.vip_banner);
@@ -427,6 +438,9 @@
     renderSectionBanner('sec-faq-section', sb.sec_faqs || l.faqs_banner);
     renderSectionBanner('sec-final-buy', sb.sec_final_buy || l.final_buy_banner);
     renderSectionBanner('sec-help-support', sb.sec_help || l.help_banner);
+
+    // Audio Book Experience Section
+    renderAudioExperienceSection(b, l);
 
     // Hero Features / Badges inside hero
     const featWrap = document.getElementById('hero-features-wrap');
@@ -1623,6 +1637,244 @@
   }
 
   // Check login state on load
+  // ==========================================================
+  // UNIVERSAL AUDIO EXPERIENCE LAYER ENGINE
+  // ==========================================================
+  let ublAudioPlaying = false;
+  let ublAudioNative = new Audio();
+  let ublTtsAudio = new Audio();
+  let ublBgMusic = new Audio('../audio/bgm/peaceful-ambient.mp3');
+  ublBgMusic.loop = true;
+  ublBgMusic.volume = 0.12;
+
+  let ublLandingChunks = [];
+  let ublLandingChunkIdx = 0;
+
+  function prepareUblAudioChunks(text) {
+    if (!text) return [];
+    const rawSegs = text.replace(/[\u3002]/g, ' । ').split(/[\r\n।\.?!]+/);
+    const chunks = [];
+    for (const seg of rawSegs) {
+      const cl = seg.replace(/[,，:;\-—_]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!cl) continue;
+      chunks.push(cl);
+    }
+    return chunks;
+  }
+
+  window.openInSystemChrome = function() {
+    try {
+      const currentUrl = window.location.href;
+      const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+      const intentUrl = `intent://${cleanUrl}#Intent;scheme=https;package=com.android.chrome;end;`;
+      window.location.href = intentUrl;
+    } catch(e) {
+      window.open(window.location.href, '_system');
+    }
+  };
+
+  window.toggleUblLandingAudio = function() {
+    if (ublAudioPlaying) {
+      window.stopUblLandingAudio();
+    } else {
+      window.startUblLandingAudio();
+    }
+  };
+
+  window.stopUblLandingAudio = function() {
+    ublAudioPlaying = false;
+    ublLandingChunks = [];
+    ublLandingChunkIdx = 0;
+    if (ublAudioNative) {
+      ublAudioNative.pause();
+      ublAudioNative.currentTime = 0;
+    }
+    if (ublTtsAudio) {
+      ublTtsAudio.pause();
+      ublTtsAudio.currentTime = 0;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    try { ublBgMusic.pause(); ublBgMusic.currentTime = 0; } catch(e){}
+
+    const stopBtn = document.getElementById('ublLandingAudioStopBtn');
+    const icon = document.getElementById('ublLandingAudioIcon');
+    const label = document.getElementById('ublLandingAudioLabel');
+    const status = document.getElementById('ublLandingAudioStatusText');
+    const wave = document.getElementById('ublLandingWaveContainer');
+    const floatPill = document.getElementById('aoi-floating-audio-pill');
+
+    if (icon) icon.textContent = '▶️';
+    if (label) label.textContent = 'ऑडियो सुनें (Play Preview)';
+    if (stopBtn) stopBtn.style.display = 'none';
+    if (status) status.textContent = 'ऑडियो बंद है • सुनने के लिए Play दबाएं';
+    if (wave) wave.classList.remove('playing');
+    if (floatPill) floatPill.style.display = 'none';
+  };
+
+  window.startUblLandingAudio = function() {
+    if (ublAudioPlaying) return;
+    window.stopUblLandingAudio();
+    ublAudioPlaying = true;
+
+    const l = currentLandingData || {};
+    const b = currentBookData || {};
+    const audioLayer = l.audio_layer || b.audio_layer || {};
+    const mode = audioLayer.mode || (audioLayer.mp3_url ? 'mp3' : (audioLayer.tts_text ? 'tts' : 'mp3'));
+    const mp3Url = audioLayer.mp3_url;
+    const ttsText = audioLayer.tts_text || (l.hero?.description || b.description || '');
+
+    const stopBtn = document.getElementById('ublLandingAudioStopBtn');
+    const icon = document.getElementById('ublLandingAudioIcon');
+    const label = document.getElementById('ublLandingAudioLabel');
+    const status = document.getElementById('ublLandingAudioStatusText');
+    const wave = document.getElementById('ublLandingWaveContainer');
+    const floatPill = document.getElementById('aoi-floating-audio-pill');
+
+    if (icon) icon.textContent = '⏸️';
+    if (label) label.textContent = 'रोकें (Pause)';
+    if (stopBtn) stopBtn.style.display = 'inline-flex';
+    if (status) status.textContent = '🔊 लाइव ऑडियो चल रहा है... ध्यान से सुनें';
+    if (wave) wave.classList.add('playing');
+    if (floatPill) floatPill.style.display = 'flex';
+
+    if (audioLayer.bgm_enabled !== false) {
+      try { ublBgMusic.play().catch(()=>{}); } catch(e){}
+    }
+
+    if (mode === 'mp3' && mp3Url) {
+      ublAudioNative.src = mp3Url;
+      ublAudioNative.onended = () => {
+        window.stopUblLandingAudio();
+      };
+      ublAudioNative.onerror = () => {
+        if (status) status.textContent = 'ऑडियो लोड करने में समस्या। AI नरेशन से चलाया जा रहा है...';
+        playSpeechSynthesisTts(ttsText);
+      };
+      ublAudioNative.play().catch(() => {
+        playSpeechSynthesisTts(ttsText);
+      });
+    } else {
+      playSpeechSynthesisTts(ttsText);
+    }
+  };
+
+  function playSpeechSynthesisTts(text) {
+    if (!('speechSynthesis' in window)) {
+      if (typeof showToast === 'function') showToast('आपके ब्राउज़र में Speech Audio सपोर्ट नहीं है।', 'info');
+      window.stopUblLandingAudio();
+      return;
+    }
+
+    ublLandingChunks = prepareUblAudioChunks(text);
+    ublLandingChunkIdx = 0;
+
+    let nativeHindiVoice = null;
+    function findBestHindiVoice() {
+      const voices = window.speechSynthesis.getVoices() || [];
+      const hindiVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
+      if (hindiVoices.length > 0) {
+        return hindiVoices.find(v => {
+          const name = (v.name || '').toLowerCase();
+          return name.includes('kalpana') || name.includes('swara') || name.includes('heera') || name.includes('female') || name.includes('google') || name.includes('zira') || name.includes('india');
+        }) || hindiVoices[0];
+      }
+      return null;
+    }
+
+    nativeHindiVoice = findBestHindiVoice();
+    if (!nativeHindiVoice) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        nativeHindiVoice = findBestHindiVoice();
+      };
+    }
+
+    let isAdvancing = false;
+    const playNext = () => {
+      if (!ublAudioPlaying) return;
+      if (ublLandingChunkIdx >= ublLandingChunks.length) {
+        window.stopUblLandingAudio();
+        return;
+      }
+
+      const chunk = ublLandingChunks[ublLandingChunkIdx];
+      const utter = new SpeechSynthesisUtterance(chunk);
+      utter.lang = 'hi-IN';
+      utter.rate = 1.0;
+      utter.pitch = 1.05;
+      if (nativeHindiVoice) utter.voice = nativeHindiVoice;
+
+      utter.onend = () => {
+        if (isAdvancing) return;
+        isAdvancing = true;
+        ublLandingChunkIdx++;
+        setTimeout(() => {
+          isAdvancing = false;
+          playNext();
+        }, 120);
+      };
+
+      utter.onerror = () => {
+        if (isAdvancing) return;
+        isAdvancing = true;
+        ublLandingChunkIdx++;
+        setTimeout(() => {
+          isAdvancing = false;
+          playNext();
+        }, 120);
+      };
+
+      try {
+        window.speechSynthesis.speak(utter);
+      } catch(e) {
+        window.stopUblLandingAudio();
+      }
+    };
+
+    window.speechSynthesis.cancel();
+    playNext();
+  }
+
+  function renderAudioExperienceSection(b, l) {
+    const audioSec = document.getElementById('sec-audio-experience');
+    if (!audioSec) return;
+
+    const audioLayer = l.audio_layer || b.audio_layer || {};
+    const isAudioOn = audioLayer.enabled !== false && (audioLayer.mp3_url || audioLayer.tts_text);
+
+    if (!isAudioOn) {
+      audioSec.style.display = 'none';
+      return;
+    }
+
+    audioSec.style.display = 'block';
+
+    const titleEl = document.getElementById('ubl-audio-title');
+    const subtitleEl = document.getElementById('ubl-audio-subtitle');
+    const bannerWrap = document.getElementById('ubl-audio-section-banner-wrap');
+    const bannerImg = document.getElementById('ubl-audio-section-banner-img');
+    const bannerUrl = audioLayer.banner_image || l.section_banners?.sec_audio;
+
+    if (titleEl) titleEl.textContent = audioLayer.title || `${b.heading || b.name || 'पुस्तक'} का लाइव ऑडियो परिचय सुनें`;
+    if (subtitleEl) subtitleEl.textContent = audioLayer.subtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
+
+    if (bannerUrl && bannerWrap && bannerImg) {
+      bannerImg.src = bannerUrl;
+      bannerWrap.style.display = 'block';
+    } else if (bannerWrap) {
+      bannerWrap.style.display = 'none';
+    }
+
+    // Check FB User Agent
+    const ua = navigator.userAgent || '';
+    const isFbBrowser = /FBAN|FBAV|Instagram|Messenger/i.test(ua);
+    const fbNotice = document.getElementById('ublFbBrowserNotice');
+    if (fbNotice) {
+      fbNotice.style.display = isFbBrowser ? 'block' : 'none';
+    }
+  }
+
   function checkLoginHeaderState() {
     try {
       const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');

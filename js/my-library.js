@@ -892,23 +892,103 @@ function showCongratulationsPopup() {
     }
 }
 
-// 12. Direct Native PDF Downloader (Desktop & Mobile 100% Reliable, No Blank Tab)
-window.downloadBookPdf = function(bookId, bookTitle) {
+// 12. Direct Native PDF Downloader & Zero-Egress Client-Side PDF Assembler
+async function loadJsPdfLibrary() {
+    if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        script.onload = () => {
+            if (window.jspdf && window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
+            else reject(new Error('jsPDF failed to load'));
+        };
+        script.onerror = () => reject(new Error('Network error loading jsPDF'));
+        document.head.appendChild(script);
+    });
+}
+
+async function assembleClientPdfFromImages(cleanId, cleanTitle) {
+    try {
+        const jsPDF = await loadJsPdfLibrary();
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageWidth = 210;
+        const pageHeight = 297;
+        
+        let pageNum = 1;
+        let addedPages = 0;
+        
+        while (pageNum <= 200) {
+            const imgPath = `/images/books/${cleanId}/${pageNum}.webp`;
+            const imgCheck = await fetch(imgPath, { method: 'HEAD' }).catch(() => ({ ok: false }));
+            let effectivePath = imgPath;
+            
+            if (!imgCheck.ok) {
+                const altPath = `/images/books/${cleanId.toLowerCase()}-preview-${pageNum}.webp`;
+                const altCheck = await fetch(altPath, { method: 'HEAD' }).catch(() => ({ ok: false }));
+                if (!altCheck.ok) break;
+                effectivePath = altPath;
+            }
+            
+            const blob = await fetch(effectivePath).then(r => r.blob());
+            const dataUrl = await new Promise(res => {
+                const fr = new FileReader();
+                fr.onload = () => res(fr.result);
+                fr.readAsDataURL(blob);
+            });
+            
+            if (addedPages > 0) doc.addPage('a4', 'portrait');
+            doc.addImage(dataUrl, 'WEBP', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+            addedPages++;
+            pageNum++;
+        }
+        
+        if (addedPages > 0) {
+            doc.save(`${cleanId}_${cleanTitle}.pdf`);
+            return true;
+        }
+        return false;
+    } catch(e) {
+        console.error('Client PDF Assembly error:', e);
+        return false;
+    }
+}
+
+window.downloadBookPdf = async function(bookId, bookTitle) {
     const cleanId = (bookId || 'BK001').toUpperCase().trim();
     const cleanTitle = (bookTitle || 'Aarogyam_India_eBook').replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_');
     const pdfPath = `/pdf/full/${cleanId}.pdf`;
 
+    // 1. Direct Static PDF check (BK001, BK002, or any existing PDF on server)
     try {
-        const link = document.createElement('a');
-        link.href = pdfPath;
-        link.download = `${cleanId}_${cleanTitle}.pdf`;
-        link.target = '_self';
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(() => {
-            if (link.parentNode) link.parentNode.removeChild(link);
-        }, 500);
-    } catch(e) {
-        window.location.href = `/ebooks/download.html?book=${encodeURIComponent(cleanId)}`;
-    }
+        const check = await fetch(pdfPath, { method: 'HEAD' }).catch(() => ({ ok: false }));
+        if (check && check.ok) {
+            const link = document.createElement('a');
+            link.href = pdfPath;
+            link.download = `${cleanId}_${cleanTitle}.pdf`;
+            link.target = '_self';
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => {
+                if (link.parentNode) link.parentNode.removeChild(link);
+            }, 500);
+            return;
+        }
+    } catch(e) {}
+
+    // 2. Client-Side Zero-Egress PDF Generation (Construct from HD page images)
+    try {
+        if (typeof showToast === 'function') {
+            showToast('⏳ डिजिटल PDF तैयार हो रहा है... कृपया 2 सेकंड प्रतीक्षा करें', 'info');
+        }
+        const success = await assembleClientPdfFromImages(cleanId, cleanTitle);
+        if (success) {
+            if (typeof showToast === 'function') {
+                showToast('🎉 PDF सफलतापूर्वक डाउनलोड हो गया!', 'success');
+            }
+            return;
+        }
+    } catch(e) {}
+
+    // 3. Fallback to download.html
+    window.location.href = `/ebooks/download.html?book=${encodeURIComponent(cleanId)}`;
 };

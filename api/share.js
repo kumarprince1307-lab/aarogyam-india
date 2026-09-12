@@ -25,6 +25,8 @@ function getBookLandingPageData(bId) {
           found.og_image = '/images/books/kgarid-fasal-og.webp';
         } else if (cleanId === 'BK002' || cleanSlug === 'kheti-dr') {
           found.og_image = '/images/books/kheti-dr-og.webp';
+        } else {
+          found.og_image = found.og_image_landscape || found.og_image || found.hero?.og_image || found.hero?.banner_image || found.hero?.cover_image || '/images/books/kharif-master-guide-2026-cover.webp';
         }
         return found;
       }
@@ -39,7 +41,7 @@ function getBookLandingPageData(bId) {
       const list = json.books || [];
       const found = list.find(p => (p.id && p.id.toUpperCase() === cleanId) || (p.slug && p.slug.toLowerCase() === cleanSlug));
       if (found) {
-        let ogImg = found.og_image || found.banner || found.cover || found.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
+        let ogImg = found.og_image_landscape || found.og_image || found.banner || found.cover || found.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
         if (found.id === 'BK001' || cleanSlug === 'kharif-2026') ogImg = '/images/books/kgarid-fasal-og.webp';
         else if (found.id === 'BK002' || cleanSlug === 'kheti-dr') ogImg = '/images/books/kheti-dr-og.webp';
         return {
