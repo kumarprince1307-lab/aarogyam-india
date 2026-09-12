@@ -117,6 +117,30 @@ export async function initBookLandingPages() {
     { key: 'sec_pdf_free', name: '📄 19. Free Book PDF / DOC Upload & File Management', desc: 'Free book PDF/DOC upload and management' }
   ];
 
+  // Helper to render section banner uploader blocks in HTML with recommended size guidance
+  function renderSectionBannerUploaderBlock(secKey, labelText, recommendedSize = '1200 × 400 px / 1200 × 500 px (3:1 / 12:5)') {
+    return `
+      <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed rgba(255,255,255,0.2); border-radius: 8px; padding: 10px 12px; margin-top: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <label style="font-weight: 700; font-size: 0.8rem; color: #93c5fd;">${labelText}</label>
+            <span style="font-size: 0.72rem; background: rgba(56,189,248,0.15); color: #38bdf8; padding: 1px 6px; border-radius: 4px; font-weight: 700;">📐 साइज़: ${recommendedSize}</span>
+          </div>
+          <button type="button" onclick="window.clearSectionBanner('${secKey}')" class="admin-button small-button" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 1px 6px; font-size: 0.72rem;">
+            🗑️ बैनर हटाएं
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 8px; align-items: center;">
+          <input type="file" accept="image/*" onchange="window.uploadSectionBannerFile('${secKey}', event)" style="font-size: 0.75rem;" />
+          <input type="text" id="blp_sec_banner_${secKey}" placeholder="या इमेज URL / Path दर्ज करें" oninput="window.setSectionBannerUrl('${secKey}', this.value)" class="admin-input" style="padding: 4px 8px; font-size: 0.78rem;" />
+        </div>
+        <div id="blp_sec_banner_preview_wrap_${secKey}" style="margin-top: 6px; display: none;">
+          <img id="blp_sec_banner_preview_${secKey}" src="" style="width: 100%; max-height: 90px; object-fit: cover; border-radius: 4px; border: 1px solid var(--admin-border);" />
+        </div>
+      </div>
+    `;
+  }
+
   content.innerHTML = `
     <!-- Top Action Header -->
     <div class="admin-section" style="margin-bottom: 14px;">
@@ -294,7 +318,7 @@ export async function initBookLandingPages() {
         <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem;">
-              🖼️ 3. 3D बुक कवर व मुख्य हीरो बैनर (Fixed 3D Aspect Ratio Mockup)
+              🖼️ 3. 3D बुक कवर व मुख्य हीरो बैनर (3D Cover Mockup & Hero Banner)
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
               <span style="font-size: 0.78rem; color: var(--admin-muted);">3D इफेक्ट:</span>
@@ -308,10 +332,13 @@ export async function initBookLandingPages() {
           <div style="display: grid; grid-template-columns: 1.2fr 1.5fr; gap: 16px;">
             <!-- 3D Book Cover -->
             <div id="sec_box_cover" style="background: rgba(0,0,0,0.25); border: 1.5px dashed #16a34a; border-radius: 8px; padding: 14px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label style="font-weight: 700; font-size: 0.84rem; color: #4ade80;">
-                  📸 3D बुक कवर (Cover Mockup) *
-                </label>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <label style="font-weight: 700; font-size: 0.84rem; color: #4ade80;">
+                    📸 3D बुक कवर (Cover Mockup) *
+                  </label>
+                  <span style="font-size: 0.72rem; background: rgba(74,222,128,0.15); color: #4ade80; padding: 1px 6px; border-radius: 4px; font-weight: 700;">📐 साइज़: 800 × 1200 px (2:3 पोर्ट्रेट)</span>
+                </div>
                 <button type="button" onclick="window.clearImageField('cover')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; font-size: 0.72rem; border-radius: 4px;">
                   🗑️ कवर हटाएं
                 </button>
@@ -347,10 +374,13 @@ export async function initBookLandingPages() {
 
             <!-- Hero Background Banner -->
             <div id="sec_box_banner" style="background: rgba(0,0,0,0.25); border: 1.5px dashed #0284c7; border-radius: 8px; padding: 14px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label style="font-weight: 700; font-size: 0.84rem; color: #38bdf8;">
-                  🖼️ बैकग्राउंड बैनर (Hero Background Banner)
-                </label>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <label style="font-weight: 700; font-size: 0.84rem; color: #38bdf8;">
+                    🖼️ बैकग्राउंड बैनर (Hero Background Banner)
+                  </label>
+                  <span style="font-size: 0.72rem; background: rgba(56,189,248,0.15); color: #38bdf8; padding: 1px 6px; border-radius: 4px; font-weight: 700;">📐 साइज़: 1200 × 630 px / 1920 × 1080 px (16:9)</span>
+                </div>
                 <button type="button" onclick="window.clearImageField('banner')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; font-size: 0.72rem; border-radius: 4px;">
                   🗑️ बैनर हटाएं
                 </button>
@@ -1886,6 +1916,31 @@ export async function initBookLandingPages() {
 
   setupImagePreview('blp_file_cover', 'blp_cover_url', 'blp_preview_cover_img');
   setupImagePreview('blp_file_banner', 'blp_banner_url', 'blp_preview_banner_img');
+
+  // Clear Image Field Helper (Cover / Banner)
+  window.clearImageField = function(fieldType) {
+    if (fieldType === 'cover') {
+      const urlInput = document.getElementById('blp_cover_url');
+      const fileInput = document.getElementById('blp_file_cover');
+      const gitSelect = document.getElementById('blp_select_git_cover');
+      const previewImg = document.getElementById('blp_preview_cover_img');
+      if (urlInput) urlInput.value = '';
+      if (fileInput) fileInput.value = '';
+      if (gitSelect) gitSelect.value = '';
+      if (previewImg) previewImg.src = '';
+      showToast('🗑️ 3D बुक कवर हटा दिया गया।', 'info');
+    } else if (fieldType === 'banner') {
+      const urlInput = document.getElementById('blp_banner_url');
+      const fileInput = document.getElementById('blp_file_banner');
+      const gitSelect = document.getElementById('blp_select_git_banner');
+      const previewImg = document.getElementById('blp_preview_banner_img');
+      if (urlInput) urlInput.value = '';
+      if (fileInput) fileInput.value = '';
+      if (gitSelect) gitSelect.value = '';
+      if (previewImg) previewImg.src = '';
+      showToast('🗑️ हीरो बैनर हटा दिया गया।', 'info');
+    }
+  };
 
   // Window Section Banner Helpers
   window.setSectionBannerUrl = function(secKey, url) {
@@ -5226,6 +5281,10 @@ export async function initBookLandingPages() {
     const wrap = document.getElementById('blp_demo_images_wrap');
     if (!wrap) return;
     wrap.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+        <span style="font-size:0.75rem;background:rgba(245,158,11,0.15);color:#fbbf24;padding:2px 8px;border-radius:4px;font-weight:700;">📐 डेमो पेज साइज़: 800 × 1200 px (2:3 पोर्ट्रेट - Pinch-Zoom Compatible)</span>
+        ${currentDemoImages.length > 0 ? `<button type="button" onclick="window.clearAllDemoImages()" class="admin-button small-button" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:1px 6px;font-size:0.72rem;">🗑️ सभी डेमो पेज हटाएं</button>` : ''}
+      </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:100%;">
         ${currentDemoImages.map((img, idx) => `
           <div style="position:relative;width:68px;height:90px;border-radius:6px;overflow:hidden;border:1.5px solid var(--admin-border);box-shadow:0 2px 6px rgba(0,0,0,0.2);">
@@ -5245,6 +5304,12 @@ export async function initBookLandingPages() {
     `;
   }
 
+  window.clearAllDemoImages = function() {
+    currentDemoImages = [];
+    renderDemoImagesInBuilder();
+    showToast('🗑️ सभी डेमो पेजेस हटा दिए गए।', 'info');
+  };
+
   function renderBonusesInBuilder() {
     const wrap = document.getElementById('blp_bonuses_list_wrap');
     if (!wrap) return;
@@ -5262,7 +5327,10 @@ export async function initBookLandingPages() {
               <input type="text" placeholder="मुफ़्त पुस्तक का नाम" value="${escapeHtml(b.title)}" onchange="window.updateBonusField(${idx}, 'title', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.82rem;font-weight:700;" />
             </div>
             <div>
-              <label style="font-size:0.72rem;color:var(--admin-muted);display:block;font-weight:700;">📸 कवर इमेज URL / File:</label>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <label style="font-size:0.72rem;color:var(--admin-muted);font-weight:700;">📸 कवर इमेज:</label>
+                <span style="font-size:0.68rem;color:#4ade80;font-weight:700;">📐 600×850 px (2:3)</span>
+              </div>
               <input type="text" placeholder="/images/books/cover.webp" value="${escapeHtml(b.image || b.cover || '')}" onchange="window.updateBonusField(${idx}, 'image', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.8rem;" />
             </div>
             <div>
