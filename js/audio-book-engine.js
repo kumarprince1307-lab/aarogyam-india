@@ -303,9 +303,6 @@ class ProAudioBookEngine {
         this.stopAudioSources();
 
         // 2. Check Page Script or Recorded Audio
-        const pageKey = String(currentPage);
-        const pageEntry = this.pageScripts[pageKey];
-
         let pageText = '';
         let pageAudio = '';
 
