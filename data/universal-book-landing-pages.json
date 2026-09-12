@@ -593,7 +593,8 @@
       ],
       "hidden_sections": [],
       "section_banners": {
-        "sec_specs_toc": "/images/banners/bk015-sec_specs_toc-banner.webp"
+        "sec_specs_toc": "/images/banners/bk015-sec_specs_toc-banner.webp",
+        "sec_audio": "/images/banners/bk015-sec_audio-banner.webp"
       },
       "og_title": "🌱 सब्जी खेती मास्टर PART 1",
       "og_description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू",
@@ -637,7 +638,8 @@
           }
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
-        "bgm_enabled": true
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
       },
       "mainPdf": "/uploads/books/BK015_main.pdf",
       "main_pdf": "/uploads/books/BK015_main.pdf",
@@ -662,8 +664,8 @@
         "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!"
       },
       "hero": {
-        "tag": "🌾 Bestseller Agriculture eBook",
-        "title": "🌱 सब्जी खेती मास्टर PART 1",
+        "tag": "🌾 Bestseller Agriculture eBook+ Audio Book",
+        "title": "🌱 सब्जी खेती मास्टर  (PART 1)",
         "subtitle": "11 प्रमुख सब्जियों की खेती — बीज से बाजार तक व्यावहारिक मार्गदर्शन | 154 पेज",
         "description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू\n",
         "mrp": 1999,
@@ -689,6 +691,10 @@
           {
             "icon": "fa-gift",
             "text": "Free Bonus PDF"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "with Audio "
           }
         ]
       },
@@ -737,11 +743,7 @@
         "/images/books/bk015-preview-9.webp",
         "/images/books/bk015-preview-10.webp",
         "/images/books/bk015-preview-11.webp",
-        "/images/books/bk015-preview-12.webp",
-        "/images/books/bk015-preview-13.webp",
-        "/images/books/bk015-preview-14.webp",
-        "/images/books/bk015-preview-15.webp",
-        "/images/books/bk015-preview-16.webp"
+        "/images/books/bk015-preview-12.webp"
       ],
       "suggested_books_list": [
         {
