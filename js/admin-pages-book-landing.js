@@ -2696,7 +2696,7 @@ export async function initBookLandingPages() {
   };
 
   // -------------------------------------------------------------
-  // SUB-TAB 6: AI E-BOOK CREATOR & 3-TIER MASTER ASSEMBLER ENGINE
+  // SUB-TAB 6: 4K VISUAL ILLUSTRATED MAGAZINE E-BOOK CREATOR ENGINE
   // -------------------------------------------------------------
   let currentAiStudioBook = {
     topic: 'टमाटर एवं मिर्च की उन्नत खेती, कीट व सम्पूर्ण स्प्रे चार्ट',
@@ -2719,31 +2719,122 @@ export async function initBookLandingPages() {
 
   const TIER1_CATEGORY_PRESETS = {
     'Agriculture': [
-      { id: 'c_agri_soil', title: '🌱 1. मृदा परीक्षण, pH मान व भूमि सुधार विज्ञान', pages: 10, checked: true },
-      { id: 'c_agri_npk', title: '🧪 2. NPK पोषण, जिंक-सल्फर व बेसल खाद डोज', pages: 10, checked: true },
-      { id: 'c_agri_spray', title: '💧 3. आधुनिक स्प्रे साइंस, स्टीकर व घोल नियम', pages: 10, checked: true },
-      { id: 'c_agri_organic', title: '🌿 4. घर पर जैविक कीटनाशक व टॉनिक निर्माण', pages: 10, checked: true }
+      { 
+        id: 'c_agri_soil', 
+        title: '🌱 1. मृदा परीक्षण, pH मान व भूमि सुधार विज्ञान', 
+        pages: 10, 
+        checked: true,
+        image: '/images/books/BK001/page-1.webp',
+        badge: '🌱 मृदा स्वास्थ्य',
+        symptoms: ['मिट्टी का pH 6.5 से 7.5 होना सर्वोत्तम', 'जैविक कार्बन 0.75% से कम होने पर पोषण अवशोषण घटता है', 'जिप्सम व गोबर खाद से क्षारीय भूमि का सुधार'],
+        dosage: 'जिप्सम 250kg + सड़ी गोबर खाद 4 ट्रॉली प्रति एकड़',
+        sprayDose: 'भूमि उपचार: ट्राइकोडर्मा विरिडी 2kg को 100kg गोबर खाद में मिलाकर फैलाएं',
+        audioText: 'किसान भाइयों, स्वस्थ फसल की शुरुआत स्वस्थ मिट्टी से होती है। खेत में बेसल खाद डालने से पहले मृदा परीक्षण अवश्य कराएं ताकि अनावश्यक खाद का खर्च 30% तक बचाया जा सके।'
+      },
+      { 
+        id: 'c_agri_npk', 
+        title: '🧪 2. NPK पोषण, जिंक-सल्फर व बेसल खाद डोज', 
+        pages: 10, 
+        checked: true,
+        image: '/images/books/BK002/page-1.webp',
+        badge: '🧪 पोषण संतुलन',
+        symptoms: ['नाइट्रोजन से वानस्पतिक वृद्धि व हरियाली', 'फास्फोरस से जड़ों का गहरा विकास', 'पोटाश से दाना भराव, चमक व रोग प्रतिरोधक क्षमता'],
+        dosage: 'DAP 50kg + MOP 30kg + Zinc Sulphate 33% @ 5kg प्रति एकड़',
+        sprayDose: 'फर्टिगेशन: 19:19:19 NPK @ 3kg/एकड़ ड्रिप से',
+        audioText: 'फसल को संतुलित पोषण देना ही बंपर पैदावार का रहस्य है। केवल यूरिया देने से कीटों का प्रकोप बढ़ता है, इसलिए पोटाश और जिंक का सही संतुलन बनाएं।'
+      },
+      { 
+        id: 'c_agri_spray', 
+        title: '💧 3. आधुनिक स्प्रे साइंस, स्टीकर व घोल नियम', 
+        pages: 10, 
+        checked: true,
+        image: '/images/books/kheti-dr-demo-1.webp',
+        badge: '💧 स्प्रे साइंस',
+        symptoms: ['हमेशा साफ व मीठे पानी का उपयोग करें (pH 6.0)', 'दवाइयों के घोल में सिलिकॉन स्टीकर 5ml प्रति 15L अवश्य मिलाएं', 'तेज धूप व दोपहर 12 से 3 बजे के बीच कभी स्प्रे न करें'],
+        dosage: 'सिलिकॉन बेस्ड नॉन-आयनिक स्टीकर @ 0.5ml प्रति लीटर पानी',
+        sprayDose: 'कट नोजल या हॉलो कोन नोजल से महीन धुंध (Fog) बनाकर स्प्रे करें',
+        audioText: 'किसान साथियों, 50% दवाइयां गलत पानी और गलत समय पर स्प्रे करने से बर्बाद हो जाती हैं। सिलिकॉन स्टीकर मिलाने से दवा 10 मिनट में पत्तों पर फैलकर चिपक जाती है।'
+      },
+      { 
+        id: 'c_agri_organic', 
+        title: '🌿 4. घर पर जैविक कीटनाशक व टॉनिक निर्माण', 
+        pages: 10, 
+        checked: true,
+        image: '/images/books/kheti-dr-demo-2.webp',
+        badge: '🌿 जीरो बजट जैविक',
+        symptoms: ['नीमास्त्र रस चूसक कीटों के लिए 100% असरदार', 'दशपर्णी अर्क इल्ली व फंगस को नष्ट करता है', 'जीवामृत से भूमि में मित्र जीवाणुओं की संख्या लाखों गुना बढ़ती है'],
+        dosage: 'नीम तेल 10,000 PPM @ 2ml/L पानी या 5% नीम काढ़ा',
+        sprayDose: 'जीवामृत 200L प्रति एकड़ सिंचाई के पानी के साथ चलाएं',
+        audioText: 'जैविक खेती अपनाकर आप अपनी लागत को आधा कर सकते हैं। नीम का तेल और जीवामृत का नियमित प्रयोग पौधों की प्राकृतिक रोग प्रतिरोधक क्षमता को बढ़ाता है।'
+      }
     ],
     'Health': [
-      { id: 'c_hlth_dosha', title: '🧘 1. वात-पित्त-कफ त्रिदोष संतुलन व प्रकृति ज्ञान', pages: 10, checked: true },
-      { id: 'c_hlth_detox', title: '💧 2. प्राकृतिक डिटॉक्स, उपवास व जल चिकित्सा', pages: 10, checked: true },
-      { id: 'c_hlth_kitchen', title: '🌿 3. रसोई घर की 25 दिव्य औषधियां व अचूक प्रयोग', pages: 10, checked: true },
-      { id: 'c_hlth_immunity', title: '🛡️ 4. रोग प्रतिरोधक क्षमता (इम्यूनिटी) वर्धक नियम', pages: 10, checked: true }
+      { 
+        id: 'c_hlth_dosha', 
+        title: '🧘 1. वात-पित्त-कफ त्रिदोष संतुलन व प्रकृति ज्ञान', 
+        pages: 10, 
+        checked: true,
+        image: '/images/books/BK001/page-1.webp',
+        badge: '🧘 त्रिदोष ज्ञान',
+        symptoms: ['वात बढ़ने से जोड़ों का दर्द व गैस', 'पित्त बढ़ने से एसिडिटी व जलन', 'कफ बढ़ने से आलस्य व सर्दी-जुकाम'],
+        dosage: 'त्रिफला चूर्ण 1 चम्मच गुनगुने पानी से रात को',
+        sprayDose: 'ऋतु अनुसार आहार व 6 रसों का दैनिक संतुलन',
+        audioText: 'आयुर्वेद का मूल सिद्धांत है त्रिदोष संतुलन। जब वात पित्त और कफ साम्यावस्था में रहते हैं तो शरीर में कोई भी रोग उत्पन्न नहीं हो सकता।'
+      },
+      { 
+        id: 'c_hlth_detox', 
+        title: '💧 2. प्राकृतिक डिटॉक्स, उपवास व जल चिकित्सा', 
+        pages: 10, 
+        checked: true,
+        image: '/images/books/BK002/page-1.webp',
+        badge: '💧 प्राकृतिक शुद्धि',
+        symptoms: ['सुबह खाली पेट 2 गिलास तांबे के बर्तन का पानी', 'सप्ताह में एक दिन फलाहार या हल्का उपवास', 'भोजन के तुरंत बाद ठंडा पानी पीने से पाचन अग्नि मंद होती है'],
+        dosage: 'उषापान: 750ml गुनगुना पानी घूंट-घूंट करके पिएं',
+        sprayDose: 'एलोवेरा + गिलोय स्वरस 15ml सुबह',
+        audioText: 'शरीर से टॉक्सिन्स बाहर निकालना ही सबसे बड़ी दवा है। सही समय पर पानी पीना और उपवास करना लिवर को प्राकृतिक रूप से नया जीवन देता है।'
+      }
     ],
     'BeautySkin': [
-      { id: 'c_skin_glow', title: '✨ 1. आयुर्वेदिक त्वचा प्रकार व प्राकृतिक निखार रूटीन', pages: 10, checked: true },
-      { id: 'c_hair_fall', title: '💆‍♀️ 2. बाल झड़ने से बचाव, डैंड्रफ व तेल निर्माण विधि', pages: 10, checked: true },
-      { id: 'c_face_pack', title: '🌸 3. 100% केमिकल-मुक्त हर्बल फेसपैक व उबटन', pages: 10, checked: true }
+      { 
+        id: 'c_skin_glow', 
+        title: '✨ 1. आयुर्वेदिक त्वचा प्रकार व प्राकृतिक निखार रूटीन', 
+        pages: 10, 
+        checked: true,
+        image: '/images/books/BK001/page-1.webp',
+        badge: '✨ स्किन ग्लो',
+        symptoms: ['केमिकल युक्त फेसवॉश से त्वचा का प्राकृतिक तेल नष्ट होता है', 'गुलाब जल व एलोवेरा जेल से त्वचा की नमी सुरक्षित रहती है', 'कच्चे दूध से चेहरे की सफाई सबसे उत्तम क्लींजर है'],
+        dosage: 'शुद्ध एलोवेरा जेल + चुटकी भर हल्दी रात को लगाएं',
+        sprayDose: 'दिन में दो बार गुलाब जल स्प्रे करें',
+        audioText: 'त्वचा का निखार बाहरी क्रीमों से नहीं, बल्कि शरीर की आंतरिक शुद्धि और प्राकृतिक जड़ी-बूटियों के सही पोषण से आता है।'
+      }
     ],
     'AnimalHusbandry': [
-      { id: 'c_anim_dairy', title: '🐄 1. दुधारू पशु आहार, संतुलित पोषण व दूध वृद्धि', pages: 10, checked: true },
-      { id: 'c_anim_disease', title: '🩺 2. मौसमी पशु रोग, एफएमडी व प्राथमिक उपचार', pages: 10, checked: true },
-      { id: 'c_anim_fish', title: '🐟 3. आधुनिक मछली पालन व तालाब जल प्रबंधन', pages: 15, checked: true }
+      { 
+        id: 'c_anim_dairy', 
+        title: '🐄 1. दुधारू पशु आहार, संतुलित पोषण व दूध वृद्धि', 
+        pages: 10, 
+        checked: true,
+        image: '/images/books/BK002/page-1.webp',
+        badge: '🐄 डेयरी साइंस',
+        symptoms: ['दूध में फैट व SNF बढ़ाने के लिए संतुलित दाना मिश्रण', 'खनिज लवण (Mineral Mixture) 50g प्रतिदिन अनिवार्य', 'सूखा चारा व हरा चारा 1:3 के अनुपात में दें'],
+        dosage: 'एग्रोमिन फोर्ट मिनरल मिक्सचर 50g प्रतिदिन दाने में',
+        sprayDose: 'बायपास फैट 100g प्रतिदिन उच्च दुधारू गाय-भैंस के लिए',
+        audioText: 'पशु के शरीर भार और दूध उत्पादन के अनुसार संतुलित राशन देना ही डेयरी व्यवसाय में अधिकतम मुनाफे की चाबी है।'
+      }
     ],
     'Business': [
-      { id: 'c_biz_direct', title: '💼 1. किसान से सीधे ग्राहक: मूल्य संवर्धन व ब्रांडिंग', pages: 10, checked: true },
-      { id: 'c_biz_poly', title: '🏡 2. पॉलीहाउस व नर्सरी व्यवसाय प्रोजेक्ट सेटअप', pages: 10, checked: true },
-      { id: 'c_biz_digital', title: '📱 3. डिजिटल किसान कम्युनिटी व ऑनलाइन बिक्री', pages: 10, checked: true }
+      { 
+        id: 'c_biz_direct', 
+        title: '💼 1. किसान से सीधे ग्राहक: मूल्य संवर्धन व ब्रांडिंग', 
+        pages: 10, 
+        checked: true,
+        image: '/images/books/BK001/page-1.webp',
+        badge: '💼 एग्री बिजनेस',
+        symptoms: ['कच्चा माल बेचने के बजाय ग्रेडिंग व पैकेजिंग करके बेचें', 'WhatsApp व सोशल मीडिया से स्थानीय ग्राहकों की कम्युनिटी बनाएं', 'शुद्धता और भरोसे की ब्रांडिंग से 40% अधिक मूल्य प्राप्त करें'],
+        dosage: 'FSSAI रजिस्ट्रेशन + 1kg/5kg आकर्षक स्टैंडअप पाउच पैकेजिंग',
+        sprayDose: 'ऑनलाइन डिलीवरी व सीधे होम डिलीवरी मॉडल',
+        audioText: 'किसान जब व्यापारी बनकर अपने उत्पाद की प्रोसेसिंग और पैकेजिंग करता है तो बिचौलियों का मुनाफा सीधे किसान की जेब में आता है।'
+      }
     ]
   };
 
@@ -2753,46 +2844,56 @@ export async function initBookLandingPages() {
         num: 1,
         title: 'अध्याय 1: उन्नत किस्में, नर्सरी प्रबंधन व बीज उपचार',
         pages: 12,
-        desc: 'हाइब्रिड एवं देशी किस्मों का चयन, कार्बेन्डाजिम व ट्राइकोडर्मा से बीज शोधन विधि।',
-        dosage: 'ट्राइकोडर्मा 10g/kg बीज + थिरम 2g/kg बीज',
-        sprayDose: 'नर्सरी स्प्रे: 19:19:19 NPK @ 2g/L पानी',
-        audioText: 'किसान भाइयों, इस अध्याय में हम जानेंगे कि कैसे सही उन्नत किस्म के चुनाव और बीज उपचार से फसल को 90% रोगों से पहले ही बचाया जा सकता है।'
+        image: '/images/books/kharif-master-guide-2026-preview-01.webp',
+        badge: '🌱 नर्सरी व बीज शोधन',
+        symptoms: ['उन्नत हाइब्रिड व रोग-प्रतिरोधी किस्मों का चयन करें', 'बीज जनित उकठा व सड़न रोकने के लिए बीज शोधन अनिवार्य', 'नर्सरी में 50% शेड नेट व कोकोपीट बेड का उपयोग'],
+        dosage: 'ट्राइकोडर्मा 10g + कार्बेन्डाजिम 2g प्रति किलो बीज',
+        sprayDose: 'नर्सरी स्प्रे (15 दिन पर): 19:19:19 NPK @ 2g/L पानी',
+        audioText: 'किसान भाइयों, इस अध्याय में हम जानेंगे कि कैसे सही उन्नत किस्म के चुनाव और बीज उपचार से फसल को 90% रोगों से पहले ही सुरक्षित रखा जा सकता है।'
       },
       {
         num: 2,
-        title: 'अध्याय 2: खेत तैयारी, ड्रिप/मल्चिंग व बेसल फर्टीगेशन',
-        pages: 12,
-        desc: 'बेड निर्माण, 25 माइक्रोन सिल्वर-ब्लैक मल्चिंग व डीएपी/पोटाश की सही मात्रा।',
-        dosage: 'गोबर खाद 5 ट्रॉली + DAP 50kg + MOP 30kg प्रति एकड़',
-        sprayDose: 'नीम खली 100kg प्रति एकड़ बेसल डोज में',
-        audioText: 'जमीन की तैयारी फसल की नींव है। सही मल्चिंग और बेड की चौड़ाई रखने से खरपतवार 80% तक कम हो जाते हैं और नमी सुरक्षित रहती है।'
+        title: 'अध्याय 2: खेत तैयारी, 25μ मल्चिंग, ड्रिप व बेसल फर्टीगेशन',
+        pages: 14,
+        image: '/images/books/kharif-master-guide-2026-preview-02.webp',
+        badge: '💧 आधुनिक ड्रिप व बेड',
+        symptoms: ['3 फीट चौड़े व 1 फीट ऊंचे उभरे हुए बेड तैयार करें', '25 माइक्रोन सिल्वर-ब्लैक मल्चिंग फिल्म से खरपतवार 80% बंद', 'ड्रिप लाइन में 40cm दूरी पर 2LPH ड्रिपर लगाएं'],
+        dosage: 'गोबर खाद 5 ट्रॉली + DAP 50kg + MOP 30kg + नीम खली 100kg प्रति एकड़',
+        sprayDose: 'बेड पर बेसल डोज डालकर मल्चिंग बिछाएं और ड्रिप चलाएं',
+        audioText: 'जमीन की तैयारी फसल की नींव है। सही मल्चिंग और बेड की चौड़ाई रखने से नमी सुरक्षित रहती है और जड़ें तेजी से फैलती हैं।'
       },
       {
         num: 3,
-        title: 'अध्याय 3: प्रमुख रस चूसक कीट (थ्रिप्स, सफेद मक्खी, माइट्स)',
-        pages: 14,
-        desc: 'पत्तियों का मुड़ना (चूर्दा-मूर्दा), थ्रिप्स व माइट्स के सटीक लक्षण व अचूक कीटनाशक।',
+        title: 'अध्याय 3: प्रमुख रस चूसक कीट (थ्रिप्स, सफेद मक्खी, माइट्स) अचूक डोज',
+        pages: 15,
+        image: '/images/books/kheti-dr-demo-1.webp',
+        badge: '🔴 हाई अलर्ट रस चूसक',
+        symptoms: ['पत्तियां ऊपर की ओर नाव जैसी मुड़ें तो थ्रिप्स का हमला', 'पत्तियां नीचे मुड़ें व खुरदरी हों तो माइट्स का हमला', 'पत्तियों पर चिपचिपा पदार्थ व पीलापन सफेद मक्खी का लक्षण'],
         dosage: 'फिप्रोनिल 5% SC @ 2ml/L या स्पिनोटोराम 11.7% SC @ 1ml/L',
-        sprayDose: 'माइट्स के लिए: प्रोपरगाइट 57% EC @ 2ml/L पानी',
-        audioText: 'थ्रिप्स और सफेद मक्खी वायरस के मुख्य वाहक हैं। पत्तियां ऊपर की ओर मुड़ें तो थ्रिप्स और नीचे मुड़ें तो माइट्स का हमला समझना चाहिए।'
+        sprayDose: 'माइट्स के लिए: प्रोपरगाइट 57% EC @ 2ml/L + स्टीकर 0.5ml/L पानी',
+        audioText: 'थ्रिप्स और सफेद मक्खी मरोड़िया वायरस के मुख्य वाहक हैं। शुरुआती लक्षण दिखते ही तुरंत सिस्टेमिक कीटनाशक का महीन स्प्रे करें।'
       },
       {
         num: 4,
-        title: 'अध्याय 4: फफूंद जनित रोग (अगेती/पछेती झुलसा व उकठा)',
-        pages: 14,
-        desc: 'पत्तियों पर काले-भूरे धब्बे, तना गलन व बैक्टीरियल विल्ट की रोकथाम।',
-        dosage: 'एज़ोक्सिस्ट्रोबिन + डिफेनोकोनाज़ोल @ 1ml/L पानी',
-        sprayDose: 'उकठा (विल्ट) के लिए: कॉपर ऑक्सीक्लोराइड 50% WP @ 3g/L ड्रेंचिंग',
-        audioText: 'झुलसा रोग नमी और बादल छाए रहने पर तेजी से फैलता है। लक्षण दिखते ही सिस्टेमिक फंगीसाइड का छिड़काव तुरंत करें।'
+        title: 'अध्याय 4: फफूंद व जीवाणु जनित रोग (अगेती/पछेती झुलसा, उकठा विल्ट)',
+        pages: 15,
+        image: '/images/books/kheti-dr-demo-2.webp',
+        badge: '🍄 फंगल व बैक्टीरियल रोग',
+        symptoms: ['पत्तियों पर गोल काले-भूरे छल्लेदार धब्बे (झुलसा)', 'दोपहर में पौधा अचानक मुरझाना और शाम को ठीक होना (उकठा)', 'तने के निचले हिस्से पर कालापन व सड़ांध'],
+        dosage: 'एज़ोक्सिस्ट्रोबिन + डिफेनोकोनाज़ोल (Amistar Top) @ 1ml/L पानी',
+        sprayDose: 'उकठा ड्रेंचिंग: कॉपर ऑक्सीक्लोराइड 50% WP @ 3g/L जड़ के पास डालें',
+        audioText: 'झुलसा रोग नमी और बादल छाए रहने पर तेजी से फैलता है। लक्षण दिखते ही सिस्टेमिक फंगीसाइड का छिड़काव स्टीकर मिलाकर तुरंत करें।'
       },
       {
         num: 5,
-        title: 'अध्याय 5: फूल-फल वृद्धि, फ्रूट सेटिंग व सम्पूर्ण स्प्रे टाइम-टेबल',
-        pages: 12,
-        desc: 'फूल झड़ने की समस्या, बोरॉन व कैल्शियम का महत्व, 7-दिवसीय स्प्रे शेड्यूल।',
-        dosage: 'बोरॉन 20% @ 1g/L + 0:52:34 NPK @ 5g/L पानी',
-        sprayDose: 'टॉनिक: प्लानोफिक्स / बायो 20 @ 0.5ml/L पानी',
-        audioText: 'फूलों से फल बनते समय बोरॉन और कैल्शियम का सही संतुलन ही फलों को फटने से रोकता है और वजन 25% तक बढ़ाता है।'
+        title: 'अध्याय 5: फूल-फल वृद्धि, फ्रूट सेटिंग, बोरॉन स्प्रे व 7-दिवसीय टाइम-टेबल',
+        pages: 14,
+        image: '/images/books/kharif-master-guide-2026-preview-03.webp',
+        badge: '🌸 बंपर फ्रूट सेटिंग',
+        symptoms: ['अत्यधिक फूल झड़ने की समस्या का तुरंत निवारण', 'फलों के फटने व चमक कम होने पर बोरॉन का छिड़काव', 'फलों का आकार व वजन 25% तक बढ़ाने के वैज्ञानिक टॉनिक'],
+        dosage: '00:52:34 NPK @ 5g/L + बोरॉन 20% @ 1g/L पानी',
+        sprayDose: 'टॉनिक: नाइट्रोबेन्जीन 20% या बायो 20 @ 1.5ml/L पानी',
+        audioText: 'फूलों से फल बनते समय बोरॉन और पोटाश का सही संतुलन ही फलों को फटने से रोकता है और मंडी में पहले दर्जे का भाव दिलाता है।'
       }
     ],
     'Health': [
@@ -2800,37 +2901,12 @@ export async function initBookLandingPages() {
         num: 1,
         title: 'अध्याय 1: वात पित्त कफ की पहचान व दैनिक आहार नियम',
         pages: 15,
-        desc: 'शरीर की प्रकृति अनुसार भोजन, पानी पीने के 5 स्वर्णिम नियम।',
-        dosage: 'प्रातःकाल 2 गिलास गुनगुना पानी + 1 चम्मच त्रिफला',
-        sprayDose: 'ऋतु अनुसार भोजन व 6 रसों का संतुलन',
+        image: '/images/books/BK001/page-1.webp',
+        badge: '🧘 प्राकृतिक स्वास्थ्य',
+        symptoms: ['शरीर की प्रकृति अनुसार भोजन का चयन', 'जल पीने के 5 स्वर्णिम नियम', 'वात-पित्त-कफ का संतुलन'],
+        dosage: 'त्रिफला चूर्ण 1 चम्मच गुनगुने पानी के साथ',
+        sprayDose: 'सुबह खाली पेट उषापान व नियमित प्राणायाम',
         audioText: 'आयुर्वेद के अनुसार हमारा शरीर पांच तत्वों से बना है। जब वात, पित्त और कफ संतुलित रहते हैं तो कोई भी रोग शरीर में टिक नहीं सकता।'
-      },
-      {
-        num: 2,
-        title: 'अध्याय 2: पेट की बीमारियां, गैस, कब्ज व लिवर डिटॉक्स',
-        pages: 15,
-        desc: 'पाचन तंत्र को मजबूत करने के घरेलू नुस्खे व लिवर शुद्धि।',
-        dosage: 'एलोवेरा + आंवला जूस 20ml खाली पेट',
-        sprayDose: 'अजवाइन + काला नमक गुनगुने पानी के साथ',
-        audioText: '90% बीमारियों की जड़ हमारा पेट और खराब पाचन है। लिवर को डिटॉक्स करने से रक्त शुद्ध होता है और चेहरे पर तेज आता है।'
-      },
-      {
-        num: 3,
-        title: 'अध्याय 3: जोड़ों का दर्द, यूरिक एसिड व गठिया निवारण',
-        pages: 15,
-        desc: 'वात दोष का शमन, मेथी दाना, सोंठ व पारिजात का काढ़ा।',
-        dosage: 'पारिजात (हरसिंगार) के 5 पत्तों का काढ़ा प्रतिदिन',
-        sprayDose: 'तिल तेल + लहसुन की मालिश',
-        audioText: 'जोड़ों के दर्द में मेथी दाना और पारिजात का काढ़ा रामबाण औषधि की तरह काम करता है। यूरिक एसिड को घटाने में यह अत्यंत लाभकारी है।'
-      },
-      {
-        num: 4,
-        title: 'अध्याय 4: हृदय स्वास्थ्य, कोलेस्ट्रॉल व ब्लड प्रेशर नियंत्रण',
-        pages: 15,
-        desc: 'अर्जुन की छाल, लौकी का सूप व प्राकृतिक प्राणायाम।',
-        dosage: 'अर्जुन की छाल का काढ़ा 50ml प्रतिदिन सुबह',
-        sprayDose: 'लहसुन की 1 कली खाली पेट',
-        audioText: 'हृदय की धमनियों में ब्लॉकेज को साफ करने के लिए अर्जुन छाल अमृत समान मानी गई है। यह रक्तचाप को स्वाभाविक रूप से सामान्य रखती है।'
       }
     ]
   };
@@ -2985,6 +3061,9 @@ export async function initBookLandingPages() {
     window.renderActiveAuditChapterCard();
   };
 
+  // -------------------------------------------------------------
+  // 4K VISUAL AUDIT CARD & LIVE MAGAZINE PAGE PREVIEW
+  // -------------------------------------------------------------
   window.renderActiveAuditChapterCard = function() {
     const card = document.getElementById('ais_active_chapter_editor_card');
     if (!card) return;
@@ -3002,46 +3081,125 @@ export async function initBookLandingPages() {
 
     const obj = current.obj;
     const isCore = current.type === 'tier2';
+    const imgSrc = obj.image || (isCore ? '/images/books/kheti-dr-demo-1.webp' : '/images/books/BK001/page-1.webp');
+    const badgeText = obj.badge || (isCore ? '🔴 हाई अलर्ट कीट/रोग' : '🌱 कॉमन फाउंडेशन ज्ञान');
+    const symptomsList = Array.isArray(obj.symptoms) ? obj.symptoms : [
+      'पत्तियों व तने पर शुरुआती लक्षण दिखने पर तुरंत पहचान करें',
+      'नमी और तापमान में बदलाव से रोग तेजी से फैलता है',
+      'सही समय पर अनुशंसित दवा का ही स्प्रे करें'
+    ];
 
     card.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 1.2rem;">${isCore ? '🟡' : '🟢'}</span>
-          <span style="font-weight: 900; font-size: 0.95rem; color: ${isCore ? '#f472b6' : '#34d399'};">
-            ${escapeHtml(obj.title)}
-          </span>
-        </div>
-        <span style="background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 4px; font-size: 0.74rem; color: #cbd5e1; font-weight: 700;">
-          📄 अध्याय साइज़: ${obj.pages || 12} Pages | Aarogyam India Logo Header Enabled ✓
-        </span>
-      </div>
+      <div style="display: grid; grid-template-columns: 1.1fr 1.3fr; gap: 16px; align-items: start;">
+        
+        <!-- LEFT: VISUAL 4K MAGAZINE PAGE MOCKUP PREVIEW -->
+        <div style="background: linear-gradient(135deg, #022c22 0%, #0f172a 100%); border: 2px solid ${isCore ? '#ec4899' : '#10b981'}; border-radius: 12px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); color: #fff; min-height: 440px; display: flex; flex-direction: column; justify-content: space-between;">
+          
+          <!-- Running Page Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(255,255,255,0.15); padding-bottom: 8px; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <img src="/images/logo/logo.png" style="height: 22px; object-fit: contain;" onerror="this.style.display='none'" />
+              <span style="font-size: 0.72rem; color: #38bdf8; font-weight: 800; letter-spacing: 0.5px;">AAROGYAM 4K MASTER GUIDE</span>
+            </div>
+            <span style="font-size: 0.68rem; color: #34d399; font-weight: 800; background: rgba(16,185,129,0.2); padding: 2px 6px; border-radius: 4px;">
+              ${escapeHtml(badgeText)}
+            </span>
+          </div>
 
-      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px;">
-        <div>
-          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700;">अध्याय शीर्षक (Chapter Heading):</label>
-          <input type="text" value="${escapeHtml(obj.title)}" onchange="window.updateCurrentChapterField('title', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-weight: 700; font-size: 0.82rem; margin-bottom: 8px;" />
+          <!-- Chapter Title & Photo Banner Grid -->
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 900; color: #f8fafc; margin: 0 0 10px 0; line-height: 1.35;">
+              ${escapeHtml(obj.title)}
+            </h3>
 
-          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700;">विस्तृत वैज्ञानिक विवरण व सारांश (Content Summary):</label>
-          <textarea rows="3" onchange="window.updateCurrentChapterField('desc', this.value)" class="admin-textarea" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; margin-bottom: 8px;">${escapeHtml(obj.desc || 'इस अध्याय में वैज्ञानिक व व्यावहारिक जानकारी विस्तार से दी गई है।')}</textarea>
+            <!-- High-Res Visual Photo Card with Zoom Effect -->
+            <div style="position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.2); margin-bottom: 12px; height: 160px; background: #000;">
+              <img id="ais_chapter_preview_img" src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
+              <div style="position: absolute; bottom: 0; inset-inline: 0; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); padding: 6px 10px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.7rem; color: #fde047; font-weight: 800;">🔍 4K सचित्र पहचान व लक्षण</span>
+                <label style="background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.4); padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; cursor: pointer; margin: 0;">
+                  📸 फोटो बदलें
+                  <input type="file" accept="image/*" onchange="window.handleChapterPhotoUpload(event)" style="display:none;" />
+                </label>
+              </div>
+            </div>
 
-          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700; color: #fbbf24;">🎙️ ऑडियो नरेशन टेक्स्ट (TTS Speech Script):</label>
-          <textarea rows="3" onchange="window.updateCurrentChapterField('audioText', this.value)" class="admin-textarea" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; color: #fde047;">${escapeHtml(obj.audioText || obj.desc || 'किसान भाइयों, इस अध्याय में सम्पूर्ण मार्गदर्शन दिया गया है।')}</textarea>
-        </div>
+            <!-- Scientific Diagnosis Points -->
+            <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; border-left: 3px solid #38bdf8;">
+              <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 800; margin-bottom: 4px;">🔬 वैज्ञानिक पहचान व लक्षण:</div>
+              <ul style="margin: 0; padding-left: 16px; font-size: 0.72rem; color: #e2e8f0; line-height: 1.4;">
+                ${symptomsList.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+              </ul>
+            </div>
 
-        <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--admin-border); border-radius: 6px; padding: 10px;">
-          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700; color: #38bdf8;">🧪 दवा / खुराक तालिका (Dosage & Formulation):</label>
-          <input type="text" value="${escapeHtml(obj.dosage || 'अनुशंसित मात्रा अनुसार')}" onchange="window.updateCurrentChapterField('dosage', this.value)" placeholder="उदा. ट्राइकोडर्मा 10g/kg" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.78rem; margin-bottom: 8px;" />
+            <!-- 3D Dosage Box -->
+            <div style="background: rgba(22,163,74,0.15); border: 1.5px solid #16a34a; border-radius: 6px; padding: 8px 10px;">
+              <div style="font-size: 0.74rem; font-weight: 900; color: #4ade80; display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+                <span>🧪</span> <span>सटीक दवा व खुराक तालिका (Dosage):</span>
+              </div>
+              <div style="font-size: 0.74rem; font-weight: 800; color: #f8fafc;">${escapeHtml(obj.dosage || 'अनुशंसित मात्रा अनुसार')}</div>
+              <div style="font-size: 0.68rem; color: #93c5fd; margin-top: 2px;">💧 स्प्रे विधि: ${escapeHtml(obj.sprayDose || '15L पानी में स्टीकर मिलाकर')}</div>
+            </div>
+          </div>
 
-          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700; color: #34d399;">💧 स्प्रे चार्ट / उपयोग विधि:</label>
-          <input type="text" value="${escapeHtml(obj.sprayDose || '15L पानी में घोलकर छिड़कें')}" onchange="window.updateCurrentChapterField('sprayDose', this.value)" placeholder="उदा. 2ml प्रति लीटर पानी" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.78rem; margin-bottom: 8px;" />
-
-          <div style="margin-top: 10px; background: rgba(22,163,74,0.1); border: 1px dashed #16a34a; border-radius: 6px; padding: 8px; text-align: center;">
-            <div style="font-size: 0.72rem; color: #4ade80; font-weight: 800;">📖 रीडर लेआउट: 4K मैगजीन स्टाइल</div>
-            <div style="font-size: 0.68rem; color: var(--admin-muted); margin-top: 2px;">Header Logo + Title + Dose Table + Footer Page No.</div>
+          <!-- Running Footer -->
+          <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; color: #94a3b8;">
+            <span>Aarogyam Digital Library</span>
+            <span style="font-weight: 800; color: #38bdf8;">पेज ${((currentAiStudioBook.activeAuditChapterIndex + 1) * 10)} of 120</span>
           </div>
         </div>
+
+        <!-- RIGHT: LIVE EDIT CONTROLS FOR THIS CHAPTER -->
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--admin-border); border-radius: 10px; padding: 14px;">
+          <div style="font-size: 0.85rem; font-weight: 800; color: #fde047; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <span>✏️ इस अध्याय की जानकारी व दवा डोज एडिट करें:</span>
+            <span style="font-size: 0.72rem; color: #94a3b8;">लाइव अपडेट होगा</span>
+          </div>
+
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700;">अध्याय शीर्षक (Chapter Heading):</label>
+          <input type="text" value="${escapeHtml(obj.title)}" oninput="window.updateCurrentChapterField('title', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-weight: 700; font-size: 0.82rem; margin-bottom: 8px;" />
+
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700;">फोटो URL (Image URL):</label>
+          <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+            <input type="text" value="${escapeHtml(obj.image || '')}" placeholder="/images/books/...webp" onchange="window.updateCurrentChapterField('image', this.value)" class="admin-input" style="flex: 1; padding: 5px 8px; font-size: 0.76rem;" />
+            <label class="admin-button small-button" style="background:#0284c7;color:#fff;padding:4px 8px;font-size:0.72rem;margin:0;cursor:pointer;">
+              अपलोड
+              <input type="file" accept="image/*" onchange="window.handleChapterPhotoUpload(event)" style="display:none;" />
+            </label>
+          </div>
+
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700; color: #4ade80;">🧪 दवा का नाम व मात्रा (Dosage):</label>
+          <input type="text" value="${escapeHtml(obj.dosage || '')}" oninput="window.updateCurrentChapterField('dosage', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; font-weight: 700; color: #4ade80; margin-bottom: 8px;" />
+
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700; color: #38bdf8;">💧 स्प्रे विधि व स्टीकर नियम (Spray Method):</label>
+          <input type="text" value="${escapeHtml(obj.sprayDose || '')}" oninput="window.updateCurrentChapterField('sprayDose', this.value)" class="admin-input" style="width: 100%; padding: 6px 10px; font-size: 0.78rem; margin-bottom: 8px;" />
+
+          <label class="admin-label" style="font-size: 0.74rem; font-weight: 700; color: #fde047;">🎙️ ऑडियो नरेशन टेक्स्ट (TTS Audio Script):</label>
+          <textarea rows="3" oninput="window.updateCurrentChapterField('audioText', this.value)" class="admin-textarea" style="width: 100%; padding: 6px 10px; font-size: 0.78rem; color: #fde047; margin-bottom: 8px;">${escapeHtml(obj.audioText || obj.desc || '')}</textarea>
+
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button type="button" onclick="window.previewFullBookTtsAudio()" class="admin-button small-button" style="background: #f59e0b; color: #000; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+              <span>▶️</span> <span>ऑडियो सुनें</span>
+            </button>
+          </div>
+        </div>
+
       </div>
     `;
+  };
+
+  window.handleChapterPhotoUpload = function(e) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const r = new FileReader();
+      r.onload = (re) => {
+        window.updateCurrentChapterField('image', re.target.result);
+        const imgEl = document.getElementById('ais_chapter_preview_img');
+        if (imgEl) imgEl.src = re.target.result;
+        showToast(`📸 अध्याय की फोटो अपडेट हो गई: ${file.name}`, 'success');
+      };
+      r.readAsDataURL(file);
+    }
   };
 
   window.updateCurrentChapterField = function(field, val) {
@@ -3116,59 +3274,88 @@ export async function initBookLandingPages() {
     const origText = btn ? btn.innerHTML : '';
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '⏳ AI रिसर्च व चैप्टर्स जनरेट हो रहे हैं...';
+      btn.innerHTML = '⏳ 4K विजुअल चैप्टर्स व तस्वीरें तैयार हो रही हैं...';
     }
 
     setTimeout(() => {
       const cat = currentAiStudioBook.category || 'Agriculture';
       const cleanTopic = topic.split(' ')[0] || 'फसल';
 
-      // Smart dynamic customisation of chapters based on subject
       currentAiStudioBook.topic = topic;
       currentAiStudioBook.tier2CoreChapters = [
         {
           num: 1,
           title: `अध्याय 1: ${topic} - उन्नत किस्में व बुवाई का सही समय`,
           pages: 12,
-          desc: `${topic} के लिए जलवायु, मिट्टी की आवश्यकता व उन्नत हाइब्रिड बीजों का सम्पूर्ण चयन।`,
-          dosage: 'ट्राइकोडर्मा 10g + कार्बोफ्यूरान 5g प्रति किलो बीज',
-          sprayDose: 'नर्सरी स्प्रे: 19:19:19 NPK @ 2g/L पानी',
-          audioText: `नमस्ते किसान साथियों! ${topic} की इस संपूर्ण मास्टर गाइड में आपका स्वागत है। इस अध्याय में हम उन्नत किस्मों के बारे में विस्तार से जानेंगे।`
+          image: '/images/books/kharif-master-guide-2026-preview-01.webp',
+          badge: '🌱 बीज शोधन व नर्सरी',
+          symptoms: [
+            `${topic} के लिए जलवायु व मिट्टी का सही चयन`,
+            'हाइब्रिड व रोग-प्रतिरोधी किस्मों की सूची',
+            'बीज शोधन से 90% फंगल रोगों से सुरक्षा'
+          ],
+          dosage: 'ट्राइकोडर्मा 10g + कार्बेन्डाजिम 2g प्रति किलो बीज',
+          sprayDose: 'नर्सरी स्प्रे (15 दिन पर): 19:19:19 NPK @ 2g/L पानी',
+          audioText: `नमस्ते किसान साथियों! ${topic} की इस संपूर्ण मास्टर गाइड में आपका स्वागत है। इस अध्याय में हम उन्नत किस्मों व बीज शोधन के बारे में विस्तार से जानेंगे।`
         },
         {
           num: 2,
           title: `अध्याय 2: ${cleanTopic} में बेसल खाद, सूक्ष्म पोषक तत्व व बेड निर्माण`,
           pages: 14,
-          desc: 'प्रति एकड़ खाद की सटीक मात्रा, पोटाश, जिंक, सल्फर व जैविक खादों का वैज्ञानिक संतुलन।',
-          dosage: 'DAP 50kg + MOP 30kg + Zinc 10kg प्रति एकड़',
-          sprayDose: 'नीम खली 100kg बेसल डोज में',
+          image: '/images/books/kharif-master-guide-2026-preview-02.webp',
+          badge: '💧 बेसल डोज व ड्रिप',
+          symptoms: [
+            'प्रति एकड़ गोबर खाद, डीएपी व पोटाश की सही मात्रा',
+            'जिंक और सल्फर का वैज्ञानिक संतुलन',
+            '25 माइक्रोन सिल्वर-ब्लैक मल्चिंग से नमी सुरक्षा'
+          ],
+          dosage: 'DAP 50kg + MOP 30kg + Zinc 10kg + गोबर खाद 4 ट्रॉली',
+          sprayDose: 'नीम खली 100kg बेसल डोज में मिलाकर बेड बनाएं',
           audioText: `भूमि की तैयारी और बेसल खाद पौधे की रीढ़ की हड्डी होती है। सही मात्रा में जिंक और पोटाश देने से पौधों की रोग प्रतिरोधक क्षमता बढ़ जाती है।`
         },
         {
           num: 3,
-          title: `अध्याय 3: ${cleanTopic} के प्रमुख कीट, रस चूसक व अचूक कीटनाशक डोज`,
+          title: `अध्याय 3: ${cleanTopic} के प्रमुख कीट (थ्रिप्स, सफेद मक्खी, इल्ली) व अचूक डोज`,
           pages: 15,
-          desc: 'थ्रिप्स, माइट्स, तना छेदक व इल्ली की सटीक पहचान और दवाइयों का सही मिश्रण।',
-          dosage: 'इमिडाक्लोप्रिड 17.8% SL @ 0.5ml/L या क्लोरेंट्रानिलिप्रोल @ 0.4ml/L',
-          sprayDose: 'माइट्स नियंत्रण: प्रोपरगाइट 57% EC @ 2ml/L पानी',
+          image: '/images/books/kheti-dr-demo-1.webp',
+          badge: '🔴 हाई अलर्ट कीट नियंत्रण',
+          symptoms: [
+            'थ्रिप्स से पत्तियों का ऊपर की ओर नाव जैसा मुड़ना',
+            'सफेद मक्खी से पत्तियों का पीला पड़ना व वायरस फैलना',
+            'तना छेदक व फल छेदक इल्ली की रोकथाम'
+          ],
+          dosage: 'फिप्रोनिल 5% SC @ 2ml/L या स्पिनोटोराम 11.7% SC @ 1ml/L',
+          sprayDose: 'माइट्स के लिए: प्रोपरगाइट 57% EC @ 2ml/L + स्टीकर',
           audioText: `कीटों के शुरुआती हमले को पहचानना ही फसल बचाने का रहस्य है। पत्तियों के पीछे बारीकी से देखें और सही सिस्टेमिक कीटनाशक का प्रयोग करें।`
         },
         {
           num: 4,
-          title: `अध्याय 4: फफूंद व जीवाणु जनित रोग (झुलसा, उकठा, पाउडरी मिल्ड्यू)`,
+          title: `अध्याय 4: फफूंद व जीवाणु जनित रोग (झुलसा, उकठा विल्ट, पाउडरी मिल्ड्यू)`,
           pages: 15,
-          desc: 'काले-भूरे धब्बे, तना गलन व विल्ट से फसल को 100% सुरक्षित रखने का उपचार।',
+          image: '/images/books/kheti-dr-demo-2.webp',
+          badge: '🍄 फंगल व बैक्टीरियल रोग',
+          symptoms: [
+            'पत्तियों पर काले-भूरे छल्लेदार धब्बे (झुलसा)',
+            'दोपहर में पौधे का अचानक मुरझाना (उकठा विल्ट)',
+            'तने के निचले हिस्से पर कालापन व सड़ांध'
+          ],
           dosage: 'एज़ोक्सिस्ट्रोबिन + टेबुकोनाज़ोल @ 1ml/L पानी',
-          sprayDose: 'उकठा ड्रेंचिंग: कॉपर ऑक्सीक्लोराइड 50% WP @ 3g/L',
+          sprayDose: 'उकठा ड्रेंचिंग: कॉपर ऑक्सीक्लोराइड 50% WP @ 3g/L जड़ के पास डालें',
           audioText: `फंगल रोगों में पत्तियों पर धब्बे दिखने के तुरंत बाद फंगीसाइड का छिड़काव आवश्यक है। स्टीकर मिलाकर छिड़कने से दवा धुलती नहीं है।`
         },
         {
           num: 5,
-          title: `अध्याय 5: फल-फूल वृद्धि, टॉनिक व 7-दिवसीय स्प्रे शेड्यूल`,
+          title: `अध्याय 5: फल-फूल वृद्धि, फ्रूट सेटिंग, बोरॉन स्प्रे व 7-दिवसीय शेड्यूल`,
           pages: 14,
-          desc: 'फूल झड़ने से रोकने के उपाय, बोरॉन 20% का स्प्रे व मंडी में रिकॉर्ड उपज पाने के नुस्खे।',
-          dosage: '00:52:34 NPK @ 5g/L + बोरॉन 20% @ 1g/L',
-          sprayDose: 'टॉनिक: नाइट्रोबेन्जीन / प्लानोफिक्स @ 0.5ml/L पानी',
+          image: '/images/books/kharif-master-guide-2026-preview-03.webp',
+          badge: '🌸 बंपर उत्पादन व चमक',
+          symptoms: [
+            'फूल झड़ने से रोकने के अचूक उपाय',
+            'बोरॉन 20% के स्प्रे से फलों का फटना बंद',
+            'फलों का वजन और चमक बढ़ाकर मंडी में रिकॉर्ड भाव'
+          ],
+          dosage: '00:52:34 NPK @ 5g/L + बोरॉन 20% @ 1g/L पानी',
+          sprayDose: 'टॉनिक: प्लानोफिक्स या बायो 20 @ 0.5ml/L पानी',
           audioText: `फूलों को झड़ने से बचाने के लिए बोरॉन का सही समय पर स्प्रे करना अत्यंत लाभकारी है। इससे फलों की चमक और वजन दोनों में रिकॉर्ड वृद्धि होती है।`
         }
       ];
@@ -3183,7 +3370,7 @@ export async function initBookLandingPages() {
         btn.innerHTML = origText;
       }
 
-      showToast(`🎉 '${topic}' के 120-पेज मास्टर चैप्टर्स सफलता से जनरेट हो गए!`, 'success');
+      showToast(`🎉 '${topic}' के 120-पेज 4K सचित्र चैप्टर्स सफलतापूर्वक तैयार हो गए!`, 'success');
     }, 800);
   };
 
@@ -3245,6 +3432,7 @@ export async function initBookLandingPages() {
     const topic = (document.getElementById('ais_input_topic')?.value || currentAiStudioBook.topic || 'ई-बुक').trim();
     const authorName = (document.getElementById('ais_author_name')?.value || currentAiStudioBook.authorName || 'आरोग्यम इंडिया कृषि टीम').trim();
     const authorPhoto = document.getElementById('ais_author_photo_url')?.value || '/images/logo/logo.png';
+    const offerPrice = document.getElementById('ais_input_offer_price')?.value || '99';
 
     // Tier 1 and Tier 2 items
     const allItems = [
@@ -3252,44 +3440,118 @@ export async function initBookLandingPages() {
       ...currentAiStudioBook.tier2CoreChapters.map(x => ({ type: 'tier2', title: x.title, pages: x.pages, obj: x }))
     ];
 
-    // Determine what content to show on this page
-    let pageType = 'chapter';
-    let chapterIndex = Math.min(allItems.length - 1, Math.floor((pNum - 1) / 12));
-    let item = allItems[chapterIndex] || allItems[0];
-
     if (pNum === 1) {
-      // Cover Page
+      // 4K MAGAZINE COVER PAGE
       canvas.innerHTML = `
-        <div style="width: 100%; max-width: 580px; min-height: 720px; background: linear-gradient(135deg, #064e3b 0%, #022c22 100%); border: 3px solid #10b981; border-radius: 12px; padding: 32px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); display: flex; flex-direction: column; justify-content: space-between; text-align: center; color: #fff;">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(16,185,129,0.3); padding-bottom: 12px;">
-            <img src="/images/logo/logo.png" style="height: 36px; object-fit: contain;" alt="Aarogyam Logo" onerror="this.style.display='none'" />
-            <span style="font-size: 0.75rem; color: #34d399; font-weight: 800; letter-spacing: 1px;">AAROGYAM INDIA MASTER EDITION</span>
+        <div style="width: 100%; max-width: 600px; min-height: 740px; background: radial-gradient(circle at top right, #065f46 0%, #022c22 40%, #051410 100%); border: 3px solid #10b981; border-radius: 16px; padding: 36px 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: space-between; text-align: center; color: #fff; position: relative; overflow: hidden;">
+          
+          <!-- Background Watermark -->
+          <div style="position: absolute; inset: 0; opacity: 0.05; background-image: radial-gradient(#10b981 1px, transparent 1px); background-size: 20px 20px; pointer-events: none;"></div>
+
+          <!-- Top Brand Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(16,185,129,0.3); padding-bottom: 12px; position: relative; z-index: 2;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="/images/logo/logo.png" style="height: 38px; object-fit: contain;" alt="Aarogyam Logo" onerror="this.style.display='none'" />
+              <span style="font-size: 0.8rem; color: #34d399; font-weight: 900; letter-spacing: 1.5px;">AAROGYAM INDIA</span>
+            </div>
+            <span style="background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #fbbf24; font-size: 0.75rem; font-weight: 900; padding: 3px 10px; border-radius: 20px;">
+              ⚡ 4K सचित्र मास्टर एडिशन
+            </span>
           </div>
 
-          <div style="padding: 30px 10px;">
-            <div style="background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid #f59e0b; display: inline-block; padding: 4px 14px; border-radius: 20px; font-weight: 900; font-size: 0.82rem; margin-bottom: 16px;">
-              🌾 संपूर्ण प्रैक्टिकल सचित्र 4K गाइड + ऑडियो बुक
+          <!-- Main Title & Badge -->
+          <div style="padding: 24px 10px; position: relative; z-index: 2;">
+            <div style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-weight: 900; font-size: 0.8rem; padding: 4px 16px; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(16,185,129,0.4);">
+              🌾 देश की पहली 120-पेज प्रैक्टिकल सचित्र ई-बुक + ऑडियो बुक
             </div>
-            <h1 style="font-size: 1.8rem; font-weight: 900; line-height: 1.3; color: #f8fafc; margin: 0 0 14px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+
+            <h1 style="font-size: 1.85rem; font-weight: 900; line-height: 1.3; color: #f8fafc; margin: 0 0 14px 0; text-shadow: 0 4px 14px rgba(0,0,0,0.6);">
               ${escapeHtml(topic)}
             </h1>
-            <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; margin: 0;">
-              बीज उपचार, खेत तैयारी, कीट-रोग पहचान, सटीक स्प्रे डोज एवं रिकॉर्ड उत्पादन की सम्पूर्ण वैज्ञानिक विधि
+
+            <p style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.6; margin: 0 auto; max-width: 480px;">
+              बीज उपचार से लेकर खेत तैयारी, रस चूसक कीट, फफूंद रोग, अचूक स्प्रे डोज एवं बंपर उत्पादन की सम्पूर्ण वैज्ञानिक विधि।
             </p>
           </div>
 
-          <div style="background: rgba(0,0,0,0.4); border-radius: 10px; padding: 16px; border: 1px solid rgba(255,255,255,0.1);">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-              <img src="${authorPhoto}" style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid #10b981; object-fit: cover;" onerror="this.src='/images/logo/logo.png'" />
-              <div style="text-align: left;">
-                <div style="font-size: 0.85rem; font-weight: 800; color: #f8fafc;">${escapeHtml(authorName)}</div>
-                <div style="font-size: 0.72rem; color: #94a3b8;">आरोग्यम इंडिया कृषि अनुसंधान एवं डिजिटल किसान क्रांति</div>
+          <!-- Center Visual Feature Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; position: relative; z-index: 2;">
+            <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 10px; text-align: left;">
+              <div style="font-size: 0.78rem; font-weight: 800; color: #4ade80;">🔬 सचित्र रोग व कीट पहचान</div>
+              <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">4K HD रंगीन तस्वीरों के साथ</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 10px; text-align: left;">
+              <div style="font-size: 0.78rem; font-weight: 800; color: #fbbf24;">🎧 फुल HD ऑडियो बुक</div>
+              <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">खेत में काम करते समय सुनें</div>
+            </div>
+          </div>
+
+          <!-- Author & Launch Card -->
+          <div style="background: rgba(0,0,0,0.5); border-radius: 12px; padding: 14px 18px; border: 1.5px solid rgba(255,255,255,0.12); position: relative; z-index: 2;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="${authorPhoto}" style="width: 48px; height: 48px; border-radius: 50%; border: 2.5px solid #f59e0b; object-fit: cover; box-shadow: 0 4px 12px rgba(245,158,11,0.3);" onerror="this.src='/images/logo/logo.png'" />
+                <div style="text-align: left;">
+                  <div style="font-size: 0.88rem; font-weight: 900; color: #f8fafc;">${escapeHtml(authorName)}</div>
+                  <div style="font-size: 0.72rem; color: #94a3b8;">आरोग्यम इंडिया कृषि अनुसंधान टीम</div>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 1.2rem; font-weight: 900; color: #4ade80;">₹${offerPrice}</span>
+                <div style="font-size: 0.68rem; color: #94a3b8; text-decoration: line-through;">MRP ₹299</div>
               </div>
             </div>
           </div>
 
-          <div style="font-size: 0.72rem; color: #6ee7b7; border-top: 1px solid rgba(16,185,129,0.3); padding-top: 10px;">
-            पेज 1 (कवर) | 120 Pages Master Practical E-Book
+          <!-- Bottom Footer -->
+          <div style="font-size: 0.72rem; color: #6ee7b7; border-top: 1px solid rgba(16,185,129,0.3); padding-top: 12px; display: flex; justify-content: space-between; position: relative; z-index: 2;">
+            <span>पेज 1 (कवर)</span>
+            <span>120 Pages Master Practical E-Book</span>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    if (pNum === 2) {
+      // TABLE OF CONTENTS (TOC)
+      canvas.innerHTML = `
+        <div style="width: 100%; max-width: 600px; min-height: 740px; background: #0f172a; border: 2px solid #38bdf8; border-radius: 16px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: space-between; color: #fff;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(56,189,248,0.3); padding-bottom: 10px; margin-bottom: 16px;">
+              <span style="font-size: 0.82rem; font-weight: 900; color: #38bdf8;">📑 विषय-सूची (Table of Contents)</span>
+              <span style="font-size: 0.72rem; color: #94a3b8;">पेज 2 / 120</span>
+            </div>
+
+            <h2 style="font-size: 1.25rem; font-weight: 900; color: #f8fafc; margin: 0 0 14px 0;">
+              इस 120-पेज मास्टर गाइड में क्या-क्या शामिल है:
+            </h2>
+
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              ${allItems.map((item, idx) => `
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 0.85rem;">${item.type === 'tier1' ? '🟢' : '🟡'}</span>
+                    <span style="font-size: 0.78rem; font-weight: 700; color: #f8fafc;">${escapeHtml(item.title)}</span>
+                  </div>
+                  <span style="font-size: 0.72rem; color: #38bdf8; font-weight: 800; background: rgba(56,189,248,0.15); padding: 2px 8px; border-radius: 4px;">
+                    पेज ${(idx * 12) + 3}
+                  </span>
+                </div>
+              `).join('')}
+              <div style="background: rgba(59,130,246,0.1); border: 1px solid #3b82f6; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 0.85rem;">👑</span>
+                  <span style="font-size: 0.78rem; font-weight: 800; color: #60a5fa;">फाउंडर संदेश + ₹1999 VIP Pro सदस्यता आमंत्रण</span>
+                </div>
+                <span style="font-size: 0.72rem; color: #60a5fa; font-weight: 800; background: rgba(59,130,246,0.2); padding: 2px 8px; border-radius: 4px;">पेज 105</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; display: flex; justify-content: space-between; font-size: 0.72rem; color: #94a3b8;">
+            <span>Aarogyam India Digital Library</span>
+            <span>पेज 2 of 120</span>
           </div>
         </div>
       `;
@@ -3297,43 +3559,49 @@ export async function initBookLandingPages() {
     }
 
     if (pNum >= 105) {
-      // Funnel & VIP Catalog Page
+      // 4K FUNNEL & VIP PRO CATALOG PAGE
       canvas.innerHTML = `
-        <div style="width: 100%; max-width: 580px; min-height: 720px; background: #0f172a; border: 2px solid #3b82f6; border-radius: 12px; padding: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); display: flex; flex-direction: column; justify-content: space-between; color: #fff;">
+        <div style="width: 100%; max-width: 600px; min-height: 740px; background: #0f172a; border: 2px solid #3b82f6; border-radius: 16px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: space-between; color: #fff;">
+          
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(59,130,246,0.4); padding-bottom: 10px;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <img src="/images/logo/logo.png" style="height: 28px;" onerror="this.style.display='none'" />
-              <span style="font-weight: 800; font-size: 0.85rem; color: #60a5fa;">Aarogyam India VIP Pro & Support</span>
+              <span style="font-weight: 900; font-size: 0.85rem; color: #60a5fa;">Aarogyam India VIP Pro Ecosystem</span>
             </div>
             <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">पेज ${pNum} / 120</span>
           </div>
 
-          <div style="padding: 20px 0;">
-            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%); border: 1.5px solid #60a5fa; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 16px;">
-              <div style="font-size: 1.8rem; margin-bottom: 6px;">👑</div>
-              <h2 style="font-size: 1.25rem; font-weight: 900; color: #fde047; margin: 0 0 6px 0;">
-                ₹1999 की VIP Pro सदस्यता आपके लिए बिल्कुल मुफ्त!
+          <div style="padding: 16px 0;">
+            <!-- VIP Pro Pass -->
+            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%); border: 2px solid #60a5fa; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 14px; box-shadow: 0 8px 24px rgba(59,130,246,0.3);">
+              <div style="font-size: 2rem; margin-bottom: 4px;">👑</div>
+              <h2 style="font-size: 1.3rem; font-weight: 900; color: #fde047; margin: 0 0 6px 0;">
+                ₹1999 की VIP Pro सदस्यता आपके लिए बिल्कुल FREE!
               </h2>
-              <p style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.5; margin: 0 0 12px 0;">
-                इस पुस्तक के खरीदार के रूप में आपको 100+ कृषि, स्वास्थ्य व व्यापार ई-बुक्स का 1 वर्ष तक फ्री एक्सेस मिलता है।
+              <p style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.5; margin: 0 0 14px 0;">
+                इस पुस्तक के पाठक के रूप में आपको 100+ कृषि, स्वास्थ्य, पशुपालन व व्यापार ई-बुक्स का 1 वर्ष तक 100% मुफ्त ऑल-एक्सेस मिलता है।
               </p>
-              <a href="/ebooks/store.html" target="_blank" style="display: inline-block; background: #f59e0b; color: #000; font-weight: 900; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 0.82rem;">
-                📚 पूरी डिजिटल लाइब्रेरी देखें ➔
+              <a href="/ebooks/store.html" target="_blank" style="display: inline-block; background: #f59e0b; color: #000; font-weight: 900; padding: 8px 20px; border-radius: 6px; text-decoration: none; font-size: 0.82rem;">
+                📚 100+ ई-बुक्स डिजिटल स्टोर खोलें ➔
               </a>
             </div>
 
-            <div style="background: rgba(34,197,94,0.1); border: 1px dashed #22c55e; border-radius: 8px; padding: 14px; text-align: center;">
-              <div style="font-weight: 800; color: #4ade80; font-size: 0.88rem; margin-bottom: 4px;">
-                💬 24×7 WhatsApp AI डॉक्टर हेल्पलाइन
+            <!-- 24x7 WhatsApp Doctor Helpline -->
+            <div style="background: rgba(34,197,94,0.12); border: 1.5px dashed #22c55e; border-radius: 10px; padding: 14px; text-align: center;">
+              <div style="font-weight: 900; color: #4ade80; font-size: 0.9rem; margin-bottom: 4px;">
+                💬 24×7 WhatsApp AI कृषि डॉक्टर हेल्पलाइन
               </div>
-              <p style="font-size: 0.76rem; color: #cbd5e1; margin: 0;">
-                फसल में कोई भी रोग या कीट दिखने पर तुरंत अपनी फोटो खींचकर WhatsApp हेल्पलाइन पर भेजें।
+              <p style="font-size: 0.78rem; color: #cbd5e1; margin: 0 0 8px 0;">
+                खेत में कोई भी अज्ञात रोग या कीट दिखने पर तुरंत पत्ती की फोटो खींचकर हमारे हेल्पलाइन नंबर पर भेजें।
               </p>
+              <span style="background: #22c55e; color: #000; font-weight: 900; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem;">
+                WhatsApp: +91 7974422572
+              </span>
             </div>
           </div>
 
           <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; display: flex; justify-content: space-between; font-size: 0.72rem; color: #94a3b8;">
-            <span>Aarogyam India Ecosystem</span>
+            <span>लेखक: ${escapeHtml(authorName)}</span>
             <span>पेज ${pNum} of 120</span>
           </div>
         </div>
@@ -3341,59 +3609,77 @@ export async function initBookLandingPages() {
       return;
     }
 
-    // Standard High-Definition Chapter Page
+    // 4K ILLUSTRATED CHAPTER PAGE (REAL GRAPHIC MAGAZINE LAYOUT)
+    let chapterIndex = Math.min(allItems.length - 1, Math.floor((pNum - 3) / 12));
+    let item = allItems[chapterIndex] || allItems[0];
     const obj = item?.obj || {};
+    const imgSrc = obj.image || (item.type === 'tier2' ? '/images/books/kheti-dr-demo-1.webp' : '/images/books/BK001/page-1.webp');
+    const badgeText = obj.badge || (item.type === 'tier2' ? '🔴 हाई अलर्ट कीट/रोग' : '🌱 कॉमन फाउंडेशन ज्ञान');
+    const symptomsList = Array.isArray(obj.symptoms) ? obj.symptoms : [
+      'पत्तियों व तने पर शुरुआती लक्षण दिखने पर तुरंत पहचान करें',
+      'नमी और तापमान में बदलाव से रोग तेजी से फैलता है',
+      'सही समय पर अनुशंसित दवा का ही स्प्रे करें'
+    ];
+
     canvas.innerHTML = `
-      <div style="width: 100%; max-width: 580px; min-height: 720px; background: #0f172a; border: 1.5px solid #334155; border-radius: 12px; padding: 26px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); display: flex; flex-direction: column; justify-content: space-between; color: #fff;">
+      <div style="width: 100%; max-width: 600px; min-height: 740px; background: #0f172a; border: 2px solid ${item.type === 'tier2' ? '#ec4899' : '#10b981'}; border-radius: 16px; padding: 26px; box-shadow: 0 20px 50px rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: space-between; color: #fff;">
         
-        <!-- Header: Aarogyam India Logo & Running Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <!-- Top Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(255,255,255,0.15); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <img src="/images/logo/logo.png" style="height: 26px; object-fit: contain;" onerror="this.style.display='none'" />
-            <span style="font-size: 0.76rem; color: #38bdf8; font-weight: 800;">AAROGYAM DIGITAL MASTER GUIDE</span>
+            <span style="font-size: 0.78rem; color: #38bdf8; font-weight: 800;">AAROGYAM 4K MASTER GUIDE</span>
           </div>
-          <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 800;">पेज ${pNum} / 120</span>
+          <span style="font-size: 0.72rem; color: #34d399; font-weight: 800; background: rgba(16,185,129,0.15); padding: 2px 8px; border-radius: 4px;">
+            ${escapeHtml(badgeText)}
+          </span>
         </div>
 
-        <!-- Chapter Main Body -->
-        <div style="padding: 18px 0; flex: 1;">
-          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
-            <span style="background: rgba(16,185,129,0.2); color: #34d399; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 4px;">
-              ${item.type === 'tier1' ? '🟢 कॉमन फाउंडेशन ज्ञान' : '🟡 AI स्पेशलिटी रिसर्च'}
-            </span>
-          </div>
-
-          <h2 style="font-size: 1.2rem; font-weight: 900; color: #f8fafc; margin: 0 0 10px 0; line-height: 1.35;">
+        <!-- Main Body: Title, Photo & Diagnostic Grid -->
+        <div style="padding: 14px 0; flex: 1;">
+          <h2 style="font-size: 1.15rem; font-weight: 900; color: #f8fafc; margin: 0 0 10px 0; line-height: 1.35;">
             ${escapeHtml(obj.title || 'अध्याय विवरण')}
           </h2>
 
-          <p style="font-size: 0.86rem; color: #cbd5e1; line-height: 1.65; margin: 0 0 16px 0;">
-            ${escapeHtml(obj.desc || 'इस अध्याय में वैज्ञानिक एवं व्यावहारिक मार्गदर्शन प्रदान किया गया है।')}
-          </p>
-
-          <!-- High-Converting 4K Dosage & Spray Table -->
-          <div style="background: rgba(0,0,0,0.4); border: 1.5px solid #16a34a; border-radius: 8px; padding: 12px; margin-bottom: 14px;">
-            <div style="font-size: 0.8rem; font-weight: 900; color: #4ade80; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-              <span>🧪</span> <span>सटीक दवा व खुराक तालिका (Dosage Schedule):</span>
-            </div>
-            <div style="font-size: 0.78rem; color: #f1f5f9; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 4px; margin-bottom: 6px; font-weight: 700;">
-              ${escapeHtml(obj.dosage || 'अनुशंसित मात्रा अनुसार')}
-            </div>
-            <div style="font-size: 0.74rem; color: #93c5fd; display: flex; align-items: center; gap: 6px;">
-              <span>💧</span> <span>स्प्रे विधि: ${escapeHtml(obj.sprayDose || '15L पानी में स्टीकर मिलाकर छिड़कें')}</span>
+          <!-- Real Visual Crop/Pest Photo Card -->
+          <div style="border-radius: 8px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.2); margin-bottom: 12px; height: 170px; background: #000; position: relative;">
+            <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
+            <div style="position: absolute; bottom: 0; inset-inline: 0; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); padding: 6px 12px;">
+              <span style="font-size: 0.72rem; color: #fde047; font-weight: 800;">🔍 4K सचित्र पहचान व फील्ड लक्षण</span>
             </div>
           </div>
 
-          <!-- Audio Listening Hint -->
-          <div style="background: rgba(245,158,11,0.08); border-left: 3px solid #f59e0b; padding: 8px 12px; border-radius: 4px;">
-            <div style="font-size: 0.74rem; color: #fde047; font-weight: 700;">
-              🎧 ऑडियो नरेशन उपलब्ध: ईयरफोन लगाकर इस अध्याय को कभी भी सुनें
+          <!-- Scientific Diagnosis Box -->
+          <div style="background: rgba(0,0,0,0.35); border-left: 3.5px solid #38bdf8; border-radius: 6px; padding: 10px 12px; margin-bottom: 12px;">
+            <div style="font-size: 0.76rem; color: #38bdf8; font-weight: 900; margin-bottom: 4px;">🔬 वैज्ञानिक पहचान एवं महत्वपूर्ण लक्षण:</div>
+            <ul style="margin: 0; padding-left: 16px; font-size: 0.76rem; color: #e2e8f0; line-height: 1.45;">
+              ${symptomsList.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+            </ul>
+          </div>
+
+          <!-- 3D High-Converting Dosage Box -->
+          <div style="background: rgba(22,163,74,0.15); border: 1.5px solid #16a34a; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px;">
+            <div style="font-size: 0.78rem; font-weight: 900; color: #4ade80; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <span>🧪</span> <span>सटीक दवा व खुराक तालिका (Dosage Schedule):</span>
+            </div>
+            <div style="font-size: 0.8rem; font-weight: 800; color: #f8fafc; background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 4px;">
+              ${escapeHtml(obj.dosage || 'अनुशंसित मात्रा अनुसार')}
+            </div>
+            <div style="font-size: 0.72rem; color: #93c5fd; margin-top: 4px;">
+              💧 स्प्रे विधि: ${escapeHtml(obj.sprayDose || '15L पानी में स्टीकर मिलाकर छिड़कें')}
+            </div>
+          </div>
+
+          <!-- Audio Listening Strip -->
+          <div style="background: rgba(245,158,11,0.08); border-left: 3px solid #f59e0b; padding: 6px 10px; border-radius: 4px;">
+            <div style="font-size: 0.72rem; color: #fde047; font-weight: 700;">
+              🎧 ऑडियो नरेशन: खेत में काम करते समय ईयरफोन लगाकर इस अध्याय को सुनें
             </div>
           </div>
         </div>
 
-        <!-- Footer: Page Number & Branding -->
-        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: #94a3b8;">
+        <!-- Running Footer -->
+        <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: #94a3b8;">
           <span>लेखक: ${escapeHtml(authorName)}</span>
           <span style="font-weight: 800; color: #38bdf8;">पेज ${pNum} of 120</span>
         </div>
@@ -3546,6 +3832,11 @@ export async function initBookLandingPages() {
         })
       });
     } catch(e) {}
+
+    showToast(`🎉 बधाई! नई ई-बुक (${newBookId}: ${topic}) स्टोर व लैंडिंग पेज पर 100% लाइव हो गई!`, 'success');
+    window.switchAdminSubTab('pages');
+    await loadAllData();
+  };
 
     showToast(`🎉 बधाई! नई ई-बुक (${newBookId}: ${topic}) स्टोर व लैंडिंग पेज पर 100% लाइव हो गई!`, 'success');
     window.switchAdminSubTab('pages');
