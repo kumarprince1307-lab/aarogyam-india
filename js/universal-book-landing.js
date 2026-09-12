@@ -234,20 +234,22 @@
               const mergedHero = { ...(serverPage.hero || {}) };
               if (item.hero) {
                 Object.keys(item.hero).forEach(k => {
-                  if (item.hero[k] !== '' && item.hero[k] !== null && item.hero[k] !== undefined) {
+                  if (item.hero[k] !== undefined && item.hero[k] !== null) {
                     mergedHero[k] = item.hero[k];
                   }
                 });
               }
-              const mergedDemo = (item.demo_images && Array.isArray(item.demo_images) && item.demo_images.length > 0)
+              const mergedDemo = Array.isArray(item.demo_images)
                 ? item.demo_images
-                : (serverPage.demo_images || []);
+                : (Array.isArray(item.preview_images) ? item.preview_images : (serverPage.demo_images || []));
               
               allLandingPages[idx] = {
                 ...serverPage,
                 ...item,
                 hero: mergedHero,
-                demo_images: mergedDemo
+                demo_images: mergedDemo,
+                audio_layer: item.audio_layer ? { ...(serverPage.audio_layer || {}), ...item.audio_layer } : serverPage.audio_layer,
+                section_banners: item.section_banners ? { ...(serverPage.section_banners || {}), ...item.section_banners } : serverPage.section_banners
               };
             } else {
               allLandingPages.unshift(item);
@@ -676,11 +678,18 @@
     // 6. Preview Gallery (Pinch-to-Zoom)
     const previewSection = document.getElementById('sec-sample-book');
     const galleryGrid = document.getElementById('preview-gallery-grid');
-    const rawDemoList = (l.demo_images && Array.isArray(l.demo_images) && l.demo_images.length > 0) ? l.demo_images :
-                        (l.preview_images && Array.isArray(l.preview_images) && l.preview_images.length > 0 ? l.preview_images :
-                        (l.previewImages && Array.isArray(l.previewImages) && l.previewImages.length > 0 ? l.previewImages :
-                        (b.demoImages && Array.isArray(b.demoImages) && b.demoImages.length > 0 ? b.demoImages :
-                        (b.pageImages && Array.isArray(b.pageImages) && b.pageImages.length > 0 ? b.pageImages.slice(0, 16) : []))));
+    let rawDemoList = [];
+    if (Array.isArray(l.demo_images)) {
+      rawDemoList = l.demo_images;
+    } else if (Array.isArray(l.preview_images)) {
+      rawDemoList = l.preview_images;
+    } else if (Array.isArray(l.previewImages)) {
+      rawDemoList = l.previewImages;
+    } else if (Array.isArray(b.demoImages) && b.demoImages.length > 0) {
+      rawDemoList = b.demoImages;
+    } else if (Array.isArray(b.pageImages) && b.pageImages.length > 0) {
+      rawDemoList = b.pageImages.slice(0, 16);
+    }
     
     const demoImages = rawDemoList.map(url => window.resolveImageSrc(url)).filter(Boolean);
 
@@ -1957,8 +1966,9 @@
     if (titleEl) titleEl.textContent = audioLayer.title || `${b.heading || b.name || 'पुस्तक'} का लाइव ऑडियो परिचय सुनें`;
     if (subtitleEl) subtitleEl.textContent = audioLayer.subtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
 
-    if (bannerUrl && bannerWrap && bannerImg) {
-      bannerImg.src = bannerUrl;
+    if (bannerUrl && typeof bannerUrl === 'string' && bannerUrl.trim().length > 0 && bannerWrap && bannerImg) {
+      bannerImg.src = window.resolveImageSrc(bannerUrl.trim());
+      bannerImg.onerror = function() { window.handleImageError(this); };
       bannerWrap.style.display = 'block';
     } else if (bannerWrap) {
       bannerWrap.style.display = 'none';

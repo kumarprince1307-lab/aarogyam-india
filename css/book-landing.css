@@ -3326,35 +3326,71 @@ section{
 }
 
 /* ==========================================================
-   UNIVERSAL SECTION BANNERS & RESPONSIVE FREE-SIZE PULSE
+   UNIVERSAL SECTION BANNERS & GENTLE FLOATING WAVE ANIMATION
    ========================================================== */
-@keyframes bannerSubtlePulse {
-  0%, 100% {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18), 0 0 0 rgba(46, 125, 50, 0);
-    transform: scale(1);
+@keyframes bannerSubtleWave {
+  0% {
+    transform: translateY(0px) scale(1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16), 0 0 0 rgba(46, 125, 50, 0);
   }
   50% {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28), 0 0 20px rgba(245, 158, 11, 0.25);
-    transform: scale(1.006);
+    transform: translateY(-6px) scale(1.008);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24), 0 0 20px rgba(245, 158, 11, 0.22);
   }
+  100% {
+    transform: translateY(0px) scale(1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16), 0 0 0 rgba(46, 125, 50, 0);
+  }
+}
+
+@keyframes heroBgWave {
+  0% {
+    transform: scale(1.02) translateY(0px);
+  }
+  50% {
+    transform: scale(1.05) translateY(-6px);
+  }
+  100% {
+    transform: scale(1.02) translateY(0px);
+  }
+}
+
+@keyframes bookCoverFloat {
+  0%, 100% {
+    transform: perspective(1000px) rotateY(-12deg) translateY(0px);
+    box-shadow: -15px 20px 40px rgba(0, 0, 0, 0.35);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(-8deg) translateY(-8px);
+    box-shadow: -20px 28px 50px rgba(0, 0, 0, 0.45);
+  }
+}
+
+.hero-banner-bg {
+  animation: heroBgWave 12s ease-in-out infinite alternate !important;
+  will-change: transform;
+}
+
+.hero-book-cover:not(.static-cover) {
+  animation: bookCoverFloat 4.5s ease-in-out infinite alternate !important;
 }
 
 .ubl-section-banner-wrap {
   width: 100%;
   max-width: 100%;
-  margin: 16px auto 24px auto;
+  margin: 18px auto 26px auto;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
   border: 1.5px solid rgba(255, 255, 255, 0.15);
-  animation: bannerSubtlePulse 4.5s ease-in-out infinite;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: bannerSubtleWave 5s ease-in-out infinite;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
   box-sizing: border-box;
 }
 
 .ubl-section-banner-wrap:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  transform: translateY(-8px) scale(1.015);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
 }
 
 .ubl-section-banner-img,
@@ -3371,26 +3407,44 @@ section{
   border-radius: 12px;
 }
 
-.preview-banner {
+.preview-banner,
+#preview-banner-wrap {
   width: 100%;
   max-width: 100%;
-  margin: 16px auto 24px auto;
+  margin: 18px auto 26px auto;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.15);
-  animation: bannerSubtlePulse 4.5s ease-in-out infinite;
-  transition: transform 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  animation: bannerSubtleWave 5s ease-in-out infinite;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
   box-sizing: border-box;
 }
 
+.preview-banner:hover,
+#preview-banner-wrap:hover {
+  transform: translateY(-8px) scale(1.015);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+}
+
 #ubl-audio-section-banner-wrap {
-  animation: bannerSubtlePulse 4.5s ease-in-out infinite;
+  animation: bannerSubtleWave 5s ease-in-out infinite;
+  transition: transform 0.35s ease;
+}
+
+.preview-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.preview-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
 }
 
 /* Mobile Responsiveness & Free Size Protection */
 @media (max-width: 768px) {
   .ubl-section-banner-wrap,
   .preview-banner,
+  #preview-banner-wrap,
   #ubl-audio-section-banner-wrap {
     margin: 12px 0 18px 0;
     border-radius: 10px;

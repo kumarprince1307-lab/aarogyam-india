@@ -2476,84 +2476,77 @@ export async function initBookLandingPages() {
     }
 
     tableWrap.innerHTML = `
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Book ID</th>
-            <th>कवर</th>
-            <th>शीर्षक व कैटेगरी</th>
-            <th>स्टोर शेल्फ व पब्लिशिंग</th>
-            <th>मूल्य</th>
-            <th>स्थिति (Status)</th>
-            <th style="text-align:center;">एक्शन (Actions)</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filtered.map(p => {
-            const rawId = (p.id || '').toUpperCase();
-            let liveUrl = `/ebooks/book-landing.html?id=${encodeURIComponent(p.id)}`;
-            if (rawId === 'BK001') liveUrl = '/ebooks/kharif-master-guide-2026.html';
-            else if (rawId === 'BK002') liveUrl = '/ebooks/kheti-dr.html';
-            const isLive = (p.status || 'active') === 'active';
-            const isComingSoon = p.is_coming_soon === true || p.store_badge === 'coming_soon';
-            const themeCol = p.theme_primary || '#2E7D32';
-            const badgeText = p.store_badge || 'best_seller';
-            const rawTargets = p.publish_targets;
-            const targets = Array.isArray(rawTargets) ? rawTargets : (typeof rawTargets === 'string' ? rawTargets.split(',') : ['ebook_store', 'category_page', 'my_library', 'home_page']);
+      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+        ${filtered.map(p => {
+          const rawId = (p.id || '').toUpperCase();
+          let liveUrl = `/ebooks/book-landing.html?id=${encodeURIComponent(p.id)}`;
+          if (rawId === 'BK001') liveUrl = '/ebooks/kharif-master-guide-2026.html';
+          else if (rawId === 'BK002') liveUrl = '/ebooks/kheti-dr.html';
+          const isLive = (p.status || 'active') === 'active';
+          const isComingSoon = p.is_coming_soon === true || p.store_badge === 'coming_soon';
+          const themeCol = p.theme_primary || '#2E7D32';
+          const badgeText = p.store_badge || 'best_seller';
+          const coverImg = p.hero?.cover_image || p.cover || '/images/books/kharif-master-guide-2026-cover.webp';
+          const offerPrice = p.hero?.offer_price || p.offerPrice || 99;
+          const mrpPrice = p.hero?.mrp || p.mrp || 299;
+          const title = p.hero?.title || p.heading || p.name || 'Untitled Book';
 
-            return `
-              <tr>
-                <td><strong style="font-family:monospace;color:${themeCol};font-size:1rem;">${p.id}</strong></td>
-                <td>
-                  <img src="${p.hero?.cover_image || p.cover || '/images/books/kharif-master-guide-2026-cover.webp'}" alt="Cover" style="width:42px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--admin-border);" />
-                </td>
-                <td>
-                  <div style="font-weight:800;color:var(--admin-text);font-size:0.92rem;">${p.hero?.title || p.heading || p.name || 'Untitled'}</div>
-                  <div style="font-size:0.75rem;color:#16a34a;font-weight:700;">📁 ${p.category || 'Agriculture'}</div>
-                </td>
-                <td>
-                  <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">
-                    <span style="font-size:0.72rem;background:#fef08a;color:#854d0e;padding:2px 6px;border-radius:4px;font-weight:800;">
-                      🏷️ ${badgeText}
-                    </span>
+          return `
+            <div style="background: var(--admin-surface, #1e293b); border: 1.5px solid var(--admin-border); border-radius: 12px; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto auto; gap: 16px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: border-color 0.2s;">
+              <!-- 1. Cover & ID Badge -->
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="${coverImg}" alt="Cover" style="width: 48px; height: 64px; object-fit: contain; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1); background: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3);" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
+                <div>
+                  <span style="font-family: monospace; font-size: 1rem; font-weight: 900; color: ${themeCol}; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px; display: inline-block;">
+                    ${p.id}
+                  </span>
+                  <div style="font-size: 0.72rem; color: var(--admin-muted); margin-top: 4px; font-weight: 700;">
+                    📁 ${p.category || 'Agriculture'}
                   </div>
-                  <div style="font-size:0.7rem;color:var(--admin-muted);">
-                    ${targets.map(t => `<span style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:3px;margin-right:3px;">${String(t).replace('_', ' ')}</span>`).join('')}
-                  </div>
-                </td>
-                <td>
-                  <strong style="color:#16a34a;font-size:1rem;">₹${p.hero?.offer_price || p.offerPrice || 99}</strong>
-                  <span style="font-size:0.75rem;color:var(--admin-muted);text-decoration:line-through;margin-left:4px;">₹${p.hero?.mrp || p.mrp || 299}</span>
-                </td>
-                <td>
-                  <div style="display:flex;flex-direction:column;gap:4px;">
-                    <button type="button" onclick="window.toggleLiveStatus('${p.id}')" class="admin-button small-button" style="background:${isLive ? 'rgba(22,163,74,0.15)' : 'rgba(239,68,68,0.15)'};color:${isLive ? '#16a34a' : '#ef4444'};border:1px solid ${isLive ? '#16a34a' : '#ef4444'};padding:3px 8px;border-radius:6px;font-size:0.78rem;font-weight:800;">
-                      ${isLive ? '🟢 Live' : '🔴 Offline'}
-                    </button>
-                    ${isComingSoon ? '<span style="font-size:0.68rem;background:#fee2e2;color:#991b1b;padding:1px 4px;border-radius:3px;font-weight:700;text-align:center;">⏳ Coming Soon</span>' : ''}
-                  </div>
-                </td>
-                <td>
-                  <div style="display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;">
-                    <button type="button" onclick="window.editBookLandingPage('${p.id}')" class="admin-button small-button" style="background:#f59e0b;color:#000;font-weight:900;padding:6px 12px;border-radius:8px;box-shadow:0 2px 8px rgba(245,158,11,0.3);" title="इस पेज को एडिट करें">
-                      ✏️ पेज एडिट करें
-                    </button>
-                    <a href="${liveUrl}" target="_blank" class="admin-button small-button" style="background:#2563eb;color:#fff;text-decoration:none;font-weight:700;" title="लाइव पेज देखें">
-                      👁️ देखें
-                    </a>
-                    <button type="button" onclick="window.copyBookLandingUrl('${p.id}')" class="admin-button small-button" style="background:transparent;border:1px solid var(--admin-border);color:var(--admin-muted);" title="लिंक कॉपी करें">
-                      📋 लिंक
-                    </button>
-                    <button type="button" onclick="window.deleteBookLandingPage('${p.id}')" class="admin-button small-button" style="background:#ef4444;color:#fff;" title="हटाएं">
-                      🗑️
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
+                </div>
+              </div>
+
+              <!-- 2. Book Title & Pricing -->
+              <div style="min-width: 0;">
+                <div style="font-weight: 800; color: var(--admin-text); font-size: 0.98rem; line-height: 1.3; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  ${escapeHtml(title)}
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span style="font-size: 1.05rem; font-weight: 900; color: #16a34a;">₹${offerPrice}</span>
+                  <span style="font-size: 0.78rem; color: var(--admin-muted); text-decoration: line-through;">₹${mrpPrice}</span>
+                  <span style="font-size: 0.72rem; background: #fef08a; color: #854d0e; padding: 1px 6px; border-radius: 4px; font-weight: 800;">
+                    🏷️ ${badgeText}
+                  </span>
+                  ${isComingSoon ? '<span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 1px 6px; border-radius: 4px; font-weight: 800;">⏳ Coming Soon</span>' : ''}
+                </div>
+              </div>
+
+              <!-- 3. Live / Offline Status -->
+              <div>
+                <button type="button" onclick="window.toggleLiveStatus('${p.id}')" class="admin-button small-button" style="background:${isLive ? 'rgba(22,163,74,0.18)' : 'rgba(239,68,68,0.18)'}; color:${isLive ? '#4ade80' : '#f87171'}; border: 1.5px solid ${isLive ? '#16a34a' : '#ef4444'}; padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                  ${isLive ? '🟢 Live' : '🔴 Offline'}
+                </button>
+              </div>
+
+              <!-- 4. Quick Actions (Immediate 1-Click Access) -->
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button type="button" onclick="window.editBookLandingPage('${p.id}')" class="admin-button" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; padding: 8px 16px; border-radius: 8px; font-size: 0.86rem; box-shadow: 0 2px 10px rgba(245,158,11,0.35); cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" title="इस पेज को एडिट करें">
+                  <span>✏️</span> <span>एडिट करें</span>
+                </button>
+                <a href="${liveUrl}" target="_blank" class="admin-button small-button" style="background: #2563eb; color: #fff; text-decoration: none; font-weight: 800; padding: 8px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;" title="लाइव पेज देखें">
+                  <span>👁️</span> <span>देखें</span>
+                </a>
+                <button type="button" onclick="window.copyBookLandingUrl('${p.id}')" class="admin-button small-button" style="background: rgba(255,255,255,0.08); border: 1px solid var(--admin-border); color: var(--admin-muted); padding: 8px 10px; border-radius: 8px; cursor: pointer;" title="लिंक कॉपी करें">
+                  📋
+                </button>
+                <button type="button" onclick="window.deleteBookLandingPage('${p.id}')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #f87171; padding: 8px 10px; border-radius: 8px; cursor: pointer;" title="हटाएं">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
     `;
   }
 
