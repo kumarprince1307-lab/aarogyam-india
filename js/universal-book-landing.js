@@ -500,12 +500,11 @@
     renderSectionBanner('sec-hero', sb.sec_hero);
     renderSectionBanner('sec-offer-timer', sb.sec_timer || l.timer?.banner_image);
     renderSectionBanner('sec-kpis-highlights', sb.sec_kpis || l.kpis_banner);
-    renderSectionBanner('sec-audio-experience', sb.sec_audio || l.audio_layer?.banner_image);
+    // Note: sec-audio-experience and sec-sample-book banners are rendered inside their own dedicated cards to prevent duplicate banner display
     renderSectionBanner('sec-trust-bar', sb.sec_trust || l.trust_banner);
     renderSectionBanner('sec-why-book', sb.sec_why_buy || l.why_read?.banner_image);
     renderSectionBanner('sec-vip-stack', sb.sec_vip_stack || l.value_stack?.vip_banner);
     renderSectionBanner('sec-book-video', sb.sec_video || l.video_section_banner);
-    renderSectionBanner('sec-sample-book', sb.sec_preview || l.preview_banner);
     renderSectionBanner('sec-suggested-books', sb.sec_suggested || l.suggested_banner);
     renderSectionBanner('sec-bonus-wrapper', sb.sec_bonuses || l.bonuses_banner);
     renderSectionBanner('sec-book-details', sb.sec_specs_toc || l.specs_banner);
