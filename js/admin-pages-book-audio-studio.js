@@ -1922,10 +1922,42 @@ function testCurrentPageTts() {
     }
 
     // Split text into chunks
-    const rawSegs = text.split(/[\r\n।\.?!]+/);
+    const normalized = text.replace(/[\u3002]/g, ' । ');
+    const rawSegs = normalized.split(/[\r\n।\.?!;:]+/);
+    const subSegments = [];
+
+    for (const seg of rawSegs) {
+        const cl = seg.trim();
+        if (!cl) continue;
+        if (cl.length > 100) {
+            const subParts = cl.split(/[,，]+/);
+            for (const part of subParts) {
+                const cleanPart = part.trim();
+                if (!cleanPart) continue;
+                if (cleanPart.length > 100) {
+                    const words = cleanPart.split(/\s+/);
+                    let wChunk = '';
+                    for (const w of words) {
+                        if ((wChunk + ' ' + w).length > 80) {
+                            if (wChunk) subSegments.push(wChunk.trim());
+                            wChunk = w;
+                        } else {
+                            wChunk = wChunk ? (wChunk + ' ' + w) : w;
+                        }
+                    }
+                    if (wChunk) subSegments.push(wChunk.trim());
+                } else {
+                    subSegments.push(cleanPart);
+                }
+            }
+        } else {
+            subSegments.push(cl);
+        }
+    }
+
     const chunks = [];
     let curChunk = '';
-    for (const seg of rawSegs) {
+    for (const seg of subSegments) {
         const cl = seg.trim();
         if (!cl) continue;
         if ((curChunk + ' ' + cl).length > 100) {

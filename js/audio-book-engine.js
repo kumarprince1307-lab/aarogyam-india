@@ -341,12 +341,46 @@ class ProAudioBookEngine {
 
     splitTextIntoChunks(text) {
         if (!text) return [];
-        // Split by lines, Hindi purna viram (।), period, question mark, exclamation
-        const rawSegments = text.split(/[\r\n।\.?!]+/);
+        // Clean text and replace non-standard full stops
+        const normalized = text.replace(/[\u3002]/g, ' । ');
+        // Split by lines, Hindi purna viram (।), period, question mark, exclamation, semicolon
+        const rawSegments = normalized.split(/[\r\n।\.?!;:]+/);
+        const subSegments = [];
+
+        for (const seg of rawSegments) {
+            const cl = seg.trim();
+            if (!cl) continue;
+            // If a single segment without punctuation is too long (> 100 chars), split by comma or words
+            if (cl.length > 100) {
+                const subParts = cl.split(/[,，]+/);
+                for (const part of subParts) {
+                    const cleanPart = part.trim();
+                    if (!cleanPart) continue;
+                    if (cleanPart.length > 100) {
+                        const words = cleanPart.split(/\s+/);
+                        let wChunk = '';
+                        for (const w of words) {
+                            if ((wChunk + ' ' + w).length > 80) {
+                                if (wChunk) subSegments.push(wChunk.trim());
+                                wChunk = w;
+                            } else {
+                                wChunk = wChunk ? (wChunk + ' ' + w) : w;
+                            }
+                        }
+                        if (wChunk) subSegments.push(wChunk.trim());
+                    } else {
+                        subSegments.push(cleanPart);
+                    }
+                }
+            } else {
+                subSegments.push(cl);
+            }
+        }
+
         const chunks = [];
         let currentChunk = '';
 
-        for (const seg of rawSegments) {
+        for (const seg of subSegments) {
             const clean = seg.trim();
             if (!clean) continue;
 
