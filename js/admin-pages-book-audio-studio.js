@@ -1921,61 +1921,24 @@ function testCurrentPageTts() {
         }
     }
 
-    // Split text into chunks with full sanitization
-    let cleanText = String(text)
-        .replace(/[\u3002]/g, ' । ')
-        .replace(/[•▪★●◆✦✓✔■►▶]/g, ' । ')
-        .replace(/(\d+)\.(\d+)/g, '$1 दशमलव $2')
-        .replace(/[\*\_\~\|\#\<\>\{\}\[\]]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-    const rawSegs = cleanText.split(/[\r\n।\.?!;:]+/);
-    const subSegments = [];
-
-    for (const seg of rawSegs) {
-        const cl = seg.trim();
-        if (!cl) continue;
-        if (cl.length > 90) {
-            const subParts = cl.split(/[,，]+/);
-            for (const part of subParts) {
-                const cleanPart = part.trim();
-                if (!cleanPart) continue;
-                if (cleanPart.length > 90) {
-                    const words = cleanPart.split(/\s+/);
-                    let wChunk = '';
-                    for (const w of words) {
-                        if ((wChunk + ' ' + w).length > 70) {
-                            if (wChunk) subSegments.push(wChunk.trim());
-                            wChunk = w;
-                        } else {
-                            wChunk = wChunk ? (wChunk + ' ' + w) : w;
-                        }
-                    }
-                    if (wChunk) subSegments.push(wChunk.trim());
-                } else {
-                    subSegments.push(cleanPart);
-                }
-            }
-        } else {
-            subSegments.push(cl);
+    // Split text into chunks with full universal sanitization
+    let chunks = [];
+    if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.splitIntoChunks === 'function') {
+        chunks = window.AarogyamAudioNormalizer.splitIntoChunks(text);
+    } else {
+        const cleanText = String(text)
+            .replace(/[\u3002\uFF0E]/g, ' । ')
+            .replace(/(\d+)\.(\d+)/g, '$1 दशमलव $2')
+            .replace(/[•▪★●◆✦✓✔■►▶❖➔→⇒—–_~*#@&|^<>{}[\]"`'()]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        const segs = cleanText.split(/\s*।\s*/);
+        for (const s of segs) {
+            const tr = s.trim();
+            if (tr) chunks.push(tr);
         }
+        if (!chunks.length) chunks.push(cleanText);
     }
-
-    const chunks = [];
-    let curChunk = '';
-    for (const seg of subSegments) {
-        const cl = seg.trim();
-        if (!cl) continue;
-        if ((curChunk + ' ' + cl).length > 80) {
-            if (curChunk.trim()) chunks.push(curChunk.trim());
-            curChunk = cl;
-        } else {
-            curChunk = curChunk ? (curChunk + ' । ' + cl) : cl;
-        }
-    }
-    if (curChunk.trim()) chunks.push(curChunk.trim());
-    if (!chunks.length) chunks.push(cleanText);
 
     studioTtsChunks = chunks;
     studioTtsChunkIndex = 0;

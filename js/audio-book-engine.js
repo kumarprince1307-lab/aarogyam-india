@@ -351,67 +351,23 @@ class ProAudioBookEngine {
 
     splitTextIntoChunks(text) {
         if (!text) return [];
-        // 1. Sanitize emojis and special formatting symbols
-        let cleanText = String(text)
-            .replace(/[\u3002]/g, ' । ')
-            .replace(/[•▪★●◆✦✓✔■►▶]/g, ' । ')
-            .replace(/(\d+)\.(\d+)/g, '$1 दशमलव $2') // Keep decimals pronounceable (e.g. 5.6 -> 5 दशमलव 6)
-            .replace(/[\*\_\~\|\#\<\>\{\}\[\]]/g, ' ')
+        if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.splitIntoChunks === 'function') {
+            return window.AarogyamAudioNormalizer.splitIntoChunks(text);
+        }
+        // Integrated Fallback
+        const clean = String(text)
+            .replace(/[\u3002\uFF0E]/g, ' । ')
+            .replace(/(\d+)\.(\d+)/g, '$1 दशमलव $2')
+            .replace(/[•▪★●◆✦✓✔■►▶❖➔→⇒—–_~*#@&|^<>{}[\]"`'()]/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
-
-        // 2. Split by lines, Hindi purna viram (।), period, question mark, exclamation, semicolon
-        const rawSegments = cleanText.split(/[\r\n।\.?!;:]+/);
-        const subSegments = [];
-
-        for (const seg of rawSegments) {
-            const cl = seg.trim();
-            if (!cl) continue;
-            // If a single segment without punctuation is too long (> 90 chars), split by comma or words
-            if (cl.length > 90) {
-                const subParts = cl.split(/[,，]+/);
-                for (const part of subParts) {
-                    const cleanPart = part.trim();
-                    if (!cleanPart) continue;
-                    if (cleanPart.length > 90) {
-                        const words = cleanPart.split(/\s+/);
-                        let wChunk = '';
-                        for (const w of words) {
-                            if ((wChunk + ' ' + w).length > 70) {
-                                if (wChunk) subSegments.push(wChunk.trim());
-                                wChunk = w;
-                            } else {
-                                wChunk = wChunk ? (wChunk + ' ' + w) : w;
-                            }
-                        }
-                        if (wChunk) subSegments.push(wChunk.trim());
-                    } else {
-                        subSegments.push(cleanPart);
-                    }
-                }
-            } else {
-                subSegments.push(cl);
-            }
+        const segs = clean.split(/\s*।\s*/);
+        const res = [];
+        for (const s of segs) {
+            const tr = s.trim();
+            if (tr) res.push(tr);
         }
-
-        const chunks = [];
-        let currentChunk = '';
-
-        for (const seg of subSegments) {
-            const clean = seg.trim();
-            if (!clean) continue;
-
-            if ((currentChunk + ' ' + clean).length > 80) {
-                if (currentChunk.trim()) chunks.push(currentChunk.trim());
-                currentChunk = clean;
-            } else {
-                currentChunk = currentChunk ? (currentChunk + ' । ' + clean) : clean;
-            }
-        }
-        if (currentChunk.trim()) {
-            chunks.push(currentChunk.trim());
-        }
-        return chunks.length ? chunks : [cleanText];
+        return res.length ? res : [clean];
     }
 
     speakText(text, currentPage, isWelcome = false) {
@@ -498,7 +454,7 @@ class ProAudioBookEngine {
                     };
 
                     // Safety Watchdog Timer: auto-advance if browser drops onend (e.g. Chrome 15s bug)
-                    const maxUtteranceDurationMs = Math.max(4000, currentChunk.length * 160);
+                    const maxUtteranceDurationMs = Math.min(12000, Math.max(3000, currentChunk.length * 150));
                     watchdogTimer = setTimeout(() => {
                         if (!hasAdvanced && this.isPlaying) {
                             console.warn("TTS Watchdog triggered for chunk:", currentChunk);
@@ -515,11 +471,11 @@ class ProAudioBookEngine {
                         if (window.speechSynthesis && window.speechSynthesis.paused) {
                             window.speechSynthesis.resume();
                         }
-                    }, 2500);
+                    }, 1800);
 
                     setTimeout(() => {
                         if (this.isPlaying && this.synth) this.synth.speak(ut);
-                    }, 30);
+                    }, 25);
                 } catch(err) {
                     chunkIndex++;
                     playNextChunk();
