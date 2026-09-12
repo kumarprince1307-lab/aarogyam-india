@@ -3838,11 +3838,6 @@ export async function initBookLandingPages() {
     await loadAllData();
   };
 
-    showToast(`🎉 बधाई! नई ई-बुक (${newBookId}: ${topic}) स्टोर व लैंडिंग पेज पर 100% लाइव हो गई!`, 'success');
-    window.switchAdminSubTab('pages');
-    await loadAllData();
-  };
-
   // -------------------------------------------------------------
   // QUICK DEMO & FREE BOOKS STUDIO CONTROLLERS
   // -------------------------------------------------------------
