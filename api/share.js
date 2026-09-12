@@ -20,7 +20,14 @@ function getBookLandingPageData(bId) {
       const json = JSON.parse(content);
       const list = json.bookLandingPages || [];
       const found = list.find(p => (p.id && p.id.toUpperCase() === cleanId) || (p.slug && p.slug.toLowerCase() === cleanSlug));
-      if (found) return found;
+      if (found) {
+        if (cleanId === 'BK001' || cleanSlug === 'kharif-2026') {
+          found.og_image = '/images/books/kgarid-fasal-og.webp';
+        } else if (cleanId === 'BK002' || cleanSlug === 'kheti-dr') {
+          found.og_image = '/images/books/kheti-dr-og.webp';
+        }
+        return found;
+      }
     }
   } catch (e) {}
 
@@ -32,15 +39,18 @@ function getBookLandingPageData(bId) {
       const list = json.books || [];
       const found = list.find(p => (p.id && p.id.toUpperCase() === cleanId) || (p.slug && p.slug.toLowerCase() === cleanSlug));
       if (found) {
+        let ogImg = found.og_image || found.banner || found.cover || found.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
+        if (found.id === 'BK001' || cleanSlug === 'kharif-2026') ogImg = '/images/books/kgarid-fasal-og.webp';
+        else if (found.id === 'BK002' || cleanSlug === 'kheti-dr') ogImg = '/images/books/kheti-dr-og.webp';
         return {
           id: found.id,
           og_title: found.heading || found.name,
           og_description: found.description || `${found.heading || found.name} - सम्पूर्ण वैज्ञानिक एवं Practical गाइड।`,
-          og_image: found.cover || found.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
+          og_image: ogImg,
           hero: {
             title: found.heading || found.name,
             description: found.description,
-            cover_image: found.cover || found.thumbnail
+            cover_image: ogImg
           }
         };
       }
@@ -387,6 +397,8 @@ module.exports = async function handler(req, res) {
   <meta property="og:image" content="${escapeHtml(finalOgImage)}">
   <meta property="og:image:secure_url" content="${escapeHtml(finalOgImage)}">
   <meta property="og:image:type" content="${imgMime}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${escapeHtml(finalTitle)}">
   <meta property="og:url" content="${escapeHtml(canonicalShareUrl)}">
   <link rel="image_src" href="${escapeHtml(finalOgImage)}">

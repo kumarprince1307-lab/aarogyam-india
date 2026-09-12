@@ -35,7 +35,8 @@
         "mrp": 299,
         "offer_price": 99,
         "offer_badge": "Launch Offer 67% Off",
-        "banner_image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+        "banner_image": "/images/books/kgarid-fasal-og.webp",
+        "og_image": "/images/books/kgarid-fasal-og.webp",
         "cover_image": "/images/books/kharif-master-guide-2026-cover.webp",
         "features": [
           {
