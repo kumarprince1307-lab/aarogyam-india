@@ -692,146 +692,6 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 </div>
 
 <!-- ==========================================================
-     NEW REVOLUTIONARY AUDIO BOOK EXPERIENCE LAYER (KHETI KA DOCTOR)
-========================================================== -->
-<section id="audio-book-experience" class="aoi-audio-kpi-section" style="padding: 60px 0; background: linear-gradient(180deg, #091e14 0%, #064e3b 50%, #022c22 100%); color: #fff; position: relative; overflow: hidden; border-top: 3px solid #10b981; border-bottom: 3px solid #10b981;">
-  
-  <!-- Glowing Background Ambient Spheres -->
-  <div style="position: absolute; top: -50px; left: -50px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(16,185,129,0.25) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
-  <div style="position: absolute; bottom: -50px; right: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(245,158,11,0.2) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
-
-  <div class="container" style="max-width: 1080px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 2;">
-    
-    <!-- Top Badge & Header -->
-    <div style="text-align: center; margin-bottom: 35px;">
-      <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.2); border: 1px solid #34d399; padding: 6px 18px; border-radius: 30px; font-size: 0.88rem; font-weight: 800; color: #6ee7b7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; box-shadow: 0 0 15px rgba(52,211,153,0.3);">
-        <span>🎧 देश की पहली क्रांतिकारी कृषि ऑडियो बुक</span>
-        <span style="background: #10b981; color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: 900;">eBook + Audio</span>
-      </div>
-      <h2 style="font-size: 2.1rem; font-weight: 900; line-height: 1.3; color: #f8fafc; margin: 0 0 10px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
-        अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की <span style="background: linear-gradient(90deg, #34d399, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">सम्पूर्ण ऑडियो बुक</span> है!
-      </h2>
-      <p style="font-size: 1.05rem; color: #cbd5e1; max-width: 780px; margin: 0 auto;">
-        🌾 कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।
-      </p>
-    </div>
-
-    <!-- Live Audio Player KPI Card -->
-    <div style="background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 2px solid rgba(52, 211, 153, 0.4); border-radius: 20px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(16,185,129,0.2); margin-bottom: 35px;">
-      
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 18px; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #10b981, #047857); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 15px rgba(16,185,129,0.4);">
-            🎙️
-          </div>
-          <div>
-            <div style="font-size: 0.8rem; font-weight: 700; color: #34d399; text-transform: uppercase;">लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)</div>
-            <div style="font-size: 1.15rem; font-weight: 900; color: #fff;">खेती का डॉक्टर का लाइव ऑडियो परिचय सुनें</div>
-          </div>
-        </div>
-
-        <!-- Master Play / Pause Trigger -->
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button id="landingAudioPlayBtn" onclick="toggleLandingAudioBook()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(16,185,129,0.4); transition: transform 0.2s, box-shadow 0.2s;">
-            <span id="landingAudioIcon">▶️</span> <span id="landingAudioLabel">ऑडियो सुनें (Play Preview)</span>
-          </button>
-          <button id="landingAudioStopBtn" onclick="stopLandingAudioBook()" style="background: #ef4444; color: #fff; border: none; padding: 12px 18px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: none; align-items: center; gap: 6px;">
-            <span>⏹️</span> रोकें (Stop)
-          </button>
-        </div>
-      </div>
-
-      <!-- Animated Sound Wave Visualizer & Status -->
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: rgba(0,0,0,0.3); padding: 12px 18px; border-radius: 10px; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div id="landingWaveContainer" style="display: flex; align-items: center; gap: 4px; height: 22px;">
-            <span class="aoi-wave-bar" style="width: 4px; height: 8px; background: #34d399; border-radius: 2px;"></span>
-            <span class="aoi-wave-bar" style="width: 4px; height: 16px; background: #34d399; border-radius: 2px;"></span>
-            <span class="aoi-wave-bar" style="width: 4px; height: 10px; background: #34d399; border-radius: 2px;"></span>
-            <span class="aoi-wave-bar" style="width: 4px; height: 20px; background: #34d399; border-radius: 2px;"></span>
-            <span class="aoi-wave-bar" style="width: 4px; height: 12px; background: #34d399; border-radius: 2px;"></span>
-          </div>
-          <span id="landingAudioStatusText" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">ऑडियो तैयार है • Play बटन दबाएं</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #6ee7b7; font-weight: 700;">
-          <span>⚡ HD AI कृषि सखी वॉइस</span>
-          <span>•</span>
-          <span>🎧 BGM एम्बिएंस</span>
-        </div>
-      </div>
-
-      <!-- Narration Text Box & Value Highlights (Kheti Dr. Master Script) -->
-      <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 22px; font-size: 0.95rem; line-height: 1.8; color: #e2e8f0;">
-        <p style="margin: 0 0 16px 0; font-size: 1.02rem; font-weight: 600; color: #f1f5f9;">
-          क्या आप फसल में लगने वाले अज्ञात रोगों, कीटों के हमलों और खाद-बीमा पर होने वाले बेहिसाब खर्चों से परेशान हैं? क्या आप चाहते हैं कि आपके खेत की हर समस्या का समाधान सीधे आपके मोबाइल पर एक क्लिक में मिल जाए? मेरे आधुनिक किसान भाई, अब आपको परेशान होने की बिल्कुल जरूरत नहीं है क्योंकि हम आपके लिए ले आए हैं देश की पहली क्रांतिकारी कृषि ऑडियो बुक <strong>"खेती का डॉक्टर"</strong> जिसे आप खेत में काम करते समय बस अपने कान में इयरफोन लगाकर आसानी से सुन सकते हैं!
-        </p>
-
-        <p style="margin: 0 0 14px 0; color: #fbbf24; font-weight: 700;">
-          ✨ यह कोई साधारण ई-बुक नहीं है, बल्कि आपके मोबाइल में चलने वाला एक संपूर्ण कृषि विज्ञान केंद्र है। इस मास्टर गाइड में आपको मिलते हैं ये 8 बेहतरीन समाधान:
-        </p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 18px;">
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🐛</span>
-            <span><strong>300+ कीटों की पहचान:</strong> उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🦠</span>
-            <span><strong>500+ रोगों का समाधान:</strong> वैज्ञानिक, सटीक और व्यावहारिक इलाज.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🧪</span>
-            <span><strong>लैब जांच विधियां:</strong> मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">💧</span>
-            <span><strong>पोषण प्रबंधन:</strong> NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🌊</span>
-            <span><strong>Water Quality Guide:</strong> pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🌱</span>
-            <span><strong>उपचार विधियां:</strong> बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">📅</span>
-            <span><strong>कृषि कैलेंडर:</strong> आपातकालीन निर्णय चार्ट व माह-दर-माह फसल सुरक्षा योजना.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">⚠️</span>
-            <span><strong>50 सबसे बड़ी गलतियाँ:</strong> जो हर साल फसल और मुनाफा डुबो देती हैं और बचाव.</span>
-          </div>
-        </div>
-
-        <p style="margin: 0 0 14px 0;">
-          इस ऑडियो बुक को देश के जाने-माने कृषि विशेषज्ञ <strong>दादा अवनीश मिश्रा</strong> ने अपने <strong>15 वर्षों के लंबे और जमीनी अनुभव</strong> से तैयार किया है, जिसे अपनाकर देश के हजारों किसान अपनी खेती को सबसे आधुनिक और लाभदायक बना रहे हैं.
-        </p>
-
-        <div style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.25)); border: 1px solid rgba(245,158,11,0.5); border-radius: 12px; padding: 16px; margin-top: 14px;">
-          <p style="margin: 0; font-weight: 700; color: #fef08a;">
-            💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल <span style="font-size: 1.3rem; color: #fff; background: #16a34a; padding: 2px 10px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">₹99</span> में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!
-          </p>
-        </div>
-      </div>
-
-      <!-- Action Buttons inside Player -->
-      <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 24px;">
-        <button type="button" onclick="addBookToCart('BK002', 'खेती का डॉक्टर', 99, this)" style="background: linear-gradient(135deg, #10b981, #047857); color: #fff; font-size: 1.1rem; font-weight: 900; padding: 14px 32px; border-radius: 30px; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(16,185,129,0.4); display: inline-flex; align-items: center; gap: 8px;">
-          <span>🛒</span> अभी ₹99 में खरीदें और ऑडियो सुनें
-        </button>
-        <a href="demo-fasal.html" style="background: rgba(255,255,255,0.1); color: #fff; font-size: 0.95rem; font-weight: 700; padding: 14px 24px; border-radius: 30px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); display: inline-flex; align-items: center; gap: 6px;">
-          <span>📖</span> फ्री डेमो देखें
-        </a>
-      </div>
-
-    </div>
-
-  </div>
-</section>
-
-<!-- ==========================================================
         YOUTUBE SHORTS VIDEO DEMO SECTION
 ========================================================== -->
 <section id="video-demo" style="padding: 50px 0; background: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
@@ -900,6 +760,146 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         🛒 कार्ट देखें &amp; आर्डर करें
       </a>
     </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     NEW REVOLUTIONARY AUDIO BOOK EXPERIENCE LAYER (KHETI KA DOCTOR) - ROYAL RED & GOLD LUXURY
+========================================================== -->
+<section id="audio-book-experience" class="aoi-audio-kpi-section" style="padding: 65px 0; background: radial-gradient(circle at 50% 30%, #450a0a 0%, #2a0404 55%, #140202 100%); color: #fff; position: relative; overflow: hidden; border-top: 3px solid #f59e0b; border-bottom: 3px solid #f59e0b; box-shadow: inset 0 0 50px rgba(0,0,0,0.6), 0 0 30px rgba(245,158,11,0.25);">
+  
+  <!-- Glowing Background Ambient Spheres -->
+  <div style="position: absolute; top: -60px; left: -60px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(220,38,38,0.3) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+  <div style="position: absolute; bottom: -60px; right: -60px; width: 350px; height: 350px; background: radial-gradient(circle, rgba(245,158,11,0.25) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+
+  <div class="container" style="max-width: 1080px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 2;">
+    
+    <!-- Top Badge & Header -->
+    <div style="text-align: center; margin-bottom: 35px;">
+      <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(220,38,38,0.25); border: 1px solid #fbbf24; padding: 6px 20px; border-radius: 30px; font-size: 0.88rem; font-weight: 800; color: #fef08a; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 14px; box-shadow: 0 0 18px rgba(245,158,11,0.35);">
+        <span>🎧 देश की पहली क्रांतिकारी कृषि ऑडियो बुक</span>
+        <span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 0.72rem; padding: 2px 9px; border-radius: 12px; font-weight: 900;">eBook + Audio</span>
+      </div>
+      <h2 style="font-size: 2.15rem; font-weight: 900; line-height: 1.3; color: #ffffff; margin: 0 0 10px 0; text-shadow: 0 2px 12px rgba(0,0,0,0.6);">
+        अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की <span style="background: linear-gradient(90deg, #fde047, #f59e0b, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">सम्पूर्ण ऑडियो बुक</span> है!
+      </h2>
+      <p style="font-size: 1.05rem; color: #fef2f2; max-width: 780px; margin: 0 auto; text-shadow: 0 1px 4px rgba(0,0,0,0.5);">
+        🌾 कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।
+      </p>
+    </div>
+
+    <!-- Live Audio Player KPI Card -->
+    <div style="background: rgba(26, 4, 4, 0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 2px solid rgba(245, 158, 11, 0.45); border-radius: 22px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 30px rgba(220,38,38,0.25); margin-bottom: 35px;">
+      
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid rgba(245,158,11,0.2); padding-bottom: 18px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 58px; height: 58px; border-radius: 14px; background: linear-gradient(135deg, #dc2626, #991b1b); border: 2px solid #fbbf24; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 18px rgba(220,38,38,0.5);">
+            🎙️
+          </div>
+          <div>
+            <div style="font-size: 0.82rem; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px;">लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)</div>
+            <div style="font-size: 1.18rem; font-weight: 900; color: #ffffff;">खेती का डॉक्टर का लाइव ऑडियो परिचय सुनें</div>
+          </div>
+        </div>
+
+        <!-- Master Play / Pause Trigger -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button id="landingAudioPlayBtn" onclick="toggleLandingAudioBook()" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000000; border: 2px solid #fef08a; padding: 12px 26px; border-radius: 12px; font-weight: 900; font-size: 0.98rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 18px rgba(245,158,11,0.45); transition: transform 0.2s, box-shadow 0.2s;">
+            <span id="landingAudioIcon">▶️</span> <span id="landingAudioLabel">ऑडियो सुनें (Play Preview)</span>
+          </button>
+          <button id="landingAudioStopBtn" onclick="stopLandingAudioBook()" style="background: #dc2626; color: #ffffff; border: 1px solid #fca5a5; padding: 12px 18px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: none; align-items: center; gap: 6px;">
+            <span>⏹️</span> रोकें (Stop)
+          </button>
+        </div>
+      </div>
+
+      <!-- Animated Sound Wave Visualizer & Status -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(245,158,11,0.25); padding: 12px 18px; border-radius: 10px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div id="landingWaveContainer" style="display: flex; align-items: center; gap: 4px; height: 22px;">
+            <span class="aoi-wave-bar" style="width: 4px; height: 8px; background: #fbbf24; border-radius: 2px;"></span>
+            <span class="aoi-wave-bar" style="width: 4px; height: 16px; background: #fbbf24; border-radius: 2px;"></span>
+            <span class="aoi-wave-bar" style="width: 4px; height: 10px; background: #fbbf24; border-radius: 2px;"></span>
+            <span class="aoi-wave-bar" style="width: 4px; height: 20px; background: #fbbf24; border-radius: 2px;"></span>
+            <span class="aoi-wave-bar" style="width: 4px; height: 12px; background: #fbbf24; border-radius: 2px;"></span>
+          </div>
+          <span id="landingAudioStatusText" style="font-size: 0.88rem; color: #fef08a; font-weight: 700;">ऑडियो तैयार है • Play बटन दबाएं</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: #fde047; font-weight: 800;">
+          <span>⚡ HD AI कृषि सखी वॉइस</span>
+          <span>•</span>
+          <span>🎧 BGM एम्बिएंस</span>
+        </div>
+      </div>
+
+      <!-- Narration Text Box & Value Highlights (Kheti Dr. Master Script) -->
+      <div style="background: rgba(45, 10, 10, 0.7); border: 1px solid rgba(245,158,11,0.2); border-radius: 14px; padding: 22px; font-size: 0.96rem; line-height: 1.8; color: #ffffff;">
+        <p style="margin: 0 0 16px 0; font-size: 1.04rem; font-weight: 600; color: #ffffff;">
+          क्या आप फसल में लगने वाले अज्ञात रोगों, कीटों के हमलों और खाद-बीमा पर होने वाले बेहिसाब खर्चों से परेशान हैं? क्या आप चाहते हैं कि आपके खेत की हर समस्या का समाधान सीधे आपके मोबाइल पर एक क्लिक में मिल जाए? मेरे आधुनिक किसान भाई, अब आपको परेशान होने की बिल्कुल जरूरत नहीं है क्योंकि हम आपके लिए ले आए हैं देश की पहली क्रांतिकारी कृषि ऑडियो बुक <strong>"खेती का डॉक्टर"</strong> जिसे आप खेत में काम करते समय बस अपने कान में इयरफोन लगाकर आसानी से सुन सकते हैं!
+        </p>
+
+        <p style="margin: 0 0 14px 0; color: #fbbf24; font-weight: 800;">
+          ✨ यह कोई साधारण ई-बुक नहीं है, बल्कि आपके मोबाइल में चलने वाला एक संपूर्ण कृषि विज्ञान केंद्र है। इस मास्टर गाइड में आपको मिलते हैं ये 8 बेहतरीन समाधान:
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 18px;">
+          <div style="background: rgba(220,38,38,0.18); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #fbbf24; font-size: 1.15rem;">🐛</span>
+            <span><strong>300+ कीटों की पहचान:</strong> उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय.</span>
+          </div>
+          <div style="background: rgba(220,38,38,0.18); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #fbbf24; font-size: 1.15rem;">🦠</span>
+            <span><strong>500+ रोगों का समाधान:</strong> वैज्ञानिक, सटीक और व्यावहारिक इलाज.</span>
+          </div>
+          <div style="background: rgba(220,38,38,0.18); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #fbbf24; font-size: 1.15rem;">🧪</span>
+            <span><strong>लैब जांच विधियां:</strong> मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके.</span>
+          </div>
+          <div style="background: rgba(220,38,38,0.18); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #fbbf24; font-size: 1.15rem;">💧</span>
+            <span><strong>पोषण प्रबंधन:</strong> NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन.</span>
+          </div>
+          <div style="background: rgba(220,38,38,0.18); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #fbbf24; font-size: 1.15rem;">🌊</span>
+            <span><strong>Water Quality Guide:</strong> pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि.</span>
+          </div>
+          <div style="background: rgba(220,38,38,0.18); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #fbbf24; font-size: 1.15rem;">🌱</span>
+            <span><strong>उपचार विधियां:</strong> बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप.</span>
+          </div>
+          <div style="background: rgba(220,38,38,0.18); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #fbbf24; font-size: 1.15rem;">📅</span>
+            <span><strong>कृषि कैलेंडर:</strong> आपातकालीन निर्णय चार्ट व माह-दर-माह फसल सुरक्षा योजना.</span>
+          </div>
+          <div style="background: rgba(220,38,38,0.18); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #fbbf24; font-size: 1.15rem;">⚠️</span>
+            <span><strong>50 सबसे बड़ी गलतियाँ:</strong> जो हर साल फसल और मुनाफा डुबो देती हैं और बचाव.</span>
+          </div>
+        </div>
+
+        <p style="margin: 0 0 14px 0; color: #ffffff;">
+          इस ऑडियो बुक को देश के जाने-माने कृषि विशेषज्ञ <strong>दादा अवनीश मिश्रा</strong> ने अपने <strong>15 वर्षों के लंबे और जमीनी अनुभव</strong> से तैयार किया है, जिसे अपनाकर देश के हजारों किसान अपनी खेती को सबसे आधुनिक और लाभदायक बना रहे हैं.
+        </p>
+
+        <div style="background: linear-gradient(135deg, rgba(220,38,38,0.4), rgba(153,27,27,0.5)); border: 1.5px solid #fbbf24; border-radius: 12px; padding: 16px; margin-top: 14px;">
+          <p style="margin: 0; font-weight: 800; color: #ffffff; font-size: 1.05rem;">
+            💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल <span style="font-size: 1.35rem; color: #000; background: #f59e0b; padding: 3px 12px; border-radius: 6px; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">₹99</span> में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons inside Player -->
+      <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 24px;">
+        <button type="button" onclick="addBookToCart('BK002', 'खेती का डॉक्टर', 99, this)" style="background: linear-gradient(135deg, #dc2626, #991b1b); border: 2px solid #fbbf24; color: #ffffff; font-size: 1.1rem; font-weight: 900; padding: 14px 32px; border-radius: 30px; cursor: pointer; box-shadow: 0 6px 22px rgba(220,38,38,0.5); display: inline-flex; align-items: center; gap: 8px; transition: transform 0.2s;">
+          <span>🛒</span> अभी ₹99 में खरीदें और ऑडियो सुनें
+        </button>
+        <a href="demo-fasal.html" style="background: rgba(255,255,255,0.12); color: #ffffff; font-size: 0.95rem; font-weight: 800; padding: 14px 24px; border-radius: 30px; text-decoration: none; border: 1px solid rgba(255,255,255,0.3); display: inline-flex; align-items: center; gap: 6px;">
+          <span>📖</span> फ्री डेमो देखें
+        </a>
+      </div>
+
+    </div>
+
   </div>
 </section>
 
@@ -2533,47 +2533,21 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   let landingChunkIdx = 0;
 
   function prepareLandingChunks(text) {
-    const rawSegs = text.replace(/[\u3002]/g, ' । ').split(/[\r\n।\.?!;:]+/);
-    const subSegments = [];
+    const rawSegs = text.replace(/[\u3002]/g, ' । ').split(/[\r\n।\.?!]+/);
+    const chunks = [];
     for (const seg of rawSegs) {
       const cl = seg.trim();
       if (!cl) continue;
-      if (cl.length > 90) {
+      if (cl.length > 95) {
         const subParts = cl.split(/[,，]+/);
         for (const part of subParts) {
           const cp = part.trim();
-          if (!cp) continue;
-          if (cp.length > 90) {
-            const words = cp.split(/\s+/);
-            let wChunk = '';
-            for (const w of words) {
-              if ((wChunk + ' ' + w).length > 70) {
-                if (wChunk) subSegments.push(wChunk.trim());
-                wChunk = w;
-              } else {
-                wChunk = wChunk ? (wChunk + ' ' + w) : w;
-              }
-            }
-            if (wChunk) subSegments.push(wChunk.trim());
-          } else {
-            subSegments.push(cp);
-          }
+          if (cp) chunks.push(cp);
         }
       } else {
-        subSegments.push(cl);
+        chunks.push(cl);
       }
     }
-    const chunks = [];
-    let cur = '';
-    for (const s of subSegments) {
-      if ((cur + ' ' + s).length > 90) {
-        if (cur.trim()) chunks.push(cur.trim());
-        cur = s;
-      } else {
-        cur = cur ? (cur + ' । ' + s) : s;
-      }
-    }
-    if (cur.trim()) chunks.push(cur.trim());
     return chunks;
   }
 
@@ -2644,6 +2618,8 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
       }
     }
 
+    let isAdvancing = false;
+
     const playNext = () => {
       if (!landingAudioPlaying) return;
       if (landingChunkIdx >= landingChunks.length) {
@@ -2652,65 +2628,55 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         return;
       }
       const chunk = landingChunks[landingChunkIdx];
+      isAdvancing = false;
+
+      const advanceToNext = () => {
+        if (isAdvancing || !landingAudioPlaying) return;
+        isAdvancing = true;
+        landingChunkIdx++;
+        playNext();
+      };
 
       if (nativeHindiVoice && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
         const ut = new SpeechSynthesisUtterance(chunk);
         ut.voice = nativeHindiVoice;
         ut.lang = 'hi-IN';
         ut.rate = 0.95;
         ut.pitch = 1.0;
+        
         ut.onend = () => {
-          if (!landingAudioPlaying) return;
-          landingChunkIdx++;
-          playNext();
+          advanceToNext();
         };
-        ut.onerror = () => {
+
+        ut.onerror = (e) => {
           if (!landingAudioPlaying) return;
-          playCloud(chunk);
+          if (e && (e.error === 'interrupted' || e.error === 'canceled')) {
+            return;
+          }
+          playCloud(chunk, advanceToNext);
         };
-        setTimeout(() => {
-          if (landingAudioPlaying) window.speechSynthesis.speak(ut);
-        }, 30);
+
+        window.speechSynthesis.speak(ut);
       } else {
-        playCloud(chunk);
+        playCloud(chunk, advanceToNext);
       }
     };
 
-    const playCloud = (chunk) => {
+    const playCloud = (chunk, onDone) => {
       if (!landingAudioPlaying) return;
       const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=hi&q=${encodeURIComponent(chunk)}`;
       landingTtsAudio.src = url;
       landingTtsAudio.onended = () => {
         if (!landingAudioPlaying) return;
-        landingChunkIdx++;
-        playNext();
+        if (onDone) onDone();
       };
       landingTtsAudio.onerror = () => {
         if (!landingAudioPlaying) return;
-        if ('speechSynthesis' in window) {
-          const ut = new SpeechSynthesisUtterance(chunk);
-          ut.lang = 'hi-IN';
-          ut.onend = () => { if (landingAudioPlaying) { landingChunkIdx++; playNext(); } };
-          ut.onerror = () => { if (landingAudioPlaying) { landingChunkIdx++; playNext(); } };
-          window.speechSynthesis.speak(ut);
-        } else {
-          landingChunkIdx++;
-          playNext();
-        }
+        if (onDone) onDone();
       };
       landingTtsAudio.play().catch(() => {
         if (!landingAudioPlaying) return;
-        if ('speechSynthesis' in window) {
-          const ut = new SpeechSynthesisUtterance(chunk);
-          ut.lang = 'hi-IN';
-          ut.onend = () => { if (landingAudioPlaying) { landingChunkIdx++; playNext(); } };
-          ut.onerror = () => { if (landingAudioPlaying) { landingChunkIdx++; playNext(); } };
-          window.speechSynthesis.speak(ut);
-        } else {
-          landingChunkIdx++;
-          playNext();
-        }
+        if (onDone) onDone();
       });
     };
 
