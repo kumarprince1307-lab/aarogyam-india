@@ -2711,6 +2711,10 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   // AUTOMATIC INSTANT PLAY ON PAGE LOAD / FIRST INTERACTION
   // ==========================================================
   function setupLandingAudioAutoplay() {
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.getVoices(); } catch(e){}
+    }
+
     const isFB = /FBAN|FBAV|FB_IAB|Instagram|Line/i.test(navigator.userAgent || '');
     if (isFB) {
       const fbBanner = document.getElementById('aoiFbBrowserNotice');
@@ -2724,8 +2728,9 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
       startLandingAudioBook();
     };
 
-    // 1. Attempt on immediate load
-    setTimeout(tryAutoStart, 800);
+    // 1. Instant attempt on immediate page load (0ms zero-latency)
+    tryAutoStart();
+    setTimeout(tryAutoStart, 50);
 
     // 2. Fallback on first user touch/scroll/click anywhere (browser autoplay permission policy)
     const interactionEvents = ['scroll', 'touchstart', 'click', 'pointerdown', 'keydown'];
