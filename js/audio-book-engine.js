@@ -194,23 +194,28 @@ class ProAudioBookEngine {
     setupAudioElement() {
         this.audioElement.preload = 'metadata';
         this.audioElement.addEventListener('ended', () => {
-            if (this.isPageRecordedAudio) {
+            if (this.isPageRecordedAudio && this.isPlaying) {
                 const totalPages = window.aoiTotalPages || 152;
                 const curPage = window.aoiPageNum || 1;
                 if (this.autoNextPage && curPage < totalPages) {
-                    this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
-                    if (typeof window.onNextPage === 'function') {
-                        window.onNextPage();
-                    }
+                    this.updateStatusDisplay(`⏭️ पृष्ठ ${curPage} ऑडियो समाप्त • अगले पृष्ठ पर जा रहे हैं...`);
                     setTimeout(() => {
-                        this.isPlaying = true;
-                        this.playCurrentPage();
-                    }, 500);
+                        if (!this.isPlaying) return;
+                        if (typeof window.onNextPage === 'function') {
+                            window.onNextPage();
+                        }
+                        setTimeout(() => {
+                            if (this.isPlaying) this.playCurrentPage();
+                        }, 600);
+                    }, 800);
                 } else {
                     this.setPlayingState(false);
                     this.updateStatusDisplay(`✅ पुस्तक वाचन समाप्त हुआ`);
                 }
             }
+        });
+        this.audioElement.addEventListener('error', (e) => {
+            console.warn("Audio element error on page:", e);
         });
         this.audioElement.addEventListener('play', () => this.setPlayingState(true));
         this.audioElement.addEventListener('pause', () => this.setPlayingState(false));
@@ -417,75 +422,27 @@ class ProAudioBookEngine {
             if (!this.isPlaying) return;
             if (isWelcome) {
                 setTimeout(() => {
-                    this.isPlaying = true;
-                    this.playCurrentPage();
-                }, 300);
+                    if (this.isPlaying) this.playCurrentPage();
+                }, 400);
                 return;
             }
 
             const totalPages = window.aoiTotalPages || 152;
             const curPage = window.aoiPageNum || 1;
             if (this.autoNextPage && curPage < totalPages) {
-                this.updateStatusDisplay(`⏭️ अगले पृष्ठ पर जा रहे हैं...`);
-                if (typeof window.onNextPage === 'function') {
-                    window.onNextPage();
-                }
+                this.updateStatusDisplay(`⏭️ पृष्ठ ${curPage} समाप्त • अगले पृष्ठ पर जा रहे हैं...`);
                 setTimeout(() => {
-                    this.isPlaying = true;
-                    this.playCurrentPage();
-                }, 500);
+                    if (!this.isPlaying) return;
+                    if (typeof window.onNextPage === 'function') {
+                        window.onNextPage();
+                    }
+                    setTimeout(() => {
+                        if (this.isPlaying) this.playCurrentPage();
+                    }, 600);
+                }, 800);
             } else {
                 this.setPlayingState(false);
                 this.updateStatusDisplay(`✅ पृष्ठ ${curPage} समाप्त हुआ`);
-            }
-        };
-
-        const playCloudChunk = (chunkText) => {
-            if (!this.isPlaying) return;
-            const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=hi&q=${encodeURIComponent(chunkText)}`;
-            this.ttsAudio.src = ttsUrl;
-            this.ttsAudio.playbackRate = this.playbackRate;
-
-            const onChunkEnd = () => {
-                this.ttsAudio.removeEventListener('ended', onChunkEnd);
-                this.ttsAudio.removeEventListener('error', onChunkError);
-                chunkIndex++;
-                playNextChunk();
-            };
-
-            const onChunkError = () => {
-                this.ttsAudio.removeEventListener('ended', onChunkEnd);
-                this.ttsAudio.removeEventListener('error', onChunkError);
-                // Fallback to WebSpeech if Cloud TTS network blocked
-                if (this.synth) {
-                    this.synth.cancel();
-                    const ut = new SpeechSynthesisUtterance(chunkText);
-                    ut.lang = 'hi-IN';
-                    ut.onend = () => { chunkIndex++; playNextChunk(); };
-                    ut.onerror = () => { chunkIndex++; playNextChunk(); };
-                    this.synth.speak(ut);
-                } else {
-                    chunkIndex++;
-                    playNextChunk();
-                }
-            };
-
-            this.ttsAudio.addEventListener('ended', onChunkEnd);
-            this.ttsAudio.addEventListener('error', onChunkError);
-
-            const playPromise = this.ttsAudio.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(() => {
-                    // Fallback to WebSpeech on browser audio gesture restriction
-                    if (this.synth) {
-                        this.synth.cancel();
-                        const ut = new SpeechSynthesisUtterance(chunkText);
-                        ut.lang = 'hi-IN';
-                        ut.onend = () => { chunkIndex++; playNextChunk(); };
-                        ut.onerror = () => { chunkIndex++; playNextChunk(); };
-                        this.synth.speak(ut);
-                    }
-                });
             }
         };
 
@@ -498,30 +455,57 @@ class ProAudioBookEngine {
 
             const currentChunk = chunks[chunkIndex];
 
-            // If system has true Hindi voice installed (e.g. Android/Mac/Google Hindi)
-            if (this.synth && this.hasNativeHindiVoice && this.femaleVoice) {
-                this.synth.cancel();
-                const ut = new SpeechSynthesisUtterance(currentChunk);
-                this.currentUtterance = ut;
-                ut.voice = this.femaleVoice;
-                ut.lang = 'hi-IN';
-                ut.pitch = 1.0;
-                ut.rate = 0.95 * this.playbackRate;
+            // 1. Prefer Native SpeechSynthesis with Voice Selection
+            if (this.synth) {
+                try {
+                    this.synth.cancel();
+                    const ut = new SpeechSynthesisUtterance(currentChunk);
+                    this.currentUtterance = ut;
+                    if (this.femaleVoice) ut.voice = this.femaleVoice;
+                    ut.lang = 'hi-IN';
+                    ut.pitch = 1.0;
+                    ut.rate = 0.98 * this.playbackRate;
 
-                ut.onend = () => {
+                    let hasAdvanced = false;
+                    const advance = () => {
+                        if (hasAdvanced || !this.isPlaying) return;
+                        hasAdvanced = true;
+                        chunkIndex++;
+                        playNextChunk();
+                    };
+
+                    ut.onend = () => {
+                        advance();
+                    };
+
+                    ut.onerror = (e) => {
+                        if (e && (e.error === 'interrupted' || e.error === 'canceled')) {
+                            return;
+                        }
+                        advance();
+                    };
+
+                    // Chrome Android Keep-Alive Pulse during utterance
+                    const pulseTimer = setInterval(() => {
+                        if (!this.isPlaying || hasAdvanced) {
+                            clearInterval(pulseTimer);
+                            return;
+                        }
+                        if (window.speechSynthesis && window.speechSynthesis.paused) {
+                            window.speechSynthesis.resume();
+                        }
+                    }, 3000);
+
+                    setTimeout(() => {
+                        if (this.isPlaying && this.synth) this.synth.speak(ut);
+                    }, 40);
+                } catch(err) {
                     chunkIndex++;
                     playNextChunk();
-                };
-                ut.onerror = () => {
-                    playCloudChunk(currentChunk);
-                };
-
-                setTimeout(() => {
-                    if (this.isPlaying && this.synth) this.synth.speak(ut);
-                }, 30);
+                }
             } else {
-                // Windows / Systems without Hindi Voice pack: Use sweet Cloud Google Hindi
-                playCloudChunk(currentChunk);
+                chunkIndex++;
+                playNextChunk();
             }
         };
 

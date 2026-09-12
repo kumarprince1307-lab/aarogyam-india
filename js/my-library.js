@@ -636,7 +636,7 @@ async function renderLibrarySections(booksArray) {
                     <a href="/ebooks/reader.html?book=${bookId}" class="btn-read" style="flex:1;min-width:85px;padding:8px;background:#138A36;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;">📖 Read</a>
                     ${hasAudioBook ? `<a href="/ebooks/reader.html?book=${bookId}&audio=1" class="btn-audio" style="flex:1;min-width:85px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;" title="ऑडियो बुक सुनें">🎧 ऑडियो</a>` : ''}
                     ${bookVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bookName}", ${JSON.stringify(bookVideos)})' class="btn-video" style="flex:1;min-width:85px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.85rem;" title="वीडियो डेमो देखें">🎬 वीडियो</button>` : ''}
-                    <a href="/pdf/full/${bookId}.pdf" target="_blank" class="btn-buy" style="flex:1;min-width:85px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;">📥 PDF</a>
+                    <button type="button" onclick="downloadBookPdf('${bookId}', '${bookName.replace(/'/g, "\\'")}')" class="btn-buy" style="flex:1;min-width:85px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.85rem;" title="सीधे PDF डाउनलोड करें">📥 PDF</button>
                 </div>
             `;
             if (purchasedGrid) purchasedGrid.appendChild(card);
@@ -891,3 +891,24 @@ function showCongratulationsPopup() {
         document.body.appendChild(pop);
     }
 }
+
+// 12. Direct Native PDF Downloader (Desktop & Mobile 100% Reliable, No Blank Tab)
+window.downloadBookPdf = function(bookId, bookTitle) {
+    const cleanId = (bookId || 'BK001').toUpperCase().trim();
+    const cleanTitle = (bookTitle || 'Aarogyam_India_eBook').replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_');
+    const pdfPath = `/pdf/full/${cleanId}.pdf`;
+
+    try {
+        const link = document.createElement('a');
+        link.href = pdfPath;
+        link.download = `${cleanId}_${cleanTitle}.pdf`;
+        link.target = '_self';
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+            if (link.parentNode) link.parentNode.removeChild(link);
+        }, 500);
+    } catch(e) {
+        window.location.href = `/ebooks/download.html?book=${encodeURIComponent(cleanId)}`;
+    }
+};

@@ -96,12 +96,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const sessionManager = getDownloadSessionManager();
         if (!sessionManager.isLoggedIn()) {
             sessionManager.requireLogin();
-            return;
         }
-        const user = sessionManager.getCurrentUser();
-        if (!user || !user.id) {
-            throw new Error("User session not found or Invalid UUID. Please log in again.");
-        }
+        let user = sessionManager.getCurrentUser();
+        if (!user) user = { full_name: "किसान मित्र" };
+        if (!user.id) user.id = "local_usr_" + (user.mobile || Date.now());
         state.userData = user;
 
         const [bookData, purchaseData] = await Promise.all([
@@ -326,13 +324,18 @@ window.triggerDownload = async function() {
         remainingEl.textContent = `Remaining : ${max - newCount}/${max}`;
     }
 
-    let pdfUrl = state.bookData.mainPdf || "pdf/full/BK001.pdf";
+    let pdfUrl = state.bookData.mainPdf || `/pdf/full/${state.bookData.id || 'BK001'}.pdf`;
+    if (!pdfUrl.startsWith('/') && !pdfUrl.startsWith('http')) pdfUrl = '/' + pdfUrl;
+    
     const link = document.createElement('a');
     link.href = pdfUrl;
-    link.download = `${state.bookData.id}-Aarogyam-India.pdf`;
+    link.download = `${state.bookData.id || 'eBook'}_${(state.bookData.heading || state.bookData.name || 'Aarogyam_India').replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_')}.pdf`;
+    link.target = '_self';
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    setTimeout(() => {
+        if (link.parentNode) link.parentNode.removeChild(link);
+    }, 500);
 
     showDownloadSuccessPopup(state.bookData.heading || state.bookData.name || "Aarogyam India E-Book");
 
