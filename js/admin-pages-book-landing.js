@@ -1536,7 +1536,7 @@ export async function initBookLandingPages() {
               Aarogyam AI ई-बुक क्रिएटर व 3-टियर असेंबलर स्टूडियो (V1.0 Pro)
             </h3>
             <p style="font-size: 0.84rem; color: var(--admin-muted); margin: 3px 0 0 0;">
-              कॉमन ज्ञान (30-50p) + AI स्पेशलिटी कंटेंट (50-75p) + आपकी फोटो व फनल कैटलॉग (20-25p) मिलाकर 100-150 पेज की सम्पूर्ण ई-बुक बनाएं।
+              कमिंग-सून बुक्स को 1-क्लिक में 100-150 पेज की संपूर्ण मैगजीन ई-बुक में बदलें या नया AI विषय जनरेट करें।
             </p>
           </div>
         </div>
@@ -1544,17 +1544,43 @@ export async function initBookLandingPages() {
           <button type="button" onclick="window.generateAiBookDraft()" id="btn-generate-ai-book" class="admin-button" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: #fff; font-weight: 900; padding: 8px 18px; border-radius: 8px; box-shadow: 0 4px 14px rgba(236,72,153,0.4);">
             ✨ 1-Click AI बुक ड्राफ्ट बनाएं
           </button>
+          <button type="button" onclick="window.openVisualBookMagazineModal()" class="admin-button" style="background: #8b5cf6; color: #fff; font-weight: 900; padding: 8px 18px; border-radius: 8px; box-shadow: 0 4px 14px rgba(139,92,246,0.4);">
+            📖 120-पेज फुल मैगजीन प्रीव्यू
+          </button>
           <button type="button" onclick="window.publishAiStudioBook()" id="btn-publish-ai-book" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 8px 18px; border-radius: 8px; box-shadow: 0 4px 14px rgba(22,163,74,0.4);">
             🚀 1-Click में पब्लिश करें
           </button>
         </div>
       </div>
 
-      <!-- STEP 1: BOOK TOPIC, CATEGORY & PRICING -->
+      <!-- STEP 1: BOOK TOPIC, CATEGORY & COMING SOON SELECTOR -->
       <div style="background: rgba(236,72,153,0.06); border: 1px solid rgba(236,72,153,0.25); border-radius: 10px; padding: 16px; margin-bottom: 18px;">
-        <div style="font-weight: 800; color: #f472b6; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-          <span>📝</span> <span>1. पुस्तक का विषय, कैटेगरी एवं मूल्य निर्धारण (Book Topic & Target)</span>
+        <div style="font-weight: 800; color: #f472b6; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span>📝</span> <span>1. पुस्तक का विषय, कमिंग-सून चयन व मूल्य निर्धारण (Book Topic & Target)</span>
+          </div>
+          <span style="font-size: 0.76rem; background: rgba(236,72,153,0.15); color: #f472b6; padding: 2px 8px; border-radius: 6px; font-weight: 700;">
+            ⚡ कमिंग-सून बुक्स को सीधे 120p एक्टिव ई-बुक में कन्वर्ट करें
+          </span>
         </div>
+
+        <!-- Quick Select Existing Coming Soon Book -->
+        <div style="background: rgba(0,0,0,0.3); border: 1px dashed rgba(236,72,153,0.4); border-radius: 8px; padding: 12px; margin-bottom: 12px; display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: center;">
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 800; color: #fde047;">
+              ⏳ कमिंग-सून बुक चुनें (Select Coming-Soon Book to Build):
+            </label>
+            <select id="ais_select_coming_soon" onchange="window.handleSelectComingSoonForAiStudio(this.value)" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 700; color: #fde047; background: #0f172a;">
+              <option value="">-- नई AI पुस्तक बनाएं (+ Create Fresh AI Book) --</option>
+              <!-- Populated dynamically with BK003, BK004, BK005, BK006, BK007... -->
+            </select>
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">Book ID / Code:</label>
+            <input type="text" id="ais_input_book_id" class="admin-input" placeholder="ऑटो जनरेट (उदा. BK003)" style="width: 100%; padding: 8px 10px; font-family: monospace; font-weight: 800; color: #10b981;" />
+          </div>
+        </div>
+
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px;">
           <div>
             <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">पुस्तक का मुख्य विषय / शीर्षक: *</label>
@@ -1690,9 +1716,15 @@ export async function initBookLandingPages() {
             </div>
             <small style="color: var(--admin-muted);">पब्लिश करने से पहले हर अध्याय का कंटेंट, दवाइयों की डोज व ऑडियो नरेशन चेक करें:</small>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button type="button" onclick="window.previewFullBookTtsAudio()" class="admin-button small-button" style="background: #f59e0b; color: #000; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
               <span>▶️</span> <span>इस अध्याय का TTS ऑडियो सुनें</span>
+            </button>
+            <button type="button" onclick="window.openVisualBookMagazineModal()" class="admin-button small-button" style="background: #8b5cf6; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+              <span>📖</span> <span>120-पेज फुल मैगजीन प्रीव्यू</span>
+            </button>
+            <button type="button" onclick="window.openAiStudioLandingPagePreview()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+              <span>🌐</span> <span>लाइव लैंडिंग पेज व ऑडियो डेमो</span>
             </button>
           </div>
         </div>
@@ -1716,11 +1748,62 @@ export async function initBookLandingPages() {
           </div>
           <small style="color: #cbd5e1;">यह स्टोर कैटलॉग, लैंडिंग पेज, रीडर और PWA ऑफलाइन मेमोरी में एक साथ सेव हो जाएगी।</small>
         </div>
-        <button type="button" onclick="window.publishAiStudioBook()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; font-size: 1rem; padding: 10px 24px; box-shadow: 0 4px 16px rgba(22,163,74,0.5);">
-          🚀 पब्लिश करें व स्टोर में लाइव करें (Publish Now)
-        </button>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" onclick="window.openVisualBookMagazineModal()" class="admin-button" style="background: #8b5cf6; color: #fff; font-weight: 800; font-size: 0.95rem; padding: 10px 18px;">
+            📖 120-पेज प्रीव्यू देखें
+          </button>
+          <button type="button" onclick="window.publishAiStudioBook()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; font-size: 1rem; padding: 10px 24px; box-shadow: 0 4px 16px rgba(22,163,74,0.5);">
+            🚀 पब्लिश करें व स्टोर में लाइव करें (Publish Now)
+          </button>
+        </div>
       </div>
 
+    </div>
+
+    <!-- 120-PAGE FULL VISUAL MAGAZINE / READER MODAL (HIGH DEFINITION FLIP PREVIEW) -->
+    <div id="ais_magazine_preview_modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 20px;">
+      <div style="background: #0f172a; border: 2px solid #8b5cf6; border-radius: 14px; width: 100%; max-width: 900px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+        
+        <!-- Modal Top Bar -->
+        <div style="background: #1e293b; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--admin-border);">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.4rem;">📖</span>
+            <div>
+              <div style="font-weight: 800; color: #c084fc; font-size: 1rem;" id="ais_mag_modal_title">
+                120-पेज सम्पूर्ण मैगजीन/रीडर प्रीव्यू (Visual 4K Page Layout)
+              </div>
+              <small style="color: var(--admin-muted);">आरोग्यम इंडिया लोगो हेडर, चैप्टर, डोज तालिका व फुटर पेज नंबरिंग</small>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <select id="ais_mag_page_jump_select" onchange="window.jumpToVisualBookPage(parseInt(this.value, 10))" class="admin-select" style="padding: 4px 8px; font-size: 0.78rem; font-weight: 700;">
+              <!-- Populated by JS -->
+            </select>
+            <button type="button" onclick="window.closeVisualBookMagazineModal()" class="admin-button small-button" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; font-size: 0.85rem; font-weight: 800;">
+              ✕ बंद करें
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual Page Canvas Container -->
+        <div id="ais_mag_page_display_canvas" style="flex: 1; overflow-y: auto; padding: 24px; display: flex; justify-content: center; background: #020617;">
+          <!-- Dynamically Rendered Page Content -->
+        </div>
+
+        <!-- Modal Bottom Navigation Controls -->
+        <div style="background: #1e293b; padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--admin-border);">
+          <button type="button" onclick="window.prevVisualBookPage()" id="ais_btn_prev_page" class="admin-button small-button" style="background: #334155; color: #fff; font-weight: 700; padding: 6px 14px;">
+            ◀ पिछला पेज (Prev)
+          </button>
+          <div id="ais_mag_page_counter_text" style="font-weight: 800; color: #38bdf8; font-size: 0.9rem;">
+            पेज 1 / 120
+          </div>
+          <button type="button" onclick="window.nextVisualBookPage()" id="ais_btn_next_page" class="admin-button small-button" style="background: #8b5cf6; color: #fff; font-weight: 700; padding: 6px 14px;">
+            अगला पेज (Next) ▶
+          </button>
+        </div>
+
+      </div>
     </div>
   `;
 
@@ -2752,11 +2835,14 @@ export async function initBookLandingPages() {
     ]
   };
 
+  let currentVisualBookCurrentPage = 1;
+
   window.renderAiStudioTab = function() {
     const cat = currentAiStudioBook.category || 'Agriculture';
     const catSelect = document.getElementById('ais_select_category');
     if (catSelect) catSelect.value = cat;
 
+    window.populateComingSoonDropdown();
     window.populateTier1Checkboxes(cat);
     if (!currentAiStudioBook.tier2CoreChapters || currentAiStudioBook.tier2CoreChapters.length === 0) {
       currentAiStudioBook.tier2CoreChapters = (DEFAULT_CORE_CHAPTER_TEMPLATES[cat] || DEFAULT_CORE_CHAPTER_TEMPLATES['Agriculture']).map(c => ({...c}));
@@ -2765,6 +2851,57 @@ export async function initBookLandingPages() {
     window.renderChapterAuditPills();
     window.renderActiveAuditChapterCard();
     window.updateAiStudioPageCountBadge();
+  };
+
+  window.populateComingSoonDropdown = function() {
+    const sel = document.getElementById('ais_select_coming_soon');
+    if (!sel) return;
+
+    const comingSoonList = [];
+    const seenIds = new Set();
+
+    [...allBooks, ...allLandingPages].forEach(b => {
+      if (b && b.id && (b.status === 'coming_soon' || b.isComingSoon === true) && !seenIds.has(b.id)) {
+        seenIds.add(b.id);
+        comingSoonList.push(b);
+      }
+    });
+
+    sel.innerHTML = `
+      <option value="">-- नई AI पुस्तक बनाएं (+ Create Fresh AI Book) --</option>
+      ${comingSoonList.map(b => `
+        <option value="${escapeHtml(b.id)}">⏳ [${escapeHtml(b.id)}] ${escapeHtml(b.heading || b.name || b.id)} (${escapeHtml(b.category || 'Agri')})</option>
+      `).join('')}
+    `;
+  };
+
+  window.handleSelectComingSoonForAiStudio = function(bookId) {
+    if (!bookId) {
+      document.getElementById('ais_input_book_id').value = '';
+      return;
+    }
+
+    const b = [...allBooks, ...allLandingPages].find(x => x.id === bookId);
+    if (!b) return;
+
+    const cleanTitle = (b.heading || b.name || '').replace(/\(Coming Soon\)/gi, '').trim();
+    document.getElementById('ais_input_book_id').value = b.id;
+    document.getElementById('ais_input_topic').value = cleanTitle || 'उन्नत खेती व कीट रोग संपूर्ण गाइड';
+    
+    if (b.category) {
+      const catSelect = document.getElementById('ais_select_category');
+      if (catSelect) {
+        catSelect.value = b.category;
+        currentAiStudioBook.category = b.category;
+      }
+    }
+
+    if (b.offerPrice) document.getElementById('ais_input_offer_price').value = b.offerPrice;
+    if (b.mrp) document.getElementById('ais_input_mrp').value = b.mrp;
+
+    currentAiStudioBook.topic = cleanTitle;
+    window.generateAiBookDraft();
+    showToast(`⚡ कमिंग-सून बुक [${b.id}: ${cleanTitle}] AI स्टूडियो में लोड हो गई!`, 'success');
   };
 
   window.handleAiStudioCategoryChange = function(cat) {
@@ -3050,6 +3187,228 @@ export async function initBookLandingPages() {
     }, 800);
   };
 
+  // -------------------------------------------------------------
+  // FULL 120-PAGE VISUAL MAGAZINE / READER ENGINE (FLIP PREVIEW)
+  // -------------------------------------------------------------
+  window.openVisualBookMagazineModal = function() {
+    const modal = document.getElementById('ais_magazine_preview_modal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    currentVisualBookCurrentPage = 1;
+
+    // Build page jump selector
+    const sel = document.getElementById('ais_mag_page_jump_select');
+    if (sel) {
+      let totalPages = 120;
+      let opts = '';
+      for (let p = 1; p <= totalPages; p += (p === 1 ? 1 : (p % 10 === 0 ? 10 : 5))) {
+        opts += `<option value="${p}">पेज ${p} पर जाएं</option>`;
+      }
+      sel.innerHTML = opts;
+    }
+
+    window.renderVisualBookPage(1);
+  };
+
+  window.closeVisualBookMagazineModal = function() {
+    const modal = document.getElementById('ais_magazine_preview_modal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.jumpToVisualBookPage = function(pageNum) {
+    currentVisualBookCurrentPage = Math.max(1, Math.min(120, pageNum));
+    window.renderVisualBookPage(currentVisualBookCurrentPage);
+  };
+
+  window.nextVisualBookPage = function() {
+    if (currentVisualBookCurrentPage < 120) {
+      currentVisualBookCurrentPage++;
+      window.renderVisualBookPage(currentVisualBookCurrentPage);
+    }
+  };
+
+  window.prevVisualBookPage = function() {
+    if (currentVisualBookCurrentPage > 1) {
+      currentVisualBookCurrentPage--;
+      window.renderVisualBookPage(currentVisualBookCurrentPage);
+    }
+  };
+
+  window.renderVisualBookPage = function(pNum) {
+    const canvas = document.getElementById('ais_mag_page_display_canvas');
+    const counter = document.getElementById('ais_mag_page_counter_text');
+    if (!canvas) return;
+
+    if (counter) counter.textContent = `पेज ${pNum} / 120`;
+
+    const topic = (document.getElementById('ais_input_topic')?.value || currentAiStudioBook.topic || 'ई-बुक').trim();
+    const authorName = (document.getElementById('ais_author_name')?.value || currentAiStudioBook.authorName || 'आरोग्यम इंडिया कृषि टीम').trim();
+    const authorPhoto = document.getElementById('ais_author_photo_url')?.value || '/images/logo/logo.png';
+
+    // Tier 1 and Tier 2 items
+    const allItems = [
+      ...currentAiStudioBook.tier1Common.filter(x => x.checked).map(x => ({ type: 'tier1', title: x.title, pages: x.pages, obj: x })),
+      ...currentAiStudioBook.tier2CoreChapters.map(x => ({ type: 'tier2', title: x.title, pages: x.pages, obj: x }))
+    ];
+
+    // Determine what content to show on this page
+    let pageType = 'chapter';
+    let chapterIndex = Math.min(allItems.length - 1, Math.floor((pNum - 1) / 12));
+    let item = allItems[chapterIndex] || allItems[0];
+
+    if (pNum === 1) {
+      // Cover Page
+      canvas.innerHTML = `
+        <div style="width: 100%; max-width: 580px; min-height: 720px; background: linear-gradient(135deg, #064e3b 0%, #022c22 100%); border: 3px solid #10b981; border-radius: 12px; padding: 32px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); display: flex; flex-direction: column; justify-content: space-between; text-align: center; color: #fff;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(16,185,129,0.3); padding-bottom: 12px;">
+            <img src="/images/logo/logo.png" style="height: 36px; object-fit: contain;" alt="Aarogyam Logo" onerror="this.style.display='none'" />
+            <span style="font-size: 0.75rem; color: #34d399; font-weight: 800; letter-spacing: 1px;">AAROGYAM INDIA MASTER EDITION</span>
+          </div>
+
+          <div style="padding: 30px 10px;">
+            <div style="background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid #f59e0b; display: inline-block; padding: 4px 14px; border-radius: 20px; font-weight: 900; font-size: 0.82rem; margin-bottom: 16px;">
+              🌾 संपूर्ण प्रैक्टिकल सचित्र 4K गाइड + ऑडियो बुक
+            </div>
+            <h1 style="font-size: 1.8rem; font-weight: 900; line-height: 1.3; color: #f8fafc; margin: 0 0 14px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+              ${escapeHtml(topic)}
+            </h1>
+            <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; margin: 0;">
+              बीज उपचार, खेत तैयारी, कीट-रोग पहचान, सटीक स्प्रे डोज एवं रिकॉर्ड उत्पादन की सम्पूर्ण वैज्ञानिक विधि
+            </p>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.4); border-radius: 10px; padding: 16px; border: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+              <img src="${authorPhoto}" style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid #10b981; object-fit: cover;" onerror="this.src='/images/logo/logo.png'" />
+              <div style="text-align: left;">
+                <div style="font-size: 0.85rem; font-weight: 800; color: #f8fafc;">${escapeHtml(authorName)}</div>
+                <div style="font-size: 0.72rem; color: #94a3b8;">आरोग्यम इंडिया कृषि अनुसंधान एवं डिजिटल किसान क्रांति</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.72rem; color: #6ee7b7; border-top: 1px solid rgba(16,185,129,0.3); padding-top: 10px;">
+            पेज 1 (कवर) | 120 Pages Master Practical E-Book
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    if (pNum >= 105) {
+      // Funnel & VIP Catalog Page
+      canvas.innerHTML = `
+        <div style="width: 100%; max-width: 580px; min-height: 720px; background: #0f172a; border: 2px solid #3b82f6; border-radius: 12px; padding: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); display: flex; flex-direction: column; justify-content: space-between; color: #fff;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(59,130,246,0.4); padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="/images/logo/logo.png" style="height: 28px;" onerror="this.style.display='none'" />
+              <span style="font-weight: 800; font-size: 0.85rem; color: #60a5fa;">Aarogyam India VIP Pro & Support</span>
+            </div>
+            <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">पेज ${pNum} / 120</span>
+          </div>
+
+          <div style="padding: 20px 0;">
+            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%); border: 1.5px solid #60a5fa; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 16px;">
+              <div style="font-size: 1.8rem; margin-bottom: 6px;">👑</div>
+              <h2 style="font-size: 1.25rem; font-weight: 900; color: #fde047; margin: 0 0 6px 0;">
+                ₹1999 की VIP Pro सदस्यता आपके लिए बिल्कुल मुफ्त!
+              </h2>
+              <p style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.5; margin: 0 0 12px 0;">
+                इस पुस्तक के खरीदार के रूप में आपको 100+ कृषि, स्वास्थ्य व व्यापार ई-बुक्स का 1 वर्ष तक फ्री एक्सेस मिलता है।
+              </p>
+              <a href="/ebooks/store.html" target="_blank" style="display: inline-block; background: #f59e0b; color: #000; font-weight: 900; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 0.82rem;">
+                📚 पूरी डिजिटल लाइब्रेरी देखें ➔
+              </a>
+            </div>
+
+            <div style="background: rgba(34,197,94,0.1); border: 1px dashed #22c55e; border-radius: 8px; padding: 14px; text-align: center;">
+              <div style="font-weight: 800; color: #4ade80; font-size: 0.88rem; margin-bottom: 4px;">
+                💬 24×7 WhatsApp AI डॉक्टर हेल्पलाइन
+              </div>
+              <p style="font-size: 0.76rem; color: #cbd5e1; margin: 0;">
+                फसल में कोई भी रोग या कीट दिखने पर तुरंत अपनी फोटो खींचकर WhatsApp हेल्पलाइन पर भेजें।
+              </p>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; display: flex; justify-content: space-between; font-size: 0.72rem; color: #94a3b8;">
+            <span>Aarogyam India Ecosystem</span>
+            <span>पेज ${pNum} of 120</span>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    // Standard High-Definition Chapter Page
+    const obj = item?.obj || {};
+    canvas.innerHTML = `
+      <div style="width: 100%; max-width: 580px; min-height: 720px; background: #0f172a; border: 1.5px solid #334155; border-radius: 12px; padding: 26px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); display: flex; flex-direction: column; justify-content: space-between; color: #fff;">
+        
+        <!-- Header: Aarogyam India Logo & Running Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="/images/logo/logo.png" style="height: 26px; object-fit: contain;" onerror="this.style.display='none'" />
+            <span style="font-size: 0.76rem; color: #38bdf8; font-weight: 800;">AAROGYAM DIGITAL MASTER GUIDE</span>
+          </div>
+          <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 800;">पेज ${pNum} / 120</span>
+        </div>
+
+        <!-- Chapter Main Body -->
+        <div style="padding: 18px 0; flex: 1;">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+            <span style="background: rgba(16,185,129,0.2); color: #34d399; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 4px;">
+              ${item.type === 'tier1' ? '🟢 कॉमन फाउंडेशन ज्ञान' : '🟡 AI स्पेशलिटी रिसर्च'}
+            </span>
+          </div>
+
+          <h2 style="font-size: 1.2rem; font-weight: 900; color: #f8fafc; margin: 0 0 10px 0; line-height: 1.35;">
+            ${escapeHtml(obj.title || 'अध्याय विवरण')}
+          </h2>
+
+          <p style="font-size: 0.86rem; color: #cbd5e1; line-height: 1.65; margin: 0 0 16px 0;">
+            ${escapeHtml(obj.desc || 'इस अध्याय में वैज्ञानिक एवं व्यावहारिक मार्गदर्शन प्रदान किया गया है।')}
+          </p>
+
+          <!-- High-Converting 4K Dosage & Spray Table -->
+          <div style="background: rgba(0,0,0,0.4); border: 1.5px solid #16a34a; border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+            <div style="font-size: 0.8rem; font-weight: 900; color: #4ade80; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <span>🧪</span> <span>सटीक दवा व खुराक तालिका (Dosage Schedule):</span>
+            </div>
+            <div style="font-size: 0.78rem; color: #f1f5f9; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 4px; margin-bottom: 6px; font-weight: 700;">
+              ${escapeHtml(obj.dosage || 'अनुशंसित मात्रा अनुसार')}
+            </div>
+            <div style="font-size: 0.74rem; color: #93c5fd; display: flex; align-items: center; gap: 6px;">
+              <span>💧</span> <span>स्प्रे विधि: ${escapeHtml(obj.sprayDose || '15L पानी में स्टीकर मिलाकर छिड़कें')}</span>
+            </div>
+          </div>
+
+          <!-- Audio Listening Hint -->
+          <div style="background: rgba(245,158,11,0.08); border-left: 3px solid #f59e0b; padding: 8px 12px; border-radius: 4px;">
+            <div style="font-size: 0.74rem; color: #fde047; font-weight: 700;">
+              🎧 ऑडियो नरेशन उपलब्ध: ईयरफोन लगाकर इस अध्याय को कभी भी सुनें
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer: Page Number & Branding -->
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: #94a3b8;">
+          <span>लेखक: ${escapeHtml(authorName)}</span>
+          <span style="font-weight: 800; color: #38bdf8;">पेज ${pNum} of 120</span>
+        </div>
+
+      </div>
+    `;
+  };
+
+  window.openAiStudioLandingPagePreview = function() {
+    const bookId = (document.getElementById('ais_input_book_id')?.value || 'BK003').trim().toUpperCase();
+    const url = `/ebooks/book-landing.html?id=${encodeURIComponent(bookId)}`;
+    window.open(url, '_blank');
+    showToast(`🌐 बुक लैंडिंग पेज प्रीव्यू खुल गया: ${url}`, 'info');
+  };
+
   window.publishAiStudioBook = async function() {
     const topicInput = document.getElementById('ais_input_topic');
     const topic = topicInput ? topicInput.value.trim() : 'नई ई-बुक';
@@ -3059,15 +3418,20 @@ export async function initBookLandingPages() {
     const authorPhoto = document.getElementById('ais_author_photo_url')?.value || '/images/logo/logo.png';
     const authorName = document.getElementById('ais_author_name')?.value || 'आरोग्यम इंडिया टीम';
 
-    let maxNum = 0;
-    const combined = [...allBooks, ...allLandingPages];
-    combined.forEach(b => {
-      if (b.id && b.id.startsWith('BK')) {
-        const num = parseInt(b.id.replace('BK', ''), 10);
-        if (!isNaN(num) && num > maxNum) maxNum = num;
-      }
-    });
-    const newBookId = `BK${String(maxNum + 1).padStart(3, '0')}`;
+    let explicitId = (document.getElementById('ais_input_book_id')?.value || '').trim().toUpperCase();
+    let newBookId = explicitId;
+
+    if (!newBookId) {
+      let maxNum = 0;
+      const combined = [...allBooks, ...allLandingPages];
+      combined.forEach(b => {
+        if (b.id && b.id.startsWith('BK')) {
+          const num = parseInt(b.id.replace('BK', ''), 10);
+          if (!isNaN(num) && num > maxNum) maxNum = num;
+        }
+      });
+      newBookId = `BK${String(maxNum + 1).padStart(3, '0')}`;
+    }
 
     // Compute total pages
     let totalPagesCount = 20; // 20p funnel
@@ -3083,9 +3447,9 @@ export async function initBookLandingPages() {
       language: 'Hindi',
       mrp: mrp,
       offerPrice: offerPrice,
-      cover: '/images/books/kharif-master-guide-2026-cover.webp',
-      thumbnail: '/images/books/kharif-master-guide-2026-cover.webp',
-      banner: '/images/banners/kharif-master-guide-2026-hero-banner.webp',
+      cover: `/images/books/${newBookId.toLowerCase()}-cover.webp`,
+      thumbnail: `/images/books/${newBookId.toLowerCase()}-cover.webp`,
+      banner: `/images/banners/${newBookId.toLowerCase()}-hero-banner.webp`,
       status: 'active',
       publish_targets: ['ebook_store', 'category_page', 'my_library', 'home_page'],
       store_badge: 'best_seller',
@@ -3123,8 +3487,8 @@ export async function initBookLandingPages() {
         offer_badge: 'Launch Offer',
         rating_score: '4.9',
         rating_count: '150+ Ratings',
-        cover_image: '/images/books/kharif-master-guide-2026-cover.webp',
-        banner_image: '/images/banners/kharif-master-guide-2026-hero-banner.webp',
+        cover_image: `/images/books/${newBookId.toLowerCase()}-cover.webp`,
+        banner_image: `/images/banners/${newBookId.toLowerCase()}-hero-banner.webp`,
         features: [
           { text: `${totalPagesCount}+ सचित्र 4K पेज` },
           { text: 'सम्पूर्ण स्प्रे डोज चार्ट' },
@@ -3149,14 +3513,22 @@ export async function initBookLandingPages() {
       table_of_contents: currentAiStudioBook.tier2CoreChapters.map(c => c.title)
     };
 
-    // Save to LocalStorage
+    // Save to LocalStorage (replacing existing if came from coming-soon)
     try {
-      allLandingPages.unshift(newLandingPageObj);
-      allBooks.unshift(newBookObj);
+      const pIdx = allLandingPages.findIndex(p => p.id === newBookId);
+      if (pIdx >= 0) allLandingPages[pIdx] = newLandingPageObj;
+      else allLandingPages.unshift(newLandingPageObj);
+
+      const bIdx = allBooks.findIndex(b => b.id === newBookId);
+      if (bIdx >= 0) allBooks[bIdx] = newBookObj;
+      else allBooks.unshift(newBookObj);
+
       localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
       
       const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
-      customBooks.unshift(newBookObj);
+      const cIdx = customBooks.findIndex(x => x.id === newBookId);
+      if (cIdx >= 0) customBooks[cIdx] = newBookObj;
+      else customBooks.unshift(newBookObj);
       localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
     } catch(e) {}
 
