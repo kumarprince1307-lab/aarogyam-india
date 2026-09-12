@@ -11,8 +11,11 @@
     <!-- PDF.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     
+    <!-- FontAwesome 6.5.1 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <!-- Custom Reader CSS -->
-    <link rel="stylesheet" href="../css/reader.css?v=20260912_v1">
+    <link rel="stylesheet" href="../css/reader.css?v=20260913_v2">
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -112,16 +115,59 @@
         </div>
     </footer>
 
-    <!-- 5. FLOATING CONTROLS (Right Bottom: Zoom, WhatsApp Direct Chat with Dynamic ID & Library) -->
+    <!-- 5. FLOATING CONTROLS (Right Bottom: Zoom, Share Landing Page, WhatsApp Direct Chat & Library) -->
     <div class="floating-controls">
-        <button id="zoomInBtn" class="float-btn" title="Zoom In">＋</button>
-        <button id="zoomOutBtn" class="float-btn" title="Zoom Out">－</button>
+        <button id="zoomInBtn" class="float-btn" title="ज़ूम इन (Zoom In)">＋</button>
+        <button id="zoomOutBtn" class="float-btn" title="ज़ूम आउट (Zoom Out)">－</button>
+        <!-- 1-Click Share Landing Page Floating Button -->
+        <button id="shareBookFloatBtn" class="float-btn share-float-btn" title="पुस्तक शेयर करें (Share Book Landing Page)">
+            <i class="fa-solid fa-share-nodes"></i>
+        </button>
         <!-- WhatsApp Floating Button with Dynamic Book & Page Info -->
-        <a id="whatsappFloatBtn" href="https://wa.me/917974422572" target="_blank" class="float-btn whatsapp-float-btn" title="WhatsApp सहायता एवं प्रश्न">💬</a>
+        <a id="whatsappFloatBtn" href="https://wa.me/917974422572" target="_blank" class="float-btn whatsapp-float-btn" title="WhatsApp पर सहायता या प्रश्न पूछें">
+            <i class="fa-brands fa-whatsapp"></i>
+        </a>
         <button onclick="window.location.href='my-library.html'" class="float-btn" title="My Library">🏠</button>
     </div>
 
-    <!-- 6. ACCESS DENIED MODAL (Security & Purchase Check) -->
+    <!-- 6. SHARE BOOK MODAL (Fallback for Desktop / Non-WebShare Browsers) -->
+    <div id="shareBookModal" class="modal-overlay" style="display: none;">
+        <div class="modal-box share-modal-box">
+            <div class="share-modal-header">
+                <div class="share-modal-icon">📤</div>
+                <h3>पुस्तक शेयर करें</h3>
+                <button id="closeShareModalBtn" class="modal-close-x" title="Close">✕</button>
+            </div>
+            <p id="shareBookModalSubtitle" class="share-book-subtitle">मित्रों व किसान भाइयों के साथ इस पुस्तक का लैंडिंग पेज शेयर करें:</p>
+            
+            <div class="share-link-input-group">
+                <input type="text" id="shareLinkInput" readonly value="">
+                <button id="copyShareLinkBtn" class="copy-btn">
+                    <i class="fa-regular fa-copy"></i> कॉपी
+                </button>
+            </div>
+
+            <div class="share-options-grid">
+                <a id="shareWhatsappDirectBtn" href="#" target="_blank" class="share-option-btn btn-wa">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </a>
+                <a id="shareTelegramDirectBtn" href="#" target="_blank" class="share-option-btn btn-tg">
+                    <i class="fa-brands fa-telegram"></i>
+                    <span>Telegram</span>
+                </a>
+                <a id="shareFacebookDirectBtn" href="#" target="_blank" class="share-option-btn btn-fb">
+                    <i class="fa-brands fa-facebook"></i>
+                    <span>Facebook</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. FLOATING TOAST NOTIFICATION -->
+    <div id="readerToast" class="reader-toast" style="display: none;"></div>
+
+    <!-- 8. ACCESS DENIED MODAL (Security & Purchase Check) -->
     <div id="accessDeniedModal" class="modal-overlay" style="display: none;">
         <div class="modal-box">
             <h2>❌ Access Denied</h2>
@@ -136,7 +182,7 @@
     <script src="../js/audio-normalizer.js?v=20260912_v1"></script>
     
     <!-- Custom Reader JS & Hybrid Audio Book Engine -->
-    <script src="../js/reader.js?v=20260912_v1"></script>
+    <script src="../js/reader.js?v=20260913_v2"></script>
     <script src="../js/audio-book-engine.js?v=20260912_v1"></script>
 </body>
 </html>
