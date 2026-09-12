@@ -9,9 +9,9 @@
   'use strict';
 
   /* ====================================================================
-     1. RECENT PURCHASE SOCIAL PROOF TOAST ENGINE
+     1. RECENT PURCHASE SOCIAL PROOF TOAST ENGINE (DYNAMIC ADMIN CONTROLLED)
      ==================================================================== */
-  const LIVE_SALES_DATA = [
+  let LIVE_SALES_DATA = [
     {
       name: 'Rameshwar Patel',
       city: 'Ujjain, MP',
@@ -70,6 +70,43 @@
 
   let toastIndex = 0;
   let toastTimer = null;
+  let isToastsEnabled = true;
+  let toastIntervalSeconds = 15;
+
+  async function loadPopupAndToastConfig() {
+    try {
+      // 1. Try local storage admin overrides
+      const localConf = localStorage.getItem('AAROGYAM_NOTIFS_POPUPS_CONFIG');
+      if (localConf) {
+        const parsed = JSON.parse(localConf);
+        applyConfig(parsed);
+        return;
+      }
+    } catch(e) {}
+
+    // 2. Fetch data/notifications-popups.json
+    try {
+      const res = await fetch('/data/notifications-popups.json');
+      if (res.ok) {
+        const json = await res.json();
+        applyConfig(json);
+      }
+    } catch(e) {}
+  }
+
+  function applyConfig(cfg) {
+    if (!cfg) return;
+    const sp = cfg.social_proof_toasts;
+    if (sp) {
+      if (typeof sp.enabled === 'boolean') isToastsEnabled = sp.enabled;
+      if (sp.interval_seconds) toastIntervalSeconds = parseInt(sp.interval_seconds, 10) || 15;
+      if (Array.isArray(sp.items) && sp.items.length > 0) {
+        LIVE_SALES_DATA = sp.items;
+      }
+    }
+  }
+
+  loadPopupAndToastConfig();
 
   function createPurchaseToastContainer() {
     let container = document.getElementById('ai-live-purchase-toast-container');
@@ -82,6 +119,7 @@
   }
 
   function showNextPurchaseToast() {
+    if (!isToastsEnabled || LIVE_SALES_DATA.length === 0) return;
     const container = createPurchaseToastContainer();
     const item = LIVE_SALES_DATA[toastIndex % LIVE_SALES_DATA.length];
     toastIndex++;
@@ -180,14 +218,14 @@
   }
 
   function startPurchaseToastStream() {
-    // Initial delay of 10 seconds (doubled time as requested)
     setTimeout(() => {
       showNextPurchaseToast();
-      // Repeat every 25 seconds (doubled interval between toasts)
+      if (toastTimer) clearInterval(toastTimer);
+      const intervalMs = Math.max(5000, (toastIntervalSeconds || 15) * 1000);
       toastTimer = setInterval(() => {
         showNextPurchaseToast();
-      }, 25000);
-    }, 10000);
+      }, intervalMs);
+    }, 6000);
   }
 
   /* ====================================================================

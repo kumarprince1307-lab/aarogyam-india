@@ -27,6 +27,26 @@ if (json_last_error() !== JSON_ERROR_NONE || !is_array($payload)) {
     json_resp(400, ['error' => 'Invalid JSON payload']);
 }
 
+// Check if this is a save_popups action
+if (isset($payload['action']) && $payload['action'] === 'save_popups' && isset($payload['popupsConfig'])) {
+    $popupsJsonPath = __DIR__ . '/../data/notifications-popups.json';
+    $backupDir = __DIR__ . '/../data/backups';
+    if (!is_dir($backupDir)) {
+        @mkdir($backupDir, 0755, true);
+    }
+    $timestamp = date('Ymd_His');
+    if (file_exists($popupsJsonPath)) {
+        @copy($popupsJsonPath, $backupDir . "/popups_backup_{$timestamp}.json");
+    }
+    $tmpPopups = $popupsJsonPath . '.tmp';
+    file_put_contents($tmpPopups, json_encode($payload['popupsConfig'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    rename($tmpPopups, $popupsJsonPath);
+    json_resp(200, [
+        'success' => true,
+        'message' => 'Popups and notifications config saved successfully'
+    ]);
+}
+
 $pageData = $payload['pageData'] ?? null;
 $bookData = $payload['bookData'] ?? null;
 $uploadedFiles = $payload['uploadedFiles'] ?? [];

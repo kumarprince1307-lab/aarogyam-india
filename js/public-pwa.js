@@ -469,11 +469,11 @@ function showNetworkBanner(isOnline) {
 
   if (!isOnline) {
     banner.className = 'public-network-banner offline';
-    banner.innerHTML = `<span>⚠️ Offline Mode — Previously loaded pages are available. Live updates will sync once connected.</span>`;
+    banner.innerHTML = `<span>🌾 ऑफ़लाइन मोड — पहले से खोली गई पुस्तकें व ऑडियो बिना इंटरनेट उपलब्ध हैं।</span>`;
     banner.style.display = 'flex';
   } else {
     banner.className = 'public-network-banner online';
-    banner.innerHTML = `<span>✅ Back Online — Live connection restored.</span>`;
+    banner.innerHTML = `<span>✅ इंटरनेट कनेक्टेड — लाइव सिंक सक्रिय है।</span>`;
     banner.style.display = 'flex';
     setTimeout(() => {
       banner.style.display = 'none';
@@ -481,4 +481,82 @@ function showNetworkBanner(isOnline) {
   }
 }
 
-console.log('✅ public-pwa.js loaded');
+// --- Background Idle Asset Pre-Fetcher (Zero-Egress Precache) ---
+function initBackgroundIdlePrefetch() {
+  if (window.location.pathname.includes('/admin/')) return;
+
+  const runPrefetch = () => {
+    try {
+      fetch('/data/books.json').then(r => r.json()).then(data => {
+        const books = data.books || [];
+        const topBooks = books.slice(0, 8);
+        topBooks.forEach(b => {
+          if (b.cover) {
+            const img = new Image();
+            img.src = b.cover;
+          }
+          if (b.thumbnail && b.thumbnail !== b.cover) {
+            const tImg = new Image();
+            tImg.src = b.thumbnail;
+          }
+        });
+      }).catch(() => {});
+    } catch(e) {}
+  };
+
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(runPrefetch, { timeout: 4000 });
+  } else {
+    setTimeout(runPrefetch, 2500);
+  }
+}
+
+// --- Universal IndexedDB Offline Cache Helper ---
+window.AarogyamOfflineDB = {
+  dbName: 'AarogyamOfflineStore',
+  dbVersion: 1,
+  open: function() {
+    return new Promise((resolve, reject) => {
+      if (!('indexedDB' in window)) return resolve(null);
+      const req = indexedDB.open(this.dbName, this.dbVersion);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('offline_books')) {
+          db.createObjectStore('offline_books', { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = (e) => resolve(e.target.result);
+      req.onerror = () => resolve(null);
+    });
+  },
+  saveBook: async function(bookId, bookData) {
+    const db = await this.open();
+    if (!db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('offline_books', 'readwrite');
+        const store = tx.objectStore('offline_books');
+        store.put({ id: bookId, data: bookData, updated_at: Date.now() });
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+      } catch(e) { resolve(false); }
+    });
+  },
+  getBook: async function(bookId) {
+    const db = await this.open();
+    if (!db) return null;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('offline_books', 'readonly');
+        const store = tx.objectStore('offline_books');
+        const req = store.get(bookId);
+        req.onsuccess = () => resolve(req.result?.data || null);
+        req.onerror = () => resolve(null);
+      } catch(e) { resolve(null); }
+    });
+  }
+};
+
+setTimeout(initBackgroundIdlePrefetch, 1500);
+
+console.log('✅ public-pwa.js V7 loaded with Deep Offline Caching & IndexedDB');

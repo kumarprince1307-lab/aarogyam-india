@@ -167,46 +167,114 @@
     </header>
 
     <!-- MAIN WEATHER CONTENT CONTAINER (Full Width, Centered) -->
-    <main class="library-main" id="mainLibraryContent">
-        <div class="welcome-card-soft"
-            style="background: linear-gradient(135deg, #050f0e 0%, #78b60e 100%); color: #fff; border-radius: 14px; padding: 25px; margin: 20px auto; max-width: 1200px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+    <main class="library-main" id="mainLibraryContent" style="max-width: 1200px; margin: 20px auto; padding: 0 16px;">
+        
+        <!-- TOP CONTROLS & DISTRICT PICKER -->
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; border: 1.5px solid #334155; border-radius: 16px; padding: 22px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 18px;">
                 <div>
-                    <h2 style="font-size: 1.5rem; margin: 0 0 5px 0;">🌤️ Aarogyam India मौसम केंद्र</h2>
-                    <p style="font-size: 0.95rem; opacity: 0.95; margin: 0;">अपने शहर या खेती की लोकेशन का सटीक लाइव
-                        तापमान और मौसम हाल देखें</p>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.6rem;">🌤️</span>
+                        <h1 style="font-size: 1.5rem; margin: 0; font-weight: 900; color: #f8fafc;">
+                            Aarogyam India 7-दिवसीय कृषि मौसम पूर्वानुमान
+                        </h1>
+                    </div>
+                    <p style="font-size: 0.88rem; color: #94a3b8; margin: 4px 0 0 0;">
+                        अपने क्षेत्र का सटीक लाइव तापमान, 7-दिवसीय वर्षा अनुमान व कृषि वैज्ञानिक एडवाइजरी
+                    </p>
                 </div>
-                <div style="display: flex; gap: 8px; width: 100%; max-width: 320px;">
-                    <input type="text" id="citySearchInput" placeholder="शहर का नाम लिखें (जैसे - Rewa)..."
-                        style="flex: 1; padding: 10px 14px; border: none; border-radius: 8px; outline: none; font-size: 0.9rem;">
-                    <button id="citySearchBtn"
-                        style="background: #081309; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">खोजें</button>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                    <button type="button" id="btn-gps-weather" onclick="window.useUserCurrentLocation()" style="background: #16a34a; color: #ffffff; border: 1px solid #4ade80; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(22,163,74,0.3);">
+                        📍 मेरी लाइव लोकेशन
+                    </button>
+                    
+                    <select id="weather-district-select" style="background: #0f172a; color: #f8fafc; border: 1.5px solid #475569; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.86rem; outline: none; cursor: pointer;">
+                        <optgroup label="मध्य प्रदेश (MP)">
+                            <option value="rewa" selected>रीवा (Rewa)</option>
+                            <option value="indore">इंदौर (Indore)</option>
+                            <option value="bhopal">भोपाल (Bhopal)</option>
+                            <option value="ujjain">उज्जैन (Ujjain)</option>
+                            <option value="jabalpur">जबलपुर (Jabalpur)</option>
+                            <option value="satna">सतना (Satna)</option>
+                        </optgroup>
+                        <optgroup label="उत्तर प्रदेश (UP)">
+                            <option value="varanasi">वाराणसी (Varanasi)</option>
+                            <option value="lucknow">लखनऊ (Lucknow)</option>
+                            <option value="sitapur">सीतापुर (Sitapur)</option>
+                            <option value="kanpur">कानपुर (Kanpur)</option>
+                        </optgroup>
+                        <optgroup label="राजस्थान (Rajasthan)">
+                            <option value="jaipur">जयपुर (Jaipur)</option>
+                            <option value="kota">कोटा (Kota)</option>
+                        </optgroup>
+                        <optgroup label="अन्य राज्य (Other)">
+                            <option value="patna">पटना (बिहार)</option>
+                            <option value="nagpur">नागपुर (महाराष्ट्र)</option>
+                            <option value="karnal">करनाल (हरियाणा)</option>
+                            <option value="ludhiana">लुधियाना (पंजाब)</option>
+                        </optgroup>
+                    </select>
                 </div>
             </div>
 
-            <div
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px; background: rgba(255, 255, 255, 0.2); padding: 20px; border-radius: 12px; backdrop-filter: blur(6px);">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <img id="weatherIconImg" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Icon"
-                        style="width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%;">
+            <!-- LIVE TODAY WEATHER HERO CARD -->
+            <div style="background: radial-gradient(circle at 30% 20%, rgba(30, 58, 138, 0.6) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1.5px solid rgba(56, 189, 248, 0.3); border-radius: 14px; padding: 22px; backdrop-filter: blur(8px); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div id="weatherIconDisplay" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);">
+                        <span style="font-size: 3.2rem;">☀️</span>
+                    </div>
                     <div>
-                        <h3 id="displayCityName" style="font-size: 1.3rem; margin: 0;">--</h3>
-                        <p id="displayCountry" style="font-size: 0.85rem; margin: 2px 0 0 0; opacity: 0.9;">India</p>
+                        <h2 id="displayCityName" style="font-size: 1.5rem; font-weight: 900; margin: 0; color: #f8fafc;">रीवा (Rewa)</h2>
+                        <p id="displayCountry" style="font-size: 0.84rem; margin: 2px 0 0 0; color: #38bdf8; font-weight: 700;">मध्य प्रदेश</p>
                     </div>
                 </div>
+
                 <div style="text-align: center;">
-                    <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">तापमान (Temperature)</div>
-                    <div id="displayTemp" style="font-size: 2.2rem; font-weight: bold; margin-top: 2px;">--°C</div>
+                    <div style="font-size: 0.78rem; color: #94a3b8; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">वर्तमान तापमान</div>
+                    <div id="displayTemp" style="font-size: 2.6rem; font-weight: 900; margin-top: 2px; color: #fde047; line-height: 1;">28°C</div>
+                    <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 4px;">महसूस (Feels like): <strong id="displayFeelsLike">29°C</strong></div>
                 </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">मौसम स्थिति</div>
-                    <div id="displayCondition"
-                        style="font-size: 1.1rem; font-weight: bold; margin-top: 4px; text-transform: capitalize;">--
+
+                <div style="text-align: center;">
+                    <div style="font-size: 0.78rem; color: #94a3b8; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">मौसम की स्थिति</div>
+                    <div id="displayCondition" style="font-size: 1.15rem; font-weight: 800; margin-top: 4px; color: #4ade80;">साफ आसमान</div>
+                </div>
+
+                <div style="display: flex; justify-content: space-around; background: rgba(0,0,0,0.35); padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.72rem; color: #94a3b8;">हवा में नमी</div>
+                        <div id="displayHumidity" style="font-size: 1rem; font-weight: 800; color: #60a5fa; margin-top: 2px;">65%</div>
+                    </div>
+                    <div style="border-left: 1px solid rgba(255,255,255,0.1);"></div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.72rem; color: #94a3b8;">हवा की गति</div>
+                        <div id="displayWind" style="font-size: 1rem; font-weight: 800; color: #fde047; margin-top: 2px;">12 km/h</div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- 7-DAY FORECAST SECTION -->
+        <div style="margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>📅</span> <span>आगामी 7 दिनों का मौसम पूर्वानुमान (7-Day Forecast)</span>
+                </h3>
+                <span style="font-size: 0.76rem; background: #e0f2fe; color: #0284c7; padding: 3px 8px; border-radius: 12px; font-weight: 800;">
+                    Daily Rain & Temp
+                </span>
+            </div>
+            <div id="weather-7day-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+                <!-- Dynamically populated by weather.js -->
+            </div>
+        </div>
+
+        <!-- AGROMETEOROLOGICAL ADVISORY BOX -->
+        <div id="weather-agro-advisory-wrap" style="margin-bottom: 30px;">
+            <!-- Dynamically populated with rain alerts, fungus alerts, spraying advice -->
+        </div>
+
     </main>
 
         <!-- =========================================

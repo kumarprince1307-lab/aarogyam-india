@@ -136,6 +136,9 @@ export async function initBookLandingPages() {
       <button type="button" id="tab-btn-free-demo-mgr" onclick="window.switchAdminSubTab('free_demo')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #f59e0b; color: #f59e0b; font-weight: 800;">
         🎁 4. डेमो व फ्री ई-बुक्स स्टूडियो (Demo & Free Books Studio)
       </button>
+      <button type="button" id="tab-btn-popups-mgr" onclick="window.switchAdminSubTab('popups')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #3b82f6; color: #38bdf8; font-weight: 800;">
+        🔔 5. सोशल प्रूफ व पॉपअप्स (Social Proof & Popups)
+      </button>
     </div>
 
     <!-- =========================================================================
@@ -1460,6 +1463,63 @@ export async function initBookLandingPages() {
         <div class="admin-loading">डेटा लोड हो रहा है...</div>
       </div>
     </div>
+
+    <!-- SUB-TAB 5: Social Proof, Toasts & Popups Hub -->
+    <div id="admin-popups-subtab-container" class="admin-card" style="display: none; margin-bottom: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #38bdf8;">
+            🔔 सोशल प्रूफ, टोस्ट्स व पॉपअप मैनेजर (Social Proof & Popups Hub)
+          </h3>
+          <p style="font-size: 0.82rem; color: var(--admin-muted); margin: 3px 0 0 0;">
+            लाइव खरीदार नोटिफिकेशन ("Rameshwar Patel ने अभी खरीदी..."), डिस्प्ले टाइमिंग व एग्जिट पॉपअप्स को 100% कस्टमाइज़ करें:
+          </p>
+        </div>
+        <button type="button" onclick="window.savePopupsConfig()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; padding: 8px 18px; box-shadow: 0 4px 12px rgba(22,163,74,0.3);">
+          💾 सेटिंग्स सुरक्षित करें (Save Popups)
+        </button>
+      </div>
+
+      <!-- Controls Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border); border-radius: 10px; padding: 14px;">
+          <label style="display: flex; align-items: center; gap: 10px; font-weight: 800; color: #fde047; cursor: pointer;">
+            <input type="checkbox" id="adm_popups_toasts_enabled" checked style="width: 18px; height: 18px; accent-color: #16a34a;" />
+            <span>🔔 लाइव खरीदार टोस्ट्स (Social Proof Toasts) चालू रखें</span>
+          </label>
+          <div style="margin-top: 10px;">
+            <label class="admin-label" style="font-size: 0.78rem;">टोस्ट डिस्प्ले अंतराल (सेकंड):</label>
+            <input type="number" id="adm_popups_interval" min="5" max="60" value="10" class="admin-input" style="width: 100%; padding: 6px 10px; font-weight: 700;" />
+          </div>
+        </div>
+
+        <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border); border-radius: 10px; padding: 14px;">
+          <label style="display: flex; align-items: center; gap: 10px; font-weight: 800; color: #38bdf8; cursor: pointer;">
+            <input type="checkbox" id="adm_popups_exit_enabled" checked style="width: 18px; height: 18px; accent-color: #2563eb;" />
+            <span>🚪 एग्जिट-इंटेंट डिस्काउंट पॉपअप चालू रखें</span>
+          </label>
+          <div style="margin-top: 10px;">
+            <label class="admin-label" style="font-size: 0.78rem;">कूपन कोड:</label>
+            <input type="text" id="adm_popups_coupon" value="KISAN10" class="admin-input" style="width: 100%; padding: 6px 10px; font-weight: 700;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Social Proof Items List -->
+      <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border); border-radius: 10px; padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: #f8fafc;">
+            👥 लाइव खरीदार सोशल प्रूफ लिस्ट (Live Buyer Testimonials Stream)
+          </h4>
+          <button type="button" onclick="window.addSocialProofItem()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
+            + नया खरीदार जोड़ें
+          </button>
+        </div>
+        <div id="adm_social_proof_items_wrap" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
   `;
 
   // Helper to render section banner uploader blocks in HTML
@@ -2109,23 +2169,26 @@ export async function initBookLandingPages() {
   }
 
   // -------------------------------------------------------------
-  // SUB-TAB SWITCHING LOGIC (Pages vs Shelves vs Leads vs Free Demo)
+  // SUB-TAB SWITCHING LOGIC (Pages vs Shelves vs Leads vs Free Demo vs Popups)
   // -------------------------------------------------------------
   window.switchAdminSubTab = function(tab) {
     const pagesCard = document.getElementById('admin-pages-subtab-container');
     const shelvesCard = document.getElementById('admin-shelves-subtab-container');
     const leadsCard = document.getElementById('admin-leads-subtab-container');
     const freeDemoCard = document.getElementById('admin-free-demo-subtab-container');
+    const popupsCard = document.getElementById('admin-popups-subtab-container');
 
     const btnPages = document.getElementById('tab-btn-landing-pages');
     const btnShelves = document.getElementById('tab-btn-shelves-mgr');
     const btnLeads = document.getElementById('tab-btn-coming-soon-leads');
     const btnFreeDemo = document.getElementById('tab-btn-free-demo-mgr');
+    const btnPopups = document.getElementById('tab-btn-popups-mgr');
 
     if (pagesCard) pagesCard.style.display = tab === 'pages' ? 'block' : 'none';
     if (shelvesCard) shelvesCard.style.display = tab === 'shelves' ? 'block' : 'none';
     if (leadsCard) leadsCard.style.display = tab === 'leads' ? 'block' : 'none';
     if (freeDemoCard) freeDemoCard.style.display = tab === 'free_demo' ? 'block' : 'none';
+    if (popupsCard) popupsCard.style.display = tab === 'popups' ? 'block' : 'none';
 
     if (btnPages) {
       btnPages.style.background = tab === 'pages' ? '#16a34a' : 'var(--admin-surface, #1e293b)';
@@ -2151,9 +2214,190 @@ export async function initBookLandingPages() {
       btnFreeDemo.style.borderColor = '#f59e0b';
     }
 
+    if (btnPopups) {
+      btnPopups.style.background = tab === 'popups' ? '#38bdf8' : 'var(--admin-surface, #1e293b)';
+      btnPopups.style.color = tab === 'popups' ? '#000' : '#38bdf8';
+      btnPopups.style.borderColor = '#38bdf8';
+    }
+
     if (tab === 'shelves') window.renderStoreShelvesTab();
     if (tab === 'leads') window.renderComingSoonLeadsTab();
     if (tab === 'free_demo') window.renderFreeDemoStudioTab();
+    if (tab === 'popups') window.renderPopupsManagerTab();
+  };
+
+  // -------------------------------------------------------------
+  // SUB-TAB 5: SOCIAL PROOF TOASTS & POPUPS HUB CONTROLLERS
+  // -------------------------------------------------------------
+  let currentPopupsConfig = null;
+
+  window.renderPopupsManagerTab = async function() {
+    const wrap = document.getElementById('adm_social_proof_items_wrap');
+    if (!wrap) return;
+
+    if (!currentPopupsConfig) {
+      try {
+        const res = await fetch('/data/notifications-popups.json?v=' + Date.now());
+        if (res.ok) {
+          currentPopupsConfig = await res.json();
+        }
+      } catch (e) {}
+
+      if (!currentPopupsConfig) {
+        try {
+          const stored = localStorage.getItem('AAROGYAM_NOTIFS_POPUPS_CONFIG');
+          if (stored) currentPopupsConfig = JSON.parse(stored);
+        } catch (e) {}
+      }
+
+      if (!currentPopupsConfig) {
+        currentPopupsConfig = {
+          social_proof_toasts: {
+            enabled: true,
+            interval_seconds: 10,
+            items: [
+              { name: "रामेश्वर पटेल", city_state: "इंदौर, MP", book_title: "खेती का डॉक्टर E-Book", cover_image: "/images/books/fasal-ka-doctor-cover.webp", time_ago: "2 मिनट पहले", avatar: "👨‍🌾" },
+              { name: "महेश शर्मा", city_state: "जयपुर, राजस्थान", book_title: "खरीफ फसल मास्टर गाइड 2026", cover_image: "/images/books/kharif-master-guide-2026-cover.webp", time_ago: "5 मिनट पहले", avatar: "👨" },
+              { name: "सुनीता देवी", city_state: "वाराणसी, UP", book_title: "सब्जियों की वैज्ञानिक खेती", cover_image: "/images/books/sabji-kheti-guide-cover.webp", time_ago: "9 मिनट पहले", avatar: "👩‍🌾" }
+            ]
+          },
+          exit_popup: {
+            enabled: true,
+            coupon_code: "KISAN10",
+            discount_text: "विशेष किसान छूट - 10% अतिरिक्त बचत!"
+          }
+        };
+      }
+    }
+
+    // Set form controls
+    const toastChk = document.getElementById('adm_popups_toasts_enabled');
+    const toastInterval = document.getElementById('adm_popups_interval');
+    const exitChk = document.getElementById('adm_popups_exit_enabled');
+    const exitCoupon = document.getElementById('adm_popups_coupon');
+
+    if (toastChk) toastChk.checked = currentPopupsConfig.social_proof_toasts?.enabled !== false;
+    if (toastInterval) toastInterval.value = currentPopupsConfig.social_proof_toasts?.interval_seconds || 10;
+    if (exitChk) exitChk.checked = currentPopupsConfig.exit_popup?.enabled !== false;
+    if (exitCoupon) exitCoupon.value = currentPopupsConfig.exit_popup?.coupon_code || 'KISAN10';
+
+    window.renderSocialProofItemsList();
+  };
+
+  window.renderSocialProofItemsList = function() {
+    const wrap = document.getElementById('adm_social_proof_items_wrap');
+    if (!wrap) return;
+
+    const items = currentPopupsConfig?.social_proof_toasts?.items || [];
+    if (items.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.85rem;text-align:center;padding:12px;">कोई सोशल प्रूफ आइटम नहीं है। ऊपर दिए बटन से नया जोड़ें।</div>';
+      return;
+    }
+
+    wrap.innerHTML = items.map((item, idx) => `
+      <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px 14px; display: grid; grid-template-columns: 50px 1fr 1fr 1.2fr 100px 50px; gap: 8px; align-items: center;">
+        <div>
+          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">अवतार</label>
+          <input type="text" value="${escapeHtml(item.avatar || '👨‍🌾')}" onchange="window.updateSocialProofField(${idx}, 'avatar', this.value)" class="admin-input" style="padding:4px 6px;text-align:center;font-size:1.1rem;width:100%;" />
+        </div>
+        <div>
+          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">खरीदार का नाम</label>
+          <input type="text" value="${escapeHtml(item.name || '')}" onchange="window.updateSocialProofField(${idx}, 'name', this.value)" placeholder="उदा. रामेश्वर पटेल" class="admin-input" style="padding:4px 8px;font-size:0.82rem;font-weight:700;width:100%;" />
+        </div>
+        <div>
+          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">स्थान (City, State)</label>
+          <input type="text" value="${escapeHtml(item.city_state || '')}" onchange="window.updateSocialProofField(${idx}, 'city_state', this.value)" placeholder="उदा. इंदौर, MP" class="admin-input" style="padding:4px 8px;font-size:0.82rem;width:100%;" />
+        </div>
+        <div>
+          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">पुस्तक का नाम</label>
+          <input type="text" value="${escapeHtml(item.book_title || '')}" onchange="window.updateSocialProofField(${idx}, 'book_title', this.value)" placeholder="उदा. खेती का डॉक्टर" class="admin-input" style="padding:4px 8px;font-size:0.82rem;color:#fde047;font-weight:700;width:100%;" />
+        </div>
+        <div>
+          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">समय (Time)</label>
+          <input type="text" value="${escapeHtml(item.time_ago || '2 मिनट पहले')}" onchange="window.updateSocialProofField(${idx}, 'time_ago', this.value)" placeholder="2 मिनट पहले" class="admin-input" style="padding:4px 6px;font-size:0.75rem;width:100%;" />
+        </div>
+        <div style="text-align:center;padding-top:14px;">
+          <button type="button" onclick="window.removeSocialProofItem(${idx})" class="admin-button small-button" style="background:rgba(239,68,68,0.2);border:1px solid #ef4444;color:#fca5a5;padding:4px 8px;" title="हटाएं">
+            🗑️
+          </button>
+        </div>
+      </div>
+    `).join('');
+  };
+
+  window.addSocialProofItem = function() {
+    if (!currentPopupsConfig) currentPopupsConfig = { social_proof_toasts: { enabled: true, items: [] } };
+    if (!currentPopupsConfig.social_proof_toasts) currentPopupsConfig.social_proof_toasts = { enabled: true, items: [] };
+    if (!Array.isArray(currentPopupsConfig.social_proof_toasts.items)) currentPopupsConfig.social_proof_toasts.items = [];
+
+    currentPopupsConfig.social_proof_toasts.items.push({
+      name: "नया किसान",
+      city_state: "मध्य प्रदेश",
+      book_title: "खेती का डॉक्टर",
+      cover_image: "/images/books/fasal-ka-doctor-cover.webp",
+      time_ago: "1 मिनट पहले",
+      avatar: "👨‍🌾"
+    });
+    window.renderSocialProofItemsList();
+    showToast('✨ नया सोशल प्रूफ आइटम जोड़ा गया!', 'info');
+  };
+
+  window.removeSocialProofItem = function(idx) {
+    if (currentPopupsConfig?.social_proof_toasts?.items) {
+      currentPopupsConfig.social_proof_toasts.items.splice(idx, 1);
+      window.renderSocialProofItemsList();
+      showToast('🗑️ आइटम हटा दिया गया', 'info');
+    }
+  };
+
+  window.updateSocialProofField = function(idx, field, val) {
+    if (currentPopupsConfig?.social_proof_toasts?.items?.[idx]) {
+      currentPopupsConfig.social_proof_toasts.items[idx][field] = val;
+    }
+  };
+
+  window.savePopupsConfig = async function() {
+    if (!currentPopupsConfig) currentPopupsConfig = { social_proof_toasts: {}, exit_popup: {} };
+
+    const toastChk = document.getElementById('adm_popups_toasts_enabled');
+    const toastInterval = document.getElementById('adm_popups_interval');
+    const exitChk = document.getElementById('adm_popups_exit_enabled');
+    const exitCoupon = document.getElementById('adm_popups_coupon');
+
+    currentPopupsConfig.social_proof_toasts = {
+      ...(currentPopupsConfig.social_proof_toasts || {}),
+      enabled: toastChk ? toastChk.checked : true,
+      interval_seconds: toastInterval ? (parseInt(toastInterval.value, 10) || 10) : 10,
+      items: currentPopupsConfig.social_proof_toasts?.items || []
+    };
+
+    currentPopupsConfig.exit_popup = {
+      ...(currentPopupsConfig.exit_popup || {}),
+      enabled: exitChk ? exitChk.checked : true,
+      coupon_code: exitCoupon ? (exitCoupon.value.trim() || 'KISAN10') : 'KISAN10'
+    };
+
+    try {
+      localStorage.setItem('AAROGYAM_NOTIFS_POPUPS_CONFIG', JSON.stringify(currentPopupsConfig));
+    } catch (e) {}
+
+    // Save to server
+    try {
+      const res = await fetch('/api/save_book_landing.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_popups',
+          popupsConfig: currentPopupsConfig
+        })
+      });
+      if (res.ok) {
+        showToast('🎉 सोशल प्रूफ व पॉपअप सेटिंग्स सर्वर पर सुरक्षित हो गईं!', 'success');
+        return;
+      }
+    } catch (e) {}
+
+    showToast('💾 सोशल प्रूफ व पॉपअप सेटिंग्स सुरक्षित हो गईं!', 'success');
   };
 
   // -------------------------------------------------------------
