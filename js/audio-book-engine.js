@@ -351,26 +351,33 @@ class ProAudioBookEngine {
 
     splitTextIntoChunks(text) {
         if (!text) return [];
-        // Clean text and replace non-standard full stops
-        const normalized = text.replace(/[\u3002]/g, ' । ');
-        // Split by lines, Hindi purna viram (।), period, question mark, exclamation, semicolon
-        const rawSegments = normalized.split(/[\r\n।\.?!;:]+/);
+        // 1. Sanitize emojis and special formatting symbols
+        let cleanText = String(text)
+            .replace(/[\u3002]/g, ' । ')
+            .replace(/[•▪★●◆✦✓✔■►▶]/g, ' । ')
+            .replace(/(\d+)\.(\d+)/g, '$1 दशमलव $2') // Keep decimals pronounceable (e.g. 5.6 -> 5 दशमलव 6)
+            .replace(/[\*\_\~\|\#\<\>\{\}\[\]]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        // 2. Split by lines, Hindi purna viram (।), period, question mark, exclamation, semicolon
+        const rawSegments = cleanText.split(/[\r\n।\.?!;:]+/);
         const subSegments = [];
 
         for (const seg of rawSegments) {
             const cl = seg.trim();
             if (!cl) continue;
-            // If a single segment without punctuation is too long (> 100 chars), split by comma or words
-            if (cl.length > 100) {
+            // If a single segment without punctuation is too long (> 90 chars), split by comma or words
+            if (cl.length > 90) {
                 const subParts = cl.split(/[,，]+/);
                 for (const part of subParts) {
                     const cleanPart = part.trim();
                     if (!cleanPart) continue;
-                    if (cleanPart.length > 100) {
+                    if (cleanPart.length > 90) {
                         const words = cleanPart.split(/\s+/);
                         let wChunk = '';
                         for (const w of words) {
-                            if ((wChunk + ' ' + w).length > 80) {
+                            if ((wChunk + ' ' + w).length > 70) {
                                 if (wChunk) subSegments.push(wChunk.trim());
                                 wChunk = w;
                             } else {
@@ -394,7 +401,7 @@ class ProAudioBookEngine {
             const clean = seg.trim();
             if (!clean) continue;
 
-            if ((currentChunk + ' ' + clean).length > 100) {
+            if ((currentChunk + ' ' + clean).length > 80) {
                 if (currentChunk.trim()) chunks.push(currentChunk.trim());
                 currentChunk = clean;
             } else {
@@ -404,7 +411,7 @@ class ProAudioBookEngine {
         if (currentChunk.trim()) {
             chunks.push(currentChunk.trim());
         }
-        return chunks.length ? chunks : [text.trim()];
+        return chunks.length ? chunks : [cleanText];
     }
 
     speakText(text, currentPage, isWelcome = false) {
@@ -454,11 +461,15 @@ class ProAudioBookEngine {
             }
 
             const currentChunk = chunks[chunkIndex];
+            if (!currentChunk || !currentChunk.trim()) {
+                chunkIndex++;
+                playNextChunk();
+                return;
+            }
 
             // 1. Prefer Native SpeechSynthesis with Voice Selection
             if (this.synth) {
                 try {
-                    this.synth.cancel();
                     const ut = new SpeechSynthesisUtterance(currentChunk);
                     this.currentUtterance = ut;
                     if (this.femaleVoice) ut.voice = this.femaleVoice;
@@ -467,9 +478,12 @@ class ProAudioBookEngine {
                     ut.rate = 0.98 * this.playbackRate;
 
                     let hasAdvanced = false;
+                    let watchdogTimer = null;
+
                     const advance = () => {
                         if (hasAdvanced || !this.isPlaying) return;
                         hasAdvanced = true;
+                        if (watchdogTimer) clearTimeout(watchdogTimer);
                         chunkIndex++;
                         playNextChunk();
                     };
@@ -479,11 +493,18 @@ class ProAudioBookEngine {
                     };
 
                     ut.onerror = (e) => {
-                        if (e && (e.error === 'interrupted' || e.error === 'canceled')) {
-                            return;
-                        }
+                        console.warn("TTS utterance note:", e?.error);
                         advance();
                     };
+
+                    // Safety Watchdog Timer: auto-advance if browser drops onend (e.g. Chrome 15s bug)
+                    const maxUtteranceDurationMs = Math.max(4000, currentChunk.length * 160);
+                    watchdogTimer = setTimeout(() => {
+                        if (!hasAdvanced && this.isPlaying) {
+                            console.warn("TTS Watchdog triggered for chunk:", currentChunk);
+                            advance();
+                        }
+                    }, maxUtteranceDurationMs);
 
                     // Chrome Android Keep-Alive Pulse during utterance
                     const pulseTimer = setInterval(() => {
@@ -494,11 +515,11 @@ class ProAudioBookEngine {
                         if (window.speechSynthesis && window.speechSynthesis.paused) {
                             window.speechSynthesis.resume();
                         }
-                    }, 3000);
+                    }, 2500);
 
                     setTimeout(() => {
                         if (this.isPlaying && this.synth) this.synth.speak(ut);
-                    }, 40);
+                    }, 30);
                 } catch(err) {
                     chunkIndex++;
                     playNextChunk();

@@ -1921,24 +1921,31 @@ function testCurrentPageTts() {
         }
     }
 
-    // Split text into chunks
-    const normalized = text.replace(/[\u3002]/g, ' । ');
-    const rawSegs = normalized.split(/[\r\n।\.?!;:]+/);
+    // Split text into chunks with full sanitization
+    let cleanText = String(text)
+        .replace(/[\u3002]/g, ' । ')
+        .replace(/[•▪★●◆✦✓✔■►▶]/g, ' । ')
+        .replace(/(\d+)\.(\d+)/g, '$1 दशमलव $2')
+        .replace(/[\*\_\~\|\#\<\>\{\}\[\]]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const rawSegs = cleanText.split(/[\r\n।\.?!;:]+/);
     const subSegments = [];
 
     for (const seg of rawSegs) {
         const cl = seg.trim();
         if (!cl) continue;
-        if (cl.length > 100) {
+        if (cl.length > 90) {
             const subParts = cl.split(/[,，]+/);
             for (const part of subParts) {
                 const cleanPart = part.trim();
                 if (!cleanPart) continue;
-                if (cleanPart.length > 100) {
+                if (cleanPart.length > 90) {
                     const words = cleanPart.split(/\s+/);
                     let wChunk = '';
                     for (const w of words) {
-                        if ((wChunk + ' ' + w).length > 80) {
+                        if ((wChunk + ' ' + w).length > 70) {
                             if (wChunk) subSegments.push(wChunk.trim());
                             wChunk = w;
                         } else {
@@ -1960,7 +1967,7 @@ function testCurrentPageTts() {
     for (const seg of subSegments) {
         const cl = seg.trim();
         if (!cl) continue;
-        if ((curChunk + ' ' + cl).length > 100) {
+        if ((curChunk + ' ' + cl).length > 80) {
             if (curChunk.trim()) chunks.push(curChunk.trim());
             curChunk = cl;
         } else {
@@ -1968,7 +1975,7 @@ function testCurrentPageTts() {
         }
     }
     if (curChunk.trim()) chunks.push(curChunk.trim());
-    if (!chunks.length) chunks.push(text);
+    if (!chunks.length) chunks.push(cleanText);
 
     studioTtsChunks = chunks;
     studioTtsChunkIndex = 0;
@@ -1980,79 +1987,59 @@ function testCurrentPageTts() {
             return;
         }
         const chunk = studioTtsChunks[studioTtsChunkIndex];
-
-        if (nativeHindiVoice && 'speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const ut = new SpeechSynthesisUtterance(chunk);
-            ut.voice = nativeHindiVoice;
-            ut.lang = 'hi-IN';
-            ut.rate = 0.95;
-            ut.pitch = 1.0;
-            ut.onend = () => {
-                if (!studioTtsIsPlaying) return;
-                studioTtsChunkIndex++;
-                playNext();
-            };
-            ut.onerror = () => {
-                if (!studioTtsIsPlaying) return;
-                playCloud(chunk);
-            };
-            setTimeout(() => {
-                if (studioTtsIsPlaying) window.speechSynthesis.speak(ut);
-            }, 30);
-        } else {
-            playCloud(chunk);
-        }
-    };
-
-    const playCloud = (chunk) => {
-        if (!studioTtsIsPlaying) return;
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=hi&q=${encodeURIComponent(chunk)}`;
-        studioTtsAudio.src = url;
-        studioTtsAudio.onended = () => {
-            if (!studioTtsIsPlaying) return;
+        if (!chunk || !chunk.trim()) {
             studioTtsChunkIndex++;
             playNext();
-        };
-        studioTtsAudio.onerror = () => {
-            if (!studioTtsIsPlaying) return;
-            if ('speechSynthesis' in window) {
+            return;
+        }
+
+        if ('speechSynthesis' in window) {
+            try {
                 const ut = new SpeechSynthesisUtterance(chunk);
+                if (nativeHindiVoice) ut.voice = nativeHindiVoice;
                 ut.lang = 'hi-IN';
+                ut.rate = 0.95;
+                ut.pitch = 1.0;
+
+                let hasAdvanced = false;
+                let watchdog = null;
+
+                const advance = () => {
+                    if (hasAdvanced || !studioTtsIsPlaying) return;
+                    hasAdvanced = true;
+                    if (watchdog) clearTimeout(watchdog);
+                    studioTtsChunkIndex++;
+                    playNext();
+                };
+
                 ut.onend = () => {
-                    if (!studioTtsIsPlaying) return;
-                    studioTtsChunkIndex++;
-                    playNext();
+                    advance();
                 };
-                ut.onerror = () => {
-                    if (!studioTtsIsPlaying) return;
-                    studioTtsChunkIndex++;
-                    playNext();
+                ut.onerror = (e) => {
+                    console.warn("Studio TTS chunk error:", e?.error);
+                    advance();
                 };
-                window.speechSynthesis.speak(ut);
-            } else {
+
+                const timeoutMs = Math.max(4000, chunk.length * 160);
+                watchdog = setTimeout(() => {
+                    if (!hasAdvanced && studioTtsIsPlaying) {
+                        advance();
+                    }
+                }, timeoutMs);
+
+                setTimeout(() => {
+                    if (studioTtsIsPlaying && 'speechSynthesis' in window) {
+                        window.speechSynthesis.speak(ut);
+                    }
+                }, 30);
+            } catch(e) {
                 studioTtsChunkIndex++;
                 playNext();
             }
-        };
-        studioTtsAudio.play().catch(() => {
-            if (!studioTtsIsPlaying) return;
-            if ('speechSynthesis' in window) {
-                const ut = new SpeechSynthesisUtterance(chunk);
-                ut.lang = 'hi-IN';
-                ut.onend = () => {
-                    if (!studioTtsIsPlaying) return;
-                    studioTtsChunkIndex++;
-                    playNext();
-                };
-                ut.onerror = () => {
-                    if (!studioTtsIsPlaying) return;
-                    studioTtsChunkIndex++;
-                    playNext();
-                };
-                window.speechSynthesis.speak(ut);
-            }
-        });
+        } else {
+            studioTtsChunkIndex++;
+            playNext();
+        }
     };
 
     playNext();
