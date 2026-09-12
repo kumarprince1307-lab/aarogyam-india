@@ -696,6 +696,146 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 </div>
 
 <!-- ==========================================================
+     NEW REVOLUTIONARY AUDIO BOOK EXPERIENCE LAYER (KHARIF CROPS SPECIAL)
+========================================================== -->
+<section id="audio-book-experience" class="aoi-audio-kpi-section" style="padding: 60px 0; background: linear-gradient(180deg, #091e14 0%, #064e3b 50%, #022c22 100%); color: #fff; position: relative; overflow: hidden; border-top: 3px solid #10b981; border-bottom: 3px solid #10b981;">
+  
+  <!-- Glowing Background Ambient Spheres -->
+  <div style="position: absolute; top: -50px; left: -50px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(16,185,129,0.25) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+  <div style="position: absolute; bottom: -50px; right: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(245,158,11,0.2) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+
+  <div class="container" style="max-width: 1080px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 2;">
+    
+    <!-- Top Badge & Header -->
+    <div style="text-align: center; margin-bottom: 35px;">
+      <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.2); border: 1px solid #34d399; padding: 6px 18px; border-radius: 30px; font-size: 0.88rem; font-weight: 800; color: #6ee7b7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; box-shadow: 0 0 15px rgba(52,211,153,0.3);">
+        <span>🎧 देश की पहली क्रांतिकारी कृषि ऑडियो बुक</span>
+        <span style="background: #10b981; color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: 900;">eBook + Audio</span>
+      </div>
+      <h2 style="font-size: 2.1rem; font-weight: 900; line-height: 1.3; color: #f8fafc; margin: 0 0 10px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+        अब यह सिर्फ ई-बुक नहीं, खरीफ फसलों की <span style="background: linear-gradient(90deg, #34d399, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">सम्पूर्ण ऑडियो बुक</span> है!
+      </h2>
+      <p style="font-size: 1.05rem; color: #cbd5e1; max-width: 780px; margin: 0 auto;">
+        🌾 धान, सोयाबीन और मक्का की खेत तैयारी, बुवाई, रोग-कीट नियंत्रण व पोषण प्रबंधन — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।
+      </p>
+    </div>
+
+    <!-- Live Audio Player KPI Card -->
+    <div style="background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 2px solid rgba(52, 211, 153, 0.4); border-radius: 20px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(16,185,129,0.2); margin-bottom: 35px;">
+      
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 18px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #10b981, #047857); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 15px rgba(16,185,129,0.4);">
+            🎙️
+          </div>
+          <div>
+            <div style="font-size: 0.8rem; font-weight: 700; color: #34d399; text-transform: uppercase;">लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)</div>
+            <div style="font-size: 1.15rem; font-weight: 900; color: #fff;">खरीफ मास्टर गाइड का लाइव ऑडियो परिचय सुनें</div>
+          </div>
+        </div>
+
+        <!-- Master Play / Pause Trigger -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button id="landingAudioPlayBtn" onclick="toggleLandingAudioBook()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(16,185,129,0.4); transition: transform 0.2s, box-shadow 0.2s;">
+            <span id="landingAudioIcon">▶️</span> <span id="landingAudioLabel">ऑडियो सुनें (Play Preview)</span>
+          </button>
+          <button id="landingAudioStopBtn" onclick="stopLandingAudioBook()" style="background: #ef4444; color: #fff; border: none; padding: 12px 18px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: none; align-items: center; gap: 6px;">
+            <span>⏹️</span> रोकें (Stop)
+          </button>
+        </div>
+      </div>
+
+      <!-- Animated Sound Wave Visualizer & Status -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: rgba(0,0,0,0.3); padding: 12px 18px; border-radius: 10px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div id="landingWaveContainer" style="display: flex; align-items: center; gap: 4px; height: 22px;">
+            <span class="aoi-wave-bar" style="width: 4px; height: 8px; background: #34d399; border-radius: 2px;"></span>
+            <span class="aoi-wave-bar" style="width: 4px; height: 16px; background: #34d399; border-radius: 2px;"></span>
+            <span class="aoi-wave-bar" style="width: 4px; height: 10px; background: #34d399; border-radius: 2px;"></span>
+            <span class="aoi-wave-bar" style="width: 4px; height: 20px; background: #34d399; border-radius: 2px;"></span>
+            <span class="aoi-wave-bar" style="width: 4px; height: 12px; background: #34d399; border-radius: 2px;"></span>
+          </div>
+          <span id="landingAudioStatusText" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">ऑडियो तैयार है • Play बटन दबाएं</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #6ee7b7; font-weight: 700;">
+          <span>⚡ HD AI कृषि सखी वॉइस</span>
+          <span>•</span>
+          <span>🎧 BGM एम्बिएंस</span>
+        </div>
+      </div>
+
+      <!-- Narration Text Box & Value Highlights (Kharif Focused) -->
+      <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 22px; font-size: 0.95rem; line-height: 1.8; color: #e2e8f0;">
+        <p style="margin: 0 0 16px 0; font-size: 1.02rem; font-weight: 600; color: #f1f5f9;">
+          क्या आप खरीफ सीजन में <strong>धान, सोयाबीन, मक्का और कपास</strong> की फसलों में लगने वाले अज्ञात रोगों, कीटों के हमलों, पीला मोज़ेक, तना छेदक और खरपतवार से परेशान हैं? क्या आप चाहते हैं कि बुवाई से लेकर कटाई तक खेत की हर समस्या का वैज्ञानिक समाधान सीधे आपके मोबाइल पर मिल जाए? मेरे आधुनिक किसान भाई, अब आपको परेशान होने की बिल्कुल जरूरत नहीं है क्योंकि हम आपके लिए ले आए हैं देश की पहली क्रांतिकारी कृषि ऑडियो बुक <strong>"खरीफ फसल मास्टर गाइड 2026"</strong> जिसे आप खेत में काम करते समय बस अपने कान में इयरफोन लगाकर आसानी से सुन सकते हैं!
+        </p>
+
+        <p style="margin: 0 0 14px 0; color: #fbbf24; font-weight: 700;">
+          ✨ यह कोई साधारण ई-बुक नहीं है, बल्कि खरीफ फसलों के लिए आपकी संपूर्ण प्रैक्टिकल मार्गदर्शिका है। इस मास्टर गाइड में आपको मिलते हैं ये विशेष समाधान:
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 18px;">
+          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #34d399; font-size: 1.1rem;">🌾</span>
+            <span><strong>धान, सोयाबीन व मक्का:</strong> खेत तैयारी, मिट्टी सुधार व वैज्ञानिक बुवाई तकनीक.</span>
+          </div>
+          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #34d399; font-size: 1.1rem;">🌱</span>
+            <span><strong>सोयाबीन स्पेशल:</strong> पीला मोज़ेक, गर्डल बीटल, सेमीलूपर व तना मक्खी का अचूक नियंत्रण.</span>
+          </div>
+          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #34d399; font-size: 1.1rem;">🌿</span>
+            <span><strong>धान स्पेशल:</strong> शीथ ब्लाइट, ब्लास्ट, हल्दी रोग, बीपीएच व तना छेदक का 100% सटीक इलाज.</span>
+          </div>
+          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #34d399; font-size: 1.1rem;">🌽</span>
+            <span><strong>मक्का स्पेशल:</strong> फॉल आर्मीवर्म व तना सड़न रोग रोकथाम की आधुनिक विधियां.</span>
+          </div>
+          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #34d399; font-size: 1.1rem;">🧪</span>
+            <span><strong>खरपतवार नियंत्रण:</strong> प्री व पोस्ट इमर्जेंस हर्बिसाइड्स का सुरक्षित व सही स्प्रे शेड्यूल.</span>
+          </div>
+          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #34d399; font-size: 1.1rem;">💧</span>
+            <span><strong>पोषण प्रबंधन:</strong> NPK, जिंक, बोरॉन व सल्फर का फसलवार संतुलित चार्ट.</span>
+          </div>
+          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #34d399; font-size: 1.1rem;">📅</span>
+            <span><strong>कृषि कैलेंडर:</strong> आपातकालीन निर्णय चार्ट व माह-दर-माह फसल सुरक्षा योजना.</span>
+          </div>
+          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+            <span style="color: #34d399; font-size: 1.1rem;">⚠️</span>
+            <span><strong>50 सबसे बड़ी गलतियाँ:</strong> जिनसे खरीफ में फसल खराब होती है और बचाव के उपाय.</span>
+          </div>
+        </div>
+
+        <p style="margin: 0 0 14px 0;">
+          इस ऑडियो बुक को देश के जाने-माने कृषि विशेषज्ञ <strong>दादा अवनीश मिश्रा</strong> ने अपने <strong>15 वर्षों के लंबे और जमीनी अनुभव</strong> से तैयार किया है, जिसे अपनाकर देश के हजारों किसान खरीफ में कम लागत में बंपर पैदावार ले रहे हैं.
+        </p>
+
+        <div style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.25)); border: 1px solid rgba(245,158,11,0.5); border-radius: 12px; padding: 16px; margin-top: 14px;">
+          <p style="margin: 0; font-weight: 700; color: #fef08a;">
+            💥 धमाकेदार ऑफर: जिस संपूर्ण खरीफ ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल <span style="font-size: 1.3rem; color: #fff; background: #16a34a; padding: 2px 10px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">₹99</span> में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons inside Player -->
+      <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 24px;">
+        <button type="button" onclick="addBookToCart('BK001', 'खरीफ फसल मास्टर गाइड 2026', 99, this)" style="background: linear-gradient(135deg, #10b981, #047857); color: #fff; font-size: 1.1rem; font-weight: 900; padding: 14px 32px; border-radius: 30px; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(16,185,129,0.4); display: inline-flex; align-items: center; gap: 8px;">
+          <span>🛒</span> अभी ₹99 में खरीदें और ऑडियो सुनें
+        </button>
+        <a href="demo-kharif.html" style="background: rgba(255,255,255,0.1); color: #fff; font-size: 0.95rem; font-weight: 700; padding: 14px 24px; border-radius: 30px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); display: inline-flex; align-items: center; gap: 6px;">
+          <span>📖</span> फ्री डेमो देखें
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ==========================================================
         YOUTUBE SHORTS VIDEO DEMO SECTION
 ========================================================== -->
 <section id="video-demo" style="padding: 50px 0; background: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
@@ -764,146 +904,6 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         🛒 कार्ट देखें &amp; आर्डर करें
       </a>
     </div>
-  </div>
-</section>
-
-<!-- ==========================================================
-     NEW REVOLUTIONARY AUDIO BOOK EXPERIENCE LAYER (KPI + LIVE AUDIO)
-========================================================== -->
-<section id="audio-book-experience" class="aoi-audio-kpi-section" style="padding: 60px 0; background: linear-gradient(180deg, #091e14 0%, #064e3b 50%, #022c22 100%); color: #fff; position: relative; overflow: hidden; border-top: 3px solid #10b981; border-bottom: 3px solid #10b981;">
-  
-  <!-- Glowing Background Ambient Spheres -->
-  <div style="position: absolute; top: -50px; left: -50px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(16,185,129,0.25) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
-  <div style="position: absolute; bottom: -50px; right: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(245,158,11,0.2) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
-
-  <div class="container" style="max-width: 1080px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 2;">
-    
-    <!-- Top Badge & Header -->
-    <div style="text-align: center; margin-bottom: 35px;">
-      <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.2); border: 1px solid #34d399; padding: 6px 18px; border-radius: 30px; font-size: 0.88rem; font-weight: 800; color: #6ee7b7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; box-shadow: 0 0 15px rgba(52,211,153,0.3);">
-        <span>🎧 देश की पहली क्रांतिकारी कृषि ऑडियो बुक</span>
-        <span style="background: #10b981; color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: 900;">eBook + Audio</span>
-      </div>
-      <h2 style="font-size: 2.1rem; font-weight: 900; line-height: 1.3; color: #f8fafc; margin: 0 0 10px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
-        अब यह सिर्फ ई-बुक नहीं, एक <span style="background: linear-gradient(90deg, #34d399, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">सम्पूर्ण ऑडियो बुक</span> भी है!
-      </h2>
-      <p style="font-size: 1.05rem; color: #cbd5e1; max-width: 760px; margin: 0 auto;">
-        🌾 खेत में काम करते समय बस अपने कान में इयरफोन लगाएं और देश के शीर्ष कृषि वैज्ञानिकों का 15 वर्षों का ज्ञान आसानी से सुनें।
-      </p>
-    </div>
-
-    <!-- Live Audio Player KPI Card -->
-    <div style="background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 2px solid rgba(52, 211, 153, 0.4); border-radius: 20px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(16,185,129,0.2); margin-bottom: 35px;">
-      
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 18px; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #10b981, #047857); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 4px 15px rgba(16,185,129,0.4);">
-            🎙️
-          </div>
-          <div>
-            <div style="font-size: 0.8rem; font-weight: 700; color: #34d399; text-transform: uppercase;">लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)</div>
-            <div style="font-size: 1.15rem; font-weight: 900; color: #fff;">ऑडियो बुक का लाइव परिचय सुनें</div>
-          </div>
-        </div>
-
-        <!-- Master Play / Pause Trigger -->
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button id="landingAudioPlayBtn" onclick="toggleLandingAudioBook()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(16,185,129,0.4); transition: transform 0.2s, box-shadow 0.2s;">
-            <span id="landingAudioIcon">▶️</span> <span id="landingAudioLabel">ऑडियो सुनें (Play Preview)</span>
-          </button>
-          <button id="landingAudioStopBtn" onclick="stopLandingAudioBook()" style="background: #ef4444; color: #fff; border: none; padding: 12px 18px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: none; align-items: center; gap: 6px;">
-            <span>⏹️</span> रोकें (Stop)
-          </button>
-        </div>
-      </div>
-
-      <!-- Animated Sound Wave Visualizer & Status -->
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: rgba(0,0,0,0.3); padding: 12px 18px; border-radius: 10px; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div id="landingWaveContainer" style="display: flex; align-items: center; gap: 4px; height: 22px;">
-            <span class="aoi-wave-bar" style="width: 4px; height: 8px; background: #34d399; border-radius: 2px;"></span>
-            <span class="aoi-wave-bar" style="width: 4px; height: 16px; background: #34d399; border-radius: 2px;"></span>
-            <span class="aoi-wave-bar" style="width: 4px; height: 10px; background: #34d399; border-radius: 2px;"></span>
-            <span class="aoi-wave-bar" style="width: 4px; height: 20px; background: #34d399; border-radius: 2px;"></span>
-            <span class="aoi-wave-bar" style="width: 4px; height: 12px; background: #34d399; border-radius: 2px;"></span>
-          </div>
-          <span id="landingAudioStatusText" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">ऑडियो तैयार है • Play बटन दबाएं</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #6ee7b7; font-weight: 700;">
-          <span>⚡ HD AI कृषि वॉइस</span>
-          <span>•</span>
-          <span>🎧 BGM एम्बिएंस</span>
-        </div>
-      </div>
-
-      <!-- Narration Text Box & Value Highlights -->
-      <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 22px; font-size: 0.95rem; line-height: 1.8; color: #e2e8f0;">
-        <p style="margin: 0 0 16px 0; font-size: 1.02rem; font-weight: 600; color: #f1f5f9;">
-          क्या आप फसल में लगने वाले अज्ञात रोगों, कीटों के हमलों और खाद-बीमा पर होने वाले बेहिसाब खर्चों से परेशान हैं? क्या आप चाहते हैं कि आपके खेत की हर समस्या का समाधान सीधे आपके मोबाइल पर एक क्लिक में मिल जाए? मेरे आधुनिक किसान भाई, अब आपको परेशान होने की बिल्कुल जरूरत नहीं है क्योंकि हम आपके लिए ले आए हैं देश की पहली क्रांतिकारी कृषि ऑडियो बुक <strong>"खेती का डॉक्टर - खरीफ फसल मास्टर गाइड 2026"</strong> जिसे आप खेत में काम करते समय बस अपने कान में इयरफोन लगाकर आसानी से सुन सकते हैं!
-        </p>
-
-        <p style="margin: 0 0 14px 0; color: #fbbf24; font-weight: 700;">
-          ✨ यह कोई साधारण ई-बुक नहीं है, बल्कि आपके मोबाइल में चलने वाला एक संपूर्ण कृषि विज्ञान केंद्र है। इस मास्टर गाइड में आपको मिलती हैं ये बेहतरीन चीजें:
-        </p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 18px;">
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🐛</span>
-            <span><strong>300+ कीटों की पहचान</strong> और तुरंत नियंत्रण के अचूक उपाय.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🔬</span>
-            <span><strong>500+ रोगों का</strong> वैज्ञानिक और सटीक समाधान.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🧪</span>
-            <span><strong>मिट्टी, पानी व पौधे की</strong> प्रयोगशाला जाँच के सरल तरीके.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🌱</span>
-            <span><strong>NPK व माइक्रोन्यूट्रिएंट्स</strong> का वैज्ञानिक पोषक तत्व प्रबंधन.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">💧</span>
-            <span><strong>पानी का pH, EC, TDS</strong> व हार्डनेस सुधारने की पूरी जानकारी.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">🌾</span>
-            <span><strong>बीज व जैविक उपचार</strong> की स्टेप-बाय-स्टेप विधियां.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">📅</span>
-            <span><strong>इमरजेंसी डिसीजन चार्ट</strong> व माह-दर-माह कृषि कैलेंडर.</span>
-          </div>
-          <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
-            <span style="color: #34d399; font-size: 1.1rem;">⚠️</span>
-            <span><strong>50 सबसे बड़ी गलतियाँ</strong> जो मुनाफा डुबो देती हैं (बचाव के उपाय).</span>
-          </div>
-        </div>
-
-        <p style="margin: 0 0 14px 0;">
-          इस ऑडियो बुक की सबसे बड़ी खासियत यह है कि इसे देश के जाने-माने कृषि विशेषज्ञ <strong>दादा अवनीश मिश्रा</strong> ने अपने <strong>15 वर्षों के लंबे और जमीनी अनुभव</strong> से तैयार किया है, जिसे देश के हजारों प्रगतिशील किसान अपनाकर अपनी खेती को सबसे आधुनिक और लाभदायक बना रहे हैं. यह पुस्तक हमारे सभी किसान भाइयों, कृषि विद्यार्थियों, एग्री इनपुट डीलरों और जैविक खेती करने वाले हर अन्नदाता के लिए एक अमूल्य उपहार है.
-        </p>
-
-        <div style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.25)); border: 1px solid rgba(245,158,11,0.5); border-radius: 12px; padding: 16px; margin-top: 14px;">
-          <p style="margin: 0; font-weight: 700; color: #fef08a;">
-            💥 धमाकेदार ऑफर: जिस संपूर्ण ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल <span style="font-size: 1.3rem; color: #fff; background: #16a34a; padding: 2px 10px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">₹99</span> में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!
-          </p>
-        </div>
-      </div>
-
-      <!-- Action Buttons inside Player -->
-      <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 24px;">
-        <button type="button" onclick="addBookToCart('BK001', 'खरीफ फसल मास्टर गाइड 2026', 99, this)" style="background: linear-gradient(135deg, #10b981, #047857); color: #fff; font-size: 1.1rem; font-weight: 900; padding: 14px 32px; border-radius: 30px; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(16,185,129,0.4); display: inline-flex; align-items: center; gap: 8px;">
-          <span>🛒</span> अभी ₹99 में खरीदें और ऑडियो सुनें
-        </button>
-        <a href="demo-kharif.html" style="background: rgba(255,255,255,0.1); color: #fff; font-size: 0.95rem; font-weight: 700; padding: 14px 24px; border-radius: 30px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); display: inline-flex; align-items: center; gap: 6px;">
-          <span>📖</span> फ्री डेमो देखें
-        </a>
-      </div>
-
-    </div>
-
   </div>
 </section>
 
@@ -1220,56 +1220,49 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 
         </div>
 
-        <!-- Bonus Grid -->
+        <!-- Bonus Grid with Rich Cards & Claim Buttons -->
+        <div class="aoi-bonus-grid">
 
-        <div class="bonus-grid">
-
-            <div class="bonus-card">
-
-                <div class="bonus-icon">
-                    📘
+            <div class="aoi-bonus-card">
+                <div class="aoi-bonus-badge">🎁 FREE BONUS #1</div>
+                <div class="aoi-bonus-icon">📋</div>
+                <h3 class="aoi-bonus-title">फसलवार स्प्रे चार्ट (PDF)</h3>
+                <p class="aoi-bonus-desc">धान, सोयाबीन और मक्का के लिए वैज्ञानिक एवं चरणबद्ध स्प्रे शेड्यूल।</p>
+                <div class="aoi-bonus-pricing">
+                    <span class="aoi-bonus-orig">मूल्य: ₹199</span>
+                    <span class="aoi-bonus-free">100% FREE</span>
                 </div>
-
-                <h3>
-                    फसलवार स्प्रे चार्ट (PDF)
-                </h3>
-
-                <p>
-                    धान, सोयाबीन और मक्का के लिए चरणबद्ध स्प्रे शेड्यूल।
-                </p>
-
+                <a href="checkout.html?id=BK001" class="aoi-bonus-claim-btn">
+                    <span>🎁</span> ई-बुक के साथ FREE पाएं
+                </a>
             </div>
 
-            <div class="bonus-card">
-
-                <div class="bonus-icon">
-                    🧪
+            <div class="aoi-bonus-card">
+                <div class="aoi-bonus-badge">🎁 FREE BONUS #2</div>
+                <div class="aoi-bonus-icon">🧪</div>
+                <h3 class="aoi-bonus-title">कीट एवं रोग पहचान गाइड</h3>
+                <p class="aoi-bonus-desc">लक्षण देखकर तुरंत पहचान करने की प्रैक्टिकल रंगीन फोटो गाइड।</p>
+                <div class="aoi-bonus-pricing">
+                    <span class="aoi-bonus-orig">मूल्य: ₹199</span>
+                    <span class="aoi-bonus-free">100% FREE</span>
                 </div>
-
-                <h3>
-                    कीट एवं रोग पहचान गाइड
-                </h3>
-
-                <p>
-                    लक्षण देखकर तुरंत पहचान करने की प्रैक्टिकल विधि।
-                </p>
-
+                <a href="checkout.html?id=BK001" class="aoi-bonus-claim-btn">
+                    <span>🎁</span> ई-बुक के साथ FREE पाएं
+                </a>
             </div>
 
-            <div class="bonus-card">
-
-                <div class="bonus-icon">
-                    🌾
+            <div class="aoi-bonus-card">
+                <div class="aoi-bonus-badge">🎁 FREE BONUS #3</div>
+                <div class="aoi-bonus-icon">🌾</div>
+                <h3 class="aoi-bonus-title">उर्वरक एवं पोषण प्रबंधन</h3>
+                <p class="aoi-bonus-desc">संतुलित खाद, NPK, जिंक और सूक्ष्म पोषक तत्वों का सही उपयोग।</p>
+                <div class="aoi-bonus-pricing">
+                    <span class="aoi-bonus-orig">मूल्य: ₹199</span>
+                    <span class="aoi-bonus-free">100% FREE</span>
                 </div>
-
-                <h3>
-                    उर्वरक एवं पोषण प्रबंधन
-                </h3>
-
-                <p>
-                    संतुलित खाद और सूक्ष्म पोषक तत्वों का सही उपयोग।
-                </p>
-
+                <a href="checkout.html?id=BK001" class="aoi-bonus-claim-btn">
+                    <span>🎁</span> ई-बुक के साथ FREE पाएं
+                </a>
             </div>
 
         </div>
@@ -2334,22 +2327,22 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   landingBgMusic.loop = true;
   landingBgMusic.volume = 0.15;
 
-  const landingNarrationText = `क्या आप फसल में लगने वाले अज्ञात रोगों, कीटों के हमलों और खाद-बीमा पर होने वाले बेहिसाब खर्चों से परेशान हैं? क्या आप चाहते हैं कि आपके खेत की हर समस्या का समाधान सीधे आपके मोबाइल पर एक क्लिक में मिल जाए? मेरे आधुनिक किसान भाई, अब आपको परेशान होने की बिल्कुल जरूरत नहीं है क्योंकि हम आपके लिए ले आए हैं देश की पहली क्रांतिकारी कृषि ऑडियो बुक "खेती का डॉक्टर - खरीफ फसल मास्टर गाइड दो हजार छब्बीस" जिसे आप खेत में काम करते समय बस अपने कान में इयरफोन लगाकर आसानी से सुन सकते हैं!
+  const landingNarrationText = `क्या आप खरीफ सीजन में धान, सोयाबीन, मक्का और कपास की फसलों में लगने वाले अज्ञात रोगों, कीटों के हमलों, पीला मोज़ेक, तना छेदक और खरपतवार से परेशान हैं? क्या आप चाहते हैं कि बुवाई से लेकर कटाई तक खेत की हर समस्या का वैज्ञानिक समाधान सीधे आपके मोबाइल पर मिल जाए? मेरे आधुनिक किसान भाई, अब आपको परेशान होने की बिल्कुल जरूरत नहीं है क्योंकि हम आपके लिए ले आए हैं देश की पहली क्रांतिकारी कृषि ऑडियो बुक "खरीफ फसल मास्टर गाइड दो हजार छब्बीस" जिसे आप खेत में काम करते समय बस अपने कान में इयरफोन लगाकर आसानी से सुन सकते हैं!
 
-यह कोई साधारण ई-बुक नहीं है, बल्कि आपके मोबाइल में चलने वाला एक संपूर्ण कृषि विज्ञान केंद्र है। इस मास्टर गाइड में आपको मिलती हैं ये बेहतरीन चीजें:
+यह कोई साधारण ई-बुक नहीं है, बल्कि खरीफ फसलों के लिए आपकी संपूर्ण प्रैक्टिकल मार्गदर्शिका है। इस मास्टर गाइड में आपको मिलते हैं ये विशेष समाधान:
 
-तीन सौ से अधिक कीटों की पहचान और उनके तुरंत नियंत्रण के अचूक उपाय।
-पाँच सौ से अधिक रोगों का वैज्ञानिक और सटीक समाधान।
-मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल और प्रभावी तरीके।
-एनपीके और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक पोषक तत्व प्रबंधन।
-पानी का पीएच, ईसी, टीडीएस और हार्डनेस सुधारने की पूरी जानकारी।
-बीज उपचार, मिट्टी उपचार और जैविक उपचार की स्टेप-बाय-स्टेप विधियां।
-आपातकालीन निर्णय चार्ट, माह-दर-माह कृषि कैलेंडर और फसलवार विशेष मार्गदर्शन।
-किसानों की वे पचास सबसे बड़ी गलतियाँ जो हर साल आपकी आधी से ज्यादा उपज और मुनाफा डुबो देती हैं।
+धान, सोयाबीन और मक्का की खेत तैयारी, मिट्टी सुधार और वैज्ञानिक बुवाई तकनीक।
+सोयाबीन स्पेशल: पीला मोज़ेक, गर्डल बीटल, सेमीलूपर और तना मक्खी का अचूक नियंत्रण।
+धान स्पेशल: शीथ ब्लाइट, ब्लास्ट, हल्दी रोग, बीपीएच और तना छेदक का सौ प्रतिशत सटीक इलाज।
+मक्का स्पेशल: फॉल आर्मीवर्म और तना सड़न रोग रोकथाम की आधुनिक विधियां।
+खरपतवार नियंत्रण: प्री और पोस्ट इमर्जेंस हर्बिसाइड्स का सुरक्षित और सही स्प्रे शेड्यूल।
+पोषण प्रबंधन: एनपीके, जिंक, बोरॉन और सल्फर का फसलवार संतुलित चार्ट।
+आपातकालीन निर्णय चार्ट, माह-दर-माह कृषि कैलेंडर और खरीफ फसल सुरक्षा योजना।
+किसानों की वे पचास सबसे बड़ी गलतियाँ जिनसे खरीफ में फसल खराब होती है और बचाव के उपाय।
 
-इस ऑडियो बुक की सबसे बड़ी खासियत यह है कि इसे देश के जाने-माने कृषि विशेषज्ञ दादा अवनीश मिश्रा ने अपने पंद्रह वर्षों के लंबे और जमीनी अनुभव से तैयार किया है, जिसे देश के हजारों प्रगतिशील किसान अपनाकर अपनी खेती को सबसे आधुनिक और लाभदायक बना रहे हैं। यह पुस्तक हमारे सभी किसान भाइयों, कृषि विद्यार्थियों, एग्री इनपुट डीलरों और जैविक खेती करने वाले हर अन्नदाता के लिए एक अमूल्य उपहार है।
+इस ऑडियो बुक की सबसे बड़ी खासियत यह है कि इसे देश के जाने-माने कृषि विशेषज्ञ दादा अवनीश मिश्रा ने अपने पंद्रह वर्षों के लंबे और जमीनी अनुभव से तैयार किया है, जिसे देश के हजारों प्रगतिशील किसान अपनाकर अपनी खेती में कम लागत में बंपर पैदावार ले रहे हैं। यह पुस्तक हमारे सभी किसान भाइयों, कृषि विद्यार्थियों और डीलरों के लिए एक अमूल्य उपहार है।
 
-और सबसे धमाकेदार बात यह है कि जिस संपूर्ण ज्ञान और गाइड की वास्तविक कीमत बाजार में एक हजार रुपये से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल निन्यानवे रुपये में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है! तो अब और देर न करें, अभी नीचे दिए गए लिंक से आरोग्यम ऐप डाउनलोड करें, इस जादुई ऑडियो बुक को अपनी माय लाइब्रेरी में जोड़ें, और अपनी खेती की तकदीर बदलें। सही जानकारी, सही निर्णय और सही समय अपनाएं, और अपनी फसल से बंपर पैदावार और भारी मुनाफा कमाएं!`;
+और सबसे धमाकेदार बात यह है कि जिस संपूर्ण खरीफ ज्ञान और गाइड की वास्तविक कीमत बाजार में एक हजार रुपये से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल निन्यानवे रुपये में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है! तो अब और देर न करें, अभी नीचे दिए गए लिंक से आरोग्यम ऐप में इस जादुई ऑडियो बुक को अपनी माय लाइब्रेरी में जोड़ें, और अपनी खरीफ फसल से बंपर पैदावार और भारी मुनाफा कमाएं!`;
 
   let landingChunks = [];
   let landingChunkIdx = 0;
@@ -2551,6 +2544,106 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(3) { animation: aoiWaveAnim 0.9s ease-in-out infinite 0.3s; }
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(4) { animation: aoiWaveAnim 0.7s ease-in-out infinite 0.1s; }
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(5) { animation: aoiWaveAnim 0.85s ease-in-out infinite 0.25s; }
+
+/* Free Bonus Section Styles & Smooth 3D Hover Animations */
+.aoi-bonus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
+}
+.aoi-bonus-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 26px 20px 20px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.aoi-bonus-card:hover {
+  transform: translateY(-8px);
+  border-color: #10b981;
+  box-shadow: 0 20px 35px rgba(16,185,129,0.18);
+}
+.aoi-bonus-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(217,119,6,0.3);
+  white-space: nowrap;
+}
+.aoi-bonus-icon {
+  font-size: 2.5rem;
+  margin: 10px 0 8px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+.aoi-bonus-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+.aoi-bonus-desc {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  flex-grow: 1;
+}
+.aoi-bonus-pricing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.aoi-bonus-orig {
+  font-size: 0.85rem;
+  text-decoration: line-through;
+  color: #94a3b8;
+  font-weight: 600;
+}
+.aoi-bonus-free {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 2px 10px;
+  border-radius: 6px;
+}
+.aoi-bonus-claim-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.92rem;
+  padding: 10px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+  transition: all 0.25s ease;
+}
+.aoi-bonus-claim-btn:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(16,185,129,0.4);
+}
 </style>
 
 <script src="/js/global-guest-modal.js"></script>
