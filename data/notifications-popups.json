@@ -4,8 +4,8 @@
     "interval_seconds": 10,
     "items": [
       {
-        "name": "Rameshwar Patel",
-        "city": "Ujjain, MP",
+        "name": "रामेश्वर पटेल",
+        "city": "उज्जैन, MP",
         "bookTitle": "खरीफ फसल मास्टर गाइड 2026",
         "price": "₹99",
         "image": "/images/books/kharif-master-guide-2026-cover.webp",
@@ -13,49 +13,445 @@
         "timeAgo": "अभी-अभी"
       },
       {
-        "name": "Suresh Kumar Yadav",
-        "city": "Karnal, Haryana",
+        "name": "सुरेश कुमार यादव",
+        "city": "करनाल, हरियाणा",
         "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
         "price": "₹99",
         "image": "/images/books/fasal-ka-doctor-cover.webp",
         "link": "/ebooks/kheti-dr.html",
-        "timeAgo": "2 मिनट पहले"
+        "timeAgo": "1 मिनट पहले"
       },
       {
-        "name": "Dinesh Sharma",
-        "city": "Jaipur, Rajasthan",
+        "name": "दिनेश शर्मा",
+        "city": "जयपुर, राजस्थान",
         "bookTitle": "Aarogyam Pro VIP Pass",
         "price": "₹99",
         "image": "/images/logo/logo.png",
         "link": "/subscription.html",
-        "timeAgo": "4 मिनट पहले"
+        "timeAgo": "2 मिनट पहले"
       },
       {
-        "name": "Kamlesh Patidar",
-        "city": "Indore, MP",
+        "name": "कमलेश पाटीदार",
+        "city": "इंदौर, MP",
         "bookTitle": "2-Book सुपर सेवर कॉम्बो",
         "price": "₹198",
         "image": "/images/books/kharif-master-guide-2026-cover.webp",
-        "link": "/ebooks/checkout.html?combo=agri2",
-        "timeAgo": "6 मिनट पहले"
+        "link": "/ebooks/cart.html",
+        "timeAgo": "3 मिनट पहले"
       },
       {
-        "name": "Balwant Singh",
-        "city": "Ludhiana, Punjab",
+        "name": "बलवंत सिंह",
+        "city": "लुधियाना, पंजाब",
         "bookTitle": "खरीफ फसल मास्टर गाइड 2026",
         "price": "₹99",
         "image": "/images/books/kharif-master-guide-2026-cover.webp",
         "link": "/ebooks/kharif-master-guide-2026.html",
-        "timeAgo": "8 मिनट पहले"
+        "timeAgo": "4 मिनट पहले"
       },
       {
-        "name": "Rajesh Verma",
-        "city": "Sitapur, UP",
+        "name": "राजेश वर्मा",
+        "city": "सीतापुर, UP",
         "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
         "price": "₹99",
         "image": "/images/books/fasal-ka-doctor-cover.webp",
         "link": "/ebooks/kheti-dr.html",
-        "timeAgo": "11 मिनट पहले"
+        "timeAgo": "5 मिनट पहले"
+      },
+      {
+        "name": "महेंद्र सिंह राठौड़",
+        "city": "जोधपुर, राजस्थान",
+        "bookTitle": "सब्जी खेती गाइड (वैज्ञानिक विधि)",
+        "price": "₹99",
+        "image": "/images/books/sabji-kheti-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK003",
+        "timeAgo": "6 मिनट पहले"
+      },
+      {
+        "name": "संजय देशमुख",
+        "city": "अकोला, महाराष्ट्र",
+        "bookTitle": "सोयाबीन मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/soyabean-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK006",
+        "timeAgo": "7 मिनट पहले"
+      },
+      {
+        "name": "अनिल कुमार मौर्या",
+        "city": "वाराणसी, UP",
+        "bookTitle": "धान मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/dhan-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK004",
+        "timeAgo": "8 मिनट पहले"
+      },
+      {
+        "name": "विकास चौधरी",
+        "city": "मेरठ, UP",
+        "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
+        "price": "₹99",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/kheti-dr.html",
+        "timeAgo": "9 मिनट पहले"
+      },
+      {
+        "name": "प्रहलाद जाट",
+        "city": "सीकर, राजस्थान",
+        "bookTitle": "जैविक खेती मास्टर गाइड",
+        "price": "₹99",
+        "image": "/images/books/jaivik-kheti-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK008",
+        "timeAgo": "10 मिनट पहले"
+      },
+      {
+        "name": "अशोक धाकड़",
+        "city": "नीमच, MP",
+        "bookTitle": "खरीफ फसल मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/kharif-master-guide-2026.html",
+        "timeAgo": "12 मिनट पहले"
+      },
+      {
+        "name": "सुनील पाटिल",
+        "city": "कोल्हापुर, महाराष्ट्र",
+        "bookTitle": "3-Book सम्पूर्ण कृषि बंडल",
+        "price": "₹297",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/cart.html",
+        "timeAgo": "13 मिनट पहले"
+      },
+      {
+        "name": "जितेंद्र सिंह",
+        "city": "पटना, बिहार",
+        "bookTitle": "मक्का मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/makka-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK007",
+        "timeAgo": "14 मिनट पहले"
+      },
+      {
+        "name": "हंसराज गुर्जर",
+        "city": "कोटा, राजस्थान",
+        "bookTitle": "गेहूँ मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/gehu-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK005",
+        "timeAgo": "15 मिनट पहले"
+      },
+      {
+        "name": "गोपाल कृष्ण त्यागी",
+        "city": "मुजफ्फरनगर, UP",
+        "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
+        "price": "₹99",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/kheti-dr.html",
+        "timeAgo": "16 मिनट पहले"
+      },
+      {
+        "name": "रविन्द्र सोलंकी",
+        "city": "धार, MP",
+        "bookTitle": "खरीफ फसल मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/kharif-master-guide-2026.html",
+        "timeAgo": "18 मिनट पहले"
+      },
+      {
+        "name": "नरेंद्र सिंह",
+        "city": "अमृतसर, पंजाब",
+        "bookTitle": "Aarogyam Pro VIP Pass",
+        "price": "₹99",
+        "image": "/images/logo/logo.png",
+        "link": "/subscription.html",
+        "timeAgo": "19 मिनट पहले"
+      },
+      {
+        "name": "मुकेश चंद्रवंशी",
+        "city": "राजनांदगांव, छत्तीसगढ़",
+        "bookTitle": "धान मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/dhan-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK004",
+        "timeAgo": "20 मिनट पहले"
+      },
+      {
+        "name": "दीपक भोंसले",
+        "city": "नासिक, महाराष्ट्र",
+        "bookTitle": "सब्जी खेती गाइड",
+        "price": "₹99",
+        "image": "/images/books/sabji-kheti-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK003",
+        "timeAgo": "22 मिनट पहले"
+      },
+      {
+        "name": "भागवत शरण",
+        "city": "झांसी, UP",
+        "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
+        "price": "₹99",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/kheti-dr.html",
+        "timeAgo": "23 मिनट पहले"
+      },
+      {
+        "name": "मनोज बिश्नोई",
+        "city": "बीकानेर, राजस्थान",
+        "bookTitle": "खरीफ फसल मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/kharif-master-guide-2026.html",
+        "timeAgo": "25 मिनट पहले"
+      },
+      {
+        "name": "सत्येंद्र कुशवाहा",
+        "city": "देवरिया, UP",
+        "bookTitle": "सब्जी खेती गाइड",
+        "price": "₹99",
+        "image": "/images/books/sabji-kheti-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK003",
+        "timeAgo": "26 मिनट पहले"
+      },
+      {
+        "name": "राघवेंद्र पांडे",
+        "city": "गया, बिहार",
+        "bookTitle": "Aarogyam Pro VIP Pass",
+        "price": "₹99",
+        "image": "/images/logo/logo.png",
+        "link": "/subscription.html",
+        "timeAgo": "28 मिनट पहले"
+      },
+      {
+        "name": "प्रमोद कदम",
+        "city": "सतारा, महाराष्ट्र",
+        "bookTitle": "2-Book सुपर सेवर कॉम्बो",
+        "price": "₹198",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/cart.html",
+        "timeAgo": "30 मिनट पहले"
+      },
+      {
+        "name": "कुलदीप यादव",
+        "city": "रेवाड़ी, हरियाणा",
+        "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
+        "price": "₹99",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/kheti-dr.html",
+        "timeAgo": "31 मिनट पहले"
+      },
+      {
+        "name": "अमरजीत सिंह",
+        "city": "पटियाला, पंजाब",
+        "bookTitle": "गेहूँ मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/gehu-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK005",
+        "timeAgo": "33 मिनट पहले"
+      },
+      {
+        "name": "किशन लाल बैरवा",
+        "city": "टोंक, राजस्थान",
+        "bookTitle": "खरीफ फसल मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/kharif-master-guide-2026.html",
+        "timeAgo": "35 मिनट पहले"
+      },
+      {
+        "name": "अवधेश राय",
+        "city": "गोरखपुर, UP",
+        "bookTitle": "धान मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/dhan-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK004",
+        "timeAgo": "37 मिनट पहले"
+      },
+      {
+        "name": "शिवकुमार जायसवाल",
+        "city": "बिलासपुर, छत्तीसगढ़",
+        "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
+        "price": "₹99",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/kheti-dr.html",
+        "timeAgo": "39 मिनट पहले"
+      },
+      {
+        "name": "ज्ञानेश्वर तांबडे",
+        "city": "पुणे, महाराष्ट्र",
+        "bookTitle": "पॉलीहाउस व नेटहाउस गाइड",
+        "price": "₹99",
+        "image": "/images/books/polyhouse-nethouse-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK010",
+        "timeAgo": "40 मिनट पहले"
+      },
+      {
+        "name": "हरिओम मीणा",
+        "city": "दौसा, राजस्थान",
+        "bookTitle": "खरीफ फसल मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/kharif-master-guide-2026.html",
+        "timeAgo": "42 मिनट पहले"
+      },
+      {
+        "name": "रामसेवक निषाद",
+        "city": "प्रयागराज, UP",
+        "bookTitle": "सब्जी खेती गाइड",
+        "price": "₹99",
+        "image": "/images/books/sabji-kheti-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK003",
+        "timeAgo": "44 मिनट पहले"
+      },
+      {
+        "name": "सुरिंदर पाल",
+        "city": "बठिंडा, पंजाब",
+        "bookTitle": "कपास एवं खरीफ फसल गाइड",
+        "price": "₹99",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/kharif-master-guide-2026.html",
+        "timeAgo": "46 मिनट पहले"
+      },
+      {
+        "name": "दिवाकर झा",
+        "city": "दरभंगा, बिहार",
+        "bookTitle": "मखाना व मक्का गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/makka-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK007",
+        "timeAgo": "48 मिनट पहले"
+      },
+      {
+        "name": "लक्ष्मण सिंह बघेल",
+        "city": "ग्वालियर, MP",
+        "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
+        "price": "₹99",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/kheti-dr.html",
+        "timeAgo": "50 मिनट पहले"
+      },
+      {
+        "name": "गणेश जाधव",
+        "city": "औरंगाबाद, महाराष्ट्र",
+        "bookTitle": "Aarogyam Pro VIP Pass",
+        "price": "₹99",
+        "image": "/images/logo/logo.png",
+        "link": "/subscription.html",
+        "timeAgo": "52 मिनट पहले"
+      },
+      {
+        "name": "रामकृपाल लोधी",
+        "city": "दमोह, MP",
+        "bookTitle": "सोयाबीन मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/soyabean-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK006",
+        "timeAgo": "54 मिनट पहले"
+      },
+      {
+        "name": "वेदप्रकाश शर्मा",
+        "city": "हिसार, हरियाणा",
+        "bookTitle": "2-Book सुपर सेवर कॉम्बो",
+        "price": "₹198",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/cart.html",
+        "timeAgo": "55 मिनट पहले"
+      },
+      {
+        "name": "चंद्रभान सिंह",
+        "city": "अलवर, राजस्थान",
+        "bookTitle": "फूल खेती गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/phool-kheti-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK009",
+        "timeAgo": "57 मिनट पहले"
+      },
+      {
+        "name": "उमेश चंद्र त्रिपाठी",
+        "city": "अयोध्या, UP",
+        "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
+        "price": "₹99",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/kheti-dr.html",
+        "timeAgo": "59 मिनट पहले"
+      },
+      {
+        "name": "नरपत सिंह",
+        "city": "बाड़मेर, राजस्थान",
+        "bookTitle": "जैविक खेती मास्टर गाइड",
+        "price": "₹99",
+        "image": "/images/books/jaivik-kheti-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK008",
+        "timeAgo": "1 घंटा पहले"
+      },
+      {
+        "name": "संजय साहू",
+        "city": "जबलपुर, MP",
+        "bookTitle": "खरीफ फसल मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/kharif-master-guide-2026.html",
+        "timeAgo": "1 घंटा पहले"
+      },
+      {
+        "name": "अनंतराम पटेल",
+        "city": "दुर्ग, छत्तीसगढ़",
+        "bookTitle": "धान मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/dhan-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK004",
+        "timeAgo": "1 घंटा पहले"
+      },
+      {
+        "name": "भगवान दास",
+        "city": "आगरा, UP",
+        "bookTitle": "सब्जी खेती गाइड",
+        "price": "₹99",
+        "image": "/images/books/sabji-kheti-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK003",
+        "timeAgo": "1 घंटा पहले"
+      },
+      {
+        "name": "सतीश मोरे",
+        "city": "नांदेड, महाराष्ट्र",
+        "bookTitle": "खेती का डॉक्टर (Pocket Doctor)",
+        "price": "₹99",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/kheti-dr.html",
+        "timeAgo": "1 घंटा पहले"
+      },
+      {
+        "name": "गुरमेल सिंह",
+        "city": "जालंधर, पंजाब",
+        "bookTitle": "गेहूँ मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/gehu-master-guide-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK005",
+        "timeAgo": "1 घंटा पहले"
+      },
+      {
+        "name": "राजेन्द्र प्रसाद",
+        "city": "मुजफ्फरपुर, बिहार",
+        "bookTitle": "खरीफ फसल मास्टर गाइड 2026",
+        "price": "₹99",
+        "image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "link": "/ebooks/kharif-master-guide-2026.html",
+        "timeAgo": "1 घंटा पहले"
+      },
+      {
+        "name": "विष्णु कांत चौबे",
+        "city": "मथुरा, UP",
+        "bookTitle": "Aarogyam Pro VIP Pass",
+        "price": "₹99",
+        "image": "/images/logo/logo.png",
+        "link": "/subscription.html",
+        "timeAgo": "1 घंटा पहले"
+      },
+      {
+        "name": "सुरेश कुमार पाटीदार",
+        "city": "रतलाम, MP",
+        "bookTitle": "खेती का डॉक्टर + खरीफ कॉम्बो",
+        "price": "₹198",
+        "image": "/images/books/fasal-ka-doctor-cover.webp",
+        "link": "/ebooks/cart.html",
+        "timeAgo": "1 घंटा पहले"
       }
     ]
   },

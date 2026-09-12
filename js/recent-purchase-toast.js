@@ -121,8 +121,18 @@
   function showNextPurchaseToast() {
     if (!isToastsEnabled || LIVE_SALES_DATA.length === 0) return;
     const container = createPurchaseToastContainer();
-    const item = LIVE_SALES_DATA[toastIndex % LIVE_SALES_DATA.length];
+    const rawItem = LIVE_SALES_DATA[toastIndex % LIVE_SALES_DATA.length];
     toastIndex++;
+
+    const item = {
+      name: rawItem.name || 'किसान साथी',
+      city: rawItem.city || rawItem.city_state || 'भारत',
+      bookTitle: rawItem.bookTitle || rawItem.book_title || 'खरीफ फसल मास्टर गाइड 2026',
+      price: rawItem.price || '₹99',
+      image: rawItem.image || rawItem.cover_image || '/images/books/kharif-master-guide-2026-cover.webp',
+      link: rawItem.link || '/ebooks/cart.html',
+      timeAgo: rawItem.timeAgo || rawItem.time_ago || 'अभी-अभी'
+    };
 
     const toast = document.createElement('div');
     toast.className = 'ai-purchase-toast-card';
@@ -151,7 +161,7 @@
 
     toast.innerHTML = `
       <div style="width: 42px; height: 52px; flex-shrink: 0; border-radius: 6px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);">
-        <img src="${item.image}" alt="${item.bookTitle}" style="width: 100%; height: 100%; object-fit: cover;" />
+        <img src="${item.image}" alt="${item.bookTitle}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
       </div>
       <div style="flex: 1; min-width: 0;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 2px;">
