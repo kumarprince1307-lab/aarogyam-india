@@ -31,6 +31,7 @@ let isSyncInProgress = false; // Anti-duplicate click lock
 let modifiedPageIndices = new Set(); // Stores 0-indexed page numbers that changed
 let audioScriptsModified = false; // Flag if text or audio voice changed
 let isFullBookReload = false; // Flag if bulk upload or fresh PDF was loaded
+let pendingSmartUploadFiles = []; // Staged files for smart position modal
 
 // Media Recorder
 let mediaRecorder = null;
@@ -274,6 +275,79 @@ export async function initBookAudioStudio() {
           </div>
         </div>
 
+        <!-- Smart Upload & Position Injection Modal -->
+        <div id="smartUploadPositionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:999999; justify-content:center; align-items:center; padding:16px;">
+          <div class="admin-card" style="max-width:560px; width:100%; background:#0f172a; border:2px solid #38bdf8; border-radius:14px; padding:22px; box-shadow:0 20px 45px rgba(0,0,0,0.7);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h3 style="margin:0; font-size:1.15rem; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+                <span>📥</span> <span id="smartUploadModalTitle">पेज अपलोड पोजीशन चुनें</span>
+              </h3>
+              <button id="closeSmartUploadModalBtn" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; line-height:1;">&times;</button>
+            </div>
+
+            <p style="color:#cbd5e1; font-size:0.85rem; margin:0 0 16px;">
+              आपने <strong id="smartUploadCountBadge" style="color:#34d399;">0 इमेजेस</strong> चुनी हैं। आप इन्हें वर्तमान पुस्तक (कुल <span id="smartUploadExistingTotal" style="color:#38bdf8;">0</span> पेजेस) में कहाँ लोड करना चाहते हैं?
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
+              
+              <!-- Option 1: Append to End -->
+              <label style="display:flex; align-items:flex-start; gap:10px; background:#1e293b; border:1.5px solid #334155; border-radius:8px; padding:12px; cursor:pointer;" class="upload-mode-opt">
+                <input type="radio" name="smartUploadMode" value="append" checked style="margin-top:3px;">
+                <div>
+                  <strong style="color:#34d399; font-size:0.9rem; display:block;">➕ अंत में जोड़ें (Append to End)</strong>
+                  <span style="font-size:0.78rem; color:#94a3b8;">मौजूदा सभी पेजों के बाद नए पेज जोड़ें (पहला कोई भी पेज नहीं हटेगा)।</span>
+                </div>
+              </label>
+
+              <!-- Option 2: Insert in Middle (Between Pages) -->
+              <label style="display:flex; align-items:flex-start; gap:10px; background:#1e293b; border:1.5px solid #334155; border-radius:8px; padding:12px; cursor:pointer;" class="upload-mode-opt">
+                <input type="radio" name="smartUploadMode" value="insert" style="margin-top:3px;">
+                <div style="flex:1;">
+                  <strong style="color:#60a5fa; font-size:0.9rem; display:block;">📥 बीच में इन्सर्ट करें (Insert Between Pages)</strong>
+                  <span style="font-size:0.78rem; color:#94a3b8; display:block; margin-bottom:6px;">पेज के बाद नए पेज जोड़ें (पुराने आगे खिसक जाएंगे, कोई पेज डिलीट नहीं होगा)।</span>
+                  <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                    <span style="font-size:0.8rem; color:#cbd5e1;">पेज नंबर:</span>
+                    <input type="number" id="smartInsertAfterPageNum" min="0" value="1" class="admin-input" style="width:70px; padding:3px 6px; font-size:0.85rem; font-weight:700;">
+                    <span style="font-size:0.78rem; color:#94a3b8;">के बाद इन्सर्ट करें</span>
+                  </div>
+                </div>
+              </label>
+
+              <!-- Option 3: Replace / Overwrite Range -->
+              <label style="display:flex; align-items:flex-start; gap:10px; background:#1e293b; border:1.5px solid #334155; border-radius:8px; padding:12px; cursor:pointer;" class="upload-mode-opt">
+                <input type="radio" name="smartUploadMode" value="replace_range" style="margin-top:3px;">
+                <div style="flex:1;">
+                  <strong style="color:#fbbf24; font-size:0.9rem; display:block;">🔄 वर्तमान पेजों को बदलें (Replace Specific Pages)</strong>
+                  <span style="font-size:0.78rem; color:#94a3b8; display:block; margin-bottom:6px;">चुने गए पेज नंबर से आगे के पेजों की इमेज बदलें (कुल पेजों की संख्या नहीं बढ़ेगी)।</span>
+                  <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                    <span style="font-size:0.8rem; color:#cbd5e1;">शुरू पेज:</span>
+                    <input type="number" id="smartReplaceStartPageNum" min="1" value="1" class="admin-input" style="width:70px; padding:3px 6px; font-size:0.85rem; font-weight:700;">
+                    <span style="font-size:0.78rem; color:#94a3b8;">से आगे बदलें</span>
+                  </div>
+                </div>
+              </label>
+
+              <!-- Option 4: Full Book Reload -->
+              <label style="display:flex; align-items:flex-start; gap:10px; background:#1e293b; border:1.5px solid #334155; border-radius:8px; padding:12px; cursor:pointer;" class="upload-mode-opt">
+                <input type="radio" name="smartUploadMode" value="full_reload" style="margin-top:3px;">
+                <div>
+                  <strong style="color:#f87171; font-size:0.9rem; display:block;">⚠️ पूरी किताब नई इमेजेस से रीलोड करें (Full Overwrite)</strong>
+                  <span style="font-size:0.78rem; color:#94a3b8;">पुराने सभी पेजों को हटाकर सिर्फ इन नई इमेजेस को रखें।</span>
+                </div>
+              </label>
+
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+              <button id="cancelSmartUploadBtn" class="admin-btn admin-btn-secondary" style="padding:7px 16px; font-size:12px;">❌ रद्द करें</button>
+              <button id="confirmSmartUploadBtn" class="admin-btn" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:7px 20px; font-weight:800; font-size:12px; box-shadow:0 4px 12px rgba(16,185,129,0.35);">
+                ✅ लागू करें (Process Upload)
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Staging / Save / Discard Bar -->
         <div id="stagingActionBar" class="admin-card" style="margin-bottom: 16px; background:#1e1b4b; border:1px solid #6366f1; display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -307,8 +381,9 @@ export async function initBookAudioStudio() {
             </div>
             
             <!-- Page Management Buttons -->
-            <div style="display:flex; gap:6px;">
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
               <button id="addPageBtn" class="admin-btn admin-btn-secondary" style="padding:4px 8px; font-size:11px;">➕ नया पेज</button>
+              <button id="insertPagesBetweenBtn" class="admin-btn" style="background:#4f46e5; color:#fff; padding:4px 8px; font-size:11px; font-weight:700;" title="वर्तमान पेज के बाद नए पेज जोड़ें / इन्सर्ट करें">📥 बीच में पेज इन्सर्ट करें</button>
               <button id="movePagePrevBtn" class="admin-btn admin-btn-secondary" style="padding:4px 8px; font-size:11px;">⬅️ आगे करें</button>
               <button id="movePageNextBtn" class="admin-btn admin-btn-secondary" style="padding:4px 8px; font-size:11px;">➡️ पीछे करें</button>
               <button id="deletePageBtn" class="admin-btn" style="background:#ef4444; color:#fff; padding:4px 8px; font-size:11px;">🗑️ यह पेज हटाएं</button>
@@ -325,9 +400,15 @@ export async function initBookAudioStudio() {
           
           <!-- LEFT: LIVE PAGE PREVIEW -->
           <div class="admin-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
               <h3 style="margin:0; font-size:1rem; color:#38bdf8;">📄 पेज प्रिव्यू (Page Preview)</h3>
-              <span id="previewPageNumberTag" style="background:#0284c7; color:#fff; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;">Page 1</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <input type="file" id="singlePageImageInput" accept="image/webp,image/png,image/jpeg" style="display:none;">
+                <button id="replaceCurrentPageImgBtn" class="admin-btn" style="background:#0284c7; color:#fff; padding:3px 10px; font-size:11px; font-weight:700; border-radius:4px; display:inline-flex; align-items:center; gap:4px;" title="सिर्फ वर्तमान पेज की इमेज बदलें">
+                  <span>🔄</span> इस पेज की इमेज बदलें
+                </button>
+                <span id="previewPageNumberTag" style="background:#0284c7; color:#fff; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;">Page 1</span>
+              </div>
             </div>
             <div id="previewContainer" style="background:#0f172a; border-radius:8px; padding:10px; display:flex; justify-content:center; align-items:center; min-height:400px; max-height:600px; overflow-y:auto;">
               <canvas id="previewCanvas" style="max-width:100%; height:auto; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:none;"></canvas>
@@ -599,8 +680,75 @@ async function setupStudioEvents() {
     const triggerBtn = document.getElementById('triggerBulkUploadBtn');
     const bulkInput = document.getElementById('bulkImageInput');
     if (triggerBtn && bulkInput) {
-        triggerBtn.addEventListener('click', () => bulkInput.click());
+        triggerBtn.addEventListener('click', () => {
+            bulkInput.value = '';
+            bulkInput.click();
+        });
         bulkInput.addEventListener('change', (e) => handleImageUpload(e.target.files));
+    }
+
+    // Direct Single Page Replace
+    const replacePageBtn = document.getElementById('replaceCurrentPageImgBtn');
+    const singlePageInput = document.getElementById('singlePageImageInput');
+    if (replacePageBtn && singlePageInput) {
+        replacePageBtn.addEventListener('click', () => {
+            singlePageInput.value = '';
+            singlePageInput.click();
+        });
+        singlePageInput.addEventListener('change', async (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const webp = await readFileAsWebp(e.target.files[0]);
+                if (!studioPageImages.length) studioPageImages = new Array(studioTotalPages).fill('');
+                studioPageImages[studioCurrentPage - 1] = webp;
+                modifiedPageIndices.add(studioCurrentPage - 1);
+                await savePagesToDb(studioCurrentBookId, studioPageImages);
+                markUnsaved(true);
+                selectPage(studioCurrentPage);
+                alert(`✅ पृष्ठ ${studioCurrentPage} की नई इमेज सुरक्षित लोड हो गई!\n\n1-Click Push to Git दबाने पर सीधे Git पर लाइव हो जाएगी।`);
+            }
+        });
+    }
+
+    // Insert Pages Between Button
+    const insertBtn = document.getElementById('insertPagesBetweenBtn');
+    if (insertBtn && bulkInput) {
+        insertBtn.addEventListener('click', () => {
+            const insertPageNumInput = document.getElementById('smartInsertAfterPageNum');
+            if (insertPageNumInput) insertPageNumInput.value = studioCurrentPage;
+            bulkInput.value = '';
+            bulkInput.dataset.targetAction = 'insert';
+            bulkInput.click();
+        });
+    }
+
+    // Smart Upload Position Modal Controls
+    const smartModal = document.getElementById('smartUploadPositionModal');
+    const cancelSmartBtn = document.getElementById('cancelSmartUploadBtn');
+    const closeSmartBtn = document.getElementById('closeSmartUploadModalBtn');
+    const confirmSmartBtn = document.getElementById('confirmSmartUploadBtn');
+
+    if (cancelSmartBtn && smartModal) {
+        cancelSmartBtn.addEventListener('click', () => { smartModal.style.display = 'none'; pendingSmartUploadFiles = []; });
+    }
+    if (closeSmartBtn && smartModal) {
+        closeSmartBtn.addEventListener('click', () => { smartModal.style.display = 'none'; pendingSmartUploadFiles = []; });
+    }
+    if (confirmSmartBtn && smartModal) {
+        confirmSmartBtn.addEventListener('click', () => {
+            const selectedRadio = document.querySelector('input[name="smartUploadMode"]:checked');
+            const mode = selectedRadio ? selectedRadio.value : 'append';
+            let targetPos = studioCurrentPage;
+            if (mode === 'insert') {
+                targetPos = parseInt(document.getElementById('smartInsertAfterPageNum')?.value, 10) || studioCurrentPage;
+            } else if (mode === 'replace_range') {
+                targetPos = parseInt(document.getElementById('smartReplaceStartPageNum')?.value, 10) || studioCurrentPage;
+            }
+            smartModal.style.display = 'none';
+            if (pendingSmartUploadFiles && pendingSmartUploadFiles.length > 0) {
+                executeSmartUpload(mode, targetPos, pendingSmartUploadFiles);
+                pendingSmartUploadFiles = [];
+            }
+        });
     }
 
     // Direct PDF Upload
@@ -1179,31 +1327,94 @@ async function selectPage(pageNum) {
 }
 
 // =======================================================
-// 5. BULK UPLOAD WITH PROGRESS BAR & SIZE METRICS
+// 5. BULK UPLOAD & POSITION INGESTION WITH PROGRESS BAR
 // =======================================================
+function openSmartUploadPositionModal(fileList, defaultMode = 'append', defaultPos = null) {
+    pendingSmartUploadFiles = fileList;
+    const smartModal = document.getElementById('smartUploadPositionModal');
+    const countBadge = document.getElementById('smartUploadCountBadge');
+    const existingTotal = document.getElementById('smartUploadExistingTotal');
+    const insertPageNumInput = document.getElementById('smartInsertAfterPageNum');
+    const replacePageNumInput = document.getElementById('smartReplaceStartPageNum');
+
+    if (countBadge) countBadge.textContent = `${fileList.length} इमेजेस`;
+    if (existingTotal) existingTotal.textContent = String(studioTotalPages);
+    if (insertPageNumInput) insertPageNumInput.value = defaultPos !== null ? defaultPos : studioCurrentPage;
+    if (replacePageNumInput) replacePageNumInput.value = defaultPos !== null ? defaultPos : studioCurrentPage;
+
+    const radio = document.querySelector(`input[name="smartUploadMode"][value="${defaultMode}"]`);
+    if (radio) radio.checked = true;
+
+    if (smartModal) {
+        smartModal.style.display = 'flex';
+    }
+}
+
 async function handleImageUpload(files) {
     if (!files || !files.length) return;
-
     const fileList = Array.from(files);
 
-    // Case A: Single File Upload -> Check whether user wants to replace ONLY current page
-    if (fileList.length === 1 && studioTotalPages > 1) {
-        const replaceSingle = confirm(`क्या आप सिर्फ वर्तमान पृष्ठ (Page ${studioCurrentPage}) को बदलना चाहते हैं?\n(OK = केवल Page ${studioCurrentPage} बदलें | Cancel = सभी पेजों को 1 पेज से बदलें)`);
-        if (replaceSingle) {
-            const webpData = await readFileAsWebp(fileList[0]);
-            if (!studioPageImages.length) studioPageImages = new Array(studioTotalPages).fill('');
-            studioPageImages[studioCurrentPage - 1] = webpData;
-            modifiedPageIndices.add(studioCurrentPage - 1);
-            markUnsaved(true);
-            selectPage(studioCurrentPage);
-            alert(`✅ पृष्ठ ${studioCurrentPage} बदल दिया गया है!\n"1-Click Push to Git" दबाने पर सिर्फ यही 1 पेज Git पर तुरंत लाइव होगा।`);
-            return;
-        }
+    const bulkInput = document.getElementById('bulkImageInput');
+    const targetAction = bulkInput?.dataset?.targetAction;
+    if (bulkInput) bulkInput.dataset.targetAction = '';
+
+    // If explicit insert button was pressed
+    if (targetAction === 'insert' && studioTotalPages > 0) {
+        openSmartUploadPositionModal(fileList, 'insert', studioCurrentPage);
+        return;
     }
 
-    // Case B: Bulk Upload
-    isFullBookReload = true;
-    modifiedPageIndices.clear();
+    // If there are no existing pages, perform direct fresh ingestion
+    if (studioTotalPages === 0) {
+        executeSmartUpload('full_reload', 1, fileList);
+        return;
+    }
+
+    // If only 1 file is selected, open modal with replace current page as default
+    if (fileList.length === 1 && studioTotalPages >= 1) {
+        openSmartUploadPositionModal(fileList, 'replace_range', studioCurrentPage);
+        return;
+    }
+
+    // For multiple files with existing pages, open smart positioning modal
+    openSmartUploadPositionModal(fileList, 'append', studioCurrentPage);
+}
+
+function shiftAudioScriptsForInsertion(insertAfterIndex, count) {
+    const newPages = {};
+    const oldPages = studioAudioScripts.pages || {};
+    Object.keys(oldPages).forEach(k => {
+        const pNum = parseInt(k, 10);
+        if (pNum <= insertAfterIndex) {
+            newPages[String(pNum)] = oldPages[k];
+        } else {
+            newPages[String(pNum + count)] = oldPages[k];
+        }
+    });
+    studioAudioScripts.pages = newPages;
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    audioScriptsModified = true;
+}
+
+function shiftAudioScriptsForDeletion(deletedIndex) {
+    const newPages = {};
+    const oldPages = studioAudioScripts.pages || {};
+    Object.keys(oldPages).forEach(k => {
+        const pNum = parseInt(k, 10);
+        if (pNum < deletedIndex) {
+            newPages[String(pNum)] = oldPages[k];
+        } else if (pNum > deletedIndex) {
+            newPages[String(pNum - 1)] = oldPages[k];
+        }
+    });
+    studioAudioScripts.pages = newPages;
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    audioScriptsModified = true;
+}
+
+async function executeSmartUpload(mode, targetPos, fileList) {
+    if (!fileList || !fileList.length) return;
+
     fileList.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
 
     const progressSection = document.getElementById('uploadProgressSection');
@@ -1226,25 +1437,66 @@ async function handleImageUpload(files) {
 
         const percent = Math.round(((i + 1) / fileList.length) * 100);
         if (progressLabel) progressLabel.textContent = `कनवर्ट हो रहा है: ${i + 1} / ${fileList.length} पेजेस (${percent}%)`;
-        if (sizeLabel) sizeLabel.textContent = `वर्तमान फाइल: ${file.name} (${Math.round(currentBytes / 1024)} KB) • कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
+        if (sizeLabel) sizeLabel.textContent = `फाइल: ${file.name} (${Math.round(currentBytes / 1024)} KB) • कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
         if (fillBar) fillBar.style.width = `${percent}%`;
 
-        // Small yield to let UI breathe smoothly
         if (i % 5 === 0) await new Promise(r => setTimeout(r, 10));
     }
 
-    studioPageImages = processedImages;
-    studioTotalPages = processedImages.length;
+    let targetSelectPage = 1;
+    let summaryMsg = '';
 
-    // Auto save immediately to IndexedDB so reader gets full 152 pages instantly
+    if (mode === 'append') {
+        const startIdx = studioPageImages.length;
+        studioPageImages.push(...processedImages);
+        for (let i = 0; i < processedImages.length; i++) {
+            modifiedPageIndices.add(startIdx + i);
+        }
+        studioTotalPages = studioPageImages.length;
+        targetSelectPage = startIdx + 1;
+        summaryMsg = `➕ अंत में ${processedImages.length} नए पेज जुड़ गए! (अब कुल: ${studioTotalPages} पेजेस)`;
+    } else if (mode === 'insert') {
+        const insertIndex = Math.max(0, Math.min(studioPageImages.length, targetPos));
+        studioPageImages.splice(insertIndex, 0, ...processedImages);
+        shiftAudioScriptsForInsertion(insertIndex, processedImages.length);
+        for (let i = 0; i < processedImages.length; i++) {
+            modifiedPageIndices.add(insertIndex + i);
+        }
+        studioTotalPages = studioPageImages.length;
+        targetSelectPage = insertIndex + 1;
+        summaryMsg = `📥 पेज ${insertIndex} के बाद ${processedImages.length} नए पेज इन्सर्ट हो गए! (अब कुल: ${studioTotalPages} पेजेस)`;
+    } else if (mode === 'replace_range') {
+        const startIdx = Math.max(0, Math.min(studioPageImages.length - 1, targetPos - 1));
+        for (let i = 0; i < processedImages.length; i++) {
+            if (startIdx + i < studioPageImages.length) {
+                studioPageImages[startIdx + i] = processedImages[i];
+                modifiedPageIndices.add(startIdx + i);
+            } else {
+                studioPageImages.push(processedImages[i]);
+                modifiedPageIndices.add(studioPageImages.length - 1);
+            }
+        }
+        studioTotalPages = studioPageImages.length;
+        targetSelectPage = startIdx + 1;
+        summaryMsg = `🔄 पेज ${startIdx + 1} से आगे ${processedImages.length} पेजों की इमेज बदल दी गई!`;
+    } else { // full_reload
+        isFullBookReload = true;
+        modifiedPageIndices.clear();
+        studioPageImages = processedImages;
+        studioTotalPages = processedImages.length;
+        targetSelectPage = 1;
+        summaryMsg = `🎉 पूरी पुस्तक ${processedImages.length} नए पेजों के साथ रीलोड हो गई!`;
+    }
+
+    // Auto save immediately to IndexedDB so reader gets full updated pages instantly
     await savePagesToDb(studioCurrentBookId, studioPageImages);
 
-    markUnsaved(false);
+    markUnsaved(true);
     renderPageChipGrid();
-    selectPage(1);
+    selectPage(targetSelectPage);
 
-    if (progressLabel) progressLabel.textContent = `🎉 पूरे ${fileList.length} पेज सुरक्षित रूप से सेव हो गए! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
-    alert(`🎉 बधाई हो! सभी ${fileList.length} पेज सफलतापूर्वक WebP में बदलकर सुरक्षित सेव हो गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nआप तुरंत रीडर में जाकर पूरे ${fileList.length} पेज देख सकते हैं!`);
+    if (progressLabel) progressLabel.textContent = `🎉 ${summaryMsg} (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
+    alert(`${summaryMsg}\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\n1-Click Push to Git दबाकर इन बदलावों को सीधे लाइव करें!`);
 }
 
 function readFileAsWebp(file) {
@@ -1797,10 +2049,11 @@ function deleteCurrentPage() {
     }
 
     if (confirm(`क्या आप पृष्ठ ${studioCurrentPage} को हटाना चाहते हैं?`)) {
+        const deletedNum = studioCurrentPage;
         if (studioPageImages.length >= studioCurrentPage) {
             studioPageImages.splice(studioCurrentPage - 1, 1);
         }
-        delete studioAudioScripts.pages[String(studioCurrentPage)];
+        shiftAudioScriptsForDeletion(deletedNum);
         studioTotalPages--;
         studioCurrentPage = Math.min(studioCurrentPage, studioTotalPages);
         markUnsaved(true);
