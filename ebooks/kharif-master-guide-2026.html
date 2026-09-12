@@ -2444,6 +2444,13 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         playNext();
       };
 
+      let utFired = false;
+      const ttsWatchdog = setTimeout(() => {
+        if (!utFired && landingAudioPlaying) {
+          advanceToNext();
+        }
+      }, 7000);
+
       if (nativeHindiVoice && 'speechSynthesis' in window) {
         const ut = new SpeechSynthesisUtterance(chunk);
         ut.voice = nativeHindiVoice;
@@ -2452,10 +2459,14 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
         ut.pitch = 1.05; // Vibrant natural tone
         
         ut.onend = () => {
+          utFired = true;
+          clearTimeout(ttsWatchdog);
           advanceToNext();
         };
 
         ut.onerror = (e) => {
+          utFired = true;
+          clearTimeout(ttsWatchdog);
           if (!landingAudioPlaying) return;
           if (e && (e.error === 'interrupted' || e.error === 'canceled')) {
             return;
@@ -2465,6 +2476,7 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 
         window.speechSynthesis.speak(ut);
       } else {
+        clearTimeout(ttsWatchdog);
         playCloud(chunk, advanceToNext);
       }
     };
@@ -2494,6 +2506,12 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   // AUTOMATIC INSTANT PLAY ON PAGE LOAD / FIRST INTERACTION
   // ==========================================================
   function setupLandingAudioAutoplay() {
+    const isFB = /FBAN|FBAV|FB_IAB|Instagram|Line/i.test(navigator.userAgent || '');
+    if (isFB) {
+      const status = document.getElementById('landingAudioStatusText');
+      if (status) status.innerHTML = '🔊 ऑडियो चालू है • सर्वोत्तम अनुभव के लिए ऊपर <strong>⋮</strong> मेनू से Chrome में खोलें';
+    }
+
     const tryAutoStart = () => {
       if (landingAudioPlaying || window._landingAudioUserStopped) return;
       startLandingAudioBook();
@@ -2535,6 +2553,18 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(3) { animation: aoiWaveAnim 0.9s ease-in-out infinite 0.3s; }
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(4) { animation: aoiWaveAnim 0.7s ease-in-out infinite 0.1s; }
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(5) { animation: aoiWaveAnim 0.85s ease-in-out infinite 0.25s; }
+
+/* Mobile Floating Audio Pill Position (Above Bottom Bar) */
+@media (max-width: 768px) {
+  #aoi-floating-audio-pill {
+    bottom: 125px !important;
+    right: 12px !important;
+    padding: 6px 12px !important;
+    gap: 8px !important;
+    z-index: 99999 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(245,158,11,0.4) !important;
+  }
+}
 
 /* Free Bonus Section Styles & Smooth 3D Hover Animations */
 .aoi-bonus-grid {

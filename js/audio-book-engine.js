@@ -275,14 +275,22 @@ class ProAudioBookEngine {
         const currentPage = window.aoiPageNum || 1;
         this.getUserProfileName();
 
-        // 1. Play Welcome Greeting Once on First Start
+        // Detect if running inside Facebook / Instagram In-App Browser (where SpeechSynthesis is blocked)
+        const isFBWebView = /FBAN|FBAV|FB_IAB|Instagram|Line/i.test(navigator.userAgent || '');
+        const pageKey = String(currentPage);
+        const pageEntry = this.pageScripts[pageKey];
+        const hasRecordedAudio = pageEntry && typeof pageEntry === 'object' && pageEntry.audio && pageEntry.audio.trim().length > 0;
+
+        // 1. Play Welcome Greeting Once on First Start (Only if not in FB WebView or if pure TTS is supported)
         if (!this.welcomePlayed) {
             this.welcomePlayed = true;
-            this.stopAudioSources();
-            const welcomeText = `${this.userName} जी, आरोग्यम इंडिया डिजिटल लाइब्रेरी में आपका हार्दिक स्वागत है। आइए अध्ययन शुरू करते हैं।`;
-            this.updateStatusDisplay(`🌸 ${this.userName} जी, स्वागत है!`);
-            this.speakText(welcomeText, currentPage, true);
-            return;
+            if (!isFBWebView && !hasRecordedAudio) {
+                this.stopAudioSources();
+                const welcomeText = `${this.userName} जी, आरोग्यम इंडिया डिजिटल लाइब्रेरी में आपका हार्दिक स्वागत है। आइए अध्ययन शुरू करते हैं।`;
+                this.updateStatusDisplay(`🌸 ${this.userName} जी, स्वागत है!`);
+                this.speakText(welcomeText, currentPage, true);
+                return;
+            }
         }
 
         if (this.isPaused && this.synth && this.synth.paused) {
