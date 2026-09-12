@@ -44,6 +44,7 @@ export async function initBookLandingPages() {
   let currentTocPoints = [];
   let currentFaqs = [];
   let currentSuggestedBooks = [];
+  let currentAudioHighlights = [];
   let currentSectionsOrder = [];
   let currentHiddenSections = [];
   let currentSectionBanners = {};
@@ -354,19 +355,19 @@ export async function initBookLandingPages() {
           </div>
         </div>
 
-        <!-- SECTION 4B: AUDIO BOOK EXPERIENCE & NARRATION LAYER (WITH SECTION BANNER & DUAL MP3/AI TTS MODES) -->
-        <div id="sec_box_audio_layer" style="background: radial-gradient(circle at 50% 30%, rgba(69,10,10,0.2) 0%, rgba(42,4,4,0.3) 100%); border: 2px solid #f59e0b; border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(245,158,11,0.15);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+        <!-- SECTION 4B: AUDIO BOOK EXPERIENCE & NARRATION LAYER (WITH LIVE PREVIEW, EMOJIS, 6 HIGHLIGHTS & DUAL MP3/AI TTS) -->
+        <div id="sec_box_audio_layer" style="background: radial-gradient(circle at 50% 30%, rgba(69,10,10,0.25) 0%, rgba(42,4,4,0.35) 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 6px 20px rgba(245,158,11,0.18);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 1.3rem;">🎧</span>
+              <span style="font-size: 1.4rem;">🎧</span>
               <div>
-                <div style="font-weight: 800; color: #fbbf24; font-size: 0.95rem;">
-                  ऑडियो बुक अनुभव व लाइव नरेशन लेयर (Audio Book Experience Layer)
+                <div style="font-weight: 900; color: #fbbf24; font-size: 1rem;">
+                  🎧 4B. ऑडियो बुक अनुभव व लाइव नरेशन लेयर (Audio Experience Layer)
                 </div>
-                <small style="color: var(--admin-muted);">लाइव ऑडियो परिचय, स्टूडियो MP3 / AI TTS वॉइस नरेशन व साउंड वेव</small>
+                <small style="color: var(--admin-muted);">लाइव ऑडियो प्लेयर, वॉइस स्विच (MP3/AI TTS), इमोजी टूलबार, 6 मुख्य हाईलाइट्स व ऑफर बॉक्स</small>
               </div>
             </div>
-            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--admin-text); background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px; border: 1px solid #f59e0b;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--admin-text); background: rgba(0,0,0,0.35); padding: 5px 12px; border-radius: 6px; border: 1px solid #f59e0b;">
               <input type="checkbox" id="blp_audio_enabled" checked style="accent-color: #f59e0b; width: 16px; height: 16px;" />
               <span>ऑडियो प्लेयर चालू रखें</span>
             </label>
@@ -375,18 +376,41 @@ export async function initBookLandingPages() {
           <!-- Optional Section Banner for Audio -->
           ${renderSectionBannerUploaderBlock('sec_audio', '🎧 ऑडियो अनुभव सेक्शन बैनर (वैकल्पिक - अपलोड करने पर दिखेगा)')}
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+          <!-- 1. Top Section Headers (Kheti Dr. Matched) -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 12px; margin-top: 10px;">
+            <div style="font-weight: 800; color: #fde047; font-size: 0.82rem; margin-bottom: 8px; text-transform: uppercase;">
+              🏷️ 1. ऑडियो सेक्शन हेडिंग व टैग्स (Header & Pitch Styling)
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; margin-bottom: 8px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; font-weight: 700;">टॉप बैज टैग (Badge Tag):</label>
+                <input type="text" id="blp_audio_badge_tag" class="admin-input" placeholder="🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO" value="🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-weight: 700; color: #fef08a;" />
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; font-weight: 700;">मुख्य सेक्शन शीर्षक (Main Heading):</label>
+                <input type="text" id="blp_audio_main_heading" class="admin-input" placeholder="अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!" value="अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!" style="width: 100%; padding: 6px 10px; font-size: 0.84rem; font-weight: 800;" />
+              </div>
+            </div>
             <div>
-              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">ऑडियो कार्ड शीर्षक (Title):</label>
+              <label class="admin-label" style="font-size: 0.76rem; font-weight: 700;">सब-हेडिंग विवरण (Main Subtitle):</label>
+              <input type="text" id="blp_audio_main_subtitle" class="admin-input" placeholder="⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।" value="⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;" />
+            </div>
+          </div>
+
+          <!-- 2. Player Card Titles -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">प्लेयर कार्ड शीर्षक (Player Title):</label>
               <input type="text" id="blp_audio_title" class="admin-input" placeholder="उदा. पुस्तक का लाइव ऑडियो परिचय सुनें" value="पुस्तक का लाइव ऑडियो परिचय सुनें" style="width: 100%; padding: 6px 10px; font-weight: 700;" />
             </div>
             <div>
-              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">सब-शीर्षक / वॉइस टैग (Subtitle):</label>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">वॉइस सब-टैग (Voice Subtitle):</label>
               <input type="text" id="blp_audio_subtitle" class="admin-input" placeholder="उदा. लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)" value="लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)" style="width: 100%; padding: 6px 10px;" />
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; margin-top: 10px; align-items: start;">
+          <!-- 3. Audio Source & Mode Config -->
+          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; margin-top: 12px; align-items: start;">
             <div>
               <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #fbbf24;">ऑडियो मोड (Audio Mode):</label>
               <select id="blp_audio_mode" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;" onchange="window.toggleAudioModeFields(this.value)">
@@ -422,11 +446,87 @@ export async function initBookLandingPages() {
             </div>
           </div>
 
-          <!-- Mode 2: TTS Textarea -->
-          <div id="blp_audio_tts_controls_wrap" style="margin-top: 10px; display: none;">
-            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #fbbf24;">हिंदी नरेशन स्क्रिप्ट (AI Text-to-Speech Hindi Script):</label>
-            <textarea id="blp_audio_tts_text" class="admin-textarea" rows="4" placeholder="क्या आप फसल में लगने वाले अज्ञात रोगों, कीटों के हमलों और खाद पर होने वाले खर्चों से परेशान हैं?..." style="width: 100%; padding: 8px 10px; font-size: 0.84rem; line-height: 1.5;"></textarea>
-            <small style="color: var(--admin-muted); font-size: 0.72rem;">💡 टिप्स: धाराप्रवाह हिंदी वॉइस के लिए अल्पविराम (,) की जगह पूर्णविराम (।) या पैराग्राफ का उपयोग करें।</small>
+          <!-- 4. Quick Emoji Insertion Toolbar -->
+          <div style="margin-top: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 8px 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+              <span style="font-size: 0.76rem; font-weight: 800; color: #fde047;">✨ 1-Click इमोजी टूलबार (क्लिक करके टेक्स्ट में जोड़ें):</span>
+              <small style="color: var(--admin-muted); font-size: 0.72rem;">टेक्स्ट एरिया में जहाँ कर्सर होगा, वहाँ इमोजी जुड़ जाएगी</small>
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🌾')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🌾</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🎧')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🎧</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🎙️')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🎙️</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('⚡')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">⚡</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🐛')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🐛</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🦠')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🦠</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🧪')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🧪</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('💧')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">💧</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🌊')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🌊</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🌱')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🌱</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('📅')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">📅</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('⚠️')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">⚠️</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('👑')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">👑</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🎁')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🎁</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('✅')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">✅</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('⭐')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">⭐</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('💥')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">💥</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('📖')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">📖</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('🔥')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">🔥</button>
+              <button type="button" onclick="window.insertEmojiAtAudioCursor('💰')" class="admin-button small-button" style="padding:2px 8px;font-size:1rem;background:rgba(255,255,255,0.08);">💰</button>
+            </div>
+          </div>
+
+          <!-- 5. Live Test Audio Player Bar Inside Admin -->
+          <div style="margin-top: 12px; background: rgba(0,0,0,0.5); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span id="admin_audio_preview_status" style="font-size: 0.85rem; font-weight: 700; color: #fef08a;">
+                🔇 ऑडियो बंद है • टेस्ट करने के लिए "Play Preview" दबाएं
+              </span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" id="btn_test_admin_audio" onclick="window.testAdminAudioPreview()" class="admin-button small-button" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; padding: 6px 16px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <span>▶️</span> <span>लाइव ऑडियो टेस्ट सुनें (Play Preview)</span>
+              </button>
+              <button type="button" id="btn_stop_admin_audio" onclick="window.stopAdminAudioPreview()" class="admin-button small-button" style="background: #dc2626; color: #fff; font-weight: 800; padding: 6px 12px; font-size: 0.82rem; cursor: pointer; display: none; align-items: center; gap: 4px;">
+                <span>⏹️</span> <span>Stop</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 6. TTS Textarea & Story Narration Box -->
+          <div id="blp_audio_tts_controls_wrap" style="margin-top: 12px;">
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #fbbf24;">
+              📝 हिंदी नरेशन स्क्रिप्ट व स्टोरी बॉक्स (Story Narration Script):
+            </label>
+            <textarea id="blp_audio_tts_text" class="admin-textarea" rows="4" placeholder="क्या आप फसल में लगने वाले अज्ञात रोगों, कीटों के हमलों और खाद-बीज पर होने वाले खर्चों से परेशान हैं?..." style="width: 100%; padding: 8px 10px; font-size: 0.84rem; line-height: 1.5;"></textarea>
+            <small style="color: var(--admin-muted); font-size: 0.72rem;">💡 टिप्स: धाराप्रवाह हिंदी वॉइस के लिए अल्पविराम (,) की जगह पूर्णविराम (।) या पैराग्राफ का उपयोग करें। ऊपर इमोजी टूलबार से इमोजी भी जोड़ सकते हैं।</small>
+          </div>
+
+          <!-- 7. Key Highlights Grid (6 Solution Badges) -->
+          <div style="margin-top: 14px; border-top: 1px dashed rgba(245,158,11,0.3); padding-top: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.82rem; font-weight: 800; color: #fde047; margin: 0;">
+                  ✨ मुख्य समस्या निवारण पॉइंट्स (Key Highlights Grid):
+                </label>
+                <small style="color: var(--admin-muted); display: block; font-size: 0.72rem;">(जैसे 300+ कीटों की पहचान, 500+ रोगों का समाधान, पोषण प्रबंधन आदि)</small>
+              </div>
+              <button type="button" onclick="window.addAudioHighlightItem()" class="admin-button small-button" style="background: #f59e0b; color: #000; font-weight: 800; padding: 4px 10px; font-size: 0.75rem;">
+                + नया हाईलाइट पॉइंट जोड़ें
+              </button>
+            </div>
+
+            <div id="blp_audio_highlights_list_wrap" style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- 8. Special Launch Offer Callout Box -->
+          <div style="margin-top: 14px; background: rgba(220,38,38,0.2); border: 1.5px solid #fbbf24; border-radius: 8px; padding: 10px 12px;">
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 800; color: #fca5a5; margin-bottom: 4px;">
+              💥 धमाकेदार लॉन्चिंग ऑफर बॉक्स (Offer Callout Box):
+            </label>
+            <input type="text" id="blp_audio_offer_box" class="admin-input" placeholder="💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत ₹1,000 से ज्यादा है, वह आज केवल ₹99 में उपलब्ध है!" value="💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!" style="width: 100%; padding: 6px 10px; font-size: 0.82rem; font-weight: 700; color: #ffffff; background: rgba(0,0,0,0.35);" />
           </div>
         </div>
 
@@ -2885,6 +2985,15 @@ export async function initBookLandingPages() {
       if (cbIdx >= 0) customBooks[cbIdx] = updatedCustom;
       else customBooks.unshift(updatedCustom);
       localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
+
+      // Background server sync to save_book_landing.php
+      if (page) {
+        fetch('/api/save_book_landing.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pageData: page, bookData: updatedCustom })
+        }).catch(() => null);
+      }
     } catch (e) {}
 
     window.renderStoreShelvesTab();
@@ -2911,11 +3020,22 @@ export async function initBookLandingPages() {
       localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
       const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
       const cbIdx = customBooks.findIndex(x => x.id === bId);
+      let updatedCustom = null;
       if (cbIdx >= 0) {
         customBooks[cbIdx].badge = 'other';
         customBooks[cbIdx].store_badge = 'other';
         customBooks[cbIdx].isComingSoon = false;
+        updatedCustom = customBooks[cbIdx];
         localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
+      }
+
+      // Background server sync to save_book_landing.php
+      if (page) {
+        fetch('/api/save_book_landing.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pageData: page, bookData: updatedCustom || bookObj })
+        }).catch(() => null);
       }
     } catch (e) {}
 
@@ -3028,8 +3148,187 @@ export async function initBookLandingPages() {
   };
 
   // ==========================================================
-  // BUILDER REPEATERS
+  // BUILDER REPEATERS & AUDIO EXPERIENCE ENGINE
   // ==========================================================
+
+  // Quick Emoji Inserter for Audio and Textareas
+  window.insertEmojiAtAudioCursor = function(emoji) {
+    const activeEl = document.activeElement;
+    const targetEl = (activeEl && (activeEl.id === 'blp_audio_tts_text' || activeEl.id === 'blp_audio_story_text' || activeEl.id === 'blp_audio_title' || activeEl.id === 'blp_audio_main_heading' || activeEl.id === 'blp_audio_offer_box')) ? activeEl : document.getElementById('blp_audio_tts_text');
+    if (!targetEl) return;
+    const start = targetEl.selectionStart || targetEl.value.length;
+    const end = targetEl.selectionEnd || targetEl.value.length;
+    const val = targetEl.value;
+    targetEl.value = val.substring(0, start) + emoji + val.substring(end);
+    targetEl.focus();
+    targetEl.selectionStart = targetEl.selectionEnd = start + emoji.length;
+    showToast(`इमोजी ${emoji} डाला गया!`, 'info');
+  };
+
+  // Audio Highlights Repeaters (6 Key Points)
+  window.renderAudioHighlightsInBuilder = function() {
+    const wrap = document.getElementById('blp_audio_highlights_list_wrap');
+    if (!wrap) return;
+    if (!currentAudioHighlights || currentAudioHighlights.length === 0) {
+      currentAudioHighlights = [
+        { icon: '🐛', text: '300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय.' },
+        { icon: '🦠', text: '500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज.' },
+        { icon: '🧪', text: 'लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके.' },
+        { icon: '💧', text: 'पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन.' },
+        { icon: '🌊', text: 'Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि.' },
+        { icon: '🌱', text: 'उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप.' }
+      ];
+    }
+    wrap.innerHTML = currentAudioHighlights.map((hl, idx) => `
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:8px 10px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;">
+        <input type="text" value="${escapeHtml(hl.icon || '🌾')}" onchange="window.updateAudioHighlightField(${idx}, 'icon', this.value)" class="admin-input" style="width:48px;text-align:center;font-size:1.1rem;padding:4px;" title="इमोजी दर्ज करें" />
+        <input type="text" placeholder="हाईलाइट विवरण (उदा. 300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय)" value="${escapeHtml(hl.text || '')}" onchange="window.updateAudioHighlightField(${idx}, 'text', this.value)" class="admin-input" style="padding:5px 8px;font-size:0.82rem;font-weight:600;" />
+        <button type="button" onclick="window.removeAudioHighlightItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:3px 8px;font-weight:800;">&times;</button>
+      </div>
+    `).join('');
+  };
+
+  window.addAudioHighlightItem = function(icon = '🌱', text = '') {
+    currentAudioHighlights.push({ icon: icon || '🌱', text: text || 'नया फसल समाधान पॉइंट' });
+    window.renderAudioHighlightsInBuilder();
+  };
+
+  window.removeAudioHighlightItem = function(idx) {
+    currentAudioHighlights.splice(idx, 1);
+    window.renderAudioHighlightsInBuilder();
+  };
+
+  window.updateAudioHighlightField = function(idx, field, val) {
+    if (currentAudioHighlights[idx]) {
+      currentAudioHighlights[idx][field] = val;
+    }
+  };
+
+  // Admin Live Audio Preview Player
+  let adminTestAudioObj = null;
+  let adminTestBgmObj = null;
+  let adminTestAudioPlaying = false;
+
+  window.testAdminAudioPreview = function() {
+    if (adminTestAudioPlaying) {
+      window.stopAdminAudioPreview();
+      return;
+    }
+
+    const mode = document.getElementById('blp_audio_mode')?.value || 'mp3';
+    const mp3Url = (document.getElementById('blp_audio_mp3_url')?.value || '').trim();
+    const ttsText = (document.getElementById('blp_audio_tts_text')?.value || document.getElementById('blp_audio_story_text')?.value || '').trim();
+    const bgmEnabled = document.getElementById('blp_audio_bgm_enabled')?.checked !== false;
+
+    const testBtn = document.getElementById('btn_test_admin_audio');
+    const stopBtn = document.getElementById('btn_stop_admin_audio');
+    const statusEl = document.getElementById('admin_audio_preview_status');
+
+    if (mode === 'mp3' && !mp3Url) {
+      showToast('⚠️ कृपया पहले MP3 URL दर्ज करें या फ़ाइल चुनें!', 'error');
+      return;
+    }
+    if (mode === 'tts' && !ttsText) {
+      showToast('⚠️ कृपया पहले हिंदी TTS टेक्स्ट टाइप करें!', 'error');
+      return;
+    }
+
+    adminTestAudioPlaying = true;
+    if (testBtn) {
+      testBtn.style.background = '#dc2626';
+      testBtn.innerHTML = '<span>⏹️</span> <span>ऑडियो रोकें (Stop)</span>';
+    }
+    if (stopBtn) stopBtn.style.display = 'inline-flex';
+    if (statusEl) {
+      statusEl.innerHTML = '🔊 <strong style="color:#4ade80;">लाइव ऑडियो चल रहा है...</strong> (हेडफ़ोन/स्पीकर पर सुनें)';
+    }
+
+    if (bgmEnabled) {
+      try {
+        if (!adminTestBgmObj) {
+          adminTestBgmObj = new Audio('/audio/bgm/peaceful-ambient.mp3');
+          adminTestBgmObj.loop = true;
+          adminTestBgmObj.volume = 0.12;
+        }
+        adminTestBgmObj.play().catch(() => {});
+      } catch (e) {}
+    }
+
+    if (mode === 'mp3') {
+      try {
+        if (adminTestAudioObj) {
+          adminTestAudioObj.pause();
+        }
+        adminTestAudioObj = new Audio(mp3Url);
+        adminTestAudioObj.onended = () => {
+          window.stopAdminAudioPreview();
+        };
+        adminTestAudioObj.onerror = () => {
+          showToast(`❌ ऑडियो लोड नहीं हो सका: ${mp3Url}`, 'error');
+          window.stopAdminAudioPreview();
+        };
+        adminTestAudioObj.play().catch(err => {
+          showToast(`⚠️ प्लेबैक त्रुटि: ${err.message}`, 'error');
+          window.stopAdminAudioPreview();
+        });
+      } catch (err) {
+        showToast(`⚠️ MP3 त्रुटि: ${err.message}`, 'error');
+        window.stopAdminAudioPreview();
+      }
+    } else {
+      // AI TTS Mode
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const ut = new SpeechSynthesisUtterance(ttsText);
+        ut.lang = 'hi-IN';
+        ut.rate = 0.95;
+        ut.pitch = 1.05;
+        const voices = window.speechSynthesis.getVoices();
+        const hiVoice = voices.find(v => v.lang.includes('hi') || v.lang.includes('HI') || v.name.includes('Hindi') || v.name.includes('Google हिन्दी'));
+        if (hiVoice) ut.voice = hiVoice;
+
+        ut.onend = () => {
+          window.stopAdminAudioPreview();
+        };
+        ut.onerror = () => {
+          window.stopAdminAudioPreview();
+        };
+        window.speechSynthesis.speak(ut);
+      } else {
+        showToast('⚠️ आपका ब्राउज़र Web Speech TTS को सपोर्ट नहीं करता।', 'error');
+        window.stopAdminAudioPreview();
+      }
+    }
+  };
+
+  window.stopAdminAudioPreview = function() {
+    adminTestAudioPlaying = false;
+    if (adminTestAudioObj) {
+      adminTestAudioObj.pause();
+      adminTestAudioObj.currentTime = 0;
+    }
+    if (adminTestBgmObj) {
+      adminTestBgmObj.pause();
+      adminTestBgmObj.currentTime = 0;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    const testBtn = document.getElementById('btn_test_admin_audio');
+    const stopBtn = document.getElementById('btn_stop_admin_audio');
+    const statusEl = document.getElementById('admin_audio_preview_status');
+
+    if (testBtn) {
+      testBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+      testBtn.innerHTML = '<span>▶️</span> <span>लाइव ऑडियो टेस्ट सुनें (Play Preview)</span>';
+    }
+    if (stopBtn) stopBtn.style.display = 'none';
+    if (statusEl) {
+      statusEl.innerHTML = '🔇 ऑडियो बंद है • टेस्ट करने के लिए "Play Preview" दबाएं';
+    }
+  };
+
   function renderKpiBadgesInBuilder() {
     const wrap = document.getElementById('blp_kpi_badges_list_wrap');
     if (!wrap) return;
@@ -3337,6 +3636,22 @@ export async function initBookLandingPages() {
 
     if (!currentSectionsOrder || currentSectionsOrder.length === 0) {
       currentSectionsOrder = defaultSectionsList.map(s => s.key);
+    } else {
+      defaultSectionsList.forEach(s => {
+        if (!currentSectionsOrder.includes(s.key)) {
+          if (s.key === 'sec_audio') {
+            const kpiIdx = currentSectionsOrder.indexOf('sec_kpis');
+            if (kpiIdx >= 0) currentSectionsOrder.splice(kpiIdx + 1, 0, 'sec_audio');
+            else currentSectionsOrder.push('sec_audio');
+          } else if (s.key === 'sec_ai_support') {
+            const bonIdx = currentSectionsOrder.indexOf('sec_bonuses');
+            if (bonIdx >= 0) currentSectionsOrder.splice(bonIdx + 1, 0, 'sec_ai_support');
+            else currentSectionsOrder.push('sec_ai_support');
+          } else {
+            currentSectionsOrder.push(s.key);
+          }
+        }
+      });
     }
 
     wrap.innerHTML = currentSectionsOrder.map((secKey, idx) => {
@@ -3863,13 +4178,27 @@ export async function initBookLandingPages() {
 
     // Reset Audio Experience Layer
     if (document.getElementById('blp_audio_enabled')) document.getElementById('blp_audio_enabled').checked = true;
+    if (document.getElementById('blp_audio_badge_tag')) document.getElementById('blp_audio_badge_tag').value = '🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO';
+    if (document.getElementById('blp_audio_main_heading')) document.getElementById('blp_audio_main_heading').value = 'अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!';
+    if (document.getElementById('blp_audio_main_subtitle')) document.getElementById('blp_audio_main_subtitle').value = '⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।';
     if (document.getElementById('blp_audio_title')) document.getElementById('blp_audio_title').value = 'पुस्तक का लाइव ऑडियो परिचय सुनें';
     if (document.getElementById('blp_audio_subtitle')) document.getElementById('blp_audio_subtitle').value = 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
     if (document.getElementById('blp_audio_mode')) document.getElementById('blp_audio_mode').value = 'mp3';
     if (document.getElementById('blp_audio_mp3_url')) document.getElementById('blp_audio_mp3_url').value = '';
     if (document.getElementById('blp_audio_tts_text')) document.getElementById('blp_audio_tts_text').value = '';
+    if (document.getElementById('blp_audio_offer_box')) document.getElementById('blp_audio_offer_box').value = '💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!';
     if (document.getElementById('blp_audio_bgm_enabled')) document.getElementById('blp_audio_bgm_enabled').checked = true;
     if (window.toggleAudioModeFields) window.toggleAudioModeFields('mp3');
+
+    currentAudioHighlights = [
+      { icon: '🐛', text: '300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय.' },
+      { icon: '🦠', text: '500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज.' },
+      { icon: '🧪', text: 'लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके.' },
+      { icon: '💧', text: 'पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन.' },
+      { icon: '🌊', text: 'Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि.' },
+      { icon: '🌱', text: 'उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप.' }
+    ];
+    renderAudioHighlightsInBuilder();
 
     // Clear all section banner previews
     defaultSectionsList.forEach(s => {
@@ -3960,14 +4289,28 @@ export async function initBookLandingPages() {
     // Audio Book Experience Layer
     const audioLayer = page.audio_layer || page.audio || {};
     if (document.getElementById('blp_audio_enabled')) document.getElementById('blp_audio_enabled').checked = audioLayer.enabled !== false;
+    if (document.getElementById('blp_audio_badge_tag')) document.getElementById('blp_audio_badge_tag').value = audioLayer.badge_tag || '🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO';
+    if (document.getElementById('blp_audio_main_heading')) document.getElementById('blp_audio_main_heading').value = audioLayer.main_heading || 'अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!';
+    if (document.getElementById('blp_audio_main_subtitle')) document.getElementById('blp_audio_main_subtitle').value = audioLayer.main_subtitle || '⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।';
     if (document.getElementById('blp_audio_title')) document.getElementById('blp_audio_title').value = audioLayer.title || 'पुस्तक का लाइव ऑडियो परिचय सुनें';
     if (document.getElementById('blp_audio_subtitle')) document.getElementById('blp_audio_subtitle').value = audioLayer.subtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
     const audioMode = audioLayer.mode || (audioLayer.mp3_url ? 'mp3' : (audioLayer.tts_text ? 'tts' : 'mp3'));
     if (document.getElementById('blp_audio_mode')) document.getElementById('blp_audio_mode').value = audioMode;
     if (document.getElementById('blp_audio_mp3_url')) document.getElementById('blp_audio_mp3_url').value = audioLayer.mp3_url || '';
-    if (document.getElementById('blp_audio_tts_text')) document.getElementById('blp_audio_tts_text').value = audioLayer.tts_text || '';
+    if (document.getElementById('blp_audio_tts_text')) document.getElementById('blp_audio_tts_text').value = audioLayer.tts_text || audioLayer.story_text || '';
+    if (document.getElementById('blp_audio_offer_box')) document.getElementById('blp_audio_offer_box').value = audioLayer.offer_callout || '💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!';
     if (document.getElementById('blp_audio_bgm_enabled')) document.getElementById('blp_audio_bgm_enabled').checked = audioLayer.bgm_enabled !== false;
     if (window.toggleAudioModeFields) window.toggleAudioModeFields(audioMode);
+
+    currentAudioHighlights = (audioLayer.highlights && Array.isArray(audioLayer.highlights) && audioLayer.highlights.length > 0) ? [...audioLayer.highlights] : [
+      { icon: '🐛', text: '300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय.' },
+      { icon: '🦠', text: '500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज.' },
+      { icon: '🧪', text: 'लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके.' },
+      { icon: '💧', text: 'पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन.' },
+      { icon: '🌊', text: 'Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि.' },
+      { icon: '🌱', text: 'उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप.' }
+    ];
+    renderAudioHighlightsInBuilder();
 
     // Publishing Targets & Badges
     const targets = page.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page'];
@@ -4090,14 +4433,23 @@ export async function initBookLandingPages() {
     currentFaqs = page.faqs || [];
     currentSectionsOrder = (page.sections_order && Array.isArray(page.sections_order) && page.sections_order.length > 0) ? 
       [...page.sections_order] : defaultSectionsList.map(s => s.key);
-    if (!currentSectionsOrder.includes('sec_ai_support')) {
-      const bonusIdx = currentSectionsOrder.indexOf('sec_bonuses');
-      if (bonusIdx >= 0) {
-        currentSectionsOrder.splice(bonusIdx + 1, 0, 'sec_ai_support');
-      } else {
-        currentSectionsOrder.push('sec_ai_support');
+    
+    // Auto-inject missing sections
+    defaultSectionsList.forEach(s => {
+      if (!currentSectionsOrder.includes(s.key)) {
+        if (s.key === 'sec_audio') {
+          const kpiIdx = currentSectionsOrder.indexOf('sec_kpis');
+          if (kpiIdx >= 0) currentSectionsOrder.splice(kpiIdx + 1, 0, 'sec_audio');
+          else currentSectionsOrder.push('sec_audio');
+        } else if (s.key === 'sec_ai_support') {
+          const bonIdx = currentSectionsOrder.indexOf('sec_bonuses');
+          if (bonIdx >= 0) currentSectionsOrder.splice(bonIdx + 1, 0, 'sec_ai_support');
+          else currentSectionsOrder.push('sec_ai_support');
+        } else {
+          currentSectionsOrder.push(s.key);
+        }
       }
-    }
+    });
     currentHiddenSections = page.hidden_sections || [];
 
     renderKpiBadgesInBuilder();
@@ -4406,13 +4758,18 @@ export async function initBookLandingPages() {
       finalOgImg = finalCoverPath;
     }
 
-    // 8. Audio Book File / URL / Text
+    // 8. Audio Book File / URL / Text & Rich Badges
     let finalAudioMp3Path = (document.getElementById('blp_audio_mp3_url')?.value || '').trim();
     const isAudioOn = document.getElementById('blp_audio_enabled')?.checked ?? true;
     const audioMode = document.getElementById('blp_audio_mode')?.value || 'mp3';
-    const audioTitle = (document.getElementById('blp_audio_title')?.value || '').trim();
-    const audioSubtitle = (document.getElementById('blp_audio_subtitle')?.value || '').trim();
+    const audioBadgeTag = (document.getElementById('blp_audio_badge_tag')?.value || '').trim() || '🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक [EBOOK + AUDIO]';
+    const audioMainHeading = (document.getElementById('blp_audio_main_heading')?.value || '').trim() || 'अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!';
+    const audioMainSubtitle = (document.getElementById('blp_audio_main_subtitle')?.value || '').trim() || '⚡ कीट, रोग, पोषण, स्प्रे गाईडेंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में ईयरफोन लगाएं और आसानी से सुनें!';
+    const audioTitle = (document.getElementById('blp_audio_title')?.value || '').trim() || `${title} का लाइव ऑडियो परिचय सुनें`;
+    const audioSubtitle = (document.getElementById('blp_audio_subtitle')?.value || '').trim() || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
     const audioTtsText = (document.getElementById('blp_audio_tts_text')?.value || '').trim();
+    const audioStoryText = (document.getElementById('blp_audio_story_text')?.value || '').trim();
+    const audioOfferCallout = (document.getElementById('blp_audio_offer_box')?.value || '').trim();
     const isAudioBgmOn = document.getElementById('blp_audio_bgm_enabled')?.checked ?? true;
 
     if (finalAudioMp3Path.startsWith('data:audio/')) {
@@ -4443,11 +4800,17 @@ export async function initBookLandingPages() {
       og_image_landscape: finalOgImg,
       audio_layer: {
         enabled: isAudioOn,
-        title: audioTitle || 'पुस्तक का लाइव ऑडियो परिचय सुनें',
-        subtitle: audioSubtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)',
+        badge_tag: audioBadgeTag,
+        main_heading: audioMainHeading,
+        main_subtitle: audioMainSubtitle,
+        title: audioTitle,
+        subtitle: audioSubtitle,
         mode: audioMode,
         mp3_url: finalAudioMp3Path,
         tts_text: audioTtsText,
+        story_text: audioStoryText,
+        highlights: currentAudioHighlights && currentAudioHighlights.length > 0 ? currentAudioHighlights : undefined,
+        offer_callout: audioOfferCallout,
         bgm_enabled: isAudioBgmOn,
         banner_image: cleanSectionBanners.sec_audio || undefined
       },
@@ -4560,70 +4923,76 @@ export async function initBookLandingPages() {
       else allBooks.unshift(newBookObj);
     } catch (e) {}
 
-    // Trigger Secure Modular Auto Git Sync API (Eliminates 413 by uploading files individually)
+    // Multi-Tier Safe Save: Tier 1 (PHP save_book_landing.php) -> Tier 2 (Node auto-sync-book) -> Tier 3 (LocalStorage + JSON Backup)
     const saveButtonEl = document.getElementById('btn_save_book_lp');
     const origSaveText = saveButtonEl ? saveButtonEl.innerHTML : '';
     if (saveButtonEl) {
       saveButtonEl.disabled = true;
-      saveButtonEl.innerHTML = '⏳ GitHub पर लाइव सिंक हो रहा है...';
+      saveButtonEl.innerHTML = '⏳ सर्वर पर सुरक्षित किया जा रहा है...';
     }
 
-    showToast(`⏳ बुक (${bId}) को GitHub पर सिंक किया जा रहा है...`, 'info');
+    showToast(`⏳ बुक (${bId}) को सर्वर पर सेव किया जा रहा है...`, 'info');
 
     let syncSuccess = false;
     let syncErrorMsg = '';
 
     try {
-      // Step 1: Upload individual media files (Images, PDFs) separately to stay far below 4.5MB
-      for (let i = 0; i < uploadedFiles.length; i++) {
-        const fileItem = uploadedFiles[i];
-        if (saveButtonEl) {
-          saveButtonEl.innerHTML = `⏳ फ़ाइल (${i + 1}/${uploadedFiles.length}) अपलोड हो रही है...`;
-        }
-        const fileRes = await fetch('/api/auto-sync-book', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'upload_asset',
-            path: fileItem.path,
-            base64: fileItem.base64
-          })
-        });
-        const fileData = await fileRes.json().catch(() => ({}));
-        if (!fileRes.ok || !fileData.success) {
-          throw new Error(fileData.error || `फ़ाइल (${fileItem.path}) अपलोड विफल (HTTP ${fileRes.status})`);
-        }
-      }
-
-      // Step 2: Save metadata JSON (Catalog & Landing Page)
-      if (saveButtonEl) {
-        saveButtonEl.innerHTML = '⏳ कैटलॉग व लैंडिंग डेटा सुरक्षित हो रहा है...';
-      }
-      const syncRes = await fetch('/api/auto-sync-book', {
+      // Step 1: Try native PHP atomic save endpoint
+      const phpRes = await fetch('/api/save_book_landing.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'save',
           pageData,
           bookData: newBookObj,
-          uploadedFiles: [] // Already uploaded in Step 1
+          uploadedFiles
         })
       });
 
-      let syncData = {};
-      try {
-        syncData = await syncRes.json();
-      } catch (pe) {
-        syncData = { error: `Server HTTP ${syncRes.status}: ${syncRes.statusText}` };
+      if (phpRes.ok) {
+        const phpData = await phpRes.json().catch(() => ({}));
+        if (phpData.success) {
+          syncSuccess = true;
+        }
       }
 
-      if (syncRes.ok && syncData.success) {
-        syncSuccess = true;
-      } else {
-        syncErrorMsg = syncData.error || 'Unknown server error';
+      // Step 2: If PHP not available or returned 404/405, fallback to Node /api/auto-sync-book
+      if (!syncSuccess) {
+        for (let i = 0; i < uploadedFiles.length; i++) {
+          const fileItem = uploadedFiles[i];
+          if (saveButtonEl) {
+            saveButtonEl.innerHTML = `⏳ फ़ाइल (${i + 1}/${uploadedFiles.length}) अपलोड हो रही है...`;
+          }
+          await fetch('/api/auto-sync-book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'upload_asset',
+              path: fileItem.path,
+              base64: fileItem.base64
+            })
+          }).catch(() => null);
+        }
+
+        const syncRes = await fetch('/api/auto-sync-book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save',
+            pageData,
+            bookData: newBookObj,
+            uploadedFiles: []
+          })
+        });
+
+        const syncData = await syncRes.json().catch(() => ({}));
+        if (syncRes.ok && syncData.success) {
+          syncSuccess = true;
+        } else {
+          syncErrorMsg = syncData.error || `HTTP ${syncRes.status}`;
+        }
       }
     } catch (netErr) {
-      syncErrorMsg = netErr.message || 'Network error connecting to /api/auto-sync-book';
+      syncErrorMsg = netErr.message || 'Network sync error';
     } finally {
       if (saveButtonEl) {
         saveButtonEl.disabled = false;
@@ -4638,13 +5007,16 @@ export async function initBookLandingPages() {
         localStorage.setItem('AAROGYAM_DELETED_LANDING_PAGES', JSON.stringify(deletedIds));
       } catch (e) {}
 
-      showToast(`🎉 बुक (${bId}) 100% लाइव सिंक हो गई! (GitHub Commit सफल, 20-30s में लाइव)`, 'success');
+      showToast(`🎉 बुक (${bId}) सफलतापूर्वक सेव हो गई!`, 'success');
       builderCard.style.display = 'none';
       resetBookBuilder();
       await loadAllData();
     } else {
-      showToast(`❌ लाइव सिंक विफल: ${syncErrorMsg}`, 'error');
-      // Keep builder card open so user does not lose input
+      // LocalStorage already saved the data safely, so user didn't lose anything
+      showToast(`💾 बुक (${bId}) लोकल सुरक्षित हो गई है। सर्वर सिंक मैसेज: ${syncErrorMsg || 'ऑफ़लाइन'}`, 'warning');
+      builderCard.style.display = 'none';
+      resetBookBuilder();
+      await loadAllData();
     }
   }
 

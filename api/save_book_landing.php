@@ -29,12 +29,35 @@ if (json_last_error() !== JSON_ERROR_NONE || !is_array($payload)) {
 
 $pageData = $payload['pageData'] ?? null;
 $bookData = $payload['bookData'] ?? null;
+$uploadedFiles = $payload['uploadedFiles'] ?? [];
 
 if (!$pageData || !isset($pageData['id']) || empty(trim($pageData['id']))) {
     json_resp(400, ['error' => 'Missing pageData or book ID']);
 }
 
 $bookId = strtoupper(trim($pageData['id']));
+
+// Save any base64 uploaded files if present
+if (!empty($uploadedFiles) && is_array($uploadedFiles)) {
+    foreach ($uploadedFiles as $fileItem) {
+        if (!empty($fileItem['path']) && !empty($fileItem['base64'])) {
+            $relPath = ltrim($fileItem['path'], '/\\');
+            $fullPath = __DIR__ . '/../' . $relPath;
+            $dir = dirname($fullPath);
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+            $b64 = $fileItem['base64'];
+            if (strpos($b64, 'base64,') !== false) {
+                $b64 = explode('base64,', $b64)[1];
+            }
+            $bin = base64_decode($b64);
+            if ($bin !== false) {
+                @file_put_contents($fullPath, $bin);
+            }
+        }
+    }
+}
 
 $booksJsonPath = __DIR__ . '/../data/books.json';
 $landingJsonPath = __DIR__ . '/../data/universal-book-landing-pages.json';

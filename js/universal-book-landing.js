@@ -1841,7 +1841,7 @@
     if (!audioSec) return;
 
     const audioLayer = l.audio_layer || b.audio_layer || {};
-    const isAudioOn = audioLayer.enabled !== false && (audioLayer.mp3_url || audioLayer.tts_text);
+    const isAudioOn = audioLayer.enabled !== false && (audioLayer.mp3_url || audioLayer.tts_text || audioLayer.story_text || audioLayer.title);
 
     if (!isAudioOn) {
       audioSec.style.display = 'none';
@@ -1850,12 +1850,20 @@
 
     audioSec.style.display = 'block';
 
+    const h2El = document.getElementById('ubl-audio-section-h2');
+    const pEl = document.getElementById('ubl-audio-section-p');
     const titleEl = document.getElementById('ubl-audio-title');
     const subtitleEl = document.getElementById('ubl-audio-subtitle');
     const bannerWrap = document.getElementById('ubl-audio-section-banner-wrap');
     const bannerImg = document.getElementById('ubl-audio-section-banner-img');
     const bannerUrl = audioLayer.banner_image || l.section_banners?.sec_audio;
 
+    if (h2El && audioLayer.main_heading) {
+      h2El.innerHTML = escapeHtml(audioLayer.main_heading);
+    }
+    if (pEl && audioLayer.main_subtitle) {
+      pEl.textContent = audioLayer.main_subtitle;
+    }
     if (titleEl) titleEl.textContent = audioLayer.title || `${b.heading || b.name || 'पुस्तक'} का लाइव ऑडियो परिचय सुनें`;
     if (subtitleEl) subtitleEl.textContent = audioLayer.subtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
 
@@ -1864,6 +1872,68 @@
       bannerWrap.style.display = 'block';
     } else if (bannerWrap) {
       bannerWrap.style.display = 'none';
+    }
+
+    // Render Story Text
+    const storyContainer = document.getElementById('ubl-audio-story-text-container');
+    if (storyContainer) {
+      const storyText = audioLayer.story_text || `क्या आप फसल में लगने वाले अज्ञात रोगों, कीटों के हमलों और खाद-दवा पर होने वाले बेहिसाब खर्चों से परेशान हैं? क्या आप चाहते हैं कि आपके खेत की हर समस्या का समाधान सीधे आपके मोबाइल पर एक क्लिक में मिल जाए? मेरे आधुनिक किसान भाई, अब आपको परेशान होने की बिल्कुल जरूरत नहीं है क्योंकि हम आपके लिए ले आए हैं देश की पहली क्रांतिकारी कृषि ऑडियो बुक "${b.heading || b.name || 'ई-बुक'}" जिसे आप खेत में काम करते समय बस अपने कान में ईयरफोन लगाकर आसानी से सुन सकते हैं!`;
+      storyContainer.innerHTML = `
+        <p style="margin: 0 0 14px 0; font-size: 1.02rem; font-weight: 600; color: #ffffff; line-height: 1.7;">
+          ${escapeHtml(storyText)}
+        </p>
+        <p style="margin: 0 0 12px 0; color: #fbbf24; font-weight: 800; font-size: 0.98rem;">
+          ✨ यह कोई साधारण ई-बुक नहीं है, बल्कि आपके मोबाइल में चलने वाला एक संपूर्ण कृषि विज्ञान केंद्र है:
+        </p>
+      `;
+    }
+
+    // Render 6 Solution Highlights Badges Grid
+    const highlightsGrid = document.getElementById('ubl-audio-highlights-grid');
+    if (highlightsGrid) {
+      const defaultHighlights = [
+        { icon: '🐛', text: '300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय।' },
+        { icon: '🦠', text: '500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज।' },
+        { icon: '🧪', text: 'लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके।' },
+        { icon: '💧', text: 'पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन।' },
+        { icon: '🌊', text: 'Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि।' },
+        { icon: '🌱', text: 'उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप।' },
+        { icon: '📅', text: 'कृषि कैलेंडर: आपातकालीन निर्णय चार्ट व माह-दर-माह फसल सुरक्षा योजना।' },
+        { icon: '⚠️', text: '50 सबसे बड़ी गलतियाँ: जो हर साल फसल और मुनाफा डुबो देती हैं और बचाव।' }
+      ];
+
+      const rawHighlights = (Array.isArray(audioLayer.highlights) && audioLayer.highlights.length > 0) ? audioLayer.highlights : defaultHighlights;
+      highlightsGrid.innerHTML = rawHighlights.map(item => `
+        <div style="background: rgba(220,38,38,0.18); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 8px;">
+          <span style="color: #fbbf24; font-size: 1.15rem; line-height: 1.2;">${escapeHtml(item.icon || '🌱')}</span>
+          <span style="font-size: 0.92rem; color: #f8fafc; line-height: 1.4;">${escapeHtml(item.text || '')}</span>
+        </div>
+      `).join('');
+    }
+
+    // Render Offer Callout Box
+    const offerCalloutContainer = document.getElementById('ubl-audio-offer-callout-container');
+    if (offerCalloutContainer) {
+      const offerPrice = l.hero?.offer_price || b.offerPrice || 99;
+      const defaultOfferCallout = `💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹${offerPrice} में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!`;
+      const offerText = audioLayer.offer_callout || defaultOfferCallout;
+
+      offerCalloutContainer.innerHTML = `
+        <div style="background: linear-gradient(135deg, rgba(220,38,38,0.4), rgba(153,27,27,0.5)); border: 1.5px solid #fbbf24; border-radius: 12px; padding: 16px; margin-top: 14px;">
+          <p style="margin: 0; font-weight: 800; color: #ffffff; font-size: 1.02rem; line-height: 1.6;">
+            ${escapeHtml(offerText)}
+          </p>
+        </div>
+      `;
+    }
+
+    // Update Direct Audio Section Buy Button
+    const audioBuyBtn = document.getElementById('ubl-audio-buy-btn');
+    if (audioBuyBtn) {
+      const checkoutUrl = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
+      audioBuyBtn.href = checkoutUrl;
+      const offerPrice = l.hero?.offer_price || b.offerPrice || 99;
+      audioBuyBtn.innerHTML = `⚡ अभी ₹${offerPrice} में खरीदें और ऑडियो सुनें`;
     }
 
     // Check FB User Agent
