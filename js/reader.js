@@ -648,14 +648,169 @@ function updateWhatsAppHelpLink(page) {
     if (!whatsappBtn) return;
     const title = (aoiCurrentBookData && (aoiCurrentBookData.heading || aoiCurrentBookData.name || aoiCurrentBookData.title)) || document.getElementById('bookHeading')?.textContent || "ई-बुक";
     const curPage = page || aoiPageNum || 1;
-    const message = `नमस्ते Aarogyam India, मैं '${title}' का पेज संख्या ${curPage} पढ़ रहा हूँ और मुझे सहायता/जानकारी चाहिए।`;
+    const bId = (aoiBookId || "BK001").trim().toUpperCase();
+    const message = `नमस्ते Aarogyam India, मैं '${title}' (Book ID: ${bId}) का पेज संख्या ${curPage} पढ़ रहा हूँ और मुझे सहायता/जानकारी चाहिए।`;
     whatsappBtn.href = "https://wa.me/917974422572?text=" + encodeURIComponent(message);
+}
+
+// =======================================================
+// TOAST NOTIFICATION UTILITY
+// =======================================================
+function showToast(message, duration = 3000) {
+    let toast = document.getElementById("readerToast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "readerToast";
+        toast.className = "reader-toast";
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.display = "block";
+    clearTimeout(window._readerToastTimer);
+    window._readerToastTimer = setTimeout(() => {
+        toast.style.display = "none";
+    }, duration);
+}
+window.showReaderToast = showToast;
+
+// =======================================================
+// BOOK LANDING PAGE 1-CLICK SHARE SYSTEM (ID BASED)
+// =======================================================
+function initShareBookSystem() {
+    const shareBtn = document.getElementById("shareBookFloatBtn");
+    const shareModal = document.getElementById("shareBookModal");
+    const closeShareModalBtn = document.getElementById("closeShareModalBtn");
+    const copyShareLinkBtn = document.getElementById("copyShareLinkBtn");
+    const shareLinkInput = document.getElementById("shareLinkInput");
+    const shareSubTitle = document.getElementById("shareBookModalSubtitle");
+    const shareWaBtn = document.getElementById("shareWhatsappDirectBtn");
+    const shareTgBtn = document.getElementById("shareTelegramDirectBtn");
+    const shareFbBtn = document.getElementById("shareFacebookDirectBtn");
+
+    if (!shareBtn) return;
+
+    function getBookShareData() {
+        const bId = (aoiBookId || (new URLSearchParams(window.location.search).get("book") || new URLSearchParams(window.location.search).get("id") || "BK001")).trim().toUpperCase();
+        const title = (aoiCurrentBookData && (aoiCurrentBookData.heading || aoiCurrentBookData.name || aoiCurrentBookData.title)) || document.getElementById('bookHeading')?.textContent || "Aarogyam India ई-बुक";
+        const origin = window.location.origin;
+        // Canonical share link passing through serverless open-graph pre-renderer
+        const shareUrl = `${origin}/api/share?id=${encodeURIComponent(bId)}`;
+        const directLandingUrl = `${origin}/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`;
+        const shareTitle = `🌾 ${title} - Aarogyam India`;
+        const shareMessage = `🌾 *Aarogyam India Practical Agriculture E-Book*\n\n📖 *${title}*\n(Book ID: ${bId})\n\n👉 इस संपूर्ण ई-बुक का विवरण, डेमो पेज एवं विशेष ऑफर देखने के लिए नीचे दिए लिंक पर क्लिक करें:\n${shareUrl}`;
+
+        return { bId, title, origin, shareUrl, directLandingUrl, shareTitle, shareMessage };
+    }
+
+    function openShareModal() {
+        if (!shareModal) return;
+        const data = getBookShareData();
+
+        if (shareSubTitle) {
+            shareSubTitle.innerHTML = `<strong>${data.title}</strong> (ID: <code>${data.bId}</code>) का लैंडिंग पेज शेयर करें:`;
+        }
+
+        if (shareLinkInput) {
+            shareLinkInput.value = data.shareUrl;
+        }
+
+        if (shareWaBtn) {
+            shareWaBtn.href = "https://api.whatsapp.com/send?text=" + encodeURIComponent(data.shareMessage);
+        }
+
+        if (shareTgBtn) {
+            shareTgBtn.href = "https://t.me/share/url?url=" + encodeURIComponent(data.shareUrl) + "&text=" + encodeURIComponent(`🌾 ${data.title} - Aarogyam India ई-बुक`);
+        }
+
+        if (shareFbBtn) {
+            shareFbBtn.href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(data.shareUrl);
+        }
+
+        shareModal.style.display = "flex";
+    }
+
+    shareBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const data = getBookShareData();
+
+        // 1. Try Native Mobile Web Share API if supported
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: data.shareTitle,
+                    text: data.shareMessage,
+                    url: data.shareUrl
+                });
+                showToast("✅ पुस्तक लिंक सफलतापूर्वक शेयर किया गया!");
+                return;
+            } catch (err) {
+                if (err && err.name === 'AbortError') {
+                    return; // User dismissed share sheet
+                }
+                console.warn("Native Web Share fallback to modal:", err);
+            }
+        }
+
+        // 2. Open Share Modal (Desktop / Fallback)
+        openShareModal();
+    });
+
+    if (closeShareModalBtn) {
+        closeShareModalBtn.addEventListener("click", () => {
+            if (shareModal) shareModal.style.display = "none";
+        });
+    }
+
+    if (shareModal) {
+        shareModal.addEventListener("click", (e) => {
+            if (e.target === shareModal) {
+                shareModal.style.display = "none";
+            }
+        });
+    }
+
+    if (copyShareLinkBtn && shareLinkInput) {
+        copyShareLinkBtn.addEventListener("click", async () => {
+            const linkToCopy = shareLinkInput.value || getBookShareData().shareUrl;
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(linkToCopy);
+                } else {
+                    shareLinkInput.select();
+                    document.execCommand('copy');
+                }
+                copyShareLinkBtn.innerHTML = `<i class="fa-solid fa-check"></i> कॉपीड!`;
+                showToast("✅ लैंडिंग पेज लिंक कॉपी कर लिया गया है!");
+                setTimeout(() => {
+                    copyShareLinkBtn.innerHTML = `<i class="fa-regular fa-copy"></i> कॉपी`;
+                }, 2500);
+            } catch (err) {
+                console.error("Clipboard copy error:", err);
+                shareLinkInput.select();
+                showToast("लिंक का चयन करें और कॉपी करें");
+            }
+        });
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         updateWhatsAppHelpLink();
-    }, 1000);
+        initShareBookSystem();
+    }, 600);
+});
+
+// Global Keyboard Shortcut: Escape to close modals
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        const shareModal = document.getElementById("shareBookModal");
+        if (shareModal && shareModal.style.display !== "none") {
+            shareModal.style.display = "none";
+        }
+        if (aiAskModal && aiAskModal.style.display !== "none") {
+            aiAskModal.style.display = "none";
+        }
+    }
 });
 
 // AI Ask Modal Toggle
