@@ -561,9 +561,7 @@
       "id": "BK015",
       "slug": "bk015",
       "category": "Agriculture",
-      "status": "coming_soon",
-      "is_coming_soon": true,
-      "store_badge": "coming_soon",
+      "status": "active",
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
@@ -576,6 +574,7 @@
         "sec_hero",
         "sec_timer",
         "sec_kpis",
+        "sec_audio",
         "sec_trust",
         "sec_why_buy",
         "sec_vip_stack",
@@ -598,7 +597,48 @@
       },
       "og_title": "🌱 सब्जी खेती मास्टर PART 1",
       "og_description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू",
-      "og_image": "/images/books/bk015-cover.webp",
+      "og_image": "/images/books/bk015-og.webp",
+      "og_image_landscape": "/images/books/bk015-og.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
       "mainPdf": "/uploads/books/BK015_main.pdf",
       "main_pdf": "/uploads/books/BK015_main.pdf",
       "freePdf": "/uploads/books/BK002_free.pdf",
@@ -688,7 +728,20 @@
       "demo_images": [
         "/images/books/bk015-preview-1.webp",
         "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp"
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
       ],
       "suggested_books_list": [
         {
