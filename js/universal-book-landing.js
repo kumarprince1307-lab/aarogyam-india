@@ -127,8 +127,8 @@
   }
 
   async function loadBookAndLandingData() {
-    const cacheTime = Math.floor(Date.now() / 300000);
-    // 1. Fetch data/books.json (Zero-Egress 5-Min Rolling HTTP Cache)
+    const cacheTime = Date.now();
+    // 1. Fetch data/books.json
     try {
       const res = await fetch('/data/books.json?v=' + cacheTime);
       if (res.ok) {
@@ -144,13 +144,13 @@
         customBooks.forEach(cb => {
           if (!cb || !cb.id) return;
           const idx = allBooks.findIndex(x => x.id && x.id.toUpperCase() === cb.id.toUpperCase());
-          if (idx >= 0) allBooks[idx] = cb;
+          if (idx >= 0) allBooks[idx] = { ...allBooks[idx], ...cb };
           else allBooks.unshift(cb);
         });
       }
     } catch (e) {}
 
-    // 2. Fetch data/universal-book-landing-pages.json (Zero-Egress 5-Min Rolling HTTP Cache)
+    // 2. Fetch data/universal-book-landing-pages.json
     try {
       const res = await fetch('/data/universal-book-landing-pages.json?v=' + cacheTime);
       if (res.ok) {
@@ -159,7 +159,7 @@
       }
     } catch (e) {}
 
-    // 3. Scan LocalStorage for latest Admin Edits (ALWAYS OVERRIDE STATIC JSON)
+    // 3. Scan LocalStorage for latest Admin Edits (Merge with static JSON safely)
     try {
       const stored = localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES');
       if (stored) {
@@ -174,7 +174,16 @@
               (x.slug && itemSlugLower && x.slug.trim().toLowerCase() === itemSlugLower)
             );
             if (idx >= 0) {
-              allLandingPages[idx] = item; // Override with latest admin edit
+              const serverPage = allLandingPages[idx];
+              const mergedDemo = (item.demo_images && Array.isArray(item.demo_images) && item.demo_images.length > 0)
+                ? item.demo_images
+                : (serverPage.demo_images || []);
+              allLandingPages[idx] = {
+                ...serverPage,
+                ...item,
+                hero: { ...(serverPage.hero || {}), ...(item.hero || {}) },
+                demo_images: mergedDemo
+              };
             } else {
               allLandingPages.unshift(item);
             }
@@ -602,15 +611,27 @@
     // 6. Preview Gallery (Pinch-to-Zoom)
     const previewSection = document.getElementById('sec-sample-book');
     const galleryGrid = document.getElementById('preview-gallery-grid');
-    const demoImages = (l.demo_images && Array.isArray(l.demo_images) && l.demo_images.length > 0) ? l.demo_images : (b.demoImages && Array.isArray(b.demoImages) && b.demoImages.length > 0 ? b.demoImages : []);
+    const rawDemoList = (l.demo_images && Array.isArray(l.demo_images) && l.demo_images.length > 0) ? l.demo_images :
+                        (l.preview_images && Array.isArray(l.preview_images) && l.preview_images.length > 0 ? l.preview_images :
+                        (l.previewImages && Array.isArray(l.previewImages) && l.previewImages.length > 0 ? l.previewImages :
+                        (b.demoImages && Array.isArray(b.demoImages) && b.demoImages.length > 0 ? b.demoImages :
+                        (b.pageImages && Array.isArray(b.pageImages) && b.pageImages.length > 0 ? b.pageImages.slice(0, 16) : []))));
     
+    const demoImages = rawDemoList.map(url => {
+      if (typeof url !== 'string') return '';
+      if (url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) return url;
+      if (!url.startsWith('/')) return '/' + url.replace(/^\.\.\//, '');
+      return url;
+    }).filter(Boolean);
+
     if (galleryGrid) {
       if (demoImages.length > 0) {
         galleryGrid.innerHTML = demoImages.map((imgUrl, i) => `
-          <div class="preview-card" onclick="window.openPinchZoomLightbox('${imgUrl}')">
-            <img src="${imgUrl}" alt="Preview Page ${i + 1}" loading="lazy" style="cursor:zoom-in;">
+          <div class="preview-card" onclick="window.openPinchZoomLightbox('${imgUrl}')" style="cursor:zoom-in;">
+            <img src="${imgUrl}" alt="Preview Page ${i + 1}" loading="lazy" onerror="this.onerror=null;if(this.src.indexOf('..')===-1){this.src='..'+this.src;}">
           </div>
         `).join('');
+        if (previewSection) previewSection.style.display = 'block';
       } else {
         galleryGrid.innerHTML = '';
       }
