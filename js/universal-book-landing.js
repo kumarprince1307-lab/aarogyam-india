@@ -126,14 +126,71 @@
     }
   }
 
-  async function loadBookAndLandingData() {
+  // Universal Image Resolver for /ebooks/ and root deployment environments
+  window.resolveImageSrc = function(url) {
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('blob:')) {
+      return trimmed;
+    }
+    const clean = trimmed.replace(/^(\.\.\/|\/)+/, '');
+    return '../' + clean;
+  };
+
+  // Universal Self-Healing Image Error Handler
+  window.handleImageError = function(img) {
+    if (!img) return;
+    const currentSrc = img.getAttribute('src') || '';
+    if (!img.dataset.retryCount) img.dataset.retryCount = '0';
+    let retries = parseInt(img.dataset.retryCount, 10);
+    if (retries >= 3) return;
+    img.dataset.retryCount = String(retries + 1);
+
+    if (retries === 0) {
+      if (currentSrc.startsWith('../')) {
+        img.src = '/' + currentSrc.replace(/^\.\.\//, '');
+      } else if (currentSrc.startsWith('/')) {
+        img.src = '../' + currentSrc.replace(/^\//, '');
+      } else {
+        img.src = '../' + currentSrc;
+      }
+    } else if (retries === 1) {
+      img.src = currentSrc.replace(/^(\.\.\/|\/)+/, '');
+    } else {
+      if (img.classList.contains('hero-book-cover') || img.id === 'hero-book-cover') {
+        img.src = '../images/books/kharif-master-guide-2026-cover.webp';
+      } else if (img.classList.contains('hero-banner-bg') || img.id === 'hero-banner-img') {
+        img.src = '../images/banners/kharif-master-guide-2026-hero-banner.webp';
+      }
+    }
+  };
+
+  async function safeFetchJson(url) {
     const cacheTime = Date.now();
+    const cleanUrl = url.replace(/^(\.\.\/|\/)+/, '');
+    const candidates = [
+      `../${cleanUrl}?v=${cacheTime}`,
+      `/${cleanUrl}?v=${cacheTime}`,
+      `${cleanUrl}?v=${cacheTime}`
+    ];
+    for (const c of candidates) {
+      try {
+        const res = await fetch(c);
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (e) {}
+    }
+    return null;
+  }
+
+  async function loadBookAndLandingData() {
     // 1. Fetch data/books.json
     try {
-      const res = await fetch('/data/books.json?v=' + cacheTime);
-      if (res.ok) {
-        const json = await res.json();
-        allBooks = json.books || [];
+      const json = await safeFetchJson('data/books.json');
+      if (json && Array.isArray(json.books)) {
+        allBooks = json.books;
       }
     } catch (e) {}
 
@@ -152,10 +209,9 @@
 
     // 2. Fetch data/universal-book-landing-pages.json
     try {
-      const res = await fetch('/data/universal-book-landing-pages.json?v=' + cacheTime);
-      if (res.ok) {
-        const json = await res.json();
-        allLandingPages = json.bookLandingPages || [];
+      const json = await safeFetchJson('data/universal-book-landing-pages.json');
+      if (json && Array.isArray(json.bookLandingPages)) {
+        allLandingPages = json.bookLandingPages;
       }
     } catch (e) {}
 
@@ -175,13 +231,22 @@
             );
             if (idx >= 0) {
               const serverPage = allLandingPages[idx];
+              const mergedHero = { ...(serverPage.hero || {}) };
+              if (item.hero) {
+                Object.keys(item.hero).forEach(k => {
+                  if (item.hero[k] !== '' && item.hero[k] !== null && item.hero[k] !== undefined) {
+                    mergedHero[k] = item.hero[k];
+                  }
+                });
+              }
               const mergedDemo = (item.demo_images && Array.isArray(item.demo_images) && item.demo_images.length > 0)
                 ? item.demo_images
                 : (serverPage.demo_images || []);
+              
               allLandingPages[idx] = {
                 ...serverPage,
                 ...item,
-                hero: { ...(serverPage.hero || {}), ...(item.hero || {}) },
+                hero: mergedHero,
                 demo_images: mergedDemo
               };
             } else {
@@ -420,7 +485,8 @@
 
     const coverImg = document.getElementById('hero-book-cover');
     if (coverImg) {
-      coverImg.src = cover;
+      coverImg.src = window.resolveImageSrc(cover);
+      coverImg.onerror = function() { window.handleImageError(this); };
       if (l.cover_effect === 'static') {
         coverImg.classList.add('static-cover');
       } else {
@@ -617,18 +683,13 @@
                         (b.demoImages && Array.isArray(b.demoImages) && b.demoImages.length > 0 ? b.demoImages :
                         (b.pageImages && Array.isArray(b.pageImages) && b.pageImages.length > 0 ? b.pageImages.slice(0, 16) : []))));
     
-    const demoImages = rawDemoList.map(url => {
-      if (typeof url !== 'string') return '';
-      if (url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) return url;
-      if (!url.startsWith('/')) return '/' + url.replace(/^\.\.\//, '');
-      return url;
-    }).filter(Boolean);
+    const demoImages = rawDemoList.map(url => window.resolveImageSrc(url)).filter(Boolean);
 
     if (galleryGrid) {
       if (demoImages.length > 0) {
         galleryGrid.innerHTML = demoImages.map((imgUrl, i) => `
           <div class="preview-card" onclick="window.openPinchZoomLightbox('${imgUrl}')" style="cursor:zoom-in;">
-            <img src="${imgUrl}" alt="Preview Page ${i + 1}" loading="lazy" onerror="this.onerror=null;if(this.src.indexOf('..')===-1){this.src='..'+this.src;}">
+            <img src="${imgUrl}" alt="Preview Page ${i + 1}" loading="lazy" onerror="window.handleImageError(this)">
           </div>
         `).join('');
         if (previewSection) previewSection.style.display = 'block';
@@ -641,7 +702,8 @@
     const prevBannerImg = document.getElementById('preview-banner-img');
     if (prevBannerWrap && prevBannerImg) {
       if (l.preview_banner && l.preview_banner.trim()) {
-        prevBannerImg.src = l.preview_banner.trim();
+        prevBannerImg.src = window.resolveImageSrc(l.preview_banner.trim());
+        prevBannerImg.onerror = function() { window.handleImageError(this); };
         prevBannerWrap.style.display = 'block';
         prevBannerImg.onclick = () => window.openPinchZoomLightbox(prevBannerImg.src);
       } else {
@@ -707,7 +769,7 @@
 
       bonusWrapper.style.display = 'block';
       freeBooksGrid.innerHTML = renderList.map(bn => {
-        const bImg = bn.image || bn.cover || '/images/books/kharif-master-guide-2026-cover.webp';
+        const bImg = window.resolveImageSrc(bn.image || bn.cover || '/images/books/kharif-master-guide-2026-cover.webp');
         const bTitle = bn.title || 'विशेष बोनस ई-बुक';
         const bDesc = bn.description || 'इस मुख्य पुस्तक के साथ बिल्कुल फ्री लाइफटाइम एक्सेस।';
         const bMrp = bn.mrp || 199;
@@ -731,7 +793,7 @@
             </div>
             <div>
               <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;">
-                <img src="${bImg}" alt="${escapeHtml(bTitle)}" style="width:75px;height:105px;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);flex-shrink:0;">
+                <img src="${bImg}" alt="${escapeHtml(bTitle)}" onerror="window.handleImageError(this)" style="width:75px;height:105px;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);flex-shrink:0;">
                 <div style="flex:1;">
                   <h4 style="margin:0 0 6px 0;font-size:1.05rem;font-weight:800;color:#065f46;line-height:1.3;">${escapeHtml(bTitle)}</h4>
                   <div style="font-size:0.82rem;margin-bottom:6px;">
@@ -998,7 +1060,8 @@
 
     window.openPinchZoomLightbox = function (url) {
       if (!modal || !img) return;
-      img.src = url;
+      img.src = window.resolveImageSrc(url);
+      img.onerror = function() { window.handleImageError(this); };
       currentZoom = 1;
       applyZoom();
       modal.style.display = 'flex';
@@ -1105,7 +1168,7 @@
 
     grid.innerHTML = displayBooks.map((b, idx) => `
       <div class="ubl-combo-book-card">
-        <img src="${b.cover}" alt="${escapeHtml(b.heading)}" class="ubl-combo-book-thumb" style="animation: ublFloatBook3D 4.5s ease-in-out infinite ${idx * 1.5}s;">
+        <img src="${window.resolveImageSrc(b.cover)}" alt="${escapeHtml(b.heading)}" class="ubl-combo-book-thumb" onerror="window.handleImageError(this)" style="animation: ublFloatBook3D 4.5s ease-in-out infinite ${idx * 1.5}s;">
         <div style="text-align: left; flex: 1;">
           <span class="ubl-combo-tag" style="background:${idx === 0 ? '#16a34a' : '#0284c7'};">${b.tag || '🏆 Bestseller Guide'}</span>
           <h3 style="font-size: 1.05rem; font-weight: 900; color: #1e293b; margin: 4px 0 2px 0;">${escapeHtml(b.heading)}</h3>
@@ -1558,10 +1621,11 @@
 
     let bannerWrap = secEl.querySelector('.ubl-section-banner-wrap');
     if (bannerUrl && typeof bannerUrl === 'string' && bannerUrl.trim().length > 0) {
+      const resolvedSrc = window.resolveImageSrc(bannerUrl.trim());
       if (!bannerWrap) {
         bannerWrap = document.createElement('div');
         bannerWrap.className = 'ubl-section-banner-wrap';
-        bannerWrap.innerHTML = `<img src="${escapeHtml(bannerUrl.trim())}" alt="Section Banner" class="ubl-section-banner-img" />`;
+        bannerWrap.innerHTML = `<img src="${escapeHtml(resolvedSrc)}" alt="Section Banner" class="ubl-section-banner-img" onerror="window.handleImageError(this)" />`;
         // Insert right after container heading or at top of section
         const container = secEl.querySelector('.container') || secEl;
         if (container.firstChild) {
@@ -1571,7 +1635,10 @@
         }
       } else {
         const img = bannerWrap.querySelector('img');
-        if (img) img.src = bannerUrl.trim();
+        if (img) {
+          img.src = resolvedSrc;
+          img.onerror = function() { window.handleImageError(this); };
+        }
         bannerWrap.style.display = 'block';
       }
     } else {
@@ -1588,7 +1655,10 @@
 
   function setElemSrc(id, src) {
     const el = document.getElementById(id);
-    if (el && src) el.src = src;
+    if (el && src) {
+      el.src = window.resolveImageSrc(src);
+      el.onerror = function() { window.handleImageError(this); };
+    }
   }
 
   function setMetaProp(id, val) {

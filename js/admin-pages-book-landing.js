@@ -29,6 +29,48 @@ export async function initBookLandingPages() {
   const content = document.getElementById('page-content');
   if (!content) return;
 
+  function getAutoSyncApiUrl() {
+    if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+      return 'https://aarogyamindia.online/api/auto-sync-book';
+    }
+    return '/api/auto-sync-book';
+  }
+
+  async function syncAssetToGitHub(path, base64Data) {
+    const apiUrl = getAutoSyncApiUrl();
+    const cleanPath = String(path || '').replace(/^\/+/, '');
+    const cleanBase64 = String(base64Data || '').replace(/^data:[^;]+;base64,/, '');
+    
+    if (!cleanPath || !cleanBase64) return { success: false, error: 'Path and Base64 required' };
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'upload_asset',
+            path: cleanPath,
+            base64: cleanBase64
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success) {
+          return { success: true, data };
+        }
+        if (attempt === 3) {
+          return { success: false, error: data.error || `HTTP ${res.status}` };
+        }
+      } catch (err) {
+        if (attempt === 3) {
+          return { success: false, error: err.message };
+        }
+      }
+      await new Promise(r => setTimeout(r, 400 * attempt));
+    }
+    return { success: false, error: 'Upload failed after 3 attempts' };
+  }
+
   let allBooks = [];
   let allLandingPages = [];
   let editingBookId = null;
@@ -1974,41 +2016,48 @@ export async function initBookLandingPages() {
       return;
     }
 
+    if (file.size > 25 * 1024 * 1024) {
+      showToast(`❌ फ़ाइल (${(file.size / (1024 * 1024)).toFixed(1)}MB) 25MB से बड़ी है। कृपया इसे 25MB से कम करें।`, 'error');
+      return;
+    }
+
     const btn = document.getElementById(sectionType === 'main' ? 'btn_upload_main_pdf' : 'btn_upload_free_pdf');
     const origText = btn ? btn.innerHTML : '';
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '⏳ अपलोड हो रहा है...';
+      btn.innerHTML = '⏳ Git पर अपलोड हो रहा है...';
     }
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('bookId', bookId);
-      formData.append('section', sectionType);
+      showToast(`⏳ ${file.name} सीधे Git पर पुश हो रही है...`, 'info');
+      const b64 = await fileToBase64(file);
+      const targetPath = `uploads/books/${bookId}_${sectionType}.pdf`;
+      const res = await syncAssetToGitHub(targetPath, b64);
 
-      showToast(`⏳ ${file.name} अपलोड हो रही है...`, 'info');
-      const res = await fetch('/api/upload_book_landing.php', {
-        method: 'POST',
-        body: formData
-      });
-
-      let data = {};
-      try {
-        data = await res.json();
-      } catch (pe) {
-        data = { error: `Server HTTP ${res.status}: ${res.statusText}` };
-      }
-
-      if (res.ok && data.success && data.fileUrl) {
+      if (res.success) {
+        const finalUrl = `/${targetPath}`;
         const urlInput = document.getElementById(sectionType === 'main' ? 'blp_main_pdf_url' : 'blp_free_pdf_url');
         if (urlInput) {
-          urlInput.value = data.fileUrl;
+          urlInput.value = finalUrl;
         }
-        window.updatePdfStatusPreview(sectionType, data.fileUrl);
-        showToast(`✅ ${file.name} सफलतापूर्वक अपलोड हो गई!`, 'success');
+        window.updatePdfStatusPreview(sectionType, finalUrl);
+        showToast(`✅ ${file.name} Git पर 100% अपलोड हो गई!`, 'success');
       } else {
-        showToast(`❌ अपलोड विफल: ${data.error || 'Server error'}`, 'error');
+        // Fallback to PHP if available
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('bookId', bookId);
+        formData.append('section', sectionType);
+        const phpRes = await fetch('/api/upload_book_landing.php', { method: 'POST', body: formData }).catch(() => null);
+        const phpData = phpRes ? await phpRes.json().catch(() => ({})) : {};
+        if (phpRes && phpRes.ok && phpData.success && phpData.fileUrl) {
+          const urlInput = document.getElementById(sectionType === 'main' ? 'blp_main_pdf_url' : 'blp_free_pdf_url');
+          if (urlInput) urlInput.value = phpData.fileUrl;
+          window.updatePdfStatusPreview(sectionType, phpData.fileUrl);
+          showToast(`✅ ${file.name} सफलतापूर्वक अपलोड हो गई!`, 'success');
+        } else {
+          showToast(`❌ अपलोड विफल: ${res.error || phpData.error || 'Server error'}`, 'error');
+        }
       }
     } catch (err) {
       console.error('PDF upload error:', err);
@@ -3818,11 +3867,22 @@ export async function initBookLandingPages() {
       localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
     } catch(e) {}
 
-    showToast(`⏳ नई 120-पेज ई-बुक (${newBookId}) सर्वर पर पब्लिश हो रही है...`, 'info');
+    showToast(`⏳ नई 120-पेज ई-बुक (${newBookId}) Git पर पब्लिश हो रही है...`, 'info');
 
-    // Multi-Tier Server Sync
+    // Multi-Tier Server Sync to Git
     try {
-      await fetch('/api/save_book_landing.php', {
+      const apiUrl = getAutoSyncApiUrl();
+      await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save',
+          pageData: newLandingPageObj,
+          bookData: newBookObj,
+          uploadedFiles: []
+        })
+      });
+      fetch('/api/save_book_landing.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -3830,7 +3890,7 @@ export async function initBookLandingPages() {
           bookData: newBookObj,
           uploadedFiles: []
         })
-      });
+      }).catch(() => null);
     } catch(e) {}
 
     showToast(`🎉 बधाई! नई ई-बुक (${newBookId}: ${topic}) स्टोर व लैंडिंग पेज पर 100% लाइव हो गई!`, 'success');
@@ -4668,8 +4728,14 @@ export async function initBookLandingPages() {
       else customBooks.unshift(updatedCustom);
       localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
 
-      // Background server sync to save_book_landing.php
+      // Background server sync to Git + save_book_landing.php
       if (page) {
+        const apiUrl = getAutoSyncApiUrl();
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save', pageData: page, bookData: updatedCustom, uploadedFiles: [] })
+        }).catch(() => null);
         fetch('/api/save_book_landing.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -4711,8 +4777,14 @@ export async function initBookLandingPages() {
         localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
       }
 
-      // Background server sync to save_book_landing.php
+      // Background server sync to Git + save_book_landing.php
       if (page) {
+        const apiUrl = getAutoSyncApiUrl();
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save', pageData: page, bookData: updatedCustom || bookObj, uploadedFiles: [] })
+        }).catch(() => null);
         fetch('/api/save_book_landing.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -6201,7 +6273,8 @@ export async function initBookLandingPages() {
     showToast(`⏳ बुक (${bIdUpper}) को GitHub सर्वर से हटाया जा रहा है...`, 'info');
 
     try {
-      const delRes = await fetch('/api/auto-sync-book', {
+      const apiUrl = getAutoSyncApiUrl();
+      const delRes = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -6209,7 +6282,7 @@ export async function initBookLandingPages() {
           bookId: bIdUpper
         })
       });
-      const delData = await delRes.json();
+      const delData = await delRes.json().catch(() => ({}));
       if (delRes.ok && delData.success) {
         showToast(`🗑️ बुक (${bIdUpper}) GitHub सर्वर से 100% डिलीट हो गई! (लाइव अपडेट 20s में)`, 'success');
       } else {
@@ -6605,74 +6678,70 @@ export async function initBookLandingPages() {
       else allBooks.unshift(newBookObj);
     } catch (e) {}
 
-    // Multi-Tier Safe Save: Tier 1 (PHP save_book_landing.php) -> Tier 2 (Node auto-sync-book) -> Tier 3 (LocalStorage + JSON Backup)
+    // Multi-Tier Safe Save: Direct GitHub Auto-Sync (Vercel Node) + LocalStorage + PHP fallback
     const saveButtonEl = document.getElementById('btn_save_book_lp');
     const origSaveText = saveButtonEl ? saveButtonEl.innerHTML : '';
     if (saveButtonEl) {
       saveButtonEl.disabled = true;
-      saveButtonEl.innerHTML = '⏳ सर्वर पर सुरक्षित किया जा रहा है...';
+      saveButtonEl.innerHTML = '⏳ Git पर सुरक्षित किया जा रहा है...';
     }
 
-    showToast(`⏳ बुक (${bId}) को सर्वर पर सेव किया जा रहा है...`, 'info');
+    showToast(`⏳ बुक (${bId}) का डेटा व मीडिया फाइलें Git पर लाइव की जा रही हैं...`, 'info');
 
     let syncSuccess = false;
     let syncErrorMsg = '';
+    const apiUrl = getAutoSyncApiUrl();
 
     try {
-      // Step 1: Try native PHP atomic save endpoint
-      const phpRes = await fetch('/api/save_book_landing.php', {
+      // Step 1: Upload any media files (Cover, Banner, Demo pages, Section Banners, PDFs) directly to Git as assets
+      if (uploadedFiles.length > 0) {
+        for (let i = 0; i < uploadedFiles.length; i++) {
+          const fileItem = uploadedFiles[i];
+          const fileName = fileItem.path.split('/').pop();
+          if (saveButtonEl) {
+            saveButtonEl.innerHTML = `⏳ Git अपलोड (${i + 1}/${uploadedFiles.length}): ${fileName}...`;
+          }
+          const upRes = await syncAssetToGitHub(fileItem.path, fileItem.base64);
+          if (!upRes.success) {
+            console.warn(`Asset upload warning for ${fileItem.path}:`, upRes.error);
+          }
+        }
+      }
+
+      // Step 2: Publish landing page JSON and books.json catalog to Git
+      if (saveButtonEl) {
+        saveButtonEl.innerHTML = `⏳ Git पर JSON कैटलॉग अपडेट हो रहा है...`;
+      }
+
+      const syncRes = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save',
+          pageData,
+          bookData: newBookObj,
+          uploadedFiles: []
+        })
+      });
+
+      const syncData = await syncRes.json().catch(() => ({}));
+      if (syncRes.ok && syncData.success) {
+        syncSuccess = true;
+      } else {
+        syncErrorMsg = syncData.error || `HTTP ${syncRes.status}`;
+      }
+
+      // Step 3: Also update PHP file if running on PHP server
+      fetch('/api/save_book_landing.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pageData,
           bookData: newBookObj,
-          uploadedFiles
+          uploadedFiles: []
         })
-      });
+      }).catch(() => null);
 
-      if (phpRes.ok) {
-        const phpData = await phpRes.json().catch(() => ({}));
-        if (phpData.success) {
-          syncSuccess = true;
-        }
-      }
-
-      // Step 2: If PHP not available or returned 404/405, fallback to Node /api/auto-sync-book
-      if (!syncSuccess) {
-        for (let i = 0; i < uploadedFiles.length; i++) {
-          const fileItem = uploadedFiles[i];
-          if (saveButtonEl) {
-            saveButtonEl.innerHTML = `⏳ फ़ाइल (${i + 1}/${uploadedFiles.length}) अपलोड हो रही है...`;
-          }
-          await fetch('/api/auto-sync-book', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'upload_asset',
-              path: fileItem.path,
-              base64: fileItem.base64
-            })
-          }).catch(() => null);
-        }
-
-        const syncRes = await fetch('/api/auto-sync-book', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'save',
-            pageData,
-            bookData: newBookObj,
-            uploadedFiles: []
-          })
-        });
-
-        const syncData = await syncRes.json().catch(() => ({}));
-        if (syncRes.ok && syncData.success) {
-          syncSuccess = true;
-        } else {
-          syncErrorMsg = syncData.error || `HTTP ${syncRes.status}`;
-        }
-      }
     } catch (netErr) {
       syncErrorMsg = netErr.message || 'Network sync error';
     } finally {
@@ -6689,13 +6758,12 @@ export async function initBookLandingPages() {
         localStorage.setItem('AAROGYAM_DELETED_LANDING_PAGES', JSON.stringify(deletedIds));
       } catch (e) {}
 
-      showToast(`🎉 बुक (${bId}) सफलतापूर्वक सेव हो गई!`, 'success');
+      showToast(`🎉 बधाई! पुस्तक (${bId}) Git पर 100% लाइव हो गई! Vercel ऑटो-डिप्लॉयमेंट चालू हो गया है।`, 'success');
       builderCard.style.display = 'none';
       resetBookBuilder();
       await loadAllData();
     } else {
-      // LocalStorage already saved the data safely, so user didn't lose anything
-      showToast(`💾 बुक (${bId}) लोकल सुरक्षित हो गई है। सर्वर सिंक मैसेज: ${syncErrorMsg || 'ऑफ़लाइन'}`, 'warning');
+      showToast(`⚠️ Git सिंक मैसेज: ${syncErrorMsg || 'ऑफ़लाइन'} (डेटा लोकल सुरक्षित है)`, 'warning');
       builderCard.style.display = 'none';
       resetBookBuilder();
       await loadAllData();
