@@ -47,14 +47,14 @@
 
   const DAYS_HINDI = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
 
-  window.load7DayWeather = async function(locationKey, userLat = null, userLon = null, customCityName = '') {
+  window.load7DayWeather = async function(locationKey, userLat = null, userLon = null, customCityName = '', customStateName = '') {
     let lat, lon, displayName, displayState;
 
     if (userLat && userLon) {
       lat = userLat;
       lon = userLon;
       displayName = customCityName || 'मेरी लाइव लोकेशन';
-      displayState = 'GPS ऑटो-डिटेक्ट';
+      displayState = customStateName || 'GPS ऑटो-डिटेक्ट';
     } else {
       const loc = DISTRICT_COORDINATES[locationKey.toLowerCase()] || DISTRICT_COORDINATES['rewa'];
       lat = loc.lat;
@@ -253,12 +253,28 @@
     if (btn) btn.innerHTML = '⏳ GPS लोकेशन खोजी जा रही है...';
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        if (btn) btn.innerHTML = '📍 मेरी लाइव लोकेशन';
-        window.load7DayWeather('gps', pos.coords.latitude, pos.coords.longitude, 'मेरी लाइव लोकेशन');
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        let detectedCity = 'मेरी लाइव लोकेशन';
+        let detectedState = 'GPS डिटेक्टेड';
+
+        try {
+          const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=hi`);
+          if (geoRes.ok) {
+            const geoData = await geoRes.json();
+            const district = geoData.locality || geoData.city || geoData.principalSubdivision;
+            const state = geoData.principalSubdivision;
+            if (district) detectedCity = `${district}`;
+            if (state) detectedState = state;
+          }
+        } catch(e) {}
+
+        if (btn) btn.innerHTML = '📍 ' + detectedCity;
+        window.load7DayWeather('gps', lat, lon, detectedCity, detectedState);
       },
       (err) => {
-        if (btn) btn.innerHTML = '📍 मेरी लाइव लोकेशन';
+        if (btn) btn.innerHTML = '📍 मेरा जिला खोजें';
         alert('लोकेशन एक्सेस की अनुमति नहीं मिली। कृपया नीचे दिए गए जिलों में से चुनें।');
       },
       { timeout: 10000, enableHighAccuracy: true }
