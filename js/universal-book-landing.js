@@ -113,6 +113,7 @@
     renderDynamicOpenGraph();
     bindInteractiveEvents();
     renderFaqSection();
+    renderBookDetails();
   }
 
   function extractQueryParameters() {
@@ -973,6 +974,19 @@
         return `<div class="faq-item"><h3>${escapeHtml(question)}</h3><p>${escapeHtml(answer)}</p></div>`;
       })
       .join('');
+  }
+
+  function renderBookDetails() {
+    const landing = currentLandingData || {};
+    const book = currentBookData || {};
+    const hero = landing.hero || {};
+    const details = landing.book_details || landing.bookDetails || {};
+    const name = details.name || details.title || landing.book_name || landing.bookName || hero.title || book.heading || book.name || currentBookId;
+    setElemText('spec-name', name);
+    setElemText('spec-lang', details.language || landing.language || book.language || 'Hindi');
+    setElemText('spec-pages', `${details.pages || landing.totalPages || landing.total_pages || book.totalPages || 120}+ Pages`);
+    setElemText('spec-author', details.author || landing.author || book.author || 'Aarogyam India');
+    setElemText('spec-version', `${details.version || landing.version || book.version || '2026'} Edition`);
   }
 
   // ==========================================================
