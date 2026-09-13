@@ -20,6 +20,19 @@
           params.delete('book');
           const qs = params.toString() ? ('?' + params.toString()) : '';
           window.location.replace('/ebooks/kheti-dr.html' + qs);
+        } else if (bookId) {
+          // Immediately bind active book ID to share elements and checkout buttons
+          document.addEventListener('DOMContentLoaded', function() {
+            const bsd = document.getElementById('book-share-data');
+            if (bsd) bsd.dataset.id = bookId;
+            document.querySelectorAll('[data-share-button="true"]').forEach(function(b) {
+              b.dataset.assetId = bookId;
+            });
+            ['hero-buy-btn', 'vip-stack-unlock-btn', 'final-buy-btn', 'sticky-buy-btn'].forEach(function(bIdKey) {
+              const el = document.getElementById(bIdKey);
+              if (el) el.href = 'checkout.html?id=' + encodeURIComponent(bookId);
+            });
+          });
         }
       } catch (e) {}
     })();
@@ -247,7 +260,7 @@
             <button type="button" id="hero-add-cart-btn" class="sample-btn" style="background:#0284c7;color:#fff;border-color:#0284c7;cursor:pointer;">
               <i class="fa-solid fa-cart-plus"></i> Add to Cart
             </button>
-            <a id="hero-buy-btn" href="checkout.html?id=BK001" class="buy-btn">
+            <a id="hero-buy-btn" href="checkout.html" class="buy-btn">
               <i class="fa-solid fa-cart-shopping"></i> Buy Now
             </a>
             <button type="button" id="hero-share-btn" onclick="window.handleUniversalBookShare(event)" class="share-now-btn" style="cursor:pointer;">
@@ -469,7 +482,7 @@
           <div style="font-size: 2.2rem; font-weight: 900; color: #ffffff; line-height: 1.2;">
             <span id="stack-offer-price-val">₹99</span> <span id="stack-total-mrp-val" style="font-size: 1rem; text-decoration: line-through; color: #cbd5e1;">₹2098</span>
           </div>
-          <a id="vip-stack-unlock-btn" href="checkout.html?id=BK001" style="display: inline-block; background: #f59e0b; color: #000; font-weight: 900; padding: 10px 24px; border-radius: 8px; margin-top: 10px; text-decoration: none;">
+          <a id="vip-stack-unlock-btn" href="checkout.html" style="display: inline-block; background: #f59e0b; color: #000; font-weight: 900; padding: 10px 24px; border-radius: 8px; margin-top: 10px; text-decoration: none;">
             ⚡ तुरंत अनलॉक करें
           </a>
         </div>
@@ -681,7 +694,7 @@
               <a id="final-sample-btn" href="#sec-sample-book" class="sample-btn">
                 📖 Sample Book
               </a>
-              <a id="final-buy-btn" href="checkout.html?id=BK001" class="buy-btn">
+              <a id="final-buy-btn" href="checkout.html" class="buy-btn">
                 🛒 Buy Now
               </a>
             </div>
@@ -747,15 +760,15 @@
       <i class="fa-solid fa-share-nodes"></i>
       <span>Share</span>
     </div>
-    <button class="desktop-share-btn share-whatsapp" type="button" data-share-button="true" data-share-target="whatsapp" data-asset-type="book" id="share-bar-wa" data-asset-id="BK001">
+    <button class="desktop-share-btn share-whatsapp" type="button" data-share-button="true" data-share-target="whatsapp" data-asset-type="book" id="share-bar-wa" data-asset-id="">
       <i class="fa-brands fa-whatsapp"></i>
       <span>WhatsApp</span>
     </button>
-    <button class="desktop-share-btn share-facebook" type="button" data-share-button="true" data-share-target="facebook" data-asset-type="book" id="share-bar-fb" data-asset-id="BK001">
+    <button class="desktop-share-btn share-facebook" type="button" data-share-button="true" data-share-target="facebook" data-asset-type="book" id="share-bar-fb" data-asset-id="">
       <i class="fa-brands fa-facebook-f"></i>
       <span>Facebook</span>
     </button>
-    <button class="desktop-share-btn share-copy" type="button" data-share-button="true" data-share-target="copy" data-asset-type="book" id="share-bar-cp" data-asset-id="BK001">
+    <button class="desktop-share-btn share-copy" type="button" data-share-button="true" data-share-target="copy" data-asset-type="book" id="share-bar-cp" data-asset-id="">
       <i class="fa-solid fa-link"></i>
       <span>Copy Link</span>
     </button>
@@ -763,11 +776,11 @@
 
   <!-- BOOK SHARE INFORMATION (FOR SHARE ENGINE) -->
   <div id="book-share-data"
-       data-id="BK001"
-       data-title="खरीफ फसल मास्टर गाइड 2026"
-       data-description="सम्पूर्ण Practical Guide | Aarogyam India"
-       data-price="₹99"
-       data-mrp="₹299"
+       data-id=""
+       data-title=""
+       data-description=""
+       data-price=""
+       data-mrp=""
        data-url=""
        data-image="">
   </div>
@@ -785,21 +798,21 @@
     <div class="mobile-book-preview">
       <img id="sticky-thumb-img" src="" alt="Thumbnail">
       <div class="mobile-book-info">
-        <h4 id="sticky-book-title">खरीफ फसल मास्टर गाइड 2026</h4>
+        <h4 id="sticky-book-title">...</h4>
         <div class="mobile-book-price">
-          <span id="sticky-mrp-val" class="old-price">₹299</span>
-          <strong id="sticky-price-val" class="offer-price">₹99</strong>
+          <span id="sticky-mrp-val" class="old-price"></span>
+          <strong id="sticky-price-val" class="offer-price"></strong>
         </div>
       </div>
     </div>
 
     <!-- 3. MOBILE SHARE BUTTON -->
-    <button class="sticky-share-btn" id="mobileShareButton" type="button" data-share-button="true" data-share-target="native" data-asset-type="book" data-asset-id="BK001">
+    <button class="sticky-share-btn" id="mobileShareButton" type="button" data-share-button="true" data-share-target="native" data-asset-type="book" data-asset-id="">
       Share
     </button>
 
     <!-- 4. BUY NOW BUTTON -->
-    <a id="sticky-buy-btn" href="checkout.html?id=BK001" class="sticky-buy-btn">
+    <a id="sticky-buy-btn" href="checkout.html" class="sticky-buy-btn">
       Buy Now
     </a>
   </div>

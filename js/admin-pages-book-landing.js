@@ -1023,6 +1023,21 @@ export async function initBookLandingPages() {
               </button>
             </div>
 
+            <!-- Option E: Audio Studio Direct Connector -->
+            <div style="margin-top: 12px; padding: 12px; background: rgba(59,130,246,0.12); border: 1.5px solid #3b82f6; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <span style="font-weight: 800; color: #60a5fa; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+                  🎧 <strong>मुख्य पुस्तक ऑडियो स्टूडियो (Main Book Audio Studio):</strong>
+                </span>
+                <span style="font-size: 0.78rem; color: #cbd5e1; display: block; margin-top: 2px;">
+                  इस पुस्तक के सभी पेजों की WebP इमेजेस, पेज-वाइज़ वॉइस रिकॉर्डिंग व ऑडियो स्टूडियो में डायरेक्ट काम करें।
+                </span>
+              </div>
+              <button type="button" onclick="window.openBookAudioStudio('${bId}')" class="admin-button" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(37,99,235,0.35); cursor: pointer;">
+                🎙️ मुख्य पुस्तक ऑडियो स्टूडियो खोलें (${bId})
+              </button>
+            </div>
+
             <div id="blp_main_pdf_status_wrap" style="margin-top: 10px; font-size: 0.8rem; color: #94a3b8; display: none;">
               <!-- Current file status indicator -->
             </div>
@@ -1095,6 +1110,21 @@ export async function initBookLandingPages() {
               </span>
               <button type="button" onclick="window.copyGitPdfPath('free')" class="admin-button small-button" style="background: rgba(16,185,129,0.25); border: 1px solid #34d399; color: #34d399; padding: 4px 10px; font-size: 0.76rem; border-radius: 6px; font-weight: 700; cursor: pointer;">
                 📋 Option D: Git फ्री PDF पाथ कॉपी करें
+              </button>
+            </div>
+
+            <!-- Option E: Audio Studio Direct Connector for Demo Book -->
+            <div style="margin-top: 12px; padding: 12px; background: rgba(16,185,129,0.12); border: 1.5px solid #10b981; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <span style="font-weight: 800; color: #34d399; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+                  🎧 <strong>डेमो पुस्तक ऑडियो स्टूडियो (Demo Book Audio Studio):</strong>
+                </span>
+                <span style="font-size: 0.78rem; color: #cbd5e1; display: block; margin-top: 2px;">
+                  इस डेमो पुस्तक के सैंपल पेजों की रिकॉर्डिंग, ऑडियो स्क्रिप्ट व वॉइस सिंक्रोनाइज़ेशन तैयार करें।
+                </span>
+              </div>
+              <button type="button" onclick="window.openBookAudioStudio('DEMO_${bId}')" class="admin-button" style="background: linear-gradient(135deg, #059669, #047857); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(16,185,129,0.35); cursor: pointer;">
+                🎙️ डेमो ऑडियो स्टूडियो खोलें (DEMO_${bId})
               </button>
             </div>
 
@@ -4982,6 +5012,18 @@ export async function initBookLandingPages() {
     }
   };
 
+  // Connect & Open Book Audio Studio directly for main book or demo book
+  window.openBookAudioStudio = function(targetBookId) {
+    if (!targetBookId) targetBookId = 'BK015';
+    const cleanId = String(targetBookId).trim().toUpperCase();
+    showToast(`🎧 ऑडियो स्टूडियो खोला जा रहा है (${cleanId})...`, 'info');
+    if (typeof window.navigateTo === 'function') {
+      window.navigateTo(`book-audio-studio?id=${encodeURIComponent(cleanId)}`);
+    } else {
+      window.location.hash = `#book-audio-studio?id=${encodeURIComponent(cleanId)}`;
+    }
+  };
+
   // Admin Live Audio Preview Player
   let adminTestAudioObj = null;
   let adminTestBgmObj = null;
@@ -6565,7 +6607,7 @@ export async function initBookLandingPages() {
     const audioTitle = (document.getElementById('blp_audio_title')?.value || '').trim() || `${title} का लाइव ऑडियो परिचय सुनें`;
     const audioSubtitle = (document.getElementById('blp_audio_subtitle')?.value || '').trim() || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
     const audioTtsText = (document.getElementById('blp_audio_tts_text')?.value || '').trim();
-    const audioStoryText = (document.getElementById('blp_audio_story_text')?.value || '').trim();
+    const audioStoryText = (document.getElementById('blp_audio_story_text')?.value || '').trim() || audioTtsText;
     const audioOfferCallout = (document.getElementById('blp_audio_offer_box')?.value || '').trim();
     const isAudioBgmOn = document.getElementById('blp_audio_bgm_enabled')?.checked ?? true;
 
