@@ -1264,7 +1264,7 @@
     }
 
     // Limit to top 2 for clean side-by-side combo like Kheti Dr
-    const displayBooks = comboBooks.slice(0, 2);
+    const displayBooks = comboBooks;
     const totalPrice = displayBooks.reduce((sum, b) => sum + (parseInt(b.offerPrice, 10) || 99), 0);
 
     grid.innerHTML = displayBooks.map((b, idx) => `
