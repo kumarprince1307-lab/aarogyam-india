@@ -561,45 +561,46 @@
       "id": "BK015",
       "slug": "bk015",
       "category": "Agriculture",
-      "status": "active",
+      "status": "draft",
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
       "google_analytics_enabled": true,
-      "theme_primary": "#EA580C",
-      "theme_dark": "#C2410C",
+      "theme_primary": "#1D4ED8",
+      "theme_dark": "#1E40AF",
       "cover_effect": "3d_float",
       "sticky_button_text": "BY NOW",
       "sections_order": [
         "sec_hero",
         "sec_timer",
-        "sec_kpis",
-        "sec_why_buy",
-        "sec_trust",
         "sec_audio",
-        "sec_vip_stack",
         "sec_video",
+        "sec_why_buy",
+        "sec_kpis",
+        "sec_trust",
+        "sec_vip_stack",
         "sec_preview",
         "sec_suggested",
         "sec_bonuses",
         "sec_ai_support",
         "sec_specs_toc",
         "sec_reviews",
-        "sec_final_buy",
         "sec_faqs",
         "sec_help",
         "sec_pdf_main",
+        "sec_final_buy",
         "sec_pdf_free"
       ],
       "hidden_sections": [],
       "section_banners": {
         "sec_ai_support": "/images/banners/bk015-sec_ai_support-banner.webp",
-        "sec_audio": "/images/banners/bk015-sec_audio-banner.webp",
         "sec_why_buy": "/images/banners/bk015-sec_why_buy-banner.webp",
         "sec_specs_toc": "/images/banners/bk015-sec_specs_toc-banner.webp",
         "sec_faqs": "/images/banners/bk015-sec_faqs-banner.webp",
         "sec_preview": "/images/banners/bk015-sec_preview-banner.webp",
-        "sec_audio": "/images/banners/bk015-sec_audio-banner.webp"
+        "sec_audio": "/images/banners/bk015-sec_audio-banner.webp",
+        "sec_vip_stack": "/images/banners/bk015-sec_vip_stack-banner.webp",
+        "sec_final_buy": "/images/banners/bk015-sec_final_buy-banner.webp"
       },
       "og_title": "🌱 सब्जी खेती मास्टर PART 1",
       "og_description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू",
@@ -615,7 +616,7 @@
         "mode": "tts",
         "mp3_url": "",
         "tts_text": "किसान भाइयों, क्या आप टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती करना चाहते हैं। बीज चयन और खेत की तैयारी से लेकर बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक की पूरी प्रक्रिया अब आपको एक ही जगह मिलेगी।\n\nयह कोई साधारण किताब नहीं है, बल्कि यह भारत की पहली डिजिटल कृषि ऑडियो बुक है जिसे आप न सिर्फ ई-बुक के रूप में डाउनलोड करके पढ़ सकते हैं, बल्कि इसे सुन भी सकते हैं। इस संपूर्ण मार्गदर्शक में आपको सैकड़ों वास्तविक तस्वीरें, टेबल, चार्ट और चेकलिस्ट मिलेंगी जो खेती को बेहद आसान बनाती हैं।\n\nकम लागत में बंपर पैदावार और लाखों का मुनाफा कमाने का यह सबसे बेहतरीन मौका है। अभी मात्र 149 रुपये के विशेष ऑफर में इस अद्भुत ज्ञान को अपनाएं और अपनी खेती को सफलता की नई ऊंचाइयों पर ले जाएं।",
-        "story_text": "",
+        "story_text": "किसान भाइयों, क्या आप टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती करना चाहते हैं। बीज चयन और खेत की तैयारी से लेकर बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक की पूरी प्रक्रिया अब आपको एक ही जगह मिलेगी।\n\nयह कोई साधारण किताब नहीं है, बल्कि यह भारत की पहली डिजिटल कृषि ऑडियो बुक है जिसे आप न सिर्फ ई-बुक के रूप में डाउनलोड करके पढ़ सकते हैं, बल्कि इसे सुन भी सकते हैं। इस संपूर्ण मार्गदर्शक में आपको सैकड़ों वास्तविक तस्वीरें, टेबल, चार्ट और चेकलिस्ट मिलेंगी जो खेती को बेहद आसान बनाती हैं।\n\nकम लागत में बंपर पैदावार और लाखों का मुनाफा कमाने का यह सबसे बेहतरीन मौका है। अभी मात्र 149 रुपये के विशेष ऑफर में इस अद्भुत ज्ञान को अपनाएं और अपनी खेती को सफलता की नई ऊंचाइयों पर ले जाएं।",
         "highlights": [
           {
             "icon": "🐛",
@@ -708,6 +709,7 @@
         "vip_value": 1999,
         "bonus_value": 199,
         "offer_price": 1,
+        "vip_banner": "/images/banners/bk015-sec_vip_stack-banner.webp",
         "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए यह गाइड उनके प्लान में 100% मुफ्त शामिल है।"
       },
       "why_read": {
@@ -793,17 +795,26 @@
           "ratio": "9:16"
         }
       ],
-      "testimonials": [],
+      "testimonials": [
+        {
+          "name": "संतुष्ट पाठक",
+          "location": "भारत",
+          "rating": 5,
+          "gender": "male",
+          "comment": "बहुत ही उपयोगी व व्यावहारिक पुस्तक है।"
+        }
+      ],
       "final_buy": {
-        "title": "🌱 सब्जी खेती मास्टर (PART 1)",
-        "description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती — बीज से बाजार तक सम्पूर्ण प्रैक्टिकल समाधान!",
+        "title": "🌱 सब्जी खेती मास्टर  (PART 1)",
+        "description": "11 प्रमुख सब्जियों की खेती — बीज से बाजार तक व्यावहारिक मार्गदर्शन | 154 पेज",
         "benefits": [
-          "Full PDF eBook & Audio Book",
-          "📱 मोबाइल में कभी भी पढ़ें (Offline Friendly)",
-          "Instant Download & Lifetime Access",
-          "🎁 Share करें और Surprise Gift जीतें",
-          "💬 पढ़ते समय सवाल हो? WhatsApp Help से पूछें"
-        ]
+          "24×7 WhatsApp Support",
+          "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+          "📖 किताब की जानकारी समझने में सहायता",
+          "🌱 फसल संबंधी सवाल",
+          "📱 Mobile Friendly PDF & Lifetime Access"
+        ],
+        "banner_image": "/images/banners/bk015-sec_final_buy-banner.webp"
       },
       "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।"
     }
