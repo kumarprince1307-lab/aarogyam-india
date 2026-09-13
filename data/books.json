@@ -467,7 +467,9 @@
         "Free Bonus PDF",
         "with Audio "
       ],
-      "totalPages": 120,
+      "totalPages": 154,
+      "author": "Dada Avnish Mishra",
+      "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html"
