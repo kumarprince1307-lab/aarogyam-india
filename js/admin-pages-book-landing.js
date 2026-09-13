@@ -582,6 +582,13 @@ export async function initBookLandingPages() {
           <!-- Optional Section Banner for Specs -->
           ${renderSectionBannerUploaderBlock('sec_specs_toc', '📑 पुस्तक जानकारी व TOC सेक्शन बैनर (वैकल्पिक)')}
 
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;">
+            <input id="blp_book_author" class="admin-input" placeholder="लेखक / Author" />
+            <input id="blp_book_language" class="admin-input" placeholder="भाषा / Language" />
+            <input id="blp_book_pages" class="admin-input" type="number" min="1" placeholder="कुल पेज" />
+            <input id="blp_book_version" class="admin-input" placeholder="संस्करण / Version" />
+          </div>
+
           <div id="blp_toc_points_list_wrap" style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
             <!-- Rendered dynamically -->
           </div>
@@ -1334,6 +1341,11 @@ export async function initBookLandingPages() {
   document.getElementById('btn_add_toc_point_item')?.addEventListener('click', () => {
     currentTocPoints.push('नया अध्याय व विषय');
     renderTocPointsInBuilder();
+  });
+
+  document.getElementById('btn_add_faq_item')?.addEventListener('click', () => {
+    currentFaqs.push({ q: 'नया प्रश्न', a: 'नया उत्तर' });
+    renderFaqsInBuilder();
   });
 
   // GitHub Cover Image Dropdown Sync (Mutual Exclusion: Clears File Input)
@@ -3049,6 +3061,10 @@ export async function initBookLandingPages() {
       'उर्वरक प्रबंधन',
       'रोग एवं कीट प्रबंधन'
     ];
+    document.getElementById('blp_book_author').value = page.author || '';
+    document.getElementById('blp_book_language').value = page.language || 'Hindi';
+    document.getElementById('blp_book_pages').value = page.totalPages || 120;
+    document.getElementById('blp_book_version').value = page.version || '2026';
     currentFaqs = page.faqs || [];
     currentSectionsOrder = (page.sections_order && Array.isArray(page.sections_order) && page.sections_order.length > 0) ? 
       [...page.sections_order] : defaultSectionsList.map(s => s.key);
@@ -3364,7 +3380,12 @@ export async function initBookLandingPages() {
 
     const pageData = {
       id: bId,
+      updated_at: new Date().toISOString(),
       slug: bId.toLowerCase(),
+      author: (document.getElementById('blp_book_author')?.value || '').trim(),
+      language: (document.getElementById('blp_book_language')?.value || 'Hindi').trim(),
+      totalPages: parseInt(document.getElementById('blp_book_pages')?.value, 10) || 120,
+      version: (document.getElementById('blp_book_version')?.value || '2026').trim(),
       category: category,
       status: document.getElementById('blp_status')?.value || 'active',
       facebook_pixel_id: isFbOn ? '1671873500553134' : 'disabled',
@@ -3468,7 +3489,10 @@ export async function initBookLandingPages() {
       freePdf: finalFreePdfPath,
       demoPdf: finalFreePdfPath,
       features: currentKpis.map(k => (typeof k === 'object' ? k.text : k)).filter(Boolean),
-      totalPages: 120,
+      totalPages: pageData.totalPages,
+      author: pageData.author,
+      language: pageData.language,
+      version: pageData.version,
       landingPage: `/ebooks/book-landing.html?id=${bId}`,
       checkoutPage: '/ebooks/checkout.html',
       readerPage: '/ebooks/reader.html'

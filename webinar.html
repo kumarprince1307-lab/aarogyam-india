@@ -1737,8 +1737,68 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       const webinarId = urlParams.get('id') || urlParams.get('wb') || 'WB_MASTER';
-      const refShareId = urlParams.get('ref') || urlParams.get('share_id') || 'AI000004';
+      let refShareId = urlParams.get('ref') || urlParams.get('share_id') || 'AI000004';
       const specificVid = urlParams.get('vid');
+
+      function generateShareId() {
+        const stamp = Date.now().toString(36).toUpperCase();
+        const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+        return `AI${stamp}${suffix}`;
+      }
+
+      function getWebinarRegistrations() {
+        try {
+          const raw = localStorage.getItem('AAROGYAM_WEBINAR_REGISTRATIONS');
+          const parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function getActiveRegistration() {
+        const records = getWebinarRegistrations();
+        const match = records.find(record => record.webinarId === webinarId && record.token && record.mobile);
+        if (match) return match;
+        const aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        if (aiUser && aiUser.webinarId === webinarId && aiUser.share_id) return aiUser;
+        return null;
+      }
+
+      function syncRefShareId() {
+        const activeReg = getActiveRegistration();
+        const storedShareId = activeReg?.share_id || localStorage.getItem('AAROGYAM_WEBINAR_CURRENT_SHARE_ID') || localStorage.getItem('WB_SHARE_ID');
+        if (storedShareId) {
+          refShareId = storedShareId;
+        }
+        return refShareId;
+      }
+
+      function buildTrackedShareUrl(baseUrl, explicitShareId = syncRefShareId()) {
+        try {
+          const url = new URL(baseUrl);
+          const params = new URLSearchParams(url.search);
+          if (explicitShareId) {
+            params.set('share_id', explicitShareId);
+            params.set('ref', explicitShareId);
+          }
+          url.search = params.toString();
+          return url.toString();
+        } catch (e) {
+          const separator = baseUrl.includes('?') ? '&' : '?';
+          const suffix = explicitShareId ? `${separator}ref=${encodeURIComponent(explicitShareId)}&share_id=${encodeURIComponent(explicitShareId)}` : '';
+          return `${baseUrl}${suffix}`;
+        }
+      }
+
+      function writeLocalWebinarEvent(type, payload = {}) {
+        try {
+          const events = JSON.parse(localStorage.getItem('AAROGYAM_WEBINAR_EVENTS') || '[]');
+          const entry = { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, type, webhook_id: webinarId, created_at: new Date().toISOString(), ...payload };
+          events.push(entry);
+          localStorage.setItem('AAROGYAM_WEBINAR_EVENTS', JSON.stringify(events));
+        } catch (e) {}
+      }
 
       let masterData = {
         title: '💼 NetSurf Career Plan + Digital Marketing Training अगर आप सीखना चाहते हैं:',
@@ -1965,43 +2025,86 @@
           const now = Date.now();
           const diffToStart = targetTs - now;
           const diffToEnd = endTs - now;
-          const isTwoMinBefore = diffToStart <= (2 * 60 * 1000);
-
+          const durationMs = (masterData.duration_minutes || 90) * 60 * 1000;
           const joinBtn = document.getElementById('wb_direct_join_btn');
           const timerStatusLabel = document.getElementById('wb_timer_status_label');
+          const midEl = document.getElementById('wb_unlocked_mid');
+          const passEl = document.getElementById('wb_unlocked_pass');
+          const meetId = masterData.meeting_id || 'Meeting ID unavailable';
+          const passcode = masterData.passcode || 'Passcode unavailable';
 
-          // STAGE 3: Session Ended
-          if (diffToEnd <= 0) {
+          if (diffToStart > 120000) {
             document.getElementById('wb_days').textContent = '00';
             document.getElementById('wb_hours').textContent = '00';
             document.getElementById('wb_mins').textContent = '00';
             document.getElementById('wb_secs').textContent = '00';
-            if (timerStatusLabel) timerStatusLabel.innerHTML = '⏰ <strong>आज का लाइव सत्र समाप्त हो चुका है। नीचे रिकॉर्डेड वीडियो व शॉर्ट्स देखें।</strong>';
+            if (timerStatusLabel) timerStatusLabel.innerHTML = '⏳ <strong>Opens 2 minutes before start</strong>';
             if (joinBtn) {
+              joinBtn.disabled = true;
+              joinBtn.setAttribute('aria-disabled', 'true');
               joinBtn.style.background = '#475569';
-              joinBtn.textContent = '🎬 AarogyamTube वीडियो देखें';
-              joinBtn.href = '#wb_shorts_section';
-              joinBtn.onclick = null;
+              joinBtn.style.opacity = '0.8';
+              joinBtn.innerHTML = '⏳ Opens 2 minutes before start';
+              joinBtn.removeAttribute('href');
+              joinBtn.onclick = (event) => event.preventDefault();
             }
+            if (midEl) midEl.textContent = 'Available 2 mins before start';
+            if (passEl) passEl.textContent = 'Locked until live';
             return;
           }
 
-          // STAGE 2: Live Now (or 2 Min Before Start)
-          if (isTwoMinBefore) {
+          if (diffToEnd <= 0 || diffToStart < -durationMs) {
             document.getElementById('wb_days').textContent = '00';
             document.getElementById('wb_hours').textContent = '00';
             document.getElementById('wb_mins').textContent = '00';
             document.getElementById('wb_secs').textContent = '00';
-            if (timerStatusLabel) timerStatusLabel.innerHTML = '🟢 <strong>लाइव क्लास चालू है! नीचे बटन दबाकर ज़ूम से जुड़ें।</strong>';
+            if (timerStatusLabel) timerStatusLabel.innerHTML = '⏰ <strong>Meeting Ended</strong>';
             if (joinBtn) {
+              joinBtn.disabled = true;
+              joinBtn.setAttribute('aria-disabled', 'true');
+              joinBtn.style.background = '#475569';
+              joinBtn.style.opacity = '0.8';
+              joinBtn.innerHTML = 'Meeting Ended';
+              joinBtn.removeAttribute('href');
+              joinBtn.onclick = (event) => event.preventDefault();
+            }
+            if (midEl) midEl.textContent = 'Session complete';
+            if (passEl) passEl.textContent = 'No access';
+            return;
+          }
+
+          if (diffToStart <= 120000 && diffToStart >= -durationMs) {
+            document.getElementById('wb_days').textContent = '00';
+            document.getElementById('wb_hours').textContent = '00';
+            document.getElementById('wb_mins').textContent = '00';
+            document.getElementById('wb_secs').textContent = '00';
+            if (timerStatusLabel) timerStatusLabel.innerHTML = '🟢 <strong>Join now</strong>';
+            if (midEl) midEl.textContent = meetId;
+            if (passEl) passEl.textContent = passcode;
+            if (joinBtn) {
+              joinBtn.disabled = false;
               joinBtn.style.background = 'linear-gradient(135deg, #16a34a, #22c55e)';
+              joinBtn.style.opacity = '1';
               joinBtn.innerHTML = '🟢 Join Zoom Meeting Now <i class="fa-solid fa-arrow-right"></i>';
               joinBtn.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.6)';
+
+                            const normalizedMeetingId = String(meetId).replace(/[^0-9]/g, '');
+              const zoomWebJoin = normalizedMeetingId ? `https://zoom.us/j/${normalizedMeetingId}${passcode ? `?pwd=${encodeURIComponent(passcode)}` : ''}` : 'https://zoom.us/join';
+              const nativeJoin = normalizedMeetingId ? `zoomus://zoom.us/join?confno=${encodeURIComponent(normalizedMeetingId)}${passcode ? `&pwd=${encodeURIComponent(passcode)}` : ''}` : 'zoomus://zoom.us/join';
+              joinBtn.href = nativeJoin;
+              joinBtn.setAttribute('data-web-fallback', zoomWebJoin);
+              joinBtn.onclick = function (event) {
+                if (!window.navigator || !window.navigator.userAgent || !/Android|iPhone|iPad|iPod/i.test(window.navigator.userAgent)) {
+                  joinBtn.href = zoomWebJoin;
+                } else {
+                  joinBtn.href = nativeJoin;
+                }
+                window.trackZoomAttendance?.();
+              };
             }
             return;
           }
 
-          // STAGE 1: Upcoming Countdown
           if (timerStatusLabel) timerStatusLabel.innerHTML = '⏳ <strong>लाइव ज़ूम वेबिनार प्रारंभ होने में शेष समय:</strong>';
           const days = Math.max(0, Math.floor(diffToStart / (1000 * 60 * 60 * 24)));
           const hours = Math.max(0, Math.floor((diffToStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
@@ -2051,23 +2154,34 @@
           return;
         }
 
-        // Save session locally so user stays on page unlocked INSTANTLY
-        const userObj = {
+        const shareId = generateShareId();
+        const registrationRecord = {
+          webinarId: webinarId,
           name: name,
           mobile: mobile,
-          share_id: 'AI' + mobile.slice(-6),
+          share_id: shareId,
+          token: `wb-${webinarId}-${Date.now()}`,
           registered_at: new Date().toISOString(),
           source: 'webinar'
         };
+
+        const registrations = getWebinarRegistrations();
+        const filtered = registrations.filter(record => record.webinarId !== webinarId);
+        filtered.push(registrationRecord);
+        localStorage.setItem('AAROGYAM_WEBINAR_REGISTRATIONS', JSON.stringify(filtered));
+        localStorage.setItem('AAROGYAM_WEBINAR_CURRENT_SHARE_ID', shareId);
+        localStorage.setItem('WB_SHARE_ID', shareId);
         localStorage.setItem('aim_user_name', name);
         localStorage.setItem('aim_user_mobile', mobile);
-        localStorage.setItem('AI_USER', JSON.stringify(userObj));
+        localStorage.setItem('AI_USER', JSON.stringify({ ...registrationRecord, share_id: shareId }));
+        localStorage.setItem(`wb_registered_${webinarId}`, 'true');
+        localStorage.setItem('wb_registered', 'true');
         sessionStorage.setItem(`wb_reg_${webinarId}`, 'true');
+        refShareId = shareId;
+        writeLocalWebinarEvent('webinar_registration', { name, mobile, share_id: shareId, webinar_id: webinarId, source: 'webinar' });
 
-        // Instantly unlock UI without network delay
         showUnlockedScreen();
 
-        // Background asynchronous registration log (non-blocking zero-egress)
         if (db) {
           setTimeout(async () => {
             try {
@@ -2087,13 +2201,16 @@
       });
 
       function checkUserSessionStatus() {
+        syncRefShareId();
+        const activeReg = getActiveRegistration();
+        const isValidToken = Boolean(activeReg && activeReg.token && activeReg.webinarId === webinarId);
         let aiUser = {};
         try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
         const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name || localStorage.getItem('user_name');
         const uMobile = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone || localStorage.getItem('user_phone') || localStorage.getItem('farmer_mobile');
-        const isReg = sessionStorage.getItem(`wb_reg_${webinarId}`) || localStorage.getItem('wb_registered');
+        const isReg = sessionStorage.getItem(`wb_reg_${webinarId}`) || localStorage.getItem(`wb_registered_${webinarId}`) || localStorage.getItem('wb_registered');
 
-        if (uName || uMobile || isReg) {
+        if (isValidToken || uName || uMobile || isReg) {
           showUnlockedScreen();
         } else {
           const regBox = document.getElementById('wb_reg_box');
@@ -2116,13 +2233,22 @@
 
         let joinUrl = masterData.zoom_link;
         if (!joinUrl && masterData.meeting_id) {
-          joinUrl = `https://zoom.us/j/${masterData.meeting_id.replace(/[^0-9]/g, '')}${masterData.passcode ? '?pwd=' + encodeURIComponent(masterData.passcode) : ''}`;
+          joinUrl = `https://zoom.us/j/${String(masterData.meeting_id).replace(/[^0-9]/g, '')}${masterData.passcode ? '?pwd=' + encodeURIComponent(masterData.passcode) : ''}`;
         }
         const directBtn = document.getElementById('wb_direct_join_btn');
         if (directBtn) {
-          directBtn.href = joinUrl || 'https://zoom.us/join';
-          directBtn.onclick = function() {
-            window.trackZoomAttendance();
+          const normalizedMeetingId = String(masterData.meeting_id || '').replace(/[^0-9]/g, '');
+          const nativeJoin = normalizedMeetingId ? `zoomus://zoom.us/join?confno=${encodeURIComponent(normalizedMeetingId)}${masterData.passcode ? `&pwd=${encodeURIComponent(masterData.passcode)}` : ''}` : 'zoomus://zoom.us/join';
+          const webJoin = joinUrl || 'https://zoom.us/join';
+          directBtn.href = nativeJoin;
+          directBtn.setAttribute('data-web-fallback', webJoin);
+          directBtn.onclick = function (event) {
+            if (!window.navigator || !window.navigator.userAgent || !/Android|iPhone|iPad|iPod/i.test(window.navigator.userAgent)) {
+              directBtn.href = webJoin;
+            } else {
+              directBtn.href = nativeJoin;
+            }
+            window.trackZoomAttendance?.();
           };
         }
       }
@@ -2131,6 +2257,7 @@
       window.trackZoomAttendance = function() {
         const mobile = localStorage.getItem('aim_user_mobile') || 'guest';
         const name = localStorage.getItem('aim_user_name') || 'किसान साथी';
+        writeLocalWebinarEvent('webinar_attendance', { name, mobile, share_id: refShareId, webinar_id: webinarId, joined_at: new Date().toISOString() });
         if (db) {
           db.from('surveys').insert([{
             phone_number: mobile,
@@ -2140,7 +2267,7 @@
             occupation: 'webinar_attendee',
             notes: `Joined Zoom Meeting: ${masterData.title}`,
             event_type: 'webinar_attendance',
-            category_answers: { webinar_id: masterData.id || 'WB_MASTER', joined_at: new Date().toISOString() }
+            category_answers: { webinar_id: masterData.id || 'WB_MASTER', joined_at: new Date().toISOString(), referrer_share_id: refShareId }
           }]).catch(() => {});
         }
       };
@@ -2155,18 +2282,18 @@
 
       // Social Share Handlers
       window.shareWbWhatsApp = function () {
-        const shareLink = `https://aarogyamindia.online/api/share?type=webinar&share_id=${encodeURIComponent(refShareId)}`;
+        const shareLink = buildTrackedShareUrl('https://aarogyamindia.online/api/share?type=webinar');
         const msg = `🔴 *${masterData.title}*\n\n📅 समय: ${document.getElementById('wb_date_label')?.textContent || 'आज का लाइव सत्र'}\n\n👉 *मुफ्त ज़ूम लिंक व सीट बुकिंग के लिए यहाँ क्लिक करें:*\n${shareLink}\n\n(ज़ूम लिंक और पासवर्ड समय पर खुलेगा)\n\n सादर,\n${localStorage.getItem('aim_user_name') || 'Aarogyam India'}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
       };
 
       window.shareWbFacebook = function () {
-        const shareLink = `https://aarogyamindia.online/api/share?type=webinar&share_id=${encodeURIComponent(refShareId)}`;
+        const shareLink = buildTrackedShareUrl('https://aarogyamindia.online/api/share?type=webinar');
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`, '_blank', 'width=600,height=400');
       };
 
       window.copyWbShareLink = function () {
-        const shareLink = `https://aarogyamindia.online/api/share?type=webinar&share_id=${encodeURIComponent(refShareId)}`;
+        const shareLink = buildTrackedShareUrl('https://aarogyamindia.online/api/share?type=webinar');
         navigator.clipboard.writeText(shareLink).then(() => {
           alert('📋 रेफरल शेयर लिंक कॉपी हो गया:\n' + shareLink);
         });

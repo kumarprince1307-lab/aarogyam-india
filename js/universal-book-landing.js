@@ -158,7 +158,7 @@
       }
     } catch (e) {}
 
-    // 3. Scan LocalStorage for latest Admin Edits (ALWAYS OVERRIDE STATIC JSON)
+    // 3. Use local edits only when they are newer than the deployed JSON.
     try {
       const stored = localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES');
       if (stored) {
@@ -173,7 +173,12 @@
               (x.slug && itemSlugLower && x.slug.trim().toLowerCase() === itemSlugLower)
             );
             if (idx >= 0) {
-              allLandingPages[idx] = item; // Override with latest admin edit
+              const deployed = allLandingPages[idx];
+              const localUpdated = Date.parse(item.updated_at || item.updatedAt || '') || 0;
+              const deployedUpdated = Date.parse(deployed.updated_at || deployed.updatedAt || '') || 0;
+              if (localUpdated > deployedUpdated) {
+                allLandingPages[idx] = item;
+              }
             } else {
               allLandingPages.unshift(item);
             }
@@ -421,6 +426,7 @@
     renderSectionBanner('sec-sample-book', sb.sec_preview || l.preview_banner);
     renderSectionBanner('sec-suggested-books', sb.sec_suggested || l.suggested_banner);
     renderSectionBanner('sec-bonus-wrapper', sb.sec_bonuses || l.bonuses_banner);
+    renderSectionBanner('sec-ai-support', sb.sec_ai_support || l.ai_support_banner);
     renderSectionBanner('sec-book-details', sb.sec_specs_toc || l.specs_banner);
     renderSectionBanner('sec-customer-reviews', sb.sec_reviews || l.reviews_banner);
     renderSectionBanner('sec-faq-section', sb.sec_faqs || l.faqs_banner);
@@ -1012,7 +1018,7 @@
     }
 
     // Limit to top 2 for clean side-by-side combo like Kheti Dr
-    const displayBooks = comboBooks.slice(0, 2);
+    const displayBooks = comboBooks;
     const totalPrice = displayBooks.reduce((sum, b) => sum + (parseInt(b.offerPrice, 10) || 99), 0);
 
     grid.innerHTML = displayBooks.map((b, idx) => `
@@ -1473,7 +1479,7 @@
       if (!bannerWrap) {
         bannerWrap = document.createElement('div');
         bannerWrap.className = 'ubl-section-banner-wrap';
-        bannerWrap.innerHTML = `<img src="${escapeHtml(bannerUrl.trim())}" alt="Section Banner" class="ubl-section-banner-img" />`;
+        bannerWrap.innerHTML = `<img src="${escapeHtml(bannerUrl.trim())}" alt="Section Banner" class="ubl-section-banner-img" onerror="window.handleImageError(this)" />`;
         // Insert right after container heading or at top of section
         const container = secEl.querySelector('.container') || secEl;
         if (container.firstChild) {
@@ -1483,7 +1489,10 @@
         }
       } else {
         const img = bannerWrap.querySelector('img');
-        if (img) img.src = bannerUrl.trim();
+        if (img) {
+          img.dataset.fallbackApplied = '';
+          img.src = bannerUrl.trim();
+        }
         bannerWrap.style.display = 'block';
       }
     } else {
@@ -1498,9 +1507,23 @@
     if (el) el.textContent = txt;
   }
 
+  window.handleImageError = function (img) {
+    if (!img || img.dataset.fallbackApplied === 'true') return;
+    img.dataset.fallbackApplied = 'true';
+    img.src = '/images/banners/agriculture-hero-banner-1.webp';
+  };
+
   function setElemSrc(id, src) {
     const el = document.getElementById(id);
-    if (el && src) el.src = src;
+    if (el && src) {
+      const version = currentLandingData?.updated_at || currentLandingData?.updatedAt;
+      const nextSrc = version && !String(src).startsWith('data:')
+        ? `${src}${String(src).includes('?') ? '&' : '?'}v=${encodeURIComponent(version)}`
+        : String(src);
+      if (el.src !== new URL(nextSrc, window.location.href).href) {
+        el.src = nextSrc;
+      }
+    }
   }
 
   function setMetaProp(id, val) {

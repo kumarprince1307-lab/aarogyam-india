@@ -62,8 +62,8 @@ function githubRequest(endpoint, method, token, body = null) {
 
       const cleanToken = String(token || '').trim();
       const authHeader = cleanToken.startsWith('github_pat_') || cleanToken.startsWith('ghp_')
-        ? `Bearer ${cleanToken}`
-        : `token ${cleanToken}`;
+        ? 'Bearer ' + cleanToken
+        : 'token ' + cleanToken;
 
       const headers = {
         'User-Agent': 'Aarogyam-Auto-Sync/1.0',
