@@ -1068,16 +1068,16 @@ Instant Download & Lifetime Access
                   🎧 <strong>मुख्य पुस्तक ऑडियो स्टूडियो व Git वेब रीडर (Audio Studio & Web Reader):</strong>
                 </span>
                 <span style="font-size: 0.78rem; color: #cbd5e1; display: block; margin-top: 2px;">
-                  ⚡ <strong>Git Reader Folder:</strong> आधुनिक वेब रीडर सीधे <code>/images/books/${bId}/</code> फोल्डर से WebP पेजों को लोड करता है। PDF फाइल केवल उपयोगकर्ताओं के 'Download PDF' बटन के लिए है।
+                  ⚡ <strong>Git Reader Folder:</strong> आधुनिक वेब रीडर सीधे <code>/images/books/[BOOK_ID]/</code> फोल्डर से WebP पेजों को लोड करता है। PDF फाइल केवल उपयोगकर्ताओं के 'Download PDF' बटन के लिए है।
                 </span>
               </div>
               <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button type="button" onclick="window.openBookAudioStudio('${bId}')" class="admin-button" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(37,99,235,0.35); cursor: pointer;">
-                  🎙️ ऑडियो स्टूडियो खोलें (${bId})
+                <button type="button" onclick="window.openBookAudioStudio()" class="admin-button" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(37,99,235,0.35); cursor: pointer;">
+                  🎙️ ऑडियो स्टूडियो खोलें
                 </button>
-                <a href="/ebooks/reader.html?book=${bId}" target="_blank" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 700; padding: 7px 14px; font-size: 0.82rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22,163,74,0.35);">
+                <button type="button" onclick="window.openLiveReader(false)" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 700; padding: 7px 14px; font-size: 0.82rem; border-radius: 6px; border:none; cursor:pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22,163,74,0.35);">
                   📖 रीडर में चेक करें
-                </a>
+                </button>
               </div>
             </div>
 
@@ -1163,16 +1163,16 @@ Instant Download & Lifetime Access
                   🎧 <strong>डेमो पुस्तक ऑडियो स्टूडियो व Git वेब रीडर (Demo Audio Studio & Reader):</strong>
                 </span>
                 <span style="font-size: 0.78rem; color: #cbd5e1; display: block; margin-top: 2px;">
-                  ⚡ <strong>Git Demo Folder:</strong> डेमो रीडर सीधे <code>/images/books/${bId}/</code> या डेमो पेजों से लोड होता है।
+                  ⚡ <strong>Git Demo Folder:</strong> डेमो रीडर सीधे <code>/images/books/[BOOK_ID]/</code> या डेमो पेजों से लोड होता है।
                 </span>
               </div>
               <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button type="button" onclick="window.openBookAudioStudio('DEMO_${bId}')" class="admin-button" style="background: linear-gradient(135deg, #059669, #047857); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(16,185,129,0.35); cursor: pointer;">
-                  🎙️ डेमो ऑडियो स्टूडियो खोलें (DEMO_${bId})
+                <button type="button" onclick="window.openBookAudioStudio('DEMO')" class="admin-button" style="background: linear-gradient(135deg, #059669, #047857); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(16,185,129,0.35); cursor: pointer;">
+                  🎙️ डेमो ऑडियो स्टूडियो खोलें
                 </button>
-                <a href="/ebooks/reader.html?book=${bId}&demo=1" target="_blank" class="admin-button" style="background: #0d9488; color: #fff; font-weight: 700; padding: 7px 14px; font-size: 0.82rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(13,148,136,0.35);">
+                <button type="button" onclick="window.openLiveReader(true)" class="admin-button" style="background: #0d9488; color: #fff; font-weight: 700; padding: 7px 14px; font-size: 0.82rem; border-radius: 6px; border:none; cursor:pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(13,148,136,0.35);">
                   📖 डेमो रीडर चेक करें
-                </a>
+                </button>
               </div>
             </div>
 
@@ -5062,14 +5062,28 @@ Instant Download & Lifetime Access
 
   // Connect & Open Book Audio Studio directly for main book or demo book
   window.openBookAudioStudio = function(targetBookId) {
-    if (!targetBookId) targetBookId = 'BK015';
-    const cleanId = String(targetBookId).trim().toUpperCase();
+    let cleanId = '';
+    const curId = (document.getElementById('blp_input_book_id')?.value || 'BK015').trim().toUpperCase();
+    if (!targetBookId) {
+      cleanId = curId;
+    } else if (targetBookId === 'DEMO') {
+      cleanId = `DEMO_${curId}`;
+    } else {
+      cleanId = String(targetBookId).trim().toUpperCase();
+    }
     showToast(`🎧 ऑडियो स्टूडियो खोला जा रहा है (${cleanId})...`, 'info');
     if (typeof window.navigateTo === 'function') {
       window.navigateTo(`book-audio-studio?id=${encodeURIComponent(cleanId)}`);
     } else {
       window.location.hash = `#book-audio-studio?id=${encodeURIComponent(cleanId)}`;
     }
+  };
+
+  // Open Live Reader for the currently edited book (Main or Demo)
+  window.openLiveReader = function(isDemo = false) {
+    const curId = (document.getElementById('blp_input_book_id')?.value || 'BK015').trim().toUpperCase();
+    const url = isDemo ? `/ebooks/reader.html?book=${encodeURIComponent(curId)}&demo=1` : `/ebooks/reader.html?book=${encodeURIComponent(curId)}`;
+    window.open(url, '_blank');
   };
 
   // Admin Live Audio Preview Player
