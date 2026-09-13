@@ -3334,8 +3334,8 @@ section{
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16), 0 0 0 rgba(46, 125, 50, 0);
   }
   50% {
-    transform: translateY(-6px) scale(1.008);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24), 0 0 20px rgba(245, 158, 11, 0.22);
+    transform: translateY(-8px) scale(1.008);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.26), 0 0 22px rgba(245, 158, 11, 0.25);
   }
   100% {
     transform: translateY(0px) scale(1);
@@ -3348,7 +3348,7 @@ section{
     transform: scale(1.02) translateY(0px);
   }
   50% {
-    transform: scale(1.05) translateY(-6px);
+    transform: scale(1.06) translateY(-8px);
   }
   100% {
     transform: scale(1.02) translateY(0px);
@@ -3361,43 +3361,68 @@ section{
     box-shadow: -15px 20px 40px rgba(0, 0, 0, 0.35);
   }
   50% {
-    transform: perspective(1000px) rotateY(-8deg) translateY(-8px);
-    box-shadow: -20px 28px 50px rgba(0, 0, 0, 0.45);
+    transform: perspective(1000px) rotateY(-7deg) translateY(-12px);
+    box-shadow: -22px 32px 55px rgba(0, 0, 0, 0.5);
   }
 }
 
-.hero-banner-bg {
-  animation: heroBgWave 12s ease-in-out infinite alternate !important;
+@keyframes aiSupportFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.02);
+  }
+}
+
+.hero-banner-bg,
+#hero-banner-img {
+  animation: heroBgWave 10s ease-in-out infinite alternate !important;
   will-change: transform;
 }
 
-.hero-book-cover:not(.static-cover) {
-  animation: bookCoverFloat 4.5s ease-in-out infinite alternate !important;
+.hero-book-cover:not(.static-cover),
+#hero-book-cover:not(.static-cover) {
+  animation: bookCoverFloat 4s ease-in-out infinite alternate !important;
+  will-change: transform;
 }
 
-.ubl-section-banner-wrap {
+.ubl-section-banner-wrap,
+.preview-banner,
+#preview-banner-wrap,
+#ubl-audio-section-banner-wrap,
+#vip-banner-img {
   width: 100%;
   max-width: 100%;
   margin: 18px auto 26px auto;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   border: 1.5px solid rgba(255, 255, 255, 0.15);
-  animation: bannerSubtleWave 5s ease-in-out infinite;
+  animation: bannerSubtleWave 5.5s ease-in-out infinite !important;
   transition: transform 0.35s ease, box-shadow 0.35s ease;
   box-sizing: border-box;
 }
 
-.ubl-section-banner-wrap:hover {
-  transform: translateY(-8px) scale(1.015);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+.ai-support-image img,
+#ai-support-cover-img {
+  animation: aiSupportFloat 5s ease-in-out infinite alternate !important;
+}
+
+.ubl-section-banner-wrap:hover,
+.preview-banner:hover,
+#preview-banner-wrap:hover,
+#ubl-audio-section-banner-wrap:hover {
+  transform: translateY(-10px) scale(1.018);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
 }
 
 .ubl-section-banner-img,
 .ubl-section-banner-wrap img,
 #ubl-audio-section-banner-wrap img,
 .preview-banner img,
-#preview-banner-img {
+#preview-banner-img,
+#vip-banner-img {
   width: 100% !important;
   max-width: 100% !important;
   height: auto !important;
@@ -3405,30 +3430,6 @@ section{
   max-height: none !important;
   display: block !important;
   border-radius: 12px;
-}
-
-.preview-banner,
-#preview-banner-wrap {
-  width: 100%;
-  max-width: 100%;
-  margin: 18px auto 26px auto;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
-  animation: bannerSubtleWave 5s ease-in-out infinite;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-  box-sizing: border-box;
-}
-
-.preview-banner:hover,
-#preview-banner-wrap:hover {
-  transform: translateY(-8px) scale(1.015);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
-}
-
-#ubl-audio-section-banner-wrap {
-  animation: bannerSubtleWave 5s ease-in-out infinite;
-  transition: transform 0.35s ease;
 }
 
 .preview-card {
@@ -3445,7 +3446,8 @@ section{
   .ubl-section-banner-wrap,
   .preview-banner,
   #preview-banner-wrap,
-  #ubl-audio-section-banner-wrap {
+  #ubl-audio-section-banner-wrap,
+  #vip-banner-img {
     margin: 12px 0 18px 0;
     border-radius: 10px;
     width: 100% !important;
@@ -3455,7 +3457,8 @@ section{
   .ubl-section-banner-wrap img,
   #ubl-audio-section-banner-wrap img,
   .preview-banner img,
-  #preview-banner-img {
+  #preview-banner-img,
+  #vip-banner-img {
     border-radius: 10px;
     width: 100% !important;
     height: auto !important;

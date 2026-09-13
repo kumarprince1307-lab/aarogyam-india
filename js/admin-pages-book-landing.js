@@ -809,7 +809,10 @@ export async function initBookLandingPages() {
               <input type="text" id="blp_ai_support_title" placeholder="🌾 FREE AI WHATSAPP SUPPORT & SPRAY FORMULA 🎁" class="admin-input" style="padding: 6px 10px; font-size: 0.85rem; font-weight: 700; width: 100%;" />
             </div>
             <div>
-              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">AI सपोर्ट इमेज URL / Icon:</label>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; margin: 0;">AI सपोर्ट इमेज URL / Icon:</label>
+                <span style="font-size: 0.7rem; background: rgba(56,189,248,0.15); color: #38bdf8; padding: 1px 6px; border-radius: 4px; font-weight: 700;">📐 साइज़: 600 × 600 px / 800 × 600 px</span>
+              </div>
               <input type="text" id="blp_ai_support_cover" placeholder="/images/books/kharif-fasal-hero-2.webp" class="admin-input" style="padding: 6px 10px; font-size: 0.85rem; width: 100%;" />
             </div>
           </div>
@@ -1878,27 +1881,6 @@ export async function initBookLandingPages() {
       </div>
     </div>
   `;
-
-  // Helper to render section banner uploader blocks in HTML
-  function renderSectionBannerUploaderBlock(secKey, labelText) {
-    return `
-      <div style="background: rgba(0,0,0,0.25); border: 1.5px dashed rgba(255,255,255,0.2); border-radius: 8px; padding: 10px 12px; margin-top: 8px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
-          <label style="font-weight: 700; font-size: 0.8rem; color: #93c5fd;">${labelText}</label>
-          <button type="button" onclick="window.clearSectionBanner('${secKey}')" class="admin-button small-button" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 1px 6px; font-size: 0.72rem;">
-            🗑️ बैनर हटाएं
-          </button>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 8px; align-items: center;">
-          <input type="file" accept="image/*" onchange="window.uploadSectionBannerFile('${secKey}', event)" style="font-size: 0.75rem;" />
-          <input type="text" id="blp_sec_banner_${secKey}" placeholder="या इमेज URL / Path दर्ज करें" oninput="window.setSectionBannerUrl('${secKey}', this.value)" class="admin-input" style="padding: 4px 8px; font-size: 0.78rem;" />
-        </div>
-        <div id="blp_sec_banner_preview_wrap_${secKey}" style="margin-top: 6px; display: none;">
-          <img id="blp_sec_banner_preview_${secKey}" src="" style="width: 100%; max-height: 90px; object-fit: cover; border-radius: 4px; border: 1px solid var(--admin-border);" />
-        </div>
-      </div>
-    `;
-  }
 
   // Bind Top Listeners
   const builderCard = document.getElementById('admin-book-builder-card');
@@ -6147,12 +6129,15 @@ export async function initBookLandingPages() {
     }
 
     // Section Banners Mapping
-    currentSectionBanners = page.section_banners || {};
+    currentSectionBanners = { ...(page.section_banners || {}) };
     if (page.preview_banner && !currentSectionBanners.sec_preview) {
       currentSectionBanners.sec_preview = page.preview_banner;
     }
     if (page.value_stack?.vip_banner && !currentSectionBanners.sec_vip_stack) {
       currentSectionBanners.sec_vip_stack = page.value_stack.vip_banner;
+    }
+    if (page.audio_layer?.banner_image && !currentSectionBanners.sec_audio) {
+      currentSectionBanners.sec_audio = page.audio_layer.banner_image;
     }
 
     defaultSectionsList.forEach(s => {

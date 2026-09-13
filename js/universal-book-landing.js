@@ -248,8 +248,8 @@
                 ...item,
                 hero: mergedHero,
                 demo_images: mergedDemo,
-                audio_layer: item.audio_layer ? { ...(serverPage.audio_layer || {}), ...item.audio_layer } : serverPage.audio_layer,
-                section_banners: item.section_banners ? { ...(serverPage.section_banners || {}), ...item.section_banners } : serverPage.section_banners
+                audio_layer: item.audio_layer !== undefined ? item.audio_layer : serverPage.audio_layer,
+                section_banners: item.section_banners !== undefined ? item.section_banners : serverPage.section_banners
               };
             } else {
               allLandingPages.unshift(item);
@@ -1955,7 +1955,9 @@
     const subtitleEl = document.getElementById('ubl-audio-subtitle');
     const bannerWrap = document.getElementById('ubl-audio-section-banner-wrap');
     const bannerImg = document.getElementById('ubl-audio-section-banner-img');
-    const bannerUrl = audioLayer.banner_image || l.section_banners?.sec_audio;
+    const bannerUrl = (l.section_banners && l.section_banners.sec_audio !== undefined)
+      ? l.section_banners.sec_audio
+      : (audioLayer.banner_image || l.section_banners?.sec_audio || '');
 
     if (h2El && audioLayer.main_heading) {
       h2El.innerHTML = escapeHtml(audioLayer.main_heading);
@@ -1970,8 +1972,9 @@
       bannerImg.src = window.resolveImageSrc(bannerUrl.trim());
       bannerImg.onerror = function() { window.handleImageError(this); };
       bannerWrap.style.display = 'block';
-    } else if (bannerWrap) {
-      bannerWrap.style.display = 'none';
+    } else {
+      if (bannerWrap) bannerWrap.style.display = 'none';
+      if (bannerImg) bannerImg.src = '';
     }
 
     // Render Story Text
