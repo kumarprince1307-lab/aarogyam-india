@@ -561,13 +561,13 @@
       "id": "BK015",
       "slug": "bk015",
       "category": "Agriculture",
-      "status": "draft",
+      "status": "active",
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
       "google_analytics_enabled": true,
-      "theme_primary": "#1D4ED8",
-      "theme_dark": "#1E40AF",
+      "theme_primary": "#D97706",
+      "theme_dark": "#B45309",
       "cover_effect": "3d_float",
       "sticky_button_text": "BY NOW",
       "sections_order": [
@@ -675,7 +675,7 @@
         "subtitle": "11 प्रमुख सब्जियों की खेती — बीज से बाजार तक व्यावहारिक मार्गदर्शन | 154 पेज",
         "description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू\n",
         "mrp": 1999,
-        "offer_price": 1,
+        "offer_price": 149,
         "offer_badge": "Launch Offer",
         "rating_score": "4.9",
         "rating_count": "120+ Ratings",
@@ -708,7 +708,7 @@
         "book_mrp": 299,
         "vip_value": 1999,
         "bonus_value": 199,
-        "offer_price": 1,
+        "offer_price": 149,
         "vip_banner": "/images/banners/bk015-sec_vip_stack-banner.webp",
         "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए यह गाइड उनके प्लान में 100% मुफ्त शामिल है।"
       },
@@ -765,15 +765,24 @@
         {
           "id": "BK002",
           "link": "BK002",
-          "title": "खेती का डॉक्टर",
+          "title": "खेती का डॉक्टर (Pocket Doctor)",
           "image": "/images/books/fasal-ka-doctor-cover.webp",
           "offerPrice": 99,
           "mrp": 299
+        },
+        {
+          "id": "BK015",
+          "link": "BK015",
+          "title": "🌱 सब्जी खेती मास्टर  (PART 1)",
+          "image": "/images/books/bk015-cover.webp",
+          "offerPrice": 149,
+          "mrp": 1999
         }
       ],
       "suggested_books": [
         "BK001",
-        "BK002"
+        "BK002",
+        "BK015"
       ],
       "table_of_contents": [
         "बीज उपचार",
