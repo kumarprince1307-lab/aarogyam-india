@@ -402,8 +402,8 @@
         "my_library",
         "home_page"
       ],
-      "store_badge": "new_arrival",
-      "badge": "new_arrival",
+      "store_badge": "best_seller",
+      "badge": "best_seller",
       "isComingSoon": false,
       "mainPdf": "",
       "pdf_url": "",
@@ -449,7 +449,8 @@
           }
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1999 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
-        "bgm_enabled": true
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
       },
       "features": [
         "120 पेज की प्रीमियम",
