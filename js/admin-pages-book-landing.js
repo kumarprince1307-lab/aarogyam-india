@@ -843,11 +843,22 @@ export async function initBookLandingPages() {
           <!-- Optional Section Banner for Specs -->
           ${renderSectionBannerUploaderBlock('sec_specs_toc', '📑 पुस्तक जानकारी व TOC सेक्शन बैनर (वैकल्पिक)')}
 
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;">
-            <input id="blp_book_author" class="admin-input" placeholder="लेखक / Author" />
-            <input id="blp_book_language" class="admin-input" placeholder="भाषा / Language" />
-            <input id="blp_book_pages" class="admin-input" type="number" min="1" placeholder="कुल पेज" />
-            <input id="blp_book_version" class="admin-input" placeholder="संस्करण / Version" />
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px;">
+            <label class="admin-label">Book Name / पुस्तक का नाम
+              <input id="blp_book_name" class="admin-input" placeholder="पुस्तक का नाम" />
+            </label>
+            <label class="admin-label">Author / लेखक
+              <input id="blp_book_author" class="admin-input" placeholder="लेखक / Author" />
+            </label>
+            <label class="admin-label">Language / भाषा
+              <input id="blp_book_language" class="admin-input" placeholder="भाषा / Language" />
+            </label>
+            <label class="admin-label">Pages / कुल पेज
+              <input id="blp_book_pages" class="admin-input" type="number" min="1" placeholder="कुल पेज" />
+            </label>
+            <label class="admin-label">Version / संस्करण
+              <input id="blp_book_version" class="admin-input" placeholder="संस्करण / Version" />
+            </label>
           </div>
 
           <div id="blp_toc_points_list_wrap" style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
@@ -6366,6 +6377,7 @@ Instant Download & Lifetime Access
       'उर्वरक प्रबंधन',
       'रोग एवं कीट प्रबंधन'
     ];
+    document.getElementById('blp_book_name').value = page.book_name || page.bookName || page.hero?.title || page.heading || '';
     document.getElementById('blp_book_author').value = page.author || '';
     document.getElementById('blp_book_language').value = page.language || 'Hindi';
     document.getElementById('blp_book_pages').value = page.totalPages || 120;
@@ -6733,6 +6745,7 @@ Instant Download & Lifetime Access
       id: bId,
       updated_at: new Date().toISOString(),
       slug: bId.toLowerCase(),
+      book_name: (document.getElementById('blp_book_name')?.value || '').trim(),
       author: (document.getElementById('blp_book_author')?.value || '').trim(),
       language: (document.getElementById('blp_book_language')?.value || 'Hindi').trim(),
       totalPages: parseInt(document.getElementById('blp_book_pages')?.value, 10) || 120,
