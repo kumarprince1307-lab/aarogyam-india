@@ -84,7 +84,9 @@ class UniversalShareEngine {
         const pageTitle = document.title;
 
         const shareUrl = this.generateShareLink(assetType, assetId);
-        const shareText = `Check this out: ${pageTitle}`;
+        const shareDataEl = document.getElementById('book-share-data');
+        const customShareText = shareDataEl?.dataset?.shareMessage?.trim();
+        const shareText = customShareText || `Check this out: ${pageTitle}`;
 
         // ==========================================
         // 1. TRACK 'share' EVENT IN SUPABASE

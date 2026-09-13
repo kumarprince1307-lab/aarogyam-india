@@ -616,6 +616,7 @@
       shareDataEl.dataset.id = b.id || currentBookId;
       shareDataEl.dataset.title = title;
       shareDataEl.dataset.description = desc;
+      shareDataEl.dataset.shareMessage = l.whatsapp_share_message || l.whatsapp_share_text || '';
       shareDataEl.dataset.price = `₹${offer}`;
       shareDataEl.dataset.mrp = `₹${mrp}`;
       shareDataEl.dataset.url = window.location.href;
