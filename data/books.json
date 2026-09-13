@@ -395,7 +395,7 @@
       "cover": "/images/books/bk015-cover.webp",
       "thumbnail": "/images/books/bk015-cover.webp",
       "banner": "/images/banners/bk015-hero-banner.webp",
-      "status": "active",
+      "status": "draft",
       "publish_targets": [
         "ebook_store",
         "category_page",
@@ -407,8 +407,8 @@
       "isComingSoon": false,
       "mainPdf": "/uploads/books/BK015_main.pdf",
       "pdf_url": "/uploads/books/BK015_main.pdf",
-      "freePdf": "/uploads/books/BK002_free.pdf",
-      "demoPdf": "/uploads/books/BK002_free.pdf",
+      "freePdf": "",
+      "demoPdf": "",
       "og_image": "/images/books/bk015-og.webp",
       "og_image_landscape": "/images/books/bk015-og.webp",
       "audio_layer": {
