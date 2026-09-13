@@ -142,9 +142,30 @@
   window.handleImageError = function(img) {
     if (!img) return;
     const currentSrc = img.getAttribute('src') || '';
+    if (!currentSrc || currentSrc === '') return;
+
+    // Check if this is a section banner or optional image
+    const isSectionBanner = img.classList.contains('ubl-section-banner-img') ||
+      img.id === 'ubl-audio-section-banner-img' ||
+      img.id === 'preview-banner-img' ||
+      img.id === 'vip-banner-img' ||
+      img.id === 'hero-banner-img' ||
+      img.classList.contains('hero-banner-bg');
+
     if (!img.dataset.retryCount) img.dataset.retryCount = '0';
     let retries = parseInt(img.dataset.retryCount, 10);
-    if (retries >= 3) return;
+
+    if (retries >= 2) {
+      if (isSectionBanner) {
+        img.style.display = 'none';
+        const wrap = img.closest('.ubl-section-banner-wrap') ||
+          document.getElementById('ubl-audio-section-banner-wrap') ||
+          document.getElementById('preview-banner-wrap');
+        if (wrap) wrap.style.display = 'none';
+      }
+      return;
+    }
+
     img.dataset.retryCount = String(retries + 1);
 
     if (retries === 0) {
@@ -157,12 +178,6 @@
       }
     } else if (retries === 1) {
       img.src = currentSrc.replace(/^(\.\.\/|\/)+/, '');
-    } else {
-      if (img.classList.contains('hero-book-cover') || img.id === 'hero-book-cover') {
-        img.src = '../images/books/kharif-master-guide-2026-cover.webp';
-      } else if (img.classList.contains('hero-banner-bg') || img.id === 'hero-banner-img') {
-        img.src = '../images/banners/kharif-master-guide-2026-hero-banner.webp';
-      }
     }
   };
 
@@ -463,8 +478,8 @@
     const mrp = hero.mrp || b.mrp || 299;
     const offer = hero.offer_price || b.offerPrice || 99;
     const badge = hero.offer_badge || 'Launch Offer';
-    const cover = hero.cover_image || b.cover || b.thumbnail || '../images/books/kharif-master-guide-2026-cover.webp';
-    const banner = hero.banner_image || b.banner || '../images/banners/kharif-master-guide-2026-hero-banner.webp';
+    const cover = hero.cover_image || b.cover || b.thumbnail || '';
+    const banner = hero.banner_image || b.banner || '';
     const ratingScore = hero.rating_score || '4.9';
     const ratingCount = hero.rating_count || '120+ Ratings';
 
@@ -487,15 +502,37 @@
 
     const coverImg = document.getElementById('hero-book-cover');
     if (coverImg) {
-      coverImg.src = window.resolveImageSrc(cover);
-      coverImg.onerror = function() { window.handleImageError(this); };
+      if (cover) {
+        coverImg.src = window.resolveImageSrc(cover);
+        coverImg.onerror = function() { window.handleImageError(this); };
+        coverImg.style.display = 'block';
+      } else {
+        coverImg.style.display = 'none';
+      }
       if (l.cover_effect === 'static') {
         coverImg.classList.add('static-cover');
       } else {
         coverImg.classList.remove('static-cover');
       }
     }
-    setElemSrc('hero-banner-img', banner);
+
+    const heroBannerImg = document.getElementById('hero-banner-img');
+    if (heroBannerImg) {
+      if (banner && typeof banner === 'string' && banner.trim().length > 0) {
+        heroBannerImg.src = window.resolveImageSrc(banner.trim());
+        heroBannerImg.style.display = 'block';
+        heroBannerImg.onerror = function() { window.handleImageError(this); };
+      } else {
+        heroBannerImg.src = '';
+        heroBannerImg.style.display = 'none';
+      }
+    }
+
+    const stickyThumb = document.getElementById('sticky-thumb-img');
+    if (stickyThumb && cover) {
+      stickyThumb.src = window.resolveImageSrc(cover);
+      stickyThumb.onerror = function() { window.handleImageError(this); };
+    }
 
     // Universal Section Banners Injection (Only shows if banner is present)
     const sb = l.section_banners || {};
@@ -729,9 +766,11 @@
       aiSupportSec.style.display = 'block';
       const aiTitle = l.ai_support_title || '🌾 FREE AI WHATSAPP SUPPORT & SPRAY FORMULA 🎁';
       const aiDesc = l.ai_support_desc || 'किताब पढ़ते समय अगर कोई बात समझ न आए, पोषक तत्वों की पहचान, महत्वपूर्ण टिप्स या फसल की समस्या हो, तो परेशान होने की जरूरत नहीं। बस WhatsApp Help बटन पर क्लिक करें और अपनी समस्या बताएं।';
-      const aiCover = l.ai_support_cover || '/images/books/kharif-fasal-hero-2.webp';
+      const aiCover = l.ai_support_cover || hero.cover_image || b.cover || '';
 
-      setElemSrc('ai-support-cover-img', aiCover);
+      if (aiCover) {
+        setElemSrc('ai-support-cover-img', aiCover);
+      }
       setElemText('ai-support-title', aiTitle);
       setElemText('ai-support-desc', aiDesc);
 
@@ -1954,10 +1993,11 @@
     const titleEl = document.getElementById('ubl-audio-title');
     const subtitleEl = document.getElementById('ubl-audio-subtitle');
     const bannerWrap = document.getElementById('ubl-audio-section-banner-wrap');
-    const bannerImg = document.getElementById('ubl-audio-section-banner-img');
-    const bannerUrl = (l.section_banners && l.section_banners.sec_audio !== undefined)
-      ? l.section_banners.sec_audio
-      : (audioLayer.banner_image || l.section_banners?.sec_audio || '');
+    const bannerUrl = (l.section_banners && typeof l.section_banners.sec_audio === 'string' && l.section_banners.sec_audio.trim().length > 0)
+      ? l.section_banners.sec_audio.trim()
+      : ((audioLayer.banner_image && typeof audioLayer.banner_image === 'string' && audioLayer.banner_image.trim().length > 0)
+        ? audioLayer.banner_image.trim()
+        : '');
 
     if (h2El && audioLayer.main_heading) {
       h2El.innerHTML = escapeHtml(audioLayer.main_heading);
@@ -1968,13 +2008,17 @@
     if (titleEl) titleEl.textContent = audioLayer.title || `${b.heading || b.name || 'पुस्तक'} का लाइव ऑडियो परिचय सुनें`;
     if (subtitleEl) subtitleEl.textContent = audioLayer.subtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
 
-    if (bannerUrl && typeof bannerUrl === 'string' && bannerUrl.trim().length > 0 && bannerWrap && bannerImg) {
-      bannerImg.src = window.resolveImageSrc(bannerUrl.trim());
+    if (bannerUrl && bannerWrap && bannerImg) {
+      bannerImg.src = window.resolveImageSrc(bannerUrl);
+      bannerImg.style.display = 'block';
       bannerImg.onerror = function() { window.handleImageError(this); };
       bannerWrap.style.display = 'block';
     } else {
       if (bannerWrap) bannerWrap.style.display = 'none';
-      if (bannerImg) bannerImg.src = '';
+      if (bannerImg) {
+        bannerImg.src = '';
+        bannerImg.style.display = 'none';
+      }
     }
 
     // Render Story Text

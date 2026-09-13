@@ -126,12 +126,12 @@ export async function initBookLandingPages() {
             <label style="font-weight: 700; font-size: 0.8rem; color: #93c5fd;">${labelText}</label>
             <span style="font-size: 0.72rem; background: rgba(56,189,248,0.15); color: #38bdf8; padding: 1px 6px; border-radius: 4px; font-weight: 700;">📐 साइज़: ${recommendedSize}</span>
           </div>
-          <button type="button" onclick="window.clearSectionBanner('${secKey}')" class="admin-button small-button" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 1px 6px; font-size: 0.72rem;">
+          <button type="button" onclick="window.clearSectionBanner('${secKey}')" class="admin-button small-button" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 1px 6px; font-size: 0.72rem; cursor: pointer;">
             🗑️ बैनर हटाएं
           </button>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 8px; align-items: center;">
-          <input type="file" accept="image/*" onchange="window.uploadSectionBannerFile('${secKey}', event)" style="font-size: 0.75rem;" />
+          <input type="file" id="blp_sec_banner_file_${secKey}" accept="image/*" onchange="window.uploadSectionBannerFile('${secKey}', event)" style="font-size: 0.75rem;" />
           <input type="text" id="blp_sec_banner_${secKey}" placeholder="या इमेज URL / Path दर्ज करें" oninput="window.setSectionBannerUrl('${secKey}', this.value)" class="admin-input" style="padding: 4px 8px; font-size: 0.78rem;" />
         </div>
         <div id="blp_sec_banner_preview_wrap_${secKey}" style="margin-top: 6px; display: none;">
@@ -1959,8 +1959,12 @@ export async function initBookLandingPages() {
   window.clearSectionBanner = function(secKey) {
     delete currentSectionBanners[secKey];
     const input = document.getElementById(`blp_sec_banner_${secKey}`);
+    const fileInput = document.getElementById(`blp_sec_banner_file_${secKey}`);
     const wrap = document.getElementById(`blp_sec_banner_preview_wrap_${secKey}`);
+    const img = document.getElementById(`blp_sec_banner_preview_${secKey}`);
     if (input) input.value = '';
+    if (fileInput) fileInput.value = '';
+    if (img) img.src = '';
     if (wrap) wrap.style.display = 'none';
     showToast('🗑️ सेक्शन बैनर हटा दिया गया', 'info');
   };
@@ -2474,44 +2478,34 @@ export async function initBookLandingPages() {
           const title = p.hero?.title || p.heading || p.name || 'Untitled Book';
 
           return `
-            <div style="background: var(--admin-surface, #1e293b); border: 1.5px solid var(--admin-border); border-radius: 12px; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto auto; gap: 16px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: border-color 0.2s;">
-              <!-- 1. Cover & ID Badge -->
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <img src="${coverImg}" alt="Cover" style="width: 48px; height: 64px; object-fit: contain; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1); background: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3);" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
-                <div>
-                  <span style="font-family: monospace; font-size: 1rem; font-weight: 900; color: ${themeCol}; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px; display: inline-block;">
-                    ${p.id}
-                  </span>
-                  <div style="font-size: 0.72rem; color: var(--admin-muted); margin-top: 4px; font-weight: 700;">
-                    📁 ${p.category || 'Agriculture'}
+            <div style="background: var(--admin-surface, #1e293b); border: 1.5px solid var(--admin-border); border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: border-color 0.2s;">
+              <!-- 1. Cover & Info -->
+              <div style="display: flex; align-items: center; gap: 12px; min-width: 240px; flex: 1 1 auto;">
+                <img src="${coverImg}" alt="Cover" style="width: 48px; height: 64px; object-fit: contain; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1); background: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); flex-shrink: 0;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
+                <div style="min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="font-family: monospace; font-size: 1rem; font-weight: 900; color: ${themeCol}; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px; display: inline-block;">
+                      ${p.id}
+                    </span>
+                    <button type="button" onclick="window.toggleLiveStatus('${p.id}')" class="admin-button small-button" style="background:${isLive ? 'rgba(22,163,74,0.18)' : 'rgba(239,68,68,0.18)'}; color:${isLive ? '#4ade80' : '#f87171'}; border: 1.5px solid ${isLive ? '#16a34a' : '#ef4444'}; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                      ${isLive ? '🟢 Live' : '🔴 Offline'}
+                    </button>
+                  </div>
+                  <div style="font-weight: 800; color: var(--admin-text); font-size: 0.96rem; line-height: 1.3; margin-bottom: 4px;">
+                    ${escapeHtml(title)}
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 0.75rem; color: var(--admin-muted); font-weight: 700;">📁 ${p.category || 'Agriculture'}</span>
+                    <span style="font-size: 1rem; font-weight: 900; color: #16a34a;">₹${offerPrice}</span>
+                    <span style="font-size: 0.75rem; color: var(--admin-muted); text-decoration: line-through;">₹${mrpPrice}</span>
+                    <span style="font-size: 0.72rem; background: #fef08a; color: #854d0e; padding: 1px 6px; border-radius: 4px; font-weight: 800;">🏷️ ${badgeText}</span>
+                    ${isComingSoon ? '<span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 1px 6px; border-radius: 4px; font-weight: 800;">⏳ Coming Soon</span>' : ''}
                   </div>
                 </div>
               </div>
 
-              <!-- 2. Book Title & Pricing -->
-              <div style="min-width: 0;">
-                <div style="font-weight: 800; color: var(--admin-text); font-size: 0.98rem; line-height: 1.3; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                  ${escapeHtml(title)}
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                  <span style="font-size: 1.05rem; font-weight: 900; color: #16a34a;">₹${offerPrice}</span>
-                  <span style="font-size: 0.78rem; color: var(--admin-muted); text-decoration: line-through;">₹${mrpPrice}</span>
-                  <span style="font-size: 0.72rem; background: #fef08a; color: #854d0e; padding: 1px 6px; border-radius: 4px; font-weight: 800;">
-                    🏷️ ${badgeText}
-                  </span>
-                  ${isComingSoon ? '<span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 1px 6px; border-radius: 4px; font-weight: 800;">⏳ Coming Soon</span>' : ''}
-                </div>
-              </div>
-
-              <!-- 3. Live / Offline Status -->
-              <div>
-                <button type="button" onclick="window.toggleLiveStatus('${p.id}')" class="admin-button small-button" style="background:${isLive ? 'rgba(22,163,74,0.18)' : 'rgba(239,68,68,0.18)'}; color:${isLive ? '#4ade80' : '#f87171'}; border: 1.5px solid ${isLive ? '#16a34a' : '#ef4444'}; padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
-                  ${isLive ? '🟢 Live' : '🔴 Offline'}
-                </button>
-              </div>
-
-              <!-- 4. Quick Actions (Immediate 1-Click Access) -->
-              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <!-- 2. Quick Actions (Always Visible Right There) -->
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-left: auto;">
                 <button type="button" onclick="window.editBookLandingPage('${p.id}')" class="admin-button" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; padding: 8px 16px; border-radius: 8px; font-size: 0.86rem; box-shadow: 0 2px 10px rgba(245,158,11,0.35); cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" title="इस पेज को एडिट करें">
                   <span>✏️</span> <span>एडिट करें</span>
                 </button>
@@ -6130,14 +6124,16 @@ export async function initBookLandingPages() {
 
     // Section Banners Mapping
     currentSectionBanners = { ...(page.section_banners || {}) };
-    if (page.preview_banner && !currentSectionBanners.sec_preview) {
-      currentSectionBanners.sec_preview = page.preview_banner;
-    }
-    if (page.value_stack?.vip_banner && !currentSectionBanners.sec_vip_stack) {
-      currentSectionBanners.sec_vip_stack = page.value_stack.vip_banner;
-    }
-    if (page.audio_layer?.banner_image && !currentSectionBanners.sec_audio) {
-      currentSectionBanners.sec_audio = page.audio_layer.banner_image;
+    if (!page.section_banners) {
+      if (page.preview_banner) {
+        currentSectionBanners.sec_preview = page.preview_banner;
+      }
+      if (page.value_stack?.vip_banner) {
+        currentSectionBanners.sec_vip_stack = page.value_stack.vip_banner;
+      }
+      if (page.audio_layer?.banner_image) {
+        currentSectionBanners.sec_audio = page.audio_layer.banner_image;
+      }
     }
 
     defaultSectionsList.forEach(s => {
