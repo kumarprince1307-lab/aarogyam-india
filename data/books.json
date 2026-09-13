@@ -395,7 +395,7 @@
       "cover": "/images/books/bk015-cover.webp",
       "thumbnail": "/images/books/bk015-cover.webp",
       "banner": "/images/banners/bk015-hero-banner.webp",
-      "status": "draft",
+      "status": "active",
       "publish_targets": [
         "ebook_store",
         "category_page",
