@@ -230,52 +230,8 @@
       }
     } catch (e) {}
 
-    // 3. Scan LocalStorage for latest Admin Edits (Merge with static JSON safely)
-    try {
-      const stored = localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES');
-      if (stored) {
-        const localList = JSON.parse(stored);
-        if (Array.isArray(localList)) {
-          localList.forEach(item => {
-            if (!item || !item.id) return;
-            const itemIdUpper = item.id.trim().toUpperCase();
-            const itemSlugLower = (item.slug || '').trim().toLowerCase();
-            const idx = allLandingPages.findIndex(x => 
-              (x.id && x.id.trim().toUpperCase() === itemIdUpper) || 
-              (x.slug && itemSlugLower && x.slug.trim().toLowerCase() === itemSlugLower)
-            );
-            if (idx >= 0) {
-              const serverPage = allLandingPages[idx];
-              const localUpdated = Date.parse(item.updated_at || item.updatedAt || '') || 0;
-              const serverUpdated = Date.parse(serverPage.updated_at || serverPage.updatedAt || '') || 0;
-              if (serverUpdated > localUpdated) return;
-              const mergedHero = { ...(serverPage.hero || {}) };
-              if (item.hero) {
-                Object.keys(item.hero).forEach(k => {
-                  if (item.hero[k] !== undefined && item.hero[k] !== null) {
-                    mergedHero[k] = item.hero[k];
-                  }
-                });
-              }
-              const mergedDemo = Array.isArray(item.demo_images)
-                ? item.demo_images
-                : (Array.isArray(item.preview_images) ? item.preview_images : (serverPage.demo_images || []));
-              
-              allLandingPages[idx] = {
-                ...serverPage,
-                ...item,
-                hero: mergedHero,
-                demo_images: mergedDemo,
-                audio_layer: item.audio_layer !== undefined ? item.audio_layer : serverPage.audio_layer,
-                section_banners: item.section_banners !== undefined ? item.section_banners : serverPage.section_banners
-              };
-            } else {
-              allLandingPages.unshift(item);
-            }
-          });
-        }
-      }
-    } catch (e) {}
+    // The deployed JSON is the source of truth. Local editor drafts must not
+    // override it, otherwise an old browser can hide newly synced content.
 
     // 4. Resolve Landing Page Data FIRST (by query key / slug)
     const qKey = (currentBookId || 'BK001').trim().toUpperCase();
@@ -771,10 +727,15 @@
       const aiTitle = l.ai_support_title || '🌾 FREE AI WHATSAPP SUPPORT & SPRAY FORMULA 🎁';
       const aiDesc = l.ai_support_desc || 'किताब पढ़ते समय अगर कोई बात समझ न आए, पोषक तत्वों की पहचान, महत्वपूर्ण टिप्स या फसल की समस्या हो, तो परेशान होने की जरूरत नहीं। बस WhatsApp Help बटन पर क्लिक करें और अपनी समस्या बताएं।';
       const aiCover = l.ai_support_cover || hero.cover_image || b.cover || '';
+      const hasDedicatedBanner = Boolean((l.section_banners || {}).sec_ai_support || l.ai_support_banner);
 
       if (aiCover) {
         setElemSrc('ai-support-cover-img', aiCover);
       }
+      // The section banner is the configured AI-support artwork. Do not show
+      // the legacy cover image beneath it as a second banner.
+      const aiCoverWrap = document.getElementById('ai-support-cover-img')?.closest('.bonus-image');
+      if (aiCoverWrap) aiCoverWrap.style.display = hasDedicatedBanner ? 'none' : 'block';
       setElemText('ai-support-title', aiTitle);
       setElemText('ai-support-desc', aiDesc);
 
@@ -895,13 +856,15 @@
       }).join('');
     }
 
-    // 8. Book Specification & TOC
-    setElemText('spec-name', l.book_name || l.bookName || title);
-    setElemText('spec-lang', l.language || b.language || 'Hindi');
-    setElemText('spec-pages', `${l.totalPages || l.total_pages || b.totalPages || 120}+ Pages`);
-    setElemText('spec-images', `${l.totalImages || l.total_images || 300}+ Real Images`);
-    setElemText('spec-author', l.author || b.author || 'Aarogyam India');
-    setElemText('spec-version', `${l.version || b.version || '2026'} Edition`);
+    // 8. Book Specification & TOC. Prefer the landing-page editor values over
+    // catalog fallbacks so BK015 cannot inherit BK001's default details.
+    const details = l.book_details || l.bookDetails || {};
+    setElemText('spec-name', details.name || details.title || l.book_name || l.bookName || hero.title || title);
+    setElemText('spec-lang', details.language || l.language || b.language || 'Hindi');
+    setElemText('spec-pages', `${details.pages || l.totalPages || l.total_pages || b.totalPages || 120}+ Pages`);
+    setElemText('spec-images', `${details.images || l.totalImages || l.total_images || 300}+ Real Images`);
+    setElemText('spec-author', details.author || l.author || b.author || 'Aarogyam India');
+    setElemText('spec-version', `${details.version || l.version || b.version || '2026'} Edition`);
 
     const tocList = document.getElementById('toc-list');
     const defaultToc = [
@@ -933,12 +896,16 @@
     ];
     const faqs = (l.faqs && l.faqs.length > 0) ? l.faqs : defaultFaqs;
     if (faqWrap) {
-      faqWrap.innerHTML = faqs.map(f => `
+      faqWrap.innerHTML = faqs.map(f => {
+        const question = f.q || f.question || '';
+        const answer = f.a || f.answer || '';
+        return `
         <div class="faq-item">
-          <h3>${escapeHtml(f.q)}</h3>
-          <p>${escapeHtml(f.a)}</p>
+          <h3>${escapeHtml(question)}</h3>
+          <p>${escapeHtml(answer)}</p>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
 
     // 10. Final CTA Buy Box Section
