@@ -561,7 +561,7 @@
       "id": "BK015",
       "slug": "bk015",
       "category": "Agriculture",
-      "status": "active",
+      "status": "draft",
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
@@ -569,7 +569,7 @@
       "theme_primary": "#EA580C",
       "theme_dark": "#C2410C",
       "cover_effect": "3d_float",
-      "sticky_button_text": "⏳ रुचि दर्ज करें (Pre-Interest)",
+      "sticky_button_text": "BY NOW",
       "sections_order": [
         "sec_hero",
         "sec_timer",
@@ -593,13 +593,12 @@
       ],
       "hidden_sections": [],
       "section_banners": {
-        "sec_specs_toc": "/images/banners/bk015-sec_specs_toc-banner.webp",
-        "sec_suggested": "/images/banners/bk015-sec_suggested-banner.webp",
-        "sec_faqs": "/images/banners/bk015-sec_faqs-banner.webp",
         "sec_pdf_main": "/images/banners/bk015-sec_pdf_main-banner.webp",
+        "sec_ai_support": "/images/banners/bk015-sec_ai_support-banner.webp",
         "sec_audio": "/images/banners/bk015-sec_audio-banner.webp",
-        "sec_bonuses": "/images/banners/bk015-sec_bonuses-banner.webp",
-        "sec_ai_support": "/images/banners/bk015-sec_ai_support-banner.webp"
+        "sec_why_buy": "/images/banners/bk015-sec_why_buy-banner.webp",
+        "sec_specs_toc": "/images/banners/bk015-sec_specs_toc-banner.webp",
+        "sec_faqs": "/images/banners/bk015-sec_faqs-banner.webp"
       },
       "og_title": "🌱 सब्जी खेती मास्टर PART 1",
       "og_description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू",
@@ -648,9 +647,9 @@
       },
       "mainPdf": "/uploads/books/BK015_main.pdf",
       "main_pdf": "/uploads/books/BK015_main.pdf",
-      "freePdf": "/uploads/books/BK002_free.pdf",
-      "free_pdf": "/uploads/books/BK002_free.pdf",
-      "demoPdf": "/uploads/books/BK002_free.pdf",
+      "freePdf": "",
+      "free_pdf": "",
+      "demoPdf": "",
       "ai_support_title": "",
       "ai_support_cover": "",
       "ai_support_desc": "",
@@ -713,6 +712,7 @@
       "why_read": {
         "title": "यह पुस्तक क्यों खरीदें?",
         "subtitle": "",
+        "banner_image": "/images/banners/bk015-sec_why_buy-banner.webp",
         "cards": [
           {
             "icon": "🌱",
@@ -740,7 +740,8 @@
         "/images/books/bk015-preview-1.webp",
         "/images/books/bk015-preview-2.webp",
         "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp"
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp"
       ],
       "suggested_books_list": [
         {
