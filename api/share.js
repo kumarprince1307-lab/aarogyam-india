@@ -358,7 +358,7 @@ module.exports = async function handler(req, res) {
   const bookData = getBookLandingPageData(lpId);
   if (bookData) {
     const finalTitle = (bookData.og_title || bookData.hero?.title || queryTitle || 'Aarogyam India eBook Practical Guide').trim();
-    const finalDesc = (bookData.og_description || bookData.hero?.description || queryDesc || 'सम्पूर्ण Practical Guide। अभी विशेष छूट पर उपलब्ध।').slice(0, 200).trim();
+    const finalDesc = (bookData.og_description || bookData.whatsapp_share_message || bookData.whatsapp_share_text || bookData.hero?.description || queryDesc || 'सम्पूर्ण Practical Guide। अभी विशेष छूट पर उपलब्ध।').slice(0, 200).trim();
     const rawImg = bookData.og_image || bookData.hero?.cover_image || bookData.hero?.banner_image || '/images/books/kharif-master-guide-2026-cover.webp';
     const finalOgImage = rawImg.startsWith('http') ? rawImg : `${HOST_ORIGIN}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`;
     

@@ -6319,6 +6319,15 @@ Instant Download & Lifetime Access
     document.getElementById('blp_custom_theme_color').value = selectedThemePrimary;
 
     document.getElementById('blp_wa_prompt').value = page.whatsapp_prompt || '';
+    if (document.getElementById('blp_og_title')) {
+      document.getElementById('blp_og_title').value = page.og_title || hero.title || page.book_name || '';
+    }
+    if (document.getElementById('blp_og_description')) {
+      document.getElementById('blp_og_description').value = page.og_description || hero.description || '';
+    }
+    if (document.getElementById('blp_og_image')) {
+      document.getElementById('blp_og_image').value = page.og_image || page.og_image_landscape || '';
+    }
     if (document.getElementById('blp_whatsapp_share_msg')) {
       document.getElementById('blp_whatsapp_share_msg').value = page.whatsapp_share_message || page.whatsapp_share_text || '';
     }
