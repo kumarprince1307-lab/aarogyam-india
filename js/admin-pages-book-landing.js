@@ -890,6 +890,44 @@ export async function initBookLandingPages() {
           </div>
         </div>
 
+        <!-- SECTION: FINAL CTA BUY BOX & BENEFITS (sec_final_buy) -->
+        <div style="background: rgba(234,88,12,0.08); border: 1.5px solid rgba(234,88,12,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <div style="font-weight: 800; color: #f97316; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+              <span>🚀</span> <span>अंतिम आर्डर बॉक्स व लाभ सामग्री (Final CTA Buy Box & Benefits)</span>
+            </div>
+            <span style="font-size: 0.72rem; background: rgba(249,115,22,0.15); color: #f97316; padding: 2px 8px; border-radius: 6px; font-weight: 800;">
+              🛒 High Converting Buy Box
+            </span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--admin-muted); margin-bottom: 10px;">
+            लैंडिंग पेज के अंतिम आर्डर बॉक्स (Final Buy Box) का शीर्षक, विवरण, बुलेट पॉइंट्स व वैकल्पिक बैनर कस्टमाइज़ करें:
+          </p>
+
+          <!-- Optional Section Banner for Final Buy -->
+          ${renderSectionBannerUploaderBlock('sec_final_buy', '🚀 फाइनल CTA बाय बॉक्स सेक्शन बैनर (वैकल्पिक)')}
+
+          <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px;">
+            <div>
+              <label class="admin-label" style="font-weight: 700; font-size: 0.8rem; color: #fdba74;">📌 अंतिम आर्डर बॉक्स मुख्य शीर्षक (Final Title):</label>
+              <input type="text" id="blp_final_buy_title" class="admin-input" placeholder="उदा. 🌱 सब्जी खेती मास्टर (PART 1)" style="width: 100%; padding: 8px 12px; font-weight: 700;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight: 700; font-size: 0.8rem; color: #fdba74;">📝 अंतिम बॉक्स विवरण (Final Subtitle / Pitch):</label>
+              <textarea id="blp_final_buy_desc" class="admin-input" rows="2" placeholder="उदा. 11 प्रमुख सब्जियों की वैज्ञानिक खेती — बीज से बाजार तक सम्पूर्ण प्रैक्टिकल समाधान!" style="width: 100%; padding: 8px 12px; font-size: 0.82rem;"></textarea>
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight: 700; font-size: 0.8rem; color: #fdba74;">✅ 'खरीदने पर आपको मिलेगा' बुलेट पॉइंट्स (प्रति पंक्ति 1 पॉइंट):</label>
+              <textarea id="blp_final_buy_benefits" class="admin-input" rows="5" placeholder="Full PDF eBook & Audio Book
+📱 मोबाइल में कभी भी पढ़ें (Offline Friendly)
+Instant Download & Lifetime Access
+🎁 Share करें और Surprise Gift जीतें
+💬 पढ़ते समय सवाल हो? WhatsApp Help से पूछें" style="width: 100%; padding: 8px 12px; font-size: 0.82rem; line-height: 1.5; font-family: inherit;"></textarea>
+              <small style="color: var(--admin-muted); font-size: 0.74rem;">प्रत्येक नई लाइन में एक लाभ बिंदु लिखें। टिक मार्क (✅) अपने आप लग जाएगा।</small>
+            </div>
+          </div>
+        </div>
+
         <!-- SECTION 16: MULTI-PAGE PUBLISHING TARGETS & STORE BADGES -->
         <div style="background: rgba(147,51,234,0.08); border: 1.5px solid rgba(147,51,234,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="font-weight: 800; color: #a855f7; font-size: 0.95rem; margin-bottom: 6px;">
@@ -1023,19 +1061,24 @@ export async function initBookLandingPages() {
               </button>
             </div>
 
-            <!-- Option E: Audio Studio Direct Connector -->
+            <!-- Option E: Audio Studio Direct Connector & Web Reader Folder Info -->
             <div style="margin-top: 12px; padding: 12px; background: rgba(59,130,246,0.12); border: 1.5px solid #3b82f6; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
               <div>
                 <span style="font-weight: 800; color: #60a5fa; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
-                  🎧 <strong>मुख्य पुस्तक ऑडियो स्टूडियो (Main Book Audio Studio):</strong>
+                  🎧 <strong>मुख्य पुस्तक ऑडियो स्टूडियो व Git वेब रीडर (Audio Studio & Web Reader):</strong>
                 </span>
                 <span style="font-size: 0.78rem; color: #cbd5e1; display: block; margin-top: 2px;">
-                  इस पुस्तक के सभी पेजों की WebP इमेजेस, पेज-वाइज़ वॉइस रिकॉर्डिंग व ऑडियो स्टूडियो में डायरेक्ट काम करें।
+                  ⚡ <strong>Git Reader Folder:</strong> आधुनिक वेब रीडर सीधे <code>/images/books/${bId}/</code> फोल्डर से WebP पेजों को लोड करता है। PDF फाइल केवल उपयोगकर्ताओं के 'Download PDF' बटन के लिए है।
                 </span>
               </div>
-              <button type="button" onclick="window.openBookAudioStudio('${bId}')" class="admin-button" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(37,99,235,0.35); cursor: pointer;">
-                🎙️ मुख्य पुस्तक ऑडियो स्टूडियो खोलें (${bId})
-              </button>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" onclick="window.openBookAudioStudio('${bId}')" class="admin-button" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(37,99,235,0.35); cursor: pointer;">
+                  🎙️ ऑडियो स्टूडियो खोलें (${bId})
+                </button>
+                <a href="/ebooks/reader.html?book=${bId}" target="_blank" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 700; padding: 7px 14px; font-size: 0.82rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22,163,74,0.35);">
+                  📖 रीडर में चेक करें
+                </a>
+              </div>
             </div>
 
             <div id="blp_main_pdf_status_wrap" style="margin-top: 10px; font-size: 0.8rem; color: #94a3b8; display: none;">
@@ -1117,15 +1160,20 @@ export async function initBookLandingPages() {
             <div style="margin-top: 12px; padding: 12px; background: rgba(16,185,129,0.12); border: 1.5px solid #10b981; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
               <div>
                 <span style="font-weight: 800; color: #34d399; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
-                  🎧 <strong>डेमो पुस्तक ऑडियो स्टूडियो (Demo Book Audio Studio):</strong>
+                  🎧 <strong>डेमो पुस्तक ऑडियो स्टूडियो व Git वेब रीडर (Demo Audio Studio & Reader):</strong>
                 </span>
                 <span style="font-size: 0.78rem; color: #cbd5e1; display: block; margin-top: 2px;">
-                  इस डेमो पुस्तक के सैंपल पेजों की रिकॉर्डिंग, ऑडियो स्क्रिप्ट व वॉइस सिंक्रोनाइज़ेशन तैयार करें।
+                  ⚡ <strong>Git Demo Folder:</strong> डेमो रीडर सीधे <code>/images/books/${bId}/</code> या डेमो पेजों से लोड होता है।
                 </span>
               </div>
-              <button type="button" onclick="window.openBookAudioStudio('DEMO_${bId}')" class="admin-button" style="background: linear-gradient(135deg, #059669, #047857); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(16,185,129,0.35); cursor: pointer;">
-                🎙️ डेमो ऑडियो स्टूडियो खोलें (DEMO_${bId})
-              </button>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" onclick="window.openBookAudioStudio('DEMO_${bId}')" class="admin-button" style="background: linear-gradient(135deg, #059669, #047857); color: #fff; font-weight: 800; padding: 7px 16px; font-size: 0.82rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(16,185,129,0.35); cursor: pointer;">
+                  🎙️ डेमो ऑडियो स्टूडियो खोलें (DEMO_${bId})
+                </button>
+                <a href="/ebooks/reader.html?book=${bId}&demo=1" target="_blank" class="admin-button" style="background: #0d9488; color: #fff; font-weight: 700; padding: 7px 14px; font-size: 0.82rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(13,148,136,0.35);">
+                  📖 डेमो रीडर चेक करें
+                </a>
+              </div>
             </div>
 
             <div id="blp_free_pdf_status_wrap" style="margin-top: 10px; font-size: 0.8rem; color: #94a3b8; display: none;">
@@ -6166,16 +6214,20 @@ export async function initBookLandingPages() {
 
     // Section Banners Mapping
     currentSectionBanners = { ...(page.section_banners || {}) };
-    if (!page.section_banners) {
-      if (page.preview_banner) {
-        currentSectionBanners.sec_preview = page.preview_banner;
-      }
-      if (page.value_stack?.vip_banner) {
-        currentSectionBanners.sec_vip_stack = page.value_stack.vip_banner;
-      }
-      if (page.audio_layer?.banner_image) {
-        currentSectionBanners.sec_audio = page.audio_layer.banner_image;
-      }
+    if (page.preview_banner && !currentSectionBanners.sec_preview) {
+      currentSectionBanners.sec_preview = page.preview_banner;
+    }
+    if (page.value_stack?.vip_banner && !currentSectionBanners.sec_vip_stack) {
+      currentSectionBanners.sec_vip_stack = page.value_stack.vip_banner;
+    }
+    if (page.why_read?.banner_image && !currentSectionBanners.sec_why_buy) {
+      currentSectionBanners.sec_why_buy = page.why_read.banner_image;
+    }
+    if (page.audio_layer?.banner_image && !currentSectionBanners.sec_audio) {
+      currentSectionBanners.sec_audio = page.audio_layer.banner_image;
+    }
+    if (page.final_buy?.banner_image && !currentSectionBanners.sec_final_buy) {
+      currentSectionBanners.sec_final_buy = page.final_buy.banner_image;
     }
 
     defaultSectionsList.forEach(s => {
@@ -6240,6 +6292,26 @@ export async function initBookLandingPages() {
     if (document.getElementById('blp_ai_support_title')) document.getElementById('blp_ai_support_title').value = page.ai_support_title || '';
     if (document.getElementById('blp_ai_support_cover')) document.getElementById('blp_ai_support_cover').value = page.ai_support_cover || '';
     if (document.getElementById('blp_ai_support_desc')) document.getElementById('blp_ai_support_desc').value = page.ai_support_desc || '';
+
+    // Final CTA Buy Box fields
+    const finalBuyCfg = page.final_buy || {};
+    if (document.getElementById('blp_final_buy_title')) {
+      document.getElementById('blp_final_buy_title').value = finalBuyCfg.title || hero.title || page.heading || '';
+    }
+    if (document.getElementById('blp_final_buy_desc')) {
+      document.getElementById('blp_final_buy_desc').value = finalBuyCfg.description || hero.subtitle || hero.description || '';
+    }
+    if (document.getElementById('blp_final_buy_benefits')) {
+      let bArr = [];
+      if (Array.isArray(finalBuyCfg.benefits) && finalBuyCfg.benefits.length > 0) {
+        bArr = finalBuyCfg.benefits;
+      } else if (Array.isArray(page.purchase_benefits) && page.purchase_benefits.length > 0) {
+        bArr = page.purchase_benefits;
+      } else if (Array.isArray(page.bonus_points) && page.bonus_points.length > 0) {
+        bArr = page.bonus_points;
+      }
+      document.getElementById('blp_final_buy_benefits').value = bArr.join('\n');
+    }
 
     // Repeaters data
     currentKpis = hero.features || [
@@ -6478,6 +6550,16 @@ export async function initBookLandingPages() {
     const coverEffect = document.getElementById('blp_cover_effect')?.value || '3d_float';
     const isTimerOn = document.getElementById('blp_timer_enabled')?.checked !== false;
 
+    // Scan all section banner inputs in DOM to ensure no entered/uploaded banner is missed
+    defaultSectionsList.forEach(s => {
+      const elVal = (document.getElementById(`blp_sec_banner_${s.key}`)?.value || '').trim();
+      if (elVal) {
+        currentSectionBanners[s.key] = elVal;
+      } else if (!currentSectionBanners[s.key]) {
+        delete currentSectionBanners[s.key];
+      }
+    });
+
     // Filter non-empty section banners
     const cleanSectionBanners = {};
     Object.keys(currentSectionBanners).forEach(k => {
@@ -6709,6 +6791,15 @@ export async function initBookLandingPages() {
       videos: currentVideos,
       testimonials: currentReviews,
       faqs: currentFaqs.length > 0 ? currentFaqs : undefined,
+      final_buy: {
+        title: (document.getElementById('blp_final_buy_title')?.value || '').trim() || title,
+        description: (document.getElementById('blp_final_buy_desc')?.value || '').trim() || (document.getElementById('blp_hero_subtitle')?.value || '').trim() || (document.getElementById('blp_hero_desc')?.value || '').trim(),
+        benefits: (document.getElementById('blp_final_buy_benefits')?.value || '')
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean),
+        banner_image: cleanSectionBanners.sec_final_buy || undefined
+      },
       whatsapp_share_message: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
       whatsapp_share_text: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
       whatsapp_prompt: document.getElementById('blp_wa_prompt')?.value || `नमस्ते, मुझे '${title}' पुस्तक के बारे में और जानकारी चाहिए।`

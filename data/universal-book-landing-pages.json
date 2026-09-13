@@ -594,6 +594,7 @@
       "hidden_sections": [],
       "section_banners": {
         "sec_ai_support": "/images/banners/bk015-sec_ai_support-banner.webp",
+        "sec_audio": "/images/banners/bk015-sec_audio-banner.webp",
         "sec_why_buy": "/images/banners/bk015-sec_why_buy-banner.webp",
         "sec_specs_toc": "/images/banners/bk015-sec_specs_toc-banner.webp",
         "sec_faqs": "/images/banners/bk015-sec_faqs-banner.webp",
@@ -645,7 +646,7 @@
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1999 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
         "bgm_enabled": true,
-        "banner_image": ""
+        "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
       },
       "mainPdf": "/uploads/books/BK015_main.pdf",
       "main_pdf": "/uploads/books/BK015_main.pdf",
@@ -796,6 +797,17 @@
         }
       ],
       "testimonials": [],
+      "final_buy": {
+        "title": "🌱 सब्जी खेती मास्टर (PART 1)",
+        "description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती — बीज से बाजार तक सम्पूर्ण प्रैक्टिकल समाधान!",
+        "benefits": [
+          "Full PDF eBook & Audio Book",
+          "📱 मोबाइल में कभी भी पढ़ें (Offline Friendly)",
+          "Instant Download & Lifetime Access",
+          "🎁 Share करें और Surprise Gift जीतें",
+          "💬 पढ़ते समय सवाल हो? WhatsApp Help से पूछें"
+        ]
+      },
       "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।"
     }
   ]

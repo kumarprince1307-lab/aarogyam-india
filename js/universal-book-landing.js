@@ -542,7 +542,7 @@
     // Note: sec-audio-experience and sec-sample-book banners are rendered inside their own dedicated cards to prevent duplicate banner display
     renderSectionBanner('sec-trust-bar', sb.sec_trust || l.trust_banner);
     renderSectionBanner('sec-why-book', sb.sec_why_buy || l.why_read?.banner_image);
-    renderSectionBanner('sec-vip-stack', sb.sec_vip_stack || l.value_stack?.vip_banner);
+    // VIP stack banner is managed in renderVipPerkSection directly via #vip-banner-img
     renderSectionBanner('sec-book-video', sb.sec_video || l.video_section_banner);
     renderSectionBanner('sec-suggested-books', sb.sec_suggested || l.suggested_banner);
     renderSectionBanner('sec-bonus-wrapper', sb.sec_bonuses || l.bonuses_banner);
@@ -808,7 +808,22 @@
         }
       ];
 
-      const rawBonuses = (l.bonuses && l.bonuses.length > 0) ? l.bonuses : ((l.bonus_books && l.bonus_books.length > 0) ? l.bonus_books : defaultBonuses);
+      const hasCustomBonuses = (Array.isArray(l.bonuses) && l.bonuses.length > 0) || (Array.isArray(l.bonus_books) && l.bonus_books.length > 0);
+      const isExplicitlyEmpty = (Array.isArray(l.bonuses) && l.bonuses.length === 0) || (Array.isArray(l.bonus_books) && l.bonus_books.length === 0);
+
+      let rawBonuses = [];
+      if (hasCustomBonuses) {
+        rawBonuses = (l.bonuses && l.bonuses.length > 0) ? l.bonuses : l.bonus_books;
+      } else if (isExplicitlyEmpty) {
+        rawBonuses = [];
+      } else if (currentBookId === 'BK001') {
+        rawBonuses = defaultBonuses;
+      }
+
+      if (!rawBonuses || rawBonuses.length === 0) {
+        bonusWrapper.style.display = 'none';
+        return;
+      }
       
       // Filter out pure text/support items so only actual bonus books & files are in this grid
       const bonusBooks = rawBonuses.filter(bn => bn && bn.title && !bn.title.toUpperCase().includes('WHATSAPP SUPPORT'));
@@ -922,10 +937,49 @@
       `).join('');
     }
 
-    // 10. Final Section
-    setElemText('final-title', title);
+    // 10. Final CTA Buy Box Section
+    setElemText('final-title', (l.final_buy && l.final_buy.title) || title);
     setElemText('final-old-price', `₹${mrp}`);
     setElemText('final-new-price', `₹${offer}`);
+
+    const finalDescEl = document.getElementById('final-desc');
+    if (finalDescEl) {
+      finalDescEl.textContent = (l.final_buy && l.final_buy.description) || hero.subtitle || hero.description || `${title} - सम्पूर्ण Practical Guide।`;
+    }
+
+    const finalBenefitsList = document.getElementById('final-benefits-list');
+    if (finalBenefitsList) {
+      let bList = [];
+      if (l.final_buy && Array.isArray(l.final_buy.benefits) && l.final_buy.benefits.length > 0) {
+        bList = l.final_buy.benefits;
+      } else if (Array.isArray(l.purchase_benefits) && l.purchase_benefits.length > 0) {
+        bList = l.purchase_benefits;
+      } else if (Array.isArray(l.bonus_points) && l.bonus_points.length > 0) {
+        bList = l.bonus_points;
+      } else {
+        bList = [
+          'Full PDF eBook & Audio Book',
+          '📱 मोबाइल में कभी भी पढ़ें',
+          'Instant Download & Lifetime Access',
+          '🎁 Share करें और Surprise Gift जीतें',
+          '💬 पढ़ते समय सवाल हो? WhatsApp Help से पूछें'
+        ];
+      }
+      finalBenefitsList.innerHTML = bList.map(item => {
+        const clean = String(item || '').trim();
+        if (!clean) return '';
+        const prefix = clean.startsWith('✅') ? '' : '✅ ';
+        return `<li>${prefix}${escapeHtml(clean)}</li>`;
+      }).filter(Boolean).join('');
+    }
+
+    const finalBuyBtn = document.getElementById('final-buy-btn');
+    if (finalBuyBtn) {
+      finalBuyBtn.href = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
+      if (l.sticky_button_text) {
+        finalBuyBtn.innerHTML = `🛒 ${escapeHtml(l.sticky_button_text)}`;
+      }
+    }
   }
 
   // ==========================================================
@@ -1417,9 +1471,16 @@
     }
 
     const vipBannerImg = document.getElementById('vip-banner-img');
-    if (vipBannerImg && stack.vip_banner) {
-      vipBannerImg.src = stack.vip_banner;
-      vipBannerImg.style.display = 'block';
+    const vipBannerUrl = stack.vip_banner || (l.section_banners && l.section_banners.sec_vip_stack) || '';
+    if (vipBannerImg) {
+      if (vipBannerUrl && typeof vipBannerUrl === 'string' && vipBannerUrl.trim()) {
+        vipBannerImg.src = window.resolveImageSrc(vipBannerUrl.trim());
+        vipBannerImg.style.display = 'block';
+        vipBannerImg.onerror = function() { window.handleImageError(this); };
+      } else {
+        vipBannerImg.src = '';
+        vipBannerImg.style.display = 'none';
+      }
     }
   }
 
@@ -1675,7 +1736,10 @@
         bannerWrap.innerHTML = `<img src="${escapeHtml(resolvedSrc)}" alt="Section Banner" class="ubl-section-banner-img" onerror="window.handleImageError(this)" />`;
         // Insert right after container heading or at top of section
         const container = secEl.querySelector('.container') || secEl;
-        if (container.firstChild) {
+        const heading = container.querySelector('.section-heading');
+        if (heading && heading.nextSibling) {
+          container.insertBefore(bannerWrap, heading.nextSibling);
+        } else if (container.firstChild) {
           container.insertBefore(bannerWrap, container.firstChild);
         } else {
           container.appendChild(bannerWrap);
