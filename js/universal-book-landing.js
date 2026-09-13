@@ -988,6 +988,17 @@
     setElemText('spec-pages', `${details.pages || landing.totalPages || landing.total_pages || book.totalPages || 120}+ Pages`);
     setElemText('spec-author', details.author || landing.author || book.author || 'Aarogyam India');
     setElemText('spec-version', `${details.version || landing.version || book.version || '2026'} Edition`);
+
+    const tocList = document.getElementById('toc-list');
+    const tocPoints = Array.isArray(landing.table_of_contents) && landing.table_of_contents.length > 0
+      ? landing.table_of_contents
+      : [];
+    if (tocList && tocPoints.length > 0) {
+      tocList.innerHTML = tocPoints
+        .filter(point => point !== null && point !== undefined && String(point).trim())
+        .map(point => `<li>✅ ${escapeHtml(String(point))}</li>`)
+        .join('');
+    }
   }
 
   // ==========================================================
