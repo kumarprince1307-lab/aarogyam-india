@@ -559,7 +559,12 @@
     },
     {
       "id": "BK015",
+      "updated_at": "2026-09-13T19:32:38.418Z",
       "slug": "bk015",
+      "author": "Dada Avnish Mishra",
+      "language": "Hindi",
+      "totalPages": 154,
+      "version": "2026",
       "category": "Agriculture",
       "status": "active",
       "facebook_pixel_id": "1671873500553134",
@@ -906,6 +911,16 @@
           "rating": 5,
           "gender": "male",
           "comment": "एक ही पुस्तक में इतनी जानकारी मिलना अच्छा लगा।\n\nटमाटर, मिर्च, खीरा और लौकी जैसी फसलों के बारे में जानकारी चाहिए थी। इसमें बीज से लेकर कटाई और बाजार तक की जानकारी दी गई है। भाषा आसान है और विषय क्रम से समझाए गए हैं। खेती सीखने वालों के लिए उपयोगी पुस्तक है।"
+        }
+      ],
+      "faqs": [
+        {
+          "q": "kya is book ko suna ja sakta hai ",
+          "a": "ha "
+        },
+        {
+          "q": "kya mujhe whats app saport milega ",
+          "a": "ha bilkul "
         }
       ],
       "final_buy": {
