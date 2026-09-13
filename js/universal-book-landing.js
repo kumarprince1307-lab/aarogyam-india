@@ -112,6 +112,7 @@
     renderCustomStickyBar();
     renderDynamicOpenGraph();
     bindInteractiveEvents();
+    renderFaqSection();
   }
 
   function extractQueryParameters() {
@@ -953,6 +954,27 @@
     }
   }
 
+  function renderFaqSection() {
+    const faqWrap = document.getElementById('faq-list-wrapper');
+    if (!faqWrap) return;
+
+    const landing = currentLandingData || {};
+    const configuredFaqs = Array.isArray(landing.faqs) ? landing.faqs : [];
+    const faqs = configuredFaqs.length > 0 ? configuredFaqs : [
+      { q: 'यह पुस्तक किसके लिए है?', a: 'यह पुस्तक किसान, कृषि विद्यार्थी, कृषि सलाहकार और कृषि व्यवसाय से जुड़े लोगों के लिए उपयोगी है।' },
+      { q: 'क्या यह Printed Book है?', a: 'नहीं, यह एक Digital PDF eBook है।' }
+    ];
+
+    faqWrap.innerHTML = faqs
+      .filter(faq => faq && typeof faq === 'object')
+      .map(faq => {
+        const question = faq.q || faq.question || '';
+        const answer = faq.a || faq.answer || '';
+        return `<div class="faq-item"><h3>${escapeHtml(question)}</h3><p>${escapeHtml(answer)}</p></div>`;
+      })
+      .join('');
+  }
+
   // ==========================================================
   // FEATURE HIGHLIGHTS / KPI BADGES BAR (KHETI DR. STYLE)
   // ==========================================================
@@ -1198,10 +1220,13 @@
     });
 
     // 2. Determine 2nd book in combo
+    const primaryId = (currentBookData.id || currentBookId || 'BK001').trim().toUpperCase();
     if (l.suggested_books_list && l.suggested_books_list.length > 0) {
       l.suggested_books_list.forEach(sb => {
+        const suggestedId = (sb.link || sb.id || '').trim().toUpperCase();
+        if (!suggestedId || suggestedId === primaryId || comboBooks.some(book => book.id.toUpperCase() === suggestedId)) return;
         comboBooks.push({
-          id: sb.link || sb.id || 'BK002',
+          id: suggestedId,
           tag: '🏆 Bestseller Guide',
           heading: sb.title || 'संबंधित ई-बुक',
           cover: sb.image || '/images/books/fasal-ka-doctor-cover.webp',
@@ -1212,7 +1237,6 @@
       });
     } else {
       // Pick alternative companion book from library
-      const primaryId = (currentBookData.id || currentBookId || 'BK001').toUpperCase();
       const otherBook = allBooks.find(b => b.id && b.id.toUpperCase() !== primaryId && (b.status === 'active' || !b.status)) || {
         id: primaryId === 'BK002' ? 'BK001' : 'BK002',
         name: primaryId === 'BK002' ? 'खरीफ फसल मास्टर गाइड 2026' : 'खेती का डॉक्टर (Pocket Doctor)',
@@ -1235,7 +1259,9 @@
     }
 
     // Limit to top 2 for clean side-by-side combo like Kheti Dr
-    const displayBooks = comboBooks;
+    const displayBooks = comboBooks.filter((book, index, books) =>
+      books.findIndex(candidate => candidate.id.toUpperCase() === book.id.toUpperCase()) === index
+    );
     const totalPrice = displayBooks.reduce((sum, b) => sum + (parseInt(b.offerPrice, 10) || 99), 0);
 
     grid.innerHTML = displayBooks.map((b, idx) => `
