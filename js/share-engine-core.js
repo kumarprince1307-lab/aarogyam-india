@@ -153,13 +153,26 @@ class UniversalShareEngine {
     // Generate the universal share link.
     generateShareLink(assetType, assetId) {
         const origin = window.location.origin || 'https://aarogyamindia.online';
+        const params = new URLSearchParams(window.location.search);
+        const urlBookId = (params.get('id') || params.get('book') || params.get('book_id') || '').toUpperCase();
+        
         let bookId = '';
-        if (assetId && typeof assetId === 'string' && assetId.toUpperCase().startsWith('BK')) {
-            bookId = assetId.toUpperCase();
+        // If current page URL explicitly specifies a book ID (e.g. ?id=BK015), that ALWAYS takes priority!
+        if (urlBookId && urlBookId.startsWith('BK')) {
+            bookId = urlBookId;
         } else {
-            const params = new URLSearchParams(window.location.search);
-            bookId = (params.get('id') || params.get('book') || params.get('book_id') || '').toUpperCase();
-            if (!bookId) {
+            // Check dynamic book-share-data element if available
+            const shareDataEl = document.getElementById('book-share-data');
+            const dataId = shareDataEl?.dataset?.id?.trim()?.toUpperCase();
+            if (dataId && dataId.startsWith('BK') && dataId !== 'BK001') {
+                bookId = dataId;
+            } else if (assetId && typeof assetId === 'string' && assetId.toUpperCase().startsWith('BK') && (!urlBookId || assetId.toUpperCase() === urlBookId)) {
+                bookId = assetId.toUpperCase();
+            } else if (urlBookId) {
+                bookId = urlBookId;
+            } else if (dataId && dataId.startsWith('BK')) {
+                bookId = dataId;
+            } else {
                 if (window.location.pathname.includes('kharif-master-guide-2026')) bookId = 'BK001';
                 else if (window.location.pathname.includes('kheti-dr')) bookId = 'BK002';
             }

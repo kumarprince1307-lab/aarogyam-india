@@ -537,6 +537,18 @@ export async function initBookAudioStudio() {
         </div>
     `;
 
+    // Extract book ID from hash or query parameters (e.g. #book-audio-studio?id=BK015)
+    try {
+        const hash = window.location.hash || '';
+        const search = window.location.search || '';
+        const hashParams = new URLSearchParams(hash.includes('?') ? hash.substring(hash.indexOf('?')) : '');
+        const searchParams = new URLSearchParams(search);
+        const urlId = (hashParams.get('id') || hashParams.get('book') || searchParams.get('id') || searchParams.get('book') || '').trim().toUpperCase();
+        if (urlId) {
+            studioCurrentBookId = urlId;
+        }
+    } catch (e) {}
+
     setupStudioEvents();
     await loadBookStudio(studioCurrentBookId);
 }
@@ -642,6 +654,18 @@ async function populateStudioBookSelect(selectedId) {
     newOpt.value = '__NEW__';
     newOpt.textContent = '➕ नया बुक / डेमो कोड जोड़ें...';
     bookSelect.appendChild(newOpt);
+
+    // If selectedId wasn't found in existing options, add it dynamically
+    if (selectedId && !Array.from(bookSelect.options).some(o => o.value === selectedId)) {
+        const customOpt = document.createElement('option');
+        customOpt.value = selectedId;
+        customOpt.textContent = `${selectedId}: पुस्तक / डेमो ऑडियो`;
+        customOpt.selected = true;
+        bookSelect.insertBefore(customOpt, newOpt);
+    }
+    if (selectedId) {
+        bookSelect.value = selectedId;
+    }
 }
 
 // =======================================================
