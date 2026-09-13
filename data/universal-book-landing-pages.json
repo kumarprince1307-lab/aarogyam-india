@@ -574,9 +574,9 @@
         "sec_hero",
         "sec_timer",
         "sec_kpis",
-        "sec_audio",
-        "sec_trust",
         "sec_why_buy",
+        "sec_trust",
+        "sec_audio",
         "sec_vip_stack",
         "sec_video",
         "sec_preview",
@@ -748,8 +748,7 @@
         "/images/books/bk015-preview-8.webp",
         "/images/books/bk015-preview-9.webp",
         "/images/books/bk015-preview-10.webp",
-        "/images/books/bk015-preview-11.webp",
-        "/images/books/bk015-preview-12.webp"
+        "/images/books/bk015-preview-11.webp"
       ],
       "suggested_books_list": [
         {
