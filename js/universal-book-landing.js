@@ -246,6 +246,9 @@
             );
             if (idx >= 0) {
               const serverPage = allLandingPages[idx];
+              const localUpdated = Date.parse(item.updated_at || item.updatedAt || '') || 0;
+              const serverUpdated = Date.parse(serverPage.updated_at || serverPage.updatedAt || '') || 0;
+              if (serverUpdated > localUpdated) return;
               const mergedHero = { ...(serverPage.hero || {}) };
               if (item.hero) {
                 Object.keys(item.hero).forEach(k => {
@@ -546,6 +549,7 @@
     renderSectionBanner('sec-book-video', sb.sec_video || l.video_section_banner);
     renderSectionBanner('sec-suggested-books', sb.sec_suggested || l.suggested_banner);
     renderSectionBanner('sec-bonus-wrapper', sb.sec_bonuses || l.bonuses_banner);
+    renderSectionBanner('sec-ai-support', sb.sec_ai_support || l.ai_support_banner);
     renderSectionBanner('sec-book-details', sb.sec_specs_toc || l.specs_banner);
     renderSectionBanner('sec-customer-reviews', sb.sec_reviews || l.reviews_banner);
     renderSectionBanner('sec-faq-section', sb.sec_faqs || l.faqs_banner);
@@ -892,12 +896,12 @@
     }
 
     // 8. Book Specification & TOC
-    setElemText('spec-name', title);
-    setElemText('spec-lang', b.language || 'Hindi');
-    setElemText('spec-pages', `${b.totalPages || 120}+ Pages`);
-    setElemText('spec-images', '300+ Real Images');
-    setElemText('spec-author', b.author || 'Aarogyam India');
-    setElemText('spec-version', `${b.version || '2026'} Edition`);
+    setElemText('spec-name', l.book_name || l.bookName || title);
+    setElemText('spec-lang', l.language || b.language || 'Hindi');
+    setElemText('spec-pages', `${l.totalPages || l.total_pages || b.totalPages || 120}+ Pages`);
+    setElemText('spec-images', `${l.totalImages || l.total_images || 300}+ Real Images`);
+    setElemText('spec-author', l.author || b.author || 'Aarogyam India');
+    setElemText('spec-version', `${l.version || b.version || '2026'} Edition`);
 
     const tocList = document.getElementById('toc-list');
     const defaultToc = [
