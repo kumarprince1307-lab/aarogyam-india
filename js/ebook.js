@@ -64,8 +64,25 @@
       if (b && b.id) bookMap.set(b.id.toUpperCase(), Object.assign({}, bookMap.get(b.id.toUpperCase()) || {}, b));
     });
 
-    // 3. Overlay from Landing Pages (both static and custom)
-    [...landingPages, ...customLp].forEach(lp => {
+    // ✅ PERMANENT FIX: Only use localStorage LP if it's newer than JSON LP (timestamp check)
+    const lpMap = new Map();
+    landingPages.forEach(lp => { if (lp && lp.id) lpMap.set(lp.id.toUpperCase(), lp); });
+    customLp.forEach(lp => {
+      if (!lp || !lp.id) return;
+      const key = lp.id.toUpperCase();
+      const existing = lpMap.get(key);
+      if (!existing) {
+        lpMap.set(key, lp);
+      } else {
+        const jsonTime = new Date(existing.updated_at || 0).getTime();
+        const localTime = new Date(lp.updated_at || 0).getTime();
+        if (localTime > jsonTime) lpMap.set(key, lp); // localStorage newer → use it
+      }
+    });
+    const mergedLp = Array.from(lpMap.values());
+
+    // 3. Overlay from Landing Pages (both static and custom, timestamp-merged)
+    mergedLp.forEach(lp => {
       if (!lp || !lp.id) return;
       const bId = lp.id.toUpperCase();
       const existing = bookMap.get(bId) || {};

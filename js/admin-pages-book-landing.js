@@ -2435,7 +2435,8 @@ Instant Download & Lifetime Access
     const tableWrap = document.getElementById('blp_table_container');
     if (tableWrap) tableWrap.innerHTML = '<div class="admin-loading">डेटा लोड हो रहा है...</div>';
 
-    const cacheTime = Math.floor(Date.now() / 300000);
+    // ✅ PERMANENT FIX: Admin always fetches fresh JSON (no 5-min stale cache)
+    const cacheTime = Date.now();
     try {
       const res = await fetch('/data/books.json?v=' + cacheTime);
       if (res.ok) {
@@ -2489,8 +2490,18 @@ Instant Download & Lifetime Access
         if (Array.isArray(localList)) {
           localList.forEach(item => {
             const idx = allLandingPages.findIndex(x => x.id === item.id);
-            if (idx >= 0) allLandingPages[idx] = item;
-            else allLandingPages.push(item);
+            if (idx >= 0) {
+              // ✅ PERMANENT FIX: Only use localStorage data if it is NEWER than the JSON file data.
+              // This prevents old cached localStorage from overwriting fresh git-pushed changes.
+              const jsonUpdatedAt = new Date(allLandingPages[idx].updated_at || 0).getTime();
+              const localUpdatedAt = new Date(item.updated_at || 0).getTime();
+              if (localUpdatedAt > jsonUpdatedAt) {
+                allLandingPages[idx] = item; // localStorage is newer → use it
+              }
+              // else: JSON is same age or newer → keep JSON data (git-pushed data wins)
+            } else {
+              allLandingPages.push(item); // New book not in JSON yet → add it
+            }
           });
         }
       }
@@ -6991,6 +7002,15 @@ Instant Download & Lifetime Access
         let deletedIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');
         deletedIds = deletedIds.filter(id => id !== bId);
         localStorage.setItem('AAROGYAM_DELETED_LANDING_PAGES', JSON.stringify(deletedIds));
+      } catch (e) {}
+
+      // ✅ PERMANENT FIX: After successful git push, remove this book from localStorage.
+      // Next load will fetch the fresh, authoritative data from the git-pushed JSON file.
+      // This ensures banners and all edits are NEVER silently lost by stale cache.
+      try {
+        const lsPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+        const filtered = lsPages.filter(p => p.id !== bId);
+        localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(filtered));
       } catch (e) {}
 
       showToast(`🎉 बधाई! पुस्तक (${bId}) Git पर 100% लाइव हो गई! Vercel ऑटो-डिप्लॉयमेंट चालू हो गया है।`, 'success');
