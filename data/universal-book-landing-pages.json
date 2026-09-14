@@ -559,7 +559,7 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-15T00:10:00.000Z",
+      "updated_at": "2026-09-14T18:54:22.594Z",
       "slug": "bk015",
       "book_name": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "author": "Dada Avnish Mishra",
@@ -670,7 +670,7 @@
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1999 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
         "bgm_enabled": true,
-        "banner_image": "images\\banners\\bk015-sec_audio-banner.webp"
+        "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
       },
       "mainPdf": "",
       "main_pdf": "",
@@ -692,7 +692,8 @@
       "timer": {
         "enabled": true,
         "minutes": 15,
-        "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!"
+        "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!",
+        "banner_image": "/images/banners/bk015-sec_timer-banner.webp"
       },
       "hero": {
         "tag": "🌾 Bestseller Agriculture eBook+ Audio Book",
@@ -795,7 +796,7 @@
           {
             "icon": "🌱",
             "title": "क्या आपकी फसल में ये समस्याएँ आती हैं?",
-            "desc": "विवरण यहाँ लिखें❌ फूल झड़ना\n\n❌ फल झड़ना\n\n❌ रोग और कीट का हमला\n\n❌ कम उत्पादन\n\n❌ सही समय पर सही दवा और खाद की जानकारी नहीं..."
+            "desc": "❌ फूल झड़ना\n\n❌ फल झड़ना\n\n❌ रोग और कीट का हमला\n\n❌ कम उत्पादन\n\n❌ सही समय पर सही दवा और खाद की जानकारी नहीं..."
           }
         ]
       },
