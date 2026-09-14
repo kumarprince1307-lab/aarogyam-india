@@ -409,8 +409,8 @@
       "pdf_url": "/uploads/books/BK015_main.pdf",
       "freePdf": "/uploads/books/BK002_free.pdf",
       "demoPdf": "/uploads/books/BK002_free.pdf",
-      "og_image": "/images/books/bk015-cover.webp",
-      "og_image_landscape": "/images/books/bk015-cover.webp",
+      "og_image": "/images/books/bk015-og.webp",
+      "og_image_landscape": "/images/books/bk015-og.webp",
       "audio_layer": {
         "enabled": true,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
@@ -449,7 +449,8 @@
           }
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
-        "bgm_enabled": true
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
       },
       "features": [
         "120 पेज की प्रीमियम",
@@ -458,7 +459,7 @@
         "Free Bonus PDF"
       ],
       "totalPages": 120,
-      "author": "",
+      "author": "dada avnish mishra",
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
