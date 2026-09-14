@@ -1035,6 +1035,28 @@
       "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।",
       "store_badge": "new_arrival",
       "is_coming_soon": false
+    },
+    {
+      "id": "SUB001",
+      "category": "Membership",
+      "status": "active",
+      "store_badge": "other",
+      "is_coming_soon": false,
+      "theme_primary": "#2E7D32",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "hero": {
+        "title": "👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)",
+        "subtitle": "",
+        "description": "",
+        "mrp": 2999,
+        "offer_price": 99,
+        "cover_image": "/images/banners/farmer-community-banner.jpeg"
+      }
     }
   ]
 }
