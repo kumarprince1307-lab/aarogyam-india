@@ -147,7 +147,10 @@
         "description": "1 Year All-Access Pass to UCAS Marketing Engine, Digital Library, and Webinars.",
         "keywords": "Aarogyam Pro, VIP Subscription, UCAS Marketing, Aarogyam India",
         "canonical": ""
-      }
+      },
+      "badge": "other",
+      "store_badge": "other",
+      "isComingSoon": false
     },
     {
       "id": "BK006",
