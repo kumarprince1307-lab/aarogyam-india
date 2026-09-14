@@ -223,7 +223,10 @@
       "downloadLimit": 3,
       "mainPdf": "",
       "fileSize": "20.1 MB",
-      "accessType": "Lifetime"
+      "accessType": "Lifetime",
+      "badge": "other",
+      "store_badge": "other",
+      "isComingSoon": false
     },
     {
       "id": "BK005",
