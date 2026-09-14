@@ -1057,6 +1057,28 @@
         "offer_price": 99,
         "cover_image": "/images/banners/farmer-community-banner.jpeg"
       }
+    },
+    {
+      "id": "BK004",
+      "category": "Agriculture",
+      "status": "active",
+      "store_badge": "other",
+      "is_coming_soon": false,
+      "theme_primary": "#2E7D32",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "hero": {
+        "title": "चावल प्रोसेसिंग गाइड",
+        "subtitle": "",
+        "description": "",
+        "mrp": 299,
+        "offer_price": 99,
+        "cover_image": "/images/books/chawal-processing-guide-cover.webp"
+      }
     }
   ]
 }
