@@ -478,7 +478,8 @@
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
-      "readerPage": "/ebooks/reader.html"
+      "readerPage": "/ebooks/reader.html",
+      "pdfUrl": ""
     }
   ]
 }

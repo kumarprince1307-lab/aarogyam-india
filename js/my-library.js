@@ -633,6 +633,8 @@ async function renderLibrarySections(booksArray) {
         const isStudioDemo = (book.type === 'demo' || book.isDemo === true || rawId.startsWith('DEMO')) && !rawId.startsWith('BONUS') && !rawId.startsWith('FREE');
         const isStudioBonus = (book.type === 'bonus_free' || book.isBonus === true || rawId.startsWith('BONUS') || rawId.startsWith('FREE')) && !rawId.startsWith('DEMO');
         const bookVideos = Array.isArray(book.videos) ? book.videos : (book.video?.url ? [{ title: book.video.title || 'Video Demo', url: book.video.url }] : []);
+        // ✅ FIX: Extract PDF path from book data (covers BK015 and all custom uploads)
+        const bookPdfPath = book.mainPdf || book.pdf_url || book.pdfUrl || book.main_pdf || '';
 
         if (hasAudioBook && !seenAudioIds.has(rawId)) {
             seenAudioIds.add(rawId);
@@ -657,7 +659,7 @@ async function renderLibrarySections(booksArray) {
                     <a href="/ebooks/reader.html?book=${bookId}" class="btn-read" style="flex:1;min-width:85px;padding:8px;background:#138A36;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;">📖 Read</a>
                     ${hasAudioBook ? `<a href="/ebooks/reader.html?book=${bookId}&audio=1" class="btn-audio" style="flex:1;min-width:85px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;" title="ऑडियो बुक सुनें">🎧 ऑडियो</a>` : ''}
                     ${bookVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bookName}", ${JSON.stringify(bookVideos)})' class="btn-video" style="flex:1;min-width:85px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.85rem;" title="वीडियो डेमो देखें">🎬 वीडियो</button>` : ''}
-                    <button type="button" onclick="downloadBookPdf('${bookId}', '${bookName.replace(/'/g, "\\'")}')" class="btn-buy" style="flex:1;min-width:85px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.85rem;" title="सीधे PDF डाउनलोड करें">📥 PDF</button>
+                    <button type="button" onclick="downloadBookPdf('${bookId}', '${bookName.replace(/'/g, "\\'").replace(/\"/g, '')}', '${bookPdfPath}')" class="btn-buy" style="flex:1;min-width:85px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.85rem;" title="PDF डाउनलोड करें">📥 PDF</button>
                 </div>
             `;
             if (purchasedGrid) purchasedGrid.appendChild(card);
@@ -974,42 +976,52 @@ async function assembleClientPdfFromImages(cleanId, cleanTitle) {
     }
 }
 
-window.downloadBookPdf = async function(bookId, bookTitle) {
-    const cleanId = (bookId || 'BK001').toUpperCase().trim();
-    const cleanTitle = (bookTitle || 'Aarogyam_India_eBook').replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_');
-    const pdfPath = `/pdf/full/${cleanId}.pdf`;
+window.downloadBookPdf = async function(bookId, bookTitle, directPdfPath) {
+    const cleanId = (bookId || '').toUpperCase().trim();
+    if (!cleanId) return;
+    const cleanTitle = (bookTitle || cleanId).replace(/[^\u0900-\u097Fa-zA-Z0-9_\- ]/g, '_').trim();
+    const dlFilename = `${cleanId}_${cleanTitle}.pdf`;
 
-    // 1. Direct Static PDF check (BK001, BK002, or any existing PDF on server)
-    try {
-        const check = await fetch(pdfPath, { method: 'HEAD' }).catch(() => ({ ok: false }));
-        if (check && check.ok) {
-            const link = document.createElement('a');
-            link.href = pdfPath;
-            link.download = `${cleanId}_${cleanTitle}.pdf`;
-            link.target = '_self';
-            document.body.appendChild(link);
-            link.click();
-            setTimeout(() => {
-                if (link.parentNode) link.parentNode.removeChild(link);
-            }, 500);
-            return;
-        }
-    } catch(e) {}
+    // ─── STEP 1: Static PDF file download ────────────────────────────────
+    // If book has a mainPdf path set in JSON (books.json or landing-pages.json), download it directly.
+    // BK001 / BK002 also fall here via /pdf/full/ candidate path.
+    const pdfPathToTry = (directPdfPath || '').trim();
+    const candidatePaths = pdfPathToTry
+        ? [pdfPathToTry]                          // mainPdf set → try only that path
+        : [`/pdf/full/${cleanId}.pdf`];           // no mainPdf → only check standard location
 
-    // 2. Client-Side Zero-Egress PDF Generation (Construct from HD page images)
+    for (const pdfUrl of candidatePaths) {
+        try {
+            const check = await fetch(pdfUrl, { method: 'HEAD' }).catch(() => ({ ok: false }));
+            if (check && check.ok) {
+                const link = document.createElement('a');
+                link.href = pdfUrl;
+                link.download = dlFilename;
+                link.target = '_self';
+                document.body.appendChild(link);
+                link.click();
+                setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 500);
+                if (typeof showToast === 'function') showToast('✅ PDF डाउनलोड शुरू हो गया!', 'success');
+                return;
+            }
+        } catch(e) {}
+    }
+
+    // ─── STEP 2: No static PDF → Assemble PDF from book page images ───────
+    // Used for books like BK015 whose pages are stored as
+    // /images/books/BK015/1.webp, 2.webp, ... N.webp
+    if (typeof showToast === 'function') {
+        showToast('⏳ PDF तैयार हो रहा है... कृपया रुकें (फोन बंद न करें)', 'info');
+    }
     try {
-        if (typeof showToast === 'function') {
-            showToast('⏳ डिजिटल PDF तैयार हो रहा है... कृपया 2 सेकंड प्रतीक्षा करें', 'info');
-        }
         const success = await assembleClientPdfFromImages(cleanId, cleanTitle);
         if (success) {
-            if (typeof showToast === 'function') {
-                showToast('🎉 PDF सफलतापूर्वक डाउनलोड हो गया!', 'success');
-            }
+            if (typeof showToast === 'function') showToast('🎉 PDF सफलतापूर्वक डाउनलोड हो गया!', 'success');
             return;
         }
     } catch(e) {}
 
-    // 3. Fallback to download.html
+    // ─── STEP 3: Total fallback ───────────────────────────────────────────
+    if (typeof showToast === 'function') showToast('⚠️ PDF उपलब्ध नहीं है, Download पेज खुल रहा है...', 'warning');
     window.location.href = `/ebooks/download.html?book=${encodeURIComponent(cleanId)}`;
 };

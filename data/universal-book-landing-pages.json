@@ -730,7 +730,8 @@
             "icon": "fa-gift",
             "text": "with Audio "
           }
-        ]
+        ],
+        "pdf_url": ""
       },
       "value_stack": {
         "book_mrp": 299,
