@@ -916,65 +916,133 @@ function showCongratulationsPopup() {
 }
 
 // 12. Direct Native PDF Downloader & Zero-Egress Client-Side PDF Assembler
+
+// Progress overlay for PDF generation
+function showPdfProgress(current, total, msg) {
+    let overlay = document.getElementById('aim_pdf_progress_overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'aim_pdf_progress_overlay';
+        overlay.style.cssText = `
+            position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:99999;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            font-family:sans-serif; color:#fff; text-align:center; padding:20px;
+        `;
+        overlay.innerHTML = `
+            <div style="background:#1a1a2e;border-radius:16px;padding:32px 28px;max-width:320px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,0.5);">
+                <div style="font-size:2.2rem;margin-bottom:12px;">📄</div>
+                <div id="aim_pdf_msg" style="font-size:1rem;font-weight:600;margin-bottom:16px;"></div>
+                <div style="background:#333;border-radius:8px;height:12px;overflow:hidden;margin-bottom:10px;">
+                    <div id="aim_pdf_bar" style="height:100%;background:linear-gradient(90deg,#f97316,#ef4444);border-radius:8px;transition:width 0.3s;width:0%;"></div>
+                </div>
+                <div id="aim_pdf_count" style="font-size:0.8rem;color:#aaa;"></div>
+                <div style="font-size:0.72rem;color:#888;margin-top:10px;">📵 फोन स्क्रीन बंद न करें</div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
+    const bar = document.getElementById('aim_pdf_bar');
+    const msgEl = document.getElementById('aim_pdf_msg');
+    const countEl = document.getElementById('aim_pdf_count');
+    if (bar && total > 0) bar.style.width = Math.round((current / total) * 100) + '%';
+    if (msgEl) msgEl.textContent = msg || 'PDF बन रहा है...';
+    if (countEl && total > 0) countEl.textContent = `पेज ${current} / ${total} प्रोसेस हो रहे हैं`;
+}
+
+function hidePdfProgress() {
+    const overlay = document.getElementById('aim_pdf_progress_overlay');
+    if (overlay) overlay.remove();
+}
+
 async function loadJsPdfLibrary() {
     if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
-    return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-        script.onload = () => {
-            if (window.jspdf && window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
-            else reject(new Error('jsPDF failed to load'));
-        };
-        script.onerror = () => reject(new Error('Network error loading jsPDF'));
-        document.head.appendChild(script);
-    });
+    // Try primary CDN, then fallback
+    const cdnList = [
+        'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+        'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js'
+    ];
+    for (const src of cdnList) {
+        try {
+            await new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = src;
+                s.onload = () => (window.jspdf && window.jspdf.jsPDF) ? resolve() : reject();
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
+            if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+        } catch(e) {}
+    }
+    throw new Error('jsPDF library load failed from all CDNs');
 }
 
 async function assembleClientPdfFromImages(cleanId, cleanTitle) {
+    showPdfProgress(0, 1, 'PDF library लोड हो रही है...');
     try {
         const jsPDF = await loadJsPdfLibrary();
+
+        // ── Step A: Find total pages by probing sequentially (no HEAD - just GET)
+        showPdfProgress(0, 1, 'बुक के पेज गिने जा रहे हैं...');
+        const pageUrls = [];
+        for (let n = 1; n <= 300; n++) {
+            const url = `/images/books/${cleanId}/${n}.webp`;
+            try {
+                const r = await fetch(url, { method: 'HEAD' }).catch(() => ({ ok: false }));
+                if (r.ok) { pageUrls.push(url); }
+                else { break; } // stop at first missing page
+            } catch(e) { break; }
+        }
+
+        if (pageUrls.length === 0) {
+            hidePdfProgress();
+            return false;
+        }
+
+        const totalPages = pageUrls.length;
+        showPdfProgress(0, totalPages, `${totalPages} पेज मिले, PDF बनाना शुरू...`);
+
+        // ── Step B: Fetch images in batches of 5 and build PDF
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        const pageWidth = 210;
-        const pageHeight = 297;
-        
-        let pageNum = 1;
-        let addedPages = 0;
-        
-        while (pageNum <= 200) {
-            const imgPath = `/images/books/${cleanId}/${pageNum}.webp`;
-            const imgCheck = await fetch(imgPath, { method: 'HEAD' }).catch(() => ({ ok: false }));
-            let effectivePath = imgPath;
-            
-            if (!imgCheck.ok) {
-                const altPath = `/images/books/${cleanId.toLowerCase()}-preview-${pageNum}.webp`;
-                const altCheck = await fetch(altPath, { method: 'HEAD' }).catch(() => ({ ok: false }));
-                if (!altCheck.ok) break;
-                effectivePath = altPath;
+        const W = 210, H = 297;
+        const BATCH = 5;
+
+        for (let i = 0; i < pageUrls.length; i += BATCH) {
+            const batchUrls = pageUrls.slice(i, i + BATCH);
+
+            // Fetch batch in parallel
+            const blobs = await Promise.all(
+                batchUrls.map(url =>
+                    fetch(url).then(r => r.ok ? r.blob() : null).catch(() => null)
+                )
+            );
+
+            for (let j = 0; j < blobs.length; j++) {
+                const blob = blobs[j];
+                if (!blob) continue;
+                const dataUrl = await new Promise(res => {
+                    const fr = new FileReader();
+                    fr.onload = () => res(fr.result);
+                    fr.readAsDataURL(blob);
+                });
+                const pageIdx = i + j;
+                if (pageIdx > 0) doc.addPage('a4', 'portrait');
+                doc.addImage(dataUrl, 'WEBP', 0, 0, W, H, undefined, 'FAST');
+                showPdfProgress(pageIdx + 1, totalPages, 'PDF बन रहा है...');
             }
-            
-            const blob = await fetch(effectivePath).then(r => r.blob());
-            const dataUrl = await new Promise(res => {
-                const fr = new FileReader();
-                fr.onload = () => res(fr.result);
-                fr.readAsDataURL(blob);
-            });
-            
-            if (addedPages > 0) doc.addPage('a4', 'portrait');
-            doc.addImage(dataUrl, 'WEBP', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
-            addedPages++;
-            pageNum++;
         }
-        
-        if (addedPages > 0) {
-            doc.save(`${cleanId}_${cleanTitle}.pdf`);
-            return true;
-        }
-        return false;
+
+        showPdfProgress(totalPages, totalPages, 'PDF सेव हो रही है...');
+        doc.save(`${cleanId}_${cleanTitle}.pdf`);
+        hidePdfProgress();
+        return true;
+
     } catch(e) {
-        console.error('Client PDF Assembly error:', e);
+        console.error('PDF Assembly error:', e);
+        hidePdfProgress();
         return false;
     }
 }
+
 
 window.downloadBookPdf = async function(bookId, bookTitle, directPdfPath) {
     const cleanId = (bookId || '').toUpperCase().trim();
@@ -1010,9 +1078,7 @@ window.downloadBookPdf = async function(bookId, bookTitle, directPdfPath) {
     // ─── STEP 2: No static PDF → Assemble PDF from book page images ───────
     // Used for books like BK015 whose pages are stored as
     // /images/books/BK015/1.webp, 2.webp, ... N.webp
-    if (typeof showToast === 'function') {
-        showToast('⏳ PDF तैयार हो रहा है... कृपया रुकें (फोन बंद न करें)', 'info');
-    }
+    showPdfProgress(0, 1, 'PDF तैयार हो रही है...');
     try {
         const success = await assembleClientPdfFromImages(cleanId, cleanTitle);
         if (success) {
@@ -1020,6 +1086,7 @@ window.downloadBookPdf = async function(bookId, bookTitle, directPdfPath) {
             return;
         }
     } catch(e) {}
+    hidePdfProgress();
 
     // ─── STEP 3: Total fallback ───────────────────────────────────────────
     if (typeof showToast === 'function') showToast('⚠️ PDF उपलब्ध नहीं है, Download पेज खुल रहा है...', 'warning');
