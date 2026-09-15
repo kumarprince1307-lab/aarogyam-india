@@ -88,7 +88,8 @@
         // 4. Load User's Personal Real-time & Stored Notifications
         loadUserNotifications: async function (forceRefresh = false) {
             const now = Date.now();
-            if (!forceRefresh && this._cache && (now - this._cacheTime < 90000)) {
+            // ✅ EGRESS FIX: Cache 90s → 30 minutes to massively reduce Supabase queries
+            if (!forceRefresh && this._cache && (now - this._cacheTime < 1800000)) {
                 this.items = this._cache;
                 this.updateBadgeCount();
                 this.renderList();
@@ -99,7 +100,9 @@
             const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${user.id || user.mobile || 'guest'}`) || '[]');
             const list = [];
 
-            const db = this.getDb();
+            // ✅ EGRESS FIX: Skip ALL Supabase queries for guests (no login = no DB egress)
+            const isLoggedIn = Boolean(user.id || user.mobile);
+            const db = isLoggedIn ? this.getDb() : null;
             const shareId = user.share_id || user.referral_code || '';
 
             // --- A. Real Referral Signups from Supabase ---
@@ -640,10 +643,14 @@ ${bc.body || bc.desc || ''}
             });
         },
 
-        // 12. Periodic Background Poll (Every 5 minutes, active tab only)
+        // 12. Periodic Background Poll (Every 30 minutes, active tab only)
         setupPeriodicCheck: function () {
+            // ✅ EGRESS FIX: 5 min → 30 min polling = 83% fewer Supabase queries
             setInterval(async () => {
                 if (document.hidden || !document.hasFocus()) return;
+                // Skip if user is not logged in
+                const u = this.getUser();
+                if (!u.id && !u.mobile) return;
                 const prevUnread = this.items.filter(n => !n.isRead).length;
                 await this.loadUserNotifications();
                 const newUnread = this.items.filter(n => !n.isRead).length;
@@ -652,7 +659,7 @@ ${bc.body || bc.desc || ''}
                     const topItem = this.items[0];
                     this.showTopToast(topItem.title, topItem.desc, topItem.icon || '🔔');
                 }
-            }, 300000);
+            }, 1800000); // 30 minutes
         },
 
         // 13. Relative Time Formatter

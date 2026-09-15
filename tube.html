@@ -3720,12 +3720,12 @@
       async function fetchSharerDetails(sId) {
         const cleanId = String(sId || getActiveUplineShareId()).trim();
 
-        // Check 10-Minute Session Cache to prevent repeat Supabase egress
+        // ✅ EGRESS FIX: Cache sharer profile 24 hours in localStorage (not 10min sessionStorage)
         try {
-          const cachedSharer = sessionStorage.getItem('aim_sharer_prof_' + cleanId);
+          const cachedSharer = localStorage.getItem('aim_sharer_prof_' + cleanId);
           if (cachedSharer) {
             const parsed = JSON.parse(cachedSharer);
-            if (parsed && (Date.now() - (parsed._ts || 0) < 600000) && parsed.data) {
+            if (parsed && (Date.now() - (parsed._ts || 0) < 86400000) && parsed.data) { // 24 hours
               currentSharerProfile = parsed.data;
               updateSharerUI(parsed.data);
               return;
@@ -3739,7 +3739,8 @@
             if (data && (data.full_name || data.mobile)) {
               currentSharerProfile = data;
               try {
-                sessionStorage.setItem('aim_sharer_prof_' + cleanId, JSON.stringify({ data: data, _ts: Date.now() }));
+                // Save to localStorage for 24-hour caching (not sessionStorage)
+                localStorage.setItem('aim_sharer_prof_' + cleanId, JSON.stringify({ data: data, _ts: Date.now() }));
               } catch(e) {}
               updateSharerUI(data);
               return;
@@ -5223,11 +5224,20 @@
         return match ? match[1] : null;
       }
 
+      // ✅ EGRESS FIX: Debounce tracker - same video+action won't insert within 5 min
+      const _activityLog = {};
+
       function logVideoActivity(action, vidObj, extra = {}) {
         try {
           const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
           const mob = localStorage.getItem('aim_user_mobile') || uObj.mobile || '';
           if (db && mob) {
+            // Debounce: skip if same action+video logged within last 5 minutes
+            const debounceKey = `${action}_${vidObj?.id || ''}`;
+            const lastLogged = _activityLog[debounceKey] || 0;
+            if (Date.now() - lastLogged < 300000) return; // 5 min debounce
+            _activityLog[debounceKey] = Date.now();
+
             db.from('user_activity').insert([{
               mobile: mob,
               action: `tube_${action}`,

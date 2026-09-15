@@ -507,63 +507,84 @@ async function renderLibrarySections(booksArray) {
     try {
         const activeDb = getLibrarySupabaseClient();
         if (activeDb) {
-            let profileIds = [];
-            if (profileId) profileIds.push(profileId);
-
-            // If mobile number exists, query Supabase profiles to get all associated profile IDs
-            if (cleanMobile && cleanMobile.length === 10) {
-                try {
-                    const { data: pList } = await activeDb
-                        .from('profiles')
-                        .select('id, full_name, mobile, is_active, is_subscriber')
-                        .or(`mobile.eq.${cleanMobile},mobile.eq.+91${cleanMobile},mobile.eq.91${cleanMobile}`);
-
-                    if (Array.isArray(pList) && pList.length > 0) {
-                        pList.forEach(p => {
-                            if (p && p.id && !profileIds.includes(p.id)) {
-                                profileIds.push(p.id);
-                            }
-                        });
-                        if (!localUser.id && pList[0].id) {
-                            localUser.id = pList[0].id;
-                            if (pList[0].full_name && !localUser.full_name) localUser.full_name = pList[0].full_name;
-                            if (pList[0].is_active) localUser.is_active = true;
-                            if (pList[0].is_subscriber) localUser.is_subscriber = true;
-                            localStorage.setItem('AI_USER', JSON.stringify(localUser));
-                        }
+            // ✅ EGRESS FIX: 15-min sessionStorage cache for purchases - skip Supabase if cached
+            const libCacheKey = 'aim_lib_purch_' + (cleanMobile || profileId || 'g');
+            let fromCache = false;
+            try {
+                const raw = sessionStorage.getItem(libCacheKey);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && (Date.now() - (parsed._ts || 0) < 900000) && Array.isArray(parsed.data)) {
+                        parsed.data.forEach(p => { if (!userPurchases.some(up => up.id === p.id)) userPurchases.push(p); });
+                        fromCache = true;
                     }
-                } catch (pe) {
-                    console.warn("Profile query note:", pe);
                 }
-            }
+            } catch(e) {}
 
-            // If profile ID(s) exist, query Supabase purchases table
-            if (profileIds.length > 0) {
-                const { data: dbPurchases, error: purErr } = await activeDb
-                    .from('purchases')
-                    .select('id, profile_id, book_id, amount, payment_status, payment_id, order_id, purchase_date, created_at')
-                    .in('profile_id', profileIds);
+            if (!fromCache) {
+                let profileIds = [];
+                if (profileId) profileIds.push(profileId);
 
-                if (!purErr && Array.isArray(dbPurchases) && dbPurchases.length > 0) {
-                    dbPurchases.forEach(p => {
-                        const rawBId = String(p.book_id || '').toUpperCase().trim();
-                        if (rawBId) {
-                            const bIds = rawBId.includes(',') ? rawBId.split(',').map(s => s.trim().toUpperCase()) : [rawBId];
-                            bIds.forEach(singleId => {
-                                if (singleId && !userPurchases.some(up => String(up.book_id || up.id || '').toUpperCase() === singleId)) {
-                                    userPurchases.push({
-                                        id: p.id || ('pur_' + singleId),
-                                        book_id: singleId,
-                                        amount: p.amount,
-                                        payment_status: p.payment_status || 'success',
-                                        purchase_date: p.purchase_date || p.created_at || new Date().toISOString()
-                                    });
+                // If mobile number exists, query Supabase profiles to get all associated profile IDs
+                if (cleanMobile && cleanMobile.length === 10) {
+                    try {
+                        const { data: pList } = await activeDb
+                            .from('profiles')
+                            .select('id, full_name, mobile, is_active, is_subscriber')
+                            .or(`mobile.eq.${cleanMobile},mobile.eq.+91${cleanMobile},mobile.eq.91${cleanMobile}`);
+
+                        if (Array.isArray(pList) && pList.length > 0) {
+                            pList.forEach(p => {
+                                if (p && p.id && !profileIds.includes(p.id)) {
+                                    profileIds.push(p.id);
                                 }
                             });
+                            if (!localUser.id && pList[0].id) {
+                                localUser.id = pList[0].id;
+                                if (pList[0].full_name && !localUser.full_name) localUser.full_name = pList[0].full_name;
+                                if (pList[0].is_active) localUser.is_active = true;
+                                if (pList[0].is_subscriber) localUser.is_subscriber = true;
+                                localStorage.setItem('AI_USER', JSON.stringify(localUser));
+                            }
                         }
-                    });
-                    localStorage.setItem('AI_PURCHASES', JSON.stringify(userPurchases));
-                    localStorage.setItem('purchases', JSON.stringify(userPurchases));
+                    } catch (pe) {
+                        console.warn("Profile query note:", pe);
+                    }
+                }
+
+                // If profile ID(s) exist, query Supabase purchases table
+                if (profileIds.length > 0) {
+                    const { data: dbPurchases, error: purErr } = await activeDb
+                        .from('purchases')
+                        .select('id, profile_id, book_id, amount, payment_status, payment_id, order_id, purchase_date, created_at')
+                        .in('profile_id', profileIds);
+
+                    if (!purErr && Array.isArray(dbPurchases) && dbPurchases.length > 0) {
+                        const newPurchases = [];
+                        dbPurchases.forEach(p => {
+                            const rawBId = String(p.book_id || '').toUpperCase().trim();
+                            if (rawBId) {
+                                const bIds = rawBId.includes(',') ? rawBId.split(',').map(s => s.trim().toUpperCase()) : [rawBId];
+                                bIds.forEach(singleId => {
+                                    if (singleId && !userPurchases.some(up => String(up.book_id || up.id || '').toUpperCase() === singleId)) {
+                                        const purObj = {
+                                            id: p.id || ('pur_' + singleId),
+                                            book_id: singleId,
+                                            amount: p.amount,
+                                            payment_status: p.payment_status || 'success',
+                                            purchase_date: p.purchase_date || p.created_at || new Date().toISOString()
+                                        };
+                                        userPurchases.push(purObj);
+                                        newPurchases.push(purObj);
+                                    }
+                                });
+                            }
+                        });
+                        localStorage.setItem('AI_PURCHASES', JSON.stringify(userPurchases));
+                        localStorage.setItem('purchases', JSON.stringify(userPurchases));
+                        // Save to session cache for 15 minutes
+                        try { sessionStorage.setItem(libCacheKey, JSON.stringify({ data: userPurchases, _ts: Date.now() })); } catch(e) {}
+                    }
                 }
             }
         }
