@@ -7,7 +7,6 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadSuccessPage();
-    startRedirectTimer(7); // 7 सेकंड का ऑटोमैटिक टाइमर
 });
 
 async function loadSuccessPage() {
@@ -217,32 +216,56 @@ async function loadSuccessPage() {
             });
         }
 
+        // 8. DIRECT FLOW TO DOWNLOAD.HTML FOR PURCHASED BOOK
+        let targetBookId = 'BK001';
+        if (resolvedBooks && resolvedBooks.length > 0 && resolvedBooks[0].id) {
+            targetBookId = resolvedBooks[0].id;
+        } else if (rawBookId) {
+            targetBookId = String(rawBookId).split(',')[0].trim().toUpperCase();
+        }
+
+        const targetDownloadUrl = `download.html?book=${encodeURIComponent(targetBookId)}`;
+
+        const downloadBtn = document.getElementById("btnDownloadNow") || document.querySelector(".library-btn");
+        if (downloadBtn) {
+            downloadBtn.href = targetDownloadUrl;
+            downloadBtn.innerHTML = `📥 ई-बुक तुरंत डाउनलोड करें / ऐप में खोलें`;
+        }
+
+        // Auto-redirect to download.html in 3 seconds (fast & smooth)
+        startRedirectTimer(3, targetDownloadUrl);
+
     } catch (error) {
         console.error("Success Page Load Error:", error);
+        // Fallback redirect even on error
+        startRedirectTimer(3, "download.html");
     }
 }
 
 /* ==========================================
-   AUTOMATIC REDIRECT TIMER
+   AUTOMATIC REDIRECT TIMER TO DOWNLOAD.HTML
 ========================================== */
-function startRedirectTimer(durationInSeconds) {
-    let timeLeft = durationInSeconds;
+function startRedirectTimer(durationInSeconds, targetUrl) {
+    let timeLeft = durationInSeconds || 3;
     const timerDisplay = document.getElementById("timerDisplay");
+    const destination = targetUrl || "download.html?book=BK001";
 
     if (!timerDisplay) return;
+
+    timerDisplay.innerHTML = `⏳ आपको ${timeLeft} सेकंड में सीधे ई-बुक डाउनलोड व ऐप हब पर भेजा जा रहा है...`;
 
     const countdownInterval = setInterval(() => {
         timeLeft--;
 
         if (timeLeft > 0) {
-            timerDisplay.innerHTML = `⏳ आपको ${timeLeft} सेकंड में ऑटोमैटिकली लाइब्रेरी में भेजा जा रहा है...`;
+            timerDisplay.innerHTML = `⏳ आपको ${timeLeft} सेकंड में सीधे ई-बुक डाउनलोड व ऐप हब पर भेजा जा रहा है...`;
         } else {
             clearInterval(countdownInterval);
-            timerDisplay.innerHTML = `🚀 आपको अब लाइब्रेरी पर भेजा जा रहा है...`;
+            timerDisplay.innerHTML = `🚀 आपको अब ई-बुक डाउनलोड हब पर भेजा जा रहा है...`;
             
             setTimeout(() => {
-                window.location.href = "my-library.html";
-            }, 1000);
+                window.location.href = destination;
+            }, 400);
         }
     }, 1000);
 }
