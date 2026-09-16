@@ -443,32 +443,46 @@ body.vip-download-theme {
 }
 
 /* =================================================================
-   SECTION 2: E-BOOK DELIVERY & DOWNLOAD CARD (BLUE FULL HD BOX)
+   SECTION 2: E-BOOK DELIVERY & DOWNLOAD CARD (ANIMATED WHITE FROSTED GLASS)
 ================================================================= */
 .download-card-vip {
-    background: var(--vip-bg-card);
-    border: 1px solid var(--vip-border-gold);
+    background: rgba(255, 255, 255, 0.96) !important;
+    border: 2px solid rgba(255, 255, 255, 0.95);
     border-radius: var(--radius-xl);
     padding: 30px 24px;
     position: relative;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
-    backdrop-filter: blur(16px);
+    box-shadow: 0 16px 45px rgba(0,0,0,0.35), 0 0 35px rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    overflow: hidden;
+    color: #0f172a;
+}
+.download-card-vip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #10b981, #f59e0b, #3b82f6, #10b981);
+    z-index: 2;
 }
 .card-gold-ribbon {
     position: absolute;
     top: 0;
     right: 24px;
     background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #000;
+    color: #ffffff;
     font-weight: 900;
-    font-size: 0.72rem;
-    padding: 5px 14px 6px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+    font-size: 0.74rem;
+    padding: 6px 16px 7px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
     display: flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+    z-index: 3;
 }
 
 .book-delivery-wrap {
@@ -493,8 +507,8 @@ body.vip-download-theme {
     aspect-ratio: 3/4;
     object-fit: cover;
     border-radius: var(--radius-md);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 20px rgba(16, 185, 129, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.22), 0 0 16px rgba(16, 185, 129, 0.2);
+    border: 2.5px solid #ffffff;
     cursor: pointer;
     transition: transform 0.3s ease;
 }
@@ -506,8 +520,8 @@ body.vip-download-theme {
     bottom: -8px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.85);
-    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(255,255,255,0.4);
     color: #fff;
     font-size: 0.65rem;
     font-weight: 700;
@@ -521,21 +535,23 @@ body.vip-download-theme {
 }
 .book-category-pill {
     display: inline-block;
-    background: rgba(16, 185, 129, 0.18);
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    color: #34d399;
+    background: #dcfce7;
+    border: 1.5px solid #86efac;
+    color: #166534;
     font-size: 0.75rem;
     font-weight: 800;
-    padding: 3px 10px;
-    border-radius: 12px;
+    padding: 4px 12px;
+    border-radius: 14px;
     margin-bottom: 8px;
 }
 .vip-book-title {
-    font-size: 1.5rem;
+    font-family: var(--font-heading);
+    font-size: 1.55rem;
     font-weight: 900;
-    color: #ffffff;
+    color: #0f172a !important;
     margin-bottom: 12px;
     line-height: 1.35;
+    letter-spacing: -0.2px;
 }
 
 /* Purchase Certificate Grid */
@@ -543,24 +559,32 @@ body.vip-download-theme {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px 16px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
     border-radius: var(--radius-md);
-    padding: 10px 14px;
+    padding: 12px 16px;
     margin-bottom: 12px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+}
+@media (max-width: 480px) {
+    .purchase-certificate-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
 }
 .cert-item {
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 .cert-lbl {
-    color: #94a3b8;
+    color: #64748b;
+    font-weight: 600;
 }
 .cert-val {
-    color: #f1f5f9;
-    font-weight: 700;
+    color: #0f172a !important;
+    font-weight: 800;
 }
 .lifetime-seal {
     display: flex;
@@ -568,19 +592,23 @@ body.vip-download-theme {
     gap: 8px;
     font-size: 0.82rem;
     font-weight: 800;
-    color: var(--vip-gold-light);
+    color: #059669;
 }
 
 /* Download Status Counter */
 .download-status-vip {
-    background: rgba(14, 46, 30, 0.65);
-    border: 1px solid rgba(52, 211, 153, 0.3);
     border-radius: var(--radius-lg);
     padding: 14px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 22px;
+    transition: all 0.25s ease;
+}
+.download-status-vip.ready {
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
 }
 @media (max-width: 640px) {
     .download-status-vip {
@@ -591,13 +619,13 @@ body.vip-download-theme {
 }
 .ready-badge {
     display: inline-block;
-    color: #34d399;
-    font-size: 0.88rem;
-    font-weight: 800;
+    color: #15803d;
+    font-size: 0.9rem;
+    font-weight: 900;
 }
 .status-note {
     font-size: 0.82rem;
-    color: #94a3b8;
+    color: #475569;
     margin-top: 2px;
 }
 .vip-download-counter {
@@ -612,18 +640,40 @@ body.vip-download-theme {
 }
 .cnt-box span {
     font-size: 0.68rem;
-    color: #94a3b8;
+    color: #64748b;
+    font-weight: 700;
 }
 .cnt-box strong {
-    font-size: 1.15rem;
-    color: #ffffff;
+    font-size: 1.2rem;
+    color: #0f172a;
+    font-weight: 900;
 }
 .cnt-divider {
-    color: rgba(255,255,255,0.2);
+    color: #cbd5e1;
     font-size: 1.2rem;
 }
 
-/* Download Tiers */
+.download-status-vip.exhausted {
+    background: #fef2f2;
+    border: 1.5px solid #fca5a5;
+    padding: 16px;
+    text-align: center;
+}
+.download-status-vip.exhausted .status-title {
+    color: #dc2626;
+    font-size: 1.05rem;
+    font-weight: 900;
+    margin-bottom: 4px;
+}
+.download-status-vip.exhausted .status-subtitle {
+    color: #4b5563;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* =================================================================
+   ANIMATED WHITE FROSTED GLASS DOWNLOAD BUTTONS
+================================================================= */
 .download-tiers-vip-wrap {
     display: flex;
     flex-direction: column;
@@ -632,156 +682,163 @@ body.vip-download-theme {
 }
 .btn-tier-vip {
     width: 100%;
-    padding: 16px 18px;
+    padding: 18px 20px;
     border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    border: 1.5px solid transparent;
-    transition: all 0.25s ease;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     text-align: left;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12), 0 0 15px rgba(255,255,255,0.6);
+    position: relative;
+    overflow: hidden;
+    color: #0f172a !important;
 }
+
+/* Animated White Shimmer Sweep (सारे बटन एनिमेटेड व्हाइट चमकदार) */
+.btn-tier-vip::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 220%;
+    height: 200%;
+    background: linear-gradient(
+        60deg,
+        transparent 25%,
+        rgba(255, 255, 255, 0.7) 48%,
+        rgba(255, 255, 255, 0.95) 52%,
+        transparent 65%
+    );
+    transform: rotate(25deg);
+    animation: btnTierShimmerSweep 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes btnTierShimmerSweep {
+    0% { transform: translateX(-120%) rotate(25deg); opacity: 0; }
+    15% { opacity: 0.9; }
+    35% { transform: translateX(120%) rotate(25deg); opacity: 0; }
+    100% { transform: translateX(120%) rotate(25deg); opacity: 0; }
+}
+
+.btn-tier-vip:hover {
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: 0 16px 35px rgba(0,0,0,0.2), 0 0 25px rgba(255, 255, 255, 0.85);
+}
+
 .tier-left-col {
     display: flex;
     align-items: center;
     gap: 14px;
 }
 .tier-icon-circle {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: 1.45rem;
     flex-shrink: 0;
 }
 .tier-headline {
-    font-size: 1.05rem;
-    font-weight: 800;
-    margin-bottom: 2px;
+    font-family: var(--font-heading);
+    font-size: 1.12rem;
+    font-weight: 900;
+    margin-bottom: 3px;
+    color: #0f172a !important;
 }
 .tier-subtext {
-    font-size: 0.8rem;
-    line-height: 1.35;
+    font-size: 0.84rem;
+    line-height: 1.4;
+    color: #475569 !important;
+    font-weight: 600;
 }
 .tier-right-badge {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 3px;
+    gap: 4px;
     flex-shrink: 0;
 }
 
-/* Fast Tier VIP (Gold/Amber) */
+/* Fast Tier VIP (Amber Accent on White) */
 .btn-tier-vip.fast-tier-vip {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(16, 185, 129, 0.16) 100%);
-    border-color: var(--vip-gold);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25);
-    color: #ffffff;
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%) !important;
 }
-.btn-tier-vip.fast-tier-vip:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(16, 185, 129, 0.25) 100%);
-}
+.btn-tier-vip.fast-tier-vip .tier-headline { color: #b45309 !important; }
 .tier-icon-circle.amber {
-    background: rgba(245, 158, 11, 0.25);
-    border: 1px solid var(--vip-gold);
+    background: #fef3c7;
+    border: 1.5px solid #f59e0b;
+    color: #b45309;
 }
 .badge-tag.gold {
     background: #f59e0b;
-    color: #000;
-    font-size: 0.7rem;
+    color: #ffffff;
+    font-size: 0.72rem;
     font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
 }
 .speed-tag.gold {
-    font-size: 0.68rem;
-    color: var(--vip-gold-light);
-    font-weight: 700;
+    font-size: 0.72rem;
+    color: #b45309;
+    font-weight: 800;
 }
 
-/* Full HD Tier VIP (DISTINCT BLUE BOX AS REQUESTED) */
+/* Full HD Tier VIP (Royal Blue Accent on White) */
 .btn-tier-vip.hd-tier-vip-blue {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.22) 0%, rgba(30, 58, 138, 0.35) 100%);
     border-color: #3b82f6;
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
-    color: #ffffff;
+    background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%) !important;
 }
-.btn-tier-vip.hd-tier-vip-blue:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.32) 0%, rgba(30, 58, 138, 0.45) 100%);
-    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.45);
-    border-color: #60a5fa;
-}
+.btn-tier-vip.hd-tier-vip-blue .tier-headline { color: #1d4ed8 !important; }
 .tier-icon-circle.blue {
-    background: rgba(37, 99, 235, 0.3);
-    border: 1.5px solid #60a5fa;
+    background: #dbeafe;
+    border: 1.5px solid #3b82f6;
+    color: #1d4ed8;
 }
 .badge-tag.blue {
     background: #2563eb;
     color: #ffffff;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
 }
 .speed-tag.blue {
-    font-size: 0.68rem;
-    color: #93c5fd;
-    font-weight: 700;
+    font-size: 0.72rem;
+    color: #1d4ed8;
+    font-weight: 800;
 }
 
-/* Read Online Tier VIP (Emerald) */
+/* Read Online Tier VIP (Emerald Accent on White) */
 .btn-tier-vip.read-tier-vip {
-    background: rgba(16, 185, 129, 0.08);
-    border-color: rgba(16, 185, 129, 0.25);
-    color: #cbd5e1;
+    border-color: #10b981;
+    background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%) !important;
 }
-.btn-tier-vip.read-tier-vip:hover {
-    background: rgba(16, 185, 129, 0.16);
-    border-color: var(--vip-emerald);
-    color: #ffffff;
-}
+.btn-tier-vip.read-tier-vip .tier-headline { color: #047857 !important; }
 .tier-icon-circle.green {
-    background: rgba(16, 185, 129, 0.2);
+    background: #d1fae5;
+    border: 1.5px solid #10b981;
+    color: #047857;
 }
 .badge-tag.green {
     background: #10b981;
-    color: #fff;
-    font-size: 0.7rem;
+    color: #ffffff;
+    font-size: 0.72rem;
     font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 6px;
-}
-.speed-tag.green {
-    font-size: 0.68rem;
-    color: #6ee7b7;
-    font-weight: 700;
-}
-
-/* Farmer Tip Box */
-.vip-farmer-tip-box {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    background: rgba(245, 158, 11, 0.08);
-    border: 1px solid rgba(245, 158, 11, 0.25);
-    border-radius: var(--radius-md);
-    padding: 12px 14px;
-}
-.vip-farmer-tip-box .tip-icon {
-    font-size: 1.2rem;
-    flex-shrink: 0;
-}
-.vip-farmer-tip-box .tip-text {
-    font-size: 0.82rem;
-    color: #cbd5e1;
-    line-height: 1.5;
+    padding: 4px 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
 }
 
 /* =================================================================

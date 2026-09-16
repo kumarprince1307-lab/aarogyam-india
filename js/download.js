@@ -263,6 +263,99 @@ async function fetchPurchaseRecord(userId, bookId) {
     return data;
 }
 
+
+// Persistent User & Book Download Counter Helpers
+function getUserStorageKey() {
+    const user = state.userData || {};
+    return (user.mobile || user.id || user.full_name || 'verified_user')
+        .toString().replace(/[^a-zA-Z0-9_]/g, '_');
+}
+
+function getBookStorageKey() {
+    return (state.bookId || 'BK001').toUpperCase().trim();
+}
+
+function getPersistentDownloadCount() {
+    const uKey = getUserStorageKey();
+    const bKey = getBookStorageKey();
+    
+    // 1. Check user-specific key
+    let val = localStorage.getItem(`AIM_DL_COUNT_${uKey}_${bKey}`);
+    if (val !== null && !isNaN(parseInt(val, 10))) return parseInt(val, 10);
+    
+    // 2. Check book generic key
+    val = localStorage.getItem(`AIM_DL_COUNT_${bKey}`);
+    if (val !== null && !isNaN(parseInt(val, 10))) return parseInt(val, 10);
+
+    // 3. Check purchaseData in state
+    if (state.purchaseData && typeof state.purchaseData.download_count === 'number') {
+        return state.purchaseData.download_count;
+    }
+
+    // 4. Check localStorage purchases list
+    try {
+        const purchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || localStorage.getItem('aarogyam_purchases') || '[]');
+        const match = purchases.find(p => (p.book_id || '').toUpperCase().trim() === bKey);
+        if (match && typeof match.download_count === 'number') {
+            return match.download_count;
+        }
+    } catch (e) {}
+
+    return 0;
+}
+
+function savePersistentDownloadCount(count) {
+    const uKey = getUserStorageKey();
+    const bKey = getBookStorageKey();
+
+    // 1. Save user-specific key
+    localStorage.setItem(`AIM_DL_COUNT_${uKey}_${bKey}`, String(count));
+    
+    // 2. Save book generic key
+    localStorage.setItem(`AIM_DL_COUNT_${bKey}`, String(count));
+
+    // 3. Update in-memory state
+    if (state.purchaseData) {
+        state.purchaseData.download_count = count;
+    }
+
+    // 4. Update in local purchases cache
+    try {
+        const keys = ['AI_PURCHASES', 'purchases', 'aarogyam_purchases'];
+        keys.forEach(k => {
+            const list = JSON.parse(localStorage.getItem(k) || '[]');
+            let updated = false;
+            list.forEach(p => {
+                if ((p.book_id || '').toUpperCase().trim() === bKey) {
+                    p.download_count = count;
+                    updated = true;
+                }
+            });
+            if (updated) {
+                localStorage.setItem(k, JSON.stringify(list));
+            }
+        });
+    } catch (e) {}
+}
+
+function updateDownloadButtonCountBadges(used, max) {
+    const fastSpeedTag = document.querySelector('#downloadFastBtn .speed-tag');
+    const hdSpeedTag = document.querySelector('#downloadHdBtn .speed-tag');
+
+    if (used > 0) {
+        if (fastSpeedTag) fastSpeedTag.textContent = `डाउनलोड ${used}/${max} प्रयुक्त`;
+        if (hdSpeedTag) hdSpeedTag.textContent = `डाउनलोड ${used}/${max} प्रयुक्त`;
+    } else {
+        if (fastSpeedTag) fastSpeedTag.textContent = `1-Sec Speed • 0/${max}`;
+        if (hdSpeedTag) hdSpeedTag.textContent = `HD प्रिंट • 0/${max}`;
+    }
+
+    if (used >= max) {
+        if (fastSpeedTag) fastSpeedTag.textContent = `लिमिट समाप्त (${max}/${max})`;
+        if (hdSpeedTag) hdSpeedTag.textContent = `लिमिट समाप्त (${max}/${max})`;
+    }
+}
+
 // --- UI MANIPULATION ---
 
 function populateUI() {
@@ -289,8 +382,10 @@ function populateUI() {
         purchaseDateEl.textContent = new Date(state.purchaseData.purchase_date).toLocaleDateString('hi-IN');
     }
 
-    const used = state.purchaseData.download_count || 0;
-    const max = state.maxAllowedDownloads;
+    // Resolve persistent download count by user & book
+    const used = getPersistentDownloadCount();
+    state.purchaseData.download_count = used;
+    const max = state.maxAllowedDownloads || 3;
     const remaining = Math.max(0, max - used);
 
     const downloadsUsed = document.getElementById('downloadsUsed');
@@ -301,6 +396,8 @@ function populateUI() {
 
     const downloadsMax = document.getElementById('downloadsMax');
     if (downloadsMax) downloadsMax.textContent = max;
+
+    updateDownloadButtonCountBadges(used, max);
 
     const readNowBtn = document.getElementById('readNowBtn');
     if (readNowBtn) {
@@ -314,6 +411,11 @@ function populateUI() {
         const exhaustedBox = document.getElementById('statusExhausted');
         if (readyBox) readyBox.style.display = 'none';
         if (exhaustedBox) exhaustedBox.style.display = 'block';
+
+        const fastBtn = document.getElementById('downloadFastBtn');
+        const hdBtn = document.getElementById('downloadHdBtn');
+        if (fastBtn) { fastBtn.disabled = true; fastBtn.style.opacity = '0.6'; }
+        if (hdBtn) { hdBtn.disabled = true; hdBtn.style.opacity = '0.6'; }
     }
 }
 
@@ -476,14 +578,33 @@ window.triggerDownloadTier = async function(tier = 'fast') {
     const hdBtn = document.getElementById('downloadHdBtn');
     const activeBtn = tier === 'fast' ? fastBtn : hdBtn;
 
-    const used = state.purchaseData.download_count || 0;
-    const max = state.maxAllowedDownloads;
+    const max = state.maxAllowedDownloads || 3;
+    const used = getPersistentDownloadCount();
     if ((max - used) <= 0) {
-        alert('⚠️ आपकी डाउनलोड लिमिट (3 डाउनलोड) समाप्त हो चुकी है। आप My Library में कभी भी इस पुस्तक को ऑनलाइन असीमित बार पढ़ और सुन सकते हैं।');
+        alert('⚠️ आपकी डाउनलोड लिमिट (3 डाउनलोड) पूरी हो चुकी है। आप My Library में कभी भी इस पुस्तक को ऑनलाइन असीमित बार पढ़ और सुन सकते हैं।');
         return;
     }
 
     const newCount = used + 1;
+    savePersistentDownloadCount(newCount);
+
+    const downloadsUsedEl = document.getElementById('downloadsUsed');
+    if (downloadsUsedEl) downloadsUsedEl.textContent = newCount;
+    const downloadsRemainingEl = document.getElementById('downloadsRemaining');
+    if (downloadsRemainingEl) downloadsRemainingEl.textContent = Math.max(0, max - newCount);
+
+    updateDownloadButtonCountBadges(newCount, max);
+
+    if (newCount >= max) {
+        const readyBox = document.getElementById('statusReady');
+        const exhaustedBox = document.getElementById('statusExhausted');
+        if (readyBox) readyBox.style.display = 'none';
+        if (exhaustedBox) exhaustedBox.style.display = 'block';
+
+        if (fastBtn) { fastBtn.disabled = true; fastBtn.style.opacity = '0.6'; }
+        if (hdBtn) { hdBtn.disabled = true; hdBtn.style.opacity = '0.6'; }
+    }
+
     const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
     if (client && state.userData?.id) {
         try {
@@ -506,12 +627,6 @@ window.triggerDownloadTier = async function(tier = 'fast') {
             console.warn('DB logging note:', err);
         }
     }
-
-    state.purchaseData.download_count = newCount;
-    const downloadsUsedEl = document.getElementById('downloadsUsed');
-    if (downloadsUsedEl) downloadsUsedEl.textContent = newCount;
-    const downloadsRemainingEl = document.getElementById('downloadsRemaining');
-    if (downloadsRemainingEl) downloadsRemainingEl.textContent = Math.max(0, max - newCount);
 
     const cleanId = (state.bookData.id || state.bookId || '').toUpperCase().trim();
     const cleanTitle = cleanBookTitle(state.bookData.heading || state.bookData.name || 'eBook')
