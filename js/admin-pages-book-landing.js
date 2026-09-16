@@ -6896,6 +6896,12 @@ Instant Download & Lifetime Access
       finalAudioMp3Path = `/${audioPath}`;
     }
 
+    const customThemeColor = (document.getElementById('blp_custom_theme_color')?.value || '').trim();
+    if (customThemeColor) {
+      selectedThemePrimary = customThemeColor;
+      selectedThemeDark = adjustColorBrightness(customThemeColor, -25);
+    }
+
     const pageData = {
       id: bId,
       updated_at: new Date().toISOString(),
@@ -6974,7 +6980,7 @@ Instant Download & Lifetime Access
         book_mrp: parseInt(document.getElementById('blp_stack_book_mrp')?.value, 10) || mrp,
         vip_value: parseInt(document.getElementById('blp_stack_vip_val')?.value, 10) || 1999,
         bonus_value: parseInt(document.getElementById('blp_stack_bonus_val')?.value, 10) || 199,
-        offer_price: offerPrice,
+        offer_price: parseInt(document.getElementById('blp_stack_offer_val')?.value, 10) || offerPrice,
         vip_banner: cleanSectionBanners.sec_vip_stack || undefined,
         subscriber_perk: document.getElementById('blp_vip_perk_text')?.value || '👑 VIP मेंबर्स के लिए 1 वर्ष का Pro सब्सक्रिप्शन 100% मुफ्त शामिल है।'
       },
@@ -6985,7 +6991,7 @@ Instant Download & Lifetime Access
         cards: currentWhyCards
       },
       preview_banner: cleanSectionBanners.sec_preview || undefined,
-      demo_images: cleanedDemoImages.length > 0 ? cleanedDemoImages : undefined,
+      demo_images: cleanedDemoImages,
       suggested_books_list: currentSuggestedBooks,
       suggested_books: currentSuggestedBooks.map(x => x.link || x.id || x.title).filter(Boolean),
       bonuses: currentBonuses,
@@ -7046,7 +7052,9 @@ Instant Download & Lifetime Access
       version: pageData.version,
       landingPage: `/ebooks/book-landing.html?id=${bId}`,
       checkoutPage: '/ebooks/checkout.html',
-      readerPage: '/ebooks/reader.html'
+      readerPage: '/ebooks/reader.html',
+      updated_at: new Date().toISOString(),
+      admin_edited: true
     };
 
     try {
@@ -7142,13 +7150,10 @@ Instant Download & Lifetime Access
         localStorage.setItem('AAROGYAM_DELETED_LANDING_PAGES', JSON.stringify(deletedIds));
       } catch (e) {}
 
-      // ✅ PERMANENT FIX: After successful git push, remove this book from localStorage.
-      // Next load will fetch the fresh, authoritative data from the git-pushed JSON file.
-      // This ensures banners and all edits are NEVER silently lost by stale cache.
+      // ✅ PERMANENT FIX: Keep updated data in localStorage with admin_edited=true
+      // This guarantees instantaneous live reflection on landing pages even before Git finishes Vercel build!
       try {
-        const lsPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
-        const filtered = lsPages.filter(p => p.id !== bId);
-        localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(filtered));
+        localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
       } catch (e) {}
 
       showToast(`🎉 बधाई! पुस्तक (${bId}) Git पर 100% लाइव हो गई! Vercel ऑटो-डिप्लॉयमेंट चालू हो गया है।`, 'success');

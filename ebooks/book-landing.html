@@ -10,17 +10,7 @@
       try {
         const params = new URLSearchParams(window.location.search);
         const bookId = (params.get('id') || params.get('book') || '').trim().toUpperCase();
-        if (bookId === 'BK001' || bookId === 'KHARIF-2026') {
-          params.delete('id');
-          params.delete('book');
-          const qs = params.toString() ? ('?' + params.toString()) : '';
-          window.location.replace('/ebooks/kharif-master-guide-2026.html' + qs);
-        } else if (bookId === 'BK002' || bookId === 'KHETI-DR' || bookId === 'FASAL-KA-DOCTOR') {
-          params.delete('id');
-          params.delete('book');
-          const qs = params.toString() ? ('?' + params.toString()) : '';
-          window.location.replace('/ebooks/kheti-dr.html' + qs);
-        } else if (bookId) {
+        if (bookId) {
           // Immediately bind active book ID to share elements and checkout buttons
           document.addEventListener('DOMContentLoaded', function() {
             const bsd = document.getElementById('book-share-data');
@@ -324,7 +314,7 @@
         <!-- Top Badge & Header -->
         <div style="text-align: center; margin-bottom: 24px;">
           <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(220,38,38,0.25); border: 1px solid #fbbf24; padding: 6px 20px; border-radius: 30px; font-size: 0.88rem; font-weight: 800; color: #fef08a; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 14px; box-shadow: 0 0 18px rgba(245,158,11,0.35);">
-            <span>🎧 डिजिटल ऑडियो बुक अनुभव</span>
+            <span id="ubl-audio-badge-tag">🎧 डिजिटल ऑडियो बुक अनुभव</span>
             <span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 0.72rem; padding: 2px 9px; border-radius: 12px; font-weight: 900;">eBook + Audio</span>
           </div>
           <h2 id="ubl-audio-section-h2" style="font-size: 2rem; font-weight: 900; line-height: 1.3; color: #ffffff; margin: 0 0 10px 0; text-shadow: 0 2px 12px rgba(0,0,0,0.6);">

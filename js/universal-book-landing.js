@@ -115,6 +115,7 @@
     renderFaqSection();
     renderBookDetails();
     initLandingPageAutoplay();
+    enforceHiddenSections();
   }
 
     function initLandingPageAutoplay() {
@@ -465,12 +466,45 @@
     });
 
     // Check hidden sections
+    enforceHiddenSections();
+  }
+
+  function enforceHiddenSections() {
+    const l = currentLandingData || {};
+    const sectionIdMap = {
+      'sec_hero': 'sec-hero',
+      'sec_timer': 'sec-offer-timer',
+      'sec_kpis': 'sec-kpis-highlights',
+      'sec_audio': 'sec-audio-experience',
+      'sec_trust': 'sec-trust-bar',
+      'sec_why_buy': 'sec-why-book',
+      'sec_vip_stack': 'sec-vip-stack',
+      'sec_video': 'sec-book-video',
+      'sec_preview': 'sec-sample-book',
+      'sec_suggested': 'sec-suggested-books',
+      'sec_bonuses': 'sec-bonus-wrapper',
+      'sec_ai_support': 'sec-ai-support',
+      'sec_specs_toc': 'sec-book-details',
+      'sec_reviews': 'sec-customer-reviews',
+      'sec_faqs': 'sec-faq-section',
+      'sec_final_buy': 'sec-final-buy',
+      'sec_help': 'sec-help-support'
+    };
+
     if (l.hidden_sections && Array.isArray(l.hidden_sections)) {
       l.hidden_sections.forEach(secKey => {
         const elId = sectionIdMap[secKey] || secKey;
         const el = document.getElementById(elId);
         if (el) el.style.display = 'none';
       });
+
+      // If sample preview is hidden, also hide jump buttons
+      if (l.hidden_sections.includes('sec_preview')) {
+        const s1 = document.getElementById('hero-sample-btn');
+        if (s1) s1.style.display = 'none';
+        const s2 = document.getElementById('final-sample-btn');
+        if (s2) s2.style.display = 'none';
+      }
     }
   }
 
@@ -601,14 +635,14 @@
     // 3. Header, Checkout Button URLs, Share & Sticky Sync
     const rawId = (b.id || currentBookId || 'BK001').trim().toUpperCase();
     const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001');
-    const isComingSoon = !isLiveAgri && (
-      l.status === 'coming_soon' || 
-      l.is_coming_soon === true || 
-      l.is_coming_soon === 'true' || 
-      b.status === 'coming_soon' || 
-      b.isComingSoon === true || 
-      b.is_coming_soon === true
-    );
+    let isComingSoon = false;
+    if (l.is_coming_soon === false || l.is_coming_soon === 'false' || l.status === 'active') {
+      isComingSoon = false;
+    } else if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon') {
+      isComingSoon = true;
+    } else {
+      isComingSoon = !isLiveAgri && (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true);
+    }
 
     if (isComingSoon) {
       const heroBuy = document.getElementById('hero-buy-btn');
@@ -695,37 +729,35 @@
     if (stickyHelpBtn) stickyHelpBtn.href = waUrl;
 
     // 5. Why Buy Section (Icon & Emoji rendering safety)
-    const why = l.why_read;
+    const why = l.why_read || {};
+    setElemText('why-title', why.title || 'यह पुस्तक क्यों खरीदें?');
+    setElemText('why-desc', why.subtitle || why.desc || 'यह केवल एक eBook नहीं, बल्कि सम्पूर्ण Practical Guide है।');
+    const whyGrid = document.getElementById('why-cards-grid');
     const defaultWhyCards = [
       { icon: '🌱', title: 'वैज्ञानिक जानकारी', desc: 'कृषि वैज्ञानिकों द्वारा तैयार 100% प्रमाणित एवं Practical जानकारी।' },
       { icon: '📷', title: '300+ वास्तविक फोटो', desc: 'रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान करना बेहद आसान।' },
       { icon: '📘', title: 'Step by Step Guide', desc: 'बीज उपचार, खाद शेड्यूल और स्प्रे फॉर्मूला की सम्पूर्ण जानकारी।' },
       { icon: '🎁', title: 'Free Bonus Gift', desc: 'इस पुस्तक के साथ विशेष बोनस सामग्री और WhatsApp सपोर्ट मुफ्त।' }
     ];
-    if (why) {
-      if (why.title) setElemText('why-title', why.title);
-      if (why.subtitle || why.desc) setElemText('why-desc', why.subtitle || why.desc);
-      const whyGrid = document.getElementById('why-cards-grid');
-      const cards = (why.cards && why.cards.length > 0) ? why.cards : defaultWhyCards;
-      if (whyGrid) {
-        whyGrid.innerHTML = cards.map(c => {
-          let iconHtml = '🌱';
-          if (c.icon) {
-            if (c.icon.startsWith('fa-') || c.icon.startsWith('fa ')) {
-              iconHtml = `<i class="fa-solid ${c.icon}"></i>`;
-            } else {
-              iconHtml = `<span style="font-size:2.2rem;line-height:1;">${escapeHtml(c.icon)}</span>`;
-            }
+    const cards = (why.cards && Array.isArray(why.cards) && why.cards.length > 0) ? why.cards : defaultWhyCards;
+    if (whyGrid) {
+      whyGrid.innerHTML = cards.map(c => {
+        let iconHtml = '🌱';
+        if (c.icon) {
+          if (c.icon.startsWith('fa-') || c.icon.startsWith('fa ')) {
+            iconHtml = `<i class="fa-solid ${c.icon}"></i>`;
+          } else {
+            iconHtml = `<span style="font-size:2.2rem;line-height:1;">${escapeHtml(c.icon)}</span>`;
           }
-          return `
-            <div class="why-card">
-              <div class="why-icon">${iconHtml}</div>
-              <h3>${escapeHtml(c.title)}</h3>
-              <p>${escapeHtml(c.desc)}</p>
-            </div>
-          `;
-        }).join('');
-      }
+        }
+        return `
+          <div class="why-card">
+            <div class="why-icon">${iconHtml}</div>
+            <h3>${escapeHtml(c.title || '')}</h3>
+            <p>${escapeHtml(c.desc || '')}</p>
+          </div>
+        `;
+      }).join('');
     }
 
     // 6. Preview Gallery (Pinch-to-Zoom)
@@ -1010,8 +1042,11 @@
     const finalBuyBtn = document.getElementById('final-buy-btn');
     if (finalBuyBtn) {
       finalBuyBtn.style.display = 'inline-flex';
-      finalBuyBtn.href = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
-      finalBuyBtn.innerHTML = `🛒 ${escapeHtml(l.sticky_button_text || 'अभी खरीदें (Buy Now)')}`;
+      if (!isComingSoon) {
+        finalBuyBtn.href = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
+        finalBuyBtn.innerHTML = `🛒 ${escapeHtml(l.sticky_button_text || 'अभी खरीदें (Buy Now)')}`;
+        finalBuyBtn.onclick = null;
+      }
     }
   }
 
@@ -1047,6 +1082,7 @@
     setElemText('spec-pages', `${details.pages || landing.totalPages || landing.total_pages || book.totalPages || 120}+ Pages`);
     setElemText('spec-author', details.author || landing.author || book.author || 'Aarogyam India');
     setElemText('spec-version', `${details.version || landing.version || book.version || '2026'} Edition`);
+    setElemText('spec-bonus', (Array.isArray(landing.bonuses) && landing.bonuses.length > 0) ? `${landing.bonuses.length} Free Bonus Books + WhatsApp Support` : 'Free Bonus PDF + 24×7 AI Support');
 
     const tocList = document.getElementById('toc-list');
     const tocPoints = Array.isArray(landing.table_of_contents) && landing.table_of_contents.length > 0
@@ -1116,6 +1152,7 @@
     }
 
     section.style.display = 'block';
+    setElemText('timer-badge-text', timerCfg.badge || '⚡ सीमित समय ऑफर');
     if (timerCfg.text) {
       setElemText('timer-message-text', timerCfg.text);
     }
@@ -1171,6 +1208,8 @@
     }
 
     section.style.display = 'block';
+    if (l.video_title) setElemText('video-section-heading', l.video_title);
+    if (l.video_subtitle) setElemText('video-section-subheading', l.video_subtitle);
 
     // If single video, render dedicated centered player
     if (videos.length === 1) {
@@ -2147,6 +2186,10 @@
           ? audioLayer.banner_image.trim()
           : '');
 
+      const badgeEl = document.getElementById('ubl-audio-badge-tag');
+      if (badgeEl && audioLayer.badge_tag) {
+        badgeEl.textContent = audioLayer.badge_tag;
+      }
       if (h2El && audioLayer.main_heading) {
         h2El.innerHTML = escapeHtml(audioLayer.main_heading);
       }
