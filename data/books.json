@@ -408,8 +408,8 @@
         "my_library",
         "home_page"
       ],
-      "store_badge": "new_arrival",
-      "badge": "new_arrival",
+      "store_badge": "best_seller",
+      "badge": "best_seller",
       "isComingSoon": false,
       "mainPdf": "",
       "pdf_url": "",
@@ -478,8 +478,7 @@
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
-      "readerPage": "/ebooks/reader.html",
-      "pdfUrl": ""
+      "readerPage": "/ebooks/reader.html"
     }
   ]
 }
