@@ -331,8 +331,8 @@
         "my_library",
         "home_page"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
       "isComingSoon": true,
       "mainPdf": "",
       "pdf_url": "",
@@ -390,7 +390,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK004",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:30:25.541Z",
+      "updated_at": "2026-09-16T18:47:00.238Z",
       "admin_edited": true
     },
     {
