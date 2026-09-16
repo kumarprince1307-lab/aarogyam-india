@@ -595,8 +595,8 @@ async function renderBusinessFunnel() {
 
     const currentId = (state.bookId || '').toUpperCase().trim();
 
-    // 4 Key Master Guides in catalog: BK006, BK001, BK002, BK015
-    const fallbackCatalog = [
+    // 100% READY-TO-ORDER ACTIVE BOOKS ONLY (NO COMING SOON, NO SUBSCRIPTIONS)
+    const activeMasterBooks = [
         {
             id: 'BK001',
             name: 'खरीफ फसल मास्टर गाइड 2026',
@@ -605,7 +605,7 @@ async function renderBusinessFunnel() {
             mrp: 299,
             cover: '/images/books/kharif-master-guide-2026-cover.webp',
             link: '/ebooks/kharif-master-guide-2026.html',
-            pitch: 'धान, सोयाबीन व मक्का की खेती में बंपर पैदावार और संपूर्ण रोग-कीट समाधान।'
+            pitch: 'धान, सोयाबीन व मक्का की सम्पूर्ण वैज्ञानिक खेती, खाद-पोषण व बंपर पैदावार की गाइड।'
         },
         {
             id: 'BK002',
@@ -615,17 +615,7 @@ async function renderBusinessFunnel() {
             mrp: 299,
             cover: '/images/books/kheti-dr-cover.webp',
             link: '/ebooks/kheti-dr.html',
-            pitch: '500+ रोगों का सटीक वैज्ञानिक और जैविक इलाज, NPK पोषण और मिट्टी-पानी सुधार गाइड।'
-        },
-        {
-            id: 'BK006',
-            name: 'रबी फसल मास्टर गाइड',
-            category: 'Agriculture',
-            offerPrice: 99,
-            mrp: 299,
-            cover: '/images/books/bk006-cover.webp',
-            link: '/ebooks/book-landing.html?id=BK006',
-            pitch: 'गेहूं, चना, सरसों व रबी फसलों के उन्नत वैज्ञानिक व व्यावहारिक फॉर्मूले।'
+            pitch: '500+ रोगों व 300+ कीटों का सटीक इलाज, NPK पोषण व पानी सुधार की संपूर्ण गाइड।'
         },
         {
             id: 'BK015',
@@ -635,11 +625,11 @@ async function renderBusinessFunnel() {
             mrp: 299,
             cover: '/images/books/bk015-cover.webp',
             link: '/ebooks/book-landing.html?id=BK015',
-            pitch: '11 प्रमुख सब्जियों की वैज्ञानिक खेती — नर्सरी, कीट नियंत्रण से लेकर बंपर उत्पादन तक।'
+            pitch: '11 प्रमुख सब्जियों की वैज्ञानिक खेती — नर्सरी, कीट नियंत्रण से बंपर उत्पादन तक।'
         }
     ];
 
-    let allBooks = fallbackCatalog;
+    let allBooks = activeMasterBooks;
 
     try {
         const resp = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 300000));
@@ -647,16 +637,29 @@ async function renderBusinessFunnel() {
             const data = await resp.json();
             const bList = Array.isArray(data.books) ? data.books : (Array.isArray(data) ? data : []);
             if (bList.length > 0) {
-                allBooks = bList.map(b => ({
-                    id: b.id || b.book_id,
-                    name: cleanBookTitle(b.heading || b.name || b.id),
-                    category: b.category || 'Agriculture',
-                    offerPrice: b.offerPrice || 99,
-                    mrp: b.mrp || 299,
-                    cover: b.cover || b.thumbnail || `/images/books/${(b.id || 'bk001').toLowerCase()}-cover.webp`,
-                    link: b.landingPage || `/ebooks/book-landing.html?id=${b.id}`,
-                    pitch: b.description || 'वैज्ञानिक एवं प्रैक्टिकल कृषि समाधान।'
-                }));
+                // STRICT FILTER:
+                // 1. Exclude Coming Soon books (status === 'coming_soon' or is_coming_soon === true)
+                // 2. Exclude Subscriptions (id starts with SUB or category includes subscription)
+                // 3. Exclude the current purchased book
+                const activeFromDb = bList.filter(b => {
+                    const bId = (b.id || b.book_id || '').toUpperCase().trim();
+                    const isSub = bId.startsWith('SUB') || (b.category || '').toLowerCase().includes('subscri');
+                    const isComingSoon = b.status === 'coming_soon' || b.is_coming_soon === true || b.is_coming_soon === 'true' || b.store_badge === 'coming_soon';
+                    return bId && !isSub && !isComingSoon && b.status === 'active';
+                });
+
+                if (activeFromDb.length > 0) {
+                    allBooks = activeFromDb.map(b => ({
+                        id: b.id || b.book_id,
+                        name: cleanBookTitle(b.heading || b.name || b.id),
+                        category: b.category || 'Agriculture',
+                        offerPrice: b.offerPrice || 99,
+                        mrp: b.mrp || 299,
+                        cover: b.cover || b.thumbnail || `/images/books/${(b.id || 'bk001').toLowerCase()}-cover.webp`,
+                        link: b.landingPage || `/ebooks/book-landing.html?id=${b.id}`,
+                        pitch: b.description || 'वैज्ञानिक एवं प्रैक्टिकल कृषि समाधान।'
+                    }));
+                }
             }
         }
     } catch(e) {}
@@ -668,23 +671,24 @@ async function renderBusinessFunnel() {
     });
 
     if (funnelBooks.length === 0) {
-        document.getElementById('businessFunnelSection').style.display = 'none';
+        const section = document.getElementById('businessFunnelSection');
+        if (section) section.style.display = 'none';
         return;
     }
 
     grid.innerHTML = funnelBooks.map(b => {
         const cleanName = cleanBookTitle(b.name);
-        const pitchText = b.pitch ? b.pitch.substring(0, 80) + '...' : 'सम्पूर्ण वैज्ञानिक गाइड।';
+        const pitchText = b.pitch ? b.pitch.substring(0, 85) + '...' : 'सम्पूर्ण वैज्ञानिक व प्रैक्टिकल गाइड।';
         return `
             <div class="funnel-book-card">
                 <div>
                     <img src="${b.cover}" alt="${cleanName}" class="funnel-book-cover" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'">
                     <h4 class="funnel-book-title">${cleanName}</h4>
-                    <p style="font-size:0.75rem;color:#94a3b8;line-height:1.4;margin-bottom:8px;">${pitchText}</p>
+                    <p style="font-size:0.8rem;color:#cbd5e1;line-height:1.45;margin-bottom:10px;min-height:36px;">${pitchText}</p>
                     <div class="funnel-book-price-row">
                         <span class="funnel-offer-price">₹${b.offerPrice}</span>
                         <span class="funnel-mrp-price">₹${b.mrp}</span>
-                        <span style="font-size:0.68rem;background:rgba(245,158,11,0.2);color:#fbbf24;padding:2px 6px;border-radius:4px;font-weight:800;margin-left:auto;">बेस्टसेलर</span>
+                        <span style="font-size:0.68rem;background:rgba(245,158,11,0.22);color:#fbbf24;border:1px solid rgba(245,158,11,0.4);padding:2px 7px;border-radius:4px;font-weight:800;margin-left:auto;">बेस्टसेलर</span>
                     </div>
                 </div>
                 <div class="funnel-btn-group">

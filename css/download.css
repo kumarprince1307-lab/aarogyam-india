@@ -279,78 +279,109 @@ body.vip-download-theme {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+/* 4 HIGH-CONTRAST CLICKABLE KPI STAT CARDS (DISTINCT FROM BACKGROUND) */
 .kpi-stat-card.kpi-clickable-btn {
-    background: rgba(14, 38, 26, 0.75);
-    border: 1.5px solid rgba(52, 211, 153, 0.25);
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
     border-radius: var(--radius-lg);
-    padding: 14px 10px;
+    padding: 16px 12px 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     cursor: pointer;
-    transition: all 0.25s ease;
-    color: inherit;
+    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #0f172a;
     font-family: inherit;
     outline: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 .kpi-stat-card.kpi-clickable-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-    border-color: rgba(52, 211, 153, 0.6);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.38);
 }
+.kpi-stat-card.kpi-clickable-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+.kpi-stat-card.glow-emerald::before { background: linear-gradient(90deg, #10b981, #059669); }
+.kpi-stat-card.glow-amber::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.kpi-stat-card.glow-blue::before { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+.kpi-stat-card.glow-purple::before { background: linear-gradient(90deg, #a855f7, #7e22ce); }
+
+.kpi-stat-card.glow-emerald:hover { border-color: #10b981; }
+.kpi-stat-card.glow-amber:hover { border-color: #f59e0b; }
+.kpi-stat-card.glow-blue:hover { border-color: #3b82f6; }
+.kpi-stat-card.glow-purple:hover { border-color: #a855f7; }
+
 .kpi-icon-wrap {
-    font-size: 1.5rem;
+    font-size: 1.65rem;
     margin-bottom: 6px;
+    line-height: 1;
 }
 .kpi-val {
     display: block;
     font-family: var(--font-heading);
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: #0f172a;
+    letter-spacing: -0.2px;
+    line-height: 1.25;
 }
+.kpi-stat-card.glow-emerald .kpi-val { color: #047857; }
+.kpi-stat-card.glow-amber .kpi-val { color: #b45309; }
+.kpi-stat-card.glow-blue .kpi-val { color: #1d4ed8; }
+.kpi-stat-card.glow-purple .kpi-val { color: #7e22ce; }
+
 .kpi-label {
     display: block;
-    font-size: 0.73rem;
-    color: #94a3b8;
-    margin-top: 2px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 3px;
+    line-height: 1.3;
     white-space: nowrap;
 }
 .kpi-beacon {
-    margin-top: 8px;
+    margin-top: 10px;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    background: rgba(16, 185, 129, 0.18);
-    border: 1px solid rgba(16, 185, 129, 0.4);
-    border-radius: 12px;
-    padding: 2px 8px;
-    font-size: 0.68rem;
+    gap: 6px;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.7rem;
     font-weight: 800;
-    color: #34d399;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    color: #15803d;
 }
 .kpi-beacon.amber {
-    background: rgba(245, 158, 11, 0.18);
-    border-color: rgba(245, 158, 11, 0.4);
-    color: #fbbf24;
+    background: #fef3c7;
+    border-color: #fde68a;
+    color: #92400e;
 }
 .kpi-beacon.blue {
-    background: rgba(59, 130, 246, 0.18);
-    border-color: rgba(59, 130, 246, 0.4);
-    color: #60a5fa;
+    background: #dbeafe;
+    border-color: #bfdbfe;
+    color: #1e40af;
 }
 .kpi-beacon.purple {
-    background: rgba(168, 85, 247, 0.18);
-    border-color: rgba(168, 85, 247, 0.4);
-    color: #c084fc;
+    background: #f3e8ff;
+    border-color: #e9d5ff;
+    color: #6b21a8;
 }
 .beacon-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: currentColor;
-    box-shadow: 0 0 8px currentColor;
+    box-shadow: 0 0 6px currentColor;
     animation: beaconPulse 1.8s infinite;
 }
 @keyframes beaconPulse {
@@ -1307,4 +1338,104 @@ body.vip-download-theme {
     color: #94a3b8;
     font-size: 1.6rem;
     cursor: pointer;
+}
+
+/* =================================================================
+   PREMIUM TYPOGRAPHY & LAYOUT REFINEMENTS (ZERO OVERLAP / CLEAN HIERARCHY)
+================================================================= */
+.celebration-heading {
+    font-size: 1.85rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+}
+.celebration-subtext {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    line-height: 1.65;
+    max-width: 680px;
+    margin: 0 auto 22px;
+}
+.vip-book-title {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 12px;
+    line-height: 1.35;
+}
+.purchase-certificate-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 18px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    margin-bottom: 14px;
+}
+.cert-item {
+    font-size: 0.86rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.4;
+}
+.cert-lbl {
+    color: #94a3b8;
+    font-weight: 500;
+}
+.cert-val {
+    color: #ffffff;
+    font-weight: 700;
+}
+.tier-headline {
+    font-size: 1.08rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+.tier-subtext {
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+.btn-tier-vip.fast-tier-vip .tier-subtext { color: #fef08a; }
+.btn-tier-vip.hd-tier-vip-blue .tier-subtext { color: #bfdbfe; }
+.btn-tier-vip.read-tier-vip .tier-subtext { color: #a7f3d0; }
+
+.install-step-vip-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.step-text-col strong {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+.step-text-col span {
+    display: block;
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+}
+.funnel-book-title {
+    font-size: 0.96rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 6px;
+    line-height: 1.35;
+    min-height: 42px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
