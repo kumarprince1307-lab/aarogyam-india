@@ -963,6 +963,7 @@
         `;
       }).join('');
     }
+  }
 
     // 8. Book Specification & TOC. Prefer the landing-page editor values over
     // catalog fallbacks so BK015 cannot inherit BK001's default details.
