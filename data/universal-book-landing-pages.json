@@ -563,7 +563,7 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-16T06:11:47.826Z",
+      "updated_at": "2026-09-16T06:21:22.367Z",
       "slug": "bk015",
       "book_name": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "author": "Dada Avnish Mishra",
@@ -808,16 +808,22 @@
       },
       "preview_banner": "/images/banners/bk015-sec_preview-banner.webp",
       "demo_images": [
-        "/images/books/BK015/1.webp",
-        "/images/books/BK015/2.webp",
-        "/images/books/BK015/3.webp",
-        "/images/books/BK015/4.webp",
-        "/images/books/BK015/5.webp",
-        "/images/books/BK015/6.webp",
-        "/images/books/BK015/7.webp",
-        "/images/books/BK015/8.webp",
-        "/images/books/BK015/9.webp",
-        "/images/books/BK015/10.webp"
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
       ],
       "suggested_books_list": [
         {
@@ -1025,7 +1031,7 @@
       ],
       "final_buy": {
         "title": "🌱 सब्जी खेती मास्टर (PART 1)",
-        "description": "11 प्रमुख सब्जियों की वैज्ञानिक व प्राकृतिक खेती — बीज से बाजार तक सम्पूर्ण व्यावहारिक गाइड | 154 पेज",
+        "description": "11 प्रमुख सब्जियों की वैज्ञानिक व प्राकृतिक खेती — बीज से बाजार तक सम्पूर्ण व्यावहारिक गाइड sanse badi baat isme 3 d sytem hai pdf down load kar sakte hai read kar skte hai aur audio sun bhi sakte hai abhi kharide",
         "benefits": [
           "11 प्रमुख सब्जियों की सम्पूर्ण वैज्ञानिक व व्यावहारिक खेती गाइड",
           "नीमास्त्र, ब्रह्मास्त्र, दशपर्णी अर्क व प्राकृतिक कीटनाशक फॉर्मूले",
