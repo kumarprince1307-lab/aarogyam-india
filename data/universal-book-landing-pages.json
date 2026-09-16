@@ -2023,6 +2023,169 @@
         "benefits": []
       },
       "whatsapp_prompt": "नमस्ते, मुझे 'पॉलीहाउस नेटहाउस गाइड' पुस्तक के बारे में और जानकारी चाहिए।"
+    },
+    {
+      "id": "BK010",
+      "updated_at": "2026-09-16T18:45:39.495Z",
+      "admin_edited": true,
+      "slug": "bk010",
+      "book_name": "फूल खेती गाइड",
+      "author": "",
+      "language": "Hindi",
+      "totalPages": 120,
+      "version": "2026",
+      "category": "Agriculture",
+      "status": "active",
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true,
+      "theme_primary": "#2e7d32",
+      "theme_dark": "#003d00",
+      "cover_effect": "3d_float",
+      "sticky_button_text": "खरीदें",
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_audio",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_ai_support",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help",
+        "sec_pdf_main",
+        "sec_pdf_free"
+      ],
+      "hidden_sections": [],
+      "section_banners": {},
+      "og_title": "फूल खेती गाइड",
+      "og_description": "फूल खेती गाइड - सम्पूर्ण Practical Guide।",
+      "og_image": "/images/books/phool-kheti-guide-cover.webp",
+      "og_image_landscape": "/images/books/phool-kheti-guide-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "mainPdf": "",
+      "main_pdf": "",
+      "freePdf": "",
+      "free_pdf": "",
+      "demoPdf": "",
+      "ai_support_title": "",
+      "ai_support_cover": "",
+      "ai_support_desc": "",
+      "bonuses": [],
+      "bonus_books": [],
+      "bonus_points": [
+        "24×7 WhatsApp Priority Support",
+        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+        "📖 किताब की जानकारी समझने में सहायता",
+        "🌱 फसल संबंधी विशेष स्प्रे फॉर्मूला",
+        "📱 Mobile Friendly PDF & Lifetime Access"
+      ],
+      "timer": {
+        "enabled": true,
+        "minutes": 15,
+        "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!"
+      },
+      "hero": {
+        "tag": "🌾 Bestseller Agriculture eBook",
+        "title": "फूल खेती गाइड",
+        "subtitle": "",
+        "description": "",
+        "mrp": 299,
+        "offer_price": 99,
+        "offer_badge": "Launch Offer",
+        "rating_score": "4.9",
+        "rating_count": "120+ Ratings",
+        "cover_image": "/images/books/phool-kheti-guide-cover.webp",
+        "banner_image": "/images/banners/bk010-hero-banner.webp",
+        "features": [
+          {
+            "icon": "fa-seedling",
+            "text": "120 पेज की प्रीमियम"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ फोटो"
+          }
+        ]
+      },
+      "value_stack": {
+        "book_mrp": 299,
+        "vip_value": 1999,
+        "bonus_value": 199,
+        "offer_price": 99,
+        "subscriber_perk": "👑 VIP मेंबर्स के लिए 1 वर्ष का Pro सब्सक्रिप्शन 100% मुफ्त शामिल है।"
+      },
+      "why_read": {
+        "title": "यह पुस्तक क्यों खरीदें?",
+        "subtitle": "",
+        "cards": []
+      },
+      "demo_images": [],
+      "suggested_books_list": [],
+      "suggested_books": [],
+      "table_of_contents": [
+        "बीज उपचार",
+        "खेत की तैयारी",
+        "बुवाई की वैज्ञानिक विधि",
+        "उर्वरक प्रबंधन",
+        "रोग एवं कीट प्रबंधन"
+      ],
+      "videos": [],
+      "testimonials": [],
+      "final_buy": {
+        "title": "फूल खेती गाइड",
+        "description": "",
+        "benefits": []
+      },
+      "whatsapp_prompt": "नमस्ते, मुझे 'फूल खेती गाइड' पुस्तक के बारे में और जानकारी चाहिए।"
     }
   ]
 }
