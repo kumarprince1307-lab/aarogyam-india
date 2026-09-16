@@ -559,7 +559,7 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-15T00:18:54.125Z",
+      "updated_at": "2026-09-16T01:45:16.836Z",
       "slug": "bk015",
       "book_name": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "author": "Dada Avnish Mishra",
@@ -592,14 +592,12 @@
         "sec_specs_toc",
         "sec_reviews",
         "sec_faqs",
+        "sec_final_buy",
         "sec_help",
         "sec_pdf_main",
-        "sec_final_buy",
         "sec_pdf_free"
       ],
-      "hidden_sections": [
-        "sec_final_buy"
-      ],
+      "hidden_sections": [],
       "section_banners": {
         "sec_hero": "/images/banners/bk015-sec_hero-banner.webp",
         "sec_timer": "/images/banners/bk015-sec_timer-banner.webp",
@@ -730,8 +728,7 @@
             "icon": "fa-gift",
             "text": "with Audio "
           }
-        ],
-        "pdf_url": ""
+        ]
       },
       "value_stack": {
         "book_mrp": 299,
