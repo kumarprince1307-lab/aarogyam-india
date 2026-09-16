@@ -280,9 +280,7 @@
             if (!item || !item.id) return;
             const idx = allLandingPages.findIndex(p => p.id && p.id.toUpperCase() === item.id.toUpperCase());
             const jsonPage = idx >= 0 ? allLandingPages[idx] : null;
-            const lsTime = item.updated_at ? new Date(item.updated_at).getTime() : 0;
-            const jsonTime = jsonPage && jsonPage.updated_at ? new Date(jsonPage.updated_at).getTime() : 0;
-            if (!jsonPage || lsTime >= jsonTime) {
+            if (!jsonPage || item.admin_edited || (item.updated_at && (!jsonPage.updated_at || new Date(item.updated_at) >= new Date(jsonPage.updated_at)))) {
               if (idx >= 0) allLandingPages[idx] = { ...allLandingPages[idx], ...item };
               else allLandingPages.push(item);
             }
@@ -609,8 +607,7 @@
       l.is_coming_soon === 'true' || 
       b.status === 'coming_soon' || 
       b.isComingSoon === true || 
-      b.is_coming_soon === true ||
-      (l.status !== 'active' && b.status !== 'active')
+      b.is_coming_soon === true
     );
 
     if (isComingSoon) {
@@ -1012,10 +1009,9 @@
 
     const finalBuyBtn = document.getElementById('final-buy-btn');
     if (finalBuyBtn) {
+      finalBuyBtn.style.display = 'inline-flex';
       finalBuyBtn.href = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
-      if (l.sticky_button_text) {
-        finalBuyBtn.innerHTML = `🛒 ${escapeHtml(l.sticky_button_text)}`;
-      }
+      finalBuyBtn.innerHTML = `🛒 ${escapeHtml(l.sticky_button_text || 'अभी खरीदें (Buy Now)')}`;
     }
   }
 

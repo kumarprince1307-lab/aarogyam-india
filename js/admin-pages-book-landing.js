@@ -2507,16 +2507,12 @@ Instant Download & Lifetime Access
           localList.forEach(item => {
             const idx = allLandingPages.findIndex(x => x.id === item.id);
             if (idx >= 0) {
-              // ✅ PERMANENT FIX: Only use localStorage data if it is NEWER than the JSON file data.
-              // This prevents old cached localStorage from overwriting fresh git-pushed changes.
-              const jsonUpdatedAt = new Date(allLandingPages[idx].updated_at || 0).getTime();
-              const localUpdatedAt = new Date(item.updated_at || 0).getTime();
-              if (localUpdatedAt > jsonUpdatedAt) {
-                allLandingPages[idx] = item; // localStorage is newer → use it
+              // Admin edits in localStorage ALWAYS take priority over static file
+              if (item.admin_edited || !allLandingPages[idx].updated_at || (item.updated_at && new Date(item.updated_at) >= new Date(allLandingPages[idx].updated_at || 0))) {
+                allLandingPages[idx] = { ...allLandingPages[idx], ...item };
               }
-              // else: JSON is same age or newer → keep JSON data (git-pushed data wins)
             } else {
-              allLandingPages.push(item); // New book not in JSON yet → add it
+              allLandingPages.push(item);
             }
           });
         }
@@ -5400,6 +5396,57 @@ Instant Download & Lifetime Access
     `).join('');
   }
 
+  
+  // Populate Demo Book Selector in Section 9
+  window.populateDemoBookPicker = function() {
+    const sel = document.getElementById('blp_demo_book_picker');
+    if (!sel) return;
+    
+    const demoBooks = typeof getStoredFreeDemoBooks === 'function' ? getStoredFreeDemoBooks() : [];
+    let opts = '<option value="">📖 डेमो बुक से पेज चुनें (Select Demo Book)...</option>';
+    
+    // 1. From Free Demo Books
+    demoBooks.forEach(db => {
+      const imgs = db.demoImages || db.pageImages || [];
+      if (imgs.length > 0) {
+        opts += `<option value="DEMO_${db.id}">[डेमो बुक] ${db.name || db.heading || db.id} (${imgs.length} पेजेस)</option>`;
+      }
+    });
+
+    // 2. From Landing Pages Catalog
+    (allLandingPages || []).forEach(lp => {
+      const imgs = lp.demo_images || [];
+      if (imgs.length > 0) {
+        opts += `<option value="LP_${lp.id}">[कैटलॉग] ${lp.hero?.title || lp.id} (${imgs.length} पेजेस)</option>`;
+      }
+    });
+
+    sel.innerHTML = opts;
+  };
+
+  window.importDemoImagesFromBook = function(val) {
+    if (!val) return;
+    let targetImages = [];
+    if (val.startsWith('DEMO_')) {
+      const dbId = val.replace('DEMO_', '');
+      const demoBooks = getStoredFreeDemoBooks();
+      const found = demoBooks.find(b => b.id === dbId);
+      if (found) targetImages = found.demoImages || found.pageImages || [];
+    } else if (val.startsWith('LP_')) {
+      const lpId = val.replace('LP_', '');
+      const found = (allLandingPages || []).find(p => p.id === lpId);
+      if (found) targetImages = found.demo_images || [];
+    }
+
+    if (targetImages && targetImages.length > 0) {
+      currentDemoImages = [...targetImages];
+      renderDemoImagesInBuilder();
+      showToast(`✅ ${targetImages.length} डेमो पेजेस सफलतापूर्वक लोड हुए!`, 'success');
+    } else {
+      showToast('⚠️ इस बुक में कोई डेमो इमेज नहीं मिली।', 'info');
+    }
+  };
+
   function renderDemoImagesInBuilder() {
     const wrap = document.getElementById('blp_demo_images_wrap');
     if (!wrap) return;
@@ -6510,6 +6557,7 @@ Instant Download & Lifetime Access
       if (typeof renderVideosInBuilder === 'function') renderVideosInBuilder();
       if (typeof renderReviewsInBuilder === 'function') renderReviewsInBuilder();
       if (typeof renderDemoImagesInBuilder === 'function') renderDemoImagesInBuilder();
+      if (typeof window.populateDemoBookPicker === 'function') window.populateDemoBookPicker();
       if (typeof renderBonusesInBuilder === 'function') renderBonusesInBuilder();
       if (typeof renderBonusPointsInBuilder === 'function') renderBonusPointsInBuilder();
       if (typeof renderTocPointsInBuilder === 'function') renderTocPointsInBuilder();
@@ -6603,7 +6651,7 @@ Instant Download & Lifetime Access
     });
   }
 
-  function compressImageFile(file, maxWidth = 1400, quality = 0.85) {
+  function compressImageFile(file, maxWidth = 800, quality = 0.78) {
     return new Promise((resolve) => {
       if (!file || !file.type || !file.type.startsWith('image/')) {
         if (file) {
@@ -6631,6 +6679,8 @@ Instant Download & Lifetime Access
             canvas.width = w;
             canvas.height = h;
             const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, w, h);
             const dataUrl = canvas.toDataURL('image/webp', quality);
             resolve(dataUrl);
@@ -6849,6 +6899,7 @@ Instant Download & Lifetime Access
     const pageData = {
       id: bId,
       updated_at: new Date().toISOString(),
+      admin_edited: true,
       slug: bId.toLowerCase(),
       book_name: (document.getElementById('blp_book_name')?.value || '').trim(),
       author: (document.getElementById('blp_book_author')?.value || '').trim(),
@@ -6956,7 +7007,8 @@ Instant Download & Lifetime Access
       whatsapp_share_message: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
       whatsapp_share_text: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
       whatsapp_prompt: document.getElementById('blp_wa_prompt')?.value || `नमस्ते, मुझे '${title}' पुस्तक के बारे में और जानकारी चाहिए।`,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      admin_edited: true
     };
 
     const existingIdx = allLandingPages.findIndex(p => p.id === bId);
