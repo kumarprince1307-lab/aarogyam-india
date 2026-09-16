@@ -403,19 +403,29 @@
     },
     {
       "id": "BK006",
-      "slug": "ai-website-guide",
-      "status": "coming_soon",
-      "is_coming_soon": true,
-      "store_badge": "coming_soon",
-      "sticky_button_text": "⏳ रुचि दर्ज करें (Pre-Interest)",
+      "updated_at": "2026-09-16T18:49:03.526Z",
+      "admin_edited": true,
+      "slug": "bk006",
+      "book_name": "AI वेबसाइट निर्माण गाइड 2026",
+      "author": "",
+      "language": "Hindi",
+      "totalPages": 120,
+      "version": "2026",
       "category": "Digital AI",
-      "theme_primary": "#7C3AED",
-      "theme_dark": "#5B21B6",
+      "status": "active",
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true,
+      "theme_primary": "#7c3aed",
+      "theme_dark": "#3c00ad",
       "cover_effect": "3d_float",
+      "sticky_button_text": "⏳ रुचि दर्ज करें (Pre-Interest)",
       "sections_order": [
         "sec_hero",
         "sec_timer",
         "sec_kpis",
+        "sec_audio",
         "sec_trust",
         "sec_why_buy",
         "sec_vip_stack",
@@ -423,24 +433,110 @@
         "sec_preview",
         "sec_suggested",
         "sec_bonuses",
+        "sec_ai_support",
         "sec_specs_toc",
         "sec_reviews",
         "sec_faqs",
         "sec_final_buy",
-        "sec_help"
+        "sec_help",
+        "sec_pdf_main",
+        "sec_pdf_free"
       ],
+      "hidden_sections": [],
+      "section_banners": {
+        "sec_vip_stack": "/images/banners/farmer-community-banner.jpeg"
+      },
+      "og_title": "AI वेबसाइट निर्माण गाइड 2026",
+      "og_description": "ChatGPT, Claude, V0, Canva और आधुनिक AI टूल्स की मदद से वेबसाइट डिजाइन, लैंडिंग पेज और डिजिटल बिजनेस शुरू करने की स्टेप-बाय-स्टेप गाइड।",
+      "og_image": "/images/banners/farmer-community-banner.jpeg",
+      "og_image_landscape": "/images/banners/farmer-community-banner.jpeg",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "mainPdf": "",
+      "main_pdf": "",
+      "freePdf": "",
+      "free_pdf": "",
+      "demoPdf": "",
+      "ai_support_title": "",
+      "ai_support_cover": "",
+      "ai_support_desc": "",
+      "bonuses": [
+        {
+          "title": "100+ READYMADE AI PROMPT TEMPLATES",
+          "description": "वेबसाइट और लैंडिंग पेज बनाने के प्रीमियम AI प्रॉम्प्ट्स बंडल मुफ्त।",
+          "mrp": 499,
+          "image": "/images/books/ai-website-guide-cover.webp"
+        }
+      ],
+      "bonus_books": [
+        {
+          "title": "100+ READYMADE AI PROMPT TEMPLATES",
+          "description": "वेबसाइट और लैंडिंग पेज बनाने के प्रीमियम AI प्रॉम्प्ट्स बंडल मुफ्त।",
+          "mrp": 499,
+          "image": "/images/books/ai-website-guide-cover.webp"
+        }
+      ],
+      "bonus_points": [
+        "100+ Ready Prompts",
+        "Step-by-step Setup Guide",
+        "Payment Gateway Integration",
+        "Lifetime Updates"
+      ],
+      "timer": {
+        "enabled": true,
+        "minutes": 15,
+        "text": "⚡ स्पेशल AI लॉन्च ऑफर: 85% की छूट केवल अगले 15 मिनट में समाप्त हो जाएगी!"
+      },
       "hero": {
         "tag": "🤖 Digital Skills & AI Mastery",
         "title": "AI वेबसाइट निर्माण गाइड 2026",
         "subtitle": "बिना कोडिंग के AI टूल्स से 10 मिनट में प्रोफेशनल वेबसाइट व ई-कॉमर्स स्टोर बनाएं",
-        "rating_score": "4.9",
-        "rating_count": "95+ Ratings",
         "description": "ChatGPT, Claude, V0, Canva और आधुनिक AI टूल्स की मदद से वेबसाइट डिजाइन, लैंडिंग पेज और डिजिटल बिजनेस शुरू करने की स्टेप-बाय-स्टेप गाइड।",
         "mrp": 1299,
         "offer_price": 199,
         "offer_badge": "Special 85% Off",
-        "banner_image": "/images/banners/farmer-community-banner.jpeg",
+        "rating_score": "4.9",
+        "rating_count": "95+ Ratings",
         "cover_image": "/images/books/ai-website-guide-cover.webp",
+        "banner_image": "/images/banners/farmer-community-banner.jpeg",
         "features": [
           {
             "icon": "fa-laptop-code",
@@ -459,17 +555,6 @@
             "text": "Free Prompt Library"
           }
         ]
-      },
-      "timer": {
-        "enabled": true,
-        "minutes": 15,
-        "text": "⚡ स्पेशल AI लॉन्च ऑफर: 85% की छूट केवल अगले 15 मिनट में समाप्त हो जाएगी!"
-      },
-      "video": {
-        "enabled": true,
-        "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "title": "🎥 AI से वेबसाइट कैसे बनाएं - 5 मिनट का लाइव डेमो",
-        "description": "देखें कैसे एक प्रॉम्प्ट लिखकर पूरी वेबसाइट और पेमेंट गेटवे तैयार होता है।"
       },
       "value_stack": {
         "book_mrp": 1299,
@@ -508,20 +593,8 @@
       "demo_images": [
         "/images/books/ai-website-guide-cover.webp"
       ],
-      "bonuses": [
-        {
-          "title": "100+ READYMADE AI PROMPT TEMPLATES",
-          "description": "वेबसाइट और लैंडिंग पेज बनाने के प्रीमियम AI प्रॉम्प्ट्स बंडल मुफ्त।",
-          "mrp": 499,
-          "image": "/images/books/ai-website-guide-cover.webp"
-        }
-      ],
-      "bonus_points": [
-        "100+ Ready Prompts",
-        "Step-by-step Setup Guide",
-        "Payment Gateway Integration",
-        "Lifetime Updates"
-      ],
+      "suggested_books_list": [],
+      "suggested_books": [],
       "table_of_contents": [
         "AI वेबसाइट बिल्डर का परिचय",
         "डोमेन व होस्टिंग सेटअप",
@@ -529,6 +602,7 @@
         "ई-कॉमर्स कार्ट व पेमेंट गेटवे",
         "SEO एवं मोबाइल ऑप्टिमाइजेशन"
       ],
+      "videos": [],
       "testimonials": [
         {
           "name": "आलोक वर्मा",
@@ -555,11 +629,12 @@
           "a": "हाँ, इसमें बताए गए कई AI टूल्स मोबाइल ब्राउज़र से भी आसानी से काम करते हैं।"
         }
       ],
-      "whatsapp_prompt": "नमस्ते, मुझे 'AI वेबसाइट गाइड' के बारे में जानकारी चाहिए।",
-      "facebook_pixel_id": "1671873500553134",
-      "google_analytics_id": "G-2BWPJVQWPK",
-      "facebook_pixel_enabled": true,
-      "google_analytics_enabled": true
+      "final_buy": {
+        "title": "AI वेबसाइट निर्माण गाइड 2026",
+        "description": "बिना कोडिंग के AI टूल्स से 10 मिनट में प्रोफेशनल वेबसाइट व ई-कॉमर्स स्टोर बनाएं",
+        "benefits": []
+      },
+      "whatsapp_prompt": "नमस्ते, मुझे 'AI वेबसाइट गाइड' के बारे में जानकारी चाहिए।"
     },
     {
       "id": "BK015",
