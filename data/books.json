@@ -411,7 +411,6 @@
         "category_page",
         "my_library",
         "home_page",
-        "home_hero",
         "download_funnel"
       ],
       "store_badge": "best_seller",
@@ -485,7 +484,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T14:14:02.489Z",
+      "updated_at": "2026-09-16T18:25:12.768Z",
       "admin_edited": true
     }
   ]
