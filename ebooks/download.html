@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>👑 VIP ई-बुक डाउनलोड व ऐप हब — Aarogyam India</title>
-    <link rel="stylesheet" href="../css/download.css?v=20260916_v3">
+    <link rel="stylesheet" href="../css/download.css?v=20260916_v5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,21 +23,18 @@
     <!-- 1. VIP Top Header -->
     <header class="vip-header">
         <div class="header-inner">
-            <a href="my-library.html" class="vip-back-btn" title="My Library में वापस जाएं">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>My Library</span>
-            </a>
             <div class="vip-brand-badge">
                 <img src="/images/logo/logo.png" alt="Aarogyam India" class="header-emblem">
                 <div class="brand-text-col">
                     <span class="brand-portal-title">Aarogyam India</span>
-                    <span class="brand-sub-badge">👑 VIP Delivery Portal</span>
+                    <span class="brand-sub-badge"><i class="fa-solid fa-crown" style="color:#f59e0b;"></i> VIP Delivery Hub</span>
                 </div>
             </div>
-            <div class="vip-secure-shield">
-                <i class="fa-solid fa-shield-halved"></i>
-                <span class="secure-text">100% Secure</span>
-            </div>
+            <a href="my-library.html" class="vip-header-library-btn" title="सीधे My Library में जाएं">
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>My Library में जाएं</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
         </div>
     </header>
 
@@ -371,6 +368,28 @@
         </div>
     </footer>
 
+    <!-- ==============================================================
+         UNIVERSAL FIXED MOBILE BOTTOM NAVIGATION
+         ============================================================== -->
+    <nav class="mobile-bottom-nav vip-mobile-bottom-nav">
+        <a href="../index.html" class="nav-tab-item">
+            <i class="fa-solid fa-house nav-tab-icon"></i>
+            <span>होम</span>
+        </a>
+        <a href="ebook.html" class="nav-tab-item">
+            <i class="fa-solid fa-book-open nav-tab-icon"></i>
+            <span>ई-बुक्स</span>
+        </a>
+        <a href="my-library.html" class="nav-tab-item active">
+            <i class="fa-solid fa-bookmark nav-tab-icon"></i>
+            <span>लाइब्रेरी</span>
+        </a>
+        <a href="https://wa.me/917974422572?text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%2C%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20eBook%20%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1%20%E0%A4%AF%E0%A4%BE%20App%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F%E0%A5%A4" target="_blank" class="nav-tab-item">
+            <i class="fa-brands fa-whatsapp nav-tab-icon" style="color: #25d366;"></i>
+            <span>हेल्पलाइन</span>
+        </a>
+    </nav>
+
     <!-- 4. Floating Audio Player (with Dismiss/Close Button & Soundwaves) -->
     <div id="aoi-download-floating-audio" class="floating-audio-pill" style="display: none;">
         <div class="floating-wave-bars">
@@ -417,6 +436,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js"></script>
     <script src="../js/session.js"></script>
-    <script src="../js/download.js?v=20260916_v4"></script>
+    <script src="../js/download.js?v=20260916_v5"></script>
 </body>
 </html>
