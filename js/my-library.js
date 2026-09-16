@@ -696,18 +696,41 @@ async function renderLibrarySections(booksArray) {
             `;
             if (purchasedGrid) purchasedGrid.appendChild(card);
 
-            // Check if purchased book has specific bonus books in Landing Pages or JSON
+            // Check if purchased book has specific bonus books in Landing Pages, JSON, or Studio Free/Bonus Books
             let bonusList = [];
             if (book.bonusBooks && Array.isArray(book.bonusBooks) && book.bonusBooks.length > 0) {
-                bonusList = book.bonusBooks.map((f, i) => ({ title: `${bookName} — VIP बोनस #${i+1}`, file_url: f, image: bookCover }));
+                bonusList = book.bonusBooks.map((f, i) => ({ title: `${bookName} — VIP बोनस #${i+1}`, file_url: f, image: bookCover, id: `${rawId}_BONUS_${i+1}` }));
             }
             if (book.bonuses && Array.isArray(book.bonuses) && book.bonuses.length > 0) {
                 bonusList = [...bonusList, ...book.bonuses];
             }
 
+            // Auto-attach any Studio Free Bonus Books linked to this purchased book
+            try {
+                const allFreeDemo = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
+                if (Array.isArray(allFreeDemo)) {
+                    allFreeDemo.forEach(fb => {
+                        if (fb && (fb.type === 'bonus_free' || fb.isBonus)) {
+                            const tBook = (fb.targetMainBook || '').toUpperCase().trim();
+                            if (tBook === rawId || tBook === 'ALL') {
+                                bonusList.push({
+                                    id: fb.id,
+                                    title: fb.heading || fb.name || `${bookName} — विशेष बोनस`,
+                                    subtitle: fb.subtitle || 'आपकी मुख्य पुस्तक खरीद के साथ अनलॉक हुआ',
+                                    image: fb.cover || fb.thumbnail || bookCover,
+                                    hasAudioBook: Boolean(fb.hasAudioBook || fb.audioUrl),
+                                    demoPdf: fb.demoPdf || fb.freePdf || fb.pdf_url || '',
+                                    videos: Array.isArray(fb.videos) ? fb.videos : []
+                                });
+                            }
+                        }
+                    });
+                }
+            } catch(e) {}
+
             if (bonusList.length > 0 && bonusGrid) {
                 bonusList.forEach((bn, bIdx) => {
-                    const bnKey = `${rawId}_bn_${bIdx}`;
+                    const bnKey = bn.id || `${rawId}_bn_${bIdx}`;
                     if (!seenBonusIds.has(bnKey)) {
                         seenBonusIds.add(bnKey);
                         bonusCount++;
@@ -716,17 +739,26 @@ async function renderLibrarySections(booksArray) {
                         bonusCard.style.cssText = 'background:#fff;border-radius:12px;padding:14px;border:1.5px solid #10b981;box-shadow:0 4px 12px rgba(0,0,0,0.05);display:flex;flex-direction:column;justify-content:space-between;';
                         const bImg = bn.image || bn.cover || '/images/books/kharif-master-guide-2026-cover.webp';
                         const bTitle = bn.title || `${bookName} — बोनस #${bIdx+1}`;
+                        const bId = bn.id || `${bookId}&demo=1`;
+                        const bReaderUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
+                        const bHasAudio = Boolean(bn.hasAudioBook || hasAudioBook);
+                        const bPdf = bn.demoPdf || bn.file_url || '';
+                        const bVideos = Array.isArray(bn.videos) ? bn.videos : [];
+
                         bonusCard.innerHTML = `
                             <div>
                                 <div style="text-align:center;margin-bottom:8px;">
-                                    <img src="${bImg}" style="width:70px;height:95px;object-fit:cover;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.12);" />
+                                    <img src="${bImg}" style="width:70px;height:95px;object-fit:cover;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.12);cursor:pointer;" onclick="openImageZoom('${bImg}')" />
                                 </div>
-                                <span style="background:#16a34a;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:4px;">🎁 100% FREE BONUS</span>
+                                <span style="background:#16a34a;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:4px;">🎁 100% FREE VIP BONUS</span>
                                 <h4 style="color:#065f46;margin:0 0 6px 0;font-size:0.95rem;">${bTitle}</h4>
-                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;">आपकी ${bookName} खरीद के साथ मुफ़्त उपलब्ध।</p>
+                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;">आपकी ${bookName} खरीद के साथ मुफ़्त अनलॉक।</p>
                             </div>
-                            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                <a href="/ebooks/reader.html?book=${bookId}&demo=1" class="btn-read" style="flex:1;text-align:center;background:#10b981;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.85rem;">📖 Read Bonus</a>
+                            <div class="book-btn-group" style="display:flex;gap:6px;flex-wrap:wrap;">
+                                <a href="${bReaderUrl}" class="btn-read" style="flex:1;min-width:80px;text-align:center;background:#10b981;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;">📖 Read Bonus</a>
+                                ${bHasAudio ? `<a href="${bReaderUrl}&audio=1" class="btn-audio" style="flex:1;min-width:75px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="ऑडियो सुनें">🎧 ऑडियो</a>` : ''}
+                                ${bVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bTitle}", ${JSON.stringify(bVideos)})' class="btn-video" style="flex:1;min-width:75px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:8px;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;" title="वीडियो देखें">🎬 वीडियो</button>` : ''}
+                                ${bPdf ? `<a href="${bPdf}" download target="_blank" class="btn-buy" style="flex:1;min-width:75px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="बोनस PDF डाउनलोड करें">📥 PDF</a>` : ''}
                             </div>
                         `;
                         bonusGrid.appendChild(bonusCard);
@@ -764,7 +796,7 @@ async function renderLibrarySections(booksArray) {
             }
         }
 
-        // 3. Demo Books (Read Free Samples from Studio)
+        // 3. Demo Books (Read Free Samples from Studio - Visible to All Users)
         const isDemoEligible = !isComingSoonBook && isStudioDemo;
         if (isDemoEligible && !seenDemoIds.has(rawId)) {
             seenDemoIds.add(rawId);
@@ -774,6 +806,7 @@ async function renderLibrarySections(booksArray) {
             const targetMain = book.targetMainBook || 'BK001';
             const targetCheckoutUrl = `/ebooks/checkout.html?product=${encodeURIComponent(targetMain)}`;
             const readerDemoUrl = `/ebooks/reader.html?book=${encodeURIComponent(bookId)}&demo=1`;
+            const demoPdfPath = book.demoPdf || book.freePdf || book.pdf_url || '';
 
             demoCard.innerHTML = `
                 <div style="position:relative;">
@@ -782,9 +815,15 @@ async function renderLibrarySections(booksArray) {
                 </div>
                 <h4>${bookName}</h4>
                 <div class="book-btn-group" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
-                    <a href="${readerDemoUrl}" class="btn-read" style="flex:1;min-width:85px;padding:8px;background:#0284c7;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;">📖 Read Demo</a>
-                    ${hasAudioBook ? `<a href="${readerDemoUrl}&audio=1" class="btn-audio" style="flex:1;min-width:85px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="ऑडियो डेमो सुनें">🎧 ऑडियो</a>` : ''}
-                    ${bookVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bookName}", ${JSON.stringify(bookVideos)})' class="btn-video" style="flex:1;min-width:85px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;" title="वीडियो डेमो देखें">🎬 वीडियो</button>` : ''}
+                    <a href="${readerDemoUrl}" class="btn-read" style="flex:1;min-width:80px;padding:8px;background:#0284c7;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;">📖 Read Demo</a>
+                    ${hasAudioBook ? `<a href="${readerDemoUrl}&audio=1" class="btn-audio" style="flex:1;min-width:75px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="ऑडियो डेमो सुनें">🎧 ऑडियो</a>` : ''}
+                    ${demoPdfPath ? `<a href="${demoPdfPath}" download target="_blank" class="btn-buy" style="flex:1;min-width:75px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="डेमो PDF डाउनलोड करें">📥 डाउनलोड</a>` : ''}
+                    ${bookVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bookName}", ${JSON.stringify(bookVideos)})' class="btn-video" style="flex:1;min-width:75px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;" title="वीडियो डेमो देखें">🎬 वीडियो</button>` : ''}
+                </div>
+                <div style="margin-top:8px;">
+                    <a href="${targetCheckoutUrl}" style="display:block;text-align:center;background:#16a34a;color:#fff;padding:6px;border-radius:8px;font-weight:800;font-size:0.78rem;text-decoration:none;box-shadow:0 2px 6px rgba(22,163,74,0.3);">
+                        ⚡ पूरी मुख्य किताब खरीदें (मात्र ₹99)
+                    </a>
                 </div>
             `;
             if (demoGrid) demoGrid.appendChild(demoCard);
@@ -798,6 +837,7 @@ async function renderLibrarySections(booksArray) {
             freeBonusCard.className = 'book-card';
             freeBonusCard.style.cssText = 'background:#fff;border-radius:12px;padding:14px;border:1.5px solid #10b981;box-shadow:0 4px 12px rgba(0,0,0,0.05);display:flex;flex-direction:column;justify-content:space-between;';
             const readerBonusUrl = `/ebooks/reader.html?book=${encodeURIComponent(bookId)}&demo=1`;
+            const bonusPdfPath = book.demoPdf || book.freePdf || book.pdf_url || '';
 
             freeBonusCard.innerHTML = `
                 <div>
@@ -809,9 +849,10 @@ async function renderLibrarySections(booksArray) {
                     <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;">${book.subtitle || 'Aarogyam India डिजिटल लाइब्रेरी में मुफ़्त उपलब्ध।'}</p>
                 </div>
                 <div class="book-btn-group" style="display:flex;gap:6px;flex-wrap:wrap;">
-                    <a href="${readerBonusUrl}" class="btn-read" style="flex:1;min-width:85px;padding:8px;background:#10b981;color:#fff;text-align:center;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;">📖 Read Bonus</a>
-                    ${hasAudioBook ? `<a href="${readerBonusUrl}&audio=1" class="btn-audio" style="flex:1;min-width:85px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="ऑडियो सुनें">🎧 ऑडियो</a>` : ''}
-                    ${bookVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bookName}", ${JSON.stringify(bookVideos)})' class="btn-video" style="flex:1;min-width:85px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:8px;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;" title="वीडियो देखें">🎬 वीडियो</button>` : ''}
+                    <a href="${readerBonusUrl}" class="btn-read" style="flex:1;min-width:80px;padding:8px;background:#10b981;color:#fff;text-align:center;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;">📖 Read Bonus</a>
+                    ${hasAudioBook ? `<a href="${readerBonusUrl}&audio=1" class="btn-audio" style="flex:1;min-width:75px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="ऑडियो सुनें">🎧 ऑडियो</a>` : ''}
+                    ${bonusPdfPath ? `<a href="${bonusPdfPath}" download target="_blank" class="btn-buy" style="flex:1;min-width:75px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="PDF डाउनलोड करें">📥 डाउनलोड</a>` : ''}
+                    ${bookVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bookName}", ${JSON.stringify(bookVideos)})' class="btn-video" style="flex:1;min-width:75px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:8px;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;" title="वीडियो देखें">🎬 वीडियो</button>` : ''}
                 </div>
             `;
             if (bonusGrid) bonusGrid.appendChild(freeBonusCard);

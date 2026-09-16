@@ -256,6 +256,23 @@ class ProAudioBookEngine {
             }
         } catch (e) {}
 
+        // Fallback for Demo/Bonus Books: check target main book scripts if empty
+        if (Object.keys(localScripts).length === 0 && Object.keys(serverScripts).length === 0) {
+            const targetMain = (window.aoiCurrentBookData?.targetMainBook || '').toUpperCase().trim();
+            if (targetMain && targetMain !== bookId) {
+                try {
+                    const fallbackData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${targetMain}`);
+                    if (fallbackData) {
+                        const parsed = JSON.parse(fallbackData);
+                        if (parsed && parsed.pages) {
+                            localScripts = parsed.pages;
+                        }
+                        serverMeta = { ...serverMeta, ...parsed };
+                    }
+                } catch(e) {}
+            }
+        }
+
         this.metadata = serverMeta;
         this.pageScripts = { ...serverScripts, ...localScripts };
         this.updateNarratorDisplay();

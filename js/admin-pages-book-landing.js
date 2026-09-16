@@ -1508,10 +1508,10 @@ Instant Download & Lifetime Access
               </select>
             </div>
 
-            <!-- Target Paid Main Book (For Buy Now Button in Reader) -->
+            <!-- Target Paid Main Book (For Buy Now Button in Reader & Bonus Attachment) -->
             <div>
-              <label class="admin-label" style="font-weight: 700; color: #38bdf8;">⚡ मुख्य पेड बुक लिंक (Buy Full Book @ ₹99):</label>
-              <select id="fd_target_main_book" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 700;">
+              <label class="admin-label" style="font-weight: 700; color: #38bdf8;">⚡ मुख्य पेड बुक लिंक (Target Main Book):</label>
+              <select id="fd_target_main_book" onchange="window.handleFdTargetMainBookChange(this.value)" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 700;">
                 <option value="BK001">🌾 BK001: खरीफ फसल मास्टर गाइड 2026</option>
                 <option value="BK002">🩺 BK002: खेती का डॉक्टर (Pocket Doctor)</option>
                 <option value="BK003">🌾 BK003: अनाज भंडारण गाइड</option>
@@ -1525,7 +1525,11 @@ Instant Download & Lifetime Access
                 <option value="BK011">🏡 BK011: पॉलीहाउस नेटहाउस गाइड</option>
                 <option value="BK012">🌱 BK012: सब्जी खेती गाइड</option>
                 <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
+                <option value="ALL">🎁 ALL: सभी पुस्तकों के साथ (Universal Bonus)</option>
               </select>
+              <button type="button" onclick="window.autoImportFromTargetMainBook()" class="admin-button small-button" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: 800; margin-top: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(2,132,199,0.3);">
+                <span>📥</span> <span>मुख्य पुस्तक के लैंडिंग पेज से प्रिव्यू इमेज व डेटा ऑटो-इम्पोर्ट करें</span>
+              </button>
             </div>
           </div>
 
@@ -1581,6 +1585,15 @@ Instant Download & Lifetime Access
               <small style="color: var(--admin-muted);">रीडर में ऑडियो सुनने के लिए</small>
             </div>
             <input type="text" id="fd_input_audio_url" placeholder="उदा. https://.../audio.mp3 या Studio Voice" class="admin-input" style="width: 100%; padding: 8px 12px;" />
+          </div>
+
+          <!-- Demo / Bonus PDF Download Path (Optional) -->
+          <div style="background: rgba(232,106,23,0.08); border: 1.5px solid rgba(232,106,23,0.3); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="font-weight: 700; font-size: 0.85rem; color: #f97316;">📥 डेमो / बोनस PDF फ़ाइल Path (Optional Download PDF):</label>
+              <small style="color: var(--admin-muted);">My Library में डाउनलोड बटन के लिए</small>
+            </div>
+            <input type="text" id="fd_input_demo_pdf" placeholder="उदा. /pdf/demo/BK015_demo.pdf या /pdf/full/BK015.pdf" class="admin-input" style="width: 100%; padding: 8px 12px;" />
           </div>
 
           <!-- Multi-YouTube Video Links (Dynamic List) -->
@@ -4347,6 +4360,240 @@ Instant Download & Lifetime Access
     }
   };
 
+  // =======================================================
+  // DYNAMIC TARGET MAIN BOOK POPULATION & AUTO-IMPORT ENGINE
+  // =======================================================
+  window.populateFdTargetMainBookSelect = function(selectedId = 'BK001') {
+    const sel = document.getElementById('fd_target_main_book');
+    if (!sel) return;
+
+    let landingList = [];
+    try {
+      landingList = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+    } catch(e) {}
+
+    let customBooks = [];
+    try {
+      customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+    } catch(e) {}
+
+    const knownBooks = [
+      { id: 'BK001', name: '🌾 BK001: खरीफ फसल मास्टर गाइड 2026' },
+      { id: 'BK002', name: '🩺 BK002: खेती का डॉक्टर (Pocket Doctor)' },
+      { id: 'BK003', name: '🌾 BK003: अनाज भंडारण गाइड' },
+      { id: 'BK004', name: '🍚 BK004: चावल प्रोसेसिंग गाइड' },
+      { id: 'BK005', name: '🌾 BK005: धान मास्टर गाइड' },
+      { id: 'BK006', name: '🤖 BK006: AI वेबसाइट गाइड' },
+      { id: 'BK007', name: '🌾 BK007: गेहूं मास्टर गाइड' },
+      { id: 'BK008', name: '🌱 BK008: जैविक खेती गाइड' },
+      { id: 'BK009', name: '🌾 BK009: मक्का मास्टर गाइड' },
+      { id: 'BK010', name: '🌸 BK010: फूल खेती गाइड' },
+      { id: 'BK011', name: '🏡 BK011: पॉलीहाउस नेटहाउस गाइड' },
+      { id: 'BK012', name: '🌱 BK012: सब्जी खेती गाइड' },
+      { id: 'BK015', name: '🌱 BK015: सब्जी खेती मास्टर PART 1' }
+    ];
+
+    const bookMap = new Map();
+    knownBooks.forEach(b => bookMap.set(b.id, b.name));
+
+    if (Array.isArray(landingList)) {
+      landingList.forEach(p => {
+        if (p && p.id) {
+          const bId = p.id.toUpperCase().trim();
+          const title = p.hero?.title || p.title || bId;
+          bookMap.set(bId, `📘 ${bId}: ${title}`);
+        }
+      });
+    }
+
+    if (Array.isArray(customBooks)) {
+      customBooks.forEach(b => {
+        if (b && b.id && !b.id.startsWith('DEMO') && !b.id.startsWith('BONUS') && !b.id.startsWith('FREE')) {
+          const bId = b.id.toUpperCase().trim();
+          if (!bookMap.has(bId)) {
+            const title = b.heading || b.name || bId;
+            bookMap.set(bId, `📗 ${bId}: ${title}`);
+          }
+        }
+      });
+    }
+
+    let optsHtml = '';
+    bookMap.forEach((name, id) => {
+      optsHtml += `<option value="${escapeHtml(id)}" ${id === selectedId ? 'selected' : ''}>${escapeHtml(name)}</option>`;
+    });
+    optsHtml += `<option value="ALL" ${selectedId === 'ALL' ? 'selected' : ''}>🎁 ALL: सभी पुस्तकों के साथ (Universal Bonus)</option>`;
+
+    sel.innerHTML = optsHtml;
+    sel.value = selectedId;
+  };
+
+  window.handleFdTargetMainBookChange = function(targetId) {
+    if (!targetId || targetId === 'ALL') return;
+    window.autoImportFromTargetMainBook(targetId);
+  };
+
+  window.autoImportFromTargetMainBook = async function(targetId = null) {
+    const sel = document.getElementById('fd_target_main_book');
+    const bId = (targetId || sel?.value || 'BK001').toUpperCase().trim();
+    if (!bId || bId === 'ALL') {
+      showToast('ℹ️ कृपया पहले कोई विशिष्ट मुख्य पुस्तक चुनें', 'info');
+      return;
+    }
+
+    showToast(`⏳ मुख्य पुस्तक (${bId}) से प्रिव्यू पेजेस व डेटा लोड हो रहा है...`, 'info');
+
+    let targetLanding = null;
+    let targetBook = null;
+
+    // 1. Check LocalStorage Landing Pages
+    try {
+      const localPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+      if (Array.isArray(localPages)) {
+        targetLanding = localPages.find(p => p && p.id && p.id.toUpperCase() === bId);
+      }
+    } catch(e) {}
+
+    // 2. Check LocalStorage Custom Books
+    try {
+      const localBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+      if (Array.isArray(localBooks)) {
+        targetBook = localBooks.find(b => b && b.id && b.id.toUpperCase() === bId);
+      }
+    } catch(e) {}
+
+    // 3. Fallback Fetch from JSON files
+    if (!targetLanding) {
+      try {
+        let res = await fetch(`../data/universal-book-landing-pages.json?v=${Date.now()}`);
+        if (!res.ok) res = await fetch(`/data/universal-book-landing-pages.json?v=${Date.now()}`);
+        if (res.ok) {
+          const json = await res.json();
+          const pages = Array.isArray(json) ? json : (json.bookLandingPages || json.pages || []);
+          if (Array.isArray(pages)) {
+            targetLanding = pages.find(p => p && p.id && p.id.toUpperCase() === bId);
+          }
+        }
+      } catch(e) {}
+    }
+
+    if (!targetBook) {
+      try {
+        let res = await fetch(`../data/books.json?v=${Date.now()}`);
+        if (!res.ok) res = await fetch(`/data/books.json?v=${Date.now()}`);
+        if (res.ok) {
+          const json = await res.json();
+          const books = Array.isArray(json) ? json : (json.books || []);
+          if (Array.isArray(books)) {
+            targetBook = books.find(b => b && ((b.id && b.id.toUpperCase() === bId) || (b.book_id && b.book_id.toUpperCase() === bId)));
+          }
+        }
+      } catch(e) {}
+    }
+
+    // 4. Extract Preview Pages
+    let extractedImages = [];
+    if (targetLanding) {
+      if (Array.isArray(targetLanding.demo_images) && targetLanding.demo_images.length > 0) {
+        extractedImages = targetLanding.demo_images;
+      } else if (Array.isArray(targetLanding.preview_images) && targetLanding.preview_images.length > 0) {
+        extractedImages = targetLanding.preview_images;
+      } else if (Array.isArray(targetLanding.pageImages) && targetLanding.pageImages.length > 0) {
+        extractedImages = targetLanding.pageImages.slice(0, 8);
+      }
+    }
+
+    if (extractedImages.length === 0 && targetBook) {
+      if (Array.isArray(targetBook.demoImages) && targetBook.demoImages.length > 0) {
+        extractedImages = targetBook.demoImages;
+      } else if (Array.isArray(targetBook.preview_images) && targetBook.preview_images.length > 0) {
+        extractedImages = targetBook.preview_images;
+      } else if (Array.isArray(targetBook.pageImages) && targetBook.pageImages.length > 0) {
+        extractedImages = targetBook.pageImages.slice(0, 8);
+      }
+    }
+
+    // Default static fallback per book if images not yet configured
+    if (extractedImages.length === 0) {
+      if (bId === 'BK001') {
+        extractedImages = [
+          '/images/books/kharif-master-guide-2026-preview-01.webp',
+          '/images/books/kharif-master-guide-2026-preview-02.webp',
+          '/images/books/kharif-master-guide-2026-preview-03.webp',
+          '/images/books/kharif-master-guide-2026-preview-04.webp'
+        ];
+      } else if (bId === 'BK002') {
+        extractedImages = [
+          '/images/books/kheti-dr-preview-01.webp',
+          '/images/books/kheti-dr-preview-02.webp',
+          '/images/books/kheti-dr-preview-03.webp',
+          '/images/books/kheti-dr-preview-04.webp'
+        ];
+      } else {
+        extractedImages = [
+          `/images/books/${bId.toLowerCase()}-preview-01.webp`,
+          `/images/books/${bId.toLowerCase()}-preview-02.webp`,
+          `/images/books/${bId.toLowerCase()}-preview-03.webp`
+        ];
+      }
+    }
+
+    // Clean paths
+    currentFdDemoPages = extractedImages.map(img => {
+      let clean = (img || '').trim();
+      if (clean && !clean.startsWith('http') && !clean.startsWith('/') && !clean.startsWith('data:')) {
+        clean = '/' + clean;
+      }
+      return clean;
+    }).filter(Boolean);
+
+    // 5. Extract Cover Image
+    const coverUrl = targetLanding?.hero?.cover_image || 
+                     targetLanding?.cover_image || 
+                     targetBook?.cover || 
+                     targetBook?.thumbnail || 
+                     targetBook?.cover_image || 
+                     '/images/books/kharif-master-guide-2026-cover.webp';
+
+    const inputCover = document.getElementById('fd_input_cover_url');
+    const prevCover = document.getElementById('fd_preview_cover_img');
+    if (inputCover) inputCover.value = coverUrl;
+    if (prevCover) prevCover.src = coverUrl;
+
+    // 6. Extract Title & Subtitle & Category
+    const mainTitle = targetLanding?.hero?.title || targetLanding?.title || targetBook?.heading || targetBook?.name || bId;
+    const mainSub = targetLanding?.hero?.subtitle || targetLanding?.subtitle || targetBook?.subtitle || '';
+    const mainCat = targetLanding?.category || targetBook?.category || 'Agriculture';
+    const type = document.getElementById('fd_input_type')?.value || 'demo';
+
+    const inputTitle = document.getElementById('fd_input_title');
+    if (inputTitle && (!inputTitle.value || !editingFdBookId)) {
+      inputTitle.value = type === 'demo' ? `${mainTitle} (Free Demo)` : `${mainTitle} (Free Bonus)`;
+    }
+
+    const inputSub = document.getElementById('fd_input_subtitle');
+    if (inputSub && (!inputSub.value || !editingFdBookId)) {
+      inputSub.value = mainSub || '5 प्रमुख पृष्ठों का सचित्र डेमो प्रिव्यू';
+    }
+
+    const inputCat = document.getElementById('fd_input_category');
+    if (inputCat && mainCat) {
+      inputCat.value = mainCat;
+    }
+
+    // 7. Extract Demo / Free PDF Path
+    const demoPdf = targetLanding?.demoPdf || targetLanding?.freePdf || targetBook?.demoPdf || targetBook?.freePdf || targetBook?.mainPdf || '';
+    const inputDemoPdf = document.getElementById('fd_input_demo_pdf');
+    if (inputDemoPdf && demoPdf) {
+      inputDemoPdf.value = demoPdf;
+    }
+
+    // 8. Re-render Demo Pages List
+    window.renderFdDemoPagesList();
+
+    showToast(`🎉 ${bId} से ${currentFdDemoPages.length} प्रिव्यू पेज व 3D कवर सफलता से इम्पोर्ट हो गए!`, 'success');
+  };
+
   window.resetFreeDemoBuilder = function() {
     editingFdBookId = null;
     currentFdVideos = [];
@@ -4368,8 +4615,9 @@ Instant Download & Lifetime Access
     if (inputType) inputType.value = 'demo';
     const inputCat = document.getElementById('fd_input_category');
     if (inputCat) inputCat.value = 'Agriculture';
-    const targetBook = document.getElementById('fd_target_main_book');
-    if (targetBook) targetBook.value = 'BK001';
+    
+    window.populateFdTargetMainBookSelect('BK001');
+
     const inputTitle = document.getElementById('fd_input_title');
     if (inputTitle) inputTitle.value = '';
     const inputSub = document.getElementById('fd_input_subtitle');
@@ -4380,6 +4628,8 @@ Instant Download & Lifetime Access
     if (prevCover) prevCover.src = '/images/books/kharif-master-guide-2026-cover.webp';
     const inputAudio = document.getElementById('fd_input_audio_url');
     if (inputAudio) inputAudio.value = '';
+    const inputDemoPdf = document.getElementById('fd_input_demo_pdf');
+    if (inputDemoPdf) inputDemoPdf.value = '';
 
     window.renderFdVideosList();
     window.renderFdDemoPagesList();
@@ -4536,6 +4786,7 @@ Instant Download & Lifetime Access
     const subtitle = (document.getElementById('fd_input_subtitle')?.value || '').trim();
     const cover = (document.getElementById('fd_input_cover_url')?.value || '').trim();
     const audioUrl = (document.getElementById('fd_input_audio_url')?.value || '').trim();
+    const demoPdf = (document.getElementById('fd_input_demo_pdf')?.value || '').trim();
 
     if (!bId) {
       showToast('❌ कृपया Book Code दर्ज करें (उदा. DEMO001)', 'error');
@@ -4577,6 +4828,10 @@ Instant Download & Lifetime Access
       audioUrl: audioUrl,
       hasAudioBook: Boolean(audioUrl),
       has_audio: Boolean(audioUrl),
+      demoPdf: demoPdf,
+      freePdf: demoPdf,
+      pdf_url: demoPdf,
+      mainPdf: demoPdf,
       videos: cleanVideos,
       demoImages: cleanPages,
       pageImages: cleanPages,
@@ -4589,7 +4844,7 @@ Instant Download & Lifetime Access
       isBonus: type === 'bonus_free',
       demoAvailable: true,
       readEnabled: true,
-      allowDownload: false // Strictly no direct PDF download
+      allowDownload: Boolean(demoPdf)
     };
 
     let list = getStoredFreeDemoBooks();
@@ -4639,8 +4894,9 @@ Instant Download & Lifetime Access
     if (inputType) inputType.value = found.type || 'demo';
     const inputCat = document.getElementById('fd_input_category');
     if (inputCat) inputCat.value = found.category || 'Agriculture';
-    const targetBook = document.getElementById('fd_target_main_book');
-    if (targetBook) targetBook.value = found.targetMainBook || 'BK001';
+    
+    window.populateFdTargetMainBookSelect(found.targetMainBook || 'BK001');
+
     const inputTitle = document.getElementById('fd_input_title');
     if (inputTitle) inputTitle.value = found.heading || found.name || '';
     const inputSub = document.getElementById('fd_input_subtitle');
@@ -4651,6 +4907,8 @@ Instant Download & Lifetime Access
     if (prevCover && found.cover) prevCover.src = found.cover;
     const inputAudio = document.getElementById('fd_input_audio_url');
     if (inputAudio) inputAudio.value = found.audioUrl || '';
+    const inputDemoPdf = document.getElementById('fd_input_demo_pdf');
+    if (inputDemoPdf) inputDemoPdf.value = found.demoPdf || found.freePdf || found.pdf_url || found.mainPdf || '';
 
     currentFdVideos = Array.isArray(found.videos) ? [...found.videos] : [];
     currentFdDemoPages = Array.isArray(found.demoImages) ? [...found.demoImages] : (Array.isArray(found.pageImages) ? [...found.pageImages] : []);

@@ -826,6 +826,21 @@
       }
     }
 
+    // Dynamic Action Buttons in Preview Section
+    const previewActionWrap = document.querySelector('#sec-sample-book .preview-action');
+    if (previewActionWrap) {
+      const bId = (currentBookData?.id || currentBookId || 'BK001').toUpperCase();
+      const readerDemoUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
+      previewActionWrap.innerHTML = `
+        <a id="preview-buy-btn" href="#sec-final-buy" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;">
+          <span>🛒</span> <span>अभी खरीदें मात्र ₹${offerPrice} में</span>
+        </a>
+        <a href="${readerDemoUrl}" class="preview-buy-btn" style="background:linear-gradient(135deg,#0284c7,#0369a1);border:1.5px solid #38bdf8;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;margin-left:8px;" title="पूरा सचित्र डेमो रीडर खोलें">
+          <span>📖</span> <span>फुल डेमो रीडर खोलें (Open Demo Reader)</span>
+        </a>
+      `;
+    }
+
     if (previewSection && demoImages.length === 0 && (!l.preview_banner || !l.preview_banner.trim())) {
       previewSection.style.display = 'none';
     }
