@@ -144,7 +144,7 @@
       ],
       "store_badge": "best_seller",
       "badge": "best_seller",
-      "isComingSoon": true,
+      "isComingSoon": false,
       "mainPdf": "",
       "pdf_url": "",
       "freePdf": "",
@@ -201,7 +201,7 @@
       "landingPage": "/ebooks/book-landing.html?id=SUB001",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:26:47.375Z",
+      "updated_at": "2026-09-16T18:28:35.319Z",
       "admin_edited": true
     },
     {
