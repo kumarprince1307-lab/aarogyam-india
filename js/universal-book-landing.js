@@ -158,7 +158,7 @@
 
   function extractQueryParameters() {
     const params = new URLSearchParams(window.location.search);
-    const idParam = params.get('id') || params.get('book') || params.get('book_id');
+    const idParam = params.get('id') || params.get('ID') || params.get('book') || params.get('book_id') || params.get('bookId');
     const slugParam = params.get('slug');
 
     if (idParam) {
@@ -292,7 +292,7 @@
       }
     } catch (e) {}
 
-    // Check localStorage admin changes and merge if newer
+    // Check localStorage admin changes and merge ONLY if strictly newer than server JSON
     try {
       const stored = localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES');
       if (stored) {
@@ -302,9 +302,10 @@
             if (!item || !item.id) return;
             const idx = allLandingPages.findIndex(p => p.id && p.id.toUpperCase() === item.id.toUpperCase());
             const jsonPage = idx >= 0 ? allLandingPages[idx] : null;
-            if (!jsonPage || item.admin_edited || (item.updated_at && (!jsonPage.updated_at || new Date(item.updated_at) >= new Date(jsonPage.updated_at)))) {
-              if (idx >= 0) allLandingPages[idx] = deepMergeSafe(allLandingPages[idx], item);
-              else allLandingPages.push(item);
+            if (!jsonPage) {
+              allLandingPages.push(item);
+            } else if (item.updated_at && jsonPage.updated_at && new Date(item.updated_at) > new Date(jsonPage.updated_at)) {
+              allLandingPages[idx] = deepMergeSafe(allLandingPages[idx], item);
             }
           });
         }
