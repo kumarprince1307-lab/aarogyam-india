@@ -413,10 +413,9 @@
         "home_page",
         "download_funnel"
       ],
-      "store_badge": "new_arrival",
-      "badge": "new_arrival",
+      "store_badge": "best_seller",
+      "badge": "best_seller",
       "isComingSoon": false,
-      "hasAudioBook": true,
       "mainPdf": "/pdf/full/BK015.pdf",
       "pdf_url": "/pdf/full/BK015.pdf",
       "freePdf": "",
@@ -484,8 +483,7 @@
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
-      "readerPage": "/ebooks/reader.html",
-      "pdfUrl": ""
+      "readerPage": "/ebooks/reader.html"
     }
   ]
 }
