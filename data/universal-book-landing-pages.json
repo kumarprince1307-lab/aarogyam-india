@@ -206,7 +206,10 @@
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
-      "google_analytics_enabled": true
+      "google_analytics_enabled": true,
+      "publish_targets": [
+        "download_funnel"
+      ]
     },
     {
       "id": "BK002",
@@ -218,7 +221,8 @@
         "ebook_store",
         "category_page",
         "my_library",
-        "home_page"
+        "home_page",
+        "download_funnel"
       ],
       "theme_primary": "#2E7D32",
       "theme_dark": "#1B5E20",
@@ -559,7 +563,7 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-16T01:45:16.836Z",
+      "updated_at": "2026-09-15T00:18:54.125Z",
       "slug": "bk015",
       "book_name": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "author": "Dada Avnish Mishra",
@@ -592,12 +596,14 @@
         "sec_specs_toc",
         "sec_reviews",
         "sec_faqs",
-        "sec_final_buy",
         "sec_help",
         "sec_pdf_main",
+        "sec_final_buy",
         "sec_pdf_free"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_final_buy"
+      ],
       "section_banners": {
         "sec_hero": "/images/banners/bk015-sec_hero-banner.webp",
         "sec_timer": "/images/banners/bk015-sec_timer-banner.webp",
@@ -672,7 +678,7 @@
         "bgm_enabled": true,
         "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
       },
-      "mainPdf": "",
+      "mainPdf": "/pdf/full/BK015.pdf",
       "main_pdf": "",
       "freePdf": "",
       "free_pdf": "",
@@ -728,7 +734,8 @@
             "icon": "fa-gift",
             "text": "with Audio "
           }
-        ]
+        ],
+        "pdf_url": ""
       },
       "value_stack": {
         "book_mrp": 299,
@@ -802,17 +809,16 @@
       },
       "preview_banner": "/images/banners/bk015-sec_preview-banner.webp",
       "demo_images": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
-        "/images/books/bk015-preview-6.webp",
-        "/images/books/bk015-preview-7.webp",
-        "/images/books/bk015-preview-8.webp",
-        "/images/books/bk015-preview-9.webp",
-        "/images/books/bk015-preview-10.webp",
-        "/images/books/bk015-preview-11.webp"
+        "/images/books/BK015/1.webp",
+        "/images/books/BK015/2.webp",
+        "/images/books/BK015/3.webp",
+        "/images/books/BK015/4.webp",
+        "/images/books/BK015/5.webp",
+        "/images/books/BK015/6.webp",
+        "/images/books/BK015/7.webp",
+        "/images/books/BK015/8.webp",
+        "/images/books/BK015/9.webp",
+        "/images/books/BK015/10.webp"
       ],
       "suggested_books_list": [
         {
@@ -1019,20 +1025,30 @@
         }
       ],
       "final_buy": {
-        "title": "🌱 सब्जी खेती मास्टर  (PART 1)",
-        "description": "11 प्रमुख सब्जियों की खेती — बीज से बाजार तक व्यावहारिक मार्गदर्शन | 154 पेज",
+        "title": "🌱 सब्जी खेती मास्टर (PART 1)",
+        "description": "11 प्रमुख सब्जियों की वैज्ञानिक व प्राकृतिक खेती — बीज से बाजार तक सम्पूर्ण व्यावहारिक गाइड | 154 पेज",
         "benefits": [
-          "24×7 WhatsApp Support",
-          "💬 आपका सवाल → हमारी मदद → आसान समाधान",
-          "📖 किताब की जानकारी समझने में सहायता",
-          "🌱 फसल संबंधी सवाल",
-          "📱 Mobile Friendly PDF & Lifetime Access"
+          "11 प्रमुख सब्जियों की सम्पूर्ण वैज्ञानिक व व्यावहारिक खेती गाइड",
+          "नीमास्त्र, ब्रह्मास्त्र, दशपर्णी अर्क व प्राकृतिक कीटनाशक फॉर्मूले",
+          "नर्सरी, पौध तैयारी व बीज उपचार की सटीक विधियां",
+          "फसल अनुसार रोग व कीट पहचान तथा 100% जैविक समाधान",
+          "लागत में 70% तक बचत और बंपर पैदावार की तकनीक",
+          "24×7 WhatsApp किसान हेल्पलाइन व लाइफटाइम एक्सेस",
+          "मोबाइल फ्रेंडली फास्ट PDF + लाइव ऑडियो बुक सुविधा"
         ],
         "banner_image": "/images/banners/bk015-sec_final_buy-banner.webp"
       },
       "whatsapp_share_message": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
       "whatsapp_share_text": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
-      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।"
+      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "download_funnel"
+      ],
+      "pdf_url": "/pdf/full/BK015.pdf"
     },
     {
       "id": "SUB001",

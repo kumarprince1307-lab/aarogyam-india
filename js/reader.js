@@ -521,11 +521,18 @@ function queueRenderPage(num) {
     }
 }
 
+function syncAudioEngineWithPage() {
+    if (window.aoiAudioBookEngine && window.aoiAudioBookEngine.isPlaying) {
+        window.aoiAudioBookEngine.playCurrentPage();
+    }
+}
+
 function onPrevPage() {
     if (aoiPageNum <= 1) return;
     aoiPageNum--;
     window.aoiPageNum = aoiPageNum;
     queueRenderPage(aoiPageNum);
+    syncAudioEngineWithPage();
 }
 
 function onNextPage() {
@@ -533,6 +540,7 @@ function onNextPage() {
     aoiPageNum++;
     window.aoiPageNum = aoiPageNum;
     queueRenderPage(aoiPageNum);
+    syncAudioEngineWithPage();
 }
 
 // Global Hooks for Audio Engine and Controls
@@ -582,6 +590,7 @@ if (pageSlider) {
         if (targetPage >= 1 && targetPage <= aoiTotalPages) {
             aoiPageNum = targetPage;
             queueRenderPage(aoiPageNum);
+            syncAudioEngineWithPage();
         }
     });
 }
@@ -593,6 +602,7 @@ if (pageJumpBtn) {
         if (inputVal >= 1 && inputVal <= aoiTotalPages) {
             aoiPageNum = inputVal;
             queueRenderPage(aoiPageNum);
+            syncAudioEngineWithPage();
             document.getElementById("pageJumpInput").value = "";
         } else {
             alert(`कृपया 1 से ${aoiTotalPages} के बीच का वैध पेज नंबर डालें।`);

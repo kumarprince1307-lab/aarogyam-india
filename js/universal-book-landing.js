@@ -114,6 +114,44 @@
     bindInteractiveEvents();
     renderFaqSection();
     renderBookDetails();
+    initLandingPageAutoplay();
+  }
+
+    function initLandingPageAutoplay() {
+    const l = currentLandingData || {};
+    const b = currentBookData || {};
+    const audioLayer = l.audio_layer || b.audio_layer || {};
+    const hasAudio = audioLayer.enabled !== false && (audioLayer.mp3_url || audioLayer.tts_text || audioLayer.story_text || audioLayer.title || b.hasAudioBook || b.audioNarrationAvailable);
+    if (!hasAudio) return;
+
+    // Show floating pill if available
+    const floatPill = document.getElementById('aoi-floating-audio-pill');
+    if (floatPill) {
+      floatPill.style.display = 'flex';
+      floatPill.style.cursor = 'pointer';
+    }
+
+    const tryAutoPlay = () => {
+      if (!ublAudioPlaying && !window._ublAudioUserStopped && typeof window.startUblLandingAudio === 'function') {
+        try { window.startUblLandingAudio(); } catch(e) {}
+      }
+    };
+
+    // 1. Immediate attempt
+    setTimeout(tryAutoPlay, 300);
+
+    // 2. Fallback on first user interaction anywhere (scroll, touch, click, pointer)
+    const interactionEvents = ['scroll', 'touchstart', 'touchend', 'click', 'pointerdown', 'keydown'];
+    const onUserInteraction = () => {
+      tryAutoPlay();
+      if (ublAudioPlaying) {
+        interactionEvents.forEach(evt => window.removeEventListener(evt, onUserInteraction));
+      }
+    };
+
+    interactionEvents.forEach(evt => {
+      window.addEventListener(evt, onUserInteraction, { once: true, passive: true });
+    });
   }
 
   function extractQueryParameters() {
@@ -232,8 +270,26 @@
       }
     } catch (e) {}
 
-    // The deployed JSON is the source of truth. Local editor drafts must not
-    // override it, otherwise an old browser can hide newly synced content.
+    // Check localStorage admin changes and merge if newer
+    try {
+      const stored = localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(item => {
+            if (!item || !item.id) return;
+            const idx = allLandingPages.findIndex(p => p.id && p.id.toUpperCase() === item.id.toUpperCase());
+            const jsonPage = idx >= 0 ? allLandingPages[idx] : null;
+            const lsTime = item.updated_at ? new Date(item.updated_at).getTime() : 0;
+            const jsonTime = jsonPage && jsonPage.updated_at ? new Date(jsonPage.updated_at).getTime() : 0;
+            if (!jsonPage || lsTime >= jsonTime) {
+              if (idx >= 0) allLandingPages[idx] = { ...allLandingPages[idx], ...item };
+              else allLandingPages.push(item);
+            }
+          });
+        }
+      }
+    } catch (e) {}
 
     // 4. Resolve Landing Page Data FIRST (by query key / slug)
     const qKey = (currentBookId || 'BK001').trim().toUpperCase();
@@ -924,20 +980,27 @@
     const finalBenefitsList = document.getElementById('final-benefits-list');
     if (finalBenefitsList) {
       let bList = [];
-      if (l.final_buy && Array.isArray(l.final_buy.benefits) && l.final_buy.benefits.length > 0) {
-        bList = l.final_buy.benefits;
-      } else if (Array.isArray(l.purchase_benefits) && l.purchase_benefits.length > 0) {
-        bList = l.purchase_benefits;
-      } else if (Array.isArray(l.bonus_points) && l.bonus_points.length > 0) {
-        bList = l.bonus_points;
-      } else {
-        bList = [
-          'Full PDF eBook & Audio Book',
-          '📱 मोबाइल में कभी भी पढ़ें',
-          'Instant Download & Lifetime Access',
-          '🎁 Share करें और Surprise Gift जीतें',
-          '💬 पढ़ते समय सवाल हो? WhatsApp Help से पूछें'
-        ];
+      if (l.final_buy && l.final_buy.benefits) {
+        if (Array.isArray(l.final_buy.benefits) && l.final_buy.benefits.length > 0) {
+          bList = l.final_buy.benefits;
+        } else if (typeof l.final_buy.benefits === 'string' && l.final_buy.benefits.trim().length > 0) {
+          bList = l.final_buy.benefits.split(/[\r\n]+/).map(x => x.trim()).filter(Boolean);
+        }
+      }
+      if (bList.length === 0) {
+        if (Array.isArray(l.purchase_benefits) && l.purchase_benefits.length > 0) {
+          bList = l.purchase_benefits;
+        } else if (Array.isArray(l.bonus_points) && l.bonus_points.length > 0) {
+          bList = l.bonus_points;
+        } else {
+          bList = [
+            'Full PDF eBook & Audio Book',
+            '📱 मोबाइल में कभी भी पढ़ें',
+            'Instant Download & Lifetime Access',
+            '🎁 Share करें और Surprise Gift जीतें',
+            '💬 पढ़ते समय सवाल हो? WhatsApp Help से पूछें'
+          ];
+        }
       }
       finalBenefitsList.innerHTML = bList.map(item => {
         const clean = String(item || '').trim();

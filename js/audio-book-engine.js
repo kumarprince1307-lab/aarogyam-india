@@ -127,6 +127,8 @@ class ProAudioBookEngine {
         this.userName = "किसान मित्र";
         this.welcomePlayed = false;
         this.isPageRecordedAudio = false;
+        this.activeEpoch = 0;
+        this.activeTimers = [];
 
         this.hasNativeHindiVoice = false;
         this.ttsAudio = new Audio();
@@ -377,16 +379,19 @@ class ProAudioBookEngine {
         const chunks = this.splitTextIntoChunks(text);
         if (!chunks.length) return;
 
+        // Distinct Epoch prevents old closures or page changes from continuing
+        const currentEpoch = ++this.activeEpoch;
         let chunkIndex = 0;
         this.isPlaying = true;
         this.setPlayingState(true);
 
         const onAllChunksFinished = () => {
-            if (!this.isPlaying) return;
+            if (!this.isPlaying || this.activeEpoch !== currentEpoch) return;
             if (isWelcome) {
-                setTimeout(() => {
-                    if (this.isPlaying) this.playCurrentPage();
-                }, 400);
+                const t = setTimeout(() => {
+                    if (this.isPlaying && this.activeEpoch === currentEpoch) this.playCurrentPage();
+                }, 300);
+                this.activeTimers.push(t);
                 return;
             }
 
@@ -394,15 +399,17 @@ class ProAudioBookEngine {
             const curPage = window.aoiPageNum || 1;
             if (this.autoNextPage && curPage < totalPages) {
                 this.updateStatusDisplay(`⏭️ पृष्ठ ${curPage} समाप्त • अगले पृष्ठ पर जा रहे हैं...`);
-                setTimeout(() => {
-                    if (!this.isPlaying) return;
+                const t1 = setTimeout(() => {
+                    if (!this.isPlaying || this.activeEpoch !== currentEpoch) return;
                     if (typeof window.onNextPage === 'function') {
                         window.onNextPage();
                     }
-                    setTimeout(() => {
-                        if (this.isPlaying) this.playCurrentPage();
-                    }, 600);
-                }, 800);
+                    const t2 = setTimeout(() => {
+                        if (this.isPlaying && this.activeEpoch === currentEpoch) this.playCurrentPage();
+                    }, 400);
+                    this.activeTimers.push(t2);
+                }, 600);
+                this.activeTimers.push(t1);
             } else {
                 this.setPlayingState(false);
                 this.updateStatusDisplay(`✅ पृष्ठ ${curPage} समाप्त हुआ`);
@@ -410,7 +417,7 @@ class ProAudioBookEngine {
         };
 
         const playNextChunk = () => {
-            if (!this.isPlaying) return;
+            if (!this.isPlaying || this.activeEpoch !== currentEpoch) return;
             if (chunkIndex >= chunks.length) {
                 onAllChunksFinished();
                 return;
@@ -423,7 +430,7 @@ class ProAudioBookEngine {
                 return;
             }
 
-            // 1. Prefer Native SpeechSynthesis with Voice Selection
+            // Prefer Native SpeechSynthesis with Voice Selection
             if (this.synth) {
                 try {
                     const ut = new SpeechSynthesisUtterance(currentChunk);
@@ -431,15 +438,17 @@ class ProAudioBookEngine {
                     if (this.femaleVoice) ut.voice = this.femaleVoice;
                     ut.lang = 'hi-IN';
                     ut.pitch = 1.0;
-                    ut.rate = 0.98 * this.playbackRate;
+                    ut.rate = 1.0 * this.playbackRate;
 
                     let hasAdvanced = false;
                     let watchdogTimer = null;
+                    let pulseTimer = null;
 
                     const advance = () => {
-                        if (hasAdvanced || !this.isPlaying) return;
+                        if (hasAdvanced || !this.isPlaying || this.activeEpoch !== currentEpoch) return;
                         hasAdvanced = true;
                         if (watchdogTimer) clearTimeout(watchdogTimer);
+                        if (pulseTimer) clearInterval(pulseTimer);
                         chunkIndex++;
                         playNextChunk();
                     };
@@ -449,33 +458,38 @@ class ProAudioBookEngine {
                     };
 
                     ut.onerror = (e) => {
-                        console.warn("TTS utterance note:", e?.error);
+                        console.warn("TTS utterance notice:", e?.error);
                         advance();
                     };
 
-                    // Safety Watchdog Timer: auto-advance if browser drops onend (e.g. Chrome 15s bug)
-                    const maxUtteranceDurationMs = Math.min(12000, Math.max(3000, currentChunk.length * 150));
+                    // Generous Watchdog Timer based on character count: 180ms per character, min 5000ms
+                    const maxUtteranceDurationMs = Math.max(5000, currentChunk.length * 180);
                     watchdogTimer = setTimeout(() => {
-                        if (!hasAdvanced && this.isPlaying) {
-                            console.warn("TTS Watchdog triggered for chunk:", currentChunk);
+                        if (!hasAdvanced && this.isPlaying && this.activeEpoch === currentEpoch) {
                             advance();
                         }
                     }, maxUtteranceDurationMs);
+                    this.activeTimers.push(watchdogTimer);
 
-                    // Chrome Android Keep-Alive Pulse during utterance
-                    const pulseTimer = setInterval(() => {
-                        if (!this.isPlaying || hasAdvanced) {
+                    // Keep-Alive Pulse during utterance
+                    pulseTimer = setInterval(() => {
+                        if (!this.isPlaying || hasAdvanced || this.activeEpoch !== currentEpoch) {
                             clearInterval(pulseTimer);
                             return;
                         }
                         if (window.speechSynthesis && window.speechSynthesis.paused) {
                             window.speechSynthesis.resume();
                         }
-                    }, 1800);
+                    }, 2000);
+                    this.activeTimers.push(pulseTimer);
 
-                    setTimeout(() => {
-                        if (this.isPlaying && this.synth) this.synth.speak(ut);
-                    }, 25);
+                    const speakTimer = setTimeout(() => {
+                        if (this.isPlaying && this.activeEpoch === currentEpoch && this.synth) {
+                            this.synth.speak(ut);
+                        }
+                    }, 20);
+                    this.activeTimers.push(speakTimer);
+
                 } catch(err) {
                     chunkIndex++;
                     playNextChunk();
@@ -490,6 +504,14 @@ class ProAudioBookEngine {
     }
 
     stopAudioSources() {
+        this.activeEpoch = (this.activeEpoch || 0) + 1;
+        if (Array.isArray(this.activeTimers)) {
+            this.activeTimers.forEach(t => {
+                clearTimeout(t);
+                clearInterval(t);
+            });
+            this.activeTimers = [];
+        }
         if (this.audioElement) {
             this.audioElement.pause();
             this.audioElement.currentTime = 0;
@@ -499,7 +521,9 @@ class ProAudioBookEngine {
             this.ttsAudio.currentTime = 0;
         }
         if (this.synth) {
-            this.synth.cancel();
+            try {
+                this.synth.cancel();
+            } catch(e) {}
         }
     }
 

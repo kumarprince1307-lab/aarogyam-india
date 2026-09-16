@@ -2,125 +2,390 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium eBook Download - Aarogyam India</title>
-    <link rel="stylesheet" href="../css/download.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>👑 VIP ई-बुक डाउनलोड व ऐप हब — Aarogyam India</title>
+    <link rel="stylesheet" href="../css/download.css?v=20260916_v2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- PWA Manifest & Theme -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#064e3b">
+    <link rel="icon" type="image/png" href="/images/logo/logo.png">
 </head>
-<body>
+<body class="vip-download-theme">
 
-    <!-- 1. Header -->
-    <header class="download-header">
-        <a href="my-library.html" class="back-button" title="Back to My Library">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
-        <h1>Secure Download</h1>
-        <img src="/images/logo/logo.png" alt="Logo" class="header-logo">
+    <!-- Ambient Glow Lights -->
+    <div class="ambient-glow glow-top"></div>
+    <div class="ambient-glow glow-bottom"></div>
+
+    <!-- 1. VIP Top Header -->
+    <header class="vip-header">
+        <div class="header-inner">
+            <a href="my-library.html" class="vip-back-btn" title="My Library में वापस जाएं">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>My Library</span>
+            </a>
+            <div class="vip-brand-badge">
+                <img src="/images/logo/logo.png" alt="Aarogyam India" class="header-emblem">
+                <div class="brand-text-col">
+                    <span class="brand-portal-title">Aarogyam India</span>
+                    <span class="brand-sub-badge">👑 VIP Delivery Portal</span>
+                </div>
+            </div>
+            <div class="vip-secure-shield">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span class="secure-text">100% Secure</span>
+            </div>
+        </div>
     </header>
 
-    <!-- 2. Main Content -->
+    <!-- 2. Main Content Container -->
     <main class="download-container">
 
-        <!-- Loading/Error State -->
+        <!-- Loading State -->
         <div id="loadingState" class="state-card">
-            <div class="spinner"></div>
-            <p>Loading your download details...</p>
+            <div class="pulse-ring-spinner">
+                <div class="spinner-core"></div>
+            </div>
+            <h3 class="loading-title">आपकी ई-बुक और VIP विवरण लोड हो रहा है...</h3>
+            <p class="loading-desc">कृपया प्रतीक्षा करें, 100% सुरक्षित सर्वर से डेटा प्राप्त हो रहा है।</p>
         </div>
 
-        <div id="errorState" class="state-card" style="display: none;">
-            <i class="fa-solid fa-circle-exclamation error-icon"></i>
-            <p id="errorMessage">An error occurred.</p>
-            <a href="my-library.html" class="action-button secondary">Go to My Library</a>
+        <!-- Error State -->
+        <div id="errorState" class="state-card error" style="display: none;">
+            <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+            <h3 class="error-title">ई-बुक लोड करने में समस्या</h3>
+            <p id="errorMessage" class="error-desc">कृपया सुनिश्चित करें कि आपका इंटरनेट कनेक्शन सक्रिय है।</p>
+            <a href="my-library.html" class="action-btn-back">My Library में जाएं</a>
         </div>
 
-        <!-- Main Download Card (hidden until data is loaded) -->
-        <div id="downloadCard" class="download-card" style="display: none;">
+        <!-- ==============================================================
+             CELEBRATION HERO BANNER & ANIMATED LIVE KPIS
+             ============================================================== -->
+        <section class="celebration-hero-section" id="heroCelebrationSection">
+            <div class="celebration-badge-pill">
+                <span class="sparkle-icon">✨</span>
+                <span>सफलतापूर्वक अनलॉक हुआ • Lifetime Active</span>
+            </div>
+            <h1 class="celebration-heading">🎉 बधाई हो किसान भाई!</h1>
+            <p class="celebration-subtext">आपकी प्रीमियम डिजिटल ई-बुक आपकी लाइब्रेरी में सफलतापूर्वक जोड़ दी गई है। आप इसे <strong>तुरंत डाउनलोड</strong> कर सकते हैं या <strong>बिना फोन मेमोरी भरे ऐप में पढ़ व सुन</strong> सकते हैं!</p>
 
-            <!-- Book Info -->
-            <div class="book-info">
-                <img id="bookCover" src="" alt="Book Cover" class="book-cover">
-                <div class="book-details">
-                    <h2 id="bookName"></h2>
-                    <p id="bookCategory"></p>
+            <!-- 4 ANIMATED GLOWING KPI STAT CARDS -->
+            <div class="kpi-metrics-grid">
+                <!-- KPI 1: VIP Access -->
+                <div class="kpi-stat-card glow-emerald">
+                    <div class="kpi-icon-wrap">👑</div>
+                    <div class="kpi-content">
+                        <span class="kpi-val">लाइफटाइम VIP</span>
+                        <span class="kpi-label">वैलिडिटी: हमेशा एक्टिव</span>
+                    </div>
+                    <div class="kpi-beacon">
+                        <span class="beacon-dot"></span>
+                        <span class="beacon-label">सक्रिय</span>
+                    </div>
+                </div>
+
+                <!-- KPI 2: CDN Download Speed -->
+                <div class="kpi-stat-card glow-amber">
+                    <div class="kpi-icon-wrap">⚡</div>
+                    <div class="kpi-content">
+                        <span class="kpi-val">सुपरफास्ट CDN</span>
+                        <span class="kpi-label">फास्ट 24MB डायरेक्ट लिंक</span>
+                    </div>
+                    <div class="kpi-beacon amber">
+                        <span class="beacon-dot"></span>
+                        <span class="beacon-label">1 सेकंड</span>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Offline PWA App -->
+                <div class="kpi-stat-card glow-blue">
+                    <div class="kpi-icon-wrap">📱</div>
+                    <div class="kpi-content">
+                        <span class="kpi-val">Aarogyam App</span>
+                        <span class="kpi-label">मेमोरी खर्च: 0% MB</span>
+                    </div>
+                    <div class="kpi-beacon blue">
+                        <span class="beacon-dot"></span>
+                        <span class="beacon-label">ऑफलाइन</span>
+                    </div>
+                </div>
+
+                <!-- KPI 4: Audio Narration -->
+                <div class="kpi-stat-card glow-purple">
+                    <div class="kpi-icon-wrap">🎧</div>
+                    <div class="kpi-content">
+                        <span class="kpi-val">स्मार्ट ऑडियो</span>
+                        <span class="kpi-label">AI वौइस् नरेशन रेडी</span>
+                    </div>
+                    <div class="kpi-beacon purple">
+                        <span class="beacon-dot"></span>
+                        <span class="beacon-label">हिंदी वौइस्</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================================================
+             CARD 1: APP INSTALL TUTORIAL & LIVE AUDIO GUIDANCE
+             ============================================================== -->
+        <section class="app-install-card-vip" id="appInstallTutorialCard">
+            <div class="card-glow-border"></div>
+            <div class="app-mono-header">
+                <div class="logo-pulse-aura">
+                    <img src="/images/logo/logo.png" alt="Aarogyam Mono Logo" class="app-mono-logo">
+                </div>
+                <div class="app-mono-title-wrap">
+                    <span class="app-install-tag">🌟 सर्वश्रेष्ठ किसान अनुभव</span>
+                    <h3>📱 Aarogyam App अपने फोन में इंस्टॉल करें</h3>
+                    <p class="app-mono-subtitle">फोन मेमोरी भरे बिना 1-क्लिक में कभी भी ई-बुक पढ़ें, ज़ूम करें और लाइव ऑडियो सुनें!</p>
                 </div>
             </div>
 
-            <!-- Purchase Summary -->
-            <div class="purchase-summary">
-                <h3>Purchase Summary</h3>
-                <div class="summary-item"><span>Customer:</span> <strong id="customerName"></strong></div>
-                <div class="summary-item"><span>Mobile:</span> <strong id="customerMobile"></strong></div>
-                <div class="summary-item"><span>Book ID:</span> <strong id="bookId"></strong></div>
-                <div class="summary-item"><span>Purchase Date:</span> <strong id="purchaseDate"></strong></div>
-                <div class="summary-item"><span>Access:</span> <strong>Lifetime</strong></div>
-            </div>
-
-            <!-- Download Status -->
-            <div id="statusReady" class="download-status ready">
-                <p class="status-title">Your eBook is ready.</p>
-                <div class="download-counter">
-                    <div><span>Used:</span> <strong id="downloadsUsed"></strong></div>
-                    <div><span>Remaining:</span> <strong id="downloadsRemaining"></strong></div>
-                    <div><span>Maximum:</span> <strong id="downloadsMax"></strong></div>
+            <!-- Audio Guidance Live Player Box -->
+            <div class="audio-guide-box-vip">
+                <button type="button" id="btnAudioGuidePlay" class="audio-guide-play-btn" title="ऑडियो गाइडेंस सुनें" onclick="window.toggleAudioGuidance()">
+                    <i class="fa-solid fa-volume-high" id="audioGuideIcon"></i>
+                </button>
+                <div class="audio-guide-meta">
+                    <div class="audio-guide-label">
+                        <span>🎧 गाइडेंस: 30 सेकंड में जानें ऐप कैसे इंस्टॉल करें व पढ़ें</span>
+                        <div class="sound-waves-indicator" id="soundWavesBox">
+                            <span class="sound-bar"></span>
+                            <span class="sound-bar"></span>
+                            <span class="sound-bar"></span>
+                            <span class="sound-bar"></span>
+                            <span class="sound-bar"></span>
+                        </div>
+                    </div>
+                    <div class="audio-guide-desc" id="audioGuideStatus">क्लिक करके 30-सेकंड की ऑडियो गाइडेंस सुनें (Hindi Voice)</div>
                 </div>
             </div>
 
-            <div id="statusExhausted" class="download-status exhausted" style="display: none;">
-                <p class="status-title">Download limit reached.</p>
-                <p class="status-subtitle">Don't worry, your Lifetime Access is safe.</p>
+            <!-- Step-by-Step Installation Tutorial Text -->
+            <div class="install-steps-vip-grid">
+                <div class="install-step-vip-box">
+                    <div class="step-badge">1</div>
+                    <div class="step-text-col">
+                        <strong>ब्राउज़र मेन्यू खोलें</strong>
+                        <span>ऊपर दाईं ओर <strong>3 डॉट्स (⋮)</strong> या नीचे <strong>Share</strong> बटन दबाएं।</span>
+                    </div>
+                </div>
+                <div class="install-step-vip-box">
+                    <div class="step-badge">2</div>
+                    <div class="step-text-col">
+                        <strong>"Add to Home screen" चुनें</strong>
+                        <span>मेन्यू में <strong>"होम स्क्रीन में जोड़ें"</strong> या <strong>"Install App"</strong> पर क्लिक करें।</span>
+                    </div>
+                </div>
+                <div class="install-step-vip-box">
+                    <div class="step-badge">3</div>
+                    <div class="step-text-col">
+                        <strong>1-क्लिक ऑफलाइन एक्सेस</strong>
+                        <span>ऐप आपके फोन में जुड़ जाएगी — कभी भी बिना मेमोरी भरे <strong>पढ़ें, ज़ूम करें और सुनें</strong>!</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button id="downloadBtn" class="action-button primary">
-                    <i class="fa-solid fa-download"></i> Download PDF
+            <button type="button" class="btn-install-app-vip" id="btnPwaInstall" onclick="window.triggerPwaInstallPrompt()">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                <span>📲 फोन होम स्क्रीन पर ऐप जोड़ें (Install App Now)</span>
+                <span class="btn-shimmer-sparkle"></span>
+            </button>
+        </section>
+
+        <!-- ==============================================================
+             CARD 2: SMART 2-SPEED E-BOOK PDF DOWNLOAD CARD
+             ============================================================== -->
+        <section id="downloadCard" class="download-card-vip" style="display: none;">
+            <div class="card-gold-ribbon">
+                <i class="fa-solid fa-crown"></i> <span>OFFICIAL VIP ACCESS</span>
+            </div>
+
+            <!-- Book Info & Certificate Box -->
+            <div class="book-delivery-wrap">
+                <div class="book-cover-stage">
+                    <img id="bookCover" src="" alt="Book Cover" class="vip-book-cover" onclick="window.openImageZoom?.(this.src)" title="क्लिक करके बड़ा देखें">
+                    <span class="cover-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> ज़ूम करें</span>
+                </div>
+                <div class="book-details-col">
+                    <div class="book-category-pill" id="bookCategory">कृषि मास्टर गाइड</div>
+                    <h2 id="bookName" class="vip-book-title">ई-बुक लोड हो रही है...</h2>
+                    
+                    <!-- Purchase Summary Certificate -->
+                    <div class="purchase-certificate-grid">
+                        <div class="cert-item">
+                            <span class="cert-lbl">ग्राहक:</span>
+                            <strong id="customerName" class="cert-val">किसान मित्र</strong>
+                        </div>
+                        <div class="cert-item">
+                            <span class="cert-lbl">मोबाइल:</span>
+                            <strong id="customerMobile" class="cert-val">--</strong>
+                        </div>
+                        <div class="cert-item">
+                            <span class="cert-lbl">कोड:</span>
+                            <strong id="bookId" class="cert-val">--</strong>
+                        </div>
+                        <div class="cert-item">
+                            <span class="cert-lbl">तारीख:</span>
+                            <strong id="purchaseDate" class="cert-val">--</strong>
+                        </div>
+                    </div>
+
+                    <div class="lifetime-seal">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>आधिकारिक डिजिटल लाइसेंस • लाइफटाइम वैलिडिटी अनलॉक्ड</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download Status Counter -->
+            <div id="statusReady" class="download-status-vip ready">
+                <div class="status-indicator-col">
+                    <span class="ready-badge">🟢 डाउनलोड के लिए तैयार</span>
+                    <p class="status-note">आपकी सुरक्षित PDF कॉपी तुरंत डाउनलोड के लिए तैयार है:</p>
+                </div>
+                <div class="vip-download-counter">
+                    <div class="cnt-box"><span>Used</span><strong id="downloadsUsed">0</strong></div>
+                    <div class="cnt-divider">/</div>
+                    <div class="cnt-box"><span>Remaining</span><strong id="downloadsRemaining">3</strong></div>
+                    <div class="cnt-divider">/</div>
+                    <div class="cnt-box"><span>Total Limit</span><strong id="downloadsMax">3</strong></div>
+                </div>
+            </div>
+
+            <div id="statusExhausted" class="download-status-vip exhausted" style="display: none;">
+                <p class="status-title">⚠️ डाउनलोड लिमिट पूरी हो चुकी है</p>
+                <p class="status-subtitle">चिंता न करें, आपकी ई-बुक My Library में हमेशा उपलब्ध है और कभी समाप्त नहीं होगी।</p>
+            </div>
+
+            <!-- 2-SPEED DOWNLOAD OPTIONS -->
+            <div class="download-tiers-vip-wrap">
+                <!-- Option 1: Fast Mobile PDF (Recommended - Instant Direct Link) -->
+                <button type="button" id="downloadFastBtn" class="btn-tier-vip fast-tier-vip" onclick="window.triggerDownloadTier('fast')">
+                    <div class="tier-left-col">
+                        <div class="tier-icon-circle">⚡</div>
+                        <div class="tier-text-col">
+                            <div class="tier-headline">फास्ट मोबाइल PDF (~24 MB)</div>
+                            <div class="tier-subtext">मोबाइल व व्हाट्सएप शेयरिंग के लिए सबसे तेज़ (मात्र 1 सेकंड में डायरेक्ट डाउनलोड)</div>
+                        </div>
+                    </div>
+                    <div class="tier-right-badge">
+                        <span class="badge-tag">✨ सबसे अनुशंसित</span>
+                        <span class="speed-tag">1-Sec Speed</span>
+                    </div>
                 </button>
-                <button id="readNowBtn" class="action-button secondary">
-                    <i class="fa-solid fa-book-open"></i> Read Now
+
+                <!-- Option 2: Full HD / Print Quality PDF -->
+                <button type="button" id="downloadHdBtn" class="btn-tier-vip hd-tier-vip" onclick="window.triggerDownloadTier('hd')">
+                    <div class="tier-left-col">
+                        <div class="tier-icon-circle">🖨️</div>
+                        <div class="tier-text-col">
+                            <div class="tier-headline">फुल HD / प्रिंट क्वालिटी PDF</div>
+                            <div class="tier-subtext">बड़े टैबलेट स्क्रीन या उच्च-गुणवत्ता प्रिंटिंग के लिए हाई-रेजोल्यूशन फाइल</div>
+                        </div>
+                    </div>
+                    <div class="tier-right-badge">
+                        <span class="badge-tag gray">हाई रेजोल्यूशन</span>
+                        <span class="speed-tag gray">अल्ट्रा क्लियर</span>
+                    </div>
+                </button>
+
+                <!-- Option 3: Read Online in Library -->
+                <button type="button" id="readNowBtn" class="btn-tier-vip read-tier-vip">
+                    <div class="tier-left-col">
+                        <div class="tier-icon-circle green">📖</div>
+                        <div class="tier-text-col">
+                            <div class="tier-headline">My Library में ऑनलाइन पढ़ें / ऑडियो सुनें</div>
+                            <div class="tier-subtext">बिना डाउनलोड किए 0% फोन मेमोरी खर्च में तुरंत ज़ूम करके पढ़ें और ऑडियो सुनें</div>
+                        </div>
+                    </div>
+                    <div class="tier-right-badge">
+                        <span class="badge-tag green">0% मेमोरी</span>
+                    </div>
                 </button>
             </div>
 
-            <!-- Info Message -->
-            <p class="info-message">
-                Your purchase is permanently linked with your account. Even after the download limit is exhausted, you can always read this book from My Library.
-            </p>
-        </div>
+            <!-- Farmer Tip Message -->
+            <div class="vip-farmer-tip-box">
+                <div class="tip-icon">💡</div>
+                <div class="tip-text">
+                    <strong>किसान मित्र टिप:</strong> आपको बार-बार भारी PDF डाउनलोड करके फोन की मेमोरी भरने की कोई आवश्यकता नहीं है। आप जब चाहें <strong>My Library</strong> में इस ई-बुक को ज़ूम करके पढ़ सकते हैं और काम करते समय कान में इयरफोन लगाकर ऑडियो भी सुन सकते हैं।
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================================================
+             CARD 3: BUSINESS FUNNEL / CROSS-SELLING SHOWCASE
+             ============================================================== -->
+        <section class="business-funnel-vip-card" id="businessFunnelSection">
+            <div class="funnel-vip-header">
+                <span class="funnel-glow-badge">🌾 पाठकों की विशेष पसंद</span>
+                <h3>अन्य लोकप्रिय कृषि मास्टर गाइड्स (Master Farmer Collection)</h3>
+                <p>हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित</p>
+            </div>
+
+            <div class="funnel-books-grid" id="businessFunnelGrid">
+                <!-- Dynamic Cross-Sell Cards rendered from JSON / LocalStorage -->
+            </div>
+        </section>
+
+        <!-- 24x7 WhatsApp VIP Support Card -->
+        <section class="vip-helpline-card">
+            <div class="helpline-icon-wrap">
+                <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <div class="helpline-text-col">
+                <strong>24×7 किसान डिजिटल सहायता केंद्र</strong>
+                <span>डाउनलोड या पढ़ने में कोई समस्या हो तो तुरंत हमारे कृषि हेल्पलाइन पर संदेश भेजें।</span>
+            </div>
+            <a href="https://wa.me/917974422572?text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%2C%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20eBook%20%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F%E0%A5%A4" target="_blank" class="btn-whatsapp-helpline">
+                <i class="fa-brands fa-whatsapp"></i> <span>हेल्पलाइन पर चैट करें</span>
+            </a>
+        </section>
+
     </main>
 
-    <!-- 3. Footer -->
-    <footer class="download-footer">
-        &copy; 2026 Aarogyam India. All Rights Reserved.
+    <!-- 3. VIP Footer -->
+    <footer class="vip-footer">
+        <div class="footer-inner">
+            <p>&copy; 2026 Aarogyam India. All Rights Reserved. • 100% Encrypted Farmer Delivery Hub</p>
+        </div>
     </footer>
 
     <!-- 4. Download Success Popup -->
     <div id="successPopup" class="popup-overlay" style="display: none;">
-        <div class="popup-card">
-            <div class="popup-header">
-                <i class="fa-solid fa-circle-check"></i>
-                <h2>Download Successful</h2>
+        <div class="popup-vip-card">
+            <div class="popup-header-vip">
+                <div class="success-icon-bounce">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h2>PDF सफलतापूर्वक डाउनलोड हुआ!</h2>
             </div>
-            <div class="popup-body">
+            <div class="popup-body-vip">
                 <img id="popupBookCover" src="" alt="Book Cover" class="popup-book-cover">
                 <h3 id="popupBookName"></h3>
-                <p>Thank you, <strong id="popupCustomerName"></strong>!</p>
-                <p class="popup-info-text">This book is permanently available in your library.</p>
+                <p>धन्यवाद, <strong id="popupCustomerName"></strong>!</p>
+                <p class="popup-info-text">आप इस पुस्तक को बिना डाउनलोड किए भी कभी भी My Library में पढ़ व सुन सकते हैं।</p>
             </div>
-            <div class="popup-actions">
-                <button id="popupReadNowBtn" class="action-button secondary">
-                    <i class="fa-solid fa-book-open"></i> Read Now
+            <div class="popup-actions-vip">
+                <button id="popupReadNowBtn" class="btn-popup-read">
+                    <i class="fa-solid fa-book-open"></i> <span>अभी पढ़ें (Read Now)</span>
                 </button>
-                <a href="my-library.html" class="action-button secondary">
-                    <i class="fa-solid fa-book-bookmark"></i> Go To My Library
+                <a href="my-library.html" class="btn-popup-library">
+                    <i class="fa-solid fa-book-bookmark"></i> <span>My Library में जाएं</span>
                 </a>
             </div>
             <button id="popupCloseBtn" class="popup-close-btn">&times;</button>
         </div>
     </div>
 
-    <!-- JS -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js"></script>
     <script src="../js/session.js"></script>
-    <script src="../js/download.js"></script>
+    <script src="../js/download.js?v=20260916_v2"></script>
 </body>
 </html>

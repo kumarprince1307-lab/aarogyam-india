@@ -473,6 +473,38 @@ async function loadLibraryData() {
             }
         } catch (e) {}
 
+        // Overlay Admin Book Landing Pages
+        try {
+            const blpPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+            if (Array.isArray(blpPages)) {
+                blpPages.forEach(p => {
+                    if (p && p.id) {
+                        const bId = p.id.toUpperCase().trim();
+                        const existing = bookMap.get(bId) || {};
+                        const isComing = (p.is_coming_soon === true || p.is_coming_soon === 'true' || p.status === 'coming_soon');
+                        bookMap.set(bId, {
+                            ...existing,
+                            id: bId,
+                            title: p.title || existing.title || existing.heading,
+                            heading: p.title || existing.heading || existing.title,
+                            name: p.title || existing.name || existing.title,
+                            cover: p.hero?.cover_image || existing.cover || existing.thumbnail,
+                            cover_image: p.hero?.cover_image || existing.cover_image,
+                            thumbnail: p.hero?.cover_image || existing.thumbnail,
+                            offerPrice: p.pricing?.offer_price || existing.offerPrice,
+                            mrp: p.pricing?.original_price || existing.mrp,
+                            status: isComing ? 'coming_soon' : (p.status || existing.status || 'active'),
+                            isComingSoon: isComing,
+                            hasAudioBook: Boolean(p.audio_layer?.enabled !== false || existing.hasAudioBook || bId === 'BK015'),
+                            audio_layer: p.audio_layer || existing.audio_layer,
+                            audio_enabled: p.audio_layer?.enabled !== false,
+                            publish_targets: p.publish_targets || existing.publish_targets
+                        });
+                    }
+                });
+            }
+        } catch(e) {}
+
         const finalBooks = Array.from(bookMap.values());
         await renderLibrarySections(finalBooks);
     } catch (error) {
@@ -599,7 +631,7 @@ async function renderLibrarySections(booksArray) {
         const bId = String(p.book_id || p.id || '').toUpperCase().trim();
         if (bId) {
             const matchedBook = booksArray.find(b => (b.id && b.id.toUpperCase() === bId) || (b.book_id && b.book_id.toUpperCase() === bId));
-            const isComing = matchedBook ? (matchedBook.status === 'coming_soon' || matchedBook.isComingSoon === true) : (bId !== 'BK001' && bId !== 'BK002' && bId !== 'SUB001');
+            const isComing = matchedBook ? (matchedBook.status === 'coming_soon' || matchedBook.isComingSoon === true) : (bId !== 'BK001' && bId !== 'BK002' && bId !== 'BK015' && bId !== 'SUB001');
             if (!isComing) {
                 activePurchasedBookIds.add(bId);
             }
@@ -629,7 +661,7 @@ async function renderLibrarySections(booksArray) {
         const bookName = book.title || book.heading || book.name;
         const bookCover = book.cover_image || book.cover || book.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
         const isComingSoonBook = (book.status === 'coming_soon' || book.isComingSoon === true || book.is_coming_soon === true);
-        const hasAudioBook = Boolean(book.hasAudioBook || book.has_audio || book.audioUrl || rawId === 'BK001' || rawId === 'BK002');
+        const hasAudioBook = Boolean(book.hasAudioBook || book.has_audio || book.audioUrl || book.audio_layer?.enabled || book.audio_enabled || rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK015');
         const isStudioDemo = (book.type === 'demo' || book.isDemo === true || rawId.startsWith('DEMO')) && !rawId.startsWith('BONUS') && !rawId.startsWith('FREE');
         const isStudioBonus = (book.type === 'bonus_free' || book.isBonus === true || rawId.startsWith('BONUS') || rawId.startsWith('FREE')) && !rawId.startsWith('DEMO');
         const bookVideos = Array.isArray(book.videos) ? book.videos : (book.video?.url ? [{ title: book.video.title || 'Video Demo', url: book.video.url }] : []);
@@ -659,7 +691,7 @@ async function renderLibrarySections(booksArray) {
                     <a href="/ebooks/reader.html?book=${bookId}" class="btn-read" style="flex:1;min-width:85px;padding:8px;background:#138A36;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;">📖 Read</a>
                     ${hasAudioBook ? `<a href="/ebooks/reader.html?book=${bookId}&audio=1" class="btn-audio" style="flex:1;min-width:85px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;" title="ऑडियो बुक सुनें">🎧 ऑडियो</a>` : ''}
                     ${bookVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bookName}", ${JSON.stringify(bookVideos)})' class="btn-video" style="flex:1;min-width:85px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.85rem;" title="वीडियो डेमो देखें">🎬 वीडियो</button>` : ''}
-                    <button type="button" onclick="downloadBookPdf('${bookId}', '${bookName.replace(/'/g, "\\'").replace(/\"/g, '')}', '${bookPdfPath}')" class="btn-buy" style="flex:1;min-width:85px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.85rem;" title="PDF डाउनलोड करें">📥 PDF</button>
+                    <a href="/ebooks/download.html?book=${encodeURIComponent(bookId)}" class="btn-buy" style="flex:1;min-width:85px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;display:inline-block;font-size:0.85rem;" title="PDF डाउनलोड हब खोलें">📥 PDF</a>
                 </div>
             `;
             if (purchasedGrid) purchasedGrid.appendChild(card);
@@ -723,8 +755,9 @@ async function renderLibrarySections(booksArray) {
                         <span style="font-weight:800;color:#138A36;font-size:1.05rem;">₹${book.offerPrice || 99}</span>
                         <span style="text-decoration:line-through;color:#94a3b8;font-size:0.85rem;">₹${book.mrp || 299}</span>
                     </div>
-                    <div class="book-btn-group" style="margin-top: 6px;">
-                        <a href="${targetUrl}" class="btn-available" style="width:100%;text-align:center;display:block;padding:10px;background:#E86A17;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;">Buy Now / Details</a>
+                    <div class="book-btn-group" style="margin-top: 6px; display:flex; gap:6px;">
+                        <a href="${targetUrl}" class="btn-available" style="flex:1;text-align:center;display:block;padding:9px;background:#E86A17;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;">Buy Now / Details</a>
+                        ${hasAudioBook ? `<a href="/ebooks/reader.html?book=${bookId}&audio=1" class="btn-audio" style="min-width:75px;padding:9px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;" title="ऑडियो बुक सुनें">🎧 ऑडियो</a>` : ''}
                     </div>
                 `;
                 if (availableGrid) availableGrid.appendChild(availCard);
@@ -976,59 +1009,107 @@ async function loadJsPdfLibrary() {
     throw new Error('jsPDF library load failed from all CDNs');
 }
 
-async function assembleClientPdfFromImages(cleanId, cleanTitle) {
-    showPdfProgress(0, 1, 'PDF library लोड हो रही है...');
+// Convert any image blob to JPEG data URL using an in-memory Canvas (jsPDF requires JPEG or PNG)
+function convertBlobToJpegDataUrl(blob) {
+    return new Promise((resolve) => {
+        if (!blob) return resolve(null);
+        const img = new Image();
+        const objUrl = URL.createObjectURL(blob);
+        img.onload = () => {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth || 800;
+                canvas.height = img.naturalHeight || 1200;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                const jpeg = canvas.toDataURL('image/jpeg', 0.85);
+                URL.revokeObjectURL(objUrl);
+                resolve(jpeg);
+            } catch(e) {
+                URL.revokeObjectURL(objUrl);
+                resolve(null);
+            }
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(objUrl);
+            resolve(null);
+        };
+        img.src = objUrl;
+    });
+}
+
+async function assembleClientPdfFromImages(cleanId, cleanTitle, hintTotalPages = 0) {
+    showPdfProgress(0, 1, 'PDF engine लोड हो रहा है...');
     try {
         const jsPDF = await loadJsPdfLibrary();
 
-        // ── Step A: Find total pages by probing sequentially (no HEAD - just GET)
-        showPdfProgress(0, 1, 'बुक के पेज गिने जा रहे हैं...');
-        const pageUrls = [];
-        for (let n = 1; n <= 300; n++) {
-            const url = `/images/books/${cleanId}/${n}.webp`;
-            try {
-                const r = await fetch(url, { method: 'HEAD' }).catch(() => ({ ok: false }));
-                if (r.ok) { pageUrls.push(url); }
-                else { break; } // stop at first missing page
-            } catch(e) { break; }
+        // ── Step A: Resolve page image URLs
+        showPdfProgress(0, 1, 'पेज लिस्ट तैयार की जा रही है...');
+        let totalPages = hintTotalPages > 0 ? hintTotalPages : 0;
+        
+        // If no hint, probe count
+        if (totalPages <= 0) {
+            for (let n = 1; n <= 300; n++) {
+                const testUrls = [`/images/books/${cleanId}/${n}.webp`, `../images/books/${cleanId}/${n}.webp`];
+                let found = false;
+                for (const u of testUrls) {
+                    try {
+                        const r = await fetch(u, { method: 'HEAD' }).catch(() => ({ ok: false }));
+                        if (r.ok) { found = true; break; }
+                    } catch(e) {}
+                }
+                if (found) { totalPages = n; }
+                else { break; }
+            }
         }
 
-        if (pageUrls.length === 0) {
+        if (totalPages <= 0) {
             hidePdfProgress();
             return false;
         }
 
-        const totalPages = pageUrls.length;
-        showPdfProgress(0, totalPages, `${totalPages} पेज मिले, PDF बनाना शुरू...`);
+        const pageUrls = [];
+        for (let i = 1; i <= totalPages; i++) {
+            pageUrls.push(`/images/books/${cleanId}/${i}.webp`);
+        }
 
-        // ── Step B: Fetch images in batches of 5 and build PDF
+        showPdfProgress(0, totalPages, `${totalPages} पेज मिले, PDF बनना शुरू...`);
+
+        // ── Step B: Fetch images in batches of 4, convert to JPEG canvas, add to jsPDF
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
         const W = 210, H = 297;
-        const BATCH = 5;
+        const BATCH = 4;
+        let processedCount = 0;
 
         for (let i = 0; i < pageUrls.length; i += BATCH) {
             const batchUrls = pageUrls.slice(i, i + BATCH);
 
-            // Fetch batch in parallel
             const blobs = await Promise.all(
                 batchUrls.map(url =>
-                    fetch(url).then(r => r.ok ? r.blob() : null).catch(() => null)
+                    fetch(url)
+                        .then(r => r.ok ? r.blob() : fetch(`..${url}`).then(r2 => r2.ok ? r2.blob() : null))
+                        .catch(() => null)
                 )
             );
 
             for (let j = 0; j < blobs.length; j++) {
                 const blob = blobs[j];
                 if (!blob) continue;
-                const dataUrl = await new Promise(res => {
-                    const fr = new FileReader();
-                    fr.onload = () => res(fr.result);
-                    fr.readAsDataURL(blob);
-                });
-                const pageIdx = i + j;
-                if (pageIdx > 0) doc.addPage('a4', 'portrait');
-                doc.addImage(dataUrl, 'WEBP', 0, 0, W, H, undefined, 'FAST');
-                showPdfProgress(pageIdx + 1, totalPages, 'PDF बन रहा है...');
+                const jpegDataUrl = await convertBlobToJpegDataUrl(blob);
+                if (!jpegDataUrl) continue;
+
+                if (processedCount > 0) doc.addPage('a4', 'portrait');
+                doc.addImage(jpegDataUrl, 'JPEG', 0, 0, W, H, undefined, 'FAST');
+                processedCount++;
+                showPdfProgress(processedCount, totalPages, 'PDF बन रहा है...');
             }
+        }
+
+        if (processedCount === 0) {
+            hidePdfProgress();
+            return false;
         }
 
         showPdfProgress(totalPages, totalPages, 'PDF सेव हो रही है...');
@@ -1043,52 +1124,8 @@ async function assembleClientPdfFromImages(cleanId, cleanTitle) {
     }
 }
 
-
-window.downloadBookPdf = async function(bookId, bookTitle, directPdfPath) {
+window.downloadBookPdf = function(bookId, bookTitle, directPdfPath, totalPagesHint = 0) {
     const cleanId = (bookId || '').toUpperCase().trim();
     if (!cleanId) return;
-    const cleanTitle = (bookTitle || cleanId).replace(/[^\u0900-\u097Fa-zA-Z0-9_\- ]/g, '_').trim();
-    const dlFilename = `${cleanId}_${cleanTitle}.pdf`;
-
-    // ─── STEP 1: Static PDF file download ────────────────────────────────
-    // If book has a mainPdf path set in JSON (books.json or landing-pages.json), download it directly.
-    // BK001 / BK002 also fall here via /pdf/full/ candidate path.
-    const pdfPathToTry = (directPdfPath || '').trim();
-    const candidatePaths = pdfPathToTry
-        ? [pdfPathToTry]                          // mainPdf set → try only that path
-        : [`/pdf/full/${cleanId}.pdf`];           // no mainPdf → only check standard location
-
-    for (const pdfUrl of candidatePaths) {
-        try {
-            const check = await fetch(pdfUrl, { method: 'HEAD' }).catch(() => ({ ok: false }));
-            if (check && check.ok) {
-                const link = document.createElement('a');
-                link.href = pdfUrl;
-                link.download = dlFilename;
-                link.target = '_self';
-                document.body.appendChild(link);
-                link.click();
-                setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 500);
-                if (typeof showToast === 'function') showToast('✅ PDF डाउनलोड शुरू हो गया!', 'success');
-                return;
-            }
-        } catch(e) {}
-    }
-
-    // ─── STEP 2: No static PDF → Assemble PDF from book page images ───────
-    // Used for books like BK015 whose pages are stored as
-    // /images/books/BK015/1.webp, 2.webp, ... N.webp
-    showPdfProgress(0, 1, 'PDF तैयार हो रही है...');
-    try {
-        const success = await assembleClientPdfFromImages(cleanId, cleanTitle);
-        if (success) {
-            if (typeof showToast === 'function') showToast('🎉 PDF सफलतापूर्वक डाउनलोड हो गया!', 'success');
-            return;
-        }
-    } catch(e) {}
-    hidePdfProgress();
-
-    // ─── STEP 3: Total fallback ───────────────────────────────────────────
-    if (typeof showToast === 'function') showToast('⚠️ PDF उपलब्ध नहीं है, Download पेज खुल रहा है...', 'warning');
     window.location.href = `/ebooks/download.html?book=${encodeURIComponent(cleanId)}`;
 };

@@ -274,7 +274,6 @@
   }
 
   const _referralsCache = new Map();
-  const REF_CACHE_TTL = 30000; // 30 seconds cache to prevent repeated database hits
 
   async function getDirectReferralsWithPurchases(referrerId, referralCode, startDate, endDate) {
     const client = getDb();
@@ -282,11 +281,21 @@
       return { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 } };
     }
 
-    const cacheKey = `${referrerId || ''}_${referralCode || ''}_${startDate || ''}_${endDate || ''}`;
-    const cached = _referralsCache.get(cacheKey);
-    if (cached && (Date.now() - cached.time < REF_CACHE_TTL)) {
-      return { success: true, data: cached.data };
+    const cacheKey = `UCAS_REF_${referrerId || ''}_${referralCode || ''}_${startDate || ''}_${endDate || ''}`;
+    // Zero-Egress Session Persistence: Check memory & sessionStorage
+    if (_referralsCache.has(cacheKey)) {
+      return { success: true, data: _referralsCache.get(cacheKey) };
     }
+    try {
+      const sess = sessionStorage.getItem(cacheKey);
+      if (sess) {
+        const parsed = JSON.parse(sess);
+        if (parsed) {
+          _referralsCache.set(cacheKey, parsed);
+          return { success: true, data: parsed };
+        }
+      }
+    } catch(e) {}
 
     try {
       const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
@@ -431,7 +440,10 @@
         totalPurchaseAmount: totalAmount
       };
 
-      _referralsCache.set(cacheKey, { time: Date.now(), data: finalResult });
+      _referralsCache.set(cacheKey, finalResult);
+      try {
+        sessionStorage.setItem(cacheKey, JSON.stringify(finalResult));
+      } catch(e) {}
 
       return {
         success: true,

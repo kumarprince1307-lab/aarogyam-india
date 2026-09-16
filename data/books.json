@@ -54,7 +54,10 @@
         "description": "खरीफ फसल मास्टर गाइड 2026 का डेमो देखें और सम्पूर्ण eBook खरीदें।",
         "keywords": "खरीफ फसल, सोयाबीन, धान, मक्का, eBook, Aarogyam India",
         "canonical": ""
-      }
+      },
+      "publish_targets": [
+        "download_funnel"
+      ]
     },
     {
       "id": "BK002",
@@ -81,7 +84,8 @@
         "ebook_store",
         "category_page",
         "my_library",
-        "home_page"
+        "home_page",
+        "download_funnel"
       ],
       "mrp": 299,
       "offerPrice": 99,
@@ -406,13 +410,15 @@
         "ebook_store",
         "category_page",
         "my_library",
-        "home_page"
+        "home_page",
+        "download_funnel"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
+      "store_badge": "new_arrival",
+      "badge": "new_arrival",
       "isComingSoon": false,
-      "mainPdf": "",
-      "pdf_url": "",
+      "hasAudioBook": true,
+      "mainPdf": "/pdf/full/BK015.pdf",
+      "pdf_url": "/pdf/full/BK015.pdf",
       "freePdf": "",
       "demoPdf": "",
       "og_image": "/images/banners/bk015-hero-banner.webp",
@@ -478,7 +484,8 @@
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
-      "readerPage": "/ebooks/reader.html"
+      "readerPage": "/ebooks/reader.html",
+      "pdfUrl": ""
     }
   ]
 }

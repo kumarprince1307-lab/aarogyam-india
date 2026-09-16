@@ -983,8 +983,24 @@ Instant Download & Lifetime Access
             <label style="display: flex; align-items: center; gap: 8px; background: var(--admin-surface, #1e293b); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--admin-border); cursor: pointer;">
               <input type="checkbox" id="blp_pub_home_page" checked style="width: 18px; height: 18px; accent-color: #a855f7;" />
               <div>
-                <strong style="font-size: 0.85rem; display: block; color: #fff;">🏠 Home Page</strong>
+                <strong style="font-size: 0.85rem; display: block; color: #fff;">🏠 Home Page Grid</strong>
                 <small style="color: var(--admin-muted); font-size: 0.72rem;">index.html</small>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 8px; background: var(--admin-surface, #1e293b); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--admin-border); cursor: pointer;">
+              <input type="checkbox" id="blp_pub_home_hero" checked style="width: 18px; height: 18px; accent-color: #a855f7;" />
+              <div>
+                <strong style="font-size: 0.85rem; display: block; color: #fff;">🌟 Home Hero Slider</strong>
+                <small style="color: var(--admin-muted); font-size: 0.72rem;">होम मुख्य बैनर / स्लाइडर</small>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 8px; background: var(--admin-surface, #1e293b); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--admin-border); cursor: pointer;">
+              <input type="checkbox" id="blp_pub_download_funnel" checked style="width: 18px; height: 18px; accent-color: #a855f7;" />
+              <div>
+                <strong style="font-size: 0.85rem; display: block; color: #fff;">📥 Download Page Funnel</strong>
+                <small style="color: var(--admin-muted); font-size: 0.72rem;">डाउनलोड फनल क्रॉस-सेल में</small>
               </div>
             </label>
           </div>
@@ -5401,11 +5417,12 @@ Instant Download & Lifetime Access
         `).join('')}
       </div>
       <div style="display:flex;gap:8px;align-items:center;margin-top:10px;width:100%;flex-wrap:wrap;">
-        <input type="text" id="blp_new_demo_img_url" placeholder="डेमो इमेज URL (उदा. /images/books/kheti-dr-demo-1.webp)" class="admin-input" style="flex:1;min-width:220px;padding:6px 10px;font-size:0.8rem;" />
-        <button type="button" onclick="window.addDemoImageUrl()" class="admin-button small-button" style="background:#0284c7;color:#fff;font-weight:700;">+ URL जोड़ें</button>
+        <input type="text" id="blp_new_demo_img_url" placeholder="डेमो इमेज URL (उदा. /images/books/kheti-dr-demo-1.webp)" class="admin-input" style="flex:1;min-width:200px;padding:6px 10px;font-size:0.8rem;" />
+        <button type="button" onclick="window.addDemoImageUrl()" class="admin-button small-button" style="background:#0284c7;color:#fff;font-weight:700;">+ URL</button>
+        <button type="button" onclick="window.selectDemoFromExistingBook()" class="admin-button small-button" style="background:#7c3aed;color:#fff;font-weight:700;" title="मौजूदा पुस्तक के फोल्डर से पेज जोड़ें (Zero Duplicate)">📚 रिपो से चुनें</button>
         <label class="admin-button small-button" style="background:#16a34a;color:#fff;cursor:pointer;margin:0;">
-          📁 फाइल अपलोड करें
-          <input type="file" accept="image/*" onchange="window.uploadDemoImage(event)" style="display:none;" />
+          📁 बल्क फाइलें अपलोड करें
+          <input type="file" multiple accept="image/*" onchange="window.uploadDemoImage(event)" style="display:none;" />
         </label>
       </div>
     `;
@@ -5970,14 +5987,50 @@ Instant Download & Lifetime Access
   };
 
   window.uploadDemoImage = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    showToast(`⏳ ${files.length} डेमो पेजेस लोड हो रहे हैं...`, 'info');
+    let loaded = 0;
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onload = (re) => {
         currentDemoImages.push(re.target.result);
-        renderDemoImagesInBuilder();
+        loaded++;
+        if (loaded === files.length) {
+          renderDemoImagesInBuilder();
+          showToast(`✅ ${loaded} डेमो पेजेस सफलतापूर्वक जुड़ गए!`, 'success');
+        }
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  window.selectDemoFromExistingBook = () => {
+    const bId = (document.getElementById('blp_book_id')?.value || 'BK015').trim().toUpperCase();
+    const rangeStr = prompt(`मौजूदा पुस्तक (${bId}) के कौन से पेज डेमो में जोड़ने हैं?\nउदा. 1-10 या 1,2,3,4,5:`, '1-10');
+    if (!rangeStr) return;
+
+    const pagesToAdd = [];
+    if (rangeStr.includes('-')) {
+      const parts = rangeStr.split('-').map(x => parseInt(x.trim(), 10));
+      const start = parts[0] || 1;
+      const end = parts[1] || start;
+      for (let i = start; i <= end; i++) {
+        pagesToAdd.push(`/images/books/${bId}/${i}.webp`);
+      }
+    } else {
+      const parts = rangeStr.split(',').map(x => parseInt(x.trim(), 10)).filter(Boolean);
+      parts.forEach(p => {
+        pagesToAdd.push(`/images/books/${bId}/${p}.webp`);
+      });
+    }
+
+    if (pagesToAdd.length > 0) {
+      pagesToAdd.forEach(url => {
+        if (!currentDemoImages.includes(url)) currentDemoImages.push(url);
+      });
+      renderDemoImagesInBuilder();
+      showToast(`✅ Git रिपो से ${pagesToAdd.length} डेमो पेजेस लिंक हो गए! (Zero Duplicate)`, 'success');
     }
   };
   window.addDemoImageUrl = () => {
@@ -6094,6 +6147,11 @@ Instant Download & Lifetime Access
     if (document.getElementById('blp_pub_category_page')) document.getElementById('blp_pub_category_page').checked = true;
     if (document.getElementById('blp_pub_my_library')) document.getElementById('blp_pub_my_library').checked = true;
     if (document.getElementById('blp_pub_home_page')) document.getElementById('blp_pub_home_page').checked = true;
+    if (document.getElementById('blp_pub_home_hero')) document.getElementById('blp_pub_home_hero').checked = true;
+    if (document.getElementById('blp_pub_download_funnel')) document.getElementById('blp_pub_download_funnel').checked = true;
+    if (document.getElementById('blp_final_buy_title')) document.getElementById('blp_final_buy_title').value = '';
+    if (document.getElementById('blp_final_buy_desc')) document.getElementById('blp_final_buy_desc').value = '';
+    if (document.getElementById('blp_final_buy_benefits')) document.getElementById('blp_final_buy_benefits').value = '';
     if (document.getElementById('blp_store_badge')) document.getElementById('blp_store_badge').value = 'best_seller';
     if (document.getElementById('blp_is_coming_soon')) document.getElementById('blp_is_coming_soon').value = 'false';
     window.updateSocialSharePreview();
@@ -6242,13 +6300,34 @@ Instant Download & Lifetime Access
     renderAudioHighlightsInBuilder();
 
     // Publishing Targets & Badges
-    const targets = page.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page'];
+    const targets = page.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page', 'download_funnel'];
     if (document.getElementById('blp_pub_ebook_store')) document.getElementById('blp_pub_ebook_store').checked = targets.includes('ebook_store');
     if (document.getElementById('blp_pub_category_page')) document.getElementById('blp_pub_category_page').checked = targets.includes('category_page');
     if (document.getElementById('blp_pub_my_library')) document.getElementById('blp_pub_my_library').checked = targets.includes('my_library');
     if (document.getElementById('blp_pub_home_page')) document.getElementById('blp_pub_home_page').checked = targets.includes('home_page');
+    if (document.getElementById('blp_pub_home_hero')) document.getElementById('blp_pub_home_hero').checked = targets.includes('home_hero');
+    if (document.getElementById('blp_pub_download_funnel')) document.getElementById('blp_pub_download_funnel').checked = targets.includes('download_funnel');
     if (document.getElementById('blp_store_badge')) document.getElementById('blp_store_badge').value = page.store_badge || 'best_seller';
     if (document.getElementById('blp_is_coming_soon')) document.getElementById('blp_is_coming_soon').value = (page.is_coming_soon === true || page.is_coming_soon === 'true') ? 'true' : 'false';
+
+    // Final CTA Buy Box & Benefits Populating
+    const fb = page.final_buy || {};
+    if (document.getElementById('blp_final_buy_title')) {
+      document.getElementById('blp_final_buy_title').value = fb.title || hero.title || page.heading || page.name || '';
+    }
+    if (document.getElementById('blp_final_buy_desc')) {
+      document.getElementById('blp_final_buy_desc').value = fb.description || hero.subtitle || hero.description || '';
+    }
+    if (document.getElementById('blp_final_buy_benefits')) {
+      const fbBenefits = fb.benefits;
+      if (Array.isArray(fbBenefits) && fbBenefits.length > 0) {
+        document.getElementById('blp_final_buy_benefits').value = fbBenefits.join('\n');
+      } else if (typeof fbBenefits === 'string' && fbBenefits.trim()) {
+        document.getElementById('blp_final_buy_benefits').value = fbBenefits;
+      } else {
+        document.getElementById('blp_final_buy_benefits').value = '';
+      }
+    }
 
     // Tracking Select / De-select
     const isFbActive = page.facebook_pixel_id !== 'disabled' && page.facebook_pixel_enabled !== false;
@@ -6642,6 +6721,8 @@ Instant Download & Lifetime Access
     if (document.getElementById('blp_pub_category_page')?.checked) publishTargets.push('category_page');
     if (document.getElementById('blp_pub_my_library')?.checked) publishTargets.push('my_library');
     if (document.getElementById('blp_pub_home_page')?.checked) publishTargets.push('home_page');
+    if (document.getElementById('blp_pub_home_hero')?.checked) publishTargets.push('home_hero');
+    if (document.getElementById('blp_pub_download_funnel')?.checked) publishTargets.push('download_funnel');
 
     const storeBadge = document.getElementById('blp_store_badge')?.value || 'best_seller';
     const isComingSoon = document.getElementById('blp_is_coming_soon')?.value === 'true';
@@ -6870,7 +6951,8 @@ Instant Download & Lifetime Access
       },
       whatsapp_share_message: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
       whatsapp_share_text: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
-      whatsapp_prompt: document.getElementById('blp_wa_prompt')?.value || `नमस्ते, मुझे '${title}' पुस्तक के बारे में और जानकारी चाहिए।`
+      whatsapp_prompt: document.getElementById('blp_wa_prompt')?.value || `नमस्ते, मुझे '${title}' पुस्तक के बारे में और जानकारी चाहिए।`,
+      updated_at: new Date().toISOString()
     };
 
     const existingIdx = allLandingPages.findIndex(p => p.id === bId);

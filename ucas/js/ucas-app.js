@@ -795,11 +795,14 @@
     return '<span style="font-size:0.75rem;background:#F1F5F9;color:#475569;padding:2px 8px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-user-plus"></i> Direct Ref</span>';
   }
 
-  function renderProfileReferralsList(list) {
+  let ucasReferralPage = 1;
+  const UCAS_REFERRAL_PAGE_SIZE = 10;
+
+  function renderProfileReferralsList(list, page = 1) {
     const container = document.getElementById('ucas-profile-referrals-list');
     if (!container) return;
 
-    if (list.length === 0) {
+    if (!list || list.length === 0) {
       container.innerHTML = `
         <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.85rem;background:#F8FAFC;border-radius:var(--radius-md);">
           🔍 चयनित फ़िल्टर के अनुसार कोई डायरेक्ट रेफरल नहीं मिला।
@@ -807,6 +810,13 @@
       `;
       return;
     }
+
+    ucasReferralPage = page;
+    const totalItems = list.length;
+    const totalPages = Math.ceil(totalItems / UCAS_REFERRAL_PAGE_SIZE);
+    const currentPage = Math.min(Math.max(1, ucasReferralPage), totalPages);
+    const startIndex = (currentPage - 1) * UCAS_REFERRAL_PAGE_SIZE;
+    const currentBatch = list.slice(startIndex, startIndex + UCAS_REFERRAL_PAGE_SIZE);
 
     container.innerHTML = `
       <div class="ucas-table-wrap" style="border:1px solid var(--border);border-radius:var(--radius-md);overflow-x:auto;">
@@ -823,7 +833,8 @@
             </tr>
           </thead>
           <tbody>
-            ${list.map((r, i) => {
+            ${currentBatch.map((r, i) => {
+              const globalIndex = startIndex + i + 1;
               const srcBadge = formatReferralSourceBadge(r.source || r.registration_source);
               const isActive = Boolean(r.is_active || (r.totalPurchasedAmount && r.totalPurchasedAmount > 0));
               const statusBadge = isActive
@@ -832,7 +843,7 @@
 
               return `
                 <tr>
-                  <td><strong>#${i + 1}</strong></td>
+                  <td><strong>#${globalIndex}</strong></td>
                   <td>
                     <div style="font-weight:700;color:var(--text-main);">${r.full_name || 'Member'}</div>
                     ${r.net_surf_id ? `<div style="font-size:0.7rem;color:#0284c7;">NetSurf: ${r.net_surf_id}</div>` : ''}
@@ -860,7 +871,30 @@
           </tbody>
         </table>
       </div>
+
+      ${totalPages > 1 ? `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:8px 12px;background:#F8FAFC;border-radius:8px;border:1px solid var(--border);flex-wrap:wrap;gap:8px;">
+          <button type="button" id="btn_prev_ref_page" ${currentPage <= 1 ? 'disabled' : ''} style="background:${currentPage <= 1 ? '#e2e8f0' : '#16a34a'};color:${currentPage <= 1 ? '#94a3b8' : '#fff'};border:none;border-radius:6px;padding:6px 14px;font-weight:700;font-size:0.8rem;cursor:${currentPage <= 1 ? 'not-allowed' : 'pointer'};">
+            ◀ पिछला
+          </button>
+          <span style="font-size:0.8rem;font-weight:700;color:var(--text-main);">
+            पेज ${currentPage} / ${totalPages} (कुल ${totalItems} सदस्य)
+          </span>
+          <button type="button" id="btn_next_ref_page" ${currentPage >= totalPages ? 'disabled' : ''} style="background:${currentPage >= totalPages ? '#e2e8f0' : '#16a34a'};color:${currentPage >= totalPages ? '#94a3b8' : '#fff'};border:none;border-radius:6px;padding:6px 14px;font-weight:700;font-size:0.8rem;cursor:${currentPage >= totalPages ? 'not-allowed' : 'pointer'};">
+            अगला ▶
+          </button>
+        </div>
+      ` : ''}
     `;
+
+    if (totalPages > 1) {
+      document.getElementById('btn_prev_ref_page')?.addEventListener('click', () => {
+        if (currentPage > 1) renderProfileReferralsList(list, currentPage - 1);
+      });
+      document.getElementById('btn_next_ref_page')?.addEventListener('click', () => {
+        if (currentPage < totalPages) renderProfileReferralsList(list, currentPage + 1);
+      });
+    }
   }
 
   function animateCounter(elementId, targetVal) {

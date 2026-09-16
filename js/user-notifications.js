@@ -643,23 +643,9 @@ ${bc.body || bc.desc || ''}
             });
         },
 
-        // 12. Periodic Background Poll (Every 30 minutes, active tab only)
+        // 12. Periodic Background Poll Disabled for Zero-Egress (Only fetch on page load or user click)
         setupPeriodicCheck: function () {
-            // ✅ EGRESS FIX: 5 min → 30 min polling = 83% fewer Supabase queries
-            setInterval(async () => {
-                if (document.hidden || !document.hasFocus()) return;
-                // Skip if user is not logged in
-                const u = this.getUser();
-                if (!u.id && !u.mobile) return;
-                const prevUnread = this.items.filter(n => !n.isRead).length;
-                await this.loadUserNotifications();
-                const newUnread = this.items.filter(n => !n.isRead).length;
-
-                if (newUnread > prevUnread && this.items[0]) {
-                    const topItem = this.items[0];
-                    this.showTopToast(topItem.title, topItem.desc, topItem.icon || '🔔');
-                }
-            }, 1800000); // 30 minutes
+            // Egress Zero Policy: No periodic background queries. Data loaded on explicit page load/refresh.
         },
 
         // 13. Relative Time Formatter
