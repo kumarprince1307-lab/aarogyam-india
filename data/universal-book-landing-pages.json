@@ -563,7 +563,7 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-16T12:40:32.627Z",
+      "updated_at": "2026-09-16T14:14:02.488Z",
       "admin_edited": true,
       "slug": "bk015",
       "book_name": "🌱 सब्जी खेती मास्टर  (PART 1)",
@@ -577,8 +577,8 @@
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
       "google_analytics_enabled": true,
-      "theme_primary": "#DC2626",
-      "theme_dark": "#991B1B",
+      "theme_primary": "#dc2626",
+      "theme_dark": "#9c0000",
       "cover_effect": "3d_float",
       "sticky_button_text": "BY NOW",
       "sections_order": [
