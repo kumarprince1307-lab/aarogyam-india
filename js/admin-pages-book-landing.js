@@ -6209,320 +6209,324 @@ Instant Download & Lifetime Access
   }
 
   window.editBookLandingPage = function(bId) {
-    if (!bId) return;
-    const cleanId = String(bId).trim().toUpperCase();
-    const page = allLandingPages.find(p => p && p.id && p.id.trim().toUpperCase() === cleanId);
-    
-    if (!page) {
-      const bObj = allBooks.find(b => b && b.id && b.id.trim().toUpperCase() === cleanId);
-      if (bObj) {
-        resetBookBuilder();
-        editingBookId = bObj.id;
-        document.getElementById('admin-book-builder-title').textContent = `✏️ एडिट बुक: ${bObj.id}`;
-        document.getElementById('blp_input_book_id').value = bObj.id;
-        document.getElementById('blp_hero_title').value = bObj.heading || bObj.name || '';
-        document.getElementById('blp_category_select').value = bObj.category || 'Agriculture';
-        document.getElementById('blp_hero_mrp').value = bObj.mrp || 299;
-        document.getElementById('blp_hero_offer_price').value = bObj.offerPrice || 99;
-        document.getElementById('blp_cover_url').value = bObj.cover || bObj.thumbnail || '';
-        if (bObj.cover) document.getElementById('blp_preview_cover_img').src = bObj.cover;
-        builderCard.style.display = 'block';
-        window.scrollTo({ top: builderCard.offsetTop - 50, behavior: 'smooth' });
-        showToast(`✏️ कैटलॉग से बुक (${cleanId}) लोड की गई`, 'info');
+    try {
+      if (!bId) return;
+      const cleanId = String(bId).trim().toUpperCase();
+
+      // 1. Immediately switch to pages tab and reveal builder card
+      if (typeof window.switchAdminSubTab === 'function') {
+        window.switchAdminSubTab('pages');
+      }
+      const bCard = document.getElementById('admin-book-builder-card') || builderCard;
+      if (bCard) {
+        bCard.style.display = 'block';
+        setTimeout(() => {
+          const rect = bCard.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          window.scrollTo({ top: Math.max(0, rect.top + scrollTop - 70), behavior: 'smooth' });
+        }, 30);
+      }
+
+      // Safe element setters to prevent null property access
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = (val !== undefined && val !== null) ? val : '';
+      };
+      const setChecked = (id, bool) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!bool;
+      };
+
+      // 2. Locate landing page or book data
+      let page = allLandingPages.find(p => p && p.id && p.id.trim().toUpperCase() === cleanId);
+      if (!page) {
+        try {
+          const localLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+          if (Array.isArray(localLp)) {
+            page = localLp.find(p => p && p.id && p.id.trim().toUpperCase() === cleanId);
+          }
+        } catch(e) {}
+      }
+
+      if (!page) {
+        const bObj = allBooks.find(b => b && b.id && b.id.trim().toUpperCase() === cleanId);
+        if (bObj) {
+          if (typeof resetBookBuilder === 'function') resetBookBuilder();
+          editingBookId = bObj.id;
+          const titleEl = document.getElementById('admin-book-builder-title');
+          if (titleEl) titleEl.textContent = `✏️ एडिट बुक: ${bObj.id}`;
+          setVal('blp_input_book_id', bObj.id);
+          setVal('blp_hero_title', bObj.heading || bObj.name || '');
+          setVal('blp_category_select', bObj.category || 'Agriculture');
+          setVal('blp_hero_mrp', bObj.mrp || 299);
+          setVal('blp_hero_offer_price', bObj.offerPrice || 99);
+          setVal('blp_cover_url', bObj.cover || bObj.thumbnail || '');
+          const prevImg = document.getElementById('blp_preview_cover_img');
+          if (prevImg && bObj.cover) prevImg.src = bObj.cover;
+          showToast(`✏️ कैटलॉग से बुक (${cleanId}) लोड की गई`, 'info');
+          return;
+        }
+        showToast(`पेज (${bId}) नहीं मिला।`, 'error');
         return;
       }
-      showToast(`पेज (${bId}) नहीं मिला।`, 'error');
-      return;
-    }
 
-    editingBookId = page.id;
-    document.getElementById('admin-book-builder-title').textContent = `✏️ एडिट बुक लैंडिंग पेज: ${page.id}`;
-    
-    document.getElementById('blp_input_book_id').value = page.id || '';
-    if (bookSelect) bookSelect.value = page.id || '';
-    document.getElementById('blp_category_select').value = page.category || 'Agriculture';
+      editingBookId = page.id;
+      const titleEl = document.getElementById('admin-book-builder-title');
+      if (titleEl) titleEl.textContent = `✏️ एडिट बुक लैंडिंग पेज: ${page.id}`;
 
-    // PDF / DOC files
-    const mainPdfUrl = page.mainPdf || page.main_pdf || page.hero?.mainPdf || '';
-    const freePdfUrl = page.freePdf || page.free_pdf || page.demoPdf || page.hero?.demoPdf || '';
-    if (document.getElementById('blp_main_pdf_url')) document.getElementById('blp_main_pdf_url').value = mainPdfUrl;
-    if (document.getElementById('blp_free_pdf_url')) document.getElementById('blp_free_pdf_url').value = freePdfUrl;
-    window.updatePdfStatusPreview('main', mainPdfUrl);
-    window.updatePdfStatusPreview('free', freePdfUrl);
+      setVal('blp_input_book_id', page.id || '');
+      const bSelect = document.getElementById('blp_select_existing_book') || bookSelect;
+      if (bSelect) bSelect.value = page.id || '';
+      setVal('blp_category_select', page.category || 'Agriculture');
 
-    const hero = page.hero || {};
-    document.getElementById('blp_hero_tag').value = hero.tag || '';
-    document.getElementById('blp_hero_title').value = hero.title || '';
-    document.getElementById('blp_hero_subtitle').value = hero.subtitle || '';
-    document.getElementById('blp_hero_desc').value = hero.description || '';
-    document.getElementById('blp_hero_mrp').value = hero.mrp || '';
-    document.getElementById('blp_hero_offer_price').value = hero.offer_price || '';
-    document.getElementById('blp_hero_badge').value = hero.offer_badge || '';
-    document.getElementById('blp_rating_score').value = hero.rating_score || '4.9';
-    document.getElementById('blp_rating_count').value = hero.rating_count || '120+ Ratings';
-    document.getElementById('blp_cover_url').value = hero.cover_image || '';
-    document.getElementById('blp_banner_url').value = hero.banner_image || '';
-    document.getElementById('blp_cover_effect').value = page.cover_effect || '3d_float';
-    
-    if (hero.cover_image) document.getElementById('blp_preview_cover_img').src = hero.cover_image;
-    if (hero.banner_image) document.getElementById('blp_preview_banner_img').src = hero.banner_image;
+      // PDF / DOC files
+      const mainPdfUrl = page.mainPdf || page.main_pdf || page.hero?.mainPdf || '';
+      const freePdfUrl = page.freePdf || page.free_pdf || page.demoPdf || page.hero?.demoPdf || '';
+      setVal('blp_main_pdf_url', mainPdfUrl);
+      setVal('blp_free_pdf_url', freePdfUrl);
+      if (typeof window.updatePdfStatusPreview === 'function') {
+        window.updatePdfStatusPreview('main', mainPdfUrl);
+        window.updatePdfStatusPreview('free', freePdfUrl);
+      }
 
-    // OG Tags
-    if (document.getElementById('blp_og_title')) document.getElementById('blp_og_title').value = page.og_title || hero.title || '';
-    if (document.getElementById('blp_og_description')) document.getElementById('blp_og_description').value = page.og_description || hero.description || '';
-    if (document.getElementById('blp_og_image')) document.getElementById('blp_og_image').value = page.og_image || page.og_image_landscape || hero.banner_image || hero.cover_image || '';
-    window.updateSocialSharePreview();
+      const hero = page.hero || {};
+      setVal('blp_hero_tag', hero.tag || '');
+      setVal('blp_hero_title', hero.title || '');
+      setVal('blp_hero_subtitle', hero.subtitle || '');
+      setVal('blp_hero_desc', hero.description || '');
+      setVal('blp_hero_mrp', hero.mrp || '');
+      setVal('blp_hero_offer_price', hero.offer_price || '');
+      setVal('blp_hero_badge', hero.offer_badge || '');
+      setVal('blp_rating_score', hero.rating_score || '4.9');
+      setVal('blp_rating_count', hero.rating_count || '120+ Ratings');
+      setVal('blp_cover_url', hero.cover_image || '');
+      setVal('blp_banner_url', hero.banner_image || '');
+      setVal('blp_cover_effect', page.cover_effect || '3d_float');
 
-    // Audio Book Experience Layer
-    const audioLayer = page.audio_layer || page.audio || {};
-    if (document.getElementById('blp_audio_enabled')) document.getElementById('blp_audio_enabled').checked = audioLayer.enabled !== false;
-    if (document.getElementById('blp_audio_badge_tag')) document.getElementById('blp_audio_badge_tag').value = audioLayer.badge_tag || '🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO';
-    if (document.getElementById('blp_audio_main_heading')) document.getElementById('blp_audio_main_heading').value = audioLayer.main_heading || 'अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!';
-    if (document.getElementById('blp_audio_main_subtitle')) document.getElementById('blp_audio_main_subtitle').value = audioLayer.main_subtitle || '⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।';
-    if (document.getElementById('blp_audio_title')) document.getElementById('blp_audio_title').value = audioLayer.title || 'पुस्तक का लाइव ऑडियो परिचय सुनें';
-    if (document.getElementById('blp_audio_subtitle')) document.getElementById('blp_audio_subtitle').value = audioLayer.subtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)';
-    const audioMode = audioLayer.mode || (audioLayer.mp3_url ? 'mp3' : (audioLayer.tts_text ? 'tts' : 'mp3'));
-    if (document.getElementById('blp_audio_mode')) document.getElementById('blp_audio_mode').value = audioMode;
-    if (document.getElementById('blp_audio_mp3_url')) document.getElementById('blp_audio_mp3_url').value = audioLayer.mp3_url || '';
-    if (document.getElementById('blp_audio_tts_text')) document.getElementById('blp_audio_tts_text').value = audioLayer.tts_text || audioLayer.story_text || '';
-    if (document.getElementById('blp_audio_offer_box')) document.getElementById('blp_audio_offer_box').value = audioLayer.offer_callout || '💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!';
-    if (document.getElementById('blp_audio_bgm_enabled')) document.getElementById('blp_audio_bgm_enabled').checked = audioLayer.bgm_enabled !== false;
-    if (window.toggleAudioModeFields) window.toggleAudioModeFields(audioMode);
+      const prevCover = document.getElementById('blp_preview_cover_img');
+      if (prevCover && hero.cover_image) prevCover.src = hero.cover_image;
+      const prevBanner = document.getElementById('blp_preview_banner_img');
+      if (prevBanner && hero.banner_image) prevBanner.src = hero.banner_image;
 
-    currentAudioHighlights = (audioLayer.highlights && Array.isArray(audioLayer.highlights) && audioLayer.highlights.length > 0) ? [...audioLayer.highlights] : [
-      { icon: '🐛', text: '300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय.' },
-      { icon: '🦠', text: '500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज.' },
-      { icon: '🧪', text: 'लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके.' },
-      { icon: '💧', text: 'पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन.' },
-      { icon: '🌊', text: 'Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि.' },
-      { icon: '🌱', text: 'उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप.' }
-    ];
-    renderAudioHighlightsInBuilder();
+      // OG Tags
+      setVal('blp_og_title', page.og_title || hero.title || page.book_name || '');
+      setVal('blp_og_description', page.og_description || hero.description || '');
+      setVal('blp_og_image', page.og_image || page.og_image_landscape || hero.banner_image || hero.cover_image || '');
+      if (typeof window.updateSocialSharePreview === 'function') window.updateSocialSharePreview();
 
-    // Publishing Targets & Badges
-    const targets = page.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page', 'download_funnel'];
-    if (document.getElementById('blp_pub_ebook_store')) document.getElementById('blp_pub_ebook_store').checked = targets.includes('ebook_store');
-    if (document.getElementById('blp_pub_category_page')) document.getElementById('blp_pub_category_page').checked = targets.includes('category_page');
-    if (document.getElementById('blp_pub_my_library')) document.getElementById('blp_pub_my_library').checked = targets.includes('my_library');
-    if (document.getElementById('blp_pub_home_page')) document.getElementById('blp_pub_home_page').checked = targets.includes('home_page');
-    if (document.getElementById('blp_pub_home_hero')) document.getElementById('blp_pub_home_hero').checked = targets.includes('home_hero');
-    if (document.getElementById('blp_pub_download_funnel')) document.getElementById('blp_pub_download_funnel').checked = targets.includes('download_funnel');
-    if (document.getElementById('blp_store_badge')) document.getElementById('blp_store_badge').value = page.store_badge || 'best_seller';
-    if (document.getElementById('blp_is_coming_soon')) document.getElementById('blp_is_coming_soon').value = (page.is_coming_soon === true || page.is_coming_soon === 'true') ? 'true' : 'false';
+      // Audio Book Experience Layer
+      const audioLayer = page.audio_layer || page.audio || {};
+      setChecked('blp_audio_enabled', audioLayer.enabled !== false);
+      setVal('blp_audio_badge_tag', audioLayer.badge_tag || '🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO');
+      setVal('blp_audio_main_heading', audioLayer.main_heading || 'अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!');
+      setVal('blp_audio_main_subtitle', audioLayer.main_subtitle || '⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।');
+      setVal('blp_audio_title', audioLayer.title || 'पुस्तक का लाइव ऑडियो परिचय सुनें');
+      setVal('blp_audio_subtitle', audioLayer.subtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)');
+      const audioMode = audioLayer.mode || (audioLayer.mp3_url ? 'mp3' : (audioLayer.tts_text ? 'tts' : 'mp3'));
+      setVal('blp_audio_mode', audioMode);
+      setVal('blp_audio_mp3_url', audioLayer.mp3_url || '');
+      setVal('blp_audio_tts_text', audioLayer.tts_text || audioLayer.story_text || '');
+      setVal('blp_audio_offer_box', audioLayer.offer_callout || '💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!');
+      setChecked('blp_audio_bgm_enabled', audioLayer.bgm_enabled !== false);
+      if (typeof window.toggleAudioModeFields === 'function') window.toggleAudioModeFields(audioMode);
 
-    // Final CTA Buy Box & Benefits Populating
-    const fb = page.final_buy || {};
-    if (document.getElementById('blp_final_buy_title')) {
-      document.getElementById('blp_final_buy_title').value = fb.title || hero.title || page.heading || page.name || '';
-    }
-    if (document.getElementById('blp_final_buy_desc')) {
-      document.getElementById('blp_final_buy_desc').value = fb.description || hero.subtitle || hero.description || '';
-    }
-    if (document.getElementById('blp_final_buy_benefits')) {
+      currentAudioHighlights = (audioLayer.highlights && Array.isArray(audioLayer.highlights) && audioLayer.highlights.length > 0) ? [...audioLayer.highlights] : [
+        { icon: '🐛', text: '300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय.' },
+        { icon: '🦠', text: '500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज.' },
+        { icon: '🧪', text: 'लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके.' },
+        { icon: '💧', text: 'पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन.' },
+        { icon: '🌊', text: 'Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि.' },
+        { icon: '🌱', text: 'उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप.' }
+      ];
+      if (typeof renderAudioHighlightsInBuilder === 'function') renderAudioHighlightsInBuilder();
+
+      // Publishing Targets & Badges
+      const targets = page.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page', 'download_funnel'];
+      setChecked('blp_pub_ebook_store', targets.includes('ebook_store'));
+      setChecked('blp_pub_category_page', targets.includes('category_page'));
+      setChecked('blp_pub_my_library', targets.includes('my_library'));
+      setChecked('blp_pub_home_page', targets.includes('home_page'));
+      setChecked('blp_pub_home_hero', targets.includes('home_hero'));
+      setChecked('blp_pub_download_funnel', targets.includes('download_funnel'));
+      setVal('blp_store_badge', page.store_badge || 'best_seller');
+      setVal('blp_is_coming_soon', (page.is_coming_soon === true || page.is_coming_soon === 'true') ? 'true' : 'false');
+
+      // Final CTA Buy Box & Benefits Populating
+      const fb = page.final_buy || {};
+      setVal('blp_final_buy_title', fb.title || hero.title || page.heading || page.name || '');
+      setVal('blp_final_buy_desc', fb.description || hero.subtitle || hero.description || '');
       const fbBenefits = fb.benefits;
       if (Array.isArray(fbBenefits) && fbBenefits.length > 0) {
-        document.getElementById('blp_final_buy_benefits').value = fbBenefits.join('\n');
+        setVal('blp_final_buy_benefits', fbBenefits.join('\n'));
       } else if (typeof fbBenefits === 'string' && fbBenefits.trim()) {
-        document.getElementById('blp_final_buy_benefits').value = fbBenefits;
+        setVal('blp_final_buy_benefits', fbBenefits);
       } else {
-        document.getElementById('blp_final_buy_benefits').value = '';
+        setVal('blp_final_buy_benefits', '');
       }
-    }
 
-    // Tracking Select / De-select
-    const isFbActive = page.facebook_pixel_id !== 'disabled' && page.facebook_pixel_enabled !== false;
-    const isGaActive = page.google_analytics_id !== 'disabled' && page.google_analytics_enabled !== false;
-    if (document.getElementById('blp_fb_pixel_enabled')) {
-      document.getElementById('blp_fb_pixel_enabled').checked = isFbActive;
-    }
-    if (document.getElementById('blp_google_tag_enabled')) {
-      document.getElementById('blp_google_tag_enabled').checked = isGaActive;
-    }
+      // Tracking Select / De-select
+      setChecked('blp_fb_pixel_enabled', page.facebook_pixel_id !== 'disabled' && page.facebook_pixel_enabled !== false);
+      setChecked('blp_google_tag_enabled', page.google_analytics_id !== 'disabled' && page.google_analytics_enabled !== false);
 
-    // Section Banners Mapping
-    currentSectionBanners = { ...(page.section_banners || {}) };
-    if (page.preview_banner && !currentSectionBanners.sec_preview) {
-      currentSectionBanners.sec_preview = page.preview_banner;
-    }
-    if (page.value_stack?.vip_banner && !currentSectionBanners.sec_vip_stack) {
-      currentSectionBanners.sec_vip_stack = page.value_stack.vip_banner;
-    }
-    if (page.why_read?.banner_image && !currentSectionBanners.sec_why_buy) {
-      currentSectionBanners.sec_why_buy = page.why_read.banner_image;
-    }
-    if (page.audio_layer?.banner_image && !currentSectionBanners.sec_audio) {
-      currentSectionBanners.sec_audio = page.audio_layer.banner_image;
-    }
-    if (page.final_buy?.banner_image && !currentSectionBanners.sec_final_buy) {
-      currentSectionBanners.sec_final_buy = page.final_buy.banner_image;
-    }
-
-    defaultSectionsList.forEach(s => {
-      const bannerUrl = currentSectionBanners[s.key];
-      const input = document.getElementById(`blp_sec_banner_${s.key}`);
-      const wrap = document.getElementById(`blp_sec_banner_preview_wrap_${s.key}`);
-      const img = document.getElementById(`blp_sec_banner_preview_${s.key}`);
-      if (bannerUrl) {
-        if (input) input.value = bannerUrl;
-        if (img) img.src = bannerUrl;
-        if (wrap) wrap.style.display = 'block';
-      } else {
-        if (input) input.value = '';
-        if (wrap) wrap.style.display = 'none';
+      // Section Banners Mapping
+      currentSectionBanners = { ...(page.section_banners || {}) };
+      if (page.preview_banner && !currentSectionBanners.sec_preview) {
+        currentSectionBanners.sec_preview = page.preview_banner;
       }
-    });
-
-    // Timer
-    const timerCfg = page.timer || {};
-    document.getElementById('blp_timer_enabled').checked = timerCfg.enabled !== false;
-    document.getElementById('blp_timer_minutes').value = timerCfg.minutes || 15;
-    document.getElementById('blp_timer_text').value = timerCfg.text || '⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!';
-
-    // Suggested Books List
-    currentSuggestedBooks = page.suggested_books_list || [];
-    if (!currentSuggestedBooks || currentSuggestedBooks.length === 0) {
-      const sugs = page.suggested_books || [];
-      currentSuggestedBooks = sugs.map(s => {
-        if (typeof s === 'object') return s;
-        const b = allBooks.find(x => x.id === s);
-        return {
-          image: b?.cover || b?.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
-          title: b?.heading || b?.name || s,
-          offerPrice: b?.offerPrice || 99,
-          mrp: b?.mrp || 299,
-          link: s
-        };
-      });
-    }
-
-    // Value stack
-    const stack = page.value_stack || {};
-    document.getElementById('blp_stack_book_mrp').value = stack.book_mrp || hero.mrp || 299;
-    document.getElementById('blp_stack_vip_val').value = stack.vip_value || 1999;
-    document.getElementById('blp_stack_bonus_val').value = stack.bonus_value || 199;
-    document.getElementById('blp_stack_offer_val').value = stack.offer_price || hero.offer_price || 99;
-    document.getElementById('blp_vip_perk_text').value = stack.subscriber_perk || '';
-
-    // Theme Color
-    selectedThemePrimary = page.theme_primary || '#2E7D32';
-    selectedThemeDark = page.theme_dark || '#1B5E20';
-    document.getElementById('blp_custom_theme_color').value = selectedThemePrimary;
-
-    document.getElementById('blp_wa_prompt').value = page.whatsapp_prompt || '';
-    if (document.getElementById('blp_og_title')) {
-      document.getElementById('blp_og_title').value = page.og_title || hero.title || page.book_name || '';
-    }
-    if (document.getElementById('blp_og_description')) {
-      document.getElementById('blp_og_description').value = page.og_description || hero.description || '';
-    }
-    if (document.getElementById('blp_og_image')) {
-      document.getElementById('blp_og_image').value = page.og_image || page.og_image_landscape || '';
-    }
-    if (document.getElementById('blp_whatsapp_share_msg')) {
-      document.getElementById('blp_whatsapp_share_msg').value = page.whatsapp_share_message || page.whatsapp_share_text || '';
-    }
-    document.getElementById('blp_status').value = page.status || 'active';
-    document.getElementById('blp_sticky_btn_text').value = page.sticky_button_text || 'खरीदें';
-
-    // AI Support fields
-    if (document.getElementById('blp_ai_support_title')) document.getElementById('blp_ai_support_title').value = page.ai_support_title || '';
-    if (document.getElementById('blp_ai_support_cover')) document.getElementById('blp_ai_support_cover').value = page.ai_support_cover || '';
-    if (document.getElementById('blp_ai_support_desc')) document.getElementById('blp_ai_support_desc').value = page.ai_support_desc || '';
-
-    // Final CTA Buy Box fields
-    const finalBuyCfg = page.final_buy || {};
-    if (document.getElementById('blp_final_buy_title')) {
-      document.getElementById('blp_final_buy_title').value = finalBuyCfg.title || hero.title || page.heading || '';
-    }
-    if (document.getElementById('blp_final_buy_desc')) {
-      document.getElementById('blp_final_buy_desc').value = finalBuyCfg.description || hero.subtitle || hero.description || '';
-    }
-    if (document.getElementById('blp_final_buy_benefits')) {
-      let bArr = [];
-      if (Array.isArray(finalBuyCfg.benefits) && finalBuyCfg.benefits.length > 0) {
-        bArr = finalBuyCfg.benefits;
-      } else if (Array.isArray(page.purchase_benefits) && page.purchase_benefits.length > 0) {
-        bArr = page.purchase_benefits;
-      } else if (Array.isArray(page.bonus_points) && page.bonus_points.length > 0) {
-        bArr = page.bonus_points;
+      if (page.value_stack?.vip_banner && !currentSectionBanners.sec_vip_stack) {
+        currentSectionBanners.sec_vip_stack = page.value_stack.vip_banner;
       }
-      document.getElementById('blp_final_buy_benefits').value = bArr.join('\n');
-    }
-
-    // Repeaters data
-    currentKpis = hero.features || [
-      { icon: 'fa-seedling', text: '120 पेज की प्रीमियम' },
-      { icon: 'fa-camera', text: '300+ फोटो' }
-    ];
-    currentWhyCards = page.why_read?.cards || [];
-    document.getElementById('blp_why_title').value = page.why_read?.title || 'यह पुस्तक क्यों खरीदें?';
-    document.getElementById('blp_why_desc').value = page.why_read?.subtitle || '';
-
-    currentVideos = page.videos || [];
-    currentReviews = page.testimonials || [];
-    currentDemoImages = page.demo_images || [];
-    currentBonuses = page.bonuses || page.bonus_books || [];
-    currentBonusPoints = page.bonus_points || [
-      '24×7 WhatsApp Priority Support',
-      '💬 आपका सवाल → हमारी मदद → आसान समाधान',
-      '📖 किताब की जानकारी समझने में सहायता',
-      '🌱 फसल संबंधी विशेष स्प्रे फॉर्मूला',
-      '📱 Mobile Friendly PDF & Lifetime Access'
-    ];
-    currentTocPoints = page.table_of_contents || [
-      'बीज उपचार',
-      'खेत की तैयारी',
-      'बुवाई की वैज्ञानिक विधि',
-      'उर्वरक प्रबंधन',
-      'रोग एवं कीट प्रबंधन'
-    ];
-    document.getElementById('blp_book_name').value = page.book_name || page.bookName || page.hero?.title || page.heading || '';
-    document.getElementById('blp_book_author').value = page.author || '';
-    document.getElementById('blp_book_language').value = page.language || 'Hindi';
-    document.getElementById('blp_book_pages').value = page.totalPages || 120;
-    document.getElementById('blp_book_version').value = page.version || '2026';
-    currentFaqs = page.faqs || [];
-    currentSectionsOrder = (page.sections_order && Array.isArray(page.sections_order) && page.sections_order.length > 0) ? 
-      [...page.sections_order] : defaultSectionsList.map(s => s.key);
-    
-    // Auto-inject missing sections
-    defaultSectionsList.forEach(s => {
-      if (!currentSectionsOrder.includes(s.key)) {
-        if (s.key === 'sec_audio') {
-          const kpiIdx = currentSectionsOrder.indexOf('sec_kpis');
-          if (kpiIdx >= 0) currentSectionsOrder.splice(kpiIdx + 1, 0, 'sec_audio');
-          else currentSectionsOrder.push('sec_audio');
-        } else if (s.key === 'sec_ai_support') {
-          const bonIdx = currentSectionsOrder.indexOf('sec_bonuses');
-          if (bonIdx >= 0) currentSectionsOrder.splice(bonIdx + 1, 0, 'sec_ai_support');
-          else currentSectionsOrder.push('sec_ai_support');
-        } else {
-          currentSectionsOrder.push(s.key);
-        }
+      if (page.why_read?.banner_image && !currentSectionBanners.sec_why_buy) {
+        currentSectionBanners.sec_why_buy = page.why_read.banner_image;
       }
-    });
-    currentHiddenSections = page.hidden_sections || [];
+      if (page.audio_layer?.banner_image && !currentSectionBanners.sec_audio) {
+        currentSectionBanners.sec_audio = page.audio_layer.banner_image;
+      }
+      if (page.final_buy?.banner_image && !currentSectionBanners.sec_final_buy) {
+        currentSectionBanners.sec_final_buy = page.final_buy.banner_image;
+      }
 
-    renderKpiBadgesInBuilder();
-    renderWhyCardsInBuilder();
-    renderVideosInBuilder();
-    renderReviewsInBuilder();
-    renderDemoImagesInBuilder();
-    renderBonusesInBuilder();
-    renderBonusPointsInBuilder();
-    renderTocPointsInBuilder();
-    renderFaqsInBuilder();
-    renderSuggestedBooksInBuilder();
-    renderSectionsReorderingList();
+      if (Array.isArray(defaultSectionsList)) {
+        defaultSectionsList.forEach(s => {
+          const bannerUrl = currentSectionBanners[s.key];
+          const input = document.getElementById(`blp_sec_banner_${s.key}`);
+          const wrap = document.getElementById(`blp_sec_banner_preview_wrap_${s.key}`);
+          const img = document.getElementById(`blp_sec_banner_preview_${s.key}`);
+          if (bannerUrl) {
+            if (input) input.value = bannerUrl;
+            if (img) img.src = bannerUrl;
+            if (wrap) wrap.style.display = 'block';
+          } else {
+            if (input) input.value = '';
+            if (wrap) wrap.style.display = 'none';
+          }
+        });
+      }
 
-    if (typeof window.toggleMobileDrawer === 'function') window.toggleMobileDrawer(false);
-    document.body.classList.remove('mobile-drawer-open');
-    builderCard.style.display = 'block';
-    setTimeout(() => {
-      const rect = builderCard.getBoundingClientRect();
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      window.scrollTo({ top: Math.max(0, rect.top + scrollTop - 90), behavior: 'smooth' });
-    }, 50);
+      // Timer
+      const timerCfg = page.timer || {};
+      setChecked('blp_timer_enabled', timerCfg.enabled !== false);
+      setVal('blp_timer_minutes', timerCfg.minutes || 15);
+      setVal('blp_timer_text', timerCfg.text || '⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!');
+
+      // Suggested Books List
+      currentSuggestedBooks = page.suggested_books_list || [];
+      if (!currentSuggestedBooks || currentSuggestedBooks.length === 0) {
+        const sugs = page.suggested_books || [];
+        currentSuggestedBooks = sugs.map(s => {
+          if (typeof s === 'object') return s;
+          const b = allBooks.find(x => x.id === s);
+          return {
+            image: b?.cover || b?.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
+            title: b?.heading || b?.name || s,
+            offerPrice: b?.offerPrice || 99,
+            mrp: b?.mrp || 299,
+            link: s
+          };
+        });
+      }
+
+      // Value stack
+      const stack = page.value_stack || {};
+      setVal('blp_stack_book_mrp', stack.book_mrp || hero.mrp || 299);
+      setVal('blp_stack_vip_val', stack.vip_value || 1999);
+      setVal('blp_stack_bonus_val', stack.bonus_value || 199);
+      setVal('blp_stack_offer_val', stack.offer_price || hero.offer_price || 99);
+      setVal('blp_vip_perk_text', stack.subscriber_perk || '');
+
+      // Theme Color
+      selectedThemePrimary = page.theme_primary || '#2E7D32';
+      selectedThemeDark = page.theme_dark || '#1B5E20';
+      setVal('blp_custom_theme_color', selectedThemePrimary);
+
+      setVal('blp_wa_prompt', page.whatsapp_prompt || '');
+      setVal('blp_whatsapp_share_msg', page.whatsapp_share_message || page.whatsapp_share_text || '');
+      setVal('blp_status', page.status || 'active');
+      setVal('blp_sticky_btn_text', page.sticky_button_text || 'खरीदें');
+
+      // AI Support fields
+      setVal('blp_ai_support_title', page.ai_support_title || '');
+      setVal('blp_ai_support_cover', page.ai_support_cover || '');
+      setVal('blp_ai_support_desc', page.ai_support_desc || '');
+
+      // Repeaters data
+      currentKpis = hero.features || [
+        { icon: 'fa-seedling', text: '120 पेज की प्रीमियम' },
+        { icon: 'fa-camera', text: '300+ फोटो' }
+      ];
+      currentWhyCards = page.why_read?.cards || [];
+      setVal('blp_why_title', page.why_read?.title || 'यह पुस्तक क्यों खरीदें?');
+      setVal('blp_why_desc', page.why_read?.subtitle || '');
+
+      currentVideos = page.videos || [];
+      currentReviews = page.testimonials || [];
+      currentDemoImages = page.demo_images || [];
+      currentBonuses = page.bonuses || page.bonus_books || [];
+      currentBonusPoints = page.bonus_points || [
+        '24×7 WhatsApp Priority Support',
+        '💬 आपका सवाल → हमारी मदद → आसान समाधान',
+        '📖 किताब की जानकारी समझने में सहायता',
+        '🌱 फसल संबंधी विशेष स्प्रे फॉर्मूला',
+        '📱 Mobile Friendly PDF & Lifetime Access'
+      ];
+      currentTocPoints = page.table_of_contents || [
+        'बीज उपचार',
+        'खेत की तैयारी',
+        'बुवाई की वैज्ञानिक विधि',
+        'उर्वरक प्रबंधन',
+        'रोग एवं कीट प्रबंधन'
+      ];
+      setVal('blp_book_name', page.book_name || page.bookName || page.hero?.title || page.heading || '');
+      setVal('blp_book_author', page.author || '');
+      setVal('blp_book_language', page.language || 'Hindi');
+      setVal('blp_book_pages', page.totalPages || 120);
+      setVal('blp_book_version', page.version || '2026');
+      currentFaqs = page.faqs || [];
+      currentSectionsOrder = (page.sections_order && Array.isArray(page.sections_order) && page.sections_order.length > 0) ?
+        [...page.sections_order] : defaultSectionsList.map(s => s.key);
+
+      // Auto-inject missing sections
+      if (Array.isArray(defaultSectionsList)) {
+        defaultSectionsList.forEach(s => {
+          if (!currentSectionsOrder.includes(s.key)) {
+            if (s.key === 'sec_audio') {
+              const kpiIdx = currentSectionsOrder.indexOf('sec_kpis');
+              if (kpiIdx >= 0) currentSectionsOrder.splice(kpiIdx + 1, 0, 'sec_audio');
+              else currentSectionsOrder.push('sec_audio');
+            } else if (s.key === 'sec_ai_support') {
+              const bonIdx = currentSectionsOrder.indexOf('sec_bonuses');
+              if (bonIdx >= 0) currentSectionsOrder.splice(bonIdx + 1, 0, 'sec_ai_support');
+              else currentSectionsOrder.push('sec_ai_support');
+            } else {
+              currentSectionsOrder.push(s.key);
+            }
+          }
+        });
+      }
+      currentHiddenSections = page.hidden_sections || [];
+
+      if (typeof renderKpiBadgesInBuilder === 'function') renderKpiBadgesInBuilder();
+      if (typeof renderWhyCardsInBuilder === 'function') renderWhyCardsInBuilder();
+      if (typeof renderVideosInBuilder === 'function') renderVideosInBuilder();
+      if (typeof renderReviewsInBuilder === 'function') renderReviewsInBuilder();
+      if (typeof renderDemoImagesInBuilder === 'function') renderDemoImagesInBuilder();
+      if (typeof renderBonusesInBuilder === 'function') renderBonusesInBuilder();
+      if (typeof renderBonusPointsInBuilder === 'function') renderBonusPointsInBuilder();
+      if (typeof renderTocPointsInBuilder === 'function') renderTocPointsInBuilder();
+      if (typeof renderFaqsInBuilder === 'function') renderFaqsInBuilder();
+      if (typeof renderSuggestedBooksInBuilder === 'function') renderSuggestedBooksInBuilder();
+      if (typeof renderSectionsReorderingList === 'function') renderSectionsReorderingList();
+
+      if (typeof window.toggleMobileDrawer === 'function') window.toggleMobileDrawer(false);
+      document.body.classList.remove('mobile-drawer-open');
+      showToast(`✏️ ${page.id} का बिल्डर फॉर्म खोला गया`, 'success');
+    } catch(err) {
+      console.error('editBookLandingPage error:', err);
+      // Ensure builder card is still visible even if an error occurred during population
+      const fallbackCard = document.getElementById('admin-book-builder-card');
+      if (fallbackCard) fallbackCard.style.display = 'block';
+      showToast(`⚠️ फॉर्म लोड हुआ (नोट: ${err.message})`, 'info');
+    }
   };
 
   window.copyBookLandingUrl = function(bId) {
