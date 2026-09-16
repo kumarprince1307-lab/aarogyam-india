@@ -552,8 +552,8 @@
         "home_page",
         "download_funnel"
       ],
-      "store_badge": "coming_soon",
-      "badge": "coming_soon",
+      "store_badge": "best_seller",
+      "badge": "best_seller",
       "isComingSoon": true,
       "mainPdf": "",
       "pdf_url": "",
@@ -611,7 +611,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK007",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:51:34.487Z",
+      "updated_at": "2026-09-16T18:52:30.299Z",
       "admin_edited": true
     },
     {
