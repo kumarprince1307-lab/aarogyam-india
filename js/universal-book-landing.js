@@ -114,6 +114,7 @@
     bindInteractiveEvents();
     renderFaqSection();
     renderBookDetails();
+    renderFinalBuySection();
     initLandingPageAutoplay();
     enforceHiddenSections();
   }
@@ -875,14 +876,12 @@
 
       if (!rawBonuses || rawBonuses.length === 0) {
         bonusWrapper.style.display = 'none';
-        return;
-      }
-      
-      // Filter out pure text/support items so only actual bonus books & files are in this grid
-      const bonusBooks = rawBonuses.filter(bn => bn && bn.title && !bn.title.toUpperCase().includes('WHATSAPP SUPPORT'));
-      const renderList = bonusBooks.length > 0 ? bonusBooks : rawBonuses;
+      } else {
+        // Filter out pure text/support items so only actual bonus books & files are in this grid
+        const bonusBooks = rawBonuses.filter(bn => bn && bn.title && !bn.title.toUpperCase().includes('WHATSAPP SUPPORT'));
+        const renderList = bonusBooks.length > 0 ? bonusBooks : rawBonuses;
 
-      bonusWrapper.style.display = 'block';
+        bonusWrapper.style.display = 'block';
       freeBooksGrid.innerHTML = renderList.map(bn => {
         const bImg = window.resolveImageSrc(bn.image || bn.cover || '/images/books/kharif-master-guide-2026-cover.webp');
         const bTitle = bn.title || 'विशेष बोनस ई-बुक';
@@ -997,56 +996,88 @@
     }
 
     // 10. Final CTA Buy Box Section
-    setElemText('final-title', (l.final_buy && l.final_buy.title) || title);
-    setElemText('final-old-price', `₹${mrp}`);
-    setElemText('final-new-price', `₹${offer}`);
+    renderFinalBuySection();
+  }
 
-    const finalDescEl = document.getElementById('final-desc');
-    if (finalDescEl) {
-      finalDescEl.textContent = (l.final_buy && l.final_buy.description) || hero.subtitle || hero.description || `${title} - सम्पूर्ण Practical Guide।`;
-    }
+  function renderFinalBuySection() {
+    try {
+      const b = currentBookData || {};
+      const l = currentLandingData || {};
+      const hero = l.hero || {};
+      const fb = l.final_buy || {};
 
-    const finalBenefitsList = document.getElementById('final-benefits-list');
-    if (finalBenefitsList) {
-      let bList = [];
-      if (l.final_buy && l.final_buy.benefits) {
-        if (Array.isArray(l.final_buy.benefits) && l.final_buy.benefits.length > 0) {
-          bList = l.final_buy.benefits;
-        } else if (typeof l.final_buy.benefits === 'string' && l.final_buy.benefits.trim().length > 0) {
-          bList = l.final_buy.benefits.split(/[\r\n]+/).map(x => x.trim()).filter(Boolean);
-        }
+      const title = fb.title || hero.title || b.heading || b.name || 'ई-बुक प्रैक्टिकल गाइड';
+      const mrp = fb.mrp || hero.mrp || b.mrp || 299;
+      const offer = fb.offer_price || hero.offer_price || b.offerPrice || 99;
+      const desc = fb.description || hero.subtitle || hero.description || `${title} - सम्पूर्ण Practical Guide।`;
+
+      setElemText('final-title', title);
+      setElemText('final-old-price', `₹${mrp}`);
+      setElemText('final-new-price', `₹${offer}`);
+
+      const finalDescEl = document.getElementById('final-desc');
+      if (finalDescEl) {
+        finalDescEl.textContent = desc;
       }
-      if (bList.length === 0) {
-        if (Array.isArray(l.purchase_benefits) && l.purchase_benefits.length > 0) {
-          bList = l.purchase_benefits;
-        } else if (Array.isArray(l.bonus_points) && l.bonus_points.length > 0) {
-          bList = l.bonus_points;
+
+      const finalBenefitsList = document.getElementById('final-benefits-list');
+      if (finalBenefitsList) {
+        let bList = [];
+        if (fb.benefits) {
+          if (Array.isArray(fb.benefits) && fb.benefits.length > 0) {
+            bList = fb.benefits;
+          } else if (typeof fb.benefits === 'string' && fb.benefits.trim().length > 0) {
+            bList = fb.benefits.split(/[\r\n]+/).map(x => x.trim()).filter(Boolean);
+          }
+        }
+        if (bList.length === 0) {
+          if (Array.isArray(l.purchase_benefits) && l.purchase_benefits.length > 0) {
+            bList = l.purchase_benefits;
+          } else if (Array.isArray(l.bonus_points) && l.bonus_points.length > 0) {
+            bList = l.bonus_points;
+          } else {
+            bList = [
+              'Full PDF eBook & Audio Book',
+              '📱 मोबाइल में कभी भी पढ़ें',
+              'Instant Download & Lifetime Access',
+              '🎁 Share करें और Surprise Gift जीतें',
+              '💬 पढ़ते समय सवाल हो? WhatsApp Help से पूछें'
+            ];
+          }
+        }
+        finalBenefitsList.innerHTML = bList.map(item => {
+          const clean = String(item || '').trim();
+          if (!clean) return '';
+          const prefix = clean.startsWith('✅') ? '' : '✅ ';
+          return `<li>${prefix}${escapeHtml(clean)}</li>`;
+        }).filter(Boolean).join('');
+      }
+
+      const finalBuyBtn = document.getElementById('final-buy-btn');
+      if (finalBuyBtn) {
+        finalBuyBtn.style.display = 'inline-flex';
+        const rawId = (b.id || currentBookId || 'BK001').trim().toUpperCase();
+        const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001');
+        let isComingSoon = false;
+        if (l.is_coming_soon === false || l.is_coming_soon === 'false' || l.status === 'active') {
+          isComingSoon = false;
+        } else if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon') {
+          isComingSoon = true;
         } else {
-          bList = [
-            'Full PDF eBook & Audio Book',
-            '📱 मोबाइल में कभी भी पढ़ें',
-            'Instant Download & Lifetime Access',
-            '🎁 Share करें और Surprise Gift जीतें',
-            '💬 पढ़ते समय सवाल हो? WhatsApp Help से पूछें'
-          ];
+          isComingSoon = !isLiveAgri && (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true);
+        }
+
+        if (!isComingSoon) {
+          finalBuyBtn.href = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
+          finalBuyBtn.innerHTML = `🛒 ${escapeHtml(l.sticky_button_text || 'अभी खरीदें (Buy Now)')}`;
+          finalBuyBtn.onclick = null;
+        } else {
+          finalBuyBtn.href = 'javascript:void(0)';
+          finalBuyBtn.innerHTML = '🔔 कमिंग सून (Coming Soon)';
         }
       }
-      finalBenefitsList.innerHTML = bList.map(item => {
-        const clean = String(item || '').trim();
-        if (!clean) return '';
-        const prefix = clean.startsWith('✅') ? '' : '✅ ';
-        return `<li>${prefix}${escapeHtml(clean)}</li>`;
-      }).filter(Boolean).join('');
-    }
-
-    const finalBuyBtn = document.getElementById('final-buy-btn');
-    if (finalBuyBtn) {
-      finalBuyBtn.style.display = 'inline-flex';
-      if (!isComingSoon) {
-        finalBuyBtn.href = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
-        finalBuyBtn.innerHTML = `🛒 ${escapeHtml(l.sticky_button_text || 'अभी खरीदें (Buy Now)')}`;
-        finalBuyBtn.onclick = null;
-      }
+    } catch (err) {
+      console.error('Error rendering Final Buy Section:', err);
     }
   }
 
