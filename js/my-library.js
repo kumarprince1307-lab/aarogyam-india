@@ -817,7 +817,6 @@ async function renderLibrarySections(booksArray) {
                 <div class="book-btn-group" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
                     <a href="${readerDemoUrl}" class="btn-read" style="flex:1;min-width:80px;padding:8px;background:#0284c7;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;">📖 Read Demo</a>
                     ${hasAudioBook ? `<a href="${readerDemoUrl}&audio=1" class="btn-audio" style="flex:1;min-width:75px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="ऑडियो डेमो सुनें">🎧 ऑडियो</a>` : ''}
-                    ${demoPdfPath ? `<a href="${demoPdfPath}" download target="_blank" class="btn-buy" style="flex:1;min-width:75px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="डेमो PDF डाउनलोड करें">📥 डाउनलोड</a>` : ''}
                     ${bookVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bookName}", ${JSON.stringify(bookVideos)})' class="btn-video" style="flex:1;min-width:75px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;" title="वीडियो डेमो देखें">🎬 वीडियो</button>` : ''}
                 </div>
                 <div style="margin-top:8px;">
