@@ -715,7 +715,7 @@
 
     // Set Dedicated Demo Landing Page URLs with active Book ID
     const demoUrl = `demo-kharif.html?id=${encodeURIComponent(rawId)}`;
-    const sampleBtns = ['hero-sample-btn', 'final-sample-btn'];
+    const sampleBtns = ['hero-sample-btn', 'final-sample-btn', 'ubl-audio-sample-btn'];
     sampleBtns.forEach(sId => {
       const sBtn = document.getElementById(sId);
       if (sBtn) sBtn.href = demoUrl;

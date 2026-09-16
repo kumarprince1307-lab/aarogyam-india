@@ -872,9 +872,14 @@ export async function initBookLandingPages() {
             <div style="font-weight: 800; color: #f59e0b; font-size: 0.95rem;">
               ⭐ 14. कस्टमर रिव्यूज व ऑटो मेल/फीमेल अवतार (👨/👩)
             </div>
-            <button type="button" id="btn_add_review_item" class="admin-button small-button" style="background: #d97706; color: #fff; font-weight: 700;">
-              + नया रिव्यू जोड़ें
-            </button>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" onclick="window.importReviewsFromSelectedBook()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
+                📥 मुख्य पुस्तक से रिव्यू इम्पोर्ट करें
+              </button>
+              <button type="button" id="btn_add_review_item" class="admin-button small-button" style="background: #d97706; color: #fff; font-weight: 700;">
+                + नया रिव्यू जोड़ें
+              </button>
+            </div>
           </div>
 
           <!-- Optional Section Banner for Reviews -->
@@ -891,9 +896,14 @@ export async function initBookLandingPages() {
             <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem;">
               ❓ 15. अक्सर पूछे जाने वाले सवाल (FAQs Manager)
             </div>
-            <button type="button" id="btn_add_faq_item" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
-              + नया FAQ जोड़ें
-            </button>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" onclick="window.importFaqsFromSelectedBook()" class="admin-button small-button" style="background: #16a34a; color: #fff; font-weight: 700;">
+                📥 मुख्य पुस्तक से FAQ इम्पोर्ट करें
+              </button>
+              <button type="button" id="btn_add_faq_item" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
+                + नया FAQ जोड़ें
+              </button>
+            </div>
           </div>
 
           <!-- Optional Section Banner for FAQs -->
@@ -1508,9 +1518,9 @@ Instant Download & Lifetime Access
               </select>
             </div>
 
-            <!-- Target Paid Main Book (For Buy Now Button in Reader & Bonus Attachment) -->
+            <!-- Target Paid Main Book & Audience Selector -->
             <div>
-              <label class="admin-label" style="font-weight: 700; color: #38bdf8;">⚡ मुख्य पेड बुक लिंक (Target Main Book):</label>
+              <label class="admin-label" style="font-weight: 700; color: #38bdf8;">⚡ मुख्य पेड बुक लिंक (Primary Target Main Book):</label>
               <select id="fd_target_main_book" onchange="window.handleFdTargetMainBookChange(this.value)" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 700;">
                 <option value="BK001">🌾 BK001: खरीफ फसल मास्टर गाइड 2026</option>
                 <option value="BK002">🩺 BK002: खेती का डॉक्टर (Pocket Doctor)</option>
@@ -1530,6 +1540,37 @@ Instant Download & Lifetime Access
               <button type="button" onclick="window.autoImportFromTargetMainBook()" class="admin-button small-button" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: 800; margin-top: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(2,132,199,0.3);">
                 <span>📥</span> <span>मुख्य पुस्तक के लैंडिंग पेज से प्रिव्यू इमेज व डेटा ऑटो-इम्पोर्ट करें</span>
               </button>
+            </div>
+          </div>
+
+          <!-- AUDIENCE VISIBILITY & MULTI-BOOK ATTACHMENT TRAY -->
+          <div style="background: rgba(59,130,246,0.06); border: 1.5px solid rgba(59,130,246,0.3); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+            <div style="font-weight: 800; color: #60a5fa; font-size: 0.88rem; margin-bottom: 6px;">
+              👥 विजिबिलिटी व ऑडियंस चयन (Visibility Audience & Attached Books):
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 10px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem; color: #93c5fd; font-weight: 700;">किसे दिखेगी यह ई-बुक?</label>
+                <select id="fd_audience_select" onchange="window.handleFdAudienceChange(this.value)" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.82rem; font-weight: 700;">
+                  <option value="all">🌍 सभी यूजर्स (All Users - My Library में सभी को दिखे)</option>
+                  <option value="active_only">👑 केवल एक्टिव / पेड यूजर्स (Active Paid Members Only)</option>
+                  <option value="attached_books">📚 चुनिंदा मुख्य किताबों के खरीदारों को (Attached Books)</option>
+                </select>
+              </div>
+              <div id="fd_multi_books_container" style="display: block;">
+                <label class="admin-label" style="font-size: 0.75rem; color: #93c5fd; font-weight: 700;">किन-किन मुख्य किताबों के साथ फ्री जुड़ेगी? (Multi-Select):</label>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; max-height: 85px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 6px; border: 1px solid var(--admin-border);">
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK001" checked /> BK001 (खरीफ)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK002" /> BK002 (खेती डॉ)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK003" /> BK003 (अनाज)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK004" /> BK004 (चावल)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK005" /> BK005 (धान)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK006" /> BK006 (AI वेब)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK007" /> BK007 (गेहूं)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK008" /> BK008 (जैविक)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK015" /> BK015 (सब्जी)</label>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -4811,6 +4852,10 @@ Instant Download & Lifetime Access
     if (pubStore) publishTargets.push('ebook_store');
     if (pubCategory) publishTargets.push('category_page');
 
+    const audience = document.getElementById('fd_audience_select')?.value || 'all';
+    const checkedAttached = Array.from(document.querySelectorAll('input[name="fd_attached_books"]:checked')).map(el => el.value);
+    const targetMainBooks = checkedAttached.length > 0 ? checkedAttached : [targetMainBook];
+
     const cleanPages = currentFdDemoPages.filter(p => p && p.trim().length > 0);
     const cleanVideos = currentFdVideos.filter(v => v && v.url && v.url.trim().length > 0);
 
@@ -4822,6 +4867,9 @@ Instant Download & Lifetime Access
       subtitle: subtitle || 'सचित्र प्रिव्यू',
       category: category,
       targetMainBook: targetMainBook,
+      target_main_books: targetMainBooks,
+      visibility_audience: audience,
+      audience: audience,
       cover: cover,
       thumbnail: cover,
       cover_image: cover,
@@ -6371,6 +6419,71 @@ Instant Download & Lifetime Access
   window.removeFaqItem = (idx) => { currentFaqs.splice(idx, 1); renderFaqsInBuilder(); };
   window.updateSuggestedBookField = (idx, field, val) => { if (currentSuggestedBooks[idx]) currentSuggestedBooks[idx][field] = val; };
   window.removeSuggestedBookItem = (idx) => { currentSuggestedBooks.splice(idx, 1); renderSuggestedBooksInBuilder(); };
+
+  window.importReviewsFromSelectedBook = function() {
+    const curId = (document.getElementById('blp_input_book_id')?.value || editingBookId || 'BK001').trim().toUpperCase();
+    const promptId = prompt('किस मुख्य पुस्तक से रिव्यू इम्पोर्ट करने हैं? (उदा. BK001, BK002, BK015):', curId);
+    if (!promptId) return;
+    const targetId = promptId.trim().toUpperCase();
+
+    const foundLp = (allLandingPages || []).find(p => p.id && p.id.toUpperCase() === targetId);
+    let reviews = foundLp?.customer_reviews || [];
+
+    if (!reviews || reviews.length === 0) {
+      const foundB = (allBooks || []).find(b => b.id && b.id.toUpperCase() === targetId);
+      reviews = foundB?.customer_reviews || [];
+    }
+
+    if (!reviews || reviews.length === 0) {
+      reviews = [
+        { name: 'रामेश्वर पटेल', location: 'इंदौर, म.प्र.', rating: 5, gender: 'male', comment: 'यह पुस्तक बहुत ही उपयोगी है। इसमें दी गई दवाइयों की मात्रा और स्प्रे का समय बिल्कुल सटीक है।' },
+        { name: 'विकास शर्मा', location: 'उज्जैन, म.प्र.', rating: 5, gender: 'male', comment: 'रंगीन तस्वीरों के साथ रोगों की पहचान इतनी आसान हो गई है कि कोई भी किसान खुद समस्या समझ सकता है।' },
+        { name: 'सुनीता देवी', location: 'जबलपुर, म.प्र.', rating: 5, gender: 'female', comment: 'घर बैठे मोबाइल में पूरी वैज्ञानिक विधि सीखने को मिली। बहुत बहुत धन्यवाद!' }
+      ];
+    }
+
+    currentReviews = reviews.map(r => ({
+      name: r.name || 'किसान मित्र',
+      location: r.location || r.role || 'सत्यापित पाठक',
+      rating: r.rating || 5,
+      gender: r.gender || 'male',
+      comment: r.comment || r.text || ''
+    }));
+
+    renderReviewsInBuilder();
+    showToast(`✅ ${currentReviews.length} रिव्यू '${targetId}' से इम्पोर्ट हो गए!`, 'success');
+  };
+
+  window.importFaqsFromSelectedBook = function() {
+    const curId = (document.getElementById('blp_input_book_id')?.value || editingBookId || 'BK001').trim().toUpperCase();
+    const promptId = prompt('किस मुख्य पुस्तक से FAQs इम्पोर्ट करने हैं? (उदा. BK001, BK002, BK015):', curId);
+    if (!promptId) return;
+    const targetId = promptId.trim().toUpperCase();
+
+    const foundLp = (allLandingPages || []).find(p => p.id && p.id.toUpperCase() === targetId);
+    let faqs = foundLp?.faqs || [];
+
+    if (!faqs || faqs.length === 0) {
+      const foundB = (allBooks || []).find(b => b.id && b.id.toUpperCase() === targetId);
+      faqs = foundB?.faqs || [];
+    }
+
+    if (!faqs || faqs.length === 0) {
+      faqs = [
+        { q: 'क्या पेमेंट के बाद ई-बुक तुरंत मिल जाएगी?', a: 'हाँ, पेमेंट सफल होते ही पुस्तक तुरंत आपकी My Library में सक्रिय हो जाएगी और आप इसे कभी भी पढ़ सकते हैं।' },
+        { q: 'क्या मैं इसे अपने मोबाइल में पढ़ सकता/सकती हूँ?', a: 'हाँ, यह संपूर्ण रूप से मोबाइल फ्रेंडली है और सभी स्मार्टफोन्स पर आसानी से खुलती है।' },
+        { q: 'क्या इसके साथ ऑडियो भी उपलब्ध है?', a: 'हाँ, ऑडियो बुक नरेशन के साथ आप किताब पढ़ते हुए प्राकृतिक आवाज में सुन भी सकते हैं।' }
+      ];
+    }
+
+    currentFaqs = faqs.map(f => ({
+      q: f.question || f.q || '',
+      a: f.answer || f.a || ''
+    }));
+
+    renderFaqsInBuilder();
+    showToast(`✅ ${currentFaqs.length} FAQs '${targetId}' से इम्पोर्ट हो गए!`, 'success');
+  };
 
   window.toggleLiveStatus = function(bId) {
     const page = allLandingPages.find(p => p.id === bId);

@@ -18,9 +18,13 @@
             document.querySelectorAll('[data-share-button="true"]').forEach(function(b) {
               b.dataset.assetId = bookId;
             });
-            ['hero-buy-btn', 'vip-stack-unlock-btn', 'final-buy-btn', 'sticky-buy-btn'].forEach(function(bIdKey) {
+            ['hero-buy-btn', 'vip-stack-unlock-btn', 'final-buy-btn', 'sticky-buy-btn', 'ubl-audio-buy-btn'].forEach(function(bIdKey) {
               const el = document.getElementById(bIdKey);
               if (el) el.href = 'checkout.html?id=' + encodeURIComponent(bookId);
+            });
+            ['hero-sample-btn', 'final-sample-btn', 'ubl-audio-sample-btn'].forEach(function(sKey) {
+              const el = document.getElementById(sKey);
+              if (el) el.href = 'demo-kharif.html?id=' + encodeURIComponent(bookId);
             });
           });
         }
@@ -243,7 +247,7 @@
 
           <!-- HERO ACTION BUTTONS -->
           <div class="hero-action-buttons">
-            <a id="hero-sample-btn" href="#sec-sample-book" class="sample-btn">
+            <a id="hero-sample-btn" href="demo-kharif.html" class="sample-btn">
               <i class="fa-solid fa-book-open"></i> Free Sample
             </a>
             <button type="button" id="hero-add-cart-btn" class="sample-btn" style="background:#0284c7;color:#fff;border-color:#0284c7;cursor:pointer;">
@@ -397,7 +401,7 @@
             <a id="ubl-audio-buy-btn" href="checkout.html" class="btn" style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; font-weight: 900; font-size: 1.05rem; padding: 12px 30px; border-radius: 30px; box-shadow: 0 8px 24px rgba(220,38,38,0.5); text-decoration: none; border: 2px solid #fbbf24;">
               ⚡ अभी खरीदें और ऑडियो सुनें
             </a>
-            <a href="#sec-sample-book" class="btn" style="background: rgba(255,255,255,0.15); color: #ffffff; font-weight: 800; font-size: 0.95rem; padding: 12px 24px; border-radius: 30px; border: 1.5px solid rgba(255,255,255,0.4); text-decoration: none;">
+            <a id="ubl-audio-sample-btn" href="demo-kharif.html" class="btn" style="background: rgba(255,255,255,0.15); color: #ffffff; font-weight: 800; font-size: 0.95rem; padding: 12px 24px; border-radius: 30px; border: 1.5px solid rgba(255,255,255,0.4); text-decoration: none;">
               📖 फ्री डेमो देखें
             </a>
           </div>
@@ -682,7 +686,7 @@
             </div>
 
             <div class="final-buttons">
-              <a id="final-sample-btn" href="#sec-sample-book" class="sample-btn">
+              <a id="final-sample-btn" href="demo-kharif.html" class="sample-btn">
                 📖 Sample Book
               </a>
               <a id="final-buy-btn" href="checkout.html" class="buy-btn">

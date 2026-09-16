@@ -309,10 +309,55 @@ async function loadBookData() {
         // Render Dynamic FAQs
         renderDemoFaqsList(currentBookData.faqs);
 
+        // Setup Banner Image
+        const bannerUrl = lHero.banner_image || matchedLanding?.banner_image || matchedBook?.banner || '';
+        const bannerWrap = document.getElementById("demoHeroBannerWrap");
+        const bannerImg = document.getElementById("demoHeroBannerImg");
+        if (bannerWrap && bannerImg) {
+            if (bannerUrl) {
+                bannerImg.src = bannerUrl;
+                bannerWrap.style.display = 'block';
+            } else {
+                bannerWrap.style.display = 'none';
+            }
+        }
+
+        // Setup Hero Read Now Button
+        const heroReadBtn = document.getElementById("demoHeroReadBtn");
+        if (heroReadBtn) {
+            heroReadBtn.href = `/ebooks/reader.html?book=${encodeURIComponent(targetKey)}&demo=1`;
+        }
+
+        const isFreeBook = matchedBook?.isFree === true || matchedBook?.type === 'bonus_free' || currentBookData.offerPrice === 0 || targetKey.startsWith('BONUS') || targetKey.startsWith('FREE');
         const targetMain = currentBookData.targetMainBook || (targetKey === 'BK002' ? 'BK002' : 'BK001');
+
+        // Setup Hero Buy vs Free Download Buttons
+        const heroBuyBtn = document.getElementById("demoHeroBuyBtn");
+        const heroDownloadBtn = document.getElementById("demoHeroDownloadBtn");
         const buyBtn = document.getElementById("stickyBuyBtn");
-        if(buyBtn) {
-            buyBtn.href = `../ebooks/checkout.html?product=${encodeURIComponent(targetMain)}`;
+
+        if (isFreeBook) {
+            if (heroBuyBtn) heroBuyBtn.style.display = 'none';
+            if (heroDownloadBtn) {
+                heroDownloadBtn.style.display = 'inline-flex';
+                heroDownloadBtn.href = `/ebooks/download.html?book=${encodeURIComponent(targetKey)}`;
+            }
+            if (buyBtn) {
+                buyBtn.innerHTML = '📥 Free PDF Download';
+                buyBtn.href = `/ebooks/download.html?book=${encodeURIComponent(targetKey)}`;
+                buyBtn.style.background = '#ea580c';
+            }
+        } else {
+            if (heroBuyBtn) {
+                heroBuyBtn.style.display = 'inline-flex';
+                heroBuyBtn.href = `../ebooks/checkout.html?product=${encodeURIComponent(targetMain)}`;
+            }
+            if (heroDownloadBtn) heroDownloadBtn.style.display = 'none';
+            if (buyBtn) {
+                buyBtn.innerHTML = '🛒 Buy Now (मात्र ₹' + currentBookData.offerPrice + ')';
+                buyBtn.href = `../ebooks/checkout.html?product=${encodeURIComponent(targetMain)}`;
+                buyBtn.style.background = 'linear-gradient(135deg, #dc2626, #b91c1c)';
+            }
         }
 
         const backBtn = document.getElementById("backBtn");
@@ -425,6 +470,46 @@ window.toggleDemoAudioPlay = function() {
     } else {
         showToast('आपके ब्राउज़र में स्पीच ऑडियो समर्थित नहीं है');
     }
+};
+
+/*==================================================
+  DEMO SMART REFERRAL SHARING FUNCTION
+==================================================*/
+window.handleDemoBookShare = function() {
+    const bId = (currentBookData?.id || 'BK001').toUpperCase();
+    const title = currentBookData?.heading || currentBookData?.name || 'Aarogyam India eBook Demo';
+    let userShareId = 'AI000004';
+    try {
+        const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+        if (u.share_id || u.ref_code || u.phone || u.mobile) {
+            userShareId = u.share_id || u.ref_code || u.phone || u.mobile;
+        }
+    } catch(e) {}
+
+    const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'https://aarogyamindia.online';
+    const shareUrl = `${origin}/ebooks/demo-kharif.html?id=${encodeURIComponent(bId)}&share_id=${encodeURIComponent(userShareId)}&source=demo_share`;
+    const shareText = `🌾 *${title}* का फ्री डेमो प्रिव्यू देखें!\n\n👉 यहाँ क्लिक करके तुरंत फ्री डेमो पढ़ें:\n${shareUrl}`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: shareText,
+            url: shareUrl
+        }).catch(() => {});
+        return;
+    }
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareText).then(() => {
+            showToast('📋 शेयर लिंक व संदेश कॉपी हो गया!');
+        }).catch(() => {});
+    }
+
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    const waUrl = isMobile 
+        ? `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}` 
+        : `https://web.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+    window.open(waUrl, '_blank');
 };
 
 /*==================================================

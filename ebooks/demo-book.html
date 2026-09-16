@@ -30,10 +30,29 @@ STICKY HEADER
 <!-- =========================================================
 BOOK HERO SECTION
 ========================================================= -->
-<section class="book-hero">
-<img src="" alt="Book Cover" class="book-cover" id="bookCover">
-<h1 id="bookTitle">लोड हो रहा है...</h1>
-<p class="book-subtitle" id="bookSubtitle">सम्पूर्ण Practical Guide</p>
+<section class="book-hero" style="position:relative; text-align:center; padding: 20px 16px;">
+<div id="demoHeroBannerWrap" style="display:none; margin-bottom: 16px; border-radius: 12px; overflow: hidden; max-width: 600px; margin-left: auto; margin-right: auto;">
+  <img src="" alt="Hero Banner" class="hero-banner" id="demoHeroBannerImg" style="width: 100%; height: auto; object-fit: cover; display: block;">
+</div>
+<img src="" alt="Book Cover" class="book-cover" id="bookCover" style="height: 160px; width: auto; object-fit: contain; margin: 0 auto 12px auto; display: block; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.15);">
+<h1 id="bookTitle" style="font-size: 1.4rem; font-weight: 900; color: #1e293b; margin: 0 0 6px 0;">लोड हो रहा है...</h1>
+<p class="book-subtitle" id="bookSubtitle" style="font-size: 0.92rem; color: #64748b; margin: 0 0 14px 0;">सम्पूर्ण Practical Guide</p>
+
+<!-- DYNAMIC HERO ACTION BUTTONS (READ NOW, SHARE, DOWNLOAD, BUY) -->
+<div id="demoHeroActionButtons" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px;">
+  <a href="#" id="demoHeroReadBtn" style="background: #0284c7; color: #fff; padding: 10px 18px; border-radius: 25px; font-weight: 800; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(2,132,199,0.3);">
+    <span>📖</span> <span>रीडर में पढ़ें (Read Demo)</span>
+  </a>
+  <button type="button" id="demoHeroShareBtn" onclick="window.handleDemoBookShare()" style="background: #16a34a; color: #fff; border: none; padding: 10px 18px; border-radius: 25px; font-weight: 800; font-size: 0.88rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(22,163,74,0.3);">
+    <span>🔗</span> <span>Share Now</span>
+  </button>
+  <a href="#" id="demoHeroDownloadBtn" style="display:none; background: #ea580c; color: #fff; padding: 10px 18px; border-radius: 25px; font-weight: 800; font-size: 0.88rem; text-decoration: none; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(234,88,12,0.3);">
+    <span>📥</span> <span>Download Free PDF</span>
+  </a>
+  <a href="#" id="demoHeroBuyBtn" style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; padding: 10px 18px; border-radius: 25px; font-weight: 800; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(220,38,38,0.35); border: 1px solid #fca5a5;">
+    <span>⚡</span> <span>पूरी किताब खरीदें (₹99)</span>
+  </a>
+</div>
 </section>
 
 <!-- =========================================================
