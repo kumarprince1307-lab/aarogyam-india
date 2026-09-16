@@ -813,6 +813,17 @@
     ];
 
     try {
+      let jsonBooks = [];
+      let jsonLp = [];
+      try {
+        const [rB, rL] = await Promise.all([
+          fetch('/data/books.json?v=' + Date.now()).then(r => r.ok ? r.json() : {}).catch(() => ({})),
+          fetch('/data/universal-book-landing-pages.json?v=' + Date.now()).then(r => r.ok ? r.json() : {}).catch(() => ({}))
+        ]);
+        jsonBooks = rB.books || [];
+        jsonLp = rL.bookLandingPages || [];
+      } catch (e) {}
+
       let customBooks = [];
       let customLp = [];
       try {
@@ -820,7 +831,7 @@
         customLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
       } catch (e) {}
 
-      const allActive = [...customBooks, ...customLp].filter(b => {
+      const allActive = [...jsonBooks, ...jsonLp, ...customBooks, ...customLp].filter(b => {
         if (!b || !b.id) return false;
         const bIdUpper = b.id.toUpperCase();
         if (bIdUpper === 'BK001' || bIdUpper === 'BK002') return false;

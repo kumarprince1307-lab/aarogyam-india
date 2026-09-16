@@ -6310,6 +6310,16 @@ Instant Download & Lifetime Access
           setVal('blp_cover_url', bObj.cover || bObj.thumbnail || '');
           const prevImg = document.getElementById('blp_preview_cover_img');
           if (prevImg && bObj.cover) prevImg.src = bObj.cover;
+          const bIsComing = Boolean(bObj.isComingSoon === true || bObj.is_coming_soon === true || bObj.status === 'coming_soon' || bObj.badge === 'coming_soon' || bObj.store_badge === 'coming_soon');
+          setVal('blp_is_coming_soon', bIsComing ? 'true' : 'false');
+          setVal('blp_store_badge', bObj.badge || bObj.store_badge || (bIsComing ? 'coming_soon' : 'best_seller'));
+          const bTargets = Array.isArray(bObj.publish_targets) ? bObj.publish_targets : ['ebook_store', 'category_page', 'my_library', 'home_page', 'download_funnel'];
+          setChecked('blp_pub_ebook_store', bTargets.includes('ebook_store'));
+          setChecked('blp_pub_category_page', bTargets.includes('category_page'));
+          setChecked('blp_pub_my_library', bTargets.includes('my_library'));
+          setChecked('blp_pub_home_page', bTargets.includes('home_page'));
+          setChecked('blp_pub_home_hero', bTargets.includes('home_hero'));
+          setChecked('blp_pub_download_funnel', bTargets.includes('download_funnel'));
           showToast(`✏️ कैटलॉग से बुक (${cleanId}) लोड की गई`, 'info');
           return;
         }
@@ -6396,7 +6406,8 @@ Instant Download & Lifetime Access
       setChecked('blp_pub_home_hero', targets.includes('home_hero'));
       setChecked('blp_pub_download_funnel', targets.includes('download_funnel'));
       setVal('blp_store_badge', page.store_badge || 'best_seller');
-      setVal('blp_is_coming_soon', (page.is_coming_soon === true || page.is_coming_soon === 'true') ? 'true' : 'false');
+      const isPageComingSoon = Boolean(page.is_coming_soon === true || page.is_coming_soon === 'true' || page.isComingSoon === true || page.isComingSoon === 'true' || page.status === 'coming_soon' || page.store_badge === 'coming_soon');
+      setVal('blp_is_coming_soon', isPageComingSoon ? 'true' : 'false');
 
       // Final CTA Buy Box & Benefits Populating
       const fb = page.final_buy || {};
@@ -6913,7 +6924,12 @@ Instant Download & Lifetime Access
       totalPages: parseInt(document.getElementById('blp_book_pages')?.value, 10) || 120,
       version: (document.getElementById('blp_book_version')?.value || '2026').trim(),
       category: category,
-      status: document.getElementById('blp_status')?.value || 'active',
+      status: isComingSoon ? 'coming_soon' : (document.getElementById('blp_status')?.value || 'active'),
+      is_coming_soon: isComingSoon,
+      isComingSoon: isComingSoon,
+      store_badge: isComingSoon ? 'coming_soon' : storeBadge,
+      badge: isComingSoon ? 'coming_soon' : storeBadge,
+      publish_targets: publishTargets,
       facebook_pixel_id: isFbOn ? '1671873500553134' : 'disabled',
       google_analytics_id: isGaOn ? 'G-2BWPJVQWPK' : 'disabled',
       facebook_pixel_enabled: isFbOn,
@@ -7033,11 +7049,12 @@ Instant Download & Lifetime Access
       cover: finalCoverPath,
       thumbnail: finalCoverPath,
       banner: finalBannerPath,
-      status: pageData.status,
+      status: isComingSoon ? 'coming_soon' : 'active',
       publish_targets: publishTargets,
-      store_badge: storeBadge,
-      badge: storeBadge,
+      store_badge: isComingSoon ? 'coming_soon' : storeBadge,
+      badge: isComingSoon ? 'coming_soon' : storeBadge,
       isComingSoon: isComingSoon,
+      is_coming_soon: isComingSoon,
       mainPdf: finalMainPdfPath,
       pdf_url: finalMainPdfPath,
       freePdf: finalFreePdfPath,

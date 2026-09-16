@@ -660,7 +660,7 @@ async function renderLibrarySections(booksArray) {
         const bookId = book.book_id || book.id;
         const bookName = book.title || book.heading || book.name;
         const bookCover = book.cover_image || book.cover || book.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
-        const isComingSoonBook = (book.status === 'coming_soon' || book.isComingSoon === true || book.is_coming_soon === true);
+        const isComingSoonBook = (book.status === 'coming_soon' || book.isComingSoon === true || book.is_coming_soon === true || book.badge === 'coming_soon' || book.store_badge === 'coming_soon');
         const hasAudioBook = Boolean(book.hasAudioBook || book.has_audio || book.audioUrl || book.audio_layer?.enabled || book.audio_enabled || rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK015');
         const isStudioDemo = (book.type === 'demo' || book.isDemo === true || rawId.startsWith('DEMO')) && !rawId.startsWith('BONUS') && !rawId.startsWith('FREE');
         const isStudioBonus = (book.type === 'bonus_free' || book.isBonus === true || rawId.startsWith('BONUS') || rawId.startsWith('FREE')) && !rawId.startsWith('DEMO');
@@ -736,7 +736,7 @@ async function renderLibrarySections(booksArray) {
         }
 
         // 2. Available Books (All live active published main books)
-        const isLiveAgri = !isComingSoonBook && !isStudioDemo && !isStudioBonus && (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001');
+        const isLiveAgri = !isComingSoonBook && !isStudioDemo && !isStudioBonus && (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'BK015' || rawId === 'SUB001');
         if (isLiveAgri && !seenAvailableIds.has(rawId)) {
             seenAvailableIds.add(rawId);
             if (window.renderUniversalBookMarketingCard && typeof window.renderUniversalBookMarketingCard === 'function') {

@@ -356,7 +356,7 @@
     } else {
       landingUrl = book.landingPage || `/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`;
     }
-    const isLiveAgri = (bId === 'BK001' || bId === 'BK002' || bId === 'SUB001');
+    const isLiveAgri = (bId === 'BK001' || bId === 'BK002' || bId === 'BK006' || bId === 'BK015' || bId === 'SUB001');
     const isComingSoon = !isLiveAgri && (
       book.isComingSoon === true || 
       book.is_coming_soon === true || 

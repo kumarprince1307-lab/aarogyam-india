@@ -204,6 +204,8 @@
           document.getElementById('ubl-audio-section-banner-wrap') ||
           document.getElementById('preview-banner-wrap');
         if (wrap) wrap.style.display = 'none';
+      } else if (img.id === 'hero-book-cover' || img.classList.contains('hero-book-cover') || img.id === 'sticky-thumb-img') {
+        img.src = '/images/books/kharif-master-guide-2026-cover.webp';
       }
       return;
     }
@@ -223,17 +225,37 @@
     }
   };
 
+  function deepMergeSafe(target, source) {
+    if (!source || typeof source !== 'object') return target;
+    if (!target || typeof target !== 'object') return source;
+    const result = Array.isArray(target) ? [...target] : { ...target };
+    Object.keys(source).forEach(key => {
+      const sVal = source[key];
+      const tVal = target[key];
+      if (sVal === undefined || sVal === null || sVal === '') {
+        return;
+      }
+      if (typeof sVal === 'object' && !Array.isArray(sVal)) {
+        result[key] = deepMergeSafe(tVal || {}, sVal);
+      } else if (Array.isArray(sVal)) {
+        result[key] = (sVal.length > 0) ? sVal : (tVal || []);
+      } else {
+        result[key] = sVal;
+      }
+    });
+    return result;
+  }
+
   async function safeFetchJson(url) {
     const cacheTime = Date.now();
     const cleanUrl = url.replace(/^(\.\.\/|\/)+/, '');
-    const candidates = [
-      `../${cleanUrl}?v=${cacheTime}`,
-      `/${cleanUrl}?v=${cacheTime}`,
-      `${cleanUrl}?v=${cacheTime}`
-    ];
+    const isEbooksSubdir = window.location.pathname.includes('/ebooks/');
+    const candidates = isEbooksSubdir
+      ? [`../${cleanUrl}?v=${cacheTime}`, `/${cleanUrl}?v=${cacheTime}`, `${cleanUrl}?v=${cacheTime}`]
+      : [`/${cleanUrl}?v=${cacheTime}`, `${cleanUrl}?v=${cacheTime}`, `../${cleanUrl}?v=${cacheTime}`];
     for (const c of candidates) {
       try {
-        const res = await fetch(c);
+        const res = await fetch(c, { cache: 'no-cache' });
         if (res.ok) {
           return await res.json();
         }
@@ -243,11 +265,17 @@
   }
 
   async function loadBookAndLandingData() {
-    // 1. Fetch data/books.json
+    // 1. Concurrent Fetch data/books.json and data/universal-book-landing-pages.json
     try {
-      const json = await safeFetchJson('data/books.json');
-      if (json && Array.isArray(json.books)) {
-        allBooks = json.books;
+      const [booksJson, lpJson] = await Promise.all([
+        safeFetchJson('data/books.json'),
+        safeFetchJson('data/universal-book-landing-pages.json')
+      ]);
+      if (booksJson && Array.isArray(booksJson.books)) {
+        allBooks = booksJson.books;
+      }
+      if (lpJson && Array.isArray(lpJson.bookLandingPages)) {
+        allLandingPages = lpJson.bookLandingPages;
       }
     } catch (e) {}
 
@@ -258,17 +286,9 @@
         customBooks.forEach(cb => {
           if (!cb || !cb.id) return;
           const idx = allBooks.findIndex(x => x.id && x.id.toUpperCase() === cb.id.toUpperCase());
-          if (idx >= 0) allBooks[idx] = { ...allBooks[idx], ...cb };
+          if (idx >= 0) allBooks[idx] = deepMergeSafe(allBooks[idx], cb);
           else allBooks.unshift(cb);
         });
-      }
-    } catch (e) {}
-
-    // 2. Fetch data/universal-book-landing-pages.json
-    try {
-      const json = await safeFetchJson('data/universal-book-landing-pages.json');
-      if (json && Array.isArray(json.bookLandingPages)) {
-        allLandingPages = json.bookLandingPages;
       }
     } catch (e) {}
 
@@ -283,7 +303,7 @@
             const idx = allLandingPages.findIndex(p => p.id && p.id.toUpperCase() === item.id.toUpperCase());
             const jsonPage = idx >= 0 ? allLandingPages[idx] : null;
             if (!jsonPage || item.admin_edited || (item.updated_at && (!jsonPage.updated_at || new Date(item.updated_at) >= new Date(jsonPage.updated_at)))) {
-              if (idx >= 0) allLandingPages[idx] = { ...allLandingPages[idx], ...item };
+              if (idx >= 0) allLandingPages[idx] = deepMergeSafe(allLandingPages[idx], item);
               else allLandingPages.push(item);
             }
           });
@@ -635,14 +655,14 @@
 
     // 3. Header, Checkout Button URLs, Share & Sticky Sync
     const rawId = (b.id || currentBookId || 'BK001').trim().toUpperCase();
-    const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001');
+    const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'BK015' || rawId === 'SUB001');
     let isComingSoon = false;
-    if (l.is_coming_soon === false || l.is_coming_soon === 'false' || l.status === 'active') {
-      isComingSoon = false;
-    } else if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon') {
+    if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon' || l.store_badge === 'coming_soon') {
       isComingSoon = true;
+    } else if (l.is_coming_soon === false || l.is_coming_soon === 'false' || l.status === 'active') {
+      isComingSoon = false;
     } else {
-      isComingSoon = !isLiveAgri && (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true);
+      isComingSoon = !isLiveAgri && (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true || b.store_badge === 'coming_soon');
     }
 
     if (isComingSoon) {
@@ -1057,14 +1077,14 @@
       if (finalBuyBtn) {
         finalBuyBtn.style.display = 'inline-flex';
         const rawId = (b.id || currentBookId || 'BK001').trim().toUpperCase();
-        const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'SUB001');
+        const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'BK015' || rawId === 'SUB001');
         let isComingSoon = false;
-        if (l.is_coming_soon === false || l.is_coming_soon === 'false' || l.status === 'active') {
-          isComingSoon = false;
-        } else if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon') {
+        if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon' || l.store_badge === 'coming_soon') {
           isComingSoon = true;
+        } else if (l.is_coming_soon === false || l.is_coming_soon === 'false' || l.status === 'active') {
+          isComingSoon = false;
         } else {
-          isComingSoon = !isLiveAgri && (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true);
+          isComingSoon = !isLiveAgri && (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true || b.store_badge === 'coming_soon');
         }
 
         if (!isComingSoon) {

@@ -352,7 +352,7 @@ async function loadBook() {
 
         // Safety Guard: Check if Book is Coming Soon
         const bIdUpper = String(book.id || targetId || '').toUpperCase();
-        const isLiveAgri = (bIdUpper === 'BK001' || bIdUpper === 'BK002' || bIdUpper === 'SUB001');
+        const isLiveAgri = (bIdUpper === 'BK001' || bIdUpper === 'BK002' || bIdUpper === 'BK006' || bIdUpper === 'BK015' || bIdUpper === 'SUB001');
         const isBookComingSoon = !isLiveAgri && (
             book.status === 'coming_soon' || 
             book.isComingSoon === true || 

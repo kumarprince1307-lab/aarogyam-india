@@ -57,7 +57,9 @@
       },
       "publish_targets": [
         "download_funnel"
-      ]
+      ],
+      "isComingSoon": false,
+      "is_coming_soon": false
     },
     {
       "id": "BK002",
@@ -121,7 +123,9 @@
         "description": "किसान का Pocket Doctor 🌾 रोग 🦠 कीट 🐛 वायरल 🍄 फंगल और पोषक तत्वों की कमी की पहचान सीखें।",
         "keywords": "खेती का डॉक्टर, Kheti Ka Doctor, फसल डॉक्टर, Aarogyam India",
         "canonical": ""
-      }
+      },
+      "isComingSoon": false,
+      "is_coming_soon": false
     },
     {
       "id": "SUB001",
@@ -202,7 +206,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:28:35.319Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": false
     },
     {
       "id": "BK006",
@@ -224,9 +229,9 @@
         "home_page",
         "download_funnel"
       ],
-      "store_badge": "coming_soon",
-      "badge": "coming_soon",
-      "isComingSoon": true,
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
       "mainPdf": "",
       "pdf_url": "",
       "freePdf": "",
@@ -286,7 +291,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:49:03.526Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": false
     },
     {
       "id": "BK003",
@@ -300,15 +306,15 @@
       "cover": "/images/books/anaj-bhandaran-guide-cover.webp",
       "thumbnail": "/images/books/anaj-bhandaran-guide-cover.webp",
       "banner": "/images/banners/bk003-hero-banner.webp",
-      "status": "active",
+      "status": "coming_soon",
       "publish_targets": [
         "ebook_store",
         "category_page",
         "my_library",
         "home_page"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
       "isComingSoon": true,
       "mainPdf": "",
       "pdf_url": "",
@@ -367,7 +373,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:31:36.455Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": true
     },
     {
       "id": "BK004",
@@ -381,7 +388,7 @@
       "cover": "/images/books/chawal-processing-guide-cover.webp",
       "thumbnail": "/images/books/chawal-processing-guide-cover.webp",
       "banner": "/images/banners/bk004-hero-banner.webp",
-      "status": "active",
+      "status": "coming_soon",
       "publish_targets": [
         "ebook_store",
         "category_page",
@@ -449,7 +456,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:49:49.237Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": true
     },
     {
       "id": "BK005",
@@ -463,15 +471,15 @@
       "cover": "/images/books/dhan-master-guide-cover.webp",
       "thumbnail": "/images/books/dhan-master-guide-cover.webp",
       "banner": "/images/banners/bk005-hero-banner.webp",
-      "status": "active",
+      "status": "coming_soon",
       "publish_targets": [
         "ebook_store",
         "category_page",
         "my_library",
         "home_page"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
       "isComingSoon": true,
       "mainPdf": "",
       "pdf_url": "",
@@ -530,7 +538,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:32:52.293Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": true
     },
     {
       "id": "BK007",
@@ -544,7 +553,7 @@
       "cover": "/images/books/gehu-master-guide-cover.webp",
       "thumbnail": "/images/books/gehu-master-guide-cover.webp",
       "banner": "/images/banners/bk007-hero-banner.webp",
-      "status": "active",
+      "status": "coming_soon",
       "publish_targets": [
         "ebook_store",
         "category_page",
@@ -552,8 +561,8 @@
         "home_page",
         "download_funnel"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
       "isComingSoon": true,
       "mainPdf": "",
       "pdf_url": "",
@@ -612,7 +621,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:52:30.299Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": true
     },
     {
       "id": "BK008",
@@ -635,7 +645,11 @@
       "downloadLimit": 3,
       "mainPdf": "",
       "fileSize": "17.8 MB",
-      "accessType": "Lifetime"
+      "accessType": "Lifetime",
+      "isComingSoon": true,
+      "is_coming_soon": true,
+      "badge": "coming_soon",
+      "store_badge": "coming_soon"
     },
     {
       "id": "BK009",
@@ -658,7 +672,11 @@
       "downloadLimit": 3,
       "mainPdf": "",
       "fileSize": "16.5 MB",
-      "accessType": "Lifetime"
+      "accessType": "Lifetime",
+      "isComingSoon": true,
+      "is_coming_soon": true,
+      "badge": "coming_soon",
+      "store_badge": "coming_soon"
     },
     {
       "id": "BK010",
@@ -672,7 +690,7 @@
       "cover": "/images/books/phool-kheti-guide-cover.webp",
       "thumbnail": "/images/books/phool-kheti-guide-cover.webp",
       "banner": "/images/banners/bk010-hero-banner.webp",
-      "status": "active",
+      "status": "coming_soon",
       "publish_targets": [
         "ebook_store",
         "category_page",
@@ -680,8 +698,8 @@
         "home_page",
         "home_hero"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
       "isComingSoon": true,
       "mainPdf": "",
       "pdf_url": "",
@@ -740,7 +758,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:45:39.495Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": true
     },
     {
       "id": "BK011",
@@ -754,15 +773,15 @@
       "cover": "/images/books/polyhouse-nethouse-guide-cover.webp",
       "thumbnail": "/images/books/polyhouse-nethouse-guide-cover.webp",
       "banner": "/images/banners/bk011-hero-banner.webp",
-      "status": "active",
+      "status": "coming_soon",
       "publish_targets": [
         "ebook_store",
         "category_page",
         "my_library",
         "home_page"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
       "isComingSoon": true,
       "mainPdf": "",
       "pdf_url": "",
@@ -821,7 +840,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:44:15.191Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": true
     },
     {
       "id": "BK012",
@@ -835,15 +855,15 @@
       "cover": "/images/books/sabji-kheti-guide-cover.webp",
       "thumbnail": "/images/books/sabji-kheti-guide-cover.webp",
       "banner": "/images/banners/bk012-hero-banner.webp",
-      "status": "active",
+      "status": "coming_soon",
       "publish_targets": [
         "ebook_store",
         "category_page",
         "my_library",
         "home_page"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
       "isComingSoon": true,
       "mainPdf": "",
       "pdf_url": "",
@@ -902,7 +922,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:40:22.068Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": true
     },
     {
       "id": "BK015",
@@ -996,7 +1017,8 @@
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-09-16T18:25:12.768Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "is_coming_soon": false
     }
   ]
 }
