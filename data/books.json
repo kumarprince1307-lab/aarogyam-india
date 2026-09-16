@@ -386,7 +386,8 @@
         "ebook_store",
         "category_page",
         "my_library",
-        "home_page"
+        "home_page",
+        "download_funnel"
       ],
       "store_badge": "coming_soon",
       "badge": "coming_soon",
@@ -447,7 +448,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK004",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:47:00.238Z",
+      "updated_at": "2026-09-16T18:49:49.237Z",
       "admin_edited": true
     },
     {
