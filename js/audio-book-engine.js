@@ -415,16 +415,7 @@ class ProAudioBookEngine {
         const pageKey = String(effectivePage);
         const pageEntry = this.pageScripts[pageKey] || this.pageScripts[String(currentPage)];
 
-        // 2. Play Welcome Greeting Once on First Start
-        if (!this.welcomePlayed) {
-            this.welcomePlayed = true;
-            const welcomeText = `${this.userName} जी, आरोग्यम इंडिया डिजिटल लाइब्रेरी में आपका स्वागत है। आइए अध्ययन शुरू करते हैं।`;
-            this.updateStatusDisplay(`🌸 ${this.userName} जी, स्वागत है!`);
-            this.speakText(welcomeText, currentPage, true);
-            return;
-        }
-
-        // 3. Check Page Script or Recorded Audio
+        // 2. Direct page text or recorded audio playback
         let pageText = '';
         let pageAudio = '';
 
@@ -501,22 +492,17 @@ class ProAudioBookEngine {
 
         const currentEpoch = ++this.activeEpoch;
         this.isPlaying = true;
+        this.isPaused = false;
         this.setPlayingState(true);
         this.requestWakeLock();
+        this.updateMediaSessionMetadata();
+
         try {
             if (this.silentKeepAliveAudio) this.silentKeepAliveAudio.play().catch(() => {});
         } catch(e) {}
 
         const onAllChunksFinished = () => {
             if (!this.isPlaying || this.activeEpoch !== currentEpoch) return;
-            if (isWelcome) {
-                const t = setTimeout(() => {
-                    if (this.isPlaying && this.activeEpoch === currentEpoch) this.playCurrentPage();
-                }, 300);
-                this.activeTimers.push(t);
-                return;
-            }
-
             this.handleTrackEnded();
         };
 
@@ -545,48 +531,37 @@ class ProAudioBookEngine {
                 playNextChunk();
             };
 
-            // Attempt Genuine HTML5 MP3 Stream First (keeps playing in background & lock screen)
-            try {
-                if (!this.ttsAudio) this.ttsAudio = new Audio();
-                const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&q=${encodeURIComponent(currentChunk)}`;
-                this.ttsAudio.src = ttsUrl;
-                this.ttsAudio.playbackRate = this.playbackRate;
-                this.ttsAudio.volume = this.isMuted ? 0 : this.volume;
-                
-                this.ttsAudio.onended = () => advance();
-                this.ttsAudio.onerror = () => {
-                    playViaSynthFallback();
-                };
+            if (this.synth) {
+                try {
+                    this.synth.cancel();
+                    const ut = new SpeechSynthesisUtterance(currentChunk);
+                    ut.lang = 'hi-IN';
+                    ut.pitch = 1.0;
+                    ut.rate = 0.95 * (this.playbackRate || 1.0);
+                    ut.volume = this.isMuted ? 0 : (this.volume || 1.0);
 
-                const playPromise = this.ttsAudio.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(() => {
-                        playViaSynthFallback();
-                    });
-                }
-                return;
-            } catch(e) {
-                playViaSynthFallback();
-            }
-
-            function playViaSynthFallback() {
-                if (window.aoiAudioBookEngine?.synth) {
-                    try {
-                        const ut = new SpeechSynthesisUtterance(currentChunk);
-                        ut.lang = 'hi-IN';
-                        ut.pitch = 1.0;
-                        ut.rate = 1.0 * (window.aoiAudioBookEngine.playbackRate || 1.0);
-                        ut.volume = window.aoiAudioBookEngine.isMuted ? 0 : (window.aoiAudioBookEngine.volume || 1.0);
-
-                        ut.onend = () => advance();
-                        ut.onerror = () => advance();
-                        window.aoiAudioBookEngine.synth.speak(ut);
-                    } catch(err) {
-                        advance();
+                    if (this.femaleVoice) {
+                        ut.voice = this.femaleVoice;
                     }
-                } else {
+
+                    ut.onend = () => {
+                        advance();
+                    };
+
+                    ut.onerror = (e) => {
+                        if (e && e.error !== 'canceled' && e.error !== 'interrupted') {
+                            console.warn("Speech error:", e);
+                        }
+                        advance();
+                    };
+
+                    this.synth.speak(ut);
+                } catch(err) {
+                    console.warn("Synth speak error:", err);
                     advance();
                 }
+            } else {
+                advance();
             }
         };
 
@@ -623,16 +598,9 @@ class ProAudioBookEngine {
     }
 
     pause() {
-        if (!this.audioElement.paused) {
-            this.audioElement.pause();
-        }
-        if (this.synth && this.synth.speaking) {
-            this.synth.pause();
-        }
-        if (this.silentKeepAliveAudio) {
-            try { this.silentKeepAliveAudio.pause(); } catch(e) {}
-        }
+        this.stopAudioSources();
         this.isPaused = true;
+        this.isPlaying = false;
         this.setPlayingState(false);
         this.updateStatusDisplay(`⏸️ ऑडियो रुका हुआ है`);
         this.releaseWakeLock();
@@ -642,6 +610,7 @@ class ProAudioBookEngine {
         this.stopAudioSources();
         this.bgm.stop();
         this.isPaused = false;
+        this.isPlaying = false;
         this.setPlayingState(false);
         this.updateStatusDisplay(`⏹️ ऑडियो बंद है`);
         this.updateProgressBar(0, 100);
