@@ -675,7 +675,7 @@
       "theme_primary": "#dc2626",
       "theme_dark": "#9c0000",
       "cover_effect": "3d_float",
-      "sticky_button_text": "BY NOW",
+      "sticky_button_text": "Buy Now",
       "sections_order": [
         "sec_hero",
         "sec_timer",

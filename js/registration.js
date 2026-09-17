@@ -273,6 +273,9 @@ async function lookupReferrerName(identifier) {
                 .from("profiles")
                 .select("id, full_name, share_id, mobile")
                 .eq("mobile", cleanId)
+                .order("is_active", { ascending: false })
+                .order("created_at", { ascending: false })
+                .limit(1)
                 .maybeSingle();
             data = res.data;
         } 
@@ -283,6 +286,9 @@ async function lookupReferrerName(identifier) {
                 .from("profiles")
                 .select("id, full_name, share_id, mobile")
                 .ilike("share_id", cleanId)
+                .order("is_active", { ascending: false })
+                .order("created_at", { ascending: false })
+                .limit(1)
                 .maybeSingle();
             data = res.data;
         }

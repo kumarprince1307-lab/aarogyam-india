@@ -2294,159 +2294,346 @@ section{
     MOBILE STICKY BAR
 ================================ */
 
-.mobile-sticky-bar{
-    position:fixed;
-    left:0;
-    bottom:0;
-    width:100%;
-    background:#ffffff;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:8px 10px;
-    box-shadow:0 -4px 20px rgba(0,0,0,.15);
-    z-index:9999;
-    box-sizing:border-box;
-    gap:6px;
+/* ==========================================================
+   CLEAN RESPONSIVE STICKY HEADER
+========================================================== */
+/* ==========================================================
+   CLEAN RESPONSIVE FIXED HEADER (GUARANTEED STICKY)
+========================================================== */
+body {
+    padding-top: 52px !important;
 }
 
-.sticky-help-btn{
-    min-width:68px;
-    height:44px;
-    padding:0 8px;
-    border-radius:10px;
-    background:#0284c7;
-    color:#fff;
-    font-size:0.8rem;
-    font-weight:800;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-decoration:none;
-    flex-shrink:0;
-    white-space:nowrap;
-    box-shadow:0 2px 8px rgba(2,132,199,0.3);
+.library-header {
+    background: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+    padding: 8px 12px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 10000 !important;
+    height: 52px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
 }
 
-.mobile-book-preview{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    flex:1;
-    min-width:0;
-    margin:0 2px;
+.header-logo-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
 }
 
-.mobile-book-preview img{
-    width:36px;
-    height:48px;
-    border-radius:6px;
-    object-fit:cover;
-    flex-shrink:0;
+.header-logo-title .site-logo {
+    height: 30px !important;
+    width: auto !important;
+    display: block !important;
+    flex-shrink: 0 !important;
 }
 
-.mobile-book-info{
-    min-width:0;
-    overflow:hidden;
+#header-book-title {
+    font-size: 0.94rem !important;
+    font-weight: 800 !important;
+    color: #1e293b !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 230px !important;
 }
 
-.mobile-book-info h4{
-    font-size:0.75rem;
-    margin:0;
-    line-height:1.2;
-    color:#1e293b;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    font-weight:800;
+.header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
 }
 
-.mobile-book-price{
-    margin-top:2px;
-    font-size:0.8rem;
-    white-space:nowrap;
+.header-cart-icon {
+    position: relative !important;
+    width: 36px !important;
+    height: 36px !important;
+    background: rgba(37, 99, 235, 0.08) !important;
+    color: #2563eb !important;
+    border: 1.5px solid #2563eb !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    font-size: 1.05rem !important;
 }
 
-.old-price{
-
-    color:#888;
-
-    text-decoration:line-through;
-
-    margin-right:6px;
-
-    font-size:12px;
-
+.header-cart-badge {
+    position: absolute !important;
+    top: -3px !important;
+    right: -3px !important;
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    border-radius: 50% !important;
+    font-size: 0.65rem !important;
+    font-weight: 800 !important;
+    padding: 2px 5px !important;
+    min-width: 14px !important;
+    text-align: center !important;
+    line-height: 1 !important;
 }
 
-.offer-price{
-
-    color:#e65100;
-
-    font-size:16px;
-
-    font-weight:700;
-
+.library-header .menu-btn {
+    width: 36px !important;
+    height: 36px !important;
+    background: #2E7D32 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 1.05rem !important;
 }
 
-/* ===============================
-        SHARE BUTTON
-================================ */
-
-.sticky-share-btn{
-
-    width:85px;
-
-    height:52px;
-
-    border:none;
-
-    border-radius:12px;
-
-    background:#1565c0;
-
-    color:#fff;
-
-    font-size:15px;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    flex-shrink:0;
-
+/* ==========================================================
+   FLOATING FREE DEMO READ BUTTON (RED-GREEN BLINKING)
+========================================================== */
+@keyframes redGreenPulseBlink {
+    0%, 100% {
+        background: linear-gradient(135deg, #16a34a, #15803d) !important;
+        box-shadow: 0 4px 14px rgba(22, 163, 74, 0.65), 0 0 10px rgba(22, 163, 74, 0.4) !important;
+        transform: scale(1);
+    }
+    50% {
+        background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+        box-shadow: 0 4px 14px rgba(220, 38, 38, 0.65), 0 0 10px rgba(220, 38, 38, 0.4) !important;
+        transform: scale(1.04);
+    }
 }
 
-/* ===============================
-        BUY BUTTON
-================================ */
+.floating-demo-blink-btn {
+    position: fixed !important;
+    bottom: 122px !important;
+    right: 12px !important;
+    z-index: 9998 !important;
+    padding: 7px 12px !important;
+    border-radius: 30px !important;
+    color: #ffffff !important;
+    font-size: 0.75rem !important;
+    font-weight: 900 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    text-decoration: none !important;
+    animation: redGreenPulseBlink 1.8s infinite ease-in-out !important;
+    white-space: nowrap !important;
+    border: 1.5px solid #ffffff !important;
+    cursor: pointer !important;
+}
 
-.sticky-buy-btn{
+/* ==========================================================
+   FLOATING WHATSAPP HELP BUTTON (ABOVE BUY NOW)
+========================================================== */
+.floating-wa-help-btn {
+    position: fixed !important;
+    bottom: 68px !important;
+    right: 12px !important;
+    z-index: 9998 !important;
+    width: 44px !important;
+    height: 44px !important;
+    background: #25D366 !important;
+    color: #ffffff !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 24px !important;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45) !important;
+    text-decoration: none !important;
+    transition: transform 0.2s ease !important;
+}
 
-    width:100px;
+.floating-wa-help-btn:active {
+    transform: scale(0.92) !important;
+}
 
-    height:52px;
+.floating-wa-tooltip {
+    position: absolute !important;
+    right: 50px !important;
+    background: rgba(15, 23, 42, 0.92) !important;
+    color: #ffffff !important;
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    pointer-events: none !important;
+}
 
-    border-radius:12px;
+/* ==========================================================
+   STREAMLINED MOBILE STICKY BAR
+   ORDER: THUMBNAIL | MRP (BLACK BOLD KATA HUA) + OFFER PRICE | BUY NOW | SHARE
+========================================================== */
+.mobile-sticky-bar {
+    position: fixed !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 6px 10px !important;
+    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.12) !important;
+    z-index: 9997 !important;
+    box-sizing: border-box !important;
+    gap: 6px !important;
+    height: 56px !important;
+}
 
-    background:#ff8a00;
+.sticky-thumb-img {
+    width: 32px !important;
+    height: 44px !important;
+    border-radius: 4px !important;
+    object-fit: cover !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15) !important;
+    flex-shrink: 0 !important;
+    display: block !important;
+}
 
-    color:#fff;
+.mobile-book-preview {
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    flex-shrink: 0 !important;
+    min-width: 0 !important;
+}
 
-    font-size:15px;
+.mobile-book-price {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: baseline !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
+}
 
-    font-weight:700;
+.old-price {
+    font-size: 11.5px !important;
+    color: #000000 !important; /* Bold black strikethrough as requested */
+    text-decoration: line-through !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
 
-    display:flex;
+.offer-price {
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    color: #e65100 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.3px !important;
+}
 
-    align-items:center;
+/* BUY NOW JUST BAGAL MEIN (BALANCED, NOT OVERLY LONG) */
+.sticky-buy-btn {
+    flex: 1 !important;
+    max-width: 125px !important;
+    min-width: 90px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #ff7a00, #ff5100) !important;
+    color: #ffffff !important;
+    font-size: 13.5px !important;
+    font-weight: 900 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 12px rgba(255, 81, 0, 0.35) !important;
+    white-space: nowrap !important;
+    padding: 0 6px !important;
+}
 
-    justify-content:center;
+/* SHARE BUTTON USKE BAAD */
+.sticky-share-btn {
+    width: 68px !important;
+    height: 42px !important;
+    border-radius: 8px !important;
+    background: #1565c0 !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    border: none !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    box-shadow: 0 2px 8px rgba(21, 101, 192, 0.25) !important;
+    white-space: nowrap !important;
+    padding: 0 6px !important;
+}
 
-    text-decoration:none;
+/* COMPACT LEFT AUDIO PILL */
+.aoi-compact-audio-pill {
+    position: fixed !important;
+    bottom: 68px !important;
+    left: 10px !important;
+    right: auto !important;
+    max-width: 180px !important;
+    width: auto !important;
+    z-index: 9998 !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1.5px solid #fbbf24 !important;
+    border-radius: 30px !important;
+    padding: 4px 8px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35) !important;
+    display: none;
+    align-items: center !important;
+    gap: 5px !important;
+    box-sizing: border-box !important;
+}
 
-    flex-shrink:0;
+.aoi-audio-pill-label {
+    color: #fef08a !important;
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+}
 
+.aoi-audio-pill-pause {
+    background: #f59e0b !important;
+    color: #000000 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 8px !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+}
+
+.aoi-audio-pill-close {
+    background: transparent !important;
+    color: #cbd5e1 !important;
+    border: none !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    padding: 0 1px !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
 }
 
 /* ===============================
@@ -3128,14 +3315,17 @@ section{
    STICKY HEADER & ICONS & SHARE SYSTEM POLISH
    ========================================================== */
 .library-header {
-  position: sticky !important;
+  position: fixed !important;
   top: 0 !important;
   left: 0 !important;
+  right: 0 !important;
   width: 100% !important;
-  z-index: 99999 !important;
+  z-index: 100000 !important;
   background: #ffffff !important;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
   border-bottom: 1px solid #e2e8f0 !important;
+  height: 52px !important;
+  box-sizing: border-box !important;
 }
 
 /* Why Icon and Feature Badge Icon Rendering Fix */
@@ -3162,21 +3352,6 @@ section{
 @media (max-width: 768px) {
   .desktop-share-bar {
     display: none !important;
-  }
-  .mobile-sticky-bar {
-    display: flex !important;
-    position: fixed !important;
-    left: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    background: #ffffff !important;
-    padding: 8px 12px !important;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.15) !important;
-    z-index: 99999 !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 8px !important;
-    box-sizing: border-box !important;
   }
 }
 
@@ -3525,13 +3700,18 @@ section{
    RESPONSIVE ENHANCEMENTS FOR MOBILE & DESKTOP ALIGNMENT
    ========================================================== */
 @media (max-width: 768px) {
-    #aoi-floating-audio-pill {
-        bottom: 80px !important;
-        right: 10px !important;
-        padding: 6px 12px !important;
-        font-size: 0.75rem !important;
+    #aoi-floating-audio-pill,
+    .aoi-compact-audio-pill {
+        bottom: 66px !important;
+        left: 10px !important;
+        right: auto !important;
+        max-width: 160px !important;
+        width: auto !important;
+        padding: 4px 8px !important;
+        font-size: 0.72rem !important;
         border-radius: 30px !important;
-        gap: 6px !important;
+        gap: 5px !important;
+        box-sizing: border-box !important;
     }
     .hero-action-buttons a,
     .hero-action-buttons button {

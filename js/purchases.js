@@ -96,10 +96,14 @@ async function fetchUserPurchases() {
             try {
                 // If user doesn't have an ID but has mobile, fetch profile from Supabase first
                 if (!user.id && user.mobile) {
+                    const cleanMobile = String(user.mobile).replace(/\D/g, '').slice(-10);
                     const { data: prof } = await client
                         .from('profiles')
                         .select('id, full_name, mobile, share_id, netsurf_id')
-                        .eq('mobile', user.mobile)
+                        .eq('mobile', cleanMobile)
+                        .order('is_active', { ascending: false })
+                        .order('created_at', { ascending: false })
+                        .limit(1)
                         .maybeSingle();
 
                     if (prof && prof.id) {

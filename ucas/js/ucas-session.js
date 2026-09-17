@@ -101,10 +101,14 @@
         return { success: false, message: 'डेटाबेस कनेक्शन उपलब्ध नहीं है।' };
       }
 
+      const cleanMobile = String(mobileNumber).replace(/\D/g, '').slice(-10);
       const { data, error } = await activeDb
         .from('profiles')
         .select('*')
-        .eq('mobile', mobileNumber)
+        .eq('mobile', cleanMobile)
+        .order('is_active', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (error) throw error;

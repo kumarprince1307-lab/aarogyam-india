@@ -417,21 +417,50 @@
   }
 
   async function safeFetchJson(url) {
-    const cacheTime = Date.now();
     const cleanUrl = url.replace(/^(\.\.\/|\/)+/, '');
     const isEbooksSubdir = window.location.pathname.includes('/ebooks/');
-    const candidates = isEbooksSubdir
-      ? [`../${cleanUrl}?v=${cacheTime}`, `/${cleanUrl}?v=${cacheTime}`, `${cleanUrl}?v=${cacheTime}`]
-      : [`/${cleanUrl}?v=${cacheTime}`, `${cleanUrl}?v=${cacheTime}`, `../${cleanUrl}?v=${cacheTime}`];
+    const primaryPath = isEbooksSubdir ? `../${cleanUrl}` : `/${cleanUrl}`;
+    const fallbackPath = isEbooksSubdir ? `/${cleanUrl}` : `../${cleanUrl}`;
+    const cacheKey = 'AIM_UBL_CACHE_' + cleanUrl.replace(/[^a-zA-Z0-9]/g, '_');
+
+    // 1. Instant Cache: If present in sessionStorage, return immediately (0ms paint!)
+    let cachedData = null;
+    try {
+      const stored = sessionStorage.getItem(cacheKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.data) {
+          cachedData = parsed.data;
+          // If cached less than 5 minutes ago, return right away
+          if (Date.now() - (parsed.time || 0) < 300000) {
+            return cachedData;
+          }
+        }
+      }
+    } catch (e) {}
+
+    // 2. Fetch fresh with 5-minute version tag instead of millisecond bypass
+    const versionTag = Math.floor(Date.now() / 300000);
+    const candidates = [
+      `${primaryPath}?v=${versionTag}`,
+      `${fallbackPath}?v=${versionTag}`
+    ];
+
     for (const c of candidates) {
       try {
-        const res = await fetch(c, { cache: 'no-cache' });
+        const res = await fetch(c);
         if (res.ok) {
-          return await res.json();
+          const freshData = await res.json();
+          try {
+            sessionStorage.setItem(cacheKey, JSON.stringify({ data: freshData, time: Date.now() }));
+          } catch (storageErr) {}
+          return freshData;
         }
       } catch (e) {}
     }
-    return null;
+
+    // If network fails (offline / low signal), return stale cache if available
+    return cachedData;
   }
 
   async function loadBookAndLandingData() {
@@ -983,11 +1012,15 @@
 
       const stickyHelp = document.getElementById('sticky-help-btn');
       if (stickyHelp) {
-        stickyHelp.href = 'javascript:void(0)';
-        stickyHelp.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(); };
-        stickyHelp.innerHTML = `📖 Free Demo`;
-        stickyHelp.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
-        stickyHelp.style.color = '#ffffff';
+        if (!stickyHelp.classList.contains('floating-wa-help-btn')) {
+          stickyHelp.href = 'javascript:void(0)';
+          stickyHelp.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(); };
+          stickyHelp.innerHTML = `📖 Free Demo`;
+          stickyHelp.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
+          stickyHelp.style.color = '#ffffff';
+        } else {
+          stickyHelp.href = `https://wa.me/917974422572?text=${encodeURIComponent('Hello Aarogyam India Team, mujhe ' + title + ' book ke bare me jankari chahiye')}`;
+        }
       }
 
       // Set Dedicated Demo Landing Page URLs with active Book ID
@@ -1996,7 +2029,9 @@
 
     if (buyBtn) {
       buyBtn.href = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
-      if (l.sticky_button_text) buyBtn.innerHTML = `🛒 ${escapeHtml(l.sticky_button_text)}`;
+      let btnLabel = l.sticky_button_text || 'Buy Now';
+      if (btnLabel.toLowerCase().includes('by now')) btnLabel = 'Buy Now';
+      buyBtn.innerHTML = `🛒 ${escapeHtml(btnLabel)}`;
       if (l.theme_primary) buyBtn.style.background = l.theme_primary;
     }
   }

@@ -142,11 +142,23 @@ const db = window.dbClient;
    ENGINE 1: VALIDATION & REGISTRATION FUNCTIONS
 =========================================================== */
 async function isMobileRegistered(mobile) {
+    if (!mobile) return null;
+    const cleanMobile = String(mobile).replace(/\D/g, '').slice(-10);
+    if (!cleanMobile || cleanMobile.length < 10) return null;
+
     try {
-        const { data, error } = await db
+        const client = window.dbClient || window.supabase || db;
+        if (!client) {
+            console.error("Mobile Check Error : DB client not ready");
+            return null;
+        }
+        const { data, error } = await client
             .from("profiles")
             .select("*")
-            .eq("mobile", mobile)
+            .eq("mobile", cleanMobile)
+            .order("is_active", { ascending: false })
+            .order("created_at", { ascending: false })
+            .limit(1)
             .maybeSingle();
         if (error) throw error;
         return data;
@@ -158,11 +170,16 @@ async function isMobileRegistered(mobile) {
 
 async function isEmailRegistered(email) {
     if (!email) return false;
+    const cleanEmail = String(email).trim().toLowerCase();
     try {
-        const { data, error } = await db
+        const client = window.dbClient || window.supabase || db;
+        if (!client) return null;
+        const { data, error } = await client
             .from("profiles")
             .select("id,email")
-            .eq("email", email)
+            .eq("email", cleanEmail)
+            .order("created_at", { ascending: false })
+            .limit(1)
             .maybeSingle();
         if (error) throw error;
         return data;
@@ -236,11 +253,23 @@ async function createUserProfile(userData) {
         // प्रत्येक नए यूजर की अपनी यूनिक Share ID होगी (ताकि Postgres UNIQUE constraint "profiles_share_id_idx" वायलेट न हो)
         const userUniqueShareId = "AI" + Math.floor(100000 + Math.random() * 900000);
 
-        const { data, error } = await db
+        const cleanMobile = String(userData.mobile || '').replace(/\D/g, '').slice(-10);
+        if (cleanMobile && cleanMobile.length === 10) {
+            const alreadyExists = await isMobileRegistered(cleanMobile);
+            if (alreadyExists) {
+                console.log("ℹ️ Profile already exists for mobile:", cleanMobile, "- Reusing profile ID:", alreadyExists.id);
+                return alreadyExists;
+            }
+        }
+
+        const activeDb = window.dbClient || window.supabase || db;
+        if (!activeDb) throw new Error("Database client not available");
+
+        const { data, error } = await activeDb
             .from("profiles")
             .insert([{
                 full_name: userData.fullName || userData.name,
-                mobile: userData.mobile,
+                mobile: cleanMobile || userData.mobile,
                 email: userData.email || null,
                 gender: userData.gender || null,
                 State: userData.state || userData.State || null,
@@ -314,42 +343,64 @@ function createLoginSession(profile) {
     return session;
 }
 
+const _registrationInFlight = new Map();
+
 async function registerUser(formData) {
-    try {
-        const attribution = resolveProfileAttribution(formData);
-        const registrationPayload = {
-            ...formData,
-            source: attribution.source,
-            referralCode: formData.referralCode || attribution.shareToken,
-            referralMobile: formData.referralMobile || attribution.referralCode,
-            referred_by: formData.referred_by || null,
-            shareToken: attribution.shareToken,
-            shareChannel: attribution.shareChannel
-        };
+    const rawMobile = formData ? (formData.mobile || '') : '';
+    const cleanMobile = String(rawMobile).replace(/\D/g, '').slice(-10);
 
-        const existingUser = await isMobileRegistered(registrationPayload.mobile);
-        if (existingUser) {
-            createLoginSession(existingUser);
-            return { success: true, type: "existing", profile: existingUser };
-        }
-
-        if (registrationPayload.email) {
-            const emailExists = await isEmailRegistered(registrationPayload.email);
-            if (emailExists) {
-                return { success: false, message: "This email address is already registered." };
-            }
-        }
-
-        const profile = await createUserProfile(registrationPayload);
-        if (!profile) {
-            return { success: false, message: "Profile creation failed. Please try again." };
-        }
-        createLoginSession(profile);
-        return { success: true, type: "new", profile: profile };
-    } catch (error) {
-        console.error(error);
-        return { success: false, message: error.message };
+    if (cleanMobile && cleanMobile.length === 10 && _registrationInFlight.has(cleanMobile)) {
+        console.warn("⏳ Registration already in progress for:", cleanMobile, "- Reusing pending request");
+        return _registrationInFlight.get(cleanMobile);
     }
+
+    const regPromise = (async () => {
+        try {
+            const attribution = resolveProfileAttribution(formData);
+            const registrationPayload = {
+                ...formData,
+                mobile: cleanMobile || formData.mobile,
+                source: attribution.source,
+                referralCode: formData.referralCode || attribution.shareToken,
+                referralMobile: formData.referralMobile || attribution.referralCode,
+                referred_by: formData.referred_by || null,
+                shareToken: attribution.shareToken,
+                shareChannel: attribution.shareChannel
+            };
+
+            const existingUser = await isMobileRegistered(registrationPayload.mobile);
+            if (existingUser) {
+                createLoginSession(existingUser);
+                return { success: true, type: "existing", profile: existingUser };
+            }
+
+            if (registrationPayload.email) {
+                const emailExists = await isEmailRegistered(registrationPayload.email);
+                if (emailExists) {
+                    return { success: false, message: "This email address is already registered." };
+                }
+            }
+
+            const profile = await createUserProfile(registrationPayload);
+            if (!profile) {
+                return { success: false, message: "Profile creation failed. Please try again." };
+            }
+            createLoginSession(profile);
+            return { success: true, type: "new", profile: profile };
+        } catch (error) {
+            console.error("registerUser Error:", error);
+            return { success: false, message: error.message };
+        }
+    })();
+
+    if (cleanMobile && cleanMobile.length === 10) {
+        _registrationInFlight.set(cleanMobile, regPromise);
+        regPromise.finally(() => {
+            setTimeout(() => _registrationInFlight.delete(cleanMobile), 2000);
+        });
+    }
+
+    return regPromise;
 }
 
 function isLoggedIn() {
