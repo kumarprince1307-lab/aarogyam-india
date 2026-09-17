@@ -928,12 +928,15 @@
     {
       "id": "BK015",
       "slug": "bk015",
+      "book_type": "paid",
+      "audience": "all",
+      "target_main_books": [],
       "heading": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "name": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "category": "Agriculture",
       "language": "Hindi",
       "mrp": 1999,
-      "offerPrice": 149,
+      "offerPrice": 99,
       "cover": "/images/books/bk015-cover.webp",
       "thumbnail": "/images/books/bk015-cover.webp",
       "banner": "/images/banners/bk015-hero-banner.webp",
@@ -948,6 +951,7 @@
       "store_badge": "best_seller",
       "badge": "best_seller",
       "isComingSoon": false,
+      "is_coming_soon": false,
       "mainPdf": "/pdf/full/BK015.pdf",
       "pdf_url": "/pdf/full/BK015.pdf",
       "freePdf": "",
@@ -1016,9 +1020,8 @@
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:25:12.768Z",
-      "admin_edited": true,
-      "is_coming_soon": false
+      "updated_at": "2026-09-17T14:35:57.582Z",
+      "admin_edited": true
     },
     {
       "id": "DEMO-BK015",
