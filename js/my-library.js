@@ -1701,6 +1701,16 @@ function initLibraryAudioGuide() {
         }
     }
 
+    window.toggleLibraryAudioGuide = function(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        toggleGuide();
+    };
+    window.speakLibraryAudioGuide = speakGuide;
+    window.stopLibraryAudioGuide = stopGuide;
+
     // Connect Header Pill Button
     if (headerBtn) {
         headerBtn.addEventListener('click', (e) => {
@@ -1735,11 +1745,25 @@ function initLibraryAudioGuide() {
             if (guideBar) guideBar.style.display = 'none';
         });
     }
-}
 
     if (synth && synth.onvoiceschanged !== undefined) {
         synth.onvoiceschanged = () => {};
     }
+
+    // Auto-attempt playback on load with fallback on first touch/click
+    setTimeout(() => {
+        try {
+            speakGuide();
+        } catch(e) {}
+    }, 600);
+
+    const triggerAutoAudioOnFirstGesture = () => {
+        if (!isPlaying) {
+            speakGuide();
+        }
+    };
+    window.addEventListener('click', triggerAutoAudioOnFirstGesture, { once: true });
+    window.addEventListener('touchstart', triggerAutoAudioOnFirstGesture, { once: true });
 }
 
 // =========================================================================
