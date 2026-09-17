@@ -847,8 +847,9 @@ async function renderBusinessFunnel() {
                     const baseId = getBaseBookId(rawId);
                     
                     if (!baseId) continue;
-                    // Exclude demos, subscriptions, coming-soon, inactive
-                    if (rawId.startsWith('DEMO') || b.book_type === 'demo' || b.is_demo === true) continue;
+                    const isDemo = rawId.startsWith('DEMO') || b.book_type === 'demo' || b.is_demo === true || b.isDemo === true;
+
+                    // Exclude subscriptions, coming-soon, inactive
                     if (baseId.startsWith('SUB') || (b.category || '').toLowerCase().includes('subscri')) continue;
                     if (b.status === 'coming_soon' || b.is_coming_soon === true || b.is_coming_soon === 'true' || b.store_badge === 'coming_soon') continue;
                     if (b.status && b.status !== 'active') continue;
@@ -866,11 +867,12 @@ async function renderBusinessFunnel() {
                         id: b.id || b.book_id,
                         name: cleanBookTitle(b.heading || b.name || b.id),
                         category: b.category || 'Agriculture',
-                        offerPrice: b.offerPrice || 99,
+                        offerPrice: isDemo ? 0 : (b.offerPrice || 99),
                         mrp: b.mrp || 299,
                         cover: b.cover || b.thumbnail || `/images/books/${(b.id || 'bk001').toLowerCase()}-cover.webp`,
-                        link: b.landingPage || `/ebooks/book-landing.html?id=${b.id}`,
-                        pitch: b.description || 'वैज्ञानिक एवं प्रैक्टिकल कृषि समाधान।'
+                        link: b.landingPage || (isDemo ? `/demo/demo-${baseId.toLowerCase()}.html` : `/ebooks/book-landing.html?id=${b.id}`),
+                        pitch: b.description || (isDemo ? 'फ्री डेमो ई-बुक — मुख्य अध्यायों का निःशुल्क पूर्वावलोकन करें।' : 'वैज्ञानिक एवं प्रैक्टिकल कृषि समाधान।'),
+                        isDemo: isDemo
                     });
                 }
             }
@@ -887,7 +889,7 @@ async function renderBusinessFunnel() {
             if (!baseId || baseId === currentBaseId || b.id === rawCurrentId) continue;
             if (seenIds.has(baseId)) continue;
             seenIds.add(baseId);
-            allBooks.push(b);
+            allBooks.push({ ...b, isDemo: false });
         }
     }
 
@@ -926,25 +928,36 @@ async function renderBusinessFunnel() {
     grid.innerHTML = funnelBooks.map(b => {
         const cleanName = cleanBookTitle(b.name);
         const pitchText = b.pitch ? b.pitch.substring(0, 85) + '...' : 'सम्पूर्ण वैज्ञानिक व प्रैक्टिकल गाइड।';
+        const isDemo = !!b.isDemo;
+
+        const badgeHtml = isDemo 
+            ? `<span class="funnel-badge-demo" style="font-size:0.68rem;background:linear-gradient(135deg, rgba(16,185,129,0.28), rgba(5,150,105,0.4));color:#34d399;border:1px solid rgba(52,211,153,0.6);padding:2px 8px;border-radius:4px;font-weight:800;margin-left:auto;letter-spacing:0.3px;box-shadow:0 0 8px rgba(52,211,153,0.25);">🎁 Free Demo Book</span>`
+            : `<span style="font-size:0.68rem;background:rgba(245,158,11,0.22);color:#fbbf24;border:1px solid rgba(245,158,11,0.4);padding:2px 7px;border-radius:4px;font-weight:800;margin-left:auto;">बेस्टसेलर</span>`;
+
+        const priceHtml = isDemo
+            ? `<span class="funnel-offer-price" style="color:#34d399;font-weight:900;">Free Demo</span><span class="funnel-mrp-price">₹${b.mrp || 299}</span>`
+            : `<span class="funnel-offer-price">₹${b.offerPrice}</span><span class="funnel-mrp-price">₹${b.mrp}</span>`;
+
+        const buyBtnHtml = isDemo
+            ? `<a href="${b.link}" class="funnel-btn-buy" title="फ्री डेमो ई-बुक पढ़ें" style="background:linear-gradient(135deg, #059669, #10b981);"><span>डेमो पढ़ें</span> <i class="fa-solid fa-arrow-right" style="font-size:0.75rem;margin-left:4px;"></i></a>`
+            : `<a href="${b.link}" class="funnel-btn-buy" title="इस गाइड के बारे में जानें"><span>देखें</span> <i class="fa-solid fa-arrow-right" style="font-size:0.75rem;margin-left:4px;"></i></a>`;
+
         return `
-            <div class="funnel-book-card">
+            <div class="funnel-book-card ${isDemo ? 'funnel-card-demo' : ''}">
                 <div>
                     <img src="${b.cover}" alt="${cleanName}" class="funnel-book-cover" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'">
                     <h4 class="funnel-book-title">${cleanName}</h4>
                     <p style="font-size:0.8rem;color:#cbd5e1;line-height:1.45;margin-bottom:10px;min-height:36px;">${pitchText}</p>
                     <div class="funnel-book-price-row">
-                        <span class="funnel-offer-price">₹${b.offerPrice}</span>
-                        <span class="funnel-mrp-price">₹${b.mrp}</span>
-                        <span style="font-size:0.68rem;background:rgba(245,158,11,0.22);color:#fbbf24;border:1px solid rgba(245,158,11,0.4);padding:2px 7px;border-radius:4px;font-weight:800;margin-left:auto;">बेस्टसेलर</span>
+                        ${priceHtml}
+                        ${badgeHtml}
                     </div>
                 </div>
                 <div class="funnel-btn-group">
                     <button type="button" class="funnel-btn-audio" onclick="window.playFunnelBookAudio('${cleanName}', '${b.id}')" title="ऑडियो सैंपल सुनें">
                         <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
                     </button>
-                    <a href="${b.link}" class="funnel-btn-buy" title="इस गाइड के बारे में जानें">
-                        <span>देखें</span> <i class="fa-solid fa-arrow-right" style="font-size:0.75rem;margin-left:4px;"></i>
-                    </a>
+                    ${buyBtnHtml}
                 </div>
             </div>
         `;

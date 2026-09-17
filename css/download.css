@@ -1147,6 +1147,13 @@ body.vip-download-theme {
     justify-content: space-between;
     transition: all 0.3s ease;
 }
+.funnel-book-card.funnel-card-demo {
+    border-color: rgba(52, 211, 153, 0.4);
+}
+.funnel-book-card.funnel-card-demo:hover {
+    border-color: #34d399;
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.35);
+}
 .funnel-book-card:hover {
     transform: translateY(-4px);
     border-color: var(--vip-gold);
