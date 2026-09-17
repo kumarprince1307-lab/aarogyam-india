@@ -2467,7 +2467,7 @@
     },
     {
       "id": "DEMO-BK015",
-      "updated_at": "2026-09-17T03:37:53.039Z",
+      "updated_at": "2026-09-17T03:39:30.777Z",
       "admin_edited": true,
       "slug": "demo-bk015",
       "book_type": "demo",
@@ -2965,7 +2965,7 @@
       },
       "download_funnel": {
         "audio_enabled": true,
-        "audio_mode": "tts",
+        "audio_mode": "mp3",
         "audio_url": "",
         "audio_narrator": "Female Voice (Aarogyam AI सखी)",
         "audio_script": "",
