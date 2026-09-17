@@ -937,7 +937,7 @@
         if (sBtn) {
           sBtn.href = 'javascript:void(0)';
           sBtn.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(); };
-          sBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> <span>📖 अभी पढ़ें (Read Demo)</span>`;
+          sBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> <span>📖 अभी पढ़ें (Demo)</span>`;
           sBtn.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
           sBtn.style.color = '#ffffff';
           sBtn.style.borderColor = '#38bdf8';
@@ -951,11 +951,11 @@
         if (btn) {
           btn.href = checkoutUrl;
           if (id === 'sticky-buy-btn') {
-            btn.innerHTML = `<span>⚡ पूरी किताब खरीदें (₹99)</span>`;
+            btn.innerHTML = `<span>⚡ खरीदें (₹${offer})</span>`;
           } else if (id === 'vip-stack-unlock-btn') {
-            btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> <span>⚡ संपूर्ण मुख्य पुस्तक प्राप्त करें (मात्र ₹99)</span>`;
+            btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> <span>⚡ संपूर्ण मुख्य पुस्तक (मात्र ₹${offer})</span>`;
           } else {
-            btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> <span>⚡ पूरी मुख्य किताब खरीदें (₹99)</span>`;
+            btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> <span>⚡ पूरी किताब खरीदें (₹${offer})</span>`;
           }
           btn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
         }
@@ -965,7 +965,7 @@
       if (stickyHelp) {
         stickyHelp.href = 'javascript:void(0)';
         stickyHelp.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(); };
-        stickyHelp.innerHTML = `📖 Free Read`;
+        stickyHelp.innerHTML = `📖 Demo पढ़ें`;
         stickyHelp.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
         stickyHelp.style.color = '#ffffff';
       }

@@ -290,20 +290,41 @@ async function verifyUserAccessAndSession(targetBookId) {
             });
         }
 
+        const targetParentBook = jsonBooks.find(b => b && b.id && b.id.toUpperCase() === targetMain);
+        let rawPreviewImages = [];
+        if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
+            rawPreviewImages = aoiCurrentBookData.demoImages;
+        } else if (aoiCurrentBookData.demo_images && Array.isArray(aoiCurrentBookData.demo_images) && aoiCurrentBookData.demo_images.length > 0) {
+            rawPreviewImages = aoiCurrentBookData.demo_images;
+        } else if (aoiCurrentBookData.sample_preview && Array.isArray(aoiCurrentBookData.sample_preview.pages) && aoiCurrentBookData.sample_preview.pages.length > 0) {
+            rawPreviewImages = aoiCurrentBookData.sample_preview.pages.map(p => typeof p === 'object' ? p.image : p).filter(Boolean);
+        } else if (targetParentBook) {
+            if (targetParentBook.demo_images && Array.isArray(targetParentBook.demo_images) && targetParentBook.demo_images.length > 0) {
+                rawPreviewImages = targetParentBook.demo_images;
+            } else if (targetParentBook.demoImages && Array.isArray(targetParentBook.demoImages) && targetParentBook.demoImages.length > 0) {
+                rawPreviewImages = targetParentBook.demoImages;
+            } else if (targetParentBook.sample_preview && Array.isArray(targetParentBook.sample_preview.pages)) {
+                rawPreviewImages = targetParentBook.sample_preview.pages.map(p => typeof p === 'object' ? p.image : p).filter(Boolean);
+            }
+        }
+
         let combinedImages = [];
         let sourceMap = [];
 
-        // 1. Include sample preview images if present
-        if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
-            aoiCurrentBookData.demoImages.forEach((img, idx) => {
+        // 1. Add all sample preview images (resolved with proper ../ relative path)
+        if (rawPreviewImages && rawPreviewImages.length > 0) {
+            rawPreviewImages.forEach((img, idx) => {
                 if (img && typeof img === 'string') {
-                    combinedImages.push(img);
-                    sourceMap.push(idx + 1);
+                    const cleanPath = img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('data:') || img.startsWith('..') ? img : ('../' + img));
+                    if (!combinedImages.includes(cleanPath)) {
+                        combinedImages.push(cleanPath);
+                        sourceMap.push(idx + 1);
+                    }
                 }
             });
         }
 
-        // 2. Include specific selected main book pages
+        // 2. Add selected specific main book pages
         if (parsedPageNumbers.length > 0) {
             parsedPageNumbers.forEach(p => {
                 const pagePath = `../images/books/${targetMain}/${p}.webp`;
@@ -315,7 +336,8 @@ async function verifyUserAccessAndSession(targetBookId) {
         } else if (combinedImages.length === 0) {
             if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
                 aoiCurrentBookData.pageImages.slice(0, 5).forEach((img, idx) => {
-                    combinedImages.push(img);
+                    const cleanPath = img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('data:') || img.startsWith('..') ? img : ('../' + img));
+                    combinedImages.push(cleanPath);
                     sourceMap.push(idx + 1);
                 });
             } else {
