@@ -936,7 +936,7 @@
       "category": "Agriculture",
       "language": "Hindi",
       "mrp": 1999,
-      "offerPrice": 99,
+      "offerPrice": 149,
       "cover": "/images/books/bk015-cover.webp",
       "thumbnail": "/images/books/bk015-cover.webp",
       "banner": "/images/banners/bk015-hero-banner.webp",
@@ -1020,7 +1020,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-17T14:35:57.582Z",
+      "updated_at": "2026-09-17T16:29:43.154Z",
       "admin_edited": true
     },
     {
