@@ -109,6 +109,57 @@ async function verifyUserAccessAndSession(targetBookId) {
         }
     } catch (e) {}
 
+    // Merge Landing Pages (for sample_preview images and demo_reader_pages)
+    try {
+        const resLp = await fetch("/data/universal-book-landing-pages.json?v=" + Date.now());
+        if (resLp.ok) {
+            const jsonLp = await resLp.json();
+            const lpList = jsonLp.bookLandingPages || [];
+            lpList.forEach(lp => {
+                if (!lp || !lp.id) return;
+                const idx = jsonBooks.findIndex(x => x && x.id && x.id.toUpperCase() === lp.id.toUpperCase());
+                const previewImgList = (lp.sample_preview && Array.isArray(lp.sample_preview.pages) && lp.sample_preview.pages.length > 0)
+                    ? lp.sample_preview.pages.map(p => typeof p === 'object' ? p.image : p).filter(Boolean)
+                    : (lp.demoImages || []);
+                const normalized = {
+                    ...lp,
+                    id: lp.id.toUpperCase(),
+                    heading: lp.hero?.title || lp.heading || lp.id,
+                    name: lp.hero?.title || lp.name || lp.id,
+                    demo_reader_pages: lp.demo_reader_pages || lp.demoPages || '',
+                    demoImages: previewImgList.length > 0 ? previewImgList : (jsonBooks[idx]?.demoImages || []),
+                    targetMainBook: lp.targetMainBook || lp.id.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || 'BK001'
+                };
+                if (idx >= 0) jsonBooks[idx] = { ...jsonBooks[idx], ...normalized };
+                else jsonBooks.push(normalized);
+            });
+        }
+    } catch (e) {}
+
+    try {
+        const localLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+        if (Array.isArray(localLp)) {
+            localLp.forEach(lp => {
+                if (!lp || !lp.id) return;
+                const idx = jsonBooks.findIndex(x => x && x.id && x.id.toUpperCase() === lp.id.toUpperCase());
+                const previewImgList = (lp.sample_preview && Array.isArray(lp.sample_preview.pages) && lp.sample_preview.pages.length > 0)
+                    ? lp.sample_preview.pages.map(p => typeof p === 'object' ? p.image : p).filter(Boolean)
+                    : (lp.demoImages || []);
+                const normalized = {
+                    ...lp,
+                    id: lp.id.toUpperCase(),
+                    heading: lp.hero?.title || lp.heading || lp.id,
+                    name: lp.hero?.title || lp.name || lp.id,
+                    demo_reader_pages: lp.demo_reader_pages || lp.demoPages || '',
+                    demoImages: previewImgList.length > 0 ? previewImgList : (jsonBooks[idx]?.demoImages || []),
+                    targetMainBook: lp.targetMainBook || lp.id.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || 'BK001'
+                };
+                if (idx >= 0) jsonBooks[idx] = { ...jsonBooks[idx], ...normalized };
+                else jsonBooks.push(normalized);
+            });
+        }
+    } catch (e) {}
+
     const targetKey = String(targetBookId).toUpperCase();
     aoiCurrentBookData = jsonBooks.find(b => 
         (b.id && b.id.toUpperCase() === targetKey) || 

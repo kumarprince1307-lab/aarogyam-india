@@ -256,21 +256,30 @@ class ProAudioBookEngine {
             }
         } catch (e) {}
 
-        // Fallback for Demo/Bonus Books: check target main book scripts if empty
-        if (Object.keys(localScripts).length === 0 && Object.keys(serverScripts).length === 0) {
-            const targetMain = (window.aoiCurrentBookData?.targetMainBook || '').toUpperCase().trim();
-            if (targetMain && targetMain !== bookId) {
+        // Fallback for Demo/Bonus Books: check target main book scripts
+        const targetMain = (window.aoiCurrentBookData?.targetMainBook || bookId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || '').toUpperCase().trim();
+        if (targetMain && targetMain !== bookId) {
+            if (Object.keys(serverScripts).length === 0) {
                 try {
-                    const fallbackData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${targetMain}`);
-                    if (fallbackData) {
-                        const parsed = JSON.parse(fallbackData);
-                        if (parsed && parsed.pages) {
-                            localScripts = parsed.pages;
-                        }
-                        serverMeta = { ...serverMeta, ...parsed };
+                    let resMain = await fetch(`../data/audio-scripts/${targetMain}.json?v=${Date.now()}`);
+                    if (!resMain.ok) resMain = await fetch(`/data/audio-scripts/${targetMain}.json?v=${Date.now()}`);
+                    if (resMain.ok) {
+                        const dataMain = await resMain.json();
+                        serverMeta = { ...dataMain, ...serverMeta };
+                        serverScripts = { ...(dataMain.pages || {}), ...serverScripts };
                     }
                 } catch(e) {}
             }
+            try {
+                const fallbackData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${targetMain}`);
+                if (fallbackData) {
+                    const parsed = JSON.parse(fallbackData);
+                    if (parsed && parsed.pages) {
+                        localScripts = { ...parsed.pages, ...localScripts };
+                    }
+                    serverMeta = { ...parsed, ...serverMeta };
+                }
+            } catch(e) {}
         }
 
         this.metadata = serverMeta;

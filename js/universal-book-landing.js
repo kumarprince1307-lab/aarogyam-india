@@ -961,6 +961,15 @@
         }
       });
 
+      const stickyHelp = document.getElementById('sticky-help-btn');
+      if (stickyHelp) {
+        stickyHelp.href = 'javascript:void(0)';
+        stickyHelp.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(); };
+        stickyHelp.innerHTML = `📖 Free Read`;
+        stickyHelp.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
+        stickyHelp.style.color = '#ffffff';
+      }
+
       setElemText('hero-offer-badge', 'FREE DEMO');
       setElemText('sticky-book-title', `${title} (Demo)`);
       if (offer) setElemText('sticky-price-val', `₹${offer}`);
@@ -971,6 +980,15 @@
         const btn = document.getElementById(id);
         if (btn) btn.href = checkoutUrl;
       });
+
+      const stickyHelp = document.getElementById('sticky-help-btn');
+      if (stickyHelp) {
+        stickyHelp.href = 'javascript:void(0)';
+        stickyHelp.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(); };
+        stickyHelp.innerHTML = `📖 Free Demo`;
+        stickyHelp.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
+        stickyHelp.style.color = '#ffffff';
+      }
 
       // Set Dedicated Demo Landing Page URLs with active Book ID
       const demoUrl = `demo-kharif.html?id=${encodeURIComponent(rawId)}`;
