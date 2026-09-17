@@ -837,6 +837,7 @@
     }
 
     const isFreeBonus = (l.book_type === 'free' || l.book_type === 'bonus_free' || Number(offer) === 0 || rawId.startsWith('BONUS'));
+    const isDemoBook = (l.book_type === 'demo' || l.is_demo === true || l.isDemo === true || b.type === 'demo' || b.isDemo === true || rawId.startsWith('DEMO'));
 
     if (isComingSoon) {
       const heroBuy = document.getElementById('hero-buy-btn');
@@ -916,6 +917,53 @@
       setElemText('hero-new-price', '₹0 (100% FREE)');
       setElemText('hero-offer-badge', '100% FREE BONUS');
       setElemText('sticky-price-val', '₹0 FREE');
+    } else if (isDemoBook) {
+      // 🟢 DEMO BOOK FLOW: Direct Read Demo CTA + Distinct Buy Full Book Funnel CTA
+      const targetMain = (l.targetMainBook || b.targetMainBook || rawId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || (rawId.includes('BK002') ? 'BK002' : 'BK001')).toUpperCase();
+      const checkoutUrl = `checkout.html?id=${encodeURIComponent(targetMain)}`;
+
+      // Header Title with Free Demo Badge
+      const headerTitleEl = document.getElementById('header-book-title');
+      if (headerTitleEl) {
+        headerTitleEl.innerHTML = `${escapeHtml(title)} <span style="background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; font-size:0.72rem; font-weight:900; padding:2px 8px; border-radius:4px; margin-left:6px; vertical-align:middle; display:inline-block;">📖 FREE DEMO</span>`;
+      }
+      setElemText('hero-tag', '📖 Free Demo Sample Edition');
+      document.title = `${title} (Free Demo) | Aarogyam India`;
+
+      // Read Demo Buttons (Triggers Auth Gate & Demo Reader)
+      const sampleBtns = ['hero-sample-btn', 'final-sample-btn', 'ubl-audio-sample-btn'];
+      sampleBtns.forEach(sId => {
+        const sBtn = document.getElementById(sId);
+        if (sBtn) {
+          sBtn.href = 'javascript:void(0)';
+          sBtn.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(); };
+          sBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> <span>📖 अभी पढ़ें (Read Demo)</span>`;
+          sBtn.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
+          sBtn.style.color = '#ffffff';
+          sBtn.style.borderColor = '#38bdf8';
+        }
+      });
+
+      // Buy Main Book Buttons (Funnel Conversion)
+      const buyBtns = ['hero-buy-btn', 'preview-buy-btn', 'final-buy-btn', 'vip-stack-unlock-btn', 'sticky-buy-btn'];
+      buyBtns.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.href = checkoutUrl;
+          if (id === 'sticky-buy-btn') {
+            btn.innerHTML = `<span>⚡ पूरी किताब खरीदें (₹99)</span>`;
+          } else if (id === 'vip-stack-unlock-btn') {
+            btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> <span>⚡ संपूर्ण मुख्य पुस्तक प्राप्त करें (मात्र ₹99)</span>`;
+          } else {
+            btn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> <span>⚡ पूरी मुख्य किताब खरीदें (₹99)</span>`;
+          }
+          btn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+        }
+      });
+
+      setElemText('hero-offer-badge', 'FREE DEMO');
+      setElemText('sticky-book-title', `${title} (Demo)`);
+      if (offer) setElemText('sticky-price-val', `₹${offer}`);
     } else {
       const checkoutUrl = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
       const buyBtns = ['hero-buy-btn', 'preview-buy-btn', 'final-buy-btn', 'vip-stack-unlock-btn', 'sticky-buy-btn'];
@@ -923,21 +971,25 @@
         const btn = document.getElementById(id);
         if (btn) btn.href = checkoutUrl;
       });
+
+      // Set Dedicated Demo Landing Page URLs with active Book ID
+      const demoUrl = `demo-kharif.html?id=${encodeURIComponent(rawId)}`;
+      const sampleBtns = ['hero-sample-btn', 'final-sample-btn', 'ubl-audio-sample-btn'];
+      sampleBtns.forEach(sId => {
+        const sBtn = document.getElementById(sId);
+        if (sBtn) {
+          sBtn.href = demoUrl;
+          sBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> <span>📖 Free Demo पढ़ें</span>`;
+        }
+      });
+
+      setElemText('header-book-title', title);
+      setElemText('sticky-book-title', title);
+      if (!isFreeBonus) {
+        setElemText('sticky-price-val', `₹${offer}`);
+      }
     }
 
-    // Set Dedicated Demo Landing Page URLs with active Book ID
-    const demoUrl = `demo-kharif.html?id=${encodeURIComponent(rawId)}`;
-    const sampleBtns = ['hero-sample-btn', 'final-sample-btn', 'ubl-audio-sample-btn'];
-    sampleBtns.forEach(sId => {
-      const sBtn = document.getElementById(sId);
-      if (sBtn) sBtn.href = demoUrl;
-    });
-
-    setElemText('header-book-title', title);
-    setElemText('sticky-book-title', title);
-    if (!isFreeBonus) {
-      setElemText('sticky-price-val', `₹${offer}`);
-    }
     setElemText('sticky-mrp-val', `₹${mrp}`);
     setElemSrc('sticky-thumb-img', cover);
 
