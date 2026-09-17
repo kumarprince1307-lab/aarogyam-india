@@ -1662,18 +1662,54 @@ function initLibraryAudioGuide() {
         }
     }
 
-    function speakGuide() {
-        if (!synth) {
-            if (headerBtnText) headerBtnText.textContent = 'ऑडियो उपलब्ध नहीं';
+    let guideAudioElement = new Audio();
+    guideAudioElement.preload = 'auto';
+    let guideChunks = [];
+    let currentChunkIdx = 0;
+
+    function splitTextIntoSentences(text) {
+        if (!text) return [];
+        return text
+            .replace(/[\n\r]+/g, ' । ')
+            .split(/([।!?\n]+)/)
+            .map(s => s.trim())
+            .filter(s => s.length > 1 && !/^[।!?]+$/.test(s));
+    }
+
+    function playMp3Chunk(index) {
+        if (!isPlaying || index >= guideChunks.length) {
+            updateUiState(false);
+            releaseWakeLock();
             return;
         }
+        currentChunkIdx = index;
+        const text = guideChunks[index];
+        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&q=${encodeURIComponent(text)}`;
+        
+        guideAudioElement.src = ttsUrl;
+        guideAudioElement.playbackRate = 1.0;
+        guideAudioElement.volume = isMuted ? 0 : 1.0;
+        
+        guideAudioElement.onended = () => {
+            if (isPlaying) {
+                playMp3Chunk(currentChunkIdx + 1);
+            }
+        };
+        
+        guideAudioElement.onerror = (e) => {
+            console.warn("HTML5 audio MP3 notice, falling back to SpeechSynthesis:", e);
+            speakViaSpeechSynthesis(guideChunks.slice(currentChunkIdx).join(' । '));
+        };
+        
+        guideAudioElement.play().catch(e => {
+            console.warn("Audio play gesture error, trying SpeechSynthesis fallback:", e);
+            speakViaSpeechSynthesis(guideChunks.slice(currentChunkIdx).join(' । '));
+        });
+    }
 
+    function speakViaSpeechSynthesis(text) {
+        if (!synth) return;
         synth.cancel();
-        startSilentKeepAlive();
-        acquireWakeLock();
-        setupMediaSession();
-
-        const text = getHindiSpeechText();
         currentUtterance = new SpeechSynthesisUtterance(text);
         currentUtterance.lang = 'hi-IN';
         currentUtterance.rate = 0.95;
@@ -1684,33 +1720,44 @@ function initLibraryAudioGuide() {
         const hindiVoice = voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')));
         if (hindiVoice) currentUtterance.voice = hindiVoice;
 
-        currentUtterance.onstart = () => {
-            updateUiState(true);
-        };
-
         currentUtterance.onend = () => {
             updateUiState(false);
-            stopSilentKeepAlive();
             releaseWakeLock();
         };
-
-        currentUtterance.onerror = (e) => {
-            console.warn('SpeechSynthesis note:', e);
+        currentUtterance.onerror = () => {
             updateUiState(false);
-            stopSilentKeepAlive();
             releaseWakeLock();
         };
-
         synth.speak(currentUtterance);
     }
 
+    function speakGuide() {
+        acquireWakeLock();
+        setupMediaSession();
+        updateUiState(true);
+        isPlaying = true;
+
+        const fullText = getHindiSpeechText();
+        guideChunks = splitTextIntoSentences(fullText);
+        currentChunkIdx = 0;
+
+        playMp3Chunk(0);
+    }
+
     function stopGuide() {
+        isPlaying = false;
+        if (guideAudioElement) {
+            try {
+                guideAudioElement.pause();
+                guideAudioElement.currentTime = 0;
+                guideAudioElement.src = '';
+            } catch(e) {}
+        }
         if (synth) {
             try { synth.cancel(); } catch(e) {}
         }
         currentUtterance = null;
         updateUiState(false);
-        stopSilentKeepAlive();
         releaseWakeLock();
     }
 

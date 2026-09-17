@@ -235,39 +235,39 @@
       </div>
 
     </div>
-  </header>
 
-  <!-- =========================================
-       3. SUB-HEADER DEDICATED LIVE AUDIO GUIDE BAR (STICKY / PROMINENT)
-  ========================================== -->
-  <div class="sub-header-audio-bar" id="subHeaderAudioBar">
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;">
-      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-        <div class="sub-audio-avatar" id="subAudioAvatar">
-          <span>🎧</span>
-        </div>
-        <div style="min-width:0;">
-          <div style="font-size:0.86rem;font-weight:900;color:#ffffff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-            🌸 कृषि सखी लाइव ऑडियो गाइड
+    <!-- =========================================
+         3. DEDICATED STICKY LIVE AUDIO GUIDE BAR INSIDE HEADER
+    ========================================== -->
+    <div class="sub-header-audio-bar" id="subHeaderAudioBar">
+      <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0;">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+          <div class="sub-audio-avatar" id="subAudioAvatar">
+            <span>🎧</span>
           </div>
-          <div style="font-size:0.72rem;color:#a7f3d0;font-weight:600;line-height:1.2;margin-top:2px;" id="subAudioStatusText">
-            लाइब्रेरी व पुस्तकों की जानकारी सुनने के लिए प्ले करें
+          <div style="min-width:0;">
+            <div style="font-size:0.86rem;font-weight:900;color:#ffffff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              🌸 कृषि सखी लाइव ऑडियो गाइड
+            </div>
+            <div style="font-size:0.72rem;color:#a7f3d0;font-weight:600;line-height:1.2;margin-top:2px;" id="subAudioStatusText">
+              लाइब्रेरी व पुस्तकों की जानकारी सुनने के लिए प्ले करें
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Main Play Action Button (Big & Easy to Tap on Mobile) -->
-      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <button type="button" id="subHeaderPlayBtn" onclick="window.toggleLibraryAudioGuide?.(event)" class="sub-audio-play-btn" title="लाइब्रेरी ऑडियो गाइड सुनें">
-          <span id="subHeaderPlayIcon">▶️</span>
-          <span id="subHeaderPlayText">गाइड सुनें</span>
-          <span class="sub-audio-waves" id="subAudioWaves">
-            <i class="wave-bar"></i><i class="wave-bar"></i><i class="wave-bar"></i>
-          </span>
-        </button>
+        <!-- Main Play Action Button (Big & Easy to Tap on Mobile) -->
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <button type="button" id="subHeaderPlayBtn" onclick="window.toggleLibraryAudioGuide?.(event)" class="sub-audio-play-btn" title="लाइब्रेरी ऑडियो गाइड सुनें">
+            <span id="subHeaderPlayIcon">▶️</span>
+            <span id="subHeaderPlayText">गाइड सुनें</span>
+            <span class="sub-audio-waves" id="subAudioWaves">
+              <i class="wave-bar"></i><i class="wave-bar"></i><i class="wave-bar"></i>
+            </span>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </header>
 
   <!-- MAIN LIBRARY CONTENT CONTAINER (Full Width, Centered) -->
   <main class="library-main" id="mainLibraryContent">

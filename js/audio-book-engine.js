@@ -537,68 +537,56 @@ class ProAudioBookEngine {
 
             this.updateProgressBar(this.currentChunkIndex + 1, chunks.length);
 
-            if (this.synth) {
-                try {
-                    const ut = new SpeechSynthesisUtterance(currentChunk);
-                    this.currentUtterance = ut;
-                    if (this.femaleVoice) ut.voice = this.femaleVoice;
-                    ut.lang = 'hi-IN';
-                    ut.pitch = 1.0;
-                    ut.rate = 1.0 * this.playbackRate;
-                    ut.volume = this.isMuted ? 0 : this.volume;
-
-                    let hasAdvanced = false;
-                    let watchdogTimer = null;
-                    let pulseTimer = null;
-
-                    const advance = () => {
-                        if (hasAdvanced || !this.isPlaying || this.activeEpoch !== currentEpoch) return;
-                        hasAdvanced = true;
-                        if (watchdogTimer) clearTimeout(watchdogTimer);
-                        if (pulseTimer) clearInterval(pulseTimer);
-                        this.currentChunkIndex++;
-                        playNextChunk();
-                    };
-
-                    ut.onend = () => advance();
-                    ut.onerror = (e) => {
-                        console.warn("TTS utterance error handled:", e?.error);
-                        advance();
-                    };
-
-                    const maxUtteranceDurationMs = Math.max(5000, currentChunk.length * 180);
-                    watchdogTimer = setTimeout(() => {
-                        if (!hasAdvanced && this.isPlaying && this.activeEpoch === currentEpoch) {
-                            advance();
-                        }
-                    }, maxUtteranceDurationMs);
-                    this.activeTimers.push(watchdogTimer);
-
-                    pulseTimer = setInterval(() => {
-                        if (!this.isPlaying || hasAdvanced || this.activeEpoch !== currentEpoch) {
-                            clearInterval(pulseTimer);
-                            return;
-                        }
-                        if (window.speechSynthesis && window.speechSynthesis.paused) {
-                            window.speechSynthesis.resume();
-                        }
-                    }, 2000);
-                    this.activeTimers.push(pulseTimer);
-
-                    const speakTimer = setTimeout(() => {
-                        if (this.isPlaying && this.activeEpoch === currentEpoch && this.synth) {
-                            this.synth.speak(ut);
-                        }
-                    }, 20);
-                    this.activeTimers.push(speakTimer);
-
-                } catch(err) {
-                    this.currentChunkIndex++;
-                    playNextChunk();
-                }
-            } else {
+            let hasAdvanced = false;
+            const advance = () => {
+                if (hasAdvanced || !this.isPlaying || this.activeEpoch !== currentEpoch) return;
+                hasAdvanced = true;
                 this.currentChunkIndex++;
                 playNextChunk();
+            };
+
+            // Attempt Genuine HTML5 MP3 Stream First (keeps playing in background & lock screen)
+            try {
+                if (!this.ttsAudio) this.ttsAudio = new Audio();
+                const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&q=${encodeURIComponent(currentChunk)}`;
+                this.ttsAudio.src = ttsUrl;
+                this.ttsAudio.playbackRate = this.playbackRate;
+                this.ttsAudio.volume = this.isMuted ? 0 : this.volume;
+                
+                this.ttsAudio.onended = () => advance();
+                this.ttsAudio.onerror = () => {
+                    playViaSynthFallback();
+                };
+
+                const playPromise = this.ttsAudio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => {
+                        playViaSynthFallback();
+                    });
+                }
+                return;
+            } catch(e) {
+                playViaSynthFallback();
+            }
+
+            function playViaSynthFallback() {
+                if (window.aoiAudioBookEngine?.synth) {
+                    try {
+                        const ut = new SpeechSynthesisUtterance(currentChunk);
+                        ut.lang = 'hi-IN';
+                        ut.pitch = 1.0;
+                        ut.rate = 1.0 * (window.aoiAudioBookEngine.playbackRate || 1.0);
+                        ut.volume = window.aoiAudioBookEngine.isMuted ? 0 : (window.aoiAudioBookEngine.volume || 1.0);
+
+                        ut.onend = () => advance();
+                        ut.onerror = () => advance();
+                        window.aoiAudioBookEngine.synth.speak(ut);
+                    } catch(err) {
+                        advance();
+                    }
+                } else {
+                    advance();
+                }
             }
         };
 
