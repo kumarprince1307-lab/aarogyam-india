@@ -1625,6 +1625,11 @@ function initLibraryAudioGuide() {
 और बिना फोन मेमोरी भरे कभी भी ऑफलाइन पढ़ने के लिए ऊपर दिए गए 'Install App' बटन से ऐप अपने फोन में जोड़ें।`;
     }
 
+    const subBtn = document.getElementById('subHeaderPlayBtn');
+    const subIcon = document.getElementById('subHeaderPlayIcon');
+    const subText = document.getElementById('subHeaderPlayText');
+    const subStatus = document.getElementById('subAudioStatusText');
+
     function updateUiState(playing) {
         isPlaying = playing;
         if (headerBtn) {
@@ -1634,6 +1639,19 @@ function initLibraryAudioGuide() {
             } else {
                 headerBtn.classList.remove('is-playing');
                 if (headerBtnText) headerBtnText.textContent = '🔊 गाइड सुनें';
+            }
+        }
+        if (subBtn) {
+            if (playing) {
+                subBtn.classList.add('is-playing');
+                if (subIcon) subIcon.textContent = '⏸️';
+                if (subText) subText.textContent = 'रोकें';
+                if (subStatus) subStatus.textContent = '🎙️ ऑडियो गाइड चल रहा है (रोकने के लिए टैप करें)...';
+            } else {
+                subBtn.classList.remove('is-playing');
+                if (subIcon) subIcon.textContent = '▶️';
+                if (subText) subText.textContent = 'गाइड सुनें';
+                if (subStatus) subStatus.textContent = 'लाइब्रेरी व पुस्तकों की जानकारी सुनने के लिए प्ले करें';
             }
         }
         if (playBtn) playBtn.textContent = playing ? '⏸️' : '▶️';
@@ -1687,7 +1705,10 @@ function initLibraryAudioGuide() {
     }
 
     function stopGuide() {
-        if (synth) synth.cancel();
+        if (synth) {
+            try { synth.cancel(); } catch(e) {}
+        }
+        currentUtterance = null;
         updateUiState(false);
         stopSilentKeepAlive();
         releaseWakeLock();
@@ -1701,8 +1722,9 @@ function initLibraryAudioGuide() {
         }
     }
 
+    // Expose Single Master Handler globally (avoids duplicate listener double-toggling)
     window.toggleLibraryAudioGuide = function(e) {
-        if (e) {
+        if (e && typeof e.preventDefault === 'function') {
             e.preventDefault();
             e.stopPropagation();
         }
@@ -1710,14 +1732,6 @@ function initLibraryAudioGuide() {
     };
     window.speakLibraryAudioGuide = speakGuide;
     window.stopLibraryAudioGuide = stopGuide;
-
-    // Connect Header Pill Button
-    if (headerBtn) {
-        headerBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleGuide();
-        });
-    }
 
     // Connect Legacy buttons if present
     if (floatBtn) {
