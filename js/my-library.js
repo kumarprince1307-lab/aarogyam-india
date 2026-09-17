@@ -97,15 +97,16 @@ window.scrollToTubeSection = function() {
 };
 
 // 3. Category Tabs Switching Logic
-function switchTab(category) {
+function switchTab(category, evt) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     
-    // Activate target tab button by ID or by current event
+    // Activate target tab button by ID or by current event safely
     const activeBtn = document.getElementById('tabBtn-' + category);
+    const eventObj = evt || (typeof window !== 'undefined' && window.event ? window.event : null);
     if (activeBtn) {
         activeBtn.classList.add('active');
-    } else if (event && event.currentTarget && event.currentTarget.classList.contains('tab-btn')) {
-        event.currentTarget.classList.add('active');
+    } else if (eventObj && eventObj.currentTarget && eventObj.currentTarget.classList && eventObj.currentTarget.classList.contains('tab-btn')) {
+        eventObj.currentTarget.classList.add('active');
     }
 
     const sections = ['purchased', 'available', 'bonus', 'demo', 'coming'];
@@ -1303,16 +1304,8 @@ window.downloadBookPdf = function(bookId, bookTitle, directPdfPath, totalPagesHi
 };
 
 // =========================================================================
-// 13. INTERACTIVE TAB HELPERS & APP INSTALL GUIDE MODAL
+// 13. INTERACTIVE TAB HELPERS & AUDIO FILTER
 // =========================================================================
-window.switchTabAndScroll = function(category) {
-    if (typeof switchTab === 'function') switchTab(category);
-    const targetSection = document.getElementById('section-' + category);
-    if (targetSection) {
-        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-};
-
 window.filterOrSwitchAudioBooks = function() {
     if (typeof switchTab === 'function') switchTab('purchased');
     setTimeout(() => {
@@ -1331,30 +1324,6 @@ window.dismissLibraryPwaCard = function() {
         card.style.display = 'none';
         sessionStorage.setItem('aim_pwa_banner_dismissed', 'true');
     }
-};
-
-window.openAppInstallGuideModal = function() {
-    const modal = document.getElementById('appInstallGuideModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
-};
-
-window.closeAppInstallGuideModal = function() {
-    const modal = document.getElementById('appInstallGuideModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-};
-
-window.speakAppInstallGuide = function() {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance("Aarogyam India App अपने मोबाइल में इंस्टॉल करने के लिए, ब्राउज़र में ऊपर दाईं ओर 3 डॉट्स या शेयर बटन दबाएं, फिर 'Add to Home Screen' या 'Install App' चुनें। ऐप तुरंत आपके फोन में जुड़ जाएगी और आप बिना इंटरनेट भी सभी किताबें पढ़ सकते हैं।");
-    utt.lang = 'hi-IN';
-    utt.rate = 0.95;
-    window.speechSynthesis.speak(utt);
 };
 
 // =========================================================================
