@@ -532,7 +532,7 @@
     </div>
 
     <!-- Mandi Quick Access KPI Card (Properly inside library-main) -->
-    <div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; padding: 18px 24px; color: #fff; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: all 0.3s ease; margin: 0 auto 25px auto; max-width: 1200px; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
+    <div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; padding: 18px 24px; color: #fff; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: all 0.3s ease; margin: 0 auto 16px auto; max-width: 1200px; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
         
         <!-- Background Watermark Icon -->
         <div style="position: absolute; right: -10px; bottom: -15px; font-size: 4.5rem; opacity: 0.1; pointer-events: none;">
@@ -553,15 +553,56 @@
             <i class="fa-solid fa-arrow-right"></i>
         </div>
     </div>
+
+    <!-- Aarogyam Tube Video Hub Preview KPI Box -->
+    <div class="tube-kpi-access-card" onclick="window.location.href='/tube.html'" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); border: 1.5px solid rgba(165, 180, 252, 0.35); border-radius: 16px; padding: 18px 24px; color: #fff; cursor: pointer; box-shadow: 0 10px 30px rgba(49, 46, 129, 0.25); transition: all 0.3s ease; margin: 0 auto 25px auto; max-width: 1200px; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
+        <!-- Background Watermark Icon -->
+        <div style="position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.12; pointer-events: none; color: #f43f5e;">
+            <i class="fa-solid fa-play"></i>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; z-index: 1; flex: 1; min-width: 0;">
+            <div style="width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, #ef4444, #e11d48); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #ffffff; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.45);">
+                <i class="fa-solid fa-play"></i>
+            </div>
+            <div style="min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #ffffff;">📺 Aarogyam Tube — प्रैक्टिकल कृषि वीडियो हब</h3>
+                    <span style="background: #ef4444; color: #fff; font-size: 0.68rem; font-weight: 900; padding: 2px 7px; border-radius: 12px; letter-spacing: 0.5px;">100+ VIDEOS</span>
+                </div>
+                <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #c7d2fe; line-height: 1.35;">फसल सुरक्षा, जैविक स्प्रे, सब्जी उत्पादन व आधुनिक कृषि तकनीकों के वीडियो सीधे देखें</p>
+            </div>
+        </div>
+
+        <div style="z-index: 1; background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 8px 14px; border-radius: 25px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(239,68,68,0.35); flex-shrink: 0; margin-left: 10px;">
+            <span>🎬 वीडियो देखें</span> <i class="fa-solid fa-arrow-right" style="font-size: 0.72rem;"></i>
+        </div>
+    </div>
   </main>
 
-<style>
-    .mandi-kpi-access-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
-        border-color: rgba(255, 255, 255, 0.4);
-    }
-</style>
+  <!-- Floating Audio Library Guide Assistant Bar -->
+  <div id="libraryAudioGuideBar" class="lib-audio-guide-bar" style="display: none;">
+      <div class="lib-guide-content">
+          <div class="lib-guide-avatar">
+              <span>🎧</span>
+          </div>
+          <div class="lib-guide-info">
+              <span class="lib-guide-title">कृषि सखी (लाइब्रेरी गाइड)</span>
+              <span class="lib-guide-status" id="libGuideStatus">ऑडियो गाइड चालू है...</span>
+          </div>
+          <div class="lib-guide-ctrls">
+              <button id="libGuidePlayBtn" class="lib-guide-btn" title="प्ले / पॉज">⏸️</button>
+              <button id="libGuideMuteBtn" class="lib-guide-btn" title="म्यूट / अनम्यूट">🔊</button>
+              <button id="libGuideCloseBtn" class="lib-guide-btn close-btn" title="बंद करें">✕</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Floating Audio Guide Trigger Button -->
+  <button id="libraryAudioGuideFloatBtn" class="lib-audio-float-btn" title="लाइब्रेरी ऑडियो गाइड सुनें">
+      <span class="float-icon">🎧</span>
+      <span class="float-text">ऑडियो गाइड</span>
+  </button>
   
   <!-- 8. Sticky Bottom Timer & Deal Bar (Centered) -->
   <div class="sticky-action-bar">

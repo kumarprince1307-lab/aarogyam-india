@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startDailyTimer();
     loadLibraryData();
     checkAndOpenProfileModal();
+    initLibraryAudioGuide();
 });
 
 // 1. Sidebar Menu Toggle Function
@@ -681,12 +682,34 @@ async function renderLibrarySections(booksArray) {
             purchasedCount++;
             const card = document.createElement('div');
             card.className = 'book-card';
+            
+            // Reading progress calculation
+            let progressPercent = 0;
+            try {
+                const readProgressMap = JSON.parse(localStorage.getItem('AOI_READ_PROGRESS') || '{}');
+                const pInfo = readProgressMap[rawId] || readProgressMap[bookId] || null;
+                if (pInfo && pInfo.total > 0) {
+                    progressPercent = Math.min(100, Math.round((pInfo.current / pInfo.total) * 100));
+                }
+            } catch(e) {}
+
             card.innerHTML = `
-                <div style="position:relative;">
-                    <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
+                <div style="position:relative;cursor:pointer;" onclick="window.location.href='/ebooks/reader.html?book=${bookId}'" title="क्लिक करके सीधे पढ़ें">
+                    <img src="${bookCover}" alt="${bookName}">
                     ${hasAudioBook ? '<span style="position:absolute; bottom:8px; left:8px; background:linear-gradient(135deg, #8b5cf6, #6366f1); color:#fff; font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.3);">🎧 ऑडियो उपलब्ध</span>' : ''}
+                    <span style="position:absolute; top:8px; right:8px; background:#10b981; color:#fff; font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.25);">✓ UNLOCKED</span>
                 </div>
                 <h4>${bookName}</h4>
+                ${progressPercent > 0 ? `
+                <div style="margin: 6px 0;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#64748b;font-weight:700;margin-bottom:3px;">
+                        <span>📖 पठन प्रोग्रेस</span>
+                        <span style="color:#10b981;">${progressPercent}% पूर्ण</span>
+                    </div>
+                    <div style="width:100%;height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+                        <div style="width:${progressPercent}%;height:100%;background:linear-gradient(90deg,#10b981,#059669);border-radius:3px;"></div>
+                    </div>
+                </div>` : ''}
                 <div class="book-btn-group" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
                     <a href="/ebooks/reader.html?book=${bookId}" class="btn-read" style="flex:1;min-width:85px;padding:8px;background:#138A36;color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;">📖 Read</a>
                     ${hasAudioBook ? `<a href="/ebooks/reader.html?book=${bookId}&audio=1" class="btn-audio" style="flex:1;min-width:85px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;" title="ऑडियो बुक सुनें">🎧 ऑडियो</a>` : ''}
@@ -771,6 +794,8 @@ async function renderLibrarySections(booksArray) {
         const isLiveAgri = !isComingSoonBook && !isStudioDemo && !isStudioBonus && (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'BK015' || rawId === 'SUB001');
         if (isLiveAgri && !seenAvailableIds.has(rawId)) {
             seenAvailableIds.add(rawId);
+            let targetUrl = book.landingPage || (rawId === 'SUB001' ? '/subscription.html' : (rawId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (rawId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${bookId}`)));
+
             if (window.renderUniversalBookMarketingCard && typeof window.renderUniversalBookMarketingCard === 'function') {
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = window.renderUniversalBookMarketingCard(book);
@@ -778,11 +803,13 @@ async function renderLibrarySections(booksArray) {
             } else {
                 const availCard = document.createElement('div');
                 availCard.className = 'book-card';
-                let targetUrl = book.landingPage || (rawId === 'SUB001' ? '/subscription.html' : (rawId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (rawId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${bookId}`)));
 
                 availCard.innerHTML = `
-                    <img src="${bookCover}" alt="${bookName}" onclick="openImageZoom('${bookCover}')" title="क्लिक करके फुल-स्क्रीन देखें">
-                    <h4>${bookName}</h4>
+                    <div style="cursor:pointer;position:relative;" onclick="window.location.href='${targetUrl}'" title="क्लिक करके मुख्य विवरण देखें">
+                        <img src="${bookCover}" alt="${bookName}" style="cursor:pointer;">
+                        ${hasAudioBook ? '<span style="position:absolute; bottom:8px; left:8px; background:linear-gradient(135deg, #8b5cf6, #6366f1); color:#fff; font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.3);">🎧 ऑडियो उपलब्ध</span>' : ''}
+                    </div>
+                    <h4 style="cursor:pointer;" onclick="window.location.href='${targetUrl}'">${bookName}</h4>
                     <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0;">
                         <span style="font-weight:800;color:#138A36;font-size:1.05rem;">₹${book.offerPrice || 99}</span>
                         <span style="text-decoration:line-through;color:#94a3b8;font-size:0.85rem;">₹${book.mrp || 299}</span>
@@ -1182,3 +1209,124 @@ window.downloadBookPdf = function(bookId, bookTitle, directPdfPath, totalPagesHi
     if (!cleanId) return;
     window.location.href = `/ebooks/download.html?book=${encodeURIComponent(cleanId)}`;
 };
+
+// =========================================================================
+// 13. FLOATING NATURAL HINDI AUDIO GUIDE ASSISTANT (लाइब्रेरी ऑडियो गाइड)
+// =========================================================================
+function initLibraryAudioGuide() {
+    const guideBar = document.getElementById('libraryAudioGuideBar');
+    const floatBtn = document.getElementById('libraryAudioGuideFloatBtn');
+    const playBtn = document.getElementById('libGuidePlayBtn');
+    const muteBtn = document.getElementById('libGuideMuteBtn');
+    const closeBtn = document.getElementById('libGuideCloseBtn');
+    const statusText = document.getElementById('libGuideStatus');
+
+    if (!guideBar || !floatBtn) return;
+
+    let isPlaying = false;
+    let isMuted = false;
+    let synth = window.speechSynthesis || null;
+    let currentUtterance = null;
+
+    function getHindiSpeechText() {
+        const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+        const userName = storedUser.full_name || storedUser.name || 'किसान साथी';
+        return `नमस्ते ${userName} जी! Aarogyam India डिजिटल लाइब्रेरी में आपका स्वागत है। यहाँ आप अपनी खरीदी गई पुस्तकें पढ़ सकते हैं, ऑडियो बुक सुन सकते हैं, फ्री बोनस प्राप्त कर सकते हैं, तथा कृषि मंडी भाव व मौसम की लाइव जानकारी देख सकते हैं। किसी भी पुस्तक को पढ़ने के लिए 'Read' बटन दबाएं, या सम्पूर्ण विवरण देखने के लिए पुस्तक के कवर पर टैप करें। नई वीडियो तकनीकों के लिए नीचे Aarogyam Tube पर विजिट करें।`;
+    }
+
+    function speakGuide() {
+        if (!synth) {
+            if (statusText) statusText.textContent = 'ऑडियो समर्थित नहीं है';
+            return;
+        }
+
+        synth.cancel();
+        const text = getHindiSpeechText();
+        currentUtterance = new SpeechSynthesisUtterance(text);
+        currentUtterance.lang = 'hi-IN';
+        currentUtterance.rate = 0.95;
+        currentUtterance.pitch = 1.0;
+        currentUtterance.volume = isMuted ? 0 : 1.0;
+
+        // Try selecting a natural Hindi voice if available
+        const voices = synth.getVoices ? synth.getVoices() : [];
+        const hindiVoice = voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')));
+        if (hindiVoice) currentUtterance.voice = hindiVoice;
+
+        currentUtterance.onstart = () => {
+            isPlaying = true;
+            if (guideBar) guideBar.style.display = 'block';
+            if (playBtn) playBtn.textContent = '⏸️';
+            if (statusText) statusText.textContent = 'ऑडियो गाइड चल रहा है...';
+            guideBar.classList.add('playing');
+        };
+
+        currentUtterance.onend = () => {
+            isPlaying = false;
+            if (playBtn) playBtn.textContent = '▶️';
+            if (statusText) statusText.textContent = 'गाइड पूरा हुआ (सुनने के लिए प्ले करें)';
+            guideBar.classList.remove('playing');
+        };
+
+        currentUtterance.onerror = (e) => {
+            console.warn('SpeechSynthesis error:', e);
+            isPlaying = false;
+            if (playBtn) playBtn.textContent = '▶️';
+            if (statusText) statusText.textContent = 'गाइड पुनः सुनने के लिए टैप करें';
+            guideBar.classList.remove('playing');
+        };
+
+        synth.speak(currentUtterance);
+    }
+
+    function stopGuide() {
+        if (synth) synth.cancel();
+        isPlaying = false;
+        if (playBtn) playBtn.textContent = '▶️';
+        if (statusText) statusText.textContent = 'पॉज़ किया गया';
+        if (guideBar) guideBar.classList.remove('playing');
+    }
+
+    // Toggle Floating Button Click
+    floatBtn.addEventListener('click', () => {
+        guideBar.style.display = 'block';
+        if (!isPlaying) {
+            speakGuide();
+        } else {
+            stopGuide();
+        }
+    });
+
+    if (playBtn) {
+        playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                stopGuide();
+            } else {
+                speakGuide();
+            }
+        });
+    }
+
+    if (muteBtn) {
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            if (muteBtn) muteBtn.textContent = isMuted ? '🔇' : '🔊';
+            if (currentUtterance && isPlaying) {
+                stopGuide();
+                speakGuide();
+            }
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            stopGuide();
+            if (guideBar) guideBar.style.display = 'none';
+        });
+    }
+
+    // Auto-listen to voice list loading in Chrome/Edge
+    if (synth && synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = () => {};
+    }
+}
