@@ -1632,4 +1632,98 @@ function initLibraryAudioGuide() {
     if (synth && synth.onvoiceschanged !== undefined) {
         synth.onvoiceschanged = () => {};
     }
-}
+}
+
+// =========================================================================
+// APP INSTALL GUIDE MODAL & 30-SEC HINDI AUDIO TUTORIAL (Screenshot 1 Match)
+// =========================================================================
+let isAppInstallAudioPlaying = false;
+let appInstallUtterance = null;
+
+const APP_INSTALL_AUDIO_SCRIPT = 'Aarogyam App इंस्टॉल करें और बिना फोन मेमोरी भरे कभी भी किताबें पढ़ें, ज़ूम करें और ऑडियो सुनें। प्रिंट निकालने के लिए नीचे नीले बॉक्स में Full HD चुनें (3 बार मान्य)! ऐप इंस्टॉल करने के लिए नीचे दिए गए हरे बटन "फोन होम स्क्रीन पर ऐप जोड़ें" पर क्लिक करें!';
+
+window.toggleAppInstallAudio = function() {
+    const statusEl = document.getElementById('appInstallAudioStatus');
+    const iconEl = document.getElementById('appInstallAudioIcon');
+    const waves = document.getElementById('appInstallSoundWaves');
+
+    if (isAppInstallAudioPlaying) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+        isAppInstallAudioPlaying = false;
+        if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
+        if (statusEl) statusEl.textContent = 'क्लिक करके लाइव हिंदी ऑडियो गाइडेंस सुनें';
+        if (waves) waves.style.opacity = '0.3';
+        return;
+    }
+
+    if (!('speechSynthesis' in window)) {
+        alert('ऑडियो सपोर्ट आपके ब्राउज़र में उपलब्ध नहीं है। कृपया नीचे दिए गए स्टेप्स पढ़कर ऐप इंस्टॉल करें।');
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+    appInstallUtterance = new SpeechSynthesisUtterance(APP_INSTALL_AUDIO_SCRIPT);
+    appInstallUtterance.lang = 'hi-IN';
+    appInstallUtterance.rate = 0.95;
+    appInstallUtterance.pitch = 1.05;
+
+    const voices = window.speechSynthesis.getVoices();
+    const hiVoice = voices.find(v => (v.lang && (v.lang.includes('hi') || v.lang.includes('hi-IN'))) || (v.name && v.name.includes('Hindi')));
+    if (hiVoice) appInstallUtterance.voice = hiVoice;
+
+    appInstallUtterance.onstart = () => {
+        isAppInstallAudioPlaying = true;
+        if (iconEl) iconEl.className = 'fa-solid fa-pause';
+        if (statusEl) statusEl.textContent = '🔊 गाइडेंस चल रही है... (रोकने के लिए दोबारा क्लिक करें)';
+        if (waves) waves.style.opacity = '1';
+    };
+
+    appInstallUtterance.onend = () => {
+        isAppInstallAudioPlaying = false;
+        if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
+        if (statusEl) statusEl.textContent = 'गाइडेंस पूरी हुई। अब नीचे से ऐप इंस्टॉल करें!';
+        if (waves) waves.style.opacity = '0.3';
+    };
+
+    appInstallUtterance.onerror = () => {
+        isAppInstallAudioPlaying = false;
+        if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
+        if (statusEl) statusEl.textContent = 'पुनः सुनने के लिए टैप करें';
+        if (waves) waves.style.opacity = '0.3';
+    };
+
+    window.speechSynthesis.speak(appInstallUtterance);
+};
+
+window.openAppInstallGuideModal = function() {
+    const modal = document.getElementById('appInstallGuideModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            try {
+                if (!isAppInstallAudioPlaying) window.toggleAppInstallAudio();
+            } catch(e) {}
+        }, 400);
+    }
+};
+
+window.closeAppInstallGuideModal = function() {
+    const modal = document.getElementById('appInstallGuideModal');
+    if (modal) {
+        modal.style.display = 'none';
+        if (isAppInstallAudioPlaying && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            isAppInstallAudioPlaying = false;
+        }
+    }
+};
+
+window.triggerAppInstallFromModal = function() {
+    if (typeof window.triggerPwaInstall === 'function') {
+        window.triggerPwaInstall();
+    } else {
+        alert('ऐप इंस्टॉल करने के लिए अपने ब्राउज़र मेन्यू (⋮) में जाकर "Add to Home screen" चुनें।');
+    }
+};

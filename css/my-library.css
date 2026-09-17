@@ -964,22 +964,22 @@ body {
 }
 
 /* ==========================================================================
-   FLOATING NATURAL HINDI AUDIO GUIDE ASSISTANT BAR & BUTTON (Left-Aligned)
+   FLOATING NATURAL HINDI AUDIO GUIDE ASSISTANT BAR & BUTTON (Left-Aligned & Emerald Theme)
    ========================================================================== */
 .lib-audio-float-btn {
     position: fixed;
     bottom: 82px;
     left: 18px;
     right: auto;
-    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
     color: #ffffff;
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    border: 2px solid #34d399;
     border-radius: 50px;
     padding: 10px 18px;
     font-size: 0.85rem;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.45);
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.45);
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -989,15 +989,15 @@ body {
 }
 .lib-audio-float-btn:hover {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.6);
+    box-shadow: 0 12px 30px rgba(5, 150, 105, 0.6);
 }
 .lib-audio-float-btn:active {
     transform: scale(0.95);
 }
 
 @keyframes guideFloatPulse {
-    0%, 100% { box-shadow: 0 8px 24px rgba(124, 58, 237, 0.45); transform: translateY(0); }
-    50% { box-shadow: 0 12px 28px rgba(124, 58, 237, 0.7); transform: translateY(-3px); }
+    0%, 100% { box-shadow: 0 8px 24px rgba(5, 150, 105, 0.45); transform: translateY(0); }
+    50% { box-shadow: 0 12px 28px rgba(5, 150, 105, 0.7); transform: translateY(-3px); }
 }
 
 .lib-audio-guide-bar {
@@ -1007,15 +1007,15 @@ body {
     right: auto;
     transform: none;
     width: auto;
-    max-width: 460px;
-    background: rgba(15, 23, 42, 0.96);
+    max-width: 440px;
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.96) 0%, rgba(4, 47, 46, 0.96) 50%, rgba(15, 23, 42, 0.96) 100%);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1.5px solid rgba(139, 92, 246, 0.5);
+    border: 1.5px solid rgba(52, 211, 153, 0.6);
     border-radius: 20px;
     padding: 12px 18px;
     color: #ffffff;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.2);
     z-index: 9999;
     animation: slideUpLeftBar 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -1036,13 +1036,13 @@ body {
     width: 40px;
     height: 40px;
     min-width: 40px;
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    background: linear-gradient(135deg, #10b981, #059669);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    box-shadow: 0 4px 10px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
 }
 
 .lib-guide-info {
@@ -1060,7 +1060,7 @@ body {
 
 .lib-guide-status {
     font-size: 0.74rem;
-    color: #a5b4fc;
+    color: #a7f3d0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1073,8 +1073,8 @@ body {
 }
 
 .lib-guide-btn {
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     color: #ffffff;
     width: 34px;
     height: 34px;
@@ -1087,12 +1087,12 @@ body {
     transition: all 0.2s ease;
 }
 .lib-guide-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.35);
     transform: scale(1.1);
 }
 .lib-guide-btn.close-btn {
-    background: rgba(239, 68, 68, 0.2);
-    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.5);
     color: #fca5a5;
     font-size: 0.85rem;
 }
@@ -1101,22 +1101,23 @@ body {
     color: #ffffff;
 }
 
-/* Mobile responsive safe space for floating audio button on the left */
+/* Mobile responsive safe space for floating audio button on the left (NEVER OVERLAPS RIGHT BUTTONS) */
 @media (max-width: 768px) {
     .lib-audio-float-btn {
-        bottom: 74px;
-        left: 10px;
-        right: auto;
-        padding: 8px 14px;
-        font-size: 0.78rem;
+        bottom: 74px !important;
+        left: 10px !important;
+        right: auto !important;
+        padding: 8px 14px !important;
+        font-size: 0.78rem !important;
     }
     .lib-audio-guide-bar {
-        bottom: 70px;
-        left: 8px;
-        right: 8px;
-        width: calc(100% - 16px);
-        max-width: 100%;
-        padding: 10px 14px;
+        bottom: 68px !important;
+        left: 8px !important;
+        right: auto !important;
+        width: calc(100% - 90px) !important;
+        max-width: 320px !important;
+        padding: 8px 12px !important;
+        border-radius: 16px !important;
     }
 }
 
@@ -1477,96 +1478,262 @@ body {
     background: #dcfce7;
 }
 
-/* App Install Guide Modal */
-.pwa-guide-modal-box {
-    background: #ffffff;
-    padding: 26px;
-    border-radius: 20px;
-    max-width: 460px;
-    width: 92%;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-    text-align: left;
-    position: relative;
+/* ==========================================================================
+   APP INSTALL GUIDE MODAL (Screenshot 1 Match)
+   ========================================================================== */
+.app-install-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 24, 18, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    box-sizing: border-box;
 }
 
-.pwa-modal-header {
+.app-install-modal-card {
+    background: linear-gradient(145deg, #052e23 0%, #031e17 50%, #064e3b 100%);
+    border: 1.5px solid rgba(52, 211, 153, 0.45);
+    border-radius: 22px;
+    padding: 24px;
+    max-width: 560px;
+    width: 100%;
+    color: #ffffff;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65), 0 0 30px rgba(16, 185, 129, 0.25);
+    position: relative;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    animation: zoomInModal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes zoomInModal {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.app-install-modal-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.2s ease;
+    z-index: 10;
 }
-.pwa-modal-icon {
-    font-size: 1.8rem;
+.app-install-modal-close-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+    transform: scale(1.1);
 }
 
-.pwa-modal-steps {
+.app-modal-mono-header {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding-right: 35px;
+}
+
+.app-modal-logo-wrap {
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #10b981;
+    padding: 3px;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.app-modal-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.app-modal-badge {
+    background: #059669;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 4px;
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+.app-modal-title {
+    font-size: 1.22rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+}
+
+.app-modal-subtitle {
+    font-size: 0.84rem;
+    color: #a7f3d0;
+    margin: 4px 0 0 0;
+    line-height: 1.4;
+}
+
+.app-modal-audio-box {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1.5px solid rgba(52, 211, 153, 0.35);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+}
+
+.app-modal-audio-btn {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+    transition: transform 0.2s;
+}
+.app-modal-audio-btn:hover {
+    transform: scale(1.08);
+}
+
+.sound-waves-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 16px;
+}
+.sound-bar {
+    width: 3px;
+    height: 6px;
+    background: #facc15;
+    border-radius: 2px;
+    animation: soundWavePulse 1.2s infinite ease-in-out;
+}
+.sound-bar:nth-child(2) { animation-delay: 0.2s; }
+.sound-bar:nth-child(3) { animation-delay: 0.4s; }
+.sound-bar:nth-child(4) { animation-delay: 0.6s; }
+.sound-bar:nth-child(5) { animation-delay: 0.8s; }
+
+@keyframes soundWavePulse {
+    0%, 100% { height: 4px; }
+    50% { height: 16px; }
+}
+
+.app-modal-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     margin-bottom: 20px;
 }
 
-.pwa-modal-step-item {
-    display: flex;
-    gap: 12px;
-    background: #f8fafc;
-    padding: 12px 14px;
+.app-modal-step-box {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
 }
-.pwa-modal-step-item .step-num {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    background: #16a34a;
+
+.app-modal-step-num {
+    background: #10b981;
     color: #ffffff;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 900;
     font-size: 0.85rem;
-}
-.pwa-modal-step-item strong {
-    font-size: 0.86rem;
-    color: #0f172a;
-    display: block;
-    margin-bottom: 2px;
-}
-.pwa-modal-step-item p {
-    font-size: 0.78rem;
-    color: #64748b;
-    margin: 0;
-    line-height: 1.35;
+    font-weight: 800;
 }
 
-.pwa-modal-btn-row {
+.app-modal-step-content strong {
+    display: block;
+    font-size: 0.84rem;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.app-modal-step-content span {
+    font-size: 0.74rem;
+    color: #cbd5e1;
+    line-height: 1.35;
+    display: block;
+}
+
+.app-modal-install-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
     display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
-    flex-wrap: wrap;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    transition: all 0.2s ease;
 }
-.pwa-modal-install-btn {
-    flex: 1;
-    min-width: 140px;
-    background: #16a34a;
-    color: #ffffff;
-    border: none;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-weight: 800;
-    font-size: 0.86rem;
-    cursor: pointer;
+.app-modal-install-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.55);
 }
-.pwa-modal-audio-btn {
-    flex: 1;
-    min-width: 140px;
-    background: #7c3aed;
-    color: #ffffff;
-    border: none;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-weight: 800;
-    font-size: 0.86rem;
-    cursor: pointer;
+
+@media (max-width: 600px) {
+    .app-modal-steps-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .app-modal-mono-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding-right: 30px;
+    }
+    .app-modal-title {
+        font-size: 1.1rem;
+    }
+    .app-install-modal-card {
+        padding: 18px 14px;
+    }
 }
 
 
