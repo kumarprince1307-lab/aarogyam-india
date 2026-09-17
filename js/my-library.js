@@ -1655,87 +1655,37 @@ function initLibraryAudioGuide() {
         }
     }
 
-    function splitTextIntoSentences(text) {
-        if (!text) return [];
-        return text
-            .replace(/[\n\r]+/g, ' । ')
-            .split(/([।!?\n]+)/)
-            .map(s => s.trim())
-            .filter(s => s.length > 1 && !/^[।!?]+$/.test(s));
+    let keepAliveTimer = null;
+
+    function clearKeepAlive() {
+        if (keepAliveTimer) {
+            clearInterval(keepAliveTimer);
+            keepAliveTimer = null;
+        }
     }
 
-    function playMp3Chunk(index, sessionId) {
-        if (!isPlaying || sessionId !== currentPlaySessionId || index >= guideChunks.length) {
-            if (sessionId === currentPlaySessionId) {
-                stopGuide();
+    function startKeepAlive() {
+        clearKeepAlive();
+        keepAliveTimer = setInterval(() => {
+            if (synth && synth.speaking) {
+                try {
+                    synth.pause();
+                    synth.resume();
+                } catch(e) {}
+            } else {
+                clearKeepAlive();
             }
-            return;
-        }
-
-        currentChunkIdx = index;
-        const text = guideChunks[index];
-        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&q=${encodeURIComponent(text)}`;
-        
-        guideAudioElement.onended = null;
-        guideAudioElement.onerror = null;
-
-        guideAudioElement.src = ttsUrl;
-        guideAudioElement.playbackRate = 1.0;
-        guideAudioElement.volume = isMuted ? 0 : 1.0;
-        
-        guideAudioElement.onended = () => {
-            if (isPlaying && sessionId === currentPlaySessionId) {
-                playMp3Chunk(currentChunkIdx + 1, sessionId);
-            }
-        };
-        
-        guideAudioElement.onerror = (e) => {
-            if (!isPlaying || sessionId !== currentPlaySessionId) return;
-            console.warn("HTML5 audio MP3 notice, falling back to SpeechSynthesis:", e);
-            speakViaSpeechSynthesis(guideChunks.slice(currentChunkIdx).join(' । '), sessionId);
-        };
-        
-        guideAudioElement.play().catch(e => {
-            if (!isPlaying || sessionId !== currentPlaySessionId) return;
-            console.warn("Audio play gesture notice, trying SpeechSynthesis fallback:", e);
-            speakViaSpeechSynthesis(guideChunks.slice(currentChunkIdx).join(' । '), sessionId);
-        });
-    }
-
-    function speakViaSpeechSynthesis(text, sessionId) {
-        if (!synth || !isPlaying || sessionId !== currentPlaySessionId) return;
-        try { synth.cancel(); } catch(e) {}
-
-        currentUtterance = new SpeechSynthesisUtterance(text);
-        currentUtterance.lang = 'hi-IN';
-        currentUtterance.rate = 0.95;
-        currentUtterance.pitch = 1.0;
-        currentUtterance.volume = isMuted ? 0 : 1.0;
-
-        const voices = synth.getVoices ? synth.getVoices() : [];
-        const hindiVoice = voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')));
-        if (hindiVoice) currentUtterance.voice = hindiVoice;
-
-        currentUtterance.onend = () => {
-            if (sessionId === currentPlaySessionId) {
-                stopGuide();
-            }
-        };
-        currentUtterance.onerror = () => {
-            if (sessionId === currentPlaySessionId) {
-                stopGuide();
-            }
-        };
-
-        if (isPlaying && sessionId === currentPlaySessionId) {
-            synth.speak(currentUtterance);
-        }
+        }, 10000);
     }
 
     function speakGuide() {
-        // Increment session ID to invalidate any previous async callbacks
-        currentPlaySessionId++;
-        const sessionId = currentPlaySessionId;
+        if (!synth) synth = window.speechSynthesis || null;
+        if (!synth) {
+            alert('आपके ब्राउज़र में ऑडियो सपोर्ट उपलब्ध नहीं है।');
+            return;
+        }
+
+        stopGuide();
 
         isPlaying = true;
         updateUiState(true);
@@ -1744,42 +1694,64 @@ function initLibraryAudioGuide() {
         setupMediaSession();
 
         const fullText = getHindiSpeechText();
-        guideChunks = splitTextIntoSentences(fullText);
-        currentChunkIdx = 0;
+        currentUtterance = new SpeechSynthesisUtterance(fullText);
+        currentUtterance.lang = 'hi-IN';
+        currentUtterance.rate = 0.95;
+        currentUtterance.pitch = 1.0;
+        currentUtterance.volume = isMuted ? 0 : 1.0;
 
-        playMp3Chunk(0, sessionId);
+        // Select natural Hindi female voice if available
+        try {
+            const voices = synth.getVoices ? synth.getVoices() : [];
+            const hindiVoice = voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')));
+            if (hindiVoice) currentUtterance.voice = hindiVoice;
+        } catch(e) {}
+
+        currentUtterance.onstart = () => {
+            isPlaying = true;
+            updateUiState(true);
+            startKeepAlive();
+        };
+
+        currentUtterance.onend = () => {
+            stopGuide();
+        };
+
+        currentUtterance.onerror = (e) => {
+            // Ignore cancel / interrupted errors caused by user clicking stop
+            if (e && e.error !== 'canceled' && e.error !== 'interrupted') {
+                console.warn('Audio guide notice:', e);
+            }
+            stopGuide();
+        };
+
+        try {
+            synth.speak(currentUtterance);
+        } catch(err) {
+            console.warn('Synth speak error:', err);
+            stopGuide();
+        }
     }
 
     function stopGuide() {
-        currentPlaySessionId++;
         isPlaying = false;
+        clearKeepAlive();
 
-        // Forcefully cancel any ongoing Web Speech synthesis
-        if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis) {
+        if (synth) {
             try {
-                window.speechSynthesis.pause();
-                window.speechSynthesis.cancel();
+                synth.cancel();
             } catch(e) {}
         }
-        if (synth) {
-            try { synth.cancel(); } catch(e) {}
-        }
-
-        // Cleanly tear down HTML5 Audio
-        if (guideAudioElement) {
-            guideAudioElement.onended = null;
-            guideAudioElement.onerror = null;
+        if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis) {
             try {
-                guideAudioElement.pause();
-                guideAudioElement.currentTime = 0;
-                guideAudioElement.removeAttribute('src');
-                guideAudioElement.load();
+                window.speechSynthesis.cancel();
             } catch(e) {}
         }
 
         if (currentUtterance) {
             currentUtterance.onend = null;
             currentUtterance.onerror = null;
+            currentUtterance.onstart = null;
             currentUtterance = null;
         }
 
@@ -1789,13 +1761,13 @@ function initLibraryAudioGuide() {
     }
 
     function toggleGuide() {
-        const isSpeakingNow = Boolean(
+        const isCurrentlySpeaking = Boolean(
             isPlaying ||
-            (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) ||
-            (guideAudioElement && !guideAudioElement.paused && guideAudioElement.currentTime > 0)
+            (synth && (synth.speaking || synth.pending)) ||
+            (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis && (window.speechSynthesis.speaking || window.speechSynthesis.pending))
         );
 
-        if (isSpeakingNow) {
+        if (isCurrentlySpeaking) {
             stopGuide();
         } else {
             speakGuide();
@@ -1830,7 +1802,6 @@ function initLibraryAudioGuide() {
         muteBtn.addEventListener('click', () => {
             isMuted = !isMuted;
             muteBtn.textContent = isMuted ? '🔇' : '🔊';
-            if (guideAudioElement) guideAudioElement.volume = isMuted ? 0 : 1.0;
             if (currentUtterance && isPlaying) {
                 stopGuide();
                 speakGuide();
@@ -1847,6 +1818,21 @@ function initLibraryAudioGuide() {
     if (synth && synth.onvoiceschanged !== undefined) {
         synth.onvoiceschanged = () => {};
     }
+
+    // Auto-attempt playback on load with fallback on first touch/click
+    setTimeout(() => {
+        try {
+            if (!isPlaying) speakGuide();
+        } catch(e) {}
+    }, 600);
+
+    const triggerAutoAudioOnFirstGesture = () => {
+        if (!isPlaying && !(synth && synth.speaking)) {
+            speakGuide();
+        }
+    };
+    window.addEventListener('click', triggerAutoAudioOnFirstGesture, { once: true });
+    window.addEventListener('touchstart', triggerAutoAudioOnFirstGesture, { once: true });
 }
 
 // =========================================================================
