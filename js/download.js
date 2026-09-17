@@ -786,10 +786,13 @@ async function renderBusinessFunnel() {
     const grid = document.getElementById('businessFunnelGrid');
     if (!grid) return;
 
-    const currentId = (state.bookId || '').toUpperCase().trim();
+    const rawCurrentId = (state.bookId || '').toUpperCase().trim();
+    // Helper to get normalized base ID (e.g. 'DEMO-BK001' -> 'BK001', 'BK001' -> 'BK001')
+    const getBaseBookId = (id) => String(id || '').toUpperCase().trim().replace(/^DEMO[-_]?/, '');
+    const currentBaseId = getBaseBookId(rawCurrentId);
 
-    // 100% READY-TO-ORDER ACTIVE BOOKS ONLY (NO COMING SOON, NO SUBSCRIPTIONS)
-    const activeMasterBooks = [
+    // 100% READY-TO-ORDER ACTIVE MASTER BOOKS (FALLBACK)
+    const fallbackMasterBooks = [
         {
             id: 'BK001',
             name: 'खरीफ फसल मास्टर गाइड 2026',
@@ -806,7 +809,7 @@ async function renderBusinessFunnel() {
             category: 'Agriculture',
             offerPrice: 99,
             mrp: 299,
-            cover: '/images/books/kheti-dr-cover.webp',
+            cover: '/images/books/fasal-ka-doctor-cover.webp',
             link: '/ebooks/kheti-dr.html',
             pitch: '500+ रोगों व 300+ कीटों का सटीक इलाज, NPK पोषण व पानी सुधार की संपूर्ण गाइड।'
         },
@@ -822,7 +825,7 @@ async function renderBusinessFunnel() {
         }
     ];
 
-    let allBooks = activeMasterBooks;
+    let allBooks = [];
 
     try {
         const resp = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 300000));
@@ -830,19 +833,36 @@ async function renderBusinessFunnel() {
             const data = await resp.json();
             const bList = Array.isArray(data.books) ? data.books : (Array.isArray(data) ? data : []);
             if (bList.length > 0) {
-                // STRICT FILTER:
-                // 1. Exclude Coming Soon books (status === 'coming_soon' or is_coming_soon === true)
+                // STRICT FILTER & DEDUPLICATION:
+                // 1. Exclude Demo books (starts with DEMO, book_type === 'demo', is_demo === true)
                 // 2. Exclude Subscriptions (id starts with SUB or category includes subscription)
-                // 3. Exclude the current purchased book
-                const activeFromDb = bList.filter(b => {
-                    const bId = (b.id || b.book_id || '').toUpperCase().trim();
-                    const isSub = bId.startsWith('SUB') || (b.category || '').toLowerCase().includes('subscri');
-                    const isComingSoon = b.status === 'coming_soon' || b.is_coming_soon === true || b.is_coming_soon === 'true' || b.store_badge === 'coming_soon';
-                    return bId && !isSub && !isComingSoon && b.status === 'active';
-                });
+                // 3. Exclude Coming Soon (status === 'coming_soon' or is_coming_soon === true)
+                // 4. Must be active (status === 'active')
+                // 5. Exclude currently purchased book (both raw ID and base ID)
+                const seenIds = new Set();
+                const seenTitles = new Set();
 
-                if (activeFromDb.length > 0) {
-                    allBooks = activeFromDb.map(b => ({
+                for (const b of bList) {
+                    const rawId = (b.id || b.book_id || '').toUpperCase().trim();
+                    const baseId = getBaseBookId(rawId);
+                    
+                    if (!baseId) continue;
+                    // Exclude demos, subscriptions, coming-soon, inactive
+                    if (rawId.startsWith('DEMO') || b.book_type === 'demo' || b.is_demo === true) continue;
+                    if (baseId.startsWith('SUB') || (b.category || '').toLowerCase().includes('subscri')) continue;
+                    if (b.status === 'coming_soon' || b.is_coming_soon === true || b.is_coming_soon === 'true' || b.store_badge === 'coming_soon') continue;
+                    if (b.status && b.status !== 'active') continue;
+                    
+                    // Exclude current purchased book
+                    if (baseId === currentBaseId || rawId === rawCurrentId) continue;
+                    
+                    // Deduplicate by baseId and cleaned title
+                    const cTitle = cleanBookTitle(b.heading || b.name || b.id).toLowerCase();
+                    if (seenIds.has(baseId) || seenTitles.has(cTitle)) continue;
+                    seenIds.add(baseId);
+                    seenTitles.add(cTitle);
+
+                    allBooks.push({
                         id: b.id || b.book_id,
                         name: cleanBookTitle(b.heading || b.name || b.id),
                         category: b.category || 'Agriculture',
@@ -851,11 +871,25 @@ async function renderBusinessFunnel() {
                         cover: b.cover || b.thumbnail || `/images/books/${(b.id || 'bk001').toLowerCase()}-cover.webp`,
                         link: b.landingPage || `/ebooks/book-landing.html?id=${b.id}`,
                         pitch: b.description || 'वैज्ञानिक एवं प्रैक्टिकल कृषि समाधान।'
-                    }));
+                    });
                 }
             }
         }
-    } catch(e) {}
+    } catch(e) {
+        console.warn('renderBusinessFunnel error:', e);
+    }
+
+    // Fallback if no books loaded from db
+    if (allBooks.length === 0) {
+        const seenIds = new Set();
+        for (const b of fallbackMasterBooks) {
+            const baseId = getBaseBookId(b.id);
+            if (!baseId || baseId === currentBaseId || b.id === rawCurrentId) continue;
+            if (seenIds.has(baseId)) continue;
+            seenIds.add(baseId);
+            allBooks.push(b);
+        }
+    }
 
     const df = state.bookData?.download_funnel || {};
     if (df.funnel_heading) {
@@ -867,16 +901,15 @@ async function renderBusinessFunnel() {
         if (descEl) descEl.textContent = df.funnel_subheading;
     }
 
-    // CRITICAL REQUIREMENT: EXCLUDE THE CURRENT PURCHASED BOOK
-    let funnelBooks = allBooks.filter(b => {
-        const bId = (b.id || '').toUpperCase().trim();
-        return bId && bId !== currentId;
-    });
+    let funnelBooks = allBooks;
 
     if (df.funnel_books && Array.isArray(df.funnel_books) && df.funnel_books.length > 0) {
+        const targetOrder = df.funnel_books.map(id => getBaseBookId(id));
         funnelBooks.sort((a, b) => {
-            const aIdx = df.funnel_books.indexOf(String(a.id).toUpperCase());
-            const bIdx = df.funnel_books.indexOf(String(b.id).toUpperCase());
+            const aBase = getBaseBookId(a.id);
+            const bBase = getBaseBookId(b.id);
+            const aIdx = targetOrder.indexOf(aBase);
+            const bIdx = targetOrder.indexOf(bBase);
             if (aIdx !== -1 && bIdx === -1) return -1;
             if (bIdx !== -1 && aIdx === -1) return 1;
             if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
