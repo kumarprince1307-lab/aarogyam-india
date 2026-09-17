@@ -401,6 +401,12 @@ async function checkUserLogin() {
         }
 
         const userData = data[0];
+        // Clean previous user purchases and session caches before logging into new account
+        localStorage.removeItem('AI_PURCHASES');
+        localStorage.removeItem('purchases');
+        localStorage.removeItem('user_purchases');
+        try { sessionStorage.clear(); } catch(e) {}
+
         SessionManager.save({
             mobile: userData.mobile,
             name: userData.full_name || 'यूजर',
@@ -467,6 +473,11 @@ function logoutUser() {
     SessionManager.remove();
     UserStorage.remove();
     ProfileStorage.remove();
+    localStorage.removeItem('AI_PURCHASES');
+    localStorage.removeItem('purchases');
+    localStorage.removeItem('aim_user_name');
+    localStorage.removeItem('aim_user_mobile');
+    try { sessionStorage.clear(); } catch(e) {}
     return true;
 }
 

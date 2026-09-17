@@ -20,16 +20,83 @@ function toggleMenu() {
 
 // 2. सुरक्षित लॉगआउट फंक्शन (पूरी तरह से स्टोरेज साफ करने वाला)
 function logoutUser() {
-    // 1. ब्राउज़र की पूरी स्टोरेज साफ़ करें
-    localStorage.clear();
-    sessionStorage.clear();
+    const keysToRemove = [
+        'AI_USER', 'AI_PROFILE', 'AI_SESSION', 'AI_LOGIN_STATUS',
+        'AI_PURCHASES', 'purchases', 'user_purchases', 'aim_purchases', 'cached_purchases',
+        'UCAS_USER', 'CURRENT_USER', 'aarogyam_user', 'user_name', 'user_phone',
+        'aim_user_name', 'aim_user_mobile', 'aim_user_email', 'wb_registered',
+        'AOI_READ_PROGRESS', 'AI_WISHLIST', 'aim_profile_completed', 'ai_profile_completed'
+    ];
+    keysToRemove.forEach(k => {
+        try { localStorage.removeItem(k); } catch(e) {}
+    });
+    try { sessionStorage.clear(); } catch(e) {}
+    try {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+            const k = localStorage.key(i);
+            if (k && (k.startsWith('aim_') || k.startsWith('ai_') || k.includes('purch'))) {
+                localStorage.removeItem(k);
+            }
+        }
+    } catch(e) {}
     
-    // 2. यूजर को सूचित करें
-    alert('आप सफलतापूर्वक लॉग आउट हो चुके हैं।');
-    
-    // 3. बिना किसी रुकावट के तुरंत पेज को फ्रेश रीलोड करें
+    alert('आप सफलतापूर्वक लॉग आउट हो चुके हैं। (Logged out successfully)');
     window.location.href = window.location.pathname;
 }
+window.logoutUser = logoutUser;
+
+// Navigation & KPI Scroll Action Helpers
+window.switchTabAndScroll = function(category) {
+    if (category === 'purchased' || category === 'mybooks') {
+        switchTab('purchased');
+    } else if (category === 'available') {
+        switchTab('available');
+    } else if (category === 'bonus') {
+        switchTab('bonus');
+    } else if (category === 'demo') {
+        switchTab('demo');
+    } else if (category === 'coming') {
+        switchTab('coming');
+    }
+    const catTabs = document.querySelector('.category-tabs');
+    if (catTabs) {
+        catTabs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+};
+
+window.scrollToWeatherSection = function() {
+    const wCard = document.getElementById('weatherSectionCard');
+    if (wCard) {
+        wCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+        window.location.href = '/weather.html';
+    }
+};
+
+window.triggerAppInstallFlow = function() {
+    if (typeof window.triggerPwaInstall === 'function') {
+        window.triggerPwaInstall();
+    } else {
+        const pwaCard = document.getElementById('library-pwa-card');
+        if (pwaCard) {
+            pwaCard.style.display = 'block';
+            pwaCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        if (typeof window.openAppInstallGuideModal === 'function') {
+            window.openAppInstallGuideModal();
+        }
+    }
+};
+
+window.scrollToTubeSection = function() {
+    const tubeCard = document.querySelector('.tube-kpi-access-card');
+    if (tubeCard) {
+        tubeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+        window.location.href = '/tube.html';
+    }
+};
+
 // 3. Category Tabs Switching Logic
 function switchTab(category) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -534,26 +601,33 @@ async function renderLibrarySections(booksArray) {
     if (!booksArray || booksArray.length === 0) return;
 
     // 1. Gather all purchases (LocalStorage + Supabase Remote Multi-Profile Sync)
-    const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
-    let userPurchases = Array.isArray(localPurchases) ? [...localPurchases] : [];
-
     const localUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     let profileId = localUser.id || null;
     const rawMobile = localUser.mobile || localUser.phone || '';
     const cleanMobile = rawMobile ? String(rawMobile).replace(/\D/g, '').slice(-10) : '';
+    const isLoggedInUser = Boolean(profileId || (cleanMobile && cleanMobile.length === 10));
+
+    let userPurchases = [];
+    if (isLoggedInUser) {
+        const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+        userPurchases = Array.isArray(localPurchases) ? [...localPurchases] : [];
+    } else {
+        localStorage.removeItem('AI_PURCHASES');
+        localStorage.removeItem('purchases');
+    }
 
     try {
         const activeDb = getLibrarySupabaseClient();
-        if (activeDb) {
-            // ✅ EGRESS FIX: 15-min sessionStorage cache for purchases - skip Supabase if cached
-            const libCacheKey = 'aim_lib_purch_' + (cleanMobile || profileId || 'g');
+        if (activeDb && isLoggedInUser) {
+            // ✅ EGRESS FIX: 15-min sessionStorage cache for purchases per specific user
+            const libCacheKey = 'aim_lib_purch_' + (cleanMobile || profileId);
             let fromCache = false;
             try {
                 const raw = sessionStorage.getItem(libCacheKey);
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     if (parsed && (Date.now() - (parsed._ts || 0) < 900000) && Array.isArray(parsed.data)) {
-                        parsed.data.forEach(p => { if (!userPurchases.some(up => up.id === p.id)) userPurchases.push(p); });
+                        userPurchases = parsed.data;
                         fromCache = true;
                     }
                 }
@@ -597,27 +671,26 @@ async function renderLibrarySections(booksArray) {
                         .select('id, profile_id, book_id, amount, payment_status, payment_id, order_id, purchase_date, created_at')
                         .in('profile_id', profileIds);
 
-                    if (!purErr && Array.isArray(dbPurchases) && dbPurchases.length > 0) {
-                        const newPurchases = [];
+                    if (!purErr && Array.isArray(dbPurchases)) {
+                        const freshPurchases = [];
                         dbPurchases.forEach(p => {
                             const rawBId = String(p.book_id || '').toUpperCase().trim();
                             if (rawBId) {
                                 const bIds = rawBId.includes(',') ? rawBId.split(',').map(s => s.trim().toUpperCase()) : [rawBId];
                                 bIds.forEach(singleId => {
-                                    if (singleId && !userPurchases.some(up => String(up.book_id || up.id || '').toUpperCase() === singleId)) {
-                                        const purObj = {
+                                    if (singleId && !freshPurchases.some(up => String(up.book_id || up.id || '').toUpperCase() === singleId)) {
+                                        freshPurchases.push({
                                             id: p.id || ('pur_' + singleId),
                                             book_id: singleId,
                                             amount: p.amount,
                                             payment_status: p.payment_status || 'success',
                                             purchase_date: p.purchase_date || p.created_at || new Date().toISOString()
-                                        };
-                                        userPurchases.push(purObj);
-                                        newPurchases.push(purObj);
+                                        });
                                     }
                                 });
                             }
                         });
+                        userPurchases = freshPurchases;
                         localStorage.setItem('AI_PURCHASES', JSON.stringify(userPurchases));
                         localStorage.setItem('purchases', JSON.stringify(userPurchases));
                         // Save to session cache for 15 minutes
@@ -993,6 +1066,15 @@ function updateWelcomeStatsCounts(purchased, bonus, wishlist, demo, audio, avail
 
     const kpiBonus = document.getElementById('kpiBonusCount');
     if (kpiBonus) kpiBonus.textContent = bonus || 0;
+
+    const kpiWeather = document.getElementById('kpiWeatherValue');
+    if (kpiWeather) kpiWeather.textContent = 'लाइव';
+
+    const kpiInstall = document.getElementById('kpiInstallAppValue');
+    if (kpiInstall) kpiInstall.textContent = 'इंस्टॉल';
+
+    const kpiTube = document.getElementById('kpiTubeCount');
+    if (kpiTube) kpiTube.textContent = '100+';
 
     const kpiDemo = document.getElementById('kpiDemoCount');
     if (kpiDemo) kpiDemo.textContent = demo || 0;

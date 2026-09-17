@@ -964,15 +964,16 @@ body {
 }
 
 /* ==========================================================================
-   FLOATING NATURAL HINDI AUDIO GUIDE ASSISTANT BAR & BUTTON
+   FLOATING NATURAL HINDI AUDIO GUIDE ASSISTANT BAR & BUTTON (Left-Aligned)
    ========================================================================== */
 .lib-audio-float-btn {
     position: fixed;
-    bottom: 85px;
-    right: 18px;
+    bottom: 82px;
+    left: 18px;
+    right: auto;
     background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
     color: #ffffff;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 50px;
     padding: 10px 18px;
     font-size: 0.85rem;
@@ -1002,25 +1003,26 @@ body {
 .lib-audio-guide-bar {
     position: fixed;
     bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 92%;
-    max-width: 580px;
-    background: rgba(15, 23, 42, 0.95);
+    left: 18px;
+    right: auto;
+    transform: none;
+    width: auto;
+    max-width: 460px;
+    background: rgba(15, 23, 42, 0.96);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1.5px solid rgba(139, 92, 246, 0.4);
+    border: 1.5px solid rgba(139, 92, 246, 0.5);
     border-radius: 20px;
     padding: 12px 18px;
     color: #ffffff;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
     z-index: 9999;
-    animation: slideUpBar 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: slideUpLeftBar 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@keyframes slideUpBar {
-    from { opacity: 0; transform: translate(-50%, 25px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
+@keyframes slideUpLeftBar {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .lib-guide-content {
@@ -1099,23 +1101,27 @@ body {
     color: #ffffff;
 }
 
-/* Mobile responsive safe space for floating audio button */
+/* Mobile responsive safe space for floating audio button on the left */
 @media (max-width: 768px) {
     .lib-audio-float-btn {
-        bottom: 82px;
-        right: 12px;
+        bottom: 74px;
+        left: 10px;
+        right: auto;
         padding: 8px 14px;
         font-size: 0.78rem;
     }
     .lib-audio-guide-bar {
-        bottom: 78px;
-        width: 94%;
+        bottom: 70px;
+        left: 8px;
+        right: 8px;
+        width: calc(100% - 16px);
+        max-width: 100%;
         padding: 10px 14px;
     }
 }
 
 /* ==========================================================================
-   INTERACTIVE CLICKABLE KPI METRICS GRID & TIRANGA THEMED CARDS
+   INTERACTIVE CLICKABLE KPI METRICS GRID & DARK ANIMATED TIRANGA THEMED CARDS
    ========================================================================== */
 .lib-kpi-stats-grid {
     display: grid;
@@ -1123,29 +1129,43 @@ body {
     gap: 12px;
     margin-top: 18px;
     padding-top: 16px;
-    border-top: 2px dashed #e2e8f0;
+    border-top: 2px dashed #cbd5e1;
 }
 
 .lib-kpi-stat-card {
-    background: #ffffff;
+    background: #0f172a;
     border-radius: 16px;
-    padding: 14px 12px;
-    border: 1.5px solid #e2e8f0;
+    padding: 14px 10px;
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
     cursor: pointer;
     text-align: center !important;
     display: flex;
     flex-direction: column;
     align-items: center !important;
     justify-content: center !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
     position: relative;
     overflow: hidden;
+    color: #ffffff;
+}
+
+/* Tiranga animated top glowing wave line on every card */
+.lib-kpi-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3.5px;
+    background: linear-gradient(90deg, #ff671f, #ffffff, #10b981, #ff671f);
+    background-size: 300% 100%;
+    animation: tirangaWave 4s linear infinite;
 }
 
 .lib-kpi-stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
 
 .lib-kpi-stat-card:active {
@@ -1160,94 +1180,100 @@ body {
     letter-spacing: 0.3px;
     margin-bottom: 6px;
     display: inline-block;
+    text-align: center;
 }
-.orange-pill { background: #ffedd5; color: #c2410c; }
-.green-pill { background: #dcfce7; color: #15803d; }
-.blue-pill { background: #e0f2fe; color: #0369a1; }
-.purple-pill { background: #f3e8ff; color: #7e22ce; }
-.gold-pill { background: #fef3c7; color: #b45309; }
-.red-pill { background: #ffe4e6; color: #be123c; }
+
+.orange-pill { background: rgba(249, 115, 22, 0.25); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.5); }
+.green-pill { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.5); }
+.gold-pill { background: rgba(245, 158, 11, 0.25); color: #fde047; border: 1px solid rgba(245, 158, 11, 0.5); }
+.weather-pill { background: rgba(14, 165, 233, 0.25); color: #7dd3fc; border: 1px solid rgba(14, 165, 233, 0.5); }
+.install-pill { background: rgba(34, 197, 94, 0.25); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.5); }
+.tube-pill { background: rgba(244, 63, 94, 0.25); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.5); }
 
 .lib-kpi-icon-centered {
-    font-size: 1.5rem;
+    font-size: 1.55rem;
     margin-bottom: 4px;
     line-height: 1;
+    text-align: center;
 }
 
 .lib-kpi-num {
-    font-size: 1.6rem !important;
+    font-size: 1.45rem !important;
     font-weight: 900 !important;
     line-height: 1.2;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
+    text-align: center !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
-.color-orange { color: #E86A17 !important; }
-.color-green { color: #138A36 !important; }
-.color-blue { color: #0284c7 !important; }
-.color-purple { color: #7c3aed !important; }
-.color-gold { color: #d97706 !important; }
-.color-red { color: #e11d48 !important; }
+
+.color-orange { color: #fb923c !important; }
+.color-green { color: #34d399 !important; }
+.color-gold { color: #fde047 !important; }
+.color-weather { color: #38bdf8 !important; }
+.color-install { color: #4ade80 !important; }
+.color-tube { color: #fb7185 !important; }
 
 .lib-kpi-label {
     font-size: 0.76rem !important;
-    font-weight: 800 !important;
-    color: #475569;
+    font-weight: 700 !important;
+    color: #e2e8f0 !important;
     text-align: center !important;
     line-height: 1.3;
 }
 
-/* Tiranga Green-Orange-White Border Highlights */
+/* Individual Tiranga Themed Dark Glow Variations */
 .kpi-tiranga-orange {
-    border-color: #fdba74 !important;
-    background: linear-gradient(180deg, #fffaf5 0%, #ffffff 100%) !important;
+    background: linear-gradient(145deg, #1c1917 0%, #0f172a 100%) !important;
+    border-color: rgba(249, 115, 22, 0.45) !important;
 }
 .kpi-tiranga-orange:hover {
-    border-color: #E86A17 !important;
-    box-shadow: 0 10px 25px rgba(232, 106, 23, 0.2) !important;
+    border-color: #f97316 !important;
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.4) !important;
 }
 
 .kpi-tiranga-green {
-    border-color: #86efac !important;
-    background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%) !important;
+    background: linear-gradient(145deg, #06281e 0%, #0f172a 100%) !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
 }
 .kpi-tiranga-green:hover {
-    border-color: #138A36 !important;
-    box-shadow: 0 10px 25px rgba(19, 138, 54, 0.2) !important;
-}
-
-.kpi-tiranga-white {
-    border-color: #cbd5e1 !important;
-    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%) !important;
-}
-.kpi-tiranga-white:hover {
-    border-color: #0284c7 !important;
-    box-shadow: 0 10px 25px rgba(2, 132, 199, 0.18) !important;
-}
-
-.kpi-tiranga-purple {
-    border-color: #d8b4fe !important;
-    background: linear-gradient(180deg, #faf5ff 0%, #ffffff 100%) !important;
-}
-.kpi-tiranga-purple:hover {
-    border-color: #7c3aed !important;
-    box-shadow: 0 10px 25px rgba(124, 58, 237, 0.18) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4) !important;
 }
 
 .kpi-tiranga-gold {
-    border-color: #fde68a !important;
-    background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%) !important;
+    background: linear-gradient(145deg, #241805 0%, #0f172a 100%) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
 }
 .kpi-tiranga-gold:hover {
-    border-color: #d97706 !important;
-    box-shadow: 0 10px 25px rgba(217, 119, 6, 0.18) !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4) !important;
 }
 
-.kpi-tiranga-red {
-    border-color: #fecdd3 !important;
-    background: linear-gradient(180deg, #fff1f2 0%, #ffffff 100%) !important;
+.kpi-tiranga-weather {
+    background: linear-gradient(145deg, #082f49 0%, #0f172a 100%) !important;
+    border-color: rgba(56, 189, 248, 0.45) !important;
 }
-.kpi-tiranga-red:hover {
-    border-color: #e11d48 !important;
-    box-shadow: 0 10px 25px rgba(225, 29, 72, 0.18) !important;
+.kpi-tiranga-weather:hover {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 10px 25px rgba(56, 189, 248, 0.4) !important;
+}
+
+.kpi-tiranga-install {
+    background: linear-gradient(145deg, #142e1d 0%, #0f172a 100%) !important;
+    border-color: rgba(74, 222, 128, 0.45) !important;
+}
+.kpi-tiranga-install:hover {
+    border-color: #22c55e !important;
+    box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4) !important;
+}
+
+.kpi-tiranga-tube {
+    background: linear-gradient(145deg, #3b0718 0%, #0f172a 100%) !important;
+    border-color: rgba(244, 63, 94, 0.45) !important;
+}
+.kpi-tiranga-tube:hover {
+    border-color: #f43f5e !important;
+    box-shadow: 0 10px 25px rgba(244, 63, 94, 0.4) !important;
 }
 
 /* ==========================================================================

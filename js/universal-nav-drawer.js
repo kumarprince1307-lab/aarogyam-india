@@ -754,6 +754,12 @@
   window.logoutUniversalUser = function () {
     localStorage.removeItem('AI_USER');
     localStorage.removeItem('AI_PROFILE');
+    localStorage.removeItem('AI_SESSION');
+    localStorage.removeItem('AI_LOGIN_STATUS');
+    localStorage.removeItem('AI_PURCHASES');
+    localStorage.removeItem('purchases');
+    localStorage.removeItem('user_purchases');
+    localStorage.removeItem('aim_purchases');
     localStorage.removeItem('UCAS_USER');
     localStorage.removeItem('aim_user_name');
     localStorage.removeItem('aim_user_mobile');
@@ -762,7 +768,7 @@
     localStorage.removeItem('aarogyam_user');
     localStorage.removeItem('CURRENT_USER');
     localStorage.removeItem('wb_registered');
-    sessionStorage.removeItem('ai_guest_dismissed');
+    try { sessionStorage.clear(); } catch(e) {}
     alert('आप सफलतापूर्वक लॉगआउट हो चुके हैं। (Logged out successfully)');
     window.location.reload();
   };

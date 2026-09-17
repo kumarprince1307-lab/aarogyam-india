@@ -176,7 +176,13 @@
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem(PROFILE_KEY);
         localStorage.removeItem(SESSION_KEY);
-        sessionStorage.removeItem('temp_share_id');
+        localStorage.removeItem('AI_PURCHASES');
+        localStorage.removeItem('purchases');
+        localStorage.removeItem('aim_user_name');
+        localStorage.removeItem('aim_user_mobile');
+        localStorage.removeItem('aim_profile_completed');
+        localStorage.removeItem('ai_profile_completed');
+        try { sessionStorage.clear(); } catch(e) {}
         
         console.log("User session cleared. Reloading...");
         window.location.reload();
