@@ -199,14 +199,11 @@ export async function initBookLandingPages() {
       <button type="button" id="tab-btn-coming-soon-leads" onclick="window.switchAdminSubTab('leads')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); color: var(--admin-text); font-weight: 800;">
         🔔 3. कमिंग सून इंटरेस्ट लीड्स (Farmer Leads)
       </button>
-      <button type="button" id="tab-btn-free-demo-mgr" onclick="window.switchAdminSubTab('free_demo')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #f59e0b; color: #f59e0b; font-weight: 800;">
-        🎁 4. डेमो व फ्री ई-बुक्स स्टूडियो (Demo & Free Books Studio)
-      </button>
       <button type="button" id="tab-btn-popups-mgr" onclick="window.switchAdminSubTab('popups')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #3b82f6; color: #38bdf8; font-weight: 800;">
-        🔔 5. सोशल प्रूफ व पॉपअप्स (Social Proof & Popups)
+        🔔 4. सोशल प्रूफ व पॉपअप्स (Social Proof & Popups)
       </button>
       <button type="button" id="tab-btn-ai-studio-mgr" onclick="window.switchAdminSubTab('ai_studio')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #ec4899; color: #f472b6; font-weight: 800; box-shadow: 0 2px 10px rgba(236,72,153,0.25);">
-        🚀 6. AI ई-बुक क्रिएटर व 3-टियर असेंबलर (AI Studio)
+        🚀 5. AI ई-बुक क्रिएटर व 3-टियर असेंबलर (AI Studio)
       </button>
     </div>
 
@@ -228,11 +225,11 @@ export async function initBookLandingPages() {
 
       <form id="admin-book-lp-form" onsubmit="return false;">
         
-        <!-- SECTION 1: BOOK CODE / ID & CATEGORY & LIBRARY SAVE -->
-        <div style="background: rgba(22,163,74,0.08); border: 1px solid rgba(22,163,74,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+        <!-- SECTION 1: BOOK TYPE & CODE / ID & CATEGORY & AUDIENCE -->
+        <div style="background: rgba(22,163,74,0.08); border: 1.5px solid rgba(22,163,74,0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <label style="font-weight: 800; color: #16a34a; font-size: 0.95rem; margin: 0;">
-              🆔 1. बुक कोड व कैटेगरी चयन (Book Code & Category) *
+              🆔 1. बुक का प्रकार, कोड व कैटेगरी (Book Type, Code & Category) *
             </label>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <button type="button" id="btn_generate_book_code" class="admin-button small-button" style="background: #16a34a; color: #fff; font-weight: 700; padding: 4px 12px;">
@@ -242,6 +239,21 @@ export async function initBookLandingPages() {
                 + नया Category जोड़ें
               </button>
             </div>
+          </div>
+
+          <!-- MASTER BOOK TYPE SELECTOR -->
+          <div style="margin-bottom: 14px; background: rgba(0,0,0,0.35); padding: 12px 14px; border-radius: 8px; border: 1.5px solid #f59e0b; display: grid; grid-template-columns: 1.2fr 2fr; gap: 12px; align-items: center;">
+            <div>
+              <label class="admin-label" style="font-weight: 800; color: #f59e0b; font-size: 0.88rem; margin: 0;">
+                📚 पुस्तक का प्रकार (Book Type): *
+              </label>
+              <span style="font-size: 0.74rem; color: var(--admin-muted);">सभी पेड, 100% फ्री बोनस व फ्री डेमो यहीं से मैनेज होंगी</span>
+            </div>
+            <select id="blp_book_type" onchange="window.handleMasterBookTypeChange(this.value)" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 800; font-size: 0.92rem; color: #fef08a; background: #0f172a; border: 1.5px solid #f59e0b;">
+              <option value="paid">📘 Paid Main Book (सशुल्क मुख्य पुस्तक — ₹99/₹299)</option>
+              <option value="free">🎁 100% Free Bonus Book (मुफ़्त बोनस पुस्तक — ₹0)</option>
+              <option value="demo">📖 Free Sample Demo Book (मुफ़्त सैंपल डेमो पुस्तक — ₹0)</option>
+            </select>
           </div>
 
           <div style="display: grid; grid-template-columns: 1.2fr 1.2fr 1fr; gap: 12px;">
@@ -266,6 +278,54 @@ export async function initBookLandingPages() {
                 <option value="Digital AI">🤖 Digital AI (डिजिटल कौशल)</option>
                 <option value="Membership">👑 Membership (सदस्यता)</option>
               </select>
+            </div>
+          </div>
+
+          <!-- AUDIENCE & ATTACHED MAIN BOOKS TRAY (Active for Free/Demo) -->
+          <div id="blp_free_audience_block" style="display: none; margin-top: 14px; background: rgba(59,130,246,0.08); border: 1.5px solid rgba(59,130,246,0.35); border-radius: 8px; padding: 12px;">
+            <div style="font-weight: 800; color: #60a5fa; font-size: 0.88rem; margin-bottom: 8px;">
+              👥 मुफ़्त पुस्तक ऑडियंस व अटैच्ड मुख्य किताबें (Audience & Attached Main Books):
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; margin-bottom: 10px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; font-weight: 700;">ऑडियंस विजिबिलिटी प्रकार:</label>
+                <select id="blp_audience_type" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.82rem; font-weight: 700;">
+                  <option value="all">🌍 All Users (सभी किसान व विज़िटर्स को दिखे)</option>
+                  <option value="active_only">👑 Active Paid Members (केवल खरीदार व VIP को)</option>
+                  <option value="attached_books">🔗 Attached Books Only (केवल नीचे चुनी गई किताबों के साथ)</option>
+                </select>
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; font-weight: 700;">मुख्य पुस्तक से डेटा व प्रिव्यू इम्पोर्ट:</label>
+                <div style="display: flex; gap: 6px;">
+                  <select id="blp_import_source_book" class="admin-select" style="flex: 1; padding: 6px 8px; font-size: 0.8rem; font-weight: 700;">
+                    <option value="BK001">🌾 BK001: खरीफ फसल मास्टर गाइड</option>
+                    <option value="BK002">🩺 BK002: खेती का डॉक्टर</option>
+                    <option value="BK003">🌾 BK003: अनाज भंडारण गाइड</option>
+                    <option value="BK004">🍚 BK004: चावल प्रोसेसिंग गाइड</option>
+                    <option value="BK005">🌾 BK005: धान मास्टर गाइड</option>
+                    <option value="BK006">🤖 BK006: AI वेबसाइट गाइड</option>
+                    <option value="BK007">🌾 BK007: गेहूं मास्टर गाइड</option>
+                    <option value="BK008">🌱 BK008: जैविक खेती गाइड</option>
+                    <option value="BK009">🌾 BK009: मक्का मास्टर गाइड</option>
+                    <option value="BK010">🌸 BK010: फूल खेती गाइड</option>
+                    <option value="BK011">🏡 BK011: पॉलीहाउस नेटहाउस गाइड</option>
+                    <option value="BK012">🌱 BK012: सब्जी खेती गाइड</option>
+                    <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
+                  </select>
+                  <button type="button" onclick="window.autoImportDemoFromSelectedBook()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; font-size: 0.75rem; white-space: nowrap;">
+                    📥 इम्पोर्ट करें
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Attached Books Checkbox Tray -->
+            <label class="admin-label" style="font-size: 0.76rem; font-weight: 700; color: #93c5fd; margin-bottom: 4px; display: block;">
+              🔗 यह मुफ़्त किताब किन मुख्य किताबों के साथ My Library में ऑटो-ऐड होगी:
+            </label>
+            <div id="blp_attached_books_tray" style="display: flex; flex-wrap: wrap; gap: 8px; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
+              <!-- Rendered with BK001..BK015 checkboxes -->
             </div>
           </div>
         </div>
@@ -1317,10 +1377,10 @@ Instant Download & Lifetime Access
           </div>
         </div>
 
-        <!-- SECTION 17: THEME COLOR & STYLING & STATUS -->
+        <!-- SECTION 17: THEME COLOR, PLACEMENTS & STATUS -->
         <div style="background: rgba(139,92,246,0.08); border: 1.5px solid rgba(139,92,246,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <label style="font-weight: 800; color: #a78bfa; font-size: 0.95rem; display: block; margin-bottom: 8px;">
-            🎨 17. थीम कलर व पेज स्टेटस (Theme Color Palette System)
+            🎨 17. थीम कलर, डिस्प्ले प्लेसमेंट व पेज स्टेटस (Theme & Detailed Placements)
           </label>
           <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px;">
             <button type="button" class="admin-button small-button theme-color-btn" data-color="#2E7D32" data-dark="#1B5E20" style="background: #2E7D32; color: #fff; font-weight: 700;">🟢 Forest Green</button>
@@ -1335,13 +1395,65 @@ Instant Download & Lifetime Access
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <!-- DETAILED MULTI-PLACEMENT TRAY -->
+          <div style="background: rgba(0,0,0,0.3); border: 1.5px dashed rgba(167,139,250,0.4); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
+            <div style="font-weight: 800; color: #c4b5fd; font-size: 0.88rem; margin-bottom: 8px;">
+              📍 डिस्प्ले प्लेसमेंट (Multi-Placement Tray — यह पुस्तक वेबसाइट पर कहाँ-कहाँ दिखेगी):
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
+                <input type="checkbox" id="blp_pub_home_hero" checked style="accent-color: #8b5cf6;" />
+                <span>🏠 Home Hero Slider</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
+                <input type="checkbox" id="blp_pub_home_page" checked style="accent-color: #8b5cf6;" />
+                <span>🏠 Home Featured Grid</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
+                <input type="checkbox" id="blp_pub_ebook_store" checked style="accent-color: #8b5cf6;" />
+                <span>🏪 eBook Store Catalog</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
+                <input type="checkbox" id="blp_pub_my_library" checked style="accent-color: #8b5cf6;" />
+                <span>📖 My Library Trays</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
+                <input type="checkbox" id="blp_pub_category_page" checked style="accent-color: #8b5cf6;" />
+                <span>🌾 Category Pages Hub</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
+                <input type="checkbox" id="blp_pub_download_funnel" checked style="accent-color: #8b5cf6;" />
+                <span>📥 Download Funnel Shelf</span>
+              </label>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
             <div>
               <label class="admin-label" style="font-weight: 700;">लाइव / ऑफलाइन स्टेटस:</label>
               <select id="blp_status" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 800;">
                 <option value="active">🟢 Live / Online</option>
                 <option value="draft">⏳ Draft / Offline</option>
                 <option value="disabled">🔴 Disabled</option>
+              </select>
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight: 700;">कमिंग सून मोड (Coming Soon):</label>
+              <select id="blp_is_coming_soon" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 800;">
+                <option value="false">🟢 Released / Live Now</option>
+                <option value="true">⏳ Coming Soon (Notify Me Active)</option>
+              </select>
+            </div>
+            <div>
+              <label class="admin-label" style="font-weight: 700;">Storefront Badge:</label>
+              <select id="blp_store_badge" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 700;">
+                <option value="best_seller">🔥 Bestseller (सर्वाधिक लोकप्रिय)</option>
+                <option value="top_rated">⭐ Top Rated (उत्कृष्ट रेटिंग)</option>
+                <option value="new_launch">✨ New Launch (नया प्रकाशन)</option>
+                <option value="editors_pick">👑 Editor's Pick (संपादक की पसंद)</option>
+                <option value="bonus_free">🎁 100% Free Bonus (मुफ़्त उपहार)</option>
+                <option value="free_demo">📖 Free Sample Demo (मुफ़्त डेमो)</option>
+                <option value="coming_soon">⏳ Coming Soon (जल्द आ रही है)</option>
               </select>
             </div>
             <div>
@@ -2621,6 +2733,13 @@ Instant Download & Lifetime Access
     if (elVideos) elVideos.textContent = videos;
   }
 
+  let currentTableFilter = 'all';
+
+  window.setTableFilter = function(filter) {
+    currentTableFilter = filter;
+    renderTable();
+  };
+
   function renderTable() {
     const tableWrap = document.getElementById('blp_table_container');
     if (!tableWrap) return;
@@ -2631,101 +2750,191 @@ Instant Download & Lifetime Access
       const id = (p.id || '').toLowerCase();
       const title = (p.hero?.title || p.heading || p.name || '').toLowerCase();
       const cat = (p.category || '').toLowerCase();
-      return id.includes(q) || title.includes(q) || cat.includes(q);
+      const matchesSearch = !q || id.includes(q) || title.includes(q) || cat.includes(q);
+      if (!matchesSearch) return false;
+
+      const rawId = (p.id || '').toUpperCase();
+      const offerPrice = Number(p.hero?.offer_price ?? p.offerPrice ?? 99);
+      let bType = p.book_type;
+      if (!bType) {
+        if (rawId.startsWith('DEMO')) bType = 'demo';
+        else if (rawId.startsWith('BONUS') || offerPrice === 0) bType = 'free';
+        else bType = 'paid';
+      }
+
+      const isLive = (p.status || 'active') === 'active';
+      const isComing = p.is_coming_soon === true || p.store_badge === 'coming_soon' || p.status === 'coming_soon';
+
+      if (currentTableFilter === 'paid') return bType === 'paid' && !isComing;
+      if (currentTableFilter === 'free') return (bType === 'free' || bType === 'bonus_free') && !isComing;
+      if (currentTableFilter === 'demo') return bType === 'demo' && !isComing;
+      if (currentTableFilter === 'coming_soon') return isComing;
+      if (currentTableFilter === 'live') return isLive && !isComing;
+      if (currentTableFilter === 'offline') return !isLive;
+      return true;
     });
 
-    if (filtered.length === 0) {
-      tableWrap.innerHTML = '<div class="admin-empty" style="text-align:center;padding:2rem;color:var(--admin-muted);">कोई बुक लैंडिंग पेज नहीं मिला।</div>';
-      return;
-    }
+    const filterCounts = {
+      all: allLandingPages.length,
+      paid: allLandingPages.filter(p => (p.book_type === 'paid' || (!p.book_type && !String(p.id).toUpperCase().startsWith('DEMO') && !String(p.id).toUpperCase().startsWith('BONUS') && Number(p.hero?.offer_price ?? p.offerPrice ?? 99) > 0))).length,
+      free: allLandingPages.filter(p => p.book_type === 'free' || p.book_type === 'bonus_free' || String(p.id).toUpperCase().startsWith('BONUS') || Number(p.hero?.offer_price ?? p.offerPrice ?? 99) === 0).length,
+      demo: allLandingPages.filter(p => p.book_type === 'demo' || String(p.id).toUpperCase().startsWith('DEMO')).length,
+      coming_soon: allLandingPages.filter(p => p.is_coming_soon === true || p.store_badge === 'coming_soon' || p.status === 'coming_soon').length,
+      live: allLandingPages.filter(p => (p.status || 'active') === 'active' && !p.is_coming_soon).length,
+      offline: allLandingPages.filter(p => p.status === 'draft' || p.status === 'offline' || p.status === 'disabled').length
+    };
+
+    const filterBtnStyle = (key, activeColor = '#16a34a') => {
+      const active = currentTableFilter === key;
+      return `background: ${active ? activeColor : 'var(--admin-surface, #1e293b)'}; color: ${active ? '#fff' : 'var(--admin-text)'}; border: 1.5px solid ${active ? activeColor : 'var(--admin-border)'}; font-weight: 800; padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;`;
+    };
 
     tableWrap.innerHTML = `
-      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-        ${filtered.map(p => {
-          const rawId = (p.id || '').toUpperCase();
-          let liveUrl = `/ebooks/book-landing.html?id=${encodeURIComponent(p.id)}`;
-          if (rawId === 'BK001') liveUrl = '/ebooks/kharif-master-guide-2026.html';
-          else if (rawId === 'BK002') liveUrl = '/ebooks/kheti-dr.html';
-          const isLive = (p.status || 'active') === 'active';
-          const isComingSoon = p.is_coming_soon === true || p.store_badge === 'coming_soon';
-          const themeCol = p.theme_primary || '#2E7D32';
-          const badgeText = p.store_badge || 'best_seller';
-          const coverImg = p.hero?.cover_image || p.cover || '/images/books/kharif-master-guide-2026-cover.webp';
-          const offerPrice = p.hero?.offer_price || p.offerPrice || 99;
-          const mrpPrice = p.hero?.mrp || p.mrp || 299;
-          const title = p.hero?.title || p.heading || p.name || 'Untitled Book';
+      <!-- TABLE FILTER PILLS / TABS -->
+      <div style="display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;">
+        <button type="button" onclick="window.setTableFilter('all')" style="${filterBtnStyle('all', '#16a34a')}">
+          <span>🔘 सभी (All)</span> <span style="background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:10px; font-size:0.72rem;">${filterCounts.all}</span>
+        </button>
+        <button type="button" onclick="window.setTableFilter('paid')" style="${filterBtnStyle('paid', '#2563eb')}">
+          <span>📘 Paid Books</span> <span style="background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:10px; font-size:0.72rem;">${filterCounts.paid}</span>
+        </button>
+        <button type="button" onclick="window.setTableFilter('free')" style="${filterBtnStyle('free', '#059669')}">
+          <span>🎁 Free Bonus</span> <span style="background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:10px; font-size:0.72rem;">${filterCounts.free}</span>
+        </button>
+        <button type="button" onclick="window.setTableFilter('demo')" style="${filterBtnStyle('demo', '#f59e0b')}">
+          <span>📖 Free Demo</span> <span style="background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:10px; font-size:0.72rem;">${filterCounts.demo}</span>
+        </button>
+        <button type="button" onclick="window.setTableFilter('coming_soon')" style="${filterBtnStyle('coming_soon', '#9333ea')}">
+          <span>⏳ Coming Soon</span> <span style="background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:10px; font-size:0.72rem;">${filterCounts.coming_soon}</span>
+        </button>
+        <button type="button" onclick="window.setTableFilter('live')" style="${filterBtnStyle('live', '#16a34a')}">
+          <span>🟢 Live</span> <span style="background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:10px; font-size:0.72rem;">${filterCounts.live}</span>
+        </button>
+        <button type="button" onclick="window.setTableFilter('offline')" style="${filterBtnStyle('offline', '#ef4444')}">
+          <span>🔴 Offline</span> <span style="background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:10px; font-size:0.72rem;">${filterCounts.offline}</span>
+        </button>
+      </div>
 
-          return `
-            <div style="background: var(--admin-surface, #1e293b); border: 1.5px solid var(--admin-border); border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: border-color 0.2s;">
-              <!-- 1. Cover & Info -->
-              <div style="display: flex; align-items: center; gap: 12px; min-width: 240px; flex: 1 1 auto;">
-                <img src="${coverImg}" alt="Cover" style="width: 48px; height: 64px; object-fit: contain; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1); background: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); flex-shrink: 0;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
-                <div style="min-width: 0;">
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="font-family: monospace; font-size: 1rem; font-weight: 900; color: ${themeCol}; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px; display: inline-block;">
-                      ${p.id}
-                    </span>
-                    <button type="button" onclick="window.toggleLiveStatus('${p.id}')" class="admin-button small-button" style="background:${isLive ? 'rgba(22,163,74,0.18)' : 'rgba(239,68,68,0.18)'}; color:${isLive ? '#4ade80' : '#f87171'}; border: 1.5px solid ${isLive ? '#16a34a' : '#ef4444'}; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
-                      ${isLive ? '🟢 Live' : '🔴 Offline'}
-                    </button>
-                  </div>
-                  <div style="font-weight: 800; color: var(--admin-text); font-size: 0.96rem; line-height: 1.3; margin-bottom: 4px;">
-                    ${escapeHtml(title)}
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <span style="font-size: 0.75rem; color: var(--admin-muted); font-weight: 700;">📁 ${p.category || 'Agriculture'}</span>
-                    <span style="font-size: 1rem; font-weight: 900; color: #16a34a;">₹${offerPrice}</span>
-                    <span style="font-size: 0.75rem; color: var(--admin-muted); text-decoration: line-through;">₹${mrpPrice}</span>
-                    <span style="font-size: 0.72rem; background: #fef08a; color: #854d0e; padding: 1px 6px; border-radius: 4px; font-weight: 800;">🏷️ ${badgeText}</span>
-                    ${isComingSoon ? '<span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 1px 6px; border-radius: 4px; font-weight: 800;">⏳ Coming Soon</span>' : ''}
+      ${filtered.length === 0 ? `
+        <div class="admin-empty" style="text-align:center;padding:2.5rem;color:var(--admin-muted);background:var(--admin-surface);border-radius:10px;border:1px dashed var(--admin-border);">
+          <div style="font-size:2rem;margin-bottom:6px;">🔍</div>
+          <div>इस फ़िल्टर में कोई पुस्तक नहीं मिली।</div>
+        </div>
+      ` : `
+        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+          ${filtered.map(p => {
+            const rawId = (p.id || '').toUpperCase();
+            const offerPrice = Number(p.hero?.offer_price ?? p.offerPrice ?? 99);
+            const mrpPrice = Number(p.hero?.mrp ?? p.mrp ?? 299);
+            
+            let bType = p.book_type;
+            if (!bType) {
+              if (rawId.startsWith('DEMO')) bType = 'demo';
+              else if (rawId.startsWith('BONUS') || offerPrice === 0) bType = 'free';
+              else bType = 'paid';
+            }
+
+            let liveUrl = `/ebooks/book-landing.html?id=${encodeURIComponent(p.id)}`;
+            if (rawId === 'BK001') liveUrl = '/ebooks/kharif-master-guide-2026.html';
+            else if (rawId === 'BK002') liveUrl = '/ebooks/kheti-dr.html';
+            else if (bType === 'demo') liveUrl = `/ebooks/demo-kharif.html?id=${encodeURIComponent(p.id)}`;
+
+            const isLive = (p.status || 'active') === 'active';
+            const isComingSoon = p.is_coming_soon === true || p.store_badge === 'coming_soon' || p.status === 'coming_soon';
+            const themeCol = p.theme_primary || '#2E7D32';
+            const badgeText = p.store_badge || (bType === 'free' ? 'bonus_free' : (bType === 'demo' ? 'free_demo' : 'best_seller'));
+            const coverImg = p.hero?.cover_image || p.cover || '/images/books/kharif-master-guide-2026-cover.webp';
+            const title = p.hero?.title || p.heading || p.name || 'Untitled Book';
+
+            let typeBadgeHtml = '<span style="font-size: 0.72rem; background: rgba(59,130,246,0.15); color: #60a5fa; padding: 2px 8px; border-radius: 6px; font-weight: 800; border: 1px solid rgba(59,130,246,0.3);">📘 Paid Book</span>';
+            if (bType === 'free' || bType === 'bonus_free') {
+              typeBadgeHtml = '<span style="font-size: 0.72rem; background: rgba(34,197,94,0.15); color: #4ade80; padding: 2px 8px; border-radius: 6px; font-weight: 800; border: 1px solid rgba(34,197,94,0.3);">🎁 100% Free Bonus</span>';
+            } else if (bType === 'demo') {
+              typeBadgeHtml = '<span style="font-size: 0.72rem; background: rgba(245,158,11,0.15); color: #fbbf24; padding: 2px 8px; border-radius: 6px; font-weight: 800; border: 1px solid rgba(245,158,11,0.3);">📖 Free Demo</span>';
+            }
+
+            // Placements summary tags
+            const targets = Array.isArray(p.publish_targets) ? p.publish_targets : ['ebook_store', 'my_library', 'home_page'];
+            const targetTags = targets.map(t => {
+              if (t === 'home_hero') return '🏠 Slider';
+              if (t === 'home_page') return '🏠 Grid';
+              if (t === 'ebook_store') return '🏪 Store';
+              if (t === 'my_library') return '📖 Library';
+              if (t === 'category_page') return '🌾 Hub';
+              if (t === 'download_funnel') return '📥 Funnel';
+              return t;
+            }).join(' • ');
+
+            return `
+              <div style="background: var(--admin-surface, #1e293b); border: 1.5px solid var(--admin-border); border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: border-color 0.2s;">
+                <!-- 1. Cover & Info -->
+                <div style="display: flex; align-items: center; gap: 12px; min-width: 240px; flex: 1 1 auto;">
+                  <img src="${coverImg}" alt="Cover" style="width: 52px; height: 68px; object-fit: contain; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1); background: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); flex-shrink: 0;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
+                  <div style="min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap;">
+                      <span style="font-family: monospace; font-size: 0.95rem; font-weight: 900; color: ${themeCol}; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px; display: inline-block;">
+                        ${p.id}
+                      </span>
+                      ${typeBadgeHtml}
+                      <button type="button" onclick="window.toggleLiveStatus('${p.id}')" class="admin-button small-button" style="background:${isLive ? 'rgba(22,163,74,0.18)' : 'rgba(239,68,68,0.18)'}; color:${isLive ? '#4ade80' : '#f87171'}; border: 1.5px solid ${isLive ? '#16a34a' : '#ef4444'}; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                        ${isLive ? '🟢 Live' : '🔴 Offline'}
+                      </button>
+                      ${isComingSoon ? '<span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 1px 6px; border-radius: 4px; font-weight: 800;">⏳ Coming Soon</span>' : ''}
+                    </div>
+                    <div style="font-weight: 800; color: var(--admin-text); font-size: 0.96rem; line-height: 1.3; margin-bottom: 4px;">
+                      ${escapeHtml(title)}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                      <span style="font-size: 0.75rem; color: var(--admin-muted); font-weight: 700;">📁 ${p.category || 'Agriculture'}</span>
+                      <span style="font-size: 1rem; font-weight: 900; color: ${offerPrice === 0 ? '#10b981' : '#16a34a'};">${offerPrice === 0 ? '₹0 (मुफ़्त)' : `₹${offerPrice}`}</span>
+                      ${mrpPrice > offerPrice ? `<span style="font-size: 0.75rem; color: var(--admin-muted); text-decoration: line-through;">₹${mrpPrice}</span>` : ''}
+                      <span style="font-size: 0.72rem; background: rgba(255,255,255,0.06); color: #cbd5e1; padding: 1px 6px; border-radius: 4px; font-weight: 700;">📍 ${targetTags || 'Store • Library'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- 2. Quick Actions (Always Visible Right There) -->
-              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-left: auto;">
-                <button type="button" onclick="window.editBookLandingPage('${p.id}')" class="admin-button" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; padding: 8px 16px; border-radius: 8px; font-size: 0.86rem; box-shadow: 0 2px 10px rgba(245,158,11,0.35); cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" title="इस पेज को एडिट करें">
-                  <span>✏️</span> <span>एडिट करें</span>
-                </button>
-                <a href="${liveUrl}" target="_blank" class="admin-button small-button" style="background: #2563eb; color: #fff; text-decoration: none; font-weight: 800; padding: 8px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;" title="लाइव पेज देखें">
-                  <span>👁️</span> <span>देखें</span>
-                </a>
-                <button type="button" onclick="window.copyBookLandingUrl('${p.id}')" class="admin-button small-button" style="background: rgba(255,255,255,0.08); border: 1px solid var(--admin-border); color: var(--admin-muted); padding: 8px 10px; border-radius: 8px; cursor: pointer;" title="लिंक कॉपी करें">
-                  📋
-                </button>
-                <button type="button" onclick="window.deleteBookLandingPage('${p.id}')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #f87171; padding: 8px 10px; border-radius: 8px; cursor: pointer;" title="हटाएं">
-                  🗑️
-                </button>
+                <!-- 2. Quick Actions with Prominent Eye View Button -->
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-left: auto;">
+                  <button type="button" onclick="window.editBookLandingPage('${p.id}')" class="admin-button" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; padding: 8px 14px; border-radius: 8px; font-size: 0.86rem; box-shadow: 0 2px 10px rgba(245,158,11,0.35); cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" title="इस पेज को एडिट करें">
+                    <span>✏️</span> <span>एडिट</span>
+                  </button>
+                  <a href="${liveUrl}" target="_blank" class="admin-button small-button" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; text-decoration: none; font-weight: 800; padding: 8px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(37,99,235,0.35);" title="लाइव पेज देखें (Preview / View)">
+                    <span>👁️</span> <span>देखें</span>
+                  </a>
+                  <button type="button" onclick="window.copyBookLandingUrl('${p.id}')" class="admin-button small-button" style="background: rgba(255,255,255,0.08); border: 1px solid var(--admin-border); color: var(--admin-muted); padding: 8px 10px; border-radius: 8px; cursor: pointer;" title="लिंक कॉपी करें">
+                    📋
+                  </button>
+                  <button type="button" onclick="window.deleteBookLandingPage('${p.id}')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #f87171; padding: 8px 10px; border-radius: 8px; cursor: pointer;" title="हटाएं">
+                    🗑️
+                  </button>
+                </div>
               </div>
-            </div>
-          `;
-        }).join('')}
-      </div>
+            `;
+          }).join('')}
+        </div>
+      `}
     `;
   }
 
   // -------------------------------------------------------------
-  // SUB-TAB SWITCHING LOGIC (Pages vs Shelves vs Leads vs Free Demo vs Popups vs AI Studio)
+  // SUB-TAB SWITCHING LOGIC (Pages vs Shelves vs Leads vs Popups vs AI Studio)
   // -------------------------------------------------------------
   window.switchAdminSubTab = function(tab) {
     const pagesCard = document.getElementById('admin-pages-subtab-container');
     const shelvesCard = document.getElementById('admin-shelves-subtab-container');
     const leadsCard = document.getElementById('admin-leads-subtab-container');
-    const freeDemoCard = document.getElementById('admin-free-demo-subtab-container');
     const popupsCard = document.getElementById('admin-popups-subtab-container');
     const aiStudioCard = document.getElementById('admin-ai-studio-subtab-container');
 
     const btnPages = document.getElementById('tab-btn-landing-pages');
     const btnShelves = document.getElementById('tab-btn-shelves-mgr');
     const btnLeads = document.getElementById('tab-btn-coming-soon-leads');
-    const btnFreeDemo = document.getElementById('tab-btn-free-demo-mgr');
     const btnPopups = document.getElementById('tab-btn-popups-mgr');
     const btnAiStudio = document.getElementById('tab-btn-ai-studio-mgr');
 
     if (pagesCard) pagesCard.style.display = tab === 'pages' ? 'block' : 'none';
     if (shelvesCard) shelvesCard.style.display = tab === 'shelves' ? 'block' : 'none';
     if (leadsCard) leadsCard.style.display = tab === 'leads' ? 'block' : 'none';
-    if (freeDemoCard) freeDemoCard.style.display = tab === 'free_demo' ? 'block' : 'none';
     if (popupsCard) popupsCard.style.display = tab === 'popups' ? 'block' : 'none';
     if (aiStudioCard) aiStudioCard.style.display = tab === 'ai_studio' ? 'block' : 'none';
 
@@ -2747,12 +2956,6 @@ Instant Download & Lifetime Access
       btnLeads.style.borderColor = tab === 'leads' ? '#0284c7' : 'var(--admin-border)';
     }
 
-    if (btnFreeDemo) {
-      btnFreeDemo.style.background = tab === 'free_demo' ? '#f59e0b' : 'var(--admin-surface, #1e293b)';
-      btnFreeDemo.style.color = tab === 'free_demo' ? '#000' : '#f59e0b';
-      btnFreeDemo.style.borderColor = '#f59e0b';
-    }
-
     if (btnPopups) {
       btnPopups.style.background = tab === 'popups' ? '#38bdf8' : 'var(--admin-surface, #1e293b)';
       btnPopups.style.color = tab === 'popups' ? '#000' : '#38bdf8';
@@ -2767,7 +2970,6 @@ Instant Download & Lifetime Access
 
     if (tab === 'shelves') window.renderStoreShelvesTab();
     if (tab === 'leads') window.renderComingSoonLeadsTab();
-    if (tab === 'free_demo') window.renderFreeDemoStudioTab();
     if (tab === 'popups') window.renderPopupsManagerTab();
     if (tab === 'ai_studio') window.renderAiStudioTab();
   };
@@ -6497,6 +6699,114 @@ Instant Download & Lifetime Access
     showToast(`स्टेटस बदला गया: ${page.status === 'active' ? '🟢 Live' : '🔴 Offline'}`, 'success');
   };
 
+  window.handleMasterBookTypeChange = function(type) {
+    const audBlock = document.getElementById('blp_free_audience_block');
+    const priceInput = document.getElementById('blp_hero_offer_price');
+    const badgeSelect = document.getElementById('blp_store_badge');
+    const stickyTextInput = document.getElementById('blp_sticky_btn_text');
+
+    if (type === 'free') {
+      if (audBlock) audBlock.style.display = 'block';
+      if (priceInput) priceInput.value = '0';
+      if (badgeSelect) badgeSelect.value = 'bonus_free';
+      if (stickyTextInput) stickyTextInput.value = 'मुफ़्त डाउनलोड करें';
+      window.renderAttachedBooksTray();
+    } else if (type === 'demo') {
+      if (audBlock) audBlock.style.display = 'block';
+      if (priceInput) priceInput.value = '0';
+      if (badgeSelect) badgeSelect.value = 'free_demo';
+      if (stickyTextInput) stickyTextInput.value = 'डेमो पढ़ें';
+      window.renderAttachedBooksTray();
+    } else {
+      if (audBlock) audBlock.style.display = 'none';
+      if (priceInput && (priceInput.value === '0' || !priceInput.value)) priceInput.value = '99';
+      if (badgeSelect) badgeSelect.value = 'best_seller';
+      if (stickyTextInput) stickyTextInput.value = 'खरीदें';
+    }
+  };
+
+  const ALL_MAIN_BOOKS_LIST = [
+    { id: 'BK001', name: '🌾 खरीफ फसल मास्टर गाइड' },
+    { id: 'BK002', name: '🩺 खेती का डॉक्टर' },
+    { id: 'BK003', name: '🌾 अनाज भंडारण गाइड' },
+    { id: 'BK004', name: '🍚 चावल प्रोसेसिंग गाइड' },
+    { id: 'BK005', name: '🌾 धान मास्टर गाइड' },
+    { id: 'BK006', name: '🤖 AI वेबसाइट गाइड' },
+    { id: 'BK007', name: '🌾 गेहूं मास्टर गाइड' },
+    { id: 'BK008', name: '🌱 जैविक खेती गाइड' },
+    { id: 'BK009', name: '🌾 मक्का मास्टर गाइड' },
+    { id: 'BK010', name: '🌸 फूल खेती गाइड' },
+    { id: 'BK011', name: '🏡 पॉलीहाउस नेटहाउस गाइड' },
+    { id: 'BK012', name: '🌱 सब्जी खेती गाइड' },
+    { id: 'BK015', name: '🌱 सब्जी खेती मास्टर PART 1' }
+  ];
+
+  window.renderAttachedBooksTray = function(selectedBookIds = []) {
+    const tray = document.getElementById('blp_attached_books_tray');
+    if (!tray) return;
+
+    tray.innerHTML = ALL_MAIN_BOOKS_LIST.map(b => {
+      const isChecked = selectedBookIds.includes(b.id) || selectedBookIds.includes('ALL');
+      return `
+        <label style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: #e2e8f0; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">
+          <input type="checkbox" name="blp_attached_book_chk" value="${b.id}" ${isChecked ? 'checked' : ''} style="accent-color: #3b82f6;" />
+          <span>${b.id}: ${b.name}</span>
+        </label>
+      `;
+    }).join('');
+  };
+
+  window.autoImportDemoFromSelectedBook = async function() {
+    const sel = document.getElementById('blp_import_source_book');
+    const sourceId = sel ? sel.value : 'BK001';
+    if (!sourceId) return;
+
+    showToast(`⏳ मुख्य पुस्तक (${sourceId}) से डेटा व प्रिव्यू पेज लोड हो रहे हैं...`, 'info');
+
+    let page = allLandingPages.find(p => p.id && p.id.toUpperCase() === sourceId.toUpperCase());
+    if (!page) {
+      const book = allBooks.find(b => b.id && b.id.toUpperCase() === sourceId.toUpperCase());
+      if (book) {
+        page = {
+          hero: {
+            title: book.heading || book.name,
+            subtitle: book.subheading || '',
+            description: book.description || '',
+            cover_image: book.cover || book.thumbnail
+          },
+          table_of_contents: book.table_of_contents,
+          demo_images: book.demoImages || book.preview_images
+        };
+      }
+    }
+
+    if (page) {
+      if (page.demo_images && Array.isArray(page.demo_images) && page.demo_images.length > 0) {
+        currentDemoImages = [...page.demo_images];
+        if (typeof renderDemoImagesInBuilder === 'function') renderDemoImagesInBuilder();
+      }
+      if (page.table_of_contents && Array.isArray(page.table_of_contents)) {
+        currentTocPoints = [...page.table_of_contents];
+        if (typeof renderTocPointsInBuilder === 'function') renderTocPointsInBuilder();
+      }
+      if (page.why_read && page.why_read.cards && Array.isArray(page.why_read.cards)) {
+        currentWhyCards = JSON.parse(JSON.stringify(page.why_read.cards));
+        if (typeof renderWhyCardsInBuilder === 'function') renderWhyCardsInBuilder();
+      }
+      if (page.faqs && Array.isArray(page.faqs)) {
+        currentFaqs = JSON.parse(JSON.stringify(page.faqs));
+        if (typeof renderFaqsInBuilder === 'function') renderFaqsInBuilder();
+      }
+      if (page.testimonials && Array.isArray(page.testimonials)) {
+        currentReviews = JSON.parse(JSON.stringify(page.testimonials));
+        if (typeof renderReviewsInBuilder === 'function') renderReviewsInBuilder();
+      }
+      showToast(`✅ ${sourceId} से प्रिव्यू पेजेस, TOC, FAQ व रिव्यूज सफलतापूर्वक इम्पोर्ट हुए!`, 'success');
+    } else {
+      showToast(`⚠️ ${sourceId} का डेटा नहीं मिला।`, 'error');
+    }
+  };
+
   function resetBookBuilder() {
     editingBookId = null;
     currentKpis = [
@@ -6558,6 +6868,11 @@ Instant Download & Lifetime Access
     if (document.getElementById('blp_fb_pixel_enabled')) document.getElementById('blp_fb_pixel_enabled').checked = true;
     if (document.getElementById('blp_google_tag_enabled')) document.getElementById('blp_google_tag_enabled').checked = true;
     
+    if (document.getElementById('blp_book_type')) document.getElementById('blp_book_type').value = 'paid';
+    if (document.getElementById('blp_audience_type')) document.getElementById('blp_audience_type').value = 'all';
+    window.handleMasterBookTypeChange('paid');
+    window.renderAttachedBooksTray([]);
+
     if (document.getElementById('blp_og_title')) document.getElementById('blp_og_title').value = '';
     if (document.getElementById('blp_og_description')) document.getElementById('blp_og_description').value = '';
     if (document.getElementById('blp_og_image')) document.getElementById('blp_og_image').value = '';
@@ -6684,6 +6999,22 @@ Instant Download & Lifetime Access
           const bIsComing = Boolean(bObj.isComingSoon === true || bObj.is_coming_soon === true || bObj.status === 'coming_soon' || bObj.badge === 'coming_soon' || bObj.store_badge === 'coming_soon');
           setVal('blp_is_coming_soon', bIsComing ? 'true' : 'false');
           setVal('blp_store_badge', bObj.badge || bObj.store_badge || (bIsComing ? 'coming_soon' : 'best_seller'));
+
+          let bType = bObj.book_type;
+          if (!bType) {
+            if (cleanId.startsWith('DEMO')) bType = 'demo';
+            else if (cleanId.startsWith('BONUS') || bObj.offerPrice === 0) bType = 'free';
+            else bType = 'paid';
+          }
+          setVal('blp_book_type', bType);
+          if (typeof window.handleMasterBookTypeChange === 'function') {
+            window.handleMasterBookTypeChange(bType);
+          }
+          setVal('blp_audience_type', bObj.audience || 'all');
+          if (typeof window.renderAttachedBooksTray === 'function') {
+            window.renderAttachedBooksTray(bObj.target_main_books || []);
+          }
+
           const bTargets = Array.isArray(bObj.publish_targets) ? bObj.publish_targets : ['ebook_store', 'category_page', 'my_library', 'home_page', 'download_funnel'];
           setChecked('blp_pub_ebook_store', bTargets.includes('ebook_store'));
           setChecked('blp_pub_category_page', bTargets.includes('category_page'));
@@ -6706,6 +7037,22 @@ Instant Download & Lifetime Access
       const bSelect = document.getElementById('blp_select_existing_book') || bookSelect;
       if (bSelect) bSelect.value = page.id || '';
       setVal('blp_category_select', page.category || 'Agriculture');
+
+      const rawId = (page.id || '').toUpperCase();
+      let bType = page.book_type;
+      if (!bType) {
+        if (rawId.startsWith('DEMO')) bType = 'demo';
+        else if (rawId.startsWith('BONUS') || page.hero?.offer_price === 0) bType = 'free';
+        else bType = 'paid';
+      }
+      setVal('blp_book_type', bType);
+      if (typeof window.handleMasterBookTypeChange === 'function') {
+        window.handleMasterBookTypeChange(bType);
+      }
+      setVal('blp_audience_type', page.audience || 'all');
+      if (typeof window.renderAttachedBooksTray === 'function') {
+        window.renderAttachedBooksTray(page.target_main_books || []);
+      }
 
       // PDF / DOC files
       const mainPdfUrl = page.mainPdf || page.main_pdf || page.hero?.mainPdf || '';
@@ -7284,11 +7631,21 @@ Instant Download & Lifetime Access
       selectedThemeDark = adjustColorBrightness(customThemeColor, -25);
     }
 
+    const bookType = document.getElementById('blp_book_type')?.value || (offerPrice === 0 ? 'free' : 'paid');
+    const audienceType = document.getElementById('blp_audience_type')?.value || 'all';
+    const attachedMainBooks = [];
+    document.querySelectorAll('input[name="blp_attached_book_chk"]:checked').forEach(cb => {
+      attachedMainBooks.push(cb.value);
+    });
+
     const pageData = {
       id: bId,
       updated_at: new Date().toISOString(),
       admin_edited: true,
       slug: bId.toLowerCase(),
+      book_type: bookType,
+      audience: audienceType,
+      target_main_books: attachedMainBooks,
       book_name: (document.getElementById('blp_book_name')?.value || '').trim(),
       author: (document.getElementById('blp_book_author')?.value || '').trim(),
       language: (document.getElementById('blp_book_language')?.value || 'Hindi').trim(),
@@ -7411,6 +7768,9 @@ Instant Download & Lifetime Access
     const newBookObj = {
       id: bId,
       slug: bId.toLowerCase(),
+      book_type: bookType,
+      audience: audienceType,
+      target_main_books: attachedMainBooks,
       heading: title,
       name: title,
       category: category,

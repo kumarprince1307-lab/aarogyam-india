@@ -265,22 +265,31 @@
             </div>
 
             <!-- Audio Guidance Live Player Box -->
-            <div class="audio-guide-box-vip">
-                <button type="button" id="btnAudioGuidePlay" class="audio-guide-play-btn" title="ऑडियो गाइडेंस सुनें" onclick="window.toggleAudioGuidance()">
-                    <i class="fa-solid fa-volume-high" id="audioGuideIcon"></i>
-                </button>
-                <div class="audio-guide-meta">
-                    <div class="audio-guide-label">
-                        <span>🎧 गाइडेंस: 30 सेकंड में जानें ऐप कैसे इंस्टॉल करें व पढ़ें</span>
-                        <div class="sound-waves-indicator" id="soundWavesBox">
-                            <span class="sound-bar"></span>
-                            <span class="sound-bar"></span>
-                            <span class="sound-bar"></span>
-                            <span class="sound-bar"></span>
-                            <span class="sound-bar"></span>
+            <div class="audio-guide-box-vip" style="flex-direction: column; align-items: stretch; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <button type="button" id="btnAudioGuidePlay" class="audio-guide-play-btn" title="ऑडियो गाइडेंस सुनें" onclick="window.toggleAudioGuidance()">
+                        <i class="fa-solid fa-volume-high" id="audioGuideIcon"></i>
+                    </button>
+                    <div class="audio-guide-meta">
+                        <div class="audio-guide-label">
+                            <span>🎧 ऑडियो गाइडेंस: 30 सेकंड में जानें ऐप कैसे चलाएं</span>
+                            <div class="sound-waves-indicator" id="soundWavesBox">
+                                <span class="sound-bar"></span>
+                                <span class="sound-bar"></span>
+                                <span class="sound-bar"></span>
+                                <span class="sound-bar"></span>
+                                <span class="sound-bar"></span>
+                            </div>
                         </div>
+                        <div class="audio-guide-desc" id="audioGuideStatus">क्लिक करके लाइव हिंदी ऑडियो गाइडेंस सुनें (Female Voice)</div>
                     </div>
-                    <div class="audio-guide-desc" id="audioGuideStatus">क्लिक करके 30-सेकंड की ऑडियो गाइडेंस सुनें (Hindi Voice)</div>
+                </div>
+                <!-- Spoken Script Transcript Box -->
+                <div class="audio-guide-script-snippet" style="background: rgba(0,0,0,0.3); border: 1px dashed rgba(52,211,153,0.3); border-radius: 8px; padding: 10px 14px; font-size: 0.8rem; color: #cbd5e1; line-height: 1.5;">
+                    <div style="font-size: 0.72rem; color: var(--vip-gold-light); font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                        <span>📜 ऑडियो स्क्रिप्ट सारांश:</span>
+                    </div>
+                    <span>"Aarogyam App इंस्टॉल करें और बिना फोन मेमोरी भरे कभी भी किताबें पढ़ें, ज़ूम करें और ऑडियो सुनें। प्रिंट निकालने के लिए नीचे नीले बॉक्स में Full HD चुनें (3 बार मान्य)!"</span>
                 </div>
             </div>
 

@@ -666,6 +666,8 @@
       isComingSoon = !isLiveAgri && (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true || b.store_badge === 'coming_soon');
     }
 
+    const isFreeBonus = (l.book_type === 'free' || l.book_type === 'bonus_free' || Number(offer) === 0 || rawId.startsWith('BONUS'));
+
     if (isComingSoon) {
       const heroBuy = document.getElementById('hero-buy-btn');
       if (heroBuy) {
@@ -704,6 +706,46 @@
         vipUnlock.href = '/subscription.html';
         vipUnlock.innerHTML = `<i class="fa-solid fa-crown"></i> <span>👑 VIP मेंबर्स को रिलीज़ पर फ्री मिलेगा</span>`;
       }
+    } else if (isFreeBonus) {
+      const freeDownloadUrl = `download.html?book=${encodeURIComponent(rawId)}`;
+      
+      const heroBuy = document.getElementById('hero-buy-btn');
+      if (heroBuy) {
+        heroBuy.href = freeDownloadUrl;
+        heroBuy.innerHTML = `<i class="fa-solid fa-download"></i> <span>📥 100% मुफ़्त PDF डाउनलोड करें (Free Bonus)</span>`;
+        heroBuy.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      }
+
+      const stickyBuy = document.getElementById('sticky-buy-btn');
+      if (stickyBuy) {
+        stickyBuy.href = freeDownloadUrl;
+        stickyBuy.innerHTML = `<span>📥 मुफ़्त डाउनलोड</span>`;
+        stickyBuy.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      }
+
+      const previewBuy = document.getElementById('preview-buy-btn');
+      if (previewBuy) {
+        previewBuy.href = freeDownloadUrl;
+        previewBuy.innerHTML = `<i class="fa-solid fa-download"></i> <span>📥 100% मुफ़्त PDF डाउनलोड करें</span>`;
+        previewBuy.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      }
+
+      const finalBuy = document.getElementById('final-buy-btn');
+      if (finalBuy) {
+        finalBuy.href = freeDownloadUrl;
+        finalBuy.innerHTML = `<i class="fa-solid fa-download"></i> <span>📥 अभी 100% मुफ़्त डाउनलोड करें (Free Access)</span>`;
+        finalBuy.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      }
+
+      const vipUnlock = document.getElementById('vip-stack-unlock-btn');
+      if (vipUnlock) {
+        vipUnlock.href = freeDownloadUrl;
+        vipUnlock.innerHTML = `<i class="fa-solid fa-crown"></i> <span>👑 100% VIP मुफ़्त बोनस एक्सेस</span>`;
+      }
+
+      setElemText('hero-new-price', '₹0 (100% FREE)');
+      setElemText('hero-offer-badge', '100% FREE BONUS');
+      setElemText('sticky-price-val', '₹0 FREE');
     } else {
       const checkoutUrl = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
       const buyBtns = ['hero-buy-btn', 'preview-buy-btn', 'final-buy-btn', 'vip-stack-unlock-btn', 'sticky-buy-btn'];
@@ -723,7 +765,9 @@
 
     setElemText('header-book-title', title);
     setElemText('sticky-book-title', title);
-    setElemText('sticky-price-val', `₹${offer}`);
+    if (!isFreeBonus) {
+      setElemText('sticky-price-val', `₹${offer}`);
+    }
     setElemText('sticky-mrp-val', `₹${mrp}`);
     setElemSrc('sticky-thumb-img', cover);
 
