@@ -941,9 +941,9 @@ async function renderLibrarySections(booksArray) {
             if (aud === 'active_only') {
                 isAllowed = purchasedCount > 0;
             } else if (aud === 'attached_books' && Array.isArray(book.target_main_books) && book.target_main_books.length > 0 && !book.target_main_books.includes('ALL')) {
-                isAllowed = book.target_main_books.some(tb => userPurchasedBookIds.includes(String(tb).toUpperCase()));
+                isAllowed = book.target_main_books.some(tb => activePurchasedBookIds.has(String(tb).toUpperCase()));
             } else if (book.targetMainBook && book.targetMainBook !== 'ALL' && aud === 'attached_books') {
-                isAllowed = userPurchasedBookIds.includes(String(book.targetMainBook).toUpperCase());
+                isAllowed = activePurchasedBookIds.has(String(book.targetMainBook).toUpperCase());
             }
 
             if (isAllowed) {
