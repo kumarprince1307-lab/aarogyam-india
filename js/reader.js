@@ -239,24 +239,44 @@ async function verifyUserAccessAndSession(targetBookId) {
             });
         }
 
-        if (parsedPageNumbers.length > 0) {
-            window.aoiSourcePageMap = parsedPageNumbers;
-            pageImages = parsedPageNumbers.map(p => `../images/books/${targetMain}/${p}.webp`);
-        } else if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
-            pageImages = aoiCurrentBookData.demoImages;
-            window.aoiSourcePageMap = pageImages.map((_, i) => i + 1);
-        } else if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
-            pageImages = aoiCurrentBookData.pageImages.slice(0, 5);
-            window.aoiSourcePageMap = pageImages.map((_, i) => i + 1);
-        } else {
-            pageImages = [
-                `../images/books/${targetMain}/1.webp`,
-                `../images/books/${targetMain}/2.webp`,
-                `../images/books/${targetMain}/3.webp`,
-                `../images/books/${targetMain}/4.webp`
-            ];
-            window.aoiSourcePageMap = [1, 2, 3, 4];
+        let combinedImages = [];
+        let sourceMap = [];
+
+        // 1. Include sample preview images if present
+        if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
+            aoiCurrentBookData.demoImages.forEach((img, idx) => {
+                if (img && typeof img === 'string') {
+                    combinedImages.push(img);
+                    sourceMap.push(idx + 1);
+                }
+            });
         }
+
+        // 2. Include specific selected main book pages
+        if (parsedPageNumbers.length > 0) {
+            parsedPageNumbers.forEach(p => {
+                const pagePath = `../images/books/${targetMain}/${p}.webp`;
+                if (!combinedImages.includes(pagePath)) {
+                    combinedImages.push(pagePath);
+                    sourceMap.push(p);
+                }
+            });
+        } else if (combinedImages.length === 0) {
+            if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
+                aoiCurrentBookData.pageImages.slice(0, 5).forEach((img, idx) => {
+                    combinedImages.push(img);
+                    sourceMap.push(idx + 1);
+                });
+            } else {
+                [1, 2, 3, 4, 5].forEach(p => {
+                    combinedImages.push(`../images/books/${targetMain}/${p}.webp`);
+                    sourceMap.push(p);
+                });
+            }
+        }
+
+        pageImages = combinedImages;
+        window.aoiSourcePageMap = sourceMap;
     } else {
         // MAIN BOOK MODE: load FULL book pages (152 pages for BK001, 118 pages for BK002, etc.)
         if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {

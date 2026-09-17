@@ -371,7 +371,7 @@
     const isFreeOrDemo = isStudioDemo || isStudioBonus;
 
     if (isFreeOrDemo) {
-      landingUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
+      landingUrl = book.landingPage || `/ebooks/demo-kharif.html?id=${encodeURIComponent(bId)}`;
     }
 
     // Store Badge Calculation

@@ -561,7 +561,7 @@ async function populateStudioBookSelect(selectedId) {
 
     let mainBooks = [];
     try {
-        const res = await fetch('../data/books.json');
+        const res = await fetch('../data/books.json?v=' + Date.now());
         if (res.ok) {
             const json = await res.json();
             if (json.books && json.books.length) mainBooks = json.books;
@@ -575,7 +575,23 @@ async function populateStudioBookSelect(selectedId) {
 
     let landingPages = [];
     try {
-        landingPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+        const resLp = await fetch('../data/universal-book-landing-pages.json?v=' + Date.now());
+        if (resLp.ok) {
+            const jsonLp = await resLp.json();
+            if (jsonLp.bookLandingPages && jsonLp.bookLandingPages.length) landingPages = jsonLp.bookLandingPages;
+        }
+    } catch (e) {}
+
+    try {
+        const localLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+        if (Array.isArray(localLp)) {
+            localLp.forEach(lp => {
+                if (!lp || !lp.id) return;
+                const idx = landingPages.findIndex(x => x && x.id && x.id.toUpperCase() === lp.id.toUpperCase());
+                if (idx >= 0) landingPages[idx] = { ...landingPages[idx], ...lp };
+                else landingPages.push(lp);
+            });
+        }
     } catch (e) {}
 
     let freeDemoBooks = [];
@@ -590,22 +606,60 @@ async function populateStudioBookSelect(selectedId) {
     }
 
     const uniqueMainMap = new Map();
+    const demoMap = new Map();
+    const bonusMap = new Map();
+
+    // 1. Process mainBooks from books.json
     mainBooks.forEach(b => {
-        if (b && b.id) uniqueMainMap.set(b.id.toUpperCase(), { id: b.id.toUpperCase(), title: b.heading || b.name || b.id });
-    });
-    customBooks.forEach(b => {
-        if (b && b.id && !b.id.toUpperCase().startsWith('DEMO') && !b.id.toUpperCase().startsWith('FREE') && !b.id.toUpperCase().startsWith('BONUS') && !uniqueMainMap.has(b.id.toUpperCase())) {
-            uniqueMainMap.set(b.id.toUpperCase(), { id: b.id.toUpperCase(), title: b.heading || b.name || b.id });
-        }
-    });
-    landingPages.forEach(p => {
-        if (p && p.id && !uniqueMainMap.has(p.id.toUpperCase())) {
-            uniqueMainMap.set(p.id.toUpperCase(), { id: p.id.toUpperCase(), title: p.hero?.title || p.id });
+        if (!b || !b.id) return;
+        const bId = b.id.toUpperCase();
+        if (bId.startsWith('DEMO') || b.type === 'demo' || b.isDemo) {
+            demoMap.set(bId, { id: bId, title: b.heading || b.name || bId });
+        } else if (bId.startsWith('FREE') || bId.startsWith('BONUS') || b.type === 'bonus_free' || b.isBonus) {
+            bonusMap.set(bId, { id: bId, title: b.heading || b.name || bId });
+        } else {
+            uniqueMainMap.set(bId, { id: bId, title: b.heading || b.name || bId });
         }
     });
 
-    const demoBooksList = freeDemoBooks.filter(b => b.type === 'demo' || b.isDemo || (b.id && b.id.toUpperCase().startsWith('DEMO')));
-    const bonusBooksList = freeDemoBooks.filter(b => b.type === 'bonus_free' || b.isBonus || (b.id && (b.id.toUpperCase().startsWith('FREE') || b.id.toUpperCase().startsWith('BONUS'))));
+    // 2. Process customBooks
+    customBooks.forEach(b => {
+        if (!b || !b.id) return;
+        const bId = b.id.toUpperCase();
+        if (bId.startsWith('DEMO') || b.type === 'demo' || b.isDemo) {
+            if (!demoMap.has(bId)) demoMap.set(bId, { id: bId, title: b.heading || b.name || bId });
+        } else if (bId.startsWith('FREE') || bId.startsWith('BONUS') || b.type === 'bonus_free' || b.isBonus) {
+            if (!bonusMap.has(bId)) bonusMap.set(bId, { id: bId, title: b.heading || b.name || bId });
+        } else if (!uniqueMainMap.has(bId)) {
+            uniqueMainMap.set(bId, { id: bId, title: b.heading || b.name || bId });
+        }
+    });
+
+    // 3. Process landingPages (crucial for DEMO-BK015, DEMO-BK002, DEMO-BK001, etc.)
+    landingPages.forEach(p => {
+        if (!p || !p.id) return;
+        const pId = p.id.toUpperCase();
+        const pTitle = p.hero?.title || p.heading || p.name || pId;
+        const bType = p.book_type || p.type || '';
+        if (bType === 'demo' || pId.startsWith('DEMO') || p.isDemo) {
+            demoMap.set(pId, { id: pId, title: pTitle });
+        } else if (bType === 'free' || pId.startsWith('FREE') || pId.startsWith('BONUS') || p.isBonus) {
+            bonusMap.set(pId, { id: pId, title: pTitle });
+        } else if (!uniqueMainMap.has(pId)) {
+            uniqueMainMap.set(pId, { id: pId, title: pTitle });
+        }
+    });
+
+    // 4. Process freeDemoBooks
+    freeDemoBooks.forEach(b => {
+        if (!b || !b.id) return;
+        const bId = b.id.toUpperCase();
+        if (bId.startsWith('DEMO') || b.type === 'demo' || b.isDemo) {
+            if (!demoMap.has(bId)) demoMap.set(bId, { id: bId, title: b.heading || b.name || 'डेमो पुस्तक' });
+        } else if (!bonusMap.has(bId)) {
+            bonusMap.set(bId, { id: bId, title: b.heading || b.name || 'फ्री बोनस' });
+        }
+    });
 
     bookSelect.innerHTML = '';
 
@@ -622,13 +676,13 @@ async function populateStudioBookSelect(selectedId) {
     bookSelect.appendChild(ogMain);
 
     // OptGroup 2: Demo Books
-    if (demoBooksList.length > 0) {
+    if (demoMap.size > 0) {
         const ogDemo = document.createElement('optgroup');
         ogDemo.label = '📖 डेमो पुस्तकें (Demo Books)';
-        demoBooksList.forEach(b => {
+        Array.from(demoMap.values()).forEach(b => {
             const opt = document.createElement('option');
-            opt.value = b.id.toUpperCase();
-            opt.textContent = `${b.id.toUpperCase()}: ${b.heading || b.name || 'डेमो पुस्तक'}`;
+            opt.value = b.id;
+            opt.textContent = `${b.id}: ${b.title}`;
             if (opt.value === selectedId) opt.selected = true;
             ogDemo.appendChild(opt);
         });
@@ -636,13 +690,13 @@ async function populateStudioBookSelect(selectedId) {
     }
 
     // OptGroup 3: Free Bonus Books
-    if (bonusBooksList.length > 0) {
+    if (bonusMap.size > 0) {
         const ogBonus = document.createElement('optgroup');
         ogBonus.label = '🎁 फ्री बोनस पुस्तकें (Free Bonus Books)';
-        bonusBooksList.forEach(b => {
+        Array.from(bonusMap.values()).forEach(b => {
             const opt = document.createElement('option');
-            opt.value = b.id.toUpperCase();
-            opt.textContent = `${b.id.toUpperCase()}: ${b.heading || b.name || 'फ्री बोनस'}`;
+            opt.value = b.id;
+            opt.textContent = `${b.id}: ${b.title}`;
             if (opt.value === selectedId) opt.selected = true;
             ogBonus.appendChild(opt);
         });
@@ -1021,12 +1075,33 @@ async function loadBookStudio(bookId) {
         freeDemoBook = fList.find(b => b.id && b.id.toUpperCase() === cleanId);
     } catch (e) {}
 
-    // 2. Fetch from books.json / custom books
+    // 2. Fetch from books.json / universal-book-landing-pages.json / custom books
     try {
         const res = await fetch('../data/books.json?v=' + Date.now());
-        const json = await res.json();
-        studioBookData = json.books.find(b => b.id === bookId || b.id === cleanId);
+        if (res.ok) {
+            const json = await res.json();
+            studioBookData = json.books.find(b => b.id === bookId || b.id === cleanId);
+        }
     } catch (e) {}
+
+    if (!studioBookData) {
+        try {
+            const resLp = await fetch('../data/universal-book-landing-pages.json?v=' + Date.now());
+            if (resLp.ok) {
+                const jsonLp = await resLp.json();
+                if (jsonLp.bookLandingPages) {
+                    studioBookData = jsonLp.bookLandingPages.find(p => p.id && p.id.toUpperCase() === cleanId);
+                }
+            }
+        } catch (e) {}
+    }
+
+    if (!studioBookData) {
+        try {
+            const localLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+            studioBookData = localLp.find(p => p.id && p.id.toUpperCase() === cleanId);
+        } catch (e) {}
+    }
 
     if (!studioBookData) {
         try {
@@ -1038,6 +1113,9 @@ async function loadBookStudio(bookId) {
     if (!studioBookData && freeDemoBook) {
         studioBookData = freeDemoBook;
     }
+
+    const isDemoStudio = cleanId.startsWith('DEMO') || studioBookData?.book_type === 'demo' || studioBookData?.type === 'demo' || studioBookData?.isDemo;
+    const targetParent = (studioBookData?.targetMainBook || cleanId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || (cleanId.includes('BK002') ? 'BK002' : 'BK001')).toUpperCase();
 
     // Determine target total pages from repository / metadata
     const repoTotal = (studioBookData && studioBookData.totalPages) 
@@ -1079,7 +1157,7 @@ async function loadBookStudio(bookId) {
         } catch (e) {}
     }
 
-    // 6. Check custom book pageImages/demoImages in JSON
+    // 6. Check custom book pageImages/demoImages in JSON / Landing Page
     if (!studioPageImages.length && studioBookData) {
         if (Array.isArray(studioBookData.pageImages) && studioBookData.pageImages.length > 0) {
             studioPageImages = studioBookData.pageImages.map(img => img.startsWith('/') ? ('..' + img) : img);
@@ -1088,6 +1166,33 @@ async function loadBookStudio(bookId) {
             studioPageImages = studioBookData.demoImages.map(img => img.startsWith('/') ? ('..' + img) : img);
             studioTotalPages = studioPageImages.length;
         }
+    }
+
+    // 6b. For Demo Books without custom uploaded images: load target parent's allowed pages + preview images
+    if (!studioPageImages.length && isDemoStudio) {
+        const allowedPagesParam = (studioBookData?.demo_reader_pages || studioBookData?.demoPages || '1-5').trim();
+        let parsedPages = [];
+        if (allowedPagesParam) {
+            allowedPagesParam.split(/[,;]+/).forEach(part => {
+                const clean = part.trim();
+                if (clean.includes('-')) {
+                    const [s, e] = clean.split('-').map(x => parseInt(x.trim(), 10));
+                    if (!isNaN(s) && !isNaN(e) && s <= e) {
+                        for (let p = s; p <= e; p++) {
+                            if (!parsedPages.includes(p)) parsedPages.push(p);
+                        }
+                    }
+                } else {
+                    const num = parseInt(clean, 10);
+                    if (!isNaN(num) && !parsedPages.includes(num)) {
+                        parsedPages.push(num);
+                    }
+                }
+            });
+        }
+        if (parsedPages.length === 0) parsedPages = [1, 2, 3, 4, 5];
+        studioPageImages = parsedPages.map(p => `../images/books/${targetParent}/${p}.webp`);
+        studioTotalPages = studioPageImages.length;
     }
 
     // 7. Load Audio Scripts (Fetch server first, then merge local edits)
@@ -1099,6 +1204,15 @@ async function loadBookStudio(bookId) {
         if (res.ok) {
             serverMeta = await res.json();
             serverScripts = serverMeta.pages || {};
+        } else if (isDemoStudio && targetParent) {
+            // Inherit audio scripts from parent main book for demo pages
+            let resParent = await fetch(`../data/audio-scripts/${targetParent}.json?v=${Date.now()}`);
+            if (!resParent.ok) resParent = await fetch(`/data/audio-scripts/${targetParent}.json?v=${Date.now()}`);
+            if (resParent.ok) {
+                const parentJson = await resParent.json();
+                serverMeta = { bookId: cleanId, pages: parentJson.pages || {} };
+                serverScripts = serverMeta.pages || {};
+            }
         } else if (freeDemoBook && freeDemoBook.audioUrl) {
             serverMeta = {
                 bookId: cleanId,
