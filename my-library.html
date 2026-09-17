@@ -155,81 +155,52 @@
   </script>
 
   <!-- =========================================
-       1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
+       1. ANIMATED INDIAN TIRANGA WAVING HEADER (COMPACT & CLEAN)
   ========================================== -->
-  <div class="home-live-ticker-wrap">
-    <div class="container">
-      <div class="home-ticker-flex">
-        <div class="ticker-pulse-badge">
-          <span class="ticker-dot-pulse"></span>
-          <span>🚨 LIVE</span>
-        </div>
-        <div style="flex:1;overflow:hidden;">
-          <div class="ticker-marquee-scroll" id="home-live-ticker-track">
-            🌾 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 AI एक्सपर्ट सहायता उपलब्ध! ✦ मेरी डिजिटल लाइब्रेरी
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- =========================================
-       2. ANIMATED INDIAN TIRANGA WAVING HEADER
-  ========================================== -->
-  <header class="header header-tiranga-animated" id="header">
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:8px;">
+  <header class="header header-tiranga-animated" id="header" style="top: 0 !important;">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;gap:8px;">
       
-      <!-- Brand Logo Left in Glass Pill + Active Page Badge + Audio Guide Pill -->
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <a href="/index.html" class="brand-logo-pill">
-          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;">
+      <!-- Brand Logo Left in Glass Pill + Active Page Badge -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <a href="/index.html" class="brand-logo-pill" style="padding:3px 10px;">
+          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:32px;width:auto;">
           <div style="display:flex;flex-direction:column;">
-            <span class="brand-title-text">
+            <span class="brand-title-text" style="font-size:0.95rem;">
               AAROGYAM <span style="color:#ff671f;">INDIA</span>
             </span>
-            <span class="brand-sub-text">
+            <span class="brand-sub-text" style="font-size:0.62rem;">
               Digital Knowledge Hub
             </span>
           </div>
         </a>
 
-        <!-- Header Audio Guide Pill Button (No floating overlap) -->
-        <button type="button" id="headerAudioGuideBtn" onclick="window.toggleLibraryAudioGuide?.(event)" class="header-audio-guide-pill" title="लाइब्रेरी ऑडियो गाइड सुनें">
-          <span class="audio-wave-anim" id="headerAudioWave">
-            <i class="wave-bar"></i>
-            <i class="wave-bar"></i>
-            <i class="wave-bar"></i>
-          </span>
-          <span id="headerAudioGuideText">🔊 गाइड सुनें</span>
-        </button>
-
         <!-- Current Active Page Indicator Badge -->
-        <span class="header-current-page-badge" title="Current Page">
+        <span class="header-current-page-badge" title="Current Page" style="padding:4px 8px;font-size:0.75rem;">
           📖 My Library
         </span>
       </div>
 
       <!-- Header Actions Right: Install App, Notification, Cart, 3-Line Menu -->
-      <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+      <div class="header-actions" style="display:flex;align-items:center;gap:6px;">
         <!-- Install App Button (PWA) -->
-        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
-          <span>📲</span> <span>Install App</span>
+        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:5px 10px;border-radius:20px;font-weight:900;font-size:0.72rem;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,0.25);">
+          <span>📲</span> <span>Install</span>
         </button>
 
         <!-- Notification Bell Icon -->
-        <button type="button" class="user-notif-bell-btn" title="Notifications" aria-label="Notifications" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
-          <i class="fa-regular fa-bell" style="font-size:1rem;"></i>
-          <span class="user-notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 5px;border-radius:10px;">0</span>
+        <button type="button" class="user-notif-bell-btn" title="Notifications" aria-label="Notifications" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:32px;height:32px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+          <i class="fa-regular fa-bell" style="font-size:0.9rem;"></i>
+          <span class="user-notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.65rem;font-weight:800;padding:1px 4px;border-radius:10px;">0</span>
         </button>
 
         <!-- Shopping Cart Icon -->
-        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
-          <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
-          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
+        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+          <i class="fa-solid fa-cart-shopping" style="font-size:0.9rem;"></i>
+          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.65rem;font-weight:900;padding:1px 5px;border-radius:10px;">0</span>
         </a>
 
         <!-- 3-Line Menu Trigger Button (Desktop Left Drawer / Mobile Right Drawer) -->
-        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.25);">
           <i class="fa-solid fa-bars"></i>
         </button>
       </div>
@@ -237,27 +208,27 @@
     </div>
 
     <!-- =========================================
-         3. DEDICATED STICKY LIVE AUDIO GUIDE BAR INSIDE HEADER
+         2. ULTRA-SLIM STICKY LIVE AUDIO GUIDE BAR INSIDE HEADER
     ========================================== -->
-    <div class="sub-header-audio-bar" id="subHeaderAudioBar">
-      <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0;">
-        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-          <div class="sub-audio-avatar" id="subAudioAvatar">
+    <div class="sub-header-audio-bar" id="subHeaderAudioBar" style="padding: 3px 0;">
+      <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 0;">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <div class="sub-audio-avatar" id="subAudioAvatar" style="width:28px;height:28px;font-size:0.95rem;">
             <span>🎧</span>
           </div>
           <div style="min-width:0;">
-            <div style="font-size:0.86rem;font-weight:900;color:#ffffff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-              🌸 कृषि सखी लाइव ऑडियो गाइड
+            <div style="font-size:0.8rem;font-weight:900;color:#ffffff;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              🌸 कृषि सखी ऑडियो गाइड
             </div>
-            <div style="font-size:0.72rem;color:#a7f3d0;font-weight:600;line-height:1.2;margin-top:2px;" id="subAudioStatusText">
-              लाइब्रेरी व पुस्तकों की जानकारी सुनने के लिए प्ले करें
+            <div style="font-size:0.68rem;color:#a7f3d0;font-weight:600;line-height:1.1;" id="subAudioStatusText">
+              लाइब्रेरी व पुस्तकों की जानकारी सुनें
             </div>
           </div>
         </div>
 
-        <!-- Main Play Action Button (Big & Easy to Tap on Mobile) -->
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-          <button type="button" id="subHeaderPlayBtn" onclick="window.toggleLibraryAudioGuide?.(event)" class="sub-audio-play-btn" title="लाइब्रेरी ऑडियो गाइड सुनें">
+        <!-- Main Play Action Button (Slim & Easy to Tap) -->
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <button type="button" id="subHeaderPlayBtn" onclick="window.toggleLibraryAudioGuide?.(event)" class="sub-audio-play-btn" title="लाइब्रेरी ऑडियो गाइड सुनें" style="padding:4px 12px;font-size:0.76rem;border-radius:18px;">
             <span id="subHeaderPlayIcon">▶️</span>
             <span id="subHeaderPlayText">गाइड सुनें</span>
             <span class="sub-audio-waves" id="subAudioWaves">

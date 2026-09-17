@@ -1000,73 +1000,74 @@ body {
     50% { box-shadow: 0 12px 28px rgba(5, 150, 105, 0.7); transform: translateY(-3px); }
 }
 
-/* Sub-Header Dedicated Audio Guide Bar (Integrated inside sticky header) */
+/* Sub-Header Dedicated Audio Guide Bar (Ultra-Slim Integrated inside sticky header) */
 .sub-header-audio-bar {
-    background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(4, 120, 87, 0.95) 50%, rgba(6, 95, 70, 0.95) 100%);
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.96) 0%, rgba(4, 120, 87, 0.96) 50%, rgba(6, 95, 70, 0.96) 100%);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.25);
-    border-bottom: 2px solid #059669;
-    padding: 5px 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1.5px solid #059669;
+    padding: 2px 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
     width: 100%;
     box-sizing: border-box;
     transition: all 0.3s ease;
 }
 
 .sub-audio-avatar {
-    width: 36px;
-    height: 36px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: linear-gradient(135deg, #10b981, #059669);
-    border: 1.5px solid #a7f3d0;
+    border: 1px solid #a7f3d0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.15rem;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    font-size: 0.9rem;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
     flex-shrink: 0;
 }
 
 .sub-audio-play-btn {
     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    border: 1.5px solid #fde68a;
+    border: 1px solid #fde68a;
     color: #ffffff;
-    padding: 7px 16px;
-    border-radius: 25px;
-    font-size: 0.84rem;
-    font-weight: 900;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.74rem;
+    font-weight: 800;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    box-shadow: 0 3px 12px rgba(217, 119, 6, 0.45);
-    transition: all 0.25s ease;
+    gap: 5px;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
+    transition: all 0.2s ease;
     white-space: nowrap;
+    line-height: 1.2;
 }
 
 .sub-audio-play-btn:hover {
-    transform: scale(1.04);
-    box-shadow: 0 5px 16px rgba(245, 158, 11, 0.6);
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.5);
 }
 
 .sub-audio-play-btn.is-playing {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
     border-color: #fca5a5 !important;
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.7) !important;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.6) !important;
     animation: subPulseAudio 1.5s infinite;
 }
 
 @keyframes subPulseAudio {
-    0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); transform: scale(1); }
-    50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.9); transform: scale(1.02); }
+    0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); transform: scale(1); }
+    50% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.8); transform: scale(1.02); }
 }
 
 .sub-audio-waves {
     display: none;
     align-items: flex-end;
     gap: 2px;
-    height: 12px;
+    height: 10px;
 }
 .sub-audio-play-btn.is-playing .sub-audio-waves {
     display: inline-flex;
@@ -1074,11 +1075,16 @@ body {
 
 @media (max-width: 576px) {
     .sub-header-audio-bar {
-        padding: 6px 10px;
+        padding: 2px 8px;
+    }
+    .sub-audio-avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 0.82rem;
     }
     .sub-audio-play-btn {
-        padding: 6px 12px;
-        font-size: 0.76rem;
+        padding: 3px 8px;
+        font-size: 0.7rem;
     }
 }
 
