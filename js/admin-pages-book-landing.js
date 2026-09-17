@@ -74,6 +74,12 @@ export async function initBookLandingPages() {
   let allBooks = [];
   let allLandingPages = [];
   let editingBookId = null;
+  let currentTableFilter = 'all';
+
+  window.setTableFilter = function(filter) {
+    currentTableFilter = filter;
+    if (typeof renderTable === 'function') renderTable();
+  };
 
   // Dynamic Array States
   let currentKpis = [];
@@ -2733,12 +2739,7 @@ Instant Download & Lifetime Access
     if (elVideos) elVideos.textContent = videos;
   }
 
-  let currentTableFilter = 'all';
 
-  window.setTableFilter = function(filter) {
-    currentTableFilter = filter;
-    renderTable();
-  };
 
   function renderTable() {
     const tableWrap = document.getElementById('blp_table_container');
