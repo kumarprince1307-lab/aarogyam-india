@@ -3311,6 +3311,295 @@
         "hd_download_limit": 3
       },
       "whatsapp_prompt": "नमस्ते, मुझे 'खरीफ फसल मास्टर गाइड 2026' पुस्तक के बारे में और जानकारी चाहिए।"
+    },
+    {
+      "id": "DEMO-BK002",
+      "updated_at": "2026-09-17T03:43:33.382Z",
+      "admin_edited": true,
+      "slug": "demo-bk002",
+      "book_type": "demo",
+      "audience": "all",
+      "target_main_books": [],
+      "book_name": "",
+      "author": "",
+      "language": "Hindi",
+      "totalPages": 120,
+      "version": "2026",
+      "category": "Agriculture",
+      "status": "active",
+      "is_coming_soon": false,
+      "isComingSoon": false,
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "home_hero",
+        "download_funnel",
+        "free_shelf",
+        "demo_shelf",
+        "coming_soon_shelf"
+      ],
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true,
+      "theme_primary": "#2e7d32",
+      "theme_dark": "#003d00",
+      "cover_effect": "3d_float",
+      "sticky_button_text": "डेमो पढ़ें",
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_audio",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_ai_support",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help",
+        "sec_pdf_main",
+        "sec_pdf_free"
+      ],
+      "hidden_sections": [],
+      "section_banners": {},
+      "og_title": "खेती का डॉक्टर (Pocket Doctor)",
+      "og_description": "रोग, कीट, वायरल, फंगल और पोषक तत्वों की कमी की फोटो सहित पहचान सीखें। अब किसान खुद बनेगा अपनी फसल का डॉक्टर।",
+      "og_image": "/images/banners/kheti-dr-banner-1.webp",
+      "og_image_landscape": "/images/banners/kheti-dr-banner-1.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "खेती का डॉक्टर (Pocket Doctor) का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "tts",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "",
+        "bgm_enabled": true
+      },
+      "mainPdf": "",
+      "main_pdf": "",
+      "freePdf": "",
+      "free_pdf": "",
+      "demoPdf": "",
+      "ai_support_title": "",
+      "ai_support_cover": "",
+      "ai_support_desc": "",
+      "bonuses": [
+        {
+          "title": "FREE SPRAY SCIENCE & WHATSAPP SUPPORT",
+          "description": "रोग पहचान व स्प्रे चार्ट के साथ 24x7 कृषि डॉक्टर हेल्पलाइन सपोर्ट बिल्कुल फ्री।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_books": [
+        {
+          "title": "FREE SPRAY SCIENCE & WHATSAPP SUPPORT",
+          "description": "रोग पहचान व स्प्रे चार्ट के साथ 24x7 कृषि डॉक्टर हेल्पलाइन सपोर्ट बिल्कुल फ्री।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_points": [
+        "24×7 WhatsApp Support",
+        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+        "📖 किताब की जानकारी समझने में सहायता",
+        "🌱 फसल संबंधी सवाल",
+        "📱 Mobile Friendly PDF & Lifetime Access"
+      ],
+      "timer": {
+        "enabled": true,
+        "minutes": 15,
+        "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल आज के लिए उपलब्ध है!"
+      },
+      "hero": {
+        "tag": "🩺 Agriculture Clinic & Diagnostic",
+        "title": "खेती का डॉक्टर (Pocket Doctor)",
+        "subtitle": "रोग 🦠 कीट 🐛 पोषण कमी 🍄 फंगल व संपूर्ण फसल निदान गाइड",
+        "description": "रोग, कीट, वायरल, फंगल और पोषक तत्वों की कमी की फोटो सहित पहचान सीखें। अब किसान खुद बनेगा अपनी फसल का डॉक्टर।",
+        "mrp": 299,
+        "offer_price": 99,
+        "offer_badge": "Special Discount 67% Off",
+        "rating_score": "4.9",
+        "rating_count": "150+ Ratings",
+        "cover_image": "/images/books/fasal-ka-doctor-cover.webp",
+        "banner_image": "/images/banners/kheti-dr-banner-1.webp",
+        "features": [
+          {
+            "icon": "fa-seedling",
+            "text": "120 पेज की प्रीमियम"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ फोटो"
+          },
+          {
+            "icon": "fa-circle-check",
+            "text": "Spray Science"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Bonus PDF"
+          }
+        ]
+      },
+      "value_stack": {
+        "book_mrp": 299,
+        "vip_value": 1999,
+        "bonus_value": 199,
+        "offer_price": 99,
+        "subscriber_perk": "👑 VIP सब्सक्राइबर्स के लिए अनलिमिटेड एक्सेस।"
+      },
+      "why_read": {
+        "title": "यह पुस्तक क्यों खरीदें?",
+        "subtitle": "",
+        "cards": [
+          {
+            "icon": "🌱",
+            "title": "फसल स्वास्थ्य",
+            "desc": "कीट पहचान, रोग पहचान, पोषक तत्व कमी पहचान और खरपतवार प्रबंधन।"
+          },
+          {
+            "icon": "💧",
+            "title": "Spray Science",
+            "desc": "सही दवा, सही मात्रा, सही समय, सही नोज़ल, पानी की गुणवत्ता, pH एवं EC।"
+          },
+          {
+            "icon": "📈",
+            "title": "उत्पादन बढ़ाने की तकनीक",
+            "desc": "वैज्ञानिक खेती, उत्पादन बढ़ाने के उपाय, लागत कम करने के तरीके और सही फसल प्रबंधन।"
+          },
+          {
+            "icon": "📚",
+            "title": "Quick Reference",
+            "desc": "त्वरित चार्ट, निर्णय तालिकाएँ, मौसम आधारित सुझाव और स्प्रे गाइड।"
+          }
+        ]
+      },
+      "demo_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp"
+      ],
+      "demo_reader_pages": "1, 2, 3, 5, 8, 12, 16",
+      "demoPages": "1, 2, 3, 5, 8, 12, 16",
+      "suggested_books_list": [
+        {
+          "image": "/images/books/kharif-master-guide-2026-cover.webp",
+          "title": "खरीफ फसल मास्टर गाइड 2026",
+          "offerPrice": 99,
+          "mrp": 299,
+          "link": "BK001"
+        }
+      ],
+      "suggested_books": [
+        "BK001"
+      ],
+      "table_of_contents": [
+        "कीट पहचान व निदान",
+        "रोग पहचान (फंगल, बैक्टीरियल, वायरल)",
+        "पोषक तत्वों की कमी के लक्षण",
+        "स्प्रे साइंस (सही दवा, सही मात्रा, सही समय)",
+        "वाटर क्वालिटी, pH एवं EC का महत्व",
+        "नोज़ल चयन व स्प्रे प्रेशर गाइड",
+        "IPM व जैविक कीट नियंत्रण",
+        "फसल सुरक्षा स्प्रे शेड्यूल"
+      ],
+      "videos": [
+        {
+          "url": "https://youtube.com/shorts/ew5tDJgGTK8?si=GdD8pJRqoJ50THeJ",
+          "title": "🎥 खेती का डॉक्टर - वीडियो डेमो",
+          "ratio": "9:16"
+        }
+      ],
+      "testimonials": [
+        {
+          "name": "राजेश पटेल",
+          "location": "उज्जैन, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "इस किताब से मुझे पता चला कि मेरी मिर्च में वायरस नहीं बल्कि रस चूसक कीटों का प्रकोप था। समय पर सही दवा डालने से फसल बच गई।"
+        },
+        {
+          "name": "दिनेश यादव",
+          "location": "जयपुर, राजस्थान",
+          "rating": 5,
+          "gender": "male",
+          "comment": "हर किसान के मोबाइल में यह किताब होनी चाहिए। बहुत ही आसान और काम की किताब है।"
+        }
+      ],
+      "faqs": [
+        {
+          "q": "क्या इसमें जैविक खेती के उपाय भी हैं?",
+          "a": "हाँ, इसमें सभी प्रमुख रोगों और कीटों के लिए जैविक (Organic) और रासायनिक दोनों समाधान दिए गए हैं।"
+        },
+        {
+          "q": "डाउनलोड करने के बाद क्या प्रिंट निकाल सकते हैं?",
+          "a": "हाँ, यह हाई क्वालिटी PDF है जिसे आप प्रिंट भी करवा सकते हैं।"
+        }
+      ],
+      "final_buy": {
+        "title": "खेती का डॉक्टर (Pocket Doctor)",
+        "description": "रोग 🦠 कीट 🐛 पोषण कमी 🍄 फंगल व संपूर्ण फसल निदान गाइड",
+        "benefits": []
+      },
+      "download_funnel": {
+        "audio_enabled": true,
+        "audio_mode": "mp3",
+        "audio_url": "",
+        "audio_narrator": "Female Voice (Aarogyam AI सखी)",
+        "audio_script": "",
+        "funnel_heading": "🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स",
+        "funnel_subheading": "हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित",
+        "funnel_books": [],
+        "farmer_tip": "",
+        "fast_size": "~24 MB",
+        "hd_download_limit": 3
+      },
+      "whatsapp_prompt": "नमस्ते, मुझे 'खेती का डॉक्टर (Pocket Doctor)' पुस्तक के बारे में और जानकारी चाहिए।"
     }
   ]
 }
