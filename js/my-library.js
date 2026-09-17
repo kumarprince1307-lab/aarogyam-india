@@ -1510,16 +1510,30 @@ function initLibraryAudioGuide() {
     const closeBtn = document.getElementById('libGuideCloseBtn');
     const statusText = document.getElementById('libGuideStatus');
 
+    // Sub-Header Dedicated Play Button Elements
+    const subBtn = document.getElementById('subHeaderPlayBtn');
+    const subIcon = document.getElementById('subHeaderPlayIcon');
+    const subText = document.getElementById('subHeaderPlayText');
+    const subStatus = document.getElementById('subAudioStatusText');
+
     let isPlaying = false;
     let isMuted = false;
     let synth = window.speechSynthesis || null;
     let currentUtterance = null;
     let wakeLockObj = null;
     let silentKeepAliveAudio = null;
+    let currentPlaySessionId = 0;
+
+    let guideAudioElement = new Audio();
+    guideAudioElement.preload = 'auto';
+    let guideChunks = [];
+    let currentChunkIdx = 0;
 
     // Load default weather on startup
     const defaultCity = DISTRICT_COORDS['rewa'];
-    window.fetchAndRenderLibraryWeather(defaultCity.lat, defaultCity.lon, defaultCity.name, defaultCity.state);
+    if (defaultCity && typeof window.fetchAndRenderLibraryWeather === 'function') {
+        window.fetchAndRenderLibraryWeather(defaultCity.lat, defaultCity.lon, defaultCity.name, defaultCity.state);
+    }
 
     // Initialize Background Silent Audio Anchor
     function startSilentKeepAlive() {
@@ -1608,25 +1622,6 @@ function initLibraryAudioGuide() {
 
 और बिना फोन मेमोरी भरे कभी भी ऑफलाइन पढ़ने के लिए ऊपर दिए गए 'Install App' बटन से ऐप अपने फोन में जोड़ें।`;
     }
-
-    // Sub-Header Dedicated Play Button Elements
-    const subBtn = document.getElementById('subHeaderPlayBtn');
-    const subIcon = document.getElementById('subHeaderPlayIcon');
-    const subText = document.getElementById('subHeaderPlayText');
-    const subStatus = document.getElementById('subAudioStatusText');
-
-    let isPlaying = false;
-    let isMuted = false;
-    let synth = window.speechSynthesis || null;
-    let currentUtterance = null;
-    let wakeLockObj = null;
-    let silentKeepAliveAudio = null;
-    let currentPlaySessionId = 0;
-
-    let guideAudioElement = new Audio();
-    guideAudioElement.preload = 'auto';
-    let guideChunks = [];
-    let currentChunkIdx = 0;
 
     function updateUiState(playing) {
         isPlaying = playing;
