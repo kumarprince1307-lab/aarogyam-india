@@ -644,7 +644,7 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-17T14:35:57.582Z",
+      "updated_at": "2026-09-17T16:29:43.154Z",
       "admin_edited": true,
       "slug": "bk015",
       "book_type": "paid",
@@ -801,7 +801,7 @@
         "subtitle": "11 प्रमुख सब्जियों की खेती — बीज से बाजार तक व्यावहारिक मार्गदर्शन | 154 पेज",
         "description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू\n",
         "mrp": 1999,
-        "offer_price": 99,
+        "offer_price": 149,
         "offer_badge": "Launch Offer",
         "rating_score": "4.9",
         "rating_count": "120+ Ratings",
@@ -834,7 +834,7 @@
         "book_mrp": 299,
         "vip_value": 1999,
         "bonus_value": 199,
-        "offer_price": 99,
+        "offer_price": 149,
         "vip_banner": "/images/banners/bk015-sec_vip_stack-banner.webp",
         "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए यह गाइड उनके प्लान में 100% मुफ्त शामिल है।"
       },
