@@ -30,12 +30,23 @@
   }
 
   // ==========================================
-  // 1. SURVEYS ENGINE
+  // 1. SURVEYS ENGINE (With 5-Min Egress Cache)
   // ==========================================
 
-  async function getSurveys(profileId) {
+  let _ucasSurveysCache = new Map();
+  const UCAS_SURVEYS_CACHE_TTL = 300000; // 5 minutes
+
+  async function getSurveys(profileId, forceRefresh = false) {
     const client = getDb();
     if (!client) return { success: false, data: [] };
+
+    const cacheKey = profileId || 'ALL';
+    if (!forceRefresh && _ucasSurveysCache.has(cacheKey)) {
+      const cached = _ucasSurveysCache.get(cacheKey);
+      if (Date.now() - cached.timestamp < UCAS_SURVEYS_CACHE_TTL) {
+        return { success: true, data: cached.data };
+      }
+    }
 
     try {
       let query = client
@@ -49,7 +60,9 @@
 
       const { data, error } = await query;
       if (error) throw error;
-      return { success: true, data: data || [] };
+      const resData = data || [];
+      _ucasSurveysCache.set(cacheKey, { data: resData, timestamp: Date.now() });
+      return { success: true, data: resData };
     } catch (e) {
       console.error('UCAS DB: getSurveys error', e);
       return { success: false, data: [], message: e.message };
@@ -86,6 +99,7 @@
         .single();
 
       if (error) throw error;
+      _ucasSurveysCache.clear(); // Invalidate cache on new survey
       return { success: true, data };
     } catch (e) {
       console.error('UCAS DB: createSurvey error', e);
@@ -94,12 +108,23 @@
   }
 
   // ==========================================
-  // 2. PHONEBOOK ENGINE
+  // 2. PHONEBOOK ENGINE (With 5-Min Egress Cache)
   // ==========================================
 
-  async function getPhonebook(profileId) {
+  let _ucasPhonebookCache = new Map();
+  const UCAS_PHONEBOOK_CACHE_TTL = 300000; // 5 minutes
+
+  async function getPhonebook(profileId, forceRefresh = false) {
     const client = getDb();
     if (!client) return { success: false, data: [] };
+
+    const cacheKey = profileId || 'ALL';
+    if (!forceRefresh && _ucasPhonebookCache.has(cacheKey)) {
+      const cached = _ucasPhonebookCache.get(cacheKey);
+      if (Date.now() - cached.timestamp < UCAS_PHONEBOOK_CACHE_TTL) {
+        return { success: true, data: cached.data };
+      }
+    }
 
     try {
       let query = client
@@ -113,7 +138,9 @@
 
       const { data, error } = await query;
       if (error) throw error;
-      return { success: true, data: data || [] };
+      const resData = data || [];
+      _ucasPhonebookCache.set(cacheKey, { data: resData, timestamp: Date.now() });
+      return { success: true, data: resData };
     } catch (e) {
       console.error('UCAS DB: getPhonebook error', e);
       return { success: false, data: [], message: e.message };
@@ -141,6 +168,7 @@
         .single();
 
       if (error) throw error;
+      _ucasPhonebookCache.clear(); // Invalidate cache on new contact
       return { success: true, data };
     } catch (e) {
       console.error('UCAS DB: addPhonebookContact error', e);
@@ -460,7 +488,7 @@
   // ==========================================
 
   let _ucasLandingPagesCache = new Map();
-  const UCAS_LP_CACHE_TTL = 20000; // 20 seconds cache
+  const UCAS_LP_CACHE_TTL = 300000; // 5 minutes cache
 
   function invalidateLandingPagesCache() {
     _ucasLandingPagesCache.clear();

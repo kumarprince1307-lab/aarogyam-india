@@ -542,6 +542,9 @@
   window.openUniversalAuthModal = window.openGuestLoginModal;
 
   window.closeGuestLoginModal = function() {
+    try {
+      sessionStorage.setItem('ai_guest_dismissed', 'true');
+    } catch(e) {}
     const modal = document.getElementById('ai-universal-auth-modal');
     const card = document.getElementById('ai-universal-auth-card');
     if (modal && card) {
@@ -551,12 +554,21 @@
     }
   };
 
-  // 4. Auto-Trigger on Public Page Load (Dual-Action Modal on Site / Fast In-Modal on Webinar)
+  // 4. Auto-Trigger on Public Page Load (Controlled, Non-Intrusive)
   function triggerAutoPopupIfApplicable() {
     const currentPath = (window.location.pathname || '').toLowerCase();
     
-    // Skip Admin Panels and dedicated registration page
-    if (currentPath.includes('/admin') || currentPath.endsWith('admin.html') || currentPath.includes('registration.html')) {
+    // Skip if user already dismissed in this session
+    if (isDismissedThisSession()) {
+      return;
+    }
+
+    // Skip Admin Panels and dedicated registration/library pages
+    if (currentPath.includes('/admin') || 
+        currentPath.endsWith('admin.html') || 
+        currentPath.includes('registration.html') ||
+        currentPath.includes('my-library') ||
+        currentPath.includes('library')) {
       return;
     }
 
@@ -586,15 +598,15 @@
       return;
     }
 
-    // Trigger popup smoothly after short delay
+    // Only open on homepage if not dismissed
     setTimeout(() => {
-      if (!window.isUserLoggedIn()) {
+      if (!window.isUserLoggedIn() && !isDismissedThisSession()) {
         const isWebinar = currentPath.includes('webinar');
         window.openGuestLoginModal(null, {
           source: isWebinar ? 'WebinarPage' : 'PublicPageLoad'
         });
       }
-    }, 450);
+    }, 800);
   }
 
   if (document.readyState === 'loading') {

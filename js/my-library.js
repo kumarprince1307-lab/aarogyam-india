@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initUserData();
     startDailyTimer();
     loadLibraryData();
-    checkAndOpenProfileModal();
     initLibraryAudioGuide();
 });
 
