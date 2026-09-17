@@ -783,7 +783,7 @@ export async function initBookLandingPages() {
         <div style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div style="font-weight: 800; color: #fbbf24; font-size: 0.95rem;">
-              🔍 9. पुस्तक के अंदर के डेमो पेजेस (Pinch-to-Zoom Gallery & Panoramic Banner)
+              🔍 9. पुस्तक के अंदर के डेमो पेजेस (Pinch-to-Zoom Gallery &amp; Panoramic Banner)
             </div>
             <button type="button" id="btn_add_demo_image" class="admin-button small-button" style="background: #d97706; color: #fff; font-weight: 700;">
               + नया डेमो पेज जोड़ें
@@ -795,6 +795,33 @@ export async function initBookLandingPages() {
 
           <div id="blp_demo_images_wrap" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
             <!-- Rendered dynamically -->
+          </div>
+
+          <!-- DEMO READER ALLOWED PAGES SELECTOR (EXCLUSIVE SETTING) -->
+          <div style="margin-top: 14px; background: rgba(245,158,11,0.1); border: 1.5px solid #f59e0b; border-radius: 8px; padding: 12px 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+              <label style="font-weight: 800; color: #fbbf24; font-size: 0.88rem; display: flex; align-items: center; gap: 6px; margin: 0;">
+                <span>📖</span> <span>डेमो रीडर अनुमत पृष्ठ (Demo Reader Allowed Pages Selection):</span>
+              </label>
+              <span style="font-size: 0.72rem; background: #d97706; color: #fff; padding: 2px 8px; border-radius: 12px; font-weight: 800;">
+                Demo Reader Exclusive
+              </span>
+            </div>
+            <p style="font-size: 0.78rem; color: #cbd5e1; margin: 0 0 8px 0; line-height: 1.4;">
+              जब पाठक 'डेमो रीडर' खोलेगा, तो मुख्य पुस्तक के कौन-कौन से विशिष्ट पृष्ठ पढ़ने और सुनने के लिए दिखाई देंगे (कॉमा या रेंज में लिखें, उदा: <code>1, 2, 3, 5, 8, 12, 16</code> या <code>1-10</code>):
+            </p>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <input type="text" id="blp_demo_reader_pages" class="admin-input" placeholder="उदा. 1, 2, 3, 4, 5, 8, 12, 16" style="flex: 1; min-width: 220px; padding: 8px 12px; font-weight: 700; color: #fef08a; background: rgba(0,0,0,0.4); border: 1.5px solid #f59e0b; font-family: monospace;" />
+              <button type="button" onclick="window.setPresetDemoPages('1-5')" class="admin-button small-button" style="background: rgba(245,158,11,0.25); border: 1px solid #f59e0b; color: #fef08a; font-size: 0.75rem; white-space: nowrap;">
+                1st 5 Pages
+              </button>
+              <button type="button" onclick="window.setPresetDemoPages('1-10')" class="admin-button small-button" style="background: rgba(245,158,11,0.25); border: 1px solid #f59e0b; color: #fef08a; font-size: 0.75rem; white-space: nowrap;">
+                1st 10 Pages
+              </button>
+              <button type="button" onclick="window.setPresetDemoPages('sample')" class="admin-button small-button" style="background: rgba(245,158,11,0.25); border: 1px solid #f59e0b; color: #fef08a; font-size: 0.75rem; white-space: nowrap;">
+                Sample (1,2,3,5,8,12)
+              </button>
+            </div>
           </div>
         </div>
 
@@ -5711,6 +5738,20 @@ Instant Download & Lifetime Access
     window.renderAudioHighlightsInBuilder();
   };
 
+  // Demo Reader Allowed Pages Preset Selector
+  window.setPresetDemoPages = function(preset) {
+    const input = document.getElementById('blp_demo_reader_pages');
+    if (!input) return;
+    if (preset === '1-5') {
+      input.value = '1, 2, 3, 4, 5';
+    } else if (preset === '1-10') {
+      input.value = '1, 2, 3, 4, 5, 6, 7, 8, 9, 10';
+    } else if (preset === 'sample') {
+      input.value = '1, 2, 3, 5, 8, 12, 16';
+    }
+    showToast(`📖 डेमो रीडर पेज सेट किए गए: ${input.value}`, 'info');
+  };
+
   window.removeAudioHighlightItem = function(idx) {
     currentAudioHighlights.splice(idx, 1);
     window.renderAudioHighlightsInBuilder();
@@ -7023,11 +7064,12 @@ Instant Download & Lifetime Access
     }
     if (typeof renderVideosInBuilder === 'function') renderVideosInBuilder();
 
-    // 8. Demo Preview Gallery
+    // 8. Demo Preview Gallery & Demo Reader Allowed Pages
     const demoImgs = page.demo_images || page.demoImages || page.preview_images;
     if (demoImgs && Array.isArray(demoImgs) && demoImgs.length > 0) {
       currentDemoImages = JSON.parse(JSON.stringify(demoImgs));
     }
+    setVal('blp_demo_reader_pages', page.demo_reader_pages || page.demoPages || (curBookType === 'demo' ? '1, 2, 3, 4, 5' : ''));
     if (typeof renderDemoImagesInBuilder === 'function') renderDemoImagesInBuilder();
 
     // 9. Suggested Books
@@ -7218,6 +7260,7 @@ Instant Download & Lifetime Access
     if (document.getElementById('blp_final_buy_title')) document.getElementById('blp_final_buy_title').value = '';
     if (document.getElementById('blp_final_buy_desc')) document.getElementById('blp_final_buy_desc').value = '';
     if (document.getElementById('blp_final_buy_benefits')) document.getElementById('blp_final_buy_benefits').value = '';
+    if (document.getElementById('blp_demo_reader_pages')) document.getElementById('blp_demo_reader_pages').value = '';
     if (document.getElementById('blp_store_badge')) document.getElementById('blp_store_badge').value = 'best_seller';
     if (document.getElementById('blp_is_coming_soon')) document.getElementById('blp_is_coming_soon').value = 'false';
     window.updateSocialSharePreview();
@@ -7587,6 +7630,7 @@ Instant Download & Lifetime Access
       currentVideos = page.videos || [];
       currentReviews = page.testimonials || [];
       currentDemoImages = page.demo_images || [];
+      setVal('blp_demo_reader_pages', page.demo_reader_pages || page.demoPages || '');
       currentBonuses = page.bonuses || page.bonus_books || [];
       currentBonusPoints = page.bonus_points || [
         '24×7 WhatsApp Priority Support',
@@ -8089,6 +8133,8 @@ Instant Download & Lifetime Access
       },
       preview_banner: cleanSectionBanners.sec_preview || undefined,
       demo_images: cleanedDemoImages,
+      demo_reader_pages: (document.getElementById('blp_demo_reader_pages')?.value || '').trim(),
+      demoPages: (document.getElementById('blp_demo_reader_pages')?.value || '').trim(),
       suggested_books_list: currentSuggestedBooks,
       suggested_books: currentSuggestedBooks.map(x => x.link || x.id || x.title).filter(Boolean),
       bonuses: currentBonuses,

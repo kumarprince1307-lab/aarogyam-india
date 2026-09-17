@@ -215,18 +215,47 @@ async function verifyUserAccessAndSession(targetBookId) {
     let pageImages = null;
 
     if (isDemoMode) {
-        // DEMO MODE: load demo preview pages
-        if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
+        // DEMO MODE: Check for specific demo reader allowed pages (e.g. 1, 2, 3, 5, 8, 12, 16 or 1-10)
+        const allowedPagesParam = (urlParams.get("pages") || aoiCurrentBookData.demo_reader_pages || aoiCurrentBookData.demoPages || '').trim();
+        const targetMain = (aoiCurrentBookData.targetMainBook || (canonicalBookId.replace(/^(DEMO_|DEMO-|BONUS_|BONUS-|FREE_|FREE-)/i, '')) || (canonicalBookId === 'BK002' ? 'BK002' : 'BK001')).toUpperCase();
+        
+        let parsedPageNumbers = [];
+        if (allowedPagesParam) {
+            allowedPagesParam.split(/[,;]+/).forEach(part => {
+                const clean = part.trim();
+                if (clean.includes('-')) {
+                    const [s, e] = clean.split('-').map(x => parseInt(x.trim(), 10));
+                    if (!isNaN(s) && !isNaN(e) && s <= e) {
+                        for (let p = s; p <= e; p++) {
+                            if (!parsedPageNumbers.includes(p)) parsedPageNumbers.push(p);
+                        }
+                    }
+                } else {
+                    const num = parseInt(clean, 10);
+                    if (!isNaN(num) && !parsedPageNumbers.includes(num)) {
+                        parsedPageNumbers.push(num);
+                    }
+                }
+            });
+        }
+
+        if (parsedPageNumbers.length > 0) {
+            window.aoiSourcePageMap = parsedPageNumbers;
+            pageImages = parsedPageNumbers.map(p => `../images/books/${targetMain}/${p}.webp`);
+        } else if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
             pageImages = aoiCurrentBookData.demoImages;
+            window.aoiSourcePageMap = pageImages.map((_, i) => i + 1);
         } else if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
             pageImages = aoiCurrentBookData.pageImages.slice(0, 5);
+            window.aoiSourcePageMap = pageImages.map((_, i) => i + 1);
         } else {
             pageImages = [
-                '../images/books/kharif-master-guide-2026-preview-01.webp',
-                '../images/books/kharif-master-guide-2026-preview-02.webp',
-                '../images/books/kharif-master-guide-2026-preview-03.webp',
-                '../images/books/kharif-master-guide-2026-preview-04.webp'
+                `../images/books/${targetMain}/1.webp`,
+                `../images/books/${targetMain}/2.webp`,
+                `../images/books/${targetMain}/3.webp`,
+                `../images/books/${targetMain}/4.webp`
             ];
+            window.aoiSourcePageMap = [1, 2, 3, 4];
         }
     } else {
         // MAIN BOOK MODE: load FULL book pages (152 pages for BK001, 118 pages for BK002, etc.)

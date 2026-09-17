@@ -297,12 +297,13 @@ class ProAudioBookEngine {
     // =======================================================
     async playCurrentPage() {
         const currentPage = window.aoiPageNum || 1;
+        const effectivePage = (window.aoiSourcePageMap && window.aoiSourcePageMap[currentPage - 1]) ? window.aoiSourcePageMap[currentPage - 1] : currentPage;
         this.getUserProfileName();
 
         // Detect if running inside Facebook / Instagram In-App Browser (where SpeechSynthesis is blocked)
         const isFBWebView = /FBAN|FBAV|FB_IAB|Instagram|Line/i.test(navigator.userAgent || '');
-        const pageKey = String(currentPage);
-        const pageEntry = this.pageScripts[pageKey];
+        const pageKey = String(effectivePage);
+        const pageEntry = this.pageScripts[pageKey] || this.pageScripts[String(currentPage)];
         const hasRecordedAudio = pageEntry && typeof pageEntry === 'object' && pageEntry.audio && pageEntry.audio.trim().length > 0;
 
         // 1. Play Welcome Greeting Once on First Start (Only if not in FB WebView or if pure TTS is supported)

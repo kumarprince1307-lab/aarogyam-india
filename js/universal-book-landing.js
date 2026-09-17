@@ -14,6 +14,174 @@
   let currentZoom = 1;
   let timerInterval = null;
 
+  let pendingAuthCallback = null;
+
+  // 1. User Registration & Session Checker
+  window.isUserRegistered = function() {
+    try {
+      const user = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+      const profile = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
+      const session = JSON.parse(localStorage.getItem('AI_SESSION') || '{}');
+      const directMobile = localStorage.getItem('aim_user_mobile');
+      const mobile = user.mobile || user.phone || profile.mobile || profile.phone || session.mobile || directMobile;
+      if (mobile && String(mobile).replace(/\D/g, '').length >= 10) {
+        return true;
+      }
+      return Boolean(user.id || profile.id);
+    } catch(e) {
+      return false;
+    }
+  };
+
+  window.isUserLoggedIn = window.isUserRegistered;
+
+  // 2. Interactive Login & Registration Modal Popups
+  window.openLoginPopup = function(customTitle, customSubtitle, callback) {
+    if (typeof callback === 'function') {
+      pendingAuthCallback = callback;
+    }
+    const overlay = document.getElementById('login-popup-overlay');
+    if (overlay) {
+      const titleEl = document.getElementById('login-popup-title') || overlay.querySelector('h2');
+      const descEl = document.getElementById('login-popup-desc') || overlay.querySelector('p');
+      if (titleEl && customTitle) titleEl.textContent = customTitle;
+      if (descEl && customSubtitle) descEl.textContent = customSubtitle;
+      overlay.style.display = 'flex';
+      const input = document.getElementById('login-mobile');
+      if (input) setTimeout(() => input.focus(), 120);
+    }
+  };
+
+  window.closeLoginPopup = function() {
+    const overlay = document.getElementById('login-popup-overlay');
+    if (overlay) overlay.style.display = 'none';
+  };
+
+  window.checkUserLogin = async function() {
+    const input = document.getElementById('login-mobile');
+    const raw = input ? input.value.trim() : '';
+    const cleanMobile = raw.replace(/\D/g, '').slice(-10);
+    if (!cleanMobile || cleanMobile.length < 10) {
+      alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।');
+      return;
+    }
+
+    try {
+      let userData = {
+        id: 'AI_' + cleanMobile,
+        mobile: cleanMobile,
+        phone: cleanMobile,
+        full_name: 'किसान मित्र',
+        created_at: new Date().toISOString()
+      };
+
+      // Query database if available
+      const db = window.supabaseClient || window.supabase || window.dbClient;
+      if (db) {
+        try {
+          const { data } = await db.from('profiles').select('*').eq('mobile', cleanMobile).limit(1);
+          if (data && data.length > 0) {
+            userData = { ...data[0], mobile: cleanMobile, phone: cleanMobile };
+          }
+        } catch(e) {}
+      }
+
+      localStorage.setItem('AI_USER', JSON.stringify(userData));
+      localStorage.setItem('AI_PROFILE', JSON.stringify(userData));
+      localStorage.setItem('aim_user_mobile', cleanMobile);
+      localStorage.setItem('AI_SESSION', JSON.stringify({
+        mobile: cleanMobile,
+        name: userData.full_name || 'किसान मित्र',
+        loginTime: new Date().toISOString(),
+        active: true
+      }));
+
+      window.closeLoginPopup();
+      window.updateAuthStatusUI();
+
+      if (typeof pendingAuthCallback === 'function') {
+        const cb = pendingAuthCallback;
+        pendingAuthCallback = null;
+        cb();
+      } else {
+        const toast = document.getElementById('cart-toast-notif');
+        const msg = document.getElementById('cart-toast-msg');
+        if (toast && msg) {
+          msg.textContent = `🎉 स्वागत है, ${userData.full_name || 'किसान मित्र'} जी!`;
+          toast.style.opacity = '1';
+          toast.style.transform = 'translateY(0)';
+          setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-30px)'; }, 2800);
+        }
+      }
+    } catch(err) {
+      console.error('Login error:', err);
+      alert('लॉगिन करने में समस्या आई, कृपया पुनः प्रयास करें।');
+    }
+  };
+
+  window.logoutUser = function() {
+    localStorage.removeItem('AI_USER');
+    localStorage.removeItem('AI_PROFILE');
+    localStorage.removeItem('AI_SESSION');
+    localStorage.removeItem('aim_user_mobile');
+    window.updateAuthStatusUI();
+    window.location.reload();
+  };
+
+  window.updateAuthStatusUI = function() {
+    const isLogged = window.isUserRegistered();
+    const loginBtn = document.getElementById('mobile-login-btn');
+    const logoutBtn = document.getElementById('mobile-logout-btn');
+    const nameEl = document.getElementById('menuUserName');
+    const phoneEl = document.getElementById('mobileUserPhone');
+
+    if (isLogged) {
+      try {
+        const user = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+        const phone = user.mobile || user.phone || localStorage.getItem('aim_user_mobile') || '';
+        if (nameEl) nameEl.textContent = user.full_name || user.name || 'प्रिय पाठक';
+        if (phoneEl) phoneEl.textContent = phone ? `(${phone})` : '';
+      } catch(e) {}
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (logoutBtn) logoutBtn.style.display = 'flex';
+    } else {
+      if (nameEl) nameEl.textContent = 'प्रिय पाठक';
+      if (phoneEl) phoneEl.textContent = '';
+      if (loginBtn) loginBtn.style.display = 'flex';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+    }
+  };
+
+  window.openDemoReaderWithAuth = function(bookId, demoPages) {
+    const bId = (bookId || currentBookData?.id || currentBookId || 'BK001').toUpperCase();
+    let readerDemoUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
+    const cleanPages = (demoPages || currentLandingData?.demo_reader_pages || '').trim();
+    if (cleanPages) {
+      readerDemoUrl += `&pages=${encodeURIComponent(cleanPages)}`;
+    }
+
+    if (!window.isUserRegistered()) {
+      window.openLoginPopup(
+        'डेमो रीडर एक्सेस',
+        '📖 सचित्र डेमो रीडर व ऑडियो सुनने के लिए कृपया अपना 10 अंकों का मोबाइल नंबर दर्ज करें:',
+        () => {
+          window.location.href = readerDemoUrl;
+        }
+      );
+      return;
+    }
+
+    window.location.href = readerDemoUrl;
+  };
+
+  window.toggleMenu = function() {
+    const menu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('sideMenuOverlay');
+    if (menu) menu.classList.toggle('active');
+    if (overlay) overlay.classList.toggle('active');
+    window.updateAuthStatusUI();
+  };
+
   // Universal Smart Book Sharing Handler (Available globally)
   window.handleUniversalBookShare = function(e) {
     if (e) {
@@ -98,6 +266,7 @@
 
   async function init() {
     extractQueryParameters();
+    window.updateAuthStatusUI();
     await loadBookAndLandingData();
     applyThemeColors();
     applyDynamicSectionOrdering();
@@ -117,6 +286,7 @@
     renderFinalBuySection();
     initLandingPageAutoplay();
     enforceHiddenSections();
+    window.updateAuthStatusUI();
   }
 
     function initLandingPageAutoplay() {
@@ -882,14 +1052,14 @@
     const previewActionWrap = document.querySelector('#sec-sample-book .preview-action');
     if (previewActionWrap) {
       const bId = (currentBookData?.id || currentBookId || 'BK001').toUpperCase();
-      const readerDemoUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
+      const demoPages = (l.demo_reader_pages || b.demo_reader_pages || '').trim();
       previewActionWrap.innerHTML = `
         <a id="preview-buy-btn" href="#sec-final-buy" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;">
-          <span>🛒</span> <span>अभी खरीदें मात्र ₹${offerPrice} में</span>
+          <span>🛒</span> <span>अभी खरीदें मात्र ₹${offer} में</span>
         </a>
-        <a href="${readerDemoUrl}" class="preview-buy-btn" style="background:linear-gradient(135deg,#0284c7,#0369a1);border:1.5px solid #38bdf8;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;margin-left:8px;" title="पूरा सचित्र डेमो रीडर खोलें">
-          <span>📖</span> <span>फुल डेमो रीडर खोलें (Open Demo Reader)</span>
-        </a>
+        <button type="button" onclick="window.openDemoReaderWithAuth('${bId}', '${demoPages}')" class="preview-buy-btn" style="background:linear-gradient(135deg,#0284c7,#0369a1);border:1.5px solid #38bdf8;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:8px;margin-left:8px;" title="पूरा सचित्र डेमो रीडर खोलें">
+          <span>📖</span> <span>फुल सचित्र डेमो रीडर खोलें (Open Demo Reader)</span>
+        </button>
       `;
     }
 
@@ -1397,6 +1567,17 @@
     const zoomText = document.getElementById('zoom-level-text');
 
     window.openPinchZoomLightbox = function (url) {
+      if (!window.isUserRegistered()) {
+        window.openLoginPopup(
+          'पूर्वावलोकन देखें (Preview Gallery)',
+          '📖 पुस्तक के पृष्ठ (Preview Images) देखने के लिए कृपया अपना 10 अंकों का मोबाइल नंबर दर्ज करें:',
+          () => {
+            window.openPinchZoomLightbox(url);
+          }
+        );
+        return;
+      }
+
       if (!modal || !img) return;
       img.src = window.resolveImageSrc(url);
       img.onerror = function() { window.handleImageError(this); };
