@@ -1000,124 +1000,83 @@ body {
     50% { box-shadow: 0 12px 28px rgba(5, 150, 105, 0.7); transform: translateY(-3px); }
 }
 
-.lib-audio-guide-bar {
-    position: fixed;
-    bottom: 80px;
-    left: 18px;
-    right: auto;
-    transform: none;
-    width: auto;
-    max-width: 440px;
-    background: linear-gradient(135deg, rgba(6, 78, 59, 0.96) 0%, rgba(4, 47, 46, 0.96) 50%, rgba(15, 23, 42, 0.96) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1.5px solid rgba(52, 211, 153, 0.6);
-    border-radius: 20px;
-    padding: 12px 18px;
+/* Header Audio Guide Pill (Integrated cleanly into header left - zero overlap) */
+.header-audio-guide-pill {
+    background: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%);
+    border: 1.5px solid #34d399;
     color: #ffffff;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.2);
-    z-index: 9999;
-    animation: slideUpLeftBar 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes slideUpLeftBar {
-    from { opacity: 0; transform: translateY(25px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.lib-guide-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.lib-guide-avatar {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    background: linear-gradient(135deg, #10b981, #059669);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
-}
-
-.lib-guide-info {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-}
-
-.lib-guide-title {
-    font-size: 0.88rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.76rem;
     font-weight: 800;
-    color: #f1f5f9;
-}
-
-.lib-guide-status {
-    font-size: 0.74rem;
-    color: #a7f3d0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.lib-guide-ctrls {
-    display: flex;
+    cursor: pointer;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
+    box-shadow: 0 3px 12px rgba(5, 150, 105, 0.4);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-.lib-guide-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: #ffffff;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-.lib-guide-btn:hover {
-    background: rgba(255, 255, 255, 0.35);
-    transform: scale(1.1);
-}
-.lib-guide-btn.close-btn {
-    background: rgba(239, 68, 68, 0.25);
-    border-color: rgba(239, 68, 68, 0.5);
-    color: #fca5a5;
-    font-size: 0.85rem;
-}
-.lib-guide-btn.close-btn:hover {
-    background: #ef4444;
-    color: #ffffff;
+.header-audio-guide-pill:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 5px 16px rgba(52, 211, 153, 0.55);
+    background: linear-gradient(135deg, #047857 0%, #059669 100%);
+    border-color: #6ee7b7;
 }
 
-/* Mobile responsive safe space for floating audio button on the left (NEVER OVERLAPS RIGHT BUTTONS) */
-@media (max-width: 768px) {
-    .lib-audio-float-btn {
-        bottom: 74px !important;
-        left: 10px !important;
-        right: auto !important;
-        padding: 8px 14px !important;
-        font-size: 0.78rem !important;
-    }
-    .lib-audio-guide-bar {
-        bottom: 68px !important;
-        left: 8px !important;
-        right: auto !important;
-        width: calc(100% - 90px) !important;
-        max-width: 320px !important;
-        padding: 8px 12px !important;
-        border-radius: 16px !important;
+.header-audio-guide-pill.is-playing {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    border-color: #f87171 !important;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.7) !important;
+    animation: pulseAudioGuide 1.5s infinite;
+}
+
+@keyframes pulseAudioGuide {
+    0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); transform: scale(1); }
+    50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.95); transform: scale(1.03); }
+}
+
+.audio-wave-anim {
+    display: none;
+    align-items: flex-end;
+    gap: 2px;
+    height: 12px;
+}
+
+.header-audio-guide-pill.is-playing .audio-wave-anim {
+    display: inline-flex;
+}
+
+.wave-bar {
+    display: inline-block;
+    width: 2.5px;
+    height: 100%;
+    background: #ffffff;
+    border-radius: 2px;
+    animation: waveBarBounce 0.8s ease-in-out infinite alternate;
+}
+
+.wave-bar:nth-child(2) { 
+    animation-delay: 0.2s; 
+    height: 75%; 
+}
+
+.wave-bar:nth-child(3) { 
+    animation-delay: 0.4s; 
+    height: 45%; 
+}
+
+@keyframes waveBarBounce {
+    0% { height: 3px; }
+    100% { height: 12px; }
+}
+
+@media (max-width: 520px) {
+    .header-audio-guide-pill {
+        padding: 5px 9px;
+        font-size: 0.72rem;
     }
 }
 

@@ -179,8 +179,8 @@
   <header class="header header-tiranga-animated" id="header">
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:8px;">
       
-      <!-- Brand Logo Left in Glass Pill + Active Page Badge -->
-      <div style="display:flex;align-items:center;gap:8px;">
+      <!-- Brand Logo Left in Glass Pill + Active Page Badge + Audio Guide Pill -->
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <a href="/index.html" class="brand-logo-pill">
           <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;">
           <div style="display:flex;flex-direction:column;">
@@ -192,6 +192,16 @@
             </span>
           </div>
         </a>
+
+        <!-- Header Audio Guide Pill Button (No floating overlap) -->
+        <button type="button" id="headerAudioGuideBtn" class="header-audio-guide-pill" title="लाइब्रेरी ऑडियो गाइड सुनें">
+          <span class="audio-wave-anim" id="headerAudioWave">
+            <i class="wave-bar"></i>
+            <i class="wave-bar"></i>
+            <i class="wave-bar"></i>
+          </span>
+          <span id="headerAudioGuideText">🔊 गाइड सुनें</span>
+        </button>
 
         <!-- Current Active Page Indicator Badge -->
         <span class="header-current-page-badge" title="Current Page">
@@ -722,30 +732,6 @@
         </div>
     </div>
   </main>
-
-  <!-- Floating Audio Library Guide Assistant Bar -->
-  <div id="libraryAudioGuideBar" class="lib-audio-guide-bar" style="display: none;">
-      <div class="lib-guide-content">
-          <div class="lib-guide-avatar">
-              <span>🎧</span>
-          </div>
-          <div class="lib-guide-info">
-              <span class="lib-guide-title">कृषि सखी (लाइब्रेरी गाइड)</span>
-              <span class="lib-guide-status" id="libGuideStatus">ऑडियो गाइड चालू है...</span>
-          </div>
-          <div class="lib-guide-ctrls">
-              <button id="libGuidePlayBtn" class="lib-guide-btn" title="प्ले / पॉज">⏸️</button>
-              <button id="libGuideMuteBtn" class="lib-guide-btn" title="म्यूट / अनम्यूट">🔊</button>
-              <button id="libGuideCloseBtn" class="lib-guide-btn close-btn" title="बंद करें">✕</button>
-          </div>
-      </div>
-  </div>
-
-  <!-- Floating Audio Guide Trigger Button (Left Aligned) -->
-  <button id="libraryAudioGuideFloatBtn" class="lib-audio-float-btn" title="लाइब्रेरी ऑडियो गाइड सुनें">
-      <span class="float-icon">🎧</span>
-      <span class="float-text">ऑडियो गाइड</span>
-  </button>
 
   <!-- =========================================
        15. MODERN DARK FOOTER

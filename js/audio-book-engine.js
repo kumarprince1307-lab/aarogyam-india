@@ -136,6 +136,9 @@ class ProAudioBookEngine {
         this.currentChunks = [];
         this.currentChunkIndex = 0;
         this.isUserSeeking = false;
+        this.silentKeepAliveAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+        this.silentKeepAliveAudio.loop = true;
+        this.silentKeepAliveAudio.volume = 0.01;
 
         this.init();
     }
@@ -500,6 +503,9 @@ class ProAudioBookEngine {
         this.isPlaying = true;
         this.setPlayingState(true);
         this.requestWakeLock();
+        try {
+            if (this.silentKeepAliveAudio) this.silentKeepAliveAudio.play().catch(() => {});
+        } catch(e) {}
 
         const onAllChunksFinished = () => {
             if (!this.isPlaying || this.activeEpoch !== currentEpoch) return;
@@ -622,6 +628,9 @@ class ProAudioBookEngine {
                 this.synth.cancel();
             } catch(e) {}
         }
+        if (this.silentKeepAliveAudio) {
+            try { this.silentKeepAliveAudio.pause(); } catch(e) {}
+        }
         this.releaseWakeLock();
     }
 
@@ -631,6 +640,9 @@ class ProAudioBookEngine {
         }
         if (this.synth && this.synth.speaking) {
             this.synth.pause();
+        }
+        if (this.silentKeepAliveAudio) {
+            try { this.silentKeepAliveAudio.pause(); } catch(e) {}
         }
         this.isPaused = true;
         this.setPlayingState(false);

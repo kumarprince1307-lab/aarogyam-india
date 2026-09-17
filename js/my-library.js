@@ -1421,13 +1421,61 @@ window.fetchAndRenderLibraryWeather = async function(lat, lon, cityName, stateNa
     }
 };
 
+// =========================================================================
+// 14. WEATHER GPS & LOCATION ENGINE (NO-FAIL SMART GEOLOCATION)
+// =========================================================================
 window.detectUserLiveLocationWeather = function() {
     const gpsBtn = document.getElementById('weatherGpsBtn');
     if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>स्थान खोज रहे हैं...</span>';
 
+    // Smart Fallback via IP Geolocation (Zero Permission Needed, 100% Reliable on Mobile / PWA)
+    async function fallbackToIpWeather() {
+        let lat = null, lon = null, cityName = 'आपका क्षेत्र', stateName = 'लाइव मौसम';
+        
+        try {
+            // Source 1: ipapi.co
+            const r1 = await fetch('https://ipapi.co/json/');
+            if (r1.ok) {
+                const d1 = await r1.json();
+                if (d1.latitude && d1.longitude) {
+                    lat = d1.latitude;
+                    lon = d1.longitude;
+                    cityName = d1.city || d1.region || 'स्थानीय क्षेत्र';
+                    stateName = d1.region || 'भारत';
+                }
+            }
+        } catch(e) {}
+
+        if (!lat) {
+            try {
+                // Source 2: bigdatacloud client info
+                const r2 = await fetch('https://api.bigdatacloud.net/data/client-info');
+                if (r2.ok) {
+                    const d2 = await r2.json();
+                    if (d2.location && d2.location.latitude) {
+                        lat = d2.location.latitude;
+                        lon = d2.location.longitude;
+                        cityName = d2.location.city || d2.location.principalSubdivision || 'स्थानीय क्षेत्र';
+                        stateName = d2.location.principalSubdivision || 'भारत';
+                    }
+                }
+            } catch(e) {}
+        }
+
+        // Final Default: Rewa
+        if (!lat) {
+            lat = 24.5362;
+            lon = 81.3037;
+            cityName = 'रीवा';
+            stateName = 'मध्य प्रदेश';
+        }
+
+        await window.fetchAndRenderLibraryWeather(lat, lon, cityName, stateName);
+        if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>📍 ' + cityName + '</span>';
+    }
+
     if (!navigator.geolocation) {
-        alert('आपके ब्राउज़र में GPS लोकेशन समर्थित नहीं है।');
-        if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> <span>📍 मेरा GPS स्थान</span>';
+        fallbackToIpWeather();
         return;
     }
 
@@ -1448,14 +1496,13 @@ window.detectUserLiveLocationWeather = function() {
             } catch(e) {}
 
             await window.fetchAndRenderLibraryWeather(lat, lon, cityName, stateName);
-            if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>📍 GPS सक्रिय</span>';
+            if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>📍 ' + cityName + '</span>';
         },
         (err) => {
-            console.warn('GPS error:', err);
-            alert('कृपया GPS / लोकेशन अनुमति चालू करें ताकि आपके क्षेत्र का मौसम लोड हो सके।');
-            if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> <span>📍 मेरा GPS स्थान</span>';
+            console.warn('GPS permission denied or unavailable, using smart IP fallback:', err);
+            fallbackToIpWeather();
         },
-        { timeout: 10000 }
+        { timeout: 8000, enableHighAccuracy: true, maximumAge: 60000 }
     );
 };
 
@@ -1482,26 +1529,81 @@ window.searchCityWeather = function() {
 };
 
 // =========================================================================
-// 15. FLOATING NATURAL HINDI AUDIO GUIDE ASSISTANT (लाइब्रेरी ऑडियो गाइड)
+// 15. PRO HEADER AUDIO GUIDE & BACKGROUND AUDIO ENGINE (लाइब्रेरी ऑडियो गाइड)
 // =========================================================================
 function initLibraryAudioGuide() {
-    const guideBar = document.getElementById('libraryAudioGuideBar');
+    const headerBtn = document.getElementById('headerAudioGuideBtn');
+    const headerBtnText = document.getElementById('headerAudioGuideText');
     const floatBtn = document.getElementById('libraryAudioGuideFloatBtn');
+    const guideBar = document.getElementById('libraryAudioGuideBar');
     const playBtn = document.getElementById('libGuidePlayBtn');
     const muteBtn = document.getElementById('libGuideMuteBtn');
     const closeBtn = document.getElementById('libGuideCloseBtn');
     const statusText = document.getElementById('libGuideStatus');
 
-    if (!guideBar || !floatBtn) return;
-
     let isPlaying = false;
     let isMuted = false;
     let synth = window.speechSynthesis || null;
     let currentUtterance = null;
+    let wakeLockObj = null;
+    let silentKeepAliveAudio = null;
 
     // Load default weather on startup
     const defaultCity = DISTRICT_COORDS['rewa'];
     window.fetchAndRenderLibraryWeather(defaultCity.lat, defaultCity.lon, defaultCity.name, defaultCity.state);
+
+    // Initialize Background Silent Audio Anchor
+    function startSilentKeepAlive() {
+        try {
+            if (!silentKeepAliveAudio) {
+                silentKeepAliveAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+                silentKeepAliveAudio.loop = true;
+                silentKeepAliveAudio.volume = 0.01;
+            }
+            silentKeepAliveAudio.play().catch(() => {});
+        } catch(e) {}
+    }
+
+    function stopSilentKeepAlive() {
+        if (silentKeepAliveAudio) {
+            try { silentKeepAliveAudio.pause(); } catch(e) {}
+        }
+    }
+
+    // WakeLock for preventing screen sleep during guide
+    async function acquireWakeLock() {
+        try {
+            if ('wakeLock' in navigator && !wakeLockObj) {
+                wakeLockObj = await navigator.wakeLock.request('screen');
+                wakeLockObj.addEventListener('release', () => { wakeLockObj = null; });
+            }
+        } catch(e) {}
+    }
+
+    function releaseWakeLock() {
+        if (wakeLockObj) {
+            try { wakeLockObj.release(); } catch(e) {}
+            wakeLockObj = null;
+        }
+    }
+
+    // MediaSession setup for Lock Screen Controls
+    function setupMediaSession() {
+        if (!('mediaSession' in navigator)) return;
+        try {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: 'डिजिटल लाइब्रेरी ऑडियो गाइड',
+                artist: 'आरोग्यम इंडिया (Aarogyam India)',
+                album: 'स्मार्ट किसान नॉलेज हब',
+                artwork: [
+                    { src: '/images/logo/logo.png', sizes: '512x512', type: 'image/png' }
+                ]
+            });
+            navigator.mediaSession.setActionHandler('play', () => speakGuide());
+            navigator.mediaSession.setActionHandler('pause', () => stopGuide());
+            navigator.mediaSession.setActionHandler('stop', () => stopGuide());
+        } catch(e) {}
+    }
 
     function getHindiSpeechText() {
         const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
@@ -1523,13 +1625,36 @@ function initLibraryAudioGuide() {
 और बिना फोन मेमोरी भरे कभी भी ऑफलाइन पढ़ने के लिए ऊपर दिए गए 'Install App' बटन से ऐप अपने फोन में जोड़ें।`;
     }
 
+    function updateUiState(playing) {
+        isPlaying = playing;
+        if (headerBtn) {
+            if (playing) {
+                headerBtn.classList.add('is-playing');
+                if (headerBtnText) headerBtnText.textContent = '⏸️ रोकें';
+            } else {
+                headerBtn.classList.remove('is-playing');
+                if (headerBtnText) headerBtnText.textContent = '🔊 गाइड सुनें';
+            }
+        }
+        if (playBtn) playBtn.textContent = playing ? '⏸️' : '▶️';
+        if (statusText) statusText.textContent = playing ? 'ऑडियो गाइड चल रहा है...' : 'गाइड पुनः सुनने के लिए टैप करें';
+        if (guideBar) {
+            if (playing) guideBar.classList.add('playing');
+            else guideBar.classList.remove('playing');
+        }
+    }
+
     function speakGuide() {
         if (!synth) {
-            if (statusText) statusText.textContent = 'ऑडियो समर्थित नहीं है';
+            if (headerBtnText) headerBtnText.textContent = 'ऑडियो उपलब्ध नहीं';
             return;
         }
 
         synth.cancel();
+        startSilentKeepAlive();
+        acquireWakeLock();
+        setupMediaSession();
+
         const text = getHindiSpeechText();
         currentUtterance = new SpeechSynthesisUtterance(text);
         currentUtterance.lang = 'hi-IN';
@@ -1542,26 +1667,20 @@ function initLibraryAudioGuide() {
         if (hindiVoice) currentUtterance.voice = hindiVoice;
 
         currentUtterance.onstart = () => {
-            isPlaying = true;
-            if (guideBar) guideBar.style.display = 'block';
-            if (playBtn) playBtn.textContent = '⏸️';
-            if (statusText) statusText.textContent = 'ऑडियो गाइड चल रहा है...';
-            guideBar.classList.add('playing');
+            updateUiState(true);
         };
 
         currentUtterance.onend = () => {
-            isPlaying = false;
-            if (playBtn) playBtn.textContent = '▶️';
-            if (statusText) statusText.textContent = 'गाइड पूरा हुआ (सुनने के लिए प्ले करें)';
-            guideBar.classList.remove('playing');
+            updateUiState(false);
+            stopSilentKeepAlive();
+            releaseWakeLock();
         };
 
         currentUtterance.onerror = (e) => {
             console.warn('SpeechSynthesis note:', e);
-            isPlaying = false;
-            if (playBtn) playBtn.textContent = '▶️';
-            if (statusText) statusText.textContent = 'गाइड पुनः सुनने के लिए टैप करें';
-            guideBar.classList.remove('playing');
+            updateUiState(false);
+            stopSilentKeepAlive();
+            releaseWakeLock();
         };
 
         synth.speak(currentUtterance);
@@ -1569,64 +1688,54 @@ function initLibraryAudioGuide() {
 
     function stopGuide() {
         if (synth) synth.cancel();
-        isPlaying = false;
-        if (playBtn) playBtn.textContent = '▶️';
-        if (statusText) statusText.textContent = 'पॉज़ किया गया';
-        if (guideBar) guideBar.classList.remove('playing');
+        updateUiState(false);
+        stopSilentKeepAlive();
+        releaseWakeLock();
     }
 
-    // Toggle Floating Button Click
-    floatBtn.addEventListener('click', () => {
-        guideBar.style.display = 'block';
-        if (!isPlaying) {
-            speakGuide();
-        } else {
+    function toggleGuide() {
+        if (isPlaying) {
             stopGuide();
+        } else {
+            speakGuide();
         }
-    });
+    }
 
-    if (playBtn) {
-        playBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                stopGuide();
-            } else {
-                speakGuide();
-            }
+    // Connect Header Pill Button
+    if (headerBtn) {
+        headerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleGuide();
         });
     }
 
+    // Connect Legacy buttons if present
+    if (floatBtn) {
+        floatBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleGuide();
+        });
+    }
+    if (playBtn) {
+        playBtn.addEventListener('click', () => toggleGuide());
+    }
     if (muteBtn) {
         muteBtn.addEventListener('click', () => {
             isMuted = !isMuted;
-            if (muteBtn) muteBtn.textContent = isMuted ? '🔇' : '🔊';
+            muteBtn.textContent = isMuted ? '🔇' : '🔊';
             if (currentUtterance && isPlaying) {
                 stopGuide();
                 speakGuide();
             }
         });
     }
-
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
             stopGuide();
             if (guideBar) guideBar.style.display = 'none';
         });
     }
-
-    // Auto-attempt playback on load with fallback on first touch/click
-    setTimeout(() => {
-        try {
-            speakGuide();
-        } catch(e) {}
-    }, 800);
-
-    const triggerAutoAudioOnFirstGesture = () => {
-        if (!isPlaying) {
-            speakGuide();
-        }
-    };
-    window.addEventListener('click', triggerAutoAudioOnFirstGesture, { once: true });
-    window.addEventListener('touchstart', triggerAutoAudioOnFirstGesture, { once: true });
+}
 
     if (synth && synth.onvoiceschanged !== undefined) {
         synth.onvoiceschanged = () => {};

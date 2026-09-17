@@ -245,12 +245,54 @@
   }
 
   window.useUserCurrentLocation = function() {
-    if (!navigator.geolocation) {
-      alert('आपके ब्राउज़र में GPS लोकेशन सपोर्ट नहीं है। कृपया लिस्ट से अपना जिला चुनें।');
-      return;
-    }
     const btn = document.getElementById('btn-gps-weather');
     if (btn) btn.innerHTML = '⏳ GPS लोकेशन खोजी जा रही है...';
+
+    async function fallbackToIpWeather() {
+      let lat = null, lon = null, detectedCity = 'आपका क्षेत्र', detectedState = 'लाइव मौसम';
+      try {
+        const r1 = await fetch('https://ipapi.co/json/');
+        if (r1.ok) {
+          const d1 = await r1.json();
+          if (d1.latitude && d1.longitude) {
+            lat = d1.latitude;
+            lon = d1.longitude;
+            detectedCity = d1.city || d1.region || 'स्थानीय क्षेत्र';
+            detectedState = d1.region || 'भारत';
+          }
+        }
+      } catch(e) {}
+
+      if (!lat) {
+        try {
+          const r2 = await fetch('https://api.bigdatacloud.net/data/client-info');
+          if (r2.ok) {
+            const d2 = await r2.json();
+            if (d2.location && d2.location.latitude) {
+              lat = d2.location.latitude;
+              lon = d2.location.longitude;
+              detectedCity = d2.location.city || d2.location.principalSubdivision || 'स्थानीय क्षेत्र';
+              detectedState = d2.location.principalSubdivision || 'भारत';
+            }
+          }
+        } catch(e) {}
+      }
+
+      if (!lat) {
+        lat = 24.5362;
+        lon = 81.3037;
+        detectedCity = 'रीवा';
+        detectedState = 'मध्य प्रदेश';
+      }
+
+      if (btn) btn.innerHTML = '📍 ' + detectedCity;
+      window.load7DayWeather('gps', lat, lon, detectedCity, detectedState);
+    }
+
+    if (!navigator.geolocation) {
+      fallbackToIpWeather();
+      return;
+    }
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -274,10 +316,10 @@
         window.load7DayWeather('gps', lat, lon, detectedCity, detectedState);
       },
       (err) => {
-        if (btn) btn.innerHTML = '📍 मेरा जिला खोजें';
-        alert('लोकेशन एक्सेस की अनुमति नहीं मिली। कृपया नीचे दिए गए जिलों में से चुनें।');
+        console.warn('GPS unavailable on mobile, using smart IP fallback:', err);
+        fallbackToIpWeather();
       },
-      { timeout: 10000, enableHighAccuracy: true }
+      { timeout: 8000, enableHighAccuracy: true, maximumAge: 60000 }
     );
   };
 
