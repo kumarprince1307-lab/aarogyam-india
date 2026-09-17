@@ -1542,9 +1542,12 @@ function initLibraryAudioGuide() {
     // WakeLock for preventing screen sleep during guide
     async function acquireWakeLock() {
         try {
-            if ('wakeLock' in navigator && !wakeLockObj) {
-                wakeLockObj = await navigator.wakeLock.request('screen');
-                wakeLockObj.addEventListener('release', () => { wakeLockObj = null; });
+            const nav = typeof navigator !== 'undefined' ? navigator : null;
+            if (nav && 'wakeLock' in nav && !wakeLockObj) {
+                wakeLockObj = await nav.wakeLock.request('screen');
+                if (wakeLockObj) {
+                    wakeLockObj.addEventListener('release', () => { wakeLockObj = null; });
+                }
             }
         } catch(e) {}
     }
@@ -1556,21 +1559,33 @@ function initLibraryAudioGuide() {
         }
     }
 
-    // MediaSession setup for Lock Screen Controls
+    // MediaSession setup for Lock Screen Controls (Type-Safe for all IDEs)
     function setupMediaSession() {
-        if (!('mediaSession' in navigator)) return;
+        const nav = typeof navigator !== 'undefined' ? navigator : null;
+        if (!nav || !('mediaSession' in nav) || !nav.mediaSession) return;
         try {
-            navigator.mediaSession.metadata = new MediaMetadata({
-                title: 'डिजिटल लाइब्रेरी ऑडियो गाइड',
-                artist: 'आरोग्यम इंडिया (Aarogyam India)',
-                album: 'स्मार्ट किसान नॉलेज हब',
-                artwork: [
-                    { src: '/images/logo/logo.png', sizes: '512x512', type: 'image/png' }
-                ]
-            });
-            navigator.mediaSession.setActionHandler('play', () => speakGuide());
-            navigator.mediaSession.setActionHandler('pause', () => stopGuide());
-            navigator.mediaSession.setActionHandler('stop', () => stopGuide());
+            const ms = nav.mediaSession;
+            const MetaClass = window.MediaMetadata || (typeof globalThis !== 'undefined' ? globalThis.MediaMetadata : null);
+            if (MetaClass) {
+                ms.metadata = new MetaClass({
+                    title: 'डिजिटल लाइब्रेरी ऑडियो गाइड',
+                    artist: 'आरोग्यम इंडिया (Aarogyam India)',
+                    album: 'स्मार्ट किसान नॉलेज हब',
+                    artwork: [
+                        { src: '/images/logo/logo.png', sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+            }
+            const bindAction = (actionName, fn) => {
+                try {
+                    if (typeof ms.setActionHandler === 'function') {
+                        ms.setActionHandler(actionName, fn);
+                    }
+                } catch(err) {}
+            };
+            bindAction('play', () => { if (typeof toggleGuide === 'function') toggleGuide(); });
+            bindAction('pause', () => { if (typeof toggleGuide === 'function') toggleGuide(); });
+            bindAction('stop', () => { if (typeof toggleGuide === 'function') toggleGuide(); });
         } catch(e) {}
     }
 
