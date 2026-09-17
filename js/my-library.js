@@ -1775,6 +1775,17 @@ function initLibraryAudioGuide() {
         currentPlaySessionId++;
         isPlaying = false;
 
+        // Forcefully cancel any ongoing Web Speech synthesis
+        if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis) {
+            try {
+                window.speechSynthesis.pause();
+                window.speechSynthesis.cancel();
+            } catch(e) {}
+        }
+        if (synth) {
+            try { synth.cancel(); } catch(e) {}
+        }
+
         // Cleanly tear down HTML5 Audio
         if (guideAudioElement) {
             guideAudioElement.onended = null;
@@ -1785,14 +1796,6 @@ function initLibraryAudioGuide() {
                 guideAudioElement.removeAttribute('src');
                 guideAudioElement.load();
             } catch(e) {}
-        }
-
-        // Cleanly tear down Web Speech Synth
-        if (synth) {
-            try { synth.cancel(); } catch(e) {}
-        }
-        if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis) {
-            try { window.speechSynthesis.cancel(); } catch(e) {}
         }
 
         if (currentUtterance) {
@@ -1807,7 +1810,13 @@ function initLibraryAudioGuide() {
     }
 
     function toggleGuide() {
-        if (isPlaying) {
+        const isSpeakingNow = Boolean(
+            isPlaying ||
+            (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) ||
+            (guideAudioElement && !guideAudioElement.paused && guideAudioElement.currentTime > 0)
+        );
+
+        if (isSpeakingNow) {
             stopGuide();
         } else {
             speakGuide();
