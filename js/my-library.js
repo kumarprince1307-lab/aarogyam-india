@@ -1625,10 +1625,24 @@ function initLibraryAudioGuide() {
 और बिना फोन मेमोरी भरे कभी भी ऑफलाइन पढ़ने के लिए ऊपर दिए गए 'Install App' बटन से ऐप अपने फोन में जोड़ें।`;
     }
 
+    // Sub-Header Dedicated Play Button Elements
     const subBtn = document.getElementById('subHeaderPlayBtn');
     const subIcon = document.getElementById('subHeaderPlayIcon');
     const subText = document.getElementById('subHeaderPlayText');
     const subStatus = document.getElementById('subAudioStatusText');
+
+    let isPlaying = false;
+    let isMuted = false;
+    let synth = window.speechSynthesis || null;
+    let currentUtterance = null;
+    let wakeLockObj = null;
+    let silentKeepAliveAudio = null;
+    let currentPlaySessionId = 0;
+
+    let guideAudioElement = new Audio();
+    guideAudioElement.preload = 'auto';
+    let guideChunks = [];
+    let currentChunkIdx = 0;
 
     function updateUiState(playing) {
         isPlaying = playing;
@@ -1651,7 +1665,7 @@ function initLibraryAudioGuide() {
                 subBtn.classList.remove('is-playing');
                 if (subIcon) subIcon.textContent = '▶️';
                 if (subText) subText.textContent = 'गाइड सुनें';
-                if (subStatus) subStatus.textContent = 'लाइब्रेरी व पुस्तकों की जानकारी सुनने के लिए प्ले करें';
+                if (subStatus) subStatus.textContent = 'लाइब्रेरी व पुस्तकों की जानकारी सुनें';
             }
         }
         if (playBtn) playBtn.textContent = playing ? '⏸️' : '▶️';
@@ -1662,11 +1676,6 @@ function initLibraryAudioGuide() {
         }
     }
 
-    let guideAudioElement = new Audio();
-    guideAudioElement.preload = 'auto';
-    let guideChunks = [];
-    let currentChunkIdx = 0;
-
     function splitTextIntoSentences(text) {
         if (!text) return [];
         return text
@@ -1676,40 +1685,48 @@ function initLibraryAudioGuide() {
             .filter(s => s.length > 1 && !/^[।!?]+$/.test(s));
     }
 
-    function playMp3Chunk(index) {
-        if (!isPlaying || index >= guideChunks.length) {
-            updateUiState(false);
-            releaseWakeLock();
+    function playMp3Chunk(index, sessionId) {
+        if (!isPlaying || sessionId !== currentPlaySessionId || index >= guideChunks.length) {
+            if (sessionId === currentPlaySessionId) {
+                stopGuide();
+            }
             return;
         }
+
         currentChunkIdx = index;
         const text = guideChunks[index];
         const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&q=${encodeURIComponent(text)}`;
         
+        guideAudioElement.onended = null;
+        guideAudioElement.onerror = null;
+
         guideAudioElement.src = ttsUrl;
         guideAudioElement.playbackRate = 1.0;
         guideAudioElement.volume = isMuted ? 0 : 1.0;
         
         guideAudioElement.onended = () => {
-            if (isPlaying) {
-                playMp3Chunk(currentChunkIdx + 1);
+            if (isPlaying && sessionId === currentPlaySessionId) {
+                playMp3Chunk(currentChunkIdx + 1, sessionId);
             }
         };
         
         guideAudioElement.onerror = (e) => {
+            if (!isPlaying || sessionId !== currentPlaySessionId) return;
             console.warn("HTML5 audio MP3 notice, falling back to SpeechSynthesis:", e);
-            speakViaSpeechSynthesis(guideChunks.slice(currentChunkIdx).join(' । '));
+            speakViaSpeechSynthesis(guideChunks.slice(currentChunkIdx).join(' । '), sessionId);
         };
         
         guideAudioElement.play().catch(e => {
-            console.warn("Audio play gesture error, trying SpeechSynthesis fallback:", e);
-            speakViaSpeechSynthesis(guideChunks.slice(currentChunkIdx).join(' । '));
+            if (!isPlaying || sessionId !== currentPlaySessionId) return;
+            console.warn("Audio play gesture notice, trying SpeechSynthesis fallback:", e);
+            speakViaSpeechSynthesis(guideChunks.slice(currentChunkIdx).join(' । '), sessionId);
         });
     }
 
-    function speakViaSpeechSynthesis(text) {
-        if (!synth) return;
-        synth.cancel();
+    function speakViaSpeechSynthesis(text, sessionId) {
+        if (!synth || !isPlaying || sessionId !== currentPlaySessionId) return;
+        try { synth.cancel(); } catch(e) {}
+
         currentUtterance = new SpeechSynthesisUtterance(text);
         currentUtterance.lang = 'hi-IN';
         currentUtterance.rate = 0.95;
@@ -1721,44 +1738,72 @@ function initLibraryAudioGuide() {
         if (hindiVoice) currentUtterance.voice = hindiVoice;
 
         currentUtterance.onend = () => {
-            updateUiState(false);
-            releaseWakeLock();
+            if (sessionId === currentPlaySessionId) {
+                stopGuide();
+            }
         };
         currentUtterance.onerror = () => {
-            updateUiState(false);
-            releaseWakeLock();
+            if (sessionId === currentPlaySessionId) {
+                stopGuide();
+            }
         };
-        synth.speak(currentUtterance);
+
+        if (isPlaying && sessionId === currentPlaySessionId) {
+            synth.speak(currentUtterance);
+        }
     }
 
     function speakGuide() {
-        acquireWakeLock();
-        setupMediaSession();
-        updateUiState(true);
+        // Increment session ID to invalidate any previous async callbacks
+        currentPlaySessionId++;
+        const sessionId = currentPlaySessionId;
+
         isPlaying = true;
+        updateUiState(true);
+        acquireWakeLock();
+        startSilentKeepAlive();
+        setupMediaSession();
 
         const fullText = getHindiSpeechText();
         guideChunks = splitTextIntoSentences(fullText);
         currentChunkIdx = 0;
 
-        playMp3Chunk(0);
+        playMp3Chunk(0, sessionId);
     }
 
     function stopGuide() {
+        currentPlaySessionId++;
         isPlaying = false;
+
+        // Cleanly tear down HTML5 Audio
         if (guideAudioElement) {
+            guideAudioElement.onended = null;
+            guideAudioElement.onerror = null;
             try {
                 guideAudioElement.pause();
                 guideAudioElement.currentTime = 0;
-                guideAudioElement.src = '';
+                guideAudioElement.removeAttribute('src');
+                guideAudioElement.load();
             } catch(e) {}
         }
+
+        // Cleanly tear down Web Speech Synth
         if (synth) {
             try { synth.cancel(); } catch(e) {}
         }
-        currentUtterance = null;
-        updateUiState(false);
+        if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis) {
+            try { window.speechSynthesis.cancel(); } catch(e) {}
+        }
+
+        if (currentUtterance) {
+            currentUtterance.onend = null;
+            currentUtterance.onerror = null;
+            currentUtterance = null;
+        }
+
+        stopSilentKeepAlive();
         releaseWakeLock();
+        updateUiState(false);
     }
 
     function toggleGuide() {
@@ -1769,11 +1814,11 @@ function initLibraryAudioGuide() {
         }
     }
 
-    // Expose Single Master Handler globally (avoids duplicate listener double-toggling)
+    // Expose Single Master Handler globally
     window.toggleLibraryAudioGuide = function(e) {
-        if (e && typeof e.preventDefault === 'function') {
-            e.preventDefault();
-            e.stopPropagation();
+        if (e) {
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
         }
         toggleGuide();
     };
@@ -1788,12 +1833,16 @@ function initLibraryAudioGuide() {
         });
     }
     if (playBtn) {
-        playBtn.addEventListener('click', () => toggleGuide());
+        playBtn.addEventListener('click', (e) => {
+            if (e) e.preventDefault();
+            toggleGuide();
+        });
     }
     if (muteBtn) {
         muteBtn.addEventListener('click', () => {
             isMuted = !isMuted;
             muteBtn.textContent = isMuted ? '🔇' : '🔊';
+            if (guideAudioElement) guideAudioElement.volume = isMuted ? 0 : 1.0;
             if (currentUtterance && isPlaying) {
                 stopGuide();
                 speakGuide();
@@ -1810,21 +1859,6 @@ function initLibraryAudioGuide() {
     if (synth && synth.onvoiceschanged !== undefined) {
         synth.onvoiceschanged = () => {};
     }
-
-    // Auto-attempt playback on load with fallback on first touch/click
-    setTimeout(() => {
-        try {
-            speakGuide();
-        } catch(e) {}
-    }, 600);
-
-    const triggerAutoAudioOnFirstGesture = () => {
-        if (!isPlaying) {
-            speakGuide();
-        }
-    };
-    window.addEventListener('click', triggerAutoAudioOnFirstGesture, { once: true });
-    window.addEventListener('touchstart', triggerAutoAudioOnFirstGesture, { once: true });
 }
 
 // =========================================================================
