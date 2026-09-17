@@ -211,6 +211,7 @@ async function fetchBookData(bookId) {
                 if (match.mainPdf) mergedData.mainPdf = match.mainPdf;
                 if (match.totalPages) mergedData.totalPages = match.totalPages;
                 if (match.audio_layer) mergedData.audio_layer = match.audio_layer;
+                if (match.download_funnel) mergedData.download_funnel = match.download_funnel;
             }
         }
     } catch (e) {
@@ -229,6 +230,8 @@ async function fetchBookData(bookId) {
                 }
                 if (match.hero?.cover_image) mergedData.cover = match.hero.cover_image;
                 if (match.mainPdf) mergedData.mainPdf = match.mainPdf;
+                if (match.audio_layer) mergedData.audio_layer = match.audio_layer;
+                if (match.download_funnel) mergedData.download_funnel = match.download_funnel;
             }
         }
     } catch (e) {}
@@ -382,6 +385,30 @@ function populateUI() {
         purchaseDateEl.textContent = new Date(state.purchaseData.purchase_date).toLocaleDateString('hi-IN');
     }
 
+    // Dynamic Download Funnel & Audio Layer integration
+    const df = state.bookData.download_funnel || {};
+    if (df.farmer_tip) {
+        const tipBox = document.querySelector('.vip-farmer-tip-box .tip-text');
+        if (tipBox) tipBox.innerHTML = `<strong>किसान मित्र टिप:</strong> ${df.farmer_tip}`;
+    }
+    if (df.fast_size) {
+        const fastHeadline = document.querySelector('#downloadFastBtn .tier-headline');
+        if (fastHeadline) fastHeadline.textContent = `फास्ट मोबाइल PDF (${df.fast_size})`;
+    }
+    if (df.hd_download_limit) {
+        state.maxAllowedDownloads = df.hd_download_limit;
+    }
+    if (df.audio_narrator) {
+        const guideDesc = document.getElementById('audioGuideStatus');
+        if (guideDesc && !isAudioGuidancePlaying) {
+            guideDesc.textContent = `क्लिक करके लाइव हिंदी ऑडियो गाइडेंस सुनें (${df.audio_narrator})`;
+        }
+    }
+    if (df.audio_script) {
+        const scriptSnippet = document.querySelector('.audio-guide-script-snippet span:last-child');
+        if (scriptSnippet) scriptSnippet.textContent = `"${df.audio_script}"`;
+    }
+
     // Resolve persistent download count by user & book
     const used = getPersistentDownloadCount();
     state.purchaseData.download_count = used;
@@ -434,6 +461,7 @@ function showError(title, message) {
 // =================================================================
 let isAudioGuidancePlaying = false;
 let audioGuidanceUtterance = null;
+let downloadAudioElement = null;
 
 // Exact Hindi script requested by user
 const AUDIO_GUIDANCE_SCRIPT = 'नमस्ते किसान भाइयों व पाठकों! Aarogyam India में आपका स्वागत है। आपकी ई-बुक सफलतापूर्वक अनलॉक हो चुकी है। अगर आप बार-बार PDF डाउनलोड करने और मोबाइल की मेमोरी भरने से बचना चाहते हैं, तो Aarogyam App इंस्टॉल करें। इसमें आप बिना इंटरनेट भी कभी भी किताबें पढ़ सकते हैं, ज़ूम कर सकते हैं और ऑडियो सुन सकते हैं। अगर आपको PDF का Print निकालना है, तो नीचे नीले रंग के बॉक्स में Full HD पर क्लिक करें। ध्यान रहे, आप केवल 3 बार ही डाउनलोड कर सकते हैं। लेकिन Reader और Audio को कभी भी, कितनी भी बार इस्तेमाल कर सकते हैं। और अगर आपको कोई भी असुविधा होती है, तो आप सीधे WhatsApp बटन पर क्लिक करके हमसे संपर्क कर सकते हैं। साथ ही नीचे हमारी अन्य सबसे लोकप्रिय कृषि मास्टर गाइड्स भी दी गई हैं, जिन्हें पढ़कर और सुनकर हजारों किसान भाई अपनी खेती को आधुनिक और अत्यधिक लाभदायक बना रहे हैं, उन्हें भी जरूर देखें!';
@@ -446,56 +474,101 @@ window.toggleAudioGuidance = function() {
     const floatingIcon = document.getElementById('floatingToggleIcon');
 
     if (isAudioGuidancePlaying) {
+        if (downloadAudioElement) {
+            try { downloadAudioElement.pause(); } catch(e){}
+        }
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+        isAudioGuidancePlaying = false;
+        if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
+        if (floatingIcon) floatingIcon.className = 'fa-solid fa-play';
+        if (statusEl) statusEl.textContent = 'क्लिक करके ऑडियो गाइडेंस सुनें';
+        bars.forEach(b => b.classList.remove('animating'));
+        return;
+    }
+
+    const df = state.bookData?.download_funnel || {};
+    const audioUrl = df.audio_url || state.bookData?.audio_layer?.mp3_url;
+    const isMp3Mode = (df.audio_mode === 'mp3' || !df.audio_mode) && audioUrl && audioUrl.length > 5;
+
+    // 1. MP3 Audio File Playback
+    if (isMp3Mode) {
+        if (!downloadAudioElement) {
+            downloadAudioElement = new Audio(audioUrl);
+            downloadAudioElement.onended = () => {
+                isAudioGuidancePlaying = false;
+                if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
+                if (floatingIcon) floatingIcon.className = 'fa-solid fa-play';
+                if (statusEl) statusEl.textContent = 'गाइडेंस समाप्त। ऐप इंस्टॉल करें या PDF डाउनलोड करें!';
+                bars.forEach(b => b.classList.remove('animating'));
+            };
+            downloadAudioElement.onerror = () => {
+                console.warn('MP3 playback failed, falling back to TTS');
+                downloadAudioElement = null;
+                playTtsGuidance();
+            };
+        }
+        downloadAudioElement.play().then(() => {
+            isAudioGuidancePlaying = true;
+            if (iconEl) iconEl.className = 'fa-solid fa-pause';
+            if (floatingIcon) floatingIcon.className = 'fa-solid fa-pause';
+            if (statusEl) statusEl.textContent = '🔊 ऑडियो चल रहा है... (रोकने के लिए दोबारा क्लिक करें)';
+            bars.forEach(b => b.classList.add('animating'));
+            if (floatingPill) floatingPill.style.display = 'flex';
+        }).catch(() => {
+            playTtsGuidance();
+        });
+        return;
+    }
+
+    // 2. TTS Voice Guidance
+    playTtsGuidance();
+
+    function playTtsGuidance() {
+        if (!('speechSynthesis' in window)) {
+            alert('ऑडियो सपोर्ट आपके ब्राउज़र में उपलब्ध नहीं है। कृपया नीचे दिए गए स्टेप्स पढ़कर ऐप इंस्टॉल करें।');
+            return;
+        }
+
         window.speechSynthesis.cancel();
-        isAudioGuidancePlaying = false;
-        if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
-        if (floatingIcon) floatingIcon.className = 'fa-solid fa-play';
-        if (statusEl) statusEl.textContent = 'क्लिक करके ऑडियो गाइडेंस सुनें (Hindi Voice)';
-        bars.forEach(b => b.classList.remove('animating'));
-        return;
+
+        const activeScript = df.audio_script || state.bookData?.audio_layer?.tts_text || AUDIO_GUIDANCE_SCRIPT;
+        audioGuidanceUtterance = new SpeechSynthesisUtterance(activeScript);
+        audioGuidanceUtterance.lang = 'hi-IN';
+        audioGuidanceUtterance.rate = 1.0;
+        audioGuidanceUtterance.pitch = 1.05;
+
+        const voices = window.speechSynthesis.getVoices();
+        const hiVoice = voices.find(v => (v.lang && (v.lang.includes('hi') || v.lang.includes('hi-IN'))) || (v.name && v.name.includes('Hindi')));
+        if (hiVoice) audioGuidanceUtterance.voice = hiVoice;
+
+        audioGuidanceUtterance.onstart = () => {
+            isAudioGuidancePlaying = true;
+            if (iconEl) iconEl.className = 'fa-solid fa-pause';
+            if (floatingIcon) floatingIcon.className = 'fa-solid fa-pause';
+            if (statusEl) statusEl.textContent = '🔊 गाइडेंस चल रही है... (रोकने के लिए दोबारा क्लिक करें)';
+            bars.forEach(b => b.classList.add('animating'));
+            if (floatingPill) floatingPill.style.display = 'flex';
+        };
+
+        audioGuidanceUtterance.onend = () => {
+            isAudioGuidancePlaying = false;
+            if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
+            if (floatingIcon) floatingIcon.className = 'fa-solid fa-play';
+            if (statusEl) statusEl.textContent = 'गाइडेंस समाप्त। ऐप इंस्टॉल करें या PDF डाउनलोड करें!';
+            bars.forEach(b => b.classList.remove('animating'));
+        };
+
+        audioGuidanceUtterance.onerror = () => {
+            isAudioGuidancePlaying = false;
+            if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
+            if (floatingIcon) floatingIcon.className = 'fa-solid fa-play';
+            bars.forEach(b => b.classList.remove('animating'));
+        };
+
+        window.speechSynthesis.speak(audioGuidanceUtterance);
     }
-
-    if (!('speechSynthesis' in window)) {
-        alert('ऑडियो सपोर्ट आपके ब्राउज़र में उपलब्ध नहीं है। कृपया नीचे दिए गए स्टेप्स पढ़कर ऐप इंस्टॉल करें।');
-        return;
-    }
-
-    window.speechSynthesis.cancel();
-
-    audioGuidanceUtterance = new SpeechSynthesisUtterance(AUDIO_GUIDANCE_SCRIPT);
-    audioGuidanceUtterance.lang = 'hi-IN';
-    audioGuidanceUtterance.rate = 1.0;
-    audioGuidanceUtterance.pitch = 1.05;
-
-    const voices = window.speechSynthesis.getVoices();
-    const hiVoice = voices.find(v => (v.lang && (v.lang.includes('hi') || v.lang.includes('hi-IN'))) || (v.name && v.name.includes('Hindi')));
-    if (hiVoice) audioGuidanceUtterance.voice = hiVoice;
-
-    audioGuidanceUtterance.onstart = () => {
-        isAudioGuidancePlaying = true;
-        if (iconEl) iconEl.className = 'fa-solid fa-pause';
-        if (floatingIcon) floatingIcon.className = 'fa-solid fa-pause';
-        if (statusEl) statusEl.textContent = '🔊 गाइडेंस चल रही है... (रोकने के लिए दोबारा क्लिक करें)';
-        bars.forEach(b => b.classList.add('animating'));
-        if (floatingPill) floatingPill.style.display = 'flex';
-    };
-
-    audioGuidanceUtterance.onend = () => {
-        isAudioGuidancePlaying = false;
-        if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
-        if (floatingIcon) floatingIcon.className = 'fa-solid fa-play';
-        if (statusEl) statusEl.textContent = 'गाइडेंस समाप्त। ऐप इंस्टॉल करें या PDF डाउनलोड करें!';
-        bars.forEach(b => b.classList.remove('animating'));
-    };
-
-    audioGuidanceUtterance.onerror = () => {
-        isAudioGuidancePlaying = false;
-        if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
-        if (floatingIcon) floatingIcon.className = 'fa-solid fa-play';
-        bars.forEach(b => b.classList.remove('animating'));
-    };
-
-    window.speechSynthesis.speak(audioGuidanceUtterance);
 };
 
 // Dismiss/Close Floating Audio Pill
@@ -505,7 +578,12 @@ window.dismissFloatingAudio = function() {
         floatingPill.style.display = 'none';
     }
     if (isAudioGuidancePlaying) {
-        window.speechSynthesis.cancel();
+        if (downloadAudioElement) {
+            try { downloadAudioElement.pause(); } catch(e){}
+        }
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
         isAudioGuidancePlaying = false;
         const iconEl = document.getElementById('audioGuideIcon');
         if (iconEl) iconEl.className = 'fa-solid fa-volume-high';
@@ -779,11 +857,32 @@ async function renderBusinessFunnel() {
         }
     } catch(e) {}
 
+    const df = state.bookData?.download_funnel || {};
+    if (df.funnel_heading) {
+        const titleEl = document.querySelector('#funnelToggleHeader .funnel-title');
+        if (titleEl) titleEl.textContent = df.funnel_heading;
+    }
+    if (df.funnel_subheading) {
+        const descEl = document.querySelector('#funnelToggleHeader .funnel-desc');
+        if (descEl) descEl.textContent = df.funnel_subheading;
+    }
+
     // CRITICAL REQUIREMENT: EXCLUDE THE CURRENT PURCHASED BOOK
-    const funnelBooks = allBooks.filter(b => {
+    let funnelBooks = allBooks.filter(b => {
         const bId = (b.id || '').toUpperCase().trim();
         return bId && bId !== currentId;
     });
+
+    if (df.funnel_books && Array.isArray(df.funnel_books) && df.funnel_books.length > 0) {
+        funnelBooks.sort((a, b) => {
+            const aIdx = df.funnel_books.indexOf(String(a.id).toUpperCase());
+            const bIdx = df.funnel_books.indexOf(String(b.id).toUpperCase());
+            if (aIdx !== -1 && bIdx === -1) return -1;
+            if (bIdx !== -1 && aIdx === -1) return 1;
+            if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+            return 0;
+        });
+    }
 
     if (funnelBooks.length === 0) {
         const section = document.getElementById('businessFunnelSection');

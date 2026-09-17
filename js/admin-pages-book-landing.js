@@ -1431,6 +1431,18 @@ Instant Download & Lifetime Access
                 <input type="checkbox" id="blp_pub_download_funnel" checked style="accent-color: #8b5cf6;" />
                 <span>📥 Download Funnel Shelf</span>
               </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: #34d399; cursor: pointer;">
+                <input type="checkbox" id="blp_pub_free_shelf" checked style="accent-color: #10b981;" />
+                <span>🎁 100% Free Bonus Shelf</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: #38bdf8; cursor: pointer;">
+                <input type="checkbox" id="blp_pub_demo_shelf" checked style="accent-color: #0284c7;" />
+                <span>📖 Free Demo & Sample Shelf</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: #fbbf24; cursor: pointer;">
+                <input type="checkbox" id="blp_pub_coming_soon_shelf" checked style="accent-color: #f59e0b;" />
+                <span>⏳ Coming Soon Pre-Launch</span>
+              </label>
             </div>
           </div>
 
@@ -1460,6 +1472,7 @@ Instant Download & Lifetime Access
                 <option value="bonus_free">🎁 100% Free Bonus (मुफ़्त उपहार)</option>
                 <option value="free_demo">📖 Free Sample Demo (मुफ़्त डेमो)</option>
                 <option value="coming_soon">⏳ Coming Soon (जल्द आ रही है)</option>
+                <option value="limited_offer">⚡ Limited Time Offer (सीमित समय छूट)</option>
               </select>
             </div>
             <div>
@@ -1492,6 +1505,100 @@ Instant Download & Lifetime Access
                 <small style="color: var(--admin-muted); font-size: 0.75rem;">ID: G-2BWPJVQWPK (Traffic & Ads Conversion)</small>
               </div>
             </label>
+          </div>
+        </div>
+
+        <!-- SECTION 19: DOWNLOAD PAGE FUNNEL & POST-PURCHASE AUDIO / MARKETING LAYER -->
+        <div style="background: rgba(14,165,233,0.08); border: 1.5px solid rgba(14,165,233,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <span>📥</span> <span>19. डाउनलोड पेज मार्केटिंग फनल व पोस्ट-परचेज ऑडियो अनुभव लेयर (Download Page & Post-Purchase Experience)</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--admin-muted); margin-bottom: 14px;">
+            जब ग्राहक इस पुस्तक को खरीदेगा या फ्री में डाउनलोड करेगा, तो VIP डाउनलोड पेज (<code style="color: #38bdf8;">/ebooks/download.html?book=...</code>) पर यह ऑडियो नरेशन, स्क्रिप्ट सारांश और अन्य अनुशंसित पुस्तकें दिखाई देंगी:
+          </p>
+
+          <!-- 1. Download Page Audio Guidance Settings -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+              <div style="font-weight: 700; color: #7dd3fc; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                <span>🎧</span> <span>डाउनलोड पेज ऑडियो गाइडेंस प्लेयर (Download Page Audio Guide)</span>
+              </div>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: #38bdf8; cursor: pointer;">
+                <input type="checkbox" id="blp_dl_audio_enabled" checked style="accent-color: #0284c7;" />
+                <span>ऑडियो गाइडेंस चालू रखें</span>
+              </label>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">ऑडियो मोड (Audio Voice Mode):</label>
+                <select id="blp_dl_audio_mode" class="admin-select" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; font-weight: 700;">
+                  <option value="mp3">🎵 MP3 ऑडियो फ़ाइल (Pre-recorded Studio)</option>
+                  <option value="tts">🗣️ हिंदी AI वौइस् नरेशन (Dynamic Browser TTS)</option>
+                </select>
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">नैरेटर वॉइस लेबल (Voice Label):</label>
+                <input type="text" id="blp_dl_audio_narrator" class="admin-input" placeholder="उदा. Female Voice (Aarogyam AI सखी)" value="Female Voice (Aarogyam AI सखी)" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+              </div>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">MP3 ऑडियो URL / फ़ाइल:</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="blp_dl_audio_mp3_url" class="admin-input" placeholder="/audio/guidance/download-guide-hi.mp3" style="flex: 1; padding: 6px 10px; font-size: 0.8rem;" />
+                <label class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700; cursor: pointer; white-space: nowrap; margin: 0; display: flex; align-items: center;">
+                  📁 अपलोड
+                  <input type="file" accept="audio/*" onchange="window.uploadDownloadAudio(event)" style="display: none;" />
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #7dd3fc;">📜 बोला जाने वाला हिंदी ऑडियो स्क्रिप्ट / सारांश टेक्स्ट (Live Script Transcript):</label>
+              <textarea id="blp_dl_audio_script" class="admin-textarea" rows="3" placeholder="नमस्ते किसान भाइयों व पाठकों! Aarogyam India में आपका स्वागत है। आपकी ई-बुक सफलतापूर्वक अनलॉक हो चुकी है..." style="width: 100%; padding: 8px 10px; font-size: 0.82rem; line-height: 1.4;"></textarea>
+              <small style="color: var(--admin-muted); font-size: 0.72rem;">यह स्क्रिप्ट सीधे download.html पर ऑडियो गाइडेंस बॉक्स और AI वॉइस में बोली जाएगी।</small>
+            </div>
+          </div>
+
+          <!-- 2. Marketing Funnel Cross-Sell Books -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+            <div style="font-weight: 700; color: #7dd3fc; font-size: 0.85rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>🌾</span> <span>डाउनलोड पेज क्रॉस-सेल मार्केटिंग फनल (Cross-Sell Master Books)</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">फनल हेडिंग (Funnel Title):</label>
+                <input type="text" id="blp_dl_funnel_heading" class="admin-input" placeholder="🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स" value="🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">फनल सब-हेडिंग:</label>
+                <input type="text" id="blp_dl_funnel_subheading" class="admin-input" placeholder="हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित" value="हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+              </div>
+            </div>
+
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">क्रॉस-सेल पुस्तकें (Book IDs - कॉमा लगाकर लिखें):</label>
+              <input type="text" id="blp_dl_funnel_books" class="admin-input" placeholder="BK001, BK002, BK015" value="BK001, BK002, BK015" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+              <small style="color: var(--admin-muted); font-size: 0.72rem;">जिस पुस्तक को ग्राहक खरीद रहा है, वह अपने आप फनल से हट जाएगी और बाकी चुनी गई पुस्तकें दिखाई देंगी।</small>
+            </div>
+          </div>
+
+          <!-- 3. Farmer Tip & Download Limits -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">💡 किसान मित्र विशेष टिप संदेश:</label>
+              <input type="text" id="blp_dl_farmer_tip" class="admin-input" placeholder="आपको बार-बार भारी PDF डाउनलोड करने की कोई आवश्यकता नहीं है..." style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">⚡ फास्ट PDF साइज:</label>
+              <input type="text" id="blp_dl_fast_size" class="admin-input" placeholder="~24 MB" value="~24 MB" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">🖨️ Full HD डाउनलोड लिमिट:</label>
+              <input type="number" id="blp_dl_hd_limit" class="admin-input" placeholder="3" value="3" min="1" max="10" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
           </div>
         </div>
 
@@ -6757,55 +6864,280 @@ Instant Download & Lifetime Access
     }).join('');
   };
 
+  window.uploadDownloadAudio = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      showToast('❌ ऑडियो फ़ाइल 25MB से छोटी होनी चाहिए!', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (re) => {
+      const dataUrl = re.target.result;
+      const input = document.getElementById('blp_dl_audio_mp3_url');
+      if (input) input.value = dataUrl;
+      showToast('✅ डाउनलोड गाइडेंस ऑडियो फ़ाइल चुनी गई!', 'success');
+    };
+    reader.readAsDataURL(file);
+  };
+
   window.autoImportDemoFromSelectedBook = async function() {
     const sel = document.getElementById('blp_import_source_book');
     const sourceId = sel ? sel.value : 'BK001';
     if (!sourceId) return;
 
-    showToast(`⏳ मुख्य पुस्तक (${sourceId}) से डेटा व प्रिव्यू पेज लोड हो रहे हैं...`, 'info');
+    showToast(`⏳ मुख्य पुस्तक (${sourceId}) से सम्पूर्ण 19 सेटिंग्स व डेटा लोड हो रहे हैं...`, 'info');
+
+    // Helper to safely set element values
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.value = (val !== undefined && val !== null) ? val : '';
+    };
+    const setChecked = (id, bool) => {
+      const el = document.getElementById(id);
+      if (el) el.checked = !!bool;
+    };
 
     let page = allLandingPages.find(p => p.id && p.id.toUpperCase() === sourceId.toUpperCase());
     if (!page) {
-      const book = allBooks.find(b => b.id && b.id.toUpperCase() === sourceId.toUpperCase());
-      if (book) {
+      try {
+        const localLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+        page = localLp.find(p => p.id && p.id.toUpperCase() === sourceId.toUpperCase());
+      } catch(e) {}
+    }
+    if (!page) {
+      const bObj = allBooks.find(b => b.id && b.id.toUpperCase() === sourceId.toUpperCase());
+      if (bObj) {
         page = {
+          id: bObj.id,
+          category: bObj.category || 'Agriculture',
           hero: {
-            title: book.heading || book.name,
-            subtitle: book.subheading || '',
-            description: book.description || '',
-            cover_image: book.cover || book.thumbnail
+            title: bObj.heading || bObj.name,
+            subtitle: bObj.subheading || '',
+            description: bObj.description || '',
+            mrp: bObj.mrp || 299,
+            offer_price: bObj.offerPrice || 99,
+            cover_image: bObj.cover || bObj.thumbnail,
+            banner_image: bObj.banner || ''
           },
-          table_of_contents: book.table_of_contents,
-          demo_images: book.demoImages || book.preview_images
+          table_of_contents: bObj.table_of_contents,
+          demo_images: bObj.demoImages || bObj.preview_images
         };
       }
     }
 
-    if (page) {
-      if (page.demo_images && Array.isArray(page.demo_images) && page.demo_images.length > 0) {
-        currentDemoImages = [...page.demo_images];
-        if (typeof renderDemoImagesInBuilder === 'function') renderDemoImagesInBuilder();
-      }
-      if (page.table_of_contents && Array.isArray(page.table_of_contents)) {
-        currentTocPoints = [...page.table_of_contents];
-        if (typeof renderTocPointsInBuilder === 'function') renderTocPointsInBuilder();
-      }
-      if (page.why_read && page.why_read.cards && Array.isArray(page.why_read.cards)) {
-        currentWhyCards = JSON.parse(JSON.stringify(page.why_read.cards));
-        if (typeof renderWhyCardsInBuilder === 'function') renderWhyCardsInBuilder();
-      }
-      if (page.faqs && Array.isArray(page.faqs)) {
-        currentFaqs = JSON.parse(JSON.stringify(page.faqs));
-        if (typeof renderFaqsInBuilder === 'function') renderFaqsInBuilder();
-      }
-      if (page.testimonials && Array.isArray(page.testimonials)) {
-        currentReviews = JSON.parse(JSON.stringify(page.testimonials));
-        if (typeof renderReviewsInBuilder === 'function') renderReviewsInBuilder();
-      }
-      showToast(`✅ ${sourceId} से प्रिव्यू पेजेस, TOC, FAQ व रिव्यूज सफलतापूर्वक इम्पोर्ट हुए!`, 'success');
-    } else {
+    if (!page) {
       showToast(`⚠️ ${sourceId} का डेटा नहीं मिला।`, 'error');
+      return;
     }
+
+    // Determine target book type
+    const curBookType = document.getElementById('blp_book_type')?.value || 'demo';
+    let newId = '';
+    if (curBookType === 'demo') {
+      newId = sourceId.toUpperCase().startsWith('DEMO-') ? sourceId.toUpperCase() : `DEMO-${sourceId.toUpperCase()}`;
+    } else if (curBookType === 'free') {
+      newId = sourceId.toUpperCase().startsWith('BONUS-') ? sourceId.toUpperCase() : `BONUS-${sourceId.toUpperCase()}`;
+    } else {
+      newId = `${sourceId.toUpperCase()}_COPY`;
+    }
+
+    // CRITICAL SAFETY: Set new ID and set editingBookId to new ID so main book is NEVER mutated
+    setVal('blp_input_book_id', newId);
+    editingBookId = newId;
+
+    const titleEl = document.getElementById('admin-book-builder-title');
+    if (titleEl) titleEl.textContent = `✨ नया ${curBookType === 'demo' ? 'डेमो' : (curBookType === 'free' ? 'फ्री बोनस' : 'बुक')} पेज: ${newId} (${sourceId} से इम्पोर्टेड)`;
+
+    // 1. Hero & Basics
+    const hero = page.hero || {};
+    setVal('blp_category_select', page.category || 'Agriculture');
+    setVal('blp_hero_tag', hero.tag || (curBookType === 'demo' ? '📖 मुफ़्त सैंपल डेमो' : (curBookType === 'free' ? '🎁 100% मुफ़्त बोनस ई-बुक' : '⚡ बेस्ट सेलर ई-बुक')));
+    setVal('blp_hero_title', hero.title || page.heading || page.name || sourceId);
+    setVal('blp_hero_subtitle', hero.subtitle || '');
+    setVal('blp_hero_desc', hero.description || '');
+    setVal('blp_hero_mrp', hero.mrp || page.mrp || 299);
+    setVal('blp_hero_offer_price', curBookType === 'demo' || curBookType === 'free' ? 0 : (hero.offer_price || page.offerPrice || 99));
+    setVal('blp_hero_badge', hero.offer_badge || (curBookType === 'demo' ? 'FREE DEMO' : (curBookType === 'free' ? '100% FREE' : 'SPECIAL OFFER')));
+    setVal('blp_rating_score', hero.rating_score || '4.9');
+    setVal('blp_rating_count', hero.rating_count || '120+ Ratings');
+    setVal('blp_cover_url', hero.cover_image || page.cover || '');
+    setVal('blp_banner_url', hero.banner_image || page.banner || '');
+    setVal('blp_cover_effect', page.cover_effect || '3d_float');
+
+    const prevCover = document.getElementById('blp_preview_cover_img');
+    if (prevCover && (hero.cover_image || page.cover)) prevCover.src = hero.cover_image || page.cover;
+    const prevBanner = document.getElementById('blp_preview_banner_img');
+    if (prevBanner && hero.banner_image) prevBanner.src = hero.banner_image;
+
+    // 2. Dynamic KPIs
+    if (hero.features && Array.isArray(hero.features) && hero.features.length > 0) {
+      currentKpis = JSON.parse(JSON.stringify(hero.features));
+    }
+    if (typeof renderKpiBadgesInBuilder === 'function') renderKpiBadgesInBuilder();
+
+    // 3. Audio Layer (Exact Match to Kheti Dr. & Main Book)
+    const audioLayer = page.audio_layer || page.audio || {};
+    setChecked('blp_audio_enabled', audioLayer.enabled !== false);
+    setVal('blp_audio_badge_tag', audioLayer.badge_tag || '🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO');
+    setVal('blp_audio_main_heading', audioLayer.main_heading || 'अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!');
+    setVal('blp_audio_main_subtitle', audioLayer.main_subtitle || '⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।');
+    setVal('blp_audio_title', audioLayer.title || `${hero.title || sourceId} का लाइव ऑडियो परिचय सुनें`);
+    setVal('blp_audio_subtitle', audioLayer.subtitle || 'लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)');
+    const audioMode = audioLayer.mode || (audioLayer.mp3_url ? 'mp3' : (audioLayer.tts_text ? 'tts' : 'mp3'));
+    setVal('blp_audio_mode', audioMode);
+    setVal('blp_audio_mp3_url', audioLayer.mp3_url || '');
+    setVal('blp_audio_tts_text', audioLayer.tts_text || audioLayer.story_text || '');
+    setVal('blp_audio_offer_box', audioLayer.offer_callout || '');
+    setChecked('blp_audio_bgm_enabled', audioLayer.bgm_enabled !== false);
+    if (typeof window.toggleAudioModeFields === 'function') window.toggleAudioModeFields(audioMode);
+
+    if (audioLayer.highlights && Array.isArray(audioLayer.highlights) && audioLayer.highlights.length > 0) {
+      currentAudioHighlights = JSON.parse(JSON.stringify(audioLayer.highlights));
+    }
+    if (typeof renderAudioHighlightsInBuilder === 'function') renderAudioHighlightsInBuilder();
+
+    // 4. Why Cards
+    if (page.why_read && page.why_read.cards && Array.isArray(page.why_read.cards)) {
+      currentWhyCards = JSON.parse(JSON.stringify(page.why_read.cards));
+    }
+    if (typeof renderWhyCardsInBuilder === 'function') renderWhyCardsInBuilder();
+
+    // 5. Timer
+    const timerCfg = page.timer || {};
+    setChecked('blp_timer_enabled', timerCfg.enabled !== false);
+    setVal('blp_timer_minutes', timerCfg.minutes || 15);
+    setVal('blp_timer_text', timerCfg.text || '⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!');
+
+    // 6. VIP Value Stack
+    const stack = page.value_stack || {};
+    setVal('blp_stack_book_mrp', stack.book_mrp || hero.mrp || 299);
+    setVal('blp_stack_vip_val', stack.vip_value || 1999);
+    setVal('blp_stack_bonus_val', stack.bonus_value || 199);
+    setVal('blp_stack_offer_val', curBookType === 'demo' || curBookType === 'free' ? 0 : (stack.offer_price || hero.offer_price || 99));
+    setVal('blp_vip_perk_text', stack.subscriber_perk || '');
+
+    // 7. Videos
+    if (page.videos && Array.isArray(page.videos)) {
+      currentVideos = JSON.parse(JSON.stringify(page.videos));
+    }
+    if (typeof renderVideosInBuilder === 'function') renderVideosInBuilder();
+
+    // 8. Demo Preview Gallery
+    const demoImgs = page.demo_images || page.demoImages || page.preview_images;
+    if (demoImgs && Array.isArray(demoImgs) && demoImgs.length > 0) {
+      currentDemoImages = JSON.parse(JSON.stringify(demoImgs));
+    }
+    if (typeof renderDemoImagesInBuilder === 'function') renderDemoImagesInBuilder();
+
+    // 9. Suggested Books
+    if (page.suggested_books_list && Array.isArray(page.suggested_books_list)) {
+      currentSuggestedBooks = JSON.parse(JSON.stringify(page.suggested_books_list));
+    }
+    if (typeof renderSuggestedBooksInBuilder === 'function') renderSuggestedBooksInBuilder();
+
+    // 10. Bonuses & Points
+    if (page.bonuses && Array.isArray(page.bonuses)) {
+      currentBonuses = JSON.parse(JSON.stringify(page.bonuses));
+    }
+    if (typeof renderBonusesInBuilder === 'function') renderBonusesInBuilder();
+
+    if (page.bonus_points && Array.isArray(page.bonus_points)) {
+      currentBonusPoints = JSON.parse(JSON.stringify(page.bonus_points));
+    }
+    if (typeof renderBonusPointsInBuilder === 'function') renderBonusPointsInBuilder();
+
+    // 11. WhatsApp AI Support
+    setVal('blp_ai_support_title', page.ai_support_title || '');
+    setVal('blp_ai_support_cover', page.ai_support_cover || '');
+    setVal('blp_ai_support_desc', page.ai_support_desc || '');
+
+    // 12. Specifications & TOC
+    if (page.table_of_contents && Array.isArray(page.table_of_contents)) {
+      currentTocPoints = JSON.parse(JSON.stringify(page.table_of_contents));
+    }
+    if (typeof renderTocPointsInBuilder === 'function') renderTocPointsInBuilder();
+
+    // 13. Customer Reviews & Avatars
+    if (page.testimonials && Array.isArray(page.testimonials)) {
+      currentReviews = JSON.parse(JSON.stringify(page.testimonials));
+    }
+    if (typeof renderReviewsInBuilder === 'function') renderReviewsInBuilder();
+
+    // 14. FAQs
+    if (page.faqs && Array.isArray(page.faqs)) {
+      currentFaqs = JSON.parse(JSON.stringify(page.faqs));
+    }
+    if (typeof renderFaqsInBuilder === 'function') renderFaqsInBuilder();
+
+    // 15. Final CTA Box
+    const fb = page.final_buy || {};
+    setVal('blp_final_buy_title', fb.title || hero.title || page.heading || page.name || '');
+    setVal('blp_final_buy_desc', fb.description || hero.subtitle || hero.description || '');
+    if (Array.isArray(fb.benefits) && fb.benefits.length > 0) {
+      setVal('blp_final_buy_benefits', fb.benefits.join('\n'));
+    }
+
+    // 16. SEO & OG Tags
+    setVal('blp_og_title', page.og_title || hero.title || page.book_name || '');
+    setVal('blp_og_description', page.og_description || hero.description || '');
+    setVal('blp_og_image', page.og_image || page.og_image_landscape || hero.banner_image || hero.cover_image || '');
+    setVal('blp_whatsapp_share_msg', page.whatsapp_share_message || page.whatsapp_share_text || '');
+    if (typeof window.updateSocialSharePreview === 'function') window.updateSocialSharePreview();
+
+    // 17. Theme Color
+    selectedThemePrimary = page.theme_primary || '#2E7D32';
+    selectedThemeDark = page.theme_dark || '#1B5E20';
+    setVal('blp_custom_theme_color', selectedThemePrimary);
+
+    // 18. Universal Section Banners
+    currentSectionBanners = JSON.parse(JSON.stringify(page.section_banners || {}));
+    if (Array.isArray(defaultSectionsList)) {
+      defaultSectionsList.forEach(s => {
+        const bannerUrl = currentSectionBanners[s.key];
+        const input = document.getElementById(`blp_sec_banner_${s.key}`);
+        const wrap = document.getElementById(`blp_sec_banner_preview_wrap_${s.key}`);
+        const img = document.getElementById(`blp_sec_banner_preview_${s.key}`);
+        if (bannerUrl) {
+          if (input) input.value = bannerUrl;
+          if (img) img.src = bannerUrl;
+          if (wrap) wrap.style.display = 'block';
+        } else {
+          if (input) input.value = '';
+          if (wrap) wrap.style.display = 'none';
+        }
+      });
+    }
+
+    // 19. Download Funnel Settings
+    const df = page.download_funnel || {};
+    setChecked('blp_dl_audio_enabled', df.audio_enabled !== false);
+    setVal('blp_dl_audio_mode', df.audio_mode || 'mp3');
+    setVal('blp_dl_audio_mp3_url', df.audio_url || '');
+    setVal('blp_dl_audio_narrator', df.audio_narrator || 'Female Voice (Aarogyam AI सखी)');
+    setVal('blp_dl_audio_script', df.audio_script || '');
+    setVal('blp_dl_funnel_heading', df.funnel_heading || '🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स');
+    setVal('blp_dl_funnel_subheading', df.funnel_subheading || 'हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित');
+    setVal('blp_dl_funnel_books', Array.isArray(df.funnel_books) ? df.funnel_books.join(', ') : (df.funnel_books || ''));
+    setVal('blp_dl_farmer_tip', df.farmer_tip || '');
+    setVal('blp_dl_fast_size', df.fast_size || '~24 MB');
+    setVal('blp_dl_hd_limit', df.hd_download_limit || 3);
+
+    // Section Drag Order
+    if (page.sections_order && Array.isArray(page.sections_order) && page.sections_order.length > 0) {
+      currentSectionsOrder = [...page.sections_order];
+    }
+    if (page.hidden_sections && Array.isArray(page.hidden_sections)) {
+      currentHiddenSections = [...page.hidden_sections];
+    }
+    if (typeof renderSectionsReorderingList === 'function') renderSectionsReorderingList();
+
+    // Attached Books Target (if free bonus)
+    if (curBookType === 'free' && typeof window.renderAttachedBooksTray === 'function') {
+      window.renderAttachedBooksTray([sourceId]);
+    }
+
+    showToast(`✅ ${sourceId} की सम्पूर्ण 19 सेटिंग्स नए ${newId} में सफलतापूर्वक इम्पोर्ट हुईं! मुख्य पुस्तक (${sourceId}) 100% सुरक्षित है।`, 'success');
   };
 
   function resetBookBuilder() {
@@ -7124,9 +7456,26 @@ Instant Download & Lifetime Access
       setChecked('blp_pub_home_page', targets.includes('home_page'));
       setChecked('blp_pub_home_hero', targets.includes('home_hero'));
       setChecked('blp_pub_download_funnel', targets.includes('download_funnel'));
+      setChecked('blp_pub_free_shelf', targets.includes('free_shelf'));
+      setChecked('blp_pub_demo_shelf', targets.includes('demo_shelf'));
+      setChecked('blp_pub_coming_soon_shelf', targets.includes('coming_soon_shelf'));
       setVal('blp_store_badge', page.store_badge || 'best_seller');
       const isPageComingSoon = Boolean(page.is_coming_soon === true || page.is_coming_soon === 'true' || page.isComingSoon === true || page.isComingSoon === 'true' || page.status === 'coming_soon' || page.store_badge === 'coming_soon');
       setVal('blp_is_coming_soon', isPageComingSoon ? 'true' : 'false');
+
+      // Download Funnel (Section 19)
+      const df = page.download_funnel || {};
+      setChecked('blp_dl_audio_enabled', df.audio_enabled !== false);
+      setVal('blp_dl_audio_mode', df.audio_mode || 'mp3');
+      setVal('blp_dl_audio_mp3_url', df.audio_url || '');
+      setVal('blp_dl_audio_narrator', df.audio_narrator || 'Female Voice (Aarogyam AI सखी)');
+      setVal('blp_dl_audio_script', df.audio_script || '');
+      setVal('blp_dl_funnel_heading', df.funnel_heading || '🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स');
+      setVal('blp_dl_funnel_subheading', df.funnel_subheading || 'हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित');
+      setVal('blp_dl_funnel_books', Array.isArray(df.funnel_books) ? df.funnel_books.join(', ') : (df.funnel_books || ''));
+      setVal('blp_dl_farmer_tip', df.farmer_tip || '');
+      setVal('blp_dl_fast_size', df.fast_size || '~24 MB');
+      setVal('blp_dl_hd_limit', df.hd_download_limit || 3);
 
       // Final CTA Buy Box & Benefits Populating
       const fb = page.final_buy || {};
@@ -7507,6 +7856,9 @@ Instant Download & Lifetime Access
     if (document.getElementById('blp_pub_home_page')?.checked) publishTargets.push('home_page');
     if (document.getElementById('blp_pub_home_hero')?.checked) publishTargets.push('home_hero');
     if (document.getElementById('blp_pub_download_funnel')?.checked) publishTargets.push('download_funnel');
+    if (document.getElementById('blp_pub_free_shelf')?.checked) publishTargets.push('free_shelf');
+    if (document.getElementById('blp_pub_demo_shelf')?.checked) publishTargets.push('demo_shelf');
+    if (document.getElementById('blp_pub_coming_soon_shelf')?.checked) publishTargets.push('coming_soon_shelf');
 
     const storeBadge = document.getElementById('blp_store_badge')?.value || 'best_seller';
     const isComingSoon = document.getElementById('blp_is_coming_soon')?.value === 'true';
@@ -7754,6 +8106,19 @@ Instant Download & Lifetime Access
           .map(s => s.trim())
           .filter(Boolean),
         banner_image: cleanSectionBanners.sec_final_buy || undefined
+      },
+      download_funnel: {
+        audio_enabled: document.getElementById('blp_dl_audio_enabled')?.checked !== false,
+        audio_mode: document.getElementById('blp_dl_audio_mode')?.value || 'mp3',
+        audio_url: (document.getElementById('blp_dl_audio_mp3_url')?.value || '').trim(),
+        audio_narrator: (document.getElementById('blp_dl_audio_narrator')?.value || '').trim() || 'Female Voice (Aarogyam AI सखी)',
+        audio_script: (document.getElementById('blp_dl_audio_script')?.value || '').trim(),
+        funnel_heading: (document.getElementById('blp_dl_funnel_heading')?.value || '').trim() || '🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स',
+        funnel_subheading: (document.getElementById('blp_dl_funnel_subheading')?.value || '').trim() || 'हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित',
+        funnel_books: (document.getElementById('blp_dl_funnel_books')?.value || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean),
+        farmer_tip: (document.getElementById('blp_dl_farmer_tip')?.value || '').trim(),
+        fast_size: (document.getElementById('blp_dl_fast_size')?.value || '~24 MB').trim(),
+        hd_download_limit: parseInt(document.getElementById('blp_dl_hd_limit')?.value, 10) || 3
       },
       whatsapp_share_message: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
       whatsapp_share_text: (document.getElementById('blp_whatsapp_share_msg')?.value || '').trim() || undefined,
