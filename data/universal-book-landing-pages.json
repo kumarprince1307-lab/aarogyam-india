@@ -644,9 +644,12 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-16T18:25:12.768Z",
+      "updated_at": "2026-09-17T14:35:57.582Z",
       "admin_edited": true,
       "slug": "bk015",
+      "book_type": "paid",
+      "audience": "all",
+      "target_main_books": [],
       "book_name": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "author": "Dada Avnish Mishra",
       "language": "Hindi",
@@ -654,6 +657,10 @@
       "version": "2026",
       "category": "Agriculture",
       "status": "active",
+      "is_coming_soon": false,
+      "isComingSoon": false,
+      "store_badge": "best_seller",
+      "badge": "best_seller",
       "publish_targets": [
         "ebook_store",
         "category_page",
@@ -661,8 +668,6 @@
         "home_page",
         "download_funnel"
       ],
-      "store_badge": "best_seller",
-      "badge": "best_seller",
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
@@ -796,7 +801,7 @@
         "subtitle": "11 प्रमुख सब्जियों की खेती — बीज से बाजार तक व्यावहारिक मार्गदर्शन | 154 पेज",
         "description": "11 प्रमुख सब्जियों की वैज्ञानिक खेती को आसान भाषा और उपयोगी जानकारी के साथ समझाया गया है।\n\nबीज चयन से लेकर खेत की तैयारी, बुवाई, पौधों की दूरी, खाद-पोषण, सिंचाई, कीट-रोग प्रबंधन, कटाई और बाजार तक—खेती की पूरी प्रक्रिया एक ही किताब में।\n\n🍅 टमाटर\n🌶️ मिर्च\n🫑 शिमला मिर्च\n🍆 बैंगन\n🌿 भिंडी\n🥒 खीरा\n🥒 ककड़ी\n🥬 लौकी\n🥒 करेला\n🌿 तोरई\n🎃 कद्दू\n",
         "mrp": 1999,
-        "offer_price": 149,
+        "offer_price": 99,
         "offer_badge": "Launch Offer",
         "rating_score": "4.9",
         "rating_count": "120+ Ratings",
@@ -829,7 +834,7 @@
         "book_mrp": 299,
         "vip_value": 1999,
         "bonus_value": 199,
-        "offer_price": 149,
+        "offer_price": 99,
         "vip_banner": "/images/banners/bk015-sec_vip_stack-banner.webp",
         "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए यह गाइड उनके प्लान में 100% मुफ्त शामिल है।"
       },
@@ -914,6 +919,8 @@
         "/images/books/bk015-preview-15.webp",
         "/images/books/bk015-preview-16.webp"
       ],
+      "demo_reader_pages": "",
+      "demoPages": "",
       "suggested_books_list": [
         {
           "id": "BK001",
@@ -1132,11 +1139,22 @@
         ],
         "banner_image": "/images/banners/bk015-sec_final_buy-banner.webp"
       },
+      "download_funnel": {
+        "audio_enabled": true,
+        "audio_mode": "mp3",
+        "audio_url": "",
+        "audio_narrator": "Female Voice (Aarogyam AI सखी)",
+        "audio_script": "",
+        "funnel_heading": "🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स",
+        "funnel_subheading": "हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित",
+        "funnel_books": [],
+        "farmer_tip": "",
+        "fast_size": "~24 MB",
+        "hd_download_limit": 3
+      },
       "whatsapp_share_message": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
       "whatsapp_share_text": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
-      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।",
-      "is_coming_soon": false,
-      "isComingSoon": false
+      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।"
     },
     {
       "id": "SUB001",
