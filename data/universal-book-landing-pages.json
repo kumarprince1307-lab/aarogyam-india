@@ -2979,6 +2979,338 @@
       "whatsapp_share_message": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
       "whatsapp_share_text": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
       "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर  (PART 1) (Free Demo)' पुस्तक के बारे में और जानकारी चाहिए।"
+    },
+    {
+      "id": "DEMO-BK001",
+      "updated_at": "2026-09-17T03:42:18.979Z",
+      "admin_edited": true,
+      "slug": "demo-bk001",
+      "book_type": "demo",
+      "audience": "all",
+      "target_main_books": [],
+      "book_name": "",
+      "author": "",
+      "language": "Hindi",
+      "totalPages": 120,
+      "version": "2026",
+      "category": "Agriculture",
+      "status": "active",
+      "is_coming_soon": false,
+      "isComingSoon": false,
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "home_hero",
+        "download_funnel",
+        "free_shelf",
+        "demo_shelf",
+        "coming_soon_shelf"
+      ],
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true,
+      "theme_primary": "#2e7d32",
+      "theme_dark": "#003d00",
+      "cover_effect": "3d_float",
+      "sticky_button_text": "डेमो पढ़ें",
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_audio",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_ai_support",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help",
+        "sec_pdf_main",
+        "sec_pdf_free"
+      ],
+      "hidden_sections": [],
+      "section_banners": {},
+      "og_title": "खरीफ फसल मास्टर गाइड 2026",
+      "og_description": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी। रोग, कीट, खरपतवार, पोषण प्रबंधन और अधिक उत्पादन के वैज्ञानिक एवं Practical समाधान।",
+      "og_image": "/images/books/kgarid-fasal-og.webp",
+      "og_image_landscape": "/images/books/kgarid-fasal-og.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "खरीफ फसल मास्टर गाइड 2026 का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "",
+        "bgm_enabled": true
+      },
+      "mainPdf": "",
+      "main_pdf": "",
+      "freePdf": "",
+      "free_pdf": "",
+      "demoPdf": "",
+      "ai_support_title": "",
+      "ai_support_cover": "",
+      "ai_support_desc": "",
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help बटन पर क्लिक करें और तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_books": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help बटन पर क्लिक करें और तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_points": [
+        "24×7 WhatsApp Support",
+        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+        "📖 किताब की जानकारी समझने में सहायता",
+        "🌱 फसल संबंधी सवाल",
+        "📱 Mobile Friendly PDF & Lifetime Access"
+      ],
+      "timer": {
+        "enabled": true,
+        "minutes": 15,
+        "text": "⚡ सीमित समय ऑफर: यह स्पेशल डिस्काउंट केवल अगले 15 मिनट के लिए मान्य है!"
+      },
+      "hero": {
+        "tag": "🌾 Bestseller Agriculture eBook",
+        "title": "खरीफ फसल मास्टर गाइड 2026",
+        "subtitle": "धान • सोयाबीन • मक्का की सम्पूर्ण Practical Guide",
+        "description": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी। रोग, कीट, खरपतवार, पोषण प्रबंधन और अधिक उत्पादन के वैज्ञानिक एवं Practical समाधान।",
+        "mrp": 299,
+        "offer_price": 99,
+        "offer_badge": "Launch Offer 67% Off",
+        "rating_score": "4.9",
+        "rating_count": "120+ Ratings",
+        "cover_image": "/images/books/kharif-master-guide-2026-cover.webp",
+        "banner_image": "/images/books/kgarid-fasal-og.webp",
+        "features": [
+          {
+            "icon": "fa-seedling",
+            "text": "150+ रंगीन पेज"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ वास्तविक फोटो"
+          },
+          {
+            "icon": "fa-circle-check",
+            "text": "Scientific Guide"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Bonus PDF"
+          }
+        ]
+      },
+      "value_stack": {
+        "book_mrp": 299,
+        "vip_value": 1999,
+        "bonus_value": 199,
+        "offer_price": 99,
+        "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए यह गाइड उनके प्लान में 100% मुफ्त शामिल है।"
+      },
+      "why_read": {
+        "title": "यह पुस्तक क्यों खरीदें?",
+        "subtitle": "",
+        "cards": [
+          {
+            "icon": "🌱",
+            "title": "वैज्ञानिक जानकारी",
+            "desc": "300+ रंगीन हाई-क्वालिटी फोटो की मदद से फसल के रोग और कीट को शुरुआती अवस्था में ही पहचानें।"
+          },
+          {
+            "icon": "📷",
+            "title": "300+ वास्तविक फोटो",
+            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
+          },
+          {
+            "icon": "📘",
+            "title": "Step by Step Guide",
+            "desc": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।"
+          },
+          {
+            "icon": "🎁",
+            "title": "Free Bonus PDF",
+            "desc": "इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।"
+          }
+        ]
+      },
+      "demo_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "demo_reader_pages": "1, 2, 3, 5, 8, 12, 16",
+      "demoPages": "1, 2, 3, 5, 8, 12, 16",
+      "suggested_books_list": [
+        {
+          "image": "/images/books/fasal-ka-doctor-cover.webp",
+          "title": "खेती का डॉक्टर (Pocket Doctor)",
+          "offerPrice": 99,
+          "mrp": 299,
+          "link": "BK002"
+        },
+        {
+          "id": "BK002",
+          "link": "BK002",
+          "title": "खेती का डॉक्टर",
+          "image": "/images/books/fasal-ka-doctor-cover.webp",
+          "offerPrice": 99,
+          "mrp": 299
+        },
+        {
+          "id": "DEMO-BK015",
+          "link": "DEMO-BK015",
+          "title": "🌱 सब्जी खेती मास्टर  (PART 1)",
+          "image": "/images/books/bk015-cover.webp",
+          "offerPrice": 99,
+          "mrp": 1999
+        }
+      ],
+      "suggested_books": [
+        "BK002",
+        "BK002",
+        "DEMO-BK015"
+      ],
+      "table_of_contents": [
+        "बीज उपचार",
+        "खेत की तैयारी",
+        "बुवाई की वैज्ञानिक विधि",
+        "उर्वरक प्रबंधन",
+        "खरपतवार नियंत्रण",
+        "रोग एवं कीट प्रबंधन",
+        "पोषक तत्वों की कमी",
+        "स्प्रे चार्ट",
+        "IPM तकनीक",
+        "अधिक उत्पादन के उपाय",
+        "विशेषज्ञ सुझाव"
+      ],
+      "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "🎥 खरीफ फसल मास्टर गाइड - वीडियो डेमो",
+          "ratio": "16:9"
+        }
+      ],
+      "testimonials": [
+        {
+          "name": "पवन पांडे",
+          "location": "सागर, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "सरल भाषा और वास्तविक फोटो के कारण फसलों के रोग पहचानना बहुत आसान हो गया। मेरी सोयाबीन की फसल बच गई।"
+        },
+        {
+          "name": "अनिता शर्मा",
+          "location": "उदयपुर, राजस्थान",
+          "rating": 5,
+          "gender": "female",
+          "comment": "पौधों के पोषण और स्प्रे की सही मात्रा सीखने के लिए यह सबसे अच्छी किताब है।"
+        },
+        {
+          "name": "तरुण कुमार मिश्रा",
+          "location": "वाराणसी, उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "कृषि विद्यार्थियों और प्रगतिशील किसानों के लिए यह एक बेहतरीन Practical Guide है।"
+        },
+        {
+          "name": "माखन दाऊ",
+          "location": "गुना, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "मात्र ₹99 में इतनी बहुमूल्य और प्रामाणिक जानकारी मिलना वास्तव में शानदार है।"
+        }
+      ],
+      "faqs": [
+        {
+          "q": "खरीदने के तुरंत बाद मुझे पुस्तक कैसे मिलेगी?",
+          "a": "भुगतान पूरा होते ही आपको तुरंत Instant Download लिंक मिलेगा और यह आपके 'My Library' डैशबोर्ड में लाइफटाइम के लिए जुड़ जाएगी।"
+        },
+        {
+          "q": "क्या मैं इसे अपने मोबाइल में ऑफलाइन पढ़ सकता हूँ?",
+          "a": "हाँ, यह एक Mobile Friendly PDF है जिसे आप डाउनलोड करके बिना इंटरनेट कभी भी पढ़ सकते हैं।"
+        },
+        {
+          "q": "क्या मुझे किताब बार-बार डाउनलोड करनी पड़ेगी?",
+          "a": "❌ नहीं। एक बार खरीदने के बाद आप Lifetime Access के साथ Reader में सीधे मोबाइल पर पढ़ सकते हैं।"
+        },
+        {
+          "q": "क्या भविष्य में इस पुस्तक के नए संस्करण का अपडेट मिलेगा?",
+          "a": "हाँ, आरोग्यम इंडिया द्वारा जारी किए जाने वाले सभी डिजिटल अपडेट्स आपको मुफ्त उपलब्ध कराए जाएंगे।"
+        }
+      ],
+      "final_buy": {
+        "title": "खरीफ फसल मास्टर गाइड 2026",
+        "description": "धान • सोयाबीन • मक्का की सम्पूर्ण Practical Guide",
+        "benefits": []
+      },
+      "download_funnel": {
+        "audio_enabled": true,
+        "audio_mode": "mp3",
+        "audio_url": "",
+        "audio_narrator": "Female Voice (Aarogyam AI सखी)",
+        "audio_script": "",
+        "funnel_heading": "🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स",
+        "funnel_subheading": "हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित",
+        "funnel_books": [],
+        "farmer_tip": "",
+        "fast_size": "~24 MB",
+        "hd_download_limit": 3
+      },
+      "whatsapp_prompt": "नमस्ते, मुझे 'खरीफ फसल मास्टर गाइड 2026' पुस्तक के बारे में और जानकारी चाहिए।"
     }
   ]
 }
