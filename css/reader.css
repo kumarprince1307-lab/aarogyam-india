@@ -1,6 +1,33 @@
 /* =================================================================
-   AAROGYAM INDIA - EBOOK READER CSS (FINAL V1 + GLAS & TRICOLOR HEADER)
+   AAROGYAM INDIA - EBOOK READER CSS (FINAL V1 + GLASS & THEME SUPPORT)
 ================================================================= */
+
+:root {
+    --reader-bg: #090d16;
+    --reader-header-bg: rgba(30, 41, 59, 0.75);
+    --reader-text: #f8fafc;
+    --reader-card-bg: #1e293b;
+    --reader-border: rgba(255, 255, 255, 0.1);
+    --page-img-bg: #ffffff;
+}
+
+body.theme-light {
+    --reader-bg: #f1f5f9;
+    --reader-header-bg: rgba(255, 255, 255, 0.9);
+    --reader-text: #0f172a;
+    --reader-card-bg: #ffffff;
+    --reader-border: rgba(0, 0, 0, 0.1);
+    --page-img-bg: #ffffff;
+}
+
+body.theme-dark {
+    --reader-bg: #090d16;
+    --reader-header-bg: rgba(30, 41, 59, 0.75);
+    --reader-text: #f8fafc;
+    --reader-card-bg: #1e293b;
+    --reader-border: rgba(255, 255, 255, 0.1);
+    --page-img-bg: #ffffff;
+}
 
 * {
     box-sizing: border-box;
@@ -10,14 +37,15 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #0f172a;
-    color: #f8fafc;
+    background-color: var(--reader-bg);
+    color: var(--reader-text);
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* 1. TOP PROGRESS BAR */
@@ -43,15 +71,48 @@ body {
 /* 2. HEADER WITH GLASS EFFECT & FULL TRICOLOR TEXT AREA */
 .reader-header {
     height: 60px;
-    background: rgba(30, 41, 59, 0.75); /* हल्का ग्लास इफेक्ट (Glassmorphism) */
+    background: var(--reader-header-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--reader-border);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
     z-index: 900;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.theme-toggle-btn {
+    background: rgba(51, 65, 85, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: transform 0.2s, background 0.2s;
+    flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.1);
+    background: #475569;
+}
+
+body.theme-light .theme-toggle-btn {
+    background: #e2e8f0;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
 }
 
 .header-left {
@@ -443,27 +504,28 @@ body {
     box-shadow: 0 6px 22px rgba(56, 189, 248, 0.65) !important;
 }
 
-/* Audio Player Floating Trigger Button */
+/* Audio Player Floating Trigger Button - Vibrant Glowing Red/Amber */
 .floating-controls .float-btn.audio-float-btn {
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
-    color: #ffffff;
-    border: 1px solid #8b5cf6;
-    font-size: 20px;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.45);
+    background: linear-gradient(135deg, #dc2626, #ea580c) !important;
+    color: #ffffff !important;
+    border: 1.5px solid #f87171 !important;
+    font-size: 20px !important;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.45) !important;
 }
 
 .floating-controls .float-btn.audio-float-btn:hover {
-    background: linear-gradient(135deg, #6d28d9, #4338ca);
-    transform: scale(1.1);
+    background: linear-gradient(135deg, #b91c1c, #c2410c) !important;
+    transform: scale(1.12);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.65) !important;
 }
 
 .floating-controls .float-btn.audio-float-btn.playing-pulse {
-    animation: audioBtnPulse 1.5s infinite alternate;
+    animation: audioBtnPulse 1.4s infinite alternate !important;
 }
 
 @keyframes audioBtnPulse {
-    0% { box-shadow: 0 0 6px #8b5cf6, 0 4px 15px rgba(124, 58, 237, 0.45); }
-    100% { box-shadow: 0 0 18px #a855f7, 0 6px 20px rgba(168, 85, 247, 0.7); }
+    0% { box-shadow: 0 0 6px #f87171, 0 4px 15px rgba(220, 38, 38, 0.45); }
+    100% { box-shadow: 0 0 22px #ef4444, 0 8px 25px rgba(239, 68, 68, 0.85); transform: scale(1.08); }
 }
 
 /* Share Modal Styling */
@@ -793,14 +855,14 @@ body {
     bottom: 75px;
     left: 50%;
     transform: translateX(-50%) translateY(150px);
-    width: 92%;
-    max-width: 720px;
-    background: rgba(15, 23, 42, 0.92);
+    width: 94%;
+    max-width: 740px;
+    background: rgba(15, 23, 42, 0.94);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(16, 185, 129, 0.4);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.2);
-    border-radius: 16px;
+    border: 1.5px solid rgba(16, 185, 129, 0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(16, 185, 129, 0.25);
+    border-radius: 18px;
     padding: 12px 18px;
     z-index: 1050;
     transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
@@ -899,6 +961,7 @@ body {
     align-items: center;
     justify-content: center;
     transition: transform 0.15s, background 0.2s;
+    flex-shrink: 0;
 }
 
 .ab-ctrl-btn:hover {
@@ -920,6 +983,7 @@ body {
     justify-content: center;
     box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
     transition: transform 0.15s;
+    flex-shrink: 0;
 }
 
 .ab-main-play-btn:hover {
@@ -932,6 +996,33 @@ body {
     gap: 8px;
 }
 
+/* Volume Control */
+.ab-vol-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(51, 65, 85, 0.5);
+    border-radius: 20px;
+    padding: 2px 6px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ab-vol-btn {
+    background: transparent !important;
+    border: none !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 13px !important;
+    padding: 0 !important;
+}
+
+.ab-vol-slider {
+    width: 50px;
+    height: 4px;
+    accent-color: #10b981;
+    cursor: pointer;
+}
+
 .ab-select {
     background: #1e293b;
     border: 1px solid #334155;
@@ -941,6 +1032,7 @@ body {
     border-radius: 6px;
     outline: none;
     cursor: pointer;
+    font-weight: 600;
 }
 
 .ab-close-btn {
@@ -987,29 +1079,75 @@ body {
     100% { border-color: #34d399; box-shadow: 0 0 14px #10b981; }
 }
 
-/* Gender Switcher */
-.ab-gender-toggle {
+/* Animated Swimming Leaf Progress Bar 🍃 */
+.ab-progress-row {
     display: flex;
-    background: #1e293b;
-    border-radius: 6px;
-    border: 1px solid #334155;
-    overflow: hidden;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.ab-gender-btn {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    font-size: 11px;
-    padding: 4px 8px;
+.ab-progress-track-wrapper {
+    flex: 1;
+    position: relative;
+    height: 22px;
+    display: flex;
+    align-items: center;
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
 }
 
-.ab-gender-btn.active {
-    background: #10b981;
-    color: #fff;
+.ab-progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(51, 65, 85, 0.7);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.ab-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+    transition: width 0.15s ease-out;
+}
+
+.ab-leaf-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: left 0.15s ease-out;
+    z-index: 10;
+}
+
+.ab-leaf-indicator .leaf-icon {
+    font-size: 18px;
+    display: inline-block;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+
+.ab-leaf-indicator.swimming-leaf .leaf-icon {
+    animation: leafSwim 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes leafSwim {
+    0% { transform: translateY(-2px) rotate(-8deg) scale(1); }
+    50% { transform: translateY(2px) rotate(4deg) scale(1.15); }
+    100% { transform: translateY(-3px) rotate(12deg) scale(1.05); }
+}
+
+.ab-time-info {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    white-space: nowrap;
+    min-width: 75px;
+    text-align: right;
+    font-family: monospace;
 }
 
 /* BGM Active Glow */
@@ -1018,4 +1156,59 @@ body {
     border-color: #10b981 !important;
     color: #34d399 !important;
     box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+/* Mobile Responsive Adjustments for Reader and Audio Player */
+@media (max-width: 600px) {
+    .audio-book-bar {
+        bottom: 65px;
+        padding: 10px 12px;
+        width: 96%;
+    }
+
+    .ab-content {
+        gap: 6px;
+    }
+
+    .ab-left {
+        gap: 6px;
+    }
+
+    .ab-avatar-box {
+        width: 32px;
+        height: 32px;
+    }
+
+    .ab-title {
+        font-size: 11.5px;
+    }
+
+    .ab-status {
+        font-size: 10px;
+    }
+
+    .ab-wave {
+        display: none;
+    }
+
+    .ab-ctrl-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+
+    .ab-main-play-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .ab-vol-slider {
+        display: none;
+    }
+
+    .ab-select {
+        font-size: 10px;
+        padding: 2px 4px;
+    }
 }

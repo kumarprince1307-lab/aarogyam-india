@@ -643,29 +643,47 @@ function queueRenderPage(num) {
     }
 }
 
-function syncAudioEngineWithPage() {
-    if (window.aoiAudioBookEngine && window.aoiAudioBookEngine.isPlaying) {
-        window.aoiAudioBookEngine.playCurrentPage();
+// Centralized Page Change and Audio Synchronization
+let _audioSyncDebounceTimer = null;
+function syncAudioEngineWithPage(immediate = false) {
+    clearTimeout(_audioSyncDebounceTimer);
+    const doSync = () => {
+        if (window.aoiAudioBookEngine && window.aoiAudioBookEngine.isPlaying) {
+            window.aoiAudioBookEngine.playCurrentPage();
+        }
+    };
+    if (immediate) {
+        doSync();
+    } else {
+        _audioSyncDebounceTimer = setTimeout(doSync, 150);
+    }
+}
+
+function changePage(targetPage, syncAudio = true, immediateAudio = true) {
+    targetPage = Math.max(1, Math.min(aoiTotalPages || 1, parseInt(targetPage) || 1));
+    if (aoiPageNum === targetPage && !syncAudio) return;
+    
+    aoiPageNum = targetPage;
+    window.aoiPageNum = aoiPageNum;
+    queueRenderPage(aoiPageNum);
+    
+    if (syncAudio) {
+        syncAudioEngineWithPage(immediateAudio);
     }
 }
 
 function onPrevPage() {
     if (aoiPageNum <= 1) return;
-    aoiPageNum--;
-    window.aoiPageNum = aoiPageNum;
-    queueRenderPage(aoiPageNum);
-    syncAudioEngineWithPage();
+    changePage(aoiPageNum - 1, true, true);
 }
 
 function onNextPage() {
     if (aoiPageNum >= aoiTotalPages) return;
-    aoiPageNum++;
-    window.aoiPageNum = aoiPageNum;
-    queueRenderPage(aoiPageNum);
-    syncAudioEngineWithPage();
+    changePage(aoiPageNum + 1, true, true);
 }
 
 // Global Hooks for Audio Engine and Controls
+window.changePage = changePage;
 window.onPrevPage = onPrevPage;
 window.onNextPage = onNextPage;
 window.renderPage = renderPage;
@@ -677,12 +695,14 @@ function updateUIControls(num) {
     if (headerPageInfo) headerPageInfo.textContent = `Page ${num} / ${aoiTotalPages}`;
     if (pageInfoDisplay) pageInfoDisplay.textContent = `Page ${num} / ${aoiTotalPages}`;
     
-    const percent = Math.round((num / aoiTotalPages) * 100);
+    const percent = Math.round((num / (aoiTotalPages || 1)) * 100);
     if (headerPercentInfo) headerPercentInfo.textContent = `${percent}%`;
     if (progressFill) progressFill.style.width = `${percent}%`;
     if (topProgressBar) topProgressBar.title = `${percent}% Completed`;
 
-    if (pageSlider) pageSlider.value = num;
+    if (pageSlider && parseInt(pageSlider.value) !== num) {
+        pageSlider.value = num;
+    }
 
     const prevBtn = document.getElementById("prevPageBtn");
     const nextBtn = document.getElementById("nextPageBtn");
@@ -699,6 +719,41 @@ function saveProgress(num) {
 }
 
 // =======================================================
+// READING THEME MANAGER (DARK NIGHT MODE / LIGHT DAY MODE)
+// =======================================================
+function initThemeManager() {
+    const themeBtn = document.getElementById("themeToggleBtn");
+    const themeIcon = document.getElementById("themeToggleIcon");
+    const savedTheme = localStorage.getItem("AOI_READER_THEME") || "dark";
+
+    function applyTheme(theme) {
+        if (theme === "light") {
+            document.body.classList.remove("theme-dark");
+            document.body.classList.add("theme-light");
+            if (themeIcon) themeIcon.textContent = "☀️";
+            if (themeBtn) themeBtn.title = "डार्क / नाइट मोड पर स्विच करें (Dark Mode)";
+        } else {
+            document.body.classList.remove("theme-light");
+            document.body.classList.add("theme-dark");
+            if (themeIcon) themeIcon.textContent = "🌙";
+            if (themeBtn) themeBtn.title = "लाइट / डे मोड पर स्विच करें (Light Mode)";
+        }
+        localStorage.setItem("AOI_READER_THEME", theme);
+    }
+
+    applyTheme(savedTheme);
+
+    if (themeBtn) {
+        themeBtn.addEventListener("click", () => {
+            const current = document.body.classList.contains("theme-light") ? "light" : "dark";
+            const next = current === "light" ? "dark" : "light";
+            applyTheme(next);
+            showToast(next === "dark" ? "🌙 नाइट मोड चालू (आँखों के लिए सुरक्षित)" : "☀️ लाइट मोड चालू");
+        });
+    }
+}
+
+// =======================================================
 // EVENT LISTENERS & CONTROLS
 // =======================================================
 const prevBtnEl = document.getElementById("prevPageBtn");
@@ -707,12 +762,19 @@ if (prevBtnEl) prevBtnEl.addEventListener("click", onPrevPage);
 if (nextBtnEl) nextBtnEl.addEventListener("click", onNextPage);
 
 if (pageSlider) {
+    // While dragging: update page visuals with debounced audio sync
     pageSlider.addEventListener("input", (e) => {
         let targetPage = parseInt(e.target.value);
         if (targetPage >= 1 && targetPage <= aoiTotalPages) {
-            aoiPageNum = targetPage;
-            queueRenderPage(aoiPageNum);
-            syncAudioEngineWithPage();
+            changePage(targetPage, true, false);
+        }
+    });
+
+    // When released: trigger immediate audio sync
+    pageSlider.addEventListener("change", (e) => {
+        let targetPage = parseInt(e.target.value);
+        if (targetPage >= 1 && targetPage <= aoiTotalPages) {
+            changePage(targetPage, true, true);
         }
     });
 }
@@ -722,12 +784,20 @@ if (pageJumpBtn) {
     pageJumpBtn.addEventListener("click", () => {
         let inputVal = parseInt(document.getElementById("pageJumpInput").value);
         if (inputVal >= 1 && inputVal <= aoiTotalPages) {
-            aoiPageNum = inputVal;
-            queueRenderPage(aoiPageNum);
-            syncAudioEngineWithPage();
+            changePage(inputVal, true, true);
             document.getElementById("pageJumpInput").value = "";
         } else {
             alert(`कृपया 1 से ${aoiTotalPages} के बीच का वैध पेज नंबर डालें।`);
+        }
+    });
+}
+
+// Enter key support for Page Jump Input
+const pageJumpInputEl = document.getElementById("pageJumpInput");
+if (pageJumpInputEl) {
+    pageJumpInputEl.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            if (pageJumpBtn) pageJumpBtn.click();
         }
     });
 }
@@ -753,6 +823,7 @@ if (zoomOutBtn) {
     });
 }
 
+// Keyboard Navigation
 document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight" || e.key === "PageDown") {
         onNextPage();
@@ -766,6 +837,38 @@ document.addEventListener("keydown", (e) => {
         renderPage(aoiPageNum);
     }
 });
+
+// Touch Swipe Navigation for Mobile
+let touchStartX = 0;
+let touchStartY = 0;
+const readerContainerEl = document.getElementById("readerContainer");
+
+if (readerContainerEl) {
+    readerContainerEl.addEventListener("touchstart", (e) => {
+        if (e.touches && e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }
+    }, { passive: true });
+
+    readerContainerEl.addEventListener("touchend", (e) => {
+        if (e.changedTouches && e.changedTouches.length === 1) {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+
+            // Horizontal swipe detected (min 60px distance and mostly horizontal)
+            if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+                if (diffX < 0) {
+                    onNextPage(); // Swiped Left -> Next Page
+                } else {
+                    onPrevPage(); // Swiped Right -> Prev Page
+                }
+            }
+        }
+    }, { passive: true });
+}
 
 function showErrorScreen() {
     if (loadingIndicator) loadingIndicator.style.display = "none";
@@ -926,6 +1029,7 @@ function initShareBookSystem() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    initThemeManager();
     setTimeout(() => {
         updateWhatsAppHelpLink();
         initShareBookSystem();

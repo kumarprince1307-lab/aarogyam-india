@@ -1,12 +1,14 @@
 /**
  * =================================================================
- * AAROGYAM INDIA - PRO HYBRID AUDIO BOOK ENGINE v3.2 (ROCK SOLID)
+ * AAROGYAM INDIA - PRO HYBRID AUDIO BOOK ENGINE v5.5 (ROCK SOLID)
  * =================================================================
- * 1. Admin Recorded Audio: Plays real recorded human voice directly
- * 2. Text Script: Plays crisp Natural Female TTS or Warm Male TTS
- * 3. Soothing Ambient BGM: Zero-Egress Web Audio Indian Ambient Pad
- * 4. Welcome Audio: Greets user by name from profile
- * 5. Unrecorded Pages: Polite audio notice + auto page turn
+ * 1. Admin Recorded Audio: Real human voice with background streaming
+ * 2. Natural TTS: Hindi Female (Kalpana/Swara/Google हिन्दी) with chunking
+ * 3. Animated Leaf Progress Bar (🍃): Live progress & smooth scrubbing
+ * 4. Volume, Mute & Speed Controls: (0.75x to 2.0x, volume slider, mute)
+ * 5. MediaSession & Background Playback: Lock screen media controls & WakeLock
+ * 6. Polite Missing Audio Voice: "इस पेज का ऑडियो मैं नहीं पढ़ पा रही हूँ..."
+ * 7. 100% Atomic Page Synchronization: Instant switch on any page turn
  */
 
 class SoothingBgmEngine {
@@ -15,8 +17,8 @@ class SoothingBgmEngine {
         this.isPlaying = false;
         this.gainNode = null;
         this.oscillators = [];
-        this.volume = 0.0; // Completely muted background music
-        this.isMuted = true; // BGM disabled by default to keep voice 100% clean & clear
+        this.volume = 0.0;
+        this.isMuted = true;
     }
 
     initContext() {
@@ -33,27 +35,22 @@ class SoothingBgmEngine {
         if (this.isMuted || this.volume === 0) return;
         try {
             this.initContext();
-            if (!this.ctx) return;
-            if (this.isPlaying) return;
+            if (!this.ctx || this.isPlaying) return;
 
-            // Master BGM Gain
             this.gainNode = this.ctx.createGain();
             this.gainNode.gain.setValueAtTime(this.volume, this.ctx.currentTime);
             this.gainNode.connect(this.ctx.destination);
 
-            // Rich Meditative Indian Ambient Tanpura & Flute Drone (Sa-Pa-Sa: C3, G3, C4, G4, C5)
             const freqs = [130.81, 196.00, 261.63, 392.00, 523.25];
             this.oscillators = freqs.map((f, i) => {
                 const osc = this.ctx.createOscillator();
                 osc.type = i % 2 === 0 ? 'sine' : 'triangle';
                 osc.frequency.setValueAtTime(f, this.ctx.currentTime);
 
-                // Gentle acoustic warmth filter
                 const filter = this.ctx.createBiquadFilter();
                 filter.type = 'lowpass';
                 filter.frequency.setValueAtTime(450 + (i * 50), this.ctx.currentTime);
 
-                // Subtle individual gain for balanced blend
                 const oscGain = this.ctx.createGain();
                 const branchVol = i === 0 ? 0.35 : (i === 1 ? 0.25 : 0.15);
                 oscGain.gain.setValueAtTime(branchVol, this.ctx.currentTime);
@@ -118,6 +115,8 @@ class ProAudioBookEngine {
         this.isPlaying = false;
         this.isPaused = false;
         this.playbackRate = 1.0;
+        this.volume = 1.0;
+        this.isMuted = false;
         this.currentUtterance = null;
         this.audioElement = new Audio();
         this.bgm = new SoothingBgmEngine();
@@ -132,6 +131,11 @@ class ProAudioBookEngine {
 
         this.hasNativeHindiVoice = false;
         this.ttsAudio = new Audio();
+        this.wakeLock = null;
+
+        this.currentChunks = [];
+        this.currentChunkIndex = 0;
+        this.isUserSeeking = false;
 
         this.init();
     }
@@ -147,7 +151,8 @@ class ProAudioBookEngine {
         this.setupAudioElement();
         await this.loadBookAudioScripts();
         this.injectUI();
-        console.log("✅ Pro AudioBookEngine v5.0 (Dual-Engine Rock Solid Voice) Initialized for:", this.userName);
+        this.setupMediaSession();
+        console.log("✅ Pro AudioBookEngine v5.5 (Dual-Engine Rock Solid Voice) Initialized for:", this.userName);
     }
 
     getUserProfileName() {
@@ -159,7 +164,6 @@ class ProAudioBookEngine {
             
             if (user) {
                 let name = (user.name || user.fullName || user.first_name || "").trim();
-                // If name has digits or is missing, use respectful title
                 if (!name || /\d/.test(name) || name.length < 2) {
                     this.userName = "किसान मित्र";
                 } else {
@@ -178,7 +182,6 @@ class ProAudioBookEngine {
         const voices = this.synth.getVoices() || [];
         if (!voices.length) return;
 
-        // Hindi natural female voices pool (Kalpana, Swara, Heera, Google हिन्दी, Zira)
         const hindiVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
         
         if (hindiVoices.length > 0) {
@@ -195,32 +198,125 @@ class ProAudioBookEngine {
 
     setupAudioElement() {
         this.audioElement.preload = 'metadata';
+        
         this.audioElement.addEventListener('ended', () => {
             if (this.isPageRecordedAudio && this.isPlaying) {
-                const totalPages = window.aoiTotalPages || 152;
-                const curPage = window.aoiPageNum || 1;
-                if (this.autoNextPage && curPage < totalPages) {
-                    this.updateStatusDisplay(`⏭️ पृष्ठ ${curPage} ऑडियो समाप्त • अगले पृष्ठ पर जा रहे हैं...`);
-                    setTimeout(() => {
-                        if (!this.isPlaying) return;
-                        if (typeof window.onNextPage === 'function') {
-                            window.onNextPage();
-                        }
-                        setTimeout(() => {
-                            if (this.isPlaying) this.playCurrentPage();
-                        }, 600);
-                    }, 800);
-                } else {
-                    this.setPlayingState(false);
-                    this.updateStatusDisplay(`✅ पुस्तक वाचन समाप्त हुआ`);
-                }
+                this.handleTrackEnded();
             }
         });
-        this.audioElement.addEventListener('error', (e) => {
-            console.warn("Audio element error on page:", e);
+
+        this.audioElement.addEventListener('timeupdate', () => {
+            if (this.isPageRecordedAudio && !this.isUserSeeking) {
+                const cur = this.audioElement.currentTime || 0;
+                const dur = this.audioElement.duration || 0;
+                this.updateProgressBar(cur, dur);
+            }
         });
-        this.audioElement.addEventListener('play', () => this.setPlayingState(true));
-        this.audioElement.addEventListener('pause', () => this.setPlayingState(false));
+
+        this.audioElement.addEventListener('play', () => {
+            this.setPlayingState(true);
+            this.requestWakeLock();
+        });
+
+        this.audioElement.addEventListener('pause', () => {
+            if (!this.synth || !this.synth.speaking) {
+                this.setPlayingState(false);
+            }
+        });
+
+        this.audioElement.addEventListener('error', (e) => {
+            console.warn("Audio element playback error, falling back to TTS:", e);
+        });
+    }
+
+    handleTrackEnded() {
+        const totalPages = window.aoiTotalPages || 152;
+        const curPage = window.aoiPageNum || 1;
+        if (this.autoNextPage && curPage < totalPages) {
+            this.updateStatusDisplay(`⏭️ पृष्ठ ${curPage} समाप्त • अगले पृष्ठ पर जा रहे हैं...`);
+            setTimeout(() => {
+                if (!this.isPlaying) return;
+                if (typeof window.onNextPage === 'function') {
+                    window.onNextPage();
+                }
+            }, 700);
+        } else {
+            this.setPlayingState(false);
+            this.updateStatusDisplay(`✅ पुस्तक वाचन समाप्त हुआ`);
+        }
+    }
+
+    async requestWakeLock() {
+        try {
+            if ('wakeLock' in navigator && !this.wakeLock) {
+                this.wakeLock = await navigator.wakeLock.request('screen');
+                this.wakeLock.addEventListener('release', () => {
+                    this.wakeLock = null;
+                });
+            }
+        } catch (err) {
+            console.warn("WakeLock request note:", err);
+        }
+    }
+
+    releaseWakeLock() {
+        if (this.wakeLock) {
+            this.wakeLock.release().catch(() => {});
+            this.wakeLock = null;
+        }
+    }
+
+    setupMediaSession() {
+        if (!('mediaSession' in navigator)) return;
+
+        navigator.mediaSession.setActionHandler('play', () => {
+            this.togglePlay();
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+            this.pause();
+        });
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+            if (typeof window.onPrevPage === 'function') window.onPrevPage();
+        });
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+            if (typeof window.onNextPage === 'function') window.onNextPage();
+        });
+        navigator.mediaSession.setActionHandler('seekto', (details) => {
+            if (details.seekTime !== undefined && this.isPageRecordedAudio && this.audioElement.duration) {
+                this.audioElement.currentTime = details.seekTime;
+                this.updateProgressBar(this.audioElement.currentTime, this.audioElement.duration);
+            }
+        });
+        navigator.mediaSession.setActionHandler('seekforward', () => {
+            if (this.isPageRecordedAudio) {
+                this.audioElement.currentTime = Math.min(this.audioElement.duration || 0, this.audioElement.currentTime + 10);
+            }
+        });
+        navigator.mediaSession.setActionHandler('seekbackward', () => {
+            if (this.isPageRecordedAudio) {
+                this.audioElement.currentTime = Math.max(0, this.audioElement.currentTime - 10);
+            }
+        });
+    }
+
+    updateMediaSessionMetadata() {
+        if (!('mediaSession' in navigator)) return;
+        const curPage = window.aoiPageNum || 1;
+        const total = window.aoiTotalPages || 1;
+        const title = (window.aoiCurrentBookData && (window.aoiCurrentBookData.heading || window.aoiCurrentBookData.name || window.aoiCurrentBookData.title)) || document.getElementById('bookHeading')?.textContent || "Aarogyam E-Book";
+
+        let coverUrl = '/images/logo/logo.png';
+        if (window.aoiCurrentBookData?.cover_image) coverUrl = window.aoiCurrentBookData.cover_image;
+        else if (window.aoiCurrentBookData?.image) coverUrl = window.aoiCurrentBookData.image;
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: `${title} (Page ${curPage}/${total})`,
+            artist: 'Aarogyam India - Digital Library',
+            album: 'Practical Agriculture Audio Book',
+            artwork: [
+                { src: coverUrl, sizes: '512x512', type: 'image/jpeg' }
+            ]
+        });
     }
 
     async loadBookAudioScripts() {
@@ -230,7 +326,6 @@ class ProAudioBookEngine {
         let serverScripts = {};
         let serverMeta = {};
 
-        // 1. Fetch from server files first (with timestamp cache buster)
         try {
             let res = await fetch(`../data/audio-scripts/${bookId}.json?v=${Date.now()}`);
             if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json?v=${Date.now()}`);
@@ -243,7 +338,6 @@ class ProAudioBookEngine {
             console.warn("Audio script server fetch warning:", e);
         }
 
-        // 2. Check local studio edits & merge
         let localScripts = {};
         try {
             const localData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${bookId}`);
@@ -256,7 +350,6 @@ class ProAudioBookEngine {
             }
         } catch (e) {}
 
-        // Fallback for Demo/Bonus Books: check target main book scripts
         const targetMain = (window.aoiCurrentBookData?.targetMainBook || bookId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || '').toUpperCase().trim();
         if (targetMain && targetMain !== bookId) {
             if (Object.keys(serverScripts).length === 0) {
@@ -302,41 +395,33 @@ class ProAudioBookEngine {
     }
 
     // =======================================================
-    // MAIN PLAY ENGINE
+    // MAIN PLAY ENGINE (ATOMIC & ZERO-DESYNC)
     // =======================================================
     async playCurrentPage() {
         const currentPage = window.aoiPageNum || 1;
         const effectivePage = (window.aoiSourcePageMap && window.aoiSourcePageMap[currentPage - 1]) ? window.aoiSourcePageMap[currentPage - 1] : currentPage;
         this.getUserProfileName();
+        this.updateMediaSessionMetadata();
 
-        // Detect if running inside Facebook / Instagram In-App Browser (where SpeechSynthesis is blocked)
-        const isFBWebView = /FBAN|FBAV|FB_IAB|Instagram|Line/i.test(navigator.userAgent || '');
+        // 1. Clean stop all ongoing audio sources immediately
+        this.stopAudioSources();
+        this.isPaused = false;
+        this.isPlaying = true;
+        this.setPlayingState(true);
+
         const pageKey = String(effectivePage);
         const pageEntry = this.pageScripts[pageKey] || this.pageScripts[String(currentPage)];
-        const hasRecordedAudio = pageEntry && typeof pageEntry === 'object' && pageEntry.audio && pageEntry.audio.trim().length > 0;
 
-        // 1. Play Welcome Greeting Once on First Start (Only if not in FB WebView or if pure TTS is supported)
+        // 2. Play Welcome Greeting Once on First Start
         if (!this.welcomePlayed) {
             this.welcomePlayed = true;
-            if (!isFBWebView && !hasRecordedAudio) {
-                this.stopAudioSources();
-                const welcomeText = `${this.userName} जी, आरोग्यम इंडिया डिजिटल लाइब्रेरी में आपका हार्दिक स्वागत है। आइए अध्ययन शुरू करते हैं।`;
-                this.updateStatusDisplay(`🌸 ${this.userName} जी, स्वागत है!`);
-                this.speakText(welcomeText, currentPage, true);
-                return;
-            }
-        }
-
-        if (this.isPaused && this.synth && this.synth.paused) {
-            this.synth.resume();
-            this.isPaused = false;
-            this.setPlayingState(true);
+            const welcomeText = `${this.userName} जी, आरोग्यम इंडिया डिजिटल लाइब्रेरी में आपका स्वागत है। आइए अध्ययन शुरू करते हैं।`;
+            this.updateStatusDisplay(`🌸 ${this.userName} जी, स्वागत है!`);
+            this.speakText(welcomeText, currentPage, true);
             return;
         }
 
-        this.stopAudioSources();
-
-        // 2. Check Page Script or Recorded Audio
+        // 3. Check Page Script or Recorded Audio
         let pageText = '';
         let pageAudio = '';
 
@@ -348,15 +433,18 @@ class ProAudioBookEngine {
             }
         }
 
-        // Case A: Real Admin Recorded Audio exists (Plays original human voice directly)
+        // Case A: Real Admin Recorded Audio exists
         if (pageAudio && pageAudio.trim().length > 0) {
             this.isPageRecordedAudio = true;
             this.updateNarratorDisplay();
             this.updateStatusDisplay(`🎙️ पृष्ठ ${currentPage} - रिकॉर्डेड आवाज़ चल रही है`);
+            
             this.audioElement.src = pageAudio;
             this.audioElement.playbackRate = this.playbackRate;
+            this.audioElement.volume = this.isMuted ? 0 : this.volume;
+            
             this.audioElement.play().catch(e => {
-                console.warn("Audio play gesture required:", e);
+                console.warn("Audio play gesture required or autoplay restriction:", e);
             });
             this.setPlayingState(true);
             return;
@@ -372,9 +460,9 @@ class ProAudioBookEngine {
             return;
         }
 
-        // Case C: Unrecorded Page -> Polite Notice + Auto Next
-        const politeNotice = `${this.userName} जी, पृष्ठ संख्या ${currentPage} की ऑडियो रिकॉर्डिंग जल्द ही उपलब्ध करा दी जाएगी। आइए अगले पृष्ठ पर चलते हैं।`;
-        this.updateStatusDisplay(`⏳ पृष्ठ ${currentPage} की ऑडियो जल्द उपलब्ध होगी...`);
+        // Case C: Unrecorded Page -> Exact polite Hindi voice notice + Auto Next
+        const politeNotice = `इस पेज का ऑडियो मैं नहीं पढ़ पा रही हूँ, जल्द ही इसमें ऑडियो आ जाएगा`;
+        this.updateStatusDisplay(`⏳ पृष्ठ ${currentPage}: ऑडियो जल्द उपलब्ध होगा...`);
         this.speakText(politeNotice, currentPage);
     }
 
@@ -383,7 +471,6 @@ class ProAudioBookEngine {
         if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.splitIntoChunks === 'function') {
             return window.AarogyamAudioNormalizer.splitIntoChunks(text);
         }
-        // Integrated Fallback
         const clean = String(text)
             .replace(/[\u3002\uFF0E]/g, ' । ')
             .replace(/(\d+)\.(\d+)/g, '$1 दशमलव $2')
@@ -400,17 +487,19 @@ class ProAudioBookEngine {
     }
 
     speakText(text, currentPage, isWelcome = false) {
-        this.stopAudioSources();
         this.loadVoices();
 
         const chunks = this.splitTextIntoChunks(text);
         if (!chunks.length) return;
 
-        // Distinct Epoch prevents old closures or page changes from continuing
+        this.currentChunks = chunks;
+        this.totalChunks = chunks.length;
+        this.currentChunkIndex = 0;
+
         const currentEpoch = ++this.activeEpoch;
-        let chunkIndex = 0;
         this.isPlaying = true;
         this.setPlayingState(true);
+        this.requestWakeLock();
 
         const onAllChunksFinished = () => {
             if (!this.isPlaying || this.activeEpoch !== currentEpoch) return;
@@ -422,42 +511,26 @@ class ProAudioBookEngine {
                 return;
             }
 
-            const totalPages = window.aoiTotalPages || 152;
-            const curPage = window.aoiPageNum || 1;
-            if (this.autoNextPage && curPage < totalPages) {
-                this.updateStatusDisplay(`⏭️ पृष्ठ ${curPage} समाप्त • अगले पृष्ठ पर जा रहे हैं...`);
-                const t1 = setTimeout(() => {
-                    if (!this.isPlaying || this.activeEpoch !== currentEpoch) return;
-                    if (typeof window.onNextPage === 'function') {
-                        window.onNextPage();
-                    }
-                    const t2 = setTimeout(() => {
-                        if (this.isPlaying && this.activeEpoch === currentEpoch) this.playCurrentPage();
-                    }, 400);
-                    this.activeTimers.push(t2);
-                }, 600);
-                this.activeTimers.push(t1);
-            } else {
-                this.setPlayingState(false);
-                this.updateStatusDisplay(`✅ पृष्ठ ${curPage} समाप्त हुआ`);
-            }
+            this.handleTrackEnded();
         };
 
         const playNextChunk = () => {
             if (!this.isPlaying || this.activeEpoch !== currentEpoch) return;
-            if (chunkIndex >= chunks.length) {
+            if (this.currentChunkIndex >= chunks.length) {
+                this.updateProgressBar(chunks.length, chunks.length);
                 onAllChunksFinished();
                 return;
             }
 
-            const currentChunk = chunks[chunkIndex];
+            const currentChunk = chunks[this.currentChunkIndex];
             if (!currentChunk || !currentChunk.trim()) {
-                chunkIndex++;
+                this.currentChunkIndex++;
                 playNextChunk();
                 return;
             }
 
-            // Prefer Native SpeechSynthesis with Voice Selection
+            this.updateProgressBar(this.currentChunkIndex + 1, chunks.length);
+
             if (this.synth) {
                 try {
                     const ut = new SpeechSynthesisUtterance(currentChunk);
@@ -466,6 +539,7 @@ class ProAudioBookEngine {
                     ut.lang = 'hi-IN';
                     ut.pitch = 1.0;
                     ut.rate = 1.0 * this.playbackRate;
+                    ut.volume = this.isMuted ? 0 : this.volume;
 
                     let hasAdvanced = false;
                     let watchdogTimer = null;
@@ -476,20 +550,16 @@ class ProAudioBookEngine {
                         hasAdvanced = true;
                         if (watchdogTimer) clearTimeout(watchdogTimer);
                         if (pulseTimer) clearInterval(pulseTimer);
-                        chunkIndex++;
+                        this.currentChunkIndex++;
                         playNextChunk();
                     };
 
-                    ut.onend = () => {
-                        advance();
-                    };
-
+                    ut.onend = () => advance();
                     ut.onerror = (e) => {
-                        console.warn("TTS utterance notice:", e?.error);
+                        console.warn("TTS utterance error handled:", e?.error);
                         advance();
                     };
 
-                    // Generous Watchdog Timer based on character count: 180ms per character, min 5000ms
                     const maxUtteranceDurationMs = Math.max(5000, currentChunk.length * 180);
                     watchdogTimer = setTimeout(() => {
                         if (!hasAdvanced && this.isPlaying && this.activeEpoch === currentEpoch) {
@@ -498,7 +568,6 @@ class ProAudioBookEngine {
                     }, maxUtteranceDurationMs);
                     this.activeTimers.push(watchdogTimer);
 
-                    // Keep-Alive Pulse during utterance
                     pulseTimer = setInterval(() => {
                         if (!this.isPlaying || hasAdvanced || this.activeEpoch !== currentEpoch) {
                             clearInterval(pulseTimer);
@@ -518,11 +587,11 @@ class ProAudioBookEngine {
                     this.activeTimers.push(speakTimer);
 
                 } catch(err) {
-                    chunkIndex++;
+                    this.currentChunkIndex++;
                     playNextChunk();
                 }
             } else {
-                chunkIndex++;
+                this.currentChunkIndex++;
                 playNextChunk();
             }
         };
@@ -542,6 +611,7 @@ class ProAudioBookEngine {
         if (this.audioElement) {
             this.audioElement.pause();
             this.audioElement.currentTime = 0;
+            this.audioElement.src = '';
         }
         if (this.ttsAudio) {
             this.ttsAudio.pause();
@@ -552,6 +622,7 @@ class ProAudioBookEngine {
                 this.synth.cancel();
             } catch(e) {}
         }
+        this.releaseWakeLock();
     }
 
     pause() {
@@ -560,10 +631,11 @@ class ProAudioBookEngine {
         }
         if (this.synth && this.synth.speaking) {
             this.synth.pause();
-            this.isPaused = true;
         }
+        this.isPaused = true;
         this.setPlayingState(false);
         this.updateStatusDisplay(`⏸️ ऑडियो रुका हुआ है`);
+        this.releaseWakeLock();
     }
 
     stop() {
@@ -572,6 +644,7 @@ class ProAudioBookEngine {
         this.isPaused = false;
         this.setPlayingState(false);
         this.updateStatusDisplay(`⏹️ ऑडियो बंद है`);
+        this.updateProgressBar(0, 100);
     }
 
     togglePlay() {
@@ -584,9 +657,80 @@ class ProAudioBookEngine {
     }
 
     setSpeed(speed) {
-        this.playbackRate = parseFloat(speed);
-        if (this.audioElement) this.audioElement.playbackRate = this.playbackRate;
-        if (this.isPlaying) this.playCurrentPage();
+        this.playbackRate = parseFloat(speed) || 1.0;
+        if (this.audioElement) {
+            this.audioElement.playbackRate = this.playbackRate;
+        }
+        const speedSelect = document.getElementById('abSpeedSelect');
+        if (speedSelect) speedSelect.value = String(this.playbackRate);
+    }
+
+    setVolume(vol) {
+        this.volume = Math.max(0, Math.min(1, parseFloat(vol)));
+        this.isMuted = (this.volume === 0);
+        if (this.audioElement) {
+            this.audioElement.volume = this.volume;
+        }
+        this.updateVolumeUi();
+    }
+
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.audioElement) {
+            this.audioElement.volume = this.isMuted ? 0 : this.volume;
+        }
+        this.updateVolumeUi();
+    }
+
+    updateVolumeUi() {
+        const btn = document.getElementById('abVolumeBtn');
+        const slider = document.getElementById('abVolumeSlider');
+        if (btn) {
+            btn.innerHTML = this.isMuted ? '🔇' : (this.volume > 0.5 ? '🔊' : '🔉');
+            btn.title = this.isMuted ? 'अनम्यूट करें' : 'म्यूट करें';
+        }
+        if (slider) {
+            slider.value = this.isMuted ? 0 : this.volume;
+        }
+    }
+
+    seekProgress(percent) {
+        percent = Math.max(0, Math.min(100, percent));
+        if (this.isPageRecordedAudio && this.audioElement && this.audioElement.duration) {
+            this.audioElement.currentTime = (percent / 100) * this.audioElement.duration;
+            this.updateProgressBar(this.audioElement.currentTime, this.audioElement.duration);
+        } else if (this.currentChunks && this.currentChunks.length > 0) {
+            const targetChunk = Math.min(this.currentChunks.length - 1, Math.floor((percent / 100) * this.currentChunks.length));
+            this.currentChunkIndex = targetChunk;
+            this.updateProgressBar(targetChunk + 1, this.currentChunks.length);
+        }
+    }
+
+    updateProgressBar(current, total) {
+        const track = document.getElementById('abProgressFill');
+        const leaf = document.getElementById('abLeafIndicator');
+        const timeDisplay = document.getElementById('abTimeDisplay');
+        
+        let percent = 0;
+        let timeStr = "0:00 / 0:00";
+
+        if (total > 0) {
+            percent = Math.min(100, Math.max(0, (current / total) * 100));
+            if (this.isPageRecordedAudio) {
+                const formatSec = (s) => {
+                    const m = Math.floor(s / 60);
+                    const sec = Math.floor(s % 60);
+                    return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+                };
+                timeStr = `${formatSec(current)} / ${formatSec(total)}`;
+            } else {
+                timeStr = `भाग ${Math.round(current)} / ${Math.round(total)}`;
+            }
+        }
+
+        if (track) track.style.width = `${percent}%`;
+        if (leaf) leaf.style.left = `${percent}%`;
+        if (timeDisplay) timeDisplay.textContent = timeStr;
     }
 
     setPlayingState(playing) {
@@ -594,11 +738,21 @@ class ProAudioBookEngine {
         const playBtn = document.getElementById('abPlayBtn');
         const floatAbBtn = document.getElementById('floatingAudioTrigger');
         const avatarBox = document.getElementById('abNarratorAvatarBox');
+        const waveBox = document.getElementById('abWaveVisualizer');
+        const leaf = document.getElementById('abLeafIndicator');
 
         if (playBtn) playBtn.innerHTML = playing ? '⏸️' : '▶️';
         if (avatarBox) {
             if (playing) avatarBox.classList.add('pulse-avatar');
             else avatarBox.classList.remove('pulse-avatar');
+        }
+        if (waveBox) {
+            if (playing) waveBox.classList.add('active');
+            else waveBox.classList.remove('active');
+        }
+        if (leaf) {
+            if (playing) leaf.classList.add('swimming-leaf');
+            else leaf.classList.remove('swimming-leaf');
         }
         if (floatAbBtn) {
             if (playing) floatAbBtn.classList.add('playing-pulse');
@@ -618,8 +772,9 @@ class ProAudioBookEngine {
         bar.id = 'audioBookBar';
         bar.className = 'audio-book-bar';
         bar.innerHTML = `
+            <!-- Top Controls Row -->
             <div class="ab-content">
-                <!-- Narrator Avatar & Info -->
+                <!-- Narrator Info -->
                 <div class="ab-left">
                     <div class="ab-avatar-box" id="abNarratorAvatarBox">
                         <img id="abNarratorAvatar" src="/images/logo/fevicon.png" alt="Narrator" class="ab-avatar-img" />
@@ -630,30 +785,56 @@ class ProAudioBookEngine {
                     </div>
                 </div>
 
-                <!-- Center Controls -->
+                <!-- Center Controls & Visualizer -->
                 <div class="ab-center">
+                    <div class="ab-wave" id="abWaveVisualizer">
+                        <span></span><span></span><span></span><span></span>
+                    </div>
                     <button class="ab-ctrl-btn" id="abPrevBtn" title="पिछला पृष्ठ">⏮️</button>
                     <button class="ab-main-play-btn" id="abPlayBtn" title="सुनें">▶️</button>
                     <button class="ab-ctrl-btn" id="abNextBtn" title="अगला पृष्ठ">⏭️</button>
                 </div>
 
-                <!-- BGM & Speed & Close Controls -->
+                <!-- Right Controls: Volume, Speed, BGM, Close -->
                 <div class="ab-right">
-                    <!-- BGM Toggle Button -->
-                    <button id="abBgmToggleBtn" class="ab-ctrl-btn" title="बैकग्राउंड म्यूजिक चालू/बंद" style="width:32px; height:32px; font-size:14px;">🎵</button>
+                    <!-- Volume Control -->
+                    <div class="ab-vol-group" title="वॉल्यूम नियंत्रण">
+                        <button id="abVolumeBtn" class="ab-ctrl-btn ab-vol-btn">🔊</button>
+                        <input type="range" id="abVolumeSlider" min="0" max="1" step="0.05" value="1" class="ab-vol-slider" />
+                    </div>
 
-                    <select id="abSpeedSelect" class="ab-select" title="गति">
+                    <!-- BGM Toggle Button -->
+                    <button id="abBgmToggleBtn" class="ab-ctrl-btn" title="बैकग्राउंड म्यूजिक चालू/बंद">🎵</button>
+
+                    <!-- Speed Selector -->
+                    <select id="abSpeedSelect" class="ab-select" title="ऑडियो गति">
                         <option value="0.75">0.75x</option>
                         <option value="1.0" selected>1.0x</option>
                         <option value="1.25">1.25x</option>
                         <option value="1.5">1.5x</option>
+                        <option value="2.0">2.0x</option>
                     </select>
                     <button class="ab-close-btn" id="abCloseBtn" title="बंद करें">✕</button>
                 </div>
             </div>
+
+            <!-- Bottom Row: Animated Swimming Leaf Progress Bar 🍃 -->
+            <div class="ab-progress-row">
+                <div class="ab-progress-track-wrapper" id="abProgressContainer">
+                    <div class="ab-progress-track">
+                        <div class="ab-progress-fill" id="abProgressFill" style="width: 0%;"></div>
+                    </div>
+                    <!-- Swimming Animated Leaf Indicator -->
+                    <div class="ab-leaf-indicator swimming-leaf" id="abLeafIndicator" style="left: 0%;">
+                        <span class="leaf-icon">🍃</span>
+                    </div>
+                </div>
+                <div class="ab-time-info" id="abTimeDisplay">0:00 / 0:00</div>
+            </div>
         `;
         document.body.appendChild(bar);
 
+        // Prominent Floating Audio Trigger with Red/Amber theme
         const floatBtn = document.createElement('button');
         floatBtn.id = 'floatingAudioTrigger';
         floatBtn.className = 'float-btn audio-float-btn';
@@ -667,21 +848,32 @@ class ProAudioBookEngine {
             document.body.appendChild(floatBtn);
         }
 
-        // Attach Events
+        // Attach UI Event Listeners
         document.getElementById('abPlayBtn').addEventListener('click', () => this.togglePlay());
+        
         document.getElementById('abPrevBtn').addEventListener('click', () => {
             if (typeof window.onPrevPage === 'function') {
                 window.onPrevPage();
-                if (this.isPlaying) this.playCurrentPage();
             }
         });
+        
         document.getElementById('abNextBtn').addEventListener('click', () => {
             if (typeof window.onNextPage === 'function') {
                 window.onNextPage();
-                if (this.isPlaying) this.playCurrentPage();
             }
         });
-        document.getElementById('abSpeedSelect').addEventListener('change', (e) => this.setSpeed(e.target.value));
+
+        document.getElementById('abSpeedSelect').addEventListener('change', (e) => {
+            this.setSpeed(e.target.value);
+        });
+
+        document.getElementById('abVolumeBtn').addEventListener('click', () => {
+            this.toggleMute();
+        });
+
+        document.getElementById('abVolumeSlider').addEventListener('input', (e) => {
+            this.setVolume(e.target.value);
+        });
         
         document.getElementById('abBgmToggleBtn').addEventListener('click', () => {
             this.bgm.toggleMute();
@@ -699,6 +891,36 @@ class ProAudioBookEngine {
             }
         });
 
+        // Interactive Progress Bar Seeking
+        const progContainer = document.getElementById('abProgressContainer');
+        if (progContainer) {
+            const handleSeek = (e) => {
+                const rect = progContainer.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clickX = clientX - rect.left;
+                const pct = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
+                this.seekProgress(pct);
+            };
+
+            progContainer.addEventListener('mousedown', (e) => {
+                this.isUserSeeking = true;
+                handleSeek(e);
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (this.isUserSeeking) this.isUserSeeking = false;
+            });
+
+            progContainer.addEventListener('touchstart', (e) => {
+                this.isUserSeeking = true;
+                handleSeek(e);
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                if (this.isUserSeeking) this.isUserSeeking = false;
+            });
+        }
+
         // Auto-open if redirected with ?audio=1
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('audio') === '1' || urlParams.get('audio') === 'true') {
@@ -708,7 +930,7 @@ class ProAudioBookEngine {
             }, 800);
         }
 
-        // 4-Second Marketing Audio Feature Announcement Toast
+        // Feature Announcement Toast
         setTimeout(() => {
             this.showMarketingAudioToast();
         }, 1000);
@@ -778,7 +1000,6 @@ class ProAudioBookEngine {
             });
         }
 
-        // Auto hide after exactly 4 seconds (4000ms)
         setTimeout(() => {
             if (toast && toast.parentNode) {
                 toast.style.transform = 'translateX(-50%) translateY(-150px)';
@@ -792,4 +1013,3 @@ class ProAudioBookEngine {
 window.addEventListener('DOMContentLoaded', () => {
     window.aoiAudioBookEngine = new ProAudioBookEngine();
 });
-
