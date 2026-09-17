@@ -1113,4 +1113,362 @@ body {
         padding: 10px 14px;
     }
 }
+
+/* ==========================================================================
+   INTERACTIVE CLICKABLE KPI METRICS GRID & GLOW CARDS
+   ========================================================================== */
+.lib-kpi-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed #cbd5e1;
+}
+
+.lib-kpi-stat-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 12px 14px;
+    border: 1.5px solid #e2e8f0;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+.lib-kpi-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.lib-kpi-stat-card:active {
+    transform: scale(0.97);
+}
+
+.lib-kpi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.lib-kpi-icon {
+    font-size: 1.3rem;
+}
+
+.lib-kpi-tag {
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+    background: #f1f5f9;
+    color: #475569;
+}
+.lib-kpi-tag.blue { background: #e0f2fe; color: #0369a1; }
+.lib-kpi-tag.green { background: #dcfce7; color: #15803d; }
+.lib-kpi-tag.purple { background: #f3e8ff; color: #7e22ce; }
+.lib-kpi-tag.gold { background: #fef3c7; color: #b45309; }
+.lib-kpi-tag.red { background: #ffe4e6; color: #be123c; }
+
+.lib-kpi-label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 2px;
+}
+
+.lib-kpi-num {
+    font-size: 1.35rem;
+    font-weight: 900;
+    line-height: 1.2;
+}
+.color-demo { color: #0284c7; }
+.color-purchased { color: #16a34a; }
+.color-audio { color: #7c3aed; }
+.color-bonus { color: #d97706; }
+.color-wishlist { color: #e11d48; }
+
+.kpi-demo-glow:hover { border-color: #38bdf8; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15); }
+.kpi-purchased-glow:hover { border-color: #4ade80; box-shadow: 0 8px 20px rgba(22, 163, 74, 0.15); }
+.kpi-audio-glow:hover { border-color: #a855f7; box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15); }
+.kpi-bonus-glow:hover { border-color: #fbbf24; box-shadow: 0 8px 20px rgba(217, 119, 6, 0.15); }
+.kpi-wishlist-glow:hover { border-color: #fb7185; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.15); }
+
+/* ==========================================================================
+   ANIMATED ULTRA-PREMIUM CATEGORY PILL TABS
+   ========================================================================== */
+.category-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 20px auto;
+    max-width: 1200px;
+    padding: 6px;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.category-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.category-tabs .tab-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    color: #475569;
+    font-size: 0.86rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+.category-tabs .tab-btn .tab-icon {
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+}
+
+.category-tabs .tab-btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+.category-tabs .tab-btn:hover .tab-icon {
+    transform: scale(1.15);
+}
+
+.category-tabs .tab-btn.active {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transform: scale(1.02);
+}
+
+/* ==========================================================================
+   PWA BANNER CARD & INSTALL GUIDE MODAL
+   ========================================================================== */
+.library-pwa-banner-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+    border: 1.5px solid #86efac;
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin: 15px auto;
+    max-width: 1200px;
+    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.08);
+    position: relative;
+    box-sizing: border-box;
+}
+
+.pwa-card-dismiss-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: #e2e8f0;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 800;
+    color: #475569;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.pwa-card-dismiss-btn:hover {
+    background: #fca5a5;
+    color: #dc2626;
+}
+
+.pwa-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding-right: 25px;
+}
+
+.pwa-card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+.pwa-card-title-row h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #166534;
+    font-weight: 800;
+}
+.pwa-free-tag {
+    background: #16a34a;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 12px;
+}
+
+.pwa-card-text {
+    font-size: 0.86rem;
+    color: #334155;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.pwa-card-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-pwa-install-action {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    transition: all 0.2s ease;
+}
+.btn-pwa-install-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.45);
+}
+
+.btn-pwa-guide-action {
+    background: #ffffff;
+    color: #166534;
+    border: 1.5px solid #86efac;
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-pwa-guide-action:hover {
+    background: #dcfce7;
+}
+
+/* App Install Guide Modal */
+.pwa-guide-modal-box {
+    background: #ffffff;
+    padding: 26px;
+    border-radius: 20px;
+    max-width: 460px;
+    width: 92%;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    text-align: left;
+    position: relative;
+}
+
+.pwa-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.pwa-modal-icon {
+    font-size: 1.8rem;
+}
+
+.pwa-modal-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.pwa-modal-step-item {
+    display: flex;
+    gap: 12px;
+    background: #f8fafc;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+.pwa-modal-step-item .step-num {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    background: #16a34a;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.85rem;
+}
+.pwa-modal-step-item strong {
+    font-size: 0.86rem;
+    color: #0f172a;
+    display: block;
+    margin-bottom: 2px;
+}
+.pwa-modal-step-item p {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.35;
+}
+
+.pwa-modal-btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.pwa-modal-install-btn {
+    flex: 1;
+    min-width: 140px;
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.86rem;
+    cursor: pointer;
+}
+.pwa-modal-audio-btn {
+    flex: 1;
+    min-width: 140px;
+    background: #7c3aed;
+    color: #ffffff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.86rem;
+    cursor: pointer;
+}
+
 

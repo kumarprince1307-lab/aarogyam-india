@@ -322,28 +322,51 @@
         </div>
       </div>
 
-      <!-- Stats Counter Row -->
-      <div
-        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1; text-align: center;">
-        <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <span style="display: block; font-size: 0.75rem; color: #64748b;">📖 Read Demo</span>
-          <strong id="kpiDemoCount" style="font-size: 1rem; color: #0284c7;">0</strong>
+      <!-- Interactive Clickable Stats Counter Row -->
+      <div class="lib-kpi-stats-grid">
+        <div class="lib-kpi-stat-card kpi-demo-glow" onclick="window.switchTabAndScroll('demo')" title="डेमो बुक्स देखें (Click to view)">
+          <div class="lib-kpi-header">
+            <span class="lib-kpi-icon">📖</span>
+            <span class="lib-kpi-tag blue">डेमो</span>
+          </div>
+          <span class="lib-kpi-label">Read Demo</span>
+          <strong id="kpiDemoCount" class="lib-kpi-num color-demo">0</strong>
         </div>
-        <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <span style="display: block; font-size: 0.75rem; color: #64748b;">📚 Purchased</span>
-          <strong id="kpiPurchasedCount" style="font-size: 1rem; color: #28a745;">0</strong>
+
+        <div class="lib-kpi-stat-card kpi-purchased-glow" onclick="window.switchTabAndScroll('purchased')" title="खरीदी गई पुस्तकें देखें (Click to view)">
+          <div class="lib-kpi-header">
+            <span class="lib-kpi-icon">📚</span>
+            <span class="lib-kpi-tag green">अनलॉक</span>
+          </div>
+          <span class="lib-kpi-label">Purchased</span>
+          <strong id="kpiPurchasedCount" class="lib-kpi-num color-purchased">0</strong>
         </div>
-        <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <span style="display: block; font-size: 0.75rem; color: #64748b;">🎧 Audio Books</span>
-          <strong id="kpiAudioCount" style="font-size: 1rem; color: #8b5cf6;">0</strong>
+
+        <div class="lib-kpi-stat-card kpi-audio-glow" onclick="window.filterOrSwitchAudioBooks()" title="ऑडियो बुक्स सुनें (Click to view)">
+          <div class="lib-kpi-header">
+            <span class="lib-kpi-icon">🎧</span>
+            <span class="lib-kpi-tag purple">लाइव ऑडियो</span>
+          </div>
+          <span class="lib-kpi-label">Audio Books</span>
+          <strong id="kpiAudioCount" class="lib-kpi-num color-audio">0</strong>
         </div>
-        <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <span style="display: block; font-size: 0.75rem; color: #64748b;">🎁 Bonus</span>
-          <strong id="kpiBonusCount" style="font-size: 1rem; color: #d97706;">0</strong>
+
+        <div class="lib-kpi-stat-card kpi-bonus-glow" onclick="window.switchTabAndScroll('bonus')" title="फ्री बोनस पुस्तकें देखें (Click to view)">
+          <div class="lib-kpi-header">
+            <span class="lib-kpi-icon">🎁</span>
+            <span class="lib-kpi-tag gold">100% FREE</span>
+          </div>
+          <span class="lib-kpi-label">Bonus Unlocked</span>
+          <strong id="kpiBonusCount" class="lib-kpi-num color-bonus">0</strong>
         </div>
-        <div style="background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <span style="display: block; font-size: 0.75rem; color: #64748b;">❤️ Wishlist</span>
-          <strong id="kpiWishlistCount" style="font-size: 1rem; color: #e11d48;">0</strong>
+
+        <div class="lib-kpi-stat-card kpi-wishlist-glow" onclick="window.switchTabAndScroll('coming')" title="आने वाली बुक्स व विशलिस्ट देखें (Click to view)">
+          <div class="lib-kpi-header">
+            <span class="lib-kpi-icon">❤️</span>
+            <span class="lib-kpi-tag red">Wishlist</span>
+          </div>
+          <span class="lib-kpi-label">Saved</span>
+          <strong id="kpiWishlistCount" class="lib-kpi-num color-wishlist">0</strong>
         </div>
       </div>
 
@@ -364,33 +387,83 @@
       </div>
     </div>
 
-    <!-- 4.1 PWA Digital Locker Install Banner Card -->
-    <div id="library-pwa-card"
-      style="display: none; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px 22px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-        <div style="flex: 1; min-width: 260px;">
-          <h3
-            style="font-size: 1.15rem; color: #166534; margin: 0 0 6px 0; display: flex; align-items: center; gap: 8px;">
-            <span>📱</span> Install Aarogyam India App
-          </h3>
-          <p style="font-size: 0.92rem; color: #334155; margin: 0; line-height: 1.5;">
-            आप अपने मोबाइल में Aarogyam India App Install करें और Offline में भी अपनी जरूरी किताबें और सामग्री पढ़ें।
+    <!-- 4.1 PWA Digital Locker Install Banner Card with Cross & Guide Modal -->
+    <div id="library-pwa-card" class="library-pwa-banner-card" style="display: none;">
+      <button type="button" class="pwa-card-dismiss-btn" onclick="window.dismissLibraryPwaCard()" title="कार्ड बंद करें">&times;</button>
+      <div class="pwa-card-body">
+        <div class="pwa-card-left">
+          <div class="pwa-card-title-row">
+            <span class="pwa-app-icon">📱</span>
+            <h3>Aarogyam India App इंस्टॉल करें</h3>
+            <span class="pwa-free-tag">⚡ 0% मेमोरी खर्च</span>
+          </div>
+          <p class="pwa-card-text">
+            📲 <strong>1-क्लिक में इंस्टॉल करें:</strong> बिना फोन मेमोरी भरे कभी भी ऑफलाइन ई-बुक्स पढ़ें, ज़ूम करें व ऑडियो सुनें।
           </p>
         </div>
-        <button id="library-pwa-install-btn"
-          style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);">
-          <span>📱</span> Install App Now
-        </button>
+        <div class="pwa-card-actions">
+          <button type="button" id="library-pwa-install-btn" class="btn-pwa-install-action" onclick="window.triggerPwaInstall()">
+            <span>📲</span> <span>Install App Now</span>
+          </button>
+          <button type="button" class="btn-pwa-guide-action" onclick="window.openAppInstallGuideModal()">
+            <span>ℹ️ कैसे इंस्टॉल करें?</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- 5. Category Pill Tabs -->
+    <!-- App Installation Guide Modal -->
+    <div id="appInstallGuideModal" class="modal-overlay" style="display: none;">
+      <div class="modal-card pwa-guide-modal-box">
+        <button type="button" class="close-modal" onclick="window.closeAppInstallGuideModal()">&times;</button>
+        <div class="pwa-modal-header">
+          <span class="pwa-modal-icon">📲</span>
+          <h3 style="margin: 0; color: #166534; font-size: 1.25rem;">Aarogyam App इंस्टॉल करने की आसान विधि</h3>
+        </div>
+        <p style="font-size: 0.85rem; color: #64748b; margin: 6px 0 16px 0;">मात्र 10 सेकंड में अपने फोन में ऐप जोड़ें — बिना गूगल प्ले स्टोर जाए और बिना फोन मेमोरी भरे!</p>
+        
+        <div class="pwa-modal-steps">
+          <div class="pwa-modal-step-item">
+            <span class="step-num">1</span>
+            <div>
+              <strong>ब्राउज़र मेन्यू खोलें (3 डॉट्स ⋮ या Share)</strong>
+              <p>Chrome में ऊपर दाईं ओर 3 बिंदु (⋮) या iPhone Safari में नीचे शेयर बटन दबाएं।</p>
+            </div>
+          </div>
+          <div class="pwa-modal-step-item">
+            <span class="step-num">2</span>
+            <div>
+              <strong>"Add to Home screen" (होम स्क्रीन में जोड़ें) चुनें</strong>
+              <p>मेन्यू में <strong>"Install App"</strong> या <strong>"Add to Home screen"</strong> पर टैप करें।</p>
+            </div>
+          </div>
+          <div class="pwa-modal-step-item">
+            <span class="step-num">3</span>
+            <div>
+              <strong>तुरंत तैयार! 🌟</strong>
+              <p>ऐप आपके फोन स्क्रीन पर जुड़ जाएगी। जब चाहें ऑफलाइन ई-बुक्स पढ़ें व ऑडियो सुनें।</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pwa-modal-btn-row">
+          <button type="button" class="pwa-modal-install-btn" onclick="window.triggerPwaInstall(); window.closeAppInstallGuideModal();">
+            <span>📲 अभी इंस्टॉल करें</span>
+          </button>
+          <button type="button" class="pwa-modal-audio-btn" onclick="window.speakAppInstallGuide();">
+            <span>🔊 बोलकर बताएं (Audio)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Category Pill Tabs (Animated Glassmorphic Look) -->
     <div class="category-tabs">
-      <button class="tab-btn active" onclick="switchTab('purchased')">मेरी पुस्तकें (MY BOOKS)</button>
-      <button class="tab-btn" onclick="switchTab('available')">उपलब्ध बुक्स (AVAILABLE)</button>
-      <button class="tab-btn" onclick="switchTab('bonus')">फ्री बोनस (BONUS)</button>
-      <button class="tab-btn" onclick="switchTab('demo')">डेमो बुक्स (DEMO)</button>
-      <button class="tab-btn" onclick="switchTab('coming')">आने वाली बुक्स (COMING SOON)</button>
+      <button class="tab-btn active" id="tabBtn-purchased" onclick="switchTab('purchased')"><span class="tab-icon">📚</span> <span>मेरी पुस्तकें (MY BOOKS)</span></button>
+      <button class="tab-btn" id="tabBtn-available" onclick="switchTab('available')"><span class="tab-icon">🛒</span> <span>उपलब्ध बुक्स (AVAILABLE)</span></button>
+      <button class="tab-btn" id="tabBtn-bonus" onclick="switchTab('bonus')"><span class="tab-icon">🎁</span> <span>फ्री बोनस (BONUS)</span></button>
+      <button class="tab-btn" id="tabBtn-demo" onclick="switchTab('demo')"><span class="tab-icon">📖</span> <span>डेमो बुक्स (DEMO)</span></button>
+      <button class="tab-btn" id="tabBtn-coming" onclick="switchTab('coming')"><span class="tab-icon">⏳</span> <span>आने वाली बुक्स (COMING SOON)</span></button>
     </div>
 
     <!-- 6. Main Container & Sections -->
@@ -492,42 +565,71 @@
 
 
 
-    <!-- Weather & Mandi Bhav Section inside Library Main -->
-    <div class="welcome-card-soft"
-      style="background: linear-gradient(135deg, #040a09 0%, #416406 100%); color: #fff; border-radius: 14px; padding: 25px; margin: 20px auto; max-width: 1200px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+    <!-- Weather Section inside Library Main with GPS & Know More -->
+    <div class="welcome-card-soft weather-library-card" id="weatherSectionCard" style="background: linear-gradient(135deg, #041812 0%, #064e3b 50%, #065f46 100%); color: #fff; border-radius: 18px; padding: 24px; margin: 20px auto; max-width: 1200px; box-shadow: 0 10px 30px rgba(6,78,59,0.25); border: 1.5px solid rgba(52,211,153,0.3); position: relative; overflow: hidden;">
+      
+      <!-- Top Title & Search/GPS Actions Row -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div>
-          <h2 style="font-size: 1.5rem; margin: 0 0 5px 0;">🌤️ Aarogyam India मौसम केंद्र</h2>
-          <p style="font-size: 0.95rem; opacity: 0.95; margin: 0;">अपने शहर या खेती की लोकेशन का सटीक लाइव तापमान और मौसम हाल देखें</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <h2 style="font-size: 1.4rem; font-weight: 800; margin: 0; color: #ffffff;">🌤️ Aarogyam India लाइव मौसम केंद्र</h2>
+            <span style="background: #10b981; color:#fff; font-size:0.7rem; font-weight:800; padding:2px 8px; border-radius:12px;">LIVE 24×7</span>
+          </div>
+          <p style="font-size: 0.88rem; color: #a7f3d0; margin: 4px 0 0 0;">अपने खेत, गांव या जिले का लाइव तापमान, बारिश की संभावना व मौसम हाल</p>
         </div>
-        <div style="display: flex; gap: 8px; width: 100%; max-width: 320px;">
-          <input type="text" id="citySearchInput" placeholder="शहर का नाम लिखें (जैसे - Rewa)..."
-            style="flex: 1; padding: 10px 14px; border: none; border-radius: 8px; outline: none; font-size: 0.9rem;">
-          <button id="citySearchBtn"
-            style="background: #081108; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">खोजें</button>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; width: 100%; max-width: 480px;">
+          <!-- GPS Button -->
+          <button type="button" id="weatherGpsBtn" onclick="window.detectUserLiveLocationWeather()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 9px 14px; border-radius: 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(16,185,129,0.35); flex-shrink: 0;" title="GPS से अपना लाइव स्थान पता करें">
+            <i class="fa-solid fa-location-crosshairs"></i> <span>📍 मेरा GPS स्थान</span>
+          </button>
+
+          <!-- City Search -->
+          <div style="display: flex; gap: 6px; flex: 1; min-width: 200px;">
+            <input type="text" id="citySearchInput" placeholder="शहर / जिला लिखें (उदा. Rewa)..." style="flex: 1; padding: 9px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; outline: none; font-size: 0.86rem; background: rgba(255,255,255,0.12); color: #fff;">
+            <button id="citySearchBtn" onclick="window.searchCityWeather()" style="background: #0f172a; color: #fde047; border: 1px solid rgba(255,255,255,0.3); padding: 9px 14px; border-radius: 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer;">खोजें</button>
+          </div>
         </div>
       </div>
 
-      <div
-        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px; background: rgba(255, 255, 255, 0.2); padding: 20px; border-radius: 12px; backdrop-filter: blur(6px);">
-        <div style="display: flex; align-items: center; gap: 15px;">
-          <img id="weatherIconImg" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Icon"
-            style="width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%;">
+      <!-- Live Weather Stats Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-top: 20px; background: rgba(0, 0, 0, 0.25); padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(8px);">
+        <!-- Location & Icon -->
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div id="weatherIconWrap" style="width: 52px; height: 52px; background: rgba(255,255,255,0.15); border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size: 1.8rem;">
+            <span id="weatherIconEmoji">⛅</span>
+          </div>
           <div>
-            <h3 id="displayCityName" style="font-size: 1.3rem; margin: 0;">--</h3>
-            <p id="displayCountry" style="font-size: 0.85rem; margin: 2px 0 0 0; opacity: 0.9;">India</p>
+            <h3 id="displayCityName" style="font-size: 1.15rem; font-weight: 800; margin: 0; color: #fff;">रीवा (Rewa)</h3>
+            <p id="displayCountry" style="font-size: 0.78rem; margin: 2px 0 0 0; color: #a7f3d0;">मध्य प्रदेश • Live</p>
           </div>
         </div>
-        <div style="text-align: center;">
-          <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">तापमान (Temperature)</div>
-          <div id="displayTemp" style="font-size: 2.2rem; font-weight: bold; margin-top: 2px;">--°C</div>
+
+        <!-- Temperature -->
+        <div style="text-align: center; border-left: 1px dashed rgba(255,255,255,0.15); padding-left: 10px;">
+          <div style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">तापमान (Temperature)</div>
+          <div id="displayTemp" style="font-size: 2rem; font-weight: 900; color: #fbbf24; margin-top: 2px;">--°C</div>
         </div>
-        <div style="text-align: right;">
-          <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase;">मौसम स्थिति</div>
-          <div id="displayCondition"
-            style="font-size: 1.1rem; font-weight: bold; margin-top: 4px; text-transform: capitalize;">--
-          </div>
+
+        <!-- Condition -->
+        <div style="text-align: center; border-left: 1px dashed rgba(255,255,255,0.15); padding-left: 10px;">
+          <div style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">मौसम स्थिति</div>
+          <div id="displayCondition" style="font-size: 0.95rem; font-weight: 800; margin-top: 4px; color: #e0e7ff;">साफ मौसम</div>
         </div>
+
+        <!-- Rain & Humidity -->
+        <div style="text-align: center; border-left: 1px dashed rgba(255,255,255,0.15); padding-left: 10px;">
+          <div style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">बारिश / हवा</div>
+          <div id="displayRainWind" style="font-size: 0.92rem; font-weight: 800; margin-top: 4px; color: #67e8f9;">नमी: 45% • 12 km/h</div>
+        </div>
+      </div>
+
+      <!-- Know More 7-Day Forecast Button Row -->
+      <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+        <a href="/weather.html" class="weather-know-more-link" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 30px; font-weight: 800; font-size: 0.86rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(245,158,11,0.4); transition: transform 0.2s;">
+          <span>📅 7 दिनों का मौसम पूर्वानुमान देखें (Know More)</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
       </div>
     </div>
 

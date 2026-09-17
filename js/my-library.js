@@ -33,7 +33,12 @@ function logoutUser() {
 // 3. Category Tabs Switching Logic
 function switchTab(category) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    if (event && event.currentTarget) {
+    
+    // Activate target tab button by ID or by current event
+    const activeBtn = document.getElementById('tabBtn-' + category);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    } else if (event && event.currentTarget && event.currentTarget.classList.contains('tab-btn')) {
         event.currentTarget.classList.add('active');
     }
 
@@ -1211,7 +1216,186 @@ window.downloadBookPdf = function(bookId, bookTitle, directPdfPath, totalPagesHi
 };
 
 // =========================================================================
-// 13. FLOATING NATURAL HINDI AUDIO GUIDE ASSISTANT (लाइब्रेरी ऑडियो गाइड)
+// 13. INTERACTIVE TAB HELPERS & APP INSTALL GUIDE MODAL
+// =========================================================================
+window.switchTabAndScroll = function(category) {
+    if (typeof switchTab === 'function') switchTab(category);
+    const targetSection = document.getElementById('section-' + category);
+    if (targetSection) {
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+};
+
+window.filterOrSwitchAudioBooks = function() {
+    if (typeof switchTab === 'function') switchTab('purchased');
+    setTimeout(() => {
+        const audioButtons = document.querySelectorAll('#purchasedBooksGrid .btn-audio, #availableBooksGrid .btn-audio');
+        if (audioButtons.length > 0) {
+            audioButtons[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            switchTab('available');
+        }
+    }, 100);
+};
+
+window.dismissLibraryPwaCard = function() {
+    const card = document.getElementById('library-pwa-card');
+    if (card) {
+        card.style.display = 'none';
+        sessionStorage.setItem('aim_pwa_banner_dismissed', 'true');
+    }
+};
+
+window.openAppInstallGuideModal = function() {
+    const modal = document.getElementById('appInstallGuideModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+};
+
+window.closeAppInstallGuideModal = function() {
+    const modal = document.getElementById('appInstallGuideModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+};
+
+window.speakAppInstallGuide = function() {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance("Aarogyam India App अपने मोबाइल में इंस्टॉल करने के लिए, ब्राउज़र में ऊपर दाईं ओर 3 डॉट्स या शेयर बटन दबाएं, फिर 'Add to Home Screen' या 'Install App' चुनें। ऐप तुरंत आपके फोन में जुड़ जाएगी और आप बिना इंटरनेट भी सभी किताबें पढ़ सकते हैं।");
+    utt.lang = 'hi-IN';
+    utt.rate = 0.95;
+    window.speechSynthesis.speak(utt);
+};
+
+// =========================================================================
+// 14. LIVE WEATHER ENGINE WITH GPS & ZERO-EGRESS CACHING
+// =========================================================================
+const DISTRICT_COORDS = {
+    'rewa': { name: 'रीवा (Rewa)', state: 'मध्य प्रदेश', lat: 24.5362, lon: 81.3038 },
+    'indore': { name: 'इंदौर (Indore)', state: 'मध्य प्रदेश', lat: 22.7196, lon: 75.8577 },
+    'bhopal': { name: 'भोपाल (Bhopal)', state: 'मध्य प्रदेश', lat: 23.2599, lon: 77.4126 },
+    'ujjain': { name: 'उज्जैन (Ujjain)', state: 'मध्य प्रदेश', lat: 23.1765, lon: 75.7885 },
+    'jabalpur': { name: 'जबलपुर (Jabalpur)', state: 'मध्य प्रदेश', lat: 23.1815, lon: 79.9864 },
+    'satna': { name: 'सतना (Satna)', state: 'मध्य प्रदेश', lat: 24.5804, lon: 80.8293 },
+    'varanasi': { name: 'वाराणसी (Varanasi)', state: 'उत्तर प्रदेश', lat: 25.3176, lon: 82.9739 },
+    'lucknow': { name: 'लखनऊ (Lucknow)', state: 'उत्तर प्रदेश', lat: 26.8467, lon: 80.9462 },
+    'patna': { name: 'पटना (Patna)', state: 'बिहार', lat: 25.5941, lon: 85.1376 },
+    'jaipur': { name: 'जयपुर (Jaipur)', state: 'राजस्थान', lat: 26.9124, lon: 75.7873 }
+};
+
+const WMO_ICONS = {
+    0: { desc: 'साफ आसमान (Clear Sky)', icon: '☀️' },
+    1: { desc: 'मुख्यतः साफ (Mainly Clear)', icon: '🌤️' },
+    2: { desc: 'हल्के बादल (Partly Cloudy)', icon: '⛅' },
+    3: { desc: 'घने बादल (Overcast)', icon: '☁️' },
+    45: { desc: 'कोहरा (Foggy)', icon: '🌫️' },
+    51: { desc: 'हल्की बूंदाबांदी', icon: '🌦️' },
+    61: { desc: 'हल्की बारिश (Light Rain)', icon: '🌧️' },
+    63: { desc: 'मध्यम बारिश (Moderate Rain)', icon: '🌧️' },
+    65: { desc: 'भारी बारिश (Heavy Rain)', icon: '⛈️' },
+    80: { desc: 'बारिश बौछार (Showers)', icon: '🌦️' },
+    95: { desc: 'गरज-चमक बारिश (Thunderstorm)', icon: '⚡⛈️' }
+};
+
+window.fetchAndRenderLibraryWeather = async function(lat, lon, cityName, stateName) {
+    try {
+        const tempEl = document.getElementById('displayTemp');
+        const cityEl = document.getElementById('displayCityName');
+        const countryEl = document.getElementById('displayCountry');
+        const condEl = document.getElementById('displayCondition');
+        const iconEmojiEl = document.getElementById('weatherIconEmoji');
+        const rainWindEl = document.getElementById('displayRainWind');
+
+        const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=precipitation_probability_max&timezone=auto`;
+        const res = await fetch(apiUrl);
+        if (!res.ok) return;
+        const data = await res.json();
+        const cur = data.current || {};
+        const daily = data.daily || {};
+
+        const temp = Math.round(cur.temperature_2m || 28);
+        const humidity = cur.relative_humidity_2m || 45;
+        const wind = Math.round(cur.wind_speed_10m || 10);
+        const code = cur.weather_code || 0;
+        const rainChance = (daily.precipitation_probability_max && daily.precipitation_probability_max[0]) || 0;
+        const wInfo = WMO_ICONS[code] || { desc: 'साफ मौसम', icon: '🌤️' };
+
+        if (tempEl) tempEl.textContent = `${temp}°C`;
+        if (cityEl) cityEl.textContent = cityName;
+        if (countryEl) countryEl.textContent = `${stateName} • Live`;
+        if (condEl) condEl.textContent = wInfo.desc;
+        if (iconEmojiEl) iconEmojiEl.textContent = wInfo.icon;
+        if (rainWindEl) rainWindEl.textContent = `नमी: ${humidity}% • हवा: ${wind} km/h • बारिश: ${rainChance}%`;
+    } catch(e) {
+        console.warn('Weather fetch warning:', e);
+    }
+};
+
+window.detectUserLiveLocationWeather = function() {
+    const gpsBtn = document.getElementById('weatherGpsBtn');
+    if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>स्थान खोज रहे हैं...</span>';
+
+    if (!navigator.geolocation) {
+        alert('आपके ब्राउज़र में GPS लोकेशन समर्थित नहीं है।');
+        if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> <span>📍 मेरा GPS स्थान</span>';
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            let cityName = 'मेरी लाइव लोकेशन';
+            let stateName = 'GPS डिटेक्टेड';
+
+            try {
+                const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=hi`);
+                if (geoRes.ok) {
+                    const geoData = await geoRes.json();
+                    if (geoData.locality || geoData.city) cityName = geoData.locality || geoData.city;
+                    if (geoData.principalSubdivision) stateName = geoData.principalSubdivision;
+                }
+            } catch(e) {}
+
+            await window.fetchAndRenderLibraryWeather(lat, lon, cityName, stateName);
+            if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>📍 GPS सक्रिय</span>';
+        },
+        (err) => {
+            console.warn('GPS error:', err);
+            alert('कृपया GPS / लोकेशन अनुमति चालू करें ताकि आपके क्षेत्र का मौसम लोड हो सके।');
+            if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> <span>📍 मेरा GPS स्थान</span>';
+        },
+        { timeout: 10000 }
+    );
+};
+
+window.searchCityWeather = function() {
+    const input = document.getElementById('citySearchInput');
+    if (!input || !input.value.trim()) return;
+    const q = input.value.trim().toLowerCase();
+    const match = DISTRICT_COORDS[q] || Object.values(DISTRICT_COORDS).find(d => d.name.toLowerCase().includes(q) || d.state.toLowerCase().includes(q));
+    if (match) {
+        window.fetchAndRenderLibraryWeather(match.lat, match.lon, match.name, match.state);
+    } else {
+        fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=hi&format=json`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.results && data.results.length > 0) {
+                    const res = data.results[0];
+                    window.fetchAndRenderLibraryWeather(res.latitude, res.longitude, res.name, res.admin1 || 'India');
+                } else {
+                    alert('शहर नहीं मिला। कृपया पुनः प्रयास करें।');
+                }
+            })
+            .catch(() => alert('मौसम खोजने में त्रुटि।'));
+    }
+};
+
+// =========================================================================
+// 15. FLOATING NATURAL HINDI AUDIO GUIDE ASSISTANT (लाइब्रेरी ऑडियो गाइड)
 // =========================================================================
 function initLibraryAudioGuide() {
     const guideBar = document.getElementById('libraryAudioGuideBar');
@@ -1228,10 +1412,28 @@ function initLibraryAudioGuide() {
     let synth = window.speechSynthesis || null;
     let currentUtterance = null;
 
+    // Load default weather on startup
+    const defaultCity = DISTRICT_COORDS['rewa'];
+    window.fetchAndRenderLibraryWeather(defaultCity.lat, defaultCity.lon, defaultCity.name, defaultCity.state);
+
     function getHindiSpeechText() {
         const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
         const userName = storedUser.full_name || storedUser.name || 'किसान साथी';
-        return `नमस्ते ${userName} जी! Aarogyam India डिजिटल लाइब्रेरी में आपका स्वागत है। यहाँ आप अपनी खरीदी गई पुस्तकें पढ़ सकते हैं, ऑडियो बुक सुन सकते हैं, फ्री बोनस प्राप्त कर सकते हैं, तथा कृषि मंडी भाव व मौसम की लाइव जानकारी देख सकते हैं। किसी भी पुस्तक को पढ़ने के लिए 'Read' बटन दबाएं, या सम्पूर्ण विवरण देखने के लिए पुस्तक के कवर पर टैप करें। नई वीडियो तकनीकों के लिए नीचे Aarogyam Tube पर विजिट करें।`;
+        return `नमस्ते ${userName} जी! Aarogyam India डिजिटल लाइब्रेरी में आपका हार्दिक स्वागत है।
+
+यहाँ 'मेरी पुस्तकें' टैब में आपकी खरीदी गई सभी ई-बुक्स सुरक्षित हैं, जिन्हें आप 'Read' बटन से पढ़ सकते हैं और 'Audio' बटन से सुन सकते हैं।
+
+'उपलब्ध बुक्स' टैब में सभी नई कृषि पुस्तकें उपलब्ध हैं—किसी भी पुस्तक के कवर पर क्लिक करके आप उसका संपूर्ण विवरण देख सकते हैं और आसानी से खरीद सकते हैं।
+
+'फ्री बोनस' और 'डेमो बुक्स' टैब में आप मुफ़्त सैंपल व बोनस सामग्री पढ़ सकते हैं।
+
+नीचे मौसम केंद्र में 'GPS' बटन दबाकर आप अपने खेत या गांव का लाइव तापमान व मौसम तुरंत जान सकते हैं, और 7 दिनों के विस्तृत पूर्वानुमान के लिए 'Know More' बटन पर क्लिक करें।
+
+'मंडी भाव' कार्ड पर क्लिक करके आप सभी फसलों के लाइव थोक बाजार भाव देख सकते हैं।
+
+खेती की नई तकनीकों के 100 से ज्यादा वीडियो देखने के लिए 'Aarogyam Tube' पर जाएं।
+
+और बिना फोन मेमोरी भरे कभी भी ऑफलाइन पढ़ने के लिए ऊपर दिए गए 'Install App' बटन से ऐप अपने फोन में जोड़ें।`;
     }
 
     function speakGuide() {
@@ -1248,7 +1450,6 @@ function initLibraryAudioGuide() {
         currentUtterance.pitch = 1.0;
         currentUtterance.volume = isMuted ? 0 : 1.0;
 
-        // Try selecting a natural Hindi voice if available
         const voices = synth.getVoices ? synth.getVoices() : [];
         const hindiVoice = voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')));
         if (hindiVoice) currentUtterance.voice = hindiVoice;
@@ -1269,7 +1470,7 @@ function initLibraryAudioGuide() {
         };
 
         currentUtterance.onerror = (e) => {
-            console.warn('SpeechSynthesis error:', e);
+            console.warn('SpeechSynthesis note:', e);
             isPlaying = false;
             if (playBtn) playBtn.textContent = '▶️';
             if (statusText) statusText.textContent = 'गाइड पुनः सुनने के लिए टैप करें';
@@ -1325,7 +1526,21 @@ function initLibraryAudioGuide() {
         });
     }
 
-    // Auto-listen to voice list loading in Chrome/Edge
+    // Auto-attempt playback on load with fallback on first touch/click
+    setTimeout(() => {
+        try {
+            speakGuide();
+        } catch(e) {}
+    }, 800);
+
+    const triggerAutoAudioOnFirstGesture = () => {
+        if (!isPlaying) {
+            speakGuide();
+        }
+    };
+    window.addEventListener('click', triggerAutoAudioOnFirstGesture, { once: true });
+    window.addEventListener('touchstart', triggerAutoAudioOnFirstGesture, { once: true });
+
     if (synth && synth.onvoiceschanged !== undefined) {
         synth.onvoiceschanged = () => {};
     }
