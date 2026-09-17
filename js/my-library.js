@@ -956,7 +956,7 @@ async function renderLibrarySections(booksArray) {
     }
 
     // Update Welcome Card Stats
-    updateWelcomeStatsCounts(purchasedCount, bonusCount, wishlistCount, demoCount, audioCount);
+    updateWelcomeStatsCounts(purchasedCount, bonusCount, wishlistCount, demoCount, audioCount, seenAvailableIds.size);
 
     if (demoCount === 0 && demoGrid) {
         demoGrid.innerHTML = `
@@ -969,11 +969,14 @@ async function renderLibrarySections(booksArray) {
 
     if (purchasedCount === 0 && purchasedGrid) {
         purchasedGrid.innerHTML = `
-            <div style="grid-column: span 2; text-align: center; padding: 30px; color: #666; background:#fff; border-radius:12px; border:1px dashed #cbd5e1;">
-                <p style="font-size: 0.95rem; font-weight: 700; color:#1e293b;">📚 आपकी लाइब्रेरी में अभी कोई खरीदी गई ई-बुक नहीं है।</p>
-                <p style="font-size: 0.82rem; margin-top: 6px; color:#64748b;">कृपया 'उपलब्ध बुक्स (AVAILABLE)' या 'डेमो बुक्स (DEMO)' टैब से अपनी पसंद की ई-बुक देखें।</p>
-                <button onclick="switchTab('available')" style="margin-top:12px; background:#E86A17; color:#fff; border:none; padding:8px 18px; border-radius:8px; font-weight:800; cursor:pointer;">
-                    🛍️ उपलब्ध पुस्तकें देखें
+            <div style="grid-column: span 2; text-align: center; padding: 30px; color: #666; background:linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border-radius:16px; border:1.5px dashed #86efac; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+                <div style="font-size: 2.2rem; margin-bottom: 8px;">📚</div>
+                <p style="font-size: 1.05rem; font-weight: 800; color:#1e293b;">आपकी डिजिटल लाइब्रेरी सुरक्षित है!</p>
+                <p style="font-size: 0.86rem; margin-top: 6px; color:#475569; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+                    आपकी कोई भी खरीदी गई ई-बुक यहाँ जीवनभर उपलब्ध रहेगी। नई पुस्तकें देखने और पढ़ने के लिए <strong>'उपलब्ध बुक्स'</strong> टैब देखें।
+                </p>
+                <button onclick="switchTab('available')" style="margin-top:14px; background:linear-gradient(135deg, #E86A17 0%, #ea580c 100%); color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:800; font-size: 0.92rem; cursor:pointer; box-shadow:0 4px 14px rgba(232,106,23,0.35);">
+                    🛍️ उपलब्ध पुस्तकें देखें (${seenAvailableIds.size} बुक्स)
                 </button>
             </div>
         `;
@@ -981,9 +984,12 @@ async function renderLibrarySections(booksArray) {
 }
 
 // वेलकम कार्ड के काउंट्स को वास्तविक वैल्यू से अपडेट करने का फंक्शन
-function updateWelcomeStatsCounts(purchased, bonus, wishlist, demo, audio) {
+function updateWelcomeStatsCounts(purchased, bonus, wishlist, demo, audio, available) {
+    const kpiAvailable = document.getElementById('kpiAvailableCount');
+    if (kpiAvailable) kpiAvailable.textContent = available || 0;
+
     const kpiPurchased = document.getElementById('kpiPurchasedCount');
-    if (kpiPurchased) kpiPurchased.textContent = purchased;
+    if (kpiPurchased) kpiPurchased.textContent = purchased || 0;
 
     const kpiBonus = document.getElementById('kpiBonusCount');
     if (kpiBonus) kpiBonus.textContent = bonus || 0;
@@ -995,7 +1001,7 @@ function updateWelcomeStatsCounts(purchased, bonus, wishlist, demo, audio) {
     if (kpiAudio) kpiAudio.textContent = audio || 0;
 
     const kpiWishlist = document.getElementById('kpiWishlistCount');
-    if (kpiWishlist) kpiWishlist.textContent = wishlist;
+    if (kpiWishlist) kpiWishlist.textContent = wishlist || 0;
 }
 
 // 10. Wishlist Heart Toggle

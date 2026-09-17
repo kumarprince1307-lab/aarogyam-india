@@ -322,51 +322,54 @@
         </div>
       </div>
 
-      <!-- Interactive Clickable Stats Counter Row -->
+      <!-- Interactive Clickable Stats Counter Row (Tiranga Orange-White-Green Centered Theme) -->
       <div class="lib-kpi-stats-grid">
-        <div class="lib-kpi-stat-card kpi-demo-glow" onclick="window.switchTabAndScroll('demo')" title="डेमो बुक्स देखें (Click to view)">
-          <div class="lib-kpi-header">
-            <span class="lib-kpi-icon">📖</span>
-            <span class="lib-kpi-tag blue">डेमो</span>
-          </div>
-          <span class="lib-kpi-label">Read Demo</span>
-          <strong id="kpiDemoCount" class="lib-kpi-num color-demo">0</strong>
+        <!-- KPI 1: Available Books (Orange) -->
+        <div class="lib-kpi-stat-card kpi-tiranga-orange" onclick="window.switchTabAndScroll('available')" title="उपलब्ध मुख्य पुस्तकें देखें (Click to view)">
+          <span class="lib-kpi-badge-pill orange-pill">🔥 मुख्य स्टोर</span>
+          <div class="lib-kpi-icon-centered">🛒</div>
+          <strong id="kpiAvailableCount" class="lib-kpi-num color-orange">0</strong>
+          <span class="lib-kpi-label">उपलब्ध बुक्स (Available)</span>
         </div>
 
-        <div class="lib-kpi-stat-card kpi-purchased-glow" onclick="window.switchTabAndScroll('purchased')" title="खरीदी गई पुस्तकें देखें (Click to view)">
-          <div class="lib-kpi-header">
-            <span class="lib-kpi-icon">📚</span>
-            <span class="lib-kpi-tag green">अनलॉक</span>
-          </div>
-          <span class="lib-kpi-label">Purchased</span>
-          <strong id="kpiPurchasedCount" class="lib-kpi-num color-purchased">0</strong>
+        <!-- KPI 2: Purchased Books (Green) -->
+        <div class="lib-kpi-stat-card kpi-tiranga-green" onclick="window.switchTabAndScroll('purchased')" title="मेरी खरीदी गई पुस्तकें (Click to view)">
+          <span class="lib-kpi-badge-pill green-pill">✓ अनलॉक बुक्स</span>
+          <div class="lib-kpi-icon-centered">📚</div>
+          <strong id="kpiPurchasedCount" class="lib-kpi-num color-green">0</strong>
+          <span class="lib-kpi-label">मेरी पुस्तकें (Purchased)</span>
         </div>
 
-        <div class="lib-kpi-stat-card kpi-audio-glow" onclick="window.filterOrSwitchAudioBooks()" title="ऑडियो बुक्स सुनें (Click to view)">
-          <div class="lib-kpi-header">
-            <span class="lib-kpi-icon">🎧</span>
-            <span class="lib-kpi-tag purple">लाइव ऑडियो</span>
-          </div>
-          <span class="lib-kpi-label">Audio Books</span>
-          <strong id="kpiAudioCount" class="lib-kpi-num color-audio">0</strong>
+        <!-- KPI 3: Demo Books (Blue/White) -->
+        <div class="lib-kpi-stat-card kpi-tiranga-white" onclick="window.switchTabAndScroll('demo')" title="डेमो सैंपल बुक्स पढ़ें (Click to view)">
+          <span class="lib-kpi-badge-pill blue-pill">📖 मुफ़्त सैंपल</span>
+          <div class="lib-kpi-icon-centered">📖</div>
+          <strong id="kpiDemoCount" class="lib-kpi-num color-blue">0</strong>
+          <span class="lib-kpi-label">डेमो बुक्स (Read Demo)</span>
         </div>
 
-        <div class="lib-kpi-stat-card kpi-bonus-glow" onclick="window.switchTabAndScroll('bonus')" title="फ्री बोनस पुस्तकें देखें (Click to view)">
-          <div class="lib-kpi-header">
-            <span class="lib-kpi-icon">🎁</span>
-            <span class="lib-kpi-tag gold">100% FREE</span>
-          </div>
-          <span class="lib-kpi-label">Bonus Unlocked</span>
-          <strong id="kpiBonusCount" class="lib-kpi-num color-bonus">0</strong>
+        <!-- KPI 4: Audio Books (Purple) -->
+        <div class="lib-kpi-stat-card kpi-tiranga-purple" onclick="window.filterOrSwitchAudioBooks()" title="ऑडियो बुक्स सुनें (Click to view)">
+          <span class="lib-kpi-badge-pill purple-pill">🎧 AI वॉइस</span>
+          <div class="lib-kpi-icon-centered">🎧</div>
+          <strong id="kpiAudioCount" class="lib-kpi-num color-purple">0</strong>
+          <span class="lib-kpi-label">ऑडियो बुक्स (Audio)</span>
         </div>
 
-        <div class="lib-kpi-stat-card kpi-wishlist-glow" onclick="window.switchTabAndScroll('coming')" title="आने वाली बुक्स व विशलिस्ट देखें (Click to view)">
-          <div class="lib-kpi-header">
-            <span class="lib-kpi-icon">❤️</span>
-            <span class="lib-kpi-tag red">Wishlist</span>
-          </div>
-          <span class="lib-kpi-label">Saved</span>
-          <strong id="kpiWishlistCount" class="lib-kpi-num color-wishlist">0</strong>
+        <!-- KPI 5: Bonus Books (Gold) -->
+        <div class="lib-kpi-stat-card kpi-tiranga-gold" onclick="window.switchTabAndScroll('bonus')" title="फ्री बोनस पुस्तकें (Click to view)">
+          <span class="lib-kpi-badge-pill gold-pill">🎁 100% FREE</span>
+          <div class="lib-kpi-icon-centered">🎁</div>
+          <strong id="kpiBonusCount" class="lib-kpi-num color-gold">0</strong>
+          <span class="lib-kpi-label">फ्री बोनस (VIP Bonus)</span>
+        </div>
+
+        <!-- KPI 6: Wishlist (Red) -->
+        <div class="lib-kpi-stat-card kpi-tiranga-red" onclick="window.switchTabAndScroll('coming')" title="आने वाली बुक्स व विशलिस्ट (Click to view)">
+          <span class="lib-kpi-badge-pill red-pill">❤️ विशलिस्ट</span>
+          <div class="lib-kpi-icon-centered">❤️</div>
+          <strong id="kpiWishlistCount" class="lib-kpi-num color-red">0</strong>
+          <span class="lib-kpi-label">विशलिस्ट (Saved)</span>
         </div>
       </div>
 
