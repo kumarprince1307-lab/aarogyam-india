@@ -205,15 +205,18 @@ async function verifyUserAccessAndSession(targetBookId) {
 
     // Sticky Top Bar for Demo / Bonus Mode
     if (isDemoMode) {
+        document.body.classList.add('demo-mode');
         if (watermarkUser) watermarkUser.textContent = "Free Demo Preview";
         const targetMain = aoiCurrentBookData.targetMainBook || (canonicalBookId === 'BK002' ? 'BK002' : 'BK001');
+        const parentBook = jsonBooks.find(b => b && b.id && b.id.toUpperCase() === String(targetMain).toUpperCase());
+        const bookPrice = aoiCurrentBookData.offerPrice || parentBook?.offerPrice || 99;
         const checkoutUrl = `/ebooks/checkout.html?product=${encodeURIComponent(targetMain)}`;
         
         let demoBar = document.getElementById('demoReaderStickyBar');
         if (!demoBar) {
             demoBar = document.createElement('div');
             demoBar.id = 'demoReaderStickyBar';
-            demoBar.style.cssText = "background:linear-gradient(135deg, #0f172a, #1e293b);border-bottom:2px solid #f59e0b;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,0.5);flex-wrap:wrap;gap:8px;";
+            demoBar.style.cssText = "background:linear-gradient(135deg, #0f172a, #1e293b);border-bottom:1.5px solid #f59e0b;padding:4px 10px;display:flex;flex-direction:column;gap:3px;z-index:9999;box-shadow:0 3px 10px rgba(0,0,0,0.4);flex-shrink:0;";
             
             // Robust extraction of video demo links (supports videos array, video object, or parent book)
             const extractVList = (src) => {
@@ -234,23 +237,34 @@ async function verifyUserAccessAndSession(targetBookId) {
             };
 
             let videos = extractVList(aoiCurrentBookData);
-            if (videos.length === 0) {
-                const parentBook = jsonBooks.find(b => b && b.id && b.id.toUpperCase() === String(targetMain).toUpperCase());
-                if (parentBook) videos = extractVList(parentBook);
+            if (videos.length === 0 && parentBook) {
+                videos = extractVList(parentBook);
             }
             const hasVideos = videos.length > 0;
 
             demoBar.innerHTML = `
-                <div style="display:flex;align-items:center;gap:8px;color:#f8fafc;font-size:0.86rem;font-weight:700;">
-                    <span style="background:#f59e0b;color:#000;font-size:0.7rem;font-weight:900;padding:2px 6px;border-radius:4px;">FREE DEMO</span>
-                    <span>⚡ यह निःशुल्क डेमो प्रिव्यू है • सम्पूर्ण मुख्य पुस्तक मात्र ₹99 में प्राप्त करें</span>
+                <!-- Line 1: [FREE DEMO] + [🎬 वीडियो देखें] + [⚡ पूरी किताब खरीदें (₹${bookPrice})] -->
+                <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:6px;box-sizing:border-box;">
+                    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                        <span style="background:linear-gradient(135deg, #f59e0b, #d97706);color:#000;font-size:0.7rem;font-weight:900;padding:2px 7px;border-radius:4px;letter-spacing:0.3px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;">
+                            <span>✨</span> FREE DEMO
+                        </span>
+                        ${hasVideos ? `
+                        <button type="button" id="readerVideoBtn" style="background:#ef4444;color:#fff;border:none;border-radius:5px;padding:3px 8px;font-size:0.75rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;box-shadow:0 2px 6px rgba(239,68,68,0.35);">
+                            <span>🎬</span> <span>वीडियो देखें</span>
+                        </button>` : ''}
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                        <a href="${checkoutUrl}" style="background:#16a34a;color:#fff;text-decoration:none;padding:3px 10px;border-radius:5px;font-size:0.75rem;font-weight:800;box-shadow:0 2px 6px rgba(22,163,74,0.35);display:inline-flex;align-items:center;gap:4px;white-space:nowrap;">
+                            <span>⚡</span> <span>पूरी किताब खरीदें (₹${bookPrice})</span>
+                        </a>
+                    </div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                    ${hasVideos ? `<button type="button" id="readerVideoBtn" style="background:#ef4444;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:0.8rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"><span>🎬</span> <span>वीडियो देखें</span></button>` : ''}
-                    <a href="${checkoutUrl}" style="background:#16a34a;color:#fff;text-decoration:none;padding:6px 14px;border-radius:6px;font-size:0.82rem;font-weight:800;box-shadow:0 2px 8px rgba(22,163,74,0.4);display:inline-flex;align-items:center;gap:4px;">
-                        <span>⚡</span> <span>पूरी मुख्य किताब खरीदें (₹99)</span>
-                    </a>
-                </div>
+
+                <!-- Line 2: Slim Clickable Notification Box leading to Checkout -->
+                <a href="${checkoutUrl}" style="display:flex;align-items:center;justify-content:center;text-align:center;width:100%;text-decoration:none;background:rgba(245, 158, 11, 0.12);border:1px dashed #f59e0b;border-radius:4px;padding:2.5px 6px;color:#fde68a;font-size:0.72rem;font-weight:700;cursor:pointer;gap:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;box-sizing:border-box;">
+                    <span>⚡ यह निःशुल्क डेमो है • सम्पूर्ण मुख्य पुस्तक मात्र ₹${bookPrice} में खरीदें <span style="color:#38bdf8;text-decoration:underline;">(यहाँ क्लिक करें 👉)</span></span>
+                </a>
             `;
             document.body.prepend(demoBar);
 

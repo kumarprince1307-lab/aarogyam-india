@@ -229,6 +229,88 @@ body.theme-light .theme-toggle-btn {
     background: #047857;
 }
 
+/* =================================================================
+   DEMO MODE: ULTRA SLIM HEADER & MAXIMUM CANVAS READING SPACE
+   ================================================================= */
+body.demo-mode .progress-bar-container {
+    height: 3px !important;
+    min-height: 3px !important;
+}
+
+body.demo-mode .reader-header {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 8px !important;
+}
+
+body.demo-mode .header-left {
+    gap: 5px !important;
+}
+
+body.demo-mode .header-left .back-btn {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 13px !important;
+}
+
+body.demo-mode .brand-box {
+    padding: 2px 5px !important;
+    gap: 4px !important;
+}
+
+body.demo-mode .brand-logo {
+    width: 20px !important;
+    height: 20px !important;
+    border-width: 1.5px !important;
+}
+
+body.demo-mode .tricolour-flag-container span {
+    font-size: 11px !important;
+}
+
+body.demo-mode .header-center {
+    padding: 2px 8px !important;
+    margin: 0 4px !important;
+    border-radius: 6px !important;
+}
+
+body.demo-mode .header-center h1 {
+    font-size: 11.5px !important;
+    line-height: 1.2 !important;
+}
+
+body.demo-mode .header-sub-info {
+    font-size: 9.5px !important;
+    margin-top: 0 !important;
+}
+
+body.demo-mode .theme-toggle-btn {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 12px !important;
+}
+
+body.demo-mode .header-right {
+    gap: 5px !important;
+}
+
+body.demo-mode .page-jump-box input {
+    width: 32px !important;
+    height: 24px !important;
+    font-size: 11px !important;
+    padding: 1px 2px !important;
+}
+
+body.demo-mode .page-jump-box button {
+    height: 24px !important;
+    padding: 0 5px !important;
+    font-size: 10.5px !important;
+}
+
+body.demo-mode .canvas-container {
+    padding: 4px !important;
+}
+
 /* 3. MAIN READER CONTAINER */
 .reader-main {
     flex: 1;
