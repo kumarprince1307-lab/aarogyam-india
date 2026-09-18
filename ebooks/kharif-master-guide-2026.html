@@ -158,22 +158,21 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     }
   }
   .hero-book {
-    perspective: 1200px;
     display: flex;
     justify-content: center;
     align-items: center;
   }
   .hero-book-cover {
     width: 100%;
-    max-width: 340px;
+    max-width: 440px;
+    height: auto;
     border-radius: 18px;
-    animation: ublFloatBook3D 4.5s ease-in-out infinite;
-    transform-style: preserve-3d;
-    transition: transform 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,.28);
+    transition: transform 0.45s ease, box-shadow 0.45s ease;
   }
   .hero-book-cover:hover {
-    animation-play-state: paused;
-    transform: perspective(1000px) rotateY(0deg) scale(1.03);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 65px rgba(0,0,0,.35);
   }
 
   /* SIDE MENU (EXACT MY PROFILE / MY LIBRARY STYLE) */
@@ -459,29 +458,20 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   <!-- =========================================
        2. PREMIUM DESKTOP & MOBILE HEADER (MY LIBRARY STYLE)
        ========================================== -->
-  <header class="library-header" style="background:#ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;">
-      <div class="header-logo-title" style="display: flex; align-items: center; gap: 12px;">
-          <a href="/index.html"><img src="/images/logo/logo.png" alt="Logo" class="site-logo" style="height: 42px; width: auto; display: block;"></a>
-          <h1 style="font-size: 1.2rem; font-weight: 800; color: #1e293b; margin: 0; line-height: 1.2;">खरीफ फसल मास्टर गाइड 2026</h1>
+  <header class="library-header">
+      <div class="header-logo-title">
+          <a href="/index.html"><img src="/images/logo/logo.png" alt="Logo" class="site-logo"></a>
+          <h1 id="header-book-title">खरीफ फसल मास्टर गाइड 2026</h1>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 10px;">
+      <div class="header-actions">
           <!-- Cart Icon -->
-          <a href="cart.html" id="top-cart-btn" style="position: relative; width: 40px; height: 40px; background: rgba(37,99,235,0.12); color: #2563eb; border: 1.5px solid #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 1.15rem;" title="Cart">
+          <a href="cart.html" class="header-cart-icon" title="Cart">
               <i class="fa-solid fa-cart-shopping"></i>
-              <span id="cart-count-badge" style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.7rem; font-weight: 800; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; padding: 0 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">0</span>
+              <span id="cart-count-badge" class="header-cart-badge">0</span>
           </a>
-          <!-- Personal Notification Bell Button -->
-          <button class="user-notif-bell-btn" onclick="window.location.href='/ucas/index.html?tab=notifications'" title="सूचनाएं (Notifications)" aria-label="Notifications" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1.5px solid #10B981; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.15rem; position: relative;">
-              <i class="fa-solid fa-bell" style="color: #10B981;"></i>
-              <span class="user-notif-badge" style="display: none; position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; border-radius: 50%; font-size: 0.7rem; font-weight: 800; padding: 2px 6px;">0</span>
-          </button>
-          <!-- Desktop Install App Button -->
-          <button id="desktop-pwa-install-btn" class="pwa-install-btn" onclick="window.triggerPWAInstall()" style="display: inline-flex; align-items: center; gap: 6px; background: #2E7D32; color: #fff; border-radius: 50px; padding: 7px 16px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer;">
-            <span>📱</span> Install App
-          </button>
-          <button class="back-btn" onclick="window.location.href='/index.html'" style="width: 40px; height: 40px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;"><i class="fa-solid fa-arrow-left"></i></button>
-          <button class="menu-btn" id="headerMenuBtn" onclick="toggleMenu()" title="मेनू खोलें" aria-label="Toggle Menu" style="width: 40px; height: 40px; background: #2E7D32; color: #fff; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem;"><i class="fa-solid fa-bars" style="pointer-events: none;"></i></button>
+          <!-- Menu Button -->
+          <button class="menu-btn" onclick="toggleMenu()" title="मेनू खोलें" aria-label="Toggle Menu"><i class="fa-solid fa-bars" style="pointer-events: none;"></i></button>
       </div>
   </header>
 
@@ -1854,67 +1844,55 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     MASTER MOBILE STICKY BUY BAR
 ========================================================== -->
 
-<div class="mobile-sticky-bar">
+  <!-- ==========================================================
+       FLOATING DEMO BUTTON (RED BLINKING WITH BOOK & HEADPHONE ICONS)
+       ========================================================== -->
+  <a id="floating-free-demo-btn" href="javascript:void(0)" onclick="openDemoReaderWithAuth('BK001')" class="floating-demo-blink-btn" style="background: #dc2626 !important; color: #ffffff !important;" title="मुफ्त डेमो पढ़ें / सुनें">
+    <i class="fa-solid fa-book-open"></i> <span>फ्री डेमो पढ़ें / सुनें</span> <i class="fa-solid fa-headphones"></i>
+  </a>
 
-    <!-- HELP -->
+  <!-- ==========================================================
+       FLOATING WHATSAPP HELP (BUY NOW KE THEEK UPAR RIGHT MEIN)
+       ========================================================== -->
+  <a id="sticky-help-btn" href="https://wa.me/917974422572?text=Hello%20Aarogyam%20India%20Team" target="_blank" rel="noopener" class="floating-wa-help-btn" title="WhatsApp पर सहायता लें">
+    <i class="fa-brands fa-whatsapp"></i>
+    <span class="floating-wa-tooltip">मदद?</span>
+  </a>
 
-    <a href="https://wa.me/917974422572"
-       class="sticky-help-btn"
-       id="helpButton"
-       target="_blank">
-        HELP
-    </a>
+  <!-- ==========================================================
+       FLOATING PWA INSTALL APP BUTTON (STICKY FOOTER KE UPAR, AUDIO KE NICHE)
+       ========================================================== -->
+  <button type="button" id="floating-pwa-install-btn" onclick="window.triggerPWAInstall()" class="floating-pwa-install-btn" title="Aarogyam App इंस्टॉल करें">
+    <i class="fa-solid fa-mobile-screen-button"></i> <span>Install App</span>
+  </button>
 
-    <!-- BOOK PREVIEW -->
+<!-- ==========================================================
+     MASTER MOBILE STICKY BUY BAR (RESPONSIVE INNER CONTAINER)
+     ========================================================== -->
+<div id="ubl-mobile-sticky-bar" class="mobile-sticky-bar">
+  <div class="mobile-sticky-bar-inner">
+    <!-- 1. BOOK THUMBNAIL -->
+    <img id="sticky-thumb-img" src="../images/books/kharif-master-guide-2026-cover.webp" alt="Kharif Master Guide" class="sticky-thumb-img">
 
+    <!-- 2. PRICING: BLACK BOLD STRIKETHROUGH MRP + VIBRANT OFFER PRICE -->
     <div class="mobile-book-preview">
-
-        <img
-            src="../images/books/kharif-master-guide-2026-cover.webp"
-            alt="Kharif Master Guide">
-
-        <div class="mobile-book-info">
-
-            <h4>
-                खरीफ फसल मास्टर गाइड 2026
-            </h4>
-
-            <div class="mobile-book-price">
-
-                <span class="old-price">
-                    ₹299
-                </span>
-
-                <strong class="offer-price">
-                    ₹99
-                </strong>
-
-            </div>
-
-        </div>
-
+      <h4 id="sticky-book-title" style="display: none !important;">खरीफ फसल मास्टर गाइड 2026</h4>
+      <div class="mobile-book-price">
+        <span id="sticky-mrp-val" class="old-price">₹299</span>
+        <strong id="sticky-price-val" class="offer-price">₹99</strong>
+      </div>
     </div>
 
-    <!-- SHARE -->
-
-    <button
-        class="sticky-share-btn"
-        id="mobileShareButton"
-        type="button"
-        data-share-button="true"
-        data-share-target="native"
-        data-asset-type="book"
-        data-asset-id="kharif-master-guide-2026">
-        Share
-    </button>
-
-    <!-- BUY -->
-
-    <a href="checkout.html?id=BK001"
-       class="sticky-buy-btn">
-        Buy Now
+    <!-- 3. BUY NOW BUTTON (JUST BAGAL MEIN) -->
+    <a id="sticky-buy-btn" href="checkout.html?id=BK001" class="sticky-buy-btn">
+      🛒 Buy Now
     </a>
 
+    <!-- 4. SHARE BUTTON (USKE BAAD) -->
+    <button class="sticky-share-btn" id="mobileShareButton" type="button" data-share-button="true" data-share-target="native" data-asset-type="book" data-asset-id="kharif-master-guide-2026">
+      <i class="fa-solid fa-share-nodes"></i> Share
+    </button>
+  </div>
 </div>
 
 <!-- =====================================================
@@ -2076,6 +2054,42 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     const popup = document.getElementById('login-popup-overlay');
     if (popup) popup.style.display = 'none';
   }
+
+  function openDemoReaderWithAuth(bookId) {
+    const bId = (bookId || 'BK001').toUpperCase();
+    const readerDemoUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
+    let isLogged = false;
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+      if (u && (u.id || u.phone || u.mobile)) isLogged = true;
+      const s = JSON.parse(localStorage.getItem('AI_SESSION') || '{}');
+      if (s && (s.mobile || s.active)) isLogged = true;
+      if (localStorage.getItem('aim_user_mobile')) isLogged = true;
+    } catch(e) {}
+
+    if (!isLogged) {
+      if (typeof openLoginPopup === 'function') {
+        sessionStorage.setItem('AIM_PENDING_DEMO_URL', readerDemoUrl);
+        openLoginPopup();
+        return;
+      }
+    }
+    window.location.href = readerDemoUrl;
+  }
+  window.openDemoReaderWithAuth = openDemoReaderWithAuth;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const pending = sessionStorage.getItem('AIM_PENDING_DEMO_URL');
+    if (pending) {
+      try {
+        const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        if (u && (u.id || u.phone || u.mobile)) {
+          sessionStorage.removeItem('AIM_PENDING_DEMO_URL');
+          window.location.href = pending;
+        }
+      } catch(e) {}
+    }
+  });
 
   function logoutUser() {
     localStorage.removeItem('AI_USER');
@@ -2315,13 +2329,34 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     });
   }
 
+  let deferredKharifPwaPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredKharifPwaPrompt = e;
+  });
+
   window.triggerPWAInstall = function() {
-    if (window.deferredPWAیکPrompt) {
-      window.deferredPWAیکPrompt.prompt();
+    const p = deferredKharifPwaPrompt || window.deferredPWAیکPrompt || window.deferredPwaPrompt;
+    if (p) {
+      p.prompt();
+      if (p.userChoice) {
+        p.userChoice.then((choice) => {
+          if (choice && choice.outcome === 'accepted') {
+            try { localStorage.setItem('AI_PWA_INSTALLED', 'true'); } catch(e) {}
+          }
+          deferredKharifPwaPrompt = null;
+        });
+      }
     } else {
-      alert('📱 Aarogyam App को होमस्क्रीन पर जोड़ने के लिए ब्राउज़र मेनू (⋮) में जाकर "Add to Home screen" चुनें।');
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIos) {
+        alert('📲 Aarogyam App को iPhone/iPad पर जोड़ने के लिए नीचे Share बटन (⎋) दबाएँ और "Add to Home Screen" चुनें।');
+      } else {
+        alert('📱 Aarogyam App को होमस्क्रीन पर जोड़ने के लिए ब्राउज़र मेनू (⋮) में जाकर "Install app" या "Add to Home screen" चुनें।');
+      }
     }
   };
+  window.triggerPwaInstall = window.triggerPWAInstall;
 
   document.addEventListener('DOMContentLoaded', () => {
     updateCartBadge();
@@ -2580,11 +2615,12 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(4) { animation: aoiWaveAnim 0.7s ease-in-out infinite 0.1s; }
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(5) { animation: aoiWaveAnim 0.85s ease-in-out infinite 0.25s; }
 
-/* Mobile Floating Audio Pill Position (Above Bottom Bar) */
+/* Floating Audio Pill Position (Left Side Above Install App Button) */
 @media (max-width: 768px) {
   #aoi-floating-audio-pill {
-    bottom: 125px !important;
-    right: 12px !important;
+    bottom: 118px !important;
+    left: 12px !important;
+    right: auto !important;
     padding: 6px 12px !important;
     gap: 8px !important;
     z-index: 99999 !important;
@@ -2693,8 +2729,8 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 }
 </style>
 
-<!-- Floating Mini Audio Player Pill (Active on Scroll) -->
-<div id="aoi-floating-audio-pill" style="display: none; position: fixed; bottom: 85px; right: 18px; z-index: 9999; background: rgba(20, 2, 2, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid #fbbf24; border-radius: 40px; padding: 8px 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(245,158,11,0.3); align-items: center; gap: 10px;">
+<!-- Floating Mini Audio Player Pill (Active on Scroll - Left Side Above Install App) -->
+<div id="aoi-floating-audio-pill" style="display: none; position: fixed; bottom: 118px; left: 12px; right: auto; z-index: 9999; background: rgba(20, 2, 2, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid #fbbf24; border-radius: 40px; padding: 8px 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(245,158,11,0.3); align-items: center; gap: 10px;">
   <span style="font-size: 1.1rem;">🎙️</span>
   <span style="font-size: 0.8rem; font-weight: 800; color: #fef08a; white-space: nowrap;">ऑडियो चालू है</span>
   <button type="button" onclick="stopLandingAudioBook()" style="background: rgba(220,38,38,0.85); color: #fff; border: 1px solid #fca5a5; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; padding: 0;" title="रोकें">

@@ -250,6 +250,7 @@ function registerPublicServiceWorker() {
       navigator.serviceWorker.register('/sw.js', { scope: '/' })
         .then((reg) => {
           console.log('✅ [Public PWA] Service Worker registered, scope:', reg.scope);
+          try { reg.update(); } catch(e) {}
         })
         .catch((err) => {
           console.warn('⚠️ [Public PWA] Service Worker registration failed:', err);

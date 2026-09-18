@@ -68,10 +68,15 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+  <!-- Cache Control for Instant Updates -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <!-- CORE STYLESHEETS -->
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/ebook.css">
-  <link rel="stylesheet" href="../css/book-landing.css?v=38.0">
+  <link rel="stylesheet" href="../css/book-landing.css?v=41.0">
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-2BWPJVQWPK"></script>
@@ -244,10 +249,10 @@
             <a id="hero-sample-btn" href="demo-kharif.html" class="sample-btn">
               <i class="fa-solid fa-book-open"></i> Free Sample
             </a>
-            <button type="button" id="hero-add-cart-btn" class="sample-btn" style="background:#0284c7;color:#fff;border-color:#0284c7;cursor:pointer;">
+            <button type="button" id="hero-add-cart-btn" class="sample-btn" style="background:#000000 !important;color:#ffffff !important;border:1.5px solid #334155 !important;cursor:pointer;">
               <i class="fa-solid fa-cart-plus"></i> Add to Cart
             </button>
-            <a id="hero-buy-btn" href="checkout.html" class="buy-btn">
+            <a id="hero-buy-btn" href="checkout.html" class="buy-btn" style="background:#dc2626 !important;color:#ffffff !important;border:1.5px solid #ef4444 !important;cursor:pointer;">
               <i class="fa-solid fa-cart-shopping"></i> Buy Now
             </a>
             <button type="button" id="hero-share-btn" onclick="window.handleUniversalBookShare(event)" class="share-now-btn" style="cursor:pointer;">
@@ -775,10 +780,10 @@
   </div>
 
   <!-- ==========================================================
-       FLOATING DEMO BUTTON (RED-GREEN BLINKING ABOVE WHATSAPP)
+       FLOATING DEMO BUTTON (RED BLINKING WITH BOOK & HEADPHONE ICONS)
        ========================================================== -->
-  <a id="floating-free-demo-btn" href="javascript:void(0)" onclick="window.openDemoReaderWithAuth()" class="floating-demo-blink-btn" title="मुफ्त डेमो पढ़ें (Free Demo)">
-    <i class="fa-solid fa-book-open"></i> <span>फ्री डेमो पढ़ें</span>
+  <a id="floating-free-demo-btn" href="javascript:void(0)" onclick="window.openDemoReaderWithAuth()" class="floating-demo-blink-btn" style="background: #dc2626 !important; color: #ffffff !important;" title="मुफ्त डेमो पढ़ें / सुनें">
+    <i class="fa-solid fa-book-open"></i> <span>फ्री डेमो पढ़ें / सुनें</span> <i class="fa-solid fa-headphones"></i>
   </a>
 
   <!-- ==========================================================
@@ -790,32 +795,40 @@
   </a>
 
   <!-- ==========================================================
-       MASTER MOBILE STICKY BUY BAR
-       ORDER: THUMBNAIL | MRP (KATA HUA) + OFFER PRICE | BUY NOW | SHARE
+       FLOATING PWA INSTALL APP BUTTON (STICKY FOOTER KE UPAR, AUDIO KE NICHE)
+       ========================================================== -->
+  <button type="button" id="floating-pwa-install-btn" onclick="window.triggerPWAInstall()" class="floating-pwa-install-btn" title="Aarogyam App इंस्टॉल करें">
+    <i class="fa-solid fa-mobile-screen-button"></i> <span>Install App</span>
+  </button>
+
+  <!-- ==========================================================
+       MASTER MOBILE STICKY BUY BAR (RESPONSIVE INNER CONTAINER)
        ========================================================== -->
   <div id="ubl-mobile-sticky-bar" class="mobile-sticky-bar">
-    <!-- 1. BOOK THUMBNAIL -->
-    <img id="sticky-thumb-img" src="" alt="Thumbnail" class="sticky-thumb-img">
+    <div class="mobile-sticky-bar-inner">
+      <!-- 1. BOOK THUMBNAIL -->
+      <img id="sticky-thumb-img" src="" alt="Thumbnail" class="sticky-thumb-img">
 
-    <!-- 2. PRICING: BLACK BOLD STRIKETHROUGH MRP + VIBRANT OFFER PRICE -->
-    <div class="mobile-book-preview">
-      <!-- Title hidden visually as requested, preserved for script compatibility -->
-      <h4 id="sticky-book-title" style="display: none !important;">...</h4>
-      <div class="mobile-book-price">
-        <span id="sticky-mrp-val" class="old-price"></span>
-        <strong id="sticky-price-val" class="offer-price"></strong>
+      <!-- 2. PRICING: BLACK BOLD STRIKETHROUGH MRP + VIBRANT OFFER PRICE -->
+      <div class="mobile-book-preview">
+        <!-- Title hidden visually as requested, preserved for script compatibility -->
+        <h4 id="sticky-book-title" style="display: none !important;">...</h4>
+        <div class="mobile-book-price">
+          <span id="sticky-mrp-val" class="old-price"></span>
+          <strong id="sticky-price-val" class="offer-price"></strong>
+        </div>
       </div>
+
+      <!-- 3. BUY NOW BUTTON (JUST BAGAL MEIN) -->
+      <a id="sticky-buy-btn" href="checkout.html" class="sticky-buy-btn">
+        🛒 Buy Now
+      </a>
+
+      <!-- 4. SHARE BUTTON (USKE BAAD) -->
+      <button class="sticky-share-btn" id="mobileShareButton" type="button" data-share-button="true" data-share-target="native" data-asset-type="book" data-asset-id="">
+        <i class="fa-solid fa-share-nodes"></i> Share
+      </button>
     </div>
-
-    <!-- 3. BUY NOW BUTTON (JUST BAGAL MEIN) -->
-    <a id="sticky-buy-btn" href="checkout.html" class="sticky-buy-btn">
-      🛒 Buy Now
-    </a>
-
-    <!-- 4. SHARE BUTTON (USKE BAAD) -->
-    <button class="sticky-share-btn" id="mobileShareButton" type="button" data-share-button="true" data-share-target="native" data-asset-type="book" data-asset-id="">
-      <i class="fa-solid fa-share-nodes"></i> Share
-    </button>
   </div>
 
   <!-- ==========================================================
@@ -912,6 +925,6 @@
   <script src="/session.js"></script>
   <script src="/js/book-marketing-card.js"></script>
   <script src="/js/share-engine-core.js?v=2.0"></script>
-  <script src="/js/universal-book-landing.js?v=20260917_v50"></script>
+  <script src="/js/universal-book-landing.js?v=20260918_v2"></script>
 </body>
 </html>

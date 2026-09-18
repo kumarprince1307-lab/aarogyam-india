@@ -174,6 +174,34 @@
     window.location.href = readerDemoUrl;
   };
 
+  let deferredUblPwaPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredUblPwaPrompt = e;
+  });
+
+  window.triggerPWAInstall = function() {
+    if (deferredUblPwaPrompt) {
+      deferredUblPwaPrompt.prompt();
+      deferredUblPwaPrompt.userChoice.then((choice) => {
+        if (choice && choice.outcome === 'accepted') {
+          try { localStorage.setItem('AI_PWA_INSTALLED', 'true'); } catch(e) {}
+        }
+        deferredUblPwaPrompt = null;
+      });
+    } else if (typeof window.triggerPwaInstall === 'function' && window.triggerPwaInstall !== window.triggerPWAInstall) {
+      window.triggerPwaInstall();
+    } else {
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIos) {
+        alert('📲 Aarogyam App को iPhone/iPad पर जोड़ने के लिए नीचे Share बटन (⎋) दबाएँ और "Add to Home Screen" चुनें।');
+      } else {
+        alert('📱 Aarogyam App को इंस्टॉल करने के लिए ब्राउज़र के 3 डॉट्स (⋮) पर क्लिक करें और "Install app" या "Add to Home screen" चुनें।');
+      }
+    }
+  };
+  window.triggerPwaInstall = window.triggerPWAInstall;
+
   window.toggleMenu = function() {
     const menu = document.getElementById('sideMenu');
     const overlay = document.getElementById('sideMenuOverlay');
@@ -421,28 +449,31 @@
     const isEbooksSubdir = window.location.pathname.includes('/ebooks/');
     const primaryPath = isEbooksSubdir ? `../${cleanUrl}` : `/${cleanUrl}`;
     const fallbackPath = isEbooksSubdir ? `/${cleanUrl}` : `../${cleanUrl}`;
-    const cacheKey = 'AIM_UBL_CACHE_' + cleanUrl.replace(/[^a-zA-Z0-9]/g, '_');
+    const cacheKey = 'AIM_UBL_CACHE_V3_' + cleanUrl.replace(/[^a-zA-Z0-9]/g, '_');
 
     // 1. Instant Cache: If present in sessionStorage, return immediately (0ms paint!)
     let cachedData = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceFresh = urlParams.has('nocache') || urlParams.has('reload');
     try {
-      const stored = sessionStorage.getItem(cacheKey);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed && parsed.data) {
-          cachedData = parsed.data;
-          // If cached less than 5 minutes ago, return right away
-          if (Date.now() - (parsed.time || 0) < 300000) {
-            return cachedData;
+      if (!forceFresh) {
+        const stored = sessionStorage.getItem(cacheKey);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.data) {
+            cachedData = parsed.data;
+            if (Date.now() - (parsed.time || 0) < 60000) {
+              return cachedData;
+            }
           }
         }
       }
     } catch (e) {}
 
-    // 2. Fetch fresh with 5-minute version tag instead of millisecond bypass
-    const versionTag = Math.floor(Date.now() / 300000);
+    // 2. Fetch fresh with timestamp version tag
+    const versionTag = Date.now();
     const candidates = [
-      `${primaryPath}?v=${versionTag}`,
+      `${primaryPath}?t=${versionTag}`,
       `${fallbackPath}?v=${versionTag}`
     ];
 
@@ -992,11 +1023,20 @@
 
       const stickyHelp = document.getElementById('sticky-help-btn');
       if (stickyHelp) {
-        stickyHelp.href = 'javascript:void(0)';
-        stickyHelp.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(); };
-        stickyHelp.innerHTML = `📖 Demo पढ़ें`;
-        stickyHelp.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
-        stickyHelp.style.color = '#ffffff';
+        if (!stickyHelp.classList.contains('floating-wa-help-btn')) {
+          stickyHelp.href = 'javascript:void(0)';
+          stickyHelp.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(); };
+          stickyHelp.innerHTML = `📖 Demo पढ़ें`;
+          stickyHelp.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
+          stickyHelp.style.color = '#ffffff';
+        } else {
+          stickyHelp.href = `https://wa.me/917974422572?text=${encodeURIComponent('Hello Aarogyam India Team, mujhe ' + title + ' demo book ke bare me jankari chahiye')}`;
+        }
+      }
+
+      const floatingDemoBtn = document.getElementById('floating-free-demo-btn');
+      if (floatingDemoBtn) {
+        floatingDemoBtn.style.display = 'none';
       }
 
       setElemText('hero-offer-badge', 'FREE DEMO');
