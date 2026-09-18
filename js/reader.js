@@ -215,7 +215,29 @@ async function verifyUserAccessAndSession(targetBookId) {
             demoBar.id = 'demoReaderStickyBar';
             demoBar.style.cssText = "background:linear-gradient(135deg, #0f172a, #1e293b);border-bottom:2px solid #f59e0b;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,0.5);flex-wrap:wrap;gap:8px;";
             
-            const videos = Array.isArray(aoiCurrentBookData.videos) ? aoiCurrentBookData.videos : [];
+            // Robust extraction of video demo links (supports videos array, video object, or parent book)
+            const extractVList = (src) => {
+                if (!src) return [];
+                if (Array.isArray(src.videos) && src.videos.length > 0) return src.videos;
+                if (src.video) {
+                    if (Array.isArray(src.video)) return src.video;
+                    if (typeof src.video === 'string' && src.video.trim()) return [{ title: '🎥 वीडियो डेमो', url: src.video.trim() }];
+                    if (typeof src.video === 'object') {
+                        const u = src.video.youtube_url || src.video.url || src.video.link;
+                        if (u) return [{ title: src.video.title || '🎥 वीडियो डेमो', url: u }];
+                    }
+                }
+                if (src.youtube_url || src.video_url) {
+                    return [{ title: '🎥 वीडियो डेमो', url: src.youtube_url || src.video_url }];
+                }
+                return [];
+            };
+
+            let videos = extractVList(aoiCurrentBookData);
+            if (videos.length === 0) {
+                const parentBook = jsonBooks.find(b => b && b.id && b.id.toUpperCase() === String(targetMain).toUpperCase());
+                if (parentBook) videos = extractVList(parentBook);
+            }
             const hasVideos = videos.length > 0;
 
             demoBar.innerHTML = `
