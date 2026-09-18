@@ -12,15 +12,20 @@
   // 1. GET USER REFERRAL / SHARE ID
   // -------------------------------------------------------------
   window.getUserShareId = function () {
+    if (window.V1_SESSION && typeof window.V1_SESSION.getUnifiedShareId === 'function') {
+      return window.V1_SESSION.getUnifiedShareId();
+    }
     let savedUser = {};
     try {
-      savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('aarogyam_user') || localStorage.getItem('CURRENT_USER') || '{}');
+      savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
     } catch (e) {}
-    let savedProfile = {};
-    try {
-      savedProfile = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
-    } catch (e) {}
-    return savedUser.share_id || savedProfile.share_id || savedUser.referral_code || 'AI000004';
+    if (savedUser.share_id && /^AI\d{4,8}$/i.test(savedUser.share_id)) return savedUser.share_id;
+    if (savedUser.referral_code && /^AI\d{4,8}$/i.test(savedUser.referral_code)) return savedUser.referral_code;
+    const cleanMob = (savedUser.mobile || localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+    if (cleanMob.length === 10) {
+      return 'AI' + cleanMob.slice(-6);
+    }
+    return 'AI000004';
   };
 
   // -------------------------------------------------------------
@@ -332,11 +337,59 @@
     }
   };
 
+  function updateHeaderUserBadge() {
+    try {
+      const headerActions = document.querySelector('.header-actions');
+      if (!headerActions) return;
+
+      const isLogged = (window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function')
+        ? window.V1_SESSION.isLoggedIn()
+        : (typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : false);
+
+      let existingBadge = document.getElementById('header-unified-user-badge');
+      if (!existingBadge) {
+        existingBadge = document.createElement('div');
+        existingBadge.id = 'header-unified-user-badge';
+        existingBadge.style.cssText = 'display:inline-flex;align-items:center;margin:0 2px;';
+        const menuBtn = headerActions.querySelector('.menu-button');
+        if (menuBtn) {
+          headerActions.insertBefore(existingBadge, menuBtn);
+        } else {
+          headerActions.appendChild(existingBadge);
+        }
+      }
+
+      if (isLogged) {
+        let savedUser = {};
+        try {
+          savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
+        } catch (e) {}
+        const name = (savedUser && (savedUser.full_name || savedUser.name)) || localStorage.getItem('aim_user_name') || 'सदस्य';
+        const isVip = Boolean(savedUser.isVip);
+        existingBadge.innerHTML = `
+          <a href="/ucas/index.html" class="header-user-status-pill" title="मेरी प्रोफाइल (My Profile)" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fde047;padding:5px 11px;border-radius:20px;text-decoration:none;font-weight:800;font-size:0.75rem;display:inline-flex;align-items:center;gap:5px;box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:all 0.2s;">
+            <span style="font-size:0.88rem;">${isVip ? '👑' : '👨‍🌾'}</span>
+            <span style="max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#ffffff;">${name}</span>
+          </a>
+        `;
+      } else {
+        existingBadge.innerHTML = `
+          <button type="button" onclick="window.openUniversalLoginHandler()" class="header-login-quick-btn" title="लॉगिन करें" style="background:#fde047;color:#0f172a;border:none;padding:5px 12px;border-radius:20px;font-weight:900;font-size:0.75rem;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,0.18);">
+            <span>🔑</span> <span>लॉगिन</span>
+          </button>
+        `;
+      }
+    } catch(e) {
+      console.warn("Header user badge notice:", e);
+    }
+  }
+
   window.updateUniversalDrawerProfile = function() {
     const headerEl = document.querySelector('#universal-drawer-card .drawer-profile-header');
     if (headerEl) {
       headerEl.innerHTML = generateDrawerProfileHeaderHtml();
     }
+    updateHeaderUserBadge();
   };
 
   window.addEventListener('ai:user-logged-in', () => {
@@ -344,6 +397,7 @@
   });
 
   function injectUniversalSideDrawer() {
+    updateHeaderUserBadge();
     if (document.getElementById('universal-side-drawer-wrap')) {
       window.updateUniversalDrawerProfile();
       return;
@@ -758,6 +812,10 @@
   });
 
   window.logoutUniversalUser = function () {
+    if (window.V1_SESSION && typeof window.V1_SESSION.logout === 'function') {
+      window.V1_SESSION.logout();
+      return;
+    }
     localStorage.removeItem('AI_USER');
     localStorage.removeItem('AI_PROFILE');
     localStorage.removeItem('AI_SESSION');
@@ -769,6 +827,10 @@
     localStorage.removeItem('UCAS_USER');
     localStorage.removeItem('aim_user_name');
     localStorage.removeItem('aim_user_mobile');
+    localStorage.removeItem('aarogyam_user_registered');
+    localStorage.removeItem('aarogyam_user_phone');
+    localStorage.removeItem('aarogyam_user_name');
+    localStorage.removeItem('aoi_user_session');
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_phone');
     localStorage.removeItem('aarogyam_user');

@@ -116,16 +116,28 @@
 
     /**
      * Retrieves the current user object from localStorage.
-     * It checks for 'AI_USER' first, with a fallback to 'AI_PROFILE'.
+     * Checks 'AI_USER' first, then 'AI_PROFILE', 'UCAS_USER', with fallback for verified mobile.
      * @returns {object|null} The parsed user object or null if not found.
      */
     function getCurrentUser() {
         try {
-            const userString = localStorage.getItem(USER_KEY) || localStorage.getItem(PROFILE_KEY);
-            if (!userString) {
-                return null;
+            const userString = localStorage.getItem(USER_KEY) || localStorage.getItem(PROFILE_KEY) || localStorage.getItem('UCAS_USER');
+            if (userString) {
+                const parsed = JSON.parse(userString);
+                if (parsed && (parsed.id || parsed.mobile)) {
+                    return parsed;
+                }
             }
-            return JSON.parse(userString);
+            const directMobile = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+            if (directMobile && directMobile.length === 10) {
+                return {
+                    id: 'UID_' + directMobile,
+                    mobile: directMobile,
+                    full_name: localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || 'Valued Member',
+                    share_id: 'AI' + directMobile.slice(-6)
+                };
+            }
+            return null;
         } catch (e) {
             console.error("Error parsing user data from localStorage", e);
             return null;
@@ -134,12 +146,101 @@
 
     /**
      * Checks if a user is currently logged in.
-     * A user is considered logged in if a user object with an 'id' exists.
+     * Returns true if user has valid id/mobile or verified 10-digit mobile exists.
      * @returns {boolean} True if the user is logged in, false otherwise.
      */
     function isLoggedIn() {
         const user = getCurrentUser();
-        return !!(user && user.id);
+        if (user && (user.id || user.mobile)) return true;
+        const aimMobile = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+        return aimMobile.length === 10;
+    }
+
+    /**
+     * Gets the unified, deterministic Share ID for the current user.
+     * For logged-in users, returns their unique share_id (e.g. AI294111 / AI000004).
+     * For guests, returns 'AI000004'.
+     * @returns {string} The verified share ID.
+     */
+    function getUnifiedShareId() {
+        const user = getCurrentUser();
+        if (user) {
+            if (user.share_id && /^AI\d{4,8}$/i.test(user.share_id)) return user.share_id;
+            if (user.referral_code && /^AI\d{4,8}$/i.test(user.referral_code)) return user.referral_code;
+            const cleanMob = (user.mobile || '').replace(/\D/g, '').slice(-10);
+            if (cleanMob.length === 10) {
+                const derivedId = 'AI' + cleanMob.slice(-6);
+                try {
+                    user.share_id = derivedId;
+                    localStorage.setItem(USER_KEY, JSON.stringify(user));
+                } catch(e) {}
+                return derivedId;
+            }
+        }
+        return 'AI000004';
+    }
+
+    /**
+     * Automated session healing & cross-key reconciliation.
+     * Eliminates split states (e.g. test lead 7852456686 / Rajesh overriding authenticated 7049294111).
+     */
+    function syncAndHealSession() {
+        try {
+            const user = getCurrentUser();
+            const authMobile = user && user.mobile ? String(user.mobile).replace(/\D/g, '').slice(-10) : '';
+            const aimMobile = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+            const masterMobile = authMobile || (aimMobile.length === 10 ? aimMobile : '');
+
+            if (masterMobile && masterMobile.length === 10) {
+                // 1. Ensure master user registration flag
+                localStorage.setItem('aarogyam_user_registered', 'true');
+                localStorage.setItem('aim_user_mobile', masterMobile);
+
+                // 2. Heal guest phone split (remedies test 7852456686 vs true 7049294111)
+                const guestPhone = (localStorage.getItem('aarogyam_user_phone') || '').replace(/\D/g, '').slice(-10);
+                if (guestPhone !== masterMobile) {
+                    console.log(`[V1_SESSION] Reconciling session: Set aarogyam_user_phone to authenticated mobile ${masterMobile} (was: ${guestPhone || 'none'})`);
+                    localStorage.setItem('aarogyam_user_phone', masterMobile);
+                }
+
+                // 3. Heal guest name split (remedies test Rajesh vs true user name)
+                const currentLeadName = localStorage.getItem('aarogyam_user_name') || '';
+                const masterName = (user && (user.full_name || user.name)) || localStorage.getItem('aim_user_name') || '';
+                if (currentLeadName === 'Rajesh' && masterMobile === '7049294111' && (!masterName || masterName === 'Rajesh')) {
+                    // Specific cleanup requested for test Rajesh lead on 7049294111
+                    const cleanName = (user && user.full_name && user.full_name !== 'Rajesh') ? user.full_name : 'आरोग्यम सदस्य';
+                    localStorage.setItem('aarogyam_user_name', cleanName);
+                    localStorage.setItem('user_name', cleanName);
+                    localStorage.setItem('aim_user_name', cleanName);
+                } else if (masterName && masterName.trim()) {
+                    localStorage.setItem('aarogyam_user_name', masterName);
+                    localStorage.setItem('user_name', masterName);
+                    localStorage.setItem('aim_user_name', masterName);
+                }
+
+                // 4. Reconcile aoi_user_session
+                try {
+                    const aoiStr = localStorage.getItem('aoi_user_session');
+                    if (aoiStr) {
+                        const aoi = JSON.parse(aoiStr);
+                        if (aoi.phone !== masterMobile || aoi.mobile !== masterMobile) {
+                            aoi.phone = masterMobile;
+                            aoi.mobile = masterMobile;
+                            if (masterName) aoi.name = masterName;
+                            localStorage.setItem('aoi_user_session', JSON.stringify(aoi));
+                        }
+                    }
+                } catch(err) {}
+
+                // 5. Ensure unified share_id
+                if (user && !user.share_id) {
+                    user.share_id = 'AI' + masterMobile.slice(-6);
+                    try { localStorage.setItem(USER_KEY, JSON.stringify(user)); } catch(e) {}
+                }
+            }
+        } catch (e) {
+            console.warn("[V1_SESSION] Session reconciliation notice:", e);
+        }
     }
 
     /**
@@ -157,7 +258,7 @@
      */
     function getMobile() {
         const user = getCurrentUser();
-        return user ? user.mobile : null;
+        return user ? user.mobile : (localStorage.getItem('aim_user_mobile') || null);
     }
 
     /**
@@ -176,12 +277,18 @@
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem(PROFILE_KEY);
         localStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem('UCAS_USER');
         localStorage.removeItem('AI_PURCHASES');
         localStorage.removeItem('purchases');
         localStorage.removeItem('aim_user_name');
         localStorage.removeItem('aim_user_mobile');
         localStorage.removeItem('aim_profile_completed');
         localStorage.removeItem('ai_profile_completed');
+        localStorage.removeItem('aarogyam_user_registered');
+        localStorage.removeItem('aarogyam_user_phone');
+        localStorage.removeItem('aarogyam_user_name');
+        localStorage.removeItem('aoi_user_session');
+        localStorage.removeItem('user_name');
         try { sessionStorage.clear(); } catch(e) {}
         
         console.log("User session cleared. Reloading...");
@@ -212,16 +319,25 @@
         requireLogin,
         getReferralId,
         getSession,
-        saveSession
+        saveSession,
+        getUnifiedShareId,
+        getUserShareId: getUnifiedShareId,
+        syncAndHealSession
     };
 
-    // Also support AISession for cross-compatibility
+    // Cross-compatibility aliases
     window.AISession = window.V1_SESSION;
+    window.isUserLoggedIn = isLoggedIn;
+    window.getUnifiedUser = getCurrentUser;
+    window.getUserShareId = getUnifiedShareId;
+    window.getUnifiedShareId = getUnifiedShareId;
+    window.logoutUniversalUser = logout;
 
-    // Run referral capture on load / refresh / login transition
+    // Run referral capture and automated session reconciliation
     captureReferral();
+    syncAndHealSession();
 
-    console.log("✅ V1 Common Session Module Loaded.");
+    console.log("✅ V1 Common Session Module Loaded & Unified.");
 
     // रीफ्रेश होने पर भी कंसोल में पूरी जानकारी दिखाने के लिए
     const activeSession = getSession();

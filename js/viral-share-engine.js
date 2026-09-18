@@ -23,26 +23,41 @@
   // Get current user's phone or ID to act as referrer
   function getCurrentUserRefId() {
     let ref = '';
-    if (typeof window.getUserShareId === 'function') {
-      try { ref = window.getUserShareId() || ''; } catch (e) {}
+    // 1. Authenticated user in session or localStorage (Top Priority)
+    try {
+      const u = (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function')
+        ? window.V1_SESSION.getCurrentUser()
+        : JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      if (u && (u.share_id || u.referral_code || u.mobile)) {
+        ref = u.share_id || u.referral_code || u.mobile || '';
+      }
+    } catch (e) {}
+
+    // 2. Global unified helper
+    if (!ref && typeof window.getUnifiedShareId === 'function') {
+      try {
+        const s = window.getUnifiedShareId();
+        if (s && s !== 'AI000004') ref = s;
+      } catch (e) {}
     }
+    if (!ref && typeof window.getUserShareId === 'function') {
+      try {
+        const s = window.getUserShareId();
+        if (s && s !== 'AI000004') ref = s;
+      } catch (e) {}
+    }
+
+    // 3. Authenticated mobile
+    if (!ref) {
+      const mob = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+      if (mob.length === 10) ref = mob;
+    }
+
+    // 4. Guest lead phone (only if no authenticated user)
     if (!ref) {
       try { ref = localStorage.getItem('aarogyam_user_phone') || ''; } catch (e) {}
     }
-    if (!ref) {
-      try {
-        const u = window.AI_USER || JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        ref = u.share_id || u.mobile || '';
-      } catch (e) {}
-    }
-    if (!ref) {
-      try {
-        const session = JSON.parse(localStorage.getItem('aoi_user_session') || localStorage.getItem('admin_session') || '{}');
-        if (session && (session.phone || session.mobile || session.id)) {
-          ref = session.phone || session.mobile || session.id;
-        }
-      } catch (e) {}
-    }
+
     if (!ref) {
       ref = getReferrerId();
     }
@@ -213,11 +228,18 @@
 
     // Check if user is already logged in
     const checkLoggedIn = () => {
+      if (window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') {
+        return window.V1_SESSION.isLoggedIn();
+      }
       if (typeof window.isUserLoggedIn === 'function') {
         return window.isUserLoggedIn();
       }
       try {
-        const s = JSON.parse(localStorage.getItem('aoi_user_session') || localStorage.getItem('AI_USER') || '{}');
+        const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
+        if (u && (u.mobile || u.id)) return true;
+        const aim = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+        if (aim.length === 10) return true;
+        const s = JSON.parse(localStorage.getItem('aoi_user_session') || '{}');
         return !!(s.phone || s.mobile);
       } catch (e) {
         return false;

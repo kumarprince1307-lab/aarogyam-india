@@ -99,10 +99,23 @@
 
   // 3. User Name Detection
   function getUserDisplayName() {
-    let name = localStorage.getItem('aarogyam_user_name') || 
-               localStorage.getItem('user_name') || 
-               localStorage.getItem('farmer_name');
-    if (!name || name.trim() === '' || name.toLowerCase() === 'null') {
+    let name = '';
+    try {
+      const u = (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function')
+        ? window.V1_SESSION.getCurrentUser()
+        : JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      if (u && (u.full_name || u.name)) name = u.full_name || u.name;
+    } catch (e) {}
+
+    if (!name || name === 'Rajesh') {
+      const storedName = localStorage.getItem('aim_user_name') || 
+                         localStorage.getItem('aarogyam_user_name') || 
+                         localStorage.getItem('user_name') || 
+                         localStorage.getItem('farmer_name');
+      if (storedName && storedName !== 'Rajesh') name = storedName;
+    }
+
+    if (!name || name.trim() === '' || name.toLowerCase() === 'null' || name === 'Rajesh') {
       // Friendly cultural defaults based on context
       if (currentPath.includes('pashu') || currentPath.includes('agri')) {
         return 'किसान भाई';
@@ -354,6 +367,12 @@
 
   function isUserRegistered() {
     try {
+      if (window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function' && window.V1_SESSION.isLoggedIn()) return true;
+      if (typeof window.isUserLoggedIn === 'function' && window.isUserLoggedIn()) return true;
+      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
+      if (u && (u.mobile || u.id)) return true;
+      const directMob = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+      if (directMob.length === 10) return true;
       if (localStorage.getItem('aarogyam_user_registered') === 'true') return true;
       const ph = (localStorage.getItem('aarogyam_user_phone') || '').replace(/\D/g, '');
       if (ph.length === 10) return true;
@@ -521,17 +540,39 @@
   // Helper to resolve best referral / share ID
   function getBestReferralCode() {
     let ref = '';
-    if (typeof window.getUserShareId === 'function') {
-      try { ref = window.getUserShareId() || ''; } catch (e) {}
+    // 1. Authenticated master user
+    try {
+      const u = (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function')
+        ? window.V1_SESSION.getCurrentUser()
+        : JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      if (u && (u.share_id || u.referral_code || u.mobile)) {
+        ref = u.share_id || u.referral_code || u.mobile || '';
+      }
+    } catch (e) {}
+
+    // 2. Global unified share ID
+    if (!ref && typeof window.getUnifiedShareId === 'function') {
+      try {
+        const s = window.getUnifiedShareId();
+        if (s && s !== 'AI000004') ref = s;
+      } catch (e) {}
     }
+    if (!ref && typeof window.getUserShareId === 'function') {
+      try {
+        const s = window.getUserShareId();
+        if (s && s !== 'AI000004') ref = s;
+      } catch (e) {}
+    }
+
+    // 3. Authenticated mobile
+    if (!ref) {
+      const mob = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+      if (mob.length === 10) ref = mob;
+    }
+
+    // 4. Guest lead phone (only if no authenticated user)
     if (!ref) {
       try { ref = localStorage.getItem('aarogyam_user_phone') || ''; } catch (e) {}
-    }
-    if (!ref) {
-      try {
-        const u = window.AI_USER || JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        ref = u.share_id || u.mobile || '';
-      } catch (e) {}
     }
     if (!ref) {
       try {
@@ -540,9 +581,6 @@
           ref = session.phone || session.mobile || session.id;
         }
       } catch (e) {}
-    }
-    if (!ref) {
-      try { ref = sessionStorage.getItem('AOI_REFERRER_ID') || ''; } catch (e) {}
     }
     return ref || 'AI000004';
   }
