@@ -634,23 +634,29 @@
 
       <!-- Sticky Floating Actions Container on Page (Fixed Right Corner) -->
       <div class="sticky-float-widget-container" id="universal-sticky-float-widget">
-        <!-- 1. Red Sticky Install App Button (Smart PWA Detection) -->
+        <!-- 1. Red Sticky Install App Button -->
         <button type="button" onclick="window.triggerPwaInstall()" class="sticky-float-pill sticky-float-install-pill" id="universal-sticky-pwa-install-btn" title="Install Aarogyam App">
           <i class="fa-solid fa-mobile-screen-button"></i>
           <span class="pill-label">Install App</span>
         </button>
 
-        <!-- 2. Green WhatsApp AI Expert Consultation -->
-        <a href="javascript:void(0)" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('Instant AI Consultation');" class="sticky-float-pill" title="Consult AI Expert">
+        <!-- 2. Purple Audio Greeting Button -->
+        <button type="button" onclick="if(window.togglePageAudioGreeting){window.togglePageAudioGreeting();}else if(window.playPageAudioGreeting){window.playPageAudioGreeting();}" class="sticky-float-pill sticky-float-audio-pill" id="universal-sticky-audio-btn" title="पेज का ऑडियो परिचय सुनें">
+          <i class="fa-solid fa-volume-high"></i>
+          <span class="pill-label">Audio</span>
+        </button>
+
+        <!-- 3. Blue Share Referral Button -->
+        <button type="button" onclick="if(window.triggerUniversalPageShare){window.triggerUniversalPageShare();}else if(window.triggerUniversalShare){window.triggerUniversalShare();}else{window.triggerViralPageShare();}" class="sticky-float-pill sticky-float-share-pill" id="universal-sticky-share-btn" title="Share Aarogyam India">
+          <i class="fa-solid fa-share-nodes"></i>
+          <span class="pill-label">Share</span>
+        </button>
+
+        <!-- 4. Green AI Expert Consultation Button -->
+        <a href="javascript:void(0)" onclick="if(window.consultAiExpert){window.consultAiExpert('AI एक्सपर्ट परामर्श');}else{window.location.href=window.getPersonalizedWhatsAppUrl('AI एक्सपर्ट परामर्श');}" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="24x7 AI Expert Support">
           <i class="fa-brands fa-whatsapp"></i>
           <span class="pill-label">AI Expert</span>
         </a>
-
-        <!-- 3. Blue Universal Referral Share -->
-        <button type="button" onclick="window.triggerUniversalPageShare()" class="sticky-float-pill sticky-float-share-pill" title="Share Referral Link">
-          <i class="fa-solid fa-share-nodes" style="color:#fde047;"></i>
-          <span class="pill-label">Share Link</span>
-        </button>
       </div>
 
       <!-- Universal Sticky Mobile Bottom 8-Tab Navigation Bar (Mobile & Tablet) -->

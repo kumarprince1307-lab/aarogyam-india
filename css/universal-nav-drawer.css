@@ -352,18 +352,39 @@
   box-shadow: 0 12px 28px rgba(29, 78, 216, 0.6) !important;
 }
 
-/* Mobile Screen Floating Stack (Lifted higher to eliminate bottom overlap) */
+/* Purple Audio Greeting Button */
+.sticky-float-audio-pill {
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.45) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+}
+
+.sticky-float-audio-pill:hover {
+  transform: translate3d(0, -3px, 0) scale(1.04);
+  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.6) !important;
+}
+
+.sticky-float-audio-pill.playing {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  animation: pulse-audio 1.5s infinite !important;
+}
+
+/* Mobile Screen Floating Stack */
 @media (max-width: 768px) {
   .sticky-float-widget-container {
-    right: 12px;
-    bottom: 74px !important; /* Safely floating above the 60px bottom sticky nav */
-    gap: 8px;
+    right: 10px;
+    bottom: 74px !important;
+    gap: 7px;
+    pointer-events: auto;
+    z-index: 9985 !important;
   }
+
   .sticky-float-pill {
-    padding: 8px 12px;
-    font-size: 0.78rem;
-    border-radius: 25px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    padding: 6px 11px;
+    font-size: 0.72rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
   }
 }
 

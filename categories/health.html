@@ -1,129 +1,518 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Health Books</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>सम्पूर्ण स्वास्थ्य एवं प्राकृतिक वेलनेस हब | Aarogyam India</title>
+  <meta name="description" content="मधुमेह, वजन नियंत्रण, जोड़ों का दर्द, महिला स्वास्थ्य, हेयर केयर, स्किन केयर, किड्स पोषण और होम केयर का 100% प्राकृतिक आयुर्वेदिक समाधान।">
+  
+  <!-- OpenGraph -->
+  <meta property="og:title" content="Aarogyam India हेल्थ केयर हब - प्राकृतिक व आयुर्वेदिक समाधान">
+  <meta property="og:description" content="भारत का सबसे विश्वसनीय प्राकृतिक स्वास्थ्य परामर्श व आयुर्वेदिक ज्ञान मंच।">
+  <meta property="og:image" content="/images/banners/health-banner.jpeg">
+
+  <!-- Favicon & PWA -->
+  <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#dc2626">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/user-notifications.css">
   <link rel="stylesheet" href="/css/universal-nav-drawer.css">
   <link rel="stylesheet" href="/css/home-revamp.css">
+  <link rel="stylesheet" href="/css/mobile-bottom-nav.css">
+
+  <style>
+    .health-hero {
+      background: linear-gradient(135deg, #450a0a 0%, #991b1b 50%, #dc2626 100%);
+      border-radius: 24px;
+      padding: 40px 32px;
+      color: #fff;
+      box-shadow: 0 20px 45px rgba(220, 38, 38, 0.25);
+      border: 1.5px solid #f87171;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .health-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+    }
+    .health-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 24px;
+      border: 1.5px solid #e2e8f0;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    .health-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+      border-color: #dc2626;
+    }
+    .health-icon-bubble {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+    }
+    .health-card-badge {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+  </style>
 </head>
-<body>
-  <!-- =========================================
-       1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
-  ========================================== -->
-  <div class="home-live-ticker-wrap">
+
+<body style="background:#ffffff; color:#0f172a;">
+
+  <!-- 1. LIVE SOCIAL PROOF TICKER -->
+  <div class="home-live-ticker-wrap" style="background:#450a0a;">
     <div class="container home-ticker-flex">
-      <div class="ticker-pulse-badge">
+      <div class="ticker-pulse-badge" style="background:#dc2626;">
         <span class="ticker-dot-pulse"></span>
-        <span>LIVE</span>
+        <span>❤️ HEALTH HUB LIVE</span>
       </div>
-      <div class="ticker-marquee-scroll">
-        ⚡ <span>किसान भाइयों का भरोसा!</span> &nbsp;•&nbsp; 📖 <span>आज 1,420+ ई-बुक्स डाउनलोड हुईं</span> &nbsp;•&nbsp; 🌾 <span>दैनिक मंडी भाव व मौसम अपडेट लाइव</span> &nbsp;•&nbsp; 👨‍🌾 <span>24×7 WhatsApp AI एक्सपर्ट परामर्श सक्रिय</span>
+      <div style="flex:1; overflow:hidden;">
+        <div class="ticker-marquee-scroll">
+          🌿 50,000+ परिवारों का भरोसा! • सभी 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान • 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- =========================================
-       2. ANIMATED INDIAN TIRANGA WAVING HEADER
-  ========================================== -->
-  <header class="header-tiranga-animated">
+  <!-- 2. TIRANGA WAVING HEADER -->
+  <header class="header-tiranga-animated" id="header">
     <div class="container header-container" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
-      
-      <!-- Brand Logo + Name + Active Page Badge -->
       <a href="/index.html" class="header-brand-wrap" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-        <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:40px;width:auto;" />
+        <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:40px;width:auto;" />
         <div style="display:flex;flex-direction:column;">
-          <span style="font-size:1.15rem;font-weight:900;color:#0f172a;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;line-height:1.1;">AAROGYAM <span style="color:#2563eb;">INDIA</span></span>
-          <span style="font-size:0.7rem;font-weight:700;color:#15803d;letter-spacing:0.5px;">डिजिटल क्रांति • समृद्ध किसान</span>
+          <span style="font-size:1.15rem;font-weight:900;color:#0f172a;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;line-height:1.1;">AAROGYAM <span style="color:#dc2626;">INDIA</span></span>
+          <span style="font-size:0.7rem;font-weight:700;color:#15803d;letter-spacing:0.5px;">प्राकृतिक स्वास्थ्य एवं वेलनेस</span>
         </div>
-        <span class="header-current-page-badge" style="background:#0f172a;color:#fde047;font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:12px;margin-left:6px;">❤️ स्वास्थ्य ई-बुक्स</span>
+        <span class="header-current-page-badge" style="background:#dc2626;color:#ffffff;font-size:0.72rem;font-weight:800;padding:3px 10px;border-radius:12px;margin-left:6px;">❤️ स्वास्थ्य केंद्र</span>
       </a>
 
-      <!-- Header Actions Right: Install App, Cart, 3-Line Menu -->
       <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
-        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
-          <span>📲</span> <span>Install App</span>
+        <button type="button" onclick="window.triggerViralPageShare({title:'Aarogyam India स्वास्थ्य केंद्र', text:'प्राकृतिक व आयुर्वेदिक स्वास्थ्य समाधान देखें:'})" class="btn" style="background:#dc2626; color:#fff; border:none; padding:6px 14px; border-radius:20px; font-weight:800; font-size:0.78rem; cursor:pointer;">
+          <span>📤</span> <span>शेयर</span>
         </button>
-
-        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
-          <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
-          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
-        </a>
-
-        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a; border:1.5px solid rgba(255,255,255,0.4); color:#ffffff; width:38px; height:38px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
           <i class="fa-solid fa-bars"></i>
         </button>
       </div>
-
     </div>
   </header>
-  <h1>Health Books</h1>
-  <p>This category page is available for compatibility.</p>
-  <p><a href="../ebooks/ebook.html">Back to eBooks</a></p>
-  <!-- =========================================
-       15. MODERN DARK FOOTER
-  ========================================== -->
-  <footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b; margin-top: 50px;">
+
+  <!-- 3. PANORAMIC BIGHAT-STYLE HEALTH CAROUSEL -->
+  <section style="padding: 24px 0 16px 0; background: #ffffff;">
+    <div class="container">
+      <div class="bighaat-carousel-container">
+        <!-- Navigation Arrows -->
+        <button type="button" class="bighaat-carousel-arrow prev" title="Previous Slide" aria-label="Previous Slide">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button type="button" class="bighaat-carousel-arrow next" title="Next Slide" aria-label="Next Slide">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Slide 1: Health & Wellness Grand Banner -->
+        <div class="home-hero-slide-item">
+          <a href="#sec-categories" class="landscape-hero-banner-link" title="आरोग्यम संपूर्ण स्वास्थ्य केंद्र">
+            <img src="/images/banners/health-banner.jpeg" alt="आरोग्यम संपूर्ण स्वास्थ्य केंद्र" class="landscape-hero-banner-img" />
+          </a>
+        </div>
+
+        <!-- Slide 2: Diabetes & Blood Sugar -->
+        <div class="home-hero-slide-item" style="display:none;">
+          <a href="/health/diabetes.html" class="landscape-hero-banner-link" title="मधुमेह व ब्लड शुगर संतुलन">
+            <img src="/images/banners/health-diabetes.jpg" alt="मधुमेह व ब्लड शुगर संतुलन" class="landscape-hero-banner-img" />
+          </a>
+        </div>
+
+        <!-- Slide 3: Joint Care & Arthritis -->
+        <div class="home-hero-slide-item" style="display:none;">
+          <a href="/health/joint-care.html" class="landscape-hero-banner-link" title="जोड़ों का दर्द व गठिया उपचार">
+            <img src="/images/banners/health-joint-care.jpg" alt="जोड़ों का दर्द व गठिया" class="landscape-hero-banner-img" />
+          </a>
+        </div>
+
+        <!-- Slide 4: Weight Loss & Fat Burn -->
+        <div class="home-hero-slide-item" style="display:none;">
+          <a href="/health/weight-loss.html" class="landscape-hero-banner-link" title="मोटापा व वजन घटाएं">
+            <img src="/images/banners/health-weight-loss.jpg" alt="मोटापा व प्राकृतिक फैट बर्न" class="landscape-hero-banner-img" />
+          </a>
+        </div>
+
+        <!-- Slide 5: Hair Fall & Scalp Nutrition -->
+        <div class="home-hero-slide-item" style="display:none;">
+          <a href="/health/hair-care.html" class="landscape-hero-banner-link" title="बाल झड़ना व डैंड्रफ समाधान">
+            <img src="/images/banners/health-hair-care.jpg" alt="बाल झड़ना व डैंड्रफ थेरेपी" class="landscape-hero-banner-img" />
+          </a>
+        </div>
+      </div>
+
+      <!-- Dots -->
+      <div class="bighaat-carousel-dots">
+        <span class="bighaat-carousel-dot active"></span>
+        <span class="bighaat-carousel-dot"></span>
+        <span class="bighaat-carousel-dot"></span>
+        <span class="bighaat-carousel-dot"></span>
+        <span class="bighaat-carousel-dot"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. MASTER 8 HEALTH CATEGORIES GRID -->
+  <section id="sec-categories" style="padding: 50px 0; background: #f8fafc;">
+    <div class="container">
+      <div style="text-align:center; margin-bottom:36px;">
+        <span class="home-section-tag" style="background:rgba(220,38,38,0.12); color:#dc2626; border-color:rgba(220,38,38,0.3);">
+          🩺 ALL HEALTH DOMAINS
+        </span>
+        <h2 style="font-size:2rem; font-weight:900; margin-top:8px; color:#0f172a;">
+          अपनी स्वास्थ्य समस्या का चयन करें
+        </h2>
+        <p style="color:#64748b; font-size:0.95rem;">प्रत्येक समस्या के लिए वैज्ञानिक जानकारी, लक्षण पहचान और सटीक प्राकृतिक समाधान</p>
+      </div>
+
+      <div class="health-grid">
+        
+        <!-- 1. Diabetes -->
+        <a href="/health/diabetes.html" class="health-card">
+          <span class="health-card-badge" style="background:#dbeafe; color:#1d4ed8;">🩸 ब्लड शुगर</span>
+          <div class="health-icon-bubble" style="background:#eff6ff; color:#2563eb;">🩺</div>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">मधुमेह (डायबिटीज)</h3>
+          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
+            फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।
+          </p>
+          <span style="color:#2563eb; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
+        </a>
+
+        <!-- 2. Weight Loss / Fat Loss -->
+        <a href="/health/weight-loss.html" class="health-card">
+          <span class="health-card-badge" style="background:#fef3c7; color:#b45309;">🔥 मेटाबॉलिज्म</span>
+          <div class="health-icon-bubble" style="background:#fffbeb; color:#d97706;">⚡</div>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">मोटापा व फैट लॉस</h3>
+          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
+            बिना कमजोरी या भूखे रहे जिद्दी पेट की चर्बी घटाएं और मेटाबॉलिज्म को तेज बनाएं।
+          </p>
+          <span style="color:#d97706; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
+        </a>
+
+        <!-- 3. Joint Care -->
+        <a href="/health/joint-care.html" class="health-card">
+          <span class="health-card-badge" style="background:#dcfce7; color:#15803d;">🦴 कार्टिलेज रिपेयर</span>
+          <div class="health-icon-bubble" style="background:#f0fdf4; color:#16a34a;">🌿</div>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">जोड़ों का दर्द व गठिया</h3>
+          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
+            घुटनों की ग्रीस (सायनोवियल फ्लूइड) बढ़ाएं, सूजन कम करें और बिना ऑपरेशन चलने की क्षमता पाएं।
+          </p>
+          <span style="color:#16a34a; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
+        </a>
+
+        <!-- 4. Women's Care -->
+        <a href="/health/womens-care.html" class="health-card">
+          <span class="health-card-badge" style="background:#fce7f3; color:#be185d;">🌸 हार्मोन संतुलन</span>
+          <div class="health-icon-bubble" style="background:#fdf2f8; color:#db2777;">💖</div>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">महिला स्वास्थ्य (हार्मोन)</h3>
+          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
+            PCOD/PCOS, अनियमित पीरियड्स, थायराइड और हीमोग्लोबिन सुधार के लिए शतावरी व लोध्र चिकित्सा।
+          </p>
+          <span style="color:#db2777; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
+        </a>
+
+        <!-- 5. Hair Care -->
+        <a href="/health/hair-care.html" class="health-card">
+          <span class="health-card-badge" style="background:#ccfbf1; color:#0f766e;">💇‍♀️ हेयर रीग्रोथ</span>
+          <div class="health-icon-bubble" style="background:#f0fdfa; color:#0d9488;">✨</div>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">हेयर केयर (बाल झड़ना व डैंड्रफ)</h3>
+          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
+            भृंगराज व आंवला के शुद्ध अर्क से बालों की जड़ों को मजबूत बनाएं और डैंड्रफ को जड़ से मिटाएं।
+          </p>
+          <span style="color:#0d9488; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
+        </a>
+
+        <!-- 6. Skin Care -->
+        <a href="/health/skin-care.html" class="health-card">
+          <span class="health-card-badge" style="background:#ffe4e6; color:#9f1239;">🌺 ब्लड प्यूरीफायर</span>
+          <div class="health-icon-bubble" style="background:#fff1f2; color:#e11d48;">🌸</div>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">स्किन केयर (मुँहासे व ग्लो)</h3>
+          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
+            रक्त शोधन (Blood Purifying) से पिंपल्स, झाइयां और एलर्जी खत्म कर प्राकृतिक ग्लो प्राप्त करें।
+          </p>
+          <span style="color:#e11d48; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
+        </a>
+
+        <!-- 7. Kids Care -->
+        <a href="/health/kids-care.html" class="health-card">
+          <span class="health-card-badge" style="background:#fef3c7; color:#92400e;">🧸 तेज दिमाग व इम्युनिटी</span>
+          <div class="health-icon-bubble" style="background:#fffbeb; color:#d97706;">🌟</div>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">किड्स केयर (बाल पोषण)</h3>
+          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
+            बच्चों की भूख में सुधार, मजबूत शारीरिक कद-काठी और ब्राह्मी-शंखपुष्पी से पढ़ाई में एकाग्रता।
+          </p>
+          <span style="color:#d97706; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
+        </a>
+
+        <!-- 8. Home Care -->
+        <a href="/health/home-care.html" class="health-card">
+          <span class="health-card-badge" style="background:#e0f2fe; color:#0369a1;">🏡 केमिकल-फ्री घर</span>
+          <div class="health-icon-bubble" style="background:#f0f9ff; color:#0284c7;">🍃</div>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">होम केयर (टॉक्सिन फ्री होम)</h3>
+          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
+            सब्जियों से कीटनाशक हटाने, बर्तनों व कपड़ों को हानिकारक केमिकल से सुरक्षित रखने की गाइड।
+          </p>
+          <span style="color:#0284c7; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. SYNDICATED VIDEO SHOWCASE -->
+  <section style="padding: 50px 0; background: #ffffff; border-top: 1.5px solid #e2e8f0;">
+    <div class="container">
+      <div style="text-align:center; margin-bottom:32px;">
+        <span style="background:rgba(239,68,68,0.1); color:#ef4444; padding:4px 14px; border-radius:20px; font-weight:800; font-size:0.8rem; text-transform:uppercase;">
+          🎬 Video Showcase
+        </span>
+        <h2 style="font-size:1.9rem; font-weight:900; margin-top:8px; color:#0f172a;">
+          आरोग्यम हेल्थ एजुकेशन वीडियो
+        </h2>
+        <p style="color:#64748b; font-size:0.92rem;">विशेषज्ञ डॉक्टरों और न्यूट्रिशनिस्ट्स द्वारा प्रमाणित स्वास्थ्य मार्गदर्शन</p>
+      </div>
+
+      <div class="universal-video-showcase" data-page-target="health-hub" data-video-category="health" data-max-videos="4">
+        <!-- Dynamically rendered by universal-video-loader.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 5.1 10 VERIFIED HEALTH REVIEWS -->
+  <section style="padding: 45px 0; background: #ffffff; border-top:1.5px solid #e2e8f0;">
+    <div class="container">
+      <div style="text-align:center; margin-bottom:28px;">
+        <span style="background:#fee2e2; color:#b91c1c; font-weight:900; font-size:0.75rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
+          ⭐ 100% संतुष्ट परिवार
+        </span>
+        <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">आरोग्यम स्वास्थ्य साधकों के 10 वास्तविक अनुभव</h2>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"डायबिटीज डाइट चार्ट और हर्बल सप्लीमेंट से 3 महीने में HbA1c 9.2 से घटकर 6.4 पर आ गया।"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- अशोक कुमार गुप्ता, इंदौर (म.प्र.)</div>
+        </div>
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"वेट लॉस प्रोग्राम से बिना कमजोरी के 2 महीने में 8 किलो वजन कम हुआ और पेट का फैट बिल्कुल गायब!"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- नेहा श्रीवास्तव, लखनऊ (उ.प्र.)</div>
+        </div>
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"घुटनों के दर्द के कारण सीढ़ियां चढ़ना मुश्किल था। 45 दिन के ज्वाइंट केयर कोर्स से दर्द 80% कम हुआ।"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- भगवती प्रसाद, जयपुर (राजस्थान)</div>
+        </div>
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"बालों का झड़ना 15 दिन में बंद हुआ और सिर पर नए बेबी हेयर निकलने लगे हैं। अद्भुत परिणाम!"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- रोहन मेहरा, दिल्ली</div>
+        </div>
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"PCOD और अनियमित पीरियड्स की समस्या प्राकृतिक आयुर्वेदिक किट और डाइट से पूरी तरह ठीक हो गई।"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- पूजा देशमुख, नागपुर (महाराष्ट्र)</div>
+        </div>
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"चेहरे के पुराने पिंपल्स व झाइयां साफ हो गईं। प्राकृतिक ग्लो देखकर सब पूछते हैं क्या लगाया!"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- सिमरन कौर, चंडीगढ़</div>
+        </div>
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"बच्चों के न्यूट्रिशन पाउडर से बेटे की भूख और इम्युनिटी दोनों में जबरदस्त सुधार हुआ।"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- कविता जैन, भोपाल (म.प्र.)</div>
+        </div>
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"WhatsApp AI डॉक्टर से तुरंत डाइट चार्ट और रिपोर्ट विश्लेषण मिला, बहुत ही तेज व सटीक सेवा।"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- राजेश त्रिवेदी, पटना (बिहार)</div>
+        </div>
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"टॉक्सिन-मुक्त होम केयर से घर में केमिकल की दुर्गंध खत्म हुई और बच्चों की स्किन एलर्जी बंद हो गई।"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- आनंद राव, हैदराबाद</div>
+        </div>
+        <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;">
+          <div style="color:#eab308; font-size:0.9rem; margin-bottom:6px;">★★★★★</div>
+          <p style="font-size:0.84rem; color:#334155; line-height:1.45; margin:0 0 8px 0;">"व्हाट्सएप ऑर्डर सिस्टम बहुत सरल है। हेल्पलाइन और अपलाइन दोनों को एक साथ संदेश चला जाता है।"</p>
+          <div style="font-size:0.78rem; font-weight:800; color:#dc2626;">- सुनील सिंह, रीवा (म.प्र.)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5.2 10 HEALTH FAQS -->
+  <section style="padding: 45px 0; background: #f8fafc;">
+    <div class="container" style="max-width:850px;">
+      <div style="text-align:center; margin-bottom:28px;">
+        <span style="background:#fee2e2; color:#b91c1c; font-weight:900; font-size:0.75rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
+          ❓ Frequently Asked Questions
+        </span>
+        <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">स्वास्थ्य संबंधी 10 सामान्य प्रश्न</h2>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;" open>
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">1. क्या आरोग्यम के स्वास्थ्य समाधान 100% प्राकृतिक हैं?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">हाँ! हमारे सभी फॉर्मूलेशन 100% शुद्ध जड़ी-बूटियों, प्राकृतिक अर्क और वैज्ञानिक आहार प्रोटोकॉल पर आधारित हैं। इनमें कोई हानिकारक केमिकल या स्टेरॉयड नहीं होता।</p>
+        </details>
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;">
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">2. क्या एलोपैथी दवाओं के साथ आयुर्वेदिक सप्लीमेंट लिए जा सकते हैं?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">हाँ, सामान्यतः दोनों के बीच 1 घंटे का अंतराल रखकर सुरक्षित रूप से लिया जा सकता है। जैसे-जैसे शरीर स्वस्थ होता है, डॉक्टर की सलाह से एलोपैथिक खुराक कम की जा सकती है।</p>
+        </details>
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;">
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">3. डाइट चार्ट कैसे प्राप्त करें?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">किसी भी रोग पेज (जैसे वेट लॉस या डायबिटीज) पर जाकर 'डाइट चार्ट लें' बटन दबाएं या सीधे 7974422572 पर व्हाट्सएप करें।</p>
+        </details>
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;">
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">4. क्या वजन कम होने के बाद दोबारा बढ़ जाता है?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">नहीं! हमारा समाधान क्रैश डाइटिंग नहीं बल्कि आपके मेटाबॉलिज्म और पाचन अग्नि को स्थायी रूप से एक्टिव करता है।</p>
+        </details>
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;">
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">5. जोड़ों के दर्द में कितने दिनों में आराम मिलता है?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">सूजन और जकड़न में 7 से 10 दिनों में राहत मिलनी शुरू हो जाती है। कार्टिलेज को पोषण देने के लिए 60 से 90 दिनों का नियमित कोर्स अनुशंसित है।</p>
+        </details>
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;">
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">6. क्या WhatsApp AI डॉक्टर परामर्श शुल्क है?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">पूरी तरह निःशुल्क! आप 24×7 किसी भी समय अपनी रिपोर्ट या लक्षण साझा कर सकते हैं।</p>
+        </details>
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;">
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">7. उत्पाद ऑर्डर करने की प्रक्रिया क्या है?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">संबंधित रोग पेज पर जाकर आवश्यक उत्पाद चुनें और सीधे व्हाट्सएप पर ऑर्डर भेजें। हमारी टीम आपसे संपर्क कर डिलीवरी व पेमेंट विधि तय करेगी।</p>
+        </details>
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;">
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">8. क्या PCOD में यह सुरक्षित है?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">बिल्कुल! शतावरी, अशोकारिष्ट और प्राकृतिक हार्मोनल बैलेंसिंग किट महिलाओं के लिए 100% सुरक्षित और दुष्प्रभाव रहित है।</p>
+        </details>
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;">
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">9. डिलीवरी में कितना समय लगता है?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">ऑर्डर पुष्टि के 3 से 5 कार्य दिवसों के भीतर सुरक्षित रूप से आपके घर पर डिलीवर कर दिया जाता है।</p>
+        </details>
+        <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;">
+          <summary style="font-weight:800; color:#0f172a; cursor:pointer;">10. क्या मैं यह जानकारी किसी मित्र को शेयर कर सकता हूँ?</summary>
+          <p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">हाँ! फ्लोटिंग शेयर बटन पर क्लिक करके किसी भी व्हाट्सएप ग्रुप या फेसबुक पर साझा कर सकते हैं।</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 24x7 AI EXPERT CONSULTATION BANNER -->
+  <section style="padding: 50px 0; background: #ffffff;">
+    <div class="container">
+      <div style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius:24px; padding:36px; color:#fff; text-align:center; border:1.5px solid #334155; box-shadow:0 12px 30px rgba(0,0,0,0.15);">
+        <h2 style="font-size:2rem; font-weight:900; margin:0 0 12px 0;">क्या आपको अपनी रिपोर्ट या बीमारी पर व्यक्तिगत सलाह चाहिए?</h2>
+        <p style="color:#94a3b8; font-size:1rem; max-width:650px; margin:0 auto 24px auto; line-height:1.6;">
+          अपनी ब्लड टेस्ट रिपोर्ट या बीमारी की स्थिति हमारे WhatsApp AI हेल्थ असिस्टेंट को भेजें और 5 मिनट में वैज्ञानिक प्राकृतिक गाइड प्राप्त करें।
+        </p>
+        <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('स्वास्थ्य रिपोर्ट परामर्श')" class="btn" style="background:#22c55e; color:#fff; font-weight:900; font-size:1rem; padding:14px 32px; border-radius:30px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px; box-shadow:0 6px 25px rgba(34,197,94,0.4);">
+          <i class="fa-brands fa-whatsapp" style="font-size:1.3rem;"></i> WhatsApp पर रिपोर्ट भेजें व सलाह लें
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. FOOTER -->
+  <footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b;">
     <div class="container">
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
-        
-        <!-- About Column -->
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
             <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:42px;width:auto;" />
-            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#38bdf8;">INDIA</span></span>
+            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#dc2626;">INDIA</span></span>
           </div>
           <p style="font-size:0.85rem;color:#94a3b8;line-height:1.55;">
-            Aarogyam India - भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य, पशु पोषण और डायरेक्ट सेलिंग ज्ञान मंच।
+            भारत का सम्पूर्ण डिजिटल स्वास्थ्य, कृषि और प्राकृतिक पोषण ज्ञान मंच।
           </p>
         </div>
 
-        <!-- Quick Links -->
+        <div>
+          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">स्वास्थ्य श्रेणियां</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
+            <li><a href="/health/diabetes.html" style="color:#94a3b8;">🩸 मधुमेह नियंत्रण</a></li>
+            <li><a href="/health/weight-loss.html" style="color:#94a3b8;">🔥 मोटापा व फैट लॉस</a></li>
+            <li><a href="/health/joint-care.html" style="color:#94a3b8;">🦴 जोड़ों का दर्द व गठिया</a></li>
+            <li><a href="/health/womens-care.html" style="color:#94a3b8;">🌸 महिला स्वास्थ्य (PCOD)</a></li>
+            <li><a href="/pashu-palan.html" style="color:#94a3b8;">🐄 पशु पालन व दुग्ध उत्पादन</a></li>
+          </ul>
+        </div>
+
         <div>
           <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">त्वरित लिंक्स</h3>
           <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
             <li><a href="/index.html" style="color:#94a3b8;">🏠 मुख्य पृष्ठ</a></li>
             <li><a href="/ebooks/ebook.html" style="color:#94a3b8;">📚 ई-बुक स्टोर</a></li>
-            <li><a href="/ebooks/agriculture.html" style="color:#94a3b8;">🌱 कृषि हब</a></li>
-            <li><a href="/ebooks/kharif-master-guide-2026.html" style="color:#94a3b8;">🌾 खरीफ मास्टर गाइड 2026</a></li>
-            <li><a href="/ebooks/kheti-dr.html" style="color:#94a3b8;">🩺 खेती का डॉक्टर</a></li>
-          </ul>
-        </div>
-
-        <!-- Utilities -->
-        <div>
-          <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सेवाएं व टूल्स</h3>
-          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:0.86rem;">
             <li><a href="/crop-doctor.html" style="color:#94a3b8;">🔬 फसल डॉक्टर AI</a></li>
-            <li><a href="/mandi.html" style="color:#94a3b8;">🌾 लाइव मंडी भाव</a></li>
-            <li><a href="/weather.html" style="color:#94a3b8;">⛅ मौसम पूर्वानुमान</a></li>
-            <li><a href="/webinar.html" style="color:#94a3b8;">📺 लाइव वेबिनार हब</a></li>
-            <li><a href="/subscription.html" style="color:#94a3b8;">👑 Pro VIP पास</a></li>
+            <li><a href="/mandi.html" style="color:#94a3b8;">🌾 मंडी भाव</a></li>
           </ul>
         </div>
 
-        <!-- Contact Support -->
         <div>
           <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सहायता केंद्र</h3>
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
-          <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
-          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 सहायता')" class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;background:#dc2626;color:#fff;border:none;border-radius:20px;font-weight:800;cursor:pointer;">
-            <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
+          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 स्वास्थ्य सहायता')" style="margin-top:8px;padding:8px 16px;font-size:0.82rem;background:#22c55e;color:#fff;border:none;border-radius:20px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI डॉक्टर</span>
           </button>
         </div>
-
       </div>
 
       <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
-        © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+        © 2026 Aarogyam India. सर्वाधिकार सुरक्षित • सम्पूर्ण प्राकृतिक स्वास्थ्य व वेलनेस
       </div>
     </div>
   </footer>
 
-  <script src="/js/user-notifications.js"></script>
+  <!-- Scripts -->
   <script src="/js/universal-nav-drawer.js"></script>
-  <script src="/js/recent-purchase-toast.js"></script>
+  <script src="/js/universal-video-loader.js"></script>
+  <script src="/js/viral-share-engine.js"></script>
+  <script src="/js/audio-greeting-engine.js"></script>
+  <script src="/js/dual-whatsapp-order.js"></script>
+  <script src="/js/home-revamp.js?v=6.1"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof window.initPanoramicCarousel === 'function') {
+        window.initPanoramicCarousel();
+      }
+    });
+  </script>
 </body>
 </html>

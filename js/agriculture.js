@@ -13,6 +13,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     initAgriStoreData();
     initAgriSearch();
+    initCropPills();
   });
 
   async function initAgriStoreData() {
@@ -266,12 +267,41 @@
     grid.innerHTML = booksToRender.map(b => window.renderUniversalBookMarketingCard(b)).join('');
   }
 
+  let activeCrop = 'all';
+
+  function initCropPills() {
+    const pills = document.querySelectorAll('#cropPillsTrack .crop-filter-pill');
+    pills.forEach(p => {
+      p.addEventListener('click', () => {
+        pills.forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+        activeCrop = p.getAttribute('data-crop') || 'all';
+        renderAgriBooks();
+      });
+    });
+  }
+
   function renderAgriBooks() {
     const grid = document.getElementById('agri-books-grid');
     if (!grid) return;
 
     const keyword = (document.getElementById('agri-search-input')?.value || '').trim().toLowerCase();
-    let filtered = agriBooks;
+    let filtered = [...agriBooks];
+
+    // Filter by Crop
+    if (activeCrop !== 'all') {
+      filtered = filtered.filter(b => {
+        const text = ((b.heading || '') + ' ' + (b.subtitle || '') + ' ' + (b.description || '')).toLowerCase();
+        if (activeCrop === 'paddy') return text.includes('धान') || text.includes('paddy') || text.includes('rice') || b.id === 'BK001';
+        if (activeCrop === 'soybean') return text.includes('सोयाबीन') || text.includes('soybean') || b.id === 'BK001';
+        if (activeCrop === 'cotton') return text.includes('कपास') || text.includes('cotton') || b.id === 'BK001';
+        if (activeCrop === 'maize') return text.includes('मक्का') || text.includes('maize') || b.id === 'BK001';
+        if (activeCrop === 'wheat') return text.includes('गेहूं') || text.includes('wheat') || text.includes('रबी') || b.id === 'BK002';
+        if (activeCrop === 'vegetables') return text.includes('सब्जी') || text.includes('बागवानी') || text.includes('टमाटर') || b.id === 'BK002';
+        return true;
+      });
+    }
+
     if (keyword) {
       filtered = filtered.filter(b => 
         (b.heading || b.name || '').toLowerCase().includes(keyword) ||
@@ -280,18 +310,29 @@
       );
     }
 
-    if (filtered.length === 0) {
+    // Deduplicate by ID
+    const seen = new Set();
+    const uniqueList = [];
+    filtered.forEach(b => {
+      const bId = String(b.id).toUpperCase();
+      if (!seen.has(bId)) {
+        seen.add(bId);
+        uniqueList.push(b);
+      }
+    });
+
+    if (uniqueList.length === 0) {
       grid.innerHTML = `
         <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #fff; border-radius: 16px; border: 1.5px dashed #cbd5e1;">
           <span style="font-size: 2.5rem;">🌾</span>
           <h3 style="margin: 10px 0 6px 0; color: #1e293b;">कोई कृषि पुस्तक नहीं मिली</h3>
-          <p style="color: #64748b; font-size: 0.88rem;">कृपया अलग शब्द खोजकर देखें।</p>
+          <p style="color: #64748b; font-size: 0.88rem;">कृपया अलग फसल या शब्द खोजकर देखें।</p>
         </div>
       `;
       return;
     }
 
-    grid.innerHTML = filtered.map(b => window.renderUniversalBookMarketingCard(b)).join('');
+    grid.innerHTML = uniqueList.map(b => window.renderUniversalBookMarketingCard(b)).join('');
   }
 
   function renderAgriCombo() {

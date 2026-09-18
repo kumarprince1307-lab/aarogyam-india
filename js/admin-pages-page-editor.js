@@ -97,7 +97,9 @@ export async function initPageEditor() {
       whatsapp_support: {
         number: '919876543210',
         prompt: 'नमस्ते आरोग्यम इंडिया, मुझे वेबसाइट व ई-बुक्स के बारे में जानकारी चाहिए।'
-      }
+      },
+      audio_title: 'मुख्य पृष्ठ (होम)',
+      audio_script: 'नमस्ते {name} जी! आरोग्यम इंडिया में आपका हार्दिक स्वागत है। यह भारत का पहला संपूर्ण डिजिटल ज्ञान मंच है जहाँ किसानों और परिवारों के लिए सभी समाधान उपलब्ध हैं। यहाँ आपको खरीफ फसल मास्टर गाइड और खेती का डॉक्टर जैसी प्रमाणित ई-बुक्स, फसलों का सचित्र वैज्ञानिक स्प्रे शेड्यूल, गाय और भैंस में दूध व फैट वृद्धि के उपाय, और डायबिटीज, जोड़ों का दर्द व मोटापे का प्राकृतिक आयुर्वेदिक परामर्श मिलता है। किसी भी सवाल या समस्या के लिए आप सीधे व्हाट्सएप पर हमारे विशेषज्ञों से 24 घंटे निःशुल्क सलाह ले सकते हैं। आरोग्यम इंडिया के साथ जुड़ने के लिए धन्यवाद!'
     },
     {
       id: 'page_agriculture',
@@ -170,7 +172,9 @@ export async function initPageEditor() {
       whatsapp_support: {
         number: '919876543210',
         prompt: 'नमस्ते, मुझे कृषि पुस्तकों और कॉम्बो ऑफर के बारे में जानकारी चाहिए।'
-      }
+      },
+      audio_title: 'वैज्ञानिक कृषि व फसल सुरक्षा हब',
+      audio_script: 'नमस्ते {name} जी! आरोग्यम कृषि हब में आपका स्वागत है। यहाँ आप खरीफ फसल मास्टर गाइड और फसल का डॉक्टर ई-बुक प्राप्त कर सकते हैं। साथ ही सभी प्रमुख फसलों के रोग, जैविक उपचार और नेटसर्फ बायो-फिट स्प्रे शेड्यूल की पूरी जानकारी देख सकते हैं।'
     },
     {
       id: 'page_ebook_store',
@@ -186,21 +190,31 @@ export async function initPageEditor() {
       ticker_text: '🚨 स्पेशल ऑफर: ₹1999 की VIP Pro मेम्बरशिप व AI डॉक्टर सहायता बिल्कुल FREE! ✦ 10,000+ किसानों का विश्वास',
       hero_slides: [
         {
-          image: '/images/books/kharif-master-guide-2026-cover.webp',
-          tag: '🌾 BESTSELLER AGRICULTURE EBOOK',
+          image: '/images/banners/ebook-banner.jpeg',
+          tag: '📚 ई-बुक स्टोर',
+          title: 'आरोग्यम डिजिटल ई-बुक स्टोर',
+          subtitle: 'कृषि, पशु पालन व स्वास्थ्य की सभी प्रमाणित हिंदी पुस्तकें',
+          cta_text: '⚡ अभी देखें',
+          cta_link: '#bestsellers-shelf',
+          cta_secondary_text: '🛒 कार्ट देखें',
+          cta_secondary_link: '/ebooks/cart.html'
+        },
+        {
+          image: '/images/banners/offer-banner-kharif-2026.webp',
+          tag: '🌾 खरीफ स्पेशल कॉम्बो',
           title: 'खरीफ फसल मास्टर गाइड 2026',
-          subtitle: 'धान, सोयाबीन, मक्का की सम्पूर्ण प्रैक्टिकल गाइड — 300+ रंगीन फोटो व स्प्रे साइंस चार्ट!',
-          cta_text: '⚡ अभी आर्डर करें - मात्र ₹99',
+          subtitle: 'धान, सोयाबीन व मक्का की सम्पूर्ण प्रैक्टिकल गाइड',
+          cta_text: '⚡ मात्र ₹99',
           cta_link: '/ebooks/kharif-master-guide-2026.html',
           cta_secondary_text: '🛒 कार्ट में जोड़ें',
           cta_secondary_link: '/ebooks/cart.html'
         },
         {
-          image: '/images/books/fasal-ka-doctor-cover.webp',
-          tag: '🩺 सर्वाधिक बिकने वाली ई-बुक (TOP BESTSELLER)',
-          title: 'खेती का डॉक्टर (फसल का डॉक्टर)',
-          subtitle: 'किसान का Pocket Doctor 🌾 रोग, कीट, वायरल, फंगल व पोषण कमी की पहचान व तुरंत स्प्रे फॉर्मूला!',
-          cta_text: '⚡ अभी आर्डर करें - मात्र ₹99',
+          image: '/images/banners/agriculture-banner.jpeg',
+          tag: '🌱 वैज्ञानिक कृषि',
+          title: 'खेती का डॉक्टर - रोग व कीट निवारण',
+          subtitle: 'सटीक स्प्रे शेड्यूल व पोषक तत्व प्रबंधन',
+          cta_text: '⚡ अभी ऑर्डर करें',
           cta_link: '/ebooks/kheti-dr.html',
           cta_secondary_text: '🛒 कार्ट में जोड़ें',
           cta_secondary_link: '/ebooks/cart.html'
@@ -244,7 +258,9 @@ export async function initPageEditor() {
       whatsapp_support: {
         number: '919876543210',
         prompt: 'नमस्ते, मुझे ई-बुक स्टोर के बारे में जानकारी चाहिए।'
-      }
+      },
+      audio_title: 'आरोग्यम डिजिटल ई-बुक स्टोर',
+      audio_script: 'नमस्ते {name} जी! आरोग्यम ई-बुक स्टोर में आपका स्वागत है। यहाँ आपको कृषि, पशु पालन और स्वास्थ्य से संबंधित सभी प्रमाणित हिंदी पुस्तकें मिलेंगी। किसी भी पुस्तक का डेमो देख सकते हैं या मात्र 99 रुपये में तुरंत डाउनलोड कर सकते हैं।'
     },
     {
       id: 'page_cart',
@@ -497,6 +513,405 @@ export async function initPageEditor() {
         number: '919876543210',
         prompt: 'नमस्ते, मुझे खेती का डॉक्टर ई-बुक के बारे में जानकारी चाहिए।'
       }
+    },
+    {
+      id: 'page_cattle_care',
+      slug: 'pashu-palan',
+      name: '🐄 पशु पालन व दुग्ध उत्पादन (Cattle Care Hub)',
+      url: '/pashu-palan.html',
+      category: 'Livestock',
+      status: 'active',
+      theme_primary: '#0284c7',
+      theme_dark: '#0369a1',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '🐄 दुग्ध वृद्धि, बांझपन निवारण व पशु स्वास्थ्य | 24×7 WhatsApp AI पशु डॉक्टर परामर्श सक्रिय!',
+      hero_slides: [
+        {
+          image: '/images/banners/pashu-palan-banner.jpg',
+          tag: '🐄 पशु पालन विशेष',
+          title: 'पशु पालन व दुग्ध संवर्धन हब',
+          subtitle: 'दुग्ध वृद्धि, बांझपन निवारण व थनैला उपचार',
+          cta_text: '💬 WhatsApp परामर्श',
+          cta_link: 'https://wa.me/917974422572',
+          cta_secondary_text: '🛒 उत्पाद देखें',
+          cta_secondary_link: '#pashu-products'
+        },
+        {
+          image: '/images/banners/pashu-cow-care.jpg',
+          tag: '🥛 दुग्ध वृद्धि फॉर्मूला',
+          title: 'गाय-भैंस में दूध व फैट वृद्धि',
+          subtitle: 'नेचुरल हर्बल सप्लीमेंट्स और मिनरल मिक्सचर',
+          cta_text: '💬 ऑर्डर करें',
+          cta_link: 'https://wa.me/917974422572',
+          cta_secondary_text: '📞 संपर्क करें',
+          cta_secondary_link: '#vet-consult'
+        },
+        {
+          image: '/images/banners/pashu-goat-care.jpg',
+          tag: '🐐 बकरी पालन गाइड',
+          title: 'उन्नत बकरी पालन व वजन वृद्धि',
+          subtitle: 'रोग रोकथाम व वैज्ञानिक पोषण प्रबंधन',
+          cta_text: '💬 जानकारी लें',
+          cta_link: 'https://wa.me/917974422572',
+          cta_secondary_text: '📖 गाइड पढ़ें',
+          cta_secondary_link: '/ebooks/ebook.html'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_reviews', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [
+        { icon: 'fa-cow', title: 'दूध उत्पादन वृद्धि', desc: 'प्राकृतिक आयुर्वेदिक मिनरल व पोषण' },
+        { icon: 'fa-shield-virus', title: 'मस्टाइटिस व थनैला', desc: 'सटीक लक्षण पहचान व हर्बल उपचार' },
+        { icon: 'fa-dna', title: 'बांझपन से मुक्ति', desc: 'समय पर हीट में लाना व गर्भाधान' },
+        { icon: 'fa-robot', title: '24×7 AI पशु डॉक्टर', desc: 'WhatsApp पर तुरंत परामर्श' }
+      ],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे पशु पालन व दुग्ध वृद्धि के बारे में सलाह चाहिए।' },
+      audio_title: 'पशु पालन व दुग्ध संवर्धन हब',
+      audio_script: 'राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा। आप सीएफएल और बायो-फिट उत्पाद सीधे व्हाट्सएप द्वारा ऑर्डर कर सकते हैं।'
+    },
+    {
+      id: 'page_health_hub',
+      slug: 'health-hub',
+      name: '❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health & Wellness Hub)',
+      url: '/categories/health.html',
+      category: 'Healthcare',
+      status: 'active',
+      theme_primary: '#dc2626',
+      theme_dark: '#991b1b',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '🌿 सम्पूर्ण 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान | 24×7 WhatsApp AI डॉक्टर परामर्श!',
+      hero_slides: [
+        {
+          image: '/images/banners/health-banner.jpeg',
+          tag: '🌿 सम्पूर्ण स्वास्थ्य केंद्र',
+          title: 'आरोग्यम हेल्थ एंड वेलनेस हब',
+          subtitle: '8 प्रमुख लाइफस्टाइल विकारों के प्राकृतिक आयुर्वेदिक समाधान',
+          cta_text: '💬 डॉक्टर से पूछें',
+          cta_link: 'https://wa.me/917974422572',
+          cta_secondary_text: '🔍 रोग चुनें',
+          cta_secondary_link: '#health-categories'
+        },
+        {
+          image: '/images/banners/health-diabetes.jpg',
+          tag: '🩸 डायबिटीज केयर',
+          title: 'प्राकृतिक शुगर नियंत्रण व रिवर्सल',
+          subtitle: 'आयुर्वेदिक अर्क व वैज्ञानिक आहार तालिका',
+          cta_text: '📖 विस्तार से देखें',
+          cta_link: '/health/diabetes.html',
+          cta_secondary_text: '💬 परामर्श',
+          cta_secondary_link: 'https://wa.me/917974422572'
+        },
+        {
+          image: '/images/banners/health-joint-care.jpg',
+          tag: '🦴 जॉइंट केयर',
+          title: 'जोड़ों के दर्द व गठिया से मुक्ति',
+          subtitle: 'नेचुरल हर्बल कार्टिलेज पोषण व तेल मालिश',
+          cta_text: '📖 विस्तार से देखें',
+          cta_link: '/health/joint-care.html',
+          cta_secondary_text: '💬 परामर्श',
+          cta_secondary_link: 'https://wa.me/917974422572'
+        },
+        {
+          image: '/images/banners/health-weight-loss.jpg',
+          tag: '🔥 वेट लॉस',
+          title: 'प्राकृतिक मोटापा व वजन नियंत्रण',
+          subtitle: 'बिना कमजोरी के सुरक्षित फैट बर्निंग',
+          cta_text: '📖 विस्तार से देखें',
+          cta_link: '/health/weight-loss.html',
+          cta_secondary_text: '💬 परामर्श',
+          cta_secondary_link: 'https://wa.me/917974422572'
+        },
+        {
+          image: '/images/banners/health-hair-care.jpg',
+          tag: '💇‍♀️ हेयर केयर',
+          title: 'बाल झड़ना रोकें व डैंड्रफ मुक्ति',
+          subtitle: 'भृंगराज व आंवला युक्त हर्बल हेयर थेरेपी',
+          cta_text: '📖 विस्तार से देखें',
+          cta_link: '/health/hair-care.html',
+          cta_secondary_text: '💬 परामर्श',
+          cta_secondary_link: 'https://wa.me/917974422572'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_category_pills', 'sec_videos', 'sec_reviews', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे स्वास्थ्य परामर्श चाहिए।' },
+      audio_title: 'आरोग्यम संपूर्ण स्वास्थ्य केंद्र',
+      audio_script: 'नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे। अपनी समस्या का चयन करें और स्थायी स्वास्थ्य लाभ पाएं।'
+    },
+    {
+      id: 'page_health_diabetes',
+      slug: 'health-diabetes',
+      name: '🩸 मधुमेह (डायबिटीज) केयर',
+      url: '/health/diabetes.html',
+      category: 'Healthcare Sub-page',
+      status: 'active',
+      theme_primary: '#2563eb',
+      theme_dark: '#1e40af',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '🩸 15,000+ लोगों ने प्राकृतिक रूप से शुगर नियंत्रित की | 24×7 AI डॉक्टर परामर्श सक्रिय',
+      hero_slides: [
+        {
+          image: '/images/banners/health-diabetes.jpg',
+          tag: '🩸 डायबिटीज केयर',
+          title: 'मधुमेह व ब्लड शुगर नियंत्रण',
+          subtitle: 'इंसुलिन संवेदनशीलता सुधार व प्राकृतिक अर्क',
+          cta_text: '💬 AI डॉक्टर परामर्श',
+          cta_link: 'https://wa.me/917974422572'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे मधुमेह / डायबिटीज समाधान चाहिए।' },
+      audio_title: 'डायबिटीज व ब्लड शुगर नियंत्रण',
+      audio_script: 'नमस्ते {name} जी! डायबिटीज केयर पेज पर आपका स्वागत है। यहाँ इंसुलिन रेजिस्टेंस दूर करने, शुगर लेवल सामान्य रखने की प्राकृतिक डाइट, एक्सरसाइज और आयुर्वेदिक फार्मूला उपलब्ध है।'
+    },
+    {
+      id: 'page_health_weight_loss',
+      slug: 'health-weight-loss',
+      name: '🔥 मोटापा व वजन नियंत्रण (Weight Loss)',
+      url: '/health/weight-loss.html',
+      category: 'Healthcare Sub-page',
+      status: 'active',
+      theme_primary: '#d97706',
+      theme_dark: '#b45309',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '🔥 बिना कमजोरी या भूखे रहे प्राकृतिक फैट बर्निंग | फ्री डाइट चार्ट उपलब्ध',
+      hero_slides: [
+        {
+          image: '/images/banners/health-weight-loss.jpg',
+          tag: '🔥 वेट लॉस',
+          title: 'मोटापा व प्राकृतिक वजन नियंत्रण',
+          subtitle: 'जिद्दी चर्बी घटाने की सम्पूर्ण डाइट व हर्बल सप्लीमेंट',
+          cta_text: '💬 फ्री डाइट चार्ट लें',
+          cta_link: 'https://wa.me/917974422572'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे वजन घटाने / फैट लॉस का समाधान चाहिए।' },
+      audio_title: 'मोटापा व प्राकृतिक वजन नियंत्रण',
+      audio_script: 'नमस्ते {name} जी! वेट लॉस गाइड में आपका स्वागत है। यहाँ आपको पेट की जिद्दी चर्बी घटाने के मुख्य कारण, लक्षण, 24 घंटे का संपूर्ण डाइट चार्ट और फैट बर्नर हर्बल सप्लीमेंट की जानकारी मिलेगी।'
+    },
+    {
+      id: 'page_health_joint_care',
+      slug: 'health-joint-care',
+      name: '🦴 जोड़ों का दर्द व गठिया (Joint Care)',
+      url: '/health/joint-care.html',
+      category: 'Healthcare Sub-page',
+      status: 'active',
+      theme_primary: '#16a34a',
+      theme_dark: '#15803d',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '🦴 घुटनों का दर्द, यूरिक एसिड व जोड़ों की ग्रीस बढ़ाएं | 100% हर्बल थेरेपी',
+      hero_slides: [
+        {
+          image: '/images/banners/health-joint-care.jpg',
+          tag: '🦴 जॉइंट केयर',
+          title: 'जोड़ों का दर्द व गठिया राहत',
+          subtitle: 'कार्टिलेज मजबूती व यूरिक एसिड नियंत्रण',
+          cta_text: '💬 हर्बल थेरेपी परामर्श',
+          cta_link: 'https://wa.me/917974422572'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे जोड़ों के दर्द व गठिया का समाधान चाहिए।' },
+      audio_title: 'जोड़ों का दर्द व गठिया राहत',
+      audio_script: 'नमस्ते {name} जी! जोड़ों के दर्द व आर्थराइटिस केयर पेज पर आपका स्वागत है। कार्टिलेज को दोबारा मजबूत बनाने, यूरिक एसिड घटाने और सूजन दूर करने की सम्पूर्ण जानकारी यहाँ दी गई है।'
+    },
+    {
+      id: 'page_health_womens_care',
+      slug: 'health-womens-care',
+      name: '🌸 महिला स्वास्थ्य (PCOD / PCOS Care)',
+      url: '/health/womens-care.html',
+      category: 'Healthcare Sub-page',
+      status: 'active',
+      theme_primary: '#db2777',
+      theme_dark: '#be185d',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '🌸 PCOD, अनियमित पीरियड्स व हार्मोन संतुलन का सुरक्षित आयुर्वेदिक उपचार',
+      hero_slides: [
+        {
+          image: '/images/banners/health-banner.jpeg',
+          tag: '🌸 महिला स्वास्थ्य',
+          title: 'महिला स्वास्थ्य व हार्मोनल संतुलन',
+          subtitle: 'PCOD, थायरॉयड व अनियमित पीरियड्स का सुरक्षित उपचार',
+          cta_text: '💬 महिला रोग विशेषज्ञ परामर्श',
+          cta_link: 'https://wa.me/917974422572'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे महिला स्वास्थ्य व हार्मोन संतुलन की सलाह चाहिए।' },
+      audio_title: 'महिला स्वास्थ्य व हार्मोनल संतुलन',
+      audio_script: 'नमस्ते {name} जी! महिला स्वास्थ्य केंद्र में आपका स्वागत है। पीसीओडी, अनियमित माहवारी, कमजोरी और हार्मोनल असंतुलन का सुरक्षित व हर्बल समाधान यहाँ मिलेगा।'
+    },
+    {
+      id: 'page_health_hair_care',
+      slug: 'health-hair-care',
+      name: '💇‍♀️ हेयर केयर (बाल झड़ना व डैंड्रफ)',
+      url: '/health/hair-care.html',
+      category: 'Healthcare Sub-page',
+      status: 'active',
+      theme_primary: '#0d9488',
+      theme_dark: '#0f766e',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '💇‍♀️ भृंगराज व आंवला से बालों का झड़ना रोकें | फ्री हेयर एनालिसिस उपलब्ध',
+      hero_slides: [
+        {
+          image: '/images/banners/health-hair-care.jpg',
+          tag: '💇‍♀️ हेयर केयर',
+          title: 'हेयर केयर व डैंड्रफ समाधान',
+          subtitle: 'नए बाल उगाने व हेयर फॉल रोकने का प्राकृतिक फॉर्मूला',
+          cta_text: '💬 हेयर एनालिसिस करवाएं',
+          cta_link: 'https://wa.me/917974422572'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे हेयर केयर व बाल झड़ने का समाधान चाहिए।' },
+      audio_title: 'हेयर केयर व डैंड्रफ समाधान',
+      audio_script: 'नमस्ते {name} जी! हेयर केयर गाइड में आपका स्वागत है। नए बाल उगाने, बालों का झड़ना तुरंत रोकने और डैंड्रफ खत्म करने के प्राकृतिक फॉर्मूले और ऑयल्स की जानकारी यहाँ देखें।'
+    },
+    {
+      id: 'page_health_skin_care',
+      slug: 'health-skin-care',
+      name: '🌺 स्किन केयर (मुँहासे व त्वचा चमक)',
+      url: '/health/skin-care.html',
+      category: 'Healthcare Sub-page',
+      status: 'active',
+      theme_primary: '#e11d48',
+      theme_dark: '#9f1239',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '🌸 नीम व मंजिष्ठा से रक्त शुद्धि व पिंपल्स से छुटकारा',
+      hero_slides: [
+        {
+          image: '/images/banners/health-banner.jpeg',
+          tag: '🌺 स्किन केयर',
+          title: 'स्किन ग्लो व त्वचा सुरक्षा',
+          subtitle: 'पिंपल्स व झाइयों से मुक्ति और प्राकृतिक निखार',
+          cta_text: '💬 स्किन एक्सपर्ट से पूछें',
+          cta_link: 'https://wa.me/917974422572'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे स्किन केयर व पिंपल्स का समाधान चाहिए।' },
+      audio_title: 'स्किन ग्लो व त्वचा सुरक्षा',
+      audio_script: 'नमस्ते {name} जी! नेचुरल स्किन केयर पेज पर आपका स्वागत है। पिंपल्स, झाइयां और डल स्किन को ठीक कर चेहरे पर प्राकृतिक ग्लो लाने की आयुर्वेदिक टिप्स यहाँ उपलब्ध हैं।'
+    },
+    {
+      id: 'page_health_kids_care',
+      slug: 'health-kids-care',
+      name: '🧸 किड्स केयर (बाल पोषण व विकास)',
+      url: '/health/kids-care.html',
+      category: 'Healthcare Sub-page',
+      status: 'active',
+      theme_primary: '#d97706',
+      theme_dark: '#b45309',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '🌟 ब्राह्मी व शंखपुष्पी से तेज दिमाग, भूख सुधार व इम्युनिटी वृद्धि',
+      hero_slides: [
+        {
+          image: '/images/banners/achievers-banner.jpeg',
+          tag: '🧸 किड्स केयर',
+          title: 'बच्चों का मानसिक व शारीरिक विकास',
+          subtitle: 'स्मृति वृद्धि, भूख सुधार व रोग प्रतिरोधक क्षमता',
+          cta_text: '💬 पोषण विशेषज्ञ परामर्श',
+          cta_link: 'https://wa.me/917974422572'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे किड्स केयर व पोषण समाधान चाहिए।' },
+      audio_title: 'बच्चों का मानसिक व शारीरिक विकास',
+      audio_script: 'नमस्ते {name} जी! किड्स केयर पेज पर आपका स्वागत है। बच्चों की याददाश्त, एकाग्रता, लंबाई और रोग प्रतिरोधक क्षमता बढ़ाने का सम्पूर्ण पोषण प्लान यहाँ देखें।'
+    },
+    {
+      id: 'page_health_home_care',
+      slug: 'health-home-care',
+      name: '🏡 होम केयर (केमिकल-मुक्त सुरक्षित घर)',
+      url: '/health/home-care.html',
+      category: 'Healthcare Sub-page',
+      status: 'active',
+      theme_primary: '#0284c7',
+      theme_dark: '#0369a1',
+      fb_pixel: true,
+      ga_tag: true,
+      ticker_text: '🍃 फलों-सब्जियों से कीटनाशक हटाने व केमिकल-फ्री क्लीनिंग गाइड',
+      hero_slides: [
+        {
+          image: '/images/banners/farmer-community-banner.jpeg',
+          tag: '🏡 होम केयर',
+          title: 'नेचुरल होम केयर व टॉक्सिन-मुक्त घर',
+          subtitle: 'केमिकल-मुक्त सुरक्षित व स्वच्छ वातावरण',
+          cta_text: '💬 होम केयर उत्पाद देखें',
+          cta_link: 'https://wa.me/917974422572'
+        }
+      ],
+      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
+      hidden_sections: [],
+      kpi_cards: [],
+      videos: [],
+      marketing_cards: [],
+      reviews: [],
+      faqs: [],
+      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे केमिकल-मुक्त होम केयर समाधान चाहिए।' },
+      audio_title: 'नेचुरल होम केयर व टॉक्सिन-मुक्त घर',
+      audio_script: 'नमस्ते {name} जी! होम केयर पेज पर आपका स्वागत है। घर को केमिकल-मुक्त, स्वच्छ व सुरक्षित रखने के इको-फ्रेंडली समाधान यहाँ उपलब्ध हैं।'
     }
   ];
 
@@ -548,6 +963,94 @@ export async function initPageEditor() {
     }
   } catch (e) {}
 
+  // Achievers default list and active state
+  const DEFAULT_ACHIEVERS_LIST = [
+    {
+      id: "ACH001",
+      name: "Prafull Upadhyay",
+      nameHindi: "प्रफुल्ल उपाध्याय",
+      location: "Rewa, Madhya Pradesh",
+      rank: "⭐ Rock Star Achiever (July 2026)",
+      image: "/images/team/achiever-1.jpg",
+      achievement: "डिजिटल कृषि ई-बुक्स व जैविक उत्पादों के प्रसार में रिकॉर्ड परिणाम देकर जुलाई 2026 रॉकस्टार क्लब हासिल किया।",
+      quote: "Aarogyam India के डिजिटल टूल्स ने मुझे सीधे हजारों किसानों तक त्वरित व प्रामाणिक समाधान पहुँचाने की शक्ति दी।"
+    },
+    {
+      id: "ACH002",
+      name: "Shikha Upadhyay",
+      nameHindi: "शिखा उपाध्याय",
+      location: "Rewa, Madhya Pradesh",
+      rank: "⭐ Rock Star Achiever (July 2026)",
+      image: "/images/team/achiever-2.jpg",
+      achievement: "महिला सशक्तिकरण व स्वास्थ्य-पोषण अभियान का सफल नेतृत्व कर जुलाई माह में रॉकस्टार अचीवर बनीं।",
+      quote: "डिजिटल मंच के माध्यम से हर घर तक प्रामाणिक स्वास्थ्य और पोषण पहुँचाना ही हमारा मुख्य संकल्प है।"
+    },
+    {
+      id: "ACH003",
+      name: "Ratna Joshi",
+      nameHindi: "रत्ना जोशी",
+      location: "Madhya Pradesh",
+      rank: "⭐ Rock Star Achiever (July 2026)",
+      image: "/images/team/achiever-3.jpg",
+      achievement: "आयुर्वेदिक वेलनेस व ई-लर्निंग कंसल्टेंसी में उत्कृष्ट योगदान देकर जुलाई रॉकस्टार मुकाम पाया।",
+      quote: "Aarogyam India के साथ जुड़कर वास्तविक सम्मान, ज्ञान और डिजिटल आत्मनिर्भरता प्राप्त हुई।"
+    },
+    {
+      id: "ACH004",
+      name: "Amrendra Singh",
+      nameHindi: "अमरेन्द्र सिंह",
+      location: "Satna, Madhya Pradesh",
+      rank: "⭐ Rock Star Achiever (July 2026)",
+      image: "/images/team/achiever-4.jpg",
+      achievement: "उन्नत फसल सुरक्षा व वैज्ञानिक स्प्रे साइंस अभियानों का सफल नेतृत्व कर रॉकस्टार क्लब हासिल किया।",
+      quote: "किसानों को समय पर सही डिजिटल गाइड और 24×7 AI परामर्श से जोड़कर अद्भुत परिणाम मिले।"
+    },
+    {
+      id: "ACH005",
+      name: "Sadhna Holker",
+      nameHindi: "साधना होल्कर",
+      location: "Indore, Madhya Pradesh",
+      rank: "⭐ Rock Star Achiever (July 2026)",
+      image: "/images/team/achiever-5.jpg",
+      achievement: "डायरेक्ट कंसल्टेंसी व वेलनेस उत्पादों के प्रसार में असाधारण योगदान देकर रॉकस्टार क्लब में स्थान बनाया।",
+      quote: "डिजिटल सिस्टम ने हमारे काम को बहुत आसान, पारदर्शी और अत्यधिक प्रभावी बना दिया है।"
+    },
+    {
+      id: "ACH006",
+      name: "Pavan Pandey",
+      nameHindi: "पवन पाण्डेय",
+      location: "Madhya Pradesh",
+      rank: "⚡ Fast Track Achiever",
+      image: "/images/team/achiever-1.jpg",
+      achievement: "फास्ट ट्रैक क्लब क्वालीफाई कर सैकड़ों किसानों को आधुनिक डिजिटल कृषि व स्प्रे शेड्यूल से जोड़ा।",
+      quote: "कम समय में फास्ट ट्रैक मुकाम हासिल करना Aarogyam India के मजबूत इकोसिस्टम का नतीजा है।"
+    },
+    {
+      id: "ACH007",
+      name: "Hari Narayan Mahto",
+      nameHindi: "हरी नारायण महतो",
+      location: "Bihar / Jharkhand",
+      rank: "⚡ Fast Track Achiever",
+      image: "/images/team/achiever-4.jpg",
+      achievement: "जैविक कृषि व मृदा संवर्धन मिशन में अभूतपूर्व प्रगति कर फास्ट ट्रैक अचीवर का गौरव हासिल किया।",
+      quote: "किसानों की लागत घटाने और सही उत्पाद सीधे पहुंचाने में हमें व्यापक जनसमर्थन मिला।"
+    }
+  ];
+
+  let currentAchievers = [];
+  try {
+    const savedAch = localStorage.getItem('AAROGYAM_ACHIEVERS_CONFIG');
+    if (savedAch) {
+      const parsed = JSON.parse(savedAch);
+      if (Array.isArray(parsed) && parsed.length > 0) currentAchievers = parsed;
+      else currentAchievers = JSON.parse(JSON.stringify(DEFAULT_ACHIEVERS_LIST));
+    } else {
+      currentAchievers = JSON.parse(JSON.stringify(DEFAULT_ACHIEVERS_LIST));
+    }
+  } catch (e) {
+    currentAchievers = JSON.parse(JSON.stringify(DEFAULT_ACHIEVERS_LIST));
+  }
+
   // Current editing state
   let editingPageId = null;
   let currentSlides = [];
@@ -590,6 +1093,9 @@ export async function initPageEditor() {
           </p>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btn-open-achievers-manager" class="admin-button" style="background: #f59e0b; color: #000; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(245,158,11,0.3);">
+            <span>🏆</span> <span>शीर्ष अचीवर्स प्रबंधक</span>
+          </button>
           <button id="btn-toggle-page-editor-form" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22,163,74,0.3);">
             <span>✨</span> <span>+ नया साइट पेज बनाएं</span>
           </button>
@@ -600,6 +1106,40 @@ export async function initPageEditor() {
             🏪 स्टोर देखें
           </a>
         </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVERS SHOWCASE MANAGER MODAL / CARD -->
+    <div id="achievers-manager-card" class="admin-card" style="display: none; margin-bottom: 24px; background: var(--admin-surface-2, #0f172a); border: 2px solid #f59e0b; border-radius: 14px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--admin-border, #334155); padding-bottom: 12px; margin-bottom: 18px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">🏆</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #fbbf24;">
+              शीर्ष अचीवर्स व सफलता की कहानियां प्रबंधक (Achievers Showcase Manager)
+            </h3>
+            <small style="color: var(--admin-muted); font-size: 0.75rem;">होम पेज व वेबसाइट के सभी शीर्ष अचीवर्स की फोटो, नाम, रैंक व प्रशंसापत्र यहाँ से बदलें</small>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btn-add-new-achiever" class="admin-button small-button" style="background: #16a34a; color: #fff; font-weight: 800;">
+            + नया अचीवर जोड़ें
+          </button>
+          <button type="button" id="btn-close-achievers-card" class="admin-button icon-button" style="color: var(--admin-muted); font-size: 1.2rem;">✕</button>
+        </div>
+      </div>
+
+      <div id="achievers-list-container" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button type="button" id="btn-save-achievers" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 10px 24px;">
+          💾 अचीवर्स सूची सुरक्षित करें (Save Achievers)
+        </button>
+        <button type="button" id="btn-cancel-achievers" class="admin-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted);">
+          बंद करें
+        </button>
       </div>
     </div>
 
@@ -684,6 +1224,31 @@ export async function initPageEditor() {
           <div>
             <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">टिकर हेडलाइंस टेक्स्ट (Marquee Headline Text)</label>
             <input type="text" id="pe_input_ticker" class="admin-input" placeholder="उदा. 🌾 खरीफ फसल मास्टर गाइड 2026 पर 67% छूट! ✦ 📲 24×7 WhatsApp AI डॉक्टर सहायता मुफ़्त!" style="width: 100%; padding: 8px 12px;" />
+          </div>
+        </div>
+
+        <!-- 2.1 Page Audio Voice Narration (Hindi Speech Script) -->
+        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <div style="font-weight: 800; color: #c084fc; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+              <span>🗣️ 2.1 पेज का ऑडियो परिचय व हिंदी वॉइस स्क्रिप्ट (Page Audio Voice Narration)</span>
+            </div>
+            <button type="button" id="btn-test-page-audio-speech" class="admin-button small-button" style="background: #7c3aed; color: #fff; font-weight: 800; font-size: 0.78rem;">
+              🔊 आवाज़ टेस्ट करें (Speak Test)
+            </button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">ऑडियो शीर्षक (Audio Headline)</label>
+              <input type="text" id="pe_input_audio_title" class="admin-input" placeholder="उदा. आरोग्यम इंडिया मुख्य पृष्ठ ऑडियो परिचय" style="width: 100%; padding: 8px 12px;" />
+            </div>
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">
+              हिंदी वॉइस स्क्रिप्ट (Speech Script Text - जो ब्राउज़र की आवाज़ में बोला जाएगा)
+            </label>
+            <textarea id="pe_input_audio_script" class="admin-input" rows="3" placeholder="नमस्ते {name} जी! आरोग्यम इंडिया में आपका स्वागत है..." style="width: 100%; padding: 8px 12px; font-family: inherit; line-height: 1.5;"></textarea>
+            <small style="color: var(--admin-muted); font-size: 0.74rem;">टिप: {name} लिखने पर यूजर का नाम अपने आप बोला जाएगा।</small>
           </div>
         </div>
 
@@ -866,6 +1431,158 @@ export async function initPageEditor() {
   searchInput?.addEventListener('input', renderPagesTable);
   exportBtn?.addEventListener('click', exportPagesJson);
 
+  // Achievers Manager Modal Listeners & Handlers
+  const achieversCard = document.getElementById('achievers-manager-card');
+  const openAchieversBtn = document.getElementById('btn-open-achievers-manager');
+  const closeAchieversBtn = document.getElementById('btn-close-achievers-card');
+  const cancelAchieversBtn = document.getElementById('btn-cancel-achievers');
+  const addAchieverBtn = document.getElementById('btn-add-new-achiever');
+  const saveAchieversBtn = document.getElementById('btn-save-achievers');
+
+  openAchieversBtn?.addEventListener('click', () => {
+    achieversCard.style.display = 'block';
+    renderAchieversList();
+    achieversCard.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  closeAchieversBtn?.addEventListener('click', () => { achieversCard.style.display = 'none'; });
+  cancelAchieversBtn?.addEventListener('click', () => { achieversCard.style.display = 'none'; });
+
+  addAchieverBtn?.addEventListener('click', () => {
+    currentAchievers.push({
+      id: `ACH00${currentAchievers.length + 1}`,
+      name: "New Achiever",
+      nameHindi: "नया अचीवर",
+      location: "Madhya Pradesh",
+      rank: "⭐ Rock Star Achiever",
+      image: "/images/team/achiever-1.jpg",
+      achievement: "सराहनीय उपलब्धि का विवरण यहाँ लिखें...",
+      quote: "Aarogyam India से जुड़कर हमें अत्यधिक सफलता मिली।"
+    });
+    renderAchieversList();
+  });
+
+  saveAchieversBtn?.addEventListener('click', () => {
+    try {
+      localStorage.setItem('AAROGYAM_ACHIEVERS_CONFIG', JSON.stringify(currentAchievers));
+      const homePage = allPages.find(p => p.id === 'page_home' || p.slug === 'index');
+      if (homePage) {
+        homePage.achievers = currentAchievers;
+        savePagesToStorage();
+      }
+      showToast('✅ शीर्ष अचीवर्स की सूची सफलतापूर्वक सुरक्षित हो गई!', 'success');
+      achieversCard.style.display = 'none';
+    } catch (e) {
+      showToast('❌ अचीवर्स सुरक्षित करने में त्रुटि!', 'error');
+    }
+  });
+
+  function renderAchieversList() {
+    const wrap = document.getElementById('achievers-list-container');
+    if (!wrap) return;
+
+    const availablePhotos = [
+      '/images/team/achiever-1.jpg',
+      '/images/team/achiever-2.jpg',
+      '/images/team/achiever-3.jpg',
+      '/images/team/achiever-4.jpg',
+      '/images/team/achiever-5.jpg'
+    ];
+
+    wrap.innerHTML = currentAchievers.map((ach, idx) => `
+      <div style="background: #0f172a; border: 1.5px solid #f59e0b50; border-radius: 10px; padding: 14px; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid #f59e0b; overflow: hidden; background: #1e293b; display: flex; align-items: center; justify-content: center;">
+              <img src="${ach.image}" alt="${ach.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/team/achiever-1.jpg'">
+            </div>
+            <div>
+              <span style="font-weight: 800; color: #fbbf24; font-size: 0.9rem;">#${idx + 1} ${ach.name}</span>
+              <span style="font-size: 0.75rem; color: var(--admin-muted); margin-left: 6px;">(${ach.nameHindi || ''})</span>
+            </div>
+          </div>
+          <button type="button" onclick="window.removeAchieverItem(${idx})" style="background: transparent; border: none; color: #ef4444; font-weight: 800; cursor: pointer; font-size: 0.82rem;">
+            &times; हटाएं
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 8px;">
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">फोटो URL (Photo URL)</label>
+            <input type="text" value="${escapeHtml(ach.image)}" onchange="window.updateAchieverField(${idx}, 'image', this.value); window.renderAchieversList();" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <select onchange="window.updateAchieverField(${idx}, 'image', this.value); window.renderAchieversList();" class="admin-select" style="width: 100%; padding: 3px 6px; font-size: 0.72rem; margin-top: 4px;">
+              <option value="">-- त्वरित फोटो चुनें --</option>
+              ${availablePhotos.map(ph => `<option value="${ph}" ${ach.image === ph ? 'selected' : ''}>${ph}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">नाम अंग्रेजी (Name EN)</label>
+            <input type="text" value="${escapeHtml(ach.name)}" onchange="window.updateAchieverField(${idx}, 'name', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+          </div>
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">नाम हिंदी (Name HI)</label>
+            <input type="text" value="${escapeHtml(ach.nameHindi || '')}" onchange="window.updateAchieverField(${idx}, 'nameHindi', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+          </div>
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">शहर / राज्य (Location)</label>
+            <input type="text" value="${escapeHtml(ach.location || '')}" onchange="window.updateAchieverField(${idx}, 'location', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+          </div>
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">रैंक / उपाधि (Rank Badge)</label>
+            <input type="text" value="${escapeHtml(ach.rank || '')}" onchange="window.updateAchieverField(${idx}, 'rank', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">उपलब्धि सारांश (Achievement)</label>
+            <textarea rows="2" onchange="window.updateAchieverField(${idx}, 'achievement', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;">${escapeHtml(ach.achievement || '')}</textarea>
+          </div>
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">प्रशंसापत्र / उद्धरण (Quote)</label>
+            <textarea rows="2" onchange="window.updateAchieverField(${idx}, 'quote', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;">${escapeHtml(ach.quote || '')}</textarea>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.renderAchieversList = renderAchieversList;
+
+  window.updateAchieverField = function(idx, field, val) {
+    if (currentAchievers[idx]) {
+      currentAchievers[idx][field] = val;
+    }
+  };
+
+  window.removeAchieverItem = function(idx) {
+    currentAchievers.splice(idx, 1);
+    renderAchieversList();
+  };
+
+  // Audio Speech Test Listener
+  document.getElementById('btn-test-page-audio-speech')?.addEventListener('click', () => {
+    const text = document.getElementById('pe_input_audio_script')?.value || '';
+    if (!text) {
+      showToast('⚠️ पहले हिंदी वॉइस स्क्रिप्ट लिखें!', 'error');
+      return;
+    }
+    const safeText = text.replace(/\{name\}/g, 'किसान भाई');
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const ut = new SpeechSynthesisUtterance(safeText);
+      ut.lang = 'hi-IN';
+      ut.rate = 0.95;
+      const voices = window.speechSynthesis.getVoices();
+      const hi = voices.find(v => v.lang.includes('hi') || v.name.toLowerCase().includes('hindi'));
+      if (hi) ut.voice = hi;
+      window.speechSynthesis.speak(ut);
+      showToast('🔊 ऑडियो वॉइस टेस्ट शुरू हो गया...', 'info');
+    } else {
+      showToast('❌ ब्राउज़र में स्पीच सिंथेसिस उपलब्ध नहीं है', 'error');
+    }
+  });
+
   document.getElementById('btn_add_hero_slide')?.addEventListener('click', () => {
     currentSlides.push({
       image: '/images/banners/kharif-master-guide-2026-hero-banner.webp',
@@ -945,6 +1662,22 @@ export async function initPageEditor() {
       return;
     }
 
+    const bannerPresets = [
+      { val: '/images/banners/agriculture-banner.jpeg', lbl: '🌱 सम्पूर्ण कृषि हब बैनर' },
+      { val: '/images/banners/offer-banner-kharif-2026.webp', lbl: '🌾 खरीफ 2026 स्पेशल ऑफर' },
+      { val: '/images/banners/kharif-master-guide-2026-hero-banner.webp', lbl: '📖 खरीफ मास्टर गाइड 2026' },
+      { val: '/images/banners/ebook-banner.jpeg', lbl: '📚 डिजिटल ई-बुक स्टोर बैनर' },
+      { val: '/images/banners/health-banner.jpeg', lbl: '❤️ सम्पूर्ण स्वास्थ्य केंद्र बैनर' },
+      { val: '/images/banners/health-diabetes.jpg', lbl: '🩸 मधुमेह / डायबिटीज केयर' },
+      { val: '/images/banners/health-joint-care.jpg', lbl: '🦴 जोड़ों का दर्द व गठिया' },
+      { val: '/images/banners/health-weight-loss.jpg', lbl: '⚖️ मोटापा व वजन घटाएं' },
+      { val: '/images/banners/health-hair-care.jpg', lbl: '💇 बाल झड़ना व डैंड्रफ' },
+      { val: '/images/banners/pashu-palan-banner.jpg', lbl: '🐄 पशु पालन व दुग्ध क्रांति' },
+      { val: '/images/banners/pashu-cow-care.jpg', lbl: '🐄 गाय-भैंस पोषण व देखभाल' },
+      { val: '/images/banners/pashu-goat-care.jpg', lbl: '🐐 बकरी पालन व वजन वृद्धि' },
+      { val: '/images/banners/achievers-banner.jpeg', lbl: '🏆 शीर्ष अचीवर्स व सफलता' }
+    ];
+
     wrap.innerHTML = currentSlides.map((slide, idx) => `
       <div style="background: #0f172a; border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; position: relative;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -954,7 +1687,12 @@ export async function initPageEditor() {
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">बैनर इमेज URL</label>
-            <input type="text" value="${escapeHtml(slide.image)}" onchange="window.updateHeroSlideField(${idx}, 'image', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(slide.image)}" onchange="window.updateHeroSlideField(${idx}, 'image', this.value); window.renderHeroSlidesInBuilder();" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <select onchange="window.updateHeroSlideField(${idx}, 'image', this.value); window.renderHeroSlidesInBuilder();" class="admin-select" style="width: 100%; padding: 3px 6px; font-size: 0.72rem; margin-top: 4px;">
+              <option value="">-- त्वरित लैंडस्केप बैनर चुनें --</option>
+              ${bannerPresets.map(bp => `<option value="${bp.val}" ${slide.image === bp.val ? 'selected' : ''}>${bp.lbl}</option>`).join('')}
+            </select>
+            ${slide.image ? `<div style="margin-top:4px;"><img src="${escapeHtml(slide.image)}" alt="Preview" style="height:36px;border-radius:4px;object-fit:cover;" onerror="this.style.display='none'"></div>` : ''}
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">टैग / ऑफर बैज</label>
@@ -980,6 +1718,8 @@ export async function initPageEditor() {
       </div>
     `).join('');
   }
+
+  window.renderHeroSlidesInBuilder = renderHeroSlidesInBuilder;
 
   window.updateHeroSlideField = function(idx, field, val) {
     if (currentSlides[idx]) currentSlides[idx][field] = val;
@@ -1124,8 +1864,25 @@ export async function initPageEditor() {
     const wrap = document.getElementById('pe_videos_container');
     if (!wrap) return;
 
+    const pageTargetOptions = [
+      { id: 'all', label: '🌐 सभी पेजेस पर (All Pages)' },
+      { id: 'home-page', label: '🏠 मुख्य पृष्ठ (Home Page)' },
+      { id: 'ebook-store', label: '📚 ई-बुक स्टोर (eBook Store)' },
+      { id: 'agriculture', label: '🌱 कृषि हब (Agriculture)' },
+      { id: 'cattle-care', label: '🐄 पशु पालन हब (Cattle Care)' },
+      { id: 'health-hub', label: '❤️ स्वास्थ्य केंद्र (Health Hub)' },
+      { id: 'diabetes', label: '🩸 मधुमेह (Diabetes)' },
+      { id: 'weight-loss', label: '🔥 मोटापा व फैट लॉस (Weight Loss)' },
+      { id: 'joint-care', label: '🦴 जोड़ों का दर्द (Joint Care)' },
+      { id: 'womens-care', label: '🌸 महिला स्वास्थ्य (PCOD/PCOS)' },
+      { id: 'hair-care', label: '💇‍♀️ हेयर केयर (Hair Care)' },
+      { id: 'skin-care', label: '🌺 स्किन केयर (Skin Care)' },
+      { id: 'kids-care', label: '🧸 किड्स केयर (Kids Nutrition)' },
+      { id: 'home-care', label: '🏡 होम केयर (Home Care)' }
+    ];
+
     wrap.innerHTML = currentVideos.map((v, idx) => `
-      <div style="background: #0f172a; border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; position: relative;">
+      <div style="background: #0f172a; border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; position: relative;">
         <div>
           <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">YouTube URL</label>
           <input type="text" value="${escapeHtml(v.url || '')}" onchange="window.updateVideoItem(${idx}, 'url', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
@@ -1133,6 +1890,12 @@ export async function initPageEditor() {
         <div>
           <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">वीडियो शीर्षक</label>
           <input type="text" value="${escapeHtml(v.title || '')}" onchange="window.updateVideoItem(${idx}, 'title', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+        </div>
+        <div>
+          <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">प्रदर्शित करने वाला पेज (Target Page)</label>
+          <select onchange="window.updateVideoItem(${idx}, 'target_page', this.value)" class="admin-select" style="width: 100%; padding: 5px 8px; font-size: 0.8rem; background:#1e293b; color:#fff;">
+            ${pageTargetOptions.map(opt => `<option value="${opt.id}" ${(v.target_page || 'all') === opt.id ? 'selected' : ''}>${opt.label}</option>`).join('')}
+          </select>
         </div>
         <div>
           <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">विवरण</label>
@@ -1305,6 +2068,12 @@ export async function initPageEditor() {
     document.getElementById('pe_chk_ga').checked = p.ga_tag !== false;
     document.getElementById('pe_input_wa_number').value = p.whatsapp_support?.number || '919876543210';
     document.getElementById('pe_input_wa_prompt').value = p.whatsapp_support?.prompt || '';
+    
+    // Audio Narration inputs
+    const audioTitleEl = document.getElementById('pe_input_audio_title');
+    const audioScriptEl = document.getElementById('pe_input_audio_script');
+    if (audioTitleEl) audioTitleEl.value = p.audio_title || p.name || '';
+    if (audioScriptEl) audioScriptEl.value = p.audio_script || '';
 
     currentSlides = Array.isArray(p.hero_slides) ? JSON.parse(JSON.stringify(p.hero_slides)) : [];
     currentSectionsOrder = Array.isArray(p.sections_order) && p.sections_order.length > 0 ? [...p.sections_order] : ALL_SECTION_DEFS.map(s => s.key);
@@ -1340,6 +2109,10 @@ export async function initPageEditor() {
     editingPageId = null;
     document.getElementById('page-editor-form-title').textContent = 'नया साइट पेज बनाएं (Universal Page Editor)';
     document.getElementById('site-page-customizer-form')?.reset();
+    const audioTitleEl = document.getElementById('pe_input_audio_title');
+    const audioScriptEl = document.getElementById('pe_input_audio_script');
+    if (audioTitleEl) audioTitleEl.value = '';
+    if (audioScriptEl) audioScriptEl.value = '';
     currentSlides = [];
     currentSectionsOrder = ALL_SECTION_DEFS.map(s => s.key);
     currentHiddenSections = [];
@@ -1370,6 +2143,8 @@ export async function initPageEditor() {
     const ga = document.getElementById('pe_chk_ga')?.checked !== false;
     const waNum = (document.getElementById('pe_input_wa_number')?.value || '').trim();
     const waPrompt = (document.getElementById('pe_input_wa_prompt')?.value || '').trim();
+    const audioTitle = (document.getElementById('pe_input_audio_title')?.value || '').trim();
+    const audioScript = (document.getElementById('pe_input_audio_script')?.value || '').trim();
 
     const pageObj = {
       id: editingPageId || `page_${slug.replace(/[^a-zA-Z0-9_]/g, '_')}`,
@@ -1381,6 +2156,8 @@ export async function initPageEditor() {
       theme_primary: themeCol,
       theme_dark: adjustColorBrightness(themeCol, -30),
       ticker_text: ticker,
+      audio_title: audioTitle,
+      audio_script: audioScript,
       fb_pixel: fb,
       ga_tag: ga,
       hero_slides: currentSlides,
@@ -1415,6 +2192,27 @@ export async function initPageEditor() {
       if (homePage) {
         localStorage.setItem('AAROGYAM_HOME_CMS_CONFIG', JSON.stringify(homePage));
       }
+      // Synchronize Audio Narration Scripts to AAROGYAM_PAGE_AUDIO_SCRIPTS
+      let existingScripts = {};
+      try {
+        existingScripts = JSON.parse(localStorage.getItem('AAROGYAM_PAGE_AUDIO_SCRIPTS') || '{}');
+      } catch (err) {}
+      allPages.forEach(p => {
+        if (p.audio_script) {
+          const rawSlug = p.slug || p.id.replace(/^page_/, '');
+          existingScripts[rawSlug] = {
+            title: p.audio_title || p.name,
+            script: p.audio_script
+          };
+          if (p.slug === 'index' || p.id === 'page_home') {
+            existingScripts['index'] = {
+              title: p.audio_title || p.name,
+              script: p.audio_script
+            };
+          }
+        }
+      });
+      localStorage.setItem('AAROGYAM_PAGE_AUDIO_SCRIPTS', JSON.stringify(existingScripts));
     } catch (e) {}
   }
 
