@@ -233,9 +233,13 @@ class ProAudioBookEngine {
     }
 
     handleTrackEnded() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDemo = urlParams.get('demo') === '1' || urlParams.get('demo') === 'true' || Boolean(window.aoiCurrentBookData?.isDemo) || String(window.aoiBookId).startsWith('DEMO');
         const totalPages = window.aoiTotalPages || 152;
         const curPage = window.aoiPageNum || 1;
-        if (this.autoNextPage && curPage < totalPages) {
+
+        // Never auto-advance on demo pages: let user read and decide
+        if (!isDemo && this.autoNextPage && curPage < totalPages) {
             this.updateStatusDisplay(`⏭️ पृष्ठ ${curPage} समाप्त • अगले पृष्ठ पर जा रहे हैं...`);
             setTimeout(() => {
                 if (!this.isPlaying) return;
@@ -245,8 +249,144 @@ class ProAudioBookEngine {
             }, 700);
         } else {
             this.setPlayingState(false);
-            this.updateStatusDisplay(`✅ पुस्तक वाचन समाप्त हुआ`);
+            this.updateStatusDisplay(isDemo ? `✅ पृष्ठ ${curPage} ऑडियो समाप्त • अगला पृष्ठ पढ़ने के लिए 'Next ▶' दबाएं` : `✅ पुस्तक वाचन समाप्त हुआ`);
         }
+    }
+
+    handleBrowserTtsRestriction() {
+        this.stop();
+        this.updateStatusDisplay(`⚠️ इस ब्राउज़र में ऑडियो समर्थित नहीं है`);
+
+        const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+        const isFbOrInApp = /FBAN|FBAV|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
+
+        if (isFbOrInApp) {
+            this.showOpenInBrowserModal();
+        } else {
+            const oldToast = document.getElementById('aiTtsMissingToast');
+            if (oldToast) oldToast.remove();
+            const toast = document.createElement('div');
+            toast.id = 'aiTtsMissingToast';
+            toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:8px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;z-index:999999;box-shadow:0 4px 14px rgba(0,0,0,0.5);white-space:nowrap;";
+            toast.textContent = "⚠️ आपके ब्राउज़र में AI आवाज़ समर्थित नहीं है। कृपया Google Chrome में खोलें।";
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4500);
+        }
+    }
+
+    showOpenInBrowserModal() {
+        if (sessionStorage.getItem('AIM_BROWSER_MODAL_DISMISSED')) return;
+        if (document.getElementById('ai-open-in-browser-modal')) return;
+
+        const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
+        const universalIntent = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end`;
+
+        const modalHtml = `
+          <div id="ai-open-in-browser-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+            <div style="background:#0f172a;border:1.5px solid #334155;border-radius:20px;max-width:390px;width:100%;padding:24px 20px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,0.7);position:relative;color:#fff;font-family:system-ui,-apple-system,sans-serif;">
+              
+              <!-- Close (✕) Button Top-Right -->
+              <button id="aiCloseBrowserModalBtn" style="position:absolute;top:10px;right:12px;background:none;border:none;color:#94a3b8;font-size:1.8rem;cursor:pointer;line-height:1;padding:4px;" title="बंद करें">&times;</button>
+
+              <!-- Supported Browser Logos Stack (One line, overlapping badges, without names) -->
+              <div style="display:flex;justify-content:center;align-items:center;margin-bottom:14px;">
+                <div style="display:flex;align-items:center;">
+                  <!-- Chrome -->
+                  <div style="width:36px;height:36px;border-radius:50%;border:2px solid #0f172a;box-shadow:0 3px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:5;background:#fff;overflow:hidden;" title="Google Chrome">
+                    <svg viewBox="0 0 48 48" width="30" height="30">
+                      <path fill="#4CAF50" d="M24,4C13,4,4,13,4,24c0,2.6,0.5,5,1.4,7.3l10.1-17.5C17.3,10.6,20.4,9,24,9c4.4,0,8.2,2.4,10.3,6L44,15 C40.4,8.4,32.8,4,24,4z"/>
+                      <path fill="#FBC02D" d="M44,15h-9.7c1.7,2.5,2.7,5.5,2.7,8.7c0,2.1-0.4,4.2-1.2,6l-10.3,17.9C24.5,47.9,25.2,48,26,48 c12.2,0,22-9.8,22-22C48,20.3,46.5,17.4,44,15z"/>
+                      <path fill="#E53935" d="M15.5,13.8L5.4,31.3C8.9,39.3,16.8,45,26,45l10.3-17.9C34.2,29.6,30.3,31,26,31c-3.6,0-6.7-1.6-8.8-4.2 L15.5,13.8z"/>
+                      <circle fill="#FFFFFF" cx="24" cy="24" r="9"/>
+                      <circle fill="#1E88E5" cx="24" cy="24" r="7"/>
+                    </svg>
+                  </div>
+                  <!-- Opera -->
+                  <div style="width:36px;height:36px;border-radius:50%;border:2px solid #0f172a;box-shadow:0 3px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;margin-left:-9px;z-index:4;background:#fff;overflow:hidden;" title="Opera">
+                    <svg viewBox="0 0 32 32" width="28" height="28">
+                      <circle cx="16" cy="16" r="16" fill="#FF1B2D"/>
+                      <ellipse cx="16" cy="16" rx="6.5" ry="11" fill="#FFFFFF"/>
+                      <ellipse cx="16" cy="16" rx="4" ry="9" fill="#FF1B2D"/>
+                    </svg>
+                  </div>
+                  <!-- Edge -->
+                  <div style="width:36px;height:36px;border-radius:50%;border:2px solid #0f172a;box-shadow:0 3px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;margin-left:-9px;z-index:3;background:#fff;overflow:hidden;" title="Microsoft Edge">
+                    <svg viewBox="0 0 32 32" width="28" height="28">
+                      <circle cx="16" cy="16" r="16" fill="#0078D7"/>
+                      <path d="M16 6C10.5 6 6 10.5 6 16c0 4 2.5 7.5 6 9 1-1.5 2.5-3.5 2.5-5.5 0-3-2-4.5-2-7 0-3 2.5-4.5 5-4.5 3 0 5.5 2 5.5 5 0 2.5-1.5 4.5-4 5.5-1.5.5-3 1.5-3 3 0 2 2 3.5 4.5 3.5 5 0 9-4 9-9 0-5.5-4.5-10-10-10z" fill="#FFFFFF"/>
+                    </svg>
+                  </div>
+                  <!-- Safari -->
+                  <div style="width:36px;height:36px;border-radius:50%;border:2px solid #0f172a;box-shadow:0 3px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;margin-left:-9px;z-index:2;background:#fff;overflow:hidden;" title="Safari">
+                    <svg viewBox="0 0 32 32" width="28" height="28">
+                      <circle cx="16" cy="16" r="16" fill="#006CFF"/>
+                      <circle cx="16" cy="16" r="13.5" fill="none" stroke="#FFFFFF" stroke-width="1.2"/>
+                      <polygon points="16,5 19,13 27,16 19,19 16,27 13,19 5,16 13,13" fill="#FFFFFF"/>
+                      <polygon points="16,5 19,13 27,16 19,19" fill="#FF3B30"/>
+                    </svg>
+                  </div>
+                  <!-- Samsung Internet -->
+                  <div style="width:36px;height:36px;border-radius:50%;border:2px solid #0f172a;box-shadow:0 3px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;margin-left:-9px;z-index:1;background:#fff;overflow:hidden;" title="Samsung Internet">
+                    <svg viewBox="0 0 32 32" width="28" height="28">
+                      <circle cx="16" cy="16" r="16" fill="#1C69D4"/>
+                      <ellipse cx="16" cy="16" rx="11" ry="5.5" fill="none" stroke="#FFFFFF" stroke-width="2" transform="rotate(-30 16 16)"/>
+                      <circle cx="16" cy="16" r="6" fill="#FFFFFF"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Title & Explanation (No payment/UPI words!) -->
+              <h3 style="margin:0 0 8px;font-size:1.1rem;font-weight:900;color:#f8fafc;line-height:1.3;">
+                🎧 क्या आप इस पुस्तक को सुनना चाहते हैं?
+              </h3>
+              <p style="margin:0 0 16px;font-size:0.84rem;color:#cbd5e1;line-height:1.45;">
+                इस पेज को सरल हिंदी ऑडियो में सुनने के लिए इसे अपने फ़ोन के मुख्य ब्राउज़र (Chrome / Browser) में खोलें।
+              </p>
+
+              <!-- Primary Action: Open in Browser Button -->
+              <button id="aiOpenBrowserIntentBtn" style="width:100%;background:linear-gradient(135deg, #10b981, #059669);color:#fff;border:none;border-radius:12px;padding:12px 16px;font-size:0.92rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(16,185,129,0.4);transition:all 0.2s;">
+                <span>🌐</span> <span>मुख्य ब्राउज़र में खोलें (क्लिक करें)</span>
+              </button>
+
+              <!-- Fallback helper guide -->
+              <div id="aiBrowserFallbackHelper" style="display:none;margin-top:10px;padding:8px 10px;background:rgba(255,255,255,0.06);border-radius:8px;font-size:0.75rem;color:#fde047;line-height:1.35;">
+                📋 लिंक कॉपी हो गया है! यदि ब्राउज़र सीधे न खुले, तो ऊपर दाएँ कोने के <strong>⋮ (3 डॉट्स)</strong> दबाकर <strong>'Open in Browser'</strong> चुनें।
+              </div>
+
+              <!-- Secondary Action: Stay and read silently -->
+              <button id="aiStayHereBtn" style="margin-top:14px;background:transparent;border:none;color:#94a3b8;font-size:0.8rem;font-weight:600;cursor:pointer;text-decoration:underline;">
+                ✕ यहीं बिना ऑडियो के पढ़ना जारी रखें
+              </button>
+
+            </div>
+          </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        const modal = document.getElementById('ai-open-in-browser-modal');
+        const dismiss = () => {
+            sessionStorage.setItem('AIM_BROWSER_MODAL_DISMISSED', 'true');
+            if (modal) modal.remove();
+        };
+
+        document.getElementById('aiCloseBrowserModalBtn')?.addEventListener('click', dismiss);
+        document.getElementById('aiStayHereBtn')?.addEventListener('click', dismiss);
+
+        // Click handler for Open in Browser
+        document.getElementById('aiOpenBrowserIntentBtn')?.addEventListener('click', () => {
+            try {
+                navigator.clipboard.writeText(window.location.href).catch(() => {});
+            } catch(e) {}
+
+            window.location.href = universalIntent;
+
+            setTimeout(() => {
+                const helper = document.getElementById('aiBrowserFallbackHelper');
+                if (helper) helper.style.display = 'block';
+            }, 1200);
+        });
     }
 
     async requestWakeLock() {
@@ -524,6 +664,8 @@ class ProAudioBookEngine {
             this.updateProgressBar(this.currentChunkIndex + 1, chunks.length);
 
             let hasAdvanced = false;
+            let chunkStartTime = Date.now();
+
             const advance = () => {
                 if (hasAdvanced || !this.isPlaying || this.activeEpoch !== currentEpoch) return;
                 hasAdvanced = true;
@@ -544,24 +686,38 @@ class ProAudioBookEngine {
                         ut.voice = this.femaleVoice;
                     }
 
+                    ut.onstart = () => {
+                        chunkStartTime = Date.now();
+                    };
+
                     ut.onend = () => {
+                        const elapsed = Date.now() - chunkStartTime;
+                        // In Facebook / WebView without TTS, onend triggers instantly in < 250ms without speaking:
+                        if (elapsed < 250 && currentChunk.length > 6) {
+                            console.warn("SpeechSynthesis ended prematurely (In-App Browser restriction)");
+                            this.handleBrowserTtsRestriction();
+                            return;
+                        }
                         advance();
                     };
 
                     ut.onerror = (e) => {
                         if (e && e.error !== 'canceled' && e.error !== 'interrupted') {
-                            console.warn("Speech error:", e);
+                            console.warn("Speech error in restricted browser:", e);
+                            this.handleBrowserTtsRestriction();
+                            return;
                         }
                         advance();
                     };
 
+                    chunkStartTime = Date.now();
                     this.synth.speak(ut);
                 } catch(err) {
                     console.warn("Synth speak error:", err);
-                    advance();
+                    this.handleBrowserTtsRestriction();
                 }
             } else {
-                advance();
+                this.handleBrowserTtsRestriction();
             }
         };
 
@@ -890,19 +1046,47 @@ class ProAudioBookEngine {
             });
         }
 
-        // Auto-open if redirected with ?audio=1
+        // Auto-play on Demo Page & Handle Facebook In-App Browser
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('audio') === '1' || urlParams.get('audio') === 'true') {
+        const isDemo = urlParams.get('demo') === '1' || urlParams.get('demo') === 'true' || Boolean(window.aoiCurrentBookData?.isDemo) || String(window.aoiBookId).startsWith('DEMO');
+        const wantsAutoplay = isDemo || urlParams.get('audio') === '1' || urlParams.get('audio') === 'true';
+
+        const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+        const isFbOrInApp = /FBAN|FBAV|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
+
+        if (isFbOrInApp) {
+            // In Facebook / Instagram In-App Browser:
+            // Proactive prompt after 4 seconds to open in Chrome / System Browser for Audio
+            setTimeout(() => {
+                if (!this.isPlaying && !sessionStorage.getItem('AIM_BROWSER_MODAL_DISMISSED')) {
+                    this.showOpenInBrowserModal();
+                }
+            }, 4000);
+        } else if (wantsAutoplay) {
+            // In Regular Browser: Immediate Smooth Autoplay on Demo Page Open!
             setTimeout(() => {
                 bar.classList.add('open');
                 this.playCurrentPage();
-            }, 800);
+
+                // Gesture fallback if browser requires touch/click gesture before audio context:
+                const triggerGesturePlay = () => {
+                    if (!this.isPlaying) {
+                        this.playCurrentPage();
+                    }
+                    document.removeEventListener('click', triggerGesturePlay);
+                    document.removeEventListener('touchstart', triggerGesturePlay);
+                };
+                document.addEventListener('click', triggerGesturePlay, { once: true });
+                document.addEventListener('touchstart', triggerGesturePlay, { once: true });
+            }, 1000);
         }
 
         // Feature Announcement Toast
         setTimeout(() => {
-            this.showMarketingAudioToast();
-        }, 1000);
+            if (!isFbOrInApp) {
+                this.showMarketingAudioToast();
+            }
+        }, 1200);
     }
 
     showMarketingAudioToast() {
