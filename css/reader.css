@@ -1445,7 +1445,7 @@ body.immersive-mode .floating-controls {
    ================================================================= */
 .ai-floating-buy-nudge {
     position: fixed;
-    bottom: 165px;
+    bottom: 195px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 99999 !important;
@@ -1559,7 +1559,7 @@ body.immersive-mode .floating-controls {
 
 @media (max-width: 600px) {
     .ai-floating-buy-nudge {
-        bottom: 160px;
+        bottom: 215px !important;
         padding: 6px 10px 6px 14px;
         max-width: 95%;
     }
