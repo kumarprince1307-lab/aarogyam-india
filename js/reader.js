@@ -233,12 +233,9 @@ async function verifyUserAccessAndSession(targetBookId) {
             document.body.prepend(demoBar);
 
             if (hasVideos) {
-                document.getElementById('readerVideoBtn')?.addEventListener('click', () => {
-                    if (window.openBookVideoModal) {
-                        window.openBookVideoModal(bookTitle, videos);
-                    } else {
-                        alert(`Video URL: ${videos[0].url}`);
-                    }
+                document.getElementById('readerVideoBtn')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.openBookVideoModal(bookTitle, videos);
                 });
             }
         }
@@ -1079,3 +1076,191 @@ if (submitAiQuery) {
         if (aiAskModal) aiAskModal.style.display = "none";
     });
 }
+
+// =================================================================
+// UNIVERSAL IN-PAGE VIDEO PLAYER MODAL ENGINE (MULTI-VIDEO PLAYLIST)
+// =================================================================
+window.extractYoutubeEmbedUrl = function (url) {
+    if (!url) return '';
+    let str = String(url).trim();
+    if (str.includes('embed/')) return str;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+    const match = str.match(regExp);
+    if (match && match[2].length === 11) {
+        return `https://www.youtube-nocookie.com/embed/${match[2]}?autoplay=1&rel=0&modestbranding=1`;
+    }
+    return str;
+};
+
+window.switchActiveVideoModal = function (url, btn) {
+    const frame = document.getElementById('ai-active-video-frame');
+    const nativePlayer = document.getElementById('ai-active-video-native');
+    const isDirect = /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
+
+    if (isDirect) {
+        if (frame) {
+            frame.src = '';
+            frame.style.display = 'none';
+        }
+        if (nativePlayer) {
+            nativePlayer.style.display = 'block';
+            nativePlayer.src = url;
+            nativePlayer.play().catch(() => {});
+        }
+    } else {
+        if (nativePlayer) {
+            nativePlayer.pause();
+            nativePlayer.style.display = 'none';
+        }
+        if (frame) {
+            frame.style.display = 'block';
+            frame.src = window.extractYoutubeEmbedUrl(url);
+        }
+    }
+
+    document.querySelectorAll('.ai-video-playlist-btn').forEach(b => {
+        b.style.background = '#1e293b';
+        b.style.borderColor = '#334155';
+        b.classList.remove('active');
+    });
+    if (btn) {
+        btn.style.background = '#ef4444';
+        btn.style.borderColor = '#ef4444';
+        btn.classList.add('active');
+    }
+};
+
+window.closeBookVideoModal = function () {
+    const overlay = document.getElementById('ai-book-video-modal-overlay');
+    if (overlay) {
+        const frame = document.getElementById('ai-active-video-frame');
+        if (frame) frame.src = '';
+        const nativePlayer = document.getElementById('ai-active-video-native');
+        if (nativePlayer) nativePlayer.pause();
+        overlay.remove();
+    }
+};
+
+window.openBookVideoModal = function (bookTitle, videos) {
+    window.closeBookVideoModal();
+
+    let list = [];
+    if (Array.isArray(videos)) {
+        list = videos.map((v, i) => {
+            if (typeof v === 'string') return { title: `भाग #${i + 1}`, url: v };
+            return { title: v.title || `भाग #${i + 1}`, url: v.url || v.link || '' };
+        }).filter(v => v && v.url);
+    } else if (typeof videos === 'string' && videos.trim()) {
+        list = [{ title: '📺 वीडियो डेमो', url: videos.trim() }];
+    }
+
+    if (list.length === 0) {
+        alert('इस पुस्तक के लिए कोई वीडियो लिंक उपलब्ध नहीं है।');
+        return;
+    }
+
+    const firstItem = list[0];
+    const isDirect = /\.(mp4|webm|ogg)(\?.*)?$/i.test(firstItem.url);
+    const firstEmbed = window.extractYoutubeEmbedUrl(firstItem.url);
+
+    const safeTitle = (bookTitle || 'eBook').replace(/[<>&"']/g, (c) => {
+        switch (c) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            case '"': return '&quot;';
+            case "'": return '&#39;';
+        }
+        return c;
+    });
+
+    const modalHtml = `
+      <div id="ai-book-video-modal-overlay" style="display:flex;align-items:center;justify-content:center;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999999;padding:16px;box-sizing:border-box;">
+        <div style="background:#0f172a;border:1.5px solid #334155;border-radius:20px;max-width:760px;width:100%;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,0.7);position:relative;color:#fff;display:flex;flex-direction:column;max-height:92vh;">
+          
+          <!-- Header -->
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:#1e293b;border-bottom:1px solid #334155;flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:1.2rem;color:#ef4444;">🎬</span>
+              <h3 style="margin:0;font-size:1.05rem;font-weight:900;color:#f8fafc;line-height:1.2;">
+                ${safeTitle} — वीडियो डेमो
+              </h3>
+            </div>
+            <button onclick="window.closeBookVideoModal()" style="background:transparent;border:none;color:#94a3b8;font-size:1.8rem;cursor:pointer;line-height:1;padding:0 8px;display:flex;align-items:center;" title="बंद करें (Close)">&times;</button>
+          </div>
+
+          <!-- Video Player Container (16:9 Responsive) -->
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;flex-shrink:0;">
+            <iframe 
+              id="ai-active-video-frame" 
+              src="${isDirect ? '' : firstEmbed}" 
+              title="${safeTitle}" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen 
+              style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;display:${isDirect ? 'none' : 'block'};">
+            </iframe>
+            <video 
+              id="ai-active-video-native" 
+              src="${isDirect ? firstItem.url : ''}" 
+              controls 
+              autoplay 
+              style="position:absolute;top:0;left:0;width:100%;height:100%;display:${isDirect ? 'block' : 'none'};background:#000;">
+            </video>
+          </div>
+
+          <!-- Multi-Video Playlist Selector (If more than 1 video) -->
+          ${list.length > 1 ? `
+            <div style="padding:12px 18px;background:#0b1329;border-top:1px solid #1e293b;flex-shrink:0;">
+              <div style="font-size:0.78rem;font-weight:800;color:#38bdf8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
+                <span>📺</span> <span>वीडियो प्लेलिस्ट (कुल ${list.length} भाग उपलब्ध - देखने के लिए चुनें):</span>
+              </div>
+              <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;">
+                ${list.map((v, idx) => {
+                  const safeVTitle = (v.title || `भाग #${idx + 1}`).replace(/[<>&"']/g, '');
+                  const rawUrl = (v.url || '').replace(/'/g, "\\'");
+                  return `
+                    <button 
+                      type="button" 
+                      onclick="window.switchActiveVideoModal('${rawUrl}', this)" 
+                      class="ai-video-playlist-btn ${idx === 0 ? 'active' : ''}" 
+                      style="padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;background:${idx === 0 ? '#ef4444' : '#1e293b'};color:#fff;border:1px solid ${idx === 0 ? '#ef4444' : '#334155'};transition:all 0.2s;"
+                    >
+                      <span>▶</span> <span>${safeVTitle}</span>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Footer Actions -->
+          <div style="padding:10px 18px;display:flex;justify-content:space-between;align-items:center;background:#0f172a;flex-wrap:wrap;gap:10px;border-top:1px solid #1e293b;flex-shrink:0;">
+            <div style="font-size:0.78rem;color:#94a3b8;">
+              🌾 Aarogyam India Digital Learning Hub
+            </div>
+            <button onclick="window.closeBookVideoModal()" style="background:#334155;color:#fff;border:none;padding:6px 16px;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;">
+              बंद करें (Close)
+            </button>
+          </div>
+
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Close on overlay click outside box
+    const overlay = document.getElementById('ai-book-video-modal-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) window.closeBookVideoModal();
+        });
+    }
+};
+
+// Global ESC key listener to close video modal
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+        window.closeBookVideoModal();
+    }
+});
