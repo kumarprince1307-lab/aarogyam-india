@@ -233,23 +233,31 @@ class ProAudioBookEngine {
     }
 
     handleTrackEnded() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const isDemo = urlParams.get('demo') === '1' || urlParams.get('demo') === 'true' || Boolean(window.aoiCurrentBookData?.isDemo) || String(window.aoiBookId).startsWith('DEMO');
+        const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+        const isFbOrInApp = /FBAN|FBAV|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
         const totalPages = window.aoiTotalPages || 152;
         const curPage = window.aoiPageNum || 1;
 
-        // Never auto-advance on demo pages: let user read and decide
-        if (!isDemo && this.autoNextPage && curPage < totalPages) {
+        // In Facebook / In-App browser: Strictly turn off auto-advance so pages never skip without audio
+        if (isFbOrInApp) {
+            this.setPlayingState(false);
+            this.updateStatusDisplay(`✅ पृष्ठ ${curPage} समाप्त • आगे पढ़ने के लिए पन्ना पलटें`);
+            return;
+        }
+
+        // In Standard Browsers (Chrome, Edge, Safari, Opera, Samsung Internet):
+        // As soon as audio finishes, advance to the next page and continue playing!
+        if (this.autoNextPage && curPage < totalPages) {
             this.updateStatusDisplay(`⏭️ पृष्ठ ${curPage} समाप्त • अगले पृष्ठ पर जा रहे हैं...`);
             setTimeout(() => {
                 if (!this.isPlaying) return;
                 if (typeof window.onNextPage === 'function') {
                     window.onNextPage();
                 }
-            }, 700);
+            }, 600);
         } else {
             this.setPlayingState(false);
-            this.updateStatusDisplay(isDemo ? `✅ पृष्ठ ${curPage} ऑडियो समाप्त • अगला पृष्ठ पढ़ने के लिए 'Next ▶' दबाएं` : `✅ पुस्तक वाचन समाप्त हुआ`);
+            this.updateStatusDisplay(`✅ पुस्तक वाचन समाप्त हुआ`);
         }
     }
 

@@ -681,8 +681,11 @@ let _audioSyncDebounceTimer = null;
 function syncAudioEngineWithPage(immediate = false) {
     clearTimeout(_audioSyncDebounceTimer);
     const doSync = () => {
-        if (window.aoiAudioBookEngine && window.aoiAudioBookEngine.isPlaying) {
-            window.aoiAudioBookEngine.playCurrentPage();
+        if (window.aoiAudioBookEngine) {
+            const barOpen = document.getElementById('audioBookBar')?.classList.contains('open');
+            if (window.aoiAudioBookEngine.isPlaying || barOpen) {
+                window.aoiAudioBookEngine.playCurrentPage();
+            }
         }
     };
     if (immediate) {
