@@ -21,6 +21,64 @@
     }
   };
 
+  // Universal KPI Card Audio Player (Hindi Speech Synthesis)
+  window.playKpiCardAudio = function (event, title, text) {
+    if (event) {
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
+    if (!('speechSynthesis' in window)) {
+      alert('आपके डिवाइस में हिंदी ऑडियो सिंथेसाइज़र समर्थित नहीं है।');
+      return;
+    }
+    const targetBtn = event?.currentTarget || (event?.target?.closest ? event.target.closest('.kpi-audio-btn') : null);
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      document.querySelectorAll('.kpi-audio-btn').forEach(b => b.classList.remove('playing'));
+      return;
+    }
+    const cleanTitle = (title || 'आरोग्यम समाधान').replace(/<[^>]+>/g, '');
+    const cleanText = (text || '').replace(/<[^>]+>/g, '');
+    const speechStr = `${cleanTitle}। ${cleanText}। सम्पूर्ण वैज्ञानिक समाधान व परामर्श के लिए आरोग्यम इंडिया पर संपर्क करें।`;
+    const utterance = new SpeechSynthesisUtterance(speechStr);
+    utterance.lang = 'hi-IN';
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
+
+    if (targetBtn) targetBtn.classList.add('playing');
+
+    utterance.onend = function () {
+      if (targetBtn) targetBtn.classList.remove('playing');
+    };
+    utterance.onerror = function () {
+      if (targetBtn) targetBtn.classList.remove('playing');
+    };
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Universal KPI Card Blue Share Trigger (Native WebShare with WhatsApp fallback)
+  window.triggerKpiNativeShare = function (event, title, text, targetUrl) {
+    if (event) {
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
+    const pageUrl = targetUrl ? (new URL(targetUrl, window.location.origin).href) : window.location.href;
+    const cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '');
+    const cleanText = (text || '').replace(/<[^>]+>/g, '');
+    const shareMessage = `🌾 *${cleanTitle}*\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व आयुर्वेदिक उपाय देखें:\n${pageUrl}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: cleanTitle,
+        text: shareMessage,
+        url: pageUrl
+      }).catch(() => { });
+    } else {
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+      window.open(waUrl, '_blank');
+    }
+  };
+
   // -------------------------------------------------------------
   const DEFAULT_HEALTH_DISEASES = [
     {
@@ -446,9 +504,6 @@
   // -------------------------------------------------------------
   // 2. HERO BANNER CAROUSEL
   // -------------------------------------------------------------
-  // -------------------------------------------------------------
-  // 2. HERO BANNER CAROUSEL (BigHaat & AgriBegri Style)
-  // -------------------------------------------------------------
   let heroSlideIndex = 0;
   let heroSlideTimer = null;
 
@@ -586,7 +641,7 @@
                 break;
               }
             }
-          } catch (err) {}
+          } catch (err) { }
         }
       }
     } catch (e) {
@@ -621,7 +676,7 @@
 
       return `
         <div class="health-disease-card" style="border-top: 4px solid ${color}; padding:0; overflow:hidden;">
-          <div style="height:150px; overflow:hidden; position:relative; background:#0f172a;">
+          <div style="height:150px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='${subPageLink}'" title="${safeTitle} - विस्तार से देखें">
             <img src="${item.image || '/images/banners/health-banner.jpeg'}" alt="${safeTitle}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'" />
             <span style="position:absolute; top:10px; left:10px; background:${color}; color:#ffffff; font-size:0.72rem; font-weight:900; padding:3px 10px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
               ${badge}
@@ -659,11 +714,19 @@
               </div>
             </div>
 
-            <div style="display:flex; gap:8px; align-items:center;">
-              <a href="${subPageLink}" class="btn" style="background:rgba(255,255,255,0.15); color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:20px; text-decoration:none; white-space:nowrap;">
+            <div class="kpi-actions-row">
+              <a href="${subPageLink}" class="btn" style="background:rgba(255,255,255,0.15); color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
                 विस्तार से →
               </a>
-              <button type="button" onclick="window.consultAiExpert('${safeTitle}', '${safeDesc}')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 14px; font-size:0.84rem;">
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, '${safeTitle}', '${safeDesc}')" title="ऑडियो विवरण सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, '${safeTitle}', '${safeDesc}', '${subPageLink}')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('${safeTitle}', '${safeDesc}')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px;">
                 <i class="fa-brands fa-whatsapp"></i>
                 <span>सलाह लें</span>
               </button>
@@ -700,7 +763,7 @@
                 break;
               }
             }
-          } catch (err) {}
+          } catch (err) { }
         }
       }
     } catch (e) {
@@ -718,11 +781,13 @@
       const issues = Array.isArray(item.mainIssues) ? item.mainIssues.join(', ') : (item.issues || item.mainIssues || 'कीट व रोग');
       const solution = item.solution || 'सटीक स्प्रे व पोषण प्रबंधन।';
       const safeName = name.replace(/"/g, '&quot;');
+      const safeIssues = issues.replace(/"/g, '&quot;');
+      const cropPageLink = '/ebooks/agriculture.html';
 
       return `
         <div class="agri-item-card">
-          <div class="agri-card-img-wrap">
-            <img src="${image}" alt="${name}" loading="lazy" onerror="this.src='/images/crops/soyabeen.jpeg'" />
+          <div class="agri-card-img-wrap" style="height:150px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='${cropPageLink}'" title="${safeName} - कृषि हब पर देखें">
+            <img src="${image}" alt="${safeName}" loading="lazy" onerror="this.src='/images/crops/soyabeen.jpeg'" style="width:100%; height:100%; object-fit:cover;" />
             <span style="position:absolute;top:10px;left:10px;background:#15803d;color:#ffffff;font-size:0.72rem;font-weight:900;padding:3px 10px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.3);">
               ${season}
             </span>
@@ -731,7 +796,7 @@
           <div class="agri-card-content">
             <div>
               <h3 style="font-size:1.15rem;font-weight:900;color:#ffffff;margin:0 0 6px 0;">
-                🌾 ${name}
+                <a href="${cropPageLink}" style="color:#ffffff;text-decoration:none;">🌾 ${name}</a>
               </h3>
               <div style="font-size:0.84rem;color:#bfdbfe;margin-bottom:8px;line-height:1.4;">
                 <strong style="color:#fde047;">मुख्य समस्याएं:</strong> ${issues}
@@ -741,10 +806,23 @@
               </div>
             </div>
 
-            <button type="button" onclick="window.consultAiExpert('${safeName} फसल सुरक्षा', 'समस्याएं: ${issues}')" class="ai-expert-red-btn" style="width:100%;">
-              <i class="fa-brands fa-whatsapp" style="font-size:1.15rem;"></i>
-              <span>AI एक्सपर्ट से सलाह लें</span>
-            </button>
+            <div class="kpi-actions-row">
+              <a href="${cropPageLink}" class="btn" style="background:rgba(255,255,255,0.15); color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                विस्तार से →
+              </a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, '${safeName} फसल सुरक्षा', 'समस्याएं: ${safeIssues}')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, '${safeName} फसल सुरक्षा', 'समस्याएं: ${safeIssues}', '${cropPageLink}')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('${safeName} फसल सुरक्षा', 'समस्याएं: ${safeIssues}')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px;">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>सलाह लें</span>
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -778,7 +856,7 @@
                 break;
               }
             }
-          } catch (err) {}
+          } catch (err) { }
         }
       }
     } catch (e) {
@@ -796,10 +874,12 @@
       const issues = Array.isArray(item.mainIssues) ? item.mainIssues.join(', ') : (item.issues || item.mainIssues || 'दूध व स्वास्थ्य समस्याएं');
       const solution = item.solution || 'आयुर्वेदिक मिनरल व पोषण आहार।';
       const safeName = name.replace(/"/g, '&quot;');
+      const safeIssues = issues.replace(/"/g, '&quot;');
+      const pashuPageLink = '/pashu-palan.html';
 
       return `
         <div class="agri-item-card">
-          <div class="agri-card-img-wrap" style="height:150px; position:relative; overflow:hidden; background:#0f172a;">
+          <div class="agri-card-img-wrap" style="height:150px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='${pashuPageLink}'" title="${safeName} - पशु पालन हब पर देखें">
             <img src="${item.image || '/images/banners/pashu-palan-banner.jpg'}" alt="${safeName}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/pashu-palan-banner.jpg'" />
             <span style="position:absolute;top:10px;left:10px;background:#0284c7;color:#ffffff;font-size:0.72rem;font-weight:900;padding:3px 10px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
               ${badge}
@@ -809,7 +889,7 @@
           <div class="agri-card-content">
             <div>
               <h3 style="font-size:1.15rem;font-weight:900;color:#ffffff;margin:0 0 6px 0;">
-                <a href="/pashu-palan.html" style="color:#ffffff;text-decoration:none;">${icon} ${name}</a>
+                <a href="${pashuPageLink}" style="color:#ffffff;text-decoration:none;">${icon} ${name}</a>
               </h3>
               <div style="font-size:0.84rem;color:#bfdbfe;margin-bottom:8px;line-height:1.4;">
                 <strong style="color:#fde047;">प्रमुख लक्ष्य:</strong> ${issues}
@@ -819,11 +899,19 @@
               </div>
             </div>
 
-            <div style="display:flex; gap:8px; align-items:center;">
-              <a href="/pashu-palan.html" class="btn" style="background:rgba(255,255,255,0.15); color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:20px; text-decoration:none; white-space:nowrap;">
+            <div class="kpi-actions-row">
+              <a href="${pashuPageLink}" class="btn" style="background:rgba(255,255,255,0.15); color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
                 विस्तार से →
               </a>
-              <button type="button" onclick="window.consultAiExpert('${safeName}', 'विवरण: ${issues}')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.84rem;">
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, '${safeName}', 'विवरण: ${safeIssues}')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, '${safeName}', 'विवरण: ${safeIssues}', '${pashuPageLink}')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('${safeName}', 'विवरण: ${safeIssues}')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px;">
                 <i class="fa-brands fa-whatsapp"></i>
                 <span>सलाह लें</span>
               </button>
@@ -856,18 +944,19 @@
           list = config.achievers;
         } else {
           const cacheTime = Math.floor(Date.now() / 300000);
-        const urls = ['data/achievers.json', '/data/achievers.json', '../data/achievers.json'];
-        for (const url of urls) {
-          try {
-            const res = await fetch(url + '?v=' + cacheTime);
-            if (res.ok) {
-              const data = await res.json();
-              if (Array.isArray(data.achievers) && data.achievers.length > 0) {
-                list = data.achievers;
-                break;
+          const urls = ['data/achievers.json', '/data/achievers.json', '../data/achievers.json'];
+          for (const url of urls) {
+            try {
+              const res = await fetch(url + '?v=' + cacheTime);
+              if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data.achievers) && data.achievers.length > 0) {
+                  list = data.achievers;
+                  break;
+                }
               }
-            }
-          } catch (err) {}
+            } catch (err) { }
+          }
         }
       }
     } catch (e) {
@@ -884,7 +973,7 @@
           <!-- Top Row: Avatar & Details -->
           <div style="display:flex;align-items:flex-start;gap:14px;">
             <div class="achiever-avatar-circle" style="border: 2px solid ${item.badgeColor || '#f59e0b'}; overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:50%; background:#1e293b;">
-              ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none;font-size:1.8rem;">${item.avatar || '👨‍💼'}</span>` : `<span style="font-size:1.8rem;">${item.avatar || '👨‍💼'}</span>`}
+              ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100\%;height:100\%;object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none;font-size:1.8rem;">${item.avatar || '👨‍💼'}</span>` : `<span style="font-size:1.8rem;">${item.avatar || '👨‍💼'}</span>`}
             </div>
             <div style="flex:1;">
               <h3 class="achiever-name-en">
@@ -962,14 +1051,14 @@
         ]);
         jsonBooks = rB.books || [];
         jsonLp = rL.bookLandingPages || [];
-      } catch (e) {}
+      } catch (e) { }
 
       let customBooks = [];
       let customLp = [];
       try {
         customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
         customLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
-      } catch (e) {}
+      } catch (e) { }
 
       const allActive = [...jsonBooks, ...jsonLp, ...customBooks, ...customLp].filter(b => {
         if (!b || !b.id) return false;
@@ -995,7 +1084,7 @@
           });
         }
       });
-    } catch (e) {}
+    } catch (e) { }
 
     // Guarantee zero duplicates by ID and title
     const seenKeys = new Set();
@@ -1124,7 +1213,7 @@
       const existing = JSON.parse(localStorage.getItem('aarogyam_user_reviews') || '[]');
       existing.unshift(newRev);
       localStorage.setItem('aarogyam_user_reviews', JSON.stringify(existing));
-    } catch (err) {}
+    } catch (err) { }
 
     // Close modal
     const modal = document.getElementById('user-review-modal');
@@ -1165,7 +1254,7 @@
         `;
         grid.prepend(card);
       });
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // -------------------------------------------------------------

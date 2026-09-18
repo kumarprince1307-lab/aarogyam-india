@@ -779,3 +779,91 @@ body {
   max-width: 700px;
   margin: 0 auto;
 }
+
+/* -------------------------------------------------------------
+   9. UNIVERSAL KPI CARD BUTTONS (BLUE SHARE & AUDIO ENGINE)
+   ------------------------------------------------------------- */
+.kpi-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.kpi-blue-share-btn {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.8rem !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+}
+
+.kpi-blue-share-btn:hover {
+  background: #0369a1 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.5) !important;
+}
+
+.kpi-blue-share-btn:active {
+  transform: scale(0.96) !important;
+}
+
+.kpi-audio-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.8rem !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  white-space: nowrap !important;
+}
+
+.kpi-audio-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.5) !important;
+}
+
+.kpi-audio-btn:active {
+  transform: scale(0.96) !important;
+}
+
+.kpi-audio-btn.playing {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  animation: kpiPulseAudio 1.5s infinite !important;
+}
+
+@keyframes kpiPulseAudio {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.kpi-card-link-wrap {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card-link-wrap:hover {
+  transform: translateY(-3px);
+}
+

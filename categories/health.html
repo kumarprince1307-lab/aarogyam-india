@@ -201,95 +201,345 @@
         <p style="color:#64748b; font-size:0.95rem;">प्रत्येक समस्या के लिए वैज्ञानिक जानकारी, लक्षण पहचान और सटीक प्राकृतिक समाधान</p>
       </div>
 
-      <div class="health-grid">
+      <div class="health-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:22px;">
         
         <!-- 1. Diabetes -->
-        <a href="/health/diabetes.html" class="health-card">
-          <span class="health-card-badge" style="background:#dbeafe; color:#1d4ed8;">🩸 ब्लड शुगर</span>
-          <div class="health-icon-bubble" style="background:#eff6ff; color:#2563eb;">🩺</div>
-          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">मधुमेह (डायबिटीज)</h3>
-          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
-            फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।
-          </p>
-          <span style="color:#2563eb; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
-        </a>
+        <div class="health-disease-card" style="border-top: 4px solid #3b82f6; padding:0; overflow:hidden; background:#ffffff; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='/health/diabetes.html'" title="मधुमेह (डायबिटीज) - विस्तार से देखें">
+            <img src="/images/banners/health-diabetes.jpg" alt="मधुमेह (डायबिटीज)" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+            <span style="position:absolute; top:10px; left:10px; background:#3b82f6; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🩸 ब्लड शुगर नियंत्रण
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🩸</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">
+                <a href="/health/diabetes.html" style="color:#0f172a; text-decoration:none;">मधुमेह (डायबिटीज)</a>
+              </h3>
+            </div>
+            <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin-bottom:10px;">
+              फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।
+            </p>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px;">
+              <span class="health-symptom-tag" style="background:#eff6ff; color:#1d4ed8; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• बार-बार पेशाब आना</span>
+              <span class="health-symptom-tag" style="background:#eff6ff; color:#1d4ed8; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• थकान व कमजोरी</span>
+              <span class="health-symptom-tag" style="background:#eff6ff; color:#1d4ed8; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• शुगर लेवल असंतुलन</span>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 प्राकृतिक फार्मूला:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">जामुन-करेला अर्क, गिलोय व मेथी दाना का प्राकृतिक योग और वैज्ञानिक डाइट प्लान।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="/health/diabetes.html" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">विस्तार से →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'मधुमेह डायबिटीज केयर', 'फास्टिंग व PP शुगर का प्राकृतिक संतुलन, जामुन करेला अर्क व आहार प्लान।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'मधुमेह डायबिटीज केयर', 'ब्लड शुगर नियंत्रण का प्राकृतिक समाधान देखें', '/health/diabetes.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('डायबिटीज केयर', 'ब्लड शुगर समस्या')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- 2. Weight Loss / Fat Loss -->
-        <a href="/health/weight-loss.html" class="health-card">
-          <span class="health-card-badge" style="background:#fef3c7; color:#b45309;">🔥 मेटाबॉलिज्म</span>
-          <div class="health-icon-bubble" style="background:#fffbeb; color:#d97706;">⚡</div>
-          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">मोटापा व फैट लॉस</h3>
-          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
-            बिना कमजोरी या भूखे रहे जिद्दी पेट की चर्बी घटाएं और मेटाबॉलिज्म को तेज बनाएं।
-          </p>
-          <span style="color:#d97706; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
-        </a>
+        <div class="health-disease-card" style="border-top: 4px solid #f59e0b; padding:0; overflow:hidden; background:#ffffff; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='/health/weight-loss.html'" title="मोटापा व वजन घटाएं - विस्तार से देखें">
+            <img src="/images/banners/health-weight-loss.jpg" alt="मोटापा व फैट लॉस" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+            <span style="position:absolute; top:10px; left:10px; background:#f59e0b; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🔥 मेटाबॉलिज्म व फैट लॉस
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#fffbeb; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">⚡</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">
+                <a href="/health/weight-loss.html" style="color:#0f172a; text-decoration:none;">मोटापा व फैट लॉस</a>
+              </h3>
+            </div>
+            <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin-bottom:10px;">
+              बिना कमजोरी या भूखे रहे जिद्दी पेट की चर्बी घटाएं और मेटाबॉलिज्म को तेज बनाएं।
+            </p>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px;">
+              <span class="health-symptom-tag" style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• पेट पर जिद्दी चर्बी</span>
+              <span class="health-symptom-tag" style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• धीमा मेटाबॉलिज्म</span>
+              <span class="health-symptom-tag" style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• सांस फूलना</span>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 प्राकृतिक फार्मूला:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">गार्सिनिया कंबोजिया, ग्रीन कॉफी अर्क व 24 घंटे का वैज्ञानिक डाइट चार्ट।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="/health/weight-loss.html" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">विस्तार से →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'मोटापा व वजन घटाएं', 'जिद्दी चर्बी घटाने की सम्पूर्ण डाइट व हर्बल सप्लीमेंट समाधान।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'मोटापा व फैट लॉस', 'प्राकृतिक वजन नियंत्रण का फार्मूला देखें', '/health/weight-loss.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('वेट लॉस', 'वजन नियंत्रण परामर्श')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- 3. Joint Care -->
-        <a href="/health/joint-care.html" class="health-card">
-          <span class="health-card-badge" style="background:#dcfce7; color:#15803d;">🦴 कार्टिलेज रिपेयर</span>
-          <div class="health-icon-bubble" style="background:#f0fdf4; color:#16a34a;">🌿</div>
-          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">जोड़ों का दर्द व गठिया</h3>
-          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
-            घुटनों की ग्रीस (सायनोवियल फ्लूइड) बढ़ाएं, सूजन कम करें और बिना ऑपरेशन चलने की क्षमता पाएं।
-          </p>
-          <span style="color:#16a34a; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
-        </a>
+        <div class="health-disease-card" style="border-top: 4px solid #16a34a; padding:0; overflow:hidden; background:#ffffff; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='/health/joint-care.html'" title="जोड़ों का दर्द व गठिया - विस्तार से देखें">
+            <img src="/images/banners/health-joint-care.jpg" alt="जोड़ों का दर्द व गठिया" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+            <span style="position:absolute; top:10px; left:10px; background:#16a34a; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🦴 कार्टिलेज रिपेयर
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#f0fdf4; color:#16a34a; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🌿</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">
+                <a href="/health/joint-care.html" style="color:#0f172a; text-decoration:none;">जोड़ों का दर्द व गठिया</a>
+              </h3>
+            </div>
+            <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin-bottom:10px;">
+              घुटनों की ग्रीस (सायनोवियल फ्लूइड) बढ़ाएं, सूजन कम करें और बिना ऑपरेशन चलने की क्षमता पाएं।
+            </p>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px;">
+              <span class="health-symptom-tag" style="background:#dcfce7; color:#15803d; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• घुटनों में कट-कट आवाज</span>
+              <span class="health-symptom-tag" style="background:#dcfce7; color:#15803d; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• यूरिक एसिड वृद्धि</span>
+              <span class="health-symptom-tag" style="background:#dcfce7; color:#15803d; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• जकड़न व सूजन</span>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 प्राकृतिक फार्मूला:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">शल्लाकी, निर्गुंडी, अश्वगंधा व ग्लूकोसामाइन युक्त पोषण थेरेपी।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="/health/joint-care.html" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">विस्तार से →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'जोड़ों का दर्द व गठिया', 'कार्टिलेज मजबूती, यूरिक एसिड नियंत्रण और सूजन से राहत का उपाय।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'जोड़ों का दर्द व गठिया', 'घुटनों की ग्रीस व कार्टिलेज रिपेयर उपाय देखें', '/health/joint-care.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('जोड़ों का दर्द', 'गठिया व आर्थराइटिस परामर्श')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- 4. Women's Care -->
-        <a href="/health/womens-care.html" class="health-card">
-          <span class="health-card-badge" style="background:#fce7f3; color:#be185d;">🌸 हार्मोन संतुलन</span>
-          <div class="health-icon-bubble" style="background:#fdf2f8; color:#db2777;">💖</div>
-          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">महिला स्वास्थ्य (हार्मोन)</h3>
-          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
-            PCOD/PCOS, अनियमित पीरियड्स, थायराइड और हीमोग्लोबिन सुधार के लिए शतावरी व लोध्र चिकित्सा।
-          </p>
-          <span style="color:#db2777; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
-        </a>
+        <div class="health-disease-card" style="border-top: 4px solid #db2777; padding:0; overflow:hidden; background:#ffffff; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='/health/womens-care.html'" title="महिला स्वास्थ्य - विस्तार से देखें">
+            <img src="/images/banners/health-banner.jpeg" alt="महिला स्वास्थ्य" style="width:100%; height:100%; object-fit:cover;" />
+            <span style="position:absolute; top:10px; left:10px; background:#db2777; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🌸 हार्मोन संतुलन व PCOD
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#fdf2f8; color:#db2777; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">💖</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">
+                <a href="/health/womens-care.html" style="color:#0f172a; text-decoration:none;">महिला स्वास्थ्य (हार्मोन)</a>
+              </h3>
+            </div>
+            <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin-bottom:10px;">
+              PCOD/PCOS, अनियमित पीरियड्स, थायराइड और हीमोग्लोबिन सुधार के लिए शतावरी व लोध्र चिकित्सा।
+            </p>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px;">
+              <span class="health-symptom-tag" style="background:#fce7f3; color:#9d174d; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• PCOD / PCOS</span>
+              <span class="health-symptom-tag" style="background:#fce7f3; color:#9d174d; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• अनियमित माहवारी</span>
+              <span class="health-symptom-tag" style="background:#fce7f3; color:#9d174d; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• कमजोरी व खून की कमी</span>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 प्राकृतिक फार्मूला:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">शतावरी, अशोकारिष्ट व लोध्र द्वारा सुरक्षित आयुर्वेदिक संतुलन।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="/health/womens-care.html" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">विस्तार से →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'महिला स्वास्थ्य केंद्र', 'PCOD, हार्मोनल असंतुलन व कमजोरी का सम्पूर्ण सुरक्षित हर्बल समाधान।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'महिला स्वास्थ्य केयर', 'हार्मोनल संतुलन व PCOD समाधान देखें', '/health/womens-care.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('महिला स्वास्थ्य', 'PCOD व हार्मोनल परामर्श')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- 5. Hair Care -->
-        <a href="/health/hair-care.html" class="health-card">
-          <span class="health-card-badge" style="background:#ccfbf1; color:#0f766e;">💇‍♀️ हेयर रीग्रोथ</span>
-          <div class="health-icon-bubble" style="background:#f0fdfa; color:#0d9488;">✨</div>
-          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">हेयर केयर (बाल झड़ना व डैंड्रफ)</h3>
-          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
-            भृंगराज व आंवला के शुद्ध अर्क से बालों की जड़ों को मजबूत बनाएं और डैंड्रफ को जड़ से मिटाएं।
-          </p>
-          <span style="color:#0d9488; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
-        </a>
+        <div class="health-disease-card" style="border-top: 4px solid #0d9488; padding:0; overflow:hidden; background:#ffffff; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='/health/hair-care.html'" title="हेयर केयर - विस्तार से देखें">
+            <img src="/images/banners/health-hair-care.jpg" alt="हेयर केयर" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+            <span style="position:absolute; top:10px; left:10px; background:#0d9488; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              💇‍♀️ हेयर रीग्रोथ व डैंड्रफ
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#f0fdfa; color:#0d9488; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">✨</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">
+                <a href="/health/hair-care.html" style="color:#0f172a; text-decoration:none;">हेयर केयर (बाल झड़ना व डैंड्रफ)</a>
+              </h3>
+            </div>
+            <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin-bottom:10px;">
+              भृंगराज व आंवला के शुद्ध अर्क से बालों की जड़ों को मजबूत बनाएं और डैंड्रफ को जड़ से मिटाएं।
+            </p>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px;">
+              <span class="health-symptom-tag" style="background:#ccfbf1; color:#115e59; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• तेजी से बाल झड़ना</span>
+              <span class="health-symptom-tag" style="background:#ccfbf1; color:#115e59; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• जिद्दी डैंड्रफ</span>
+              <span class="health-symptom-tag" style="background:#ccfbf1; color:#115e59; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• बालों का पतला होना</span>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 प्राकृतिक फार्मूला:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">भृंगराज, ब्राह्मी, आंवला व प्याज अर्क आधारित रूट-न्यूट्रीशन थेरेपी।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="/health/hair-care.html" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">विस्तार से →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'हेयर केयर गाइड', 'बालों का झड़ना रोकने और नए बाल उगाने का आयुर्वेदिक फार्मूला।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'हेयर केयर समाधान', 'बाल झड़ना रोकने का हर्बल फार्मूला देखें', '/health/hair-care.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('हेयर केयर', 'बाल झड़ने की समस्या')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- 6. Skin Care -->
-        <a href="/health/skin-care.html" class="health-card">
-          <span class="health-card-badge" style="background:#ffe4e6; color:#9f1239;">🌺 ब्लड प्यूरीफायर</span>
-          <div class="health-icon-bubble" style="background:#fff1f2; color:#e11d48;">🌸</div>
-          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">स्किन केयर (मुँहासे व ग्लो)</h3>
-          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
-            रक्त शोधन (Blood Purifying) से पिंपल्स, झाइयां और एलर्जी खत्म कर प्राकृतिक ग्लो प्राप्त करें।
-          </p>
-          <span style="color:#e11d48; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
-        </a>
+        <div class="health-disease-card" style="border-top: 4px solid #e11d48; padding:0; overflow:hidden; background:#ffffff; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='/health/skin-care.html'" title="स्किन केयर - विस्तार से देखें">
+            <img src="/images/banners/health-banner.jpeg" alt="स्किन केयर" style="width:100%; height:100%; object-fit:cover;" />
+            <span style="position:absolute; top:10px; left:10px; background:#e11d48; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🌺 ब्लड प्यूरीफायर व ग्लो
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#fff1f2; color:#e11d48; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🌸</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">
+                <a href="/health/skin-care.html" style="color:#0f172a; text-decoration:none;">स्किन केयर (मुँहासे व ग्लो)</a>
+              </h3>
+            </div>
+            <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin-bottom:10px;">
+              रक्त शोधन (Blood Purifying) से पिंपल्स, झाइयां और एलर्जी खत्म कर प्राकृतिक ग्लो प्राप्त करें।
+            </p>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px;">
+              <span class="health-symptom-tag" style="background:#ffe4e6; color:#9f1239; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• कील-मुंहासे व पिंपल्स</span>
+              <span class="health-symptom-tag" style="background:#ffe4e6; color:#9f1239; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• चेहरे पर झाइयां</span>
+              <span class="health-symptom-tag" style="background:#ffe4e6; color:#9f1239; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• एलर्जी व खुजली</span>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 प्राकृतिक फार्मूला:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">नीम, मंजिष्ठा व खदिरारिष्ट द्वारा रक्त शुद्धि और हर्बल लेप।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="/health/skin-care.html" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">विस्तार से →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'स्किन केयर गाइड', 'पिंपल्स, झाइयां और डल स्किन को ठीक कर चेहरे पर प्राकृतिक ग्लो लाने का तरीका।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'नेचुरल स्किन केयर', 'पिंपल्स व झाइयों से प्राकृतिक मुक्ति उपाय देखें', '/health/skin-care.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('स्किन केयर', 'पिंपल्स व त्वचा समस्या')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- 7. Kids Care -->
-        <a href="/health/kids-care.html" class="health-card">
-          <span class="health-card-badge" style="background:#fef3c7; color:#92400e;">🧸 तेज दिमाग व इम्युनिटी</span>
-          <div class="health-icon-bubble" style="background:#fffbeb; color:#d97706;">🌟</div>
-          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">किड्स केयर (बाल पोषण)</h3>
-          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
-            बच्चों की भूख में सुधार, मजबूत शारीरिक कद-काठी और ब्राह्मी-शंखपुष्पी से पढ़ाई में एकाग्रता।
-          </p>
-          <span style="color:#d97706; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
-        </a>
+        <div class="health-disease-card" style="border-top: 4px solid #d97706; padding:0; overflow:hidden; background:#ffffff; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='/health/kids-care.html'" title="किड्स केयर - विस्तार से देखें">
+            <img src="/images/banners/health-banner.jpeg" alt="किड्स केयर" style="width:100%; height:100%; object-fit:cover;" />
+            <span style="position:absolute; top:10px; left:10px; background:#d97706; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🧸 तेज दिमाग व इम्युनिटी
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#fffbeb; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🌟</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">
+                <a href="/health/kids-care.html" style="color:#0f172a; text-decoration:none;">किड्स केयर (बाल पोषण)</a>
+              </h3>
+            </div>
+            <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin-bottom:10px;">
+              बच्चों की भूख में सुधार, मजबूत शारीरिक कद-काठी और ब्राह्मी-शंखपुष्पी से पढ़ाई में एकाग्रता।
+            </p>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px;">
+              <span class="health-symptom-tag" style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• याददाश्त की कमी</span>
+              <span class="health-symptom-tag" style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• भूख न लगना</span>
+              <span class="health-symptom-tag" style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• कमजोर इम्युनिटी</span>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 प्राकृतिक फार्मूला:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">ब्राह्मी, शंखपुष्पी, अश्वगंधा व सम्पूर्ण हर्बल सुपरफूड मिश्रण।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="/health/kids-care.html" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">विस्तार से →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'किड्स केयर पोषण गाइड', 'बच्चों की याददाश्त, एकाग्रता और शारीरिक विकास का सम्पूर्ण प्लान।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'किड्स केयर पोषण', 'बच्चों का मानसिक व शारीरिक विकास फार्मूला देखें', '/health/kids-care.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('किड्स केयर', 'बच्चों का पोषण परामर्श')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- 8. Home Care -->
-        <a href="/health/home-care.html" class="health-card">
-          <span class="health-card-badge" style="background:#e0f2fe; color:#0369a1;">🏡 केमिकल-फ्री घर</span>
-          <div class="health-icon-bubble" style="background:#f0f9ff; color:#0284c7;">🍃</div>
-          <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin:0 0 8px 0;">होम केयर (टॉक्सिन फ्री होम)</h3>
-          <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin:0 0 16px 0; flex:1;">
-            सब्जियों से कीटनाशक हटाने, बर्तनों व कपड़ों को हानिकारक केमिकल से सुरक्षित रखने की गाइड।
-          </p>
-          <span style="color:#0284c7; font-weight:800; font-size:0.86rem;">सम्पूर्ण समाधान देखें →</span>
-        </a>
+        <div class="health-disease-card" style="border-top: 4px solid #0284c7; padding:0; overflow:hidden; background:#ffffff; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='/health/home-care.html'" title="होम केयर - विस्तार से देखें">
+            <img src="/images/banners/health-banner.jpeg" alt="होम केयर" style="width:100%; height:100%; object-fit:cover;" />
+            <span style="position:absolute; top:10px; left:10px; background:#0284c7; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🏡 टॉक्सिन-फ्री केमिकल मुक्त घर
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#f0f9ff; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🍃</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">
+                <a href="/health/home-care.html" style="color:#0f172a; text-decoration:none;">होम केयर (टॉक्सिन फ्री होम)</a>
+              </h3>
+            </div>
+            <p style="color:#64748b; font-size:0.88rem; line-height:1.55; margin-bottom:10px;">
+              सब्जियों से कीटनाशक हटाने, बर्तनों व कपड़ों को हानिकारक केमिकल से सुरक्षित रखने की गाइड।
+            </p>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px;">
+              <span class="health-symptom-tag" style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• कीटनाशक युक्त सब्जियां</span>
+              <span class="health-symptom-tag" style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• हानिकारक केमिकल डिटर्जेंट</span>
+              <span class="health-symptom-tag" style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; padding:2px 8px; border-radius:12px;">• फर्श व बर्तनों पर टॉक्सिन</span>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 प्राकृतिक फार्मूला:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">हर्बल वेजी-वॉश व बायो-एंजाइम आधारित 100% सुरक्षित होम केयर उत्पाद।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="/health/home-care.html" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">विस्तार से →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'होम केयर सुरक्षा गाइड', 'घर को केमिकल मुक्त और स्वच्छ रखने के इको फ्रेंडली समाधान।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'टॉक्सिन-फ्री होम केयर', 'केमिकल मुक्त घर बनाने के उपाय देखें', '/health/home-care.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('होम केयर', 'टॉक्सिन फ्री घर परामर्श')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
 
       </div>
     </div>

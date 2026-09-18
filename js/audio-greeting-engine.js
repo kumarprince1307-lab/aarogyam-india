@@ -116,18 +116,50 @@
   let isSpeaking = false;
   let synth = window.speechSynthesis;
   let currentUtterance = null;
+  let userMutedAudio = false;
 
   function stopAudio() {
+    userMutedAudio = true;
+    try {
+      sessionStorage.setItem('aoi_audio_user_stopped', '1');
+      sessionStorage.setItem('aoi_audio_stopped_' + getActivePageKey(), '1');
+    } catch (e) {}
+
     if (synth) {
       synth.cancel();
     }
+
+    // Halt any HTML5 audio tags on the page
+    document.querySelectorAll('audio').forEach(a => {
+      try {
+        a.pause();
+        a.currentTime = 0;
+      } catch (err) {}
+    });
+
     isSpeaking = false;
     updateAudioUIState(false);
+    hideAudioToast();
   }
 
-  function playAudioGreeting() {
+  function playAudioGreeting(isAutoPlay = false) {
+    if (isAutoPlay) {
+      try {
+        if (sessionStorage.getItem('aoi_audio_user_stopped') === '1' || sessionStorage.getItem('aoi_audio_stopped_' + getActivePageKey()) === '1') {
+          return; // User explicitly stopped it
+        }
+      } catch (e) {}
+    } else {
+      // User explicitly clicked play button - clear mute flag
+      userMutedAudio = false;
+      try {
+        sessionStorage.removeItem('aoi_audio_user_stopped');
+        sessionStorage.removeItem('aoi_audio_stopped_' + getActivePageKey());
+      } catch (e) {}
+    }
+
     if (!synth) {
-      alert('आपके ब्राउज़र में ऑडियो स्पीच सपोर्ट उपलब्ध नहीं है।');
+      if (!isAutoPlay) alert('आपके ब्राउज़र में ऑडियो स्पीच सपोर्ट उपलब्ध नहीं है।');
       return;
     }
 
@@ -263,9 +295,9 @@
     document.body.appendChild(container);
   }
 
-  // 6. Injects Mobile Sticky Bottom Navigation
+  // 6. Injects Mobile Sticky Bottom Navigation (Zero duplication)
   function renderMobileBottomNav() {
-    if (document.getElementById('mobile-bottom-nav-bar')) return;
+    if (document.getElementById('mobile-bottom-nav-bar') || document.getElementById('universal-mobile-bottom-nav') || document.querySelector('.universal-mobile-bottom-nav')) return;
 
     const nav = document.createElement('nav');
     nav.id = 'mobile-bottom-nav-bar';
@@ -331,46 +363,118 @@
     }
   };
 
+  // Universal KPI Card Audio Player (Hindi Speech Synthesis)
+  window.playKpiCardAudio = function (event, title, text) {
+    if (event) {
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
+    if (!('speechSynthesis' in window)) {
+      alert('आपके डिवाइस में हिंदी ऑडियो सिंथेसाइज़र समर्थित नहीं है।');
+      return;
+    }
+    const targetBtn = event?.currentTarget || (event?.target?.closest ? event.target.closest('.kpi-audio-btn') : null);
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      document.querySelectorAll('.kpi-audio-btn').forEach(b => b.classList.remove('playing'));
+      return;
+    }
+    const cleanTitle = (title || 'आरोग्यम समाधान').replace(/<[^>]+>/g, '');
+    const cleanText = (text || '').replace(/<[^>]+>/g, '');
+    const speechStr = `${cleanTitle}। ${cleanText}। सम्पूर्ण वैज्ञानिक समाधान व परामर्श के लिए आरोग्यम इंडिया पर संपर्क करें।`;
+    const utterance = new SpeechSynthesisUtterance(speechStr);
+    utterance.lang = 'hi-IN';
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
+
+    if (targetBtn) targetBtn.classList.add('playing');
+
+    utterance.onend = function () {
+      if (targetBtn) targetBtn.classList.remove('playing');
+    };
+    utterance.onerror = function () {
+      if (targetBtn) targetBtn.classList.remove('playing');
+    };
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Universal KPI Card Blue Share Trigger (Native WebShare with WhatsApp fallback)
+  window.triggerKpiNativeShare = function (event, title, text, targetUrl) {
+    if (event) {
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
+    const pageUrl = targetUrl ? (new URL(targetUrl, window.location.origin).href) : window.location.href;
+    const cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '');
+    const cleanText = (text || '').replace(/<[^>]+>/g, '');
+    const shareMessage = `🌾 *${cleanTitle}*\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व आयुर्वेदिक उपाय देखें:\n${pageUrl}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: cleanTitle,
+        text: shareMessage,
+        url: pageUrl
+      }).catch(() => {});
+    } else {
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+      window.open(waUrl, '_blank');
+    }
+  };
+
   // Public APIs
   window.togglePageAudioGreeting = playAudioGreeting;
   window.stopPageAudioGreeting = stopAudio;
   window.playPageAudioGreeting = playAudioGreeting;
 
-  // 8. Polite First-Gesture Smart Auto-Play Controller
+  // 8. Reliable Page Audio Auto-Play Controller (Respects user stop)
   let autoPlayHandled = false;
-  function handleFirstUserGesture() {
+
+  function attemptPageAudioAutoPlay() {
     if (autoPlayHandled) return;
-    autoPlayHandled = true;
-
-    window.removeEventListener('click', handleFirstUserGesture);
-    window.removeEventListener('touchstart', handleFirstUserGesture);
-
     const pageKey = getActivePageKey();
+    if (sessionStorage.getItem('aoi_audio_user_stopped') === '1' || sessionStorage.getItem('aoi_audio_stopped_' + pageKey) === '1') {
+      return;
+    }
     const sessionKey = 'aoi_audio_played_' + pageKey;
     if (sessionStorage.getItem(sessionKey)) {
-      return; // Already played for this page in this session
+      return;
     }
 
-    // Auto-play after 400ms following user's first natural interaction
-    setTimeout(() => {
-      try {
-        sessionStorage.setItem(sessionKey, '1');
-        playAudioGreeting();
-      } catch (e) {}
-    }, 400);
+    autoPlayHandled = true;
+    window.removeEventListener('click', handleFirstUserGesture);
+    window.removeEventListener('touchstart', handleFirstUserGesture);
+    window.removeEventListener('scroll', handleFirstUserGesture);
+
+    try {
+      sessionStorage.setItem(sessionKey, '1');
+      playAudioGreeting(true);
+    } catch (e) {}
   }
 
+  function handleFirstUserGesture() {
+    attemptPageAudioAutoPlay();
+  }
+
+  // Register user gesture triggers for browsers requiring user interaction
   window.addEventListener('click', handleFirstUserGesture, { once: true, passive: true });
   window.addEventListener('touchstart', handleFirstUserGesture, { once: true, passive: true });
+  window.addEventListener('scroll', handleFirstUserGesture, { once: true, passive: true });
 
   // Initialize once DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      renderFloatingActionBar();
-      renderMobileBottomNav();
-    });
-  } else {
+  function initEngine() {
     renderFloatingActionBar();
     renderMobileBottomNav();
+
+    // Auto-play attempt on page load after brief delay
+    setTimeout(() => {
+      attemptPageAudioAutoPlay();
+    }, 900);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initEngine);
+  } else {
+    initEngine();
   }
 })();
+

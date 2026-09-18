@@ -191,94 +191,150 @@
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:22px;">
         
         <!-- Problem 1: थनैला रोग -->
-        <div class="problem-box">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <span style="background:#fee2e2; color:#b91c1c; font-weight:800; font-size:0.75rem; padding:3px 10px; border-radius:12px;">🚨 सर्वाधिक नुकसानदेह</span>
-              <span style="color:#64748b; font-size:0.8rem; font-weight:700;">थनैला (Mastitis)</span>
-            </div>
-            <h3 style="font-size:1.25rem; font-weight:900; color:#0f172a; margin:0 0 10px 0;">थनों में सूजन, दर्द व दूध में छीछड़े</h3>
-            <div style="font-size:0.85rem; color:#475569; line-height:1.5; margin-bottom:12px;">
-              <p style="margin:0 0 6px 0;"><strong>• कारण:</strong> थन में जीवाणु संक्रमण (Streptococcus/Staphylococcus), फर्श की अस्वच्छता, दूध अधूरा निकालना।</p>
-              <p style="margin:0 0 6px 0;"><strong>• लक्षण:</strong> अयन सख्त व गर्म होना, छूने पर दर्द, दूध फटा हुआ या मवाद/खून युक्त आना।</p>
-              <p style="margin:0;"><strong>• उपचार:</strong> थन को खाली करें। हल्दी, चूना व घी का लेप + हर्बल एंटी-बायोटिक किट व बायो-फिट स्प्रे शेड्यूल तुरंत शुरू करें।</p>
-            </div>
+        <div class="problem-box" style="padding:0; overflow:hidden; border-top:4px solid #ef4444; border-radius:18px; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='#products-cattle'" title="थनैला (Mastitis) - दवा देखें">
+            <img src="/images/banners/pashu-cow-care.jpg" alt="थनैला रोग" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/pashu-palan-banner.jpg'" />
+            <span style="position:absolute; top:10px; left:10px; background:#ef4444; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🚨 थनैला (Mastitis) रोकथाम
+            </span>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:14px; border-top:1px solid #e2e8f0;">
-            <button type="button" onclick="window.triggerViralPageShare({title:'थनैला रोग का अचूक उपचार', text:'गाय-भैंस में थनैला रोग के लक्षण व घरेलू/हर्बल उपचार देखें:'})" style="background:none; border:none; color:#0284c7; font-weight:800; font-size:0.85rem; cursor:pointer;">
-              📤 लक्षण व उपचार शेयर करें
-            </button>
-            <a href="#products-cattle" style="color:#15803d; font-weight:800; font-size:0.85rem; text-decoration:underline;">दवा देखें →</a>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🐄</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">थनों में सूजन, दर्द व छीछड़े</h3>
+            </div>
+            <div style="font-size:0.85rem; color:#475569; line-height:1.5; margin-bottom:10px;">
+              <p style="margin:0 0 6px 0;"><strong>• कारण:</strong> थन में जीवाणु संक्रमण (Streptococcus), फर्श की अस्वच्छता, दूध अधूरा निकालना।</p>
+              <p style="margin:0 0 6px 0;"><strong>• लक्षण:</strong> अयन सख्त व गर्म होना, छूने पर दर्द, दूध फटा हुआ या मवाद/खून युक्त आना।</p>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 सटीक उपचार:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">थन को पूर्ण खाली करें। हर्बल एंटी-बायोटिक किट व बायो-फिट स्प्रे शेड्यूल तुरंत शुरू करें।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="#products-cattle" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">दवा देखें →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'थनैला रोग उपचार', 'थनों में सूजन, दर्द व छीछड़े दूर करने का हर्बल उपचार व बायो-फिट शेड्यूल।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'थनैला रोग का अचूक उपचार', 'गाय-भैंस में थनैला रोग के लक्षण व घरेलू/हर्बल उपचार देखें', window.location.href)" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('थनैला रोग उपचार', 'थनों में सूजन व छीछड़े')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Problem 2: दूध व FAT% कमी -->
-        <div class="problem-box">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <span style="background:#fef08a; color:#854d0e; font-weight:800; font-size:0.75rem; padding:3px 10px; border-radius:12px;">⚖️ उत्पादकता हानि</span>
-              <span style="color:#64748b; font-size:0.8rem; font-weight:700;">दूध व फैट कमी</span>
-            </div>
-            <h3 style="font-size:1.25rem; font-weight:900; color:#0f172a; margin:0 0 10px 0;">दूध की मात्रा घटना और फैट 3-4% पर अटकना</h3>
-            <div style="font-size:0.85rem; color:#475569; line-height:1.5; margin-bottom:12px;">
-              <p style="margin:0 0 6px 0;"><strong>• कारण:</strong> रूमेन में माइक्रोफ्लोरा की कमी, रेशेदार चारे का असंतुलन, मिनरल्स (जिंक, कॉपर, कोबाल्ट) की कमी।</p>
-              <p style="margin:0 0 6px 0;"><strong>• लक्षण:</strong> पशु का सुस्त दिखना, दूध गाढ़ा न होना, ब्यात के 2-3 महीने बाद ही दूध सूखना।</p>
-              <p style="margin:0;"><strong>• उपचार:</strong> दैनिक 50 ग्राम सीएफएल मिनरल मिक्सचर + बायपास फैट व संतुलित हरा/सूखा चारा 3:1 के अनुपात में दें।</p>
-            </div>
+        <div class="problem-box" style="padding:0; overflow:hidden; border-top:4px solid #f59e0b; border-radius:18px; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='#products-cattle'" title="दूध व फैट वृद्धि - CFL देखें">
+            <img src="/images/banners/pashu-palan-banner.jpg" alt="दूध व फैट वृद्धि" style="width:100%; height:100%; object-fit:cover;" />
+            <span style="position:absolute; top:10px; left:10px; background:#f59e0b; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🥛 दूध व FAT% संवर्धन
+            </span>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:14px; border-top:1px solid #e2e8f0;">
-            <button type="button" onclick="window.triggerViralPageShare({title:'दूध व फैट बढ़ाने का फार्मूला', text:'गाय-भैंस का दूध व फैट प्राकृतिक रूप से बढ़ाने का फार्मूला देखें:'})" style="background:none; border:none; color:#0284c7; font-weight:800; font-size:0.85rem; cursor:pointer;">
-              📤 यह नुस्खा शेयर करें
-            </button>
-            <a href="#products-cattle" style="color:#15803d; font-weight:800; font-size:0.85rem; text-decoration:underline;">CFL ऑर्डर करें →</a>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#fef3c7; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🥛</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">दूध की मात्रा व फैट प्रतिशत वृद्धि</h3>
+            </div>
+            <div style="font-size:0.85rem; color:#475569; line-height:1.5; margin-bottom:10px;">
+              <p style="margin:0 0 6px 0;"><strong>• कारण:</strong> रूमेन में माइक्रोफ्लोरा असंतुलन, मिनरल्स (जिंक, कॉपर, कोबाल्ट) की कमी।</p>
+              <p style="margin:0 0 6px 0;"><strong>• लक्षण:</strong> पशु का सुस्त दिखना, दूध गाढ़ा न होना, ब्यात के 2-3 महीने बाद ही दूध सूखना।</p>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 पोषण फॉर्मूला:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">दैनिक 50 ग्राम सीएफएल मिनरल मिक्सचर + बायपास फैट व संतुलित चारा 3:1 में दें।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="#products-cattle" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">CFL ऑर्डर करें →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'दूध व फैट बढ़ाने का फार्मूला', 'दैनिक 50 ग्राम सीएफएल मिनरल मिक्सचर व बायपास फैट से दूध व फैट वृद्धि।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'दूध व फैट बढ़ाने का फार्मूला', 'गाय-भैंस का दूध व फैट प्राकृतिक रूप से बढ़ाने का फार्मूला देखें', window.location.href)" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('दूध व फैट वृद्धि', 'दूध कम होना व फैट 3% पर अटकना')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Problem 3: बांझपन व रिपीटर -->
-        <div class="problem-box">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <span style="background:#ede9fe; color:#6d28d9; font-weight:800; font-size:0.75rem; padding:3px 10px; border-radius:12px;">🔄 आर्थिक संकट</span>
-              <span style="color:#64748b; font-size:0.8rem; font-weight:700;">बांझपन (Infertility)</span>
+        <div class="problem-box" style="padding:0; overflow:hidden; border-top:4px solid #8b5cf6; border-radius:18px; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='#products-cattle'" title="बांझपन व रिपीटर - समाधान देखें">
+            <img src="/images/banners/pashu-cow-care.jpg" alt="बांझपन व रिपीटर" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/pashu-palan-banner.jpg'" />
+            <span style="position:absolute; top:10px; left:10px; background:#8b5cf6; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🔄 बांझपन (Infertility) मुक्ति
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#ede9fe; color:#7c3aed; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🔄</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">समय पर हीट में न आना या सीमन न ठहरना</h3>
             </div>
-            <h3 style="font-size:1.25rem; font-weight:900; color:#0f172a; margin:0 0 10px 0;">समय पर हीट में न आना या सीमन न ठहरना</h3>
-            <div style="font-size:0.85rem; color:#475569; line-height:1.5; margin-bottom:12px;">
+            <div style="font-size:0.85rem; color:#475569; line-height:1.5; margin-bottom:10px;">
               <p style="margin:0 0 6px 0;"><strong>• कारण:</strong> गर्भाशय में इंफेक्शन (Metritis), ओवेरियन सिस्ट, फॉस्फोरस व विटामिन E की कमी।</p>
               <p style="margin:0 0 6px 0;"><strong>• लक्षण:</strong> हीट के समय गंदा डिस्चार्ज देना, हर 21 दिन में बार-बार सीमन डलवाने पर भी खाली रहना।</p>
-              <p style="margin:0;"><strong>• उपचार:</strong> यूट्रस टोन लिक्विड द्वारा गर्भाशय की सफाई करें और ट्रेस मिनरल्स का 30 दिन का कोर्स कराएं।</p>
             </div>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:14px; border-top:1px solid #e2e8f0;">
-            <button type="button" onclick="window.triggerViralPageShare({title:'पशु बांझपन मुक्ति गाइड', text:'पशु का बार-बार फिरना रोकने और गर्भधारण कराने का सटीक उपाय देखें:'})" style="background:none; border:none; color:#0284c7; font-weight:800; font-size:0.85rem; cursor:pointer;">
-              📤 शेयर करें
-            </button>
-            <a href="#products-cattle" style="color:#15803d; font-weight:800; font-size:0.85rem; text-decoration:underline;">दवा देखें →</a>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 सटीक उपचार:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">यूट्रस टोन लिक्विड द्वारा गर्भाशय की सफाई और ट्रेस मिनरल्स का 30 दिन का कोर्स कराएं।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="#products-cattle" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">दवा देखें →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'पशु बांझपन मुक्ति गाइड', 'पशु का बार-बार फिरना रोकने और गर्भधारण कराने का सटीक उपाय।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'पशु बांझपन मुक्ति गाइड', 'पशु का बार-बार फिरना रोकने और गर्भधारण कराने का सटीक उपाय देखें', window.location.href)" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('बांझपन व रिपीटर', 'पशु बार-बार फिर रहा है')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Problem 4: पाचन, आफरा व पेट फूलना -->
-        <div class="problem-box">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <span style="background:#ffedd5; color:#c2410c; font-weight:800; font-size:0.75rem; padding:3px 10px; border-radius:12px;">⚠️ आपात स्थिति</span>
-              <span style="color:#64748b; font-size:0.8rem; font-weight:700;">आफरा व एसिडोसिस</span>
+        <!-- Problem 4: आफरा व एसिडोसिस -->
+        <div class="problem-box" style="padding:0; overflow:hidden; border-top:4px solid #ea580c; border-radius:18px; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0;">
+          <div style="height:160px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='#products-cattle'" title="आफरा व एसिडोसिस - घरेलू इलाज">
+            <img src="/images/banners/pashu-goat-care.jpg" alt="आफरा व एसिडोसिस" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/pashu-palan-banner.jpg'" />
+            <span style="position:absolute; top:10px; left:10px; background:#ea580c; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              ⚠️ आफरा व एसिडोसिस राहत
+            </span>
+          </div>
+          <div style="padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:#ffedd5; color:#ea580c; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">⚠️</div>
+              <h3 style="font-size:1.2rem; font-weight:900; margin:0; color:#0f172a;">पेट का ढोल की तरह फूलना व सांस फूलना</h3>
             </div>
-            <h3 style="font-size:1.25rem; font-weight:900; color:#0f172a; margin:0 0 10px 0;">पेट का ढोल की तरह फूलना व सांस फूलना</h3>
-            <div style="font-size:0.85rem; color:#475569; line-height:1.5; margin-bottom:12px;">
+            <div style="font-size:0.85rem; color:#475569; line-height:1.5; margin-bottom:10px;">
               <p style="margin:0 0 6px 0;"><strong>• कारण:</strong> गीला व सड़ा चारा खाना, अत्यधिक अनाज या दलिया एक साथ खा लेना, गैस न निकलना।</p>
               <p style="margin:0 0 6px 0;"><strong>• लक्षण:</strong> बाईं कोख का फूल जाना, जुगाली बंद होना, मुंह से लार टपकना व बेचैनी।</p>
-              <p style="margin:0;"><strong>• उपचार:</strong> हींग, अजवाइन, काला नमक व मीठा तेल नाल से दें। रूमेन बफर और प्रोबायोटिक्स तुरंत दें।</p>
+            </div>
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 आपात उपचार:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">हींग, अजवाइन, काला नमक व मीठा तेल नाल से दें। रूमेन बफर और प्रोबायोटिक्स तुरंत दें।</div>
+            </div>
+            <div class="kpi-actions-row">
+              <a href="#products-cattle" class="btn" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none;">उपचार देखें →</a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'पशु आफरा घरेलू उपचार', 'पशु में आफरा व गैस का 10 मिनट में घरेलू इलाज और रूमेन बफर।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i> <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'पशु आफरा घरेलू उपचार', 'पशु में आफरा व गैस का 10 मिनट में घरेलू इलाज देखें', window.location.href)" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('आफरा आपातकालीन उपचार', 'पशु का पेट फूल गया है')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              </button>
             </div>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:14px; border-top:1px solid #e2e8f0;">
-            <button type="button" onclick="window.triggerViralPageShare({title:'पशु आफरा घरेलू उपचार', text:'पशु में आफरा व गैस का 10 मिनट में घरेलू इलाज देखें:'})" style="background:none; border:none; color:#0284c7; font-weight:800; font-size:0.85rem; cursor:pointer;">
-              📤 शेयर करें
-            </button>
-            <button type="button" onclick="window.consultAiExpert('आफरा आपातकालीन उपचार')" style="background:none; border:none; color:#dc2626; font-weight:800; font-size:0.85rem; cursor:pointer;">
-              🚨 डॉक्टर से पूछें
-            </button>
-          </div>
         </div>
+
+      </div>
 
       </div>
     </div>

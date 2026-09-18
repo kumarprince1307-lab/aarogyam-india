@@ -44,7 +44,6 @@
   <link rel="stylesheet" href="/css/user-notifications.css">
   <link rel="stylesheet" href="/css/ebook.css">
   <link rel="stylesheet" href="/css/universal-nav-drawer.css">
-  <link rel="stylesheet" href="/css/home-revamp.css">
   <link rel="stylesheet" href="/css/mobile-bottom-nav.css">
 
   <style>
@@ -327,87 +326,170 @@
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:22px;">
         
         <!-- Card 1: Paddy / धान -->
-        <div style="background:#f8fafc; border-radius:18px; border:1.5px solid #e2e8f0; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="background:#dcfce7; color:#15803d; font-weight:800; font-size:0.75rem; padding:3px 10px; border-radius:14px;">🌾 धान (Paddy)</span>
-              <span style="font-size:0.8rem; color:#64748b; font-weight:700;">ई-बुक उपलब्ध ✔</span>
-            </div>
-            <h3 style="font-size:1.2rem; font-weight:900; color:#0f172a; margin:0 0 8px 0;">ब्लास्ट (झुलसा), शीथ ब्लाइट व तना छेदक</h3>
-            <p style="font-size:0.86rem; color:#475569; line-height:1.5; margin-bottom:12px;">
-              पत्तियों पर नाव के आकार के धब्बे और बालियों का सूखना। जैविक समाधान में Wrap-Up (2ml/L) + StimRich (1.5ml/L) + Bio-99 (0.5ml/L) का छिड़काव करें।
-            </p>
+        <div class="agri-item-card" style="background:#ffffff; border-radius:18px; border:1px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/kharif-master-guide-2026.html'" title="धान (Paddy) - ई-बुक पढ़ें">
+            <img src="/images/banners/agriculture-banner.jpeg" alt="धान (Paddy)" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#16a34a;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🌾 धान (Paddy) • ई-बुक उपलब्ध ✔
+            </span>
           </div>
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px; padding-top:14px; border-top:1px solid #e2e8f0;">
-            <a href="/ebooks/kharif-master-guide-2026.html" class="btn" style="background:#15803d; color:#fff; font-weight:800; font-size:0.82rem; padding:8px 16px; border-radius:20px; text-decoration:none;">
-              📖 पूरी सचित्र ई-बुक पढ़ें (₹99)
-            </a>
-            <button type="button" onclick="window.triggerViralPageShare({title:'धान के रोग व जैविक समाधान', text:'धान में ब्लास्ट व तना छेदक का 100% जैविक समाधान देखें:'})" style="background:none; border:none; color:#15803d; font-weight:800; font-size:0.82rem; cursor:pointer;">
-              📤 शेयर करें
-            </button>
+          <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div>
+              <h3 style="font-size:1.2rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+                <a href="/ebooks/kharif-master-guide-2026.html" style="color:#0f172a;text-decoration:none;">ब्लास्ट (झुलसा), शीथ ब्लाइट व तना छेदक</a>
+              </h3>
+              <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
+                <strong>लक्षण:</strong> पत्तियों पर नाव के आकार के धब्बे और बालियों का सूखना।
+              </div>
+              <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Wrap-Up (2ml/L) + StimRich (1.5ml/L) + Bio-99 (0.5ml/L) का छिड़काव करें।</div>
+              </div>
+            </div>
+
+            <div class="kpi-actions-row">
+              <a href="/ebooks/kharif-master-guide-2026.html" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                📖 ई-बुक पढ़ें (₹99)
+              </a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'धान ब्लास्ट व तना छेदक', 'धान में ब्लास्ट झुलसा व शीथ ब्लाइट का Wrap-Up और StimRich से जैविक समाधान।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'धान के रोग व जैविक समाधान', 'धान में ब्लास्ट व तना छेदक का 100% जैविक समाधान देखें', '/ebooks/kharif-master-guide-2026.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('धान फसल सुरक्षा', 'ब्लास्ट व तना छेदक समस्या')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>सलाह लें</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Card 2: Soybean / सोयाबीन -->
-        <div style="background:#f8fafc; border-radius:18px; border:1.5px solid #e2e8f0; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="background:#dcfce7; color:#15803d; font-weight:800; font-size:0.75rem; padding:3px 10px; border-radius:14px;">🌱 सोयाबीन (Soybean)</span>
-              <span style="font-size:0.8rem; color:#64748b; font-weight:700;">ई-बुक उपलब्ध ✔</span>
-            </div>
-            <h3 style="font-size:1.2rem; font-weight:900; color:#0f172a; margin:0 0 8px 0;">पीला मोज़ेक, गर्डल बीटल व सेमीलूपर</h3>
-            <p style="font-size:0.86rem; color:#475569; line-height:1.5; margin-bottom:12px;">
-              सफेद मक्खी द्वारा फैलने वाला पीला मोज़ेक और तने को काटने वाला गर्डल बीटल। नियंत्रण के लिए Intact (2ml/L) + Bio-99 (0.5ml/L) का शुरुआती अवस्था में स्प्रे करें।
-            </p>
+        <div class="agri-item-card" style="background:#ffffff; border-radius:18px; border:1px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/kharif-master-guide-2026.html'" title="सोयाबीन (Soybean) - ई-बुक पढ़ें">
+            <img src="/images/banners/offer-banner-kharif-2026.webp" alt="सोयाबीन (Soybean)" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#15803d;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🌱 सोयाबीन (Soybean) • ई-बुक उपलब्ध ✔
+            </span>
           </div>
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px; padding-top:14px; border-top:1px solid #e2e8f0;">
-            <a href="/ebooks/kharif-master-guide-2026.html" class="btn" style="background:#15803d; color:#fff; font-weight:800; font-size:0.82rem; padding:8px 16px; border-radius:20px; text-decoration:none;">
-              📖 पूरी सचित्र ई-बुक पढ़ें (₹99)
-            </a>
-            <button type="button" onclick="window.triggerViralPageShare({title:'सोयाबीन के रोग व रोकथाम', text:'सोयाबीन में पीला मोज़ेक व गर्डल बीटल का जैविक स्प्रे शेड्यूल:'})" style="background:none; border:none; color:#15803d; font-weight:800; font-size:0.82rem; cursor:pointer;">
-              📤 शेयर करें
-            </button>
+          <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div>
+              <h3 style="font-size:1.2rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+                <a href="/ebooks/kharif-master-guide-2026.html" style="color:#0f172a;text-decoration:none;">पीला मोज़ेक, गर्डल बीटल व सेमीलूपर</a>
+              </h3>
+              <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
+                <strong>लक्षण:</strong> सफेद मक्खी द्वारा फैलने वाला पीला मोज़ेक और तने को काटने वाला गर्डल बीटल।
+              </div>
+              <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Intact (2ml/L) + Bio-99 (0.5ml/L) का शुरुआती अवस्था में छिड़काव करें।</div>
+              </div>
+            </div>
+
+            <div class="kpi-actions-row">
+              <a href="/ebooks/kharif-master-guide-2026.html" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                📖 ई-बुक पढ़ें (₹99)
+              </a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'सोयाबीन पीला मोजेक व गर्डल बीटल', 'सोयाबीन में पीला मोज़ेक और गर्डल बीटल का Intact व Bio-99 से सुरक्षित निवारण।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'सोयाबीन के रोग व रोकथाम', 'सोयाबीन में पीला मोज़ेक व गर्डल बीटल का जैविक स्प्रे शेड्यूल देखें', '/ebooks/kharif-master-guide-2026.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('सोयाबीन फसल सुरक्षा', 'पीला मोज़ेक व गर्डल बीटल')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>सलाह लें</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Card 3: Cotton / कपास -->
-        <div style="background:#f8fafc; border-radius:18px; border:1.5px solid #e2e8f0; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="background:#dcfce7; color:#15803d; font-weight:800; font-size:0.75rem; padding:3px 10px; border-radius:14px;">⚪ कपास (Cotton)</span>
-              <span style="font-size:0.8rem; color:#64748b; font-weight:700;">ई-बुक उपलब्ध ✔</span>
-            </div>
-            <h3 style="font-size:1.2rem; font-weight:900; color:#0f172a; margin:0 0 8px 0;">गुलाबी सुंडी व सफेद मक्खी नियंत्रण</h3>
-            <p style="font-size:0.86rem; color:#475569; line-height:1.5; margin-bottom:12px;">
-              फूल व टिंडे में घुसकर नुकसान करने वाली गुलाबी सुंडी का जैविक फेरोमोन ट्रैप व इंटैक्ट स्प्रे द्वारा 100% सफल निवारण।
-            </p>
+        <div class="agri-item-card" style="background:#ffffff; border-radius:18px; border:1px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/kheti-dr.html'" title="कपास (Cotton) - ई-बुक पढ़ें">
+            <img src="/images/banners/agriculture-banner.jpeg" alt="कपास (Cotton)" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#0284c7;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              ⚪ कपास (Cotton) • ई-बुक उपलब्ध ✔
+            </span>
           </div>
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px; padding-top:14px; border-top:1px solid #e2e8f0;">
-            <a href="/ebooks/kheti-dr.html" class="btn" style="background:#15803d; color:#fff; font-weight:800; font-size:0.82rem; padding:8px 16px; border-radius:20px; text-decoration:none;">
-              📖 खेती का डॉक्टर ई-बुक पढ़ें (₹99)
-            </a>
+          <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div>
+              <h3 style="font-size:1.2rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+                <a href="/ebooks/kheti-dr.html" style="color:#0f172a;text-decoration:none;">गुलाबी सुंडी व सफेद मक्खी नियंत्रण</a>
+              </h3>
+              <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
+                <strong>लक्षण:</strong> फूल व टिंडे में घुसकर नुकसान करने वाली गुलाबी सुंडी और पत्तियों का रस चूसने वाली मक्खी।
+              </div>
+              <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">जैविक फेरोमोन ट्रैप व Intact + Bio-99 स्प्रे द्वारा 100% सफल निवारण।</div>
+              </div>
+            </div>
+
+            <div class="kpi-actions-row">
+              <a href="/ebooks/kheti-dr.html" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                📖 ई-बुक पढ़ें (₹99)
+              </a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'कपास गुलाबी सुंडी व सफेद मक्खी', 'कपास में गुलाबी सुंडी और रसचूसक कीटों का जैविक फेरोमोन ट्रैप और Intact स्प्रे निवारण।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'कपास के रोग व रोकथाम', 'कपास में गुलाबी सुंडी नियंत्रण का वैज्ञानिक उपाय देखें', '/ebooks/kheti-dr.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('कपास फसल सुरक्षा', 'गुलाबी सुंडी व सफेद मक्खी')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>सलाह लें</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Card 4: Vegetables & Fruits (NO BOOK YET -> RICH NETSURF PROTOCOL FUNNEL) -->
-        <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius:18px; border:2px dashed #22c55e; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="background:#22c55e; color:#fff; font-weight:800; font-size:0.75rem; padding:3px 10px; border-radius:14px;">🍅 सब्जियां व बागवानी</span>
-              <span style="background:#fde047; color:#000; font-size:0.72rem; font-weight:900; padding:2px 8px; border-radius:10px;">🌟 विशेषज्ञ ऑर्गेनिक किट</span>
-            </div>
-            <h3 style="font-size:1.2rem; font-weight:900; color:#0f172a; margin:0 0 8px 0;">टमाटर, मिर्च, प्याज, लहसुन व फल सुरक्षा</h3>
-            <p style="font-size:0.86rem; color:#14532d; line-height:1.5; margin-bottom:12px;">
-              (इस विषय पर स्वतंत्र ई-बुक लेखन प्रक्रिया में है) — लेकिन आप हमारे <strong>विशेषज्ञ प्रमाणित नेटसर्फ बायो-फिट प्रोटोकॉल</strong> और 24×7 व्हाट्सएप परामर्श से अपनी सब्जी फसल को कीट-मुक्त व दोगुना उत्पादन वाला बना सकते हैं!
-            </p>
+        <!-- Card 4: Vegetables & Fruits -->
+        <div class="agri-item-card" style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius:18px; border:2px dashed #22c55e; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='#sec-agri-products'" title="सब्जियां व बागवानी - उत्पाद देखें">
+            <img src="/images/banners/agriculture-banner.jpeg" alt="सब्जियां व बागवानी" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#22c55e;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🍅 सब्जियां व बागवानी • विशेषज्ञ ऑर्गेनिक किट
+            </span>
           </div>
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px; padding-top:14px; border-top:1px solid #bbf7d0;">
-            <button type="button" onclick="window.consultAiExpert('सब्जी व बागवानी फसल सुरक्षा प्लान')" class="btn" style="background:#16a34a; color:#fff; font-weight:800; font-size:0.82rem; padding:8px 18px; border-radius:20px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-              <i class="fa-brands fa-whatsapp"></i> मुफ़्त सब्जी स्प्रे चार्ट लें
-            </button>
-            <a href="#sec-agri-products" style="color:#166534; font-weight:800; font-size:0.82rem; text-decoration:underline;">
-              📦 उत्पाद चुनें →
-            </a>
+          <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div>
+              <h3 style="font-size:1.2rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+                <a href="#sec-agri-products" style="color:#0f172a;text-decoration:none;">टमाटर, मिर्च, प्याज, लहसुन व फल सुरक्षा</a>
+              </h3>
+              <div style="font-size:0.86rem;color:#14532d;margin-bottom:10px;line-height:1.5;">
+                विशेषज्ञ प्रमाणित नेटसर्फ बायो-फिट प्रोटोकॉल और 24×7 व्हाट्सएप परामर्श से सब्जी फसल को कीट-मुक्त बनाएं।
+              </div>
+              <div style="background:#ffffff;padding:10px 12px;border-radius:10px;border:1px solid #86efac;margin-bottom:12px;">
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 विशेषज्ञ किट:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">StimRich + Bio-99 + Wrap-Up + Intact का सम्पूर्ण 4-इन-1 कॉम्बो किट।</div>
+              </div>
+            </div>
+
+            <div class="kpi-actions-row">
+              <a href="#sec-agri-products" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                📦 उत्पाद चुनें →
+              </a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'सब्जी व बागवानी फसल सुरक्षा', 'टमाटर मिर्च प्याज व फल सुरक्षा के लिए प्रमाणित नेटसर्फ बायो-फिट प्रोटोकॉल।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'सब्जी व बागवानी सुरक्षा किट', 'सब्जी व फल फसलों के लिए ऑर्गेनिक स्प्रे चार्ट देखें', '#sec-agri-products')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('सब्जी व बागवानी फसल सुरक्षा प्लान')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>सलाह लें</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -706,7 +788,6 @@
   <script src="/js/agriculture.js?v=20260918_v1"></script>
   <script src="/js/audio-greeting-engine.js"></script>
   <script src="/js/dual-whatsapp-order.js"></script>
-  <script src="/js/home-revamp.js?v=6.1"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof window.initPanoramicCarousel === 'function') {

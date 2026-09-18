@@ -17,8 +17,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <title>डिजिटल ई-बुक स्टोर | Aarogyam India (Kindle & Digital Edition)</title>
-  <meta name="description" content="Aarogyam India Digital eBook Store - कृषि, स्वास्थ्य, व्यवसाय एवं AI डिजिटल पुस्तकों का भारत का सबसे बड़ा प्रैक्टिकल ई-बुक स्टोर।">
-  <meta name="keywords" content="Aarogyam India, Agriculture eBooks, Kharif Guide, Crop Doctor, Hindi eBooks, Kindle India, Combo Maker">
+  <meta name="description"
+    content="Aarogyam India Digital eBook Store - कृषि, स्वास्थ्य, व्यवसाय एवं AI डिजिटल पुस्तकों का भारत का सबसे बड़ा प्रैक्टिकल ई-बुक स्टोर।">
+  <meta name="keywords"
+    content="Aarogyam India, Agriculture eBooks, Kharif Guide, Crop Doctor, Hindi eBooks, Kindle India, Combo Maker">
   <meta name="author" content="Aarogyam India">
   <meta name="robots" content="index, follow">
 
@@ -39,7 +41,9 @@
   <!-- Google Fonts & FontAwesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
   <!-- CSS Stylesheets -->
@@ -54,10 +58,11 @@
       background: #ffffff;
       border-radius: 20px;
       padding: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
       border: 1.5px solid #e2e8f0;
       margin-bottom: 28px;
     }
+
     .filter-pills-row {
       display: flex;
       gap: 10px;
@@ -65,13 +70,16 @@
       padding-bottom: 8px;
       scrollbar-width: thin;
     }
+
     .filter-pills-row::-webkit-scrollbar {
       height: 4px;
     }
+
     .filter-pills-row::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 4px;
     }
+
     .status-chip {
       padding: 6px 14px;
       border-radius: 20px;
@@ -84,23 +92,26 @@
       transition: all 0.2s ease;
       white-space: nowrap;
     }
+
     .status-chip.active {
       background: #0f172a;
       color: #fde047;
       border-color: #0f172a;
-      box-shadow: 0 3px 10px rgba(15,23,42,0.25);
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.25);
     }
+
     .combo-builder-box {
       background: linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #1e3a8a 100%);
       border-radius: 24px;
       padding: 32px 28px;
       color: #ffffff;
       border: 1.5px solid #3b82f6;
-      box-shadow: 0 16px 40px rgba(30,58,138,0.3);
+      box-shadow: 0 16px 40px rgba(30, 58, 138, 0.3);
     }
+
     .combo-book-item {
-      background: rgba(255,255,255,0.08);
-      border: 1.5px solid rgba(255,255,255,0.15);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
       border-radius: 14px;
       padding: 12px 14px;
       display: flex;
@@ -109,8 +120,9 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
+
     .combo-book-item.selected {
-      background: rgba(34,197,94,0.15);
+      background: rgba(34, 197, 94, 0.15);
       border-color: #22c55e;
     }
   </style>
@@ -150,20 +162,28 @@
       </div>
 
       <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
-        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn"
+          title="Install Aarogyam App"
+          style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
           <span>📲</span> <span>Install App</span>
         </button>
 
-        <button type="button" onclick="window.triggerUniversalShare({title:'Aarogyam India ई-बुक स्टोर', text:'सर्वश्रेष्ठ प्रैक्टिकल कृषि, स्वास्थ्य व बिज़नेस ई-बुक्स देखें:'})" class="btn" style="background:#ff671f; color:#fff; border:none; padding:6px 14px; border-radius:20px; font-weight:800; font-size:0.78rem; cursor:pointer;">
+        <button type="button"
+          onclick="window.triggerUniversalShare({title:'Aarogyam India ई-बुक स्टोर', text:'सर्वश्रेष्ठ प्रैक्टिकल कृषि, स्वास्थ्य व बिज़नेस ई-बुक्स देखें:'})"
+          class="btn"
+          style="background:#ff671f; color:#fff; border:none; padding:6px 14px; border-radius:20px; font-weight:800; font-size:0.78rem; cursor:pointer;">
           <span>📤</span> <span>शेयर</span>
         </button>
 
-        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+        <a href="/ebooks/cart.html" title="Shopping Cart"
+          style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
           <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
-          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
+          <span class="cart-count" id="cartCount"
+            style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
         </a>
 
-        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu"
+          style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
           <i class="fa-solid fa-bars"></i>
         </button>
       </div>
@@ -173,7 +193,7 @@
   <!-- 3. HERO SLIDER / DYNAMIC HERO BANNER -->
   <section class="ebook-hero-slider-section" style="padding: 24px 0 10px 0; background: #ffffff;">
     <div class="container" id="store-hero-slider-wrap">
-      
+
       <div class="bighaat-carousel-container">
         <!-- Navigation Arrows -->
         <button type="button" class="bighaat-carousel-arrow prev" title="Previous Slide" aria-label="Previous Slide">
@@ -192,29 +212,37 @@
 
         <!-- Slide 2: Special Kharif Doctor 2026 Offer (₹99) -->
         <div class="home-hero-slide-item" style="display:none;">
-          <a href="/ebooks/checkout.html?combo=agri2" class="landscape-hero-banner-link" title="खरीफ स्पेशल खेती का डॉक्टर ऑफर">
-            <img src="/images/banners/offer-banner-kharif-2026.webp" alt="खरीफ फसल मास्टर गाइड 2026 स्पेशल ऑफर" class="landscape-hero-banner-img" />
+          <a href="/ebooks/checkout.html?combo=agri2" class="landscape-hero-banner-link"
+            title="खरीफ स्पेशल खेती का डॉक्टर ऑफर">
+            <img src="/images/banners/offer-banner-kharif-2026.webp" alt="खरीफ फसल मास्टर गाइड 2026 स्पेशल ऑफर"
+              class="landscape-hero-banner-img" />
           </a>
         </div>
 
         <!-- Slide 3: Kharif Master Guide 2026 -->
         <div class="home-hero-slide-item" style="display:none;">
-          <a href="/ebooks/kharif-master-guide-2026.html" class="landscape-hero-banner-link" title="खरीफ फसल मास्टर गाइड 2026">
-            <img src="/images/banners/kharif-master-guide-2026-hero-banner.webp" alt="खरीफ फसल मास्टर गाइड 2026" class="landscape-hero-banner-img" />
+          <a href="/ebooks/kharif-master-guide-2026.html" class="landscape-hero-banner-link"
+            title="खरीफ फसल मास्टर गाइड 2026">
+            <img src="/images/banners/kharif-master-guide-2026-hero-banner.webp" alt="खरीफ फसल मास्टर गाइड 2026"
+              class="landscape-hero-banner-img" />
           </a>
         </div>
 
         <!-- Slide 4: Agriculture Hub -->
         <div class="home-hero-slide-item" style="display:none;">
-          <a href="/ebooks/agriculture.html" class="landscape-hero-banner-link" title="सम्पूर्ण कृषि हब व वैज्ञानिक फसल सुरक्षा">
-            <img src="/images/banners/agriculture-banner.jpeg" alt="सम्पूर्ण कृषि हब" class="landscape-hero-banner-img" />
+          <a href="/ebooks/agriculture.html" class="landscape-hero-banner-link"
+            title="सम्पूर्ण कृषि हब व वैज्ञानिक फसल सुरक्षा">
+            <img src="/images/banners/agriculture-banner.jpeg" alt="सम्पूर्ण कृषि हब"
+              class="landscape-hero-banner-img" />
           </a>
         </div>
 
         <!-- Slide 5: Achievers Showcase -->
         <div class="home-hero-slide-item" style="display:none;">
-          <a href="/index.html#sec-achievers-showcase" class="landscape-hero-banner-link" title="हमारे शीर्ष अचीवर्स व सफलता की कहानियां">
-            <img src="/images/banners/achievers-banner.jpeg" alt="हमारे शीर्ष अचीवर्स" class="landscape-hero-banner-img" />
+          <a href="/index.html#sec-achievers-showcase" class="landscape-hero-banner-link"
+            title="हमारे शीर्ष अचीवर्स व सफलता की कहानियां">
+            <img src="/images/banners/achievers-banner.jpeg" alt="हमारे शीर्ष अचीवर्स"
+              class="landscape-hero-banner-img" />
           </a>
         </div>
 
@@ -236,14 +264,18 @@
   <section style="padding: 24px 0 10px 0;">
     <div class="container">
       <div class="dual-filter-wrap">
-        
+
         <!-- Search Input Bar with Counter -->
         <div style="display:flex; gap:12px; align-items:center; margin-bottom:18px; flex-wrap:wrap;">
           <div style="flex:1; min-width:260px; position:relative;">
-            <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94a3b8;"></i>
-            <input type="text" id="store-book-search-input" placeholder="शीर्षक, विषय या फसल का नाम खोजें (उदा. खरीफ, रोग, शुगर)..." style="width:100%; box-sizing:border-box; padding:12px 14px 12px 42px; border-radius:30px; border:1.5px solid #cbd5e1; font-size:0.92rem; outline:none; background:#f8fafc;">
+            <i class="fa-solid fa-magnifying-glass"
+              style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94a3b8;"></i>
+            <input type="text" id="store-book-search-input"
+              placeholder="शीर्षक, विषय या फसल का नाम खोजें (उदा. खरीफ, रोग, शुगर)..."
+              style="width:100%; box-sizing:border-box; padding:12px 14px 12px 42px; border-radius:30px; border:1.5px solid #cbd5e1; font-size:0.92rem; outline:none; background:#f8fafc;">
           </div>
-          <div id="store-book-count-badge" style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:0.82rem; padding:8px 16px; border-radius:20px; white-space:nowrap;">
+          <div id="store-book-count-badge"
+            style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:0.82rem; padding:8px 16px; border-radius:20px; white-space:nowrap;">
             📚 <span id="filtered-count">0</span> पुस्तकें उपलब्ध
           </div>
         </div>
@@ -289,11 +321,12 @@
           <span class="shelf-icon">📖</span>
           <div>
             <h2 class="shelf-title" id="shelf-dynamic-title" style="color:#0f172a;">प्रमाणित डिजिटल ई-बुक्स</h2>
-            <p class="shelf-subtitle" id="shelf-dynamic-subtitle" style="color:#64748b;">1-क्लिक में लाइव पीडीएफ डाउनलोड व आजीवन निःशुल्क अपडेट</p>
+            <p class="shelf-subtitle" id="shelf-dynamic-subtitle" style="color:#64748b;">1-क्लिक में लाइव पीडीएफ डाउनलोड
+              व आजीवन निःशुल्क अपडेट</p>
           </div>
         </div>
       </div>
-      
+
       <!-- Unified Grid with zero duplicates -->
       <div class="shelf-books-grid" id="store-books-unified-grid">
         <!-- Rendered dynamically by js/ebook.js -->
@@ -302,12 +335,15 @@
   </section>
 
   <!-- 6. CUSTOM COMBO MAKER SECTION (INTERACTIVE REAL-TIME PRICING) -->
-  <section id="sec-custom-combo-maker" style="padding: 40px 0; background: #ffffff; border-top: 1.5px solid #e2e8f0; border-bottom: 1.5px solid #e2e8f0;">
+  <section id="sec-custom-combo-maker"
+    style="padding: 40px 0; background: #ffffff; border-top: 1.5px solid #e2e8f0; border-bottom: 1.5px solid #e2e8f0;">
     <div class="container">
       <div class="combo-builder-box">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px; margin-bottom:24px;">
+        <div
+          style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px; margin-bottom:24px;">
           <div>
-            <span style="background:#facc15; color:#000; font-weight:900; font-size:0.75rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
+            <span
+              style="background:#facc15; color:#000; font-weight:900; font-size:0.75rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
               🎯 CUSTOM BUNDLE BUILDER
             </span>
             <h2 style="font-size:1.85rem; font-weight:900; margin:10px 0 6px 0; color:#ffffff;">
@@ -320,12 +356,14 @@
 
           <!-- Pricing Tiers Badge -->
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.25); border-radius:12px; padding:10px 14px; text-align:center;">
+            <div
+              style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.25); border-radius:12px; padding:10px 14px; text-align:center;">
               <div style="font-size:0.75rem; color:#cbd5e1;">कोई भी 2 किताबें</div>
               <div style="font-size:1.2rem; font-weight:900; color:#facc15;">₹179</div>
               <div style="font-size:0.7rem; color:#86efac;">बचत ₹19</div>
             </div>
-            <div style="background:rgba(34,197,94,0.15); border:1.5px solid #22c55e; border-radius:12px; padding:10px 14px; text-align:center;">
+            <div
+              style="background:rgba(34,197,94,0.15); border:1.5px solid #22c55e; border-radius:12px; padding:10px 14px; text-align:center;">
               <div style="font-size:0.75rem; color:#dcfce7;">कोई भी 3 किताबें</div>
               <div style="font-size:1.2rem; font-weight:900; color:#ffffff;">₹249</div>
               <div style="font-size:0.7rem; color:#fde047;">बचत ₹48 + Pro VIP</div>
@@ -338,20 +376,25 @@
           <div style="font-size:0.85rem; font-weight:800; color:#e0e7ff; margin-bottom:12px;">
             नीचे से पुस्तकें चुनें (अधिकतम 3):
           </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;" id="combo-books-selector-grid">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;"
+            id="combo-books-selector-grid">
             <!-- Rendered dynamically by js/ebook.js -->
           </div>
         </div>
 
         <!-- Real-Time Calculation & Checkout Bar -->
-        <div style="background:rgba(15,23,42,0.7); backdrop-filter:blur(10px); border-radius:16px; padding:18px 24px; border:1px solid rgba(255,255,255,0.2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div
+          style="background:rgba(15,23,42,0.7); backdrop-filter:blur(10px); border-radius:16px; padding:18px 24px; border:1px solid rgba(255,255,255,0.2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
           <div>
-            <div style="font-size:0.82rem; color:#94a3b8;">चयनित पुस्तकें: <strong id="combo-selected-count" style="color:#ffffff;">0</strong> / 3</div>
-            <div style="font-size:1.35rem; font-weight:900; color:#facc15;" id="combo-calculated-price">कुल मूल्य: ₹0</div>
+            <div style="font-size:0.82rem; color:#94a3b8;">चयनित पुस्तकें: <strong id="combo-selected-count"
+                style="color:#ffffff;">0</strong> / 3</div>
+            <div style="font-size:1.35rem; font-weight:900; color:#facc15;" id="combo-calculated-price">कुल मूल्य: ₹0
+            </div>
             <div style="font-size:0.75rem; color:#86efac;" id="combo-savings-text">कृपया कम से कम 1 पुस्तक चुनें</div>
           </div>
 
-          <button type="button" id="combo-checkout-btn" onclick="window.proceedCustomComboCheckout()" class="btn" style="background:#22c55e; color:#ffffff; font-weight:900; font-size:1rem; padding:12px 28px; border-radius:30px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 8px 25px rgba(34,197,94,0.4); opacity:0.5; pointer-events:none;">
+          <button type="button" id="combo-checkout-btn" onclick="window.proceedCustomComboCheckout()" class="btn"
+            style="background:#22c55e; color:#ffffff; font-weight:900; font-size:1rem; padding:12px 28px; border-radius:30px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 8px 25px rgba(34,197,94,0.4); opacity:0.5; pointer-events:none;">
             <i class="fa-solid fa-cart-shopping"></i> <span>यह कॉम्बो अभी खरीदें</span>
           </button>
         </div>
@@ -363,7 +406,8 @@
   <section style="padding: 50px 0; background: #ffffff;">
     <div class="container">
       <div style="text-align:center; margin-bottom:35px;">
-        <span style="background:rgba(37,99,235,0.1); color:#2563eb; font-weight:800; font-size:0.8rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
+        <span
+          style="background:rgba(37,99,235,0.1); color:#2563eb; font-weight:800; font-size:0.8rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
           ✨ AAROGYAM GUARANTEE
         </span>
         <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">
@@ -375,35 +419,41 @@
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:24px; text-align:center;">
           <div style="font-size:2.4rem; margin-bottom:10px;">⚡</div>
           <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin-bottom:6px;">इंस्टेंट PDF डाउनलोड</h4>
-          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">भुगतान के तुरंत बाद आपके WhatsApp व ईमेल पर सुरक्षित हाई-क्वालिटी रंगीन PDF उपलब्ध।</p>
+          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">भुगतान के तुरंत बाद आपके WhatsApp व ईमेल पर
+            सुरक्षित हाई-क्वालिटी रंगीन PDF उपलब्ध।</p>
         </div>
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:24px; text-align:center;">
           <div style="font-size:2.4rem; margin-bottom:10px;">🎧</div>
           <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin-bottom:6px;">स्मार्ट ऑडियो रीडर</h4>
-          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">किताब पढ़ने के साथ-साथ बैकग्राउंड में हिंदी ऑडियो सुनें—काम करते हुए भी सीखना संभव।</p>
+          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">किताब पढ़ने के साथ-साथ बैकग्राउंड में हिंदी
+            ऑडियो सुनें—काम करते हुए भी सीखना संभव।</p>
         </div>
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:24px; text-align:center;">
           <div style="font-size:2.4rem; margin-bottom:10px;">🩺</div>
           <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin-bottom:6px;">24×7 WhatsApp AI डॉक्टर</h4>
-          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">किताब से जुड़ा कोई भी सवाल हो, सीधे WhatsApp पर AI विशेषज्ञ से आजीवन मुफ्त सलाह पाएं।</p>
+          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">किताब से जुड़ा कोई भी सवाल हो, सीधे WhatsApp पर
+            AI विशेषज्ञ से आजीवन मुफ्त सलाह पाएं।</p>
         </div>
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:24px; text-align:center;">
           <div style="font-size:2.4rem; margin-bottom:10px;">🛡️</div>
           <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin-bottom:6px;">100% सुरक्षित भुगतान</h4>
-          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">UPI, PhonePe, Google Pay, Paytm व सभी कार्ड्स द्वारा त्वरित व सुरक्षित भुगतान।</p>
+          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">UPI, PhonePe, Google Pay, Paytm व सभी कार्ड्स
+            द्वारा त्वरित व सुरक्षित भुगतान।</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- 8. CROSS-PAGE SYNDICATED VIDEO GUIDES -->
-  <section style="padding: 50px 0; background: #f8fafc; border-top: 1.5px solid #e2e8f0; border-bottom: 1.5px solid #e2e8f0;">
+  <section
+    style="padding: 50px 0; background: #f8fafc; border-top: 1.5px solid #e2e8f0; border-bottom: 1.5px solid #e2e8f0;">
     <div class="container">
       <div style="text-align:center; margin-bottom:30px;">
-        <span style="background:rgba(239,68,68,0.1); color:#ef4444; font-weight:800; font-size:0.8rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
+        <span
+          style="background:rgba(239,68,68,0.1); color:#ef4444; font-weight:800; font-size:0.8rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
           🎬 Video Walkthroughs
         </span>
         <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">
@@ -411,7 +461,8 @@
         </h2>
       </div>
 
-      <div class="universal-video-showcase" data-page-target="ebook-store" data-video-category="agriculture" data-max-videos="3">
+      <div class="universal-video-showcase" data-page-target="ebook-store" data-video-category="agriculture"
+        data-max-videos="3">
         <!-- Dynamically rendered by universal-video-loader.js -->
       </div>
     </div>
@@ -426,33 +477,48 @@
       </div>
 
       <div style="display:flex; flex-direction:column; gap:12px;">
-        <details style="background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:16px 20px; cursor:pointer;" open>
-          <summary style="font-weight:800; color:#0f172a; font-size:0.98rem;">भुगतान के बाद ई-बुक मुझे कैसे मिलेगी?</summary>
-          <p style="margin-top:10px; color:#64748b; line-height:1.6; font-size:0.9rem;">भुगतान पूरा होते ही डाउनलोड स्क्रीन खुलेगी और आपके WhatsApp नंबर व ईमेल पर भी PDF लिंक तुरंत भेज दिया जाता है। साथ ही 'मेरी लाइब्रेरी' में यह हमेशा के लिए सेव रहती है।</p>
-        </details>
-        
-        <details style="background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:16px 20px; cursor:pointer;">
-          <summary style="font-weight:800; color:#0f172a; font-size:0.98rem;">कस्टम कॉम्बो ऑफर कैसे काम करता है?</summary>
-          <p style="margin-top:10px; color:#64748b; line-height:1.6; font-size:0.9rem;">कॉम्बो मेकर में आप कोई भी 2 किताबें ₹179 में और 3 किताबें ₹249 में एक साथ ले सकते हैं। इसके साथ आपको 1 साल का VIP सपोर्ट भी फ्री मिलता है।</p>
+        <details
+          style="background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:16px 20px; cursor:pointer;"
+          open>
+          <summary style="font-weight:800; color:#0f172a; font-size:0.98rem;">भुगतान के बाद ई-बुक मुझे कैसे मिलेगी?
+          </summary>
+          <p style="margin-top:10px; color:#64748b; line-height:1.6; font-size:0.9rem;">भुगतान पूरा होते ही डाउनलोड
+            स्क्रीन खुलेगी और आपके WhatsApp नंबर व ईमेल पर भी PDF लिंक तुरंत भेज दिया जाता है। साथ ही 'मेरी लाइब्रेरी'
+            में यह हमेशा के लिए सेव रहती है।</p>
         </details>
 
-        <details style="background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:16px 20px; cursor:pointer;">
-          <summary style="font-weight:800; color:#0f172a; font-size:0.98rem;">क्या ई-बुक को बिना इंटरनेट के भी पढ़ सकते हैं?</summary>
-          <p style="margin-top:10px; color:#64748b; line-height:1.6; font-size:0.9rem;">हाँ, एक बार डाउनलोड करने के बाद PDF आपके मोबाइल स्टोरेज में सुरक्षित हो जाती है, जिसे आप बिना इंटरनेट कभी भी पढ़ सकते हैं।</p>
+        <details
+          style="background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:16px 20px; cursor:pointer;">
+          <summary style="font-weight:800; color:#0f172a; font-size:0.98rem;">कस्टम कॉम्बो ऑफर कैसे काम करता है?
+          </summary>
+          <p style="margin-top:10px; color:#64748b; line-height:1.6; font-size:0.9rem;">कॉम्बो मेकर में आप कोई भी 2
+            किताबें ₹179 में और 3 किताबें ₹249 में एक साथ ले सकते हैं। इसके साथ आपको 1 साल का VIP सपोर्ट भी फ्री मिलता
+            है।</p>
+        </details>
+
+        <details
+          style="background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0; padding:16px 20px; cursor:pointer;">
+          <summary style="font-weight:800; color:#0f172a; font-size:0.98rem;">क्या ई-बुक को बिना इंटरनेट के भी पढ़ सकते
+            हैं?</summary>
+          <p style="margin-top:10px; color:#64748b; line-height:1.6; font-size:0.9rem;">हाँ, एक बार डाउनलोड करने के बाद
+            PDF आपके मोबाइल स्टोरेज में सुरक्षित हो जाती है, जिसे आप बिना इंटरनेट कभी भी पढ़ सकते हैं।</p>
         </details>
       </div>
     </div>
   </section>
 
   <!-- 10. MODERN DARK FOOTER -->
-  <footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b;">
+  <footer class="footer"
+    style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b;">
     <div class="container">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
-        
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
+
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
             <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:42px;width:auto;" />
-            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#38bdf8;">INDIA</span></span>
+            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span
+                style="color:#38bdf8;">INDIA</span></span>
           </div>
           <p style="font-size:0.85rem;color:#94a3b8;line-height:1.55;">
             भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य, पशु पोषण और डायरेक्ट सेलिंग ज्ञान मंच।
@@ -483,7 +549,9 @@
           <h3 style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:14px;">सहायता केंद्र</h3>
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
-          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 ई-बुक सहायता')" class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;background:#dc2626;color:#fff;border:none;border-radius:20px;font-weight:800;cursor:pointer;">
+          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 ई-बुक सहायता')"
+            class="ai-expert-red-btn"
+            style="margin:0;padding:8px 16px;font-size:0.82rem;background:#dc2626;color:#fff;border:none;border-radius:20px;font-weight:800;cursor:pointer;">
             <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
           </button>
         </div>
@@ -505,11 +573,10 @@
   <script src="/js/universal-nav-drawer.js"></script>
   <script src="/js/universal-video-loader.js"></script>
   <script src="/js/viral-share-engine.js"></script>
-  <script src="/js/ebook.js?v=20260918_v1"></script>
+  <script src="/js/ebook.js?v=20260918_v2"></script>
   <script src="/js/audio-greeting-engine.js"></script>
-  <script src="/js/home-revamp.js?v=6.1"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       if (typeof window.initPanoramicCarousel === 'function') {
         window.initPanoramicCarousel();
       }
@@ -517,4 +584,5 @@
   </script>
 
 </body>
+
 </html>
