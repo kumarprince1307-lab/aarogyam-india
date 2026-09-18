@@ -3331,7 +3331,7 @@
     },
     {
       "id": "DEMO-BK002",
-      "updated_at": "2026-09-17T04:51:10.990Z",
+      "updated_at": "2026-09-18T18:31:57.734Z",
       "admin_edited": true,
       "slug": "demo-bk002",
       "book_type": "demo",
@@ -3352,7 +3352,6 @@
         "ebook_store",
         "category_page",
         "my_library",
-        "home_page",
         "home_hero",
         "free_shelf",
         "demo_shelf",
@@ -3540,8 +3539,8 @@
         "/images/books/kheti-dr-demo-4.webp",
         "/images/books/kheti-dr-demo-5.webp"
       ],
-      "demo_reader_pages": "1, 2, 3, 5, 8, 12, 16",
-      "demoPages": "1, 2, 3, 5, 8, 12, 16",
+      "demo_reader_pages": "9, 41, 51, 71, 75, 89, 93, 97, 117",
+      "demoPages": "9, 41, 51, 71, 75, 89, 93, 97, 117",
       "suggested_books_list": [
         {
           "image": "/images/books/kharif-master-guide-2026-cover.webp",
