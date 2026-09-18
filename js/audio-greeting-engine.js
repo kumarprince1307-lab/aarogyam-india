@@ -518,16 +518,48 @@
     return null;
   }
 
+  // Helper to resolve best referral / share ID
+  function getBestReferralCode() {
+    let ref = '';
+    if (typeof window.getUserShareId === 'function') {
+      try { ref = window.getUserShareId() || ''; } catch (e) {}
+    }
+    if (!ref) {
+      try { ref = localStorage.getItem('aarogyam_user_phone') || ''; } catch (e) {}
+    }
+    if (!ref) {
+      try {
+        const u = window.AI_USER || JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        ref = u.share_id || u.mobile || '';
+      } catch (e) {}
+    }
+    if (!ref) {
+      try {
+        const session = JSON.parse(localStorage.getItem('aoi_user_session') || localStorage.getItem('admin_session') || '{}');
+        if (session && (session.phone || session.mobile || session.id)) {
+          ref = session.phone || session.mobile || session.id;
+        }
+      } catch (e) {}
+    }
+    if (!ref) {
+      try { ref = sessionStorage.getItem('AOI_REFERRER_ID') || ''; } catch (e) {}
+    }
+    return ref || 'AI000004';
+  }
+
   // 7. Universal Viral Share Trigger (Action Gated + Dynamic OG Layer)
   window.triggerViralPageShare = function (customData) {
     checkRegistrationGate(() => {
       const cms = getCurrentPageCmsConfig();
       const pageKey = getActivePageKey();
       const config = pageAudioScripts[pageKey] || pageAudioScripts['index'];
-      const userPhone = localStorage.getItem('aarogyam_user_phone') || '';
+      const refCode = getBestReferralCode();
 
       const currentUrlObj = new URL(window.location.href);
-      if (userPhone) currentUrlObj.searchParams.set('ref', userPhone);
+      if (refCode) {
+        currentUrlObj.searchParams.set('ref', refCode);
+        currentUrlObj.searchParams.set('share_id', refCode);
+      }
       const shareUrl = currentUrlObj.href;
 
       const title = customData?.title || cms?.og_title || `${config.title} - Aarogyam India`;
@@ -547,8 +579,9 @@
         shareMessage = `🌾 *${title}*\n${desc}\n\n👉 यहाँ देखें:\n${shareUrl}`;
       }
 
+      // Do NOT pass url separately as shareMessage already contains it, preventing double URL in mobile share
       if (navigator.share) {
-        navigator.share({ title, text: shareMessage, url: shareUrl }).catch(() => {});
+        navigator.share({ title, text: shareMessage }).catch(() => {});
       } else {
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
         window.open(waUrl, '_blank');
@@ -607,10 +640,13 @@
 
     checkRegistrationGate(() => {
       const cms = getCurrentPageCmsConfig();
-      const userPhone = localStorage.getItem('aarogyam_user_phone') || '';
+      const refCode = getBestReferralCode();
 
       const targetUrlObj = new URL(targetUrl || window.location.href, window.location.origin);
-      if (userPhone) targetUrlObj.searchParams.set('ref', userPhone);
+      if (refCode) {
+        targetUrlObj.searchParams.set('ref', refCode);
+        targetUrlObj.searchParams.set('share_id', refCode);
+      }
       const pageUrl = targetUrlObj.href;
 
       const cleanTitle = (title || cms?.og_title || 'Aarogyam India').replace(/<[^>]+>/g, '');
@@ -630,11 +666,11 @@
         shareMessage = `🌾 *${cleanTitle}*\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व आयुर्वेदिक उपाय देखें:\n${pageUrl}`;
       }
 
+      // Do NOT pass url separately to avoid duplication in Android/WhatsApp
       if (navigator.share) {
         navigator.share({
           title: cleanTitle,
-          text: shareMessage,
-          url: pageUrl
+          text: shareMessage
         }).catch(() => {});
       } else {
         const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
@@ -804,6 +840,9 @@
   }
 
   window.initPanoramicCarousel = initUniversalHeroCarousel;
+  window.checkRegistrationGate = checkRegistrationGate;
+  window.openSlimLeadModal = openSlimLeadModal;
+  window.isUserRegistered = isUserRegistered;
 
   // Initialize once DOM is ready
   function initEngine() {

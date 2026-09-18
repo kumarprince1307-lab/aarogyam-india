@@ -2360,7 +2360,7 @@ export async function initPageEditor() {
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">प्रमुख रोग व समस्याएं (Issues)</label>
               <textarea rows="2" onchange="window.updateCropCardField(${idx}, 'mainIssues', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.78rem;">${escapeHtml(issuesStr)}</textarea>
@@ -2368,6 +2368,33 @@ export async function initPageEditor() {
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">जैविक / वैज्ञानिक समाधान (Solution)</label>
               <textarea rows="2" onchange="window.updateCropCardField(${idx}, 'solution', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.78rem;">${safeSolution}</textarea>
+            </div>
+          </div>
+
+          <!-- Product & Book Funnel Integration -->
+          <div style="background:#1e293b; border-radius:8px; padding:10px; border:1px solid #334155;">
+            <div style="font-size:0.75rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">📦 उत्पाद व ई-बुक लिंक (Marketing & Order Funnel):</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+              <div>
+                <label style="font-size:0.7rem; color:var(--admin-muted); display:block;">संबंधित ई-बुक लिंक (Book Link)</label>
+                <input type="text" value="${escapeHtml(item.book_link || '/ebooks/kharif-master-guide-2026.html')}" placeholder="/ebooks/kharif-master-guide-2026.html" onchange="window.updateCropCardField(${idx}, 'book_link', this.value)" class="admin-input" style="width:100%; padding:4px 6px; font-size:0.76rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.7rem; color:var(--admin-muted); display:block;">Biofit उत्पाद नाम (Product Name)</label>
+                <input type="text" value="${escapeHtml(item.product_name || 'Biofit Wrap-Up')}" placeholder="उदा. Biofit Wrap-Up" onchange="window.updateCropCardField(${idx}, 'product_name', this.value)" class="admin-input" style="width:100%; padding:4px 6px; font-size:0.76rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.7rem; color:var(--admin-muted); display:block;">उत्पाद MRP (₹)</label>
+                <input type="number" value="${item.product_mrp || 850}" placeholder="850" onchange="window.updateCropCardField(${idx}, 'product_mrp', Number(this.value))" class="admin-input" style="width:100%; padding:4px 6px; font-size:0.76rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.7rem; color:var(--admin-muted); display:block;">उत्पाद कार्य (Work / Benefit)</label>
+                <input type="text" value="${escapeHtml(item.product_work || 'फंगस शील्ड')}" placeholder="फंगस शील्ड" onchange="window.updateCropCardField(${idx}, 'product_work', this.value)" class="admin-input" style="width:100%; padding:4px 6px; font-size:0.76rem;" />
+              </div>
+              <div>
+                <label style="font-size:0.7rem; color:var(--admin-muted); display:block;">खुराक / डोज़ (Dosage)</label>
+                <input type="text" value="${escapeHtml(item.product_dose || '2ml / लीटर पानी')}" placeholder="2ml / लीटर पानी" onchange="window.updateCropCardField(${idx}, 'product_dose', this.value)" class="admin-input" style="width:100%; padding:4px 6px; font-size:0.76rem;" />
+              </div>
             </div>
           </div>
         </div>

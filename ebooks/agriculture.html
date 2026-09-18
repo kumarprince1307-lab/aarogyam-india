@@ -41,6 +41,7 @@
 
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/home-revamp.css">
   <link rel="stylesheet" href="/css/user-notifications.css">
   <link rel="stylesheet" href="/css/ebook.css">
   <link rel="stylesheet" href="/css/universal-nav-drawer.css">
@@ -205,67 +206,98 @@
     </div>
   </section>
 
-  <!-- 4. FAST AGRI TOOLS LAUNCHER -->
+  <!-- 4. FAST AGRI TOOLS LAUNCHER (ANIMATED KPI CARDS) -->
   <section style="padding: 24px 0 10px 0;">
     <div class="container">
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
-        <a href="/crop-doctor.html" class="agri-tool-card">
-          <div style="font-size:2rem; background:#eff6ff; padding:10px; border-radius:12px;">🔬</div>
+        
+        <!-- Tool 1: Fasal Doctor AI (Triggers WhatsApp 7974422572 with user name) -->
+        <div onclick="window.openFasalDoctorWhatsApp()" class="agri-tool-card" style="cursor:pointer; background:linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border:1.5px solid #60a5fa; box-shadow:0 4px 18px rgba(37,99,235,0.12); position:relative; overflow:hidden;">
+          <span style="position:absolute; top:8px; right:8px; background:#22c55e; color:#fff; font-size:0.65rem; font-weight:900; padding:2px 8px; border-radius:10px; animation:pulse 2s infinite;">LIVE 24×7</span>
+          <div style="font-size:2rem; background:#dbeafe; padding:12px; border-radius:14px; color:#2563eb; display:flex; align-items:center; justify-content:center;">🔬</div>
           <div>
-            <h4 style="font-size:1rem; font-weight:800; margin:0 0 2px 0; color:#0f172a;">फसल डॉक्टर AI</h4>
-            <p style="font-size:0.78rem; color:#64748b; margin:0;">फोटो से तुरंत रोग पहचानें</p>
+            <h4 style="font-size:1.02rem; font-weight:900; margin:0 0 3px 0; color:#1e3a8a;">फसल डॉक्टर AI</h4>
+            <p style="font-size:0.78rem; color:#475569; margin:0 0 6px 0;">व्हाट्सएप पर फोटो भेजें</p>
+            <span style="display:inline-flex; align-items:center; gap:4px; font-size:0.72rem; font-weight:800; color:#16a34a;">
+              <i class="fa-brands fa-whatsapp"></i> 7974422572 से जुड़ें →
+            </span>
+          </div>
+        </div>
+
+        <!-- Tool 2: Live Mandi Bhav -->
+        <a href="/mandi.html" class="agri-tool-card" style="background:linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border:1.5px solid #86efac; box-shadow:0 4px 18px rgba(22,163,74,0.12);">
+          <div style="font-size:2rem; background:#dcfce7; padding:12px; border-radius:14px; color:#16a34a; display:flex; align-items:center; justify-content:center;">🌾</div>
+          <div>
+            <h4 style="font-size:1.02rem; font-weight:900; margin:0 0 3px 0; color:#14532d;">लाइव मंडी भाव</h4>
+            <p style="font-size:0.78rem; color:#475569; margin:0 0 6px 0;">दैनिक अनाज व सब्जी दरें</p>
+            <span style="display:inline-flex; align-items:center; gap:4px; font-size:0.72rem; font-weight:800; color:#15803d;">आज के भाव देखें →</span>
           </div>
         </a>
 
-        <a href="/mandi.html" class="agri-tool-card">
-          <div style="font-size:2rem; background:#f0fdf4; padding:10px; border-radius:12px;">🌾</div>
+        <!-- Tool 3: Weather Forecast -->
+        <a href="/weather.html" class="agri-tool-card" style="background:linear-gradient(135deg, #ffffff 0%, #fefce8 100%); border:1.5px solid #fde047; box-shadow:0 4px 18px rgba(234,179,8,0.12);">
+          <div style="font-size:2rem; background:#fef9c3; padding:12px; border-radius:14px; color:#ca8a04; display:flex; align-items:center; justify-content:center;">⛅</div>
           <div>
-            <h4 style="font-size:1rem; font-weight:800; margin:0 0 2px 0; color:#0f172a;">लाइव मंडी भाव</h4>
-            <p style="font-size:0.78rem; color:#64748b; margin:0;">दैनिक मंडी दरें व रुझान</p>
+            <h4 style="font-size:1.02rem; font-weight:900; margin:0 0 3px 0; color:#713f12;">मौसम पूर्वानुमान</h4>
+            <p style="font-size:0.78rem; color:#475569; margin:0 0 6px 0;">बारिश व स्प्रे अनुकूलता</p>
+            <span style="display:inline-flex; align-items:center; gap:4px; font-size:0.72rem; font-weight:800; color:#a16207;">मौसम अपडेट →</span>
           </div>
         </a>
 
-        <a href="/weather.html" class="agri-tool-card">
-          <div style="font-size:2rem; background:#fefce8; padding:10px; border-radius:12px;">⛅</div>
+        <!-- Tool 4: Pashu Palan Hub -->
+        <a href="/pashu-palan.html" class="agri-tool-card" style="background:linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%); border:1.5px solid #7dd3fc; box-shadow:0 4px 18px rgba(2,132,199,0.12);">
+          <div style="font-size:2rem; background:#e0f2fe; padding:12px; border-radius:14px; color:#0284c7; display:flex; align-items:center; justify-content:center;">🐄</div>
           <div>
-            <h4 style="font-size:1rem; font-weight:800; margin:0 0 2px 0; color:#0f172a;">मौसम पूर्वानुमान</h4>
-            <p style="font-size:0.78rem; color:#64748b; margin:0;">बारिश व स्प्रे मौसम अलर्ट</p>
+            <h4 style="font-size:1.02rem; font-weight:900; margin:0 0 3px 0; color:#0c4a6e;">पशु पालन हब</h4>
+            <p style="font-size:0.78rem; color:#475569; margin:0 0 6px 0;">दुग्ध वृद्धि, FAT% व थनैला</p>
+            <span style="display:inline-flex; align-items:center; gap:4px; font-size:0.72rem; font-weight:800; color:#0284c7;">पशु गाइड देखें →</span>
           </div>
         </a>
 
-        <a href="/pashu-palan.html" class="agri-tool-card">
-          <div style="font-size:2rem; background:#f0f9ff; padding:10px; border-radius:12px;">🐄</div>
-          <div>
-            <h4 style="font-size:1rem; font-weight:800; margin:0 0 2px 0; color:#0f172a;">पशु पालन हब</h4>
-            <p style="font-size:0.78rem; color:#64748b; margin:0;">दुग्ध वृद्धि व स्वास्थ्य गाइड</p>
-          </div>
-        </a>
       </div>
     </div>
   </section>
 
-  <!-- 5. 2-BOOK SUPER SAVER COMBO PROMO -->
+  <!-- 5. 3-BOOK MEGA SUPER SAVER COMBO PROMO (BK001 + BK002 + BK015 + VIP BONUS) -->
   <section style="padding: 20px 0;">
     <div class="container">
-      <div style="background: linear-gradient(135deg, #1e1b4b 0%, #1e3a8a 100%); border: 1.5px solid #3b82f6; border-radius: 20px; padding: 24px 28px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; box-shadow: 0 10px 30px rgba(30,58,138,0.25);">
-        <div style="flex:1;min-width:260px;">
-          <span style="background: #facc15; color: #000; font-weight: 900; font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; text-transform: uppercase;">
-            🎁 2-BOOK SUPER COMBO
-          </span>
-          <h2 style="font-size: 1.45rem; font-weight: 900; margin: 8px 0 6px 0; color: #ffffff;">
-            खरीफ फसल मास्टर गाइड + खेती का डॉक्टर कॉम्बो
+      <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #15803d 100%); border: 2px solid #facc15; border-radius: 22px; padding: 26px 30px; color: #fff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; box-shadow: 0 14px 40px rgba(15,23,42,0.4); position:relative; overflow:hidden;">
+        
+        <div style="flex:1; min-width:280px; z-index:2;">
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+            <span style="background: #facc15; color: #000; font-weight: 900; font-size: 0.76rem; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; box-shadow:0 3px 10px rgba(250,204,21,0.3);">
+              🎁 3-BOOK MEGA SUPER COMBO
+            </span>
+            <span style="background: rgba(34,197,94,0.25); border:1px solid #22c55e; color: #86efac; font-weight: 800; font-size: 0.74rem; padding: 3px 12px; border-radius: 20px;">
+              👑 1 वर्ष का Pro VIP AI पास FREE
+            </span>
+          </div>
+
+          <h2 style="font-size: 1.55rem; font-weight: 900; margin: 6px 0 8px 0; color: #ffffff; line-height:1.25;">
+            खरीफ फसल मास्टर गाइड + खेती का डॉक्टर + सब्जी मास्टर कॉम्बो
           </h2>
-          <p style="color: #bfdbfe; font-size: 0.88rem; line-height: 1.4; margin-bottom: 12px;">
-            दोनों प्रमुख बेस्टसेलर ई-बुक्स (मूल्य ₹598) अब पाएं मात्र <strong>₹198</strong> में!
+
+          <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; margin-bottom: 14px; max-width:550px;">
+            तीनों प्रमुख बेस्टसेलर ई-बुक्स (मूल्य <s>₹897</s>) अब पाएं मात्र <strong>₹249</strong> में! साथ ही 24×7 WhatsApp AI एक्सपर्ट डॉक्टर परामर्श आजीवन मुफ्त।
           </p>
-          <a href="/ebooks/checkout.html?combo=agri2" class="btn" style="background:#facc15;color:#000;font-weight:900;font-size:0.9rem;padding:10px 22px;border-radius:24px;text-decoration:none;">
-            ⚡ कॉम्बो अभी खरीदें (₹198)
-          </a>
+
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <a href="/ebooks/checkout.html?combo=agri3&books=BK001,BK002,BK015" class="btn" style="background:#facc15; color:#000; font-weight:900; font-size:0.95rem; padding:12px 28px; border-radius:30px; text-decoration:none; box-shadow:0 6px 20px rgba(250,204,21,0.4); display:inline-flex; align-items:center; gap:8px; transition:transform 0.2s;">
+              <span>⚡ 3-बुक कॉम्बो अभी खरीदें (₹249)</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <span style="color:#86efac; font-weight:800; font-size:0.85rem;">
+              ✔ तुरंत PDF व ऑडियो एक्टिव
+            </span>
+          </div>
         </div>
-        <div style="display:flex;gap:10px;">
-          <img src="/images/books/kharif-master-guide-2026-cover.webp" alt="Kharif" style="width:80px;height:110px;object-fit:cover;border-radius:6px;box-shadow:-4px 6px 14px rgba(0,0,0,0.5);" />
-          <img src="/images/books/fasal-ka-doctor-cover.webp" alt="Doctor" style="width:80px;height:110px;object-fit:cover;border-radius:6px;box-shadow:-4px 6px 14px rgba(0,0,0,0.5);" />
+
+        <div style="display:flex; gap:8px; align-items:center; z-index:2; flex-wrap:nowrap;">
+          <img src="/images/books/kharif-master-guide-2026-cover.webp" alt="BK001 Kharif" style="width:78px; height:108px; object-fit:cover; border-radius:6px; box-shadow:-4px 6px 16px rgba(0,0,0,0.6); transform:rotate(-4deg);" />
+          <img src="/images/books/fasal-ka-doctor-cover.webp" alt="BK002 Fasal Doctor" style="width:84px; height:116px; object-fit:cover; border-radius:6px; box-shadow:0 8px 20px rgba(0,0,0,0.7); z-index:2;" />
+          <img src="/images/books/kharif-master-guide-2026-cover.webp" alt="BK015 Sabji Master" style="width:78px; height:108px; object-fit:cover; border-radius:6px; box-shadow:4px 6px 16px rgba(0,0,0,0.6); transform:rotate(4deg);" />
         </div>
+
       </div>
     </div>
   </section>
@@ -308,42 +340,66 @@
     </div>
   </section>
 
-  <!-- 8. CROP DISEASES, ORGANIC PROTOCOLS & EBOOK FUNNEL -->
-  <section style="padding: 40px 0; background: #ffffff;">
+  <!-- 8. BHARAT KI SHAAN KISAN - COMPREHENSIVE CROP PROTECTION & MODERN AGRI MATRIX -->
+  <section id="sec-kisan-shaan-matrix" style="padding: 45px 0 55px 0; background: #ffffff;">
     <div class="container">
-      <div style="text-align:center; margin-bottom:30px;">
-        <span style="background:rgba(21,128,61,0.1); color:#15803d; font-weight:800; font-size:0.8rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
-          🛡️ CROP PROTECTION MATRIX
-        </span>
-        <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">
-          प्रमुख फसल रोग, जैविक उपचार व संपूर्ण समाधान
+      
+      <!-- Attractive Heading Badge & Title -->
+      <div style="text-align:center; margin-bottom:28px;">
+        <button type="button" class="btn-shaan-kisan" style="background:linear-gradient(135deg, #15803d, #16a34a); color:#ffffff; border:2px solid #86efac; padding:10px 28px; border-radius:30px; font-weight:900; font-size:1.12rem; box-shadow:0 8px 24px rgba(22,163,74,0.3); letter-spacing:0.5px; cursor:default; display:inline-flex; align-items:center; gap:8px;">
+          <span>🇮🇳</span> <span>भारत की शान किसान</span> <span>🌾</span>
+        </button>
+        <h2 style="font-size:2rem; font-weight:900; margin-top:12px; color:#0f172a; line-height:1.25;">
+          सम्पूर्ण फसल सुरक्षा, प्रमुख रोग, जैविक उपचार व आधुनिक कृषि
         </h2>
-        <p style="color:#64748b; font-size:0.92rem; max-width:650px; margin:6px auto 0 auto;">
-          वैज्ञानिक स्प्रे शेड्यूल अपनाएं, फसल को रोगों से बचाएं और 25-40% अधिक उत्पादन प्राप्त करें
+        <p style="color:#64748b; font-size:0.92rem; max-width:720px; margin:8px auto 0 auto; line-height:1.5;">
+          अपनी फसल चुनें—समस्या व लक्षण पहचानें, Biofit जैविक स्प्रे शेड्यूल देखें, ऑडियो सुनें और 1-क्लिक में वैज्ञानिक समाधान पाएं
         </p>
       </div>
 
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:22px;">
+      <!-- Crop Category Filter Tabs (Interactive Bar) -->
+      <div style="background:#f8fafc; border-radius:20px; padding:12px 16px; border:1.5px solid #e2e8f0; margin-bottom:28px; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
+        <div class="crop-pills-wrap" style="display:flex; gap:8px; overflow-x:auto; padding:4px 0; scrollbar-width:thin;">
+          <button type="button" class="crop-filter-pill crop-cat-tab active" onclick="window.filterCropCategoryCards('all', this)" style="padding:8px 18px; border-radius:24px; font-size:0.84rem; font-weight:800; cursor:pointer; white-space:nowrap; border:1.5px solid #16a34a; background:#16a34a; color:#fff; transition:all 0.2s;">
+            🌱 सभी फसलें (All)
+          </button>
+          <button type="button" class="crop-filter-pill crop-cat-tab" onclick="window.filterCropCategoryCards('grain', this)" style="padding:8px 18px; border-radius:24px; font-size:0.84rem; font-weight:800; cursor:pointer; white-space:nowrap; border:1.5px solid #cbd5e1; background:#fff; color:#1e293b; transition:all 0.2s;">
+            🌾 अनाज व दलहन (धान, सोयाबीन, मक्का, गेहूं, चना)
+          </button>
+          <button type="button" class="crop-filter-pill crop-cat-tab" onclick="window.filterCropCategoryCards('veg', this)" style="padding:8px 18px; border-radius:24px; font-size:0.84rem; font-weight:800; cursor:pointer; white-space:nowrap; border:1.5px solid #cbd5e1; background:#fff; color:#1e293b; transition:all 0.2s;">
+            🍅 सब्जियां (टमाटर, मिर्च, आलू, प्याज, बैंगन आदि)
+          </button>
+          <button type="button" class="crop-filter-pill crop-cat-tab" onclick="window.filterCropCategoryCards('horti', this)" style="padding:8px 18px; border-radius:24px; font-size:0.84rem; font-weight:800; cursor:pointer; white-space:nowrap; border:1.5px solid #cbd5e1; background:#fff; color:#1e293b; transition:all 0.2s;">
+            🌸 फल, फूल व बागवानी (आम, अनार, पपीता, गेंदा)
+          </button>
+          <button type="button" class="crop-filter-pill crop-cat-tab" onclick="window.filterCropCategoryCards('modern', this)" style="padding:8px 18px; border-radius:24px; font-size:0.84rem; font-weight:800; cursor:pointer; white-space:nowrap; border:1.5px solid #cbd5e1; background:#fff; color:#1e293b; transition:all 0.2s;">
+            🏡 आधुनिक कृषि व उपकरण (पॉलीहाउस, नेट हाउस, ड्रिप)
+          </button>
+        </div>
+      </div>
+
+      <!-- Problem-Solution Cards Grid -->
+      <div id="crop-disease-cards-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:22px;">
         
-        <!-- Card 1: Paddy / धान -->
-        <div class="agri-item-card" style="background:#ffffff; border-radius:18px; border:1px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+        <!-- Card 1: Paddy / धान (Grain) -->
+        <div class="agri-item-card crop-disease-card-item" data-category="grain" style="background:#ffffff; border-radius:18px; border:1.5px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.25s ease;">
           <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/kharif-master-guide-2026.html'" title="धान (Paddy) - ई-बुक पढ़ें">
             <img src="/images/banners/agriculture-banner.jpeg" alt="धान (Paddy)" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
             <span style="position:absolute;top:10px;left:10px;background:#16a34a;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
-              🌾 धान (Paddy) • ई-बुक उपलब्ध ✔
+              🌾 धान (Paddy) • BK001 ई-बुक उपलब्ध ✔
             </span>
           </div>
           <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
             <div>
-              <h3 style="font-size:1.2rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+              <h3 style="font-size:1.18rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
                 <a href="/ebooks/kharif-master-guide-2026.html" style="color:#0f172a;text-decoration:none;">ब्लास्ट (झुलसा), शीथ ब्लाइट व तना छेदक</a>
               </h3>
               <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
-                <strong>लक्षण:</strong> पत्तियों पर नाव के आकार के धब्बे और बालियों का सूखना।
+                <strong>लक्षण:</strong> पत्तियों पर नाव के आकार के भूरे-नीले धब्बे, तने की गांठों का काला पड़ना व बालियों का सूखना।
               </div>
               <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
-                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 जैविक समाधान:</div>
-                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Wrap-Up (2ml/L) + StimRich (1.5ml/L) + Bio-99 (0.5ml/L) का छिड़काव करें।</div>
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 Biofit जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Wrap-Up (2ml/L) + StimRich (1.5ml/L) + Bio-99 (0.5ml/L) का 15 दिन के अंतराल पर 2 बार छिड़काव करें।</div>
               </div>
             </div>
 
@@ -351,7 +407,7 @@
               <a href="/ebooks/kharif-master-guide-2026.html" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
                 📖 ई-बुक पढ़ें (₹99)
               </a>
-              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'धान ब्लास्ट व तना छेदक', 'धान में ब्लास्ट झुलसा व शीथ ब्लाइट का Wrap-Up और StimRich से जैविक समाधान।')" title="ऑडियो सुनें">
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'धान ब्लास्ट व तना छेदक', 'धान में ब्लास्ट झुलसा व शीथ ब्लाइट का Wrap-Up और StimRich से सम्पूर्ण जैविक समाधान।')" title="ऑडियो सुनें">
                 <i class="fa-solid fa-volume-high"></i>
                 <span>ऑडियो</span>
               </button>
@@ -361,31 +417,34 @@
               </button>
               <button type="button" onclick="window.consultAiExpert('धान फसल सुरक्षा', 'ब्लास्ट व तना छेदक समस्या')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
                 <i class="fa-brands fa-whatsapp"></i>
-                <span>सलाह लें</span>
+                <span>सलाह</span>
               </button>
             </div>
+            <button type="button" onclick="window.toggleProductSelection(this, 'biofit_wrapup', 'Wrap-Up (फंगस रक्षक) 1L', 850, '/images/banners/agriculture-banner.jpeg', '2ml/लीटर पानी')" class="btn-add-to-cart" style="margin-top:10px; width:100%; background:#f8fafc; border:1.5px solid #cbd5e1; color:#1e293b; padding:8px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+              <i class="fa-solid fa-cart-plus"></i> 🛒 Biofit Wrap-Up ऑर्डर में जोड़ें (₹850)
+            </button>
           </div>
         </div>
 
-        <!-- Card 2: Soybean / सोयाबीन -->
-        <div class="agri-item-card" style="background:#ffffff; border-radius:18px; border:1px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+        <!-- Card 2: Soybean / सोयाबीन (Grain) -->
+        <div class="agri-item-card crop-disease-card-item" data-category="grain" style="background:#ffffff; border-radius:18px; border:1.5px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
           <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/kharif-master-guide-2026.html'" title="सोयाबीन (Soybean) - ई-बुक पढ़ें">
             <img src="/images/banners/offer-banner-kharif-2026.webp" alt="सोयाबीन (Soybean)" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
             <span style="position:absolute;top:10px;left:10px;background:#15803d;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
-              🌱 सोयाबीन (Soybean) • ई-बुक उपलब्ध ✔
+              🌱 सोयाबीन • BK001 ई-बुक उपलब्ध ✔
             </span>
           </div>
           <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
             <div>
-              <h3 style="font-size:1.2rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+              <h3 style="font-size:1.18rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
                 <a href="/ebooks/kharif-master-guide-2026.html" style="color:#0f172a;text-decoration:none;">पीला मोज़ेक, गर्डल बीटल व सेमीलूपर</a>
               </h3>
               <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
-                <strong>लक्षण:</strong> सफेद मक्खी द्वारा फैलने वाला पीला मोज़ेक और तने को काटने वाला गर्डल बीटल।
+                <strong>लक्षण:</strong> सफेद मक्खी द्वारा पत्तियों का पीला पड़ना और तने पर गोल रिंग बनाकर काटने वाला गर्डल बीटल।
               </div>
               <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
-                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 जैविक समाधान:</div>
-                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Intact (2ml/L) + Bio-99 (0.5ml/L) का शुरुआती अवस्था में छिड़काव करें।</div>
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 Biofit जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Intact (2ml/L) + StimRich (1.5ml/L) + Bio-99 (0.5ml/L) स्प्रे से रसचूसक कीट व सुंडियां तुरंत नियंत्रित।</div>
               </div>
             </div>
 
@@ -403,31 +462,169 @@
               </button>
               <button type="button" onclick="window.consultAiExpert('सोयाबीन फसल सुरक्षा', 'पीला मोज़ेक व गर्डल बीटल')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
                 <i class="fa-brands fa-whatsapp"></i>
-                <span>सलाह लें</span>
+                <span>सलाह</span>
               </button>
             </div>
+            <button type="button" onclick="window.toggleProductSelection(this, 'biofit_intact', 'Intact (कीट रक्षक) 500ml', 750, '/images/banners/offer-banner-kharif-2026.webp', '2ml/लीटर पानी')" class="btn-add-to-cart" style="margin-top:10px; width:100%; background:#f8fafc; border:1.5px solid #cbd5e1; color:#1e293b; padding:8px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+              <i class="fa-solid fa-cart-plus"></i> 🛒 Biofit Intact ऑर्डर में जोड़ें (₹750)
+            </button>
           </div>
         </div>
 
-        <!-- Card 3: Cotton / कपास -->
-        <div class="agri-item-card" style="background:#ffffff; border-radius:18px; border:1px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
-          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/kheti-dr.html'" title="कपास (Cotton) - ई-बुक पढ़ें">
-            <img src="/images/banners/agriculture-banner.jpeg" alt="कपास (Cotton)" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
-            <span style="position:absolute;top:10px;left:10px;background:#0284c7;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
-              ⚪ कपास (Cotton) • ई-बुक उपलब्ध ✔
+        <!-- Card 3: Maize / मक्का (Grain) -->
+        <div class="agri-item-card crop-disease-card-item" data-category="grain" style="background:#ffffff; border-radius:18px; border:1.5px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/kharif-master-guide-2026.html'" title="मक्का - ई-बुक पढ़ें">
+            <img src="/images/banners/kharif-master-guide-2026-hero-banner.webp" alt="मक्का" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#eab308;color:#000;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🌽 मक्का (Maize) • BK001 ई-बुक उपलब्ध ✔
             </span>
           </div>
           <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
             <div>
-              <h3 style="font-size:1.2rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
-                <a href="/ebooks/kheti-dr.html" style="color:#0f172a;text-decoration:none;">गुलाबी सुंडी व सफेद मक्खी नियंत्रण</a>
+              <h3 style="font-size:1.18rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+                <a href="/ebooks/kharif-master-guide-2026.html" style="color:#0f172a;text-decoration:none;">फॉल आर्मीवर्म (Fall Armyworm) व तना छेदक</a>
               </h3>
               <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
-                <strong>लक्षण:</strong> फूल व टिंडे में घुसकर नुकसान करने वाली गुलाबी सुंडी और पत्तियों का रस चूसने वाली मक्खी।
+                <strong>लक्षण:</strong> मक्का के पोंगे (Whorl) में सुंडी पत्तियों को छलनी करती है और बुरादा छोड़ती है।
               </div>
               <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
-                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 जैविक समाधान:</div>
-                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">जैविक फेरोमोन ट्रैप व Intact + Bio-99 स्प्रे द्वारा 100% सफल निवारण।</div>
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 Biofit जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Intact (2.5ml/L) + Bio-99 (0.5ml/L) को पोंगे में अच्छी तरह भीगने तक शाम के समय छिड़कें।</div>
+              </div>
+            </div>
+
+            <div class="kpi-actions-row">
+              <a href="/ebooks/kharif-master-guide-2026.html" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                📖 ई-बुक पढ़ें (₹99)
+              </a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'मक्का फॉल आर्मीवर्म', 'मक्का में फॉल आर्मीवर्म का Intact और Bio-99 से सुरक्षित जैविक उपचार।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'मक्का फॉल आर्मीवर्म समाधान', 'मक्का में फॉल आर्मीवर्म का 100% जैविक स्प्रे शेड्यूल देखें', '/ebooks/kharif-master-guide-2026.html')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('मक्का फसल सुरक्षा', 'फॉल आर्मीवर्म समस्या')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>सलाह</span>
+              </button>
+            </div>
+            <button type="button" onclick="window.toggleProductSelection(this, 'biofit_bio99', 'Bio-99 (स्प्रेडर व स्टीकर) 250ml', 395, '/images/banners/kharif-master-guide-2026-hero-banner.webp', '0.5ml/लीटर पानी')" class="btn-add-to-cart" style="margin-top:10px; width:100%; background:#f8fafc; border:1.5px solid #cbd5e1; color:#1e293b; padding:8px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+              <i class="fa-solid fa-cart-plus"></i> 🛒 Bio-99 स्प्रेडर ऑर्डर में जोड़ें (₹395)
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 4: Tomato / टमाटर (Vegetables) -->
+        <div class="agri-item-card crop-disease-card-item" data-category="veg" style="background:#ffffff; border-radius:18px; border:1.5px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/book-landing.html?id=BK015'" title="टमाटर - सब्जी ई-बुक पढ़ें">
+            <img src="/images/banners/agriculture-banner.jpeg" alt="टमाटर" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#ef4444;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🍅 टमाटर • BK015 सब्जी गाइड उपलब्ध ✔
+            </span>
+          </div>
+          <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div>
+              <h3 style="font-size:1.18rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+                <a href="/ebooks/book-landing.html?id=BK015" style="color:#0f172a;text-decoration:none;">अगेती/पछेती झुलसा, फल सड़न व लीफ माइनर</a>
+              </h3>
+              <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
+                <strong>लक्षण:</strong> पत्तियों पर छल्लेदार काले धब्बे, निचली पत्तियों का सूखना और फलों पर काले चकत्ते पड़ना।
+              </div>
+              <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 Biofit जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Wrap-Up (2ml/L) + Intact (2ml/L) + StimRich (1.5ml/L) स्प्रे से झुलसा व कीट दोनों पूरी तरह नियंत्रित।</div>
+              </div>
+            </div>
+
+            <div class="kpi-actions-row">
+              <a href="/ebooks/book-landing.html?id=BK015" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                📖 ई-बुक पढ़ें (₹99)
+              </a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'टमाटर झुलसा व फल सड़न', 'टमाटर में अगेती पछेती झुलसा और लीफ माइनर का Wrap-Up और StimRich से सम्पूर्ण समाधान।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'टमाटर के रोग व उपचार', 'टमाटर की वैज्ञानिक खेती व झुलसा नियंत्रण गाइड देखें', '/ebooks/book-landing.html?id=BK015')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('टमाटर फसल सुरक्षा', 'झुलसा व फल सड़न')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>सलाह</span>
+              </button>
+            </div>
+            <button type="button" onclick="window.toggleProductSelection(this, 'biofit_stimrich', 'StimRich (पौध विकास टॉनिक) 500ml', 550, '/images/banners/agriculture-banner.jpeg', '1.5ml/लीटर पानी')" class="btn-add-to-cart" style="margin-top:10px; width:100%; background:#f8fafc; border:1.5px solid #cbd5e1; color:#1e293b; padding:8px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+              <i class="fa-solid fa-cart-plus"></i> 🛒 Biofit StimRich ऑर्डर में जोड़ें (₹550)
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 5: Chilli / मिर्च (Vegetables) -->
+        <div class="agri-item-card crop-disease-card-item" data-category="veg" style="background:#ffffff; border-radius:18px; border:1.5px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/book-landing.html?id=BK015'" title="मिर्च - सब्जी ई-बुक पढ़ें">
+            <img src="/images/banners/offer-banner-kharif-2026.webp" alt="मिर्च" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🌶️ मिर्च • मरोड़िया मुक्ति गाइड ✔
+            </span>
+          </div>
+          <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div>
+              <h3 style="font-size:1.18rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+                <a href="/ebooks/book-landing.html?id=BK015" style="color:#0f172a;text-decoration:none;">मरोड़िया (Leaf Curl), थ्रिप्स व चुर्रा-मुर्रा</a>
+              </h3>
+              <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
+                <strong>लक्षण:</strong> पत्तियों का नाव के आकार में ऊपर/नीचे मुड़ना, पौधों की बढ़वार रुकना व फूल झड़ना।
+              </div>
+              <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 Biofit जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Intact (2ml/L) + StimRich (1.5ml/L) + Bio-99 (0.5ml/L) स्प्रे करें। नई पत्तियां सीधी और स्वस्थ निकलेंगी।</div>
+              </div>
+            </div>
+
+            <div class="kpi-actions-row">
+              <a href="/ebooks/book-landing.html?id=BK015" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                📖 ई-बुक पढ़ें (₹99)
+              </a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'मिर्च मरोड़िया व थ्रिप्स', 'मिर्च में चुर्रा मुर्रा और थ्रिप्स का Intact और StimRich से 100% जैविक निवारण।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'मिर्च मरोड़िया रोग उपचार', 'मिर्च में चुर्रा मुर्रा का 100% सफल जैविक इलाज देखें', '/ebooks/book-landing.html?id=BK015')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('मिर्च फसल सुरक्षा', 'मरोड़िया व थ्रिप्स')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>सलाह</span>
+              </button>
+            </div>
+            <button type="button" onclick="window.toggleProductSelection(this, 'biofit_intact', 'Intact (कीट रक्षक) 500ml', 750, '/images/banners/offer-banner-kharif-2026.webp', '2ml/लीटर पानी')" class="btn-add-to-cart" style="margin-top:10px; width:100%; background:#f8fafc; border:1.5px solid #cbd5e1; color:#1e293b; padding:8px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+              <i class="fa-solid fa-cart-plus"></i> 🛒 Biofit Intact ऑर्डर में जोड़ें (₹750)
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 6: Gram & Pulses / चना व दलहन (Grain) -->
+        <div class="agri-item-card crop-disease-card-item" data-category="grain" style="background:#ffffff; border-radius:18px; border:1.5px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/kheti-dr.html'" title="चना व दलहन - ई-बुक पढ़ें">
+            <img src="/images/banners/agriculture-banner.jpeg" alt="चना व दलहन" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#b45309;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🌰 चना व दलहन • BK002 ई-बुक उपलब्ध ✔
+            </span>
+          </div>
+          <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div>
+              <h3 style="font-size:1.18rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+                <a href="/ebooks/kheti-dr.html" style="color:#0f172a;text-decoration:none;">उकठा (Wilt), जड़ सड़न व फली छेदक</a>
+              </h3>
+              <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
+                <strong>लक्षण:</strong> पौधे अचानक सूखकर मुरझाना, जड़ काली पड़ना और दानों को खाने वाली इल्ली।
+              </div>
+              <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 Biofit जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">बुआई पूर्व SHET से बीज व मिट्टी उपचार करें। फली छेदक पर Intact (2ml/L) + Bio-99 स्प्रे करें।</div>
               </div>
             </div>
 
@@ -435,61 +632,112 @@
               <a href="/ebooks/kheti-dr.html" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
                 📖 ई-बुक पढ़ें (₹99)
               </a>
-              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'कपास गुलाबी सुंडी व सफेद मक्खी', 'कपास में गुलाबी सुंडी और रसचूसक कीटों का जैविक फेरोमोन ट्रैप और Intact स्प्रे निवारण।')" title="ऑडियो सुनें">
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'चना उकठा व फली छेदक', 'चना में उकठा रोग और फली छेदक का SHET और Intact से जैविक उपचार।')" title="ऑडियो सुनें">
                 <i class="fa-solid fa-volume-high"></i>
                 <span>ऑडियो</span>
               </button>
-              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'कपास के रोग व रोकथाम', 'कपास में गुलाबी सुंडी नियंत्रण का वैज्ञानिक उपाय देखें', '/ebooks/kheti-dr.html')" title="शेयर करें">
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'चना उकठा रोग समाधान', 'चना फसल में उकठा व फली छेदक का जैविक शेड्यूल देखें', '/ebooks/kheti-dr.html')" title="शेयर करें">
                 <i class="fa-solid fa-share-nodes"></i>
                 <span>Share</span>
               </button>
-              <button type="button" onclick="window.consultAiExpert('कपास फसल सुरक्षा', 'गुलाबी सुंडी व सफेद मक्खी')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+              <button type="button" onclick="window.consultAiExpert('चना फसल सुरक्षा', 'उकठा व फली छेदक')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
                 <i class="fa-brands fa-whatsapp"></i>
-                <span>सलाह लें</span>
+                <span>सलाह</span>
               </button>
             </div>
+            <button type="button" onclick="window.toggleProductSelection(this, 'biofit_shet', 'SHET (मृदा जीवाणु टॉनिक) 1L', 950, '/images/banners/agriculture-banner.jpeg', '1L प्रति एकड़ सिंचाई')" class="btn-add-to-cart" style="margin-top:10px; width:100%; background:#f8fafc; border:1.5px solid #cbd5e1; color:#1e293b; padding:8px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+              <i class="fa-solid fa-cart-plus"></i> 🛒 Biofit SHET ऑर्डर में जोड़ें (₹950)
+            </button>
           </div>
         </div>
 
-        <!-- Card 4: Vegetables & Fruits -->
-        <div class="agri-item-card" style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius:18px; border:2px dashed #22c55e; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
-          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='#sec-agri-products'" title="सब्जियां व बागवानी - उत्पाद देखें">
-            <img src="/images/banners/agriculture-banner.jpeg" alt="सब्जियां व बागवानी" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
-            <span style="position:absolute;top:10px;left:10px;background:#22c55e;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
-              🍅 सब्जियां व बागवानी • विशेषज्ञ ऑर्गेनिक किट
+        <!-- Card 7: Mango & Fruit Orchards / आम व फल (Horticulture) -->
+        <div class="agri-item-card crop-disease-card-item" data-category="horti" style="background:#ffffff; border-radius:18px; border:1.5px solid #e2e8f0; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/ebooks/kheti-dr.html'" title="बागवानी ई-बुक पढ़ें">
+            <img src="/images/banners/agriculture-banner.jpeg" alt="आम व बागवानी" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#f59e0b;color:#000;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🥭 आम व फल • बागवानी केयर गाइड ✔
             </span>
           </div>
           <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
             <div>
-              <h3 style="font-size:1.2rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
-                <a href="#sec-agri-products" style="color:#0f172a;text-decoration:none;">टमाटर, मिर्च, प्याज, लहसुन व फल सुरक्षा</a>
+              <h3 style="font-size:1.18rem;font-weight:900;color:#0f172a;margin:0 0 8px 0;">
+                <a href="/ebooks/kheti-dr.html" style="color:#0f172a;text-decoration:none;">बौर झुलसा, पाउडरी मिल्ड्यू व मिलीबग</a>
               </h3>
-              <div style="font-size:0.86rem;color:#14532d;margin-bottom:10px;line-height:1.5;">
-                विशेषज्ञ प्रमाणित नेटसर्फ बायो-फिट प्रोटोकॉल और 24×7 व्हाट्सएप परामर्श से सब्जी फसल को कीट-मुक्त बनाएं।
+              <div style="font-size:0.86rem;color:#475569;margin-bottom:10px;line-height:1.5;">
+                <strong>लक्षण:</strong> बौर पर सफेद पाउडर जमना, फूलों का काला पड़कर गिरना और फलों का गिरना।
               </div>
-              <div style="background:#ffffff;padding:10px 12px;border-radius:10px;border:1px solid #86efac;margin-bottom:12px;">
-                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 विशेषज्ञ किट:</div>
-                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">StimRich + Bio-99 + Wrap-Up + Intact का सम्पूर्ण 4-इन-1 कॉम्बो किट।</div>
+              <div style="background:#f0fdf4;padding:10px 12px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:12px;">
+                <div style="font-size:0.76rem;font-weight:800;color:#15803d;margin-bottom:3px;">🌿 Biofit जैविक समाधान:</div>
+                <div style="font-size:0.82rem;color:#166534;line-height:1.4;">Wrap-Up (2ml/L) + StimRich (2ml/L) + Bio-99 स्प्रे से बौर स्वस्थ रहता है और 40% अधिक फल सेट होते हैं।</div>
               </div>
             </div>
 
             <div class="kpi-actions-row">
-              <a href="#sec-agri-products" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
-                📦 उत्पाद चुनें →
+              <a href="/ebooks/kheti-dr.html" class="btn" style="background:#15803d; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                📖 ई-बुक पढ़ें (₹99)
               </a>
-              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'सब्जी व बागवानी फसल सुरक्षा', 'टमाटर मिर्च प्याज व फल सुरक्षा के लिए प्रमाणित नेटसर्फ बायो-फिट प्रोटोकॉल।')" title="ऑडियो सुनें">
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'आम बौर झुलसा व फल ड्रॉप', 'आम के बाग में बौर झुलसा और फल गिरने की रोकथाम हेतु Wrap-Up और StimRich शेड्यूल।')" title="ऑडियो सुनें">
                 <i class="fa-solid fa-volume-high"></i>
                 <span>ऑडियो</span>
               </button>
-              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'सब्जी व बागवानी सुरक्षा किट', 'सब्जी व फल फसलों के लिए ऑर्गेनिक स्प्रे चार्ट देखें', '#sec-agri-products')" title="शेयर करें">
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'आम बागवानी रोग निवारण', 'आम में बौर सुरक्षा व अधिक फल का जैविक उपाय देखें', '/ebooks/kheti-dr.html')" title="शेयर करें">
                 <i class="fa-solid fa-share-nodes"></i>
                 <span>Share</span>
               </button>
-              <button type="button" onclick="window.consultAiExpert('सब्जी व बागवानी फसल सुरक्षा प्लान')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+              <button type="button" onclick="window.consultAiExpert('बागवानी फसल सुरक्षा', 'बौर झुलसा व मिलीबग')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
                 <i class="fa-brands fa-whatsapp"></i>
-                <span>सलाह लें</span>
+                <span>सलाह</span>
               </button>
             </div>
+            <button type="button" onclick="window.toggleProductSelection(this, 'biofit_wrapup', 'Wrap-Up (फंगस रक्षक) 1L', 850, '/images/banners/agriculture-banner.jpeg', '2ml/लीटर पानी')" class="btn-add-to-cart" style="margin-top:10px; width:100%; background:#f8fafc; border:1.5px solid #cbd5e1; color:#1e293b; padding:8px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+              <i class="fa-solid fa-cart-plus"></i> 🛒 Biofit Wrap-Up ऑर्डर में जोड़ें (₹850)
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 8: Polyhouse, Net House & Drip (Modern Agri) -->
+        <div class="agri-item-card crop-disease-card-item" data-category="modern" style="background:linear-gradient(135deg, #f8fafc 0%, #ecfdf5 100%); border-radius:18px; border:2px solid #34d399; overflow:hidden; box-shadow:0 8px 24px rgba(16,185,129,0.1); display:flex; flex-direction:column;">
+          <div class="agri-card-img-wrap" style="height:160px; position:relative; overflow:hidden; background:#0f172a; cursor:pointer;" onclick="window.location.href='/crop-doctor.html'" title="आधुनिक पॉलीहाउस तकनीक">
+            <img src="/images/banners/agriculture-banner.jpeg" alt="पॉलीहाउस व नेट हाउस" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="position:absolute;top:10px;left:10px;background:#059669;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,0.35);">
+              🏡 पॉलीहाउस, शेडनेट व ड्रिप फर्टिगेशन ✔
+            </span>
+          </div>
+          <div style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div>
+              <h3 style="font-size:1.18rem;font-weight:900;color:#065f46;margin:0 0 8px 0;">
+                <a href="/crop-doctor.html" style="color:#065f46;text-decoration:none;">पॉलीहाउस नमी, सफेद मक्खी व ड्रिप क्लॉगिंग</a>
+              </h3>
+              <div style="font-size:0.86rem;color:#047857;margin-bottom:10px;line-height:1.5;">
+                <strong>लक्षण:</strong> बंद वातावरण में उच्च नमी से फंगल ब्लास्ट, निमेटोड और ड्रिप पाइप में लवण/केमिकल जमने की समस्या।
+              </div>
+              <div style="background:#ffffff;padding:10px 12px;border-radius:10px;border:1px solid #a7f3d0;margin-bottom:12px;">
+                <div style="font-size:0.76rem;font-weight:800;color:#059669;margin-bottom:3px;">🌿 Biofit आधुनिक पैकेज:</div>
+                <div style="font-size:0.82rem;color:#065f46;line-height:1.4;">Biofit SHET + NPK लिक्विड ड्रिप फर्टिगेशन + Wrap-Up स्प्रे। 100% केमिकल-फ्री हाई-वैल्यू बेमौसमी उपज।</div>
+              </div>
+            </div>
+
+            <div class="kpi-actions-row">
+              <a href="/ebooks/checkout.html?combo=agri3" class="btn" style="background:#059669; color:#fff; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; white-space:nowrap;">
+                ⚡ कॉम्बो खरीदें (₹249)
+              </a>
+              <button type="button" class="kpi-audio-btn" onclick="window.playKpiCardAudio(event, 'पॉलीहाउस व ड्रिप प्रबंधन', 'पॉलीहाउस शेडनेट और ड्रिप फर्टिगेशन का सम्पूर्ण बायो-फिट ऑर्गेनिक प्रोटोकॉल।')" title="ऑडियो सुनें">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>ऑडियो</span>
+              </button>
+              <button type="button" class="kpi-blue-share-btn" onclick="window.triggerKpiNativeShare(event, 'आधुनिक कृषि व पॉलीहाउस गाइड', 'पॉलीहाउस व ड्रिप फर्टिगेशन का सफल फॉर्मूला देखें', '/ebooks/agriculture.html#sec-kisan-shaan-matrix')" title="शेयर करें">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Share</span>
+              </button>
+              <button type="button" onclick="window.consultAiExpert('आधुनिक पॉलीहाउस व ड्रिप सहायता')" class="ai-expert-red-btn" style="flex:1; margin:0; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800;">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>सलाह</span>
+              </button>
+            </div>
+            <button type="button" onclick="window.toggleProductSelection(this, 'biofit_npk', 'Biofit NPK (जैविक खाद तिकड़ी) 3L', 1800, '/images/banners/agriculture-banner.jpeg', 'ड्रिप फर्टिगेशन')" class="btn-add-to-cart" style="margin-top:10px; width:100%; background:#f8fafc; border:1.5px solid #cbd5e1; color:#1e293b; padding:8px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+              <i class="fa-solid fa-cart-plus"></i> 🛒 Biofit NPK ड्रिप किट ऑर्डर में जोड़ें (₹1,800)
+            </button>
           </div>
         </div>
 
@@ -794,6 +1042,53 @@
         window.initPanoramicCarousel();
       }
     });
+
+    window.openFasalDoctorWhatsApp = function() {
+      const proceed = () => {
+        let userName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('user_name') || '';
+        if (userName === 'null' || userName.trim() === '') userName = '';
+        const userPhone = localStorage.getItem('aarogyam_user_phone') || '';
+        
+        let msg = `नमस्ते फसल डॉक्टर AI जी! 🙏\n`;
+        if (userName) {
+          msg += `मेरा नाम ${userName} है${userPhone ? ' (' + userPhone + ')' : ''}।\n`;
+        }
+        msg += `मेरी फसल में रोग/कीट की समस्या है। कृपया फोटो देखकर रोग की पहचान और जैविक स्प्रे उपचार बताएं। 🌾🔬`;
+        
+        const waUrl = `https://wa.me/917974422572?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, '_blank');
+      };
+
+      if (typeof window.checkRegistrationGate === 'function') {
+        window.checkRegistrationGate(proceed);
+      } else {
+        proceed();
+      }
+    };
+
+    window.filterCropCategoryCards = function(category, btn) {
+      document.querySelectorAll('.crop-cat-tab').forEach(t => {
+        t.classList.remove('active');
+        t.style.background = '#fff';
+        t.style.color = '#1e293b';
+        t.style.borderColor = '#cbd5e1';
+      });
+      if (btn) {
+        btn.classList.add('active');
+        btn.style.background = '#16a34a';
+        btn.style.color = '#fff';
+        btn.style.borderColor = '#16a34a';
+      }
+      const cards = document.querySelectorAll('.crop-disease-card-item');
+      cards.forEach(card => {
+        const cardCat = card.getAttribute('data-category');
+        if (category === 'all' || cardCat === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    };
   </script>
 
 </body>

@@ -218,61 +218,100 @@ async function loadBook() {
             }
         } catch (e) {}
 
-        // Multi-Book Bundle Check
-        if (rawIds) {
-            const idList = rawIds.split(",").map(x => x.trim()).filter(Boolean);
-            const matchedBooks = [];
-            let totalMrp = 0;
-            let totalOffer = 0;
+        // Combo and Multi-Book Bundle Check
+        const comboParam = (params.get("combo") || "").toLowerCase().trim();
+        const booksParam = (params.get("books") || "").trim();
+        if (comboParam || rawIds || booksParam) {
+            let idList = [];
+            let comboPrice = null;
+            let comboMrp = null;
+            let comboTitle = null;
 
-            idList.forEach(id => {
-                const b = booksArray.find(item => item.id && item.id.toLowerCase() === id.toLowerCase()) || {
-                    id: id,
-                    name: id === 'BK001' ? 'खरीफ फसल मास्टर गाइड 2026' : (id === 'BK002' ? 'खेती का डॉक्टर (Pocket Doctor)' : 'Aarogyam India eBook'),
-                    mrp: 299,
-                    offerPrice: 99,
-                    cover: "/images/books/kharif-master-guide-2026-cover.webp"
+            if (comboParam === "agri3" || comboParam === "combo3" || comboParam === "3" || comboParam === "super_combo") {
+                idList = ["BK001", "BK002", "BK015"];
+                comboPrice = 249;
+                comboMrp = 897;
+                comboTitle = "3-पुस्तक सुपर कॉम्बो (खरीफ + डॉक्टर + सब्जी मास्टर)";
+            } else if (comboParam === "agri2" || comboParam === "combo2" || comboParam === "2") {
+                idList = ["BK001", "BK002"];
+                comboPrice = 179;
+                comboMrp = 598;
+                comboTitle = "2-पुस्तक सुपर कॉम्बो (खरीफ + डॉक्टर)";
+            } else if (rawIds || booksParam) {
+                idList = (rawIds || booksParam).split(",").map(x => x.trim()).filter(Boolean);
+            }
+
+            if (idList.length > 0) {
+                const matchedBooks = [];
+                let calcMrp = 0;
+                let calcOffer = 0;
+
+                idList.forEach(id => {
+                    const upperId = id.toUpperCase();
+                    let b = booksArray.find(item => item.id && item.id.toUpperCase() === upperId);
+                    if (!b) {
+                        if (upperId === "BK001") {
+                            b = { id: "BK001", name: "खरीफ फसल मास्टर गाइड 2026", mrp: 299, offerPrice: 99, cover: "/images/books/kharif-master-guide-2026-cover.webp" };
+                        } else if (upperId === "BK002") {
+                            b = { id: "BK002", name: "खेती का डॉक्टर (Pocket Doctor)", mrp: 299, offerPrice: 99, cover: "/images/books/fasal-ka-doctor-cover.webp" };
+                        } else if (upperId === "BK015") {
+                            b = { id: "BK015", name: "सब्जी खेती मास्टर गाइड (भाग 1)", mrp: 299, offerPrice: 99, cover: "/images/books/kharif-master-guide-2026-cover.webp" };
+                        } else {
+                            b = { id: upperId, name: `Aarogyam India eBook (${upperId})`, mrp: 299, offerPrice: 99, cover: "/images/books/kharif-master-guide-2026-cover.webp" };
+                        }
+                    }
+                    matchedBooks.push(b);
+                    calcMrp += (b.mrp || 299);
+                    calcOffer += (b.offerPrice || 99);
+                });
+
+                if (comboPrice === null) {
+                    if (matchedBooks.length === 3) comboPrice = 249;
+                    else if (matchedBooks.length === 2) comboPrice = 179;
+                    else comboPrice = calcOffer;
+                }
+                if (comboMrp === null) comboMrp = calcMrp;
+                if (!comboTitle) comboTitle = `${matchedBooks.length} डिजिटल पुस्तकें बंडल`;
+
+                window.currentCheckoutBookList = matchedBooks;
+                window.currentCheckoutBook = {
+                    id: idList.join(","),
+                    title: comboTitle,
+                    mrp: comboMrp,
+                    offerPrice: comboPrice,
+                    cover: matchedBooks[0]?.cover || "/images/books/kharif-master-guide-2026-cover.webp"
                 };
-                matchedBooks.push(b);
-                totalMrp += (b.mrp || 299);
-                totalOffer += (b.offerPrice || 99);
-            });
 
-            window.currentCheckoutBookList = matchedBooks;
-            window.currentCheckoutBook = {
-                id: idList.join(","),
-                title: `${matchedBooks.length} डिजिटल पुस्तकें बंडल`,
-                mrp: totalMrp,
-                offerPrice: totalOffer,
-                cover: matchedBooks[0]?.cover || "/images/books/kharif-master-guide-2026-cover.webp"
-            };
+                const coverEl = document.getElementById("bookCover");
+                if (coverEl) coverEl.src = window.currentCheckoutBook.cover;
+                
+                const nameEl = document.getElementById("bookName");
+                if (nameEl) {
+                    const isThreeBookCombo = matchedBooks.length >= 3 || comboParam === "agri3" || comboParam === "combo3";
+                    nameEl.innerHTML = `${comboTitle} <small style="display:block;font-size:0.8rem;color:#16a34a;font-weight:700;margin-top:4px;">(${matchedBooks.map(b => b.name || b.id).join(" + ")})</small>${isThreeBookCombo ? '<div style="margin-top:6px;background:#dcfce7;color:#15803d;padding:4px 10px;border-radius:8px;font-size:0.75rem;font-weight:800;display:inline-block;">🎁 1-वर्ष Pro VIP AI पास बिल्कुल FREE!</div>' : ''}`;
+                }
+                
+                const mrpEl = document.getElementById("bookMrp");
+                if (mrpEl) mrpEl.textContent = "₹" + comboMrp;
+                
+                const priceEl = document.getElementById("bookPrice");
+                if (priceEl) priceEl.textContent = "₹" + comboPrice;
 
-            const coverEl = document.getElementById("bookCover");
-            if (coverEl) coverEl.src = window.currentCheckoutBook.cover;
-            
-            const nameEl = document.getElementById("bookName");
-            if (nameEl) nameEl.innerHTML = `${matchedBooks.length} पुस्तकें बंडल <small style="display:block;font-size:0.8rem;color:#16a34a;font-weight:700;">(${matchedBooks.map(b => b.name || b.id).join(" + ")})</small>`;
-            
-            const mrpEl = document.getElementById("bookMrp");
-            if (mrpEl) mrpEl.textContent = "₹" + totalMrp;
-            
-            const priceEl = document.getElementById("bookPrice");
-            if (priceEl) priceEl.textContent = "₹" + totalOffer;
+                const sumBook = document.getElementById("summaryBook");
+                if (sumBook) sumBook.textContent = comboTitle;
+                
+                const sumMrp = document.getElementById("summaryMrp");
+                if (sumMrp) sumMrp.textContent = "₹" + comboMrp;
+                
+                const sumPrice = document.getElementById("summaryPrice");
+                if (sumPrice) sumPrice.textContent = "₹" + comboPrice;
+                
+                const totPrice = document.getElementById("totalPrice");
+                if (totPrice) totPrice.textContent = "₹" + comboPrice;
 
-            const sumBook = document.getElementById("summaryBook");
-            if (sumBook) sumBook.textContent = `${matchedBooks.length} ई-बुक्स कॉम्बो`;
-            
-            const sumMrp = document.getElementById("summaryMrp");
-            if (sumMrp) sumMrp.textContent = "₹" + totalMrp;
-            
-            const sumPrice = document.getElementById("summaryPrice");
-            if (sumPrice) sumPrice.textContent = "₹" + totalOffer;
-            
-            const totPrice = document.getElementById("totalPrice");
-            if (totPrice) totPrice.textContent = "₹" + totalOffer;
-
-            autoFillUserData();
-            return;
+                autoFillUserData();
+                return;
+            }
         }
 
         // Single Book Lookup
@@ -294,7 +333,7 @@ async function loadBook() {
         }
 
         if (!book && booksArray.length > 0 && !customTitle) {
-            book = booksArray[0];
+            book = booksArray.find(b => b && b.id === 'BK001') || booksArray[0];
         }
 
         // If not found in JSON but custom params provided, build dynamic product
@@ -358,7 +397,7 @@ async function loadBook() {
 
         // Safety Guard: Check if Book is Coming Soon
         const bIdUpper = String(book.id || targetId || '').toUpperCase();
-        const isLiveAgri = (bIdUpper === 'BK001' || bIdUpper === 'BK002' || bIdUpper === 'BK006' || bIdUpper === 'BK015' || bIdUpper === 'SUB001');
+        const isLiveAgri = (bIdUpper === 'BK001' || bIdUpper === 'BK002' || bIdUpper === 'BK015' || bIdUpper === 'SUB001' || bIdUpper.includes('BK001') || bIdUpper.includes('BK002'));
         const isBookComingSoon = !isLiveAgri && (
             book.status === 'coming_soon' || 
             book.isComingSoon === true || 

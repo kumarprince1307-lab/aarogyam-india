@@ -10,7 +10,7 @@
 (function () {
   let allStoreBooks = [];
   let activeCategory = 'all';
-  let activeStatus = 'all';
+  let activeStatus = 'live';
   let selectedComboBooks = [];
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -187,6 +187,7 @@
         if (activeStatus === 'bestseller') return b.store_badge === 'best_seller' || b.badge === 'best_seller' || b.id === 'BK001' || b.id === 'BK002';
         if (activeStatus === 'live') return !b.isComingSoon;
         if (activeStatus === 'free_demo') return b.hasAudioDemo || b.audio_files || b.id === 'BK001' || b.id === 'BK002';
+        if (activeStatus === 'free') return b.offerPrice === 0 || b.isFree === true || b.mrp === 0;
         if (activeStatus === 'coming_soon') return b.isComingSoon || b.badge === 'coming_soon';
         return true;
       });
@@ -236,34 +237,59 @@
   // -------------------------------------------------------------
   // 3. DUAL FILTER BARS CONTROLLER
   // -------------------------------------------------------------
+  window.selectEbookCategory = function (category, el) {
+    activeCategory = (activeCategory === category) ? 'all' : category;
+    document.querySelectorAll('#ebookCategoryKpiGrid .cat-kpi-card').forEach(card => {
+      const c = card.getAttribute('data-category');
+      if (c === activeCategory) {
+        card.classList.add('active');
+        card.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
+        card.style.borderColor = '#86efac';
+        card.style.boxShadow = '0 4px 14px rgba(22,163,74,0.18)';
+      } else {
+        card.classList.remove('active');
+        card.style.background = '#ffffff';
+        card.style.borderColor = '#e2e8f0';
+        card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+      }
+    });
+    renderUnifiedBooksGrid();
+  };
+
+  window.setStoreStatusFilter = function (status, el) {
+    activeStatus = status;
+    document.querySelectorAll('#statusChipsTrack .status-chip').forEach(chip => {
+      chip.classList.remove('active');
+      chip.style.background = '#ffffff';
+      chip.style.color = '#334155';
+      chip.style.borderColor = '#cbd5e1';
+    });
+    if (el) {
+      el.classList.add('active');
+      el.style.background = '#0f172a';
+      el.style.color = '#fde047';
+      el.style.borderColor = '#0f172a';
+    }
+    renderUnifiedBooksGrid();
+  };
+
   function initDualFilterBars() {
-    // Category pills
-    const catButtons = document.querySelectorAll('#categoryPillsTrack .cat-pill');
-    catButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        catButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeCategory = btn.getAttribute('data-category') || 'all';
-        renderUnifiedBooksGrid();
-      });
-    });
-
-    // Status chips
-    const statusChips = document.querySelectorAll('#statusChipsTrack .status-chip');
-    statusChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        statusChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        activeStatus = chip.getAttribute('data-status') || 'all';
-        renderUnifiedBooksGrid();
-      });
-    });
-
     window.resetStoreFilters = function () {
       activeCategory = 'all';
-      activeStatus = 'all';
-      catButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-category') === 'all'));
-      statusChips.forEach(c => c.classList.toggle('active', c.getAttribute('data-status') === 'all'));
+      activeStatus = 'live';
+      document.querySelectorAll('#ebookCategoryKpiGrid .cat-kpi-card').forEach(card => {
+        card.classList.remove('active');
+        card.style.background = '#ffffff';
+        card.style.borderColor = '#e2e8f0';
+        card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+      });
+      document.querySelectorAll('#statusChipsTrack .status-chip').forEach(c => {
+        const isLive = c.getAttribute('data-status') === 'live';
+        c.classList.toggle('active', isLive);
+        c.style.background = isLive ? '#0f172a' : '#ffffff';
+        c.style.color = isLive ? '#fde047' : '#334155';
+        c.style.borderColor = isLive ? '#0f172a' : '#cbd5e1';
+      });
       const search = document.getElementById('store-book-search-input');
       if (search) search.value = '';
       renderUnifiedBooksGrid();
@@ -282,10 +308,10 @@
   }
 
   // -------------------------------------------------------------
-  // 5. CUSTOM COMBO MAKER ENGINE (2 FOR ₹179, 3 FOR ₹249)
+  // 5. CUSTOM COMBO MAKER ENGINE (BK001, BK002, BK015)
   // -------------------------------------------------------------
   function initCustomComboMaker() {
-    selectedComboBooks = [];
+    selectedComboBooks = ['BK001', 'BK002', 'BK015'];
     updateComboCalculationUI();
   }
 
@@ -293,15 +319,28 @@
     const selectorGrid = document.getElementById('combo-books-selector-grid');
     if (!selectorGrid) return;
 
-    // Filter to live books only
-    const liveBooks = allStoreBooks.filter(b => !b.isComingSoon);
+    // Guaranteed 3 books combo: BK001, BK002, BK015
+    const comboSourceIds = ['BK001', 'BK002', 'BK015'];
+    const comboBooks = comboSourceIds.map(id => {
+      let b = allStoreBooks.find(item => String(item.id).toUpperCase() === id);
+      if (!b) {
+        if (id === 'BK001') {
+          b = { id: 'BK001', heading: 'खरीफ फसल मास्टर गाइड 2026', mrp: 299, offerPrice: 99, cover: '/images/books/kharif-master-guide-2026-cover.webp', category: 'Agriculture' };
+        } else if (id === 'BK002') {
+          b = { id: 'BK002', heading: 'खेती का डॉक्टर (Pocket Doctor)', mrp: 299, offerPrice: 99, cover: '/images/books/fasal-ka-doctor-cover.webp', category: 'Agriculture' };
+        } else if (id === 'BK015') {
+          b = { id: 'BK015', heading: 'सब्जी खेती मास्टर गाइड (भाग 1)', mrp: 299, offerPrice: 99, cover: '/images/books/kharif-master-guide-2026-cover.webp', category: 'Agriculture' };
+        }
+      }
+      return b;
+    }).filter(Boolean);
 
-    selectorGrid.innerHTML = liveBooks.map(b => {
+    selectorGrid.innerHTML = comboBooks.map(b => {
       const bId = String(b.id).toUpperCase();
       const isSelected = selectedComboBooks.includes(bId);
       const title = b.heading || b.name || bId;
       const cover = b.cover || b.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
-      const cat = b.category || 'General';
+      const cat = b.category || 'Agriculture';
 
       return `
         <div class="combo-book-item ${isSelected ? 'selected' : ''}" onclick="window.toggleComboBookSelection('${bId}')" id="combo-item-${bId}">
@@ -311,11 +350,13 @@
             <div style="font-size:0.88rem; font-weight:800; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
               ${title}
             </div>
-            <div style="font-size:0.75rem; color:#94a3b8;">${cat} • <s>₹${b.mrp || 299}</s></div>
+            <div style="font-size:0.75rem; color:#94a3b8;">${cat} • <s>₹${b.mrp || 299}</s> <span style="color:#86efac;font-weight:800;">₹${b.offerPrice || 99}</span></div>
           </div>
         </div>
       `;
     }).join('');
+
+    updateComboCalculationUI();
   }
 
   window.toggleComboBookSelection = function (bookId) {
@@ -375,7 +416,7 @@
       btnActive = true;
     } else if (count === 3) {
       price = 249;
-      savingsText = '🔥 3-पुस्तक मेगा कॉम्बो एक्टिव! कुल बचत ₹48 + आजीवन VIP AI एक्सेस मुफ़्त!';
+      savingsText = '🔥 3-पुस्तक सुपर कॉम्बो एक्टिव! कुल बचत ₹48 + 1-वर्ष Pro VIP AI पास बिल्कुल FREE!';
       btnActive = true;
     }
 

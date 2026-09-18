@@ -280,32 +280,70 @@
           </div>
         </div>
 
-        <!-- Filter 1: Categories -->
-        <div style="margin-bottom:12px;">
-          <div style="font-size:0.78rem; font-weight:800; color:#64748b; margin-bottom:6px; text-transform:uppercase;">
-            📂 विषय अनुसार चुनें (Categories):
+        <!-- 5 Quick Action Category KPI Cards -->
+        <div style="margin-bottom:20px;">
+          <div style="font-size:0.8rem; font-weight:800; color:#475569; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px;">
+            ⚡ विषय अनुसार त्वरित चयन (Quick Categories):
           </div>
-          <div class="filter-pills-row" id="categoryPillsTrack">
-            <button class="cat-pill active" data-category="all">📚 सभी पुस्तकें</button>
-            <button class="cat-pill" data-category="agriculture">🌾 कृषि (Agriculture)</button>
-            <button class="cat-pill" data-category="health">❤️ स्वास्थ्य (Health)</button>
-            <button class="cat-pill" data-category="business">💼 बिज़नेस व सेलिंग</button>
-            <button class="cat-pill" data-category="netsurf">🌐 NetSurf Direct</button>
-            <button class="cat-pill" data-category="digital-ai">🤖 Digital AI</button>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;" id="ebookCategoryKpiGrid">
+            <!-- 1: Agriculture -->
+            <div class="cat-kpi-card" data-category="agriculture" onclick="window.selectEbookCategory('agriculture', this)" style="cursor:pointer; background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border:1.5px solid #86efac; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:10px; box-shadow:0 4px 12px rgba(22,163,74,0.1); transition:all 0.2s;">
+              <span style="font-size:1.8rem;">🌾</span>
+              <div>
+                <strong style="display:block; font-size:0.92rem; color:#14532d; font-weight:900;">कृषि (Agri)</strong>
+                <small style="color:#15803d; font-size:0.75rem;">फसल रोग व स्प्रे</small>
+              </div>
+            </div>
+
+            <!-- 2: Health -->
+            <div class="cat-kpi-card" data-category="health" onclick="window.selectEbookCategory('health', this)" style="cursor:pointer; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:10px; box-shadow:0 2px 8px rgba(0,0,0,0.04); transition:all 0.2s;">
+              <span style="font-size:1.8rem;">❤️</span>
+              <div>
+                <strong style="display:block; font-size:0.92rem; color:#0f172a; font-weight:900;">स्वास्थ्य (Health)</strong>
+                <small style="color:#64748b; font-size:0.75rem;">डाइट व लाइफस्टाइल</small>
+              </div>
+            </div>
+
+            <!-- 3: Business -->
+            <div class="cat-kpi-card" data-category="business" onclick="window.selectEbookCategory('business', this)" style="cursor:pointer; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:10px; box-shadow:0 2px 8px rgba(0,0,0,0.04); transition:all 0.2s;">
+              <span style="font-size:1.8rem;">💼</span>
+              <div>
+                <strong style="display:block; font-size:0.92rem; color:#0f172a; font-weight:900;">बिज़नेस व सेलिंग</strong>
+                <small style="color:#64748b; font-size:0.75rem;">लीड्स व क्लोजिंग</small>
+              </div>
+            </div>
+
+            <!-- 4: NetSurf -->
+            <div class="cat-kpi-card" data-category="netsurf" onclick="window.selectEbookCategory('netsurf', this)" style="cursor:pointer; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:10px; box-shadow:0 2px 8px rgba(0,0,0,0.04); transition:all 0.2s;">
+              <span style="font-size:1.8rem;">🌐</span>
+              <div>
+                <strong style="display:block; font-size:0.92rem; color:#0f172a; font-weight:900;">NetSurf Direct</strong>
+                <small style="color:#64748b; font-size:0.75rem;">बायो-फिट प्रोडक्ट्स</small>
+              </div>
+            </div>
+
+            <!-- 5: Digital AI -->
+            <div class="cat-kpi-card" data-category="digital-ai" onclick="window.selectEbookCategory('digital-ai', this)" style="cursor:pointer; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:10px; box-shadow:0 2px 8px rgba(0,0,0,0.04); transition:all 0.2s;">
+              <span style="font-size:1.8rem;">🤖</span>
+              <div>
+                <strong style="display:block; font-size:0.92rem; color:#0f172a; font-weight:900;">Digital AI</strong>
+                <small style="color:#64748b; font-size:0.75rem;">स्मार्ट ऑटोमेशन</small>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Filter 2: Status & Edition -->
+        <!-- Single Clean Status Filter Bar -->
         <div>
-          <div style="font-size:0.78rem; font-weight:800; color:#64748b; margin-bottom:6px; text-transform:uppercase;">
-            ⚡ उपलब्धता व स्टेटस (Status Filter):
+          <div style="font-size:0.78rem; font-weight:800; color:#64748b; margin-bottom:8px; text-transform:uppercase;">
+            ⚡ उपलब्धता व स्टेटस (Availability Status):
           </div>
-          <div class="filter-pills-row" id="statusChipsTrack">
-            <button class="status-chip active" data-status="all">🌟 सभी स्टेटस</button>
-            <button class="status-chip" data-status="bestseller">🔥 सर्वाधिक बिकने वाली (Best Sellers)</button>
-            <button class="status-chip" data-status="live">⚡ लाइव उपलब्ध (Instant Download)</button>
-            <button class="status-chip" data-status="free_demo">📖 फ्री ऑडियो डेमो उपलब्ध</button>
-            <button class="status-chip" data-status="coming_soon">⏳ आगामी पुस्तकें (Coming Soon)</button>
+          <div class="filter-pills-row" id="statusChipsTrack" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:4px;">
+            <button type="button" class="status-chip active" data-status="live" onclick="window.setStoreStatusFilter('live', this)">⚡ तुरंत उपलब्ध (Instant Download)</button>
+            <button type="button" class="status-chip" data-status="all" onclick="window.setStoreStatusFilter('all', this)">🌟 सभी पुस्तकें (Show All)</button>
+            <button type="button" class="status-chip" data-status="free_demo" onclick="window.setStoreStatusFilter('free_demo', this)">🎧 ऑडियो डेमो उपलब्ध</button>
+            <button type="button" class="status-chip" data-status="free" onclick="window.setStoreStatusFilter('free', this)">🎁 मुफ़्त पुस्तकें (Free Books)</button>
+            <button type="button" class="status-chip" data-status="coming_soon" onclick="window.setStoreStatusFilter('coming_soon', this)">⏳ आगामी (Coming Soon)</button>
           </div>
         </div>
 
@@ -402,7 +440,7 @@
     </div>
   </section>
 
-  <!-- 7. COMMON HIGHLIGHTS & 4 PILLARS -->
+  <!-- 7. COMMON HIGHLIGHTS & 10 PILLARS -->
   <section style="padding: 50px 0; background: #ffffff;">
     <div class="container">
       <div style="text-align:center; margin-bottom:35px;">
@@ -411,37 +449,82 @@
           ✨ AAROGYAM GUARANTEE
         </span>
         <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">
-          आरोग्यम ई-बुक्स की 4 प्रमुख विशेषताएं
+          आरोग्यम ई-बुक्स की 10 प्रमुख विशेषताएं
         </h2>
+        <p style="color:#64748b; font-size:0.92rem; max-width:650px; margin:6px auto 0 auto;">
+          भारत के किसानों, परिवारों व डायरेक्ट सेलर्स के लिए निर्मित सम्पूर्ण वैज्ञानिक डिजिटल ज्ञान
+        </p>
       </div>
 
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:20px;">
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:24px; text-align:center;">
-          <div style="font-size:2.4rem; margin-bottom:10px;">⚡</div>
-          <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin-bottom:6px;">इंस्टेंट PDF डाउनलोड</h4>
-          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">भुगतान के तुरंत बाद आपके WhatsApp व ईमेल पर
-            सुरक्षित हाई-क्वालिटी रंगीन PDF उपलब्ध।</p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px;">
+        <!-- Feature 1 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">⚡</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">1. इंस्टेंट PDF डाउनलोड</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">भुगतान के तुरंत बाद आपके WhatsApp व ईमेल पर सुरक्षित हाई-क्वालिटी रंगीन PDF उपलब्ध।</p>
         </div>
 
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:24px; text-align:center;">
-          <div style="font-size:2.4rem; margin-bottom:10px;">🎧</div>
-          <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin-bottom:6px;">स्मार्ट ऑडियो रीडर</h4>
-          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">किताब पढ़ने के साथ-साथ बैकग्राउंड में हिंदी
-            ऑडियो सुनें—काम करते हुए भी सीखना संभव।</p>
+        <!-- Feature 2 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">🎧</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">2. स्मार्ट ऑडियो रीडर</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">किताब पढ़ने के साथ-साथ बैकग्राउंड में स्पष्ट हिंदी ऑडियो सुनें—काम करते हुए भी सीखना आसान।</p>
         </div>
 
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:24px; text-align:center;">
-          <div style="font-size:2.4rem; margin-bottom:10px;">🩺</div>
-          <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin-bottom:6px;">24×7 WhatsApp AI डॉक्टर</h4>
-          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">किताब से जुड़ा कोई भी सवाल हो, सीधे WhatsApp पर
-            AI विशेषज्ञ से आजीवन मुफ्त सलाह पाएं।</p>
+        <!-- Feature 3 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">🩺</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">3. 24×7 WhatsApp AI डॉक्टर</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">फसल रोग या स्वास्थ्य समस्या की फोटो भेजें और AI विशेषज्ञ से 10 सेकंड में जैविक समाधान पाएं।</p>
         </div>
 
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:24px; text-align:center;">
-          <div style="font-size:2.4rem; margin-bottom:10px;">🛡️</div>
-          <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin-bottom:6px;">100% सुरक्षित भुगतान</h4>
-          <p style="font-size:0.85rem; color:#64748b; line-height:1.5;">UPI, PhonePe, Google Pay, Paytm व सभी कार्ड्स
-            द्वारा त्वरित व सुरक्षित भुगतान।</p>
+        <!-- Feature 4 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">🛡️</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">4. 100% सुरक्षित भुगतान</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">UPI, PhonePe, Google Pay, Paytm व सभी कार्ड्स द्वारा 256-bit एन्क्रिप्टेड सुरक्षित ट्रांजेक्शन।</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">📱</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">5. बिना इंटरनेट ऑफलाइन रीडिंग</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">खेत में या यात्रा में इंटरनेट न होने पर भी डाउनलोड की गई ई-बुक कभी भी और कहीं भी पढ़ें।</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">🔄</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">6. आजीवन निःशुल्क नए अपडेट्स</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">भविष्य में आने वाले हर नए रिसर्च व अपडेटेड संस्करण आपके खाते में बिना अतिरिक्त शुल्क जुड़ेंगे।</p>
+        </div>
+
+        <!-- Feature 7 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">🔬</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">7. प्रमाणित व परीक्षित फॉर्मूले</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">कृषि वैज्ञानिकों व आयुर्वेद विशेषज्ञों द्वारा सैकड़ों खेतों व मरीजों पर परीक्षित 100% सफल तरीके।</p>
+        </div>
+
+        <!-- Feature 8 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">🎨</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">8. रंगीन सचित्र गाइड</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">300+ असली फोटो, रोग के लक्षण व स्प्रे चार्ट जिससे समझना और पहचानना बेहद आसान हो जाता है।</p>
+        </div>
+
+        <!-- Feature 9 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">👥</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">9. 10,000+ पाठक समुदाय</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">मध्य प्रदेश, महाराष्ट्र, राजस्थान, पंजाब और बिहार के हजारों किसान भाइयों का भरोसा।</p>
+        </div>
+
+        <!-- Feature 10 -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; padding:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">💰</div>
+          <h4 style="font-size:1.02rem; font-weight:900; color:#0f172a; margin-bottom:6px;">10. हजारों रुपयों की बचत</h4>
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.45;">दुकानदारों के महंगे केमिकल से मुक्ति और सही समय पर सही जैविक स्प्रे से लागत में 50% कमी।</p>
         </div>
       </div>
     </div>

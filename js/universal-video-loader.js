@@ -170,6 +170,12 @@
             `;
           }).join('')}
         </div>
+        <div style="text-align:center; margin-top:28px;">
+          <a href="/tube.html" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color:#ffffff; font-weight:900; font-size:0.92rem; padding:12px 30px; border-radius:30px; text-decoration:none; box-shadow:0 8px 24px rgba(239,68,68,0.35); transition:transform 0.15s ease;">
+            <span>📺 Aarogyam Tube देखें (Know More)</span>
+            <span>→</span>
+          </a>
+        </div>
       `;
 
       // Attach Click events to cards

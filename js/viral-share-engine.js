@@ -22,13 +22,31 @@
 
   // Get current user's phone or ID to act as referrer
   function getCurrentUserRefId() {
-    try {
-      const session = JSON.parse(localStorage.getItem('aoi_user_session') || localStorage.getItem('admin_session') || '{}');
-      if (session && (session.phone || session.mobile || session.id)) {
-        return session.phone || session.mobile || session.id;
-      }
-    } catch (e) {}
-    return getReferrerId() || '';
+    let ref = '';
+    if (typeof window.getUserShareId === 'function') {
+      try { ref = window.getUserShareId() || ''; } catch (e) {}
+    }
+    if (!ref) {
+      try { ref = localStorage.getItem('aarogyam_user_phone') || ''; } catch (e) {}
+    }
+    if (!ref) {
+      try {
+        const u = window.AI_USER || JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        ref = u.share_id || u.mobile || '';
+      } catch (e) {}
+    }
+    if (!ref) {
+      try {
+        const session = JSON.parse(localStorage.getItem('aoi_user_session') || localStorage.getItem('admin_session') || '{}');
+        if (session && (session.phone || session.mobile || session.id)) {
+          ref = session.phone || session.mobile || session.id;
+        }
+      } catch (e) {}
+    }
+    if (!ref) {
+      ref = getReferrerId();
+    }
+    return ref || 'AI000004';
   }
 
   // Build a personalized WhatsApp Inquiry URL with Lead Attribution
@@ -54,7 +72,7 @@
     const cleanUrl = url.split('?')[0];
     const myRef = getCurrentUserRefId();
     if (myRef) {
-      return `${cleanUrl}?ref=${encodeURIComponent(myRef)}`;
+      return `${cleanUrl}?ref=${encodeURIComponent(myRef)}&share_id=${encodeURIComponent(myRef)}`;
     }
     return cleanUrl;
   }
@@ -69,13 +87,12 @@
     const shareUrl = options.url || buildShareableUrl();
     const fullShareMessage = `🌾 *${title}*\n${text}\n\n👉 सम्पूर्ण जानकारी, ई-बुक्स व समाधान यहाँ देखें:\n${shareUrl}`;
 
-    // 1. Try Native Mobile WebShare API
+    // 1. Try Native Mobile WebShare API (do not pass url separately as fullShareMessage already contains it)
     if (navigator.share) {
       try {
         await navigator.share({
           title: title,
-          text: fullShareMessage,
-          url: shareUrl
+          text: fullShareMessage
         });
         showShareToast('✅ सफलतापूर्वक शेयर किया गया!');
         return;
