@@ -89,58 +89,53 @@
     </div>
   </header>
 
-  <!-- 3. PANORAMIC CAROUSEL (BigHaat Style) -->
-  <section class="bighaat-carousel-wrap">
-    <div class="bighaat-carousel-container" id="kidsHeroCarousel">
-      <div class="bighaat-carousel-track">
-        
+  <!-- 3. PANORAMIC BIGHAT-STYLE HERO SLIDER -->
+  <section style="padding: 24px 0 16px 0; background: #ffffff;">
+    <div class="container">
+      <div class="bighaat-carousel-container" id="kidsHeroCarousel">
+        <button type="button" class="bighaat-carousel-arrow prev" title="Previous Slide"><i class="fa-solid fa-chevron-left"></i></button>
+        <button type="button" class="bighaat-carousel-arrow next" title="Next Slide"><i class="fa-solid fa-chevron-right"></i></button>
+
         <!-- Slide 1 -->
-        <div class="bighaat-carousel-slide bighaat-slide-kids-1">
-          <div class="bighaat-slide-content">
-            <span class="bighaat-tag">🧸 SHARP BRAIN & MEMORY</span>
-            <h2 class="bighaat-title">बच्चों की तेज याददाश्त व एकाग्रता हेतु मेध्य रसायन</h2>
-            <p class="bighaat-desc">ब्राह्मी, शंखपुष्पी व अश्वगंधा का वैज्ञानिक फॉर्मूलेशन—पढ़ाई में ध्यान बढ़ाए, भूलने की आदत दूर करे और मानसिक थकावट मिटाए।</p>
-            <div class="bighaat-cta-row">
-              <a href="#sec-products" class="bighaat-cta-btn" style="background:#f59e0b; color:#000;">पोषण सप्लीमेंट्स देखें ↓</a>
-              <button type="button" onclick="window.triggerPersonalizedConsultation('किड्स केयर - याददाश्त व विकास')" class="bighaat-cta-btn secondary">विशेषज्ञ से बात करें</button>
+        <div class="home-hero-slide-item">
+          <div class="home-hero-slide-card" style="background:linear-gradient(135deg, #451a03 0%, #78350f 50%, #b45309 100%); border-color:#f59e0b;">
+            <div style="flex:1; min-width:280px;">
+              <span class="home-hero-tag" style="background:#fef3c7; color:#78350f;">🧸 SHARP BRAIN & MEMORY</span>
+              <h1 class="home-hero-title">बच्चों की तेज याददाश्त, एकाग्रता व तीव्र मानसिक विकास</h1>
+              <p class="home-hero-desc">ब्राह्मी, शंखपुष्पी व अश्वगंधा का वैज्ञानिक फॉर्मूलेशन—पढ़ाई में ध्यान बढ़ाए, भूलने की आदत दूर करे और मानसिक थकावट मिटाए।</p>
+              <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                <button type="button" onclick="window.consultAiExpert('बच्चों का मानसिक व शारीरिक विकास')" class="btn" style="background:#22c55e; color:#fff; font-weight:900; padding:12px 24px; border-radius:30px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                  <i class="fa-brands fa-whatsapp"></i> AI डॉक्टर से बच्चों की सलाह लें
+                </button>
+                <a href="#sec-products" style="color:#fde047; font-weight:800; font-size:0.9rem; text-decoration:underline;">📦 किड्स केयर उत्पाद देखें ↓</a>
+              </div>
+            </div>
+            <div class="home-hero-3d-book" onclick="window.location.href='#sec-products'">
+              <img src="/images/books/fasal-ka-doctor-cover.webp" alt="Kids Care Pack" />
             </div>
           </div>
         </div>
 
         <!-- Slide 2 -->
-        <div class="bighaat-carousel-slide bighaat-slide-kids-2">
-          <div class="bighaat-slide-content">
-            <span class="bighaat-tag">🥛 HEALTHY APPETITE & GROWTH</span>
-            <h2 class="bighaat-title">कम भूख व शारीरिक दुबलेपन का प्राकृतिक समाधान</h2>
-            <p class="bighaat-desc">पाचन अग्नि प्रदीप्त कर स्वाभाविक भूख जगाए। हड्डियों का संपूर्ण विकास, वजन संतुलन और कद वृद्धि में सहायक संतुलित प्रोटीन पोषण।</p>
-            <div class="bighaat-cta-row">
-              <a href="#sec-diet" class="bighaat-cta-btn" style="background:#ffffff; color:#b45309;">24-घंटे डाइट चार्ट देखें ↓</a>
-              <a href="#sec-products" class="bighaat-cta-btn secondary">चोको प्रोटीन शेक</a>
+        <div class="home-hero-slide-item" style="display:none;">
+          <div class="home-hero-slide-card" style="background:linear-gradient(135deg, #064e3b 0%, #047857 50%, #059669 100%); border-color:#34d399;">
+            <div style="flex:1; min-width:280px;">
+              <span class="home-hero-tag" style="background:#a7f3d0; color:#065f46;">🥛 HEALTHY APPETITE & IMMUNITY</span>
+              <h1 class="home-hero-title">कम भूख, शारीरिक दुबलेपन व कमजोर इम्युनिटी का समाधान</h1>
+              <p class="home-hero-desc">पाचन अग्नि प्रदीप्त कर स्वाभाविक भूख जगाए। हड्डियों का संपूर्ण विकास, वजन संतुलन और हर मौसम में सर्दी-जुकाम से प्राकृतिक सुरक्षा।</p>
+              <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                <a href="#sec-diet" class="btn" style="background:#facc15; color:#000; font-weight:900; padding:12px 24px; border-radius:30px; text-decoration:none;">🥗 24-घंटे डाइट चार्ट पढ़ें</a>
+              </div>
+            </div>
+            <div class="home-hero-3d-book" onclick="window.location.href='#sec-diet'">
+              <img src="/images/books/kharif-master-guide-2026-cover.webp" alt="Kids Diet" />
             </div>
           </div>
         </div>
-
-        <!-- Slide 3 -->
-        <div class="bighaat-carousel-slide bighaat-slide-kids-3">
-          <div class="bighaat-slide-content">
-            <span class="bighaat-tag">🛡️ SUPER IMMUNITY SHIELD</span>
-            <h2 class="bighaat-title">हर मौसम में सर्दी, जुकाम व बुखार से सुरक्षा कवच</h2>
-            <p class="bighaat-desc">आंवला, तुलसी और गिलोय का 100% हर्बल अर्क। बच्चों की स्वाभाविक रोग प्रतिरोधक क्षमता बढ़ाए, बार-बार एंटीबायोटिक की जरूरत न पड़े।</p>
-            <div class="bighaat-cta-row">
-              <a href="#sec-products" class="bighaat-cta-btn" style="background:#22c55e; color:#fff;">इम्युनिटी गमीज ऑर्डर करें</a>
-              <button type="button" onclick="window.triggerUniversalShare({title:'बच्चों की सेहत व पोषण', text:'Aarogyam India पर बच्चों के विकास का सम्पूर्ण डाइट व गाइड देखें:'})" class="bighaat-cta-btn secondary">📤 दोस्तों को भेजें</button>
-            </div>
-          </div>
-        </div>
-
       </div>
-
-      <button class="bighaat-carousel-arrow prev" title="Previous Slide"><i class="fa-solid fa-chevron-left"></i></button>
-      <button class="bighaat-carousel-arrow next" title="Next Slide"><i class="fa-solid fa-chevron-right"></i></button>
 
       <div class="bighaat-carousel-dots">
         <span class="bighaat-carousel-dot active"></span>
-        <span class="bighaat-carousel-dot"></span>
         <span class="bighaat-carousel-dot"></span>
       </div>
     </div>

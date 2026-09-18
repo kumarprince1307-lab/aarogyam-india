@@ -172,6 +172,15 @@ export async function initPageEditor() {
       } else if (targetType === 'review' && currentReviews[targetIndex]) {
         currentReviews[targetIndex][fieldName] = webpPath;
         renderReviewsInBuilder();
+      } else if (targetType === 'og_image') {
+        const inputEl = document.getElementById('pe_input_og_image');
+        if (inputEl) inputEl.value = webpPath;
+        const prevWrap = document.getElementById('pe_og_image_preview');
+        const prevImg = document.getElementById('pe_og_image_preview_img');
+        if (prevWrap && prevImg) {
+          prevImg.src = webpPath;
+          prevWrap.style.display = 'block';
+        }
       }
 
       showToast(`⚡ WebP इमेज तैयार (${sizeKb} KB) | गिटहब पर सिंक हो रही है...`, 'info');
@@ -1346,6 +1355,8 @@ export async function initPageEditor() {
   let currentHealthDiseases = [];
   let currentCrops = [];
   let currentPashuCards = [];
+  let pagesCurrentPage = 1;
+  const pagesPageSize = 10;
 
   const ALL_SECTION_DEFS = [
     { key: 'sec_ticker', name: '🚨 1. ब्रेकिंग न्यूज़ लाइव टिकर बार (News Ticker)', desc: 'चलती हुई हेडलाइन व लाइव पल्सिंग बैज' },
@@ -1431,22 +1442,27 @@ export async function initPageEditor() {
       </div>
     </div>
 
-    <!-- ADVANCED UNIVERSAL PAGE EDITOR & BUILDER FORM -->
-    <div id="page-editor-form-card" class="admin-card" style="display: none; margin-bottom: 24px; background: var(--admin-surface-2, #0f172a); border: 2px solid #3b82f6; border-radius: 14px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--admin-border, #334155); padding-bottom: 12px; margin-bottom: 18px; flex-wrap: wrap; gap: 8px;">
+    <!-- BACKDROP OVERLAY FOR SIDE DRAWER -->
+    <div id="page-editor-drawer-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 99998; transition: opacity 0.25s ease;"></div>
+
+    <!-- ADVANCED UNIVERSAL PAGE EDITOR SIDE DRAWER -->
+    <div id="page-editor-form-card" class="admin-card" style="display: none; position: fixed; top: 0; right: 0; bottom: 0; width: min(820px, 96vw); z-index: 99999; margin: 0; border-radius: 0; border-left: 2px solid #3b82f6; border-top: none; border-right: none; border-bottom: none; background: var(--admin-surface-2, #0b1120); box-shadow: -14px 0 50px rgba(0,0,0,0.75); overflow-y: auto; padding: 0;">
+      <!-- Sticky Top Header -->
+      <div style="position: sticky; top: 0; z-index: 20; background: #0f172a; padding: 16px 22px; border-bottom: 1.5px solid var(--admin-border, #334155); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,0.3);">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.5rem;">📑</span>
+          <span style="font-size: 1.4rem;">📑</span>
           <div>
-            <h3 id="page-editor-form-title" style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #60a5fa;">
-              पेज कस्टमाइज़र व बिल्डर (Universal Page Builder)
+            <h3 id="page-editor-form-title" style="margin: 0; font-size: 1.12rem; font-weight: 800; color: #60a5fa;">
+              पेज कस्टमाइज़र व साइड ड्रावर (Universal Page Editor Drawer)
             </h3>
-            <small style="color: var(--admin-muted); font-size: 0.75rem;">पेज के सभी सेक्शंस, हीरो स्लाइडर और लाइव सेलिंग कार्ड्स को एडिट करें</small>
+            <small style="color: var(--admin-muted); font-size: 0.74rem;">पेज के सभी सेक्शंस, OG शेयरिंग, हीरो स्लाइडर और लाइव सेलिंग कार्ड्स को यहाँ से नियंत्रित करें</small>
           </div>
         </div>
-        <button type="button" id="btn-close-page-editor-form" class="admin-button icon-button" style="color: var(--admin-muted); font-size: 1.2rem;">✕</button>
+        <button type="button" id="btn-close-page-editor-form" class="admin-button icon-button" style="color: #cbd5e1; font-size: 1.3rem; background: rgba(255,255,255,0.08); border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
       </div>
 
-      <form id="site-page-customizer-form">
+      <div style="padding: 20px 22px 100px 22px;">
+        <form id="site-page-customizer-form">
         <!-- 1. Basic Page Settings -->
         <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
@@ -1537,6 +1553,41 @@ export async function initPageEditor() {
             </label>
             <textarea id="pe_input_audio_script" class="admin-input" rows="3" placeholder="नमस्ते {name} जी! आरोग्यम इंडिया में आपका स्वागत है..." style="width: 100%; padding: 8px 12px; font-family: inherit; line-height: 1.5;"></textarea>
             <small style="color: var(--admin-muted); font-size: 0.74rem;">टिप: {name} लिखने पर यूजर का नाम अपने आप बोला जाएगा।</small>
+          </div>
+        </div>
+
+        <!-- 2.2 Social Sharing, OpenGraph (OG) & WhatsApp Share Message -->
+        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #0284c750;">
+          <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <span>🔗 2.2 सोशल शेयरिंग, OpenGraph (OG) व WhatsApp शेयर संदेश (Social Share Engine Layer)</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">OG शेयर टाइटल (OG Title)</label>
+              <input type="text" id="pe_input_og_title" class="admin-input" placeholder="उदा. Aarogyam India - खरीफ स्पेशल कृषि व स्वास्थ्य मंच" style="width: 100%; padding: 8px 12px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">OG इमेज थंबनेल (WebP 10-15 KB)</label>
+              <input type="text" id="pe_input_og_image" class="admin-input" placeholder="/images/banners/..." style="width: 100%; padding: 8px 12px;" />
+              <div style="display:flex; gap:6px; margin-top:6px; align-items:center;">
+                <input type="file" id="pe_file_og_image" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'og_image', 0, 'image')">
+                <button type="button" onclick="document.getElementById('pe_file_og_image').click()" class="admin-button small-button" style="background:#0284c7; color:#fff; padding:4px 10px; font-size:0.75rem; font-weight:800;">
+                  📁 थंबनेल अपलोड (WebP)
+                </button>
+              </div>
+              <div id="pe_og_image_preview" style="margin-top:6px; display:none;">
+                <img id="pe_og_image_preview_img" src="" alt="OG Preview" style="height:48px; border-radius:6px; object-fit:cover; border:1px solid #0284c7;" />
+              </div>
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">OG संक्षिप्त विवरण (OG Description - WhatsApp/FB प्रीव्यू)</label>
+            <textarea id="pe_input_og_description" rows="2" class="admin-input" placeholder="उदा. 100% प्रमाणित डिजिटल ई-बुक्स, फसल सुरक्षा गाइड व 24x7 WhatsApp AI डॉक्टर परामर्श।" style="width: 100%; padding: 8px 12px; font-size: 0.82rem;"></textarea>
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">WhatsApp व शेयर इंजन के साथ जाने वाला संदेश (Custom Share Message)</label>
+            <textarea id="pe_input_share_message" rows="3" class="admin-input" placeholder="उदा. 🌾 *{title}*\n{description}\n👉 तुरंत पढ़ें व ऑर्डर करें:\n{url}" style="width: 100%; padding: 8px 12px; font-size: 0.82rem;"></textarea>
+            <small style="color: var(--admin-muted); font-size: 0.72rem;">नोट: {title}, {description}, {url} अपने आप संबंधित पेज व रेफरल कोड से बदल जाएंगे।</small>
           </div>
         </div>
 
@@ -1727,16 +1778,17 @@ export async function initPageEditor() {
           </div>
         </div>
 
-        <!-- Submit & Save Actions -->
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <button type="submit" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 12px 28px; font-size: 1rem; box-shadow: 0 4px 14px rgba(22,163,74,0.4);">
-            💾 यह साइट पेज सुरक्षित करें (Save Page)
-          </button>
-          <button type="button" id="btn-cancel-page-editor-form" class="admin-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted);">
+        <!-- Sticky Drawer Bottom Save Bar -->
+        <div style="position: sticky; bottom: -100px; margin: 24px -22px -100px -22px; background: #0f172a; padding: 14px 22px; border-top: 1.5px solid var(--admin-border, #334155); display: flex; gap: 12px; justify-content: flex-end; align-items: center; box-shadow: 0 -4px 16px rgba(0,0,0,0.4); z-index: 25;">
+          <button type="button" id="btn-cancel-page-editor-form" class="admin-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted); padding: 10px 18px; font-weight: 700;">
             रद्द करें
+          </button>
+          <button type="submit" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 10px 24px; font-size: 0.95rem; box-shadow: 0 4px 14px rgba(22,163,74,0.4);">
+            💾 यह साइट पेज सुरक्षित करें (Save Page)
           </button>
         </div>
       </form>
+      </div>
     </div>
 
     <!-- Active Site Pages Table -->
@@ -1762,15 +1814,37 @@ export async function initPageEditor() {
   const searchInput = document.getElementById('pe_search_input');
   const exportBtn = document.getElementById('btn-export-pages-json');
 
+  function openPageDrawer() {
+    const backdrop = document.getElementById('page-editor-drawer-backdrop');
+    if (backdrop) backdrop.style.display = 'block';
+    if (formCard) formCard.style.display = 'block';
+  }
+
+  function closePageDrawer() {
+    const backdrop = document.getElementById('page-editor-drawer-backdrop');
+    if (backdrop) backdrop.style.display = 'none';
+    if (formCard) formCard.style.display = 'none';
+  }
+
+  window.openPageDrawer = openPageDrawer;
+  window.closePageDrawer = closePageDrawer;
+
   toggleBtn?.addEventListener('click', () => {
     resetPageForm();
-    formCard.style.display = formCard.style.display === 'none' ? 'block' : 'none';
-    if (formCard.style.display === 'block') formCard.scrollIntoView({ behavior: 'smooth' });
+    openPageDrawer();
   });
 
-  closeBtn?.addEventListener('click', () => { formCard.style.display = 'none'; });
-  cancelBtn?.addEventListener('click', () => { formCard.style.display = 'none'; });
-  searchInput?.addEventListener('input', renderPagesTable);
+  closeBtn?.addEventListener('click', closePageDrawer);
+  cancelBtn?.addEventListener('click', closePageDrawer);
+  document.getElementById('page-editor-drawer-backdrop')?.addEventListener('click', closePageDrawer);
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePageDrawer();
+  });
+
+  searchInput?.addEventListener('input', () => {
+    pagesCurrentPage = 1;
+    renderPagesTable();
+  });
   exportBtn?.addEventListener('click', exportPagesJson);
 
   const syncPagesGithubBtn = document.getElementById('btn-sync-pages-github');
@@ -2675,6 +2749,14 @@ export async function initPageEditor() {
       return;
     }
 
+    const totalPages = Math.ceil(filtered.length / pagesPageSize) || 1;
+    if (pagesCurrentPage > totalPages) pagesCurrentPage = totalPages;
+    if (pagesCurrentPage < 1) pagesCurrentPage = 1;
+
+    const startIdx = (pagesCurrentPage - 1) * pagesPageSize;
+    const endIdx = Math.min(startIdx + pagesPageSize, filtered.length);
+    const paginated = filtered.slice(startIdx, endIdx);
+
     wrap.innerHTML = `
       <table class="admin-table">
         <thead>
@@ -2689,7 +2771,7 @@ export async function initPageEditor() {
           </tr>
         </thead>
         <tbody>
-          ${filtered.map(p => {
+          ${paginated.map(p => {
             const isLive = p.status === 'active';
             const slidesCount = (p.hero_slides || []).length;
             const secCount = (p.sections_order || []).length;
@@ -2738,8 +2820,33 @@ export async function initPageEditor() {
           }).join('')}
         </tbody>
       </table>
+
+      <!-- 10 Pages Pagination Controller Bar -->
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#0f172a; border-top:1px solid var(--admin-border); flex-wrap:wrap; gap:10px; margin-top:8px; border-radius:0 0 10px 10px;">
+        <div style="font-size:0.8rem; color:var(--admin-muted);">
+          पेज <strong style="color:#38bdf8;">${pagesCurrentPage}</strong> का <strong style="color:#f8fafc;">${totalPages}</strong> (दिख रहे हैं: ${startIdx + 1}–${endIdx} / कुल: ${filtered.length} पेजेस)
+        </div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button type="button" onclick="window.changePagesPage(${pagesCurrentPage - 1})" ${pagesCurrentPage <= 1 ? 'disabled' : ''} class="admin-button small-button" style="padding:4px 10px; font-size:0.78rem; opacity:${pagesCurrentPage <= 1 ? '0.35' : '1'}; cursor:${pagesCurrentPage <= 1 ? 'not-allowed' : 'pointer'};">
+            ◀ पिछला
+          </button>
+          ${Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNo => `
+            <button type="button" onclick="window.changePagesPage(${pageNo})" class="admin-button small-button" style="padding:4px 10px; font-size:0.78rem; background:${pageNo === pagesCurrentPage ? '#2563eb' : 'transparent'}; color:#fff; border:1px solid ${pageNo === pagesCurrentPage ? '#3b82f6' : 'var(--admin-border)'}; font-weight:${pageNo === pagesCurrentPage ? '900' : '600'};">
+              ${pageNo}
+            </button>
+          `).join('')}
+          <button type="button" onclick="window.changePagesPage(${pagesCurrentPage + 1})" ${pagesCurrentPage >= totalPages ? 'disabled' : ''} class="admin-button small-button" style="padding:4px 10px; font-size:0.78rem; opacity:${pagesCurrentPage >= totalPages ? '0.35' : '1'}; cursor:${pagesCurrentPage >= totalPages ? 'not-allowed' : 'pointer'};">
+            अगला ▶
+          </button>
+        </div>
+      </div>
     `;
   }
+
+  window.changePagesPage = function(pageNo) {
+    pagesCurrentPage = pageNo;
+    renderPagesTable();
+  };
 
   window.editSitePage = function(pageId) {
     const p = allPages.find(x => x.id === pageId);
@@ -2765,6 +2872,27 @@ export async function initPageEditor() {
     if (audioTitleEl) audioTitleEl.value = p.audio_title || p.name || '';
     if (audioScriptEl) audioScriptEl.value = p.audio_script || '';
 
+    // Social Sharing, OG & WhatsApp Custom Share Message
+    const ogTitleEl = document.getElementById('pe_input_og_title');
+    const ogImgEl = document.getElementById('pe_input_og_image');
+    const ogDescEl = document.getElementById('pe_input_og_description');
+    const shareMsgEl = document.getElementById('pe_input_share_message');
+    if (ogTitleEl) ogTitleEl.value = p.og_title || '';
+    if (ogImgEl) ogImgEl.value = p.og_image || '';
+    if (ogDescEl) ogDescEl.value = p.og_description || '';
+    if (shareMsgEl) shareMsgEl.value = p.share_message || '';
+
+    const ogPrevWrap = document.getElementById('pe_og_image_preview');
+    const ogPrevImg = document.getElementById('pe_og_image_preview_img');
+    if (ogPrevWrap && ogPrevImg) {
+      if (p.og_image) {
+        ogPrevImg.src = p.og_image;
+        ogPrevWrap.style.display = 'block';
+      } else {
+        ogPrevWrap.style.display = 'none';
+      }
+    }
+
     currentSlides = Array.isArray(p.hero_slides) ? JSON.parse(JSON.stringify(p.hero_slides)) : [];
     currentSectionsOrder = Array.isArray(p.sections_order) && p.sections_order.length > 0 ? [...p.sections_order] : ALL_SECTION_DEFS.map(s => s.key);
     currentHiddenSections = Array.isArray(p.hidden_sections) ? [...p.hidden_sections] : [];
@@ -2788,8 +2916,7 @@ export async function initPageEditor() {
     renderCropCardsInBuilder();
     renderPashuCardsInBuilder();
 
-    formCard.style.display = 'block';
-    formCard.scrollIntoView({ behavior: 'smooth' });
+    openPageDrawer();
   };
 
   window.toggleSitePageStatus = function(pageId) {
@@ -2803,12 +2930,25 @@ export async function initPageEditor() {
 
   function resetPageForm() {
     editingPageId = null;
-    document.getElementById('page-editor-form-title').textContent = 'नया साइट पेज बनाएं (Universal Page Editor)';
+    document.getElementById('page-editor-form-title').textContent = 'नया साइट पेज बनाएं (Universal Page Editor Drawer)';
     document.getElementById('site-page-customizer-form')?.reset();
     const audioTitleEl = document.getElementById('pe_input_audio_title');
     const audioScriptEl = document.getElementById('pe_input_audio_script');
     if (audioTitleEl) audioTitleEl.value = '';
     if (audioScriptEl) audioScriptEl.value = '';
+
+    const ogTitleEl = document.getElementById('pe_input_og_title');
+    const ogImgEl = document.getElementById('pe_input_og_image');
+    const ogDescEl = document.getElementById('pe_input_og_description');
+    const shareMsgEl = document.getElementById('pe_input_share_message');
+    if (ogTitleEl) ogTitleEl.value = '';
+    if (ogImgEl) ogImgEl.value = '';
+    if (ogDescEl) ogDescEl.value = '';
+    if (shareMsgEl) shareMsgEl.value = '';
+
+    const ogPrevWrap = document.getElementById('pe_og_image_preview');
+    if (ogPrevWrap) ogPrevWrap.style.display = 'none';
+
     currentSlides = [];
     currentSectionsOrder = ALL_SECTION_DEFS.map(s => s.key);
     currentHiddenSections = [];
@@ -2848,6 +2988,11 @@ export async function initPageEditor() {
     const audioTitle = (document.getElementById('pe_input_audio_title')?.value || '').trim();
     const audioScript = (document.getElementById('pe_input_audio_script')?.value || '').trim();
 
+    const ogTitle = (document.getElementById('pe_input_og_title')?.value || '').trim();
+    const ogImage = (document.getElementById('pe_input_og_image')?.value || '').trim();
+    const ogDesc = (document.getElementById('pe_input_og_description')?.value || '').trim();
+    const shareMsg = (document.getElementById('pe_input_share_message')?.value || '').trim();
+
     const pageObj = {
       id: editingPageId || `page_${slug.replace(/[^a-zA-Z0-9_]/g, '_')}`,
       slug: slug,
@@ -2860,6 +3005,10 @@ export async function initPageEditor() {
       ticker_text: ticker,
       audio_title: audioTitle,
       audio_script: audioScript,
+      og_title: ogTitle,
+      og_image: ogImage,
+      og_description: ogDesc,
+      share_message: shareMsg,
       fb_pixel: fb,
       ga_tag: ga,
       hero_slides: currentSlides,
@@ -2884,7 +3033,7 @@ export async function initPageEditor() {
     else allPages.unshift(pageObj);
 
     savePagesToStorage();
-    formCard.style.display = 'none';
+    closePageDrawer();
     resetPageForm();
     renderPagesTable();
     showToast(`✅ पेज '${name}' सम्पूर्ण कॉन्फ़िगरेशन के साथ सुरक्षित हो गया!`, 'success');

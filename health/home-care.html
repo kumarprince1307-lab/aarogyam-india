@@ -89,58 +89,53 @@
     </div>
   </header>
 
-  <!-- 3. PANORAMIC CAROUSEL (BigHaat Style) -->
-  <section class="bighaat-carousel-wrap">
-    <div class="bighaat-carousel-container" id="homeHeroCarousel">
-      <div class="bighaat-carousel-track">
-        
+  <!-- 3. PANORAMIC BIGHAT-STYLE HERO SLIDER -->
+  <section style="padding: 24px 0 16px 0; background: #ffffff;">
+    <div class="container">
+      <div class="bighaat-carousel-container" id="homeHeroCarousel">
+        <button type="button" class="bighaat-carousel-arrow prev" title="Previous Slide"><i class="fa-solid fa-chevron-left"></i></button>
+        <button type="button" class="bighaat-carousel-arrow next" title="Next Slide"><i class="fa-solid fa-chevron-right"></i></button>
+
         <!-- Slide 1 -->
-        <div class="bighaat-carousel-slide bighaat-slide-home-1">
-          <div class="bighaat-slide-content">
-            <span class="bighaat-tag">🥦 100% PESTICIDE-FREE FOOD</span>
-            <h2 class="bighaat-title">सब्जियों व फलों से कीटनाशक व मोम (Wax) की 99% सफाई</h2>
-            <p class="bighaat-desc">केवल पानी से धोने पर जहरीले केमिकल नहीं निकलते। प्राकृतिक वेज-वॉश से सब्जियां व फल बनाएं परिवार के लिए 100% सुरक्षित और शुद्ध।</p>
-            <div class="bighaat-cta-row">
-              <a href="#sec-products" class="bighaat-cta-btn" style="background:#38bdf8; color:#000;">नेचुरल वेज-वॉश देखें ↓</a>
-              <button type="button" onclick="window.triggerPersonalizedConsultation('होम केयर - कीटनाशक मुक्त परिवार')" class="bighaat-cta-btn secondary">सलाहकार से जुड़ें</button>
+        <div class="home-hero-slide-item">
+          <div class="home-hero-slide-card" style="background:linear-gradient(135deg, #082f49 0%, #0369a1 50%, #0284c7 100%); border-color:#38bdf8;">
+            <div style="flex:1; min-width:280px;">
+              <span class="home-hero-tag" style="background:#e0f2fe; color:#0369a1;">🥦 100% PESTICIDE-FREE FOOD</span>
+              <h1 class="home-hero-title">सब्जियों व फलों से कीटनाशक व केमिकल मोम की 99% सफाई</h1>
+              <p class="home-hero-desc">केवल पानी से धोने पर जहरीले केमिकल नहीं निकलते। बायो-एंजाइम वेज-वॉश से फल-सब्जियां बनाएं परिवार व बच्चों के लिए 100% सुरक्षित।</p>
+              <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                <button type="button" onclick="window.consultAiExpert('होम केयर - केमिकल मुक्त घर')" class="btn" style="background:#22c55e; color:#fff; font-weight:900; padding:12px 24px; border-radius:30px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                  <i class="fa-brands fa-whatsapp"></i> AI डॉक्टर से होम केयर सलाह लें
+                </button>
+                <a href="#sec-products" style="color:#fde047; font-weight:800; font-size:0.9rem; text-decoration:underline;">📦 होम केयर उत्पाद देखें ↓</a>
+              </div>
+            </div>
+            <div class="home-hero-3d-book" onclick="window.location.href='#sec-products'">
+              <img src="/images/books/fasal-ka-doctor-cover.webp" alt="Veg Wash Pack" />
             </div>
           </div>
         </div>
 
         <!-- Slide 2 -->
-        <div class="bighaat-carousel-slide bighaat-slide-home-2">
-          <div class="bighaat-slide-content">
-            <span class="bighaat-tag">🌿 ACID-FREE FLOOR HYGIENE</span>
-            <h2 class="bighaat-title">हानिकारक एसिड मुक्त, बच्चों व पेट्स के लिए सुरक्षित फर्श</h2>
-            <p class="bighaat-desc">नीम, पाइन और लेमनग्रास बायो-एंजाइम फ्लोर क्लीनर। बिना किसी जहरीले धुआं या जलन के 99.9% कीटाणुओं का नाश और प्राकृतिक ताजगी।</p>
-            <div class="bighaat-cta-row">
-              <a href="#sec-detox" class="bighaat-cta-btn" style="background:#ffffff; color:#0284c7;">होम डिटॉक्स प्रोटोकॉल ↓</a>
-              <a href="#sec-products" class="bighaat-cta-btn secondary">हर्बल फ्लोर क्लीनर</a>
+        <div class="home-hero-slide-item" style="display:none;">
+          <div class="home-hero-slide-card" style="background:linear-gradient(135deg, #064e3b 0%, #047857 50%, #059669 100%); border-color:#34d399;">
+            <div style="flex:1; min-width:280px;">
+              <span class="home-hero-tag" style="background:#a7f3d0; color:#065f46;">🌿 ACID-FREE HYGIENE</span>
+              <h1 class="home-hero-title">हानिकारक एसिड मुक्त, बच्चों व पालतू जीवों के लिए सुरक्षित फर्श</h1>
+              <p class="home-hero-desc">नीम, पाइन और लेमनग्रास बायो-एंजाइम। बिना किसी जहरीले धुएं या जलन के 99.9% कीटाणुओं का नाश और प्राकृतिक ताजगी।</p>
+              <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                <a href="#sec-detox" class="btn" style="background:#facc15; color:#000; font-weight:900; padding:12px 24px; border-radius:30px; text-decoration:none;">🏡 होम डिटॉक्स प्रोटोकॉल पढ़ें</a>
+              </div>
+            </div>
+            <div class="home-hero-3d-book" onclick="window.location.href='#sec-detox'">
+              <img src="/images/books/kharif-master-guide-2026-cover.webp" alt="Floor Care" />
             </div>
           </div>
         </div>
-
-        <!-- Slide 3 -->
-        <div class="bighaat-carousel-slide bighaat-slide-home-3">
-          <div class="bighaat-slide-content">
-            <span class="bighaat-tag">🍽️ NON-TOXIC DISH & FABRIC CARE</span>
-            <h2 class="bighaat-title">बर्तनों पर केमिकल अवशेष नहीं, हाथों की त्वचा रहे कोमल</h2>
-            <p class="bighaat-desc">रीठा और नारियल तेल से बना प्राकृतिक डिशवॉश जेल। बर्तनों से तेल-मसाला तुरंत हटाए बिना किसी हानिकारक सफेद अवशेष (Residue) के।</p>
-            <div class="bighaat-cta-row">
-              <a href="#sec-products" class="bighaat-cta-btn" style="background:#22c55e; color:#fff;">क्लीनिंग कॉम्बो पैक ऑर्डर करें</a>
-              <button type="button" onclick="window.triggerUniversalShare({title:'केमिकल-मुक्त घर गाइड', text:'Aarogyam India पर परिवार को टॉक्सिक केमिकल से बचाने की संपूर्ण गाइड देखें:'})" class="bighaat-cta-btn secondary">📤 दोस्तों को शेयर करें</button>
-            </div>
-          </div>
-        </div>
-
       </div>
-
-      <button class="bighaat-carousel-arrow prev" title="Previous Slide"><i class="fa-solid fa-chevron-left"></i></button>
-      <button class="bighaat-carousel-arrow next" title="Next Slide"><i class="fa-solid fa-chevron-right"></i></button>
 
       <div class="bighaat-carousel-dots">
         <span class="bighaat-carousel-dot active"></span>
-        <span class="bighaat-carousel-dot"></span>
         <span class="bighaat-carousel-dot"></span>
       </div>
     </div>

@@ -613,7 +613,9 @@
     }
   }
 
-  window.initPanoramicCarousel = initHeroCarousel;
+  if (typeof window.initPanoramicCarousel !== 'function') {
+    window.initPanoramicCarousel = initHeroCarousel;
+  }
 
   // -------------------------------------------------------------
   // 3. HEALTH DISEASE CONSULTATION CARDS (10 GLOWING BLUE CARDS)
