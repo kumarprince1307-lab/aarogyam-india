@@ -94,6 +94,27 @@
 
   // Universal Share Trigger (Modal or Native WebShare)
   async function triggerShare(options = {}) {
+    // 0. MANDATORY AUTHENTICATION CHECK: Sharing strictly requires logging in or registering!
+    const isLogged = (window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function')
+      ? window.V1_SESSION.isLoggedIn()
+      : (typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : false);
+
+    if (!isLogged) {
+      console.log('[ViralShareEngine] User not logged in. Registration required before sharing.');
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          triggerShare(options);
+        }, { force: true, source: 'ShareGate' });
+      } else if (typeof window.openSlimLeadModal === 'function') {
+        window.openSlimLeadModal(() => {
+          triggerShare(options);
+        });
+      } else {
+        window.location.href = '/registration.html';
+      }
+      return; // STOP! DO NOT GENERATE SHARE LINK FOR GUESTS
+    }
+
     const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
     const ogDesc = document.querySelector('meta[property="og:description"]')?.getAttribute('content');
     
@@ -265,13 +286,13 @@
 
       const promptShown = sessionStorage.getItem('aoi_ref_prompt_shown');
       if (!promptShown) {
-        sessionStorage.setItem('aoi_ref_prompt_shown', 'true');
         intercepted = true;
         e.preventDefault();
         e.stopPropagation();
 
         if (typeof window.openGuestLoginModal === 'function') {
           window.openGuestLoginModal(() => {
+            sessionStorage.setItem('aoi_ref_prompt_shown', 'true');
             if (target.tagName === 'A' && target.href) {
               window.location.href = target.href;
             } else {

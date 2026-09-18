@@ -131,7 +131,12 @@ export async function initPageEditor() {
       .substring(0, 18);
     const stamp = Date.now().toString().slice(-6);
     const rand = Math.random().toString(36).substring(2, 6);
-    return `images/banners/${category}-${cleanName}-${stamp}-${rand}.webp`;
+    // Auto-detect folder based on upload type
+    let folder = 'images/banners';
+    if (category === 'product') folder = 'images/products';
+    else if (category === 'kpi_card' || category === 'kpi_section') folder = 'images/kpi';
+    else if (category === 'review' || category === 'achiever') folder = 'images/team';
+    return `${folder}/${category}-${cleanName}-${stamp}-${rand}.webp`;
   }
 
   window.handleAdminImageUpload = async function(event, targetType, targetIndex, fieldName = 'image') {
@@ -172,6 +177,15 @@ export async function initPageEditor() {
       } else if (targetType === 'review' && currentReviews[targetIndex]) {
         currentReviews[targetIndex][fieldName] = webpPath;
         renderReviewsInBuilder();
+      } else if (targetType === 'product' && currentProducts[targetIndex]) {
+        currentProducts[targetIndex][fieldName] = webpPath;
+        renderProductsInBuilder();
+      } else if (targetType === 'kpi_card' && currentKpiCards[targetIndex]) {
+        currentKpiCards[targetIndex][fieldName] = webpPath;
+        renderKpiCardsInBuilder();
+      } else if (targetType === 'kpi_section' && currentPageKpiSections[targetIndex]) {
+        currentPageKpiSections[targetIndex][fieldName] = webpPath;
+        renderPageKpiSectionsInBuilder();
       } else if (targetType === 'og_image') {
         const inputEl = document.getElementById('pe_input_og_image');
         if (inputEl) inputEl.value = webpPath;
@@ -1355,6 +1369,8 @@ export async function initPageEditor() {
   let currentHealthDiseases = [];
   let currentCrops = [];
   let currentPashuCards = [];
+  let currentProducts = [];           // NEW: Product Manager
+  let currentPageKpiSections = [];    // NEW: Page-specific KPI sections (health sub-pages)
   let pagesCurrentPage = 1;
   const pagesPageSize = 10;
 
@@ -1611,7 +1627,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 3.1 Health Disease Cards Manager (8 Cards) -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #dc262640;">
+        <div id="pe-section-health-cards" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #dc262640;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #f87171; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
@@ -1629,7 +1645,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 3.2 Major Crops Protection Cards Manager (8 Cards) -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #16a34a40;">
+        <div id="pe-section-crop-cards" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #16a34a40;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #4ade80; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
@@ -1647,7 +1663,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 3.3 Pashu Palan & Livestock Cards Manager (6 Cards) -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #0284c740;">
+        <div id="pe-section-pashu-cards" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #0284c740;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
@@ -1757,6 +1773,42 @@ export async function initPageEditor() {
             </button>
           </div>
           <div id="pe_faqs_container" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- 10.1 Page-Specific KPI Sections (for Health Sub-pages: Symptoms / Yoga / Remedy) -->
+        <div id="pe-section-page-kpi" style="display:none; background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #0284c750;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                <span>✨ 10.1 पेज-विशिष्ट KPI सेक्शंस (लक्षण • योगासन • उपाय) — Page KPI Sections</span>
+              </div>
+              <small style="color: var(--admin-muted); font-size: 0.75rem;">इस पेज के लिए: बैनर इमेज, KPI शीर्षक, लक्षण/योगा की सूची और ऑडियो KPI टेक्स्ट यहाँ से जोड़ें</small>
+            </div>
+            <button type="button" id="btn_add_page_kpi_section" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800;">
+              + नया KPI सेक्शन जोड़ें
+            </button>
+          </div>
+          <div id="pe_page_kpi_sections_container" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- 10.2 Product Manager (उत्पाद: Image, Title, MRP, Discount%, Dose) -->
+        <div id="pe-section-products" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #7c3aed50;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <div style="font-weight: 800; color: #c084fc; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                <span>🛍️ 10.2 उत्पाद प्रबंधक (Product Manager — इमेज • MRP • छूट% • खुराक)</span>
+              </div>
+              <small style="color: var(--admin-muted); font-size: 0.75rem;">पेज पर दिखाए जाने वाले उत्पादों की WebP इमेज (auto-folder), MRP, डिस्काउंट% और खुराक प्रबंधित करें</small>
+            </div>
+            <button type="button" id="btn_add_product" class="admin-button small-button" style="background: #7c3aed; color: #fff; font-weight: 800;">
+              + नया उत्पाद जोड़ें
+            </button>
+          </div>
+          <div id="pe_products_container" style="display: flex; flex-direction: column; gap: 12px;">
             <!-- Rendered dynamically -->
           </div>
         </div>
@@ -2128,6 +2180,31 @@ export async function initPageEditor() {
     renderFaqsInBuilder();
   });
 
+  document.getElementById('btn_add_product')?.addEventListener('click', () => {
+    currentProducts.push({
+      title: 'नया उत्पाद (New Product)',
+      description: 'उत्पाद के लाभ व उपयोग विधि यहाँ लिखें...',
+      image: '',
+      mrp: 850,
+      discount_pct: 0,
+      dose: '2ml / लीटर पानी',
+      whatsapp_link: 'https://wa.me/917974422572'
+    });
+    renderProductsInBuilder();
+  });
+
+  document.getElementById('btn_add_page_kpi_section')?.addEventListener('click', () => {
+    currentPageKpiSections.push({
+      id: `KPI_SEC_${Date.now()}`,
+      title: 'नया KPI सेक्शन',
+      icon: '✨',
+      image: '',
+      audio_kpi: '',
+      items: ['पहला बिंदु', 'दूसरा बिंदु', 'तीसरा बिंदु']
+    });
+    renderPageKpiSectionsInBuilder();
+  });
+
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
     savePageConfig();
@@ -2202,6 +2279,22 @@ export async function initPageEditor() {
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">CTA बटन लिंक (URL)</label>
             <input type="text" value="${escapeHtml(slide.cta_link || '')}" onchange="window.updateHeroSlideField(${idx}, 'cta_link', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+          </div>
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">Secondary CTA टेक्स्ट</label>
+            <input type="text" value="${escapeHtml(slide.cta_secondary_text || '')}" onchange="window.updateHeroSlideField(${idx}, 'cta_secondary_text', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+          </div>
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">Secondary CTA लिंक (URL)</label>
+            <input type="text" value="${escapeHtml(slide.cta_secondary_link || '')}" onchange="window.updateHeroSlideField(${idx}, 'cta_secondary_link', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+          </div>
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">← बैक बटन टेक्स्ट (Back Navigation)</label>
+            <input type="text" value="${escapeHtml(slide.back_text || '← वापस जाएं')}" onchange="window.updateHeroSlideField(${idx}, 'back_text', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" placeholder="← वापस जाएं"/>
+          </div>
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">← बैक लिंक URL (Back Link)</label>
+            <input type="text" value="${escapeHtml(slide.back_link || '')}" onchange="window.updateHeroSlideField(${idx}, 'back_link', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" placeholder="/categories/health.html"/>
           </div>
         </div>
       </div>
@@ -2541,17 +2634,31 @@ export async function initPageEditor() {
     const wrap = document.getElementById('pe_kpi_cards_container');
     if (!wrap) return;
 
-    wrap.innerHTML = currentKpiCards.map((card, idx) => `
+    if (currentKpiCards.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:12px;">कोई KPI कार्ड नहीं है। "+ नया फीचर कार्ड जोड़ें" बटन दबाएं।</div>';
+      return;
+    }
+
+    wrap.innerHTML = currentKpiCards.map((card, idx) => {
+      const safeImg = escapeHtml(card.image || '');
+      return `
       <div style="background: #0f172a; border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px; position: relative;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span style="font-size: 0.75rem; font-weight: 700; color: #34d399;">कार्ड #${idx + 1}</span>
+          <span style="font-size: 0.75rem; font-weight: 700; color: #34d399;">KPI #${idx + 1}</span>
           <button type="button" onclick="window.removeKpiCard(${idx})" style="background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 0.75rem;">&times;</button>
         </div>
         <input type="text" value="${escapeHtml(card.icon || '')}" onchange="window.updateKpiCard(${idx}, 'icon', this.value)" class="admin-input" placeholder="FontAwesome Icon (e.g. fa-seedling)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem; margin-bottom: 4px;" />
         <input type="text" value="${escapeHtml(card.title || '')}" onchange="window.updateKpiCard(${idx}, 'title', this.value)" class="admin-input" placeholder="शीर्षक (Title)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem; margin-bottom: 4px;" />
-        <input type="text" value="${escapeHtml(card.desc || '')}" onchange="window.updateKpiCard(${idx}, 'desc', this.value)" class="admin-input" placeholder="विवरण (Desc)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
+        <input type="text" value="${escapeHtml(card.desc || '')}" onchange="window.updateKpiCard(${idx}, 'desc', this.value)" class="admin-input" placeholder="विवरण (Desc)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem; margin-bottom: 4px;" />
+        <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
+          <input type="file" id="kpi_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'kpi_card', ${idx}, 'image')">
+          <button type="button" onclick="document.getElementById('kpi_file_${idx}').click()" class="admin-button small-button" style="background:#16a34a; color:#fff; padding:3px 8px; font-size:0.7rem; font-weight:800;">📁 KPI बैनर इमेज (WebP)</button>
+          <input type="text" value="${safeImg}" onchange="window.updateKpiCard(${idx}, 'image', this.value); window.renderKpiCardsInBuilder();" class="admin-input" placeholder="/images/kpi/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
+        </div>
+        ${safeImg ? `<div style="margin-top:4px;"><img src="${safeImg}" alt="KPI Preview" style="height:36px;border-radius:4px;object-fit:cover;border:1px solid #16a34a;" onerror="this.style.display='none'"></div>` : ''}
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   window.updateKpiCard = function(idx, field, val) {
@@ -2760,6 +2867,145 @@ export async function initPageEditor() {
   };
 
   // -------------------------------------------------------------
+  // PRODUCT MANAGER RENDER
+  // -------------------------------------------------------------
+  function renderProductsInBuilder() {
+    const wrap = document.getElementById('pe_products_container');
+    if (!wrap) return;
+    if (currentProducts.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:12px;">कोई उत्पाद नहीं है। "+ नया उत्पाद जोड़ें" बटन दबाएं।</div>';
+      return;
+    }
+    wrap.innerHTML = currentProducts.map((prod, idx) => {
+      const safeImg = escapeHtml(prod.image || '');
+      const offerPrice = (prod.mrp && prod.discount_pct) ? Math.round(prod.mrp * (1 - prod.discount_pct / 100)) : null;
+      return `
+        <div style="background:#0f172a; border:1.5px solid #7c3aed50; border-radius:10px; padding:14px; position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-weight:800; color:#c084fc; font-size:0.92rem;">🛍️ उत्पाद #${idx + 1}: ${escapeHtml(prod.title || 'New Product')}</span>
+            <button type="button" onclick="window.removeProduct(${idx})" style="background:transparent; border:none; color:#ef4444; font-weight:800; cursor:pointer; font-size:0.82rem;">&times; हटाएं</button>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद इमेज (WebP — auto: images/products/)</label>
+              <input type="text" value="${safeImg}" onchange="window.updateProduct(${idx}, 'image', this.value); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
+              <div style="display:flex; gap:6px; margin-top:4px;">
+                <input type="file" id="prod_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'product', ${idx}, 'image')">
+                <button type="button" onclick="document.getElementById('prod_file_${idx}').click()" class="admin-button small-button" style="background:#7c3aed; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">📁 इमेज अपलोड (WebP)</button>
+              </div>
+              ${safeImg ? `<img src="${safeImg}" alt="Preview" style="height:48px;border-radius:4px;object-fit:cover;border:1px solid #7c3aed;margin-top:4px;" onerror="this.style.display='none'">` : ''}
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद का नाम (Title)*</label>
+              <input type="text" value="${escapeHtml(prod.title || '')}" onchange="window.updateProduct(${idx}, 'title', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="उदा. Biofit Wrap-Up"/>
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">MRP (₹)</label>
+              <input type="number" value="${prod.mrp || ''}" onchange="window.updateProduct(${idx}, 'mrp', Number(this.value)); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="850"/>
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">डिस्काउंट % (Discount)</label>
+              <input type="number" value="${prod.discount_pct || ''}" min="0" max="100" onchange="window.updateProduct(${idx}, 'discount_pct', Number(this.value)); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="15"/>
+              ${offerPrice ? `<small style="color:#34d399; font-size:0.7rem; font-weight:700;">✅ ऑफर प्राइस: ₹${offerPrice}</small>` : ''}
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">खुराक / डोज़ (Dose)</label>
+              <input type="text" value="${escapeHtml(prod.dose || '')}" onchange="window.updateProduct(${idx}, 'dose', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="2ml/लीटर पानी"/>
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">WhatsApp ऑर्डर लिंक</label>
+              <input type="text" value="${escapeHtml(prod.whatsapp_link || '')}" onchange="window.updateProduct(${idx}, 'whatsapp_link', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="https://wa.me/917974422572"/>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद विवरण (Description)</label>
+            <textarea rows="2" onchange="window.updateProduct(${idx}, 'description', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.78rem;" placeholder="उत्पाद के लाभ व उपयोग...">${escapeHtml(prod.description || '')}</textarea>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  window.renderProductsInBuilder = renderProductsInBuilder;
+  window.updateProduct = function(idx, field, val) { if (currentProducts[idx]) currentProducts[idx][field] = val; };
+  window.removeProduct = function(idx) { currentProducts.splice(idx, 1); renderProductsInBuilder(); };
+
+  // -------------------------------------------------------------
+  // PAGE KPI SECTIONS RENDER (Health Sub-pages: Symptoms / Yoga / Remedy)
+  // -------------------------------------------------------------
+  function renderPageKpiSectionsInBuilder() {
+    const wrap = document.getElementById('pe_page_kpi_sections_container');
+    if (!wrap) return;
+    if (currentPageKpiSections.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:12px;">कोई KPI सेक्शन नहीं है। "+ नया KPI सेक्शन जोड़ें" बटन दबाएं। (जैसे: मुख्य लक्षण, योगासन, घरेलू उपाय)</div>';
+      return;
+    }
+    wrap.innerHTML = currentPageKpiSections.map((sec, idx) => {
+      const safeImg = escapeHtml(sec.image || '');
+      const itemsStr = Array.isArray(sec.items) ? sec.items.join('\n') : (sec.items || '');
+      return `
+        <div style="background:#0f172a; border:1.5px solid #0284c750; border-radius:10px; padding:14px; position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.4rem;">${escapeHtml(sec.icon || '✨')}</span>
+              <span style="font-weight:800; color:#38bdf8; font-size:0.92rem;">KPI सेक्शन #${idx + 1}: ${escapeHtml(sec.title || '')}</span>
+            </div>
+            <button type="button" onclick="window.removePageKpiSection(${idx})" style="background:transparent; border:none; color:#ef4444; font-weight:800; cursor:pointer; font-size:0.82rem;">&times; हटाएं</button>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">बैनर इमेज (WebP — auto: images/kpi/)</label>
+              <input type="text" value="${safeImg}" onchange="window.updatePageKpiSection(${idx}, 'image', this.value); window.renderPageKpiSectionsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;"/>
+              <div style="display:flex; gap:6px; margin-top:4px;">
+                <input type="file" id="kpi_sec_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'kpi_section', ${idx}, 'image')">
+                <button type="button" onclick="document.getElementById('kpi_sec_file_${idx}').click()" class="admin-button small-button" style="background:#0284c7; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">📁 बैनर अपलोड (WebP)</button>
+              </div>
+              ${safeImg ? `<img src="${safeImg}" alt="Preview" style="height:40px;border-radius:4px;object-fit:cover;border:1px solid #0284c7;margin-top:4px;" onerror="this.style.display='none'">` : ''}
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">सेक्शन शीर्षक (Title)</label>
+              <input type="text" value="${escapeHtml(sec.title || '')}" onchange="window.updatePageKpiSection(${idx}, 'title', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="जैसे: मुख्य लक्षण, योगासन, उपाय"/>
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">आइकन इमोजी (Icon)</label>
+              <input type="text" value="${escapeHtml(sec.icon || '✨')}" onchange="window.updatePageKpiSection(${idx}, 'icon', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="✨ 🩺 🧘 🌿"/>
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">🔊 ऑडियो KPI टेक्स्ट (यह बोला जाएगा)</label>
+              <input type="text" value="${escapeHtml(sec.audio_kpi || '')}" onchange="window.updatePageKpiSection(${idx}, 'audio_kpi', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="इस सेक्शन का ऑडियो परिचय..."/>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">📋 आइटम्स की सूची (एक लाइन = एक आइटम) — लक्षण / योगासन / उपाय</label>
+            <textarea rows="4" onchange="window.updatePageKpiSection(${idx}, 'items', this.value.split('\\n').map(s=>s.trim()).filter(s=>s))" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.78rem; font-family:inherit;" placeholder="बार-बार पेशाब आना&#10;थकान व कमजोरी&#10;प्यास अधिक लगना">${escapeHtml(itemsStr)}</textarea>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  window.renderPageKpiSectionsInBuilder = renderPageKpiSectionsInBuilder;
+  window.updatePageKpiSection = function(idx, field, val) { if (currentPageKpiSections[idx]) currentPageKpiSections[idx][field] = val; };
+  window.removePageKpiSection = function(idx) { currentPageKpiSections.splice(idx, 1); renderPageKpiSectionsInBuilder(); };
+
+  // Context-aware section show/hide based on page category
+  function updateContextualSections(category) {
+    const healthSection = document.getElementById('pe-section-health-cards');
+    const cropSection = document.getElementById('pe-section-crop-cards');
+    const pashuSection = document.getElementById('pe-section-pashu-cards');
+    const pageKpiSection = document.getElementById('pe-section-page-kpi');
+
+    const isHealthSubPage = category === 'Healthcare Sub-page';
+    const isAgri = category === 'Agriculture' || category === 'eBooks' || category === 'Core';
+    const isPashu = category === 'Livestock';
+    const showHealth = category === 'Health' || category === 'Healthcare' || category === 'Core';
+
+    if (healthSection) healthSection.style.display = (showHealth && !isHealthSubPage) ? 'block' : 'none';
+    if (cropSection) cropSection.style.display = (isAgri && !isHealthSubPage) ? 'block' : 'none';
+    if (pashuSection) pashuSection.style.display = (isPashu || category === 'Core') ? 'block' : 'none';
+    if (pageKpiSection) pageKpiSection.style.display = isHealthSubPage ? 'block' : 'none';
+  }
+  window.updateContextualSections = updateContextualSections;
+
+  // -------------------------------------------------------------
   // TABLE & ACTIONS
   // -------------------------------------------------------------
   function renderPagesTable() {
@@ -2928,9 +3174,13 @@ export async function initPageEditor() {
     currentMarketingCards = Array.isArray(p.marketing_cards) ? JSON.parse(JSON.stringify(p.marketing_cards)) : [];
     currentReviews = Array.isArray(p.reviews) ? JSON.parse(JSON.stringify(p.reviews)) : [];
     currentFaqs = Array.isArray(p.faqs) ? JSON.parse(JSON.stringify(p.faqs)) : [];
-    currentHealthDiseases = Array.isArray(p.health_diseases) ? JSON.parse(JSON.stringify(p.health_diseases)) : JSON.parse(JSON.stringify(DEFAULT_HEALTH_DISEASES));
-    currentCrops = Array.isArray(p.crops) ? JSON.parse(JSON.stringify(p.crops)) : JSON.parse(JSON.stringify(DEFAULT_CROPS_LIST));
-    currentPashuCards = Array.isArray(p.pashu_cards) ? JSON.parse(JSON.stringify(p.pashu_cards)) : JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST));
+    // For health sub-pages, don't load global disease defaults — start empty or load page-specific
+    const isHealthSubPage = (p.category === 'Healthcare Sub-page');
+    currentHealthDiseases = Array.isArray(p.health_diseases) ? JSON.parse(JSON.stringify(p.health_diseases)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_HEALTH_DISEASES)));
+    currentCrops = Array.isArray(p.crops) ? JSON.parse(JSON.stringify(p.crops)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_CROPS_LIST)));
+    currentPashuCards = Array.isArray(p.pashu_cards) ? JSON.parse(JSON.stringify(p.pashu_cards)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST)));
+    currentProducts = Array.isArray(p.products) ? JSON.parse(JSON.stringify(p.products)) : [];
+    currentPageKpiSections = Array.isArray(p.page_kpi_sections) ? JSON.parse(JSON.stringify(p.page_kpi_sections)) : [];
 
     renderHeroSlidesInBuilder();
     renderSectionsReorderingList();
@@ -2942,8 +3192,11 @@ export async function initPageEditor() {
     renderHealthCardsInBuilder();
     renderCropCardsInBuilder();
     renderPashuCardsInBuilder();
+    renderProductsInBuilder();
+    renderPageKpiSectionsInBuilder();
 
     openPageDrawer();
+    setTimeout(() => updateContextualSections(p.category || 'eBooks'), 60);
   };
 
   window.toggleSitePageStatus = function(pageId) {
@@ -2987,6 +3240,8 @@ export async function initPageEditor() {
     currentHealthDiseases = JSON.parse(JSON.stringify(DEFAULT_HEALTH_DISEASES));
     currentCrops = JSON.parse(JSON.stringify(DEFAULT_CROPS_LIST));
     currentPashuCards = JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST));
+    currentProducts = [];
+    currentPageKpiSections = [];
 
     renderHeroSlidesInBuilder();
     renderSectionsReorderingList();
@@ -2998,6 +3253,9 @@ export async function initPageEditor() {
     renderHealthCardsInBuilder();
     renderCropCardsInBuilder();
     renderPashuCardsInBuilder();
+    renderProductsInBuilder();
+    renderPageKpiSectionsInBuilder();
+    updateContextualSections('eBooks');
   }
 
   function savePageConfig() {
@@ -3049,6 +3307,8 @@ export async function initPageEditor() {
       health_diseases: currentHealthDiseases,
       crops: currentCrops,
       pashu_cards: currentPashuCards,
+      products: currentProducts,
+      page_kpi_sections: currentPageKpiSections,
       whatsapp_support: {
         number: waNum,
         prompt: waPrompt

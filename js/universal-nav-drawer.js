@@ -115,6 +115,26 @@
   // 5. MULTI-PLATFORM REFERRAL SHARE ENGINE MODAL (TRANSPARENT 5-BUTTON STACK)
   // -------------------------------------------------------------
   window.openUniversalShareModal = function (title, text, url) {
+    const isLogged = (window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function')
+      ? window.V1_SESSION.isLoggedIn()
+      : (typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : false);
+
+    if (!isLogged) {
+      console.log('[UniversalNavDrawer] User not logged in. Requiring authentication before sharing.');
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          window.openUniversalShareModal(title, text, url);
+        }, { force: true, source: 'UniversalShareGate' });
+      } else if (typeof window.openSlimLeadModal === 'function') {
+        window.openSlimLeadModal(() => {
+          window.openUniversalShareModal(title, text, url);
+        });
+      } else {
+        window.location.href = '/registration.html';
+      }
+      return;
+    }
+
     const referralUrl = window.generateReferralShareUrl(url);
     title = title || document.title || 'Aarogyam India - Digital Agriculture & Healthcare Hub';
     

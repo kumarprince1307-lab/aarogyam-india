@@ -385,7 +385,11 @@
       if (typeof actionCallback === 'function') actionCallback();
       return;
     }
-    openSlimLeadModal(actionCallback);
+    if (typeof window.openGuestLoginModal === 'function') {
+      window.openGuestLoginModal(actionCallback, { force: true, source: 'AudioShareGate' });
+    } else {
+      openSlimLeadModal(actionCallback);
+    }
   }
 
   function openSlimLeadModal(callback) {

@@ -277,9 +277,12 @@
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem(PROFILE_KEY);
         localStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem('AI_LOGIN_STATUS');
         localStorage.removeItem('UCAS_USER');
         localStorage.removeItem('AI_PURCHASES');
         localStorage.removeItem('purchases');
+        localStorage.removeItem('user_purchases');
+        localStorage.removeItem('aim_purchases');
         localStorage.removeItem('aim_user_name');
         localStorage.removeItem('aim_user_mobile');
         localStorage.removeItem('aim_profile_completed');
@@ -289,9 +292,16 @@
         localStorage.removeItem('aarogyam_user_name');
         localStorage.removeItem('aoi_user_session');
         localStorage.removeItem('user_name');
+        localStorage.removeItem('user_phone');
+        localStorage.removeItem('farmer_mobile');
+        localStorage.removeItem('farmer_name');
+        localStorage.removeItem('aarogyam_user');
+        localStorage.removeItem('CURRENT_USER');
+        localStorage.removeItem('wb_registered');
+        localStorage.removeItem('AOI_REFERRER_ID');
         try { sessionStorage.clear(); } catch(e) {}
         
-        console.log("User session cleared. Reloading...");
+        console.log("100% User session cleared. Reloading...");
         window.location.reload();
     }
 

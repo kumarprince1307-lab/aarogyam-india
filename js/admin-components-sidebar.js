@@ -19,14 +19,22 @@ const MENU = [
   ] },
   { label: 'Page Editor (पेज एडिटर)', icon: '📑', children: [
     { label: 'All Site Pages (सभी पेज एडिटर)', href: 'page-editor.html', route: 'page-editor' },
-    { label: '🌾 खरीफ फसल गाइड लैंडिंग पेज', href: 'page-editor.html?page=page_kharif_guide', route: 'page-editor?page=page_kharif_guide' },
-    { label: '🩺 खेती का डॉक्टर लैंडिंग पेज', href: 'page-editor.html?page=page_kheti_dr', route: 'page-editor?page=page_kheti_dr' },
     { label: '🏠 Home Page Editor', href: 'page-editor.html?page=home', route: 'page-editor?page=home' },
-    { label: '🌾 Agriculture Hub Editor', href: 'page-editor.html?page=agriculture', route: 'page-editor?page=agriculture' },
     { label: '📚 eBook Store Editor', href: 'page-editor.html?page=ebook', route: 'page-editor?page=ebook' },
-    { label: '🛒 Shopping Cart Editor', href: 'page-editor.html?page=cart', route: 'page-editor?page=cart' },
-    { label: '📖 My Library Editor', href: 'page-editor.html?page=library', route: 'page-editor?page=library' },
-    { label: '🌾 Mandi & Weather Editor', href: 'page-editor.html?page=mandi', route: 'page-editor?page=mandi' }
+    { label: '🌾 Agriculture Hub Editor', href: 'page-editor.html?page=agriculture', route: 'page-editor?page=agriculture' },
+    { label: '❤️ Health Hub Editor', href: 'page-editor.html?page=health-hub', route: 'page-editor?page=health-hub' },
+    { label: '🩸 Diabetes (मधुमेह) Editor', href: 'page-editor.html?page=page_health_diabetes', route: 'page-editor?page=page_health_diabetes' },
+    { label: '⚖️ Weight Loss (मोटापा) Editor', href: 'page-editor.html?page=page_health_weight_loss', route: 'page-editor?page=page_health_weight_loss' },
+    { label: '🦴 Joint Care (जोड़ दर्द) Editor', href: 'page-editor.html?page=page_health_joint_care', route: 'page-editor?page=page_health_joint_care' },
+    { label: '🌸 Women Care (महिला स्वास्थ्य) Editor', href: 'page-editor.html?page=page_health_womens_care', route: 'page-editor?page=page_health_womens_care' },
+    { label: '💇 Hair Care (बाल झड़ना) Editor', href: 'page-editor.html?page=page_health_hair_care', route: 'page-editor?page=page_health_hair_care' },
+    { label: '🌺 Skin Care (स्किन) Editor', href: 'page-editor.html?page=page_health_skin_care', route: 'page-editor?page=page_health_skin_care' },
+    { label: '🧸 Kids Care (बच्चे) Editor', href: 'page-editor.html?page=page_health_kids_care', route: 'page-editor?page=page_health_kids_care' },
+    { label: '🏡 Home Care (घरेलू) Editor', href: 'page-editor.html?page=page_health_home_care', route: 'page-editor?page=page_health_home_care' },
+    { label: '🐄 Pashu Palan Editor', href: 'page-editor.html?page=pashu', route: 'page-editor?page=pashu' },
+    { label: '🌾 Mandi & Weather Editor', href: 'page-editor.html?page=mandi', route: 'page-editor?page=mandi' },
+    { label: '🌾 खरीफ फसल गाइड लैंडिंग पेज', href: 'page-editor.html?page=page_kharif_guide', route: 'page-editor?page=page_kharif_guide' },
+    { label: '🩺 खेती का डॉक्टर लैंडिंग पेज', href: 'page-editor.html?page=page_kheti_dr', route: 'page-editor?page=page_kheti_dr' }
   ] },
   { label: '👑 Smart eTailer (₹8.19L)', icon: '👑', href: 'smart-etailer.html', route: 'smart-etailer' },
   { label: 'Products', icon: '🛍️', children: [ 

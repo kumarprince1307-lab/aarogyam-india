@@ -369,22 +369,84 @@
         const sponsorShareId = getActiveSponsorShareId();
         const userUniqueShareId = 'AI' + mobile.slice(-6);
 
-        // 1. Instant 0ms Local Storage Session (Zero Lag)
+        // Database lookup: Check if user is already registered
+        const db = getDb();
+        let existingProfile = null;
+        let sponsorProfileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
+
+        if (db) {
+          try {
+            const { data } = await db
+              .from('profiles')
+              .select('id, full_name, mobile, share_id, referral_code')
+              .eq('mobile', mobile)
+              .limit(1)
+              .maybeSingle();
+            existingProfile = data;
+
+            if (sponsorShareId !== 'AI000004') {
+              try {
+                const { data: refUser } = await db.from('profiles').select('id').eq('share_id', sponsorShareId).limit(1).maybeSingle();
+                if (refUser && refUser.id) sponsorProfileId = refUser.id;
+              } catch(e) {}
+            }
+          } catch (e) {
+            console.warn('Profile check warning:', e);
+          }
+        }
+
+        let officialName = name;
+        let officialShareId = userUniqueShareId;
+
+        if (existingProfile) {
+          // IMPORTANT: If user is already registered, their database profile name is 100% preserved!
+          // Profile name in DB will NOT change even if entered name is different.
+          if (existingProfile.full_name && existingProfile.full_name.trim()) {
+            officialName = existingProfile.full_name.trim();
+          }
+          if (existingProfile.share_id) {
+            officialShareId = existingProfile.share_id;
+          }
+          console.log(`[UniversalModal] Existing user detected (${mobile}). Preserving profile name: "${officialName}" (submitted: "${name}").`);
+        } else if (db) {
+          // New user registration in Supabase
+          try {
+            await db.from('profiles').insert([{
+              full_name: name,
+              mobile: mobile,
+              share_id: userUniqueShareId,
+              referral_code: sponsorShareId,
+              referral_mobile: sponsorShareId === 'AI000004' ? '7974422572' : null,
+              referred_by: sponsorProfileId,
+              registration_source: currentAuthOptions?.source || 'UniversalModal',
+              profile_complete: false,
+              is_active: true
+            }]);
+          } catch (e) {
+            console.warn('Insert profile warning:', e);
+          }
+        }
+
+        // Instant 0ms Local Storage Session (Zero Lag)
         const userObj = {
-          id: 'AI_' + mobile,
-          name: name,
-          full_name: name,
+          id: existingProfile?.id || ('AI_' + mobile),
+          name: officialName,
+          full_name: officialName,
           mobile: mobile,
           phone: mobile,
-          share_id: userUniqueShareId,
-          referral_code: sponsorShareId,
+          share_id: officialShareId,
+          referral_code: existingProfile?.referral_code || sponsorShareId,
           registered_at: new Date().toISOString(),
           source: currentAuthOptions?.source || 'UniversalModal'
         };
 
         try {
-          localStorage.setItem('aim_user_name', name);
+          localStorage.setItem('aim_user_name', officialName);
           localStorage.setItem('aim_user_mobile', mobile);
+          localStorage.setItem('user_name', officialName);
+          localStorage.setItem('aarogyam_user_name', officialName);
+          localStorage.setItem('aarogyam_user_phone', mobile);
+          localStorage.setItem('aarogyam_user_registered', 'true');
           localStorage.setItem('AI_USER', JSON.stringify(userObj));
           localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
           localStorage.setItem('UCAS_USER', JSON.stringify(userObj));
@@ -399,6 +461,10 @@
             loginTime: new Date().toISOString(),
             referral_share_id: sponsorShareId
           }));
+
+          if (window.V1_SESSION && typeof window.V1_SESSION.syncAndHealSession === 'function') {
+            window.V1_SESSION.syncAndHealSession();
+          }
         } catch (err) {
           console.warn('LocalStorage save notice:', err);
         }
@@ -413,75 +479,25 @@
           submitBtn.innerHTML = '<span>🟢 तुरंत शुरू करें/लॉगिन करें (Continue) &rarr;</span>';
         }
 
-        // 2. Broadcast Global Logged-in Event
+        // Broadcast Global Logged-in Event
         try {
+          if (typeof window.updateUniversalDrawerProfile === 'function') {
+            window.updateUniversalDrawerProfile();
+          }
           window.dispatchEvent(new CustomEvent('ai:user-logged-in', { detail: userObj }));
         } catch(e) {}
 
-        // 3. Execute Context Callback (e.g. play video, unlock webinar, join zoom)
+        // Execute Context Callback
         if (typeof pendingAuthCallback === 'function') {
           const cb = pendingAuthCallback;
           pendingAuthCallback = null;
           try { cb(userObj); } catch(e) { console.warn('Auth callback error:', e); }
         }
 
-        // 4. Background Non-Blocking Zero-Egress Database Sync (Supabase)
-        const db = getDb();
+        // Background Survey sync
         if (db) {
           (async () => {
             try {
-              const { data: existingProfile } = await db
-                .from('profiles')
-                .select('id, full_name, mobile, share_id')
-                .eq('mobile', mobile)
-                .limit(1)
-                .maybeSingle();
-
-              let sponsorProfileId = '52ef705c-bb45-4137-bee4-a3f8df73b676';
-              if (sponsorShareId !== 'AI000004') {
-                try {
-                  const { data: refUser } = await db.from('profiles').select('id').eq('share_id', sponsorShareId).limit(1).maybeSingle();
-                  if (refUser && refUser.id) sponsorProfileId = refUser.id;
-                } catch(e) {}
-              }
-
-              if (existingProfile) {
-                const officialDbName = (existingProfile.full_name && existingProfile.full_name.trim()) 
-                  ? existingProfile.full_name.trim() 
-                  : name;
-                const officialShareId = existingProfile.share_id || userUniqueShareId;
-
-                const syncedObj = {
-                  ...userObj,
-                  name: officialDbName,
-                  full_name: officialDbName,
-                  share_id: officialShareId
-                };
-
-                try {
-                  localStorage.setItem('aim_user_name', officialDbName);
-                  localStorage.setItem('AI_USER', JSON.stringify(syncedObj));
-                  localStorage.setItem('AI_PROFILE', JSON.stringify(syncedObj));
-                  localStorage.setItem('UCAS_USER', JSON.stringify(syncedObj));
-                } catch(e) {}
-
-                if (typeof window.updateUniversalDrawerProfile === 'function') {
-                  window.updateUniversalDrawerProfile();
-                }
-                window.dispatchEvent(new CustomEvent('ai:user-logged-in', { detail: syncedObj }));
-              } else {
-                await db.from('profiles').insert([{
-                  full_name: name,
-                  mobile: mobile,
-                  share_id: userUniqueShareId,
-                  referral_code: sponsorShareId,
-                  referral_mobile: sponsorShareId === 'AI000004' ? '7974422572' : null,
-                  referred_by: sponsorProfileId,
-                  registration_source: currentAuthOptions?.source || 'UniversalModal',
-                  profile_complete: false,
-                  is_active: true
-                }]);
-              }
 
               await db.from('surveys').insert([{
                 phone_number: mobile,
