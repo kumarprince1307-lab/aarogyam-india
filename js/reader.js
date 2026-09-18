@@ -362,8 +362,8 @@ async function verifyUserAccessAndSession(targetBookId) {
         }
     }
 
-    // Floating Buy Nudge Pill (Red Background, White Text, Pulse Effect, 10s Reappearance & Page Change Re-trigger)
-    if (!isUserPurchased) {
+    // Floating Buy Nudge Pill - Sirf Demo Book me dikhega, Main Book me nahi
+    if (isDemoMode && !isUserPurchased) {
         const targetMain = aoiCurrentBookData.targetMainBook || 
             (canonicalBookId ? canonicalBookId.replace(/^(DEMO_|DEMO-|BONUS_|BONUS-|FREE_|FREE-)/i, '') : 'BK001') || 'BK001';
         const parentBook = jsonBooks.find(b => b && b.id && b.id.toUpperCase() === String(targetMain).toUpperCase());
@@ -825,7 +825,7 @@ function changePage(targetPage, syncAudio = true, immediateAudio = true) {
     window.aoiPageNum = aoiPageNum;
     if (typeof resetZoomAndPan === 'function') resetZoomAndPan(false);
     if (typeof resetImmersiveTimer === 'function') resetImmersiveTimer();
-    if (typeof showFloatingBuyNudge === 'function') showFloatingBuyNudge();
+    if (typeof showFloatingBuyNudge === 'function' && typeof isDemoMode !== 'undefined' && isDemoMode) showFloatingBuyNudge();
     queueRenderPage(aoiPageNum);
     
     if (syncAudio) {
