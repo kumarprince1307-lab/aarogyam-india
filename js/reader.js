@@ -376,90 +376,130 @@ async function verifyUserAccessAndSession(targetBookId) {
     let pageImages = null;
 
     if (isDemoMode) {
-        // DEMO MODE: Check for specific demo reader allowed pages (e.g. 1, 2, 3, 5, 8, 12, 16 or 1-10)
-        const allowedPagesParam = (urlParams.get("pages") || aoiCurrentBookData.demo_reader_pages || aoiCurrentBookData.demoPages || '').trim();
-        const targetMain = (aoiCurrentBookData.targetMainBook || (canonicalBookId.replace(/^(DEMO_|DEMO-|BONUS_|BONUS-|FREE_|FREE-)/i, '')) || (canonicalBookId === 'BK002' ? 'BK002' : 'BK001')).toUpperCase();
-        
-        let parsedPageNumbers = [];
-        if (allowedPagesParam) {
-            allowedPagesParam.split(/[,;]+/).forEach(part => {
-                const clean = part.trim();
-                if (clean.includes('-')) {
-                    const [s, e] = clean.split('-').map(x => parseInt(x.trim(), 10));
-                    if (!isNaN(s) && !isNaN(e) && s <= e) {
-                        for (let p = s; p <= e; p++) {
-                            if (!parsedPageNumbers.includes(p)) parsedPageNumbers.push(p);
+        // 0. FIRST PRIORITY: Dedicated pages assembled in Audio Studio for this book (canonicalBookId)
+        let studioPages = null;
+        if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
+            studioPages = aoiCurrentBookData.pageImages;
+        }
+        if (!studioPages || !studioPages.length) {
+            try {
+                studioPages = await loadPagesFromIndexedDb(canonicalBookId);
+            } catch (e) {}
+        }
+        if (!studioPages || !studioPages.length) {
+            try {
+                const localPages = localStorage.getItem(`AOI_BOOK_PAGES_${canonicalBookId}`);
+                if (localPages) {
+                    const parsed = JSON.parse(localPages);
+                    if (Array.isArray(parsed) && parsed.length > 0) studioPages = parsed;
+                }
+            } catch (e) {}
+        }
+        if (!studioPages || !studioPages.length) {
+            const total = aoiCurrentBookData.totalPages || 0;
+            const basePath = aoiCurrentBookData.pageImagesPath || `images/books/${canonicalBookId}`;
+            if (aoiCurrentBookData.hasWebpPages && total > 0) {
+                studioPages = [];
+                for (let p = 1; p <= total; p++) {
+                    studioPages.push(`../${basePath}/${p}.webp`);
+                }
+            }
+        }
+
+        if (studioPages && studioPages.length > 0) {
+            // Audio Studio has configured dedicated pages for this book.
+            // Decoupled from landing page: changes on landing page will NEVER delete reader pages!
+            pageImages = studioPages.map(img => {
+                if (typeof img !== 'string') return img;
+                return img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('data:') || img.startsWith('..') ? img : ('../' + img));
+            });
+            window.aoiSourcePageMap = pageImages.map((_, i) => i + 1);
+        } else {
+            // SECOND PRIORITY (FALLBACK): Landing page previews or allowed pages
+            const allowedPagesParam = (urlParams.get("pages") || aoiCurrentBookData.demo_reader_pages || aoiCurrentBookData.demoPages || '').trim();
+            const targetMain = (aoiCurrentBookData.targetMainBook || (canonicalBookId.replace(/^(DEMO_|DEMO-|BONUS_|BONUS-|FREE_|FREE-)/i, '')) || (canonicalBookId === 'BK002' ? 'BK002' : 'BK001')).toUpperCase();
+            
+            let parsedPageNumbers = [];
+            if (allowedPagesParam) {
+                allowedPagesParam.split(/[,;]+/).forEach(part => {
+                    const clean = part.trim();
+                    if (clean.includes('-')) {
+                        const [s, e] = clean.split('-').map(x => parseInt(x.trim(), 10));
+                        if (!isNaN(s) && !isNaN(e) && s <= e) {
+                            for (let p = s; p <= e; p++) {
+                                if (!parsedPageNumbers.includes(p)) parsedPageNumbers.push(p);
+                            }
+                        }
+                    } else {
+                        const num = parseInt(clean, 10);
+                        if (!isNaN(num) && !parsedPageNumbers.includes(num)) {
+                            parsedPageNumbers.push(num);
                         }
                     }
-                } else {
-                    const num = parseInt(clean, 10);
-                    if (!isNaN(num) && !parsedPageNumbers.includes(num)) {
-                        parsedPageNumbers.push(num);
-                    }
-                }
-            });
-        }
-
-        const targetParentBook = jsonBooks.find(b => b && b.id && b.id.toUpperCase() === targetMain);
-        let rawPreviewImages = [];
-        if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
-            rawPreviewImages = aoiCurrentBookData.demoImages;
-        } else if (aoiCurrentBookData.demo_images && Array.isArray(aoiCurrentBookData.demo_images) && aoiCurrentBookData.demo_images.length > 0) {
-            rawPreviewImages = aoiCurrentBookData.demo_images;
-        } else if (aoiCurrentBookData.sample_preview && Array.isArray(aoiCurrentBookData.sample_preview.pages) && aoiCurrentBookData.sample_preview.pages.length > 0) {
-            rawPreviewImages = aoiCurrentBookData.sample_preview.pages.map(p => typeof p === 'object' ? p.image : p).filter(Boolean);
-        } else if (targetParentBook) {
-            if (targetParentBook.demo_images && Array.isArray(targetParentBook.demo_images) && targetParentBook.demo_images.length > 0) {
-                rawPreviewImages = targetParentBook.demo_images;
-            } else if (targetParentBook.demoImages && Array.isArray(targetParentBook.demoImages) && targetParentBook.demoImages.length > 0) {
-                rawPreviewImages = targetParentBook.demoImages;
-            } else if (targetParentBook.sample_preview && Array.isArray(targetParentBook.sample_preview.pages)) {
-                rawPreviewImages = targetParentBook.sample_preview.pages.map(p => typeof p === 'object' ? p.image : p).filter(Boolean);
+                });
             }
-        }
 
-        let combinedImages = [];
-        let sourceMap = [];
+            const targetParentBook = jsonBooks.find(b => b && b.id && b.id.toUpperCase() === targetMain);
+            let rawPreviewImages = [];
+            if (aoiCurrentBookData.demoImages && Array.isArray(aoiCurrentBookData.demoImages) && aoiCurrentBookData.demoImages.length > 0) {
+                rawPreviewImages = aoiCurrentBookData.demoImages;
+            } else if (aoiCurrentBookData.demo_images && Array.isArray(aoiCurrentBookData.demo_images) && aoiCurrentBookData.demo_images.length > 0) {
+                rawPreviewImages = aoiCurrentBookData.demo_images;
+            } else if (aoiCurrentBookData.sample_preview && Array.isArray(aoiCurrentBookData.sample_preview.pages) && aoiCurrentBookData.sample_preview.pages.length > 0) {
+                rawPreviewImages = aoiCurrentBookData.sample_preview.pages.map(p => typeof p === 'object' ? p.image : p).filter(Boolean);
+            } else if (targetParentBook) {
+                if (targetParentBook.demo_images && Array.isArray(targetParentBook.demo_images) && targetParentBook.demo_images.length > 0) {
+                    rawPreviewImages = targetParentBook.demo_images;
+                } else if (targetParentBook.demoImages && Array.isArray(targetParentBook.demoImages) && targetParentBook.demoImages.length > 0) {
+                    rawPreviewImages = targetParentBook.demoImages;
+                } else if (targetParentBook.sample_preview && Array.isArray(targetParentBook.sample_preview.pages)) {
+                    rawPreviewImages = targetParentBook.sample_preview.pages.map(p => typeof p === 'object' ? p.image : p).filter(Boolean);
+                }
+            }
 
-        // 1. Add all sample preview images (resolved with proper ../ relative path)
-        if (rawPreviewImages && rawPreviewImages.length > 0) {
-            rawPreviewImages.forEach((img, idx) => {
-                if (img && typeof img === 'string') {
-                    const cleanPath = img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('data:') || img.startsWith('..') ? img : ('../' + img));
-                    if (!combinedImages.includes(cleanPath)) {
+            let combinedImages = [];
+            let sourceMap = [];
+
+            // 1. Add all sample preview images (resolved with proper ../ relative path)
+            if (rawPreviewImages && rawPreviewImages.length > 0) {
+                rawPreviewImages.forEach((img, idx) => {
+                    if (img && typeof img === 'string') {
+                        const cleanPath = img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('data:') || img.startsWith('..') ? img : ('../' + img));
+                        if (!combinedImages.includes(cleanPath)) {
+                            combinedImages.push(cleanPath);
+                            sourceMap.push(idx + 1);
+                        }
+                    }
+                });
+            }
+
+            // 2. Add selected specific main book pages
+            if (parsedPageNumbers.length > 0) {
+                parsedPageNumbers.forEach(p => {
+                    const pagePath = `../images/books/${targetMain}/${p}.webp`;
+                    if (!combinedImages.includes(pagePath)) {
+                        combinedImages.push(pagePath);
+                        sourceMap.push(p);
+                    }
+                });
+            } else if (combinedImages.length === 0) {
+                if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
+                    aoiCurrentBookData.pageImages.slice(0, 5).forEach((img, idx) => {
+                        const cleanPath = img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('data:') || img.startsWith('..') ? img : ('../' + img));
                         combinedImages.push(cleanPath);
                         sourceMap.push(idx + 1);
-                    }
+                    });
+                } else {
+                    [1, 2, 3, 4, 5].forEach(p => {
+                        combinedImages.push(`../images/books/${targetMain}/${p}.webp`);
+                        sourceMap.push(p);
+                    });
                 }
-            });
-        }
-
-        // 2. Add selected specific main book pages
-        if (parsedPageNumbers.length > 0) {
-            parsedPageNumbers.forEach(p => {
-                const pagePath = `../images/books/${targetMain}/${p}.webp`;
-                if (!combinedImages.includes(pagePath)) {
-                    combinedImages.push(pagePath);
-                    sourceMap.push(p);
-                }
-            });
-        } else if (combinedImages.length === 0) {
-            if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
-                aoiCurrentBookData.pageImages.slice(0, 5).forEach((img, idx) => {
-                    const cleanPath = img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('data:') || img.startsWith('..') ? img : ('../' + img));
-                    combinedImages.push(cleanPath);
-                    sourceMap.push(idx + 1);
-                });
-            } else {
-                [1, 2, 3, 4, 5].forEach(p => {
-                    combinedImages.push(`../images/books/${targetMain}/${p}.webp`);
-                    sourceMap.push(p);
-                });
             }
-        }
 
-        pageImages = combinedImages;
-        window.aoiSourcePageMap = sourceMap;
+            pageImages = combinedImages;
+            window.aoiSourcePageMap = sourceMap;
+        }
     } else {
         // MAIN BOOK MODE: load FULL book pages (152 pages for BK001, 118 pages for BK002, etc.)
         if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
@@ -657,7 +697,12 @@ function renderPage(num) {
         if (aoiCanvas) aoiCanvas.style.display = 'none';
         if (pageImgEl) {
             pageImgEl.style.display = 'block';
-            pageImgEl.src = aoiPageImagesList[num - 1];
+            let imgSrc = aoiPageImagesList[num - 1];
+            if (imgSrc && typeof imgSrc === 'string' && !imgSrc.startsWith('data:') && !imgSrc.includes('?v=')) {
+                const bookVer = aoiCurrentBookData?.version || aoiCurrentBookData?.updated_at || '2026';
+                imgSrc += (imgSrc.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(bookVer);
+            }
+            pageImgEl.src = imgSrc;
             
             const container = document.getElementById('canvasContainer');
             if (aoiScale === 1.2) {
