@@ -3331,7 +3331,7 @@
     },
     {
       "id": "DEMO-BK002",
-      "updated_at": "2026-09-18T18:31:57.734Z",
+      "updated_at": "2026-09-18T19:15:29.963Z",
       "admin_edited": true,
       "slug": "demo-bk002",
       "book_type": "demo",
@@ -3352,6 +3352,7 @@
         "ebook_store",
         "category_page",
         "my_library",
+        "home_page",
         "home_hero",
         "free_shelf",
         "demo_shelf",
@@ -3429,7 +3430,7 @@
             "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
           }
         ],
-        "offer_callout": "",
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
         "bgm_enabled": true
       },
       "mainPdf": "",
@@ -3539,8 +3540,8 @@
         "/images/books/kheti-dr-demo-4.webp",
         "/images/books/kheti-dr-demo-5.webp"
       ],
-      "demo_reader_pages": "9, 41, 51, 71, 75, 89, 93, 97, 117",
-      "demoPages": "9, 41, 51, 71, 75, 89, 93, 97, 117",
+      "demo_reader_pages": "1, 2, 3, 5, 8, 12, 16",
+      "demoPages": "1, 2, 3, 5, 8, 12, 16",
       "suggested_books_list": [
         {
           "image": "/images/books/kharif-master-guide-2026-cover.webp",
