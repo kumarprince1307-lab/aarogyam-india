@@ -199,6 +199,71 @@ async function verifyUserAccessAndSession(targetBookId) {
                        canonicalBookId.startsWith('BONUS') || 
                        canonicalBookId.startsWith('FREE');
 
+    let isUserPurchased = false;
+    let _buyNudgeTimer = null;
+
+    function showFloatingBuyNudge() {
+        if (_buyNudgeTimer) {
+            clearTimeout(_buyNudgeTimer);
+            _buyNudgeTimer = null;
+        }
+        const buyNudge = document.getElementById('aiFloatingBuyNudge');
+        if (buyNudge) {
+            buyNudge.style.display = 'flex';
+            buyNudge.classList.remove('nudge-hidden');
+        }
+    }
+
+    function hideFloatingBuyNudge(scheduleReappear = true) {
+        const buyNudge = document.getElementById('aiFloatingBuyNudge');
+        if (buyNudge) {
+            buyNudge.classList.add('nudge-hidden');
+        }
+        if (_buyNudgeTimer) {
+            clearTimeout(_buyNudgeTimer);
+            _buyNudgeTimer = null;
+        }
+        if (scheduleReappear) {
+            // User requirement: "cross karne me 10 sec me fir aa jaye"
+            _buyNudgeTimer = setTimeout(() => {
+                showFloatingBuyNudge();
+            }, 10000);
+        }
+    }
+
+    function setupFloatingBuyNudge(checkoutUrl, bookPrice) {
+        let buyNudge = document.getElementById('aiFloatingBuyNudge');
+        if (!buyNudge) {
+            buyNudge = document.createElement('div');
+            buyNudge.id = 'aiFloatingBuyNudge';
+            buyNudge.className = 'ai-floating-buy-nudge';
+            buyNudge.innerHTML = `
+                <a href="${checkoutUrl}" class="ai-buy-nudge-link">
+                    <span class="nudge-pulse-dot">⚡</span>
+                    <span class="nudge-text">इस शानदार बुक को अभी खरीदें (मात्र ₹${bookPrice})</span>
+                    <span class="nudge-arrow">👉</span>
+                </a>
+                <button type="button" class="nudge-close-btn" id="closeBuyNudgeBtn" title="बंद करें" aria-label="बंद करें">&times;</button>
+            `;
+            document.body.appendChild(buyNudge);
+
+            buyNudge.querySelector('#closeBuyNudgeBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                hideFloatingBuyNudge(true);
+            });
+        } else {
+            const link = buyNudge.querySelector('.ai-buy-nudge-link');
+            if (link) link.href = checkoutUrl;
+            const txt = buyNudge.querySelector('.nudge-text');
+            if (txt) txt.textContent = `इस शानदार बुक को अभी खरीदें (मात्र ₹${bookPrice})`;
+        }
+        showFloatingBuyNudge();
+    }
+
+    window.showFloatingBuyNudge = showFloatingBuyNudge;
+    window.hideFloatingBuyNudge = hideFloatingBuyNudge;
+
     const bookTitle = aoiCurrentBookData.heading || aoiCurrentBookData.name || "Aarogyam India eBook";
     if (bookHeading) bookHeading.textContent = bookTitle + (isDemoMode ? " (Demo)" : "");
     if (loaderBookTitle) loaderBookTitle.textContent = bookTitle;
@@ -291,8 +356,20 @@ async function verifyUserAccessAndSession(targetBookId) {
 
             if (error || !data) {
                 console.warn("No purchase record in DB, proceeding with local access...");
+            } else {
+                isUserPurchased = true;
             }
         }
+    }
+
+    // Floating Buy Nudge Pill (Red Background, White Text, Pulse Effect, 10s Reappearance & Page Change Re-trigger)
+    if (!isUserPurchased) {
+        const targetMain = aoiCurrentBookData.targetMainBook || 
+            (canonicalBookId ? canonicalBookId.replace(/^(DEMO_|DEMO-|BONUS_|BONUS-|FREE_|FREE-)/i, '') : 'BK001') || 'BK001';
+        const parentBook = jsonBooks.find(b => b && b.id && b.id.toUpperCase() === String(targetMain).toUpperCase());
+        const bookPrice = aoiCurrentBookData.offerPrice || parentBook?.offerPrice || 99;
+        const checkoutUrl = `/ebooks/checkout.html?product=${encodeURIComponent(targetMain)}`;
+        setupFloatingBuyNudge(checkoutUrl, bookPrice);
     }
 
     // Check for WebP / Image Pages first (Smart HD Fast Engine)
@@ -701,6 +778,9 @@ function changePage(targetPage, syncAudio = true, immediateAudio = true) {
     
     aoiPageNum = targetPage;
     window.aoiPageNum = aoiPageNum;
+    if (typeof resetZoomAndPan === 'function') resetZoomAndPan(false);
+    if (typeof resetImmersiveTimer === 'function') resetImmersiveTimer();
+    if (typeof showFloatingBuyNudge === 'function') showFloatingBuyNudge();
     queueRenderPage(aoiPageNum);
     
     if (syncAudio) {
@@ -874,28 +954,113 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-// Touch Swipe Navigation for Mobile
+// =======================================================
+// SMOOTH PINCH-TO-ZOOM, DOUBLE-TAP, PAN & SWIPE ENGINE
+// =======================================================
 let touchStartX = 0;
 let touchStartY = 0;
+let initialPinchDistance = 0;
+let currentZoomScale = 1.0;
+let currentPanX = 0;
+let currentPanY = 0;
+let lastPanX = 0;
+let lastPanY = 0;
+let isPinching = false;
+let lastTapTime = 0;
+
+function updateCanvasTransform(animate = false) {
+    const pageImg = document.getElementById('pageImage');
+    const pdfCanvasEl = document.getElementById('pdfCanvas');
+    const target = (pageImg && pageImg.style.display !== 'none') ? pageImg : pdfCanvasEl;
+    if (!target) return;
+
+    target.style.transition = animate ? 'transform 0.25s cubic-bezier(0.2, 0, 0.2, 1)' : 'none';
+    target.style.transformOrigin = 'center center';
+    target.style.transform = `scale(${currentZoomScale}) translate(${currentPanX}px, ${currentPanY}px)`;
+}
+
+function resetZoomAndPan(animate = true) {
+    currentZoomScale = 1.0;
+    currentPanX = 0;
+    currentPanY = 0;
+    lastPanX = 0;
+    lastPanY = 0;
+    isPinching = false;
+    updateCanvasTransform(animate);
+}
+
 const readerContainerEl = document.getElementById("readerContainer");
 
 if (readerContainerEl) {
     readerContainerEl.addEventListener("touchstart", (e) => {
-        if (e.touches && e.touches.length === 1) {
+        if (e.touches && e.touches.length === 2) {
+            isPinching = true;
+            initialPinchDistance = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+        } else if (e.touches && e.touches.length === 1) {
+            const now = Date.now();
+            if (now - lastTapTime < 300) {
+                // Double Tap Zoom In / Reset
+                if (currentZoomScale > 1.2) {
+                    resetZoomAndPan(true);
+                } else {
+                    currentZoomScale = 2.0;
+                    currentPanX = 0;
+                    currentPanY = 0;
+                    updateCanvasTransform(true);
+                }
+                lastTapTime = 0;
+                return;
+            }
+            lastTapTime = now;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
+            lastPanX = currentPanX;
+            lastPanY = currentPanY;
+        }
+    }, { passive: true });
+
+    readerContainerEl.addEventListener("touchmove", (e) => {
+        if (isPinching && e.touches && e.touches.length === 2) {
+            const currentDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            if (initialPinchDistance > 0) {
+                const ratio = currentDist / initialPinchDistance;
+                currentZoomScale = Math.max(0.95, Math.min(3.5, currentZoomScale * ratio));
+                initialPinchDistance = currentDist;
+                updateCanvasTransform(false);
+            }
+        } else if (e.touches && e.touches.length === 1 && currentZoomScale > 1.1) {
+            // Pan zoomed image
+            const deltaX = (e.touches[0].clientX - touchStartX) / currentZoomScale;
+            const deltaY = (e.touches[0].clientY - touchStartY) / currentZoomScale;
+            currentPanX = lastPanX + deltaX;
+            currentPanY = lastPanY + deltaY;
+            updateCanvasTransform(false);
         }
     }, { passive: true });
 
     readerContainerEl.addEventListener("touchend", (e) => {
-        if (e.changedTouches && e.changedTouches.length === 1) {
+        if (isPinching) {
+            isPinching = false;
+            if (currentZoomScale <= 1.05) {
+                resetZoomAndPan(true);
+            }
+            return;
+        }
+
+        if (e.changedTouches && e.changedTouches.length === 1 && currentZoomScale <= 1.05) {
             const touchEndX = e.changedTouches[0].clientX;
             const touchEndY = e.changedTouches[0].clientY;
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
 
-            // Horizontal swipe detected (min 60px distance and mostly horizontal)
-            if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+            // Horizontal swipe detected (min 50px distance and predominantly horizontal)
+            if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY) * 1.35) {
                 if (diffX < 0) {
                     onNextPage(); // Swiped Left -> Next Page
                 } else {
@@ -905,6 +1070,69 @@ if (readerContainerEl) {
         }
     }, { passive: true });
 }
+
+// =======================================================
+// 5-SECOND INACTIVITY IMMERSIVE FULLSCREEN AUTO-HIDE
+// =======================================================
+let _immersiveInactivityTimer = null;
+
+function resetImmersiveTimer() {
+    clearTimeout(_immersiveInactivityTimer);
+
+    // If currently in immersive mode, smoothly restore all controls
+    if (document.body.classList.contains('immersive-mode')) {
+        document.body.classList.remove('immersive-mode');
+        const abBar = document.getElementById('audioBookBar');
+        if (abBar) abBar.classList.remove('minimized');
+    }
+
+    _immersiveInactivityTimer = setTimeout(() => {
+        const videoModal = document.getElementById('ai-book-video-modal-overlay');
+        const browserModal = document.getElementById('ai-open-in-browser-modal');
+        const shareModal = document.getElementById('shareBookModal');
+        if (videoModal || browserModal || (shareModal && shareModal.style.display !== 'none')) {
+            return;
+        }
+
+        document.body.classList.add('immersive-mode');
+        const abBar = document.getElementById('audioBookBar');
+        if (abBar && abBar.classList.contains('open')) {
+            abBar.classList.add('minimized');
+        }
+    }, 5000);
+}
+
+['touchstart', 'click', 'mousemove', 'keydown'].forEach(evt => {
+    window.addEventListener(evt, resetImmersiveTimer, { passive: true });
+});
+
+// Click on minimized floating pill restores full audio controls
+document.addEventListener('click', (e) => {
+    const minBar = e.target.closest('.audio-book-bar.minimized');
+    if (minBar) {
+        minBar.classList.remove('minimized');
+        document.body.classList.remove('immersive-mode');
+        resetImmersiveTimer();
+    }
+});
+
+// Start initial immersive timer
+resetImmersiveTimer();
+
+// Animated Swipe Tutorial Hint (shows once per session)
+setTimeout(() => {
+    if (!sessionStorage.getItem('AIM_SWIPE_HINT_SHOWN')) {
+        sessionStorage.setItem('AIM_SWIPE_HINT_SHOWN', 'true');
+        const hint = document.createElement('div');
+        hint.id = 'aiSwipeTutorialHint';
+        hint.innerHTML = '👈 स्वाइप करके पन्ने पलटें 👉';
+        document.body.appendChild(hint);
+        setTimeout(() => {
+            hint.style.opacity = '0';
+            setTimeout(() => hint.remove(), 600);
+        }, 3500);
+    }
+}, 1200);
 
 function showErrorScreen() {
     if (loadingIndicator) loadingIndicator.style.display = "none";

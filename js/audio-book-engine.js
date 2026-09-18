@@ -269,7 +269,7 @@ class ProAudioBookEngine {
         const isFbOrInApp = /FBAN|FBAV|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
 
         if (isFbOrInApp) {
-            this.showOpenInBrowserModal();
+            this.showOpenInBrowserModal(true);
         } else {
             const oldToast = document.getElementById('aiTtsMissingToast');
             if (oldToast) oldToast.remove();
@@ -282,8 +282,8 @@ class ProAudioBookEngine {
         }
     }
 
-    showOpenInBrowserModal() {
-        if (sessionStorage.getItem('AIM_BROWSER_MODAL_DISMISSED')) return;
+    showOpenInBrowserModal(force = false) {
+        if (!force && sessionStorage.getItem('AIM_BROWSER_MODAL_DISMISSED')) return;
         if (document.getElementById('ai-open-in-browser-modal')) return;
 
         const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
@@ -982,7 +982,15 @@ class ProAudioBookEngine {
         }
 
         // Attach UI Event Listeners
-        document.getElementById('abPlayBtn').addEventListener('click', () => this.togglePlay());
+        document.getElementById('abPlayBtn').addEventListener('click', () => {
+            const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+            const isFbOrInApp = /FBAN|FBAV|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
+            if (isFbOrInApp && !this.isPageRecordedAudio) {
+                this.showOpenInBrowserModal(true);
+                return;
+            }
+            this.togglePlay();
+        });
         
         document.getElementById('abPrevBtn').addEventListener('click', () => {
             if (typeof window.onPrevPage === 'function') {
@@ -1018,6 +1026,12 @@ class ProAudioBookEngine {
         });
 
         floatBtn.addEventListener('click', () => {
+            const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+            const isFbOrInApp = /FBAN|FBAV|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
+            if (isFbOrInApp && !this.isPageRecordedAudio) {
+                this.showOpenInBrowserModal(true);
+                return;
+            }
             bar.classList.toggle('open');
             if (bar.classList.contains('open') && !this.isPlaying) {
                 this.playCurrentPage();
