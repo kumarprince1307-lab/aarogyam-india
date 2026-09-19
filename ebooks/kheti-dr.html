@@ -2010,50 +2010,44 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 </div>
 
   <!-- ==========================================================
-       FLOATING DEMO BUTTON (RED BLINKING WITH BOOK & HEADPHONE ICONS)
+       DISABLED FLOATING BUTTONS (REMOVED CLUTTER AS REQUESTED)
        ========================================================== -->
-  <a id="floating-free-demo-btn" href="javascript:void(0)" onclick="openDemoReaderWithAuth('DEMO-BK002')" class="floating-demo-blink-btn" style="background: #dc2626 !important; color: #ffffff !important;" title="मुफ्त डेमो पढ़ें / सुनें">
+  <a id="floating-free-demo-btn" href="javascript:void(0)" onclick="openDemoReaderWithAuth('DEMO-BK002')" class="floating-demo-blink-btn" style="display: none !important;" title="मुफ्त डेमो पढ़ें / सुनें">
     <i class="fa-solid fa-book-open"></i> <span>फ्री डेमो पढ़ें / सुनें</span> <i class="fa-solid fa-headphones"></i>
   </a>
 
-  <!-- ==========================================================
-       FLOATING WHATSAPP HELP (BUY NOW KE THEEK UPAR RIGHT MEIN)
-       ========================================================== -->
-  <a id="sticky-help-btn" href="https://wa.me/917974422572?text=Hello%20Aarogyam%20India%20Team" target="_blank" rel="noopener" class="floating-wa-help-btn" title="WhatsApp पर सहायता लें">
+  <a id="sticky-help-btn" href="https://wa.me/917974422572?text=Hello%20Aarogyam%20India%20Team" target="_blank" rel="noopener" class="floating-wa-help-btn" style="display: none !important;" title="WhatsApp पर सहायता लें">
     <i class="fa-brands fa-whatsapp"></i>
     <span class="floating-wa-tooltip">मदद?</span>
   </a>
 
-  <!-- ==========================================================
-       FLOATING PWA INSTALL APP BUTTON (STICKY FOOTER KE UPAR, AUDIO KE NICHE)
-       ========================================================== -->
-  <button type="button" id="floating-pwa-install-btn" onclick="window.triggerPWAInstall()" class="floating-pwa-install-btn" title="Aarogyam App इंस्टॉल करें">
+  <button type="button" id="floating-pwa-install-btn" onclick="window.triggerPWAInstall()" class="floating-pwa-install-btn" style="display: none !important;" title="Aarogyam App इंस्टॉल करें">
     <i class="fa-solid fa-mobile-screen-button"></i> <span>Install App</span>
   </button>
 
 <!-- ==========================================================
-     MASTER MOBILE STICKY BUY BAR (RESPONSIVE INNER CONTAINER)
+     STREAMLINED PREMIUM MOBILE STICKY BUY BAR (ENLARGED & CLEAN UX)
      ========================================================== -->
 <div id="ubl-mobile-sticky-bar" class="mobile-sticky-bar">
   <div class="mobile-sticky-bar-inner">
-    <!-- 1. BOOK THUMBNAIL -->
-    <img id="sticky-thumb-img" src="../images/books/fasal-ka-doctor-cover.webp" alt="Kheti Ka Doctor" class="sticky-thumb-img">
+    <!-- 1. ENLARGED CRISP BOOK THUMBNAIL -->
+    <img id="sticky-thumb-img" src="../images/books/fasal-ka-doctor-cover.webp" alt="खेती का डॉक्टर" class="sticky-thumb-img">
 
-    <!-- 2. PRICING: BLACK BOLD STRIKETHROUGH MRP + VIBRANT OFFER PRICE -->
+    <!-- 2. PRICING: ₹199 KATA HUA + ₹99 OFFER PRICE -->
     <div class="mobile-book-preview">
       <h4 id="sticky-book-title" style="display: none !important;">खेती का डॉक्टर</h4>
       <div class="mobile-book-price">
-        <span id="sticky-mrp-val" class="old-price">₹299</span>
+        <span id="sticky-mrp-val" class="old-price">₹199</span>
         <strong id="sticky-price-val" class="offer-price">₹99</strong>
       </div>
     </div>
 
-    <!-- 3. BUY NOW BUTTON (JUST BAGAL MEIN) -->
+    <!-- 3. LARGE TOUCH-FRIENDLY BUY NOW BUTTON -->
     <a id="sticky-buy-btn" href="checkout.html?id=BK002" class="sticky-buy-btn">
       🛒 Buy Now
     </a>
 
-    <!-- 4. SHARE BUTTON (USKE BAAD) -->
+    <!-- 4. CLEAR SHARE BUTTON -->
     <button class="sticky-share-btn" id="mobileShareButton" type="button" data-share-button="true" data-share-target="native" data-asset-type="book" data-asset-id="kheti-dr">
       <i class="fa-solid fa-share-nodes"></i> Share
     </button>
@@ -2151,13 +2145,13 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   </div>
 </div>
 
-<!-- LIVE PURCHASE NOTIFICATION TICKER -->
-<div id="live-purchase-toast" style="position: fixed; bottom: 85px; left: 20px; background: #ffffff; color: #1e293b; border: 1.5px solid #22c55e; border-radius: 12px; padding: 10px 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; display: flex; align-items: center; gap: 12px; max-width: 320px; transition: transform 0.4s ease, opacity 0.4s ease; transform: translateY(150%); opacity: 0; pointer-events: none;">
-  <img src="../images/books/fasal-ka-doctor-cover.webp" alt="Book" style="width: 40px; height: 52px; object-fit: cover; border-radius: 6px; flex-shrink: 0;" />
+<!-- LIVE PURCHASE NOTIFICATION TICKER (RIGHT SIDE BELOW HEADER) -->
+<div id="live-purchase-toast" style="position: fixed; top: 58px; right: 12px; bottom: auto; left: auto; background: #ffffff; color: #1e293b; border: 1.5px solid #22c55e; border-radius: 12px; padding: 8px 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.18); z-index: 9999; display: flex; align-items: center; gap: 10px; max-width: 300px; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; transform: translateY(-20px); opacity: 0; pointer-events: none;">
+  <img src="../images/books/fasal-ka-doctor-cover.webp" alt="Book" style="width: 38px; height: 50px; object-fit: cover; border-radius: 5px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" />
   <div>
-    <div style="font-size: 0.8rem; font-weight: 800; color: #15803d;" id="toast-user-name">🧑‍🌾 रामेश्वर पटेल (मध्य प्रदेश)</div>
-    <div style="font-size: 0.75rem; color: #334155; margin-top: 2px;">ने अभी <strong>'खेती का डॉक्टर'</strong> ई-बुक खरीदी</div>
-    <small style="font-size: 0.68rem; color: #94a3b8;" id="toast-time">2 मिनट पहले • Verified Purchase</small>
+    <div style="font-size: 0.78rem; font-weight: 800; color: #15803d; line-height: 1.2;" id="toast-user-name">🧑‍🌾 रामेश्वर पटेल (मध्य प्रदेश)</div>
+    <div style="font-size: 0.72rem; color: #334155; margin-top: 2px;">ने अभी <strong>'खेती का डॉक्टर'</strong> ई-बुक खरीदी</div>
+    <small style="font-size: 0.66rem; color: #94a3b8;" id="toast-time">2 मिनट पहले • Verified Purchase</small>
   </div>
 </div>
 
@@ -2455,7 +2449,7 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
       toast.style.opacity = '1';
 
       setTimeout(() => {
-        toast.style.transform = 'translateY(150%)';
+        toast.style.transform = 'translateY(-20px)';
         toast.style.opacity = '0';
       }, 4500);
 
@@ -2781,22 +2775,213 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(4) { animation: aoiWaveAnim 0.7s ease-in-out infinite 0.1s; }
 #landingWaveContainer.playing .aoi-wave-bar:nth-child(5) { animation: aoiWaveAnim 0.85s ease-in-out infinite 0.25s; }
 
-/* Floating Audio Pill Position (Left Side Above Install App Button) */
+/* ==========================================================
+   FLOATING AUDIO PILL (BELOW HEADER ON LEFT)
+   ========================================================== */
+#aoi-floating-audio-pill {
+  position: fixed !important;
+  top: 58px !important;
+  left: 12px !important;
+  bottom: auto !important;
+  right: auto !important;
+  z-index: 9999 !important;
+  background: rgba(15, 23, 42, 0.94) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1.5px solid #fbbf24 !important;
+  border-radius: 40px !important;
+  padding: 6px 14px !important;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45), 0 0 16px rgba(245, 158, 11, 0.25) !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
 @media (max-width: 768px) {
   #aoi-floating-audio-pill {
-    bottom: 118px !important;
-    left: 12px !important;
+    top: 56px !important;
+    left: 8px !important;
+    bottom: auto !important;
     right: auto !important;
-    padding: 6px 12px !important;
-    gap: 8px !important;
+    padding: 5px 10px !important;
+    gap: 6px !important;
     z-index: 99999 !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(245,158,11,0.4) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(245, 158, 11, 0.3) !important;
+  }
+}
+
+/* ==========================================================
+   STREAMLINED PREMIUM MOBILE STICKY BUY BAR OVERRIDES
+   ========================================================== */
+.mobile-sticky-bar {
+  position: fixed !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  background: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 -4px 22px rgba(0, 0, 0, 0.14) !important;
+  border-top: 1px solid #e2e8f0 !important;
+  z-index: 9997 !important;
+  box-sizing: border-box !important;
+  height: 68px !important;
+}
+
+.mobile-sticky-bar-inner {
+  width: 100% !important;
+  max-width: 600px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+}
+
+/* ENLARGED CRISP BOOK COVER */
+.sticky-thumb-img {
+  width: 42px !important;
+  height: 56px !important;
+  border-radius: 6px !important;
+  object-fit: cover !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25) !important;
+  flex-shrink: 0 !important;
+  display: block !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+}
+
+.mobile-book-preview {
+  display: flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  min-width: 0 !important;
+}
+
+.mobile-book-price {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+}
+
+/* ₹199 KATA HUA (BIGGER BOLD RED STRIKETHROUGH) */
+.mobile-book-price .old-price {
+  font-size: 16px !important;
+  color: #dc2626 !important;
+  text-decoration: line-through !important;
+  text-decoration-color: #dc2626 !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+/* ₹99 OFFER PRICE (GREEN, SIDE-BY-SIDE IN BAJAL) */
+.mobile-book-price .offer-price {
+  font-size: 23px !important;
+  font-weight: 900 !important;
+  color: #16a34a !important;
+  line-height: 1 !important;
+  letter-spacing: -0.4px !important;
+}
+
+/* ENLARGED PROMINENT BUY NOW BUTTON (WIDER, VIBRANT ORANGE) */
+.sticky-buy-btn {
+  flex: 2 1 auto !important;
+  max-width: 190px !important;
+  min-width: 130px !important;
+  height: 48px !important;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, #ff7a00, #ea580c) !important;
+  color: #ffffff !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 15px rgba(234, 88, 12, 0.45) !important;
+  white-space: nowrap !important;
+  padding: 0 14px !important;
+  transition: transform 0.15s, box-shadow 0.15s !important;
+}
+.sticky-buy-btn:active {
+  transform: scale(0.97) !important;
+}
+
+/* CLEAR COMPACT SHARE BUTTON */
+.sticky-share-btn {
+  width: 65px !important;
+  min-width: 56px !important;
+  height: 48px !important;
+  border-radius: 10px !important;
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  border: none !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.28) !important;
+  white-space: nowrap !important;
+  padding: 0 6px !important;
+  transition: transform 0.15s !important;
+}
+.sticky-share-btn:active {
+  transform: scale(0.97) !important;
+}
+
+/* STRICT DISABLE OF CONFUSING FLOATING BUTTONS */
+#floating-free-demo-btn,
+#sticky-help-btn,
+#floating-pwa-install-btn {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* RESPONSIVE FINE-TUNING */
+@media (max-width: 400px) {
+  .mobile-sticky-bar {
+    padding: 6px 8px !important;
+    height: 66px !important;
+  }
+  .sticky-thumb-img {
+    width: 36px !important;
+    height: 50px !important;
+  }
+  .mobile-book-price {
+    gap: 4px !important;
+  }
+  .mobile-book-price .offer-price {
+    font-size: 20px !important;
+  }
+  .mobile-book-price .old-price {
+    font-size: 14px !important;
+  }
+  .sticky-buy-btn {
+    height: 46px !important;
+    font-size: 15px !important;
+    min-width: 115px !important;
+    padding: 0 10px !important;
+  }
+  .sticky-share-btn {
+    height: 46px !important;
+    width: 56px !important;
+    font-size: 12px !important;
   }
 }
 </style>
 
-<!-- Floating Mini Audio Player Pill (Active on Scroll - Left Side Above Install App) -->
-<div id="aoi-floating-audio-pill" style="display: none; position: fixed; bottom: 118px; left: 12px; right: auto; z-index: 9999; background: rgba(20, 2, 2, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid #fbbf24; border-radius: 40px; padding: 8px 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(245,158,11,0.3); align-items: center; gap: 10px;">
+<!-- Floating Mini Audio Player Pill (Active on Scroll - Placed Below Header) -->
+<div id="aoi-floating-audio-pill" style="display: none; position: fixed; top: 58px; left: 12px; bottom: auto; right: auto; z-index: 9999; background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.5px solid #fbbf24; border-radius: 40px; padding: 6px 14px; box-shadow: 0 6px 22px rgba(0,0,0,0.45), 0 0 16px rgba(245,158,11,0.25); align-items: center; gap: 8px;">
   <span style="font-size: 1.1rem;">🎙️</span>
   <span style="font-size: 0.8rem; font-weight: 800; color: #fef08a; white-space: nowrap;">ऑडियो चालू है</span>
   <button type="button" onclick="stopLandingAudioBook()" style="background: rgba(220,38,38,0.85); color: #fff; border: 1px solid #fca5a5; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; padding: 0;" title="रोकें">
