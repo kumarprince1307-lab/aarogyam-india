@@ -240,30 +240,56 @@ async function fetchBookData(bookId) {
 }
 
 async function fetchPurchaseRecord(userId, bookId) {
-    // 1. Check local purchases cache
+    const cleanId = String(bookId || '').toUpperCase().trim();
+    const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
+    
+    // 1. Check Supabase first for absolute source of truth
+    if (client) {
+        try {
+            // First check by profile_id
+            if (userId && !String(userId).startsWith('local_usr_')) {
+                const { data, error } = await client
+                    .from('purchases')
+                    .select('id, profile_id, book_id, amount, payment_status, download_count, created_at')
+                    .eq('profile_id', userId)
+                    .eq('book_id', cleanId)
+                    .maybeSingle();
+                    
+                if (!error && data) return data;
+            }
+
+            // Fallback: Check if user has a mobile number and query via customer mobile
+            const userMobile = state.userData?.mobile || localStorage.getItem('user_mobile');
+            if (userMobile) {
+                const { data: profData } = await client
+                    .from('profiles')
+                    .select('id')
+                    .eq('mobile', userMobile)
+                    .maybeSingle();
+                
+                if (profData?.id) {
+                    const { data: pData } = await client
+                        .from('purchases')
+                        .select('id, profile_id, book_id, amount, payment_status, download_count, created_at')
+                        .eq('profile_id', profData.id)
+                        .eq('book_id', cleanId)
+                        .maybeSingle();
+                    if (pData) return pData;
+                }
+            }
+        } catch(e) {
+            console.warn('Supabase purchase fetch warning:', e);
+        }
+    }
+
+    // 2. Check local purchases cache
     try {
-        const localPurchases = JSON.parse(localStorage.getItem('aarogyam_purchases') || '[]');
-        const cleanId = String(bookId || '').toUpperCase().trim();
+        const localPurchases = JSON.parse(localStorage.getItem('aarogyam_purchases') || localStorage.getItem('AI_PURCHASES') || '[]');
         const found = localPurchases.find(p => (p.book_id || '').toUpperCase().trim() === cleanId);
         if (found) return found;
     } catch(e) {}
 
-    // 2. Check Supabase
-    const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
-    if (!client) return null;
-
-    const { data, error } = await client
-        .from('purchases')
-        .select('id, profile_id, book_id, amount, payment_status, download_count, created_at')
-        .eq('profile_id', userId)
-        .eq('book_id', bookId)
-        .maybeSingle();
-        
-    if (error) {
-        console.warn('Purchase record fetch warning:', error.message);
-        return null; 
-    }
-    return data;
+    return null;
 }
 
 

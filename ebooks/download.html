@@ -246,6 +246,17 @@
                     <strong>किसान मित्र टिप:</strong> आपको बार-बार भारी PDF डाउनलोड करने की कोई आवश्यकता नहीं है। आप जब चाहें <strong>My Library</strong> में इस ई-बुक को ज़ूम करके पढ़ सकते हैं और खेत में काम करते समय कान में इयरफोन लगाकर ऑडियो भी सुन सकते हैं।
                 </div>
             </div>
+
+            <!-- Smart Browser Switch Notice (Visible in In-App Browsers or on Audio Block) -->
+            <div id="download-iab-notice" style="margin-top: 14px; background: #f8fafc; border: 1.5px solid #38bdf8; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.3rem;">🌐</span>
+                    <span style="font-size: 0.86rem; color: #1e293b; font-weight: 700;">ऑडियो स्पष्ट सुनने व फ़ाइल सुरक्षित करने के लिए:</span>
+                </div>
+                <button type="button" onclick="navigator.clipboard?.writeText(window.location.href); alert('✅ लिंक कॉपी हो गया! Google Chrome खोलकर पेस्ट करें।');" style="background: #0284c7; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <span>📋</span> <span>Chrome में खोलें</span>
+                </button>
+            </div>
         </section>
 
         <!-- ==============================================================

@@ -24,7 +24,17 @@
             });
             ['hero-sample-btn', 'final-sample-btn', 'ubl-audio-sample-btn'].forEach(function(sKey) {
               const el = document.getElementById(sKey);
-              if (el) el.href = 'demo-kharif.html?id=' + encodeURIComponent(bookId);
+              if (el) {
+                el.href = 'javascript:void(0)';
+                el.onclick = function(e) {
+                  e.preventDefault();
+                  if (typeof window.openDemoReaderWithAuth === 'function') {
+                    window.openDemoReaderWithAuth(bookId);
+                  } else {
+                    window.location.href = 'reader.html?book=' + encodeURIComponent(bookId) + '&demo=1';
+                  }
+                };
+              }
             });
           });
         }
@@ -105,6 +115,146 @@
   src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   /></noscript>
   <!-- End Meta Pixel Code -->
+  <!-- CUSTOM ENHANCEMENTS: Left-Center Floating Demo, Top-Right Toast, Top-Left Audio, Enlarged Red Buy Now & Pricing -->
+  <style>
+    /* 1. FLOATING FREE DEMO BUTTON: Pinned to Left-Center screen edge */
+    #floating-free-demo-btn,
+    .floating-demo-blink-btn {
+      position: fixed !important;
+      left: 0 !important;
+      top: 50% !important;
+      bottom: auto !important;
+      right: auto !important;
+      transform: translateY(-50%) !important;
+      z-index: 99998 !important;
+      background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+      color: #ffffff !important;
+      padding: 10px 14px 10px 10px !important;
+      border-radius: 0 30px 30px 0 !important;
+      font-size: 0.85rem !important;
+      font-weight: 800 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      box-shadow: 4px 6px 20px rgba(220, 38, 38, 0.5) !important;
+      border: 2px solid #ffffff !important;
+      border-left: none !important;
+      text-decoration: none !important;
+      animation: pureRedPulseBlink 1.4s infinite ease-in-out !important;
+      cursor: pointer !important;
+      white-space: nowrap !important;
+    }
+
+    /* 2. REMOVE / HIDE WHATSAPP HELP & INSTALL APP FROM MOBILE AND BOTTOM */
+    #sticky-help-btn,
+    .floating-wa-help-btn,
+    #floating-pwa-install-btn,
+    .floating-pwa-install-btn {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+    }
+
+    /* 3. MARKETING TOAST & PURCHASE TOAST PINNED TO TOP-RIGHT */
+    #ai-live-purchase-toast-container,
+    #live-purchase-toast,
+    .netflix-3d-popup-wrap {
+      position: fixed !important;
+      top: 65px !important;
+      right: 12px !important;
+      bottom: auto !important;
+      left: auto !important;
+      z-index: 99995 !important;
+      pointer-events: auto !important;
+    }
+
+    .ai-purchase-toast-card {
+      margin-bottom: 8px !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* 4. FLOATING AUDIO PILL PINNED TO TOP-LEFT */
+    #aoi-floating-audio-pill,
+    .aoi-compact-audio-pill {
+      position: fixed !important;
+      top: 62px !important;
+      left: 12px !important;
+      bottom: auto !important;
+      right: auto !important;
+      z-index: 99990 !important;
+    }
+
+    /* 5. MRP: Larger Size in Solid RED with Strikethrough */
+    .hero-price-box .old-price,
+    .old-price {
+      font-size: 28px !important;
+      color: #dc2626 !important;
+      text-decoration: line-through !important;
+      font-weight: 900 !important;
+    }
+
+    /* Offer Price: GREEN color */
+    .hero-price-box .new-price,
+    .new-price,
+    .offer-price {
+      font-size: 38px !important;
+      font-weight: 900 !important;
+      color: #16a34a !important;
+    }
+
+    /* Buy Now Button: Prominent Solid RED with Larger Size */
+    .buy-btn,
+    #hero-buy-btn,
+    #preview-buy-btn,
+    #final-buy-btn,
+    .preview-buy-btn {
+      font-size: 1.28rem !important;
+      font-weight: 900 !important;
+      padding: 15px 32px !important;
+      border-radius: 12px !important;
+      background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+      box-shadow: 0 6px 22px rgba(220, 38, 38, 0.5) !important;
+      border: 2px solid #ffffff !important;
+      color: #ffffff !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 10px !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-sticky-bar {
+        height: 70px !important;
+        padding: 8px 12px !important;
+        background: #ffffff !important;
+        box-shadow: 0 -4px 22px rgba(0, 0, 0, 0.14) !important;
+      }
+      .mobile-book-price .old-price {
+        font-size: 22px !important;
+        color: #dc2626 !important;
+        font-weight: 900 !important;
+        text-decoration: line-through !important;
+      }
+      .mobile-book-price .offer-price {
+        font-size: 28px !important;
+        font-weight: 900 !important;
+        color: #16a34a !important;
+      }
+      .sticky-buy-btn {
+        height: 52px !important;
+        font-size: 18px !important;
+        font-weight: 900 !important;
+        background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 18px rgba(220, 38, 38, 0.5) !important;
+        color: #ffffff !important;
+        border: 1.5px solid #ffffff !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -514,12 +664,26 @@
         </div>
 
         <div id="preview-gallery-grid" class="preview-grid">
-          <!-- Rendered dynamically -->
+          <div class="preview-card" onclick="window.openPinchZoomLightbox && window.openPinchZoomLightbox('../images/books/kharif-master-guide-2026-preview-01.webp')" style="cursor:zoom-in;">
+            <img src="../images/books/kharif-master-guide-2026-preview-01.webp" alt="Preview Page 1" loading="lazy" onerror="window.handleImageError && window.handleImageError(this)">
+          </div>
+          <div class="preview-card" onclick="window.openPinchZoomLightbox && window.openPinchZoomLightbox('../images/books/kharif-master-guide-2026-preview-02.webp')" style="cursor:zoom-in;">
+            <img src="../images/books/kharif-master-guide-2026-preview-02.webp" alt="Preview Page 2" loading="lazy" onerror="window.handleImageError && window.handleImageError(this)">
+          </div>
+          <div class="preview-card" onclick="window.openPinchZoomLightbox && window.openPinchZoomLightbox('../images/books/kharif-master-guide-2026-preview-03.webp')" style="cursor:zoom-in;">
+            <img src="../images/books/kharif-master-guide-2026-preview-03.webp" alt="Preview Page 3" loading="lazy" onerror="window.handleImageError && window.handleImageError(this)">
+          </div>
+          <div class="preview-card" onclick="window.openPinchZoomLightbox && window.openPinchZoomLightbox('../images/books/kharif-master-guide-2026-preview-04.webp')" style="cursor:zoom-in;">
+            <img src="../images/books/kharif-master-guide-2026-preview-04.webp" alt="Preview Page 4" loading="lazy" onerror="window.handleImageError && window.handleImageError(this)">
+          </div>
+          <div class="preview-card" onclick="window.openPinchZoomLightbox && window.openPinchZoomLightbox('../images/books/kharif-master-guide-2026-preview-05.webp')" style="cursor:zoom-in;">
+            <img src="../images/books/kharif-master-guide-2026-preview-05.webp" alt="Preview Page 5" loading="lazy" onerror="window.handleImageError && window.handleImageError(this)">
+          </div>
         </div>
 
         <div class="preview-action">
-          <a id="preview-buy-btn" href="#sec-final-buy" class="preview-buy-btn">
-            🛒 अभी खरीदें मात्र ₹99 में
+          <a id="preview-buy-btn" href="#sec-final-buy" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:2px solid #fff;font-size:1.15rem;font-weight:800;padding:14px 28px;border-radius:10px;box-shadow:0 6px 18px rgba(220,38,38,0.35);">
+            🛒 Buy Now
           </a>
         </div>
       </div>
@@ -575,7 +739,7 @@
 
         <div class="bonus-wrapper">
           <div class="bonus-image">
-            <img id="ai-support-cover-img" src="" alt="AI Support">
+            <img id="ai-support-cover-img" src="../images/banners/farmer-community-banner.jpeg" alt="AI Support" onerror="this.onerror=null; this.src='../images/banners/farmer-community-banner.jpeg';">
           </div>
 
           <div class="bonus-content">
@@ -789,13 +953,6 @@
   </a>
 
   <!-- ==========================================================
-       FLOATING PWA INSTALL APP BUTTON (STICKY FOOTER KE UPAR, AUDIO KE NICHE)
-       ========================================================== -->
-  <button type="button" id="floating-pwa-install-btn" onclick="window.triggerPWAInstall()" class="floating-pwa-install-btn" title="Aarogyam App इंस्टॉल करें">
-    <i class="fa-solid fa-mobile-screen-button"></i> <span>Install App</span>
-  </button>
-
-  <!-- ==========================================================
        MASTER MOBILE STICKY BUY BAR (RESPONSIVE INNER CONTAINER)
        ========================================================== -->
   <div id="ubl-mobile-sticky-bar" class="mobile-sticky-bar">
@@ -803,22 +960,22 @@
       <!-- 1. BOOK THUMBNAIL -->
       <img id="sticky-thumb-img" src="" alt="Thumbnail" class="sticky-thumb-img">
 
-      <!-- 2. PRICING: BLACK BOLD STRIKETHROUGH MRP + VIBRANT OFFER PRICE -->
+      <!-- 2. PRICING: RED BOLD STRIKETHROUGH MRP + GREEN VIBRANT OFFER PRICE -->
       <div class="mobile-book-preview">
         <!-- Title hidden visually as requested, preserved for script compatibility -->
         <h4 id="sticky-book-title" style="display: none !important;">...</h4>
         <div class="mobile-book-price">
-          <span id="sticky-mrp-val" class="old-price"></span>
-          <strong id="sticky-price-val" class="offer-price"></strong>
+          <span id="sticky-mrp-val" class="old-price">₹299</span>
+          <strong id="sticky-price-val" class="offer-price">₹99</strong>
         </div>
       </div>
 
-      <!-- 3. BUY NOW BUTTON (JUST BAGAL MEIN) -->
-      <a id="sticky-buy-btn" href="checkout.html" class="sticky-buy-btn">
+      <!-- 3. BUY NOW RED BUTTON -->
+      <a id="sticky-buy-btn" href="checkout.html" class="sticky-buy-btn" style="background: linear-gradient(135deg, #dc2626, #b91c1c) !important; color: #ffffff !important; border: 1.5px solid #ffffff !important;">
         🛒 Buy Now
       </a>
 
-      <!-- 4. SHARE BUTTON (USKE BAAD) -->
+      <!-- 4. SHARE BUTTON -->
       <button class="sticky-share-btn" id="mobileShareButton" type="button" data-share-button="true" data-share-target="native" data-asset-type="book" data-asset-id="">
         <i class="fa-solid fa-share-nodes"></i> Share
       </button>
@@ -902,7 +1059,12 @@
     </a>
   </div>
 
-  <!-- FLOATING AUDIO PILL (FOR UNIVERSAL LANDING PAGE - COMPACT LEFT) -->
+  <!-- FLOATING FREE DEMO READER BUTTON (PINNED LEFT-CENTER) -->
+  <a id="floating-free-demo-btn" href="javascript:void(0)" onclick="window.openDemoReaderWithAuth('DEMO-BK001')" class="floating-demo-blink-btn" style="background: #dc2626 !important; color: #ffffff !important;" title="मुफ्त डेमो पढ़ें / सुनें">
+    <i class="fa-solid fa-book-open"></i> <span>📖 Free Demo पढ़ें</span>
+  </a>
+
+  <!-- FLOATING AUDIO PILL (FOR UNIVERSAL LANDING PAGE - PINNED TOP-LEFT) -->
   <div id="aoi-floating-audio-pill" class="aoi-compact-audio-pill">
     <div style="display: flex; align-items: center; gap: 2px; height: 12px; flex-shrink: 0;">
       <span class="aoi-pill-wave-bar" style="width: 2.5px; height: 5px; background: #fbbf24; border-radius: 2px;"></span>
@@ -918,7 +1080,8 @@
   <!-- Common JS & Controller -->
   <script src="/session.js"></script>
   <script src="/js/book-marketing-card.js"></script>
+  <script src="/js/recent-purchase-toast.js"></script>
   <script src="/js/share-engine-core.js?v=2.0"></script>
-  <script src="/js/universal-book-landing.js?v=20260918_v2"></script>
+  <script src="/js/universal-book-landing.js?v=20260923_v1"></script>
 </body>
 </html>

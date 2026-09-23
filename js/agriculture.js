@@ -96,6 +96,8 @@
       const bIdUpper = String(b.id).toUpperCase();
       if (bIdUpper === 'BK001' || bIdUpper === 'BK002') return true; // Always show top 2 agriculture books
       if (deletedIds.includes(bIdUpper)) return false;
+      // DEMO BOOK SECURITY RULE: Demo books NEVER appear in Category Pages
+      if (bIdUpper.startsWith('DEMO') || b.book_type === 'demo' || b.type === 'demo') return false;
       if (b.status === 'draft' || b.status === 'inactive') return false;
       if (b.publish_targets && Array.isArray(b.publish_targets)) {
         if (!b.publish_targets.includes('category_page')) return false;

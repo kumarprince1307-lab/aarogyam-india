@@ -57,6 +57,18 @@ if (!$pageData || !isset($pageData['id']) || empty(trim($pageData['id']))) {
 
 $bookId = strtoupper(trim($pageData['id']));
 
+// DEMO BOOK SECURITY RULE: Demo books never appear in store/website trays, ONLY in My Library
+if (strpos($bookId, 'DEMO-') === 0 || ($pageData['book_type'] ?? '') === 'demo' || ($bookData['book_type'] ?? '') === 'demo') {
+    $pageData['publish_targets'] = ['my_library'];
+    if (is_array($bookData)) {
+        $bookData['publish_targets'] = ['my_library'];
+    }
+    $pageData['facebook_pixel_enabled'] = false;
+    $pageData['google_analytics_enabled'] = false;
+    $pageData['facebook_pixel_id'] = 'disabled';
+    $pageData['google_analytics_id'] = 'disabled';
+}
+
 // Save any base64 uploaded files if present
 if (!empty($uploadedFiles) && is_array($uploadedFiles)) {
     foreach ($uploadedFiles as $fileItem) {

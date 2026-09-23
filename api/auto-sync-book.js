@@ -519,6 +519,16 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    // DEMO BOOK SECURITY RULE: Demo books never appear in store/website trays, ONLY in My Library
+    if (bookId.startsWith('DEMO-') || pageData.book_type === 'demo' || bookData.book_type === 'demo') {
+      pageData.publish_targets = ['my_library'];
+      bookData.publish_targets = ['my_library'];
+      pageData.facebook_pixel_enabled = false;
+      pageData.google_analytics_enabled = false;
+      pageData.facebook_pixel_id = 'disabled';
+      pageData.google_analytics_id = 'disabled';
+    }
+
     const commitLog = [];
 
     // 1. UPLOAD ANY EMBEDDED MEDIA FILES

@@ -477,9 +477,11 @@ class ProAudioBookEngine {
         let serverScripts = {};
         let serverMeta = {};
 
+        // Zero-Egress System: Use cached asset fetch with stable version / 1-hour cache partition rather than Date.now()
+        const cacheVer = window.aoiCurrentBookData?.version || Math.floor(Date.now() / 3600000);
         try {
-            let res = await fetch(`../data/audio-scripts/${bookId}.json?v=${Date.now()}`);
-            if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json?v=${Date.now()}`);
+            let res = await fetch(`../data/audio-scripts/${bookId}.json?v=${cacheVer}`);
+            if (!res.ok) res = await fetch(`/data/audio-scripts/${bookId}.json?v=${cacheVer}`);
             if (res.ok) {
                 const data = await res.json();
                 serverMeta = data || {};
@@ -503,10 +505,11 @@ class ProAudioBookEngine {
 
         const targetMain = (window.aoiCurrentBookData?.targetMainBook || bookId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || '').toUpperCase().trim();
         if (targetMain && targetMain !== bookId) {
+            // Strict isolation: only fall back to target main book if demo has NO dedicated server audio scripts
             if (Object.keys(serverScripts).length === 0) {
                 try {
-                    let resMain = await fetch(`../data/audio-scripts/${targetMain}.json?v=${Date.now()}`);
-                    if (!resMain.ok) resMain = await fetch(`/data/audio-scripts/${targetMain}.json?v=${Date.now()}`);
+                    let resMain = await fetch(`../data/audio-scripts/${targetMain}.json?v=${cacheVer}`);
+                    if (!resMain.ok) resMain = await fetch(`/data/audio-scripts/${targetMain}.json?v=${cacheVer}`);
                     if (resMain.ok) {
                         const dataMain = await resMain.json();
                         serverMeta = { ...dataMain, ...serverMeta };
@@ -514,16 +517,19 @@ class ProAudioBookEngine {
                     }
                 } catch(e) {}
             }
-            try {
-                const fallbackData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${targetMain}`);
-                if (fallbackData) {
-                    const parsed = JSON.parse(fallbackData);
-                    if (parsed && parsed.pages) {
-                        localScripts = { ...parsed.pages, ...localScripts };
+            // Strict isolation: only fall back to target main book local storage if demo has no local storage of its own
+            if (Object.keys(localScripts).length === 0 && Object.keys(serverScripts).length === 0) {
+                try {
+                    const fallbackData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${targetMain}`);
+                    if (fallbackData) {
+                        const parsed = JSON.parse(fallbackData);
+                        if (parsed && parsed.pages) {
+                            localScripts = { ...parsed.pages };
+                        }
+                        serverMeta = { ...parsed, ...serverMeta };
                     }
-                    serverMeta = { ...parsed, ...serverMeta };
-                }
-            } catch(e) {}
+                } catch(e) {}
+            }
         }
 
         this.metadata = serverMeta;
@@ -1181,6 +1187,56 @@ class ProAudioBookEngine {
                 setTimeout(() => toast.remove(), 400);
             }
         }, 4000);
+    }
+
+    showOpenInBrowserModal(forced = false) {
+        if (!forced && sessionStorage.getItem('AIM_BROWSER_MODAL_DISMISSED')) return;
+        if (document.getElementById('ai-open-main-browser-modal')) return;
+
+        const curUrl = window.location.href;
+        const modal = document.createElement('div');
+        modal.id = 'ai-open-main-browser-modal';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:9999999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;';
+        
+        modal.innerHTML = `
+            <div style="background:#ffffff;color:#0f172a;max-width:390px;width:100%;border-radius:18px;padding:24px 20px;text-align:center;position:relative;box-shadow:0 25px 60px rgba(0,0,0,0.5);border:2px solid #22c55e;">
+                <button type="button" id="closeBrowserModalBtn" style="position:absolute;top:12px;right:14px;background:#f1f5f9;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;color:#64748b;display:flex;align-items:center;justify-content:center;">&times;</button>
+                <div style="width:55px;height:55px;background:#ecfdf5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;border:1.5px solid #a7f3d0;">
+                    🌐
+                </div>
+                <h3 style="font-size:1.15rem;font-weight:800;color:#1e293b;margin:0 0 8px 0;line-height:1.3;">
+                    मुख्य ब्राउज़र (Chrome) में खोलें
+                </h3>
+                <p style="font-size:0.86rem;color:#475569;margin:0 0 18px 0;line-height:1.5;">
+                    फेसबुक ब्राउज़र ऑडियो प्लेबैक को ब्लॉक कर देता है। सम्पूर्ण ऑडियो व स्पष्ट पन्ने देखने के लिए इसे <strong>Chrome</strong> या अपने मुख्य ब्राउज़र में खोलें।
+                </p>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <button type="button" id="copyBrowserLinkBtn" style="background:linear-gradient(135deg, #16a34a, #15803d);color:#ffffff;border:none;padding:12px;border-radius:10px;font-size:0.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(22,163,74,0.35);">
+                        <span>📋</span> <span>लिंक कॉपी करें & Chrome में खोलें</span>
+                    </button>
+                    <button type="button" id="dismissBrowserModalBtn" style="background:#f1f5f9;color:#475569;border:none;padding:10px;border-radius:10px;font-size:0.85rem;font-weight:700;cursor:pointer;">
+                        यहीं पढ़ें (बिना आवाज़)
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const dismiss = () => {
+            sessionStorage.setItem('AIM_BROWSER_MODAL_DISMISSED', 'true');
+            modal.remove();
+        };
+
+        modal.querySelector('#closeBrowserModalBtn')?.addEventListener('click', dismiss);
+        modal.querySelector('#dismissBrowserModalBtn')?.addEventListener('click', dismiss);
+        modal.querySelector('#copyBrowserLinkBtn')?.addEventListener('click', () => {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(curUrl).catch(() => {});
+            }
+            alert('✅ लिंक कॉपी हो गया है! अब अपने मोबाइल का Google Chrome खोलकर वहाँ पेस्ट करें।');
+            dismiss();
+        });
     }
 }
 

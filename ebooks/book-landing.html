@@ -11,7 +11,7 @@
         const params = new URLSearchParams(window.location.search);
         const bookId = (params.get('id') || params.get('book') || '').trim().toUpperCase();
         if (bookId) {
-          // Immediately bind active book ID to share elements and checkout buttons
+          // Immediately bind active book ID to share elements, checkout buttons and open graph tags
           document.addEventListener('DOMContentLoaded', function() {
             const bsd = document.getElementById('book-share-data');
             if (bsd) bsd.dataset.id = bookId;
@@ -24,8 +24,32 @@
             });
             ['hero-sample-btn', 'final-sample-btn', 'ubl-audio-sample-btn'].forEach(function(sKey) {
               const el = document.getElementById(sKey);
-              if (el) el.href = 'demo-kharif.html?id=' + encodeURIComponent(bookId);
+              if (el) {
+                el.href = 'javascript:void(0)';
+                el.onclick = function(e) {
+                  e.preventDefault();
+                  if (typeof window.openDemoReaderWithAuth === 'function') {
+                    window.openDemoReaderWithAuth(bookId);
+                  } else {
+                    window.location.href = 'reader.html?book=' + encodeURIComponent(bookId) + '&demo=1';
+                  }
+                };
+              }
             });
+
+            // Dynamic Open Graph Image and Meta
+            const specificOg = (bookId === 'BK002' || bookId.includes('KHETI'))
+              ? 'https://aarogyamindia.online/images/books/kheti-dr-og.webp'
+              : (bookId === 'BK001' || bookId.includes('KHARIF'))
+                ? 'https://aarogyamindia.online/images/books/kgarid-fasal-og.webp'
+                : `https://aarogyamindia.online/images/books/${bookId.toLowerCase()}-cover.webp`;
+
+            const ogImg = document.getElementById('og-image-meta');
+            if (ogImg) ogImg.setAttribute('content', specificOg);
+            const twImg = document.getElementById('twitter-image-meta');
+            if (twImg) twImg.setAttribute('content', specificOg);
+            const ogUrl = document.getElementById('og-url-meta');
+            if (ogUrl) ogUrl.setAttribute('content', window.location.href);
           });
         }
       } catch (e) {}
@@ -104,7 +128,172 @@
   <noscript><img height="1" width="1" style="display:none"
   src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   /></noscript>
-  <!-- End Meta Pixel Code -->
+  <!-- CUSTOM ENHANCEMENTS: Left-Center Floating Demo, Top-Right Toast, Top-Left Audio, Enlarged Buy Now & Pricing -->
+  <!-- CUSTOM ENHANCEMENTS: Left-Center Floating Demo, Top-Right Toast, Top-Left Audio, Enlarged Red Buy Now & Pricing -->
+  <style>
+    /* 1. FLOATING FREE DEMO BUTTON: Pinned to Left-Center screen edge (Like Kheti Dr) */
+    #floating-free-demo-btn,
+    .floating-demo-blink-btn {
+      position: fixed !important;
+      left: 0 !important;
+      top: 50% !important;
+      bottom: auto !important;
+      right: auto !important;
+      transform: translateY(-50%) !important;
+      z-index: 99998 !important;
+      background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+      color: #ffffff !important;
+      padding: 10px 14px 10px 10px !important;
+      border-radius: 0 30px 30px 0 !important;
+      font-size: 0.85rem !important;
+      font-weight: 800 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      box-shadow: 4px 6px 20px rgba(220, 38, 38, 0.5) !important;
+      border: 2px solid #ffffff !important;
+      border-left: none !important;
+      text-decoration: none !important;
+      animation: pureRedPulseBlink 1.4s infinite ease-in-out !important;
+      cursor: pointer !important;
+      white-space: nowrap !important;
+    }
+
+    /* 2. REMOVE / HIDE WHATSAPP HELP & INSTALL APP FROM MOBILE AND BOTTOM */
+    #sticky-help-btn,
+    .floating-wa-help-btn,
+    #floating-pwa-install-btn,
+    .floating-pwa-install-btn {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+    }
+
+    /* 3. MARKETING TOAST & PURCHASE TOAST PINNED TO TOP-RIGHT */
+    #ai-live-purchase-toast-container,
+    #live-purchase-toast,
+    .netflix-3d-popup-wrap {
+      position: fixed !important;
+      top: 65px !important;
+      right: 12px !important;
+      bottom: auto !important;
+      left: auto !important;
+      z-index: 99995 !important;
+      pointer-events: auto !important;
+    }
+
+    .ai-purchase-toast-card {
+      margin-bottom: 8px !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* 4. FLOATING AUDIO PILL PINNED TO TOP-LEFT (BELOW HEADER) */
+    #aoi-floating-audio-pill,
+    .aoi-compact-audio-pill {
+      position: fixed !important;
+      top: 62px !important;
+      left: 12px !important;
+      bottom: auto !important;
+      right: auto !important;
+      z-index: 99990 !important;
+    }
+
+    /* 5. ENLARGED HERO COVER, PRICES & PROMINENT RED BUY NOW BUTTON */
+    .hero-book-cover {
+      max-width: 440px !important;
+      width: 100% !important;
+      border-radius: 16px !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* MRP: Larger Size in Solid RED with Strikethrough */
+    .hero-price-box .old-price,
+    .old-price {
+      font-size: 28px !important;
+      color: #dc2626 !important;
+      text-decoration: line-through !important;
+      font-weight: 900 !important;
+    }
+
+    /* Offer Price: GREEN color, optimal prominent size */
+    .hero-price-box .new-price,
+    .new-price,
+    .offer-price {
+      font-size: 38px !important;
+      font-weight: 900 !important;
+      color: #16a34a !important;
+      letter-spacing: -0.5px !important;
+    }
+
+    /* Buy Now Button: Prominent Solid RED with Larger Size */
+    .buy-btn,
+    #hero-buy-btn,
+    #preview-buy-btn,
+    #final-buy-btn,
+    .preview-buy-btn {
+      font-size: 1.28rem !important;
+      font-weight: 900 !important;
+      padding: 15px 32px !important;
+      border-radius: 12px !important;
+      background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+      box-shadow: 0 6px 22px rgba(220, 38, 38, 0.5) !important;
+      border: 2px solid #ffffff !important;
+      color: #ffffff !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 10px !important;
+      transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+    }
+
+    .buy-btn:active,
+    #hero-buy-btn:active,
+    .preview-buy-btn:active {
+      transform: scale(0.97) !important;
+    }
+
+    /* 6. STREAMLINED PREMIUM MOBILE STICKY BUY BAR */
+    @media (max-width: 768px) {
+      .mobile-sticky-bar {
+        height: 70px !important;
+        padding: 8px 12px !important;
+        background: #ffffff !important;
+        box-shadow: 0 -4px 22px rgba(0, 0, 0, 0.14) !important;
+      }
+      .sticky-thumb-img {
+        width: 44px !important;
+        height: 56px !important;
+        border-radius: 6px !important;
+      }
+      .mobile-book-price .old-price {
+        font-size: 22px !important;
+        color: #dc2626 !important;
+        font-weight: 900 !important;
+        text-decoration: line-through !important;
+      }
+      .mobile-book-price .offer-price {
+        font-size: 28px !important;
+        font-weight: 900 !important;
+        color: #16a34a !important;
+      }
+      .sticky-buy-btn {
+        height: 52px !important;
+        font-size: 18px !important;
+        font-weight: 900 !important;
+        background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 18px rgba(220, 38, 38, 0.5) !important;
+        color: #ffffff !important;
+        border: 1.5px solid #ffffff !important;
+      }
+      .hero-price-box .new-price {
+        font-size: 32px !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -514,12 +703,12 @@
         </div>
 
         <div id="preview-gallery-grid" class="preview-grid">
-          <!-- Rendered dynamically -->
+          <!-- Dynamically populated by universal-book-landing.js based on active Book ID -->
         </div>
 
         <div class="preview-action">
-          <a id="preview-buy-btn" href="#sec-final-buy" class="preview-buy-btn">
-            🛒 अभी खरीदें मात्र ₹99 में
+          <a id="preview-buy-btn" href="#sec-final-buy" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:2px solid #fff;font-size:1.15rem;font-weight:800;padding:14px 28px;border-radius:10px;box-shadow:0 6px 18px rgba(220,38,38,0.35);">
+            🛒 Buy Now
           </a>
         </div>
       </div>
@@ -575,7 +764,7 @@
 
         <div class="bonus-wrapper">
           <div class="bonus-image">
-            <img id="ai-support-cover-img" src="" alt="AI Support">
+            <img id="ai-support-cover-img" src="" alt="AI Support" style="display:none;" onerror="window.handleImageError && window.handleImageError(this)">
           </div>
 
           <div class="bonus-content">
@@ -787,21 +976,6 @@
   </a>
 
   <!-- ==========================================================
-       FLOATING WHATSAPP HELP (BUY NOW KE THEEK UPAR RIGHT MEIN)
-       ========================================================== -->
-  <a id="sticky-help-btn" href="https://wa.me/917974422572?text=Hello%20Aarogyam%20India%20Team" target="_blank" rel="noopener" class="floating-wa-help-btn" title="WhatsApp पर सहायता लें">
-    <i class="fa-brands fa-whatsapp"></i>
-    <span class="floating-wa-tooltip">मदद?</span>
-  </a>
-
-  <!-- ==========================================================
-       FLOATING PWA INSTALL APP BUTTON (STICKY FOOTER KE UPAR, AUDIO KE NICHE)
-       ========================================================== -->
-  <button type="button" id="floating-pwa-install-btn" onclick="window.triggerPWAInstall()" class="floating-pwa-install-btn" title="Aarogyam App इंस्टॉल करें">
-    <i class="fa-solid fa-mobile-screen-button"></i> <span>Install App</span>
-  </button>
-
-  <!-- ==========================================================
        MASTER MOBILE STICKY BUY BAR (RESPONSIVE INNER CONTAINER)
        ========================================================== -->
   <div id="ubl-mobile-sticky-bar" class="mobile-sticky-bar">
@@ -809,22 +983,22 @@
       <!-- 1. BOOK THUMBNAIL -->
       <img id="sticky-thumb-img" src="" alt="Thumbnail" class="sticky-thumb-img">
 
-      <!-- 2. PRICING: BLACK BOLD STRIKETHROUGH MRP + VIBRANT OFFER PRICE -->
+      <!-- 2. PRICING: RED BOLD STRIKETHROUGH MRP + GREEN VIBRANT OFFER PRICE -->
       <div class="mobile-book-preview">
         <!-- Title hidden visually as requested, preserved for script compatibility -->
         <h4 id="sticky-book-title" style="display: none !important;">...</h4>
         <div class="mobile-book-price">
-          <span id="sticky-mrp-val" class="old-price"></span>
-          <strong id="sticky-price-val" class="offer-price"></strong>
+          <span id="sticky-mrp-val" class="old-price">₹299</span>
+          <strong id="sticky-price-val" class="offer-price">₹99</strong>
         </div>
       </div>
 
-      <!-- 3. BUY NOW BUTTON (JUST BAGAL MEIN) -->
-      <a id="sticky-buy-btn" href="checkout.html" class="sticky-buy-btn">
+      <!-- 3. BUY NOW RED BUTTON (LARGER SIZE) -->
+      <a id="sticky-buy-btn" href="checkout.html" class="sticky-buy-btn" style="background: linear-gradient(135deg, #dc2626, #b91c1c) !important; color: #ffffff !important; border: 1.5px solid #ffffff !important;">
         🛒 Buy Now
       </a>
 
-      <!-- 4. SHARE BUTTON (USKE BAAD) -->
+      <!-- 4. SHARE BUTTON -->
       <button class="sticky-share-btn" id="mobileShareButton" type="button" data-share-button="true" data-share-target="native" data-asset-type="book" data-asset-id="">
         <i class="fa-solid fa-share-nodes"></i> Share
       </button>
@@ -908,7 +1082,7 @@
     </a>
   </div>
 
-  <!-- FLOATING AUDIO PILL (FOR UNIVERSAL LANDING PAGE - COMPACT LEFT) -->
+  <!-- FLOATING AUDIO PILL (FOR UNIVERSAL LANDING PAGE - PINNED TOP-LEFT) -->
   <div id="aoi-floating-audio-pill" class="aoi-compact-audio-pill">
     <div style="display: flex; align-items: center; gap: 2px; height: 12px; flex-shrink: 0;">
       <span class="aoi-pill-wave-bar" style="width: 2.5px; height: 5px; background: #fbbf24; border-radius: 2px;"></span>
@@ -924,7 +1098,8 @@
   <!-- Common JS & Controller -->
   <script src="/session.js"></script>
   <script src="/js/book-marketing-card.js"></script>
+  <script src="/js/recent-purchase-toast.js"></script>
   <script src="/js/share-engine-core.js?v=2.0"></script>
-  <script src="/js/universal-book-landing.js?v=20260918_v2"></script>
+  <script src="/js/universal-book-landing.js?v=20260923_v1"></script>
 </body>
 </html>

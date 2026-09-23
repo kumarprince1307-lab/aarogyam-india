@@ -2437,24 +2437,28 @@ body {
 
 .floating-demo-blink-btn {
     position: fixed !important;
-    bottom: 118px !important;
-    right: 12px !important;
+    left: 0 !important;
+    top: 50% !important;
+    bottom: auto !important;
+    right: auto !important;
+    transform: translateY(-50%) !important;
     z-index: 9998 !important;
     background: #dc2626 !important;
     background-color: #dc2626 !important;
     color: #ffffff !important;
-    padding: 8px 14px !important;
-    border-radius: 30px !important;
-    font-size: 0.76rem !important;
+    padding: 10px 18px !important;
+    border-radius: 0 30px 30px 0 !important;
+    font-size: 0.88rem !important;
     font-weight: 900 !important;
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 8px !important;
     text-decoration: none !important;
     animation: pureRedPulseBlink 1.4s infinite ease-in-out !important;
     white-space: nowrap !important;
     border: 2px solid #ffffff !important;
-    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.75) !important;
+    border-left: none !important;
+    box-shadow: 2px 4px 16px rgba(220, 38, 38, 0.75) !important;
     cursor: pointer !important;
 }
 
@@ -3761,8 +3765,10 @@ body {
 @media (max-width: 768px) {
     #aoi-floating-audio-pill,
     .aoi-compact-audio-pill {
-        bottom: 118px !important;
+        position: fixed !important;
+        top: 62px !important;
         left: 10px !important;
+        bottom: auto !important;
         right: auto !important;
         max-width: 160px !important;
         width: auto !important;
@@ -3771,6 +3777,7 @@ body {
         border-radius: 30px !important;
         gap: 5px !important;
         box-sizing: border-box !important;
+        z-index: 99990 !important;
     }
     .hero-action-buttons a,
     .hero-action-buttons button {
@@ -3883,33 +3890,36 @@ body {
     }
 
     .floating-demo-blink-btn {
-        bottom: 135px !important;
-        right: 24px !important;
-        padding: 10px 22px !important;
-        font-size: 0.95rem !important;
-        border-radius: 35px !important;
+        position: fixed !important;
+        left: 0 !important;
+        top: 50% !important;
+        bottom: auto !important;
+        right: auto !important;
+        transform: translateY(-50%) !important;
+        padding: 10px 18px !important;
+        font-size: 0.92rem !important;
+        border-radius: 0 30px 30px 0 !important;
         gap: 8px !important;
+        z-index: 99998 !important;
     }
 
-    .floating-wa-help-btn {
-        bottom: 74px !important;
-        right: 24px !important;
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 28px !important;
-    }
-
-    .floating-pwa-install-btn {
-        bottom: 74px !important;
-        left: 24px !important;
-        padding: 9px 18px !important;
-        font-size: 0.85rem !important;
+    .floating-wa-help-btn,
+    .floating-pwa-install-btn,
+    #floating-pwa-install-btn,
+    #sticky-help-btn {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
 
     #aoi-floating-audio-pill,
     .aoi-compact-audio-pill {
-        bottom: 135px !important;
-        left: 24px !important;
+        position: fixed !important;
+        top: 62px !important;
+        left: 12px !important;
+        bottom: auto !important;
+        right: auto !important;
+        z-index: 99990 !important;
     }
 }
 

@@ -59,7 +59,23 @@
         "download_funnel"
       ],
       "isComingSoon": false,
-      "is_coming_soon": false
+      "is_coming_soon": false,
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "preview_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "demo_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ]
     },
     {
       "id": "BK002",
@@ -116,7 +132,9 @@
         "/images/books/kheti-dr-demo-2.webp",
         "/images/books/kheti-dr-demo-3.webp",
         "/images/books/kheti-dr-demo-4.webp",
-        "/images/books/kheti-dr-demo-5.webp"
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
       ],
       "seo": {
         "title": "खेती का डॉक्टर",
@@ -125,7 +143,27 @@
         "canonical": ""
       },
       "isComingSoon": false,
-      "is_coming_soon": false
+      "is_coming_soon": false,
+      "preview_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "demo_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ]
     },
     {
       "id": "SUB001",
@@ -205,7 +243,7 @@
       "landingPage": "/ebooks/book-landing.html?id=SUB001",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:28:35.319Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "is_coming_soon": false
     },
@@ -290,7 +328,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK006",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:49:03.526Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "is_coming_soon": false
     },
@@ -372,7 +410,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK003",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:31:36.455Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "is_coming_soon": true
     },
@@ -455,7 +493,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK004",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:49:49.237Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "is_coming_soon": true
     },
@@ -537,7 +575,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK005",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:32:52.293Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "is_coming_soon": true
     },
@@ -620,7 +658,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK007",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:52:30.299Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "is_coming_soon": true
     },
@@ -649,7 +687,9 @@
       "isComingSoon": true,
       "is_coming_soon": true,
       "badge": "coming_soon",
-      "store_badge": "coming_soon"
+      "store_badge": "coming_soon",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true
     },
     {
       "id": "BK009",
@@ -676,7 +716,9 @@
       "isComingSoon": true,
       "is_coming_soon": true,
       "badge": "coming_soon",
-      "store_badge": "coming_soon"
+      "store_badge": "coming_soon",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true
     },
     {
       "id": "BK010",
@@ -757,7 +799,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK010",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:45:39.495Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "is_coming_soon": true
     },
@@ -839,7 +881,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK011",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:44:15.191Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "is_coming_soon": true
     },
@@ -921,7 +963,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK012",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-16T18:40:22.068Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "is_coming_soon": true
     },
@@ -931,6 +973,9 @@
       "book_type": "paid",
       "audience": "all",
       "target_main_books": [],
+      "hasWebpPages": true,
+      "demo_reader_pages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
+      "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
       "heading": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "name": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "category": "Agriculture",
@@ -1020,15 +1065,93 @@
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-17T16:29:43.154Z",
-      "admin_edited": true
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "demoImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "demo_images": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "preview_images": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "demoAvailable": true
     },
     {
       "id": "DEMO-BK015",
       "slug": "demo-bk015",
       "book_type": "demo",
       "audience": "all",
-      "target_main_books": [],
+      "target_main_books": [
+        "BK015"
+      ],
+      "targetMainBook": "BK015",
+      "demo_reader_pages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
+      "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
       "heading": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "name": "🌱 सब्जी खेती मास्टर  (PART 1)",
       "category": "Agriculture",
@@ -1040,12 +1163,7 @@
       "banner": "/images/banners/bk015-hero-banner.webp",
       "status": "active",
       "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "free_shelf",
-        "demo_shelf"
+        "my_library"
       ],
       "store_badge": "best_seller",
       "badge": "best_seller",
@@ -1119,15 +1237,90 @@
       "landingPage": "/ebooks/book-landing.html?id=DEMO-BK015",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-17T03:39:30.777Z",
-      "admin_edited": true
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "demoImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "demo_images": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "preview_images": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "demoAvailable": true
     },
     {
       "id": "DEMO-BK001",
       "slug": "demo-bk001",
       "book_type": "demo",
       "audience": "all",
-      "target_main_books": [],
+      "target_main_books": [
+        "BK001"
+      ],
       "heading": "खरीफ फसल मास्टर गाइड 2026",
       "name": "खरीफ फसल मास्टर गाइड 2026",
       "category": "Agriculture",
@@ -1139,14 +1332,7 @@
       "banner": "/images/books/kgarid-fasal-og.webp",
       "status": "active",
       "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "home_hero",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
+        "my_library"
       ],
       "store_badge": "best_seller",
       "badge": "best_seller",
@@ -1210,15 +1396,44 @@
       "landingPage": "/ebooks/book-landing.html?id=DEMO-BK001",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-17T03:42:18.979Z",
-      "admin_edited": true
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "demo_reader_pages": "1, 2, 3, 5, 8, 12, 16",
+      "demoPages": "1, 2, 3, 5, 8, 12, 16",
+      "demoImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "preview_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "demo_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "targetMainBook": "BK001"
     },
     {
       "id": "DEMO-BK002",
       "slug": "demo-bk002",
       "book_type": "demo",
       "audience": "all",
-      "target_main_books": [],
+      "target_main_books": [
+        "BK002"
+      ],
+      "targetMainBook": "BK002",
+      "demo_reader_pages": "18, 29, 31, 106, 111, 117",
+      "demoPages": "18, 29, 31, 106, 111, 117",
       "heading": "खेती का डॉक्टर (Pocket Doctor)",
       "name": "खेती का डॉक्टर (Pocket Doctor)",
       "category": "Agriculture",
@@ -1230,13 +1445,7 @@
       "banner": "/images/banners/kheti-dr-banner-1.webp",
       "status": "active",
       "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_hero",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
+        "my_library"
       ],
       "store_badge": "best_seller",
       "badge": "best_seller",
@@ -1269,8 +1478,35 @@
       "landingPage": "/ebooks/book-landing.html?id=DEMO-BK002",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-18T20:03:22.941Z",
-      "admin_edited": true
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "demoImages": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "preview_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "demo_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ]
     }
   ]
 }

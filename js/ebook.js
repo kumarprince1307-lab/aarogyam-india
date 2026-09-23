@@ -118,6 +118,9 @@
       const bIdUpper = String(b.id).toUpperCase();
       if (bIdUpper === 'BK001' || bIdUpper === 'BK002') return true;
       if (deletedIds.includes(bIdUpper)) return false;
+      // DEMO BOOK SECURITY RULE: Demo books NEVER appear in eBook Store trays/catalog
+      if (bIdUpper.startsWith('DEMO') || b.book_type === 'demo' || b.type === 'demo') return false;
+      if (b.publish_targets && Array.isArray(b.publish_targets) && !b.publish_targets.includes('ebook_store')) return false;
       if (b.status === 'draft' || b.status === 'inactive') return false;
       return true;
     });

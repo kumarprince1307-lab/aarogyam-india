@@ -301,7 +301,7 @@ export async function initBookLandingPages() {
                   <option value="attached_books">🔗 Attached Books Only (केवल नीचे चुनी गई किताबों के साथ)</option>
                 </select>
               </div>
-              <div>
+              <div id="blp_import_source_wrap">
                 <label class="admin-label" style="font-size: 0.76rem; font-weight: 700;">मुख्य पुस्तक से डेटा व प्रिव्यू इम्पोर्ट:</label>
                 <div style="display: flex; gap: 6px;">
                   <select id="blp_import_source_book" class="admin-select" style="flex: 1; padding: 6px 8px; font-size: 0.8rem; font-weight: 700;">
@@ -326,12 +326,14 @@ export async function initBookLandingPages() {
               </div>
             </div>
 
-            <!-- Attached Books Checkbox Tray -->
-            <label class="admin-label" style="font-size: 0.76rem; font-weight: 700; color: #93c5fd; margin-bottom: 4px; display: block;">
-              🔗 यह मुफ़्त किताब किन मुख्य किताबों के साथ My Library में ऑटो-ऐड होगी:
-            </label>
-            <div id="blp_attached_books_tray" style="display: flex; flex-wrap: wrap; gap: 8px; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
-              <!-- Rendered with BK001..BK015 checkboxes -->
+            <!-- Attached Books Checkbox Tray (Exclusive for Free Bonus Books) -->
+            <div id="blp_attached_books_tray_wrap">
+              <label class="admin-label" style="font-size: 0.76rem; font-weight: 700; color: #93c5fd; margin-bottom: 4px; display: block;">
+                🔗 यह मुफ़्त किताब किन मुख्य किताबों के साथ My Library में ऑटो-ऐड होगी:
+              </label>
+              <div id="blp_attached_books_tray" style="display: flex; flex-wrap: wrap; gap: 8px; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
+                <!-- Rendered with BK001..BK015 checkboxes -->
+              </div>
             </div>
           </div>
         </div>
@@ -358,13 +360,16 @@ export async function initBookLandingPages() {
               <label class="admin-label" style="font-weight: 700;">संक्षिप्त विवरण (Short Pitch Description):</label>
               <textarea id="blp_hero_desc" class="admin-textarea" rows="2" placeholder="बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी..." style="width: 100%; padding: 8px 12px;"></textarea>
             </div>
-            <div>
+            <div id="blp_pricing_mrp_wrap">
               <label class="admin-label" style="font-weight: 700;">MRP (असली मूल्य ₹):</label>
               <input type="number" id="blp_hero_mrp" class="admin-input" placeholder="299" value="299" style="width: 100%; padding: 8px 12px;" />
             </div>
-            <div>
+            <div id="blp_pricing_offer_wrap">
               <label class="admin-label" style="font-weight: 700; color: #16a34a;">ऑफर मूल्य (Offer Price ₹): *</label>
               <input type="number" id="blp_hero_offer_price" class="admin-input" placeholder="99" value="99" required style="width: 100%; padding: 8px 12px; font-weight: 800;" />
+            </div>
+            <div id="blp_demo_free_price_note" style="display: none; grid-column: 1 / -1; background: rgba(16,185,129,0.15); border: 1px solid #10b981; border-radius: 6px; padding: 8px 12px; color: #6ee7b7; font-weight: 700; font-size: 0.85rem;">
+              📖 डेमो पुस्तक: मूल्य ₹0 (100% मुफ़्त) — पाठकों के लिए बिल्कुल फ्री
             </div>
             <div>
               <label class="admin-label" style="font-weight: 700;">ऑफर बैज (Offer Badge):</label>
@@ -797,8 +802,8 @@ export async function initBookLandingPages() {
             <!-- Rendered dynamically -->
           </div>
 
-          <!-- DEMO READER ALLOWED PAGES SELECTOR (EXCLUSIVE SETTING) -->
-          <div style="margin-top: 14px; background: rgba(245,158,11,0.1); border: 1.5px solid #f59e0b; border-radius: 8px; padding: 12px 14px;">
+          <!-- DEMO READER ALLOWED PAGES SELECTOR (EXCLUSIVE FOR DEMO BOOKS) -->
+          <div id="blp_demo_pages_container" style="margin-top: 14px; background: rgba(245,158,11,0.1); border: 1.5px solid #f59e0b; border-radius: 8px; padding: 12px 14px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
               <label style="font-weight: 800; color: #fbbf24; font-size: 0.88rem; display: flex; align-items: center; gap: 6px; margin: 0;">
                 <span>📖</span> <span>डेमो रीडर अनुमत पृष्ठ (Demo Reader Allowed Pages Selection):</span>
@@ -1470,6 +1475,9 @@ Instant Download & Lifetime Access
                 <input type="checkbox" id="blp_pub_coming_soon_shelf" checked style="accent-color: #f59e0b;" />
                 <span>⏳ Coming Soon Pre-Launch</span>
               </label>
+            </div>
+            <div id="blp_demo_placement_notice" style="display: none; margin-top: 10px; padding: 10px 14px; background: rgba(220, 38, 38, 0.15); border: 1.5px solid #dc2626; border-radius: 8px; font-size: 0.84rem; color: #fca5a5; font-weight: 700;">
+              🔒 डेमो सुरक्षा नियम लागू: डेमो पुस्तकें केवल 'My Library' में ही सुरक्षित रहेंगी। वेबसाइट की किसी भी ख़रीद ट्रे (Store / Home Grid / Category Pages / Funnel) में नहीं दिखेंगी क्योंकि यह केवल पढ़ने व सुनने हेतु मुफ़्त सैंपल है (खरीदने की वस्तु नहीं है)।
             </div>
           </div>
 
@@ -2798,7 +2806,8 @@ Instant Download & Lifetime Access
 
     allLandingPages = [];
     try {
-      const res = await fetch('/data/universal-book-landing-pages.json?v=' + cacheTime);
+      let res = await fetch('/data/universal-book-landing-pages.json?v=' + cacheTime);
+      if (!res.ok) res = await fetch('../data/universal-book-landing-pages.json?v=' + cacheTime);
       if (res.ok) {
         const json = await res.json();
         allLandingPages = json.bookLandingPages || [];
@@ -2813,8 +2822,7 @@ Instant Download & Lifetime Access
           localList.forEach(item => {
             const idx = allLandingPages.findIndex(x => x.id === item.id);
             if (idx >= 0) {
-              // Admin edits in localStorage ALWAYS take priority over static file
-              if (item.admin_edited || !allLandingPages[idx].updated_at || (item.updated_at && new Date(item.updated_at) >= new Date(allLandingPages[idx].updated_at || 0))) {
+              if (item.admin_edited && (item.updated_at && new Date(item.updated_at) > new Date(allLandingPages[idx].updated_at || 0))) {
                 allLandingPages[idx] = { ...allLandingPages[idx], ...item };
               }
             } else {
@@ -6771,18 +6779,65 @@ Instant Download & Lifetime Access
   window.updateSuggestedBookField = (idx, field, val) => { if (currentSuggestedBooks[idx]) currentSuggestedBooks[idx][field] = val; };
   window.removeSuggestedBookItem = (idx) => { currentSuggestedBooks.splice(idx, 1); renderSuggestedBooksInBuilder(); };
 
-  window.importReviewsFromSelectedBook = function() {
+  window.importReviewsFromSelectedBook = async function() {
     const curId = (document.getElementById('blp_input_book_id')?.value || editingBookId || 'BK001').trim().toUpperCase();
-    const promptId = prompt('किस मुख्य पुस्तक से रिव्यू इम्पोर्ट करने हैं? (उदा. BK001, BK002, BK015):', curId);
+    const defaultTarget = curId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '').trim() || 'BK015';
+    const promptId = prompt('किस मुख्य पुस्तक से रिव्यू इम्पोर्ट करने हैं? (उदा. BK001, BK002, BK015):', defaultTarget);
     if (!promptId) return;
     const targetId = promptId.trim().toUpperCase();
+    const cleanTarget = targetId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '').trim();
 
-    const foundLp = (allLandingPages || []).find(p => p.id && p.id.toUpperCase() === targetId);
-    let reviews = foundLp?.customer_reviews || [];
+    // 1. Check in memory
+    const candidates = [targetId, cleanTarget, `DEMO-${cleanTarget}`];
+    let reviews = [];
+    for (const tid of candidates) {
+      const foundLp = (allLandingPages || []).find(p => p && p.id && p.id.toUpperCase() === tid);
+      if (foundLp?.testimonials && foundLp.testimonials.length > 0) {
+        reviews = foundLp.testimonials;
+        break;
+      }
+      if (foundLp?.customer_reviews && foundLp.customer_reviews.length > 0) {
+        reviews = foundLp.customer_reviews;
+        break;
+      }
+      const foundB = (allBooks || []).find(b => b && b.id && b.id.toUpperCase() === tid);
+      if (foundB?.testimonials && foundB.testimonials.length > 0) {
+        reviews = foundB.testimonials;
+        break;
+      }
+      if (foundB?.customer_reviews && foundB.customer_reviews.length > 0) {
+        reviews = foundB.customer_reviews;
+        break;
+      }
+    }
 
-    if (!reviews || reviews.length === 0) {
-      const foundB = (allBooks || []).find(b => b.id && b.id.toUpperCase() === targetId);
-      reviews = foundB?.customer_reviews || [];
+    // 2. If fewer than 5 reviews found, fetch fresh from server JSON directly
+    if (!reviews || reviews.length < 5) {
+      try {
+        const fetchUrls = [
+          '/data/universal-book-landing-pages.json?v=' + Date.now(),
+          '../data/universal-book-landing-pages.json?v=' + Date.now()
+        ];
+        for (const u of fetchUrls) {
+          try {
+            const res = await fetch(u, { cache: 'no-store' });
+            if (res.ok) {
+              const freshLp = await res.json();
+              const found = (freshLp.bookLandingPages || []).find(p => 
+                p && p.id && (p.id.toUpperCase() === targetId || p.id.toUpperCase() === cleanTarget)
+              );
+              if (found?.testimonials && found.testimonials.length > 0) {
+                reviews = found.testimonials;
+                break;
+              }
+              if (found?.customer_reviews && found.customer_reviews.length > 0) {
+                reviews = found.customer_reviews;
+                break;
+              }
+            }
+          } catch(e) {}
+        }
+      } catch (e) {}
     }
 
     if (!reviews || reviews.length === 0) {
@@ -6802,21 +6857,54 @@ Instant Download & Lifetime Access
     }));
 
     renderReviewsInBuilder();
-    showToast(`✅ ${currentReviews.length} रिव्यू '${targetId}' से इम्पोर्ट हो गए!`, 'success');
+    showToast(`✅ ${currentReviews.length} रिव्यू '${cleanTarget}' से इम्पोर्ट हो गए!`, 'success');
   };
 
-  window.importFaqsFromSelectedBook = function() {
+  window.importFaqsFromSelectedBook = async function() {
     const curId = (document.getElementById('blp_input_book_id')?.value || editingBookId || 'BK001').trim().toUpperCase();
-    const promptId = prompt('किस मुख्य पुस्तक से FAQs इम्पोर्ट करने हैं? (उदा. BK001, BK002, BK015):', curId);
+    const defaultTarget = curId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '').trim() || 'BK015';
+    const promptId = prompt('किस मुख्य पुस्तक से FAQs इम्पोर्ट करने हैं? (उदा. BK001, BK002, BK015):', defaultTarget);
     if (!promptId) return;
     const targetId = promptId.trim().toUpperCase();
+    const cleanTarget = targetId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '').trim();
 
-    const foundLp = (allLandingPages || []).find(p => p.id && p.id.toUpperCase() === targetId);
-    let faqs = foundLp?.faqs || [];
+    const candidates = [targetId, cleanTarget, `DEMO-${cleanTarget}`];
+    let faqs = [];
+    for (const tid of candidates) {
+      const foundLp = (allLandingPages || []).find(p => p && p.id && p.id.toUpperCase() === tid);
+      if (foundLp?.faqs && foundLp.faqs.length > 0) {
+        faqs = foundLp.faqs;
+        break;
+      }
+      const foundB = (allBooks || []).find(b => b && b.id && b.id.toUpperCase() === tid);
+      if (foundB?.faqs && foundB.faqs.length > 0) {
+        faqs = foundB.faqs;
+        break;
+      }
+    }
 
-    if (!faqs || faqs.length === 0) {
-      const foundB = (allBooks || []).find(b => b.id && b.id.toUpperCase() === targetId);
-      faqs = foundB?.faqs || [];
+    if (!faqs || faqs.length < 3) {
+      try {
+        const fetchUrls = [
+          '/data/universal-book-landing-pages.json?v=' + Date.now(),
+          '../data/universal-book-landing-pages.json?v=' + Date.now()
+        ];
+        for (const u of fetchUrls) {
+          try {
+            const res = await fetch(u, { cache: 'no-store' });
+            if (res.ok) {
+              const freshLp = await res.json();
+              const found = (freshLp.bookLandingPages || []).find(p => 
+                p && p.id && (p.id.toUpperCase() === targetId || p.id.toUpperCase() === cleanTarget)
+              );
+              if (found?.faqs && found.faqs.length > 0) {
+                faqs = found.faqs;
+                break;
+              }
+            }
+          } catch(e) {}
+        }
+      } catch (e) {}
     }
 
     if (!faqs || faqs.length === 0) {
@@ -6833,7 +6921,7 @@ Instant Download & Lifetime Access
     }));
 
     renderFaqsInBuilder();
-    showToast(`✅ ${currentFaqs.length} FAQs '${targetId}' से इम्पोर्ट हो गए!`, 'success');
+    showToast(`✅ ${currentFaqs.length} FAQs '${cleanTarget}' से इम्पोर्ट हो गए!`, 'success');
   };
 
   window.toggleLiveStatus = function(bId) {
@@ -6848,29 +6936,113 @@ Instant Download & Lifetime Access
     showToast(`स्टेटस बदला गया: ${page.status === 'active' ? '🟢 Live' : '🔴 Offline'}`, 'success');
   };
 
+  window.updatePlacementTrayAvailability = function(type, bookId) {
+    const rawId = String(bookId || document.getElementById('blp_input_book_id')?.value || '').trim().toUpperCase();
+    const isDemo = (type === 'demo') || rawId.startsWith('DEMO');
+    const demoTrayNotice = document.getElementById('blp_demo_placement_notice');
+
+    const trayCheckboxes = [
+      'blp_pub_ebook_store',
+      'blp_pub_category_page',
+      'blp_pub_home_page',
+      'blp_pub_home_hero',
+      'blp_pub_download_funnel',
+      'blp_pub_free_shelf',
+      'blp_pub_demo_shelf',
+      'blp_pub_coming_soon_shelf'
+    ];
+
+    if (isDemo) {
+      trayCheckboxes.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.checked = false;
+          el.disabled = true;
+          if (el.parentElement) el.parentElement.style.opacity = '0.35';
+        }
+      });
+      const myLib = document.getElementById('blp_pub_my_library');
+      if (myLib) {
+        myLib.checked = true;
+        myLib.disabled = false;
+        if (myLib.parentElement) myLib.parentElement.style.opacity = '1';
+      }
+      if (demoTrayNotice) demoTrayNotice.style.display = 'block';
+
+      // Demo books also disable tracking pixels by default
+      const fbChk = document.getElementById('blp_fb_pixel_enabled');
+      const gaChk = document.getElementById('blp_google_tag_enabled');
+      if (fbChk) fbChk.checked = false;
+      if (gaChk) gaChk.checked = false;
+    } else {
+      trayCheckboxes.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.disabled = false;
+          if (el.parentElement) el.parentElement.style.opacity = '1';
+        }
+      });
+      if (demoTrayNotice) demoTrayNotice.style.display = 'none';
+    }
+  };
+
   window.handleMasterBookTypeChange = function(type) {
     const audBlock = document.getElementById('blp_free_audience_block');
+    const importWrap = document.getElementById('blp_import_source_wrap');
+    const attachedTrayWrap = document.getElementById('blp_attached_books_tray_wrap');
+    const demoPagesContainer = document.getElementById('blp_demo_pages_container');
     const priceInput = document.getElementById('blp_hero_offer_price');
     const badgeSelect = document.getElementById('blp_store_badge');
     const stickyTextInput = document.getElementById('blp_sticky_btn_text');
+    const mrpWrap = document.getElementById('blp_pricing_mrp_wrap');
+    const offerWrap = document.getElementById('blp_pricing_offer_wrap');
+    const demoFreeNote = document.getElementById('blp_demo_free_price_note');
 
     if (type === 'free') {
       if (audBlock) audBlock.style.display = 'block';
+      if (importWrap) importWrap.style.display = 'none';
+      if (attachedTrayWrap) attachedTrayWrap.style.display = 'block';
+      if (demoPagesContainer) demoPagesContainer.style.display = 'none';
+      if (mrpWrap) mrpWrap.style.display = 'none';
+      if (offerWrap) offerWrap.style.display = 'none';
+      if (demoFreeNote) {
+        demoFreeNote.style.display = 'block';
+        demoFreeNote.textContent = '🎁 बोनस पुस्तक: मूल्य ₹0 (100% मुफ़्त) — पाठकों के लिए बिल्कुल फ्री';
+      }
       if (priceInput) priceInput.value = '0';
       if (badgeSelect) badgeSelect.value = 'bonus_free';
       if (stickyTextInput) stickyTextInput.value = 'मुफ़्त डाउनलोड करें';
       window.renderAttachedBooksTray();
+      window.updatePlacementTrayAvailability('free');
     } else if (type === 'demo') {
       if (audBlock) audBlock.style.display = 'block';
+      if (importWrap) importWrap.style.display = 'block';
+      if (attachedTrayWrap) attachedTrayWrap.style.display = 'none';
+      if (demoPagesContainer) demoPagesContainer.style.display = 'block';
+      if (mrpWrap) mrpWrap.style.display = 'none';
+      if (offerWrap) offerWrap.style.display = 'none';
+      if (demoFreeNote) {
+        demoFreeNote.style.display = 'block';
+        demoFreeNote.textContent = '📖 डेमो पुस्तक: मूल्य ₹0 (100% मुफ़्त) — पाठकों के लिए पढ़ने व सुनने हेतु बिल्कुल फ्री';
+      }
       if (priceInput) priceInput.value = '0';
       if (badgeSelect) badgeSelect.value = 'free_demo';
       if (stickyTextInput) stickyTextInput.value = 'डेमो पढ़ें';
       window.renderAttachedBooksTray();
+      window.updatePlacementTrayAvailability('demo');
     } else {
+      // Main Paid Book: Cleanly hide ALL demo/free options, show full pricing
       if (audBlock) audBlock.style.display = 'none';
+      if (importWrap) importWrap.style.display = 'none';
+      if (attachedTrayWrap) attachedTrayWrap.style.display = 'none';
+      if (demoPagesContainer) demoPagesContainer.style.display = 'none';
+      if (mrpWrap) mrpWrap.style.display = 'block';
+      if (offerWrap) offerWrap.style.display = 'block';
+      if (demoFreeNote) demoFreeNote.style.display = 'none';
       if (priceInput && (priceInput.value === '0' || !priceInput.value)) priceInput.value = '99';
       if (badgeSelect) badgeSelect.value = 'best_seller';
       if (stickyTextInput) stickyTextInput.value = 'खरीदें';
+      window.updatePlacementTrayAvailability('paid');
     }
   };
 
@@ -7391,13 +7563,22 @@ Instant Download & Lifetime Access
             window.renderAttachedBooksTray(bObj.target_main_books || []);
           }
 
-          const bTargets = Array.isArray(bObj.publish_targets) ? bObj.publish_targets : ['ebook_store', 'category_page', 'my_library', 'home_page', 'download_funnel'];
+          const isDemoBook = (cleanId.startsWith('DEMO') || bType === 'demo');
+          const bTargets = Array.isArray(bObj.publish_targets) && bObj.publish_targets.length > 0
+            ? bObj.publish_targets
+            : (isDemoBook ? ['my_library'] : ['ebook_store', 'category_page', 'my_library', 'home_page', 'download_funnel']);
           setChecked('blp_pub_ebook_store', bTargets.includes('ebook_store'));
           setChecked('blp_pub_category_page', bTargets.includes('category_page'));
-          setChecked('blp_pub_my_library', bTargets.includes('my_library'));
+          setChecked('blp_pub_my_library', bTargets.includes('my_library') || isDemoBook);
           setChecked('blp_pub_home_page', bTargets.includes('home_page'));
           setChecked('blp_pub_home_hero', bTargets.includes('home_hero'));
           setChecked('blp_pub_download_funnel', bTargets.includes('download_funnel'));
+          setChecked('blp_pub_free_shelf', bTargets.includes('free_shelf'));
+          setChecked('blp_pub_demo_shelf', bTargets.includes('demo_shelf'));
+          setChecked('blp_pub_coming_soon_shelf', bTargets.includes('coming_soon_shelf'));
+          if (typeof window.updatePlacementTrayAvailability === 'function') {
+            window.updatePlacementTrayAvailability(bType, cleanId);
+          }
           showToast(`✏️ कैटलॉग से बुक (${cleanId}) लोड की गई`, 'info');
           return;
         }
@@ -7492,16 +7673,22 @@ Instant Download & Lifetime Access
       if (typeof renderAudioHighlightsInBuilder === 'function') renderAudioHighlightsInBuilder();
 
       // Publishing Targets & Badges
-      const targets = page.publish_targets || ['ebook_store', 'category_page', 'my_library', 'home_page', 'download_funnel'];
+      const isDemoPage = (rawId.startsWith('DEMO') || bType === 'demo' || page.book_type === 'demo');
+      const targets = Array.isArray(page.publish_targets) && page.publish_targets.length > 0
+        ? page.publish_targets
+        : (isDemoPage ? ['my_library'] : ['ebook_store', 'category_page', 'my_library', 'home_page', 'download_funnel']);
       setChecked('blp_pub_ebook_store', targets.includes('ebook_store'));
       setChecked('blp_pub_category_page', targets.includes('category_page'));
-      setChecked('blp_pub_my_library', targets.includes('my_library'));
+      setChecked('blp_pub_my_library', targets.includes('my_library') || isDemoPage);
       setChecked('blp_pub_home_page', targets.includes('home_page'));
       setChecked('blp_pub_home_hero', targets.includes('home_hero'));
       setChecked('blp_pub_download_funnel', targets.includes('download_funnel'));
       setChecked('blp_pub_free_shelf', targets.includes('free_shelf'));
       setChecked('blp_pub_demo_shelf', targets.includes('demo_shelf'));
       setChecked('blp_pub_coming_soon_shelf', targets.includes('coming_soon_shelf'));
+      if (typeof window.updatePlacementTrayAvailability === 'function') {
+        window.updatePlacementTrayAvailability(bType, rawId);
+      }
       setVal('blp_store_badge', page.store_badge || 'best_seller');
       const isPageComingSoon = Boolean(page.is_coming_soon === true || page.is_coming_soon === 'true' || page.isComingSoon === true || page.isComingSoon === 'true' || page.status === 'coming_soon' || page.store_badge === 'coming_soon');
       setVal('blp_is_coming_soon', isPageComingSoon ? 'true' : 'false');
@@ -7887,22 +8074,30 @@ Instant Download & Lifetime Access
       }
     });
 
-    const isFbOn = document.getElementById('blp_fb_pixel_enabled')?.checked !== false;
-    const isGaOn = document.getElementById('blp_google_tag_enabled')?.checked !== false;
+    const bookType = document.getElementById('blp_book_type')?.value || (offerPrice === 0 ? 'free' : 'paid');
+    const isDemoBook = (bId.startsWith('DEMO') || bookType === 'demo');
+
+    const isFbOn = isDemoBook ? false : (document.getElementById('blp_fb_pixel_enabled')?.checked !== false);
+    const isGaOn = isDemoBook ? false : (document.getElementById('blp_google_tag_enabled')?.checked !== false);
 
     const ogTitle = (document.getElementById('blp_og_title')?.value || '').trim() || title;
     const ogDesc = (document.getElementById('blp_og_description')?.value || '').trim() || (document.getElementById('blp_hero_desc')?.value || `${title} - सम्पूर्ण Practical Guide।`);
 
     const publishTargets = [];
-    if (document.getElementById('blp_pub_ebook_store')?.checked) publishTargets.push('ebook_store');
-    if (document.getElementById('blp_pub_category_page')?.checked) publishTargets.push('category_page');
-    if (document.getElementById('blp_pub_my_library')?.checked) publishTargets.push('my_library');
-    if (document.getElementById('blp_pub_home_page')?.checked) publishTargets.push('home_page');
-    if (document.getElementById('blp_pub_home_hero')?.checked) publishTargets.push('home_hero');
-    if (document.getElementById('blp_pub_download_funnel')?.checked) publishTargets.push('download_funnel');
-    if (document.getElementById('blp_pub_free_shelf')?.checked) publishTargets.push('free_shelf');
-    if (document.getElementById('blp_pub_demo_shelf')?.checked) publishTargets.push('demo_shelf');
-    if (document.getElementById('blp_pub_coming_soon_shelf')?.checked) publishTargets.push('coming_soon_shelf');
+    if (isDemoBook) {
+      // DEMO BOOK SECURITY RULE: Demo books NEVER appear in store/website trays, ONLY in My Library
+      publishTargets.push('my_library');
+    } else {
+      if (document.getElementById('blp_pub_ebook_store')?.checked) publishTargets.push('ebook_store');
+      if (document.getElementById('blp_pub_category_page')?.checked) publishTargets.push('category_page');
+      if (document.getElementById('blp_pub_my_library')?.checked) publishTargets.push('my_library');
+      if (document.getElementById('blp_pub_home_page')?.checked) publishTargets.push('home_page');
+      if (document.getElementById('blp_pub_home_hero')?.checked) publishTargets.push('home_hero');
+      if (document.getElementById('blp_pub_download_funnel')?.checked) publishTargets.push('download_funnel');
+      if (document.getElementById('blp_pub_free_shelf')?.checked) publishTargets.push('free_shelf');
+      if (document.getElementById('blp_pub_demo_shelf')?.checked) publishTargets.push('demo_shelf');
+      if (document.getElementById('blp_pub_coming_soon_shelf')?.checked) publishTargets.push('coming_soon_shelf');
+    }
 
     const storeBadge = document.getElementById('blp_store_badge')?.value || 'best_seller';
     const isComingSoon = document.getElementById('blp_is_coming_soon')?.value === 'true';
@@ -8034,6 +8229,10 @@ Instant Download & Lifetime Access
     document.querySelectorAll('input[name="blp_attached_book_chk"]:checked').forEach(cb => {
       attachedMainBooks.push(cb.value);
     });
+    if (isDemoBook && attachedMainBooks.length === 0) {
+      const derivedMain = bId.replace(/^DEMO[-_]?/i, '');
+      if (derivedMain) attachedMainBooks.push(derivedMain);
+    }
 
     const pageData = {
       id: bId,
@@ -8202,6 +8401,13 @@ Instant Download & Lifetime Access
       pdf_url: finalMainPdfPath,
       freePdf: finalFreePdfPath,
       demoPdf: finalFreePdfPath,
+      demoImages: cleanedDemoImages,
+      demo_images: cleanedDemoImages,
+      preview_images: cleanedDemoImages,
+      previewImages: cleanedDemoImages,
+      demoAvailable: Boolean(cleanedDemoImages.length > 0 || finalFreePdfPath),
+      demo_reader_pages: (document.getElementById('blp_demo_reader_pages')?.value || '').trim(),
+      demoPages: (document.getElementById('blp_demo_reader_pages')?.value || '').trim(),
       og_image: finalOgImg,
       og_image_landscape: finalOgImg,
       audio_layer: pageData.audio_layer,

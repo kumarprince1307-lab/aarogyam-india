@@ -32,6 +32,8 @@ let modifiedPageIndices = new Set(); // Stores 0-indexed page numbers that chang
 let audioScriptsModified = false; // Flag if text or audio voice changed
 let isFullBookReload = false; // Flag if bulk upload or fresh PDF was loaded
 let pendingSmartUploadFiles = []; // Staged files for smart position modal
+let studioDemoParsedPages = []; // Stores real book page numbers for demo books
+let studioIsDemoStudio = false; // Flag if current studio book is a demo book
 
 // Media Recorder
 let mediaRecorder = null;
@@ -1084,22 +1086,35 @@ async function loadBookStudio(bookId) {
         }
     } catch (e) {}
 
-    if (!studioBookData) {
+    // For Demo / Free books, prioritize Universal Landing Pages and Custom Landing Pages to obtain demo_reader_pages & preview images
+    const isDemoId = cleanId.startsWith('DEMO') || cleanId.startsWith('FREE') || cleanId.startsWith('BONUS');
+    if (isDemoId || !studioBookData) {
         try {
-            const resLp = await fetch('../data/universal-book-landing-pages.json?v=' + Date.now());
+            const resLp = await fetch('../data/universal-book-landing-pages.json?v=' + Math.floor(Date.now() / 300000));
             if (resLp.ok) {
                 const jsonLp = await resLp.json();
                 if (jsonLp.bookLandingPages) {
-                    studioBookData = jsonLp.bookLandingPages.find(p => p.id && p.id.toUpperCase() === cleanId);
+                    const matchLp = jsonLp.bookLandingPages.find(p => 
+                        (p.id && p.id.toUpperCase() === cleanId) ||
+                        (p.id && p.id.replace(/-/g, '').toUpperCase() === cleanId.replace(/-/g, '')) ||
+                        (cleanId.includes('002') && p.id && p.id.includes('002') && p.id.startsWith('DEMO')) ||
+                        (cleanId.includes('015') && p.id && p.id.includes('015') && p.id.startsWith('DEMO')) ||
+                        (cleanId.includes('001') && p.id && p.id.includes('001') && p.id.startsWith('DEMO'))
+                    );
+                    if (matchLp) studioBookData = { ...(studioBookData || {}), ...matchLp };
                 }
             }
         } catch (e) {}
     }
 
-    if (!studioBookData) {
+    if (!studioBookData || isDemoId) {
         try {
             const localLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
-            studioBookData = localLp.find(p => p.id && p.id.toUpperCase() === cleanId);
+            const matchLocal = localLp.find(p => 
+                (p.id && p.id.toUpperCase() === cleanId) ||
+                (p.id && p.id.replace(/-/g, '').toUpperCase() === cleanId.replace(/-/g, ''))
+            );
+            if (matchLocal) studioBookData = { ...(studioBookData || {}), ...matchLocal };
         } catch (e) {}
     }
 
@@ -1114,19 +1129,80 @@ async function loadBookStudio(bookId) {
         studioBookData = freeDemoBook;
     }
 
-    const isDemoStudio = cleanId.startsWith('DEMO') || studioBookData?.book_type === 'demo' || studioBookData?.type === 'demo' || studioBookData?.isDemo;
-    const targetParent = (studioBookData?.targetMainBook || cleanId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || (cleanId.includes('BK002') ? 'BK002' : 'BK001')).toUpperCase();
+    studioIsDemoStudio = cleanId.startsWith('DEMO') || studioBookData?.book_type === 'demo' || studioBookData?.type === 'demo' || studioBookData?.isDemo;
+    const isDemoStudio = studioIsDemoStudio;
+    
+    // Robust target parent resolution for DEMO-BK002, DEMO002, DEMO-BK015, etc.
+    let targetParent = (studioBookData?.targetMainBook || '').toUpperCase();
+    if (!targetParent && studioBookData?.target_main_books) {
+        if (Array.isArray(studioBookData.target_main_books) && studioBookData.target_main_books.length > 0) {
+            targetParent = String(studioBookData.target_main_books[0]).toUpperCase();
+        } else if (typeof studioBookData.target_main_books === 'string') {
+            targetParent = studioBookData.target_main_books.trim().toUpperCase();
+        }
+    }
+    if (!targetParent) {
+        const stripped = cleanId.replace(/^(DEMO_|DEMO-|DEMO|FREE_|FREE-|FREE|BONUS_|BONUS-|BONUS)/i, '').trim().toUpperCase();
+        if (stripped.startsWith('BK')) targetParent = stripped;
+        else if (/^\d+$/.test(stripped)) targetParent = 'BK' + stripped.padStart(3, '0');
+        else targetParent = stripped || (cleanId.includes('002') ? 'BK002' : (cleanId.includes('015') ? 'BK015' : 'BK001'));
+    }
 
-    // Determine target total pages from repository / metadata
+    // 2b. PRIORITY 1 FOR DEMO BOOKS: Load explicitly configured demo_reader_pages
+    studioDemoParsedPages = [];
+    if (isDemoStudio) {
+        const allowedPagesParam = (studioBookData?.demo_reader_pages || studioBookData?.demoPages || '').trim();
+        if (allowedPagesParam) {
+            allowedPagesParam.split(/[,;]+/).forEach(part => {
+                const clean = part.trim();
+                if (clean.includes('-')) {
+                    const [s, e] = clean.split('-').map(x => parseInt(x.trim(), 10));
+                    if (!isNaN(s) && !isNaN(e) && s <= e) {
+                        for (let p = s; p <= e; p++) {
+                            if (!studioDemoParsedPages.includes(p)) studioDemoParsedPages.push(p);
+                        }
+                    }
+                } else {
+                    const num = parseInt(clean, 10);
+                    if (!isNaN(num) && !studioDemoParsedPages.includes(num)) {
+                        studioDemoParsedPages.push(num);
+                    }
+                }
+            });
+        }
+
+        studioPageImages = [];
+        // 1. Add preview gallery images configured in builder for this demo book
+        const rawPreviewImgs = (studioBookData?.demo_images || studioBookData?.demoImages || studioBookData?.preview_images || []);
+        if (Array.isArray(rawPreviewImgs) && rawPreviewImgs.length > 0) {
+            rawPreviewImgs.forEach(img => {
+                if (img && typeof img === 'string') {
+                    const cleanPath = img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('..') ? img : ('../' + img));
+                    if (!studioPageImages.includes(cleanPath)) studioPageImages.push(cleanPath);
+                }
+            });
+        }
+
+        // 2. Also add selected main book pages from studioDemoParsedPages without duplicate
+        if (studioDemoParsedPages.length > 0) {
+            studioDemoParsedPages.forEach(p => {
+                const pagePath = `../images/books/${targetParent}/${p}.webp`;
+                if (!studioPageImages.includes(pagePath)) studioPageImages.push(pagePath);
+            });
+        }
+        studioTotalPages = studioPageImages.length;
+    }
+
+    // Determine target total pages from repository / metadata for main books
     const repoTotal = (studioBookData && studioBookData.totalPages) 
         ? studioBookData.totalPages 
-        : (cleanId === 'BK001' ? 152 : (cleanId === 'BK002' ? 118 : 0));
+        : (cleanId === 'BK001' ? 152 : (cleanId === 'BK002' ? 118 : (cleanId === 'BK015' ? 154 : 0)));
     const basePath = (studioBookData && studioBookData.pageImagesPath) 
         ? studioBookData.pageImagesPath 
         : `images/books/${cleanId}`;
 
-    // 3. Static WebP images in Repository (Priority for BK001, BK002, and books with WebP pages)
-    if (repoTotal > 0 && (studioBookData?.hasWebpPages || cleanId === 'BK001' || cleanId === 'BK002')) {
+    // 3. Static WebP images in Repository (Priority for main books with WebP pages, e.g. BK001, BK002, BK015)
+    if (!studioPageImages.length && !isDemoStudio && repoTotal > 0 && (studioBookData?.hasWebpPages || cleanId.startsWith('BK') || cleanId === 'BK001' || cleanId === 'BK002' || cleanId === 'BK015')) {
         studioPageImages = [];
         for (let p = 1; p <= repoTotal; p++) {
             studioPageImages.push(`../${basePath}/${p}.webp`);
@@ -1157,41 +1233,20 @@ async function loadBookStudio(bookId) {
         } catch (e) {}
     }
 
-    // 6. Check custom book pageImages/demoImages in JSON / Landing Page
-    if (!studioPageImages.length && studioBookData) {
+    // 6. Check custom book pageImages in JSON / Landing Page (ONLY for main books, NEVER demo books)
+    if (!studioPageImages.length && studioBookData && !isDemoStudio) {
         if (Array.isArray(studioBookData.pageImages) && studioBookData.pageImages.length > 0) {
             studioPageImages = studioBookData.pageImages.map(img => img.startsWith('/') ? ('..' + img) : img);
-            studioTotalPages = studioPageImages.length;
-        } else if (Array.isArray(studioBookData.demoImages) && studioBookData.demoImages.length > 0) {
-            studioPageImages = studioBookData.demoImages.map(img => img.startsWith('/') ? ('..' + img) : img);
             studioTotalPages = studioPageImages.length;
         }
     }
 
-    // 6b. For Demo Books without custom uploaded images: load target parent's allowed pages + preview images
+    // 6b. Fallback for Demo Books without configured demo_reader_pages: default to 1..5 of targetParent
     if (!studioPageImages.length && isDemoStudio) {
-        const allowedPagesParam = (studioBookData?.demo_reader_pages || studioBookData?.demoPages || '1-5').trim();
-        let parsedPages = [];
-        if (allowedPagesParam) {
-            allowedPagesParam.split(/[,;]+/).forEach(part => {
-                const clean = part.trim();
-                if (clean.includes('-')) {
-                    const [s, e] = clean.split('-').map(x => parseInt(x.trim(), 10));
-                    if (!isNaN(s) && !isNaN(e) && s <= e) {
-                        for (let p = s; p <= e; p++) {
-                            if (!parsedPages.includes(p)) parsedPages.push(p);
-                        }
-                    }
-                } else {
-                    const num = parseInt(clean, 10);
-                    if (!isNaN(num) && !parsedPages.includes(num)) {
-                        parsedPages.push(num);
-                    }
-                }
-            });
-        }
-        if (parsedPages.length === 0) parsedPages = [1, 2, 3, 4, 5];
-        studioPageImages = parsedPages.map(p => `../images/books/${targetParent}/${p}.webp`);
+        [1, 2, 3, 4, 5].forEach(p => {
+            const pagePath = `../images/books/${targetParent}/${p}.webp`;
+            if (!studioPageImages.includes(pagePath)) studioPageImages.push(pagePath);
+        });
         studioTotalPages = studioPageImages.length;
     }
 
@@ -1210,7 +1265,22 @@ async function loadBookStudio(bookId) {
             if (!resParent.ok) resParent = await fetch(`/data/audio-scripts/${targetParent}.json?v=${Date.now()}`);
             if (resParent.ok) {
                 const parentJson = await resParent.json();
-                serverMeta = { bookId: cleanId, pages: parentJson.pages || {} };
+                serverMeta = { bookId: cleanId, pages: {} };
+                const parentPages = parentJson.pages || {};
+                
+                if (studioDemoParsedPages.length > 0) {
+                    studioDemoParsedPages.forEach((realPage, idx) => {
+                        const seqKey = String(idx + 1);
+                        const realKey = String(realPage);
+                        const scriptData = parentPages[realKey] || parentPages[seqKey];
+                        if (scriptData) {
+                            serverMeta.pages[seqKey] = scriptData;
+                            serverMeta.pages[realKey] = scriptData;
+                        }
+                    });
+                } else {
+                    serverMeta.pages = parentPages;
+                }
                 serverScripts = serverMeta.pages || {};
             }
         } else if (freeDemoBook && freeDemoBook.audioUrl) {
@@ -1238,11 +1308,32 @@ async function loadBookStudio(bookId) {
         }
     } catch (e) {}
 
+    // CRITICAL: NEVER let empty local text or audio overwrite populated server text or audio!
+    const mergedPages = { ...serverScripts };
+    Object.keys(localScripts).forEach(k => {
+        const localP = localScripts[k];
+        const serverP = serverScripts[k] || {};
+        const localText = (typeof localP === 'string' ? localP : localP?.text || '').trim();
+        const serverText = (typeof serverP === 'string' ? serverP : serverP?.text || '').trim();
+        const localAudio = (typeof localP === 'object' ? localP?.audio || '' : '').trim();
+        const serverAudio = (typeof serverP === 'object' ? serverP?.audio || '' : '').trim();
+
+        mergedPages[k] = {
+            text: localText || serverText,
+            audio: localAudio || serverAudio
+        };
+    });
+
     studioAudioScripts = {
         ...serverMeta,
         bookId: cleanId,
-        pages: { ...serverScripts, ...localScripts }
+        pages: mergedPages
     };
+
+    // Cleanse local storage with populated merged scripts
+    try {
+        localStorage.setItem(`AOI_AUDIO_SCRIPTS_${cleanId}`, JSON.stringify(studioAudioScripts));
+    } catch(e) {}
 
     // 8. Fallback to PDF if no WebP images yet
     if (!studioPageImages.length) {
@@ -1321,6 +1412,9 @@ function renderPageChipGrid() {
         }
 
         let badge = `Pg ${p}`;
+        if (studioIsDemoStudio && studioDemoParsedPages && studioDemoParsedPages.length >= p) {
+            badge = `D${p} (P${studioDemoParsedPages[p - 1]})`;
+        }
         if (hasAudio) badge += ' 🎙️';
         else if (hasText) badge += ' 📖';
 
@@ -1356,7 +1450,13 @@ async function selectPage(pageNum) {
     renderPageChipGrid();
 
     const pageTag = document.getElementById('previewPageNumberTag');
-    if (pageTag) pageTag.textContent = `Page ${pageNum}`;
+    if (pageTag) {
+        if (studioIsDemoStudio && studioDemoParsedPages && studioDemoParsedPages.length >= pageNum) {
+            pageTag.textContent = `Demo Page ${pageNum} (Book Page ${studioDemoParsedPages[pageNum - 1]})`;
+        } else {
+            pageTag.textContent = `Page ${pageNum}`;
+        }
+    }
 
     const sizeTag = document.getElementById('currentPageSizeTag');
     const previewCanvas = document.getElementById('previewCanvas');
@@ -1373,25 +1473,36 @@ async function selectPage(pageNum) {
         if (previewCanvas) previewCanvas.style.display = 'none';
         if (previewImage) {
             const rawSrc = studioPageImages[pageNum - 1];
+            let retryCount = 0;
             previewImage.onload = () => {
                 if (loadingText) loadingText.style.display = 'none';
                 previewImage.style.display = 'block';
             };
             previewImage.onerror = () => {
-                // Fallback attempt: if ../images failed, try /images or direct
-                if (rawSrc.startsWith('../')) {
-                    previewImage.src = rawSrc.replace('../', '/');
-                } else if (rawSrc.startsWith('/')) {
-                    previewImage.src = '..' + rawSrc;
-                } else {
-                    if (loadingText) {
-                        loadingText.style.display = 'block';
-                        loadingText.textContent = `पृष्ठ ${pageNum} लोड नहीं हो सका।`;
+                retryCount++;
+                if (retryCount === 1) {
+                    if (rawSrc.startsWith('../')) {
+                        previewImage.src = rawSrc.replace(/^\.\.\//, '/');
+                        return;
+                    } else if (rawSrc.startsWith('/')) {
+                        previewImage.src = '..' + rawSrc;
+                        return;
                     }
+                } else if (retryCount === 2) {
+                    previewImage.src = rawSrc.replace(/^(\.\.\/|\/)+/, '');
+                    return;
+                }
+                if (loadingText) {
+                    loadingText.style.display = 'block';
+                    loadingText.textContent = `पृष्ठ ${pageNum} लोड नहीं हो सका।`;
                 }
             };
 
             previewImage.src = rawSrc;
+            if (previewImage.complete && previewImage.naturalWidth > 0) {
+                if (loadingText) loadingText.style.display = 'none';
+                previewImage.style.display = 'block';
+            }
             
             // Calculate approximate size
             if (typeof rawSrc === 'string' && rawSrc.startsWith('data:')) {

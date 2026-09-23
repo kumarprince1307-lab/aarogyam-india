@@ -608,13 +608,8 @@ async function renderLibrarySections(booksArray) {
     const isLoggedInUser = Boolean(profileId || (cleanMobile && cleanMobile.length === 10));
 
     let userPurchases = [];
-    if (isLoggedInUser) {
-        const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
-        userPurchases = Array.isArray(localPurchases) ? [...localPurchases] : [];
-    } else {
-        localStorage.removeItem('AI_PURCHASES');
-        localStorage.removeItem('purchases');
-    }
+    const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+    userPurchases = Array.isArray(localPurchases) ? [...localPurchases] : [];
 
     try {
         const activeDb = getLibrarySupabaseClient();
@@ -703,17 +698,14 @@ async function renderLibrarySections(booksArray) {
         console.warn("Supabase purchases sync exception:", dbErr);
     }
 
-    // Filter valid purchased book IDs (Coming Soon books e.g. BK015 can NEVER be purchased)
+    // Collect all valid purchased book IDs
     const activePurchasedBookIds = new Set();
     userPurchases.forEach(p => {
         if (!p) return;
         const bId = String(p.book_id || p.id || '').toUpperCase().trim();
         if (bId) {
-            const matchedBook = booksArray.find(b => (b.id && b.id.toUpperCase() === bId) || (b.book_id && b.book_id.toUpperCase() === bId));
-            const isComing = matchedBook ? (matchedBook.status === 'coming_soon' || matchedBook.isComingSoon === true) : (bId !== 'BK001' && bId !== 'BK002' && bId !== 'BK015' && bId !== 'SUB001');
-            if (!isComing) {
-                activePurchasedBookIds.add(bId);
-            }
+            activePurchasedBookIds.add(bId);
+            activePurchasedBookIds.add(bId.replace(/^DEMO-?/i, ''));
         }
     });
 

@@ -512,7 +512,8 @@
    ==================================================================== */
 #ai-live-purchase-toast-container {
   position: fixed !important;
-  left: 20px !important;
+  right: 20px !important;
+  left: auto !important;
   bottom: 28px !important;
   z-index: 999990 !important;
   pointer-events: auto !important;
@@ -521,7 +522,8 @@
 
 @media (max-width: 768px) {
   #ai-live-purchase-toast-container {
-    left: 12px !important;
+    right: 12px !important;
+    left: auto !important;
     bottom: 84px !important; /* Floats safely above the 8-tab bottom nav */
     max-width: calc(100vw - 24px) !important;
   }

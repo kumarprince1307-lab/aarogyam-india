@@ -111,8 +111,9 @@ async function verifyUserAccessAndSession(targetBookId) {
 
     // Merge Landing Pages (for sample_preview images and demo_reader_pages)
     try {
-        const resLp = await fetch("/data/universal-book-landing-pages.json?v=" + Date.now());
-        if (resLp.ok) {
+        let resLp = await fetch("../data/universal-book-landing-pages.json?v=" + Date.now());
+        if (!resLp || !resLp.ok) resLp = await fetch("/data/universal-book-landing-pages.json?v=" + Date.now());
+        if (resLp && resLp.ok) {
             const jsonLp = await resLp.json();
             const lpList = jsonLp.bookLandingPages || [];
             lpList.forEach(lp => {
@@ -145,12 +146,13 @@ async function verifyUserAccessAndSession(targetBookId) {
                 const previewImgList = (lp.sample_preview && Array.isArray(lp.sample_preview.pages) && lp.sample_preview.pages.length > 0)
                     ? lp.sample_preview.pages.map(p => typeof p === 'object' ? p.image : p).filter(Boolean)
                     : (lp.demoImages || []);
+                const curServerPages = jsonBooks[idx]?.demo_reader_pages || '';
                 const normalized = {
                     ...lp,
                     id: lp.id.toUpperCase(),
                     heading: lp.hero?.title || lp.heading || lp.id,
                     name: lp.hero?.title || lp.name || lp.id,
-                    demo_reader_pages: lp.demo_reader_pages || lp.demoPages || '',
+                    demo_reader_pages: (curServerPages && curServerPages.length >= (lp.demo_reader_pages || '').length) ? curServerPages : (lp.demo_reader_pages || lp.demoPages || curServerPages),
                     demoImages: previewImgList.length > 0 ? previewImgList : (jsonBooks[idx]?.demoImages || []),
                     targetMainBook: lp.targetMainBook || lp.id.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || 'BK001'
                 };
@@ -395,16 +397,8 @@ async function verifyUserAccessAndSession(targetBookId) {
                 }
             } catch (e) {}
         }
-        if (!studioPages || !studioPages.length) {
-            const total = aoiCurrentBookData.totalPages || 0;
-            const basePath = aoiCurrentBookData.pageImagesPath || `images/books/${canonicalBookId}`;
-            if (aoiCurrentBookData.hasWebpPages && total > 0) {
-                studioPages = [];
-                for (let p = 1; p <= total; p++) {
-                    studioPages.push(`../${basePath}/${p}.webp`);
-                }
-            }
-        }
+        // In Demo Mode, DO NOT load all 152 pages of the main book.
+        // Studio custom pages for demo mode must be explicitly configured or fall through to demo_reader_pages.
 
         if (studioPages && studioPages.length > 0) {
             // Audio Studio has configured dedicated pages for this book.
@@ -460,7 +454,7 @@ async function verifyUserAccessAndSession(targetBookId) {
             let combinedImages = [];
             let sourceMap = [];
 
-            // 1. Add all sample preview images (resolved with proper ../ relative path)
+            // 1. Add preview gallery images configured in builder
             if (rawPreviewImages && rawPreviewImages.length > 0) {
                 rawPreviewImages.forEach((img, idx) => {
                     if (img && typeof img === 'string') {
@@ -473,7 +467,7 @@ async function verifyUserAccessAndSession(targetBookId) {
                 });
             }
 
-            // 2. Add selected specific main book pages
+            // 2. Also add selected main book pages from parsedPageNumbers without duplicates
             if (parsedPageNumbers.length > 0) {
                 parsedPageNumbers.forEach(p => {
                     const pagePath = `../images/books/${targetMain}/${p}.webp`;
@@ -482,19 +476,19 @@ async function verifyUserAccessAndSession(targetBookId) {
                         sourceMap.push(p);
                     }
                 });
+            } else if (combinedImages.length === 0 && aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
+                // Priority 3: First 5 pages from book page images
+                aoiCurrentBookData.pageImages.slice(0, 5).forEach((img, idx) => {
+                    const cleanPath = img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('data:') || img.startsWith('..') ? img : ('../' + img));
+                    combinedImages.push(cleanPath);
+                    sourceMap.push(idx + 1);
+                });
             } else if (combinedImages.length === 0) {
-                if (aoiCurrentBookData.pageImages && Array.isArray(aoiCurrentBookData.pageImages) && aoiCurrentBookData.pageImages.length > 0) {
-                    aoiCurrentBookData.pageImages.slice(0, 5).forEach((img, idx) => {
-                        const cleanPath = img.startsWith('/') ? ('..' + img) : (img.startsWith('http') || img.startsWith('data:') || img.startsWith('..') ? img : ('../' + img));
-                        combinedImages.push(cleanPath);
-                        sourceMap.push(idx + 1);
-                    });
-                } else {
-                    [1, 2, 3, 4, 5].forEach(p => {
-                        combinedImages.push(`../images/books/${targetMain}/${p}.webp`);
-                        sourceMap.push(p);
-                    });
-                }
+                // Fallback: first 5 pages of target main book
+                [1, 2, 3, 4, 5].forEach(p => {
+                    combinedImages.push(`../images/books/${targetMain}/${p}.webp`);
+                    sourceMap.push(p);
+                });
             }
 
             pageImages = combinedImages;
@@ -562,7 +556,10 @@ async function verifyUserAccessAndSession(targetBookId) {
         initImageModeReader(pageImages);
     } else {
         console.log("📄 Standard PDF Engine Activated for:", targetBookId);
-        loadPdfFile(aoiCurrentBookData.mainPdf || "pdf/full/" + targetBookId + ".pdf");
+        const fallbackPdf = isDemoMode 
+            ? (aoiCurrentBookData.demoPdf || `/pdf/sample/${canonicalBookId}-demo.pdf`)
+            : (aoiCurrentBookData.mainPdf || `/pdf/full/${targetBookId}.pdf`);
+        loadPdfFile(fallbackPdf);
     }
 }
 

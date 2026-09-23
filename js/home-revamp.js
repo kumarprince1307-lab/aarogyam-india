@@ -1066,6 +1066,9 @@
         if (!b || !b.id) return false;
         const bIdUpper = b.id.toUpperCase();
         if (bIdUpper === 'BK001' || bIdUpper === 'BK002') return false;
+        // DEMO BOOK SECURITY RULE: Demo books NEVER appear in Home trays/bestsellers
+        if (bIdUpper.startsWith('DEMO') || b.book_type === 'demo' || b.type === 'demo') return false;
+        if (b.publish_targets && Array.isArray(b.publish_targets) && !b.publish_targets.includes('home_page')) return false;
         if (b.status === 'draft' || b.status === 'inactive' || b.isComingSoon || b.is_coming_soon) return false;
         return true;
       });

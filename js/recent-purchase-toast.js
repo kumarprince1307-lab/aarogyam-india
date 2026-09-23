@@ -151,7 +151,7 @@
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
       max-width: 320px;
       cursor: pointer;
-      transform: translate3d(-120%, 0, 0);
+      transform: translate3d(120%, 0, 0);
       opacity: 0;
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
       position: relative;
@@ -202,7 +202,7 @@
 
     container.appendChild(toast);
 
-    // Animate In
+    // Animate In from Right
     requestAnimationFrame(() => {
       toast.style.transform = 'translate3d(0, 0, 0)';
       toast.style.opacity = '1';
@@ -220,7 +220,7 @@
 
   function removeToast(toast) {
     if (!toast) return;
-    toast.style.transform = 'translate3d(-120%, 0, 0)';
+    toast.style.transform = 'translate3d(120%, 0, 0)';
     toast.style.opacity = '0';
     setTimeout(() => {
       toast.remove();
@@ -235,7 +235,7 @@
       toastTimer = setInterval(() => {
         showNextPurchaseToast();
       }, intervalMs);
-    }, 6000);
+    }, 1800);
   }
 
   /* ====================================================================

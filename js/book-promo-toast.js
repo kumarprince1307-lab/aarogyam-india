@@ -261,7 +261,8 @@
       toastContainer.style.cssText = `
         position: fixed;
         bottom: 24px;
-        left: 24px;
+        right: 24px;
+        left: auto;
         z-index: 9999;
         max-width: 360px;
         width: calc(100% - 48px);

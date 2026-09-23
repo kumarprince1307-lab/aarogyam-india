@@ -211,7 +211,60 @@
         "download_funnel"
       ],
       "is_coming_soon": false,
-      "isComingSoon": false
+      "isComingSoon": false,
+      "preview_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "previewImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "demoImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "customer_reviews": [
+        {
+          "name": "पवन पांडे",
+          "location": "सागर, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "सरल भाषा और वास्तविक फोटो के कारण फसलों के रोग पहचानना बहुत आसान हो गया। मेरी सोयाबीन की फसल बच गई।"
+        },
+        {
+          "name": "अनिता शर्मा",
+          "location": "उदयपुर, राजस्थान",
+          "rating": 5,
+          "gender": "female",
+          "comment": "पौधों के पोषण और स्प्रे की सही मात्रा सीखने के लिए यह सबसे अच्छी किताब है।"
+        },
+        {
+          "name": "तरुण कुमार मिश्रा",
+          "location": "वाराणसी, उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "कृषि विद्यार्थियों और प्रगतिशील किसानों के लिए यह एक बेहतरीन Practical Guide है।"
+        },
+        {
+          "name": "माखन दाऊ",
+          "location": "गुना, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "मात्र ₹99 में इतनी बहुमूल्य और प्रामाणिक जानकारी मिलना वास्तव में शानदार है।"
+        }
+      ]
     },
     {
       "id": "BK002",
@@ -344,7 +397,9 @@
         "/images/books/kheti-dr-demo-2.webp",
         "/images/books/kheti-dr-demo-3.webp",
         "/images/books/kheti-dr-demo-4.webp",
-        "/images/books/kheti-dr-demo-5.webp"
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
       ],
       "bonuses": [
         {
@@ -403,11 +458,57 @@
       "facebook_pixel_enabled": true,
       "google_analytics_enabled": true,
       "is_coming_soon": false,
-      "isComingSoon": false
+      "isComingSoon": false,
+      "preview_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "previewImages": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "demoImages": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "customer_reviews": [
+        {
+          "name": "राजेश पटेल",
+          "location": "उज्जैन, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "इस किताब से मुझे पता चला कि मेरी मिर्च में वायरस नहीं बल्कि रस चूसक कीटों का प्रकोप था। समय पर सही दवा डालने से फसल बच गई।"
+        },
+        {
+          "name": "दिनेश यादव",
+          "location": "जयपुर, राजस्थान",
+          "rating": 5,
+          "gender": "male",
+          "comment": "हर किसान के मोबाइल में यह किताब होनी चाहिए। बहुत ही आसान और काम की किताब है।"
+        }
+      ],
+      "ai_support_cover": "/images/banners/kheti-dr-banner-3.webp"
     },
     {
       "id": "BK006",
-      "updated_at": "2026-09-16T18:49:03.526Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "bk006",
       "book_name": "AI वेबसाइट निर्माण गाइड 2026",
@@ -640,11 +741,27 @@
       },
       "whatsapp_prompt": "नमस्ते, मुझे 'AI वेबसाइट गाइड' के बारे में जानकारी चाहिए।",
       "is_coming_soon": false,
-      "isComingSoon": false
+      "isComingSoon": false,
+      "customer_reviews": [
+        {
+          "name": "आलोक वर्मा",
+          "location": "भोपाल, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "मैंने इस गाइड को पढ़कर 2 घंटे में अपनी खुद की ऑनलाइन दुकान की वेबसाइट बना ली। बहुत ही उपयोगी किताब है।"
+        },
+        {
+          "name": "संजय गुप्ता",
+          "location": "इंदौर, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "AI प्रॉम्प्ट्स बहुत शानदार हैं। कोई भी बिना कोडिंग के शानदार वेबसाइट बना सकता है।"
+        }
+      ]
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-17T16:29:43.154Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "bk015",
       "book_type": "paid",
@@ -778,7 +895,7 @@
       "free_pdf": "",
       "demoPdf": "",
       "ai_support_title": "",
-      "ai_support_cover": "",
+      "ai_support_cover": "/images/banners/bk015-sec_ai_support-banner.webp",
       "ai_support_desc": "📱 खेती की समस्या का समाधान अब आपके WhatsApp पर!\n\nकिताब पढ़ते समय खेती से जुड़ा कोई सवाल समझ न आए, या अपनी फसल में कोई परेशानी हो, तो WhatsApp पर Aarogyam AI को अपना सवाल भेजें। 🌱\n\n💬 कैसे इस्तेमाल करें?\n\n1️⃣ अपने मोबाइल में WhatsApp खोलें।\n\n2️⃣ इस नंबर 7974422572 पर अपना सवाल भेजें।\n\n3️⃣ अपनी फसल की समस्या या किताब से जुड़ा सवाल लिखें।\n\n4️⃣ Aarogyam AI से समाधान और मार्गदर्शन पाएं।\n\n🎁 पुस्तक खरीदने पर 90 दिनों तक निःशुल्क AI WhatsApp Support!\n\n📖 किताब पढ़ें, सवाल पूछें और खेती का ज्ञान बढ़ाएं।\n\n🌾 आपका सवाल → Aarogyam AI की मदद → खेती में आसान समाधान!",
       "bonuses": [],
       "bonus_books": [],
@@ -919,8 +1036,9 @@
         "/images/books/bk015-preview-15.webp",
         "/images/books/bk015-preview-16.webp"
       ],
-      "demo_reader_pages": "",
-      "demoPages": "",
+      "demo_reader_pages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
+      "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
+      "hasWebpPages": true,
       "suggested_books_list": [
         {
           "id": "BK001",
@@ -1154,11 +1272,130 @@
       },
       "whatsapp_share_message": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
       "whatsapp_share_text": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
-      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।"
+      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।",
+      "preview_images": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "demoImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "customer_reviews": [
+        {
+          "name": "Rakesh sharma ",
+          "location": " उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "पहले खेती में बहुत सी बातें समझ नहीं आती थीं।\nटमाटर और मिर्च की खेती में बीज चयन और खाद-पोषण को लेकर परेशानी होती थी। इस पुस्तक में खेती की जानकारी आसान भाषा में दी गई है। तस्वीरों और टेबल से समझना बहुत आसान लगा। अब जरूरत पड़ने पर ऑडियो भी सुन सकता हूं। खेती सीखने के लिए अच्छी मार्गदर्शक पुस्तक है।"
+        },
+        {
+          "name": "हरिओम शर्मा  किसान",
+          "location": "उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "🌱 बीज से लेकर फसल तैयार होने तक की जानकारी मिली।\nपहले टमाटर और बैंगन की खेती में सही बीज और पौधों की दूरी को लेकर परेशानी होती थी। इस पुस्तक में पूरी जानकारी क्रम से दी गई है। भाषा आसान है और तस्वीरों से समझना अच्छा लगा। मोबाइल पर पढ़ना और ऑडियो सुनना दोनों सुविधाजनक हैं।\n"
+        },
+        {
+          "name": "Sunita Pathak ",
+          "location": "मध्य प्रदेश",
+          "rating": 5,
+          "gender": "female",
+          "comment": "पढ़ना और सुनना दोनों बहुत अच्छा लगा।\nमुझे पहले खेती की किताबें पढ़ने में कठिनाई होती थी। इस ई-बुक में टमाटर, बैंगन, भिंडी और दूसरी सब्जियों की जानकारी एक ही जगह मिलती है। अब मोबाइल पर पढ़ लेती हूं और काम करते समय ऑडियो सुन सकती हूं। भाषा सरल है और समझने में आसानी होती है।"
+        },
+        {
+          "name": "महेश यादव  किसान ",
+          "location": "उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "खेत की तैयारी और बुवाई की जानकारी उपयोगी लगी।\n\nपहले हर फसल के लिए अलग-अलग जानकारी ढूंढनी पड़ती थी। इस पुस्तक में खेत की तैयारी, पौधों की दूरी, सिंचाई और पोषण के बारे में समझाया गया है। मुझे सबसे अच्छा लगा कि जानकारी क्रम से दी गई है। पढ़ते समय ऐसा लगता है जैसे कोई खेती सिखा रहा हो।"
+        },
+        {
+          "name": "विजय सिंह  सब्जी किसान",
+          "location": "राजस्थान",
+          "rating": 4,
+          "gender": "male",
+          "comment": "कीट और रोग की जानकारी सबसे अच्छी लगी।\n\nमेरी फसल में कीट और बीमारी की समस्या आती रहती है। इस पुस्तक में रोग और कीट की पहचान तथा प्रबंधन के बारे में जानकारी मिली। तस्वीरों से पहचान समझने में मदद मिलती है। अब खेती से जुड़ी जानकारी के लिए मेरे पास एक उपयोगी डिजिटल साधन है।"
+        },
+        {
+          "name": "अशोक वर्मा  किसान ",
+          "location": "बिहार",
+          "rating": 5,
+          "gender": "male",
+          "comment": "ऑडियो की सुविधा बहुत काम की है।\n\nखेत में काम करते समय किताब पढ़ना संभव नहीं होता। इसलिए Audio + eBook का विकल्प मुझे बहुत पसंद आया। खाली समय में ई-बुक पढ़ता हूं और खेत में काम करते समय ऑडियो सुन सकता हूं। 11 सब्जियों की जानकारी एक ही जगह मिलना अच्छा लगा।"
+        },
+        {
+          "name": "संतुष्ट पाठक",
+          "location": "भारत",
+          "rating": 5,
+          "gender": "male",
+          "comment": "बहुत ही उपयोगी व व्यावहारिक पुस्तक है।"
+        },
+        {
+          "name": "कविता बाई  महिला किसान ",
+          "location": " महाराष्ट्र",
+          "rating": 5,
+          "gender": "male",
+          "comment": "खेती की जानकारी अब समझना आसान लग रहा है।\n\nमुझे सब्जियों की खेती में खाद, पानी और पौधों की देखभाल को लेकर कई सवाल रहते थे। इस पुस्तक में जानकारी सरल तरीके से दी गई है। चित्र और चेकलिस्ट अच्छे लगे। मोबाइल में पढ़ना आसान है और ऑडियो से सुनकर भी सीख सकती हूं।"
+        },
+        {
+          "name": "सुरेश चौधरी ",
+          "location": "हरियाणा",
+          "rating": 5,
+          "gender": "male",
+          "comment": "एक ही पुस्तक में इतनी जानकारी मिलना अच्छा लगा।\n\nटमाटर, मिर्च, खीरा और लौकी जैसी फसलों के बारे में जानकारी चाहिए थी। इसमें बीज से लेकर कटाई और बाजार तक की जानकारी दी गई है। भाषा आसान है और विषय क्रम से समझाए गए हैं। खेती सीखने वालों के लिए उपयोगी पुस्तक है।"
+        }
+      ]
     },
     {
       "id": "SUB001",
-      "updated_at": "2026-09-16T18:28:35.319Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "sub001",
       "book_name": "👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)",
@@ -1323,7 +1560,7 @@
     },
     {
       "id": "BK004",
-      "updated_at": "2026-09-16T18:49:49.237Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "bk004",
       "book_name": "चावल प्रोसेसिंग गाइड",
@@ -1489,7 +1726,7 @@
     },
     {
       "id": "BK003",
-      "updated_at": "2026-09-16T18:31:36.455Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "bk003",
       "book_name": "अनाज भंडारण गाइड",
@@ -1655,7 +1892,7 @@
     },
     {
       "id": "BK005",
-      "updated_at": "2026-09-16T18:32:52.293Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "bk005",
       "book_name": "धान मास्टर गाइड",
@@ -1821,7 +2058,7 @@
     },
     {
       "id": "BK012",
-      "updated_at": "2026-09-16T18:40:22.068Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "bk012",
       "book_name": "सब्जी खेती गाइड",
@@ -1987,7 +2224,7 @@
     },
     {
       "id": "BK011",
-      "updated_at": "2026-09-16T18:44:15.191Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "bk011",
       "book_name": "पॉलीहाउस नेटहाउस गाइड",
@@ -2153,7 +2390,7 @@
     },
     {
       "id": "BK010",
-      "updated_at": "2026-09-16T18:45:39.495Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "bk010",
       "book_name": "फूल खेती गाइड",
@@ -2319,7 +2556,7 @@
     },
     {
       "id": "BK007",
-      "updated_at": "2026-09-16T18:52:30.299Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "bk007",
       "book_name": "गेहूं मास्टर गाइड",
@@ -2485,12 +2722,17 @@
     },
     {
       "id": "DEMO-BK015",
-      "updated_at": "2026-09-17T03:39:30.777Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "demo-bk015",
       "book_type": "demo",
       "audience": "all",
-      "target_main_books": [],
+      "target_main_books": [
+        "BK015"
+      ],
+      "targetMainBook": "BK015",
+      "demo_reader_pages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
+      "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
       "book_name": "🌱 सब्जी खेती मास्टर  (PART 1) (Free Demo)",
       "author": "",
       "language": "Hindi",
@@ -2503,17 +2745,12 @@
       "store_badge": "best_seller",
       "badge": "best_seller",
       "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "free_shelf",
-        "demo_shelf"
+        "my_library"
       ],
-      "facebook_pixel_id": "1671873500553134",
-      "google_analytics_id": "G-2BWPJVQWPK",
-      "facebook_pixel_enabled": true,
-      "google_analytics_enabled": true,
+      "facebook_pixel_id": "disabled",
+      "google_analytics_id": "disabled",
+      "facebook_pixel_enabled": false,
+      "google_analytics_enabled": false,
       "theme_primary": "#dc2626",
       "theme_dark": "#9c0000",
       "cover_effect": "3d_float",
@@ -2539,7 +2776,9 @@
         "sec_final_buy",
         "sec_pdf_free"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_suggested"
+      ],
       "section_banners": {
         "sec_hero": "/images/banners/bk015-sec_hero-banner.webp",
         "sec_timer": "/images/banners/bk015-sec_timer-banner.webp",
@@ -2620,7 +2859,7 @@
       "free_pdf": "",
       "demoPdf": "",
       "ai_support_title": "",
-      "ai_support_cover": "",
+      "ai_support_cover": "/images/banners/bk015-sec_ai_support-banner.webp",
       "ai_support_desc": "📱 खेती की समस्या का समाधान अब आपके WhatsApp पर!\n\nकिताब पढ़ते समय खेती से जुड़ा कोई सवाल समझ न आए, या अपनी फसल में कोई परेशानी हो, तो WhatsApp पर Aarogyam AI को अपना सवाल भेजें। 🌱\n\n💬 कैसे इस्तेमाल करें?\n\n1️⃣ अपने मोबाइल में WhatsApp खोलें।\n\n2️⃣ इस नंबर 7974422572 पर अपना सवाल भेजें।\n\n3️⃣ अपनी फसल की समस्या या किताब से जुड़ा सवाल लिखें।\n\n4️⃣ Aarogyam AI से समाधान और मार्गदर्शन पाएं।\n\n🎁 पुस्तक खरीदने पर 90 दिनों तक निःशुल्क AI WhatsApp Support!\n\n📖 किताब पढ़ें, सवाल पूछें और खेती का ज्ञान बढ़ाएं।\n\n🌾 आपका सवाल → Aarogyam AI की मदद → खेती में आसान समाधान!",
       "bonuses": [],
       "bonus_books": [],
@@ -2761,8 +3000,6 @@
         "/images/books/bk015-preview-15.webp",
         "/images/books/bk015-preview-16.webp"
       ],
-      "demo_reader_pages": "1, 2, 3, 5, 8, 12, 16",
-      "demoPages": "1, 2, 3, 5, 8, 12, 16",
       "suggested_books_list": [
         {
           "id": "BK001",
@@ -2996,16 +3233,137 @@
       },
       "whatsapp_share_message": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
       "whatsapp_share_text": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
-      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर  (PART 1) (Free Demo)' पुस्तक के बारे में और जानकारी चाहिए।"
+      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर  (PART 1) (Free Demo)' पुस्तक के बारे में और जानकारी चाहिए।",
+      "preview_images": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "demoImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "customer_reviews": [
+        {
+          "name": "Rakesh sharma ",
+          "location": " उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "पहले खेती में बहुत सी बातें समझ नहीं आती थीं।\nटमाटर और मिर्च की खेती में बीज चयन और खाद-पोषण को लेकर परेशानी होती थी। इस पुस्तक में खेती की जानकारी आसान भाषा में दी गई है। तस्वीरों और टेबल से समझना बहुत आसान लगा। अब जरूरत पड़ने पर ऑडियो भी सुन सकता हूं। खेती सीखने के लिए अच्छी मार्गदर्शक पुस्तक है।"
+        },
+        {
+          "name": "हरिओम शर्मा  किसान",
+          "location": "उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "🌱 बीज से लेकर फसल तैयार होने तक की जानकारी मिली।\nपहले टमाटर और बैंगन की खेती में सही बीज और पौधों की दूरी को लेकर परेशानी होती थी। इस पुस्तक में पूरी जानकारी क्रम से दी गई है। भाषा आसान है और तस्वीरों से समझना अच्छा लगा। मोबाइल पर पढ़ना और ऑडियो सुनना दोनों सुविधाजनक हैं।\n"
+        },
+        {
+          "name": "Sunita Pathak ",
+          "location": "मध्य प्रदेश",
+          "rating": 5,
+          "gender": "female",
+          "comment": "पढ़ना और सुनना दोनों बहुत अच्छा लगा।\nमुझे पहले खेती की किताबें पढ़ने में कठिनाई होती थी। इस ई-बुक में टमाटर, बैंगन, भिंडी और दूसरी सब्जियों की जानकारी एक ही जगह मिलती है। अब मोबाइल पर पढ़ लेती हूं और काम करते समय ऑडियो सुन सकती हूं। भाषा सरल है और समझने में आसानी होती है।"
+        },
+        {
+          "name": "महेश यादव  किसान ",
+          "location": "उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "खेत की तैयारी और बुवाई की जानकारी उपयोगी लगी।\n\nपहले हर फसल के लिए अलग-अलग जानकारी ढूंढनी पड़ती थी। इस पुस्तक में खेत की तैयारी, पौधों की दूरी, सिंचाई और पोषण के बारे में समझाया गया है। मुझे सबसे अच्छा लगा कि जानकारी क्रम से दी गई है। पढ़ते समय ऐसा लगता है जैसे कोई खेती सिखा रहा हो।"
+        },
+        {
+          "name": "विजय सिंह  सब्जी किसान",
+          "location": "राजस्थान",
+          "rating": 4,
+          "gender": "male",
+          "comment": "कीट और रोग की जानकारी सबसे अच्छी लगी।\n\nमेरी फसल में कीट और बीमारी की समस्या आती रहती है। इस पुस्तक में रोग और कीट की पहचान तथा प्रबंधन के बारे में जानकारी मिली। तस्वीरों से पहचान समझने में मदद मिलती है। अब खेती से जुड़ी जानकारी के लिए मेरे पास एक उपयोगी डिजिटल साधन है।"
+        },
+        {
+          "name": "अशोक वर्मा  किसान ",
+          "location": "बिहार",
+          "rating": 5,
+          "gender": "male",
+          "comment": "ऑडियो की सुविधा बहुत काम की है।\n\nखेत में काम करते समय किताब पढ़ना संभव नहीं होता। इसलिए Audio + eBook का विकल्प मुझे बहुत पसंद आया। खाली समय में ई-बुक पढ़ता हूं और खेत में काम करते समय ऑडियो सुन सकता हूं। 11 सब्जियों की जानकारी एक ही जगह मिलना अच्छा लगा।"
+        },
+        {
+          "name": "संतुष्ट पाठक",
+          "location": "भारत",
+          "rating": 5,
+          "gender": "male",
+          "comment": "बहुत ही उपयोगी व व्यावहारिक पुस्तक है।"
+        },
+        {
+          "name": "कविता बाई  महिला किसान ",
+          "location": " महाराष्ट्र",
+          "rating": 5,
+          "gender": "male",
+          "comment": "खेती की जानकारी अब समझना आसान लग रहा है।\n\nमुझे सब्जियों की खेती में खाद, पानी और पौधों की देखभाल को लेकर कई सवाल रहते थे। इस पुस्तक में जानकारी सरल तरीके से दी गई है। चित्र और चेकलिस्ट अच्छे लगे। मोबाइल में पढ़ना आसान है और ऑडियो से सुनकर भी सीख सकती हूं।"
+        },
+        {
+          "name": "सुरेश चौधरी ",
+          "location": "हरियाणा",
+          "rating": 5,
+          "gender": "male",
+          "comment": "एक ही पुस्तक में इतनी जानकारी मिलना अच्छा लगा।\n\nटमाटर, मिर्च, खीरा और लौकी जैसी फसलों के बारे में जानकारी चाहिए थी। इसमें बीज से लेकर कटाई और बाजार तक की जानकारी दी गई है। भाषा आसान है और विषय क्रम से समझाए गए हैं। खेती सीखने वालों के लिए उपयोगी पुस्तक है।"
+        }
+      ]
     },
     {
       "id": "DEMO-BK001",
-      "updated_at": "2026-09-17T03:42:18.979Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "demo-bk001",
       "book_type": "demo",
       "audience": "all",
-      "target_main_books": [],
+      "target_main_books": [
+        "BK001"
+      ],
       "book_name": "",
       "author": "",
       "language": "Hindi",
@@ -3018,19 +3376,12 @@
       "store_badge": "best_seller",
       "badge": "best_seller",
       "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "home_hero",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
+        "my_library"
       ],
-      "facebook_pixel_id": "1671873500553134",
-      "google_analytics_id": "G-2BWPJVQWPK",
-      "facebook_pixel_enabled": true,
-      "google_analytics_enabled": true,
+      "facebook_pixel_id": "disabled",
+      "google_analytics_id": "disabled",
+      "facebook_pixel_enabled": false,
+      "google_analytics_enabled": false,
       "theme_primary": "#2e7d32",
       "theme_dark": "#003d00",
       "cover_effect": "3d_float",
@@ -3056,7 +3407,9 @@
         "sec_pdf_main",
         "sec_pdf_free"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_suggested"
+      ],
       "section_banners": {},
       "og_title": "खरीफ फसल मास्टर गाइड 2026",
       "og_description": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी। रोग, कीट, खरपतवार, पोषण प्रबंधन और अधिक उत्पादन के वैज्ञानिक एवं Practical समाधान।",
@@ -3327,16 +3680,71 @@
         "fast_size": "~24 MB",
         "hd_download_limit": 3
       },
-      "whatsapp_prompt": "नमस्ते, मुझे 'खरीफ फसल मास्टर गाइड 2026' पुस्तक के बारे में और जानकारी चाहिए।"
+      "whatsapp_prompt": "नमस्ते, मुझे 'खरीफ फसल मास्टर गाइड 2026' पुस्तक के बारे में और जानकारी चाहिए।",
+      "preview_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "previewImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "demoImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "customer_reviews": [
+        {
+          "name": "पवन पांडे",
+          "location": "सागर, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "सरल भाषा और वास्तविक फोटो के कारण फसलों के रोग पहचानना बहुत आसान हो गया। मेरी सोयाबीन की फसल बच गई।"
+        },
+        {
+          "name": "अनिता शर्मा",
+          "location": "उदयपुर, राजस्थान",
+          "rating": 5,
+          "gender": "female",
+          "comment": "पौधों के पोषण और स्प्रे की सही मात्रा सीखने के लिए यह सबसे अच्छी किताब है।"
+        },
+        {
+          "name": "तरुण कुमार मिश्रा",
+          "location": "वाराणसी, उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "कृषि विद्यार्थियों और प्रगतिशील किसानों के लिए यह एक बेहतरीन Practical Guide है।"
+        },
+        {
+          "name": "माखन दाऊ",
+          "location": "गुना, मध्य प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "मात्र ₹99 में इतनी बहुमूल्य और प्रामाणिक जानकारी मिलना वास्तव में शानदार है।"
+        }
+      ],
+      "targetMainBook": "BK001"
     },
     {
       "id": "DEMO-BK002",
-      "updated_at": "2026-09-18T20:03:22.941Z",
+      "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "slug": "demo-bk002",
       "book_type": "demo",
       "audience": "all",
-      "target_main_books": [],
+      "target_main_books": [
+        "BK002"
+      ],
+      "targetMainBook": "BK002",
       "book_name": "खेती का डॉक्टर (Pocket Doctor)",
       "author": "",
       "language": "Hindi",
@@ -3349,24 +3757,20 @@
       "store_badge": "best_seller",
       "badge": "best_seller",
       "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_hero",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
+        "my_library"
       ],
-      "facebook_pixel_id": "1671873500553134",
-      "google_analytics_id": "G-2BWPJVQWPK",
-      "facebook_pixel_enabled": true,
-      "google_analytics_enabled": true,
+      "facebook_pixel_id": "disabled",
+      "google_analytics_id": "disabled",
+      "facebook_pixel_enabled": false,
+      "google_analytics_enabled": false,
       "theme_primary": "#2e7d32",
       "theme_dark": "#003d00",
       "cover_effect": "3d_float",
       "sticky_button_text": "डेमो पढ़ें",
       "sections_order": [],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_suggested"
+      ],
       "section_banners": {},
       "og_title": "खेती का डॉक्टर (Pocket Doctor)",
       "og_description": "रोग, कीट, वायरल, फंगल और पोषक तत्वों की कमी की फोटो सहित पहचान सीखें। अब किसान खुद बनेगा अपनी फसल का डॉक्टर।",
@@ -3392,7 +3796,7 @@
       "free_pdf": "",
       "demoPdf": "",
       "ai_support_title": "",
-      "ai_support_cover": "",
+      "ai_support_cover": "/images/banners/kheti-dr-banner-3.webp",
       "ai_support_desc": "",
       "bonuses": [],
       "bonus_books": [],
@@ -3428,7 +3832,15 @@
         "subtitle": "",
         "cards": []
       },
-      "demo_images": [],
+      "demo_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
       "demo_reader_pages": "18, 29, 31, 106, 111, 117",
       "demoPages": "18, 29, 31, 106, 111, 117",
       "suggested_books_list": [],
@@ -3454,7 +3866,34 @@
         "fast_size": "~24 MB",
         "hd_download_limit": 3
       },
-      "whatsapp_prompt": "नमस्ते, मुझे 'खेती का डॉक्टर (Pocket Doctor)' पुस्तक के बारे में और जानकारी चाहिए।"
+      "whatsapp_prompt": "नमस्ते, मुझे 'खेती का डॉक्टर (Pocket Doctor)' पुस्तक के बारे में और जानकारी चाहिए।",
+      "preview_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "previewImages": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "demoImages": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ]
     }
   ]
 }
