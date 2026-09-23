@@ -56,41 +56,26 @@
     window.speechSynthesis.speak(utterance);
   };
 
-  // Universal KPI Card Blue Share Trigger (Native WebShare with WhatsApp fallback + share_id via viral-share-engine)
+  // Universal KPI Card Blue Share Trigger (Native WebShare with WhatsApp fallback)
   window.triggerKpiNativeShare = function (event, title, text, targetUrl) {
     if (event) {
       if (typeof event.stopPropagation === 'function') event.stopPropagation();
       if (typeof event.preventDefault === 'function') event.preventDefault();
     }
-
-    // Build the page URL — if viral-share-engine is loaded, use its ref-attributed URL builder
-    var pageUrl;
-    try {
-      // Extract clean path from targetUrl (could be full URL or relative path)
-      var rawUrl = targetUrl || window.location.href;
-      if (typeof window.AarogyamShareEngine === 'object' && typeof window.AarogyamShareEngine.getShareableUrl === 'function') {
-        // Viral engine already appends ?ref=CODE&share_id=CODE for the logged-in user
-        try {
-          var urlPath = new URL(rawUrl, window.location.origin).pathname;
-          pageUrl = window.AarogyamShareEngine.getShareableUrl(urlPath);
-        } catch (e) {
-          pageUrl = rawUrl;
-        }
-      } else {
-        pageUrl = rawUrl;
-      }
-    } catch (e) {
-      pageUrl = targetUrl || window.location.href;
-    }
-
-    var cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '');
-    var cleanText = (text || '').replace(/<[^>]+>/g, '');
-    var shareMessage = '🌾 *' + cleanTitle + '*\n' + (cleanText ? cleanText + '\n\n' : '') + '👉 सम्पूर्ण विवरण व आयुर्वेदिक उपाय देखें:\n' + pageUrl;
+    const pageUrl = targetUrl ? (new URL(targetUrl, window.location.origin).href) : window.location.href;
+    const cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '');
+    const cleanText = (text || '').replace(/<[^>]+>/g, '');
+    const shareMessage = `🌾 *${cleanTitle}*\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व आयुर्वेदिक उपाय देखें:\n${pageUrl}`;
 
     if (navigator.share) {
-      navigator.share({ title: cleanTitle, text: shareMessage }).catch(function () { });
+      navigator.share({
+        title: cleanTitle,
+        text: shareMessage,
+        url: pageUrl
+      }).catch(() => { });
     } else {
-      window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(shareMessage), '_blank');
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+      window.open(waUrl, '_blank');
     }
   };
 
