@@ -56,62 +56,41 @@
     window.speechSynthesis.speak(utterance);
   };
 
-  // Universal KPI Card Blue Share Trigger (Native WebShare with WhatsApp fallback + share_id)
+  // Universal KPI Card Blue Share Trigger (Native WebShare with WhatsApp fallback + share_id via viral-share-engine)
   window.triggerKpiNativeShare = function (event, title, text, targetUrl) {
     if (event) {
       if (typeof event.stopPropagation === 'function') event.stopPropagation();
       if (typeof event.preventDefault === 'function') event.preventDefault();
     }
 
-    // Build referral-attributed share URL (same logic as audio-greeting-engine.js)
-    function _getShareRefCode() {
-      // 1. Authenticated user share_id
-      try {
-        const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-        if (u && (u.share_id || u.referral_code || u.mobile)) {
-          return u.share_id || u.referral_code || u.mobile;
-        }
-      } catch (e) {}
-      // 2. Global helper
-      if (typeof window.getUnifiedShareId === 'function') {
-        try { const s = window.getUnifiedShareId(); if (s && s !== 'AI000004') return s; } catch (e) {}
-      }
-      if (typeof window.getUserShareId === 'function') {
-        try { const s = window.getUserShareId(); if (s && s !== 'AI000004') return s; } catch (e) {}
-      }
-      // 3. Mobile number in storage
-      const mob = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
-      if (mob.length === 10) return mob;
-      // 4. Referral from URL
-      try { return localStorage.getItem('AOI_REFERRER_ID') || ''; } catch (e) {}
-      return '';
-    }
-
-    const refCode = _getShareRefCode();
-    let pageUrl;
+    // Build the page URL — if viral-share-engine is loaded, use its ref-attributed URL builder
+    var pageUrl;
     try {
-      const urlObj = new URL(targetUrl || window.location.href, window.location.origin);
-      if (refCode) {
-        urlObj.searchParams.set('ref', refCode);
-        urlObj.searchParams.set('share_id', refCode);
+      // Extract clean path from targetUrl (could be full URL or relative path)
+      var rawUrl = targetUrl || window.location.href;
+      if (typeof window.AarogyamShareEngine === 'object' && typeof window.AarogyamShareEngine.getShareableUrl === 'function') {
+        // Viral engine already appends ?ref=CODE&share_id=CODE for the logged-in user
+        try {
+          var urlPath = new URL(rawUrl, window.location.origin).pathname;
+          pageUrl = window.AarogyamShareEngine.getShareableUrl(urlPath);
+        } catch (e) {
+          pageUrl = rawUrl;
+        }
+      } else {
+        pageUrl = rawUrl;
       }
-      pageUrl = urlObj.href;
     } catch (e) {
       pageUrl = targetUrl || window.location.href;
     }
 
-    const cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '');
-    const cleanText = (text || '').replace(/<[^>]+>/g, '');
-    const shareMessage = `🌾 *${cleanTitle}*\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व आयुर्वेदिक उपाय देखें:\n${pageUrl}`;
+    var cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '');
+    var cleanText = (text || '').replace(/<[^>]+>/g, '');
+    var shareMessage = '🌾 *' + cleanTitle + '*\n' + (cleanText ? cleanText + '\n\n' : '') + '👉 सम्पूर्ण विवरण व आयुर्वेदिक उपाय देखें:\n' + pageUrl;
 
     if (navigator.share) {
-      navigator.share({
-        title: cleanTitle,
-        text: shareMessage
-      }).catch(() => { });
+      navigator.share({ title: cleanTitle, text: shareMessage }).catch(function () { });
     } else {
-      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
-      window.open(waUrl, '_blank');
+      window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(shareMessage), '_blank');
     }
   };
 
