@@ -2414,9 +2414,14 @@ export async function initPageEditor() {
             <div style="font-weight: 800; color: #c084fc; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
               <span>🗣️ 2.1 पेज का ऑडियो परिचय व हिंदी वॉइस स्क्रिप्ट (Page Audio Voice Narration)</span>
             </div>
-            <button type="button" id="btn-test-page-audio-speech" class="admin-button small-button" style="background: #7c3aed; color: #fff; font-weight: 800; font-size: 0.78rem;">
-              🔊 आवाज़ टेस्ट करें (Speak Test)
-            </button>
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+              <button type="button" id="btn-test-page-audio-speech" class="admin-button small-button" style="background: #7c3aed; color: #fff; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; position: relative;">
+                🔊 <span id="pe-audio-btn-label">आवाज़ टेस्ट करें</span>
+              </button>
+              <button type="button" id="btn-stop-page-audio-speech" class="admin-button small-button" style="background: #ef4444; color: #fff; font-weight: 800; font-size: 0.78rem; display: none; align-items: center; gap: 5px;" title="ऑडियो बंद करें">
+                ⏹ रोकें (Stop)
+              </button>
+            </div>
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 10px;">
             <div>
@@ -3392,28 +3397,82 @@ export async function initPageEditor() {
     renderAchieversList();
   };
 
-  // Audio Speech Test Listener
-  document.getElementById('btn-test-page-audio-speech')?.addEventListener('click', () => {
-    const text = document.getElementById('pe_input_audio_script')?.value || '';
-    if (!text) {
-      showToast('⚠️ पहले हिंदी वॉइस स्क्रिप्ट लिखें!', 'error');
-      return;
+  // Audio Speech Test Listener - with Stop Button & Pulse Animation
+  (function() {
+    const playBtn = document.getElementById('btn-test-page-audio-speech');
+    const stopBtn = document.getElementById('btn-stop-page-audio-speech');
+    const labelEl = document.getElementById('pe-audio-btn-label');
+
+    function setAudioPlaying(isPlaying) {
+      if (!playBtn || !stopBtn) return;
+      if (isPlaying) {
+        playBtn.style.background = '#6d28d9';
+        playBtn.style.animation = 'peAudioPulse 1.2s ease-in-out infinite';
+        if (labelEl) labelEl.textContent = 'चल रहा है...';
+        stopBtn.style.display = 'inline-flex';
+      } else {
+        playBtn.style.animation = '';
+        playBtn.style.background = '#7c3aed';
+        if (labelEl) labelEl.textContent = 'आवाज़ टेस्ट करें';
+        stopBtn.style.display = 'none';
+      }
     }
-    const safeText = text.replace(/\{name\}/g, 'किसान भाई');
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const ut = new SpeechSynthesisUtterance(safeText);
-      ut.lang = 'hi-IN';
-      ut.rate = 0.95;
-      const voices = window.speechSynthesis.getVoices();
-      const hi = voices.find(v => v.lang.includes('hi') || v.name.toLowerCase().includes('hindi'));
-      if (hi) ut.voice = hi;
-      window.speechSynthesis.speak(ut);
-      showToast('🔊 ऑडियो वॉइस टेस्ट शुरू हो गया...', 'info');
-    } else {
-      showToast('❌ ब्राउज़र में स्पीच सिंथेसिस उपलब्ध नहीं है', 'error');
+
+    // Inject pulse keyframe CSS
+    if (!document.getElementById('pe-audio-pulse-css')) {
+      const style = document.createElement('style');
+      style.id = 'pe-audio-pulse-css';
+      style.textContent = `
+        @keyframes peAudioPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7); transform: scale(1); }
+          50% { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); transform: scale(1.04); }
+        }
+      `;
+      document.head.appendChild(style);
     }
-  });
+
+    playBtn?.addEventListener('click', () => {
+      const text = document.getElementById('pe_input_audio_script')?.value || '';
+      if (!text) {
+        showToast('⚠️ पहले हिंदी वॉइस स्क्रिप्ट लिखें!', 'error');
+        return;
+      }
+      // If already speaking, cancel
+      if (window.speechSynthesis?.speaking) {
+        window.speechSynthesis.cancel();
+        setAudioPlaying(false);
+        showToast('⏹ ऑडियो बंद किया', 'info');
+        return;
+      }
+      const safeText = text.replace(/\{name\}/g, 'किसान भाई');
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const ut = new SpeechSynthesisUtterance(safeText);
+        ut.lang = 'hi-IN';
+        ut.rate = 0.95;
+        const voices = window.speechSynthesis.getVoices();
+        const hi = voices.find(v => v.lang.includes('hi') || v.name.toLowerCase().includes('hindi'));
+        if (hi) ut.voice = hi;
+        ut.onstart = () => setAudioPlaying(true);
+        ut.onend = () => { setAudioPlaying(false); showToast('✅ ऑडियो टेस्ट पूरा हुआ!', 'success'); };
+        ut.onerror = () => setAudioPlaying(false);
+        window.speechSynthesis.speak(ut);
+        // Fallback in case onstart doesn't fire (some browsers)
+        setTimeout(() => { if (window.speechSynthesis.speaking) setAudioPlaying(true); }, 200);
+        showToast('🔊 ऑडियो वॉइस टेस्ट शुरू हो गया...', 'info');
+      } else {
+        showToast('❌ ब्राउज़र में स्पीच सिंथेसिस उपलब्ध नहीं है', 'error');
+      }
+    });
+
+    stopBtn?.addEventListener('click', () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      setAudioPlaying(false);
+      showToast('⏹ ऑडियो बंद किया', 'info');
+    });
+  })();
 
   document.getElementById('btn_add_hero_slide')?.addEventListener('click', () => {
     currentSlides.push({
