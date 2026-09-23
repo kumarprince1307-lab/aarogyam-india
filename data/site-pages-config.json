@@ -262,10 +262,23 @@
       "category": "Health",
       "status": "active",
       "theme_primary": "#dc2626",
-      "theme_dark": "#7f1d1d",
+      "theme_dark": "#900000",
+      "ticker_text": "🌿 50,000+ परिवारों का भरोसा! • सभी 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान • 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय",
+      "audio_title": "आरोग्यम संपूर्ण स्वास्थ्य केंद्र",
+      "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे।",
+      "og_title": "",
+      "og_image": "",
+      "og_description": "",
+      "share_message": "",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
       "fb_pixel": true,
       "ga_tag": true,
-      "ticker_text": "🌿 50,000+ परिवारों का भरोसा! • सभी 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान • 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय",
       "hero_slides": [
         {
           "image": "/images/banners/health-banner.jpeg",
@@ -276,6 +289,16 @@
           "cta_link": "#sec-categories",
           "cta_secondary_text": "💬 डॉक्टर परामर्श",
           "cta_secondary_link": "https://wa.me/917974422572"
+        },
+        {
+          "image": "/images/banners/hero_slide-cover02-882999-qw30.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
       "sections_order": [
@@ -304,8 +327,17 @@
           "desc": "GMP व ISO प्रमाणित तत्व"
         }
       ],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "tag": "🔥 बेस्टसेलर डील",
+          "headline": "खरीफ फसल मास्टर गाइड 2026",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा",
+          "image": "/images/banners/marketing_card-000-945423-zbyc.webp"
+        }
+      ],
       "videos": [],
-      "marketing_cards": [],
       "reviews": [
         {
           "name": "कमलेश शर्मा",
@@ -320,12 +352,237 @@
           "a": "नहीं, आरोग्यम इंडिया पर प्राथमिक AI व विशेषज्ञ परामर्श निःशुल्क है।"
         }
       ],
+      "health_diseases": [
+        {
+          "id": "DIS001",
+          "name": "मधुमेह / डायबिटीज",
+          "badge": "ब्लड शुगर नियंत्रण",
+          "color": "#3b82f6",
+          "icon": "🩸",
+          "image": "/images/banners/health-diabetes.jpg",
+          "symptoms": [
+            "बार-बार पेशाब आना",
+            "थकान व कमजोरी",
+            "शुगर असंतुलन"
+          ],
+          "description": "फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।",
+          "solution": "जामुन-करेला अर्क, गिलोय व मेथी दाना का प्राकृतिक योग और वैज्ञानिक डाइट प्लान।"
+        },
+        {
+          "id": "DIS002",
+          "name": "जोड़ों का दर्द व गठिया",
+          "badge": "जोड़ों का दर्द राहत",
+          "color": "#8b5cf6",
+          "icon": "🦴",
+          "image": "/images/banners/health-joint-care.jpg",
+          "symptoms": [
+            "घुटनों व जोड़ों में दर्द",
+            "चलने में तकलीफ",
+            "सूजन व जकड़न"
+          ],
+          "description": "कार्टिलेज पोषण, यूरिक एसिड नियंत्रण और जोड़ों के दर्द से प्राकृतिक आयुर्वेदिक समाधान।",
+          "solution": "शल्लाकी, गुग्गुल, निर्गुंडी तैलम मालिश व यूरिक एसिड घटाने वाला प्राकृतिक अर्क।"
+        },
+        {
+          "id": "DIS003",
+          "name": "महिला स्वास्थ्य / PCOD",
+          "badge": "हार्मोनल संतुलन",
+          "color": "#ec4899",
+          "icon": "🌸",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "अनियमित माहवारी",
+            "हार्मोनल असंतुलन",
+            "कमजोरी"
+          ],
+          "description": "हार्मोनल संतुलन, गर्भाशय पोषण और पीसीओडी/पीसीओएस का सम्पूर्ण सुरक्षित हर्बल समाधान।",
+          "solution": "अशोकारिष्ट, शतावरी, लोध्र व कांचनार गुग्गुलु का सुरक्षित आयुर्वेदिक सेवन।"
+        },
+        {
+          "id": "DIS004",
+          "name": "बाल झड़ना व डैंड्रफ",
+          "badge": "हेयर फॉल कंट्रोल",
+          "color": "#6366f1",
+          "icon": "💇",
+          "image": "/images/banners/health-hair-care.jpg",
+          "symptoms": [
+            "तेजी से बाल झड़ना",
+            "रूसी व डैंड्रफ",
+            "सिर में खुजली"
+          ],
+          "description": "बालों की जड़ों को पोषण, नए बालों का विकास और डैंड्रफ मुक्त घने बालों के लिए विशेष थेरेपी।",
+          "solution": "भृंगराज, आंवला, शिकाकाई हर्बल हेयर ऑयल व एंटी-डैंड्रफ स्कैल्प सीरम।"
+        },
+        {
+          "id": "DIS005",
+          "name": "त्वचा रोग व ग्लो",
+          "badge": "ग्लोइंग स्किन",
+          "color": "#06b6d4",
+          "icon": "✨",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कील-मुंहासे (पिंपल्स)",
+            "दाद व खुजली",
+            "झाइयां"
+          ],
+          "description": "रक्त शुद्धि और प्राकृतिक जड़ी-बूटियों द्वारा पिंपल्स, झाइयों और त्वचा संक्रमण से राहत।",
+          "solution": "नीम, मंजिष्ठा, खदिरारिष्ट रक्त शोधक और एलोवेरा-हल्दी जेल लेप।"
+        },
+        {
+          "id": "DIS006",
+          "name": "मोटापा व वजन नियंत्रण",
+          "badge": "नेचुरल फैट बर्न",
+          "color": "#f59e0b",
+          "icon": "⚖️",
+          "image": "/images/banners/health-weight-loss.jpg",
+          "symptoms": [
+            "पेट की जिद्दी चर्बी",
+            "सांस फूलना",
+            "धीमा मेटाबॉलिज्म"
+          ],
+          "description": "प्राकृतिक मेटाबॉलिज्म बूस्ट और जिद्दी फैट घटाने की सम्पूर्ण वैज्ञानिक डाइट और हर्बल फार्मूला।",
+          "solution": "मेदोहर गुग्गुलु, त्रिफला, दालचीनी-ग्रीन टी एक्सट्रैक्ट व 24 घंटे की डिटॉक्स डाइट।"
+        },
+        {
+          "id": "DIS007",
+          "name": "बच्चों का पोषण व दिमाग",
+          "badge": "स्मार्ट किड्स",
+          "color": "#10b981",
+          "icon": "👶",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कमजोर याददाश्त",
+            "भूख न लगना",
+            "धीमी शारीरिक लंबाई"
+          ],
+          "description": "बच्चों की रोग प्रतिरोधक क्षमता, लंबाई और मानसिक एकाग्रता बढ़ाने का सम्पूर्ण प्राकृतिक न्यूट्रिशन।",
+          "solution": "शंखपुष्पी, ब्राह्मी, अश्वगंधा सिरप और प्राकृतिक सुपरफूड्स व बादाम शेक डाइट।"
+        },
+        {
+          "id": "DIS008",
+          "name": "नेचुरल होम केयर",
+          "badge": "टॉक्सिन फ्री",
+          "color": "#84cc16",
+          "icon": "🏡",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "केमिकल युक्त फिनाइल व डिटर्जेंट",
+            "बच्चों व बुजुर्गों को एलर्जी"
+          ],
+          "description": "घर को हानिकारक रसायनों से मुक्त, स्वच्छ और रोगाणु-रहित रखने के इको-फ्रेंडली बायो-नेचुरल क्लीनर्स।",
+          "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
+        }
+      ],
+      "crops": [
+        {
+          "id": "CROP001",
+          "name": "सोयाबीन (Soybean)",
+          "season": "खरीफ फसल",
+          "image": "/images/crops/soyabeen.jpeg",
+          "badge": "प्रमुख तिलहन",
+          "color": "#3b82f6",
+          "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
+          "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
+        },
+        {
+          "id": "CROP002",
+          "name": "धान / चावल (Paddy)",
+          "season": "खरीफ / रबी",
+          "image": "/images/crops/paddy.jpeg",
+          "badge": "अन्नदाता फसल",
+          "color": "#8b5cf6",
+          "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
+          "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
+        },
+        {
+          "id": "CROP003",
+          "name": "गेहूं (Wheat)",
+          "season": "रबी फसल",
+          "image": "/images/crops/wheat.jpeg",
+          "badge": "मुख्य खाद्यान्न",
+          "color": "#6366f1",
+          "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
+          "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
+        },
+        {
+          "id": "CROP004",
+          "name": "कपास / नरमा (Cotton)",
+          "season": "खरीफ व जायद",
+          "image": "/images/banners/hero-banner-1.jpeg",
+          "badge": "सफेद सोना",
+          "color": "#0ea5e9",
+          "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
+          "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
+        },
+        {
+          "id": "CROP005",
+          "name": "मक्का (Maize)",
+          "season": "खरीफ / जायद",
+          "image": "/images/crops/maize.jpeg",
+          "badge": "अनाज व चारा",
+          "color": "#06b6d4",
+          "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
+          "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
+        },
+        {
+          "id": "CROP006",
+          "name": "सब्जियां, मिर्च व टमाटर",
+          "season": "बारहमासी",
+          "image": "/images/crops/vegetables.jpeg",
+          "badge": "नकदी फसल",
+          "color": "#10b981",
+          "mainIssues": "मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा",
+          "solution": "ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।"
+        }
+      ],
+      "pashu_cards": [
+        {
+          "id": "PASHU001",
+          "name": "गाय - दुग्ध वृद्धि व पोषण",
+          "category": "गाय पालन (Cow Care)",
+          "icon": "🐄",
+          "badge": "1-2L दूध वृद्धि",
+          "image": "/images/banners/pashu-cow-care.jpg",
+          "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
+          "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
+        },
+        {
+          "id": "PASHU002",
+          "name": "भैंस - FAT% व SNF वृद्धि",
+          "category": "भैंस पालन (Buffalo Care)",
+          "icon": "🐃",
+          "badge": "FAT 8% तक",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "दूध में फैट (FAT) कम आना, गर्मी में हांफना व सुस्ती, बांझपन",
+          "solution": "बायपास फैट, रुमेन बफर और हर्बल पाचक चूर्ण द्वारा दूध में गाढ़ापन और उच्चतम फैट प्रतिशत।"
+        },
+        {
+          "id": "PASHU003",
+          "name": "बकरी पालन - वजन वृद्धि",
+          "category": "बकरी पालन (Goat Farming)",
+          "icon": "🐐",
+          "badge": "उच्च मुनाफा",
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "mainIssues": "बच्चों में दस्त व निमोनिया, वजन धीमी गति से बढ़ना, पेट के कीड़े",
+          "solution": "नियमित डीवर्मिंग (कृमिनाशक), प्रोटीन युक्त दाना मिश्रण और ग्रोथ प्रमोटर सप्लीमेंट्स।"
+        },
+        {
+          "id": "PASHU004",
+          "name": "पशुओं में थनैला व पाचन रोग",
+          "category": "रोग नियंत्रण व प्राथमिक उपचार",
+          "icon": "🩺",
+          "badge": "100% सुरक्षा",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "थनैला (Mastitis), अयन में सूजन, छेछड़े आना, आफरा (गैस) व अपच",
+          "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
+        }
+      ],
+      "products": [],
+      "page_kpi_sections": [],
       "whatsapp_support": {
         "number": "917974422572",
         "prompt": "नमस्ते, मुझे स्वास्थ्य समस्याओं के बारे में परामर्श चाहिए।"
-      },
-      "audio_title": "आरोग्यम संपूर्ण स्वास्थ्य केंद्र",
-      "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे।"
+      }
     },
     {
       "id": "page_pashu",
@@ -403,8 +660,8 @@
         {
           "id": "PAS001",
           "name": "CFL Mineral Feed (1kg)",
-          "price": 650.0,
-          "mrp": 650.0,
+          "price": 650,
+          "mrp": 650,
           "badge": "दुग्ध वृद्धि बूस्टर",
           "description": "बायपास प्रोटीन, चेलेटेड मिनरल्स व प्रोबायोटिक्स युक्त। 7 दिन में दूध और फैट में अचूक सुधार लाता है।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -412,8 +669,8 @@
         {
           "id": "PAS002",
           "name": "Mastitis Shield Care Kit",
-          "price": 850.0,
-          "mrp": 850.0,
+          "price": 850,
+          "mrp": 850,
           "badge": "थनैला रक्षक",
           "description": "अयन की सूजन, गांठ व दूध में छीछड़ों को दूर करने वाली 100% सुरक्षित आयुर्वेदिक एंटी-इंफ्लेमेटरी किट।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -421,8 +678,8 @@
         {
           "id": "PAS003",
           "name": "Doodh Dhara High-Cal (1L)",
-          "price": 450.0,
-          "mrp": 450.0,
+          "price": 450,
+          "mrp": 450,
           "badge": "लिक्विड कैल्शियम",
           "description": "विटामिन D3, B12 व बायोटीन युक्त बायो-अवेलेबल कैल्शियम। ब्यात के बाद मिल्क फीवर से बचाता है।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -430,8 +687,8 @@
         {
           "id": "PAS004",
           "name": "Uterus Tone Cleanser (500ml)",
-          "price": 550.0,
-          "mrp": 550.0,
+          "price": 550,
+          "mrp": 550,
           "badge": "बांझपन निवारक",
           "description": "बच्चेदानी की गंदगी साफ कर समय पर शुद्ध हीट में लाता है और गर्भ ठहरने की संभावना 90% बढ़ाता है।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1033,8 +1290,8 @@
         {
           "id": "PAS001",
           "name": "CFL Mineral Feed (1kg)",
-          "price": 650.0,
-          "mrp": 650.0,
+          "price": 650,
+          "mrp": 650,
           "badge": "दुग्ध वृद्धि बूस्टर",
           "description": "बायपास प्रोटीन, चेलेटेड मिनरल्स व प्रोबायोटिक्स युक्त। 7 दिन में दूध और फैट में अचूक सुधार लाता है।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1042,8 +1299,8 @@
         {
           "id": "PAS002",
           "name": "Mastitis Shield Care Kit",
-          "price": 850.0,
-          "mrp": 850.0,
+          "price": 850,
+          "mrp": 850,
           "badge": "थनैला रक्षक",
           "description": "अयन की सूजन, गांठ व दूध में छीछड़ों को दूर करने वाली 100% सुरक्षित आयुर्वेदिक एंटी-इंफ्लेमेटरी किट।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1051,8 +1308,8 @@
         {
           "id": "PAS003",
           "name": "Doodh Dhara High-Cal (1L)",
-          "price": 450.0,
-          "mrp": 450.0,
+          "price": 450,
+          "mrp": 450,
           "badge": "लिक्विड कैल्शियम",
           "description": "विटामिन D3, B12 व बायोटीन युक्त बायो-अवेलेबल कैल्शियम। ब्यात के बाद मिल्क फीवर से बचाता है।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1060,8 +1317,8 @@
         {
           "id": "PAS004",
           "name": "Uterus Tone Cleanser (500ml)",
-          "price": 550.0,
-          "mrp": 550.0,
+          "price": 550,
+          "mrp": 550,
           "badge": "बांझपन निवारक",
           "description": "बच्चेदानी की गंदगी साफ कर समय पर शुद्ध हीट में लाता है और गर्भ ठहरने की संभावना 90% बढ़ाता है।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1201,8 +1458,8 @@
         {
           "id": "DB001",
           "name": "Madhu-Mukti Care (60 Cap)",
-          "price": 750.0,
-          "mrp": 750.0,
+          "price": 750,
+          "mrp": 750,
           "badge": "शुगर केयर कैप्सूल",
           "description": "गुड़मार, विजयसार, जामुन गुठली व गिलोय अर्क। इंसुलिन संवेदनशीलता सुधारकर फास्टिंग व PP शुगर को संतुलित रखता है।",
           "image": "/images/logo/logo.png"
@@ -1210,8 +1467,8 @@
         {
           "id": "DB002",
           "name": "Karela-Jamun Juice (1L)",
-          "price": 450.0,
-          "mrp": 450.0,
+          "price": 450,
+          "mrp": 450,
           "badge": "प्योर अर्क",
           "description": "शुद्ध नीम, करेला व जामुन का कोल्ड प्रेस्ड रस। रक्त शोधन करता है और भोजन के बाद शुगर स्पाइक रोकता है।",
           "image": "/images/logo/logo.png"
@@ -1219,8 +1476,8 @@
         {
           "id": "DB003",
           "name": "Gymnema Churna (100g)",
-          "price": 350.0,
-          "mrp": 350.0,
+          "price": 350,
+          "mrp": 350,
           "badge": "शुगर डिस्ट्रॉयर",
           "description": "मीठे की लत (Sugar Craving) मिटाता है और आंतों में ग्लूकोज के अवशोषण को कम करता है।",
           "image": "/images/logo/logo.png"
@@ -1273,8 +1530,8 @@
         {
           "id": "WL001",
           "name": "Slim-Fit Herbal Fat Burner",
-          "price": 850.0,
-          "mrp": 850.0,
+          "price": 850,
+          "mrp": 850,
           "badge": "फैट बर्नर",
           "description": "गार्सिनिया कैम्बोजिया, ग्रीन कॉफी व गुग्गुल अर्क युक्त। भूख को नियंत्रित कर जिद्दी फैट बर्न करता है।",
           "image": "/images/logo/logo.png"
@@ -1282,8 +1539,8 @@
         {
           "id": "WL002",
           "name": "Triphala Detox Cleanse",
-          "price": 650.0,
-          "mrp": 650.0,
+          "price": 650,
+          "mrp": 650,
           "badge": "टॉक्सिन क्लींजर",
           "description": "आंतों में जमा पुराना मल व टॉक्सिन्स बाहर निकालता है। पेट फूलने और गैस से तुरंत मुक्ति।",
           "image": "/images/logo/logo.png"
@@ -1291,8 +1548,8 @@
         {
           "id": "WL003",
           "name": "Metabolic Boost Green Tea",
-          "price": 450.0,
-          "mrp": 450.0,
+          "price": 450,
+          "mrp": 450,
           "badge": "मेटाबॉलिक टी",
           "description": "दालचीनी, तुलसी, लेमनग्रास व सौंठ का शक्तिशाली मिश्रण। दैनिक 2 कप पीने से कैलोरी बर्न 30% तेज।",
           "image": "/images/logo/logo.png"
@@ -1345,8 +1602,8 @@
         {
           "id": "JC001",
           "name": "Sandhi-Sudha Pain Oil (100ml)",
-          "price": 450.0,
-          "mrp": 450.0,
+          "price": 450,
+          "mrp": 450,
           "badge": "दर्द निवारक तेल",
           "description": "शल्लाकी, निर्गुंडी, महानारायण व गंधपुरा तेल। 10 मिनट में जोड़ों की गहराई तक पहुंचकर दर्द खींचता है।",
           "image": "/images/logo/logo.png"
@@ -1354,8 +1611,8 @@
         {
           "id": "JC002",
           "name": "Ortho-Care Cartilage Cap",
-          "price": 850.0,
-          "mrp": 850.0,
+          "price": 850,
+          "mrp": 850,
           "badge": "कार्टिलेज रिपेयर",
           "description": "ग्लूकोसामाइन, बोसवेलिया व अश्वगंधा। साइनोवियल फ्लूइड की कमी को दूर कर घुटनों का घिसना रोकता है।",
           "image": "/images/logo/logo.png"
@@ -1363,8 +1620,8 @@
         {
           "id": "JC003",
           "name": "Natural Calcium & Vit D3",
-          "price": 550.0,
-          "mrp": 550.0,
+          "price": 550,
+          "mrp": 550,
           "badge": "बोन डेंसिटी",
           "description": "शंख भस्म व मोरिंगा आधारित प्राकृतिक बायो-कैल्शियम। पेट में पथरी बनाए बिना 100% अवशोषित होता है।",
           "image": "/images/logo/logo.png"
@@ -1417,8 +1674,8 @@
         {
           "id": "WC001",
           "name": "Nari-Kalyan PCOD Tonic (200ml)",
-          "price": 450.0,
-          "mrp": 450.0,
+          "price": 450,
+          "mrp": 450,
           "badge": "PCOD स्पेशल",
           "description": "अशोक, लोध्र, शतावरी व कंचनार गुग्गुल। गर्भाशय की सफाई कर ओवरी सिस्ट को प्राकृतिक रूप से घोलता है।",
           "image": "/images/logo/logo.png"
@@ -1426,8 +1683,8 @@
         {
           "id": "WC002",
           "name": "Shatavari Extract Cap (60 Cap)",
-          "price": 550.0,
-          "mrp": 550.0,
+          "price": 550,
+          "mrp": 550,
           "badge": "हार्मोन बैलेंस",
           "description": "प्राकृतिक एस्ट्रोजन बूस्टर। कमजोरी, थकान, कमर दर्द दूर करता है और प्रजनन तंत्र को शक्ति प्रदान करता है।",
           "image": "/images/logo/logo.png"
@@ -1435,8 +1692,8 @@
         {
           "id": "WC003",
           "name": "Iron & Folic Tonic (200ml)",
-          "price": 350.0,
-          "mrp": 350.0,
+          "price": 350,
+          "mrp": 350,
           "badge": "हीमोग्लोबिन बूस्टर",
           "description": "द्राक्षा, आंवला व लोह भस्म। बिना कब्ज किए हीमोग्लोबिन 15 दिन में बढ़ाता है और सुस्ती भगाता है।",
           "image": "/images/logo/logo.png"
@@ -1489,8 +1746,8 @@
         {
           "id": "HC001",
           "name": "Kesh-Sanjivani Hair Oil (100ml)",
-          "price": 450.0,
-          "mrp": 450.0,
+          "price": 450,
+          "mrp": 450,
           "badge": "रूट न्यूट्रिशन ऑयल",
           "description": "भृंगराज, ब्राह्मी, आंवला, शिकाकाई व प्याज अर्क। जड़ों को मजबूत कर 15 दिन में बाल झड़ना रोकता है।",
           "image": "/images/logo/logo.png"
@@ -1498,8 +1755,8 @@
         {
           "id": "HC002",
           "name": "Neem Anti-Dandruff Shampoo",
-          "price": 350.0,
-          "mrp": 350.0,
+          "price": 350,
+          "mrp": 350,
           "badge": "एंटी-डैंड्रफ",
           "description": "सल्फेट-फ्री हर्बल फॉर्मूला। नीम व टी-ट्री ऑयल स्कैल्प के फंगस को पहली वॉश में ही नष्ट कर देता है।",
           "image": "/images/logo/logo.png"
@@ -1507,8 +1764,8 @@
         {
           "id": "HC003",
           "name": "Hair-Vital Biotin Cap (60 Cap)",
-          "price": 750.0,
-          "mrp": 750.0,
+          "price": 750,
+          "mrp": 750,
           "badge": "बायोटिन + DHT ब्लॉकर",
           "description": "प्राकृतिक सेसबानिया बायोटिन व ग्रीन टी अर्क। नए बाल उगाने और पतले बालों को मोटा करने में सक्षम।",
           "image": "/images/logo/logo.png"
@@ -1561,8 +1818,8 @@
         {
           "id": "SK001",
           "name": "Rakt-Shodhak Syrup (200ml)",
-          "price": 350.0,
-          "mrp": 350.0,
+          "price": 350,
+          "mrp": 350,
           "badge": "रक्त शोधक",
           "description": "मंजिष्ठा, नीम, चिरायता व अनंतमूल। खून की गंदगी साफ कर पिंपल्स को जड़ से समाप्त करता है।",
           "image": "/images/logo/logo.png"
@@ -1570,8 +1827,8 @@
         {
           "id": "SK002",
           "name": "Kumkumadi Radiance Oil (30ml)",
-          "price": 650.0,
-          "mrp": 650.0,
+          "price": 650,
+          "mrp": 650,
           "badge": "ग्लो सीरम",
           "description": "कश्मीरी केसर, चंदन व उशीर। झाइयों (Melasma), डार्क स्पॉट्स और झुर्रियों को मिटाकर प्राकृतिक तेज देता है।",
           "image": "/images/logo/logo.png"
@@ -1579,8 +1836,8 @@
         {
           "id": "SK003",
           "name": "Neem-Tulsi Face Wash (100ml)",
-          "price": 250.0,
-          "mrp": 250.0,
+          "price": 250,
+          "mrp": 250,
           "badge": "हर्बल क्लींजर",
           "description": "सल्फेट-मुक्त प्राकृतिक फेस वॉश। अतिरिक्त तेल और बैक्टीरिया को हटाकर रोमछिद्रों को साफ रखता है।",
           "image": "/images/logo/logo.png"
@@ -1633,8 +1890,8 @@
         {
           "id": "kids_choco_protein",
           "name": "Kids Choco-Nutri Protein Shake (500g)",
-          "price": 999.0,
-          "mrp": 1199.0,
+          "price": 999,
+          "mrp": 1199,
           "badge": "शारीरिक विकास व वजन",
           "description": "स्वादिष्ट चॉकलेट फ्लेवर में व्हे प्रोटीन, सोया प्रोटीन, कैल्शियम और 24 आवश्यक विटामिन्स का संपूर्ण सम्मिश्रण।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1642,8 +1899,8 @@
         {
           "id": "brahmi_brain_syrup",
           "name": "Brahmi-Shankhpushpi Brain Tonic (300ml)",
-          "price": 399.0,
-          "mrp": 499.0,
+          "price": 399,
+          "mrp": 499,
           "badge": "तेज याददाश्त व एकाग्रता",
           "description": "आयुर्वेदिक मेध्य रसायन। भूलने की समस्या दूर करे, पढ़ाई में एकाग्रता और मानसिक ऊर्जा में अप्रत्याशित सुधार।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1651,8 +1908,8 @@
         {
           "id": "kids_immunity_gummies",
           "name": "Kids Herbal Immunity Gummies (60 Pcs)",
-          "price": 549.0,
-          "mrp": 699.0,
+          "price": 549,
+          "mrp": 699,
           "badge": "रोग प्रतिरोधक ढाल",
           "description": "आंवला, विटामिन C, जिंक और गिलोय युक्त च्यूएबल गमीज। मौसम बदलने पर होने वाले सर्दी-जुकाम से प्राकृतिक सुरक्षा।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1705,8 +1962,8 @@
         {
           "id": "natural_veggie_wash",
           "name": "Natural Veggie & Fruit Wash Concentrate (500ml)",
-          "price": 399.0,
-          "mrp": 499.0,
+          "price": 399,
+          "mrp": 499,
           "badge": "सब्जी व फल शोधक",
           "description": "प्राकृतिक एंजाइम व नीम अर्क। सब्जियों व फलों से 99.9% कीटनाशक, बैक्टीरिया और मोम की परत को सुरक्षित रूप से हटाए।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1714,8 +1971,8 @@
         {
           "id": "herbal_floor_cleaner",
           "name": "Herbal Bio-Enzyme Floor Cleaner (1000ml)",
-          "price": 299.0,
-          "mrp": 399.0,
+          "price": 299,
+          "mrp": 399,
           "badge": "एसिड-फ्री फर्श सुरक्षा",
           "description": "नीम, लेमनग्रास और पाइन ऑयल से निर्मित। फर्श को चमकाए, मक्खी-मच्छरों को दूर रखे और बच्चों व पालतू जानवरों के लिए 100% सुरक्षित।",
           "image": "/images/banners/pashu-palan-banner.jpg"
@@ -1723,8 +1980,8 @@
         {
           "id": "bio_dishwash_gel",
           "name": "Bio-Enzyme Dishwash Liquid Gel (500ml)",
-          "price": 269.0,
-          "mrp": 349.0,
+          "price": 269,
+          "mrp": 349,
           "badge": "शून्य रासायनिक अवशेष",
           "description": "रीठा व नींबू का प्राकृतिक सत्व। चिकनाई को तुरंत काटे, बर्तनों पर कोई रासायनिक परत नहीं छोड़ता और हाथों की त्वचा को मुलायम रखता है।",
           "image": "/images/banners/pashu-palan-banner.jpg"
