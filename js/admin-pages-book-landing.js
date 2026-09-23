@@ -8223,7 +8223,6 @@ Instant Download & Lifetime Access
       selectedThemeDark = adjustColorBrightness(customThemeColor, -25);
     }
 
-    const bookType = document.getElementById('blp_book_type')?.value || (offerPrice === 0 ? 'free' : 'paid');
     const audienceType = document.getElementById('blp_audience_type')?.value || 'all';
     const attachedMainBooks = [];
     document.querySelectorAll('input[name="blp_attached_book_chk"]:checked').forEach(cb => {
