@@ -94,26 +94,10 @@
 
   // Universal Share Trigger (Modal or Native WebShare)
   async function triggerShare(options = {}) {
-    // 0. MANDATORY AUTHENTICATION CHECK: Sharing strictly requires logging in or registering!
-    const isLogged = (window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function')
-      ? window.V1_SESSION.isLoggedIn()
-      : (typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : false);
-
-    if (!isLogged) {
-      console.log('[ViralShareEngine] User not logged in. Registration required before sharing.');
-      if (typeof window.openGuestLoginModal === 'function') {
-        window.openGuestLoginModal(() => {
-          triggerShare(options);
-        }, { force: true, source: 'ShareGate' });
-      } else if (typeof window.openSlimLeadModal === 'function') {
-        window.openSlimLeadModal(() => {
-          triggerShare(options);
-        });
-      } else {
-        window.location.href = '/registration.html';
-      }
-      return; // STOP! DO NOT GENERATE SHARE LINK FOR GUESTS
-    }
+    // Universal Referral & Share Attribute:
+    // If user is logged in, their unique ID/phone is used.
+    // If visitor is not logged in, system seamlessly falls back to promoter ID or AI000004.
+    // Sharing is NEVER blocked or redirected to registration.html.
 
     const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
     const ogDesc = document.querySelector('meta[property="og:description"]')?.getAttribute('content');

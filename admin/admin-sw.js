@@ -1,10 +1,11 @@
-/* Aarogyam India Admin - Isolated Service Worker (V38) */
+/* Aarogyam India Admin - Isolated Service Worker (V41) */
 
-const CACHE_NAME = 'aarogyam-admin-shell-v38';
+const CACHE_NAME = 'aarogyam-admin-shell-v41';
 const OFFLINE_FALLBACK = '/admin/offline.html';
 
 const APP_SHELL_ASSETS = [
   '/admin/index.html',
+  '/admin/page-editor.html',
   '/admin/all-webinars.html',
   '/admin/webinar-reports.html',
   '/admin/book-landing-pages.html',
@@ -76,6 +77,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
+
+  // Localhost development: Always Network-first / Network-only to prevent stale UI
+  if (['localhost', '127.0.0.1'].includes(url.hostname)) {
+    event.respondWith(fetch(request).catch(() => caches.match(request)));
+    return;
+  }
 
   // 1. Live Database & Supabase APIs: ALWAYS Network Only (Never serve stale DB cache)
   if (url.hostname.includes('supabase.co') || url.pathname.includes('/rest/v1/')) {

@@ -136,6 +136,7 @@ export async function initPageEditor() {
     if (category === 'product') folder = 'images/products';
     else if (category === 'kpi_card' || category === 'kpi_section') folder = 'images/kpi';
     else if (category === 'review' || category === 'achiever') folder = 'images/team';
+    else if (category === 'floating_banner') folder = 'images/banners';
     return `${folder}/${category}-${cleanName}-${stamp}-${rand}.webp`;
   }
 
@@ -159,6 +160,15 @@ export async function initPageEditor() {
       if (targetType === 'hero_slide' && currentSlides[targetIndex]) {
         currentSlides[targetIndex][fieldName] = webpPath;
         renderHeroSlidesInBuilder();
+      } else if (targetType === 'floating_banner') {
+        const inputEl = document.getElementById('pe_input_floating_banner_img');
+        if (inputEl) inputEl.value = webpPath;
+        const prevWrap = document.getElementById('pe_floating_banner_preview');
+        const prevImg = document.getElementById('pe_floating_banner_preview_img');
+        if (prevWrap && prevImg) {
+          prevImg.src = webpPath;
+          prevWrap.style.display = 'block';
+        }
       } else if (targetType === 'achiever' && currentAchievers[targetIndex]) {
         currentAchievers[targetIndex][fieldName] = webpPath;
         renderAchieversList();
@@ -214,1005 +224,1794 @@ export async function initPageEditor() {
 
   const defaultPages = [
     {
-      id: 'page_home',
-      slug: 'index',
-      name: '🏠 मुख्य पृष्ठ (Home Page)',
-      url: '/index.html',
-      category: 'Core',
-      status: 'active',
-      theme_primary: '#15803d',
-      theme_dark: '#0e5227',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '📢 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 WhatsApp AI डॉक्टर सहायता उपलब्ध! ✦ प्रमाणित ई-बुक्स व मंडी भाव',
-      hero_slides: [
-        {
-          image: '/images/banners/kharif-master-guide-2026-hero-banner.webp',
-          tag: '🌾 खरीफ 2026 स्पेशल एडिशन',
-          title: 'Aarogyam India - सम्पूर्ण किसान व डिजिटल ज्ञान मंच',
-          subtitle: 'वैज्ञानिक खेती, फसल डॉक्टर, मंडी भाव, और 100% प्रमाणित डिजिटल ई-बुक्स',
-          cta_text: '📚 डिजिटल स्टोर देखें',
-          cta_link: '/ebooks/ebook.html',
-          cta_secondary_text: '🌱 कृषि हब',
-          cta_secondary_link: '/ebooks/agriculture.html'
+        "id": "page_home",
+        "slug": "index",
+        "name": "🏠 मुख्य पृष्ठ (Home Page)",
+        "url": "/index.html",
+        "category": "Core",
+        "status": "active",
+        "theme_primary": "#15803d",
+        "theme_dark": "#0e5227",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "📢 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 WhatsApp AI डॉक्टर सहायता उपलब्ध! ✦ प्रमाणित ई-बुक्स व मंडी भाव",
+        "hero_slides": [
+            {
+                "image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+                "tag": "🌾 खरीफ 2026 स्पेशल एडिशन",
+                "title": "Aarogyam India - सम्पूर्ण किसान व डिजिटल ज्ञान मंच",
+                "subtitle": "वैज्ञानिक खेती, फसल डॉक्टर, मंडी भाव, और 100% प्रमाणित डिजिटल ई-बुक्स",
+                "cta_text": "📚 डिजिटल स्टोर देखें",
+                "cta_link": "/ebooks/ebook.html",
+                "cta_secondary_text": "🌱 कृषि हब",
+                "cta_secondary_link": "/ebooks/agriculture.html"
+            },
+            {
+                "image": "/images/banners/farmer-community-banner.jpeg",
+                "tag": "👑 VIP Annual Pass",
+                "title": "Aarogyam Pro VIP सदस्यता - 1 वर्ष का ऑल-एक्सेस",
+                "subtitle": "सभी ई-बुक्स, लाइव वेबिनार्स और 24×7 WhatsApp AI डॉक्टर सहायता बिल्कुल मुफ़्त!",
+                "cta_text": "👑 VIP मेम्बर बनें (₹99)",
+                "cta_link": "/subscription.html",
+                "cta_secondary_text": "🛒 कार्ट देखें",
+                "cta_secondary_link": "/ebooks/cart.html"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_category_pills",
+            "sec_shelves_bestseller",
+            "sec_interspersed_marketing",
+            "sec_shelves_new",
+            "sec_combo_promo",
+            "sec_videos",
+            "sec_reviews",
+            "sec_trust_guarantee",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [
+            {
+                "icon": "fa-book-open",
+                "title": "120+ रंगीन पेज",
+                "desc": "उच्च गुणवत्ता सचित्र मार्गदर्शिका"
+            },
+            {
+                "icon": "fa-bolt",
+                "title": "इंस्टेंट PDF डाउनलोड",
+                "desc": "भुगतान के तुरंत बाद आजीवन एक्सेस"
+            },
+            {
+                "icon": "fa-robot",
+                "title": "24×7 WhatsApp AI डॉक्टर",
+                "desc": "किताब पढ़ते समय तुरंत सवाल पूछें"
+            },
+            {
+                "icon": "fa-shield-halved",
+                "title": "100% सुरक्षित भुगतान",
+                "desc": "UPI, PhonePe, GPay व कार्ड्स"
+            }
+        ],
+        "videos": [
+            {
+                "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "title": "📖 खरीफ मास्टर गाइड - अंदर के पेज व डेमो",
+                "desc": "300+ वास्तविक फोटो और स्प्रे साइंस चार्ट का लाइव प्रीव्यू।",
+                "ratio": "16:9"
+            },
+            {
+                "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "title": "📲 24×7 WhatsApp AI डॉक्टर सहायता कैसे काम करती है?",
+                "desc": "किताब पढ़ते समय सवाल पूछने और तुरंत समाधान पाने का तरीका।",
+                "ratio": "16:9"
+            }
+        ],
+        "marketing_cards": [
+            {
+                "book_id": "BK001",
+                "tag": "🔥 सर्वाधिक लोकप्रिय",
+                "headline": "खरीफ फसल मास्टर गाइड 2026",
+                "desc": "सोयाबीन, मक्का, धान व कपास की वैज्ञानिक खेती और रोग समाधान।",
+                "sales_counter": "1,420+ किसानों ने खरीदा"
+            },
+            {
+                "book_id": "BK002",
+                "tag": "🌱 किसान का पॉकेट डॉक्टर",
+                "headline": "खेती का डॉक्टर (फसल का डॉक्टर)",
+                "desc": "रोग, कीट, फंगल और पोषक तत्वों की कमी की पहचान व सटीक इलाज।",
+                "sales_counter": "980+ किसानों ने खरीदा"
+            }
+        ],
+        "reviews": [
+            {
+                "name": "रामेश्वर पटेल",
+                "location": "उज्जैन, मध्य प्रदेश",
+                "rating": 5,
+                "comment": "खरीफ मास्टर गाइड बहुत ही उपयोगी है। स्प्रे साइंस चार्ट से मेरी फसल बच गई।"
+            },
+            {
+                "name": "सुरेश कुमार यादव",
+                "location": "करनाल, हरियाणा",
+                "rating": 5,
+                "comment": "WhatsApp AI डॉक्टर सहायता से जब भी सवाल पूछा तुरंत उत्तर मिला। बहुत बढ़िया मंच!"
+            }
+        ],
+        "faqs": [
+            {
+                "q": "ई-बुक खरीदने के बाद कैसे मिलेगी?",
+                "a": "भुगतान होते ही आपको तुरंत PDF डाउनलोड लिंक मिलेगा और पुस्तक आपकी \"मेरी लाइब्रेरी\" में आजीवन सुरक्षित रहेगी।"
+            },
+            {
+                "q": "क्या मैं मोबाइल पर पढ़ सकता हूँ?",
+                "a": "हाँ, सभी पुस्तकें मोबाइल और टैबलेट के लिए पूरी तरह ऑप्टिमाइज़्ड हैं।"
+            }
+        ],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते आरोग्यम इंडिया, मुझे वेबसाइट व ई-बुक्स के बारे में जानकारी चाहिए।"
         },
-        {
-          image: '/images/banners/farmer-community-banner.jpeg',
-          tag: '👑 VIP Annual Pass',
-          title: 'Aarogyam Pro VIP सदस्यता - 1 वर्ष का ऑल-एक्सेस',
-          subtitle: 'सभी ई-बुक्स, लाइव वेबिनार्स और 24×7 WhatsApp AI डॉक्टर सहायता बिल्कुल मुफ़्त!',
-          cta_text: '👑 VIP मेम्बर बनें (₹99)',
-          cta_link: '/subscription.html',
-          cta_secondary_text: '🛒 कार्ट देखें',
-          cta_secondary_link: '/ebooks/cart.html'
-        }
-      ],
-      sections_order: [
-        'sec_ticker',
-        'sec_hero_slider',
-        'sec_kpi_badges',
-        'sec_category_pills',
-        'sec_shelves_bestseller',
-        'sec_interspersed_marketing',
-        'sec_shelves_new',
-        'sec_combo_promo',
-        'sec_videos',
-        'sec_reviews',
-        'sec_trust_guarantee',
-        'sec_faqs',
-        'sec_help_support'
-      ],
-      hidden_sections: [],
-      kpi_cards: [
-        { icon: 'fa-book-open', title: '120+ रंगीन पेज', desc: 'उच्च गुणवत्ता सचित्र मार्गदर्शिका' },
-        { icon: 'fa-bolt', title: 'इंस्टेंट PDF डाउनलोड', desc: 'भुगतान के तुरंत बाद आजीवन एक्सेस' },
-        { icon: 'fa-robot', title: '24×7 WhatsApp AI डॉक्टर', desc: 'किताब पढ़ते समय तुरंत सवाल पूछें' },
-        { icon: 'fa-shield-halved', title: '100% सुरक्षित भुगतान', desc: 'UPI, PhonePe, GPay व कार्ड्स' }
-      ],
-      videos: [
-        { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: '📖 खरीफ मास्टर गाइड - अंदर के पेज व डेमो', desc: '300+ वास्तविक फोटो और स्प्रे साइंस चार्ट का लाइव प्रीव्यू।', ratio: '16:9' },
-        { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: '📲 24×7 WhatsApp AI डॉक्टर सहायता कैसे काम करती है?', desc: 'किताब पढ़ते समय सवाल पूछने और तुरंत समाधान पाने का तरीका।', ratio: '16:9' }
-      ],
-      marketing_cards: [
-        { book_id: 'BK001', tag: '🔥 सर्वाधिक लोकप्रिय', headline: 'खरीफ फसल मास्टर गाइड 2026', desc: 'सोयाबीन, मक्का, धान व कपास की वैज्ञानिक खेती और रोग समाधान।', sales_counter: '1,420+ किसानों ने खरीदा' },
-        { book_id: 'BK002', tag: '🌱 किसान का पॉकेट डॉक्टर', headline: 'खेती का डॉक्टर (फसल का डॉक्टर)', desc: 'रोग, कीट, फंगल और पोषक तत्वों की कमी की पहचान व सटीक इलाज।', sales_counter: '980+ किसानों ने खरीदा' }
-      ],
-      reviews: [
-        { name: 'रामेश्वर पटेल', location: 'उज्जैन, मध्य प्रदेश', rating: 5, comment: 'खरीफ मास्टर गाइड बहुत ही उपयोगी है। स्प्रे साइंस चार्ट से मेरी फसल बच गई।' },
-        { name: 'सुरेश कुमार यादव', location: 'करनाल, हरियाणा', rating: 5, comment: 'WhatsApp AI डॉक्टर सहायता से जब भी सवाल पूछा तुरंत उत्तर मिला। बहुत बढ़िया मंच!' }
-      ],
-      faqs: [
-        { q: 'ई-बुक खरीदने के बाद कैसे मिलेगी?', a: 'भुगतान होते ही आपको तुरंत PDF डाउनलोड लिंक मिलेगा और पुस्तक आपकी "मेरी लाइब्रेरी" में आजीवन सुरक्षित रहेगी।' },
-        { q: 'क्या मैं मोबाइल पर पढ़ सकता हूँ?', a: 'हाँ, सभी पुस्तकें मोबाइल और टैबलेट के लिए पूरी तरह ऑप्टिमाइज़्ड हैं।' }
-      ],
-      whatsapp_support: {
-        number: '919876543210',
-        prompt: 'नमस्ते आरोग्यम इंडिया, मुझे वेबसाइट व ई-बुक्स के बारे में जानकारी चाहिए।'
-      },
-      audio_title: 'मुख्य पृष्ठ (होम)',
-      audio_script: 'नमस्ते {name} जी! आरोग्यम इंडिया में आपका हार्दिक स्वागत है। यह भारत का पहला संपूर्ण डिजिटल ज्ञान मंच है जहाँ किसानों और परिवारों के लिए सभी समाधान उपलब्ध हैं। यहाँ आपको खरीफ फसल मास्टर गाइड और खेती का डॉक्टर जैसी प्रमाणित ई-बुक्स, फसलों का सचित्र वैज्ञानिक स्प्रे शेड्यूल, गाय और भैंस में दूध व फैट वृद्धि के उपाय, और डायबिटीज, जोड़ों का दर्द व मोटापे का प्राकृतिक आयुर्वेदिक परामर्श मिलता है। किसी भी सवाल या समस्या के लिए आप सीधे व्हाट्सएप पर हमारे विशेषज्ञों से 24 घंटे निःशुल्क सलाह ले सकते हैं। आरोग्यम इंडिया के साथ जुड़ने के लिए धन्यवाद!'
+        "audio_title": "मुख्य पृष्ठ (होम)",
+        "audio_script": "नमस्ते {name} जी! आरोग्यम इंडिया में आपका हार्दिक स्वागत है। यह भारत का पहला संपूर्ण डिजिटल ज्ञान मंच है जहाँ किसानों और परिवारों के लिए सभी समाधान उपलब्ध हैं। यहाँ आपको खरीफ फसल मास्टर गाइड और खेती का डॉक्टर जैसी प्रमाणित ई-बुक्स, फसलों का सचित्र वैज्ञानिक स्प्रे शेड्यूल, गाय और भैंस में दूध व फैट वृद्धि के उपाय, और डायबिटीज, जोड़ों का दर्द व मोटापे का प्राकृतिक आयुर्वेदिक परामर्श मिलता है। किसी भी सवाल या समस्या के लिए आप सीधे व्हाट्सएप पर हमारे विशेषज्ञों से 24 घंटे निःशुल्क सलाह ले सकते हैं। आरोग्यम इंडिया के साथ जुड़ने के लिए धन्यवाद!"
     },
     {
-      id: 'page_agriculture',
-      slug: 'agriculture',
-      name: '🌱 कृषि मार्गदर्शिका हब (Agriculture Hub)',
-      url: '/ebooks/agriculture.html',
-      category: 'eBooks',
-      status: 'active',
-      theme_primary: '#15803d',
-      theme_dark: '#0e5227',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🌾 खरीफ व रबी स्पेशल फसल गाइड्स उपलब्ध | ₹198 में 2-बुक कॉम्बो बंडल व WhatsApp AI डॉक्टर सहायता!',
-      hero_slides: [
-        {
-          image: '/images/books/kharif-master-guide-2026-cover.webp',
-          tag: '🌾 BESTSELLER AGRICULTURE EBOOK',
-          title: 'खरीफ फसल मास्टर गाइड 2026',
-          subtitle: 'धान, सोयाबीन व मक्का की सम्पूर्ण प्रैक्टिकल गाइड। बीज उपचार से लेकर कटाई तक सम्पूर्ण समाधान।',
-          cta_text: '⚡ अभी ऑर्डर करें (₹99)',
-          cta_link: '/ebooks/kharif-master-guide-2026.html',
-          cta_secondary_text: '← सभी पुस्तकें',
-          cta_secondary_link: '/ebooks/ebook.html'
+        "id": "page_agriculture",
+        "slug": "agriculture",
+        "name": "🌱 कृषि मार्गदर्शिका हब (Agriculture Hub)",
+        "url": "/ebooks/agriculture.html",
+        "category": "eBooks",
+        "status": "active",
+        "theme_primary": "#15803d",
+        "theme_dark": "#0e5227",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🌾 खरीफ व रबी स्पेशल फसल गाइड्स उपलब्ध | ₹198 में 2-बुक कॉम्बो बंडल व WhatsApp AI डॉक्टर सहायता!",
+        "hero_slides": [
+            {
+                "image": "/images/books/kharif-master-guide-2026-cover.webp",
+                "tag": "🌾 BESTSELLER AGRICULTURE EBOOK",
+                "title": "खरीफ फसल मास्टर गाइड 2026",
+                "subtitle": "धान, सोयाबीन व मक्का की सम्पूर्ण प्रैक्टिकल गाइड। बीज उपचार से लेकर कटाई तक सम्पूर्ण समाधान।",
+                "cta_text": "⚡ अभी ऑर्डर करें (₹99)",
+                "cta_link": "/ebooks/kharif-master-guide-2026.html",
+                "cta_secondary_text": "← सभी पुस्तकें",
+                "cta_secondary_link": "/ebooks/ebook.html"
+            },
+            {
+                "image": "/images/books/fasal-ka-doctor-cover.webp",
+                "tag": "🩺 सर्वाधिक बिकने वाली ई-बुक (TOP BESTSELLER)",
+                "title": "खेती का डॉक्टर (फसल का डॉक्टर)",
+                "subtitle": "रोग, कीट, वायरल, फंगल और पोषक तत्वों की कमी की पहचान सीखें। अब तक की सर्वाधिक बिकने वाली ई-बुक!",
+                "cta_text": "⚡ अभी ऑर्डर करें (₹99)",
+                "cta_link": "/ebooks/kheti-dr.html",
+                "cta_secondary_text": "← सभी पुस्तकें",
+                "cta_secondary_link": "/ebooks/ebook.html"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_combo_promo",
+            "sec_kpi_badges",
+            "sec_shelves_bestseller",
+            "sec_interspersed_marketing",
+            "sec_videos",
+            "sec_reviews",
+            "sec_trust_guarantee",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [
+            {
+                "icon": "fa-seedling",
+                "title": "बीज उपचार व किस्में",
+                "desc": "टॉप उन्नत वैरायटी का चयन"
+            },
+            {
+                "icon": "fa-spray-can",
+                "title": "स्प्रे साइंस चार्ट",
+                "desc": "सटीक रासायनिक व जैविक स्प्रे"
+            },
+            {
+                "icon": "fa-bug",
+                "title": "कीट व रोग नियंत्रण",
+                "desc": "लक्षण व प्रमाणित रोकथाम"
+            },
+            {
+                "icon": "fa-comments",
+                "title": "24×7 WhatsApp AI सहायता",
+                "desc": "कृषि विशेषज्ञों का डिजिटल सहयोग"
+            }
+        ],
+        "videos": [
+            {
+                "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "title": "🎥 खरीफ फसलों में रोग व कीट प्रबंधन कैसे करें?",
+                "desc": "खेत पर विशेषज्ञों द्वारा तैयार विस्तृत वीडियो गाइड।",
+                "ratio": "16:9"
+            }
+        ],
+        "marketing_cards": [
+            {
+                "book_id": "BK001",
+                "tag": "🌾 खरीफ स्पेशल",
+                "headline": "खरीफ फसल मास्टर गाइड 2026",
+                "desc": "सोयाबीन, मक्का व धान के उत्पादन को दोगुना करने के वैज्ञानिक तरीके।",
+                "sales_counter": "1,420+ किसानों ने खरीदा"
+            },
+            {
+                "book_id": "BK002",
+                "tag": "🌱 फसल डॉक्टर",
+                "headline": "खेती का डॉक्टर",
+                "desc": "सभी प्रकार के रोगों और कीटों का 1-क्लिक समाधान।",
+                "sales_counter": "980+ किसानों ने खरीदा"
+            }
+        ],
+        "reviews": [
+            {
+                "name": "दिनेश जाट",
+                "location": "इंदौर, मध्य प्रदेश",
+                "rating": 5,
+                "comment": "सोयाबीन में खरपतवार नियंत्रण का बहुत ही सही फॉर्मूला इस किताब में मिला।"
+            },
+            {
+                "name": "प्रदीप वर्मा",
+                "location": "वाराणसी, उत्तर प्रदेश",
+                "rating": 5,
+                "comment": "धान की फसल के लिए धान मास्टर गाइड और खेती डॉक्टर दोनों लाजवाब हैं।"
+            }
+        ],
+        "faqs": [
+            {
+                "q": "क्या कॉम्बो में दोनों पुस्तकें तुरंत मिलेंगी?",
+                "a": "हाँ, पेमेंट के बाद दोनों PDF डाउनलोड लिंक्स तुरंत स्क्रीन पर दिखेंगे।"
+            }
+        ],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे कृषि पुस्तकों और कॉम्बो ऑफर के बारे में जानकारी चाहिए।"
         },
-        {
-          image: '/images/books/fasal-ka-doctor-cover.webp',
-          tag: '🩺 सर्वाधिक बिकने वाली ई-बुक (TOP BESTSELLER)',
-          title: 'खेती का डॉक्टर (फसल का डॉक्टर)',
-          subtitle: 'रोग, कीट, वायरल, फंगल और पोषक तत्वों की कमी की पहचान सीखें। अब तक की सर्वाधिक बिकने वाली ई-बुक!',
-          cta_text: '⚡ अभी ऑर्डर करें (₹99)',
-          cta_link: '/ebooks/kheti-dr.html',
-          cta_secondary_text: '← सभी पुस्तकें',
-          cta_secondary_link: '/ebooks/ebook.html'
-        }
-      ],
-      sections_order: [
-        'sec_ticker',
-        'sec_hero_slider',
-        'sec_combo_promo',
-        'sec_kpi_badges',
-        'sec_shelves_bestseller',
-        'sec_interspersed_marketing',
-        'sec_videos',
-        'sec_reviews',
-        'sec_trust_guarantee',
-        'sec_faqs',
-        'sec_help_support'
-      ],
-      hidden_sections: [],
-      kpi_cards: [
-        { icon: 'fa-seedling', title: 'बीज उपचार व किस्में', desc: 'टॉप उन्नत वैरायटी का चयन' },
-        { icon: 'fa-spray-can', title: 'स्प्रे साइंस चार्ट', desc: 'सटीक रासायनिक व जैविक स्प्रे' },
-        { icon: 'fa-bug', title: 'कीट व रोग नियंत्रण', desc: 'लक्षण व प्रमाणित रोकथाम' },
-        { icon: 'fa-comments', title: '24×7 WhatsApp AI सहायता', desc: 'कृषि विशेषज्ञों का डिजिटल सहयोग' }
-      ],
-      videos: [
-        { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: '🎥 खरीफ फसलों में रोग व कीट प्रबंधन कैसे करें?', desc: 'खेत पर विशेषज्ञों द्वारा तैयार विस्तृत वीडियो गाइड।', ratio: '16:9' }
-      ],
-      marketing_cards: [
-        { book_id: 'BK001', tag: '🌾 खरीफ स्पेशल', headline: 'खरीफ फसल मास्टर गाइड 2026', desc: 'सोयाबीन, मक्का व धान के उत्पादन को दोगुना करने के वैज्ञानिक तरीके।', sales_counter: '1,420+ किसानों ने खरीदा' },
-        { book_id: 'BK002', tag: '🌱 फसल डॉक्टर', headline: 'खेती का डॉक्टर', desc: 'सभी प्रकार के रोगों और कीटों का 1-क्लिक समाधान।', sales_counter: '980+ किसानों ने खरीदा' }
-      ],
-      reviews: [
-        { name: 'दिनेश जाट', location: 'इंदौर, मध्य प्रदेश', rating: 5, comment: 'सोयाबीन में खरपतवार नियंत्रण का बहुत ही सही फॉर्मूला इस किताब में मिला।' },
-        { name: 'प्रदीप वर्मा', location: 'वाराणसी, उत्तर प्रदेश', rating: 5, comment: 'धान की फसल के लिए धान मास्टर गाइड और खेती डॉक्टर दोनों लाजवाब हैं।' }
-      ],
-      faqs: [
-        { q: 'क्या कॉम्बो में दोनों पुस्तकें तुरंत मिलेंगी?', a: 'हाँ, पेमेंट के बाद दोनों PDF डाउनलोड लिंक्स तुरंत स्क्रीन पर दिखेंगे।' }
-      ],
-      whatsapp_support: {
-        number: '919876543210',
-        prompt: 'नमस्ते, मुझे कृषि पुस्तकों और कॉम्बो ऑफर के बारे में जानकारी चाहिए।'
-      },
-      audio_title: 'वैज्ञानिक कृषि व फसल सुरक्षा हब',
-      audio_script: 'नमस्ते {name} जी! आरोग्यम कृषि हब में आपका स्वागत है। यहाँ आप खरीफ फसल मास्टर गाइड और फसल का डॉक्टर ई-बुक प्राप्त कर सकते हैं। साथ ही सभी प्रमुख फसलों के रोग, जैविक उपचार और नेटसर्फ बायो-फिट स्प्रे शेड्यूल की पूरी जानकारी देख सकते हैं।'
+        "audio_title": "वैज्ञानिक कृषि व फसल सुरक्षा हब",
+        "audio_script": "नमस्ते {name} जी! आरोग्यम कृषि हब में आपका स्वागत है। यहाँ आप खरीफ फसल मास्टर गाइड और फसल का डॉक्टर ई-बुक प्राप्त कर सकते हैं। साथ ही सभी प्रमुख फसलों के रोग, जैविक उपचार और नेटसर्फ बायो-फिट स्प्रे शेड्यूल की पूरी जानकारी देख सकते हैं।"
     },
     {
-      id: 'page_health',
-      slug: 'health',
-      name: '❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health Hub)',
-      url: '/categories/health.html',
-      category: 'Health',
-      status: 'active',
-      theme_primary: '#dc2626',
-      theme_dark: '#7f1d1d',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🌿 50,000+ परिवारों का भरोसा! • सभी 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान • 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय',
-      hero_slides: [
-        {
-          image: '/images/banners/health-banner.jpeg',
-          tag: '❤️ ALL HEALTH DOMAINS',
-          title: 'आरोग्यम सम्पूर्ण स्वास्थ्य केंद्र',
-          subtitle: 'डायबिटीज, जोड़ों का दर्द, वजन नियंत्रण, महिला व पुरुष स्वास्थ्य का प्राकृतिक आयुर्वेदिक समाधान',
-          cta_text: '🩺 समाधान चुनें',
-          cta_link: '#sec-categories',
-          cta_secondary_text: '💬 डॉक्टर परामर्श',
-          cta_secondary_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_reviews', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [
-        { icon: 'fa-heart-pulse', title: '100% प्राकृतिक', desc: 'हानिरहित आयुर्वेदिक फॉर्मूलेशन' },
-        { icon: 'fa-user-doctor', title: 'AI डॉक्टर परामर्श', desc: '24×7 व्यक्तिगत डाइट व सलाह' },
-        { icon: 'fa-shield-halved', title: 'प्रमाणित शुद्धता', desc: 'GMP व ISO प्रमाणित तत्व' }
-      ],
-      videos: [],
-      marketing_cards: [],
-      reviews: [
-        { name: 'कमलेश शर्मा', location: 'भोपाल, मध्य प्रदेश', rating: 5, comment: 'डायबिटीज केयर और डाइट प्लान से मेरा शुगर लेवल 3 महीने में काफी नियंत्रित हुआ।' }
-      ],
-      faqs: [
-        { q: 'क्या परामर्श के लिए कोई शुल्क है?', a: 'नहीं, आरोग्यम इंडिया पर प्राथमिक AI व विशेषज्ञ परामर्श निःशुल्क है।' }
-      ],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे स्वास्थ्य समस्याओं के बारे में परामर्श चाहिए।' },
-      audio_title: 'आरोग्यम संपूर्ण स्वास्थ्य केंद्र',
-      audio_script: 'नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे।'
-    },
-    {
-      id: 'page_pashu',
-      slug: 'pashu-palan',
-      name: '🐄 पशु पालन व दुग्ध संवर्धन हब (Pashu Palan Hub)',
-      url: '/pashu-palan.html',
-      category: 'Agriculture',
-      status: 'active',
-      theme_primary: '#0284c7',
-      theme_dark: '#075985',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🐄 10,000+ पशुपालकों का भरोसा | थनैला मुक्ति, दूध व फैट वृद्धि के 100% सफल फॉर्मूले',
-      hero_slides: [
-        {
-          image: '/images/banners/pashu-palan-banner.jpg',
-          tag: '🐄 PASHU PALAN SPECIAL',
-          title: 'पशु पालन, पोषण व दुग्ध संवर्धन हब',
-          subtitle: 'गाय-भैंस में थनैला रोग, दूध व फैट वृद्धि, बांझपन और आफरा का 100% सफल निवारण',
-          cta_text: '🐄 समाधान देखें',
-          cta_link: '#problems-matrix',
-          cta_secondary_text: '📦 CFL ऑर्डर करें',
-          cta_secondary_link: '#products-cattle'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_reviews', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [
-        { icon: 'fa-glass-water-droplet', title: '1-2L दूध वृद्धि', desc: 'CFL मिनरल मिक्सचर व बायपास फैट' },
-        { icon: 'fa-shield-virus', title: 'थनैला से सुरक्षा', desc: 'एंटीसेप्टिक व प्राकृतिक हर्बल अर्क' },
-        { icon: 'fa-cow', title: 'प्रजनन स्वास्थ्य', desc: 'समय पर हीट में आना व गर्भधारण' }
-      ],
-      videos: [],
-      marketing_cards: [],
-      reviews: [
-        { name: 'भंवरलाल चौधरी', location: 'नागौर, राजस्थान', rating: 5, comment: 'CFL मिनरल मिक्सचर देने के 15 दिन बाद ही मेरी भैंस का फैट 6 से बढ़कर 7.5 हो गया।' }
-      ],
-      faqs: [
-        { q: 'क्या CFL मिनरल मिक्सचर सभी पशुओं को दिया जा सकता है?', a: 'हाँ, गाय, भैंस और बकरियों के लिए यह अत्यंत लाभकारी है।' }
-      ],
-      whatsapp_support: { number: '917974422572', prompt: 'राम राम, मुझे पशुओं के स्वास्थ्य व दुग्ध वृद्धि के बारे में जानकारी चाहिए।' },
-      audio_title: 'पशु पालन व दुग्ध संवर्धन हब',
-      audio_script: 'राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा।'
-    },
-    {
-      id: 'page_ebook_store',
-      slug: 'ebook',
-      name: '📚 ई-बुक स्टोर (eBook Store Marketplace)',
-      url: '/ebooks/ebook.html',
-      category: 'eBooks',
-      status: 'active',
-      theme_primary: '#14532d',
-      theme_dark: '#052e16',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🚨 स्पेशल ऑफर: ₹1999 की VIP Pro मेम्बरशिप व AI डॉक्टर सहायता बिल्कुल FREE! ✦ 10,000+ किसानों का विश्वास',
-      hero_slides: [
-        {
-          image: '/images/banners/ebook-banner.jpeg',
-          tag: '📚 ई-बुक स्टोर',
-          title: 'आरोग्यम डिजिटल ई-बुक स्टोर',
-          subtitle: 'कृषि, पशु पालन व स्वास्थ्य की सभी प्रमाणित हिंदी पुस्तकें',
-          cta_text: '⚡ अभी देखें',
-          cta_link: '#bestsellers-shelf',
-          cta_secondary_text: '🛒 कार्ट देखें',
-          cta_secondary_link: '/ebooks/cart.html'
+        "id": "page_health",
+        "slug": "health",
+        "name": "❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health Hub)",
+        "url": "/categories/health.html",
+        "category": "Health",
+        "status": "active",
+        "theme_primary": "#dc2626",
+        "theme_dark": "#7f1d1d",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🌿 50,000+ परिवारों का भरोसा! • सभी 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान • 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय",
+        "hero_slides": [
+            {
+                "image": "/images/banners/health-banner.jpeg",
+                "tag": "❤️ ALL HEALTH DOMAINS",
+                "title": "आरोग्यम सम्पूर्ण स्वास्थ्य केंद्र",
+                "subtitle": "डायबिटीज, जोड़ों का दर्द, वजन नियंत्रण, महिला व पुरुष स्वास्थ्य का प्राकृतिक आयुर्वेदिक समाधान",
+                "cta_text": "🩺 समाधान चुनें",
+                "cta_link": "#sec-categories",
+                "cta_secondary_text": "💬 डॉक्टर परामर्श",
+                "cta_secondary_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_reviews",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [
+            {
+                "icon": "fa-heart-pulse",
+                "title": "100% प्राकृतिक",
+                "desc": "हानिरहित आयुर्वेदिक फॉर्मूलेशन"
+            },
+            {
+                "icon": "fa-user-doctor",
+                "title": "AI डॉक्टर परामर्श",
+                "desc": "24×7 व्यक्तिगत डाइट व सलाह"
+            },
+            {
+                "icon": "fa-shield-halved",
+                "title": "प्रमाणित शुद्धता",
+                "desc": "GMP व ISO प्रमाणित तत्व"
+            }
+        ],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [
+            {
+                "name": "कमलेश शर्मा",
+                "location": "भोपाल, मध्य प्रदेश",
+                "rating": 5,
+                "comment": "डायबिटीज केयर और डाइट प्लान से मेरा शुगर लेवल 3 महीने में काफी नियंत्रित हुआ।"
+            }
+        ],
+        "faqs": [
+            {
+                "q": "क्या परामर्श के लिए कोई शुल्क है?",
+                "a": "नहीं, आरोग्यम इंडिया पर प्राथमिक AI व विशेषज्ञ परामर्श निःशुल्क है।"
+            }
+        ],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे स्वास्थ्य समस्याओं के बारे में परामर्श चाहिए।"
         },
-        {
-          image: '/images/banners/offer-banner-kharif-2026.webp',
-          tag: '🌾 खरीफ स्पेशल कॉम्बो',
-          title: 'खरीफ फसल मास्टर गाइड 2026',
-          subtitle: 'धान, सोयाबीन व मक्का की सम्पूर्ण प्रैक्टिकल गाइड',
-          cta_text: '⚡ मात्र ₹99',
-          cta_link: '/ebooks/kharif-master-guide-2026.html',
-          cta_secondary_text: '🛒 कार्ट में जोड़ें',
-          cta_secondary_link: '/ebooks/cart.html'
+        "audio_title": "आरोग्यम संपूर्ण स्वास्थ्य केंद्र",
+        "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे।"
+    },
+    {
+        "id": "page_pashu",
+        "slug": "pashu-palan",
+        "name": "🐄 पशु पालन व दुग्ध संवर्धन हब (Pashu Palan Hub)",
+        "url": "/pashu-palan.html",
+        "category": "Agriculture",
+        "status": "active",
+        "theme_primary": "#0284c7",
+        "theme_dark": "#075985",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🐄 10,000+ पशुपालकों का भरोसा | थनैला मुक्ति, दूध व फैट वृद्धि के 100% सफल फॉर्मूले",
+        "hero_slides": [
+            {
+                "image": "/images/banners/pashu-palan-banner.jpg",
+                "tag": "🐄 PASHU PALAN SPECIAL",
+                "title": "पशु पालन, पोषण व दुग्ध संवर्धन हब",
+                "subtitle": "गाय-भैंस में थनैला रोग, दूध व फैट वृद्धि, बांझपन और आफरा का 100% सफल निवारण",
+                "cta_text": "🐄 समाधान देखें",
+                "cta_link": "#problems-matrix",
+                "cta_secondary_text": "📦 CFL ऑर्डर करें",
+                "cta_secondary_link": "#products-cattle"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_reviews",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [
+            {
+                "icon": "fa-glass-water-droplet",
+                "title": "1-2L दूध वृद्धि",
+                "desc": "CFL मिनरल मिक्सचर व बायपास फैट"
+            },
+            {
+                "icon": "fa-shield-virus",
+                "title": "थनैला से सुरक्षा",
+                "desc": "एंटीसेप्टिक व प्राकृतिक हर्बल अर्क"
+            },
+            {
+                "icon": "fa-cow",
+                "title": "प्रजनन स्वास्थ्य",
+                "desc": "समय पर हीट में आना व गर्भधारण"
+            }
+        ],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [
+            {
+                "name": "भंवरलाल चौधरी",
+                "location": "नागौर, राजस्थान",
+                "rating": 5,
+                "comment": "CFL मिनरल मिक्सचर देने के 15 दिन बाद ही मेरी भैंस का फैट 6 से बढ़कर 7.5 हो गया।"
+            }
+        ],
+        "faqs": [
+            {
+                "q": "क्या CFL मिनरल मिक्सचर सभी पशुओं को दिया जा सकता है?",
+                "a": "हाँ, गाय, भैंस और बकरियों के लिए यह अत्यंत लाभकारी है।"
+            }
+        ],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "राम राम, मुझे पशुओं के स्वास्थ्य व दुग्ध वृद्धि के बारे में जानकारी चाहिए।"
         },
-        {
-          image: '/images/banners/agriculture-banner.jpeg',
-          tag: '🌱 वैज्ञानिक कृषि',
-          title: 'खेती का डॉक्टर - रोग व कीट निवारण',
-          subtitle: 'सटीक स्प्रे शेड्यूल व पोषक तत्व प्रबंधन',
-          cta_text: '⚡ अभी ऑर्डर करें',
-          cta_link: '/ebooks/kheti-dr.html',
-          cta_secondary_text: '🛒 कार्ट में जोड़ें',
-          cta_secondary_link: '/ebooks/cart.html'
-        }
-      ],
-      sections_order: [
-        'sec_ticker',
-        'sec_hero_slider',
-        'sec_category_pills',
-        'sec_shelves_bestseller',
-        'sec_interspersed_marketing',
-        'sec_shelves_new',
-        'sec_shelves_coming_soon',
-        'sec_videos',
-        'sec_trust_guarantee',
-        'sec_faqs',
-        'sec_help_support'
-      ],
-      hidden_sections: [],
-      kpi_cards: [
-        { icon: 'fa-bolt', title: 'Instant PDF', desc: '1-सेकंड में डाउनलोड' },
-        { icon: 'fa-seedling', title: '100% Practical', desc: 'प्रमाणित वैज्ञानिक ज्ञान' },
-        { icon: 'fa-robot', title: 'AI Doctor Support', desc: '24×7 WhatsApp सहायता' },
-        { icon: 'fa-lock', title: '256-Bit SSL', desc: '100% सुरक्षित चेकआउट' }
-      ],
-      videos: [
-        { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: '📖 खरीफ फसल मास्टर गाइड - अंदर के पेज व डेमो', desc: '300+ वास्तविक फोटो और स्प्रे साइंस चार्ट का लाइव प्रीव्यू।', ratio: '16:9' },
-        { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: '📲 24×7 WhatsApp AI डॉक्टर सहायता कैसे काम करती है?', desc: 'किताब पढ़ते समय सवाल पूछने और तुरंत समाधान पाने का तरीका।', ratio: '16:9' }
-      ],
-      marketing_cards: [
-        { book_id: 'BK001', tag: '🔥 Best Seller', headline: 'खरीफ फसल मास्टर गाइड 2026', desc: 'सोयाबीन, मक्का, धान व कपास की सम्पूर्ण प्रैक्टिकल गाइड।', sales_counter: '1,420+ किसानों ने खरीदा' },
-        { book_id: 'BK002', tag: '🌱 Top Rated', headline: 'खेती का डॉक्टर (फसल डॉक्टर)', desc: 'रोग, कीट और फंगल का 1-क्लिक समाधान।', sales_counter: '980+ किसानों ने खरीदा' }
-      ],
-      reviews: [
-        { name: 'मनोज सिंह', location: 'भोपाल, मध्य प्रदेश', rating: 5, comment: 'किंडल जैसी 3D कवर्स और शानदार लेआउट! तुरंत डाउनलोड हो गया।' },
-        { name: 'विक्रम सिंह', location: 'जयपुर, राजस्थान', rating: 5, comment: 'Aarogyam India का यह स्टोर किसानों के लिए बहुत बड़ा वरदान है।' }
-      ],
-      faqs: [
-        { q: 'क्या पुस्तकें डाउनलोड के बाद ऑफलाइन पढ़ी जा सकती हैं?', a: 'हाँ, एक बार डाउनलोड करने के बाद आप बिना इंटरनेट के भी कभी भी पढ़ सकते हैं।' }
-      ],
-      whatsapp_support: {
-        number: '919876543210',
-        prompt: 'नमस्ते, मुझे ई-बुक स्टोर के बारे में जानकारी चाहिए।'
-      },
-      audio_title: 'आरोग्यम डिजिटल ई-बुक स्टोर',
-      audio_script: 'नमस्ते {name} जी! आरोग्यम ई-बुक स्टोर में आपका स्वागत है। यहाँ आपको कृषि, पशु पालन और स्वास्थ्य से संबंधित सभी प्रमाणित हिंदी पुस्तकें मिलेंगी। किसी भी पुस्तक का डेमो देख सकते हैं या मात्र 99 रुपये में तुरंत डाउनलोड कर सकते हैं।'
+        "audio_title": "पशु पालन व दुग्ध संवर्धन हब",
+        "audio_script": "राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा।",
+        "products": [
+            {
+                "id": "PAS001",
+                "name": "CFL Mineral Feed (1kg)",
+                "price": 650.0,
+                "mrp": 650.0,
+                "badge": "दुग्ध वृद्धि बूस्टर",
+                "description": "बायपास प्रोटीन, चेलेटेड मिनरल्स व प्रोबायोटिक्स युक्त। 7 दिन में दूध और फैट में अचूक सुधार लाता है।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "PAS002",
+                "name": "Mastitis Shield Care Kit",
+                "price": 850.0,
+                "mrp": 850.0,
+                "badge": "थनैला रक्षक",
+                "description": "अयन की सूजन, गांठ व दूध में छीछड़ों को दूर करने वाली 100% सुरक्षित आयुर्वेदिक एंटी-इंफ्लेमेटरी किट।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "PAS003",
+                "name": "Doodh Dhara High-Cal (1L)",
+                "price": 450.0,
+                "mrp": 450.0,
+                "badge": "लिक्विड कैल्शियम",
+                "description": "विटामिन D3, B12 व बायोटीन युक्त बायो-अवेलेबल कैल्शियम। ब्यात के बाद मिल्क फीवर से बचाता है।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "PAS004",
+                "name": "Uterus Tone Cleanser (500ml)",
+                "price": 550.0,
+                "mrp": 550.0,
+                "badge": "बांझपन निवारक",
+                "description": "बच्चेदानी की गंदगी साफ कर समय पर शुद्ध हीट में लाता है और गर्भ ठहरने की संभावना 90% बढ़ाता है।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            }
+        ]
     },
     {
-      id: 'page_cart',
-      slug: 'cart',
-      name: '🛒 शॉपिंग कार्ट (Shopping Cart)',
-      url: '/ebooks/cart.html',
-      category: 'Checkout',
-      status: 'active',
-      theme_primary: '#15803d',
-      theme_dark: '#0e5227',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '⚡ 256-Bit SSL सुरक्षित भुगतान | इंस्टेंट PDF डाउनलोड व लाइफटाइम एक्सेस',
-      hero_slides: [],
-      sections_order: ['sec_ticker', 'sec_trust_guarantee', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '919876543210', prompt: 'नमस्ते, मुझे कार्ट चेकआउट में सहायता चाहिए।' }
-    },
-    {
-      id: 'page_library',
-      slug: 'my-library',
-      name: '📖 मेरी डिजिटल लाइब्रेरी (My Library)',
-      url: '/ebooks/my-library.html',
-      category: 'User Area',
-      status: 'active',
-      theme_primary: '#15803d',
-      theme_dark: '#0e5227',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '📖 आपकी सभी खरीदी गई ई-बुक्स और बोनस गाइड्स यहाँ सुरक्षित हैं',
-      hero_slides: [],
-      sections_order: ['sec_ticker', 'sec_shelves_bestseller', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '919876543210', prompt: 'नमस्ते, मुझे मेरी लाइब्रेरी एक्सेस में मदद चाहिए।' }
-    },
-    {
-      id: 'page_wishlist',
-      slug: 'wishlist',
-      name: '❤️ मेरी विशलिस्ट (Saved Wishlist)',
-      url: '/ebooks/wishlist.html',
-      category: 'User Area',
-      status: 'active',
-      theme_primary: '#db2777',
-      theme_dark: '#831843',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '❤️ आपकी पसंदीदा पुस्तकें सुरक्षित हैं - जब चाहें 1-क्लिक में कार्ट में जोड़ें',
-      hero_slides: [],
-      sections_order: ['sec_ticker', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '919876543210', prompt: 'नमस्ते, मुझे विशलिस्ट में मदद चाहिए।' }
-    },
-    {
-      id: 'page_profile',
-      slug: 'profile',
-      name: '👤 यूजर प्रोफ़ाइल (User Profile)',
-      url: '/pages/profile.html',
-      category: 'User Area',
-      status: 'active',
-      theme_primary: '#15803d',
-      theme_dark: '#0e5227',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '👑 Aarogyam Pro VIP मेम्बरशिप डैशबोर्ड व सेटिंग्स',
-      hero_slides: [],
-      sections_order: ['sec_ticker', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '919876543210', prompt: 'नमस्ते, मुझे यूजर प्रोफ़ाइल में मदद चाहिए।' }
-    },
-    {
-      id: 'page_mandi',
-      slug: 'mandi',
-      name: '🌾 मंडी भाव (Mandi Rates Live)',
-      url: '/mandi.html',
-      category: 'Utilities',
-      status: 'active',
-      theme_primary: '#0284c7',
-      theme_dark: '#075985',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🌾 ताज़ा मंडी भाव अपडेट्स | सोयाबीन, गेहूं, धान, कपास और दलहन के दैनिक प्रमाणित दाम',
-      hero_slides: [],
-      sections_order: ['sec_ticker', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '919876543210', prompt: 'नमस्ते, मुझे आज के मंडी भाव के बारे में जानकारी चाहिए।' }
-    },
-    {
-      id: 'page_weather',
-      slug: 'weather',
-      name: '⛅ मौसम पूर्वानुमान (Live Weather)',
-      url: '/weather.html',
-      category: 'Utilities',
-      status: 'active',
-      theme_primary: '#0284c7',
-      theme_dark: '#075985',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '⛅ आज का मौसम, आगामी 7 दिनों का पूर्वानुमान व स्प्रे अनुकूलता अलर्ट्स',
-      hero_slides: [],
-      sections_order: ['sec_ticker', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '919876543210', prompt: 'नमस्ते, मुझे मौसम पूर्वानुमान के बारे में जानकारी चाहिए।' }
-    },
-    {
-      id: 'page_kharif_guide',
-      slug: 'kharif-master-guide-2026',
-      name: '🌾 खरीफ फसल मास्टर गाइड 2026 (Kharif Guide Landing Page)',
-      url: '/ebooks/kharif-master-guide-2026.html',
-      category: 'Book Landing Page',
-      status: 'active',
-      theme_primary: '#2E7D32',
-      theme_dark: '#1B5E20',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🌾 खरीफ स्पेशल: ₹299 की जगह मात्र ₹99 में सम्पूर्ण गाइड | धान • सोयाबीन • मक्का • कपास ✦ 24×7 AI डॉक्टर सपोर्ट',
-      hero_slides: [
-        {
-          image: '/images/banners/kharif-master-guide-2026-hero-banner.webp',
-          tag: '🌾 Bestseller Agriculture eBook',
-          title: 'खरीफ फसल मास्टर गाइड 2026',
-          subtitle: 'धान • सोयाबीन • मक्का की सम्पूर्ण Practical Guide',
-          cta_text: '⚡ अभी ऑर्डर करें (₹99)',
-          cta_link: '/ebooks/checkout.html?id=BK001',
-          cta_secondary_text: '📖 फ्री डेमो देखें',
-          cta_secondary_link: '/ebooks/demo-kharif.html'
-        }
-      ],
-      sections_order: [
-        'sec_ticker',
-        'sec_hero_slider',
-        'sec_kpi_badges',
-        'sec_combo_promo',
-        'sec_videos',
-        'sec_reviews',
-        'sec_trust_guarantee',
-        'sec_faqs',
-        'sec_help_support'
-      ],
-      hidden_sections: [],
-      kpi_cards: [
-        { icon: 'fa-seedling', title: '150+ रंगीन पेज', desc: 'उच्च गुणवत्ता सचित्र मार्गदर्शिका' },
-        { icon: 'fa-camera', title: '300+ वास्तविक फोटो', desc: 'रोग, कीट व पोषण की वास्तविक पहचान' },
-        { icon: 'fa-circle-check', title: 'Scientific Guide', desc: 'वैज्ञानिक व प्रैक्टिकल कृषि समाधान' },
-        { icon: 'fa-robot', title: '24×7 WhatsApp AI डॉक्टर', desc: 'किताब पढ़ते समय त्वरित समाधान' }
-      ],
-      videos: [
-        { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: '🎥 खरीफ फसल मास्टर गाइड - वीडियो ओवरव्यू व डेमो', desc: 'धान, सोयाबीन व मक्का की सम्पूर्ण सुरक्षा तकनीक।', ratio: '16:9' }
-      ],
-      marketing_cards: [
-        { book_id: 'BK002', tag: '🌱 कॉम्बो सुझाव', headline: 'खेती का डॉक्टर (फसल डॉक्टर)', desc: 'रोग, कीट और फंगल का 1-क्लिक समाधान।', sales_counter: '980+ किसानों ने खरीदा' }
-      ],
-      reviews: [
-        { name: 'रामेश्वर पटेल', location: 'उज्जैन, मध्य प्रदेश', rating: 5, comment: 'खरीफ मास्टर गाइड बहुत ही उपयोगी है। स्प्रे साइंस चार्ट से मेरी फसल बच गई।' },
-        { name: 'सुरेश कुमार यादव', location: 'करनाल, हरियाणा', rating: 5, comment: 'WhatsApp AI डॉक्टर सहायता से जब भी सवाल पूछा तुरंत उत्तर मिला। बहुत बढ़िया गाइड!' }
-      ],
-      faqs: [
-        { q: 'ई-बुक खरीदने के बाद कैसे मिलेगी?', a: 'भुगतान होते ही आपको तुरंत PDF डाउनलोड लिंक मिलेगा और पुस्तक आपकी "मेरी लाइब्रेरी" में आजीवन सुरक्षित रहेगी।' },
-        { q: 'क्या मैं मोबाइल पर पढ़ सकता हूँ?', a: 'हाँ, सभी पुस्तकें मोबाइल और टैबलेट के लिए पूरी तरह ऑप्टिमाइज़्ड हैं।' }
-      ],
-      whatsapp_support: {
-        number: '919876543210',
-        prompt: 'नमस्ते, मुझे खरीफ फसल मास्टर गाइड 2026 के बारे में जानकारी चाहिए।'
-      }
-    },
-    {
-      id: 'page_kheti_dr',
-      slug: 'kheti-dr',
-      name: '🩺 खेती का डॉक्टर (Kheti Ka Doctor Landing Page)',
-      url: '/ebooks/kheti-dr.html',
-      category: 'Book Landing Page',
-      status: 'active',
-      theme_primary: '#059669',
-      theme_dark: '#064e3b',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🩺 किसान का पॉकेट डॉक्टर: रोग, कीट, फंगल व पोषक तत्वों की कमी की पहचान व सटीक स्प्रे फॉर्मूला',
-      hero_slides: [
-        {
-          image: '../images/banners/kheti-dr-banner-1.webp',
-          tag: '🩺 Pocket Doctor Edition',
-          title: 'खेती का डॉक्टर (फसल का डॉक्टर)',
-          subtitle: 'रोग, कीट, वायरल, फंगल और पोषण प्रबंधन का सचित्र गाइड',
-          cta_text: '⚡ अभी ऑर्डर करें (₹99)',
-          cta_link: '/ebooks/checkout.html?id=BK002',
-          cta_secondary_text: '📖 फ्री डेमो देखें',
-          cta_secondary_link: '/ebooks/demo-kharif.html'
-        }
-      ],
-      sections_order: [
-        'sec_ticker',
-        'sec_hero_slider',
-        'sec_kpi_badges',
-        'sec_combo_promo',
-        'sec_videos',
-        'sec_reviews',
-        'sec_trust_guarantee',
-        'sec_faqs',
-        'sec_help_support'
-      ],
-      hidden_sections: [],
-      kpi_cards: [
-        { icon: 'fa-stethoscope', title: 'पॉकेट डॉक्टर', desc: 'खेत पर तुरंत रोग व कीट पहचान' },
-        { icon: 'fa-spray-can', title: 'स्प्रे फॉर्मूले', desc: 'सटीक दवा व खुराक की तालिका' },
-        { icon: 'fa-circle-check', title: '120+ रंगीन पेज', desc: 'सचित्र व सरल हिंदी भाषा' },
-        { icon: 'fa-robot', title: '24×7 AI हेल्प', desc: 'WhatsApp पर तुरंत समाधान' }
-      ],
-      videos: [
-        { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: '🎥 खेती का डॉक्टर - वीडियो डेमो व गाइड', desc: 'फसलों के मुख्य रोगों की पहचान व वैज्ञानिक स्प्रे विधि।', ratio: '16:9' }
-      ],
-      marketing_cards: [
-        { book_id: 'BK001', tag: '🌾 कॉम्बो सुझाव', headline: 'खरीफ फसल मास्टर गाइड 2026', desc: 'धान, सोयाबीन व मक्का की अधिक पैदावार के गुर।', sales_counter: '1,420+ किसानों ने खरीदा' }
-      ],
-      reviews: [
-        { name: 'कमलेश पाटीदार', location: 'रतलाम, मध्य प्रदेश', rating: 5, comment: 'रोगों की फोटो देखकर पहचानना बहुत आसान हो गया। हर किसान के पास यह किताब होनी चाहिए।' }
-      ],
-      faqs: [
-        { q: 'क्या इसमें कीटनाशकों की मात्रा भी दी गई है?', a: 'हाँ, प्रति एकड़ व प्रति पंप सही खुराक व मिश्रण की विस्तृत जानकारी दी गई है।' }
-      ],
-      whatsapp_support: {
-        number: '919876543210',
-        prompt: 'नमस्ते, मुझे खेती का डॉक्टर ई-बुक के बारे में जानकारी चाहिए।'
-      }
-    },
-    {
-      id: 'page_cattle_care',
-      slug: 'pashu-palan',
-      name: '🐄 पशु पालन व दुग्ध उत्पादन (Cattle Care Hub)',
-      url: '/pashu-palan.html',
-      category: 'Livestock',
-      status: 'active',
-      theme_primary: '#0284c7',
-      theme_dark: '#0369a1',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🐄 दुग्ध वृद्धि, बांझपन निवारण व पशु स्वास्थ्य | 24×7 WhatsApp AI पशु डॉक्टर परामर्श सक्रिय!',
-      hero_slides: [
-        {
-          image: '/images/banners/pashu-palan-banner.jpg',
-          tag: '🐄 पशु पालन विशेष',
-          title: 'पशु पालन व दुग्ध संवर्धन हब',
-          subtitle: 'दुग्ध वृद्धि, बांझपन निवारण व थनैला उपचार',
-          cta_text: '💬 WhatsApp परामर्श',
-          cta_link: 'https://wa.me/917974422572',
-          cta_secondary_text: '🛒 उत्पाद देखें',
-          cta_secondary_link: '#pashu-products'
+        "id": "page_ebook_store",
+        "slug": "ebook",
+        "name": "📚 ई-बुक स्टोर (eBook Store Marketplace)",
+        "url": "/ebooks/ebook.html",
+        "category": "eBooks",
+        "status": "active",
+        "theme_primary": "#14532d",
+        "theme_dark": "#052e16",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🚨 स्पेशल ऑफर: ₹1999 की VIP Pro मेम्बरशिप व AI डॉक्टर सहायता बिल्कुल FREE! ✦ 10,000+ किसानों का विश्वास",
+        "hero_slides": [
+            {
+                "image": "/images/banners/ebook-banner.jpeg",
+                "tag": "📚 ई-बुक स्टोर",
+                "title": "आरोग्यम डिजिटल ई-बुक स्टोर",
+                "subtitle": "कृषि, पशु पालन व स्वास्थ्य की सभी प्रमाणित हिंदी पुस्तकें",
+                "cta_text": "⚡ अभी देखें",
+                "cta_link": "#bestsellers-shelf",
+                "cta_secondary_text": "🛒 कार्ट देखें",
+                "cta_secondary_link": "/ebooks/cart.html"
+            },
+            {
+                "image": "/images/banners/offer-banner-kharif-2026.webp",
+                "tag": "🌾 खरीफ स्पेशल कॉम्बो",
+                "title": "खरीफ फसल मास्टर गाइड 2026",
+                "subtitle": "धान, सोयाबीन व मक्का की सम्पूर्ण प्रैक्टिकल गाइड",
+                "cta_text": "⚡ मात्र ₹99",
+                "cta_link": "/ebooks/kharif-master-guide-2026.html",
+                "cta_secondary_text": "🛒 कार्ट में जोड़ें",
+                "cta_secondary_link": "/ebooks/cart.html"
+            },
+            {
+                "image": "/images/banners/agriculture-banner.jpeg",
+                "tag": "🌱 वैज्ञानिक कृषि",
+                "title": "खेती का डॉक्टर - रोग व कीट निवारण",
+                "subtitle": "सटीक स्प्रे शेड्यूल व पोषक तत्व प्रबंधन",
+                "cta_text": "⚡ अभी ऑर्डर करें",
+                "cta_link": "/ebooks/kheti-dr.html",
+                "cta_secondary_text": "🛒 कार्ट में जोड़ें",
+                "cta_secondary_link": "/ebooks/cart.html"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_category_pills",
+            "sec_shelves_bestseller",
+            "sec_interspersed_marketing",
+            "sec_shelves_new",
+            "sec_shelves_coming_soon",
+            "sec_videos",
+            "sec_trust_guarantee",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [
+            {
+                "icon": "fa-bolt",
+                "title": "Instant PDF",
+                "desc": "1-सेकंड में डाउनलोड"
+            },
+            {
+                "icon": "fa-seedling",
+                "title": "100% Practical",
+                "desc": "प्रमाणित वैज्ञानिक ज्ञान"
+            },
+            {
+                "icon": "fa-robot",
+                "title": "AI Doctor Support",
+                "desc": "24×7 WhatsApp सहायता"
+            },
+            {
+                "icon": "fa-lock",
+                "title": "256-Bit SSL",
+                "desc": "100% सुरक्षित चेकआउट"
+            }
+        ],
+        "videos": [
+            {
+                "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "title": "📖 खरीफ फसल मास्टर गाइड - अंदर के पेज व डेमो",
+                "desc": "300+ वास्तविक फोटो और स्प्रे साइंस चार्ट का लाइव प्रीव्यू।",
+                "ratio": "16:9"
+            },
+            {
+                "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "title": "📲 24×7 WhatsApp AI डॉक्टर सहायता कैसे काम करती है?",
+                "desc": "किताब पढ़ते समय सवाल पूछने और तुरंत समाधान पाने का तरीका।",
+                "ratio": "16:9"
+            }
+        ],
+        "marketing_cards": [
+            {
+                "book_id": "BK001",
+                "tag": "🔥 Best Seller",
+                "headline": "खरीफ फसल मास्टर गाइड 2026",
+                "desc": "सोयाबीन, मक्का, धान व कपास की सम्पूर्ण प्रैक्टिकल गाइड।",
+                "sales_counter": "1,420+ किसानों ने खरीदा"
+            },
+            {
+                "book_id": "BK002",
+                "tag": "🌱 Top Rated",
+                "headline": "खेती का डॉक्टर (फसल डॉक्टर)",
+                "desc": "रोग, कीट और फंगल का 1-क्लिक समाधान।",
+                "sales_counter": "980+ किसानों ने खरीदा"
+            }
+        ],
+        "reviews": [
+            {
+                "name": "मनोज सिंह",
+                "location": "भोपाल, मध्य प्रदेश",
+                "rating": 5,
+                "comment": "किंडल जैसी 3D कवर्स और शानदार लेआउट! तुरंत डाउनलोड हो गया।"
+            },
+            {
+                "name": "विक्रम सिंह",
+                "location": "जयपुर, राजस्थान",
+                "rating": 5,
+                "comment": "Aarogyam India का यह स्टोर किसानों के लिए बहुत बड़ा वरदान है।"
+            }
+        ],
+        "faqs": [
+            {
+                "q": "क्या पुस्तकें डाउनलोड के बाद ऑफलाइन पढ़ी जा सकती हैं?",
+                "a": "हाँ, एक बार डाउनलोड करने के बाद आप बिना इंटरनेट के भी कभी भी पढ़ सकते हैं।"
+            }
+        ],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे ई-बुक स्टोर के बारे में जानकारी चाहिए।"
         },
-        {
-          image: '/images/banners/pashu-cow-care.jpg',
-          tag: '🥛 दुग्ध वृद्धि फॉर्मूला',
-          title: 'गाय-भैंस में दूध व फैट वृद्धि',
-          subtitle: 'नेचुरल हर्बल सप्लीमेंट्स और मिनरल मिक्सचर',
-          cta_text: '💬 ऑर्डर करें',
-          cta_link: 'https://wa.me/917974422572',
-          cta_secondary_text: '📞 संपर्क करें',
-          cta_secondary_link: '#vet-consult'
+        "audio_title": "आरोग्यम डिजिटल ई-बुक स्टोर",
+        "audio_script": "नमस्ते {name} जी! आरोग्यम ई-बुक स्टोर में आपका स्वागत है। यहाँ आपको कृषि, पशु पालन और स्वास्थ्य से संबंधित सभी प्रमाणित हिंदी पुस्तकें मिलेंगी। किसी भी पुस्तक का डेमो देख सकते हैं या मात्र 99 रुपये में तुरंत डाउनलोड कर सकते हैं।"
+    },
+    {
+        "id": "page_cart",
+        "slug": "cart",
+        "name": "🛒 शॉपिंग कार्ट (Shopping Cart)",
+        "url": "/ebooks/cart.html",
+        "category": "Checkout",
+        "status": "active",
+        "theme_primary": "#15803d",
+        "theme_dark": "#0e5227",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "⚡ 256-Bit SSL सुरक्षित भुगतान | इंस्टेंट PDF डाउनलोड व लाइफटाइम एक्सेस",
+        "hero_slides": [],
+        "sections_order": [
+            "sec_ticker",
+            "sec_trust_guarantee",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे कार्ट चेकआउट में सहायता चाहिए।"
+        }
+    },
+    {
+        "id": "page_library",
+        "slug": "my-library",
+        "name": "📖 मेरी डिजिटल लाइब्रेरी (My Library)",
+        "url": "/ebooks/my-library.html",
+        "category": "User Area",
+        "status": "active",
+        "theme_primary": "#15803d",
+        "theme_dark": "#0e5227",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "📖 आपकी सभी खरीदी गई ई-बुक्स और बोनस गाइड्स यहाँ सुरक्षित हैं",
+        "hero_slides": [],
+        "sections_order": [
+            "sec_ticker",
+            "sec_shelves_bestseller",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे मेरी लाइब्रेरी एक्सेस में मदद चाहिए।"
+        }
+    },
+    {
+        "id": "page_wishlist",
+        "slug": "wishlist",
+        "name": "❤️ मेरी विशलिस्ट (Saved Wishlist)",
+        "url": "/ebooks/wishlist.html",
+        "category": "User Area",
+        "status": "active",
+        "theme_primary": "#db2777",
+        "theme_dark": "#831843",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "❤️ आपकी पसंदीदा पुस्तकें सुरक्षित हैं - जब चाहें 1-क्लिक में कार्ट में जोड़ें",
+        "hero_slides": [],
+        "sections_order": [
+            "sec_ticker",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे विशलिस्ट में मदद चाहिए।"
+        }
+    },
+    {
+        "id": "page_profile",
+        "slug": "profile",
+        "name": "👤 यूजर प्रोफ़ाइल (User Profile)",
+        "url": "/pages/profile.html",
+        "category": "User Area",
+        "status": "active",
+        "theme_primary": "#15803d",
+        "theme_dark": "#0e5227",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "👑 Aarogyam Pro VIP मेम्बरशिप डैशबोर्ड व सेटिंग्स",
+        "hero_slides": [],
+        "sections_order": [
+            "sec_ticker",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे यूजर प्रोफ़ाइल में मदद चाहिए।"
+        }
+    },
+    {
+        "id": "page_mandi",
+        "slug": "mandi",
+        "name": "🌾 मंडी भाव (Mandi Rates Live)",
+        "url": "/mandi.html",
+        "category": "Utilities",
+        "status": "active",
+        "theme_primary": "#0284c7",
+        "theme_dark": "#075985",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🌾 ताज़ा मंडी भाव अपडेट्स | सोयाबीन, गेहूं, धान, कपास और दलहन के दैनिक प्रमाणित दाम",
+        "hero_slides": [],
+        "sections_order": [
+            "sec_ticker",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे आज के मंडी भाव के बारे में जानकारी चाहिए।"
+        }
+    },
+    {
+        "id": "page_weather",
+        "slug": "weather",
+        "name": "⛅ मौसम पूर्वानुमान (Live Weather)",
+        "url": "/weather.html",
+        "category": "Utilities",
+        "status": "active",
+        "theme_primary": "#0284c7",
+        "theme_dark": "#075985",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "⛅ आज का मौसम, आगामी 7 दिनों का पूर्वानुमान व स्प्रे अनुकूलता अलर्ट्स",
+        "hero_slides": [],
+        "sections_order": [
+            "sec_ticker",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे मौसम पूर्वानुमान के बारे में जानकारी चाहिए।"
+        }
+    },
+    {
+        "id": "page_kharif_guide",
+        "slug": "kharif-master-guide-2026",
+        "name": "🌾 खरीफ फसल मास्टर गाइड 2026 (Kharif Guide Landing Page)",
+        "url": "/ebooks/kharif-master-guide-2026.html",
+        "category": "Book Landing Page",
+        "status": "active",
+        "theme_primary": "#2E7D32",
+        "theme_dark": "#1B5E20",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🌾 खरीफ स्पेशल: ₹299 की जगह मात्र ₹99 में सम्पूर्ण गाइड | धान • सोयाबीन • मक्का • कपास ✦ 24×7 AI डॉक्टर सपोर्ट",
+        "hero_slides": [
+            {
+                "image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+                "tag": "🌾 Bestseller Agriculture eBook",
+                "title": "खरीफ फसल मास्टर गाइड 2026",
+                "subtitle": "धान • सोयाबीन • मक्का की सम्पूर्ण Practical Guide",
+                "cta_text": "⚡ अभी ऑर्डर करें (₹99)",
+                "cta_link": "/ebooks/checkout.html?id=BK001",
+                "cta_secondary_text": "📖 फ्री डेमो देखें",
+                "cta_secondary_link": "/ebooks/demo-kharif.html"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_combo_promo",
+            "sec_videos",
+            "sec_reviews",
+            "sec_trust_guarantee",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [
+            {
+                "icon": "fa-seedling",
+                "title": "150+ रंगीन पेज",
+                "desc": "उच्च गुणवत्ता सचित्र मार्गदर्शिका"
+            },
+            {
+                "icon": "fa-camera",
+                "title": "300+ वास्तविक फोटो",
+                "desc": "रोग, कीट व पोषण की वास्तविक पहचान"
+            },
+            {
+                "icon": "fa-circle-check",
+                "title": "Scientific Guide",
+                "desc": "वैज्ञानिक व प्रैक्टिकल कृषि समाधान"
+            },
+            {
+                "icon": "fa-robot",
+                "title": "24×7 WhatsApp AI डॉक्टर",
+                "desc": "किताब पढ़ते समय त्वरित समाधान"
+            }
+        ],
+        "videos": [
+            {
+                "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "title": "🎥 खरीफ फसल मास्टर गाइड - वीडियो ओवरव्यू व डेमो",
+                "desc": "धान, सोयाबीन व मक्का की सम्पूर्ण सुरक्षा तकनीक।",
+                "ratio": "16:9"
+            }
+        ],
+        "marketing_cards": [
+            {
+                "book_id": "BK002",
+                "tag": "🌱 कॉम्बो सुझाव",
+                "headline": "खेती का डॉक्टर (फसल डॉक्टर)",
+                "desc": "रोग, कीट और फंगल का 1-क्लिक समाधान।",
+                "sales_counter": "980+ किसानों ने खरीदा"
+            }
+        ],
+        "reviews": [
+            {
+                "name": "रामेश्वर पटेल",
+                "location": "उज्जैन, मध्य प्रदेश",
+                "rating": 5,
+                "comment": "खरीफ मास्टर गाइड बहुत ही उपयोगी है। स्प्रे साइंस चार्ट से मेरी फसल बच गई।"
+            },
+            {
+                "name": "सुरेश कुमार यादव",
+                "location": "करनाल, हरियाणा",
+                "rating": 5,
+                "comment": "WhatsApp AI डॉक्टर सहायता से जब भी सवाल पूछा तुरंत उत्तर मिला। बहुत बढ़िया गाइड!"
+            }
+        ],
+        "faqs": [
+            {
+                "q": "ई-बुक खरीदने के बाद कैसे मिलेगी?",
+                "a": "भुगतान होते ही आपको तुरंत PDF डाउनलोड लिंक मिलेगा और पुस्तक आपकी \"मेरी लाइब्रेरी\" में आजीवन सुरक्षित रहेगी।"
+            },
+            {
+                "q": "क्या मैं मोबाइल पर पढ़ सकता हूँ?",
+                "a": "हाँ, सभी पुस्तकें मोबाइल और टैबलेट के लिए पूरी तरह ऑप्टिमाइज़्ड हैं।"
+            }
+        ],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे खरीफ फसल मास्टर गाइड 2026 के बारे में जानकारी चाहिए।"
+        }
+    },
+    {
+        "id": "page_kheti_dr",
+        "slug": "kheti-dr",
+        "name": "🩺 खेती का डॉक्टर (Kheti Ka Doctor Landing Page)",
+        "url": "/ebooks/kheti-dr.html",
+        "category": "Book Landing Page",
+        "status": "active",
+        "theme_primary": "#059669",
+        "theme_dark": "#064e3b",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🩺 किसान का पॉकेट डॉक्टर: रोग, कीट, फंगल व पोषक तत्वों की कमी की पहचान व सटीक स्प्रे फॉर्मूला",
+        "hero_slides": [
+            {
+                "image": "../images/banners/kheti-dr-banner-1.webp",
+                "tag": "🩺 Pocket Doctor Edition",
+                "title": "खेती का डॉक्टर (फसल का डॉक्टर)",
+                "subtitle": "रोग, कीट, वायरल, फंगल और पोषण प्रबंधन का सचित्र गाइड",
+                "cta_text": "⚡ अभी ऑर्डर करें (₹99)",
+                "cta_link": "/ebooks/checkout.html?id=BK002",
+                "cta_secondary_text": "📖 फ्री डेमो देखें",
+                "cta_secondary_link": "/ebooks/demo-kharif.html"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_combo_promo",
+            "sec_videos",
+            "sec_reviews",
+            "sec_trust_guarantee",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [
+            {
+                "icon": "fa-stethoscope",
+                "title": "पॉकेट डॉक्टर",
+                "desc": "खेत पर तुरंत रोग व कीट पहचान"
+            },
+            {
+                "icon": "fa-spray-can",
+                "title": "स्प्रे फॉर्मूले",
+                "desc": "सटीक दवा व खुराक की तालिका"
+            },
+            {
+                "icon": "fa-circle-check",
+                "title": "120+ रंगीन पेज",
+                "desc": "सचित्र व सरल हिंदी भाषा"
+            },
+            {
+                "icon": "fa-robot",
+                "title": "24×7 AI हेल्प",
+                "desc": "WhatsApp पर तुरंत समाधान"
+            }
+        ],
+        "videos": [
+            {
+                "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "title": "🎥 खेती का डॉक्टर - वीडियो डेमो व गाइड",
+                "desc": "फसलों के मुख्य रोगों की पहचान व वैज्ञानिक स्प्रे विधि।",
+                "ratio": "16:9"
+            }
+        ],
+        "marketing_cards": [
+            {
+                "book_id": "BK001",
+                "tag": "🌾 कॉम्बो सुझाव",
+                "headline": "खरीफ फसल मास्टर गाइड 2026",
+                "desc": "धान, सोयाबीन व मक्का की अधिक पैदावार के गुर।",
+                "sales_counter": "1,420+ किसानों ने खरीदा"
+            }
+        ],
+        "reviews": [
+            {
+                "name": "कमलेश पाटीदार",
+                "location": "रतलाम, मध्य प्रदेश",
+                "rating": 5,
+                "comment": "रोगों की फोटो देखकर पहचानना बहुत आसान हो गया। हर किसान के पास यह किताब होनी चाहिए।"
+            }
+        ],
+        "faqs": [
+            {
+                "q": "क्या इसमें कीटनाशकों की मात्रा भी दी गई है?",
+                "a": "हाँ, प्रति एकड़ व प्रति पंप सही खुराक व मिश्रण की विस्तृत जानकारी दी गई है।"
+            }
+        ],
+        "whatsapp_support": {
+            "number": "919876543210",
+            "prompt": "नमस्ते, मुझे खेती का डॉक्टर ई-बुक के बारे में जानकारी चाहिए।"
+        }
+    },
+    {
+        "id": "page_cattle_care",
+        "slug": "pashu-palan",
+        "name": "🐄 पशु पालन व दुग्ध उत्पादन (Cattle Care Hub)",
+        "url": "/pashu-palan.html",
+        "category": "Livestock",
+        "status": "active",
+        "theme_primary": "#0284c7",
+        "theme_dark": "#0369a1",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🐄 दुग्ध वृद्धि, बांझपन निवारण व पशु स्वास्थ्य | 24×7 WhatsApp AI पशु डॉक्टर परामर्श सक्रिय!",
+        "hero_slides": [
+            {
+                "image": "/images/banners/pashu-palan-banner.jpg",
+                "tag": "🐄 पशु पालन विशेष",
+                "title": "पशु पालन व दुग्ध संवर्धन हब",
+                "subtitle": "दुग्ध वृद्धि, बांझपन निवारण व थनैला उपचार",
+                "cta_text": "💬 WhatsApp परामर्श",
+                "cta_link": "https://wa.me/917974422572",
+                "cta_secondary_text": "🛒 उत्पाद देखें",
+                "cta_secondary_link": "#pashu-products"
+            },
+            {
+                "image": "/images/banners/pashu-cow-care.jpg",
+                "tag": "🥛 दुग्ध वृद्धि फॉर्मूला",
+                "title": "गाय-भैंस में दूध व फैट वृद्धि",
+                "subtitle": "नेचुरल हर्बल सप्लीमेंट्स और मिनरल मिक्सचर",
+                "cta_text": "💬 ऑर्डर करें",
+                "cta_link": "https://wa.me/917974422572",
+                "cta_secondary_text": "📞 संपर्क करें",
+                "cta_secondary_link": "#vet-consult"
+            },
+            {
+                "image": "/images/banners/pashu-goat-care.jpg",
+                "tag": "🐐 बकरी पालन गाइड",
+                "title": "उन्नत बकरी पालन व वजन वृद्धि",
+                "subtitle": "रोग रोकथाम व वैज्ञानिक पोषण प्रबंधन",
+                "cta_text": "💬 जानकारी लें",
+                "cta_link": "https://wa.me/917974422572",
+                "cta_secondary_text": "📖 गाइड पढ़ें",
+                "cta_secondary_link": "/ebooks/ebook.html"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_videos",
+            "sec_reviews",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [
+            {
+                "icon": "fa-cow",
+                "title": "दूध उत्पादन वृद्धि",
+                "desc": "प्राकृतिक आयुर्वेदिक मिनरल व पोषण"
+            },
+            {
+                "icon": "fa-shield-virus",
+                "title": "मस्टाइटिस व थनैला",
+                "desc": "सटीक लक्षण पहचान व हर्बल उपचार"
+            },
+            {
+                "icon": "fa-dna",
+                "title": "बांझपन से मुक्ति",
+                "desc": "समय पर हीट में लाना व गर्भाधान"
+            },
+            {
+                "icon": "fa-robot",
+                "title": "24×7 AI पशु डॉक्टर",
+                "desc": "WhatsApp पर तुरंत परामर्श"
+            }
+        ],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे पशु पालन व दुग्ध वृद्धि के बारे में सलाह चाहिए।"
         },
-        {
-          image: '/images/banners/pashu-goat-care.jpg',
-          tag: '🐐 बकरी पालन गाइड',
-          title: 'उन्नत बकरी पालन व वजन वृद्धि',
-          subtitle: 'रोग रोकथाम व वैज्ञानिक पोषण प्रबंधन',
-          cta_text: '💬 जानकारी लें',
-          cta_link: 'https://wa.me/917974422572',
-          cta_secondary_text: '📖 गाइड पढ़ें',
-          cta_secondary_link: '/ebooks/ebook.html'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_reviews', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [
-        { icon: 'fa-cow', title: 'दूध उत्पादन वृद्धि', desc: 'प्राकृतिक आयुर्वेदिक मिनरल व पोषण' },
-        { icon: 'fa-shield-virus', title: 'मस्टाइटिस व थनैला', desc: 'सटीक लक्षण पहचान व हर्बल उपचार' },
-        { icon: 'fa-dna', title: 'बांझपन से मुक्ति', desc: 'समय पर हीट में लाना व गर्भाधान' },
-        { icon: 'fa-robot', title: '24×7 AI पशु डॉक्टर', desc: 'WhatsApp पर तुरंत परामर्श' }
-      ],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे पशु पालन व दुग्ध वृद्धि के बारे में सलाह चाहिए।' },
-      audio_title: 'पशु पालन व दुग्ध संवर्धन हब',
-      audio_script: 'राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा। आप सीएफएल और बायो-फिट उत्पाद सीधे व्हाट्सएप द्वारा ऑर्डर कर सकते हैं।'
+        "audio_title": "पशु पालन व दुग्ध संवर्धन हब",
+        "audio_script": "राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा। आप सीएफएल और बायो-फिट उत्पाद सीधे व्हाट्सएप द्वारा ऑर्डर कर सकते हैं।",
+        "products": [
+            {
+                "id": "PAS001",
+                "name": "CFL Mineral Feed (1kg)",
+                "price": 650.0,
+                "mrp": 650.0,
+                "badge": "दुग्ध वृद्धि बूस्टर",
+                "description": "बायपास प्रोटीन, चेलेटेड मिनरल्स व प्रोबायोटिक्स युक्त। 7 दिन में दूध और फैट में अचूक सुधार लाता है।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "PAS002",
+                "name": "Mastitis Shield Care Kit",
+                "price": 850.0,
+                "mrp": 850.0,
+                "badge": "थनैला रक्षक",
+                "description": "अयन की सूजन, गांठ व दूध में छीछड़ों को दूर करने वाली 100% सुरक्षित आयुर्वेदिक एंटी-इंफ्लेमेटरी किट।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "PAS003",
+                "name": "Doodh Dhara High-Cal (1L)",
+                "price": 450.0,
+                "mrp": 450.0,
+                "badge": "लिक्विड कैल्शियम",
+                "description": "विटामिन D3, B12 व बायोटीन युक्त बायो-अवेलेबल कैल्शियम। ब्यात के बाद मिल्क फीवर से बचाता है।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "PAS004",
+                "name": "Uterus Tone Cleanser (500ml)",
+                "price": 550.0,
+                "mrp": 550.0,
+                "badge": "बांझपन निवारक",
+                "description": "बच्चेदानी की गंदगी साफ कर समय पर शुद्ध हीट में लाता है और गर्भ ठहरने की संभावना 90% बढ़ाता है।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            }
+        ]
     },
     {
-      id: 'page_health_hub',
-      slug: 'health-hub',
-      name: '❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health & Wellness Hub)',
-      url: '/categories/health.html',
-      category: 'Healthcare',
-      status: 'active',
-      theme_primary: '#dc2626',
-      theme_dark: '#991b1b',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🌿 सम्पूर्ण 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान | 24×7 WhatsApp AI डॉक्टर परामर्श!',
-      hero_slides: [
-        {
-          image: '/images/banners/health-banner.jpeg',
-          tag: '🌿 सम्पूर्ण स्वास्थ्य केंद्र',
-          title: 'आरोग्यम हेल्थ एंड वेलनेस हब',
-          subtitle: '8 प्रमुख लाइफस्टाइल विकारों के प्राकृतिक आयुर्वेदिक समाधान',
-          cta_text: '💬 डॉक्टर से पूछें',
-          cta_link: 'https://wa.me/917974422572',
-          cta_secondary_text: '🔍 रोग चुनें',
-          cta_secondary_link: '#health-categories'
+        "id": "page_health_hub",
+        "slug": "health-hub",
+        "name": "❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health & Wellness Hub)",
+        "url": "/categories/health.html",
+        "category": "Healthcare",
+        "status": "active",
+        "theme_primary": "#dc2626",
+        "theme_dark": "#991b1b",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🌿 सम्पूर्ण 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान | 24×7 WhatsApp AI डॉक्टर परामर्श!",
+        "hero_slides": [
+            {
+                "image": "/images/banners/health-banner.jpeg",
+                "tag": "🌿 सम्पूर्ण स्वास्थ्य केंद्र",
+                "title": "आरोग्यम हेल्थ एंड वेलनेस हब",
+                "subtitle": "8 प्रमुख लाइफस्टाइल विकारों के प्राकृतिक आयुर्वेदिक समाधान",
+                "cta_text": "💬 डॉक्टर से पूछें",
+                "cta_link": "https://wa.me/917974422572",
+                "cta_secondary_text": "🔍 रोग चुनें",
+                "cta_secondary_link": "#health-categories"
+            },
+            {
+                "image": "/images/banners/health-diabetes.jpg",
+                "tag": "🩸 डायबिटीज केयर",
+                "title": "प्राकृतिक शुगर नियंत्रण व रिवर्सल",
+                "subtitle": "आयुर्वेदिक अर्क व वैज्ञानिक आहार तालिका",
+                "cta_text": "📖 विस्तार से देखें",
+                "cta_link": "/health/diabetes.html",
+                "cta_secondary_text": "💬 परामर्श",
+                "cta_secondary_link": "https://wa.me/917974422572"
+            },
+            {
+                "image": "/images/banners/health-joint-care.jpg",
+                "tag": "🦴 जॉइंट केयर",
+                "title": "जोड़ों के दर्द व गठिया से मुक्ति",
+                "subtitle": "नेचुरल हर्बल कार्टिलेज पोषण व तेल मालिश",
+                "cta_text": "📖 विस्तार से देखें",
+                "cta_link": "/health/joint-care.html",
+                "cta_secondary_text": "💬 परामर्श",
+                "cta_secondary_link": "https://wa.me/917974422572"
+            },
+            {
+                "image": "/images/banners/health-weight-loss.jpg",
+                "tag": "🔥 वेट लॉस",
+                "title": "प्राकृतिक मोटापा व वजन नियंत्रण",
+                "subtitle": "बिना कमजोरी के सुरक्षित फैट बर्निंग",
+                "cta_text": "📖 विस्तार से देखें",
+                "cta_link": "/health/weight-loss.html",
+                "cta_secondary_text": "💬 परामर्श",
+                "cta_secondary_link": "https://wa.me/917974422572"
+            },
+            {
+                "image": "/images/banners/health-hair-care.jpg",
+                "tag": "💇‍♀️ हेयर केयर",
+                "title": "बाल झड़ना रोकें व डैंड्रफ मुक्ति",
+                "subtitle": "भृंगराज व आंवला युक्त हर्बल हेयर थेरेपी",
+                "cta_text": "📖 विस्तार से देखें",
+                "cta_link": "/health/hair-care.html",
+                "cta_secondary_text": "💬 परामर्श",
+                "cta_secondary_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_category_pills",
+            "sec_videos",
+            "sec_reviews",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे स्वास्थ्य परामर्श चाहिए।"
         },
-        {
-          image: '/images/banners/health-diabetes.jpg',
-          tag: '🩸 डायबिटीज केयर',
-          title: 'प्राकृतिक शुगर नियंत्रण व रिवर्सल',
-          subtitle: 'आयुर्वेदिक अर्क व वैज्ञानिक आहार तालिका',
-          cta_text: '📖 विस्तार से देखें',
-          cta_link: '/health/diabetes.html',
-          cta_secondary_text: '💬 परामर्श',
-          cta_secondary_link: 'https://wa.me/917974422572'
+        "audio_title": "आरोग्यम संपूर्ण स्वास्थ्य केंद्र",
+        "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे। अपनी समस्या का चयन करें और स्थायी स्वास्थ्य लाभ पाएं।"
+    },
+    {
+        "id": "page_health_diabetes",
+        "slug": "health-diabetes",
+        "name": "🩸 मधुमेह (डायबिटीज) केयर",
+        "url": "/health/diabetes.html",
+        "category": "Healthcare Sub-page",
+        "status": "active",
+        "theme_primary": "#2563eb",
+        "theme_dark": "#1e40af",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🩸 15,000+ लोगों ने प्राकृतिक रूप से शुगर नियंत्रित की | 24×7 AI डॉक्टर परामर्श सक्रिय",
+        "hero_slides": [
+            {
+                "image": "/images/banners/health-diabetes.jpg",
+                "tag": "🩸 डायबिटीज केयर",
+                "title": "मधुमेह व ब्लड शुगर नियंत्रण",
+                "subtitle": "इंसुलिन संवेदनशीलता सुधार व प्राकृतिक अर्क",
+                "cta_text": "💬 AI डॉक्टर परामर्श",
+                "cta_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_videos",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे मधुमेह / डायबिटीज समाधान चाहिए।"
         },
-        {
-          image: '/images/banners/health-joint-care.jpg',
-          tag: '🦴 जॉइंट केयर',
-          title: 'जोड़ों के दर्द व गठिया से मुक्ति',
-          subtitle: 'नेचुरल हर्बल कार्टिलेज पोषण व तेल मालिश',
-          cta_text: '📖 विस्तार से देखें',
-          cta_link: '/health/joint-care.html',
-          cta_secondary_text: '💬 परामर्श',
-          cta_secondary_link: 'https://wa.me/917974422572'
+        "audio_title": "डायबिटीज व ब्लड शुगर नियंत्रण",
+        "audio_script": "नमस्ते {name} जी! डायबिटीज केयर पेज पर आपका स्वागत है। यहाँ इंसुलिन रेजिस्टेंस दूर करने, शुगर लेवल सामान्य रखने की प्राकृतिक डाइट, एक्सरसाइज और आयुर्वेदिक फार्मूला उपलब्ध है।",
+        "products": [
+            {
+                "id": "DB001",
+                "name": "Madhu-Mukti Care (60 Cap)",
+                "price": 750.0,
+                "mrp": 750.0,
+                "badge": "शुगर केयर कैप्सूल",
+                "description": "गुड़मार, विजयसार, जामुन गुठली व गिलोय अर्क। इंसुलिन संवेदनशीलता सुधारकर फास्टिंग व PP शुगर को संतुलित रखता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "DB002",
+                "name": "Karela-Jamun Juice (1L)",
+                "price": 450.0,
+                "mrp": 450.0,
+                "badge": "प्योर अर्क",
+                "description": "शुद्ध नीम, करेला व जामुन का कोल्ड प्रेस्ड रस। रक्त शोधन करता है और भोजन के बाद शुगर स्पाइक रोकता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "DB003",
+                "name": "Gymnema Churna (100g)",
+                "price": 350.0,
+                "mrp": 350.0,
+                "badge": "शुगर डिस्ट्रॉयर",
+                "description": "मीठे की लत (Sugar Craving) मिटाता है और आंतों में ग्लूकोज के अवशोषण को कम करता है।",
+                "image": "/images/logo/logo.png"
+            }
+        ]
+    },
+    {
+        "id": "page_health_weight_loss",
+        "slug": "health-weight-loss",
+        "name": "🔥 मोटापा व वजन नियंत्रण (Weight Loss)",
+        "url": "/health/weight-loss.html",
+        "category": "Healthcare Sub-page",
+        "status": "active",
+        "theme_primary": "#d97706",
+        "theme_dark": "#b45309",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🔥 बिना कमजोरी या भूखे रहे प्राकृतिक फैट बर्निंग | फ्री डाइट चार्ट उपलब्ध",
+        "hero_slides": [
+            {
+                "image": "/images/banners/health-weight-loss.jpg",
+                "tag": "🔥 वेट लॉस",
+                "title": "मोटापा व प्राकृतिक वजन नियंत्रण",
+                "subtitle": "जिद्दी चर्बी घटाने की सम्पूर्ण डाइट व हर्बल सप्लीमेंट",
+                "cta_text": "💬 फ्री डाइट चार्ट लें",
+                "cta_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_videos",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे वजन घटाने / फैट लॉस का समाधान चाहिए।"
         },
-        {
-          image: '/images/banners/health-weight-loss.jpg',
-          tag: '🔥 वेट लॉस',
-          title: 'प्राकृतिक मोटापा व वजन नियंत्रण',
-          subtitle: 'बिना कमजोरी के सुरक्षित फैट बर्निंग',
-          cta_text: '📖 विस्तार से देखें',
-          cta_link: '/health/weight-loss.html',
-          cta_secondary_text: '💬 परामर्श',
-          cta_secondary_link: 'https://wa.me/917974422572'
+        "audio_title": "मोटापा व प्राकृतिक वजन नियंत्रण",
+        "audio_script": "नमस्ते {name} जी! वेट लॉस गाइड में आपका स्वागत है। यहाँ आपको पेट की जिद्दी चर्बी घटाने के मुख्य कारण, लक्षण, 24 घंटे का संपूर्ण डाइट चार्ट और फैट बर्नर हर्बल सप्लीमेंट की जानकारी मिलेगी।",
+        "products": [
+            {
+                "id": "WL001",
+                "name": "Slim-Fit Herbal Fat Burner",
+                "price": 850.0,
+                "mrp": 850.0,
+                "badge": "फैट बर्नर",
+                "description": "गार्सिनिया कैम्बोजिया, ग्रीन कॉफी व गुग्गुल अर्क युक्त। भूख को नियंत्रित कर जिद्दी फैट बर्न करता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "WL002",
+                "name": "Triphala Detox Cleanse",
+                "price": 650.0,
+                "mrp": 650.0,
+                "badge": "टॉक्सिन क्लींजर",
+                "description": "आंतों में जमा पुराना मल व टॉक्सिन्स बाहर निकालता है। पेट फूलने और गैस से तुरंत मुक्ति।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "WL003",
+                "name": "Metabolic Boost Green Tea",
+                "price": 450.0,
+                "mrp": 450.0,
+                "badge": "मेटाबॉलिक टी",
+                "description": "दालचीनी, तुलसी, लेमनग्रास व सौंठ का शक्तिशाली मिश्रण। दैनिक 2 कप पीने से कैलोरी बर्न 30% तेज।",
+                "image": "/images/logo/logo.png"
+            }
+        ]
+    },
+    {
+        "id": "page_health_joint_care",
+        "slug": "health-joint-care",
+        "name": "🦴 जोड़ों का दर्द व गठिया (Joint Care)",
+        "url": "/health/joint-care.html",
+        "category": "Healthcare Sub-page",
+        "status": "active",
+        "theme_primary": "#16a34a",
+        "theme_dark": "#15803d",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🦴 घुटनों का दर्द, यूरिक एसिड व जोड़ों की ग्रीस बढ़ाएं | 100% हर्बल थेरेपी",
+        "hero_slides": [
+            {
+                "image": "/images/banners/health-joint-care.jpg",
+                "tag": "🦴 जॉइंट केयर",
+                "title": "जोड़ों का दर्द व गठिया राहत",
+                "subtitle": "कार्टिलेज मजबूती व यूरिक एसिड नियंत्रण",
+                "cta_text": "💬 हर्बल थेरेपी परामर्श",
+                "cta_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_videos",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे जोड़ों के दर्द व गठिया का समाधान चाहिए।"
         },
-        {
-          image: '/images/banners/health-hair-care.jpg',
-          tag: '💇‍♀️ हेयर केयर',
-          title: 'बाल झड़ना रोकें व डैंड्रफ मुक्ति',
-          subtitle: 'भृंगराज व आंवला युक्त हर्बल हेयर थेरेपी',
-          cta_text: '📖 विस्तार से देखें',
-          cta_link: '/health/hair-care.html',
-          cta_secondary_text: '💬 परामर्श',
-          cta_secondary_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_category_pills', 'sec_videos', 'sec_reviews', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे स्वास्थ्य परामर्श चाहिए।' },
-      audio_title: 'आरोग्यम संपूर्ण स्वास्थ्य केंद्र',
-      audio_script: 'नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे। अपनी समस्या का चयन करें और स्थायी स्वास्थ्य लाभ पाएं।'
+        "audio_title": "जोड़ों का दर्द व गठिया राहत",
+        "audio_script": "नमस्ते {name} जी! जोड़ों के दर्द व आर्थराइटिस केयर पेज पर आपका स्वागत है। कार्टिलेज को दोबारा मजबूत बनाने, यूरिक एसिड घटाने और सूजन दूर करने की सम्पूर्ण जानकारी यहाँ दी गई है।",
+        "products": [
+            {
+                "id": "JC001",
+                "name": "Sandhi-Sudha Pain Oil (100ml)",
+                "price": 450.0,
+                "mrp": 450.0,
+                "badge": "दर्द निवारक तेल",
+                "description": "शल्लाकी, निर्गुंडी, महानारायण व गंधपुरा तेल। 10 मिनट में जोड़ों की गहराई तक पहुंचकर दर्द खींचता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "JC002",
+                "name": "Ortho-Care Cartilage Cap",
+                "price": 850.0,
+                "mrp": 850.0,
+                "badge": "कार्टिलेज रिपेयर",
+                "description": "ग्लूकोसामाइन, बोसवेलिया व अश्वगंधा। साइनोवियल फ्लूइड की कमी को दूर कर घुटनों का घिसना रोकता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "JC003",
+                "name": "Natural Calcium & Vit D3",
+                "price": 550.0,
+                "mrp": 550.0,
+                "badge": "बोन डेंसिटी",
+                "description": "शंख भस्म व मोरिंगा आधारित प्राकृतिक बायो-कैल्शियम। पेट में पथरी बनाए बिना 100% अवशोषित होता है।",
+                "image": "/images/logo/logo.png"
+            }
+        ]
     },
     {
-      id: 'page_health_diabetes',
-      slug: 'health-diabetes',
-      name: '🩸 मधुमेह (डायबिटीज) केयर',
-      url: '/health/diabetes.html',
-      category: 'Healthcare Sub-page',
-      status: 'active',
-      theme_primary: '#2563eb',
-      theme_dark: '#1e40af',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🩸 15,000+ लोगों ने प्राकृतिक रूप से शुगर नियंत्रित की | 24×7 AI डॉक्टर परामर्श सक्रिय',
-      hero_slides: [
-        {
-          image: '/images/banners/health-diabetes.jpg',
-          tag: '🩸 डायबिटीज केयर',
-          title: 'मधुमेह व ब्लड शुगर नियंत्रण',
-          subtitle: 'इंसुलिन संवेदनशीलता सुधार व प्राकृतिक अर्क',
-          cta_text: '💬 AI डॉक्टर परामर्श',
-          cta_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे मधुमेह / डायबिटीज समाधान चाहिए।' },
-      audio_title: 'डायबिटीज व ब्लड शुगर नियंत्रण',
-      audio_script: 'नमस्ते {name} जी! डायबिटीज केयर पेज पर आपका स्वागत है। यहाँ इंसुलिन रेजिस्टेंस दूर करने, शुगर लेवल सामान्य रखने की प्राकृतिक डाइट, एक्सरसाइज और आयुर्वेदिक फार्मूला उपलब्ध है।'
+        "id": "page_health_womens_care",
+        "slug": "health-womens-care",
+        "name": "🌸 महिला स्वास्थ्य (PCOD / PCOS Care)",
+        "url": "/health/womens-care.html",
+        "category": "Healthcare Sub-page",
+        "status": "active",
+        "theme_primary": "#db2777",
+        "theme_dark": "#be185d",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🌸 PCOD, अनियमित पीरियड्स व हार्मोन संतुलन का सुरक्षित आयुर्वेदिक उपचार",
+        "hero_slides": [
+            {
+                "image": "/images/banners/health-banner.jpeg",
+                "tag": "🌸 महिला स्वास्थ्य",
+                "title": "महिला स्वास्थ्य व हार्मोनल संतुलन",
+                "subtitle": "PCOD, थायरॉयड व अनियमित पीरियड्स का सुरक्षित उपचार",
+                "cta_text": "💬 महिला रोग विशेषज्ञ परामर्श",
+                "cta_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_videos",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे महिला स्वास्थ्य व हार्मोन संतुलन की सलाह चाहिए।"
+        },
+        "audio_title": "महिला स्वास्थ्य व हार्मोनल संतुलन",
+        "audio_script": "नमस्ते {name} जी! महिला स्वास्थ्य केंद्र में आपका स्वागत है। पीसीओडी, अनियमित माहवारी, कमजोरी और हार्मोनल असंतुलन का सुरक्षित व हर्बल समाधान यहाँ मिलेगा।",
+        "products": [
+            {
+                "id": "WC001",
+                "name": "Nari-Kalyan PCOD Tonic (200ml)",
+                "price": 450.0,
+                "mrp": 450.0,
+                "badge": "PCOD स्पेशल",
+                "description": "अशोक, लोध्र, शतावरी व कंचनार गुग्गुल। गर्भाशय की सफाई कर ओवरी सिस्ट को प्राकृतिक रूप से घोलता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "WC002",
+                "name": "Shatavari Extract Cap (60 Cap)",
+                "price": 550.0,
+                "mrp": 550.0,
+                "badge": "हार्मोन बैलेंस",
+                "description": "प्राकृतिक एस्ट्रोजन बूस्टर। कमजोरी, थकान, कमर दर्द दूर करता है और प्रजनन तंत्र को शक्ति प्रदान करता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "WC003",
+                "name": "Iron & Folic Tonic (200ml)",
+                "price": 350.0,
+                "mrp": 350.0,
+                "badge": "हीमोग्लोबिन बूस्टर",
+                "description": "द्राक्षा, आंवला व लोह भस्म। बिना कब्ज किए हीमोग्लोबिन 15 दिन में बढ़ाता है और सुस्ती भगाता है।",
+                "image": "/images/logo/logo.png"
+            }
+        ]
     },
     {
-      id: 'page_health_weight_loss',
-      slug: 'health-weight-loss',
-      name: '🔥 मोटापा व वजन नियंत्रण (Weight Loss)',
-      url: '/health/weight-loss.html',
-      category: 'Healthcare Sub-page',
-      status: 'active',
-      theme_primary: '#d97706',
-      theme_dark: '#b45309',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🔥 बिना कमजोरी या भूखे रहे प्राकृतिक फैट बर्निंग | फ्री डाइट चार्ट उपलब्ध',
-      hero_slides: [
-        {
-          image: '/images/banners/health-weight-loss.jpg',
-          tag: '🔥 वेट लॉस',
-          title: 'मोटापा व प्राकृतिक वजन नियंत्रण',
-          subtitle: 'जिद्दी चर्बी घटाने की सम्पूर्ण डाइट व हर्बल सप्लीमेंट',
-          cta_text: '💬 फ्री डाइट चार्ट लें',
-          cta_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे वजन घटाने / फैट लॉस का समाधान चाहिए।' },
-      audio_title: 'मोटापा व प्राकृतिक वजन नियंत्रण',
-      audio_script: 'नमस्ते {name} जी! वेट लॉस गाइड में आपका स्वागत है। यहाँ आपको पेट की जिद्दी चर्बी घटाने के मुख्य कारण, लक्षण, 24 घंटे का संपूर्ण डाइट चार्ट और फैट बर्नर हर्बल सप्लीमेंट की जानकारी मिलेगी।'
+        "id": "page_health_hair_care",
+        "slug": "health-hair-care",
+        "name": "💇‍♀️ हेयर केयर (बाल झड़ना व डैंड्रफ)",
+        "url": "/health/hair-care.html",
+        "category": "Healthcare Sub-page",
+        "status": "active",
+        "theme_primary": "#0d9488",
+        "theme_dark": "#0f766e",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "💇‍♀️ भृंगराज व आंवला से बालों का झड़ना रोकें | फ्री हेयर एनालिसिस उपलब्ध",
+        "hero_slides": [
+            {
+                "image": "/images/banners/health-hair-care.jpg",
+                "tag": "💇‍♀️ हेयर केयर",
+                "title": "हेयर केयर व डैंड्रफ समाधान",
+                "subtitle": "नए बाल उगाने व हेयर फॉल रोकने का प्राकृतिक फॉर्मूला",
+                "cta_text": "💬 हेयर एनालिसिस करवाएं",
+                "cta_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_videos",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे हेयर केयर व बाल झड़ने का समाधान चाहिए।"
+        },
+        "audio_title": "हेयर केयर व डैंड्रफ समाधान",
+        "audio_script": "नमस्ते {name} जी! हेयर केयर गाइड में आपका स्वागत है। नए बाल उगाने, बालों का झड़ना तुरंत रोकने और डैंड्रफ खत्म करने के प्राकृतिक फॉर्मूले और ऑयल्स की जानकारी यहाँ देखें।",
+        "products": [
+            {
+                "id": "HC001",
+                "name": "Kesh-Sanjivani Hair Oil (100ml)",
+                "price": 450.0,
+                "mrp": 450.0,
+                "badge": "रूट न्यूट्रिशन ऑयल",
+                "description": "भृंगराज, ब्राह्मी, आंवला, शिकाकाई व प्याज अर्क। जड़ों को मजबूत कर 15 दिन में बाल झड़ना रोकता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "HC002",
+                "name": "Neem Anti-Dandruff Shampoo",
+                "price": 350.0,
+                "mrp": 350.0,
+                "badge": "एंटी-डैंड्रफ",
+                "description": "सल्फेट-फ्री हर्बल फॉर्मूला। नीम व टी-ट्री ऑयल स्कैल्प के फंगस को पहली वॉश में ही नष्ट कर देता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "HC003",
+                "name": "Hair-Vital Biotin Cap (60 Cap)",
+                "price": 750.0,
+                "mrp": 750.0,
+                "badge": "बायोटिन + DHT ब्लॉकर",
+                "description": "प्राकृतिक सेसबानिया बायोटिन व ग्रीन टी अर्क। नए बाल उगाने और पतले बालों को मोटा करने में सक्षम।",
+                "image": "/images/logo/logo.png"
+            }
+        ]
     },
     {
-      id: 'page_health_joint_care',
-      slug: 'health-joint-care',
-      name: '🦴 जोड़ों का दर्द व गठिया (Joint Care)',
-      url: '/health/joint-care.html',
-      category: 'Healthcare Sub-page',
-      status: 'active',
-      theme_primary: '#16a34a',
-      theme_dark: '#15803d',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🦴 घुटनों का दर्द, यूरिक एसिड व जोड़ों की ग्रीस बढ़ाएं | 100% हर्बल थेरेपी',
-      hero_slides: [
-        {
-          image: '/images/banners/health-joint-care.jpg',
-          tag: '🦴 जॉइंट केयर',
-          title: 'जोड़ों का दर्द व गठिया राहत',
-          subtitle: 'कार्टिलेज मजबूती व यूरिक एसिड नियंत्रण',
-          cta_text: '💬 हर्बल थेरेपी परामर्श',
-          cta_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे जोड़ों के दर्द व गठिया का समाधान चाहिए।' },
-      audio_title: 'जोड़ों का दर्द व गठिया राहत',
-      audio_script: 'नमस्ते {name} जी! जोड़ों के दर्द व आर्थराइटिस केयर पेज पर आपका स्वागत है। कार्टिलेज को दोबारा मजबूत बनाने, यूरिक एसिड घटाने और सूजन दूर करने की सम्पूर्ण जानकारी यहाँ दी गई है।'
+        "id": "page_health_skin_care",
+        "slug": "health-skin-care",
+        "name": "🌺 स्किन केयर (मुँहासे व त्वचा चमक)",
+        "url": "/health/skin-care.html",
+        "category": "Healthcare Sub-page",
+        "status": "active",
+        "theme_primary": "#e11d48",
+        "theme_dark": "#9f1239",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🌸 नीम व मंजिष्ठा से रक्त शुद्धि व पिंपल्स से छुटकारा",
+        "hero_slides": [
+            {
+                "image": "/images/banners/health-banner.jpeg",
+                "tag": "🌺 स्किन केयर",
+                "title": "स्किन ग्लो व त्वचा सुरक्षा",
+                "subtitle": "पिंपल्स व झाइयों से मुक्ति और प्राकृतिक निखार",
+                "cta_text": "💬 स्किन एक्सपर्ट से पूछें",
+                "cta_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_videos",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे स्किन केयर व पिंपल्स का समाधान चाहिए।"
+        },
+        "audio_title": "स्किन ग्लो व त्वचा सुरक्षा",
+        "audio_script": "नमस्ते {name} जी! नेचुरल स्किन केयर पेज पर आपका स्वागत है। पिंपल्स, झाइयां और डल स्किन को ठीक कर चेहरे पर प्राकृतिक ग्लो लाने की आयुर्वेदिक टिप्स यहाँ उपलब्ध हैं।",
+        "products": [
+            {
+                "id": "SK001",
+                "name": "Rakt-Shodhak Syrup (200ml)",
+                "price": 350.0,
+                "mrp": 350.0,
+                "badge": "रक्त शोधक",
+                "description": "मंजिष्ठा, नीम, चिरायता व अनंतमूल। खून की गंदगी साफ कर पिंपल्स को जड़ से समाप्त करता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "SK002",
+                "name": "Kumkumadi Radiance Oil (30ml)",
+                "price": 650.0,
+                "mrp": 650.0,
+                "badge": "ग्लो सीरम",
+                "description": "कश्मीरी केसर, चंदन व उशीर। झाइयों (Melasma), डार्क स्पॉट्स और झुर्रियों को मिटाकर प्राकृतिक तेज देता है।",
+                "image": "/images/logo/logo.png"
+            },
+            {
+                "id": "SK003",
+                "name": "Neem-Tulsi Face Wash (100ml)",
+                "price": 250.0,
+                "mrp": 250.0,
+                "badge": "हर्बल क्लींजर",
+                "description": "सल्फेट-मुक्त प्राकृतिक फेस वॉश। अतिरिक्त तेल और बैक्टीरिया को हटाकर रोमछिद्रों को साफ रखता है।",
+                "image": "/images/logo/logo.png"
+            }
+        ]
     },
     {
-      id: 'page_health_womens_care',
-      slug: 'health-womens-care',
-      name: '🌸 महिला स्वास्थ्य (PCOD / PCOS Care)',
-      url: '/health/womens-care.html',
-      category: 'Healthcare Sub-page',
-      status: 'active',
-      theme_primary: '#db2777',
-      theme_dark: '#be185d',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🌸 PCOD, अनियमित पीरियड्स व हार्मोन संतुलन का सुरक्षित आयुर्वेदिक उपचार',
-      hero_slides: [
-        {
-          image: '/images/banners/health-banner.jpeg',
-          tag: '🌸 महिला स्वास्थ्य',
-          title: 'महिला स्वास्थ्य व हार्मोनल संतुलन',
-          subtitle: 'PCOD, थायरॉयड व अनियमित पीरियड्स का सुरक्षित उपचार',
-          cta_text: '💬 महिला रोग विशेषज्ञ परामर्श',
-          cta_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे महिला स्वास्थ्य व हार्मोन संतुलन की सलाह चाहिए।' },
-      audio_title: 'महिला स्वास्थ्य व हार्मोनल संतुलन',
-      audio_script: 'नमस्ते {name} जी! महिला स्वास्थ्य केंद्र में आपका स्वागत है। पीसीओडी, अनियमित माहवारी, कमजोरी और हार्मोनल असंतुलन का सुरक्षित व हर्बल समाधान यहाँ मिलेगा।'
+        "id": "page_health_kids_care",
+        "slug": "health-kids-care",
+        "name": "🧸 किड्स केयर (बाल पोषण व विकास)",
+        "url": "/health/kids-care.html",
+        "category": "Healthcare Sub-page",
+        "status": "active",
+        "theme_primary": "#d97706",
+        "theme_dark": "#b45309",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🌟 ब्राह्मी व शंखपुष्पी से तेज दिमाग, भूख सुधार व इम्युनिटी वृद्धि",
+        "hero_slides": [
+            {
+                "image": "/images/banners/achievers-banner.jpeg",
+                "tag": "🧸 किड्स केयर",
+                "title": "बच्चों का मानसिक व शारीरिक विकास",
+                "subtitle": "स्मृति वृद्धि, भूख सुधार व रोग प्रतिरोधक क्षमता",
+                "cta_text": "💬 पोषण विशेषज्ञ परामर्श",
+                "cta_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_videos",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे किड्स केयर व पोषण समाधान चाहिए।"
+        },
+        "audio_title": "बच्चों का मानसिक व शारीरिक विकास",
+        "audio_script": "नमस्ते {name} जी! किड्स केयर पेज पर आपका स्वागत है। बच्चों की याददाश्त, एकाग्रता, लंबाई और रोग प्रतिरोधक क्षमता बढ़ाने का सम्पूर्ण पोषण प्लान यहाँ देखें।",
+        "products": [
+            {
+                "id": "kids_choco_protein",
+                "name": "Kids Choco-Nutri Protein Shake (500g)",
+                "price": 999.0,
+                "mrp": 1199.0,
+                "badge": "शारीरिक विकास व वजन",
+                "description": "स्वादिष्ट चॉकलेट फ्लेवर में व्हे प्रोटीन, सोया प्रोटीन, कैल्शियम और 24 आवश्यक विटामिन्स का संपूर्ण सम्मिश्रण।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "brahmi_brain_syrup",
+                "name": "Brahmi-Shankhpushpi Brain Tonic (300ml)",
+                "price": 399.0,
+                "mrp": 499.0,
+                "badge": "तेज याददाश्त व एकाग्रता",
+                "description": "आयुर्वेदिक मेध्य रसायन। भूलने की समस्या दूर करे, पढ़ाई में एकाग्रता और मानसिक ऊर्जा में अप्रत्याशित सुधार।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "kids_immunity_gummies",
+                "name": "Kids Herbal Immunity Gummies (60 Pcs)",
+                "price": 549.0,
+                "mrp": 699.0,
+                "badge": "रोग प्रतिरोधक ढाल",
+                "description": "आंवला, विटामिन C, जिंक और गिलोय युक्त च्यूएबल गमीज। मौसम बदलने पर होने वाले सर्दी-जुकाम से प्राकृतिक सुरक्षा।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            }
+        ]
     },
     {
-      id: 'page_health_hair_care',
-      slug: 'health-hair-care',
-      name: '💇‍♀️ हेयर केयर (बाल झड़ना व डैंड्रफ)',
-      url: '/health/hair-care.html',
-      category: 'Healthcare Sub-page',
-      status: 'active',
-      theme_primary: '#0d9488',
-      theme_dark: '#0f766e',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '💇‍♀️ भृंगराज व आंवला से बालों का झड़ना रोकें | फ्री हेयर एनालिसिस उपलब्ध',
-      hero_slides: [
-        {
-          image: '/images/banners/health-hair-care.jpg',
-          tag: '💇‍♀️ हेयर केयर',
-          title: 'हेयर केयर व डैंड्रफ समाधान',
-          subtitle: 'नए बाल उगाने व हेयर फॉल रोकने का प्राकृतिक फॉर्मूला',
-          cta_text: '💬 हेयर एनालिसिस करवाएं',
-          cta_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे हेयर केयर व बाल झड़ने का समाधान चाहिए।' },
-      audio_title: 'हेयर केयर व डैंड्रफ समाधान',
-      audio_script: 'नमस्ते {name} जी! हेयर केयर गाइड में आपका स्वागत है। नए बाल उगाने, बालों का झड़ना तुरंत रोकने और डैंड्रफ खत्म करने के प्राकृतिक फॉर्मूले और ऑयल्स की जानकारी यहाँ देखें।'
-    },
-    {
-      id: 'page_health_skin_care',
-      slug: 'health-skin-care',
-      name: '🌺 स्किन केयर (मुँहासे व त्वचा चमक)',
-      url: '/health/skin-care.html',
-      category: 'Healthcare Sub-page',
-      status: 'active',
-      theme_primary: '#e11d48',
-      theme_dark: '#9f1239',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🌸 नीम व मंजिष्ठा से रक्त शुद्धि व पिंपल्स से छुटकारा',
-      hero_slides: [
-        {
-          image: '/images/banners/health-banner.jpeg',
-          tag: '🌺 स्किन केयर',
-          title: 'स्किन ग्लो व त्वचा सुरक्षा',
-          subtitle: 'पिंपल्स व झाइयों से मुक्ति और प्राकृतिक निखार',
-          cta_text: '💬 स्किन एक्सपर्ट से पूछें',
-          cta_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे स्किन केयर व पिंपल्स का समाधान चाहिए।' },
-      audio_title: 'स्किन ग्लो व त्वचा सुरक्षा',
-      audio_script: 'नमस्ते {name} जी! नेचुरल स्किन केयर पेज पर आपका स्वागत है। पिंपल्स, झाइयां और डल स्किन को ठीक कर चेहरे पर प्राकृतिक ग्लो लाने की आयुर्वेदिक टिप्स यहाँ उपलब्ध हैं।'
-    },
-    {
-      id: 'page_health_kids_care',
-      slug: 'health-kids-care',
-      name: '🧸 किड्स केयर (बाल पोषण व विकास)',
-      url: '/health/kids-care.html',
-      category: 'Healthcare Sub-page',
-      status: 'active',
-      theme_primary: '#d97706',
-      theme_dark: '#b45309',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🌟 ब्राह्मी व शंखपुष्पी से तेज दिमाग, भूख सुधार व इम्युनिटी वृद्धि',
-      hero_slides: [
-        {
-          image: '/images/banners/achievers-banner.jpeg',
-          tag: '🧸 किड्स केयर',
-          title: 'बच्चों का मानसिक व शारीरिक विकास',
-          subtitle: 'स्मृति वृद्धि, भूख सुधार व रोग प्रतिरोधक क्षमता',
-          cta_text: '💬 पोषण विशेषज्ञ परामर्श',
-          cta_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे किड्स केयर व पोषण समाधान चाहिए।' },
-      audio_title: 'बच्चों का मानसिक व शारीरिक विकास',
-      audio_script: 'नमस्ते {name} जी! किड्स केयर पेज पर आपका स्वागत है। बच्चों की याददाश्त, एकाग्रता, लंबाई और रोग प्रतिरोधक क्षमता बढ़ाने का सम्पूर्ण पोषण प्लान यहाँ देखें।'
-    },
-    {
-      id: 'page_health_home_care',
-      slug: 'health-home-care',
-      name: '🏡 होम केयर (केमिकल-मुक्त सुरक्षित घर)',
-      url: '/health/home-care.html',
-      category: 'Healthcare Sub-page',
-      status: 'active',
-      theme_primary: '#0284c7',
-      theme_dark: '#0369a1',
-      fb_pixel: true,
-      ga_tag: true,
-      ticker_text: '🍃 फलों-सब्जियों से कीटनाशक हटाने व केमिकल-फ्री क्लीनिंग गाइड',
-      hero_slides: [
-        {
-          image: '/images/banners/farmer-community-banner.jpeg',
-          tag: '🏡 होम केयर',
-          title: 'नेचुरल होम केयर व टॉक्सिन-मुक्त घर',
-          subtitle: 'केमिकल-मुक्त सुरक्षित व स्वच्छ वातावरण',
-          cta_text: '💬 होम केयर उत्पाद देखें',
-          cta_link: 'https://wa.me/917974422572'
-        }
-      ],
-      sections_order: ['sec_ticker', 'sec_hero_slider', 'sec_kpi_badges', 'sec_videos', 'sec_faqs', 'sec_help_support'],
-      hidden_sections: [],
-      kpi_cards: [],
-      videos: [],
-      marketing_cards: [],
-      reviews: [],
-      faqs: [],
-      whatsapp_support: { number: '917974422572', prompt: 'नमस्ते, मुझे केमिकल-मुक्त होम केयर समाधान चाहिए।' },
-      audio_title: 'नेचुरल होम केयर व टॉक्सिन-मुक्त घर',
-      audio_script: 'नमस्ते {name} जी! होम केयर पेज पर आपका स्वागत है। घर को केमिकल-मुक्त, स्वच्छ व सुरक्षित रखने के इको-फ्रेंडली समाधान यहाँ उपलब्ध हैं।'
+        "id": "page_health_home_care",
+        "slug": "health-home-care",
+        "name": "🏡 होम केयर (केमिकल-मुक्त सुरक्षित घर)",
+        "url": "/health/home-care.html",
+        "category": "Healthcare Sub-page",
+        "status": "active",
+        "theme_primary": "#0284c7",
+        "theme_dark": "#0369a1",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "🍃 फलों-सब्जियों से कीटनाशक हटाने व केमिकल-फ्री क्लीनिंग गाइड",
+        "hero_slides": [
+            {
+                "image": "/images/banners/farmer-community-banner.jpeg",
+                "tag": "🏡 होम केयर",
+                "title": "नेचुरल होम केयर व टॉक्सिन-मुक्त घर",
+                "subtitle": "केमिकल-मुक्त सुरक्षित व स्वच्छ वातावरण",
+                "cta_text": "💬 होम केयर उत्पाद देखें",
+                "cta_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_videos",
+            "sec_faqs",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे केमिकल-मुक्त होम केयर समाधान चाहिए।"
+        },
+        "audio_title": "नेचुरल होम केयर व टॉक्सिन-मुक्त घर",
+        "audio_script": "नमस्ते {name} जी! होम केयर पेज पर आपका स्वागत है। घर को केमिकल-मुक्त, स्वच्छ व सुरक्षित रखने के इको-फ्रेंडली समाधान यहाँ उपलब्ध हैं।",
+        "products": [
+            {
+                "id": "natural_veggie_wash",
+                "name": "Natural Veggie & Fruit Wash Concentrate (500ml)",
+                "price": 399.0,
+                "mrp": 499.0,
+                "badge": "सब्जी व फल शोधक",
+                "description": "प्राकृतिक एंजाइम व नीम अर्क। सब्जियों व फलों से 99.9% कीटनाशक, बैक्टीरिया और मोम की परत को सुरक्षित रूप से हटाए।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "herbal_floor_cleaner",
+                "name": "Herbal Bio-Enzyme Floor Cleaner (1000ml)",
+                "price": 299.0,
+                "mrp": 399.0,
+                "badge": "एसिड-फ्री फर्श सुरक्षा",
+                "description": "नीम, लेमनग्रास और पाइन ऑयल से निर्मित। फर्श को चमकाए, मक्खी-मच्छरों को दूर रखे और बच्चों व पालतू जानवरों के लिए 100% सुरक्षित।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            },
+            {
+                "id": "bio_dishwash_gel",
+                "name": "Bio-Enzyme Dishwash Liquid Gel (500ml)",
+                "price": 269.0,
+                "mrp": 349.0,
+                "badge": "शून्य रासायनिक अवशेष",
+                "description": "रीठा व नींबू का प्राकृतिक सत्व। चिकनाई को तुरंत काटे, बर्तनों पर कोई रासायनिक परत नहीं छोड़ता और हाथों की त्वचा को मुलायम रखता है।",
+                "image": "/images/banners/pashu-palan-banner.jpg"
+            }
+        ]
     }
-  ];
+];
 
-  // Load from localStorage or defaults
+  // Load from site-pages-config.json (Server Ground Truth), then localStorage fallback, then defaultPages
   let allPages = [];
   try {
-    const stored = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        allPages = parsed;
-        // Merge missing default pages (like new landing pages) into existing list
-        defaultPages.forEach(dp => {
-          if (!allPages.some(p => p.id === dp.id || p.slug === dp.slug)) {
-            allPages.push(dp);
+    const cacheTime = Math.floor(Date.now() / 60000);
+    // Robust multi-path fetch for relative, local server, and root setups
+    const pathsToTry = [
+      '../data/site-pages-config.json?v=' + cacheTime,
+      '/data/site-pages-config.json?v=' + cacheTime,
+      './data/site-pages-config.json?v=' + cacheTime
+    ];
+    for (const p of pathsToTry) {
+      try {
+        const res = await fetch(p);
+        if (res.ok) {
+          const j = await res.json();
+          if (j && Array.isArray(j.sitePages) && j.sitePages.length > 0) {
+            allPages = j.sitePages;
+            break;
           }
-        });
-      }
+        }
+      } catch (err) {}
     }
   } catch (e) {}
 
   if (allPages.length === 0) {
-    allPages = defaultPages;
+    try {
+      const stored = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          allPages = parsed;
+        }
+      }
+    } catch (e) {}
   }
+
+  if (allPages.length === 0) {
+    allPages = JSON.parse(JSON.stringify(defaultPages));
+  } else {
+    // Merge missing default pages & restore missing product lists from defaultPages
+    defaultPages.forEach(dp => {
+      const existing = allPages.find(p => p.id === dp.id || p.slug === dp.slug);
+      if (!existing) {
+        allPages.push(JSON.parse(JSON.stringify(dp)));
+      } else {
+        // If existing has empty products but defaultPages has products, hydrate them!
+        if ((!existing.products || existing.products.length === 0) && dp.products && dp.products.length > 0) {
+          existing.products = JSON.parse(JSON.stringify(dp.products));
+        }
+        // Ensure category and url match ground truth
+        if (!existing.category && dp.category) existing.category = dp.category;
+        if (!existing.url && dp.url) existing.url = dp.url;
+      }
+    });
+  }
+
   try {
     localStorage.setItem('AAROGYAM_SITE_PAGES_CONFIG', JSON.stringify(allPages));
   } catch (e) {}
@@ -1372,7 +2171,8 @@ export async function initPageEditor() {
   let currentProducts = [];           // NEW: Product Manager
   let currentPageKpiSections = [];    // NEW: Page-specific KPI sections (health sub-pages)
   let pagesCurrentPage = 1;
-  const pagesPageSize = 10;
+  let pagesPageSize = 25;
+  let activeCategoryFilter = 'all';
 
   const ALL_SECTION_DEFS = [
     { key: 'sec_ticker', name: '🚨 1. ब्रेकिंग न्यूज़ लाइव टिकर बार (News Ticker)', desc: 'चलती हुई हेडलाइन व लाइव पल्सिंग बैज' },
@@ -1461,26 +2261,84 @@ export async function initPageEditor() {
     <!-- BACKDROP OVERLAY FOR SIDE DRAWER -->
     <div id="page-editor-drawer-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 99998; transition: opacity 0.25s ease;"></div>
 
-    <!-- ADVANCED UNIVERSAL PAGE EDITOR SIDE DRAWER -->
-    <div id="page-editor-form-card" class="admin-card" style="display: none; position: fixed; top: 0; right: 0; bottom: 0; width: min(820px, 96vw); z-index: 99999; margin: 0; border-radius: 0; border-left: 2px solid #3b82f6; border-top: none; border-right: none; border-bottom: none; background: var(--admin-surface-2, #0b1120); box-shadow: -14px 0 50px rgba(0,0,0,0.75); overflow-y: auto; padding: 0;">
-      <!-- Sticky Top Header -->
-      <div style="position: sticky; top: 0; z-index: 20; background: #0f172a; padding: 16px 22px; border-bottom: 1.5px solid var(--admin-border, #334155); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,0.3);">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.4rem;">📑</span>
-          <div>
-            <h3 id="page-editor-form-title" style="margin: 0; font-size: 1.12rem; font-weight: 800; color: #60a5fa;">
-              पेज कस्टमाइज़र व साइड ड्रावर (Universal Page Editor Drawer)
-            </h3>
-            <small style="color: var(--admin-muted); font-size: 0.74rem;">पेज के सभी सेक्शंस, OG शेयरिंग, हीरो स्लाइडर और लाइव सेलिंग कार्ड्स को यहाँ से नियंत्रित करें</small>
+    <!-- ADVANCED UNIVERSAL PAGE EDITOR STUDIO (FULL-SCREEN WORKSPACE) -->
+    <div id="page-editor-form-card" class="pe-studio-container" style="display: none; position: fixed; inset: 0; width: 100%; height: 100%; max-width: 100%; z-index: 99999; margin: 0; border-radius: 0; border: none; background: #070d19; box-shadow: none; overflow: hidden; padding: 0; flex-direction: column; box-sizing: border-box;">
+      <!-- 1. Top Header Bar -->
+      <header class="pe-studio-header" style="height: 56px; min-height: 56px; flex-shrink: 0; background: #0f172a; padding: 0 16px; border-bottom: 1.5px solid #1e293b; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 18px rgba(0,0,0,0.4); z-index: 50;">
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; overflow: hidden;">
+          <!-- Mobile Sidebar Drawer Toggle Button -->
+          <button type="button" id="btn-toggle-pe-mobile-nav" class="pe-mobile-nav-toggle admin-button" style="display: none; background: #1e293b; border: 1.5px solid #38bdf8; color: #38bdf8; padding: 6px 12px; font-size: 0.8rem; font-weight: 800; border-radius: 8px; cursor: pointer; white-space: nowrap; align-items: center; gap: 4px; flex-shrink: 0;">
+            <span>📑</span> <span>सेक्शंस</span>
+          </button>
+          <span class="pe-desktop-only" style="font-size: 1.3rem; flex-shrink: 0;">📑</span>
+          <div style="min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow: hidden;">
+              <h3 id="page-editor-form-title" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #60a5fa; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
+                Universal Page Editor Studio
+              </h3>
+              <span id="pe_studio_cat_pill" style="font-size: 0.7rem; background: rgba(59,130,246,0.2); color: #38bdf8; padding: 2px 8px; border-radius: 12px; font-weight: 700; flex-shrink: 0;">Studio Mode</span>
+            </div>
+            <small class="pe-desktop-only" style="color: var(--admin-muted); font-size: 0.72rem; display: block;">पेज के सभी सेक्शंस, 3D बैनर, WhatsApp उत्पाद व लाइव सेलिंग प्रबंधित करें</small>
           </div>
         </div>
-        <button type="button" id="btn-close-page-editor-form" class="admin-button icon-button" style="color: #cbd5e1; font-size: 1.3rem; background: rgba(255,255,255,0.08); border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
-      </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+          <button type="button" id="btn-studio-save-top" class="pe-desktop-only admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 7px 14px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(22,163,74,0.35); cursor: pointer; border-radius: 8px; white-space: nowrap;">
+            <span>🚀</span> <span>Save Live</span>
+          </button>
+          <button type="button" id="btn-close-page-editor-form" class="admin-button icon-button" style="color: #cbd5e1; font-size: 1.3rem; background: rgba(255,255,255,0.08); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;" title="बंद करें">✕</button>
+        </div>
+      </header>
 
-      <div style="padding: 20px 22px 100px 22px;">
-        <form id="site-page-customizer-form">
-        <!-- 1. Basic Page Settings -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+      <!-- 2. Mobile Horizontal Section Chips Bar (Visible on mobile screens <= 768px) -->
+      <nav id="pe-mobile-chips-nav" class="pe-mobile-chips-bar" style="display: none; background: #090f1d; border-bottom: 1px solid #1e293b; padding: 8px 10px; overflow-x: auto; white-space: nowrap; gap: 6px; -webkit-overflow-scrolling: touch; z-index: 45;">
+        <button type="button" class="pe-chip-link active" onclick="window.scrollToPeSection('pe-sec-basic', this)">⚙️ 1. मूल</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-ticker', this)">🚨 2. टिकर</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-audio', this)">🎙️ 3. ऑडियो</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-og', this)">🔗 4. OG</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-hero', this)">🖼️ 5. बैनर</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-products', this)">🛍️ 6. उत्पाद</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-kpis', this)">✨ 7. KPI</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-marketing', this)">📢 8. सेलिंग</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-health-cards', this)">🩺 9. रोग</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-crop-cards', this)">🌾 10. फसल</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-pashu-cards', this)">🐄 11. पशु</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-page-kpi', this)">📋 12. पेज KPI</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-videos', this)">🎥 13. वीडियो</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-reviews', this)">💬 14. समीक्षा</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-faqs', this)">❓ 15. FAQ</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-sections-reorder', this)">🔀 16. क्रम</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-whatsapp-support', this)">💬 17. AI डॉक्टर</button>
+      </nav>
+
+      <!-- 3. Studio Middle Workspace Area (Flex: 1, min-height: 0, overflow: hidden) -->
+      <div class="pe-studio-body" style="flex: 1; min-height: 0; display: flex; overflow: hidden; position: relative;">
+        <!-- Left Studio Navigation Sidebar -->
+        <div id="pe-studio-nav-sidebar" class="pe-studio-sidebar" style="width: 240px; min-width: 240px; background: #0b1120; border-right: 1.5px solid #1e293b; overflow-y: auto; padding: 14px 10px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase; padding: 4px 8px; letter-spacing: 0.5px;">सेक्शन नेविगेशन</div>
+          <button type="button" class="pe-nav-link active" onclick="window.scrollToPeSection('pe-sec-basic', this)">⚙️ 1. मूल पेज सेटिंग्स</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-ticker', this)">🚨 2. न्यूज़ टिकर बार</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-audio', this)">🎙️ 3. ऑडियो वाचन व वॉइस</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-og', this)">🔗 4. OG व सोशल शेयर</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-hero', this)">🖼️ 5. हीरो व 3D बैनर</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-products', this)">🛍️ 6. WhatsApp उत्पाद</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-kpis', this)">✨ 7. KPI व फीचर्स</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-marketing', this)">📢 8. लाइव सेलिंग कार्ड्स</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-health-cards', this)">🩺 9. स्वास्थ्य रोग कार्ड्स</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-crop-cards', this)">🌾 10. फसल सुरक्षा कार्ड्स</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-pashu-cards', this)">🐄 11. पशु पालन कार्ड्स</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-page-kpi', this)">📋 12. पेज KPI सेक्शन</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-videos', this)">🎥 13. यूट्यूब वीडियो डेमो</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-reviews', this)">💬 14. पाठक समीक्षाएं</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-faqs', this)">❓ 15. अक्सर पूछे सवाल</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-sections-reorder', this)">🔀 16. सेक्शंस क्रम व दृश्यता</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-whatsapp-support', this)">💬 17. 24x7 AI डॉक्टर सपोर्ट</button>
+        </div>
+
+        <!-- Right Main Workspace Canvas -->
+        <div id="pe-studio-main-canvas" class="pe-studio-canvas" style="flex: 1; min-width: 0; overflow-y: auto; padding: 20px 24px 30px 24px; background: #070d19; scroll-behavior: smooth;">
+          <form id="site-page-customizer-form">
+          <!-- 1. Basic Page Settings -->
+          <div id="pe-sec-basic" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
             <span>⚙️ 1. मूल पेज सेटिंग्स (Page Information & Route)</span>
           </div>
@@ -1503,6 +2361,9 @@ export async function initPageEditor() {
                 <option value="eBooks">eBooks / डिजिटल स्टोर</option>
                 <option value="Agriculture">Agriculture / कृषि</option>
                 <option value="Health">Health / स्वास्थ्य</option>
+                <option value="Healthcare Sub-page">Healthcare Sub-page (रोग विशेष पेज)</option>
+                <option value="Livestock">Livestock / पशु पालन</option>
+                <option value="Book Landing Page">Book Landing Page (पुस्तक लैंडिंग पेज)</option>
                 <option value="Business">Business / व्यापार</option>
                 <option value="Digital AI">Digital AI / तकनीक</option>
                 <option value="Core">Core / मुख्य</option>
@@ -1537,7 +2398,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 2. Breaking News Live Ticker -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+        <div id="pe-sec-ticker" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
             <span>🚨 2. ब्रेकिंग न्यूज़ लाइव टिकर बार (Live Marquee Ticker)</span>
           </div>
@@ -1548,7 +2409,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 2.1 Page Audio Voice Narration (Hindi Speech Script) -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+        <div id="pe-sec-audio" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
             <div style="font-weight: 800; color: #c084fc; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
               <span>🗣️ 2.1 पेज का ऑडियो परिचय व हिंदी वॉइस स्क्रिप्ट (Page Audio Voice Narration)</span>
@@ -1573,7 +2434,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 2.2 Social Sharing, OpenGraph (OG) & WhatsApp Share Message -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #0284c750;">
+        <div id="pe-sec-og" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #0284c750;">
           <div style="font-weight: 800; color: #38bdf8; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
             <span>🔗 2.2 सोशल शेयरिंग, OpenGraph (OG) व WhatsApp शेयर संदेश (Social Share Engine Layer)</span>
           </div>
@@ -1607,12 +2468,56 @@ export async function initPageEditor() {
           </div>
         </div>
 
-        <!-- 3. Multi-Slide Hero Banner Slider Customizer -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+        <!-- 3. Multi-Slide Hero Banner Slider Customizer & 3D Floating Banner -->
+        <div id="pe-sec-hero" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+          <!-- 3.0 Floating 3D Banner & Live Animation Layer -->
+          <div style="background: #0f172a; border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1.5px solid #3b82f640;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+              <div style="font-weight: 800; color: #60a5fa; font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
+                <span>🔮 3.0 तैरता हुआ 3D बैनर व एनिमेशन (Floating 3D Banner Layer)</span>
+              </div>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #38bdf8; cursor: pointer; font-weight: 700;">
+                <input type="checkbox" id="pe_chk_floating_banner" style="width: 16px; height: 16px; accent-color: #3b82f6;" />
+                <span>3D फ्लोटिंग बैनर सक्रिय करें</span>
+              </label>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 8px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">बैनर इमेज URL (WebP)</label>
+                <input type="text" id="pe_input_floating_banner_img" class="admin-input" placeholder="/images/banners/..." style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+                <div style="display:flex; gap:6px; margin-top:4px;">
+                  <input type="file" id="pe_file_floating_banner" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'floating_banner', 0, 'image')">
+                  <button type="button" onclick="document.getElementById('pe_file_floating_banner').click()" class="admin-button small-button" style="background:#2563eb; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">
+                    📁 3D इमेज अपलोड (WebP)
+                  </button>
+                </div>
+                <div id="pe_floating_banner_preview" style="margin-top:6px; display:none;">
+                  <img id="pe_floating_banner_preview_img" src="" alt="3D Preview" class="pe-3d-float-preview" style="height:55px; border-radius:6px; object-fit:cover; border:1px solid #3b82f6; box-shadow:0 8px 16px rgba(0,0,0,0.5);" />
+                </div>
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">बैनर हेडलाइन / बैज (Badge Title)</label>
+                <input type="text" id="pe_input_floating_banner_title" class="admin-input" placeholder="उदा. 🌟 विशेष संस्करण 2026" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">क्लिक लिंक (Action Link)</label>
+                <input type="text" id="pe_input_floating_banner_link" class="admin-input" placeholder="/ebooks/kharif-master-guide-2026.html" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">3D एनिमेशन प्रभाव (Animation)</label>
+                <select id="pe_select_floating_banner_anim" class="admin-select" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;">
+                  <option value="ublFloatBook3D">🌟 3D Smooth Float & Bob (ublFloatBook3D)</option>
+                  <option value="gentle_pulse">💫 Gentle Pulse (हल्की चमक)</option>
+                  <option value="none">स्थिर (Static)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
-                <span>🖼️ 3. हीरो बैनर स्लाइडर (Hero Banner Slider / Carousel)</span>
+                <span>🖼️ 3.1 हीरो बैनर स्लाइडर (Hero Banner Slider / Carousel)</span>
               </div>
               <small style="color: var(--admin-muted); font-size: 0.75rem;">पेज पर सबसे ऊपर दिखने वाले एनिमेटेड बैनर स्लाइड्स</small>
             </div>
@@ -1681,7 +2586,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 4. Drag & Drop Section Reordering -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+        <div id="pe-sec-sections-reorder" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
@@ -1700,7 +2605,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 5. KPI & Feature Badges Manager -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+        <div id="pe-sec-kpis" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem;">
               <span>✨ 5. मुख्य KPI व फीचर बैजेस (Feature Highlights)</span>
@@ -1715,7 +2620,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 6. Interspersed Book Sell Marketing Cards Manager -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+        <div id="pe-sec-marketing" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div>
               <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
@@ -1733,7 +2638,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 7. YouTube Video Guides Showcase -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+        <div id="pe-sec-videos" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem;">
               <span>🎥 7. यूट्यूब वीडियो गाइड व डेमो (Video Showcase)</span>
@@ -1748,7 +2653,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 8. Testimonials & Farmer Reviews -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+        <div id="pe-sec-reviews" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem;">
               <span>💬 8. पाठकों व किसानों की समीक्षाएं (Customer Reviews)</span>
@@ -1763,7 +2668,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 9. FAQs Accordion Manager -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
+        <div id="pe-sec-faqs" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem;">
               <span>❓ 9. अक्सर पूछे जाने वाले सवाल (FAQs Accordion)</span>
@@ -1814,7 +2719,7 @@ export async function initPageEditor() {
         </div>
 
         <!-- 10. WhatsApp AI Support & Social Share Settings -->
-        <div style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--admin-border);">
+        <div id="pe-sec-whatsapp-support" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--admin-border);">
           <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem; margin-bottom: 12px;">
             <span>💬 10. 24×7 WhatsApp AI डॉक्टर सहायता व यूनिवर्सल सोशल शेयर</span>
           </div>
@@ -1830,56 +2735,491 @@ export async function initPageEditor() {
           </div>
         </div>
 
-        <!-- Sticky Drawer Bottom Save Bar -->
-        <div style="position: sticky; bottom: -100px; margin: 24px -22px -100px -22px; background: #0f172a; padding: 14px 22px; border-top: 1.5px solid var(--admin-border, #334155); display: flex; gap: 12px; justify-content: flex-end; align-items: center; box-shadow: 0 -4px 16px rgba(0,0,0,0.4); z-index: 25;">
-          <button type="button" id="btn-cancel-page-editor-form" class="admin-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted); padding: 10px 18px; font-weight: 700;">
-            रद्द करें
+          </form>
+        </div>
+      </div>
+
+      <!-- 4. Permanent Docked Studio Bottom Footer Bar -->
+      <footer id="pe-studio-docked-footer" class="pe-studio-footer" style="height: 56px; min-height: 56px; flex-shrink: 0; background: #0b1220; border-top: 1.5px solid #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 50; box-shadow: 0 -4px 16px rgba(0,0,0,0.5);">
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden;">
+          <span id="pe_footer_active_badge" style="font-size: 0.82rem; font-weight: 700; color: #38bdf8; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
+            🏡 मुख्य पृष्ठ (Home Page)
+          </span>
+          <span class="pe-desktop-only" style="font-size: 0.75rem; color: #94a3b8; white-space: nowrap;">
+            • बदलाव करने के बाद 'Save Page' दबाएं
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <button type="button" id="btn-cancel-page-editor-form" class="admin-button" style="background: transparent; border: 1.5px solid #334155; color: #cbd5e1; padding: 8px 18px; font-weight: 700; font-size: 0.85rem; border-radius: 8px; cursor: pointer;">
+            रद्द करें (Cancel)
           </button>
-          <button type="submit" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 10px 24px; font-size: 0.95rem; box-shadow: 0 4px 14px rgba(22,163,74,0.4);">
+          <button type="submit" form="site-page-customizer-form" id="btn-save-page-editor-form" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 8px 22px; font-size: 0.88rem; border-radius: 8px; box-shadow: 0 4px 14px rgba(22,163,74,0.4); cursor: pointer; white-space: nowrap;">
             💾 यह साइट पेज सुरक्षित करें (Save Page)
           </button>
         </div>
-      </form>
-      </div>
+      </footer>
     </div>
 
-    <!-- Active Site Pages Table -->
-    <div class="admin-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
-        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--admin-text);">
-          📋 सभी सक्रिय वेबसाइट पेजेस (All Website Pages)
-        </h3>
-        <input type="text" id="pe_search_input" class="admin-input" placeholder="🔍 पेज खोजें..." style="max-width: 260px; padding: 6px 10px; font-size: 0.82rem;" />
+    <!-- Active Site Pages Table / Compact Directory -->
+    <div class="admin-card" style="margin-top: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--admin-text); display: flex; align-items: center; gap: 8px;">
+            <span>📋 वेबसाइट पेजेस डायरेक्टरी (Universal Pages Directory)</span>
+            <span id="pe_total_pages_count" style="font-size: 0.75rem; background: rgba(59,130,246,0.18); color: #38bdf8; padding: 2px 10px; border-radius: 12px; font-weight: 800;">23 Pages</span>
+          </h3>
+          <small style="color: var(--admin-muted); font-size: 0.76rem;">सभी 23 पेजों की सेटिंग्स, मॉड्यूल्स, और लाइव स्थिति एक कॉम्पैक्ट दृश्य में देखें व प्रबंधित करें</small>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <input type="text" id="pe_search_input" class="admin-input" placeholder="🔍 नाम, रूट या कैटेगरी खोजें..." style="min-width: 260px; padding: 7px 12px; font-size: 0.84rem; border-radius: 8px;" />
+        </div>
       </div>
 
-      <div id="pe_table_container" class="admin-table-wrapper">
+      <!-- Category Filter Pills Bar -->
+      <div id="pe_cat_filter_bar" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--admin-border);">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <div id="pe_table_container" class="admin-table-wrapper" style="overflow-x: auto;">
         <!-- Rendered dynamically -->
       </div>
     </div>
+
+    <style>
+      /* Base Navigation Links */
+      .pe-nav-link {
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        color: #94a3b8;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-align: left;
+        padding: 8px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        width: 100%;
+      }
+      .pe-nav-link:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: #f8fafc;
+      }
+      .pe-nav-link.active {
+        background: rgba(59, 130, 246, 0.16);
+        color: #38bdf8;
+        border-left: 3px solid #3b82f6;
+      }
+
+      /* Mobile Horizontal Chips */
+      .pe-chip-link {
+        background: #1e293b;
+        border: 1px solid #334155;
+        color: #cbd5e1;
+        font-size: 0.74rem;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s ease;
+      }
+      .pe-chip-link:hover, .pe-chip-link.active {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 2px 8px rgba(37,99,235,0.4);
+      }
+      .pe-mobile-chips-bar {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .pe-mobile-chips-bar::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* ==============================================================
+         HIGH-CONTRAST STUDIO STYLES (NO MORE WHITE-ON-WHITE OR BLACK-ON-BLACK)
+         ============================================================== */
+      #page-editor-form-card {
+        --pe-input-bg: #090e1a;
+        --pe-input-text: #ffffff;
+        --pe-input-border: #334155;
+        --pe-label-text: #cbd5e1;
+      }
+
+      /* Inputs, Selects, and Textareas in Studio */
+      #page-editor-form-card .admin-input,
+      #page-editor-form-card .admin-select,
+      #page-editor-form-card textarea {
+        background: #090e1a !important;
+        color: #ffffff !important;
+        border: 1.5px solid #334155 !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        font-size: 0.88rem !important;
+        font-weight: 500 !important;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      #page-editor-form-card .admin-input:focus,
+      #page-editor-form-card .admin-select:focus,
+      #page-editor-form-card textarea:focus {
+        border-color: #38bdf8 !important;
+        background: #0d1629 !important;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
+        outline: none !important;
+      }
+
+      #page-editor-form-card .admin-input::placeholder,
+      #page-editor-form-card textarea::placeholder {
+        color: #64748b !important;
+        opacity: 1 !important;
+      }
+
+      #page-editor-form-card select.admin-select option {
+        background: #0f172a !important;
+        color: #ffffff !important;
+      }
+
+      #page-editor-form-card label.admin-label,
+      #page-editor-form-card label {
+        color: #cbd5e1 !important;
+        font-size: 0.8rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 4px !important;
+      }
+
+      #page-editor-form-card small {
+        color: #94a3b8 !important;
+      }
+
+      /* Light Theme Studio Overrides when body has light-theme */
+      body.light-theme #page-editor-form-card {
+        background: #f1f5f9 !important;
+      }
+      body.light-theme #page-editor-form-card header.pe-studio-header {
+        background: #ffffff !important;
+        border-bottom-color: #cbd5e1 !important;
+      }
+      body.light-theme #page-editor-form-card #page-editor-form-title {
+        color: #1e40af !important;
+      }
+      body.light-theme #page-editor-form-card #pe-mobile-chips-nav {
+        background: #ffffff !important;
+        border-bottom-color: #cbd5e1 !important;
+      }
+      body.light-theme #page-editor-form-card .pe-chip-link {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
+      }
+      body.light-theme #page-editor-form-card .pe-chip-link.active {
+        background: #2563eb !important;
+        color: #ffffff !important;
+        border-color: #2563eb !important;
+      }
+      body.light-theme #page-editor-form-card #pe-studio-nav-sidebar {
+        background: #ffffff !important;
+        border-right-color: #cbd5e1 !important;
+      }
+      body.light-theme #page-editor-form-card .pe-nav-link {
+        color: #475569 !important;
+      }
+      body.light-theme #page-editor-form-card .pe-nav-link:hover {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+      }
+      body.light-theme #page-editor-form-card .pe-nav-link.active {
+        background: rgba(37, 99, 235, 0.1) !important;
+        color: #2563eb !important;
+        border-left-color: #2563eb !important;
+      }
+      body.light-theme #page-editor-form-card #pe-studio-main-canvas {
+        background: #f8fafc !important;
+      }
+      body.light-theme #page-editor-form-card [id^="pe-sec-"],
+      body.light-theme #page-editor-form-card [id^="pe-section-"] {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+      }
+      body.light-theme #page-editor-form-card [id^="pe-sec-"] > div:first-child span,
+      body.light-theme #page-editor-form-card [id^="pe-section-"] > div:first-child span {
+        color: #0f172a !important;
+      }
+      body.light-theme #page-editor-form-card .admin-input,
+      body.light-theme #page-editor-form-card .admin-select,
+      body.light-theme #page-editor-form-card textarea {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border-color: #cbd5e1 !important;
+      }
+      body.light-theme #page-editor-form-card .admin-input:focus,
+      body.light-theme #page-editor-form-card .admin-select:focus,
+      body.light-theme #page-editor-form-card textarea:focus {
+        border-color: #2563eb !important;
+        background: #ffffff !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+      }
+      body.light-theme #page-editor-form-card label.admin-label,
+      body.light-theme #page-editor-form-card label {
+        color: #1e293b !important;
+      }
+      body.light-theme #page-editor-form-card small {
+        color: #64748b !important;
+      }
+      body.light-theme #page-editor-form-card select.admin-select option {
+        background: #ffffff !important;
+        color: #0f172a !important;
+      }
+      body.light-theme #page-editor-form-card .pe-studio-footer {
+        background: #ffffff !important;
+        border-top-color: #cbd5e1 !important;
+      }
+      body.light-theme #page-editor-form-card #btn-cancel-page-editor-form {
+        background: #f1f5f9 !important;
+        color: #475569 !important;
+        border-color: #cbd5e1 !important;
+      }
+
+      /* ==============================================================
+         MOBILE RESPONSIVE RULES (MAX-WIDTH: 768px)
+         ============================================================== */
+      @media (max-width: 768px) {
+        .pe-desktop-only { display: none !important; }
+        .pe-mobile-nav-toggle { display: inline-flex !important; }
+        #pe-mobile-chips-nav { display: flex !important; }
+        
+        #page-editor-form-card {
+          width: 100vw !important;
+          max-width: 100vw !important;
+          left: 0 !important;
+          right: 0 !important;
+          top: 0 !important;
+          bottom: 0 !important;
+        }
+
+        /* Compact Header on Mobile so Close (X) is always fully visible */
+        .pe-studio-header {
+          padding: 0 10px !important;
+          gap: 6px !important;
+          width: 100% !important;
+          max-width: 100vw !important;
+          box-sizing: border-box !important;
+        }
+        .pe-studio-header > div:first-child {
+          flex: 1 1 auto !important;
+          min-width: 0 !important;
+          overflow: hidden !important;
+          display: flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+        }
+        .pe-studio-header > div:last-child {
+          flex: 0 0 auto !important;
+          display: flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+        }
+        .pe-studio-header #page-editor-form-title {
+          display: none !important;
+        }
+        #pe_studio_cat_pill {
+          max-width: 110px !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+        }
+        #btn-close-page-editor-form {
+          width: 34px !important;
+          height: 34px !important;
+          flex-shrink: 0 !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+
+        /* Sidebar becomes off-canvas drawer on mobile */
+        #pe-studio-nav-sidebar {
+          position: absolute !important;
+          left: 0 !important;
+          top: 0 !important;
+          bottom: 0 !important;
+          width: 270px !important;
+          z-index: 60 !important;
+          transform: translateX(-100%) !important;
+          box-shadow: 6px 0 24px rgba(0,0,0,0.7) !important;
+        }
+        #pe-studio-nav-sidebar.drawer-open {
+          transform: translateX(0) !important;
+        }
+        
+        /* Full width canvas on mobile */
+        #pe-studio-main-canvas {
+          padding: 12px 10px 24px 10px !important;
+          width: 100% !important;
+          max-width: 100vw !important;
+          box-sizing: border-box !important;
+          overflow-x: hidden !important;
+        }
+        #pe-studio-main-canvas * {
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        #pe-studio-main-canvas input,
+        #pe-studio-main-canvas select,
+        #pe-studio-main-canvas textarea {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        #pe-studio-main-canvas [id^="pe-sec-"],
+        #pe-studio-main-canvas [id^="pe-section-"] {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          padding: 14px 10px !important;
+        }
+        
+        /* Stack all multi-column grids to 1 column */
+        #pe-studio-main-canvas div[style*="grid-template-columns"] {
+          grid-template-columns: 1fr !important;
+        }
+        
+        /* Mobile Footer touch-friendly buttons */
+        .pe-studio-footer {
+          padding: 8px 10px !important;
+          width: 100% !important;
+          max-width: 100vw !important;
+          box-sizing: border-box !important;
+        }
+        .pe-studio-footer > div:last-child {
+          width: 100% !important;
+          display: flex !important;
+          justify-content: space-between !important;
+          gap: 8px !important;
+        }
+        .pe-studio-footer #btn-cancel-page-editor-form {
+          flex: 1 1 35% !important;
+          text-align: center !important;
+          padding: 8px 10px !important;
+          font-size: 0.8rem !important;
+          white-space: nowrap !important;
+        }
+        .pe-studio-footer #btn-save-page-editor-form {
+          flex: 2 1 65% !important;
+          text-align: center !important;
+          padding: 8px 12px !important;
+          font-size: 0.82rem !important;
+          white-space: nowrap !important;
+        }
+        #pe_footer_active_badge {
+          display: none !important;
+        }
+      }
+
+      @keyframes ublFloatBook3DAnim {
+        0% { transform: translateY(0px) rotateX(4deg) rotateY(-4deg); }
+        50% { transform: translateY(-8px) rotateX(8deg) rotateY(-8deg); }
+        100% { transform: translateY(0px) rotateX(4deg) rotateY(-4deg); }
+      }
+      .pe-3d-float-preview {
+        animation: ublFloatBook3DAnim 3.5s ease-in-out infinite;
+        perspective: 800px;
+      }
+    </style>
   `;
 
   const formCard = document.getElementById('page-editor-form-card');
   const toggleBtn = document.getElementById('btn-toggle-page-editor-form');
   const closeBtn = document.getElementById('btn-close-page-editor-form');
   const cancelBtn = document.getElementById('btn-cancel-page-editor-form');
+  const footerSaveBtn = document.getElementById('btn-save-page-editor-form');
   const form = document.getElementById('site-page-customizer-form');
   const searchInput = document.getElementById('pe_search_input');
   const exportBtn = document.getElementById('btn-export-pages-json');
+  const mobileNavToggle = document.getElementById('btn-toggle-pe-mobile-nav');
+  const sidebarNav = document.getElementById('pe-studio-nav-sidebar');
+
+  // Mobile sidebar drawer toggle
+  mobileNavToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (sidebarNav) {
+      sidebarNav.classList.toggle('drawer-open');
+    }
+  });
+
+  // Close mobile drawer when clicking canvas
+  document.getElementById('pe-studio-main-canvas')?.addEventListener('click', () => {
+    if (sidebarNav && sidebarNav.classList.contains('drawer-open')) {
+      sidebarNav.classList.remove('drawer-open');
+    }
+  });
 
   function openPageDrawer() {
     const backdrop = document.getElementById('page-editor-drawer-backdrop');
     if (backdrop) backdrop.style.display = 'block';
-    if (formCard) formCard.style.display = 'block';
+    if (formCard) formCard.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
   }
 
   function closePageDrawer() {
     const backdrop = document.getElementById('page-editor-drawer-backdrop');
     if (backdrop) backdrop.style.display = 'none';
     if (formCard) formCard.style.display = 'none';
+    if (sidebarNav) sidebarNav.classList.remove('drawer-open');
+    document.body.style.overflow = '';
   }
 
   window.openPageDrawer = openPageDrawer;
   window.closePageDrawer = closePageDrawer;
+
+  window.scrollToPeSection = function(sectionId, btnEl) {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    document.querySelectorAll('.pe-nav-link, .pe-chip-link').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    // Also highlight corresponding link in other nav bar
+    if (sectionId) {
+      const relatedLinks = document.querySelectorAll(`[onclick*="'${sectionId}'"]`);
+      relatedLinks.forEach(l => l.classList.add('active'));
+    }
+    // Close mobile drawer if open
+    if (sidebarNav) sidebarNav.classList.remove('drawer-open');
+  };
+
+  const studioSaveTopBtn = document.getElementById('btn-studio-save-top');
+  studioSaveTopBtn?.addEventListener('click', () => {
+    savePageConfig();
+  });
+  footerSaveBtn?.addEventListener('click', () => {
+    savePageConfig();
+  });
+
+  const floatImgInput = document.getElementById('pe_input_floating_banner_img');
+  floatImgInput?.addEventListener('input', () => {
+    const val = (floatImgInput.value || '').trim();
+    const prevWrap = document.getElementById('pe_floating_banner_preview');
+    const prevImg = document.getElementById('pe_floating_banner_preview_img');
+    if (prevWrap && prevImg) {
+      if (val) {
+        prevImg.src = val;
+        prevWrap.style.display = 'block';
+      } else {
+        prevWrap.style.display = 'none';
+      }
+    }
+  });
 
   toggleBtn?.addEventListener('click', () => {
     resetPageForm();
@@ -2878,16 +4218,21 @@ export async function initPageEditor() {
     }
     wrap.innerHTML = currentProducts.map((prod, idx) => {
       const safeImg = escapeHtml(prod.image || '');
-      const offerPrice = (prod.mrp && prod.discount_pct) ? Math.round(prod.mrp * (1 - prod.discount_pct / 100)) : null;
+      const prodTitle = prod.title || prod.name || '';
+      const prodMrp = (prod.mrp !== undefined && prod.mrp !== '') ? prod.mrp : (prod.price || '');
+      const prodBadge = prod.badge || '';
+      const prodDose = prod.dose || '';
+      const prodDesc = prod.description || '';
+      const offerPrice = (prodMrp && prod.discount_pct) ? Math.round(prodMrp * (1 - prod.discount_pct / 100)) : null;
       return `
         <div style="background:#0f172a; border:1.5px solid #7c3aed50; border-radius:10px; padding:14px; position:relative;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-weight:800; color:#c084fc; font-size:0.92rem;">🛍️ उत्पाद #${idx + 1}: ${escapeHtml(prod.title || 'New Product')}</span>
+            <span style="font-weight:800; color:#c084fc; font-size:0.92rem;">🛍️ उत्पाद #${idx + 1}: ${escapeHtml(prodTitle || 'New Product')}</span>
             <button type="button" onclick="window.removeProduct(${idx})" style="background:transparent; border:none; color:#ef4444; font-weight:800; cursor:pointer; font-size:0.82rem;">&times; हटाएं</button>
           </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
             <div>
-              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद इमेज (WebP — auto: images/products/)</label>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद इमेज (WebP)</label>
               <input type="text" value="${safeImg}" onchange="window.updateProduct(${idx}, 'image', this.value); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
               <div style="display:flex; gap:6px; margin-top:4px;">
                 <input type="file" id="prod_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'product', ${idx}, 'image')">
@@ -2896,30 +4241,29 @@ export async function initPageEditor() {
               ${safeImg ? `<img src="${safeImg}" alt="Preview" style="height:48px;border-radius:4px;object-fit:cover;border:1px solid #7c3aed;margin-top:4px;" onerror="this.style.display='none'">` : ''}
             </div>
             <div>
-              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद का नाम (Title)*</label>
-              <input type="text" value="${escapeHtml(prod.title || '')}" onchange="window.updateProduct(${idx}, 'title', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="उदा. Biofit Wrap-Up"/>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद का नाम (Title / Name)*</label>
+              <input type="text" value="${escapeHtml(prodTitle)}" onchange="window.updateProduct(${idx}, 'title', this.value); window.updateProduct(${idx}, 'name', this.value);" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="उदा. CFL Mineral Feed (1kg)"/>
             </div>
             <div>
-              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">MRP (₹)</label>
-              <input type="number" value="${prod.mrp || ''}" onchange="window.updateProduct(${idx}, 'mrp', Number(this.value)); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="850"/>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">MRP (₹)*</label>
+              <input type="number" value="${prodMrp}" onchange="window.updateProduct(${idx}, 'mrp', Number(this.value)); window.updateProduct(${idx}, 'price', Number(this.value)); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="650"/>
             </div>
             <div>
-              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">डिस्काउंट % (Discount)</label>
-              <input type="number" value="${prod.discount_pct || ''}" min="0" max="100" onchange="window.updateProduct(${idx}, 'discount_pct', Number(this.value)); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="15"/>
-              ${offerPrice ? `<small style="color:#34d399; font-size:0.7rem; font-weight:700;">✅ ऑफर प्राइस: ₹${offerPrice}</small>` : ''}
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">बैज / श्रेणी (Badge)</label>
+              <input type="text" value="${escapeHtml(prodBadge)}" onchange="window.updateProduct(${idx}, 'badge', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="उदा. दुग्ध वृद्धि बूस्टर"/>
             </div>
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">खुराक / डोज़ (Dose)</label>
-              <input type="text" value="${escapeHtml(prod.dose || '')}" onchange="window.updateProduct(${idx}, 'dose', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="2ml/लीटर पानी"/>
+              <input type="text" value="${escapeHtml(prodDose)}" onchange="window.updateProduct(${idx}, 'dose', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="50g दैनिक"/>
             </div>
             <div>
-              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">WhatsApp ऑर्डर लिंक</label>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">WhatsApp ऑर्डर लिंक (वैकल्पिक)</label>
               <input type="text" value="${escapeHtml(prod.whatsapp_link || '')}" onchange="window.updateProduct(${idx}, 'whatsapp_link', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="https://wa.me/917974422572"/>
             </div>
           </div>
           <div>
             <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद विवरण (Description)</label>
-            <textarea rows="2" onchange="window.updateProduct(${idx}, 'description', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.78rem;" placeholder="उत्पाद के लाभ व उपयोग...">${escapeHtml(prod.description || '')}</textarea>
+            <textarea rows="2" onchange="window.updateProduct(${idx}, 'description', this.value)" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.78rem;" placeholder="उत्पाद के लाभ व उपयोग...">${escapeHtml(prodDesc)}</textarea>
           </div>
         </div>
       `;
@@ -3006,16 +4350,90 @@ export async function initPageEditor() {
   window.updateContextualSections = updateContextualSections;
 
   // -------------------------------------------------------------
-  // TABLE & ACTIONS
+  // TABLE & ACTIONS (Compact 5-Column Directory with Category Filter Pills)
   // -------------------------------------------------------------
+  function renderCategoryFilterPills() {
+    const bar = document.getElementById('pe_cat_filter_bar');
+    if (!bar) return;
+
+    const categories = [
+      { id: 'all', label: 'All Pages' },
+      { id: 'Core', label: 'Core / Home' },
+      { id: 'eBooks', label: 'eBooks' },
+      { id: 'Agriculture', label: 'Agriculture (कृषि)' },
+      { id: 'Livestock', label: 'Livestock (पशु पालन)' },
+      { id: 'Health', label: 'Health & Care' },
+      { id: 'Book Landing Page', label: 'Book Landing' },
+      { id: 'Utilities', label: 'Utilities' },
+      { id: 'User Area', label: 'User Area' }
+    ];
+
+    const counts = { all: allPages.length };
+    categories.slice(1).forEach(c => {
+      counts[c.id] = allPages.filter(p => {
+        const cat = (p.category || '').toLowerCase();
+        if (c.id === 'Health') return cat.includes('health');
+        if (c.id === 'Core') return cat === 'core';
+        if (c.id === 'Agriculture') return cat.includes('agri');
+        if (c.id === 'Livestock') return cat.includes('live') || cat.includes('pashu');
+        if (c.id === 'Book Landing Page') return cat.includes('landing');
+        return cat === c.id.toLowerCase();
+      }).length;
+    });
+
+    bar.innerHTML = categories.map(c => {
+      const isActive = activeCategoryFilter === c.id;
+      const count = counts[c.id] !== undefined ? counts[c.id] : 0;
+      return `
+        <button type="button" class="admin-button small-button" onclick="window.setPageCategoryFilter('${c.id}')"
+          style="border-radius: 20px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; transition: all 0.2s ease; cursor: pointer;
+                 background: ${isActive ? '#2563eb' : 'rgba(255,255,255,0.05)'};
+                 color: ${isActive ? '#fff' : 'var(--admin-muted)'};
+                 border: 1px solid ${isActive ? '#3b82f6' : 'var(--admin-border)'};">
+          ${c.label} <span style="font-size: 0.7rem; opacity: 0.85; margin-left: 3px;">(${count})</span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  window.setPageCategoryFilter = function(catId) {
+    activeCategoryFilter = catId;
+    pagesCurrentPage = 1;
+    renderCategoryFilterPills();
+    renderPagesTable();
+  };
+
   function renderPagesTable() {
+    renderCategoryFilterPills();
+
     const wrap = document.getElementById('pe_table_container');
     if (!wrap) return;
 
+    const countBadge = document.getElementById('pe_total_pages_count');
+
     const q = (searchInput?.value || '').toLowerCase().trim();
     const filtered = allPages.filter(p => {
-      return (p.name || '').toLowerCase().includes(q) || (p.url || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q);
+      if (activeCategoryFilter !== 'all') {
+        const cat = (p.category || '').toLowerCase();
+        let catMatch = false;
+        if (activeCategoryFilter === 'Health') catMatch = cat.includes('health');
+        else if (activeCategoryFilter === 'Core') catMatch = (cat === 'core');
+        else if (activeCategoryFilter === 'Agriculture') catMatch = cat.includes('agri');
+        else if (activeCategoryFilter === 'Livestock') catMatch = cat.includes('live') || cat.includes('pashu');
+        else if (activeCategoryFilter === 'Book Landing Page') catMatch = cat.includes('landing');
+        else catMatch = (cat === activeCategoryFilter.toLowerCase());
+        if (!catMatch) return false;
+      }
+      if (!q) return true;
+      return (p.name || '').toLowerCase().includes(q) ||
+             (p.url || '').toLowerCase().includes(q) ||
+             (p.slug || '').toLowerCase().includes(q) ||
+             (p.category || '').toLowerCase().includes(q);
     });
+
+    if (countBadge) {
+      countBadge.textContent = `${filtered.length} / ${allPages.length} Pages`;
+    }
 
     if (filtered.length === 0) {
       wrap.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--admin-muted);">कोई पेज नहीं मिला।</div>';
@@ -3031,16 +4449,14 @@ export async function initPageEditor() {
     const paginated = filtered.slice(startIdx, endIdx);
 
     wrap.innerHTML = `
-      <table class="admin-table">
+      <table class="admin-table" style="width: 100%; border-collapse: collapse;">
         <thead>
           <tr>
-            <th>पेज का नाम (Page Name)</th>
-            <th>कैटेगरी</th>
-            <th>Live URL</th>
-            <th>स्लाइड्स व सेक्शंस</th>
-            <th>ट्रैकिंग</th>
-            <th>स्थिति (Status)</th>
-            <th style="text-align:center;">एक्शन (Actions)</th>
+            <th style="min-width: 220px;">पेज व रूट (Page & Route)</th>
+            <th style="min-width: 110px;">कैटेगरी</th>
+            <th style="min-width: 200px;">मॉड्यूल्स व सामग्री (Modules)</th>
+            <th style="min-width: 90px; text-align: center;">स्थिति</th>
+            <th style="min-width: 130px; text-align: center;">एक्शन</th>
           </tr>
         </thead>
         <tbody>
@@ -3052,38 +4468,45 @@ export async function initPageEditor() {
             return `
               <tr>
                 <td>
-                  <strong style="color:var(--admin-text);font-size:0.95rem;">${p.name}</strong>
-                  <div style="font-size:0.75rem;color:var(--admin-muted);">${p.ticker_text ? p.ticker_text.substring(0, 45) + '...' : ''}</div>
+                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem; margin-bottom: 3px;">${escapeHtml(p.name)}</div>
+                  <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <a href="${p.url}" target="_blank" style="font-size: 0.74rem; color: #10b981; background: rgba(16,185,129,0.1); padding: 2px 6px; border-radius: 4px; text-decoration: none; font-weight: 600;">
+                      ${escapeHtml(p.url)}
+                    </a>
+                    <span style="font-size: 0.72rem; color: #64748b;">(${escapeHtml(p.slug || p.id)})</span>
+                  </div>
+                  ${p.ticker_text ? `<div style="font-size: 0.72rem; color: var(--admin-muted); margin-top: 2px;">📢 ${escapeHtml(p.ticker_text.substring(0, 48))}...</div>` : ''}
                 </td>
                 <td>
-                  <span style="font-size:0.75rem;background:rgba(59,130,246,0.15);color:#3b82f6;padding:2px 8px;border-radius:4px;font-weight:700;">
-                    ${p.category || 'General'}
+                  <span style="font-size: 0.74rem; background: rgba(59,130,246,0.15); color: #38bdf8; padding: 3px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap;">
+                    ${escapeHtml(p.category || 'General')}
                   </span>
                 </td>
                 <td>
-                  <code style="font-size:0.8rem;color:#16a34a;background:rgba(22,163,74,0.1);padding:2px 6px;border-radius:4px;">${p.url}</code>
+                  <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                    <span style="font-size: 0.72rem; background: rgba(168,85,247,0.15); color: #c084fc; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
+                      🖼️ ${slidesCount} Slides
+                    </span>
+                    <span style="font-size: 0.72rem; background: rgba(30,58,138,0.3); color: #93c5fd; padding: 2px 6px; border-radius: 4px; font-weight: 700;">
+                      📑 ${secCount} Secs
+                    </span>
+                    ${p.products && p.products.length ? `<span style="font-size:0.72rem; background:rgba(234,179,8,0.15); color:#facc15; padding:2px 6px; border-radius:4px; font-weight:700;">🛍️ ${p.products.length} Prod</span>` : ''}
+                    ${p.audio_script ? `<span style="font-size:0.72rem; background:rgba(16,185,129,0.15); color:#34d399; padding:2px 6px; border-radius:4px; font-weight:700;">🎙️ Audio</span>` : ''}
+                    ${p.floating_banner?.enabled ? `<span style="font-size:0.72rem; background:rgba(236,72,153,0.15); color:#f472b6; padding:2px 6px; border-radius:4px; font-weight:700;">🔮 3D Float</span>` : ''}
+                    ${p.fb_pixel !== false ? `<span style="font-size:0.7rem; background:rgba(37,99,235,0.12); color:#60a5fa; padding:2px 5px; border-radius:4px;">🔵 Pixel</span>` : ''}
+                  </div>
                 </td>
-                <td>
-                  <span style="font-size:0.75rem;background:rgba(168,85,247,0.15);color:#c084fc;padding:2px 6px;border-radius:4px;font-weight:700;">
-                    🖼️ ${slidesCount} स्लाइड | 📑 ${secCount} सेक्शंस
-                  </span>
-                </td>
-                <td>
-                  <span style="font-size:0.72rem;background:rgba(37,99,235,0.15);color:#3b82f6;padding:2px 6px;border-radius:4px;font-weight:700;">
-                    ${p.fb_pixel !== false ? '🔵 FB + GA ON' : 'Off'}
-                  </span>
-                </td>
-                <td>
-                  <button type="button" onclick="window.toggleSitePageStatus('${p.id}')" class="admin-button small-button" style="background:${isLive ? 'rgba(22,163,74,0.15)' : 'rgba(239,68,68,0.15)'};color:${isLive ? '#16a34a' : '#ef4444'};border:1px solid ${isLive ? '#16a34a' : '#ef4444'};padding:3px 8px;border-radius:6px;font-size:0.78rem;font-weight:800;">
-                    ${isLive ? '🟢 Live' : '🔴 Offline'}
+                <td style="text-align: center;">
+                  <button type="button" onclick="window.toggleSitePageStatus('${p.id}')" class="admin-button small-button" style="background:${isLive ? 'rgba(22,163,74,0.15)' : 'rgba(239,68,68,0.15)'};color:${isLive ? '#16a34a' : '#ef4444'};border:1px solid ${isLive ? '#16a34a' : '#ef4444'};padding:3px 8px;border-radius:6px;font-size:0.76rem;font-weight:800; cursor: pointer;">
+                    ${isLive ? '🟢 Live' : '🔴 Draft'}
                   </button>
                 </td>
-                <td>
-                  <div style="display:flex;gap:6px;align-items:center;justify-content:center;">
-                    <button type="button" onclick="window.editSitePage('${p.id}')" class="admin-button small-button" style="background:#f59e0b;color:#000;font-weight:900;padding:5px 12px;" title="एडिट करें">
+                <td style="text-align: center;">
+                  <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
+                    <button type="button" onclick="window.editSitePage('${p.id}')" class="admin-button small-button" style="background: #f59e0b; color: #000; font-weight: 900; padding: 4px 10px; font-size: 0.78rem;" title="एडिट स्टूडियो खोलें">
                       ✏️ एडिट
                     </button>
-                    <a href="${p.url}" target="_blank" class="admin-button small-button" style="background:#2563eb;color:#fff;text-decoration:none;font-weight:700;" title="लाइव देखें">
+                    <a href="${p.url}" target="_blank" class="admin-button small-button" style="background: #2563eb; color: #fff; text-decoration: none; font-weight: 700; padding: 4px 8px; font-size: 0.78rem;" title="लाइव देखें">
                       👁️ देखें
                     </a>
                   </div>
@@ -3094,11 +4517,12 @@ export async function initPageEditor() {
         </tbody>
       </table>
 
-      <!-- 10 Pages Pagination Controller Bar -->
+      <!-- Directory Pagination Controller Bar -->
       <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#0f172a; border-top:1px solid var(--admin-border); flex-wrap:wrap; gap:10px; margin-top:8px; border-radius:0 0 10px 10px;">
         <div style="font-size:0.8rem; color:var(--admin-muted);">
           पेज <strong style="color:#38bdf8;">${pagesCurrentPage}</strong> का <strong style="color:#f8fafc;">${totalPages}</strong> (दिख रहे हैं: ${startIdx + 1}–${endIdx} / कुल: ${filtered.length} पेजेस)
         </div>
+        ${totalPages > 1 ? `
         <div style="display:flex; gap:6px; align-items:center;">
           <button type="button" onclick="window.changePagesPage(${pagesCurrentPage - 1})" ${pagesCurrentPage <= 1 ? 'disabled' : ''} class="admin-button small-button" style="padding:4px 10px; font-size:0.78rem; opacity:${pagesCurrentPage <= 1 ? '0.35' : '1'}; cursor:${pagesCurrentPage <= 1 ? 'not-allowed' : 'pointer'};">
             ◀ पिछला
@@ -3112,6 +4536,7 @@ export async function initPageEditor() {
             अगला ▶
           </button>
         </div>
+        ` : ''}
       </div>
     `;
   }
@@ -3127,6 +4552,8 @@ export async function initPageEditor() {
 
     editingPageId = p.id;
     document.getElementById('page-editor-form-title').textContent = `✏️ पेज एडिट करें: ${p.name}`;
+    const footerBadge = document.getElementById('pe_footer_active_badge');
+    if (footerBadge) footerBadge.textContent = `✏️ ${p.name || 'Site Page'}`;
     document.getElementById('pe_input_slug').value = p.slug || p.id;
     document.getElementById('pe_input_name').value = p.name || '';
     document.getElementById('pe_input_url').value = p.url || '';
@@ -3164,6 +4591,37 @@ export async function initPageEditor() {
       } else {
         ogPrevWrap.style.display = 'none';
       }
+    }
+
+    // 3.0 Floating 3D Banner & Live Animation Layer
+    const floatChk = document.getElementById('pe_chk_floating_banner');
+    const floatImg = document.getElementById('pe_input_floating_banner_img');
+    const floatTitle = document.getElementById('pe_input_floating_banner_title');
+    const floatLink = document.getElementById('pe_input_floating_banner_link');
+    const floatAnim = document.getElementById('pe_select_floating_banner_anim');
+    const floatPrevWrap = document.getElementById('pe_floating_banner_preview');
+    const floatPrevImg = document.getElementById('pe_floating_banner_preview_img');
+
+    const fbData = p.floating_banner || {};
+    if (floatChk) floatChk.checked = Boolean(fbData.enabled);
+    if (floatImg) floatImg.value = fbData.image || '';
+    if (floatTitle) floatTitle.value = fbData.badge_title || '';
+    if (floatLink) floatLink.value = fbData.action_link || '';
+    if (floatAnim) floatAnim.value = fbData.animation || 'ublFloatBook3D';
+
+    if (floatPrevWrap && floatPrevImg) {
+      if (fbData.image) {
+        floatPrevImg.src = fbData.image;
+        floatPrevWrap.style.display = 'block';
+      } else {
+        floatPrevWrap.style.display = 'none';
+      }
+    }
+
+    // Studio Category Pill in top bar
+    const studioCatPill = document.getElementById('pe_studio_cat_pill');
+    if (studioCatPill) {
+      studioCatPill.textContent = `${p.category || 'eBooks'} • ${p.slug || p.id}`;
     }
 
     currentSlides = Array.isArray(p.hero_slides) ? JSON.parse(JSON.stringify(p.hero_slides)) : [];
@@ -3211,6 +4669,8 @@ export async function initPageEditor() {
   function resetPageForm() {
     editingPageId = null;
     document.getElementById('page-editor-form-title').textContent = 'नया साइट पेज बनाएं (Universal Page Editor Drawer)';
+    const footerBadge = document.getElementById('pe_footer_active_badge');
+    if (footerBadge) footerBadge.textContent = '✨ नया साइट पेज (New Page)';
     document.getElementById('site-page-customizer-form')?.reset();
     const audioTitleEl = document.getElementById('pe_input_audio_title');
     const audioScriptEl = document.getElementById('pe_input_audio_script');
@@ -3228,6 +4688,23 @@ export async function initPageEditor() {
 
     const ogPrevWrap = document.getElementById('pe_og_image_preview');
     if (ogPrevWrap) ogPrevWrap.style.display = 'none';
+
+    // Reset Floating 3D Banner
+    const floatChk = document.getElementById('pe_chk_floating_banner');
+    const floatImg = document.getElementById('pe_input_floating_banner_img');
+    const floatTitle = document.getElementById('pe_input_floating_banner_title');
+    const floatLink = document.getElementById('pe_input_floating_banner_link');
+    const floatAnim = document.getElementById('pe_select_floating_banner_anim');
+    const floatPrevWrap = document.getElementById('pe_floating_banner_preview');
+    if (floatChk) floatChk.checked = false;
+    if (floatImg) floatImg.value = '';
+    if (floatTitle) floatTitle.value = '';
+    if (floatLink) floatLink.value = '';
+    if (floatAnim) floatAnim.value = 'ublFloatBook3D';
+    if (floatPrevWrap) floatPrevWrap.style.display = 'none';
+
+    const studioCatPill = document.getElementById('pe_studio_cat_pill');
+    if (studioCatPill) studioCatPill.textContent = 'New Page Studio';
 
     currentSlides = [];
     currentSectionsOrder = ALL_SECTION_DEFS.map(s => s.key);
@@ -3278,6 +4755,21 @@ export async function initPageEditor() {
     const ogDesc = (document.getElementById('pe_input_og_description')?.value || '').trim();
     const shareMsg = (document.getElementById('pe_input_share_message')?.value || '').trim();
 
+    // 3.0 Floating 3D Banner
+    const floatEnabled = document.getElementById('pe_chk_floating_banner')?.checked || false;
+    const floatImg = (document.getElementById('pe_input_floating_banner_img')?.value || '').trim();
+    const floatTitle = (document.getElementById('pe_input_floating_banner_title')?.value || '').trim();
+    const floatLink = (document.getElementById('pe_input_floating_banner_link')?.value || '').trim();
+    const floatAnim = document.getElementById('pe_select_floating_banner_anim')?.value || 'ublFloatBook3D';
+
+    const floating_banner = {
+      enabled: floatEnabled,
+      image: floatImg,
+      badge_title: floatTitle,
+      action_link: floatLink,
+      animation: floatAnim
+    };
+
     const pageObj = {
       id: editingPageId || `page_${slug.replace(/[^a-zA-Z0-9_]/g, '_')}`,
       slug: slug,
@@ -3294,6 +4786,7 @@ export async function initPageEditor() {
       og_image: ogImage,
       og_description: ogDesc,
       share_message: shareMsg,
+      floating_banner: floating_banner,
       fb_pixel: fb,
       ga_tag: ga,
       hero_slides: currentSlides,
@@ -3324,6 +4817,17 @@ export async function initPageEditor() {
     resetPageForm();
     renderPagesTable();
     showToast(`✅ पेज '${name}' सम्पूर्ण कॉन्फ़िगरेशन के साथ सुरक्षित हो गया!`, 'success');
+
+    // Auto Git Live Sync on Save
+    try {
+      const configStr = JSON.stringify({ sitePages: allPages }, null, 2);
+      const base64Data = btoa(unescape(encodeURIComponent(configStr)));
+      syncAssetToGitHub('data/site-pages-config.json', base64Data).then(res => {
+        if (res.success) {
+          showToast('🚀 GitHub पर site-pages-config.json ऑटो-सिंक हो गया!', 'info');
+        }
+      }).catch(() => {});
+    } catch (e) {}
   }
 
   function savePagesToStorage() {
@@ -3392,16 +4896,18 @@ export async function initPageEditor() {
 
   // Check URL hash/query for direct page editor target
   try {
-    const rawHash = location.hash || location.search || '';
-    const queryPart = rawHash.includes('?') ? rawHash.split('?')[1] : '';
+    let queryPart = '';
+    if (location.hash && location.hash.includes('?')) {
+      queryPart = location.hash.substring(location.hash.indexOf('?') + 1);
+    } else if (location.search && location.search.length > 1) {
+      queryPart = location.search.substring(1);
+    }
     const params = new URLSearchParams(queryPart);
     const targetPage = params.get('page');
     if (targetPage) {
-      const found = allPages.find(p => p.slug === targetPage || p.id.includes(targetPage));
+      const found = allPages.find(p => p.slug === targetPage || p.id === targetPage || p.id.includes(targetPage) || (targetPage === 'home' && (p.slug === 'index' || p.id === 'page_home')) || (targetPage === 'pashu' && (p.id.includes('pashu') || p.id.includes('cattle'))));
       if (found) {
-        setTimeout(() => {
-          window.editSitePage(found.id);
-        }, 150);
+        window.editSitePage(found.id);
       }
     }
   } catch (e) {}

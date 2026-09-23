@@ -867,3 +867,15 @@ body {
   transform: translateY(-3px);
 }
 
+/* 3D Floating Book & Banner Animation Layer */
+@keyframes ublFloatBook3DAnim {
+  0% { transform: translateY(0px) rotateX(4deg) rotateY(-4deg); }
+  50% { transform: translateY(-8px) rotateX(8deg) rotateY(-8deg); }
+  100% { transform: translateY(0px) rotateX(4deg) rotateY(-4deg); }
+}
+
+.ubl-float-3d-anim {
+  animation: ublFloatBook3DAnim 3.5s ease-in-out infinite;
+  perspective: 800px;
+}
+

@@ -13,19 +13,35 @@
   <link rel="manifest" href="admin-manifest.json">
   <meta name="theme-color" content="#0f172a">
 
-  <!-- Security Check -->
+  <!-- Security Check & Localhost Auto-Session -->
   <script>
+    const isLocal = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
+    if (isLocal && !localStorage.getItem('admin_session')) {
+      localStorage.setItem('admin_session', 'true');
+    }
     const adminSession = localStorage.getItem('admin_session');
-    if (!adminSession) {
+    if (!adminSession && !isLocal) {
       window.location.replace('login.html');
+    }
+    if ('caches' in window) {
+      caches.keys().then(keys => {
+        keys.forEach(k => {
+          if (k !== 'aarogyam-admin-shell-v41') caches.delete(k);
+        });
+      });
+    }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.update());
+      });
     }
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/admin-panel.css?v=26.0">
-  <link rel="stylesheet" href="../css/admin-components.css?v=26.0">
+  <link rel="stylesheet" href="../css/admin-panel.css?v=41.0">
+  <link rel="stylesheet" href="../css/admin-components.css?v=41.0">
 </head>
 <body>
   <div id="admin-app" class="admin-app">
@@ -47,6 +63,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="../js/admin-main.js?v=26.0"></script>
+  <script type="module" src="../js/admin-main.js?v=41.0"></script>
 </body>
 </html>

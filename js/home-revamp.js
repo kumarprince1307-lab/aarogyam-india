@@ -499,6 +499,27 @@
         tickerTrack.textContent = realAlerts.join('   ✦   ');
       }
     }
+
+    // 3.0 Floating 3D Banner injection if active
+    if (config.floating_banner && config.floating_banner.enabled && config.floating_banner.image) {
+      let fbEl = document.getElementById('home-3d-floating-banner');
+      if (!fbEl) {
+        fbEl = document.createElement('div');
+        fbEl.id = 'home-3d-floating-banner';
+        fbEl.style.cssText = `
+          position: fixed; bottom: 85px; right: 20px; z-index: 9999;
+          max-width: 140px; cursor: pointer; transition: transform 0.3s ease;
+        `;
+        document.body.appendChild(fbEl);
+      }
+      const animClass = config.floating_banner.animation === 'none' ? '' : 'ubl-float-3d-anim';
+      fbEl.innerHTML = `
+        <a href="${config.floating_banner.action_link || '#'}" style="display:block; text-decoration:none; text-align:center;">
+          ${config.floating_banner.badge_title ? `<div style="background:#16a34a; color:#fff; font-size:0.68rem; font-weight:800; padding:2px 8px; border-radius:10px; margin-bottom:4px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">${config.floating_banner.badge_title}</div>` : ''}
+          <img src="${config.floating_banner.image}" alt="Special Feature" class="${animClass}" style="width:100%; border-radius:12px; box-shadow:0 12px 28px rgba(0,0,0,0.5); border:2px solid #38bdf8;" />
+        </a>
+      `;
+    }
   }
 
   // -------------------------------------------------------------

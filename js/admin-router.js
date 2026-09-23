@@ -15,7 +15,7 @@ const ROUTES = {
   'all-landing-pages': () => import('./admin-pages-landing-pages.js?v=31.4').then(m => m.initAllLandingPages()),
   'book-landing-pages': () => import('./admin-pages-book-landing.js?v=39.1').then(m => m.initBookLandingPages()),
   'book-audio-studio': () => import('./admin-pages-book-audio-studio.js?v=3.4').then(m => m.initBookAudioStudio()),
-  'page-editor': () => import('./admin-pages-page-editor.js?v=30.1').then(m => m.initPageEditor()),
+  'page-editor': () => import('./admin-pages-page-editor.js?v=31.0').then(m => m.initPageEditor()),
   'product-landing-pages': () => import('./admin-pages-product-landing.js').then(m => m.initProductLandingPages()),
   'marketing-templates': () => import('./admin-pages-smart-etailer.js?v=4.2').then(m => m.initSmartEtailerAdmin('adm-sec-marketing')),
   'purchases': () => import('./admin-pages-purchases.js').then(m => m.initPurchases()),
@@ -126,10 +126,11 @@ function getDefaultRouteFromUrl() {
     if (h) return h;
   }
   const p = location.pathname.toLowerCase();
+  const search = location.search || '';
   for (const r of Object.keys(ROUTES)) {
-    if (p.includes(r)) return r;
+    if (p.includes(r)) return `${r}${search}`;
   }
-  return 'dashboard';
+  return `dashboard${search}`;
 }
 
 export function initRouter() {
