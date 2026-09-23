@@ -130,6 +130,46 @@
   <meta name="apple-mobile-web-app-title" content="Aarogyam">
 
   <style>
+    /* FLOATING FREE DEMO BUTTON: Pinned to Left-Center screen edge */
+    #floating-free-demo-btn,
+    .floating-demo-blink-btn {
+      position: fixed !important;
+      left: 0 !important;
+      top: 50% !important;
+      bottom: auto !important;
+      right: auto !important;
+      transform: translateY(-50%) !important;
+      z-index: 99998 !important;
+      background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+      color: #ffffff !important;
+      padding: 10px 14px 10px 10px !important;
+      border-radius: 0 30px 30px 0 !important;
+      font-size: 0.85rem !important;
+      font-weight: 800 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      box-shadow: 4px 6px 20px rgba(220, 38, 38, 0.5) !important;
+      border: 2px solid #ffffff !important;
+      border-left: none !important;
+      text-decoration: none !important;
+      animation: pureRedPulseBlink 1.4s infinite ease-in-out !important;
+      cursor: pointer !important;
+      white-space: nowrap !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+    @keyframes pureRedPulseBlink {
+      0%, 100% {
+        box-shadow: 4px 6px 20px rgba(220, 38, 38, 0.6);
+        transform: translateY(-50%) scale(1);
+      }
+      50% {
+        box-shadow: 4px 8px 30px rgba(220, 38, 38, 0.95);
+        transform: translateY(-50%) scale(1.06);
+      }
+    }
+
     /* 3D FLOATING BOOK COVER ANIMATION */
     @keyframes ublFloatBook3D {
       0% {
@@ -451,21 +491,25 @@
        1. LOGIN POPUP
        ========================================== -->
   <div id="login-popup-overlay"
-    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; display: none; justify-content: center; align-items: center;">
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: 99999; display: none; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
     <div
-      style="background: #ffffff; padding: 30px; width: 100%; max-width: 380px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; font-family: sans-serif; position: relative;">
+      style="background: #ffffff; padding: 28px 24px; width: 100%; max-width: 380px; border-radius: 14px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); text-align: center; font-family: sans-serif; position: relative;">
       <button onclick="closeLoginPopup()"
-        style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 20px; color: #888; cursor: pointer; line-height: 1;">&times;</button>
-      <h2 style="margin-bottom: 10px; color: #333; font-size: 22px;">लॉगिन करें</h2>
-      <p style="font-size: 14px; color: #666; margin-bottom: 20px;">अपनी डिजिटल लाइब्रेरी देखने के लिए रजिस्टर्ड मोबाइल
-        नंबर दर्ज करें</p>
-      <input type="tel" id="login-mobile" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10"
-        style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; outline: none;">
-      <button onclick="checkUserLogin()"
-        style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">लॉगिन
-        करें</button>
-      <p style="margin-top: 20px; font-size: 14px; color: #555;">नया यूजर हैं? <a href="/registration.html"
-          style="color: #007bff; text-decoration: none; font-weight: bold;">यहाँ साइन अप करें</a></p>
+        style="position: absolute; top: 12px; right: 14px; background: transparent; border: none; font-size: 24px; color: #888; cursor: pointer; line-height: 1;" title="बंद करें">&times;</button>
+      <div style="font-size: 32px; margin-bottom: 6px;">📖</div>
+      <h2 style="margin: 0 0 6px 0; color: #1e293b; font-size: 21px; font-weight: 800;">फ्री डेमो रीडर एक्सेस</h2>
+      <p style="font-size: 13px; color: #64748b; margin: 0 0 18px 0; line-height: 1.4;">कृपया अपना नाम व 10 अंकों का मोबाइल नंबर दर्ज कर तुरंत पढ़ना व सुनना शुरू करें:</p>
+      <input type="text" id="login-name" placeholder="आपका पूरा नाम (उदा. रमेश पटेल)"
+        style="width: 100%; padding: 12px 14px; margin-bottom: 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none;">
+      <input type="tel" id="login-mobile" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10"
+        style="width: 100%; padding: 12px 14px; margin-bottom: 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none;">
+      <button id="btn-login-submit" onclick="checkUserLoginOrRegister()"
+        style="width: 100%; padding: 13px; background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 800; box-shadow: 0 4px 12px rgba(22,163,74,0.35);">
+        🚀 डेमो रीडर में प्रवेश करें
+      </button>
+      <p style="margin: 14px 0 0 0; font-size: 12px; color: #64748b;">
+        🔒 100% सुरक्षित • कोई पासवर्ड आवश्यक नहीं • सीधे रीडर खुलेगा
+      </p>
     </div>
   </div>
 
@@ -633,7 +677,7 @@
         <!-- HERO ACTION BUTTONS -->
         <div class="hero-action-buttons">
           <!-- Free Sample -->
-          <a href="demo-kharif.html?id=BK002" class="sample-btn">
+          <a href="javascript:void(0)" onclick="openDemoReaderWithAuth('DEMO-BK002')" class="sample-btn" title="मुफ़्त डेमो पढ़ें">
             <i class="fa-solid fa-book-open"></i> Free Sample
           </a>
           <!-- Add to Cart -->
@@ -752,8 +796,8 @@
 
         <!-- FB In-App Browser Open In Chrome Helper Banner -->
         <div id="aoiFbBrowserNotice"
-          style="display: none; background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(30,58,138,0.4)); border: 1px solid rgba(96,165,250,0.5); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          style="display: none; background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(30,58,138,0.4)); border: 1px solid rgba(96,165,250,0.5); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; position: relative;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-right: 28px;">
             <div style="font-size: 0.88rem; color: #bfdbfe; font-weight: 600;">
               📱 <strong>Facebook / In-App यूजर:</strong> ऑडियो और सुरक्षित UPI पेमेंट के लिए Chrome में खोलें
             </div>
@@ -762,6 +806,8 @@
               🌐 Chrome में खोलें
             </a>
           </div>
+          <button type="button" onclick="dismissFbBrowserNotice()"
+            style="position: absolute; top: 8px; right: 10px; background: transparent; border: none; color: #bfdbfe; font-size: 22px; font-weight: 700; cursor: pointer; line-height: 1; padding: 2px 6px;" title="सूचना बंद करें">&times;</button>
         </div>
 
         <!-- Animated Sound Wave Visualizer & Status -->
@@ -875,8 +921,8 @@
             style="background: linear-gradient(135deg, #dc2626, #991b1b); border: 2px solid #fbbf24; color: #ffffff; font-size: 1.1rem; font-weight: 900; padding: 14px 32px; border-radius: 30px; text-decoration: none; box-shadow: 0 6px 22px rgba(220,38,38,0.5); display: inline-flex; align-items: center; gap: 8px; transition: transform 0.2s;">
             <span>⚡</span> अभी ₹99 में खरीदें और ऑडियो सुनें
           </a>
-          <a href="demo-kharif.html?id=BK002"
-            style="background: rgba(255,255,255,0.12); color: #ffffff; font-size: 0.95rem; font-weight: 800; padding: 14px 24px; border-radius: 30px; text-decoration: none; border: 1px solid rgba(255,255,255,0.3); display: inline-flex; align-items: center; gap: 6px;">
+          <a href="javascript:void(0)" onclick="openDemoReaderWithAuth('DEMO-BK002')"
+            style="background: rgba(255,255,255,0.12); color: #ffffff; font-size: 0.95rem; font-weight: 800; padding: 14px 24px; border-radius: 30px; text-decoration: none; border: 1px solid rgba(255,255,255,0.3); display: inline-flex; align-items: center; gap: 6px;" title="मुफ़्त डेमो पढ़ें">
             <span>📖</span> फ्री डेमो देखें
           </a>
         </div>
@@ -946,7 +992,7 @@
         </div>
       </div>
 
-      <!-- BOTH BOOKS SHOWCASE UNDER VIDEO -->
+      <!-- BOOKS COMBO SHOWCASE UNDER VIDEO -->
       <div class="ubl-video-books-grid">
         <!-- Book 1: खेती का डॉक्टर -->
         <div class="ubl-video-book-card">
@@ -993,13 +1039,35 @@
             </div>
           </div>
         </div>
+
+        <!-- Book 3: सब्जी उत्पादन सम्पूर्ण मास्टर गाइड 2026 (BK015) -->
+        <div class="ubl-video-book-card">
+          <img src="../images/books/bk015-cover.webp" alt="सब्जी उत्पादन सम्पूर्ण मास्टर गाइड कवर"
+            style="width: 100px; height: 140px; object-fit: cover; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); flex-shrink: 0; animation: ublFloatBook3D 4.5s ease-in-out infinite 3s;">
+          <div style="text-align: left; flex: 1;">
+            <span
+              style="background: #ea580c; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; display: inline-block;">🥦
+              सब्जी मास्टर गाइड</span>
+            <h3 style="font-size: 1.05rem; font-weight: 900; color: #1e293b; margin: 4px 0 2px 0;">सब्जी उत्पादन मास्टर गाइड</h3>
+            <p style="font-size: 0.78rem; color: #64748b; margin: 0 0 8px 0;">120+ रंगीन पेज • 300+ फोटो • स्प्रे साइंस + Audio
+            </p>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span style="font-size: 1.2rem; font-weight: 900; color: #2E7D32;">₹149</span>
+              <span style="font-size: 0.82rem; text-decoration: line-through; color: #94a3b8;">₹1,999</span>
+              <button type="button" onclick="addBookToCart('BK015', 'सब्जी उत्पादन सम्पूर्ण मास्टर गाइड (PART 1)', 149, this)"
+                class="ubl-btn-add-cart-mini" title="कार्ट में जोड़ें">
+                <i class="fa-solid fa-cart-plus"></i> कार्ट में जोड़ें
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
         style="text-align: center; margin-top: 25px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
         <button type="button" onclick="addBothBooksToCart(this)" class="preview-buy-btn"
           style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #16a34a, #15803d); border: none; cursor: pointer;">
-          📦 दोनों पुस्तकें कार्ट में जोड़ें (₹198)
+          📦 पुस्तकें कार्ट में जोड़ें (Super Combo - ₹347)
         </button>
         <a href="cart.html" class="preview-buy-btn"
           style="display: inline-flex; align-items: center; gap: 8px; background: #2563eb;">
@@ -1304,11 +1372,36 @@
       </div>
 
       <div class="ubl-suggested-grid">
-        <!-- Related Book: खरीफ फसल मास्टर गाइड 2026 -->
+        <!-- Book 1: खेती का डॉक्टर -->
+        <div class="ubl-suggested-card">
+          <img src="../images/books/fasal-ka-doctor-cover.webp" alt="खेती का डॉक्टर"
+            class="ubl-suggested-thumb">
+          <div class="ubl-suggested-info">
+            <span style="background: #2E7D32; color: #fff; font-size: 0.68rem; font-weight: 800; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-bottom: 3px;">बेस्टसेलर गाइड</span>
+            <h4>खेती का डॉक्टर (Pocket Doctor)</h4>
+            <div class="price-row">
+              <span class="price">₹99</span>
+              <span class="mrp">₹299</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <button type="button" class="ubl-btn-add-cart-mini"
+                onclick="addBookToCart('BK002', 'खेती का डॉक्टर', 99, this)">
+                <i class="fa-solid fa-cart-plus"></i> कार्ट में जोड़ें
+              </button>
+              <a href="javascript:void(0)" onclick="openDemoReaderWithAuth('DEMO-BK002')"
+                style="font-size:0.78rem;color:#2E7D32;font-weight:700;text-decoration:underline;">
+                फ्री डेमो पढ़ें &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book 2: खरीफ फसल मास्टर गाइड 2026 -->
         <div class="ubl-suggested-card">
           <img src="../images/books/kharif-master-guide-2026-cover.webp" alt="खरीफ फसल मास्टर गाइड 2026"
             class="ubl-suggested-thumb">
           <div class="ubl-suggested-info">
+            <span style="background: #0284c7; color: #fff; font-size: 0.68rem; font-weight: 800; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-bottom: 3px;">40+ फसलें</span>
             <h4>खरीफ फसल मास्टर गाइड 2026</h4>
             <div class="price-row">
               <span class="price">₹99</span>
@@ -1320,8 +1413,32 @@
                 <i class="fa-solid fa-cart-plus"></i> कार्ट में जोड़ें
               </button>
               <a href="kharif-master-guide-2026.html"
-                style="font-size:0.78rem;color:#2E7D32;font-weight:700;text-decoration:underline;">
+                style="font-size:0.78rem;color:#0284c7;font-weight:700;text-decoration:underline;">
                 विवरण देखें &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book 3: सब्जी उत्पादन सम्पूर्ण मास्टर गाइड (PART 1) -->
+        <div class="ubl-suggested-card">
+          <img src="../images/books/bk015-cover.webp" alt="सब्जी उत्पादन सम्पूर्ण मास्टर गाइड 2026"
+            class="ubl-suggested-thumb">
+          <div class="ubl-suggested-info">
+            <span style="background: #ea580c; color: #fff; font-size: 0.68rem; font-weight: 800; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-bottom: 3px;">स्प्रे + Audio</span>
+            <h4>सब्जी उत्पादन सम्पूर्ण मास्टर गाइड</h4>
+            <div class="price-row">
+              <span class="price">₹149</span>
+              <span class="mrp">₹1,999</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <button type="button" class="ubl-btn-add-cart-mini"
+                onclick="addBookToCart('BK015', 'सब्जी उत्पादन सम्पूर्ण मास्टर गाइड (PART 1)', 149, this)">
+                <i class="fa-solid fa-cart-plus"></i> कार्ट में जोड़ें
+              </button>
+              <a href="javascript:void(0)" onclick="openDemoReaderWithAuth('DEMO-BK015')"
+                style="font-size:0.78rem;color:#ea580c;font-weight:700;text-decoration:underline;">
+                डेमो देखें &rarr;
               </a>
             </div>
           </div>
@@ -1864,6 +1981,50 @@
 
         </div>
 
+        <div class="review-card">
+
+          <div class="review-stars">
+
+            ⭐⭐⭐⭐⭐
+
+          </div>
+
+          <p>
+
+            "खेती का डॉक्टर के साथ मैंने BK015 (सब्जी उत्पादन मास्टर गाइड) भी ली। मिर्च और टमाटर में थ्रिप्स व उकठा रोग का सटीक स्प्रे चार्ट और ऑडियो फीचर कमाल का है! अब खेत पर काम करते हुए भी सुन लेता हूँ।"
+
+          </p>
+
+          <h4>
+
+            — रमेश पाटीदार, खरगोन (मध्य प्रदेश)
+
+          </h4>
+
+        </div>
+
+        <div class="review-card">
+
+          <div class="review-stars">
+
+            ⭐⭐⭐⭐⭐
+
+          </div>
+
+          <p>
+
+            "सब्जी की अगेती खेती और सही फर्टिगेशन शेड्यूल से मेरी गोभी व शिमला मिर्च की लागत 40% घटी और पैदावार जबरदस्त मिली। ऑडियो सुनकर समझना और भी आसान हो जाता है।"
+
+          </p>
+
+          <h4>
+
+            — वीरेन्द्र यादव, नासिक (महाराष्ट्र)
+
+          </h4>
+
+        </div>
+
       </div>
 
     </div>
@@ -1928,7 +2089,7 @@
 
           <div class="final-buttons">
 
-            <a href="demo-kharif.html?id=BK002" class="sample-btn">
+            <a href="javascript:void(0)" onclick="openDemoReaderWithAuth('DEMO-BK002')" class="sample-btn" title="मुफ़्त डेमो पढ़ें">
 
               📖 Sample Book
 
@@ -2089,11 +2250,11 @@
   </div>
 
   <!-- ==========================================================
-       DISABLED FLOATING BUTTONS (REMOVED CLUTTER AS REQUESTED)
+       LEFT-CENTER FLOATING DEMO BUTTON
        ========================================================== -->
   <a id="floating-free-demo-btn" href="javascript:void(0)" onclick="openDemoReaderWithAuth('DEMO-BK002')"
-    class="floating-demo-blink-btn" style="display: none !important;" title="मुफ्त डेमो पढ़ें / सुनें">
-    <i class="fa-solid fa-book-open"></i> <span>फ्री डेमो पढ़ें / सुनें</span> <i class="fa-solid fa-headphones"></i>
+    class="floating-demo-blink-btn" title="मुफ्त डेमो पढ़ें / सुनें">
+    <i class="fa-solid fa-book-open"></i> <span>फ्री डेमो पढ़ें</span> <i class="fa-solid fa-headphones"></i>
   </a>
 
   <a id="sticky-help-btn" href="https://wa.me/917974422572?text=Hello%20Aarogyam%20India%20Team" target="_blank"
@@ -2349,28 +2510,165 @@
       } catch (e) { }
 
       if (!isLogged) {
-        if (typeof openLoginPopup === 'function') {
-          sessionStorage.setItem('AIM_PENDING_DEMO_URL', readerDemoUrl);
-          openLoginPopup();
-          return;
-        }
+        sessionStorage.setItem('AIM_PENDING_DEMO_URL', readerDemoUrl);
+        openLoginPopup();
+        return;
       }
       window.location.href = readerDemoUrl;
     }
     window.openDemoReaderWithAuth = openDemoReaderWithAuth;
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const pending = sessionStorage.getItem('AIM_PENDING_DEMO_URL');
-      if (pending) {
-        try {
-          const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-          if (u && (u.id || u.phone || u.mobile)) {
-            sessionStorage.removeItem('AIM_PENDING_DEMO_URL');
-            window.location.href = pending;
-          }
-        } catch (e) { }
+    async function checkUserLoginOrRegister() {
+      const nameInput = (document.getElementById('login-name')?.value || '').trim();
+      const mobileInput = (document.getElementById('login-mobile')?.value || '').trim();
+
+      if (!mobileInput || mobileInput.length < 10) {
+        alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।');
+        document.getElementById('login-mobile')?.focus();
+        return;
       }
-    });
+
+      const cleanMobile = mobileInput.replace(/\D/g, '').slice(-10);
+      if (cleanMobile.length !== 10) {
+        alert('कृपया 10 अंकों का वैध भारतीय मोबाइल नंबर दर्ज करें।');
+        return;
+      }
+
+      const submitBtn = document.getElementById('btn-login-submit');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ सत्यापन हो रहा है...';
+      }
+
+      try {
+        const activeDb = window.dbClient || window.supabase;
+        let userData = null;
+
+        if (activeDb) {
+          try {
+            const { data, error } = await activeDb
+              .from('profiles')
+              .select('*')
+              .eq('mobile', cleanMobile)
+              .limit(1);
+
+            if (!error && data && data.length > 0) {
+              // Existing registered user: DO NOT OVERWRITE REGISTERED NAME
+              userData = data[0];
+            }
+          } catch (e) {
+            console.warn('DB lookup error:', e);
+          }
+        }
+
+        if (userData) {
+          // Registered user found: preserve existing registered name
+          const finalName = userData.full_name || nameInput || 'किसान मित्र';
+          if (typeof SessionManager !== 'undefined' && SessionManager.save) {
+            SessionManager.save({
+              mobile: userData.mobile || cleanMobile,
+              name: finalName,
+              loginTime: new Date().toISOString(),
+              active: true
+            });
+          }
+          if (typeof UserStorage !== 'undefined' && UserStorage.save) {
+            UserStorage.save(userData);
+          }
+          localStorage.setItem('aim_user_mobile', cleanMobile);
+          localStorage.setItem('aim_user_name', finalName);
+          localStorage.setItem('AI_USER', JSON.stringify({
+            id: userData.id || cleanMobile,
+            phone: cleanMobile,
+            mobile: cleanMobile,
+            full_name: finalName,
+            name: finalName
+          }));
+        } else {
+          // New unregistered user: take name and mobile, insert if possible
+          const finalName = nameInput || 'किसान मित्र';
+          let newId = 'USR_' + cleanMobile;
+
+          if (activeDb) {
+            try {
+              const { data: inserted } = await activeDb
+                .from('profiles')
+                .insert([{
+                  full_name: finalName,
+                  mobile: cleanMobile
+                }])
+                .select();
+              if (inserted && inserted.length > 0) {
+                newId = inserted[0].id || newId;
+              }
+            } catch (e) {
+              console.warn('DB insert guest error (non-fatal):', e);
+            }
+          }
+
+          const userObj = {
+            id: newId,
+            mobile: cleanMobile,
+            phone: cleanMobile,
+            full_name: finalName,
+            name: finalName,
+            is_new: true
+          };
+
+          if (typeof SessionManager !== 'undefined' && SessionManager.save) {
+            SessionManager.save({
+              mobile: cleanMobile,
+              name: finalName,
+              loginTime: new Date().toISOString(),
+              active: true
+            });
+          }
+          if (typeof UserStorage !== 'undefined' && UserStorage.save) {
+            UserStorage.save(userObj);
+          }
+          localStorage.setItem('aim_user_mobile', cleanMobile);
+          localStorage.setItem('aim_user_name', finalName);
+          localStorage.setItem('AI_USER', JSON.stringify(userObj));
+        }
+
+        // Close login popup
+        closeLoginPopup();
+
+        // Redirect directly to pending reader demo or default DEMO-BK002
+        const pendingUrl = sessionStorage.getItem('AIM_PENDING_DEMO_URL') || '/ebooks/reader.html?book=DEMO-BK002&demo=1';
+        sessionStorage.removeItem('AIM_PENDING_DEMO_URL');
+        window.location.href = pendingUrl;
+
+      } catch (err) {
+        console.error('Demo auth error:', err);
+        const finalName = nameInput || 'किसान मित्र';
+        localStorage.setItem('aim_user_mobile', cleanMobile);
+        localStorage.setItem('aim_user_name', finalName);
+        localStorage.setItem('AI_USER', JSON.stringify({
+          phone: cleanMobile,
+          mobile: cleanMobile,
+          full_name: finalName
+        }));
+        closeLoginPopup();
+        const pendingUrl = sessionStorage.getItem('AIM_PENDING_DEMO_URL') || '/ebooks/reader.html?book=DEMO-BK002&demo=1';
+        sessionStorage.removeItem('AIM_PENDING_DEMO_URL');
+        window.location.href = pendingUrl;
+      }
+    }
+    window.checkUserLoginOrRegister = checkUserLoginOrRegister;
+
+    function dismissFbBrowserNotice() {
+      try {
+        localStorage.setItem('AIM_FB_NOTICE_DISMISSED', 'true');
+      } catch (e) { }
+      const fbBanner = document.getElementById('aoiFbBrowserNotice');
+      if (fbBanner) fbBanner.style.display = 'none';
+      const status = document.getElementById('landingAudioStatusText');
+      if (status && status.innerHTML.includes('Facebook')) {
+        status.innerHTML = '🔊 ऑडियो तैयार है • Play बटन दबाएं';
+      }
+    }
+    window.dismissFbBrowserNotice = dismissFbBrowserNotice;
 
     function logoutUser() {
       localStorage.removeItem('AI_USER');
@@ -2429,7 +2727,7 @@
         let items = raw ? JSON.parse(raw) : [];
         if (!Array.isArray(items)) items = [];
 
-        ['BK002', 'BK001'].forEach(id => {
+        ['BK002', 'BK001', 'BK015'].forEach(id => {
           if (!items.includes(id)) items.push(id);
         });
         localStorage.setItem('AI_CART_ITEMS', JSON.stringify(items));
@@ -2437,16 +2735,16 @@
 
         if (typeof window.fbq === 'function') {
           window.fbq('track', 'AddToCart', {
-            content_name: 'Combo: खेती का डॉक्टर + खरीफ फसल मास्टर गाइड 2026',
-            content_ids: ['BK002', 'BK001'],
-            value: 198,
+            content_name: 'Combo: खेती का डॉक्टर + खरीफ फसल गाइड + सब्जी उत्पादन गाइड',
+            content_ids: ['BK002', 'BK001', 'BK015'],
+            value: 347,
             currency: 'INR'
           });
         }
 
         if (btnElement) {
           const originalHTML = btnElement.innerHTML;
-          btnElement.innerHTML = '<i class="fa-solid fa-circle-check"></i> दोनों पुस्तकें कार्ट में जुड़ गईं!';
+          btnElement.innerHTML = '<i class="fa-solid fa-circle-check"></i> सभी पुस्तकें कार्ट में जुड़ गईं!';
           btnElement.style.background = '#15803d';
           setTimeout(() => {
             btnElement.innerHTML = originalHTML;
@@ -2454,7 +2752,7 @@
           }, 2500);
         }
 
-        showCartToast(`🛒 दोनों पुस्तकें कार्ट में जोड़ दी गई हैं! (कुल: ${items.length})`);
+        showCartToast(`🛒 सभी 3 पुस्तकें कार्ट में जोड़ दी गई हैं! (कुल: ${items.length})`);
       } catch (e) {
         console.error('addBothBooksToCart error:', e);
       }
@@ -2845,8 +3143,13 @@
         try { window.speechSynthesis.getVoices(); } catch (e) { }
       }
 
+      let fbNoticeDismissed = false;
+      try {
+        fbNoticeDismissed = (localStorage.getItem('AIM_FB_NOTICE_DISMISSED') === 'true');
+      } catch (e) { }
+
       const isFB = /FBAN|FBAV|FB_IAB|Instagram|Line/i.test(navigator.userAgent || '');
-      if (isFB) {
+      if (isFB && !fbNoticeDismissed) {
         const fbBanner = document.getElementById('aoiFbBrowserNotice');
         if (fbBanner) fbBanner.style.display = 'block';
         const status = document.getElementById('landingAudioStatusText');
@@ -3084,7 +3387,6 @@
     }
 
     /* STRICT DISABLE OF CONFUSING FLOATING BUTTONS */
-    #floating-free-demo-btn,
     #sticky-help-btn,
     #floating-pwa-install-btn {
       display: none !important;

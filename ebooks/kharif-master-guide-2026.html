@@ -703,8 +703,8 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
       </div>
 
       <!-- FB In-App Browser Open In Chrome Helper Banner -->
-      <div id="aoiFbBrowserNotice" style="display: none; background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(30,58,138,0.4)); border: 1px solid rgba(96,165,250,0.5); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+      <div id="aoiFbBrowserNotice" style="display: none; background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(30,58,138,0.4)); border: 1px solid rgba(96,165,250,0.5); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; position: relative;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-right: 28px;">
           <div style="font-size: 0.88rem; color: #bfdbfe; font-weight: 600;">
             📱 <strong>Facebook / In-App यूजर:</strong> ऑडियो और सुरक्षित UPI पेमेंट के लिए Chrome में खोलें
           </div>
@@ -712,6 +712,8 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
             🌐 Chrome में खोलें
           </a>
         </div>
+        <button type="button" onclick="dismissFbBrowserNotice()"
+          style="position: absolute; top: 8px; right: 10px; background: transparent; border: none; color: #bfdbfe; font-size: 22px; font-weight: 700; cursor: pointer; line-height: 1; padding: 2px 6px;" title="सूचना बंद करें">&times;</button>
       </div>
 
       <!-- Animated Sound Wave Visualizer & Status -->
@@ -2564,8 +2566,23 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
       try { window.speechSynthesis.getVoices(); } catch(e){}
     }
 
+    window.dismissFbBrowserNotice = function() {
+      try { localStorage.setItem('AIM_FB_NOTICE_DISMISSED', 'true'); } catch (e) { }
+      const fbBanner = document.getElementById('aoiFbBrowserNotice');
+      if (fbBanner) fbBanner.style.display = 'none';
+      const status = document.getElementById('landingAudioStatusText');
+      if (status && status.innerHTML.includes('Facebook')) {
+        status.innerHTML = '🔊 ऑडियो तैयार है • Play बटन दबाएं';
+      }
+    };
+
+    let fbNoticeDismissed = false;
+    try {
+      fbNoticeDismissed = (localStorage.getItem('AIM_FB_NOTICE_DISMISSED') === 'true');
+    } catch (e) { }
+
     const isFB = /FBAN|FBAV|FB_IAB|Instagram|Line/i.test(navigator.userAgent || '');
-    if (isFB) {
+    if (isFB && !fbNoticeDismissed) {
       const fbBanner = document.getElementById('aoiFbBrowserNotice');
       if (fbBanner) fbBanner.style.display = 'block';
       const status = document.getElementById('landingAudioStatusText');
