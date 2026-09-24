@@ -9,7 +9,7 @@
       "status": "active",
       "theme_primary": "#15803d",
       "theme_dark": "#003400",
-      "ticker_text": "📢 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 WhatsApp AI डॉक्टर सहायता उपलब्ध! ✦ प्रमाणित ई-बुक्स व मंडी भाव",
+      "ticker_text": "📢 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 WhatsApp AI डॉक्टर सहायता उपलब्ध! ✦ प्रमाणित ई-बुक्स व मंडी भाव aarogyam india ko call  karo 7049294111",
       "audio_title": "मुख्य पृष्ठ (होम)",
       "audio_script": "नमस्ते {name} जी! आरोग्यम इंडिया में आपका हार्दिक स्वागत है। यह भारत का पहला संपूर्ण डिजिटल ज्ञान मंच है जहाँ किसानों और परिवारों के लिए सभी समाधान उपलब्ध हैं। यहाँ आपको खरीफ फसल मास्टर गाइड और खेती का डॉक्टर जैसी प्रमाणित ई-बुक्स, फसलों का सचित्र वैज्ञानिक स्प्रे शेड्यूल, गाय और भैंस में दूध व फैट वृद्धि के उपाय, और डायबिटीज, जोड़ों का दर्द व मोटापे का प्राकृतिक आयुर्वेदिक परामर्श मिलता है। किसी भी सवाल या समस्या के लिए आप सीधे व्हाट्सएप पर हमारे विशेषज्ञों से 24 घंटे निःशुल्क सलाह ले सकते हैं। आरोग्यम इंडिया के साथ जुड़ने के लिए धन्यवाद!",
       "og_title": "",
@@ -18,7 +18,7 @@
       "share_message": "",
       "floating_banner": {
         "enabled": false,
-        "image": "/images/banners/floating_banner-gemini_generated_i-311455-eggk.webp",
+        "image": "",
         "badge_title": "",
         "action_link": "",
         "animation": "ublFloatBook3D"
@@ -44,26 +44,6 @@
           "cta_text": "👑 VIP मेम्बर बनें (₹99)",
           "cta_link": "/subscription.html",
           "cta_secondary_text": "🛒 कार्ट देखें",
-          "cta_secondary_link": "/ebooks/cart.html"
-        },
-        {
-          "image": "/images/banners/hero_slide-bk015-sec_audio-ba-340008-uap9.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
-        },
-        {
-          "image": "/images/banners/pashu-goat-care.jpg",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
           "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
