@@ -288,8 +288,8 @@
       });
     }
 
-    // 2. Process Section Reordering if on Home page
-    if (Array.isArray(pageConfig.sections_order) && pageConfig.sections_order.length > 0 && (pageConfig.slug === 'index' || pageConfig.id === 'page_home')) {
+    // 2. Process Section Reordering for ALL pages (not just Home)
+    if (Array.isArray(pageConfig.sections_order) && pageConfig.sections_order.length > 0) {
       const order = pageConfig.sections_order;
       const getSectionEl = (key) => {
         if (key === 'sec_ticker') return document.querySelector('.home-live-ticker-wrap');

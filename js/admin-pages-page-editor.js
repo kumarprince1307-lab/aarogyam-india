@@ -59,6 +59,7 @@ export async function initPageEditor() {
         }
       } catch (e) {
         console.warn('[Admin LocalSync] Local server not reachable on 5505, using fallback:', e);
+        showToast('⚠️ Local Sync Server (port 5505) चालू नहीं है — GitHub fallback से sync होगा।', 'info');
       }
     }
 
@@ -276,8 +277,15 @@ export async function initPageEditor() {
       if (syncRes.success) {
         showToast(`✅ इमेज GitHub पर सफलतापूर्वक सिंक हो गई! (${sizeKb} KB HD WebP)`, 'success');
       } else {
-        console.warn('[Admin] GitHub sync info (local preview active):', syncRes.error);
-        showToast(`✅ इमेज तैयार (${sizeKb} KB) | तत्काल प्रीव्यू सक्रिय!`, 'success');
+        const _errMsg = syncRes.error || '';
+        const _isTokenErr = _errMsg.includes('401') || _errMsg.includes('403') ||
+          _errMsg.toLowerCase().includes('token') || _errMsg.toLowerCase().includes('bad credential');
+        if (_isTokenErr) {
+          showToast(`❌ GitHub Token expire हो गया! Vercel में GITHUB_TOKEN update करें। (इमेज सिर्फ इस browser में दिखेगी)`, 'error');
+        } else {
+          console.warn('[Admin] GitHub sync info (local preview active):', syncRes.error);
+          showToast(`✅ इमेज तैयार (${sizeKb} KB) | प्रीव्यू सक्रिय! (GitHub sync pending)`, 'success');
+        }
       }
     } catch (err) {
       console.error('[Admin] Upload error:', err);
