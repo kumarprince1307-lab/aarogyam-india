@@ -18,7 +18,7 @@
       "share_message": "",
       "floating_banner": {
         "enabled": false,
-        "image": "/images/banners/floating_banner-bk015-sec_audio-ba-726652-faih.webp",
+        "image": "/images/banners/floating_banner-gemini_generated_i-311455-eggk.webp",
         "badge_title": "",
         "action_link": "",
         "animation": "ublFloatBook3D"
@@ -37,13 +37,33 @@
           "cta_secondary_link": "/ebooks/agriculture.html"
         },
         {
-          "image": "/images/banners/hero_slide-whatsapp-image-202-615535-6py4.webp",
+          "image": "/images/banners/farmer-community-banner.jpeg",
           "tag": "👑 VIP Annual Pass",
           "title": "Aarogyam Pro VIP सदस्यता - 1 वर्ष का ऑल-एक्सेस",
           "subtitle": "सभी ई-बुक्स, लाइव वेबिनार्स और 24×7 WhatsApp AI डॉक्टर सहायता बिल्कुल मुफ़्त!",
           "cta_text": "👑 VIP मेम्बर बनें (₹99)",
           "cta_link": "/subscription.html",
           "cta_secondary_text": "🛒 कार्ट देखें",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-bk015-sec_audio-ba-340008-uap9.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
           "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
