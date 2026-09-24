@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v9';
-const PAGES_CACHE = 'aarogyam-public-pages-v9';
-const MEDIA_CACHE = 'aarogyam-public-media-v9';
+const STATIC_CACHE = 'aarogyam-public-static-v10';
+const PAGES_CACHE = 'aarogyam-public-pages-v10';
+const MEDIA_CACHE = 'aarogyam-public-media-v10';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_SHELL = [
@@ -102,7 +102,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // JSON Catalog & Configurations: Stale-While-Revalidate (Instant 0ms + Background Refresh)
+  // Dynamic Site Configurations & Catalog: Network First (always fresh for admin edits & live visitors)
+  if (url.pathname.includes('site-pages-config') || url.pathname.includes('universal-book-landing') || url.searchParams.has('v')) {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(async () => {
+          const cache = await caches.open(STATIC_CACHE);
+          return (await cache.match(request)) || new Response('{"sitePages":[]}', { headers: { 'Content-Type': 'application/json' } });
+        })
+    );
+    return;
+  }
+
+  // General JSON Files: Stale-While-Revalidate with Background Refresh
   if (url.pathname.endsWith('.json') || url.pathname.startsWith('/data/')) {
     event.respondWith(
       caches.open(STATIC_CACHE).then((cache) => {

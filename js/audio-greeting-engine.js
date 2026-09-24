@@ -73,19 +73,37 @@
     }
   };
 
-  // Merge Admin Customized Page Audio Scripts from CMS
-  try {
-    const customScripts = JSON.parse(localStorage.getItem('AAROGYAM_PAGE_AUDIO_SCRIPTS') || '{}');
-    Object.keys(customScripts).forEach(k => {
-      if (customScripts[k] && customScripts[k].script) {
-        pageAudioScripts[k] = {
-          title: customScripts[k].title || (pageAudioScripts[k] ? pageAudioScripts[k].title : 'आरोग्यम इंडिया'),
-          category: pageAudioScripts[k] ? pageAudioScripts[k].category : 'ऑडियो परिचय',
-          text: (name) => customScripts[k].script.replace(/\{name\}/g, name)
-        };
+  // Merge Admin Customized Page Audio Scripts from CMS or Active CMS Config
+  function syncCmsAudioScripts() {
+    try {
+      const customScripts = JSON.parse(localStorage.getItem('AAROGYAM_PAGE_AUDIO_SCRIPTS') || '{}');
+      if (window.AAROGYAM_ACTIVE_PAGE_CMS && window.AAROGYAM_ACTIVE_PAGE_CMS.audio_script) {
+        const p = window.AAROGYAM_ACTIVE_PAGE_CMS;
+        const key = p.slug || (p.id ? p.id.replace(/^page_/, '') : '');
+        if (key) {
+          customScripts[key] = {
+            title: p.audio_title || p.name,
+            script: p.audio_script
+          };
+          if (key === 'index' || p.id === 'page_home') {
+            customScripts['index'] = { title: p.audio_title || p.name, script: p.audio_script };
+          }
+        }
       }
-    });
-  } catch (e) {}
+      Object.keys(customScripts).forEach(k => {
+        if (customScripts[k] && customScripts[k].script) {
+          pageAudioScripts[k] = {
+            title: customScripts[k].title || (pageAudioScripts[k] ? pageAudioScripts[k].title : 'आरोग्यम इंडिया'),
+            category: pageAudioScripts[k] ? pageAudioScripts[k].category : 'ऑडियो परिचय',
+            text: (name) => customScripts[k].script.replace(/\{name\}/g, name)
+          };
+        }
+      });
+    } catch (e) {}
+  }
+
+  syncCmsAudioScripts();
+  window.syncCmsAudioScripts = syncCmsAudioScripts;
 
   // 2. Identify Current Page Key
   function getActivePageKey() {

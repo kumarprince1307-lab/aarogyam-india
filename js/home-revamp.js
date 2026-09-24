@@ -483,6 +483,9 @@
   // 1. ADMIN CMS CONFIGURATION LOADER
   // -------------------------------------------------------------
   function getHomeCmsConfig() {
+    if (window.AAROGYAM_ACTIVE_PAGE_CMS && typeof window.AAROGYAM_ACTIVE_PAGE_CMS === 'object') {
+      return window.AAROGYAM_ACTIVE_PAGE_CMS;
+    }
     try {
       const saved = localStorage.getItem('AAROGYAM_HOME_CMS_CONFIG') || localStorage.getItem('site_page_index') || '{}';
       return JSON.parse(saved);
@@ -1305,6 +1308,8 @@
     loadKindleBestsellers();
     renderSavedReviews();
   }
+
+  window.startHomeRevampEngine = startHomeRevampEngine;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', startHomeRevampEngine);

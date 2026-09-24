@@ -5017,6 +5017,25 @@ export async function initPageEditor() {
       animation: floatAnim
     };
 
+    function stripImagePreviews(obj) {
+      if (!obj) return obj;
+      try {
+        const clone = JSON.parse(JSON.stringify(obj));
+        function walk(o) {
+          if (Array.isArray(o)) {
+            o.forEach(walk);
+          } else if (o && typeof o === 'object') {
+            delete o.image_preview;
+            Object.values(o).forEach(walk);
+          }
+        }
+        walk(clone);
+        return clone;
+      } catch (e) {
+        return obj;
+      }
+    }
+
     const pageObj = {
       id: editingPageId || `page_${slug.replace(/[^a-zA-Z0-9_]/g, '_')}`,
       slug: slug,
@@ -5033,22 +5052,22 @@ export async function initPageEditor() {
       og_image: ogImage,
       og_description: ogDesc,
       share_message: shareMsg,
-      floating_banner: floating_banner,
+      floating_banner: stripImagePreviews(floating_banner),
       fb_pixel: fb,
       ga_tag: ga,
-      hero_slides: currentSlides,
+      hero_slides: stripImagePreviews(currentSlides),
       sections_order: currentSectionsOrder,
       hidden_sections: currentHiddenSections,
-      kpi_cards: currentKpiCards,
-      marketing_cards: currentMarketingCards,
-      videos: currentVideos,
-      reviews: currentReviews,
-      faqs: currentFaqs,
-      health_diseases: currentHealthDiseases,
-      crops: currentCrops,
-      pashu_cards: currentPashuCards,
-      products: currentProducts,
-      page_kpi_sections: currentPageKpiSections,
+      kpi_cards: stripImagePreviews(currentKpiCards),
+      marketing_cards: stripImagePreviews(currentMarketingCards),
+      videos: stripImagePreviews(currentVideos),
+      reviews: stripImagePreviews(currentReviews),
+      faqs: stripImagePreviews(currentFaqs),
+      health_diseases: stripImagePreviews(currentHealthDiseases),
+      crops: stripImagePreviews(currentCrops),
+      pashu_cards: stripImagePreviews(currentPashuCards),
+      products: stripImagePreviews(currentProducts),
+      page_kpi_sections: stripImagePreviews(currentPageKpiSections),
       whatsapp_support: {
         number: waNum,
         prompt: waPrompt
@@ -5067,18 +5086,27 @@ export async function initPageEditor() {
 
     // Auto Git Live Sync & Local Disk Sync on Save
     try {
-      const configStr = JSON.stringify({ sitePages: allPages }, null, 2);
+      const cleanAllPages = stripImagePreviews(allPages);
+      const configStr = JSON.stringify({ sitePages: cleanAllPages }, null, 2);
       const base64Data = btoa(unescape(encodeURIComponent(configStr)));
       syncAssetToGitHub('data/site-pages-config.json', base64Data).then(res => {
         if (res.success) {
           if (res.localDisk) {
             showToast('💾 स्थानीय डिस्क पर site-pages-config.json तुरंत सुरक्षित हो गया!', 'success');
           } else {
-            showToast('🚀 GitHub पर site-pages-config.json ऑटो-सिंक हो गया!', 'info');
+            showToast('🚀 GitHub पर site-pages-config.json ऑटो-सिंक हो गया!', 'success');
           }
+        } else {
+          console.warn('[Admin Save] GitHub sync response warning:', res);
+          showToast(`⚠️ GitHub ऑटो-सिंक: ${res.error || 'पेंडिंग'} (लोकल सेव सफल)`, 'info');
         }
-      }).catch(() => {});
-    } catch (e) {}
+      }).catch(err => {
+        console.warn('[Admin Save] GitHub sync fetch error:', err);
+        showToast('⚠️ स्थानीय रूप से सुरक्षित हो गया (क्लाउड सिंक पेंडिंग)', 'info');
+      });
+    } catch (e) {
+      console.warn('[Admin Save] Serialization error:', e);
+    }
   }
 
   window.savePageConfig = savePageConfig;
