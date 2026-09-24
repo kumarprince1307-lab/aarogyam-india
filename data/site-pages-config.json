@@ -27,7 +27,17 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/hero_slide-whatsapp-image-202-457576-enzl.webp",
+          "image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+          "tag": "🌾 खरीफ 2026 स्पेशल एडिशन",
+          "title": "Aarogyam India - सम्पूर्ण किसान व डिजिटल ज्ञान मंच",
+          "subtitle": "वैज्ञानिक खेती, फसल डॉक्टर, मंडी भाव, और 100% प्रमाणित डिजिटल ई-बुक्स",
+          "cta_text": "📚 डिजिटल स्टोर देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🌱 कृषि हब",
+          "cta_secondary_link": "/ebooks/agriculture.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-whatsapp-image-202-615535-6py4.webp",
           "tag": "👑 VIP Annual Pass",
           "title": "Aarogyam Pro VIP सदस्यता - 1 वर्ष का ऑल-एक्सेस",
           "subtitle": "सभी ई-बुक्स, लाइव वेबिनार्स और 24×7 WhatsApp AI डॉक्टर सहायता बिल्कुल मुफ़्त!",
