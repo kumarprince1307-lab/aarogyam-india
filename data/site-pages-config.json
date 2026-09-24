@@ -1293,9 +1293,9 @@
       "sections_order": [
         "sec_ticker",
         "sec_hero_slider",
-        "sec_videos",
         "sec_kpi_badges",
         "sec_reviews",
+        "sec_videos",
         "sec_faqs",
         "sec_help_support"
       ],
