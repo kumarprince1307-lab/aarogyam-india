@@ -140,7 +140,7 @@
             const title = item.title || 'आरोग्यम विशेष वीडियो';
             const dur = item.duration || 'Video';
             return `
-              <div class="universal-video-card" style="background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;" data-yt-id="${ytId}" data-title="${encodeURIComponent(title)}">
+              <div class="universal-video-card" style="background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;" data-vid-id="${item.id || ''}" data-yt-id="${ytId}" data-title="${encodeURIComponent(title)}">
                 <div style="position:relative; width:100%; padding-bottom:56.25%; background:#0f172a; overflow:hidden;">
                   <img src="${thumb}" alt="${title}" loading="lazy" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.92;" />
                   <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);"></div>
@@ -158,11 +158,11 @@
                     ${title}
                   </h4>
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                    <span style="font-size:0.75rem; color:#2563eb; font-weight:700;">
-                      ▶️ अभी देखें
+                    <span style="font-size:0.75rem; color:#ef4444; font-weight:800; display:flex; align-items:center; gap:4px;">
+                      <span>▶️ AarogyamTube</span>
                     </span>
-                    <button type="button" class="btn-video-share" style="background:#f1f5f9; border:none; color:#475569; padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:700;">
-                      🔗 शेयर
+                    <button type="button" class="btn-video-share" style="background:#f1f5f9; border:none; color:#2563eb; padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:800; display:flex; align-items:center; gap:4px;">
+                      <i class="fa-solid fa-share-nodes"></i> <span>शेयर</span>
                     </button>
                   </div>
                 </div>
@@ -172,7 +172,7 @@
         </div>
         <div style="text-align:center; margin-top:28px;">
           <a href="/tube.html" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color:#ffffff; font-weight:900; font-size:0.92rem; padding:12px 30px; border-radius:30px; text-decoration:none; box-shadow:0 8px 24px rgba(239,68,68,0.35); transition:transform 0.15s ease;">
-            <span>📺 Aarogyam Tube देखें (Know More)</span>
+            <span>📺 AarogyamTube देखें (All Videos & Shorts)</span>
             <span>→</span>
           </a>
         </div>
@@ -183,20 +183,22 @@
         card.addEventListener('click', (e) => {
           if (e.target.closest('.btn-video-share')) {
             e.stopPropagation();
-            const title = decodeURIComponent(card.getAttribute('data-title'));
+            const title = decodeURIComponent(card.getAttribute('data-title') || 'AarogyamTube Video');
+            const vidId = card.getAttribute('data-vid-id');
             const ytId = card.getAttribute('data-yt-id');
-            const shareUrl = ytId ? `https://youtu.be/${ytId}` : window.location.href;
+            const shareUrl = vidId ? `/tube.html?vid=${vidId}` : (ytId ? `/tube.html?yt=${ytId}` : '/tube.html');
             if (window.AarogyamShareEngine) {
               window.AarogyamShareEngine.share({
                 title: title,
-                text: `${title} - Aarogyam India पर देखें:`,
+                text: `${title} - AarogyamTube पर देखें:`,
                 url: shareUrl
               });
-            } else if (navigator.share) {
-              navigator.share({ title, url: shareUrl }).catch(() => {});
-            } else {
-              navigator.clipboard?.writeText(shareUrl);
-              alert("लिंक कॉपी हो गया!");
+            } else if (typeof window.triggerShare === 'function') {
+              window.triggerShare({
+                title: title,
+                text: `${title} - AarogyamTube पर देखें:`,
+                url: shareUrl
+              });
             }
             return;
           }

@@ -27,15 +27,22 @@
 
   function getPageMatch(allPages) {
     if (!Array.isArray(allPages) || allPages.length === 0) return null;
-    const path = window.location.pathname.toLowerCase();
+    const path = (window.location.pathname || '').toLowerCase();
     
+    // Check Homepage first
+    const isHomePage = path === '/' || path === '' || path.endsWith('/index.html') || path.endsWith('index.html');
+    if (isHomePage) {
+      const homePage = allPages.find(p => p.id === 'page_home' || p.slug === 'index' || (p.url && p.url.includes('index.html')));
+      if (homePage) return homePage;
+    }
+
     // Exact or suffix matches
     return allPages.find(p => {
       const u = (p.url || '').toLowerCase();
       const s = (p.slug || '').toLowerCase();
       const id = (p.id || '').toLowerCase();
 
-      if (path.endsWith(u) || (u && path.includes(u))) return true;
+      if (u && (path.endsWith(u) || path.includes(u))) return true;
       if (path.includes('pashu') && (id.includes('pashu') || id.includes('cattle'))) return true;
       if (path.includes('diabetes') && id.includes('diabetes')) return true;
       if (path.includes('weight-loss') && id.includes('weight_loss')) return true;
@@ -115,9 +122,16 @@
       const badge = p.badge || (isPashu ? 'आयुर्वेदिक पशु पोषण' : 'प्रमाणित हर्बल किट');
       const desc = p.description || p.dose || '';
 
+      let pImg = p.image_preview || p.image || '';
+      try {
+        const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        if (pImg && offSync[pImg]) pImg = offSync[pImg];
+      } catch (e) {}
+
       return `
         <div style="background:#fff; border-radius:16px; border:1.5px solid #e2e8f0; padding:20px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 14px rgba(0,0,0,0.03); transition: transform 0.2s ease, box-shadow 0.2s ease;">
           <div>
+            ${pImg ? `<div style="width:100%; height:130px; border-radius:10px; overflow:hidden; margin-bottom:12px; background:#f8fafc; display:flex; align-items:center; justify-content:center;"><img src="${escapeHtml(pImg)}" alt="${escapeHtml(name)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'"></div>` : ''}
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
               <span style="background:#fef08a; color:#854d0e; font-weight:800; font-size:0.72rem; padding:2px 8px; border-radius:8px;">${escapeHtml(badge)}</span>
               <div style="text-align:right;">
@@ -157,12 +171,72 @@
       document.body.appendChild(fbEl);
     }
     const animClass = fb.animation === 'none' ? '' : 'ubl-float-3d-anim';
+    let fbImg = fb.image_preview || fb.image;
+    try {
+      const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+      if (offSync[fbImg]) fbImg = offSync[fbImg];
+      const norm = '/' + (fb.image || '').replace(/^\/+/, '');
+      if (offSync[norm]) fbImg = offSync[norm];
+    } catch (e) {}
+
     fbEl.innerHTML = `
       <a href="${fb.action_link || '#'}" style="display:block; text-decoration:none; text-align:center;">
         ${fb.badge_title ? `<div style="background:#16a34a; color:#fff; font-size:0.68rem; font-weight:800; padding:2px 8px; border-radius:10px; margin-bottom:4px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">${escapeHtml(fb.badge_title)}</div>` : ''}
-        <img src="${fb.image}" alt="Feature Banner" class="${animClass}" style="width:100%; border-radius:12px; box-shadow:0 12px 28px rgba(0,0,0,0.5); border:2px solid #38bdf8;" />
+        <img src="${fbImg}" alt="Feature Banner" class="${animClass}" style="width:100%; border-radius:12px; box-shadow:0 12px 28px rgba(0,0,0,0.5); border:2px solid #38bdf8;" />
       </a>
     `;
+  }
+
+  function renderDynamicTicker(pageConfig) {
+    const text = pageConfig.ticker_text || (pageConfig.live_ticker && pageConfig.live_ticker.text);
+    if (!text) return;
+    const tickerTrack = document.getElementById('home-live-ticker-track') || document.querySelector('.ticker-marquee-scroll');
+    if (tickerTrack) {
+      tickerTrack.textContent = text;
+    }
+  }
+
+  function renderDynamicHeroSlides(pageConfig) {
+    if (!Array.isArray(pageConfig.hero_slides) || pageConfig.hero_slides.length === 0) return;
+    const carouselContainer = document.querySelector('.bighaat-carousel-container');
+    if (!carouselContainer) return;
+
+    const validSlides = pageConfig.hero_slides.filter(s => s && (s.image || s.image_preview));
+    if (validSlides.length === 0) return;
+
+    // Remove existing slide items
+    const existingSlides = carouselContainer.querySelectorAll('.home-hero-slide-item');
+    existingSlides.forEach(el => el.remove());
+
+    validSlides.forEach((s, idx) => {
+      let imgSrc = s.image_preview || s.image;
+      try {
+        const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        if (offSync[imgSrc]) imgSrc = offSync[imgSrc];
+        const norm = '/' + (s.image || '').replace(/^\/+/, '');
+        if (offSync[norm]) imgSrc = offSync[norm];
+      } catch (e) {}
+
+      const slideDiv = document.createElement('div');
+      slideDiv.className = 'home-hero-slide-item';
+      if (idx !== 0) slideDiv.style.display = 'none';
+
+      slideDiv.innerHTML = `
+        <a href="${s.cta_link || '#'}" class="landscape-hero-banner-link" title="${escapeHtml(s.title || s.tag || '')}">
+          <img src="${imgSrc}" alt="${escapeHtml(s.title || 'Hero Banner')}" class="landscape-hero-banner-img" onerror="this.onerror=null; this.src='/images/banners/kharif-master-guide-2026-hero-banner.webp';" />
+        </a>
+      `;
+      carouselContainer.appendChild(slideDiv);
+    });
+
+    const dotsContainer = document.querySelector('.bighaat-carousel-dots');
+    if (dotsContainer) {
+      dotsContainer.innerHTML = validSlides.map((_, i) => `<span class="bighaat-carousel-dot${i === 0 ? ' active' : ''}"></span>`).join('');
+    }
+
+    if (typeof window.initHeroCarousel === 'function') {
+      try { window.initHeroCarousel(); } catch (e) {}
+    }
   }
 
   async function initLiveCmsBridge() {
@@ -170,6 +244,9 @@
       const allPages = await loadConfigData();
       const pageConfig = getPageMatch(allPages);
       if (pageConfig) {
+        window.AAROGYAM_ACTIVE_PAGE_CMS = pageConfig;
+        renderDynamicTicker(pageConfig);
+        renderDynamicHeroSlides(pageConfig);
         renderDynamicProducts(pageConfig);
         renderFloatingBanner(pageConfig);
       }

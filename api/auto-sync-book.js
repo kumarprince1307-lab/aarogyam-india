@@ -209,8 +209,19 @@ module.exports = async function handler(req, res) {
       }
     }
 
+    // 2. CORS PREFLIGHT OPTIONS
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Max-Age': '86400'
+      });
+      return res.end();
+    }
+
     if (req.method !== 'POST') {
-      return sendJson(res, 405, { success: false, error: 'Method not allowed. Use GET or POST.' });
+      return sendJson(res, 405, { success: false, error: 'Method not allowed. Use GET, POST or OPTIONS.' });
     }
 
     const payload = await parseBody(req);

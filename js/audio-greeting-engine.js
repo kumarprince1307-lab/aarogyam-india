@@ -589,12 +589,26 @@
     return ref || 'AI000004';
   }
 
-  // 7. Universal Viral Share Trigger (NO gate — share always works for everyone)
+  // 7. Universal Viral Share Trigger
+  // NOTE: viral-share-engine.js defines window.triggerViralPageShare with glassmorphic modal.
+  // audio-greeting-engine.js only defines it as fallback (if viral-share-engine is NOT loaded)
+  // or enhances it with CMS data + share_id when it IS defined.
+  // We ALWAYS override with the enhanced CMS-aware version (respects customData + page config).
   window.triggerViralPageShare = function (customData) {
     const cms = getCurrentPageCmsConfig();
     const pageKey = getActivePageKey();
     const config = pageAudioScripts[pageKey] || pageAudioScripts['index'];
     const refCode = getBestReferralCode();
+
+    // If viral-share-engine is loaded, delegate to it for unified auth gate & 3-option modal
+    if (typeof window.triggerShare === 'function') {
+      window.triggerShare(customData || {});
+      return;
+    }
+    if (typeof window.AarogyamShareEngine === 'object' && typeof window.AarogyamShareEngine.share === 'function') {
+      window.AarogyamShareEngine.share(customData || {});
+      return;
+    }
 
     const currentUrlObj = new URL(window.location.href);
     if (refCode) {
@@ -621,13 +635,14 @@
     }
 
     if (navigator.share) {
-      navigator.share({ title, text: shareMessage }).catch(() => {});
+      navigator.share({ title, text: shareMessage, url: shareUrl }).catch(() => {});
     } else {
       const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
       window.open(waUrl, '_blank');
     }
   };
 
+  // triggerUniversalShare always delegates to triggerViralPageShare
   window.triggerUniversalShare = function (customData) {
     window.triggerViralPageShare(customData);
   };
@@ -670,16 +685,14 @@
     });
   };
 
-  // Universal KPI Card Blue Share Trigger (NO gate — share always works for everyone)
+  // Universal KPI Card Blue Share Trigger (Delegates to Universal 3-Option Share Engine)
   window.triggerKpiNativeShare = function (event, title, text, targetUrl) {
     if (event) {
       if (typeof event.stopPropagation === 'function') event.stopPropagation();
       if (typeof event.preventDefault === 'function') event.preventDefault();
     }
 
-    const cms = getCurrentPageCmsConfig();
     const refCode = getBestReferralCode();
-
     const targetUrlObj = new URL(targetUrl || window.location.href, window.location.origin);
     if (refCode) {
       targetUrlObj.searchParams.set('ref', refCode);
@@ -687,28 +700,12 @@
     }
     const pageUrl = targetUrlObj.href;
 
-    const cleanTitle = (title || cms?.og_title || 'Aarogyam India').replace(/<[^>]+>/g, '');
-    const cleanText = (text || cms?.og_description || '').replace(/<[^>]+>/g, '');
-
-    let shareMessage = '';
-    if (cms?.share_message && cms.share_message.trim()) {
-      shareMessage = cms.share_message
-        .replace(/\{title\}/g, cleanTitle)
-        .replace(/\{description\}/g, cleanText)
-        .replace(/\{desc\}/g, cleanText)
-        .replace(/\{url\}/g, pageUrl);
-      if (!shareMessage.includes(pageUrl)) {
-        shareMessage += `\n\n👉 सम्पूर्ण विवरण व समाधान देखें:\n${pageUrl}`;
-      }
-    } else {
-      shareMessage = `🌾 *${cleanTitle}*\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व आयुर्वेदिक उपाय देखें:\n${pageUrl}`;
-    }
-
-    if (navigator.share) {
-      navigator.share({ title: cleanTitle, text: shareMessage }).catch(() => {});
-    } else {
-      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
-      window.open(waUrl, '_blank');
+    if (typeof window.triggerShare === 'function') {
+      window.triggerShare({ title, text, url: pageUrl });
+    } else if (window.AarogyamShareEngine && typeof window.AarogyamShareEngine.share === 'function') {
+      window.AarogyamShareEngine.share({ title, text, url: pageUrl });
+    } else if (typeof window.triggerUniversalShare === 'function') {
+      window.triggerUniversalShare({ title, text, url: pageUrl });
     }
   };
 
@@ -725,39 +722,10 @@
   window.stopPageAudioGreeting = stopAudio;
   window.playPageAudioGreeting = playAudioGreeting;
 
-  // 8. Reliable Page Audio Auto-Play Controller (Respects user stop)
-  let autoPlayHandled = false;
-
+  // 8. Page Audio Auto-Play Controller (Disabled per user request - manual click only)
   function attemptPageAudioAutoPlay() {
-    if (autoPlayHandled) return;
-    const pageKey = getActivePageKey();
-    if (sessionStorage.getItem('aoi_audio_user_stopped') === '1' || sessionStorage.getItem('aoi_audio_stopped_' + pageKey) === '1') {
-      return;
-    }
-    const sessionKey = 'aoi_audio_played_' + pageKey;
-    if (sessionStorage.getItem(sessionKey)) {
-      return;
-    }
-
-    autoPlayHandled = true;
-    window.removeEventListener('click', handleFirstUserGesture);
-    window.removeEventListener('touchstart', handleFirstUserGesture);
-    window.removeEventListener('scroll', handleFirstUserGesture);
-
-    try {
-      sessionStorage.setItem(sessionKey, '1');
-      playAudioGreeting(true);
-    } catch (e) {}
+    return; // Strictly no auto-playing sound
   }
-
-  function handleFirstUserGesture() {
-    attemptPageAudioAutoPlay();
-  }
-
-  // Register user gesture triggers for browsers requiring user interaction
-  window.addEventListener('click', handleFirstUserGesture, { once: true, passive: true });
-  window.addEventListener('touchstart', handleFirstUserGesture, { once: true, passive: true });
-  window.addEventListener('scroll', handleFirstUserGesture, { once: true, passive: true });
 
   // 9. Universal Robust Hero Carousel Engine (Works on all pages & subpages)
   function initUniversalHeroCarousel(customSelector) {

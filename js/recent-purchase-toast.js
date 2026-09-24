@@ -342,20 +342,6 @@
       };
     }
 
-    // 4. Live Webinar / Notification Rule:
-    if (!currentPath.includes('webinar')) {
-      return {
-        type: 'webinar_live',
-        badge: '🔴 आज शाम 7:00 बजे',
-        title: 'लाइव ज़ूम कृषि वेबिनार',
-        desc: 'आधुनिक स्प्रे साइंस व जैविक तकनीकों पर विशेष ऑनलाइन प्रशिक्षण!',
-        priceTag: 'Free Pass',
-        ctaText: '📺 वेबिनार जॉइन करें',
-        link: '/webinar.html',
-        image: '/images/banners/farmer-community-banner.jpeg'
-      };
-    }
-
     return null;
   }
 

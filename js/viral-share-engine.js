@@ -31,20 +31,20 @@
       if (u && (u.share_id || u.referral_code || u.mobile)) {
         ref = u.share_id || u.referral_code || u.mobile || '';
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 2. Global unified helper
     if (!ref && typeof window.getUnifiedShareId === 'function') {
       try {
         const s = window.getUnifiedShareId();
         if (s && s !== 'AI000004') ref = s;
-      } catch (e) {}
+      } catch (e) { }
     }
     if (!ref && typeof window.getUserShareId === 'function') {
       try {
         const s = window.getUserShareId();
         if (s && s !== 'AI000004') ref = s;
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // 3. Authenticated mobile
@@ -55,7 +55,7 @@
 
     // 4. Guest lead phone (only if no authenticated user)
     if (!ref) {
-      try { ref = localStorage.getItem('aarogyam_user_phone') || ''; } catch (e) {}
+      try { ref = localStorage.getItem('aarogyam_user_phone') || ''; } catch (e) { }
     }
 
     if (!ref) {
@@ -81,9 +81,9 @@
     return `https://wa.me/${DEFAULT_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
   }
 
-  // Build a Shareable Referral Link for the current page
+  // Build a Shareable Referral Link for any page or custom path
   function buildShareableUrl(customPath = '') {
-    let url = customPath ? (window.location.origin + customPath) : window.location.href;
+    let url = customPath ? (customPath.startsWith('http') ? customPath : (window.location.origin + (customPath.startsWith('/') ? customPath : '/' + customPath))) : window.location.href;
     const cleanUrl = url.split('?')[0];
     const myRef = getCurrentUserRefId();
     if (myRef) {
@@ -94,35 +94,34 @@
 
   // Universal Share Trigger (Modal or Native WebShare)
   async function triggerShare(options = {}) {
-    // Universal Referral & Share Attribute:
-    // If user is logged in, their unique ID/phone is used.
-    // If visitor is not logged in, system seamlessly falls back to promoter ID or AI000004.
-    // Sharing is NEVER blocked or redirected to registration.html.
-
     const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
     const ogDesc = document.querySelector('meta[property="og:description"]')?.getAttribute('content');
-    
-    const title = options.title || ogTitle || document.title || 'Aarogyam India';
-    const text = options.text || ogDesc || 'Aarogyam India - सम्पूर्ण किसान व डिजिटल ज्ञान मंच:';
-    const shareUrl = options.url || buildShareableUrl();
-    const fullShareMessage = `🌾 *${title}*\n${text}\n\n👉 सम्पूर्ण जानकारी, ई-बुक्स व समाधान यहाँ देखें:\n${shareUrl}`;
 
-    // 1. Try Native Mobile WebShare API (do not pass url separately as fullShareMessage already contains it)
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: title,
-          text: fullShareMessage
-        });
-        showShareToast('✅ सफलतापूर्वक शेयर किया गया!');
-        return;
-      } catch (err) {
-        if (err.name === 'AbortError') return;
+    let title = options.title || ogTitle || document.title || 'Aarogyam India';
+    let text = options.text || ogDesc || 'Aarogyam India - सम्पूर्ण किसान व डिजिटल ज्ञान मंच:';
+    const shareUrl = buildShareableUrl(options.url || '');
+
+    // Pull CMS custom share message if available
+    try {
+      const allPages = JSON.parse(localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG') || '[]');
+      const curPath = window.location.pathname.toLowerCase();
+      const match = allPages.find(p => p && ((p.url && curPath.endsWith(p.url.toLowerCase())) || (p.slug && curPath.includes(p.slug.toLowerCase()))));
+      if (match) {
+        if (match.share_message && !options.text) {
+          text = match.share_message;
+        }
+        if (match.og_title && !options.title) {
+          title = match.og_title;
+        }
       }
-    }
+    } catch (e) {}
 
-    // 2. Fallback: Custom Glassmorphic Share Modal
-    renderShareModal(title, fullShareMessage, shareUrl);
+    const cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '').trim();
+    const cleanText = (text || '').replace(/<[^>]+>/g, '').trim();
+    const fullShareMessage = `🌾 *${cleanTitle}*\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व समाधान यहाँ देखें:\n${shareUrl}`;
+
+    // Render the sleek 3-option transparent floating sheet (No box, transparent background)
+    renderShareModal(cleanTitle, fullShareMessage, shareUrl);
   }
 
   function renderShareModal(title, text, shareUrl) {
@@ -131,71 +130,149 @@
       modal = document.createElement('div');
       modal.id = 'aoi-viral-share-modal';
       modal.style.cssText = `
-        position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-        backdrop-filter: blur(8px); z-index: 999999;
-        display: flex; align-items: center; justify-content: center;
-        padding: 16px; opacity: 0; transition: opacity 0.3s ease;
+        position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        z-index: 999999; display: flex; align-items: center; justify-content: center;
+        padding: 20px; opacity: 0; transition: opacity 0.22s ease;
       `;
       document.body.appendChild(modal);
     }
 
-    const waMsg = `${text}`;
-    const waShareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
-    const fbShareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-    const tgShareLink = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`;
+    const waShareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
 
     modal.innerHTML = `
-      <div style="background:#0f172a; border: 1.5px solid #38bdf8; border-radius: 20px; max-width: 440px; width: 100%; padding: 24px; color: #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size: 1.5rem;">📤</span>
-            <h3 style="margin:0; font-size:1.2rem; color:#f8fafc; font-weight:800;">मित्रों के साथ शेयर करें</h3>
-          </div>
-          <button id="closeAoiShareModal" type="button" style="background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:1.3rem; width:32px; height:32px; border-radius:50%; cursor:pointer;">✕</button>
-        </div>
-        
-        <p style="color:#94a3b8; font-size:0.85rem; margin-bottom:18px; line-height:1.4;">
-          अपने दोस्तों और किसान भाइयों को यह पेज शेयर करें ताकि वे भी इसका लाभ ले सकें।
-        </p>
+      <div style="background: transparent; border: none; box-shadow: none; max-width: 360px; width: 100%; display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center; transform: scale(0.92); transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);" id="aoi-viral-share-container">
 
-        <!-- Quick 1-Click Buttons -->
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom: 20px;">
-          <a href="${waShareLink}" target="_blank" style="background:linear-gradient(135deg, #22c55e, #16a34a); color:#fff; text-decoration:none; padding:12px 14px; border-radius:12px; font-weight:800; font-size:0.9rem; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(22,163,74,0.4);">
-            <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i> WhatsApp
-          </a>
-          <a href="${fbShareLink}" target="_blank" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#fff; text-decoration:none; padding:12px 14px; border-radius:12px; font-weight:800; font-size:0.9rem; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(37,99,235,0.4);">
-            <i class="fa-brands fa-facebook" style="font-size:1.2rem;"></i> Facebook
-          </a>
-        </div>
+        <!-- 1. WhatsApp Share (Green Pill Button) -->
+        <a href="${waShareLink}" target="_blank" id="btnAoiWhatsAppShare" style="
+          background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+          color: #ffffff; text-decoration: none; padding: 15px 24px; border-radius: 50px;
+          font-weight: 800; font-size: 1.05rem; display: flex; align-items: center;
+          justify-content: center; gap: 12px; width: 100%; box-sizing: border-box;
+          box-shadow: 0 10px 25px rgba(22, 163, 74, 0.45);
+          border: 1.5px solid rgba(255, 255, 255, 0.25);
+          cursor: pointer; transition: transform 0.15s ease;
+        ">
+          <i class="fa-brands fa-whatsapp" style="font-size: 1.45rem;"></i>
+          <span>WhatsApp पर शेयर करें</span>
+        </a>
 
-        <!-- Copy Link Box -->
-        <div style="background:#1e293b; border-radius:10px; padding:6px 10px; display:flex; align-items:center; gap:8px; border:1px solid #334155;">
-          <input type="text" value="${shareUrl}" readonly id="aoiShareInputCopy" style="flex:1; background:transparent; border:none; color:#38bdf8; font-size:0.82rem; outline:none;" />
-          <button type="button" id="btnCopyShareUrl" style="background:#3b82f6; color:#fff; border:none; border-radius:6px; padding:6px 14px; font-weight:700; font-size:0.8rem; cursor:pointer;">
-            कॉपी
-          </button>
-        </div>
+        <!-- 2. Native Mobile Share (Blue Pill Button) -->
+        <button type="button" id="btnAoiNativeShare" style="
+          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+          color: #ffffff; border: 1.5px solid rgba(255, 255, 255, 0.25); padding: 15px 24px; border-radius: 50px;
+          font-weight: 800; font-size: 1.05rem; display: flex; align-items: center;
+          justify-content: center; gap: 12px; width: 100%; box-sizing: border-box;
+          box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+          cursor: pointer; transition: transform 0.15s ease;
+        ">
+          <i class="fa-solid fa-share-nodes" style="font-size: 1.3rem;"></i>
+          <span>सभी ऐप्स पर शेयर करें (Native)</span>
+        </button>
+
+        <!-- 3. Copy Link (Glass Pill Button) -->
+        <button type="button" id="btnCopyShareUrl" style="
+          background: rgba(15, 23, 42, 0.88);
+          color: #38bdf8; border: 1.5px solid rgba(56, 189, 248, 0.5); padding: 14px 24px; border-radius: 50px;
+          font-weight: 800; font-size: 1rem; display: flex; align-items: center;
+          justify-content: center; gap: 10px; width: 100%; box-sizing: border-box;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+          cursor: pointer; transition: transform 0.15s ease;
+          backdrop-filter: blur(10px);
+        ">
+          <i class="fa-solid fa-copy" style="font-size: 1.15rem;"></i>
+          <span id="btnCopyShareText">लिंक कॉपी करें (Copy Link)</span>
+        </button>
+
+        <!-- Cancel / Close button -->
+        <button type="button" id="closeAoiShareModal" style="
+          background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25);
+          color: #f1f5f9; padding: 8px 22px; border-radius: 30px;
+          font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-top: 6px;
+          display: inline-flex; align-items: center; gap: 6px;
+        ">
+          <span>✕ बंद करें (Cancel)</span>
+        </button>
       </div>
     `;
 
     modal.style.display = 'flex';
-    requestAnimationFrame(() => { modal.style.opacity = '1'; });
+    requestAnimationFrame(() => {
+      modal.style.opacity = '1';
+      const container = document.getElementById('aoi-viral-share-container');
+      if (container) container.style.transform = 'scale(1)';
+    });
 
     const closeModal = () => {
       modal.style.opacity = '0';
-      setTimeout(() => { modal.style.display = 'none'; }, 300);
+      const container = document.getElementById('aoi-viral-share-container');
+      if (container) container.style.transform = 'scale(0.92)';
+      setTimeout(() => { modal.style.display = 'none'; }, 220);
     };
 
     document.getElementById('closeAoiShareModal').onclick = closeModal;
     modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 
-    document.getElementById('btnCopyShareUrl').onclick = () => {
-      const input = document.getElementById('aoiShareInputCopy');
-      input.select();
-      navigator.clipboard?.writeText(shareUrl);
-      showShareToast('🔗 लिंक कॉपी हो गया!');
-      closeModal();
-    };
+    // 1. WhatsApp Button Click
+    const waBtn = document.getElementById('btnAoiWhatsAppShare');
+    if (waBtn) {
+      waBtn.onclick = () => {
+        closeModal();
+      };
+    }
+
+    // 2. Native Mobile WebShare Button Click
+    const nativeBtn = document.getElementById('btnAoiNativeShare');
+    if (nativeBtn) {
+      nativeBtn.onclick = async () => {
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: title,
+              text: text,
+              url: shareUrl
+            });
+            closeModal();
+            showShareToast('✅ सफलतापूर्वक शेयर किया गया!');
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              window.open(waShareLink, '_blank');
+              closeModal();
+            }
+          }
+        } else {
+          // If desktop without navigator.share, fallback to WhatsApp
+          window.open(waShareLink, '_blank');
+          closeModal();
+        }
+      };
+    }
+
+    // 3. Copy Link Button Click
+    const copyBtn = document.getElementById('btnCopyShareUrl');
+    if (copyBtn) {
+      copyBtn.onclick = () => {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareUrl);
+          } else {
+            const tempInp = document.createElement('input');
+            tempInp.value = shareUrl;
+            document.body.appendChild(tempInp);
+            tempInp.select();
+            document.execCommand('copy');
+            tempInp.remove();
+          }
+        } catch(e) {}
+        const textSpan = document.getElementById('btnCopyShareText');
+        if (textSpan) textSpan.textContent = '✔ लिंक कॉपी हो गया!';
+        showShareToast('🔗 लिंक कॉपी हो गया!');
+        setTimeout(() => {
+          closeModal();
+          if (textSpan) textSpan.textContent = 'लिंक कॉपी करें (Copy Link)';
+        }, 800);
+      };
+    }
   }
 
   function showShareToast(msg) {
@@ -260,11 +337,11 @@
       if (!target) return;
 
       // Skip modals and share controls themselves
-      if (target.closest('#aoi-viral-share-modal') || 
-          target.closest('#user-review-modal') || 
-          target.closest('#ai-universal-auth-modal') ||
-          target.id === 'floating-audio-btn' ||
-          target.id === 'closeAoiShareModal') {
+      if (target.closest('#aoi-viral-share-modal') ||
+        target.closest('#user-review-modal') ||
+        target.closest('#ai-universal-auth-modal') ||
+        target.id === 'floating-audio-btn' ||
+        target.id === 'closeAoiShareModal') {
         return;
       }
 
@@ -343,7 +420,7 @@
         localStorage.setItem('aoi_user_session', JSON.stringify(session));
         localStorage.setItem('user_name', name);
         localStorage.setItem('aim_user_mobile', phone);
-      } catch (err) {}
+      } catch (err) { }
 
       modal.remove();
 
@@ -366,10 +443,22 @@
   };
 
   window.getPersonalizedWhatsAppUrl = buildPersonalizedWhatsAppUrl;
+  window.triggerShare = triggerShare;
   window.triggerUniversalShare = triggerShare;
   window.triggerUniversalPageShare = triggerShare;
   window.triggerViralPageShare = triggerShare;
   window.triggerBookShare = (title, url) => triggerShare({ title, url });
+  window.triggerKpiNativeShare = function (event, title, text, targetUrl) {
+    if (event) {
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
+    triggerShare({
+      title: title,
+      text: text,
+      url: targetUrl
+    });
+  };
 
   // Track initial referrer ID & init action intercept
   getReferrerId();

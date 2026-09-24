@@ -22,21 +22,48 @@ export async function initPageEditor() {
   if (!container) return;
 
   // ====================================================================
-  // WEBP CANVAS IMAGE COMPRESSION (10-15 KB) & AUTO GITHUB SYNC
+  // WEBP CANVAS IMAGE COMPRESSION (HD 1600px Banners & Cards) & AUTO GITHUB SYNC
   // ====================================================================
   function getAutoSyncApiUrl() {
-    if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
-      return 'https://aarogyamindia.online/api/auto-sync-book';
+    if (typeof window !== 'undefined') {
+      const h = window.location.hostname;
+      if (h === '127.0.0.1' || h === 'localhost' || h === '' || window.location.protocol === 'file:') {
+        return 'https://aarogyamindia.online/api/auto-sync-book';
+      }
     }
     return '/api/auto-sync-book';
   }
 
   async function syncAssetToGitHub(path, base64Data) {
-    const apiUrl = getAutoSyncApiUrl();
     const cleanPath = String(path || '').replace(/^\/+/, '');
     const cleanBase64 = String(base64Data || '').replace(/^data:[^;]+;base64,/, '');
 
     if (!cleanPath || !cleanBase64) return { success: false, error: 'Path and Base64 required' };
+
+    // 1. If on 127.0.0.1 or localhost, first save directly to local disk via local-sync-server (port 5505)
+    if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+      try {
+        const localRes = await fetch('http://127.0.0.1:5505', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: cleanPath.endsWith('.json') ? 'save_config' : 'upload_asset',
+            path: cleanPath,
+            base64: cleanBase64
+          })
+        });
+        const localData = await localRes.json().catch(() => ({}));
+        if (localRes.ok && localData.success) {
+          console.log('[Admin LocalSync] Wrote asset directly to disk:', cleanPath);
+          return { success: true, localDisk: true, data: localData };
+        }
+      } catch (e) {
+        console.warn('[Admin LocalSync] Local server not reachable on 5505, using fallback:', e);
+      }
+    }
+
+    // 2. Production / Remote auto-sync fallback
+    const apiUrl = getAutoSyncApiUrl();
 
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
@@ -66,7 +93,21 @@ export async function initPageEditor() {
     return { success: false, error: 'Upload failed after 3 attempts' };
   }
 
-  async function compressImageToWebp(file, maxTargetBytes = 15360, maxWidth = 800) {
+  function getPreviewImgSrc(item, field = 'image', fallback = '') {
+    if (!item) return fallback;
+    if (item.image_preview) return item.image_preview;
+    const path = item[field] || '';
+    if (!path) return fallback;
+    try {
+      const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+      if (offSync[path]) return offSync[path];
+      const norm = '/' + path.replace(/^\/+/, '');
+      if (offSync[norm]) return offSync[norm];
+    } catch (e) {}
+    return path || fallback;
+  }
+
+  async function compressImageToWebp(file, maxTargetBytes = 180000, maxWidth = 1600) {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -87,26 +128,27 @@ export async function initPageEditor() {
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, w, h);
 
-            let quality = 0.75;
+            let quality = 0.88;
             let dataUrl = canvas.toDataURL('image/webp', quality);
             let sizeBytes = Math.round((dataUrl.length * 3) / 4);
 
-            const qualitySteps = [0.65, 0.52, 0.40, 0.30, 0.22];
+            const qualitySteps = [0.82, 0.76, 0.70];
             for (let i = 0; i < qualitySteps.length && sizeBytes > maxTargetBytes; i++) {
               quality = qualitySteps[i];
               dataUrl = canvas.toDataURL('image/webp', quality);
               sizeBytes = Math.round((dataUrl.length * 3) / 4);
             }
 
-            if (sizeBytes > maxTargetBytes && w > 480) {
+            // Only downscale if drastically exceeding sizeBytes and width is still very wide (>1200px)
+            if (sizeBytes > maxTargetBytes && w > 1200) {
               const scaleCanvas = document.createElement('canvas');
-              const scaleW = Math.round(w * 0.72);
-              const scaleH = Math.round(h * 0.72);
+              const scaleW = Math.round(w * 0.85);
+              const scaleH = Math.round(h * 0.85);
               scaleCanvas.width = scaleW;
               scaleCanvas.height = scaleH;
               const sctx = scaleCanvas.getContext('2d');
               sctx.drawImage(canvas, 0, 0, scaleW, scaleH);
-              dataUrl = scaleCanvas.toDataURL('image/webp', 0.45);
+              dataUrl = scaleCanvas.toDataURL('image/webp', 0.72);
               sizeBytes = Math.round((dataUrl.length * 3) / 4);
             }
 
@@ -144,10 +186,14 @@ export async function initPageEditor() {
     const file = event.target?.files?.[0];
     if (!file) return;
 
-    showToast(`⏳ इमेज प्रोसेस हो रही है (10-15 KB WebP कम्प्रेशन)...`, 'info');
+    const isBanner = ['hero_slide', 'floating_banner', 'banner', 'og_image'].includes(targetType);
+    const maxTargetBytes = isBanner ? 180000 : 75000;
+    const maxWidth = isBanner ? 1600 : 800;
+
+    showToast(`⏳ इमेज प्रोसेस हो रही है (${isBanner ? 'HD WebP 1600px' : 'WebP'} कम्प्रेशन)...`, 'info');
 
     try {
-      const { dataUrl, sizeBytes } = await compressImageToWebp(file, 15360, 800);
+      const { dataUrl, sizeBytes } = await compressImageToWebp(file, maxTargetBytes, maxWidth);
       if (!dataUrl) {
         showToast('❌ इमेज प्रोसेस करने में त्रुटि', 'error');
         return;
@@ -157,8 +203,16 @@ export async function initPageEditor() {
       const generatedPath = generateAssetPath(targetType, file.name);
       const webpPath = '/' + generatedPath;
 
+      // Cache locally in browser offline uploads store
+      try {
+        const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        offSync[webpPath] = dataUrl;
+        localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
+      } catch (e) {}
+
       if (targetType === 'hero_slide' && currentSlides[targetIndex]) {
         currentSlides[targetIndex][fieldName] = webpPath;
+        currentSlides[targetIndex]['image_preview'] = dataUrl;
         renderHeroSlidesInBuilder();
       } else if (targetType === 'floating_banner') {
         const inputEl = document.getElementById('pe_input_floating_banner_img');
@@ -166,35 +220,44 @@ export async function initPageEditor() {
         const prevWrap = document.getElementById('pe_floating_banner_preview');
         const prevImg = document.getElementById('pe_floating_banner_preview_img');
         if (prevWrap && prevImg) {
-          prevImg.src = webpPath;
+          prevImg.src = dataUrl;
           prevWrap.style.display = 'block';
         }
       } else if (targetType === 'achiever' && currentAchievers[targetIndex]) {
         currentAchievers[targetIndex][fieldName] = webpPath;
+        currentAchievers[targetIndex]['image_preview'] = dataUrl;
         renderAchieversList();
       } else if (targetType === 'health_card' && currentHealthDiseases[targetIndex]) {
         currentHealthDiseases[targetIndex][fieldName] = webpPath;
+        currentHealthDiseases[targetIndex]['image_preview'] = dataUrl;
         renderHealthCardsInBuilder();
       } else if (targetType === 'crop_card' && currentCrops[targetIndex]) {
         currentCrops[targetIndex][fieldName] = webpPath;
+        currentCrops[targetIndex]['image_preview'] = dataUrl;
         renderCropCardsInBuilder();
       } else if (targetType === 'pashu_card' && currentPashuCards[targetIndex]) {
         currentPashuCards[targetIndex][fieldName] = webpPath;
+        currentPashuCards[targetIndex]['image_preview'] = dataUrl;
         renderPashuCardsInBuilder();
       } else if (targetType === 'marketing_card' && currentMarketingCards[targetIndex]) {
         currentMarketingCards[targetIndex][fieldName] = webpPath;
+        currentMarketingCards[targetIndex]['image_preview'] = dataUrl;
         renderMarketingCardsInBuilder();
       } else if (targetType === 'review' && currentReviews[targetIndex]) {
         currentReviews[targetIndex][fieldName] = webpPath;
+        currentReviews[targetIndex]['image_preview'] = dataUrl;
         renderReviewsInBuilder();
       } else if (targetType === 'product' && currentProducts[targetIndex]) {
         currentProducts[targetIndex][fieldName] = webpPath;
+        currentProducts[targetIndex]['image_preview'] = dataUrl;
         renderProductsInBuilder();
       } else if (targetType === 'kpi_card' && currentKpiCards[targetIndex]) {
         currentKpiCards[targetIndex][fieldName] = webpPath;
+        currentKpiCards[targetIndex]['image_preview'] = dataUrl;
         renderKpiCardsInBuilder();
       } else if (targetType === 'kpi_section' && currentPageKpiSections[targetIndex]) {
         currentPageKpiSections[targetIndex][fieldName] = webpPath;
+        currentPageKpiSections[targetIndex]['image_preview'] = dataUrl;
         renderPageKpiSectionsInBuilder();
       } else if (targetType === 'og_image') {
         const inputEl = document.getElementById('pe_input_og_image');
@@ -202,23 +265,23 @@ export async function initPageEditor() {
         const prevWrap = document.getElementById('pe_og_image_preview');
         const prevImg = document.getElementById('pe_og_image_preview_img');
         if (prevWrap && prevImg) {
-          prevImg.src = webpPath;
+          prevImg.src = dataUrl;
           prevWrap.style.display = 'block';
         }
       }
 
-      showToast(`⚡ WebP इमेज तैयार (${sizeKb} KB) | गिटहब पर सिंक हो रही है...`, 'info');
+      showToast(`⚡ HD WebP तैयार (${sizeKb} KB) | सर्वर व GitHub पर सिंक हो रही है...`, 'info');
 
       const syncRes = await syncAssetToGitHub(generatedPath, dataUrl);
       if (syncRes.success) {
-        showToast(`✅ इमेज GitHub पर सफलतापूर्वक पुश हो गई! (${sizeKb} KB WebP)`, 'success');
+        showToast(`✅ इमेज GitHub पर सफलतापूर्वक सिंक हो गई! (${sizeKb} KB HD WebP)`, 'success');
       } else {
-        console.warn('[Admin] GitHub sync info (local storage fallback active):', syncRes.error);
-        showToast(`✅ इमेज स्थानीय रूप से सुरक्षित हो गई (${sizeKb} KB) - लोकल सर्वर सुरक्षित!`, 'success');
+        console.warn('[Admin] GitHub sync info (local preview active):', syncRes.error);
+        showToast(`✅ इमेज तैयार (${sizeKb} KB) | तत्काल प्रीव्यू सक्रिय!`, 'success');
       }
     } catch (err) {
       console.error('[Admin] Upload error:', err);
-      showToast('⚠️ अपलोड सुरक्षित: स्थानीय रूप से लागू हुआ', 'info');
+      showToast('⚠️ अपलोड तैयार: स्थानीय प्रीव्यू सक्रिय', 'info');
     }
   };
 
@@ -1956,38 +2019,37 @@ export async function initPageEditor() {
     }
 ];
 
-  // Load from site-pages-config.json (Server Ground Truth), then localStorage fallback, then defaultPages
+  // Load order: 1) Active localStorage session (instant local edits) -> 2) site-pages-config.json (disk/remote truth) -> 3) defaultPages
   let allPages = [];
   try {
-    const cacheTime = Math.floor(Date.now() / 60000);
-    // Robust multi-path fetch for relative, local server, and root setups
-    const pathsToTry = [
-      '../data/site-pages-config.json?v=' + cacheTime,
-      '/data/site-pages-config.json?v=' + cacheTime,
-      './data/site-pages-config.json?v=' + cacheTime
-    ];
-    for (const p of pathsToTry) {
-      try {
-        const res = await fetch(p);
-        if (res.ok) {
-          const j = await res.json();
-          if (j && Array.isArray(j.sitePages) && j.sitePages.length > 0) {
-            allPages = j.sitePages;
-            break;
-          }
-        }
-      } catch (err) {}
+    const stored = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        allPages = parsed;
+      }
     }
   } catch (e) {}
 
   if (allPages.length === 0) {
     try {
-      const stored = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          allPages = parsed;
-        }
+      const cacheTime = Math.floor(Date.now() / 60000);
+      const pathsToTry = [
+        '../data/site-pages-config.json?v=' + cacheTime,
+        '/data/site-pages-config.json?v=' + cacheTime,
+        './data/site-pages-config.json?v=' + cacheTime
+      ];
+      for (const p of pathsToTry) {
+        try {
+          const res = await fetch(p);
+          if (res.ok) {
+            const j = await res.json();
+            if (j && Array.isArray(j.sitePages) && j.sitePages.length > 0) {
+              allPages = j.sitePages;
+              break;
+            }
+          }
+        } catch (err) {}
       }
     } catch (e) {}
   }
@@ -2024,6 +2086,17 @@ export async function initPageEditor() {
     if (res.ok) {
       const j = await res.json();
       availableBooks = j.books || [];
+    }
+  } catch (e) {}
+
+  // Load AarogyamTube recordings for video selector
+  let availableTubeRecordings = [];
+  try {
+    const cacheTime = Math.floor(Date.now() / 300000);
+    const res = await fetch('/data/webinar-recordings.json?v=' + cacheTime);
+    if (res.ok) {
+      const j = await res.json();
+      availableTubeRecordings = j.recordings || [];
     }
   } catch (e) {}
 
@@ -2336,7 +2409,7 @@ export async function initPageEditor() {
 
         <!-- Right Main Workspace Canvas -->
         <div id="pe-studio-main-canvas" class="pe-studio-canvas" style="flex: 1; min-width: 0; overflow-y: auto; padding: 20px 24px 30px 24px; background: #070d19; scroll-behavior: smooth;">
-          <form id="site-page-customizer-form">
+          <form id="site-page-customizer-form" novalidate onsubmit="event.preventDefault(); window.savePageConfig(); return false;">
           <!-- 1. Basic Page Settings -->
           <div id="pe-sec-basic" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
@@ -2345,15 +2418,15 @@ export async function initPageEditor() {
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
             <div>
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">पेज का नाम (Page Name)*</label>
-              <input type="text" id="pe_input_name" class="admin-input" placeholder="उदा. 📚 ई-बुक स्टोर (eBook Store)" required style="width: 100%; padding: 8px 12px;" />
+              <input type="text" id="pe_input_name" class="admin-input" placeholder="उदा. 📚 ई-बुक स्टोर (eBook Store)" style="width: 100%; padding: 8px 12px;" />
             </div>
             <div>
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">पेज स्लग (Slug)*</label>
-              <input type="text" id="pe_input_slug" class="admin-input" placeholder="उदा. ebook, agriculture, health" required style="width: 100%; padding: 8px 12px;" />
+              <input type="text" id="pe_input_slug" class="admin-input" placeholder="उदा. ebook, agriculture, health" style="width: 100%; padding: 8px 12px;" />
             </div>
             <div>
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">Live URL / Path*</label>
-              <input type="text" id="pe_input_url" class="admin-input" placeholder="/ebooks/ebook.html" required style="width: 100%; padding: 8px 12px;" />
+              <input type="text" id="pe_input_url" class="admin-input" placeholder="/ebooks/ebook.html" style="width: 100%; padding: 8px 12px;" />
             </div>
             <div>
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">कैटेगरी (Category)</label>
@@ -2755,10 +2828,13 @@ export async function initPageEditor() {
           </span>
         </div>
         <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <button type="button" id="btn-export-pages-json" onclick="window.exportPagesJson()" class="admin-button" style="background: #0284c7; color: #fff; font-weight: 800; padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap;">
+            📥 बैकअप JSON डाउनलोड करें
+          </button>
           <button type="button" id="btn-cancel-page-editor-form" class="admin-button" style="background: transparent; border: 1.5px solid #334155; color: #cbd5e1; padding: 8px 18px; font-weight: 700; font-size: 0.85rem; border-radius: 8px; cursor: pointer;">
             रद्द करें (Cancel)
           </button>
-          <button type="submit" form="site-page-customizer-form" id="btn-save-page-editor-form" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 8px 22px; font-size: 0.88rem; border-radius: 8px; box-shadow: 0 4px 14px rgba(22,163,74,0.4); cursor: pointer; white-space: nowrap;">
+          <button type="button" id="btn-save-page-editor-form" onclick="window.savePageConfig()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 8px 22px; font-size: 0.88rem; border-radius: 8px; box-shadow: 0 4px 14px rgba(22,163,74,0.4); cursor: pointer; white-space: nowrap;">
             💾 यह साइट पेज सुरक्षित करें (Save Page)
           </button>
         </div>
@@ -3324,7 +3400,7 @@ export async function initPageEditor() {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid #f59e0b; overflow: hidden; background: #1e293b; display: flex; align-items: center; justify-content: center;">
-              <img src="${ach.image}" alt="${ach.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/team/achiever-1.jpg'">
+              <img src="${escapeHtml(getPreviewImgSrc(ach, 'image', '/images/team/achiever-1.jpg'))}" alt="${ach.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/team/achiever-1.jpg'">
             </div>
             <div>
               <span style="font-weight: 800; color: #fbbf24; font-size: 0.9rem;">#${idx + 1} ${ach.name}</span>
@@ -3339,18 +3415,23 @@ export async function initPageEditor() {
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 8px;">
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">फोटो URL (WebP 10-15 KB)</label>
-            <input type="text" value="${escapeHtml(ach.image)}" onchange="window.updateAchieverField(${idx}, 'image', this.value); window.renderAchieversList();" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(ach.image)}" onchange="window.updateAchieverField(${idx}, 'image', this.value); if (currentAchievers[${idx}]) delete currentAchievers[${idx}].image_preview; window.renderAchieversList();" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
             <div style="display:flex;gap:4px;margin-top:4px;align-items:center;">
               <input type="file" id="achiever_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'achiever', ${idx}, 'image')">
               <button type="button" onclick="document.getElementById('achiever_file_${idx}').click()" class="admin-button small-button" style="background:#3b82f6;color:#fff;padding:3px 8px;font-size:0.72rem;font-weight:800;">
                 📁 फोटो अपलोड (WebP)
               </button>
-              <select onchange="window.updateAchieverField(${idx}, 'image', this.value); window.renderAchieversList();" class="admin-select" style="flex:1; padding: 3px 6px; font-size: 0.72rem;">
+              <select onchange="window.updateAchieverField(${idx}, 'image', this.value); if (currentAchievers[${idx}]) delete currentAchievers[${idx}].image_preview; window.renderAchieversList();" class="admin-select" style="flex:1; padding: 3px 6px; font-size: 0.72rem;">
                 <option value="">-- प्रीसेट चुनें --</option>
                 ${availablePhotos.map(ph => `<option value="${ph}" ${ach.image === ph ? 'selected' : ''}>${ph}</option>`).join('')}
               </select>
             </div>
-            ${ach.image ? `<div style="margin-top:4px;"><img src="${escapeHtml(ach.image)}" alt="Preview" style="height:38px;border-radius:4px;object-fit:cover;border:1px solid #f59e0b;" onerror="this.style.display='none'"></div>` : ''}
+            ${(ach.image_preview || ach.image) ? `
+              <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                <img src="${escapeHtml(getPreviewImgSrc(ach, 'image', '/images/team/achiever-1.jpg'))}" alt="Preview" style="height:44px; width:44px; border-radius:50%; object-fit:cover; border:2px solid #f59e0b; display:block;" onerror="this.src='/images/team/achiever-1.jpg'" />
+                <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${ach.image_preview ? '✓ नया अपलोड (WebP)' : '✓ एक्टिव फोटो'}</span>
+              </div>
+            ` : ''}
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">नाम अंग्रेजी (Name EN)</label>
@@ -3555,11 +3636,17 @@ export async function initPageEditor() {
   });
 
   document.getElementById('btn_add_page_video')?.addEventListener('click', () => {
+    const firstRec = availableTubeRecordings[0] || {};
     currentVideos.push({
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      title: '🎥 नया वीडियो डेमो शीर्षक',
-      desc: 'वीडियो का विवरण यहाँ लिखें...',
-      ratio: '16:9'
+      video_id: firstRec.id || 'VID_S432998',
+      title: firstRec.title || '🎬 AarogyamTube विशेष वीडियो',
+      desc: firstRec.description?.substring(0, 100) || 'वैज्ञानिक कृषि व पशु पोषण गाइड',
+      url: firstRec.id ? `/tube.html?vid=${firstRec.id}` : '/tube.html',
+      youtube_id: firstRec.youtube_id || '',
+      thumbnail: firstRec.thumbnail || '',
+      duration: firstRec.duration || '',
+      target_page: 'all',
+      ratio: firstRec.format === 'short_reel' ? '9:16' : '16:9'
     });
     renderVideosInBuilder();
   });
@@ -3645,19 +3732,24 @@ export async function initPageEditor() {
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
           <div>
-            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">बैनर इमेज URL (WebP 10-15 KB)</label>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">बैनर इमेज URL (HD WebP 1600px)</label>
             <input type="text" value="${escapeHtml(slide.image)}" onchange="window.updateHeroSlideField(${idx}, 'image', this.value); window.renderHeroSlidesInBuilder();" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
             <div style="display:flex;gap:4px;margin-top:4px;align-items:center;">
               <input type="file" id="hero_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'hero_slide', ${idx}, 'image')">
               <button type="button" onclick="document.getElementById('hero_file_${idx}').click()" class="admin-button small-button" style="background:#16a34a;color:#fff;padding:3px 8px;font-size:0.72rem;font-weight:800;">
-                📁 बैनर अपलोड (WebP)
+                📁 बैनर अपलोड (HD WebP)
               </button>
               <select onchange="window.updateHeroSlideField(${idx}, 'image', this.value); window.renderHeroSlidesInBuilder();" class="admin-select" style="flex:1; padding: 3px 6px; font-size: 0.72rem;">
                 <option value="">-- त्वरित प्रीसेट चुनें --</option>
                 ${bannerPresets.map(bp => `<option value="${bp.val}" ${slide.image === bp.val ? 'selected' : ''}>${bp.lbl}</option>`).join('')}
               </select>
             </div>
-            ${slide.image ? `<div style="margin-top:4px;"><img src="${escapeHtml(slide.image)}" alt="Preview" style="height:40px;border-radius:4px;object-fit:cover;border:1px solid #3b82f6;" onerror="this.style.display='none'"></div>` : ''}
+            ${(slide.image_preview || slide.image) ? `
+              <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                <img src="${escapeHtml(slide.image_preview || slide.image)}" alt="Preview" style="height:55px; max-width:140px; border-radius:6px; object-fit:cover; border:2px solid #3b82f6; display:block;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+                <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${slide.image_preview ? '✓ नया अपलोड (HD Preview)' : '✓ एक्टिव बैनर'}</span>
+              </div>
+            ` : ''}
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">टैग / ऑफर बैज</label>
@@ -3725,7 +3817,7 @@ export async function initPageEditor() {
 
     wrap.innerHTML = currentHealthDiseases.map((item, idx) => {
       const safeName = escapeHtml(item.name || '');
-      const safeImg = escapeHtml(item.image || '/images/banners/health-banner.jpeg');
+      const safeImg = escapeHtml(getPreviewImgSrc(item, 'image', '/images/banners/health-banner.jpeg'));
       const safeBadge = escapeHtml(item.badge || '');
       const safeColor = item.color || '#3b82f6';
       const safeIcon = escapeHtml(item.icon || '🩺');
@@ -3749,14 +3841,19 @@ export async function initPageEditor() {
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-bottom:8px;">
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">कार्ड इमेज (WebP 10-15 KB)</label>
-              <input type="text" value="${safeImg}" onchange="window.updateHealthCardField(${idx}, 'image', this.value); window.renderHealthCardsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
+              <input type="text" value="${safeImg}" onchange="window.updateHealthCardField(${idx}, 'image', this.value); if (currentHealthDiseases[${idx}]) delete currentHealthDiseases[${idx}].image_preview; window.renderHealthCardsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
               <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
                 <input type="file" id="health_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'health_card', ${idx}, 'image')">
                 <button type="button" onclick="document.getElementById('health_file_${idx}').click()" class="admin-button small-button" style="background:#dc2626; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">
                   📁 इमेज बदलें (WebP)
                 </button>
               </div>
-              ${safeImg ? `<div style="margin-top:4px;"><img src="${safeImg}" alt="Preview" style="height:44px;border-radius:4px;object-fit:cover;border:1px solid ${safeColor};" onerror="this.style.display='none'"></div>` : ''}
+              ${(item.image_preview || item.image) ? `
+                <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                  <img src="${safeImg}" alt="Preview" style="height:44px; width:65px; border-radius:6px; object-fit:cover; border:1.5px solid ${safeColor}; display:block;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+                  <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${item.image_preview ? '✓ नया अपलोड (WebP)' : '✓ एक्टिव कार्ड'}</span>
+                </div>
+              ` : ''}
             </div>
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">समस्या / नाम (Hindi Title)</label>
@@ -3807,7 +3904,7 @@ export async function initPageEditor() {
 
     wrap.innerHTML = currentCrops.map((item, idx) => {
       const safeName = escapeHtml(item.name || '');
-      const safeImg = escapeHtml(item.image || '/images/banners/agriculture-banner.jpeg');
+      const safeImg = escapeHtml(getPreviewImgSrc(item, 'image', '/images/banners/agriculture-banner.jpeg'));
       const safeBadge = escapeHtml(item.badge || '');
       const safeSeason = escapeHtml(item.season || 'खरीफ फसल');
       const issuesStr = Array.isArray(item.mainIssues) ? item.mainIssues.join(', ') : (item.issues || item.mainIssues || '');
@@ -3829,14 +3926,19 @@ export async function initPageEditor() {
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-bottom:8px;">
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">फसल इमेज (WebP 10-15 KB)</label>
-              <input type="text" value="${safeImg}" onchange="window.updateCropCardField(${idx}, 'image', this.value); window.renderCropCardsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
+              <input type="text" value="${safeImg}" onchange="window.updateCropCardField(${idx}, 'image', this.value); if (currentCrops[${idx}]) delete currentCrops[${idx}].image_preview; window.renderCropCardsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
               <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
                 <input type="file" id="crop_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'crop_card', ${idx}, 'image')">
                 <button type="button" onclick="document.getElementById('crop_file_${idx}').click()" class="admin-button small-button" style="background:#16a34a; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">
                   📁 इमेज बदलें (WebP)
                 </button>
               </div>
-              ${safeImg ? `<div style="margin-top:4px;"><img src="${safeImg}" alt="Preview" style="height:44px;border-radius:4px;object-fit:cover;border:1px solid #16a34a;" onerror="this.style.display='none'"></div>` : ''}
+              ${(item.image_preview || item.image) ? `
+                <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                  <img src="${safeImg}" alt="Preview" style="height:44px; width:65px; border-radius:6px; object-fit:cover; border:1.5px solid #16a34a; display:block;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+                  <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${item.image_preview ? '✓ नया अपलोड (WebP)' : '✓ एक्टिव फसल'}</span>
+                </div>
+              ` : ''}
             </div>
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">फसल का नाम (Crop Name)</label>
@@ -3914,7 +4016,7 @@ export async function initPageEditor() {
 
     wrap.innerHTML = currentPashuCards.map((item, idx) => {
       const safeName = escapeHtml(item.name || '');
-      const safeImg = escapeHtml(item.image || '/images/banners/pashu-palan-banner.jpg');
+      const safeImg = escapeHtml(getPreviewImgSrc(item, 'image', '/images/banners/pashu-palan-banner.jpg'));
       const safeBadge = escapeHtml(item.badge || '');
       const safeCat = escapeHtml(item.category || 'पशु पालन');
       const issuesStr = Array.isArray(item.mainIssues) ? item.mainIssues.join(', ') : (item.issues || item.mainIssues || '');
@@ -3936,14 +4038,19 @@ export async function initPageEditor() {
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-bottom:8px;">
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">पशु फोटो (WebP 10-15 KB)</label>
-              <input type="text" value="${safeImg}" onchange="window.updatePashuCardField(${idx}, 'image', this.value); window.renderPashuCardsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
+              <input type="text" value="${safeImg}" onchange="window.updatePashuCardField(${idx}, 'image', this.value); if (currentPashuCards[${idx}]) delete currentPashuCards[${idx}].image_preview; window.renderPashuCardsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
               <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
                 <input type="file" id="pashu_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'pashu_card', ${idx}, 'image')">
                 <button type="button" onclick="document.getElementById('pashu_file_${idx}').click()" class="admin-button small-button" style="background:#0284c7; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">
                   📁 इमेज बदलें (WebP)
                 </button>
               </div>
-              ${safeImg ? `<div style="margin-top:4px;"><img src="${safeImg}" alt="Preview" style="height:44px;border-radius:4px;object-fit:cover;border:1px solid #0284c7;" onerror="this.style.display='none'"></div>` : ''}
+              ${(item.image_preview || item.image) ? `
+                <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                  <img src="${safeImg}" alt="Preview" style="height:44px; width:65px; border-radius:6px; object-fit:cover; border:1.5px solid #0284c7; display:block;" onerror="this.src='/images/banners/pashu-palan-banner.jpg'" />
+                  <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${item.image_preview ? '✓ नया अपलोड (WebP)' : '✓ एक्टिव पशु'}</span>
+                </div>
+              ` : ''}
             </div>
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">पशु विषय / नाम</label>
@@ -4039,7 +4146,7 @@ export async function initPageEditor() {
     }
 
     wrap.innerHTML = currentKpiCards.map((card, idx) => {
-      const safeImg = escapeHtml(card.image || '');
+      const safeImg = escapeHtml(getPreviewImgSrc(card, 'image', ''));
       return `
       <div style="background: #0f172a; border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px; position: relative;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -4052,9 +4159,14 @@ export async function initPageEditor() {
         <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
           <input type="file" id="kpi_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'kpi_card', ${idx}, 'image')">
           <button type="button" onclick="document.getElementById('kpi_file_${idx}').click()" class="admin-button small-button" style="background:#16a34a; color:#fff; padding:3px 8px; font-size:0.7rem; font-weight:800;">📁 KPI बैनर इमेज (WebP)</button>
-          <input type="text" value="${safeImg}" onchange="window.updateKpiCard(${idx}, 'image', this.value); window.renderKpiCardsInBuilder();" class="admin-input" placeholder="/images/kpi/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
+          <input type="text" value="${safeImg}" onchange="window.updateKpiCard(${idx}, 'image', this.value); if (currentKpiCards[${idx}]) delete currentKpiCards[${idx}].image_preview; window.renderKpiCardsInBuilder();" class="admin-input" placeholder="/images/kpi/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
         </div>
-        ${safeImg ? `<div style="margin-top:4px;"><img src="${safeImg}" alt="KPI Preview" style="height:36px;border-radius:4px;object-fit:cover;border:1px solid #16a34a;" onerror="this.style.display='none'"></div>` : ''}
+        ${(card.image_preview || card.image) ? `
+          <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+            <img src="${safeImg}" alt="KPI Preview" style="height:38px; width:60px; border-radius:4px; object-fit:cover; border:1px solid #16a34a; display:block;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${card.image_preview ? '✓ नया अपलोड (WebP)' : '✓ KPI बैनर'}</span>
+          </div>
+        ` : ''}
       </div>
     `;
     }).join('');
@@ -4100,14 +4212,19 @@ export async function initPageEditor() {
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">कार्ड इमेज / बैनर (WebP 10-15 KB)</label>
-            <input type="text" value="${escapeHtml(m.image || '')}" onchange="window.updateMarketingCardField(${idx}, 'image', this.value); window.renderMarketingCardsInBuilder();" class="admin-input" placeholder="/images/..." style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(m.image || '')}" onchange="window.updateMarketingCardField(${idx}, 'image', this.value); if (currentMarketingCards[${idx}]) delete currentMarketingCards[${idx}].image_preview; window.renderMarketingCardsInBuilder();" class="admin-input" placeholder="/images/..." style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
             <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
               <input type="file" id="mkt_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'marketing_card', ${idx}, 'image')">
               <button type="button" onclick="document.getElementById('mkt_file_${idx}').click()" class="admin-button small-button" style="background:#f59e0b; color:#000; padding:3px 8px; font-size:0.72rem; font-weight:800;">
                 📁 इमेज बदलें (WebP)
               </button>
             </div>
-            ${m.image ? `<div style="margin-top:4px;"><img src="${escapeHtml(m.image)}" alt="Preview" style="height:36px;border-radius:4px;object-fit:cover;border:1px solid #f59e0b;" onerror="this.style.display='none'"></div>` : ''}
+            ${(m.image_preview || m.image) ? `
+              <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                <img src="${escapeHtml(getPreviewImgSrc(m, 'image', '/images/banners/ebook-banner.jpeg'))}" alt="Preview" style="height:40px; width:65px; border-radius:4px; object-fit:cover; border:1px solid #f59e0b; display:block;" onerror="this.src='/images/banners/ebook-banner.jpeg'" />
+                <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${m.image_preview ? '✓ नया अपलोड (WebP)' : '✓ सेलिंग कार्ड'}</span>
+              </div>
+            ` : ''}
           </div>
           <div style="grid-column: 1 / -1;">
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">संक्षिप्त विवरण (Description)</label>
@@ -4160,31 +4277,79 @@ export async function initPageEditor() {
     ];
 
     wrap.innerHTML = currentVideos.map((v, idx) => `
-      <div style="background: #0f172a; border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; position: relative;">
-        <div>
-          <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">YouTube URL</label>
-          <input type="text" value="${escapeHtml(v.url || '')}" onchange="window.updateVideoItem(${idx}, 'url', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+      <div style="background: #0b1120; border: 1.5px solid #1e293b; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: #ef4444; color: #fff; font-size: 0.7rem; font-weight: 900; padding: 2px 8px; border-radius: 6px;">AarogyamTube</span>
+            <span style="font-size: 0.85rem; font-weight: 800; color: #f8fafc;">वीडियो #${idx + 1}</span>
+            ${v.duration ? `<span style="font-size: 0.72rem; color: #94a3b8; background: #1e293b; padding: 2px 6px; border-radius: 4px;">⏱️ ${escapeHtml(v.duration)}</span>` : ''}
+          </div>
+          <button type="button" onclick="window.removeVideoItem(${idx})" class="admin-button small-button" style="background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); padding: 4px 10px; font-size: 0.75rem;">&times; हटाएं</button>
         </div>
-        <div>
-          <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">वीडियो शीर्षक</label>
-          <input type="text" value="${escapeHtml(v.title || '')}" onchange="window.updateVideoItem(${idx}, 'title', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+          <div>
+            <label style="font-size: 0.72rem; color: #38bdf8; font-weight: 800; display: block; margin-bottom: 4px;">
+              🎬 AarogyamTube वीडियो लाइब्रेरी से चुनें:
+            </label>
+            <select onchange="window.selectAarogyamTubeVideo(${idx}, this.value)" class="admin-select" style="width: 100%; padding: 7px 10px; font-size: 0.8rem; background: #0f172a; color: #38bdf8; border: 1.5px solid #38bdf8; border-radius: 8px; font-weight: 700;">
+              <option value="">-- AarogyamTube वीडियो चुनें --</option>
+              ${availableTubeRecordings.map(r => `
+                <option value="${r.id}" ${(v.video_id === r.id || v.url?.includes(r.id)) ? 'selected' : ''}>
+                  ${r.format === 'short_reel' ? '📱 [शॉर्ट]' : '🎬 [वीडियो]'} ${escapeHtml(r.title.substring(0, 44))} (${r.duration || ''})
+                </option>
+              `).join('')}
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block; margin-bottom: 4px;">प्रदर्शित करने वाला पेज (Target Page)</label>
+            <select onchange="window.updateVideoItem(${idx}, 'target_page', this.value)" class="admin-select" style="width: 100%; padding: 7px 10px; font-size: 0.8rem; background: #1e293b; color: #fff; border-radius: 8px;">
+              ${pageTargetOptions.map(opt => `<option value="${opt.id}" ${(v.target_page || 'all') === opt.id ? 'selected' : ''}>${opt.label}</option>`).join('')}
+            </select>
+          </div>
         </div>
-        <div>
-          <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">प्रदर्शित करने वाला पेज (Target Page)</label>
-          <select onchange="window.updateVideoItem(${idx}, 'target_page', this.value)" class="admin-select" style="width: 100%; padding: 5px 8px; font-size: 0.8rem; background:#1e293b; color:#fff;">
-            ${pageTargetOptions.map(opt => `<option value="${opt.id}" ${(v.target_page || 'all') === opt.id ? 'selected' : ''}>${opt.label}</option>`).join('')}
-          </select>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block; margin-bottom: 4px;">वीडियो शीर्षक (Title)</label>
+            <input type="text" value="${escapeHtml(v.title || '')}" onchange="window.updateVideoItem(${idx}, 'title', this.value)" class="admin-input" style="width: 100%; padding: 7px 10px; font-size: 0.82rem;" />
+          </div>
+
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block; margin-bottom: 4px;">विवरण (Description)</label>
+            <input type="text" value="${escapeHtml(v.desc || '')}" onchange="window.updateVideoItem(${idx}, 'desc', this.value)" class="admin-input" style="width: 100%; padding: 7px 10px; font-size: 0.82rem;" />
+          </div>
         </div>
-        <div>
-          <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">विवरण</label>
-          <input type="text" value="${escapeHtml(v.desc || '')}" onchange="window.updateVideoItem(${idx}, 'desc', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
-        </div>
-        <div style="display: flex; align-items: flex-end; justify-content: flex-end;">
-          <button type="button" onclick="window.removeVideoItem(${idx})" class="admin-button small-button" style="background: #ef4444; color: #fff;">&times; हटाएं</button>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #070d19; padding: 8px 12px; border-radius: 8px; border: 1px solid #1e293b; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="${v.thumbnail || '/images/banners/agriculture-hero-banner-1.webp'}" alt="Thumb" style="width: 56px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid #334155;" onerror="this.src='/images/banners/agriculture-hero-banner-1.webp'" />
+            <span style="font-size: 0.75rem; color: #94a3b8; font-family: monospace;">${escapeHtml(v.url || '/tube.html')}</span>
+          </div>
+          <a href="${v.url || '/tube.html'}" target="_blank" style="color: #38bdf8; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            <span>▶ AarogyamTube में देखें</span>
+          </a>
         </div>
       </div>
     `).join('');
   }
+
+  window.selectAarogyamTubeVideo = function(idx, recId) {
+    if (!currentVideos[idx]) return;
+    const rec = availableTubeRecordings.find(r => r.id === recId);
+    if (rec) {
+      currentVideos[idx].video_id = rec.id;
+      currentVideos[idx].title = rec.title;
+      currentVideos[idx].desc = rec.description?.substring(0, 140) || '';
+      currentVideos[idx].url = `/tube.html?vid=${rec.id}`;
+      currentVideos[idx].youtube_id = rec.youtube_id || '';
+      currentVideos[idx].thumbnail = rec.thumbnail || (rec.youtube_id ? `https://img.youtube.com/vi/${rec.youtube_id}/hqdefault.jpg` : '');
+      currentVideos[idx].duration = rec.duration || '';
+      currentVideos[idx].ratio = rec.format === 'short_reel' ? '9:16' : '16:9';
+      renderVideosInBuilder();
+    }
+  };
 
   window.updateVideoItem = function(idx, field, val) {
     if (currentVideos[idx]) currentVideos[idx][field] = val;
@@ -4216,14 +4381,19 @@ export async function initPageEditor() {
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">अवतार फोटो (WebP 10-15 KB)</label>
-            <input type="text" value="${escapeHtml(r.image || r.avatar || '')}" onchange="window.updateReviewItem(${idx}, 'image', this.value); window.renderReviewsInBuilder();" class="admin-input" placeholder="/images/..." style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
+            <input type="text" value="${escapeHtml(r.image || r.avatar || '')}" onchange="window.updateReviewItem(${idx}, 'image', this.value); if (currentReviews[${idx}]) delete currentReviews[${idx}].image_preview; window.renderReviewsInBuilder();" class="admin-input" placeholder="/images/..." style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
             <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
               <input type="file" id="rev_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'review', ${idx}, 'image')">
               <button type="button" onclick="document.getElementById('rev_file_${idx}').click()" class="admin-button small-button" style="background:#8b5cf6; color:#fff; padding:2px 8px; font-size:0.72rem; font-weight:800;">
                 📁 फोटो बदलें (WebP)
               </button>
             </div>
-            ${(r.image || r.avatar) && (r.image || r.avatar).startsWith('/') ? `<div style="margin-top:4px;"><img src="${escapeHtml(r.image || r.avatar)}" alt="Avatar" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid #8b5cf6;" onerror="this.style.display='none'"></div>` : ''}
+            ${(r.image_preview || r.image || r.avatar) ? `
+              <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                <img src="${escapeHtml(getPreviewImgSrc(r, 'image', '/images/team/achiever-1.jpg'))}" alt="Avatar" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid #8b5cf6; display:block;" onerror="this.src='/images/team/achiever-1.jpg'" />
+                <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${r.image_preview ? '✓ नया अवतार' : '✓ एक्टिव'}</span>
+              </div>
+            ` : ''}
           </div>
         </div>
         <input type="text" value="${escapeHtml(r.comment || '')}" onchange="window.updateReviewItem(${idx}, 'comment', this.value)" class="admin-input" placeholder="टिप्पणी" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
@@ -4276,7 +4446,7 @@ export async function initPageEditor() {
       return;
     }
     wrap.innerHTML = currentProducts.map((prod, idx) => {
-      const safeImg = escapeHtml(prod.image || '');
+      const safeImg = escapeHtml(getPreviewImgSrc(prod, 'image', ''));
       const prodTitle = prod.title || prod.name || '';
       const prodMrp = (prod.mrp !== undefined && prod.mrp !== '') ? prod.mrp : (prod.price || '');
       const prodBadge = prod.badge || '';
@@ -4292,12 +4462,17 @@ export async function initPageEditor() {
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद इमेज (WebP)</label>
-              <input type="text" value="${safeImg}" onchange="window.updateProduct(${idx}, 'image', this.value); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
+              <input type="text" value="${safeImg}" onchange="window.updateProduct(${idx}, 'image', this.value); if (currentProducts[${idx}]) delete currentProducts[${idx}].image_preview; window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
               <div style="display:flex; gap:6px; margin-top:4px;">
                 <input type="file" id="prod_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'product', ${idx}, 'image')">
                 <button type="button" onclick="document.getElementById('prod_file_${idx}').click()" class="admin-button small-button" style="background:#7c3aed; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">📁 इमेज अपलोड (WebP)</button>
               </div>
-              ${safeImg ? `<img src="${safeImg}" alt="Preview" style="height:48px;border-radius:4px;object-fit:cover;border:1px solid #7c3aed;margin-top:4px;" onerror="this.style.display='none'">` : ''}
+              ${(prod.image_preview || prod.image) ? `
+                <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                  <img src="${safeImg}" alt="Preview" style="height:48px; width:48px; border-radius:4px; object-fit:cover; border:1px solid #7c3aed; display:block;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+                  <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${prod.image_preview ? '✓ नया अपलोड' : '✓ प्रोडक्ट'}</span>
+                </div>
+              ` : ''}
             </div>
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">उत्पाद का नाम (Title / Name)*</label>
@@ -4343,7 +4518,7 @@ export async function initPageEditor() {
       return;
     }
     wrap.innerHTML = currentPageKpiSections.map((sec, idx) => {
-      const safeImg = escapeHtml(sec.image || '');
+      const safeImg = escapeHtml(getPreviewImgSrc(sec, 'image', ''));
       const itemsStr = Array.isArray(sec.items) ? sec.items.join('\n') : (sec.items || '');
       return `
         <div style="background:#0f172a; border:1.5px solid #0284c750; border-radius:10px; padding:14px; position:relative;">
@@ -4357,12 +4532,17 @@ export async function initPageEditor() {
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">बैनर इमेज (WebP — auto: images/kpi/)</label>
-              <input type="text" value="${safeImg}" onchange="window.updatePageKpiSection(${idx}, 'image', this.value); window.renderPageKpiSectionsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;"/>
+              <input type="text" value="${safeImg}" onchange="window.updatePageKpiSection(${idx}, 'image', this.value); if (currentPageKpiSections[${idx}]) delete currentPageKpiSections[${idx}].image_preview; window.renderPageKpiSectionsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;"/>
               <div style="display:flex; gap:6px; margin-top:4px;">
                 <input type="file" id="kpi_sec_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'kpi_section', ${idx}, 'image')">
                 <button type="button" onclick="document.getElementById('kpi_sec_file_${idx}').click()" class="admin-button small-button" style="background:#0284c7; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">📁 बैनर अपलोड (WebP)</button>
               </div>
-              ${safeImg ? `<img src="${safeImg}" alt="Preview" style="height:40px;border-radius:4px;object-fit:cover;border:1px solid #0284c7;margin-top:4px;" onerror="this.style.display='none'">` : ''}
+              ${(sec.image_preview || sec.image) ? `
+                <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                  <img src="${safeImg}" alt="Preview" style="height:40px; width:65px; border-radius:4px; object-fit:cover; border:1px solid #0284c7; display:block;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+                  <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${sec.image_preview ? '✓ नया अपलोड' : '✓ सेक्शन'}</span>
+                </div>
+              ` : ''}
             </div>
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">सेक्शन शीर्षक (Title)</label>
@@ -4795,9 +4975,17 @@ export async function initPageEditor() {
   }
 
   function savePageConfig() {
-    const slug = (document.getElementById('pe_input_slug')?.value || '').trim();
-    const name = (document.getElementById('pe_input_name')?.value || '').trim();
-    const url = (document.getElementById('pe_input_url')?.value || '').trim();
+    let slug = (document.getElementById('pe_input_slug')?.value || '').trim();
+    let name = (document.getElementById('pe_input_name')?.value || '').trim();
+    let url = (document.getElementById('pe_input_url')?.value || '').trim();
+
+    if (!slug && editingPageId) {
+      slug = editingPageId.replace(/^page_/, '');
+    }
+    if (!slug) slug = 'index';
+    if (!name) name = 'मुख्य पृष्ठ';
+    if (!url) url = '/' + (slug === 'index' ? 'index.html' : slug + '.html');
+
     const cat = document.getElementById('pe_select_category')?.value || 'eBooks';
     const status = document.getElementById('pe_select_status')?.value || 'active';
     const themeCol = document.getElementById('pe_input_theme_primary')?.value || '#15803d';
@@ -4877,17 +5065,24 @@ export async function initPageEditor() {
     renderPagesTable();
     showToast(`✅ पेज '${name}' सम्पूर्ण कॉन्फ़िगरेशन के साथ सुरक्षित हो गया!`, 'success');
 
-    // Auto Git Live Sync on Save
+    // Auto Git Live Sync & Local Disk Sync on Save
     try {
       const configStr = JSON.stringify({ sitePages: allPages }, null, 2);
       const base64Data = btoa(unescape(encodeURIComponent(configStr)));
       syncAssetToGitHub('data/site-pages-config.json', base64Data).then(res => {
         if (res.success) {
-          showToast('🚀 GitHub पर site-pages-config.json ऑटो-सिंक हो गया!', 'info');
+          if (res.localDisk) {
+            showToast('💾 स्थानीय डिस्क पर site-pages-config.json तुरंत सुरक्षित हो गया!', 'success');
+          } else {
+            showToast('🚀 GitHub पर site-pages-config.json ऑटो-सिंक हो गया!', 'info');
+          }
         }
       }).catch(() => {});
     } catch (e) {}
   }
+
+  window.savePageConfig = savePageConfig;
+  window.exportPagesJson = exportPagesJson;
 
   function savePagesToStorage() {
     try {

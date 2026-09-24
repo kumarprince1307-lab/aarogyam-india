@@ -246,7 +246,7 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
-              <a href="/registration.html?source=homepage-modal" style="
+              <a href="/registration.html?ref=${encodeURIComponent(sponsorId)}&source=homepage-modal" style="
                 background: linear-gradient(135deg, #059669 0%, #047857 100%);
                 color: #ffffff;
                 padding: 14px 10px;
@@ -266,7 +266,7 @@
                 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 600;">(New User)</span>
               </a>
 
-              <a href="/registration.html?mode=login&source=homepage-modal" style="
+              <a href="/registration.html?mode=login&ref=${encodeURIComponent(sponsorId)}&source=homepage-modal" style="
                 background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
                 color: #ffffff;
                 padding: 14px 10px;
@@ -538,9 +538,9 @@
     pendingAuthCallback = callback || null;
 
     const currentPath = (window.location.pathname || '').toLowerCase();
-    const isWebinar = currentPath.includes('webinar') || currentAuthOptions?.source === 'WebinarPage';
+    const isFastMode = currentAuthOptions?.fastForm || currentAuthOptions?.mode === 'fast' || currentAuthOptions?.source === 'ShareAction' || currentAuthOptions?.source === 'ActionGate' || currentPath.includes('webinar') || currentAuthOptions?.source === 'WebinarPage';
 
-    createOrGetAuthModal(isWebinar);
+    createOrGetAuthModal(isFastMode);
 
     const modal = document.getElementById('ai-universal-auth-modal');
     const card = document.getElementById('ai-universal-auth-card');
@@ -554,13 +554,24 @@
     }
   };
 
-  // Universal alias
+  // Universal alias & helper
   window.openUniversalAuthModal = window.openGuestLoginModal;
 
+  window.ensureAuthenticatedGuest = function(callback, options = {}) {
+    if (typeof window.isUserLoggedIn === 'function' && window.isUserLoggedIn()) {
+      if (typeof callback === 'function') callback();
+      return true;
+    }
+    const mob = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+    if (mob.length === 10) {
+      if (typeof callback === 'function') callback();
+      return true;
+    }
+    window.openGuestLoginModal(callback, { fastForm: true, source: 'ActionGate', ...options });
+    return false;
+  };
+
   window.closeGuestLoginModal = function() {
-    try {
-      sessionStorage.setItem('ai_guest_dismissed', 'true');
-    } catch(e) {}
     const modal = document.getElementById('ai-universal-auth-modal');
     const card = document.getElementById('ai-universal-auth-card');
     if (modal && card) {
@@ -570,42 +581,14 @@
     }
   };
 
-  // 4. Auto-Trigger on Public Page Load (Controlled, Non-Intrusive)
+  // 4. Auto-Trigger on Public Page Load (Reliable Traditional Login / Registration Modal)
   function triggerAutoPopupIfApplicable() {
     const currentPath = (window.location.pathname || '').toLowerCase();
     
-    // Skip if user already dismissed in this session
-    if (isDismissedThisSession()) {
-      return;
-    }
-
-    // Skip Admin Panels and dedicated registration/library pages
+    // Skip Admin Panels and dedicated registration page
     if (currentPath.includes('/admin') || 
         currentPath.endsWith('admin.html') || 
-        currentPath.includes('registration.html') ||
-        currentPath.includes('my-library') ||
-        currentPath.includes('library')) {
-      return;
-    }
-
-    // Strictly DO NOT auto-show popup on ANY Book Landing Page or Checkout/Reader Funnel
-    const isBookLandingOrFunnel = 
-      currentPath.includes('kharif') ||
-      currentPath.includes('kheti-dr') ||
-      currentPath.includes('book-landing') ||
-      currentPath.includes('landing') ||
-      currentPath.includes('book-details') ||
-      currentPath.includes('demo-book') ||
-      currentPath.includes('sample-ai-book') ||
-      currentPath.includes('ai-website-guide') ||
-      currentPath.includes('demo-kharif') ||
-      currentPath.includes('checkout') ||
-      currentPath.includes('payment') ||
-      currentPath.includes('reader') ||
-      currentPath.includes('download') ||
-      currentPath.includes('share-rewards');
-
-    if (isBookLandingOrFunnel) {
+        currentPath.includes('registration.html')) {
       return;
     }
 
@@ -614,15 +597,15 @@
       return;
     }
 
-    // Only open on homepage if not dismissed
+    // Trigger popup smoothly after short delay so visitor sees traditional login/registration options
     setTimeout(() => {
-      if (!window.isUserLoggedIn() && !isDismissedThisSession()) {
+      if (!window.isUserLoggedIn()) {
         const isWebinar = currentPath.includes('webinar');
         window.openGuestLoginModal(null, {
           source: isWebinar ? 'WebinarPage' : 'PublicPageLoad'
         });
       }
-    }, 800);
+    }, 650);
   }
 
   if (document.readyState === 'loading') {

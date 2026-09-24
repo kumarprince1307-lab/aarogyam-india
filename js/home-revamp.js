@@ -56,11 +56,19 @@
     window.speechSynthesis.speak(utterance);
   };
 
-  // Universal KPI Card Blue Share Trigger (Native WebShare with WhatsApp fallback)
+  // Universal KPI Card Blue Share Trigger (Delegates to Universal Share Engine)
   window.triggerKpiNativeShare = function (event, title, text, targetUrl) {
     if (event) {
       if (typeof event.stopPropagation === 'function') event.stopPropagation();
       if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
+    if (typeof window.triggerShare === 'function') {
+      window.triggerShare({ title: title, text: text, url: targetUrl });
+      return;
+    }
+    if (typeof window.AarogyamShareEngine === 'object' && typeof window.AarogyamShareEngine.share === 'function') {
+      window.AarogyamShareEngine.share({ title: title, text: text, url: targetUrl });
+      return;
     }
     const pageUrl = targetUrl ? (new URL(targetUrl, window.location.origin).href) : window.location.href;
     const cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '');
@@ -637,6 +645,7 @@
   if (typeof window.initPanoramicCarousel !== 'function') {
     window.initPanoramicCarousel = initHeroCarousel;
   }
+  window.initHeroCarousel = initHeroCarousel;
 
   // -------------------------------------------------------------
   // 3. HEALTH DISEASE CONSULTATION CARDS (10 GLOWING BLUE CARDS)
