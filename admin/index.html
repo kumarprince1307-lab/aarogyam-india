@@ -28,11 +28,13 @@
     if (!adminSession && !isLocal) {
       window.location.replace('login.html');
     }
-    // Force immediate Service Worker and Cache update
+    // Force immediate Service Worker and Cache update - purge legacy caches
     if ('caches' in window) {
       caches.keys().then(keys => {
         keys.forEach(k => {
-          if (k !== 'aarogyam-admin-shell-v41') caches.delete(k);
+          if (k.startsWith('aarogyam-admin-') && k !== 'aarogyam-admin-shell-v46') {
+            caches.delete(k);
+          }
         });
       });
     }
@@ -77,6 +79,6 @@
   <script src="../js/audio-normalizer.js?v=20260912_v1"></script>
 
   <!-- 2. Admin Main Module Script -->
-  <script type="module" src="../js/admin-main.js?v=41.0"></script>
+  <script type="module" src="../js/admin-main.js?v=42.0"></script>
 </body>
 </html>

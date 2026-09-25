@@ -1,63 +1,33 @@
 /* Aarogyam India Admin - Isolated Service Worker (V41) */
 
-const CACHE_NAME = 'aarogyam-admin-shell-v45';
+const CACHE_NAME = 'aarogyam-admin-shell-v46';
 const OFFLINE_FALLBACK = '/admin/offline.html';
 
 const APP_SHELL_ASSETS = [
   '/admin/index.html',
   '/admin/page-editor.html',
-  '/admin/all-webinars.html',
-  '/admin/webinar-reports.html',
-  '/admin/book-landing-pages.html',
   '/admin/offline.html',
   '/admin/admin-manifest.json',
   '/css/admin-panel.css',
   '/css/admin-components.css',
-  '/js/admin-main.js',
-  '/js/admin-router.js',
-  '/js/admin-api.js',
-  '/js/admin-pwa.js',
-  '/js/admin-components-header.js',
-  '/js/admin-components-sidebar.js',
-  '/js/admin-pages-dashboard.js',
-  '/js/admin-pages-book-landing.js',
-  '/js/admin-pages-notifications.js',
-  '/js/admin-pages-broadcast.js',
-  '/js/admin-pages-marketing-templates.js',
-  '/js/admin-pages-product-landing.js',
-  '/js/admin-pages-webinars.js',
-  '/js/admin-pages-webinar-reports.js',
-  '/js/admin-pages-users.js',
-  '/js/admin-pages-user-details.js',
-  '/js/admin-pages-user-permissions.js',
-  '/js/admin-pages-phonebook.js',
-  '/js/admin-pages-surveys.js',
-  '/js/admin-pages-landing-pages.js',
-  '/js/admin-pages-purchases.js',
-  '/js/admin-pages-checkout-funnel.js',
-  '/js/admin-pages-downloads.js',
-  '/js/admin-pages-reports.js',
-  '/js/admin-pages-settings.js',
-  '/js/supabase.js',
   '/images/logo/fevicon.png',
   '/images/logo/logo.png'
 ];
 
-// Install: Cache isolated Admin App Shell
+// Install: Skip waiting immediately
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[Admin SW] Caching Admin App Shell assets');
-        self.skipWaiting();
-        return cache.addAll(APP_SHELL_ASSETS).catch((err) => {
-          console.warn('[Admin SW] Some static assets could not be cached on install:', err);
-        });
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('[Admin SW] Caching Admin App Shell assets');
+      return cache.addAll(APP_SHELL_ASSETS).catch((err) => {
+        console.warn('[Admin SW] Cache on install warning:', err);
+      });
+    })
   );
 });
 
-// Activate: Clean up old admin caches
+// Activate: Clean up old admin caches immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -73,20 +43,33 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Message listener for instant skip waiting
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Fetch: Strategy Implementation
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
-  // Localhost development: Always Network-first / Network-only to prevent stale UI
+  // Localhost development: Always Network-first / Network-only
   if (['localhost', '127.0.0.1'].includes(url.hostname)) {
     event.respondWith(fetch(request).catch(() => caches.match(request)));
     return;
   }
 
-  // 1. Live Database & Supabase APIs: ALWAYS Network Only (Never serve stale DB cache)
+  // 1. Live Database & Supabase APIs: ALWAYS Network Only
   if (url.hostname.includes('supabase.co') || url.pathname.includes('/rest/v1/')) {
     event.respondWith(fetch(request));
+    return;
+  }
+
+  // 2. CRITICAL: ALL Admin scripts (/js/admin-*.js), configs (/data/*) and APIs (/api/*) MUST BE ALWAYS NETWORK-ONLY NO-CACHE!
+  if (url.pathname.includes('/js/admin-') || url.pathname.includes('/data/') || url.pathname.includes('/api/')) {
+    event.respondWith(fetch(request, { cache: 'no-cache' }));
     return;
   }
 

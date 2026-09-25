@@ -20,9 +20,23 @@ export function initAdminPwa() {
 function registerAdminServiceWorker() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/admin/admin-sw.js', { scope: '/admin/' })
+      navigator.serviceWorker.register('/admin/admin-sw.js?v=46.0', { scope: '/admin/' })
         .then((reg) => {
           console.log('✅ [Admin PWA] Service Worker registered with scope:', reg.scope);
+          reg.update();
+          if (reg.waiting) {
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            }
+          });
         })
         .catch((err) => {
           console.warn('⚠️ [Admin PWA] Service Worker registration failed:', err);

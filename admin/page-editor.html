@@ -26,7 +26,7 @@
     if ('caches' in window) {
       caches.keys().then(keys => {
         keys.forEach(k => {
-          if (k !== 'aarogyam-admin-shell-v41') caches.delete(k);
+          if (k.startsWith('aarogyam-admin-') && k !== 'aarogyam-admin-shell-v46') caches.delete(k);
         });
       });
     }
@@ -63,6 +63,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="../js/admin-main.js?v=41.0"></script>
+  <script type="module" src="../js/admin-main.js?v=42.0"></script>
 </body>
 </html>
