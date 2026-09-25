@@ -2269,18 +2269,18 @@
       "status": "active",
       "theme_primary": "#ebc024",
       "theme_dark": "#9f7400",
-      "ticker_text": "🩸 15,000+ लोगों ने प्राकृतिक रूप से शुगर नियंत्रित की | 24×7 AI डॉक्टर परामर्श सक्रिय aarogyam india",
+      "ticker_text": "🩸 भारत में लगभग 9 करोड़ वयस्क मधुमेह से प्रभावित • क्या आपका ब्लड शुगर भी बढ़ रहा है? • लक्षणों को नजरअंदाज न करें • समय पर जांच, सही आहार और चिकित्सकीय सलाह जरूरी • 🩺 Aarogyam India — मधुमेह जागरूकता एवं प्राकृतिक स्वास्थ्य मार्गदर्शन",
       "audio_title": "डायबिटीज व ब्लड शुगर नियंत्रण",
-      "audio_script": "नमस्ते {name} जी! डायबिटीज केयर पेज पर आपका स्वागत है। यहाँ इंसुलिन रेजिस्टेंस दूर करने, शुगर लेवल सामान्य रखने की प्राकृतिक डाइट, एक्सरसाइज और आयुर्वेदिक फार्मूला उपलब्ध है। aarogyam",
-      "og_title": "",
-      "og_image": "",
-      "og_description": "",
-      "share_message": "",
+      "audio_script": "नमस्ते {name} जी! क्या आपका ब्लड शुगर बार बार बढ़ रहा है और आप अभी भी इसे सामान्य समझकर नजरअंदाज कर रहे हैं तो सावधान हो जाइए क्योंकि अनियंत्रित मधुमेह समय के साथ आंखों किडनी नसों और हृदय पर गंभीर असर डाल सकता है लेकिन घबराने की जरूरत नहीं है सही समय पर सही कदम उठाना जरूरी है सही डाइट नियमित एक्सरसाइज समय समय पर शुगर की जांच और सही मार्गदर्शन के साथ ब्लड शुगर को बेहतर तरीके से नियंत्रित करने की दिशा में आगे बढ़ा जा सकता है Aarogyam India आपको डाइट एक्सरसाइज और स्वास्थ्य संबंधी सही मार्गदर्शन देने के साथ आगे बताए गए उत्पादों के सही इस्तेमाल की जानकारी भी देता है ध्यान रखें किसी भी उत्पाद का इस्तेमाल उसकी निर्धारित विधि लेबल निर्देश और विशेषज्ञ की सलाह के अनुसार ही करें और डॉक्टर द्वारा दी गई दवाओं को बिना सलाह बंद न करें आज से शुरुआत कीजिए लापरवाही नहीं सही जानकारी और सही मार्गदर्शन चुनिए Aarogyam India बेहतर स्वास्थ्य और बेहतर शुगर नियंत्रण की दिशा में आपके साथ है",
+      "og_title": "Aarogyam India | मधुमेह नियंत्रण की सही राह | डाइट, एक्सरसाइज और सही मार्गदर्शन",
+      "og_image": "/images/banners/og_image-whatsapp-image-202-936789-y196.webp",
+      "og_description": "“90 दिन में शुगर कंट्रोल? 😳 सच क्या है? जो बात आपको आज तक नहीं बताई गई… वीडियो जरूर देखें!”",
+      "share_message": "📲 इसे अभी शेयर करें और जानिए—क्या खाएं, क्या न खाएं, कौन-सी एक्सरसाइज करें, शुगर कंट्रोल में किन बातों का ध्यान रखें और दवाओं के साथ सही स्वास्थ्य मार्गदर्शन कैसे लें? 👀 सबसे जरूरी बात शायद आपको अभी तक पता ही नहीं थी… 👉 अभी लिंक खोलें और तुरंत अपने Aarogyam स्वास्थ्य सलाहकार से संपर्क करें।",
       "floating_banner": {
         "enabled": false,
-        "image": "/images/banners/floating_banner-whatsapp-image-202-152991-s2vg.webp",
-        "badge_title": "",
-        "action_link": "",
+        "image": "/images/banners/floating_banner-whatsapp-image-202-999042-m6m2.webp",
+        "badge_title": "👉 90 दिन में शुगर कंट्रोल? असली राज जानिए…",
+        "action_link": "https://aarogyamindia.online/health/diabetes.html",
         "animation": "ublFloatBook3D"
       },
       "fb_pixel": true,
@@ -2295,24 +2295,14 @@
           "cta_link": "https://wa.me/917974422572"
         },
         {
-          "image": "/images/banners/health-diabetes.jpg",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "image": "/images/banners/hero_slide-whatsapp-image-202-089360-rgni.webp",
+          "tag": "90 दिन में शुगर कंट्रोल?",
+          "title": "असली राज जानिए…",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
           "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
-        },
-        {
-          "image": "/images/banners/hero_slide-whatsapp-image-202-600521-36o7.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "cta_link": "https://wa.me/917974422572",
+          "cta_secondary_text": "📚 अभी देखें",
+          "cta_secondary_link": "https://wa.me/917974422572"
         }
       ],
       "sections_order": [
@@ -2339,28 +2329,21 @@
           "price": 450,
           "mrp": 450,
           "badge": "शुगर केयर कैप्सूल",
-          "description": "गुड़मार, विजयसार, जामुन गुठली व गिलोय अर्क। इंसुलिन संवेदनशीलता सुधारकर फास्टिंग व PP शुगर को संतुलित रखता है।",
-          "image": "/images/logo/logo.png",
-          "title": "life style plus "
+          "description": "गुड़मार, विजयसार, जामुन गुठली व गिलोय अर्क। इंसुलिन संवेदनशीलता सुधारकर फास्टिंग व PP शुगर को संतुलित रखता है।The improved Naturamore Lifestyle Plus is a useful nutraceutical for people with a sedentary lifestyle, improper metabolism leading to weight gain and increased blood sugar levels. With an enhanced Nutraceutical formula, it helps support the normal glucose metabolism and digestive secretions, and helps in secreting normal liver enzymes. Naturamore Lifestyle Plus is enriched with natural herbs such as Vijaysar, Gudmar, Jamun, Neem, Mamejao, Kutki, Ginger and Kokum which are traditionally used to balance the metabolism and insulin secretions in the body.\n\nIt helps to maintain:\n\nSupport normal glucose metabolism.\n\nSupport normal digestive secretions.\n\nIn secreting normal liver enzymes.",
+          "image": "/images/products/product-banner-lifestyle-363982-au72.webp",
+          "title": "life style plus ",
+          "dose": "1 capsule before both meals with lukewarm water / milk."
         },
         {
           "id": "DB002",
-          "name": "life style plu",
+          "name": "Nutri liver ",
           "price": 450,
           "mrp": 450,
-          "badge": "प्योर अर्क",
-          "description": "शुद्ध नीम, करेला व जामुन का कोल्ड प्रेस्ड रस। रक्त शोधन करता है और भोजन के बाद शुगर स्पाइक रोकता है।",
-          "image": "/images/products/product-whatsapp-image-202-624714-g2ob.webp",
-          "title": "life style plu"
-        },
-        {
-          "id": "DB003",
-          "name": "Gymnema Churna (100g)",
-          "price": 350,
-          "mrp": 350,
-          "badge": "शुगर डिस्ट्रॉयर",
-          "description": "मीठे की लत (Sugar Craving) मिटाता है और आंतों में ग्लूकोज के अवशोषण को कम करता है।",
-          "image": "/images/logo/logo.png"
+          "badge": "liver care ",
+          "description": "The new Naturamore Nutri Liver is a scientifically and clinically proven enhanced Nutraceutical formula that provides the necessary nutrients to the hepatobiliary system. Naturamore Nutri Liver contains natural herbs such as Milk Thistle, Kutki, Bhuiamla, Punarnava, Kakmachi, Chicory, Chirayita and Siberian Ginseng which are useful in maintaining liver health by providing the necessary functional nutrition to the liver.\n\nIt helps to maintain:\n\nMaintain overall liver health.\n\nBalance levels of liver enzymes.\n\nMaintain healthy Pitta (Bile) secretions.\n\nOptimize detoxification",
+          "image": "/images/products/product-nutri-liver-498231-l1x4.webp",
+          "title": "Nutri liver ",
+          "dose": "1 capsule before both meals with lukewarm water / milk."
         }
       ],
       "page_kpi_sections": [],
