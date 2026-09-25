@@ -2342,14 +2342,6 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/health-diabetes.jpg",
-          "tag": "🩸 डायबिटीज केयर",
-          "title": "मधुमेह व ब्लड शुगर नियंत्रण",
-          "subtitle": "इंसुलिन संवेदनशीलता सुधार व प्राकृतिक अर्क",
-          "cta_text": "💬 AI डॉक्टर परामर्श",
-          "cta_link": "https://wa.me/917974422572"
-        },
-        {
           "image": "/images/banners/hero_slide-whatsapp-image-202-089360-rgni.webp",
           "banner_mode": "full",
           "tag": "90 दिन में शुगर कंट्रोल?",
