@@ -2360,7 +2360,8 @@
           "cta_text": "📚 अभी देखें",
           "cta_link": "/ebooks/ebook.html",
           "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "cta_secondary_link": "/ebooks/cart.html",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
