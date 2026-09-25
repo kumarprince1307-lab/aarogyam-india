@@ -2593,10 +2593,23 @@
       "category": "Healthcare Sub-page",
       "status": "active",
       "theme_primary": "#0d9488",
-      "theme_dark": "#0f766e",
+      "theme_dark": "#00483c",
+      "ticker_text": "💇‍♀️ भृंगराज व आंवला से बालों का झड़ना रोकें | फ्री हेयर एनालिसिस उपलब्ध aarogyam india",
+      "audio_title": "हेयर केयर व डैंड्रफ समाधान",
+      "audio_script": "नमस्ते {name} जी! हेयर केयर गाइड में आपका स्वागत है। नए बाल उगाने, बालों का झड़ना तुरंत रोकने और डैंड्रफ खत्म करने के प्राकृतिक फॉर्मूले और ऑयल्स की जानकारी यहाँ देखें। dhara pranam",
+      "og_title": "",
+      "og_image": "/images/banners/og_image-whatsapp-image-202-747199-dj40.webp",
+      "og_description": "",
+      "share_message": "",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
       "fb_pixel": true,
       "ga_tag": true,
-      "ticker_text": "💇‍♀️ भृंगराज व आंवला से बालों का झड़ना रोकें | फ्री हेयर एनालिसिस उपलब्ध",
       "hero_slides": [
         {
           "image": "/images/banners/health-hair-care.jpg",
@@ -2605,6 +2618,26 @@
           "subtitle": "नए बाल उगाने व हेयर फॉल रोकने का प्राकृतिक फॉर्मूला",
           "cta_text": "💬 हेयर एनालिसिस करवाएं",
           "cta_link": "https://wa.me/917974422572"
+        },
+        {
+          "image": "/images/banners/health-hair-care.jpg",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-bk015-sec_audio-ba-776389-n3e2.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
       "sections_order": [
@@ -2617,25 +2650,23 @@
       ],
       "hidden_sections": [],
       "kpi_cards": [],
-      "videos": [],
       "marketing_cards": [],
+      "videos": [],
       "reviews": [],
       "faqs": [],
-      "whatsapp_support": {
-        "number": "917974422572",
-        "prompt": "नमस्ते, मुझे हेयर केयर व बाल झड़ने का समाधान चाहिए।"
-      },
-      "audio_title": "हेयर केयर व डैंड्रफ समाधान",
-      "audio_script": "नमस्ते {name} जी! हेयर केयर गाइड में आपका स्वागत है। नए बाल उगाने, बालों का झड़ना तुरंत रोकने और डैंड्रफ खत्म करने के प्राकृतिक फॉर्मूले और ऑयल्स की जानकारी यहाँ देखें।",
+      "health_diseases": [],
+      "crops": [],
+      "pashu_cards": [],
       "products": [
         {
           "id": "HC001",
-          "name": "Kesh-Sanjivani Hair Oil (100ml)",
-          "price": 450,
-          "mrp": 450,
+          "name": "hair nutrament ",
+          "price": 460,
+          "mrp": 460,
           "badge": "रूट न्यूट्रिशन ऑयल",
           "description": "भृंगराज, ब्राह्मी, आंवला, शिकाकाई व प्याज अर्क। जड़ों को मजबूत कर 15 दिन में बाल झड़ना रोकता है।",
-          "image": "/images/logo/logo.png"
+          "image": "/images/products/product-whatsapp-image-202-818789-y5x9.webp",
+          "title": "hair nutrament "
         },
         {
           "id": "HC002",
@@ -2655,7 +2686,12 @@
           "description": "प्राकृतिक सेसबानिया बायोटिन व ग्रीन टी अर्क। नए बाल उगाने और पतले बालों को मोटा करने में सक्षम।",
           "image": "/images/logo/logo.png"
         }
-      ]
+      ],
+      "page_kpi_sections": [],
+      "whatsapp_support": {
+        "number": "917974422572",
+        "prompt": "नमस्ते, मुझे हेयर केयर व बाल झड़ने का समाधान चाहिए।"
+      }
     },
     {
       "id": "page_health_skin_care",
