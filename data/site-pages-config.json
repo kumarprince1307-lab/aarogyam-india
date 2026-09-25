@@ -2647,9 +2647,9 @@
       "status": "active",
       "theme_primary": "#16a34a",
       "theme_dark": "#005700",
-      "ticker_text": "🦴 घुटनों का दर्द, यूरिक एसिड व जोड़ों की ग्रीस बढ़ाएं | 100% हर्बल थेरेपी",
+      "ticker_text": "🦴 घुटनों का दर्द, यूरिक एसिड व जोड़ों की ग्रीस बढ़ाएं | 100% हर्बल थेरेपी aarogyam india",
       "audio_title": "जोड़ों का दर्द व गठिया राहत",
-      "audio_script": "नमस्ते {name} जी! जोड़ों के दर्द व आर्थराइटिस केयर पेज पर आपका स्वागत है। कार्टिलेज को दोबारा मजबूत बनाने, यूरिक एसिड घटाने और सूजन दूर करने की सम्पूर्ण जानकारी यहाँ दी गई है। kaise ho aa dhara pranam",
+      "audio_script": "नमस्ते {name} जी! जोड़ों के दर्द व आर्थराइटिस केयर पेज पर आपका स्वागत है। कार्टिलेज को दोबारा मजबूत बनाने, यूरिक एसिड घटाने और सूजन दूर करने की सम्पूर्ण जानकारी यहाँ दी गई है।  dhara pranam  aarogyam",
       "og_title": "जोड़ों का दर्द व गठिया का संपूर्ण प्राकृतिक समाधान | Aarogyam India",
       "og_image": "/images/banners/health-joint-care.jpg",
       "og_description": "घुटनों का दर्द, कट-कट की आवाज, कार्टिलेज घिसाव व यूरिक एसिड का आयुर्वेदिक उपचार व डाइट चार्ट।",
@@ -2671,26 +2671,6 @@
           "subtitle": "कार्टिलेज मजबूती व यूरिक एसिड नियंत्रण",
           "cta_text": "💬 हर्बल थेरेपी परामर्श",
           "cta_link": "https://wa.me/917974422572"
-        },
-        {
-          "image": "/images/banners/hero_slide-whatsapp-image-202-708431-qub9.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
-        },
-        {
-          "image": "/images/banners/hero_slide-whatsapp-image-202-729050-urfb.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
       "sections_order": [
@@ -2718,7 +2698,7 @@
           "mrp": 450,
           "badge": "दर्द निवारक तेल",
           "description": "शल्लाकी, निर्गुंडी, महानारायण व गंधपुरा तेल। 10 मिनट में जोड़ों की गहराई तक पहुंचकर दर्द खींचता है।",
-          "image": "/images/products/product-889-1-764581-31ib.webp"
+          "image": "/images/logo/logo.png"
         },
         {
           "id": "JC002",
