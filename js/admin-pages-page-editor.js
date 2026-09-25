@@ -5155,6 +5155,8 @@ export async function initPageEditor() {
     if (!name) name = 'मुख्य पृष्ठ';
     if (!url) url = '/' + (slug === 'index' ? 'index.html' : slug + '.html');
 
+    const existingPage = (editingPageId ? allPages.find(x => x.id === editingPageId) : null) || (slug ? allPages.find(x => x.slug === slug) : null);
+
     const cat = document.getElementById('pe_select_category')?.value || 'eBooks';
     const status = document.getElementById('pe_select_status')?.value || 'active';
     const themeCol = document.getElementById('pe_input_theme_primary')?.value || '#15803d';

@@ -50,9 +50,11 @@
   ],
   "scope_extensions": [
     {
+      "type": "origin",
       "origin": "https://aarogyamindia.online"
     },
     {
+      "type": "origin",
       "origin": "https://www.aarogyamindia.online"
     }
   ],

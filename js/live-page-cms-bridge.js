@@ -551,6 +551,8 @@
         <p style="margin:10px 0 0 0; font-size:0.88rem; color:#475569; line-height:1.5;">${escapeHtml(f.answer || f.a)}</p>
       </details>
     `).join('');
+  }
+
   function renderDynamicClinicalBreakdown(pageConfig) {
     if (!pageConfig || !pageConfig.clinical_breakdown) return;
     const cb = pageConfig.clinical_breakdown;
