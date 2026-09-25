@@ -113,7 +113,7 @@
       } catch (err) {}
     }
 
-    // 2. Merge / Fallback with active local admin edits in localStorage (for instant editing previews)
+    // 2. Safe Local Storage Sync: Server is always the single source of truth
     try {
       const stored = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
       if (stored) {
@@ -122,16 +122,24 @@
           if (!serverConfigLoaded || allPages.length === 0) {
             allPages = localParsed;
           } else {
-            localParsed.forEach(lp => {
-              const sIdx = allPages.findIndex(sp => sp.id === lp.id || sp.slug === lp.slug);
-              if (sIdx >= 0) {
-                allPages[sIdx] = Object.assign({}, allPages[sIdx], lp);
-              } else {
-                allPages.push(lp);
-              }
-            });
+            // Only merge if explicitly in developer preview mode (?admin_preview=1)
+            const isPreviewMode = window.location.search.includes('admin_preview=1') || window.location.search.includes('cms_draft=1');
+            if (isPreviewMode) {
+              localParsed.forEach(lp => {
+                const sIdx = allPages.findIndex(sp => sp.id === lp.id || sp.slug === lp.slug);
+                if (sIdx >= 0) {
+                  allPages[sIdx] = Object.assign({}, allPages[sIdx], lp);
+                } else {
+                  allPages.push(lp);
+                }
+              });
+            }
           }
         }
+      }
+      // If server loaded successfully, refresh localStorage with fresh server data
+      if (serverConfigLoaded && allPages.length > 0) {
+        localStorage.setItem('AAROGYAM_SITE_PAGES_CONFIG', JSON.stringify(allPages));
       }
     } catch (e) {}
 
@@ -286,7 +294,12 @@
       slideDiv.className = 'home-hero-slide-item';
       if (idx !== 0) slideDiv.style.display = 'none';
 
-      if (isHealthPage && (s.title || s.tag || s.subtitle)) {
+      // Banner mode detection:
+      // If s.banner_mode === 'full' OR (isHealthPage && !s.subtitle) OR non-health page:
+      // render 100% full panoramic banner so 1600x639 wide banners are NEVER cropped!
+      const isCardMode = s.banner_mode === 'card' || (isHealthPage && s.banner_mode !== 'full' && (s.subtitle && s.subtitle.trim().length > 0));
+
+      if (isCardMode) {
         const tag = s.tag || 'HEALTH CARE';
         const title = s.title || 'आरोग्यम स्वास्थ्य समाधान';
         const desc = s.subtitle || s.description || '';
@@ -306,16 +319,19 @@
                 ${s.cta_secondary_text ? `<a href="${escapeHtml(s.cta_secondary_link || '#')}" style="color:#fde047; font-weight:800; font-size:0.9rem; text-decoration:underline;">${escapeHtml(s.cta_secondary_text)}</a>` : ''}
               </div>
             </div>
-            <div class="home-hero-3d-book" style="width:200px; height:150px; border-radius:14px; overflow:hidden; box-shadow:0 12px 28px rgba(0,0,0,0.5);">
-              <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(title)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+            <div class="home-hero-3d-book" style="flex:0 0 auto; max-width:320px; width:100%; border-radius:14px; overflow:hidden; box-shadow:0 12px 28px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.25); padding:4px;">
+              <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(title)}" style="width:100%; height:auto; max-height:220px; object-fit:contain; border-radius:12px;" onerror="this.src='/images/banners/health-banner.jpeg'" />
             </div>
           </div>
         `;
       } else {
+        // Full Panoramic Banner (100% full width, natural aspect ratio, zero horizontal or vertical clipping)
         slideDiv.innerHTML = `
-          <a href="${s.cta_link || '#'}" class="landscape-hero-banner-link" title="${escapeHtml(s.title || s.tag || '')}">
-            <img src="${imgSrc}" alt="${escapeHtml(s.title || 'Hero Banner')}" class="landscape-hero-banner-img" onerror="this.onerror=null; this.src='/images/banners/kharif-master-guide-2026-hero-banner.webp';" />
-          </a>
+          <div class="home-hero-full-banner-wrap" style="width:100%; border-radius:18px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.12); position:relative;">
+            <a href="${escapeHtml(s.cta_link || '#sec-products')}" class="landscape-hero-banner-link" title="${escapeHtml(s.title || s.tag || '')}" style="display:block; width:100%; line-height:0; text-decoration:none;">
+              <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(s.title || 'Hero Banner')}" class="landscape-hero-banner-img" style="width:100%; height:auto; display:block; object-fit:contain; border-radius:18px;" onerror="this.onerror=null; this.src='/images/banners/health-banner.jpeg';" />
+            </a>
+          </div>
         `;
       }
 
@@ -556,11 +572,18 @@
     if (!grid || !Array.isArray(cb.cards) || cb.cards.length === 0) return;
 
     grid.innerHTML = cb.cards.map(c => `
-      <div style="background:#fff; border-radius:16px; border:1.5px solid #e2e8f0; padding:22px; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
-        <h3 style="font-size:1.15rem; font-weight:900; color:${c.color || '#2563eb'}; margin:0 0 10px 0;">${escapeHtml(c.title || '')}</h3>
-        <ul style="padding-left:18px; margin:0; font-size:0.86rem; color:#475569; line-height:1.6;">
-          ${(Array.isArray(c.points) ? c.points : (c.points || '').split('\n')).filter(Boolean).map(pt => `<li>${pt}</li>`).join('')}
-        </ul>
+      <div style="background:#fff; border-radius:16px; border:1.5px solid #e2e8f0; padding:22px; box-shadow:0 4px 14px rgba(0,0,0,0.03); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          ${c.image ? `
+            <div style="width:100%; height:180px; border-radius:12px; overflow:hidden; margin-bottom:14px; background:#f1f5f9; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+              <img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title || '')}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.style.display='none'">
+            </div>
+          ` : ''}
+          <h3 style="font-size:1.15rem; font-weight:900; color:${c.color || '#2563eb'}; margin:0 0 10px 0;">${escapeHtml(c.title || '')}</h3>
+          <ul style="padding-left:18px; margin:0; font-size:0.86rem; color:#475569; line-height:1.6;">
+            ${(Array.isArray(c.points) ? c.points : (c.points || '').split('\n')).filter(Boolean).map(pt => `<li>${pt}</li>`).join('')}
+          </ul>
+        </div>
       </div>
     `).join('');
   }
@@ -598,6 +621,49 @@
         }
       }
     }
+  }
+
+  function renderDynamicVideos(pageConfig) {
+    if (!Array.isArray(pageConfig.videos) || pageConfig.videos.length === 0) return;
+    const videoContainer = document.querySelector('.universal-video-showcase') ||
+                           document.getElementById('home-video-showcase') ||
+                           document.querySelector('#sec-videos .universal-video-showcase') ||
+                           document.querySelector('#sec-videos div[style*="grid"]');
+    if (!videoContainer) return;
+
+    videoContainer.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%;">
+        ${pageConfig.videos.map(v => {
+          const ytUrl = v.youtube_url || v.url || '';
+          const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|live\/))([\w-]{10,12})/);
+          const ytId = ytMatch ? ytMatch[1] : (v.youtube_id || '');
+          const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '/images/banners/health-banner.jpeg');
+          const title = v.title || 'आरोग्यम विशेष वीडियो';
+          const dur = v.duration || 'मास्टरक्लास';
+          return `
+            <div class="universal-video-card" style="background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;" onclick="if(window.openUniversalVideoModal){window.openUniversalVideoModal('${escapeHtml(title)}', '${ytId}')}else{window.open('${escapeHtml(ytUrl || 'https://youtube.com/watch?v=' + ytId)}','_blank')}">
+              <div style="position:relative; width:100%; padding-bottom:56.25%; background:#0f172a; overflow:hidden;">
+                <img src="${thumb}" alt="${escapeHtml(title)}" loading="lazy" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.92;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+                <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);"></div>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:46px; height:46px; border-radius:50%; background:rgba(239,68,68,0.92); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 4px 15px rgba(239,68,68,0.6);">
+                  ▶
+                </div>
+                <div style="position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.75); color:#fff; font-size:0.7rem; font-weight:700; padding:2px 6px; border-radius:4px;">
+                  ⏱️ ${escapeHtml(dur)}
+                </div>
+              </div>
+              <div style="padding:14px; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+                <h4 style="font-size:0.92rem; font-weight:800; color:#0f172a; margin:0 0 8px 0; line-height:1.4;">${escapeHtml(title)}</h4>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#64748b;">
+                  <span style="color:#ef4444; font-weight:800;">🔴 YouTube Masterclass</span>
+                  <span>▶ अभी देखें</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
   }
 
   function renderFloatingBanner(pageConfig) {
@@ -693,6 +759,7 @@
         renderDynamicDietExercise(pageConfig);
         renderDynamicReviews(pageConfig);
         renderDynamicFaqs(pageConfig);
+        renderDynamicVideos(pageConfig);
         renderFloatingBanner(pageConfig);
         applyWhatsAppSupport(pageConfig);
         syncAudioNarration(pageConfig);

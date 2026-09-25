@@ -2027,37 +2027,37 @@ export async function initPageEditor() {
     }
 ];
 
-  // Load order: 1) Active localStorage session (instant local edits) -> 2) site-pages-config.json (disk/remote truth) -> 3) defaultPages
+  // Load order: 1) site-pages-config.json (Server Truth Network First) -> 2) localStorage fallback -> 3) defaultPages
   let allPages = [];
   try {
-    const stored = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        allPages = parsed;
-      }
+    const cacheTime = Date.now();
+    const pathsToTry = [
+      '/data/site-pages-config.json?v=' + cacheTime,
+      '../data/site-pages-config.json?v=' + cacheTime,
+      './data/site-pages-config.json?v=' + cacheTime
+    ];
+    for (const p of pathsToTry) {
+      try {
+        const res = await fetch(p, { cache: 'no-store' });
+        if (res.ok) {
+          const j = await res.json();
+          if (j && Array.isArray(j.sitePages) && j.sitePages.length > 0) {
+            allPages = j.sitePages;
+            break;
+          }
+        }
+      } catch (err) {}
     }
   } catch (e) {}
 
   if (allPages.length === 0) {
     try {
-      const cacheTime = Math.floor(Date.now() / 60000);
-      const pathsToTry = [
-        '../data/site-pages-config.json?v=' + cacheTime,
-        '/data/site-pages-config.json?v=' + cacheTime,
-        './data/site-pages-config.json?v=' + cacheTime
-      ];
-      for (const p of pathsToTry) {
-        try {
-          const res = await fetch(p);
-          if (res.ok) {
-            const j = await res.json();
-            if (j && Array.isArray(j.sitePages) && j.sitePages.length > 0) {
-              allPages = j.sitePages;
-              break;
-            }
-          }
-        } catch (err) {}
+      const stored = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          allPages = parsed;
+        }
       }
     } catch (e) {}
   }
@@ -2658,18 +2658,51 @@ export async function initPageEditor() {
             <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #60a5fa;">❓ कारण शीर्षक (Causes Title)</label>
               <input type="text" id="pe_input_cb_causes_title" class="admin-input" placeholder="❓ क्यों होती है डायबिटीज? (Causes)" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
+              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">कारण फोटो (Causes Card Image)</label>
+              <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px;">
+                <input type="text" id="pe_input_cb_causes_img" class="admin-input" placeholder="/images/banners/diabetes-causes-infographic.webp" style="flex:1; padding:6px 10px;" onchange="window.previewCbCardImage(0, this.value)" />
+                <label class="admin-button small-button" style="background:#2563eb; color:#fff; cursor:pointer; padding:6px 10px; margin:0; font-size:0.75rem; white-space:nowrap;">
+                  📁 अपलोड
+                  <input type="file" accept="image/*" style="display:none;" onchange="window.handleCbCardImageUpload(0, this)">
+                </label>
+              </div>
+              <div id="pe_cb_causes_img_preview" style="margin-bottom:8px; display:none; max-height:80px; border-radius:6px; overflow:hidden; border:1px solid #334155;">
+                <img id="pe_cb_causes_img_preview_img" src="" style="width:100%; height:80px; object-fit:cover;">
+              </div>
               <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">कारण बिंदु (1 बिंदु प्रति लाइन)</label>
               <textarea id="pe_input_cb_causes_points" class="admin-textarea" rows="4" placeholder="इंसुलिन प्रतिरोध (Resistance)...&#10;पैंक्रियाज की कमजोरी...&#10;तनाव व कोर्टिसोल..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
             </div>
             <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #60a5fa;">⚠️ मुख्य लक्षण (Symptoms Title)</label>
               <input type="text" id="pe_input_cb_symptoms_title" class="admin-input" placeholder="⚠️ मुख्य लक्षण (Symptoms)" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
+              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">लक्षण फोटो (Symptoms Card Image)</label>
+              <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px;">
+                <input type="text" id="pe_input_cb_symptoms_img" class="admin-input" placeholder="/images/banners/diabetes-symptoms-infographic.webp" style="flex:1; padding:6px 10px;" onchange="window.previewCbCardImage(1, this.value)" />
+                <label class="admin-button small-button" style="background:#2563eb; color:#fff; cursor:pointer; padding:6px 10px; margin:0; font-size:0.75rem; white-space:nowrap;">
+                  📁 अपलोड
+                  <input type="file" accept="image/*" style="display:none;" onchange="window.handleCbCardImageUpload(1, this)">
+                </label>
+              </div>
+              <div id="pe_cb_symptoms_img_preview" style="margin-bottom:8px; display:none; max-height:80px; border-radius:6px; overflow:hidden; border:1px solid #334155;">
+                <img id="pe_cb_symptoms_img_preview_img" src="" style="width:100%; height:80px; object-fit:cover;">
+              </div>
               <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">लक्षण बिंदु (1 बिंदु प्रति लाइन)</label>
               <textarea id="pe_input_cb_symptoms_points" class="admin-textarea" rows="4" placeholder="रात में बार-बार पेशाब जाना...&#10;भूख लगना और थकान...&#10;हाथ-पैरों में जलन या सुन्नपन..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
             </div>
             <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #f87171;">🚨 साइड इफेक्ट्स व खतरे (Risks Title)</label>
               <input type="text" id="pe_input_cb_risks_title" class="admin-input" placeholder="🚨 साइड इफेक्ट्स व खतरे (Risks)" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
+              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">खतरे फोटो (Risks Card Image)</label>
+              <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px;">
+                <input type="text" id="pe_input_cb_risks_img" class="admin-input" placeholder="/images/banners/diabetes-risks-infographic.webp" style="flex:1; padding:6px 10px;" onchange="window.previewCbCardImage(2, this.value)" />
+                <label class="admin-button small-button" style="background:#dc2626; color:#fff; cursor:pointer; padding:6px 10px; margin:0; font-size:0.75rem; white-space:nowrap;">
+                  📁 अपलोड
+                  <input type="file" accept="image/*" style="display:none;" onchange="window.handleCbCardImageUpload(2, this)">
+                </label>
+              </div>
+              <div id="pe_cb_risks_img_preview" style="margin-bottom:8px; display:none; max-height:80px; border-radius:6px; overflow:hidden; border:1px solid #334155;">
+                <img id="pe_cb_risks_img_preview_img" src="" style="width:100%; height:80px; object-fit:cover;">
+              </div>
               <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">खतरे बिंदु (1 बिंदु प्रति लाइन)</label>
               <textarea id="pe_input_cb_risks_points" class="admin-textarea" rows="4" placeholder="किडनी डैमेज (नेफ्रोपैथी)...&#10;डायबिटिक न्यूरोपैथी...&#10;हार्ट अटैक व स्ट्रोक जोखिम..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
             </div>
@@ -3818,6 +3851,13 @@ export async function initPageEditor() {
             ` : ''}
           </div>
           <div>
+            <label style="font-size: 0.72rem; color: #38bdf8; font-weight: 800; display: block;">🖼️ बैनर डिस्प्ले मोड (Banner Size / Layout)</label>
+            <select onchange="window.updateHeroSlideField(${idx}, 'banner_mode', this.value); window.renderHeroSlidesInBuilder();" class="admin-select" style="width: 100%; padding: 5px 8px; font-size: 0.8rem; border-color: #38bdf8;">
+              <option value="full" ${slide.banner_mode === 'full' || (!slide.subtitle && !slide.tag) ? 'selected' : ''}>🖼️ फुल चौड़ा पैनोरमिक बैनर (Full Width - 100% पूरा दिखेगा)</option>
+              <option value="card" ${slide.banner_mode === 'card' ? 'selected' : ''}>🎴 3D कार्ड + टेक्स्ट (Card with Title, Text & Floating Box)</option>
+            </select>
+          </div>
+          <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">टैग / ऑफर बैज</label>
             <input type="text" value="${escapeHtml(slide.tag || '')}" onchange="window.updateHeroSlideField(${idx}, 'tag', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
           </div>
@@ -4923,6 +4963,22 @@ export async function initPageEditor() {
     if (cbRisksTitleEl) cbRisksTitleEl.value = risksCard.title || '🚨 साइड इफेक्ट्स व खतरे (Risks)';
     if (cbRisksPointsEl) cbRisksPointsEl.value = Array.isArray(risksCard.points) ? risksCard.points.join('\n') : (risksCard.points || '');
 
+    const cbCausesImgEl = document.getElementById('pe_input_cb_causes_img');
+    const cbSymptomsImgEl = document.getElementById('pe_input_cb_symptoms_img');
+    const cbRisksImgEl = document.getElementById('pe_input_cb_risks_img');
+    if (cbCausesImgEl) {
+      cbCausesImgEl.value = causesCard.image || '';
+      if (typeof window.previewCbCardImage === 'function') window.previewCbCardImage(0, causesCard.image);
+    }
+    if (cbSymptomsImgEl) {
+      cbSymptomsImgEl.value = symptomsCard.image || '';
+      if (typeof window.previewCbCardImage === 'function') window.previewCbCardImage(1, symptomsCard.image);
+    }
+    if (cbRisksImgEl) {
+      cbRisksImgEl.value = risksCard.image || '';
+      if (typeof window.previewCbCardImage === 'function') window.previewCbCardImage(2, risksCard.image);
+    }
+
     const deData = p.diet_exercise || {};
     const dietData = deData.diet || {};
     const exData = deData.exercise || {};
@@ -5119,14 +5175,17 @@ export async function initPageEditor() {
     const cbBadge = (document.getElementById('pe_input_cb_badge')?.value || '').trim();
     const cbTitle = (document.getElementById('pe_input_cb_title')?.value || '').trim();
     const cbCausesTitle = (document.getElementById('pe_input_cb_causes_title')?.value || '').trim();
+    const cbCausesImg = (document.getElementById('pe_input_cb_causes_img')?.value || '').trim();
     const cbCausesPoints = (document.getElementById('pe_input_cb_causes_points')?.value || '').trim();
     const cbSymptomsTitle = (document.getElementById('pe_input_cb_symptoms_title')?.value || '').trim();
+    const cbSymptomsImg = (document.getElementById('pe_input_cb_symptoms_img')?.value || '').trim();
     const cbSymptomsPoints = (document.getElementById('pe_input_cb_symptoms_points')?.value || '').trim();
     const cbRisksTitle = (document.getElementById('pe_input_cb_risks_title')?.value || '').trim();
+    const cbRisksImg = (document.getElementById('pe_input_cb_risks_img')?.value || '').trim();
     const cbRisksPoints = (document.getElementById('pe_input_cb_risks_points')?.value || '').trim();
 
     let clinical_breakdown = null;
-    if (cbCausesTitle || cbSymptomsTitle || cbRisksTitle || cbTitle) {
+    if (cbCausesTitle || cbSymptomsTitle || cbRisksTitle || cbTitle || cbCausesImg || cbSymptomsImg || cbRisksImg) {
       clinical_breakdown = {
         badge_text: cbBadge || '🔬 वैज्ञानिक विश्लेषण',
         main_title: cbTitle,
@@ -5134,16 +5193,19 @@ export async function initPageEditor() {
           {
             title: cbCausesTitle || '❓ कारण (Causes)',
             color: '#2563eb',
+            image: cbCausesImg,
             points: cbCausesPoints ? cbCausesPoints.split('\n').map(s => s.trim()).filter(Boolean) : []
           },
           {
             title: cbSymptomsTitle || '⚠️ मुख्य लक्षण (Symptoms)',
             color: '#2563eb',
+            image: cbSymptomsImg,
             points: cbSymptomsPoints ? cbSymptomsPoints.split('\n').map(s => s.trim()).filter(Boolean) : []
           },
           {
             title: cbRisksTitle || '🚨 साइड इफेक्ट्स व खतरे (Risks)',
             color: '#dc2626',
+            image: cbRisksImg,
             points: cbRisksPoints ? cbRisksPoints.split('\n').map(s => s.trim()).filter(Boolean) : []
           }
         ]
@@ -5299,6 +5361,45 @@ export async function initPageEditor() {
 
   window.savePageConfig = savePageConfig;
   window.exportPagesJson = exportPagesJson;
+
+  window.previewCbCardImage = function(cardIdx, url) {
+    const ids = ['pe_cb_causes_img_preview', 'pe_cb_symptoms_img_preview', 'pe_cb_risks_img_preview'];
+    const imgIds = ['pe_cb_causes_img_preview_img', 'pe_cb_symptoms_img_preview_img', 'pe_cb_risks_img_preview_img'];
+    const wrap = document.getElementById(ids[cardIdx]);
+    const img = document.getElementById(imgIds[cardIdx]);
+    if (wrap && img) {
+      if (url && url.trim()) {
+        img.src = url.trim();
+        wrap.style.display = 'block';
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+  };
+
+  window.handleCbCardImageUpload = async function(cardIdx, inputEl) {
+    if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
+    const file = inputEl.files[0];
+    showToast('⏳ फोटो कंप्रेस व अपलोड हो रही है...', 'info');
+    try {
+      const compressed = await compressImageToWebp(file, 160000, 1200);
+      const filename = `health_card_${Date.now()}.webp`;
+      const res = await uploadImageWithFallback('health_card', compressed.dataUrl, filename);
+      if (res && res.success && res.path) {
+        const inputIds = ['pe_input_cb_causes_img', 'pe_input_cb_symptoms_img', 'pe_input_cb_risks_img'];
+        const targetInput = document.getElementById(inputIds[cardIdx]);
+        if (targetInput) {
+          targetInput.value = res.path;
+          window.previewCbCardImage(cardIdx, res.path);
+        }
+        showToast('✅ फोटो सफलतापूर्वक अपलोड हो गई!', 'success');
+      } else {
+        showToast('❌ अपलोड विफल रहा: ' + (res?.error || 'Unknown error'), 'error');
+      }
+    } catch (e) {
+      showToast('❌ एरर: ' + e.message, 'error');
+    }
+  };
 
   function savePagesToStorage() {
     try {
