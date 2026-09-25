@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
@@ -27,7 +27,7 @@
     <div class="container home-ticker-flex">
       <div class="ticker-pulse-badge" style="background:#2563eb;"><span class="ticker-dot-pulse"></span><span>🚨 LIVE</span></div>
       <div style="flex:1; overflow:hidden;">
-        <div class="ticker-marquee-scroll">🩸 15,000+ डायबिटीज मरीजों ने पाया सामान्य शुगर लेवल | 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय!</div>
+        <div class="ticker-marquee-scroll">🩸 15,000+ लोगों ने प्राकृतिक रूप से शुगर नियंत्रित की | 24×7 AI डॉक्टर परामर्श सक्रिय aarogyam india</div>
       </div>
     </div>
   </div>
@@ -98,10 +98,31 @@
             </div>
           </div>
         </div>
+
+        <!-- Slide 3 -->
+        <div class="home-hero-slide-item" style="display:none;">
+          <div class="home-hero-slide-card" style="background:linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); border-color:#818cf8;">
+            <div style="flex:1; min-width:280px;">
+              <span class="home-hero-tag" style="background:#c7d2fe; color:#312e81;">🌾 नया स्पेशल ऑफर</span>
+              <h1 class="home-hero-title">नया बैनर शीर्षक यहाँ लिखें</h1>
+              <p class="home-hero-desc">बैनर का आकर्षक विवरण और लाभ यहाँ लिखें</p>
+              <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                <a href="/ebooks/ebook.html" class="btn" style="background:#22c55e; color:#fff; font-weight:900; padding:12px 24px; border-radius:30px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                  📚 अभी देखें
+                </a>
+                <a href="/ebooks/cart.html" style="color:#fde047; font-weight:800; font-size:0.9rem; text-decoration:underline;">🛒 लाइव कार्ट</a>
+              </div>
+            </div>
+            <div class="home-hero-3d-book" onclick="window.location.href='/ebooks/ebook.html'" style="width:200px; height:150px; border-radius:14px; overflow:hidden; box-shadow:0 12px 28px rgba(0,0,0,0.5);">
+              <img src="/images/banners/hero_slide-whatsapp-image-202-600521-36o7.webp" alt="Special Offer Banner" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="bighaat-carousel-dots">
         <span class="bighaat-carousel-dot active"></span>
+        <span class="bighaat-carousel-dot"></span>
         <span class="bighaat-carousel-dot"></span>
       </div>
     </div>
@@ -276,14 +297,17 @@
 
         <div style="background:#fff; border-radius:16px; border:1.5px solid #e2e8f0; padding:20px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
           <div>
+            <div style="width:100%; height:140px; border-radius:10px; overflow:hidden; margin-bottom:12px; background:#f8fafc; display:flex; align-items:center; justify-content:center;">
+              <img src="/images/products/product-whatsapp-image-202-624714-g2ob.webp" alt="life style plu" style="width:100%; height:100%; object-fit:contain; padding:6px;" onerror="this.parentElement.style.display='none'">
+            </div>
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
               <span style="background:#dcfce7; color:#15803d; font-weight:800; font-size:0.72rem; padding:2px 8px; border-radius:8px;">प्योर अर्क</span>
               <span style="font-size:1.15rem; font-weight:900; color:#2563eb;">MRP ₹450</span>
             </div>
-            <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin:0 0 6px 0;">Karela-Jamun Detox Juice (1L)</h4>
+            <h4 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin:0 0 6px 0;">life style plu</h4>
             <p style="font-size:0.82rem; color:#64748b; line-height:1.45; margin-bottom:14px;">शुद्ध नीम, करेला व जामुन का कोल्ड प्रेस्ड रस। रक्त शोधन करता है और भोजन के बाद शुगर स्पाइक रोकता है।</p>
           </div>
-          <button type="button" class="product-order-toggle-btn" onclick="window.toggleProductSelection(this, 'DB002', 'Karela-Jamun Juice (1L)', 450)">
+          <button type="button" class="product-order-toggle-btn" onclick="window.toggleProductSelection(this, 'DB002', 'life style plu', 450)">
             <i class="fa-solid fa-cart-plus"></i> ऑर्डर सूची में जोड़ें
           </button>
         </div>
@@ -374,7 +398,7 @@
   <script src="/js/viral-share-engine.js"></script>
   <script src="/js/audio-greeting-engine.js"></script>
   <script src="/js/dual-whatsapp-order.js"></script>
-<script src="/js/live-page-cms-bridge.js?v=20260925_v2"></script>
+<script src="/js/live-page-cms-bridge.js?v=20260925_v5"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof window.initPanoramicCarousel === 'function') {
@@ -384,3 +408,4 @@
   </script>
 </body>
 </html>
+

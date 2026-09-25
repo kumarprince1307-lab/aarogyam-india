@@ -188,6 +188,11 @@
   function setupUniversalCarouselController(carouselContainer, totalSlides) {
     if (!carouselContainer || totalSlides <= 1) return;
 
+    // Reset init lock so fresh slides can be controlled cleanly
+    delete carouselContainer.dataset.carouselInit;
+    const parentSec = carouselContainer.closest('section') || carouselContainer.parentElement;
+    if (parentSec) delete parentSec.dataset.carouselInit;
+
     // Try global carousel engines first
     if (typeof window.initPanoramicCarousel === 'function') {
       try { window.initPanoramicCarousel(); return; } catch (e) {}
@@ -202,9 +207,10 @@
     // Fallback standalone carousel controller
     let currentIdx = 0;
     const slides = carouselContainer.querySelectorAll('.home-hero-slide-item');
-    const dots = carouselContainer.querySelectorAll('.bighaat-carousel-dot');
-    const prevBtn = carouselContainer.querySelector('.bighaat-carousel-arrow.prev');
-    const nextBtn = carouselContainer.querySelector('.bighaat-carousel-arrow.next');
+    const parentScope = carouselContainer.closest('.container') || carouselContainer.parentElement || carouselContainer;
+    const dots = parentScope.querySelectorAll('.bighaat-carousel-dot');
+    const prevBtn = carouselContainer.querySelector('.bighaat-carousel-arrow.prev') || parentScope.querySelector('.bighaat-carousel-arrow.prev');
+    const nextBtn = carouselContainer.querySelector('.bighaat-carousel-arrow.next') || parentScope.querySelector('.bighaat-carousel-arrow.next');
 
     function showSlide(index) {
       if (slides.length === 0) return;
@@ -213,8 +219,13 @@
         s.style.display = (i === currentIdx) ? 'block' : 'none';
       });
       dots.forEach((d, i) => {
-        if (i === currentIdx) d.classList.add('active');
-        else d.classList.remove('active');
+        if (i === currentIdx) {
+          d.classList.add('active');
+          d.style.background = '#16a34a';
+        } else {
+          d.classList.remove('active');
+          d.style.background = '#cbd5e1';
+        }
       });
     }
 
@@ -244,6 +255,11 @@
 
     const validSlides = pageConfig.hero_slides.filter(s => s && (s.image || s.image_preview));
     if (validSlides.length === 0) return;
+
+    // Reset init lock
+    delete carouselContainer.dataset.carouselInit;
+    const parentSec = carouselContainer.closest('section') || carouselContainer.parentElement;
+    if (parentSec) delete parentSec.dataset.carouselInit;
 
     // Remove existing slide items
     const existingSlides = carouselContainer.querySelectorAll('.home-hero-slide-item');
@@ -290,7 +306,7 @@
         `;
       }
 
-      // Insert before dots if they exist, else append
+      // Insert before dots if they exist inside container, else append
       const dotsEl = carouselContainer.querySelector('.bighaat-carousel-dots');
       if (dotsEl) {
         carouselContainer.insertBefore(slideDiv, dotsEl);
@@ -299,7 +315,8 @@
       }
     });
 
-    let dotsContainer = carouselContainer.querySelector('.bighaat-carousel-dots');
+    const parentScope = carouselContainer.closest('.container') || carouselContainer.parentElement || carouselContainer;
+    let dotsContainer = parentScope.querySelector('.bighaat-carousel-dots') || carouselContainer.querySelector('.bighaat-carousel-dots');
     if (!dotsContainer && validSlides.length > 1) {
       dotsContainer = document.createElement('div');
       dotsContainer.className = 'bighaat-carousel-dots';
@@ -320,7 +337,7 @@
       const sectionKeyMap = {
         'sec_ticker': ['.home-live-ticker-wrap', '#sec_ticker'],
         'sec_hero_slider': ['.home-hero-section', '#sec_hero_slider', '#sec-hero-slider', '.bighaat-carousel-container'],
-        'sec_kpi_badges': ['#sec-kpi-badges', '#sec_kpi_badges', '.health-kpi-matrix-section'],
+        'sec_kpi_badges': ['#sec-kpi-badges', '#sec_kpi_badges'],
         'sec_category_pills': ['#sec-quick-hub', '#sec-category-pills', '.quick-hub-grid'],
         'sec_shelves_bestseller': ['.shelf-section', '#sec-bestsellers', '#sec_shelves_bestseller'],
         'sec_interspersed_marketing': ['#sec-interspersed-marketing', '#sec_interspersed_marketing'],
@@ -341,7 +358,8 @@
         const selectors = sectionKeyMap[secKey] || [`#${secKey}`];
         for (const sel of selectors) {
           const el = document.querySelector(sel);
-          if (el) {
+          // Never hide .health-kpi-matrix-section
+          if (el && !el.classList.contains('health-kpi-matrix-section')) {
             el.style.display = 'none';
             break;
           }
@@ -349,13 +367,20 @@
       });
     }
 
-    // 2. Process Section Reordering
+    // 2. Process Section Reordering (STRICTLY FOR HOMEPAGE ONLY!)
+    // Subpages have rich, custom informational hierarchy that must never be displaced by insertBefore(el, footer).
+    const path = (window.location.pathname || '').toLowerCase();
+    const isHomePage = path === '/' || path === '' || path.endsWith('/index.html') || path.endsWith('index.html');
+    if (!isHomePage) {
+      return; // Absolute protection for all subpages against layout jumping/reordering!
+    }
+
     if (Array.isArray(pageConfig.sections_order) && pageConfig.sections_order.length > 0) {
       const order = pageConfig.sections_order;
       const getSectionEl = (key) => {
         if (key === 'sec_ticker') return document.querySelector('.home-live-ticker-wrap');
         if (key === 'sec_hero_slider') return document.getElementById('sec-hero-slider') || document.querySelector('.home-hero-section') || document.querySelector('.bighaat-carousel-container')?.closest('section');
-        if (key === 'sec_kpi_badges') return document.getElementById('sec-kpi-badges') || document.querySelector('.health-kpi-matrix-section');
+        if (key === 'sec_kpi_badges') return document.getElementById('sec-kpi-badges');
         if (key === 'sec_category_pills') return document.getElementById('sec-quick-hub') || document.querySelector('.quick-hub-grid')?.closest('section');
         if (key === 'sec_shelves_bestseller') return document.querySelector('.shelf-section');
         if (key === 'sec_combo_promo') return document.getElementById('sec-combo-box') || document.getElementById('sec-combo-promo');
@@ -401,6 +426,10 @@
   }
 
   function renderDynamicKpiBadges(pageConfig) {
+    // CRITICAL: Never replace or touch .health-kpi-matrix-section on health pages!
+    if (window.location.pathname.includes('/health/')) {
+      return;
+    }
     if (!Array.isArray(pageConfig.kpi_cards) || pageConfig.kpi_cards.length === 0) return;
     let kpiSection = document.getElementById('sec-kpi-badges');
     if (!kpiSection) {
@@ -460,12 +489,13 @@
       const offerPrice = (mrp > 0 && discount > 0) ? Math.round(mrp * (1 - discount / 100)) : (Number(p.price) || mrp);
       const badge = p.badge || (isPashu ? 'आयुर्वेदिक पशु पोषण' : 'प्रमाणित हर्बल किट');
       const desc = p.description || p.dose || '';
-      const pImg = resolveAssetSrc(p, 'image', '/images/logo/logo.png');
+      const rawImg = resolveAssetSrc(p, 'image', '');
+      const hasRealImg = rawImg && !rawImg.includes('logo.png') && !rawImg.endsWith('/logo.png');
 
       return `
         <div style="background:#fff; border-radius:16px; border:1.5px solid #e2e8f0; padding:20px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 14px rgba(0,0,0,0.03); transition: transform 0.2s ease, box-shadow 0.2s ease;">
           <div>
-            ${pImg ? `<div style="width:100%; height:140px; border-radius:10px; overflow:hidden; margin-bottom:12px; background:#f8fafc; display:flex; align-items:center; justify-content:center;"><img src="${escapeHtml(pImg)}" alt="${escapeHtml(name)}" style="width:100%; height:100%; object-fit:contain; padding:6px;" onerror="this.src='/images/logo/logo.png'"></div>` : ''}
+            ${hasRealImg ? `<div style="width:100%; height:140px; border-radius:10px; overflow:hidden; margin-bottom:12px; background:#f8fafc; display:flex; align-items:center; justify-content:center;"><img src="${escapeHtml(rawImg)}" alt="${escapeHtml(name)}" style="width:100%; height:100%; object-fit:contain; padding:6px;" onerror="this.parentElement.style.display='none'"></div>` : ''}
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
               <span style="background:#fef08a; color:#854d0e; font-weight:800; font-size:0.72rem; padding:2px 8px; border-radius:8px;">${escapeHtml(badge)}</span>
               <div style="text-align:right;">
@@ -629,7 +659,9 @@
         applyWhatsAppSupport(pageConfig);
         syncAudioNarration(pageConfig);
 
-        if (typeof window.startHomeRevampEngine === 'function') {
+        const curPath = (window.location.pathname || '').toLowerCase();
+        const isHome = curPath === '/' || curPath === '' || curPath.endsWith('/index.html') || curPath.endsWith('index.html');
+        if (isHome && typeof window.startHomeRevampEngine === 'function') {
           window.startHomeRevampEngine();
         }
       }
