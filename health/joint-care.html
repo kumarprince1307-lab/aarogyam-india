@@ -56,7 +56,7 @@
   </header>
 
   <!-- PANORAMIC BIGHAT-STYLE HERO SLIDER -->
-  <section style="padding: 24px 0 16px 0; background: #ffffff;">
+  <section id="sec-hero-slider" class="home-hero-section" style="padding: 24px 0 16px 0; background: #ffffff;">
     <div class="container">
       <div class="bighaat-carousel-container">
         <button type="button" class="bighaat-carousel-arrow prev" title="Previous Slide"><i class="fa-solid fa-chevron-left"></i></button>
@@ -303,13 +303,13 @@
   </section>
 
   <!-- 10 REVIEWS -->
-  <section style="padding: 45px 0; background: #ffffff;">
+  <section id="sec-reviews" style="padding: 45px 0; background: #ffffff;">
     <div class="container">
       <div style="text-align:center; margin-bottom:28px;">
         <span style="background:#dcfce7; color:#15803d; font-weight:900; font-size:0.75rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">⭐ 100% संतुष्ट मरीज</span>
         <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">10 वास्तविक ज्वाइंट केयर सफलता अनुभव</h2>
       </div>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+      <div style="display:grid; class="reviews-grid" grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
         <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;"><div style="color:#eab308; margin-bottom:6px;">★★★★★</div><p style="font-size:0.84rem; color:#334155; margin:0 0 8px 0;">"घुटनों में इतना दर्द था कि बैठ नहीं पाता था। 1 महीने में दर्द 70% कम हुआ और सीढ़ियां चढ़ना आसान हो गया।"</p><div style="font-size:0.78rem; font-weight:800; color:#15803d;">- रामकिशोर शर्मा, ग्वालियर</div></div>
         <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;"><div style="color:#eab308; margin-bottom:6px;">★★★★★</div><p style="font-size:0.84rem; color:#334155; margin:0 0 8px 0;">"यूरिक एसिड 8.5 था और पैर के अंगूठे में भयंकर सूजन थी। 3 हफ्ते में यूरिक एसिड 5.8 पर आ गया।"</p><div style="font-size:0.78rem; font-weight:800; color:#15803d;">- हरिशंकर दुबे, रीवा</div></div>
         <div style="background:#f8fafc; border-radius:14px; padding:16px; border:1px solid #e2e8f0;"><div style="color:#eab308; margin-bottom:6px;">★★★★★</div><p style="font-size:0.84rem; color:#334155; margin:0 0 8px 0;">"संधि-सुधा तेल की मालिश से रात को बहुत अच्छी नींद आती है और अकड़न नहीं रहती।"</p><div style="font-size:0.78rem; font-weight:800; color:#15803d;">- शांति देवी, वाराणसी</div></div>
@@ -325,13 +325,13 @@
   </section>
 
   <!-- 10 FAQS -->
-  <section style="padding: 45px 0; background: #f8fafc;">
+  <section id="sec-faqs" style="padding: 45px 0; background: #f8fafc;">
     <div class="container" style="max-width:850px;">
       <div style="text-align:center; margin-bottom:28px;">
         <span style="background:#dcfce7; color:#15803d; font-weight:900; font-size:0.75rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">❓ जरूरी प्रश्नोत्तर</span>
         <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">जोड़ों के दर्द से जुड़े 10 जरूरी सवाल</h2>
       </div>
-      <div style="display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; flex-direction:column; class="faq-accordion" gap:10px;">
         <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;" open><summary style="font-weight:800; color:#0f172a; cursor:pointer;">1. क्या घिसा हुआ कार्टिलेज दोबारा ठीक हो सकता है?</summary><p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">शुरुआती और मध्यम अवस्था में ग्लूकोसामाइन, बोसवेलिया और पोषण से कार्टिलेज की मरम्मत और साइनोवियल फ्लूइड का निर्माण संभव है।</p></details>
         <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;"><summary style="font-weight:800; color:#0f172a; cursor:pointer;">2. क्या यूरिक एसिड मरीज को दालें छोड़नी चाहिए?</summary><p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">हाई प्यूरीन दालें (उड़द, राजमा, चना) और टमाटर से परहेज करें। मूंग की दाल और लौकी-तोरई का सूप सर्वोत्तम है।</p></details>
         <details style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px;"><summary style="font-weight:800; color:#0f172a; cursor:pointer;">3. परिणाम दिखने में कितना समय लगता है?</summary><p style="margin:8px 0 0 0; color:#64748b; font-size:0.88rem; line-height:1.5;">तेल मालिश से 10-15 मिनट में दर्द कम होता है और सप्लीमेंट्स से 7-10 दिन में सूजन व कट-कट में स्थाई सुधार दिखता है।</p></details>
@@ -347,7 +347,7 @@
   </section>
 
   <!-- VIDEOS -->
-  <section style="padding: 50px 0; background: #ffffff; border-top:1.5px solid #e2e8f0; border-bottom:1.5px solid #e2e8f0;">
+  <section id="sec-videos" style="padding: 50px 0; background: #ffffff; border-top:1.5px solid #e2e8f0; border-bottom:1.5px solid #e2e8f0;">
     <div class="container">
       <div style="text-align:center; margin-bottom:28px;">
         <h2 style="font-size:1.8rem; font-weight:900; color:#0f172a;">ज्वाइंट केयर व गठिया वीडियो मास्टरक्लास</h2>
@@ -371,7 +371,7 @@
   <script src="/js/viral-share-engine.js"></script>
   <script src="/js/audio-greeting-engine.js"></script>
   <script src="/js/dual-whatsapp-order.js"></script>
-<script src="/js/live-page-cms-bridge.js"></script>
+<script src="/js/live-page-cms-bridge.js?v=20260925_v2"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof window.initPanoramicCarousel === 'function') {

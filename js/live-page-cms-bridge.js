@@ -1,13 +1,14 @@
 /**
  * ====================================================================
  * AAROGYAM INDIA - UNIVERSAL LIVE PAGE CMS BRIDGE & DYNAMIC ENGINE
- * Version: 28.0 (Bulletproof Live Page Real-Time Synchronization)
+ * Version: 32.0 (Rock-Solid Multi-Page Synchronization & Zero Cache-Lag)
  * ====================================================================
  * Connects all live customer-facing pages (index.html, pashu-palan.html,
- * health/*.html, etc.) directly to the Admin Page Editor CMS data.
+ * health/*.html, categories/*.html, ebooks/*.html, etc.) directly to
+ * the Admin Page Editor CMS data.
  * 
  * Synchronizes in Real-Time:
- * 1. Live Breaking News Ticker (Marquee & Speed)
+ * 1. Live Breaking News Ticker (Marquee & Speed) - Always preserved at top
  * 2. Hero Banners & Panoramic Carousel (Slides, Badges, CTAs, Images)
  * 3. 3D Floating Action Banners (Image, Badge, Link, 3D Animations)
  * 4. Section Reordering & Instant Section Show/Hide
@@ -79,6 +80,8 @@
       if (path.includes('skin-care') && id.includes('skin_care')) return true;
       if (path.includes('kids-care') && id.includes('kids_care')) return true;
       if (path.includes('home-care') && id.includes('home_care')) return true;
+      if (path.includes('agriculture') && id.includes('agriculture')) return true;
+      if (path.includes('ebook') && (id.includes('ebook_store') || s.includes('ebook'))) return true;
       if (s && path.includes(s)) return true;
       return false;
     });
@@ -110,7 +113,7 @@
       } catch (err) {}
     }
 
-    // 2. Merge / Fallback with active local admin edits in localStorage
+    // 2. Merge / Fallback with active local admin edits in localStorage (for instant editing previews)
     try {
       const stored = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
       if (stored) {
@@ -119,11 +122,9 @@
           if (!serverConfigLoaded || allPages.length === 0) {
             allPages = localParsed;
           } else {
-            // Merge: If local edit has newer changes in active tab session, preserve them
             localParsed.forEach(lp => {
               const sIdx = allPages.findIndex(sp => sp.id === lp.id || sp.slug === lp.slug);
               if (sIdx >= 0) {
-                // If local storage has customizations, keep them merged
                 allPages[sIdx] = Object.assign({}, allPages[sIdx], lp);
               } else {
                 allPages.push(lp);
@@ -184,9 +185,61 @@
     }
   }
 
+  function setupUniversalCarouselController(carouselContainer, totalSlides) {
+    if (!carouselContainer || totalSlides <= 1) return;
+
+    // Try global carousel engines first
+    if (typeof window.initPanoramicCarousel === 'function') {
+      try { window.initPanoramicCarousel(); return; } catch (e) {}
+    }
+    if (typeof window.initHeroCarousel === 'function') {
+      try { window.initHeroCarousel(); return; } catch (e) {}
+    }
+    if (typeof window.initUniversalHeroCarousel === 'function') {
+      try { window.initUniversalHeroCarousel(); return; } catch (e) {}
+    }
+
+    // Fallback standalone carousel controller
+    let currentIdx = 0;
+    const slides = carouselContainer.querySelectorAll('.home-hero-slide-item');
+    const dots = carouselContainer.querySelectorAll('.bighaat-carousel-dot');
+    const prevBtn = carouselContainer.querySelector('.bighaat-carousel-arrow.prev');
+    const nextBtn = carouselContainer.querySelector('.bighaat-carousel-arrow.next');
+
+    function showSlide(index) {
+      if (slides.length === 0) return;
+      currentIdx = (index + slides.length) % slides.length;
+      slides.forEach((s, i) => {
+        s.style.display = (i === currentIdx) ? 'block' : 'none';
+      });
+      dots.forEach((d, i) => {
+        if (i === currentIdx) d.classList.add('active');
+        else d.classList.remove('active');
+      });
+    }
+
+    let autoTimer = setInterval(() => showSlide(currentIdx + 1), 5000);
+    function resetTimer() {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => showSlide(currentIdx + 1), 5000);
+    }
+
+    if (prevBtn) {
+      prevBtn.onclick = (e) => { e.preventDefault(); showSlide(currentIdx - 1); resetTimer(); };
+    }
+    if (nextBtn) {
+      nextBtn.onclick = (e) => { e.preventDefault(); showSlide(currentIdx + 1); resetTimer(); };
+    }
+    dots.forEach((dot, idx) => {
+      dot.onclick = () => { showSlide(idx); resetTimer(); };
+    });
+  }
+
   function renderDynamicHeroSlides(pageConfig) {
     if (!Array.isArray(pageConfig.hero_slides) || pageConfig.hero_slides.length === 0) return;
-    const carouselContainer = document.querySelector('.bighaat-carousel-container');
+    const carouselContainer = document.querySelector('.bighaat-carousel-container') || 
+                              document.querySelector('.home-hero-section') || 
+                              document.getElementById('sec-hero-slider');
     if (!carouselContainer) return;
 
     const validSlides = pageConfig.hero_slides.filter(s => s && (s.image || s.image_preview));
@@ -199,13 +252,12 @@
     const isHealthPage = window.location.pathname.includes('/health/');
 
     validSlides.forEach((s, idx) => {
-      const imgSrc = resolveAssetSrc(s, 'image', '/images/banners/kharif-master-guide-2026-hero-banner.webp');
+      const imgSrc = resolveAssetSrc(s, 'image', '/images/banners/health-banner.jpeg');
       const slideDiv = document.createElement('div');
       slideDiv.className = 'home-hero-slide-item';
       if (idx !== 0) slideDiv.style.display = 'none';
 
       if (isHealthPage && (s.title || s.tag || s.subtitle)) {
-        // Health Card Hero Style
         const tag = s.tag || 'HEALTH CARE';
         const title = s.title || 'आरोग्यम स्वास्थ्य समाधान';
         const desc = s.subtitle || s.description || '';
@@ -231,7 +283,6 @@
           </div>
         `;
       } else {
-        // Landscape Banner Style
         slideDiv.innerHTML = `
           <a href="${s.cta_link || '#'}" class="landscape-hero-banner-link" title="${escapeHtml(s.title || s.tag || '')}">
             <img src="${imgSrc}" alt="${escapeHtml(s.title || 'Hero Banner')}" class="landscape-hero-banner-img" onerror="this.onerror=null; this.src='/images/banners/kharif-master-guide-2026-hero-banner.webp';" />
@@ -239,17 +290,26 @@
         `;
       }
 
-      carouselContainer.appendChild(slideDiv);
+      // Insert before dots if they exist, else append
+      const dotsEl = carouselContainer.querySelector('.bighaat-carousel-dots');
+      if (dotsEl) {
+        carouselContainer.insertBefore(slideDiv, dotsEl);
+      } else {
+        carouselContainer.appendChild(slideDiv);
+      }
     });
 
-    const dotsContainer = document.querySelector('.bighaat-carousel-dots');
+    let dotsContainer = carouselContainer.querySelector('.bighaat-carousel-dots');
+    if (!dotsContainer && validSlides.length > 1) {
+      dotsContainer = document.createElement('div');
+      dotsContainer.className = 'bighaat-carousel-dots';
+      carouselContainer.appendChild(dotsContainer);
+    }
     if (dotsContainer) {
       dotsContainer.innerHTML = validSlides.map((_, i) => `<span class="bighaat-carousel-dot${i === 0 ? ' active' : ''}"></span>`).join('');
     }
 
-    if (typeof window.initHeroCarousel === 'function') {
-      try { window.initHeroCarousel(); } catch (e) {}
-    }
+    setupUniversalCarouselController(carouselContainer, validSlides.length);
   }
 
   function applySectionReorderingAndVisibility(pageConfig) {
@@ -259,12 +319,13 @@
     if (Array.isArray(pageConfig.hidden_sections) && pageConfig.hidden_sections.length > 0) {
       const sectionKeyMap = {
         'sec_ticker': ['.home-live-ticker-wrap', '#sec_ticker'],
-        'sec_hero_slider': ['.home-hero-section', '#sec_hero_slider'],
-        'sec_kpi_badges': ['#sec-kpi-badges', '#sec_kpi_badges'],
+        'sec_hero_slider': ['.home-hero-section', '#sec_hero_slider', '#sec-hero-slider', '.bighaat-carousel-container'],
+        'sec_kpi_badges': ['#sec-kpi-badges', '#sec_kpi_badges', '.health-kpi-matrix-section'],
         'sec_category_pills': ['#sec-quick-hub', '#sec-category-pills', '.quick-hub-grid'],
         'sec_shelves_bestseller': ['.shelf-section', '#sec-bestsellers', '#sec_shelves_bestseller'],
         'sec_interspersed_marketing': ['#sec-interspersed-marketing', '#sec_interspersed_marketing'],
         'sec_combo_promo': ['#sec-combo-promo', '#sec-combo-box'],
+        'sec_products': ['#sec-products', '#products-cattle', '.products-catalog-section'],
         'sec_videos': ['#sec-videos', '#sec-video-guides'],
         'sec_reviews': ['#sec-reviews', '#sec-reviews-showcase'],
         'sec_faqs': ['#sec-faqs', '#sec-faqs-accordion'],
@@ -288,19 +349,20 @@
       });
     }
 
-    // 2. Process Section Reordering for ALL pages (not just Home)
+    // 2. Process Section Reordering
     if (Array.isArray(pageConfig.sections_order) && pageConfig.sections_order.length > 0) {
       const order = pageConfig.sections_order;
       const getSectionEl = (key) => {
         if (key === 'sec_ticker') return document.querySelector('.home-live-ticker-wrap');
-        if (key === 'sec_hero_slider') return document.querySelector('.home-hero-section');
-        if (key === 'sec_kpi_badges') return document.getElementById('sec-kpi-badges');
+        if (key === 'sec_hero_slider') return document.getElementById('sec-hero-slider') || document.querySelector('.home-hero-section') || document.querySelector('.bighaat-carousel-container')?.closest('section');
+        if (key === 'sec_kpi_badges') return document.getElementById('sec-kpi-badges') || document.querySelector('.health-kpi-matrix-section');
         if (key === 'sec_category_pills') return document.getElementById('sec-quick-hub') || document.querySelector('.quick-hub-grid')?.closest('section');
         if (key === 'sec_shelves_bestseller') return document.querySelector('.shelf-section');
         if (key === 'sec_combo_promo') return document.getElementById('sec-combo-box') || document.getElementById('sec-combo-promo');
-        if (key === 'sec_videos') return document.getElementById('sec-video-guides') || document.getElementById('sec-videos');
-        if (key === 'sec_reviews') return document.getElementById('sec-reviews-showcase') || document.getElementById('sec-reviews');
-        if (key === 'sec_faqs') return document.getElementById('sec-faqs-accordion') || document.getElementById('sec-faqs');
+        if (key === 'sec_products') return document.getElementById('sec-products') || document.getElementById('products-cattle') || document.querySelector('.products-catalog-section');
+        if (key === 'sec_videos') return document.getElementById('sec-videos') || document.getElementById('sec-video-guides') || document.querySelector('.universal-video-showcase')?.closest('section');
+        if (key === 'sec_reviews') return document.getElementById('sec-reviews') || document.getElementById('sec-reviews-showcase');
+        if (key === 'sec_faqs') return document.getElementById('sec-faqs') || document.getElementById('sec-faqs-accordion');
         if (key === 'sec_health_consultation') return document.getElementById('sec-health-consultation');
         if (key === 'sec_major_crops') return document.getElementById('sec-major-crops');
         if (key === 'sec_pashu_palan') return document.getElementById('sec-pashu-palan');
@@ -311,8 +373,21 @@
 
       const parent = document.body;
       const footer = document.querySelector('footer');
+      const header = document.querySelector('header');
+      const ticker = document.querySelector('.home-live-ticker-wrap');
 
+      // CRITICAL FIX: Ensure ticker ALWAYS stays at the very top of body, before header!
+      if (ticker) {
+        if (header && parent.contains(header)) {
+          parent.insertBefore(ticker, header);
+        } else {
+          parent.prepend(ticker);
+        }
+      }
+
+      // Reorder content sections between header and footer
       order.forEach(secKey => {
+        if (secKey === 'sec_ticker') return; // Handled above, never move to footer!
         const el = getSectionEl(secKey);
         if (el && parent.contains(el)) {
           if (footer && parent.contains(footer)) {
@@ -332,7 +407,7 @@
       kpiSection = document.createElement('section');
       kpiSection.id = 'sec-kpi-badges';
       kpiSection.style.cssText = 'padding: 24px 0; background: #ffffff; border-bottom: 1.5px solid #e2e8f0;';
-      const hero = document.querySelector('.home-hero-section');
+      const hero = document.getElementById('sec-hero-slider') || document.querySelector('.home-hero-section') || document.querySelector('.bighaat-carousel-container')?.closest('section');
       if (hero && hero.nextSibling) {
         hero.parentNode.insertBefore(kpiSection, hero.nextSibling);
       } else {
@@ -364,7 +439,9 @@
       return;
     }
 
-    const section = document.getElementById('products-cattle') || document.getElementById('sec-products') || document.querySelector('.products-catalog-section');
+    const section = document.getElementById('sec-products') || 
+                    document.getElementById('products-cattle') || 
+                    document.querySelector('.products-catalog-section');
     if (!section) return;
 
     const container = section.querySelector('.container') || section;
@@ -380,15 +457,15 @@
       const name = p.name || p.title || 'आरोग्यम उत्पाद';
       const mrp = Number(p.mrp || p.price || 0);
       const discount = Number(p.discount_pct || 0);
-      const offerPrice = (mrp > 0 && discount > 0) ? Math.round(mrp * (1 - discount / 100)) : mrp;
+      const offerPrice = (mrp > 0 && discount > 0) ? Math.round(mrp * (1 - discount / 100)) : (Number(p.price) || mrp);
       const badge = p.badge || (isPashu ? 'आयुर्वेदिक पशु पोषण' : 'प्रमाणित हर्बल किट');
       const desc = p.description || p.dose || '';
-      const pImg = resolveAssetSrc(p, 'image', '/images/banners/agriculture-banner.jpeg');
+      const pImg = resolveAssetSrc(p, 'image', '/images/logo/logo.png');
 
       return `
         <div style="background:#fff; border-radius:16px; border:1.5px solid #e2e8f0; padding:20px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 14px rgba(0,0,0,0.03); transition: transform 0.2s ease, box-shadow 0.2s ease;">
           <div>
-            ${pImg ? `<div style="width:100%; height:130px; border-radius:10px; overflow:hidden; margin-bottom:12px; background:#f8fafc; display:flex; align-items:center; justify-content:center;"><img src="${escapeHtml(pImg)}" alt="${escapeHtml(name)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/agriculture-banner.jpeg'"></div>` : ''}
+            ${pImg ? `<div style="width:100%; height:140px; border-radius:10px; overflow:hidden; margin-bottom:12px; background:#f8fafc; display:flex; align-items:center; justify-content:center;"><img src="${escapeHtml(pImg)}" alt="${escapeHtml(name)}" style="width:100%; height:100%; object-fit:contain; padding:6px;" onerror="this.src='/images/logo/logo.png'"></div>` : ''}
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
               <span style="background:#fef08a; color:#854d0e; font-weight:800; font-size:0.72rem; padding:2px 8px; border-radius:8px;">${escapeHtml(badge)}</span>
               <div style="text-align:right;">
@@ -413,7 +490,10 @@
 
   function renderDynamicReviews(pageConfig) {
     if (!Array.isArray(pageConfig.reviews) || pageConfig.reviews.length === 0) return;
-    const grid = document.getElementById('home-reviews-grid');
+    const grid = document.getElementById('home-reviews-grid') || 
+                 document.querySelector('#sec-reviews .reviews-grid') || 
+                 document.querySelector('#sec-reviews div[style*="grid"]') ||
+                 document.getElementById('sec-reviews-grid');
     if (!grid) return;
 
     grid.innerHTML = pageConfig.reviews.map(r => `
@@ -429,7 +509,7 @@
             ${r.avatar || '👨‍🌾'}
           </div>
           <div>
-            <h4 style="font-size:0.95rem; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(r.name || 'किसान मित्र')}</h4>
+            <h4 style="font-size:0.95rem; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(r.name || 'किसान / ग्राहक मित्र')}</h4>
             <div style="font-size:0.75rem; color:#64748b;">📍 ${escapeHtml(r.location || 'भारत')}</div>
           </div>
         </div>
@@ -440,6 +520,8 @@
   function renderDynamicFaqs(pageConfig) {
     if (!Array.isArray(pageConfig.faqs) || pageConfig.faqs.length === 0) return;
     const faqContainer = document.getElementById('home-faq-accordion') || 
+      document.querySelector('#sec-faqs .faq-accordion') ||
+      document.querySelector('#sec-faqs div[style*="flex-direction"]') ||
       document.querySelector('#sec-faqs-accordion div[style*="flex-direction"]') ||
       document.querySelector('section details')?.parentElement;
     if (!faqContainer) return;
@@ -488,13 +570,11 @@
     const waNum = (number || '7974422572').replace(/\D/g, '');
     const defaultText = prompt || 'नमस्ते Aarogyam India! मुझे सहायता चाहिए।';
 
-    // Hook into global WhatsApp helper
     window.getPersonalizedWhatsAppUrl = function(customPrompt) {
       const text = customPrompt || defaultText;
       return `https://wa.me/91${waNum}?text=${encodeURIComponent(text)}`;
     };
 
-    // Update static AI Expert links
     document.querySelectorAll('.ai-expert-red-btn, a[href*="wa.me"]').forEach(btn => {
       if (btn.tagName === 'A') {
         btn.href = `https://wa.me/91${waNum}?text=${encodeURIComponent(defaultText)}`;
@@ -528,6 +608,10 @@
 
   async function initLiveCmsBridge() {
     try {
+      // Ensure page is scrollable (prevent any modal/drawer scroll freeze)
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+
       const allPages = await loadConfigData();
       const pageConfig = getPageMatch(allPages);
       if (pageConfig) {
@@ -545,7 +629,6 @@
         applyWhatsAppSupport(pageConfig);
         syncAudioNarration(pageConfig);
 
-        // If Home Revamp is present, trigger a smooth re-hydration of lists
         if (typeof window.startHomeRevampEngine === 'function') {
           window.startHomeRevampEngine();
         }
