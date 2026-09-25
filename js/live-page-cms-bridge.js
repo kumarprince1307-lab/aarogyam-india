@@ -367,62 +367,9 @@
       });
     }
 
-    // 2. Process Section Reordering (STRICTLY FOR HOMEPAGE ONLY!)
-    // Subpages have rich, custom informational hierarchy that must never be displaced by insertBefore(el, footer).
-    const path = (window.location.pathname || '').toLowerCase();
-    const isHomePage = path === '/' || path === '' || path.endsWith('/index.html') || path.endsWith('index.html');
-    if (!isHomePage) {
-      return; // Absolute protection for all subpages against layout jumping/reordering!
-    }
-
-    if (Array.isArray(pageConfig.sections_order) && pageConfig.sections_order.length > 0) {
-      const order = pageConfig.sections_order;
-      const getSectionEl = (key) => {
-        if (key === 'sec_ticker') return document.querySelector('.home-live-ticker-wrap');
-        if (key === 'sec_hero_slider') return document.getElementById('sec-hero-slider') || document.querySelector('.home-hero-section') || document.querySelector('.bighaat-carousel-container')?.closest('section');
-        if (key === 'sec_kpi_badges') return document.getElementById('sec-kpi-badges');
-        if (key === 'sec_category_pills') return document.getElementById('sec-quick-hub') || document.querySelector('.quick-hub-grid')?.closest('section');
-        if (key === 'sec_shelves_bestseller') return document.querySelector('.shelf-section');
-        if (key === 'sec_combo_promo') return document.getElementById('sec-combo-box') || document.getElementById('sec-combo-promo');
-        if (key === 'sec_products') return document.getElementById('sec-products') || document.getElementById('products-cattle') || document.querySelector('.products-catalog-section');
-        if (key === 'sec_videos') return document.getElementById('sec-videos') || document.getElementById('sec-video-guides') || document.querySelector('.universal-video-showcase')?.closest('section');
-        if (key === 'sec_reviews') return document.getElementById('sec-reviews') || document.getElementById('sec-reviews-showcase');
-        if (key === 'sec_faqs') return document.getElementById('sec-faqs') || document.getElementById('sec-faqs-accordion');
-        if (key === 'sec_health_consultation') return document.getElementById('sec-health-consultation');
-        if (key === 'sec_major_crops') return document.getElementById('sec-major-crops');
-        if (key === 'sec_pashu_palan') return document.getElementById('sec-pashu-palan');
-        if (key === 'sec_career_business') return document.getElementById('sec-career-business');
-        if (key === 'sec_achievers_showcase') return document.getElementById('sec-achievers-showcase');
-        return document.getElementById(key);
-      };
-
-      const parent = document.body;
-      const footer = document.querySelector('footer');
-      const header = document.querySelector('header');
-      const ticker = document.querySelector('.home-live-ticker-wrap');
-
-      // CRITICAL FIX: Ensure ticker ALWAYS stays at the very top of body, before header!
-      if (ticker) {
-        if (header && parent.contains(header)) {
-          parent.insertBefore(ticker, header);
-        } else {
-          parent.prepend(ticker);
-        }
-      }
-
-      // Reorder content sections between header and footer
-      order.forEach(secKey => {
-        if (secKey === 'sec_ticker') return; // Handled above, never move to footer!
-        const el = getSectionEl(secKey);
-        if (el && parent.contains(el)) {
-          if (footer && parent.contains(footer)) {
-            parent.insertBefore(el, footer);
-          } else {
-            parent.appendChild(el);
-          }
-        }
-      });
-    }
+    // 2. Section reordering: We preserve the natural, semantic HTML DOM order on ALL pages.
+    // Zero insertBefore manipulation ensures that unlisted sections (e.g. Health Consultation, Crops, Diet Charts)
+    // NEVER get stranded out of order or pushed above the header/banner.
   }
 
   function renderDynamicKpiBadges(pageConfig) {
@@ -522,9 +469,16 @@
     if (!Array.isArray(pageConfig.reviews) || pageConfig.reviews.length === 0) return;
     const grid = document.getElementById('home-reviews-grid') || 
                  document.querySelector('#sec-reviews .reviews-grid') || 
+                 document.querySelector('.reviews-grid') || 
                  document.querySelector('#sec-reviews div[style*="grid"]') ||
                  document.getElementById('sec-reviews-grid');
     if (!grid) return;
+
+    // Safety: If static HTML already has 3 or more rich reviews and incoming config has fewer, don't downgrade/wipe them!
+    const existingCount = grid.querySelectorAll('div[style*="border-radius"], .review-card').length;
+    if (existingCount >= 3 && pageConfig.reviews.length < existingCount) {
+      return;
+    }
 
     grid.innerHTML = pageConfig.reviews.map(r => `
       <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 18px; padding: 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column; justify-content:space-between;">
@@ -551,10 +505,16 @@
     if (!Array.isArray(pageConfig.faqs) || pageConfig.faqs.length === 0) return;
     const faqContainer = document.getElementById('home-faq-accordion') || 
       document.querySelector('#sec-faqs .faq-accordion') ||
+      document.querySelector('.faq-accordion') ||
       document.querySelector('#sec-faqs div[style*="flex-direction"]') ||
-      document.querySelector('#sec-faqs-accordion div[style*="flex-direction"]') ||
-      document.querySelector('section details')?.parentElement;
+      document.querySelector('#sec-faqs-accordion div[style*="flex-direction"]');
     if (!faqContainer) return;
+
+    // Safety: If static HTML already has more FAQs than incoming config, don't downgrade/wipe them!
+    const existingCount = faqContainer.querySelectorAll('details').length;
+    if (existingCount >= 3 && pageConfig.faqs.length < existingCount) {
+      return;
+    }
 
     faqContainer.innerHTML = pageConfig.faqs.map((f, i) => `
       <details style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:16px 20px; cursor:pointer; color:#0f172a; margin-bottom:10px;" ${i === 0 ? 'open' : ''}>
