@@ -2373,7 +2373,14 @@
         "sec_help_support"
       ],
       "hidden_sections": [],
-      "kpi_cards": [],
+      "kpi_cards": [
+        {
+          "icon": "fa-star",
+          "title": "नया फीचर शीर्षक",
+          "desc": "फीचर का विवरण यहाँ लिखें...",
+          "image": "/images/kpi/kpi_card-whatsapp-image-202-685174-tiz9.webp"
+        }
+      ],
       "marketing_cards": [],
       "videos": [
         {
