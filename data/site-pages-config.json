@@ -2351,6 +2351,16 @@
           "cta_link": "https://wa.me/917974422572",
           "cta_secondary_text": "",
           "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-whatsapp-image-202-366304-v5a4.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
       "sections_order": [
@@ -2417,6 +2427,17 @@
           "image": "/images/products/product-nutri-liver-498231-l1x4.webp",
           "title": "Nutri liver ",
           "dose": "1 capsule before both meals with lukewarm water / milk."
+        },
+        {
+          "title": "naturamore active ",
+          "description": "72% Plant-based protein with BCAA | Digestive Enzyme| Gokhshura & Ashwagandha\n\nNaturamore Active is the ultimate plant-based nutraceutical designed for those who demand more from their bodies. Whether you're an athlete, a fitness enthusiast, or someone recovering from an injury, Naturamore Active is here to fuel your healing, recovery, and performance.",
+          "image": "/images/products/product-889-1-398356-hvb9.webp",
+          "mrp": 1425,
+          "discount_pct": 0,
+          "dose": "10 gm /daye ",
+          "whatsapp_link": "https://wa.me/917974422572",
+          "price": 1425,
+          "name": "naturamore active "
         }
       ],
       "page_kpi_sections": [],
