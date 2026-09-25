@@ -789,9 +789,9 @@
       "status": "active",
       "theme_primary": "#dc2626",
       "theme_dark": "#900000",
-      "ticker_text": "🌿 50,000+ परिवारों का भरोसा! • सभी 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान • 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय",
+      "ticker_text": "🌿 50,000+ परिवारों का भरोसा! • सभी 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान • 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय aarogyam india",
       "audio_title": "आरोग्यम संपूर्ण स्वास्थ्य केंद्र",
-      "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे।",
+      "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे। dhara pranam",
       "og_title": "",
       "og_image": "",
       "og_description": "",
@@ -818,6 +818,16 @@
         },
         {
           "image": "/images/banners/hero_slide-cover02-882999-qw30.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-whatsapp-image-202-381291-0i97.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
@@ -861,9 +871,29 @@
           "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
           "sales_counter": "1,200+ किसानों ने खरीदा",
           "image": "/images/banners/marketing_card-000-945423-zbyc.webp"
+        },
+        {
+          "book_id": "BK002",
+          "tag": "🔥 बेस्टसेलर डील",
+          "headline": "खेती का डॉक्टर",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा",
+          "image": "/images/banners/marketing_card-whatsapp-image-202-448507-bkrb.webp"
         }
       ],
-      "videos": [],
+      "videos": [
+        {
+          "video_id": "VID_S284427",
+          "title": "खेती का डॉक्टर बुक क्यों खरीदे",
+          "desc": "ये बुक ऐसी बुक है जिसमें किसान बीमारी के लक्षण पहचान सकता हैं अंतर देख सकता हैं कि कौन सी बीमारी कीट",
+          "url": "/tube.html?vid=VID_S284427",
+          "youtube_id": "bvCuBEuyg48",
+          "thumbnail": "https://img.youtube.com/vi/bvCuBEuyg48/hqdefault.jpg",
+          "duration": "0:10",
+          "target_page": "all",
+          "ratio": "9:16"
+        }
+      ],
       "reviews": [
         {
           "name": "कमलेश शर्मा",
@@ -997,6 +1027,20 @@
           ],
           "description": "घर को हानिकारक रसायनों से मुक्त, स्वच्छ और रोगाणु-रहित रखने के इको-फ्रेंडली बायो-नेचुरल क्लीनर्स।",
           "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
+        },
+        {
+          "id": "DIS009",
+          "name": "नई स्वास्थ्य समस्या",
+          "badge": "आयुर्वेदिक उपचार",
+          "color": "#3b82f6",
+          "icon": "🩺",
+          "image": "/images/banners/health_card-whatsapp-image-202-413881-jjja.webp",
+          "symptoms": [
+            "लक्षण 1",
+            "लक्षण 2"
+          ],
+          "description": "समस्या का संक्षिप्त विवरण यहाँ लिखें...",
+          "solution": "आयुर्वेदिक औषधि व आहार संतुलन तालिका।"
         }
       ],
       "crops": [
@@ -1103,7 +1147,19 @@
           "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
         }
       ],
-      "products": [],
+      "products": [
+        {
+          "title": "ebook",
+          "description": "उत्पाद के लाभ व उपयोग विधि यहाँ लिखें...",
+          "image": "/images/products/product-whatsapp-image-202-475057-3ggm.webp",
+          "mrp": 99,
+          "discount_pct": 0,
+          "dose": "2ml / लीटर पानी",
+          "whatsapp_link": "https://wa.me/917974422572",
+          "name": "ebook",
+          "price": 99
+        }
+      ],
       "page_kpi_sections": [],
       "whatsapp_support": {
         "number": "917974422572",
