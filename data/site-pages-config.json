@@ -2646,10 +2646,23 @@
       "category": "Healthcare Sub-page",
       "status": "active",
       "theme_primary": "#16a34a",
-      "theme_dark": "#15803d",
+      "theme_dark": "#005700",
+      "ticker_text": "🦴 घुटनों का दर्द, यूरिक एसिड व जोड़ों की ग्रीस बढ़ाएं | 100% हर्बल थेरेपी",
+      "audio_title": "जोड़ों का दर्द व गठिया राहत",
+      "audio_script": "नमस्ते {name} जी! जोड़ों के दर्द व आर्थराइटिस केयर पेज पर आपका स्वागत है। कार्टिलेज को दोबारा मजबूत बनाने, यूरिक एसिड घटाने और सूजन दूर करने की सम्पूर्ण जानकारी यहाँ दी गई है। kaise ho aa dhara pranam",
+      "og_title": "जोड़ों का दर्द व गठिया का संपूर्ण प्राकृतिक समाधान | Aarogyam India",
+      "og_image": "/images/banners/health-joint-care.jpg",
+      "og_description": "घुटनों का दर्द, कट-कट की आवाज, कार्टिलेज घिसाव व यूरिक एसिड का आयुर्वेदिक उपचार व डाइट चार्ट।",
+      "share_message": "",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
       "fb_pixel": true,
       "ga_tag": true,
-      "ticker_text": "🦴 घुटनों का दर्द, यूरिक एसिड व जोड़ों की ग्रीस बढ़ाएं | 100% हर्बल थेरेपी",
       "hero_slides": [
         {
           "image": "/images/banners/health-joint-care.jpg",
@@ -2658,6 +2671,26 @@
           "subtitle": "कार्टिलेज मजबूती व यूरिक एसिड नियंत्रण",
           "cta_text": "💬 हर्बल थेरेपी परामर्श",
           "cta_link": "https://wa.me/917974422572"
+        },
+        {
+          "image": "/images/banners/hero_slide-whatsapp-image-202-708431-qub9.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-whatsapp-image-202-729050-urfb.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
       "sections_order": [
@@ -2670,16 +2703,13 @@
       ],
       "hidden_sections": [],
       "kpi_cards": [],
-      "videos": [],
       "marketing_cards": [],
+      "videos": [],
       "reviews": [],
       "faqs": [],
-      "whatsapp_support": {
-        "number": "917974422572",
-        "prompt": "नमस्ते, मुझे जोड़ों के दर्द व गठिया का समाधान चाहिए।"
-      },
-      "audio_title": "जोड़ों का दर्द व गठिया राहत",
-      "audio_script": "नमस्ते {name} जी! जोड़ों के दर्द व आर्थराइटिस केयर पेज पर आपका स्वागत है। कार्टिलेज को दोबारा मजबूत बनाने, यूरिक एसिड घटाने और सूजन दूर करने की सम्पूर्ण जानकारी यहाँ दी गई है।",
+      "health_diseases": [],
+      "crops": [],
+      "pashu_cards": [],
       "products": [
         {
           "id": "JC001",
@@ -2688,7 +2718,7 @@
           "mrp": 450,
           "badge": "दर्द निवारक तेल",
           "description": "शल्लाकी, निर्गुंडी, महानारायण व गंधपुरा तेल। 10 मिनट में जोड़ों की गहराई तक पहुंचकर दर्द खींचता है।",
-          "image": "/images/logo/logo.png"
+          "image": "/images/products/product-889-1-764581-31ib.webp"
         },
         {
           "id": "JC002",
@@ -2709,13 +2739,15 @@
           "image": "/images/logo/logo.png"
         }
       ],
+      "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "जोड़ों का दर्द: कारण, लक्षण व गंभीर खतरे",
         "cards": [
           {
             "title": "❓ जोड़ों में दर्द क्यों होता है? (Causes)",
-            "color": "#16a34a",
+            "color": "#2563eb",
+            "image": "",
             "points": [
               "<strong>सायनोवियल फ्लूइड की कमी:</strong> उम्र व पोषण की कमी से जोड़ों का ग्रीस खत्म होना।",
               "<strong>कार्टिलेज घिसना (Osteoarthritis):</strong> हड्डियों के आपस में टकराने से घिसाव।",
@@ -2725,7 +2757,8 @@
           },
           {
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
-            "color": "#16a34a",
+            "color": "#2563eb",
+            "image": "",
             "points": [
               "उठते-बैठते समय घुटनों से कट-कट या चटकने की आवाज।",
               "सुबह सोकर उठने पर जोड़ों में तेज जकड़न व अकड़न।",
@@ -2736,6 +2769,7 @@
           {
             "title": "🚨 साइड इफेक्ट्स व खतरे (Risks)",
             "color": "#dc2626",
+            "image": "",
             "points": [
               "<strong>नी रिप्लेसमेंट की नौबत:</strong> समय पर इलाज न होने से घुटने का पूरी तरह जाम होना।",
               "<strong>स्थायी विकलांगता:</strong> पैरों की बनावट टेढ़ी (Bow Legs) हो जाना।",
@@ -2765,9 +2799,10 @@
           ]
         }
       },
-      "og_title": "जोड़ों का दर्द व गठिया का संपूर्ण प्राकृतिक समाधान | Aarogyam India",
-      "og_image": "/images/banners/health-joint-care.jpg",
-      "og_description": "घुटनों का दर्द, कट-कट की आवाज, कार्टिलेज घिसाव व यूरिक एसिड का आयुर्वेदिक उपचार व डाइट चार्ट।"
+      "whatsapp_support": {
+        "number": "917974422572",
+        "prompt": "नमस्ते, मुझे जोड़ों के दर्द व गठिया का समाधान चाहिए।"
+      }
     },
     {
       "id": "page_health_womens_care",
