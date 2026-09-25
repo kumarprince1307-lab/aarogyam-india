@@ -73,29 +73,39 @@
     }
   };
 
+  // Active HTML5 audio element for custom MP3 uploads
+  let activeAudioElement = null;
+
   // Merge Admin Customized Page Audio Scripts from CMS or Active CMS Config
   function syncCmsAudioScripts() {
     try {
       const customScripts = JSON.parse(localStorage.getItem('AAROGYAM_PAGE_AUDIO_SCRIPTS') || '{}');
-      if (window.AAROGYAM_ACTIVE_PAGE_CMS && window.AAROGYAM_ACTIVE_PAGE_CMS.audio_script) {
+      if (window.AAROGYAM_ACTIVE_PAGE_CMS) {
         const p = window.AAROGYAM_ACTIVE_PAGE_CMS;
         const key = p.slug || (p.id ? p.id.replace(/^page_/, '') : '');
-        if (key) {
+        if (key && (p.audio_script || p.audio_url)) {
           customScripts[key] = {
             title: p.audio_title || p.name,
-            script: p.audio_script
+            script: p.audio_script || '',
+            audio_url: p.audio_url || ''
           };
+          const cleanKey = key.replace(/^health_/, '').replace(/^page_health_/, '');
+          customScripts[cleanKey] = customScripts[key];
           if (key === 'index' || p.id === 'page_home') {
-            customScripts['index'] = { title: p.audio_title || p.name, script: p.audio_script };
+            customScripts['index'] = customScripts[key];
           }
         }
       }
       Object.keys(customScripts).forEach(k => {
-        if (customScripts[k] && customScripts[k].script) {
+        if (customScripts[k] && (customScripts[k].script || customScripts[k].audio_url)) {
           pageAudioScripts[k] = {
             title: customScripts[k].title || (pageAudioScripts[k] ? pageAudioScripts[k].title : 'आरोग्यम इंडिया'),
             category: pageAudioScripts[k] ? pageAudioScripts[k].category : 'ऑडियो परिचय',
-            text: (name) => customScripts[k].script.replace(/\{name\}/g, name)
+            audio_url: customScripts[k].audio_url || '',
+            text: (name) => {
+              const sc = customScripts[k].script || (pageAudioScripts[k]?.text ? pageAudioScripts[k].text(name) : '');
+              return typeof sc === 'function' ? sc(name) : sc.replace(/\{name\}/g, name);
+            }
           };
         }
       });
@@ -105,10 +115,29 @@
   syncCmsAudioScripts();
   window.syncCmsAudioScripts = syncCmsAudioScripts;
 
-  // 2. Identify Current Page Key
+  // 2. Identify Current Page Key (Exact Subpage Matching)
   function getActivePageKey() {
-    for (const key of Object.keys(pageAudioScripts)) {
-      if (key !== 'index' && currentPath.includes(key)) {
+    syncCmsAudioScripts();
+    // 1. Check window.AAROGYAM_ACTIVE_PAGE_CMS directly
+    if (window.AAROGYAM_ACTIVE_PAGE_CMS) {
+      const p = window.AAROGYAM_ACTIVE_PAGE_CMS;
+      const candidates = [
+        p.slug,
+        p.id ? p.id.replace(/^page_/, '') : '',
+        p.id ? p.id.replace(/^page_health_/, '') : '',
+        p.id
+      ];
+      for (const c of candidates) {
+        if (c && pageAudioScripts[c]) return c;
+      }
+    }
+    // 2. Sort keys by length DESCENDING to match subpages (e.g. 'diabetes') before parent directories ('health')
+    const sortedKeys = Object.keys(pageAudioScripts)
+      .filter(k => k !== 'index')
+      .sort((a, b) => b.length - a.length);
+
+    for (const key of sortedKeys) {
+      if (currentPath.includes(key)) {
         return key;
       }
     }
@@ -156,11 +185,19 @@
       sessionStorage.setItem('aoi_audio_stopped_' + getActivePageKey(), '1');
     } catch (e) {}
 
+    if (activeAudioElement) {
+      try {
+        activeAudioElement.pause();
+        activeAudioElement.currentTime = 0;
+      } catch (err) {}
+      activeAudioElement = null;
+    }
+
     if (synth) {
       synth.cancel();
     }
 
-    // Halt any HTML5 audio tags on the page
+    // Halt any other HTML5 audio tags on the page
     document.querySelectorAll('audio').forEach(a => {
       try {
         a.pause();
@@ -189,22 +226,53 @@
       } catch (e) {}
     }
 
-    if (!synth) {
-      if (!isAutoPlay) alert('आपके ब्राउज़र में ऑडियो स्पीच सपोर्ट उपलब्ध नहीं है।');
-      return;
-    }
-
     if (isSpeaking) {
       stopAudio();
       return;
     }
 
-    synth.cancel(); // Stop any pending speech
-
     const pageKey = getActivePageKey();
     const config = pageAudioScripts[pageKey] || pageAudioScripts['index'];
     const userName = getUserDisplayName();
-    const textToSpeak = config.text(userName);
+
+    // 1. If page has an uploaded MP3 audio file, play it with HTML5 Audio
+    if (config && config.audio_url && config.audio_url.trim()) {
+      if (activeAudioElement) {
+        try { activeAudioElement.pause(); } catch (e) {}
+      }
+      activeAudioElement = new Audio(config.audio_url.trim());
+      activeAudioElement.onplay = function () {
+        isSpeaking = true;
+        updateAudioUIState(true);
+        showAudioToast(`🔊 सुन रहे हैं: ${config.title}`);
+      };
+      activeAudioElement.onended = function () {
+        isSpeaking = false;
+        updateAudioUIState(false);
+        hideAudioToast();
+        activeAudioElement = null;
+      };
+      activeAudioElement.onerror = function () {
+        isSpeaking = false;
+        updateAudioUIState(false);
+        hideAudioToast();
+        activeAudioElement = null;
+      };
+      activeAudioElement.play().catch(err => {
+        console.warn('[Audio Engine] Autoplay audio_url playback blocked or deferred:', err);
+      });
+      return;
+    }
+
+    // 2. Otherwise play Hindi Voice Speech Synthesis
+    if (!synth) {
+      if (!isAutoPlay) alert('आपके ब्राउज़र में ऑडियो स्पीच सपोर्ट उपलब्ध नहीं है।');
+      return;
+    }
+
+    synth.cancel(); // Stop any pending speech
+
+    const textToSpeak = typeof config.text === 'function' ? config.text(userName) : (config.text || '');
 
     currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
     currentUtterance.lang = 'hi-IN';
@@ -740,9 +808,43 @@
   window.stopPageAudioGreeting = stopAudio;
   window.playPageAudioGreeting = playAudioGreeting;
 
-  // 8. Page Audio Auto-Play Controller (Disabled per user request - manual click only)
+  // 8. Page Audio Auto-Play Controller (Smart Auto-play on entry + interaction unlock)
   function attemptPageAudioAutoPlay() {
-    return; // Strictly no auto-playing sound
+    try {
+      const pageKey = getActivePageKey();
+      if (sessionStorage.getItem('aoi_audio_user_stopped') === '1' || sessionStorage.getItem('aoi_audio_stopped_' + pageKey) === '1') {
+        return;
+      }
+      const hasPlayed = sessionStorage.getItem('aoi_audio_played_' + pageKey);
+      if (hasPlayed === '1') return;
+
+      let played = false;
+      const doPlay = () => {
+        if (played || isSpeaking) return;
+        played = true;
+        sessionStorage.setItem('aoi_audio_played_' + pageKey, '1');
+        playAudioGreeting(true);
+      };
+
+      // Try playing automatically after DOM settled
+      setTimeout(() => {
+        try {
+          doPlay();
+        } catch (e) {}
+      }, 1500);
+
+      // In case browser policy blocked unmuted sound without interaction, trigger on very first gesture
+      const unlockGestures = ['click', 'touchstart', 'scroll', 'keydown'];
+      const gestureHandler = function () {
+        unlockGestures.forEach(g => window.removeEventListener(g, gestureHandler, { capture: true }));
+        if (!played && !isSpeaking) {
+          doPlay();
+        }
+      };
+      unlockGestures.forEach(g => window.addEventListener(g, gestureHandler, { capture: true, once: true, passive: true }));
+    } catch (err) {
+      console.warn('[Audio Engine] AutoPlay check info:', err);
+    }
   }
 
   // 9. Universal Robust Hero Carousel Engine (Works on all pages & subpages)

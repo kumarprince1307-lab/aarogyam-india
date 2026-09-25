@@ -325,14 +325,28 @@ body {
   .home-hero-slide-card {
     flex-direction: column-reverse;
     text-align: center;
-    padding: 26px 18px;
+    padding: 20px 14px;
+    gap: 14px;
+    border-radius: 16px;
+  }
+  .home-hero-slide-card > div {
+    min-width: 0 !important;
+    width: 100% !important;
   }
   .home-hero-title {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
+    line-height: 1.3;
+    margin: 10px 0 8px 0;
+  }
+  .home-hero-desc {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    margin-bottom: 14px;
   }
   .home-hero-3d-book {
     width: 140px;
-    height: 190px;
+    height: 110px;
+    margin: 0 auto;
   }
 }
 

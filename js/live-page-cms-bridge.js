@@ -252,7 +252,19 @@
       if (slides.length === 0) return;
       currentIdx = (index + slides.length) % slides.length;
       slides.forEach((s, i) => {
-        s.style.display = (i === currentIdx) ? 'block' : 'none';
+        if (i === currentIdx) {
+          s.style.display = 'block';
+          s.style.opacity = '0';
+          s.style.transform = 'scale(0.98)';
+          s.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          requestAnimationFrame(() => {
+            s.style.opacity = '1';
+            s.style.transform = 'scale(1)';
+          });
+        } else {
+          s.style.display = 'none';
+          s.style.opacity = '0';
+        }
       });
       dots.forEach((d, i) => {
         if (i === currentIdx) {
@@ -417,18 +429,18 @@
   }
 
   function renderDynamicKpiBadges(pageConfig) {
-    // CRITICAL: Never replace or touch .health-kpi-matrix-section on health pages!
-    if (window.location.pathname.includes('/health/')) {
-      return;
-    }
-    if (!Array.isArray(pageConfig.kpi_cards) || pageConfig.kpi_cards.length === 0) return;
+    if (!pageConfig || !Array.isArray(pageConfig.kpi_cards) || pageConfig.kpi_cards.length === 0) return;
     let kpiSection = document.getElementById('sec-kpi-badges');
     if (!kpiSection) {
       kpiSection = document.createElement('section');
       kpiSection.id = 'sec-kpi-badges';
-      kpiSection.style.cssText = 'padding: 24px 0; background: #ffffff; border-bottom: 1.5px solid #e2e8f0;';
+      kpiSection.className = 'cms-dynamic-kpi-badges-section';
+      kpiSection.style.cssText = 'padding: 16px 0; background: #ffffff; border-bottom: 1.5px solid #e2e8f0;';
+      const matrix = document.querySelector('.health-kpi-matrix-section');
       const hero = document.getElementById('sec-hero-slider') || document.querySelector('.home-hero-section') || document.querySelector('.bighaat-carousel-container')?.closest('section');
-      if (hero && hero.nextSibling) {
+      if (matrix && matrix.nextSibling) {
+        matrix.parentNode.insertBefore(kpiSection, matrix.nextSibling);
+      } else if (hero && hero.nextSibling) {
         hero.parentNode.insertBefore(kpiSection, hero.nextSibling);
       } else {
         document.body.prepend(kpiSection);
@@ -622,6 +634,28 @@
           const items = Array.isArray(de.diet.items) ? de.diet.items : de.diet.items.split('\n').filter(Boolean);
           listDiv.innerHTML = items.map(it => `<p style="margin:0;">${it}</p>`).join('');
         }
+
+        // Render Multi-Image Gallery for Diet
+        let dietGallery = dietBox.querySelector('.cms-diet-gallery');
+        if (Array.isArray(de.diet.images) && de.diet.images.length > 0) {
+          if (!dietGallery) {
+            dietGallery = document.createElement('div');
+            dietGallery.className = 'cms-diet-gallery';
+            dietGallery.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:14px;';
+            dietBox.appendChild(dietGallery);
+          }
+          dietGallery.innerHTML = de.diet.images.map(imgObj => {
+            const url = typeof imgObj === 'string' ? imgObj : (imgObj.image || imgObj.url || '');
+            const caption = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
+            if (!url) return '';
+            return `
+              <div style="background:#ffffff; border-radius:10px; overflow:hidden; border:1.5px solid #bfdbfe; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; flex-direction:column;">
+                <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'डाइट फोटो')}" loading="lazy" style="width:100%; height:100px; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
+                ${caption ? `<div style="padding:4px 6px; font-size:0.72rem; font-weight:700; color:#1e3a8a; text-align:center; line-height:1.2; background:#f0f9ff;">${escapeHtml(caption)}</div>` : ''}
+              </div>
+            `;
+          }).join('');
+        }
       }
     }
 
@@ -636,9 +670,78 @@
           const items = Array.isArray(de.exercise.items) ? de.exercise.items : de.exercise.items.split('\n').filter(Boolean);
           listDiv.innerHTML = items.map(it => `<p style="margin:0;">${it}</p>`).join('');
         }
+
+        // Render Multi-Image Gallery for Exercise & Yoga
+        let exGallery = exBox.querySelector('.cms-exercise-gallery');
+        if (Array.isArray(de.exercise.images) && de.exercise.images.length > 0) {
+          if (!exGallery) {
+            exGallery = document.createElement('div');
+            exGallery.className = 'cms-exercise-gallery';
+            exGallery.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:14px;';
+            exBox.appendChild(exGallery);
+          }
+          exGallery.innerHTML = de.exercise.images.map(imgObj => {
+            const url = typeof imgObj === 'string' ? imgObj : (imgObj.image || imgObj.url || '');
+            const caption = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
+            if (!url) return '';
+            return `
+              <div style="background:#ffffff; border-radius:10px; overflow:hidden; border:1.5px solid #bbf7d0; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; flex-direction:column;">
+                <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'व्यायाम व योगासन')}" loading="lazy" style="width:100%; height:100px; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
+                ${caption ? `<div style="padding:4px 6px; font-size:0.72rem; font-weight:700; color:#14532d; text-align:center; line-height:1.2; background:#f0fdf4;">${escapeHtml(caption)}</div>` : ''}
+              </div>
+            `;
+          }).join('');
+        }
       }
     }
   }
+
+  // Universal In-Page AarogyamTube Video Player Modal (Prevents external redirection)
+  window.openUniversalVideoModal = function (title, ytId) {
+    if (!ytId) {
+      window.location.href = '/tube.html';
+      return;
+    }
+    let modal = document.getElementById('aarogyam_tube_video_modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'aarogyam_tube_video_modal';
+      modal.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.95); z-index:999999; display:flex; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(10px);';
+      document.body.appendChild(modal);
+    }
+    modal.innerHTML = `
+      <div style="background:#090d16; border:1.5px solid #3b82f6; border-radius:18px; width:100%; max-width:760px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,0.8); display:flex; flex-direction:column; position:relative; z-index:1000000;">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:linear-gradient(90deg, #1e3a8a, #0f172a); border-bottom:1px solid #1e293b;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="background:#ef4444; color:#fff; font-weight:900; font-size:0.72rem; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+              <i class="fa-brands fa-youtube"></i> AarogyamTube
+            </span>
+            <span style="color:#f8fafc; font-weight:800; font-size:0.88rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:400px;">${escapeHtml(title || 'आरोग्यम विशेष वीडियो')}</span>
+          </div>
+          <button type="button" onclick="document.getElementById('aarogyam_tube_video_modal').remove()" style="background:rgba(255,255,255,0.1); border:none; color:#fff; width:32px; height:32px; border-radius:50%; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+        </div>
+        <div style="position:relative; width:100%; padding-bottom:56.25%; background:#000;">
+          <iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?autoplay=1&rel=0&modestbranding=1" title="${escapeHtml(title)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute; inset:0; width:100%; height:100%; border:none;"></iframe>
+        </div>
+        <div style="padding:14px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#0f172a;">
+          <div style="font-size:0.78rem; color:#94a3b8;">
+            ✦ AarogyamTube सुरक्षित प्लेयर — आप आरोग्यम इंडिया पर ही वीडियो देख रहे हैं
+          </div>
+          <div style="display:flex; gap:8px;">
+            <a href="/tube.html" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; padding:7px 14px; border-radius:20px; font-weight:800; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+              🎬 AarogyamTube हब देखें
+            </a>
+            <button type="button" onclick="document.getElementById('aarogyam_tube_video_modal').remove()" style="background:#334155; color:#fff; border:none; padding:7px 14px; border-radius:20px; font-weight:700; font-size:0.78rem; cursor:pointer;">
+              बंद करें
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+  };
 
   function renderDynamicVideos(pageConfig) {
     if (!Array.isArray(pageConfig.videos) || pageConfig.videos.length === 0) return;
@@ -658,7 +761,7 @@
           const title = v.title || 'आरोग्यम विशेष वीडियो';
           const dur = v.duration || 'मास्टरक्लास';
           return `
-            <div class="universal-video-card" style="background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;" onclick="if(window.openUniversalVideoModal){window.openUniversalVideoModal('${escapeHtml(title)}', '${ytId}')}else{window.open('${escapeHtml(ytUrl || 'https://youtube.com/watch?v=' + ytId)}','_blank')}">
+            <div class="universal-video-card" style="background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;" onclick="window.openUniversalVideoModal('${escapeHtml(title)}', '${ytId}')">
               <div style="position:relative; width:100%; padding-bottom:56.25%; background:#0f172a; overflow:hidden;">
                 <img src="${thumb}" alt="${escapeHtml(title)}" loading="lazy" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.92;" onerror="this.src='/images/banners/health-banner.jpeg'" />
                 <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);"></div>
@@ -672,7 +775,7 @@
               <div style="padding:14px; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
                 <h4 style="font-size:0.92rem; font-weight:800; color:#0f172a; margin:0 0 8px 0; line-height:1.4;">${escapeHtml(title)}</h4>
                 <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#64748b;">
-                  <span style="color:#ef4444; font-weight:800;">🔴 YouTube Masterclass</span>
+                  <span style="color:#ef4444; font-weight:800;">🔴 AarogyamTube Masterclass</span>
                   <span>▶ अभी देखें</span>
                 </div>
               </div>
@@ -767,20 +870,20 @@
   }
 
   function syncAudioNarration(pageConfig) {
-    if (!pageConfig || !pageConfig.audio_script) return;
+    if (!pageConfig || (!pageConfig.audio_script && !pageConfig.audio_url)) return;
     try {
       const existing = JSON.parse(localStorage.getItem('AAROGYAM_PAGE_AUDIO_SCRIPTS') || '{}');
       const key = pageConfig.slug || (pageConfig.id ? pageConfig.id.replace(/^page_/, '') : '');
       if (key) {
         existing[key] = {
           title: pageConfig.audio_title || pageConfig.name,
-          script: pageConfig.audio_script
+          script: pageConfig.audio_script || '',
+          audio_url: pageConfig.audio_url || ''
         };
+        const cleanKey = key.replace(/^health_/, '').replace(/^page_health_/, '');
+        existing[cleanKey] = existing[key];
         if (key === 'index' || pageConfig.id === 'page_home') {
-          existing['index'] = {
-            title: pageConfig.audio_title || pageConfig.name,
-            script: pageConfig.audio_script
-          };
+          existing['index'] = existing[key];
         }
       }
       localStorage.setItem('AAROGYAM_PAGE_AUDIO_SCRIPTS', JSON.stringify(existing));

@@ -2253,6 +2253,8 @@ export async function initPageEditor() {
   let currentPashuCards = [];
   let currentProducts = [];           // NEW: Product Manager
   let currentPageKpiSections = [];    // NEW: Page-specific KPI sections (health sub-pages)
+  let currentDietImages = [];         // NEW: Multi-image gallery for Diet
+  let currentExerciseImages = [];     // NEW: Multi-image gallery for Exercise
   let pagesCurrentPage = 1;
   let pagesPageSize = 25;
   let activeCategoryFilter = 'all';
@@ -2513,10 +2515,20 @@ export async function initPageEditor() {
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">ऑडियो शीर्षक (Audio Headline)</label>
               <input type="text" id="pe_input_audio_title" class="admin-input" placeholder="उदा. आरोग्यम इंडिया मुख्य पृष्ठ ऑडियो परिचय" style="width: 100%; padding: 8px 12px;" />
             </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">कस्टम MP3 ऑडियो URL (वैकल्पिक)</label>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <input type="text" id="pe_input_audio_url" class="admin-input" placeholder="https://... / audio.mp3" style="flex:1; padding: 7px 10px; font-size:0.8rem;" />
+                <label class="admin-button small-button" style="background:#8b5cf6; color:#fff; cursor:pointer; padding:6px 10px; font-size:0.75rem; white-space:nowrap; margin:0;">
+                  📁 MP3 अपलोड
+                  <input type="file" id="pe_file_audio" accept="audio/*" style="display:none;" onchange="window.handlePageAudioFileUpload(this)">
+                </label>
+              </div>
+            </div>
           </div>
           <div>
             <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">
-              हिंदी वॉइस स्क्रिप्ट (Speech Script Text - जो ब्राउज़र की आवाज़ में बोला जाएगा)
+              हिंदी वॉइस स्क्रिप्ट (Speech Script Text - यदि MP3 नहीं है तो यह ब्राउज़र की आवाज़ में बोला जाएगा)
             </label>
             <textarea id="pe_input_audio_script" class="admin-input" rows="3" placeholder="नमस्ते {name} जी! आरोग्यम इंडिया में आपका स्वागत है..." style="width: 100%; padding: 8px 12px; font-family: inherit; line-height: 1.5;"></textarea>
             <small style="color: var(--admin-muted); font-size: 0.74rem;">टिप: {name} लिखने पर यूजर का नाम अपने आप बोला जाएगा।</small>
@@ -2716,13 +2728,32 @@ export async function initPageEditor() {
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #34d399;">🥗 24-घंटे का डाइट चार्ट (Diet Protocol Title)</label>
               <input type="text" id="pe_input_diet_title" class="admin-input" placeholder="शुगर बैलेंसिंग डाइट प्रोटोकॉल" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
               <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">डाइट शेड्यूल (1 मील/समय प्रति लाइन)</label>
-              <textarea id="pe_input_diet_items" class="admin-textarea" rows="5" placeholder="सुबह 6:30 AM: 1 चम्मच मेथी दाना भीगा पानी...&#10;नाश्ता 8:30 AM: बेसन चीला / स्प्राउट्स...&#10;दोपहर भोजन 1:00 PM: 1 बड़ी प्लेट सलाद + जौ-चना रोटी...&#10;शाम 5:00 PM: मखाने + दालचीनी चाय...&#10;रात भोजन 7:30 PM: मूंग दाल सूप..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
+              <textarea id="pe_input_diet_items" class="admin-textarea" rows="4" placeholder="सुबह 6:30 AM: 1 चम्मच मेथी दाना भीगा पानी...&#10;नाश्ता 8:30 AM: बेसन चीला / स्प्राउट्स...&#10;दोपहर भोजन 1:00 PM: 1 बड़ी प्लेट सलाद + जौ-चना रोटी...&#10;शाम 5:00 PM: मखाने + दालचीनी चाय...&#10;रात भोजन 7:30 PM: मूंग दाल सूप..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px; margin-bottom: 8px;"></textarea>
+              
+              <!-- Diet Multi-Images -->
+              <div style="border-top: 1px dashed #05966950; padding-top: 8px; margin-top: 6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:0.75rem; font-weight:800; color:#34d399;">🖼️ डाइट फोटो गैलरी (Multiple Images)</span>
+                  <button type="button" onclick="window.addDietImage()" class="admin-button small-button" style="background:#059669; color:#fff; font-size:0.72rem; padding:3px 8px; font-weight:800;">+ नई फोटो जोड़ें</button>
+                </div>
+                <div id="pe_diet_images_container" style="display:flex; flex-direction:column; gap:6px;"></div>
+              </div>
             </div>
+
             <div style="background: #1e1b4b30; padding: 12px; border-radius: 8px; border: 1.5px solid #6366f150;">
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #a5b4fc;">🧘 प्राणायाम, व्यायाम व उपचार (Exercise & Therapy Title)</label>
               <input type="text" id="pe_input_exercise_title" class="admin-input" placeholder="इंसुलिन सक्रियता व मोबिलिटी" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
               <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">व्यायाम व नियम (1 अभ्यास प्रति लाइन)</label>
-              <textarea id="pe_input_exercise_items" class="admin-textarea" rows="5" placeholder="1. मंडूकासन (Frog Pose): पैंक्रियाज पर दबाव देकर इंसुलिन स्राव बढ़ाता है।&#10;2. पवनमुक्तासन: पेट की गैस व पाचन दुरुस्त करता है।&#10;3. कपालभाति प्राणायाम: 15 मिनट रोजाना।&#10;4. भोजनोपरांत शतपावली: भोजन के बाद 20 मिनट टहलें।" style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
+              <textarea id="pe_input_exercise_items" class="admin-textarea" rows="4" placeholder="1. मंडूकासन (Frog Pose): पैंक्रियाज पर दबाव देकर इंसुलिन स्राव बढ़ाता है।&#10;2. पवनमुक्तासन: पेट की गैस व पाचन दुरुस्त करता है।&#10;3. कपालभाति प्राणायाम: 15 मिनट रोजाना।&#10;4. भोजनोपरांत शतपावली: भोजन के बाद 20 मिनट टहलें।" style="width: 100%; font-size: 0.8rem; padding: 6px 10px; margin-bottom: 8px;"></textarea>
+
+              <!-- Exercise Multi-Images -->
+              <div style="border-top: 1px dashed #6366f150; padding-top: 8px; margin-top: 6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:0.75rem; font-weight:800; color:#a5b4fc;">🖼️ व्यायाम व योगासन फोटो (Multiple Images)</span>
+                  <button type="button" onclick="window.addExerciseImage()" class="admin-button small-button" style="background:#4f46e5; color:#fff; font-size:0.72rem; padding:3px 8px; font-weight:800;">+ नई फोटो जोड़ें</button>
+                </div>
+                <div id="pe_exercise_images_container" style="display:flex; flex-direction:column; gap:6px;"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -4916,8 +4947,10 @@ export async function initPageEditor() {
     // Audio Narration inputs
     const audioTitleEl = document.getElementById('pe_input_audio_title');
     const audioScriptEl = document.getElementById('pe_input_audio_script');
+    const audioUrlEl = document.getElementById('pe_input_audio_url');
     if (audioTitleEl) audioTitleEl.value = p.audio_title || p.name || '';
     if (audioScriptEl) audioScriptEl.value = p.audio_script || '';
+    if (audioUrlEl) audioUrlEl.value = p.audio_url || '';
 
     // Social Sharing, OG & WhatsApp Custom Share Message
     const ogTitleEl = document.getElementById('pe_input_og_title');
@@ -5041,6 +5074,8 @@ export async function initPageEditor() {
     currentPashuCards = Array.isArray(p.pashu_cards) ? JSON.parse(JSON.stringify(p.pashu_cards)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST)));
     currentProducts = Array.isArray(p.products) ? JSON.parse(JSON.stringify(p.products)) : [];
     currentPageKpiSections = Array.isArray(p.page_kpi_sections) ? JSON.parse(JSON.stringify(p.page_kpi_sections)) : [];
+    currentDietImages = Array.isArray(dietData.images) ? JSON.parse(JSON.stringify(dietData.images)) : [];
+    currentExerciseImages = Array.isArray(exData.images) ? JSON.parse(JSON.stringify(exData.images)) : [];
 
     renderHeroSlidesInBuilder();
     renderSectionsReorderingList();
@@ -5054,6 +5089,8 @@ export async function initPageEditor() {
     renderPashuCardsInBuilder();
     renderProductsInBuilder();
     renderPageKpiSectionsInBuilder();
+    renderDietImagesInBuilder();
+    renderExerciseImagesInBuilder();
 
     openPageDrawer();
     setTimeout(() => updateContextualSections(p.category || 'eBooks'), 60);
@@ -5076,8 +5113,10 @@ export async function initPageEditor() {
     document.getElementById('site-page-customizer-form')?.reset();
     const audioTitleEl = document.getElementById('pe_input_audio_title');
     const audioScriptEl = document.getElementById('pe_input_audio_script');
+    const audioUrlEl = document.getElementById('pe_input_audio_url');
     if (audioTitleEl) audioTitleEl.value = '';
     if (audioScriptEl) audioScriptEl.value = '';
+    if (audioUrlEl) audioUrlEl.value = '';
 
     const ogTitleEl = document.getElementById('pe_input_og_title');
     const ogImgEl = document.getElementById('pe_input_og_image');
@@ -5129,6 +5168,8 @@ export async function initPageEditor() {
     currentPashuCards = JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST));
     currentProducts = [];
     currentPageKpiSections = [];
+    currentDietImages = [];
+    currentExerciseImages = [];
 
     renderHeroSlidesInBuilder();
     renderSectionsReorderingList();
@@ -5142,6 +5183,8 @@ export async function initPageEditor() {
     renderPashuCardsInBuilder();
     renderProductsInBuilder();
     renderPageKpiSectionsInBuilder();
+    renderDietImagesInBuilder();
+    renderExerciseImagesInBuilder();
     updateContextualSections('eBooks');
   }
 
@@ -5169,6 +5212,7 @@ export async function initPageEditor() {
     const waPrompt = (document.getElementById('pe_input_wa_prompt')?.value || '').trim();
     const audioTitle = (document.getElementById('pe_input_audio_title')?.value || '').trim();
     const audioScript = (document.getElementById('pe_input_audio_script')?.value || '').trim();
+    const audioUrl = (document.getElementById('pe_input_audio_url')?.value || '').trim();
 
     const ogTitle = (document.getElementById('pe_input_og_title')?.value || '').trim();
     const ogImage = (document.getElementById('pe_input_og_image')?.value || '').trim();
@@ -5223,15 +5267,17 @@ export async function initPageEditor() {
     const exItems = (document.getElementById('pe_input_exercise_items')?.value || '').trim();
 
     let diet_exercise = null;
-    if (dietTitle || exTitle || dietItems || exItems) {
+    if (dietTitle || exTitle || dietItems || exItems || currentDietImages.length > 0 || currentExerciseImages.length > 0) {
       diet_exercise = {
         diet: {
           title: dietTitle,
-          items: dietItems ? dietItems.split('\n').map(s => s.trim()).filter(Boolean) : []
+          items: dietItems ? dietItems.split('\n').map(s => s.trim()).filter(Boolean) : [],
+          images: Array.isArray(currentDietImages) ? currentDietImages.filter(x => x && (x.image || x.url)) : []
         },
         exercise: {
           title: exTitle,
-          items: exItems ? exItems.split('\n').map(s => s.trim()).filter(Boolean) : []
+          items: exItems ? exItems.split('\n').map(s => s.trim()).filter(Boolean) : [],
+          images: Array.isArray(currentExerciseImages) ? currentExerciseImages.filter(x => x && (x.image || x.url)) : []
         }
       };
     }
@@ -5283,6 +5329,7 @@ export async function initPageEditor() {
       ticker_text: ticker,
       audio_title: audioTitle,
       audio_script: audioScript,
+      audio_url: audioUrl,
       og_title: ogTitle,
       og_image: ogImage,
       og_description: ogDesc,
@@ -5385,24 +5432,222 @@ export async function initPageEditor() {
   window.handleCbCardImageUpload = async function(cardIdx, inputEl) {
     if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
     const file = inputEl.files[0];
-    showToast('⏳ फोटो कंप्रेस व अपलोड हो रही है...', 'info');
+    showToast('⏳ फोटो कंप्रेस व प्रोसेस हो रही है (WebP)...', 'info');
     try {
-      const compressed = await compressImageToWebp(file, 160000, 1200);
-      const filename = `health_card_${Date.now()}.webp`;
-      const res = await uploadImageWithFallback('health_card', compressed.dataUrl, filename);
-      if (res && res.success && res.path) {
-        const inputIds = ['pe_input_cb_causes_img', 'pe_input_cb_symptoms_img', 'pe_input_cb_risks_img'];
-        const targetInput = document.getElementById(inputIds[cardIdx]);
-        if (targetInput) {
-          targetInput.value = res.path;
-          window.previewCbCardImage(cardIdx, res.path);
-        }
-        showToast('✅ फोटो सफलतापूर्वक अपलोड हो गई!', 'success');
+      const { dataUrl, sizeBytes } = await compressImageToWebp(file, 160000, 1200);
+      if (!dataUrl) {
+        showToast('❌ इमेज प्रोसेस करने में त्रुटि', 'error');
+        return;
+      }
+      const sizeKb = (sizeBytes / 1024).toFixed(1);
+      const generatedPath = generateAssetPath('health_card', file.name);
+      const webpPath = '/' + generatedPath;
+
+      // Cache locally in browser offline uploads store
+      try {
+        const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        offSync[webpPath] = dataUrl;
+        localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
+      } catch (e) {}
+
+      const inputIds = ['pe_input_cb_causes_img', 'pe_input_cb_symptoms_img', 'pe_input_cb_risks_img'];
+      const targetInput = document.getElementById(inputIds[cardIdx]);
+      if (targetInput) {
+        targetInput.value = webpPath;
+        window.previewCbCardImage(cardIdx, dataUrl);
+      }
+
+      showToast(`⚡ HD WebP तैयार (${sizeKb} KB) | सर्वर व GitHub पर सिंक हो रही है...`, 'info');
+      const syncRes = await syncAssetToGitHub(generatedPath, dataUrl);
+      if (syncRes && syncRes.success) {
+        showToast(`✅ फोटो सफलतापूर्वक अपलोड व सिंक हो गई! (${sizeKb} KB)`, 'success');
       } else {
-        showToast('❌ अपलोड विफल रहा: ' + (res?.error || 'Unknown error'), 'error');
+        showToast(`✅ फोटो तैयार (${sizeKb} KB) | स्थानीय प्रीव्यू सक्रिय!`, 'success');
       }
     } catch (e) {
-      showToast('❌ एरर: ' + e.message, 'error');
+      console.error('[Admin] Clinical Breakdown Card Image error:', e);
+      showToast('❌ एरर: ' + (e?.message || 'Upload error'), 'error');
+    }
+  };
+
+  // ==========================================
+  // MULTI-IMAGE BUILDER FOR DIET & EXERCISE
+  // ==========================================
+  function renderDietImagesInBuilder() {
+    const container = document.getElementById('pe_diet_images_container');
+    if (!container) return;
+    if (!Array.isArray(currentDietImages) || currentDietImages.length === 0) {
+      container.innerHTML = '<small style="color:var(--admin-muted); font-size:0.72rem;">कोई फोटो नहीं जोड़ी गई। "+ नई फोटो जोड़ें" दबाएं।</small>';
+      return;
+    }
+    container.innerHTML = currentDietImages.map((item, idx) => `
+      <div style="background:#091910; border:1px solid #05966960; border-radius:6px; padding:6px 8px; display:flex; align-items:center; gap:8px;">
+        <div style="width:48px; height:48px; border-radius:4px; overflow:hidden; background:#000; flex-shrink:0; border:1px solid #059669;">
+          <img src="${escapeHtml(item.image_preview || item.image || item.url || '/images/banners/health-banner.jpeg')}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'">
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:4px; min-width:0;">
+          <input type="text" value="${escapeHtml(item.caption || '')}" onchange="window.updateDietImageField(${idx}, 'caption', this.value)" class="admin-input" placeholder="कैप्शन (उदा. मेथी दाना पानी / सलाद)" style="padding:4px 8px; font-size:0.75rem;" />
+          <div style="display:flex; gap:4px; align-items:center;">
+            <input type="text" value="${escapeHtml(item.image || item.url || '')}" onchange="window.updateDietImageField(${idx}, 'image', this.value)" class="admin-input" placeholder="/images/banners/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
+            <label class="admin-button small-button" style="background:#059669; color:#fff; cursor:pointer; padding:3px 6px; font-size:0.7rem; margin:0; white-space:nowrap;">
+              📁 फोटो
+              <input type="file" accept="image/*" style="display:none;" onchange="window.handleDietImageUpload(${idx}, this)">
+            </label>
+          </div>
+        </div>
+        <button type="button" onclick="window.removeDietImage(${idx})" style="background:none; border:none; color:#ef4444; font-weight:800; cursor:pointer; font-size:1.1rem; padding:0 4px;" title="हटाएं">✕</button>
+      </div>
+    `).join('');
+  }
+
+  window.addDietImage = function() {
+    if (!Array.isArray(currentDietImages)) currentDietImages = [];
+    currentDietImages.push({ image: '', caption: '' });
+    renderDietImagesInBuilder();
+  };
+
+  window.removeDietImage = function(idx) {
+    if (!Array.isArray(currentDietImages)) return;
+    currentDietImages.splice(idx, 1);
+    renderDietImagesInBuilder();
+  };
+
+  window.updateDietImageField = function(idx, field, val) {
+    if (!currentDietImages[idx]) return;
+    currentDietImages[idx][field] = val;
+    if (field === 'image') currentDietImages[idx].url = val;
+  };
+
+  window.handleDietImageUpload = async function(idx, inputEl) {
+    if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
+    const file = inputEl.files[0];
+    showToast('⏳ डाइट फोटो प्रोसेस हो रही है...', 'info');
+    try {
+      const { dataUrl, sizeBytes } = await compressImageToWebp(file, 140000, 1000);
+      const generatedPath = generateAssetPath('diet_card', file.name);
+      const webpPath = '/' + generatedPath;
+
+      try {
+        const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        offSync[webpPath] = dataUrl;
+        localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
+      } catch (e) {}
+
+      if (currentDietImages[idx]) {
+        currentDietImages[idx].image = webpPath;
+        currentDietImages[idx].url = webpPath;
+        currentDietImages[idx].image_preview = dataUrl;
+        renderDietImagesInBuilder();
+      }
+
+      await syncAssetToGitHub(generatedPath, dataUrl);
+      showToast('✅ डाइट फोटो सुरक्षित हो गई!', 'success');
+    } catch (err) {
+      showToast('❌ एरर: ' + err.message, 'error');
+    }
+  };
+
+  function renderExerciseImagesInBuilder() {
+    const container = document.getElementById('pe_exercise_images_container');
+    if (!container) return;
+    if (!Array.isArray(currentExerciseImages) || currentExerciseImages.length === 0) {
+      container.innerHTML = '<small style="color:var(--admin-muted); font-size:0.72rem;">कोई फोटो नहीं जोड़ी गई। "+ नई फोटो जोड़ें" दबाएं।</small>';
+      return;
+    }
+    container.innerHTML = currentExerciseImages.map((item, idx) => `
+      <div style="background:#0e1329; border:1px solid #6366f160; border-radius:6px; padding:6px 8px; display:flex; align-items:center; gap:8px;">
+        <div style="width:48px; height:48px; border-radius:4px; overflow:hidden; background:#000; flex-shrink:0; border:1px solid #6366f1;">
+          <img src="${escapeHtml(item.image_preview || item.image || item.url || '/images/banners/health-banner.jpeg')}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'">
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:4px; min-width:0;">
+          <input type="text" value="${escapeHtml(item.caption || '')}" onchange="window.updateExerciseImageField(${idx}, 'caption', this.value)" class="admin-input" placeholder="कैप्शन (उदा. मंडूकासन / पवनमुक्तासन)" style="padding:4px 8px; font-size:0.75rem;" />
+          <div style="display:flex; gap:4px; align-items:center;">
+            <input type="text" value="${escapeHtml(item.image || item.url || '')}" onchange="window.updateExerciseImageField(${idx}, 'image', this.value)" class="admin-input" placeholder="/images/banners/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
+            <label class="admin-button small-button" style="background:#4f46e5; color:#fff; cursor:pointer; padding:3px 6px; font-size:0.7rem; margin:0; white-space:nowrap;">
+              📁 फोटो
+              <input type="file" accept="image/*" style="display:none;" onchange="window.handleExerciseImageUpload(${idx}, this)">
+            </label>
+          </div>
+        </div>
+        <button type="button" onclick="window.removeExerciseImage(${idx})" style="background:none; border:none; color:#ef4444; font-weight:800; cursor:pointer; font-size:1.1rem; padding:0 4px;" title="हटाएं">✕</button>
+      </div>
+    `).join('');
+  }
+
+  window.addExerciseImage = function() {
+    if (!Array.isArray(currentExerciseImages)) currentExerciseImages = [];
+    currentExerciseImages.push({ image: '', caption: '' });
+    renderExerciseImagesInBuilder();
+  };
+
+  window.removeExerciseImage = function(idx) {
+    if (!Array.isArray(currentExerciseImages)) return;
+    currentExerciseImages.splice(idx, 1);
+    renderExerciseImagesInBuilder();
+  };
+
+  window.updateExerciseImageField = function(idx, field, val) {
+    if (!currentExerciseImages[idx]) return;
+    currentExerciseImages[idx][field] = val;
+    if (field === 'image') currentExerciseImages[idx].url = val;
+  };
+
+  window.handleExerciseImageUpload = async function(idx, inputEl) {
+    if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
+    const file = inputEl.files[0];
+    showToast('⏳ व्यायाम/योगासन फोटो प्रोसेस हो रही है...', 'info');
+    try {
+      const { dataUrl, sizeBytes } = await compressImageToWebp(file, 140000, 1000);
+      const generatedPath = generateAssetPath('exercise_card', file.name);
+      const webpPath = '/' + generatedPath;
+
+      try {
+        const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        offSync[webpPath] = dataUrl;
+        localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
+      } catch (e) {}
+
+      if (currentExerciseImages[idx]) {
+        currentExerciseImages[idx].image = webpPath;
+        currentExerciseImages[idx].url = webpPath;
+        currentExerciseImages[idx].image_preview = dataUrl;
+        renderExerciseImagesInBuilder();
+      }
+
+      await syncAssetToGitHub(generatedPath, dataUrl);
+      showToast('✅ व्यायाम फोटो सुरक्षित हो गई!', 'success');
+    } catch (err) {
+      showToast('❌ एरर: ' + err.message, 'error');
+    }
+  };
+
+  // Custom MP3 Audio File Upload Handler
+  window.handlePageAudioFileUpload = async function(inputEl) {
+    if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
+    const file = inputEl.files[0];
+    showToast('⏳ ऑडियो फाइल प्रोसेस हो रही है...', 'info');
+    try {
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const dataUrl = e.target.result;
+        const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const assetPath = `audio/page_audio_${Date.now()}_${cleanName}`;
+        const inputUrlEl = document.getElementById('pe_input_audio_url');
+        if (inputUrlEl) inputUrlEl.value = '/' + assetPath;
+
+        try {
+          const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+          offSync['/' + assetPath] = dataUrl;
+          localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
+        } catch (err) {}
+
+        showToast('⚡ ऑडियो तैयार | सर्वर पर सिंक हो रहा है...', 'info');
+        await syncAssetToGitHub(assetPath, dataUrl);
+        showToast('✅ कस्टम ऑडियो फाइल सुरक्षित हो गई!', 'success');
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      showToast('❌ ऑडियो एरर: ' + err.message, 'error');
     }
   };
 
@@ -5419,17 +5664,17 @@ export async function initPageEditor() {
         existingScripts = JSON.parse(localStorage.getItem('AAROGYAM_PAGE_AUDIO_SCRIPTS') || '{}');
       } catch (err) {}
       allPages.forEach(p => {
-        if (p.audio_script) {
+        if (p.audio_script || p.audio_url) {
           const rawSlug = p.slug || p.id.replace(/^page_/, '');
           existingScripts[rawSlug] = {
             title: p.audio_title || p.name,
-            script: p.audio_script
+            script: p.audio_script || '',
+            audio_url: p.audio_url || ''
           };
+          const cleanKey = rawSlug.replace(/^health_/, '').replace(/^page_health_/, '');
+          existingScripts[cleanKey] = existingScripts[rawSlug];
           if (p.slug === 'index' || p.id === 'page_home') {
-            existingScripts['index'] = {
-              title: p.audio_title || p.name,
-              script: p.audio_script
-            };
+            existingScripts['index'] = existingScripts[rawSlug];
           }
         }
       });
