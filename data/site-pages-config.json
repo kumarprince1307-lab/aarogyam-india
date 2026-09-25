@@ -2222,7 +2222,7 @@
       "share_message": "",
       "floating_banner": {
         "enabled": false,
-        "image": "",
+        "image": "/images/banners/floating_banner-whatsapp-image-202-152991-s2vg.webp",
         "badge_title": "",
         "action_link": "",
         "animation": "ublFloatBook3D"
@@ -2279,12 +2279,13 @@
       "products": [
         {
           "id": "DB001",
-          "name": "Madhu-Mukti Care (60 Cap)",
-          "price": 750,
-          "mrp": 750,
+          "name": "life style plus ",
+          "price": 450,
+          "mrp": 450,
           "badge": "शुगर केयर कैप्सूल",
           "description": "गुड़मार, विजयसार, जामुन गुठली व गिलोय अर्क। इंसुलिन संवेदनशीलता सुधारकर फास्टिंग व PP शुगर को संतुलित रखता है।",
-          "image": "/images/logo/logo.png"
+          "image": "/images/logo/logo.png",
+          "title": "life style plus "
         },
         {
           "id": "DB002",
