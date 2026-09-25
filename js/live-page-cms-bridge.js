@@ -721,15 +721,15 @@
           <button type="button" onclick="document.getElementById('aarogyam_tube_video_modal').remove()" style="background:rgba(255,255,255,0.1); border:none; color:#fff; width:32px; height:32px; border-radius:50%; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
         </div>
         <div style="position:relative; width:100%; padding-bottom:56.25%; background:#000;">
-          <iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?autoplay=1&rel=0&modestbranding=1" title="${escapeHtml(title)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute; inset:0; width:100%; height:100%; border:none;"></iframe>
+          <iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3" title="${escapeHtml(title)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute; inset:0; width:100%; height:100%; border:none;"></iframe>
         </div>
         <div style="padding:14px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#0f172a;">
           <div style="font-size:0.78rem; color:#94a3b8;">
             ✦ AarogyamTube सुरक्षित प्लेयर — आप आरोग्यम इंडिया पर ही वीडियो देख रहे हैं
           </div>
           <div style="display:flex; gap:8px;">
-            <a href="/tube.html" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; padding:7px 14px; border-radius:20px; font-weight:800; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
-              🎬 AarogyamTube हब देखें
+            <a href="/tube.html?yt=${encodeURIComponent(ytId)}" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; padding:7px 16px; border-radius:20px; font-weight:800; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(239,68,68,0.4);">
+              🎬 AarogyamTube हब में पूरा देखें
             </a>
             <button type="button" onclick="document.getElementById('aarogyam_tube_video_modal').remove()" style="background:#334155; color:#fff; border:none; padding:7px 14px; border-radius:20px; font-weight:700; font-size:0.78rem; cursor:pointer;">
               बंद करें

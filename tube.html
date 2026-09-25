@@ -3493,7 +3493,7 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       const refShareId = urlParams.get('ref') || urlParams.get('share_id') || 'AI000004';
-      const specificVid = urlParams.get('vid') || urlParams.get('video') || urlParams.get('video_id') || urlParams.get('reel') || urlParams.get('short');
+      const specificVid = urlParams.get('vid') || urlParams.get('video') || urlParams.get('video_id') || urlParams.get('reel') || urlParams.get('short') || urlParams.get('yt');
       const specificPlaylist = urlParams.get('playlist') || urlParams.get('pl');
 
       let allRecordings = [];
@@ -4821,7 +4821,7 @@
         const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
 
         if (ifr) {
-          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=0&playsinline=1&origin=${encodeURIComponent(origin)}`;
+          ifr.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&fs=0&playsinline=1&iv_load_policy=3&origin=${encodeURIComponent(origin)}`;
         }
       }
 
@@ -5205,13 +5205,28 @@
       };
 
       function openSpecificVideoOrReel(vid) {
-        const match = allRecordings.find(x => x.id === vid);
+        if (!vid) return;
+        let match = allRecordings.find(x => x.id === vid) || allRecordings.find(x => x.youtube_id === vid || extractYoutubeVideoId(x.video_url) === vid);
+        if (!match && (/^[a-zA-Z0-9_-]{10,12}$/.test(vid) || String(vid).includes('youtu'))) {
+          const cleanYt = extractYoutubeVideoId(vid) || vid;
+          match = {
+            id: 'VID_CUSTOM_' + cleanYt,
+            title: 'आरोग्यम विशेष वीडियो मास्टरक्लास',
+            youtube_id: cleanYt,
+            video_url: 'https://www.youtube.com/watch?v=' + cleanYt,
+            format: 'full_video',
+            speaker: 'आरोग्यम विशेषज्ञ',
+            duration: 'मास्टरक्लास',
+            status: 'active'
+          };
+          allRecordings.unshift(match);
+        }
         if (match) {
           if (match.format === 'short_reel' || match.id.startsWith('VID_S')) {
-            const idx = activeReelsList.findIndex(x => x.id === vid);
+            const idx = activeReelsList.findIndex(x => x.id === match.id);
             window.openReelPlayer(idx !== -1 ? idx : 0);
           } else {
-            window.openVideoModal(vid);
+            window.openVideoModal(match.id);
           }
         }
       }

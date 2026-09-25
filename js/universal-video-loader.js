@@ -32,36 +32,57 @@
     return match ? match[1] : '';
   }
 
-  function renderVideoModal(videoTitle, youtubeId) {
+  function renderVideoModal(videoTitle, youtubeId, vidId) {
     let modal = document.getElementById('universal-video-modal-overlay');
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'universal-video-modal-overlay';
       modal.style.cssText = `
-        position: fixed; inset: 0; background: rgba(0,0,0,0.88);
-        backdrop-filter: blur(8px); z-index: 999999;
+        position: fixed; inset: 0; background: rgba(15,23,42,0.95);
+        backdrop-filter: blur(10px); z-index: 999999;
         display: flex; align-items: center; justify-content: center;
         padding: 16px; opacity: 0; transition: opacity 0.3s ease;
       `;
       document.body.appendChild(modal);
     }
 
+    const tubeUrl = vidId ? `/tube.html?vid=${encodeURIComponent(vidId)}` : (youtubeId ? `/tube.html?yt=${encodeURIComponent(youtubeId)}` : '/tube.html');
+    const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+
     modal.innerHTML = `
-      <div style="background:#0f172a; border: 1.5px solid #38bdf8; border-radius: 18px; max-width: 760px; width: 100%; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative;">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 18px; background:#1e293b; border-bottom: 1px solid #334155;">
-          <span style="color:#f8fafc; font-weight:800; font-size: 0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 85%;">
-            🎬 ${videoTitle}
-          </span>
-          <button id="closeVideoModalBtn" type="button" style="background:rgba(255,255,255,0.1); border:none; color:#fff; font-size: 1.3rem; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+      <div style="background:#090d16; border: 1.5px solid #3b82f6; border-radius: 18px; max-width: 760px; width: 100%; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.85); position: relative; display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 18px; background:linear-gradient(90deg, #1e3a8a, #0f172a); border-bottom: 1px solid #1e293b;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="background:#ef4444; color:#fff; font-weight:900; font-size:0.72rem; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+              <i class="fa-brands fa-youtube"></i> AarogyamTube
+            </span>
+            <span style="color:#f8fafc; font-weight:800; font-size: 0.92rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 420px;">
+              ${videoTitle}
+            </span>
+          </div>
+          <button id="closeVideoModalBtn" type="button" style="background:rgba(255,255,255,0.1); border:none; color:#fff; font-size: 1.2rem; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
         </div>
         <div style="position: relative; padding-bottom: 56.25%; height: 0; background: #000;">
           <iframe 
-            src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1" 
+            src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&origin=${encodeURIComponent(origin)}" 
             title="${videoTitle}"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowfullscreen 
             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
           </iframe>
+        </div>
+        <div style="padding:12px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#0f172a; border-top:1px solid #1e293b;">
+          <div style="font-size:0.78rem; color:#94a3b8;">
+            ✦ AarogyamTube सुरक्षित प्लेयर — आप आरोग्यम इंडिया पर ही वीडियो देख रहे हैं
+          </div>
+          <div style="display:flex; gap:8px;">
+            <a href="${tubeUrl}" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; padding:7px 16px; border-radius:20px; font-weight:800; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(239,68,68,0.4);">
+              🎬 AarogyamTube हब में पूरा देखें
+            </a>
+            <button type="button" id="closeVideoModalBtn2" style="background:#334155; color:#fff; border:none; padding:7px 14px; border-radius:20px; font-weight:700; font-size:0.78rem; cursor:pointer;">
+              बंद करें
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -69,7 +90,6 @@
     modal.style.display = 'flex';
     requestAnimationFrame(() => { modal.style.opacity = '1'; });
 
-    const closeBtn = document.getElementById('closeVideoModalBtn');
     const closeModal = () => {
       modal.style.opacity = '0';
       setTimeout(() => {
@@ -78,7 +98,10 @@
       }, 300);
     };
 
-    closeBtn.onclick = closeModal;
+    const closeBtn = document.getElementById('closeVideoModalBtn');
+    const closeBtn2 = document.getElementById('closeVideoModalBtn2');
+    if (closeBtn) closeBtn.onclick = closeModal;
+    if (closeBtn2) closeBtn2.onclick = closeModal;
     modal.onclick = (e) => {
       if (e.target === modal) closeModal();
     };
@@ -178,7 +201,7 @@
         </div>
       `;
 
-      // Attach Click events to cards
+      // Attach Click events to cards: open directly in AarogyamTube on-site
       container.querySelectorAll('.universal-video-card').forEach(card => {
         card.addEventListener('click', (e) => {
           if (e.target.closest('.btn-video-share')) {
@@ -203,15 +226,35 @@
             return;
           }
 
+          const vidId = card.getAttribute('data-vid-id');
           const ytId = card.getAttribute('data-yt-id');
           const title = decodeURIComponent(card.getAttribute('data-title'));
-          if (ytId) {
-            renderVideoModal(title, ytId);
-          }
+
+          // Directly navigate to AarogyamTube player so user never goes to external YouTube
+          const targetTubeUrl = vidId ? `/tube.html?vid=${encodeURIComponent(vidId)}` : (ytId ? `/tube.html?yt=${encodeURIComponent(ytId)}` : '/tube.html');
+          window.location.href = targetTubeUrl;
         });
       });
     });
   }
+
+  // Global safety link interceptor: Prevent off-site YouTube video navigation anywhere on the website
+  document.addEventListener('click', function (e) {
+    const a = e.target.closest('a');
+    if (!a || !a.href) return;
+    const href = a.href;
+    // Keep channel subscriptions intact
+    if (href.includes('/@') || href.includes('sub_confirmation=1')) return;
+
+    // Check if link points to a YouTube video / watch / shorts / embed
+    const ytMatch = href.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|live\/))([\w-]{10,12})/);
+    if (ytMatch && ytMatch[1]) {
+      e.preventDefault();
+      e.stopPropagation();
+      const ytId = ytMatch[1];
+      window.location.href = `/tube.html?yt=${encodeURIComponent(ytId)}`;
+    }
+  }, true);
 
   // Expose globally and self-initialize
   window.AarogyamVideoLoader = {
