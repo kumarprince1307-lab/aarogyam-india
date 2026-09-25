@@ -199,8 +199,13 @@
       setOrCreateMeta('meta[name="twitter:description"]', 'name', 'twitter:description', pageConfig.og_description);
     }
 
+    window.AAROGYAM_ACTIVE_PAGE_CMS = pageConfig;
+
     if (pageConfig.og_image) {
-      const resolvedOg = resolveAssetSrc(pageConfig, 'og_image');
+      let resolvedOg = resolveAssetSrc(pageConfig, 'og_image');
+      if (resolvedOg && resolvedOg.startsWith('/')) {
+        resolvedOg = 'https://aarogyamindia.online' + resolvedOg;
+      }
       setOrCreateMeta('meta[property="og:image"]', 'property', 'og:image', resolvedOg);
       setOrCreateMeta('meta[name="twitter:image"]', 'name', 'twitter:image', resolvedOg);
       setOrCreateMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
@@ -706,6 +711,13 @@
           perspective: 800px !important;
           will-change: transform;
         }
+        @media (max-width: 768px) {
+          #live-3d-floating-banner {
+            top: 95px !important;
+            left: 10px !important;
+            max-width: 155px !important;
+          }
+        }
       `;
       document.head.appendChild(st);
     }
@@ -714,8 +726,8 @@
       fbEl = document.createElement('div');
       fbEl.id = 'live-3d-floating-banner';
       fbEl.style.cssText = `
-        position: fixed; bottom: 85px; right: 20px; z-index: 9990;
-        max-width: 145px; cursor: pointer; transition: transform 0.3s ease;
+        position: fixed; top: 110px; left: 18px; z-index: 9990;
+        max-width: 220px; cursor: pointer; transition: transform 0.3s ease;
       `;
       document.body.appendChild(fbEl);
     }
@@ -724,10 +736,13 @@
     const fbImg = resolveAssetSrc(fb, 'image', '/images/banners/agriculture-banner.jpeg');
 
     fbEl.innerHTML = `
-      <a href="${escapeHtml(fb.action_link || '#')}" style="display:block; text-decoration:none; text-align:center;">
-        ${fb.badge_title ? `<div style="background:#16a34a; color:#fff; font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:10px; margin-bottom:4px; box-shadow:0 2px 8px rgba(0,0,0,0.3); line-height:1.2;">${escapeHtml(fb.badge_title)}</div>` : ''}
-        <img src="${escapeHtml(fbImg)}" alt="Feature Banner" class="${animClass}" style="width:100%; border-radius:12px; box-shadow:0 12px 28px rgba(0,0,0,0.45); border:2.5px solid #38bdf8;" />
-      </a>
+      <div style="position:relative;">
+        <button type="button" aria-label="Close" onclick="event.stopPropagation(); this.closest('#live-3d-floating-banner').style.display='none';" style="position:absolute; top:-7px; right:-7px; z-index:10; background:#0f172a; color:#fff; border:1.5px solid #fff; border-radius:50%; width:22px; height:22px; font-size:11px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.35);">✕</button>
+        <a href="${escapeHtml(fb.action_link || '#')}" style="display:block; text-decoration:none; text-align:center;">
+          ${fb.badge_title ? `<div style="background:#16a34a; color:#fff; font-size:0.72rem; font-weight:800; padding:4px 8px; border-radius:10px; margin-bottom:5px; box-shadow:0 2px 8px rgba(0,0,0,0.3); line-height:1.2;">${escapeHtml(fb.badge_title)}</div>` : ''}
+          <img src="${escapeHtml(fbImg)}" alt="3D Feature Banner" class="${animClass}" style="width:100%; border-radius:14px; box-shadow:0 14px 32px rgba(0,0,0,0.45); border:2.5px solid #38bdf8;" />
+        </a>
+      </div>
     `;
   }
 

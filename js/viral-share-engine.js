@@ -101,26 +101,37 @@
     let text = options.text || ogDesc || 'Aarogyam India - सम्पूर्ण किसान व डिजिटल ज्ञान मंच:';
     const shareUrl = buildShareableUrl(options.url || '');
 
-    // Pull CMS custom share message if available
-    try {
-      const allPages = JSON.parse(localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG') || '[]');
-      const curPath = window.location.pathname.toLowerCase();
-      const match = allPages.find(p => p && ((p.url && curPath.endsWith(p.url.toLowerCase())) || (p.slug && curPath.includes(p.slug.toLowerCase()))));
-      if (match) {
-        if (match.share_message && !options.text) {
-          text = match.share_message;
-        }
-        if (match.og_title && !options.title) {
-          title = match.og_title;
-        }
+    // Pull CMS custom share message and OG title (Single Source of Truth)
+    const activeCms = window.AAROGYAM_ACTIVE_PAGE_CMS;
+    if (activeCms) {
+      if (activeCms.share_message && !options.text) {
+        text = activeCms.share_message;
+      } else if (activeCms.og_description && !options.text) {
+        text = activeCms.og_description;
       }
-    } catch (e) {}
+      if (activeCms.og_title && !options.title) {
+        title = activeCms.og_title;
+      }
+    } else {
+      try {
+        const allPages = JSON.parse(localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG') || '[]');
+        const curPath = window.location.pathname.toLowerCase();
+        const match = allPages.find(p => p && p.url && curPath.endsWith(p.url.toLowerCase()));
+        if (match) {
+          if (match.share_message && !options.text) text = match.share_message;
+          else if (match.og_description && !options.text) text = match.og_description;
+          if (match.og_title && !options.title) title = match.og_title;
+        }
+      } catch (e) {}
+    }
 
     const cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '').trim();
     const cleanText = (text || '').replace(/<[^>]+>/g, '').trim();
-    const fullShareMessage = `🌾 *${cleanTitle}*\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व समाधान यहाँ देखें:\n${shareUrl}`;
+    const isAgri = window.location.pathname.includes('agriculture') || window.location.pathname.includes('crop');
+    const headerPrefix = isAgri ? '🌾' : '✨';
+    const fullShareMessage = `${headerPrefix} *${cleanTitle}*\n\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व समाधान यहाँ देखें:\n${shareUrl}`;
 
-    // Render the sleek 3-option transparent floating sheet (No box, transparent background)
+    // Render the sleek 3-option transparent floating sheet
     renderShareModal(cleanTitle, fullShareMessage, shareUrl);
   }
 
