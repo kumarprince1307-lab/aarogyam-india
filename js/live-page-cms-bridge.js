@@ -153,26 +153,39 @@
       document.documentElement.style.setProperty('--primary-dark', pageConfig.theme_dark);
     }
 
-    // 2. Page Title & Meta Tags
-    if (pageConfig.name || pageConfig.og_title) {
-      const newTitle = pageConfig.og_title || (pageConfig.name ? `${pageConfig.name} | Aarogyam India` : '');
-      if (newTitle && !document.title.includes(pageConfig.name)) {
-        document.title = newTitle;
+    // Helper to safely set or create meta tags
+    function setOrCreateMeta(selector, attrName, attrVal, content) {
+      if (!content) return;
+      let el = document.querySelector(selector);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attrName, attrVal);
+        document.head.appendChild(el);
       }
+      el.setAttribute('content', content);
     }
-    if (pageConfig.og_description) {
-      let descMeta = document.querySelector('meta[name="description"]');
-      if (descMeta) descMeta.setAttribute('content', pageConfig.og_description);
-      let ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.setAttribute('content', pageConfig.og_description);
-    }
+
+    // 2. Page Title & Meta Tags
     if (pageConfig.og_title) {
-      let ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute('content', pageConfig.og_title);
+      document.title = pageConfig.og_title;
+      setOrCreateMeta('meta[property="og:title"]', 'property', 'og:title', pageConfig.og_title);
+      setOrCreateMeta('meta[name="twitter:title"]', 'name', 'twitter:title', pageConfig.og_title);
+    } else if (pageConfig.name) {
+      document.title = `${pageConfig.name} | Aarogyam India`;
+      setOrCreateMeta('meta[property="og:title"]', 'property', 'og:title', `${pageConfig.name} | Aarogyam India`);
     }
+
+    if (pageConfig.og_description) {
+      setOrCreateMeta('meta[name="description"]', 'name', 'description', pageConfig.og_description);
+      setOrCreateMeta('meta[property="og:description"]', 'property', 'og:description', pageConfig.og_description);
+      setOrCreateMeta('meta[name="twitter:description"]', 'name', 'twitter:description', pageConfig.og_description);
+    }
+
     if (pageConfig.og_image) {
-      let ogImg = document.querySelector('meta[property="og:image"]');
-      if (ogImg) ogImg.setAttribute('content', resolveAssetSrc(pageConfig, 'og_image'));
+      const resolvedOg = resolveAssetSrc(pageConfig, 'og_image');
+      setOrCreateMeta('meta[property="og:image"]', 'property', 'og:image', resolvedOg);
+      setOrCreateMeta('meta[name="twitter:image"]', 'name', 'twitter:image', resolvedOg);
+      setOrCreateMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
     }
   }
 
@@ -522,6 +535,69 @@
         <p style="margin:10px 0 0 0; font-size:0.88rem; color:#475569; line-height:1.5;">${escapeHtml(f.answer || f.a)}</p>
       </details>
     `).join('');
+  function renderDynamicClinicalBreakdown(pageConfig) {
+    if (!pageConfig || !pageConfig.clinical_breakdown) return;
+    const cb = pageConfig.clinical_breakdown;
+    const sec = document.getElementById('sec-scientific-breakdown') || 
+                document.getElementById('sec-mastitis') ||
+                document.querySelector('section:has(.breakdown-grid)');
+    if (!sec) return;
+
+    if (cb.badge_text) {
+      const badge = sec.querySelector('span[style*="uppercase"]') || sec.querySelector('span[style*="border-radius:20px"]') || sec.querySelector('span');
+      if (badge) badge.textContent = cb.badge_text;
+    }
+    if (cb.main_title) {
+      const h2 = sec.querySelector('h2');
+      if (h2) h2.textContent = cb.main_title;
+    }
+
+    const grid = sec.querySelector('.breakdown-grid') || sec.querySelector('div[style*="grid"]');
+    if (!grid || !Array.isArray(cb.cards) || cb.cards.length === 0) return;
+
+    grid.innerHTML = cb.cards.map(c => `
+      <div style="background:#fff; border-radius:16px; border:1.5px solid #e2e8f0; padding:22px; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+        <h3 style="font-size:1.15rem; font-weight:900; color:${c.color || '#2563eb'}; margin:0 0 10px 0;">${escapeHtml(c.title || '')}</h3>
+        <ul style="padding-left:18px; margin:0; font-size:0.86rem; color:#475569; line-height:1.6;">
+          ${(Array.isArray(c.points) ? c.points : (c.points || '').split('\n')).filter(Boolean).map(pt => `<li>${pt}</li>`).join('')}
+        </ul>
+      </div>
+    `).join('');
+  }
+
+  function renderDynamicDietExercise(pageConfig) {
+    if (!pageConfig || !pageConfig.diet_exercise) return;
+    const de = pageConfig.diet_exercise;
+    const sec = document.getElementById('sec-diet');
+    if (!sec) return;
+
+    // Diet Card
+    if (de.diet && de.diet.title) {
+      const dietBox = sec.querySelector('div[style*="background:#eff6ff"], div[style*="background:#f0fdf4"]') || sec.querySelector('div[style*="border-radius:18px"]');
+      if (dietBox) {
+        const titleEl = dietBox.querySelector('h3');
+        if (titleEl) titleEl.textContent = de.diet.title;
+        const listDiv = dietBox.querySelector('div[style*="flex-direction:column"]') || dietBox.querySelector('div[style*="display:flex"]');
+        if (listDiv && de.diet.items) {
+          const items = Array.isArray(de.diet.items) ? de.diet.items : de.diet.items.split('\n').filter(Boolean);
+          listDiv.innerHTML = items.map(it => `<p style="margin:0;">${it}</p>`).join('');
+        }
+      }
+    }
+
+    // Exercise Card
+    if (de.exercise && de.exercise.title) {
+      const exBox = document.getElementById('sec-exercise') || sec.querySelectorAll('div[style*="border-radius:18px"]')[1];
+      if (exBox) {
+        const titleEl = exBox.querySelector('h3');
+        if (titleEl) titleEl.textContent = de.exercise.title;
+        const listDiv = exBox.querySelector('div[style*="flex-direction:column"]') || exBox.querySelector('div[style*="display:flex"]');
+        if (listDiv && de.exercise.items) {
+          const items = Array.isArray(de.exercise.items) ? de.exercise.items : de.exercise.items.split('\n').filter(Boolean);
+          listDiv.innerHTML = items.map(it => `<p style="margin:0;">${it}</p>`).join('');
+        }
+      }
+    }
   }
 
   function renderFloatingBanner(pageConfig) {
@@ -613,6 +689,8 @@
         applySectionReorderingAndVisibility(pageConfig);
         renderDynamicKpiBadges(pageConfig);
         renderDynamicProducts(pageConfig);
+        renderDynamicClinicalBreakdown(pageConfig);
+        renderDynamicDietExercise(pageConfig);
         renderDynamicReviews(pageConfig);
         renderDynamicFaqs(pageConfig);
         renderFloatingBanner(pageConfig);

@@ -2363,8 +2363,8 @@ export async function initPageEditor() {
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-          <button type="button" id="btn-studio-save-top" class="pe-desktop-only admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 7px 14px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(22,163,74,0.35); cursor: pointer; border-radius: 8px; white-space: nowrap;">
-            <span>🚀</span> <span>Save Live</span>
+          <button type="button" id="btn-studio-save-top" onclick="window.savePageConfig()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 7px 12px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 4px 14px rgba(22,163,74,0.35); cursor: pointer; border-radius: 8px; white-space: nowrap;">
+            <span>💾</span> <span>Save Live</span>
           </button>
           <button type="button" id="btn-close-page-editor-form" class="admin-button icon-button" style="color: #cbd5e1; font-size: 1.3rem; background: rgba(255,255,255,0.08); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;" title="बंद करें">✕</button>
         </div>
@@ -2381,6 +2381,7 @@ export async function initPageEditor() {
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-kpis', this)">✨ 7. KPI</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-marketing', this)">📢 8. सेलिंग</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-health-cards', this)">🩺 9. रोग</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-clinical-breakdown', this)">🔬 9.1 विश्लेषण व डाइट</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-crop-cards', this)">🌾 10. फसल</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-pashu-cards', this)">🐄 11. पशु</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-page-kpi', this)">📋 12. पेज KPI</button>
@@ -2405,6 +2406,7 @@ export async function initPageEditor() {
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-kpis', this)">✨ 7. KPI व फीचर्स</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-marketing', this)">📢 8. लाइव सेलिंग कार्ड्स</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-health-cards', this)">🩺 9. स्वास्थ्य रोग कार्ड्स</button>
+          <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-clinical-breakdown', this)">🔬 9.1 वैज्ञानिक विश्लेषण व डाइट</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-crop-cards', this)">🌾 10. फसल सुरक्षा कार्ड्स</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-pashu-cards', this)">🐄 11. पशु पालन कार्ड्स</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-page-kpi', this)">📋 12. पेज KPI सेक्शन</button>
@@ -2634,6 +2636,62 @@ export async function initPageEditor() {
             <!-- Rendered dynamically -->
           </div>
         </div>
+        <!-- 9.1 Deep Scientific Breakdown, Symptoms & 24-Hr Diet/Exercise Chart -->
+        <div id="pe-section-clinical-breakdown" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #2563eb60;">
+          <div style="font-weight: 800; color: #60a5fa; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <span>🔬 9.1 वैज्ञानिक विश्लेषण (कारण, लक्षण, खतरे) व 24-घंटे का डाइट/व्यायाम चार्ट</span>
+            <span style="font-size: 0.72rem; background: rgba(37,99,235,0.2); color: #93c5fd; padding: 2px 8px; border-radius: 10px;">रोग विशेष व स्वास्थ्य सब-पेज</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 14px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">सेक्शन बैज (Badge Text)</label>
+              <input type="text" id="pe_input_cb_badge" class="admin-input" placeholder="🔬 वैज्ञानिक विश्लेषण" style="width: 100%; padding: 8px 12px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">मुख्य विश्लेषण शीर्षक (Main Title)</label>
+              <input type="text" id="pe_input_cb_title" class="admin-input" placeholder="डायबिटीज: कारण, लक्षण व गंभीर खतरे" style="width: 100%; padding: 8px 12px;" />
+            </div>
+          </div>
+
+          <!-- 3 Cards: Causes, Symptoms, Risks -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 14px;">
+            <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #60a5fa;">❓ कारण शीर्षक (Causes Title)</label>
+              <input type="text" id="pe_input_cb_causes_title" class="admin-input" placeholder="❓ क्यों होती है डायबिटीज? (Causes)" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
+              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">कारण बिंदु (1 बिंदु प्रति लाइन)</label>
+              <textarea id="pe_input_cb_causes_points" class="admin-textarea" rows="4" placeholder="इंसुलिन प्रतिरोध (Resistance)...&#10;पैंक्रियाज की कमजोरी...&#10;तनाव व कोर्टिसोल..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
+            </div>
+            <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #60a5fa;">⚠️ मुख्य लक्षण (Symptoms Title)</label>
+              <input type="text" id="pe_input_cb_symptoms_title" class="admin-input" placeholder="⚠️ मुख्य लक्षण (Symptoms)" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
+              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">लक्षण बिंदु (1 बिंदु प्रति लाइन)</label>
+              <textarea id="pe_input_cb_symptoms_points" class="admin-textarea" rows="4" placeholder="रात में बार-बार पेशाब जाना...&#10;भूख लगना और थकान...&#10;हाथ-पैरों में जलन या सुन्नपन..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
+            </div>
+            <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #f87171;">🚨 साइड इफेक्ट्स व खतरे (Risks Title)</label>
+              <input type="text" id="pe_input_cb_risks_title" class="admin-input" placeholder="🚨 साइड इफेक्ट्स व खतरे (Risks)" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
+              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">खतरे बिंदु (1 बिंदु प्रति लाइन)</label>
+              <textarea id="pe_input_cb_risks_points" class="admin-textarea" rows="4" placeholder="किडनी डैमेज (नेफ्रोपैथी)...&#10;डायबिटिक न्यूरोपैथी...&#10;हार्ट अटैक व स्ट्रोक जोखिम..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
+            </div>
+          </div>
+
+          <!-- 2 Cards: 24-Hr Diet Protocol & Exercise/Lifestyle Guidance -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+            <div style="background: #064e3b30; padding: 12px; border-radius: 8px; border: 1.5px solid #05966950;">
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #34d399;">🥗 24-घंटे का डाइट चार्ट (Diet Protocol Title)</label>
+              <input type="text" id="pe_input_diet_title" class="admin-input" placeholder="शुगर बैलेंसिंग डाइट प्रोटोकॉल" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
+              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">डाइट शेड्यूल (1 मील/समय प्रति लाइन)</label>
+              <textarea id="pe_input_diet_items" class="admin-textarea" rows="5" placeholder="सुबह 6:30 AM: 1 चम्मच मेथी दाना भीगा पानी...&#10;नाश्ता 8:30 AM: बेसन चीला / स्प्राउट्स...&#10;दोपहर भोजन 1:00 PM: 1 बड़ी प्लेट सलाद + जौ-चना रोटी...&#10;शाम 5:00 PM: मखाने + दालचीनी चाय...&#10;रात भोजन 7:30 PM: मूंग दाल सूप..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
+            </div>
+            <div style="background: #1e1b4b30; padding: 12px; border-radius: 8px; border: 1.5px solid #6366f150;">
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #a5b4fc;">🧘 प्राणायाम, व्यायाम व उपचार (Exercise & Therapy Title)</label>
+              <input type="text" id="pe_input_exercise_title" class="admin-input" placeholder="इंसुलिन सक्रियता व मोबिलिटी" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
+              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">व्यायाम व नियम (1 अभ्यास प्रति लाइन)</label>
+              <textarea id="pe_input_exercise_items" class="admin-textarea" rows="5" placeholder="1. मंडूकासन (Frog Pose): पैंक्रियाज पर दबाव देकर इंसुलिन स्राव बढ़ाता है।&#10;2. पवनमुक्तासन: पेट की गैस व पाचन दुरुस्त करता है।&#10;3. कपालभाति प्राणायाम: 15 मिनट रोजाना।&#10;4. भोजनोपरांत शतपावली: भोजन के बाद 20 मिनट टहलें।" style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
+            </div>
+          </div>
+        </div>
+
 
         <!-- 3.2 Major Crops Protection Cards Manager (8 Cards) -->
         <div id="pe-section-crop-cards" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #16a34a40;">
@@ -2835,15 +2893,15 @@ export async function initPageEditor() {
             • बदलाव करने के बाद 'Save Page' दबाएं
           </span>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-          <button type="button" id="btn-export-pages-json" onclick="window.exportPagesJson()" class="admin-button" style="background: #0284c7; color: #fff; font-weight: 800; padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap;">
-            📥 बैकअप JSON डाउनलोड करें
+        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; max-width: 100%;">
+          <button type="button" id="btn-export-pages-json" onclick="window.exportPagesJson()" class="pe-desktop-only admin-button" style="background: #0284c7; color: #fff; font-weight: 800; padding: 8px 14px; font-size: 0.82rem; border-radius: 8px; cursor: pointer; white-space: nowrap;">
+            📥 बैकअप JSON
           </button>
-          <button type="button" id="btn-cancel-page-editor-form" class="admin-button" style="background: transparent; border: 1.5px solid #334155; color: #cbd5e1; padding: 8px 18px; font-weight: 700; font-size: 0.85rem; border-radius: 8px; cursor: pointer;">
-            रद्द करें (Cancel)
+          <button type="button" id="btn-cancel-page-editor-form" class="admin-button" style="background: transparent; border: 1.5px solid #334155; color: #cbd5e1; padding: 8px 14px; font-weight: 700; font-size: 0.82rem; border-radius: 8px; cursor: pointer;">
+            रद्द करें
           </button>
-          <button type="button" id="btn-save-page-editor-form" onclick="window.savePageConfig()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 8px 22px; font-size: 0.88rem; border-radius: 8px; box-shadow: 0 4px 14px rgba(22,163,74,0.4); cursor: pointer; white-space: nowrap;">
-            💾 यह साइट पेज सुरक्षित करें (Save Page)
+          <button type="button" id="btn-save-page-editor-form" onclick="window.savePageConfig()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 9px 18px; font-size: 0.88rem; border-radius: 8px; box-shadow: 0 4px 14px rgba(22,163,74,0.4); cursor: pointer; white-space: nowrap;">
+            💾 सुरक्षित करें (Save Page)
           </button>
         </div>
       </footer>
@@ -4840,6 +4898,45 @@ export async function initPageEditor() {
       }
     }
 
+    // 3.1B Clinical Breakdown & Diet/Exercise
+    const cbData = p.clinical_breakdown || {};
+    const cbCards = cbData.cards || [];
+    const causesCard = cbCards[0] || {};
+    const symptomsCard = cbCards[1] || {};
+    const risksCard = cbCards[2] || {};
+
+    const cbBadgeEl = document.getElementById('pe_input_cb_badge');
+    const cbTitleEl = document.getElementById('pe_input_cb_title');
+    const cbCausesTitleEl = document.getElementById('pe_input_cb_causes_title');
+    const cbCausesPointsEl = document.getElementById('pe_input_cb_causes_points');
+    const cbSymptomsTitleEl = document.getElementById('pe_input_cb_symptoms_title');
+    const cbSymptomsPointsEl = document.getElementById('pe_input_cb_symptoms_points');
+    const cbRisksTitleEl = document.getElementById('pe_input_cb_risks_title');
+    const cbRisksPointsEl = document.getElementById('pe_input_cb_risks_points');
+
+    if (cbBadgeEl) cbBadgeEl.value = cbData.badge_text || '🔬 वैज्ञानिक विश्लेषण';
+    if (cbTitleEl) cbTitleEl.value = cbData.main_title || '';
+    if (cbCausesTitleEl) cbCausesTitleEl.value = causesCard.title || '❓ कारण (Causes)';
+    if (cbCausesPointsEl) cbCausesPointsEl.value = Array.isArray(causesCard.points) ? causesCard.points.join('\n') : (causesCard.points || '');
+    if (cbSymptomsTitleEl) cbSymptomsTitleEl.value = symptomsCard.title || '⚠️ मुख्य लक्षण (Symptoms)';
+    if (cbSymptomsPointsEl) cbSymptomsPointsEl.value = Array.isArray(symptomsCard.points) ? symptomsCard.points.join('\n') : (symptomsCard.points || '');
+    if (cbRisksTitleEl) cbRisksTitleEl.value = risksCard.title || '🚨 साइड इफेक्ट्स व खतरे (Risks)';
+    if (cbRisksPointsEl) cbRisksPointsEl.value = Array.isArray(risksCard.points) ? risksCard.points.join('\n') : (risksCard.points || '');
+
+    const deData = p.diet_exercise || {};
+    const dietData = deData.diet || {};
+    const exData = deData.exercise || {};
+
+    const dietTitleEl = document.getElementById('pe_input_diet_title');
+    const dietItemsEl = document.getElementById('pe_input_diet_items');
+    const exTitleEl = document.getElementById('pe_input_exercise_title');
+    const exItemsEl = document.getElementById('pe_input_exercise_items');
+
+    if (dietTitleEl) dietTitleEl.value = dietData.title || '';
+    if (dietItemsEl) dietItemsEl.value = Array.isArray(dietData.items) ? dietData.items.join('\n') : (dietData.items || '');
+    if (exTitleEl) exTitleEl.value = exData.title || '';
+    if (exItemsEl) exItemsEl.value = Array.isArray(exData.items) ? exData.items.join('\n') : (exData.items || '');
+
     // 3.0 Floating 3D Banner & Live Animation Layer
     const floatChk = document.getElementById('pe_chk_floating_banner');
     const floatImg = document.getElementById('pe_input_floating_banner_img');
@@ -4936,6 +5033,14 @@ export async function initPageEditor() {
     const ogPrevWrap = document.getElementById('pe_og_image_preview');
     if (ogPrevWrap) ogPrevWrap.style.display = 'none';
 
+    // Reset Clinical Breakdown & Diet
+    ['pe_input_cb_badge', 'pe_input_cb_title', 'pe_input_cb_causes_title', 'pe_input_cb_causes_points',
+     'pe_input_cb_symptoms_title', 'pe_input_cb_symptoms_points', 'pe_input_cb_risks_title', 'pe_input_cb_risks_points',
+     'pe_input_diet_title', 'pe_input_diet_items', 'pe_input_exercise_title', 'pe_input_exercise_items'].forEach(id => {
+       const el = document.getElementById(id);
+       if (el) el.value = '';
+    });
+
     // Reset Floating 3D Banner
     const floatChk = document.getElementById('pe_chk_floating_banner');
     const floatImg = document.getElementById('pe_input_floating_banner_img');
@@ -5010,6 +5115,61 @@ export async function initPageEditor() {
     const ogDesc = (document.getElementById('pe_input_og_description')?.value || '').trim();
     const shareMsg = (document.getElementById('pe_input_share_message')?.value || '').trim();
 
+    // 3.1B Clinical Breakdown (Causes, Symptoms, Risks)
+    const cbBadge = (document.getElementById('pe_input_cb_badge')?.value || '').trim();
+    const cbTitle = (document.getElementById('pe_input_cb_title')?.value || '').trim();
+    const cbCausesTitle = (document.getElementById('pe_input_cb_causes_title')?.value || '').trim();
+    const cbCausesPoints = (document.getElementById('pe_input_cb_causes_points')?.value || '').trim();
+    const cbSymptomsTitle = (document.getElementById('pe_input_cb_symptoms_title')?.value || '').trim();
+    const cbSymptomsPoints = (document.getElementById('pe_input_cb_symptoms_points')?.value || '').trim();
+    const cbRisksTitle = (document.getElementById('pe_input_cb_risks_title')?.value || '').trim();
+    const cbRisksPoints = (document.getElementById('pe_input_cb_risks_points')?.value || '').trim();
+
+    let clinical_breakdown = null;
+    if (cbCausesTitle || cbSymptomsTitle || cbRisksTitle || cbTitle) {
+      clinical_breakdown = {
+        badge_text: cbBadge || '🔬 वैज्ञानिक विश्लेषण',
+        main_title: cbTitle,
+        cards: [
+          {
+            title: cbCausesTitle || '❓ कारण (Causes)',
+            color: '#2563eb',
+            points: cbCausesPoints ? cbCausesPoints.split('\n').map(s => s.trim()).filter(Boolean) : []
+          },
+          {
+            title: cbSymptomsTitle || '⚠️ मुख्य लक्षण (Symptoms)',
+            color: '#2563eb',
+            points: cbSymptomsPoints ? cbSymptomsPoints.split('\n').map(s => s.trim()).filter(Boolean) : []
+          },
+          {
+            title: cbRisksTitle || '🚨 साइड इफेक्ट्स व खतरे (Risks)',
+            color: '#dc2626',
+            points: cbRisksPoints ? cbRisksPoints.split('\n').map(s => s.trim()).filter(Boolean) : []
+          }
+        ]
+      };
+    }
+
+    // Diet & Exercise
+    const dietTitle = (document.getElementById('pe_input_diet_title')?.value || '').trim();
+    const dietItems = (document.getElementById('pe_input_diet_items')?.value || '').trim();
+    const exTitle = (document.getElementById('pe_input_exercise_title')?.value || '').trim();
+    const exItems = (document.getElementById('pe_input_exercise_items')?.value || '').trim();
+
+    let diet_exercise = null;
+    if (dietTitle || exTitle || dietItems || exItems) {
+      diet_exercise = {
+        diet: {
+          title: dietTitle,
+          items: dietItems ? dietItems.split('\n').map(s => s.trim()).filter(Boolean) : []
+        },
+        exercise: {
+          title: exTitle,
+          items: exItems ? exItems.split('\n').map(s => s.trim()).filter(Boolean) : []
+        }
+      };
+    }
+
     // 3.0 Floating 3D Banner
     const floatEnabled = document.getElementById('pe_chk_floating_banner')?.checked || false;
     const floatImg = (document.getElementById('pe_input_floating_banner_img')?.value || '').trim();
@@ -5076,6 +5236,8 @@ export async function initPageEditor() {
       pashu_cards: stripImagePreviews(currentPashuCards),
       products: stripImagePreviews(currentProducts),
       page_kpi_sections: stripImagePreviews(currentPageKpiSections),
+      clinical_breakdown: clinical_breakdown || existingPage?.clinical_breakdown || null,
+      diet_exercise: diet_exercise || existingPage?.diet_exercise || null,
       whatsapp_support: {
         number: waNum,
         prompt: waPrompt
@@ -5092,25 +5254,43 @@ export async function initPageEditor() {
     renderPagesTable();
     showToast(`✅ पेज '${name}' सम्पूर्ण कॉन्फ़िगरेशन के साथ सुरक्षित हो गया!`, 'success');
 
-    // Auto Git Live Sync & Local Disk Sync on Save
+    // Universal Triple-Sync: 1) PHP API (Direct Server File Write + Git), 2) GitHub Contents API, 3) LocalStorage
     try {
       const cleanAllPages = stripImagePreviews(allPages);
       const configStr = JSON.stringify({ sitePages: cleanAllPages }, null, 2);
       const base64Data = btoa(unescape(encodeURIComponent(configStr)));
+
+      // Call dedicated PHP save API (matches Universal Book Landing flow)
+      fetch('/api/save_site_pages.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save_site_pages', sitePages: cleanAllPages })
+      }).then(r => r.json()).then(phpRes => {
+        if (phpRes && phpRes.success) {
+          console.log('[Admin Save] PHP API success:', phpRes);
+          showToast('⚡ सर्वर JSON व गिट पर तुरंत लाइव सुरक्षित हो गया!', 'success');
+        }
+      }).catch(() => {
+        fetch('/api/save_book_landing.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save_site_pages', sitePages: cleanAllPages })
+        }).catch(() => null);
+      });
+
+      // Call GitHub Contents API (Serverless / Cloud Sync)
       syncAssetToGitHub('data/site-pages-config.json', base64Data).then(res => {
         if (res.success) {
           if (res.localDisk) {
             showToast('💾 स्थानीय डिस्क पर site-pages-config.json तुरंत सुरक्षित हो गया!', 'success');
           } else {
-            showToast('🚀 GitHub पर site-pages-config.json ऑटो-सिंक हो गया!', 'success');
+            showToast('🚀 GitHub व लाइव वेबसाइट पर डेटा सिंक हो गया!', 'success');
           }
         } else {
-          console.warn('[Admin Save] GitHub sync response warning:', res);
-          showToast(`⚠️ GitHub ऑटो-सिंक: ${res.error || 'पेंडिंग'} (लोकल सेव सफल)`, 'info');
+          console.warn('[Admin Save] GitHub sync warning:', res);
         }
       }).catch(err => {
         console.warn('[Admin Save] GitHub sync fetch error:', err);
-        showToast('⚠️ स्थानीय रूप से सुरक्षित हो गया (क्लाउड सिंक पेंडिंग)', 'info');
       });
     } catch (e) {
       console.warn('[Admin Save] Serialization error:', e);

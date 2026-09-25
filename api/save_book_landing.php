@@ -47,6 +47,39 @@ if (isset($payload['action']) && $payload['action'] === 'save_popups' && isset($
     ]);
 }
 
+// Check if this is a save_site_pages action
+if (isset($payload['action']) && $payload['action'] === 'save_site_pages' && isset($payload['sitePages'])) {
+    $pagesJsonPath = __DIR__ . '/../data/site-pages-config.json';
+    $backupDir = __DIR__ . '/../data/backups';
+    if (!is_dir($backupDir)) {
+        @mkdir($backupDir, 0755, true);
+    }
+    $timestamp = date('Ymd_His');
+    if (file_exists($pagesJsonPath)) {
+        @copy($pagesJsonPath, $backupDir . "/site_pages_backup_{$timestamp}.json");
+    }
+    $tmpPages = $pagesJsonPath . '.tmp';
+    $jsonContent = is_array($payload['sitePages']) ? ['sitePages' => $payload['sitePages']] : $payload['sitePages'];
+    file_put_contents($tmpPages, json_encode($jsonContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    rename($tmpPages, $pagesJsonPath);
+
+    $commitMsg = "Publish site pages config update [PHP-Auto-Sync]";
+    $gitCmd = sprintf(
+        'git -C %s add %s && git -C %s commit -m %s && git -C %s push',
+        escapeshellarg(__DIR__ . '/..'),
+        escapeshellarg('data/site-pages-config.json'),
+        escapeshellarg(__DIR__ . '/..'),
+        escapeshellarg('"' . $commitMsg . '"'),
+        escapeshellarg(__DIR__ . '/..')
+    );
+    @exec($gitCmd, $out, $rc);
+
+    json_resp(200, [
+        'success' => true,
+        'message' => 'Site pages config saved successfully via save_book_landing.php'
+    ]);
+}
+
 $pageData = $payload['pageData'] ?? null;
 $bookData = $payload['bookData'] ?? null;
 $uploadedFiles = $payload['uploadedFiles'] ?? [];
