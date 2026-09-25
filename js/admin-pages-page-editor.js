@@ -218,6 +218,8 @@ export async function initPageEditor() {
       } else if (targetType === 'floating_banner') {
         const inputEl = document.getElementById('pe_input_floating_banner_img');
         if (inputEl) inputEl.value = webpPath;
+        const chkEl = document.getElementById('pe_chk_floating_banner');
+        if (chkEl) chkEl.checked = true;
         const prevWrap = document.getElementById('pe_floating_banner_preview');
         const prevImg = document.getElementById('pe_floating_banner_preview_img');
         if (prevWrap && prevImg) {
@@ -5235,11 +5237,12 @@ export async function initPageEditor() {
     }
 
     // 3.0 Floating 3D Banner
-    const floatEnabled = document.getElementById('pe_chk_floating_banner')?.checked || false;
     const floatImg = (document.getElementById('pe_input_floating_banner_img')?.value || '').trim();
     const floatTitle = (document.getElementById('pe_input_floating_banner_title')?.value || '').trim();
     const floatLink = (document.getElementById('pe_input_floating_banner_link')?.value || '').trim();
     const floatAnim = document.getElementById('pe_select_floating_banner_anim')?.value || 'ublFloatBook3D';
+    const floatChk = document.getElementById('pe_chk_floating_banner');
+    const floatEnabled = floatChk ? floatChk.checked : Boolean(floatImg);
 
     const floating_banner = {
       enabled: floatEnabled,

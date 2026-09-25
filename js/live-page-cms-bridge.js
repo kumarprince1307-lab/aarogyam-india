@@ -55,36 +55,46 @@
 
   function getPageMatch(allPages) {
     if (!Array.isArray(allPages) || allPages.length === 0) return null;
-    const path = (window.location.pathname || '').toLowerCase();
+    const path = (window.location.pathname || '').toLowerCase().trim();
+    const cleanFilename = (path.split('/').pop() || '').replace('.html', '').trim();
     
-    // 1. Check Homepage first
+    // 1. Exact URL match (Highest Priority)
+    const exactUrl = allPages.find(p => p.url && p.url.toLowerCase().trim() === path);
+    if (exactUrl) return exactUrl;
+
+    // 2. Path ends with configured URL (e.g. domain.com/health/diabetes.html ends with /health/diabetes.html)
+    const endsUrl = allPages.find(p => p.url && path.endsWith(p.url.toLowerCase().trim()));
+    if (endsUrl) return endsUrl;
+
+    // 3. Homepage check
     const isHomePage = path === '/' || path === '' || path.endsWith('/index.html') || path.endsWith('index.html');
     if (isHomePage) {
-      const homePage = allPages.find(p => p.id === 'page_home' || p.slug === 'index' || (p.url && (p.url === '/' || p.url.includes('index.html'))));
+      const homePage = allPages.find(p => p.id === 'page_home' || p.id === 'page_index' || p.slug === 'index');
       if (homePage) return homePage;
     }
 
-    // 2. Exact or suffix matches
-    return allPages.find(p => {
-      const u = (p.url || '').toLowerCase();
-      const s = (p.slug || '').toLowerCase();
-      const id = (p.id || '').toLowerCase();
+    // 4. Exact filename / subpage slug match (e.g. /health/diabetes.html -> health-diabetes or diabetes)
+    if (cleanFilename) {
+      const subpageMatch = allPages.find(p => {
+        const s = (p.slug || '').toLowerCase();
+        const id = (p.id || '').toLowerCase();
+        return s === `health-${cleanFilename}` || s === cleanFilename || id === `page_health_${cleanFilename.replace(/-/g, '_')}` || id === `page_${cleanFilename.replace(/-/g, '_')}`;
+      });
+      if (subpageMatch) return subpageMatch;
+    }
 
-      if (u && (path.endsWith(u) || path.includes(u))) return true;
-      if (path.includes('pashu') && (id.includes('pashu') || id.includes('cattle'))) return true;
-      if (path.includes('diabetes') && id.includes('diabetes')) return true;
-      if (path.includes('weight-loss') && id.includes('weight_loss')) return true;
-      if (path.includes('joint-care') && id.includes('joint_care')) return true;
-      if (path.includes('womens-care') && id.includes('womens_care')) return true;
-      if (path.includes('hair-care') && id.includes('hair_care')) return true;
-      if (path.includes('skin-care') && id.includes('skin_care')) return true;
-      if (path.includes('kids-care') && id.includes('kids_care')) return true;
-      if (path.includes('home-care') && id.includes('home_care')) return true;
-      if (path.includes('agriculture') && id.includes('agriculture')) return true;
-      if (path.includes('ebook') && (id.includes('ebook_store') || s.includes('ebook'))) return true;
-      if (s && path.includes(s)) return true;
-      return false;
-    });
+    // 5. Explicit section keywords
+    if (path.includes('pashu')) {
+      const pashuPage = allPages.find(p => p.id === 'page_pashu' || p.id === 'page_pashu_palan' || p.id.includes('cattle'));
+      if (pashuPage) return pashuPage;
+    }
+
+    if (path.includes('agriculture')) {
+      const agriPage = allPages.find(p => p.id && p.id.includes('agriculture'));
+      if (agriPage) return agriPage;
+    }
+
+    return null;
   }
 
   async function loadConfigData() {
@@ -670,17 +680,42 @@
 
   function renderFloatingBanner(pageConfig) {
     let fbEl = document.getElementById('home-3d-floating-banner') || document.getElementById('live-3d-floating-banner');
-    if (!pageConfig || !pageConfig.floating_banner || !pageConfig.floating_banner.enabled || !pageConfig.floating_banner.image) {
+    if (!pageConfig || !pageConfig.floating_banner || !pageConfig.floating_banner.image) {
       if (fbEl) fbEl.style.display = 'none';
       return;
     }
     const fb = pageConfig.floating_banner;
+    // Don't render if explicitly disabled without valid action
+    if (fb.enabled === false && !fb.image) {
+      if (fbEl) fbEl.style.display = 'none';
+      return;
+    }
+
+    // Ensure 3D Floating Animation Style is injected on ALL pages
+    if (!document.getElementById('style-floating-3d-anim')) {
+      const st = document.createElement('style');
+      st.id = 'style-floating-3d-anim';
+      st.textContent = `
+        @keyframes ublFloat3DKeyframes {
+          0%, 100% { transform: translateY(0px) rotateX(4deg) rotateY(-5deg) scale(1); }
+          50% { transform: translateY(-12px) rotateX(-4deg) rotateY(5deg) scale(1.03); }
+        }
+        .ubl-float-3d-anim {
+          animation: ublFloat3DKeyframes 3.6s ease-in-out infinite !important;
+          transform-style: preserve-3d !important;
+          perspective: 800px !important;
+          will-change: transform;
+        }
+      `;
+      document.head.appendChild(st);
+    }
+
     if (!fbEl) {
       fbEl = document.createElement('div');
       fbEl.id = 'live-3d-floating-banner';
       fbEl.style.cssText = `
         position: fixed; bottom: 85px; right: 20px; z-index: 9990;
-        max-width: 140px; cursor: pointer; transition: transform 0.3s ease;
+        max-width: 145px; cursor: pointer; transition: transform 0.3s ease;
       `;
       document.body.appendChild(fbEl);
     }
@@ -689,9 +724,9 @@
     const fbImg = resolveAssetSrc(fb, 'image', '/images/banners/agriculture-banner.jpeg');
 
     fbEl.innerHTML = `
-      <a href="${fb.action_link || '#'}" style="display:block; text-decoration:none; text-align:center;">
-        ${fb.badge_title ? `<div style="background:#16a34a; color:#fff; font-size:0.68rem; font-weight:800; padding:2px 8px; border-radius:10px; margin-bottom:4px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">${escapeHtml(fb.badge_title)}</div>` : ''}
-        <img src="${fbImg}" alt="Feature Banner" class="${animClass}" style="width:100%; border-radius:12px; box-shadow:0 12px 28px rgba(0,0,0,0.5); border:2px solid #38bdf8;" />
+      <a href="${escapeHtml(fb.action_link || '#')}" style="display:block; text-decoration:none; text-align:center;">
+        ${fb.badge_title ? `<div style="background:#16a34a; color:#fff; font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:10px; margin-bottom:4px; box-shadow:0 2px 8px rgba(0,0,0,0.3); line-height:1.2;">${escapeHtml(fb.badge_title)}</div>` : ''}
+        <img src="${escapeHtml(fbImg)}" alt="Feature Banner" class="${animClass}" style="width:100%; border-radius:12px; box-shadow:0 12px 28px rgba(0,0,0,0.45); border:2.5px solid #38bdf8;" />
       </a>
     `;
   }
