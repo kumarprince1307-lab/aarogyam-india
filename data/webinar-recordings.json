@@ -1,6 +1,28 @@
 {
   "recordings": [
     {
+      "id": "VID_187128",
+      "format": "both",
+      "platform": "youtube",
+      "channel_id": "CH_AAROGYAM_MAIN",
+      "title": "जोड़ों के दर्द से राहत! | Naturamore Joint Care Testimonial | Aarogyam India",
+      "description": "स्वागत है आपका Aarogyam India में! क्या आप या आपके परिवार का कोई सदस्य जोड़ों के दर्द, घुटनों की जकड़न या जोड़ों की समस्या से परेशान है?\n​इस वीडियो में देखिए Naturamore Joint Care (हड़जोड़, गुग्गुल, और Shallaki से समृद्ध) का शानदार रिजल्ट! प्राकृतिक जड़ी-बूटियों से तैयार यह न्यूट्रास्युटिकल कैप्सूल जोड़ों को स्वस्थ रखने और पुरानी समस्याओं में असरदार राहत दिलाने में मदद करता है।",
+      "subject": "HEALTH",
+      "category": "HEALTH",
+      "video_url": "https://youtube.com/shorts/-SPS50UQPjA?si=XwJt60FL38PvYGNW",
+      "youtube_url": "https://youtube.com/shorts/-SPS50UQPjA?si=XwJt60FL38PvYGNW",
+      "youtube_id": "-SPS50UQPjA",
+      "thumbnail": "https://img.youtube.com/vi/-SPS50UQPjA/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यं हेल्थ केयर",
+      "access_tier": "all",
+      "pinned": false,
+      "priority": 50,
+      "order_type": "priority",
+      "status": "active",
+      "created_at": "2026-09-26T11:29:47.128Z"
+    },
+    {
       "id": "VID_242806",
       "format": "both",
       "platform": "youtube",
