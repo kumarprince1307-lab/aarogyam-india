@@ -2416,76 +2416,95 @@ export async function initPageEditor() {
       </div>
     </div>
 
-    <!-- MASTER PRODUCT & CATEGORIES MANAGER MODAL / CARD -->
-    <div id="master-product-manager-card" class="admin-card" style="display: none; margin-bottom: 24px; background: var(--admin-surface-2, #0f172a); border: 2.5px solid #10b981; border-radius: 14px; padding: 22px; box-shadow: 0 10px 32px rgba(0,0,0,0.6);">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--admin-border, #334155); padding-bottom: 14px; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <span style="font-size: 1.8rem; background: rgba(16,185,129,0.15); padding: 8px 12px; border-radius: 12px;">🛍️</span>
+    <!-- MASTER PRODUCT & CATEGORIES MANAGER FULL-SCREEN STUDIO MODAL -->
+    <div id="master-product-manager-card" class="mpm-studio-container" style="display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; max-width: 100%; z-index: 99999; margin: 0; border: none; background: #070d19; overflow: hidden; padding: 0; flex-direction: column; box-sizing: border-box;">
+      
+      <!-- Top Fixed Header -->
+      <header style="height: 60px; min-height: 60px; flex-shrink: 0; background: #0f172a; padding: 0 20px; border-bottom: 1.5px solid #1e293b; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 18px rgba(0,0,0,0.4); z-index: 50;">
+        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+          <span style="font-size: 1.8rem;">🛍️</span>
           <div>
-            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 900; color: #34d399; display: flex; align-items: center; gap: 10px;">
-              <span>मास्टर उत्पाद व कैटेगरी प्रबंधक (Master Product Manager Studio)</span>
-              <span id="mpm-total-count-badge" style="font-size: 0.76rem; background: rgba(16,185,129,0.2); color: #6ee7b7; padding: 2px 10px; border-radius: 12px; font-weight: 800;">30 उत्पाद</span>
-            </h3>
-            <small style="color: #94a3b8; font-size: 0.78rem;">कैटेगरी व सब-कैटेगरी बनाएं, फोटो, MRP, छूट%, विवरण, घटक, खुराक व सावधानियां बदलें (ऑटो Git Push सक्रिय)</small>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 style="margin: 0; font-size: 1.15rem; font-weight: 900; color: #34d399; line-height: 1.2;">
+                मास्टर उत्पाद व कैटेगरी प्रबंधक Studio
+              </h3>
+              <span id="mpm-total-count-badge" style="font-size: 0.74rem; background: rgba(16,185,129,0.2); color: #6ee7b7; padding: 2px 10px; border-radius: 12px; font-weight: 800;">
+                30 उत्पाद
+              </span>
+            </div>
+            <small style="color: #94a3b8; font-size: 0.74rem;">कैटेगरी व सब-कैटेगरी, फोटो, MRP, छूट%, विवरण, घटक, खुराक व सावधानियां बदलें</small>
           </div>
         </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button type="button" id="btn-mpm-add-category" onclick="window.addMpmCategory()" class="admin-button small-button" style="background: #8b5cf6; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+
+        <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+          <button type="button" id="btn-mpm-add-category" onclick="window.addMpmCategory()" class="admin-button small-button" style="background: #8b5cf6; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 8px;">
             <span>📁</span> <span>+ नई कैटेगरी</span>
           </button>
-          <button type="button" id="btn-mpm-add-subcategory" onclick="window.addMpmSubcategory()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+          <button type="button" id="btn-mpm-add-subcategory" onclick="window.addMpmSubcategory()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 8px;">
             <span>🏷️</span> <span>+ नई सब-कैटेगरी</span>
           </button>
-          <button type="button" id="btn-mpm-add-product" onclick="window.addMpmProduct()" class="admin-button small-button" style="background: #10b981; color: #fff; font-weight: 900; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 3px 10px rgba(16,185,129,0.35);">
+          <button type="button" id="btn-mpm-add-product" onclick="window.addMpmProduct()" class="admin-button small-button" style="background: #10b981; color: #fff; font-weight: 900; display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; border-radius: 8px; box-shadow: 0 2px 8px rgba(16,185,129,0.4);">
             <span>✨</span> <span>+ नया उत्पाद जोड़ें</span>
           </button>
-          <button type="button" id="btn-close-master-product-card" class="admin-button icon-button" style="color: var(--admin-muted); font-size: 1.25rem;">✕</button>
-        </div>
-      </div>
-
-      <!-- Search & Category Filters -->
-      <div style="background: #090f1d; border: 1px solid #1e293b; border-radius: 10px; padding: 14px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;">
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
-          <div style="flex: 1; min-width: 260px;">
-            <input type="text" id="mpm-search-input" class="admin-input" placeholder="🔍 उत्पाद का नाम, घटक, विवरण या सब-कैटेगरी खोजें..." style="width: 100%; padding: 8px 12px; font-size: 0.85rem;" />
-          </div>
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <select id="mpm-filter-category" class="admin-select" style="padding: 7px 12px; font-size: 0.82rem; min-width: 190px;">
-              <option value="all">🌟 सभी मुख्य कैटेगरी</option>
-            </select>
-            <select id="mpm-filter-subcategory" class="admin-select" style="padding: 7px 12px; font-size: 0.82rem; min-width: 190px;">
-              <option value="all">🏷️ सभी सब-कैटेगरी</option>
-            </select>
-          </div>
-        </div>
-        <!-- Category Quick Pills Bar -->
-        <div id="mpm-category-pills" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
-      </div>
-
-      <!-- Products Accordion Container -->
-      <div id="master-products-list-container" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; max-height: 65vh; overflow-y: auto; padding-right: 6px;">
-        <div style="text-align: center; padding: 40px; color: #94a3b8;">उत्पाद लोड हो रहे हैं...</div>
-      </div>
-
-      <!-- Bottom Action Bar -->
-      <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center; border-top: 1.5px solid var(--admin-border, #334155); padding-top: 14px; flex-wrap: wrap;">
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <button type="button" id="btn-export-master-products" onclick="window.exportMasterProductsJson()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
-            📥 Export Products JSON
+          <button type="button" onclick="window.saveMasterProducts()" class="admin-button small-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 6px 16px; border-radius: 8px; box-shadow: 0 4px 14px rgba(22,163,74,0.45); white-space: nowrap;">
+            <span>💾</span> <span>Save Live</span>
           </button>
-          <span style="font-size: 0.78rem; color: #34d399; display: flex; align-items: center; gap: 4px;">
-            ⚡ 'Save & Push to Git' दबाते ही local और remote Git repo दोनों तुरंत सिंक होंगे
+          <button type="button" id="btn-close-master-product-card" class="admin-button icon-button" style="color: #cbd5e1; font-size: 1.3rem; background: rgba(255,255,255,0.08); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);" title="बंद करें">✕</button>
+        </div>
+      </header>
+
+      <!-- Main Scrollable Canvas Area (Flex: 1; min-height: 0; overflow-y: auto) -->
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 20px 24px 80px 24px; background: #070d19; scroll-behavior: smooth;">
+        <div style="max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
+          
+          <!-- Search & Category Filters Toolbar -->
+          <div style="background: #0d1527; border: 1.5px solid #1e293b; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.3);">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+              <div style="flex: 1; min-width: 260px;">
+                <input type="text" id="mpm-search-input" class="admin-input" placeholder="🔍 उत्पाद का नाम, घटक, विवरण या सब-कैटेगरी खोजें..." style="width: 100%; padding: 9px 14px; font-size: 0.88rem; background: #070d19; border: 1.5px solid #334155; border-radius: 8px; color: #fff;" />
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <select id="mpm-filter-category" class="admin-select" style="padding: 8px 12px; font-size: 0.84rem; min-width: 200px; background: #070d19; border: 1.5px solid #334155; border-radius: 8px; color: #fde047;">
+                  <option value="all">🌟 सभी मुख्य कैटेगरी</option>
+                </select>
+                <select id="mpm-filter-subcategory" class="admin-select" style="padding: 8px 12px; font-size: 0.84rem; min-width: 200px; background: #070d19; border: 1.5px solid #334155; border-radius: 8px; color: #38bdf8;">
+                  <option value="all">🏷️ सभी सब-कैटेगरी</option>
+                </select>
+              </div>
+            </div>
+            <!-- Category Quick Pills Bar -->
+            <div id="mpm-category-pills" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
+          </div>
+
+          <!-- Products Accordion Container -->
+          <div id="master-products-list-container" style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="text-align: center; padding: 40px; color: #94a3b8;">उत्पाद लोड हो रहे हैं...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Docked Studio Bottom Footer Bar -->
+      <footer style="height: 56px; min-height: 56px; flex-shrink: 0; background: #0b1220; border-top: 1.5px solid #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 50; box-shadow: 0 -4px 16px rgba(0,0,0,0.5);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: #34d399;">
+            ⚡ Auto Git Push Active
+          </span>
+          <span style="font-size: 0.76rem; color: #94a3b8;">
+            • बदलाव करने के बाद 'सुरक्षित करें व Git पर पुश करें' दबाएं
           </span>
         </div>
-        <div style="display: flex; gap: 10px;">
-          <button type="button" id="btn-cancel-master-product-card" class="admin-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted);">
-            रद्द करें
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" id="btn-export-master-products" onclick="window.exportMasterProductsJson()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; padding: 8px 14px; font-size: 0.82rem; border-radius: 8px;">
+            📥 Export JSON
           </button>
-          <button type="button" id="btn-save-master-products" onclick="window.saveMasterProducts()" class="admin-button" style="background: #10b981; color: #fff; font-weight: 900; padding: 10px 24px; box-shadow: 0 4px 16px rgba(16,185,129,0.45); cursor: pointer;">
+          <button type="button" id="btn-cancel-master-product-card" class="admin-button" style="background: transparent; border: 1.5px solid #334155; color: #cbd5e1; padding: 8px 16px; font-weight: 700; font-size: 0.82rem; border-radius: 8px; cursor: pointer;">
+            बंद करें
+          </button>
+          <button type="button" id="btn-save-master-products" onclick="window.saveMasterProducts()" class="admin-button" style="background: #10b981; color: #fff; font-weight: 900; padding: 9px 24px; font-size: 0.88rem; border-radius: 8px; box-shadow: 0 4px 16px rgba(16,185,129,0.45); cursor: pointer; white-space: nowrap;">
             💾 सभी उत्पाद सुरक्षित करें व Git पर पुश करें
           </button>
         </div>
-      </div>
+      </footer>
     </div>
 
     <!-- BACKDROP OVERLAY FOR SIDE DRAWER -->
@@ -4312,16 +4331,33 @@ export async function initPageEditor() {
   const mpmCatSelect = document.getElementById('mpm-filter-category');
   const mpmSubSelect = document.getElementById('mpm-filter-subcategory');
 
-  openMpmBtn?.addEventListener('click', () => {
+  function openMpmStudio() {
     if (mpmCard) {
-      mpmCard.style.display = 'block';
+      mpmCard.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
       fetchMasterProductsData();
-      mpmCard.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  function closeMpmStudio() {
+    if (mpmCard) {
+      mpmCard.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }
+
+  window.openMpmStudio = openMpmStudio;
+  window.closeMpmStudio = closeMpmStudio;
+
+  openMpmBtn?.addEventListener('click', openMpmStudio);
+  closeMpmBtn?.addEventListener('click', closeMpmStudio);
+  cancelMpmBtn?.addEventListener('click', closeMpmStudio);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mpmCard && mpmCard.style.display !== 'none') {
+      closeMpmStudio();
     }
   });
-
-  closeMpmBtn?.addEventListener('click', () => { if (mpmCard) mpmCard.style.display = 'none'; });
-  cancelMpmBtn?.addEventListener('click', () => { if (mpmCard) mpmCard.style.display = 'none'; });
 
   mpmSearchInput?.addEventListener('input', (e) => {
     mpmSearchQuery = (e.target.value || '').trim();
