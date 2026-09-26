@@ -998,59 +998,11 @@
       "pdf_url": "/pdf/full/BK015.pdf",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
-        "/images/books/bk015-preview-6.webp",
-        "/images/books/bk015-preview-7.webp",
-        "/images/books/bk015-preview-8.webp",
-        "/images/books/bk015-preview-9.webp",
-        "/images/books/bk015-preview-10.webp",
-        "/images/books/bk015-preview-11.webp",
-        "/images/books/bk015-preview-12.webp",
-        "/images/books/bk015-preview-13.webp"
-      ],
-      "demo_images": [
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
-        "/images/books/bk015-preview-6.webp",
-        "/images/books/bk015-preview-7.webp",
-        "/images/books/bk015-preview-8.webp",
-        "/images/books/bk015-preview-9.webp",
-        "/images/books/bk015-preview-10.webp",
-        "/images/books/bk015-preview-11.webp",
-        "/images/books/bk015-preview-12.webp",
-        "/images/books/bk015-preview-13.webp"
-      ],
-      "preview_images": [
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
-        "/images/books/bk015-preview-6.webp",
-        "/images/books/bk015-preview-7.webp",
-        "/images/books/bk015-preview-8.webp",
-        "/images/books/bk015-preview-9.webp",
-        "/images/books/bk015-preview-10.webp",
-        "/images/books/bk015-preview-11.webp",
-        "/images/books/bk015-preview-12.webp",
-        "/images/books/bk015-preview-13.webp"
-      ],
-      "previewImages": [
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
-        "/images/books/bk015-preview-6.webp",
-        "/images/books/bk015-preview-7.webp",
-        "/images/books/bk015-preview-8.webp",
-        "/images/books/bk015-preview-9.webp",
-        "/images/books/bk015-preview-10.webp",
-        "/images/books/bk015-preview-11.webp",
-        "/images/books/bk015-preview-12.webp",
-        "/images/books/bk015-preview-13.webp"
-      ],
-      "demoAvailable": true,
+      "demoImages": [],
+      "demo_images": [],
+      "preview_images": [],
+      "previewImages": [],
+      "demoAvailable": false,
       "demo_reader_pages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
       "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
       "og_image": "/images/banners/bk015-hero-banner.webp",
@@ -1066,58 +1018,18 @@
         "mp3_url": "",
         "tts_text": "किसान भाई क्या आप भी चाहते हैं कि आपकी सब्जियों की खेती में मेहनत कम हो और पैदावार बेहतर हो लेकिन सही बीज सही खाद सिंचाई और कीट रोग प्रबंधन की जानकारी के लिए आपको अलग अलग जगह भटकना पड़ता है\nअब आपकी इस समस्या का समाधान है\nभारत में पहली बार पेश है Krishi Audio E-Book\nयह सिर्फ एक ई बुक नहीं बल्कि आपकी खेती का डिजिटल ज्ञान साथी है\nइसमें आपको टमाटर मिर्च शिमला मिर्च बैंगन भिंडी खीरा ककड़ी लौकी करेला तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती की पूरी जानकारी मिलेगी\nबीज चयन खेत की तैयारी बुवाई पौधों की दूरी खाद पोषण सिंचाई कीट रोग प्रबंधन कटाई और बाजार तक की जानकारी\nसब कुछ एक ही जगह\nआप इसे मोबाइल पर पढ़ भी सकते हैं और सुन भी सकते हैं\nअपनी भाषा में आसान और व्यावहारिक कृषि ज्ञान\nभारत में पहली बार पढ़िए भी सुनिए भी और सीखिए भी\nकिसान का ज्ञान करेगा मालामाल\nबेहतर खेती बेहतर भविष्य\nअभी अपनी Krishi Audio E-Book शुरू करें",
         "story_text": "किसान भाई क्या आप भी चाहते हैं कि आपकी सब्जियों की खेती में मेहनत कम हो और पैदावार बेहतर हो लेकिन सही बीज सही खाद सिंचाई और कीट रोग प्रबंधन की जानकारी के लिए आपको अलग अलग जगह भटकना पड़ता है\nअब आपकी इस समस्या का समाधान है\nभारत में पहली बार पेश है Krishi Audio E-Book\nयह सिर्फ एक ई बुक नहीं बल्कि आपकी खेती का डिजिटल ज्ञान साथी है\nइसमें आपको टमाटर मिर्च शिमला मिर्च बैंगन भिंडी खीरा ककड़ी लौकी करेला तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती की पूरी जानकारी मिलेगी\nबीज चयन खेत की तैयारी बुवाई पौधों की दूरी खाद पोषण सिंचाई कीट रोग प्रबंधन कटाई और बाजार तक की जानकारी\nसब कुछ एक ही जगह\nआप इसे मोबाइल पर पढ़ भी सकते हैं और सुन भी सकते हैं\nअपनी भाषा में आसान और व्यावहारिक कृषि ज्ञान\nभारत में पहली बार पढ़िए भी सुनिए भी और सीखिए भी\nकिसान का ज्ञान करेगा मालामाल\nबेहतर खेती बेहतर भविष्य\nअभी अपनी Krishi Audio E-Book शुरू करें",
-        "highlights": [
-          {
-            "icon": "🌱",
-            "text": " फसल की सही शुरुआत  बीज से पौध तैयार करने तक — खेती की मजबूत नींव बनाएं।"
-          },
-          {
-            "icon": "🐛",
-            "text": " रोग और कीट की पहचान  फसल में परेशानी दिखे तो कारण समझें और सही प्रबंधन सीखें।"
-          },
-          {
-            "icon": "🌿 ",
-            "text": " पोषण का सही ज्ञान  खाद, उर्वरक और पौधों की जरूरतों को समझकर बेहतर फैसले लें।"
-          },
-          {
-            "icon": "💧",
-            "text": " पानी और मिट्टी की समझ  सिंचाई, मिट्टी और पानी की गुणवत्ता से जुड़ी जरूरी जानकारी।"
-          },
-          {
-            "icon": "🎧 ",
-            "text": "पढ़ें भी, सुनें भी  मोबाइल पर अपनी सुविधा के अनुसार ई-बुक पढ़ें या ऑडियो सुनें।"
-          },
-          {
-            "icon": "📈 ",
-            "text": "ज्ञान से बेहतर खेती  सही जानकारी के साथ खेती के फैसले बेहतर बनाएं और आगे बढ़ें।"
-          },
-          {
-            "icon": " 🔥 ",
-            "text": "ज्ञान ही असली पूंजी है!  आज का सही ज्ञान, कल की बेहतर खेती।  किसान का ज्ञान करेगा मालामाल — बेहतर खेती, बेहतर भविष्य!"
-          },
-          {
-            "icon": "🎧 ",
-            "text": "अभी पढ़ें और सुनना शुरू करें"
-          }
-        ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1999 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
         "bgm_enabled": true,
         "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
       },
-      "features": [
-        "120 पेज की प्रीमियम",
-        "300+ फोटो",
-        "Spray Science",
-        "Free Bonus PDF",
-        "with Audio "
-      ],
+      "features": [],
       "totalPages": 154,
       "author": "Dada Avnish Mishra",
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-26T19:34:28.914Z",
+      "updated_at": "2026-09-26T19:36:45.190Z",
       "admin_edited": true
     },
     {
