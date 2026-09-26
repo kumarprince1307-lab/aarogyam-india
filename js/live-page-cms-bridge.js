@@ -322,9 +322,9 @@
       if (idx !== 0) slideDiv.style.display = 'none';
 
       // Banner mode detection:
-      // If s.banner_mode === 'full' OR (isHealthPage && !s.subtitle) OR non-health page:
-      // render 100% full panoramic banner so 1600x639 wide banners are NEVER cropped!
-      const isCardMode = s.banner_mode === 'card' || (isHealthPage && s.banner_mode !== 'full' && (s.subtitle && s.subtitle.trim().length > 0));
+      // Only switch to split card layout if s.banner_mode === 'card' is explicitly chosen.
+      // Default to 100% full panoramic banner so widescreen banners are never cropped or randomly swapped!
+      const isCardMode = s.banner_mode === 'card';
 
       if (isCardMode) {
         const tag = s.tag || 'HEALTH CARE';
@@ -715,7 +715,7 @@
         if (!dietGallery) {
           dietGallery = document.createElement('div');
           dietGallery.className = 'cms-diet-gallery';
-          dietGallery.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:14px;';
+          dietGallery.style.cssText = 'display:flex; flex-direction:column; gap:12px; margin-top:14px;';
           dietBox.appendChild(dietGallery);
         }
         dietGallery.innerHTML = de.diet.images.map(imgObj => {
@@ -723,9 +723,9 @@
           const caption = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
           if (!url) return '';
           return `
-            <div style="background:#ffffff; border-radius:10px; overflow:hidden; border:1.5px solid #bfdbfe; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; flex-direction:column;">
-              <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'डाइट फोटो')}" loading="lazy" style="width:100%; height:130px; object-fit:cover; display:block; cursor:pointer;" onclick="window.open('${escapeHtml(url)}', '_blank')" onerror="this.parentElement.style.display='none'">
-              ${caption ? `<div style="padding:4px 6px; font-size:0.75rem; font-weight:700; color:#1e3a8a; text-align:center; line-height:1.2; background:#f0f9ff;">${escapeHtml(caption)}</div>` : ''}
+            <div style="background:#ffffff; border-radius:12px; overflow:hidden; border:1.5px solid #bfdbfe; box-shadow:0 3px 10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+              <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'डाइट फोटो')}" loading="lazy" style="width:100%; height:auto; max-height:380px; object-fit:contain; background:#ffffff; display:block; cursor:pointer;" onclick="window.open('${escapeHtml(url)}', '_blank')" onerror="this.parentElement.style.display='none'">
+              ${caption ? `<div style="padding:6px 10px; font-size:0.78rem; font-weight:700; color:#1e3a8a; text-align:center; line-height:1.3; background:#f0f9ff; border-top:1px solid #dbeafe;">${escapeHtml(caption)}</div>` : ''}
             </div>
           `;
         }).join('');
@@ -754,7 +754,7 @@
         if (!exGallery) {
           exGallery = document.createElement('div');
           exGallery.className = 'cms-exercise-gallery';
-          exGallery.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:14px;';
+          exGallery.style.cssText = 'display:flex; flex-direction:column; gap:12px; margin-top:14px;';
           exBox.appendChild(exGallery);
         }
         exGallery.innerHTML = de.exercise.images.map(imgObj => {
@@ -762,9 +762,9 @@
           const caption = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
           if (!url) return '';
           return `
-            <div style="background:#ffffff; border-radius:10px; overflow:hidden; border:1.5px solid #bbf7d0; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; flex-direction:column;">
-              <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'व्यायाम व योगासन')}" loading="lazy" style="width:100%; height:130px; object-fit:cover; display:block; cursor:pointer;" onclick="window.open('${escapeHtml(url)}', '_blank')" onerror="this.parentElement.style.display='none'">
-              ${caption ? `<div style="padding:4px 6px; font-size:0.75rem; font-weight:700; color:#14532d; text-align:center; line-height:1.2; background:#f0fdf4;">${escapeHtml(caption)}</div>` : ''}
+            <div style="background:#ffffff; border-radius:12px; overflow:hidden; border:1.5px solid #bbf7d0; box-shadow:0 3px 10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+              <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'व्यायाम व योगासन')}" loading="lazy" style="width:100%; height:auto; max-height:380px; object-fit:contain; background:#ffffff; display:block; cursor:pointer;" onclick="window.open('${escapeHtml(url)}', '_blank')" onerror="this.parentElement.style.display='none'">
+              ${caption ? `<div style="padding:6px 10px; font-size:0.78rem; font-weight:700; color:#14532d; text-align:center; line-height:1.3; background:#f0fdf4; border-top:1px solid #dcfce7;">${escapeHtml(caption)}</div>` : ''}
             </div>
           `;
         }).join('');
@@ -892,9 +892,10 @@
         }
         @media (max-width: 768px) {
           #live-3d-floating-banner {
-            top: 95px !important;
-            left: 10px !important;
-            max-width: 155px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            left: 8px !important;
+            max-width: 140px !important;
           }
         }
       `;
@@ -905,8 +906,8 @@
       fbEl = document.createElement('div');
       fbEl.id = 'live-3d-floating-banner';
       fbEl.style.cssText = `
-        position: fixed; top: 110px; left: 18px; z-index: 9990;
-        max-width: 220px; cursor: pointer; transition: transform 0.3s ease;
+        position: fixed; top: 50%; transform: translateY(-50%); left: 16px; z-index: 9990;
+        max-width: 200px; cursor: pointer; transition: transform 0.3s ease;
       `;
       document.body.appendChild(fbEl);
     }

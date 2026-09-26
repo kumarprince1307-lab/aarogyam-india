@@ -2026,6 +2026,76 @@ export async function initPageEditor() {
                 "image": "/images/banners/pashu-palan-banner.jpg"
             }
         ]
+    },
+    {
+        "id": "page_health_sexual_wellness",
+        "slug": "health-sexual-wellness",
+        "name": "⚡ पौरुष शक्ति व यौन स्वास्थ्य",
+        "url": "/health/sexual-wellness.html",
+        "category": "Healthcare Sub-page",
+        "status": "active",
+        "theme_primary": "#b45309",
+        "theme_dark": "#78350f",
+        "fb_pixel": true,
+        "ga_tag": true,
+        "ticker_text": "⚡ भ्रामक प्रचार व केमिकल दवाओं से सावधान • 100% सुरक्षित प्राकृतिक पोषण, पेल्विक योगासन व वैज्ञानिक लाइफस्टाइल से पाएं खोई हुई शक्ति • 🩺 24×7 गोपनीय AI डॉक्टर परामर्श",
+        "hero_slides": [
+            {
+                "image": "/images/banners/health-banner.jpeg",
+                "tag": "⚡ VITALITY & MEN'S HEALTH",
+                "title": "पौरुष कमजोरी: भ्रामक दवाओं से बचें, वैज्ञानिक समाधान चुनें",
+                "subtitle": "नसों में ब्लड फ्लो, टेस्टोस्टेरोन और सहनशक्ति का 100% सुरक्षित आयुर्वेदिक कायाकल्प।",
+                "cta_text": "💬 गोपनीय AI डॉक्टर परामर्श",
+                "cta_link": "https://wa.me/917974422572"
+            }
+        ],
+        "sections_order": [
+            "sec_ticker",
+            "sec_hero_slider",
+            "sec_kpi_badges",
+            "sec_page_kpi_sections",
+            "sec_scientific_breakdown",
+            "sec_diet",
+            "sec_products",
+            "sec_faqs",
+            "sec_videos",
+            "sec_reviews",
+            "sec_help_support"
+        ],
+        "hidden_sections": [],
+        "kpi_cards": [
+            {
+                "icon": "fa-shield-halved",
+                "title": "100% केमिकल व स्टेरॉइड फ्री",
+                "desc": "शून्य साइड इफेक्ट्स। दिल, किडनी और लिवर के लिए 100% सुरक्षित प्राकृतिक पोषण।"
+            },
+            {
+                "icon": "fa-bolt",
+                "title": "टेस्टोस्टेरोन पुनरुद्धार",
+                "desc": "प्राकृतिक जिंक, अश्वगंधा व मूसली से पुरुष हार्मोन का प्राकृतिक संतुलन।"
+            }
+        ],
+        "videos": [],
+        "marketing_cards": [],
+        "reviews": [],
+        "faqs": [],
+        "whatsapp_support": {
+            "number": "917974422572",
+            "prompt": "नमस्ते, मुझे पौरुष व यौन स्वास्थ्य पर गोपनीय और सुरक्षित परामर्श चाहिए।"
+        },
+        "audio_title": "पौरुष शक्ति व यौन स्वास्थ्य समाधान",
+        "audio_script": "नमस्ते {name} जी! पौरुष शक्ति व यौन स्वास्थ्य पेज पर आपका स्वागत है।",
+        "products": [
+            {
+                "id": "SW001",
+                "name": "Naturamore For Him (वाइटैलिटी न्यूट्रास्यूटिकल)",
+                "price": 1425,
+                "mrp": 1425,
+                "badge": "पुरुष स्वास्थ्य व स्टैमिना",
+                "description": "अश्वगंधा, गोखरू, सफेद मूसली, जिनसेंग व 72% प्लांट प्रोटीन। शारीरिक सहनशक्ति, स्टैमिना और प्राकृतिक टेस्टोस्टेरोन स्तर को सुदृढ़ करे।",
+                "image": "/images/products/product-889-1-398356-hvb9.webp"
+            }
+        ]
     }
 ];
 
