@@ -125,13 +125,58 @@ export async function initAllSurveys() {
       search: searchInput?.value || ''
     };
 
-    const res = await fetchAllSurveys(params);
-    if (!res.success) {
-      container.innerHTML = '<div class="admin-error"><strong>Unable to load survey records.</strong></div>';
-      return;
+    let serverSurveys = [];
+    try {
+      const res = await fetchAllSurveys(params);
+      if (res && res.success && Array.isArray(res.data)) {
+        serverSurveys = res.data;
+      }
+    } catch (err) {
+      console.warn('Server surveys fetch notice:', err);
     }
 
-    allSurveysData = res.data || [];
+    // Merge local NetSurf Career leads
+    let localLeads = [];
+    try {
+      const rawLeads = JSON.parse(localStorage.getItem('aim_ns_leads') || '[]');
+      localLeads = rawLeads.map((l, idx) => ({
+        id: 'ns_lead_' + idx,
+        name: l.name || 'Visitor Lead',
+        mobile: l.mobile || '',
+        selected_categories: ['netsurf'],
+        village: l.city || 'Netsurf Web',
+        district: l.city || 'Web Lead',
+        owner_name: l.sponsor || 'Netsurf Career Page',
+        profile_id: 'local_lead',
+        created_at: l.date || new Date().toISOString(),
+        category_answers: {
+          'Background': l.background || 'Prospect',
+          'Income Goal': l.target || '₹8,19,250',
+          'Interest': l.interest || 'Netsurf Direct Selling',
+          'Source': 'Netsurf Career Landing Page'
+        }
+      }));
+    } catch (e) {}
+
+    allSurveysData = [...localLeads, ...serverSurveys];
+
+    // Filter by search or category if selected
+    if (params.category && params.category !== 'all') {
+      allSurveysData = allSurveysData.filter(s => {
+        const c = Array.isArray(s.selected_categories) ? s.selected_categories.join(' ').toLowerCase() : String(s.selected_categories || '').toLowerCase();
+        return c.includes(params.category.toLowerCase());
+      });
+    }
+
+    if (params.search && params.search.trim()) {
+      const q = params.search.toLowerCase().trim();
+      allSurveysData = allSurveysData.filter(s => 
+        (s.name && s.name.toLowerCase().includes(q)) || 
+        (s.mobile && s.mobile.includes(q)) || 
+        (s.village && s.village.toLowerCase().includes(q))
+      );
+    }
+
     currentPage = 1;
     renderTable();
   }

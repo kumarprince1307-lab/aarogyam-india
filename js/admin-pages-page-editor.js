@@ -2987,11 +2987,16 @@ export async function initPageEditor() {
               <div style="font-weight: 800; color: #c084fc; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
                 <span>🛍️ 10.2 उत्पाद प्रबंधक (Product Manager — इमेज • MRP • छूट% • खुराक)</span>
               </div>
-              <small style="color: var(--admin-muted); font-size: 0.75rem;">पेज पर दिखाए जाने वाले उत्पादों की WebP इमेज (auto-folder), MRP, डिस्काउंट% और खुराक प्रबंधित करें</small>
+              <small style="color: var(--admin-muted); font-size: 0.75rem;">Netsurf मास्टर से 1-क्लिक में उत्पाद चुनें या नया कस्टम उत्पाद जोड़ें, छूट% सेट करें और इमेज बदलें</small>
             </div>
-            <button type="button" id="btn_add_product" class="admin-button small-button" style="background: #7c3aed; color: #fff; font-weight: 800;">
-              + नया उत्पाद जोड़ें
-            </button>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <select id="pe_netsurf_preset_select" class="admin-select" style="background: #0f172a; color: #fde047; border: 1.5px solid #a855f7; font-weight: 700; font-size: 0.8rem; padding: 6px 10px; border-radius: 8px; max-width: 290px; cursor: pointer;">
+                <option value="">⚡ Netsurf मास्टर से चुनें (Auto-Fill)...</option>
+              </select>
+              <button type="button" id="btn_add_product" class="admin-button small-button" style="background: #7c3aed; color: #fff; font-weight: 800;">
+                + नया कस्टम उत्पाद
+              </button>
+            </div>
           </div>
           <div id="pe_products_container" style="display: flex; flex-direction: column; gap: 12px;">
             <!-- Rendered dynamically -->
@@ -3868,13 +3873,55 @@ export async function initPageEditor() {
     renderFaqsInBuilder();
   });
 
+  let netsurfMasterCatalog = [];
+  async function loadNetsurfMasterCatalog() {
+    try {
+      const res = await fetch('/data/netsurf-products-master.json?v=' + Date.now());
+      if (res.ok) {
+        const data = await res.json();
+        netsurfMasterCatalog = data.products || [];
+        const sel = document.getElementById('pe_netsurf_preset_select');
+        if (sel && netsurfMasterCatalog.length > 0) {
+          sel.innerHTML = '<option value="">⚡ Netsurf मास्टर से चुनें (1-Click Auto-Fill)...</option>' + 
+            netsurfMasterCatalog.map(p => `<option value="${p.id}">[${p.category_label}] ${p.name} - ₹${p.mrp} (${p.discount_pct}% छूट)</option>`).join('');
+        }
+      }
+    } catch (e) {
+      console.warn('Could not load Netsurf master catalog:', e);
+    }
+  }
+  loadNetsurfMasterCatalog();
+
+  document.getElementById('pe_netsurf_preset_select')?.addEventListener('change', function() {
+    const pid = this.value;
+    if (!pid) return;
+    const p = netsurfMasterCatalog.find(item => item.id === pid);
+    if (p) {
+      currentProducts.push({
+        title: p.name,
+        name: p.name,
+        description: p.description,
+        image: p.image,
+        mrp: p.mrp,
+        price: p.mrp,
+        discount_pct: p.discount_pct || 20,
+        dose: p.dose || '',
+        badge: p.badge || p.category_label,
+        whatsapp_link: 'https://wa.me/917974422572'
+      });
+      renderProductsInBuilder();
+      this.value = '';
+      showToast(`✓ "${p.name}" मास्टर से जोड़ा गया! अब आप चाहें तो इमेज बदल सकते हैं।`, 'success');
+    }
+  });
+
   document.getElementById('btn_add_product')?.addEventListener('click', () => {
     currentProducts.push({
       title: 'नया उत्पाद (New Product)',
       description: 'उत्पाद के लाभ व उपयोग विधि यहाँ लिखें...',
       image: '',
       mrp: 850,
-      discount_pct: 0,
+      discount_pct: 20,
       dose: '2ml / लीटर पानी',
       whatsapp_link: 'https://wa.me/917974422572'
     });
@@ -4690,6 +4737,14 @@ export async function initPageEditor() {
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">MRP (₹)*</label>
               <input type="number" value="${prodMrp}" onchange="window.updateProduct(${idx}, 'mrp', Number(this.value)); window.updateProduct(${idx}, 'price', Number(this.value)); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="650"/>
+            </div>
+            <div>
+              <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">छूट % (Discount %)</label>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <input type="number" min="0" max="90" value="${prod.discount_pct !== undefined ? prod.discount_pct : 20}" onchange="window.updateProduct(${idx}, 'discount_pct', Number(this.value)); window.renderProductsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" placeholder="20"/>
+                <span style="font-size:0.8rem; color:#fde047; font-weight:800;">%</span>
+              </div>
+              ${offerPrice ? `<div style="font-size:0.72rem; color:#4ade80; font-weight:800; margin-top:3px;">ऑफ़र मूल्य: ₹${offerPrice} (${prod.discount_pct || 0}% छूट)</div>` : ''}
             </div>
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">बैज / श्रेणी (Badge)</label>

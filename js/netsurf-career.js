@@ -230,7 +230,7 @@
       // Store lead locally for safety
       try {
         const storedLeads = JSON.parse(localStorage.getItem('aim_ns_leads') || '[]');
-        storedLeads.push({ name, mobile, city, background, target, interest, date: new Date().toISOString() });
+        storedLeads.push({ name, mobile, city, background, target, interest, sponsor: currentSponsor.name, date: new Date().toISOString() });
         localStorage.setItem('aim_ns_leads', JSON.stringify(storedLeads));
       } catch (err) {}
 
