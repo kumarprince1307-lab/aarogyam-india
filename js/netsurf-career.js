@@ -57,7 +57,7 @@
     initIncomeCalculator();
     initSurveyForm();
     initVideoPlayer();
-    initKypTabs();
+    initKypProductsAndTabs();
     initFaqAccordion();
   });
 
@@ -270,21 +270,139 @@
   }
 
   /**
-   * 5. KYP CATEGORY FILTER TABS
+   * 5. DYNAMIC KYP PRODUCTS & CATEGORY FILTER TABS
    */
-  function initKypTabs() {
-    const tabs = document.querySelectorAll('.ns-kyp-tab-btn');
-    const cards = document.querySelectorAll('.ns-product-card');
+  async function initKypProductsAndTabs() {
+    const tabsContainer = document.querySelector('.ns-kyp-tabs');
+    const gridContainer = document.querySelector('.ns-kyp-grid');
+    if (!gridContainer) return;
 
-    if (!tabs || tabs.length === 0) return;
+    let productsData = null;
 
-    tabs.forEach(tab => {
+    // 1. Try local cache first for instant render
+    try {
+      const localCached = localStorage.getItem('aim_netsurf_products_master');
+      if (localCached) {
+        productsData = JSON.parse(localCached);
+      }
+    } catch (e) {}
+
+    // 2. Fetch fresh from JSON
+    try {
+      const res = await fetch('/data/netsurf-products-master.json?t=' + Date.now());
+      if (res.ok) {
+        const remoteData = await res.json();
+        if (remoteData && remoteData.products && remoteData.products.length > 0) {
+          productsData = remoteData;
+          try {
+            localStorage.setItem('aim_netsurf_products_master', JSON.stringify(remoteData));
+          } catch (e) {}
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch remote products master, using cache or static HTML:', e);
+    }
+
+    if (productsData && productsData.products && productsData.products.length > 0) {
+      // Dynamically render category tabs
+      if (tabsContainer && productsData.categories && productsData.categories.length > 0) {
+        let tabsHtml = `
+          <button type="button" class="ns-kyp-tab-btn active" data-cat="all">
+            <span>🌟</span> सभी उत्पाद (${productsData.products.length})
+          </button>
+        `;
+        productsData.categories.forEach(cat => {
+          const count = productsData.products.filter(p => p.category === cat.id).length;
+          tabsHtml += `
+            <button type="button" class="ns-kyp-tab-btn" data-cat="${cat.id}">
+              ${cat.name} (${count})
+            </button>
+          `;
+        });
+        tabsContainer.innerHTML = tabsHtml;
+      }
+
+      // Dynamically render product cards
+      const targetPhone = currentSponsor.isPersonalized ? currentSponsor.phone : DEFAULT_SUPPORT_PHONE;
+      let gridHtml = '';
+
+      productsData.products.forEach(p => {
+        const mrp = parseInt(p.mrp, 10) || 0;
+        const discountPct = parseInt(p.discount_pct, 10) || 0;
+        const offerPrice = p.discounted_price || (discountPct ? Math.round(mrp * (1 - discountPct / 100)) : mrp);
+        const imgSrc = p.image || '/images/logo/logo.png';
+
+        const waMsg = encodeURIComponent(`नमस्ते ${currentSponsor.name} जी! मुझे नेटसर्फ उत्पाद: *${p.name}* (MRP: ₹${mrp}, ऑफर रेट: ₹${offerPrice}, ${discountPct}% छूट) की जानकारी चाहिए व ऑर्डर करना है।`);
+        const waOrderUrl = `https://api.whatsapp.com/send?phone=${targetPhone}&text=${waMsg}`;
+
+        gridHtml += `
+          <div class="ns-product-card" data-product-cat="${p.category}" data-product-sub="${p.subcategory || ''}">
+            <div class="ns-product-img-wrap" style="position:relative;">
+              <img src="${imgSrc}" alt="${p.name}" onerror="this.src='/images/logo/logo.png';" loading="lazy">
+              ${p.badge ? `<span style="position:absolute;top:8px;left:8px;background:rgba(21,128,61,0.92);color:#fff;font-size:0.68rem;padding:3px 8px;border-radius:12px;font-weight:800;backdrop-filter:blur(4px);">${p.badge}</span>` : ''}
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px;flex-wrap:wrap;">
+              <span class="ns-product-badge" style="background:#dcfce7;color:#15803d;font-size:0.72rem;padding:3px 8px;border-radius:12px;font-weight:700;">
+                ${p.category_label || p.category}
+              </span>
+              ${p.subcategory_label ? `<span style="font-size:0.7rem;background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:10px;font-weight:600;">${p.subcategory_label}</span>` : ''}
+            </div>
+            <h3 class="ns-product-title" style="font-size:1.1rem;font-weight:800;color:#0f172a;margin:2px 0 6px 0;line-height:1.35;">${p.name}</h3>
+            
+            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+              <span style="font-size:1.2rem;font-weight:900;color:#16a34a;">₹${offerPrice}</span>
+              ${mrp > offerPrice ? `
+                <span style="text-decoration:line-through;color:#94a3b8;font-size:0.85rem;">₹${mrp}</span>
+                <span style="font-size:0.75rem;background:#fee2e2;color:#dc2626;padding:1px 6px;border-radius:6px;font-weight:800;">${discountPct}% छूट</span>
+              ` : ''}
+            </div>
+
+            <p class="ns-product-benefits" style="font-size:0.84rem;color:#475569;margin-bottom:10px;line-height:1.45;">
+              ${p.description || ''}
+            </p>
+
+            ${p.ingredients ? `
+              <div style="background:#f8fafc;border-left:3px solid #10b981;padding:6px 10px;border-radius:4px;margin-bottom:8px;font-size:0.76rem;color:#334155;">
+                <strong style="color:#059669;">🌱 मुख्य घटक:</strong> ${p.ingredients}
+              </div>
+            ` : ''}
+
+            ${p.dose ? `
+              <div style="background:#f0fdf4;border-left:3px solid #22c55e;padding:6px 10px;border-radius:4px;margin-bottom:8px;font-size:0.76rem;color:#166534;">
+                <strong style="color:#15803d;">📋 उपयोग व खुराक:</strong> ${p.dose}
+              </div>
+            ` : ''}
+
+            ${p.precautions ? `
+              <div style="background:#fffbeb;border-left:3px solid #f59e0b;padding:6px 10px;border-radius:4px;margin-bottom:12px;font-size:0.76rem;color:#92400e;">
+                <strong style="color:#b45309;">⚠️ सावधानियां:</strong> ${p.precautions}
+              </div>
+            ` : ''}
+
+            <div style="margin-top:auto;padding-top:10px;">
+              <a href="${waOrderUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#16a34a;color:#ffffff;font-weight:800;font-size:0.82rem;padding:9px 14px;border-radius:8px;text-decoration:none;box-shadow:0 3px 10px rgba(22,163,74,0.3);transition:all 0.2s;" onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
+                <i class="fa-brands fa-whatsapp" style="font-size:1rem;"></i>
+                <span>ऑर्डर / WhatsApp पूछताछ</span>
+              </a>
+            </div>
+          </div>
+        `;
+      });
+
+      gridContainer.innerHTML = gridHtml;
+    }
+
+    // Attach Tab Filtering Listeners
+    const allTabs = document.querySelectorAll('.ns-kyp-tab-btn');
+    const allCards = document.querySelectorAll('.ns-product-card');
+
+    allTabs.forEach(tab => {
       tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
+        allTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
         const cat = tab.getAttribute('data-cat');
-        cards.forEach(card => {
+        allCards.forEach(card => {
           if (cat === 'all' || card.getAttribute('data-product-cat') === cat) {
             card.style.display = 'flex';
           } else {

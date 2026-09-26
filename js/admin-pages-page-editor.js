@@ -2363,6 +2363,9 @@ export async function initPageEditor() {
           <button type="button" id="btn-open-achievers-manager" class="admin-button" style="background: #f59e0b; color: #000; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(245,158,11,0.3);">
             <span>🏆</span> <span>शीर्ष अचीवर्स प्रबंधक</span>
           </button>
+          <button type="button" id="btn-open-master-product-manager" class="admin-button" style="background: #10b981; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(16,185,129,0.35);">
+            <span>🛍️</span> <span>मास्टर उत्पाद प्रबंधक</span>
+          </button>
           <button id="btn-toggle-page-editor-form" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22,163,74,0.3);">
             <span>✨</span> <span>+ नया साइट पेज बनाएं</span>
           </button>
@@ -2413,6 +2416,78 @@ export async function initPageEditor() {
       </div>
     </div>
 
+    <!-- MASTER PRODUCT & CATEGORIES MANAGER MODAL / CARD -->
+    <div id="master-product-manager-card" class="admin-card" style="display: none; margin-bottom: 24px; background: var(--admin-surface-2, #0f172a); border: 2.5px solid #10b981; border-radius: 14px; padding: 22px; box-shadow: 0 10px 32px rgba(0,0,0,0.6);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--admin-border, #334155); padding-bottom: 14px; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.8rem; background: rgba(16,185,129,0.15); padding: 8px 12px; border-radius: 12px;">🛍️</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 900; color: #34d399; display: flex; align-items: center; gap: 10px;">
+              <span>मास्टर उत्पाद व कैटेगरी प्रबंधक (Master Product Manager Studio)</span>
+              <span id="mpm-total-count-badge" style="font-size: 0.76rem; background: rgba(16,185,129,0.2); color: #6ee7b7; padding: 2px 10px; border-radius: 12px; font-weight: 800;">30 उत्पाद</span>
+            </h3>
+            <small style="color: #94a3b8; font-size: 0.78rem;">कैटेगरी व सब-कैटेगरी बनाएं, फोटो, MRP, छूट%, विवरण, घटक, खुराक व सावधानियां बदलें (ऑटो Git Push सक्रिय)</small>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btn-mpm-add-category" onclick="window.addMpmCategory()" class="admin-button small-button" style="background: #8b5cf6; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+            <span>📁</span> <span>+ नई कैटेगरी</span>
+          </button>
+          <button type="button" id="btn-mpm-add-subcategory" onclick="window.addMpmSubcategory()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+            <span>🏷️</span> <span>+ नई सब-कैटेगरी</span>
+          </button>
+          <button type="button" id="btn-mpm-add-product" onclick="window.addMpmProduct()" class="admin-button small-button" style="background: #10b981; color: #fff; font-weight: 900; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 3px 10px rgba(16,185,129,0.35);">
+            <span>✨</span> <span>+ नया उत्पाद जोड़ें</span>
+          </button>
+          <button type="button" id="btn-close-master-product-card" class="admin-button icon-button" style="color: var(--admin-muted); font-size: 1.25rem;">✕</button>
+        </div>
+      </div>
+
+      <!-- Search & Category Filters -->
+      <div style="background: #090f1d; border: 1px solid #1e293b; border-radius: 10px; padding: 14px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+          <div style="flex: 1; min-width: 260px;">
+            <input type="text" id="mpm-search-input" class="admin-input" placeholder="🔍 उत्पाद का नाम, घटक, विवरण या सब-कैटेगरी खोजें..." style="width: 100%; padding: 8px 12px; font-size: 0.85rem;" />
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <select id="mpm-filter-category" class="admin-select" style="padding: 7px 12px; font-size: 0.82rem; min-width: 190px;">
+              <option value="all">🌟 सभी मुख्य कैटेगरी</option>
+            </select>
+            <select id="mpm-filter-subcategory" class="admin-select" style="padding: 7px 12px; font-size: 0.82rem; min-width: 190px;">
+              <option value="all">🏷️ सभी सब-कैटेगरी</option>
+            </select>
+          </div>
+        </div>
+        <!-- Category Quick Pills Bar -->
+        <div id="mpm-category-pills" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
+      </div>
+
+      <!-- Products Accordion Container -->
+      <div id="master-products-list-container" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; max-height: 65vh; overflow-y: auto; padding-right: 6px;">
+        <div style="text-align: center; padding: 40px; color: #94a3b8;">उत्पाद लोड हो रहे हैं...</div>
+      </div>
+
+      <!-- Bottom Action Bar -->
+      <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center; border-top: 1.5px solid var(--admin-border, #334155); padding-top: 14px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button type="button" id="btn-export-master-products" onclick="window.exportMasterProductsJson()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
+            📥 Export Products JSON
+          </button>
+          <span style="font-size: 0.78rem; color: #34d399; display: flex; align-items: center; gap: 4px;">
+            ⚡ 'Save & Push to Git' दबाते ही local और remote Git repo दोनों तुरंत सिंक होंगे
+          </span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" id="btn-cancel-master-product-card" class="admin-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted);">
+            रद्द करें
+          </button>
+          <button type="button" id="btn-save-master-products" onclick="window.saveMasterProducts()" class="admin-button" style="background: #10b981; color: #fff; font-weight: 900; padding: 10px 24px; box-shadow: 0 4px 16px rgba(16,185,129,0.45); cursor: pointer;">
+            💾 सभी उत्पाद सुरक्षित करें व Git पर पुश करें
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- BACKDROP OVERLAY FOR SIDE DRAWER -->
     <div id="page-editor-drawer-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 99998; transition: opacity 0.25s ease;"></div>
 
@@ -2454,6 +2529,7 @@ export async function initPageEditor() {
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-products', this)">🛍️ 6. उत्पाद</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-kpis', this)">✨ 7. KPI</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-marketing', this)">📢 8. सेलिंग</button>
+        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-netsurf-career', this)">💼 10.3 नेटसर्फ प्लान</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-health-cards', this)">🩺 9. रोग</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-clinical-breakdown', this)">🔬 9.1 विश्लेषण व डाइट</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-crop-cards', this)">🌾 10. फसल</button>
@@ -3679,6 +3755,587 @@ export async function initPageEditor() {
       currentAchievers[idx][field] = val;
     }
   };
+
+  
+  // ====================================================================
+  // MASTER PRODUCT MANAGER & CATEGORIES STUDIO (ULTIMATE PRO)
+  // ====================================================================
+  let masterCategories = [];
+  let masterProducts = [];
+  let mpmActiveCatFilter = 'all';
+  let mpmActiveSubFilter = 'all';
+  let mpmSearchQuery = '';
+  let mpmExpandedIdx = null;
+
+  async function fetchMasterProductsData() {
+    try {
+      // 1. Try local storage cache
+      const localCached = localStorage.getItem('aim_netsurf_products_master');
+      if (localCached) {
+        const parsed = JSON.parse(localCached);
+        if (parsed.categories && parsed.products) {
+          masterCategories = parsed.categories;
+          masterProducts = parsed.products;
+        }
+      }
+    } catch (e) {}
+
+    // 2. Fetch from data/netsurf-products-master.json
+    try {
+      const res = await fetch('../data/netsurf-products-master.json?t=' + Date.now());
+      if (res.ok) {
+        const remoteData = await res.json();
+        if (remoteData && remoteData.products && remoteData.products.length > 0) {
+          masterCategories = remoteData.categories || masterCategories;
+          masterProducts = remoteData.products;
+          localStorage.setItem('aim_netsurf_products_master', JSON.stringify(remoteData));
+        }
+      }
+    } catch (err) {
+      console.warn('Could not fetch remote netsurf-products-master.json:', err);
+    }
+
+    renderMpmFilters();
+    renderMasterProductsList();
+    syncMpmWithPresetDropdown();
+  }
+
+  function syncMpmWithPresetDropdown() {
+    const presetSelect = document.getElementById('pe_netsurf_preset_select');
+    if (!presetSelect) return;
+    const currentVal = presetSelect.value;
+    let opts = '<option value="">⚡ Netsurf मास्टर से चुनें (Auto-Fill)...</option>';
+    masterCategories.forEach(cat => {
+      const catProds = masterProducts.filter(p => p.category === cat.id);
+      if (catProds.length > 0) {
+        opts += `<optgroup label="${cat.name}">`;
+        catProds.forEach(p => {
+          opts += `<option value="${p.id}">${p.name} (MRP: ₹${p.mrp} | ${p.discount_pct || 20}% छूट)</option>`;
+        });
+        opts += `</optgroup>`;
+      }
+    });
+    presetSelect.innerHTML = opts;
+    presetSelect.value = currentVal;
+  }
+
+  function renderMpmFilters() {
+    const catSelect = document.getElementById('mpm-filter-category');
+    const subSelect = document.getElementById('mpm-filter-subcategory');
+    const pillsWrap = document.getElementById('mpm-category-pills');
+
+    if (catSelect) {
+      let catHtml = '<option value="all">🌟 सभी मुख्य कैटेगरी</option>';
+      masterCategories.forEach(c => {
+        const count = masterProducts.filter(p => p.category === c.id).length;
+        catHtml += `<option value="${c.id}" ${mpmActiveCatFilter === c.id ? 'selected' : ''}>${c.name} (${count})</option>`;
+      });
+      catSelect.innerHTML = catHtml;
+    }
+
+    if (subSelect) {
+      let subHtml = '<option value="all">🏷️ सभी सब-कैटेगरी</option>';
+      let relevantSubs = [];
+      if (mpmActiveCatFilter === 'all') {
+        masterCategories.forEach(c => {
+          (c.subcategories || []).forEach(s => relevantSubs.push({ ...s, catName: c.name }));
+        });
+      } else {
+        const selectedCat = masterCategories.find(c => c.id === mpmActiveCatFilter);
+        if (selectedCat) relevantSubs = selectedCat.subcategories || [];
+      }
+      relevantSubs.forEach(s => {
+        const count = masterProducts.filter(p => p.subcategory === s.id).length;
+        subHtml += `<option value="${s.id}" ${mpmActiveSubFilter === s.id ? 'selected' : ''}>${s.name} (${count})</option>`;
+      });
+      subSelect.innerHTML = subHtml;
+    }
+
+    if (pillsWrap) {
+      let pillsHtml = `
+        <button type="button" onclick="window.setMpmCatFilter('all')" class="pe-chip-link ${mpmActiveCatFilter === 'all' ? 'active' : ''}">
+          🌟 सभी (${masterProducts.length})
+        </button>
+      `;
+      masterCategories.forEach(c => {
+        const count = masterProducts.filter(p => p.category === c.id).length;
+        pillsHtml += `
+          <button type="button" onclick="window.setMpmCatFilter('${c.id}')" class="pe-chip-link ${mpmActiveCatFilter === c.id ? 'active' : ''}">
+            ${c.name} (${count})
+          </button>
+        `;
+      });
+      pillsWrap.innerHTML = pillsHtml;
+    }
+  }
+
+  function renderMasterProductsList() {
+    const wrap = document.getElementById('master-products-list-container');
+    const countBadge = document.getElementById('mpm-total-count-badge');
+    if (!wrap) return;
+
+    const filtered = masterProducts.map((p, idx) => ({ ...p, _idx: idx })).filter(p => {
+      if (mpmActiveCatFilter !== 'all' && p.category !== mpmActiveCatFilter) return false;
+      if (mpmActiveSubFilter !== 'all' && p.subcategory !== mpmActiveSubFilter) return false;
+      if (mpmSearchQuery) {
+        const q = mpmSearchQuery.toLowerCase();
+        const str = `${p.name || ''} ${p.category_label || ''} ${p.subcategory_label || ''} ${p.description || ''} ${p.ingredients || ''}`.toLowerCase();
+        if (!str.includes(q)) return false;
+      }
+      return true;
+    });
+
+    if (countBadge) {
+      countBadge.textContent = `${filtered.length} / ${masterProducts.length} उत्पाद`;
+    }
+
+    if (filtered.length === 0) {
+      wrap.innerHTML = `
+        <div style="text-align: center; padding: 40px; background: #0f172a; border-radius: 10px; border: 1px dashed #334155; color: #94a3b8;">
+          <span style="font-size: 2rem; display: block; margin-bottom: 8px;">🔍</span>
+          <strong>कोई उत्पाद नहीं मिला</strong>
+          <p style="font-size: 0.8rem; margin: 4px 0 12px 0;">फ़िल्टर बदलें या ऊपर दिए गए '+ नया उत्पाद जोड़ें' बटन से नया उत्पाद जोड़ें।</p>
+          <button type="button" onclick="window.setMpmCatFilter('all')" class="admin-button small-button" style="background: #10b981; color: #fff;">
+            सभी उत्पाद देखें
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    wrap.innerHTML = filtered.map(p => {
+      const idx = p._idx;
+      const isExpanded = mpmExpandedIdx === idx;
+      const currentCat = masterCategories.find(c => c.id === p.category);
+      const availableSubs = currentCat ? (currentCat.subcategories || []) : [];
+
+      const mrp = parseInt(p.mrp, 10) || 0;
+      const discountPct = parseInt(p.discount_pct, 10) || 0;
+      const offerPrice = p.discounted_price || (discountPct ? Math.round(mrp * (1 - discountPct / 100)) : mrp);
+      const imgSrc = p.image_preview || p.image || '/images/logo/logo.png';
+
+      return `
+        <div style="background: #0f172a; border: 1.5px solid ${isExpanded ? '#10b981' : '#334155'}; border-radius: 12px; overflow: hidden; transition: all 0.2s; box-shadow: ${isExpanded ? '0 4px 16px rgba(16,185,129,0.2)' : 'none'};">
+          <!-- Card Compact Header Bar -->
+          <div onclick="window.toggleMpmCard(${idx})" style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: ${isExpanded ? 'rgba(16,185,129,0.08)' : 'transparent'}; border-bottom: ${isExpanded ? '1px solid #1e293b' : 'none'}; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+              <div style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #334155; overflow: hidden; background: #1e293b; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(p.name)}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.src='/images/logo/logo.png'">
+              </div>
+              <div style="min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <strong style="color: #ffffff; font-size: 0.94rem;">${escapeHtml(p.name)}</strong>
+                  <span style="font-size: 0.7rem; background: #064e3b; color: #6ee7b7; padding: 2px 8px; border-radius: 8px; font-weight: 700;">
+                    ${escapeHtml(p.category_label || p.category)}
+                  </span>
+                  ${p.subcategory_label ? `
+                    <span style="font-size: 0.68rem; background: #1e293b; color: #cbd5e1; padding: 2px 7px; border-radius: 8px;">
+                      ${escapeHtml(p.subcategory_label)}
+                    </span>
+                  ` : ''}
+                  ${p.badge ? `
+                    <span style="font-size: 0.68rem; background: rgba(245,158,11,0.2); color: #fbbf24; padding: 2px 6px; border-radius: 6px; font-weight: 700;">
+                      ${escapeHtml(p.badge)}
+                    </span>
+                  ` : ''}
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.78rem; color: #94a3b8; margin-top: 3px; align-items: center; flex-wrap: wrap;">
+                  <span>MRP: <strong style="color: #cbd5e1;">₹${mrp}</strong></span>
+                  <span>छूट: <strong style="color: #f87171;">${discountPct}%</strong></span>
+                  <span>ऑफर रेट: <strong style="color: #34d399; font-size: 0.85rem;">₹${offerPrice}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation()">
+              <button type="button" onclick="window.duplicateMpmProduct(${idx})" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f640; font-size: 0.72rem; padding: 4px 8px;" title="डुप्लीकेट कॉपी बनाएं">
+                📋 कॉपी
+              </button>
+              <button type="button" onclick="window.deleteMpmProduct(${idx})" class="admin-button small-button" style="background: rgba(239,68,68,0.18); color: #f87171; border: 1px solid #ef444440; font-size: 0.72rem; padding: 4px 8px;" title="उत्पाद हटाएं">
+                🗑️ हटाएं
+              </button>
+              <button type="button" onclick="window.toggleMpmCard(${idx})" class="admin-button small-button" style="background: transparent; color: #cbd5e1; font-size: 0.85rem; padding: 4px 6px;">
+                ${isExpanded ? '▲ समेटें' : '▼ एडिट करें'}
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded Full Edit Form -->
+          ${isExpanded ? `
+            <div style="padding: 16px; background: #0b1120; border-top: 1px solid #1e293b; display: flex; flex-direction: column; gap: 14px;">
+              
+              <!-- Row 1: Name, Category, Sub-Category, Badge -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">उत्पाद का नाम (Product Name)*</label>
+                  <input type="text" value="${escapeHtml(p.name || '')}" oninput="window.updateMpmProductField(${idx}, 'name', this.value)" class="admin-input" style="width: 100%;" />
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label class="admin-label" style="font-size: 0.78rem; margin: 0;">मुख्य कैटेगरी (Category)</label>
+                    <a href="javascript:void(0)" onclick="window.addMpmCategory()" style="font-size: 0.72rem; color: #a78bfa; text-decoration: underline;">+ नई</a>
+                  </div>
+                  <select onchange="window.updateMpmProductCategory(${idx}, this.value)" class="admin-select" style="width: 100%;">
+                    ${masterCategories.map(c => `
+                      <option value="${c.id}" ${p.category === c.id ? 'selected' : ''}>${c.name}</option>
+                    `).join('')}
+                  </select>
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label class="admin-label" style="font-size: 0.78rem; margin: 0;">सब-कैटेगरी (Sub-Category)</label>
+                    <a href="javascript:void(0)" onclick="window.addMpmSubcategory('${p.category}')" style="font-size: 0.72rem; color: #38bdf8; text-decoration: underline;">+ नई</a>
+                  </div>
+                  <select onchange="window.updateMpmProductSubcategory(${idx}, this.value)" class="admin-select" style="width: 100%;">
+                    <option value="">-- सब-कैटेगरी चुनें --</option>
+                    ${availableSubs.map(s => `
+                      <option value="${s.id}" ${p.subcategory === s.id ? 'selected' : ''}>${s.name}</option>
+                    `).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">हाईलाइट बैज (Badge Text)</label>
+                  <input type="text" value="${escapeHtml(p.badge || '')}" oninput="window.updateMpmProductField(${idx}, 'badge', this.value)" class="admin-input" placeholder="उदा. 🌱 100% जैविक, Best Seller" style="width: 100%;" />
+                </div>
+              </div>
+
+              <!-- Row 2: MRP, Discount %, Offer Price, Photo & Upload -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; align-items: start;">
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">MRP (अधिकतम खुदरा मूल्य ₹)*</label>
+                  <input type="number" value="${p.mrp || 0}" oninput="window.updateMpmProductPrice(${idx}, 'mrp', this.value)" class="admin-input" style="width: 100%; font-weight: 700;" />
+                </div>
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">छूट प्रतिशत (Discount %)</label>
+                  <input type="number" min="0" max="100" value="${p.discount_pct || 0}" oninput="window.updateMpmProductPrice(${idx}, 'discount_pct', this.value)" class="admin-input" style="width: 100%; font-weight: 700; color: #f87171;" />
+                </div>
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">ऑफर / डिस्काउंटेड मूल्य (₹)*</label>
+                  <input type="number" id="mpm_offer_price_${idx}" value="${offerPrice}" oninput="window.updateMpmProductField(${idx}, 'discounted_price', parseFloat(this.value)||0)" class="admin-input" style="width: 100%; font-weight: 800; color: #34d399;" />
+                </div>
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">उत्पाद फोटो (WebP Image)</label>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <input type="text" value="${escapeHtml(p.image || '')}" oninput="window.updateMpmProductField(${idx}, 'image', this.value)" class="admin-input" style="flex: 1; padding: 6px 8px; font-size: 0.76rem;" placeholder="/images/products/..." />
+                    <label class="admin-button small-button" style="background: #10b981; color: #fff; cursor: pointer; padding: 6px 10px; margin: 0; font-size: 0.75rem; white-space: nowrap;">
+                      📁 अपलोड
+                      <input type="file" accept="image/*" style="display: none;" onchange="window.handleMpmProductImageUpload(${idx}, this)">
+                    </label>
+                  </div>
+                  ${imgSrc ? `
+                    <div style="margin-top: 6px; display: flex; align-items: center; gap: 8px;">
+                      <img src="${escapeHtml(imgSrc)}" alt="Preview" style="height: 38px; width: 38px; border-radius: 6px; object-fit: contain; border: 1px solid #334155; background: #070d19;" onerror="this.src='/images/logo/logo.png'" />
+                      <span style="font-size: 0.7rem; color: #86efac;">${p.image_preview ? '✓ नया अपलोड (WebP)' : '✓ एक्टिव फोटो'}</span>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+
+              <!-- Row 3: Description & Ingredients -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">उत्पाद विवरण / क्या काम करता है (Description)</label>
+                  <textarea rows="3" oninput="window.updateMpmProductField(${idx}, 'description', this.value)" class="admin-textarea" placeholder="उत्पाद का विस्तृत कार्य व लाभ..." style="width: 100%; font-size: 0.8rem;">${escapeHtml(p.description || '')}</textarea>
+                </div>
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">मुख्य घटक / सक्रिय तत्व (Ingredients)*</label>
+                  <textarea rows="3" oninput="window.updateMpmProductField(${idx}, 'ingredients', this.value)" class="admin-textarea" placeholder="अमीनो एसिड्स, सीवीड अर्क, साइटोकाइनिन, विटामिन्स..." style="width: 100%; font-size: 0.8rem;">${escapeHtml(p.ingredients || '')}</textarea>
+                </div>
+              </div>
+
+              <!-- Row 4: Dosage/Usage & Precautions -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">उपयोग विधि व खुराक (Usage & Dosage)*</label>
+                  <textarea rows="3" oninput="window.updateMpmProductField(${idx}, 'dose', this.value)" class="admin-textarea" placeholder="20-25ml प्रति 15 लीटर पंप, सुबह या शाम के समय छिड़कें..." style="width: 100%; font-size: 0.8rem;">${escapeHtml(p.dose || '')}</textarea>
+                </div>
+                <div>
+                  <label class="admin-label" style="font-size: 0.78rem;">सावधानियां / क्या न करें (Precautions & Sawdhani)*</label>
+                  <textarea rows="3" oninput="window.updateMpmProductField(${idx}, 'precautions', this.value)" class="admin-textarea" placeholder="कड़ी धूप में छिड़काव न करें। बच्चों की पहुंच से दूर और ठंडी जगह पर रखें..." style="width: 100%; font-size: 0.8rem;">${escapeHtml(p.precautions || '')}</textarea>
+                </div>
+              </div>
+
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Window Handlers for MPM
+  window.setMpmCatFilter = function(catId) {
+    mpmActiveCatFilter = catId;
+    mpmActiveSubFilter = 'all';
+    renderMpmFilters();
+    renderMasterProductsList();
+  };
+
+  window.toggleMpmCard = function(idx) {
+    mpmExpandedIdx = mpmExpandedIdx === idx ? null : idx;
+    renderMasterProductsList();
+  };
+
+  window.updateMpmProductField = function(idx, field, val) {
+    if (masterProducts[idx]) {
+      masterProducts[idx][field] = val;
+    }
+  };
+
+  window.updateMpmProductPrice = function(idx, field, val) {
+    if (masterProducts[idx]) {
+      masterProducts[idx][field] = parseFloat(val) || 0;
+      const mrp = parseFloat(masterProducts[idx].mrp) || 0;
+      const disc = parseFloat(masterProducts[idx].discount_pct) || 0;
+      const calcOffer = Math.round(mrp * (1 - disc / 100));
+      masterProducts[idx].discounted_price = calcOffer;
+      const offerInput = document.getElementById(`mpm_offer_price_${idx}`);
+      if (offerInput) offerInput.value = calcOffer;
+    }
+  };
+
+  window.updateMpmProductCategory = function(idx, catId) {
+    if (masterProducts[idx]) {
+      masterProducts[idx].category = catId;
+      const catObj = masterCategories.find(c => c.id === catId);
+      masterProducts[idx].category_label = catObj ? catObj.name.replace(/^[^\w\sऀ-ॿ]+/, '').trim() : catId;
+      masterProducts[idx].subcategory = catObj?.subcategories?.[0]?.id || '';
+      masterProducts[idx].subcategory_label = catObj?.subcategories?.[0]?.name || '';
+      renderMasterProductsList();
+    }
+  };
+
+  window.updateMpmProductSubcategory = function(idx, subId) {
+    if (masterProducts[idx]) {
+      masterProducts[idx].subcategory = subId;
+      const catObj = masterCategories.find(c => c.id === masterProducts[idx].category);
+      const subObj = catObj?.subcategories?.find(s => s.id === subId);
+      masterProducts[idx].subcategory_label = subObj ? subObj.name : '';
+    }
+  };
+
+  window.duplicateMpmProduct = function(idx) {
+    if (masterProducts[idx]) {
+      const copy = JSON.parse(JSON.stringify(masterProducts[idx]));
+      copy.id = 'ns_prod_' + Date.now().toString().slice(-5);
+      copy.name = (copy.name || 'उत्पाद') + ' (कॉपी)';
+      masterProducts.splice(idx + 1, 0, copy);
+      mpmExpandedIdx = idx + 1;
+      renderMasterProductsList();
+      showToast('📋 उत्पाद की कॉपी बना दी गई!', 'success');
+    }
+  };
+
+  window.deleteMpmProduct = function(idx) {
+    if (masterProducts[idx]) {
+      const name = masterProducts[idx].name || 'उत्पाद';
+      if (confirm(`क्या आप '${name}' को हटाना चाहते हैं?`)) {
+        masterProducts.splice(idx, 1);
+        if (mpmExpandedIdx === idx) mpmExpandedIdx = null;
+        renderMasterProductsList();
+        showToast('🗑️ उत्पाद हटा दिया गया!', 'info');
+      }
+    }
+  };
+
+  window.addMpmCategory = function() {
+    const catName = prompt('नई मुख्य कैटेगरी का नाम दर्ज करें (उदा. 👶 बेबी केयर / Baby Care):');
+    if (!catName || !catName.trim()) return;
+    const cleanName = catName.trim();
+    const catId = 'cat_' + Date.now().toString().slice(-4);
+    masterCategories.push({
+      id: catId,
+      name: cleanName,
+      subcategories: [
+        { id: catId + '_gen', name: 'सामान्य (General)' }
+      ]
+    });
+    mpmActiveCatFilter = catId;
+    renderMpmFilters();
+    renderMasterProductsList();
+    showToast(`✅ नई कैटेगरी '${cleanName}' जोड़ी गई!`, 'success');
+  };
+
+  window.addMpmSubcategory = function(prefCatId) {
+    let targetCatId = prefCatId;
+    if (!targetCatId || targetCatId === 'all') {
+      const catOptions = masterCategories.map((c, i) => `${i + 1}. ${c.name}`).join('\n');
+      const pick = prompt(`किस कैटेगरी में सब-कैटेगरी जोड़नी है? संख्या चुनें:\n${catOptions}`);
+      const pickNum = parseInt(pick, 10);
+      if (pickNum >= 1 && pickNum <= masterCategories.length) {
+        targetCatId = masterCategories[pickNum - 1].id;
+      } else {
+        return;
+      }
+    }
+    const catObj = masterCategories.find(c => c.id === targetCatId);
+    if (!catObj) return;
+
+    const subName = prompt(`कैटेगरी '${catObj.name}' के लिए नई सब-कैटेगरी का नाम दर्ज करें:`);
+    if (!subName || !subName.trim()) return;
+    const cleanSub = subName.trim();
+    if (!catObj.subcategories) catObj.subcategories = [];
+    catObj.subcategories.push({
+      id: 'sub_' + Date.now().toString().slice(-4),
+      name: cleanSub
+    });
+    renderMpmFilters();
+    renderMasterProductsList();
+    showToast(`✅ सब-कैटेगरी '${cleanSub}' जोड़ी गई!`, 'success');
+  };
+
+  window.addMpmProduct = function() {
+    const firstCat = masterCategories[0] || { id: 'agri', name: 'कृषि बायोफिट', subcategories: [] };
+    const firstSub = firstCat.subcategories?.[0] || { id: 'general', name: 'सामान्य' };
+    const newProd = {
+      id: 'ns_prod_' + Date.now().toString().slice(-5),
+      name: 'नया उत्पाद (New Product)',
+      category: firstCat.id,
+      category_label: firstCat.name,
+      subcategory: firstSub.id,
+      subcategory_label: firstSub.name,
+      badge: '✨ New Launch',
+      mrp: 600,
+      discount_pct: 25,
+      discounted_price: 450,
+      image: '/images/logo/logo.png',
+      description: 'उत्पाद का विस्तृत विवरण व मुख्य लाभ...',
+      ingredients: '100% प्राकृतिक व सक्रिय जैविक तत्व',
+      dose: 'खुराक व उपयोग विधि...',
+      precautions: 'ठंडी व सूखी जगह पर रखें। बच्चों से दूर रखें।'
+    };
+    masterProducts.unshift(newProd);
+    mpmExpandedIdx = 0;
+    renderMasterProductsList();
+    showToast('✨ नया उत्पाद फॉर्म में जोड़ा गया! विवरण भरें।', 'success');
+  };
+
+  window.handleMpmProductImageUpload = async function(idx, inputEl) {
+    const file = inputEl.files?.[0];
+    if (!file || !masterProducts[idx]) return;
+    showToast('⏳ उत्पाद फोटो प्रोसेस हो रही है (HD WebP)...', 'info');
+    try {
+      const { dataUrl } = await compressImageToWebp(file, 80000, 800);
+      if (dataUrl) {
+        const prodName = masterProducts[idx].name || 'prod';
+        const cleanPath = generateAssetPath('product', prodName);
+        masterProducts[idx].image = '/' + cleanPath;
+        masterProducts[idx].image_preview = dataUrl;
+
+        // Save to offline uploads store
+        try {
+          const off = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+          off['/' + cleanPath] = dataUrl;
+          localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(off));
+        } catch (e) {}
+
+        renderMasterProductsList();
+        showToast('✅ फोटो लोड हो गई (सुरक्षित करने पर Git में अपलोड होगी)', 'success');
+      }
+    } catch (e) {
+      showToast('❌ फोटो प्रोसेस में त्रुटि', 'error');
+    }
+  };
+
+  window.saveMasterProducts = async function() {
+    showToast('⏳ उत्पाद सुरक्षित व Git पर पुश हो रहे हैं...', 'info');
+    const masterPayload = {
+      version: "2026.2",
+      updated_at: new Date().toISOString(),
+      total_products: masterProducts.length,
+      categories: masterCategories,
+      products: masterProducts
+    };
+
+    const jsonStr = JSON.stringify(masterPayload, null, 2);
+    try {
+      localStorage.setItem('aim_netsurf_products_master', jsonStr);
+    } catch (e) {}
+
+    // 1. Try local disk write via port 5505 (if localhost)
+    let localOk = false;
+    if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+      try {
+        const locRes = await fetch('http://127.0.0.1:5505', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save_config',
+            path: 'data/netsurf-products-master.json',
+            base64: btoa(unescape(encodeURIComponent(jsonStr)))
+          })
+        });
+        const locData = await locRes.json().catch(() => ({}));
+        if (locRes.ok && locData.success) localOk = true;
+      } catch (e) {}
+    }
+
+    // 2. Push to GitHub
+    try {
+      const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
+      const syncRes = await syncAssetToGitHub('data/netsurf-products-master.json', base64Data);
+      if (syncRes.success) {
+        showToast(`✅ ${masterProducts.length} उत्पाद व कैटेगरी Git पर सफलतापूर्वक पुश हो गए!`, 'success');
+      } else if (localOk) {
+        showToast(`✅ ${masterProducts.length} उत्पाद लोकल डिस्क पर सुरक्षित हो गए!`, 'success');
+      } else {
+        showToast(`✅ ${masterProducts.length} उत्पाद स्थानीय मेमोरी (LocalStorage) में सुरक्षित हो गए!`, 'success');
+      }
+    } catch (err) {
+      showToast(`✅ ${masterProducts.length} उत्पाद सुरक्षित हो गए!`, 'success');
+    }
+
+    syncMpmWithPresetDropdown();
+  };
+
+  window.exportMasterProductsJson = function() {
+    const masterPayload = {
+      version: "2026.2",
+      updated_at: new Date().toISOString(),
+      total_products: masterProducts.length,
+      categories: masterCategories,
+      products: masterProducts
+    };
+    const blob = new Blob([JSON.stringify(masterPayload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `netsurf-products-master-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    showToast('📥 netsurf-products-master.json डाउनलोड हो गया!', 'info');
+  };
+
+  // Master Product Manager Modal Toggle Handlers
+  const mpmCard = document.getElementById('master-product-manager-card');
+  const openMpmBtn = document.getElementById('btn-open-master-product-manager');
+  const closeMpmBtn = document.getElementById('btn-close-master-product-card');
+  const cancelMpmBtn = document.getElementById('btn-cancel-master-product-card');
+  const mpmSearchInput = document.getElementById('mpm-search-input');
+  const mpmCatSelect = document.getElementById('mpm-filter-category');
+  const mpmSubSelect = document.getElementById('mpm-filter-subcategory');
+
+  openMpmBtn?.addEventListener('click', () => {
+    if (mpmCard) {
+      mpmCard.style.display = 'block';
+      fetchMasterProductsData();
+      mpmCard.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  closeMpmBtn?.addEventListener('click', () => { if (mpmCard) mpmCard.style.display = 'none'; });
+  cancelMpmBtn?.addEventListener('click', () => { if (mpmCard) mpmCard.style.display = 'none'; });
+
+  mpmSearchInput?.addEventListener('input', (e) => {
+    mpmSearchQuery = (e.target.value || '').trim();
+    renderMasterProductsList();
+  });
+
+  mpmCatSelect?.addEventListener('change', (e) => {
+    window.setMpmCatFilter(e.target.value);
+  });
+
+  mpmSubSelect?.addEventListener('change', (e) => {
+    mpmActiveSubFilter = e.target.value;
+    renderMasterProductsList();
+  });
 
   window.removeAchieverItem = function(idx) {
     currentAchievers.splice(idx, 1);
@@ -5217,6 +5874,44 @@ export async function initPageEditor() {
     renderDietImagesInBuilder();
     renderExerciseImagesInBuilder();
 
+    // 10.3 Populate Netsurf Career Plan Fields
+    const nsPlan = p.netsurf_plan || {};
+    const isNetsurfPage = p.id === 'page_netsurf_career' || p.category === 'Career & Direct Selling';
+
+    const nsLegacyEl = document.getElementById('pe_input_ns_legacy');
+    const nsSloganEl = document.getElementById('pe_input_ns_slogan');
+    const nsZeroEgressEl = document.getElementById('pe_input_ns_zero_egress');
+    const nsRetailMarginEl = document.getElementById('pe_input_ns_retail_margin');
+    const nsRetailPayoutEl = document.getElementById('pe_input_ns_retail_payout');
+    const nsCustDiscountEl = document.getElementById('pe_input_ns_customer_discount');
+    const nsAutoshipEl = document.getElementById('pe_input_ns_autoship_offer');
+    const nsTeamTurnoverEl = document.getElementById('pe_input_ns_team_turnover');
+    const nsGenSlabsEl = document.getElementById('pe_input_ns_generation_slabs');
+    const nsClosingCycleEl = document.getElementById('pe_input_ns_closing_cycle');
+    const nsMaxCappingEl = document.getElementById('pe_input_ns_max_capping');
+    const nsCareerStepsEl = document.getElementById('pe_input_ns_career_steps');
+    const nsMediclaimEl = document.getElementById('pe_input_ns_mediclaim');
+    const nsAccidentalEl = document.getElementById('pe_input_ns_accidental');
+    const nsNaturalDeathEl = document.getElementById('pe_input_ns_natural_death');
+    const nsTourRewardsEl = document.getElementById('pe_input_ns_tour_rewards');
+
+    if (nsLegacyEl) nsLegacyEl.value = nsPlan.legacy || (isNetsurfPage ? '26 वर्षों की अटूट विरासत (26 Years of Proven Excellence)' : '');
+    if (nsSloganEl) nsSloganEl.value = nsPlan.slogan || (isNetsurfPage ? 'सम्पूर्ण डायरेक्ट सेलिंग व कंज्यूमर सेलिंग मॉडल' : '');
+    if (nsZeroEgressEl) nsZeroEgressEl.value = nsPlan.zero_egress || (isNetsurfPage ? 'पारंपरिक नेटवर्क मार्केटिंग में 90% लोग मनी सर्कुलेशन और महंगे गैर-जरूरी प्रोडक्ट्स के कारण छोड़ जाते हैं। नेटसर्फ का Zero Egress फॉर्मूला दैनिक जरूरत के रिजल्ट-ओरिएंटेड प्रोडक्ट्स और ऑटोशिप रिपीट सेलिंग पर आधारित है।' : '');
+    if (nsRetailMarginEl) nsRetailMarginEl.value = nsPlan.retail_margin || (isNetsurfPage ? '5% से 15% (साप्ताहिक खुदरा लाभ)' : '');
+    if (nsRetailPayoutEl) nsRetailPayoutEl.value = nsPlan.retail_payout || (isNetsurfPage ? 'प्रत्येक सोमवार (Weekly Monday Closing & Payout)' : '');
+    if (nsCustDiscountEl) nsCustDiscountEl.value = nsPlan.customer_discount || (isNetsurfPage ? '25% तक ग्राहक डिस्काउंट' : '');
+    if (nsAutoshipEl) nsAutoshipEl.value = nsPlan.autoship_offer || (isNetsurfPage ? '5 महीने लगातार खरीदी पर 1 महीना मुफ़्त (5+1 Free Autoship)' : '');
+    if (nsTeamTurnoverEl) nsTeamTurnoverEl.value = nsPlan.team_turnover || (isNetsurfPage ? '3%, 4%, 5% (₹25,000 व ₹50,000 स्लैब)' : '');
+    if (nsGenSlabsEl) nsGenSlabsEl.value = nsPlan.generation_slabs || (isNetsurfPage ? '3% से 8% (10K=3%, 20K=4%, 40K=5%, 80K=6%, 1.2L=7%, 1.6L+=8%)' : '');
+    if (nsClosingCycleEl) nsClosingCycleEl.value = nsPlan.closing_cycle || (isNetsurfPage ? '15-15 दिन में क्लोजिंग (Bi-monthly Payout)' : '');
+    if (nsMaxCappingEl) nsMaxCappingEl.value = nsPlan.max_capping || (isNetsurfPage ? '₹8,19,250 (प्रत्येक 15 दिन की अधिकतम कैपिंग)' : '');
+    if (nsCareerStepsEl) nsCareerStepsEl.value = nsPlan.career_steps || (isNetsurfPage ? '1. डायरेक्ट सेलर (Direct Seller) - 25% छूट व 5% रिटेल मुनाफा\n2. क्लब एग्जीक्यूटिव (Club Executive) - 10% रिटेल + 3% टर्नओवर\n3. सिल्वर अचीवर (Silver Achiever) - 15% रिटेल + 4% टर्नओवर + 3% जनरेशन\n4. गोल्ड अचीवर (Gold Achiever) - 5% टर्नओवर + 5% जनरेशन + डोमेस्टिक टूर\n5. प्लेटिनम क्लब (Platinum Club) - ₹2 लाख+ क्लोजिंग + इंटरनेशनल टूर\n6. डायमंड क्लब (Diamond Club) - ₹5 लाख+ क्लोजिंग + कार फंड + फैमिली सिक्योरिटी\n7. किंग व क्वीन क्लब (King & Queen Club) - ₹8,19,250 कैपिंग + आजीवन रॉयल्टी' : '');
+    if (nsMediclaimEl) nsMediclaimEl.value = nsPlan.mediclaim || (isNetsurfPage ? '₹3,00,000 तक पारिवारिक मेडिक्लेम सुरक्षा' : '');
+    if (nsAccidentalEl) nsAccidentalEl.value = nsPlan.accidental || (isNetsurfPage ? '₹2,00,000 से ₹25,00,000 दुर्घटना सुरक्षा कवर' : '');
+    if (nsNaturalDeathEl) nsNaturalDeathEl.value = nsPlan.natural_death || (isNetsurfPage ? 'आकस्मिक निधन पर नॉमिनी के नाम बिज़नेस ट्रांसफर व निरंतर पेआउट' : '');
+    if (nsTourRewardsEl) nsTourRewardsEl.value = nsPlan.tour_rewards || (isNetsurfPage ? 'वर्ष में 2 बार फ्री राष्ट्रीय व अंतरराष्ट्रीय टूर रिवॉर्ड्स' : '');
+
     openPageDrawer();
     setTimeout(() => updateContextualSections(p.category || 'eBooks'), 60);
   };
@@ -5442,6 +6137,46 @@ export async function initPageEditor() {
       }
     }
 
+        // 10.3 Save Netsurf Career Plan Fields
+    const nsLegacy = (document.getElementById('pe_input_ns_legacy')?.value || '').trim();
+    const nsSlogan = (document.getElementById('pe_input_ns_slogan')?.value || '').trim();
+    const nsZeroEgress = (document.getElementById('pe_input_ns_zero_egress')?.value || '').trim();
+    const nsRetailMargin = (document.getElementById('pe_input_ns_retail_margin')?.value || '').trim();
+    const nsRetailPayout = (document.getElementById('pe_input_ns_retail_payout')?.value || '').trim();
+    const nsCustDiscount = (document.getElementById('pe_input_ns_customer_discount')?.value || '').trim();
+    const nsAutoship = (document.getElementById('pe_input_ns_autoship_offer')?.value || '').trim();
+    const nsTeamTurnover = (document.getElementById('pe_input_ns_team_turnover')?.value || '').trim();
+    const nsGenSlabs = (document.getElementById('pe_input_ns_generation_slabs')?.value || '').trim();
+    const nsClosingCycle = (document.getElementById('pe_input_ns_closing_cycle')?.value || '').trim();
+    const nsMaxCapping = (document.getElementById('pe_input_ns_max_capping')?.value || '').trim();
+    const nsCareerSteps = (document.getElementById('pe_input_ns_career_steps')?.value || '').trim();
+    const nsMediclaim = (document.getElementById('pe_input_ns_mediclaim')?.value || '').trim();
+    const nsAccidental = (document.getElementById('pe_input_ns_accidental')?.value || '').trim();
+    const nsNaturalDeath = (document.getElementById('pe_input_ns_natural_death')?.value || '').trim();
+    const nsTourRewards = (document.getElementById('pe_input_ns_tour_rewards')?.value || '').trim();
+
+    let netsurf_plan = null;
+    if (nsLegacy || nsZeroEgress || nsMaxCapping || editingPageId === 'page_netsurf_career' || cat === 'Career & Direct Selling') {
+      netsurf_plan = {
+        legacy: nsLegacy,
+        slogan: nsSlogan,
+        zero_egress: nsZeroEgress,
+        retail_margin: nsRetailMargin,
+        retail_payout: nsRetailPayout,
+        customer_discount: nsCustDiscount,
+        autoship_offer: nsAutoship,
+        team_turnover: nsTeamTurnover,
+        generation_slabs: nsGenSlabs,
+        closing_cycle: nsClosingCycle,
+        max_capping: nsMaxCapping,
+        career_steps: nsCareerSteps,
+        mediclaim: nsMediclaim,
+        accidental: nsAccidental,
+        natural_death: nsNaturalDeath,
+        tour_rewards: nsTourRewards
+      };
+    }
+
     const pageObj = {
       id: editingPageId || `page_${slug.replace(/[^a-zA-Z0-9_]/g, '_')}`,
       slug: slug,
@@ -5476,6 +6211,7 @@ export async function initPageEditor() {
       products: stripImagePreviews(currentProducts),
       page_kpi_sections: stripImagePreviews(currentPageKpiSections),
       clinical_breakdown: clinical_breakdown || existingPage?.clinical_breakdown || null,
+      netsurf_plan: netsurf_plan || existingPage?.netsurf_plan || null,
       diet_exercise: diet_exercise || existingPage?.diet_exercise || null,
       whatsapp_support: {
         number: waNum,
