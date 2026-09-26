@@ -581,37 +581,10 @@
     }
   };
 
-  // 4. Auto-Trigger on Public Page Load (Reliable Traditional Login / Registration Modal)
+  // 4. Auto-Trigger on Public Page Load disabled per user requirement
+  // Modal will only open when explicitly requested by user actions (e.g. clicking login, demo, checkout)
   function triggerAutoPopupIfApplicable() {
-    const currentPath = (window.location.pathname || '').toLowerCase();
-    
-    // Skip Admin Panels and dedicated registration page
-    if (currentPath.includes('/admin') || 
-        currentPath.endsWith('admin.html') || 
-        currentPath.includes('registration.html')) {
-      return;
-    }
-
-    // If user is already logged in, do NOT show modal
-    if (window.isUserLoggedIn()) {
-      return;
-    }
-
-    // Trigger popup smoothly after short delay so visitor sees traditional login/registration options
-    setTimeout(() => {
-      if (!window.isUserLoggedIn()) {
-        const isWebinar = currentPath.includes('webinar');
-        window.openGuestLoginModal(null, {
-          source: isWebinar ? 'WebinarPage' : 'PublicPageLoad'
-        });
-      }
-    }, 650);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', triggerAutoPopupIfApplicable);
-  } else {
-    triggerAutoPopupIfApplicable();
+    return;
   }
 
 })();

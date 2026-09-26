@@ -450,17 +450,80 @@
     kpiSection.innerHTML = `
       <div class="container">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
-          ${pageConfig.kpi_cards.map(c => `
+          ${pageConfig.kpi_cards.map(c => {
+            const hasImg = c.image && typeof c.image === 'string' && c.image.trim().length > 0;
+            return `
             <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s ease;">
-              <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(37,99,235,0.1); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">
-                <i class="fa-solid ${escapeHtml(c.icon || 'fa-check')}"></i>
+              <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(37,99,235,0.08); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; overflow: hidden;">
+                ${hasImg ? `<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title || 'KPI')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.parentElement.innerHTML='<i class=\\\'fa-solid ${escapeHtml(c.icon || 'fa-check')}\\\'></i>'">` : `<i class="fa-solid ${escapeHtml(c.icon || 'fa-check')}"></i>`}
               </div>
               <div style="flex:1;">
                 <h4 style="margin: 0 0 2px 0; font-size: 0.95rem; font-weight: 800; color: #0f172a;">${escapeHtml(c.title || '')}</h4>
                 <p style="margin: 0; font-size: 0.76rem; color: #64748b; line-height: 1.3;">${escapeHtml(c.desc || '')}</p>
               </div>
             </div>
-          `).join('')}
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderDynamicPageKpiSections(pageConfig) {
+    if (!pageConfig || !Array.isArray(pageConfig.page_kpi_sections) || pageConfig.page_kpi_sections.length === 0) return;
+    
+    let secContainer = document.getElementById('sec-page-kpi-sections');
+    if (!secContainer) {
+      secContainer = document.createElement('section');
+      secContainer.id = 'sec-page-kpi-sections';
+      secContainer.className = 'cms-dynamic-page-kpi-sections';
+      secContainer.style.cssText = 'padding: 30px 0; background: #ffffff; border-bottom: 1.5px solid #e2e8f0;';
+      
+      const kpiBadges = document.getElementById('sec-kpi-badges');
+      const matrix = document.querySelector('.health-kpi-matrix-section');
+      const targetAnchor = kpiBadges || matrix;
+      if (targetAnchor && targetAnchor.parentNode) {
+        targetAnchor.parentNode.insertBefore(secContainer, targetAnchor.nextSibling);
+      } else {
+        const dietSec = document.getElementById('sec-diet') || document.getElementById('sec-scientific-breakdown');
+        if (dietSec && dietSec.parentNode) {
+          dietSec.parentNode.insertBefore(secContainer, dietSec);
+        } else {
+          document.body.appendChild(secContainer);
+        }
+      }
+    }
+
+    secContainer.innerHTML = `
+      <div class="container">
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          ${pageConfig.page_kpi_sections.map(sec => {
+            const items = Array.isArray(sec.items) ? sec.items : (sec.items ? String(sec.items).split('\n').filter(Boolean) : []);
+            const hasImg = sec.image && typeof sec.image === 'string' && sec.image.trim().length > 0;
+            return `
+              <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 22px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                  <span style="font-size: 1.6rem;">${escapeHtml(sec.icon || '✨')}</span>
+                  <h3 style="font-size: 1.25rem; font-weight: 900; color: #0f172a; margin: 0;">${escapeHtml(sec.title || 'KPI सेक्शन')}</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: ${hasImg ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr'}; gap: 20px; align-items: start;">
+                  ${hasImg ? `
+                    <div style="width: 100%; border-radius: 12px; overflow: hidden; background: #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); max-height: 260px;">
+                      <img src="${escapeHtml(sec.image)}" alt="${escapeHtml(sec.title || 'KPI Image')}" style="width: 100%; height: 100%; max-height: 260px; object-fit: cover; display: block; cursor: pointer;" onclick="window.open('${escapeHtml(sec.image)}', '_blank')" onerror="this.parentElement.style.display='none'">
+                    </div>
+                  ` : ''}
+                  <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${items.map(it => `
+                      <div style="display: flex; align-items: flex-start; gap: 10px; background: #ffffff; padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 0.88rem; color: #334155; line-height: 1.5;">
+                        <span style="color: #16a34a; font-weight: 900; margin-top: 1px;">✓</span>
+                        <div style="flex: 1;">${escapeHtml(it)}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
       </div>
     `;
@@ -623,75 +686,88 @@
     const sec = document.getElementById('sec-diet');
     if (!sec) return;
 
+    // Find cards by direct grid children
+    const container = sec.querySelector('.container') || sec;
+    const grid = container.querySelector('div[style*="grid"]') || container.children[0] || container;
+    const cards = grid.children || [];
+    const dietBox = cards[0] || sec.querySelector('div[style*="eff6ff"]') || sec;
+    const exBox = document.getElementById('sec-exercise') || cards[1] || sec.querySelector('div[style*="f0fdf4"]');
+
     // Diet Card
-    if (de.diet && de.diet.title) {
-      const dietBox = sec.querySelector('div[style*="background:#eff6ff"], div[style*="background:#f0fdf4"]') || sec.querySelector('div[style*="border-radius:18px"]');
-      if (dietBox) {
+    if (de.diet && dietBox) {
+      if (de.diet.title) {
         const titleEl = dietBox.querySelector('h3');
         if (titleEl) titleEl.textContent = de.diet.title;
+      }
+      if (de.diet.items) {
         const listDiv = dietBox.querySelector('div[style*="flex-direction:column"]') || dietBox.querySelector('div[style*="display:flex"]');
-        if (listDiv && de.diet.items) {
+        if (listDiv) {
           const items = Array.isArray(de.diet.items) ? de.diet.items : de.diet.items.split('\n').filter(Boolean);
-          listDiv.innerHTML = items.map(it => `<p style="margin:0;">${it}</p>`).join('');
-        }
-
-        // Render Multi-Image Gallery for Diet
-        let dietGallery = dietBox.querySelector('.cms-diet-gallery');
-        if (Array.isArray(de.diet.images) && de.diet.images.length > 0) {
-          if (!dietGallery) {
-            dietGallery = document.createElement('div');
-            dietGallery.className = 'cms-diet-gallery';
-            dietGallery.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:14px;';
-            dietBox.appendChild(dietGallery);
+          if (items.length > 0) {
+            listDiv.innerHTML = items.map(it => `<p style="margin:0;">${it}</p>`).join('');
           }
-          dietGallery.innerHTML = de.diet.images.map(imgObj => {
-            const url = typeof imgObj === 'string' ? imgObj : (imgObj.image || imgObj.url || '');
-            const caption = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
-            if (!url) return '';
-            return `
-              <div style="background:#ffffff; border-radius:10px; overflow:hidden; border:1.5px solid #bfdbfe; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; flex-direction:column;">
-                <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'डाइट फोटो')}" loading="lazy" style="width:100%; height:100px; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
-                ${caption ? `<div style="padding:4px 6px; font-size:0.72rem; font-weight:700; color:#1e3a8a; text-align:center; line-height:1.2; background:#f0f9ff;">${escapeHtml(caption)}</div>` : ''}
-              </div>
-            `;
-          }).join('');
         }
+      }
+
+      // Render Multi-Image Gallery for Diet
+      if (Array.isArray(de.diet.images) && de.diet.images.length > 0) {
+        let dietGallery = dietBox.querySelector('.cms-diet-gallery');
+        if (!dietGallery) {
+          dietGallery = document.createElement('div');
+          dietGallery.className = 'cms-diet-gallery';
+          dietGallery.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:14px;';
+          dietBox.appendChild(dietGallery);
+        }
+        dietGallery.innerHTML = de.diet.images.map(imgObj => {
+          const url = typeof imgObj === 'string' ? imgObj : (imgObj.image || imgObj.url || '');
+          const caption = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
+          if (!url) return '';
+          return `
+            <div style="background:#ffffff; border-radius:10px; overflow:hidden; border:1.5px solid #bfdbfe; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; flex-direction:column;">
+              <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'डाइट फोटो')}" loading="lazy" style="width:100%; height:130px; object-fit:cover; display:block; cursor:pointer;" onclick="window.open('${escapeHtml(url)}', '_blank')" onerror="this.parentElement.style.display='none'">
+              ${caption ? `<div style="padding:4px 6px; font-size:0.75rem; font-weight:700; color:#1e3a8a; text-align:center; line-height:1.2; background:#f0f9ff;">${escapeHtml(caption)}</div>` : ''}
+            </div>
+          `;
+        }).join('');
       }
     }
 
     // Exercise Card
-    if (de.exercise && de.exercise.title) {
-      const exBox = document.getElementById('sec-exercise') || sec.querySelectorAll('div[style*="border-radius:18px"]')[1];
-      if (exBox) {
+    if (de.exercise && exBox) {
+      if (de.exercise.title) {
         const titleEl = exBox.querySelector('h3');
         if (titleEl) titleEl.textContent = de.exercise.title;
+      }
+      if (de.exercise.items) {
         const listDiv = exBox.querySelector('div[style*="flex-direction:column"]') || exBox.querySelector('div[style*="display:flex"]');
-        if (listDiv && de.exercise.items) {
+        if (listDiv) {
           const items = Array.isArray(de.exercise.items) ? de.exercise.items : de.exercise.items.split('\n').filter(Boolean);
-          listDiv.innerHTML = items.map(it => `<p style="margin:0;">${it}</p>`).join('');
-        }
-
-        // Render Multi-Image Gallery for Exercise & Yoga
-        let exGallery = exBox.querySelector('.cms-exercise-gallery');
-        if (Array.isArray(de.exercise.images) && de.exercise.images.length > 0) {
-          if (!exGallery) {
-            exGallery = document.createElement('div');
-            exGallery.className = 'cms-exercise-gallery';
-            exGallery.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:14px;';
-            exBox.appendChild(exGallery);
+          if (items.length > 0) {
+            listDiv.innerHTML = items.map(it => `<p style="margin:0;">${it}</p>`).join('');
           }
-          exGallery.innerHTML = de.exercise.images.map(imgObj => {
-            const url = typeof imgObj === 'string' ? imgObj : (imgObj.image || imgObj.url || '');
-            const caption = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
-            if (!url) return '';
-            return `
-              <div style="background:#ffffff; border-radius:10px; overflow:hidden; border:1.5px solid #bbf7d0; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; flex-direction:column;">
-                <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'व्यायाम व योगासन')}" loading="lazy" style="width:100%; height:100px; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
-                ${caption ? `<div style="padding:4px 6px; font-size:0.72rem; font-weight:700; color:#14532d; text-align:center; line-height:1.2; background:#f0fdf4;">${escapeHtml(caption)}</div>` : ''}
-              </div>
-            `;
-          }).join('');
         }
+      }
+
+      // Render Multi-Image Gallery for Exercise & Yoga
+      if (Array.isArray(de.exercise.images) && de.exercise.images.length > 0) {
+        let exGallery = exBox.querySelector('.cms-exercise-gallery');
+        if (!exGallery) {
+          exGallery = document.createElement('div');
+          exGallery.className = 'cms-exercise-gallery';
+          exGallery.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:14px;';
+          exBox.appendChild(exGallery);
+        }
+        exGallery.innerHTML = de.exercise.images.map(imgObj => {
+          const url = typeof imgObj === 'string' ? imgObj : (imgObj.image || imgObj.url || '');
+          const caption = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
+          if (!url) return '';
+          return `
+            <div style="background:#ffffff; border-radius:10px; overflow:hidden; border:1.5px solid #bbf7d0; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; flex-direction:column;">
+              <img src="${escapeHtml(url)}" alt="${escapeHtml(caption || 'व्यायाम व योगासन')}" loading="lazy" style="width:100%; height:130px; object-fit:cover; display:block; cursor:pointer;" onclick="window.open('${escapeHtml(url)}', '_blank')" onerror="this.parentElement.style.display='none'">
+              ${caption ? `<div style="padding:4px 6px; font-size:0.75rem; font-weight:700; color:#14532d; text-align:center; line-height:1.2; background:#f0fdf4;">${escapeHtml(caption)}</div>` : ''}
+            </div>
+          `;
+        }).join('');
       }
     }
   }
@@ -909,6 +985,7 @@
         renderDynamicHeroSlides(pageConfig);
         applySectionReorderingAndVisibility(pageConfig);
         renderDynamicKpiBadges(pageConfig);
+        renderDynamicPageKpiSections(pageConfig);
         renderDynamicProducts(pageConfig);
         renderDynamicClinicalBreakdown(pageConfig);
         renderDynamicDietExercise(pageConfig);

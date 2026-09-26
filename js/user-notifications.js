@@ -268,6 +268,11 @@
                     );
 
                     globalBroadcasts.forEach(bc => {
+                        // Suppress all webinar/zoom broadcast notifications website-wide
+                        if (bc.category === 'webinar' || /zoom|वेबिनार/i.test(bc.title || '') || /zoom|webinar/i.test(bc.id || '')) {
+                            return;
+                        }
+
                         let isEligible = false;
                         if (!bc.target || bc.target === 'all') isEligible = true;
                         else if (bc.target === 'birthday' && isUserBday) isEligible = true;
