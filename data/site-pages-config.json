@@ -3471,10 +3471,24 @@
       "category": "Healthcare Sub-page",
       "status": "active",
       "theme_primary": "#0284c7",
-      "theme_dark": "#0369a1",
+      "theme_dark": "#00387b",
+      "ticker_text": "🍃 फलों-सब्जियों से कीटनाशक हटाने व केमिकल-फ्री क्लीनिंग गाइड",
+      "audio_title": "नेचुरल होम केयर व टॉक्सिन-मुक्त घर",
+      "audio_script": "नमस्ते {name} जी! होम केयर पेज पर आपका स्वागत है। घर को केमिकल-मुक्त, स्वच्छ व सुरक्षित रखने के इको-फ्रेंडली समाधान यहाँ उपलब्ध हैं।",
+      "audio_url": "",
+      "og_title": "केमिकल-मुक्त सुरक्षित व स्वच्छ घर समाधान | Aarogyam India",
+      "og_image": "/images/banners/health-home-care.jpg",
+      "og_description": "फलों-सब्जियों से कीटनाशक हटाने व बायो-एंजाइम क्लीनिंग के 100% प्राकृतिक उपाय।",
+      "share_message": "",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
       "fb_pixel": true,
       "ga_tag": true,
-      "ticker_text": "🍃 फलों-सब्जियों से कीटनाशक हटाने व केमिकल-फ्री क्लीनिंग गाइड",
       "hero_slides": [
         {
           "image": "/images/banners/farmer-community-banner.jpeg",
@@ -3495,52 +3509,60 @@
       ],
       "hidden_sections": [],
       "kpi_cards": [],
-      "videos": [],
       "marketing_cards": [],
+      "videos": [],
       "reviews": [],
       "faqs": [],
-      "whatsapp_support": {
-        "number": "917974422572",
-        "prompt": "नमस्ते, मुझे केमिकल-मुक्त होम केयर समाधान चाहिए।"
-      },
-      "audio_title": "नेचुरल होम केयर व टॉक्सिन-मुक्त घर",
-      "audio_script": "नमस्ते {name} जी! होम केयर पेज पर आपका स्वागत है। घर को केमिकल-मुक्त, स्वच्छ व सुरक्षित रखने के इको-फ्रेंडली समाधान यहाँ उपलब्ध हैं।",
+      "health_diseases": [],
+      "crops": [],
+      "pashu_cards": [],
       "products": [
         {
-          "id": "natural_veggie_wash",
-          "name": "Natural Veggie & Fruit Wash Concentrate (500ml)",
-          "price": 399,
-          "mrp": 499,
-          "badge": "सब्जी व फल शोधक",
-          "description": "प्राकृतिक एंजाइम व नीम अर्क। सब्जियों व फलों से 99.9% कीटनाशक, बैक्टीरिया और मोम की परत को सुरक्षित रूप से हटाए।",
-          "image": "/images/banners/pashu-palan-banner.jpg"
+          "title": "Clean & More Multi-Purpose Home Cleaner 500ml",
+          "name": "Clean & More Multi-Purpose Home Cleaner 500ml",
+          "description": "फर्श, शीशा, टाइल्स, किचन स्लैब व डाइनिंग टेबल की सफाई हेतु 99.9% कीटाणुनाशक और प्राकृतिक खुशबूदार फॉर्मूला।",
+          "image": "/images/products/product-clean---more-dish--013316-62du.webp",
+          "mrp": 350,
+          "price": 350,
+          "discount_pct": 20,
+          "dose": "फर्श पोंछा: 10ml प्रति आधा बाल्टी पानी। टाइल्स व स्लैब: स्प्रे करके माइक्रोफाइबर कपड़े से पोंछें।",
+          "badge": "🏡 फर्श, टाइल्स व सतह सैनिटाइजर",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "herbal_floor_cleaner",
-          "name": "Herbal Bio-Enzyme Floor Cleaner (1000ml)",
+          "title": "Clean & More Dish Washing Liquid 250 250 MLT",
+          "name": "Clean & More Dish Washing Liquid 250 250 MLT",
+          "description": "फर्श, शीशा, किचन स्लैब और बाथरूम को 99.9% कीटाणु-मुक्त और सुगंधित रखने वाला सुरक्षित क्लीनर।",
+          "image": "/images/products/product-clean---more-dish--013316-62du.webp",
+          "mrp": 125,
+          "price": 125,
+          "discount_pct": 20,
+          "dose": "फर्श पोंछा: 10ml प्रति आधा बाल्टी पानी। टाइल्स/किचन स्लैब: स्प्रे करके पोंछें।",
+          "badge": "🏡 फर्श, टाइल्स व सतह सैनिटाइजर",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "Clean & More Fabric Wash & Conditioner 500 500 MLT",
+          "name": "Clean & More Fabric Wash & Conditioner 500 500 MLT",
+          "description": "कपड़ों की चमक बरकरार रखते हुए जिद्दी दाग साफ करता है। केमिकल-मुक्त और हाथों के लिए 100% सुरक्षित।",
+          "image": "/images/products/product-clean---more-fabri-889428-vqwm.webp",
+          "mrp": 299,
           "price": 299,
-          "mrp": 399,
-          "badge": "एसिड-फ्री फर्श सुरक्षा",
-          "description": "नीम, लेमनग्रास और पाइन ऑयल से निर्मित। फर्श को चमकाए, मक्खी-मच्छरों को दूर रखे और बच्चों व पालतू जानवरों के लिए 100% सुरक्षित।",
-          "image": "/images/banners/pashu-palan-banner.jpg"
-        },
-        {
-          "id": "bio_dishwash_gel",
-          "name": "Bio-Enzyme Dishwash Liquid Gel (500ml)",
-          "price": 269,
-          "mrp": 349,
-          "badge": "शून्य रासायनिक अवशेष",
-          "description": "रीठा व नींबू का प्राकृतिक सत्व। चिकनाई को तुरंत काटे, बर्तनों पर कोई रासायनिक परत नहीं छोड़ता और हाथों की त्वचा को मुलायम रखता है।",
-          "image": "/images/banners/pashu-palan-banner.jpg"
+          "discount_pct": 25,
+          "dose": "10-15ml प्रति बाल्टी (10-12 कपड़े) या वाशिंग मशीन में 20ml प्रति लोड।",
+          "badge": "🧺 प्राकृतिक एंजाइम लिक्विड डिटर्जेंट",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
+      "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "टॉक्सिन-मुक्त घर: केमिकल के खतरे व प्राकृतिक विकल्प",
         "cards": [
           {
             "title": "❓ घर में छिपे खतरे क्या हैं? (Causes)",
-            "color": "#0284c7",
+            "color": "#2563eb",
+            "image": "",
             "points": [
               "<strong>फलों-सब्जियों पर कीटनाशक:</strong> रासायनिक स्प्रे जो साधारण पानी से नहीं धुलते।",
               "<strong>एसिड युक्त फर्श व टॉयलेट क्लीनर:</strong> हानिकारक गैसें जो फेफड़ों को नुकसान पहुंचाती हैं।",
@@ -3550,7 +3572,8 @@
           },
           {
             "title": "⚠️ अनदेखे खतरे व लक्षण (Symptoms)",
-            "color": "#0284c7",
+            "color": "#2563eb",
+            "image": "",
             "points": [
               "घर में बच्चों व बुजुर्गों को बार-बार छींकें, एलर्जी व सांस की तकलीफ।",
               "फर्श साफ करने के बाद आंखों व गले में जलन या तीखी गंध का अहसास।",
@@ -3561,6 +3584,7 @@
           {
             "title": "🚨 दीर्घकालिक स्वास्थ्य खतरे (Risks)",
             "color": "#dc2626",
+            "image": "",
             "points": [
               "<strong>गंभीर श्वसन रोग (Asthma / COPD):</strong> जहरीले धुएं से फेफड़ों का कमजोर होना।",
               "<strong>हार्मोनल असंतुलन (Endocrine Disruptors):</strong> प्लास्टिक्स व हानिकारक केमिकल से विकार।",
@@ -3569,6 +3593,7 @@
           }
         ]
       },
+      "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
           "title": "फल व सब्जी शोधन विधि (Veggie Wash Protocol)",
@@ -3577,7 +3602,8 @@
             "<strong>2. 10 मिनट भिगोना:</strong> हरी सब्जियों, सेब, टमाटर को घोल में 10 मिनट के लिए छोड़ें।",
             "<strong>3. मोम व कीटनाशक हटाना:</strong> सतह को हल्के हाथ से रगड़कर साफ पानी से धो लें।",
             "<strong>4. सुरक्षित भंडारण:</strong> सूती कपड़े से पोंछकर फ्रिज में रखें, ताजगी 2 गुना अधिक रहेगी।"
-          ]
+          ],
+          "images": []
         },
         "exercise": {
           "title": "इको-फ्रेंडली घर के सरल नियम",
@@ -3586,12 +3612,14 @@
             "<strong>2. रीठा व नींबू डिशवॉश:</strong> बर्तनों पर शून्य रासायनिक अवशेष छोड़ता है।",
             "<strong>3. धूप व ताजी हवा का संचार:</strong> रोजाना सुबह 1 घंटा खिड़कियां खोलकर क्रॉस वेंटिलेशन करें।",
             "<strong>4. एयर प्यूरीफायर पौधे:</strong> स्नेक प्लांट, एलोवेरा और मनी प्लांट घर में लगाएं।"
-          ]
+          ],
+          "images": []
         }
       },
-      "og_title": "केमिकल-मुक्त सुरक्षित व स्वच्छ घर समाधान | Aarogyam India",
-      "og_image": "/images/banners/health-home-care.jpg",
-      "og_description": "फलों-सब्जियों से कीटनाशक हटाने व बायो-एंजाइम क्लीनिंग के 100% प्राकृतिक उपाय।"
+      "whatsapp_support": {
+        "number": "917974422572",
+        "prompt": "नमस्ते, मुझे केमिकल-मुक्त होम केयर समाधान चाहिए।"
+      }
     },
     {
       "id": "page_health_sexual_wellness",
