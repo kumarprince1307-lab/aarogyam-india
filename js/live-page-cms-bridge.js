@@ -547,25 +547,11 @@
     const isPashu = window.location.pathname.includes('pashu');
     const primaryColor = isPashu ? '#15803d' : (pageConfig.theme_primary || '#2563eb');
 
-    // Inject responsive product grid CSS once
+    // Inject mobile-responsive product CSS once
     if (!document.getElementById('cms-products-responsive-style')) {
       const st = document.createElement('style');
       st.id = 'cms-products-responsive-style';
       st.textContent = `
-        .cms-products-grid {
-          display: grid !important;
-          grid-template-columns: repeat(2, 1fr) !important;
-          gap: 12px !important;
-        }
-        @media (min-width: 480px) {
-          .cms-products-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; }
-        }
-        @media (min-width: 640px) {
-          .cms-products-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important; gap: 16px !important; }
-        }
-        @media (min-width: 768px) {
-          .cms-products-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important; gap: 20px !important; }
-        }
         .cms-product-img-wrap {
           width: 100%;
           border-radius: 10px;
@@ -585,40 +571,19 @@
           object-fit: contain;
           display: block;
         }
-        @media (min-width: 640px) {
-          .cms-product-img-wrap img { max-height: 180px; }
+        @media (max-width: 639px) {
+          #sec-products .container > div[style*="grid"],
+          #sec-products .container .products-grid,
+          #products-cattle .container > div[style*="grid"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+          }
+          .cms-product-img-wrap img { max-height: 120px; }
         }
         .cms-product-card { display: flex; flex-direction: column; justify-content: space-between; }
-        .product-order-toggle-btn {
-          width: 100%;
-          background: #2563eb;
-          color: #fff;
-          border: none;
-          padding: 10px 10px;
-          border-radius: 10px;
-          font-weight: 800;
-          font-size: 0.8rem;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-          transition: background 0.2s;
-          margin-top: 10px;
-        }
-        .product-order-toggle-btn:hover { background: #1d4ed8; }
-        .product-order-toggle-btn.selected { background: #16a34a; }
       `;
       document.head.appendChild(st);
     }
-
-    // Apply responsive grid class to the grid element
-    if (!grid.classList.contains('cms-products-grid')) {
-      grid.classList.add('cms-products-grid');
-    }
-    // Remove any inline grid styles that override responsive CSS
-    if (grid.style.gridTemplateColumns) grid.style.gridTemplateColumns = '';
-    if (grid.style.display) grid.style.display = '';
 
     grid.innerHTML = prods.map((p, idx) => {
       const id = p.id || `PROD_${idx + 1}`;
@@ -645,7 +610,7 @@
             <h4 style="font-size:0.95rem; font-weight:900; color:#0f172a; margin:0 0 6px 0; line-height:1.35;">${escapeHtml(name)}</h4>
             ${desc ? `<p style="font-size:0.78rem; color:#64748b; line-height:1.45; margin-bottom:10px;">${escapeHtml(desc)}</p>` : ''}
           </div>
-          <button type="button" class="product-order-toggle-btn" onclick="window.toggleProductSelection ? window.toggleProductSelection(this, '${escapeHtml(id)}', '${escapeHtml(name)}', ${offerPrice || mrp}) : (window.toggleProductOrder && window.toggleProductOrder('${escapeHtml(id)}', '${escapeHtml(name)}', ${offerPrice || mrp}, ${mrp}, this))">
+          <button type="button" class="product-order-toggle-btn" style="width:100%;background:${primaryColor};color:#fff;border:none;padding:10px;border-radius:10px;font-weight:800;font-size:0.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;" onclick="window.toggleProductSelection ? window.toggleProductSelection(this, '${escapeHtml(id)}', '${escapeHtml(name)}', ${offerPrice || mrp}) : (window.toggleProductOrder && window.toggleProductOrder('${escapeHtml(id)}', '${escapeHtml(name)}', ${offerPrice || mrp}, ${mrp}, this))">
             <i class="fa-solid fa-cart-plus"></i> ऑर्डर जोड़ें
           </button>
         </div>
@@ -656,6 +621,7 @@
       window.syncPageButtonStates();
     }
   }
+
 
     function renderDynamicReviews(pageConfig) {
     if (!Array.isArray(pageConfig.reviews) || pageConfig.reviews.length === 0) return;
