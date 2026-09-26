@@ -1022,6 +1022,73 @@
     padding-bottom: 70px;
   }
 }
+
+/* ===== MOBILE RESPONSIVE FIXES ===== */
+@media (max-width: 639px) {
+  /* KYP Products grid - 2 columns on mobile */
+  .ns-kyp-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .ns-product-card {
+    padding: 12px !important;
+  }
+  .ns-product-img-wrap {
+    height: 120px !important;
+  }
+  .ns-product-title {
+    font-size: 0.85rem !important;
+  }
+  .ns-product-benefits {
+    font-size: 0.75rem !important;
+  }
+  /* Step Ladder grid - 2 columns on mobile */
+  .ns-ladder-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .ns-ladder-card {
+    padding: 12px !important;
+  }
+  .ns-ladder-img-wrap {
+    height: 80px !important;
+  }
+  .ns-ladder-title {
+    font-size: 0.82rem !important;
+  }
+  .ns-ladder-criteria,
+  .ns-ladder-perks {
+    font-size: 0.72rem !important;
+  }
+  /* KYP tabs - horizontal scroll */
+  .ns-kyp-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    flex-wrap: nowrap !important;
+  }
+  .ns-kyp-tab-btn {
+    flex-shrink: 0;
+    font-size: 0.75rem !important;
+    padding: 6px 10px !important;
+  }
+  /* Income calculator */
+  .ns-calc-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ns-kyp-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .ns-ladder-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+}
+
 .ns-mobile-btn-call {
   flex: 1;
   background: #2563eb;

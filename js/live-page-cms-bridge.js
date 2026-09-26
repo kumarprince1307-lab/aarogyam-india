@@ -547,7 +547,7 @@
     const isPashu = window.location.pathname.includes('pashu');
     const primaryColor = isPashu ? '#15803d' : (pageConfig.theme_primary || '#2563eb');
 
-    // Inject mobile-responsive product CSS once
+    // Inject product image CSS once (safe - no !important overrides)
     if (!document.getElementById('cms-products-responsive-style')) {
       const st = document.createElement('style');
       st.id = 'cms-products-responsive-style';
@@ -570,15 +570,6 @@
           max-height: 160px;
           object-fit: contain;
           display: block;
-        }
-        @media (max-width: 639px) {
-          #sec-products .container > div[style*="grid"],
-          #sec-products .container .products-grid,
-          #products-cattle .container > div[style*="grid"] {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 12px !important;
-          }
-          .cms-product-img-wrap img { max-height: 120px; }
         }
         .cms-product-card { display: flex; flex-direction: column; justify-content: space-between; }
       `;
