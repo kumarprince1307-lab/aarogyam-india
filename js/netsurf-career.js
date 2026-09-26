@@ -19,34 +19,34 @@
     isPersonalized: false
   };
 
-  // Video Masterclass Playlist
+  // Video Masterclass Playlist (Authentic Aarogyam India YouTube Channel Videos)
   const MASTERCLASS_VIDEOS = [
     {
       id: 'factory_profile',
       title: '🏭 कंपनी प्रोफ़ाइल व R&D फैक्ट्री टूर (₹1500 करोड़ कमीशन का सच)',
-      embedUrl: 'https://www.youtube-nocookie.com/embed/videoseries?list=PLwB_a_9_demo1', // fallback or real id
-      videoId: 'videoseries?list=PLwB_a_9_demo1',
+      embedUrl: 'https://www.youtube-nocookie.com/embed/bk2bxcHeKsM?rel=0&playsinline=1',
+      videoId: 'bk2bxcHeKsM',
       desc: 'नेटसर्फ की 26 साल की विरासत, पुणे हेडक्वार्टर, DSIR अप्रूव्ड लैब्स और अपनी मैन्युफैक्चरिंग यूनिट की अंदरूनी झलक।'
     },
     {
       id: 'why_90_fail',
       title: '⚠️ नेटसर्फ में 90% लोग फेल क्यों होते हैं? (सच जो कोई नहीं बताता)',
-      embedUrl: 'https://www.youtube-nocookie.com/embed/demo_fail_analysis',
-      videoId: 'demo_fail_analysis',
+      embedUrl: 'https://www.youtube-nocookie.com/embed/HI5D8KYWJK0?rel=0&playsinline=1',
+      videoId: 'HI5D8KYWJK0',
       desc: 'गलत तरीके से काम करने का नुकसान और 10% टॉप अचीवर्स की सही कार्यप्रणाली।'
     },
     {
       id: 'autoship_formula',
       title: '📊 ₹45,000/माह फिक्स इनकम फॉर्मूला (5+1 फ्री ऑटोशिप सिस्टम)',
-      embedUrl: 'https://www.youtube-nocookie.com/embed/demo_autoship',
-      videoId: 'demo_autoship',
-      desc: '180 संतुष्ट उपभोक्ता और 5 महीने पर 1 महीना फ्री ऑटोशिप द्वारा स्थायी मासिक आय।'
+      embedUrl: 'https://www.youtube-nocookie.com/embed/8I9qX1elzgg?rel=0&playsinline=1',
+      videoId: '8I9qX1elzgg',
+      desc: '180 संतुष्ट उपभोक्ता और 5 महीने पर 1 महीना फ्री ऑटोशिप द्वारा स्थायी मासिक आय व जैविक प्रोडक्ट्स का कमाल।'
     },
     {
       id: 'nominee_security',
       title: '🛡️ फैमिली प्रोटेक्शन व नॉमिनी फैसिलिटी (आजीवन सुरक्षा)',
-      embedUrl: 'https://www.youtube-nocookie.com/embed/demo_nominee',
-      videoId: 'demo_nominee',
+      embedUrl: 'https://www.youtube-nocookie.com/embed/OlX2t84-8Es?rel=0&playsinline=1',
+      videoId: 'OlX2t84-8Es',
       desc: 'मेडिक्लेम, एक्सीडेंटल कवर और परिवार के नाम बिज़नेस की अटूट सुरक्षा।'
     }
   ];
@@ -254,6 +254,13 @@
 
     if (!tabs || tabs.length === 0 || !player) return;
 
+    // Ensure player has active video initially
+    if (player && (!player.src || player.src.includes('demo') || player.src.includes('PLwB_a_9'))) {
+      player.src = MASTERCLASS_VIDEOS[0].embedUrl;
+      if (titleEl) titleEl.textContent = MASTERCLASS_VIDEOS[0].title;
+      if (descEl) descEl.textContent = MASTERCLASS_VIDEOS[0].desc;
+    }
+
     tabs.forEach((tab, index) => {
       tab.addEventListener('click', () => {
         tabs.forEach(t => t.classList.remove('active'));
@@ -279,28 +286,39 @@
 
     let productsData = null;
 
-    // 1. Try local cache first for instant render
-    try {
-      const localCached = localStorage.getItem('aim_netsurf_products_master');
-      if (localCached) {
-        productsData = JSON.parse(localCached);
-      }
-    } catch (e) {}
+    // 1. Multi-path network-first fetch with cache-busting timestamp
+    const tBuster = Date.now();
+    const candidatePaths = [
+      `/data/netsurf-products-master.json?t=${tBuster}`,
+      `../data/netsurf-products-master.json?t=${tBuster}`,
+      `./data/netsurf-products-master.json?t=${tBuster}`,
+      `/data/netsurf-products-master.json`
+    ];
 
-    // 2. Fetch fresh from JSON
-    try {
-      const res = await fetch('/data/netsurf-products-master.json?t=' + Date.now());
-      if (res.ok) {
-        const remoteData = await res.json();
-        if (remoteData && remoteData.products && remoteData.products.length > 0) {
-          productsData = remoteData;
-          try {
-            localStorage.setItem('aim_netsurf_products_master', JSON.stringify(remoteData));
-          } catch (e) {}
+    for (const pUrl of candidatePaths) {
+      try {
+        const res = await fetch(pUrl, { cache: 'no-store' });
+        if (res.ok) {
+          const remoteData = await res.json();
+          if (remoteData && Array.isArray(remoteData.products) && remoteData.products.length > 0) {
+            productsData = remoteData;
+            try {
+              localStorage.setItem('aim_netsurf_products_master', JSON.stringify(remoteData));
+            } catch (e) {}
+            break;
+          }
         }
-      }
-    } catch (e) {
-      console.warn('Could not fetch remote products master, using cache or static HTML:', e);
+      } catch (err) {}
+    }
+
+    // 2. Safe Local Storage fallback if network fetch was blocked
+    if (!productsData || !productsData.products) {
+      try {
+        const localCached = localStorage.getItem('aim_netsurf_products_master');
+        if (localCached) {
+          productsData = JSON.parse(localCached);
+        }
+      } catch (e) {}
     }
 
     if (productsData && productsData.products && productsData.products.length > 0) {
