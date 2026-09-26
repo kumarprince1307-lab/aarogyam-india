@@ -7,10 +7,10 @@
       "url": "/index.html",
       "category": "eBooks",
       "status": "active",
-      "theme_primary": "#15803d",
-      "theme_dark": "#003400",
+      "theme_primary": "#ff5d05",
+      "theme_dark": "#b31100",
       "ticker_text": "",
-      "audio_title": "",
+      "audio_title": "मुख्य पृष्ठ",
       "audio_script": "",
       "audio_url": "",
       "og_title": "",
@@ -303,7 +303,7 @@
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
-        "number": "",
+        "number": "919876543210",
         "prompt": ""
       }
     },
