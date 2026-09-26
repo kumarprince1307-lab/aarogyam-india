@@ -761,7 +761,7 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-26T19:36:45.189Z",
+      "updated_at": "2026-09-26T19:48:09.978Z",
       "admin_edited": true,
       "slug": "bk015",
       "book_type": "paid",
@@ -793,10 +793,29 @@
       "theme_dark": "#003d00",
       "cover_effect": "3d_float",
       "sticky_button_text": "Buy Now",
-      "sections_order": [],
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_audio",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_ai_support",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help",
+        "sec_pdf_main",
+        "sec_pdf_free"
+      ],
       "hidden_sections": [],
       "section_banners": {
-        "sec_suggested": "/images/banners/bk015-sec_suggested-banner.webp",
         "sec_timer": "/images/banners/bk015-sec_timer-banner.webp",
         "sec_kpis": "/images/banners/bk015-sec_kpis-banner.webp",
         "sec_audio": "/images/banners/bk015-sec_audio-banner.webp",
@@ -804,6 +823,7 @@
         "sec_vip_stack": "/images/banners/bk015-sec_vip_stack-banner.webp",
         "sec_video": "/images/banners/bk015-sec_video-banner.webp",
         "sec_preview": "/images/banners/bk015-sec_preview-banner.webp",
+        "sec_suggested": "/images/banners/bk015-sec_suggested-banner.webp",
         "sec_ai_support": "/images/banners/bk015-sec_ai_support-banner.webp",
         "sec_specs_toc": "/images/banners/bk015-sec_specs_toc-banner.webp",
         "sec_final_buy": "/images/banners/bk015-sec_final_buy-banner.webp",
@@ -824,6 +844,32 @@
         "mp3_url": "",
         "tts_text": "किसान भाई क्या आप भी चाहते हैं कि आपकी सब्जियों की खेती में मेहनत कम हो और पैदावार बेहतर हो लेकिन सही बीज सही खाद सिंचाई और कीट रोग प्रबंधन की जानकारी के लिए आपको अलग अलग जगह भटकना पड़ता है\nअब आपकी इस समस्या का समाधान है\nभारत में पहली बार पेश है Krishi Audio E-Book\nयह सिर्फ एक ई बुक नहीं बल्कि आपकी खेती का डिजिटल ज्ञान साथी है\nइसमें आपको टमाटर मिर्च शिमला मिर्च बैंगन भिंडी खीरा ककड़ी लौकी करेला तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती की पूरी जानकारी मिलेगी\nबीज चयन खेत की तैयारी बुवाई पौधों की दूरी खाद पोषण सिंचाई कीट रोग प्रबंधन कटाई और बाजार तक की जानकारी\nसब कुछ एक ही जगह\nआप इसे मोबाइल पर पढ़ भी सकते हैं और सुन भी सकते हैं\nअपनी भाषा में आसान और व्यावहारिक कृषि ज्ञान\nभारत में पहली बार पढ़िए भी सुनिए भी और सीखिए भी\nकिसान का ज्ञान करेगा मालामाल\nबेहतर खेती बेहतर भविष्य\nअभी अपनी Krishi Audio E-Book शुरू करें",
         "story_text": "किसान भाई क्या आप भी चाहते हैं कि आपकी सब्जियों की खेती में मेहनत कम हो और पैदावार बेहतर हो लेकिन सही बीज सही खाद सिंचाई और कीट रोग प्रबंधन की जानकारी के लिए आपको अलग अलग जगह भटकना पड़ता है\nअब आपकी इस समस्या का समाधान है\nभारत में पहली बार पेश है Krishi Audio E-Book\nयह सिर्फ एक ई बुक नहीं बल्कि आपकी खेती का डिजिटल ज्ञान साथी है\nइसमें आपको टमाटर मिर्च शिमला मिर्च बैंगन भिंडी खीरा ककड़ी लौकी करेला तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती की पूरी जानकारी मिलेगी\nबीज चयन खेत की तैयारी बुवाई पौधों की दूरी खाद पोषण सिंचाई कीट रोग प्रबंधन कटाई और बाजार तक की जानकारी\nसब कुछ एक ही जगह\nआप इसे मोबाइल पर पढ़ भी सकते हैं और सुन भी सकते हैं\nअपनी भाषा में आसान और व्यावहारिक कृषि ज्ञान\nभारत में पहली बार पढ़िए भी सुनिए भी और सीखिए भी\nकिसान का ज्ञान करेगा मालामाल\nबेहतर खेती बेहतर भविष्य\nअभी अपनी Krishi Audio E-Book शुरू करें",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1999 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
         "bgm_enabled": true,
         "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
@@ -836,9 +882,29 @@
       "ai_support_title": "",
       "ai_support_cover": "/images/banners/bk015-sec_ai_support-banner.webp",
       "ai_support_desc": "📱 खेती की समस्या का समाधान अब आपके WhatsApp पर!\n\nकिताब पढ़ते समय खेती से जुड़ा कोई सवाल समझ न आए, या अपनी फसल में कोई परेशानी हो, तो WhatsApp पर Aarogyam AI को अपना सवाल भेजें। 🌱\n\n💬 कैसे इस्तेमाल करें?\n\n1️⃣ अपने मोबाइल में WhatsApp खोलें।\n\n2️⃣ इस नंबर 7974422572 पर अपना सवाल भेजें।\n\n3️⃣ अपनी फसल की समस्या या किताब से जुड़ा सवाल लिखें।\n\n4️⃣ Aarogyam AI से समाधान और मार्गदर्शन पाएं।\n\n🎁 पुस्तक खरीदने पर 90 दिनों तक निःशुल्क AI WhatsApp Support!\n\n📖 किताब पढ़ें, सवाल पूछें और खेती का ज्ञान बढ़ाएं।\n\n🌾 आपका सवाल → Aarogyam AI की मदद → खेती में आसान समाधान!",
-      "bonuses": [],
-      "bonus_books": [],
-      "bonus_points": [],
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_books": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_points": [
+        "24×7 WhatsApp Support",
+        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+        "📖 किताब की जानकारी समझने में सहायता",
+        "🌱 फसल संबंधी सवाल",
+        "📱 Mobile Friendly PDF & Lifetime Access"
+      ],
       "timer": {
         "enabled": true,
         "minutes": 15,
@@ -857,7 +923,24 @@
         "rating_count": "120+ Ratings",
         "cover_image": "/images/books/bk015-cover.webp",
         "banner_image": "/images/banners/bk015-hero-banner.webp",
-        "features": []
+        "features": [
+          {
+            "icon": "fa-seedling",
+            "text": "120 पेज की प्रीमियम"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ फोटो"
+          },
+          {
+            "icon": "fa-flask",
+            "text": "Spray Science"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Bonus PDF"
+          }
+        ]
       },
       "value_stack": {
         "book_mrp": 299,
@@ -871,7 +954,28 @@
         "title": "यह पुस्तक क्यों खरीदें?",
         "subtitle": "🌱 यह पुस्तक क्यों खरीदें?  खेती की हर समस्या का ज्ञान, एक ही जगह!  बीज से बाजार तक, सही जानकारी के साथ बेहतर खेती की ओर बढ़ें।",
         "banner_image": "/images/banners/bk015-sec_why_buy-banner.webp",
-        "cards": []
+        "cards": [
+          {
+            "icon": "🌱",
+            "title": "वैज्ञानिक जानकारी",
+            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।"
+          },
+          {
+            "icon": "📷",
+            "title": "300+ वास्तविक फोटो",
+            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
+          },
+          {
+            "icon": "📘",
+            "title": "Step by Step Guide",
+            "desc": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।"
+          },
+          {
+            "icon": "🎁",
+            "title": "Free Bonus PDF",
+            "desc": "इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।"
+          }
+        ]
       },
       "preview_banner": "/images/banners/bk015-sec_preview-banner.webp",
       "demo_images": [],
@@ -879,7 +983,19 @@
       "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
       "suggested_books_list": [],
       "suggested_books": [],
-      "table_of_contents": [],
+      "table_of_contents": [
+        "बीज उपचार",
+        "खेत की तैयारी",
+        "बुवाई की वैज्ञानिक विधि",
+        "उर्वरक प्रबंधन",
+        "खरपतवार नियंत्रण",
+        "रोग एवं कीट प्रबंधन",
+        "पोषक तत्वों की कमी",
+        "स्प्रे चार्ट",
+        "IPM तकनीक",
+        "अधिक उत्पादन के उपाय",
+        "विशेषज्ञ सुझाव"
+      ],
       "videos": [],
       "testimonials": [],
       "final_buy": {
