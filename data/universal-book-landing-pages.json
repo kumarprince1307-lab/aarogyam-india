@@ -761,7 +761,7 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-23T23:59:59.999Z",
+      "updated_at": "2026-09-26T18:17:22.440Z",
       "admin_edited": true,
       "slug": "bk015",
       "book_type": "paid",
@@ -825,14 +825,10 @@
         "sec_trust": "/images/banners/bk015-sec_trust-banner.webp",
         "sec_vip_stack": "/images/banners/bk015-sec_vip_stack-banner.webp",
         "sec_preview": "/images/banners/bk015-sec_preview-banner.webp",
-        "sec_suggested": "/images/banners/bk015-sec_suggested-banner.webp",
-        "sec_bonuses": "/images/banners/bk015-sec_bonuses-banner.webp",
         "sec_ai_support": "/images/banners/bk015-sec_ai_support-banner.webp",
         "sec_specs_toc": "/images/banners/bk015-sec_specs_toc-banner.webp",
         "sec_reviews": "/images/banners/bk015-sec_reviews-banner.webp",
-        "sec_faqs": "/images/banners/bk015-sec_faqs-banner.webp",
         "sec_help": "/images/banners/bk015-sec_help-banner.webp",
-        "sec_pdf_main": "/images/banners/bk015-sec_pdf_main-banner.webp",
         "sec_final_buy": "/images/banners/bk015-sec_final_buy-banner.webp",
         "sec_pdf_free": "/images/banners/bk015-sec_pdf_free-banner.webp"
       },
@@ -1019,8 +1015,6 @@
       },
       "preview_banner": "/images/banners/bk015-sec_preview-banner.webp",
       "demo_images": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
         "/images/books/bk015-preview-3.webp",
         "/images/books/bk015-preview-4.webp",
         "/images/books/bk015-preview-5.webp",
@@ -1031,14 +1025,10 @@
         "/images/books/bk015-preview-10.webp",
         "/images/books/bk015-preview-11.webp",
         "/images/books/bk015-preview-12.webp",
-        "/images/books/bk015-preview-13.webp",
-        "/images/books/bk015-preview-14.webp",
-        "/images/books/bk015-preview-15.webp",
-        "/images/books/bk015-preview-16.webp"
+        "/images/books/bk015-preview-13.webp"
       ],
       "demo_reader_pages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
       "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
-      "hasWebpPages": true,
       "suggested_books_list": [
         {
           "id": "BK001",
@@ -1272,126 +1262,7 @@
       },
       "whatsapp_share_message": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
       "whatsapp_share_text": "क्या आप सब्जियों की खेती के बारे में पूरी जानकारी चाहते हैं? 🌱\n\nतो पढ़िए “खेती का डॉक्टर” eBook + Audio Book 📖🎧\n\nइसमें टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू सहित 11 प्रमुख सब्जियों की खेती की पूरी जानकारी दी गई है।\n\n✅ सही बीज का चुनाव \n✅ खेत की तैयारी और बुवाई \n✅ खाद, पोषण और सिंचाई \n✅ कीट एवं रोग प्रबंधन \n✅ बेहतर पैदावार के तरीके \n✅ कटाई से बाजार तक की जानकारी \n🎧 पढ़ें भी और सुनें भी — मोबाइल पर!\n\n👉 आज ही अपनी कृषि पुस्तक प्राप्त करें: \n🌾 सही ज्ञान अपनाएं, बेहतर खेती की ओर बढ़ें! \n💚 Aarogyam India 💚",
-      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।",
-      "preview_images": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
-        "/images/books/bk015-preview-6.webp",
-        "/images/books/bk015-preview-7.webp",
-        "/images/books/bk015-preview-8.webp",
-        "/images/books/bk015-preview-9.webp",
-        "/images/books/bk015-preview-10.webp",
-        "/images/books/bk015-preview-11.webp",
-        "/images/books/bk015-preview-12.webp",
-        "/images/books/bk015-preview-13.webp",
-        "/images/books/bk015-preview-14.webp",
-        "/images/books/bk015-preview-15.webp",
-        "/images/books/bk015-preview-16.webp"
-      ],
-      "previewImages": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
-        "/images/books/bk015-preview-6.webp",
-        "/images/books/bk015-preview-7.webp",
-        "/images/books/bk015-preview-8.webp",
-        "/images/books/bk015-preview-9.webp",
-        "/images/books/bk015-preview-10.webp",
-        "/images/books/bk015-preview-11.webp",
-        "/images/books/bk015-preview-12.webp",
-        "/images/books/bk015-preview-13.webp",
-        "/images/books/bk015-preview-14.webp",
-        "/images/books/bk015-preview-15.webp",
-        "/images/books/bk015-preview-16.webp"
-      ],
-      "demoImages": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
-        "/images/books/bk015-preview-6.webp",
-        "/images/books/bk015-preview-7.webp",
-        "/images/books/bk015-preview-8.webp",
-        "/images/books/bk015-preview-9.webp",
-        "/images/books/bk015-preview-10.webp",
-        "/images/books/bk015-preview-11.webp",
-        "/images/books/bk015-preview-12.webp",
-        "/images/books/bk015-preview-13.webp",
-        "/images/books/bk015-preview-14.webp",
-        "/images/books/bk015-preview-15.webp",
-        "/images/books/bk015-preview-16.webp"
-      ],
-      "customer_reviews": [
-        {
-          "name": "Rakesh sharma ",
-          "location": " उत्तर प्रदेश",
-          "rating": 5,
-          "gender": "male",
-          "comment": "पहले खेती में बहुत सी बातें समझ नहीं आती थीं।\nटमाटर और मिर्च की खेती में बीज चयन और खाद-पोषण को लेकर परेशानी होती थी। इस पुस्तक में खेती की जानकारी आसान भाषा में दी गई है। तस्वीरों और टेबल से समझना बहुत आसान लगा। अब जरूरत पड़ने पर ऑडियो भी सुन सकता हूं। खेती सीखने के लिए अच्छी मार्गदर्शक पुस्तक है।"
-        },
-        {
-          "name": "हरिओम शर्मा  किसान",
-          "location": "उत्तर प्रदेश",
-          "rating": 5,
-          "gender": "male",
-          "comment": "🌱 बीज से लेकर फसल तैयार होने तक की जानकारी मिली।\nपहले टमाटर और बैंगन की खेती में सही बीज और पौधों की दूरी को लेकर परेशानी होती थी। इस पुस्तक में पूरी जानकारी क्रम से दी गई है। भाषा आसान है और तस्वीरों से समझना अच्छा लगा। मोबाइल पर पढ़ना और ऑडियो सुनना दोनों सुविधाजनक हैं।\n"
-        },
-        {
-          "name": "Sunita Pathak ",
-          "location": "मध्य प्रदेश",
-          "rating": 5,
-          "gender": "female",
-          "comment": "पढ़ना और सुनना दोनों बहुत अच्छा लगा।\nमुझे पहले खेती की किताबें पढ़ने में कठिनाई होती थी। इस ई-बुक में टमाटर, बैंगन, भिंडी और दूसरी सब्जियों की जानकारी एक ही जगह मिलती है। अब मोबाइल पर पढ़ लेती हूं और काम करते समय ऑडियो सुन सकती हूं। भाषा सरल है और समझने में आसानी होती है।"
-        },
-        {
-          "name": "महेश यादव  किसान ",
-          "location": "उत्तर प्रदेश",
-          "rating": 5,
-          "gender": "male",
-          "comment": "खेत की तैयारी और बुवाई की जानकारी उपयोगी लगी।\n\nपहले हर फसल के लिए अलग-अलग जानकारी ढूंढनी पड़ती थी। इस पुस्तक में खेत की तैयारी, पौधों की दूरी, सिंचाई और पोषण के बारे में समझाया गया है। मुझे सबसे अच्छा लगा कि जानकारी क्रम से दी गई है। पढ़ते समय ऐसा लगता है जैसे कोई खेती सिखा रहा हो।"
-        },
-        {
-          "name": "विजय सिंह  सब्जी किसान",
-          "location": "राजस्थान",
-          "rating": 4,
-          "gender": "male",
-          "comment": "कीट और रोग की जानकारी सबसे अच्छी लगी।\n\nमेरी फसल में कीट और बीमारी की समस्या आती रहती है। इस पुस्तक में रोग और कीट की पहचान तथा प्रबंधन के बारे में जानकारी मिली। तस्वीरों से पहचान समझने में मदद मिलती है। अब खेती से जुड़ी जानकारी के लिए मेरे पास एक उपयोगी डिजिटल साधन है।"
-        },
-        {
-          "name": "अशोक वर्मा  किसान ",
-          "location": "बिहार",
-          "rating": 5,
-          "gender": "male",
-          "comment": "ऑडियो की सुविधा बहुत काम की है।\n\nखेत में काम करते समय किताब पढ़ना संभव नहीं होता। इसलिए Audio + eBook का विकल्प मुझे बहुत पसंद आया। खाली समय में ई-बुक पढ़ता हूं और खेत में काम करते समय ऑडियो सुन सकता हूं। 11 सब्जियों की जानकारी एक ही जगह मिलना अच्छा लगा।"
-        },
-        {
-          "name": "संतुष्ट पाठक",
-          "location": "भारत",
-          "rating": 5,
-          "gender": "male",
-          "comment": "बहुत ही उपयोगी व व्यावहारिक पुस्तक है।"
-        },
-        {
-          "name": "कविता बाई  महिला किसान ",
-          "location": " महाराष्ट्र",
-          "rating": 5,
-          "gender": "male",
-          "comment": "खेती की जानकारी अब समझना आसान लग रहा है।\n\nमुझे सब्जियों की खेती में खाद, पानी और पौधों की देखभाल को लेकर कई सवाल रहते थे। इस पुस्तक में जानकारी सरल तरीके से दी गई है। चित्र और चेकलिस्ट अच्छे लगे। मोबाइल में पढ़ना आसान है और ऑडियो से सुनकर भी सीख सकती हूं।"
-        },
-        {
-          "name": "सुरेश चौधरी ",
-          "location": "हरियाणा",
-          "rating": 5,
-          "gender": "male",
-          "comment": "एक ही पुस्तक में इतनी जानकारी मिलना अच्छा लगा।\n\nटमाटर, मिर्च, खीरा और लौकी जैसी फसलों के बारे में जानकारी चाहिए थी। इसमें बीज से लेकर कटाई और बाजार तक की जानकारी दी गई है। भाषा आसान है और विषय क्रम से समझाए गए हैं। खेती सीखने वालों के लिए उपयोगी पुस्तक है।"
-        }
-      ]
+      "whatsapp_prompt": "नमस्ते, मुझे '🌱 सब्जी खेती मास्टर PART 1' पुस्तक के बारे में और जानकारी चाहिए।"
     },
     {
       "id": "SUB001",
