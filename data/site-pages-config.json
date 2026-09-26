@@ -2364,6 +2364,26 @@
           "cta_secondary_text": "🛒 लाइव कार्ट",
           "cta_secondary_link": "/ebooks/cart.html",
           "banner_mode": "full"
+        },
+        {
+          "image": "/images/banners/hero_slide-whatsapp-image-202-221438-qj4a.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-whatsapp-image-202-454995-xpaf.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
       "sections_order": [
@@ -2375,24 +2395,7 @@
         "sec_help_support"
       ],
       "hidden_sections": [],
-      "kpi_cards": [
-        {
-          "icon": "fa-star",
-          "title": "नया फीचर शीर्षक",
-          "desc": "फीचर का विवरण यहाँ लिखें...",
-          "image": "/images/kpi/kpi_card-whatsapp-image-202-685174-tiz9.webp"
-        },
-        {
-          "icon": "fa-droplet",
-          "title": "फास्टिंग शुगर संतुलन",
-          "desc": "प्राकृतिक आहार व जामुन-मेथी अर्क से फास्टिंग ग्लूकोज स्तर सामान्य रखें।"
-        },
-        {
-          "icon": "fa-heart-pulse",
-          "title": "इंसुलिन संवेदनशीलता",
-          "desc": "पैंक्रियाटिक बीटा सेल्स को सक्रिय कर इंसुलिन प्रतिरोध दूर करें।"
-        }
-      ],
+      "kpi_cards": [],
       "marketing_cards": [],
       "videos": [
         {
@@ -2460,20 +2463,7 @@
           "name": "naturamore active "
         }
       ],
-      "page_kpi_sections": [
-        {
-          "id": "KPI_SEC_1790358508022",
-          "title": "नया KPI सेक्शन",
-          "icon": "✨",
-          "image": "/images/kpi/kpi_section-whatsapp-image-202-521733-tbx7.webp",
-          "audio_kpi": "",
-          "items": [
-            "पहला बिंदु",
-            "दूसरा बिंदु",
-            "तीसरा बिंदु"
-          ]
-        }
-      ],
+      "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "डायबिटीज: कारण, लक्षण व गंभीर खतरे",
@@ -2525,9 +2515,9 @@
           ],
           "images": [
             {
-              "image": "/images/banners/diet_card-whatsapp-image-202-060468-sk4m.webp",
+              "image": "/images/banners/diet_card-whatsapp-image-202-255552-ax1u.webp",
               "caption": "",
-              "url": "/images/banners/diet_card-whatsapp-image-202-060468-sk4m.webp"
+              "url": "/images/banners/diet_card-whatsapp-image-202-255552-ax1u.webp"
             }
           ]
         },
@@ -2541,9 +2531,9 @@
           ],
           "images": [
             {
-              "image": "/images/banners/exercise_card-kheti-dr-banner-3-050700-fdhd.webp",
+              "image": "/images/banners/exercise_card-whatsapp-image-202-264593-4yt0.webp",
               "caption": "",
-              "url": "/images/banners/exercise_card-kheti-dr-banner-3-050700-fdhd.webp"
+              "url": "/images/banners/exercise_card-whatsapp-image-202-264593-4yt0.webp"
             }
           ]
         }
