@@ -277,6 +277,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
+      "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
         "number": "",
@@ -2430,37 +2431,52 @@
       "pashu_cards": [],
       "products": [
         {
-          "id": "DB001",
-          "name": "life style plus ",
-          "price": 450,
+          "title": "नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus Capsules)",
+          "name": "नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus Capsules)",
+          "description": "करेला, जामुन बीज, गुड़मार और विजयसार से पैंक्रियाज को जाग्रत कर प्राकृतिक इंसुलिन संतुलन बनाता है।",
+          "image": "/images/products/product--------------------836232-cht7.webp",
           "mrp": 450,
-          "badge": "शुगर केयर कैप्सूल",
-          "description": "गुड़मार, विजयसार, जामुन गुठली व गिलोय अर्क। इंसुलिन संवेदनशीलता सुधारकर फास्टिंग व PP शुगर को संतुलित रखता है।The improved Naturamore Lifestyle Plus is a useful nutraceutical for people with a sedentary lifestyle, improper metabolism leading to weight gain and increased blood sugar levels. With an enhanced Nutraceutical formula, it helps support the normal glucose metabolism and digestive secretions, and helps in secreting normal liver enzymes. Naturamore Lifestyle Plus is enriched with natural herbs such as Vijaysar, Gudmar, Jamun, Neem, Mamejao, Kutki, Ginger and Kokum which are traditionally used to balance the metabolism and insulin secretions in the body.\n\nIt helps to maintain:\n\nSupport normal glucose metabolism.\n\nSupport normal digestive secretions.\n\nIn secreting normal liver enzymes.",
-          "image": "/images/products/product-banner-lifestyle-363982-au72.webp",
-          "title": "life style plus ",
-          "dose": "1 capsule before both meals with lukewarm water / milk."
+          "price": 450,
+          "discount_pct": 20,
+          "dose": "1 कैप्सूल सुबह और 1 शाम भोजन से 30 मिनट पहले पानी के साथ।",
+          "badge": "🩺 ब्लड शुगर व डायबिटीज संतुलन",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "DB002",
-          "name": "Nutri liver ",
-          "price": 450,
+          "title": "Nutriliver 30 NOS",
+          "name": "Nutriliver 30 NOS",
+          "description": "उत्पाद का विस्तृत विवरण व मुख्य लाभयकृत की सुरक्षा: यह लिवर के स्वस्थ कामकाज को बनाए रखने और लिवर की कोशिकाओं को नुकसान से बचाने में मदद करता है।\n\nडिटॉक्सिफिकेशन: शरीर और लिवर से हानिकारक टॉक्सिन्स को बाहर निकालकर प्राकृतिक रूप से डिटॉक्स करने में सहायक है।\n\n2. मुख्य घटक (Ingredients)\nहर्ब एक्सट्रैक्ट्स: इसमें कुटकी, कालमेघ, भृंगराज और पुनर्नवा जैसी लिवर-सुरक्षात्मक जड़ी-बूटियाँ शामिल हैं।\n\nएंटीऑक्सीडेंट्स व विटामिन्स: लिवर की कोशिकाओं की मरम्मत और ऊर्जा स्तर को बनाए रखने के लिए पोषक तत्व।...",
+          "image": "/images/products/product-nutriliver-30-nos-446989-trp1.webp",
           "mrp": 450,
-          "badge": "liver care ",
-          "description": "The new Naturamore Nutri Liver is a scientifically and clinically proven enhanced Nutraceutical formula that provides the necessary nutrients to the hepatobiliary system. Naturamore Nutri Liver contains natural herbs such as Milk Thistle, Kutki, Bhuiamla, Punarnava, Kakmachi, Chicory, Chirayita and Siberian Ginseng which are useful in maintaining liver health by providing the necessary functional nutrition to the liver.\n\nIt helps to maintain:\n\nMaintain overall liver health.\n\nBalance levels of liver enzymes.\n\nMaintain healthy Pitta (Bile) secretions.\n\nOptimize detoxification",
-          "image": "/images/products/product-nutri-liver-498231-l1x4.webp",
-          "title": "Nutri liver ",
-          "dose": "1 capsule before both meals with lukewarm water / milk."
+          "price": 450,
+          "discount_pct": 25,
+          "dose": "मात्रा व तरीका: 1 कैप्सूल दिन में दो बार (या चिकित्सक के निर्देशानुसार) भोजन के बाद लें।\n\nनियमित सेवन: बेहतर और लंबे परिणामों के लिए इसे पानी के साथ नियमित रूप से लें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "title": "naturamore active ",
-          "description": "72% Plant-based protein with BCAA | Digestive Enzyme| Gokhshura & Ashwagandha\n\nNaturamore Active is the ultimate plant-based nutraceutical designed for those who demand more from their bodies. Whether you're an athlete, a fitness enthusiast, or someone recovering from an injury, Naturamore Active is here to fuel your healing, recovery, and performance.",
-          "image": "/images/products/product-889-1-398356-hvb9.webp",
+          "title": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
+          "name": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
+          "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
+          "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
           "mrp": 1425,
-          "discount_pct": 0,
-          "dose": "10 gm /daye ",
-          "whatsapp_link": "https://wa.me/917974422572",
           "price": 1425,
-          "name": "naturamore active "
+          "discount_pct": 25,
+          "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।",
+          "badge": "❤️ संपूर्ण परिवार पोषण",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "नेचुरामोरे ईज़ी डिटॉक्स (Easy Detox Tablets)",
+          "name": "नेचुरामोरे ईज़ी डिटॉक्स (Easy Detox Tablets)",
+          "description": "त्रिफला, सनाय व कालमेघ से कब्ज, खट्टी डकारें, गैस व फैटी लिवर की समस्या से 100% राहत।",
+          "image": "/images/products/product--------------------929114-1dtr.webp",
+          "mrp": 800,
+          "price": 800,
+          "discount_pct": 20,
+          "dose": "1 या 2 टैबलेट रात को सोने से पहले गुनगुने पानी के साथ।",
+          "badge": "🌿 आंतों की सफाई व लिवर डिटॉक्स",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
@@ -2503,6 +2519,7 @@
           }
         ]
       },
+      "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
           "title": "शुगर बैलेंसिंग डाइट प्रोटोकॉल",
