@@ -1,6 +1,6 @@
 {
   "version": "2026.2",
-  "updated_at": "2026-09-26T10:43:01.504Z",
+  "updated_at": "2026-09-26T10:44:06.904Z",
   "total_products": 39,
   "categories": [
     {
@@ -86,10 +86,10 @@
     {
       "id": "ns_prod_00027",
       "name": "Pet-Vet Breed 500 GM ",
-      "category": "agri",
-      "category_label": "🌾 कृषि बायोफिट (Biofit Agriculture)",
-      "subcategory": "agri_growth",
-      "subcategory_label": "🌱 पौध विकास व पैदावार (Plant Growth)",
+      "category": "cattle",
+      "category_label": "पशु पोषण (Biofit Cattle Care)",
+      "subcategory": "cattle_health",
+      "subcategory_label": "💪 पशु स्वास्थ्य व पाचन (Animal Care)",
       "badge": "✨ New Launch",
       "mrp": 650,
       "discount_pct": 25,
