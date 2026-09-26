@@ -761,7 +761,7 @@
     },
     {
       "id": "BK015",
-      "updated_at": "2026-09-26T18:17:22.440Z",
+      "updated_at": "2026-09-26T18:51:35.414Z",
       "admin_edited": true,
       "slug": "bk015",
       "book_type": "paid",
@@ -957,12 +957,12 @@
         "banner_image": "/images/banners/bk015-sec_why_buy-banner.webp",
         "cards": [
           {
-            "icon": "📷",
-            "title": "वैज्ञानिक जानकारी",
-            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।"
+            "icon": "🍅",
+            "title": "टमाटर ",
+            "desc": "🍅 टमाटर की खेती में असली खेल कहाँ है?\n👉 बीज चुनने से लेकर पौधे की देखभाल तक छोटी-सी गलती उत्पादन पर असर डाल सकती है। किताब में पूरा Step-by-Step तरीका देखें।\n"
           },
           {
-            "icon": " 🌱",
+            "icon": " 🥦",
             "title": "  सही बीज का चुनाव",
             "desc": "कौन सा बीज चुनें, कब बोएं और अच्छी शुरुआत कैसे करें।"
           },
@@ -1077,7 +1077,7 @@
       ],
       "videos": [
         {
-          "url": "https://youtube.com/shorts/ew5tDJgGTK8?si=uVHuFbNH0L31qUc7",
+          "url": "https://youtube.com/shorts/zry1LfjV_q0?si=zVwdT6p62F1hMwNS",
           "title": "🎥 नया वीडियो डेमो",
           "ratio": "9:16"
         }
