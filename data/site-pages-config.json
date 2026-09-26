@@ -3816,6 +3816,93 @@
         "number": "917974422572",
         "prompt": "नमस्ते, मुझे पौरुष व यौन स्वास्थ्य पर गोपनीय और सुरक्षित परामर्श चाहिए।"
       }
+    },
+    {
+      "id": "page_netsurf_career",
+      "slug": "netsurf-career",
+      "name": "नेटसर्फ डायरेक्ट सेलिंग करियर",
+      "url": "/categories/netsurf.html",
+      "category": "Career & Direct Selling",
+      "status": "active",
+      "theme_primary": "#059669",
+      "theme_dark": "#0b1329",
+      "ticker_text": "⚡ नेटसर्फ 15-दिवसीय क्लोजिंग पे-आउट चक्र लाइव • 🏆 ₹8,19,250 अधिकतम कैप अचीवर्स • 26 साल का अटूट विश्वास",
+      "audio_title": "नेटसर्फ डायरेक्ट सेलिंग करियर परिचर्चा",
+      "audio_script": "नमस्ते! नेटसर्फ के 26-वर्षीय प्रामाणिक डायरेक्ट सेलिंग मॉडल, जीरो इग्रेस फॉर्मूला और ₹8,19,250 के 15-दिवसीय पे-आउट की पूरी जानकारी यहां उपलब्ध है।",
+      "audio_url": "",
+      "og_title": "नेटसर्फ डायरेक्ट सेलिंग - ₹8,19,250/15-दिन क्लोजिंग व डिजिटल करियर",
+      "og_image": "/images/logo/logo.png",
+      "og_description": "मनी रोटेशन के भ्रम से दूर — 26 साल पुरानी 100% प्रामाणिक डायरेक्ट सेलिंग कंपनी और आरोग्यम ऑटो-लीड सिस्टम।",
+      "share_message": "🚀 जानिए नेटसर्फ डायरेक्ट सेलिंग और आरोग्यम ऑटोमेशन से ₹8,19,250 की 15-दिवसीय सफलता का रोडमैप:",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "₹8.19L कैप समिट",
+        "action_link": "/categories/netsurf.html",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": true,
+      "hero_slides": [],
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_zero_egress",
+        "sec_reality_check",
+        "sec_income_matrix",
+        "sec_step_ladder",
+        "sec_rewards_protection",
+        "sec_aarogyam_automation",
+        "sec_video_masterclass",
+        "sec_kyp_products",
+        "sec_survey_form",
+        "sec_faqs",
+        "sec_help_support"
+      ],
+      "hidden_sections": [],
+      "kpi_cards": [
+        {
+          "title": "26+ वर्ष विरासत",
+          "value": "2000 से स्थापित",
+          "icon": "🏢",
+          "badge": "100% DEBT FREE"
+        },
+        {
+          "title": "15-दिन क्लोजिंग कैप",
+          "value": "₹8,19,250",
+          "icon": "👑",
+          "badge": "BI-MONTHLY CAP"
+        },
+        {
+          "title": "सोमवार रिटेल पे-आउट",
+          "value": "5% से 15%",
+          "icon": "💰",
+          "badge": "WEEKLY PAYOUT"
+        },
+        {
+          "title": "कस्टमर ऑटोशिप",
+          "value": "5 + 1 FREE",
+          "icon": "🎁",
+          "badge": "25% DISCOUNT"
+        },
+        {
+          "title": "जनरेशन कमीशन",
+          "value": "3% से 8%",
+          "icon": "📈",
+          "badge": "PASSIVE ROYALTY"
+        },
+        {
+          "title": "फैमिली प्रोटेक्शन",
+          "value": "मेडिक्लेम + नॉमिनी",
+          "icon": "🛡️",
+          "badge": "LIFETIME SECURITY"
+        }
+      ],
+      "marketing_cards": [],
+      "videos": [],
+      "reviews": [],
+      "faqs": []
     }
   ]
 }
