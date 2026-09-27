@@ -1023,42 +1023,42 @@
   }
 }
 
-/* ===== MOBILE RESPONSIVE FIXES ===== */
+/* ===== MOBILE RESPONSIVE FIXES (Fixed to 1 column / 1 ke neeche 1) ===== */
 @media (max-width: 639px) {
-  /* KYP Products grid - 2 columns on mobile */
+  /* KYP Products grid - 1 column on mobile */
   .ns-kyp-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
   .ns-product-card {
-    padding: 12px !important;
+    padding: 16px !important;
   }
   .ns-product-img-wrap {
-    height: 120px !important;
+    height: 160px !important;
   }
   .ns-product-title {
-    font-size: 0.85rem !important;
+    font-size: 1.05rem !important;
   }
   .ns-product-benefits {
-    font-size: 0.75rem !important;
+    font-size: 0.85rem !important;
   }
-  /* Step Ladder grid - 2 columns on mobile */
+  /* Step Ladder grid - 1 column on mobile */
   .ns-ladder-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
   .ns-ladder-card {
-    padding: 12px !important;
+    padding: 16px !important;
   }
   .ns-ladder-img-wrap {
-    height: 80px !important;
+    height: 140px !important;
   }
   .ns-ladder-title {
-    font-size: 0.82rem !important;
+    font-size: 1.05rem !important;
   }
   .ns-ladder-criteria,
   .ns-ladder-perks {
-    font-size: 0.72rem !important;
+    font-size: 0.82rem !important;
   }
   /* KYP tabs - horizontal scroll */
   .ns-kyp-tabs {
@@ -1080,12 +1080,12 @@
 
 @media (max-width: 480px) {
   .ns-kyp-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
   }
   .ns-ladder-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
   }
 }
 
