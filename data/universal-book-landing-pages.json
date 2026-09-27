@@ -1019,9 +1019,7 @@
       },
       "preview_banner": "/images/banners/bk015-sec_preview-banner.webp",
       "demo_images": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
+       "/images/books/bk015-preview-3.webp",
         "/images/books/bk015-preview-4.webp",
         "/images/books/bk015-preview-5.webp",
         "/images/books/bk015-preview-6.webp",
@@ -1032,9 +1030,7 @@
         "/images/books/bk015-preview-11.webp",
         "/images/books/bk015-preview-12.webp",
         "/images/books/bk015-preview-13.webp",
-        "/images/books/bk015-preview-14.webp",
-        "/images/books/bk015-preview-15.webp",
-        "/images/books/bk015-preview-16.webp"
+         "/images/books/bk015-preview-16.webp"
       ],
       "demo_reader_pages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
       "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
@@ -1087,7 +1083,7 @@
       ],
       "videos": [
         {
-          "url": "https://youtube.com/shorts/ew5tDJgGTK8?si=uVHuFbNH0L31qUc7",
+          "url": "https://youtube.com/shorts/zry1LfjV_q0?si=zVwdT6p62F1hMwNS",
           "title": "🎥 नया वीडियो डेमो",
           "ratio": "9:16"
         }

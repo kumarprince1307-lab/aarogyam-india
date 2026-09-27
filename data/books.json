@@ -1068,9 +1068,7 @@
       "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "demoImages": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
+      "/images/books/bk015-preview-3.webp",
         "/images/books/bk015-preview-4.webp",
         "/images/books/bk015-preview-5.webp",
         "/images/books/bk015-preview-6.webp",
@@ -1086,9 +1084,7 @@
         "/images/books/bk015-preview-16.webp"
       ],
       "demo_images": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
+       "/images/books/bk015-preview-3.webp",
         "/images/books/bk015-preview-4.webp",
         "/images/books/bk015-preview-5.webp",
         "/images/books/bk015-preview-6.webp",
@@ -1104,8 +1100,6 @@
         "/images/books/bk015-preview-16.webp"
       ],
       "preview_images": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
         "/images/books/bk015-preview-3.webp",
         "/images/books/bk015-preview-4.webp",
         "/images/books/bk015-preview-5.webp",
@@ -1122,9 +1116,7 @@
         "/images/books/bk015-preview-16.webp"
       ],
       "previewImages": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
+       "/images/books/bk015-preview-3.webp",
         "/images/books/bk015-preview-4.webp",
         "/images/books/bk015-preview-5.webp",
         "/images/books/bk015-preview-6.webp",
@@ -1240,11 +1232,6 @@
       "updated_at": "2026-09-23T23:59:59.999Z",
       "admin_edited": true,
       "demoImages": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
         "/images/books/bk015-preview-6.webp",
         "/images/books/bk015-preview-7.webp",
         "/images/books/bk015-preview-8.webp",
@@ -1258,8 +1245,6 @@
         "/images/books/bk015-preview-16.webp"
       ],
       "demo_images": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
         "/images/books/bk015-preview-3.webp",
         "/images/books/bk015-preview-4.webp",
         "/images/books/bk015-preview-5.webp",
@@ -1276,9 +1261,7 @@
         "/images/books/bk015-preview-16.webp"
       ],
       "preview_images": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
+         "/images/books/bk015-preview-3.webp",
         "/images/books/bk015-preview-4.webp",
         "/images/books/bk015-preview-5.webp",
         "/images/books/bk015-preview-6.webp",
@@ -1294,11 +1277,7 @@
         "/images/books/bk015-preview-16.webp"
       ],
       "previewImages": [
-        "/images/books/bk015-preview-1.webp",
-        "/images/books/bk015-preview-2.webp",
-        "/images/books/bk015-preview-3.webp",
-        "/images/books/bk015-preview-4.webp",
-        "/images/books/bk015-preview-5.webp",
+       "/images/books/bk015-preview-5.webp",
         "/images/books/bk015-preview-6.webp",
         "/images/books/bk015-preview-7.webp",
         "/images/books/bk015-preview-8.webp",
