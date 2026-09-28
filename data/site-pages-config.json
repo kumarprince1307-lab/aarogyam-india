@@ -2945,10 +2945,10 @@
       "audio_title": "जोड़ों का दर्द व गठिया राहत",
       "audio_script": "नमस्ते {name} जी! जोड़ों के दर्द व आर्थराइटिस केयर पेज पर आपका स्वागत है। कार्टिलेज को दोबारा मजबूत बनाने, यूरिक एसिड घटाने और सूजन दूर करने की सम्पूर्ण जानकारी यहाँ दी गई है। kaise ho aa dhara pranam",
       "audio_url": "",
-      "og_title": "जोड़ों का दर्द व गठिया का संपूर्ण प्राकृतिक समाधान | Aarogyam India",
-      "og_image": "/images/banners/health-joint-care.jpg",
+      "og_title": "🔥 क्या आपको पता है आपके जोड़ों का दर्द बार-बार क्यों लौटता है?",
+      "og_image": "/images/banners/og_image-1003678899-976100-9wi4.webp",
       "og_description": "घुटनों का दर्द, कट-कट की आवाज, कार्टिलेज घिसाव व यूरिक एसिड का आयुर्वेदिक उपचार व डाइट चार्ट।",
-      "share_message": "",
+      "share_message": "हमारे Joint Treatment Plan में जानिए:\n🦴 Joint health और movement को कैसे support करें\n💧 Synovial fluid और joint lubrication की भूमिका क्या है\n🧪 Uric acid बढ़ने पर joints पर क्या असर पड़ सकता है और उसे manage करने के तरीके\n🔥 सूजन और stiffness को कम करने के लिए किन चीज़ों पर ध्यान देना चाहिए\n💪 हड्डियों और muscles को मजबूत रखने के लिए क्या जरूरी है\nपूरी जानकारी पाने के लिए नीचे दिए Link को Open करें 👇",
       "floating_banner": {
         "enabled": false,
         "image": "",
@@ -2960,7 +2960,7 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/health-joint-care.jpg",
+          "image": "/images/banners/hero_slide-1003678884-907250-9plu.webp",
           "tag": "🦴 जॉइंट केयर",
           "title": "जोड़ों का दर्द व गठिया राहत",
           "subtitle": "कार्टिलेज मजबूती व यूरिक एसिड नियंत्रण",
@@ -2968,7 +2968,7 @@
           "cta_link": "https://wa.me/917974422572"
         },
         {
-          "image": "/images/banners/hero_slide-whatsapp-image-202-708431-qub9.webp",
+          "image": "/images/banners/hero_slide-1003678885-919508-ty2x.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
@@ -2978,7 +2978,17 @@
           "cta_secondary_link": "/ebooks/cart.html"
         },
         {
-          "image": "/images/banners/hero_slide-whatsapp-image-202-729050-urfb.webp",
+          "image": "/images/banners/hero_slide-1003678886-928731-mq38.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-1003678888-943437-i9qr.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
