@@ -287,7 +287,7 @@
 
     // 1. Unpurchased Book Rule:
     // If user has not purchased BK001 (Kharif Guide) and is not already on that page:
-    if (!purchased.includes('BK001') && !currentPath.includes('kharif-master-guide-2026')) {
+   if (!purchased.includes('BK001') && currentBookId !== 'BK015' && !currentPath.includes('kharif-master-guide-2026')) {
       return {
         type: 'book_kharif',
         badge: '🌾 अनुशंसित ई-बुक',
@@ -301,7 +301,7 @@
     }
 
     // If user has BK001 but NOT BK002 (Kheti Ka Doctor):
-    if (!purchased.includes('BK002') && !currentPath.includes('kheti-dr')) {
+  if (!purchased.includes('BK002') && currentBookId !== 'BK015' && !currentPath.includes('kharif-master-guide-2026')) {
       return {
         type: 'book_kheti_dr',
         badge: '🩺 फसल सुरक्षा गाइड',
@@ -315,7 +315,7 @@
     }
 
     // 2. VIP Subscription Rule (if user is not a VIP member):
-    if (!user.isVip && !currentPath.includes('subscription')) {
+    if (false) {
       return {
         type: 'vip_pass',
         badge: '👑 VIP ऑल-एक्सेस पास',
