@@ -266,6 +266,10 @@ export async function initPageEditor() {
         currentPageKpiSections[targetIndex][fieldName] = webpPath;
         currentPageKpiSections[targetIndex]['image_preview'] = dataUrl;
         renderPageKpiSectionsInBuilder();
+      } else if (targetType === 'cb_card' && currentCbCards[targetIndex]) {
+        currentCbCards[targetIndex][fieldName] = webpPath;
+        currentCbCards[targetIndex]['image_preview'] = dataUrl;
+        renderCbCardsInBuilder();
       } else if (targetType === 'og_image') {
         const inputEl = document.getElementById('pe_input_og_image');
         if (inputEl) inputEl.value = webpPath;
@@ -1251,123 +1255,559 @@ export async function initPageEditor() {
         "category": "Livestock",
         "status": "active",
         "theme_primary": "#0284c7",
-        "theme_dark": "#0369a1",
+        "theme_dark": "#00387b",
+        "ticker_text": "🐄 दुग्ध वृद्धि, बांझपन निवारण व पशु स्वास्थ्य | 24×7 WhatsApp AI पशु डॉक्टर परामर्श सक्रिय! aarogyam india",
+        "audio_title": "पशु पालन व दुग्ध संवर्धन हब",
+        "audio_script": "राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा। आप pet vet  और बायो-फिट उत्पाद सीधे व्हाट्सएप द्वारा ऑर्डर कर सकते हैं।",
+        "audio_url": "",
+        "og_title": "गाय-भैंस में दूध व FAT 2X बढ़ायें | 100% आयुर्वेदिक पशु पोषण हब आरोग्यम",
+        "og_image": "/images/banners/og_image-pashupalan-029612-sv0a.webp",
+        "og_description": "थनैला, बांझपन व दुग्ध समस्याओं का पक्का समाधान। 24x7 WhatsApp AI डॉक्टर परामर्श व प्रमाणित नेटसर्फ Pet-Vet पशुधन पूरक आहार।",
+        "share_message": "🐄 गाय-भैंस में दूध और FAT 2X बढ़ाएं! 🥛\n\nथनैला, बांझपन और कमजोरी का 100% सफल आयुर्वेदिक समाधान। \n\n✨ प्रमुख विशेषताएं:\n• 1 से 2 लीटर दूध और 8% तक FAT वृद्धि\n• थनैला व पाचन रोगों से स्थायी सुरक्षा\n• 24×7 WhatsApp AI डॉक्टर परामर्श उपलब्ध\n\n👉 पूरी जानकारी पढ़ने व सीधे ऑर्डर करने के लिए लिंक पर क्लिक करें:",
+        "floating_banner": {
+                "enabled": false,
+                "image": "",
+                "badge_title": "",
+                "action_link": "",
+                "animation": "ublFloatBook3D"
+        },
         "fb_pixel": true,
         "ga_tag": true,
-        "ticker_text": "🐄 दुग्ध वृद्धि, बांझपन निवारण व पशु स्वास्थ्य | 24×7 WhatsApp AI पशु डॉक्टर परामर्श सक्रिय!",
         "hero_slides": [
-            {
-                "image": "/images/banners/pashu-palan-banner.jpg",
-                "tag": "🐄 पशु पालन विशेष",
-                "title": "पशु पालन व दुग्ध संवर्धन हब",
-                "subtitle": "दुग्ध वृद्धि, बांझपन निवारण व थनैला उपचार",
-                "cta_text": "💬 WhatsApp परामर्श",
-                "cta_link": "https://wa.me/917974422572",
-                "cta_secondary_text": "🛒 उत्पाद देखें",
-                "cta_secondary_link": "#pashu-products"
-            },
-            {
-                "image": "/images/banners/pashu-cow-care.jpg",
-                "tag": "🥛 दुग्ध वृद्धि फॉर्मूला",
-                "title": "गाय-भैंस में दूध व फैट वृद्धि",
-                "subtitle": "नेचुरल हर्बल सप्लीमेंट्स और मिनरल मिक्सचर",
-                "cta_text": "💬 ऑर्डर करें",
-                "cta_link": "https://wa.me/917974422572",
-                "cta_secondary_text": "📞 संपर्क करें",
-                "cta_secondary_link": "#vet-consult"
-            },
-            {
-                "image": "/images/banners/pashu-goat-care.jpg",
-                "tag": "🐐 बकरी पालन गाइड",
-                "title": "उन्नत बकरी पालन व वजन वृद्धि",
-                "subtitle": "रोग रोकथाम व वैज्ञानिक पोषण प्रबंधन",
-                "cta_text": "💬 जानकारी लें",
-                "cta_link": "https://wa.me/917974422572",
-                "cta_secondary_text": "📖 गाइड पढ़ें",
-                "cta_secondary_link": "/ebooks/ebook.html"
-            }
+                {
+                        "image": "/images/banners/hero_slide-pashupalan-banner-371712-0doa.webp",
+                        "tag": "🌾 नया स्पेशल ऑफर",
+                        "title": "नया बैनर शीर्षक यहाँ लिखें",
+                        "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+                        "cta_text": "📚 अभी देखें",
+                        "cta_link": "/ebooks/ebook.html",
+                        "cta_secondary_text": "🛒 लाइव कार्ट",
+                        "cta_secondary_link": "/ebooks/cart.html"
+                },
+                {
+                        "image": "/images/banners/hero_slide-oasupalan-banner-452947-b9ha.webp",
+                        "tag": "🌾 नया स्पेशल ऑफर",
+                        "title": "नया बैनर शीर्षक यहाँ लिखें",
+                        "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+                        "cta_text": "📚 अभी देखें",
+                        "cta_link": "/ebooks/ebook.html",
+                        "cta_secondary_text": "🛒 लाइव कार्ट",
+                        "cta_secondary_link": "/ebooks/cart.html"
+                },
+                {
+                        "image": "/images/banners/hero_slide-pashupalan2-527789-7csc.webp",
+                        "tag": "🌾 नया स्पेशल ऑफर",
+                        "title": "नया बैनर शीर्षक यहाँ लिखें",
+                        "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+                        "cta_text": "📚 अभी देखें",
+                        "cta_link": "/ebooks/ebook.html",
+                        "cta_secondary_text": "🛒 लाइव कार्ट",
+                        "cta_secondary_link": "/ebooks/cart.html"
+                },
+                {
+                        "image": "/images/banners/hero_slide-pashupalan-3-651651-1zbn.webp",
+                        "tag": "🌾 नया स्पेशल ऑफर",
+                        "title": "नया बैनर शीर्षक यहाँ लिखें",
+                        "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+                        "cta_text": "📚 अभी देखें",
+                        "cta_link": "/ebooks/ebook.html",
+                        "cta_secondary_text": "🛒 लाइव कार्ट",
+                        "cta_secondary_link": "/ebooks/cart.html"
+                }
         ],
         "sections_order": [
-            "sec_ticker",
-            "sec_hero_slider",
-            "sec_kpi_badges",
-            "sec_videos",
-            "sec_reviews",
-            "sec_faqs",
-            "sec_help_support"
+                "sec_ticker",
+                "sec_hero_slider",
+                "sec_kpi_badges",
+                "sec_category_pills",
+                "sec_shelves_bestseller",
+                "sec_interspersed_marketing",
+                "sec_shelves_new",
+                "sec_shelves_coming_soon",
+                "sec_combo_promo",
+                "sec_videos",
+                "sec_reviews",
+                "sec_trust_guarantee",
+                "sec_faqs",
+                "sec_help_support"
         ],
         "hidden_sections": [],
         "kpi_cards": [
-            {
-                "icon": "fa-cow",
-                "title": "दूध उत्पादन वृद्धि",
-                "desc": "प्राकृतिक आयुर्वेदिक मिनरल व पोषण"
-            },
-            {
-                "icon": "fa-shield-virus",
-                "title": "मस्टाइटिस व थनैला",
-                "desc": "सटीक लक्षण पहचान व हर्बल उपचार"
-            },
-            {
-                "icon": "fa-dna",
-                "title": "बांझपन से मुक्ति",
-                "desc": "समय पर हीट में लाना व गर्भाधान"
-            },
-            {
-                "icon": "fa-robot",
-                "title": "24×7 AI पशु डॉक्टर",
-                "desc": "WhatsApp पर तुरंत परामर्श"
-            }
+                {
+                        "icon": "fa-cow",
+                        "title": "दूध उत्पादन वृद्धि",
+                        "desc": "प्राकृतिक आयुर्वेदिक मिनरल व पोषण"
+                },
+                {
+                        "icon": "fa-shield-virus",
+                        "title": "मस्टाइटिस व थनैला",
+                        "desc": "सटीक लक्षण पहचान व हर्बल उपचार"
+                },
+                {
+                        "icon": "fa-dna",
+                        "title": "बांझपन से मुक्ति",
+                        "desc": "समय पर हीट में लाना व गर्भाधान"
+                },
+                {
+                        "icon": "fa-robot",
+                        "title": "24×7 AI पशु डॉक्टर",
+                        "desc": "WhatsApp पर तुरंत परामर्श"
+                }
         ],
-        "videos": [],
         "marketing_cards": [],
-        "reviews": [],
-        "faqs": [],
-        "whatsapp_support": {
-            "number": "917974422572",
-            "prompt": "नमस्ते, मुझे पशु पालन व दुग्ध वृद्धि के बारे में सलाह चाहिए।"
-        },
-        "audio_title": "पशु पालन व दुग्ध संवर्धन हब",
-        "audio_script": "राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा। आप सीएफएल और बायो-फिट उत्पाद सीधे व्हाट्सएप द्वारा ऑर्डर कर सकते हैं।",
+        "videos": [],
+        "reviews": [
+                {
+                        "name": "सुखविंदर सिंह",
+                        "location": "रोहतक (हरियाणा)",
+                        "rating": 5,
+                        "comment": "CFL मिनरल मिक्सचर देने के 10 दिन बाद ही मुर्राह भैंस का दूध 1.5 लीटर बढ़ गया और फैट 6.5 से 8.0 हो गया।",
+                        "avatar": "👨‍🌾"
+                },
+                {
+                        "name": "मदनलाल पाटीदार",
+                        "location": "मंदसौर (म.प्र.)",
+                        "rating": 5,
+                        "comment": "गाय के एक थन में सख्त गांठ थी और दूध फटा आ रहा था। थनैला किट से 4 दिन में थन एकदम सामान्य हो गया।",
+                        "avatar": "👨‍🌾"
+                },
+                {
+                        "name": "बलराम गुर्जर",
+                        "location": "दौसा (राजस्थान)",
+                        "rating": 5,
+                        "comment": "भैंस 1.5 साल से गाभिन नहीं ठहर रही थी। यूट्रस टोन और मिनरल देने के बाद पहली ही AI में ठहर गई।",
+                        "avatar": "👨‍🌾"
+                },
+                {
+                        "name": "धर्मेन्द्र यादव",
+                        "location": "इटावा (उ.प्र.)",
+                        "rating": 5,
+                        "comment": "दूध धारा कैल्शियम बहुत बढ़िया है। ब्यात के बाद गाय कमजोर नहीं पड़ी और जेर भी 2 घंटे में साफ गिर गई।",
+                        "avatar": "👨‍🌾"
+                },
+                {
+                        "name": "संतोष तिवारी",
+                        "location": "रीवा (म.प्र.)",
+                        "rating": 5,
+                        "comment": "व्हाट्सएप पर AI डॉक्टर से तुरंत समाधान मिल जाता है। रात में भी आफरा का सटीक उपाय बताया।",
+                        "avatar": "👨‍🌾"
+                },
+                {
+                        "name": "जगजीत ढिल्लों",
+                        "location": "लुधियाना (पंजाब)",
+                        "rating": 5,
+                        "comment": "डेयरी फार्म में 12 गायें हैं। सबका रूमेन पाचन सुधरा है और गोबर में बिना पचा दाना आना बंद हो गया।",
+                        "avatar": "👨‍🌾"
+                },
+                {
+                        "name": "मुस्तकीम खान",
+                        "location": "मेवात (हरियाणा)",
+                        "rating": 5,
+                        "comment": "बकरी पालन में मेमनों की मृत्यु दर रुक गई। CFL से बकरियों का वजन और चमक दोनों बढ़ गए।",
+                        "avatar": "👨‍🌾"
+                },
+                {
+                        "name": "प्रकाश चंद्र",
+                        "location": "कोटा (राजस्थान)",
+                        "rating": 5,
+                        "comment": "पेज पर ऑडियो गाइड बहुत काम की है। पूरा परिचय बिना पढ़े आवाज में समझ आ गया।",
+                        "avatar": "👨‍🌾"
+                },
+                {
+                        "name": "विलास शिंदे",
+                        "location": "पुणे (महाराष्ट्र)",
+                        "rating": 5,
+                        "comment": "डेयरी का मुनाफा 30% बढ़ गया क्योंकि दूध की फैट दर बहुत अच्छी मिलने लगी है।",
+                        "avatar": "👨‍🌾"
+                },
+                {
+                        "name": "छोटेलाल मौर्य",
+                        "location": "प्रयागराज (उ.प्र.)",
+                        "rating": 5,
+                        "comment": "व्हाट्सएप पर ऑर्डर किया और 3 दिन में पार्सल गांव के पते पर डिलीवर हो गया।",
+                        "avatar": "👨‍🌾"
+                }
+        ],
+        "faqs": [
+                {
+                        "q": "CFL मिनरल मिक्सचर प्रतिदिन कितना देना चाहिए?",
+                        "a": "बड़ी दुधारू गाय-भैंस को प्रतिदिन 40-50 ग्राम और छोटी बछिया या बकरी को 15-20 ग्राम दाने या चोकर में मिलाकर देना चाहिए。"
+                },
+                {
+                        "q": "थनैला रोग के शुरुआती लक्षण क्या हैं?",
+                        "a": "थन का गर्म व सख्त होना, छूने पर दर्द, दूध में पानी जैसा पीलापन या सफेद छीछड़े आना। इस अवस्था में तुरंत हर्बल थनैला किट शुरू करें।"
+                },
+                {
+                        "q": "गाय-भैंस बार-बार फिर रही है (रिपीटर), क्या करें?",
+                        "a": "Pet-Vet Breed 500g का 30 दिन का कोर्स कराएं और AI कराने से 2 घंटे पहले यूट्रस टोन दें जिससे गर्भाशय स्वस्थ हो और गर्भ ठहरे।"
+                },
+                {
+                        "q": "दूध में फैट (FAT%) और SNF कैसे बढ़ाएं?",
+                        "a": "Pet-Vet Advanced Cattle Feed Supplement (10-15g दैनिक) दें। यह रूमेन में लाभदायक बैक्टीरिया बढ़ाकर फैट को 6.5 से 8.0% तक बढ़ाता है।"
+                },
+                {
+                        "q": "ब्यात के तुरंत बाद जेर न गिरे तो क्या सावधानी बरतें?",
+                        "a": "हाथ से जेर बिल्कुल न खींचें। यूट्रस क्लीनर टोन व गर्म काढ़ा दें, जिससे 2 से 3 घंटे में प्राकृतिक रूप से जेर साफ हो जाती है।"
+                },
+                {
+                        "q": "क्या Pet-Vet उत्पाद 100% सुरक्षित और प्राकृतिक हैं?",
+                        "a": "हाँ, Pet-Vet उत्पाद 100% जैविक, रासायनिक अवशेष मुक्त और आयुष/GMP प्रमाणित हैं। इनका कोई साइड इफेक्ट नहीं होता।"
+                },
+                {
+                        "q": "बकरी पालन में वजन बढ़ाने के लिए क्या खुराक है?",
+                        "a": "बकरियों और मेमनों को 10-15 ग्राम Pet-Vet सप्लीमेंट दैनिक दाने में दें। इससे 60 दिनों में 4 से 6 किलो तक शुद्ध वजन वृद्धि होती है।"
+                },
+                {
+                        "q": "दवाइयों की डिलीवरी कितने दिनों में होती है?",
+                        "a": "ऑर्डर करने के 2 से 4 कार्य दिवसों में स्पीड पोस्ट या कूरियर द्वारा पूरे भारत में सीधे किसान के घर तक सुरक्षित डिलीवरी हो जाती है।"
+                },
+                {
+                        "q": "WhatsApp AI पशु डॉक्टर से कैसे सलाह लें?",
+                        "a": "पेज पर दिए गए 'सलाह लें' या '24×7 WhatsApp AI डॉक्टर' बटन पर क्लिक करें। अपने पशु की फोटो या लक्षण लिखकर भेजें, तुरंत उपाय मिलेगा।"
+                },
+                {
+                        "q": "क्या हम सीधे फोन पर ऑर्डर दे सकते हैं?",
+                        "a": "हाँ, आप हमारे हेल्पलाइन नंबर 7974422572 पर कॉल या व्हाट्सएप करके किसी भी उत्पाद का सीधा कैश ऑन डिलीवरी (COD) ऑर्डर दे सकते हैं।"
+                }
+        ],
+        "health_diseases": [
+                {
+                        "id": "DIS001",
+                        "name": "मधुमेह / डायबिटीज",
+                        "badge": "ब्लड शुगर नियंत्रण",
+                        "color": "#3b82f6",
+                        "icon": "🩸",
+                        "image": "/images/banners/health-diabetes.jpg",
+                        "symptoms": [
+                                "बार-बार पेशाब आना",
+                                "थकान व कमजोरी",
+                                "शुगर असंतुलन"
+                        ],
+                        "description": "फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।",
+                        "solution": "जामुन-करेला अर्क, गिलोय व मेथी दाना का प्राकृतिक योग और वैज्ञानिक डाइट प्लान।"
+                },
+                {
+                        "id": "DIS002",
+                        "name": "जोड़ों का दर्द व गठिया",
+                        "badge": "जोड़ों का दर्द राहत",
+                        "color": "#8b5cf6",
+                        "icon": "🦴",
+                        "image": "/images/banners/health-joint-care.jpg",
+                        "symptoms": [
+                                "घुटनों व जोड़ों में दर्द",
+                                "चलने में तकलीफ",
+                                "सूजन व जकड़न"
+                        ],
+                        "description": "कार्टिलेज पोषण, यूरिक एसिड नियंत्रण और जोड़ों के दर्द से प्राकृतिक आयुर्वेदिक समाधान।",
+                        "solution": "शल्लाकी, गुग्गुल, निर्गुंडी तैलम मालिश व यूरिक एसिड घटाने वाला प्राकृतिक अर्क।"
+                },
+                {
+                        "id": "DIS003",
+                        "name": "महिला स्वास्थ्य / PCOD",
+                        "badge": "हार्मोनल संतुलन",
+                        "color": "#ec4899",
+                        "icon": "🌸",
+                        "image": "/images/banners/health-banner.jpeg",
+                        "symptoms": [
+                                "अनियमित माहवारी",
+                                "हार्मोनल असंतुलन",
+                                "कमजोरी"
+                        ],
+                        "description": "हार्मोनल संतुलन, गर्भाशय पोषण और पीसीओडी/पीसीओएस का सम्पूर्ण सुरक्षित हर्बल समाधान।",
+                        "solution": "अशोकारिष्ट, शतावरी, लोध्र व कांचनार गुग्गुलु का सुरक्षित आयुर्वेदिक सेवन।"
+                },
+                {
+                        "id": "DIS004",
+                        "name": "बाल झड़ना व डैंड्रफ",
+                        "badge": "हेयर फॉल कंट्रोल",
+                        "color": "#6366f1",
+                        "icon": "💇",
+                        "image": "/images/banners/health-hair-care.jpg",
+                        "symptoms": [
+                                "तेजी से बाल झड़ना",
+                                "रूसी व डैंड्रफ",
+                                "सिर में खुजली"
+                        ],
+                        "description": "बालों की जड़ों को पोषण, नए बालों का विकास और डैंड्रफ मुक्त घने बालों के लिए विशेष थेरेपी।",
+                        "solution": "भृंगराज, आंवला, शिकाकाई हर्बल हेयर ऑयल व एंटी-डैंड्रफ स्कैल्प सीरम।"
+                },
+                {
+                        "id": "DIS005",
+                        "name": "त्वचा रोग व ग्लो",
+                        "badge": "ग्लोइंग स्किन",
+                        "color": "#06b6d4",
+                        "icon": "✨",
+                        "image": "/images/banners/health-banner.jpeg",
+                        "symptoms": [
+                                "कील-मुंहासे (पिंपल्स)",
+                                "दाद व खुजली",
+                                "झाइयां"
+                        ],
+                        "description": "रक्त शुद्धि और प्राकृतिक जड़ी-बूटियों द्वारा पिंपल्स, झाइयों और त्वचा संक्रमण से राहत।",
+                        "solution": "नीम, मंजिष्ठा, खदिरारिष्ट रक्त शोधक और एलोवेरा-हल्दी जेल लेप।"
+                },
+                {
+                        "id": "DIS006",
+                        "name": "मोटापा व वजन नियंत्रण",
+                        "badge": "नेचुरल फैट बर्न",
+                        "color": "#f59e0b",
+                        "icon": "⚖️",
+                        "image": "/images/banners/health-weight-loss.jpg",
+                        "symptoms": [
+                                "पेट की जिद्दी चर्बी",
+                                "सांस फूलना",
+                                "धीमा मेटाबॉलिज्म"
+                        ],
+                        "description": "प्राकृतिक मेटाबॉलिज्म बूस्ट और जिद्दी फैट घटाने की सम्पूर्ण वैज्ञानिक डाइट और हर्बल फार्मूला।",
+                        "solution": "मेदोहर गुग्गुलु, त्रिफला, दालचीनी-ग्रीन टी एक्सट्रैक्ट व 24 घंटे की डिटॉक्स डाइट।"
+                },
+                {
+                        "id": "DIS007",
+                        "name": "बच्चों का पोषण व दिमाग",
+                        "badge": "स्मार्ट किड्स",
+                        "color": "#10b981",
+                        "icon": "👶",
+                        "image": "/images/banners/health-banner.jpeg",
+                        "symptoms": [
+                                "कमजोर याददाश्त",
+                                "भूख न लगना",
+                                "धीमी शारीरिक लंबाई"
+                        ],
+                        "description": "बच्चों की रोग प्रतिरोधक क्षमता, लंबाई और मानसिक एकाग्रता बढ़ाने का सम्पूर्ण प्राकृतिक न्यूट्रिशन।",
+                        "solution": "शंखपुष्पी, ब्राह्मी, अश्वगंधा सिरप और प्राकृतिक सुपरफूड्स व बादाम शेक डाइट।"
+                },
+                {
+                        "id": "DIS008",
+                        "name": "नेचुरल होम केयर",
+                        "badge": "टॉक्सिन फ्री",
+                        "color": "#84cc16",
+                        "icon": "🏡",
+                        "image": "/images/banners/health-banner.jpeg",
+                        "symptoms": [
+                                "केमिकल युक्त फिनाइल व डिटर्जेंट",
+                                "बच्चों व बुजुर्गों को एलर्जी"
+                        ],
+                        "description": "घर को हानिकारक रसायनों से मुक्त, स्वच्छ और रोगाणु-रहित रखने के इको-फ्रेंडली बायो-नेचुरल क्लीनर्स।",
+                        "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
+                }
+        ],
+        "crops": [
+                {
+                        "id": "CROP001",
+                        "name": "सोयाबीन (Soybean)",
+                        "season": "खरीफ फसल",
+                        "image": "/images/crops/soyabeen.jpeg",
+                        "badge": "प्रमुख तिलहन",
+                        "color": "#3b82f6",
+                        "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
+                        "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
+                },
+                {
+                        "id": "CROP002",
+                        "name": "धान / चावल (Paddy)",
+                        "season": "खरीफ / रबी",
+                        "image": "/images/crops/paddy.jpeg",
+                        "badge": "अन्नदाता फसल",
+                        "color": "#8b5cf6",
+                        "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
+                        "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
+                },
+                {
+                        "id": "CROP003",
+                        "name": "गेहूं (Wheat)",
+                        "season": "रबी फसल",
+                        "image": "/images/crops/wheat.jpeg",
+                        "badge": "मुख्य खाद्यान्न",
+                        "color": "#6366f1",
+                        "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
+                        "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
+                },
+                {
+                        "id": "CROP004",
+                        "name": "कपास / नरमा (Cotton)",
+                        "season": "खरीफ व जायद",
+                        "image": "/images/banners/hero-banner-1.jpeg",
+                        "badge": "सफेद सोना",
+                        "color": "#0ea5e9",
+                        "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
+                        "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
+                },
+                {
+                        "id": "CROP005",
+                        "name": "मक्का (Maize)",
+                        "season": "खरीफ / जायद",
+                        "image": "/images/crops/maize.jpeg",
+                        "badge": "अनाज व चारा",
+                        "color": "#06b6d4",
+                        "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
+                        "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
+                },
+                {
+                        "id": "CROP006",
+                        "name": "सब्जियां, मिर्च व टमाटर",
+                        "season": "बारहमासी",
+                        "image": "/images/crops/vegetables.jpeg",
+                        "badge": "नकदी फसल",
+                        "color": "#10b981",
+                        "mainIssues": "मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा",
+                        "solution": "ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।"
+                }
+        ],
+        "pashu_cards": [
+                {
+                        "id": "PASHU001",
+                        "name": "गाय - दुग्ध वृद्धि व पोषण",
+                        "category": "गाय पालन (Cow Care)",
+                        "icon": "🐄",
+                        "badge": "1-2L दूध वृद्धि",
+                        "image": "/images/banners/pashu-cow-care.jpg",
+                        "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
+                        "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
+                },
+                {
+                        "id": "PASHU002",
+                        "name": "भैंस - FAT% व SNF वृद्धि",
+                        "category": "भैंस पालन (Buffalo Care)",
+                        "icon": "🐃",
+                        "badge": "FAT 8% तक",
+                        "image": "/images/banners/pashu-palan-banner.jpg",
+                        "mainIssues": "दूध में फैट (FAT) कम आना, गर्मी में हांफना व सुस्ती, बांझपन",
+                        "solution": "बायपास फैट, रुमेन बफर और हर्बल पाचक चूर्ण द्वारा दूध में गाढ़ापन और उच्चतम फैट प्रतिशत।"
+                },
+                {
+                        "id": "PASHU003",
+                        "name": "बकरी पालन - वजन वृद्धि",
+                        "category": "बकरी पालन (Goat Farming)",
+                        "icon": "🐐",
+                        "badge": "उच्च मुनाफा",
+                        "image": "/images/banners/pashu-goat-care.jpg",
+                        "mainIssues": "बच्चों में दस्त व निमोनिया, वजन धीमी गति से बढ़ना, पेट के कीड़े",
+                        "solution": "नियमित डीवर्मिंग (कृमिनाशक), प्रोटीन युक्त दाना मिश्रण और ग्रोथ प्रमोटर सप्लीमेंट्स।"
+                },
+                {
+                        "id": "PASHU004",
+                        "name": "पशुओं में थनैला व पाचन रोग",
+                        "category": "रोग नियंत्रण व प्राथमिक उपचार",
+                        "icon": "🩺",
+                        "badge": "100% सुरक्षा",
+                        "image": "/images/banners/pashu-palan-banner.jpg",
+                        "mainIssues": "थनैला (Mastitis), अयन में सूजन, छेछड़े आना, आफरा (गैस) व अपच",
+                        "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
+                }
+        ],
         "products": [
-            {
-                "id": "PAS001",
-                "name": "CFL Mineral Feed (1kg)",
-                "price": 650.0,
-                "mrp": 650.0,
-                "badge": "दुग्ध वृद्धि बूस्टर",
-                "description": "बायपास प्रोटीन, चेलेटेड मिनरल्स व प्रोबायोटिक्स युक्त। 7 दिन में दूध और फैट में अचूक सुधार लाता है।",
-                "image": "/images/banners/pashu-palan-banner.jpg"
-            },
-            {
-                "id": "PAS002",
-                "name": "Mastitis Shield Care Kit",
-                "price": 850.0,
-                "mrp": 850.0,
-                "badge": "थनैला रक्षक",
-                "description": "अयन की सूजन, गांठ व दूध में छीछड़ों को दूर करने वाली 100% सुरक्षित आयुर्वेदिक एंटी-इंफ्लेमेटरी किट।",
-                "image": "/images/banners/pashu-palan-banner.jpg"
-            },
-            {
-                "id": "PAS003",
-                "name": "Doodh Dhara High-Cal (1L)",
-                "price": 450.0,
-                "mrp": 450.0,
-                "badge": "लिक्विड कैल्शियम",
-                "description": "विटामिन D3, B12 व बायोटीन युक्त बायो-अवेलेबल कैल्शियम। ब्यात के बाद मिल्क फीवर से बचाता है।",
-                "image": "/images/banners/pashu-palan-banner.jpg"
-            },
-            {
-                "id": "PAS004",
-                "name": "Uterus Tone Cleanser (500ml)",
-                "price": 550.0,
-                "mrp": 550.0,
-                "badge": "बांझपन निवारक",
-                "description": "बच्चेदानी की गंदगी साफ कर समय पर शुद्ध हीट में लाता है और गर्भ ठहरने की संभावना 90% बढ़ाता है।",
-                "image": "/images/banners/pashu-palan-banner.jpg"
-            }
-        ]
-    },
+                {
+                        "title": "Pet-Vet Breed 500 GM ",
+                        "name": "Pet-Vet Breed 500 GM ",
+                        "description": "समस्या का समाधान: अक्सर पशुओं में खाना न पचना, पेट फूलना, गैस, दस्त, या भोजन से सही पोषण न मिलने के कारण उनकी सेहत गिरने लगती है और दूध या ग्रोथ पर बुरा असर पड़ता है।\n\nउत्पाद का लाभ: यह पेट की इन सभी समस्याओं को जड़ से खत्म करता है, पाचन एंजाइम्स को एक्टिवेट करता है और खाए गए चारे से मिलने वाले पोषण (Nutrient absorption) को सौ प्रतिशत तक बढ़ाकर पशु को स्वस्थ और तंदुरुस्त रखता है।..",
+                        "image": "/images/products/product-------------new-pr-296198-6gyd.webp",
+                        "mrp": 650,
+                        "price": 650,
+                        "discount_pct": 25,
+                        "dose": "मात्रा व तरीका: पशु चिकित्सक या उत्पाद के निर्देशों के अनुसार उचित मात्रा में इसे पशु के चारे या दाने में मिलाकर दें।\n\nनियमित सेवन: पाचन तंत्र को हमेशा दुरुस्त रखने के लिए इसे नियमित रूप से उपयोग करें।",
+                        "badge": "✨ New Launch",
+                        "whatsapp_link": "https://wa.me/917974422572"
+                },
+                {
+                        "title": "Pet-Vet Breed 500 GRAM ",
+                        "name": "Pet-Vet Breed 500 GRAM ",
+                        "description": "समस्या का समाधान: अक्सर पशुओं में हॉर्मोनल असंतुलन, सही समय पर हीट (Estrous cycle) में न आना और गर्भधारण न ठहरने (Infertility) जैसी गंभीर समस्याओं के कारण पशुपालकों को भारी आर्थिक नुकसान उठाना पड़ता है।\n\nउत्पाद का लाभ: यह विशेष लिक्विड फॉर्मूलेशन पशुओं में प्राकृतिक प्रजनन चक्र को सुचारू बनाने, गर्भधारण दर (Conception rate) को बढ़ाने और स्वस्थ प्रजनन अंगों के विकास में मदद करता है, जिससे पशुपालन व्यवसाय अधिक लाभदायक बनता है।",
+                        "image": "/images/products/product-pet-vet-breed-500--931551-mm4t.webp",
+                        "mrp": 650,
+                        "price": 650,
+                        "discount_pct": 25,
+                        "dose": "मात्रा व तरीका: विशेषज्ञ या पैकेजिंग पर दिए गए दिशा-निर्देशों के अनुसार पशुओं के दैनिक आहार या पानी में उचित मात्रा मिलाएं।\n\nनियमित सेवन: प्रजनन संबंधी बेहतर और स्थायी परिणामों के लिए इसे नियमित रूप से उपयोग करें।",
+                        "badge": "✨ New Launch",
+                        "whatsapp_link": "https://wa.me/917974422572"
+                },
+                {
+                        "title": "Pet-Vet Advanced Cattle Feed Supplement 1 KG",
+                        "name": "Pet-Vet Advanced Cattle Feed Supplement 1 KG",
+                        "description": "गाय-भैंस में 1 से 1.5 लीटर दूध वृद्धि, 0.8 से 1.2 डिग्री फैट बढ़त और समय पर गाभिन ठहराने में 100% सहायक।",
+                        "image": "/images/products/product-pet-vet-advanced-c-454250-7umw.webp",
+                        "mrp": 1275,
+                        "price": 1275,
+                        "discount_pct": 25,
+                        "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने या बांटे में मिलाकर दें। बछड़े/बकरियां: 5 ग्राम प्रतिदिन।",
+                        "badge": "🐄 दूध व फैट बूस्टर",
+                        "whatsapp_link": "https://wa.me/917974422572"
+                },
+                {
+                        "title": "Pet-Vet Advanced Cattle Feed Supplement 500 gm",
+                        "name": "Pet-Vet Advanced Cattle Feed Supplement 500 gm",
+                        "description": "चेलेटेड मिनरल्स, विटामिन्स, प्रीबायोटिक व प्रोबायोटिक्स से भरपूर सम्पूर्ण पशु आहार पूरक।",
+                        "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp",
+                        "mrp": 699,
+                        "price": 699,
+                        "discount_pct": 25,
+                        "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने में मिलाकर दें। 60 से 90 दिन लगातार खिलाएं।",
+                        "badge": "🥛 प्रीमियम कैटल फीड कंसंट्रेट",
+                        "whatsapp_link": "https://wa.me/917974422572"
+                }
+        ],
+        "page_kpi_sections": [],
+        "clinical_breakdown": {
+                "badge_text": "🩺 SCIENTIFIC DIAGNOSIS & REMEDIES",
+                "main_title": "पशुओं की प्रमुख 4 गंभीर समस्याएं: कारण, लक्षण व इलाज",
+                "subtitle": "सही समय पर सही पहचान करें और पशुधन की उत्पादकता व जीवन को सुरक्षित रखें",
+                "cards": [
+                        {
+                                "title": "🚨 थनैला (Mastitis) रोकथाम: सूजन, दर्द व छीछड़े",
+                                "color": "#ef4444",
+                                "image": "/images/banners/pashu-cow-care.jpg",
+                                "badge": "🚨 आपातकालीन",
+                                "points": [
+                                        "कारण: थन में जीवाणु संक्रमण (Streptococcus), फर्श की गंदगी, दूध अधूरा निकालना।",
+                                        "लक्षण: अयन सख्त व गर्म होना, छूने पर दर्द, दूध फटा हुआ या मवाद/खून युक्त आना।",
+                                        "उपचार: थन को पूर्ण खाली करें। हर्बल थनैला किट व बायो-फिट स्प्रे शेड्यूल तुरंत शुरू करें।"
+                                ],
+                                "remedy": "हर्बल थनैला किट + बायो-फिट स्प्रे (थन को पूर्ण खाली कर 4 दिन लगातार दें)"
+                        },
+                        {
+                                "title": "🥛 दूध व FAT% की कमी: दुग्ध वृद्धि व फैट संवर्धन",
+                                "color": "#2563eb",
+                                "image": "/images/banners/pashu-palan-banner.jpg",
+                                "badge": "🥛 दुग्ध संवर्धन",
+                                "points": [
+                                        "कारण: रूमेन में सूक्ष्मजीवों की कमी, पोषक तत्वों का अवशोषण न होना, असंतुलित आहार।",
+                                        "लक्षण: समय से पहले दूध घटना, फैट 6.5 से घटकर 4.0 होना, पशु का दिन-ब-दिन कमजोर होना।",
+                                        "उपचार: Pet-Vet Advanced Cattle Feed Supplement (10-15g दैनिक) दाने में मिलाकर दें।"
+                                ],
+                                "remedy": "Pet-Vet Advanced Cattle Feed Supplement (10-15 ग्राम दैनिक दाने में दें)"
+                        },
+                        {
+                                "title": "🐄 बांझपन व रिपीटर: समय पर गाभिन न ठहरना",
+                                "color": "#f59e0b",
+                                "image": "/images/banners/pashu-goat-care.jpg",
+                                "badge": "🔄 प्रजनन सुरक्षा",
+                                "points": [
+                                        "कारण: गर्भाशय में इंफेक्शन (Metritis), ओवेरियन सिस्ट, फॉस्फोरस व विटामिन E की कमी।",
+                                        "लक्षण: हीट के समय गंदा डिस्चार्ज देना, हर 21 दिन में बार-बार सीमन डलवाने पर भी खाली रहना।",
+                                        "उपचार: Pet-Vet Breed (500g) का नियमित कोर्स कराएं जिससे गर्भाशय स्वस्थ हो और पहली बार में गर्भ ठहरे।"
+                                ],
+                                "remedy": "Pet-Vet Breed (500g) नियमित कोर्स द्वारा गर्भाशय शुद्धि व सफल गर्भाधान"
+                        },
+                        {
+                                "title": "🌿 अफरा, अपच व दस्त: रूमेन पाचन विकार",
+                                "color": "#16a34a",
+                                "image": "/images/banners/pashu-cow-care.jpg",
+                                "badge": "⚠️ पाचन राहत",
+                                "points": [
+                                        "कारण: गीला व सड़ा चारा खाना, अत्यधिक अनाज या दलिया एक साथ खा लेना, गैस न निकलना।",
+                                        "लक्षण: बाईं कोख का फूल जाना, जुगाली बंद होना, मुंह से लार टपकना व बेचैनी।",
+                                        "उपचार: हींग, अजवाइन, काला नमक व मीठा तेल नाल से दें। रूमेन बफर और प्रोबायोटिक्स तुरंत दें।"
+                                ],
+                                "remedy": "हींग-अजवाइन नाल + रूमेन बफर प्रोबायोटिक्स (10 मिनट में तत्काल राहत)"
+                        }
+                ]
+        },
+        "netsurf_plan": null,
+        "diet_exercise": null,
+        "whatsapp_support": {
+                "number": "917974422572",
+                "prompt": "नमस्ते, मुझे पशु पालन व दुग्ध वृद्धि के बारे में सलाह चाहिए।"
+        }
+},
     {
         "id": "page_health_hub",
         "slug": "health-hub",
@@ -2329,6 +2769,7 @@ export async function initPageEditor() {
   let currentPageKpiSections = [];    // NEW: Page-specific KPI sections (health sub-pages)
   let currentDietImages = [];         // NEW: Multi-image gallery for Diet
   let currentExerciseImages = [];     // NEW: Multi-image gallery for Exercise
+  let currentCbCards = [];            // Dynamic Clinical Breakdown Cards
   let pagesCurrentPage = 1;
   let pagesPageSize = 25;
   let activeCategoryFilter = 'all';
@@ -2825,7 +3266,7 @@ export async function initPageEditor() {
             <span>🔬 9.1 वैज्ञानिक विश्लेषण (कारण, लक्षण, खतरे) व 24-घंटे का डाइट/व्यायाम चार्ट</span>
             <span style="font-size: 0.72rem; background: rgba(37,99,235,0.2); color: #93c5fd; padding: 2px 8px; border-radius: 10px;">रोग विशेष व स्वास्थ्य सब-पेज</span>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 14px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px;">
             <div>
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">सेक्शन बैज (Badge Text)</label>
               <input type="text" id="pe_input_cb_badge" class="admin-input" placeholder="🔬 वैज्ञानिक विश्लेषण" style="width: 100%; padding: 8px 12px;" />
@@ -2834,61 +3275,20 @@ export async function initPageEditor() {
               <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">मुख्य विश्लेषण शीर्षक (Main Title)</label>
               <input type="text" id="pe_input_cb_title" class="admin-input" placeholder="डायबिटीज: कारण, लक्षण व गंभीर खतरे" style="width: 100%; padding: 8px 12px;" />
             </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: var(--admin-text);">उप-शीर्षक (Subtitle)</label>
+              <input type="text" id="pe_input_cb_subtitle" class="admin-input" placeholder="लक्षण पहचानें, सही आयुर्वेदिक निदान व वैज्ञानिक उपचार अपनाएं" style="width: 100%; padding: 8px 12px;" />
+            </div>
           </div>
 
-          <!-- 3 Cards: Causes, Symptoms, Risks -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 14px;">
-            <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
-              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #60a5fa;">❓ कारण शीर्षक (Causes Title)</label>
-              <input type="text" id="pe_input_cb_causes_title" class="admin-input" placeholder="❓ क्यों होती है डायबिटीज? (Causes)" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
-              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">कारण फोटो (Causes Card Image)</label>
-              <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px;">
-                <input type="text" id="pe_input_cb_causes_img" class="admin-input" placeholder="/images/banners/diabetes-causes-infographic.webp" style="flex:1; padding:6px 10px;" onchange="window.previewCbCardImage(0, this.value)" />
-                <label class="admin-button small-button" style="background:#2563eb; color:#fff; cursor:pointer; padding:6px 10px; margin:0; font-size:0.75rem; white-space:nowrap;">
-                  📁 अपलोड
-                  <input type="file" accept="image/*" style="display:none;" onchange="window.handleCbCardImageUpload(0, this)">
-                </label>
-              </div>
-              <div id="pe_cb_causes_img_preview" style="margin-bottom:8px; display:none; max-height:80px; border-radius:6px; overflow:hidden; border:1px solid #334155;">
-                <img id="pe_cb_causes_img_preview_img" src="" style="width:100%; height:80px; object-fit:cover;">
-              </div>
-              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">कारण बिंदु (1 बिंदु प्रति लाइन)</label>
-              <textarea id="pe_input_cb_causes_points" class="admin-textarea" rows="4" placeholder="इंसुलिन प्रतिरोध (Resistance)...&#10;पैंक्रियाज की कमजोरी...&#10;तनाव व कोर्टिसोल..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
-            </div>
-            <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
-              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #60a5fa;">⚠️ मुख्य लक्षण (Symptoms Title)</label>
-              <input type="text" id="pe_input_cb_symptoms_title" class="admin-input" placeholder="⚠️ मुख्य लक्षण (Symptoms)" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
-              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">लक्षण फोटो (Symptoms Card Image)</label>
-              <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px;">
-                <input type="text" id="pe_input_cb_symptoms_img" class="admin-input" placeholder="/images/banners/diabetes-symptoms-infographic.webp" style="flex:1; padding:6px 10px;" onchange="window.previewCbCardImage(1, this.value)" />
-                <label class="admin-button small-button" style="background:#2563eb; color:#fff; cursor:pointer; padding:6px 10px; margin:0; font-size:0.75rem; white-space:nowrap;">
-                  📁 अपलोड
-                  <input type="file" accept="image/*" style="display:none;" onchange="window.handleCbCardImageUpload(1, this)">
-                </label>
-              </div>
-              <div id="pe_cb_symptoms_img_preview" style="margin-bottom:8px; display:none; max-height:80px; border-radius:6px; overflow:hidden; border:1px solid #334155;">
-                <img id="pe_cb_symptoms_img_preview_img" src="" style="width:100%; height:80px; object-fit:cover;">
-              </div>
-              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">लक्षण बिंदु (1 बिंदु प्रति लाइन)</label>
-              <textarea id="pe_input_cb_symptoms_points" class="admin-textarea" rows="4" placeholder="रात में बार-बार पेशाब जाना...&#10;भूख लगना और थकान...&#10;हाथ-पैरों में जलन या सुन्नपन..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
-            </div>
-            <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
-              <label class="admin-label" style="font-size: 0.8rem; font-weight: 700; color: #f87171;">🚨 साइड इफेक्ट्स व खतरे (Risks Title)</label>
-              <input type="text" id="pe_input_cb_risks_title" class="admin-input" placeholder="🚨 साइड इफेक्ट्स व खतरे (Risks)" style="width: 100%; padding: 6px 10px; margin-bottom: 8px;" />
-              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">खतरे फोटो (Risks Card Image)</label>
-              <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px;">
-                <input type="text" id="pe_input_cb_risks_img" class="admin-input" placeholder="/images/banners/diabetes-risks-infographic.webp" style="flex:1; padding:6px 10px;" onchange="window.previewCbCardImage(2, this.value)" />
-                <label class="admin-button small-button" style="background:#dc2626; color:#fff; cursor:pointer; padding:6px 10px; margin:0; font-size:0.75rem; white-space:nowrap;">
-                  📁 अपलोड
-                  <input type="file" accept="image/*" style="display:none;" onchange="window.handleCbCardImageUpload(2, this)">
-                </label>
-              </div>
-              <div id="pe_cb_risks_img_preview" style="margin-bottom:8px; display:none; max-height:80px; border-radius:6px; overflow:hidden; border:1px solid #334155;">
-                <img id="pe_cb_risks_img_preview_img" src="" style="width:100%; height:80px; object-fit:cover;">
-              </div>
-              <label class="admin-label" style="font-size: 0.76rem; color: var(--admin-muted);">खतरे बिंदु (1 बिंदु प्रति लाइन)</label>
-              <textarea id="pe_input_cb_risks_points" class="admin-textarea" rows="4" placeholder="किडनी डैमेज (नेफ्रोपैथी)...&#10;डायबिटिक न्यूरोपैथी...&#10;हार्ट अटैक व स्ट्रोक जोखिम..." style="width: 100%; font-size: 0.8rem; padding: 6px 10px;"></textarea>
-            </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <span style="font-size: 0.85rem; font-weight: 800; color: #93c5fd;">📑 रोग / समस्या विश्लेषण कार्ड्स (Problem & Clinical Cards)</span>
+            <button type="button" id="btn_add_cb_card" class="admin-button small-button" style="background: #2563eb; color: #fff; font-weight: 800;">
+              + नया विश्लेषण कार्ड जोड़ें
+            </button>
+          </div>
+          <div id="pe_cb_cards_container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px;">
+            <!-- Rendered dynamically -->
           </div>
 
           <!-- 2 Cards: 24-Hr Diet Protocol & Exercise/Lifestyle Guidance -->
@@ -3041,6 +3441,16 @@ export async function initPageEditor() {
               + नई समीक्षा जोड़ें
             </button>
           </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 12px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #a78bfa;">शीर्षक / मुख्य हेडिंग (Reviews Heading)</label>
+              <input type="text" id="pe_input_reviews_heading" class="admin-input" placeholder="जैसे: संतुष्ट किसान व पशुपालक क्या कहते हैं?" style="width: 100%; font-size: 0.85rem; padding: 6px 10px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #a78bfa;">बैज / उप-शीर्षक (Reviews Badge)</label>
+              <input type="text" id="pe_input_reviews_badge" class="admin-input" placeholder="जैसे: ⭐ 100% प्रामाणिक किसान समीक्षाएं" style="width: 100%; font-size: 0.85rem; padding: 6px 10px;" />
+            </div>
+          </div>
           <div id="pe_reviews_container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
             <!-- Rendered dynamically -->
           </div>
@@ -3055,6 +3465,16 @@ export async function initPageEditor() {
             <button type="button" id="btn_add_page_faq" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800;">
               + नया प्रश्न जोड़ें
             </button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 12px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">शीर्षक / मुख्य हेडिंग (FAQs Heading)</label>
+              <input type="text" id="pe_input_faqs_heading" class="admin-input" placeholder="जैसे: अक्सर पूछे जाने वाले सवाल (FAQs)" style="width: 100%; font-size: 0.85rem; padding: 6px 10px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">बैज / उप-शीर्षक (FAQs Badge)</label>
+              <input type="text" id="pe_input_faqs_badge" class="admin-input" placeholder="जैसे: ❓ आपके सभी सवालों के सटीक जवाब" style="width: 100%; font-size: 0.85rem; padding: 6px 10px;" />
+            </div>
           </div>
           <div id="pe_faqs_container" style="display: flex; flex-direction: column; gap: 10px;">
             <!-- Rendered dynamically -->
@@ -4625,6 +5045,26 @@ export async function initPageEditor() {
     renderFaqsInBuilder();
   });
 
+  document.getElementById('btn_add_cb_card')?.addEventListener('click', () => {
+    currentCbCards.push({
+      id: `CB_${Date.now()}`,
+      title: 'नई समस्या / रोग शीर्षक',
+      badge: '🔬 वैज्ञानिक निदान',
+      color: '#2563eb',
+      image: '',
+      points: ['मुख्य कारण या लक्षण बिंदु 1', 'मुख्य कारण या लक्षण बिंदु 2'],
+      remedy: {
+        title: 'प्राकृतिक व आयुर्वेदिक उपचार (Herbal Remedy)',
+        steps: ['उपचार विधि / उपाय 1', 'उपचार विधि / उपाय 2']
+      },
+      whatsapp_btn: {
+        enabled: true,
+        text: '📱 विशेषज्ञ से समाधान पूछें'
+      }
+    });
+    renderCbCardsInBuilder();
+  });
+
   let netsurfMasterCatalog = [];
   async function loadNetsurfMasterCatalog() {
     try {
@@ -5372,45 +5812,63 @@ export async function initPageEditor() {
     const wrap = document.getElementById('pe_reviews_container');
     if (!wrap) return;
 
+    if (!currentReviews || currentReviews.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;grid-column:1/-1;text-align:center;padding:12px;">कोई समीक्षा नहीं है। "+ नई समीक्षा जोड़ें" बटन दबाएं।</div>';
+      return;
+    }
+
     wrap.innerHTML = currentReviews.map((r, idx) => `
       <div style="background: #0f172a; border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span style="font-size: 0.75rem; font-weight: 700; color: #a78bfa;">समीक्षा #${idx + 1}</span>
-          <button type="button" onclick="window.removeReviewItem(${idx})" style="background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 0.75rem;">&times;</button>
+          <span style="font-size: 0.78rem; font-weight: 800; color: #a78bfa;">समीक्षा #${idx + 1}</span>
+          <button type="button" onclick="window.removeReviewItem(${idx})" style="background: transparent; border: none; color: #ef4444; font-weight: 800; cursor: pointer; font-size: 0.85rem;">&times; हटाएं</button>
         </div>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-bottom: 6px;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 6px;">
           <div>
-            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">नाम</label>
-            <input type="text" value="${escapeHtml(r.name || '')}" onchange="window.updateReviewItem(${idx}, 'name', this.value)" class="admin-input" placeholder="नाम" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">नाम (Reviewer Name)</label>
+            <input type="text" value="${escapeHtml(r.name || '')}" oninput="window.updateReviewItem(${idx}, 'name', this.value)" class="admin-input" placeholder="किसान / पाठक का नाम" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
           </div>
           <div>
-            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">स्थान / शहर</label>
-            <input type="text" value="${escapeHtml(r.location || '')}" onchange="window.updateReviewItem(${idx}, 'location', this.value)" class="admin-input" placeholder="स्थान / शहर" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">स्थान / जिला (Location)</label>
+            <input type="text" value="${escapeHtml(r.location || '')}" oninput="window.updateReviewItem(${idx}, 'location', this.value)" class="admin-input" placeholder="जिला, राज्य" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
           </div>
           <div>
-            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">अवतार फोटो (WebP 10-15 KB)</label>
-            <input type="text" value="${escapeHtml(r.image || r.avatar || '')}" onchange="window.updateReviewItem(${idx}, 'image', this.value); if (currentReviews[${idx}]) delete currentReviews[${idx}].image_preview; window.renderReviewsInBuilder();" class="admin-input" placeholder="/images/..." style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
-            <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
-              <input type="file" id="rev_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'review', ${idx}, 'image')">
-              <button type="button" onclick="document.getElementById('rev_file_${idx}').click()" class="admin-button small-button" style="background:#8b5cf6; color:#fff; padding:2px 8px; font-size:0.72rem; font-weight:800;">
-                📁 फोटो बदलें (WebP)
-              </button>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">रेटिंग (Rating)</label>
+            <select onchange="window.updateReviewItem(${idx}, 'rating', parseInt(this.value)||5)" class="admin-select" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;">
+              <option value="5" ${(r.rating == 5 || !r.rating) ? 'selected' : ''}>⭐⭐⭐⭐⭐ (5 Star)</option>
+              <option value="4" ${r.rating == 4 ? 'selected' : ''}>⭐⭐⭐⭐ (4 Star)</option>
+              <option value="3" ${r.rating == 3 ? 'selected' : ''}>⭐⭐⭐ (3 Star)</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom: 6px;">
+          <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">अवतार फोटो URL</label>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="text" value="${escapeHtml(r.image || r.avatar || '')}" oninput="window.updateReviewItem(${idx}, 'image', this.value)" class="admin-input" placeholder="/images/team/achiever-1.jpg" style="flex:1; padding: 4px 6px; font-size: 0.75rem;" />
+            <input type="file" id="rev_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'review', ${idx}, 'image')">
+            <button type="button" onclick="document.getElementById('rev_file_${idx}').click()" class="admin-button small-button" style="background:#8b5cf6; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800; white-space:nowrap;">
+              📁 फोटो अपलोड
+            </button>
+          </div>
+          ${(r.image_preview || r.image || r.avatar) ? `
+            <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">
+              <img src="${escapeHtml(getPreviewImgSrc(r, 'image', '/images/team/achiever-1.jpg'))}" alt="Avatar" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid #8b5cf6; display:block;" onerror="this.src='/images/team/achiever-1.jpg'" />
+              <span style="font-size:0.7rem; color:#86efac; font-weight:700;">${r.image_preview ? '✓ नया अपलोड' : '✓ एक्टिव फोटो'}</span>
             </div>
-            ${(r.image_preview || r.image || r.avatar) ? `
-              <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-                <img src="${escapeHtml(getPreviewImgSrc(r, 'image', '/images/team/achiever-1.jpg'))}" alt="Avatar" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid #8b5cf6; display:block;" onerror="this.src='/images/team/achiever-1.jpg'" />
-                <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${r.image_preview ? '✓ नया अवतार' : '✓ एक्टिव'}</span>
-              </div>
-            ` : ''}
-          </div>
+          ` : ''}
         </div>
-        <input type="text" value="${escapeHtml(r.comment || '')}" onchange="window.updateReviewItem(${idx}, 'comment', this.value)" class="admin-input" placeholder="टिप्पणी" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
+        <div>
+          <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">समीक्षा / अनुभव (Review Comment)</label>
+          <textarea oninput="window.updateReviewItem(${idx}, 'comment', this.value); window.updateReviewItem(${idx}, 'text', this.value);" class="admin-input" placeholder="समीक्षा व अनुभव विस्तार से लिखें..." style="width: 100%; padding: 5px 8px; font-size: 0.75rem; height: 50px;">${escapeHtml(r.comment || r.text || '')}</textarea>
+        </div>
       </div>
     `).join('');
   }
 
   window.updateReviewItem = function(idx, field, val) {
-    if (currentReviews[idx]) currentReviews[idx][field] = val;
+    if (currentReviews[idx]) {
+      currentReviews[idx][field] = val;
+    }
   };
 
   window.removeReviewItem = function(idx) {
@@ -5422,25 +5880,162 @@ export async function initPageEditor() {
     const wrap = document.getElementById('pe_faqs_container');
     if (!wrap) return;
 
+    if (!currentFaqs || currentFaqs.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:12px;">कोई प्रश्नोत्तर नहीं है। "+ नया प्रश्न जोड़ें" बटन दबाएं।</div>';
+      return;
+    }
+
     wrap.innerHTML = currentFaqs.map((faq, idx) => `
       <div style="background: #0f172a; border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span style="font-size: 0.75rem; font-weight: 700; color: #38bdf8;">प्रश्न #${idx + 1}</span>
-          <button type="button" onclick="window.removeFaqItem(${idx})" style="background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 0.75rem;">&times;</button>
+          <span style="font-size: 0.78rem; font-weight: 800; color: #38bdf8;">प्रश्न #${idx + 1}</span>
+          <button type="button" onclick="window.removeFaqItem(${idx})" style="background: transparent; border: none; color: #ef4444; font-weight: 800; cursor: pointer; font-size: 0.85rem;">&times; हटाएं</button>
         </div>
-        <input type="text" value="${escapeHtml(faq.q || '')}" onchange="window.updateFaqItem(${idx}, 'q', this.value)" class="admin-input" placeholder="प्रश्न (Question)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem; margin-bottom: 4px;" />
-        <textarea onchange="window.updateFaqItem(${idx}, 'a', this.value)" class="admin-input" placeholder="उत्तर (Answer)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem; height: 50px;">${escapeHtml(faq.a || '')}</textarea>
+        <div style="margin-bottom:6px;">
+          <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">प्रश्न (Question)</label>
+          <input type="text" value="${escapeHtml(faq.q || faq.question || '')}" oninput="window.updateFaqItem(${idx}, 'q', this.value); window.updateFaqItem(${idx}, 'question', this.value);" class="admin-input" placeholder="प्रश्न यहाँ लिखें..." style="width: 100%; padding: 5px 8px; font-size: 0.78rem;" />
+        </div>
+        <div>
+          <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">उत्तर (Answer)</label>
+          <textarea oninput="window.updateFaqItem(${idx}, 'a', this.value); window.updateFaqItem(${idx}, 'answer', this.value);" class="admin-input" placeholder="उत्तर यहाँ विस्तार से लिखें..." style="width: 100%; padding: 5px 8px; font-size: 0.78rem; height: 55px;">${escapeHtml(faq.a || faq.answer || '')}</textarea>
+        </div>
       </div>
     `).join('');
   }
 
   window.updateFaqItem = function(idx, field, val) {
-    if (currentFaqs[idx]) currentFaqs[idx][field] = val;
+    if (currentFaqs[idx]) {
+      currentFaqs[idx][field] = val;
+    }
   };
 
   window.removeFaqItem = function(idx) {
     currentFaqs.splice(idx, 1);
     renderFaqsInBuilder();
+  };
+
+  // -------------------------------------------------------------
+  // CLINICAL BREAKDOWN CARDS BUILDER (DYNAMIC FOR ALL PAGES)
+  // -------------------------------------------------------------
+  function renderCbCardsInBuilder() {
+    const wrap = document.getElementById('pe_cb_cards_container');
+    if (!wrap) return;
+
+    if (!currentCbCards || currentCbCards.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:12px;background:#0f172a;border-radius:8px;border:1px dashed #334155;">कोई विश्लेषण कार्ड नहीं है। "+ नया विश्लेषण कार्ड जोड़ें" बटन दबाकर कार्ड बनाएं।</div>';
+      return;
+    }
+
+    wrap.innerHTML = currentCbCards.map((card, idx) => {
+      const pointsText = Array.isArray(card.points) ? card.points.join('\n') : (card.points || '');
+      const remedySteps = card.remedy && Array.isArray(card.remedy.steps) ? card.remedy.steps.join('\n') : (card.remedy?.text || card.remedy?.solution || '');
+      const remedyTitle = card.remedy?.title || '🌿 प्राकृतिक व वैज्ञानिक समाधान (Herbal Remedy)';
+
+      return `
+        <div style="background: #0f172a; border: 1.5px solid #2563eb60; border-radius: 8px; padding: 12px; position: relative;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-weight: 800; color: #60a5fa; font-size: 0.85rem;">कार्ड #${idx + 1}: ${escapeHtml(card.title || 'विश्लेषण')}</span>
+              <span style="font-size: 0.72rem; background: #2563eb20; color: #93c5fd; padding: 2px 6px; border-radius: 4px;">${escapeHtml(card.badge || 'समस्या व समाधान')}</span>
+            </div>
+            <button type="button" onclick="window.removeCbCard(${idx})" style="background: transparent; border: none; color: #ef4444; font-weight: 800; cursor: pointer; font-size: 0.85rem;">
+              &times; कार्ड हटाएं
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 8px;">
+            <div>
+              <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">कार्ड मुख्य शीर्षक (Card Title)</label>
+              <input type="text" value="${escapeHtml(card.title || '')}" oninput="window.updateCbCardField(${idx}, 'title', this.value)" class="admin-input" placeholder="जैसे: थनैला रोग (Mastitis)" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">कार्ड बैज (Card Badge)</label>
+              <input type="text" value="${escapeHtml(card.badge || '')}" oninput="window.updateCbCardField(${idx}, 'badge', this.value)" class="admin-input" placeholder="जैसे: 🚨 तत्काल ध्यान योग्य" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">रंग थीम (Color)</label>
+              <input type="color" value="${escapeHtml(card.color || '#2563eb')}" onchange="window.updateCbCardField(${idx}, 'color', this.value)" style="height: 32px; width: 100%; border-radius: 6px; border: 1px solid #334155; background: #1e293b; cursor: pointer;" />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 8px;">
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">फोटो URL (HD WebP)</label>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input type="text" value="${escapeHtml(card.image || '')}" oninput="window.updateCbCardField(${idx}, 'image', this.value)" class="admin-input" placeholder="/images/banners/... या URL" style="flex:1; padding: 5px 8px; font-size: 0.8rem;" />
+              <input type="file" id="cb_card_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'cb_card', ${idx}, 'image')">
+              <button type="button" onclick="document.getElementById('cb_card_file_${idx}').click()" class="admin-button small-button" style="background:#2563eb; color:#fff; padding:4px 10px; font-size:0.75rem; font-weight:800; white-space:nowrap;">
+                📁 फोटो अपलोड
+              </button>
+            </div>
+            ${(card.image_preview || card.image) ? `
+              <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+                <img src="${escapeHtml(getPreviewImgSrc(card, 'image', '/images/banners/pashu-palan-banner.jpg'))}" alt="Card Preview" style="height:48px; width:80px; border-radius:6px; object-fit:cover; border:1px solid #2563eb; display:block;" onerror="this.src='/images/banners/pashu-palan-banner.jpg'" />
+                <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${card.image_preview ? '✓ नया अपलोड' : '✓ एक्टिव फोटो'}</span>
+              </div>
+            ` : ''}
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; margin-bottom: 8px;">
+            <div>
+              <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">कारण व मुख्य लक्षण (1 बिंदु प्रति लाइन)</label>
+              <textarea oninput="window.updateCbCardPoints(${idx}, this.value)" class="admin-input" placeholder="लक्षण 1...&#10;लक्षण 2...&#10;लक्षण 3..." style="width: 100%; padding: 6px 8px; font-size: 0.78rem; height: 80px;">${escapeHtml(pointsText)}</textarea>
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">प्राकृतिक व वैज्ञानिक उपचार / उपाय (1 उपाय प्रति लाइन)</label>
+              <div style="margin-bottom: 4px;">
+                <input type="text" value="${escapeHtml(remedyTitle)}" oninput="window.updateCbCardRemedyField(${idx}, 'title', this.value)" class="admin-input" placeholder="उपचार बॉक्स हेडिंग" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
+              </div>
+              <textarea oninput="window.updateCbCardRemedySteps(${idx}, this.value)" class="admin-input" placeholder="उपाय 1...&#10;उपाय 2...&#10;उपाय 3..." style="width: 100%; padding: 6px 8px; font-size: 0.78rem; height: 55px;">${escapeHtml(remedySteps)}</textarea>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">WhatsApp परामर्श बटन टेक्स्ट</label>
+            <input type="text" value="${escapeHtml(card.whatsapp_btn?.text || '📱 विशेषज्ञ से समाधान पूछें')}" oninput="window.updateCbCardWhatsAppText(${idx}, this.value)" class="admin-input" placeholder="बटन टेक्स्ट" style="width: 100%; padding: 4px 8px; font-size: 0.75rem;" />
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.renderCbCardsInBuilder = renderCbCardsInBuilder;
+
+  window.updateCbCardField = function(idx, field, val) {
+    if (currentCbCards[idx]) {
+      currentCbCards[idx][field] = val;
+    }
+  };
+
+  window.updateCbCardPoints = function(idx, textVal) {
+    if (currentCbCards[idx]) {
+      currentCbCards[idx].points = textVal.split('\n').map(s => s.trim()).filter(Boolean);
+    }
+  };
+
+  window.updateCbCardRemedyField = function(idx, field, val) {
+    if (currentCbCards[idx]) {
+      if (!currentCbCards[idx].remedy) currentCbCards[idx].remedy = {};
+      currentCbCards[idx].remedy[field] = val;
+    }
+  };
+
+  window.updateCbCardRemedySteps = function(idx, textVal) {
+    if (currentCbCards[idx]) {
+      if (!currentCbCards[idx].remedy) currentCbCards[idx].remedy = {};
+      currentCbCards[idx].remedy.steps = textVal.split('\n').map(s => s.trim()).filter(Boolean);
+    }
+  };
+
+  window.updateCbCardWhatsAppText = function(idx, textVal) {
+    if (currentCbCards[idx]) {
+      if (!currentCbCards[idx].whatsapp_btn) currentCbCards[idx].whatsapp_btn = { enabled: true };
+      currentCbCards[idx].whatsapp_btn.text = textVal;
+    }
+  };
+
+  window.removeCbCard = function(idx) {
+    currentCbCards.splice(idx, 1);
+    renderCbCardsInBuilder();
   };
 
   // -------------------------------------------------------------
@@ -5850,46 +6445,33 @@ export async function initPageEditor() {
       }
     }
 
+    // Reviews & FAQs dynamic headings & badges
+    const revHeadEl = document.getElementById('pe_input_reviews_heading');
+    const revBadgeEl = document.getElementById('pe_input_reviews_badge');
+    if (revHeadEl) revHeadEl.value = p.reviews_heading || '';
+    if (revBadgeEl) revBadgeEl.value = p.reviews_badge || '';
+
+    const faqsHeadEl = document.getElementById('pe_input_faqs_heading');
+    const faqsBadgeEl = document.getElementById('pe_input_faqs_badge');
+    if (faqsHeadEl) faqsHeadEl.value = p.faqs_heading || '';
+    if (faqsBadgeEl) faqsBadgeEl.value = p.faqs_badge || '';
+
     // 3.1B Clinical Breakdown & Diet/Exercise
     const cbData = p.clinical_breakdown || {};
-    const cbCards = cbData.cards || [];
-    const causesCard = cbCards[0] || {};
-    const symptomsCard = cbCards[1] || {};
-    const risksCard = cbCards[2] || {};
-
     const cbBadgeEl = document.getElementById('pe_input_cb_badge');
     const cbTitleEl = document.getElementById('pe_input_cb_title');
-    const cbCausesTitleEl = document.getElementById('pe_input_cb_causes_title');
-    const cbCausesPointsEl = document.getElementById('pe_input_cb_causes_points');
-    const cbSymptomsTitleEl = document.getElementById('pe_input_cb_symptoms_title');
-    const cbSymptomsPointsEl = document.getElementById('pe_input_cb_symptoms_points');
-    const cbRisksTitleEl = document.getElementById('pe_input_cb_risks_title');
-    const cbRisksPointsEl = document.getElementById('pe_input_cb_risks_points');
+    const cbSubtitleEl = document.getElementById('pe_input_cb_subtitle');
 
     if (cbBadgeEl) cbBadgeEl.value = cbData.badge_text || '🔬 वैज्ञानिक विश्लेषण';
     if (cbTitleEl) cbTitleEl.value = cbData.main_title || '';
-    if (cbCausesTitleEl) cbCausesTitleEl.value = causesCard.title || '❓ कारण (Causes)';
-    if (cbCausesPointsEl) cbCausesPointsEl.value = Array.isArray(causesCard.points) ? causesCard.points.join('\n') : (causesCard.points || '');
-    if (cbSymptomsTitleEl) cbSymptomsTitleEl.value = symptomsCard.title || '⚠️ मुख्य लक्षण (Symptoms)';
-    if (cbSymptomsPointsEl) cbSymptomsPointsEl.value = Array.isArray(symptomsCard.points) ? symptomsCard.points.join('\n') : (symptomsCard.points || '');
-    if (cbRisksTitleEl) cbRisksTitleEl.value = risksCard.title || '🚨 साइड इफेक्ट्स व खतरे (Risks)';
-    if (cbRisksPointsEl) cbRisksPointsEl.value = Array.isArray(risksCard.points) ? risksCard.points.join('\n') : (risksCard.points || '');
+    if (cbSubtitleEl) cbSubtitleEl.value = cbData.subtitle || '';
 
-    const cbCausesImgEl = document.getElementById('pe_input_cb_causes_img');
-    const cbSymptomsImgEl = document.getElementById('pe_input_cb_symptoms_img');
-    const cbRisksImgEl = document.getElementById('pe_input_cb_risks_img');
-    if (cbCausesImgEl) {
-      cbCausesImgEl.value = causesCard.image || '';
-      if (typeof window.previewCbCardImage === 'function') window.previewCbCardImage(0, causesCard.image);
+    if (Array.isArray(cbData.cards) && cbData.cards.length > 0) {
+      currentCbCards = JSON.parse(JSON.stringify(cbData.cards));
+    } else {
+      currentCbCards = [];
     }
-    if (cbSymptomsImgEl) {
-      cbSymptomsImgEl.value = symptomsCard.image || '';
-      if (typeof window.previewCbCardImage === 'function') window.previewCbCardImage(1, symptomsCard.image);
-    }
-    if (cbRisksImgEl) {
-      cbRisksImgEl.value = risksCard.image || '';
-      if (typeof window.previewCbCardImage === 'function') window.previewCbCardImage(2, risksCard.image);
-    }
+    renderCbCardsInBuilder();
 
     const deData = p.diet_exercise || {};
     const dietData = deData.diet || {};
@@ -6045,13 +6627,15 @@ export async function initPageEditor() {
     const ogPrevWrap = document.getElementById('pe_og_image_preview');
     if (ogPrevWrap) ogPrevWrap.style.display = 'none';
 
-    // Reset Clinical Breakdown & Diet
-    ['pe_input_cb_badge', 'pe_input_cb_title', 'pe_input_cb_causes_title', 'pe_input_cb_causes_points',
-     'pe_input_cb_symptoms_title', 'pe_input_cb_symptoms_points', 'pe_input_cb_risks_title', 'pe_input_cb_risks_points',
+    // Reset Reviews, FAQs, Clinical Breakdown & Diet
+    ['pe_input_reviews_heading', 'pe_input_reviews_badge', 'pe_input_faqs_heading', 'pe_input_faqs_badge',
+     'pe_input_cb_badge', 'pe_input_cb_title', 'pe_input_cb_subtitle',
      'pe_input_diet_title', 'pe_input_diet_items', 'pe_input_exercise_title', 'pe_input_exercise_items'].forEach(id => {
        const el = document.getElementById(id);
        if (el) el.value = '';
     });
+    currentCbCards = [];
+    renderCbCardsInBuilder();
 
     // Reset Floating 3D Banner
     const floatChk = document.getElementById('pe_chk_floating_banner');
@@ -6134,44 +6718,36 @@ export async function initPageEditor() {
     const ogDesc = (document.getElementById('pe_input_og_description')?.value || '').trim();
     const shareMsg = (document.getElementById('pe_input_share_message')?.value || '').trim();
 
-    // 3.1B Clinical Breakdown (Causes, Symptoms, Risks)
+    // Reviews & FAQs dynamic headings
+    const reviewsHeading = (document.getElementById('pe_input_reviews_heading')?.value || '').trim();
+    const reviewsBadge = (document.getElementById('pe_input_reviews_badge')?.value || '').trim();
+    const faqsHeading = (document.getElementById('pe_input_faqs_heading')?.value || '').trim();
+    const faqsBadge = (document.getElementById('pe_input_faqs_badge')?.value || '').trim();
+
+    // 3.1B Clinical Breakdown (Dynamic Cards)
     const cbBadge = (document.getElementById('pe_input_cb_badge')?.value || '').trim();
     const cbTitle = (document.getElementById('pe_input_cb_title')?.value || '').trim();
-    const cbCausesTitle = (document.getElementById('pe_input_cb_causes_title')?.value || '').trim();
-    const cbCausesImg = (document.getElementById('pe_input_cb_causes_img')?.value || '').trim();
-    const cbCausesPoints = (document.getElementById('pe_input_cb_causes_points')?.value || '').trim();
-    const cbSymptomsTitle = (document.getElementById('pe_input_cb_symptoms_title')?.value || '').trim();
-    const cbSymptomsImg = (document.getElementById('pe_input_cb_symptoms_img')?.value || '').trim();
-    const cbSymptomsPoints = (document.getElementById('pe_input_cb_symptoms_points')?.value || '').trim();
-    const cbRisksTitle = (document.getElementById('pe_input_cb_risks_title')?.value || '').trim();
-    const cbRisksImg = (document.getElementById('pe_input_cb_risks_img')?.value || '').trim();
-    const cbRisksPoints = (document.getElementById('pe_input_cb_risks_points')?.value || '').trim();
+    const cbSubtitle = (document.getElementById('pe_input_cb_subtitle')?.value || '').trim();
 
     let clinical_breakdown = null;
-    if (cbCausesTitle || cbSymptomsTitle || cbRisksTitle || cbTitle || cbCausesImg || cbSymptomsImg || cbRisksImg) {
+    if (cbBadge || cbTitle || cbSubtitle || (currentCbCards && currentCbCards.length > 0)) {
       clinical_breakdown = {
         badge_text: cbBadge || '🔬 वैज्ञानिक विश्लेषण',
-        main_title: cbTitle,
-        cards: [
-          {
-            title: cbCausesTitle || '❓ कारण (Causes)',
-            color: '#2563eb',
-            image: cbCausesImg,
-            points: cbCausesPoints ? cbCausesPoints.split('\n').map(s => s.trim()).filter(Boolean) : []
-          },
-          {
-            title: cbSymptomsTitle || '⚠️ मुख्य लक्षण (Symptoms)',
-            color: '#2563eb',
-            image: cbSymptomsImg,
-            points: cbSymptomsPoints ? cbSymptomsPoints.split('\n').map(s => s.trim()).filter(Boolean) : []
-          },
-          {
-            title: cbRisksTitle || '🚨 साइड इफेक्ट्स व खतरे (Risks)',
-            color: '#dc2626',
-            image: cbRisksImg,
-            points: cbRisksPoints ? cbRisksPoints.split('\n').map(s => s.trim()).filter(Boolean) : []
-          }
-        ]
+        main_title: cbTitle || '',
+        subtitle: cbSubtitle || '',
+        cards: (currentCbCards && currentCbCards.length > 0)
+          ? currentCbCards.map(c => ({
+              id: c.id || `CB_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+              title: c.title || '',
+              badge: c.badge || '',
+              color: c.color || '#2563eb',
+              image: c.image || '',
+              points: Array.isArray(c.points) ? c.points : (typeof c.points === 'string' ? c.points.split('\n').map(s => s.trim()).filter(Boolean) : []),
+              remedy: c.remedy || null,
+              whatsapp_btn: c.whatsapp_btn || null,
+              catalog_btn: c.catalog_btn || null
+            }))
+          : (existingPage?.clinical_breakdown?.cards || [])
       };
     }
 
@@ -6298,7 +6874,11 @@ export async function initPageEditor() {
       kpi_cards: stripImagePreviews(currentKpiCards),
       marketing_cards: stripImagePreviews(currentMarketingCards),
       videos: stripImagePreviews(currentVideos),
+      reviews_heading: reviewsHeading,
+      reviews_badge: reviewsBadge,
       reviews: stripImagePreviews(currentReviews),
+      faqs_heading: faqsHeading,
+      faqs_badge: faqsBadge,
       faqs: stripImagePreviews(currentFaqs),
       health_diseases: stripImagePreviews(currentHealthDiseases),
       crops: stripImagePreviews(currentCrops),
@@ -6306,6 +6886,7 @@ export async function initPageEditor() {
       products: stripImagePreviews(currentProducts),
       page_kpi_sections: stripImagePreviews(currentPageKpiSections),
       clinical_breakdown: clinical_breakdown || existingPage?.clinical_breakdown || null,
+      admin_edited: Date.now(),
       netsurf_plan: netsurf_plan || existingPage?.netsurf_plan || null,
       diet_exercise: diet_exercise || existingPage?.diet_exercise || null,
       whatsapp_support: {

@@ -132,18 +132,17 @@
           if (!serverConfigLoaded || allPages.length === 0) {
             allPages = localParsed;
           } else {
-            // Only merge if explicitly in developer preview mode (?admin_preview=1)
             const isPreviewMode = window.location.search.includes('admin_preview=1') || window.location.search.includes('cms_draft=1');
-            if (isPreviewMode) {
-              localParsed.forEach(lp => {
+            localParsed.forEach(lp => {
+              if (lp && (lp.admin_edited || isPreviewMode)) {
                 const sIdx = allPages.findIndex(sp => sp.id === lp.id || sp.slug === lp.slug);
                 if (sIdx >= 0) {
                   allPages[sIdx] = Object.assign({}, allPages[sIdx], lp);
                 } else {
                   allPages.push(lp);
                 }
-              });
-            }
+              }
+            });
           }
         }
       }
@@ -661,61 +660,83 @@
   }
 
 
-    function renderDynamicReviews(pageConfig) {
+  function renderDynamicReviews(pageConfig) {
     if (!Array.isArray(pageConfig.reviews) || pageConfig.reviews.length === 0) return;
-    const grid = document.getElementById('home-reviews-grid') || 
-                 document.querySelector('#sec-reviews .reviews-grid') || 
-                 document.querySelector('.reviews-grid') || 
-                 document.querySelector('#sec-reviews div[style*="grid"]') ||
-                 document.getElementById('sec-reviews-grid');
-    if (!grid) return;
-
-    // Safety: If static HTML already has 3 or more rich reviews and incoming config has fewer, don't downgrade/wipe them!
-    const existingCount = grid.querySelectorAll('div[style*="border-radius"], .review-card').length;
-    if (existingCount >= 3 && pageConfig.reviews.length < existingCount) {
-      return;
+    const sec = document.getElementById('sec-reviews') || document.querySelector('section:has(.reviews-grid)');
+    if (sec) {
+      if (pageConfig.reviews_heading) {
+        const h2 = sec.querySelector('h2');
+        if (h2) h2.textContent = pageConfig.reviews_heading;
+      }
+      if (pageConfig.reviews_badge) {
+        const badge = sec.querySelector('span');
+        if (badge) badge.textContent = pageConfig.reviews_badge;
+      }
     }
 
-    grid.innerHTML = pageConfig.reviews.map(r => `
-      <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 18px; padding: 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); display:flex; flex-direction:column; justify-content:space-between;">
-        <div>
-          <div style="color: #facc15; font-size: 1rem; margin-bottom: 8px;">★★★★★</div>
-          <p style="font-size: 0.88rem; color: #334155; line-height: 1.5; margin-bottom: 14px;">
-            "${escapeHtml(r.comment || r.text || '')}"
-          </p>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="width:42px; height:42px; border-radius:50%; background:#eff6ff; border:1.5px solid #3b82f6; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
-            ${r.avatar || '👨‍🌾'}
-          </div>
+    const grid = document.getElementById('sec-reviews-grid') || 
+                 document.getElementById('home-reviews-grid') || 
+                 document.querySelector('#sec-reviews .reviews-grid') || 
+                 document.querySelector('.reviews-grid') || 
+                 document.querySelector('#sec-reviews div[style*="grid"]');
+    if (!grid) return;
+
+    grid.innerHTML = pageConfig.reviews.map(r => {
+      const rating = Number(r.rating) || 5;
+      const stars = '★'.repeat(Math.max(1, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
+      const comment = r.comment || r.text || '';
+      const name = r.name || 'किसान / पाठक मित्र';
+      const loc = r.location || 'भारत';
+      const rawImg = resolveAssetSrc(r, 'image', '') || resolveAssetSrc(r, 'avatar', '');
+      const hasImg = rawImg && !rawImg.includes('achiever-1.jpg');
+
+      return `
+        <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); display:flex; flex-direction:column; justify-content:space-between;">
           <div>
-            <h4 style="font-size:0.95rem; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(r.name || 'किसान / ग्राहक मित्र')}</h4>
-            <div style="font-size:0.75rem; color:#64748b;">📍 ${escapeHtml(r.location || 'भारत')}</div>
+            <div style="color: #eab308; font-size: 0.95rem; margin-bottom: 8px; letter-spacing: 2px;">${stars}</div>
+            <p style="font-size: 0.86rem; color: #334155; line-height: 1.5; margin: 0 0 14px 0;">
+              "${escapeHtml(comment)}"
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+            <div style="width:40px; height:40px; border-radius:50%; background:#eff6ff; border:1.5px solid #0284c7; display:flex; align-items:center; justify-content:center; font-size:1.2rem; overflow:hidden; flex-shrink:0;">
+              ${hasImg ? `<img src="${escapeHtml(rawImg)}" alt="${escapeHtml(name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='👨‍🌾'">` : (r.avatar && r.avatar.length <= 4 ? r.avatar : '👨‍🌾')}
+            </div>
+            <div>
+              <h4 style="font-size:0.9rem; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(name)}</h4>
+              <div style="font-size:0.75rem; color:#64748b;">📍 ${escapeHtml(loc)}</div>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function renderDynamicFaqs(pageConfig) {
     if (!Array.isArray(pageConfig.faqs) || pageConfig.faqs.length === 0) return;
-    const faqContainer = document.getElementById('home-faq-accordion') || 
-      document.querySelector('#sec-faqs .faq-accordion') ||
-      document.querySelector('.faq-accordion') ||
-      document.querySelector('#sec-faqs div[style*="flex-direction"]') ||
-      document.querySelector('#sec-faqs-accordion div[style*="flex-direction"]');
-    if (!faqContainer) return;
-
-    // Safety: If static HTML already has more FAQs than incoming config, don't downgrade/wipe them!
-    const existingCount = faqContainer.querySelectorAll('details').length;
-    if (existingCount >= 3 && pageConfig.faqs.length < existingCount) {
-      return;
+    const sec = document.getElementById('sec-faqs') || document.querySelector('section:has(.faq-accordion)');
+    if (sec) {
+      if (pageConfig.faqs_heading) {
+        const h2 = sec.querySelector('h2');
+        if (h2) h2.textContent = pageConfig.faqs_heading;
+      }
+      if (pageConfig.faqs_badge) {
+        const badge = sec.querySelector('span');
+        if (badge) badge.textContent = pageConfig.faqs_badge;
+      }
     }
 
+    const faqContainer = document.getElementById('sec-faqs-accordion') ||
+      document.getElementById('home-faq-accordion') || 
+      document.querySelector('#sec-faqs .faq-accordion') ||
+      document.querySelector('.faq-accordion') ||
+      document.querySelector('#sec-faqs div[style*="flex-direction"]');
+    if (!faqContainer) return;
+
     faqContainer.innerHTML = pageConfig.faqs.map((f, i) => `
-      <details style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:16px 20px; cursor:pointer; color:#0f172a; margin-bottom:10px;" ${i === 0 ? 'open' : ''}>
-        <summary style="font-weight:800; color:#2563eb; font-size:0.96rem;">${i + 1}. ${escapeHtml(f.question || f.q)}</summary>
-        <p style="margin:10px 0 0 0; font-size:0.88rem; color:#475569; line-height:1.5;">${escapeHtml(f.answer || f.a)}</p>
+      <details style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; margin-bottom:10px; cursor:pointer;" ${i === 0 ? 'open' : ''}>
+        <summary style="font-weight:800; color:#0f172a; font-size:0.94rem; outline:none;">${i + 1}. ${escapeHtml(f.question || f.q || '')}</summary>
+        <p style="margin:10px 0 0 0; font-size:0.88rem; color:#475569; line-height:1.55;">${escapeHtml(f.answer || f.a || '')}</p>
       </details>
     `).join('');
   }
@@ -723,8 +744,8 @@
   function renderDynamicClinicalBreakdown(pageConfig) {
     if (!pageConfig || !pageConfig.clinical_breakdown) return;
     const cb = pageConfig.clinical_breakdown;
-    const sec = document.getElementById('sec-scientific-breakdown') || 
-                document.getElementById('sec-mastitis') ||
+    const sec = document.getElementById('sec-mastitis') || 
+                document.getElementById('sec-scientific-breakdown') || 
                 document.querySelector('section:has(.breakdown-grid)');
     if (!sec) return;
 
@@ -736,25 +757,78 @@
       const h2 = sec.querySelector('h2');
       if (h2) h2.textContent = cb.main_title;
     }
+    if (cb.subtitle) {
+      const sub = sec.querySelector('p');
+      if (sub) sub.textContent = cb.subtitle;
+    }
 
     const grid = sec.querySelector('.breakdown-grid') || sec.querySelector('div[style*="grid"]');
     if (!grid || !Array.isArray(cb.cards) || cb.cards.length === 0) return;
 
-    grid.innerHTML = cb.cards.map(c => `
-      <div style="background:#fff; border-radius:16px; border:1.5px solid #e2e8f0; padding:22px; box-shadow:0 4px 14px rgba(0,0,0,0.03); display:flex; flex-direction:column; justify-content:space-between;">
-        <div>
-          ${c.image ? `
-            <div style="width:100%; height:180px; border-radius:12px; overflow:hidden; margin-bottom:14px; background:#f1f5f9; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-              <img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title || '')}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.style.display='none'">
+    // Safety: If cards have no points or no real content, DO NOT OVERWRITE static cards!
+    const hasAnyPoints = cb.cards.some(c => (Array.isArray(c.points) && c.points.length > 0) || (typeof c.points === 'string' && c.points.trim().length > 0));
+    if (!hasAnyPoints) return;
+
+    const isPashu = window.location.pathname.includes('pashu') || (pageConfig.id && pageConfig.id.includes('cattle'));
+
+    grid.innerHTML = cb.cards.map(c => {
+      const points = (Array.isArray(c.points) ? c.points : (c.points || '').split('\n')).filter(Boolean);
+      const color = c.color || '#2563eb';
+      const title = c.title || '';
+      const badge = c.badge || (isPashu ? 'पशु स्वास्थ्य समाधान' : 'वैज्ञानिक विश्लेषण');
+      const img = resolveAssetSrc(c, 'image', '');
+
+      let remedyHtml = '';
+      if (c.remedy) {
+        if (typeof c.remedy === 'string') {
+          remedyHtml = `
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:3px;">🌿 सटीक उपचार / समाधान:</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">${escapeHtml(c.remedy)}</div>
             </div>
-          ` : ''}
-          <h3 style="font-size:1.15rem; font-weight:900; color:${c.color || '#2563eb'}; margin:0 0 10px 0;">${escapeHtml(c.title || '')}</h3>
-          <ul style="padding-left:18px; margin:0; font-size:0.86rem; color:#475569; line-height:1.6;">
-            ${(Array.isArray(c.points) ? c.points : (c.points || '').split('\n')).filter(Boolean).map(pt => `<li>${pt}</li>`).join('')}
-          </ul>
+          `;
+        } else if (typeof c.remedy === 'object') {
+          const remTitle = c.remedy.title || '🌿 सटीक उपचार / समाधान:';
+          const remSteps = Array.isArray(c.remedy.steps) ? c.remedy.steps : (c.remedy.text ? [c.remedy.text] : []);
+          remedyHtml = `
+            <div style="background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+              <div style="font-size:0.76rem; font-weight:800; color:#b45309; margin-bottom:4px;">${escapeHtml(remTitle)}</div>
+              <div style="font-size:0.82rem; color:#334155; line-height:1.4;">
+                ${remSteps.map(s => `<div style="margin-bottom:2px;">• ${escapeHtml(s)}</div>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      return `
+        <div class="problem-box" style="padding:0; overflow:hidden; border-top:4px solid ${color}; border-radius:18px; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            ${img ? `
+              <div style="height:170px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='#products-cattle'">
+                <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.style.display='none'">
+                ${badge ? `<span style="position:absolute; top:10px; left:10px; background:${color}; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">${escapeHtml(badge)}</span>` : ''}
+              </div>
+            ` : ''}
+            <div style="padding:18px;">
+              <h3 style="font-size:1.15rem; font-weight:900; color:#0f172a; margin:0 0 10px 0; line-height:1.35;">${escapeHtml(title)}</h3>
+              <div style="font-size:0.85rem; color:#475569; line-height:1.55; margin-bottom:12px;">
+                ${points.map(pt => `<p style="margin:0 0 6px 0;">• ${escapeHtml(pt.replace(/^[•\-\*\s]+/, ''))}</p>`).join('')}
+              </div>
+              ${remedyHtml}
+            </div>
+          </div>
+          <div style="padding:0 18px 18px 18px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <a href="#products-cattle" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+              दवा देखें →
+            </a>
+            <button type="button" onclick="window.consultAiExpert ? window.consultAiExpert('${escapeHtml(title)}', '${escapeHtml(points[0] || title)}') : (window.open('https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते! मुझे ' + '${escapeHtml(title)}' + ' के बारे में सलाह चाहिए।'), '_blank'))" style="flex:1; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+              <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+            </button>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function renderDynamicDietExercise(pageConfig) {
