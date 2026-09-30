@@ -1989,17 +1989,17 @@
         "diet": {
           "title": "शुगर बैलेंसिंग डाइट प्रोटोकॉल",
           "items": [
-            "🌅 सुबह 6:30 AM: 1 चम्मच मेथी दाना रात का भीगा पानी + 15ml करेला-जामुन जूस।",
-            "🍳 नाश्ता 8:30 AM: बेसन-मेथी चीला / उबले चने की चाट / स्प्राउट्स + बिना चीनी की दालचीनी चाय।",
-            "🍛 दोपहर भोजन 1:00 PM: 1 बड़ी प्लेट खीरा-टमाटर-मूली + जौ-चना मिक्स 2 रोटी + हरी सब्जी + मेथी रायता।",
-            "☕ शाम 5:00 PM: भुने मखाने + दालचीनी ग्रीन टी।",
-            "🍲 रात भोजन 7:30 PM: मूंग दाल का सूप + उबली सब्जियां या 1 रोटी। (सफेद चावल, मैदा, आलू व चीनी पूरी तरह वर्जित)।"
+            "🌅 सुबह (6:30 AM): 1 चम्मच मेथी दाना रात का भीगा पानी + 15ml करेला-जामुन जूस।",
+            "🍳 नाश्ता (8:30 AM): बेसन-मेथी चीला / उबले चने की चाट / स्प्राउट्स + बिना चीनी की दालचीनी चाय।",
+            "🍛 दोपहर (1:00 PM): 1 बड़ी प्लेट खीरा-टमाटर-मूली (सलाद) + जौ-चना मिक्स 2 रोटी + हरी सब्जी + मेथी रायता।",
+            "☕ शाम (5:00 PM): भुने मखाने + दालचीनी ग्रीन टी।",
+            "🍲 रात (7:30 PM): मूंग दाल का सूप + उबली सब्जियां या 1 रोटी।"
           ],
           "images": [
             {
-              "image": "/images/banners/diet_card-whatsapp-image-202-255552-ax1u.webp",
+              "image": "/images/banners/diet_card-madhumeh-960930-l863.webp",
               "caption": "",
-              "url": "/images/banners/diet_card-whatsapp-image-202-255552-ax1u.webp"
+              "url": "/images/banners/diet_card-madhumeh-960930-l863.webp"
             }
           ]
         },
@@ -2013,9 +2013,9 @@
           ],
           "images": [
             {
-              "image": "/images/banners/exercise_card-whatsapp-image-202-264593-4yt0.webp",
+              "image": "/images/banners/exercise_card-madhumeh-2-025642-lzvt.webp",
               "caption": "",
-              "url": "/images/banners/exercise_card-whatsapp-image-202-264593-4yt0.webp"
+              "url": "/images/banners/exercise_card-madhumeh-2-025642-lzvt.webp"
             }
           ]
         }
