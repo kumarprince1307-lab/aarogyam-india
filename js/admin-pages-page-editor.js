@@ -58,8 +58,7 @@ export async function initPageEditor() {
           return { success: true, localDisk: true, data: localData };
         }
       } catch (e) {
-        console.warn('[Admin LocalSync] Local server not reachable on 5505, using fallback:', e);
-        showToast('⚠️ Local Sync Server (port 5505) चालू नहीं है — GitHub fallback से sync होगा।', 'info');
+        console.warn('[Admin LocalSync] Local server (5505) inactive, syncing via remote API fallback.');
       }
     }
 
