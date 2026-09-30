@@ -53,6 +53,8 @@
       "faqs_heading": "",
       "faqs_badge": "",
       "faqs": [],
+      "ladder_header": null,
+      "career_ladder": [],
       "health_diseases": [
         {
           "id": "DIS001",
@@ -281,7 +283,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1790791198238,
+      "admin_edited": 1790794165513,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
