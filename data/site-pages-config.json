@@ -2778,7 +2778,7 @@
       "audio_script": "नमस्ते {name} जी! हेयर केयर गाइड में आपका स्वागत है। नए बाल उगाने, बालों का झड़ना तुरंत रोकने और डैंड्रफ खत्म करने के प्राकृतिक फॉर्मूले और ऑयल्स की जानकारी यहाँ देखें। dhara pranam",
       "audio_url": "",
       "og_title": "🚨 क्या आप भी बालों के झड़ने और गंजेपन से परेशान हैं? | 100% आयुर्वेदिक समाधान",
-      "og_image": "/images/banners/og_image-hair-care-1-559375-m4x6.webp",
+      "og_image": "/images/banners/og_image-hair-77-009171-wb0k.webp",
       "og_description": "कंघी करते समय गुच्छों में गिरते बाल, चौड़ी होती मांग या जिद्दी डैंड्रफ? जानिए कमजोर जड़ों को मजबूत करने और 15 दिनों में प्राकृतिक रूप से नए बाल उगाने का अचूक फॉर्मूला।",
       "share_message": "⚠ क्या आपके भी बाल तेजी से झड़ रहे हैं और स्कैल्प दिखने लगा है? ⚠\n\n🛑 इन 4 गंभीर लक्षणों को समय रहते पहचानें:\n\n❌ कंघी या तकिए पर 100+ बालों का गुच्छों में टूटना\n\n❌ सिर की मांग चौड़ी होना और बालों का तेजी से पतला होना\n\n❌ जिद्दी सफेद डैंड्रफ, फंगल इन्फेक्शन और सिर में लगातार खुजली\n\n❌ माथे के दोनों कोनों (Receding Hairline) से बालों का पीछे जाना\n\n💡 केमिकल वाले शैम्पू केवल झाग बनाते हैं, असली समाधान है स्कैल्प को पोषण और DHT ब्लॉक करना!\n\n🌿 अपनाएं भृंगराज, आंवला, शिकाकाई व सेसबानिया बायोटिन का 100% प्राकृतिक व वैज्ञानिक फॉर्मूला।\n\n👇 पूरी जानकारी, डाइट चार्ट व समाधान के लिए तुरंत लिंक खोलें:",
       "floating_banner": {
@@ -2800,7 +2800,7 @@
           "cta_link": "https://wa.me/917974422572"
         },
         {
-          "image": "/images/banners/hero_slide-hair-22-751981-8mbb.webp",
+          "image": "/images/banners/hero_slide-hair-care-1-024668-mgxx.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
@@ -2810,7 +2810,27 @@
           "cta_secondary_link": "/ebooks/cart.html"
         },
         {
-          "image": "/images/banners/hero_slide-hair-33-810999-fkca.webp",
+          "image": "/images/banners/hero_slide-hair-22-030918-4j9e.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-hair-33-043250-05to.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-hair-77-050248-frmf.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
@@ -2934,7 +2954,7 @@
           }
         ]
       },
-      "admin_edited": 1790790955674,
+      "admin_edited": 1790791061992,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
