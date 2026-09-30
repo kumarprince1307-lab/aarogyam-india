@@ -502,6 +502,39 @@
     color: #dc2626 !important;
   }
 
+  /* Netsurf Emerald Active */
+  .u-nav-tab.active:has(i.fa-briefcase) {
+    background: #ecfdf5 !important;
+  }
+  .u-nav-tab.active:has(i.fa-briefcase) .u-icon-wrap {
+    background: #d1fae5 !important;
+  }
+  .u-nav-tab.active:has(i.fa-briefcase) span {
+    color: #059669 !important;
+  }
+
+  /* Health Pink Active */
+  .u-nav-tab.active:has(i.fa-heart-pulse) {
+    background: #fdf2f8 !important;
+  }
+  .u-nav-tab.active:has(i.fa-heart-pulse) .u-icon-wrap {
+    background: #fce7f3 !important;
+  }
+  .u-nav-tab.active:has(i.fa-heart-pulse) span {
+    color: #db2777 !important;
+  }
+
+  /* Pashupalan Blue Active */
+  .u-nav-tab.active:has(i.fa-cow) {
+    background: #f0f9ff !important;
+  }
+  .u-nav-tab.active:has(i.fa-cow) .u-icon-wrap {
+    background: #e0f2fe !important;
+  }
+  .u-nav-tab.active:has(i.fa-cow) span {
+    color: #0284c7 !important;
+  }
+
   body {
     padding-bottom: 75px !important;
   }

@@ -1006,14 +1006,14 @@
 .ns-mobile-bar {
   display: none;
   position: fixed;
-  bottom: 0;
+  bottom: 60px; /* Positioned directly above universal bottom nav */
   left: 0;
   right: 0;
   background: rgba(11, 19, 41, 0.95);
   backdrop-filter: blur(12px);
   border-top: 1.5px solid #1e293b;
   padding: 10px 16px;
-  z-index: 999;
+  z-index: 99990;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
@@ -1023,7 +1023,7 @@
     display: flex;
   }
   .ns-page-wrapper {
-    padding-bottom: 70px;
+    padding-bottom: 125px; /* Clear space for both action bar and bottom nav */
   }
 }
 

@@ -592,26 +592,30 @@
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-categories">
+              <a href="/categories/netsurf.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><i class="fa-solid fa-briefcase" style="color:#059669;"></i><span>💼 NetSurf Career (डायरेक्ट सेलिंग)</span></div>
+                <span class="drawer-cat-badge" style="background:#dcfce7;color:#15803d;">करियर 4.0</span>
+              </a>
+              <a href="/categories/health.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><i class="fa-solid fa-heart-pulse" style="color:#ec4899;"></i><span>❤️ Health & Wellness (स्वास्थ्य केंद्र)</span></div>
+              </a>
+              <a href="/pashu-palan.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><i class="fa-solid fa-cow" style="color:#0284c7;"></i><span>🐄 Livestock & Dairy (पशु पालन हब)</span></div>
+              </a>
               <a href="/ebooks/agriculture.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-seedling" style="color:#16a34a;"></i><span>🌾 Agriculture (कृषि हब)</span></div>
               </a>
-              <a href="/ebooks/health.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-heart-pulse" style="color:#ec4899;"></i><span>❤️ Health & Wellness</span></div>
+              <a href="/pages/smart-etailer.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><i class="fa-solid fa-crown" style="color:#10b981;"></i><span>👑 Smart eTailer टूल</span></div>
               </a>
               <a href="/ebooks/business.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-briefcase" style="color:#8b5cf6;"></i><span>💼 Business (बिज़नेस)</span></div>
-              </a>
-              <a href="/ebooks/netsurf.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-network-wired" style="color:#2563eb;"></i><span>🌐 NetSurf Direct</span></div>
+                <div class="drawer-item-left"><i class="fa-solid fa-chart-line" style="color:#8b5cf6;"></i><span>📊 Business (बिज़नेस)</span></div>
               </a>
               <a href="/ebooks/education.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-graduation-cap" style="color:#0284c7;"></i><span>🎓 Education & Training</span></div>
               </a>
               <a href="/ebooks/digital-ai.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-robot" style="color:#d97706;"></i><span>🤖 Digital AI Tools</span></div>
-              </a>
-              <a href="/index.html#sec-pashu-palan" class="drawer-sub-link-item" onclick="window.closeUniversalDrawer()">
-                <div class="drawer-item-left"><i class="fa-solid fa-cow" style="color:#15803d;"></i><span>🐄 Livestock & Dairy (पशु पालन)</span></div>
               </a>
             </div>
 
@@ -733,10 +737,10 @@
         </a>
       </div>
 
-      <!-- Universal Sticky Mobile Bottom 8-Tab Navigation Bar (Mobile & Tablet) -->
+      <!-- Universal Sticky Mobile Bottom Navigation Bar (Mobile & Tablet) -->
       <nav class="universal-mobile-bottom-nav" id="universal-mobile-bottom-nav">
         <!-- 1. Home -->
-        <a href="/index.html" class="u-nav-tab ${(currentPath === '/' || currentPath.endsWith('index.html')) && !currentPath.includes('ucas') && !currentPath.includes('smart-etailer') && !currentPath.includes('tube') ? 'active' : ''}">
+        <a href="/index.html" class="u-nav-tab ${(currentPath === '/' || currentPath.endsWith('index.html')) && !currentPath.includes('ucas') && !currentPath.includes('smart-etailer') && !currentPath.includes('tube') && !currentPath.includes('netsurf') && !currentPath.includes('health') && !currentPath.includes('pashu') ? 'active' : ''}">
           <div class="u-icon-wrap"><i class="fa-solid fa-house"></i></div>
           <span>Home</span>
         </a>
@@ -745,36 +749,41 @@
           <div class="u-icon-wrap"><i class="fa-brands fa-youtube" style="color:#ef4444;font-size:1.15rem;"></i></div>
           <span style="color:#ef4444;font-weight:800;">Tube</span>
         </a>
-        <!-- 3. Library -->
-        <a href="/ebooks/my-library.html" class="u-nav-tab ${currentPath.includes('my-library') ? 'active' : ''}">
+        <!-- 3. My Library -->
+        <a href="/ebooks/my-library.html" class="u-nav-tab ${currentPath.includes('my-library') || (currentPath.includes('ebook') && !currentPath.includes('smart-etailer')) ? 'active' : ''}">
           <div class="u-icon-wrap"><i class="fa-solid fa-book-bookmark"></i></div>
           <span>Library</span>
         </a>
-        <!-- 4. eBooks -->
-        <a href="/ebooks/ebook.html" class="u-nav-tab ${currentPath.includes('ebook') && !currentPath.includes('my-library') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-book-open"></i></div>
-          <span>eBooks</span>
+        <!-- 4. Netsurf -->
+        <a href="/categories/netsurf.html" class="u-nav-tab ${currentPath.includes('netsurf') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-solid fa-briefcase" style="color:#059669;"></i></div>
+          <span style="color:#059669;font-weight:800;">Netsurf</span>
         </a>
-        <!-- 5. Mandi -->
-        <a href="/mandi.html" class="u-nav-tab ${currentPath.includes('mandi') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-seedling"></i></div>
-          <span>Mandi</span>
+        <!-- 5. Health -->
+        <a href="/categories/health.html" class="u-nav-tab ${currentPath.includes('health') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-solid fa-heart-pulse" style="color:#ec4899;"></i></div>
+          <span style="color:#ec4899;font-weight:800;">Health</span>
         </a>
-        <!-- 6. Marketing (Smart eTailer) -->
+        <!-- 6. Pashupalan -->
+        <a href="/pashu-palan.html" class="u-nav-tab ${currentPath.includes('pashu') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-solid fa-cow" style="color:#0284c7;"></i></div>
+          <span style="color:#0284c7;font-weight:800;">पशु पालन</span>
+        </a>
+        <!-- 7. eTailer -->
         <a href="/pages/smart-etailer.html" class="u-nav-tab ${currentPath.includes('smart-etailer') || currentPath.includes('marketing') ? 'active' : ''}">
           <div class="u-icon-wrap"><i class="fa-solid fa-crown" style="color:#10b981;"></i></div>
           <span style="color:#10b981;font-weight:800;">eTailer</span>
         </a>
-        <!-- 7. Webinar -->
-        <a href="/webinar.html" class="u-nav-tab ${currentPath.includes('webinar') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-video"></i></div>
-          <span>Webinar</span>
-        </a>
         <!-- 8. Profile -->
         <a href="/ucas/index.html" class="u-nav-tab ${(currentPath.includes('ucas') || currentPath.includes('profile')) && !currentPath.includes('smart-etailer') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-user"></i></div>
+          <div class="u-icon-wrap"><i class="fa-solid fa-user" style="color:#3b82f6;"></i></div>
           <span>Profile</span>
         </a>
+        <!-- 9. Drawer / Menu Trigger -->
+        <button type="button" onclick="window.openUniversalDrawer(event)" class="u-nav-tab" style="cursor:pointer;" title="सभी मेनू व सेवाएं खोलें">
+          <div class="u-icon-wrap"><i class="fa-solid fa-bars" style="color:#8b5cf6;"></i></div>
+          <span style="color:#8b5cf6;font-weight:800;">Drawer</span>
+        </button>
       </nav>
     `;
 
