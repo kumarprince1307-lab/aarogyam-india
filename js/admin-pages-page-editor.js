@@ -4288,7 +4288,48 @@ export async function initPageEditor() {
       } catch (e) {}
     }
 
-    // 2. Push to GitHub
+    // 2. Push pending product images to GitHub + local disk
+    const pendingImgPushes = [];
+    try {
+      const offStore = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+      for (const prod of masterProducts) {
+        const imgPath = prod.image;
+        if (!imgPath || imgPath.includes('logo.png')) continue;
+        const cleanPath = imgPath.replace(/^\//, '');
+        const dataUrl = offStore['/' + cleanPath] || offStore[cleanPath];
+        if (dataUrl && dataUrl.startsWith('data:')) {
+          // Convert dataURL to base64 (strip prefix)
+          const base64 = dataUrl.split(',')[1];
+          if (base64) pendingImgPushes.push({ path: cleanPath, base64 });
+        }
+      }
+    } catch (e) {}
+
+    // Push images to local disk (port 5505) and GitHub
+    let imgsPushed = 0;
+    for (const { path, base64 } of pendingImgPushes) {
+      // Local disk
+      if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+        try {
+          await fetch('http://127.0.0.1:5505', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'save_config', path, base64 })
+          });
+        } catch (e) {}
+      }
+      // GitHub
+      try {
+        await syncAssetToGitHub(path, base64);
+        imgsPushed++;
+      } catch (e) {}
+    }
+
+    if (imgsPushed > 0) {
+      showToast(`📸 ${imgsPushed} उत्पाद फोटो Git पर अपलोड हो गई!`, 'info');
+    }
+
+    // 3. Push JSON to GitHub
     try {
       const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
       const syncRes = await syncAssetToGitHub('data/netsurf-products-master.json', base64Data);

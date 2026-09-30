@@ -1,6 +1,290 @@
 {
   "sitePages": [
     {
+      "id": "page_index",
+      "slug": "index",
+      "name": "मुख्य पृष्ठ",
+      "url": "/index.html",
+      "category": "eBooks",
+      "status": "active",
+      "theme_primary": "#15803d",
+      "theme_dark": "#003400",
+      "ticker_text": "",
+      "audio_title": "",
+      "audio_script": "",
+      "audio_url": "",
+      "og_title": "",
+      "og_image": "",
+      "og_description": "",
+      "share_message": "",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": true,
+      "hero_slides": [],
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_category_pills",
+        "sec_shelves_bestseller",
+        "sec_interspersed_marketing",
+        "sec_shelves_new",
+        "sec_shelves_coming_soon",
+        "sec_combo_promo",
+        "sec_videos",
+        "sec_reviews",
+        "sec_trust_guarantee",
+        "sec_faqs",
+        "sec_help_support"
+      ],
+      "hidden_sections": [],
+      "kpi_cards": [],
+      "marketing_cards": [],
+      "videos": [],
+      "reviews": [],
+      "faqs": [],
+      "health_diseases": [
+        {
+          "id": "DIS001",
+          "name": "मधुमेह / डायबिटीज",
+          "badge": "ब्लड शुगर नियंत्रण",
+          "color": "#3b82f6",
+          "icon": "🩸",
+          "image": "/images/banners/health-diabetes.jpg",
+          "symptoms": [
+            "बार-बार पेशाब आना",
+            "थकान व कमजोरी",
+            "शुगर असंतुलन"
+          ],
+          "description": "फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।",
+          "solution": "जामुन-करेला अर्क, गिलोय व मेथी दाना का प्राकृतिक योग और वैज्ञानिक डाइट प्लान।"
+        },
+        {
+          "id": "DIS002",
+          "name": "जोड़ों का दर्द व गठिया",
+          "badge": "जोड़ों का दर्द राहत",
+          "color": "#8b5cf6",
+          "icon": "🦴",
+          "image": "/images/banners/health-joint-care.jpg",
+          "symptoms": [
+            "घुटनों व जोड़ों में दर्द",
+            "चलने में तकलीफ",
+            "सूजन व जकड़न"
+          ],
+          "description": "कार्टिलेज पोषण, यूरिक एसिड नियंत्रण और जोड़ों के दर्द से प्राकृतिक आयुर्वेदिक समाधान।",
+          "solution": "शल्लाकी, गुग्गुल, निर्गुंडी तैलम मालिश व यूरिक एसिड घटाने वाला प्राकृतिक अर्क।"
+        },
+        {
+          "id": "DIS003",
+          "name": "महिला स्वास्थ्य / PCOD",
+          "badge": "हार्मोनल संतुलन",
+          "color": "#ec4899",
+          "icon": "🌸",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "अनियमित माहवारी",
+            "हार्मोनल असंतुलन",
+            "कमजोरी"
+          ],
+          "description": "हार्मोनल संतुलन, गर्भाशय पोषण और पीसीओडी/पीसीओएस का सम्पूर्ण सुरक्षित हर्बल समाधान।",
+          "solution": "अशोकारिष्ट, शतावरी, लोध्र व कांचनार गुग्गुलु का सुरक्षित आयुर्वेदिक सेवन।"
+        },
+        {
+          "id": "DIS004",
+          "name": "बाल झड़ना व डैंड्रफ",
+          "badge": "हेयर फॉल कंट्रोल",
+          "color": "#6366f1",
+          "icon": "💇",
+          "image": "/images/banners/health-hair-care.jpg",
+          "symptoms": [
+            "तेजी से बाल झड़ना",
+            "रूसी व डैंड्रफ",
+            "सिर में खुजली"
+          ],
+          "description": "बालों की जड़ों को पोषण, नए बालों का विकास और डैंड्रफ मुक्त घने बालों के लिए विशेष थेरेपी।",
+          "solution": "भृंगराज, आंवला, शिकाकाई हर्बल हेयर ऑयल व एंटी-डैंड्रफ स्कैल्प सीरम।"
+        },
+        {
+          "id": "DIS005",
+          "name": "त्वचा रोग व ग्लो",
+          "badge": "ग्लोइंग स्किन",
+          "color": "#06b6d4",
+          "icon": "✨",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कील-मुंहासे (पिंपल्स)",
+            "दाद व खुजली",
+            "झाइयां"
+          ],
+          "description": "रक्त शुद्धि और प्राकृतिक जड़ी-बूटियों द्वारा पिंपल्स, झाइयों और त्वचा संक्रमण से राहत।",
+          "solution": "नीम, मंजिष्ठा, खदिरारिष्ट रक्त शोधक और एलोवेरा-हल्दी जेल लेप।"
+        },
+        {
+          "id": "DIS006",
+          "name": "मोटापा व वजन नियंत्रण",
+          "badge": "नेचुरल फैट बर्न",
+          "color": "#f59e0b",
+          "icon": "⚖️",
+          "image": "/images/banners/health-weight-loss.jpg",
+          "symptoms": [
+            "पेट की जिद्दी चर्बी",
+            "सांस फूलना",
+            "धीमा मेटाबॉलिज्म"
+          ],
+          "description": "प्राकृतिक मेटाबॉलिज्म बूस्ट और जिद्दी फैट घटाने की सम्पूर्ण वैज्ञानिक डाइट और हर्बल फार्मूला।",
+          "solution": "मेदोहर गुग्गुलु, त्रिफला, दालचीनी-ग्रीन टी एक्सट्रैक्ट व 24 घंटे की डिटॉक्स डाइट।"
+        },
+        {
+          "id": "DIS007",
+          "name": "बच्चों का पोषण व दिमाग",
+          "badge": "स्मार्ट किड्स",
+          "color": "#10b981",
+          "icon": "👶",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कमजोर याददाश्त",
+            "भूख न लगना",
+            "धीमी शारीरिक लंबाई"
+          ],
+          "description": "बच्चों की रोग प्रतिरोधक क्षमता, लंबाई और मानसिक एकाग्रता बढ़ाने का सम्पूर्ण प्राकृतिक न्यूट्रिशन।",
+          "solution": "शंखपुष्पी, ब्राह्मी, अश्वगंधा सिरप और प्राकृतिक सुपरफूड्स व बादाम शेक डाइट।"
+        },
+        {
+          "id": "DIS008",
+          "name": "नेचुरल होम केयर",
+          "badge": "टॉक्सिन फ्री",
+          "color": "#84cc16",
+          "icon": "🏡",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "केमिकल युक्त फिनाइल व डिटर्जेंट",
+            "बच्चों व बुजुर्गों को एलर्जी"
+          ],
+          "description": "घर को हानिकारक रसायनों से मुक्त, स्वच्छ और रोगाणु-रहित रखने के इको-फ्रेंडली बायो-नेचुरल क्लीनर्स।",
+          "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
+        }
+      ],
+      "crops": [
+        {
+          "id": "CROP001",
+          "name": "सोयाबीन (Soybean)",
+          "season": "खरीफ फसल",
+          "image": "/images/crops/soyabeen.jpeg",
+          "badge": "प्रमुख तिलहन",
+          "color": "#3b82f6",
+          "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
+          "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
+        },
+        {
+          "id": "CROP002",
+          "name": "धान / चावल (Paddy)",
+          "season": "खरीफ / रबी",
+          "image": "/images/crops/paddy.jpeg",
+          "badge": "अन्नदाता फसल",
+          "color": "#8b5cf6",
+          "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
+          "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
+        },
+        {
+          "id": "CROP003",
+          "name": "गेहूं (Wheat)",
+          "season": "रबी फसल",
+          "image": "/images/crops/wheat.jpeg",
+          "badge": "मुख्य खाद्यान्न",
+          "color": "#6366f1",
+          "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
+          "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
+        },
+        {
+          "id": "CROP004",
+          "name": "कपास / नरमा (Cotton)",
+          "season": "खरीफ व जायद",
+          "image": "/images/banners/hero-banner-1.jpeg",
+          "badge": "सफेद सोना",
+          "color": "#0ea5e9",
+          "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
+          "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
+        },
+        {
+          "id": "CROP005",
+          "name": "मक्का (Maize)",
+          "season": "खरीफ / जायद",
+          "image": "/images/crops/maize.jpeg",
+          "badge": "अनाज व चारा",
+          "color": "#06b6d4",
+          "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
+          "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
+        },
+        {
+          "id": "CROP006",
+          "name": "सब्जियां, मिर्च व टमाटर",
+          "season": "बारहमासी",
+          "image": "/images/crops/vegetables.jpeg",
+          "badge": "नकदी फसल",
+          "color": "#10b981",
+          "mainIssues": "मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा",
+          "solution": "ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।"
+        }
+      ],
+      "pashu_cards": [
+        {
+          "id": "PASHU001",
+          "name": "गाय - दुग्ध वृद्धि व पोषण",
+          "category": "गाय पालन (Cow Care)",
+          "icon": "🐄",
+          "badge": "1-2L दूध वृद्धि",
+          "image": "/images/banners/pashu-cow-care.jpg",
+          "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
+          "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
+        },
+        {
+          "id": "PASHU002",
+          "name": "भैंस - FAT% व SNF वृद्धि",
+          "category": "भैंस पालन (Buffalo Care)",
+          "icon": "🐃",
+          "badge": "FAT 8% तक",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "दूध में फैट (FAT) कम आना, गर्मी में हांफना व सुस्ती, बांझपन",
+          "solution": "बायपास फैट, रुमेन बफर और हर्बल पाचक चूर्ण द्वारा दूध में गाढ़ापन और उच्चतम फैट प्रतिशत।"
+        },
+        {
+          "id": "PASHU003",
+          "name": "बकरी पालन - वजन वृद्धि",
+          "category": "बकरी पालन (Goat Farming)",
+          "icon": "🐐",
+          "badge": "उच्च मुनाफा",
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "mainIssues": "बच्चों में दस्त व निमोनिया, वजन धीमी गति से बढ़ना, पेट के कीड़े",
+          "solution": "नियमित डीवर्मिंग (कृमिनाशक), प्रोटीन युक्त दाना मिश्रण और ग्रोथ प्रमोटर सप्लीमेंट्स।"
+        },
+        {
+          "id": "PASHU004",
+          "name": "पशुओं में थनैला व पाचन रोग",
+          "category": "रोग नियंत्रण व प्राथमिक उपचार",
+          "icon": "🩺",
+          "badge": "100% सुरक्षा",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "थनैला (Mastitis), अयन में सूजन, छेछड़े आना, आफरा (गैस) व अपच",
+          "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
+        }
+      ],
+      "products": [],
+      "page_kpi_sections": [],
+      "clinical_breakdown": null,
+      "netsurf_plan": null,
+      "diet_exercise": null,
+      "whatsapp_support": {
+        "number": "",
+        "prompt": ""
+      }
+    },
+    {
       "id": "page_home",
       "slug": "index",
       "name": "🏠 मुख्य पृष्ठ (Home Page)",
@@ -501,104 +785,17 @@
       "audio_script": "नमस्ते {name} जी! आरोग्यम कृषि हब में आपका स्वागत है। यहाँ आप खरीफ फसल मास्टर गाइड और फसल का डॉक्टर ई-बुक प्राप्त कर सकते हैं। साथ ही सभी प्रमुख फसलों के रोग, जैविक उपचार और नेटसर्फ बायो-फिट स्प्रे शेड्यूल की पूरी जानकारी देख सकते हैं।"
     },
     {
-      "id": "page_health_hub",
-      "slug": "health-hub",
-      "name": "❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health & Wellness Hub)",
+      "id": "page_health",
+      "slug": "health",
+      "name": "❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health Hub)",
       "url": "/categories/health.html",
-      "category": "Healthcare",
+      "category": "Health",
       "status": "active",
       "theme_primary": "#dc2626",
-      "theme_dark": "#991b1b",
-      "fb_pixel": true,
-      "ga_tag": true,
-      "ticker_text": "🌿 सम्पूर्ण 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान | 24×7 WhatsApp AI डॉक्टर परामर्श!",
-      "hero_slides": [
-        {
-          "image": "/images/banners/health-banner.jpeg",
-          "tag": "🌿 सम्पूर्ण स्वास्थ्य केंद्र",
-          "title": "आरोग्यम हेल्थ एंड वेलनेस हब",
-          "subtitle": "8 प्रमुख लाइफस्टाइल विकारों के प्राकृतिक आयुर्वेदिक समाधान",
-          "cta_text": "💬 डॉक्टर से पूछें",
-          "cta_link": "https://wa.me/917974422572",
-          "cta_secondary_text": "🔍 रोग चुनें",
-          "cta_secondary_link": "#health-categories"
-        },
-        {
-          "image": "/images/banners/health-diabetes.jpg",
-          "tag": "🩸 डायबिटीज केयर",
-          "title": "प्राकृतिक शुगर नियंत्रण व रिवर्सल",
-          "subtitle": "आयुर्वेदिक अर्क व वैज्ञानिक आहार तालिका",
-          "cta_text": "📖 विस्तार से देखें",
-          "cta_link": "/health/diabetes.html",
-          "cta_secondary_text": "💬 परामर्श",
-          "cta_secondary_link": "https://wa.me/917974422572"
-        },
-        {
-          "image": "/images/banners/health-joint-care.jpg",
-          "tag": "🦴 जॉइंट केयर",
-          "title": "जोड़ों के दर्द व गठिया से मुक्ति",
-          "subtitle": "नेचुरल हर्बल कार्टिलेज पोषण व तेल मालिश",
-          "cta_text": "📖 विस्तार से देखें",
-          "cta_link": "/health/joint-care.html",
-          "cta_secondary_text": "💬 परामर्श",
-          "cta_secondary_link": "https://wa.me/917974422572"
-        },
-        {
-          "image": "/images/banners/health-weight-loss.jpg",
-          "tag": "🔥 वेट लॉस",
-          "title": "प्राकृतिक मोटापा व वजन नियंत्रण",
-          "subtitle": "बिना कमजोरी के सुरक्षित फैट बर्निंग",
-          "cta_text": "📖 विस्तार से देखें",
-          "cta_link": "/health/weight-loss.html",
-          "cta_secondary_text": "💬 परामर्श",
-          "cta_secondary_link": "https://wa.me/917974422572"
-        },
-        {
-          "image": "/images/banners/health-hair-care.jpg",
-          "tag": "💇‍♀️ हेयर केयर",
-          "title": "बाल झड़ना रोकें व डैंड्रफ मुक्ति",
-          "subtitle": "भृंगराज व आंवला युक्त हर्बल हेयर थेरेपी",
-          "cta_text": "📖 विस्तार से देखें",
-          "cta_link": "/health/hair-care.html",
-          "cta_secondary_text": "💬 परामर्श",
-          "cta_secondary_link": "https://wa.me/917974422572"
-        }
-      ],
-      "sections_order": [
-        "sec_ticker",
-        "sec_hero_slider",
-        "sec_kpi_badges",
-        "sec_category_pills",
-        "sec_videos",
-        "sec_reviews",
-        "sec_faqs",
-        "sec_help_support"
-      ],
-      "hidden_sections": [],
-      "kpi_cards": [],
-      "videos": [],
-      "marketing_cards": [],
-      "reviews": [],
-      "faqs": [],
-      "whatsapp_support": {
-        "number": "917974422572",
-        "prompt": "नमस्ते, मुझे स्वास्थ्य परामर्श चाहिए।"
-      },
+      "theme_dark": "#900000",
+      "ticker_text": "🌿 50,000+ परिवारों का भरोसा! • सभी 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान • 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय aarogyam india",
       "audio_title": "आरोग्यम संपूर्ण स्वास्थ्य केंद्र",
-      "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे। अपनी समस्या का चयन करें और स्थायी स्वास्थ्य लाभ पाएं।"
-    },
-    {
-      "id": "page_cattle_care",
-      "slug": "pashu-palan",
-      "name": "🐄 पशु पालन व दुग्ध उत्पादन (Cattle Care Hub)",
-      "url": "/pashu-palan.html",
-      "category": "Livestock",
-      "status": "active",
-      "theme_primary": "#0284c7",
-      "theme_dark": "#00387b",
-      "ticker_text": "🐄 दुग्ध वृद्धि, बांझपन निवारण व पशु स्वास्थ्य | 24×7 WhatsApp AI पशु डॉक्टर परामर्श सक्रिय! aarogyam india",
-      "audio_title": "पशु पालन व दुग्ध संवर्धन हब",
-      "audio_script": "राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा। आप सीएफएल और बायो-फिट उत्पाद सीधे व्हाट्सएप द्वारा ऑर्डर कर सकते हैं। dhara paranam",
+      "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे। dhara pranam",
       "og_title": "",
       "og_image": "",
       "og_description": "",
@@ -614,37 +811,17 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/pashu-palan-banner.jpg",
-          "tag": "🐄 पशु पालन विशेष",
-          "title": "पशु पालन व दुग्ध संवर्धन हब",
-          "subtitle": "दुग्ध वृद्धि, बांझपन निवारण व थनैला उपचार",
-          "cta_text": "💬 WhatsApp परामर्श",
-          "cta_link": "https://wa.me/917974422572",
-          "cta_secondary_text": "🛒 उत्पाद देखें",
-          "cta_secondary_link": "#pashu-products"
+          "image": "/images/banners/health-banner.jpeg",
+          "tag": "❤️ ALL HEALTH DOMAINS",
+          "title": "आरोग्यम सम्पूर्ण स्वास्थ्य केंद्र",
+          "subtitle": "डायबिटीज, जोड़ों का दर्द, वजन नियंत्रण, महिला व पुरुष स्वास्थ्य का प्राकृतिक आयुर्वेदिक समाधान",
+          "cta_text": "🩺 समाधान चुनें",
+          "cta_link": "#sec-categories",
+          "cta_secondary_text": "💬 डॉक्टर परामर्श",
+          "cta_secondary_link": "https://wa.me/917974422572"
         },
         {
-          "image": "/images/banners/pashu-cow-care.jpg",
-          "tag": "🥛 दुग्ध वृद्धि फॉर्मूला",
-          "title": "गाय-भैंस में दूध व फैट वृद्धि",
-          "subtitle": "नेचुरल हर्बल सप्लीमेंट्स और मिनरल मिक्सचर",
-          "cta_text": "💬 ऑर्डर करें",
-          "cta_link": "https://wa.me/917974422572",
-          "cta_secondary_text": "📞 संपर्क करें",
-          "cta_secondary_link": "#vet-consult"
-        },
-        {
-          "image": "/images/banners/pashu-goat-care.jpg",
-          "tag": "🐐 बकरी पालन गाइड",
-          "title": "उन्नत बकरी पालन व वजन वृद्धि",
-          "subtitle": "रोग रोकथाम व वैज्ञानिक पोषण प्रबंधन",
-          "cta_text": "💬 जानकारी लें",
-          "cta_link": "https://wa.me/917974422572",
-          "cta_secondary_text": "📖 गाइड पढ़ें",
-          "cta_secondary_link": "/ebooks/ebook.html"
-        },
-        {
-          "image": "/images/banners/hero_slide-bk015-sec_audio-ba-628476-vren.webp",
+          "image": "/images/banners/hero_slide-cover02-882999-qw30.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
@@ -654,7 +831,7 @@
           "cta_secondary_link": "/ebooks/cart.html"
         },
         {
-          "image": "/images/banners/hero_slide-whatsapp-image-202-646683-isg0.webp",
+          "image": "/images/banners/hero_slide-whatsapp-image-202-381291-0i97.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
@@ -668,45 +845,411 @@
         "sec_ticker",
         "sec_hero_slider",
         "sec_kpi_badges",
-        "sec_category_pills",
-        "sec_shelves_bestseller",
-        "sec_interspersed_marketing",
-        "sec_shelves_new",
-        "sec_shelves_coming_soon",
-        "sec_combo_promo",
-        "sec_videos",
         "sec_reviews",
-        "sec_trust_guarantee",
         "sec_faqs",
         "sec_help_support"
       ],
       "hidden_sections": [],
       "kpi_cards": [
         {
-          "icon": "fa-cow",
-          "title": "दूध उत्पादन वृद्धि",
-          "desc": "प्राकृतिक आयुर्वेदिक मिनरल व पोषण"
+          "icon": "fa-heart-pulse",
+          "title": "100% प्राकृतिक",
+          "desc": "हानिरहित आयुर्वेदिक फॉर्मूलेशन"
+        },
+        {
+          "icon": "fa-user-doctor",
+          "title": "AI डॉक्टर परामर्श",
+          "desc": "24×7 व्यक्तिगत डाइट व सलाह"
+        },
+        {
+          "icon": "fa-shield-halved",
+          "title": "प्रमाणित शुद्धता",
+          "desc": "GMP व ISO प्रमाणित तत्व"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "tag": "🔥 बेस्टसेलर डील",
+          "headline": "खरीफ फसल मास्टर गाइड 2026",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा",
+          "image": "/images/banners/marketing_card-000-945423-zbyc.webp"
+        },
+        {
+          "book_id": "BK002",
+          "tag": "🔥 बेस्टसेलर डील",
+          "headline": "खेती का डॉक्टर",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा",
+          "image": "/images/banners/marketing_card-whatsapp-image-202-448507-bkrb.webp"
+        }
+      ],
+      "videos": [
+        {
+          "video_id": "VID_S284427",
+          "title": "खेती का डॉक्टर बुक क्यों खरीदे",
+          "desc": "ये बुक ऐसी बुक है जिसमें किसान बीमारी के लक्षण पहचान सकता हैं अंतर देख सकता हैं कि कौन सी बीमारी कीट",
+          "url": "/tube.html?vid=VID_S284427",
+          "youtube_id": "bvCuBEuyg48",
+          "thumbnail": "https://img.youtube.com/vi/bvCuBEuyg48/hqdefault.jpg",
+          "duration": "0:10",
+          "target_page": "all",
+          "ratio": "9:16"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "कमलेश शर्मा",
+          "location": "भोपाल, मध्य प्रदेश",
+          "rating": 5,
+          "comment": "डायबिटीज केयर और डाइट प्लान से मेरा शुगर लेवल 3 महीने में काफी नियंत्रित हुआ।"
+        }
+      ],
+      "faqs": [
+        {
+          "q": "क्या परामर्श के लिए कोई शुल्क है?",
+          "a": "नहीं, आरोग्यम इंडिया पर प्राथमिक AI व विशेषज्ञ परामर्श निःशुल्क है।"
+        }
+      ],
+      "health_diseases": [
+        {
+          "id": "DIS001",
+          "name": "मधुमेह / डायबिटीज",
+          "badge": "ब्लड शुगर नियंत्रण",
+          "color": "#3b82f6",
+          "icon": "🩸",
+          "image": "/images/banners/health-diabetes.jpg",
+          "symptoms": [
+            "बार-बार पेशाब आना",
+            "थकान व कमजोरी",
+            "शुगर असंतुलन"
+          ],
+          "description": "फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।",
+          "solution": "जामुन-करेला अर्क, गिलोय व मेथी दाना का प्राकृतिक योग और वैज्ञानिक डाइट प्लान।"
+        },
+        {
+          "id": "DIS002",
+          "name": "जोड़ों का दर्द व गठिया",
+          "badge": "जोड़ों का दर्द राहत",
+          "color": "#8b5cf6",
+          "icon": "🦴",
+          "image": "/images/banners/health-joint-care.jpg",
+          "symptoms": [
+            "घुटनों व जोड़ों में दर्द",
+            "चलने में तकलीफ",
+            "सूजन व जकड़न"
+          ],
+          "description": "कार्टिलेज पोषण, यूरिक एसिड नियंत्रण और जोड़ों के दर्द से प्राकृतिक आयुर्वेदिक समाधान।",
+          "solution": "शल्लाकी, गुग्गुल, निर्गुंडी तैलम मालिश व यूरिक एसिड घटाने वाला प्राकृतिक अर्क।"
+        },
+        {
+          "id": "DIS003",
+          "name": "महिला स्वास्थ्य / PCOD",
+          "badge": "हार्मोनल संतुलन",
+          "color": "#ec4899",
+          "icon": "🌸",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "अनियमित माहवारी",
+            "हार्मोनल असंतुलन",
+            "कमजोरी"
+          ],
+          "description": "हार्मोनल संतुलन, गर्भाशय पोषण और पीसीओडी/पीसीओएस का सम्पूर्ण सुरक्षित हर्बल समाधान।",
+          "solution": "अशोकारिष्ट, शतावरी, लोध्र व कांचनार गुग्गुलु का सुरक्षित आयुर्वेदिक सेवन।"
+        },
+        {
+          "id": "DIS004",
+          "name": "बाल झड़ना व डैंड्रफ",
+          "badge": "हेयर फॉल कंट्रोल",
+          "color": "#6366f1",
+          "icon": "💇",
+          "image": "/images/banners/health-hair-care.jpg",
+          "symptoms": [
+            "तेजी से बाल झड़ना",
+            "रूसी व डैंड्रफ",
+            "सिर में खुजली"
+          ],
+          "description": "बालों की जड़ों को पोषण, नए बालों का विकास और डैंड्रफ मुक्त घने बालों के लिए विशेष थेरेपी।",
+          "solution": "भृंगराज, आंवला, शिकाकाई हर्बल हेयर ऑयल व एंटी-डैंड्रफ स्कैल्प सीरम।"
+        },
+        {
+          "id": "DIS005",
+          "name": "त्वचा रोग व ग्लो",
+          "badge": "ग्लोइंग स्किन",
+          "color": "#06b6d4",
+          "icon": "✨",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कील-मुंहासे (पिंपल्स)",
+            "दाद व खुजली",
+            "झाइयां"
+          ],
+          "description": "रक्त शुद्धि और प्राकृतिक जड़ी-बूटियों द्वारा पिंपल्स, झाइयों और त्वचा संक्रमण से राहत।",
+          "solution": "नीम, मंजिष्ठा, खदिरारिष्ट रक्त शोधक और एलोवेरा-हल्दी जेल लेप।"
+        },
+        {
+          "id": "DIS006",
+          "name": "मोटापा व वजन नियंत्रण",
+          "badge": "नेचुरल फैट बर्न",
+          "color": "#f59e0b",
+          "icon": "⚖️",
+          "image": "/images/banners/health-weight-loss.jpg",
+          "symptoms": [
+            "पेट की जिद्दी चर्बी",
+            "सांस फूलना",
+            "धीमा मेटाबॉलिज्म"
+          ],
+          "description": "प्राकृतिक मेटाबॉलिज्म बूस्ट और जिद्दी फैट घटाने की सम्पूर्ण वैज्ञानिक डाइट और हर्बल फार्मूला।",
+          "solution": "मेदोहर गुग्गुलु, त्रिफला, दालचीनी-ग्रीन टी एक्सट्रैक्ट व 24 घंटे की डिटॉक्स डाइट।"
+        },
+        {
+          "id": "DIS007",
+          "name": "बच्चों का पोषण व दिमाग",
+          "badge": "स्मार्ट किड्स",
+          "color": "#10b981",
+          "icon": "👶",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कमजोर याददाश्त",
+            "भूख न लगना",
+            "धीमी शारीरिक लंबाई"
+          ],
+          "description": "बच्चों की रोग प्रतिरोधक क्षमता, लंबाई और मानसिक एकाग्रता बढ़ाने का सम्पूर्ण प्राकृतिक न्यूट्रिशन।",
+          "solution": "शंखपुष्पी, ब्राह्मी, अश्वगंधा सिरप और प्राकृतिक सुपरफूड्स व बादाम शेक डाइट।"
+        },
+        {
+          "id": "DIS008",
+          "name": "नेचुरल होम केयर",
+          "badge": "टॉक्सिन फ्री",
+          "color": "#84cc16",
+          "icon": "🏡",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "केमिकल युक्त फिनाइल व डिटर्जेंट",
+            "बच्चों व बुजुर्गों को एलर्जी"
+          ],
+          "description": "घर को हानिकारक रसायनों से मुक्त, स्वच्छ और रोगाणु-रहित रखने के इको-फ्रेंडली बायो-नेचुरल क्लीनर्स।",
+          "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
+        },
+        {
+          "id": "DIS009",
+          "name": "नई स्वास्थ्य समस्या",
+          "badge": "आयुर्वेदिक उपचार",
+          "color": "#3b82f6",
+          "icon": "🩺",
+          "image": "/images/banners/health_card-whatsapp-image-202-413881-jjja.webp",
+          "symptoms": [
+            "लक्षण 1",
+            "लक्षण 2"
+          ],
+          "description": "समस्या का संक्षिप्त विवरण यहाँ लिखें...",
+          "solution": "आयुर्वेदिक औषधि व आहार संतुलन तालिका।"
+        }
+      ],
+      "crops": [
+        {
+          "id": "CROP001",
+          "name": "सोयाबीन (Soybean)",
+          "season": "खरीफ फसल",
+          "image": "/images/crops/soyabeen.jpeg",
+          "badge": "प्रमुख तिलहन",
+          "color": "#3b82f6",
+          "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
+          "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
+        },
+        {
+          "id": "CROP002",
+          "name": "धान / चावल (Paddy)",
+          "season": "खरीफ / रबी",
+          "image": "/images/crops/paddy.jpeg",
+          "badge": "अन्नदाता फसल",
+          "color": "#8b5cf6",
+          "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
+          "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
+        },
+        {
+          "id": "CROP003",
+          "name": "गेहूं (Wheat)",
+          "season": "रबी फसल",
+          "image": "/images/crops/wheat.jpeg",
+          "badge": "मुख्य खाद्यान्न",
+          "color": "#6366f1",
+          "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
+          "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
+        },
+        {
+          "id": "CROP004",
+          "name": "कपास / नरमा (Cotton)",
+          "season": "खरीफ व जायद",
+          "image": "/images/banners/hero-banner-1.jpeg",
+          "badge": "सफेद सोना",
+          "color": "#0ea5e9",
+          "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
+          "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
+        },
+        {
+          "id": "CROP005",
+          "name": "मक्का (Maize)",
+          "season": "खरीफ / जायद",
+          "image": "/images/crops/maize.jpeg",
+          "badge": "अनाज व चारा",
+          "color": "#06b6d4",
+          "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
+          "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
+        },
+        {
+          "id": "CROP006",
+          "name": "सब्जियां, मिर्च व टमाटर",
+          "season": "बारहमासी",
+          "image": "/images/crops/vegetables.jpeg",
+          "badge": "नकदी फसल",
+          "color": "#10b981",
+          "mainIssues": "मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा",
+          "solution": "ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।"
+        }
+      ],
+      "pashu_cards": [
+        {
+          "id": "PASHU001",
+          "name": "गाय - दुग्ध वृद्धि व पोषण",
+          "category": "गाय पालन (Cow Care)",
+          "icon": "🐄",
+          "badge": "1-2L दूध वृद्धि",
+          "image": "/images/banners/pashu-cow-care.jpg",
+          "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
+          "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
+        },
+        {
+          "id": "PASHU002",
+          "name": "भैंस - FAT% व SNF वृद्धि",
+          "category": "भैंस पालन (Buffalo Care)",
+          "icon": "🐃",
+          "badge": "FAT 8% तक",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "दूध में फैट (FAT) कम आना, गर्मी में हांफना व सुस्ती, बांझपन",
+          "solution": "बायपास फैट, रुमेन बफर और हर्बल पाचक चूर्ण द्वारा दूध में गाढ़ापन और उच्चतम फैट प्रतिशत।"
+        },
+        {
+          "id": "PASHU003",
+          "name": "बकरी पालन - वजन वृद्धि",
+          "category": "बकरी पालन (Goat Farming)",
+          "icon": "🐐",
+          "badge": "उच्च मुनाफा",
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "mainIssues": "बच्चों में दस्त व निमोनिया, वजन धीमी गति से बढ़ना, पेट के कीड़े",
+          "solution": "नियमित डीवर्मिंग (कृमिनाशक), प्रोटीन युक्त दाना मिश्रण और ग्रोथ प्रमोटर सप्लीमेंट्स।"
+        },
+        {
+          "id": "PASHU004",
+          "name": "पशुओं में थनैला व पाचन रोग",
+          "category": "रोग नियंत्रण व प्राथमिक उपचार",
+          "icon": "🩺",
+          "badge": "100% सुरक्षा",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "थनैला (Mastitis), अयन में सूजन, छेछड़े आना, आफरा (गैस) व अपच",
+          "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
+        }
+      ],
+      "products": [
+        {
+          "title": "ebook",
+          "description": "उत्पाद के लाभ व उपयोग विधि यहाँ लिखें...",
+          "image": "/images/products/product-whatsapp-image-202-475057-3ggm.webp",
+          "mrp": 99,
+          "discount_pct": 0,
+          "dose": "2ml / लीटर पानी",
+          "whatsapp_link": "https://wa.me/917974422572",
+          "name": "ebook",
+          "price": 99
+        }
+      ],
+      "page_kpi_sections": [],
+      "whatsapp_support": {
+        "number": "917974422572",
+        "prompt": "नमस्ते, मुझे स्वास्थ्य समस्याओं के बारे में परामर्श चाहिए।"
+      }
+    },
+    {
+      "id": "page_pashu",
+      "slug": "pashu-palan",
+      "name": "🐄 पशु पालन व दुग्ध संवर्धन हब (Pashu Palan Hub)",
+      "url": "/pashu-palan.html",
+      "category": "Agriculture",
+      "status": "active",
+      "theme_primary": "#0284c7",
+      "theme_dark": "#00387b",
+      "ticker_text": "🐄 10,000+ पशुपालकों का भरोसा | थनैला मुक्ति, दूध व फैट वृद्धि के 100% सफल फॉर्मूले",
+      "audio_title": "पशु पालन व दुग्ध संवर्धन हब",
+      "audio_script": "राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा।",
+      "audio_url": "",
+      "og_title": "पशु पालन, थनैला रोग उपचार व दुग्ध संवर्धन हब | Aarogyam India",
+      "og_image": "/images/banners/pashu-palan-banner.jpg",
+      "og_description": "गाय-भैंस का दूध व फैट बढ़ाने, थनैला रोग से बचाने और साइलेज तकनीक की संपूर्ण वैज्ञानिक जानकारी।",
+      "share_message": "",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": true,
+      "hero_slides": [
+        {
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "tag": "🐄 PASHU PALAN SPECIAL",
+          "title": "पशु पालन, पोषण व दुग्ध संवर्धन हब",
+          "subtitle": "गाय-भैंस में थनैला रोग, दूध व फैट वृद्धि, बांझपन और आफरा का 100% सफल निवारण",
+          "cta_text": "🐄 समाधान देखें",
+          "cta_link": "#problems-matrix",
+          "cta_secondary_text": "📦 CFL ऑर्डर करें",
+          "cta_secondary_link": "#products-cattle"
+        }
+      ],
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_help_support"
+      ],
+      "hidden_sections": [],
+      "kpi_cards": [
+        {
+          "icon": "fa-glass-water-droplet",
+          "title": "1-2L दूध वृद्धि",
+          "desc": "CFL मिनरल मिक्सचर व बायपास फैट"
         },
         {
           "icon": "fa-shield-virus",
-          "title": "मस्टाइटिस व थनैला",
-          "desc": "सटीक लक्षण पहचान व हर्बल उपचार"
+          "title": "थनैला से सुरक्षा",
+          "desc": "एंटीसेप्टिक व प्राकृतिक हर्बल अर्क"
         },
         {
-          "icon": "fa-dna",
-          "title": "बांझपन से मुक्ति",
-          "desc": "समय पर हीट में लाना व गर्भाधान"
-        },
-        {
-          "icon": "fa-robot",
-          "title": "24×7 AI पशु डॉक्टर",
-          "desc": "WhatsApp पर तुरंत परामर्श"
+          "icon": "fa-cow",
+          "title": "प्रजनन स्वास्थ्य",
+          "desc": "समय पर हीट में आना व गर्भधारण"
         }
       ],
       "marketing_cards": [],
       "videos": [],
-      "reviews": [],
-      "faqs": [],
+      "reviews": [
+        {
+          "name": "भंवरलाल चौधरी",
+          "location": "नागौर, राजस्थान",
+          "rating": 5,
+          "comment": "CFL मिनरल मिक्सचर देने के 15 दिन बाद ही मेरी भैंस का फैट 6 से बढ़कर 7.5 हो गया।"
+        }
+      ],
+      "faqs": [
+        {
+          "q": "क्या CFL मिनरल मिक्सचर सभी पशुओं को दिया जा सकता है?",
+          "a": "हाँ, गाय, भैंस और बकरियों के लिए यह अत्यंत लाभकारी है।"
+        }
+      ],
       "health_diseases": [
         {
           "id": "DIS001",
@@ -934,58 +1477,114 @@
       ],
       "products": [
         {
-          "id": "ns_cattle_cfc",
+          "title": "Pet-Vet Advanced Cattle Feed Supplement 1 KG",
           "name": "Pet-Vet Advanced Cattle Feed Supplement 1 KG",
+          "description": "गाय-भैंस में 1 से 1.5 लीटर दूध वृद्धि, 0.8 से 1.2 डिग्री फैट बढ़त और समय पर गाभिन ठहराने में 100% सहायक।",
           "image": "/images/products/product-pet-vet-advanced-c-454250-7umw.webp",
           "mrp": 1275,
-          "price": 956,
+          "price": 1275,
           "discount_pct": 25,
-          "description": "गाय-भैंस में 1 से 1.5 लीटर दूध वृद्धि, 0.8 से 1.2 डिग्री फैट बढ़त और समय पर गाभिन ठहराने में 100% सहायक।",
-          "badge": "पशु पोषण",
-          "ingredients": "बायपास प्रोटीन, चेलेटेड मिनरल्स (Zinc, Copper, Mn), प्रोबायोटिक्स, मेथाओनिन, विटामिन A, D3, E",
-          "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने या बांटे में मिलाकर दें। बछड़े/बकरियां: 5 ग्राम प्रतिदिन।"
+          "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने या बांटे में मिलाकर दें। बछड़े/बकरियां: 5 ग्राम प्रतिदिन।",
+          "badge": "🐄 दूध व फैट बूस्टर",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "ns_cattle_cfc_1kg",
+          "title": "Pet-Vet Advanced Cattle Feed Supplement 500 gm",
           "name": "Pet-Vet Advanced Cattle Feed Supplement 500 gm",
+          "description": "चेलेटेड मिनरल्स, विटामिन्स, प्रीबायोटिक व प्रोबायोटिक्स से भरपूर सम्पूर्ण पशु आहार पूरक।",
           "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp",
           "mrp": 699,
-          "price": 524,
+          "price": 699,
           "discount_pct": 25,
-          "description": "चेलेटेड मिनरल्स, विटामिन्स, प्रीबायोटिक व प्रोबायोटिक्स से भरपूर सम्पूर्ण पशु आहार पूरक।",
-          "badge": "पशु पोषण",
-          "ingredients": "बायपास प्रोटीन, चेलेटेड मिनरल्स (Zinc, Copper, Mn), प्रोबायोटिक्स, मेथाओनिन, विटामिन A, D3, E",
-          "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने में मिलाकर दें। 60 से 90 दिन लगातार खिलाएं।"
+          "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने में मिलाकर दें। 60 से 90 दिन लगातार खिलाएं।",
+          "badge": "🥛 प्रीमियम कैटल फीड कंसंट्रेट",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "ns_prod_00027",
+          "title": "Pet-Vet Breed 500 GM ",
           "name": "Pet-Vet Breed 500 GM ",
+          "description": "समस्या का समाधान: अक्सर पशुओं में खाना न पचना, पेट फूलना, गैस, दस्त, या भोजन से सही पोषण न मिलने के कारण उनकी सेहत गिरने लगती है और दूध या ग्रोथ पर बुरा असर पड़ता है।\n\nउत्पाद का लाभ: यह पेट की इन सभी समस्याओं को जड़ से खत्म करता है, पाचन एंजाइम्स को एक्टिवेट करता है और खाए गए चारे से मिलने वाले पोषण (Nutrient absorption) को सौ प्रतिशत तक बढ़ाकर पशु को स्वस्थ और तंदुरुस्त रखता है।..",
           "image": "/images/products/product-------------new-pr-296198-6gyd.webp",
           "mrp": 650,
-          "price": 488,
+          "price": 650,
           "discount_pct": 25,
-          "description": "समस्या का समाधान: अक्सर पशुओं में खाना न पचना, पेट फूलना, गैस, दस्त, या भोजन से सही पोषण न मिलने के कारण उनकी सेहत गिरने लगती है और दूध या ग्रोथ पर बुरा असर पड़ता है।\n\nउत्पाद का लाभ: यह पेट की इन सभी समस्याओं को जड़ से खत्म करता है, पाचन एंजाइम्स को एक्टिवेट करता है और खाए गए चारे से मिलने वाले पोषण (Nutrient absorption) को सौ प्रतिशत तक बढ़ाकर पशु को स्वस्थ और तंदुरुस्त रखता है।..",
-          "badge": "पशु पोषण (Biofit Cattle Care)",
-          "ingredients": "पाचक एंजाइम्स और प्रोबायोटिक्स: आंतों के गुड बैक्टीरिया को मजबूत करने और पाचन क्रिया को सुपरफास्ट बनाने वाले तत्व।\n\nपाचन-सहायक हर्ब्स: पेट की गैस, आफरा और अपच से तुरंत राहत देने वाली प्राकृतिक जड़ी-बूटियों का मिश्रण।",
-          "dose": "मात्रा व तरीका: पशु चिकित्सक या उत्पाद के निर्देशों के अनुसार उचित मात्रा में इसे पशु के चारे या दाने में मिलाकर दें।\n\nनियमित सेवन: पाचन तंत्र को हमेशा दुरुस्त रखने के लिए इसे नियमित रूप से उपयोग करें।"
+          "dose": "मात्रा व तरीका: पशु चिकित्सक या उत्पाद के निर्देशों के अनुसार उचित मात्रा में इसे पशु के चारे या दाने में मिलाकर दें।\n\nनियमित सेवन: पाचन तंत्र को हमेशा दुरुस्त रखने के लिए इसे नियमित रूप से उपयोग करें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "ns_prod_46333",
+          "title": "Pet-Vet Breed 500 GRAM ",
           "name": "Pet-Vet Breed 500 GRAM ",
+          "description": "समस्या का समाधान: अक्सर पशुओं में हॉर्मोनल असंतुलन, सही समय पर हीट (Estrous cycle) में न आना और गर्भधारण न ठहरने (Infertility) जैसी गंभीर समस्याओं के कारण पशुपालकों को भारी आर्थिक नुकसान उठाना पड़ता है।\n\nउत्पाद का लाभ: यह विशेष लिक्विड फॉर्मूलेशन पशुओं में प्राकृतिक प्रजनन चक्र को सुचारू बनाने, गर्भधारण दर (Conception rate) को बढ़ाने और स्वस्थ प्रजनन अंगों के विकास में मदद करता है, जिससे पशुपालन व्यवसाय अधिक लाभदायक बनता है।",
           "image": "/images/products/product-pet-vet-breed-500--931551-mm4t.webp",
           "mrp": 650,
-          "price": 488,
+          "price": 650,
           "discount_pct": 25,
-          "description": "समस्या का समाधान: अक्सर पशुओं में हॉर्मोनल असंतुलन, सही समय पर हीट (Estrous cycle) में न आना और गर्भधारण न ठहरने (Infertility) जैसी गंभीर समस्याओं के कारण पशुपालकों को भारी आर्थिक नुकसान उठाना पड़ता है।\n\nउत्पाद का लाभ: यह विशेष लिक्विड फॉर्मूलेशन पशुओं में प्राकृतिक प्रजनन चक्र को सुचारू बनाने, गर्भधारण दर (Conception rate) को बढ़ाने और स्वस्थ प्रजनन अंगों के विकास में मदद करता है, जिससे पशुपालन व्यवसाय अधिक लाभदायक बनता है।",
-          "badge": "पशु पोषण (Biofit Cattle Care)",
-          "ingredients": "100% प्राकृतिक व सक्रिय जैविक तत्व संतुलित पोषक तत्व व विटामिन्स: प्रजनन हॉर्मोन्स के स्राव (Secretion) को बढ़ावा देने वाले उच्च गुणवत्ता वाले विटामिन्स।\n\nविशेष प्राकृतिक हर्ब्स: पशुओं के reproductive system को अंदर से मजबूत और सक्रिय बनाने वाली पारंपरिक जड़ी-बूटियों का अनूठा मिश्रण।",
-          "dose": "मात्रा व तरीका: विशेषज्ञ या पैकेजिंग पर दिए गए दिशा-निर्देशों के अनुसार पशुओं के दैनिक आहार या पानी में उचित मात्रा मिलाएं।\n\nनियमित सेवन: प्रजनन संबंधी बेहतर और स्थायी परिणामों के लिए इसे नियमित रूप से उपयोग करें।"
+          "dose": "मात्रा व तरीका: विशेषज्ञ या पैकेजिंग पर दिए गए दिशा-निर्देशों के अनुसार पशुओं के दैनिक आहार या पानी में उचित मात्रा मिलाएं।\n\nनियमित सेवन: प्रजनन संबंधी बेहतर और स्थायी परिणामों के लिए इसे नियमित रूप से उपयोग करें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
+      "clinical_breakdown": {
+        "badge_text": "🔬 वैज्ञानिक पशु पोषण",
+        "main_title": "पशु स्वास्थ्य: थनैला रोग, दुग्ध उत्पादन व संतुलित साइलेज",
+        "cards": [
+          {
+            "title": "❓ थनैला रोग (Mastitis) के कारण",
+            "color": "#2563eb",
+            "image": "",
+            "points": [
+              "<strong>गंदा फर्श व जीवाणु संक्रमण:</strong> थन के छिद्र खुले रहने पर बैक्टीरिया का प्रवेश।",
+              "<strong>गलत मिल्किंग तकनीक:</strong> अंगूठे से दबाकर दूध निकालने से थनों में अंदरूनी चोट।",
+              "<strong>विटामिन व मिनरल्स की कमी:</strong> पशु की रोग प्रतिरोधक क्षमता (Immunity) कमजोर होना।"
+            ]
+          },
+          {
+            "title": "⚠️ मुख्य लक्षण व पहचान",
+            "color": "#2563eb",
+            "image": "",
+            "points": [
+              "थनों में तेज सूजन, गर्माहट व छूने पर पशु का लात मारना।",
+              "दूध में थक्के (छीछड़े), पीलापन या खून आना।",
+              "दूध का स्वाद नमकीन होना व पीएच (pH) मान में बदलाव आना।"
+            ]
+          },
+          {
+            "title": "🚨 अनदेखी के नुकसान (Risks)",
+            "color": "#dc2626",
+            "image": "",
+            "points": [
+              "<strong>थन का हमेशा के लिए मरना:</strong> चार में से एक या दो थन से दूध स्थायी रूप से बंद होना।",
+              "<strong>लाखों का आर्थिक नुकसान:</strong> दुग्ध उत्पादन 80% तक गिर जाना व पशु की कीमत घटना।"
+            ]
+          }
+        ]
+      },
+      "netsurf_plan": null,
+      "diet_exercise": {
+        "diet": {
+          "title": "दूध व FAT% वृद्धि संतुलित आहार चार्ट",
+          "items": [
+            "<strong>1. मिनरल मिक्सचर (100g रोज):</strong> चेलैटेड कैल्शियम, फॉस्फोरस व जिंक की दैनिक खुराक।",
+            "<strong>2. बाईपास फैट (50-100g):</strong> दूध में मक्खन व फैट प्रतिशत तुरंत 1 से 1.5% बढ़ाता है।",
+            "<strong>3. साइलेज व सूखा भूसा अनुपात:</strong> 60% हरा चारा (साइलेज) + 40% सूखा भूसा व दाना मिश्रण।"
+          ],
+          "images": []
+        },
+        "exercise": {
+          "title": "पशु प्रबंधन व मिल्किंग प्रोटोकॉल",
+          "items": [
+            "<strong>1. फुल-हैंड मिल्किंग:</strong> चारों उंगलियों व हथेली से पूरा दबाव देकर दूध निकालें।",
+            "<strong>2. टीट डिपिंग (Teat Dip):</strong> दूध निकालने के तुरंत बाद पोटाश या आयोडीन घोल में थन डुबोएं।",
+            "<strong>3. दूध निकालने के बाद 30 मिनट खड़ा रखें:</strong> पशु को चारा डालकर खड़ा रखें ताकि थन का छेद बंद हो सके।"
+          ],
+          "images": []
+        }
+      },
       "whatsapp_support": {
         "number": "917974422572",
-        "prompt": "नमस्ते, मुझे पशु पालन व दुग्ध वृद्धि के बारे में सलाह चाहिए।"
+        "prompt": "राम राम, मुझे पशुओं के स्वास्थ्य व दुग्ध वृद्धि के बारे में जानकारी चाहिए।"
       }
     },
     {
@@ -1494,6 +2093,484 @@
       }
     },
     {
+      "id": "page_cattle_care",
+      "slug": "pashu-palan",
+      "name": "🐄 पशु पालन व दुग्ध उत्पादन (Cattle Care Hub)",
+      "url": "/pashu-palan.html",
+      "category": "Livestock",
+      "status": "active",
+      "theme_primary": "#0284c7",
+      "theme_dark": "#00387b",
+      "ticker_text": "🐄 दुग्ध वृद्धि, बांझपन निवारण व पशु स्वास्थ्य | 24×7 WhatsApp AI पशु डॉक्टर परामर्श सक्रिय! aarogyam india",
+      "audio_title": "पशु पालन व दुग्ध संवर्धन हब",
+      "audio_script": "राम राम {name} जी! आरोग्यम पशु पालन केंद्र में आपका स्वागत है। यहाँ गाय-भैंस में थनैला रोग, दूध व फैट बढ़ाने के फॉर्मूले, बांझपन और पाचन समस्याओं का 100% सफल समाधान मिलेगा। आप सीएफएल और बायो-फिट उत्पाद सीधे व्हाट्सएप द्वारा ऑर्डर कर सकते हैं। dhara paranam",
+      "og_title": "",
+      "og_image": "",
+      "og_description": "",
+      "share_message": "",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": true,
+      "hero_slides": [
+        {
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "tag": "🐄 पशु पालन विशेष",
+          "title": "पशु पालन व दुग्ध संवर्धन हब",
+          "subtitle": "दुग्ध वृद्धि, बांझपन निवारण व थनैला उपचार",
+          "cta_text": "💬 WhatsApp परामर्श",
+          "cta_link": "https://wa.me/917974422572",
+          "cta_secondary_text": "🛒 उत्पाद देखें",
+          "cta_secondary_link": "#pashu-products"
+        },
+        {
+          "image": "/images/banners/pashu-cow-care.jpg",
+          "tag": "🥛 दुग्ध वृद्धि फॉर्मूला",
+          "title": "गाय-भैंस में दूध व फैट वृद्धि",
+          "subtitle": "नेचुरल हर्बल सप्लीमेंट्स और मिनरल मिक्सचर",
+          "cta_text": "💬 ऑर्डर करें",
+          "cta_link": "https://wa.me/917974422572",
+          "cta_secondary_text": "📞 संपर्क करें",
+          "cta_secondary_link": "#vet-consult"
+        },
+        {
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "tag": "🐐 बकरी पालन गाइड",
+          "title": "उन्नत बकरी पालन व वजन वृद्धि",
+          "subtitle": "रोग रोकथाम व वैज्ञानिक पोषण प्रबंधन",
+          "cta_text": "💬 जानकारी लें",
+          "cta_link": "https://wa.me/917974422572",
+          "cta_secondary_text": "📖 गाइड पढ़ें",
+          "cta_secondary_link": "/ebooks/ebook.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-bk015-sec_audio-ba-628476-vren.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-whatsapp-image-202-646683-isg0.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        }
+      ],
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_category_pills",
+        "sec_shelves_bestseller",
+        "sec_interspersed_marketing",
+        "sec_shelves_new",
+        "sec_shelves_coming_soon",
+        "sec_combo_promo",
+        "sec_videos",
+        "sec_reviews",
+        "sec_trust_guarantee",
+        "sec_faqs",
+        "sec_help_support"
+      ],
+      "hidden_sections": [],
+      "kpi_cards": [
+        {
+          "icon": "fa-cow",
+          "title": "दूध उत्पादन वृद्धि",
+          "desc": "प्राकृतिक आयुर्वेदिक मिनरल व पोषण"
+        },
+        {
+          "icon": "fa-shield-virus",
+          "title": "मस्टाइटिस व थनैला",
+          "desc": "सटीक लक्षण पहचान व हर्बल उपचार"
+        },
+        {
+          "icon": "fa-dna",
+          "title": "बांझपन से मुक्ति",
+          "desc": "समय पर हीट में लाना व गर्भाधान"
+        },
+        {
+          "icon": "fa-robot",
+          "title": "24×7 AI पशु डॉक्टर",
+          "desc": "WhatsApp पर तुरंत परामर्श"
+        }
+      ],
+      "marketing_cards": [],
+      "videos": [],
+      "reviews": [],
+      "faqs": [],
+      "health_diseases": [
+        {
+          "id": "DIS001",
+          "name": "मधुमेह / डायबिटीज",
+          "badge": "ब्लड शुगर नियंत्रण",
+          "color": "#3b82f6",
+          "icon": "🩸",
+          "image": "/images/banners/health-diabetes.jpg",
+          "symptoms": [
+            "बार-बार पेशाब आना",
+            "थकान व कमजोरी",
+            "शुगर असंतुलन"
+          ],
+          "description": "फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।",
+          "solution": "जामुन-करेला अर्क, गिलोय व मेथी दाना का प्राकृतिक योग और वैज्ञानिक डाइट प्लान।"
+        },
+        {
+          "id": "DIS002",
+          "name": "जोड़ों का दर्द व गठिया",
+          "badge": "जोड़ों का दर्द राहत",
+          "color": "#8b5cf6",
+          "icon": "🦴",
+          "image": "/images/banners/health-joint-care.jpg",
+          "symptoms": [
+            "घुटनों व जोड़ों में दर्द",
+            "चलने में तकलीफ",
+            "सूजन व जकड़न"
+          ],
+          "description": "कार्टिलेज पोषण, यूरिक एसिड नियंत्रण और जोड़ों के दर्द से प्राकृतिक आयुर्वेदिक समाधान।",
+          "solution": "शल्लाकी, गुग्गुल, निर्गुंडी तैलम मालिश व यूरिक एसिड घटाने वाला प्राकृतिक अर्क।"
+        },
+        {
+          "id": "DIS003",
+          "name": "महिला स्वास्थ्य / PCOD",
+          "badge": "हार्मोनल संतुलन",
+          "color": "#ec4899",
+          "icon": "🌸",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "अनियमित माहवारी",
+            "हार्मोनल असंतुलन",
+            "कमजोरी"
+          ],
+          "description": "हार्मोनल संतुलन, गर्भाशय पोषण और पीसीओडी/पीसीओएस का सम्पूर्ण सुरक्षित हर्बल समाधान।",
+          "solution": "अशोकारिष्ट, शतावरी, लोध्र व कांचनार गुग्गुलु का सुरक्षित आयुर्वेदिक सेवन।"
+        },
+        {
+          "id": "DIS004",
+          "name": "बाल झड़ना व डैंड्रफ",
+          "badge": "हेयर फॉल कंट्रोल",
+          "color": "#6366f1",
+          "icon": "💇",
+          "image": "/images/banners/health-hair-care.jpg",
+          "symptoms": [
+            "तेजी से बाल झड़ना",
+            "रूसी व डैंड्रफ",
+            "सिर में खुजली"
+          ],
+          "description": "बालों की जड़ों को पोषण, नए बालों का विकास और डैंड्रफ मुक्त घने बालों के लिए विशेष थेरेपी।",
+          "solution": "भृंगराज, आंवला, शिकाकाई हर्बल हेयर ऑयल व एंटी-डैंड्रफ स्कैल्प सीरम।"
+        },
+        {
+          "id": "DIS005",
+          "name": "त्वचा रोग व ग्लो",
+          "badge": "ग्लोइंग स्किन",
+          "color": "#06b6d4",
+          "icon": "✨",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कील-मुंहासे (पिंपल्स)",
+            "दाद व खुजली",
+            "झाइयां"
+          ],
+          "description": "रक्त शुद्धि और प्राकृतिक जड़ी-बूटियों द्वारा पिंपल्स, झाइयों और त्वचा संक्रमण से राहत।",
+          "solution": "नीम, मंजिष्ठा, खदिरारिष्ट रक्त शोधक और एलोवेरा-हल्दी जेल लेप।"
+        },
+        {
+          "id": "DIS006",
+          "name": "मोटापा व वजन नियंत्रण",
+          "badge": "नेचुरल फैट बर्न",
+          "color": "#f59e0b",
+          "icon": "⚖️",
+          "image": "/images/banners/health-weight-loss.jpg",
+          "symptoms": [
+            "पेट की जिद्दी चर्बी",
+            "सांस फूलना",
+            "धीमा मेटाबॉलिज्म"
+          ],
+          "description": "प्राकृतिक मेटाबॉलिज्म बूस्ट और जिद्दी फैट घटाने की सम्पूर्ण वैज्ञानिक डाइट और हर्बल फार्मूला।",
+          "solution": "मेदोहर गुग्गुलु, त्रिफला, दालचीनी-ग्रीन टी एक्सट्रैक्ट व 24 घंटे की डिटॉक्स डाइट।"
+        },
+        {
+          "id": "DIS007",
+          "name": "बच्चों का पोषण व दिमाग",
+          "badge": "स्मार्ट किड्स",
+          "color": "#10b981",
+          "icon": "👶",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कमजोर याददाश्त",
+            "भूख न लगना",
+            "धीमी शारीरिक लंबाई"
+          ],
+          "description": "बच्चों की रोग प्रतिरोधक क्षमता, लंबाई और मानसिक एकाग्रता बढ़ाने का सम्पूर्ण प्राकृतिक न्यूट्रिशन।",
+          "solution": "शंखपुष्पी, ब्राह्मी, अश्वगंधा सिरप और प्राकृतिक सुपरफूड्स व बादाम शेक डाइट।"
+        },
+        {
+          "id": "DIS008",
+          "name": "नेचुरल होम केयर",
+          "badge": "टॉक्सिन फ्री",
+          "color": "#84cc16",
+          "icon": "🏡",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "केमिकल युक्त फिनाइल व डिटर्जेंट",
+            "बच्चों व बुजुर्गों को एलर्जी"
+          ],
+          "description": "घर को हानिकारक रसायनों से मुक्त, स्वच्छ और रोगाणु-रहित रखने के इको-फ्रेंडली बायो-नेचुरल क्लीनर्स।",
+          "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
+        }
+      ],
+      "crops": [
+        {
+          "id": "CROP001",
+          "name": "सोयाबीन (Soybean)",
+          "season": "खरीफ फसल",
+          "image": "/images/crops/soyabeen.jpeg",
+          "badge": "प्रमुख तिलहन",
+          "color": "#3b82f6",
+          "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
+          "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
+        },
+        {
+          "id": "CROP002",
+          "name": "धान / चावल (Paddy)",
+          "season": "खरीफ / रबी",
+          "image": "/images/crops/paddy.jpeg",
+          "badge": "अन्नदाता फसल",
+          "color": "#8b5cf6",
+          "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
+          "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
+        },
+        {
+          "id": "CROP003",
+          "name": "गेहूं (Wheat)",
+          "season": "रबी फसल",
+          "image": "/images/crops/wheat.jpeg",
+          "badge": "मुख्य खाद्यान्न",
+          "color": "#6366f1",
+          "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
+          "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
+        },
+        {
+          "id": "CROP004",
+          "name": "कपास / नरमा (Cotton)",
+          "season": "खरीफ व जायद",
+          "image": "/images/banners/hero-banner-1.jpeg",
+          "badge": "सफेद सोना",
+          "color": "#0ea5e9",
+          "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
+          "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
+        },
+        {
+          "id": "CROP005",
+          "name": "मक्का (Maize)",
+          "season": "खरीफ / जायद",
+          "image": "/images/crops/maize.jpeg",
+          "badge": "अनाज व चारा",
+          "color": "#06b6d4",
+          "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
+          "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
+        },
+        {
+          "id": "CROP006",
+          "name": "सब्जियां, मिर्च व टमाटर",
+          "season": "बारहमासी",
+          "image": "/images/crops/vegetables.jpeg",
+          "badge": "नकदी फसल",
+          "color": "#10b981",
+          "mainIssues": "मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा",
+          "solution": "ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।"
+        }
+      ],
+      "pashu_cards": [
+        {
+          "id": "PASHU001",
+          "name": "गाय - दुग्ध वृद्धि व पोषण",
+          "category": "गाय पालन (Cow Care)",
+          "icon": "🐄",
+          "badge": "1-2L दूध वृद्धि",
+          "image": "/images/banners/pashu-cow-care.jpg",
+          "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
+          "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
+        },
+        {
+          "id": "PASHU002",
+          "name": "भैंस - FAT% व SNF वृद्धि",
+          "category": "भैंस पालन (Buffalo Care)",
+          "icon": "🐃",
+          "badge": "FAT 8% तक",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "दूध में फैट (FAT) कम आना, गर्मी में हांफना व सुस्ती, बांझपन",
+          "solution": "बायपास फैट, रुमेन बफर और हर्बल पाचक चूर्ण द्वारा दूध में गाढ़ापन और उच्चतम फैट प्रतिशत।"
+        },
+        {
+          "id": "PASHU003",
+          "name": "बकरी पालन - वजन वृद्धि",
+          "category": "बकरी पालन (Goat Farming)",
+          "icon": "🐐",
+          "badge": "उच्च मुनाफा",
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "mainIssues": "बच्चों में दस्त व निमोनिया, वजन धीमी गति से बढ़ना, पेट के कीड़े",
+          "solution": "नियमित डीवर्मिंग (कृमिनाशक), प्रोटीन युक्त दाना मिश्रण और ग्रोथ प्रमोटर सप्लीमेंट्स।"
+        },
+        {
+          "id": "PASHU004",
+          "name": "पशुओं में थनैला व पाचन रोग",
+          "category": "रोग नियंत्रण व प्राथमिक उपचार",
+          "icon": "🩺",
+          "badge": "100% सुरक्षा",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "थनैला (Mastitis), अयन में सूजन, छेछड़े आना, आफरा (गैस) व अपच",
+          "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
+        }
+      ],
+      "products": [
+        {
+          "id": "PAS001",
+          "name": "pet vet 500 gram ",
+          "price": 699,
+          "mrp": 699,
+          "badge": "दुग्ध वृद्धि बूस्टर",
+          "description": "बायपास प्रोटीन, चेलेटेड मिनरल्स व प्रोबायोटिक्स युक्त। 7 दिन में दूध और फैट में अचूक सुधार लाता है।",
+          "image": "/images/products/product-whatsapp-image-202-726876-4zvg.webp",
+          "dose": "10 gram ",
+          "title": "pet vet 500 gram "
+        },
+        {
+          "id": "PAS002",
+          "name": "Mastitis Shield Care Kit",
+          "price": 850,
+          "mrp": 850,
+          "badge": "थनैला रक्षक",
+          "description": "अयन की सूजन, गांठ व दूध में छीछड़ों को दूर करने वाली 100% सुरक्षित आयुर्वेदिक एंटी-इंफ्लेमेटरी किट।",
+          "image": "/images/banners/pashu-palan-banner.jpg"
+        },
+        {
+          "id": "PAS003",
+          "name": "Doodh Dhara High-Cal (1L)",
+          "price": 450,
+          "mrp": 450,
+          "badge": "लिक्विड कैल्शियम",
+          "description": "विटामिन D3, B12 व बायोटीन युक्त बायो-अवेलेबल कैल्शियम। ब्यात के बाद मिल्क फीवर से बचाता है।",
+          "image": "/images/banners/pashu-palan-banner.jpg"
+        },
+        {
+          "id": "PAS004",
+          "name": "Uterus Tone Cleanser (500ml)",
+          "price": 550,
+          "mrp": 550,
+          "badge": "बांझपन निवारक",
+          "description": "बच्चेदानी की गंदगी साफ कर समय पर शुद्ध हीट में लाता है और गर्भ ठहरने की संभावना 90% बढ़ाता है।",
+          "image": "/images/banners/pashu-palan-banner.jpg"
+        }
+      ],
+      "page_kpi_sections": [],
+      "whatsapp_support": {
+        "number": "917974422572",
+        "prompt": "नमस्ते, मुझे पशु पालन व दुग्ध वृद्धि के बारे में सलाह चाहिए।"
+      }
+    },
+    {
+      "id": "page_health_hub",
+      "slug": "health-hub",
+      "name": "❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health & Wellness Hub)",
+      "url": "/categories/health.html",
+      "category": "Healthcare",
+      "status": "active",
+      "theme_primary": "#dc2626",
+      "theme_dark": "#991b1b",
+      "fb_pixel": true,
+      "ga_tag": true,
+      "ticker_text": "🌿 सम्पूर्ण 8 स्वास्थ्य विकारों के प्राकृतिक आयुर्वेदिक समाधान | 24×7 WhatsApp AI डॉक्टर परामर्श!",
+      "hero_slides": [
+        {
+          "image": "/images/banners/health-banner.jpeg",
+          "tag": "🌿 सम्पूर्ण स्वास्थ्य केंद्र",
+          "title": "आरोग्यम हेल्थ एंड वेलनेस हब",
+          "subtitle": "8 प्रमुख लाइफस्टाइल विकारों के प्राकृतिक आयुर्वेदिक समाधान",
+          "cta_text": "💬 डॉक्टर से पूछें",
+          "cta_link": "https://wa.me/917974422572",
+          "cta_secondary_text": "🔍 रोग चुनें",
+          "cta_secondary_link": "#health-categories"
+        },
+        {
+          "image": "/images/banners/health-diabetes.jpg",
+          "tag": "🩸 डायबिटीज केयर",
+          "title": "प्राकृतिक शुगर नियंत्रण व रिवर्सल",
+          "subtitle": "आयुर्वेदिक अर्क व वैज्ञानिक आहार तालिका",
+          "cta_text": "📖 विस्तार से देखें",
+          "cta_link": "/health/diabetes.html",
+          "cta_secondary_text": "💬 परामर्श",
+          "cta_secondary_link": "https://wa.me/917974422572"
+        },
+        {
+          "image": "/images/banners/health-joint-care.jpg",
+          "tag": "🦴 जॉइंट केयर",
+          "title": "जोड़ों के दर्द व गठिया से मुक्ति",
+          "subtitle": "नेचुरल हर्बल कार्टिलेज पोषण व तेल मालिश",
+          "cta_text": "📖 विस्तार से देखें",
+          "cta_link": "/health/joint-care.html",
+          "cta_secondary_text": "💬 परामर्श",
+          "cta_secondary_link": "https://wa.me/917974422572"
+        },
+        {
+          "image": "/images/banners/health-weight-loss.jpg",
+          "tag": "🔥 वेट लॉस",
+          "title": "प्राकृतिक मोटापा व वजन नियंत्रण",
+          "subtitle": "बिना कमजोरी के सुरक्षित फैट बर्निंग",
+          "cta_text": "📖 विस्तार से देखें",
+          "cta_link": "/health/weight-loss.html",
+          "cta_secondary_text": "💬 परामर्श",
+          "cta_secondary_link": "https://wa.me/917974422572"
+        },
+        {
+          "image": "/images/banners/health-hair-care.jpg",
+          "tag": "💇‍♀️ हेयर केयर",
+          "title": "बाल झड़ना रोकें व डैंड्रफ मुक्ति",
+          "subtitle": "भृंगराज व आंवला युक्त हर्बल हेयर थेरेपी",
+          "cta_text": "📖 विस्तार से देखें",
+          "cta_link": "/health/hair-care.html",
+          "cta_secondary_text": "💬 परामर्श",
+          "cta_secondary_link": "https://wa.me/917974422572"
+        }
+      ],
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_category_pills",
+        "sec_videos",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_help_support"
+      ],
+      "hidden_sections": [],
+      "kpi_cards": [],
+      "videos": [],
+      "marketing_cards": [],
+      "reviews": [],
+      "faqs": [],
+      "whatsapp_support": {
+        "number": "917974422572",
+        "prompt": "नमस्ते, मुझे स्वास्थ्य परामर्श चाहिए।"
+      },
+      "audio_title": "आरोग्यम संपूर्ण स्वास्थ्य केंद्र",
+      "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे। अपनी समस्या का चयन करें और स्थायी स्वास्थ्य लाभ पाएं।"
+    },
+    {
       "id": "page_health_diabetes",
       "slug": "health-diabetes",
       "name": "🩸 मधुमेह (डायबिटीज) केयर",
@@ -1607,40 +2684,40 @@
       "pashu_cards": [],
       "products": [
         {
-          "id": "ns_health_sugar",
+          "title": "नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus Capsules)",
           "name": "नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus Capsules)",
+          "description": "करेला, जामुन बीज, गुड़मार और विजयसार से पैंक्रियाज को जाग्रत कर प्राकृतिक इंसुलिन संतुलन बनाता है।",
           "image": "/images/products/product--------------------836232-cht7.webp",
           "mrp": 450,
-          "price": 360,
+          "price": 450,
           "discount_pct": 20,
-          "description": "करेला, जामुन बीज, गुड़मार और विजयसार से पैंक्रियाज को जाग्रत कर प्राकृतिक इंसुलिन संतुलन बनाता है।",
-          "badge": "स्वास्थ्य नेचुरामोरे",
-          "ingredients": "गुड़मार (Gymnema Sylvestre), जामुन बीज, करेला, विजयसार, मेथी, नीम, दालचीनी",
-          "dose": "1 कैप्सूल सुबह और 1 शाम भोजन से 30 मिनट पहले पानी के साथ।"
+          "dose": "1 कैप्सूल सुबह और 1 शाम भोजन से 30 मिनट पहले पानी के साथ।",
+          "badge": "🩺 ब्लड शुगर व डायबिटीज संतुलन",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "ns_prod_85933",
+          "title": "Nutriliver 30 NOS",
           "name": "Nutriliver 30 NOS",
+          "description": "उत्पाद का विस्तृत विवरण व मुख्य लाभयकृत की सुरक्षा: यह लिवर के स्वस्थ कामकाज को बनाए रखने और लिवर की कोशिकाओं को नुकसान से बचाने में मदद करता है।\n\nडिटॉक्सिफिकेशन: शरीर और लिवर से हानिकारक टॉक्सिन्स को बाहर निकालकर प्राकृतिक रूप से डिटॉक्स करने में सहायक है।\n\n2. मुख्य घटक (Ingredients)\nहर्ब एक्सट्रैक्ट्स: इसमें कुटकी, कालमेघ, भृंगराज और पुनर्नवा जैसी लिवर-सुरक्षात्मक जड़ी-बूटियाँ शामिल हैं।\n\nएंटीऑक्सीडेंट्स व विटामिन्स: लिवर की कोशिकाओं की मरम्मत और ऊर्जा स्तर को बनाए रखने के लिए पोषक तत्व।...",
           "image": "/images/products/product-nutriliver-30-nos-446989-trp1.webp",
           "mrp": 450,
-          "price": 338,
+          "price": 450,
           "discount_pct": 25,
-          "description": "उत्पाद का विस्तृत विवरण व मुख्य लाभयकृत की सुरक्षा: यह लिवर के स्वस्थ कामकाज को बनाए रखने और लिवर की कोशिकाओं को नुकसान से बचाने में मदद करता है।\n\nडिटॉक्सिफिकेशन: शरीर और लिवर से हानिकारक टॉक्सिन्स को बाहर निकालकर प्राकृतिक रूप से डिटॉक्स करने में सहायक है।\n\n2. मुख्य घटक (Ingredients)\nहर्ब एक्सट्रैक्ट्स: इसमें कुटकी, कालमेघ, भृंगराज और पुनर्नवा जैसी लिवर-सुरक्षात्मक जड़ी-बूटियाँ शामिल हैं।\n\nएंटीऑक्सीडेंट्स व विटामिन्स: लिवर की कोशिकाओं की मरम्मत और ऊर्जा स्तर को बनाए रखने के लिए पोषक तत्व।...",
-          "badge": "स्वास्थ्य नेचुरामोरे (Naturamore Health)",
-          "ingredients": " मुख्य घटक (Ingredients)\nहर्ब एक्सट्रैक्ट्स: इसमें कुटकी, कालमेघ, भृंगराज और पुनर्नवा जैसी लिवर-सुरक्षात्मक जड़ी-बूटियाँ शामिल हैं।\n\nएंटीऑक्सीडेंट्स व विटामिन्स: लिवर की कोशिकाओं की मरम्मत और ऊर्जा स्तर को बनाए रखने के लिए पोषक तत्व।...",
-          "dose": "मात्रा व तरीका: 1 कैप्सूल दिन में दो बार (या चिकित्सक के निर्देशानुसार) भोजन के बाद लें।\n\nनियमित सेवन: बेहतर और लंबे परिणामों के लिए इसे पानी के साथ नियमित रूप से लें।"
+          "dose": "मात्रा व तरीका: 1 कैप्सूल दिन में दो बार (या चिकित्सक के निर्देशानुसार) भोजन के बाद लें।\n\nनियमित सेवन: बेहतर और लंबे परिणामों के लिए इसे पानी के साथ नियमित रूप से लें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "ns_health_plus",
+          "title": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
           "name": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
+          "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
           "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
           "mrp": 1425,
-          "price": 1069,
+          "price": 1425,
           "discount_pct": 25,
-          "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
-          "badge": "स्वास्थ्य नेचुरामोरे",
-          "ingredients": "सोया प्रोटीन आइसोलेट, व्हे प्रोटीन, एलोवेरा, ओमेगा-3 डीएचए, शतावरी, 13 विटामिन्स व 11 मिनरल्स",
-          "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।"
+          "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।",
+          "badge": "❤️ संपूर्ण परिवार पोषण",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
@@ -1768,40 +2845,31 @@
       "audio_script": "नमस्ते {name} जी! वेट लॉस गाइड में आपका स्वागत है। यहाँ आपको पेट की जिद्दी चर्बी घटाने के मुख्य कारण, लक्षण, 24 घंटे का संपूर्ण डाइट चार्ट और फैट बर्नर हर्बल सप्लीमेंट की जानकारी मिलेगी।",
       "products": [
         {
-          "id": "ns_health_detox",
-          "name": "नेचुरामोरे ईज़ी डिटॉक्स (Easy Detox Tablets)",
-          "image": "/images/products/product--------------------929114-1dtr.webp",
-          "mrp": 800,
-          "price": 640,
-          "discount_pct": 20,
-          "description": "त्रिफला, सनाय व कालमेघ से कब्ज, खट्टी डकारें, गैस व फैटी लिवर की समस्या से 100% राहत।",
-          "badge": "स्वास्थ्य नेचुरामोरे",
-          "ingredients": "त्रिफला (आंवला, हरड़, बहेड़ा), सौंफ, सनाय, अजवाइन, यष्टिमधु, अमलतास",
-          "dose": "1 या 2 टैबलेट रात को सोने से पहले गुनगुने पानी के साथ।"
+          "id": "WL001",
+          "name": "Slim-Fit Herbal Fat Burner",
+          "price": 850,
+          "mrp": 850,
+          "badge": "फैट बर्नर",
+          "description": "गार्सिनिया कैम्बोजिया, ग्रीन कॉफी व गुग्गुल अर्क युक्त। भूख को नियंत्रित कर जिद्दी फैट बर्न करता है।",
+          "image": "/images/logo/logo.png"
         },
         {
-          "id": "ns_prod_56695",
-          "name": "Blood Detox 30 NOS",
-          "image": "/images/products/product-blood-detox-30-nos-107334-rozt.webp",
-          "mrp": 400,
-          "price": 300,
-          "discount_pct": 25,
-          "description": "रक्त शोधन (Blood Purification): यह शरीर से हानिकारक टॉक्सिन्स (विषाक्त पदार्थों) को बाहर निकालकर खून को प्राकृतिक रूप से साफ करने में मदद करता है।\n\nत्वचा की चमक व सेहत: यह खून की शुद्धि के जरिए मुंहासों, दाग-धब्बों को दूर करता है और त्वचा को स्वस्थ व चमकदार बनाता है।",
-          "badge": "स्वास्थ्य नेचुरामोरे (Naturamore Health)",
-          "ingredients": "प्राकृतिक हर्बल अर्क: इसमें नीम, मंजिष्ठा, हल्दी और गिलोय जैसी पारंपरिक रक्त-शोधक (Blood purifying) जड़ी-बूटियाँ शामिल हैं।\n\nडिटॉक्सिफाइंग तत्व: जो लिवर और पाचन तंत्र को सपोर्ट करके शरीर के आंतरिक अंगों को डिटॉक्स करते हैं।",
-          "dose": "मात्रा व तरीका: 1 कैप्सूल दिन में दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतर और लंबे समय तक साफ-सुथरी त्वचा व सेहत के लिए कोर्स के अनुसार इसका नियमित सेवन करें।"
+          "id": "WL002",
+          "name": "Triphala Detox Cleanse",
+          "price": 650,
+          "mrp": 650,
+          "badge": "टॉक्सिन क्लींजर",
+          "description": "आंतों में जमा पुराना मल व टॉक्सिन्स बाहर निकालता है। पेट फूलने और गैस से तुरंत मुक्ति।",
+          "image": "/images/logo/logo.png"
         },
         {
-          "id": "ns_prod_03157",
-          "name": "Klearkof Cough Remedy 100 MLT",
-          "image": "/images/products/product-klearkof-cough-rem-349961-9yml.webp",
-          "mrp": 210,
-          "price": 158,
-          "discount_pct": 25,
-          "description": "खांसी व सर्दी से राहत: यह मौसमी खांसी, जुकाम, फ्लू और श्वसन संबंधी समस्याओं से लड़ने के लिए एक प्रभावी आयुर्वेदिक प्रोप्राइटरी दवा है।   विशेष गुण: यह शुगर-फ्री और कम कैलोरी वाला सिरप है, जो बिना सुस्ती (Drowsiness) लाए गले की खराश और कफ से राहत दिलाता है।",
-          "badge": "स्वास्थ्य नेचुरामोरे (Naturamore Health)",
-          "ingredients": "प्रमुख जड़ी-बूटियाँ: इसमें शुंठी (सोंठ), पिप्पली, यष्टिममधु (मुलेठी) सहित लगभग 10 शक्तिशाली आयुर्वेदिक जड़ी-बूटियों का मिश्रण होता है।   श्वसन स्वास्थ्य: इसके घटक गले को शांत करते हैं, जमे हुए बलगम (Phlegm) को ढीला करते हैं और वायुमार्ग (Airways) को साफ करते हैं। ",
-          "dose": "वयस्कों के लिए: 10 मिली सिरप दिन में 3 बार।   बच्चों के लिए (5 वर्ष से अधिक): 5 मिली सिरप दिन में 3 बार (या चिकित्सक के निर्देशानुसार)।  "
+          "id": "WL003",
+          "name": "Metabolic Boost Green Tea",
+          "price": 450,
+          "mrp": 450,
+          "badge": "मेटाबॉलिक टी",
+          "description": "दालचीनी, तुलसी, लेमनग्रास व सौंठ का शक्तिशाली मिश्रण। दैनिक 2 कप पीने से कैलोरी बर्न 30% तेज।",
+          "image": "/images/logo/logo.png"
         }
       ],
       "clinical_breakdown": {
@@ -1949,76 +3017,76 @@
       "pashu_cards": [],
       "products": [
         {
-          "id": "ns_health_joint",
-          "name": " Joint Care New 30 NOS",
-          "image": "/images/products/product--joint-care-new-30-770549-y5ld.webp",
-          "mrp": 450,
-          "price": 338,
-          "discount_pct": 25,
-          "description": "हर्बल ग्लूकोसामाइन, गुग्गुल, शल्लाकी व रास्ना से घुटनों की ग्रीस और कार्टिलेज का पुनर्निर्माण। सूजन व दर्द में आराम।",
-          "badge": "स्वास्थ्य नेचुरामोरे",
-          "ingredients": "सलाई गुग्गुल (Boswellia), हड़जोड़, निर्गुंडी, मेथी, रसना, ग्लूकोसामाइन सल्फेट",
-          "dose": "1 कैप्सूल सुबह व 1 शाम भोजन के आधे घंटे बाद गुनगुने पानी के साथ।"
+          "title": "नेचुरामोरे ईज़ी डिटॉक्स (Easy Detox Tablets)",
+          "name": "नेचुरामोरे ईज़ी डिटॉक्स (Easy Detox Tablets)",
+          "description": "त्रिफला, सनाय व कालमेघ से कब्ज, खट्टी डकारें, गैस व फैटी लिवर की समस्या से 100% राहत।",
+          "image": "/images/products/product--------------------929114-1dtr.webp",
+          "mrp": 800,
+          "price": 800,
+          "discount_pct": 20,
+          "dose": "1 या 2 टैबलेट रात को सोने से पहले गुनगुने पानी के साथ।",
+          "badge": "🌿 आंतों की सफाई व लिवर डिटॉक्स",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "ns_prod_32472",
+          "title": "Omega Triple Strength 30 NOS",
           "name": "Omega Triple Strength 30 NOS",
+          "description": "हार्ट और ब्रेन हेल्थ: यह हृदय को स्वस्थ रखने, कोलेस्ट्रॉल को नियंत्रित करने और मस्तिष्क (Brain) की कार्यप्रणाली व याददाश्त को बेहतर बनाने में सहायक है।\n\nजोड़ों और आँखों की सेहत: यह जोड़ों के लचीलेपन और गतिशीलता (Mobility) को बनाए रखता है तथा आँखों की रोशनी और त्वचा की नमी के लिए फायदेमंद है।",
           "image": "/images/products/product-omega-triple-stren-050587-qf16.webp",
           "mrp": 600,
-          "price": 450,
+          "price": 600,
           "discount_pct": 25,
-          "description": "हार्ट और ब्रेन हेल्थ: यह हृदय को स्वस्थ रखने, कोलेस्ट्रॉल को नियंत्रित करने और मस्तिष्क (Brain) की कार्यप्रणाली व याददाश्त को बेहतर बनाने में सहायक है।\n\nजोड़ों और आँखों की सेहत: यह जोड़ों के लचीलेपन और गतिशीलता (Mobility) को बनाए रखता है तथा आँखों की रोशनी और त्वचा की नमी के लिए फायदेमंद है।",
-          "badge": "स्वास्थ्य नेचुरामोरे (Naturamore Health)",
-          "ingredients": "एसेंशियल फैटी एसिड्स: इसमें उच्च गुणवत्ता वाले ओमेगा-3 फैटी एसिड्स (EPA और DHA) प्रचुर मात्रा में पाए जाते हैं।\n\nशुद्ध व प्राकृतिक स्रोत: इसे शुद्ध और सुरक्षित स्रोतों से तैयार किया जाता है जो शरीर में आसानी से अवशोषित हो जाते हैं।",
-          "dose": "मात्रा व तरीका: 1 कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: स्वास्थ्य के बेहतर परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।"
+          "dose": "मात्रा व तरीका: 1 कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: स्वास्थ्य के बेहतर परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "ns_health_plus",
-          "name": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
-          "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
-          "mrp": 1425,
-          "price": 1069,
-          "discount_pct": 25,
-          "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
-          "badge": "स्वास्थ्य नेचुरामोरे",
-          "ingredients": "सोया प्रोटीन आइसोलेट, व्हे प्रोटीन, एलोवेरा, ओमेगा-3 डीएचए, शतावरी, 13 विटामिन्स व 11 मिनरल्स",
-          "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।"
-        },
-        {
-          "id": "ns_prod_56695",
-          "name": "Blood Detox 30 NOS",
-          "image": "/images/products/product-blood-detox-30-nos-107334-rozt.webp",
-          "mrp": 400,
-          "price": 300,
-          "discount_pct": 25,
-          "description": "रक्त शोधन (Blood Purification): यह शरीर से हानिकारक टॉक्सिन्स (विषाक्त पदार्थों) को बाहर निकालकर खून को प्राकृतिक रूप से साफ करने में मदद करता है।\n\nत्वचा की चमक व सेहत: यह खून की शुद्धि के जरिए मुंहासों, दाग-धब्बों को दूर करता है और त्वचा को स्वस्थ व चमकदार बनाता है।",
-          "badge": "स्वास्थ्य नेचुरामोरे (Naturamore Health)",
-          "ingredients": "प्राकृतिक हर्बल अर्क: इसमें नीम, मंजिष्ठा, हल्दी और गिलोय जैसी पारंपरिक रक्त-शोधक (Blood purifying) जड़ी-बूटियाँ शामिल हैं।\n\nडिटॉक्सिफाइंग तत्व: जो लिवर और पाचन तंत्र को सपोर्ट करके शरीर के आंतरिक अंगों को डिटॉक्स करते हैं।",
-          "dose": "मात्रा व तरीका: 1 कैप्सूल दिन में दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतर और लंबे समय तक साफ-सुथरी त्वचा व सेहत के लिए कोर्स के अनुसार इसका नियमित सेवन करें।"
-        },
-        {
-          "id": "ns_prod_68977",
+          "title": "Multi Vitamin For Women 30 NOS",
           "name": "Multi Vitamin For Women 30 NOS",
+          "description": "दैनिक पोषण व ऊर्जा: यह महिलाओं की दैनिक पोषण संबंधी ज़रूरतों को पूरा करता है, जिससे पूरे दिन शरीर में ऊर्जा बनी रहती है और थकान कम होती है।\n\nत्वचा, बाल व हड्डियाँ: यह महिलाओं की रोग प्रतिरोधक क्षमता (Immunity) को मजबूत बनाने के साथ-साथ स्वस्थ त्वचा, मजबूत बालों और हड्डियों के विकास में मदद करता है।",
           "image": "/images/products/product-------------new-pr-824493-y893.webp",
           "mrp": 375,
-          "price": 281,
+          "price": 375,
           "discount_pct": 25,
-          "description": "दैनिक पोषण व ऊर्जा: यह महिलाओं की दैनिक पोषण संबंधी ज़रूरतों को पूरा करता है, जिससे पूरे दिन शरीर में ऊर्जा बनी रहती है और थकान कम होती है।\n\nत्वचा, बाल व हड्डियाँ: यह महिलाओं की रोग प्रतिरोधक क्षमता (Immunity) को मजबूत बनाने के साथ-साथ स्वस्थ त्वचा, मजबूत बालों और हड्डियों के विकास में मदद करता है।",
-          "badge": "स्वास्थ्य नेचुरामोरे (Naturamore Health)",
-          "ingredients": "विटामिन्स व मिनरल्स: इसमें महिलाओं के स्वास्थ्य के लिए आवश्यक मल्टी-विटामिन्स और मिनरल्स (जैसे आयरन, कैल्शियम, विटामिन D, और B-कम्प्लेक्स) का संतुलित मिश्रण होता है।\n\nप्राकृतिक अर्क व एंटीऑक्सीडेंट्स: ऑक्सीडेटिव तनाव से लड़ने और आंतरिक सेहत को बेहतर बनाए रखने के लिए विशेष फल व हर्बल एक्सट्रैक्ट्स।",
-          "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग के निर्देशों के अनुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतर और लंबे समय तक स्वस्थ परिणामों के लिए इसका नियमित उपयोग करें।"
+          "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग के निर्देशों के अनुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतर और लंबे समय तक स्वस्थ परिणामों के लिए इसका नियमित उपयोग करें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "ns_prod_47328",
-          "name": "Naturamore Pre Meal Nutrition 200 Gm 200 GMS",
-          "image": "/images/products/product-naturamore-pre-mea-124648-myf1.webp",
-          "mrp": 335,
-          "price": 251,
+          "title": "Multi Vitamin For Men 30 NOS",
+          "name": "Multi Vitamin For Men 30 NOS",
+          "description": "पुरुषों के लिए दैनिक ऊर्जा: यह पुरुषों की शारीरिक और मानसिक ऊर्जा, स्टैमिना तथा थकान को दूर करने के लिए तैयार किया गया है।\n\nरोग प्रतिरोधक क्षमता व फिटनेस: यह शरीर की इम्युनिटी (रोग प्रतिरोधक क्षमता) को मजबूत करता है और मांसपेशियों के स्वस्थ विकास व मेटाबॉलिज्म में मदद करता है।",
+          "image": "/images/products/product-multi-vitamin-for--705279-tr2v.webp",
+          "mrp": 375,
+          "price": 375,
           "discount_pct": 25,
-          "description": "Naturamore Pre-Meal Nutrition एक उत्कृष्ट न्यूट्रास्युटिकल (Nutraceutical) प्रोडक्ट है, जिसे भोजन से पहले लेने के लिए डिज़ाइन किया गया है। यह शरीर की पाचन शक्ति और भोजन से पोषक तत्वों (Nutrients) को अवशोषित करने की क्षमता को बेहतर बनाता है।",
-          "badge": "स्वास्थ्य नेचुरामोरे (Naturamore Health)",
-          "ingredients": "यह उत्पाद उच्च गुणवत्ता वाले प्रोटीन्स, विटामिन्स, फाइबर और पारंपरिक भारतीय जड़ी-बूटियों का अनूठा मिश्रण है:   प्रोटीन स्रोत: राइस प्रोटीन (Rice Protein) और पी प्रोटीन (Pea Protein)।   विटामिन्स और मिनरल्स: शरीर की दैनिक आवश्यकताओं को पूरा करने वाले 23 आवश्यक पोषक तत्व (23 Vital Nutrients)।   डाइटरी फाइबर (High Dietary Fiber): गुड गट बैक्टीरिया (Good gut bacteria) के लिए भोजन का काम करता है, भोजन के ग्लाइसेमिक इंडेक्स को कम करने और कोलेस्ट्रॉल नियंत्रित करने में सहायक है।   8 पारंपरिक जड़ी-बूटियाँ और मसाले:   पुदीना पत्ती, जीरा और हींग: पेट फूलना, गैस, डकार और अपच की समस्या को दूर करते हैं।   आमचूर (सूखा आम), काला नमक और सामान्य नमक: लार और पाचक रस के स्राव (Digestive enzymes) को बढ़ाते हैं, जिससे भूख और स्वाद में सुधार होता है।   सोंठ (सूखी अदरक), मिर्च और काली मिर्च: मेटाबॉलिज्म को तेज करते हैं और स्वस्थ पाचन तंत्र का समर्थन करते हैं। ",
-          "dose": "10 GM  PAR DAY KHANE SE PAHLE "
+          "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतरीन परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": " Joint Care New 30 NOS",
+          "name": " Joint Care New 30 NOS",
+          "description": "हर्बल ग्लूकोसामाइन, गुग्गुल, शल्लाकी व रास्ना से घुटनों की ग्रीस और कार्टिलेज का पुनर्निर्माण। सूजन व दर्द में आराम।",
+          "image": "/images/products/product--joint-care-new-30-770549-y5ld.webp",
+          "mrp": 450,
+          "price": 450,
+          "discount_pct": 25,
+          "dose": "1 कैप्सूल सुबह व 1 शाम भोजन के आधे घंटे बाद गुनगुने पानी के साथ।",
+          "badge": "🦴 जोड़ों का दर्द व कार्टिलेज",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
+          "name": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
+          "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
+          "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
+          "mrp": 1425,
+          "price": 1425,
+          "discount_pct": 25,
+          "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।",
+          "badge": "❤️ संपूर्ण परिवार पोषण",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
@@ -2133,40 +3201,31 @@
       "audio_script": "नमस्ते {name} जी! महिला स्वास्थ्य केंद्र में आपका स्वागत है। पीसीओडी, अनियमित माहवारी, कमजोरी और हार्मोनल असंतुलन का सुरक्षित व हर्बल समाधान यहाँ मिलेगा।",
       "products": [
         {
-          "id": "ns_health_women",
-          "name": "नेचुरामोरे फॉर विमेन (Naturamore Women 400g)",
-          "image": "/images/products/product--------------------009008-7r2u.webp",
-          "mrp": 1425,
-          "price": 1069,
-          "discount_pct": 25,
-          "description": "शतावरी, अशोका, लोध्र और आयरन युक्त पोषण। अनियमित माहवारी, कमर दर्द, कमजोरी व PCOD में लाभकारी।",
-          "badge": "स्वास्थ्य नेचुरामोरे",
-          "ingredients": "सोया व व्हे प्रोटीन, शतावरी, पुनर्नवा, फोलिक एसिड, आयरन, कैल्शियम, बायोटीन व विटामिन्स",
-          "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध में मिलाकर लें।"
-        },
-        {
-          "id": "ns_prod_40011",
-          "name": "Women'S Wellness 30 NOS",
-          "image": "/images/products/product-women-s-wellness-3-603217-b863.webp",
-          "mrp": 600,
+          "id": "WC001",
+          "name": "Nari-Kalyan PCOD Tonic (200ml)",
           "price": 450,
-          "discount_pct": 25,
-          "description": "महिलाओं के लिए विशेष पोषण: यह महिलाओं के शरीर की आंतरिक और जटिल शारीरिक आवश्यकताओं को पूरा करने के लिए तैयार किया गया एक बेहतरीन न्यूट्रास्युटिकल उत्पाद है।   हार्मोनल संतुलन व स्वास्थ्य: यह हॉर्मोन्स को संतुलित रखने, पीरियड्स की अनियमितता को दूर करने तथा त्वचा, बाल और नाखूनों की सेहत में सुधार करता है।  ",
-          "badge": "स्वास्थ्य नेचुरामोरे",
-          "ingredients": "प्रमुख जड़ी-बूटियाँ: इसमें शतावरी, अशोक, और चेस्ट ट्री (Chasteberry) शामिल हैं जो हार्मोनल बैलेंस और गर्भाशय के स्वास्थ्य में मदद करते हैं।   अन्य प्राकृतिक तत्व: एलोवेरा, पुनर्नवा, ब्राह्मी और लाइकोपीन (Lycopene) शरीर को डिटॉक्स करने, ऊर्जा बढ़ाने और रोग प्रतिरोधक क्षमता मजबूत करने में सहायक हैं।",
-          "dose": "मात्रा व तरीका: 1 टैबलेट या कैप्सूल दिन में दो बार (या चिकित्सक के निर्देशानुसार) भोजन के बाद हल्के गर्म पानी या दूध के साथ लें।   नियमित सेवन: बेहतर और स्थायी परिणामों के लिए इसका नियमित उपयोग किया जाना चाहिए।"
+          "mrp": 450,
+          "badge": "PCOD स्पेशल",
+          "description": "अशोक, लोध्र, शतावरी व कंचनार गुग्गुल। गर्भाशय की सफाई कर ओवरी सिस्ट को प्राकृतिक रूप से घोलता है।",
+          "image": "/images/logo/logo.png"
         },
         {
-          "id": "ns_prod_56442",
-          "name": "Multi Vitamin For Men 30 NOS",
-          "image": "/images/products/product-multi-vitamin-for--705279-tr2v.webp",
-          "mrp": 375,
-          "price": 281,
-          "discount_pct": 25,
-          "description": "पुरुषों के लिए दैनिक ऊर्जा: यह पुरुषों की शारीरिक और मानसिक ऊर्जा, स्टैमिना तथा थकान को दूर करने के लिए तैयार किया गया है।\n\nरोग प्रतिरोधक क्षमता व फिटनेस: यह शरीर की इम्युनिटी (रोग प्रतिरोधक क्षमता) को मजबूत करता है और मांसपेशियों के स्वस्थ विकास व मेटाबॉलिज्म में मदद करता है।",
-          "badge": "स्वास्थ्य नेचुरामोरे (Naturamore Health)",
-          "ingredients": "विटामिन्स व मिनरल्स: इसमें शरीर की दैनिक जरूरत के सभी जरूरी विटामिन्स (जैसे विटामिन A, B-कम्प्लेक्स, C, D, E) और मिनरल्स प्रचुर मात्रा में होते हैं।\n\nप्राकृतिक अर्क व हर्ब्स: पुरुषों की जीवन शक्ति (Vitality) और स्टैमिना बढ़ाने के लिए विशेष जड़ी-बूटियों और एंटीऑक्सीडेंट्स का मिश्रण।",
-          "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतरीन परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।"
+          "id": "WC002",
+          "name": "Shatavari Extract Cap (60 Cap)",
+          "price": 550,
+          "mrp": 550,
+          "badge": "हार्मोन बैलेंस",
+          "description": "प्राकृतिक एस्ट्रोजन बूस्टर। कमजोरी, थकान, कमर दर्द दूर करता है और प्रजनन तंत्र को शक्ति प्रदान करता है।",
+          "image": "/images/logo/logo.png"
+        },
+        {
+          "id": "WC003",
+          "name": "Iron & Folic Tonic (200ml)",
+          "price": 350,
+          "mrp": 350,
+          "badge": "हीमोग्लोबिन बूस्टर",
+          "description": "द्राक्षा, आंवला व लोह भस्म। बिना कब्ज किए हीमोग्लोबिन 15 दिन में बढ़ाता है और सुस्ती भगाता है।",
+          "image": "/images/logo/logo.png"
         }
       ],
       "clinical_breakdown": {
@@ -2303,40 +3362,32 @@
       "pashu_cards": [],
       "products": [
         {
-          "id": "ns_herbs_shampoo",
-          "name": "Scalp Renaissance Anti Dandruff Shampoo 200 MLT",
-          "image": "/images/products/product-scalp-renaissance--603882-ulwy.webp",
-          "mrp": 560,
-          "price": 420,
-          "discount_pct": 25,
-          "description": "अदरक का अर्क और टी-ट्री ऑयल से पहली वॉश से ही रूसी का खात्मा और स्कैल्प को ठंडक।",
-          "badge": "हर्ब्स एंड मोर",
-          "ingredients": "टी-ट्री ऑयल, शिकाकाई, रीठा, नींबू सत्व, प्रो-विटामिन B5",
-          "dose": "गीले बालों में लगाकर झाग बनाएं, 2 मिनट रहने दें और फिर पानी से धो लें।"
+          "id": "HC001",
+          "name": "hair nutrament ",
+          "price": 460,
+          "mrp": 460,
+          "badge": "रूट न्यूट्रिशन ऑयल",
+          "description": "भृंगराज, ब्राह्मी, आंवला, शिकाकाई व प्याज अर्क। जड़ों को मजबूत कर 15 दिन में बाल झड़ना रोकता है।",
+          "image": "/images/products/product-whatsapp-image-202-818789-y5x9.webp",
+          "title": "hair nutrament "
         },
         {
-          "id": "ns_herbs_conditioner",
-          "name": "Scalp Renaissance Anti Hair Fall Shampoo 200 MLT",
-          "image": "/images/products/product-scalp-renaissance--685423-o4zj.webp",
-          "mrp": 499,
-          "price": 374,
-          "discount_pct": 25,
-          "description": "सिल्क प्रोटीन व जोजोबा ऑयल से सूखे व बेजान बालों को गहरा पोषण और चमकदार रेशमी अहसास।",
-          "badge": "हर्ब्स एंड मोर",
-          "ingredients": "शिया बटर, बादाम तेल, एलोवेरा, आर्गन ऑयल, हाइड्रोलाइज्ड केराटिन",
-          "dose": "शैम्पू के बाद बालों की लंबाई पर लगाएं (जड़ों को छोड़कर), 2-3 मिनट बाद धो लें।"
+          "id": "HC002",
+          "name": "Neem Anti-Dandruff Shampoo",
+          "price": 350,
+          "mrp": 350,
+          "badge": "एंटी-डैंड्रफ",
+          "description": "सल्फेट-फ्री हर्बल फॉर्मूला। नीम व टी-ट्री ऑयल स्कैल्प के फंगस को पहली वॉश में ही नष्ट कर देता है।",
+          "image": "/images/logo/logo.png"
         },
         {
-          "id": "ns_herbs_hairoil",
-          "name": "Scalp Renaissance Hair Nutriment",
-          "image": "/images/products/product-----------------he-371545-w7a1.webp",
-          "mrp": 450,
-          "price": 347,
-          "discount_pct": 23,
-          "description": "भृंगराज, ब्राह्मी, आंवला और तिल का तेल। नए बाल उगाने और बालों का झड़ना 15 दिन में रोकने में असरदार।",
-          "badge": "हर्ब्स एंड मोर",
-          "ingredients": "भृंगराज, आंवला, ब्राह्मी, नीम तेल, तिल का तेल, नारियल तेल, विटामिन E",
-          "dose": "सप्ताह में 2-3 बार बालों की जड़ों में हल्के हाथों से 10 मिनट मालिश करें।"
+          "id": "HC003",
+          "name": "Hair-Vital Biotin Cap (60 Cap)",
+          "price": 750,
+          "mrp": 750,
+          "badge": "बायोटिन + DHT ब्लॉकर",
+          "description": "प्राकृतिक सेसबानिया बायोटिन व ग्रीन टी अर्क। नए बाल उगाने और पतले बालों को मोटा करने में सक्षम।",
+          "image": "/images/logo/logo.png"
         }
       ],
       "page_kpi_sections": [],
@@ -2445,52 +3496,31 @@
       "audio_script": "नमस्ते {name} जी! नेचुरल स्किन केयर पेज पर आपका स्वागत है। पिंपल्स, झाइयां और डल स्किन को ठीक कर चेहरे पर प्राकृतिक ग्लो लाने की आयुर्वेदिक टिप्स यहाँ उपलब्ध हैं।",
       "products": [
         {
-          "id": "ns_herbs_facewash",
-          "name": "Anti Pollution Face Wash 100 GMS",
-          "image": "/images/products/product-anti-pollution-fac-183712-pfhx.webp",
+          "id": "SK001",
+          "name": "Rakt-Shodhak Syrup (200ml)",
+          "price": 350,
+          "mrp": 350,
+          "badge": "रक्त शोधक",
+          "description": "मंजिष्ठा, नीम, चिरायता व अनंतमूल। खून की गंदगी साफ कर पिंपल्स को जड़ से समाप्त करता है।",
+          "image": "/images/logo/logo.png"
+        },
+        {
+          "id": "SK002",
+          "name": "Kumkumadi Radiance Oil (30ml)",
+          "price": 650,
+          "mrp": 650,
+          "badge": "ग्लो सीरम",
+          "description": "कश्मीरी केसर, चंदन व उशीर। झाइयों (Melasma), डार्क स्पॉट्स और झुर्रियों को मिटाकर प्राकृतिक तेज देता है।",
+          "image": "/images/logo/logo.png"
+        },
+        {
+          "id": "SK003",
+          "name": "Neem-Tulsi Face Wash (100ml)",
+          "price": 250,
           "mrp": 250,
-          "price": 213,
-          "discount_pct": 15,
-          "description": "विटामिन E व B3 से भरपूर सौम्य क्लींजर। धूल-मिट्टी साफ कर चेहरे पर तुरंत प्राकृतिक निखार लाता है।",
-          "badge": "हर्ब्स एंड मोर",
-          "ingredients": "विटामिन B3, विटामिन E, गेहूं के अंकुर का तेल, एलोवेरा, टी-ट्री ऑयल",
-          "dose": "दिन में 2 बार चेहरे को पानी से गीला करके हल्की मसाज करें और धो लें।"
-        },
-        {
-          "id": "ns_herbs_antiacne",
-          "name": "Anti Acne Gel New 20 GMS",
-          "image": "/images/products/product-anti-acne-gel-new--244348-r2pn.webp",
-          "mrp": 120,
-          "price": 96,
-          "discount_pct": 20,
-          "description": "नीम, टी-ट्री ऑयल और लौंग के तेल से जिद्दी मुंहासे, लालिमा व बैक्टीरिया का खात्मा करता है।",
-          "badge": "हर्ब्स एंड मोर",
-          "ingredients": "नीम सत्व, हल्दी, टी-ट्री ऑयल, विटामिन B3, सैलिसिलिक एसिड (हर्बल)",
-          "dose": "चेहरा धोने के बाद केवल मुंहासों और दाग-धब्बों पर लगाएं। रात में प्रयोग उत्तम।"
-        },
-        {
-          "id": "ns_herbs_undereye",
-          "name": " Under Eye Rejuvenating Gel 20 GMS ",
-          "image": "/images/products/product--------------under-290595-u9sz.webp",
-          "mrp": 135,
-          "price": 108,
-          "discount_pct": 20,
-          "description": "खीरा व एलोवेरा अर्क से आंखों के काले घेरे, सूजन और स्क्रीन की थकान को दूर करता है।",
-          "badge": "हर्ब्स एंड मोर",
-          "ingredients": "खीरा सत्व, ग्रीन टी अर्क, बादाम तेल, विटामिन E, एलोवेरा जेल",
-          "dose": "रात को सोने से पहले आंखों के नीचे काले घेरों पर उंगली के पोर से धीरे-धीरे थपथपाकर लगाएं।"
-        },
-        {
-          "id": "ns_herbs_soap",
-          "name": "Moisturizing Soap Pack Of 5 375 GMS",
-          "image": "/images/products/product-moisturizing-soap--833490-26du.webp",
-          "mrp": 335,
-          "price": 251,
-          "discount_pct": 25,
-          "description": "शुद्ध नीम और हल्दी से तैयार एंटी-बैक्टीरियल आयुर्वेदिक साबुन जो दाद, खाज और त्वचा संक्रमण से बचाता है।",
-          "badge": "हर्ब्स एंड मोर",
-          "ingredients": "शुद्ध नीम तेल, हल्दी सत्व, ग्लिसरीन, तुलसी तेल, ग्रेड-1 सोप बेस",
-          "dose": "प्रतिदिन स्नान के समय पूरे शरीर पर प्रयोग करें।"
+          "badge": "हर्बल क्लींजर",
+          "description": "सल्फेट-मुक्त प्राकृतिक फेस वॉश। अतिरिक्त तेल और बैक्टीरिया को हटाकर रोमछिद्रों को साफ रखता है।",
+          "image": "/images/logo/logo.png"
         }
       ],
       "clinical_breakdown": {
@@ -2597,34 +3627,31 @@
       "audio_script": "नमस्ते {name} जी! किड्स केयर पेज पर आपका स्वागत है। बच्चों की याददाश्त, एकाग्रता, लंबाई और रोग प्रतिरोधक क्षमता बढ़ाने का सम्पूर्ण पोषण प्लान यहाँ देखें।",
       "products": [
         {
-          "id": "ns_health_kids",
-          "name": "नेचुरामोरे फॉर किड्स (Naturamore Kids 400g)",
-          "image": "/images/products/product--------------------101309-53ll.webp",
-          "mrp": 1225,
-          "price": 980,
-          "discount_pct": 20,
-          "description": "ब्राह्मी, शंखपुष्पी व ओमेगा-3 DHA चॉकलेट कुकी फ्लेवर में। हाइट ग्रोथ, मजबूत हड्डियां और तेज याददाश्त।",
-          "badge": "स्वास्थ्य नेचुरामोरे"
+          "id": "kids_choco_protein",
+          "name": "Kids Choco-Nutri Protein Shake (500g)",
+          "price": 999,
+          "mrp": 1199,
+          "badge": "शारीरिक विकास व वजन",
+          "description": "स्वादिष्ट चॉकलेट फ्लेवर में व्हे प्रोटीन, सोया प्रोटीन, कैल्शियम और 24 आवश्यक विटामिन्स का संपूर्ण सम्मिश्रण।",
+          "image": "/images/banners/pashu-palan-banner.jpg"
         },
         {
-          "id": "ns_health_plus",
-          "name": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
-          "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
-          "mrp": 1425,
-          "price": 1069,
-          "discount_pct": 25,
-          "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
-          "badge": "स्वास्थ्य नेचुरामोरे"
+          "id": "brahmi_brain_syrup",
+          "name": "Brahmi-Shankhpushpi Brain Tonic (300ml)",
+          "price": 399,
+          "mrp": 499,
+          "badge": "तेज याददाश्त व एकाग्रता",
+          "description": "आयुर्वेदिक मेध्य रसायन। भूलने की समस्या दूर करे, पढ़ाई में एकाग्रता और मानसिक ऊर्जा में अप्रत्याशित सुधार।",
+          "image": "/images/banners/pashu-palan-banner.jpg"
         },
         {
-          "id": "ns_health_vanilla",
-          "name": "Naturamore Original Vanilla Flavour 400 GMS ",
-          "image": "/images/products/product-naturamore-origina-711440-v0ra.webp",
-          "mrp": 1425,
-          "price": 1069,
-          "discount_pct": 25,
-          "description": "स्वादिष्ट वैनिला फ्लेवर में व्हे प्रोटीन, सोया प्रोटीन व एलोवेरा का शक्तिवर्धक प्राकृतिक योग।",
-          "badge": "स्वास्थ्य नेचुरामोरे"
+          "id": "kids_immunity_gummies",
+          "name": "Kids Herbal Immunity Gummies (60 Pcs)",
+          "price": 549,
+          "mrp": 699,
+          "badge": "रोग प्रतिरोधक ढाल",
+          "description": "आंवला, विटामिन C, जिंक और गिलोय युक्त च्यूएबल गमीज। मौसम बदलने पर होने वाले सर्दी-जुकाम से प्राकृतिक सुरक्षा।",
+          "image": "/images/banners/pashu-palan-banner.jpg"
         }
       ],
       "clinical_breakdown": {
@@ -2742,40 +3769,40 @@
       "pashu_cards": [],
       "products": [
         {
-          "id": "ns_clean_fabric",
-          "name": "Clean & More Fabric Wash & Conditioner 500 500 MLT",
-          "image": "/images/products/product-clean---more-fabri-889428-vqwm.webp",
-          "mrp": 299,
-          "price": 224,
-          "discount_pct": 25,
-          "description": "कपड़ों की चमक बरकरार रखते हुए जिद्दी दाग साफ करता है। केमिकल-मुक्त और हाथों के लिए 100% सुरक्षित।",
-          "badge": "क्लीन एंड मोर",
-          "ingredients": "बायो-एंजाइम्स (Bio-Enzymes), प्लांट बेस्ड सर्फेक्टेंट्स, कंडीशनर, प्राकृतिक खुशबू",
-          "dose": "10-15ml प्रति बाल्टी (10-12 कपड़े) या वाशिंग मशीन में 20ml प्रति लोड।"
-        },
-        {
-          "id": "ns_clean_multipurpose",
-          "name": "Clean & More Dish Washing Liquid 250 250 MLT",
-          "image": "/images/products/product-clean---more-dish--013316-62du.webp",
-          "mrp": 125,
-          "price": 100,
-          "discount_pct": 20,
-          "description": "फर्श, शीशा, किचन स्लैब और बाथरूम को 99.9% कीटाणु-मुक्त और सुगंधित रखने वाला सुरक्षित क्लीनर।",
-          "badge": "क्लीन एंड मोर",
-          "ingredients": "नींबू सत्व, पाइन ऑयल, बायो-क्लीनर्स, रोगाणुरोधक हर्बल तत्व",
-          "dose": "फर्श पोंछा: 10ml प्रति आधा बाल्टी पानी। टाइल्स/किचन स्लैब: स्प्रे करके पोंछें।"
-        },
-        {
-          "id": "ns_clean_home_cleaner",
+          "title": "Clean & More Multi-Purpose Home Cleaner 500ml",
           "name": "Clean & More Multi-Purpose Home Cleaner 500ml",
+          "description": "फर्श, शीशा, टाइल्स, किचन स्लैब व डाइनिंग टेबल की सफाई हेतु 99.9% कीटाणुनाशक और प्राकृतिक खुशबूदार फॉर्मूला।",
           "image": "/images/products/product-clean---more-dish--013316-62du.webp",
           "mrp": 350,
           "price": 350,
           "discount_pct": 20,
-          "description": "फर्श, शीशा, टाइल्स, किचन स्लैब व डाइनिंग टेबल की सफाई हेतु 99.9% कीटाणुनाशक और प्राकृतिक खुशबूदार फॉर्मूला।",
-          "badge": "क्लीन एंड मोर",
-          "ingredients": "बायो-एंजाइम्स, नींबू सत्व, पाइन ऑयल, प्राकृतिक रोगाणुरोधक तत्व",
-          "dose": "फर्श पोंछा: 10ml प्रति आधा बाल्टी पानी। टाइल्स व स्लैब: स्प्रे करके माइक्रोफाइबर कपड़े से पोंछें।"
+          "dose": "फर्श पोंछा: 10ml प्रति आधा बाल्टी पानी। टाइल्स व स्लैब: स्प्रे करके माइक्रोफाइबर कपड़े से पोंछें।",
+          "badge": "🏡 फर्श, टाइल्स व सतह सैनिटाइजर",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "Clean & More Dish Washing Liquid 250 250 MLT",
+          "name": "Clean & More Dish Washing Liquid 250 250 MLT",
+          "description": "फर्श, शीशा, किचन स्लैब और बाथरूम को 99.9% कीटाणु-मुक्त और सुगंधित रखने वाला सुरक्षित क्लीनर।",
+          "image": "/images/products/product-clean---more-dish--013316-62du.webp",
+          "mrp": 125,
+          "price": 125,
+          "discount_pct": 20,
+          "dose": "फर्श पोंछा: 10ml प्रति आधा बाल्टी पानी। टाइल्स/किचन स्लैब: स्प्रे करके पोंछें।",
+          "badge": "🏡 फर्श, टाइल्स व सतह सैनिटाइजर",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "Clean & More Fabric Wash & Conditioner 500 500 MLT",
+          "name": "Clean & More Fabric Wash & Conditioner 500 500 MLT",
+          "description": "कपड़ों की चमक बरकरार रखते हुए जिद्दी दाग साफ करता है। केमिकल-मुक्त और हाथों के लिए 100% सुरक्षित।",
+          "image": "/images/products/product-clean---more-fabri-889428-vqwm.webp",
+          "mrp": 299,
+          "price": 299,
+          "discount_pct": 25,
+          "dose": "10-15ml प्रति बाल्टी (10-12 कपड़े) या वाशिंग मशीन में 20ml प्रति लोड।",
+          "badge": "🧺 प्राकृतिक एंजाइम लिक्विड डिटर्जेंट",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
@@ -3014,40 +4041,40 @@
       "pashu_cards": [],
       "products": [
         {
-          "id": "ns_health_men",
-          "name": "नेचुरामोरे मेन्स वेलनेस (Men's Wellness Capsules)",
-          "image": "/images/products/product--------------------051545-547x.webp",
-          "mrp": 689,
-          "price": 517,
-          "discount_pct": 25,
-          "description": "अश्वगंधा, जिनसेंग, गोक्षुर, कौंच बीज व सफेद मूसली से प्राकृतिक ऊर्जा, स्टैमिना और आत्मविश्वास।",
-          "badge": "स्वास्थ्य नेचुरामोरे",
-          "ingredients": "शुद्ध शिलाजीत, सफेद मूसली, अश्वगंधा, गोक्षुरा (गोखरू), कौंच बीज, जयफल",
-          "dose": "1 कैप्सूल रात को भोजन के बाद गुनगुने दूध या पानी के साथ।"
-        },
-        {
-          "id": "ns_prod_56442",
+          "title": "Multi Vitamin For Men 30 NOS",
           "name": "Multi Vitamin For Men 30 NOS",
+          "description": "पुरुषों के लिए दैनिक ऊर्जा: यह पुरुषों की शारीरिक और मानसिक ऊर्जा, स्टैमिना तथा थकान को दूर करने के लिए तैयार किया गया है।\n\nरोग प्रतिरोधक क्षमता व फिटनेस: यह शरीर की इम्युनिटी (रोग प्रतिरोधक क्षमता) को मजबूत करता है और मांसपेशियों के स्वस्थ विकास व मेटाबॉलिज्म में मदद करता है।",
           "image": "/images/products/product-multi-vitamin-for--705279-tr2v.webp",
           "mrp": 375,
-          "price": 281,
+          "price": 375,
           "discount_pct": 25,
-          "description": "पुरुषों के लिए दैनिक ऊर्जा: यह पुरुषों की शारीरिक और मानसिक ऊर्जा, स्टैमिना तथा थकान को दूर करने के लिए तैयार किया गया है।\n\nरोग प्रतिरोधक क्षमता व फिटनेस: यह शरीर की इम्युनिटी (रोग प्रतिरोधक क्षमता) को मजबूत करता है और मांसपेशियों के स्वस्थ विकास व मेटाबॉलिज्म में मदद करता है।",
-          "badge": "स्वास्थ्य नेचुरामोरे (Naturamore Health)",
-          "ingredients": "विटामिन्स व मिनरल्स: इसमें शरीर की दैनिक जरूरत के सभी जरूरी विटामिन्स (जैसे विटामिन A, B-कम्प्लेक्स, C, D, E) और मिनरल्स प्रचुर मात्रा में होते हैं।\n\nप्राकृतिक अर्क व हर्ब्स: पुरुषों की जीवन शक्ति (Vitality) और स्टैमिना बढ़ाने के लिए विशेष जड़ी-बूटियों और एंटीऑक्सीडेंट्स का मिश्रण।",
-          "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतरीन परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।"
+          "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतरीन परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "ns_health_plus",
+          "title": "नेचुरामोरे मेन्स वेलनेस (Men's Wellness Capsules)",
+          "name": "नेचुरामोरे मेन्स वेलनेस (Men's Wellness Capsules)",
+          "description": "अश्वगंधा, जिनसेंग, गोक्षुर, कौंच बीज व सफेद मूसली से प्राकृतिक ऊर्जा, स्टैमिना और आत्मविश्वास।",
+          "image": "/images/products/product--------------------051545-547x.webp",
+          "mrp": 689,
+          "price": 689,
+          "discount_pct": 25,
+          "dose": "1 कैप्सूल रात को भोजन के बाद गुनगुने दूध या पानी के साथ।",
+          "badge": "⚡ पौरुष शक्ति, स्टैमिना व टेस्टोस्टेरोन",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
           "name": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
+          "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
           "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
           "mrp": 1425,
-          "price": 1069,
+          "price": 1425,
           "discount_pct": 25,
-          "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
-          "badge": "स्वास्थ्य नेचुरामोरे",
-          "ingredients": "सोया प्रोटीन आइसोलेट, व्हे प्रोटीन, एलोवेरा, ओमेगा-3 डीएचए, शतावरी, 13 विटामिन्स व 11 मिनरल्स",
-          "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।"
+          "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।",
+          "badge": "❤️ संपूर्ण परिवार पोषण",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [

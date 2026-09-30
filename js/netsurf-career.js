@@ -51,15 +51,58 @@
     }
   ];
 
+  // ── Resolve image: check AI_OFFLINE_UPLOADS localStorage first ──
+  function resolveProductImg(imgPath) {
+    if (!imgPath) return '/images/logo/logo.png';
+    try {
+      const offline = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+      if (offline[imgPath]) return offline[imgPath];
+      const norm = '/' + imgPath.replace(/^\/+/, '');
+      if (offline[norm]) return offline[norm];
+    } catch (e) {}
+    return imgPath || '/images/logo/logo.png';
+  }
+
   // Initialize on DOM Ready
   document.addEventListener('DOMContentLoaded', () => {
     detectSponsorReferral();
+    initShareButton();
     initIncomeCalculator();
     initSurveyForm();
     initVideoPlayer();
     initKypProductsAndTabs();
     initFaqAccordion();
   });
+
+  // ── Share Button (same as other pages) ──
+  function initShareButton() {
+    const shareBtns = document.querySelectorAll('[data-action="ns-share"], .ns-share-btn');
+    shareBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (typeof window.triggerViralPageShare === 'function') {
+          window.triggerViralPageShare({
+            title: 'नेटसर्फ डायरेक्ट सेलिंग करियर - Aarogyam India',
+            text: 'नेटसर्फ डायरेक्ट सेलिंग बिज़नेस और ₹8,19,250 क्लोजिंग प्लान देखें:',
+            url: window.location.href
+          });
+        } else {
+          // Native share fallback
+          const shareData = {
+            title: 'नेटसर्फ करियर - Aarogyam India',
+            text: 'नेटसर्फ डायरेक्ट सेलिंग बिज़नेस देखें',
+            url: window.location.href
+          };
+          if (navigator.share) {
+            navigator.share(shareData).catch(() => {});
+          } else {
+            // WhatsApp share
+            const waUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(shareData.text + ' ' + shareData.url);
+            window.open(waUrl, '_blank');
+          }
+        }
+      });
+    });
+  }
 
   /**
    * 1. DETECT SPONSOR REFERRAL FROM URL
@@ -348,7 +391,7 @@
         const mrp = parseInt(p.mrp, 10) || 0;
         const discountPct = parseInt(p.discount_pct, 10) || 0;
         const offerPrice = p.discounted_price || (discountPct ? Math.round(mrp * (1 - discountPct / 100)) : mrp);
-        const imgSrc = p.image || '/images/logo/logo.png';
+        const imgSrc = resolveProductImg(p.image);
 
         const waMsg = encodeURIComponent(`नमस्ते ${currentSponsor.name} जी! मुझे नेटसर्फ उत्पाद: *${p.name}* (MRP: ₹${mrp}, ऑफर रेट: ₹${offerPrice}, ${discountPct}% छूट) की जानकारी चाहिए व ऑर्डर करना है।`);
         const waOrderUrl = `https://api.whatsapp.com/send?phone=${targetPhone}&text=${waMsg}`;
@@ -410,17 +453,17 @@
       gridContainer.innerHTML = gridHtml;
     }
 
-    // Attach Tab Filtering Listeners
+    // Attach Tab Filtering Listeners — AFTER innerHTML is set
     const allTabs = document.querySelectorAll('.ns-kyp-tab-btn');
-    const allCards = document.querySelectorAll('.ns-product-card');
-
     allTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         allTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
         const cat = tab.getAttribute('data-cat');
-        allCards.forEach(card => {
+        // Re-query cards each time (they exist after innerHTML was set)
+        const cards = document.querySelectorAll('.ns-product-card');
+        cards.forEach(card => {
           if (cat === 'all' || card.getAttribute('data-product-cat') === cat) {
             card.style.display = 'flex';
           } else {
