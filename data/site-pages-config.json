@@ -1892,32 +1892,7 @@
       "health_diseases": [],
       "crops": [],
       "pashu_cards": [],
-      "products": [
-        {
-          "title": "Omega Triple Strength 30 NOS",
-          "name": "Omega Triple Strength 30 NOS",
-          "description": "हार्ट और ब्रेन हेल्थ: यह हृदय को स्वस्थ रखने, कोलेस्ट्रॉल को नियंत्रित करने और मस्तिष्क (Brain) की कार्यप्रणाली व याददाश्त को बेहतर बनाने में सहायक है।\n\nजोड़ों और आँखों की सेहत: यह जोड़ों के लचीलेपन और गतिशीलता (Mobility) को बनाए रखता है तथा आँखों की रोशनी और त्वचा की नमी के लिए फायदेमंद है।",
-          "image": "/images/products/product-omega-triple-stren-050587-qf16.webp",
-          "mrp": 600,
-          "price": 600,
-          "discount_pct": 25,
-          "dose": "मात्रा व तरीका: 1 कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: स्वास्थ्य के बेहतर परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।",
-          "badge": "✨ New Launch",
-          "whatsapp_link": "https://wa.me/917974422572"
-        },
-        {
-          "title": "Naturamore Pre Meal Nutrition 200 Gm 200 GMS",
-          "name": "Naturamore Pre Meal Nutrition 200 Gm 200 GMS",
-          "description": "Naturamore Pre-Meal Nutrition एक उत्कृष्ट न्यूट्रास्युटिकल (Nutraceutical) प्रोडक्ट है, जिसे भोजन से पहले लेने के लिए डिज़ाइन किया गया है। यह शरीर की पाचन शक्ति और भोजन से पोषक तत्वों (Nutrients) को अवशोषित करने की क्षमता को बेहतर बनाता है।",
-          "image": "/images/products/product-naturamore-pre-mea-124648-myf1.webp",
-          "mrp": 335,
-          "price": 335,
-          "discount_pct": 25,
-          "dose": "10 GM  PAR DAY KHANE SE PAHLE ",
-          "badge": "✨ New Launch",
-          "whatsapp_link": "https://wa.me/917974422572"
-        }
-      ],
+      "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
