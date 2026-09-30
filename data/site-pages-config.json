@@ -2064,7 +2064,56 @@
       "health_diseases": [],
       "crops": [],
       "pashu_cards": [],
-      "products": [],
+      "products": [
+        {
+          "title": "Nutriliver 30 NOS",
+          "name": "Nutriliver 30 NOS",
+          "description": "उत्पाद का विस्तृत विवरण व मुख्य लाभयकृत की सुरक्षा: यह लिवर के स्वस्थ कामकाज को बनाए रखने और लिवर की कोशिकाओं को नुकसान से बचाने में मदद करता है।\n\nडिटॉक्सिफिकेशन: शरीर और लिवर से हानिकारक टॉक्सिन्स को बाहर निकालकर प्राकृतिक रूप से डिटॉक्स करने में सहायक है।\n\n2. मुख्य घटक (Ingredients)\nहर्ब एक्सट्रैक्ट्स: इसमें कुटकी, कालमेघ, भृंगराज और पुनर्नवा जैसी लिवर-सुरक्षात्मक जड़ी-बूटियाँ शामिल हैं।\n\nएंटीऑक्सीडेंट्स व विटामिन्स: लिवर की कोशिकाओं की मरम्मत और ऊर्जा स्तर को बनाए रखने के लिए पोषक तत्व।...",
+          "image": "/images/products/product-nutriliver-30-nos-446989-trp1.webp",
+          "mrp": 450,
+          "price": 450,
+          "discount_pct": 25,
+          "dose": "मात्रा व तरीका: 1 कैप्सूल दिन में दो बार (या चिकित्सक के निर्देशानुसार) भोजन के बाद लें।\n\nनियमित सेवन: बेहतर और लंबे परिणामों के लिए इसे पानी के साथ नियमित रूप से लें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "Naturamore Pre Meal Nutrition 200 Gm 200 GMS",
+          "name": "Naturamore Pre Meal Nutrition 200 Gm 200 GMS",
+          "description": "Naturamore Pre-Meal Nutrition एक उत्कृष्ट न्यूट्रास्युटिकल (Nutraceutical) प्रोडक्ट है, जिसे भोजन से पहले लेने के लिए डिज़ाइन किया गया है। यह शरीर की पाचन शक्ति और भोजन से पोषक तत्वों (Nutrients) को अवशोषित करने की क्षमता को बेहतर बनाता है।",
+          "image": "/images/products/product-naturamore-pre-mea-124648-myf1.webp",
+          "mrp": 335,
+          "price": 335,
+          "discount_pct": 25,
+          "dose": "10 GM  PAR DAY KHANE SE PAHLE ",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "स्टीमरिच (Biofit Stimrich)",
+          "name": "स्टीमरिच (Biofit Stimrich)",
+          "description": "कल्ले, नई शाखाओं और फूलों की संख्या में 30-40% वृद्धि। फूल झड़ने से रोकता है और पैदावार बढ़ाता है।",
+          "image": "/images/products/product-----------biofit-s-069210-gir4.webp",
+          "mrp": 1695,
+          "price": 1695,
+          "discount_pct": 25,
+          "dose": "30ml प्रति 15 लीटर पंप। फसल के कल्ले फूटने व फूल आने से पहले छिड़काव करें।",
+          "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
+          "name": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 |",
+          "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
+          "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
+          "mrp": 1425,
+          "price": 1425,
+          "discount_pct": 25,
+          "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।",
+          "badge": "❤️ संपूर्ण परिवार पोषण",
+          "whatsapp_link": "https://wa.me/917974422572"
+        }
+      ],
       "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
