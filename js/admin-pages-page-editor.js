@@ -167,11 +167,16 @@ export async function initPageEditor() {
   }
 
   function generateAssetPath(category = 'banner', originalName = '') {
-    const cleanName = (originalName || 'image')
+    let cleanName = (originalName || 'image')
       .toLowerCase()
       .replace(/\.[^/.]+$/, '')
       .replace(/[^a-z0-9_-]/g, '-')
-      .substring(0, 18);
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .substring(0, 20);
+    if (!cleanName || cleanName.length < 2) {
+      cleanName = (category || 'item') + '-pic';
+    }
     const stamp = Date.now().toString().slice(-6);
     const rand = Math.random().toString(36).substring(2, 6);
     // Auto-detect folder based on upload type
@@ -4097,6 +4102,9 @@ export async function initPageEditor() {
   window.updateMpmProductField = function(idx, field, val) {
     if (masterProducts[idx]) {
       masterProducts[idx][field] = val;
+      if (field === 'image') {
+        delete masterProducts[idx].image_preview;
+      }
     }
   };
 
@@ -4257,18 +4265,29 @@ export async function initPageEditor() {
 
   window.saveMasterProducts = async function() {
     showToast('⏳ उत्पाद सुरक्षित व Git पर पुश हो रहे हैं...', 'info');
+
+    // Clean products payload: strip temporary image_preview and _idx to avoid bloating JSON & hitting localStorage quota
+    const cleanProducts = masterProducts.map(p => {
+      const copy = { ...p };
+      delete copy.image_preview;
+      delete copy._idx;
+      return copy;
+    });
+
     const masterPayload = {
       version: "2026.2",
       updated_at: new Date().toISOString(),
-      total_products: masterProducts.length,
+      total_products: cleanProducts.length,
       categories: masterCategories,
-      products: masterProducts
+      products: cleanProducts
     };
 
     const jsonStr = JSON.stringify(masterPayload, null, 2);
     try {
       localStorage.setItem('aim_netsurf_products_master', jsonStr);
-    } catch (e) {}
+    } catch (e) {
+      console.warn('LocalStorage quota warning for master products:', e);
+    }
 
     // 1. Try local disk write via port 5505 (if localhost)
     let localOk = false;
@@ -4296,7 +4315,7 @@ export async function initPageEditor() {
         const imgPath = prod.image;
         if (!imgPath || imgPath.includes('logo.png')) continue;
         const cleanPath = imgPath.replace(/^\//, '');
-        const dataUrl = offStore['/' + cleanPath] || offStore[cleanPath];
+        const dataUrl = offStore['/' + cleanPath] || offStore[cleanPath] || prod.image_preview;
         if (dataUrl && dataUrl.startsWith('data:')) {
           // Convert dataURL to base64 (strip prefix)
           const base64 = dataUrl.split(',')[1];
@@ -4314,7 +4333,7 @@ export async function initPageEditor() {
           await fetch('http://127.0.0.1:5505', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'save_config', path, base64 })
+            body: JSON.stringify({ action: 'upload_asset', path, base64 })
           });
         } catch (e) {}
       }

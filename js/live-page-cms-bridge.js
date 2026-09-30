@@ -551,35 +551,74 @@
     const grid = container.querySelector('div[style*="grid"]') || container.querySelector('.products-grid') || container.children[1];
     if (!grid) return;
 
+    grid.classList.add('cms-dynamic-products-grid');
+
     const prods = pageConfig.products;
     const isPashu = window.location.pathname.includes('pashu');
     const primaryColor = isPashu ? '#15803d' : (pageConfig.theme_primary || '#2563eb');
 
-    // Inject product image CSS once (safe - no !important overrides)
+    // Inject product responsive CSS (1-col on mobile, uncapped contain images)
     if (!document.getElementById('cms-products-responsive-style')) {
       const st = document.createElement('style');
       st.id = 'cms-products-responsive-style';
       st.textContent = `
+        /* Mobile: strictly 1 column (ek ke niche ek) */
+        .cms-dynamic-products-grid {
+          display: grid !important;
+          grid-template-columns: 1fr !important;
+          gap: 16px !important;
+          width: 100% !important;
+        }
+        /* Tablet: 2 columns */
+        @media (min-width: 640px) {
+          .cms-dynamic-products-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 20px !important;
+          }
+        }
+        /* Desktop: 3 to 4 columns */
+        @media (min-width: 992px) {
+          .cms-dynamic-products-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+            gap: 24px !important;
+          }
+        }
+        .cms-product-card {
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: space-between !important;
+          background: #ffffff !important;
+          border-radius: 16px !important;
+          border: 1.5px solid #e2e8f0 !important;
+          padding: 16px !important;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.04) !important;
+          box-sizing: border-box !important;
+          width: 100% !important;
+        }
         .cms-product-img-wrap {
-          width: 100%;
-          border-radius: 10px;
-          overflow: hidden;
-          margin-bottom: 10px;
-          background: #f8fafc;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 6px;
-          box-sizing: border-box;
+          width: 100% !important;
+          height: 200px !important;
+          max-height: 220px !important;
+          border-radius: 12px !important;
+          overflow: hidden !important;
+          margin-bottom: 12px !important;
+          background: #f8fafc !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 10px !important;
+          box-sizing: border-box !important;
+          border: 1px solid #f1f5f9 !important;
         }
         .cms-product-img-wrap img {
-          width: 100%;
-          height: auto;
-          max-height: 160px;
-          object-fit: contain;
-          display: block;
+          width: auto !important;
+          max-width: 100% !important;
+          height: auto !important;
+          max-height: 180px !important;
+          object-fit: contain !important;
+          display: block !important;
+          margin: 0 auto !important;
         }
-        .cms-product-card { display: flex; flex-direction: column; justify-content: space-between; }
       `;
       document.head.appendChild(st);
     }
@@ -596,7 +635,7 @@
       const hasRealImg = rawImg && !rawImg.includes('logo.png') && !rawImg.endsWith('/logo.png');
 
       return `
-        <div class="cms-product-card" style="background:#fff; border-radius:16px; border:1.5px solid #e2e8f0; padding:14px; box-shadow:0 4px 14px rgba(0,0,0,0.03); transition: transform 0.2s ease, box-shadow 0.2s ease;">
+        <div class="cms-product-card">
           <div>
             ${hasRealImg ? `<div class="cms-product-img-wrap"><img src="${escapeHtml(rawImg)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : ''}
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap; gap:4px;">
