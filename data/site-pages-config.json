@@ -3497,7 +3497,7 @@
       "theme_dark": "#004a1d",
       "ticker_text": "⚡ नेटसर्फ 15-दिवसीय क्लोजिंग पे-आउट चक्र लाइव • 🏆 ₹8,19,250 अधिकतम कैप अचीवर्स • 26 साल का अटूट विश्वास",
       "audio_title": "नेटसर्फ डायरेक्ट सेलिंग करियर परिचर्चा",
-      "audio_script": "नमस्ते! क्या आप भी अपनी नौकरी या पढ़ाई के साथ-साथ पार्ट टाइम में अपने सपनों को पूरा करना चाहते हैं? नेटसर्फ और आरोग्यम आपके लिए लाए हैं 26 साल के भरोसे पर टिका एक सुरक्षित और प्रामाणिक बिजनेस अवसर। यहाँ बिना किसी रिस्क और जीरो इग्रेस मॉडल के साथ आप हर 15 दिन में बेहतरीन इनकम पा सकते हैं, जिसकी अधिकतम सीमा ₹8,19,250 तक है। तो देर किस बात की? आज ही जानिए और हमारे साथ अपने सपनों की नई शुरुआत कीजिए।\"",
+      "audio_script": "नमस्ते! नेटसर्फ के 26-वर्षीय प्रामाणिक डायरेक्ट सेलिंग मॉडल, जीरो इग्रेस फॉर्मूला और ₹8,19,250 के 15-दिवसीय पे-आउट की पूरी जानकारी यहां उपलब्ध है।",
       "audio_url": "",
       "og_title": "क्या आप पार्ट टाइम में अपने सपने पूरे करना चाहते हैं? | Netsurf & Aarogyam India",
       "og_image": "/images/banners/og_image-netsurf-398382-r3uq.webp",
@@ -3514,37 +3514,7 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/hero_slide-netsurf-2-085152-qj5v.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
-        },
-        {
-          "image": "/images/banners/hero_slide-n3-074559-dkgu.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
-        },
-        {
-          "image": "/images/banners/hero_slide-n4-097443-eor9.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
-        },
-        {
-          "image": "/images/banners/hero_slide-n6-114106-qq3v.webp",
+          "image": "/images/banners/hero_slide-netsurf-2-138561-ofc1.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
