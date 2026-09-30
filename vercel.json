@@ -1,7 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": false,
-  "rewrites": [
+  "redirects": [
     {
       "source": "/ebooks/book-landing.html",
       "has": [
@@ -15,7 +14,8 @@
           "key": "id"
         }
       ],
-      "destination": "/api/share?id=:id"
+      "destination": "/api/share?id=:id",
+      "permanent": false
     },
     {
       "source": "/ebooks/book-landing.html",
@@ -30,7 +30,8 @@
           "key": "book"
         }
       ],
-      "destination": "/api/share?id=:book"
+      "destination": "/api/share?id=:book",
+      "permanent": false
     },
     {
       "source": "/ebooks/book-landing",
@@ -45,7 +46,8 @@
           "key": "id"
         }
       ],
-      "destination": "/api/share?id=:id"
+      "destination": "/api/share?id=:id",
+      "permanent": false
     },
     {
       "source": "/ebooks/kharif-master-guide-2026.html",
@@ -56,7 +58,8 @@
           "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
         }
       ],
-      "destination": "/api/share?id=BK001"
+      "destination": "/api/share?id=BK001",
+      "permanent": false
     },
     {
       "source": "/ebooks/kheti-dr.html",
@@ -67,7 +70,8 @@
           "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
         }
       ],
-      "destination": "/api/share?id=BK002"
+      "destination": "/api/share?id=BK002",
+      "permanent": false
     }
   ]
 }
