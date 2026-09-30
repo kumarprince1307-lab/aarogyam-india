@@ -3863,7 +3863,7 @@
       "slug": "netsurf-career",
       "name": "नेटसर्फ डायरेक्ट सेलिंग करियर",
       "url": "/categories/netsurf.html",
-      "category": "Career & Direct Selling",
+      "category": "eBooks",
       "status": "active",
       "theme_primary": "#059669",
       "theme_dark": "#004a1d",
@@ -3886,7 +3886,37 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/hero_slide-netsurf-2-138561-ofc1.webp",
+          "image": "/images/banners/hero_slide-netsurf-2-368522-u51q.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-n3-385140-3dx7.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-n4-394701-ygty.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-n6-402882-dwm7.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
@@ -3953,6 +3983,8 @@
       ],
       "marketing_cards": [],
       "videos": [],
+      "reviews_heading": "सफल डायरेक्ट सेलर लीडर्स के अनुभव",
+      "reviews_badge": "💼 प्रामाणिक अचीवर समीक्षाएं",
       "reviews": [
         {
           "name": "राजेश कुमार पाटिल",
@@ -3976,6 +4008,8 @@
           "avatar": "👩‍💼"
         }
       ],
+      "faqs_heading": "अक्सर पूछे जाने वाले सवाल",
+      "faqs_badge": "❓ सामान्य प्रश्न (FAQ)",
       "faqs": [
         {
           "q": "क्या मुझे घर-घर जाकर सामान बेचना पड़ेगा या रिश्तेदार बनाने पड़ेंगे?",
@@ -4000,6 +4034,76 @@
         {
           "q": "नॉमिनी सुविधा (Nominee Facility) और फैमिली प्रोटेक्शन क्या है?",
           "a": "भगवान न करे यदि डिस्ट्रीब्यूटर के साथ कोई अप्रिय घटना होती है, तो उसका पूरा बिज़नेस और हर 15 दिन में आने वाला पे-आउट उसके नॉमिनी (पत्नी/बच्चे) के नाम ट्रांसफर हो जाता है। साथ ही मेडिक्लेम और एक्सीडेंटल कवर भी मिलता है।"
+        }
+      ],
+      "ladder_header": {
+        "title": "स्टेप लैडर: ज़ीरो से ₹8,19,250 हीरो बनने का सफर",
+        "badge": "🪜 सफलता की सीढ़ी",
+        "subtitle": "आरोग्यम के डिजिटल रोडमैप पर हर डिस्ट्रीब्यूटर चरणबद्ध तरीके से आगे बढ़ता है। नीचे दिए गए 7 चरणों को समझें:"
+      },
+      "career_ladder": [
+        {
+          "level": 1,
+          "step_num": "STEP 1",
+          "badge": "Pro eTailer",
+          "title": "🌱 प्रो ई-टेलर (Pro e-Tailer)",
+          "criteria": "₹5,000 प्रोडक्ट खरीद / ID एक्टिवेशन",
+          "perks": "ग्राहकों को 25% तक छूट दिलाने का अधिकार + 5% से 10% का पर्सनल रिटेल डिस्काउंट मुनाफा।",
+          "image": "/images/banners/ladder_step-pro-513351-lw2x.webp"
+        },
+        {
+          "level": 2,
+          "step_num": "STEP 2",
+          "badge": "Rock Star Achiever",
+          "title": "⭐ रॉक स्टार (Rock Star)",
+          "criteria": "साइकल में ₹8,000 का पर्सनल रिटेल",
+          "perks": "🔥 15% अधिकतम शुक्रवार रिटेल कमीशन अनलॉक। हर सोमवार बैंक में डायरेक्ट कैश क्रेडिट।",
+          "image": "/images/banners/ladder_step-rokstar-831324-eo79.webp"
+        },
+        {
+          "level": 3,
+          "step_num": "STEP 3",
+          "badge": "Business Consultant",
+          "title": "💼 बिज़नेस कंसलटेंट (BC)",
+          "criteria": "Team 1: ₹10,000 | Team 2: ₹10,000 मैचिंग",
+          "perks": "3% टीम टर्नओवर मैचिंग बोनस + 3% जनरेशन कमीशन और डायरेक्ट सेलर लीडरशिप पिन।",
+          "image": "/images/banners/ladder_step-bc-846132-bv63.webp"
+        },
+        {
+          "level": 4,
+          "step_num": "STEP 4",
+          "badge": "Senior BC",
+          "title": "🏆 सीनियर कंसलटेंट (SBC)",
+          "criteria": "Team 1: ₹1,00,000 | Team 2: ₹1,00,000",
+          "perks": "4% टर्नओवर मैचिंग बोनस + 7% जनरेशन कमीशन + स्टेज सम्मान व स्टेट रिकॉग्निशन।",
+          "image": "/images/banners/ladder_step-sbc-927118-l9c7.webp"
+        },
+        {
+          "level": 5,
+          "step_num": "STEP 5",
+          "badge": "PRO-VC ",
+          "title": "🚀 फास्ट ट्रैक चैंपियन (Fastrack)",
+          "criteria": "Team 1: ₹3,00,000 | Team 2: ₹3,00,000",
+          "perks": "5% लाइफटाइम टर्नओवर कमीशन + 8% जनरेशन + 5-स्टार रेजिडेंशियल फ्री ट्रेनिंग वर्कशॉप।",
+          "image": "/images/banners/ladder_step-prvc-994397-sr1i.webp"
+        },
+        {
+          "level": 6,
+          "step_num": "STEP 6",
+          "badge": "Club Elite Leader",
+          "title": "👑 क्लब एलीट लीडर (Club Elite)",
+          "criteria": "Team 1: ₹15,00,000 | Team 2: ₹15,00,000",
+          "perks": "कार फंड + विदेश यात्रा (International Luxury Tour) + नेशनल लीडरशिप काउंसिल की सदस्यता।",
+          "image": "/images/banners/ladder_step-cv-086184-wrgf.webp"
+        },
+        {
+          "level": 7,
+          "step_num": "STEP 7 (शिखर)",
+          "badge": "Cap Achiever Summit",
+          "title": "🎖️ ₹8,19,250 कैप अचीवर",
+          "criteria": "₹81,92,500 प्रति 15-दिन मैचिंग",
+          "perks": "हर 15 दिन में ₹8,19,250 का पे-आउट (प्रति माह ₹16.38 लाख) + 100% फाइनेंशियल फ्रीडम।",
+          "image": "/images/logo/logo.png"
         }
       ],
       "health_diseases": [
@@ -4896,124 +5000,67 @@
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "",
+        "subtitle": "",
         "cards": [
           {
+            "id": "CB_1790794164706_qly3",
             "title": "❓ कारण (Causes)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
-            "points": []
+            "points": [],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790794164706_520w",
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
-            "points": []
+            "points": [],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790794164706_tp2d",
             "title": "🚨 साइड इफेक्ट्स व खतरे (Risks)",
+            "badge": "",
             "color": "#dc2626",
             "image": "",
-            "points": []
+            "points": [],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           }
         ]
       },
+      "admin_edited": 1790794164740,
       "netsurf_plan": {
-        "legacy": "",
-        "slogan": "",
-        "zero_egress": "",
-        "retail_margin": "",
-        "retail_payout": "",
-        "customer_discount": "",
-        "autoship_offer": "",
-        "team_turnover": "",
-        "generation_slabs": "",
-        "closing_cycle": "",
-        "max_capping": "",
-        "career_steps": "",
-        "mediclaim": "",
-        "accidental": "",
-        "natural_death": "",
-        "tour_rewards": ""
+        "legacy": "26 वर्षों की अटूट विरासत (26 Years of Proven Excellence)",
+        "slogan": "सम्पूर्ण डायरेक्ट सेलिंग व कंज्यूमर सेलिंग मॉडल",
+        "zero_egress": "पारंपरिक नेटवर्क मार्केटिंग में 90% लोग मनी सर्कुलेशन और महंगे गैर-जरूरी प्रोडक्ट्स के कारण छोड़ जाते हैं। नेटसर्फ का Zero Egress फॉर्मूला दैनिक जरूरत के रिजल्ट-ओरिएंटेड प्रोडक्ट्स और ऑटोशिप रिपीट सेलिंग पर आधारित है।",
+        "retail_margin": "5% से 15% (साप्ताहिक खुदरा लाभ)",
+        "retail_payout": "प्रत्येक सोमवार (Weekly Monday Closing & Payout)",
+        "customer_discount": "25% तक ग्राहक डिस्काउंट",
+        "autoship_offer": "5 महीने लगातार खरीदी पर 1 महीना मुफ़्त (5+1 Free Autoship)",
+        "team_turnover": "3%, 4%, 5% (₹25,000 व ₹50,000 स्लैब)",
+        "generation_slabs": "3% से 8% (10K=3%, 20K=4%, 40K=5%, 80K=6%, 1.2L=7%, 1.6L+=8%)",
+        "closing_cycle": "15-15 दिन में क्लोजिंग (Bi-monthly Payout)",
+        "max_capping": "₹8,19,250 (प्रत्येक 15 दिन की अधिकतम कैपिंग)",
+        "career_steps": "1. डायरेक्ट सेलर (Direct Seller) - 25% छूट व 5% रिटेल मुनाफा2. क्लब एग्जीक्यूटिव (Club Executive) - 10% रिटेल + 3% टर्नओवर3. सिल्वर अचीवर (Silver Achiever) - 15% रिटेल + 4% टर्नओवर + 3% जनरेशन4. गोल्ड अचीवर (Gold Achiever) - 5% टर्नओवर + 5% जनरेशन + डोमेस्टिक टूर5. प्लेटिनम क्लब (Platinum Club) - ₹2 लाख+ क्लोजिंग + इंटरनेशनल टूर6. डायमंड क्लब (Diamond Club) - ₹5 लाख+ क्लोजिंग + कार फंड + फैमिली सिक्योरिटी7. किंग व क्वीन क्लब (King & Queen Club) - ₹8,19,250 कैपिंग + आजीवन रॉयल्टी",
+        "mediclaim": "₹3,00,000 तक पारिवारिक मेडिक्लेम सुरक्षा",
+        "accidental": "₹2,00,000 से ₹25,00,000 दुर्घटना सुरक्षा कवर",
+        "natural_death": "आकस्मिक निधन पर नॉमिनी के नाम बिज़नेस ट्रांसफर व निरंतर पेआउट",
+        "tour_rewards": "वर्ष में 2 बार फ्री राष्ट्रीय व अंतरराष्ट्रीय टूर रिवॉर्ड्स"
       },
       "diet_exercise": null,
       "whatsapp_support": {
         "number": "919876543210",
         "prompt": ""
-      },
-      "ladder_header": {
-        "badge": "🪜 सफलता की सीढ़ी",
-        "title": "स्टेप लैडर: ज़ीरो से ₹8,19,250 हीरो बनने का सफर",
-        "subtitle": "आरोग्यम के डिजिटल रोडमैप पर हर डिस्ट्रीब्यूटर चरणबद्ध तरीके से आगे बढ़ता है। नीचे दिए गए 7 चरणों को समझें:"
-      },
-      "career_ladder": [
-        {
-          "level": 1,
-          "step_num": "STEP 1",
-          "badge": "Pro eTailer",
-          "title": "🌱 प्रो ई-टेलर (Pro e-Tailer)",
-          "criteria": "₹5,000 प्रोडक्ट खरीद / ID एक्टिवेशन",
-          "perks": "ग्राहकों को 25% तक छूट दिलाने का अधिकार + 5% से 10% का पर्सनल रिटेल डिस्काउंट मुनाफा।",
-          "image": "/images/logo/logo.png"
-        },
-        {
-          "level": 2,
-          "step_num": "STEP 2",
-          "badge": "Rock Star Achiever",
-          "title": "⭐ रॉक स्टार (Rock Star)",
-          "criteria": "साइकल में ₹8,000 का पर्सनल रिटेल",
-          "perks": "🔥 15% अधिकतम शुक्रवार रिटेल कमीशन अनलॉक। हर सोमवार बैंक में डायरेक्ट कैश क्रेडिट।",
-          "image": "/images/logo/logo.png"
-        },
-        {
-          "level": 3,
-          "step_num": "STEP 3",
-          "badge": "Business Consultant",
-          "title": "💼 बिज़नेस कंसलटेंट (BC)",
-          "criteria": "Team 1: ₹10,000 | Team 2: ₹10,000 मैचिंग",
-          "perks": "3% टीम टर्नओवर मैचिंग बोनस + 3% जनरेशन कमीशन और डायरेक्ट सेलर लीडरशिप पिन।",
-          "image": "/images/logo/logo.png"
-        },
-        {
-          "level": 4,
-          "step_num": "STEP 4",
-          "badge": "Senior BC",
-          "title": "🏆 सीनियर कंसलटेंट (SBC)",
-          "criteria": "Team 1: ₹1,00,000 | Team 2: ₹1,00,000",
-          "perks": "4% टर्नओवर मैचिंग बोनस + 7% जनरेशन कमीशन + स्टेज सम्मान व स्टेट रिकॉग्निशन।",
-          "image": "/images/logo/logo.png"
-        },
-        {
-          "level": 5,
-          "step_num": "STEP 5",
-          "badge": "Fast Track Champion",
-          "title": "🚀 फास्ट ट्रैक चैंपियन (Fastrack)",
-          "criteria": "Team 1: ₹3,00,000 | Team 2: ₹3,00,000",
-          "perks": "5% लाइफटाइम टर्नओवर कमीशन + 8% जनरेशन + 5-स्टार रेजिडेंशियल फ्री ट्रेनिंग वर्कशॉप।",
-          "image": "/images/logo/logo.png"
-        },
-        {
-          "level": 6,
-          "step_num": "STEP 6",
-          "badge": "Club Elite Leader",
-          "title": "👑 क्लब एलीट लीडर (Club Elite)",
-          "criteria": "Team 1: ₹15,00,000 | Team 2: ₹15,00,000",
-          "perks": "कार फंड + विदेश यात्रा (International Luxury Tour) + नेशनल लीडरशिप काउंसिल की सदस्यता।",
-          "image": "/images/logo/logo.png"
-        },
-        {
-          "level": 7,
-          "step_num": "STEP 7 (शिखर)",
-          "badge": "Cap Achiever Summit",
-          "title": "🎖️ ₹8,19,250 कैप अचीवर",
-          "criteria": "₹81,92,500 प्रति 15-दिन मैचिंग",
-          "perks": "हर 15 दिन में ₹8,19,250 का पे-आउट (प्रति माह ₹16.38 लाख) + 100% फाइनेंशियल फ्रीडम।",
-          "image": "/images/logo/logo.png"
-        }
-      ],
-      "faqs_heading": "अक्सर पूछे जाने वाले सवाल",
-      "faqs_badge": "❓ सामान्य प्रश्न (FAQ)",
-      "reviews_heading": "सफल डायरेक्ट सेलर लीडर्स के अनुभव",
-      "reviews_badge": "💼 प्रामाणिक अचीवर समीक्षाएं"
+      }
     },
     {
       "id": "page_health",
