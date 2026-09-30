@@ -751,18 +751,85 @@
     }).join('');
   }
 
+  function renderDynamicStepLadder(pageConfig) {
+    const sec = document.getElementById('sec-step-ladder') || document.querySelector('.ns-ladder-section');
+    if (!sec) return;
+
+    if (pageConfig.ladder_header) {
+      if (pageConfig.ladder_header.badge) {
+        const badge = sec.querySelector('.ns-pill-badge') || sec.querySelector('span');
+        if (badge) badge.textContent = pageConfig.ladder_header.badge;
+      }
+      if (pageConfig.ladder_header.title) {
+        const h2 = sec.querySelector('.ns-section-title') || sec.querySelector('h2');
+        if (h2) h2.textContent = pageConfig.ladder_header.title;
+      }
+      if (pageConfig.ladder_header.subtitle) {
+        const sub = sec.querySelector('.ns-section-subtitle') || sec.querySelector('p');
+        if (sub) sub.textContent = pageConfig.ladder_header.subtitle;
+      }
+    }
+
+    const steps = pageConfig.career_ladder || pageConfig.netsurf_steps;
+    if (!Array.isArray(steps) || steps.length === 0) return;
+
+    const grid = sec.querySelector('.ns-ladder-grid');
+    if (!grid) return;
+
+    grid.innerHTML = steps.map((s, idx) => {
+      const stepNum = s.step_num || `STEP ${idx + 1}`;
+      const img = resolveAssetSrc(s, 'image', '/images/logo/logo.png');
+      const isSummit = idx === steps.length - 1 || stepNum.includes('7') || (s.title && s.title.includes('8,19,250'));
+      const cardStyle = isSummit ? 'border:2px solid #f59e0b;background:#fffdf5;' : '';
+      const stepStyle = isSummit ? 'background:#f59e0b;color:#000;' : '';
+      const titleStyle = isSummit ? 'color:#b45309;' : '';
+      const critStyle = isSummit ? 'color:#b45309;' : '';
+
+      return `
+        <div class="ns-ladder-card" style="${cardStyle}">
+          <span class="ns-ladder-step-num" style="${stepStyle}">${escapeHtml(stepNum)}</span>
+          <div class="ns-ladder-img-wrap" style="${isSummit ? 'border-color:#f59e0b;' : ''}">
+            <img src="${escapeHtml(img)}" alt="${escapeHtml(s.title || stepNum)}" onerror="this.src='/images/logo/logo.png';">
+          </div>
+          <h3 class="ns-ladder-title" style="${titleStyle}">${escapeHtml(s.title || '')}</h3>
+          <div class="ns-ladder-criteria" style="${critStyle}">${escapeHtml(s.criteria || '')}</div>
+          <p class="ns-ladder-perks">
+            ${escapeHtml(s.perks || '')}
+          </p>
+        </div>
+      `;
+    }).join('');
+  }
+
   function renderDynamicFaqs(pageConfig) {
     if (!Array.isArray(pageConfig.faqs) || pageConfig.faqs.length === 0) return;
-    const sec = document.getElementById('sec-faqs') || document.querySelector('section:has(.faq-accordion)');
+    const sec = document.getElementById('sec-faqs') || document.querySelector('section:has(.faq-accordion)') || document.querySelector('.ns-faq-section');
     if (sec) {
       if (pageConfig.faqs_heading) {
-        const h2 = sec.querySelector('h2');
+        const h2 = sec.querySelector('h2') || sec.querySelector('.ns-section-title');
         if (h2) h2.textContent = pageConfig.faqs_heading;
       }
       if (pageConfig.faqs_badge) {
-        const badge = sec.querySelector('span');
+        const badge = sec.querySelector('.ns-pill-badge') || sec.querySelector('span');
         if (badge) badge.textContent = pageConfig.faqs_badge;
       }
+    }
+
+    // Support Netsurf Custom Accordion (.ns-faq-grid)
+    const nsGrid = sec ? (sec.querySelector('.ns-faq-grid') || document.querySelector('.ns-faq-grid')) : document.querySelector('.ns-faq-grid');
+    if (nsGrid) {
+      nsGrid.innerHTML = pageConfig.faqs.map((f, i) => `
+        <div class="ns-faq-item ${i === 0 ? 'active' : ''}">
+          <div class="ns-faq-question" onclick="this.parentElement.classList.toggle('active')">
+            <span>${i + 1}. ${escapeHtml(f.question || f.q || '')}</span>
+            <i class="fa-solid fa-chevron-down ns-faq-icon"></i>
+          </div>
+          <div class="ns-faq-answer">
+            ${escapeHtml(f.answer || f.a || '')}
+          </div>
+        </div>
+      `).join('');
+      return;
     }
 
     const faqContainer = document.getElementById('sec-faqs-accordion') ||
@@ -1180,6 +1247,7 @@
         renderDynamicProducts(pageConfig);
         renderDynamicClinicalBreakdown(pageConfig);
         renderDynamicDietExercise(pageConfig);
+        renderDynamicStepLadder(pageConfig);
         renderDynamicReviews(pageConfig);
         renderDynamicFaqs(pageConfig);
         renderDynamicVideos(pageConfig);

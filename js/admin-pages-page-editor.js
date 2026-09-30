@@ -2770,6 +2770,7 @@ export async function initPageEditor() {
   let currentDietImages = [];         // NEW: Multi-image gallery for Diet
   let currentExerciseImages = [];     // NEW: Multi-image gallery for Exercise
   let currentCbCards = [];            // Dynamic Clinical Breakdown Cards
+  let currentNsLadder = [];           // NEW: 7-Level Netsurf Step Ladder Manager
   let pagesCurrentPage = 1;
   let pagesPageSize = 25;
   let activeCategoryFilter = 'all';
@@ -3478,6 +3479,42 @@ export async function initPageEditor() {
             <div>
               <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">टूर व रिवार्ड्स (Tour Rewards)</label>
               <input type="text" id="pe_input_ns_tour_rewards" class="admin-input" placeholder="साल में 2 बार घरेलू व अंतरराष्ट्रीय यात्राएं" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+          </div>
+
+          <!-- Netsurf Step Ladder Manager (स्टेप लैडर: ज़ीरो से ₹8,19,250 हीरो बनने का सफर) -->
+          <div style="margin-top: 18px; border-top: 1.5px dashed #05966960; padding-top: 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+              <div>
+                <div style="font-weight: 800; color: #fde047; font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
+                  <span>🪜 स्टेप लैडर मैनेजर (7-चरण करियर सीढ़ी: ज़ीरो से ₹8,19,250)</span>
+                </div>
+                <small style="color: var(--admin-muted); font-size: 0.75rem;">प्रत्येक चरण का नाम, योग्यता (Criteria), लाभ (Perks), और बैज यहाँ से लाइव बदलें</small>
+              </div>
+              <button type="button" onclick="window.addNsLadderStep()" class="admin-button small-button" style="background: #10b981; color: #fff; font-weight: 800;">
+                + नया चरण जोड़ें
+              </button>
+            </div>
+
+            <!-- Ladder Header Settings -->
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 12px; background: #0b1329; padding: 10px; border-radius: 8px; border: 1px solid #1e293b;">
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem; color: #34d399;">लैडर मुख्य हेडिंग (Heading)</label>
+                <input type="text" id="pe_input_ns_ladder_title" class="admin-input" placeholder="स्टेप लैडर: ज़ीरो से ₹8,19,250 हीरो बनने का सफर" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;" />
+              </div>
+              <div>
+                <label class="admin-label" style="font-size: 0.75rem; color: #34d399;">लैडर बैज (Badge)</label>
+                <input type="text" id="pe_input_ns_ladder_badge" class="admin-input" placeholder="🪜 सफलता की सीढ़ी" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;" />
+              </div>
+              <div style="grid-column: 1 / -1;">
+                <label class="admin-label" style="font-size: 0.75rem; color: #34d399;">लैडर उप-शीर्षक (Subtitle)</label>
+                <input type="text" id="pe_input_ns_ladder_subtitle" class="admin-input" placeholder="आरोग्यम के डिजिटल रोडमैप पर हर डिस्ट्रीब्यूटर चरणबद्ध तरीके से आगे बढ़ता है..." style="width: 100%; padding: 5px 8px; font-size: 0.78rem;" />
+              </div>
+            </div>
+
+            <!-- Steps Container -->
+            <div id="pe_ns_ladder_container" style="display: flex; flex-direction: column; gap: 10px;">
+              <!-- Rendered dynamically -->
             </div>
           </div>
         </div>
@@ -6005,6 +6042,135 @@ export async function initPageEditor() {
   };
 
   // -------------------------------------------------------------
+  // NETSURF STEP LADDER BUILDER (7-LEVEL CAREER STEPS)
+  // -------------------------------------------------------------
+  function renderNsLadderInBuilder() {
+    const wrap = document.getElementById('pe_ns_ladder_container');
+    if (!wrap) return;
+
+    if (!currentNsLadder || currentNsLadder.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:12px;background:#0b1329;border-radius:8px;border:1px dashed #334155;">कोई करियर चरण नहीं है। "+ नया चरण जोड़ें" बटन दबाकर जोड़ें।</div>';
+      return;
+    }
+
+    wrap.innerHTML = currentNsLadder.map((s, idx) => {
+      const stepNum = s.step_num || `STEP ${idx + 1}`;
+      const title = s.title || '';
+      const criteria = s.criteria || '';
+      const perks = s.perks || '';
+      const badge = s.badge || '';
+      const img = s.image_preview || s.image || '/images/logo/logo.png';
+
+      return `
+        <div style="background: #0b1329; border: 1.5px solid #10b98150; border-radius: 8px; padding: 12px; position: relative;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-weight: 800; color: #34d399; font-size: 0.85rem;">चरण #${idx + 1}: ${escapeHtml(stepNum)}</span>
+              <span style="font-size: 0.72rem; background: #05966930; color: #a7f3d0; padding: 2px 6px; border-radius: 4px;">${escapeHtml(badge || 'Career Level')}</span>
+            </div>
+            <button type="button" onclick="window.removeNsLadderStep(${idx})" style="background: transparent; border: none; color: #ef4444; font-weight: 800; cursor: pointer; font-size: 0.85rem;">
+              &times; हटाएं
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-bottom: 8px;">
+            <div>
+              <label style="font-size: 0.72rem; color: #94a3b8; display: block;">चरण संख्या (Step Number)</label>
+              <input type="text" value="${escapeHtml(stepNum)}" oninput="window.updateNsLadderStep(${idx}, 'step_num', this.value)" class="admin-input" placeholder="जैसे: STEP 1 या STEP 7 (शिखर)" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;" />
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; color: #94a3b8; display: block;">रैंक / बैज नाम (Badge Name)</label>
+              <input type="text" value="${escapeHtml(badge)}" oninput="window.updateNsLadderStep(${idx}, 'badge', this.value)" class="admin-input" placeholder="जैसे: Pro eTailer या Rock Star" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;" />
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; color: #94a3b8; display: block;">पदवी शीर्षक (Title with Emoji)</label>
+              <input type="text" value="${escapeHtml(title)}" oninput="window.updateNsLadderStep(${idx}, 'title', this.value)" class="admin-input" placeholder="जैसे: 🌱 प्रो ई-टेलर (Pro e-Tailer)" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;" />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 8px;">
+            <label style="font-size: 0.72rem; color: #94a3b8; display: block;">योग्यता / टर्नओवर क्राइटेरिया (Eligibility / Criteria)</label>
+            <input type="text" value="${escapeHtml(criteria)}" oninput="window.updateNsLadderStep(${idx}, 'criteria', this.value)" class="admin-input" placeholder="जैसे: ₹5,000 प्रोडक्ट खरीद / ID एक्टिवेशन" style="width: 100%; padding: 5px 8px; font-size: 0.78rem;" />
+          </div>
+
+          <div style="margin-bottom: 8px;">
+            <label style="font-size: 0.72rem; color: #94a3b8; display: block;">कमीशन लाभ व अधिकार (Perks & Benefits)</label>
+            <textarea oninput="window.updateNsLadderStep(${idx}, 'perks', this.value)" class="admin-input" placeholder="जैसे: ग्राहकों को 25% तक छूट दिलाने का अधिकार + 5% से 10% का पर्सनल रिटेल डिस्काउंट मुनाफा।" style="width: 100%; padding: 5px 8px; font-size: 0.78rem; height: 50px;">${escapeHtml(perks)}</textarea>
+          </div>
+
+          <div>
+            <label style="font-size: 0.72rem; color: #94a3b8; display: block;">फोटो या लोगो (Icon / Image)</label>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input type="text" value="${escapeHtml(s.image || '')}" oninput="window.updateNsLadderStep(${idx}, 'image', this.value)" class="admin-input" placeholder="/images/logo/logo.png" style="flex:1; padding: 5px 8px; font-size: 0.75rem;" />
+              <label class="admin-button small-button" style="background:#059669; color:#fff; cursor:pointer; padding:4px 8px; font-size:0.75rem; margin:0; white-space:nowrap;">
+                📁 फोटो
+                <input type="file" accept="image/*" style="display:none;" onchange="window.handleNsLadderImageUpload(${idx}, this)">
+              </label>
+            </div>
+            ${img ? `
+              <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">
+                <img src="${escapeHtml(img)}" alt="Preview" style="width:28px;height:28px;object-fit:contain;border:1px solid #059669;border-radius:4px;" onerror="this.src='/images/logo/logo.png'">
+                <span style="font-size:0.7rem; color:#6ee7b7;">✓ एक्टिव फोटो</span>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.addNsLadderStep = function() {
+    if (!Array.isArray(currentNsLadder)) currentNsLadder = [];
+    currentNsLadder.push({
+      level: currentNsLadder.length + 1,
+      step_num: `STEP ${currentNsLadder.length + 1}`,
+      badge: 'Achiever',
+      title: 'नई पदवी / लेवल',
+      criteria: 'टर्नओवर योग्यता',
+      perks: 'कमीशन व लाभ विवरण',
+      image: '/images/logo/logo.png'
+    });
+    renderNsLadderInBuilder();
+  };
+
+  window.removeNsLadderStep = function(idx) {
+    if (!Array.isArray(currentNsLadder)) return;
+    currentNsLadder.splice(idx, 1);
+    renderNsLadderInBuilder();
+  };
+
+  window.updateNsLadderStep = function(idx, field, val) {
+    if (!currentNsLadder[idx]) return;
+    currentNsLadder[idx][field] = val;
+  };
+
+  window.handleNsLadderImageUpload = async function(idx, inputEl) {
+    if (!inputEl || !inputEl.files || !inputEl.files[0]) return;
+    const file = inputEl.files[0];
+    showToast('⏳ स्टेप इमेज प्रोसेस हो रही है...', 'info');
+    try {
+      const { dataUrl } = await compressImageToWebp(file, 120000, 800);
+      const generatedPath = generateAssetPath('ladder_step', file.name);
+      const webpPath = '/' + generatedPath;
+      try {
+        const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        offSync[webpPath] = dataUrl;
+        localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
+      } catch (e) {}
+
+      if (currentNsLadder[idx]) {
+        currentNsLadder[idx].image = webpPath;
+        currentNsLadder[idx].image_preview = dataUrl;
+        renderNsLadderInBuilder();
+      }
+      await syncAssetToGitHub(generatedPath, dataUrl);
+      showToast('✅ स्टेप इमेज सुरक्षित हो गई!', 'success');
+    } catch (err) {
+      showToast('❌ एरर: ' + err.message, 'error');
+    }
+  };
+
+  // -------------------------------------------------------------
   // CLINICAL BREAKDOWN CARDS BUILDER (DYNAMIC FOR ALL PAGES)
   // -------------------------------------------------------------
   function renderCbCardsInBuilder() {
@@ -6684,6 +6850,25 @@ export async function initPageEditor() {
     if (nsNaturalDeathEl) nsNaturalDeathEl.value = nsPlan.natural_death || (isNetsurfPage ? 'आकस्मिक निधन पर नॉमिनी के नाम बिज़नेस ट्रांसफर व निरंतर पेआउट' : '');
     if (nsTourRewardsEl) nsTourRewardsEl.value = nsPlan.tour_rewards || (isNetsurfPage ? 'वर्ष में 2 बार फ्री राष्ट्रीय व अंतरराष्ट्रीय टूर रिवॉर्ड्स' : '');
 
+    // Populate Ladder Header & Steps
+    const ladderHead = p.ladder_header || {};
+    const ladderTitleEl = document.getElementById('pe_input_ns_ladder_title');
+    const ladderBadgeEl = document.getElementById('pe_input_ns_ladder_badge');
+    const ladderSubEl = document.getElementById('pe_input_ns_ladder_subtitle');
+
+    if (ladderTitleEl) ladderTitleEl.value = ladderHead.title || (isNetsurfPage ? 'स्टेप लैडर: ज़ीरो से ₹8,19,250 हीरो बनने का सफर' : '');
+    if (ladderBadgeEl) ladderBadgeEl.value = ladderHead.badge || (isNetsurfPage ? '🪜 सफलता की सीढ़ी' : '');
+    if (ladderSubEl) ladderSubEl.value = ladderHead.subtitle || (isNetsurfPage ? 'आरोग्यम के डिजिटल रोडमैप पर हर डिस्ट्रीब्यूटर चरणबद्ध तरीके से आगे बढ़ता है। नीचे दिए गए 7 चरणों को समझें:' : '');
+
+    if (Array.isArray(p.career_ladder) && p.career_ladder.length > 0) {
+      currentNsLadder = JSON.parse(JSON.stringify(p.career_ladder));
+    } else if (Array.isArray(p.netsurf_steps) && p.netsurf_steps.length > 0) {
+      currentNsLadder = JSON.parse(JSON.stringify(p.netsurf_steps));
+    } else {
+      currentNsLadder = [];
+    }
+    renderNsLadderInBuilder();
+
     openPageDrawer();
     setTimeout(() => updateContextualSections(p.category || 'eBooks'), 60);
   };
@@ -6757,6 +6942,8 @@ export async function initPageEditor() {
     currentMarketingCards = [];
     currentReviews = [];
     currentFaqs = [];
+    currentNsLadder = [];
+    renderNsLadderInBuilder();
     currentHealthDiseases = JSON.parse(JSON.stringify(DEFAULT_HEALTH_DISEASES));
     currentCrops = JSON.parse(JSON.stringify(DEFAULT_CROPS_LIST));
     currentPashuCards = JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST));
@@ -6903,7 +7090,17 @@ export async function initPageEditor() {
       }
     }
 
-        // 10.3 Save Netsurf Career Plan Fields
+        // 10.3 Save Netsurf Ladder & Career Plan Fields
+    const nsLadderTitle = (document.getElementById('pe_input_ns_ladder_title')?.value || '').trim();
+    const nsLadderBadge = (document.getElementById('pe_input_ns_ladder_badge')?.value || '').trim();
+    const nsLadderSub = (document.getElementById('pe_input_ns_ladder_subtitle')?.value || '').trim();
+    const ladderHeader = (nsLadderTitle || nsLadderBadge || nsLadderSub) ? {
+      title: nsLadderTitle,
+      badge: nsLadderBadge,
+      subtitle: nsLadderSub
+    } : null;
+
+    // 10.3 Save Netsurf Career Plan Fields
     const nsLegacy = (document.getElementById('pe_input_ns_legacy')?.value || '').trim();
     const nsSlogan = (document.getElementById('pe_input_ns_slogan')?.value || '').trim();
     const nsZeroEgress = (document.getElementById('pe_input_ns_zero_egress')?.value || '').trim();
@@ -6969,12 +7166,14 @@ export async function initPageEditor() {
       kpi_cards: stripImagePreviews(currentKpiCards),
       marketing_cards: stripImagePreviews(currentMarketingCards),
       videos: stripImagePreviews(currentVideos),
-      reviews_heading: reviewsHeading,
-      reviews_badge: reviewsBadge,
-      reviews: stripImagePreviews(currentReviews),
-      faqs_heading: faqsHeading,
-      faqs_badge: faqsBadge,
-      faqs: stripImagePreviews(currentFaqs),
+      reviews_heading: reviewsHeading || existingPage?.reviews_heading || '',
+      reviews_badge: reviewsBadge || existingPage?.reviews_badge || '',
+      reviews: (currentReviews && currentReviews.length > 0) ? stripImagePreviews(currentReviews) : (existingPage?.reviews || []),
+      faqs_heading: faqsHeading || existingPage?.faqs_heading || '',
+      faqs_badge: faqsBadge || existingPage?.faqs_badge || '',
+      faqs: (currentFaqs && currentFaqs.length > 0) ? stripImagePreviews(currentFaqs) : (existingPage?.faqs || []),
+      ladder_header: ladderHeader || existingPage?.ladder_header || null,
+      career_ladder: (currentNsLadder && currentNsLadder.length > 0) ? stripImagePreviews(currentNsLadder) : (existingPage?.career_ladder || []),
       health_diseases: stripImagePreviews(currentHealthDiseases),
       crops: stripImagePreviews(currentCrops),
       pashu_cards: stripImagePreviews(currentPashuCards),
