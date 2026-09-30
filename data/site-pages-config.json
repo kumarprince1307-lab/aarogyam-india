@@ -2039,9 +2039,9 @@
       "audio_script": "नमस्ते {name} जी! वेट लॉस गाइड में आपका स्वागत है। यहाँ आपको पेट की जिद्दी चर्बी घटाने के मुख्य कारण, लक्षण, 24 घंटे का संपूर्ण डाइट चार्ट और फैट बर्नर हर्बल सप्लीमेंट की जानकारी मिलेगी।",
       "audio_url": "",
       "og_title": "मोटापा व पेट की चर्बी घटाने का प्राकृतिक डाइट चार्ट | Aarogyam India",
-      "og_image": "/images/banners/health-weight-loss.jpg",
+      "og_image": "/images/banners/og_image-motapa-490448-grer.webp",
       "og_description": "बिना कमजोरी और बिना भूखे रहे 30 दिनों में 4 से 6 किलो वजन नियंत्रित करने का वैज्ञानिक उपाय।",
-      "share_message": "",
+      "share_message": "🔥 *मोटापा व पेट की चर्बी घटाने का प्राकृतिक डाइट चार्ट* 🥗\n\nबिना कमजोरी और बिना भूखे रहे 30 दिनों में 4 से 6 किलो वजन नियंत्रित करने का वैज्ञानिक उपाय।\n\n✨ मुख्य विशेषताएं:\n• जिद्दी बेली फैट बर्न करने का आसान घरेलू नियम\n• 24-घंटे का सम्पूर्ण डाइट व डिटॉक्स चार्ट\n• 24×7 WhatsApp AI डॉक्टर परामर्श उपलब्ध\n\n👉 पूरी गाइड व डाइट चार्ट के लिए लिंक पर क्लिक करें:\n{url}",
       "floating_banner": {
         "enabled": false,
         "image": "",
@@ -2053,12 +2053,44 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/health-weight-loss.jpg",
-          "tag": "🔥 वेट लॉस",
-          "title": "मोटापा व प्राकृतिक वजन नियंत्रण",
-          "subtitle": "जिद्दी चर्बी घटाने की सम्पूर्ण डाइट व हर्बल सप्लीमेंट",
-          "cta_text": "💬 फ्री डाइट चार्ट लें",
-          "cta_link": "https://wa.me/917974422572"
+          "image": "/images/banners/hero_slide-motapa-banner-593603-wb4y.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-motapa-banner-2-643853-74xl.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-motapa-banner-3-713879-scql.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-motapa-banne4-794378-45vl.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
       "sections_order": [
@@ -2124,7 +2156,7 @@
           {
             "title": "❓ वजन क्यों बढ़ता है? (Causes)",
             "color": "#2563eb",
-            "image": "",
+            "image": "/images/banners/health_card-karan-motapa-875375-0zjo.webp",
             "points": [
               "<strong>धीमा मेटाबॉलिज्म:</strong> कैलोरी का ऊर्जा में न बदलकर फैट के रूप में जमा होना।",
               "<strong>हार्मोनल असंतुलन:</strong> थायरॉइड, इंसुलिन रेजिस्टेंस या लेप्टिन हार्मोन की गड़बड़ी।",
@@ -2135,7 +2167,7 @@
           {
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
             "color": "#2563eb",
-            "image": "",
+            "image": "/images/banners/health_card-mukhya-lakshan-952856-1g0y.webp",
             "points": [
               "थोड़ी सी सीढ़ियां चढ़ने या चलने पर ही सांस फूलना व पसीना आना।",
               "पेट, जांघों व कमर के चारों ओर चर्बी की मोटी परत का जमाव।",
@@ -2146,7 +2178,7 @@
           {
             "title": "🚨 मोटापे से जुड़े गंभीर खतरे (Risks)",
             "color": "#dc2626",
-            "image": "",
+            "image": "/images/banners/health_card-motapa-khatra-035377-ixqd.webp",
             "points": [
               "<strong>फैटी लिवर (Grade 1/2):</strong> लिवर में चर्बी जमने से पाचन तंत्र व लिवर सिरोसिस का खतरा।",
               "<strong>हाई ब्लड प्रेशर व हार्ट अटैक:</strong> नसों में कोलेस्ट्रॉल व ब्लॉकेज का तेजी से बढ़ना।",
@@ -2166,7 +2198,13 @@
             "<strong>☕ शाम:</strong> भुने मखाने + अदरक-तुलसी की काली चाय।",
             "<strong>🍲 रात 7:00 PM:</strong> सब्जियों का गर्मागर्म सूप या उबली सब्जियां। (सूर्यास्त के बाद अन्न न लें)।"
           ],
-          "images": []
+          "images": [
+            {
+              "image": "/images/banners/diet_card-fat-bernor-350911-56i8.webp",
+              "caption": "",
+              "url": "/images/banners/diet_card-fat-bernor-350911-56i8.webp"
+            }
+          ]
         },
         "exercise": {
           "title": "फैट बर्निंग व मेटाबॉलिज्म बूस्ट उपाय",
@@ -2176,7 +2214,13 @@
             "<strong>3. भस्त्रिका व कपालभाति:</strong> आंतरिक जठराग्नि तेज कर मेटाबॉलिज्म को 2x गति देता है।",
             "<strong>4. गुनगुना पानी पीना:</strong> दिनभर केवल गुनगुना पानी पिएं, यह वसा को पिघलाने में मदद करता है।"
           ],
-          "images": []
+          "images": [
+            {
+              "image": "/images/banners/exercise_card-exersize-motapa-630923-2xna.webp",
+              "caption": "",
+              "url": "/images/banners/exercise_card-exersize-motapa-630923-2xna.webp"
+            }
+          ]
         }
       },
       "whatsapp_support": {
