@@ -458,16 +458,17 @@
     const primaryPath = isEbooksSubdir ? `../${cleanUrl}` : `/${cleanUrl}`;
     const fallbackPath = isEbooksSubdir ? `/${cleanUrl}` : `../${cleanUrl}`;
 
-    // 100% Live: Always fetch fresh JSON with timestamp and no-store cache
-    const versionTag = Date.now();
+    // High-speed CDN/Browser caching with 60-second revalidation for ultra-fast mobile loading
+    const cacheBucket = Math.floor(Date.now() / 60000);
     const candidates = [
-      `${primaryPath}?t=${versionTag}`,
-      `${fallbackPath}?v=${versionTag}`
+      `${primaryPath}?v=${cacheBucket}`,
+      primaryPath,
+      fallbackPath
     ];
 
     for (const c of candidates) {
       try {
-        const res = await fetch(c, { cache: 'no-store' });
+        const res = await fetch(c);
         if (res.ok) {
           return await res.json();
         }

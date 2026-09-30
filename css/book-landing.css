@@ -2515,11 +2515,15 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 6px 12px !important;
+    padding-top: 6px !important;
+    padding-left: max(10px, env(safe-area-inset-left, 10px)) !important;
+    padding-right: max(10px, env(safe-area-inset-right, 10px)) !important;
+    padding-bottom: max(10px, calc(6px + env(safe-area-inset-bottom, 0px))) !important;
     box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.12) !important;
     z-index: 9997 !important;
     box-sizing: border-box !important;
-    height: 56px !important;
+    height: auto !important;
+    min-height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
 .mobile-sticky-bar-inner {
@@ -2585,14 +2589,13 @@ body {
 
 /* BUY NOW JUST BAGAL MEIN (BALANCED, NOT OVERLY LONG) */
 .sticky-buy-btn {
-    flex: 1 !important;
-    max-width: 125px !important;
+    flex: 1 1 auto !important;
     min-width: 90px !important;
-    height: 40px !important;
+    height: 42px !important;
     border-radius: 8px !important;
     background: linear-gradient(135deg, #ff7a00, #ff5100) !important;
     color: #ffffff !important;
-    font-size: 13.5px !important;
+    font-size: 14px !important;
     font-weight: 900 !important;
     display: flex !important;
     align-items: center !important;
@@ -2601,7 +2604,7 @@ body {
     text-decoration: none !important;
     box-shadow: 0 4px 12px rgba(255, 81, 0, 0.35) !important;
     white-space: nowrap !important;
-    padding: 0 6px !important;
+    padding: 0 8px !important;
 }
 
 /* SHARE BUTTON USKE BAAD */
