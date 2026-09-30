@@ -1,0 +1,73 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": false,
+  "rewrites": [
+    {
+      "source": "/ebooks/book-landing.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        },
+        {
+          "type": "query",
+          "key": "id"
+        }
+      ],
+      "destination": "/api/share?id=:id"
+    },
+    {
+      "source": "/ebooks/book-landing.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        },
+        {
+          "type": "query",
+          "key": "book"
+        }
+      ],
+      "destination": "/api/share?id=:book"
+    },
+    {
+      "source": "/ebooks/book-landing",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        },
+        {
+          "type": "query",
+          "key": "id"
+        }
+      ],
+      "destination": "/api/share?id=:id"
+    },
+    {
+      "source": "/ebooks/kharif-master-guide-2026.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?id=BK001"
+    },
+    {
+      "source": "/ebooks/kheti-dr.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?id=BK002"
+    }
+  ]
+}
