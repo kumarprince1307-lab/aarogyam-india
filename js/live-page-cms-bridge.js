@@ -751,6 +751,75 @@
     }).join('');
   }
 
+  function renderDynamicNetsurfPlan(pageConfig) {
+    if (!pageConfig || !pageConfig.netsurf_plan) return;
+    const plan = pageConfig.netsurf_plan;
+
+    // 1. Hero Tag (26 Years Legacy)
+    if (plan.legacy) {
+      const heroTag = document.querySelector('.ns-hero-tag');
+      if (heroTag) {
+        heroTag.innerHTML = `<span>🇮🇳</span> ${escapeHtml(plan.legacy)}`;
+      }
+    }
+
+    // 2. Zero Egress Formula Card
+    if (plan.zero_egress) {
+      const zeroCard = document.querySelector('.ns-zero-egress-card p');
+      if (zeroCard) {
+        zeroCard.textContent = plan.zero_egress;
+      }
+    }
+
+    // 3. 4-Fold Income Model Grid (.ns-income-grid)
+    const incomeCards = document.querySelectorAll('.ns-income-card');
+    if (incomeCards.length >= 4) {
+      // Card 1: Retail Margin
+      if (plan.retail_margin) {
+        const rateEl = incomeCards[0].querySelector('.ns-income-rate');
+        if (rateEl) rateEl.textContent = plan.retail_margin;
+      }
+      if (plan.retail_payout) {
+        const badgeEl = incomeCards[0].querySelector('.ns-income-closing-badge');
+        if (badgeEl) badgeEl.innerHTML = `<span>🗓️ पे-आउट:</span> <strong>${escapeHtml(plan.retail_payout)}</strong>`;
+      }
+      // Card 2: Team Turnover
+      if (plan.team_turnover) {
+        const rateEl = incomeCards[1].querySelector('.ns-income-rate');
+        if (rateEl) rateEl.textContent = plan.team_turnover;
+      }
+      // Card 3: Generation Slabs
+      if (plan.generation_slabs) {
+        const rateEl = incomeCards[2].querySelector('.ns-income-rate');
+        if (rateEl) rateEl.textContent = plan.generation_slabs.split('(')[0].trim() || plan.generation_slabs;
+      }
+      // Card 4: Max Capping & Closing Cycle
+      if (plan.max_capping) {
+        const rateEl = incomeCards[3].querySelector('.ns-income-rate');
+        if (rateEl) rateEl.textContent = plan.max_capping;
+      }
+      if (plan.closing_cycle) {
+        const badgeEl = incomeCards[3].querySelector('.ns-income-closing-badge');
+        if (badgeEl) badgeEl.innerHTML = `<span>⚡ चक्र:</span> <strong>${escapeHtml(plan.closing_cycle)}</strong>`;
+      }
+    }
+
+    // 4. Family Protection Plan (FPP) Box
+    const fppCard = document.querySelector('.ns-reward-box[style*="f0fdf4"]');
+    if (fppCard) {
+      const descEl = fppCard.querySelector('.ns-reward-desc');
+      if (descEl) {
+        let bullets = [];
+        if (plan.mediclaim) bullets.push(`• <strong>मेडिक्लेम स्वास्थ्य सुरक्षा:</strong> ${escapeHtml(plan.mediclaim)}`);
+        if (plan.accidental) bullets.push(`• <strong>एक्सीडेंटल सुरक्षा कवर:</strong> ${escapeHtml(plan.accidental)}`);
+        if (plan.natural_death) bullets.push(`• <strong>आजीवन नॉमिनी सुरक्षा:</strong> ${escapeHtml(plan.natural_death)}`);
+        if (bullets.length > 0) {
+          descEl.innerHTML = bullets.join('<br>\n');
+        }
+      }
+    }
+  }
+
   function renderDynamicStepLadder(pageConfig) {
     const sec = document.getElementById('sec-step-ladder') || document.querySelector('.ns-ladder-section');
     if (!sec) return;
@@ -876,6 +945,8 @@
     if (!hasAnyPoints) return;
 
     const isPashu = window.location.pathname.includes('pashu') || (pageConfig.id && pageConfig.id.includes('cattle'));
+    const catalogTarget = isPashu ? '#products-cattle' : '#sec-products';
+    const catalogBtnText = isPashu ? 'दवा देखें →' : 'उत्पाद देखें →';
 
     grid.innerHTML = cb.cards.map(c => {
       const points = (Array.isArray(c.points) ? c.points : (c.points || '').split('\n')).filter(Boolean);
@@ -907,11 +978,13 @@
         }
       }
 
+      const waBtnText = c.whatsapp_btn?.text || 'सलाह लें';
+
       return `
         <div class="problem-box" style="padding:0; overflow:hidden; border-top:4px solid ${color}; border-radius:18px; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0; display:flex; flex-direction:column; justify-content:space-between;">
           <div>
             ${img ? `
-              <div style="height:170px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='#products-cattle'">
+              <div style="height:170px; overflow:hidden; position:relative; background:#0f172a; cursor:pointer;" onclick="window.location.href='${catalogTarget}'">
                 <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.style.display='none'">
                 ${badge ? `<span style="position:absolute; top:10px; left:10px; background:${color}; color:#ffffff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:20px; box-shadow:0 3px 8px rgba(0,0,0,0.35);">${escapeHtml(badge)}</span>` : ''}
               </div>
@@ -925,11 +998,11 @@
             </div>
           </div>
           <div style="padding:0 18px 18px 18px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <a href="#products-cattle" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
-              दवा देखें →
+            <a href="${catalogTarget}" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+              ${catalogBtnText}
             </a>
             <button type="button" onclick="window.consultAiExpert ? window.consultAiExpert('${escapeHtml(title)}', '${escapeHtml(points[0] || title)}') : (window.open('https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते! मुझे ' + '${escapeHtml(title)}' + ' के बारे में सलाह चाहिए।'), '_blank'))" style="flex:1; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
-              <i class="fa-brands fa-whatsapp"></i> <span>सलाह लें</span>
+              <i class="fa-brands fa-whatsapp"></i> <span>${escapeHtml(waBtnText)}</span>
             </button>
           </div>
         </div>
@@ -1248,6 +1321,7 @@
         renderDynamicClinicalBreakdown(pageConfig);
         renderDynamicDietExercise(pageConfig);
         renderDynamicStepLadder(pageConfig);
+        renderDynamicNetsurfPlan(pageConfig);
         renderDynamicReviews(pageConfig);
         renderDynamicFaqs(pageConfig);
         renderDynamicVideos(pageConfig);

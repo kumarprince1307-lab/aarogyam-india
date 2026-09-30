@@ -2994,7 +2994,7 @@ export async function initPageEditor() {
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-products', this)">🛍️ 6. उत्पाद</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-kpis', this)">✨ 7. KPI</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-marketing', this)">📢 8. सेलिंग</button>
-        <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-sec-netsurf-career', this)">💼 10.3 नेटसर्फ प्लान</button>
+        <button type="button" class="pe-chip-link" id="pe-chip-netsurf" onclick="window.scrollToPeSection('pe-sec-netsurf-plan', this)">💼 10.3 नेटसर्फ प्लान</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-health-cards', this)">🩺 9. रोग</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-clinical-breakdown', this)">🔬 9.1 विश्लेषण व डाइट</button>
         <button type="button" class="pe-chip-link" onclick="window.scrollToPeSection('pe-section-crop-cards', this)">🌾 10. फसल</button>
@@ -3020,6 +3020,7 @@ export async function initPageEditor() {
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-products', this)">🛍️ 6. WhatsApp उत्पाद</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-kpis', this)">✨ 7. KPI व फीचर्स</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-sec-marketing', this)">📢 8. लाइव सेलिंग कार्ड्स</button>
+          <button type="button" class="pe-nav-link" id="pe-nav-netsurf" onclick="window.scrollToPeSection('pe-sec-netsurf-plan', this)">💼 10.3 नेटसर्फ प्लान व लैडर</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-health-cards', this)">🩺 9. स्वास्थ्य रोग कार्ड्स</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-clinical-breakdown', this)">🔬 9.1 वैज्ञानिक विश्लेषण व डाइट</button>
           <button type="button" class="pe-nav-link" onclick="window.scrollToPeSection('pe-section-crop-cards', this)">🌾 10. फसल सुरक्षा कार्ड्स</button>
@@ -5322,31 +5323,31 @@ export async function initPageEditor() {
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">टैग / ऑफर बैज</label>
-            <input type="text" value="${escapeHtml(slide.tag || '')}" onchange="window.updateHeroSlideField(${idx}, 'tag', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(slide.tag || '')}" oninput="window.updateHeroSlideField(${idx}, 'tag', this.value)" onchange="window.updateHeroSlideField(${idx}, 'tag', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">मुख्य शीर्षक (Headline)</label>
-            <input type="text" value="${escapeHtml(slide.title || '')}" onchange="window.updateHeroSlideField(${idx}, 'title', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(slide.title || '')}" oninput="window.updateHeroSlideField(${idx}, 'title', this.value)" onchange="window.updateHeroSlideField(${idx}, 'title', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">उप-शीर्षक (Subtitle)</label>
-            <input type="text" value="${escapeHtml(slide.subtitle || '')}" onchange="window.updateHeroSlideField(${idx}, 'subtitle', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(slide.subtitle || '')}" oninput="window.updateHeroSlideField(${idx}, 'subtitle', this.value)" onchange="window.updateHeroSlideField(${idx}, 'subtitle', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">CTA बटन टेक्स्ट</label>
-            <input type="text" value="${escapeHtml(slide.cta_text || 'देखें')}" onchange="window.updateHeroSlideField(${idx}, 'cta_text', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(slide.cta_text || 'देखें')}" oninput="window.updateHeroSlideField(${idx}, 'cta_text', this.value)" onchange="window.updateHeroSlideField(${idx}, 'cta_text', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">CTA बटन लिंक (URL)</label>
-            <input type="text" value="${escapeHtml(slide.cta_link || '')}" onchange="window.updateHeroSlideField(${idx}, 'cta_link', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(slide.cta_link || '')}" oninput="window.updateHeroSlideField(${idx}, 'cta_link', this.value)" onchange="window.updateHeroSlideField(${idx}, 'cta_link', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">Secondary CTA टेक्स्ट</label>
-            <input type="text" value="${escapeHtml(slide.cta_secondary_text || '')}" onchange="window.updateHeroSlideField(${idx}, 'cta_secondary_text', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(slide.cta_secondary_text || '')}" oninput="window.updateHeroSlideField(${idx}, 'cta_secondary_text', this.value)" onchange="window.updateHeroSlideField(${idx}, 'cta_secondary_text', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">Secondary CTA लिंक (URL)</label>
-            <input type="text" value="${escapeHtml(slide.cta_secondary_link || '')}" onchange="window.updateHeroSlideField(${idx}, 'cta_secondary_link', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
+            <input type="text" value="${escapeHtml(slide.cta_secondary_link || '')}" oninput="window.updateHeroSlideField(${idx}, 'cta_secondary_link', this.value)" onchange="window.updateHeroSlideField(${idx}, 'cta_secondary_link', this.value)" class="admin-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;" />
           </div>
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">← बैक बटन टेक्स्ट (Back Navigation)</label>
@@ -6444,6 +6445,8 @@ export async function initPageEditor() {
     const pageKpiSection = document.getElementById('pe-section-page-kpi');
     const cbSection = document.getElementById('pe-section-clinical-breakdown');
     const netsurfSection = document.getElementById('pe-sec-netsurf-plan');
+    const chipNetsurf = document.getElementById('pe-chip-netsurf');
+    const navNetsurf = document.getElementById('pe-nav-netsurf');
 
     const isNetsurf = (editingPageId === 'page_netsurf_career' || category === 'Career & Direct Selling');
     const isPashu = (editingPageId === 'page_cattle_care' || category === 'Livestock');
@@ -6452,6 +6455,8 @@ export async function initPageEditor() {
     const showHealth = (category === 'Health' || category === 'Healthcare' || category === 'Core') && !isNetsurf && !isPashu;
 
     if (netsurfSection) netsurfSection.style.display = isNetsurf ? 'block' : 'none';
+    if (chipNetsurf) chipNetsurf.style.display = isNetsurf ? 'inline-block' : 'none';
+    if (navNetsurf) navNetsurf.style.display = isNetsurf ? 'block' : 'none';
     if (cbSection) cbSection.style.display = (isPashu || isHealthSubPage) ? 'block' : 'none';
     if (healthSection) healthSection.style.display = (showHealth && !isHealthSubPage) ? 'block' : 'none';
     if (cropSection) cropSection.style.display = isAgri ? 'block' : 'none';
@@ -7317,9 +7322,9 @@ export async function initPageEditor() {
           <img src="${escapeHtml(item.image_preview || item.image || item.url || '/images/banners/health-banner.jpeg')}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'">
         </div>
         <div style="flex:1; display:flex; flex-direction:column; gap:4px; min-width:0;">
-          <input type="text" value="${escapeHtml(item.caption || '')}" onchange="window.updateDietImageField(${idx}, 'caption', this.value)" class="admin-input" placeholder="कैप्शन (उदा. मेथी दाना पानी / सलाद)" style="padding:4px 8px; font-size:0.75rem;" />
+          <input type="text" value="${escapeHtml(item.caption || '')}" oninput="window.updateDietImageField(${idx}, 'caption', this.value)" onchange="window.updateDietImageField(${idx}, 'caption', this.value)" class="admin-input" placeholder="कैप्शन (उदा. मेथी दाना पानी / सलाद)" style="padding:4px 8px; font-size:0.75rem;" />
           <div style="display:flex; gap:4px; align-items:center;">
-            <input type="text" value="${escapeHtml(item.image || item.url || '')}" onchange="window.updateDietImageField(${idx}, 'image', this.value)" class="admin-input" placeholder="/images/banners/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
+            <input type="text" value="${escapeHtml(item.image || item.url || '')}" oninput="window.updateDietImageField(${idx}, 'image', this.value)" onchange="window.updateDietImageField(${idx}, 'image', this.value)" class="admin-input" placeholder="/images/banners/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
             <label class="admin-button small-button" style="background:#059669; color:#fff; cursor:pointer; padding:3px 6px; font-size:0.7rem; margin:0; white-space:nowrap;">
               📁 फोटो
               <input type="file" accept="image/*" style="display:none;" onchange="window.handleDietImageUpload(${idx}, this)">
@@ -7391,9 +7396,9 @@ export async function initPageEditor() {
           <img src="${escapeHtml(item.image_preview || item.image || item.url || '/images/banners/health-banner.jpeg')}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/images/banners/health-banner.jpeg'">
         </div>
         <div style="flex:1; display:flex; flex-direction:column; gap:4px; min-width:0;">
-          <input type="text" value="${escapeHtml(item.caption || '')}" onchange="window.updateExerciseImageField(${idx}, 'caption', this.value)" class="admin-input" placeholder="कैप्शन (उदा. मंडूकासन / पवनमुक्तासन)" style="padding:4px 8px; font-size:0.75rem;" />
+          <input type="text" value="${escapeHtml(item.caption || '')}" oninput="window.updateExerciseImageField(${idx}, 'caption', this.value)" onchange="window.updateExerciseImageField(${idx}, 'caption', this.value)" class="admin-input" placeholder="कैप्शन (उदा. मंडूकासन / पवनमुक्तासन)" style="padding:4px 8px; font-size:0.75rem;" />
           <div style="display:flex; gap:4px; align-items:center;">
-            <input type="text" value="${escapeHtml(item.image || item.url || '')}" onchange="window.updateExerciseImageField(${idx}, 'image', this.value)" class="admin-input" placeholder="/images/banners/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
+            <input type="text" value="${escapeHtml(item.image || item.url || '')}" oninput="window.updateExerciseImageField(${idx}, 'image', this.value)" onchange="window.updateExerciseImageField(${idx}, 'image', this.value)" class="admin-input" placeholder="/images/banners/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
             <label class="admin-button small-button" style="background:#4f46e5; color:#fff; cursor:pointer; padding:3px 6px; font-size:0.7rem; margin:0; white-space:nowrap;">
               📁 फोटो
               <input type="file" accept="image/*" style="display:none;" onchange="window.handleExerciseImageUpload(${idx}, this)">
