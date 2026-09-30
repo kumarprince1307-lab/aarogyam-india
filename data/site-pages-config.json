@@ -2777,10 +2777,10 @@
       "audio_title": "हेयर केयर व डैंड्रफ समाधान",
       "audio_script": "नमस्ते {name} जी! हेयर केयर गाइड में आपका स्वागत है। नए बाल उगाने, बालों का झड़ना तुरंत रोकने और डैंड्रफ खत्म करने के प्राकृतिक फॉर्मूले और ऑयल्स की जानकारी यहाँ देखें। dhara pranam",
       "audio_url": "",
-      "og_title": "हेयर फॉल व डैंड्रफ का 100% प्राकृतिक फॉर्मूला | Aarogyam India",
-      "og_image": "/images/banners/og_image-whatsapp-image-202-747199-dj40.webp",
-      "og_description": "नए बाल उगाने, बालों का झड़ना 15 दिन में रोकने और डैंड्रफ खत्म करने के प्राकृतिक फॉर्मूले।",
-      "share_message": "",
+      "og_title": "🚨 क्या आप भी बालों के झड़ने और गंजेपन से परेशान हैं? | 100% आयुर्वेदिक समाधान",
+      "og_image": "/images/banners/og_image-hair-care-1-559375-m4x6.webp",
+      "og_description": "कंघी करते समय गुच्छों में गिरते बाल, चौड़ी होती मांग या जिद्दी डैंड्रफ? जानिए कमजोर जड़ों को मजबूत करने और 15 दिनों में प्राकृतिक रूप से नए बाल उगाने का अचूक फॉर्मूला।",
+      "share_message": "⚠ क्या आपके भी बाल तेजी से झड़ रहे हैं और स्कैल्प दिखने लगा है? ⚠\n\n🛑 इन 4 गंभीर लक्षणों को समय रहते पहचानें:\n\n❌ कंघी या तकिए पर 100+ बालों का गुच्छों में टूटना\n\n❌ सिर की मांग चौड़ी होना और बालों का तेजी से पतला होना\n\n❌ जिद्दी सफेद डैंड्रफ, फंगल इन्फेक्शन और सिर में लगातार खुजली\n\n❌ माथे के दोनों कोनों (Receding Hairline) से बालों का पीछे जाना\n\n💡 केमिकल वाले शैम्पू केवल झाग बनाते हैं, असली समाधान है स्कैल्प को पोषण और DHT ब्लॉक करना!\n\n🌿 अपनाएं भृंगराज, आंवला, शिकाकाई व सेसबानिया बायोटिन का 100% प्राकृतिक व वैज्ञानिक फॉर्मूला।\n\n👇 पूरी जानकारी, डाइट चार्ट व समाधान के लिए तुरंत लिंक खोलें:",
       "floating_banner": {
         "enabled": false,
         "image": "",
@@ -2800,7 +2800,17 @@
           "cta_link": "https://wa.me/917974422572"
         },
         {
-          "image": "/images/banners/health-hair-care.jpg",
+          "image": "/images/banners/hero_slide-hair-22-751981-8mbb.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-hair-33-810999-fkca.webp",
           "tag": "🌾 नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
           "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
@@ -2822,47 +2832,63 @@
       "kpi_cards": [],
       "marketing_cards": [],
       "videos": [],
+      "reviews_heading": "",
+      "reviews_badge": "",
       "reviews": [],
+      "faqs_heading": "",
+      "faqs_badge": "",
       "faqs": [],
       "health_diseases": [],
       "crops": [],
       "pashu_cards": [],
       "products": [
         {
-          "id": "HC001",
-          "name": "Kesh-Sanjivani Hair Oil (100ml)",
-          "price": 450,
+          "title": "Scalp Renaissance Hair Nutriment",
+          "name": "Scalp Renaissance Hair Nutriment",
+          "description": "भृंगराज, ब्राह्मी, आंवला और तिल का तेल। नए बाल उगाने और बालों का झड़ना 15 दिन में रोकने में असरदार।",
+          "image": "/images/products/product-----------------he-371545-w7a1.webp",
           "mrp": 450,
-          "badge": "रूट न्यूट्रिशन ऑयल",
-          "description": "भृंगराज, ब्राह्मी, आंवला, शिकाकाई व प्याज अर्क। जड़ों को मजबूत कर 15 दिन में बाल झड़ना रोकता है।",
-          "image": "/images/logo/logo.png"
+          "price": 450,
+          "discount_pct": 23,
+          "dose": "सप्ताह में 2-3 बार बालों की जड़ों में हल्के हाथों से 10 मिनट मालिश करें।",
+          "badge": "💆 बाल झड़ना बंद व घने बाल",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "HC002",
-          "name": "Neem Anti-Dandruff Shampoo",
-          "price": 350,
-          "mrp": 350,
-          "badge": "एंटी-डैंड्रफ",
-          "description": "सल्फेट-फ्री हर्बल फॉर्मूला। नीम व टी-ट्री ऑयल स्कैल्प के फंगस को पहली वॉश में ही नष्ट कर देता है।",
-          "image": "/images/logo/logo.png"
+          "title": "Scalp Renaissance Anti Dandruff Shampoo 200 MLT",
+          "name": "Scalp Renaissance Anti Dandruff Shampoo 200 MLT",
+          "description": "अदरक का अर्क और टी-ट्री ऑयल से पहली वॉश से ही रूसी का खात्मा और स्कैल्प को ठंडक।",
+          "image": "/images/products/product-scalp-renaissance--603882-ulwy.webp",
+          "mrp": 560,
+          "price": 560,
+          "discount_pct": 25,
+          "dose": "गीले बालों में लगाकर झाग बनाएं, 2 मिनट रहने दें और फिर पानी से धो लें।",
+          "badge": "❄️ रूसी व सिर की खुजली मुक्त",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "HC003",
-          "name": "Hair-Vital Biotin Cap (60 Cap)",
-          "price": 750,
-          "mrp": 750,
-          "badge": "बायोटिन + DHT ब्लॉकर",
-          "description": "प्राकृतिक सेसबानिया बायोटिन व ग्रीन टी अर्क। नए बाल उगाने और पतले बालों को मोटा करने में सक्षम।",
-          "image": "/images/logo/logo.png"
+          "title": "Scalp Renaissance Anti Hair Fall Shampoo 200 MLT",
+          "name": "Scalp Renaissance Anti Hair Fall Shampoo 200 MLT",
+          "description": "सिल्क प्रोटीन व जोजोबा ऑयल से सूखे व बेजान बालों को गहरा पोषण और चमकदार रेशमी अहसास।",
+          "image": "/images/products/product-scalp-renaissance--685423-o4zj.webp",
+          "mrp": 499,
+          "price": 499,
+          "discount_pct": 25,
+          "dose": "शैम्पू के बाद बालों की लंबाई पर लगाएं (जड़ों को छोड़कर), 2-3 मिनट बाद धो लें।",
+          "badge": "💇 रेशमी, चमकदार व सुलझे बाल",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "हेयर फॉल: कारण, लक्षण व गंभीर खतरे",
+        "subtitle": "",
         "cards": [
           {
+            "id": "CB_1790790955670_sl07",
             "title": "❓ बाल क्यों झड़ते हैं? (Causes)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
             "points": [
@@ -2870,10 +2896,15 @@
               "<strong>स्कैल्प का रूखापन व डैंड्रफ:</strong> फंगल इन्फेक्शन से जड़ों की पकड़ कमजोर होना।",
               "<strong>बायोटिन व आयरन की कमी:</strong> बालों को पर्याप्त ऑक्सीजन व पोषण न मिलना।",
               "<strong>केमिकल युक्त शैम्पू व तनाव:</strong> सल्फेट व पैराबेन से बालों का पतला होना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790790955670_94jm",
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
             "points": [
@@ -2881,20 +2912,29 @@
               "सिर की मांग चौड़ी होना और बालों का पतला व बेजान दिखना।",
               "स्कैल्प पर लगातार खुजली व सफेद पपड़ीदार डैंड्रफ का दिखना।",
               "माथे के दोनों कोनों (Receding Hairline) से बालों का पीछे खिसकना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790790955670_0hnj",
             "title": "🚨 खतरे व अनदेखी के परिणाम (Risks)",
+            "badge": "",
             "color": "#dc2626",
             "image": "",
             "points": [
               "<strong>स्थायी गंजापन (Male/Female Baldness):</strong> जड़ें खत्म होने पर बाल दोबारा न उगना।",
               "<strong>कम उम्र में बुढ़ापा:</strong> बालों के समय से पहले सफेद होने से आत्मविश्वास गिरना।",
               "<strong>केमिकल साइड इफेक्ट्स:</strong> हेयर डाई से एलर्जी व आंखों पर दुष्प्रभाव।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           }
         ]
       },
+      "admin_edited": 1790790955674,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
