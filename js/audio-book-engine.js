@@ -235,7 +235,7 @@ class ProAudioBookEngine {
     handleTrackEnded() {
         const ua = navigator.userAgent || navigator.vendor || window.opera || '';
         const isFbOrInApp = /FBAN|FBAV|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
-        const totalPages = window.aoiTotalPages || 152;
+        const totalPages = window.aoiTotalPages || (window.aoiPageImagesList ? window.aoiPageImagesList.length : 152);
         const curPage = window.aoiPageNum || 1;
 
         // In Facebook / In-App browser: Strictly turn off auto-advance so pages never skip without audio
@@ -249,12 +249,15 @@ class ProAudioBookEngine {
         // As soon as audio finishes, advance to the next page and continue playing!
         if (this.autoNextPage && curPage < totalPages) {
             this.updateStatusDisplay(`⏭️ पृष्ठ ${curPage} समाप्त • अगले पृष्ठ पर जा रहे हैं...`);
-            setTimeout(() => {
+            const autoTimer = setTimeout(() => {
                 if (!this.isPlaying) return;
                 if (typeof window.onNextPage === 'function') {
                     window.onNextPage();
                 }
             }, 600);
+            if (Array.isArray(this.activeTimers)) {
+                this.activeTimers.push(autoTimer);
+            }
         } else {
             this.setPlayingState(false);
             this.updateStatusDisplay(`✅ पुस्तक वाचन समाप्त हुआ`);
@@ -504,32 +507,28 @@ class ProAudioBookEngine {
         } catch (e) {}
 
         const targetMain = (window.aoiCurrentBookData?.targetMainBook || bookId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || '').toUpperCase().trim();
+        this.mainBookScripts = {};
         if (targetMain && targetMain !== bookId) {
-            // Strict isolation: only fall back to target main book if demo has NO dedicated server audio scripts
-            if (Object.keys(serverScripts).length === 0) {
-                try {
-                    let resMain = await fetch(`../data/audio-scripts/${targetMain}.json?v=${cacheVer}`);
-                    if (!resMain.ok) resMain = await fetch(`/data/audio-scripts/${targetMain}.json?v=${cacheVer}`);
-                    if (resMain.ok) {
-                        const dataMain = await resMain.json();
+            try {
+                let resMain = await fetch(`../data/audio-scripts/${targetMain}.json?v=${cacheVer}`);
+                if (!resMain.ok) resMain = await fetch(`/data/audio-scripts/${targetMain}.json?v=${cacheVer}`);
+                if (resMain.ok) {
+                    const dataMain = await resMain.json();
+                    this.mainBookScripts = dataMain.pages || {};
+                    if (Object.keys(serverScripts).length === 0) {
                         serverMeta = { ...dataMain, ...serverMeta };
-                        serverScripts = { ...(dataMain.pages || {}), ...serverScripts };
                     }
-                } catch(e) {}
-            }
-            // Strict isolation: only fall back to target main book local storage if demo has no local storage of its own
-            if (Object.keys(localScripts).length === 0 && Object.keys(serverScripts).length === 0) {
-                try {
-                    const fallbackData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${targetMain}`);
-                    if (fallbackData) {
-                        const parsed = JSON.parse(fallbackData);
-                        if (parsed && parsed.pages) {
-                            localScripts = { ...parsed.pages };
-                        }
-                        serverMeta = { ...parsed, ...serverMeta };
+                }
+            } catch(e) {}
+            try {
+                const fallbackData = localStorage.getItem(`AOI_AUDIO_SCRIPTS_${targetMain}`);
+                if (fallbackData) {
+                    const parsed = JSON.parse(fallbackData);
+                    if (parsed && parsed.pages) {
+                        this.mainBookScripts = { ...this.mainBookScripts, ...parsed.pages };
                     }
-                } catch(e) {}
-            }
+                }
+            } catch(e) {}
         }
 
         this.metadata = serverMeta;
@@ -567,7 +566,10 @@ class ProAudioBookEngine {
         this.setPlayingState(true);
 
         const pageKey = String(effectivePage);
-        const pageEntry = this.pageScripts[pageKey] || this.pageScripts[String(currentPage)];
+        const curKey = String(currentPage);
+        const pageEntry = this.pageScripts[pageKey] || 
+                          this.pageScripts[curKey] || 
+                          (this.mainBookScripts ? (this.mainBookScripts[pageKey] || this.mainBookScripts[curKey]) : null);
 
         // 2. Direct page text or recorded audio playback
         let pageText = '';
@@ -604,14 +606,14 @@ class ProAudioBookEngine {
         // Case B: Text Script exists -> Plays Crisp Natural Female TTS with Chunking
         if (pageText && pageText.trim().length > 0) {
             this.updateStatusDisplay(`📖 पृष्ठ ${currentPage} सुनाया जा रहा है`);
-            this.speakText(pageText, currentPage);
+            this.speakText(pageText, currentPage, false, true);
             return;
         }
 
-        // Case C: Unrecorded Page -> Exact polite Hindi voice notice + Auto Next
+        // Case C: Unrecorded Page -> Polite notice, but DO NOT auto-advance without user's Next click
         const politeNotice = `इस पेज का ऑडियो मैं नहीं पढ़ पा रही हूँ, जल्द ही इसमें ऑडियो आ जाएगा`;
         this.updateStatusDisplay(`⏳ पृष्ठ ${currentPage}: ऑडियो जल्द उपलब्ध होगा...`);
-        this.speakText(politeNotice, currentPage);
+        this.speakText(politeNotice, currentPage, false, false);
     }
 
     splitTextIntoChunks(text) {
@@ -634,7 +636,7 @@ class ProAudioBookEngine {
         return res.length ? res : [clean];
     }
 
-    speakText(text, currentPage, isWelcome = false) {
+    speakText(text, currentPage, isWelcome = false, allowAutoAdvance = true) {
         this.loadVoices();
 
         const chunks = this.splitTextIntoChunks(text);
@@ -657,7 +659,12 @@ class ProAudioBookEngine {
 
         const onAllChunksFinished = () => {
             if (!this.isPlaying || this.activeEpoch !== currentEpoch) return;
-            this.handleTrackEnded();
+            if (allowAutoAdvance) {
+                this.handleTrackEnded();
+            } else {
+                this.setPlayingState(false);
+                this.updateStatusDisplay(`📖 पृष्ठ ${currentPage} समाप्त`);
+            }
         };
 
         const playNextChunk = () => {
@@ -716,14 +723,27 @@ class ProAudioBookEngine {
                     };
 
                     ut.onerror = (e) => {
-                        if (e && e.error !== 'canceled' && e.error !== 'interrupted') {
-                            console.warn("Speech error in restricted browser:", e);
-                            this.handleBrowserTtsRestriction();
+                        // Crucial fix: do NOT advance on cancel/interrupt to prevent runaway loops!
+                        if (e && (e.error === 'canceled' || e.error === 'interrupted')) {
                             return;
                         }
-                        advance();
+                        console.warn("Speech error in restricted browser:", e);
+                        this.handleBrowserTtsRestriction();
                     };
 
+                    // Dynamic Watchdog to prevent Chromium speech freeze:
+                    const watchdogMs = Math.min(15000, Math.max(3500, currentChunk.length * 160));
+                    const wTimer = setTimeout(() => {
+                        if (!hasAdvanced && this.isPlaying && this.activeEpoch === currentEpoch) {
+                            advance();
+                        }
+                    }, watchdogMs);
+                    if (Array.isArray(this.activeTimers)) {
+                        this.activeTimers.push(wTimer);
+                    }
+
+                    // Keep strong reference so utterance is not garbage collected
+                    this.currentUtterance = ut;
                     chunkStartTime = Date.now();
                     this.synth.speak(ut);
                 } catch(err) {
@@ -929,9 +949,7 @@ class ProAudioBookEngine {
                     <div class="ab-wave" id="abWaveVisualizer">
                         <span></span><span></span><span></span><span></span>
                     </div>
-                    <button class="ab-ctrl-btn" id="abPrevBtn" title="पिछला पृष्ठ">⏮️</button>
-                    <button class="ab-main-play-btn" id="abPlayBtn" title="सुनें">▶️</button>
-                    <button class="ab-ctrl-btn" id="abNextBtn" title="अगला पृष्ठ">⏭️</button>
+                    <button class="ab-main-play-btn" id="abPlayBtn" title="सुनें / रोकें">▶️</button>
                 </div>
 
                 <!-- Right Controls: Volume, Speed, BGM, Close -->
@@ -996,18 +1014,6 @@ class ProAudioBookEngine {
                 return;
             }
             this.togglePlay();
-        });
-        
-        document.getElementById('abPrevBtn').addEventListener('click', () => {
-            if (typeof window.onPrevPage === 'function') {
-                window.onPrevPage();
-            }
-        });
-        
-        document.getElementById('abNextBtn').addEventListener('click', () => {
-            if (typeof window.onNextPage === 'function') {
-                window.onNextPage();
-            }
         });
 
         document.getElementById('abSpeedSelect').addEventListener('change', (e) => {

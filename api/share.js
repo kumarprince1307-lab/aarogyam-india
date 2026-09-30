@@ -21,13 +21,7 @@ function getBookLandingPageData(bId) {
       const list = json.bookLandingPages || [];
       const found = list.find(p => (p.id && p.id.toUpperCase() === cleanId) || (p.slug && p.slug.toLowerCase() === cleanSlug));
       if (found) {
-        if (cleanId === 'BK001' || cleanSlug === 'kharif-2026') {
-          found.og_image = '/images/books/kgarid-fasal-og.webp';
-        } else if (cleanId === 'BK002' || cleanSlug === 'kheti-dr') {
-          found.og_image = '/images/books/kheti-dr-og.webp';
-        } else {
-          found.og_image = found.og_image_landscape || found.og_image || found.hero?.og_image || found.hero?.banner_image || found.hero?.cover_image || '/images/books/kharif-master-guide-2026-cover.webp';
-        }
+        found.og_image = found.og_image_landscape || found.og_image || found.hero?.og_image || found.hero?.banner_image || found.hero?.cover_image || '/images/books/kharif-master-guide-2026-cover.webp';
         return found;
       }
     }
@@ -42,10 +36,9 @@ function getBookLandingPageData(bId) {
       const found = list.find(p => (p.id && p.id.toUpperCase() === cleanId) || (p.slug && p.slug.toLowerCase() === cleanSlug));
       if (found) {
         let ogImg = found.og_image_landscape || found.og_image || found.banner || found.cover || found.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
-        if (found.id === 'BK001' || cleanSlug === 'kharif-2026') ogImg = '/images/books/kgarid-fasal-og.webp';
-        else if (found.id === 'BK002' || cleanSlug === 'kheti-dr') ogImg = '/images/books/kheti-dr-og.webp';
         return {
           id: found.id,
+          landingPage: found.landingPage,
           og_title: found.heading || found.name,
           og_description: found.description || `${found.heading || found.name} - सम्पूर्ण वैज्ञानिक एवं Practical गाइड।`,
           og_image: ogImg,
@@ -363,8 +356,9 @@ module.exports = async function handler(req, res) {
     const finalOgImage = rawImg.startsWith('http') ? rawImg : `${HOST_ORIGIN}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`;
     
     let destUrl = `${HOST_ORIGIN}/ebooks/book-landing.html?id=${encodeURIComponent(bookData.id || lpId)}`;
-    if (bookData.id === 'BK001') destUrl = `${HOST_ORIGIN}/ebooks/kharif-master-guide-2026.html`;
-    else if (bookData.id === 'BK002') destUrl = `${HOST_ORIGIN}/ebooks/kheti-dr.html`;
+    if (bookData.landingPage) {
+      destUrl = bookData.landingPage.startsWith('http') ? bookData.landingPage : `${HOST_ORIGIN}${bookData.landingPage.startsWith('/') ? '' : '/'}${bookData.landingPage}`;
+    }
     
     const canonicalShareUrl = `${HOST_ORIGIN}/api/share?id=${encodeURIComponent(bookData.id || lpId)}`;
 

@@ -227,15 +227,27 @@
     }, 400);
   }
 
+  let sessionToastCount = 0;
+  const MAX_SESSION_TOASTS = 2;
+
   function startPurchaseToastStream() {
+    // Non-intrusive timing: first toast at 18s, subsequent at 55s, max 2 per session
     setTimeout(() => {
+      if (sessionToastCount >= MAX_SESSION_TOASTS) return;
+      sessionToastCount++;
       showNextPurchaseToast();
+
       if (toastTimer) clearInterval(toastTimer);
-      const intervalMs = Math.max(5000, (toastIntervalSeconds || 15) * 1000);
+      const intervalMs = Math.max(35000, (toastIntervalSeconds && toastIntervalSeconds > 15 ? toastIntervalSeconds : 55) * 1000);
       toastTimer = setInterval(() => {
+        if (sessionToastCount >= MAX_SESSION_TOASTS) {
+          clearInterval(toastTimer);
+          return;
+        }
+        sessionToastCount++;
         showNextPurchaseToast();
       }, intervalMs);
-    }, 1800);
+    }, 18000);
   }
 
   /* ====================================================================

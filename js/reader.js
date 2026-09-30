@@ -591,8 +591,13 @@ let aoiPageImagesList = null;
 function initImageModeReader(images) {
     aoiPageImagesList = images;
     aoiTotalPages = images.length;
+    window.aoiPageImagesList = aoiPageImagesList;
     window.aoiTotalPages = aoiTotalPages;
     window.aoiCurrentBookData = aoiCurrentBookData;
+
+    if (!window.aoiSourcePageMap || window.aoiSourcePageMap.length !== aoiTotalPages) {
+        window.aoiSourcePageMap = images.map((_, i) => i + 1);
+    }
 
     if (pageSlider) pageSlider.max = aoiTotalPages;
 
@@ -690,7 +695,9 @@ function renderPage(num) {
     const pageImgEl = document.getElementById('pageImage');
 
     // Case 1: Fast HD WebP Image Mode
-    if (aoiPageImagesList && aoiPageImagesList.length >= num) {
+    if (aoiPageImagesList && aoiPageImagesList.length > 0) {
+        aoiPageRendering = false;
+        num = Math.max(1, Math.min(aoiPageImagesList.length, parseInt(num) || 1));
         if (aoiCanvas) aoiCanvas.style.display = 'none';
         if (pageImgEl) {
             pageImgEl.style.display = 'block';
@@ -699,6 +706,11 @@ function renderPage(num) {
                 const bookVer = aoiCurrentBookData?.version || aoiCurrentBookData?.updated_at || '2026';
                 imgSrc += (imgSrc.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(bookVer);
             }
+            pageImgEl.onerror = () => {
+                if (imgSrc && imgSrc.includes('?v=')) {
+                    pageImgEl.src = imgSrc.split('?')[0];
+                }
+            };
             pageImgEl.src = imgSrc;
             
             const container = document.getElementById('canvasContainer');
@@ -713,11 +725,11 @@ function renderPage(num) {
             pageImgEl.style.transition = 'transform 0.15s ease';
 
             // Instant Background Preload next/prev pages
-            if (num < aoiTotalPages) {
+            if (num < aoiTotalPages && aoiPageImagesList[num]) {
                 const preloadNext = new Image();
                 preloadNext.src = aoiPageImagesList[num];
             }
-            if (num > 1) {
+            if (num > 1 && aoiPageImagesList[num - 2]) {
                 const preloadPrev = new Image();
                 preloadPrev.src = aoiPageImagesList[num - 2];
             }
@@ -780,7 +792,21 @@ function renderPage(num) {
                 renderPage(aoiPageNumPending);
                 aoiPageNumPending = null;
             }
+        }).catch(err => {
+            console.warn("Render task error/cancelled:", err);
+            aoiPageRendering = false;
+            if (aoiPageNumPending !== null) {
+                renderPage(aoiPageNumPending);
+                aoiPageNumPending = null;
+            }
         });
+    }).catch(err => {
+        console.warn("PDF getPage error:", err);
+        aoiPageRendering = false;
+        if (aoiPageNumPending !== null) {
+            renderPage(aoiPageNumPending);
+            aoiPageNumPending = null;
+        }
     });
 
     updateUIControls(num);
@@ -788,7 +814,10 @@ function renderPage(num) {
 }
 
 function queueRenderPage(num) {
-    if (aoiPageRendering) {
+    if (aoiPageImagesList && aoiPageImagesList.length > 0) {
+        aoiPageRendering = false;
+        renderPage(num);
+    } else if (aoiPageRendering) {
         aoiPageNumPending = num;
     } else {
         renderPage(num);

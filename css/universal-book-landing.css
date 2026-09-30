@@ -892,12 +892,16 @@ ul {
   right: 0;
   background: #ffffff;
   border-top: 1.5px solid #CBD5E1;
-  padding: 10px 14px;
+  padding-top: 10px;
+  padding-left: max(14px, env(safe-area-inset-left, 14px));
+  padding-right: max(14px, env(safe-area-inset-right, 14px));
+  padding-bottom: max(14px, calc(10px + env(safe-area-inset-bottom, 0px)));
   z-index: 9999;
   box-shadow: 0 -4px 15px rgba(0,0,0,0.12);
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  box-sizing: border-box;
 }
 
 .ubl-sticky-book-info {
@@ -1030,6 +1034,6 @@ ul {
   }
   
   body {
-    padding-bottom: 70px;
+    padding-bottom: max(85px, calc(75px + env(safe-area-inset-bottom, 0px)));
   }
 }

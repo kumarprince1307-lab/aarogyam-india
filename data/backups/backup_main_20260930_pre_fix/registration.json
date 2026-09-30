@@ -1,0 +1,58 @@
+{
+  "module": {
+    "name": "Free Registration",
+    "version": "1.0",
+    "status": "active"
+  },
+
+  "redirect": {
+    "afterRegistration": "index.html",
+    "afterLogin": "index.html",
+    "alreadyRegistered": "index.html"
+  },
+
+  "validation": {
+    "mobileLength": 10,
+    "minimumNameLength": 3,
+    "emailOptional": true,
+    "stateOptional": true,
+    "districtOptional": true,
+    "referralOptional": true,
+    "acceptTermsRequired": true
+  },
+
+  "registration": {
+    "allowDuplicateMobile": false,
+    "autoLogin": true,
+    "autoRestoreSession": true
+  },
+
+  "referral": {
+    "enabled": true,
+    "queryParameter": "ref",
+    "autoFill": true,
+    "readOnlyWhenLink": true
+  },
+
+  "language": {
+    "googleTranslate": true,
+    "rememberLanguage": true,
+    "defaultLanguage": "en"
+  },
+
+  "session": {
+    "storage": "localStorage",
+    "profileKey": "ai_current_profile",
+    "loginKey": "ai_logged_in"
+  },
+
+  "futureModules": {
+    "demo": true,
+    "checkout": true,
+    "wallet": true,
+    "myLibrary": true,
+    "membership": true,
+    "notifications": false,
+    "activityLog": false
+  }
+}

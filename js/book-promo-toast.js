@@ -239,12 +239,35 @@
     } catch (e) {}
   }
 
+  function getAllPromoBooks() {
+    let list = [...ALL_PROMO_BOOKS];
+    try {
+      const globalBooks = window.AAROGYAM_BOOKS_DATA || window.AAROGYAM_ALL_BOOKS || [];
+      if (Array.isArray(globalBooks) && globalBooks.length > 0) {
+        globalBooks.forEach(b => {
+          if (!b || !b.id || b.id.startsWith('DEMO-') || b.book_type === 'demo' || list.some(x => x.id === b.id)) return;
+          list.push({
+            id: b.id,
+            alias: b.slug || b.id.toLowerCase(),
+            title: b.heading || b.name || b.id,
+            desc: b.description || 'सम्पूर्ण वैज्ञानिक एवं Practical गाइड।',
+            oldPrice: `₹${b.mrp || 299}`,
+            offerPrice: `₹${b.offerPrice || 99}`,
+            link: `/ebooks/checkout.html?product=${encodeURIComponent(b.slug || b.id)}&id=${encodeURIComponent(b.id)}&amount=${b.offerPrice || 99}&title=${encodeURIComponent(b.name || b.heading || b.id)}`
+          });
+        });
+      }
+    } catch (e) {}
+    return list;
+  }
+
   function showPromoToast() {
     if (isUserActiveSubscriber()) return; // VIP Subscribers don't need promos
 
     const purchasedIds = getUserPurchasedBookIds();
-    // Filter strictly to unpurchased books
-    const availableBooks = ALL_PROMO_BOOKS.filter(b => !purchasedIds.has(b.id));
+    // Dynamically filter all catalog books strictly to unpurchased books
+    const allBooksList = getAllPromoBooks();
+    const availableBooks = allBooksList.filter(b => !purchasedIds.has(b.id));
 
     if (availableBooks.length === 0) return; // User bought all featured books!
 
@@ -380,12 +403,12 @@
     const path = window.location.pathname.toLowerCase();
     if (path.includes('admin') || path.includes('checkout') || path.includes('payment') || path.includes('share')) return;
 
-    // Show promo toast strictly once 10 seconds after page load for non-subscribers
+    // Show promo toast strictly once 24 seconds after page load for non-subscribers
     setTimeout(() => {
       if (!isUserActiveSubscriber()) {
         showPromoToast();
       }
-    }, 10000);
+    }, 24000);
   });
 
 })();

@@ -37,11 +37,35 @@ export async function initBookLandingPages() {
   }
 
   async function syncAssetToGitHub(path, base64Data) {
-    const apiUrl = getAutoSyncApiUrl();
     const cleanPath = String(path || '').replace(/^\/+/, '');
     const cleanBase64 = String(base64Data || '').replace(/^data:[^;]+;base64,/, '');
     
     if (!cleanPath || !cleanBase64) return { success: false, error: 'Path and Base64 required' };
+
+    // 1. If on 127.0.0.1 or localhost, first save directly to local disk via local-sync-server (port 5505)
+    if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+      try {
+        const localRes = await fetch('http://127.0.0.1:5505', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: cleanPath.endsWith('.json') ? 'save_config' : 'upload_asset',
+            path: cleanPath,
+            base64: cleanBase64,
+            auto_push: false
+          })
+        });
+        const localData = await localRes.json().catch(() => ({}));
+        if (localRes.ok && localData.success) {
+          console.log('[Book Landing LocalSync] Saved asset to disk:', cleanPath);
+          return { success: true, localDisk: true, data: localData };
+        }
+      } catch (e) {
+        console.warn('[Book Landing LocalSync] Port 5505 fallback to API:', e);
+      }
+    }
+
+    const apiUrl = getAutoSyncApiUrl();
 
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
@@ -7239,7 +7263,7 @@ Instant Download & Lifetime Access
     // 8. Demo Preview Gallery & Demo Reader Allowed Pages
     const demoImgs = page.demo_images || page.demoImages || page.preview_images;
     if (demoImgs && Array.isArray(demoImgs) && demoImgs.length > 0) {
-      currentDemoImages = JSON.parse(JSON.stringify(demoImgs));
+      currentDemoImages = Array.from(new Set(demoImgs.filter(Boolean)));
     }
     setVal('blp_demo_reader_pages', page.demo_reader_pages || page.demoPages || (curBookType === 'demo' ? '1, 2, 3, 4, 5' : ''));
     if (typeof renderDemoImagesInBuilder === 'function') renderDemoImagesInBuilder();
@@ -8174,18 +8198,19 @@ Instant Download & Lifetime Access
       uploadedFiles.push({ path: `uploads/books/${bId}_free.pdf`, base64: b64 });
     }
 
-    // 6. Demo Images
-    const cleanedDemoImages = [];
+    // 6. Demo Images (Strict Deduplication - No duplicate URLs)
+    const rawDemoList = [];
     for (let i = 0; i < currentDemoImages.length; i++) {
       const dImg = currentDemoImages[i];
       if (typeof dImg === 'string' && dImg.startsWith('data:image/')) {
         const dPath = `images/books/${bId.toLowerCase()}-preview-${i + 1}.webp`;
         uploadedFiles.push({ path: dPath, base64: dImg });
-        cleanedDemoImages.push(`/${dPath}`);
-      } else if (dImg) {
-        cleanedDemoImages.push(dImg);
+        rawDemoList.push(`/${dPath}`);
+      } else if (typeof dImg === 'string' && dImg.trim()) {
+        rawDemoList.push(dImg.trim());
       }
     }
+    const cleanedDemoImages = Array.from(new Set(rawDemoList));
 
     // 7. OG Social Image
     let finalOgImg = (document.getElementById('blp_og_image')?.value || '').trim();
@@ -8465,39 +8490,74 @@ Instant Download & Lifetime Access
         }
       }
 
-      // Step 2: Publish landing page JSON and books.json catalog to Git
+      // Step 2: Unified Triple-Sync: 1) Local 5505 Disk Sync, 2) PHP Server Sync, 3) Auto-Sync API
       if (saveButtonEl) {
-        saveButtonEl.innerHTML = `⏳ Git पर JSON कैटलॉग अपडेट हो रहा है...`;
+        saveButtonEl.innerHTML = `⏳ JSON कैटलॉग व डिस्क पर सुरक्षित हो रहा है...`;
       }
 
-      const syncRes = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save',
-          pageData,
-          bookData: newBookObj,
-          uploadedFiles: []
-        })
-      });
-
-      const syncData = await syncRes.json().catch(() => ({}));
-      if (syncRes.ok && syncData.success) {
-        syncSuccess = true;
-      } else {
-        syncErrorMsg = syncData.error || `HTTP ${syncRes.status}`;
+      // 2A. Direct Local Disk Save (Port 5505) if on localhost
+      if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+        try {
+          const localSyncRes = await fetch('http://127.0.0.1:5505', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'save',
+              pageData,
+              bookData: newBookObj,
+              auto_push: false // Respect user instruction: test first, no git push yet
+            })
+          });
+          const localSyncData = await localSyncRes.json().catch(() => ({}));
+          if (localSyncRes.ok && localSyncData.success) {
+            syncSuccess = true;
+            console.log('[Book Landing LocalSync] Saved book and landing page directly to disk:', bId);
+          }
+        } catch (localErr) {
+          console.warn('[Book Landing LocalSync] Local 5505 server fallback:', localErr);
+        }
       }
 
-      // Step 3: Also update PHP file if running on PHP server
-      fetch('/api/save_book_landing.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pageData,
-          bookData: newBookObj,
-          uploadedFiles: []
-        })
-      }).catch(() => null);
+      // 2B. Server PHP API (Atomic JSON Write with Safety Backup)
+      try {
+        const phpRes = await fetch('/api/save_book_landing.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pageData,
+            bookData: newBookObj,
+            uploadedFiles: []
+          })
+        });
+        const phpData = await phpRes.json().catch(() => ({}));
+        if (phpRes.ok && phpData.success) {
+          syncSuccess = true;
+          console.log('[Book Landing PHP Sync] Saved to server JSON:', bId);
+        }
+      } catch (phpErr) {
+        // Fallback silently if PHP server not present locally
+      }
+
+      // 2C. Remote / Auto-sync fallback (if local / php didn't handle it or in production)
+      if (!syncSuccess) {
+        const syncRes = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save',
+            pageData,
+            bookData: newBookObj,
+            uploadedFiles: []
+          })
+        });
+
+        const syncData = await syncRes.json().catch(() => ({}));
+        if (syncRes.ok && syncData.success) {
+          syncSuccess = true;
+        } else {
+          syncErrorMsg = syncData.error || `HTTP ${syncRes.status}`;
+        }
+      }
 
     } catch (netErr) {
       syncErrorMsg = netErr.message || 'Network sync error';

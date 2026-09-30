@@ -1,0 +1,1434 @@
+{
+  "books": [
+    {
+      "id": "BK001",
+      "slug": "kharif-2026",
+      "heading": "खरीफ फसल मास्टर गाइड 2026",
+      "shortTitle": "खरीफ मास्टर गाइड",
+      "name": "खरीफ फसल मास्टर गाइड 2026",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "author": "Aarogyam India",
+      "version": "1.0",
+      "status": "active",
+      "cover": "/images/books/kharif-master-guide-2026-cover.webp",
+      "thumbnail": "/images/books/kharif-master-guide-2026-cover.webp",
+      "banner": "/images/books/kgarid-fasal-og.webp",
+      "og_image": "/images/books/kgarid-fasal-og.webp",
+      "landingPage": "/ebooks/kharif-master-guide-2026.html",
+      "demoPage": "/demo/demo-kharif.html",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "mrp": 299,
+      "offerPrice": 99,
+      "currency": "INR",
+      "demoAvailable": true,
+      "readEnabled": true,
+      "downloadEnabled": true,
+      "downloadLimit": 3,
+      "mainPdf": "/pdf/full/BK001.pdf",
+      "demoPdf": "/pdf/sample/BK001-demo.pdf",
+      "fileSize": "24.8 MB",
+      "totalPages": 152,
+      "hasWebpPages": true,
+      "pageImagesPath": "images/books/BK001",
+      "accessType": "Lifetime",
+      "bonusBooks": [],
+      "demoImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "hasAudioBook": true,
+      "audioNarrationAvailable": true,
+      "audioFeatures": [
+        "AI Hindi Voice TTS",
+        "Admin Voice Studio Recording",
+        "Ambient BGM",
+        "Male/Female Switcher"
+      ],
+      "seo": {
+        "title": "खरीफ फसल मास्टर गाइड 2026",
+        "description": "खरीफ फसल मास्टर गाइड 2026 का डेमो देखें और सम्पूर्ण eBook खरीदें।",
+        "keywords": "खरीफ फसल, सोयाबीन, धान, मक्का, eBook, Aarogyam India",
+        "canonical": ""
+      },
+      "publish_targets": [
+        "download_funnel"
+      ],
+      "isComingSoon": false,
+      "is_coming_soon": false,
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "preview_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "demo_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ]
+    },
+    {
+      "id": "BK002",
+      "slug": "kheti-dr",
+      "heading": "खेती का डॉक्टर",
+      "shortTitle": "खेती का डॉक्टर",
+      "name": "खेती का डॉक्टर (फसल का डॉक्टर)",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "author": "Aarogyam India",
+      "version": "1.0",
+      "status": "active",
+      "cover": "/images/books/fasal-ka-doctor-cover.webp",
+      "thumbnail": "/images/books/fasal-ka-doctor-cover.webp",
+      "banner": "/images/books/kheti-dr-og.webp",
+      "og_image": "/images/books/kheti-dr-og.webp",
+      "landingPage": "/ebooks/kheti-dr.html",
+      "demoPage": "/ebooks/demo-kharif.html",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "download_funnel"
+      ],
+      "mrp": 299,
+      "offerPrice": 99,
+      "currency": "INR",
+      "demoAvailable": true,
+      "readEnabled": true,
+      "downloadEnabled": true,
+      "downloadLimit": 3,
+      "mainPdf": "/pdf/full/BK002.pdf",
+      "fileSize": "22.5 MB",
+      "totalPages": 118,
+      "hasWebpPages": true,
+      "pageImagesPath": "images/books/BK002",
+      "accessType": "Lifetime",
+      "bonusBooks": [],
+      "hasAudioBook": true,
+      "audioNarrationAvailable": true,
+      "audioFeatures": [
+        "AI Hindi Voice TTS",
+        "Admin Voice Studio Recording",
+        "Ambient BGM",
+        "Male/Female Switcher"
+      ],
+      "demoImages": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "seo": {
+        "title": "खेती का डॉक्टर",
+        "description": "किसान का Pocket Doctor 🌾 रोग 🦠 कीट 🐛 वायरल 🍄 फंगल और पोषक तत्वों की कमी की पहचान सीखें।",
+        "keywords": "खेती का डॉक्टर, Kheti Ka Doctor, फसल डॉक्टर, Aarogyam India",
+        "canonical": ""
+      },
+      "isComingSoon": false,
+      "is_coming_soon": false,
+      "preview_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "demo_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ]
+    },
+    {
+      "id": "SUB001",
+      "slug": "sub001",
+      "heading": "👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)",
+      "name": "👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 2999,
+      "offerPrice": 99,
+      "cover": "/images/banners/farmer-community-banner.jpeg",
+      "thumbnail": "/images/banners/farmer-community-banner.jpeg",
+      "banner": "/images/banners/sub001-hero-banner.webp",
+      "status": "active",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/banners/farmer-community-banner.jpeg",
+      "og_image_landscape": "/images/banners/farmer-community-banner.jpeg",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=SUB001",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "is_coming_soon": false
+    },
+    {
+      "id": "BK006",
+      "slug": "bk006",
+      "heading": "AI वेबसाइट निर्माण गाइड 2026",
+      "name": "AI वेबसाइट निर्माण गाइड 2026",
+      "category": "Digital AI",
+      "language": "Hindi",
+      "mrp": 1299,
+      "offerPrice": 199,
+      "cover": "/images/books/ai-website-guide-cover.webp",
+      "thumbnail": "/images/books/ai-website-guide-cover.webp",
+      "banner": "/images/banners/farmer-community-banner.jpeg",
+      "status": "active",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "download_funnel"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/banners/farmer-community-banner.jpeg",
+      "og_image_landscape": "/images/banners/farmer-community-banner.jpeg",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "features": [
+        "No Coding Required",
+        "Top 20+ AI Tools",
+        "Ready Templates",
+        "Free Prompt Library"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK006",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "is_coming_soon": false
+    },
+    {
+      "id": "BK003",
+      "slug": "bk003",
+      "heading": "अनाज भंडारण गाइड",
+      "name": "अनाज भंडारण गाइड",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/anaj-bhandaran-guide-cover.webp",
+      "thumbnail": "/images/books/anaj-bhandaran-guide-cover.webp",
+      "banner": "/images/banners/bk003-hero-banner.webp",
+      "status": "coming_soon",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
+      "isComingSoon": true,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/books/anaj-bhandaran-guide-cover.webp",
+      "og_image_landscape": "/images/books/anaj-bhandaran-guide-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK003",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "is_coming_soon": true
+    },
+    {
+      "id": "BK004",
+      "slug": "bk004",
+      "heading": "चावल प्रोसेसिंग गाइड",
+      "name": "चावल प्रोसेसिंग गाइड",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/chawal-processing-guide-cover.webp",
+      "thumbnail": "/images/books/chawal-processing-guide-cover.webp",
+      "banner": "/images/banners/bk004-hero-banner.webp",
+      "status": "coming_soon",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "download_funnel"
+      ],
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
+      "isComingSoon": true,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/books/chawal-processing-guide-cover.webp",
+      "og_image_landscape": "/images/books/chawal-processing-guide-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK004",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "is_coming_soon": true
+    },
+    {
+      "id": "BK005",
+      "slug": "bk005",
+      "heading": "धान मास्टर गाइड",
+      "name": "धान मास्टर गाइड",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/dhan-master-guide-cover.webp",
+      "thumbnail": "/images/books/dhan-master-guide-cover.webp",
+      "banner": "/images/banners/bk005-hero-banner.webp",
+      "status": "coming_soon",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
+      "isComingSoon": true,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/books/dhan-master-guide-cover.webp",
+      "og_image_landscape": "/images/books/dhan-master-guide-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK005",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "is_coming_soon": true
+    },
+    {
+      "id": "BK007",
+      "slug": "bk007",
+      "heading": "गेहूं मास्टर गाइड",
+      "name": "गेहूं मास्टर गाइड",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/gehu-master-guide-cover.webp",
+      "thumbnail": "/images/books/gehu-master-guide-cover.webp",
+      "banner": "/images/banners/bk007-hero-banner.webp",
+      "status": "coming_soon",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "download_funnel"
+      ],
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
+      "isComingSoon": true,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/books/gehu-master-guide-cover.webp",
+      "og_image_landscape": "/images/books/gehu-master-guide-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK007",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "is_coming_soon": true
+    },
+    {
+      "id": "BK008",
+      "slug": "jaivik-kheti-guide",
+      "heading": "जैविक खेती गाइड",
+      "name": "जैविक खेती गाइड (Coming Soon)",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "author": "Aarogyam India",
+      "version": "1.0",
+      "status": "coming_soon",
+      "cover": "/images/books/jaivik-kheti-guide-cover.webp",
+      "thumbnail": "/images/books/jaivik-kheti-guide-cover.webp",
+      "mrp": 299,
+      "offerPrice": 99,
+      "currency": "INR",
+      "demoAvailable": false,
+      "readEnabled": false,
+      "downloadEnabled": false,
+      "downloadLimit": 3,
+      "mainPdf": "",
+      "fileSize": "17.8 MB",
+      "accessType": "Lifetime",
+      "isComingSoon": true,
+      "is_coming_soon": true,
+      "badge": "coming_soon",
+      "store_badge": "coming_soon",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true
+    },
+    {
+      "id": "BK009",
+      "slug": "makka-master-guide",
+      "heading": "मक्का मास्टर गाइड",
+      "name": "मक्का मास्टर गाइड (Coming Soon)",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "author": "Aarogyam India",
+      "version": "1.0",
+      "status": "coming_soon",
+      "cover": "/images/books/makka-master-guide-cover.webp",
+      "thumbnail": "/images/books/makka-master-guide-cover.webp",
+      "mrp": 299,
+      "offerPrice": 99,
+      "currency": "INR",
+      "demoAvailable": false,
+      "readEnabled": false,
+      "downloadEnabled": false,
+      "downloadLimit": 3,
+      "mainPdf": "",
+      "fileSize": "16.5 MB",
+      "accessType": "Lifetime",
+      "isComingSoon": true,
+      "is_coming_soon": true,
+      "badge": "coming_soon",
+      "store_badge": "coming_soon",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true
+    },
+    {
+      "id": "BK010",
+      "slug": "bk010",
+      "heading": "फूल खेती गाइड",
+      "name": "फूल खेती गाइड",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/phool-kheti-guide-cover.webp",
+      "thumbnail": "/images/books/phool-kheti-guide-cover.webp",
+      "banner": "/images/banners/bk010-hero-banner.webp",
+      "status": "coming_soon",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "home_hero"
+      ],
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
+      "isComingSoon": true,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/books/phool-kheti-guide-cover.webp",
+      "og_image_landscape": "/images/books/phool-kheti-guide-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK010",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "is_coming_soon": true
+    },
+    {
+      "id": "BK011",
+      "slug": "bk011",
+      "heading": "पॉलीहाउस नेटहाउस गाइड",
+      "name": "पॉलीहाउस नेटहाउस गाइड",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/polyhouse-nethouse-guide-cover.webp",
+      "thumbnail": "/images/books/polyhouse-nethouse-guide-cover.webp",
+      "banner": "/images/banners/bk011-hero-banner.webp",
+      "status": "coming_soon",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
+      "isComingSoon": true,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/books/polyhouse-nethouse-guide-cover.webp",
+      "og_image_landscape": "/images/books/polyhouse-nethouse-guide-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK011",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "is_coming_soon": true
+    },
+    {
+      "id": "BK012",
+      "slug": "bk012",
+      "heading": "सब्जी खेती गाइड",
+      "name": "सब्जी खेती गाइड",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/sabji-kheti-guide-cover.webp",
+      "thumbnail": "/images/books/sabji-kheti-guide-cover.webp",
+      "banner": "/images/banners/bk012-hero-banner.webp",
+      "status": "coming_soon",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page"
+      ],
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
+      "isComingSoon": true,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/books/sabji-kheti-guide-cover.webp",
+      "og_image_landscape": "/images/books/sabji-kheti-guide-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK012",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "is_coming_soon": true
+    },
+    {
+      "id": "BK015",
+      "slug": "bk015",
+      "book_type": "paid",
+      "audience": "all",
+      "target_main_books": [],
+      "heading": "🌱 सब्जी खेती मास्टर  (PART 1)",
+      "name": "🌱 सब्जी खेती मास्टर  (PART 1)",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 1999,
+      "offerPrice": 149,
+      "cover": "/images/books/bk015-cover.webp",
+      "thumbnail": "/images/books/bk015-cover.webp",
+      "banner": "/images/banners/bk015-hero-banner.webp",
+      "status": "active",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "download_funnel"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "is_coming_soon": false,
+      "mainPdf": "/pdf/full/BK015.pdf",
+      "pdf_url": "/pdf/full/BK015.pdf",
+      "freePdf": "",
+      "demoPdf": "",
+      "demoImages": [],
+      "demo_images": [],
+      "preview_images": [],
+      "previewImages": [],
+      "demoAvailable": false,
+      "demo_reader_pages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
+      "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
+      "og_image": "/images/banners/bk015-hero-banner.webp",
+      "og_image_landscape": "/images/banners/bk015-hero-banner.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "tts",
+        "mp3_url": "",
+        "tts_text": "किसान भाई क्या आप भी चाहते हैं कि आपकी सब्जियों की खेती में मेहनत कम हो और पैदावार बेहतर हो लेकिन सही बीज सही खाद सिंचाई और कीट रोग प्रबंधन की जानकारी के लिए आपको अलग अलग जगह भटकना पड़ता है\nअब आपकी इस समस्या का समाधान है\nभारत में पहली बार पेश है Krishi Audio E-Book\nयह सिर्फ एक ई बुक नहीं बल्कि आपकी खेती का डिजिटल ज्ञान साथी है\nइसमें आपको टमाटर मिर्च शिमला मिर्च बैंगन भिंडी खीरा ककड़ी लौकी करेला तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती की पूरी जानकारी मिलेगी\nबीज चयन खेत की तैयारी बुवाई पौधों की दूरी खाद पोषण सिंचाई कीट रोग प्रबंधन कटाई और बाजार तक की जानकारी\nसब कुछ एक ही जगह\nआप इसे मोबाइल पर पढ़ भी सकते हैं और सुन भी सकते हैं\nअपनी भाषा में आसान और व्यावहारिक कृषि ज्ञान\nभारत में पहली बार पढ़िए भी सुनिए भी और सीखिए भी\nकिसान का ज्ञान करेगा मालामाल\nबेहतर खेती बेहतर भविष्य\nअभी अपनी Krishi Audio E-Book शुरू करें",
+        "story_text": "किसान भाई क्या आप भी चाहते हैं कि आपकी सब्जियों की खेती में मेहनत कम हो और पैदावार बेहतर हो लेकिन सही बीज सही खाद सिंचाई और कीट रोग प्रबंधन की जानकारी के लिए आपको अलग अलग जगह भटकना पड़ता है\nअब आपकी इस समस्या का समाधान है\nभारत में पहली बार पेश है Krishi Audio E-Book\nयह सिर्फ एक ई बुक नहीं बल्कि आपकी खेती का डिजिटल ज्ञान साथी है\nइसमें आपको टमाटर मिर्च शिमला मिर्च बैंगन भिंडी खीरा ककड़ी लौकी करेला तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती की पूरी जानकारी मिलेगी\nबीज चयन खेत की तैयारी बुवाई पौधों की दूरी खाद पोषण सिंचाई कीट रोग प्रबंधन कटाई और बाजार तक की जानकारी\nसब कुछ एक ही जगह\nआप इसे मोबाइल पर पढ़ भी सकते हैं और सुन भी सकते हैं\nअपनी भाषा में आसान और व्यावहारिक कृषि ज्ञान\nभारत में पहली बार पढ़िए भी सुनिए भी और सीखिए भी\nकिसान का ज्ञान करेगा मालामाल\nबेहतर खेती बेहतर भविष्य\nअभी अपनी Krishi Audio E-Book शुरू करें",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1999 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो",
+        "Spray Science",
+        "Free Bonus PDF"
+      ],
+      "totalPages": 154,
+      "author": "Dada Avnish Mishra",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK015",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-27T02:55:15.636Z",
+      "admin_edited": true
+    },
+    {
+      "id": "DEMO-BK015",
+      "slug": "demo-bk015",
+      "book_type": "demo",
+      "audience": "all",
+      "target_main_books": [
+        "BK015"
+      ],
+      "targetMainBook": "BK015",
+      "demo_reader_pages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
+      "demoPages": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23",
+      "heading": "🌱 सब्जी खेती मास्टर  (PART 1)",
+      "name": "🌱 सब्जी खेती मास्टर  (PART 1)",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 1999,
+      "offerPrice": 99,
+      "cover": "/images/books/bk015-cover.webp",
+      "thumbnail": "/images/books/bk015-cover.webp",
+      "banner": "/images/banners/bk015-hero-banner.webp",
+      "status": "active",
+      "publish_targets": [
+        "my_library"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "is_coming_soon": false,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/banners/bk015-hero-banner.webp",
+      "og_image_landscape": "/images/banners/bk015-hero-banner.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "tts",
+        "mp3_url": "",
+        "tts_text": "किसान भाई क्या आप भी चाहते हैं कि आपकी सब्जियों की खेती में मेहनत कम हो और पैदावार बेहतर हो लेकिन सही बीज सही खाद सिंचाई और कीट रोग प्रबंधन की जानकारी के लिए आपको अलग अलग जगह भटकना पड़ता है\nअब आपकी इस समस्या का समाधान है\nभारत में पहली बार पेश है Krishi Audio E-Book\nयह सिर्फ एक ई बुक नहीं बल्कि आपकी खेती का डिजिटल ज्ञान साथी है\nइसमें आपको टमाटर मिर्च शिमला मिर्च बैंगन भिंडी खीरा ककड़ी लौकी करेला तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती की पूरी जानकारी मिलेगी\nबीज चयन खेत की तैयारी बुवाई पौधों की दूरी खाद पोषण सिंचाई कीट रोग प्रबंधन कटाई और बाजार तक की जानकारी\nसब कुछ एक ही जगह\nआप इसे मोबाइल पर पढ़ भी सकते हैं और सुन भी सकते हैं\nअपनी भाषा में आसान और व्यावहारिक कृषि ज्ञान\nभारत में पहली बार पढ़िए भी सुनिए भी और सीखिए भी\nकिसान का ज्ञान करेगा मालामाल\nबेहतर खेती बेहतर भविष्य\nअभी अपनी Krishi Audio E-Book शुरू करें",
+        "story_text": "किसान भाई क्या आप भी चाहते हैं कि आपकी सब्जियों की खेती में मेहनत कम हो और पैदावार बेहतर हो लेकिन सही बीज सही खाद सिंचाई और कीट रोग प्रबंधन की जानकारी के लिए आपको अलग अलग जगह भटकना पड़ता है\nअब आपकी इस समस्या का समाधान है\nभारत में पहली बार पेश है Krishi Audio E-Book\nयह सिर्फ एक ई बुक नहीं बल्कि आपकी खेती का डिजिटल ज्ञान साथी है\nइसमें आपको टमाटर मिर्च शिमला मिर्च बैंगन भिंडी खीरा ककड़ी लौकी करेला तोरई और कद्दू जैसी ग्यारह प्रमुख सब्जियों की वैज्ञानिक खेती की पूरी जानकारी मिलेगी\nबीज चयन खेत की तैयारी बुवाई पौधों की दूरी खाद पोषण सिंचाई कीट रोग प्रबंधन कटाई और बाजार तक की जानकारी\nसब कुछ एक ही जगह\nआप इसे मोबाइल पर पढ़ भी सकते हैं और सुन भी सकते हैं\nअपनी भाषा में आसान और व्यावहारिक कृषि ज्ञान\nभारत में पहली बार पढ़िए भी सुनिए भी और सीखिए भी\nकिसान का ज्ञान करेगा मालामाल\nबेहतर खेती बेहतर भविष्य\nअभी अपनी Krishi Audio E-Book शुरू करें",
+        "highlights": [
+          {
+            "icon": "🌱",
+            "text": " फसल की सही शुरुआत  बीज से पौध तैयार करने तक — खेती की मजबूत नींव बनाएं।"
+          },
+          {
+            "icon": "🐛",
+            "text": " रोग और कीट की पहचान  फसल में परेशानी दिखे तो कारण समझें और सही प्रबंधन सीखें।"
+          },
+          {
+            "icon": "🌿 ",
+            "text": " पोषण का सही ज्ञान  खाद, उर्वरक और पौधों की जरूरतों को समझकर बेहतर फैसले लें।"
+          },
+          {
+            "icon": "💧",
+            "text": " पानी और मिट्टी की समझ  सिंचाई, मिट्टी और पानी की गुणवत्ता से जुड़ी जरूरी जानकारी।"
+          },
+          {
+            "icon": "🎧 ",
+            "text": "पढ़ें भी, सुनें भी  मोबाइल पर अपनी सुविधा के अनुसार ई-बुक पढ़ें या ऑडियो सुनें।"
+          },
+          {
+            "icon": "📈 ",
+            "text": "ज्ञान से बेहतर खेती  सही जानकारी के साथ खेती के फैसले बेहतर बनाएं और आगे बढ़ें।"
+          },
+          {
+            "icon": " 🔥 ",
+            "text": "ज्ञान ही असली पूंजी है!  आज का सही ज्ञान, कल की बेहतर खेती।  किसान का ज्ञान करेगा मालामाल — बेहतर खेती, बेहतर भविष्य!"
+          },
+          {
+            "icon": "🎧 ",
+            "text": "अभी पढ़ें और सुनना शुरू करें"
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1999 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk015-sec_audio-banner.webp"
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो",
+        "Spray Science",
+        "Free Bonus PDF",
+        "with Audio "
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=DEMO-BK015",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "demoImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "demo_images": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "preview_images": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk015-preview-1.webp",
+        "/images/books/bk015-preview-2.webp",
+        "/images/books/bk015-preview-3.webp",
+        "/images/books/bk015-preview-4.webp",
+        "/images/books/bk015-preview-5.webp",
+        "/images/books/bk015-preview-6.webp",
+        "/images/books/bk015-preview-7.webp",
+        "/images/books/bk015-preview-8.webp",
+        "/images/books/bk015-preview-9.webp",
+        "/images/books/bk015-preview-10.webp",
+        "/images/books/bk015-preview-11.webp",
+        "/images/books/bk015-preview-12.webp",
+        "/images/books/bk015-preview-13.webp",
+        "/images/books/bk015-preview-14.webp",
+        "/images/books/bk015-preview-15.webp",
+        "/images/books/bk015-preview-16.webp"
+      ],
+      "demoAvailable": true
+    },
+    {
+      "id": "DEMO-BK001",
+      "slug": "demo-bk001",
+      "book_type": "demo",
+      "audience": "all",
+      "target_main_books": [
+        "BK001"
+      ],
+      "heading": "खरीफ फसल मास्टर गाइड 2026",
+      "name": "खरीफ फसल मास्टर गाइड 2026",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/kharif-master-guide-2026-cover.webp",
+      "thumbnail": "/images/books/kharif-master-guide-2026-cover.webp",
+      "banner": "/images/books/kgarid-fasal-og.webp",
+      "status": "active",
+      "publish_targets": [
+        "my_library"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "is_coming_soon": false,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/books/kgarid-fasal-og.webp",
+      "og_image_landscape": "/images/books/kgarid-fasal-og.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "खरीफ फसल मास्टर गाइड 2026 का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "",
+        "bgm_enabled": true
+      },
+      "features": [
+        "150+ रंगीन पेज",
+        "300+ वास्तविक फोटो",
+        "Scientific Guide",
+        "Free Bonus PDF"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=DEMO-BK001",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "demo_reader_pages": "1, 2, 3, 5, 8, 12, 16",
+      "demoPages": "1, 2, 3, 5, 8, 12, 16",
+      "demoImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "preview_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "demo_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp",
+        "/images/books/kharif-master-guide-2026-preview-02.webp",
+        "/images/books/kharif-master-guide-2026-preview-03.webp",
+        "/images/books/kharif-master-guide-2026-preview-04.webp",
+        "/images/books/kharif-master-guide-2026-preview-05.webp"
+      ],
+      "targetMainBook": "BK001"
+    },
+    {
+      "id": "DEMO-BK002",
+      "slug": "demo-bk002",
+      "book_type": "demo",
+      "audience": "all",
+      "target_main_books": [
+        "BK002"
+      ],
+      "targetMainBook": "BK002",
+      "demo_reader_pages": "18, 29, 31, 106, 111, 117",
+      "demoPages": "18, 29, 31, 106, 111, 117",
+      "heading": "खेती का डॉक्टर (Pocket Doctor)",
+      "name": "खेती का डॉक्टर (Pocket Doctor)",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/fasal-ka-doctor-cover.webp",
+      "thumbnail": "/images/books/fasal-ka-doctor-cover.webp",
+      "banner": "/images/banners/kheti-dr-banner-1.webp",
+      "status": "active",
+      "publish_targets": [
+        "my_library"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "is_coming_soon": false,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "og_image": "/images/banners/kheti-dr-banner-1.webp",
+      "og_image_landscape": "/images/banners/kheti-dr-banner-1.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "खेती का डॉक्टर (Pocket Doctor) का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "mp3",
+        "mp3_url": "",
+        "tts_text": "",
+        "story_text": "",
+        "offer_callout": "",
+        "bgm_enabled": true
+      },
+      "features": [],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=DEMO-BK002",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-09-23T23:59:59.999Z",
+      "admin_edited": true,
+      "demoImages": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "preview_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ],
+      "demo_images": [
+        "/images/books/kheti-dr-demo-1.webp",
+        "/images/books/kheti-dr-demo-2.webp",
+        "/images/books/kheti-dr-demo-3.webp",
+        "/images/books/kheti-dr-demo-4.webp",
+        "/images/books/kheti-dr-demo-5.webp",
+        "/images/books/kheti-dr-demo-6.webp",
+        "/images/books/kheti-dr-demo-7.webp"
+      ]
+    }
+  ]
+}

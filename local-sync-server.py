@@ -156,6 +156,11 @@ class LocalSyncHandler(http.server.BaseHTTPRequestHandler):
                 if action == 'save' and ('pageData' in data or 'bookData' in data):
                     page_data = data.get('pageData')
                     book_data = data.get('bookData')
+                    backup_dir = os.path.join(BASE_DIR, 'data', 'backups')
+                    os.makedirs(backup_dir, exist_ok=True)
+                    from datetime import datetime
+                    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+
                     # Update universal-book-landing-pages.json
                     if page_data and page_data.get('id'):
                         lp_path = os.path.join(BASE_DIR, 'data', 'universal-book-landing-pages.json')
@@ -164,12 +169,18 @@ class LocalSyncHandler(http.server.BaseHTTPRequestHandler):
                             try:
                                 with open(lp_path, 'r', encoding='utf-8') as f:
                                     lp_json = json.load(f)
+                                # Save atomic backup
+                                with open(os.path.join(backup_dir, f'landing_backup_{ts}.json'), 'w', encoding='utf-8') as bf:
+                                    json.dump(lp_json, bf, ensure_ascii=False, indent=2)
                             except Exception:
                                 pass
                         lps = lp_json.get('bookLandingPages', [])
                         idx = next((i for i, x in enumerate(lps) if x.get('id') == page_data.get('id')), -1)
                         if idx >= 0:
-                            lps[idx] = page_data
+                            if page_data.get('id') in ['BK001', 'BK002']:
+                                lps[idx].update(page_data)
+                            else:
+                                lps[idx] = page_data
                         else:
                             lps.append(page_data)
                         lp_json['bookLandingPages'] = lps
@@ -178,18 +189,30 @@ class LocalSyncHandler(http.server.BaseHTTPRequestHandler):
 
                     # Update books.json
                     if book_data and book_data.get('id'):
+                        # Deduplicate demoImages if list
+                        if 'demoImages' in book_data and isinstance(book_data['demoImages'], list):
+                            book_data['demoImages'] = list(dict.fromkeys(book_data['demoImages']))
+                            book_data['demo_images'] = book_data['demoImages']
+                            book_data['preview_images'] = book_data['demoImages']
+
                         bk_path = os.path.join(BASE_DIR, 'data', 'books.json')
                         bk_json = {"books": []}
                         if os.path.exists(bk_path):
                             try:
                                 with open(bk_path, 'r', encoding='utf-8') as f:
                                     bk_json = json.load(f)
+                                # Save atomic backup
+                                with open(os.path.join(backup_dir, f'books_backup_{ts}.json'), 'w', encoding='utf-8') as bf:
+                                    json.dump(bk_json, bf, ensure_ascii=False, indent=2)
                             except Exception:
                                 pass
                         bks = bk_json.get('books', [])
                         idx = next((i for i, x in enumerate(bks) if x.get('id') == book_data.get('id')), -1)
                         if idx >= 0:
-                            bks[idx] = book_data
+                            if book_data.get('id') in ['BK001', 'BK002']:
+                                bks[idx].update(book_data)
+                            else:
+                                bks[idx] = book_data
                         else:
                             bks.append(book_data)
                         bk_json['books'] = bks

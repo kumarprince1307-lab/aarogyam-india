@@ -522,12 +522,10 @@ module.exports = async function handler(req, res) {
     const bookData = payload.bookData || {};
     const uploadedFiles = Array.isArray(payload.uploadedFiles) ? payload.uploadedFiles : [];
 
-    // STRICT PROTECTION FOR BK001 & BK002
+    // SAFE MERGE PROTECTION FOR BK001 & BK002: Core integrity preserved while allowing content/price/media updates
     if (bookId === 'BK001' || bookId === 'BK002') {
-      return sendJson(res, 403, {
-        success: false,
-        error: `Security Rule Violation: ${bookId} is a protected core landing page and cannot be overwritten via auto-sync.`
-      });
+      pageData.id = bookId;
+      bookData.id = bookId;
     }
 
     // DEMO BOOK SECURITY RULE: Demo books never appear in store/website trays, ONLY in My Library
@@ -573,7 +571,11 @@ module.exports = async function handler(req, res) {
 
     const existingLpIdx = landingJson.bookLandingPages.findIndex(p => p && p.id && String(p.id).trim().toUpperCase() === bookId);
     if (existingLpIdx >= 0) {
-      landingJson.bookLandingPages[existingLpIdx] = pageData;
+      if (bookId === 'BK001' || bookId === 'BK002') {
+        landingJson.bookLandingPages[existingLpIdx] = Object.assign({}, landingJson.bookLandingPages[existingLpIdx], pageData);
+      } else {
+        landingJson.bookLandingPages[existingLpIdx] = pageData;
+      }
     } else {
       landingJson.bookLandingPages.push(pageData);
     }
@@ -594,7 +596,11 @@ module.exports = async function handler(req, res) {
 
     const existingBookIdx = booksJson.books.findIndex(b => b && b.id && String(b.id).trim().toUpperCase() === bookId);
     if (existingBookIdx >= 0) {
-      booksJson.books[existingBookIdx] = bookData;
+      if (bookId === 'BK001' || bookId === 'BK002') {
+        booksJson.books[existingBookIdx] = Object.assign({}, booksJson.books[existingBookIdx], bookData);
+      } else {
+        booksJson.books[existingBookIdx] = bookData;
+      }
     } else {
       booksJson.books.push(bookData);
     }

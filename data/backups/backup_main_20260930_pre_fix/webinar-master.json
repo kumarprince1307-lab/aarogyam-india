@@ -1,0 +1,48 @@
+{
+  "webinarMaster": {
+    "id": "WB_MASTER",
+    "title": "🚀🔥 TEAM Aarogyam India PRESENTS 🔥🚀",
+    "description": "क्या आप अपने Business को अगले Level पर ले जाने के लिए तैयार हैं? 📈🚀\n\nतो जुड़िए एक खास और Powerful Online Meeting में, जहाँ हम बात करेंगे SUCCESS, GROWTH और BUSINESS OPPORTUNITIES की! 💼✨",
+    "date": "2026-09-10",
+    "time": "20:30",
+    "duration_minutes": 60,
+    "price": 0,
+    "zoom_link": "https://us06web.zoom.us/j/82823316040?pwd=cdZlJpFbYi3yKIkuoRy0Ep9VgaEtun.1",
+    "meeting_id": "828 2331 6040",
+    "passcode": "638417",
+    "cover_image": "/images/banners/webinar-cover-live.webp",
+    "banners": [],
+    "youtube_videos": [],
+    "kpis": [
+      "🔴 100% लाइव इंटरएक्टिव ज़ूम क्लास",
+      "🌱 जैविक खाद एवं स्प्रे फॉर्मूला",
+      "🎁 फ्री BC TRAINING",
+      "💬 लाइव सवाल-जवाब एवं समाधान"
+    ],
+    "faqs": [
+      {
+        "q": "ज़ूम मीटिंग में कैसे शामिल हों?",
+        "a": "वेबिनार शुरू होने के ठीक 2 मिनट पहले Join Zoom Meeting बटन सक्रिय हो जाएगा और Meeting ID व पासवर्ड भी दिखाई देने लगेगा।"
+      },
+      {
+        "q": "क्या यह वेबिनार फ्री है?",
+        "a": "हाँ, यह वेबिनार पूरी तरह निःशुल्क है। अपना नाम और मोबाइल नंबर डालकर सीट सुरक्षित कर सकते हैं।"
+      }
+    ],
+    "section_order": [
+      "sec_timer",
+      "sec_hero_zoom",
+      "sec_tutorial",
+      "sec_kpis",
+      "sec_banners",
+      "sec_aarogyamtube_shorts",
+      "sec_aarogyamtube_videos",
+      "sec_faqs"
+    ],
+    "og_title": "🔴 Aarogyam India — लाइव ज़ूम वेबिनार एवं AarogyamTube",
+    "og_description": "लाइव ज़ूम ट्रेनिंग में भाग लें और 1-मिनट के कृषि शॉर्ट्स देखें।",
+    "og_image": "/images/banners/universal-zoom-webinar-og.jpg",
+    "posters_title": "🖼️ विशेष वेबिनार एवं कृषि पोस्टर्स",
+    "posters_subtitle": "नवीनतम अध्ययन सामग्री एवं स्पेशल वेबिनार कवर्स"
+  }
+}

@@ -38,11 +38,15 @@
             });
 
             // Dynamic Open Graph Image and Meta
-            const specificOg = (bookId === 'BK002' || bookId.includes('KHETI'))
-              ? 'https://aarogyamindia.online/images/books/kheti-dr-og.webp'
-              : (bookId === 'BK001' || bookId.includes('KHARIF'))
-                ? 'https://aarogyamindia.online/images/books/kgarid-fasal-og.webp'
-                : `https://aarogyamindia.online/images/books/${bookId.toLowerCase()}-cover.webp`;
+            let specificOg = `https://aarogyamindia.online/images/books/${bookId.toLowerCase()}-cover.webp`;
+            try {
+              const localLps = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+              const foundLp = localLps.find(p => p && p.id && p.id.toUpperCase() === bookId);
+              if (foundLp && (foundLp.og_image || foundLp.hero?.og_image || foundLp.hero?.banner_image)) {
+                const imgPath = foundLp.og_image || foundLp.hero?.og_image || foundLp.hero?.banner_image;
+                specificOg = imgPath.startsWith('http') ? imgPath : `https://aarogyamindia.online${imgPath.startsWith('/') ? '' : '/'}${imgPath}`;
+              }
+            } catch (e) {}
 
             const ogImg = document.getElementById('og-image-meta');
             if (ogImg) ogImg.setAttribute('content', specificOg);
@@ -1093,10 +1097,10 @@
   </div>
 
   <!-- Common JS & Controller -->
-  <script src="/session.js"></script>
-  <script src="/js/book-marketing-card.js"></script>
-  <script src="/js/recent-purchase-toast.js"></script>
-  <script src="/js/share-engine-core.js?v=2.0"></script>
-  <script src="/js/universal-book-landing.js?v=20260923_v1"></script>
+  <script src="/session.js" defer></script>
+  <script src="/js/book-marketing-card.js" defer></script>
+  <script src="/js/recent-purchase-toast.js" defer></script>
+  <script src="/js/share-engine-core.js?v=2.0" defer></script>
+  <script src="/js/universal-book-landing.js?v=20260930_v1" defer></script>
 </body>
 </html>

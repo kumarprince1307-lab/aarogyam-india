@@ -147,9 +147,17 @@
           }
         }
       }
-      // If server loaded successfully, refresh localStorage with fresh server data
+      // Only refresh localStorage if server data is loaded and local has no unsaved admin edits
       if (serverConfigLoaded && allPages.length > 0) {
-        localStorage.setItem('AAROGYAM_SITE_PAGES_CONFIG', JSON.stringify(allPages));
+        try {
+          const existingLocal = JSON.parse(localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG') || '[]');
+          const hasUnsavedLocalEdits = Array.isArray(existingLocal) && existingLocal.some(p => p && p.admin_edited);
+          if (!hasUnsavedLocalEdits) {
+            localStorage.setItem('AAROGYAM_SITE_PAGES_CONFIG', JSON.stringify(allPages));
+          }
+        } catch (lErr) {
+          localStorage.setItem('AAROGYAM_SITE_PAGES_CONFIG', JSON.stringify(allPages));
+        }
       }
     } catch (e) {}
 

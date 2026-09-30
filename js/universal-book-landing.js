@@ -516,7 +516,7 @@
             const jsonPage = idx >= 0 ? allLandingPages[idx] : null;
             if (!jsonPage) {
               allLandingPages.push(item);
-            } else if (item.updated_at && jsonPage.updated_at && (new Date(item.updated_at) > new Date(jsonPage.updated_at))) {
+            } else if (item.admin_edited || !jsonPage.updated_at || (item.updated_at && (new Date(item.updated_at) >= new Date(jsonPage.updated_at)))) {
               allLandingPages[idx] = deepMergeSafe(allLandingPages[idx], item);
             }
           });
