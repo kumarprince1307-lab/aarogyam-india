@@ -303,7 +303,8 @@
 
   function renderDynamicHeroSlides(pageConfig) {
     if (!Array.isArray(pageConfig.hero_slides) || pageConfig.hero_slides.length === 0) return;
-    const carouselContainer = document.querySelector('.bighaat-carousel-container') || 
+    const carouselContainer = document.getElementById('ns-hero-carousel') ||
+                              document.querySelector('.bighaat-carousel-container') || 
                               document.querySelector('.home-hero-section') || 
                               document.getElementById('sec-hero-slider');
     if (!carouselContainer) return;
@@ -465,8 +466,12 @@
                 ${hasImg ? `<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title || 'KPI')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.parentElement.innerHTML='<i class=\\\'fa-solid ${escapeHtml(c.icon || 'fa-check')}\\\'></i>'">` : `<i class="fa-solid ${escapeHtml(c.icon || 'fa-check')}"></i>`}
               </div>
               <div style="flex:1;">
-                <h4 style="margin: 0 0 2px 0; font-size: 0.95rem; font-weight: 800; color: #0f172a;">${escapeHtml(c.title || '')}</h4>
-                <p style="margin: 0; font-size: 0.76rem; color: #64748b; line-height: 1.3;">${escapeHtml(c.desc || '')}</p>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                  <h4 style="margin: 0; font-size: 0.92rem; font-weight: 800; color: #0f172a;">${escapeHtml(c.title || '')}</h4>
+                  ${c.badge ? `<span style="font-size:0.65rem; font-weight:800; background:#fef08a; color:#854d0e; padding:1px 6px; border-radius:4px;">${escapeHtml(c.badge)}</span>` : ''}
+                </div>
+                ${c.value ? `<div style="font-size:1.15rem; font-weight:900; color:#15803d; margin:2px 0;">${escapeHtml(c.value)}</div>` : ''}
+                ${c.desc ? `<p style="margin: 0; font-size: 0.76rem; color: #64748b; line-height: 1.3;">${escapeHtml(c.desc)}</p>` : ''}
               </div>
             </div>
             `;
@@ -535,6 +540,32 @@
       </div>
     `;
   }
+
+  // Master Product Catalog Live Linking (Instant Multi-Page Sync)
+  let masterProductsCatalog = [];
+  async function loadMasterCatalogForSync() {
+    try {
+      const cached = localStorage.getItem('aim_netsurf_products_master');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && Array.isArray(parsed.products) && parsed.products.length > 0) {
+          masterProductsCatalog = parsed.products;
+        }
+      }
+    } catch (e) {}
+
+    try {
+      const res = await fetch('/data/netsurf-products-master.json?v=' + Date.now());
+      if (res.ok) {
+        const d = await res.json();
+        if (d && Array.isArray(d.products) && d.products.length > 0) {
+          masterProductsCatalog = d.products;
+          try { localStorage.setItem('aim_netsurf_products_master', JSON.stringify(d)); } catch(e){}
+        }
+      }
+    } catch (e) {}
+  }
+  loadMasterCatalogForSync();
 
   function renderDynamicProducts(pageConfig) {
     if (!pageConfig || !Array.isArray(pageConfig.products) || pageConfig.products.length === 0) {
@@ -623,14 +654,22 @@
     }
 
     grid.innerHTML = prods.map((p, idx) => {
-      const id = p.id || `PROD_${idx + 1}`;
-      const name = p.name || p.title || 'आरोग्यम उत्पाद';
-      const mrp = Number(p.mrp || p.price || 0);
-      const discount = Number(p.discount_pct || 0);
-      const offerPrice = (mrp > 0 && discount > 0) ? Math.round(mrp * (1 - discount / 100)) : (Number(p.price) || mrp);
-      const badge = p.badge || (isPashu ? 'आयुर्वेदिक पशु पोषण' : 'प्रमाणित हर्बल किट');
-      const desc = p.description || p.dose || '';
-      const rawImg = resolveAssetSrc(p, 'image', '');
+      // 1-Master Live Join: If product exists in Product Master Studio, pull latest image, price, discount & description!
+      const masterMatch = masterProductsCatalog.find(m => 
+        (m.id && p.id && String(m.id).toLowerCase() === String(p.id).toLowerCase()) ||
+        (m.name && p.name && m.name.trim().toLowerCase() === p.name.trim().toLowerCase()) ||
+        (m.name && p.title && m.name.trim().toLowerCase() === p.title.trim().toLowerCase())
+      );
+
+      const activeProd = masterMatch ? { ...p, ...masterMatch, ...((p.dose && !masterMatch.dose) ? { dose: p.dose } : {}) } : p;
+      const id = activeProd.id || p.id || `PROD_${idx + 1}`;
+      const name = activeProd.name || activeProd.title || p.name || p.title || 'आरोग्यम उत्पाद';
+      const mrp = Number(activeProd.mrp || activeProd.price || p.mrp || p.price || 0);
+      const discount = Number(activeProd.discount_pct !== undefined ? activeProd.discount_pct : (p.discount_pct || 0));
+      const offerPrice = (mrp > 0 && discount > 0) ? Math.round(mrp * (1 - discount / 100)) : (Number(activeProd.price || p.price) || mrp);
+      const badge = activeProd.badge || activeProd.category_label || p.badge || (isPashu ? 'आयुर्वेदिक पशु पोषण' : 'प्रमाणित हर्बल किट');
+      const desc = activeProd.description || activeProd.dose || p.description || p.dose || '';
+      const rawImg = resolveAssetSrc(activeProd, 'image', '') || resolveAssetSrc(p, 'image', '');
       const hasRealImg = rawImg && !rawImg.includes('logo.png') && !rawImg.endsWith('/logo.png');
 
       return `

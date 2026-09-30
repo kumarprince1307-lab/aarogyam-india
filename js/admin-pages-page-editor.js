@@ -3398,6 +3398,90 @@ export async function initPageEditor() {
           </div>
         </div>
 
+        <!-- 10.3 Netsurf Career Plan Manager (Dedicated for Netsurf Direct Selling) -->
+        <div id="pe-sec-netsurf-plan" style="display:none; background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #05966960;">
+          <div style="font-weight: 800; color: #34d399; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <span>💼 10.3 नेटसर्फ करियर व डायरेक्ट सेलिंग प्लान (Netsurf Career Matrix)</span>
+            <span style="font-size: 0.72rem; background: rgba(5,150,105,0.2); color: #6ee7b7; padding: 2px 8px; border-radius: 10px;">Netsurf Dedicated Layer</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">विरासत व अनुभव (Legacy)</label>
+              <input type="text" id="pe_input_ns_legacy" class="admin-input" placeholder="26 वर्षों का अटूट विश्वास (स्थापना वर्ष 2000)" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">करियर स्लोगन (Slogan)</label>
+              <input type="text" id="pe_input_ns_slogan" class="admin-input" placeholder="डायरेक्ट सेलिंग क्रांति व ₹8,19,250 का क्लोजिंग प्लान" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">ज़ीरो इग्रेस नियम (Zero Egress)</label>
+              <input type="text" id="pe_input_ns_zero_egress" class="admin-input" placeholder="कभी बिज़नेस लैप्स नहीं, आजीवन कैरी-फॉरवर्ड, शून्य अनिवार्य निवेश" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">रिटेल मार्जिन प्रतिशत (Retail Margin)</label>
+              <input type="text" id="pe_input_ns_retail_margin" class="admin-input" placeholder="5% से 15% (सोमवार पे-आउट)" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">रिटेल पे-आउट शेड्यूल (Retail Payout)</label>
+              <input type="text" id="pe_input_ns_retail_payout" class="admin-input" placeholder="साप्ताहिक भुगतान (Weekly on Monday)" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">ग्राहक छूट (Customer Discount)</label>
+              <input type="text" id="pe_input_ns_customer_discount" class="admin-input" placeholder="25% तक अधिकतम रिटेल छूट" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">ऑटोशिप ऑफर (Autoship Offer)</label>
+              <input type="text" id="pe_input_ns_autoship_offer" class="admin-input" placeholder="5 लगातार ऑर्डर्स पर 1 ऑर्डर मुफ्त" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">टीम टर्नओवर बोनस (Team Turnover)</label>
+              <input type="text" id="pe_input_ns_team_turnover" class="admin-input" placeholder="3%, 4%, 5% (₹25,000 मैचिंग से शुरू)" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">जनरेशन स्लैब (Generation Slabs)</label>
+              <input type="text" id="pe_input_ns_generation_slabs" class="admin-input" placeholder="3% से 8% (10K=3%, 20K=4%, 40K=5%, 80K=6%, 1.6L=7%, 3.2L=8%)" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">क्लोजिंग चक्र (Closing Cycle)</label>
+              <input type="text" id="pe_input_ns_closing_cycle" class="admin-input" placeholder="15-15 दिन चक्र (1 से 15, 16 से माह का अंत)" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">अधिकतम क्लोजिंग कैप (Max Capping)</label>
+              <input type="text" id="pe_input_ns_max_capping" class="admin-input" placeholder="₹8,19,250 (प्रत्येक 15 दिन में अधिकतम पे-आउट)" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">करियर स्टेप्स (Career Steps)</label>
+              <input type="text" id="pe_input_ns_career_steps" class="admin-input" placeholder="1. डायरेक्ट सेलर, 2. BC, 3. SBC, 4. फास्ट ट्रैक, 5. सक्षम, 6. अस्मिता" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">मेडिक्लेम सुरक्षा (Mediclaim)</label>
+              <input type="text" id="pe_input_ns_mediclaim" class="admin-input" placeholder="₹3,00,000 तक पारिवारिक स्वास्थ्य सुरक्षा" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">दुर्घटना बीमा (Accidental Insurance)</label>
+              <input type="text" id="pe_input_ns_accidental" class="admin-input" placeholder="₹2,00,000 से ₹25,00,000 सुरक्षा कवर" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">प्राकृतिक मृत्यु सहायता (Natural Death Support)</label>
+              <input type="text" id="pe_input_ns_natural_death" class="admin-input" placeholder="परिवार सुरक्षा व नॉमिनी बिज़नेस ट्रांसफर" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.75rem; font-weight: 700; color: var(--admin-text);">टूर व रिवार्ड्स (Tour Rewards)</label>
+              <input type="text" id="pe_input_ns_tour_rewards" class="admin-input" placeholder="साल में 2 बार घरेलू व अंतरराष्ट्रीय यात्राएं" style="width: 100%; padding: 6px 10px; font-size: 0.8rem;" />
+            </div>
+          </div>
+        </div>
+
         <!-- 6. Interspersed Book Sell Marketing Cards Manager -->
         <div id="pe-sec-marketing" style="background: var(--admin-surface, #1e293b); border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--admin-border);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
@@ -5599,11 +5683,17 @@ export async function initPageEditor() {
       <div style="background: #0f172a; border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px; position: relative;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
           <span style="font-size: 0.75rem; font-weight: 700; color: #34d399;">KPI #${idx + 1}</span>
-          <button type="button" onclick="window.removeKpiCard(${idx})" style="background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 0.75rem;">&times;</button>
+          <button type="button" onclick="window.removeKpiCard(${idx})" style="background: transparent; border: none; color: #ef4444; font-weight: 800; cursor: pointer; font-size: 0.85rem;">&times; हटाएं</button>
         </div>
-        <input type="text" value="${escapeHtml(card.icon || '')}" onchange="window.updateKpiCard(${idx}, 'icon', this.value)" class="admin-input" placeholder="FontAwesome Icon (e.g. fa-seedling)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem; margin-bottom: 4px;" />
-        <input type="text" value="${escapeHtml(card.title || '')}" onchange="window.updateKpiCard(${idx}, 'title', this.value)" class="admin-input" placeholder="शीर्षक (Title)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem; margin-bottom: 4px;" />
-        <input type="text" value="${escapeHtml(card.desc || '')}" onchange="window.updateKpiCard(${idx}, 'desc', this.value)" class="admin-input" placeholder="विवरण (Desc)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem; margin-bottom: 4px;" />
+        <div style="display: grid; grid-template-columns: 80px 1fr; gap: 6px; margin-bottom: 4px;">
+          <input type="text" value="${escapeHtml(card.icon || '')}" oninput="window.updateKpiCard(${idx}, 'icon', this.value)" class="admin-input" placeholder="Icon/Emoji" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" title="आइकन या इमोजी (जैसे 🏢, 👑 या fa-seedling)" />
+          <input type="text" value="${escapeHtml(card.title || '')}" oninput="window.updateKpiCard(${idx}, 'title', this.value)" class="admin-input" placeholder="शीर्षक (Title)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 4px;">
+          <input type="text" value="${escapeHtml(card.value || '')}" oninput="window.updateKpiCard(${idx}, 'value', this.value)" class="admin-input" placeholder="मान/संख्या (e.g. ₹8,19,250 या 26+ वर्ष)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
+          <input type="text" value="${escapeHtml(card.badge || '')}" oninput="window.updateKpiCard(${idx}, 'badge', this.value)" class="admin-input" placeholder="बैज/टैग (e.g. BI-MONTHLY CAP)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem;" />
+        </div>
+        <input type="text" value="${escapeHtml(card.desc || '')}" oninput="window.updateKpiCard(${idx}, 'desc', this.value)" class="admin-input" placeholder="संक्षिप्त विवरण (Description)" style="width: 100%; padding: 4px 6px; font-size: 0.75rem; margin-bottom: 4px;" />
         <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
           <input type="file" id="kpi_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'kpi_card', ${idx}, 'image')">
           <button type="button" onclick="document.getElementById('kpi_file_${idx}').click()" class="admin-button small-button" style="background:#16a34a; color:#fff; padding:3px 8px; font-size:0.7rem; font-weight:800;">📁 KPI बैनर इमेज (WebP)</button>
@@ -6180,21 +6270,26 @@ export async function initPageEditor() {
   window.updatePageKpiSection = function(idx, field, val) { if (currentPageKpiSections[idx]) currentPageKpiSections[idx][field] = val; };
   window.removePageKpiSection = function(idx) { currentPageKpiSections.splice(idx, 1); renderPageKpiSectionsInBuilder(); };
 
-  // Context-aware section show/hide based on page category
+  // Context-aware section show/hide based on page category and active page ID
   function updateContextualSections(category) {
     const healthSection = document.getElementById('pe-section-health-cards');
     const cropSection = document.getElementById('pe-section-crop-cards');
     const pashuSection = document.getElementById('pe-section-pashu-cards');
     const pageKpiSection = document.getElementById('pe-section-page-kpi');
+    const cbSection = document.getElementById('pe-section-clinical-breakdown');
+    const netsurfSection = document.getElementById('pe-sec-netsurf-plan');
 
-    const isHealthSubPage = category === 'Healthcare Sub-page';
-    const isAgri = category === 'Agriculture' || category === 'eBooks' || category === 'Core';
-    const isPashu = category === 'Livestock';
-    const showHealth = category === 'Health' || category === 'Healthcare' || category === 'Core';
+    const isNetsurf = (editingPageId === 'page_netsurf_career' || category === 'Career & Direct Selling');
+    const isPashu = (editingPageId === 'page_cattle_care' || category === 'Livestock');
+    const isHealthSubPage = (category === 'Healthcare Sub-page');
+    const isAgri = (category === 'Agriculture' || category === 'eBooks' || category === 'Core') && !isNetsurf && !isPashu;
+    const showHealth = (category === 'Health' || category === 'Healthcare' || category === 'Core') && !isNetsurf && !isPashu;
 
+    if (netsurfSection) netsurfSection.style.display = isNetsurf ? 'block' : 'none';
+    if (cbSection) cbSection.style.display = (isPashu || isHealthSubPage) ? 'block' : 'none';
     if (healthSection) healthSection.style.display = (showHealth && !isHealthSubPage) ? 'block' : 'none';
-    if (cropSection) cropSection.style.display = (isAgri && !isHealthSubPage) ? 'block' : 'none';
-    if (pashuSection) pashuSection.style.display = (isPashu || category === 'Core') ? 'block' : 'none';
+    if (cropSection) cropSection.style.display = isAgri ? 'block' : 'none';
+    if (pashuSection) pashuSection.style.display = isPashu ? 'block' : 'none';
     if (pageKpiSection) pageKpiSection.style.display = isHealthSubPage ? 'block' : 'none';
   }
   window.updateContextualSections = updateContextualSections;
