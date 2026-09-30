@@ -696,7 +696,7 @@ export async function fetchUsers(params = {}) {
 
     // Step 2: Fetch all necessary aggregated data in parallel
     const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes, surveysRes] = await Promise.all([
-        db.from('purchases').select('profile_id, amount').or('payment_status.eq.success,payment_status.is.null'),
+        db.from('purchases').select('profile_id, amount, download_count').or('payment_status.eq.success,payment_status.is.null'),
         db.from('share_logs').select('share_token, event_type').in('share_token', shareIds),
         db.from('profiles').select('id, referred_by'), // Fetch all referral relationships
         db.from('download_logs').select('profile_id').in('profile_id', profileIds),
@@ -757,9 +757,10 @@ export async function fetchUsers(params = {}) {
     const purchaseSummary = (allPurchases || []).reduce((acc, purchase) => {
         const profileId = purchase.profile_id;
         if (!profileId) return acc;
-        if (!acc[profileId]) acc[profileId] = { totalPurchases: 0, totalSpent: 0 };
+        if (!acc[profileId]) acc[profileId] = { totalPurchases: 0, totalSpent: 0, totalDownloads: 0 };
         acc[profileId].totalPurchases += 1;
         acc[profileId].totalSpent += purchase.amount || 0;
+        acc[profileId].totalDownloads += (purchase.download_count || 0);
         return acc;
     }, {});
 
@@ -810,7 +811,7 @@ export async function fetchUsers(params = {}) {
         totalDirectPurchases: directPurchaseCounts[user.id] || 0,
         totalPurchases: ownPurchases.totalPurchases,
         totalSpent: ownPurchases.totalSpent,
-        totalDownloads: downloadCounts[user.id] || 0,
+        totalDownloads: Math.max(downloadCounts[user.id] || 0, ownPurchases.totalDownloads || 0),
         downloadLimit: (ownPurchases.totalPurchases || 0) * 3,
         appInstalled: user.app_installed === true || String(user.registration_source || '').toLowerCase().includes('pwa') || String(user.registration_source || '').toLowerCase().includes('app'),
         appInstalledAt: user.app_installed_at ? new Date(user.app_installed_at).toLocaleDateString('en-GB') : null,
@@ -913,37 +914,62 @@ export async function fetchDownloads() {
         const db = window.dbClient;
         if (!db) throw new Error("Supabase client not available.");
 
-        // Fetch all download logs
-        const { data: logs, error } = await db
-            .from('download_logs')
-            .select('book_id, profile_id, downloaded_at')
-            .order('downloaded_at', { ascending: false });
+        // Fetch download logs AND purchases with download counts
+        const [logsRes, purchasesRes] = await Promise.all([
+            db.from('download_logs').select('book_id, profile_id, downloaded_at').order('downloaded_at', { ascending: false }),
+            db.from('purchases').select('book_id, profile_id, download_count, purchase_date, created_at').gt('download_count', 0)
+        ]);
 
-        if (error) throw error;
+        const logs = logsRes.data || [];
+        const purchases = purchasesRes.data || [];
 
-        if (!logs || logs.length === 0) {
+        if (logs.length === 0 && purchases.length === 0) {
             return { success: true, data: [] };
         }
 
         // Aggregate the data in JavaScript
-        const summary = logs.reduce((acc, log) => {
+        const summary = {};
+
+        // 1. Process explicit download_logs
+        logs.forEach(log => {
             const bookId = log.book_id || 'Unknown';
-            if (!acc[bookId]) {
-                acc[bookId] = {
+            if (!summary[bookId]) {
+                summary[bookId] = {
                     book: bookId,
                     downloads: 0,
                     usersSet: new Set(),
                     lastDownloaded: new Date(0)
                 };
             }
-            acc[bookId].downloads++;
-            acc[bookId].usersSet.add(log.profile_id);
-            const downloadDate = new Date(log.downloaded_at);
-            if (downloadDate > acc[bookId].lastDownloaded) {
-                acc[bookId].lastDownloaded = downloadDate;
+            summary[bookId].downloads++;
+            if (log.profile_id) summary[bookId].usersSet.add(log.profile_id);
+            const downloadDate = new Date(log.downloaded_at || 0);
+            if (downloadDate > summary[bookId].lastDownloaded) {
+                summary[bookId].lastDownloaded = downloadDate;
             }
-            return acc;
-        }, {});
+        });
+
+        // 2. Also account for purchases with download_count > 0
+        purchases.forEach(p => {
+            const bookId = p.book_id || 'Unknown';
+            if (!summary[bookId]) {
+                summary[bookId] = {
+                    book: bookId,
+                    downloads: 0,
+                    usersSet: new Set(),
+                    lastDownloaded: new Date(0)
+                };
+            }
+            // If download_logs didn't capture this user's downloads, ensure count is at least p.download_count
+            if (!summary[bookId].usersSet.has(p.profile_id)) {
+                summary[bookId].downloads += (p.download_count || 1);
+                if (p.profile_id) summary[bookId].usersSet.add(p.profile_id);
+                const pDate = new Date(p.purchase_date || p.created_at || 0);
+                if (pDate > summary[bookId].lastDownloaded) {
+                    summary[bookId].lastDownloaded = pDate;
+                }
+            }
+        });
 
         // Format the aggregated data for the UI
         const formattedData = Object.values(summary).map(item => ({

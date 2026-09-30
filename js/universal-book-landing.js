@@ -120,11 +120,27 @@
   };
 
   window.logoutUser = function() {
-    localStorage.removeItem('AI_USER');
-    localStorage.removeItem('AI_PROFILE');
-    localStorage.removeItem('AI_SESSION');
-    localStorage.removeItem('aim_user_mobile');
-    window.updateAuthStatusUI();
+    const keysToRemove = [
+      'AI_USER', 'AI_PROFILE', 'AI_SESSION', 'aim_user_mobile', 'aim_user_name',
+      'user_mobile', 'user_name', 'user_phone', 'user_id', 'profile_id',
+      'aarogyam_user_registered', 'aarogyam_user_phone', 'aarogyam_user_name',
+      'aoi_user_session', 'current_user', 'CURRENT_USER', 'AI_LOGIN_STATUS',
+      'supabase.auth.token', 'sb-access-token', 'sb-refresh-token',
+      'wb_registered', 'wb_user_phone', 'wb_user_name'
+    ];
+    keysToRemove.forEach(k => {
+      try { localStorage.removeItem(k); } catch(e) {}
+      try { sessionStorage.removeItem(k); } catch(e) {}
+    });
+
+    if (window.V1_SESSION && typeof window.V1_SESSION.logout === 'function') {
+      try { window.V1_SESSION.logout(); return; } catch(e) {}
+    }
+
+    if (typeof window.updateAuthStatusUI === 'function') {
+      window.updateAuthStatusUI();
+    }
+    alert('आप सफलतापूर्वक लॉग आउट हो चुके हैं।');
     window.location.reload();
   };
 
@@ -132,23 +148,40 @@
     const isLogged = window.isUserRegistered();
     const loginBtn = document.getElementById('mobile-login-btn');
     const logoutBtn = document.getElementById('mobile-logout-btn');
+    const headerLoginBtn = document.getElementById('header-login-btn');
+    const headerUserBtn = document.getElementById('header-user-btn');
+    const headerUserName = document.getElementById('header-user-name');
     const nameEl = document.getElementById('menuUserName');
     const phoneEl = document.getElementById('mobileUserPhone');
+    const memberStatus = document.getElementById('mobileMemberStatus');
 
     if (isLogged) {
+      let displayName = 'प्रिय पाठक';
+      let displayPhone = '';
       try {
         const user = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-        const phone = user.mobile || user.phone || localStorage.getItem('aim_user_mobile') || '';
-        if (nameEl) nameEl.textContent = user.full_name || user.name || 'प्रिय पाठक';
-        if (phoneEl) phoneEl.textContent = phone ? `(${phone})` : '';
+        displayPhone = user.mobile || user.phone || localStorage.getItem('aim_user_mobile') || '';
+        displayName = user.full_name || user.name || 'प्रिय पाठक';
+        if (memberStatus) memberStatus.textContent = user.is_subscriber ? 'VIP Pro Member' : 'Active Reader';
       } catch(e) {}
+
+      if (nameEl) nameEl.textContent = displayName;
+      if (phoneEl) phoneEl.textContent = displayPhone ? `(${displayPhone})` : '';
       if (loginBtn) loginBtn.style.display = 'none';
       if (logoutBtn) logoutBtn.style.display = 'flex';
+      if (headerLoginBtn) headerLoginBtn.style.display = 'none';
+      if (headerUserBtn) {
+        headerUserBtn.style.display = 'inline-flex';
+        if (headerUserName) headerUserName.textContent = displayName.split(' ')[0] || 'प्रोफाइल';
+      }
     } else {
       if (nameEl) nameEl.textContent = 'प्रिय पाठक';
       if (phoneEl) phoneEl.textContent = '';
+      if (memberStatus) memberStatus.textContent = 'Free Reader';
       if (loginBtn) loginBtn.style.display = 'flex';
       if (logoutBtn) logoutBtn.style.display = 'none';
+      if (headerLoginBtn) headerLoginBtn.style.display = 'inline-flex';
+      if (headerUserBtn) headerUserBtn.style.display = 'none';
     }
   };
 
@@ -2558,11 +2591,6 @@
     if (popup) popup.style.display = 'none';
   };
 
-  window.logoutUser = function () {
-    localStorage.removeItem('AI_USER');
-    localStorage.removeItem('AI_PROFILE');
-    window.location.reload();
-  };
 
   function renderBookNotFound(bookId) {
     const container = document.getElementById('landing-sections-container');
@@ -2919,26 +2947,9 @@
   }
 
   function checkLoginHeaderState() {
-    try {
-      const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-      const isLoggedIn = storedUser.id || storedUser.mobile;
-      const menuName = document.getElementById('menuUserName');
-      const memberStatus = document.getElementById('mobileMemberStatus');
-      const mobilePhone = document.getElementById('mobileUserPhone');
-      const loginBtn = document.getElementById('mobile-login-btn');
-      const logoutBtn = document.getElementById('mobile-logout-btn');
-
-      if (isLoggedIn) {
-        if (menuName) menuName.textContent = storedUser.full_name || storedUser.name || 'प्रिय पाठक';
-        if (memberStatus) memberStatus.textContent = storedUser.is_subscriber ? 'VIP Pro Member' : 'Active Reader';
-        if (mobilePhone && storedUser.mobile) mobilePhone.textContent = `(${storedUser.mobile})`;
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (logoutBtn) logoutBtn.style.display = 'flex';
-      } else {
-        if (loginBtn) loginBtn.style.display = 'flex';
-        if (logoutBtn) logoutBtn.style.display = 'none';
-      }
-    } catch (e) {}
+    if (typeof window.updateAuthStatusUI === 'function') {
+      window.updateAuthStatusUI();
+    }
   }
 
   // Side Menu Toggle Controller

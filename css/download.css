@@ -842,6 +842,175 @@ body.vip-download-theme {
 }
 
 /* =================================================================
+   DIRECT VIP ACTION BUTTONS (BIG RED DOWNLOAD + BLUE HD + GREEN READ)
+================================================================= */
+.direct-action-buttons-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 14px 0 18px 0;
+}
+.btn-action-primary-red {
+    width: 100%;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    color: #ffffff !important;
+    border: 2.5px solid #ffffff;
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    box-shadow: 0 10px 28px rgba(220, 38, 38, 0.45), 0 0 18px rgba(239, 68, 68, 0.35);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+.btn-action-primary-red:hover {
+    transform: translateY(-3px) scale(1.015);
+    box-shadow: 0 14px 34px rgba(220, 38, 38, 0.6), 0 0 24px rgba(239, 68, 68, 0.5);
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+}
+.btn-action-primary-red:active {
+    transform: scale(0.98);
+}
+.btn-action-secondary-blue {
+    width: 100%;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid #bfdbfe;
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: left;
+}
+.btn-action-secondary-blue:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.5);
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+}
+.btn-action-secondary-blue:active {
+    transform: scale(0.98);
+}
+.btn-action-tertiary-green {
+    width: 100%;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid #bbf7d0;
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(22, 163, 74, 0.35);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: left;
+}
+.btn-action-tertiary-green:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 28px rgba(22, 163, 74, 0.5);
+    background: linear-gradient(135deg, #22c55e 0%, #15803d 100%) !important;
+}
+.btn-action-tertiary-green:active {
+    transform: scale(0.98);
+}
+.action-btn-main {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 900;
+    margin-bottom: 2px;
+    color: #ffffff !important;
+    letter-spacing: -0.2px;
+}
+.action-btn-sub {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.92) !important;
+    font-weight: 600;
+    line-height: 1.35;
+}
+.action-btn-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    color: #ffffff;
+}
+.action-btn-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.action-btn-badge.red-badge {
+    background: #ffffff;
+    color: #dc2626;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.action-btn-badge.blue-badge {
+    background: #ffffff;
+    color: #1d4ed8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.action-btn-badge.green-badge {
+    background: #ffffff;
+    color: #15803d;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.db-download-status-bar {
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: #166534;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+}
+@media (max-width: 640px) {
+    .action-btn-main {
+        font-size: 1.02rem;
+    }
+    .action-btn-sub {
+        font-size: 0.74rem;
+    }
+    .btn-action-primary-red,
+    .btn-action-secondary-blue,
+    .btn-action-tertiary-green {
+        padding: 14px 14px;
+        gap: 10px;
+    }
+    .action-btn-icon-wrap {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+    .action-btn-badge {
+        display: none;
+    }
+}
+
+/* =================================================================
    SECTION 3: APP INSTALL TUTORIAL & LIVE AUDIO GUIDANCE
 ================================================================= */
 .app-install-card-vip {
@@ -1625,3 +1794,164 @@ body.vip-download-theme {
     margin-bottom: 3px;
     transition: transform 0.2s ease;
 }
+
+/* =================================================================
+   FIXED STICKY BOTTOM ACTION DOCK (3 BUTTONS: RED, BLUE, GREEN)
+================================================================= */
+.vip-sticky-action-dock {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 99995;
+    background: rgba(5, 20, 14, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1.5px solid rgba(52, 211, 153, 0.4);
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.65);
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+
+.sticky-dock-inner {
+    max-width: 880px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.sticky-action-btn {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    outline: none;
+    user-select: none;
+    text-align: left;
+}
+
+.sticky-action-btn:hover {
+    transform: translateY(-2px);
+}
+
+.sticky-action-btn:active {
+    transform: scale(0.97);
+}
+
+.sticky-btn-red {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    color: #ffffff !important;
+    border-color: #fca5a5 !important;
+    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.45);
+}
+
+.sticky-btn-red:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
+}
+
+.sticky-btn-blue {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    border-color: #bfdbfe !important;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+}
+
+.sticky-btn-blue:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+}
+
+.sticky-btn-green {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+    color: #ffffff !important;
+    border-color: #bbf7d0 !important;
+    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.35);
+}
+
+.sticky-btn-green:hover {
+    background: linear-gradient(135deg, #22c55e 0%, #15803d 100%) !important;
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5);
+}
+
+.sticky-action-btn i {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    color: #ffffff;
+}
+
+.sticky-btn-text {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+.sticky-btn-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sticky-btn-sub {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.88);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.sticky-action-btn:disabled {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+    filter: grayscale(0.85);
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+    .vip-sticky-action-dock {
+        padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+    }
+    .sticky-dock-inner {
+        gap: 6px;
+    }
+    .sticky-action-btn {
+        padding: 9px 8px;
+        gap: 6px;
+        border-radius: 10px;
+    }
+    .sticky-action-btn i {
+        font-size: 1.05rem;
+    }
+    .sticky-btn-title {
+        font-size: 0.82rem;
+    }
+    .sticky-btn-sub {
+        font-size: 0.62rem;
+    }
+}
+
+body.vip-download-theme {
+    padding-bottom: 95px !important;
+}
+.download-container {
+    padding-bottom: 105px !important;
+}
+.floating-audio-pill {
+    bottom: 82px !important;
+}
+

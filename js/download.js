@@ -150,6 +150,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (loadingState) loadingState.style.display = 'none';
         if (downloadCard) downloadCard.style.display = 'block';
+        const heroCelebration = document.getElementById('heroCelebrationSection');
+        if (heroCelebration) heroCelebration.style.display = 'block';
+        const stickyDock = document.getElementById('stickyDownloadDock');
+        if (stickyDock) stickyDock.style.display = 'block';
 
         // Auto-Play Audio Guidance on load / first touch
         setupDownloadAudioAutoplay();
@@ -246,36 +250,58 @@ async function fetchPurchaseRecord(userId, bookId) {
     // 1. Check Supabase first for absolute source of truth
     if (client) {
         try {
-            // First check by profile_id
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order_id') || urlParams.get('order');
+            const paymentId = urlParams.get('payment_id') || urlParams.get('payment');
+            
+            // Check by order_id or payment_id if available in URL
+            if (orderId) {
+                const { data } = await client.from('purchases').select('*').eq('order_id', orderId).eq('book_id', cleanId).maybeSingle();
+                if (data) return data;
+            }
+            if (paymentId) {
+                const { data } = await client.from('purchases').select('*').eq('payment_id', paymentId).eq('book_id', cleanId).maybeSingle();
+                if (data) return data;
+            }
+
+            // Check by user mobile via profiles table
+            const userMobile = state.userData?.mobile || localStorage.getItem('user_mobile') || localStorage.getItem('aim_user_mobile') || urlParams.get('mobile');
+            if (userMobile) {
+                const cleanPhone = String(userMobile).replace(/\D/g, '').slice(-10);
+                if (cleanPhone.length === 10) {
+                    const { data: profData } = await client
+                        .from('profiles')
+                        .select('id, full_name, mobile')
+                        .eq('mobile', cleanPhone)
+                        .maybeSingle();
+                    
+                    if (profData?.id) {
+                        state.userData = { ...state.userData, id: profData.id, full_name: profData.full_name || state.userData.full_name, mobile: profData.mobile };
+                        const { data: pData } = await client
+                            .from('purchases')
+                            .select('*')
+                            .eq('profile_id', profData.id)
+                            .eq('book_id', cleanId)
+                            .order('created_at', { ascending: false })
+                            .limit(1)
+                            .maybeSingle();
+                        if (pData) return pData;
+                    }
+                }
+            }
+
+            // Check by profile_id
             if (userId && !String(userId).startsWith('local_usr_')) {
                 const { data, error } = await client
                     .from('purchases')
-                    .select('id, profile_id, book_id, amount, payment_status, download_count, created_at')
+                    .select('*')
                     .eq('profile_id', userId)
                     .eq('book_id', cleanId)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
                     .maybeSingle();
                     
                 if (!error && data) return data;
-            }
-
-            // Fallback: Check if user has a mobile number and query via customer mobile
-            const userMobile = state.userData?.mobile || localStorage.getItem('user_mobile');
-            if (userMobile) {
-                const { data: profData } = await client
-                    .from('profiles')
-                    .select('id')
-                    .eq('mobile', userMobile)
-                    .maybeSingle();
-                
-                if (profData?.id) {
-                    const { data: pData } = await client
-                        .from('purchases')
-                        .select('id, profile_id, book_id, amount, payment_status, download_count, created_at')
-                        .eq('profile_id', profData.id)
-                        .eq('book_id', cleanId)
-                        .maybeSingle();
-                    if (pData) return pData;
-                }
             }
         } catch(e) {
             console.warn('Supabase purchase fetch warning:', e);
@@ -284,7 +310,7 @@ async function fetchPurchaseRecord(userId, bookId) {
 
     // 2. Check local purchases cache
     try {
-        const localPurchases = JSON.parse(localStorage.getItem('aarogyam_purchases') || localStorage.getItem('AI_PURCHASES') || '[]');
+        const localPurchases = JSON.parse(localStorage.getItem('aarogyam_purchases') || localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
         const found = localPurchases.find(p => (p.book_id || '').toUpperCase().trim() === cleanId);
         if (found) return found;
     } catch(e) {}
@@ -305,23 +331,24 @@ function getBookStorageKey() {
 }
 
 function getPersistentDownloadCount() {
-    const uKey = getUserStorageKey();
-    const bKey = getBookStorageKey();
-    
-    // 1. Check user-specific key
-    let val = localStorage.getItem(`AIM_DL_COUNT_${uKey}_${bKey}`);
-    if (val !== null && !isNaN(parseInt(val, 10))) return parseInt(val, 10);
-    
-    // 2. Check book generic key
-    val = localStorage.getItem(`AIM_DL_COUNT_${bKey}`);
-    if (val !== null && !isNaN(parseInt(val, 10))) return parseInt(val, 10);
-
-    // 3. Check purchaseData in state
+    // 1. Primary Source of Truth: Real Database Purchase Record
     if (state.purchaseData && typeof state.purchaseData.download_count === 'number') {
         return state.purchaseData.download_count;
     }
 
-    // 4. Check localStorage purchases list
+    const uKey = getUserStorageKey();
+    const bKey = getBookStorageKey();
+    
+    // 2. Check user-specific key
+    let val = localStorage.getItem(`AIM_DL_COUNT_${uKey}_${bKey}`);
+    if (val !== null && !isNaN(parseInt(val, 10))) return parseInt(val, 10);
+
+    // Clean up generic book key so it NEVER blocks new users
+    try {
+        localStorage.removeItem(`AIM_DL_COUNT_${bKey}`);
+    } catch(e) {}
+
+    // 3. Check localStorage purchases list
     try {
         const purchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || localStorage.getItem('aarogyam_purchases') || '[]');
         const match = purchases.find(p => (p.book_id || '').toUpperCase().trim() === bKey);
@@ -340,15 +367,17 @@ function savePersistentDownloadCount(count) {
     // 1. Save user-specific key
     localStorage.setItem(`AIM_DL_COUNT_${uKey}_${bKey}`, String(count));
     
-    // 2. Save book generic key
-    localStorage.setItem(`AIM_DL_COUNT_${bKey}`, String(count));
+    // Clean up generic book key
+    try {
+        localStorage.removeItem(`AIM_DL_COUNT_${bKey}`);
+    } catch(e) {}
 
-    // 3. Update in-memory state
+    // 2. Update in-memory state
     if (state.purchaseData) {
         state.purchaseData.download_count = count;
     }
 
-    // 4. Update in local purchases cache
+    // 3. Update in local purchases cache
     try {
         const keys = ['AI_PURCHASES', 'purchases', 'aarogyam_purchases'];
         keys.forEach(k => {
@@ -368,22 +397,33 @@ function savePersistentDownloadCount(count) {
 }
 
 function updateDownloadButtonCountBadges(used, max) {
-    const fastSpeedTag = document.querySelector('#downloadFastBtn .speed-tag');
-    const hdSpeedTag = document.querySelector('#downloadHdBtn .speed-tag');
+    const fastSpeedTag = document.querySelector('#downloadFastBtn .action-btn-badge, #downloadFastBtn .speed-tag');
+    const hdSpeedTag = document.querySelector('#downloadHdBtn .action-btn-badge, #downloadHdBtn .speed-tag');
+    const stickyFastSub = document.querySelector('#stickyDownloadFastBtn .sticky-btn-sub');
+    const stickyHdSub = document.querySelector('#stickyDownloadHdBtn .sticky-btn-sub');
+
+    const remaining = Math.max(0, max - used);
 
     if (used > 0) {
-        if (fastSpeedTag) fastSpeedTag.textContent = `डाउनलोड ${used}/${max} प्रयुक्त`;
-        if (hdSpeedTag) hdSpeedTag.textContent = `डाउनलोड ${used}/${max} प्रयुक्त`;
+        if (fastSpeedTag) fastSpeedTag.textContent = `डाउनलोड ${used}/${max}`;
+        if (hdSpeedTag) hdSpeedTag.textContent = `डाउनलोड ${used}/${max}`;
+        if (stickyFastSub) stickyFastSub.textContent = `डाउनलोड ${used}/${max}`;
+        if (stickyHdSub) stickyHdSub.textContent = `${remaining} डाउनलोड शेष`;
     } else {
-        if (fastSpeedTag) fastSpeedTag.textContent = `1-Sec Speed • 0/${max}`;
+        if (fastSpeedTag) fastSpeedTag.textContent = `⚡ सबसे तेज़`;
         if (hdSpeedTag) hdSpeedTag.textContent = `HD प्रिंट • 0/${max}`;
+        if (stickyFastSub) stickyFastSub.textContent = `फास्ट ~24MB`;
+        if (stickyHdSub) stickyHdSub.textContent = `प्रिंट • 3 मान्य`;
     }
 
     if (used >= max) {
         if (fastSpeedTag) fastSpeedTag.textContent = `लिमिट समाप्त (${max}/${max})`;
         if (hdSpeedTag) hdSpeedTag.textContent = `लिमिट समाप्त (${max}/${max})`;
+        if (stickyFastSub) stickyFastSub.textContent = `लिमिट समाप्त`;
+        if (stickyHdSub) stickyHdSub.textContent = `लिमिट समाप्त`;
     }
 }
+
 
 // --- UI MANIPULATION ---
 
@@ -400,8 +440,13 @@ function populateUI() {
     const bookCategory = document.getElementById('bookCategory');
     if (bookCategory) bookCategory.textContent = state.bookData.category || 'कृषि मास्टर गाइड';
 
+    const userName = state.userData.full_name || state.userData.email || 'किसान मित्र';
     const customerName = document.getElementById('customerName');
-    if (customerName) customerName.textContent = state.userData.full_name || state.userData.email || 'किसान मित्र';
+    if (customerName) customerName.textContent = userName;
+    
+    // Dynamic user greeting: "बधाई हो, <User Name> जी!"
+    const celebrationUserName = document.getElementById('celebrationUserName');
+    if (celebrationUserName) celebrationUserName.textContent = userName;
     
     const customerMobile = document.getElementById('customerMobile');
     if (customerMobile) customerMobile.textContent = state.userData.mobile || 'वेरिफाइड पाठक';
@@ -459,6 +504,14 @@ function populateUI() {
         };
     }
 
+    // Wire up sticky Read Now button
+    const stickyReadNowBtn = document.getElementById('stickyReadNowBtn');
+    if (stickyReadNowBtn) {
+        stickyReadNowBtn.onclick = () => {
+            window.location.href = `reader.html?book=${state.bookId}`;
+        };
+    }
+
     if (remaining <= 0) {
         const readyBox = document.getElementById('statusReady');
         const exhaustedBox = document.getElementById('statusExhausted');
@@ -469,6 +522,26 @@ function populateUI() {
         const hdBtn = document.getElementById('downloadHdBtn');
         if (fastBtn) { fastBtn.disabled = true; fastBtn.style.opacity = '0.6'; }
         if (hdBtn) { hdBtn.disabled = true; hdBtn.style.opacity = '0.6'; }
+
+        const stickyFastBtn = document.getElementById('stickyDownloadFastBtn');
+        const stickyHdBtn = document.getElementById('stickyDownloadHdBtn');
+        if (stickyFastBtn) { stickyFastBtn.disabled = true; stickyFastBtn.style.opacity = '0.45'; }
+        if (stickyHdBtn) { stickyHdBtn.disabled = true; stickyHdBtn.style.opacity = '0.45'; }
+    } else {
+        const readyBox = document.getElementById('statusReady');
+        const exhaustedBox = document.getElementById('statusExhausted');
+        if (readyBox) readyBox.style.display = 'block';
+        if (exhaustedBox) exhaustedBox.style.display = 'none';
+
+        const fastBtn = document.getElementById('downloadFastBtn');
+        const hdBtn = document.getElementById('downloadHdBtn');
+        if (fastBtn) { fastBtn.disabled = false; fastBtn.style.opacity = '1'; }
+        if (hdBtn) { hdBtn.disabled = false; hdBtn.style.opacity = '1'; }
+
+        const stickyFastBtn = document.getElementById('stickyDownloadFastBtn');
+        const stickyHdBtn = document.getElementById('stickyDownloadHdBtn');
+        if (stickyFastBtn) { stickyFastBtn.disabled = false; stickyFastBtn.style.opacity = '1'; }
+        if (stickyHdBtn) { stickyHdBtn.disabled = false; stickyHdBtn.style.opacity = '1'; }
     }
 }
 
@@ -707,26 +780,42 @@ window.triggerDownloadTier = async function(tier = 'fast') {
 
         if (fastBtn) { fastBtn.disabled = true; fastBtn.style.opacity = '0.6'; }
         if (hdBtn) { hdBtn.disabled = true; hdBtn.style.opacity = '0.6'; }
+
+        const stickyFastBtn = document.getElementById('stickyDownloadFastBtn');
+        const stickyHdBtn = document.getElementById('stickyDownloadHdBtn');
+        if (stickyFastBtn) { stickyFastBtn.disabled = true; stickyFastBtn.style.opacity = '0.45'; }
+        if (stickyHdBtn) { stickyHdBtn.disabled = true; stickyHdBtn.style.opacity = '0.45'; }
     }
 
     const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
-    if (client && state.userData?.id) {
+    if (client) {
         try {
-            await client.from('purchases')
-                .update({ download_count: newCount })
-                .eq('profile_id', state.userData.id)
-                .eq('book_id', state.bookId);
+            // Update purchase record directly by primary ID
+            if (state.purchaseData?.id && !String(state.purchaseData.id).startsWith('local_')) {
+                await client.from('purchases')
+                    .update({ download_count: newCount })
+                    .eq('id', state.purchaseData.id);
+            } else if (state.userData?.id) {
+                await client.from('purchases')
+                    .update({ download_count: newCount })
+                    .eq('profile_id', state.userData.id)
+                    .eq('book_id', state.bookId);
+            }
 
-            await client.from('download_logs').insert([{
-                user_id: state.userData.id,
-                purchase_id: String(state.purchaseData.id),
-                book_id: state.bookId,
-                download_number: newCount,
-                device_info: `${navigator.userAgent} [Tier: ${tier}]`,
-                ip_address: null,
-                download_status: 'success',
-                downloaded_at: new Date().toISOString()
-            }]);
+            // Insert into download_logs with profile_id
+            const activeProfileId = state.purchaseData?.profile_id || (state.userData?.id && !String(state.userData.id).startsWith('local_') ? state.userData.id : null);
+            if (activeProfileId) {
+                await client.from('download_logs').insert([{
+                    profile_id: activeProfileId,
+                    purchase_id: String(state.purchaseData?.id || ''),
+                    book_id: state.bookId,
+                    download_number: newCount,
+                    device_info: `${navigator.userAgent} [Tier: ${tier}]`,
+                    ip_address: null,
+                    download_status: 'success',
+                    downloaded_at: new Date().toISOString()
+                }]);
+            }
         } catch (err) {
             console.warn('DB logging note:', err);
         }

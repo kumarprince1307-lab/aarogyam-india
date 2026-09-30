@@ -402,6 +402,14 @@
       </div>
 
       <div class="header-actions">
+          <!-- Header Login / User Profile Action Button -->
+          <button type="button" id="header-login-btn" onclick="openLoginPopup()" class="header-auth-btn" style="background:#16a34a;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:0.82rem;font-weight:800;display:inline-flex;align-items:center;gap:6px;cursor:pointer;box-shadow:0 2px 8px rgba(22,163,74,0.3);">
+              <i class="fa-solid fa-right-to-bracket"></i> <span>लॉगिन</span>
+          </button>
+          <a href="/ucas/index.html" id="header-user-btn" class="header-auth-btn" style="background:#fde047;color:#0f172a;border:none;border-radius:20px;padding:6px 14px;font-size:0.82rem;font-weight:800;display:none;align-items:center;gap:6px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+              <i class="fa-solid fa-user-check"></i> <span id="header-user-name">प्रोफाइल</span>
+          </a>
+
           <!-- Cart Icon -->
           <a href="cart.html" class="header-cart-icon" title="Cart">
               <i class="fa-solid fa-cart-shopping"></i>

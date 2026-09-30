@@ -59,91 +59,77 @@
         </div>
 
         <!-- ==============================================================
-             SECTION 1: WELCOME & CLICKABLE INTERACTIVE KPIS
-             ============================================================== -->
-        <section class="celebration-hero-section" id="heroCelebrationSection">
-            <div class="celebration-badge-pill">
-                <span class="sparkle-icon">✨</span>
-                <span>सफलतापूर्वक अनलॉक हुआ • Lifetime Active</span>
-            </div>
-            <h1 class="celebration-heading">🎉 बधाई हो किसान भाई!</h1>
-            <p class="celebration-subtext">आपकी प्रीमियम डिजिटल ई-बुक आपकी लाइब्रेरी में सफलतापूर्वक जोड़ दी गई है। आप इसे <strong>तुरंत डाउनलोड</strong> कर सकते हैं या <strong>बिना फोन मेमोरी भरे ऐप में पढ़ व सुन</strong> सकते हैं!</p>
-
-            <!-- 4 CLICKABLE ANIMATED GLOWING KPI STAT CARDS -->
-            <div class="kpi-metrics-grid">
-                <!-- KPI 1: VIP Access (Clickable -> Scrolls to Certificate) -->
-                <button type="button" class="kpi-stat-card glow-emerald kpi-clickable-btn" onclick="window.scrollToSection('downloadCard')" title="लाइफटाइम VIP स्टेटस देखें">
-                    <div class="kpi-icon-wrap">👑</div>
-                    <div class="kpi-content">
-                        <span class="kpi-val">लाइफटाइम VIP</span>
-                        <span class="kpi-label">वैलिडिटी: हमेशा एक्टिव</span>
-                    </div>
-                    <div class="kpi-beacon">
-                        <span class="beacon-dot"></span>
-                        <span class="beacon-label">सक्रिय • क्लिक करें</span>
-                    </div>
-                </button>
-
-                <!-- KPI 2: CDN Download Speed (Clickable -> Scrolls to Download Tiers) -->
-                <button type="button" class="kpi-stat-card glow-amber kpi-clickable-btn" onclick="window.scrollToSection('downloadTiersBox')" title="सुपरफास्ट डाउनलोड पर जाएं">
-                    <div class="kpi-icon-wrap">⚡</div>
-                    <div class="kpi-content">
-                        <span class="kpi-val">सुपरफास्ट CDN</span>
-                        <span class="kpi-label">24MB डायरेक्ट लिंक</span>
-                    </div>
-                    <div class="kpi-beacon amber">
-                        <span class="beacon-dot"></span>
-                        <span class="beacon-label">1 सेकंड • क्लिक करें</span>
-                    </div>
-                </button>
-
-                <!-- KPI 3: Offline PWA App (Clickable -> Scrolls to App Install Section) -->
-                <button type="button" class="kpi-stat-card glow-blue kpi-clickable-btn" onclick="window.scrollToSection('appInstallTutorialCard')" title="ऐप इंस्टॉल सेक्शन पर जाएं">
-                    <div class="kpi-icon-wrap">📱</div>
-                    <div class="kpi-content">
-                        <span class="kpi-val">Aarogyam App</span>
-                        <span class="kpi-label">मेमोरी खर्च: 0% MB</span>
-                    </div>
-                    <div class="kpi-beacon blue">
-                        <span class="beacon-dot"></span>
-                        <span class="beacon-label">ऑफलाइन • इंस्टॉल करें</span>
-                    </div>
-                </button>
-
-                <!-- KPI 4: Audio Narration (Clickable -> Toggles Spoken Guidance) -->
-                <button type="button" class="kpi-stat-card glow-purple kpi-clickable-btn" onclick="window.toggleAudioGuidance()" title="ऑडियो गाइडेंस प्ले/पॉज करें">
-                    <div class="kpi-icon-wrap">🎧</div>
-                    <div class="kpi-content">
-                        <span class="kpi-val">स्मार्ट ऑडियो</span>
-                        <span class="kpi-label">AI वौइस् नरेशन रेडी</span>
-                    </div>
-                    <div class="kpi-beacon purple">
-                        <span class="beacon-dot"></span>
-                        <span class="beacon-label">सुनें • क्लिक करें</span>
-                    </div>
-                </button>
-            </div>
-        </section>
-
-        <!-- ==============================================================
-             SECTION 2: E-BOOK DELIVERY & DOWNLOAD CARD (BLUE HD BOX + 1-SEC PDF)
+             SECTION 1: E-BOOK DELIVERY & DIRECT ACTION BUTTONS STAGE (FIRST & TOP)
              ============================================================== -->
         <section id="downloadCard" class="download-card-vip" style="display: none;">
             <div class="card-gold-ribbon">
-                <i class="fa-solid fa-crown"></i> <span>OFFICIAL VIP ACCESS</span>
+                <i class="fa-solid fa-crown"></i> <span>OFFICIAL VIP ACCESS • LIFETIME UNLOCKED</span>
             </div>
 
-            <!-- Book Info & Certificate Box -->
+            <!-- Book Info, Cover & Big Action Buttons Box -->
             <div class="book-delivery-wrap">
+                <!-- 1. Prominent Book Cover Image (First & Top) -->
                 <div class="book-cover-stage">
                     <img id="bookCover" src="" alt="Book Cover" class="vip-book-cover" onclick="window.openImageZoom?.(this.src)" title="क्लिक करके बड़ा देखें">
                     <span class="cover-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> ज़ूम करें</span>
                 </div>
+
+                <!-- 2. Clean Title, Live Table-Synced Counter & Direct Download Buttons -->
                 <div class="book-details-col">
                     <div class="book-category-pill" id="bookCategory">कृषि मास्टर गाइड</div>
                     <!-- Clean Book Title (No BK001/BK015 Codes) -->
                     <h2 id="bookName" class="vip-book-title">ई-बुक लोड हो रही है...</h2>
                     
+                    <!-- Live Table-Synced Download Status Counter -->
+                    <div id="statusReady" class="db-download-status-bar">
+                        <i class="fa-solid fa-circle-check" style="color:#16a34a; font-size:1.15rem;"></i>
+                        <span>डाउनलोड स्थिति: <strong id="downloadsUsed">0</strong> / <strong id="downloadsMax">3</strong> प्रयुक्त (<strong id="downloadsRemaining">3</strong> डाउनलोड शेष • लाइफटाइम सुरक्षित)</span>
+                    </div>
+
+                    <div id="statusExhausted" class="download-status-vip exhausted" style="display: none; margin: 12px 0;">
+                        <p class="status-title">⚠️ डाउनलोड लिमिट (3/3) पूरी हो चुकी है</p>
+                        <p class="status-subtitle">चिंता न करें! आप नीचे <strong>"My Library में ऑनलाइन पढ़ें"</strong> बटन दबाकर असीमित बार कभी भी पढ़ व सुन सकते हैं।</p>
+                    </div>
+
+                    <!-- 3 CLEAR, HIGH-CONVERTING ACTION BUTTONS (NO HUNTING REQUIRED) -->
+                    <div class="direct-action-buttons-stack" id="downloadTiersBox">
+                        <!-- BUTTON 1: BIG RED PRIMARY DOWNLOAD BUTTON (~24 MB) -->
+                        <button type="button" id="downloadFastBtn" class="btn-action-primary-red" onclick="window.triggerDownloadTier('fast')">
+                            <div class="action-btn-icon-wrap">
+                                <i class="fa-solid fa-file-arrow-down"></i>
+                            </div>
+                            <div class="action-btn-text">
+                                <div class="action-btn-main">📥 तुरंत PDF डाउनलोड करें (~24 MB)</div>
+                                <div class="action-btn-sub">फास्ट मोबाइल PDF • 1 सेकंड में डायरेक्ट डाउनलोड</div>
+                            </div>
+                            <span class="action-btn-badge red-badge">⚡ सबसे तेज़</span>
+                        </button>
+
+                        <!-- BUTTON 2: FULL HD PRINT QUALITY BUTTON -->
+                        <button type="button" id="downloadHdBtn" class="btn-action-secondary-blue" onclick="window.triggerDownloadTier('hd')">
+                            <div class="action-btn-icon-wrap">
+                                <i class="fa-solid fa-print"></i>
+                            </div>
+                            <div class="action-btn-text">
+                                <div class="action-btn-main">🖨️ फुल HD / प्रिंट क्वालिटी PDF</div>
+                                <div class="action-btn-sub">उच्च-गुणवत्ता प्रिंट हेतु • 3 डाउनलोड मान्य</div>
+                            </div>
+                            <span class="action-btn-badge blue-badge">HD प्रिंट</span>
+                        </button>
+
+                        <!-- BUTTON 3: READ NOW ONLINE (ZERO PHONE MEMORY) -->
+                        <button type="button" id="readNowBtn" class="btn-action-tertiary-green">
+                            <div class="action-btn-icon-wrap">
+                                <i class="fa-solid fa-book-open-reader"></i>
+                            </div>
+                            <div class="action-btn-text">
+                                <div class="action-btn-main">📖 My Library में ऑनलाइन पढ़ें व सुनें</div>
+                                <div class="action-btn-sub">0% फोन मेमोरी खर्च • असीमित बार कभी भी पढ़ें व सुनें</div>
+                            </div>
+                            <span class="action-btn-badge green-badge">असीमित बार</span>
+                        </button>
+                    </div>
+
                     <!-- Purchase Summary Certificate -->
                     <div class="purchase-certificate-grid" id="certBox">
                         <div class="cert-item">
@@ -156,7 +142,7 @@
                         </div>
                         <div class="cert-item">
                             <span class="cert-lbl">एक्सेस:</span>
-                            <strong class="cert-val" style="color:#34d399;">लाइफटाइम अनलॉक्ड</strong>
+                            <strong class="cert-val" style="color:#16a34a;">लाइफटाइम अनलॉक्ड</strong>
                         </div>
                         <div class="cert-item">
                             <span class="cert-lbl">तारीख:</span>
@@ -171,76 +157,8 @@
                 </div>
             </div>
 
-            <!-- Download Status Counter -->
-            <div id="statusReady" class="download-status-vip ready">
-                <div class="status-indicator-col">
-                    <span class="ready-badge">🟢 डाउनलोड के लिए तैयार</span>
-                    <p class="status-note">आपकी सुरक्षित PDF कॉपी तुरंत डाउनलोड के लिए तैयार है (अधिकतम 3 डाउनलोड मान्य):</p>
-                </div>
-                <div class="vip-download-counter">
-                    <div class="cnt-box"><span>Used</span><strong id="downloadsUsed">0</strong></div>
-                    <div class="cnt-divider">/</div>
-                    <div class="cnt-box"><span>Remaining</span><strong id="downloadsRemaining">3</strong></div>
-                    <div class="cnt-divider">/</div>
-                    <div class="cnt-box"><span>Limit</span><strong id="downloadsMax">3</strong></div>
-                </div>
-            </div>
-
-            <div id="statusExhausted" class="download-status-vip exhausted" style="display: none;">
-                <p class="status-title">⚠️ डाउनलोड लिमिट पूरी हो चुकी है</p>
-                <p class="status-subtitle">चिंता न करें! Reader और Audio कभी समाप्त नहीं होते — आप My Library में असीमित बार पढ़ व सुन सकते हैं।</p>
-            </div>
-
-            <!-- 2-SPEED DOWNLOAD OPTIONS (WITH BLUE FULL HD BOX) -->
-            <div class="download-tiers-vip-wrap" id="downloadTiersBox">
-                <!-- Option 1: Fast Mobile PDF (Recommended - Instant 1-Sec Direct Link) -->
-                <button type="button" id="downloadFastBtn" class="btn-tier-vip fast-tier-vip" onclick="window.triggerDownloadTier('fast')">
-                    <div class="tier-left-col">
-                        <div class="tier-icon-circle amber">⚡</div>
-                        <div class="tier-text-col">
-                            <div class="tier-headline">फास्ट मोबाइल PDF (~24 MB)</div>
-                            <div class="tier-subtext">मोबाइल व व्हाट्सएप शेयरिंग के लिए सबसे तेज़ (मात्र 1 सेकंड में डायरेक्ट डाउनलोड)</div>
-                        </div>
-                    </div>
-                    <div class="tier-right-badge">
-                        <span class="badge-tag gold">✨ सबसे अनुशंसित</span>
-                        <span class="speed-tag gold">1-Sec Speed</span>
-                    </div>
-                </button>
-
-                <!-- Option 2: Full HD / Print Quality PDF (BLUE COLOR BOX AS REQUESTED) -->
-                <button type="button" id="downloadHdBtn" class="btn-tier-vip hd-tier-vip-blue" onclick="window.triggerDownloadTier('hd')">
-                    <div class="tier-left-col">
-                        <div class="tier-icon-circle blue">🖨️</div>
-                        <div class="tier-text-col">
-                            <div class="tier-headline">फुल HD / प्रिंट क्वालिटी PDF</div>
-                            <div class="tier-subtext">प्रिंट निकालने व बड़े स्क्रीन के लिए उच्च-गुणवत्ता HD फाइल (केवल 3 बार डाउनलोड मान्य)</div>
-                        </div>
-                    </div>
-                    <div class="tier-right-badge">
-                        <span class="badge-tag blue">🖨️ प्रिंट क्वालिटी</span>
-                        <span class="speed-tag blue">3 डाउनलोड मान्य</span>
-                    </div>
-                </button>
-
-                <!-- Option 3: Read Online in Library (Zero Memory Usage) -->
-                <button type="button" id="readNowBtn" class="btn-tier-vip read-tier-vip">
-                    <div class="tier-left-col">
-                        <div class="tier-icon-circle green">📖</div>
-                        <div class="tier-text-col">
-                            <div class="tier-headline">My Library में ऑनलाइन पढ़ें / ऑडियो सुनें</div>
-                            <div class="tier-subtext">बिना डाउनलोड किए 0% फोन मेमोरी खर्च में तुरंत ज़ूम करके कभी भी कितनी भी बार पढ़ें व सुनें</div>
-                        </div>
-                    </div>
-                    <div class="tier-right-badge">
-                        <span class="badge-tag green">0% मेमोरी खर्च</span>
-                        <span class="speed-tag green">असीमित बार</span>
-                    </div>
-                </button>
-            </div>
-
             <!-- Farmer Tip Message -->
-            <div class="vip-farmer-tip-box">
+            <div class="vip-farmer-tip-box" style="margin-top: 18px;">
                 <div class="tip-icon">💡</div>
                 <div class="tip-text">
                     <strong>किसान मित्र टिप:</strong> आपको बार-बार भारी PDF डाउनलोड करने की कोई आवश्यकता नहीं है। आप जब चाहें <strong>My Library</strong> में इस ई-बुक को ज़ूम करके पढ़ सकते हैं और खेत में काम करते समय कान में इयरफोन लगाकर ऑडियो भी सुन सकते हैं।
@@ -255,6 +173,73 @@
                 </div>
                 <button type="button" onclick="navigator.clipboard?.writeText(window.location.href); alert('✅ लिंक कॉपी हो गया! Google Chrome खोलकर पेस्ट करें।');" style="background: #0284c7; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                     <span>📋</span> <span>Chrome में खोलें</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==============================================================
+             SECTION 2: VIP CELEBRATION & 4 KPIS (BELOW DOWNLOAD CARD AS REQUESTED)
+             ============================================================== -->
+        <section class="celebration-hero-section" id="heroCelebrationSection" style="display: none;">
+            <div class="celebration-badge-pill">
+                <span class="sparkle-icon">✨</span>
+                <span>सफलतापूर्वक अनलॉक हुआ • Lifetime Active VIP Access</span>
+            </div>
+            <h1 class="celebration-heading" id="celebrationHeading">🎉 बधाई हो, <span id="celebrationUserName">किसान मित्र</span> जी!</h1>
+            <p class="celebration-subtext">आपकी प्रीमियम डिजिटल ई-बुक सफलतापूर्वक अनलॉक हो चुकी है। आप इसे <strong>तुरंत ऊपर दिए गए लाल बटन से डाउनलोड</strong> कर सकते हैं या <strong>बिना मेमोरी खर्च किए सीधे पढ़ व सुन</strong> सकते हैं!</p>
+
+            <!-- 4 CLICKABLE ANIMATED GLOWING KPI STAT CARDS -->
+            <div class="kpi-metrics-grid">
+                <!-- KPI 1: VIP Access (Clickable -> Scrolls to Certificate) -->
+                <button type="button" class="kpi-stat-card glow-emerald kpi-clickable-btn" onclick="window.scrollToSection('certBox')" title="लाइफटाइम VIP स्टेटस देखें">
+                    <div class="kpi-icon-wrap">👑</div>
+                    <div class="kpi-content">
+                        <span class="kpi-val">लाइफटाइम VIP</span>
+                        <span class="kpi-label">वैलिडिटी: हमेशा एक्टिव</span>
+                    </div>
+                    <div class="kpi-beacon">
+                        <span class="beacon-dot"></span>
+                        <span class="beacon-label">सक्रिय • लाइफटाइम</span>
+                    </div>
+                </button>
+
+                <!-- KPI 2: CDN Download Speed (Clickable -> Scrolls to Download Tiers) -->
+                <button type="button" class="kpi-stat-card glow-amber kpi-clickable-btn" onclick="window.scrollToSection('downloadTiersBox')" title="सुपरफास्ट डाउनलोड पर जाएं">
+                    <div class="kpi-icon-wrap">⚡</div>
+                    <div class="kpi-content">
+                        <span class="kpi-val">सुपरफास्ट CDN</span>
+                        <span class="kpi-label">24MB डायरेक्ट लिंक</span>
+                    </div>
+                    <div class="kpi-beacon amber">
+                        <span class="beacon-dot"></span>
+                        <span class="beacon-label">1 सेकंड स्पीड</span>
+                    </div>
+                </button>
+
+                <!-- KPI 3: Offline PWA App (Clickable -> Scrolls to App Install Section) -->
+                <button type="button" class="kpi-stat-card glow-blue kpi-clickable-btn" onclick="window.scrollToSection('appInstallTutorialCard')" title="ऐप इंस्टॉल सेक्शन पर जाएं">
+                    <div class="kpi-icon-wrap">📱</div>
+                    <div class="kpi-content">
+                        <span class="kpi-val">Aarogyam App</span>
+                        <span class="kpi-label">मेमोरी खर्च: 0% MB</span>
+                    </div>
+                    <div class="kpi-beacon blue">
+                        <span class="beacon-dot"></span>
+                        <span class="beacon-label">ऑफलाइन रेडी</span>
+                    </div>
+                </button>
+
+                <!-- KPI 4: Audio Narration (Clickable -> Toggles Spoken Guidance) -->
+                <button type="button" class="kpi-stat-card glow-purple kpi-clickable-btn" onclick="window.toggleAudioGuidance()" title="ऑडियो गाइडेंस प्ले/पॉज करें">
+                    <div class="kpi-icon-wrap">🎧</div>
+                    <div class="kpi-content">
+                        <span class="kpi-val">स्मार्ट ऑडियो</span>
+                        <span class="kpi-label">हिंदी वौइस् नरेशन</span>
+                    </div>
+                    <div class="kpi-beacon purple">
+                        <span class="beacon-dot"></span>
+                        <span class="beacon-label">लाइव सुनें</span>
+                    </div>
                 </button>
             </div>
         </section>
@@ -389,26 +374,38 @@
     </footer>
 
     <!-- ==============================================================
-         UNIVERSAL FIXED MOBILE BOTTOM NAVIGATION
+         STICKY BOTTOM ACTION DOCK (3 FIXED BUTTONS: FAST RED, BLUE HD, GREEN READ NOW)
          ============================================================== -->
-    <nav class="mobile-bottom-nav vip-mobile-bottom-nav">
-        <a href="../index.html" class="nav-tab-item">
-            <i class="fa-solid fa-house nav-tab-icon"></i>
-            <span>होम</span>
-        </a>
-        <a href="ebook.html" class="nav-tab-item">
-            <i class="fa-solid fa-book-open nav-tab-icon"></i>
-            <span>ई-बुक्स</span>
-        </a>
-        <a href="my-library.html" class="nav-tab-item active">
-            <i class="fa-solid fa-bookmark nav-tab-icon"></i>
-            <span>लाइब्रेरी</span>
-        </a>
-        <a href="https://wa.me/917974422572?text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%2C%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20eBook%20%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1%20%E0%A4%AF%E0%A4%BE%20App%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F%E0%A5%A4" target="_blank" class="nav-tab-item">
-            <i class="fa-brands fa-whatsapp nav-tab-icon" style="color: #25d366;"></i>
-            <span>हेल्पलाइन</span>
-        </a>
-    </nav>
+    <div id="stickyDownloadDock" class="vip-sticky-action-dock" style="display: none;">
+        <div class="sticky-dock-inner">
+            <!-- 1. FAST RED DOWNLOAD -->
+            <button type="button" id="stickyDownloadFastBtn" class="sticky-action-btn sticky-btn-red" onclick="window.triggerDownloadTier('fast')">
+                <i class="fa-solid fa-file-arrow-down"></i>
+                <div class="sticky-btn-text">
+                    <span class="sticky-btn-title">📥 तुरंत PDF</span>
+                    <span class="sticky-btn-sub">फास्ट ~24MB</span>
+                </div>
+            </button>
+
+            <!-- 2. FULL HD BLUE DOWNLOAD -->
+            <button type="button" id="stickyDownloadHdBtn" class="sticky-action-btn sticky-btn-blue" onclick="window.triggerDownloadTier('hd')">
+                <i class="fa-solid fa-print"></i>
+                <div class="sticky-btn-text">
+                    <span class="sticky-btn-title">🖨️ फुल HD PDF</span>
+                    <span class="sticky-btn-sub">प्रिंट क्वालिटी</span>
+                </div>
+            </button>
+
+            <!-- 3. READ NOW GREEN -->
+            <button type="button" id="stickyReadNowBtn" class="sticky-action-btn sticky-btn-green">
+                <i class="fa-solid fa-book-open-reader"></i>
+                <div class="sticky-btn-text">
+                    <span class="sticky-btn-title">📖 ऑनलाइन पढ़ें</span>
+                    <span class="sticky-btn-sub">0% मेमोरी खर्च</span>
+                </div>
+            </button>
+        </div>
+    </div>
 
     <!-- 4. Floating Audio Player (with Dismiss/Close Button & Soundwaves) -->
     <div id="aoi-download-floating-audio" class="floating-audio-pill" style="display: none;">
