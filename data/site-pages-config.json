@@ -1904,7 +1904,9 @@
         "sec_help_support",
         "sec_faqs"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_hero_slider"
+      ],
       "kpi_cards": [],
       "marketing_cards": [],
       "videos": [
@@ -1933,8 +1935,14 @@
           "thumbnail": "https://img.youtube.com/vi/bvCuBEuyg48/hqdefault.jpg"
         }
       ],
+      "reviews_heading": "",
+      "reviews_badge": "",
       "reviews": [],
+      "faqs_heading": "",
+      "faqs_badge": "",
       "faqs": [],
+      "ladder_header": null,
+      "career_ladder": [],
       "health_diseases": [],
       "crops": [],
       "pashu_cards": [],
@@ -1980,9 +1988,12 @@
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "डायबिटीज: कारण, लक्षण व गंभीर खतरे",
+        "subtitle": "",
         "cards": [
           {
+            "id": "CB_1790854451222_e13z",
             "title": "❓ कारण (Causes)",
+            "badge": "",
             "color": "#2563eb",
             "image": "/images/banners/diabetes-causes-infographic.webp",
             "points": [
@@ -1990,10 +2001,15 @@
               "पैंक्रियाज की कमजोरी: बीटा सेल्स द्वारा पर्याप्त इंसुलिन का न बनना।",
               "तनाव व कोर्टिसोल: मानसिक तनाव से लिवर अतिरिक्त ग्लूकोज रिलीज करता है।",
               "मोटापा व फैटी लिवर: पेट की चर्बी इंसुलिन के मार्ग में रुकावट"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790854451222_8nik",
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
+            "badge": "",
             "color": "#2563eb",
             "image": "/images/banners/diabetes-symptoms-infographic.webp",
             "points": [
@@ -2001,10 +2017,15 @@
               "भरपेट खाने के बाद भी जल्दी भूख लगना और थकान।",
               "हाथों व पैरों के तलवों में जलन, सूई चुभने जैसा अहसास या सुन्नपन।",
               "आंखों के आगे धुंधलापन आना और चोट/घाव देर से भरना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790854451222_7b8l",
             "title": "🚨 साइड इफेक्ट्स व खतरे (Risks)",
+            "badge": "",
             "color": "#dc2626",
             "image": "/images/banners/diabetes-risks-infographic.webp",
             "points": [
@@ -2012,10 +2033,14 @@
               "डायबिटिक न्यूरोपैथी: पैरों की नसों का कमजोर होना व सेंसेशन खोना।",
               "रेटिनोपैथी: आंखों के पर्दे की बारीक नसों का फटना व अंधापन।",
               "हार्ट अटैक व स्ट्रोक: सामान्य व्यक्ति की तुलना में 3 गुना अधिक जोखिम।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           }
         ]
       },
+      "admin_edited": 1790854451223,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
