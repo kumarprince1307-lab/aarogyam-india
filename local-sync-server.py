@@ -93,7 +93,8 @@ def sync_og_to_html_files(site_pages):
                 continue
 
             head_open, head_inner, head_close = head_match.groups()
-            head_clean = re.sub(r'\s*<meta\s+property=["\']og:[^"\']+["\'][^>]*>', '', head_inner, flags=re.IGNORECASE)
+            head_clean = re.sub(r'<!--\s*OpenGraph\s*&\s*Social\s*Share\s*Meta[^-]*-->\s*', '', head_inner, flags=re.IGNORECASE)
+            head_clean = re.sub(r'\s*<meta\s+property=["\']og:[^"\']+["\'][^>]*>', '', head_clean, flags=re.IGNORECASE)
             head_clean = re.sub(r'\s*<meta\s+name=["\']twitter:[^"\']+["\'][^>]*>', '', head_clean, flags=re.IGNORECASE)
 
             og_lines = [
