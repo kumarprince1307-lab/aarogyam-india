@@ -512,8 +512,10 @@
     }
 
     // 3.0 Floating 3D Banner injection if active
-    if (config.floating_banner && config.floating_banner.enabled && config.floating_banner.image) {
-      let fbEl = document.getElementById('home-3d-floating-banner');
+    let fbEl = document.getElementById('home-3d-floating-banner');
+    if (!config.floating_banner || config.floating_banner.enabled === false || !config.floating_banner.image) {
+      if (fbEl) fbEl.style.display = 'none';
+    } else {
       if (!fbEl) {
         fbEl = document.createElement('div');
         fbEl.id = 'home-3d-floating-banner';
@@ -523,6 +525,7 @@
         `;
         document.body.appendChild(fbEl);
       }
+      fbEl.style.display = 'block';
       const animClass = config.floating_banner.animation === 'none' ? '' : 'ubl-float-3d-anim';
       fbEl.innerHTML = `
         <a href="${config.floating_banner.action_link || '#'}" style="display:block; text-decoration:none; text-align:center;">
@@ -531,6 +534,7 @@
         </a>
       `;
     }
+
   }
 
   // -------------------------------------------------------------

@@ -3190,10 +3190,13 @@ export async function initPageEditor() {
               <div style="font-weight: 800; color: #60a5fa; font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
                 <span>🔮 3.0 तैरता हुआ 3D बैनर व एनिमेशन (Floating 3D Banner Layer)</span>
               </div>
-              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #38bdf8; cursor: pointer; font-weight: 700;">
-                <input type="checkbox" id="pe_chk_floating_banner" style="width: 16px; height: 16px; accent-color: #3b82f6;" />
-                <span>3D फ्लोटिंग बैनर सक्रिय करें</span>
-              </label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #38bdf8; cursor: pointer; font-weight: 700;">
+                  <input type="checkbox" id="pe_chk_floating_banner" onchange="window.updateFloatingBannerToggleUI(this.checked)" style="width: 16px; height: 16px; accent-color: #3b82f6;" />
+                  <span>3D फ्लोटिंग बैनर सक्रिय रखें</span>
+                </label>
+                <span id="pe_status_floating_banner" style="font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:12px; background:#ef4444; color:#fff; transition:all 0.2s ease;">🔴 बंद (OFF)</span>
+              </div>
             </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 8px;">
               <div>
@@ -4135,6 +4138,18 @@ export async function initPageEditor() {
     savePageConfig();
   });
 
+  window.updateFloatingBannerToggleUI = function(isChecked) {
+    const statusEl = document.getElementById('pe_status_floating_banner');
+    if (!statusEl) return;
+    if (isChecked) {
+      statusEl.style.background = '#16a34a';
+      statusEl.textContent = '🟢 चालू (ACTIVE)';
+    } else {
+      statusEl.style.background = '#ef4444';
+      statusEl.textContent = '🔴 बंद (OFF)';
+    }
+  };
+
   const floatImgInput = document.getElementById('pe_input_floating_banner_img');
   floatImgInput?.addEventListener('input', () => {
     const val = (floatImgInput.value || '').trim();
@@ -4149,6 +4164,8 @@ export async function initPageEditor() {
       }
     }
   });
+
+
 
   toggleBtn?.addEventListener('click', () => {
     resetPageForm();
@@ -6763,11 +6780,15 @@ export async function initPageEditor() {
     const floatPrevImg = document.getElementById('pe_floating_banner_preview_img');
 
     const fbData = p.floating_banner || {};
-    if (floatChk) floatChk.checked = Boolean(fbData.enabled);
+    if (floatChk) {
+      floatChk.checked = Boolean(fbData.enabled);
+      window.updateFloatingBannerToggleUI(floatChk.checked);
+    }
     if (floatImg) floatImg.value = fbData.image || '';
     if (floatTitle) floatTitle.value = fbData.badge_title || '';
     if (floatLink) floatLink.value = fbData.action_link || '';
     if (floatAnim) floatAnim.value = fbData.animation || 'ublFloatBook3D';
+
 
     if (floatPrevWrap && floatPrevImg) {
       if (fbData.image) {

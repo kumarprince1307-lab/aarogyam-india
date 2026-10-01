@@ -1199,11 +1199,12 @@
       return;
     }
     const fb = pageConfig.floating_banner;
-    // Don't render if explicitly disabled without valid action
-    if (fb.enabled === false && !fb.image) {
+    // Don't render if explicitly disabled in Admin
+    if (!fb || fb.enabled === false || !fb.image) {
       if (fbEl) fbEl.style.display = 'none';
       return;
     }
+
 
     // Ensure 3D Floating Animation Style is injected on ALL pages
     if (!document.getElementById('style-floating-3d-anim')) {

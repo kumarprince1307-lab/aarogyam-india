@@ -1,0 +1,300 @@
+/**
+ * ====================================================================
+ * AAROGYAM INDIA - PREMIUM GLASSMORPHIC MOBILE & DESKTOP UI SUITE
+ * Version: 2026.1.0 (Butter-Smooth Mobile UX, Neu-Cards, Micro-Haptics)
+ * ====================================================================
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+/* --- 1. GLOBAL TYPOGRAPHY & SMOOTH RENDERING --- */
+html, body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-family: 'Noto Sans Devanagari', 'Inter', -apple-system, sans-serif;
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6,
+.home-hero-title,
+.header-brand-wrap,
+.bighaat-title,
+.kpi-title,
+.section-title {
+  font-family: 'Outfit', 'Noto Sans Devanagari', sans-serif !important;
+  letter-spacing: -0.02em;
+}
+
+/* --- 2. HERO BANNER & PANORAMIC CAROUSEL (MOBILE ADAPTIVE) --- */
+.bighaat-carousel-container,
+.home-hero-section {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.home-hero-slide-item {
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landscape-hero-banner-link,
+.home-hero-full-banner-wrap {
+  display: block;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.15), 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  background: #f8fafc;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.landscape-hero-banner-link:active,
+.home-hero-full-banner-wrap:active {
+  transform: scale(0.99);
+}
+
+.landscape-hero-banner-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  border-radius: 18px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Mobile Hero Banner Optimization: Never shrink into an unreadable thin strip! */
+@media (max-width: 768px) {
+  .landscape-hero-banner-link,
+  .home-hero-full-banner-wrap {
+    border-radius: 16px;
+    box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
+  }
+  .landscape-hero-banner-img {
+    min-height: 190px;
+    max-height: 270px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 15px;
+  }
+  /* Zoom hint badge over mobile hero banner */
+  .landscape-hero-banner-link::after {
+    content: "🔍 HD फ़ोटो देखें";
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    pointer-events: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Frosted Glass Carousel Arrows */
+.bighaat-carousel-arrow {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16) !important;
+  color: #0f172a !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.bighaat-carousel-arrow:hover {
+  background: #ffffff !important;
+  transform: scale(1.1) translateY(-50%) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.24) !important;
+}
+.bighaat-carousel-arrow:active {
+  transform: scale(0.92) translateY(-50%) !important;
+}
+
+/* Expanding Pill Carousel Dots */
+.bighaat-carousel-dots {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  margin-top: 14px !important;
+}
+.bighaat-carousel-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 10px !important;
+  background: #cbd5e1 !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
+}
+.bighaat-carousel-dot.active {
+  width: 26px !important;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4) !important;
+}
+
+/* --- 3. FROSTED GLASS NEU-CARDS (KPI CARDS, SYMPTOMS, REMEDIES) --- */
+.kpi-card,
+.pe-kpi-card,
+.health-disease-card,
+.home-disease-card,
+.pashu-card,
+.ns-product-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1.5px solid rgba(226, 232, 240, 0.9) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 6px 20px -3px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  will-change: transform;
+}
+
+.kpi-card:hover,
+.health-disease-card:hover,
+.pashu-card:hover,
+.ns-product-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06) !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Tactile Micro-Haptic Click Feedback */
+.kpi-card:active,
+.health-disease-card:active,
+.pashu-card:active,
+.ns-product-card:active {
+  transform: scale(0.975) !important;
+}
+
+/* Glowing Accent Line on Top of Cards */
+.kpi-card::before,
+.health-disease-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, #dc2626 0%, #f97316 50%, #eab308 100%);
+  opacity: 0.85;
+}
+
+/* Card Images with Zoom Indicator */
+.health-disease-card .card-img-wrap,
+.pashu-card .card-img-wrap,
+.ns-product-card .card-img-wrap,
+.kpi-card .card-img-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.health-disease-card img,
+.pashu-card img,
+.ns-product-card img {
+  border-radius: 14px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.health-disease-card:hover img,
+.pashu-card:hover img,
+.ns-product-card:hover img {
+  transform: scale(1.04);
+}
+
+/* KPI Audio Wave Pulse Animation */
+@keyframes aiAudioWave {
+  0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5); }
+  70% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+}
+
+.kpi-audio-btn,
+.btn-speech-trigger {
+  animation: aiAudioWave 2.2s infinite ease-in-out !important;
+  border-radius: 20px !important;
+  font-weight: 800 !important;
+  transition: transform 0.2s ease !important;
+}
+.kpi-audio-btn:active,
+.btn-speech-trigger:active {
+  transform: scale(0.92) !important;
+}
+
+/* Modern Glowing Badges (Pills) */
+.badge-pill-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.badge-pill-red {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.25);
+}
+.badge-pill-green {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(22, 163, 74, 0.25);
+}
+.badge-pill-blue {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+/* WhatsApp Action Buttons (Glowing Green Aura) */
+.btn-whatsapp-glow {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-radius: 25px !important;
+  padding: 10px 20px !important;
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  text-decoration: none !important;
+}
+.btn-whatsapp-glow:hover {
+  box-shadow: 0 6px 22px rgba(22, 163, 74, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+.btn-whatsapp-glow:active {
+  transform: scale(0.96) !important;
+}
+
+/* Subtle Shimmer for Highlighting New Elements */
+@keyframes aiShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.ai-shimmer-effect {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: aiShimmer 3s infinite;
+}
+
+/* Live Marquee Ticker Glow */
+.home-live-ticker-wrap {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+.ticker-pulse-badge {
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.5);
+}
