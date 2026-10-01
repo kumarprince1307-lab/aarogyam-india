@@ -283,7 +283,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1790847987680,
+      "admin_edited": 1790848453273,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -4026,6 +4026,30 @@
           "badge": "पुरुष स्वास्थ्य व स्टैमिना",
           "description": "अश्वगंधा, गोखरू, सफेद मूसली, जिनसेंग व 72% प्लांट प्रोटीन। शारीरिक सहनशक्ति, स्टैमिना और प्राकृतिक टेस्टोस्टेरोन स्तर को सुदृढ़ करे।",
           "image": "/images/products/product-889-1-398356-hvb9.webp"
+        },
+        {
+          "title": "Multi Vitamin For Men 30 NOS",
+          "name": "Multi Vitamin For Men 30 NOS",
+          "description": "पुरुषों के लिए दैनिक ऊर्जा: यह पुरुषों की शारीरिक और मानसिक ऊर्जा, स्टैमिना तथा थकान को दूर करने के लिए तैयार किया गया है।\n\nरोग प्रतिरोधक क्षमता व फिटनेस: यह शरीर की इम्युनिटी (रोग प्रतिरोधक क्षमता) को मजबूत करता है और मांसपेशियों के स्वस्थ विकास व मेटाबॉलिज्म में मदद करता है।",
+          "image": "/images/products/product-multi-vitamin-for--705279-tr2v.webp",
+          "mrp": 375,
+          "price": 375,
+          "discount_pct": 25,
+          "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतरीन परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "नेचुरामोरे मेन्स वेलनेस (Men's Wellness Capsules)",
+          "name": "नेचुरामोरे मेन्स वेलनेस (Men's Wellness Capsules)",
+          "description": "अश्वगंधा, जिनसेंग, गोक्षुर, कौंच बीज व सफेद मूसली से प्राकृतिक ऊर्जा, स्टैमिना और आत्मविश्वास।",
+          "image": "/images/products/product--------------------051545-547x.webp",
+          "mrp": 689,
+          "price": 689,
+          "discount_pct": 25,
+          "dose": "1 कैप्सूल रात को भोजन के बाद गुनगुने दूध या पानी के साथ।",
+          "badge": "⚡ पौरुष शक्ति, स्टैमिना व टेस्टोस्टेरोन",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [
@@ -4098,7 +4122,7 @@
           }
         ]
       },
-      "admin_edited": 1790848009625,
+      "admin_edited": 1790848452869,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
