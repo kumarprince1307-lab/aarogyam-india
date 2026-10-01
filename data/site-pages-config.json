@@ -3850,28 +3850,28 @@
       "url": "/health/sexual-wellness.html",
       "category": "Healthcare Sub-page",
       "status": "active",
-      "theme_primary": "#b45309",
-      "theme_dark": "#680700",
+      "theme_primary": "#0011ff",
+      "theme_dark": "#0000b3",
       "ticker_text": "⚡ भ्रामक प्रचार व केमिकल दवाओं से सावधान • 100% सुरक्षित प्राकृतिक पोषण, पेल्विक योगासन व वैज्ञानिक लाइफस्टाइल से पाएं खोई हुई शक्ति • 🩺 24×7 गोपनीय AI डॉक्टर परामर्श",
       "audio_title": "पौरुष शक्ति व यौन स्वास्थ्य समाधान",
       "audio_script": "नमस्ते {name} जी! पौरुष शक्ति व यौन स्वास्थ्य पेज पर आपका स्वागत है। अत्यधिक मानसिक तनाव, नींद की कमी, स्मोकिंग और नसों में रक्त प्रवाह की रुकावट पौरुष कमजोरी के मुख्य कारण होते हैं। सड़क किनारे मिलने वाली केमिकल दवाओं या वियाग्रा जैसी गोलियों से बचें क्योंकि ये दिल, किडनी और लिवर पर गंभीर असर डालती हैं। सही डाइट, पेल्विक फ्लोर एक्सरसाइज और सुरक्षित आयुर्वेदिक पोषण से इस समस्या को प्राकृतिक रूप से ठीक किया जा सकता है। Aarogyam India पूरी गोपनीयता के साथ आपके स्वास्थ्य सुधार में साथ है।",
       "audio_url": "",
       "og_title": "Aarogyam India | पौरुष शक्ति व यौन स्वास्थ्य | वैज्ञानिक व प्राकृतिक समाधान",
-      "og_image": "/images/banners/health-banner.jpeg",
+      "og_image": "/images/banners/og_image-ed-677895-iqr6.webp",
       "og_description": "“ED, शीघ्रपतन, लो टेस्टोस्टेरोन और स्पर्म काउंट की कमी का सच। भ्रामक केमिकल दवाओं से बचें और सुरक्षित प्राकृतिक समाधान जानें।”",
       "share_message": "📲 पौरुष कमजोरी का सही वैज्ञानिक समाधान: क्या खाएं, कौन से आसन करें और केमिकल दवाओं के नुकसान से कैसे बचें? पूरी जानकारी अभी देखें:",
       "floating_banner": {
         "enabled": true,
         "image": "/images/banners/health-banner.jpeg",
         "badge_title": "👉 पौरुष स्वास्थ्य का सुरक्षित सच जानिए…",
-        "action_link": "/health/sexual-wellness.html",
+        "action_link": "https://wa.me/917974422572",
         "animation": "ublFloatBook3D"
       },
       "fb_pixel": true,
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/health-banner.jpeg",
+          "image": "/images/banners/hero_slide-ed2-820992-3lfn.webp",
           "banner_mode": "full",
           "tag": "⚡ VITALITY & MEN'S HEALTH",
           "title": "पौरुष कमजोरी: भ्रामक दवाओं से बचें, वैज्ञानिक समाधान चुनें",
@@ -3879,10 +3879,11 @@
           "cta_text": "💬 गोपनीय AI डॉक्टर परामर्श",
           "cta_link": "https://wa.me/917974422572",
           "cta_secondary_text": "📦 सुरक्षित हर्बल किट ↓",
-          "cta_secondary_link": "#sec-products"
+          "cta_secondary_link": "#sec-products",
+          "back_link": "https://wa.me/917974422572"
         },
         {
-          "image": "/images/banners/health-banner.jpeg",
+          "image": "/images/banners/hero_slide-ed67-970852-vf7e.webp",
           "banner_mode": "full",
           "tag": "🥗 NATURAL PROTOCOL",
           "title": "24-घंटे का टेस्टोस्टेरोन व शक्ति वर्धक डाइट चार्ट",
@@ -3948,6 +3949,8 @@
           "thumbnail": "https://img.youtube.com/vi/qAux7BHnpyo/hqdefault.jpg"
         }
       ],
+      "reviews_heading": "",
+      "reviews_badge": "",
       "reviews": [
         {
           "name": "राजेश कुमार (ग्वालियर)",
@@ -3965,6 +3968,8 @@
           "comment": "गोपनीय सलाह और शुद्ध आयुर्वेदिक सप्लीमेंट। 2 महीने में स्पर्म काउंट और स्टैमिना में जबरदस्त सुधार देखने को मिला।"
         }
       ],
+      "faqs_heading": "",
+      "faqs_badge": "",
       "faqs": [
         {
           "q": "1. क्या पौरुष कमजोरी पूरी तरह से ठीक हो सकती है?",
@@ -4007,6 +4012,8 @@
           "a": "शून्य साइड इफेक्ट्स! ये सभी उत्पाद 100% हर्बल, आयुष अनुमोदित, स्टेरॉइड-मुक्त और प्राकृतिक न्यूट्रास्यूटिकल्स हैं।"
         }
       ],
+      "ladder_header": null,
+      "career_ladder": [],
       "health_diseases": [],
       "crops": [],
       "pashu_cards": [],
@@ -4039,9 +4046,12 @@
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "यौन कमजोरी: असली कारण, टेस्टोस्टेरोन व स्पर्म काउंट का सच",
+        "subtitle": "",
         "cards": [
           {
+            "id": "CB_1790847987300_qm23",
             "title": "❓ असली शारीरिक व मानसिक कारण (Root Causes)",
+            "badge": "",
             "color": "#2563eb",
             "image": "/images/banners/health-banner.jpeg",
             "points": [
@@ -4049,10 +4059,15 @@
               "मानसिक तनाव व कोर्टिसोल: अत्यधिक तनाव पुरुष हार्मोन टेस्टोस्टेरोन को तेजी से नष्ट करता है।",
               "खराब जीवनशैली: देर रात तक जागना, स्मोकिंग, शराब और पोषक तत्वों (जिंक, विटामिन D3) की कमी।",
               "डायबिटीज व मोटापा: बढ़ा हुआ ब्लड शुगर जननांगों की बारीक नसों (Nerves) को सुन्न कर देता है।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790847987300_u2nd",
             "title": "⚠️ मुख्य लक्षण व हार्मोन असंतुलन (Symptoms)",
+            "badge": "",
             "color": "#2563eb",
             "image": "/images/banners/health-banner.jpeg",
             "points": [
@@ -4060,10 +4075,15 @@
               "सहनशक्ति (Stamina) और शारीरिक ऊर्जा में तेजी से गिरावट आना।",
               "चिड़चिड़ापन, एकाग्रता की कमी और पेट के निचले हिस्से पर जिद्दी फैट जमना।",
               "आत्मविश्वास में भारी कमी और संकोच के कारण वैवाहिक तनाव उत्पन्न होना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790847987300_exuo",
             "title": "🚨 भ्रामक प्रचार व केमिकल दवाओं के जानलेवा खतरे (Quack Trap & Risks)",
+            "badge": "",
             "color": "#dc2626",
             "image": "/images/banners/health-banner.jpeg",
             "points": [
@@ -4071,10 +4091,14 @@
               "सिल्डेनाफिल (वियाग्रा) जैसी केमिकल गोलियों से दिल की धड़कन बढ़ना, आंखों की रोशनी कमजोर होना व हार्ट अटैक का खतरा।",
               "लंबे समय तक केमिकल दवाओं के सेवन से लिवर टॉक्सिसिटी, किडनी फेलियर और नसों का स्थायी रूप से खराब होना।",
               "सुरक्षित समाधान: बिना किसी केमिकल के प्राकृतिक आयुर्वेदिक पोषण, लाइफस्टाइल सुधार और योग ही एकमात्र स्थायी उपचार है।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           }
         ]
       },
+      "admin_edited": 1790847987306,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
