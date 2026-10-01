@@ -2151,7 +2151,9 @@
   // ==========================================================
   function renderCustomCustomerReviews() {
     const grid = document.getElementById('reviews-grid');
+    if (!grid) return;
     const l = currentLandingData || {};
+    const b = currentBookData || {};
 
     const defaultReviews = [
       { name: 'पवन पांडे', location: 'सागर, मध्य प्रदेश', rating: 5, gender: 'male', comment: 'सरल भाषा और वास्तविक फोटो के कारण रोग पहचानना बहुत आसान हो गया। मेरी सोयाबीन की फसल बच गई।' },
@@ -2160,29 +2162,66 @@
       { name: 'माखन दाऊ', location: 'गुना, मध्य प्रदेश', rating: 5, gender: 'male', comment: 'कम कीमत में इतनी उपयोगी जानकारी मिलना वास्तव में शानदार है।' }
     ];
 
-    const reviews = (l.testimonials && l.testimonials.length > 0) ? l.testimonials : defaultReviews;
-    if (!grid) return;
+    const rawReviews = (Array.isArray(l.reviews) && l.reviews.length > 0) ? l.reviews :
+                       (Array.isArray(l.testimonials) && l.testimonials.length > 0) ? l.testimonials :
+                       (Array.isArray(b.reviews) && b.reviews.length > 0) ? b.reviews : defaultReviews;
 
-    grid.innerHTML = reviews.map(r => {
-      const avatarHtml = r.photo ? 
-        `<img src="${r.photo}" alt="${escapeHtml(r.name)}" class="ubl-review-avatar-img" />` : 
-        `<div class="ubl-review-avatar-icon">${(r.gender === 'female') ? '👩' : '👨'}</div>`;
+    grid.innerHTML = rawReviews.map(r => {
+      const avatarHtml = r.photo || r.avatar ? 
+        `<img src="${window.resolveImageSrc(r.photo || r.avatar)}" alt="${escapeHtml(r.name)}" class="ubl-review-avatar-img" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:1.5px solid #0284c7;" onerror="this.outerHTML='<div class=\\'ubl-review-avatar-icon\\'>👨‍🌾</div>'" />` : 
+        `<div class="ubl-review-avatar-icon" style="width:42px;height:42px;border-radius:50%;background:#eff6ff;border:1.5px solid #0284c7;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">${(r.gender === 'female') ? '👩‍🌾' : '👨‍🌾'}</div>`;
 
+      const comment = r.comment || r.text || '';
       return `
-        <div class="review-card">
-          <div class="review-stars">${'⭐'.repeat(r.rating || 5)}</div>
-          <p>"${escapeHtml(r.comment)}"</p>
-          <div class="ubl-review-avatar-wrap">
+        <div class="review-card" style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; padding:18px; box-shadow:0 6px 18px rgba(0,0,0,0.06); display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div class="review-stars" style="color:#eab308; font-size:0.95rem; margin-bottom:8px; letter-spacing:2px;">${'★'.repeat(r.rating || 5)}</div>
+            <p style="font-size:0.86rem; color:#334155; line-height:1.5; margin:0 0 14px 0;">"${escapeHtml(comment)}"</p>
+          </div>
+          <div class="ubl-review-avatar-wrap" style="display:flex; align-items:center; gap:10px; border-top:1px solid #f1f5f9; padding-top:10px;">
             ${avatarHtml}
             <div>
-              <h4 style="margin:0;font-size:0.95rem;font-weight:800;color:#0f172a;">${escapeHtml(r.name)}</h4>
-              <small style="color:#64748b;font-size:0.75rem;">${escapeHtml(r.location || 'India')}</small>
+              <h4 style="margin:0;font-size:0.92rem;font-weight:800;color:#0f172a;">${escapeHtml(r.name || 'किसान मित्र')}</h4>
+              <small style="color:#64748b;font-size:0.75rem;">📍 ${escapeHtml(r.location || r.role || 'भारत')}</small>
             </div>
           </div>
         </div>
       `;
     }).join('');
   }
+
+  // ==========================================================
+  // FAQ ACCORDION ENGINE (ACCORDION & EXPAND)
+  // ==========================================================
+  function renderFaqSection() {
+    const wrapper = document.getElementById('faq-list-wrapper');
+    if (!wrapper) return;
+    const l = currentLandingData || {};
+    const b = currentBookData || {};
+
+    const defaultFaqs = [
+      { q: "क्या इस पुस्तक को मोबाइल में ऑफलाइन पढ़ सकते हैं?", a: "हाँ, खरीदने के बाद आप इसे अपनी 'My Library' में सुरक्षित ऑफलाइन कभी भी पढ़ सकते हैं।" },
+      { q: "क्या इसके साथ कोई मुफ्त बोनस सामग्री भी मिलती है?", a: "हाँ, विशेष लॉन्चिंग ऑफर में संपूर्ण फसल स्प्रे चार्ट और 24×7 AI डॉक्टर सहायता शामिल है।" },
+      { q: "पेमेंट करने के बाद ई-बुक कैसे प्राप्त होगी?", a: "पेमेंट पूरा होते ही ई-बुक तुरंत आपकी डिजिटल लाइब्रेरी में अनलॉक हो जाएगी और व्हाट्सएप पर लिंक भी मिलेगा।" },
+      { q: "यदि कोई तकनीकी समस्या आए तो किससे संपर्क करें?", a: "हमारी समर्पित व्हाट्सएप हेल्पलाइन 7974422572 पर तुरंत सहायता उपलब्ध है।" }
+    ];
+
+    const faqs = (Array.isArray(l.faqs) && l.faqs.length > 0) ? l.faqs :
+                 (Array.isArray(b.faqs) && b.faqs.length > 0) ? b.faqs : defaultFaqs;
+
+    wrapper.innerHTML = faqs.map((f, idx) => `
+      <details class="faq-item" style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px 18px; margin-bottom:10px; box-shadow:0 4px 14px rgba(0,0,0,0.04);" ${idx === 0 ? 'open' : ''}>
+        <summary style="font-weight:800; font-size:0.96rem; color:#0f172a; cursor:pointer; font-family:'Outfit',sans-serif; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+          <span>${escapeHtml(f.q || f.question || 'प्रश्न')}</span>
+          <span style="color:#16a34a; font-size:1.1rem; font-weight:900;">+</span>
+        </summary>
+        <p style="margin:10px 0 0 0; color:#475569; font-size:0.88rem; line-height:1.6;">
+          ${escapeHtml(f.a || f.answer || '')}
+        </p>
+      </details>
+    `).join('');
+  }
+
 
   // ==========================================================
   // AAROGYAM PRO VIP PERKS & VALUE STACK

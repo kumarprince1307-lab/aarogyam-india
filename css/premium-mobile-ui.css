@@ -149,23 +149,41 @@ h1, h2, h3, h4, h5, h6,
   background: rgba(255, 255, 255, 0.94) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
-  border: 1.5px solid rgba(226, 232, 240, 0.9) !important;
+  border: 1.5px solid rgba(226, 232, 240, 0.95) !important;
   border-radius: 20px !important;
-  box-shadow: 0 6px 20px -3px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.1), 0 3px 8px -1px rgba(15, 23, 42, 0.05) !important;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   position: relative !important;
   overflow: hidden !important;
   will-change: transform;
 }
 
+/* Elevated Content Cards (Problem Boxes, Clinical Breakdowns, Reviews, FAQs) */
+.problem-box,
+.breakdown-grid > div,
+.reviews-grid > div,
+.review-card,
+.faq-accordion details,
+.cms-dynamic-page-kpi-sections > div {
+  background: #ffffff !important;
+  border-radius: 18px !important;
+  border: 1.5px solid rgba(226, 232, 240, 0.95) !important;
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.09), 0 4px 10px -2px rgba(15, 23, 42, 0.05) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease !important;
+}
+
 .kpi-card:hover,
 .health-disease-card:hover,
 .pashu-card:hover,
-.ns-product-card:hover {
+.ns-product-card:hover,
+.problem-box:hover,
+.breakdown-grid > div:hover,
+.reviews-grid > div:hover {
   transform: translateY(-5px) !important;
-  box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06) !important;
-  border-color: rgba(220, 38, 38, 0.3) !important;
+  box-shadow: 0 20px 38px -6px rgba(15, 23, 42, 0.15), 0 6px 14px -2px rgba(15, 23, 42, 0.08) !important;
+  border-color: rgba(220, 38, 38, 0.35) !important;
 }
+
 
 /* Tactile Micro-Haptic Click Feedback */
 .kpi-card:active,
