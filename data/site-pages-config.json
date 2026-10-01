@@ -3599,9 +3599,7 @@
         "sec_reviews",
         "sec_help_support"
       ],
-      "hidden_sections": [
-        "sec_hero_slider"
-      ],
+      "hidden_sections": [],
       "kpi_cards": [
         {
           "icon": "fa-shield-halved",
@@ -3884,7 +3882,7 @@
           }
         ]
       },
-      "admin_edited": 1790854406394,
+      "admin_edited": 1790855019766,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
