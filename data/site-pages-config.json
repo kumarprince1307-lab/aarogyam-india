@@ -283,7 +283,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1790855034777,
+      "admin_edited": 1790856592477,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -3543,7 +3543,7 @@
       "og_description": "“ED, शीघ्रपतन, लो टेस्टोस्टेरोन और स्पर्म काउंट की कमी का सच। भ्रामक केमिकल दवाओं से बचें और सुरक्षित प्राकृतिक समाधान जानें।”",
       "share_message": "📲 पौरुष कमजोरी का सही वैज्ञानिक समाधान: क्या खाएं, कौन से आसन करें और केमिकल दवाओं के नुकसान से कैसे बचें? पूरी जानकारी अभी देखें:",
       "floating_banner": {
-        "enabled": true,
+        "enabled": false,
         "image": "/images/banners/health-banner.jpeg",
         "badge_title": "👉 पौरुष स्वास्थ्य का सुरक्षित सच जानिए…",
         "action_link": "https://wa.me/917974422572",
@@ -3882,7 +3882,7 @@
           }
         ]
       },
-      "admin_edited": 1790855019766,
+      "admin_edited": 1790856592254,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
