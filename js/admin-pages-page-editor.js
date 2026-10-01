@@ -6450,7 +6450,7 @@ export async function initPageEditor() {
 
     const isNetsurf = (editingPageId === 'page_netsurf_career' || category === 'Career & Direct Selling');
     const isPashu = (editingPageId === 'page_cattle_care' || category === 'Livestock');
-    const isHealthSubPage = (category === 'Healthcare Sub-page');
+    const isHealthSubPage = (category === 'Healthcare Sub-page') || (editingPageId && editingPageId.startsWith('page_health_') && editingPageId !== 'page_health_hub');
     const isAgri = (category === 'Agriculture' || category === 'eBooks' || category === 'Core') && !isNetsurf && !isPashu;
     const showHealth = (category === 'Health' || category === 'Healthcare' || category === 'Core') && !isNetsurf && !isPashu;
 
@@ -6793,7 +6793,7 @@ export async function initPageEditor() {
     currentReviews = Array.isArray(p.reviews) ? JSON.parse(JSON.stringify(p.reviews)) : [];
     currentFaqs = Array.isArray(p.faqs) ? JSON.parse(JSON.stringify(p.faqs)) : [];
     // For health sub-pages, don't load global disease defaults — start empty or load page-specific
-    const isHealthSubPage = (p.category === 'Healthcare Sub-page');
+    const isHealthSubPage = (p.category === 'Healthcare Sub-page') || (p.id && p.id.startsWith('page_health_') && p.id !== 'page_health_hub');
     currentHealthDiseases = Array.isArray(p.health_diseases) ? JSON.parse(JSON.stringify(p.health_diseases)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_HEALTH_DISEASES)));
     currentCrops = Array.isArray(p.crops) ? JSON.parse(JSON.stringify(p.crops)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_CROPS_LIST)));
     currentPashuCards = Array.isArray(p.pashu_cards) ? JSON.parse(JSON.stringify(p.pashu_cards)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST)));

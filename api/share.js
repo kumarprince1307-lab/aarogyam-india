@@ -55,6 +55,52 @@ function getBookLandingPageData(bId) {
   return null;
 }
 
+function getSitePageData(pageTarget) {
+  if (!pageTarget) return null;
+  const target = String(pageTarget).trim().toLowerCase();
+
+  try {
+    const pathsToTry = [
+      path.join(process.cwd(), 'data', 'site-pages-config.json'),
+      path.join(__dirname, '..', 'data', 'site-pages-config.json')
+    ];
+    for (const p of pathsToTry) {
+      if (fs.existsSync(p)) {
+        const content = fs.readFileSync(p, 'utf8');
+        const json = JSON.parse(content);
+        const list = json.sitePages || [];
+        const found = list.find(item => {
+          const pid = (item.id || '').toLowerCase();
+          const pslug = (item.slug || '').toLowerCase();
+          const purl = (item.url || '').toLowerCase();
+          return pid === target || pslug === target || purl === target ||
+                 pid === `page_${target.replace(/-/g, '_')}` ||
+                 pslug === target.replace('health-', '') ||
+                 purl.endsWith(target) || purl.endsWith(`${target}.html`);
+        });
+        if (found) {
+          let ogImg = found.og_image || '/images/banners/og_image-bk015-sec_audio-ba-436589-2buf.webp';
+          if (ogImg && !ogImg.startsWith('http')) {
+            ogImg = `${HOST_ORIGIN}${ogImg.startsWith('/') ? '' : '/'}${ogImg}`;
+          }
+          let destUrl = found.url || '/index.html';
+          if (!destUrl.startsWith('http')) {
+            destUrl = `${HOST_ORIGIN}${destUrl.startsWith('/') ? '' : '/'}${destUrl}`;
+          }
+          return {
+            id: found.id,
+            destUrl,
+            og_title: found.og_title || found.name || 'Aarogyam India',
+            og_description: found.og_description || 'Aarogyam India - भारत का सम्पूर्ण डिजिटल मंच।',
+            og_image: ogImg
+          };
+        }
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
 function getWebinarOrVideoData(id, type, query) {
   const cleanId = String(id || '').trim();
   const cleanType = String(type || '').trim().toLowerCase();
@@ -346,6 +392,84 @@ module.exports = async function handler(req, res) {
   const queryTitle = (query.title || '').trim();
   const queryDesc = (query.desc || query.msg || query.message || '').trim();
   const queryCat = (query.cat || query.category || '').trim();
+  const queryPage = (query.page || query.p || '').trim();
+
+  // 0. Check if request is for a Site Page (Homepage, Pashu-Palan, Netsurf, Health, etc.)
+  if (queryPage) {
+    const pageData = getSitePageData(queryPage);
+    if (pageData) {
+      const finalTitle = pageData.og_title;
+      const finalDesc = pageData.og_description;
+      const finalOgImage = pageData.og_image;
+      const destUrl = pageData.destUrl;
+      const canonicalShareUrl = `${HOST_ORIGIN}/api/share?page=${encodeURIComponent(queryPage)}`;
+
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      const isWebp = finalOgImage.toLowerCase().endsWith('.webp');
+      const isPng = finalOgImage.toLowerCase().endsWith('.png');
+      const imgMime = isWebp ? 'image/webp' : (isPng ? 'image/png' : 'image/jpeg');
+
+      const html = `<!DOCTYPE html>
+<html lang="hi" prefix="og: https://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(finalTitle)}</title>
+
+  <!-- Open Graph / WhatsApp & Facebook Crawlers -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Aarogyam India">
+  <meta property="og:title" content="${escapeHtml(finalTitle)}">
+  <meta property="og:description" content="${escapeHtml(finalDesc)}">
+  <meta property="og:image" content="${escapeHtml(finalOgImage)}">
+  <meta property="og:image:secure_url" content="${escapeHtml(finalOgImage)}">
+  <meta property="og:image:type" content="${imgMime}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${escapeHtml(finalTitle)}">
+  <meta property="og:url" content="${escapeHtml(canonicalShareUrl)}">
+  <link rel="image_src" href="${escapeHtml(finalOgImage)}">
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@AarogyamIndia">
+  <meta name="twitter:title" content="${escapeHtml(finalTitle)}">
+  <meta name="twitter:description" content="${escapeHtml(finalDesc)}">
+  <meta name="twitter:image" content="${escapeHtml(finalOgImage)}">
+  <link rel="canonical" href="${escapeHtml(canonicalShareUrl)}">
+
+  <!-- Instant Redirection for human visitors -->
+  <script>
+    (function() {
+      try {
+        window.location.replace("${destUrl}");
+      } catch (e) {}
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=${escapeHtml(destUrl)}">
+  </noscript>
+</head>
+<body style="margin:0;padding:0;background:#0f172a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <div style="background:#1e293b;max-width:440px;width:90%;margin:20px auto;padding:28px 20px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.5);text-align:center;border:1px solid #334155;">
+    <div style="display:inline-flex;align-items:center;gap:6px;background:#16a34a;color:#fff;padding:4px 12px;border-radius:8px;font-weight:900;font-size:0.85rem;margin-bottom:12px;">
+      <span>🌿</span> <span>Aarogyam India</span>
+    </div>
+    <h2 style="font-size:1.15rem;font-weight:800;color:#F8FAFC;margin:0 0 10px 0;line-height:1.35;">${escapeHtml(finalTitle)}</h2>
+    <p style="font-size:0.88rem;color:#94A3B8;margin:0 0 20px 0;line-height:1.45;">${escapeHtml(finalDesc)}</p>
+    <a href="${escapeHtml(destUrl)}" style="display:block;padding:14px;background:#16a34a;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:800;font-size:1rem;box-shadow:0 4px 12px rgba(22,163,74,0.4);">पेज खोलें →</a>
+  </div>
+  <script>
+    setTimeout(function() {
+      try { window.location.href = "${destUrl}"; } catch(e) {}
+    }, 150);
+  </script>
+</body>
+</html>`;
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(html);
+    }
+  }
 
   // 1. Check if ID represents an eBook Landing Page (e.g. BK015, BK001, etc.)
   const bookData = getBookLandingPageData(lpId);

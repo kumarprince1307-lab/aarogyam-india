@@ -58,20 +58,20 @@
     const path = (window.location.pathname || '').toLowerCase().trim();
     const cleanFilename = (path.split('/').pop() || '').replace('.html', '').trim();
     
-    // 1. Exact URL match (Highest Priority)
-    const exactUrl = allPages.find(p => p.url && p.url.toLowerCase().trim() === path);
-    if (exactUrl) return exactUrl;
-
-    // 2. Path ends with configured URL (e.g. domain.com/health/diabetes.html ends with /health/diabetes.html)
-    const endsUrl = allPages.find(p => p.url && path.endsWith(p.url.toLowerCase().trim()));
-    if (endsUrl) return endsUrl;
-
-    // 3. Homepage check
+    // 1. Homepage check (Highest Priority)
     const isHomePage = path === '/' || path === '' || path.endsWith('/index.html') || path.endsWith('index.html');
     if (isHomePage) {
       const homePage = allPages.find(p => p.id === 'page_home' || p.id === 'page_index' || p.slug === 'index');
       if (homePage) return homePage;
     }
+
+    // 2. Exact URL match
+    const exactUrl = allPages.find(p => p.url && p.url.toLowerCase().trim() === path);
+    if (exactUrl) return exactUrl;
+
+    // 3. Path ends with configured URL (e.g. domain.com/health/diabetes.html ends with /health/diabetes.html)
+    const endsUrl = allPages.find(p => p.url && path.endsWith(p.url.toLowerCase().trim()));
+    if (endsUrl) return endsUrl;
 
     // 4. Exact filename / subpage slug match (e.g. /health/diabetes.html -> health-diabetes or diabetes)
     if (cleanFilename) {

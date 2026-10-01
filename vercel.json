@@ -72,6 +72,66 @@
       ],
       "destination": "/api/share?id=BK002",
       "permanent": false
+    },
+    {
+      "source": "/index.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=index",
+      "permanent": false
+    },
+    {
+      "source": "/pashu-palan.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=pashu-palan",
+      "permanent": false
+    },
+    {
+      "source": "/categories/netsurf.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=netsurf",
+      "permanent": false
+    },
+    {
+      "source": "/categories/health.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=health",
+      "permanent": false
+    },
+    {
+      "source": "/health/:slug.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=health-:slug",
+      "permanent": false
     }
   ]
 }

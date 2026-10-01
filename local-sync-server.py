@@ -57,6 +57,73 @@ def git_commit_and_push(commit_msg="Update website via Admin Studio"):
         print(f"[LocalSync ERR] Git auto-push exception: {e}")
         return {"success": False, "error": str(e)}
 
+import re
+
+def sync_og_to_html_files(site_pages):
+    """Automatically updates static HTML <head> OG tags when Admin saves site-pages-config.json."""
+    if not isinstance(site_pages, list):
+        return
+    for page in site_pages:
+        if not isinstance(page, dict):
+            continue
+        url = page.get('url') or ''
+        if not url or not url.endswith('.html'):
+            if url == '/' or page.get('id') == 'page_home':
+                url = '/index.html'
+            else:
+                continue
+        rel_html = url.lstrip('/')
+        target_html = os.path.abspath(os.path.join(BASE_DIR, rel_html))
+        if not os.path.exists(target_html):
+            continue
+
+        og_title = (page.get('og_title') or page.get('name') or 'Aarogyam India').strip()
+        og_desc = (page.get('og_description') or 'Aarogyam India - भारत का सम्पूर्ण डिजिटल मंच।').strip()
+        og_img = (page.get('og_image') or '/images/banners/og_image-bk015-sec_audio-ba-436589-2buf.webp').strip()
+        if og_img and not og_img.startswith('http'):
+            og_img = 'https://aarogyamindia.online' + ('' if og_img.startswith('/') else '/') + og_img
+        og_url = 'https://aarogyamindia.online' + ('' if url.startswith('/') else '/') + url
+
+        try:
+            with open(target_html, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            head_match = re.search(r'(<head[^>]*>)(.*?)(</head>)', content, re.DOTALL | re.IGNORECASE)
+            if not head_match:
+                continue
+
+            head_open, head_inner, head_close = head_match.groups()
+            head_clean = re.sub(r'\s*<meta\s+property=["\']og:[^"\']+["\'][^>]*>', '', head_inner, flags=re.IGNORECASE)
+            head_clean = re.sub(r'\s*<meta\s+name=["\']twitter:[^"\']+["\'][^>]*>', '', head_clean, flags=re.IGNORECASE)
+
+            og_lines = [
+                "\n  <!-- OpenGraph & Social Share Meta (Synced from Admin) -->",
+                f'  <meta property="og:title" content="{og_title}">',
+                f'  <meta property="og:description" content="{og_desc}">',
+                f'  <meta property="og:image" content="{og_img}">',
+                f'  <meta property="og:url" content="{og_url}">',
+                f'  <meta property="og:type" content="website">',
+                f'  <meta property="og:site_name" content="Aarogyam India">',
+                f'  <meta name="twitter:card" content="summary_large_image">',
+                f'  <meta name="twitter:title" content="{og_title}">',
+                f'  <meta name="twitter:description" content="{og_desc}">',
+                f'  <meta name="twitter:image" content="{og_img}">'
+            ]
+            og_block = "\n".join(og_lines) + "\n"
+
+            link_idx = head_clean.find('<link')
+            if link_idx >= 0:
+                new_head_inner = head_clean[:link_idx] + og_block + "  " + head_clean[link_idx:]
+            else:
+                new_head_inner = head_clean + og_block
+
+            new_content = content[:head_match.start(2)] + new_head_inner + content[head_match.end(2):]
+            with open(target_html, 'w', encoding='utf-8') as f:
+                f.write(new_content)
+            print(f"[LocalSync OK] Auto-synced OG tags to: {rel_html}")
+        except Exception as e:
+            print(f"[LocalSync WARN] Failed to sync OG to {rel_html}: {e}")
+
 class LocalSyncHandler(http.server.BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         sys.stdout.write(f"[LocalSync] {self.address_string()} - {format % args}\n")
@@ -245,6 +312,22 @@ class LocalSyncHandler(http.server.BaseHTTPRequestHandler):
                 with open(target_path, 'w', encoding='utf-8') as f:
                     f.write(out_text)
                 print(f"[LocalSync OK] Saved JSON to disk: {rel_path} ({len(out_text)} chars)")
+
+                # If site-pages-config.json was updated, auto-sync OG tags into HTML files on disk
+                if rel_path.endswith('site-pages-config.json'):
+                    try:
+                        pages_list = None
+                        if isinstance(content, dict):
+                            pages_list = content.get('sitePages')
+                        elif isinstance(content, list):
+                            pages_list = content
+                        if not pages_list:
+                            parsed = json.loads(out_text)
+                            pages_list = parsed.get('sitePages') if isinstance(parsed, dict) else parsed
+                        if isinstance(pages_list, list):
+                            sync_og_to_html_files(pages_list)
+                    except Exception as og_err:
+                        print(f"[LocalSync WARN] OG auto-sync exception: {og_err}")
 
                 git_push_info = None
                 if auto_push:
