@@ -283,7 +283,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1790820694959,
+      "admin_edited": 1790846494913,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -5079,10 +5079,10 @@
       "audio_title": "आरोग्यम संपूर्ण स्वास्थ्य केंद्र",
       "audio_script": "नमस्ते {name} जी! आरोग्यम स्वास्थ्य केंद्र में आपका स्वागत है। यहाँ आपको मोटापा, डायबिटीज, जोड़ों का दर्द, हेयर केयर और महिला स्वास्थ्य की संपूर्ण प्राकृतिक डाइट, योगासन और हर्बल उपचार मिलेंगे।",
       "audio_url": "",
-      "og_title": "",
-      "og_image": "",
-      "og_description": "",
-      "share_message": "",
+      "og_title": "Aarogyam India - सम्पूर्ण स्वास्थ्य केंद्र | 8 प्रमुख विकारों के प्राकृतिक आयुर्वेदिक समाधान",
+      "og_image": "/images/banners/og_image-health-og-676433-sb3k.webp",
+      "og_description": "डायबिटीज, जोड़ों का दर्द, मोटापा, हेयर फॉल, स्किन केयर व महिला स्वास्थ्य के 100% प्राकृतिक उपचार और 24×7 AI डॉक्टर डाइट परामर्श।",
+      "share_message": "🩺 मुख्य समाधान:\n• ब्लड शुगर व डायबिटीज नियंत्रण\n• जोड़ों व घुटनों के दर्द से प्राकृतिक राहत\n• सुरक्षित वजन व चर्बी घटाएं (फैट बर्न)\n• हेयर फॉल कंट्रोल व चमकदार त्वचा\n• महिला व बच्चों का संपूर्ण पोषण\n\n👉 तुरंत पूरी गाइड देखें व फ्री परामर्श लें:",
       "floating_banner": {
         "enabled": false,
         "image": "",
@@ -5132,6 +5132,8 @@
       ],
       "marketing_cards": [],
       "videos": [],
+      "reviews_heading": "",
+      "reviews_badge": "",
       "reviews": [
         {
           "name": "कमलेश शर्मा",
@@ -5140,12 +5142,16 @@
           "comment": "डायबिटीज केयर और डाइट प्लान से मेरा शुगर लेवल 3 महीने में काफी नियंत्रित हुआ।"
         }
       ],
+      "faqs_heading": "",
+      "faqs_badge": "",
       "faqs": [
         {
           "q": "क्या परामर्श के लिए कोई शुल्क है?",
           "a": "नहीं, आरोग्यम इंडिया पर प्राथमिक AI व विशेषज्ञ परामर्श निःशुल्क है।"
         }
       ],
+      "ladder_header": null,
+      "career_ladder": [],
       "health_diseases": [
         {
           "id": "DIS001",
@@ -5168,7 +5174,7 @@
           "badge": "जोड़ों का दर्द राहत",
           "color": "#8b5cf6",
           "icon": "🦴",
-          "image": "/images/banners/health-joint-care.jpg",
+          "image": "/images/banners/health_card-khatra-join-problm-912182-yndp.webp",
           "symptoms": [
             "घुटनों व जोड़ों में दर्द",
             "चलने में तकलीफ",
@@ -5183,7 +5189,7 @@
           "badge": "हार्मोनल संतुलन",
           "color": "#ec4899",
           "icon": "🌸",
-          "image": "/images/banners/health-banner.jpeg",
+          "image": "/images/banners/health_card-femail-2-953481-eimy.webp",
           "symptoms": [
             "अनियमित माहवारी",
             "हार्मोनल असंतुलन",
@@ -5213,7 +5219,7 @@
           "badge": "ग्लोइंग स्किन",
           "color": "#06b6d4",
           "icon": "✨",
-          "image": "/images/banners/health-banner.jpeg",
+          "image": "/images/banners/health_card-nice-skin-2-975616-xbuv.webp",
           "symptoms": [
             "कील-मुंहासे (पिंपल्स)",
             "दाद व खुजली",
@@ -5228,7 +5234,7 @@
           "badge": "नेचुरल फैट बर्न",
           "color": "#f59e0b",
           "icon": "⚖️",
-          "image": "/images/banners/health-weight-loss.jpg",
+          "image": "/images/banners/health_card-motapa-992156-3pfe.webp",
           "symptoms": [
             "पेट की जिद्दी चर्बी",
             "सांस फूलना",
@@ -5376,27 +5382,44 @@
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "",
+        "subtitle": "",
         "cards": [
           {
+            "id": "CB_1790847009385_rl59",
             "title": "❓ कारण (Causes)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
-            "points": []
+            "points": [],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790847009385_mwdr",
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
-            "points": []
+            "points": [],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1790847009385_htpv",
             "title": "🚨 साइड इफेक्ट्स व खतरे (Risks)",
+            "badge": "",
             "color": "#dc2626",
             "image": "",
-            "points": []
+            "points": [],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           }
         ]
       },
+      "admin_edited": 1790847009389,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
