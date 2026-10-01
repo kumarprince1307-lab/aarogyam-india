@@ -2962,6 +2962,8 @@
       "faqs_heading": "",
       "faqs_badge": "",
       "faqs": [],
+      "ladder_header": null,
+      "career_ladder": [],
       "health_diseases": [],
       "crops": [],
       "pashu_cards": [],
@@ -3058,7 +3060,7 @@
           }
         ]
       },
-      "admin_edited": 1790791197940,
+      "admin_edited": 1790820694725,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
