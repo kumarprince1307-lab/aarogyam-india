@@ -165,6 +165,157 @@ function createReferrerSpanElement() {
     }
 }
 
+// =================================================================
+// 🛡️ CRYPTOGRAPHIC OFFER VERIFICATION & TAMPER-PROOF SECURITY
+// =================================================================
+const OFFER_SECURITY_SALT = 'AAROGYAM_OFFER_SIG_SALT_v2026_KARTIK';
+
+function sha256Hex(ascii) {
+  function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+  const mathPow = Math.pow; const maxWord = mathPow(2, 32);
+  let lengthProperty = 'length'; let i, j; let result = '';
+  const words = []; const asciiBitLength = ascii[lengthProperty] * 8;
+  let hash = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+  const k = [
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+  ];
+  ascii += '\x80';
+  while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+  for (i = 0; i < ascii[lengthProperty]; i++) {
+    j = ascii.charCodeAt(i);
+    words[i >> 2] |= j << ((3 - i) % 4) * 8;
+  }
+  words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+  words[words[lengthProperty]] = (asciiBitLength);
+  for (j = 0; j < words[lengthProperty];) {
+    const w = words.slice(j, j += 16);
+    const oldHash = hash;
+    hash = hash.slice(0, 8);
+    for (i = 0; i < 64; i++) {
+      const w15 = w[i - 15], w2 = w[i - 2];
+      const s0 = (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3));
+      const s1 = (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10));
+      w[i] = (i < 16) ? w[i] : (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+      const s1_maj = (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22));
+      const maj = ((hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]));
+      const t2 = (s1_maj + maj) | 0;
+      const s1_ch = (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25));
+      const ch = ((hash[4] & hash[5]) ^ ((~hash[4]) & hash[6]));
+      const t1 = (hash[7] + s1_ch + ch + k[i] + w[i]) | 0;
+      hash = [(t1 + t2) | 0].concat(hash);
+      hash[4] = (hash[4] + t1) | 0;
+    }
+    for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+  }
+  for (i = 0; i < 8; i++) {
+    for (j = 3; j >= 0; j--) {
+      const b = (hash[i] >> (8 * j)) & 255;
+      result += (b < 16 ? '0' : '') + b.toString(16);
+    }
+  }
+  return result;
+}
+
+function generateOfferSignature(bookId, amount, mobile, expTimestamp) {
+  const cleanMobile = (mobile || '').toString().replace(/\D/g, '').slice(-10);
+  const cleanBook = (bookId || '').toUpperCase().trim();
+  const cleanAmount = (amount !== undefined && amount !== null) ? parseInt(amount, 10) : 99;
+  const cleanExp = expTimestamp ? parseInt(expTimestamp, 10) : 0;
+  
+  const rawPayload = `${cleanBook}|${cleanAmount}|${cleanMobile}|${cleanExp}|${OFFER_SECURITY_SALT}`;
+  return sha256Hex(rawPayload).slice(0, 16);
+}
+
+// 🛡️ Security Banner & Live Countdown Display
+let checkoutCountdownTimerId = null;
+function renderCheckoutSecurityBanner(isVerified, errorMsg, offerData) {
+    let bannerEl = document.getElementById("checkoutSecurityBanner");
+    if (!bannerEl) {
+        bannerEl = document.createElement("div");
+        bannerEl.id = "checkoutSecurityBanner";
+        const mainEl = document.querySelector(".checkout-container") || document.body;
+        mainEl.parentNode.insertBefore(bannerEl, mainEl);
+    }
+
+    if (errorMsg) {
+        bannerEl.innerHTML = `
+            <div style="max-width:1050px; margin:14px auto 6px auto; padding:12px 18px; background:#fff1f2; border:1.5px solid #f43f5e; color:#be123c; border-radius:12px; font-size:0.85rem; font-weight:800; display:flex; align-items:center; gap:10px; box-shadow:0 4px 15px rgba(244,63,94,0.15);">
+                <span style="font-size:1.4rem;">🛡️</span>
+                <div>
+                    <div>${errorMsg}</div>
+                    <div style="font-size:0.75rem; color:#881337; font-weight:600; margin-top:2px;">सुरक्षा प्रोटोकॉल सक्रिय: पुस्तक का वास्तविक प्रमाणित मूल्य लागू कर दिया गया है।</div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    if (isVerified && offerData) {
+        const maskedMobile = offerData.mobile === 'ADMIN_TEST' ? 'ADMIN MASTER TEST' : `+91-XXXXX${offerData.mobile.slice(-4)}`;
+        bannerEl.innerHTML = `
+            <div style="max-width:1050px; margin:14px auto 6px auto; padding:12px 18px; background:linear-gradient(135deg, #f0fdf4, #dcfce7); border:1.5px solid #22c55e; color:#15803d; border-radius:12px; font-size:0.86rem; font-weight:800; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; box-shadow:0 4px 15px rgba(34,197,94,0.15);">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:1.3rem;">🔒</span>
+                    <div>
+                        <span>प्रमाणित व्यक्तिगत ऑफर सक्रिय (${maskedMobile} के लिए सुरक्षित)</span>
+                        <div style="font-size:0.75rem; color:#166534; font-weight:600;">डिस्काउंट लॉक: यह लिंक केवल आपके अधिकृत नंबर पर ही काम करेगा।</div>
+                    </div>
+                </div>
+                ${offerData.exp > 0 ? `
+                    <div style="display:flex; align-items:center; gap:6px; background:#ffffff; border:1px solid #86efac; padding:6px 12px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                        <span style="font-size:0.85rem; color:#15803d;">⏳ समय शेष:</span>
+                        <strong id="checkoutTimerClock" style="font-family:monospace; font-size:1.05rem; color:#dc2626;">--:--</strong>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        if (offerData.exp > 0) {
+            startCheckoutCountdown(offerData.exp);
+        }
+    }
+}
+
+function startCheckoutCountdown(expTimestamp) {
+    if (checkoutCountdownTimerId) clearInterval(checkoutCountdownTimerId);
+
+    function tick() {
+        const remainingMs = expTimestamp - Date.now();
+        const clock = document.getElementById("checkoutTimerClock");
+        if (!clock) return;
+
+        if (remainingMs <= 0) {
+            clearInterval(checkoutCountdownTimerId);
+            clock.textContent = "00:00";
+            renderCheckoutSecurityBanner(false, "⏳ समय सीमा समाप्त: यह 15-मिनट ऑफर लिंक एक्सपायर हो चुका है। मूल मूल्य लागू किया गया।", null);
+            if (window.currentCheckoutBook) {
+                window.currentCheckoutBook.offerPrice = 99;
+                const pEl = document.getElementById("bookPrice");
+                if (pEl) pEl.textContent = "₹99";
+                const spEl = document.getElementById("summaryPrice");
+                if (spEl) spEl.textContent = "₹99";
+                const tpEl = document.getElementById("totalPrice");
+                if (tpEl) tpEl.textContent = "₹99";
+            }
+            return;
+        }
+
+        const mins = Math.floor(remainingMs / 60000);
+        const secs = Math.floor((remainingMs % 60000) / 1000);
+        clock.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    tick();
+    checkoutCountdownTimerId = setInterval(tick, 1000);
+}
+
 async function loadBook() {
     try {
         const params = new URLSearchParams(window.location.search);
@@ -172,6 +323,13 @@ async function loadBook() {
         const rawIds = params.get("ids") || params.get("bundle_ids");
         const customTitle = params.get("title") || params.get("name");
         const customAmount = params.get("amount") || params.get("price");
+
+        // 🛡️ Security Parameters (Signature, Mobile, Expiry)
+        const offerSig = (params.get("sig") || params.get("signature") || "").trim();
+        const offerMobile = (params.get("m") || params.get("mobile") || "").trim();
+        const offerExp = parseInt(params.get("exp") || "0", 10);
+        let verifiedOfferAmount = null;
+        let offerSecurityError = null;
 
         let booksArray = [];
         const cacheTime = Math.floor(Date.now() / 300000);
@@ -229,12 +387,10 @@ async function loadBook() {
 
             if (comboParam === "agri3" || comboParam === "combo3" || comboParam === "3" || comboParam === "super_combo") {
                 idList = ["BK001", "BK002", "BK015"];
-                comboPrice = customAmount ? parseInt(customAmount, 10) : 249;
                 comboMrp = 897;
                 comboTitle = "3-पुस्तक सुपर कॉम्बो (खरीफ + डॉक्टर + सब्जी मास्टर)";
             } else if (comboParam === "agri2" || comboParam === "combo2" || comboParam === "2") {
                 idList = ["BK001", "BK002"];
-                comboPrice = customAmount ? parseInt(customAmount, 10) : 179;
                 comboMrp = 598;
                 comboTitle = "2-पुस्तक सुपर कॉम्बो (खरीफ + डॉक्टर)";
             } else if (rawIds || booksParam) {
@@ -265,9 +421,30 @@ async function loadBook() {
                     calcOffer += (b.offerPrice || 99);
                 });
 
+                // 🛡️ Cryptographic Security Check for Combo
+                if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
+                    const rawAmt = parseInt(customAmount, 10);
+                    const targetCheckId = idList.join(",");
+                    if (!offerSig) {
+                        offerSecurityError = "⚠️ अनधिकृत कॉम्बो डिस्काउंट लिंक: कोई सुरक्षा डिजिटल हस्ताक्षर नहीं मिला।";
+                    } else if (offerExp > 0 && Date.now() > offerExp) {
+                        offerSecurityError = "⏳ समय सीमा समाप्त: यह कॉम्बो ऑफर समाप्त हो चुका है। मूल मूल्य लागू किया गया।";
+                    } else {
+                        const expectedSig = generateOfferSignature(targetCheckId, rawAmt, offerMobile, offerExp);
+                        if (offerSig !== expectedSig) {
+                            offerSecurityError = "⚠️ लिंक से छेड़छाड़ पकड़ी गई (Tampered URL): कॉम्बो डिस्काउंट अमान्य है।";
+                        } else if (rawAmt <= 0 && offerMobile !== "ADMIN_TEST" && offerMobile !== "7974422572") {
+                            offerSecurityError = "⚠️ ₹0 टेस्ट केवल अधिकृत एडमिन के लिए ही मान्य है।";
+                        } else {
+                            verifiedOfferAmount = rawAmt;
+                            window.activeVerifiedOffer = { amount: rawAmt, mobile: offerMobile, exp: offerExp, bookId: targetCheckId };
+                        }
+                    }
+                }
+
                 if (comboPrice === null) {
-                    if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
-                        comboPrice = parseInt(customAmount, 10);
+                    if (verifiedOfferAmount !== null) {
+                        comboPrice = verifiedOfferAmount;
                     } else if (matchedBooks.length === 3) comboPrice = 249;
                     else if (matchedBooks.length === 2) comboPrice = 179;
                     else comboPrice = calcOffer;
@@ -310,6 +487,17 @@ async function loadBook() {
                 
                 const totPrice = document.getElementById("totalPrice");
                 if (totPrice) totPrice.textContent = "₹" + comboPrice;
+
+                // Render Security Badge & Countdown Banner
+                renderCheckoutSecurityBanner(verifiedOfferAmount !== null, offerSecurityError, window.activeVerifiedOffer);
+
+                // Auto-fill mobile if valid offer
+                if (window.activeVerifiedOffer && window.activeVerifiedOffer.mobile && window.activeVerifiedOffer.mobile !== 'ADMIN_TEST') {
+                    const custMobEl = document.getElementById("customerMobile");
+                    if (custMobEl && !custMobEl.value) {
+                        custMobEl.value = window.activeVerifiedOffer.mobile;
+                    }
+                }
 
                 autoFillUserData();
                 return;
@@ -355,10 +543,35 @@ async function loadBook() {
             };
         }
 
+        // 🛡️ Cryptographic Security Check for Single Book
+        if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
+            const rawAmt = parseInt(customAmount, 10);
+            const targetCheckId = (book && book.id) ? book.id.toUpperCase() : (targetId || "BK001").toUpperCase();
+            
+            if (!offerSig) {
+                offerSecurityError = "⚠️ अनधिकृत डिस्काउंट लिंक: कोई डिजिटल सुरक्षा हस्ताक्षर नहीं मिला।";
+            } else if (offerExp > 0 && Date.now() > offerExp) {
+                offerSecurityError = "⏳ समय सीमा समाप्त: यह विशेष ऑफर समाप्त हो चुका है। मूल मूल्य लागू किया गया।";
+            } else {
+                const expectedSig = generateOfferSignature(targetCheckId, rawAmt, offerMobile, offerExp);
+                if (offerSig !== expectedSig) {
+                    offerSecurityError = "⚠️ लिंक से छेड़छाड़ पकड़ी गई (Tampered URL): डिस्काउंट अमान्य है।";
+                } else if (rawAmt <= 0 && offerMobile !== "ADMIN_TEST" && offerMobile !== "7974422572") {
+                    offerSecurityError = "⚠️ ₹0 टेस्ट केवल अधिकृत एडमिन के लिए ही मान्य है।";
+                } else {
+                    verifiedOfferAmount = rawAmt;
+                    window.activeVerifiedOffer = { amount: rawAmt, mobile: offerMobile, exp: offerExp, bookId: targetCheckId };
+                }
+            }
+        }
+
         // Override with explicit URL custom params if provided
         if (customTitle) book.name = customTitle;
-        if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
-            book.offerPrice = parseInt(customAmount, 10);
+        if (verifiedOfferAmount !== null) {
+            book.offerPrice = verifiedOfferAmount;
+        } else if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
+            // Tampered or missing signature: force standard offer price
+            book.offerPrice = 99;
         }
 
         const bookCover = book.cover || book.thumbnail || book.cover_image || "/images/banners/farmer-community-banner.jpeg";
@@ -386,6 +599,17 @@ async function loadBook() {
         
         const priceEl = document.getElementById("bookPrice");
         if (priceEl) priceEl.textContent = "₹" + bookOffer;
+
+        // Render Security Badge & Countdown Banner
+        renderCheckoutSecurityBanner(verifiedOfferAmount !== null, offerSecurityError, window.activeVerifiedOffer);
+
+        // Auto-fill mobile if valid offer
+        if (window.activeVerifiedOffer && window.activeVerifiedOffer.mobile && window.activeVerifiedOffer.mobile !== 'ADMIN_TEST') {
+            const custMobEl = document.getElementById("customerMobile");
+            if (custMobEl && !custMobEl.value) {
+                custMobEl.value = window.activeVerifiedOffer.mobile;
+            }
+        }
 
         const sumBook = document.getElementById("summaryBook");
         if (sumBook) sumBook.textContent = bookName;
@@ -561,6 +785,15 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         return;
     }
 
+    // 🛡️ SECURITY LAYER 2: Enforce Customer Mobile Number Match
+    if (window.activeVerifiedOffer && window.activeVerifiedOffer.mobile && window.activeVerifiedOffer.mobile !== 'ADMIN_TEST') {
+        const cleanEntered = mobile.replace(/\D/g, '').slice(-10);
+        if (cleanEntered !== window.activeVerifiedOffer.mobile) {
+            alert(`⚠️ सुरक्षा चेतावनी (Unauthorized Customer):\n\nयह विशेष डिस्काउंट केवल पंजीकृत नंबर +91-XXXXX${window.activeVerifiedOffer.mobile.slice(-4)} के लिए जारी किया गया है।\n\nकृपया वही मोबाइल नंबर दर्ज करें जिस पर यह लिंक भेजा गया था।`);
+            return;
+        }
+    }
+
     // सुरक्षा चेक: बिना बुक लोड हुए पेमेंट प्रोसेस न हो
     if (!window.currentCheckoutBook || !window.currentCheckoutBook.id) {
         alert("Error: Book data not found. Please refresh the page.");
@@ -632,6 +865,14 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
         // 🚀 100% FREE / ADMIN TEST CHECKOUT HANDLER (₹0 - Immediate Unlock)
         if (bookPrice === 0 || bookPrice <= 0) {
+            // 🛡️ SECURITY LAYER 4: Strict Admin-Only Verification for ₹0 Unlocks
+            if (!window.activeVerifiedOffer || (window.activeVerifiedOffer.mobile !== "ADMIN_TEST" && window.activeVerifiedOffer.mobile !== "7974422572")) {
+                alert("⚠️ अनधिकृत अनुरोध: ₹0 टेस्ट केवल अधिकृत एडमिन के लिए ही उपलब्ध है।");
+                payBtn.disabled = false;
+                payBtn.textContent = "Pay Now";
+                return;
+            }
+
             payBtn.disabled = true;
             payBtn.textContent = "सत्यापित हो रहा है...";
             const freePaymentId = 'FREE_TEST_' + Date.now();

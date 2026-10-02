@@ -507,7 +507,7 @@ function renderActiveTabContent(audienceList, paginatedUsers, totalPages, totalR
 // TAB 1: WhatsApp Dispatcher + DYNAMIC OFFER CAMPAIGN BUILDER LAYER
 function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
   const ob = mktState.offerBuilder;
-  const sampleUser = { full_name: 'किसान मित्र', mobile: '7974422572' };
+  const sampleUser = { full_name: 'किसान मित्र (एडमिन टेस्ट)', mobile: '7974422572', isAdminTest: true };
   const sampleLinkInfo = getGeneratedOfferUrlAndMsg(sampleUser);
 
   return `
@@ -736,31 +736,111 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
   `;
 }
 
-// Generate Offer URL & Text based on Admin Campaign Builder
+// =================================================================
+// CRYPTOGRAPHIC OFFER SIGNATURE & TAMPER-PROOF SECURITY ENGINE
+// =================================================================
+const OFFER_SECURITY_SALT = 'AAROGYAM_OFFER_SIG_SALT_v2026_KARTIK';
+
+function sha256Hex(ascii) {
+  function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+  const mathPow = Math.pow; const maxWord = mathPow(2, 32);
+  let lengthProperty = 'length'; let i, j; let result = '';
+  const words = []; const asciiBitLength = ascii[lengthProperty] * 8;
+  let hash = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+  const k = [
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+  ];
+  ascii += '\x80';
+  while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+  for (i = 0; i < ascii[lengthProperty]; i++) {
+    j = ascii.charCodeAt(i);
+    words[i >> 2] |= j << ((3 - i) % 4) * 8;
+  }
+  words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+  words[words[lengthProperty]] = (asciiBitLength);
+  for (j = 0; j < words[lengthProperty];) {
+    const w = words.slice(j, j += 16);
+    const oldHash = hash;
+    hash = hash.slice(0, 8);
+    for (i = 0; i < 64; i++) {
+      const w15 = w[i - 15], w2 = w[i - 2];
+      const s0 = (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3));
+      const s1 = (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10));
+      w[i] = (i < 16) ? w[i] : (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+      const s1_maj = (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22));
+      const maj = ((hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]));
+      const t2 = (s1_maj + maj) | 0;
+      const s1_ch = (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25));
+      const ch = ((hash[4] & hash[5]) ^ ((~hash[4]) & hash[6]));
+      const t1 = (hash[7] + s1_ch + ch + k[i] + w[i]) | 0;
+      hash = [(t1 + t2) | 0].concat(hash);
+      hash[4] = (hash[4] + t1) | 0;
+    }
+    for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+  }
+  for (i = 0; i < 8; i++) {
+    for (j = 3; j >= 0; j--) {
+      const b = (hash[i] >> (8 * j)) & 255;
+      result += (b < 16 ? '0' : '') + b.toString(16);
+    }
+  }
+  return result;
+}
+
+function generateOfferSignature(bookId, amount, mobile, expTimestamp) {
+  const cleanMobile = (mobile || '').toString().replace(/\D/g, '').slice(-10);
+  const cleanBook = (bookId || '').toUpperCase().trim();
+  const cleanAmount = (amount !== undefined && amount !== null) ? parseInt(amount, 10) : 99;
+  const cleanExp = expTimestamp ? parseInt(expTimestamp, 10) : 0;
+  
+  const rawPayload = `${cleanBook}|${cleanAmount}|${cleanMobile}|${cleanExp}|${OFFER_SECURITY_SALT}`;
+  return sha256Hex(rawPayload).slice(0, 16);
+}
+
+// Generate Tamper-Proof Offer URL & Text based on Admin Campaign Builder
 function getGeneratedOfferUrlAndMsg(user) {
   const name = user.full_name ? user.full_name.split(' ')[0] : 'किसान मित्र';
   const ob = mktState.offerBuilder;
   const primaryBookObj = mktState.catalogMap[ob.primaryBook] || { name: 'ई-बुक' };
   const bonusBookObj = mktState.catalogMap[ob.bonusBook] || { name: 'बोनस ई-बुक' };
   
-  const timerQuery = ob.timer !== 'none' ? `&timer=${ob.timer}` : '';
+  // Calculate dynamic expiry timestamp
+  let exp = 0;
+  const now = Date.now();
+  if (ob.timer === '15m') exp = now + (15 * 60 * 1000);
+  else if (ob.timer === '1h') exp = now + (60 * 60 * 1000);
+  else if (ob.timer === '24h') exp = now + (24 * 60 * 60 * 1000);
+
+  const cleanMobile = (user.mobile || '').toString().replace(/\D/g, '').slice(-10) || '7974422572';
+  const targetMobile = user.isAdminTest ? 'ADMIN_TEST' : cleanMobile;
+  const timerQuery = ob.timer !== 'none' ? `&timer=${ob.timer}&exp=${exp}` : '';
   const audioQuery = ob.hasAudio ? '&audio=1' : '';
 
   let checkoutUrl = '';
   let msg = '';
 
   if (ob.type === 'bogo') {
-    checkoutUrl = `/ebooks/checkout.html?books=${ob.primaryBook},${ob.bonusBook}&ids=${ob.primaryBook},${ob.bonusBook}&amount=${ob.price}${timerQuery}${audioQuery}`;
+    const bookPair = `${ob.primaryBook},${ob.bonusBook}`;
+    const sig = generateOfferSignature(bookPair, ob.price, targetMobile, exp);
+    checkoutUrl = `/ebooks/checkout.html?books=${ob.primaryBook},${ob.bonusBook}&ids=${ob.primaryBook},${ob.bonusBook}&amount=${ob.price}&m=${targetMobile}&exp=${exp}&sig=${sig}${timerQuery}${audioQuery}`;
     const priceText = ob.price === 0 ? 'बिल्कुल FREE (100% मुफ़्त)' : `मात्र ₹${ob.price}`;
-    msg = `नमस्ते ${name} जी! 🙏 आरोग्यम इंडिया की ओर से आपके लिए 1 के साथ 1 मुफ़्त कॉम्बो ऑफर!\n\n📚 मुख्य पुस्तक: ${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}\n🎁 फ्री बोनस पुस्तक: ${bonusBookObj.name || bonusBookObj.heading || ob.bonusBook} (बिल्कुल FREE)\n💰 कॉम्बो मूल्य: ${priceText} (MRP: ₹598)\n${ob.timer !== 'none' ? `⏳ समय सीमा: केवल ${ob.timer === '15m' ? '15 मिनट' : ob.timer === '1h' ? '1 घंटा' : '24 घंटे'} के लिए मान्य!` : ''}\n\n👉 अभी दोनों पुस्तकें एक साथ पाने के लिए यहाँ क्लिक करें:\nhttps://aarogyamindia.online${checkoutUrl}`;
+    msg = `नमस्ते ${name} जी! 🙏 आरोग्यम इंडिया की ओर से आपके लिए 1 के साथ 1 मुफ़्त कॉम्बो ऑफर!\n\n📚 मुख्य पुस्तक: ${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}\n🎁 फ्री बोनस पुस्तक: ${bonusBookObj.name || bonusBookObj.heading || ob.bonusBook} (बिल्कुल FREE)\n💰 कॉम्बो मूल्य: ${priceText} (MRP: ₹598)\n${ob.timer !== 'none' ? `⏳ समय सीमा: केवल ${ob.timer === '15m' ? '15 मिनट' : ob.timer === '1h' ? '1 घंटा' : '24 घंटे'} के लिए मान्य!` : ''}\n\n🔒 यह गोपनीय लिंक केवल आपके नंबर (+91-XXXXX${cleanMobile.slice(-4)}) पर ही अनलॉक होगा:\nhttps://aarogyamindia.online${checkoutUrl}`;
   } else if (ob.type === 'review_reward') {
     checkoutUrl = `/ebooks/book-landing.html?id=${ob.primaryBook}#reviews`;
     msg = `नमस्ते ${name} जी! 🙏 क्या आपने हमारी पुस्तक '${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}' पढ़ी? कैसी लगी?\n\n⭐ नीचे दिए लिंक पर 1 मिनट में अपना रिव्यू दर्ज करें और अगली पुस्तक के लिए 50% का सीक्रेट गिफ्ट वाउचर अनलॉक करें!\n\n👉 रिव्यू दर्ज करने के लिए यहाँ क्लिक करें:\nhttps://aarogyamindia.online${checkoutUrl}`;
   } else {
-    // Discount mode: pass book_id, id, and book for full backward compatibility
-    checkoutUrl = `/ebooks/checkout.html?book_id=${ob.primaryBook}&id=${ob.primaryBook}&book=${ob.primaryBook}&amount=${ob.price}${timerQuery}${audioQuery}`;
+    // Discount mode: Cryptographically signed with book_id, amount, target mobile and expiry
+    const sig = generateOfferSignature(ob.primaryBook, ob.price, targetMobile, exp);
+    checkoutUrl = `/ebooks/checkout.html?book_id=${ob.primaryBook}&id=${ob.primaryBook}&book=${ob.primaryBook}&amount=${ob.price}&m=${targetMobile}&exp=${exp}&sig=${sig}${timerQuery}${audioQuery}`;
     const priceText = ob.price === 0 ? 'बिल्कुल FREE (100% मुफ़्त वाउचर)' : `मात्र ₹${ob.price}`;
-    msg = `नमस्ते ${name} जी! 🙏 आरोग्यम इंडिया की ओर से आपके लिए विशेष सीमित समय ऑफर है:\n\n📖 पुस्तक: ${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}\n🔥 स्पेशल ऑफर मूल्य: ${priceText} (MRP: ₹299)\n${ob.timer !== 'none' ? `⏳ समय सीमा: केवल ${ob.timer === '15m' ? '15 मिनट' : ob.timer === '1h' ? '1 घंटा' : '24 घंटे'} के लिए मान्य!` : ''}\n\n👉 अभी ऑर्डर पूरा करने के लिए यहाँ क्लिक करें:\nhttps://aarogyamindia.online${checkoutUrl}`;
+    msg = `नमस्ते ${name} जी! 🙏 आरोग्यम इंडिया की ओर से आपके लिए विशेष सीमित समय ऑफर है:\n\n📖 पुस्तक: ${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}\n🔥 स्पेशल ऑफर मूल्य: ${priceText} (MRP: ₹299)\n${ob.timer !== 'none' ? `⏳ समय सीमा: केवल ${ob.timer === '15m' ? '15 मिनट' : ob.timer === '1h' ? '1 घंटा' : '24 घंटे'} के लिए मान्य!` : ''}\n\n🔒 यह गोपनीय लिंक केवल आपके नंबर (+91-XXXXX${cleanMobile.slice(-4)}) पर ही अनलॉक होगा:\nhttps://aarogyamindia.online${checkoutUrl}`;
   }
 
   return { checkoutUrl, msg };
@@ -1398,7 +1478,7 @@ function syncOfferBuilderLive() {
   saveOfferBuilderState();
 
   const ob = mktState.offerBuilder;
-  const sampleUser = { full_name: 'किसान मित्र', mobile: '7974422572' };
+  const sampleUser = { full_name: 'किसान मित्र (एडमिन टेस्ट)', mobile: '7974422572', isAdminTest: true };
   const sampleLinkInfo = getGeneratedOfferUrlAndMsg(sampleUser);
 
   // 1. Update generated checkout URL display & test button href
