@@ -1780,6 +1780,158 @@
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-10-02T12:46:02.152Z",
       "admin_edited": true
+    },
+    {
+      "id": "DEMO-BK016",
+      "slug": "demo-bk016",
+      "book_type": "demo",
+      "audience": "all",
+      "target_main_books": [
+        "BK016"
+      ],
+      "heading": "कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा की पूरी गाइड",
+      "name": "कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा की पूरी गाइड",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 499,
+      "offerPrice": 99,
+      "cover": "/images/books/bk016-cover.webp",
+      "thumbnail": "/images/books/bk016-cover.webp",
+      "banner": "/images/banners/bk016-hero-banner.webp",
+      "status": "active",
+      "publish_targets": [
+        "my_library"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "is_coming_soon": false,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "demoImages": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
+      "demo_images": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
+      "preview_images": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
+      "demoAvailable": true,
+      "demo_reader_pages": "1, 2, 3, 5, 8, 12, 16",
+      "demoPages": "1, 2, 3, 5, 8, 12, 16",
+      "og_image": "/images/books/bk016-og.webp",
+      "og_image_landscape": "/images/books/bk016-og.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "tts",
+        "mp3_url": "",
+        "tts_text": "नमस्कार किसान भाई।\nखेती में रोग और कीट की समस्या आए, तो सबसे जरूरी है सही जानकारी और सही समय पर सही कदम।\n\nइस कृषि दवा डायरेक्टरी में आपको रासायनिक दवाओं की जानकारी के साथ, उनके उपयोग को समझने का आसान तरीका मिलेगा।\n\nसाथ ही जैविक और कम-रासायनिक विकल्प, IPM के तरीके और किसान के उपयोगी नुस्खे भी दिए गए हैं।\n\nकिताब के अंत में रोग से फसल और Chemical से रोग खोजने की Quick Directory है, ताकि जरूरत की जानकारी जल्दी मिल सके।\n\nऔर सबसे जरूरी—कृषि दवाओं के सुरक्षित उपयोग और गलती से शरीर में जाने पर जरूरी सावधानियों की जानकारी भी शामिल है।\n\nइस किताब को अपने खेत के लिए एक Practical Reference की तरह रखें—समस्या आए, जानकारी देखें और फिर सही निर्णय लें।",
+        "story_text": "नमस्कार किसान भाई।\nखेती में रोग और कीट की समस्या आए, तो सबसे जरूरी है सही जानकारी और सही समय पर सही कदम।\n\nइस कृषि दवा डायरेक्टरी में आपको रासायनिक दवाओं की जानकारी के साथ, उनके उपयोग को समझने का आसान तरीका मिलेगा।\n\nसाथ ही जैविक और कम-रासायनिक विकल्प, IPM के तरीके और किसान के उपयोगी नुस्खे भी दिए गए हैं।\n\nकिताब के अंत में रोग से फसल और Chemical से रोग खोजने की Quick Directory है, ताकि जरूरत की जानकारी जल्दी मिल सके।\n\nऔर सबसे जरूरी—कृषि दवाओं के सुरक्षित उपयोग और गलती से शरीर में जाने पर जरूरी सावधानियों की जानकारी भी शामिल है।\n\nइस किताब को अपने खेत के लिए एक Practical Reference की तरह रखें—समस्या आए, जानकारी देखें और फिर सही निर्णय लें।",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "🌾 रासायनिक दवाओं की Practical जानकारी"
+          },
+          {
+            "icon": "🧪",
+            "text": "🌱 जैविक विकल्प और IPM तरीके"
+          },
+          {
+            "icon": "💧",
+            "text": "🍂 फफूंद, जीवाणु और विषाणु रोगों की जानकारी"
+          },
+          {
+            "icon": "🌊",
+            "text": "💧 बीज, मिट्टी और जड़ उपचार की जानकारी"
+          },
+          {
+            "icon": "🌊",
+            "text": "🎯 सही दवा चुनने का आसान तरीका"
+          },
+          {
+            "icon": "🌱",
+            "text": "📖 रोग → फसल | Chemical → रोग Quick Directory"
+          },
+          {
+            "icon": "🌱",
+            "text": "🌿 किसान के काम के नुस्खे"
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk016-sec_audio-banner.webp"
+      },
+      "features": [
+        "1. रासायनिक दवा डायरेक्टरी: फफूंदनाशी, कीटनाशक व कृषि दवाओं की सम्पूर्ण गाइड",
+        "2. रोग–कीट व फसल संदर्भ: कौन-सा रोग/कीट किन फसलों में — Quick Reference",
+        "3. जैविक विकल्प + देसी नुस्खे: कम खर्च वाले जैविक उपाय, IPM तरीके व देसी नुस्खे",
+        "4. 4-पेज Quick Directory: रोग ➔ फसल और Chemical ➔ रोग की A-Z त्वरित खोज",
+        "5. सुरक्षित दवा उपयोग: स्प्रे पूर्व सावधानियाँ व इमरजेंसी फर्स्ट-एड सुरक्षा",
+        "6. सही दवा चुनने का फॉर्मूला: Active Ingredient, formulation व label समझें"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=DEMO-BK016",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-10-02T19:48:39.005Z",
+      "admin_edited": true
     }
   ]
 }
