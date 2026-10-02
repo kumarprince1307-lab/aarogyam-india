@@ -1434,11 +1434,59 @@
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [],
-      "demo_images": [],
-      "preview_images": [],
-      "previewImages": [],
-      "demoAvailable": false,
+      "demoImages": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
+      "demo_images": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
+      "preview_images": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
+      "demoAvailable": true,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/bk016-og.webp",
@@ -1489,7 +1537,8 @@
           }
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
-        "bgm_enabled": true
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk016-sec_audio-banner.webp"
       },
       "features": [
         "🌱 1. रासायनिक दवा डायरेक्टरी फफूंदनाशी, कीटनाशक और अन्य कृषि दवाओं की आसान जानकारी",
@@ -1500,12 +1549,12 @@
         "🔎 6. सही दवा चुनने में मदद Active Ingredient, formulation और label को समझने का आसान तरीका"
       ],
       "totalPages": 120,
-      "author": "",
+      "author": "Dada Avnish Mishra",
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK016",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-10-02T05:22:42.245Z",
+      "updated_at": "2026-10-02T06:13:56.275Z",
       "admin_edited": true
     }
   ]
