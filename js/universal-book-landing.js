@@ -2273,21 +2273,57 @@
       `;
     }).join('');
 
-    // Append Write Review CTA Button if not already present
+    // Append Write Review & Wishlist CTA Buttons
     let reviewActionWrap = document.getElementById('ubl-write-review-action-wrap');
     if (!reviewActionWrap && grid.parentElement) {
       reviewActionWrap = document.createElement('div');
       reviewActionWrap.id = 'ubl-write-review-action-wrap';
       reviewActionWrap.style.textAlign = 'center';
       reviewActionWrap.style.marginTop = '22px';
+      
+      let isWishlisted = false;
+      try {
+        const wList = JSON.parse(localStorage.getItem('AAROGYAM_WISHLIST') || localStorage.getItem('AOI_MKT_WISHLIST') || '[]');
+        isWishlisted = wList.some(item => (typeof item === 'string' ? item === rawId : item.id === rawId));
+      } catch(e) {}
+
       reviewActionWrap.innerHTML = `
-        <button type="button" onclick="window.openCustomerReviewModal('${rawId}', '${escapeHtml(b.title || l.title || 'पुस्तक')}')" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; font-weight: 800; padding: 12px 26px; border-radius: 30px; border: none; cursor: pointer; font-size: 0.92rem; box-shadow: 0 4px 16px rgba(22,163,74,0.35); display: inline-flex; align-items: center; gap: 8px;">
-          <span>⭐</span> <span>अपना अनुभव व रिव्यू साझा करें (Write Review)</span>
-        </button>
+        <div style="display:inline-flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center;">
+          <button type="button" onclick="window.openCustomerReviewModal('${rawId}', '${escapeHtml(b.title || l.title || b.heading || 'पुस्तक')}')" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; font-weight: 800; padding: 12px 24px; border-radius: 30px; border: none; cursor: pointer; font-size: 0.92rem; box-shadow: 0 4px 16px rgba(22,163,74,0.35); display: inline-flex; align-items: center; gap: 8px;">
+            <span>⭐</span> <span>अपना अनुभव व रिव्यू साझा करें (Write Review)</span>
+          </button>
+          <button type="button" onclick="window.toggleBookLandingWishlist('${rawId}', '${escapeHtml(b.heading || b.name || l.title || 'पुस्तक')}')" id="ubl-wishlist-toggle-btn" style="background: #ffffff; color: #ef4444; border: 2px solid #ef4444; font-weight: 800; padding: 11px 22px; border-radius: 30px; cursor: pointer; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(239,68,68,0.15);">
+            <span id="ubl-wishlist-heart-icon">${isWishlisted ? '❤️' : '🤍'}</span> <span id="ubl-wishlist-btn-text">${isWishlisted ? 'विशलिस्ट में सुरक्षित है' : 'विशलिस्ट में जोड़ें'}</span>
+          </button>
+        </div>
       `;
       grid.parentElement.appendChild(reviewActionWrap);
     }
   }
+
+  // Universal Wishlist Toggle Engine
+  window.toggleBookLandingWishlist = function(bookId, bookTitle) {
+    try {
+      let list = JSON.parse(localStorage.getItem('AAROGYAM_WISHLIST') || localStorage.getItem('AOI_MKT_WISHLIST') || '[]');
+      const exists = list.some(item => (typeof item === 'string' ? item === bookId : item.id === bookId));
+      const btnText = document.getElementById('ubl-wishlist-btn-text');
+      const heartIcon = document.getElementById('ubl-wishlist-heart-icon');
+
+      if (exists) {
+        list = list.filter(item => (typeof item === 'string' ? item !== bookId : item.id !== bookId));
+        if (btnText) btnText.textContent = 'विशलिस्ट में जोड़ें';
+        if (heartIcon) heartIcon.textContent = '🤍';
+        alert(`'${bookTitle}' को विशलिस्ट से हटा दिया गया।`);
+      } else {
+        list.push({ id: bookId, title: bookTitle, addedAt: new Date().toISOString() });
+        if (btnText) btnText.textContent = 'विशलिस्ट में सुरक्षित है';
+        if (heartIcon) heartIcon.textContent = '❤️';
+        alert(`❤️ '${bookTitle}' आपकी विशलिस्ट में सुरक्षित हो गई है!`);
+      }
+      localStorage.setItem('AAROGYAM_WISHLIST', JSON.stringify(list));
+      localStorage.setItem('AOI_MKT_WISHLIST', JSON.stringify(list));
+    } catch(e) {}
+  };
 
   // Customer Review Submission Modal
   window.openCustomerReviewModal = function(bookId, bookTitle) {
@@ -2376,10 +2412,14 @@
       pending = JSON.parse(localStorage.getItem('AOI_PENDING_REVIEWS') || '[]');
     } catch(e) {}
 
+    const bookTitle = (currentBookData && (currentBookData.heading || currentBookData.name)) || 
+                      (currentLandingData && currentLandingData.title) || document.title || 'ई-बुक';
+
     const newRev = {
       id: 'rev_' + Date.now(),
-      book_id: bookId || 'BK016',
-      book_title: document.title || 'ई-बुक',
+      book_id: bookId || rawId || 'BK016',
+      book_title: bookTitle,
+      page_url: window.location.pathname + window.location.search,
       user_name: name,
       location: loc || 'भारत',
       rating: rating,
@@ -2402,7 +2442,18 @@
 
     alert("🎉 धन्यवाद! आपका रिव्यू सफलतापूर्वक सबमिट हो गया है। एडमिन स्वीकृति के बाद यह वेबसाइट पर दिखाई देगा।");
   };
-  }
+
+  // Telemetry: Log page visit for Marketing Hub
+  try {
+    const visits = JSON.parse(localStorage.getItem('AOI_PAGE_VISITS') || '{}');
+    const pKey = rawId || window.location.pathname;
+    const bTitle = (currentBookData && (currentBookData.heading || currentBookData.name)) || document.title;
+    if (!visits[pKey]) visits[pKey] = { views: 0, title: bTitle, lastSeen: Date.now() };
+    visits[pKey].views = (visits[pKey].views || 0) + 1;
+    visits[pKey].lastSeen = Date.now();
+    localStorage.setItem('AOI_PAGE_VISITS', JSON.stringify(visits));
+  } catch(e) {}
+}
 
   // ==========================================================
   // FAQ ACCORDION ENGINE (ACCORDION & EXPAND)

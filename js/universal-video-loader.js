@@ -230,6 +230,15 @@
           const ytId = card.getAttribute('data-yt-id');
           const title = decodeURIComponent(card.getAttribute('data-title'));
 
+          // Telemetry: Record Tube Interest for Marketing Hub
+          try {
+            const tubeData = JSON.parse(localStorage.getItem('AOI_TUBE_TELEMETRY') || '{"views":0,"recent":[]}');
+            tubeData.views = (tubeData.views || 0) + 1;
+            tubeData.recent.unshift({ title, vidId: vidId || ytId, timestamp: Date.now() });
+            if (tubeData.recent.length > 30) tubeData.recent.pop();
+            localStorage.setItem('AOI_TUBE_TELEMETRY', JSON.stringify(tubeData));
+          } catch(e) {}
+
           // Directly navigate to AarogyamTube player so user never goes to external YouTube
           const targetTubeUrl = vidId ? `/tube.html?vid=${encodeURIComponent(vidId)}` : (ytId ? `/tube.html?yt=${encodeURIComponent(ytId)}` : '/tube.html');
           window.location.href = targetTubeUrl;
