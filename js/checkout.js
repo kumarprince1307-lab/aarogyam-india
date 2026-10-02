@@ -423,6 +423,55 @@ async function loadBook() {
             }
         }
 
+        // Handle Offer Timer & Free Checkout UI
+        const timerParam = params.get("timer");
+        if (timerParam) {
+            let timerBar = document.getElementById("checkout-offer-timer-bar");
+            if (!timerBar) {
+                timerBar = document.createElement("div");
+                timerBar.id = "checkout-offer-timer-bar";
+                timerBar.style.cssText = "background:linear-gradient(90deg, #dc2626, #991b1b); color:#ffffff; padding:10px 14px; text-align:center; font-weight:800; font-size:0.88rem; border-radius:10px; margin: 12px 0; box-shadow:0 4px 12px rgba(220,38,38,0.25); display:flex; align-items:center; justify-content:center; gap:8px;";
+                const header = document.querySelector(".checkout-header");
+                if (header && header.nextSibling) {
+                    header.parentNode.insertBefore(timerBar, header.nextSibling);
+                } else {
+                    document.body.prepend(timerBar);
+                }
+            }
+            let durationSeconds = 900; // default 15m
+            if (timerParam === '1h') durationSeconds = 3600;
+            else if (timerParam === '24h') durationSeconds = 86400;
+            else if (parseInt(timerParam, 10) > 0) durationSeconds = parseInt(timerParam, 10) * 60;
+
+            let remaining = durationSeconds;
+            const updateTimerDisplay = () => {
+                const m = Math.floor(remaining / 60);
+                const s = remaining % 60;
+                timerBar.innerHTML = `⏳ <strong>विशेष सीमित समय ऑफर!</strong> यह डिस्काउंट केवल <span style="background:#0f172a; color:#f8fafc; padding:2px 8px; border-radius:6px; font-family:monospace; font-size:1rem; letter-spacing:1px;">${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</span> में समाप्त हो जाएगा!`;
+                if (remaining > 0) remaining--;
+            };
+            updateTimerDisplay();
+            setInterval(updateTimerDisplay, 1000);
+        }
+
+        // If amount is 0 (Free Checkout / Admin Test)
+        if (bookOffer === 0 || bookOffer <= 0) {
+            const payBtn = document.getElementById("payNowBtn") || document.querySelector(".pay-btn");
+            if (payBtn) {
+                payBtn.innerHTML = `🚀 मुफ़्त में अभी प्राप्त करें (Get Free Access - ₹0)`;
+                payBtn.style.background = "linear-gradient(135deg, #16a34a, #15803d)";
+                payBtn.style.boxShadow = "0 4px 16px rgba(22,163,74,0.4)";
+            }
+            const orderSummary = document.querySelector(".order-summary");
+            if (orderSummary && !document.getElementById("free-voucher-badge")) {
+                const badge = document.createElement("div");
+                badge.id = "free-voucher-badge";
+                badge.style.cssText = "background:#dcfce7; border:1.5px solid #16a34a; color:#15803d; padding:10px 14px; border-radius:10px; font-size:0.86rem; margin-top:12px; font-weight:800; display:flex; align-items:center; gap:8px;";
+                badge.innerHTML = `🎉 <strong>100% मुफ़्त वाउचर लागू!</strong> इसके लिए कोई भुगतान नहीं करना होगा।`;
+                orderSummary.prepend(badge);
+            }
+        }
+
         autoFillUserData();
 
     } catch (error) {
@@ -576,6 +625,64 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         
         // 📝 1. चेकआउट लॉग दर्ज करें: पेमेंट शुरू (initiated) - असली बुक आईडी के साथ
         await logCheckoutActivity(activeUserId, bookIdToBuy, 'initiated');
+
+        // 🚀 100% FREE / ADMIN TEST CHECKOUT HANDLER (₹0 - Immediate Unlock)
+        if (bookPrice === 0 || bookPrice <= 0) {
+            payBtn.disabled = true;
+            payBtn.textContent = "सत्यापित हो रहा है...";
+            const freePaymentId = 'FREE_TEST_' + Date.now();
+            await logCheckoutActivity(activeUserId, bookIdToBuy, 'free_success');
+
+            try {
+                const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+                const myPurchasedIds = JSON.parse(localStorage.getItem('my_purchased_book_ids') || '[]');
+                const booksToUnlock = (window.currentCheckoutBookList && window.currentCheckoutBookList.length > 0) 
+                    ? window.currentCheckoutBookList 
+                    : [{ id: bookIdToBuy, name: bookTitle, offerPrice: 0 }];
+
+                const db = window.dbClient || window.supabase;
+                const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+
+                for (const b of booksToUnlock) {
+                    const bId = b.id || bookIdToBuy;
+                    const newPurchase = {
+                        book_id: bId,
+                        title: b.name || b.title || bookTitle,
+                        amount: 0,
+                        payment_id: freePaymentId,
+                        order_id: 'FREE_ORD_' + Date.now(),
+                        created_at: new Date().toISOString()
+                    };
+                    localPurchases.push(newPurchase);
+                    if (!myPurchasedIds.includes(bId)) myPurchasedIds.push(bId);
+
+                    if (db) {
+                        await db.from('purchases').insert([{
+                            profile_id: activeUserId || userObj.id,
+                            book_id: bId,
+                            amount: 0,
+                            payment_id: freePaymentId,
+                            status: 'completed'
+                        }]).catch(() => {});
+                    }
+                }
+
+                localStorage.setItem('AI_PURCHASES', JSON.stringify(localPurchases));
+                localStorage.setItem('purchases', JSON.stringify(localPurchases));
+                localStorage.setItem('my_purchased_book_ids', JSON.stringify(myPurchasedIds));
+                localStorage.removeItem('AI_CART_ITEMS');
+
+                userObj.is_active = true;
+                localStorage.setItem('AI_USER', JSON.stringify(userObj));
+                localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
+                localStorage.setItem('user_is_active', 'true');
+            } catch (saveErr) {
+                console.warn('Free purchase save note:', saveErr);
+            }
+
+            window.location.href = `/ebooks/payment-success.html?payment_id=${freePaymentId}&book_id=${bookIdToBuy}&amount=0`;
+            return;
+        }
 
         if (typeof startPayment === "function") {
             const res = startPayment();
