@@ -2232,9 +2232,23 @@
       { name: 'माखन दाऊ', location: 'गुना, मध्य प्रदेश', rating: 5, gender: 'male', comment: 'कम कीमत में इतनी उपयोगी जानकारी मिलना वास्तव में शानदार है।' }
     ];
 
-    const rawReviews = (Array.isArray(l.reviews) && l.reviews.length > 0) ? l.reviews :
+    let approvedAdditions = [];
+    try {
+      const allApproved = JSON.parse(localStorage.getItem('AOI_APPROVED_REVIEWS') || '[]');
+      if (Array.isArray(allApproved)) {
+        approvedAdditions = allApproved.filter(ar => ar && (ar.book_id === rawId || !ar.book_id)).map(ar => ({
+          name: ar.user_name || ar.name,
+          location: ar.location || 'भारत',
+          rating: ar.rating || 5,
+          comment: ar.review_text || ar.comment || '',
+          gender: 'male'
+        }));
+      }
+    } catch(e) {}
+
+    const rawReviews = [...approvedAdditions, ...((Array.isArray(l.reviews) && l.reviews.length > 0) ? l.reviews :
                        (Array.isArray(l.testimonials) && l.testimonials.length > 0) ? l.testimonials :
-                       (Array.isArray(b.reviews) && b.reviews.length > 0) ? b.reviews : defaultReviews;
+                       (Array.isArray(b.reviews) && b.reviews.length > 0) ? b.reviews : defaultReviews)];
 
     grid.innerHTML = rawReviews.map(r => {
       const avatarHtml = r.photo || r.avatar ? 
@@ -2258,6 +2272,136 @@
         </div>
       `;
     }).join('');
+
+    // Append Write Review CTA Button if not already present
+    let reviewActionWrap = document.getElementById('ubl-write-review-action-wrap');
+    if (!reviewActionWrap && grid.parentElement) {
+      reviewActionWrap = document.createElement('div');
+      reviewActionWrap.id = 'ubl-write-review-action-wrap';
+      reviewActionWrap.style.textAlign = 'center';
+      reviewActionWrap.style.marginTop = '22px';
+      reviewActionWrap.innerHTML = `
+        <button type="button" onclick="window.openCustomerReviewModal('${rawId}', '${escapeHtml(b.title || l.title || 'पुस्तक')}')" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; font-weight: 800; padding: 12px 26px; border-radius: 30px; border: none; cursor: pointer; font-size: 0.92rem; box-shadow: 0 4px 16px rgba(22,163,74,0.35); display: inline-flex; align-items: center; gap: 8px;">
+          <span>⭐</span> <span>अपना अनुभव व रिव्यू साझा करें (Write Review)</span>
+        </button>
+      `;
+      grid.parentElement.appendChild(reviewActionWrap);
+    }
+  }
+
+  // Customer Review Submission Modal
+  window.openCustomerReviewModal = function(bookId, bookTitle) {
+    let modal = document.getElementById('ubl-customer-review-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'ubl-customer-review-modal';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.background = 'rgba(0,0,0,0.65)';
+      modal.style.backdropFilter = 'blur(4px)';
+      modal.style.zIndex = '999999';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.padding = '16px';
+      modal.style.boxSizing = 'border-box';
+      modal.innerHTML = `
+        <div style="background:#ffffff; border-radius:18px; max-width:440px; width:100%; padding:24px; box-shadow:0 20px 50px rgba(0,0,0,0.3); border:2px solid #86efac; position:relative; font-family:'Outfit',sans-serif;">
+          <button onclick="document.getElementById('ubl-customer-review-modal').style.display='none'" style="position:absolute; top:12px; right:14px; background:#f1f5f9; border:none; font-size:20px; color:#64748b; cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;">&times;</button>
+          
+          <div style="text-align:center; margin-bottom:14px;">
+            <div style="width:50px; height:50px; border-radius:50%; background:#dcfce7; color:#16a34a; font-size:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 8px;">⭐</div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#0f172a;">अपना अनुभव साझा करें</h3>
+            <p style="margin:4px 0 0 0; font-size:0.82rem; color:#64748b;" id="crm-modal-book-subtitle">पुस्तक के बारे में अपनी राय दें</p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div>
+              <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">आपका नाम: *</label>
+              <input type="text" id="crm-input-name" placeholder="उदा. रमेश पटेल" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:700; box-sizing:border-box;" required />
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">जिला एवं राज्य: *</label>
+              <input type="text" id="crm-input-location" placeholder="उदा. उज्जैन, मध्य प्रदेश" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:700; box-sizing:border-box;" required />
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">स्टार रेटिंग:</label>
+              <select id="crm-input-rating" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:800; color:#eab308; box-sizing:border-box;">
+                <option value="5">⭐⭐⭐⭐⭐ (5 स्टार - बहुत उपयोगी)</option>
+                <option value="4">⭐⭐⭐⭐ (4 स्टार - अच्छी किताब)</option>
+                <option value="3">⭐⭐⭐ (3 स्टार - ठीक-ठाक)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">आपकी समीक्षा (2-3 पंक्तियों में): *</label>
+              <textarea id="crm-input-text" rows="3" placeholder="इस पुस्तक की कौन-सी जानकारी आपको सबसे ज्यादा काम आई..." style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:600; box-sizing:border-box;" required></textarea>
+            </div>
+
+            <button type="button" onclick="window.submitCustomerReview('${bookId}')" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:900; font-size:0.95rem; padding:12px; border-radius:8px; border:none; cursor:pointer; margin-top:6px; box-shadow:0 4px 14px rgba(22,163,74,0.35);">
+              🚀 रिव्यू सबमिट करें
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    } else {
+      modal.style.display = 'flex';
+    }
+  };
+
+  window.submitCustomerReview = function(bookId) {
+    const nameInput = document.getElementById('crm-input-name');
+    const locInput = document.getElementById('crm-input-location');
+    const ratingInput = document.getElementById('crm-input-rating');
+    const textInput = document.getElementById('crm-input-text');
+
+    const name = (nameInput?.value || '').trim();
+    const loc = (locInput?.value || '').trim();
+    const rating = parseInt(ratingInput?.value || '5', 10);
+    const text = (textInput?.value || '').trim();
+
+    if (!name || !text) {
+      alert("कृपया अपना नाम और समीक्षा दर्ज करें।");
+      return;
+    }
+
+    let pending = [];
+    try {
+      pending = JSON.parse(localStorage.getItem('AOI_PENDING_REVIEWS') || '[]');
+    } catch(e) {}
+
+    const newRev = {
+      id: 'rev_' + Date.now(),
+      book_id: bookId || 'BK016',
+      book_title: document.title || 'ई-बुक',
+      user_name: name,
+      location: loc || 'भारत',
+      rating: rating,
+      review_text: text,
+      created_at: new Date().toISOString(),
+      status: 'pending'
+    };
+
+    pending.unshift(newRev);
+    try {
+      localStorage.setItem('AOI_PENDING_REVIEWS', JSON.stringify(pending));
+    } catch(e) {}
+
+    const modal = document.getElementById('ubl-customer-review-modal');
+    if (modal) modal.style.display = 'none';
+
+    if (nameInput) nameInput.value = '';
+    if (locInput) locInput.value = '';
+    if (textInput) textInput.value = '';
+
+    alert("🎉 धन्यवाद! आपका रिव्यू सफलतापूर्वक सबमिट हो गया है। एडमिन स्वीकृति के बाद यह वेबसाइट पर दिखाई देगा।");
+  };
   }
 
   // ==========================================================

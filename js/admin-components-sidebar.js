@@ -2,6 +2,7 @@
 
 const MENU = [
   { label: 'Dashboard', href: 'dashboard.html', icon: '🏠', route: 'dashboard' },
+  { label: '🚀 Marketing Hub (मार्केटिंग हब)', href: 'reports.html', icon: '📈', route: 'reports' },
   { label: 'Users', icon: '👥', children: [ 
     { label: 'All Users', href: 'users.html', route: 'users' }, 
     { label: '🎥 Webinar Reports (वेबिनार रिपोर्ट)', href: 'webinar-reports.html', route: 'webinar-reports' },

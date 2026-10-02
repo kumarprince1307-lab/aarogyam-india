@@ -45,7 +45,9 @@ const ROUTE_ALIASES = {
   'webinar': 'all-webinars',
   'webinars': 'all-webinars',
   'all-webinar': 'all-webinars',
-  'all-webinars': 'all-webinars'
+  'all-webinars': 'all-webinars',
+  'marketing-hub': 'reports',
+  'marketing': 'reports'
 };
 
 export async function navigateTo(routeName) {
