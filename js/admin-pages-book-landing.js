@@ -1782,11 +1782,11 @@ Instant Download & Lifetime Access
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <label class="admin-label" style="font-weight: 700; margin: 0;">बुक कोड (Book Code): *</label>
-                <button type="button" id="btn_gen_fd_code" class="admin-button small-button" style="background: #16a34a; color: #fff; padding: 2px 8px; font-size: 0.72rem;">
+                <button type="button" id="btn_gen_fd_code" onclick="window.autoGenerateFdCode()" class="admin-button small-button" style="background: #16a34a; color: #fff; padding: 2px 8px; font-size: 0.72rem; cursor: pointer;">
                   ⚡ Auto Code
                 </button>
               </div>
-              <input type="text" id="fd_input_id" class="admin-input" placeholder="उदा. DEMO001" style="width: 100%; padding: 8px 10px; font-family: monospace; font-weight: 800; color: #16a34a;" required />
+              <input type="text" id="fd_input_id" class="admin-input" placeholder="उदा. DEMO-BK016" style="width: 100%; padding: 8px 10px; font-family: monospace; font-size: 1rem; font-weight: 900; color: #15803d; background: #f0fdf4; border: 2px solid #86efac; border-radius: 6px;" required />
             </div>
 
             <!-- Category -->
@@ -1819,6 +1819,7 @@ Instant Download & Lifetime Access
                 <option value="BK011">🏡 BK011: पॉलीहाउस नेटहाउस गाइड</option>
                 <option value="BK012">🌱 BK012: सब्जी खेती गाइड</option>
                 <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
+                <option value="BK016">🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा</option>
                 <option value="ALL">🎁 ALL: सभी पुस्तकों के साथ (Universal Bonus)</option>
               </select>
               <button type="button" onclick="window.autoImportFromTargetMainBook()" class="admin-button small-button" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: 800; margin-top: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(2,132,199,0.3);">
@@ -1853,6 +1854,7 @@ Instant Download & Lifetime Access
                   <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK007" /> BK007 (गेहूं)</label>
                   <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK008" /> BK008 (जैविक)</label>
                   <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK015" /> BK015 (सब्जी)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK016" /> BK016 (कृषि दवा)</label>
                 </div>
               </div>
             </div>
@@ -4800,7 +4802,8 @@ Instant Download & Lifetime Access
       { id: 'BK010', name: '🌸 BK010: फूल खेती गाइड' },
       { id: 'BK011', name: '🏡 BK011: पॉलीहाउस नेटहाउस गाइड' },
       { id: 'BK012', name: '🌱 BK012: सब्जी खेती गाइड' },
-      { id: 'BK015', name: '🌱 BK015: सब्जी खेती मास्टर PART 1' }
+      { id: 'BK015', name: '🌱 BK015: सब्जी खेती मास्टर PART 1' },
+      { id: 'BK016', name: '🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा' }
     ];
 
     const bookMap = new Map();
@@ -4939,6 +4942,14 @@ Instant Download & Lifetime Access
           '/images/books/kheti-dr-preview-03.webp',
           '/images/books/kheti-dr-preview-04.webp'
         ];
+      } else if (bId === 'BK016') {
+        extractedImages = [
+          '/images/books/bk016-preview-1.webp',
+          '/images/books/bk016-preview-2.webp',
+          '/images/books/bk016-preview-3.webp',
+          '/images/books/bk016-preview-4.webp',
+          '/images/books/bk016-preview-5.webp'
+        ];
       } else {
         extractedImages = [
           `/images/books/${bId.toLowerCase()}-preview-01.webp`,
@@ -5001,6 +5012,19 @@ Instant Download & Lifetime Access
     // 8. Re-render Demo Pages List
     window.renderFdDemoPagesList();
 
+    // 9. Auto-sync and display Book Code prominently
+    const idInput = document.getElementById('fd_input_id');
+    if (idInput && (!idInput.value || idInput.value.startsWith('DEMO') || idInput.value.startsWith('FREE'))) {
+      const type = document.getElementById('fd_input_type')?.value || 'demo';
+      const prefix = type === 'demo' ? 'DEMO' : 'FREE';
+      const nextCode = `${prefix}-${bId}`;
+      idInput.value = nextCode;
+      idInput.style.fontWeight = '900';
+      idInput.style.color = '#15803d';
+      idInput.style.backgroundColor = '#f0fdf4';
+      idInput.style.border = '2px solid #86efac';
+    }
+
     showToast(`🎉 ${bId} से ${currentFdDemoPages.length} प्रिव्यू पेज व 3D कवर सफलता से इम्पोर्ट हो गए!`, 'success');
   };
 
@@ -5018,8 +5042,12 @@ Instant Download & Lifetime Access
 
     const inputId = document.getElementById('fd_input_id');
     if (inputId) {
-      inputId.value = '';
+      inputId.value = 'DEMO-BK001';
       inputId.disabled = false;
+      inputId.style.fontWeight = '900';
+      inputId.style.color = '#15803d';
+      inputId.style.backgroundColor = '#f0fdf4';
+      inputId.style.border = '2px solid #86efac';
     }
     const inputType = document.getElementById('fd_input_type');
     if (inputType) inputType.value = 'demo';
@@ -5027,6 +5055,7 @@ Instant Download & Lifetime Access
     if (inputCat) inputCat.value = 'Agriculture';
     
     window.populateFdTargetMainBookSelect('BK001');
+    window.autoGenerateFdCode();
 
     const inputTitle = document.getElementById('fd_input_title');
     if (inputTitle) inputTitle.value = '';
@@ -5046,19 +5075,33 @@ Instant Download & Lifetime Access
   };
 
   window.autoGenerateFdCode = function() {
-    const books = getStoredFreeDemoBooks();
+    const targetBook = document.getElementById('fd_target_main_book')?.value || 'BK016';
     const type = document.getElementById('fd_input_type')?.value || 'demo';
     const prefix = type === 'demo' ? 'DEMO' : 'FREE';
-    let maxNum = 0;
-    books.forEach(b => {
-      if (b.id && b.id.toUpperCase().startsWith(prefix)) {
-        const num = parseInt(b.id.replace(prefix, ''), 10);
-        if (!isNaN(num) && num > maxNum) maxNum = num;
-      }
-    });
-    const nextCode = `${prefix}${String(maxNum + 1).padStart(3, '0')}`;
+    
+    let nextCode = '';
+    if (targetBook && targetBook !== 'ALL') {
+      nextCode = `${prefix}-${targetBook.toUpperCase()}`;
+    } else {
+      const books = getStoredFreeDemoBooks();
+      let maxNum = 0;
+      books.forEach(b => {
+        if (b.id && b.id.toUpperCase().startsWith(prefix)) {
+          const num = parseInt(b.id.replace(/[^0-9]/g, ''), 10);
+          if (!isNaN(num) && num > maxNum) maxNum = num;
+        }
+      });
+      nextCode = `${prefix}${String(maxNum + 1).padStart(3, '0')}`;
+    }
+
     const idInput = document.getElementById('fd_input_id');
-    if (idInput) idInput.value = nextCode;
+    if (idInput) {
+      idInput.value = nextCode;
+      idInput.style.fontWeight = '900';
+      idInput.style.color = '#15803d';
+      idInput.style.backgroundColor = '#f0fdf4';
+      idInput.style.border = '2px solid #86efac';
+    }
     showToast(`⚡ नया कोड सेट हुआ: ${nextCode}`, 'info');
   };
 

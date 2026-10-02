@@ -2372,6 +2372,11 @@ function stopCurrentPageTts() {
     studioTtsChunks = [];
     studioTtsChunkIndex = 0;
 
+    if (window._studioTtsKeepAliveInterval) {
+        clearInterval(window._studioTtsKeepAliveInterval);
+        window._studioTtsKeepAliveInterval = null;
+    }
+    window._studioCurrentUtterance = null;
     if (studioTtsAudio) {
         studioTtsAudio.pause();
         studioTtsAudio.currentTime = 0;
@@ -2491,6 +2496,15 @@ function testCurrentPageTts() {
                         advance();
                     }
                 }, timeoutMs);
+
+                window._studioCurrentUtterance = ut;
+                if (!window._studioTtsKeepAliveInterval) {
+                    window._studioTtsKeepAliveInterval = setInterval(() => {
+                        if ('speechSynthesis' in window && window.speechSynthesis.paused) {
+                            window.speechSynthesis.resume();
+                        }
+                    }, 2500);
+                }
 
                 setTimeout(() => {
                     if (studioTtsIsPlaying && 'speechSynthesis' in window) {
@@ -3162,6 +3176,7 @@ function playSourceAudioPreview(audioSrc, textSrc) {
         ut.lang = 'hi-IN';
         ut.rate = 0.95;
         ut.pitch = 1.0;
+        window._studioSourceUtterance = ut;
         window.speechSynthesis.speak(ut);
     } else {
         alert("इस पेज पर कोई ऑडियो या टेक्स्ट उपलब्ध नहीं है।");

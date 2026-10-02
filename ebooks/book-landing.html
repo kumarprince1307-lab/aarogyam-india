@@ -369,6 +369,94 @@
       .hero-price-box .new-price {
         font-size: 32px !important;
       }
+
+      /* MOBILE HEADER FIX: Hide Login Button on Mobile to give Logo & Title Full Space */
+      #header-login-btn,
+      #header-user-btn,
+      .header-auth-btn {
+        display: none !important;
+      }
+      .header-logo-title {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+        overflow: hidden !important;
+      }
+      .header-logo-title .site-logo {
+        height: 32px !important;
+        width: auto !important;
+        flex-shrink: 0 !important;
+      }
+      #header-book-title {
+        font-size: 0.95rem !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: none !important;
+      }
+    }
+
+    /* HIGH-CONTRAST DARK BOLD TEXT FOR SUPERIOR DAYLIGHT READABILITY */
+    #why-desc,
+    .why-desc,
+    .why-card p,
+    .section-heading p,
+    .hero-lead,
+    .book-spec-val,
+    .ubl-kpi-badge-subtext,
+    .ubl-spec-value,
+    .faq-answer p,
+    .review-content,
+    .preview-note,
+    .feature-item p,
+    .feature-card p,
+    .bonus-card p,
+    .trust-item span {
+      color: #0f172a !important;
+      font-weight: 600 !important;
+      line-height: 1.65 !important;
+    }
+
+    #why-title,
+    .section-heading h2,
+    .why-card h3,
+    .bonus-title,
+    .review-author h4 {
+      color: #0f172a !important;
+      font-weight: 900 !important;
+    }
+
+    /* KPI HIGHLIGHTS & FAQ: SAWAL (RED) & JAWAB (SOLID BLACK) */
+    .ubl-kpi-badge-title,
+    .ubl-kpi-card-title,
+    .faq-item summary,
+    .faq-question h3,
+    .faq-item h3 {
+      color: #dc2626 !important; /* लाल रंग में सवाल / Heading */
+      font-weight: 800 !important;
+    }
+
+    .ubl-kpi-badge-subtext,
+    .ubl-kpi-card-desc,
+    .faq-item p,
+    .faq-answer p {
+      color: #111827 !important; /* सॉलिड ब्लैक रंग में जवाब / Description */
+      font-weight: 600 !important;
+    }
+
+    #why-desc {
+      font-size: 1.05rem !important;
+      background: #f8fafc;
+      padding: 16px 18px;
+      border-radius: 12px;
+      border-left: 4px solid #16a34a;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      margin-top: 12px !important;
+      text-align: left !important;
     }
   </style>
 </head>

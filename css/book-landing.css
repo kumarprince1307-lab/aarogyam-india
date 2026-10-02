@@ -2417,6 +2417,18 @@ body {
     font-size: 1.05rem !important;
 }
 
+@media (max-width: 768px) {
+    #header-login-btn,
+    #header-user-btn,
+    .header-auth-btn {
+        display: none !important;
+    }
+    #header-book-title {
+        max-width: none !important;
+        font-size: 0.95rem !important;
+    }
+}
+
 /* ==========================================================
    FLOATING FREE DEMO READ BUTTON (PURE RED PULSE BLINKING)
 ========================================================== */
@@ -3924,6 +3936,26 @@ body {
         right: auto !important;
         z-index: 99990 !important;
     }
+}
+
+/* ==========================================================
+   KPI HIGHLIGHTS & FAQ: SAWAL (RED) & JAWAB (SOLID BLACK)
+========================================================== */
+.ubl-kpi-badge-title,
+.ubl-kpi-card-title,
+.faq-item summary,
+.faq-question h3,
+.faq-item h3 {
+    color: #dc2626 !important; /* लाल रंग में सवाल / Title */
+    font-weight: 800 !important;
+}
+
+.ubl-kpi-badge-subtext,
+.ubl-kpi-card-desc,
+.faq-item p,
+.faq-answer p {
+    color: #111827 !important; /* सॉलिड ब्लैक रंग में जवाब / Description */
+    font-weight: 600 !important;
 }
 
 

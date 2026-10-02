@@ -696,7 +696,6 @@ class ProAudioBookEngine {
 
             if (this.synth) {
                 try {
-                    this.synth.cancel();
                     const ut = new SpeechSynthesisUtterance(currentChunk);
                     ut.lang = 'hi-IN';
                     ut.pitch = 1.0;
@@ -712,23 +711,15 @@ class ProAudioBookEngine {
                     };
 
                     ut.onend = () => {
-                        const elapsed = Date.now() - chunkStartTime;
-                        // In Facebook / WebView without TTS, onend triggers instantly in < 250ms without speaking:
-                        if (elapsed < 250 && currentChunk.length > 6) {
-                            console.warn("SpeechSynthesis ended prematurely (In-App Browser restriction)");
-                            this.handleBrowserTtsRestriction();
-                            return;
-                        }
                         advance();
                     };
 
                     ut.onerror = (e) => {
-                        // Crucial fix: do NOT advance on cancel/interrupt to prevent runaway loops!
                         if (e && (e.error === 'canceled' || e.error === 'interrupted')) {
                             return;
                         }
-                        console.warn("Speech error in restricted browser:", e);
-                        this.handleBrowserTtsRestriction();
+                        console.warn("Speech synthesis note:", e?.error);
+                        advance();
                     };
 
                     // Dynamic Watchdog to prevent Chromium speech freeze:
@@ -742,13 +733,24 @@ class ProAudioBookEngine {
                         this.activeTimers.push(wTimer);
                     }
 
-                    // Keep strong reference so utterance is not garbage collected
+                    // Keep strong global reference so utterance is never garbage-collected mid-sentence
                     this.currentUtterance = ut;
+                    window._aoiActiveUtterance = ut;
                     chunkStartTime = Date.now();
+
+                    // Periodic Chrome Android Keep-Alive
+                    if (!window._aoiKeepAliveInterval) {
+                        window._aoiKeepAliveInterval = setInterval(() => {
+                            if (window.speechSynthesis && window.speechSynthesis.paused) {
+                                window.speechSynthesis.resume();
+                            }
+                        }, 2500);
+                    }
+
                     this.synth.speak(ut);
                 } catch(err) {
                     console.warn("Synth speak error:", err);
-                    this.handleBrowserTtsRestriction();
+                    advance();
                 }
             } else {
                 this.handleBrowserTtsRestriction();
@@ -760,6 +762,11 @@ class ProAudioBookEngine {
 
     stopAudioSources() {
         this.activeEpoch = (this.activeEpoch || 0) + 1;
+        if (window._aoiKeepAliveInterval) {
+            clearInterval(window._aoiKeepAliveInterval);
+            window._aoiKeepAliveInterval = null;
+        }
+        window._aoiActiveUtterance = null;
         if (Array.isArray(this.activeTimers)) {
             this.activeTimers.forEach(t => {
                 clearTimeout(t);

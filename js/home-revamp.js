@@ -1057,16 +1057,19 @@
     const grid = document.getElementById('home-kindle-bestsellers-grid');
     if (!grid) return;
 
+    // Strict priority sequence requested: BK016, BK002, BK015, BK001
+    const priorityOrder = ['BK016', 'BK002', 'BK015', 'BK001'];
+
     let bestsellers = [
       {
-        id: 'BK001',
-        title: 'खरीफ फसल मास्टर गाइड 2026',
-        subtitle: 'धान, सोयाबीन, मक्का व कपास की सम्पूर्ण सचित्र वैज्ञानिक गाइड',
-        price: '₹99',
-        oldPrice: '₹299',
-        image: '/images/books/kharif-master-guide-2026-cover.webp',
-        link: '/ebooks/kharif-master-guide-2026.html',
-        tag: '🔥 सर्वाधिक लोकप्रिय'
+        id: 'BK016',
+        title: 'कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा',
+        subtitle: 'रासायनिक दवाएँ • जैविक विकल्प • किसान के नुस्खे • 4-पेज Quick Directory',
+        price: '₹149',
+        oldPrice: '₹499',
+        image: '/images/books/bk016-cover.webp',
+        link: '/ebooks/book-landing.html?id=BK016',
+        tag: '🆕 नई कृषि दवा डायरेक्टरी'
       },
       {
         id: 'BK002',
@@ -1075,8 +1078,28 @@
         price: '₹99',
         oldPrice: '₹299',
         image: '/images/books/fasal-ka-doctor-cover.webp',
-        link: '/ebooks/kheti-dr.html',
+        link: '/ebooks/book-landing.html?id=BK002',
         tag: '🩺 किसान का डॉक्टर'
+      },
+      {
+        id: 'BK015',
+        title: '🌱 सब्जी खेती मास्टर  (PART 1)',
+        subtitle: 'टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी व 10+ सब्जियों की नर्सरी से कटाई तक सम्पूर्ण गाइड',
+        price: '₹149',
+        oldPrice: '₹1999',
+        image: '/images/books/bk015-cover.webp',
+        link: '/ebooks/book-landing.html?id=BK015',
+        tag: '🌱 सब्जी खेती मास्टर'
+      },
+      {
+        id: 'BK001',
+        title: 'खरीफ फसल मास्टर गाइड 2026',
+        subtitle: 'धान, सोयाबीन, मक्का व कपास की सम्पूर्ण सचित्र वैज्ञानिक गाइड',
+        price: '₹99',
+        oldPrice: '₹299',
+        image: '/images/books/kharif-master-guide-2026-cover.webp',
+        link: '/ebooks/book-landing.html?id=BK001',
+        tag: '🔥 सर्वाधिक लोकप्रिय'
       }
     ];
 
@@ -1102,7 +1125,6 @@
       const allActive = [...jsonBooks, ...jsonLp, ...customBooks, ...customLp].filter(b => {
         if (!b || !b.id) return false;
         const bIdUpper = b.id.toUpperCase();
-        if (bIdUpper === 'BK001' || bIdUpper === 'BK002') return false;
         // DEMO BOOK SECURITY RULE: Demo books NEVER appear in Home trays/bestsellers
         if (bIdUpper.startsWith('DEMO') || b.book_type === 'demo' || b.type === 'demo') return false;
         if (b.publish_targets && Array.isArray(b.publish_targets) && !b.publish_targets.includes('home_page')) return false;
@@ -1113,17 +1135,22 @@
       allActive.forEach(b => {
         const hero = b.hero || {};
         const bId = b.id.toUpperCase();
-        if (!bestsellers.some(x => x.id === bId)) {
-          bestsellers.push({
-            id: bId,
-            title: hero.title || b.heading || b.name || bId,
-            subtitle: hero.subtitle || b.subtitle || 'सम्पूर्ण प्रैक्टिकल गाइड',
-            price: `₹${hero.offer_price || b.offerPrice || 99}`,
-            oldPrice: `₹${hero.mrp || b.mrp || 299}`,
-            image: hero.cover_image || b.cover || b.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
-            link: `/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`,
-            tag: b.store_badge === 'new_arrival' ? '🆕 New Arrival' : '⭐ Bestseller'
-          });
+        const existingIdx = bestsellers.findIndex(x => x.id === bId);
+        const bookObj = {
+          id: bId,
+          title: hero.title || b.heading || b.name || bId,
+          subtitle: hero.subtitle || b.subtitle || 'सम्पूर्ण प्रैक्टिकल गाइड',
+          price: `₹${hero.offer_price || b.offerPrice || 99}`,
+          oldPrice: `₹${hero.mrp || b.mrp || 299}`,
+          image: hero.cover_image || b.cover || b.thumbnail || (bId === 'BK016' ? '/images/books/bk016-cover.webp' : '/images/books/kharif-master-guide-2026-cover.webp'),
+          link: `/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`,
+          tag: b.store_badge === 'new_arrival' ? '🆕 New Arrival' : (b.store_badge === 'best_seller' ? '⭐ Bestseller' : (bId === 'BK016' ? '🆕 नई डायरेक्टरी' : '⭐ Bestseller'))
+        };
+
+        if (existingIdx !== -1) {
+          bestsellers[existingIdx] = { ...bestsellers[existingIdx], ...bookObj };
+        } else {
+          bestsellers.push(bookObj);
         }
       });
     } catch (e) { }
@@ -1137,6 +1164,18 @@
         seenKeys.add(key);
         uniqueBestsellers.push(book);
       }
+    });
+
+    // Enforce strict priority sequence: BK016, BK002, BK015, BK001 first
+    uniqueBestsellers.sort((a, b) => {
+      const idA = String(a.id || '').toUpperCase();
+      const idB = String(b.id || '').toUpperCase();
+      const idxA = priorityOrder.indexOf(idA);
+      const idxB = priorityOrder.indexOf(idB);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return 0;
     });
 
     grid.innerHTML = uniqueBestsellers.map(book => `

@@ -882,6 +882,61 @@
     // Audio Book Experience Section
     renderAudioExperienceSection(b, l);
 
+    // Helper: Format KPI / Feature items dynamically based on words, separators and emojis
+    function parseKpiItem(badge) {
+      let rawText = '';
+      let icon = '';
+      if (typeof badge === 'string') {
+        rawText = badge.trim();
+      } else if (badge && typeof badge === 'object') {
+        rawText = (badge.text || badge.title || '').trim();
+        icon = (badge.icon || '').trim();
+      }
+
+      // 1. Detect and cleanly separate leading emoji if present
+      let leadingEmoji = '';
+      const emojiMatch = rawText.match(/^([\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]|\uD83D[\uDE80-\uDEFF]|\uD83E[\uDD00-\uDDFF]|[\uFE00-\uFE0F])+\s*/);
+      if (emojiMatch) {
+        leadingEmoji = emojiMatch[0].trim();
+        rawText = rawText.substring(emojiMatch[0].length).trim();
+      }
+
+      // If icon is absent or generic fallback, adopt the leading emoji
+      if ((!icon || icon === 'fa-seedling' || icon === 'fa-check' || icon === 'fa-circle-check') && leadingEmoji) {
+        icon = leadingEmoji;
+      }
+
+      // 2. Intelligent Word Separation for Title & Subtitle
+      let title = rawText;
+      let subtitle = '';
+
+      if (badge && badge.title && badge.desc) {
+        title = badge.title.trim();
+        subtitle = badge.desc.trim();
+      } else if (rawText.includes(':')) {
+        const parts = rawText.split(':');
+        title = parts[0].trim();
+        subtitle = parts.slice(1).join(':').trim();
+      } else if (rawText.includes('—') || rawText.includes('–')) {
+        const sep = rawText.includes('—') ? '—' : '–';
+        const parts = rawText.split(sep);
+        title = parts[0].trim();
+        subtitle = parts.slice(1).join(sep).trim();
+      } else if (rawText.includes('\n')) {
+        const parts = rawText.split('\n');
+        title = parts[0].trim();
+        subtitle = parts.slice(1).join(' ').trim();
+      } else {
+        const words = rawText.split(/\s+/);
+        if (words.length > 7) {
+          title = words.slice(0, 4).join(' ');
+          subtitle = words.slice(4).join(' ');
+        }
+      }
+
+      return { icon, title, subtitle, rawText, leadingEmoji };
+    }
+
     // Hero Features / Badges inside hero
     const featWrap = document.getElementById('hero-features-wrap');
     if (featWrap) {
@@ -892,18 +947,19 @@
         { icon: 'fa-gift', text: 'Free Bonus PDF' }
       ];
       featWrap.innerHTML = feats.map(f => {
+        const item = parseKpiItem(f);
         let fIconHtml = '<i class="fa-solid fa-check"></i>';
-        if (f.icon) {
-          if (f.icon.startsWith('fa-') || f.icon.startsWith('fa ')) {
-            fIconHtml = `<i class="fa-solid ${f.icon}"></i>`;
+        if (item.icon) {
+          if (item.icon.startsWith('fa-') || item.icon.startsWith('fa ')) {
+            fIconHtml = `<i class="fa-solid ${item.icon}"></i>`;
           } else {
-            fIconHtml = `<span style="font-size:1.15rem;line-height:1;">${escapeHtml(f.icon)}</span>`;
+            fIconHtml = `<span style="font-size:1.15rem;line-height:1;">${escapeHtml(item.icon)}</span>`;
           }
         }
         return `
           <div class="hero-feature">
             ${fIconHtml}
-            <span>${escapeHtml(f.text)}</span>
+            <span>${escapeHtml(item.title)}</span>
           </div>
         `;
       }).join('');
@@ -1718,21 +1774,35 @@
     ];
 
     grid.innerHTML = badges.map(badge => {
+      let item;
+      if (typeof parseKpiItem === 'function') {
+        item = parseKpiItem(badge);
+      } else {
+        item = {
+          icon: badge.icon || '',
+          title: badge.text || '',
+          subtitle: ''
+        };
+      }
+
       let iconHtml = '<i class="fa-solid fa-circle-check"></i>';
-      if (badge.icon) {
-        if (badge.icon.startsWith('fa-') || badge.icon.startsWith('fa ')) {
-          iconHtml = `<i class="fa-solid ${badge.icon}"></i>`;
+      if (item.icon) {
+        if (item.icon.startsWith('fa-') || item.icon.startsWith('fa ')) {
+          iconHtml = `<i class="fa-solid ${item.icon}"></i>`;
         } else {
-          iconHtml = `<span style="font-size:1.6rem;line-height:1;">${escapeHtml(badge.icon)}</span>`;
+          iconHtml = `<span style="font-size:1.5rem;line-height:1;display:inline-block;">${escapeHtml(item.icon)}</span>`;
         }
       }
       return `
-        <div class="ubl-kpi-badge-card">
-          <div class="ubl-kpi-icon-wrap">
+        <div class="ubl-kpi-badge-card" style="display:flex; align-items:${item.subtitle ? 'flex-start' : 'center'}; gap:12px; padding:14px 16px; border-radius:14px; background:#ffffff; border:1.5px solid #e2e8f0; box-shadow:0 3px 12px rgba(0,0,0,0.04); transition:all 0.25s ease;">
+          <div class="ubl-kpi-icon-wrap" style="width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #fee2e2, #fecaca); color:#dc2626; font-size:1.25rem; flex-shrink:0;">
             ${iconHtml}
           </div>
-          <div class="ubl-kpi-badge-text">
-            ${escapeHtml(badge.text)}
+          <div class="ubl-kpi-badge-content" style="flex:1; min-width:0;">
+            <div class="ubl-kpi-badge-title" style="font-size:0.95rem; font-weight:800; color:#dc2626; line-height:1.35;">
+              ${escapeHtml(item.title)}
+            </div>
+            ${item.subtitle ? `<div class="ubl-kpi-badge-subtext" style="font-size:0.84rem; font-weight:600; color:#111827; line-height:1.45; margin-top:3px;">${escapeHtml(item.subtitle)}</div>` : ''}
           </div>
         </div>
       `;
@@ -2211,11 +2281,11 @@
 
     wrapper.innerHTML = faqs.map((f, idx) => `
       <details class="faq-item" style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px 18px; margin-bottom:10px; box-shadow:0 4px 14px rgba(0,0,0,0.04);" ${idx === 0 ? 'open' : ''}>
-        <summary style="font-weight:800; font-size:0.96rem; color:#0f172a; cursor:pointer; font-family:'Outfit',sans-serif; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+        <summary style="font-weight:800; font-size:0.96rem; color:#dc2626; cursor:pointer; font-family:'Outfit',sans-serif; list-style:none; display:flex; justify-content:space-between; align-items:center;">
           <span>${escapeHtml(f.q || f.question || 'प्रश्न')}</span>
           <span style="color:#16a34a; font-size:1.1rem; font-weight:900;">+</span>
         </summary>
-        <p style="margin:10px 0 0 0; color:#475569; font-size:0.88rem; line-height:1.6;">
+        <p style="margin:10px 0 0 0; color:#111827; font-weight:600; font-size:0.88rem; line-height:1.6;">
           ${escapeHtml(f.a || f.answer || '')}
         </p>
       </details>
@@ -2713,6 +2783,11 @@
       ublTtsAudio.pause();
       ublTtsAudio.currentTime = 0;
     }
+    if (window._ublKeepAliveInterval) {
+      clearInterval(window._ublKeepAliveInterval);
+      window._ublKeepAliveInterval = null;
+    }
+    window._ublActiveUtterance = null;
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
@@ -2811,6 +2886,8 @@
     }
 
     let isAdvancing = false;
+    let watchdogTimer = null;
+
     const playNext = () => {
       if (!ublAudioPlaying) return;
       if (ublLandingChunkIdx >= ublLandingChunks.length) {
@@ -2819,41 +2896,66 @@
       }
 
       const chunk = ublLandingChunks[ublLandingChunkIdx];
+      if (!chunk || !chunk.trim()) {
+        ublLandingChunkIdx++;
+        playNext();
+        return;
+      }
+
       const utter = new SpeechSynthesisUtterance(chunk);
       utter.lang = 'hi-IN';
       utter.rate = 1.0;
       utter.pitch = 1.05;
       if (nativeHindiVoice) utter.voice = nativeHindiVoice;
 
-      utter.onend = () => {
-        if (isAdvancing) return;
+      window._ublActiveUtterance = utter;
+
+      const advance = () => {
+        if (isAdvancing || !ublAudioPlaying) return;
         isAdvancing = true;
+        if (watchdogTimer) clearTimeout(watchdogTimer);
         ublLandingChunkIdx++;
         setTimeout(() => {
           isAdvancing = false;
           playNext();
-        }, 120);
+        }, 80);
       };
 
-      utter.onerror = () => {
-        if (isAdvancing) return;
-        isAdvancing = true;
-        ublLandingChunkIdx++;
-        setTimeout(() => {
-          isAdvancing = false;
-          playNext();
-        }, 120);
+      utter.onend = () => {
+        advance();
       };
+
+      utter.onerror = (e) => {
+        console.warn("UBL TTS error note:", e?.error);
+        advance();
+      };
+
+      const watchdogMs = Math.min(12000, Math.max(3500, chunk.length * 150));
+      watchdogTimer = setTimeout(() => {
+        if (!isAdvancing && ublAudioPlaying) {
+          advance();
+        }
+      }, watchdogMs);
+
+      if (!window._ublKeepAliveInterval) {
+        window._ublKeepAliveInterval = setInterval(() => {
+          if ('speechSynthesis' in window && window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+        }, 2500);
+      }
 
       try {
         window.speechSynthesis.speak(utter);
       } catch(e) {
-        window.stopUblLandingAudio();
+        advance();
       }
     };
 
     window.speechSynthesis.cancel();
-    playNext();
+    setTimeout(() => {
+      if (ublAudioPlaying) playNext();
+    }, 50);
   }
 
   function renderAudioExperienceSection(b, l) {
