@@ -168,7 +168,7 @@ function createReferrerSpanElement() {
 async function loadBook() {
     try {
         const params = new URLSearchParams(window.location.search);
-        let rawId = (params.get("book_id") || params.get("id") || params.get("product") || params.get("slug") || "").toLowerCase().trim();
+        let rawId = (params.get("book_id") || params.get("book") || params.get("id") || params.get("product") || params.get("slug") || "").toLowerCase().trim();
         const rawIds = params.get("ids") || params.get("bundle_ids");
         const customTitle = params.get("title") || params.get("name");
         const customAmount = params.get("amount") || params.get("price");
@@ -229,12 +229,12 @@ async function loadBook() {
 
             if (comboParam === "agri3" || comboParam === "combo3" || comboParam === "3" || comboParam === "super_combo") {
                 idList = ["BK001", "BK002", "BK015"];
-                comboPrice = 249;
+                comboPrice = customAmount ? parseInt(customAmount, 10) : 249;
                 comboMrp = 897;
                 comboTitle = "3-पुस्तक सुपर कॉम्बो (खरीफ + डॉक्टर + सब्जी मास्टर)";
             } else if (comboParam === "agri2" || comboParam === "combo2" || comboParam === "2") {
                 idList = ["BK001", "BK002"];
-                comboPrice = 179;
+                comboPrice = customAmount ? parseInt(customAmount, 10) : 179;
                 comboMrp = 598;
                 comboTitle = "2-पुस्तक सुपर कॉम्बो (खरीफ + डॉक्टर)";
             } else if (rawIds || booksParam) {
@@ -266,7 +266,9 @@ async function loadBook() {
                 });
 
                 if (comboPrice === null) {
-                    if (matchedBooks.length === 3) comboPrice = 249;
+                    if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
+                        comboPrice = parseInt(customAmount, 10);
+                    } else if (matchedBooks.length === 3) comboPrice = 249;
                     else if (matchedBooks.length === 2) comboPrice = 179;
                     else comboPrice = calcOffer;
                 }
@@ -355,12 +357,14 @@ async function loadBook() {
 
         // Override with explicit URL custom params if provided
         if (customTitle) book.name = customTitle;
-        if (customAmount) book.offerPrice = parseInt(customAmount, 10);
+        if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
+            book.offerPrice = parseInt(customAmount, 10);
+        }
 
         const bookCover = book.cover || book.thumbnail || book.cover_image || "/images/banners/farmer-community-banner.jpeg";
         const bookName = book.name || book.title || "Aarogyam India Digital Product";
-        const bookMrp = book.mrp || (book.offerPrice ? book.offerPrice * 2 : 299);
-        const bookOffer = book.offerPrice || book.offer_price || 99;
+        const bookMrp = book.mrp || ((book.offerPrice !== undefined && book.offerPrice !== null) ? (book.offerPrice > 0 ? book.offerPrice * 2 : 299) : 299);
+        const bookOffer = (book.offerPrice !== undefined && book.offerPrice !== null) ? book.offerPrice : (book.offer_price !== undefined ? book.offer_price : 99);
 
         window.currentCheckoutBookList = [book];
         window.currentCheckoutBook = {

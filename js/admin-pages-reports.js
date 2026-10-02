@@ -611,7 +611,7 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
           <code id="mkt-builder-generated-link" style="color:#38bdf8; font-size:0.82rem; word-break:break-all;">${sampleLinkInfo.checkoutUrl}</code>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <a href="${sampleLinkInfo.checkoutUrl}" target="_blank" style="background:#16a34a; color:#fff; font-weight:800; padding:8px 14px; border-radius:8px; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.35);">
+          <a href="${sampleLinkInfo.checkoutUrl}" id="btn-test-offer-link" target="_blank" style="background:#16a34a; color:#fff; font-weight:800; padding:8px 14px; border-radius:8px; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.35);">
             <span>🧪 अभी टेस्ट करें (Test Link)</span>
           </a>
           <button type="button" id="btn-copy-offer-link" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; font-weight:700; padding:8px 12px; border-radius:8px; font-size:0.78rem; cursor:pointer;">
@@ -696,7 +696,7 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
                       <span style="color:#64748b;">0 खरीद</span>
                     `}
                   </td>
-                  <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
+                  <td class="mkt-offer-summary-cell" style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
                     <span style="color:#f8fafc; font-weight:700; font-size:0.78rem;">
                       ${ob.type === 'bogo' ? `🎁 1+1 फ़्री कॉम्बो (${ob.price === 0 ? 'FREE' : '₹' + ob.price})` :
                         ob.type === 'review_reward' ? `⭐ रिव्यू रिवॉर्ड वाउचर` :
@@ -709,7 +709,7 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
                       <button onclick="window.openMktUserDetail('${u.id}')" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:6px 10px; border-radius:8px; font-size:0.74rem; font-weight:700; cursor:pointer;">
                         👤 विवरण
                       </button>
-                      <a href="${waLink}" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 12px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(22,163,74,0.3);">
+                      <a href="${waLink}" class="mkt-whatsapp-btn" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 12px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(22,163,74,0.3);">
                         <span>WhatsApp</span> <span>➔</span>
                       </a>
                     </div>
@@ -750,15 +750,15 @@ function getGeneratedOfferUrlAndMsg(user) {
   let msg = '';
 
   if (ob.type === 'bogo') {
-    checkoutUrl = `/ebooks/checkout.html?books=${ob.primaryBook},${ob.bonusBook}&amount=${ob.price}${timerQuery}${audioQuery}`;
+    checkoutUrl = `/ebooks/checkout.html?books=${ob.primaryBook},${ob.bonusBook}&ids=${ob.primaryBook},${ob.bonusBook}&amount=${ob.price}${timerQuery}${audioQuery}`;
     const priceText = ob.price === 0 ? 'बिल्कुल FREE (100% मुफ़्त)' : `मात्र ₹${ob.price}`;
     msg = `नमस्ते ${name} जी! 🙏 आरोग्यम इंडिया की ओर से आपके लिए 1 के साथ 1 मुफ़्त कॉम्बो ऑफर!\n\n📚 मुख्य पुस्तक: ${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}\n🎁 फ्री बोनस पुस्तक: ${bonusBookObj.name || bonusBookObj.heading || ob.bonusBook} (बिल्कुल FREE)\n💰 कॉम्बो मूल्य: ${priceText} (MRP: ₹598)\n${ob.timer !== 'none' ? `⏳ समय सीमा: केवल ${ob.timer === '15m' ? '15 मिनट' : ob.timer === '1h' ? '1 घंटा' : '24 घंटे'} के लिए मान्य!` : ''}\n\n👉 अभी दोनों पुस्तकें एक साथ पाने के लिए यहाँ क्लिक करें:\nhttps://aarogyamindia.online${checkoutUrl}`;
   } else if (ob.type === 'review_reward') {
     checkoutUrl = `/ebooks/book-landing.html?id=${ob.primaryBook}#reviews`;
     msg = `नमस्ते ${name} जी! 🙏 क्या आपने हमारी पुस्तक '${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}' पढ़ी? कैसी लगी?\n\n⭐ नीचे दिए लिंक पर 1 मिनट में अपना रिव्यू दर्ज करें और अगली पुस्तक के लिए 50% का सीक्रेट गिफ्ट वाउचर अनलॉक करें!\n\n👉 रिव्यू दर्ज करने के लिए यहाँ क्लिक करें:\nhttps://aarogyamindia.online${checkoutUrl}`;
   } else {
-    // Discount mode
-    checkoutUrl = `/ebooks/checkout.html?book=${ob.primaryBook}&amount=${ob.price}${timerQuery}${audioQuery}`;
+    // Discount mode: pass book_id, id, and book for full backward compatibility
+    checkoutUrl = `/ebooks/checkout.html?book_id=${ob.primaryBook}&id=${ob.primaryBook}&book=${ob.primaryBook}&amount=${ob.price}${timerQuery}${audioQuery}`;
     const priceText = ob.price === 0 ? 'बिल्कुल FREE (100% मुफ़्त वाउचर)' : `मात्र ₹${ob.price}`;
     msg = `नमस्ते ${name} जी! 🙏 आरोग्यम इंडिया की ओर से आपके लिए विशेष सीमित समय ऑफर है:\n\n📖 पुस्तक: ${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}\n🔥 स्पेशल ऑफर मूल्य: ${priceText} (MRP: ₹299)\n${ob.timer !== 'none' ? `⏳ समय सीमा: केवल ${ob.timer === '15m' ? '15 मिनट' : ob.timer === '1h' ? '1 घंटा' : '24 घंटे'} के लिए मान्य!` : ''}\n\n👉 अभी ऑर्डर पूरा करने के लिए यहाँ क्लिक करें:\nhttps://aarogyamindia.online${checkoutUrl}`;
   }
@@ -1236,13 +1236,12 @@ function attachMarketingHubEvents(container) {
     });
   });
 
-  // === OFFER BUILDER CONTROLS ===
+  // === OFFER BUILDER CONTROLS (Live In-Place Sync without page re-render) ===
   const builderType = document.getElementById('mkt-builder-type');
   if (builderType) {
     builderType.addEventListener('change', (e) => {
       mktState.offerBuilder.type = e.target.value;
-      saveOfferBuilderState();
-      updateMarketingHubView(container);
+      syncOfferBuilderLive();
     });
   }
 
@@ -1252,18 +1251,16 @@ function attachMarketingHubEvents(container) {
       mktState.offerBuilder.price = p;
       const inp = document.getElementById('mkt-builder-custom-price');
       if (inp) inp.value = p;
-      saveOfferBuilderState();
-      updateMarketingHubView(container);
+      syncOfferBuilderLive();
     });
   });
 
   const customPriceInp = document.getElementById('mkt-builder-custom-price');
   if (customPriceInp) {
-    customPriceInp.addEventListener('change', (e) => {
+    customPriceInp.addEventListener('input', (e) => {
       const p = Math.max(0, parseInt(e.target.value || '0', 10));
       mktState.offerBuilder.price = p;
-      saveOfferBuilderState();
-      updateMarketingHubView(container);
+      syncOfferBuilderLive();
     });
   }
 
@@ -1271,8 +1268,7 @@ function attachMarketingHubEvents(container) {
   if (primaryBookSel) {
     primaryBookSel.addEventListener('change', (e) => {
       mktState.offerBuilder.primaryBook = e.target.value;
-      saveOfferBuilderState();
-      updateMarketingHubView(container);
+      syncOfferBuilderLive();
     });
   }
 
@@ -1280,8 +1276,7 @@ function attachMarketingHubEvents(container) {
   if (bonusBookSel) {
     bonusBookSel.addEventListener('change', (e) => {
       mktState.offerBuilder.bonusBook = e.target.value;
-      saveOfferBuilderState();
-      updateMarketingHubView(container);
+      syncOfferBuilderLive();
     });
   }
 
@@ -1289,8 +1284,7 @@ function attachMarketingHubEvents(container) {
   if (timerSel) {
     timerSel.addEventListener('change', (e) => {
       mktState.offerBuilder.timer = e.target.value;
-      saveOfferBuilderState();
-      updateMarketingHubView(container);
+      syncOfferBuilderLive();
     });
   }
 
@@ -1298,8 +1292,7 @@ function attachMarketingHubEvents(container) {
   if (audioCheck) {
     audioCheck.addEventListener('change', (e) => {
       mktState.offerBuilder.hasAudio = e.target.checked;
-      saveOfferBuilderState();
-      updateMarketingHubView(container);
+      syncOfferBuilderLive();
     });
   }
 
@@ -1335,13 +1328,23 @@ function attachMarketingHubEvents(container) {
     });
   }
 
-  // Search Input
+  // Search Input with Debounce & Focus Preservation
+  let searchDebounceTimer = null;
   const searchInput = document.getElementById('mkt-search-input');
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       mktState.searchQuery = e.target.value;
       mktState.currentPage = 1;
-      updateMarketingHubView(container);
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        updateMarketingHubView(container);
+        const refocused = document.getElementById('mkt-search-input');
+        if (refocused) {
+          refocused.focus();
+          const len = refocused.value.length;
+          refocused.setSelectionRange(len, len);
+        }
+      }, 300);
     });
   }
 
@@ -1388,6 +1391,80 @@ function attachMarketingHubEvents(container) {
       exportAudienceToCSV(buyers, 'Aarogyam_Converted_Buyers.csv');
     });
   }
+}
+
+// Live In-Place Synchronizer for Offer Builder (Zero Screen Flash & Preserves Selection)
+function syncOfferBuilderLive() {
+  saveOfferBuilderState();
+
+  const ob = mktState.offerBuilder;
+  const sampleUser = { full_name: 'किसान मित्र', mobile: '7974422572' };
+  const sampleLinkInfo = getGeneratedOfferUrlAndMsg(sampleUser);
+
+  // 1. Update generated checkout URL display & test button href
+  const codeEl = document.getElementById('mkt-builder-generated-link');
+  if (codeEl) {
+    codeEl.textContent = sampleLinkInfo.checkoutUrl;
+  }
+  const testBtn = document.getElementById('btn-test-offer-link');
+  if (testBtn) {
+    testBtn.href = sampleLinkInfo.checkoutUrl;
+  }
+
+  // 2. Update price box and bonus book visibility based on offer type
+  const priceWrap = document.getElementById('mkt-builder-price-wrap');
+  if (priceWrap) {
+    priceWrap.style.display = (ob.type === 'review_reward') ? 'none' : 'block';
+  }
+  const bonusBox = document.getElementById('mkt-builder-bonus-box');
+  if (bonusBox) {
+    bonusBox.style.display = (ob.type === 'bogo') ? 'block' : 'none';
+  }
+
+  // 3. Highlight selected price button
+  document.querySelectorAll('.mkt-builder-price-btn').forEach(btn => {
+    const p = parseInt(btn.getAttribute('data-price'), 10);
+    const isSelected = (p === ob.price);
+    if (p === 0) {
+      btn.style.background = isSelected ? '#16a34a' : '#1e293b';
+      btn.style.borderColor = isSelected ? '#22c55e' : '#334155';
+    } else {
+      btn.style.background = isSelected ? '#2563eb' : '#1e293b';
+      btn.style.borderColor = isSelected ? '#3b82f6' : '#334155';
+    }
+  });
+
+  // 4. Update custom price input without stealing focus if typing
+  const customPriceInp = document.getElementById('mkt-builder-custom-price');
+  if (customPriceInp && document.activeElement !== customPriceInp) {
+    customPriceInp.value = ob.price;
+  }
+
+  // 5. Update rows in the active leads table in place without re-rendering!
+  document.querySelectorAll('.mkt-user-row').forEach(row => {
+    const uid = row.getAttribute('data-user-id');
+    const u = (mktState.profiles || []).find(p => p.id === uid);
+    if (!u) return;
+
+    // Update Offer cell
+    const offerCell = row.querySelector('.mkt-offer-summary-cell');
+    if (offerCell) {
+      offerCell.innerHTML = `
+        <span style="color:#f8fafc; font-weight:700; font-size:0.78rem;">
+          ${ob.type === 'bogo' ? `🎁 1+1 फ़्री कॉम्बो (${ob.price === 0 ? 'FREE' : '₹' + ob.price})` :
+            ob.type === 'review_reward' ? `⭐ रिव्यू रिवॉर्ड वाउचर` :
+            `🏷️ स्पेशल डिस्काउंट (${ob.price === 0 ? '100% FREE' : '₹' + ob.price})`}
+        </span>
+        <div style="font-size:0.7rem; color:#38bdf8;">${ob.timer !== 'none' ? `⏳ ${ob.timer} टाइमर लागू` : 'स्थाई लिंक'}</div>
+      `;
+    }
+
+    // Update WhatsApp link href
+    const waLinkEl = row.querySelector('.mkt-whatsapp-btn');
+    if (waLinkEl) {
+      waLinkEl.href = generatePersonalizedWhatsAppLink(u);
+    }
+  });
 }
 
 function saveOfferBuilderState() {
