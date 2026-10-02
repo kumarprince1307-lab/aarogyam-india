@@ -149,11 +149,28 @@ async function loadMarketingHubData(forceSync = false) {
   }
 }
 
+const DEFAULT_CATALOG_FALLBACK = {
+  'BK001': { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026', mrp: 299, offerPrice: 99, category: 'फसल सुरक्षा' },
+  'BK002': { id: 'BK002', name: 'खेती का डॉक्टर (फसल का डॉक्टर)', mrp: 299, offerPrice: 99, category: 'फसल रोग व कीट इलाज' },
+  'BK006': { id: 'BK006', name: 'AI वेबसाइट निर्माण गाइड 2026', mrp: 1299, offerPrice: 199, category: 'डिजिटल तकनीक' },
+  'BK015': { id: 'BK015', name: 'सब्जी खेती मास्टर गाइड', mrp: 1999, offerPrice: 149, category: 'उन्नत सब्जी उत्पादन' },
+  'BK016': { id: 'BK016', name: 'कृषि दवा डायरेक्टरी', mrp: 499, offerPrice: 149, category: 'कीटनाशक व फफूंदनाशक डायरेक्टरी' },
+  'BK017': { id: 'BK017', name: 'गेहूँ की खेती सम्पूर्ण मार्गदर्शिका', mrp: 299, offerPrice: 99, category: 'गेहूँ उत्पादन' },
+  'SUB001': { id: 'SUB001', name: '👑 Aarogyam Pro VIP सदस्यता', mrp: 2999, offerPrice: 99, category: 'VIP ऑल-एक्सेस' }
+};
+
 function buildCatalogMap() {
-  mktState.catalogMap = {};
+  mktState.catalogMap = { ...DEFAULT_CATALOG_FALLBACK };
   if (Array.isArray(mktState.books)) {
     mktState.books.forEach(b => {
-      mktState.catalogMap[b.id] = b;
+      const fallback = DEFAULT_CATALOG_FALLBACK[b.id] || {};
+      mktState.catalogMap[b.id] = Object.assign({}, fallback, b);
+      if (!mktState.catalogMap[b.id].mrp && fallback.mrp) {
+        mktState.catalogMap[b.id].mrp = fallback.mrp;
+      }
+      if (!mktState.catalogMap[b.id].offerPrice && fallback.offerPrice) {
+        mktState.catalogMap[b.id].offerPrice = fallback.offerPrice;
+      }
     });
   }
 }
@@ -202,7 +219,7 @@ function processAudienceAndFunnel() {
       funnelBadgeColor = '#10b981';
       const boughtBids = uPurchases.map(p => p.book_id);
       if (boughtBids.includes('BK002')) {
-        defaultOfferDesc = 'BK001 खरीफ मास्टर गाइड या BK016 पशुपालन कॉम्बो';
+        defaultOfferDesc = 'BK001 खरीफ मास्टर गाइड या BK016 कृषि दवा डायरेक्टरी';
         actionTip = 'यह किसान BK002 ले चुका है! 1 के साथ 1 फ़्री कॉम्बो या रिव्यू रिवॉर्ड भेजें।';
         primaryBook = 'BK001';
       } else {
@@ -540,7 +557,7 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
           </select>
         </div>
 
-        <!-- 2. Price Selector (Free ₹0, ₹49, ₹50, ₹79, ₹99) -->
+        <!-- 2. Price Selector (Free ₹0, ₹49, ₹50, ₹79, ₹99, ₹149, ₹199) -->
         <div id="mkt-builder-price-wrap" style="display:${ob.type === 'review_reward' ? 'none' : 'block'};">
           <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">2. चेकआउट मूल्य (Charge Amount):</label>
           <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
@@ -559,6 +576,12 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
             <button type="button" class="mkt-builder-price-btn" data-price="99" style="background:${ob.price === 99 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 99 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
               ₹99
             </button>
+            <button type="button" class="mkt-builder-price-btn" data-price="149" style="background:${ob.price === 149 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 149 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+              ₹149
+            </button>
+            <button type="button" class="mkt-builder-price-btn" data-price="199" style="background:${ob.price === 199 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 199 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+              ₹199
+            </button>
           </div>
           <input type="number" id="mkt-builder-custom-price" value="${ob.price}" min="0" placeholder="कस्टम मूल्य..." style="width:100%; background:#1e293b; color:#38bdf8; border:1px solid #334155; padding:6px 10px; border-radius:6px; font-weight:800; font-size:0.85rem;" />
         </div>
@@ -567,23 +590,19 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
         <div>
           <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">3. मुख्य पुस्तक चुनें:</label>
           <select id="mkt-builder-primary-book" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
-            ${(mktState.books.length > 0 ? mktState.books : [
-              { id: 'BK002', name: 'खेती का डॉक्टर (BK002)' },
-              { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026 (BK001)' },
-              { id: 'BK016', name: 'पशुपालन व डेयरी प्रबंधन (BK016)' },
-              { id: 'BK006', name: 'जैविक खाद व कीटनाशक (BK006)' },
-              { id: 'BK015', name: 'सब्जी खेती मास्टर (BK015)' }
-            ]).map(b => `<option value="${b.id}" ${b.id === ob.primaryBook ? 'selected' : ''}>${b.id} - ${b.name || b.heading}</option>`).join('')}
+            ${Object.keys(mktState.catalogMap).map(id => {
+              const b = mktState.catalogMap[id];
+              return `<option value="${b.id}" ${b.id === ob.primaryBook ? 'selected' : ''}>${b.id} - ${b.name || b.heading} (MRP: ₹${b.mrp} • स्टोर: ₹${b.offerPrice})</option>`;
+            }).join('')}
           </select>
 
           <div id="mkt-builder-bonus-box" style="margin-top:6px; display:${ob.type === 'bogo' ? 'block' : 'none'};">
             <label style="font-size:0.75rem; font-weight:800; color:#f59e0b; display:block; margin-bottom:2px;">🎁 फ्री बोनस पुस्तक (FREE with it):</label>
             <select id="mkt-builder-bonus-book" style="width:100%; background:#1e293b; color:#f59e0b; border:1px solid #f59e0b; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
-              ${(mktState.books.length > 0 ? mktState.books : [
-                { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026 (BK001)' },
-                { id: 'BK002', name: 'खेती का डॉक्टर (BK002)' },
-                { id: 'BK016', name: 'पशुपालन व डेयरी प्रबंधन (BK016)' }
-              ]).map(b => `<option value="${b.id}" ${b.id === ob.bonusBook ? 'selected' : ''}>${b.id} - ${b.name || b.heading}</option>`).join('')}
+              ${Object.keys(mktState.catalogMap).map(id => {
+                const b = mktState.catalogMap[id];
+                return `<option value="${b.id}" ${b.id === ob.bonusBook ? 'selected' : ''}>${b.id} - ${b.name || b.heading} (MRP: ₹${b.mrp} • स्टोर: ₹${b.offerPrice})</option>`;
+              }).join('')}
             </select>
           </div>
         </div>
@@ -592,22 +611,35 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
         <div>
           <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">4. उलटी गिनती टाइमर (Timer):</label>
           <select id="mkt-builder-timer" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
-            <option value="15m" ${ob.timer === '15m' ? 'selected' : ''}>⏳ 15 मिनट (अत्यधिक प्रभावी)</option>
+            <option value="15m" ${ob.timer === '15m' ? 'selected' : ''}>⏳ 15 मिनट</option>
+            <option value="25m" ${ob.timer === '25m' ? 'selected' : ''}>⏳ 25 मिनट (अनुशंसित)</option>
             <option value="1h" ${ob.timer === '1h' ? 'selected' : ''}>⏳ 1 घंटा</option>
             <option value="24h" ${ob.timer === '24h' ? 'selected' : ''}>⏳ 24 घंटे</option>
             <option value="none" ${ob.timer === 'none' ? 'selected' : ''}>🚫 कोई टाइमर नहीं (स्थाई)</option>
           </select>
           <label style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:0.75rem; color:#cbd5e1; cursor:pointer;">
             <input type="checkbox" id="mkt-builder-audio" ${ob.hasAudio ? 'checked' : ''} />
-            <span>🔊 चेकआउट पर ऑडियो वॉयस नोट सक्रिय रखें</span>
+            <span>🔊 चेकआउट पर ऑटो हिंदी वॉयस नोट सक्रिय रखें</span>
           </label>
         </div>
       </div>
 
-      <!-- Generated Link Preview & Instant ₹0 Test Button -->
+      <!-- Universal VIP Offer Banner Preview -->
+      <div style="border-radius:12px; overflow:hidden; border:1px solid #334155; margin-bottom:12px; position:relative; max-height:180px;">
+        <img src="/images/banners/vip-reader-offer-badge.jpg" alt="Aarogyam India VIP Offer Banner" style="width:100%; height:180px; object-fit:cover; display:block;" />
+        <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(15,23,42,0.95), transparent); padding:8px 14px; display:flex; justify-content:space-between; align-items:flex-end;">
+          <div>
+            <span style="font-size:0.72rem; color:#38bdf8; font-weight:800; text-transform:uppercase;">VIP Campaign Visual Banner</span>
+            <div style="font-size:0.85rem; font-weight:800; color:#f8fafc;">सर्वश्रेष्ठ पाठक सीमित समय विशेष ऑफर</div>
+          </div>
+          <span style="background:#16a34a; color:#fff; font-size:0.7rem; font-weight:800; padding:2px 8px; border-radius:6px;">100% Verified Customer</span>
+        </div>
+      </div>
+
+      <!-- Generated Compact Link Preview & Instant ₹0 Test Button -->
       <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div style="flex:1; min-width:260px;">
-          <span style="font-size:0.72rem; color:#94a3b8; display:block;">🔗 जनरेटेड चेकआउट लिंक (ग्राहक के लिए):</span>
+          <span style="font-size:0.72rem; color:#94a3b8; display:block;">🔗 सुपर-शॉर्ट चेकआउट लिंक (ग्राहक के लिए सुरक्षित):</span>
           <code id="mkt-builder-generated-link" style="color:#38bdf8; font-size:0.82rem; word-break:break-all;">${sampleLinkInfo.checkoutUrl}</code>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -643,9 +675,10 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
             <option value="all">📚 सभी पुस्तकें (All Books)</option>
             <option value="BK002" ${mktState.bookFilter === 'BK002' ? 'selected' : ''}>BK002 - फसल का डॉक्टर (130)</option>
             <option value="BK001" ${mktState.bookFilter === 'BK001' ? 'selected' : ''}>BK001 - खरीफ फसल मास्टर (14)</option>
-            <option value="BK006" ${mktState.bookFilter === 'BK006' ? 'selected' : ''}>BK006 - जैविक खाद (10)</option>
+            <option value="BK006" ${mktState.bookFilter === 'BK006' ? 'selected' : ''}>BK006 - AI वेबसाइट गाइड (10)</option>
             <option value="BK015" ${mktState.bookFilter === 'BK015' ? 'selected' : ''}>BK015 - सब्जी की खेती (7)</option>
-            <option value="BK016" ${mktState.bookFilter === 'BK016' ? 'selected' : ''}>BK016 - पशुपालन व डेयरी (1)</option>
+            <option value="BK016" ${mktState.bookFilter === 'BK016' ? 'selected' : ''}>BK016 - कृषि दवा डायरेक्टरी (1)</option>
+            <option value="BK017" ${mktState.bookFilter === 'BK017' ? 'selected' : ''}>BK017 - गेहूँ की खेती</option>
           </select>
         </div>
       </div>
@@ -672,6 +705,7 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
               </tr>
             ` : paginatedUsers.map(u => {
               const waLink = generatePersonalizedWhatsAppLink(u);
+              const smsLink = generatePersonalizedSmsLink(u);
               return `
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.15s ease;" class="mkt-user-row" data-user-id="${u.id}">
                   <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
@@ -706,10 +740,13 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
                   </td>
                   <td style="padding:12px; text-align:right;">
                     <div style="display:flex; justify-content:flex-end; gap:6px;">
-                      <button onclick="window.openMktUserDetail('${u.id}')" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:6px 10px; border-radius:8px; font-size:0.74rem; font-weight:700; cursor:pointer;">
-                        👤 विवरण
+                      <button onclick="window.openMktUserDetail('${u.id}')" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:6px 9px; border-radius:8px; font-size:0.74rem; font-weight:700; cursor:pointer;" title="यूज़र एक्टिविटी विवरण">
+                        👤
                       </button>
-                      <a href="${waLink}" class="mkt-whatsapp-btn" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 12px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(22,163,74,0.3);">
+                      <a href="${smsLink}" class="mkt-sms-btn" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 10px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(37,99,235,0.3);" title="सीधे मोबाइल SMS भेजें (बिना इंटरनेट वाले किसानों के लिए)">
+                        <span>📱 SMS</span>
+                      </a>
+                      <a href="${waLink}" class="mkt-whatsapp-btn" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 12px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(22,163,74,0.3);" title="WhatsApp पर भेजें">
                         <span>WhatsApp</span> <span>➔</span>
                       </a>
                     </div>
@@ -798,52 +835,83 @@ function generateOfferSignature(bookId, amount, mobile, expTimestamp) {
   const cleanMobile = (mobile || '').toString().replace(/\D/g, '').slice(-10);
   const cleanBook = (bookId || '').toUpperCase().trim();
   const cleanAmount = (amount !== undefined && amount !== null) ? parseInt(amount, 10) : 99;
-  const cleanExp = expTimestamp ? parseInt(expTimestamp, 10) : 0;
+  const cleanToken = (expTimestamp || '').toString().trim();
   
-  const rawPayload = `${cleanBook}|${cleanAmount}|${cleanMobile}|${cleanExp}|${OFFER_SECURITY_SALT}`;
-  return sha256Hex(rawPayload).slice(0, 16);
+  const rawPayload = `${cleanBook}|${cleanAmount}|${cleanMobile}|${cleanToken}|${OFFER_SECURITY_SALT}`;
+  return sha256Hex(rawPayload).slice(0, 8);
 }
 
 // Generate Tamper-Proof Offer URL & Text based on Admin Campaign Builder
 function getGeneratedOfferUrlAndMsg(user) {
   const name = user.full_name ? user.full_name.split(' ')[0] : 'किसान मित्र';
   const ob = mktState.offerBuilder;
-  const primaryBookObj = mktState.catalogMap[ob.primaryBook] || { name: 'ई-बुक' };
-  const bonusBookObj = mktState.catalogMap[ob.bonusBook] || { name: 'बोनस ई-बुक' };
+  const primaryBookObj = mktState.catalogMap[ob.primaryBook] || { name: 'ई-बुक', heading: 'ई-बुक' };
+  const bonusBookObj = mktState.catalogMap[ob.bonusBook] || { name: 'बोनस ई-बुक', heading: 'बोनस ई-बुक' };
   
-  // Calculate dynamic expiry timestamp
+  // Calculate dynamic expiry
   let exp = 0;
   const now = Date.now();
   if (ob.timer === '15m') exp = now + (15 * 60 * 1000);
+  else if (ob.timer === '25m') exp = now + (25 * 60 * 1000);
   else if (ob.timer === '1h') exp = now + (60 * 60 * 1000);
   else if (ob.timer === '24h') exp = now + (24 * 60 * 60 * 1000);
 
   const cleanMobile = (user.mobile || '').toString().replace(/\D/g, '').slice(-10) || '7974422572';
   const targetMobile = user.isAdminTest ? 'ADMIN_TEST' : cleanMobile;
-  const timerQuery = ob.timer !== 'none' ? `&timer=${ob.timer}&exp=${exp}` : '';
-  const audioQuery = ob.hasAudio ? '&audio=1' : '';
+  const timerQuery = ob.timer !== 'none' ? `&t=${ob.timer}` : '';
+
+  // Personalized condition analysis for intelligent marketing
+  let userConditionText = "आप हमारे अति महत्वपूर्ण पाठक हैं।";
+  if (user.purchases && user.purchases.length > 0) {
+    const boughtList = user.purchases.map(p => p.book_id).join(', ');
+    userConditionText = `आपने पहले हमारी पुस्तक (${boughtList}) पढ़ी है और आपका अनुभव हमारे लिए बहुत मायने रखता है।`;
+  } else if (user.funnelStage === 'abandoned_cart') {
+    userConditionText = "आपने हमारी वेबसाइट पर चेकआउट शुरू किया था लेकिन ऑर्डर अधूरा रह गया था।";
+  } else if (user.funnelStage === 'wishlist') {
+    userConditionText = "आपने हमारी पुस्तक में विशेष रुचि दिखाई थी।";
+  }
+
+  const bookTitle = primaryBookObj.name || primaryBookObj.heading || ob.primaryBook;
+  const bookDesc = primaryBookObj.shortTitle || primaryBookObj.category || "कृषि व फसल सुरक्षा संपूर्ण प्रैक्टिकल गाइड";
+  const bookMrp = primaryBookObj.mrp || 299;
+  const bookStoreOffer = primaryBookObj.offerPrice || 99;
+  const timerText = ob.timer === '15m' ? '15 मिनट' : (ob.timer === '25m' ? '25 मिनट' : (ob.timer === '1h' ? '1 घंटा' : '24 घंटे'));
+  const priceText = ob.price === 0 ? 'बिल्कुल FREE (100% मुफ़्त)' : `मात्र ₹${ob.price}`;
+  const landingUrl = `https://aarogyamindia.online/ebooks/book-landing.html?id=${ob.primaryBook}`;
 
   let checkoutUrl = '';
   let msg = '';
+  let shortSms = '';
 
   if (ob.type === 'bogo') {
     const bookPair = `${ob.primaryBook},${ob.bonusBook}`;
-    const sig = generateOfferSignature(bookPair, ob.price, targetMobile, exp);
-    checkoutUrl = `/ebooks/checkout.html?books=${ob.primaryBook},${ob.bonusBook}&ids=${ob.primaryBook},${ob.bonusBook}&amount=${ob.price}&m=${targetMobile}&exp=${exp}&sig=${sig}${timerQuery}${audioQuery}`;
-    const priceText = ob.price === 0 ? 'बिल्कुल FREE (100% मुफ़्त)' : `मात्र ₹${ob.price}`;
-    msg = `नमस्ते ${name} जी! 🙏 आरोग्यम इंडिया की ओर से आपके लिए 1 के साथ 1 मुफ़्त कॉम्बो ऑफर!\n\n📚 मुख्य पुस्तक: ${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}\n🎁 फ्री बोनस पुस्तक: ${bonusBookObj.name || bonusBookObj.heading || ob.bonusBook} (बिल्कुल FREE)\n💰 कॉम्बो मूल्य: ${priceText} (MRP: ₹598)\n${ob.timer !== 'none' ? `⏳ समय सीमा: केवल ${ob.timer === '15m' ? '15 मिनट' : ob.timer === '1h' ? '1 घंटा' : '24 घंटे'} के लिए मान्य!` : ''}\n\n🔒 यह गोपनीय लिंक केवल आपके नंबर (+91-XXXXX${cleanMobile.slice(-4)}) पर ही अनलॉक होगा:\nhttps://aarogyamindia.online${checkoutUrl}`;
+    const sig = generateOfferSignature(bookPair, ob.price, targetMobile, ob.timer !== 'none' ? ob.timer : exp);
+    // Ultra-short URL (/c.html?bs=...&p=...&m=...&s=...&t=...)
+    checkoutUrl = `/c.html?bs=${ob.primaryBook},${ob.bonusBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}`;
+    const bonusTitle = bonusBookObj.name || bonusBookObj.heading || ob.bonusBook;
+    const bonusMrp = bonusBookObj.mrp || 299;
+    const bonusStoreOffer = bonusBookObj.offerPrice || 99;
+    const comboTotalMrp = bookMrp + bonusMrp;
+    const comboTotalStoreOffer = bookStoreOffer + bonusStoreOffer;
+
+    msg = `🌾 *नमस्ते ${name} जी!* 🙏\n\n${userConditionText} आज आरोग्यम इंडिया की ओर से आपको हमारे *सर्वश्रेष्ठ किसान पाठकों* में चुना गया है! 🏆\n\n🎁 *आपके लिए 1+1 फ़्री कॉम्बो ऑफर:* \n📚 *मुख्य पुस्तक:* ${bookTitle} (MRP: ₹${bookMrp})\n🎁 *फ्री बोनस पुस्तक:* ${bonusTitle} (MRP: ₹${bonusMrp} - बिल्कुल FREE)\n💰 *कॉम्बो मूल्य:* ${priceText} (सामान्य MRP: ~₹${comboTotalMrp}~, स्टोर पर ₹${comboTotalStoreOffer})\n${ob.timer !== 'none' ? `⏳ *समय सीमा:* केवल *${timerText}* के लिए मान्य!\n` : ''}\n👉 *दोनों पुस्तकें तुरंत प्राप्त करने के लिए यहाँ क्लिक करें:*\nhttps://aarogyamindia.online${checkoutUrl}\n\n📖 *पुस्तकों का संपूर्ण विवरण व इंडेक्स यहाँ देखें:*\n${landingUrl}\n\n🔒 *सुरक्षा सूचना:* यह गोपनीय लिंक केवल आपके मोबाइल नंबर (+91-XXXXX${cleanMobile.slice(-4)}) के लिए सुरक्षित है। इसे किसी अन्य को शेयर न करें, एक बार ऑर्डर पूरा होने पर यह ऑफर स्वतः समाप्त हो जाएगा।\n\nधन्यवाद!\n_आरोग्यम इंडिया टीम_`;
+
+    shortSms = `नमस्ते ${name} जी! Aarogyam VIP 1+1 Free: ${bookTitle} + ${bonusTitle} मात्र रु.${ob.price} (MRP रु.${comboTotalMrp})। केवल ${timerText}: https://aarogyamindia.online${checkoutUrl}`;
   } else if (ob.type === 'review_reward') {
     checkoutUrl = `/ebooks/book-landing.html?id=${ob.primaryBook}#reviews`;
-    msg = `नमस्ते ${name} जी! 🙏 क्या आपने हमारी पुस्तक '${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}' पढ़ी? कैसी लगी?\n\n⭐ नीचे दिए लिंक पर 1 मिनट में अपना रिव्यू दर्ज करें और अगली पुस्तक के लिए 50% का सीक्रेट गिफ्ट वाउचर अनलॉक करें!\n\n👉 रिव्यू दर्ज करने के लिए यहाँ क्लिक करें:\nhttps://aarogyamindia.online${checkoutUrl}`;
+    msg = `नमस्ते ${name} जी! 🙏 क्या आपने हमारी पुस्तक '${bookTitle}' पढ़ी? कैसी लगी?\n\n⭐ नीचे दिए लिंक पर 1 मिनट में अपना रिव्यू दर्ज करें और अगली पुस्तक के लिए 50% का सीक्रेट गिफ्ट वाउचर अनलॉक करें!\n\n👉 रिव्यू दर्ज करने के लिए यहाँ क्लिक करें:\nhttps://aarogyamindia.online${checkoutUrl}`;
+    shortSms = `नमस्ते ${name} जी! पुस्तक ${bookTitle} का रिव्यू दें और 50% छूट वाउचर पाएं: https://aarogyamindia.online${checkoutUrl}`;
   } else {
-    // Discount mode: Cryptographically signed with book_id, amount, target mobile and expiry
-    const sig = generateOfferSignature(ob.primaryBook, ob.price, targetMobile, exp);
-    checkoutUrl = `/ebooks/checkout.html?book_id=${ob.primaryBook}&id=${ob.primaryBook}&book=${ob.primaryBook}&amount=${ob.price}&m=${targetMobile}&exp=${exp}&sig=${sig}${timerQuery}${audioQuery}`;
-    const priceText = ob.price === 0 ? 'बिल्कुल FREE (100% मुफ़्त वाउचर)' : `मात्र ₹${ob.price}`;
-    msg = `नमस्ते ${name} जी! 🙏 आरोग्यम इंडिया की ओर से आपके लिए विशेष सीमित समय ऑफर है:\n\n📖 पुस्तक: ${primaryBookObj.name || primaryBookObj.heading || ob.primaryBook}\n🔥 स्पेशल ऑफर मूल्य: ${priceText} (MRP: ₹299)\n${ob.timer !== 'none' ? `⏳ समय सीमा: केवल ${ob.timer === '15m' ? '15 मिनट' : ob.timer === '1h' ? '1 घंटा' : '24 घंटे'} के लिए मान्य!` : ''}\n\n🔒 यह गोपनीय लिंक केवल आपके नंबर (+91-XXXXX${cleanMobile.slice(-4)}) पर ही अनलॉक होगा:\nhttps://aarogyamindia.online${checkoutUrl}`;
+    const sig = generateOfferSignature(ob.primaryBook, ob.price, targetMobile, ob.timer !== 'none' ? ob.timer : exp);
+    // Ultra-short URL (/c.html?b=...&p=...&m=...&s=...&t=...)
+    checkoutUrl = `/c.html?b=${ob.primaryBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}`;
+
+    msg = `🌾 *नमस्ते ${name} जी!* 🙏\n\n${userConditionText} आज आपके लिए आरोग्यम इंडिया का विशेष वीआईपी ऑफर है:\n\n📖 *पुस्तक:* ${bookTitle}\n🌱 *संक्षिप्त परिचय:* ${bookDesc}\n💰 *विशेष मूल्य:* ${priceText} (सामान्य MRP: ~₹${bookMrp}~, स्टोर पर ₹${bookStoreOffer})\n${ob.timer !== 'none' ? `⏳ *समय सीमा:* केवल *${timerText}* के लिए मान्य!\n` : ''}\n👉 *विशेष छूट पर ऑर्डर करने के लिए यहाँ क्लिक करें:*\nhttps://aarogyamindia.online${checkoutUrl}\n\n📖 *पुस्तक का संपूर्ण विवरण व इंडेक्स यहाँ देखें:*\n${landingUrl}\n\n🔒 *नोट:* यह विशेष छूट केवल आपके पंजीकृत नंबर (+91-XXXXX${cleanMobile.slice(-4)}) के लिए सुरक्षित है। इसे किसी को शेयर न करें, एक बार खरीदने पर यह ऑफर बंद हो जाएगा।\n\nधन्यवाद!\n_आरोग्यम इंडिया - समृद्ध किसान, समृद्ध भारत_`;
+
+    shortSms = `नमस्ते ${name} जी! Aarogyam VIP ऑफर: ${bookTitle} मात्र रु.${ob.price} (MRP रु.${bookMrp})। केवल ${timerText}: https://aarogyamindia.online${checkoutUrl}`;
   }
 
-  return { checkoutUrl, msg };
+  return { checkoutUrl, msg, shortSms };
 }
 
 function generatePersonalizedWhatsAppLink(user) {
@@ -851,6 +919,13 @@ function generatePersonalizedWhatsAppLink(user) {
   const targetPhone = cleanMobile.startsWith('91') && cleanMobile.length === 12 ? cleanMobile : ('91' + cleanMobile);
   const { msg } = getGeneratedOfferUrlAndMsg(user);
   return `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
+}
+
+function generatePersonalizedSmsLink(user) {
+  const cleanMobile = (user.mobile || '').replace(/\D/g, '');
+  const targetPhone = cleanMobile.startsWith('91') && cleanMobile.length === 12 ? cleanMobile : ('91' + cleanMobile);
+  const { shortSms } = getGeneratedOfferUrlAndMsg(user);
+  return `sms:+${targetPhone}?body=${encodeURIComponent(shortSms)}`;
 }
 
 // TAB 2: Demand Heatmap & Real Book Rankings
@@ -922,13 +997,13 @@ function renderDemandHeatmapTab(totalRevenue, bookSalesCount) {
 
           <div>
             <div style="display:flex; justify-content:space-between; font-size:0.84rem; margin-bottom:6px;">
-              <span style="color:#f8fafc; font-weight:700;">🐄 पशुपालन व डेयरी प्रबंधन (Pashupalan)</span>
-              <strong style="color:#f59e0b;">7% मांग (तेजी से बढ़ता)</strong>
+              <span style="color:#f8fafc; font-weight:700;">💊 कृषि दवा व कीटनाशक डायरेक्टरी (Agri Medicine)</span>
+              <strong style="color:#f59e0b;">12% मांग (फसल रोग पहचान)</strong>
             </div>
             <div style="width:100%; height:8px; background:#1e293b; border-radius:4px; overflow:hidden;">
-              <div style="width:7%; height:100%; background:linear-gradient(90deg, #f59e0b, #d97706); border-radius:4px;"></div>
+              <div style="width:12%; height:100%; background:linear-gradient(90deg, #f59e0b, #d97706); border-radius:4px;"></div>
             </div>
-            <div style="font-size:0.72rem; color:#94a3b8; margin-top:3px;">BK016 पशुपालन संपूर्ण गाइड (अग्रिम बुकिंग व मांग)</div>
+            <div style="font-size:0.72rem; color:#94a3b8; margin-top:3px;">BK016 कृषि दवा डायरेक्टरी (रोग, कीट व कीटनाशक संपूर्ण खुराक व इलाज)</div>
           </div>
 
           <div>
@@ -946,7 +1021,7 @@ function renderDemandHeatmapTab(totalRevenue, bookSalesCount) {
         <div style="margin-top:24px; padding:14px; background:rgba(37,99,235,0.1); border:1px solid rgba(59,130,246,0.25); border-radius:12px;">
           <strong style="color:#60a5fa; font-size:0.84rem; display:block; margin-bottom:4px;">💡 फ़नल मार्केटिंग निष्कर्ष (Insights):</strong>
           <p style="margin:0; font-size:0.78rem; color:#cbd5e1; line-height:1.5;">
-            130 किसानों ने BK002 ("फसल का डॉक्टर") खरीदी है। इन सभी किसानों को BK001 (खरीफ मास्टर गाइड) और BK016 (पशुपालन) का कॉम्बो व्हाट्सएप पर भेजने से 25-30% अतिरिक्त कन्वर्ज़न मिल सकता है।
+            130 किसानों ने BK002 ("फसल का डॉक्टर") खरीदी है। इन सभी किसानों को BK001 (खरीफ मास्टर गाइड) और BK016 (कृषि दवा डायरेक्टरी) का कॉम्बो व्हाट्सएप पर भेजने से 25-30% अतिरिक्त कन्वर्ज़न मिल सकता है।
           </p>
         </div>
       </div>
@@ -974,7 +1049,7 @@ function renderSwitchboardTab() {
       <div style="display:flex; flex-direction:column; gap:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; background:#1e293b; padding:16px 20px; border-radius:12px; border:1px solid #334155;">
           <div>
-            <h4 style="margin:0; font-size:0.95rem; color:#f8fafc; font-weight:800;">🌾 BK016 पशुपालन टॉप बैनर व लॉन्चिंग ऑफर</h4>
+            <h4 style="margin:0; font-size:0.95rem; color:#f8fafc; font-weight:800;">💊 BK016 कृषि दवा डायरेक्टरी टॉप बैनर व लॉन्चिंग ऑफर</h4>
             <p style="margin:2px 0 0 0; font-size:0.78rem; color:#94a3b8;">होमपेज और लैंडिंग पेजों पर BK016 का हाई-कन्वर्जन बैनर ऑन/ऑफ करें।</p>
           </div>
           <label class="admin-toggle-switch">
@@ -1166,6 +1241,7 @@ window.openMktUserDetail = function(userId) {
   if (!modalWrap) return;
 
   const waLink = generatePersonalizedWhatsAppLink(processedUser);
+  const smsLink = generatePersonalizedSmsLink(processedUser);
   const sampleInfo = getGeneratedOfferUrlAndMsg(processedUser);
 
   modalWrap.innerHTML = `
@@ -1249,10 +1325,15 @@ window.openMktUserDetail = function(userId) {
           </div>
         </div>
 
-        <!-- 1-Click WhatsApp Button -->
-        <a href="${waLink}" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:900; font-size:0.95rem; padding:14px; border-radius:12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 16px rgba(22,163,74,0.35);">
-          <span>📲 इस ग्राहक को WhatsApp पर संदेश भेजें</span>
-        </a>
+        <!-- Action Buttons: WhatsApp & Direct Mobile SMS -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a href="${smsLink}" style="flex:1; min-width:180px; background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#ffffff; font-weight:900; font-size:0.9rem; padding:12px; border-radius:12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 16px rgba(37,99,235,0.35);">
+            <span>📱 सीधा SMS भेजें</span>
+          </a>
+          <a href="${waLink}" target="_blank" rel="noopener noreferrer" style="flex:2; min-width:240px; background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:900; font-size:0.95rem; padding:12px; border-radius:12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 16px rgba(22,163,74,0.35);">
+            <span>📲 WhatsApp पर भेजें</span>
+          </a>
+        </div>
       </div>
     </div>
   `;
@@ -1543,6 +1624,12 @@ function syncOfferBuilderLive() {
     const waLinkEl = row.querySelector('.mkt-whatsapp-btn');
     if (waLinkEl) {
       waLinkEl.href = generatePersonalizedWhatsAppLink(u);
+    }
+
+    // Update SMS link href
+    const smsLinkEl = row.querySelector('.mkt-sms-btn');
+    if (smsLinkEl) {
+      smsLinkEl.href = generatePersonalizedSmsLink(u);
     }
   });
 }

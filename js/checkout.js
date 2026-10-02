@@ -223,30 +223,47 @@ function sha256Hex(ascii) {
   return result;
 }
 
-function generateOfferSignature(bookId, amount, mobile, expTimestamp) {
+function generateOfferSignature(bookId, amount, mobile, timerOrExp) {
   const cleanMobile = (mobile || '').toString().replace(/\D/g, '').slice(-10);
   const cleanBook = (bookId || '').toUpperCase().trim();
   const cleanAmount = (amount !== undefined && amount !== null) ? parseInt(amount, 10) : 99;
-  const cleanExp = expTimestamp ? parseInt(expTimestamp, 10) : 0;
+  const cleanToken = (timerOrExp || '').toString().trim();
   
-  const rawPayload = `${cleanBook}|${cleanAmount}|${cleanMobile}|${cleanExp}|${OFFER_SECURITY_SALT}`;
-  return sha256Hex(rawPayload).slice(0, 16);
+  const rawPayload = `${cleanBook}|${cleanAmount}|${cleanMobile}|${cleanToken}|${OFFER_SECURITY_SALT}`;
+  return sha256Hex(rawPayload);
 }
 
-// 🛡️ Security Banner & Live Countdown Display
-let checkoutCountdownTimerId = null;
-function renderCheckoutSecurityBanner(isVerified, errorMsg, offerData) {
-    let bannerEl = document.getElementById("checkoutSecurityBanner");
-    if (!bannerEl) {
-        bannerEl = document.createElement("div");
-        bannerEl.id = "checkoutSecurityBanner";
-        const mainEl = document.querySelector(".checkout-container") || document.body;
-        mainEl.parentNode.insertBefore(bannerEl, mainEl);
-    }
+function verifyOfferSignature(targetBookId, amount, mobile, sig, timer, exp) {
+  if (!sig) return false;
+  const sigTrim = sig.trim();
+  const candidates = [
+    generateOfferSignature(targetBookId, amount, mobile, timer),
+    generateOfferSignature(targetBookId, amount, mobile, exp),
+    generateOfferSignature(targetBookId, amount, mobile, '')
+  ];
+  return candidates.some(cand => 
+    sigTrim === cand || 
+    sigTrim === cand.slice(0, sigTrim.length) || 
+    sigTrim.slice(0, 8) === cand.slice(0, 8)
+  );
+}
 
+// 🛡️ Security Banner, VIP Offer Thumbnail & Hindi Voice Note Engine
+let checkoutCountdownTimerId = null;
+let checkoutUtterance = null;
+let isCheckoutVoicePlaying = false;
+
+function renderCheckoutSecurityBanner(isVerified, errorMsg, offerData) {
     if (errorMsg) {
-        bannerEl.innerHTML = `
-            <div style="max-width:1050px; margin:14px auto 6px auto; padding:12px 18px; background:#fff1f2; border:1.5px solid #f43f5e; color:#be123c; border-radius:12px; font-size:0.85rem; font-weight:800; display:flex; align-items:center; gap:10px; box-shadow:0 4px 15px rgba(244,63,94,0.15);">
+        let errEl = document.getElementById("checkoutVipOfferControls") || document.getElementById("checkoutSecurityBanner");
+        if (!errEl) {
+            errEl = document.createElement("div");
+            errEl.id = "checkoutSecurityBanner";
+            const mainEl = document.querySelector(".checkout-container") || document.body;
+            mainEl.parentNode.insertBefore(errEl, mainEl);
+        }
+        errEl.innerHTML = `
+            <div style="max-width:1050px; margin:10px auto; padding:12px 18px; background:#fff1f2; border:1.5px solid #f43f5e; color:#be123c; border-radius:12px; font-size:0.85rem; font-weight:800; display:flex; align-items:center; gap:10px; box-shadow:0 4px 15px rgba(244,63,94,0.15);">
                 <span style="font-size:1.4rem;">🛡️</span>
                 <div>
                     <div>${errorMsg}</div>
@@ -259,29 +276,321 @@ function renderCheckoutSecurityBanner(isVerified, errorMsg, offerData) {
 
     if (isVerified && offerData) {
         const maskedMobile = offerData.mobile === 'ADMIN_TEST' ? 'ADMIN MASTER TEST' : `+91-XXXXX${offerData.mobile.slice(-4)}`;
-        bannerEl.innerHTML = `
-            <div style="max-width:1050px; margin:14px auto 6px auto; padding:12px 18px; background:linear-gradient(135deg, #f0fdf4, #dcfce7); border:1.5px solid #22c55e; color:#15803d; border-radius:12px; font-size:0.86rem; font-weight:800; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; box-shadow:0 4px 15px rgba(34,197,94,0.15);">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:1.3rem;">🔒</span>
+
+        // 1. Hide Header Login/Profile button (ऑफर लिंक में बटन की जरूरत नहीं)
+        const authBtnWrap = document.getElementById("checkoutAuthBtnWrap");
+        if (authBtnWrap) authBtnWrap.style.display = "none";
+
+        // 2. Automatic Login with customer mobile number
+        const cleanMobile = (offerData.mobile || '').replace(/\D/g, '').slice(-10);
+        if (cleanMobile && cleanMobile.length === 10) {
+            try {
+                let existingUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+                const autoUser = {
+                    id: existingUser.id || ('user_' + cleanMobile),
+                    mobile: cleanMobile,
+                    full_name: existingUser.full_name || 'किसान पाठक',
+                    role: 'customer',
+                    isVipOfferAuth: true,
+                    login_at: new Date().toISOString()
+                };
+                localStorage.setItem('AI_USER', JSON.stringify(autoUser));
+                localStorage.setItem('AI_PROFILE', JSON.stringify(autoUser));
+                if (window.V1_SESSION && typeof window.V1_SESSION.setSession === 'function') {
+                    window.V1_SESSION.setSession({ mobile: cleanMobile, user_id: autoUser.id });
+                }
+            } catch(e) {}
+        }
+
+        // 3. Header Sticky Timer (हेडर में चिपका हुआ टाइमर)
+        const stickyTimer = document.getElementById("checkoutHeaderStickyTimer");
+        if (stickyTimer) {
+            stickyTimer.style.display = "inline-flex";
+        }
+
+        // 4. Universal VIP Offer Banner (कटने से बचाने के लिए 100% width व auto height)
+        const topBannerWrap = document.getElementById("checkoutTopBannerContainer");
+        if (topBannerWrap) {
+            topBannerWrap.style.display = "block";
+            topBannerWrap.innerHTML = `
+                <div style="width:100%; border-radius:14px; overflow:hidden; border:2px solid #22c55e; box-shadow:0 4px 20px rgba(0,0,0,0.12); background:#0f172a;">
+                    <img src="/images/banners/vip-reader-offer-badge.jpg" alt="Aarogyam India VIP Offer Banner" style="width:100%; height:auto; display:block; object-fit:contain;" />
+                </div>
+            `;
+        }
+
+        // 5. Controls After Email (Email के बाद सुरक्षा लॉक व ऑडियो प्लेयर)
+        let vipControls = document.getElementById("checkoutVipOfferControls");
+        if (!vipControls) {
+            const emailInput = document.getElementById("customerEmail");
+            if (emailInput && emailInput.closest(".form-group")) {
+                vipControls = document.createElement("div");
+                vipControls.id = "checkoutVipOfferControls";
+                vipControls.style.marginTop = "14px";
+                emailInput.closest(".form-group").after(vipControls);
+            }
+        }
+
+        if (vipControls) {
+            vipControls.innerHTML = `
+                <!-- 🔒 Security Lock Badge (Email के बाद) -->
+                <div style="padding:10px 14px; background:linear-gradient(135deg, #f0fdf4, #dcfce7); border:1.5px solid #22c55e; color:#15803d; border-radius:10px; font-size:0.82rem; font-weight:800; display:flex; align-items:center; gap:8px; margin-bottom:10px; box-shadow:0 2px 8px rgba(34,197,94,0.12);">
+                    <span style="font-size:1.25rem;">🔒</span>
                     <div>
-                        <span>प्रमाणित व्यक्तिगत ऑफर सक्रिय (${maskedMobile} के लिए सुरक्षित)</span>
-                        <div style="font-size:0.75rem; color:#166534; font-weight:600;">डिस्काउंट लॉक: यह लिंक केवल आपके अधिकृत नंबर पर ही काम करेगा।</div>
+                        <div>प्रमाणित व्यक्तिगत ऑफर सक्रिय (${maskedMobile} के लिए सुरक्षित)</div>
+                        <div style="font-size:0.73rem; color:#166534; font-weight:600;">डिस्काउंट लॉक: यह लिंक केवल आपके अधिकृत नंबर पर ही काम करेगा।</div>
                     </div>
                 </div>
-                ${offerData.exp > 0 ? `
-                    <div style="display:flex; align-items:center; gap:6px; background:#ffffff; border:1px solid #86efac; padding:6px 12px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-                        <span style="font-size:0.85rem; color:#15803d;">⏳ समय शेष:</span>
-                        <strong id="checkoutTimerClock" style="font-family:monospace; font-size:1.05rem; color:#dc2626;">--:--</strong>
-                    </div>
-                ` : ''}
-            </div>
-        `;
 
-        if (offerData.exp > 0) {
-            startCheckoutCountdown(offerData.exp);
+                <!-- 🎧 Interactive VIP Hindi Voice Note Player -->
+                <div id="checkoutVoiceNoteCard" style="padding:12px 14px; background:linear-gradient(135deg, #0f172a, #1e293b); border:1.5px solid #38bdf8; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg, #0284c7, #0369a1); display:flex; align-items:center; justify-content:center; font-size:1.2rem; box-shadow:0 2px 8px rgba(2,132,199,0.5); flex-shrink:0;">
+                            🎧
+                        </div>
+                        <div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <span style="color:#f8fafc; font-size:0.84rem; font-weight:800;">आरोग्यम विशेष पाठक वॉइस संदेश</span>
+                                <span id="voiceWaveAnimation" style="display:none; align-items:center; gap:3px;">
+                                    <span class="voice-bar"></span>
+                                    <span class="voice-bar"></span>
+                                    <span class="voice-bar"></span>
+                                    <span class="voice-bar"></span>
+                                </span>
+                            </div>
+                            <div id="voiceStatusText" style="font-size:0.73rem; color:#94a3b8; margin-top:2px;">
+                                ऑटो-प्ले सक्रिय (Personal Voice Note)
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <button type="button" id="btnPlayCheckoutVoice" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; border:none; padding:8px 16px; border-radius:20px; font-weight:800; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(22,163,74,0.4); animation:voicePulse 2s infinite;">
+                            <span id="btnVoiceIcon">▶️</span> <span id="btnVoiceLabel">ऑडियो संदेश</span>
+                        </button>
+                        <button type="button" id="btnRestartCheckoutVoice" style="background:#334155; color:#cbd5e1; border:none; padding:8px 10px; border-radius:20px; font-size:0.78rem; font-weight:700; cursor:pointer; display:none;" title="दोबारा सुनें">
+                            🔄
+                        </button>
+                    </div>
+                </div>
+
+                <style>
+                    @keyframes voicePulse {
+                        0% { transform: scale(1); box-shadow: 0 4px 12px rgba(22,163,74,0.4); }
+                        50% { transform: scale(1.03); box-shadow: 0 4px 20px rgba(22,163,74,0.7); }
+                        100% { transform: scale(1); box-shadow: 0 4px 12px rgba(22,163,74,0.4); }
+                    }
+                    .voice-bar {
+                        display: inline-block;
+                        width: 3px;
+                        height: 11px;
+                        background: #38bdf8;
+                        border-radius: 2px;
+                        animation: voiceWave 0.7s ease-in-out infinite alternate;
+                    }
+                    .voice-bar:nth-child(2) { animation-delay: 0.15s; height: 15px; }
+                    .voice-bar:nth-child(3) { animation-delay: 0.3s; height: 9px; }
+                    .voice-bar:nth-child(4) { animation-delay: 0.45s; height: 13px; }
+                    @keyframes voiceWave {
+                        0% { transform: scaleY(0.4); }
+                        100% { transform: scaleY(1.3); }
+                    }
+                </style>
+            `;
         }
+
+        // 6. Calculate & Start Timer
+        let targetExpMs = offerData.exp;
+        if (!targetExpMs && offerData.timer) {
+            let mins = 25;
+            if (offerData.timer === '15m') mins = 15;
+            else if (offerData.timer === '25m') mins = 25;
+            else if (offerData.timer === '1h') mins = 60;
+            else if (offerData.timer === '24h') mins = 1440;
+            targetExpMs = Date.now() + (mins * 60 * 1000);
+        }
+
+        if (targetExpMs > 0) {
+            startCheckoutCountdown(targetExpMs);
+        }
+
+        // 7. Initialize Voice Engine with Auto-Play
+        setupCheckoutVoiceEngine(offerData);
     }
 }
+
+function setupCheckoutVoiceEngine(offerData) {
+    if (!('speechSynthesis' in window)) return;
+
+    const btnPlay = document.getElementById("btnPlayCheckoutVoice");
+    const btnRestart = document.getElementById("btnRestartCheckoutVoice");
+    const statusText = document.getElementById("voiceStatusText");
+    const waveAnim = document.getElementById("voiceWaveAnimation");
+    const btnIcon = document.getElementById("btnVoiceIcon");
+    const btnLabel = document.getElementById("btnVoiceLabel");
+
+    if (!btnPlay) return;
+
+    const b = window.currentCheckoutBook || {};
+    const bookTitle = b.title || "आरोग्यम डिजिटल ई-बुक";
+    const bookId = String(b.id || "").toUpperCase();
+    const isCombo = (window.currentCheckoutBookList && window.currentCheckoutBookList.length > 1) || bookId.includes(",");
+
+    // Dynamic user condition analysis
+    let conditionText = "प्रिय ग्राहक, आप हमारे लिए अति महत्वपूर्ण पाठक हैं। आपको हमारे सर्वश्रेष्ठ पाठक के रूप में चुना गया है। ";
+    try {
+        const storedPurchases = JSON.parse(localStorage.getItem("AI_PURCHASES") || "[]");
+        if (storedPurchases.length > 0) {
+            const hasBk001 = storedPurchases.some(p => String(p.book_id || "").includes("BK001"));
+            const hasBk002 = storedPurchases.some(p => String(p.book_id || "").includes("BK002"));
+            if (hasBk001) {
+                conditionText = "प्रिय ग्राहक, आप हमारे लिए अति महत्वपूर्ण पाठक हैं। आपने पहले हमारी खरीफ फसल मास्टर गाइड पुस्तक पढ़ी है। ";
+            } else if (hasBk002) {
+                conditionText = "प्रिय ग्राहक, आप हमारे लिए अति महत्वपूर्ण पाठक हैं। आपने पहले हमारी खेती का डॉक्टर पुस्तक पढ़ी है। ";
+            } else {
+                conditionText = "प्रिय ग्राहक, आप हमारे लिए अति महत्वपूर्ण पाठक हैं। आपने पहले हमारी आरोग्यम ई-बुक्स खरीदी हैं। ";
+            }
+        } else if (sessionStorage.getItem("AI_PREV_STORE_PAGE") || document.referrer.includes("landing")) {
+            conditionText = "प्रिय ग्राहक, आप हमारे लिए अति महत्वपूर्ण हैं। आपने आरोग्यम ई-बुक में विशेष रुचि दिखाई थी और चेकआउट किया था। ";
+        }
+    } catch(e) {}
+
+    // Short intro
+    let bookDesc = "जिसमें संपूर्ण उन्नत कृषि तकनीक व वैज्ञानिक मार्गदर्शन दिया गया है।";
+    if (bookId.includes("BK002")) bookDesc = "जिसमें 50 से अधिक फसलों के रोगों, कीटों और फफूंद का सटीक और सफल इलाज दिया गया है।";
+    else if (bookId.includes("BK001")) bookDesc = "जिसमें खरीफ फसलों की उन्नत बुवाई, खाद प्रबंधन और खरपतवार नियंत्रण की संपूर्ण विधि है।";
+    else if (bookId.includes("BK016")) bookDesc = "जिसमें फसलों के सभी रोगों, कीटों और फफूंद के लिए सटीक कीटनाशक, फफूंदनाशक व खरपतवारनाशक दवाओं की संपूर्ण डायरेक्टरी दी गई है।";
+    else if (bookId.includes("BK017")) bookDesc = "जिसमें उन्नत किस्में, बुवाई, संतुलित खाद प्रबंधन, सिंचाई और गेहूं की बंपर पैदावार की संपूर्ण वैज्ञानिक तकनीक दी गई है।";
+    else if (bookId.includes("BK015")) bookDesc = "जिसमें सब्जियों की उन्नत खेती और बंपर पैदावार की संपूर्ण तकनीक है।";
+    else if (bookId.includes("BK006")) bookDesc = "जिसमें घर पर जैविक खाद और 100% असरदार जैविक कीटनाशक बनाने की विधियां हैं।";
+    else if (isCombo) bookDesc = "जिसमें संपूर्ण उन्नत कृषि व फसल सुरक्षा का डिजिटल महासंग्रह शामिल है।";
+
+    const amt = offerData.amount !== undefined ? offerData.amount : (b.offerPrice || 99);
+    let priceText = amt === 0 ? "बिल्कुल फ्री, यानी 100% मुफ़्त में उपलब्ध है।" : `मात्र ₹${amt} में मिल रही है।`;
+
+    let timerText = "25 मिनट";
+    if (offerData.timer === "15m") timerText = "15 मिनट";
+    else if (offerData.timer === "25m") timerText = "25 मिनट";
+    else if (offerData.timer === "1h") timerText = "1 घंटा";
+    else if (offerData.timer === "24h") timerText = "24 घंटे";
+
+    const storeNormalPrice = b.defaultOfferPrice || b.baseOfferPrice || b.comboStorePrice || (isCombo ? b.offerPrice : (b.offerPrice || 99));
+    const realMrp = b.mrp || (storeNormalPrice >= 149 ? (storeNormalPrice * 2) : 299);
+
+    const fullScript = isCombo
+        ? `${conditionText} आज आपके लिए विशेष एक्सक्लूसिव 1+1 फ़्री कॉम्बो ऑफर है: ${bookTitle}। ${bookDesc} यदि आप इन पुस्तकों का पूरा विवरण देखना चाहते हैं तो इस पेज पर संपूर्ण विवरण देख सकते हैं। इस कॉम्बो का कुल सामान्य मूल्य ₹${realMrp} है और स्टोर पर यह ₹${storeNormalPrice} में मिलता है। परंतु आज आपके लिए यह संपूर्ण कॉम्बो ${priceText} यह विशेष ऑफर आज मात्र ${timerText} के लिए ही मान्य है। कृपया अभी चेकआउट करें और अपनी डिजिटल पुस्तकें तुरंत प्राप्त करें। विशेष नोट: कृपया यह गोपनीय लिंक किसी अन्य को शेयर न करें। यह ऑफर केवल आपके नंबर के लिए है और एक बार खरीदने के बाद बंद हो जाएगा। धन्यवाद! आरोग्यम भारत।`
+        : `${conditionText} आज आपके लिए विशेष एक्सक्लूसिव ऑफर है: ${bookTitle}। ${bookDesc} यदि आप इस पुस्तक का पूरा विवरण देखना चाहते हैं तो इस पेज पर संपूर्ण विवरण देख सकते हैं। यह पुस्तक सामान्य रूप से ₹${realMrp} की है और स्टोर पर सभी पाठकों को ₹${storeNormalPrice} में मिलती है। परंतु आज आपके लिए यह पुस्तक ${priceText} यह विशेष ऑफर आज मात्र ${timerText} के लिए ही मान्य है। कृपया अभी चेकआउट करें और अपनी डिजिटल पुस्तक तुरंत प्राप्त करें। विशेष नोट: कृपया यह गोपनीय लिंक किसी अन्य को शेयर न करें। यह ऑफर केवल आपके नंबर के लिए है और एक बार खरीदने के बाद बंद हो जाएगा। धन्यवाद! आरोग्यम भारत।`;
+
+    function playVoice() {
+        try {
+            window.speechSynthesis.cancel();
+            checkoutUtterance = new SpeechSynthesisUtterance(fullScript);
+            checkoutUtterance.lang = "hi-IN";
+            checkoutUtterance.rate = 0.92;
+            checkoutUtterance.pitch = 1.0;
+
+            const voices = window.speechSynthesis.getVoices();
+            const hindiVoice = voices.find(v => v.lang === "hi-IN" || v.lang === "hi_IN" || (v.lang.startsWith("hi") && !v.lang.startsWith("en")) || v.name.toLowerCase().includes("hindi") || v.name.toLowerCase().includes("lekha"));
+            if (hindiVoice) checkoutUtterance.voice = hindiVoice;
+
+            checkoutUtterance.onstart = () => {
+                isCheckoutVoicePlaying = true;
+                if (btnIcon) btnIcon.textContent = "⏸️";
+                if (btnLabel) btnLabel.textContent = "ऑडियो रोकें";
+                if (btnPlay) {
+                    btnPlay.style.animation = "none";
+                    btnPlay.style.background = "linear-gradient(135deg, #e11d48, #be123c)";
+                }
+                if (waveAnim) waveAnim.style.display = "inline-flex";
+                if (statusText) statusText.innerHTML = `<span style="color:#38bdf8; font-weight:800;">🔊 ऑडियो चल रहा है...</span> (ध्यान से सुनें)`;
+                if (btnRestart) btnRestart.style.display = "inline-flex";
+            };
+
+            checkoutUtterance.onend = () => {
+                isCheckoutVoicePlaying = false;
+                if (btnIcon) btnIcon.textContent = "🔄";
+                if (btnLabel) btnLabel.textContent = "दोबारा सुनें";
+                if (btnPlay) {
+                    btnPlay.style.animation = "voicePulse 2s infinite";
+                    btnPlay.style.background = "linear-gradient(135deg, #16a34a, #15803d)";
+                }
+                if (waveAnim) waveAnim.style.display = "none";
+                if (statusText) statusText.textContent = "✅ विशेष ऑडियो संदेश समाप्त हुआ। नीचे दिए फॉर्म से चेकआउट पूरा करें।";
+            };
+
+            checkoutUtterance.onerror = (e) => {
+                console.warn("Speech synthesis notice:", e);
+                isCheckoutVoicePlaying = false;
+                if (btnIcon) btnIcon.textContent = "▶️";
+                if (btnLabel) btnLabel.textContent = "ऑडियो सुनें";
+                if (waveAnim) waveAnim.style.display = "none";
+            };
+
+            window.speechSynthesis.speak(checkoutUtterance);
+        } catch(err) {
+            console.warn("Speech synthesis trigger failed:", err);
+        }
+    }
+
+    function pauseVoice() {
+        if (window.speechSynthesis && window.speechSynthesis.speaking) {
+            window.speechSynthesis.pause();
+            isCheckoutVoicePlaying = false;
+            if (btnIcon) btnIcon.textContent = "▶️";
+            if (btnLabel) btnLabel.textContent = "पुनः शुरू करें";
+            if (waveAnim) waveAnim.style.display = "none";
+            if (statusText) statusText.textContent = "⏸️ ऑडियो रुका हुआ है। जारी रखने के लिए क्लिक करें।";
+        }
+    }
+
+    function resumeVoice() {
+        if (window.speechSynthesis && window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+            isCheckoutVoicePlaying = true;
+            if (btnIcon) btnIcon.textContent = "⏸️";
+            if (btnLabel) btnLabel.textContent = "ऑडियो रोकें";
+            if (waveAnim) waveAnim.style.display = "inline-flex";
+            if (statusText) statusText.innerHTML = `<span style="color:#38bdf8; font-weight:800;">🔊 ऑडियो चल रहा है...</span>`;
+        } else {
+            playVoice();
+        }
+    }
+
+    btnPlay.onclick = () => {
+        if (isCheckoutVoicePlaying) pauseVoice();
+        else resumeVoice();
+    };
+
+    if (btnRestart) {
+        btnRestart.onclick = () => {
+            playVoice();
+        };
+    }
+
+    // 🚀 Auto-Play Audio: Immediate attempt + fallback on very first touch/scroll
+    setTimeout(playVoice, 500);
+
+    const handleFirstGesturePlay = () => {
+        if (!isCheckoutVoicePlaying) {
+            playVoice();
+        }
+        ['touchstart', 'pointerdown', 'click', 'scroll'].forEach(evt => {
+            document.removeEventListener(evt, handleFirstGesturePlay);
+        });
+    };
+    ['touchstart', 'pointerdown', 'click', 'scroll'].forEach(evt => {
+        document.addEventListener(evt, handleFirstGesturePlay, { once: true, passive: true });
+    });
+}
+
+const DEFAULT_BOOK_CATALOG = {
+    'BK001': { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026', mrp: 299, offerPrice: 99, cover: '/images/books/kharif-master-guide-2026-cover.webp' },
+    'BK002': { id: 'BK002', name: 'खेती का डॉक्टर (फसल का डॉक्टर)', mrp: 299, offerPrice: 99, cover: '/images/books/fasal-ka-doctor-cover.webp' },
+    'BK006': { id: 'BK006', name: 'AI वेबसाइट निर्माण गाइड 2026', mrp: 1299, offerPrice: 199, cover: '/images/books/ai-website-guide-cover.webp' },
+    'BK015': { id: 'BK015', name: 'सब्जी खेती मास्टर गाइड', mrp: 1999, offerPrice: 149, cover: '/images/books/bk015-cover.webp' },
+    'BK016': { id: 'BK016', name: 'कृषि दवा डायरेक्टरी', mrp: 499, offerPrice: 149, cover: '/images/books/bk016-cover.webp' },
+    'BK017': { id: 'BK017', name: 'गेहूँ की खेती सम्पूर्ण मार्गदर्शिका', mrp: 299, offerPrice: 99, cover: '/images/books/bk017-cover.webp' },
+    'SUB001': { id: 'SUB001', name: '👑 Aarogyam Pro VIP सदस्यता', mrp: 2999, offerPrice: 99, cover: '/images/banners/farmer-community-banner.jpeg' }
+};
 
 function startCheckoutCountdown(expTimestamp) {
     if (checkoutCountdownTimerId) clearInterval(checkoutCountdownTimerId);
@@ -294,15 +603,16 @@ function startCheckoutCountdown(expTimestamp) {
         if (remainingMs <= 0) {
             clearInterval(checkoutCountdownTimerId);
             clock.textContent = "00:00";
-            renderCheckoutSecurityBanner(false, "⏳ समय सीमा समाप्त: यह 15-मिनट ऑफर लिंक एक्सपायर हो चुका है। मूल मूल्य लागू किया गया।", null);
+            renderCheckoutSecurityBanner(false, "⏳ समय सीमा समाप्त: यह विशेष ऑफर लिंक एक्सपायर हो चुका है। मूल मूल्य लागू किया गया।", null);
             if (window.currentCheckoutBook) {
-                window.currentCheckoutBook.offerPrice = 99;
+                const revertPrice = window.currentCheckoutBook.defaultOfferPrice || window.currentCheckoutBook.baseOfferPrice || window.currentCheckoutBook.comboStorePrice || 99;
+                window.currentCheckoutBook.offerPrice = revertPrice;
                 const pEl = document.getElementById("bookPrice");
-                if (pEl) pEl.textContent = "₹99";
+                if (pEl) pEl.textContent = "₹" + revertPrice;
                 const spEl = document.getElementById("summaryPrice");
-                if (spEl) spEl.textContent = "₹99";
+                if (spEl) spEl.textContent = "₹" + revertPrice;
                 const tpEl = document.getElementById("totalPrice");
-                if (tpEl) tpEl.textContent = "₹99";
+                if (tpEl) tpEl.textContent = "₹" + revertPrice;
             }
             return;
         }
@@ -319,15 +629,17 @@ function startCheckoutCountdown(expTimestamp) {
 async function loadBook() {
     try {
         const params = new URLSearchParams(window.location.search);
-        let rawId = (params.get("book_id") || params.get("book") || params.get("id") || params.get("product") || params.get("slug") || "").toLowerCase().trim();
-        const rawIds = params.get("ids") || params.get("bundle_ids");
+        let rawId = (params.get("b") || params.get("book_id") || params.get("book") || params.get("id") || params.get("product") || params.get("slug") || "").toLowerCase().trim();
+        const rawIds = params.get("bs") || params.get("ids") || params.get("bundle_ids");
         const customTitle = params.get("title") || params.get("name");
-        const customAmount = params.get("amount") || params.get("price");
+        const customAmount = params.get("p") || params.get("amount") || params.get("price");
 
-        // 🛡️ Security Parameters (Signature, Mobile, Expiry)
-        const offerSig = (params.get("sig") || params.get("signature") || "").trim();
+        // 🛡️ Security Parameters (Signature, Mobile, Expiry, Audio, Timer)
+        const offerSig = (params.get("s") || params.get("sig") || params.get("signature") || "").trim();
         const offerMobile = (params.get("m") || params.get("mobile") || "").trim();
-        const offerExp = parseInt(params.get("exp") || "0", 10);
+        const offerExp = parseInt(params.get("e") || params.get("exp") || "0", 10);
+        const offerAudio = (params.get("a") || params.get("audio") || "").trim();
+        const offerTimer = (params.get("t") || params.get("timer") || "").trim();
         let verifiedOfferAmount = null;
         let offerSecurityError = null;
 
@@ -405,20 +717,19 @@ async function loadBook() {
                 idList.forEach(id => {
                     const upperId = id.toUpperCase();
                     let b = booksArray.find(item => item.id && item.id.toUpperCase() === upperId);
-                    if (!b) {
-                        if (upperId === "BK001") {
-                            b = { id: "BK001", name: "खरीफ फसल मास्टर गाइड 2026", mrp: 299, offerPrice: 99, cover: "/images/books/kharif-master-guide-2026-cover.webp" };
-                        } else if (upperId === "BK002") {
-                            b = { id: "BK002", name: "खेती का डॉक्टर (Pocket Doctor)", mrp: 299, offerPrice: 99, cover: "/images/books/fasal-ka-doctor-cover.webp" };
-                        } else if (upperId === "BK015") {
-                            b = { id: "BK015", name: "सब्जी खेती मास्टर गाइड (भाग 1)", mrp: 299, offerPrice: 99, cover: "/images/books/kharif-master-guide-2026-cover.webp" };
-                        } else {
-                            b = { id: upperId, name: `Aarogyam India eBook (${upperId})`, mrp: 299, offerPrice: 99, cover: "/images/books/kharif-master-guide-2026-cover.webp" };
-                        }
+                    const catalogDef = DEFAULT_BOOK_CATALOG[upperId];
+                    if (!b && catalogDef) {
+                        b = { ...catalogDef };
+                    } else if (b && catalogDef) {
+                        if (!b.mrp && catalogDef.mrp) b.mrp = catalogDef.mrp;
+                        if ((b.offerPrice === undefined || b.offerPrice === null) && catalogDef.offerPrice !== undefined) b.offerPrice = catalogDef.offerPrice;
+                        if (!b.cover && catalogDef.cover) b.cover = catalogDef.cover;
+                    } else if (!b) {
+                        b = { id: upperId, name: `Aarogyam India eBook (${upperId})`, mrp: 299, offerPrice: 99, cover: "/images/books/kharif-master-guide-2026-cover.webp" };
                     }
                     matchedBooks.push(b);
-                    calcMrp += (b.mrp || 299);
-                    calcOffer += (b.offerPrice || 99);
+                    calcMrp += (b.mrp || (catalogDef?.mrp || 299));
+                    calcOffer += (b.offerPrice !== undefined ? b.offerPrice : (catalogDef?.offerPrice || 99));
                 });
 
                 // 🛡️ Cryptographic Security Check for Combo
@@ -430,14 +741,22 @@ async function loadBook() {
                     } else if (offerExp > 0 && Date.now() > offerExp) {
                         offerSecurityError = "⏳ समय सीमा समाप्त: यह कॉम्बो ऑफर समाप्त हो चुका है। मूल मूल्य लागू किया गया।";
                     } else {
-                        const expectedSig = generateOfferSignature(targetCheckId, rawAmt, offerMobile, offerExp);
-                        if (offerSig !== expectedSig) {
+                        const isSigValid = verifyOfferSignature(targetCheckId, rawAmt, offerMobile, offerSig, offerTimer, offerExp);
+                        if (!isSigValid) {
                             offerSecurityError = "⚠️ लिंक से छेड़छाड़ पकड़ी गई (Tampered URL): कॉम्बो डिस्काउंट अमान्य है।";
                         } else if (rawAmt <= 0 && offerMobile !== "ADMIN_TEST" && offerMobile !== "7974422572") {
                             offerSecurityError = "⚠️ ₹0 टेस्ट केवल अधिकृत एडमिन के लिए ही मान्य है।";
                         } else {
                             verifiedOfferAmount = rawAmt;
-                            window.activeVerifiedOffer = { amount: rawAmt, mobile: offerMobile, exp: offerExp, bookId: targetCheckId };
+                            window.activeVerifiedOffer = { 
+                                amount: rawAmt, 
+                                mobile: offerMobile, 
+                                exp: offerExp, 
+                                bookId: targetCheckId,
+                                timer: offerTimer,
+                                audio: offerAudio,
+                                isCombo: true
+                            };
                         }
                     }
                 }
@@ -458,6 +777,9 @@ async function loadBook() {
                     title: comboTitle,
                     mrp: comboMrp,
                     offerPrice: comboPrice,
+                    defaultOfferPrice: calcOffer,
+                    baseOfferPrice: calcOffer,
+                    comboStorePrice: calcOffer,
                     cover: matchedBooks[0]?.cover || "/images/books/kharif-master-guide-2026-cover.webp"
                 };
 
@@ -505,21 +827,30 @@ async function loadBook() {
         }
 
         // Single Book Lookup
-        let targetId = rawId;
-        if (rawId.includes("sub") || rawId === "subscription" || rawId === "pro-subscription") {
+        let targetId = (rawId || "").toUpperCase().trim();
+        if (targetId.includes("SUB") || targetId === "SUBSCRIPTION" || targetId === "PRO-SUBSCRIPTION") {
             targetId = "SUB001";
-        } else if (rawId.includes("kheti") || rawId === "fasal-ka-doctor") {
+        } else if (targetId.includes("KHETI") || targetId === "FASAL-KA-DOCTOR") {
             targetId = "BK002";
-        } else if (rawId.includes("kharif")) {
+        } else if (targetId.includes("KHARIF")) {
             targetId = "BK001";
         }
 
         let book = null;
         if (targetId) {
             book = booksArray.find(item => 
-                (item.id && item.id.toLowerCase() === targetId.toLowerCase()) || 
-                (item.slug && item.slug.toLowerCase() === targetId.toLowerCase())
+                (item.id && item.id.toUpperCase() === targetId) || 
+                (item.slug && item.slug.toUpperCase() === targetId)
             );
+        }
+
+        const catalogDef = DEFAULT_BOOK_CATALOG[targetId];
+        if (!book && catalogDef) {
+            book = { ...catalogDef };
+        } else if (book && catalogDef) {
+            if (!book.mrp && catalogDef.mrp) book.mrp = catalogDef.mrp;
+            if ((book.offerPrice === undefined || book.offerPrice === null) && catalogDef.offerPrice !== undefined) book.offerPrice = catalogDef.offerPrice;
+            if (!book.cover && catalogDef.cover) book.cover = catalogDef.cover;
         }
 
         if (!book && booksArray.length > 0 && !customTitle) {
@@ -543,6 +874,10 @@ async function loadBook() {
             };
         }
 
+        // Standard book values from catalog/metadata
+        const standardBookStoreOffer = (book.offerPrice !== undefined && book.offerPrice !== null) ? book.offerPrice : ((catalogDef && catalogDef.offerPrice !== undefined) ? catalogDef.offerPrice : 99);
+        const standardBookMrp = book.mrp || ((catalogDef && catalogDef.mrp) ? catalogDef.mrp : (standardBookStoreOffer >= 149 ? standardBookStoreOffer * 2 : 299));
+
         // 🛡️ Cryptographic Security Check for Single Book
         if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
             const rawAmt = parseInt(customAmount, 10);
@@ -553,14 +888,22 @@ async function loadBook() {
             } else if (offerExp > 0 && Date.now() > offerExp) {
                 offerSecurityError = "⏳ समय सीमा समाप्त: यह विशेष ऑफर समाप्त हो चुका है। मूल मूल्य लागू किया गया।";
             } else {
-                const expectedSig = generateOfferSignature(targetCheckId, rawAmt, offerMobile, offerExp);
-                if (offerSig !== expectedSig) {
+                const isSigValid = verifyOfferSignature(targetCheckId, rawAmt, offerMobile, offerSig, offerTimer, offerExp);
+                if (!isSigValid) {
                     offerSecurityError = "⚠️ लिंक से छेड़छाड़ पकड़ी गई (Tampered URL): डिस्काउंट अमान्य है।";
                 } else if (rawAmt <= 0 && offerMobile !== "ADMIN_TEST" && offerMobile !== "7974422572") {
                     offerSecurityError = "⚠️ ₹0 टेस्ट केवल अधिकृत एडमिन के लिए ही मान्य है।";
                 } else {
                     verifiedOfferAmount = rawAmt;
-                    window.activeVerifiedOffer = { amount: rawAmt, mobile: offerMobile, exp: offerExp, bookId: targetCheckId };
+                    window.activeVerifiedOffer = { 
+                        amount: rawAmt, 
+                        mobile: offerMobile, 
+                        exp: offerExp, 
+                        bookId: targetCheckId,
+                        timer: offerTimer,
+                        audio: offerAudio,
+                        isCombo: false
+                    };
                 }
             }
         }
@@ -569,15 +912,16 @@ async function loadBook() {
         if (customTitle) book.name = customTitle;
         if (verifiedOfferAmount !== null) {
             book.offerPrice = verifiedOfferAmount;
-        } else if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
-            // Tampered or missing signature: force standard offer price
-            book.offerPrice = 99;
+        } else {
+            // Tampered, expired, or standard view: use the actual book's standard offer price!
+            book.offerPrice = standardBookStoreOffer;
         }
+        book.mrp = standardBookMrp;
 
         const bookCover = book.cover || book.thumbnail || book.cover_image || "/images/banners/farmer-community-banner.jpeg";
         const bookName = book.name || book.title || "Aarogyam India Digital Product";
-        const bookMrp = book.mrp || ((book.offerPrice !== undefined && book.offerPrice !== null) ? (book.offerPrice > 0 ? book.offerPrice * 2 : 299) : 299);
-        const bookOffer = (book.offerPrice !== undefined && book.offerPrice !== null) ? book.offerPrice : (book.offer_price !== undefined ? book.offer_price : 99);
+        const bookMrp = standardBookMrp;
+        const bookOffer = book.offerPrice;
 
         window.currentCheckoutBookList = [book];
         window.currentCheckoutBook = {
@@ -585,6 +929,8 @@ async function loadBook() {
             title: bookName,
             mrp: bookMrp,
             offerPrice: bookOffer,
+            defaultOfferPrice: standardBookStoreOffer,
+            baseOfferPrice: standardBookStoreOffer,
             cover: bookCover
         };
 
@@ -651,8 +997,8 @@ async function loadBook() {
             }
         }
 
-        // Handle Offer Timer & Free Checkout UI
-        const timerParam = params.get("timer");
+        // Handle Legacy/Fallback Offer Timer UI (when security banner timer is not active)
+        const timerParam = !window.activeVerifiedOffer ? (params.get("t") || params.get("timer")) : null;
         if (timerParam) {
             let timerBar = document.getElementById("checkout-offer-timer-bar");
             if (!timerBar) {
