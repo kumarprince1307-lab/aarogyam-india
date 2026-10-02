@@ -233,6 +233,12 @@ class ProAudioBookEngine {
     }
 
     handleTrackEnded() {
+        try {
+            const dur = this.audioElement ? (this.audioElement.duration || 60) : 60;
+            if (window.AarogyamTelemetry && typeof window.AarogyamTelemetry.trackAudioNarrationTime === 'function') {
+                window.AarogyamTelemetry.trackAudioNarrationTime(window.aoiBookId, Math.round(dur));
+            }
+        } catch(e) {}
         const ua = navigator.userAgent || navigator.vendor || window.opera || '';
         const isFbOrInApp = /FBAN|FBAV|Instagram|Messenger|Line|MicroMessenger/i.test(ua);
         const totalPages = window.aoiTotalPages || (window.aoiPageImagesList ? window.aoiPageImagesList.length : 152);

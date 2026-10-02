@@ -1335,6 +1335,12 @@
         if (isHome && typeof window.startHomeRevampEngine === 'function') {
           window.startHomeRevampEngine();
         }
+      // ⚡ Asynchronous Zero-Lag 360° Telemetry Bridge
+      if (!window.AarogyamTelemetry && !document.querySelector('script[src*="aarogyam-telemetry"]')) {
+        const telScript = document.createElement('script');
+        telScript.src = '/js/aarogyam-telemetry.js?v=20261002_v1';
+        telScript.async = true;
+        document.head.appendChild(telScript);
       }
     } catch (e) {
       console.warn('[LivePageCMS] Hydration skipped, using static fallback:', e);

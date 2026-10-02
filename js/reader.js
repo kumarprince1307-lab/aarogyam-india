@@ -903,6 +903,10 @@ function saveProgress(num) {
     let savedData = JSON.parse(localStorage.getItem("AOI_READ_PROGRESS") || "{}");
     savedData[aoiBookId] = num;
     localStorage.setItem("AOI_READ_PROGRESS", JSON.stringify(savedData));
+
+    if (window.AarogyamTelemetry && typeof window.AarogyamTelemetry.trackReaderProgress === "function") {
+        window.AarogyamTelemetry.trackReaderProgress(aoiBookId, num, aoiTotalPages);
+    }
 }
 
 // =======================================================

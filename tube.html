@@ -39,6 +39,7 @@
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="/js/aarogyam-telemetry.js"></script>
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/my-library.css">
@@ -4469,9 +4470,19 @@
                     isReelPlaying = true;
                   },
                   'onStateChange': function(e) {
-                    if (e.data === 1) isReelPlaying = true;
+                    if (e.data === 1) {
+                      isReelPlaying = true;
+                      const activeReel = (activeReelsList && activeReelsList[currentReelIndex]) ? activeReelsList[currentReelIndex] : {};
+                      if (window.AarogyamTelemetry) {
+                        window.AarogyamTelemetry.trackVideoPlay(activeReel.id || ytId, activeReel.title, activeReel.category || 'Reel');
+                      }
+                    }
                     else if (e.data === 2) isReelPlaying = false;
                     else if (e.data === 0) {
+                      const activeReel = (activeReelsList && activeReelsList[currentReelIndex]) ? activeReelsList[currentReelIndex] : {};
+                      if (window.AarogyamTelemetry) {
+                        window.AarogyamTelemetry.trackVideoProgress(activeReel.id || ytId, 60, true);
+                      }
                       // Video ended: AUTO ADVANCE TO NEXT REEL!
                       window.navReel(1);
                     }
