@@ -291,6 +291,14 @@ function applyDateFilter(items, dateField = 'created_at') {
 // =================================================================
 // 3. MAIN RENDER CONTROLLER
 // =================================================================
+export async function initReports() {
+  initAdminLayout('Marketing Hub & Analytics', 'लाइव मांग मीटर, 4-स्टेज मार्केटिंग फ़नल एवं व्हाट्सएप रिकवरी इंजन');
+  const container = document.getElementById('page-content');
+  if (container) {
+    await renderReports(container);
+  }
+}
+
 export async function renderReports(container) {
   if (!container) return;
 
