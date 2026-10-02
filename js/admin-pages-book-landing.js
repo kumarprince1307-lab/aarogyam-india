@@ -342,6 +342,8 @@ export async function initBookLandingPages() {
                     <option value="BK011">🏡 BK011: पॉलीहाउस नेटहाउस गाइड</option>
                     <option value="BK012">🌱 BK012: सब्जी खेती गाइड</option>
                     <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
+                    <option value="BK016">🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा</option>
+                    <option value="BK017">🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका</option>
                   </select>
                   <button type="button" onclick="window.autoImportDemoFromSelectedBook()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; font-size: 0.75rem; white-space: nowrap;">
                     📥 इम्पोर्ट करें
@@ -1820,6 +1822,7 @@ Instant Download & Lifetime Access
                 <option value="BK012">🌱 BK012: सब्जी खेती गाइड</option>
                 <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
                 <option value="BK016">🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा</option>
+                <option value="BK017">🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका</option>
                 <option value="ALL">🎁 ALL: सभी पुस्तकों के साथ (Universal Bonus)</option>
               </select>
               <button type="button" onclick="window.autoImportFromTargetMainBook()" class="admin-button small-button" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: 800; margin-top: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(2,132,199,0.3);">
@@ -4803,7 +4806,8 @@ Instant Download & Lifetime Access
       { id: 'BK011', name: '🏡 BK011: पॉलीहाउस नेटहाउस गाइड' },
       { id: 'BK012', name: '🌱 BK012: सब्जी खेती गाइड' },
       { id: 'BK015', name: '🌱 BK015: सब्जी खेती मास्टर PART 1' },
-      { id: 'BK016', name: '🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा' }
+      { id: 'BK016', name: '🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा' },
+      { id: 'BK017', name: '🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका' }
     ];
 
     const bookMap = new Map();
@@ -7126,7 +7130,9 @@ Instant Download & Lifetime Access
     { id: 'BK010', name: '🌸 फूल खेती गाइड' },
     { id: 'BK011', name: '🏡 पॉलीहाउस नेटहाउस गाइड' },
     { id: 'BK012', name: '🌱 सब्जी खेती गाइड' },
-    { id: 'BK015', name: '🌱 सब्जी खेती मास्टर PART 1' }
+    { id: 'BK015', name: '🌱 सब्जी खेती मास्टर PART 1' },
+    { id: 'BK016', name: '🌾 कृषि दवा डायरेक्टरी' },
+    { id: 'BK017', name: '🌾 गेहूँ की खेती सम्पूर्ण मार्गदर्शिका' }
   ];
 
   window.renderAttachedBooksTray = function(selectedBookIds = []) {

@@ -297,9 +297,11 @@
     const user = getUserProfile();
     const currentPath = (window.location.pathname || '').toLowerCase();
 
+    const curBId = (typeof currentBookId !== 'undefined' ? currentBookId : (window.currentBookId || ''));
+
     // 1. Unpurchased Book Rule:
     // If user has not purchased BK001 (Kharif Guide) and is not already on that page:
-   if (!purchased.includes('BK001') && currentBookId !== 'BK015' && !currentPath.includes('kharif-master-guide-2026')) {
+    if (!purchased.includes('BK001') && curBId !== 'BK015' && !currentPath.includes('kharif-master-guide-2026')) {
       return {
         type: 'book_kharif',
         badge: '🌾 अनुशंसित ई-बुक',
@@ -313,7 +315,7 @@
     }
 
     // If user has BK001 but NOT BK002 (Kheti Ka Doctor):
-  if (!purchased.includes('BK002') && currentBookId !== 'BK015' && !currentPath.includes('kharif-master-guide-2026')) {
+    if (!purchased.includes('BK002') && curBId !== 'BK015' && !currentPath.includes('kharif-master-guide-2026')) {
       return {
         type: 'book_kheti_dr',
         badge: '🩺 फसल सुरक्षा गाइड',

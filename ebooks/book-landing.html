@@ -58,6 +58,15 @@
         }
       } catch (e) {}
     })();
+    // Safe Early Image Error Handler
+    window.handleImageError = window.handleImageError || function(img) {
+      if (!img) return;
+      if (img.id === 'hero-banner-img' || img.classList.contains('hero-banner-bg')) {
+        img.style.display = 'none';
+      } else if (img.id === 'hero-book-cover' || img.classList.contains('hero-book-cover') || img.id === 'sticky-thumb-img') {
+        img.src = '/images/books/kharif-master-guide-2026-cover.webp';
+      }
+    };
   </script>
   
   <title id="page-seo-title">Aarogyam India | Official eBook Practical Guide</title>
@@ -91,6 +100,7 @@
   <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Aarogyam">
 
@@ -604,7 +614,7 @@
       <div class="hero-container">
         <!-- LEFT: 3D BOOK COVER -->
         <div class="hero-book">
-          <img id="hero-book-cover" src="" alt="Book Cover" class="hero-book-cover" onerror="window.handleImageError(this)">
+          <img id="hero-book-cover" src="" alt="Book Cover" class="hero-book-cover" onerror="window.handleImageError && window.handleImageError(this)">
         </div>
 
         <!-- RIGHT: BOOK DETAILS -->

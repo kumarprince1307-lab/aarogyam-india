@@ -194,7 +194,11 @@
     const isInEbooks = window.location.pathname.includes('/ebooks/');
     const readerBase = isInEbooks ? 'reader.html' : '/ebooks/reader.html';
     let readerDemoUrl = `${readerBase}?book=${encodeURIComponent(demoTarget)}&demo=1`;
-    const cleanPages = (demoPages || currentLandingData?.demo_reader_pages || currentBookData?.demo_reader_pages || '').trim();
+    let cleanPages = (demoPages || currentLandingData?.demo_reader_pages || currentBookData?.demo_reader_pages || '').trim();
+    if (!cleanPages) {
+      if (rawTarget.includes('BK015')) cleanPages = '1-23';
+      else if (rawTarget.includes('BK016')) cleanPages = '1-15';
+    }
     if (cleanPages) {
       readerDemoUrl += `&pages=${encodeURIComponent(cleanPages)}`;
     }
@@ -403,6 +407,7 @@
     } else if (slugParam) {
       currentBookId = slugParam.trim().toLowerCase();
     }
+    window.currentBookId = currentBookId;
   }
 
   // Universal Image Resolver for /ebooks/ and root deployment environments
@@ -601,6 +606,36 @@
             ]
           }
         };
+      } else if (qKey.startsWith('DEMO-') || qKey.startsWith('DEMO_') || qKey.startsWith('FREE-') || qKey.startsWith('BONUS-')) {
+        const parentKey = qKey.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '').trim().toUpperCase();
+        const parentLanding = allLandingPages.find(p => p.id && p.id.trim().toUpperCase() === parentKey);
+        const parentBook = allBooks.find(b => b.id && b.id.trim().toUpperCase() === parentKey);
+        if (parentLanding || parentBook) {
+          const baseData = parentLanding ? JSON.parse(JSON.stringify(parentLanding)) : {};
+          const baseHero = baseData.hero || {};
+          currentLandingData = {
+            ...baseData,
+            id: qKey,
+            slug: qKey.toLowerCase(),
+            book_type: 'demo',
+            isDemo: true,
+            targetMainBook: parentKey,
+            hero: {
+              ...baseHero,
+              tag: baseHero.tag || '🌾 Agriculture Practical Guide (Demo)',
+              title: (baseHero.title || parentBook?.heading || parentBook?.name || parentKey) + ' (Free Demo)',
+              cover_image: baseHero.cover_image || parentBook?.cover || parentBook?.thumbnail || `/images/books/${parentKey.toLowerCase()}-cover.webp`,
+              banner_image: baseHero.banner_image || parentBook?.banner || `/images/banners/${parentKey.toLowerCase()}-hero-banner.webp`,
+              mrp: baseHero.mrp || parentBook?.mrp || 299,
+              offer_price: baseHero.offer_price || parentBook?.offerPrice || 99
+            }
+          };
+        } else if (currentBookId && qKey !== 'BK001') {
+          renderBookNotFound(currentBookId);
+          return;
+        } else {
+          currentLandingData = allLandingPages[0] || {};
+        }
       } else if (currentBookId && qKey !== 'BK001') {
         // Stop silent fallback to BK001 - Show proper Not Found state
         renderBookNotFound(currentBookId);
@@ -2453,7 +2488,6 @@
     visits[pKey].lastSeen = Date.now();
     localStorage.setItem('AOI_PAGE_VISITS', JSON.stringify(visits));
   } catch(e) {}
-}
 
   // ==========================================================
   // FAQ ACCORDION ENGINE (ACCORDION & EXPAND)
