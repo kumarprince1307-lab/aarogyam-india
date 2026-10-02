@@ -3939,22 +3939,61 @@ body {
 }
 
 /* ==========================================================
-   KPI HIGHLIGHTS & FAQ: SAWAL (RED) & JAWAB (SOLID BLACK)
+   1. KPI BADGES: BOX (BLACK) & TEXT (WHITE)
 ========================================================== */
+.ubl-kpi-badge-card {
+    background: #0f172a !important;
+    border: 1.5px solid #334155 !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
 .ubl-kpi-badge-title,
-.ubl-kpi-card-title,
-.faq-item summary,
-.faq-question h3,
-.faq-item h3 {
-    color: #dc2626 !important; /* लाल रंग में सवाल / Title */
+.ubl-kpi-card-title {
+    color: #ffffff !important;
     font-weight: 800 !important;
 }
 
 .ubl-kpi-badge-subtext,
-.ubl-kpi-card-desc,
+.ubl-kpi-card-desc {
+    color: #cbd5e1 !important;
+    font-weight: 500 !important;
+}
+
+/* ==========================================================
+   2. WHY BUY CARDS: BOX (LIGHT BLUE), SAWAL (GREEN), ANSWER (DARK BLACK)
+========================================================== */
+.why-card {
+    background: #f0f7ff !important;
+    border: 1.5px solid #bae6fd !important;
+    border-radius: 18px !important;
+    box-shadow: 0 10px 25px rgba(186, 230, 253, 0.4) !important;
+}
+
+.why-card h3 {
+    color: #15803d !important; /* हरा रंग में सवाल */
+    font-weight: 800 !important;
+}
+
+.why-card p {
+    color: #0f172a !important; /* डार्क ब्लैक रंग में उत्तर */
+    font-weight: 600 !important;
+    font-size: 0.96rem !important;
+    line-height: 1.7 !important;
+}
+
+/* ==========================================================
+   3. FAQ ACCORDION: SAWAL (GREEN), ANSWER (DARK BLACK)
+========================================================== */
+.faq-item summary,
+.faq-question h3,
+.faq-item h3 {
+    color: #15803d !important;
+    font-weight: 800 !important;
+}
+
 .faq-item p,
 .faq-answer p {
-    color: #111827 !important; /* सॉलिड ब्लैक रंग में जवाब / Description */
+    color: #0f172a !important;
     font-weight: 600 !important;
 }
 

@@ -1794,15 +1794,15 @@
         }
       }
       return `
-        <div class="ubl-kpi-badge-card" style="display:flex; align-items:${item.subtitle ? 'flex-start' : 'center'}; gap:12px; padding:14px 16px; border-radius:14px; background:#ffffff; border:1.5px solid #e2e8f0; box-shadow:0 3px 12px rgba(0,0,0,0.04); transition:all 0.25s ease;">
-          <div class="ubl-kpi-icon-wrap" style="width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #fee2e2, #fecaca); color:#dc2626; font-size:1.25rem; flex-shrink:0;">
+        <div class="ubl-kpi-badge-card" style="display:flex; align-items:${item.subtitle ? 'flex-start' : 'center'}; gap:12px; padding:14px 16px; border-radius:14px; background:#0f172a; border:1.5px solid #334155; box-shadow:0 4px 16px rgba(0,0,0,0.25); transition:all 0.25s ease;">
+          <div class="ubl-kpi-icon-wrap" style="width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.12); color:#ffffff; font-size:1.25rem; flex-shrink:0; border:1px solid rgba(255,255,255,0.18);">
             ${iconHtml}
           </div>
           <div class="ubl-kpi-badge-content" style="flex:1; min-width:0;">
-            <div class="ubl-kpi-badge-title" style="font-size:0.95rem; font-weight:800; color:#dc2626; line-height:1.35;">
+            <div class="ubl-kpi-badge-title" style="font-size:0.95rem; font-weight:800; color:#ffffff; line-height:1.35;">
               ${escapeHtml(item.title)}
             </div>
-            ${item.subtitle ? `<div class="ubl-kpi-badge-subtext" style="font-size:0.84rem; font-weight:600; color:#111827; line-height:1.45; margin-top:3px;">${escapeHtml(item.subtitle)}</div>` : ''}
+            ${item.subtitle ? `<div class="ubl-kpi-badge-subtext" style="font-size:0.84rem; font-weight:500; color:#cbd5e1; line-height:1.45; margin-top:3px;">${escapeHtml(item.subtitle)}</div>` : ''}
           </div>
         </div>
       `;
