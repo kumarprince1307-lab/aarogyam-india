@@ -4177,6 +4177,273 @@
           "comment": "हम पंजाब में बहुत ज्यादा केमिकल इस्तेमाल करते थे। इस किताब के 'IPM और जैविक नुस्खे' वाले भाग ने मेरी आँखें खोल दीं। अब मैं मित्र कीटों और ट्राइकोडर्मा का उपयोग करता हूँ। दवा का खर्च 40% तक कम हो गया और जमीन की सेहत भी सुधर रही है।"
         }
       ]
+    },
+    {
+      "id": "BK017",
+      "updated_at": "2026-10-02T12:46:02.152Z",
+      "admin_edited": true,
+      "slug": "bk017",
+      "book_type": "paid",
+      "audience": "all",
+      "target_main_books": [],
+      "book_name": "",
+      "author": "",
+      "language": "Hindi",
+      "totalPages": 120,
+      "version": "2026",
+      "category": "Agriculture",
+      "status": "active",
+      "is_coming_soon": false,
+      "isComingSoon": false,
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "publish_targets": [
+        "my_library"
+      ],
+      "facebook_pixel_id": "disabled",
+      "google_analytics_id": "disabled",
+      "facebook_pixel_enabled": false,
+      "google_analytics_enabled": false,
+      "theme_primary": "#2e7d32",
+      "theme_dark": "#003d00",
+      "cover_effect": "3d_float",
+      "sticky_button_text": "खरीदें",
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_audio",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_ai_support",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help",
+        "sec_pdf_main",
+        "sec_pdf_free"
+      ],
+      "hidden_sections": [],
+      "section_banners": {
+        "sec_why_buy": "/images/banners/bk017-sec_why_buy-banner.webp",
+        "sec_vip_stack": "/images/banners/bk017-sec_vip_stack-banner.webp",
+        "sec_preview": "/images/banners/bk017-sec_preview-banner.webp",
+        "sec_audio": "/images/banners/bk017-sec_audio-banner.webp",
+        "sec_ai_support": "/images/banners/bk017-sec_ai_support-banner.webp"
+      },
+      "og_title": "गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका",
+      "og_description": "सही किस्म का चुनाव, बुवाई, फुटाव बढ़ाने का प्रबंधन, सिंचाई, पोषण, खरपतवार, रोग-कीट नियंत्रण, मौसम प्रबंधन, कटाई-भंडारण और लागत/उपज ऑडिट — गेहूँ की खेती के लिए एक आसान Practical eBook Guide।\n\nPrice/Offer अलग Pricing section में रखें:\nMRP ₹299 | आज सिर्फ ₹99",
+      "og_image": "/images/books/bk017-cover.webp",
+      "og_image_landscape": "/images/books/bk017-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ “गेहूँ की खेती की पूरी जानकारी — बुवाई से कटाई तक, फुटाव बढ़ाने, रोग-कीट की पहचान और उनके प्रबंधन, सिंचाई, खाद-पोषण, खरपतवार, मौसम, कटाई-भंडारण और बेहतर उत्पादन से जुड़ी जरूरी जानकारी एक ही किताब में।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "tts",
+        "mp3_url": "",
+        "tts_text": "क्या आप गेहूँ की फसल में ज्यादा फुटाव, मजबूत पौधे और बेहतर उत्पादन चाहते हैं?\nतो यह गेहूँ की खेती सम्पूर्ण मार्गदर्शिका आपके लिए तैयार की गई है।\nइस किताब में आपको सिर्फ खेती की सामान्य जानकारी नहीं, बल्कि बुवाई से लेकर कटाई और भंडारण तक पूरी Practical Guide मिलेगी।\nजानिए सही किस्म और अपने क्षेत्र के अनुसार किस्म का चुनाव, सही समय पर बुवाई और शुरुआती फसल प्रबंधन।\nखास तौर पर जानिए बुवाई के बाद फुटाव कब और कैसे बढ़ाना है, CRI अवस्था में क्या ध्यान रखना है और पोषण तथा सिंचाई का सही प्रबंधन कैसे करना है।\nकिताब में गेहूँ के प्रमुख रोगों की पहचान और उनके प्रबंधन, जैसे पीला रतुआ, भूरा रतुआ, काला रतुआ, झुलसा, कंडुआ और करनाल बंट जैसी समस्याओं की जानकारी भी शामिल है। \nसाथ ही कीट, खरपतवार, मौसम का प्रभाव, पोषक तत्वों की कमी, पानी का प्रबंधन, कटाई, मड़ाई और सुरक्षित भंडारण जैसे जरूरी विषय भी शामिल हैं।\nयह जानकारी अलग-अलग क्षेत्रों और परिस्थितियों को ध्यान में रखकर समझाई गई है—क्योंकि गेहूँ की सही किस्म और प्रबंधन क्षेत्र तथा बुवाई की स्थिति के अनुसार बदल सकते हैं। \nयानी एक ही जगह पर गेहूँ की फसल की पूरी योजना और जरूरी सावधानियाँ।\nऔर सबसे खास बात—यह पूरी eBook अभी सिर्फ ₹99 में उपलब्ध है।\nMRP ₹299 — आज का ऑफर सिर्फ ₹99।",
+        "story_text": "क्या आप गेहूँ की फसल में ज्यादा फुटाव, मजबूत पौधे और बेहतर उत्पादन चाहते हैं?\nतो यह गेहूँ की खेती सम्पूर्ण मार्गदर्शिका आपके लिए तैयार की गई है।\nइस किताब में आपको सिर्फ खेती की सामान्य जानकारी नहीं, बल्कि बुवाई से लेकर कटाई और भंडारण तक पूरी Practical Guide मिलेगी।\nजानिए सही किस्म और अपने क्षेत्र के अनुसार किस्म का चुनाव, सही समय पर बुवाई और शुरुआती फसल प्रबंधन।\nखास तौर पर जानिए बुवाई के बाद फुटाव कब और कैसे बढ़ाना है, CRI अवस्था में क्या ध्यान रखना है और पोषण तथा सिंचाई का सही प्रबंधन कैसे करना है।\nकिताब में गेहूँ के प्रमुख रोगों की पहचान और उनके प्रबंधन, जैसे पीला रतुआ, भूरा रतुआ, काला रतुआ, झुलसा, कंडुआ और करनाल बंट जैसी समस्याओं की जानकारी भी शामिल है। \nसाथ ही कीट, खरपतवार, मौसम का प्रभाव, पोषक तत्वों की कमी, पानी का प्रबंधन, कटाई, मड़ाई और सुरक्षित भंडारण जैसे जरूरी विषय भी शामिल हैं।\nयह जानकारी अलग-अलग क्षेत्रों और परिस्थितियों को ध्यान में रखकर समझाई गई है—क्योंकि गेहूँ की सही किस्म और प्रबंधन क्षेत्र तथा बुवाई की स्थिति के अनुसार बदल सकते हैं। \nयानी एक ही जगह पर गेहूँ की फसल की पूरी योजना और जरूरी सावधानियाँ।\nऔर सबसे खास बात—यह पूरी eBook अभी सिर्फ ₹99 में उपलब्ध है।\nMRP ₹299 — आज का ऑफर सिर्फ ₹99।",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
+        "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk017-sec_audio-banner.webp"
+      },
+      "mainPdf": "",
+      "main_pdf": "",
+      "freePdf": "",
+      "free_pdf": "",
+      "demoPdf": "",
+      "ai_support_title": "",
+      "ai_support_cover": "",
+      "ai_support_desc": "",
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_books": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_points": [
+        "24×7 WhatsApp Support",
+        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
+        "📖 किताब की जानकारी समझने में सहायता",
+        "🌱 फसल संबंधी सवाल",
+        "📱 Mobile Friendly PDF & Lifetime Access"
+      ],
+      "timer": {
+        "enabled": true,
+        "minutes": 15,
+        "text": "⚡ सीमित समय ऑफर: यह विशेष छूट केवल अगले 15 मिनट के लिए मान्य है!"
+      },
+      "hero": {
+        "tag": "🌾 रबी फसल मास्टर सीरीज | गेहूँ",
+        "title": "गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका",
+        "subtitle": "बुवाई से कटाई तक पूरी जानकारी • ज्यादा फुटाव • बेहतर फसल • रोग एवं कीट प्रबंधन",
+        "description": "सही किस्म का चुनाव, बुवाई, फुटाव बढ़ाने का प्रबंधन, सिंचाई, पोषण, खरपतवार, रोग-कीट नियंत्रण, मौसम प्रबंधन, कटाई-भंडारण और लागत/उपज ऑडिट — गेहूँ की खेती के लिए एक आसान Practical eBook Guide।\n\nPrice/Offer अलग Pricing section में रखें:\nMRP ₹299 | आज सिर्फ ₹99",
+        "mrp": 299,
+        "offer_price": 99,
+        "offer_badge": "Launch Offer",
+        "rating_score": "4.9",
+        "rating_count": "120+ Ratings",
+        "cover_image": "/images/books/bk017-cover.webp",
+        "banner_image": "/images/banners/bk017-hero-banner.webp",
+        "features": [
+          {
+            "icon": "fa-seedling",
+            "text": "120 पेज की प्रीमियम"
+          },
+          {
+            "icon": "fa-camera",
+            "text": "300+ फोटो"
+          },
+          {
+            "icon": "fa-flask",
+            "text": "Spray Science"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Bonus PDF"
+          },
+          {
+            "icon": "fa-seedling",
+            "text": "120+ रंगीन पेज"
+          }
+        ]
+      },
+      "value_stack": {
+        "book_mrp": 299,
+        "vip_value": 1999,
+        "bonus_value": 199,
+        "offer_price": 99,
+        "vip_banner": "/images/banners/bk017-sec_vip_stack-banner.webp",
+        "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए यह गाइड उनके प्लान में 100% मुफ्त शामिल है।"
+      },
+      "why_read": {
+        "title": "यह पुस्तक क्यों खरीदें?",
+        "subtitle": "📘 यह पुस्तक क्यों खरीदें?  गेहूँ की खेती में सही फैसला, सही समय पर लेने के लिए—बुवाई से कटाई तक की जरूरी Practical जानकारी एक ही eBook में।  MRP ₹299 → आज सिर्फ ₹99 🎧 eBook + Audio सुविधा | खेती के समय सुनें और सीखें",
+        "banner_image": "/images/banners/bk017-sec_why_buy-banner.webp",
+        "cards": [
+          {
+            "icon": "🌱",
+            "title": "वैज्ञानिक जानकारी",
+            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।"
+          },
+          {
+            "icon": "📷",
+            "title": "300+ वास्तविक फोटो",
+            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
+          },
+          {
+            "icon": "📘",
+            "title": "Step by Step Guide",
+            "desc": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।"
+          },
+          {
+            "icon": "🎁",
+            "title": "Free Bonus PDF",
+            "desc": "इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।"
+          },
+          {
+            "icon": "🌱",
+            "title": "नया कारण शीर्षक",
+            "desc": "विवरण यहाँ लिखें..."
+          },
+          {
+            "icon": "🌱",
+            "title": "नया कारण शीर्षक",
+            "desc": "विवरण यहाँ लिखें..."
+          }
+        ]
+      },
+      "preview_banner": "/images/banners/bk017-sec_preview-banner.webp",
+      "demo_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp"
+      ],
+      "demo_reader_pages": "",
+      "demoPages": "",
+      "suggested_books_list": [],
+      "suggested_books": [],
+      "table_of_contents": [
+        "बीज उपचार",
+        "खेत की तैयारी",
+        "बुवाई की वैज्ञानिक विधि",
+        "उर्वरक प्रबंधन",
+        "खरपतवार नियंत्रण",
+        "रोग एवं कीट प्रबंधन",
+        "पोषक तत्वों की कमी",
+        "स्प्रे चार्ट",
+        "IPM तकनीक",
+        "अधिक उत्पादन के उपाय",
+        "विशेषज्ञ सुझाव"
+      ],
+      "videos": [],
+      "testimonials": [],
+      "final_buy": {
+        "title": "गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका",
+        "description": "बुवाई से कटाई तक पूरी जानकारी • ज्यादा फुटाव • बेहतर फसल • रोग एवं कीट प्रबंधन",
+        "benefits": []
+      },
+      "download_funnel": {
+        "audio_enabled": true,
+        "audio_mode": "mp3",
+        "audio_url": "",
+        "audio_narrator": "Female Voice (Aarogyam AI सखी)",
+        "audio_script": "",
+        "funnel_heading": "🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स",
+        "funnel_subheading": "हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित",
+        "funnel_books": [
+          "BK001",
+          "BK002",
+          "BK015"
+        ],
+        "farmer_tip": "",
+        "fast_size": "~24 MB",
+        "hd_download_limit": 3
+      },
+      "whatsapp_prompt": "नमस्ते, मुझे 'गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका' पुस्तक के बारे में और जानकारी चाहिए।"
     }
   ]
 }
