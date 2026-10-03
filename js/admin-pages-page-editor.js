@@ -1276,43 +1276,43 @@ export async function initPageEditor() {
         "hero_slides": [
                 {
                         "image": "/images/banners/hero_slide-pashupalan-banner-371712-0doa.webp",
-                        "tag": "🌾 नया स्पेशल ऑफर",
-                        "title": "नया बैनर शीर्षक यहाँ लिखें",
-                        "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-                        "cta_text": "📚 अभी देखें",
-                        "cta_link": "/ebooks/ebook.html",
-                        "cta_secondary_text": "🛒 लाइव कार्ट",
-                        "cta_secondary_link": "/ebooks/cart.html"
+                        "tag": "🐄 पशु पालन व दुग्ध संवर्धन",
+                        "title": "पशु पोषण, दुग्ध वृद्धि व थनैला मुक्ति हब",
+                        "subtitle": "गाय-भैंस में थनैला रोग, दूध व फैट वृद्धि और बांझपन का 100% सफल समाधान",
+                        "cta_text": "🐄 उत्पाद देखें",
+                        "cta_link": "#products-cattle",
+                        "cta_secondary_text": "💬 AI पशु डॉक्टर सलाह",
+                        "cta_secondary_link": "https://wa.me/917974422572"
                 },
                 {
                         "image": "/images/banners/hero_slide-oasupalan-banner-452947-b9ha.webp",
-                        "tag": "🌾 नया स्पेशल ऑफर",
-                        "title": "नया बैनर शीर्षक यहाँ लिखें",
-                        "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-                        "cta_text": "📚 अभी देखें",
-                        "cta_link": "/ebooks/ebook.html",
-                        "cta_secondary_text": "🛒 लाइव कार्ट",
-                        "cta_secondary_link": "/ebooks/cart.html"
+                        "tag": "🥛 1-2L दुग्ध वृद्धि",
+                        "title": "गाय-भैंस पोषण व उच्च दुग्ध उत्पादन",
+                        "subtitle": "बायपास प्रोटीन व चेलेटेड मिनरल से दूध और फैट दर में अभूतपूर्व बढ़ोतरी",
+                        "cta_text": "📦 ऑर्डर करें",
+                        "cta_link": "#products-cattle",
+                        "cta_secondary_text": "🩺 लक्षण व इलाज",
+                        "cta_secondary_link": "#sec-mastitis"
                 },
                 {
                         "image": "/images/banners/hero_slide-pashupalan2-527789-7csc.webp",
-                        "tag": "🌾 नया स्पेशल ऑफर",
-                        "title": "नया बैनर शीर्षक यहाँ लिखें",
-                        "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-                        "cta_text": "📚 अभी देखें",
-                        "cta_link": "/ebooks/ebook.html",
-                        "cta_secondary_text": "🛒 लाइव कार्ट",
-                        "cta_secondary_link": "/ebooks/cart.html"
+                        "tag": "🩺 100% सफल निवारण",
+                        "title": "थनैला व बांझपन से स्थायी सुरक्षा",
+                        "subtitle": "हर्बल थनैला किट व यूट्रस टोन द्वारा बच्चेदानी की प्राकृतिक सफाई",
+                        "cta_text": "🌿 उपचार देखें",
+                        "cta_link": "#sec-mastitis",
+                        "cta_secondary_text": "💬 व्हाट्सएप सलाह",
+                        "cta_secondary_link": "https://wa.me/917974422572"
                 },
                 {
                         "image": "/images/banners/hero_slide-pashupalan-3-651651-1zbn.webp",
-                        "tag": "🌾 नया स्पेशल ऑफर",
-                        "title": "नया बैनर शीर्षक यहाँ लिखें",
-                        "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-                        "cta_text": "📚 अभी देखें",
-                        "cta_link": "/ebooks/ebook.html",
-                        "cta_secondary_text": "🛒 लाइव कार्ट",
-                        "cta_secondary_link": "/ebooks/cart.html"
+                        "tag": "🤖 AI पशु चिकित्सक",
+                        "title": "24×7 WhatsApp AI पशु डॉक्टर सेवा",
+                        "subtitle": "पशु के लक्षण बताएं और तुरंत मोबाइल पर सटीक घरेलू व वैज्ञानिक उपाय पाएं",
+                        "cta_text": "📲 तुरंत परामर्श लें",
+                        "cta_link": "https://wa.me/917974422572",
+                        "cta_secondary_text": "⭐ किसान अनुभव",
+                        "cta_secondary_link": "#sec-reviews"
                 }
         ],
         "sections_order": [

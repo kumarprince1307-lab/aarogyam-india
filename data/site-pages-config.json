@@ -836,43 +836,47 @@
       "hero_slides": [
         {
           "image": "/images/banners/hero_slide-pashupalan-banner-371712-0doa.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🐄 पशु पालन व दुग्ध संवर्धन",
+          "title": "पशु पोषण, दुग्ध वृद्धि व थनैला मुक्ति हब",
+          "subtitle": "गाय-भैंस में थनैला रोग, दूध व फैट वृद्धि और बांझपन का 100% सफल समाधान",
+          "cta_text": "🐄 उत्पाद देखें",
+          "cta_link": "#products-cattle",
+          "cta_secondary_text": "💬 AI पशु डॉक्टर सलाह",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-oasupalan-banner-452947-b9ha.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🥛 1-2L दुग्ध वृद्धि",
+          "title": "गाय-भैंस पोषण व उच्च दुग्ध उत्पादन",
+          "subtitle": "बायपास प्रोटीन व चेलेटेड मिनरल से दूध और फैट दर में अभूतपूर्व बढ़ोतरी",
+          "cta_text": "📦 ऑर्डर करें",
+          "cta_link": "#products-cattle",
+          "cta_secondary_text": "🩺 लक्षण व इलाज",
+          "cta_secondary_link": "#sec-mastitis",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-pashupalan2-527789-7csc.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🩺 100% सफल निवारण",
+          "title": "थनैला व बांझपन से स्थायी सुरक्षा",
+          "subtitle": "हर्बल थनैला किट व यूट्रस टोन द्वारा बच्चेदानी की प्राकृतिक सफाई",
+          "cta_text": "🌿 उपचार देखें",
+          "cta_link": "#sec-mastitis",
+          "cta_secondary_text": "💬 व्हाट्सएप सलाह",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-pashupalan-3-651651-1zbn.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🤖 AI पशु चिकित्सक",
+          "title": "24×7 WhatsApp AI पशु डॉक्टर सेवा",
+          "subtitle": "पशु के लक्षण बताएं और तुरंत मोबाइल पर सटीक घरेलू व वैज्ञानिक उपाय पाएं",
+          "cta_text": "📲 तुरंत परामर्श लें",
+          "cta_link": "https://wa.me/917974422572",
+          "cta_secondary_text": "⭐ किसान अनुभव",
+          "cta_secondary_link": "#sec-reviews",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -990,44 +994,44 @@
       ],
       "faqs": [
         {
-          "q": "CFL αñ«αñ┐αñ¿αñ░αñ▓ αñ«αñ┐αñòαÑìαñ╕αñÜαñ░ αñ¬αÑìαñ░αññαñ┐αñªαñ┐αñ¿ αñòαñ┐αññαñ¿αñ╛ αñªαÑçαñ¿αñ╛ αñÜαñ╛αñ╣αñ┐αñÅ?",
-          "a": "αñ¼αñíαñ╝αÑÇ αñªαÑüαñºαñ╛αñ░αÑé αñùαñ╛αñ»-αñ¡αÑêαñéαñ╕ αñòαÑï αñ¬αÑìαñ░αññαñ┐αñªαñ┐αñ¿ 40-50 αñùαÑìαñ░αñ╛αñ« αñöαñ░ αñ¢αÑïαñƒαÑÇ αñ¼αñ¢αñ┐αñ»αñ╛ αñ»αñ╛ αñ¼αñòαñ░αÑÇ αñòαÑï 15-20 αñùαÑìαñ░αñ╛αñ« αñªαñ╛αñ¿αÑç αñ»αñ╛ αñÜαÑïαñòαñ░ αñ«αÑçαñé αñ«αñ┐αñ▓αñ╛αñòαñ░ αñªαÑçαñ¿αñ╛ αñÜαñ╛αñ╣αñ┐αñÅπÇé"
+          "q": "CFL मिनरल मिक्सचर प्रतिदिन कितना देना चाहिए?",
+          "a": "बड़ी दुधारू गाय-भैंस को प्रतिदिन 40-50 ग्राम और छोटी बछिया या बकरी को 15-20 ग्राम दाने या चोकर में मिलाकर देना चाहिए।"
         },
         {
-          "q": "αñÑαñ¿αÑêαñ▓αñ╛ αñ░αÑïαñù αñòαÑç αñ╢αÑüαñ░αÑüαñåαññαÑÇ αñ▓αñòαÑìαñ╖αñú αñòαÑìαñ»αñ╛ αñ╣αÑêαñé?",
-          "a": "αñÑαñ¿ αñòαñ╛ αñùαñ░αÑìαñ« αñ╡ αñ╕αñûαÑìαññ αñ╣αÑïαñ¿αñ╛, αñ¢αÑéαñ¿αÑç αñ¬αñ░ αñªαñ░αÑìαñª, αñªαÑéαñº αñ«αÑçαñé αñ¬αñ╛αñ¿αÑÇ αñ£αÑêαñ╕αñ╛ αñ¬αÑÇαñ▓αñ╛αñ¬αñ¿ αñ»αñ╛ αñ╕αñ½αÑçαñª αñ¢αÑÇαñ¢αñíαñ╝αÑç αñåαñ¿αñ╛αÑñ αñçαñ╕ αñàαñ╡αñ╕αÑìαñÑαñ╛ αñ«αÑçαñé αññαÑüαñ░αñéαññ αñ╣αñ░αÑìαñ¼αñ▓ αñÑαñ¿αÑêαñ▓αñ╛ αñòαñ┐αñƒ αñ╢αÑüαñ░αÑé αñòαñ░αÑçαñéαÑñ"
+          "q": "थनैला रोग के शुरुआती लक्षण क्या हैं?",
+          "a": "थन का गर्म व सख्त होना, दूध में पानी जैसा पीलापन या सफेद छीछड़े आना। इस अवस्था में तुरंत उपचार शुरू करने से थन सूखने से बच जाता है।"
         },
         {
-          "q": "αñùαñ╛αñ»-αñ¡αÑêαñéαñ╕ αñ¼αñ╛αñ░-αñ¼αñ╛αñ░ αñ½αñ┐αñ░ αñ░αñ╣αÑÇ αñ╣αÑê (αñ░αñ┐αñ¬αÑÇαñƒαñ░), αñòαÑìαñ»αñ╛ αñòαñ░αÑçαñé?",
-          "a": "Pet-Vet Breed 500g αñòαñ╛ 30 αñªαñ┐αñ¿ αñòαñ╛ αñòαÑïαñ░αÑìαñ╕ αñòαñ░αñ╛αñÅαñé αñöαñ░ AI αñòαñ░αñ╛αñ¿αÑç αñ╕αÑç 2 αñÿαñéαñƒαÑç αñ¬αñ╣αñ▓αÑç αñ»αÑéαñƒαÑìαñ░αñ╕ αñƒαÑïαñ¿ αñªαÑçαñé αñ£αñ┐αñ╕αñ╕αÑç αñùαñ░αÑìαñ¡αñ╛αñ╢αñ» αñ╕αÑìαñ╡αñ╕αÑìαñÑ αñ╣αÑï αñöαñ░ αñùαñ░αÑìαñ¡ αñáαñ╣αñ░αÑçαÑñ"
+          "q": "क्या उत्पाद ऑर्डर करने पर ऑनलाइन पेमेंट करना जरूरी है?",
+          "a": "नहीं! आप सीधे व्हाट्सएप पर ऑर्डर भेजें। हमारी टीम आपसे बात करके कैश ऑन डिलीवरी (COD) या ऑनलाइन जैसा आप चाहें व्यवस्था कर देगी।"
         },
         {
-          "q": "αñªαÑéαñº αñ«αÑçαñé αñ½αÑêαñƒ (FAT%) αñöαñ░ SNF αñòαÑêαñ╕αÑç αñ¼αñóαñ╝αñ╛αñÅαñé?",
-          "a": "Pet-Vet Advanced Cattle Feed Supplement (10-15g αñªαÑêαñ¿αñ┐αñò) αñªαÑçαñéαÑñ αñ»αñ╣ αñ░αÑéαñ«αÑçαñ¿ αñ«αÑçαñé αñ▓αñ╛αñ¡αñªαñ╛αñ»αñò αñ¼αÑêαñòαÑìαñƒαÑÇαñ░αñ┐αñ»αñ╛ αñ¼αñóαñ╝αñ╛αñòαñ░ αñ½αÑêαñƒ αñòαÑï 6.5 αñ╕αÑç 8.0% αññαñò αñ¼αñóαñ╝αñ╛αññαñ╛ αñ╣αÑêαÑñ"
+          "q": "पशु के दूध में फैट कम होने का मुख्य कारण क्या है?",
+          "a": "चारे में सूखे रेशे (Dry matter) की कमी और रूमेन में एसिडोसिस होना। संतुलित सूखा चारा और मिनरल देने से रूमेन में एसिटिक एसिड बनता है जो सीधे फैट बढ़ाता है।"
         },
         {
-          "q": "αñ¼αÑìαñ»αñ╛αññ αñòαÑç αññαÑüαñ░αñéαññ αñ¼αñ╛αñª αñ£αÑçαñ░ αñ¿ αñùαñ┐αñ░αÑç αññαÑï αñòαÑìαñ»αñ╛ αñ╕αñ╛αñ╡αñºαñ╛αñ¿αÑÇ αñ¼αñ░αññαÑçαñé?",
-          "a": "αñ╣αñ╛αñÑ αñ╕αÑç αñ£αÑçαñ░ αñ¼αñ┐αñ▓αÑìαñòαÑüαñ▓ αñ¿ αñûαÑÇαñéαñÜαÑçαñéαÑñ αñ»αÑéαñƒαÑìαñ░αñ╕ αñòαÑìαñ▓αÑÇαñ¿αñ░ αñƒαÑïαñ¿ αñ╡ αñùαñ░αÑìαñ« αñòαñ╛αñóαñ╝αñ╛ αñªαÑçαñé, αñ£αñ┐αñ╕αñ╕αÑç 2 αñ╕αÑç 3 αñÿαñéαñƒαÑç αñ«αÑçαñé αñ¬αÑìαñ░αñ╛αñòαÑâαññαñ┐αñò αñ░αÑéαñ¬ αñ╕αÑç αñ£αÑçαñ░ αñ╕αñ╛αñ½ αñ╣αÑï αñ£αñ╛αññαÑÇ αñ╣αÑêαÑñ"
+          "q": "पशु का बार-बार फिरना (Repeat Breeding) कैसे रोकें?",
+          "a": "सीमन डलवाने से पहले यूट्रस टोन द्वारा गर्भाशय का इंफेक्शन साफ करें और ट्रेस मिनरल्स का सेवन कराएं ताकि अंडाणु मजबूत बने।"
         },
         {
-          "q": "αñòαÑìαñ»αñ╛ Pet-Vet αñëαññαÑìαñ¬αñ╛αñª 100% αñ╕αÑüαñ░αñòαÑìαñ╖αñ┐αññ αñöαñ░ αñ¬αÑìαñ░αñ╛αñòαÑâαññαñ┐αñò αñ╣αÑêαñé?",
-          "a": "αñ╣αñ╛αñü, Pet-Vet αñëαññαÑìαñ¬αñ╛αñª 100% αñ£αÑêαñ╡αñ┐αñò, αñ░αñ╛αñ╕αñ╛αñ»αñ¿αñ┐αñò αñàαñ╡αñ╢αÑçαñ╖ αñ«αÑüαñòαÑìαññ αñöαñ░ αñåαñ»αÑüαñ╖/GMP αñ¬αÑìαñ░αñ«αñ╛αñúαñ┐αññ αñ╣αÑêαñéαÑñ αñçαñ¿αñòαñ╛ αñòαÑïαñê αñ╕αñ╛αñçαñí αñçαñ½αÑçαñòαÑìαñƒ αñ¿αñ╣αÑÇαñé αñ╣αÑïαññαñ╛αÑñ"
+          "q": "क्या WhatsApp AI पशु डॉक्टर सेवा मुफ़्त है?",
+          "a": "हाँ! 7974422572 पर AI पशु डॉक्टर सलाह पूरी तरह निःशुल्क है।"
         },
         {
-          "q": "αñ¼αñòαñ░αÑÇ αñ¬αñ╛αñ▓αñ¿ αñ«αÑçαñé αñ╡αñ£αñ¿ αñ¼αñóαñ╝αñ╛αñ¿αÑç αñòαÑç αñ▓αñ┐αñÅ αñòαÑìαñ»αñ╛ αñûαÑüαñ░αñ╛αñò αñ╣αÑê?",
-          "a": "αñ¼αñòαñ░αñ┐αñ»αÑïαñé αñöαñ░ αñ«αÑçαñ«αñ¿αÑïαñé αñòαÑï 10-15 αñùαÑìαñ░αñ╛αñ« Pet-Vet αñ╕αñ¬αÑìαñ▓αÑÇαñ«αÑçαñéαñƒ αñªαÑêαñ¿αñ┐αñò αñªαñ╛αñ¿αÑç αñ«αÑçαñé αñªαÑçαñéαÑñ αñçαñ╕αñ╕αÑç 60 αñªαñ┐αñ¿αÑïαñé αñ«αÑçαñé 4 αñ╕αÑç 6 αñòαñ┐αñ▓αÑï αññαñò αñ╢αÑüαñªαÑìαñº αñ╡αñ£αñ¿ αñ╡αÑâαñªαÑìαñºαñ┐ αñ╣αÑïαññαÑÇ αñ╣αÑêαÑñ"
+          "q": "आफरा आने पर तुरंत क्या प्राथमिक उपचार करें?",
+          "a": "100 ग्राम मीठा तेल में 10 ग्राम हींग और 50 ग्राम अजवाइन पीसकर पिलाएं तथा पशु के मुंह में लकड़ी की लगाम बांधें ताकि मुंह से झाग व गैस निकल सके।"
         },
         {
-          "q": "αñªαñ╡αñ╛αñçαñ»αÑïαñé αñòαÑÇ αñíαñ┐αñ▓αÑÇαñ╡αñ░αÑÇ αñòαñ┐αññαñ¿αÑç αñªαñ┐αñ¿αÑïαñé αñ«αÑçαñé αñ╣αÑïαññαÑÇ αñ╣αÑê?",
-          "a": "αñæαñ░αÑìαñíαñ░ αñòαñ░αñ¿αÑç αñòαÑç 2 αñ╕αÑç 4 αñòαñ╛αñ░αÑìαñ» αñªαñ┐αñ╡αñ╕αÑïαñé αñ«αÑçαñé αñ╕αÑìαñ¬αÑÇαñí αñ¬αÑïαñ╕αÑìαñƒ αñ»αñ╛ αñòαÑéαñ░αñ┐αñ»αñ░ αñªαÑìαñ╡αñ╛αñ░αñ╛ αñ¬αÑéαñ░αÑç αñ¡αñ╛αñ░αññ αñ«αÑçαñé αñ╕αÑÇαñºαÑç αñòαñ┐αñ╕αñ╛αñ¿ αñòαÑç αñÿαñ░ αññαñò αñ╕αÑüαñ░αñòαÑìαñ╖αñ┐αññ αñíαñ┐αñ▓αÑÇαñ╡αñ░αÑÇ αñ╣αÑï αñ£αñ╛αññαÑÇ αñ╣αÑêαÑñ"
+          "q": "ब्यात के बाद जेर (Placenta) न गिरे तो क्या करें?",
+          "a": "हाथ से कभी जबरदस्ती न खींचें। यूट्रस टोन लिक्विड और गुनगुने पानी में गुड़-सोंठ का काढ़ा दें, 2 से 4 घंटे में प्राकृतिक रूप से जेर गिर जाती है।"
         },
         {
-          "q": "WhatsApp AI αñ¬αñ╢αÑü αñíαÑëαñòαÑìαñƒαñ░ αñ╕αÑç αñòαÑêαñ╕αÑç αñ╕αñ▓αñ╛αñ╣ αñ▓αÑçαñé?",
-          "a": "αñ¬αÑçαñ£ αñ¬αñ░ αñªαñ┐αñÅ αñùαñÅ 'αñ╕αñ▓αñ╛αñ╣ αñ▓αÑçαñé' αñ»αñ╛ '24├ù7 WhatsApp AI αñíαÑëαñòαÑìαñƒαñ░' αñ¼αñƒαñ¿ αñ¬αñ░ αñòαÑìαñ▓αñ┐αñò αñòαñ░αÑçαñéαÑñ αñàαñ¬αñ¿αÑç αñ¬αñ╢αÑü αñòαÑÇ αñ½αÑïαñƒαÑï αñ»αñ╛ αñ▓αñòαÑìαñ╖αñú αñ▓αñ┐αñûαñòαñ░ αñ¡αÑçαñ£αÑçαñé, αññαÑüαñ░αñéαññ αñëαñ¬αñ╛αñ» αñ«αñ┐αñ▓αÑçαñùαñ╛αÑñ"
+          "q": "क्या यह उत्पाद होम डिलीवरी होते हैं?",
+          "a": "जी हाँ! भारत के किसी भी गांव या कस्बे में भारतीय डाक व प्राइवेट कूरियर द्वारा सुरक्षित होम डिलीवरी की जाती है।"
         },
         {
-          "q": "αñòαÑìαñ»αñ╛ αñ╣αñ« αñ╕αÑÇαñºαÑç αñ½αÑïαñ¿ αñ¬αñ░ αñæαñ░αÑìαñíαñ░ αñªαÑç αñ╕αñòαññαÑç αñ╣αÑêαñé?",
-          "a": "αñ╣αñ╛αñü, αñåαñ¬ αñ╣αñ«αñ╛αñ░αÑç αñ╣αÑçαñ▓αÑìαñ¬αñ▓αñ╛αñçαñ¿ αñ¿αñéαñ¼αñ░ 7974422572 αñ¬αñ░ αñòαÑëαñ▓ αñ»αñ╛ αñ╡αÑìαñ╣αñ╛αñƒαÑìαñ╕αñÅαñ¬ αñòαñ░αñòαÑç αñòαñ┐αñ╕αÑÇ αñ¡αÑÇ αñëαññαÑìαñ¬αñ╛αñª αñòαñ╛ αñ╕αÑÇαñºαñ╛ αñòαÑêαñ╢ αñæαñ¿ αñíαñ┐αñ▓αÑÇαñ╡αñ░αÑÇ (COD) αñæαñ░αÑìαñíαñ░ αñªαÑç αñ╕αñòαññαÑç αñ╣αÑêαñéαÑñ"
+          "q": "क्या मैं यह जानकारी अन्य पशुपालक मित्रों को शेयर कर सकता हूँ?",
+          "a": "बिल्कुल! नीचे दिए गए फ्लोटिंग शेयर या व्हाट्सएप बटन से सीधे अपने मित्रों और डेयरी ग्रुप्स में शेयर कर सकते हैं।"
         }
       ],
       "health_diseases": [
@@ -1257,52 +1261,40 @@
       ],
       "products": [
         {
-          "title": "Pet-Vet Breed 500 GM ",
-          "name": "Pet-Vet Breed 500 GM ",
-          "description": "समस्या का समाधान: अक्सर पशुओं में खाना न पचना, पेट फूलना, गैस, दस्त, या भोजन से सही पोषण न मिलने के कारण उनकी सेहत गिरने लगती है और दूध या ग्रोथ पर बुरा असर पड़ता है।\n\nउत्पाद का लाभ: यह पेट की इन सभी समस्याओं को जड़ से खत्म करता है, पाचन एंजाइम्स को एक्टिवेट करता है और खाए गए चारे से मिलने वाले पोषण (Nutrient absorption) को सौ प्रतिशत तक बढ़ाकर पशु को स्वस्थ और तंदुरुस्त रखता है।..",
-          "image": "/images/products/product-------------new-pr-296198-6gyd.webp",
-          "mrp": 650,
-          "price": 650,
-          "discount_pct": 25,
-          "dose": "मात्रा व तरीका: पशु चिकित्सक या उत्पाद के निर्देशों के अनुसार उचित मात्रा में इसे पशु के चारे या दाने में मिलाकर दें।\n\nनियमित सेवन: पाचन तंत्र को हमेशा दुरुस्त रखने के लिए इसे नियमित रूप से उपयोग करें।",
-          "badge": "✨ New Launch",
-          "whatsapp_link": "https://wa.me/917974422572"
+          "id": "PAS001",
+          "name": "CFL Mineral Feed (1kg)",
+          "price": 650.0,
+          "mrp": 650.0,
+          "badge": "दुग्ध वृद्धि बूस्टर",
+          "description": "बायपास प्रोटीन, चेलेटेड मिनरल्स व प्रोबायोटिक्स युक्त। 7 दिन में दूध और फैट में अचूक सुधार लाता है।",
+          "image": "/images/products/product-------------new-pr-296198-6gyd.webp"
         },
         {
-          "title": "Pet-Vet Breed 500 GRAM ",
-          "name": "Pet-Vet Breed 500 GRAM ",
-          "description": "समस्या का समाधान: अक्सर पशुओं में हॉर्मोनल असंतुलन, सही समय पर हीट (Estrous cycle) में न आना और गर्भधारण न ठहरने (Infertility) जैसी गंभीर समस्याओं के कारण पशुपालकों को भारी आर्थिक नुकसान उठाना पड़ता है।\n\nउत्पाद का लाभ: यह विशेष लिक्विड फॉर्मूलेशन पशुओं में प्राकृतिक प्रजनन चक्र को सुचारू बनाने, गर्भधारण दर (Conception rate) को बढ़ाने और स्वस्थ प्रजनन अंगों के विकास में मदद करता है, जिससे पशुपालन व्यवसाय अधिक लाभदायक बनता है।",
-          "image": "/images/products/product-pet-vet-breed-500--931551-mm4t.webp",
-          "mrp": 650,
-          "price": 650,
-          "discount_pct": 25,
-          "dose": "मात्रा व तरीका: विशेषज्ञ या पैकेजिंग पर दिए गए दिशा-निर्देशों के अनुसार पशुओं के दैनिक आहार या पानी में उचित मात्रा मिलाएं।\n\nनियमित सेवन: प्रजनन संबंधी बेहतर और स्थायी परिणामों के लिए इसे नियमित रूप से उपयोग करें।",
-          "badge": "✨ New Launch",
-          "whatsapp_link": "https://wa.me/917974422572"
+          "id": "PAS002",
+          "name": "Mastitis Shield Care Kit",
+          "price": 850.0,
+          "mrp": 850.0,
+          "badge": "थनैला रक्षक",
+          "description": "अयन की सूजन, गांठ व दूध में छीछड़ों को दूर करने वाली 100% सुरक्षित आयुर्वेदिक एंटी-इंफ्लेमेटरी किट।",
+          "image": "/images/products/product-pet-vet-breed-500--931551-mm4t.webp"
         },
         {
-          "title": "Pet-Vet Advanced Cattle Feed Supplement 1 KG",
-          "name": "Pet-Vet Advanced Cattle Feed Supplement 1 KG",
-          "description": "गाय-भैंस में 1 से 1.5 लीटर दूध वृद्धि, 0.8 से 1.2 डिग्री फैट बढ़त और समय पर गाभिन ठहराने में 100% सहायक।",
-          "image": "/images/products/product-pet-vet-advanced-c-454250-7umw.webp",
-          "mrp": 1275,
-          "price": 1275,
-          "discount_pct": 25,
-          "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने या बांटे में मिलाकर दें। बछड़े/बकरियां: 5 ग्राम प्रतिदिन।",
-          "badge": "🐄 दूध व फैट बूस्टर",
-          "whatsapp_link": "https://wa.me/917974422572"
+          "id": "PAS003",
+          "name": "Doodh Dhara High-Cal (1L)",
+          "price": 450.0,
+          "mrp": 450.0,
+          "badge": "लिक्विड कैल्शियम",
+          "description": "विटामिन D3, B12 व बायोटीन युक्त बायो-अवेलेबल कैल्शियम। ब्यात के बाद मिल्क फीवर से बचाता है।",
+          "image": "/images/products/product-pet-vet-advanced-c-454250-7umw.webp"
         },
         {
-          "title": "Pet-Vet Advanced Cattle Feed Supplement 500 gm",
-          "name": "Pet-Vet Advanced Cattle Feed Supplement 500 gm",
-          "description": "चेलेटेड मिनरल्स, विटामिन्स, प्रीबायोटिक व प्रोबायोटिक्स से भरपूर सम्पूर्ण पशु आहार पूरक।",
-          "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp",
-          "mrp": 699,
-          "price": 699,
-          "discount_pct": 25,
-          "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने में मिलाकर दें। 60 से 90 दिन लगातार खिलाएं।",
-          "badge": "🥛 प्रीमियम कैटल फीड कंसंट्रेट",
-          "whatsapp_link": "https://wa.me/917974422572"
+          "id": "PAS004",
+          "name": "Uterus Tone Cleanser (500ml)",
+          "price": 550.0,
+          "mrp": 550.0,
+          "badge": "बांझपन निवारक",
+          "description": "बच्चेदानी की गंदगी साफ कर समय पर शुद्ध हीट में लाता है और गर्भ ठहरने की संभावना 90% बढ़ाता है।",
+          "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp"
         }
       ],
       "page_kpi_sections": [],
@@ -1876,42 +1868,44 @@
           "banner_mode": "full",
           "tag": "90 दिन में शुगर कंट्रोल?",
           "title": "असली राज जानिए…",
-          "subtitle": "",
+          "subtitle": "पैंक्रियाज बीटा सेल्स एक्टिवेशन और इंसुलिन रेजिस्टेंस का प्राकृतिक समाधान",
           "cta_text": "💬 AI डॉक्टर परामर्श",
           "cta_link": "https://wa.me/917974422572",
-          "cta_secondary_text": "",
-          "cta_secondary_link": ""
+          "cta_secondary_text": "📦 हर्बल उत्पाद",
+          "cta_secondary_link": "#sec-products"
         },
         {
           "image": "/images/banners/hero_slide-whatsapp-image-202-366304-v5a4.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html",
+          "tag": "🩸 90 दिन रिवर्सल प्लान",
+          "title": "प्राकृतिक इंसुलिन सेंसिटिविटी व फास्टिंग शुगर नियंत्रण",
+          "subtitle": "बिना हानिकारक साइड इफेक्ट के रक्त शर्करा को प्राकृतिक स्तर पर लाएं",
+          "cta_text": "📦 उत्पाद देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "🥗 डाइट गाइड",
+          "cta_secondary_link": "#sec-diet",
           "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-whatsapp-image-202-221438-qj4a.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🥗 साइंटिफिक डाइट",
+          "title": "24-घंटे का लो-ग्लाइसेमिक डाइट चार्ट",
+          "subtitle": "मेथी दाना, जामुन व फाइबर युक्त भोजन से भोजन के बाद का शुगर स्पाइक रोकें",
+          "cta_text": "🥗 डाइट चार्ट पढ़ें",
+          "cta_link": "#sec-diet",
+          "cta_secondary_text": "💬 परामर्श लें",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-whatsapp-image-202-454995-xpaf.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🌿 100% प्राकृतिक उपचार",
+          "title": "बीटा सेल्स रिजुविनेशन व हर्बल केयर",
+          "subtitle": "नेचुरल सप्लीमेंट्स जो नसों की कमजोरी और पैरों की जलन से मुक्ति दिलाएं",
+          "cta_text": "🛒 अभी आर्डर करें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "⭐ मरीज अनुभव",
+          "cta_secondary_link": "#sec-reviews",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -2127,43 +2121,47 @@
       "hero_slides": [
         {
           "image": "/images/banners/hero_slide-motapa-banner-593603-wb4y.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🔥 वजन नियंत्रण हब",
+          "title": "मोटापा व पेट की चर्बी घटाने का प्राकृतिक फॉर्मूला",
+          "subtitle": "बिना भूखे रहे और बिना कमजोरी के 5 से 8 किलो वजन नियंत्रित करें",
+          "cta_text": "📦 उत्पाद देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "💬 AI न्यूट्रिशनिस्ट",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-motapa-banner-2-643853-74xl.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "⚖️ फैट बर्न गाइड",
+          "title": "मेटाबॉलिज्म बूस्ट करें और जिद्दी फैट गलाएं",
+          "subtitle": "प्री-मील न्यूट्रिशन और डिटॉक्स थेरेपी से आंतों की शुद्धि",
+          "cta_text": "🥗 डाइट प्लान देखें",
+          "cta_link": "#sec-diet",
+          "cta_secondary_text": "🛒 अभी आर्डर करें",
+          "cta_secondary_link": "#sec-products",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-motapa-banner-3-713879-scql.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🥗 न्यूट्रिशन थेरेपी",
+          "title": "प्राकृतिक शेक्स व प्रोटीन आधारित वेट लॉस",
+          "subtitle": "शारीरिक ऊर्जा बनाए रखें और कैलोरी नियंत्रण में सफलता पाएं",
+          "cta_text": "📦 शेक व सप्लीमेंट",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "💬 मुफ़्त सलाह",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-motapa-banne4-794378-45vl.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🤖 AI एक्सपर्ट गाइड",
+          "title": "24×7 WhatsApp AI न्यूट्रिशनिस्ट सलाह",
+          "subtitle": "अपनी ऊंचाई व वजन के अनुसार व्यक्तिगत डाइट चार्ट तुरंत प्राप्त करें",
+          "cta_text": "📲 व्हाट्सएप सलाह",
+          "cta_link": "https://wa.me/917974422572",
+          "cta_secondary_text": "⭐ रिव्यू पढ़ें",
+          "cta_secondary_link": "#sec-reviews",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -2332,39 +2330,45 @@
           "image": "/images/banners/hero_slide-1003678884-907250-9plu.webp",
           "tag": "🦴 जॉइंट केयर",
           "title": "जोड़ों का दर्द व गठिया राहत",
-          "subtitle": "कार्टिलेज मजबूती व यूरिक एसिड नियंत्रण",
-          "cta_text": "💬 हर्बल थेरेपी परामर्श",
-          "cta_link": "https://wa.me/917974422572"
+          "subtitle": "कार्टिलेज मजबूती, साइनोवियल फ्लूइड बहाली व यूरिक एसिड नियंत्रण",
+          "cta_text": "📦 उपचार देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "💬 डॉक्टर सलाह",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-1003678885-919508-ty2x.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🦵 कार्टिलेज रिपेयर",
+          "title": "घुटनों का ग्रीस व कार्टिलेज पुनर्जीवन",
+          "subtitle": "सीढ़ियां चढ़ने और उठने-बैठने में कट-कट की आवाज व दर्द से मुक्ति",
+          "cta_text": "📦 जॉइंट केयर कैप्सूल",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "🥗 खानपान चार्ट",
+          "cta_secondary_link": "#sec-diet",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-1003678886-928731-mq38.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🌿 100% हर्बल आराम",
+          "title": "यूरिक एसिड व सूजन से स्थायी मुक्ति",
+          "subtitle": "प्राकृतिक हर्बल एक्सट्रैक्ट जो बिना पेनकिलर के जोड़ों को राहत दें",
+          "cta_text": "🛒 अभी आर्डर करें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "💬 व्हाट्सएप परामर्श",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-1003678888-943437-i9qr.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "✨ दर्दमुक्त जीवन",
+          "title": "आयुर्वेदिक जॉइंट केयर संपूर्ण थेरेपी",
+          "subtitle": "हजारों वरिष्ठ नागरिकों का भरोसेमंद हर्बल जोड़ पोषण",
+          "cta_text": "⭐ मरीज अनुभव",
+          "cta_link": "#sec-reviews",
+          "cta_secondary_text": "📦 उत्पाद देखें",
+          "cta_secondary_link": "#sec-products",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -2570,53 +2574,58 @@
       "hero_slides": [
         {
           "image": "/images/banners/hero_slide-femail-problm-791887-lnfv.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🌸 महिला स्वास्थ्य",
+          "title": "PCOD / PCOS व हार्मोनल संतुलन का प्राकृतिक समाधान",
+          "subtitle": "अनियमित माहवारी, वजन वृद्धि व चेहरे के अनचाहे बालों से मुक्ति",
+          "cta_text": "📦 समाधान देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "💬 महिला डॉक्टर सलाह",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-femail-2-799358-wr1o.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🩸 संपूर्ण नारी आरोग्य",
+          "title": "अनियमित माहवारी व गर्भाशय पोषण",
+          "subtitle": "हर्बल एक्सट्रैक्ट द्वारा प्राकृतिक पीरियड चक्र बहाली",
+          "cta_text": "📦 विमेन वेलनेस",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "🥗 हार्मोनल डाइट",
+          "cta_secondary_link": "#sec-diet",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-2-femail-805610-lwjd.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "💪 ऊर्जा व पोषण",
+          "title": "कमजोरी, खून की कमी व हीमोग्लोबिन सुधार",
+          "subtitle": "महिलाओं के लिए विशेष मल्टीविटामिन और आयरन सप्लीमेंट",
+          "cta_text": "🛒 अभी आर्डर करें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "💬 परामर्श लें",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-slide-feam3-811681-o6wl.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🌿 सुरक्षित उपचार",
+          "title": "प्राकृतिक आयुर्वेदिक महिला टॉनिक व न्यूट्रिशन",
+          "subtitle": "100% शाकाहारी, रसायन-मुक्त और प्रमाणित हर्बल उत्पाद",
+          "cta_text": "📦 उत्पाद देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "⭐ अनुभव पढ़ें",
+          "cta_secondary_link": "#sec-reviews",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-5fe-826149-3k0l.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "👩‍⚕️ AI विशेषज्ञ परामर्श",
+          "title": "24×7 WhatsApp AI महिला डॉक्टर सलाह",
+          "subtitle": "गोपनीय और सुरक्षित तरीके से अपने लक्षणों का समाधान पाएं",
+          "cta_text": "📲 तुरंत परामर्श लें",
+          "cta_link": "https://wa.me/917974422572",
+          "cta_secondary_text": "❓ सामान्य प्रश्न",
+          "cta_secondary_link": "#sec-faqs",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -2864,38 +2873,44 @@
           "tag": "💇‍♀️ हेयर केयर",
           "title": "हेयर केयर व डैंड्रफ समाधान",
           "subtitle": "नए बाल उगाने व हेयर फॉल रोकने का प्राकृतिक फॉर्मूला",
-          "cta_text": "💬 हेयर एनालिसिस करवाएं",
-          "cta_link": "https://wa.me/917974422572"
+          "cta_text": "📦 हेयर उत्पाद",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "💬 एक्सपर्ट सलाह",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-hair-care-1-168376-9fhu.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "💆‍♂️ स्कैल्प पोषण",
+          "title": "जड़ों से मजबूत बाल व 15 दिन में हेयरफॉल रोकथाम",
+          "subtitle": "स्कैल्प रीनाइसेंस न्यूट्रीमेंट द्वारा बालों की जड़ों को पोषण",
+          "cta_text": "🛒 अभी आर्डर करें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "🥗 हेयर डाइट",
+          "cta_secondary_link": "#sec-diet",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-hair-33-176702-9bv1.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "✨ हर्बल कंडीशनिंग",
+          "title": "डैंड्रफ व दोमुंहे बालों से स्थायी मुक्ति",
+          "subtitle": "एंटी-डैंड्रफ शैम्पू और हर्बल कंडीशनर का सुरक्षित संगम",
+          "cta_text": "📦 शैम्पू देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "💬 सलाह लें",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-hair-77-184520-86ds.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🌿 प्राकृतिक हेयर थेरेपी",
+          "title": "बायो-एक्टिव स्कैल्प सीरम व पोषण शैम्पू",
+          "subtitle": "बालों का पतलापन दूर कर घना और चमकदार बनाएं",
+          "cta_text": "⭐ समीक्षाएं पढ़ें",
+          "cta_link": "#sec-reviews",
+          "cta_secondary_text": "📦 किट ऑर्डर करें",
+          "cta_secondary_link": "#sec-products",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -3073,23 +3088,25 @@
       "hero_slides": [
         {
           "image": "/images/banners/hero_slide-skine-366961-milu.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🌺 नेचुरल स्किन केयर",
+          "title": "मुँहासे, पिग्मेंटेशन व झाइयों से प्राकृतिक सुरक्षा",
+          "subtitle": "एंटी एक्ने जेल व अंडर आई रीजुविनेटिंग फॉर्मूला",
+          "cta_text": "📦 स्किन उत्पाद",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "💬 स्किन डॉक्टर",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-skine23-429649-d0ai.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "✨ हर्बल ब्यूटी केयर",
+          "title": "केमिकल-मुक्त निखरी व ग्लोइंग त्वचा",
+          "subtitle": "एंटी पॉल्यूशन फेस वॉश और मॉइस्चराइजिंग सोप थेरेपी",
+          "cta_text": "🛒 अभी आर्डर करें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "⭐ कस्टमर रिव्यू",
+          "cta_secondary_link": "#sec-reviews",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -3572,36 +3589,36 @@
       "hero_slides": [
         {
           "image": "/images/banners/hero_slide-ed2-820992-3lfn.webp",
-          "banner_mode": "full",
           "tag": "⚡ VITALITY & MEN'S HEALTH",
           "title": "पौरुष कमजोरी: भ्रामक दवाओं से बचें, वैज्ञानिक समाधान चुनें",
           "subtitle": "नसों में ब्लड फ्लो, टेस्टोस्टेरोन और सहनशक्ति का 100% सुरक्षित आयुर्वेदिक कायाकल्प।",
-          "cta_text": "💬 गोपनीय AI डॉक्टर परामर्श",
+          "cta_text": "💬 विशेषज्ञ सलाह",
           "cta_link": "https://wa.me/917974422572",
-          "cta_secondary_text": "📦 सुरक्षित हर्बल किट ↓",
+          "cta_secondary_text": "📦 हर्बल उत्पाद",
           "cta_secondary_link": "#sec-products",
-          "back_link": "https://wa.me/917974422572"
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-ed67-970852-vf7e.webp",
-          "banner_mode": "full",
           "tag": "🥗 NATURAL PROTOCOL",
           "title": "24-घंटे का टेस्टोस्टेरोन व शक्ति वर्धक डाइट चार्ट",
           "subtitle": "जिंक, ओमेगा-3 व पेल्विक केगेल व्यायाम से नसों को दें नई ताकत।",
           "cta_text": "🥗 डाइट चार्ट पढ़ें",
           "cta_link": "#sec-diet",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "cta_secondary_text": "🛒 उत्पाद देखें",
+          "cta_secondary_link": "#sec-products",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-youn-334-893093-m2u5.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "💪 नेचुरल वाइटैलिटी",
+          "title": "पुरुष जीवन शक्ति व स्टैमिना वर्धक पोषण",
+          "subtitle": "Naturamore For Him व Men's Wellness द्वारा ऊर्जा संवर्धन",
+          "cta_text": "🛒 अभी आर्डर करें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "⭐ रिव्यू पढ़ें",
+          "cta_secondary_link": "#sec-reviews",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -3956,43 +3973,47 @@
       "hero_slides": [
         {
           "image": "/images/banners/hero_slide-netsurf-2-368522-u51q.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🇮🇳 नेटसर्फ डायरेक्ट सेलिंग",
+          "title": "कंपनी से सीधा ग्राहक: डायरेक्ट सेलिंग क्रांति",
+          "subtitle": "बिचौलियों और विज्ञापनों का 60% मुनाफा अब सीधे आपकी जेब में",
+          "cta_text": "💼 कैरियर प्लान देखें",
+          "cta_link": "#sec-plan",
+          "cta_secondary_text": "📝 फ्री रजिस्ट्रेशन",
+          "cta_secondary_link": "#sec-survey-form",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-n3-385140-3dx7.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "💼 कैरियर अवसर",
+          "title": "₹8,19,250 का क्लोजिंग प्लान व लाइफटाइम रॉयल्टी",
+          "subtitle": "हर 15 दिन में बैंक ट्रांसफर और फैमिली प्रोटेक्शन प्लान",
+          "cta_text": "📈 इनकम स्लैब देखें",
+          "cta_link": "#sec-plan",
+          "cta_secondary_text": "💬 एक्सपर्ट से बात",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-n4-394701-ygty.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "⚡ Zero Egress Formula",
+          "title": "ज़ीरो इग्रेस फॉर्मूला: शून्य नुकसान, आजीवन सुरक्षित रैंक",
+          "subtitle": "कोई अनिवार्य मासिक किट नहीं, हासिल की हुई रैंक कभी डिमोट नहीं होती",
+          "cta_text": "✨ सिस्टम समझें",
+          "cta_link": "#sec-plan",
+          "cta_secondary_text": "🛒 उत्पाद देखें",
+          "cta_secondary_link": "#sec-products",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-n6-402882-dwm7.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🚀 100% डिजिटल ऑटोमation",
+          "title": "आरोग्यम डिजिटल ऑटोमेशन व ऑनलाइन बिजनेस",
+          "subtitle": "घर बैठे पूरे भारत में ग्राहकों को जोड़ें और ऑटोमेटेड सिस्टम से आय बढ़ाएं",
+          "cta_text": "🤝 आज ही जुड़ें",
+          "cta_link": "#sec-survey-form",
+          "cta_secondary_text": "❓ सामान्य प्रश्न",
+          "cta_secondary_link": "#sec-faqs",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -5166,67 +5187,74 @@
           "cta_text": "🩺 समाधान चुनें",
           "cta_link": "#sec-categories",
           "cta_secondary_text": "💬 डॉक्टर परामर्श",
-          "cta_secondary_link": "https://wa.me/917974422572"
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-hair-77-319003-1iav.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "💇‍♀️ हेयर केयर हब",
+          "title": "बालों का झड़ना व डैंड्रफ समाधान",
+          "subtitle": "बायो-एक्टिव स्कैल्प पोषण और हर्बल शैम्पू",
+          "cta_text": "💇‍♀️ हेयर केयर देखें",
+          "cta_link": "/health/hair-care.html",
+          "cta_secondary_text": "💬 सलाह लें",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-2-femail-337594-jp9b.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🌸 महिला स्वास्थ्य",
+          "title": "PCOD / PCOS व महिला स्वास्थ्य मार्गदर्शन",
+          "subtitle": "हार्मोनल संतुलन और गर्भाशय पोषण के सुरक्षित आयुर्वेदिक उपाय",
+          "cta_text": "🌸 महिला हब देखें",
+          "cta_link": "/health/womens-care.html",
+          "cta_secondary_text": "💬 महिला डॉक्टर",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🌾 कृषि संवर्धन",
+          "title": "खरीफ फसल सुरक्षा व रोग रोकथाम 2026",
+          "subtitle": "फसल के डॉक्टर द्वारा वैज्ञानिक स्प्रे शेड्यूल व किट",
+          "cta_text": "🌾 कृषि गाइड पढ़ें",
+          "cta_link": "/index.html",
+          "cta_secondary_text": "📚 ई-बुक्स देखें",
+          "cta_secondary_link": "/ebooks/ebook.html",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-skine-1-357718-xc8p.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🌺 स्किन केयर",
+          "title": "प्राकृतिक त्वचा निखार व हर्बल केयर",
+          "subtitle": "मुँहासे व पिग्मेंटेशन से सुरक्षित आयुर्वेदिक समाधान",
+          "cta_text": "🌺 स्किन केयर देखें",
+          "cta_link": "/health/skin-care.html",
+          "cta_secondary_text": "🛒 उत्पाद देखें",
+          "cta_secondary_link": "/health/skin-care.html#sec-products",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-khatra-join-problm-384488-2iqy.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🦴 जॉइंट केयर",
+          "title": "गठिया, जोड़ों का दर्द व कार्टिलेज सुरक्षा",
+          "subtitle": "घुटनों का ग्रीस व लचीलापन लौटाने वाला हर्बल पोषण",
+          "cta_text": "🦴 जॉइंट केयर देखें",
+          "cta_link": "/health/joint-care.html",
+          "cta_secondary_text": "💬 सलाह लें",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-madhumeh-406609-2k17.webp",
-          "tag": "🌾 नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "📚 अभी देखें",
-          "cta_link": "/ebooks/ebook.html",
-          "cta_secondary_text": "🛒 लाइव कार्ट",
-          "cta_secondary_link": "/ebooks/cart.html"
+          "tag": "🩸 डायबिटीज केयर",
+          "title": "मधुमेह व ब्लड शुगर प्राकृतिक नियंत्रण",
+          "subtitle": "पैंक्रियाज पोषण व फास्टिंग-पीपी शर्करा नियंत्रण",
+          "cta_text": "🩸 डायबिटीज हब देखें",
+          "cta_link": "/health/diabetes.html",
+          "cta_secondary_text": "💬 डॉक्टर सलाह",
+          "cta_secondary_link": "https://wa.me/917974422572",
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
