@@ -26,44 +26,7 @@
       },
       "fb_pixel": true,
       "ga_tag": true,
-      "hero_slides": [
-        {
-          "image": "/images/banners/bk016-hero-banner.webp",
-          "tag": "🌾 120 पेज सम्पूर्ण गाइड 2026",
-          "title": "कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा की पूरी गाइड",
-          "subtitle": "रासायनिक दवाएँ • जैविक विकल्प • किसान के नुस्खे • सुरक्षित उपयोग",
-          "cta_text": "📖 ई-बुक देखें (मात्र ₹149)",
-          "cta_link": "/ebooks/book-landing.html?id=BK016",
-          "banner_mode": "full"
-        },
-        {
-          "image": "/images/banners/kheti-dr-banner-1.webp",
-          "tag": "🩺 किसान का पॉकेट डॉक्टर",
-          "title": "खेती का डॉक्टर — 50+ फसल रोगों व कीटों की पहचान व सटीक स्प्रे फॉर्मूला",
-          "subtitle": "धान, गेहूं, सोयाबीन, कपास व सब्जियों के रोगों का तत्काल निदान",
-          "cta_text": "📖 ई-बुक देखें (मात्र ₹99)",
-          "cta_link": "/ebooks/book-landing.html?id=BK002",
-          "banner_mode": "full"
-        },
-        {
-          "image": "/images/banners/bk015-hero-banner.webp",
-          "tag": "🌱 सब्जी खेती मास्टर (Part 1)",
-          "title": "सब्जी खेती मास्टर गाइड — नर्सरी से कटाई तक सम्पूर्ण प्रैक्टिकल ज्ञान",
-          "subtitle": "टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी व करेला",
-          "cta_text": "📖 ई-बुक देखें (मात्र ₹149)",
-          "cta_link": "/ebooks/book-landing.html?id=BK015",
-          "banner_mode": "full"
-        },
-        {
-          "image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
-          "tag": "🔥 सर्वाधिक लोकप्रिय गाइड",
-          "title": "खरीफ फसल मास्टर गाइड 2026 — सम्पूर्ण सचित्र वैज्ञानिक फसल सुरक्षा",
-          "subtitle": "सोयाबीन, धान, मक्का, मूंग व कपास में खरपतवार, रोग व कीटों का सम्पूर्ण निदान",
-          "cta_text": "📖 ई-बुक देखें (मात्र ₹99)",
-          "cta_link": "/ebooks/book-landing.html?id=BK001",
-          "banner_mode": "full"
-        }
-      ],
+      "hero_slides": [],
       "sections_order": [
         "sec_ticker",
         "sec_hero_slider",
@@ -320,7 +283,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1790855034777,
+      "admin_edited": 1791018139381,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
