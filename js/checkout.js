@@ -248,6 +248,87 @@ function verifyOfferSignature(targetBookId, amount, mobile, sig, timer, exp) {
   );
 }
 
+// -------------------------------------------------------------
+// OFFER CLAIMS & CONVERSION TRACKING HELPER
+// -------------------------------------------------------------
+function recordCheckoutOfferClaim(mobile, name, bookId, bookTitle, offerPrice, timer) {
+    try {
+        const cleanMob = String(mobile || '').replace(/\D/g, '').slice(-10);
+        if (!cleanMob || cleanMob.length !== 10) return;
+        const claims = JSON.parse(localStorage.getItem('AOI_OFFER_CLAIMS') || '[]');
+        const bookKey = bookId || 'BK001';
+        const existingIdx = claims.findIndex(c => c.mobile === cleanMob && c.book_id === bookKey);
+        const item = {
+            mobile: cleanMob,
+            name: (name || '').trim(),
+            book_id: bookKey,
+            book_title: bookTitle || 'Aarogyam eBook',
+            offer_price: Number(offerPrice) || 0,
+            timer: timer || 'none',
+            claimed_at: new Date().toISOString(),
+            status: 'claimed'
+        };
+        if (existingIdx >= 0) {
+            claims[existingIdx] = { ...claims[existingIdx], ...item };
+        } else {
+            claims.unshift(item);
+        }
+        localStorage.setItem('AOI_OFFER_CLAIMS', JSON.stringify(claims.slice(0, 300)));
+    } catch(e) {}
+}
+
+function markCheckoutOfferPurchased(mobile, bookId, amount, orderId) {
+    try {
+        const cleanMob = String(mobile || '').replace(/\D/g, '').slice(-10);
+        const claims = JSON.parse(localStorage.getItem('AOI_OFFER_CLAIMS') || '[]');
+        let updated = false;
+        claims.forEach(c => {
+            if (c.mobile === cleanMob && (!c.status || c.status === 'claimed')) {
+                c.status = 'purchased';
+                c.purchased_at = new Date().toISOString();
+                c.order_id = orderId || ('ORD_' + Date.now());
+                c.amount_paid = Number(amount) || 0;
+                updated = true;
+            }
+        });
+        if (updated) {
+            localStorage.setItem('AOI_OFFER_CLAIMS', JSON.stringify(claims));
+        }
+
+        // Also sync into WhatsApp offer purchases report
+        try {
+            const waList = JSON.parse(localStorage.getItem('AOI_WHATSAPP_OFFER_PURCHASES') || '[]');
+            const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+            const sid = userObj.share_id || userObj.referral_code || '';
+            const matchingClaim = claims.find(c => c.mobile === cleanMob);
+            const bookTitle = matchingClaim ? matchingClaim.book_title : (bookId || 'eBook');
+            const newWaItem = {
+                id: 'wa_pur_' + Date.now(),
+                user_id: cleanMob,
+                identifier: sid || cleanMob,
+                name: (userObj.full_name ? `${sid || cleanMob} • ${userObj.full_name}` : `${sid || cleanMob} (WhatsApp ग्राहक)`),
+                mobile: cleanMob,
+                share_id: sid,
+                state: userObj.State || userObj.district || 'भारत',
+                book_id: bookId,
+                book_title: bookTitle,
+                offer_type: '📲 WhatsApp स्पेशल ऑफर लिंक',
+                offer_price: Number(amount) || 0,
+                amount_paid: Number(amount) || 0,
+                status: 'converted',
+                order_id: orderId || ('WA_ORD_' + Date.now()),
+                timestamp: new Date().toISOString(),
+                source: 'whatsapp_offer_link'
+            };
+            const alreadyExists = waList.some(item => item.mobile === cleanMob && item.book_id === bookId);
+            if (!alreadyExists) {
+                waList.unshift(newWaItem);
+                localStorage.setItem('AOI_WHATSAPP_OFFER_PURCHASES', JSON.stringify(waList));
+            }
+        } catch(waErr) {}
+    } catch(e) {}
+}
+
 // 🛡️ Security Banner, VIP Offer Thumbnail & Hindi Voice Note Engine
 let checkoutCountdownTimerId = null;
 let checkoutUtterance = null;
@@ -824,6 +905,18 @@ async function loadBook() {
                     }
                 }
 
+                // Record Combo Offer Claim for Admin Reports & Conversion Tracking
+                if (window.activeVerifiedOffer && window.activeVerifiedOffer.mobile) {
+                    recordCheckoutOfferClaim(
+                        window.activeVerifiedOffer.mobile,
+                        offerName,
+                        window.currentCheckoutBook.id,
+                        comboTitle,
+                        comboPrice,
+                        offerTimer
+                    );
+                }
+
                 autoFillUserData();
                 return;
             }
@@ -1018,6 +1111,16 @@ async function loadBook() {
 
             // 🛑 CHECK IF ALREADY PURCHASED (1-Time Use Protection)
             await checkOfferAlreadyPurchased(offerMobileTarget, resolvedName, book.id || targetId, bookName);
+
+            // Record Single Book Offer Claim for Admin Reports & Conversion Tracking
+            recordCheckoutOfferClaim(
+                offerMobileTarget,
+                resolvedName,
+                book.id || targetId,
+                bookName,
+                bookOffer,
+                offerTimer
+            );
         }
 
         const sumBook = document.getElementById("summaryBook");
@@ -1421,6 +1524,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 localStorage.setItem('AI_USER', JSON.stringify(userObj));
                 localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
                 localStorage.setItem('user_is_active', 'true');
+                markCheckoutOfferPurchased(mobile, bookIdToBuy, 0, freePaymentId);
             } catch (saveErr) {
                 console.warn('Free purchase save note:', saveErr);
             }
@@ -1507,6 +1611,8 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                                 is_subscriber: isSub ? true : userObj.is_subscriber
                             }).eq('id', activeUserId || userObj.id);
                         }
+
+                        markCheckoutOfferPurchased(mobile, bookIdToBuy, bookPrice, response.razorpay_order_id || response.razorpay_payment_id);
                     } catch (saveErr) {
                         console.warn('Local purchase save note:', saveErr);
                     }

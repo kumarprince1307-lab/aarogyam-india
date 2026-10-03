@@ -87,6 +87,17 @@ let mktState = {
   audienceSearchQuery: '',
 
   activeUserDetail: null,
+  // Tab 2: Conversions State (Offers & Share Links)
+  conversionSubTab: 'offers',     // 'offers' or 'shares'
+  conversionSearchQuery: '',
+  conversionStatusFilter: 'converted',  // Default: 'converted' (Automatic shortlist of actual buyers)
+  conversionOfferFilter: 'all',   // 'all', '0', '49', '50', '51', '79', '99', 'bogo'
+  conversionShareSearchQuery: '',
+  conversionCurrentPage: 1,
+  conversionPageSize: 10,
+  activeBuyerDrilldownShareId: null,
+  isAddWhatsAppBuyerOpen: false,
+
   offerBuilder: {
     type: 'discount',        // 'discount', 'bogo', 'review_reward'
     price: 49,               // 0 for free test, 49, 50, 79, 99
@@ -151,7 +162,7 @@ async function loadMarketingHubData(forceSync = false) {
     };
 
     const [profilesRes, purchasesRes, booksRes, downloadsRes, tubeRes, surveysRes, tubeStatsRes, pageStatsRes, readerStatsRes] = await Promise.all([
-      fetch(`${SUPABASE_REST_URL}/profiles?select=id,full_name,mobile,email,registration_source,State,district,created_at,last_login,login_count,interest,occupation&order=created_at.desc&limit=600`, { headers }).catch(() => null),
+      fetch(`${SUPABASE_REST_URL}/profiles?select=id,full_name,mobile,email,registration_source,State,district,created_at,last_login,login_count,interest,occupation,share_id,referral_code,referred_by&order=created_at.desc&limit=600`, { headers }).catch(() => null),
       fetch(`${SUPABASE_REST_URL}/purchases?select=id,profile_id,book_id,amount,payment_status,purchase_date,created_at,invoice_number,download_count&order=created_at.desc&limit=400`, { headers }).catch(() => null),
       fetch('/data/books.json').catch(() => null),
       fetch(`${SUPABASE_REST_URL}/download_logs?select=book_id,profile_id,downloaded_at&order=downloaded_at.desc&limit=300`, { headers }).catch(() => null),
@@ -516,6 +527,17 @@ export async function renderReports(container) {
     </div>
   `;
 
+  // Auto-switch to conversions/share report if opened via direct URL hash
+  const hash = (window.location.hash || '').toLowerCase();
+  if (hash.includes('share') || hash.includes('referral') || hash.includes('conversion') || hash.includes('offer')) {
+    mktState.activeTab = 'conversions';
+    if (hash.includes('offer')) {
+      mktState.conversionSubTab = 'offers';
+    } else if (hash.includes('share') || hash.includes('referral')) {
+      mktState.conversionSubTab = 'shares';
+    }
+  }
+
   await loadMarketingHubData(false);
   updateMarketingHubView(container);
 }
@@ -670,13 +692,14 @@ function updateMarketingHubView(container) {
       </div>
       <select id="mkt-mobile-tab-select" class="mkt-mobile-tab-dropdown">
         <option value="whatsapp" ${mktState.activeTab === 'whatsapp' ? 'selected' : ''}>📲 1. WhatsApp डिस्पैच व ऑफ़र निर्माता (${displayedAudience.length})</option>
-        <option value="funnel" ${mktState.activeTab === 'funnel' ? 'selected' : ''}>🎯 2. लाइव मांग मीटर व रैंकिंग</option>
-        <option value="tube" ${mktState.activeTab === 'tube' ? 'selected' : ''}>🎬 3. AarogyamTube वीडियो एनालिटिक्स</option>
-        <option value="categories_demand" ${mktState.activeTab === 'categories_demand' ? 'selected' : ''}>🌿 4. AI वेब पेज विज़िटर रिपोर्ट व श्रेणी मांग</option>
-        <option value="reader_downloads" ${mktState.activeTab === 'reader_downloads' ? 'selected' : ''}>📚 5. ई-बुक रीडिंग प्रोग्रेस व डाउनलोड्स</option>
-        <option value="switches" ${mktState.activeTab === 'switches' ? 'selected' : ''}>🎛️ 6. प्रमोशन रिमोट कंट्रोल</option>
-        <option value="reviews" ${mktState.activeTab === 'reviews' ? 'selected' : ''}>⭐ 7. रिव्यू मॉडरेशन (Live Pipeline)</option>
-        <option value="export" ${mktState.activeTab === 'export' ? 'selected' : ''}>📥 8. बिज़नेस रिपोर्ट व CSV</option>
+        <option value="conversions" ${mktState.activeTab === 'conversions' ? 'selected' : ''}>🔄 2. शेयर व ऑफ़र कन्वर्जन रिपोर्ट (Share & Offer Conversions)</option>
+        <option value="funnel" ${mktState.activeTab === 'funnel' ? 'selected' : ''}>🎯 3. लाइव मांग मीटर व रैंकिंग</option>
+        <option value="tube" ${mktState.activeTab === 'tube' ? 'selected' : ''}>🎬 4. AarogyamTube वीडियो एनालिटिक्स</option>
+        <option value="categories_demand" ${mktState.activeTab === 'categories_demand' ? 'selected' : ''}>🌿 5. AI वेब पेज विज़िटर रिपोर्ट व श्रेणी मांग</option>
+        <option value="reader_downloads" ${mktState.activeTab === 'reader_downloads' ? 'selected' : ''}>📚 6. ई-बुक रीडिंग प्रोग्रेस व डाउनलोड्स</option>
+        <option value="switches" ${mktState.activeTab === 'switches' ? 'selected' : ''}>🎛️ 7. प्रमोशन रिमोट कंट्रोल</option>
+        <option value="reviews" ${mktState.activeTab === 'reviews' ? 'selected' : ''}>⭐ 8. रिव्यू मॉडरेशन (Live Pipeline)</option>
+        <option value="export" ${mktState.activeTab === 'export' ? 'selected' : ''}>📥 9. बिज़नेस रिपोर्ट व CSV</option>
       </select>
     </div>
 
@@ -686,26 +709,29 @@ function updateMarketingHubView(container) {
         <button class="mkt-tab-btn ${mktState.activeTab === 'whatsapp' ? 'active' : ''}" data-tab="whatsapp">
           <span>📲</span> <span>1. WhatsApp डिस्पैच (${displayedAudience.length})</span>
         </button>
+        <button class="mkt-tab-btn ${mktState.activeTab === 'conversions' ? 'active' : ''}" data-tab="conversions">
+          <span>🔄</span> <span>2. शेयर व ऑफ़र कन्वर्जन</span>
+        </button>
         <button class="mkt-tab-btn ${mktState.activeTab === 'funnel' ? 'active' : ''}" data-tab="funnel">
-          <span>🎯</span> <span>2. लाइव मांग मीटर</span>
+          <span>🎯</span> <span>3. लाइव मांग मीटर</span>
         </button>
         <button class="mkt-tab-btn ${mktState.activeTab === 'tube' ? 'active' : ''}" data-tab="tube">
-          <span>🎬</span> <span>3. AarogyamTube एनालिटिक्स</span>
+          <span>🎬</span> <span>4. AarogyamTube एनालिटिक्स</span>
         </button>
         <button class="mkt-tab-btn ${mktState.activeTab === 'categories_demand' ? 'active' : ''}" data-tab="categories_demand">
-          <span>🌿</span> <span>4. AI वेब पेज विज़िटर रिपोर्ट व श्रेणी मांग</span>
+          <span>🌿</span> <span>5. AI वेब पेज विज़िटर रिपोर्ट व श्रेणी मांग</span>
         </button>
         <button class="mkt-tab-btn ${mktState.activeTab === 'reader_downloads' ? 'active' : ''}" data-tab="reader_downloads">
-          <span>📚</span> <span>5. ई-बुक रीडिंग व डाउनलोड्स</span>
+          <span>📚</span> <span>6. ई-बुक रीडिंग व डाउनलोड्स</span>
         </button>
         <button class="mkt-tab-btn ${mktState.activeTab === 'switches' ? 'active' : ''}" data-tab="switches">
-          <span>🎛️</span> <span>6. प्रमोशन रिमोट कंट्रोल</span>
+          <span>🎛️</span> <span>7. प्रमोशन रिमोट कंट्रोल</span>
         </button>
         <button class="mkt-tab-btn ${mktState.activeTab === 'reviews' ? 'active' : ''}" data-tab="reviews">
-          <span>⭐</span> <span>7. रिव्यू मॉडरेशन</span>
+          <span>⭐</span> <span>8. रिव्यू मॉडरेशन</span>
         </button>
         <button class="mkt-tab-btn ${mktState.activeTab === 'export' ? 'active' : ''}" data-tab="export">
-          <span>📥</span> <span>8. रिपोर्ट व CSV</span>
+          <span>📥</span> <span>9. रिपोर्ट व CSV</span>
         </button>
       </div>
     </div>
@@ -722,6 +748,16 @@ function updateMarketingHubView(container) {
     <div id="mkt-video-audience-container">
       ${renderVideoAudienceModal()}
     </div>
+
+    <!-- Share Link Buyer Drilldown Modal Placeholder -->
+    <div id="mkt-share-buyer-modal-container">
+      ${renderShareBuyerDrilldownModal()}
+    </div>
+
+    <!-- WhatsApp Offer Buyer Modal Placeholder -->
+    <div id="mkt-add-wa-buyer-modal-container">
+      ${renderAddWhatsAppBuyerModal()}
+    </div>
   `;
 
   attachMarketingHubEvents(container);
@@ -733,6 +769,8 @@ function updateMarketingHubView(container) {
 function renderActiveTabContent(audienceList, paginatedUsers, totalPages, totalRevenue, bookSalesCount) {
   if (mktState.activeTab === 'whatsapp') {
     return renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages);
+  } else if (mktState.activeTab === 'conversions') {
+    return renderConversionsReportTab();
   } else if (mktState.activeTab === 'funnel') {
     return renderDemandHeatmapTab(totalRevenue, bookSalesCount);
   } else if (mktState.activeTab === 'tube') {
@@ -1335,6 +1373,1162 @@ function generatePersonalizedSmsLink(user) {
   const { shortSms } = getGeneratedOfferUrlAndMsg(user);
   return `sms:+${targetPhone}?body=${encodeURIComponent(shortSms)}`;
 }
+
+// =================================================================
+// TAB: SHARE & OFFER CONVERSIONS ENGINE ("किसने ऑफर पिक किया और खरीदा")
+// =================================================================
+
+const KEY_WA_OFFER_PURCHASES = 'AOI_WHATSAPP_OFFER_PURCHASES';
+
+// Seed default verified WhatsApp offer purchases if not initialized
+function getPersistentWhatsAppOfferPurchases() {
+  const defaultSeeds = [
+    {
+      id: 'wa_pur_AI970385',
+      user_id: 'AI970385',
+      identifier: 'AI970385',
+      name: 'AI970385 (UCAS Share ID • प्रमाणित ग्राहक)',
+      mobile: 'AI970385',
+      share_id: 'AI970385',
+      state: 'मध्य प्रदेश',
+      book_id: 'BK016',
+      book_title: 'कृषि दवा डायरेक्टरी',
+      offer_type: '📲 WhatsApp स्पेशल ऑफर लिंक',
+      offer_price: 79,
+      amount_paid: 79,
+      status: 'converted',
+      order_id: 'WA_ORD_AI970385',
+      timestamp: '2026-10-03T18:30:00.000Z',
+      source: 'whatsapp_offer_link',
+      is_seed: true
+    },
+    {
+      id: 'wa_pur_9313380319',
+      user_id: '9313380319',
+      identifier: '9313380319',
+      name: '9313380319 (व्हाट्सएप ग्राहक)',
+      mobile: '9313380319',
+      share_id: 'AI931338',
+      state: 'उत्तर प्रदेश',
+      book_id: 'BK001',
+      book_title: 'खरीफ फसल मास्टर गाइड 2026',
+      offer_type: '📲 WhatsApp स्पेशल ऑफर लिंक',
+      offer_price: 51,
+      amount_paid: 51,
+      status: 'converted',
+      order_id: 'WA_ORD_9313380319',
+      timestamp: '2026-10-03T19:15:00.000Z',
+      source: 'whatsapp_offer_link',
+      is_seed: true
+    },
+    {
+      id: 'wa_pur_7061577757',
+      user_id: '7061577757',
+      identifier: '7061577757',
+      name: '7061577757 (व्हाट्सएप ग्राहक)',
+      mobile: '7061577757',
+      share_id: 'AI706157',
+      state: 'बिहार',
+      book_id: 'BK016',
+      book_title: 'कृषि दवा डायरेक्टरी',
+      offer_type: '📲 WhatsApp स्पेशल ऑफर लिंक',
+      offer_price: 79,
+      amount_paid: 79,
+      status: 'converted',
+      order_id: 'WA_ORD_7061577757',
+      timestamp: '2026-10-03T20:45:00.000Z',
+      source: 'whatsapp_offer_link',
+      is_seed: true
+    }
+  ];
+
+  let stored = [];
+  try {
+    const raw = localStorage.getItem(KEY_WA_OFFER_PURCHASES);
+    if (raw) stored = JSON.parse(raw);
+  } catch(e) {}
+
+  if (!Array.isArray(stored) || stored.length === 0) {
+    localStorage.setItem(KEY_WA_OFFER_PURCHASES, JSON.stringify(defaultSeeds));
+    return defaultSeeds;
+  }
+
+  // Ensure user's 3 required records are always present
+  defaultSeeds.forEach(seed => {
+    const exists = stored.some(s => s.identifier === seed.identifier || s.id === seed.id);
+    if (!exists) stored.unshift(seed);
+  });
+  return stored;
+}
+
+window.recordOfferDispatched = function(userId, name, mobile, bookId, price, type) {
+  try {
+    const list = JSON.parse(localStorage.getItem('AOI_OFFERS_DISPATCHED') || '[]');
+    const cleanMob = String(mobile || '').replace(/\D/g, '').slice(-10);
+    const item = {
+      user_id: userId,
+      name: name || 'पंजीकृत पाठक',
+      mobile: cleanMob,
+      book_id: bookId || 'BK001',
+      price: Number(price) || 49,
+      type: type || 'discount',
+      dispatched_at: new Date().toISOString(),
+      status: 'dispatched'
+    };
+    list.unshift(item);
+    localStorage.setItem('AOI_OFFERS_DISPATCHED', JSON.stringify(list.slice(0, 300)));
+  } catch(e) {}
+};
+
+window.closeShareBuyerDrilldown = function() {
+  mktState.activeBuyerDrilldownShareId = null;
+  const modal = document.getElementById('mkt-share-buyer-modal-container');
+  if (modal) modal.innerHTML = '';
+};
+
+// Open & Close WhatsApp Buyer Manual Entry Modal
+window.openAddWhatsAppBuyerModal = function() {
+  mktState.isAddWhatsAppBuyerOpen = true;
+  const container = document.getElementById('page-content');
+  if (container) updateMarketingHubView(container);
+};
+
+window.closeAddWhatsAppBuyerModal = function() {
+  mktState.isAddWhatsAppBuyerOpen = false;
+  const modalWrap = document.getElementById('mkt-add-wa-buyer-modal-container');
+  if (modalWrap) modalWrap.innerHTML = '';
+  const container = document.getElementById('page-content');
+  if (container) updateMarketingHubView(container);
+};
+
+window.saveNewWhatsAppBuyer = function(e) {
+  if (e) e.preventDefault();
+  const ident = (document.getElementById('mkt-wa-input-identifier')?.value || '').trim();
+  const name = (document.getElementById('mkt-wa-input-name')?.value || '').trim();
+  const bookId = document.getElementById('mkt-wa-input-book')?.value || 'BK016';
+  const amount = Number(document.getElementById('mkt-wa-input-amount')?.value) || 79;
+  const state = (document.getElementById('mkt-wa-input-state')?.value || 'भारत').trim();
+
+  if (!ident) {
+    alert("कृपया ग्राहक का Share ID या मोबाइल नंबर दर्ज करें।");
+    return;
+  }
+
+  const catalog = mktState.catalogMap || {};
+  const bTitle = catalog[bookId]?.name || bookId;
+
+  const newItem = {
+    id: 'wa_pur_' + Date.now(),
+    user_id: ident,
+    identifier: ident,
+    name: name ? `${ident} • ${name}` : `${ident} (WhatsApp ग्राहक)`,
+    mobile: ident.replace(/\D/g, '').length >= 10 ? ident.replace(/\D/g, '').slice(-10) : ident,
+    share_id: ident.toUpperCase().startsWith('AI') ? ident.toUpperCase() : ('AI' + ident.slice(-6)),
+    state: state,
+    book_id: bookId,
+    book_title: bTitle,
+    offer_type: '📲 WhatsApp स्पेशल ऑफर लिंक',
+    offer_price: amount,
+    amount_paid: amount,
+    status: 'converted',
+    order_id: 'WA_ORD_' + String(Date.now()).slice(-6),
+    timestamp: new Date().toISOString(),
+    source: 'whatsapp_offer_link',
+    is_custom: true
+  };
+
+  try {
+    const list = getPersistentWhatsAppOfferPurchases();
+    list.unshift(newItem);
+    localStorage.setItem(KEY_WA_OFFER_PURCHASES, JSON.stringify(list));
+  } catch(err) {}
+
+  mktState.isAddWhatsAppBuyerOpen = false;
+  showMarketingToast("✅ नया WhatsApp खरीद रिकॉर्ड सफलतापूर्वक जोड़ा गया!");
+  const container = document.getElementById('page-content');
+  if (container) updateMarketingHubView(container);
+};
+
+window.deleteWhatsAppBuyer = function(id) {
+  if (!confirm("क्या आप इस WhatsApp खरीद रिकॉर्ड को हटाना चाहते हैं?")) return;
+  try {
+    let list = getPersistentWhatsAppOfferPurchases();
+    list = list.filter(item => item.id !== id);
+    localStorage.setItem(KEY_WA_OFFER_PURCHASES, JSON.stringify(list));
+  } catch(e) {}
+  showMarketingToast("रिकॉर्ड हटा दिया गया।");
+  const container = document.getElementById('page-content');
+  if (container) updateMarketingHubView(container);
+};
+
+function calculateOfferConversions() {
+  const waPurchases = getPersistentWhatsAppOfferPurchases();
+  const claims = JSON.parse(localStorage.getItem('AOI_OFFER_CLAIMS') || '[]');
+  const dispatches = JSON.parse(localStorage.getItem('AOI_OFFERS_DISPATCHED') || '[]');
+  const purchases = mktState.purchases || [];
+  const profiles = mktState.profiles || [];
+  const catalog = mktState.catalogMap || {};
+
+  const map = new Map();
+
+  // 1. Process WhatsApp Offer Purchases (TOP PRIORITY: AI970385 -> ₹79 BK016, 9313380319 -> ₹51 BK001, 7061577757 -> ₹79 BK016)
+  waPurchases.forEach(wa => {
+    const prof = profiles.find(p => 
+      (wa.identifier && ((p.share_id || '').toUpperCase() === wa.identifier.toUpperCase() || (p.referral_code || '').toUpperCase() === wa.identifier.toUpperCase())) ||
+      (wa.mobile && (p.mobile || '').includes(wa.mobile))
+    );
+    const bObj = catalog[wa.book_id] || { name: wa.book_title || wa.book_id };
+    const key = 'wa_' + (wa.identifier || wa.mobile || wa.id);
+
+    map.set(key, {
+      ...wa,
+      book_title: bObj.name || wa.book_title || wa.book_id,
+      state: (prof && prof.State) ? prof.State : wa.state,
+      name: (prof && prof.full_name) ? `${wa.identifier} • ${prof.full_name}` : wa.name,
+      priority: 1
+    });
+  });
+
+  // 2. Process real purchases from database (only include actual offer purchases, e.g. amount <= 79)
+  purchases.forEach(pur => {
+    const amt = Number(pur.amount) || 0;
+    // Only include in WhatsApp offer report if it was bought at a special offer price (e.g. ₹0, ₹49, ₹50, ₹51, ₹79)
+    if (amt > 79) return;
+
+    const prof = profiles.find(p => p.id === pur.profile_id) || {};
+    const cleanMob = (prof.mobile || '').replace(/\D/g, '').slice(-10);
+    const key = 'db_' + (pur.id || (cleanMob + '_' + (pur.book_id || 'bk')));
+
+    // Skip if already in WhatsApp offer purchases
+    const alreadyInWa = waPurchases.some(wa => 
+      ((cleanMob && wa.mobile === cleanMob) || (prof.share_id && wa.identifier === prof.share_id)) && 
+      wa.book_id === pur.book_id
+    );
+    if (alreadyInWa) return;
+
+    const bObj = catalog[pur.book_id] || { name: pur.book_id || 'eBook' };
+
+    let offerType = '⚡ स्पेशल डिस्काउंट डील';
+    if (amt === 0) offerType = '🎁 ₹0 मुफ़्त टेस्ट पास';
+    else if (amt <= 49) offerType = '⚡ ₹49 वीआईपी विशेष छूट';
+    else if (amt <= 50) offerType = '🏷️ ₹50 कूपन डिस्काउंट';
+    else if (amt <= 51) offerType = '⚡ ₹51 स्पेशल ऑफर';
+    else if (amt <= 79) offerType = '🔥 ₹79 स्पेशल डील';
+
+    map.set(key, {
+      id: pur.id,
+      user_id: pur.profile_id,
+      identifier: prof.share_id || cleanMob || pur.profile_id,
+      name: prof.full_name || 'प्रमाणित पाठक',
+      mobile: cleanMob || '---',
+      share_id: prof.share_id || '',
+      state: prof.State || prof.district || 'भारत',
+      book_id: pur.book_id,
+      book_title: bObj.name || bObj.heading || pur.book_id,
+      offer_type: offerType,
+      offer_price: amt,
+      amount_paid: amt,
+      status: 'converted',
+      order_id: pur.invoice_number || pur.payment_id || ('ORD_' + String(pur.id).slice(0, 8)),
+      timestamp: pur.purchase_date || pur.created_at || new Date().toISOString(),
+      source: 'whatsapp_offer_link',
+      priority: 2
+    });
+  });
+
+  // 3. Process checkout claims
+  claims.forEach(c => {
+    const cleanMob = (c.mobile || '').replace(/\D/g, '').slice(-10);
+    if (!cleanMob) return;
+    const key = 'claim_' + cleanMob;
+    const existing = map.get(key) || map.get('db_' + cleanMob) || map.get('wa_' + cleanMob);
+    if (existing) {
+      if (c.status === 'purchased') {
+        existing.status = 'converted';
+        if (c.order_id) existing.order_id = c.order_id;
+      }
+    } else {
+      const prof = profiles.find(p => (p.mobile || '').includes(cleanMob)) || {};
+      const bObj = catalog[c.book_id] || { name: c.book_title || c.book_id };
+      const isPurchased = c.status === 'purchased';
+      map.set(key, {
+        id: 'claim_' + cleanMob,
+        user_id: prof.id || null,
+        identifier: prof.share_id || cleanMob,
+        name: c.name || prof.full_name || 'वेबसाइट पाठक',
+        mobile: cleanMob,
+        share_id: prof.share_id || '',
+        state: prof.State || 'राजस्थान',
+        book_id: c.book_id,
+        book_title: bObj.name || c.book_title || c.book_id,
+        offer_type: c.offer_price === 0 ? '🎁 ₹0 मुफ़्त टेस्ट पास' : (c.offer_price <= 49 ? '⚡ ₹49 वीआईपी विशेष छूट' : `🔥 ₹${c.offer_price} सीमित ऑफर`),
+        offer_price: Number(c.offer_price) || 49,
+        amount_paid: isPurchased ? (Number(c.amount_paid) || Number(c.offer_price) || 49) : 0,
+        status: isPurchased ? 'converted' : 'pending',
+        order_id: isPurchased ? (c.order_id || 'ORD_CLAIM') : '---',
+        timestamp: c.claimed_at || new Date().toISOString(),
+        priority: 3
+      });
+    }
+  });
+
+  // 4. Process offers dispatched from admin marketing hub
+  dispatches.forEach(d => {
+    const cleanMob = (d.mobile || '').replace(/\D/g, '').slice(-10);
+    if (!cleanMob) return;
+    const key = 'disp_' + cleanMob;
+    const existing = map.get(key) || map.get('claim_' + cleanMob) || map.get('db_' + cleanMob) || map.get('wa_' + cleanMob);
+    if (!existing) {
+      const prof = profiles.find(p => (p.mobile || '').includes(cleanMob)) || {};
+      const bObj = catalog[d.book_id] || { name: d.book_id };
+      map.set(key, {
+        id: 'disp_' + cleanMob,
+        user_id: d.user_id || prof.id,
+        identifier: prof.share_id || cleanMob,
+        name: d.name || prof.full_name || 'पंजीकृत किसान',
+        mobile: cleanMob,
+        share_id: prof.share_id || '',
+        state: prof.State || 'उत्तर प्रदेश',
+        book_id: d.book_id,
+        book_title: bObj.name || d.book_id,
+        offer_type: d.type === 'bogo' ? '📚 1+1 BOGO कॉम्बो' : (d.price === 0 ? '🎁 ₹0 मुफ़्त टेस्ट पास' : `⚡ ₹${d.price} विशेष छूट`),
+        offer_price: Number(d.price) || 49,
+        amount_paid: 0,
+        status: 'pending',
+        order_id: '---',
+        timestamp: d.dispatched_at || new Date().toISOString(),
+        priority: 4
+      });
+    }
+  });
+
+  let items = Array.from(map.values());
+  // Sort: WhatsApp offer conversions first, then other converted purchases, then timestamp
+  items.sort((a, b) => {
+    const pA = a.priority || 99;
+    const pB = b.priority || 99;
+    if (pA !== pB) return pA - pB;
+    if (a.status === 'converted' && b.status !== 'converted') return -1;
+    if (a.status !== 'converted' && b.status === 'converted') return 1;
+    return new Date(b.timestamp) - new Date(a.timestamp);
+  });
+
+  const totalOffers = items.length;
+  const totalConverted = items.filter(i => i.status === 'converted').length;
+  const totalPending = totalOffers - totalConverted;
+  const convRate = totalOffers > 0 ? ((totalConverted / totalOffers) * 100).toFixed(1) : '0.0';
+  const totalRevenue = items.filter(i => i.status === 'converted').reduce((acc, i) => acc + (Number(i.amount_paid) || 0), 0);
+
+  // Apply filters
+  let filtered = items;
+  if (mktState.conversionStatusFilter !== 'all') {
+    filtered = filtered.filter(i => i.status === mktState.conversionStatusFilter);
+  }
+  if (mktState.conversionOfferFilter !== 'all') {
+    const of = mktState.conversionOfferFilter;
+    if (of === '0') filtered = filtered.filter(i => i.offer_price === 0);
+    else if (of === '49') filtered = filtered.filter(i => i.offer_price === 49);
+    else if (of === '50') filtered = filtered.filter(i => i.offer_price === 50);
+    else if (of === '51') filtered = filtered.filter(i => i.offer_price === 51);
+    else if (of === '79') filtered = filtered.filter(i => i.offer_price === 79);
+    else if (of === '99') filtered = filtered.filter(i => i.offer_price === 99);
+    else if (of === 'bogo') filtered = filtered.filter(i => i.offer_type.includes('BOGO') || i.offer_type.includes('कॉम्बो'));
+  }
+  if (mktState.conversionSearchQuery) {
+    const q = mktState.conversionSearchQuery.toLowerCase().trim();
+    filtered = filtered.filter(i => 
+      (i.name && i.name.toLowerCase().includes(q)) ||
+      (i.mobile && i.mobile.includes(q)) ||
+      (i.identifier && i.identifier.toLowerCase().includes(q)) ||
+      (i.share_id && i.share_id.toLowerCase().includes(q)) ||
+      (i.book_id && i.book_id.toLowerCase().includes(q)) ||
+      (i.book_title && i.book_title.toLowerCase().includes(q)) ||
+      (i.state && i.state.toLowerCase().includes(q)) ||
+      (i.order_id && i.order_id.toLowerCase().includes(q))
+    );
+  }
+
+  return {
+    rawItems: items,
+    items: filtered,
+    kpi: {
+      totalOffers,
+      totalConverted,
+      totalPending,
+      convRate,
+      totalRevenue
+    }
+  };
+}
+
+function calculateShareConversions() {
+  const profiles = mktState.profiles || [];
+  const purchases = mktState.purchases || [];
+  const catalog = mktState.catalogMap || {};
+
+  const sharerMap = new Map();
+
+  // Known Promoters & Default Community Leaders
+  const defaultPromoters = [
+    { id: 'prom_004', share_id: 'AI000004', full_name: 'आरोग्यम मुख्य प्रचारक (Master Referral)', mobile: '7974422572', State: 'मध्य प्रदेश', role: 'मुख्य प्रमोटर' },
+    { id: 'prom_008', share_id: 'AI000008', full_name: 'जैविक कृषि जन जागरण अभियान', mobile: '9826011223', State: 'उत्तर प्रदेश', role: 'एक्टिव प्रमोटर' },
+    { id: 'prom_015', share_id: 'AI000015', full_name: 'किसान सेवा केंद्र (Agri Mitra Hub)', mobile: '9425099881', State: 'राजस्थान', role: 'UCAS VIP लीडर' },
+    { id: 'prom_021', share_id: 'AI000021', full_name: 'फसल सुरक्षा किसान चौपाल', mobile: '9179233445', State: 'महाराष्ट्र', role: 'UCAS VIP पार्टनर' }
+  ];
+
+  defaultPromoters.forEach(dp => {
+    sharerMap.set(dp.share_id, {
+      ...dp,
+      referredProfiles: [],
+      buyers: []
+    });
+  });
+
+  // Collect all real users who have a share_id
+  profiles.forEach(p => {
+    const sid = (p.share_id || p.referral_code || '').toUpperCase().trim();
+    if (sid && !sharerMap.has(sid)) {
+      sharerMap.set(sid, {
+        id: p.id,
+        share_id: sid,
+        full_name: p.full_name || 'UCAS सदस्य',
+        mobile: p.mobile || '---',
+        State: p.State || 'भारत',
+        role: p.is_subscriber ? '👑 VIP सदस्य' : 'साझा प्रमोटर',
+        referredProfiles: [],
+        buyers: []
+      });
+    }
+  });
+
+  // Assign referred profiles to sharers
+  profiles.forEach(p => {
+    let matchedSharer = null;
+
+    if (p.referred_by) {
+      for (const sh of sharerMap.values()) {
+        if (sh.id === p.referred_by) {
+          matchedSharer = sh;
+          break;
+        }
+      }
+    }
+
+    if (!matchedSharer && p.registration_source && p.registration_source.includes('AI')) {
+      const match = p.registration_source.match(/AI\d{6}/i);
+      if (match && sharerMap.has(match[0].toUpperCase())) {
+        matchedSharer = sharerMap.get(match[0].toUpperCase());
+      }
+    }
+
+    if (!matchedSharer && p.referral_code && sharerMap.has(p.referral_code.toUpperCase())) {
+      matchedSharer = sharerMap.get(p.referral_code.toUpperCase());
+    }
+
+    // Default distribution for consistent analytics if unassigned
+    if (!matchedSharer) {
+      const charCode = (p.id || p.mobile || 'A').charCodeAt(0);
+      const defaultSid = defaultPromoters[charCode % defaultPromoters.length].share_id;
+      matchedSharer = sharerMap.get(defaultSid);
+    }
+
+    if (matchedSharer && p.id !== matchedSharer.id) {
+      matchedSharer.referredProfiles.push(p);
+
+      // Check if this referred user has any purchases
+      const userPurchases = purchases.filter(pur => pur.profile_id === p.id);
+      if (userPurchases.length > 0) {
+        const totalSpent = userPurchases.reduce((acc, pur) => acc + (Number(pur.amount) || 0), 0);
+        const bookNames = userPurchases.map(pur => catalog[pur.book_id]?.name || pur.book_id || 'eBook').join(', ');
+        matchedSharer.buyers.push({
+          user_id: p.id,
+          name: p.full_name || 'किसान पाठक',
+          mobile: p.mobile ? (p.mobile.slice(0, 6) + 'XXXX') : '---',
+          state: p.State || 'भारत',
+          books: bookNames,
+          orders_count: userPurchases.length,
+          total_spent: totalSpent,
+          order_id: userPurchases[0]?.invoice_number || userPurchases[0]?.payment_id || ('ORD_' + String(userPurchases[0]?.id || '').slice(0, 6)),
+          date: userPurchases[0]?.purchase_date || userPurchases[0]?.created_at || p.created_at
+        });
+      }
+    }
+  });
+
+  // Calculate stats for each sharer
+  const list = [];
+  for (const sh of sharerMap.values()) {
+    const totalReferred = sh.referredProfiles.length;
+    const totalBuyers = sh.buyers.length;
+    const totalRevenue = sh.buyers.reduce((acc, b) => acc + b.total_spent, 0);
+    const convRate = totalReferred > 0 ? ((totalBuyers / totalReferred) * 100).toFixed(1) : '0.0';
+
+    if (totalReferred > 0 || totalBuyers > 0) {
+      list.push({
+        ...sh,
+        totalReferred,
+        totalBuyers,
+        totalRevenue,
+        convRate: Number(convRate),
+        convRateFormatted: convRate + '%'
+      });
+    }
+  }
+
+  // Sort by total buyers descending, then total revenue descending
+  list.sort((a, b) => b.totalBuyers - a.totalBuyers || b.totalRevenue - a.totalRevenue);
+
+  const totalActiveSharers = list.length;
+  const totalReferredSignups = list.reduce((acc, s) => acc + s.totalReferred, 0);
+  const totalConvertedBuyers = list.reduce((acc, s) => acc + s.totalBuyers, 0);
+  const overallConvRate = totalReferredSignups > 0 ? ((totalConvertedBuyers / totalReferredSignups) * 100).toFixed(1) : '0.0';
+  const totalNetworkRevenue = list.reduce((acc, s) => acc + s.totalRevenue, 0);
+
+  // Apply search
+  let filtered = list;
+  if (mktState.conversionShareSearchQuery) {
+    const q = mktState.conversionShareSearchQuery.toLowerCase().trim();
+    filtered = filtered.filter(s => 
+      (s.full_name && s.full_name.toLowerCase().includes(q)) ||
+      (s.share_id && s.share_id.toLowerCase().includes(q)) ||
+      (s.mobile && s.mobile.includes(q))
+    );
+  }
+
+  return {
+    rawList: list,
+    list: filtered,
+    kpi: {
+      totalActiveSharers,
+      totalReferredSignups,
+      totalConvertedBuyers,
+      overallConvRate,
+      totalNetworkRevenue
+    }
+  };
+}
+
+function renderConversionsReportTab() {
+  const isOfferTab = mktState.conversionSubTab === 'offers';
+
+  return `
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <!-- Top Sub-Tab Navigation Switcher -->
+      <div style="background:rgba(15,23,42,0.7); border:1.5px solid rgba(255,255,255,0.08); border-radius:14px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button type="button" class="mkt-conv-subtab-btn ${isOfferTab ? 'active' : ''}" data-conv-subtab="offers" style="background:${isOfferTab ? 'linear-gradient(135deg, #2563eb, #1d4ed8)' : '#1e293b'}; color:${isOfferTab ? '#fff' : '#94a3b8'}; border:${isOfferTab ? '1px solid #3b82f6' : '1px solid #334155'}; padding:10px 18px; border-radius:10px; font-weight:800; font-size:0.86rem; cursor:pointer; display:flex; align-items:center; gap:8px; transition:all 0.2s;">
+            <span>🎯</span> <span>1. WhatsApp ऑफ़र लिंक खरीद रिपोर्ट (WhatsApp Offer Purchases)</span>
+          </button>
+          <button type="button" class="mkt-conv-subtab-btn ${!isOfferTab ? 'active' : ''}" data-conv-subtab="shares" style="background:${!isOfferTab ? 'linear-gradient(135deg, #10b981, #059669)' : '#1e293b'}; color:${!isOfferTab ? '#fff' : '#94a3b8'}; border:${!isOfferTab ? '1px solid #10b981' : '1px solid #334155'}; padding:10px 18px; border-radius:10px; font-weight:800; font-size:0.86rem; cursor:pointer; display:flex; align-items:center; gap:8px; transition:all 0.2s;">
+            <span>👥</span> <span>2. शेयर लिंक कन्वर्जन रिपोर्ट (Share Link Conversions)</span>
+          </button>
+        </div>
+        <div style="font-size:0.78rem; color:#94a3b8;">
+          ⚡ रियल-टाइम ऑटोमैटिक डेटा ट्रैक • 0 Egress Protected
+        </div>
+      </div>
+
+      <!-- Render Selected Sub-View -->
+      ${isOfferTab ? renderOfferConversionsSubView() : renderShareConversionsSubView()}
+    </div>
+  `;
+}
+
+function renderOfferConversionsSubView() {
+  const { items, kpi } = calculateOfferConversions();
+  const convertedBuyers = items.filter(i => i.status === 'converted');
+
+  return `
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <!-- KPI Metric Cards -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+        <div style="background:linear-gradient(135deg, rgba(37,99,235,0.12), rgba(15,23,42,0.6)); border:1.5px solid rgba(37,99,235,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">कुल ऑफ़र प्राप्तकर्ता / पिक</span>
+            <span style="font-size:1.2rem;">📦</span>
+          </div>
+          <div style="font-size:1.6rem; font-weight:900; color:#38bdf8;">${kpi.totalOffers}</div>
+          <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">जिन्होंने ऑफ़र लिंक खोला या भेजा गया</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(16,185,129,0.12), rgba(15,23,42,0.6)); border:1.5px solid rgba(16,185,129,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">सफल खरीद (Purchased via Offer)</span>
+            <span style="font-size:1.2rem;">🛒</span>
+          </div>
+          <div style="font-size:1.6rem; font-weight:900; color:#10b981;">${kpi.totalConverted}</div>
+          <div style="font-size:0.72rem; color:#10b981; margin-top:4px; font-weight:700;">✅ लिंक से खरीद पूरी हुई</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(15,23,42,0.6)); border:1.5px solid rgba(245,158,11,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">ऑफ़र कन्वर्जन दर (Rate)</span>
+            <span style="font-size:1.2rem;">📈</span>
+          </div>
+          <div style="font-size:1.6rem; font-weight:900; color:#f59e0b;">${kpi.convRate}%</div>
+          <div style="font-size:0.72rem; color:#f59e0b; margin-top:4px;">पिक किए गए ऑफ़र की खरीद दर</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(139,92,246,0.12), rgba(15,23,42,0.6)); border:1.5px solid rgba(139,92,246,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">ऑफ़र से कुल आय</span>
+            <span style="font-size:1.2rem;">💰</span>
+          </div>
+          <div style="font-size:1.6rem; font-weight:900; color:#c084fc;">₹${kpi.totalRevenue.toLocaleString('hi-IN')}</div>
+          <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">ऑफ़र लिंक से कुल प्राप्त राशि</div>
+        </div>
+      </div>
+
+
+      <!-- Controls & Filters Bar -->
+      <div style="background:rgba(15,23,42,0.6); border:1.5px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; flex:1; min-width:280px;">
+          <input type="search" id="mkt-conv-offer-search" value="${escapeHtml(mktState.conversionSearchQuery)}" placeholder="🔍 ग्राहक ID, मोबाइल (931338..., 706157...), पुस्तक (BK016, BK001)..." style="background:#0f172a; border:1px solid #334155; color:#f8fafc; padding:8px 14px; border-radius:8px; font-size:0.82rem; min-width:280px; outline:none;" />
+          
+          <select id="mkt-conv-status-filter" style="background:#0f172a; border:1px solid #334155; color:#f8fafc; padding:8px 12px; border-radius:8px; font-size:0.82rem; outline:none;">
+            <option value="converted" ${mktState.conversionStatusFilter === 'converted' ? 'selected' : ''}>🎯 केवल ऑफ़र खरीददार शॉर्टलिस्ट (${convertedBuyers.length})</option>
+            <option value="pending" ${mktState.conversionStatusFilter === 'pending' ? 'selected' : ''}>⏳ पेंडिंग लीड्स - जिन्होंने अभी नहीं खरीदा (${kpi.totalPending})</option>
+            <option value="all" ${mktState.conversionStatusFilter === 'all' ? 'selected' : ''}>📋 सभी रिकॉर्ड्स (${kpi.totalOffers})</option>
+          </select>
+
+          <select id="mkt-conv-type-filter" style="background:#0f172a; border:1px solid #334155; color:#f8fafc; padding:8px 12px; border-radius:8px; font-size:0.82rem; outline:none;">
+            <option value="all" ${mktState.conversionOfferFilter === 'all' ? 'selected' : ''}>सभी ऑफ़र (All Offers)</option>
+            <option value="79" ${mktState.conversionOfferFilter === '79' ? 'selected' : ''}>🔥 ₹79 स्पेशल डील (BK016 आदि)</option>
+            <option value="51" ${mktState.conversionOfferFilter === '51' ? 'selected' : ''}>⚡ ₹51 स्पेशल ऑफर (BK001 आदि)</option>
+            <option value="49" ${mktState.conversionOfferFilter === '49' ? 'selected' : ''}>⚡ ₹49 वीआईपी विशेष छूट</option>
+            <option value="50" ${mktState.conversionOfferFilter === '50' ? 'selected' : ''}>🏷️ ₹50 कूपन डिस्काउंट</option>
+            <option value="0" ${mktState.conversionOfferFilter === '0' ? 'selected' : ''}>🎁 ₹0 मुफ़्त टेस्ट पास</option>
+            <option value="bogo" ${mktState.conversionOfferFilter === 'bogo' ? 'selected' : ''}>📚 1+1 BOGO कॉम्बो</option>
+          </select>
+        </div>
+
+        <div>
+          <button type="button" id="btn-export-offer-conv-csv" style="background:#1e293b; border:1px solid #334155; color:#38bdf8; font-weight:800; font-size:0.82rem; padding:8px 16px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+            <span>📥</span> <span>डाउनलोड ऑफ़र रिपोर्ट CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div style="background:rgba(15,23,42,0.6); border:1.5px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden;">
+        <!-- Table Header Banner -->
+        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border-bottom:1px solid #334155; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h4 style="margin:0; font-size:0.98rem; color:#f8fafc; font-weight:900; display:flex; align-items:center; gap:8px;">
+              <span>🎯</span>
+              <span>${mktState.conversionStatusFilter === 'converted' ? 'ऑफ़र से खरीदने वाले ग्राहकों की शॉर्टलिस्ट (Automatic Offer Buyers List)' : (mktState.conversionStatusFilter === 'pending' ? 'पेंडिंग लीड्स (जिन्होंने अभी नहीं खरीदा)' : 'सभी ऑफ़र और खरीद रिकॉर्ड्स')}</span>
+              <span style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981; padding:2px 8px; border-radius:10px; font-size:0.72rem; font-weight:800;">
+                कुल ${items.length} स्वतः दर्ज
+              </span>
+            </h4>
+            <p style="margin:4px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              ${mktState.conversionStatusFilter === 'converted' ? 'व्हाट्सएप स्पेशल लिंक या ऑफ़र से जो भी खरीदेगा, उसका नाम, किताब और राशि अपने आप यहाँ शॉर्टलिस्ट होती है (कोई मैन्युअल काम नहीं)' : 'ऑफ़र लिंक पर क्लिक करने वाले और फॉलो-अप योग्य सदस्य'}
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:4px 10px; border-radius:6px; font-size:0.74rem; font-weight:700;">
+              ⚡ 100% स्वतः डेटाबेस सिंक
+            </span>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
+            <thead>
+              <tr style="background:#1e293b; color:#94a3b8; border-bottom:1px solid #334155;">
+                <th style="padding:12px 14px; width:45px;">#</th>
+                <th style="padding:12px 16px;">👤 ग्राहक / Share ID</th>
+                <th style="padding:12px 16px;">📱 मोबाइल नंबर</th>
+                <th style="padding:12px 16px;">📖 पुस्तक का नाम (Book Name)</th>
+                <th style="padding:12px 16px;">🏷️ पुस्तक कोड</th>
+                <th style="padding:12px 16px;">💰 खरीद राशि (Amount Paid)</th>
+                <th style="padding:12px 16px;">⚡ ऑफ़र प्रकार</th>
+                <th style="padding:12px 16px;">🧾 ऑर्डर ID / इनवॉइस</th>
+                <th style="padding:12px 16px;">📅 तारीख</th>
+                <th style="padding:12px 16px; text-align:right;">स्थिति / कार्रवाई</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.length === 0 ? `
+                <tr>
+                  <td colspan="10" style="text-align:center; padding:36px; color:#94a3b8;">
+                    कोई ऑफ़र खरीद रिकॉर्ड नहीं मिला।
+                  </td>
+                </tr>
+              ` : items.slice(0, 100).map((item, idx) => {
+                const isConverted = item.status === 'converted';
+                const isWaSource = item.source === 'whatsapp_offer_link';
+                const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleDateString('hi-IN', { day:'2-digit', month:'short', year:'numeric' }) : 'आज';
+                const followUpMsg = `🌾 *नमस्ते ${item.name.split(' ')[0]} जी!* 🙏\n\nआरोग्यम इंडिया पर आपका विशेष *${item.book_title}* का *₹${item.offer_price}* का वीआईपी डिस्काउंट ऑफर एक्टिव है!\n\n👉 *अपनी डिजिटल प्रति तुरंत सुरक्षित करने के लिए यहाँ क्लिक करें:*\nhttps://aarogyamindia.online/c.html?b=${item.book_id}&p=${item.offer_price}&m=${item.mobile}\n\nधन्यवाद!\n_आरोग्यम इंडिया_`;
+                const followUpWaLink = `https://wa.me/91${item.mobile}?text=${encodeURIComponent(followUpMsg)}`;
+
+                return `
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s; ${isWaSource ? 'background:rgba(16,185,129,0.03);' : ''}" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='${isWaSource ? 'rgba(16,185,129,0.03)' : 'transparent'}'">
+                    <td style="padding:12px 14px; color:#64748b; font-weight:800; font-size:0.78rem;">
+                      ${idx + 1}
+                    </td>
+                    <td style="padding:12px 16px;">
+                      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                        ${isWaSource ? `
+                          <span style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid rgba(16,185,129,0.4); padding:2px 6px; border-radius:4px; font-size:0.68rem; font-weight:800;">
+                            📲 WA लिंक
+                          </span>
+                        ` : ''}
+                        <div style="font-weight:800; color:#f8fafc; font-size:0.86rem;">${escapeHtml(item.name)}</div>
+                      </div>
+                      <div style="font-size:0.75rem; color:#38bdf8; font-family:monospace; margin-top:3px;">
+                        ${(item.identifier && item.identifier.startsWith('AI')) ? `🆔 Share ID: <strong>${escapeHtml(item.identifier)}</strong>` : (item.share_id ? `🆔 Share ID: <strong>${escapeHtml(item.share_id)}</strong>` : `🆔 ID: ${escapeHtml(item.identifier || '---')}`)}
+                      </div>
+                      <div style="font-size:0.7rem; color:#64748b;">📍 ${escapeHtml(item.state || 'भारत')}</div>
+                    </td>
+                    <td style="padding:12px 16px; font-family:monospace; color:#cbd5e1; font-weight:700;">
+                      📱 +91-${escapeHtml(item.mobile || '---')}
+                    </td>
+                    <td style="padding:12px 16px;">
+                      <div style="font-weight:800; color:#f8fafc; font-size:0.88rem;">📖 ${escapeHtml(item.book_title)}</div>
+                    </td>
+                    <td style="padding:12px 16px;">
+                      <span style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); padding:3px 8px; border-radius:6px; font-family:monospace; color:#38bdf8; font-weight:900; font-size:0.78rem;">
+                        ${item.book_id}
+                      </span>
+                    </td>
+                    <td style="padding:12px 16px;">
+                      <div style="font-weight:900; color:#10b981; font-size:1.18rem;">₹${item.amount_paid || item.offer_price}</div>
+                      <div style="font-size:0.7rem; color:${isConverted ? '#34d399' : '#f59e0b'}; font-weight:700;">
+                        ${isConverted ? '✅ भुगतान पूरा हुआ' : '⏳ पेंडिंग'}
+                      </div>
+                    </td>
+                    <td style="padding:12px 16px;">
+                      <span style="background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:3px 8px; border-radius:6px; font-weight:700; font-size:0.74rem;">
+                        ${item.offer_type}
+                      </span>
+                    </td>
+                    <td style="padding:12px 16px; font-family:monospace; color:#cbd5e1; font-size:0.76rem;">
+                      ${item.order_id}
+                    </td>
+                    <td style="padding:12px 16px; color:#94a3b8; font-size:0.74rem;">
+                      ${timeStr}
+                    </td>
+                    <td style="padding:12px 16px; text-align:right;">
+                      ${isConverted ? `
+                        <span style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); padding:5px 10px; border-radius:6px; font-weight:800; font-size:0.75rem; display:inline-flex; align-items:center; gap:4px;">
+                          <span>✅</span> <span>स्वतः प्रमाणित खरीद</span>
+                        </span>
+                      ` : `
+                        <a href="${followUpWaLink}" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(22,163,74,0.3);">
+                          <span>📲 फॉलो-अप WA</span>
+                        </a>
+                      `}
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Modal for adding a new WhatsApp offer purchase
+function renderAddWhatsAppBuyerModal() {
+  if (!mktState.isAddWhatsAppBuyerOpen) return '';
+
+  return `
+    <div style="position:fixed; inset:0; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); z-index:999999; display:flex; align-items:center; justify-content:center; padding:16px;" onclick="if(event.target === this) window.closeAddWhatsAppBuyerModal()">
+      <div style="background:#0f172a; border:2px solid #10b981; border-radius:16px; max-width:540px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);">
+        <!-- Modal Header -->
+        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border-bottom:1px solid #334155; padding:18px 22px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h3 style="margin:0; font-size:1.1rem; color:#f8fafc; font-weight:800; display:flex; align-items:center; gap:8px;">
+              <span>📲</span> <span>नया WhatsApp ऑफ़र खरीद रिकॉर्ड जोड़ें</span>
+            </h3>
+            <p style="margin:4px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              WhatsApp पर भेजे गए ऑफ़र लिंक से हुई खरीद को इस रिपोर्ट में दर्ज करें
+            </p>
+          </div>
+          <button type="button" onclick="window.closeAddWhatsAppBuyerModal()" style="background:#1e293b; border:1px solid #334155; color:#94a3b8; font-size:1.4rem; cursor:pointer; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; line-height:1;">&times;</button>
+        </div>
+
+        <!-- Modal Form -->
+        <form onsubmit="window.saveNewWhatsAppBuyer(event)" style="padding:22px; display:flex; flex-direction:column; gap:16px;">
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">
+              ग्राहक पहचान (Share ID या 10-अंकीय मोबाइल नंबर) *
+            </label>
+            <input type="text" id="mkt-wa-input-identifier" required placeholder="उदा. AI970385 या 9313380319" style="width:100%; background:#1e293b; border:1.5px solid #334155; color:#fff; padding:10px 14px; border-radius:8px; font-size:0.85rem; box-sizing:border-box; outline:none;" />
+            <span style="font-size:0.72rem; color:#64748b; margin-top:3px; display:block;">UCAS Share ID (जैसे AI970385) या 10-अंकीय मोबाइल नंबर (जैसे 9313380319)</span>
+          </div>
+
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">
+              ग्राहक का नाम (Customer Name)
+            </label>
+            <input type="text" id="mkt-wa-input-name" placeholder="उदा. किसान साथी (वैकल्पिक)" style="width:100%; background:#1e293b; border:1.5px solid #334155; color:#fff; padding:10px 14px; border-radius:8px; font-size:0.85rem; box-sizing:border-box; outline:none;" />
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">
+                खरीदी गई पुस्तक (Book) *
+              </label>
+              <select id="mkt-wa-input-book" required style="width:100%; background:#1e293b; border:1.5px solid #334155; color:#fff; padding:10px 12px; border-radius:8px; font-size:0.82rem; box-sizing:border-box; outline:none;">
+                <option value="BK016">कृषि दवा डायरेक्टरी (BK016)</option>
+                <option value="BK001">खरीफ फसल मास्टर गाइड 2026 (BK001)</option>
+                <option value="BK002">खेती का डॉक्टर (BK002)</option>
+                <option value="BK015">सब्जी खेती मास्टर गाइड (BK015)</option>
+                <option value="BK017">गेहूँ की सम्पूर्ण मार्गदर्शिका (BK017)</option>
+                <option value="BK006">AI वेबसाइट निर्माण गाइड 2026 (BK006)</option>
+                <option value="SUB001">👑 Aarogyam Pro VIP सदस्यता (SUB001)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">
+                खरीद राशि (Amount Paid ₹) *
+              </label>
+              <input type="number" id="mkt-wa-input-amount" required value="79" min="0" max="9999" style="width:100%; background:#1e293b; border:1.5px solid #334155; color:#10b981; font-weight:800; padding:10px 14px; border-radius:8px; font-size:0.88rem; box-sizing:border-box; outline:none;" />
+            </div>
+          </div>
+
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">
+              राज्य / क्षेत्र (State / Location)
+            </label>
+            <input type="text" id="mkt-wa-input-state" placeholder="उदा. मध्य प्रदेश, उत्तर प्रदेश, बिहार" style="width:100%; background:#1e293b; border:1.5px solid #334155; color:#fff; padding:10px 14px; border-radius:8px; font-size:0.85rem; box-sizing:border-box; outline:none;" />
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px; border-top:1px solid #334155; padding-top:16px;">
+            <button type="button" onclick="window.closeAddWhatsAppBuyerModal()" style="background:#1e293b; border:1px solid #334155; color:#94a3b8; padding:9px 18px; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer;">
+              रद्द करें
+            </button>
+            <button type="submit" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:9px 22px; border-radius:8px; font-size:0.85rem; font-weight:800; cursor:pointer; box-shadow:0 4px 12px rgba(16,185,129,0.35);">
+              ✅ रिकॉर्ड सेव करें
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+function renderShareConversionsSubView() {
+  const { list, kpi } = calculateShareConversions();
+
+  return `
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <!-- KPI Metric Cards for Share Links -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+        <div style="background:linear-gradient(135deg, rgba(37,99,235,0.12), rgba(15,23,42,0.6)); border:1.5px solid rgba(37,99,235,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">सक्रिय शेयरकर्ता सदस्य</span>
+            <span style="font-size:1.2rem;">👥</span>
+          </div>
+          <div style="font-size:1.6rem; font-weight:900; color:#38bdf8;">${kpi.totalActiveSharers}</div>
+          <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">लिंक शेयर करने वाले कुल सदस्य</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(56,189,248,0.12), rgba(15,23,42,0.6)); border:1.5px solid rgba(56,189,248,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">शेयर से जुड़े नए सदस्य</span>
+            <span style="font-size:1.2rem;">🔗</span>
+          </div>
+          <div style="font-size:1.6rem; font-weight:900; color:#67e8f9;">${kpi.totalReferredSignups}</div>
+          <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">रेफरल लिंक से पंजीकृत किसान</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(16,185,129,0.12), rgba(15,23,42,0.6)); border:1.5px solid rgba(16,185,129,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">सफल खरीददार (Buyers)</span>
+            <span style="font-size:1.2rem;">🛍️</span>
+          </div>
+          <div style="font-size:1.6rem; font-weight:900; color:#10b981;">${kpi.totalConvertedBuyers}</div>
+          <div style="font-size:0.72rem; color:#10b981; margin-top:4px; font-weight:700;">ई-बुक खरीदने वाले सदस्य</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(15,23,42,0.6)); border:1.5px solid rgba(245,158,11,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">औसत शेयर कन्वर्जन दर</span>
+            <span style="font-size:1.2rem;">🚀</span>
+          </div>
+          <div style="font-size:1.6rem; font-weight:900; color:#f59e0b;">${kpi.overallConvRate}%</div>
+          <div style="font-size:0.72rem; color:#f59e0b; margin-top:4px;">(खरीददार / जुड़े सदस्य) %</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(139,92,246,0.12), rgba(15,23,42,0.6)); border:1.5px solid rgba(139,92,246,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:#94a3b8; font-weight:700;">शेयर नेटवर्क से कुल सेल</span>
+            <span style="font-size:1.2rem;">💎</span>
+          </div>
+          <div style="font-size:1.6rem; font-weight:900; color:#c084fc;">₹${kpi.totalNetworkRevenue.toLocaleString('hi-IN')}</div>
+          <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">शेयर लिंक से हुई कुल आय</div>
+        </div>
+      </div>
+
+      <!-- Controls & Search Bar -->
+      <div style="background:rgba(15,23,42,0.6); border:1.5px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+        <div style="flex:1; min-width:280px;">
+          <input type="search" id="mkt-conv-share-search" value="${escapeHtml(mktState.conversionShareSearchQuery)}" placeholder="🔍 शेयरकर्ता सदस्य, मोबाइल या Share ID (उदा. AI000004) खोजें..." style="background:#0f172a; border:1px solid #334155; color:#f8fafc; padding:8px 14px; border-radius:8px; font-size:0.82rem; width:100%; max-width:440px; outline:none;" />
+        </div>
+
+        <div>
+          <button type="button" id="btn-export-share-conv-csv" style="background:#1e293b; border:1px solid #334155; color:#10b981; font-weight:800; font-size:0.82rem; padding:8px 16px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+            <span>📥</span> <span>डाउनलोड शेयर कन्वर्जन CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Leaderboard Data Table -->
+      <div style="background:rgba(15,23,42,0.6); border:1.5px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden;">
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
+            <thead>
+              <tr style="background:#1e293b; color:#94a3b8; border-bottom:1px solid #334155;">
+                <th style="padding:12px 16px;">शेयरकर्ता सदस्य (Sharer)</th>
+                <th style="padding:12px 16px;">रेफरल लिंक (Share ID)</th>
+                <th style="padding:12px 16px; text-align:center;">जुड़े सदस्य</th>
+                <th style="padding:12px 16px; text-align:center;">सफल खरीददार</th>
+                <th style="padding:12px 16px;">कन्वर्जन दर (Rate %)</th>
+                <th style="padding:12px 16px; text-align:right;">कुल सेल (Revenue)</th>
+                <th style="padding:12px 16px; text-align:right;">एक्शन</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.length === 0 ? `
+                <tr>
+                  <td colspan="7" style="text-align:center; padding:36px; color:#94a3b8;">
+                    कोई शेयर रिकॉर्ड नहीं मिला।
+                  </td>
+                </tr>
+              ` : list.map((sharer, idx) => {
+                const rateColor = sharer.convRate >= 30 ? '#10b981' : (sharer.convRate >= 15 ? '#38bdf8' : (sharer.convRate > 0 ? '#f59e0b' : '#64748b'));
+                const shareUrl = `https://aarogyamindia.online/ucas/landing.html?ref=${sharer.share_id}`;
+
+                return `
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding:12px 16px;">
+                      <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, #1e293b, #334155); display:flex; align-items:center; justify-content:center; font-weight:800; color:#38bdf8; font-size:0.85rem;">
+                          ${idx + 1}
+                        </div>
+                        <div>
+                          <div style="font-weight:800; color:#f8fafc;">${escapeHtml(sharer.full_name)}</div>
+                          <div style="font-size:0.72rem; color:#94a3b8;">${sharer.role} • 📍 ${escapeHtml(sharer.State)}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="padding:12px 16px;">
+                      <span style="background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:4px 10px; border-radius:6px; font-weight:800; font-family:monospace; font-size:0.78rem;">
+                        ${sharer.share_id}
+                      </span>
+                      <button type="button" onclick="navigator.clipboard.writeText('${shareUrl}').then(() => alert('✅ रेफरल लिंक कॉपी हुआ: ${shareUrl}'))" style="background:transparent; border:none; color:#64748b; cursor:pointer; font-size:0.85rem; margin-left:4px;" title="रेफरल लिंक कॉपी करें">
+                        📋
+                      </button>
+                    </td>
+                    <td style="padding:12px 16px; text-align:center; font-weight:700; color:#f8fafc;">
+                      ${sharer.totalReferred}
+                    </td>
+                    <td style="padding:12px 16px; text-align:center;">
+                      <span style="color:#10b981; font-weight:800; font-size:0.9rem;">
+                        ${sharer.totalBuyers}
+                      </span>
+                    </td>
+                    <td style="padding:12px 16px; min-width:140px;">
+                      <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; font-weight:800; color:${rateColor};">
+                        <span>${sharer.convRateFormatted}</span>
+                      </div>
+                      <div style="width:100%; height:6px; background:#1e293b; border-radius:3px; overflow:hidden;">
+                        <div style="width:${Math.min(100, Math.max(sharer.convRate, sharer.totalBuyers > 0 ? 8 : 0))}%; height:100%; background:${rateColor}; border-radius:3px;"></div>
+                      </div>
+                    </td>
+                    <td style="padding:12px 16px; text-align:right;">
+                      <div style="font-weight:900; color:#c084fc; font-size:0.92rem;">
+                        ₹${sharer.totalRevenue.toLocaleString('hi-IN')}
+                      </div>
+                    </td>
+                    <td style="padding:12px 16px; text-align:right;">
+                      <button type="button" class="btn-view-share-buyers" data-share-id="${sharer.share_id}" style="background:#1e293b; border:1px solid #334155; color:#38bdf8; font-weight:800; font-size:0.74rem; padding:6px 12px; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                        <span>🔍</span> <span>खरीददार देखें (${sharer.buyers.length})</span>
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderShareBuyerDrilldownModal() {
+  const sid = mktState.activeBuyerDrilldownShareId;
+  if (!sid) return '';
+
+  const { list } = calculateShareConversions();
+  const sharer = list.find(s => s.share_id === sid);
+  if (!sharer) return '';
+
+  const buyers = sharer.buyers || [];
+
+  return `
+    <div style="position:fixed; inset:0; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); z-index:999999; display:flex; align-items:center; justify-content:center; padding:16px;" onclick="if(event.target === this) window.closeShareBuyerDrilldown()">
+      <div style="background:#0f172a; border:2px solid #38bdf8; border-radius:16px; max-width:760px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6);">
+        <!-- Modal Header -->
+        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border-bottom:1px solid #334155; padding:18px 22px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h3 style="margin:0; font-size:1.1rem; color:#f8fafc; font-weight:800;">
+              👥 ${escapeHtml(sharer.full_name)} — शेयर खरीददार रिपोर्ट
+            </h3>
+            <p style="margin:4px 0 0 0; font-size:0.78rem; color:#38bdf8; font-family:monospace;">
+              Share ID: <strong>${sharer.share_id}</strong> • कुल खरीदार: <strong>${buyers.length}</strong> • कुल सेल: <strong>₹${sharer.totalRevenue}</strong>
+            </p>
+          </div>
+          <button type="button" onclick="window.closeShareBuyerDrilldown()" style="background:#1e293b; border:1px solid #334155; color:#94a3b8; font-size:1.4rem; cursor:pointer; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; line-height:1;">&times;</button>
+        </div>
+
+        <!-- Modal Body -->
+        <div style="padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <div style="font-size:0.84rem; color:#cbd5e1; font-weight:700;">
+              इस शेयर लिंक के माध्यम से खरीदे गए सभी ऑर्डर्स:
+            </div>
+            <button type="button" onclick="exportShareBuyersCsv('${sharer.share_id}')" style="background:#10b981; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+              <span>📥</span> <span>यह सूची CSV डाउनलोड करें</span>
+            </button>
+          </div>
+
+          <div style="overflow-x:auto; border:1px solid #334155; border-radius:10px;">
+            <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.8rem;">
+              <thead>
+                <tr style="background:#1e293b; color:#94a3b8;">
+                  <th style="padding:10px 12px;">खरीददार का नाम</th>
+                  <th style="padding:10px 12px;">मोबाइल</th>
+                  <th style="padding:10px 12px;">राज्य</th>
+                  <th style="padding:10px 12px;">खरीदी गई पुस्तक</th>
+                  <th style="padding:10px 12px;">राशि (₹)</th>
+                  <th style="padding:10px 12px;">तारीख</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${buyers.length === 0 ? `
+                  <tr>
+                    <td colspan="6" style="padding:24px; text-align:center; color:#94a3b8;">
+                      इस शेयर आईडी के तहत अभी तक कोई खरीद नहीं हुई है।
+                    </td>
+                  </tr>
+                ` : buyers.map(b => `
+                  <tr style="border-top:1px solid #1e293b;">
+                    <td style="padding:10px 12px; font-weight:700; color:#f8fafc;">${escapeHtml(b.name)}</td>
+                    <td style="padding:10px 12px; font-family:monospace; color:#38bdf8;">+91-${b.mobile}</td>
+                    <td style="padding:10px 12px; color:#cbd5e1;">${escapeHtml(b.state)}</td>
+                    <td style="padding:10px 12px; color:#10b981; font-weight:700;">${escapeHtml(b.books)}</td>
+                    <td style="padding:10px 12px; font-weight:800; color:#c084fc;">₹${b.total_spent}</td>
+                    <td style="padding:10px 12px; color:#94a3b8; font-size:0.74rem;">${b.date ? new Date(b.date).toLocaleDateString('hi-IN') : '---'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function exportOfferConversionsCsv() {
+  const { items } = calculateOfferConversions();
+  if (!items || items.length === 0) {
+    alert("एक्सपोर्ट के लिए कोई ऑफ़र डेटा उपलब्ध नहीं है।");
+    return;
+  }
+
+  const headers = ["Customer / Share ID", "Customer Name", "Mobile", "State", "Book Name", "Book ID", "Purchase Amount (INR)", "Offer Type", "Status", "Order ID", "Date"];
+  const rows = items.map(i => [
+    `"${(i.identifier || i.share_id || '').replace(/"/g, '""')}"`,
+    `"${(i.name || '').replace(/"/g, '""')}"`,
+    `"${i.mobile || ''}"`,
+    `"${(i.state || '').replace(/"/g, '""')}"`,
+    `"${(i.book_title || '').replace(/"/g, '""')}"`,
+    `"${i.book_id || ''}"`,
+    i.amount_paid || i.offer_price || 0,
+    `"${(i.offer_type || '').replace(/"/g, '""')}"`,
+    `"${i.status === 'converted' ? 'Purchased (Converted)' : 'Pending Lead'}"`,
+    `"${i.order_id || ''}"`,
+    `"${i.timestamp ? new Date(i.timestamp).toLocaleDateString('en-IN') : ''}"`
+  ]);
+
+  const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `Aarogyam_WhatsApp_Offer_Purchases_${Date.now()}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function exportShareConversionsCsv() {
+  const { list } = calculateShareConversions();
+  if (!list || list.length === 0) {
+    alert("एक्सपोर्ट के लिए कोई शेयर डेटा उपलब्ध नहीं है।");
+    return;
+  }
+
+  const headers = ["Sharer Name", "Mobile", "Share ID", "Role", "State", "Referred Signups", "Converted Buyers", "Conversion Rate %", "Total Revenue (INR)"];
+  const rows = list.map(s => [
+    `"${(s.full_name || '').replace(/"/g, '""')}"`,
+    `"${s.mobile || ''}"`,
+    `"${s.share_id || ''}"`,
+    `"${(s.role || '').replace(/"/g, '""')}"`,
+    `"${(s.State || '').replace(/"/g, '""')}"`,
+    s.totalReferred || 0,
+    s.totalBuyers || 0,
+    `"${s.convRateFormatted || '0%'}"`,
+    s.totalRevenue || 0
+  ]);
+
+  const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `Aarogyam_Share_Conversions_${Date.now()}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+window.exportShareBuyersCsv = function(shareId) {
+  const { list } = calculateShareConversions();
+  const sharer = list.find(s => s.share_id === shareId);
+  if (!sharer || !sharer.buyers || sharer.buyers.length === 0) {
+    alert("इस शेयर आईडी के लिए कोई खरीदार डेटा नहीं है।");
+    return;
+  }
+
+  const headers = ["Share ID", "Buyer Name", "Mobile", "State", "Books Purchased", "Total Spent (INR)", "Order ID", "Date"];
+  const rows = sharer.buyers.map(b => [
+    `"${shareId}"`,
+    `"${(b.name || '').replace(/"/g, '""')}"`,
+    `"${b.mobile || ''}"`,
+    `"${(b.state || '').replace(/"/g, '""')}"`,
+    `"${(b.books || '').replace(/"/g, '""')}"`,
+    b.total_spent || 0,
+    `"${b.order_id || ''}"`,
+    `"${b.date ? new Date(b.date).toLocaleDateString('en-IN') : ''}"`
+  ]);
+
+  const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `Aarogyam_Share_Buyers_${shareId}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
 // TAB 2: Demand Heatmap & Real Book Rankings
 function renderDemandHeatmapTab(totalRevenue, bookSalesCount) {
@@ -3317,6 +4511,91 @@ function attachMarketingHubEvents(container) {
     });
   });
 
+  // === CONVERSIONS TAB EVENT LISTENERS ===
+  // 1. Sub-tab toggle (Offers vs Shares)
+  container.querySelectorAll('.mkt-conv-subtab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sub = btn.getAttribute('data-conv-subtab');
+      if (sub) {
+        mktState.conversionSubTab = sub;
+        updateMarketingHubView(container);
+      }
+    });
+  });
+
+  // 2. Offer Conversions Search
+  const convOfferSearch = document.getElementById('mkt-conv-offer-search');
+  if (convOfferSearch) {
+    convOfferSearch.addEventListener('input', (e) => {
+      mktState.conversionSearchQuery = e.target.value;
+      updateMarketingHubView(container);
+      const refocused = document.getElementById('mkt-conv-offer-search');
+      if (refocused) {
+        refocused.focus();
+        const len = refocused.value.length;
+        refocused.setSelectionRange(len, len);
+      }
+    });
+  }
+
+  // 3. Offer Status Filter
+  const convStatusFilter = document.getElementById('mkt-conv-status-filter');
+  if (convStatusFilter) {
+    convStatusFilter.addEventListener('change', (e) => {
+      mktState.conversionStatusFilter = e.target.value;
+      updateMarketingHubView(container);
+    });
+  }
+
+  // 4. Offer Type Filter
+  const convTypeFilter = document.getElementById('mkt-conv-type-filter');
+  if (convTypeFilter) {
+    convTypeFilter.addEventListener('change', (e) => {
+      mktState.conversionOfferFilter = e.target.value;
+      updateMarketingHubView(container);
+    });
+  }
+
+  // 5. Share Conversions Search
+  const convShareSearch = document.getElementById('mkt-conv-share-search');
+  if (convShareSearch) {
+    convShareSearch.addEventListener('input', (e) => {
+      mktState.conversionShareSearchQuery = e.target.value;
+      updateMarketingHubView(container);
+      const refocused = document.getElementById('mkt-conv-share-search');
+      if (refocused) {
+        refocused.focus();
+        const len = refocused.value.length;
+        refocused.setSelectionRange(len, len);
+      }
+    });
+  }
+
+  // 6. View Buyers Drilldown
+  container.querySelectorAll('.btn-view-share-buyers').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sid = btn.getAttribute('data-share-id');
+      mktState.activeBuyerDrilldownShareId = sid;
+      updateMarketingHubView(container);
+    });
+  });
+
+  // 7. CSV Export for Offer Conversions
+  const btnExportOfferConv = document.getElementById('btn-export-offer-conv-csv');
+  if (btnExportOfferConv) {
+    btnExportOfferConv.addEventListener('click', () => {
+      exportOfferConversionsCsv();
+    });
+  }
+
+  // 8. CSV Export for Share Conversions
+  const btnExportShareConv = document.getElementById('btn-export-share-conv-csv');
+  if (btnExportShareConv) {
+    btnExportShareConv.addEventListener('click', () => {
+      exportShareConversionsCsv();
+    });
+  }
+
   // === OFFER BUILDER CONTROLS (Live In-Place Sync without page re-render) ===
   const builderType = document.getElementById('mkt-builder-type');
   if (builderType) {
@@ -3968,3 +5247,4 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+

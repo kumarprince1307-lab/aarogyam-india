@@ -51,11 +51,11 @@ const MENU = [
     { label: 'Downloads', href: 'downloads.html', route: 'downloads' } 
   ] },
   { label: 'Reports', icon: '📈', children: [ 
-    { label: 'Daily', href: 'reports.html#daily-report', route: 'reports' }, 
-    { label: 'Monthly', href: '#' }, 
-    { label: 'Sales', href: '#' }, 
-    { label: 'Referral', href: 'reports.html#share-report', route: 'reports' }, 
-    { label: 'Source', href: 'reports.html#lead-report', route: 'reports' } 
+    { label: '🔄 Share & Offer Conversions (कन्वर्जन रिपोर्ट)', href: 'reports.html#share-conversions', route: 'reports' }, 
+    { label: '🎯 Offer Purchases (ऑफ़र खरीद)', href: 'reports.html#offer-purchases', route: 'reports' }, 
+    { label: '👥 Share Links (शेयर कन्वर्जन)', href: 'reports.html#share-report', route: 'reports' }, 
+    { label: 'Daily Reports', href: 'reports.html#daily-report', route: 'reports' }, 
+    { label: 'Lead Source', href: 'reports.html#lead-report', route: 'reports' } 
   ] },
   { label: 'Marketing', icon: '📣', children: [ 
     { label: 'UCAS Landing Pages', href: 'all-landing-pages.html', route: 'all-landing-pages' }, 

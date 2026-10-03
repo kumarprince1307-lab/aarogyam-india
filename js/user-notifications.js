@@ -13,6 +13,10 @@
 
         // 1. Initialize Engine on DOM Ready
         init: async function () {
+            // Ensure no intrusive broadcast popup overlay is displayed
+            const existingPopup = document.getElementById('ai-broadcast-popup-overlay');
+            if (existingPopup) existingPopup.remove();
+
             this.ensureDomElements();
             await this.loadUserNotifications();
             this.bindEvents();
@@ -311,12 +315,8 @@
                                 isRead: isRead
                             });
 
-                            // Auto trigger broadcast popup for unread urgent or birthday broadcasts
-                            if (!isRead && !sessionStorage.getItem(`AI_BC_POPUP_SHOWN_${bc.id}`)) {
-                                setTimeout(() => {
-                                    window.USER_NOTIFICATIONS?.showBroadcastPopup(bc);
-                                }, 1500);
-                            }
+                            // Auto popup trigger disabled permanently to maintain clean user experience.
+                            // Broadcast announcements remain safe and available in the notification center.
                         }
                     });
                 }
@@ -585,59 +585,24 @@
             if (toast) toast.classList.remove('show');
         },
 
-        // 11. Full Screen Broadcast Announcement Popup Modal
+        // 11. Full Screen Broadcast Announcement Popup Modal (Permanently Disabled)
         showBroadcastPopup: function (bc) {
-            if (!bc || !bc.id) return;
-            sessionStorage.setItem(`AI_BC_POPUP_SHOWN_${bc.id}`, 'true');
-
-            let popup = document.getElementById('ai-broadcast-popup-overlay');
-            if (!popup) {
-                popup = document.createElement('div');
-                popup.id = 'ai-broadcast-popup-overlay';
-                popup.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.8);backdrop-filter:blur(6px);z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;';
-                document.body.appendChild(popup);
+            // Permanently disabled: Intrusive auto popups are disabled to preserve clean UX.
+            // Notifications remain safely accessible through the notification bell & message center.
+            const popup = document.getElementById('ai-broadcast-popup-overlay');
+            if (popup) {
+                popup.style.display = 'none';
+                popup.remove();
             }
-
-            const priorityColor = bc.priority === 'urgent' ? '#EF4444' : (bc.priority === 'important' ? '#F59E0B' : '#10B981');
-
-            popup.innerHTML = `
-                <div style="background:#ffffff;border-radius:16px;max-width:440px;width:100%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);overflow:hidden;border:2px solid ${priorityColor};">
-                    <div style="background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="font-size:1.3rem;">${bc.category === 'birthday' ? '🎂' : '📢'}</span>
-                            <strong style="font-size:1rem;color:#F8FAFC;">आरोग्यम इंडिया का संदेश</strong>
-                        </div>
-                        <button type="button" onclick="window.USER_NOTIFICATIONS.closeBroadcastPopup('${bc.id}')" style="background:transparent;border:none;color:#94A3B8;font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
-                    </div>
-
-                    <div style="padding:20px;">
-                        <div style="font-weight:800;font-size:1.1rem;color:#0F172A;margin-bottom:8px;line-height:1.35;">
-                            ${bc.title}
-                        </div>
-                        <div style="font-size:0.9rem;color:#334155;line-height:1.5;margin-bottom:16px;white-space:pre-wrap;background:#F8FAFC;padding:12px;border-radius:8px;border:1px solid #E2E8F0;">
-${bc.body || bc.desc || ''}
-                        </div>
-
-                        <div style="display:flex;flex-direction:column;gap:8px;">
-                            ${bc.action_url ? `
-                                <a href="${bc.action_url}" target="_blank" onclick="window.USER_NOTIFICATIONS.markAsRead('${bc.id}'); window.USER_NOTIFICATIONS.closeBroadcastPopup('${bc.id}');" style="background:#2563EB;color:#fff;text-align:center;padding:10px 14px;border-radius:8px;font-weight:800;text-decoration:none;font-size:0.92rem;display:flex;align-items:center;justify-content:center;gap:6px;">
-                                    <span>🔗</span> <span>अभी देखें (View Now)</span>
-                                </a>
-                            ` : ''}
-                            <button type="button" onclick="window.USER_NOTIFICATIONS.markAsRead('${bc.id}'); window.USER_NOTIFICATIONS.closeBroadcastPopup('${bc.id}');" style="background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;padding:10px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.88rem;">
-                                ✓ धन्यवाद (Mark As Read)
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            popup.style.display = 'flex';
-            this.playBellSound();
+            return;
         },
 
         closeBroadcastPopup: function (bcId) {
             const popup = document.getElementById('ai-broadcast-popup-overlay');
-            if (popup) popup.style.display = 'none';
+            if (popup) {
+                popup.style.display = 'none';
+                popup.remove();
+            }
         },
 
         // 11. Wire DOM Event Listeners
