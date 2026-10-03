@@ -308,13 +308,15 @@ function renderCheckoutSecurityBanner(isVerified, errorMsg, offerData) {
             stickyTimer.style.display = "inline-flex";
         }
 
-        // 4. Universal VIP Offer Banner (कटने से बचाने के लिए 100% width व auto height)
+        // 4. Universal VIP Offer Banner (फटने या खिंचने से बचाने के लिए ऑटो-फिट रिस्पॉन्सिव स्टाइल)
         const topBannerWrap = document.getElementById("checkoutTopBannerContainer");
         if (topBannerWrap) {
             topBannerWrap.style.display = "block";
+            topBannerWrap.style.maxWidth = "520px";
+            topBannerWrap.style.margin = "12px auto 8px auto";
             topBannerWrap.innerHTML = `
-                <div style="width:100%; border-radius:14px; overflow:hidden; border:2px solid #22c55e; box-shadow:0 4px 20px rgba(0,0,0,0.12); background:#0f172a;">
-                    <img src="/images/banners/vip-reader-offer-badge.jpg" alt="Aarogyam India VIP Offer Banner" style="width:100%; height:auto; display:block; object-fit:contain;" />
+                <div style="width:100%; max-width:520px; margin:0 auto; border-radius:14px; overflow:hidden; border:2px solid #22c55e; box-shadow:0 6px 24px rgba(0,0,0,0.22); background:#070d19; text-align:center;">
+                    <img src="/images/banners/vip-reader-offer-badge.jpeg" onerror="this.onerror=null; this.src='/images/banners/vip-reader-offer-badge.jpg';" alt="Aarogyam India VIP Offer Banner" style="max-width:100%; width:auto; height:auto; max-height:280px; display:block; margin:0 auto; object-fit:contain;" />
                 </div>
             `;
         }

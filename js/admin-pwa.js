@@ -20,7 +20,7 @@ export function initAdminPwa() {
 function registerAdminServiceWorker() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/admin/admin-sw.js?v=46.0', { scope: '/admin/' })
+      navigator.serviceWorker.register('/admin/admin-sw.js?v=52.0', { scope: '/admin/' })
         .then((reg) => {
           console.log('✅ [Admin PWA] Service Worker registered with scope:', reg.scope);
           reg.update();

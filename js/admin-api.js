@@ -276,7 +276,12 @@ export async function fetchTodaysBirthdays() {
 }
 
 export async function fetchDashboardData(params = {}) {
-  await delay(250); // Simulate network latency
+  const cacheKey = `dashboard_${params.startDate || 'def'}_${params.endDate || 'def'}`;
+  const cached = _adminMemoryCache.get(cacheKey);
+  if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+    return cached.data;
+  }
+  await delay(150);
   try {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
@@ -426,7 +431,7 @@ export async function fetchDashboardData(params = {}) {
       date: new Date(a.date).toLocaleDateString('en-GB')
     }));
 
-    return {
+    const resultData = {
       success: true,
       data: {
         shareSummary,
@@ -439,6 +444,8 @@ export async function fetchDashboardData(params = {}) {
         recentActivity: sortedActivity
       }
     };
+    _adminMemoryCache.set(cacheKey, { data: resultData, ts: Date.now() });
+    return resultData;
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
     return { success: false, data: null, error: error.message };
@@ -832,7 +839,12 @@ export async function fetchUsers(params = {}) {
 }
 
 export async function fetchPurchases(params = {}) {
-    await delay(150);
+    const cacheKey = `purchases_${params.status || 'all'}_${params.bookId || 'all'}_${params.source || 'all'}_${params.query || ''}`;
+    const cached = _adminMemoryCache.get(cacheKey);
+    if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+        return cached.data;
+    }
+    await delay(100);
     try {
         const db = window.dbClient;
         if (!db) throw new Error("Supabase client not available.");
@@ -901,7 +913,9 @@ export async function fetchPurchases(params = {}) {
             );
         }
 
-        return { success: true, data: mappedData };
+        const resultObj = { success: true, data: mappedData };
+        _adminMemoryCache.set(cacheKey, { data: resultObj, ts: Date.now() });
+        return resultObj;
     } catch (error) {
         console.error('Failed to fetch real purchases:', error);
         return { success: false, data: [], error: error.message };
@@ -909,6 +923,11 @@ export async function fetchPurchases(params = {}) {
 }
 
 export async function fetchDownloads() {
+    const cacheKey = 'downloads_summary';
+    const cached = _adminMemoryCache.get(cacheKey);
+    if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+        return cached.data;
+    }
     await delay(150);
     try {
         const db = window.dbClient;
@@ -981,7 +1000,9 @@ export async function fetchDownloads() {
                 : item.lastDownloaded.toLocaleDateString('en-GB')
         }));
 
-        return { success: true, data: formattedData };
+        const response = { success: true, data: formattedData };
+        _adminMemoryCache.set(cacheKey, { data: response, ts: Date.now() });
+        return response;
 
     } catch (error) {
         console.error('Failed to fetch real download data:', error);
@@ -1894,6 +1915,11 @@ function getAdminDb() {
 }
 
 export async function fetchUcasDashboardSummary() {
+  const cacheKey = 'ucas_dashboard_summary';
+  const cached = _adminMemoryCache.get(cacheKey);
+  if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+    return cached.data;
+  }
   try {
     const db = getAdminDb();
     if (!db) throw new Error("Supabase client not available.");
@@ -1971,7 +1997,7 @@ export async function fetchUcasDashboardSummary() {
     const totalShares = shareLogs.filter(l => l.event_type === 'share').length;
     const surveyResponses = totalSurveys;
 
-    return {
+    const response = {
       success: true,
       data: {
         totalUsers,
@@ -1986,6 +2012,8 @@ export async function fetchUcasDashboardSummary() {
         surveyResponses
       }
     };
+    _adminMemoryCache.set(cacheKey, { data: response, ts: Date.now() });
+    return response;
   } catch (error) {
     console.error('Failed to fetch UCAS dashboard summary:', error);
     return {
@@ -2185,6 +2213,11 @@ export async function fetchUserUcasDetail(userId) {
 }
 
 export async function fetchAllPhonebook(params = {}) {
+  const cacheKey = 'phonebook_' + JSON.stringify(params);
+  const cached = _adminMemoryCache.get(cacheKey);
+  if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+    return cached.data;
+  }
   try {
     const db = getAdminDb();
     if (!db) throw new Error("Supabase client not available.");
@@ -2229,7 +2262,9 @@ export async function fetchAllPhonebook(params = {}) {
       );
     }
 
-    return { success: true, data: mapped };
+    const response = { success: true, data: mapped };
+    _adminMemoryCache.set(cacheKey, { data: response, ts: Date.now() });
+    return response;
   } catch (error) {
     console.error('Failed to fetch all phonebook:', error);
     return { success: false, data: [], error: error.message };
@@ -2237,6 +2272,11 @@ export async function fetchAllPhonebook(params = {}) {
 }
 
 export async function fetchAllSurveys(params = {}) {
+  const cacheKey = 'surveys_' + JSON.stringify(params);
+  const cached = _adminMemoryCache.get(cacheKey);
+  if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+    return cached.data;
+  }
   try {
     const db = getAdminDb();
     if (!db) throw new Error("Supabase client not available.");
@@ -2297,7 +2337,9 @@ export async function fetchAllSurveys(params = {}) {
       );
     }
 
-    return { success: true, data: mapped };
+    const response = { success: true, data: mapped };
+    _adminMemoryCache.set(cacheKey, { data: response, ts: Date.now() });
+    return response;
   } catch (error) {
     console.error('Failed to fetch all surveys:', error);
     return { success: false, data: [], error: error.message };
@@ -2305,6 +2347,11 @@ export async function fetchAllSurveys(params = {}) {
 }
 
 export async function fetchAllLandingPages(params = {}) {
+  const cacheKey = 'landing_pages_' + JSON.stringify(params);
+  const cached = _adminMemoryCache.get(cacheKey);
+  if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+    return cached.data;
+  }
   try {
     const db = getAdminDb();
     let pages = [];
@@ -2372,7 +2419,9 @@ export async function fetchAllLandingPages(params = {}) {
       );
     }
 
-    return { success: true, data: mapped };
+    const response = { success: true, data: mapped };
+    _adminMemoryCache.set(cacheKey, { data: response, ts: Date.now() });
+    return response;
   } catch (error) {
     console.error('Failed to fetch all landing pages:', error);
     return { success: false, data: [], error: error.message };

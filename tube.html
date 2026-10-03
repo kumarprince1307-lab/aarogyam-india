@@ -4320,6 +4320,10 @@
 
         logVideoActivity('comment', reel, { comment: commentText });
 
+        if (window.AarogyamTelemetry && typeof window.AarogyamTelemetry.trackVideoComment === 'function') {
+          window.AarogyamTelemetry.trackVideoComment(reel.id, commentText, { name });
+        }
+
         input.value = '';
         renderReelsComments(reel.id);
       };
@@ -4531,6 +4535,10 @@
         }
         if (count) count.textContent = 'Liked ❤️';
         logVideoActivity('like', reel);
+
+        if (window.AarogyamTelemetry && typeof window.AarogyamTelemetry.trackVideoLike === 'function') {
+          window.AarogyamTelemetry.trackVideoLike(reel.id, reel.title, reel.category);
+        }
       };
 
       window.toggleReelPlayPause = function() {
@@ -5255,6 +5263,14 @@
 
       function logVideoActivity(action, vidObj, extra = {}) {
         try {
+          if (window.AarogyamTelemetry && vidObj) {
+            window.AarogyamTelemetry.trackVideoPlay(
+              vidObj.id || vidObj.youtube_id,
+              vidObj.title,
+              vidObj.category || vidObj.subject || 'Agriculture',
+              60
+            );
+          }
           const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
           const mob = localStorage.getItem('aim_user_mobile') || uObj.mobile || '';
           if (db && mob) {

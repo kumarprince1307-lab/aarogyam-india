@@ -21,7 +21,7 @@ const ROUTES = {
   'purchases': () => import('./admin-pages-purchases.js').then(m => m.initPurchases()),
   'checkout-funnel': () => import('./admin-pages-checkout-funnel.js').then(m => m.initCheckoutFunnel()),
   'downloads': () => import('./admin-pages-downloads.js').then(m => m.initDownloads()),
-  'reports': () => import('./admin-pages-reports.js?v=2.0').then(m => (m.initReports ? m.initReports() : m.renderReports(document.getElementById('page-content')))),
+  'reports': () => import('./admin-pages-reports.js?v=4.0').then(m => (m.initReports ? m.initReports() : m.renderReports(document.getElementById('page-content')))),
   'notifications': () => import('./admin-pages-notifications.js').then(m => m.initNotifications()),
   'broadcast': () => import('./admin-pages-broadcast.js').then(m => m.initAdminBroadcast()),
   'all-webinars': () => import(`./admin-pages-webinars.js?v=34.1`).then(m => m.initWebinars()),

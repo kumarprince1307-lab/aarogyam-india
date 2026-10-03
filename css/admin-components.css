@@ -1707,6 +1707,157 @@ body.light-theme .theme-switch input:checked + .slider {
   color: #f8fafc;
 }
 
+/* ==========================================================================
+   📱 MOBILE-FRIENDLY & RESPONSIVE MARKETING HUB OVERHAUL
+   Ensures zero cutoffs, clean vertical stacking ("एक के नीचे एक"), and prominent tabs
+   ========================================================================== */
+
+.mkt-mobile-tab-card {
+  display: none;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.95));
+  border: 1.5px solid #3b82f6;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.mkt-mobile-tab-dropdown {
+  width: 100%;
+  background: #1e293b;
+  color: #f8fafc;
+  border: 1.5px solid #3b82f6;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  appearance: auto;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.mkt-mobile-tab-dropdown:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+
+.mkt-tabs-container {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #3b82f6 rgba(255, 255, 255, 0.05);
+}
+
+.mkt-tabs-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.mkt-tabs-container::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 4px;
+}
+
+.mkt-tab-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #94a3b8;
+  padding: 10px 16px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mkt-tab-btn:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.mkt-tab-btn.active {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(30, 58, 138, 0.4));
+  color: #60a5fa;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+/* 📱 Responsive Screen Rules (Mobile & Tablet Breakpoints) */
+@media (max-width: 992px) {
+  .mkt-mobile-tab-card {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Funnel cards stack vertically with zero cutoff */
+  .mkt-funnel-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .mkt-funnel-card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 14px !important;
+  }
+
+  /* Date filters stack nicely */
+  .mkt-date-filter-wrap {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 12px !important;
+  }
+
+  .mkt-filter-pill {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 10px 14px !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Tables never clip or cut text */
+  .table-responsive,
+  .mkt-table-wrap {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 12px !important;
+    display: block !important;
+  }
+
+  /* Modals fit neatly on screen */
+  .mkt-user-modal-box {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    padding: 16px !important;
+    margin: 10px auto !important;
+  }
+
+  /* Grids inside tabs collapse to single column */
+  .mkt-two-col-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mkt-header-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+}
+
 
 
 

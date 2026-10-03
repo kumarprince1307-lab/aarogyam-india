@@ -30,6 +30,25 @@
 (function () {
   'use strict';
 
+  // Safe zero-impact Telemetry loader for 11 health pages and category landing pages
+  try {
+    if (typeof window !== 'undefined') {
+      if (!window.AarogyamTelemetry && typeof document !== 'undefined' && document.head) {
+        const telScript = document.createElement('script');
+        telScript.src = '/js/aarogyam-telemetry.js?v=20261003_v1';
+        telScript.async = true;
+        telScript.onload = function () {
+          if (window.AarogyamTelemetry && typeof window.AarogyamTelemetry.trackPageVisit === 'function') {
+            window.AarogyamTelemetry.trackPageVisit();
+          }
+        };
+        document.head.appendChild(telScript);
+      } else if (window.AarogyamTelemetry && typeof window.AarogyamTelemetry.trackPageVisit === 'function') {
+        window.AarogyamTelemetry.trackPageVisit();
+      }
+    }
+  } catch(e) {}
+
   function escapeHtml(str) {
     if (!str) return '';
     return String(str)

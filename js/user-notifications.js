@@ -322,6 +322,37 @@
                 }
             } catch (err) {}
 
+            // --- F. Targeted Personal Notifications from Admin Marketing Hub ---
+            try {
+                const uKey = user.id || user.mobile;
+                const personalNotifs = JSON.parse(localStorage.getItem(`AI_NOTIFS_PERSONAL_${uKey}`) || '[]');
+                const targetedNotifs = JSON.parse(localStorage.getItem('AAROGYAM_TARGETED_NOTIFICATIONS') || '[]');
+
+                const combinedTargeted = [...personalNotifs];
+                targetedNotifs.forEach(tn => {
+                    if (tn && (tn.userId === user.id || tn.mobile === user.mobile || tn.userMobile === user.mobile)) {
+                        if (!combinedTargeted.some(x => x.id === tn.id)) {
+                            combinedTargeted.push(tn);
+                        }
+                    }
+                });
+
+                combinedTargeted.forEach(tn => {
+                    const notifId = tn.id || `target_${Date.now()}`;
+                    list.push({
+                        id: notifId,
+                        category: 'announcements',
+                        icon: '🎁',
+                        iconClass: 'user-notif-icon-sale',
+                        title: tn.title || '🎁 आपके लिए विशेष VIP ऑफ़र',
+                        desc: tn.desc || 'सीमित समय का विशेष डिस्काउंट उपलब्ध है।',
+                        timestamp: tn.timestamp || new Date().toISOString(),
+                        actionUrl: tn.link || '/store.html',
+                        isRead: readStore.includes(notifId)
+                    });
+                });
+            } catch (tErr) {}
+
             // Sort by timestamp descending
             list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 

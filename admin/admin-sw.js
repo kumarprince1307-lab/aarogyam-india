@@ -1,6 +1,6 @@
-/* Aarogyam India Admin - Isolated Service Worker (V49) */
+/* Aarogyam India Admin - Isolated Service Worker (V52) */
 
-const CACHE_NAME = 'aarogyam-admin-shell-v49';
+const CACHE_NAME = 'aarogyam-admin-shell-v52';
 
 const OFFLINE_FALLBACK = '/admin/offline.html';
 
@@ -56,9 +56,15 @@ self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
-  // Localhost development: Always Network-first / Network-only
+  // Localhost development: Always Network-first / Network-only with valid Response fallback
   if (['localhost', '127.0.0.1'].includes(url.hostname)) {
-    event.respondWith(fetch(request).catch(() => caches.match(request)));
+    event.respondWith(
+      fetch(request).catch(async () => {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        return new Response('', { status: 408, statusText: 'Dev Offline' });
+      })
+    );
     return;
   }
 

@@ -21,6 +21,26 @@
   const STORAGE_USER_INTERESTS = 'AOI_USER_INTERESTS';
   const STORAGE_DOWNLOAD_LOGS = 'AOI_DOWNLOAD_LOGS';
 
+  // Supabase REST endpoint & anon key for atomic telemetry counters (0-egress write RPCs)
+  const SUPABASE_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
+  const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+
+  // Helper: Call atomic Supabase RPC without blocking UI (returns 204 with 0-egress)
+  function sendRpcIncrement(rpcName, params) {
+    try {
+      if (typeof window === 'undefined' || !window.fetch) return;
+      fetch(`${SUPABASE_REST_URL}/rpc/${rpcName}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(params)
+      }).catch(() => {});
+    } catch(e) {}
+  }
+
   // Helper: Read JSON safely
   function getStorageJson(key, defaultVal = {}) {
     try {
@@ -65,25 +85,44 @@
           };
         }
       }
+      const aiUserRaw = localStorage.getItem('AI_USER');
+      if (aiUserRaw) {
+        const aiU = JSON.parse(aiUserRaw);
+        if (aiU && (aiU.mobile || aiU.phone || aiU.full_name || aiU.name)) {
+          return {
+            id: aiU.id || '',
+            mobile: aiU.mobile || aiU.phone || '',
+            name: aiU.full_name || aiU.name || '',
+            email: aiU.email || ''
+          };
+        }
+      }
+      const m = localStorage.getItem('aim_user_mobile') || localStorage.getItem('aoi_user_mobile') || '';
+      const n = localStorage.getItem('aim_user_name') || localStorage.getItem('aoi_user_name') || '';
+      if (m || n) {
+        return { id: m || 'user', mobile: m, name: n || 'किसान साथी', email: '' };
+      }
     } catch (e) {}
-    return { id: 'anonymous', mobile: '', name: 'अज्ञात विज़िटर', email: '' };
+    return { id: 'anonymous', mobile: '', name: 'अज्ञात पाठक', email: '' };
   }
 
   // Categorize Page based on URL pathname
   function detectPageCategory(pathname) {
     const p = (pathname || window.location.pathname || '').toLowerCase();
     
-    if (p.includes('/health/') || p.includes('diabetes') || p.includes('joint-care') || p.includes('weight-loss') || p.includes('hair-care') || p.includes('skin-care') || p.includes('womens-care') || p.includes('kids-care') || p.includes('sexual-wellness') || p.includes('home-care')) {
-      let sub = 'सामान्य स्वास्थ्य';
-      if (p.includes('diabetes')) sub = 'मधुमेह (Diabetes)';
-      else if (p.includes('joint-care')) sub = 'जोड़ों का दर्द (Joint Care)';
-      else if (p.includes('weight-loss')) sub = 'वज़न घटाना (Weight Loss)';
-      else if (p.includes('hair-care')) sub = 'बालों की देखभाल (Hair Care)';
-      else if (p.includes('skin-care')) sub = 'त्वचा रोग (Skin Care)';
+    if (p.includes('/health/') || p.includes('diabetes') || p.includes('joint-care') || p.includes('weight-loss') || p.includes('hair-care') || p.includes('skin-care') || p.includes('womens-care') || p.includes('kids-care') || p.includes('sexual-wellness') || p.includes('home-care') || p.includes('immunity') || p.includes('digestion')) {
+      let sub = 'सामान्य स्वास्थ्य (General Health)';
+      if (p.includes('diabetes')) sub = 'मधुमेह नियंत्रण (Diabetes Care)';
+      else if (p.includes('joint-care')) sub = 'जोड़ों व घुटनों का दर्द (Joint Care)';
+      else if (p.includes('weight-loss')) sub = 'वज़न प्रबंधन (Weight Loss)';
+      else if (p.includes('hair-care')) sub = 'बालों की सुरक्षा (Hair Care)';
+      else if (p.includes('skin-care')) sub = 'त्वचा विकार व निखार (Skin Care)';
       else if (p.includes('womens-care')) sub = 'महिला स्वास्थ्य (Women Care)';
       else if (p.includes('kids-care')) sub = 'बच्चों का पोषण (Kids Care)';
-      else if (p.includes('sexual-wellness')) sub = 'पुरुष स्वास्थ्य (Vitality)';
-      else if (p.includes('home-care')) sub = 'घरेलू स्वच्छता (Home Care)';
+      else if (p.includes('sexual-wellness')) sub = 'पुरुष शक्ति व स्फूर्ति (Vitality)';
+      else if (p.includes('home-care')) sub = 'हर्बल होम केयर (Home Care)';
+      else if (p.includes('immunity')) sub = 'रोग प्रतिरोधक क्षमता (Immunity)';
+      else if (p.includes('digestion')) sub = 'पाचन व गैस मुक्ति (Digestion)';
       return { category: 'health', categoryLabel: '❤️ स्वास्थ्य देखभाल (Health)', subCategory: sub };
     }
     
@@ -92,7 +131,7 @@
     }
 
     if (p.includes('netsurf') || p.includes('biofit') || p.includes('naturamore')) {
-      return { category: 'netsurf', categoryLabel: '🌿 नेट्सर्फ बायोफिट व बिज़नेस', subCategory: 'जैविक कृषि व वेलनेस उत्पाद' };
+      return { category: 'netsurf', categoryLabel: '🌿 नेट्सर्फ बायोफिट व जैविक', subCategory: 'जैविक कृषि व वेलनेस उत्पाद' };
     }
 
     if (p.includes('tube') || p.includes('reels') || p.includes('video')) {
@@ -161,6 +200,14 @@
       if (user.mobile || (user.id && user.id !== 'anonymous')) {
         recordUserInterest(user, catInfo, cleanPageName);
       }
+
+      // Sync atomic page counter to Supabase cloud (0-egress)
+      sendRpcIncrement('increment_page_stat', {
+        p_key: String(cleanPageName),
+        p_path: String(path),
+        p_cat: String(catInfo.category || 'health'),
+        dur_secs: 0
+      });
     } catch (e) {
       console.warn('[Telemetry] Page visit record note:', e);
     }
@@ -225,7 +272,7 @@
   }
 
   // ====================================================================
-  // 2. AAROGYAMTUBE VIDEO TELEMETRY ENGINE
+  // 2. AAROGYAMTUBE VIDEO TELEMETRY ENGINE (VIEWS, LIKES, COMMENTS)
   // ====================================================================
   function trackVideoPlay(videoId, title, category = 'General', duration = 60) {
     try {
@@ -239,6 +286,8 @@
           category: category || 'Agriculture',
           plays: 0,
           completions: 0,
+          likes: 0,
+          comments_count: 0,
           totalWatchSeconds: 0,
           lastPlayedAt: Date.now()
         };
@@ -249,7 +298,78 @@
       store.totalViews = (store.totalViews || 0) + 1;
 
       setStorageJson(STORAGE_TUBE_TELEMETRY, store);
+
+      // Atomic Cloud Sync to Supabase
+      sendRpcIncrement('increment_video_stat', {
+        v_id: String(videoId),
+        v_title: String(title || videoId),
+        v_category: String(category || 'Agriculture'),
+        stat_type: 'view',
+        watch_secs: 0
+      });
     } catch (e) {}
+  }
+
+  function trackVideoLike(videoId, title = '', category = 'General') {
+    try {
+      if (!videoId) return;
+      const store = getStorageJson(STORAGE_TUBE_TELEMETRY, { videos: {}, totalViews: 0, totalWatchMinutes: 0 });
+      if (!store.videos[videoId]) {
+        store.videos[videoId] = {
+          videoId,
+          title: title || `AarogyamTube Video (${videoId})`,
+          category: category || 'Agriculture',
+          plays: 0,
+          completions: 0,
+          likes: 0,
+          comments_count: 0,
+          totalWatchSeconds: 0,
+          lastPlayedAt: Date.now()
+        };
+      }
+      store.videos[videoId].likes = (store.videos[videoId].likes || 0) + 1;
+      setStorageJson(STORAGE_TUBE_TELEMETRY, store);
+
+      // Atomic Cloud Sync to Supabase
+      sendRpcIncrement('increment_video_stat', {
+        v_id: String(videoId),
+        v_title: String(title || store.videos[videoId].title || videoId),
+        v_category: String(category || store.videos[videoId].category || 'Agriculture'),
+        stat_type: 'like',
+        watch_secs: 0
+      });
+    } catch(e) {}
+  }
+
+  function trackVideoComment(videoId, commentText = '', user = null) {
+    try {
+      if (!videoId) return;
+      const store = getStorageJson(STORAGE_TUBE_TELEMETRY, { videos: {}, totalViews: 0, totalWatchMinutes: 0 });
+      if (!store.videos[videoId]) {
+        store.videos[videoId] = {
+          videoId,
+          title: `AarogyamTube Video (${videoId})`,
+          category: 'Agriculture',
+          plays: 0,
+          completions: 0,
+          likes: 0,
+          comments_count: 0,
+          totalWatchSeconds: 0,
+          lastPlayedAt: Date.now()
+        };
+      }
+      store.videos[videoId].comments_count = (store.videos[videoId].comments_count || 0) + 1;
+      setStorageJson(STORAGE_TUBE_TELEMETRY, store);
+
+      // Atomic Cloud Sync to Supabase
+      sendRpcIncrement('increment_video_stat', {
+        v_id: String(videoId),
+        v_title: String(store.videos[videoId].title || videoId),
+        v_category: String(store.videos[videoId].category || 'Agriculture'),
+        stat_type: 'comment',
+        watch_secs: 0
+      });
+    } catch(e) {}
   }
 
   function trackVideoProgress(videoId, watchedSeconds, isCompleted = false) {
@@ -261,6 +381,13 @@
         store.videos[videoId].totalWatchSeconds = (store.videos[videoId].totalWatchSeconds || 0) + watchedSeconds;
         if (isCompleted) {
           store.videos[videoId].completions = (store.videos[videoId].completions || 0) + 1;
+          sendRpcIncrement('increment_video_stat', {
+            v_id: String(videoId),
+            v_title: String(store.videos[videoId].title || videoId),
+            v_category: String(store.videos[videoId].category || 'Agriculture'),
+            stat_type: 'completion',
+            watch_secs: watchedSeconds || 60
+          });
         }
         store.totalWatchMinutes = Math.round(Object.values(store.videos).reduce((acc, v) => acc + (v.totalWatchSeconds || 0), 0) / 60);
         setStorageJson(STORAGE_TUBE_TELEMETRY, store);
@@ -271,7 +398,8 @@
   // ====================================================================
   // 3. EBOOK READER & AUDIO TELEMETRY ENGINE
   // ====================================================================
-  function trackReaderProgress(bookId, currentPage, totalPages) {
+  let readerSyncDebounceTimer = null;
+  function trackReaderProgress(bookId, currentPage, totalPages, isOpen = false) {
     try {
       if (!bookId) return;
       const store = getStorageJson(STORAGE_READER_TELEMETRY, { books: {}, readers: {} });
@@ -292,32 +420,54 @@
       }
 
       const bRecord = store.books[bookId];
-      bRecord.totalOpens += 1;
+      if (isOpen) bRecord.totalOpens += 1;
       if (currentPage > bRecord.maxPageReached) bRecord.maxPageReached = currentPage;
       if (totalPages) bRecord.totalPages = totalPages;
       bRecord.lastReadAt = Date.now();
 
       // User level stats
-      const userKey = user.mobile || user.id;
-      if (userKey && userKey !== 'anonymous') {
-        if (!store.readers[userKey]) {
-          store.readers[userKey] = {
-            userId: user.id,
-            mobile: user.mobile,
-            name: user.name,
-            books: {}
-          };
+      let userKey = user.mobile || user.id;
+      if (!userKey || userKey === 'anonymous') {
+        let anonKey = localStorage.getItem('aoi_anon_reader_key');
+        if (!anonKey) {
+          anonKey = 'reader_' + Math.random().toString(36).substring(2, 9);
+          localStorage.setItem('aoi_anon_reader_key', anonKey);
         }
-        store.readers[userKey].books[bookId] = {
-          bookId,
-          currentPage,
-          totalPages: totalPages || 1,
-          percent: pct,
-          lastReadAt: Date.now()
+        userKey = anonKey;
+      }
+      const userName = user.name || 'किसान साथी';
+
+      if (!store.readers[userKey]) {
+        store.readers[userKey] = {
+          userId: user.id,
+          mobile: user.mobile,
+          name: userName,
+          books: {}
         };
       }
+      store.readers[userKey].books[bookId] = {
+        bookId,
+        currentPage,
+        totalPages: totalPages || 1,
+        percent: pct,
+        lastReadAt: Date.now()
+      };
 
       setStorageJson(STORAGE_READER_TELEMETRY, store);
+
+      // Debounced 0-Egress Atomic RPC Sync to Supabase (returns 204 No Content)
+      clearTimeout(readerSyncDebounceTimer);
+      readerSyncDebounceTimer = setTimeout(() => {
+        sendRpcIncrement('sync_reader_progress', {
+          p_user_key: String(userKey),
+          p_user_name: String(userName),
+          p_book_id: String(bookId),
+          p_page: parseInt(currentPage, 10) || 1,
+          p_total_pages: parseInt(totalPages, 10) || 1,
+          p_audio_secs: 0,
+          p_is_open: Boolean(isOpen)
+        });
+      }, 1200);
     } catch (e) {}
   }
 
@@ -329,6 +479,23 @@
         store.books[bookId].audioMinutes = (store.books[bookId].audioMinutes || 0) + Math.round(secondsListened / 60);
         setStorageJson(STORAGE_READER_TELEMETRY, store);
       }
+
+      const user = getCurrentUserIdentity();
+      let userKey = user.mobile || user.id;
+      if (!userKey || userKey === 'anonymous') {
+        userKey = localStorage.getItem('aoi_anon_reader_key') || 'guest_reader';
+      }
+      const userName = user.name || 'किसान साथी';
+
+      sendRpcIncrement('sync_reader_progress', {
+        p_user_key: String(userKey),
+        p_user_name: String(userName),
+        p_book_id: String(bookId),
+        p_page: 1,
+        p_total_pages: 1,
+        p_audio_secs: parseInt(secondsListened, 10) || 0,
+        p_is_open: false
+      });
     } catch (e) {}
   }
 
@@ -360,6 +527,8 @@
   window.AarogyamTelemetry = {
     trackPageVisit,
     trackVideoPlay,
+    trackVideoLike,
+    trackVideoComment,
     trackVideoProgress,
     trackReaderProgress,
     trackAudioNarrationTime,
@@ -372,63 +541,36 @@
     getUserInterestsData: () => getStorageJson(STORAGE_USER_INTERESTS, {}),
     getDownloadLogsData: () => getStorageJson(STORAGE_DOWNLOAD_LOGS, []),
 
-    // Reset / Seed helper for Admin Testing
+    // Purge legacy mock/dummy data safely
+    cleanLegacyMockDataIfNeeded: function() {
+      try {
+        const tube = getStorageJson(STORAGE_TUBE_TELEMETRY, null);
+        if (tube && (tube.totalViews === 4860 || (tube.videos && tube.videos['tube_vid_01']))) {
+          localStorage.removeItem(STORAGE_TUBE_TELEMETRY);
+        }
+        const visits = getStorageJson(STORAGE_PAGE_VISITS, null);
+        if (visits && (visits.totalVisits === 3420 || (visits.pages && visits.pages['diabetes.html'] && visits.pages['diabetes.html'].visits === 520))) {
+          localStorage.removeItem(STORAGE_PAGE_VISITS);
+        }
+      } catch (e) {}
+    },
+
+    // Initialize clean telemetry store for real incoming data (No Fake Dummy Records)
     seedSampleTelemetryIfNeeded: function() {
+      if (typeof this.cleanLegacyMockDataIfNeeded === 'function') {
+        this.cleanLegacyMockDataIfNeeded();
+      }
       const tube = getStorageJson(STORAGE_TUBE_TELEMETRY, null);
-      if (!tube || !tube.videos || Object.keys(tube.videos).length === 0) {
-        setStorageJson(STORAGE_TUBE_TELEMETRY, {
-          totalViews: 4860,
-          totalWatchMinutes: 12450,
-          videos: {
-            'tube_vid_01': { videoId: 'tube_vid_01', title: 'सोयाबीन में पीला मोज़ेक वायरस का 100% सटीक इलाज', category: 'कृषि रोग इलाज', plays: 1820, completions: 1450, totalWatchSeconds: 109200, lastPlayedAt: Date.now() - 3600000 },
-            'tube_vid_02': { videoId: 'tube_vid_02', title: 'दूध और फैट 3 गुना बढ़ाने का प्राकृतिक पशु आहार फॉर्मूला', category: 'पशुपालन', plays: 1430, completions: 1120, totalWatchSeconds: 85800, lastPlayedAt: Date.now() - 7200000 },
-            'tube_vid_03': { videoId: 'tube_vid_03', title: 'मधुमेह और HbA1c को 90 दिन में प्राकृतिक नियंत्रण कैसे करें', category: 'स्वास्थ्य', plays: 980, completions: 760, totalWatchSeconds: 58800, lastPlayedAt: Date.now() - 14400000 },
-            'tube_vid_04': { videoId: 'tube_vid_04', title: 'गेहूं की बंपर पैदावार: पहला पानी और खाद का सही समय', category: 'फसल प्रबंधन', plays: 630, completions: 510, totalWatchSeconds: 37800, lastPlayedAt: Date.now() - 28800000 }
-          }
-        });
+      if (!tube || !tube.videos) {
+        setStorageJson(STORAGE_TUBE_TELEMETRY, { totalViews: 0, totalWatchMinutes: 0, videos: {} });
       }
-
       const pVisits = getStorageJson(STORAGE_PAGE_VISITS, null);
-      if (!pVisits || !pVisits.pages || Object.keys(pVisits.pages).length === 0) {
-        setStorageJson(STORAGE_PAGE_VISITS, {
-          totalVisits: 3420,
-          categories: {
-            'health': { category: 'health', label: '❤️ स्वास्थ्य देखभाल (Health)', visits: 1240, uniquePages: { 'diabetes.html': true, 'joint-care.html': true, 'weight-loss.html': true } },
-            'agriculture': { category: 'agriculture', label: '🌾 कृषि व फसल सुरक्षा', visits: 1380, uniquePages: { 'index.html': true, 'crop-doctor.html': true } },
-            'pashupalan': { category: 'pashupalan', label: '🐄 पशुपालन व दुग्ध क्रांति', visits: 510, uniquePages: { 'pashu-palan.html': true } },
-            'netsurf': { category: 'netsurf', label: '🌿 नेट्सर्फ बायोफिट व बिज़नेस', visits: 290, uniquePages: { 'netsurf.html': true } }
-          },
-          pages: {
-            'diabetes.html': { name: 'diabetes.html', title: 'मधुमेह नियंत्रण की सही राह', path: '/health/diabetes.html', category: 'health', categoryLabel: '❤️ स्वास्थ्य', subCategory: 'मधुमेह (Diabetes)', visits: 520, totalDurationSeconds: 46800, lastVisitedAt: Date.now() },
-            'joint-care.html': { name: 'joint-care.html', title: 'जोड़ों व घुटनों के दर्द का समाधान', path: '/health/joint-care.html', category: 'health', categoryLabel: '❤️ स्वास्थ्य', subCategory: 'जोड़ों का दर्द', visits: 380, totalDurationSeconds: 26600, lastVisitedAt: Date.now() - 1200000 },
-            'weight-loss.html': { name: 'weight-loss.html', title: 'वज़न घटाने का प्राकृतिक फॉर्मूला', path: '/health/weight-loss.html', category: 'health', categoryLabel: '❤️ स्वास्थ्य', subCategory: 'वज़न प्रबंधन', visits: 340, totalDurationSeconds: 23800, lastVisitedAt: Date.now() - 3600000 },
-            'pashu-palan.html': { name: 'pashu-palan.html', title: 'पशुपालन एवं दुग्ध क्रांति', path: '/pashu-palan.html', category: 'pashupalan', categoryLabel: '🐄 पशुपालन', subCategory: 'दुग्ध उत्पादन', visits: 510, totalDurationSeconds: 40800, lastVisitedAt: Date.now() - 500000 },
-            'netsurf.html': { name: 'netsurf.html', title: 'नेट्सर्फ बायोफिट ऑर्गेनिक', path: '/categories/netsurf.html', category: 'netsurf', categoryLabel: '🌿 नेट्सर्फ', subCategory: 'बायोफिट उत्पाद', visits: 290, totalDurationSeconds: 17400, lastVisitedAt: Date.now() - 1800000 }
-          }
-        });
+      if (!pVisits || !pVisits.pages) {
+        setStorageJson(STORAGE_PAGE_VISITS, { totalVisits: 0, categories: {}, pages: {} });
       }
-
       const rdr = getStorageJson(STORAGE_READER_TELEMETRY, null);
-      if (!rdr || !rdr.books || Object.keys(rdr.books).length === 0) {
-        setStorageJson(STORAGE_READER_TELEMETRY, {
-          books: {
-            'BK001': { bookId: 'BK001', totalOpens: 340, maxPageReached: 152, totalPages: 152, avgProgress: 64, audioMinutes: 280, lastReadAt: Date.now() - 1800000 },
-            'BK002': { bookId: 'BK002', totalOpens: 420, maxPageReached: 120, totalPages: 120, avgProgress: 72, audioMinutes: 390, lastReadAt: Date.now() - 3600000 },
-            'BK015': { bookId: 'BK015', totalOpens: 190, maxPageReached: 98, totalPages: 140, avgProgress: 52, audioMinutes: 140, lastReadAt: Date.now() - 7200000 },
-            'BK016': { bookId: 'BK016', totalOpens: 150, maxPageReached: 85, totalPages: 110, avgProgress: 48, audioMinutes: 110, lastReadAt: Date.now() - 14400000 }
-          },
-          readers: {
-            '7974422572': {
-              userId: 'admin_master',
-              mobile: '7974422572',
-              name: 'किसान मित्र (एडमिन)',
-              books: {
-                'BK001': { bookId: 'BK001', currentPage: 92, totalPages: 152, percent: 61, lastReadAt: Date.now() - 1800000 },
-                'BK002': { bookId: 'BK002', currentPage: 110, totalPages: 120, percent: 92, lastReadAt: Date.now() - 3600000 }
-              }
-            }
-          }
-        });
+      if (!rdr || !rdr.books) {
+        setStorageJson(STORAGE_READER_TELEMETRY, { books: {}, readers: {} });
       }
     }
   };
