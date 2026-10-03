@@ -1294,8 +1294,8 @@ function getGeneratedOfferUrlAndMsg(user) {
   if (ob.type === 'bogo') {
     const bookPair = `${ob.primaryBook},${ob.bonusBook}`;
     const sig = generateOfferSignature(bookPair, ob.price, targetMobile, ob.timer !== 'none' ? ob.timer : exp);
-    // Ultra-short URL (/c.html?bs=...&p=...&m=...&n=...&s=...&t=...)
-    checkoutUrl = `/c.html?bs=${ob.primaryBook},${ob.bonusBook}&p=${ob.price}&m=${targetMobile}&n=${encodeURIComponent(user.full_name || '')}&s=${sig}${timerQuery}`;
+    // Ultra-short clean URL (/c.html?bs=...&p=...&m=...&s=...&t=...)
+    checkoutUrl = `/c.html?bs=${ob.primaryBook},${ob.bonusBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}`;
     const bonusTitle = bonusBookObj.name || bonusBookObj.heading || ob.bonusBook;
     const bonusMrp = bonusBookObj.mrp || 299;
     const bonusStoreOffer = bonusBookObj.offerPrice || 99;
@@ -1311,8 +1311,8 @@ function getGeneratedOfferUrlAndMsg(user) {
     shortSms = `नमस्ते ${name} जी! पुस्तक ${bookTitle} का रिव्यू दें और 50% छूट वाउचर पाएं: https://aarogyamindia.online${checkoutUrl}`;
   } else {
     const sig = generateOfferSignature(ob.primaryBook, ob.price, targetMobile, ob.timer !== 'none' ? ob.timer : exp);
-    // Ultra-short URL (/c.html?b=...&p=...&m=...&n=...&s=...&t=...)
-    checkoutUrl = `/c.html?b=${ob.primaryBook}&p=${ob.price}&m=${targetMobile}&n=${encodeURIComponent(user.full_name || '')}&s=${sig}${timerQuery}`;
+    // Ultra-short clean URL (/c.html?b=...&p=...&m=...&s=...&t=...)
+    checkoutUrl = `/c.html?b=${ob.primaryBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}`;
 
     msg = `🌾 *नमस्ते ${name} जी!* 🙏\n\n${userConditionText} आज आपके लिए आरोग्यम इंडिया का विशेष वीआईपी ऑफर है:\n\n📖 *पुस्तक:* ${bookTitle}\n🌱 *संक्षिप्त परिचय:* ${bookDesc}\n💰 *विशेष मूल्य:* ${priceText} (सामान्य MRP: ~₹${bookMrp}~, स्टोर पर ₹${bookStoreOffer})\n${ob.timer !== 'none' ? `⏳ *समय सीमा:* केवल *${timerText}* के लिए मान्य!\n` : ''}\n👉 *विशेष छूट पर ऑर्डर करने के लिए यहाँ क्लिक करें:*\nhttps://aarogyamindia.online${checkoutUrl}\n\n📖 *पुस्तक का संपूर्ण विवरण व इंडेक्स यहाँ देखें:*\n${landingUrl}\n\n🔒 *नोट:* यह विशेष छूट केवल आपके पंजीकृत नंबर (+91-XXXXX${cleanMobile.slice(-4)}) के लिए सुरक्षित है। इसे किसी को शेयर न करें, एक बार खरीदने पर यह ऑफर बंद हो जाएगा।\n\nधन्यवाद!\n_आरोग्यम इंडिया - समृद्ध किसान, समृद्ध भारत_`;
 
