@@ -920,6 +920,8 @@
       ],
       "marketing_cards": [],
       "videos": [],
+      "reviews_heading": "पशुपालकों के 10 वास्तविक अनुभव",
+      "reviews_badge": "⭐ 100% पशुपालक संतुष्टि",
       "reviews": [
         {
           "name": "सुखविंदर सिंह",
@@ -992,6 +994,8 @@
           "text": "व्हाट्सएप पर ऑर्डर किया और 3 दिन में पार्सल गांव के पते पर डिलीवर हो गया।"
         }
       ],
+      "faqs_heading": "",
+      "faqs_badge": "",
       "faqs": [
         {
           "q": "CFL मिनरल मिक्सचर प्रतिदिन कितना देना चाहिए?",
@@ -1034,6 +1038,8 @@
           "a": "बिल्कुल! नीचे दिए गए फ्लोटिंग शेयर या व्हाट्सएप बटन से सीधे अपने मित्रों और डेयरी ग्रुप्स में शेयर कर सकते हैं।"
         }
       ],
+      "ladder_header": null,
+      "career_ladder": [],
       "health_diseases": [
         {
           "id": "DIS001",
@@ -1261,75 +1267,102 @@
       ],
       "products": [
         {
-          "id": "PAS001",
-          "name": "CFL Mineral Feed (1kg)",
-          "price": 650.0,
-          "mrp": 650.0,
-          "badge": "दुग्ध वृद्धि बूस्टर",
-          "description": "बायपास प्रोटीन, चेलेटेड मिनरल्स व प्रोबायोटिक्स युक्त। 7 दिन में दूध और फैट में अचूक सुधार लाता है।",
-          "image": "/images/products/product-------------new-pr-296198-6gyd.webp"
+          "title": "Pet-Vet Breed 500 GM ",
+          "name": "Pet-Vet Breed 500 GM ",
+          "description": "समस्या का समाधान: अक्सर पशुओं में खाना न पचना, पेट फूलना, गैस, दस्त, या भोजन से सही पोषण न मिलने के कारण उनकी सेहत गिरने लगती है और दूध या ग्रोथ पर बुरा असर पड़ता है।\n\nउत्पाद का लाभ: यह पेट की इन सभी समस्याओं को जड़ से खत्म करता है, पाचन एंजाइम्स को एक्टिवेट करता है और खाए गए चारे से मिलने वाले पोषण (Nutrient absorption) को सौ प्रतिशत तक बढ़ाकर पशु को स्वस्थ और तंदुरुस्त रखता है।..",
+          "image": "/images/products/product-------------new-pr-296198-6gyd.webp",
+          "mrp": 650,
+          "price": 650,
+          "discount_pct": 25,
+          "dose": "मात्रा व तरीका: पशु चिकित्सक या उत्पाद के निर्देशों के अनुसार उचित मात्रा में इसे पशु के चारे या दाने में मिलाकर दें।\n\nनियमित सेवन: पाचन तंत्र को हमेशा दुरुस्त रखने के लिए इसे नियमित रूप से उपयोग करें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "PAS002",
-          "name": "Mastitis Shield Care Kit",
-          "price": 850.0,
-          "mrp": 850.0,
-          "badge": "थनैला रक्षक",
-          "description": "अयन की सूजन, गांठ व दूध में छीछड़ों को दूर करने वाली 100% सुरक्षित आयुर्वेदिक एंटी-इंफ्लेमेटरी किट।",
-          "image": "/images/products/product-pet-vet-breed-500--931551-mm4t.webp"
+          "title": "Pet-Vet Breed 500 GRAM ",
+          "name": "Pet-Vet Breed 500 GRAM ",
+          "description": "समस्या का समाधान: अक्सर पशुओं में हॉर्मोनल असंतुलन, सही समय पर हीट (Estrous cycle) में न आना और गर्भधारण न ठहरने (Infertility) जैसी गंभीर समस्याओं के कारण पशुपालकों को भारी आर्थिक नुकसान उठाना पड़ता है।\n\nउत्पाद का लाभ: यह विशेष लिक्विड फॉर्मूलेशन पशुओं में प्राकृतिक प्रजनन चक्र को सुचारू बनाने, गर्भधारण दर (Conception rate) को बढ़ाने और स्वस्थ प्रजनन अंगों के विकास में मदद करता है, जिससे पशुपालन व्यवसाय अधिक लाभदायक बनता है।",
+          "image": "/images/products/product-pet-vet-breed-500--931551-mm4t.webp",
+          "mrp": 650,
+          "price": 650,
+          "discount_pct": 25,
+          "dose": "मात्रा व तरीका: विशेषज्ञ या पैकेजिंग पर दिए गए दिशा-निर्देशों के अनुसार पशुओं के दैनिक आहार या पानी में उचित मात्रा मिलाएं।\n\nनियमित सेवन: प्रजनन संबंधी बेहतर और स्थायी परिणामों के लिए इसे नियमित रूप से उपयोग करें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "PAS003",
-          "name": "Doodh Dhara High-Cal (1L)",
-          "price": 450.0,
-          "mrp": 450.0,
-          "badge": "लिक्विड कैल्शियम",
-          "description": "विटामिन D3, B12 व बायोटीन युक्त बायो-अवेलेबल कैल्शियम। ब्यात के बाद मिल्क फीवर से बचाता है।",
-          "image": "/images/products/product-pet-vet-advanced-c-454250-7umw.webp"
+          "title": "Pet-Vet Advanced Cattle Feed Supplement 1 KG",
+          "name": "Pet-Vet Advanced Cattle Feed Supplement 1 KG",
+          "description": "गाय-भैंस में 1 से 1.5 लीटर दूध वृद्धि, 0.8 से 1.2 डिग्री फैट बढ़त और समय पर गाभिन ठहराने में 100% सहायक।",
+          "image": "/images/products/product-pet-vet-advanced-c-454250-7umw.webp",
+          "mrp": 1275,
+          "price": 1275,
+          "discount_pct": 25,
+          "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने या बांटे में मिलाकर दें। बछड़े/बकरियां: 5 ग्राम प्रतिदिन।",
+          "badge": "🐄 दूध व फैट बूस्टर",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "PAS004",
-          "name": "Uterus Tone Cleanser (500ml)",
-          "price": 550.0,
-          "mrp": 550.0,
-          "badge": "बांझपन निवारक",
-          "description": "बच्चेदानी की गंदगी साफ कर समय पर शुद्ध हीट में लाता है और गर्भ ठहरने की संभावना 90% बढ़ाता है।",
-          "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp"
+          "title": "Pet-Vet Advanced Cattle Feed Supplement 500 gm",
+          "name": "Pet-Vet Advanced Cattle Feed Supplement 500 gm",
+          "description": "चेलेटेड मिनरल्स, विटामिन्स, प्रीबायोटिक व प्रोबायोटिक्स से भरपूर सम्पूर्ण पशु आहार पूरक।",
+          "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp",
+          "mrp": 699,
+          "price": 699,
+          "discount_pct": 25,
+          "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने में मिलाकर दें। 60 से 90 दिन लगातार खिलाएं।",
+          "badge": "🥛 प्रीमियम कैटल फीड कंसंट्रेट",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "",
+        "subtitle": "",
         "cards": [
           {
+            "id": "CB_1791022298186_wvtr",
             "title": "❓ कारण (Causes)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
-            "points": []
+            "points": [],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1791022298187_o4qu",
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
-            "points": []
+            "points": [],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1791022298187_9ns8",
             "title": "🚨 साइड इफेक्ट्स व खतरे (Risks)",
+            "badge": "",
             "color": "#dc2626",
             "image": "",
-            "points": []
+            "points": [],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           }
         ]
       },
+      "admin_edited": 1791022298188,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
         "number": "917974422572",
         "prompt": "नमस्ते, मुझे पशु पालन व दुग्ध वृद्धि के बारे में सलाह चाहिए।"
-      },
-      "reviews_heading": "पशुपालकों के 10 वास्तविक अनुभव",
-      "reviews_badge": "⭐ 100% पशुपालक संतुष्टि"
+      }
     },
     {
       "id": "page_ebook_store",
