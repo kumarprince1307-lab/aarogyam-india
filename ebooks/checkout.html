@@ -113,6 +113,17 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
                     <span>Offer Price</span>
                     <span id="summaryPrice">-</span>
                 </div>
+                <!-- 🪙 Wallet Points 20% Discount Option -->
+                <div id="checkoutWalletRow" style="display:none; background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:10px 14px; margin:10px 0;">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.86rem; font-weight:800; color:#15803d; margin:0;">
+                        <input type="checkbox" id="useWalletCheckbox" style="width:18px; height:18px; accent-color:#16a34a; cursor:pointer;" checked>
+                        <span>🪙 आरोग्यम वॉलेट पॉइंट्स उपयोग करें</span>
+                    </label>
+                    <div style="font-size:0.75rem; color:#166534; margin-top:5px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>उपलब्ध: ₹<span id="checkoutWalletBalText">0</span> (अधिकतम 20% छूट)</span>
+                        <strong style="color:#15803d; font-size:0.95rem;">-₹<span id="checkoutWalletDiscountText">0</span></strong>
+                    </div>
+                </div>
                 <div class="summary-row total">
                     <strong>Total Payable</strong>
                     <strong id="totalPrice">-</strong>
@@ -215,6 +226,7 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="/js/supabase.js?v=2.2.0"></script>
     <script src="/session.js?v=2.2.0"></script>
+    <script src="/js/wallet-reward-engine.js"></script>
     <script src="/js/checkout.js?v=2.2.0"></script>
 
     <!-- लॉगिन या प्रोफाइल ट्रिगर करने के लिए स्क्रिप्ट -->

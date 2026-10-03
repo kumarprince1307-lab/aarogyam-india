@@ -331,6 +331,9 @@
     // 🟢 Active / Inactive Status & 365-Day Subscription Timer
     updateUcasSubscriptionState(user);
 
+    // 🪙 Aarogyam Wallet & Share Rewards (90-Day Timer & Zero Egress)
+    updateUcasWalletCard(user);
+
     // 📊 Profile Completion Progress Calculation
     calculateUcasProfileProgress(user);
 
@@ -392,6 +395,58 @@
       if (inactiveBanner) inactiveBanner.style.display = 'block';
     }
   }
+
+  function updateUcasWalletCard(user) {
+    if (!window.AarogyamWallet) return;
+    try {
+      const w = window.AarogyamWallet;
+      w.init();
+      const state = w.state || {};
+
+      const balEl = document.getElementById('ucas-wallet-balance');
+      const selfEl = document.getElementById('ucas-wallet-self');
+      const refEl = document.getElementById('ucas-wallet-ref');
+      const refCountEl = document.getElementById('ucas-wallet-ref-count');
+      const spentEl = document.getElementById('ucas-wallet-spent');
+
+      if (balEl) balEl.textContent = state.balance || 0;
+      if (selfEl) selfEl.textContent = state.earned_self || 0;
+      if (refEl) refEl.textContent = state.earned_referral || 0;
+      if (refCountEl) refCountEl.textContent = state.referred_buyers_count || 0;
+      if (spentEl) spentEl.textContent = state.total_spent || 0;
+
+      // Start live 90-day countdown timer
+      w.startCountdownUI('ucas-wallet-timer');
+
+      // Trigger background sync with Supabase
+      if (typeof w.refreshFromRemoteAsync === 'function') {
+        w.refreshFromRemoteAsync();
+      }
+
+      // Check if expiry warning popup needed
+      setTimeout(() => {
+        if (typeof w.showExpiryWarningModalIfNeeded === 'function') {
+          w.showExpiryWarningModalIfNeeded();
+        }
+      }, 1500);
+    } catch (e) {
+      console.warn("UCAS Wallet card update error:", e);
+    }
+  }
+
+  window.shareUcasReferralLink = function() {
+    const user = (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || {};
+    const sid = user.share_id || user.mobile || 'AI000004';
+    const shareUrl = `https://aarogyamindia.online/?ref=${encodeURIComponent(sid)}`;
+    const msg = `🌾 *नमस्ते किसान भाई!* 🙏\n\nआरोग्यम इंडिया पर कृषि व पशुपालन की सभी ई-बुक्स, फसल डॉक्टर AI और खाद-दवा डायरेक्टरी उपलब्ध हैं।\n\n👉 *नीचे दिए गए विशेष लिंक से जुड़ें और 20% तक की छूट का लाभ उठाएं:*\n${shareUrl}\n\nधन्यवाद!\n_आरोग्यम इंडिया_`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  // Re-render wallet card if updated anywhere in session
+  window.addEventListener('aoi:wallet_updated', (e) => {
+    const u = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
+    updateUcasWalletCard(u);
+  });
 
   function calculateUcasProfileProgress(user) {
     let score = 0;

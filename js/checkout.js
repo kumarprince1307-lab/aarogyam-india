@@ -329,6 +329,50 @@ function markCheckoutOfferPurchased(mobile, bookId, amount, orderId) {
     } catch(e) {}
 }
 
+// 🪙 Wallet Points 20% Discount Helper
+window.appliedWalletDiscount = 0;
+function applyWalletCheckoutDiscount(basePrice) {
+    const rawPrice = Number(basePrice) || 0;
+    if (rawPrice <= 0 || !window.AarogyamWallet) {
+        window.appliedWalletDiscount = 0;
+        return rawPrice;
+    }
+    const w = window.AarogyamWallet;
+    const balance = w.getBalance();
+    const walletRow = document.getElementById("checkoutWalletRow");
+    const balText = document.getElementById("checkoutWalletBalText");
+    const discText = document.getElementById("checkoutWalletDiscountText");
+    const chk = document.getElementById("useWalletCheckbox");
+    const totPrice = document.getElementById("totalPrice");
+
+    if (balance <= 0) {
+        if (walletRow) walletRow.style.display = "none";
+        window.appliedWalletDiscount = 0;
+        return rawPrice;
+    }
+
+    const maxDisc = w.calculateMaxDiscount(rawPrice); // Max 20% Cap
+    if (balText) balText.textContent = balance;
+    if (discText) discText.textContent = maxDisc;
+    if (walletRow) walletRow.style.display = "block";
+
+    const isChecked = chk ? chk.checked : true;
+    const effectiveDiscount = isChecked ? maxDisc : 0;
+    window.appliedWalletDiscount = effectiveDiscount;
+    const finalPrice = Math.max(0, rawPrice - effectiveDiscount);
+
+    if (totPrice) totPrice.textContent = "₹" + finalPrice;
+
+    if (chk && !chk.dataset.walletBound) {
+        chk.dataset.walletBound = "true";
+        chk.addEventListener("change", function() {
+            applyWalletCheckoutDiscount(rawPrice);
+        });
+    }
+
+    return finalPrice;
+}
+
 // 🛡️ Security Banner, VIP Offer Thumbnail & Hindi Voice Note Engine
 let checkoutCountdownTimerId = null;
 let checkoutUtterance = null;
@@ -1135,6 +1179,11 @@ async function loadBook() {
         const totPrice = document.getElementById("totalPrice");
         if (totPrice) totPrice.textContent = "₹" + bookOffer;
 
+        // 🪙 Apply Wallet Points 20% Discount if available
+        try {
+            applyWalletCheckoutDiscount(bookOffer);
+        } catch(e) {}
+
         // Safety Guard: Check if Book is Coming Soon
         const bIdUpper = String(book.id || targetId || '').toUpperCase();
         const isLiveAgri = (bIdUpper === 'BK001' || bIdUpper === 'BK002' || bIdUpper === 'BK015' || bIdUpper === 'SUB001' || bIdUpper.includes('BK001') || bIdUpper.includes('BK002'));
@@ -1442,11 +1491,15 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         const bookIdToBuy = window.currentCheckoutBook.id;
         const bookTitle = window.currentCheckoutBook.title;
         const bookPrice = window.currentCheckoutBook.offerPrice;
+        const walletDiscount = (window.appliedWalletDiscount || 0);
+        const finalPayablePrice = Math.max(0, bookPrice - walletDiscount);
         
         const orderData = {
             bookId: bookIdToBuy,
             title: bookTitle,
-            amount: bookPrice,
+            amount: finalPayablePrice,
+            basePrice: bookPrice,
+            walletDiscount: walletDiscount,
             customerName: name,
             mobile: mobile,
             email: email,
@@ -1467,9 +1520,9 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         await logCheckoutActivity(activeUserId, bookIdToBuy, 'initiated');
 
         // 🚀 100% FREE / ADMIN TEST CHECKOUT HANDLER (₹0 - Immediate Unlock)
-        if (bookPrice === 0 || bookPrice <= 0) {
+        if (finalPayablePrice === 0 || bookPrice === 0 || bookPrice <= 0) {
             // 🛡️ SECURITY LAYER 4: Strict Admin-Only Verification for ₹0 Unlocks
-            if (!window.activeVerifiedOffer || (window.activeVerifiedOffer.mobile !== "ADMIN_TEST" && window.activeVerifiedOffer.mobile !== "7974422572")) {
+            if (bookPrice > 0 && walletDiscount < bookPrice && (!window.activeVerifiedOffer || (window.activeVerifiedOffer.mobile !== "ADMIN_TEST" && window.activeVerifiedOffer.mobile !== "7974422572"))) {
                 alert("⚠️ अनधिकृत अनुरोध: ₹0 टेस्ट केवल अधिकृत एडमिन के लिए ही उपलब्ध है।");
                 payBtn.disabled = false;
                 payBtn.textContent = "Pay Now";
@@ -1478,7 +1531,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
             payBtn.disabled = true;
             payBtn.textContent = "सत्यापित हो रहा है...";
-            const freePaymentId = 'FREE_TEST_' + Date.now();
+            const freePaymentId = 'FREE_ORD_' + Date.now();
             await logCheckoutActivity(activeUserId, bookIdToBuy, 'free_success');
 
             try {
@@ -1525,6 +1578,11 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
                 localStorage.setItem('user_is_active', 'true');
                 markCheckoutOfferPurchased(mobile, bookIdToBuy, 0, freePaymentId);
+
+                // Deduct wallet if used
+                if (walletDiscount > 0 && window.AarogyamWallet) {
+                    window.AarogyamWallet.deductPoints(walletDiscount, bookTitle, freePaymentId);
+                }
             } catch (saveErr) {
                 console.warn('Free purchase save note:', saveErr);
             }
@@ -1545,7 +1603,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         else if (typeof Razorpay !== "undefined") {
             var options = {
                 "key": window.RAZORPAY_KEY || "rzp_live_TOlsqOqkmxYCWP",
-                "amount": bookPrice * 100, // पैसों में कन्वर्ट करने के लिए 100 से गुणा
+                "amount": finalPayablePrice * 100, // पैसों में कन्वर्ट करने के लिए 100 से गुणा
                 "currency": "INR",
                 "name": "Aarogyam India",
                 "description": bookTitle,
@@ -1559,14 +1617,14 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         const myPurchasedIds = JSON.parse(localStorage.getItem('my_purchased_book_ids') || '[]');
                         const booksToUnlock = (window.currentCheckoutBookList && window.currentCheckoutBookList.length > 0) 
                             ? window.currentCheckoutBookList 
-                            : [{ id: bookIdToBuy, name: bookTitle, offerPrice: bookPrice }];
+                            : [{ id: bookIdToBuy, name: bookTitle, offerPrice: finalPayablePrice }];
 
                         const db = window.dbClient || window.supabase;
                         const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
 
                         for (const b of booksToUnlock) {
                             const bId = b.id || bookIdToBuy;
-                            const bAmt = b.offerPrice || (bookPrice / booksToUnlock.length);
+                            const bAmt = b.offerPrice || (finalPayablePrice / booksToUnlock.length);
 
                             const newPurchase = {
                                 book_id: bId,
@@ -1596,7 +1654,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         localStorage.removeItem('AI_CART_ITEMS');
 
                         // Activate Membership in local session
-                        const isSub = (bookIdToBuy.includes('SUB') || bookPrice >= 999);
+                        const isSub = (bookIdToBuy.includes('SUB') || finalPayablePrice >= 999);
                         userObj.is_active = true;
                         if (isSub) userObj.is_subscriber = true;
                         localStorage.setItem('AI_USER', JSON.stringify(userObj));
@@ -1612,12 +1670,41 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                             }).eq('id', activeUserId || userObj.id);
                         }
 
-                        markCheckoutOfferPurchased(mobile, bookIdToBuy, bookPrice, response.razorpay_order_id || response.razorpay_payment_id);
+                        markCheckoutOfferPurchased(mobile, bookIdToBuy, finalPayablePrice, response.razorpay_order_id || response.razorpay_payment_id);
+
+                        // 🪙 Deduct wallet points if used (Max 20%)
+                        if (walletDiscount > 0 && window.AarogyamWallet) {
+                            window.AarogyamWallet.deductPoints(walletDiscount, bookTitle, response.razorpay_order_id || response.razorpay_payment_id);
+                        }
+
+                        // 🪙 Credit 10% Self Purchase Reward Points to Wallet
+                        if (window.AarogyamWallet && finalPayablePrice > 0) {
+                            window.AarogyamWallet.creditPoints(Math.round(finalPayablePrice * 0.10), '🛍️ ' + bookTitle + ' खरीद पर 10% कैशबैक', 'earn_self');
+                        }
+
+                        // 👥 Credit 1st Level Referral to Direct Sponsor (10%)
+                        if (finalReferralCode) {
+                            try {
+                                const refLedger = JSON.parse(localStorage.getItem('AOI_DIRECT_REFERRALS_LEDGER') || '[]');
+                                refLedger.unshift({
+                                    sponsor_share_id: finalReferralCode,
+                                    sponsor_mobile: finalReferralMobile,
+                                    buyer_mobile: mobile,
+                                    buyer_name: name,
+                                    purchase_amount: finalPayablePrice,
+                                    points_earned: Math.round(finalPayablePrice * 0.10),
+                                    book_id: bookIdToBuy,
+                                    book_title: bookTitle,
+                                    timestamp: new Date().toISOString()
+                                });
+                                localStorage.setItem('AOI_DIRECT_REFERRALS_LEDGER', JSON.stringify(refLedger.slice(0, 300)));
+                            } catch(e) {}
+                        }
                     } catch (saveErr) {
                         console.warn('Local purchase save note:', saveErr);
                     }
 
-                    window.location.href = `/ebooks/payment-success.html?payment_id=${response.razorpay_payment_id}&book_id=${bookIdToBuy}&amount=${bookPrice}`;
+                    window.location.href = `/ebooks/payment-success.html?payment_id=${response.razorpay_payment_id}&book_id=${bookIdToBuy}&amount=${finalPayablePrice}`;
                 },
                 "prefill": {
                     "name": name,

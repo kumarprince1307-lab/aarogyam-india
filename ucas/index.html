@@ -243,6 +243,80 @@
         </div>
       </div>
 
+      <!-- =========================================
+           UCAS WALLET & SHARE REWARDS CARD (90-DAY REVERSE TIMER)
+      ========================================== -->
+      <div id="ucas-wallet-card" style="margin-bottom:1.25rem; background:linear-gradient(135deg, #091426 0%, #0f2942 100%); border:2px solid #10b981; border-radius:18px; padding:20px; color:#fff; box-shadow:0 12px 35px rgba(16,185,129,0.18);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-bottom:1px solid rgba(255,255,255,0.12); padding-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg, #10b981, #059669); display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 4px 12px rgba(16,185,129,0.4);">
+              🪙
+            </div>
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#f8fafc;">आरोग्यम शेयर & अर्न वॉलेट</h3>
+                <span style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981; font-size:0.7rem; font-weight:800; padding:2px 8px; border-radius:12px;">1 अंक = ₹1 नकद मूल्य</span>
+              </div>
+              <p style="margin:2px 0 0 0; font-size:0.78rem; color:#94a3b8;">
+                अपनी खरीद पर 10% कैशबैक + आपके रेफरल से हुई खरीद पर 10% शेयर पॉइंट्स
+              </p>
+            </div>
+          </div>
+
+          <!-- 90 Days Reverse Timer Clock -->
+          <div id="ucas-wallet-timer-wrap" style="background:rgba(15,23,42,0.85); border:1.5px solid #334155; padding:6px 14px; border-radius:12px; display:inline-flex; align-items:center;">
+            <div id="ucas-wallet-timer" style="font-family:monospace; font-size:0.84rem; font-weight:800; color:#10b981;">⏳ वैधता: 90 दिन शेष</div>
+          </div>
+        </div>
+
+        <!-- 4-Stat Metric Row -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-top:16px;">
+          <div style="background:rgba(16,185,129,0.1); border:1.5px solid rgba(16,185,129,0.35); border-radius:12px; padding:12px;">
+            <div style="font-size:0.72rem; color:#94a3b8; font-weight:700;">🪙 कुल उपलब्ध बैलेंस</div>
+            <div style="font-size:1.6rem; font-weight:900; color:#10b981; margin-top:3px;">₹<span id="ucas-wallet-balance">0</span></div>
+            <div style="font-size:0.68rem; color:#34d399; margin-top:2px;">किताब खरीद पर 20% तक छूट</div>
+          </div>
+
+          <div style="background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:12px;">
+            <div style="font-size:0.72rem; color:#94a3b8; font-weight:700;">🛍️ सेल्फ खरीद कैशबैक (10%)</div>
+            <div style="font-size:1.3rem; font-weight:900; color:#38bdf8; margin-top:3px;">+₹<span id="ucas-wallet-self">0</span></div>
+            <div style="font-size:0.68rem; color:#64748b; margin-top:2px;">आपकी पिछली व नई खरीद पर</div>
+          </div>
+
+          <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:12px; padding:12px;">
+            <div style="font-size:0.72rem; color:#94a3b8; font-weight:700;">👥 1st Level रेफरल कमाई (10%)</div>
+            <div style="font-size:1.3rem; font-weight:900; color:#f59e0b; margin-top:3px;">+₹<span id="ucas-wallet-ref">0</span></div>
+            <div style="font-size:0.68rem; color:#64748b; margin-top:2px;"><span id="ucas-wallet-ref-count">0</span> मेंबर्स के बिजनेस से</div>
+          </div>
+
+          <div style="background:rgba(148,163,184,0.08); border:1px solid rgba(148,163,184,0.2); border-radius:12px; padding:12px;">
+            <div style="font-size:0.72rem; color:#94a3b8; font-weight:700;">🛒 खर्च किए गए पॉइंट्स</div>
+            <div style="font-size:1.3rem; font-weight:900; color:#94a3b8; margin-top:3px;">-₹<span id="ucas-wallet-spent">0</span></div>
+            <div style="font-size:0.68rem; color:#64748b; margin-top:2px;">ई-बुक खरीद में बचाए गए</div>
+          </div>
+        </div>
+
+        <!-- CTA Action Buttons -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:16px; padding-top:14px; border-top:1px dashed rgba(255,255,255,0.12);">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="/ebooks/ebook.html" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-weight:800; font-size:0.82rem; padding:8px 16px; border-radius:20px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(16,185,129,0.3);">
+              <span>🛍️</span> <span>Use Now (20% छूट लें)</span>
+            </a>
+            <button type="button" onclick="window.shareUcasReferralLink()" style="background:#1e293b; border:1.5px solid #22c55e; color:#22c55e; font-weight:800; font-size:0.82rem; padding:8px 16px; border-radius:20px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+              <span>📲</span> <span>WhatsApp पर शेयर करें व 10% कमाएं</span>
+            </button>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <span style="font-size:0.72rem; color:#6ee7b7; display:inline-flex; align-items:center; gap:4px;">
+              <i class="fa-solid fa-shield-halved"></i> 100% Zero-Egress Vault + Cloud Sync
+            </span>
+            <a href="/ebooks/share-rewards.html" style="background:rgba(56,189,248,0.15); border:1px solid #38bdf8; color:#38bdf8; font-size:0.8rem; font-weight:800; padding:6px 14px; border-radius:20px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; transition:transform 0.2s;">
+              <span>🎧</span> <span>ऑडियो गाइड व रिवॉर्ड्स नियम खोलें →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
       <!-- KPI Summary Cards (Real Dynamic Data) -->
       <div class="ucas-kpi-grid">
         <div class="ucas-kpi-card kpi-green">
@@ -1998,6 +2072,7 @@
 <script src="/session.js"></script>
 <script src="/js/supabase.js"></script>
 <script src="/js/share-engine-core.js"></script>
+<script src="/js/wallet-reward-engine.js"></script>
 <script src="/js/universal-nav-drawer.js?v=20261001_v3"></script>
 <script src="/js/recent-purchase-toast.js"></script>
 

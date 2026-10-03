@@ -204,6 +204,75 @@
         </div>
       </div>
 
+      <!-- =========================================
+           WALLET & SHARE REWARDS CARD (90-DAY REVERSE TIMER)
+      ========================================== -->
+      <div id="profile-wallet-card" style="margin-top:20px; background:linear-gradient(135deg, #091426 0%, #0f2942 100%); border:2px solid #10b981; border-radius:20px; padding:24px; color:#fff; box-shadow:0 12px 36px rgba(16,185,129,0.18);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:16px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg, #10b981, #059669); display:flex; align-items:center; justify-content:center; font-size:1.6rem; box-shadow:0 4px 14px rgba(16,185,129,0.4);">
+              🪙
+            </div>
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <h2 style="margin:0; font-size:1.25rem; font-weight:900; color:#f8fafc;">आरोग्यम शेयर & अर्न वॉलेट</h2>
+                <span style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981; font-size:0.7rem; font-weight:800; padding:2px 8px; border-radius:12px;">1 अंक = ₹1 नकद मूल्य</span>
+              </div>
+              <p style="margin:3px 0 0 0; font-size:0.78rem; color:#94a3b8;">
+                अपनी खरीद पर 10% कैशबैक + आपके रेफरल से हुई खरीद पर 10% शेयर पॉइंट्स
+              </p>
+            </div>
+          </div>
+
+          <!-- 90 Days Reverse Timer Clock -->
+          <div id="profile-wallet-timer-wrap" style="background:rgba(15,23,42,0.85); border:1.5px solid #334155; padding:8px 16px; border-radius:12px; display:inline-flex; align-items:center;">
+            <div id="profile-wallet-timer">⏳ वैधता: 90 दिन शेष</div>
+          </div>
+        </div>
+
+        <!-- 4-Stat Metric Row -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-top:18px;">
+          <div style="background:rgba(16,185,129,0.1); border:1.5px solid rgba(16,185,129,0.35); border-radius:14px; padding:14px;">
+            <div style="font-size:0.75rem; color:#94a3b8; font-weight:700;">🪙 कुल उपलब्ध बैलेंस</div>
+            <div style="font-size:1.7rem; font-weight:900; color:#10b981; margin-top:4px;">₹<span id="profile-wallet-balance">0</span></div>
+            <div style="font-size:0.7rem; color:#34d399; margin-top:2px;">किताब खरीद पर 20% तक उपयोग योग्य</div>
+          </div>
+
+          <div style="background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.25); border-radius:14px; padding:14px;">
+            <div style="font-size:0.75rem; color:#94a3b8; font-weight:700;">🛍️ सेल्फ खरीद कैशबैक (10%)</div>
+            <div style="font-size:1.35rem; font-weight:900; color:#38bdf8; margin-top:4px;">+₹<span id="profile-wallet-self">0</span></div>
+            <div style="font-size:0.7rem; color:#64748b; margin-top:2px;">आपकी पिछली व नई खरीद पर</div>
+          </div>
+
+          <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:14px; padding:14px;">
+            <div style="font-size:0.75rem; color:#94a3b8; font-weight:700;">👥 1st Level रेफरल कमाई (10%)</div>
+            <div style="font-size:1.35rem; font-weight:900; color:#f59e0b; margin-top:4px;">+₹<span id="profile-wallet-ref">0</span></div>
+            <div style="font-size:0.7rem; color:#64748b; margin-top:2px;"><span id="profile-wallet-ref-count">0</span> किसानों की खरीद से</div>
+          </div>
+
+          <div style="background:rgba(148,163,184,0.08); border:1px solid rgba(148,163,184,0.2); border-radius:14px; padding:14px;">
+            <div style="font-size:0.75rem; color:#94a3b8; font-weight:700;">🛒 खर्च किए गए पॉइंट्स</div>
+            <div style="font-size:1.35rem; font-weight:900; color:#94a3b8; margin-top:4px;">-₹<span id="profile-wallet-spent">0</span></div>
+            <div style="font-size:0.7rem; color:#64748b; margin-top:2px;">ई-बुक खरीद में बचाए गए</div>
+          </div>
+        </div>
+
+        <!-- CTA Action Buttons -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:18px; padding-top:16px; border-top:1px dashed rgba(255,255,255,0.12);">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="/ebooks/ebook.html" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-weight:800; font-size:0.84rem; padding:10px 18px; border-radius:24px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(16,185,129,0.35);">
+              <span>🛍️</span> <span>Use Now (किताब पर 20% छूट लें)</span>
+            </a>
+            <button type="button" onclick="window.shareProfileReferralLink()" style="background:#1e293b; border:1.5px solid #22c55e; color:#22c55e; font-weight:800; font-size:0.84rem; padding:10px 18px; border-radius:24px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+              <span>📲</span> <span>WhatsApp पर शेयर करें व 10% कमाएं</span>
+            </button>
+          </div>
+          <a href="/ebooks/share-rewards.html" style="color:#38bdf8; font-size:0.8rem; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+            <span>📖</span> <span>ट्यूटोरियल व ऑडियो गाइड देखें →</span>
+          </a>
+        </div>
+      </div>
+
       <!-- Profile Grid -->
       <div class="profile-grid">
         
@@ -379,6 +448,7 @@
   <script src="/js/universal-nav-drawer.js?v=20261001_v3"></script>
   <script src="/js/recent-purchase-toast.js"></script>
   <script src="/js/global-guest-modal.js?v=20260926_v16"></script>
+  <script src="/js/wallet-reward-engine.js"></script>
   <script type="module" src="/js/public-pwa.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -401,7 +471,48 @@
         const wEl = document.getElementById('profile-stat-wishlist');
         if (wEl) wEl.textContent = Array.isArray(w) ? w.length : 0;
       } catch (e) {}
+
+      // ==========================================
+      // INITIALIZE WALLET & 90-DAY REVERSE TIMER
+      // ==========================================
+      if (window.AarogyamWallet) {
+        try {
+          const w = window.AarogyamWallet;
+          w.init();
+          const state = w.state || {};
+          const balEl = document.getElementById('profile-wallet-balance');
+          const selfEl = document.getElementById('profile-wallet-self');
+          const refEl = document.getElementById('profile-wallet-ref');
+          const refCountEl = document.getElementById('profile-wallet-ref-count');
+          const spentEl = document.getElementById('profile-wallet-spent');
+
+          if (balEl) balEl.textContent = state.balance || 0;
+          if (selfEl) selfEl.textContent = state.earned_self || 0;
+          if (refEl) refEl.textContent = state.earned_referral || 0;
+          if (refCountEl) refCountEl.textContent = state.referred_buyers_count || 0;
+          if (spentEl) spentEl.textContent = state.total_spent || 0;
+
+          // Start live 90-day countdown timer
+          w.startCountdownUI('profile-wallet-timer');
+
+          // Check if expiry warning popup needed
+          setTimeout(() => {
+            w.showExpiryWarningModalIfNeeded();
+          }, 1200);
+        } catch(err) {
+          console.warn("Wallet profile init error:", err);
+        }
+      }
     });
+
+    // 1-Click WhatsApp Referral Share Link
+    window.shareProfileReferralLink = function() {
+      const user = (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || {};
+      const sid = user.share_id || user.mobile || 'AI000004';
+      const shareUrl = `https://aarogyamindia.online/?ref=${encodeURIComponent(sid)}`;
+      const msg = `🌾 *नमस्ते किसान भाई!* 🙏\n\nआरोग्यम इंडिया पर खेती की सभी टॉप ई-बुक्स, फसल डॉक्टर AI और खाद-दवा गाइड उपलब्ध हैं।\n\n👉 *नीचे दिए गए विशेष लिंक से जुड़ें और 20% तक की छूट पाएं:*\n${shareUrl}\n\nधन्यवाद!\n_आरोग्यम इंडिया_`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    };
   </script>
 </body>
 
