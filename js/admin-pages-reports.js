@@ -672,7 +672,7 @@ function updateMarketingHubView(container) {
         <option value="whatsapp" ${mktState.activeTab === 'whatsapp' ? 'selected' : ''}>📲 1. WhatsApp डिस्पैच व ऑफ़र निर्माता (${displayedAudience.length})</option>
         <option value="funnel" ${mktState.activeTab === 'funnel' ? 'selected' : ''}>🎯 2. लाइव मांग मीटर व रैंकिंग</option>
         <option value="tube" ${mktState.activeTab === 'tube' ? 'selected' : ''}>🎬 3. AarogyamTube वीडियो एनालिटिक्स</option>
-        <option value="categories_demand" ${mktState.activeTab === 'categories_demand' ? 'selected' : ''}>🌿 4. 11 हेल्थ पेज, पशुपालन व Netsurf मांग</option>
+        <option value="categories_demand" ${mktState.activeTab === 'categories_demand' ? 'selected' : ''}>🌿 4. AI वेब पेज विज़िटर रिपोर्ट व श्रेणी मांग</option>
         <option value="reader_downloads" ${mktState.activeTab === 'reader_downloads' ? 'selected' : ''}>📚 5. ई-बुक रीडिंग प्रोग्रेस व डाउनलोड्स</option>
         <option value="switches" ${mktState.activeTab === 'switches' ? 'selected' : ''}>🎛️ 6. प्रमोशन रिमोट कंट्रोल</option>
         <option value="reviews" ${mktState.activeTab === 'reviews' ? 'selected' : ''}>⭐ 7. रिव्यू मॉडरेशन (Live Pipeline)</option>
@@ -680,8 +680,8 @@ function updateMarketingHubView(container) {
       </select>
     </div>
 
-    <!-- Horizontal Desktop/Tablet Tab Pills with Clean Swipeable Scrolling -->
-    <div style="position:relative; margin-bottom:20px;">
+    <!-- Horizontal Desktop Tab Pills (Hidden on Mobile to Prevent Duplicate Tabs) -->
+    <div class="mkt-tabs-desktop-wrap" style="position:relative; margin-bottom:20px;">
       <div class="mkt-tabs-container">
         <button class="mkt-tab-btn ${mktState.activeTab === 'whatsapp' ? 'active' : ''}" data-tab="whatsapp">
           <span>📲</span> <span>1. WhatsApp डिस्पैच (${displayedAudience.length})</span>
@@ -693,7 +693,7 @@ function updateMarketingHubView(container) {
           <span>🎬</span> <span>3. AarogyamTube एनालिटिक्स</span>
         </button>
         <button class="mkt-tab-btn ${mktState.activeTab === 'categories_demand' ? 'active' : ''}" data-tab="categories_demand">
-          <span>🌿</span> <span>4. 11 हेल्थ पेज, पशुपालन व Netsurf</span>
+          <span>🌿</span> <span>4. AI वेब पेज विज़िटर रिपोर्ट व श्रेणी मांग</span>
         </button>
         <button class="mkt-tab-btn ${mktState.activeTab === 'reader_downloads' ? 'active' : ''}" data-tab="reader_downloads">
           <span>📚</span> <span>5. ई-बुक रीडिंग व डाउनलोड्स</span>
@@ -941,8 +941,8 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
               </div>
               <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0;">${agriCount} किसान</div>
               <div style="font-size:0.72rem; color:#94a3b8; margin-bottom:10px;">संस्तुत: <strong>BK002</strong> (खेती का डॉक्टर)</div>
-              <button type="button" class="btn-copy-broadcast" data-pillar="agri" style="width:100%; background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; border:none; padding:7px 10px; border-radius:6px; font-size:0.74rem; font-weight:800; cursor:pointer;">
-                📢 1-क्लिक WhatsApp ब्रॉडकास्ट
+              <button type="button" class="btn-open-pillar-audience" data-pillar="agri" style="width:100%; background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; border:none; padding:8px 10px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(2,132,199,0.3);">
+                <span>👥</span> <span>${agriCount} किसान देखें व संपर्क करें</span>
               </button>
             </div>
 
@@ -954,8 +954,8 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
               </div>
               <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0;">${dairyCount} किसान</div>
               <div style="font-size:0.72rem; color:#94a3b8; margin-bottom:10px;">संस्तुत: <strong>BK016</strong> (पशुपालन व दुग्ध वृद्धि)</div>
-              <button type="button" class="btn-copy-broadcast" data-pillar="dairy" style="width:100%; background:linear-gradient(135deg, #d97706, #b45309); color:#fff; border:none; padding:7px 10px; border-radius:6px; font-size:0.74rem; font-weight:800; cursor:pointer;">
-                📢 1-क्लिक WhatsApp ब्रॉडकास्ट
+              <button type="button" class="btn-open-pillar-audience" data-pillar="dairy" style="width:100%; background:linear-gradient(135deg, #d97706, #b45309); color:#fff; border:none; padding:8px 10px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(217,119,6,0.3);">
+                <span>👥</span> <span>${dairyCount} किसान देखें व संपर्क करें</span>
               </button>
             </div>
 
@@ -963,12 +963,12 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
             <div style="background:rgba(30,41,59,0.7); border:1px solid #f43f5e; border-radius:12px; padding:14px;">
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <strong style="color:#f43f5e; font-size:0.85rem;">❤️ स्वास्थ्य व आयुर्वेद</strong>
-                <span style="font-size:1.1rem;">🩸</span>
+                <span style="font-size:1.1rem;">🩺</span>
               </div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0;">${healthCount} किसान</div>
+              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0;">${healthCount} पाठक</div>
               <div style="font-size:0.72rem; color:#94a3b8; margin-bottom:10px;">संस्तुत: <strong>BK016</strong> (स्वास्थ्य संकलन)</div>
-              <button type="button" class="btn-copy-broadcast" data-pillar="health" style="width:100%; background:linear-gradient(135deg, #e11d48, #be123c); color:#fff; border:none; padding:7px 10px; border-radius:6px; font-size:0.74rem; font-weight:800; cursor:pointer;">
-                📢 1-क्लिक WhatsApp ब्रॉडकास्ट
+              <button type="button" class="btn-open-pillar-audience" data-pillar="health" style="width:100%; background:linear-gradient(135deg, #e11d48, #be123c); color:#fff; border:none; padding:8px 10px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(225,29,72,0.3);">
+                <span>👥</span> <span>${healthCount} पाठक देखें व संपर्क करें</span>
               </button>
             </div>
 
@@ -980,8 +980,8 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
               </div>
               <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0;">${netsurfCount} किसान</div>
               <div style="font-size:0.72rem; color:#94a3b8; margin-bottom:10px;">संस्तुत: <strong>BK002</strong> + बायोफिट कॉम्बो</div>
-              <button type="button" class="btn-copy-broadcast" data-pillar="netsurf" style="width:100%; background:linear-gradient(135deg, #059669, #047857); color:#fff; border:none; padding:7px 10px; border-radius:6px; font-size:0.74rem; font-weight:800; cursor:pointer;">
-                📢 1-क्लिक WhatsApp ब्रॉडकास्ट
+              <button type="button" class="btn-open-pillar-audience" data-pillar="netsurf" style="width:100%; background:linear-gradient(135deg, #059669, #047857); color:#fff; border:none; padding:8px 10px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(5,150,105,0.3);">
+                <span>👥</span> <span>${netsurfCount} किसान देखें व संपर्क करें</span>
               </button>
             </div>
           </div>
@@ -1020,7 +1020,7 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
       </div>
 
       <!-- Leads Table (10 per page) -->
-      <div style="overflow-x:auto;">
+      <div class="mkt-table-responsive">
         <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
           <thead>
             <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#94a3b8;">
@@ -1294,8 +1294,8 @@ function getGeneratedOfferUrlAndMsg(user) {
   if (ob.type === 'bogo') {
     const bookPair = `${ob.primaryBook},${ob.bonusBook}`;
     const sig = generateOfferSignature(bookPair, ob.price, targetMobile, ob.timer !== 'none' ? ob.timer : exp);
-    // Ultra-short URL (/c.html?bs=...&p=...&m=...&s=...&t=...)
-    checkoutUrl = `/c.html?bs=${ob.primaryBook},${ob.bonusBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}`;
+    // Ultra-short URL (/c.html?bs=...&p=...&m=...&n=...&s=...&t=...)
+    checkoutUrl = `/c.html?bs=${ob.primaryBook},${ob.bonusBook}&p=${ob.price}&m=${targetMobile}&n=${encodeURIComponent(user.full_name || '')}&s=${sig}${timerQuery}`;
     const bonusTitle = bonusBookObj.name || bonusBookObj.heading || ob.bonusBook;
     const bonusMrp = bonusBookObj.mrp || 299;
     const bonusStoreOffer = bonusBookObj.offerPrice || 99;
@@ -1311,8 +1311,8 @@ function getGeneratedOfferUrlAndMsg(user) {
     shortSms = `नमस्ते ${name} जी! पुस्तक ${bookTitle} का रिव्यू दें और 50% छूट वाउचर पाएं: https://aarogyamindia.online${checkoutUrl}`;
   } else {
     const sig = generateOfferSignature(ob.primaryBook, ob.price, targetMobile, ob.timer !== 'none' ? ob.timer : exp);
-    // Ultra-short URL (/c.html?b=...&p=...&m=...&s=...&t=...)
-    checkoutUrl = `/c.html?b=${ob.primaryBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}`;
+    // Ultra-short URL (/c.html?b=...&p=...&m=...&n=...&s=...&t=...)
+    checkoutUrl = `/c.html?b=${ob.primaryBook}&p=${ob.price}&m=${targetMobile}&n=${encodeURIComponent(user.full_name || '')}&s=${sig}${timerQuery}`;
 
     msg = `🌾 *नमस्ते ${name} जी!* 🙏\n\n${userConditionText} आज आपके लिए आरोग्यम इंडिया का विशेष वीआईपी ऑफर है:\n\n📖 *पुस्तक:* ${bookTitle}\n🌱 *संक्षिप्त परिचय:* ${bookDesc}\n💰 *विशेष मूल्य:* ${priceText} (सामान्य MRP: ~₹${bookMrp}~, स्टोर पर ₹${bookStoreOffer})\n${ob.timer !== 'none' ? `⏳ *समय सीमा:* केवल *${timerText}* के लिए मान्य!\n` : ''}\n👉 *विशेष छूट पर ऑर्डर करने के लिए यहाँ क्लिक करें:*\nhttps://aarogyamindia.online${checkoutUrl}\n\n📖 *पुस्तक का संपूर्ण विवरण व इंडेक्स यहाँ देखें:*\n${landingUrl}\n\n🔒 *नोट:* यह विशेष छूट केवल आपके पंजीकृत नंबर (+91-XXXXX${cleanMobile.slice(-4)}) के लिए सुरक्षित है। इसे किसी को शेयर न करें, एक बार खरीदने पर यह ऑफर बंद हो जाएगा।\n\nधन्यवाद!\n_आरोग्यम इंडिया - समृद्ध किसान, समृद्ध भारत_`;
 
@@ -1623,7 +1623,125 @@ function getVideoAudienceUsers(v, recBook) {
   return matched;
 }
 
-// Targeted Audience Modal for a Specific Video (3-Channel 1-Click Marketing: SMS, In-App Notification & WhatsApp)
+// 🧠 AI Pillar Targeted Audience Matcher (Agri, Dairy, Health, Netsurf)
+function getPillarAudienceUsers(pillarKey) {
+  const allSurveys = mktState.surveys || [];
+  const allPurchases = mktState.purchases || [];
+  const profiles = mktState.profiles || [];
+  
+  const matched = [];
+  profiles.forEach(u => {
+    const interest = (u.interest || '').toLowerCase();
+    const occ = (u.occupation || '').toLowerCase();
+    const src = (u.registration_source || '').toLowerCase();
+    const uSurv = allSurveys.find(s => (s.profile_id && s.profile_id === u.id) || (s.mobile && u.mobile && s.mobile === u.mobile));
+    const survCats = uSurv && Array.isArray(uSurv.selected_categories) ? uSurv.selected_categories : [];
+    const survAnswers = uSurv && uSurv.category_answers ? JSON.stringify(uSurv.category_answers).toLowerCase() : '';
+
+    let matchPillar = 'agri';
+    let matchReason = 'फसल सुरक्षा व उन्नत खेती रुचि';
+    if (interest.includes('पशु') || interest.includes('डेयरी') || occ.includes('पशु') || occ.includes('डेयरी') || survCats.includes('cattlecare') || survAnswers.includes('दूध') || survAnswers.includes('गाय') || survAnswers.includes('भैंस')) {
+      matchPillar = 'dairy';
+      matchReason = 'दुग्ध वृद्धि व पशुपालन रुचि';
+    } else if (interest.includes('स्वास्थ्य') || interest.includes('आयुर्वेद') || survCats.includes('healthcare') || survAnswers.includes('sugar') || survAnswers.includes('दर्द') || survAnswers.includes('मधुमेह')) {
+      matchPillar = 'health';
+      matchReason = 'आयुर्वेद व स्वास्थ्य परामर्श रुचि';
+    } else if (interest.includes('netsurf') || interest.includes('जैविक') || src.includes('netsurf') || survCats.includes('netsurf') || survAnswers.includes('biofit')) {
+      matchPillar = 'netsurf';
+      matchReason = 'नेट्सर्फ Biofit जैविक खेती';
+    }
+
+    if (matchPillar === pillarKey) {
+      const hasPurchased = allPurchases.some(p => (p.customer_mobile && p.customer_mobile === u.mobile) || (p.profile_id && p.profile_id === u.id));
+      matched.push({
+        ...u,
+        matchReason,
+        funnelLabel: hasPurchased ? '🏆 खरीदार' : '🎯 संभावित ग्राहक',
+        badgeColor: hasPurchased ? '#10b981' : '#f59e0b'
+      });
+    }
+  });
+
+  return matched;
+}
+
+// 🌿 Web Page Audience Matcher (Health topics, Cattle, Netsurf, Wheat)
+function getPageAudienceUsers(pageKey, pageName, pagePath) {
+  const pLower = ((pageKey || '') + ' ' + (pageName || '') + ' ' + (pagePath || '')).toLowerCase();
+  const allSurveys = mktState.surveys || [];
+  const allPurchases = mktState.purchases || [];
+  const profiles = mktState.profiles || [];
+
+  const matched = [];
+  profiles.forEach(u => {
+    const interest = (u.interest || '').toLowerCase();
+    const occ = (u.occupation || '').toLowerCase();
+    const uSurv = allSurveys.find(s => (s.profile_id && s.profile_id === u.id) || (s.mobile && u.mobile && s.mobile === u.mobile));
+    const survCats = uSurv && Array.isArray(uSurv.selected_categories) ? uSurv.selected_categories : [];
+    const survAnswers = uSurv && uSurv.category_answers ? JSON.stringify(uSurv.category_answers).toLowerCase() : '';
+
+    let isMatch = false;
+    let reason = 'संभावित पाठक';
+
+    if (pLower.includes('sugar') || pLower.includes('मधुमेह') || pLower.includes('diabetes')) {
+      if (survAnswers.includes('sugar') || survAnswers.includes('मधुमेह') || survCats.includes('healthcare') || interest.includes('स्वास्थ्य')) {
+        isMatch = true;
+        reason = 'शुगर/मधुमेह गाइड रुचि';
+      }
+    } else if (pLower.includes('joint') || pLower.includes('जोड़ों') || pLower.includes('दर्द') || pLower.includes('pain')) {
+      if (survAnswers.includes('दर्द') || survAnswers.includes('joint') || survCats.includes('healthcare') || interest.includes('स्वास्थ्य')) {
+        isMatch = true;
+        reason = 'जोड़ों का दर्द / आयुर्वेद रुचि';
+      }
+    } else if (pLower.includes('pashu') || pLower.includes('पशु') || pLower.includes('dairy') || pLower.includes('डेयरी') || pLower.includes('गाय') || pLower.includes('भैंस')) {
+      if (survCats.includes('cattlecare') || survAnswers.includes('दूध') || survAnswers.includes('पशु') || interest.includes('पशु')) {
+        isMatch = true;
+        reason = 'पशुपालन व दुग्ध परामर्श';
+      }
+    } else if (pLower.includes('netsurf') || pLower.includes('biofit') || pLower.includes('जैविक')) {
+      if (survCats.includes('netsurf') || survAnswers.includes('biofit') || interest.includes('netsurf')) {
+        isMatch = true;
+        reason = 'बायो-ऑर्गेनिक जैविक गाइड';
+      }
+    } else if (pLower.includes('wheat') || pLower.includes('गेहूं') || pLower.includes('गेहूँ')) {
+      if (interest.includes('गेहूं') || survAnswers.includes('गेहूं') || occ.includes('किसान')) {
+        isMatch = true;
+        reason = 'गेहूँ उत्पादन व सुरक्षा गाइड';
+      }
+    } else {
+      if (survCats.length > 0 || interest.length > 0 || occ.includes('किसान')) {
+        isMatch = true;
+        reason = 'कृषि व स्वास्थ्य रुचि';
+      }
+    }
+
+    if (isMatch) {
+      const hasPurchased = allPurchases.some(p => (p.customer_mobile && p.customer_mobile === u.mobile) || (p.profile_id && p.profile_id === u.id));
+      matched.push({
+        ...u,
+        matchReason: reason,
+        funnelLabel: hasPurchased ? '🏆 खरीदार' : '🎯 इच्छुक पाठक',
+        badgeColor: hasPurchased ? '#10b981' : '#38bdf8'
+      });
+    }
+  });
+
+  // If specific matched list is empty, fallback to active registered users
+  if (matched.length === 0) {
+    profiles.slice(0, 30).forEach(u => {
+      matched.push({
+        ...u,
+        matchReason: 'पंजीकृत पाठक',
+        funnelLabel: '🎯 इच्छुक पाठक',
+        badgeColor: '#38bdf8'
+      });
+    });
+  }
+
+  return matched;
+}
+
+// Universal Targeted Audience Modal (Videos, AI 4 Pillars & Category Pages - SMS, Call, In-App Notification & WhatsApp)
 function renderVideoAudienceModal() {
   const aud = mktState.activeVideoAudience;
   if (!aud) return '';
@@ -1642,21 +1760,45 @@ function renderVideoAudienceModal() {
   const ob = mktState.offerBuilder;
   const targetPrice = (ob.price === 0) ? 0 : (ob.price || 49);
 
+  const isPillar = !!aud.isPillar;
+  const isPage = !!aud.isPage;
+  const modalTitle = aud.title || aud.videoTitle || (isPillar ? aud.pillarTitle : (isPage ? aud.pageName : 'लक्षित दर्शक सूची'));
+  const modalIcon = aud.icon || (isPillar ? '🧠' : (isPage ? '🌿' : '🎬'));
+  const idBadge = isPillar ? `स्तंभ: ${(aud.pillarKey || '').toUpperCase()}` : (isPage ? `पेज: ${aud.pageKey || ''}` : `ID: ${aud.videoId || ''}`);
+
+  // Prepared broadcast text for 1-click clipboard copy
+  let modalBroadcastText = '';
+  if (isPillar) {
+    if (aud.pillarKey === 'dairy') {
+      modalBroadcastText = `🐄 *नमस्ते किसान साथियों!* 🙏\n\nदुग्ध उत्पादन में 3 गुना वृद्धि और पशुओं की संपूर्ण देखभाल के लिए आरोग्यम इंडिया की विशेष डायरेक्टरी ई-बुक (*पशुपालन व दवा डायरेक्टरी - BK016*) पर केवल आज सीमित समय का VIP डिस्काउंट उपलब्ध है!\n\n👉 *अभी अपनी डिजिटल प्रति प्राप्त करें:* https://aarogyamindia.online/store.html?cat=dairy\n\nधन्यवाद!\n_आरोग्यम इंडिया टीम_`;
+    } else if (aud.pillarKey === 'health') {
+      modalBroadcastText = `❤️ *नमस्ते प्रिय पाठकों!* 🙏\n\nडायबिटीज नियंत्रण, जोड़ों के दर्द और प्राकृतिक स्वास्थ्य सुरक्षा पर आरोग्यम इंडिया की सम्पूर्ण प्रैक्टिकल गाइड ई-बुक पर विशेष छूट उपलब्ध है!\n\n👉 *यहाँ क्लिक करके प्राप्त करें:* https://aarogyamindia.online/health/diabetes.html\n\nधन्यवाद!\n_आरोग्यम इंडिया स्वास्थ्य मंच_`;
+    } else if (aud.pillarKey === 'netsurf') {
+      modalBroadcastText = `🌿 *नमस्ते जैविक किसान साथियों!* 🙏\n\nरासायनिक खादों का 50% खर्च घटाने और उत्पादन 30% बढ़ाने के लिए नेट्सर्फ बायो-फर्टिलाइजर व फसल डॉक्टर कॉम्बो गाइड पर विशेष सीमित ऑफर:\n\n👉 *यहाँ देखें:* https://aarogyamindia.online/categories/netsurf.html\n\nधन्यवाद!\n_आरोग्यम इंडिया जैविक क्रांति_`;
+    } else {
+      modalBroadcastText = `🌾 *नमस्ते किसान साथियों!* 🙏\n\nफसलों के कीट, रोग, फफूंद व पीलापन नियंत्रण की सम्पूर्ण प्रैक्टिकल गाइड ई-बुक (*खेती का डॉक्टर - BK002*) पर आज के लिए VIP 1+1 कॉम्बो ऑफर एक्टिव है!\n\n👉 *अभी ऑर्डर करें:* https://aarogyamindia.online/store.html\n\nधन्यवाद!\n_आरोग्यम इंडिया टीम_`;
+    }
+  } else if (isPage) {
+    modalBroadcastText = `🌾 *नमस्ते प्रिय पाठकों!* 🙏\n\nआरोग्यम इंडिया के लोकप्रिय गाइड पृष्ठ *"${escapeHtml(aud.pageName || aud.title)}"* के सन्दर्भ में सम्पूर्ण प्रैक्टिकल ई-बुक गाइड (*${escapeHtml(aud.bookName)}*) पर सीमित समय का VIP ऑफर उपलब्ध है!\n\n👉 *मार्गदर्शिका देखें:* https://aarogyamindia.online${aud.pagePath || ''}\n\nधन्यवाद!\n_आरोग्यम इंडिया टीम_`;
+  } else {
+    modalBroadcastText = `🌾 *नमस्ते किसान साथियों!* 🙏\n\nAarogyamTube के वीडियो *"${escapeHtml(aud.videoTitle)}"* से संबंधित सम्पूर्ण ई-बुक गाइड (*${escapeHtml(aud.bookName)}*) पर विशेष छूट उपलब्ध है!\n\n👉 *विजिट करें:* https://aarogyamindia.online/aarogyamtube.html\n\nधन्यवाद!\n_आरोग्यम इंडिया टीम_`;
+  }
+
   return `
     <div class="mkt-user-modal-overlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); z-index:99999; display:flex; align-items:center; justify-content:center; padding:16px;">
-      <div style="background:#0f172a; border:1.5px solid #3b82f6; border-radius:18px; width:100%; max-width:960px; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.8); position:relative;">
+      <div style="background:#0f172a; border:1.5px solid #3b82f6; border-radius:18px; width:100%; max-width:980px; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.8); position:relative;">
         <!-- Close Button -->
         <button id="btn-close-audience-modal" type="button" style="position:absolute; top:16px; right:18px; background:#1e293b; border:1px solid #334155; color:#94a3b8; font-size:20px; cursor:pointer; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;">&times;</button>
 
         <!-- Header -->
         <div style="margin-bottom:18px; border-bottom:1px solid #334155; padding-bottom:16px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:1.8rem;">🎬</span>
-            <div>
-              <h3 style="margin:0; font-size:1.2rem; font-weight:900; color:#f8fafc;">${escapeHtml(aud.videoTitle)}</h3>
-              <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:5px; font-size:0.78rem;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:2rem;">${modalIcon}</span>
+            <div style="flex:1;">
+              <h3 style="margin:0; font-size:1.25rem; font-weight:900; color:#f8fafc;">${escapeHtml(modalTitle)}</h3>
+              <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:6px; font-size:0.78rem;">
                 <span style="background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); padding:2px 8px; border-radius:6px; font-weight:800;">
-                  ID: ${escapeHtml(aud.videoId)}
+                  ${escapeHtml(idBadge)}
                 </span>
                 <span style="color:#94a3b8;">•</span>
                 <span style="color:#fbbf24; font-weight:800;">
@@ -1664,34 +1806,44 @@ function renderVideoAudienceModal() {
                 </span>
                 <span style="color:#94a3b8;">•</span>
                 <span style="color:${users.length > 0 ? '#34d399' : '#94a3b8'}; font-weight:800;">
-                  👥 कुल ${aud.users.length} वास्तविक लक्षित किसान
+                  👥 कुल ${aud.users.length} वास्तविक लक्षित किसान / पाठक
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Search Bar Inside Modal -->
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-          <div style="flex:1; min-width:240px;">
-            <input type="text" id="mkt-audience-search-input" value="${escapeHtml(mktState.audienceSearchQuery)}" placeholder="🔍 किसान का नाम, मोबाइल नंबर या ज़िला खोजें..." style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem;" />
+        <!-- Action Tools Bar: Copy Phones & Broadcast Message -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; background:rgba(30,41,59,0.7); border:1px solid #334155; border-radius:10px; padding:10px 14px;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" id="btn-copy-all-audience-phones" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:0.76rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 6px rgba(2,132,199,0.3);">
+              <span>📋</span> <span>सभी मोबाइल नंबर कॉपी करें (${users.length})</span>
+            </button>
+            <button type="button" id="btn-copy-modal-broadcast" data-broadcast="${escapeHtml(modalBroadcastText)}" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:0.76rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 6px rgba(22,163,74,0.3);">
+              <span>📢</span> <span>पूरा ब्रॉडकास्ट संदेश कॉपी करें</span>
+            </button>
           </div>
-          <span style="font-size:0.75rem; color:#94a3b8;">
-            वास्तविक परिणाम: <strong>${users.length} किसान</strong>
+          <span style="font-size:0.74rem; color:#94a3b8;">
+            वास्तविक परिणाम: <strong style="color:#38bdf8;">${users.length} किसान</strong>
           </span>
         </div>
 
+        <!-- Search Bar Inside Modal -->
+        <div style="margin-bottom:14px;">
+          <input type="text" id="mkt-audience-search-input" value="${escapeHtml(mktState.audienceSearchQuery)}" placeholder="🔍 नाम, मोबाइल नंबर या ज़िला से खोजें..." style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem; box-sizing:border-box;" />
+        </div>
+
         <!-- Audience Table -->
-        <div style="overflow-x:auto;">
+        <div class="mkt-table-responsive">
           <table style="width:100%; border-collapse:collapse; font-size:0.8rem; text-align:left;">
             <thead>
               <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#94a3b8; font-size:0.74rem; text-transform:uppercase;">
-                <th style="padding:10px 12px;">किसान का नाम</th>
+                <th style="padding:10px 12px;">किसान / पाठक का नाम</th>
                 <th style="padding:10px 12px;">मोबाइल नंबर</th>
                 <th style="padding:10px 12px;">स्थान / ज़िला</th>
                 <th style="padding:10px 12px;">सत्यापित जुड़ाव</th>
                 <th style="padding:10px 12px; text-align:center;">स्थिति</th>
-                <th style="padding:10px 12px; text-align:right;">1-क्लिक प्रचार (SMS • ऐप • WA)</th>
+                <th style="padding:10px 12px; text-align:right;">1-क्लिक प्रचार (कॉल • SMS • ऐप • WA)</th>
               </tr>
             </thead>
             <tbody>
@@ -1700,10 +1852,10 @@ function renderVideoAudienceModal() {
                   <td colspan="6" style="padding:36px; text-align:center;">
                     <div style="font-size:2rem; margin-bottom:8px;">🔍</div>
                     <strong style="color:#f8fafc; font-size:0.95rem; display:block; margin-bottom:4px;">
-                      इस वीडियो विषय से संबंधित अभी कोई पंजीकृत किसान नहीं मिला (0 परिणाम)
+                      इस विषय से संबंधित अभी कोई पंजीकृत किसान नहीं मिला (0 परिणाम)
                     </strong>
                     <p style="margin:0; font-size:0.78rem; color:#94a3b8; line-height:1.5;">
-                      100% वास्तविक पारदर्शी डेटा — कोई फ़ेक 371 डमी सूची नहीं दिखाई जा रही। जैसे ही किसान इस विषय में रुचि लेंगे, वे यहाँ स्वतः जुड़ जाएँगे।
+                      100% वास्तविक पारदर्शी डेटा — जैसे ही नए किसान इस विषय में रुचि लेंगे, वे यहाँ स्वतः जुड़ जाएँगे।
                     </p>
                   </td>
                 </tr>
@@ -1712,14 +1864,35 @@ function renderVideoAudienceModal() {
                 const linkInfo = getGeneratedOfferUrlAndMsg(userObj);
                 const fullOfferLink = `https://aarogyamindia.online${linkInfo.checkoutUrl}`;
                 
-                const customWaMsg = encodeURIComponent(
-                  `🌾 *नमस्ते ${u.full_name || 'किसान साथी'} जी!* 🙏\n\n` +
-                  `AarogyamTube पर हमारे लोकप्रिय वीडियो *"${aud.videoTitle}"* के सन्दर्भ में आपके लिए एक विशेष उपहार है।\n\n` +
-                  `📚 इससे जुड़ी सम्पूर्ण प्रैक्टिकल गाइड ई-बुक (*${aud.bookName}*) पर केवल आपके लिए सीमित समय का विशेष VIP डिस्काउंट उपलब्ध कराया गया है:\n` +
-                  `👉 *यहाँ क्लिक करके प्राप्त करें:* ${fullOfferLink}\n\n` +
-                  `⚡ *सीमित समय विशेष ऑफर* — अपनी प्रति तुरंत सुरक्षित करें।\n\n` +
-                  `धन्यवाद!\n_आरोग्यम इंडिया टीम_`
-                );
+                let customWaMsg = '';
+                if (isPillar) {
+                  customWaMsg = encodeURIComponent(
+                    `🌾 *नमस्ते ${u.full_name || 'किसान साथी'} जी!* 🙏\n\n` +
+                    `आरोग्यम इंडिया के *${escapeHtml(aud.pillarTitle || aud.title)}* मंच पर आपके लिए एक विशेष उपहार है।\n\n` +
+                    `📚 सम्पूर्ण प्रैक्टिकल गाइड ई-बुक (*${aud.bookName}*) पर केवल आपके लिए सीमित समय का विशेष VIP डिस्काउंट उपलब्ध कराया गया है:\n` +
+                    `👉 *यहाँ क्लिक करके प्राप्त करें:* ${fullOfferLink}\n\n` +
+                    `⚡ *सीमित समय विशेष ऑफर* — अपनी प्रति तुरंत सुरक्षित करें।\n\n` +
+                    `धन्यवाद!\n_आरोग्यम इंडिया टीम_`
+                  );
+                } else if (isPage) {
+                  customWaMsg = encodeURIComponent(
+                    `🌾 *नमस्ते ${u.full_name || 'किसान साथी'} जी!* 🙏\n\n` +
+                    `आरोग्यम इंडिया के लोकप्रिय गाइड पृष्ठ *"${escapeHtml(aud.pageName || aud.title)}"* के सन्दर्भ में आपके लिए विशेष उपहार है।\n\n` +
+                    `👉 *मार्गदर्शिका देखें:* https://aarogyamindia.online${aud.pagePath || ''}\n\n` +
+                    `📚 सम्पूर्ण ई-बुक गाइड (*${aud.bookName}*) पर केवल आपके लिए सीमित समय का विशेष VIP ऑफर:\n` +
+                    `👉 *यहाँ क्लिक करके प्राप्त करें:* ${fullOfferLink}\n\n` +
+                    `धन्यवाद!\n_आरोग्यम इंडिया टीम_`
+                  );
+                } else {
+                  customWaMsg = encodeURIComponent(
+                    `🌾 *नमस्ते ${u.full_name || 'किसान साथी'} जी!* 🙏\n\n` +
+                    `AarogyamTube पर हमारे लोकप्रिय वीडियो *"${aud.videoTitle}"* के सन्दर्भ में आपके लिए एक विशेष उपहार है।\n\n` +
+                    `📚 इससे जुड़ी सम्पूर्ण प्रैक्टिकल गाइड ई-बुक (*${aud.bookName}*) पर केवल आपके लिए सीमित समय का विशेष VIP डिस्काउंट उपलब्ध कराया गया है:\n` +
+                    `👉 *यहाँ क्लिक करके प्राप्त करें:* ${fullOfferLink}\n\n` +
+                    `⚡ *सीमित समय विशेष ऑफर* — अपनी प्रति तुरंत सुरक्षित करें।\n\n` +
+                    `धन्यवाद!\n_आरोग्यम इंडिया टीम_`
+                  );
+                }
 
                 const cleanDigits = (u.mobile || '').replace(/\D/g, '').slice(-10);
                 const waDirectUrl = cleanDigits.length === 10 ? `https://api.whatsapp.com/send?phone=91${cleanDigits}&text=${customWaMsg}` : `https://api.whatsapp.com/send?text=${customWaMsg}`;
@@ -1738,7 +1911,7 @@ function renderVideoAudienceModal() {
                     </td>
                     <td style="padding:10px 12px; font-size:0.75rem; color:#cbd5e1;">
                       <span style="background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.25); padding:2px 6px; border-radius:4px;">
-                        ${escapeHtml(u.matchReason || 'दर्शक')}
+                        ${escapeHtml(u.matchReason || 'लक्षित')}
                       </span>
                     </td>
                     <td style="padding:10px 12px; text-align:center;">
@@ -1747,19 +1920,26 @@ function renderVideoAudienceModal() {
                       </span>
                     </td>
                     <td style="padding:10px 12px; text-align:right;">
-                      <div style="display:flex; justify-content:flex-end; gap:6px; align-items:center;">
-                        <!-- 1. SMS Link -->
-                        <a href="${smsDirectUrl}" class="mkt-sms-btn" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#fff; font-weight:800; font-size:0.72rem; padding:5px 9px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.3);" title="सीधे मोबाइल SMS भेजें">
+                      <div style="display:flex; justify-content:flex-end; gap:6px; align-items:center; flex-wrap:wrap;">
+                        <!-- 1. Direct Call -->
+                        ${cleanDigits.length === 10 ? `
+                          <a href="tel:+91${cleanDigits}" style="background:linear-gradient(135deg, #059669, #047857); color:#fff; font-weight:800; font-size:0.72rem; padding:5px 8px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:3px; box-shadow:0 2px 6px rgba(5,150,105,0.3);" title="सीधे कॉल करें">
+                            <span>📞 कॉल</span>
+                          </a>
+                        ` : ''}
+
+                        <!-- 2. SMS Link -->
+                        <a href="${smsDirectUrl}" class="mkt-sms-btn" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#fff; font-weight:800; font-size:0.72rem; padding:5px 8px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:3px; box-shadow:0 2px 6px rgba(37,99,235,0.3);" title="सीधे मोबाइल SMS भेजें">
                           <span>💬 SMS</span>
                         </a>
 
-                        <!-- 2. In-App Notification Dispatcher -->
-                        <button type="button" onclick="window.dispatchTargetedInAppNotification('${u.id}', '${escapeHtml(u.full_name || 'किसान साथी')}', '${escapeHtml(u.mobile || '')}', '${aud.bookId}', '${escapeHtml(aud.bookName)}')" style="background:linear-gradient(135deg, #8b5cf6, #7c3aed); color:#fff; font-weight:800; font-size:0.72rem; padding:5px 9px; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(139,92,246,0.3);" title="इन-ऐप VIP नोटिफिकेशन भेजें">
+                        <!-- 3. In-App Notification Dispatcher -->
+                        <button type="button" onclick="window.dispatchTargetedInAppNotification('${u.id}', '${escapeHtml(u.full_name || 'किसान साथी')}', '${escapeHtml(u.mobile || '')}', '${aud.bookId}', '${escapeHtml(aud.bookName)}')" style="background:linear-gradient(135deg, #8b5cf6, #7c3aed); color:#fff; font-weight:800; font-size:0.72rem; padding:5px 8px; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:3px; box-shadow:0 2px 6px rgba(139,92,246,0.3);" title="इन-ऐप VIP नोटिफिकेशन भेजें">
                           <span>🔔 अलर्ट</span>
                         </button>
 
-                        <!-- 3. WhatsApp Direct -->
-                        <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#fff; font-weight:800; font-size:0.72rem; padding:5px 11px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(22,163,74,0.35);" title="${escapeHtml(u.full_name)} को WhatsApp पर सीधा ऑफर भेजें">
+                        <!-- 4. WhatsApp Direct -->
+                        <a href="${waDirectUrl}" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#fff; font-weight:800; font-size:0.72rem; padding:5px 10px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:3px; box-shadow:0 2px 6px rgba(22,163,74,0.35);" title="${escapeHtml(u.full_name)} को WhatsApp पर सीधा ऑफर भेजें">
                           <span>📲 WhatsApp</span>
                         </a>
                       </div>
@@ -1960,7 +2140,7 @@ function renderTubeAnalyticsTab() {
           </span>
         </div>
 
-        <div style="overflow-x:auto;">
+        <div class="mkt-table-responsive">
           <table style="width:100%; border-collapse:collapse; font-size:0.82rem; text-align:left;">
             <thead>
               <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#94a3b8; font-size:0.75rem; text-transform:uppercase;">
@@ -2186,7 +2366,7 @@ function renderMultiCategoryDemandTab() {
 
         <div style="background:rgba(15,23,42,0.6); border:1.5px solid rgba(239,68,68,0.3); border-radius:14px; padding:18px;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:0.78rem; font-weight:800; color:#f87171;">❤️ 11 प्रमुख स्वास्थ्य विषय</span>
+            <span style="font-size:0.78rem; font-weight:800; color:#f87171;">❤️ स्वास्थ्य व आयुर्वेद विषय</span>
             <span style="font-size:1.2rem;">🩺</span>
           </div>
           <div style="font-size:1.8rem; font-weight:900; color:#f8fafc; margin:8px 0 2px 0;">${healthVisits.toLocaleString('hi-IN')} विज़िट्स</div>
@@ -2203,19 +2383,19 @@ function renderMultiCategoryDemandTab() {
         </div>
       </div>
 
-      <!-- 11 Core Health & Category Pages Live Telemetry Table -->
+      <!-- Core Health & Category Pages Live Telemetry Table -->
       <div style="background:rgba(15,23,42,0.6); border:1.5px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
           <div>
-            <h3 style="margin:0; font-size:1.1rem; font-weight:800; color:#f8fafc;">🩺 11 प्रमुख स्वास्थ्य, पशुपालन एवं जैविक पृष्ठों की लाइव मांग</h3>
+            <h3 style="margin:0; font-size:1.1rem; font-weight:800; color:#f8fafc;">🩺 प्रमुख स्वास्थ्य, पशुपालन एवं जैविक पृष्ठों की लाइव मांग</h3>
             <p style="margin:2px 0 0 0; font-size:0.76rem; color:#94a3b8;">प्रति पेज Top 10 पृष्ठ — 100% लाइव टेलीमेट्री व पाठक एंगेजमेंट (किस समस्या पर पाठक सबसे ज्यादा समय बिता रहे हैं)</p>
           </div>
           <span style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid #10b981; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem;">
-            ⚡ 11 Pages Live Synced
+            ⚡ वेब पेजेस लाइव सिंक
           </span>
         </div>
 
-        <div style="overflow-x:auto;">
+        <div class="mkt-table-responsive">
           <table style="width:100%; border-collapse:collapse; font-size:0.82rem; text-align:left;">
             <thead>
               <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#94a3b8; font-size:0.75rem; text-transform:uppercase;">
@@ -2242,8 +2422,6 @@ function renderMultiCategoryDemandTab() {
                 const safeName = escapeHtml(hp.name);
                 const safeDesc = escapeHtml(hp.desc);
                 const safePath = escapeHtml(hp.path);
-                const fullPageUrl = `https://aarogyamindia.online${hp.path}`;
-                const waHealthText = encodeURIComponent(`🌾 *नमस्ते!* 🙏\n\nआरोग्यम इंडिया की ओर से क्या आप *${hp.name}* के बारे में संपूर्ण प्राकृतिक गाइड व परामर्श प्राप्त करना चाहते हैं?\n\n👉 *यहाँ संपूर्ण जानकारी देखें:* ${fullPageUrl}\n\n📚 सम्बंधित ई-बुक गाइड मात्र ₹99/₹149 में प्राप्त करने के लिए रिप्लाई करें।\n\nधन्यवाद!\n_आरोग्यम इंडिया_`);
 
                 return `
                   <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
@@ -2269,9 +2447,9 @@ function renderMultiCategoryDemandTab() {
                         <a href="${hp.path}" target="_blank" rel="noopener noreferrer" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:5px 8px; border-radius:6px; text-decoration:none; font-size:0.72rem; font-weight:700;" title="लाइव पेज देखें">
                           🔗 देखें
                         </a>
-                        <a href="https://api.whatsapp.com/send?text=${waHealthText}" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#fff; padding:5px 10px; border-radius:6px; text-decoration:none; font-weight:800; font-size:0.72rem; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(22,163,74,0.3);" title="WhatsApp पर परामर्श भेजें">
-                          <span>📲 परामर्श भेजें</span>
-                        </a>
+                        <button type="button" class="btn-open-page-audience" data-pagekey="${hp.key}" data-pagename="${safeName}" data-pagepath="${safePath}" data-icon="${hp.icon}" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#fff; border:none; padding:5px 10px; border-radius:6px; font-weight:800; font-size:0.72rem; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(22,163,74,0.3); cursor:pointer;" title="${safeName} के लक्षित पाठक व किसान देखें">
+                          <span>👥 पाठक व संपर्क</span>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -2511,7 +2689,7 @@ function renderReaderDownloadsTab() {
           </span>
         </div>
 
-        <div style="overflow-x:auto;">
+        <div class="mkt-table-responsive">
           <table style="width:100%; border-collapse:collapse; font-size:0.82rem; text-align:left;">
             <thead>
               <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#94a3b8; font-size:0.75rem; text-transform:uppercase;">
@@ -2579,7 +2757,7 @@ function renderReaderDownloadsTab() {
           </div>
         </div>
 
-        <div style="overflow-x:auto;">
+        <div class="mkt-table-responsive">
           <table style="width:100%; border-collapse:collapse; font-size:0.82rem; text-align:left;">
             <thead>
               <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#94a3b8; font-size:0.75rem; text-transform:uppercase;">
@@ -3401,6 +3579,129 @@ function attachMarketingHubEvents(container) {
       updateMarketingHubView(container);
     });
   });
+
+  // 🧠 Open Targeted Audience Modal for AI Marketing 4 Pillars
+  container.querySelectorAll('.btn-open-pillar-audience').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pillar = btn.getAttribute('data-pillar');
+      let pTitle = '🌾 कृषि व फसल सुरक्षा';
+      let pIcon = '🌾';
+      let recBook = 'BK002';
+      let recBookName = 'खेती का डॉक्टर - सम्पूर्ण फसल सुरक्षा (BK002)';
+      if (pillar === 'dairy') {
+        pTitle = '🐄 पशुपालन व डेयरी उद्योग';
+        pIcon = '🐄';
+        recBook = 'BK016';
+        recBookName = 'पशुपालन, दुग्ध वृद्धि व दवा डायरेक्टरी (BK016)';
+      } else if (pillar === 'health') {
+        pTitle = '❤️ स्वास्थ्य व आयुर्वेद परामर्श';
+        pIcon = '🩺';
+        recBook = 'BK016';
+        recBookName = 'स्वास्थ्य, आयुर्वेद व घरेलू उपचार डायरेक्टरी (BK016)';
+      } else if (pillar === 'netsurf') {
+        pTitle = '🌿 नेट्सर्फ बायो-ऑर्गेनिक खेती';
+        pIcon = '🌿';
+        recBook = 'BK002';
+        recBookName = 'बायोफिट जैविक खाद व फसल डॉक्टर कॉम्बो (BK002)';
+      }
+
+      const matchedUsers = getPillarAudienceUsers(pillar);
+      mktState.activeVideoAudience = {
+        isPillar: true,
+        pillarKey: pillar,
+        pillarTitle: pTitle,
+        icon: pIcon,
+        title: pTitle,
+        bookId: recBook,
+        bookName: recBookName,
+        users: matchedUsers
+      };
+      mktState.audienceSearchQuery = '';
+      updateMarketingHubView(container);
+    });
+  });
+
+  // 🌿 Open Targeted Audience Modal for Web Page Visitors (Tab 4)
+  container.querySelectorAll('.btn-open-page-audience').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pageKey = btn.getAttribute('data-pagekey');
+      const pageName = btn.getAttribute('data-pagename');
+      const pagePath = btn.getAttribute('data-pagepath');
+      const pageIcon = btn.getAttribute('data-icon') || '📄';
+
+      let recBook = 'BK002';
+      let recBookName = 'खेती का डॉक्टर - सम्पूर्ण फसल सुरक्षा (BK002)';
+      const pLower = ((pageKey || '') + ' ' + (pageName || '') + ' ' + (pagePath || '')).toLowerCase();
+      if (pLower.includes('pashu') || pLower.includes('पशु') || pLower.includes('dairy') || pLower.includes('गाय')) {
+        recBook = 'BK016';
+        recBookName = 'पशुपालन व दवा डायरेक्टरी (BK016)';
+      } else if (pLower.includes('sugar') || pLower.includes('मधुमेह') || pLower.includes('joint') || pLower.includes('दर्द') || pLower.includes('health') || pLower.includes('स्वास्थ्य')) {
+        recBook = 'BK016';
+        recBookName = 'स्वास्थ्य व आयुर्वेद दवा डायरेक्टरी (BK016)';
+      } else if (pLower.includes('wheat') || pLower.includes('गेहूं')) {
+        recBook = 'BK017';
+        recBookName = 'गेहूँ की सम्पूर्ण मार्गदर्शिका (BK017)';
+      }
+
+      const matchedUsers = getPageAudienceUsers(pageKey, pageName, pagePath);
+      mktState.activeVideoAudience = {
+        isPage: true,
+        pageKey,
+        pageName,
+        pagePath,
+        icon: pageIcon,
+        title: pageName,
+        bookId: recBook,
+        bookName: recBookName,
+        users: matchedUsers
+      };
+      mktState.audienceSearchQuery = '';
+      updateMarketingHubView(container);
+    });
+  });
+
+  // Copy All Audience Phone Numbers to Clipboard
+  const btnCopyAllPhones = document.getElementById('btn-copy-all-audience-phones');
+  if (btnCopyAllPhones && mktState.activeVideoAudience) {
+    btnCopyAllPhones.addEventListener('click', () => {
+      const aud = mktState.activeVideoAudience;
+      const users = aud.users || [];
+      const phones = users
+        .map(u => (u.mobile || '').replace(/\D/g, '').slice(-10))
+        .filter(p => p.length === 10);
+      const uniquePhones = Array.from(new Set(phones));
+
+      if (uniquePhones.length === 0) {
+        showMarketingToast('⚠️ कोई मान्य 10-अंकीय मोबाइल नंबर उपलब्ध नहीं है।');
+        return;
+      }
+
+      const copyText = uniquePhones.join(', ');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(copyText).then(() => {
+          showMarketingToast(`📋 कुल ${uniquePhones.length} किसानों के मोबाइल नंबर कॉपी हो गए!`);
+        }).catch(() => {
+          showMarketingToast(`नंबर कॉपी करने में असमर्थ।`);
+        });
+      }
+    });
+  }
+
+  // Copy Modal Full Broadcast Pitch Message
+  const btnCopyModalBroadcast = document.getElementById('btn-copy-modal-broadcast');
+  if (btnCopyModalBroadcast) {
+    btnCopyModalBroadcast.addEventListener('click', () => {
+      const msg = btnCopyModalBroadcast.getAttribute('data-broadcast') || '';
+      if (!msg) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg).then(() => {
+          showMarketingToast('📢 पूरा ब्रॉडकास्ट संदेश कॉपी हो गया! इसे WhatsApp ग्रुप या ब्रॉडकास्ट लिस्ट में भेजें।');
+        }).catch(() => {
+          showMarketingToast('संदेश कॉपी नहीं हुआ।');
+        });
+      }
+    });
+  }
 
   // Close Video Audience Modal
   const btnCloseAudience = document.getElementById('btn-close-audience-modal');

@@ -1792,10 +1792,43 @@ body.light-theme .theme-switch input:checked + .slider {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
+.mkt-table-responsive,
+.mkt-table-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  position: relative;
+  display: block !important;
+  box-sizing: border-box !important;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.mkt-table-responsive table,
+.mkt-table-wrap table {
+  min-width: 650px !important;
+  width: 100% !important;
+}
+
 /* 📱 Responsive Screen Rules (Mobile & Tablet Breakpoints) */
 @media (max-width: 992px) {
   .mkt-mobile-tab-card {
-    display: block;
+    display: block !important;
+  }
+  .mkt-tabs-desktop-wrap,
+  .mkt-tabs-container {
+    display: none !important;
+  }
+}
+
+@media (min-width: 993px) {
+  .mkt-mobile-tab-card {
+    display: none !important;
+  }
+  .mkt-tabs-desktop-wrap,
+  .mkt-tabs-container {
+    display: flex !important;
   }
 }
 
@@ -1829,12 +1862,36 @@ body.light-theme .theme-switch input:checked + .slider {
 
   /* Tables never clip or cut text */
   .table-responsive,
+  .mkt-table-responsive,
   .mkt-table-wrap {
     width: 100% !important;
+    max-width: 100% !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
     border-radius: 12px !important;
     display: block !important;
+    box-sizing: border-box !important;
+  }
+
+  .table-responsive table,
+  .mkt-table-responsive table,
+  .mkt-table-wrap table {
+    min-width: 650px !important;
+    width: 100% !important;
+  }
+
+  .mkt-table-responsive::before {
+    content: "👉 पूरी तालिका देखने के लिए दायें-बायें स्वाइप करें";
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #60a5fa;
+    padding: 5px 10px;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    text-align: center;
   }
 
   /* Modals fit neatly on screen */

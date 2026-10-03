@@ -4,9 +4,9 @@
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-// Intelligent Admin In-Memory Cache (2.5 Minutes TTL to eliminate redundant egress on tab switches)
+// Intelligent Admin In-Memory Cache (Manual Refresh Only - Zero Auto Egress)
 const _adminMemoryCache = new Map();
-const ADMIN_CACHE_TTL = 150000; // 2.5 minutes
+const ADMIN_CACHE_TTL = Infinity; // Data refreshes ONLY when admin explicitly clicks Sync / Refresh!
 
 export function clearAdminCache() {
   _adminMemoryCache.clear();

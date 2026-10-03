@@ -636,9 +636,10 @@ async function loadBook() {
         const customTitle = params.get("title") || params.get("name");
         const customAmount = params.get("p") || params.get("amount") || params.get("price");
 
-        // 🛡️ Security Parameters (Signature, Mobile, Expiry, Audio, Timer)
+        // 🛡️ Security Parameters (Signature, Mobile, Name, Expiry, Audio, Timer)
         const offerSig = (params.get("s") || params.get("sig") || params.get("signature") || "").trim();
         const offerMobile = (params.get("m") || params.get("mobile") || "").trim();
+        const offerName = (params.get("n") || params.get("name") || "").trim();
         const offerExp = parseInt(params.get("e") || params.get("exp") || "0", 10);
         const offerAudio = (params.get("a") || params.get("audio") || "").trim();
         const offerTimer = (params.get("t") || params.get("timer") || "").trim();
@@ -951,12 +952,72 @@ async function loadBook() {
         // Render Security Badge & Countdown Banner
         renderCheckoutSecurityBanner(verifiedOfferAmount !== null, offerSecurityError, window.activeVerifiedOffer);
 
-        // Auto-fill mobile if valid offer
-        if (window.activeVerifiedOffer && window.activeVerifiedOffer.mobile && window.activeVerifiedOffer.mobile !== 'ADMIN_TEST') {
+        // 🔒 Auto-fill and LOCK Name & Mobile for personalized VIP Offer Links
+        const offerMobileTarget = (window.activeVerifiedOffer && window.activeVerifiedOffer.mobile && window.activeVerifiedOffer.mobile !== 'ADMIN_TEST')
+            ? window.activeVerifiedOffer.mobile
+            : (offerMobile && offerMobile !== 'ADMIN_TEST' ? offerMobile : null);
+
+        if (offerMobileTarget) {
             const custMobEl = document.getElementById("customerMobile");
-            if (custMobEl && !custMobEl.value) {
-                custMobEl.value = window.activeVerifiedOffer.mobile;
+            const custNameEl = document.getElementById("customerName");
+
+            if (custMobEl) {
+                custMobEl.value = offerMobileTarget;
+                // 🔒 Lock Mobile so user cannot change number to exploit discount
+                custMobEl.readOnly = true;
+                custMobEl.style.backgroundColor = "rgba(16, 185, 129, 0.08)";
+                custMobEl.style.borderColor = "#10b981";
+                custMobEl.style.color = "#10b981";
+                custMobEl.style.fontWeight = "800";
+                custMobEl.style.cursor = "not-allowed";
+                custMobEl.title = "यह वीआईपी ऑफर केवल इसी पंजीकृत मोबाइल नंबर के लिए मान्य है";
             }
+
+            // Name Resolution: URL parameter 'n' -> Supabase Profiles Database lookup
+            let resolvedName = offerName;
+            if (!resolvedName) {
+                try {
+                    const activeDb = window.dbClient || window.supabase;
+                    if (activeDb) {
+                        const { data: pData } = await activeDb
+                            .from('profiles')
+                            .select('full_name')
+                            .eq('mobile', offerMobileTarget)
+                            .maybeSingle();
+                        if (pData && pData.full_name) {
+                            resolvedName = pData.full_name;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Profile name lookup failed:", e);
+                }
+            }
+
+            if (custNameEl) {
+                if (resolvedName) {
+                    custNameEl.value = resolvedName;
+                }
+                // 🔒 Lock Name as well so it cannot be modified
+                custNameEl.readOnly = true;
+                custNameEl.style.backgroundColor = "rgba(16, 185, 129, 0.08)";
+                custNameEl.style.borderColor = "#10b981";
+                custNameEl.style.color = "#10b981";
+                custNameEl.style.fontWeight = "800";
+                custNameEl.style.cursor = "not-allowed";
+            }
+
+            // Inject Verified Farmer Badge
+            let badge = document.getElementById("checkout-verified-farmer-badge");
+            if (!badge && custMobEl && custMobEl.parentElement) {
+                badge = document.createElement("div");
+                badge.id = "checkout-verified-farmer-badge";
+                badge.style.cssText = "font-size:0.75rem; color:#10b981; font-weight:800; margin-top:5px; display:flex; align-items:center; gap:5px;";
+                badge.innerHTML = `🔒 <span>अधिकृत किसान: <strong>${resolvedName || 'पंजीकृत पाठक'}</strong> (+91 ${offerMobileTarget}) — सुरक्षित लिंक</span>`;
+                custMobEl.parentElement.appendChild(badge);
+            }
+
+            // 🛑 CHECK IF ALREADY PURCHASED (1-Time Use Protection)
+            await checkOfferAlreadyPurchased(offerMobileTarget, resolvedName, book.id || targetId, bookName);
         }
 
         const sumBook = document.getElementById("summaryBook");
@@ -1055,7 +1116,98 @@ async function loadBook() {
     }
 }
 
+// 🛑 One-Time Use Check: Verify if customer already purchased this book
+async function checkOfferAlreadyPurchased(mobile, userName, targetBookId, bookTitle) {
+    if (!mobile || !targetBookId) return;
+    try {
+        let isAlreadyBought = false;
+        let invoiceNum = '';
+        const cleanTargetId = String(targetBookId).toUpperCase();
+
+        // 1. Check local storage purchases first
+        const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+        if (Array.isArray(localPurchases)) {
+            const localMatch = localPurchases.find(p => 
+                p && (String(p.book_id || '').toUpperCase().includes(cleanTargetId) || cleanTargetId.includes(String(p.book_id || '').toUpperCase())) &&
+                (p.mobile === mobile || p.customerMobile === mobile)
+            );
+            if (localMatch) {
+                isAlreadyBought = true;
+                invoiceNum = localMatch.invoice_number || localMatch.payment_id || '';
+            }
+        }
+
+        // 2. Check live Supabase purchases table
+        const activeDb = window.dbClient || window.supabase;
+        if (activeDb && !isAlreadyBought) {
+            const { data: prof } = await activeDb.from('profiles').select('id, full_name').eq('mobile', mobile).maybeSingle();
+            if (prof && prof.id) {
+                const { data: supaPurchases } = await activeDb.from('purchases')
+                    .select('id, book_id, invoice_number, purchase_date, payment_status')
+                    .eq('profile_id', prof.id)
+                    .or('payment_status.eq.success,payment_status.is.null');
+
+                if (supaPurchases && supaPurchases.length > 0) {
+                    const match = supaPurchases.find(p => 
+                        String(p.book_id || '').toUpperCase().includes(cleanTargetId) || 
+                        cleanTargetId.includes(String(p.book_id || '').toUpperCase())
+                    );
+                    if (match) {
+                        isAlreadyBought = true;
+                        invoiceNum = match.invoice_number || '';
+                    }
+                }
+            }
+        }
+
+        if (isAlreadyBought) {
+            // Disable Pay Button
+            const payBtn = document.getElementById("payNowBtn") || document.querySelector(".pay-btn");
+            if (payBtn) {
+                payBtn.disabled = true;
+                payBtn.style.background = "#64748b";
+                payBtn.style.cursor = "not-allowed";
+                payBtn.innerHTML = `⚠️ यह पुस्तक पहले ही खरीदी जा चुकी है`;
+            }
+
+            // Render Expired/Already-Bought Banner at the top of checkout
+            let expireBanner = document.getElementById("checkout-offer-expired-card");
+            if (!expireBanner) {
+                expireBanner = document.createElement("div");
+                expireBanner.id = "checkout-offer-expired-card";
+                expireBanner.style.cssText = "background:linear-gradient(135deg, rgba(220,38,38,0.18), rgba(15,23,42,0.95)); border:2px solid #ef4444; border-radius:16px; padding:20px; margin-bottom:20px; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.5);";
+                expireBanner.innerHTML = `
+                    <div style="font-size:2.4rem; margin-bottom:6px;">⚠️</div>
+                    <h3 style="color:#f87171; margin:0 0 6px 0; font-size:1.2rem; font-weight:900;">
+                        यह विशेष ऑफ़र लिंक पहले ही उपयोग हो चुका है!
+                    </h3>
+                    <p style="color:#cbd5e1; font-size:0.88rem; margin:0 0 16px 0; line-height:1.5;">
+                        प्रिय <strong>${userName || 'किसान मित्र'}</strong> जी, आपके मोबाइल (+91 ${mobile}) पर <strong>${bookTitle || 'यह ई-बुक'}</strong> की खरीद सफलतापूर्वक संपन्न हो चुकी है${invoiceNum ? ` (बिल क्र: ${invoiceNum})` : ''}।
+                        <br><span style="color:#94a3b8; font-size:0.8rem;">एक ही पुस्तक को दोबारा खरीदने की आवश्यकता नहीं है। पढ़ने के लिए 'मेरी लाइब्रेरी' खोलें या हेल्प पर बात करें।</span>
+                    </p>
+                    <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+                        <a href="/reader.html?book=${targetBookId}" style="background:#16a34a; color:#fff; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:800; font-size:0.86rem; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.4);">
+                            <span>📖</span> <span>मेरी लाइब्रेरी में ई-बुक पढ़ें</span>
+                        </a>
+                        <a href="https://api.whatsapp.com/send?phone=917974422572&text=${encodeURIComponent(`नमस्ते आरोग्यम इंडिया! मेरे नंबर ${mobile} पर ई-बुक ${bookTitle} का ऑफर लिंक एक्सपायर्ड बता रहा है। मुझे सहायता चाहिए।`)}" target="_blank" rel="noopener noreferrer" style="background:#2563eb; color:#fff; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:800; font-size:0.86rem; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(37,99,235,0.4);">
+                            <span>💬</span> <span>WhatsApp सहायता से बात करें</span>
+                        </a>
+                    </div>
+                `;
+                const container = document.querySelector(".checkout-container") || document.querySelector("main") || document.body;
+                container.insertBefore(expireBanner, container.firstChild);
+            }
+        }
+    } catch(err) {
+        console.warn("Already-purchased check error:", err);
+    }
+}
+
 function autoFillUserData() {
+    const custMobEl = document.getElementById("customerMobile");
+    // 🔒 If fields are locked by VIP offer link, do not overwrite them!
+    if (custMobEl && custMobEl.readOnly) return;
+
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     
     const nameVal = storedUser.full_name || storedUser.name || "";
