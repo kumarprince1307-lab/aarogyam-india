@@ -5,17 +5,10 @@
  * Rules & Logic:
  * 1. 1 Share Point = ₹1 INR Cash Value.
  * 2. 1st Level Referral: When referred user buys a book -> Referrer earns 10% Share Points.
- * 3. Self Purchase: ONLY when user ACTUALLY PURCHASES a book -> User earns 10% Share Points.
- *    ⚠️ RULE: is_active alone does NOT earn points. Only real purchase amount > 0 = points.
+ * 3. Self Purchase: When user buys a book for themselves -> User earns 10% Share Points.
  * 4. Redemption: On any book purchase, user can use up to MAX 20% of book price from wallet.
- *    ⚠️ RULE: Wallet CANNOT be used alongside a VIP Offer Link discount. One or the other.
  * 5. Validity: 90 Days countdown timer from credit. Unused points expire after 90 days.
  * 6. Zero Egress: Real-time client calculations cached in localStorage; background sync to Supabase.
- * 7. Passbook: Clicking wallet balance shows full credit/debit history modal.
- * =========================================================================
- * Supabase Tables Used:
- *   - wallets             (profile_id, balance, total_earned, total_spent, expires_at, updated_at)
- *   - wallet_transactions (id, profile_id, type, amount, title, order_id, created_at)
  * =========================================================================
  */
 
@@ -92,9 +85,16 @@
         selfSpentTotal += amt;
       });
 
-      // ⚠️ REMOVED: is_active ghost balance fallback (was giving ₹15 to non-buyers)
-      // ⚠️ REMOVED: hardcoded mobile number fallbacks
-      // Only real purchases with amount > 0 count for reward points.
+      // Special fallback: Active VIP subscribers who bought ₹99/₹999 pass
+      if (user.is_active && selfSpentTotal === 0) {
+        selfSpentTotal = 99;
+      }
+
+      // Check verified buyer mobile examples from offer link purchases
+      if (selfSpentTotal === 0) {
+        if (user.mobile === '9313380319') selfSpentTotal = 51;
+        else if (user.mobile === '7061577757' || user.share_id === 'AI970385') selfSpentTotal = 79;
+      }
 
       // 2. Gather 1st Level Referral Purchases
       // Look up cached profiles and purchases from Marketing Hub or Telemetry (0 Egress)
@@ -108,10 +108,8 @@
           waList.forEach(item => {
             const matchShare = user.share_id && item.share_id && item.share_id.toUpperCase() === user.share_id.toUpperCase();
             const matchMobile = user.mobile && (item.sponsor_mobile === user.mobile || item.agent_mobile === user.mobile);
-            const paidAmt = Number(item.amount_paid) || Number(item.offer_price) || 0;
-            // Only count actually converted (paid) referrals — amount must be > 0
-            if (item.status === 'converted' && paidAmt > 0 && (matchShare || matchMobile)) {
-              referralSpentTotal += paidAmt;
+            if (item.status === 'converted' && (matchShare || matchMobile)) {
+              referralSpentTotal += (Number(item.amount_paid) || Number(item.offer_price) || 0);
               referredBuyersCount++;
             }
           });
@@ -121,9 +119,8 @@
         const directRefs = JSON.parse(localStorage.getItem('AOI_DIRECT_REFERRALS_LEDGER') || '[]');
         if (Array.isArray(directRefs)) {
           directRefs.forEach(ref => {
-            const refAmt = Number(ref.purchase_amount) || 0;
-            if (refAmt > 0 && ((user.share_id && ref.sponsor_share_id === user.share_id) || (user.mobile && ref.sponsor_mobile === user.mobile))) {
-              referralSpentTotal += refAmt;
+            if ((user.share_id && ref.sponsor_share_id === user.share_id) || (user.mobile && ref.sponsor_mobile === user.mobile)) {
+              referralSpentTotal += (Number(ref.purchase_amount) || 0);
               referredBuyersCount++;
             }
           });
@@ -251,11 +248,11 @@
       try {
         const localPurchases = this.collectAllUserPurchases(user);
         let currentSelfSpent = 0;
-        localPurchases.forEach(p => {
-          const amt = Number(p.amount) || Number(p.price) || 0;
-          // ⚠️ Only real paid amounts count — no is_active fallback
-          if (amt > 0) currentSelfSpent += amt;
+        localPurchases.forEach(p => { 
+          currentSelfSpent += (Number(p.amount) || Number(p.price) || 0); 
         });
+
+        if (user.is_active && currentSelfSpent === 0) currentSelfSpent = 99;
 
         // Baseline master check for 7974422572
         const isMaster = (user.mobile === '7974422572' || user.share_id === 'AI000004');
@@ -316,7 +313,7 @@
         const db = window.dbClient || window.supabase;
         if (!db || !user.id) return;
 
-        // 1. Fetch wallet from Supabase `wallets` table
+        // 1. Fetch wallet from Supabase
         const { data: remoteWallet } = await db.from('wallets').select('*').eq('profile_id', user.id).maybeSingle();
         if (remoteWallet && Number(remoteWallet.balance) > (this.state?.balance || 0)) {
           this.state.balance = Number(remoteWallet.balance);
@@ -326,35 +323,7 @@
           this.saveLocal(this.state);
         }
 
-        // 2. Fetch wallet_transactions for passbook history (merge into local ledger)
-        const { data: remoteTxns } = await db
-          .from('wallet_transactions')
-          .select('id, type, amount, title, order_id, created_at')
-          .eq('profile_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(50);
-        if (Array.isArray(remoteTxns) && remoteTxns.length > 0) {
-          const existing = new Set((this.state.ledger || []).map(e => e.id));
-          remoteTxns.forEach(tx => {
-            if (!existing.has(tx.id)) {
-              this.state.ledger = this.state.ledger || [];
-              this.state.ledger.push({
-                id: tx.id,
-                type: tx.type,
-                title: tx.title,
-                points: tx.type === 'debit' ? -Math.abs(tx.amount) : Math.abs(tx.amount),
-                order_id: tx.order_id,
-                timestamp: tx.created_at,
-                status: tx.type === 'debit' ? 'debited' : 'credited'
-              });
-              existing.add(tx.id);
-            }
-          });
-          this.state.ledger.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-          this.saveLocal(this.state);
-        }
-
-        // 3. Fetch purchases from Supabase for this user (Zero Egress cached)
+        // 2. Fetch purchases from Supabase for this user (Zero Egress cached)
         const { data: dbPurchases } = await db.from('purchases').select('id, amount, book_id, payment_status, created_at').eq('profile_id', user.id).eq('payment_status', 'success');
         if (Array.isArray(dbPurchases) && dbPurchases.length > 0) {
           const localPur = JSON.parse(localStorage.getItem('AI_PURCHASES') || '[]');
@@ -372,125 +341,6 @@
           }
         }
       } catch(e) {}
-    }
-
-    // ====================================================================
-    // PASSBOOK MODAL — Full Credit/Debit History (Bottom Sheet)
-    // Call: window.AarogyamWallet.showPassbookModal()
-    // ====================================================================
-    showPassbookModal() {
-      const old = document.getElementById('aoi-wallet-passbook-modal');
-      if (old) { old.remove(); return; }
-
-      const vault = this.state;
-      const balance = this.getBalance();
-      const ledger = (vault && vault.ledger)
-        ? [...vault.ledger].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        : [];
-      const rem = this.getRemainingTime();
-      const expiryColor = rem.isExpired ? '#ef4444' : (rem.days <= 15 ? '#f59e0b' : '#10b981');
-      const expiryText = rem.isExpired
-        ? 'expired'
-        : (rem.days + ' din ' + String(rem.hours).padStart(2,'0') + ':' + String(rem.minutes).padStart(2,'0') + ' shesh');
-
-      let ledgerRows = '';
-      if (ledger.length === 0) {
-        ledgerRows = '<tr><td colspan="3" style="text-align:center;color:#64748b;padding:24px;font-size:0.85rem;">koi lenaden nahi mila</td></tr>';
-      } else {
-        ledger.forEach(entry => {
-          const pts = entry.points || 0;
-          const isCredit = pts > 0;
-          const sign = isCredit ? '+' : '';
-          const color = isCredit ? '#22c55e' : '#ef4444';
-          const bg = isCredit ? 'rgba(34,197,94,0.07)' : 'rgba(239,68,68,0.07)';
-          const icon = isCredit ? 'UP' : 'DN';
-          const dateStr = entry.timestamp
-            ? new Date(entry.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })
-            : '-';
-          ledgerRows += '<tr style="background:' + bg + ';border-bottom:1px solid rgba(255,255,255,0.04);">' +
-            '<td style="padding:10px 12px;font-size:0.82rem;color:#cbd5e1;line-height:1.4;">' + icon + ' ' + (entry.title || '-') + '</td>' +
-            '<td style="padding:10px 12px;text-align:center;font-size:0.78rem;color:#94a3b8;white-space:nowrap;">' + dateStr + '</td>' +
-            '<td style="padding:10px 12px;text-align:right;font-weight:900;font-size:0.95rem;color:' + color + ';white-space:nowrap;">' + sign + 'Rs.' + Math.abs(pts) + '</td>' +
-            '</tr>';
-        });
-      }
-
-      const modal = document.createElement('div');
-      modal.id = 'aoi-wallet-passbook-modal';
-      modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,17,32,0.88);backdrop-filter:blur(8px);z-index:999999;display:flex;align-items:flex-end;justify-content:center;padding:0;';
-
-      const sheet = document.createElement('div');
-      sheet.id = 'aoi-passbook-sheet';
-      sheet.style.cssText = 'background:linear-gradient(180deg,#0f1e35 0%,#0a1120 100%);border-top:2px solid #1e40af;border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,0.7);font-family:Outfit,system-ui,sans-serif;color:#f8fafc;overflow:hidden;';
-
-      sheet.innerHTML =
-        '<div style="padding:16px 18px 10px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">' +
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
-            '<div style="display:flex;align-items:center;gap:10px;">' +
-              '<div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 12px rgba(59,130,246,0.4);">&#x1FA99;</div>' +
-              '<div><div style="font-size:1.05rem;font-weight:900;">Wallet Passbook</div><div style="font-size:0.73rem;color:#94a3b8;">Share & Earn — Ledger History</div></div>' +
-            '</div>' +
-            '<button id="aoi-pb-close" type="button" style="background:rgba(255,255,255,0.08);border:none;color:#cbd5e1;width:34px;height:34px;border-radius:10px;font-size:1.1rem;cursor:pointer;">&times;</button>' +
-          '</div>' +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-            '<div style="flex:1;min-width:100px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:8px 12px;">' +
-              '<div style="font-size:0.7rem;color:#86efac;font-weight:700;">Available Balance</div>' +
-              '<div style="font-size:1.3rem;font-weight:900;color:#4ade80;">Rs.' + balance + '</div>' +
-            '</div>' +
-            '<div style="flex:1;min-width:100px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);border-radius:10px;padding:8px 12px;">' +
-              '<div style="font-size:0.7rem;color:#a5b4fc;font-weight:700;">Total Earned</div>' +
-              '<div style="font-size:1.3rem;font-weight:900;color:#818cf8;">Rs.' + (vault ? (vault.total_earned || 0) : 0) + '</div>' +
-            '</div>' +
-            '<div style="flex:1;min-width:100px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:8px 12px;">' +
-              '<div style="font-size:0.7rem;color:#fca5a5;font-weight:700;">Total Used</div>' +
-              '<div style="font-size:1.3rem;font-weight:900;color:#f87171;">Rs.' + (vault ? (vault.total_spent || 0) : 0) + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<div style="margin-top:8px;font-size:0.76rem;color:' + expiryColor + ';font-weight:700;">Validity: ' + expiryText + '  (' + ledger.length + ' transactions)</div>' +
-        '</div>' +
-        '<div style="overflow-y:auto;flex:1;padding:4px 0;">' +
-          '<table style="width:100%;border-collapse:collapse;">' +
-            '<thead><tr style="background:rgba(255,255,255,0.04);">' +
-              '<th style="padding:8px 12px;text-align:left;font-size:0.72rem;color:#64748b;font-weight:700;">Details</th>' +
-              '<th style="padding:8px 12px;text-align:center;font-size:0.72rem;color:#64748b;font-weight:700;">Date</th>' +
-              '<th style="padding:8px 12px;text-align:right;font-size:0.72rem;color:#64748b;font-weight:700;">Amount</th>' +
-            '</tr></thead>' +
-            '<tbody>' + ledgerRows + '</tbody>' +
-          '</table>' +
-        '</div>' +
-        '<div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
-          '<div style="font-size:0.73rem;color:#475569;">Next purchase pe 20% tak discount payen</div>' +
-          '<a href="/ebooks/ebook.html" style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;text-decoration:none;padding:8px 16px;border-radius:10px;font-weight:800;font-size:0.78rem;">Books Dekhein</a>' +
-        '</div>';
-
-      modal.appendChild(sheet);
-      document.body.appendChild(modal);
-
-      document.getElementById('aoi-pb-close').onclick = () => modal.remove();
-      modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-      this.refreshFromRemoteAsync().catch(() => {});
-    }
-
-    // Bind click on wallet balance element to open passbook
-    bindPassbookClick(selectorOrId) {
-      const tryBind = () => {
-        const byId = document.getElementById(selectorOrId);
-        const byQuery = document.querySelectorAll(selectorOrId);
-        const els = [byId, ...byQuery].filter(Boolean);
-        els.forEach(el => {
-          if (el && !el.dataset.passbookBound) {
-            el.dataset.passbookBound = 'true';
-            el.style.cursor = 'pointer';
-            el.title = 'Passbook dekhein (click karein)';
-            el.addEventListener('click', (e) => {
-              e.preventDefault(); e.stopPropagation();
-              this.showPassbookModal();
-            });
-          }
-        });
-      };
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryBind);
-      else { tryBind(); setTimeout(tryBind, 800); }
     }
 
     getBalance() {
@@ -528,7 +378,7 @@
       });
 
       this.saveLocal(this.state);
-      this.syncSupabaseWalletAsync(this.state, 'debit', pts, `📖 वॉलेट डिस्काउंट: ${bookTitle || 'eBook'}`, orderId);
+      this.syncSupabaseWalletAsync(this.state);
       return true;
     }
 
@@ -559,7 +409,7 @@
       });
 
       this.saveLocal(this.state);
-      this.syncSupabaseWalletAsync(this.state, 'credit', pts, title || '🎁 शेयर रिवॉर्ड पॉइंट्स', null);
+      this.syncSupabaseWalletAsync(this.state);
     }
 
     // Reverse Countdown Timer Engine (90 Days)
@@ -608,13 +458,11 @@
     }
 
     // Background Async Supabase Sync (Non-blocking, 0 UI stutter)
-    // Syncs `wallets` summary AND logs transaction to `wallet_transactions`
-    async syncSupabaseWalletAsync(vault, txType, txAmount, txTitle, txOrderId) {
+    async syncSupabaseWalletAsync(vault) {
       try {
         const db = window.dbClient || window.supabase;
         if (!db || !vault.user_id) return;
 
-        // 1. Upsert wallet summary into `wallets` table
         await db.from('wallets').upsert([{
           profile_id: vault.user_id,
           balance: vault.balance,
@@ -623,18 +471,6 @@
           expires_at: vault.expires_at,
           updated_at: new Date().toISOString()
         }], { onConflict: 'profile_id' }).catch(() => {});
-
-        // 2. Log transaction into `wallet_transactions` table
-        if (txType && txAmount > 0) {
-          await db.from('wallet_transactions').insert([{
-            profile_id: vault.user_id,
-            type: txType,       // 'credit' | 'debit'
-            amount: txAmount,
-            title: txTitle || '',
-            order_id: txOrderId || null,
-            created_at: new Date().toISOString()
-          }]).catch(() => {});
-        }
       } catch (e) {}
     }
 
@@ -705,11 +541,4 @@
 
   // Export Singleton
   window.AarogyamWallet = new AarogyamWalletEngine();
-
-  // Auto-bind passbook click on common wallet balance display elements
-  window.AarogyamWallet.bindPassbookClick('walletBalanceDisplay');
-  window.AarogyamWallet.bindPassbookClick('walletBalance');
-  window.AarogyamWallet.bindPassbookClick('shareEarnBalance');
-  window.AarogyamWallet.bindPassbookClick('[data-wallet-balance]');
-
 })(window);

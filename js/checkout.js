@@ -1179,9 +1179,17 @@ async function loadBook() {
         const totPrice = document.getElementById("totalPrice");
         if (totPrice) totPrice.textContent = "₹" + bookOffer;
 
-        // 🪙 Apply Wallet Points 20% Discount if available
+        // 🪙 Apply Wallet Points 20% Discount ONLY if no VIP Offer Link is active
+        // RULE: Wallet discount and Offer Link discount are mutually exclusive — use one, not both
         try {
-            applyWalletCheckoutDiscount(bookOffer);
+            if (window.activeVerifiedOffer) {
+                // Offer link is active — hide wallet row, zero out any discount
+                const walletRow = document.getElementById('checkoutWalletRow');
+                if (walletRow) walletRow.style.display = 'none';
+                window.appliedWalletDiscount = 0;
+            } else {
+                applyWalletCheckoutDiscount(bookOffer);
+            }
         } catch(e) {}
 
         // Safety Guard: Check if Book is Coming Soon
@@ -1678,8 +1686,10 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         }
 
                         // 🪙 Credit 10% Self Purchase Reward Points to Wallet
-                        if (window.AarogyamWallet && finalPayablePrice > 0) {
-                            window.AarogyamWallet.creditPoints(Math.round(finalPayablePrice * 0.10), '🛍️ ' + bookTitle + ' खरीद पर 10% कैशबैक', 'earn_self');
+                        // NOTE: Credit on original bookPrice (not on wallet-discounted finalPayablePrice)
+                        // so reward is fair regardless of whether wallet discount was applied.
+                        if (window.AarogyamWallet && bookPrice > 0) {
+                            window.AarogyamWallet.creditPoints(Math.round(bookPrice * 0.10), '🛒 ' + bookTitle + ' kharid par 10% cashback', 'earn_self');
                         }
 
                         // 👥 Credit 1st Level Referral to Direct Sponsor (10%)
