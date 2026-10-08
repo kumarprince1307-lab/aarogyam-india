@@ -1,6 +1,28 @@
 {
   "recordings": [
     {
+      "id": "VID_S019796",
+      "format": "short_reel",
+      "platform": "youtube",
+      "channel_id": "CH_AAROGYAM_MAIN",
+      "title": "टमाटर को रोगों से कैसे बचाए",
+      "description": "टमाटर में कूकड़ा से कैसे बचाए",
+      "subject": "Crop Protection",
+      "category": "Crop Protection",
+      "video_url": "https://youtube.com/shorts/9GWQlduG_AM?si=t1YHAy16lAdwlgml",
+      "youtube_url": "https://youtube.com/shorts/9GWQlduG_AM?si=t1YHAy16lAdwlgml",
+      "youtube_id": "9GWQlduG_AM",
+      "thumbnail": "https://img.youtube.com/vi/9GWQlduG_AM/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "all",
+      "pinned": false,
+      "priority": 50,
+      "order_type": "normal",
+      "status": "active",
+      "created_at": "2026-10-08T06:13:39.796Z"
+    },
+    {
       "id": "VID_S041329",
       "format": "short_reel",
       "platform": "youtube",
