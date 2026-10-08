@@ -283,7 +283,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1791022298334,
+      "admin_edited": 1791500344854,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -2416,8 +2416,14 @@
       "kpi_cards": [],
       "marketing_cards": [],
       "videos": [],
+      "reviews_heading": "",
+      "reviews_badge": "",
       "reviews": [],
+      "faqs_heading": "",
+      "faqs_badge": "",
       "faqs": [],
+      "ladder_header": null,
+      "career_ladder": [],
       "health_diseases": [],
       "crops": [],
       "pashu_cards": [],
@@ -2429,7 +2435,7 @@
           "image": "/images/products/product-------------new-pr-824493-y893.webp",
           "mrp": 375,
           "price": 375,
-          "discount_pct": 25,
+          "discount_pct": 0,
           "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग के निर्देशों के अनुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतर और लंबे समय तक स्वस्थ परिणामों के लिए इसका नियमित उपयोग करें।",
           "badge": "✨ New Launch",
           "whatsapp_link": "https://wa.me/917974422572"
@@ -2441,7 +2447,7 @@
           "image": "/images/products/product-multi-vitamin-for--705279-tr2v.webp",
           "mrp": 375,
           "price": 375,
-          "discount_pct": 25,
+          "discount_pct": 0,
           "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतरीन परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।",
           "badge": "✨ New Launch",
           "whatsapp_link": "https://wa.me/917974422572"
@@ -2453,7 +2459,7 @@
           "image": "/images/products/product--joint-care-new-30-770549-y5ld.webp",
           "mrp": 450,
           "price": 450,
-          "discount_pct": 25,
+          "discount_pct": 0,
           "dose": "1 कैप्सूल सुबह व 1 शाम भोजन के आधे घंटे बाद गुनगुने पानी के साथ।",
           "badge": "🦴 जोड़ों का दर्द व कार्टिलेज",
           "whatsapp_link": "https://wa.me/917974422572"
@@ -2465,7 +2471,7 @@
           "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
           "mrp": 1425,
           "price": 1425,
-          "discount_pct": 25,
+          "discount_pct": 0,
           "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।",
           "badge": "❤️ संपूर्ण परिवार पोषण",
           "whatsapp_link": "https://wa.me/917974422572"
@@ -2502,9 +2508,12 @@
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "जोड़ों का दर्द: कारण, लक्षण व गंभीर खतरे",
+        "subtitle": "",
         "cards": [
           {
+            "id": "CB_1791500344761_wuw0",
             "title": "❓ जोड़ों में दर्द क्यों होता है? (Causes)",
+            "badge": "",
             "color": "#2563eb",
             "image": "/images/banners/health_card-joincare-077465-pyvb.webp",
             "points": [
@@ -2512,10 +2521,15 @@
               "<strong>कार्टिलेज घिसना (Osteoarthritis):</strong> हड्डियों के आपस में टकराने से घिसाव।",
               "<strong>यूरिक एसिड का जमाव:</strong> खून में प्यूरीन बढ़ने से जोड़ों में सुई जैसे क्रिस्टल जमना।",
               "<strong>कैल्शियम व विटामिन D3 की कमी:</strong> हड्डियों का भुरभुरा (Osteoporosis) होना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1791500344761_x96e",
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
+            "badge": "",
             "color": "#2563eb",
             "image": "/images/banners/health_card-jpoin-pain-lakshan-242044-cp04.webp",
             "points": [
@@ -2523,20 +2537,29 @@
               "सुबह सोकर उठने पर जोड़ों में तेज जकड़न व अकड़न।",
               "घुटनों, टखनों या उंगलियों के जोड़ों में सूजन व लालिमा।",
               "जमीन पर बैठने या सीढ़ियां चढ़ने-उतरने में असहनीय दर्द।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1791500344761_jgfa",
             "title": "🚨 साइड इफेक्ट्स व खतरे (Risks)",
+            "badge": "",
             "color": "#dc2626",
             "image": "",
             "points": [
               "<strong>नी रिप्लेसमेंट की नौबत:</strong> समय पर इलाज न होने से घुटने का पूरी तरह जाम होना।",
               "<strong>स्थायी विकलांगता:</strong> पैरों की बनावट टेढ़ी (Bow Legs) हो जाना।",
               "<strong>पेनकिलर्स से किडनी डैमेज:</strong> रोज दर्द निवारक गोलियां खाने से गुर्दे फेल होना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           }
         ]
       },
+      "admin_edited": 1791500344762,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
