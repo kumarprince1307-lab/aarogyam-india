@@ -246,7 +246,7 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
-              <a href="/registration.html?ref=${encodeURIComponent(sponsorId)}&source=homepage-modal" style="
+              <a href="/registration.html?ref=${encodeURIComponent(sponsorId)}&source=homepage-modal&return=${encodeURIComponent(window.location.pathname + window.location.search)}" style="
                 background: linear-gradient(135deg, #059669 0%, #047857 100%);
                 color: #ffffff;
                 padding: 14px 10px;
@@ -266,7 +266,7 @@
                 <span style="font-size: 0.72rem; opacity: 0.85; font-weight: 600;">(New User)</span>
               </a>
 
-              <a href="/registration.html?mode=login&ref=${encodeURIComponent(sponsorId)}&source=homepage-modal" style="
+              <a href="/registration.html?mode=login&ref=${encodeURIComponent(sponsorId)}&source=homepage-modal&return=${encodeURIComponent(window.location.pathname + window.location.search)}" style="
                 background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
                 color: #ffffff;
                 padding: 14px 10px;
@@ -384,10 +384,14 @@
               .maybeSingle();
             existingProfile = data;
 
+            let sponsorMobile = '7974422572';
             if (sponsorShareId !== 'AI000004') {
               try {
-                const { data: refUser } = await db.from('profiles').select('id').eq('share_id', sponsorShareId).limit(1).maybeSingle();
-                if (refUser && refUser.id) sponsorProfileId = refUser.id;
+                const { data: refUser } = await db.from('profiles').select('id, mobile').eq('share_id', sponsorShareId).limit(1).maybeSingle();
+                if (refUser && refUser.id) {
+                  sponsorProfileId = refUser.id;
+                  if (refUser.mobile) sponsorMobile = refUser.mobile;
+                }
               } catch(e) {}
             }
           } catch (e) {
@@ -411,17 +415,28 @@
         } else if (db) {
           // New user registration in Supabase
           try {
-            await db.from('profiles').insert([{
+            const { data: newReg } = await db.from('profiles').insert([{
               full_name: name,
               mobile: mobile,
               share_id: userUniqueShareId,
               referral_code: sponsorShareId,
-              referral_mobile: sponsorShareId === 'AI000004' ? '7974422572' : null,
+              referral_mobile: sponsorShareId === 'AI000004' ? '7974422572' : (sponsorMobile || null),
               referred_by: sponsorProfileId,
               registration_source: currentAuthOptions?.source || 'UniversalModal',
               profile_complete: false,
               is_active: true
-            }]);
+            }]).select().single();
+
+            if (newReg?.id || sponsorProfileId) {
+              try {
+                await db.from('referrals').insert([{
+                  referred_by: sponsorProfileId,
+                  referral_code: sponsorShareId,
+                  status: 'success',
+                  joined_at: new Date().toISOString()
+                }]);
+              } catch(refErr) {}
+            }
           } catch (e) {
             console.warn('Insert profile warning:', e);
           }
@@ -527,6 +542,10 @@
 
   // 3. Global Control Functions
   window.openGuestLoginModal = function(callback, options) {
+    try {
+      sessionStorage.setItem('ai_auth_return_url', window.location.pathname + window.location.search);
+    } catch (e) {}
+
     currentAuthOptions = options || {};
 
     // Only skip if already logged in AND NOT an explicit user click (force !== true)

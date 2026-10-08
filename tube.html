@@ -3881,37 +3881,121 @@
           submitBtn.innerHTML = '<span>⏳ सत्यापन हो रहा है...</span>';
         }
 
+        const callbackToExecute = pendingGateCallback;
+
         try {
-          let userObj = {};
-          try { userObj = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(err) {}
-          userObj.full_name = inputName;
-          userObj.name = inputName;
-          userObj.mobile = cleanMobile;
-          userObj.phone = cleanMobile;
-          if (!userObj.share_id) userObj.share_id = 'AI' + cleanMobile.slice(-6);
+          // 1. Resolve sponsor details from active upline share ID
+          const uplineShareId = getActiveUplineShareId();
+          let sponsorUuid = '52ef705c-bb45-4137-bee4-a3f8df73b676'; // Master Partner Aarogyam India
+          let sponsorMobile = '7974422572';
+
+          if (db && uplineShareId && uplineShareId !== 'AI000004') {
+            try {
+              const { data: sponsorProf } = await db
+                .from('profiles')
+                .select('id, mobile')
+                .eq('share_id', uplineShareId)
+                .limit(1)
+                .maybeSingle();
+              if (sponsorProf && sponsorProf.id) {
+                sponsorUuid = sponsorProf.id;
+                if (sponsorProf.mobile) sponsorMobile = sponsorProf.mobile;
+              }
+            } catch(spErr) {
+              console.warn('Sponsor lookup notice:', spErr);
+            }
+          }
+
+          // 2. Check if user already exists in profiles
+          let existingProfile = null;
+          if (db) {
+            try {
+              const { data: exProf } = await db
+                .from('profiles')
+                .select('id, full_name, mobile, share_id, referral_code, referred_by')
+                .eq('mobile', cleanMobile)
+                .limit(1)
+                .maybeSingle();
+              existingProfile = exProf;
+            } catch(e) {}
+          }
+
+          const userUniqueShareId = existingProfile?.share_id || ('AI' + cleanMobile.slice(-6));
+          const finalName = (existingProfile && existingProfile.full_name && existingProfile.full_name.trim()) ? existingProfile.full_name.trim() : inputName;
+          const finalSponsorId = existingProfile?.referral_code || uplineShareId;
+          const finalSponsorUuid = existingProfile?.referred_by || sponsorUuid;
+
+          // 3. Insert new user into profiles and referrals (Universal reporting format)
+          if (!existingProfile && db) {
+            try {
+              const { data: newProf, error: insErr } = await db.from('profiles').insert([{
+                full_name: inputName,
+                mobile: cleanMobile,
+                share_id: userUniqueShareId,
+                referral_code: finalSponsorId,
+                referral_mobile: sponsorMobile,
+                referred_by: finalSponsorUuid,
+                registration_source: 'AarogyamTube',
+                profile_complete: false,
+                is_active: true
+              }]).select().single();
+
+              if (!insErr && (newProf?.id || finalSponsorUuid)) {
+                try {
+                  await db.from('referrals').insert([{
+                    referred_by: finalSponsorUuid,
+                    referral_code: finalSponsorId,
+                    status: 'success',
+                    joined_at: new Date().toISOString()
+                  }]);
+                } catch(refErr) {
+                  console.warn('Referrals table log notice:', refErr);
+                }
+              }
+            } catch(dbErr) {
+              console.warn('Cloud registration notice:', dbErr);
+            }
+          }
+
+          // 4. Save universal session keys in local storage (Zero-lag)
+          const userObj = {
+            id: existingProfile?.id || ('AI_' + cleanMobile),
+            name: finalName,
+            full_name: finalName,
+            mobile: cleanMobile,
+            phone: cleanMobile,
+            share_id: userUniqueShareId,
+            referral_code: finalSponsorId,
+            registration_source: 'AarogyamTube'
+          };
 
           localStorage.setItem('AI_USER', JSON.stringify(userObj));
-          localStorage.setItem('aim_user_name', inputName);
+          localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
+          localStorage.setItem('UCAS_USER', JSON.stringify(userObj));
+          localStorage.setItem('aim_user_name', finalName);
           localStorage.setItem('aim_user_mobile', cleanMobile);
+          localStorage.setItem('aarogyam_user_registered', 'true');
 
-          // Zero-Egress Cloud Registration
-          try {
-            if (db) {
-              await db.from('profiles').upsert({
-                mobile: cleanMobile,
-                full_name: inputName,
-                referral_code: getActiveUplineShareId(),
-                updated_at: new Date().toISOString()
-              }, { onConflict: 'mobile' });
-            }
-          } catch(dbErr) {}
+          let existingSession = {};
+          try { existingSession = JSON.parse(localStorage.getItem('AI_SESSION') || '{}'); } catch(e) {}
+          localStorage.setItem('AI_SESSION', JSON.stringify({
+            ...existingSession,
+            mobile: cleanMobile,
+            active: true,
+            loginTime: new Date().toISOString(),
+            referral_share_id: finalSponsorId
+          }));
 
+          if (window.V1_SESSION && typeof window.V1_SESSION.syncAndHealSession === 'function') {
+            window.V1_SESSION.syncAndHealSession();
+          }
+
+          // 5. Close gate modal smoothly
           window.closeTubeGateModal();
 
-          if (typeof pendingGateCallback === 'function') {
-            const cb = pendingGateCallback;
-            pendingGateCallback = null;
-            cb();
+          // 6. Execute pending playback callback cleanly
+          if (typeof callbackToExecute === 'function') {
+            callbackToExecute();
           }
         } catch(err) {
           if (msgEl) {

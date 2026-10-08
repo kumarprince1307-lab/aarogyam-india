@@ -4128,13 +4128,49 @@ function renderReviewModerationTab() {
     approved = JSON.parse(localStorage.getItem(KEY_APPROVED_REVIEWS) || '[]');
   } catch(e) {}
 
+  // Extract all cloud reviews from mktState.surveys (Live Supabase Reviews)
+  try {
+    const cloudReviews = (mktState.surveys || [])
+      .filter(s => {
+        const cats = Array.isArray(s.selected_categories) ? s.selected_categories : [];
+        const ans = s.category_answers || {};
+        return cats.includes('customer_review') || ans.type === 'review';
+      })
+      .map(s => {
+        const ans = s.category_answers || {};
+        return {
+          id: s.id,
+          user_name: s.name,
+          mobile: s.mobile,
+          location: s.state || s.district || 'भारत',
+          rating: ans.rating || 5,
+          review_text: ans.comment || ans.text || '',
+          page_url: ans.page_url || '',
+          book_id: ans.page_id || ans.book_id || 'General',
+          book_title: ans.page_title || ans.book_title || ans.topic || 'आरोग्यम रिव्यू',
+          created_at: s.created_at,
+          status: ans.status || 'approved',
+          category_answers: ans,
+          isCloud: true
+        };
+      });
+
+    cloudReviews.forEach(cr => {
+      if (cr.status === 'pending') {
+        if (!pending.some(p => p.id === cr.id)) pending.push(cr);
+      } else {
+        if (!approved.some(a => a.id === cr.id)) approved.push(cr);
+      }
+    });
+  } catch(e) {}
+
   return `
     <div style="background:rgba(15,23,42,0.6); border:1.5px solid rgba(255,255,255,0.08); border-radius:16px; padding:24px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
         <div>
           <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#f8fafc;">⭐ कस्टमर रिव्यू मॉडरेशन (Source Page Pipeline)</h3>
           <p style="margin:4px 0 0 0; font-size:0.82rem; color:#94a3b8;">
-            पाठकों द्वारा सबमिट किए गए रिव्यू स्वीकार या अस्वीकार करें। स्वीकार होते ही उसी पेज पर तुरंत लाइव दिखेंगे।
+            पाठकों और वेबसाइट सदस्यों द्वारा सबमिट किए गए सभी लाइव रिव्यू। स्वीकार या अस्वीकार करें — परिवर्तन तुरंत साइट पर प्रभावी होते हैं।
           </p>
         </div>
         <div style="display:flex; gap:10px;">
@@ -5206,11 +5242,30 @@ window.approveMarketingReview = function(revId) {
 
     localStorage.setItem(KEY_PENDING_REVIEWS, JSON.stringify(pending));
     localStorage.setItem(KEY_APPROVED_REVIEWS, JSON.stringify(approved));
-
-    alert("✅ रिव्यू सफलतापूर्वक स्वीकार कर लिया गया है। यह संबंधित पुस्तक के लैंडिंग पेज पर लाइव हो गया है!");
-    const container = document.getElementById('page-content');
-    if (container) updateMarketingHubView(container);
   }
+
+  // Cloud sync: update status in Supabase surveys if applicable
+  try {
+    fetch(`${SUPABASE_REST_URL}/surveys?id=eq.${revId}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        category_answers: {
+          ...(target?.category_answers || {}),
+          status: 'approved',
+          approved_at: new Date().toISOString()
+        }
+      })
+    }).catch(() => {});
+  } catch(e) {}
+
+  alert("✅ रिव्यू सफलतापूर्वक स्वीकार कर लिया गया है। यह वेबसाइट पर लाइव हो गया है!");
+  const container = document.getElementById('page-content');
+  if (container) updateMarketingHubView(container);
 };
 
 window.rejectMarketingReview = function(revId) {
@@ -5221,6 +5276,22 @@ window.rejectMarketingReview = function(revId) {
     pending = pending.filter(r => r.id !== revId);
     localStorage.setItem(KEY_PENDING_REVIEWS, JSON.stringify(pending));
   } catch(e) {}
+
+  // Cloud sync: delete from Supabase surveys if applicable
+  try {
+    fetch(`${SUPABASE_REST_URL}/surveys?id=eq.${revId}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    }).catch(() => {});
+  } catch(e) {}
+
+  if (Array.isArray(mktState.surveys)) {
+    mktState.surveys = mktState.surveys.filter(s => s.id !== revId);
+  }
+
   const container = document.getElementById('page-content');
   if (container) updateMarketingHubView(container);
 };
@@ -5233,6 +5304,22 @@ window.rejectApprovedReview = function(revId) {
     approved = approved.filter(r => r.id !== revId);
     localStorage.setItem(KEY_APPROVED_REVIEWS, JSON.stringify(approved));
   } catch(e) {}
+
+  // Cloud sync: delete from Supabase surveys if applicable
+  try {
+    fetch(`${SUPABASE_REST_URL}/surveys?id=eq.${revId}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    }).catch(() => {});
+  } catch(e) {}
+
+  if (Array.isArray(mktState.surveys)) {
+    mktState.surveys = mktState.surveys.filter(s => s.id !== revId);
+  }
+
   const container = document.getElementById('page-content');
   if (container) updateMarketingHubView(container);
 };

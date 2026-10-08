@@ -64,9 +64,18 @@
   let deferredPwaPrompt = null;
 
   function isPwaInstalled() {
-    return window.matchMedia('(display-mode: standalone)').matches || 
-           window.navigator.standalone === true || 
-           localStorage.getItem('AI_PWA_INSTALLED') === 'true';
+    try {
+      // Return true ONLY when running inside the installed standalone PWA app window
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.navigator.standalone === true;
+      if (isStandalone) return true;
+
+      // Android TWA / WebAPK wrapper
+      if (document.referrer && document.referrer.startsWith('android-app://')) {
+        return true;
+      }
+    } catch(e) {}
+    return false;
   }
 
   function checkPwaInstallState() {
@@ -74,7 +83,9 @@
     const installBtns = document.querySelectorAll('#universal-sticky-pwa-install-btn, .sticky-float-install-pill, #header-pwa-install-btn, .btn-pwa-install');
     installBtns.forEach(btn => {
       if (installed) {
-        btn.style.display = 'none';
+        btn.style.setProperty('display', 'none', 'important');
+      } else {
+        btn.style.removeProperty('display');
       }
     });
   }
@@ -86,17 +97,32 @@
   });
 
   window.addEventListener('appinstalled', () => {
-    localStorage.setItem('AI_PWA_INSTALLED', 'true');
-    checkPwaInstallState();
+    try { localStorage.setItem('AI_PWA_INSTALLED', 'true'); } catch(e) {}
+    const installBtns = document.querySelectorAll('#universal-sticky-pwa-install-btn, .sticky-float-install-pill, #header-pwa-install-btn, .btn-pwa-install');
+    installBtns.forEach(btn => btn.style.setProperty('display', 'none', 'important'));
   });
 
+  try {
+    if (window.matchMedia) {
+      window.matchMedia('(display-mode: standalone)').addEventListener('change', (evt) => {
+        checkPwaInstallState();
+      });
+    }
+  } catch(e) {}
+
   window.triggerPwaInstall = function () {
+    if (isPwaInstalled()) {
+      showDrawerToast('🎉 Aarogyam India App पहले से आपके मोबाइल में इंस्टॉल है!', 'success');
+      checkPwaInstallState();
+      return;
+    }
     if (deferredPwaPrompt) {
       deferredPwaPrompt.prompt();
       deferredPwaPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
-          localStorage.setItem('AI_PWA_INSTALLED', 'true');
-          checkPwaInstallState();
+          try { localStorage.setItem('AI_PWA_INSTALLED', 'true'); } catch(e) {}
+          const installBtns = document.querySelectorAll('#universal-sticky-pwa-install-btn, .sticky-float-install-pill');
+          installBtns.forEach(btn => btn.style.setProperty('display', 'none', 'important'));
           showDrawerToast('🎉 Aarogyam India App installed successfully!', 'success');
         }
         deferredPwaPrompt = null;
@@ -104,9 +130,9 @@
     } else {
       const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
       if (isIos) {
-        alert('📲 To install Aarogyam App on iPhone / iPad:\n1. Tap the Share button ⎋ below.\n2. Select "Add to Home Screen" (+).');
+        alert('📲 Aarogyam App को iPhone / iPad पर इनस्टॉल करने के लिए:\n1. नीचे Safari Share बटन (⎋) दबाएं।\n2. "Add to Home Screen" (+) चुनें।');
       } else {
-        alert('📲 To install Aarogyam App, open your browser menu (⋮) and tap "Add to Home screen" or "Install App".');
+        alert('📲 Aarogyam App इनस्टॉल करने के लिए ब्राउज़र मेनू (⋮) खोलें और "Add to Home screen" या "Install App" दबाएं।');
       }
     }
   };
@@ -437,6 +463,7 @@
 
     const currentPath = (window.location.pathname || '').toLowerCase();
     const currentSearch = (window.location.search || '').toLowerCase();
+    const isInstalled = isPwaInstalled();
 
     const drawerHtml = `
       <div id="universal-side-drawer-wrap">
@@ -710,30 +737,26 @@
         </div>
       </div>
 
-      <!-- Sticky Floating Actions Container on Page (Fixed Right Corner) -->
+      <!-- Sticky Floating Actions Container on Page (Fixed Right Corner - Strictly Icon-Only) -->
       <div class="sticky-float-widget-container" id="universal-sticky-float-widget">
-        <!-- 1. Red Sticky Install App Button -->
-        <button type="button" onclick="window.triggerPwaInstall()" class="sticky-float-pill sticky-float-install-pill" id="universal-sticky-pwa-install-btn" title="Install Aarogyam App">
+        <!-- 1. Red Sticky Install App Button (Only in Browser mode; auto-hidden if opened in installed standalone app) -->
+        <button type="button" onclick="window.triggerPwaInstall()" class="sticky-float-pill sticky-float-install-pill" id="universal-sticky-pwa-install-btn" title="ऐप इंस्टॉल करें (Install App)" aria-label="Install App" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; ${isInstalled ? 'display:none !important;' : 'display:inline-flex;'}; align-items:center; justify-content:center;">
           <i class="fa-solid fa-mobile-screen-button"></i>
-          <span class="pill-label">Install App</span>
         </button>
 
         <!-- 2. Purple Audio Greeting Button -->
-        <button type="button" onclick="if(window.togglePageAudioGreeting){window.togglePageAudioGreeting();}else if(window.playPageAudioGreeting){window.playPageAudioGreeting();}" class="sticky-float-pill sticky-float-audio-pill" id="universal-sticky-audio-btn" title="पेज का ऑडियो परिचय सुनें">
+        <button type="button" onclick="if(window.togglePageAudioGreeting){window.togglePageAudioGreeting();}else if(window.playPageAudioGreeting){window.playPageAudioGreeting();}" class="sticky-float-pill sticky-float-audio-pill" id="universal-sticky-audio-btn" title="पेज ऑडियो सुनें" aria-label="Audio" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
           <i class="fa-solid fa-volume-high"></i>
-          <span class="pill-label">Audio</span>
         </button>
 
         <!-- 3. Blue Share Referral Button -->
-        <button type="button" onclick="if(window.triggerUniversalPageShare){window.triggerUniversalPageShare();}else if(window.triggerUniversalShare){window.triggerUniversalShare();}else{window.triggerViralPageShare();}" class="sticky-float-pill sticky-float-share-pill" id="universal-sticky-share-btn" title="Share Aarogyam India">
+        <button type="button" onclick="if(window.triggerUniversalPageShare){window.triggerUniversalPageShare();}else if(window.triggerUniversalShare){window.triggerUniversalShare();}else{window.triggerViralPageShare();}" class="sticky-float-pill sticky-float-share-pill" id="universal-sticky-share-btn" title="शेयर करें (Share)" aria-label="Share" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
           <i class="fa-solid fa-share-nodes"></i>
-          <span class="pill-label">Share</span>
         </button>
 
         <!-- 4. Green AI Expert Consultation Button -->
-        <a href="javascript:void(0)" onclick="if(window.consultAiExpert){window.consultAiExpert('AI एक्सपर्ट परामर्श');}else{window.location.href=window.getPersonalizedWhatsAppUrl('AI एक्सपर्ट परामर्श');}" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="24x7 AI Expert Support">
+        <a href="javascript:void(0)" onclick="if(window.consultAiExpert){window.consultAiExpert('AI एक्सपर्ट परामर्श');}else{window.location.href=window.getPersonalizedWhatsAppUrl('AI एक्सपर्ट परामर्श');}" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="WhatsApp AI एक्सपर्ट" aria-label="AI Expert" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
           <i class="fa-brands fa-whatsapp"></i>
-          <span class="pill-label">AI Expert</span>
         </a>
       </div>
 
@@ -879,8 +902,13 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectUniversalSideDrawer);
+    document.addEventListener('DOMContentLoaded', () => {
+      injectUniversalSideDrawer();
+      checkPwaInstallState();
+    });
   } else {
     injectUniversalSideDrawer();
+    checkPwaInstallState();
   }
+  window.addEventListener('load', checkPwaInstallState);
 })();

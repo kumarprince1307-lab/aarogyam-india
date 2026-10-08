@@ -133,8 +133,20 @@ async function initializePage() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
         const mobileParam = urlParams.get('mobile');
-        const modeParam = urlParams.get('mode');
-        returnUrl = urlParams.get('return');
+        returnUrl = urlParams.get('return') || urlParams.get('redirect') || urlParams.get('redirect_to');
+        if (!returnUrl) {
+            try {
+                const storedReturn = sessionStorage.getItem('ai_auth_return_url');
+                if (storedReturn && !storedReturn.includes('registration') && !storedReturn.includes('login')) {
+                    returnUrl = storedReturn;
+                } else if (document.referrer) {
+                    const refUrl = new URL(document.referrer, window.location.origin);
+                    if (refUrl.origin === window.location.origin && !refUrl.pathname.includes('registration') && !refUrl.pathname.includes('login')) {
+                        returnUrl = refUrl.pathname + refUrl.search + refUrl.hash;
+                    }
+                }
+            } catch(e) {}
+        }
 
         syncShareContextFromUrl();
 
@@ -536,11 +548,11 @@ function completeRegistration(result) {
         setTimeout(() => {
             if (isFromCheckout) {
                 window.location.href = "/ebooks/my-library.html";
-            } else if (returnUrl && !returnUrl.includes('registration')) {
+            } else if (returnUrl && !returnUrl.includes('registration') && !returnUrl.includes('login')) {
                 window.location.href = returnUrl;
             } else {
-                // डिफ़ॉल्ट डायरेक्ट रजिस्ट्रेशन -> My Profile
-                window.location.href = "/ucas/index.html";
+                // डिफ़ॉल्ट: होमपेज या पूर्ववत पेज (My Profile पर जबरन रीडायरेक्ट नहीं)
+                window.location.href = "/index.html";
             }
         }, 800);
     }

@@ -745,38 +745,39 @@
                  document.querySelector('.reviews-grid') || 
                  document.querySelector('#sec-reviews div[style*="grid"]');
 
-    if (grid && Array.isArray(pageConfig?.reviews) && pageConfig.reviews.length > 0) {
-      const cmsReviewsHtml = pageConfig.reviews.map(r => {
-        const rating = Number(r.rating) || 5;
-        const stars = '★'.repeat(Math.max(1, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
-        const comment = r.comment || r.text || '';
-        const name = r.name || 'किसान / पाठक मित्र';
-        const loc = r.location || 'भारत';
-        const rawImg = resolveAssetSrc(r, 'image', '') || resolveAssetSrc(r, 'avatar', '');
-        const hasImg = rawImg && !rawImg.includes('achiever-1.jpg');
+    if (grid) {
+      if (Array.isArray(pageConfig?.reviews) && pageConfig.reviews.length > 0) {
+        const cmsReviewsHtml = pageConfig.reviews.map(r => {
+          const rating = Number(r.rating) || 5;
+          const stars = '★'.repeat(Math.max(1, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
+          const comment = r.comment || r.text || '';
+          const name = r.name || 'किसान / पाठक मित्र';
+          const loc = r.location || 'भारत';
+          const rawImg = resolveAssetSrc(r, 'image', '') || resolveAssetSrc(r, 'avatar', '');
+          const hasImg = rawImg && !rawImg.includes('achiever-1.jpg');
 
-        return `
-          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-              <div style="color: #eab308; font-size: 0.95rem; margin-bottom: 8px; letter-spacing: 2px;">${stars}</div>
-              <p style="font-size: 0.86rem; color: #334155; line-height: 1.5; margin: 0 0 14px 0;">
-                "${escapeHtml(comment)}"
-              </p>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
-              <div style="width:40px; height:40px; border-radius:50%; background:#eff6ff; border:1.5px solid #0284c7; display:flex; align-items:center; justify-content:center; font-size:1.2rem; overflow:hidden; flex-shrink:0;">
-                ${hasImg ? `<img src="${escapeHtml(rawImg)}" alt="${escapeHtml(name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='👨‍🌾'">` : (r.avatar && r.avatar.length <= 4 ? r.avatar : '👨‍🌾')}
-              </div>
+          return `
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); display:flex; flex-direction:column; justify-content:space-between;">
               <div>
-                <h4 style="font-size:0.9rem; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(name)}</h4>
-                <div style="font-size:0.75rem; color:#64748b;">📍 ${escapeHtml(loc)}</div>
+                <div style="color: #eab308; font-size: 0.95rem; margin-bottom: 8px; letter-spacing: 2px;">${stars}</div>
+                <p style="font-size: 0.86rem; color: #334155; line-height: 1.5; margin: 0 0 14px 0;">
+                  "${escapeHtml(comment)}"
+                </p>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                <div style="width:40px; height:40px; border-radius:50%; background:#eff6ff; border:1.5px solid #0284c7; display:flex; align-items:center; justify-content:center; font-size:1.2rem; overflow:hidden; flex-shrink:0;">
+                  ${hasImg ? `<img src="${escapeHtml(rawImg)}" alt="${escapeHtml(name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='👨‍🌾'">` : (r.avatar && r.avatar.length <= 4 ? r.avatar : '👨‍🌾')}
+                </div>
+                <div>
+                  <h4 style="font-size:0.9rem; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(name)}</h4>
+                  <div style="font-size:0.75rem; color:#64748b;">📍 ${escapeHtml(loc)}</div>
+                </div>
               </div>
             </div>
-          </div>
-        `;
-      }).join('');
-
-      grid.innerHTML = cmsReviewsHtml;
+          `;
+        }).join('');
+        grid.innerHTML = cmsReviewsHtml;
+      }
       renderUserSubmittedReviews(grid);
     }
 
@@ -784,32 +785,89 @@
   }
 
   function renderUserSubmittedReviews(grid) {
+    if (!grid) return;
+    const curPath = (window.location.pathname || '').toLowerCase();
+    const activePage = window.AAROGYAM_ACTIVE_PAGE_CMS;
+    const pageId = (activePage?.id || curPath.split('/').pop().replace('.html','')).toLowerCase();
+
+    // 1. Instant client-side display from localStorage (0ms cache)
     try {
       const userRevs = JSON.parse(localStorage.getItem('aarogyam_user_reviews') || '[]');
-      if (!Array.isArray(userRevs) || userRevs.length === 0 || !grid) return;
-      const curPath = (window.location.pathname || '').toLowerCase();
+      if (Array.isArray(userRevs) && userRevs.length > 0) {
+        userRevs.forEach(r => {
+          if (!r || (!r.comment && !r.text)) return;
+          if (document.getElementById(r.id)) return;
+          const revPageId = (r.page_id || '').toLowerCase();
+          const revPageUrl = (r.page_url || '').toLowerCase();
+          const isMatch = !revPageId || revPageId === pageId || revPageUrl === curPath || curPath.includes('index') || curPath === '/';
+          if (!isMatch) return;
 
-      userRevs.forEach(r => {
-        if (!r || !r.comment && !r.text) return;
-        if (document.getElementById(r.id)) return;
-        // Show if matches current page or within recent
-        const isMatch = !r.page_url || r.page_url === curPath || curPath.includes('index') || curPath === '/';
+          const rating = Number(r.rating) || 5;
+          const stars = '★'.repeat(Math.max(1, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
+          const comment = r.comment || r.text || '';
+          const name = r.name || 'किसान साथी';
+          const loc = r.location || 'भारत';
+
+          const card = document.createElement('div');
+          card.id = r.id || ('REV_' + Math.random().toString(36).substr(2, 6));
+          card.style.cssText = 'background:#f0fdf4; border:1.8px solid #22c55e; border-radius:16px; padding:20px; box-shadow:0 4px 16px rgba(34,197,94,0.12); display:flex; flex-direction:column; justify-content:space-between; animation:fadeIn 0.3s ease;';
+          card.innerHTML = `
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div style="color:#eab308; font-size:0.95rem; letter-spacing:2px;">${stars}</div>
+                <span style="background:#22c55e; color:#fff; font-size:0.68rem; font-weight:900; padding:2px 8px; border-radius:10px;">✓ नया रिव्यू</span>
+              </div>
+              <p style="font-size:0.86rem; color:#1e293b; line-height:1.5; margin:0 0 14px 0;">"${escapeHtml(comment)}"</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; border-top:1px solid #dcfce7; padding-top:10px;">
+              <div style="width:40px; height:40px; border-radius:50%; background:#dcfce7; color:#15803d; border:1.5px solid #22c55e; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">✍️</div>
+              <div>
+                <h4 style="font-size:0.9rem; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(name)}</h4>
+                <div style="font-size:0.75rem; color:#15803d; font-weight:700;">📍 ${escapeHtml(loc)} ${r.topic ? `• ${escapeHtml(r.topic)}` : ''}</div>
+              </div>
+            </div>
+          `;
+          grid.prepend(card);
+        });
+      }
+    } catch (e) {}
+
+    // 2. Live cloud fetch from Supabase surveys table (Real online reviews for everyone)
+    const SUPABASE_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
+    const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+    fetch(`${SUPABASE_REST_URL}/surveys?select=id,name,mobile,state,district,selected_categories,category_answers,created_at&selected_categories=cs.{"customer_review"}&order=created_at.desc&limit=50`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    })
+    .then(res => res.ok ? res.json() : [])
+    .then(surveys => {
+      if (!Array.isArray(surveys) || surveys.length === 0) return;
+      surveys.forEach(s => {
+        const ans = s.category_answers || {};
+        if (ans.status === 'rejected') return;
+        const revPageId = (ans.page_id || '').toLowerCase();
+        const revPageUrl = (ans.page_url || '').toLowerCase();
+        const isMatch = !revPageId || revPageId === pageId || revPageUrl === curPath || curPath.includes('index') || curPath === '/';
         if (!isMatch) return;
+        if (document.getElementById(s.id)) return;
 
-        const rating = Number(r.rating) || 5;
+        const rating = Number(ans.rating) || 5;
         const stars = '★'.repeat(Math.max(1, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
-        const comment = r.comment || r.text || '';
-        const name = r.name || 'किसान साथी';
-        const loc = r.location || 'भारत';
+        const comment = ans.comment || ans.text || '';
+        if (!comment) return;
+        const name = s.name || 'किसान / पाठक मित्र';
+        const loc = s.state || s.district || 'भारत';
 
         const card = document.createElement('div');
-        card.id = r.id || ('REV_' + Math.random().toString(36).substr(2, 6));
-        card.style.cssText = 'background:#f0fdf4; border:1.8px solid #22c55e; border-radius:16px; padding:20px; box-shadow:0 4px 16px rgba(34,197,94,0.12); display:flex; flex-direction:column; justify-content:space-between;';
+        card.id = s.id;
+        card.style.cssText = 'background:#f0fdf4; border:1.8px solid #22c55e; border-radius:16px; padding:20px; box-shadow:0 4px 16px rgba(34,197,94,0.12); display:flex; flex-direction:column; justify-content:space-between; animation:fadeIn 0.3s ease;';
         card.innerHTML = `
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <div style="color:#eab308; font-size:0.95rem; letter-spacing:2px;">${stars}</div>
-              <span style="background:#22c55e; color:#fff; font-size:0.68rem; font-weight:900; padding:2px 8px; border-radius:10px;">✓ नया रिव्यू</span>
+              <span style="background:#22c55e; color:#fff; font-size:0.68rem; font-weight:900; padding:2px 8px; border-radius:10px;">✓ प्रमाणित पाठक</span>
             </div>
             <p style="font-size:0.86rem; color:#1e293b; line-height:1.5; margin:0 0 14px 0;">"${escapeHtml(comment)}"</p>
           </div>
@@ -817,13 +875,14 @@
             <div style="width:40px; height:40px; border-radius:50%; background:#dcfce7; color:#15803d; border:1.5px solid #22c55e; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">✍️</div>
             <div>
               <h4 style="font-size:0.9rem; font-weight:800; margin:0; color:#0f172a;">${escapeHtml(name)}</h4>
-              <div style="font-size:0.75rem; color:#15803d; font-weight:700;">📍 ${escapeHtml(loc)} ${r.topic ? `• ${escapeHtml(r.topic)}` : ''}</div>
+              <div style="font-size:0.75rem; color:#15803d; font-weight:700;">📍 ${escapeHtml(loc)} ${ans.topic ? `• ${escapeHtml(ans.topic)}` : ''}</div>
             </div>
           </div>
         `;
         grid.prepend(card);
       });
-    } catch (e) {}
+    })
+    .catch(() => {});
   }
 
   function ensureUniversalReviewCtaOnPage() {
@@ -841,6 +900,28 @@
     `;
     const container = sec.querySelector('.container') || sec;
     container.appendChild(wrap);
+  }
+
+  // Helper: Auto-detect registered user profile
+  function getReviewAuthUser() {
+    let user = null;
+    try {
+      if (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function') {
+        user = window.V1_SESSION.getCurrentUser();
+      }
+    } catch(e) {}
+    if (!user) {
+      try {
+        user = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || 'null');
+      } catch(e) {}
+    }
+    const mobile = user?.mobile || user?.phone || localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_phone') || '';
+    const name = (user?.full_name && user.full_name !== 'Valued Member') ? user.full_name : (user?.name || localStorage.getItem('aim_user_name') || localStorage.getItem('aarogyam_user_name') || '');
+    const location = user?.district ? `${user.district}, ${user.State || user.state || ''}` : (user?.State || user?.state || user?.city || 'भारत');
+    const profileId = user?.id || user?.profile_id || null;
+    const isRegistered = !!(name && mobile);
+
+    return { user, name, mobile, location, profileId, isRegistered };
   }
 
   // Universal Global Review Form Modal
@@ -864,61 +945,85 @@
     else if (curPath.includes('sexual-wellness')) defaultTopic = 'पौरुष शक्ति व वेलनेस';
     else if (curPath.includes('ebook')) defaultTopic = 'कृषि व स्वास्थ्य ई-बुक्स';
 
+    const auth = getReviewAuthUser();
+
     modal = document.createElement('div');
     modal.id = 'user-review-modal';
     modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.78);backdrop-filter:blur(6px);z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
     modal.innerHTML = `
-      <div style="background:#ffffff; border-radius:24px; max-width:500px; width:100%; padding:26px; box-shadow:0 24px 60px rgba(0,0,0,0.35); position:relative; border:1.5px solid #cbd5e1; max-height:92vh; overflow-y:auto; box-sizing:border-box; font-family:inherit;">
+      <div style="background:#ffffff; border-radius:24px; max-width:480px; width:100%; padding:26px; box-shadow:0 24px 60px rgba(0,0,0,0.35); position:relative; border:1.5px solid #cbd5e1; max-height:92vh; overflow-y:auto; box-sizing:border-box; font-family:inherit;">
         <button type="button" onclick="document.getElementById('user-review-modal')?.remove()" style="position:absolute; top:16px; right:16px; background:#f1f5f9; border:none; width:36px; height:36px; border-radius:50%; font-size:1.15rem; font-weight:900; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="बंद करें">✕</button>
         
         <div style="text-align:center; margin-bottom:18px;">
-          <div style="width:52px; height:52px; border-radius:50%; background:#dcfce7; color:#16a34a; display:inline-flex; align-items:center; justify-content:center; font-size:1.6rem; margin-bottom:8px; box-shadow:0 4px 12px rgba(22,163,74,0.2);">✍️</div>
+          <div style="width:52px; height:52px; border-radius:50%; background:#dcfce7; color:#16a34a; display:inline-flex; align-items:center; justify-content:center; font-size:1.6rem; margin-bottom:8px; box-shadow:0 4px 12px rgba(22,163,74,0.2);">⭐</div>
           <h3 style="margin:0; font-size:1.35rem; font-weight:900; color:#0f172a;">अपना रिव्यू / अनुभव साझा करें</h3>
-          <p style="margin:4px 0 0 0; font-size:0.84rem; color:#64748b;">${escapeHtml(pageName)} — आपका फीडबैक हजारों लोगों का मार्गदर्शन करता है</p>
+          <p style="margin:4px 0 0 0; font-size:0.84rem; color:#64748b;">${escapeHtml(pageName)} — आपकी सच्ची समीक्षा अन्य सदस्यों का मार्गदर्शन करती है</p>
         </div>
 
         <form id="aarogyam-universal-review-form" onsubmit="window.handleReviewFormSubmit(event)">
-          <div style="margin-bottom:14px;">
-            <label style="display:block; font-size:0.84rem; font-weight:800; color:#334155; margin-bottom:5px;">आपका पूरा नाम *</label>
-            <input type="text" id="review-user-name" required placeholder="उदा. सुखविंदर सिंह / रमेश पाटीदार" style="width:100%; padding:10px 14px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.9rem; box-sizing:border-box; outline:none;" />
-          </div>
+          ${auth.isRegistered ? `
+            <!-- Authenticated Member Badge: No redundant name/mobile input required! -->
+            <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:14px; padding:12px 14px; margin-bottom:16px; display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; border-radius:50%; background:#22c55e; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:900; flex-shrink:0;">✓</div>
+              <div style="flex:1;">
+                <div style="font-size:0.95rem; font-weight:800; color:#14532d;">${escapeHtml(auth.name)}</div>
+                <div style="font-size:0.78rem; color:#16a34a; font-weight:700;">📱 ${escapeHtml(auth.mobile)} ${auth.location ? `• 📍 ${escapeHtml(auth.location)}` : ''}</div>
+              </div>
+              <span style="background:#22c55e; color:#fff; font-size:0.7rem; font-weight:900; padding:3px 10px; border-radius:12px; white-space:nowrap;">लॉगिन सदस्य</span>
+            </div>
+            <input type="hidden" id="review-user-name" value="${escapeHtml(auth.name)}" />
+            <input type="hidden" id="review-user-location" value="${escapeHtml(auth.location || 'भारत')}" />
+            <input type="hidden" id="review-user-mobile" value="${escapeHtml(auth.mobile)}" />
+            <input type="hidden" id="review-user-profile-id" value="${escapeHtml(auth.profileId || '')}" />
+          ` : `
+            <!-- Guest Member Details -->
+            <div style="margin-bottom:14px;">
+              <label style="display:block; font-size:0.84rem; font-weight:800; color:#334155; margin-bottom:5px;">आपका पूरा नाम *</label>
+              <input type="text" id="review-user-name" required placeholder="उदा. सुखविंदर सिंह / रमेश पाटीदार" style="width:100%; padding:10px 14px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.9rem; box-sizing:border-box; outline:none;" />
+            </div>
+
+            <div style="margin-bottom:14px; display:flex; gap:12px;">
+              <div style="flex:1;">
+                <label style="display:block; font-size:0.84rem; font-weight:800; color:#334155; margin-bottom:5px;">स्थान / ज़िला (राज्य) *</label>
+                <input type="text" id="review-user-location" required placeholder="उदा. रोहतक (हरियाणा)" style="width:100%; padding:10px 14px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.9rem; box-sizing:border-box; outline:none;" />
+              </div>
+              <div style="flex:1;">
+                <label style="display:block; font-size:0.84rem; font-weight:800; color:#334155; margin-bottom:5px;">मोबाइल नंबर</label>
+                <input type="tel" id="review-user-mobile" placeholder="10 अंकों का मोबाइल" style="width:100%; padding:10px 14px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.9rem; box-sizing:border-box; outline:none;" />
+              </div>
+            </div>
+            <input type="hidden" id="review-user-profile-id" value="" />
+          `}
 
           <div style="margin-bottom:14px; display:flex; gap:12px;">
             <div style="flex:1;">
-              <label style="display:block; font-size:0.84rem; font-weight:800; color:#334155; margin-bottom:5px;">स्थान / ज़िला (राज्य) *</label>
-              <input type="text" id="review-user-location" required placeholder="उदा. रोहतक (हरियाणा)" style="width:100%; padding:10px 14px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.9rem; box-sizing:border-box; outline:none;" />
-            </div>
-            <div style="width:130px;">
               <label style="display:block; font-size:0.84rem; font-weight:800; color:#334155; margin-bottom:5px;">रेटिंग *</label>
               <select id="review-user-rating" style="width:100%; padding:10px 8px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.88rem; background:#fff; box-sizing:border-box; cursor:pointer;">
-                <option value="5" selected>⭐⭐⭐⭐⭐ (5/5)</option>
-                <option value="4">⭐⭐⭐⭐ (4/5)</option>
-                <option value="3">⭐⭐⭐ (3/5)</option>
-                <option value="2">⭐⭐ (2/5)</option>
-                <option value="1">⭐ (1/5)</option>
+                <option value="5" selected>⭐⭐⭐⭐⭐ (5/5 बहुत शानदार)</option>
+                <option value="4">⭐⭐⭐⭐ (4/5 अच्छा)</option>
+                <option value="3">⭐⭐⭐ (3/5 ठीक-ठाक)</option>
+              </select>
+            </div>
+            <div style="flex:1;">
+              <label style="display:block; font-size:0.84rem; font-weight:800; color:#334155; margin-bottom:5px;">संबंधित श्रेणी *</label>
+              <select id="review-user-topic" style="width:100%; padding:10px 10px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.88rem; background:#fff; box-sizing:border-box;">
+                <option value="${escapeHtml(defaultTopic)}" selected>📌 ${escapeHtml(defaultTopic)}</option>
+                <option value="पशु पालन व दुग्ध संवर्धन">🐄 पशु पालन व दुग्ध</option>
+                <option value="मधुमेह व ब्लड शुगर">🩸 मधुमेह (डायबिटीज)</option>
+                <option value="जोड़ों का दर्द व गठिया">🦴 जोड़ों का दर्द</option>
+                <option value="वजन नियंत्रण व मोटापा">🔥 मोटापा नियंत्रण</option>
+                <option value="महिला स्वास्थ्य व PCOD">🌸 महिला स्वास्थ्य</option>
+                <option value="हेयर केयर व डैंड्रफ">💇‍♀️ हेयर केयर</option>
+                <option value="स्किन केयर व त्वचा ग्लो">🌺 स्किन केयर</option>
+                <option value="डिजिटल बिज़नेस व नेटसर्फ">💼 नेटसर्फ बिज़नेस</option>
+                <option value="कृषि ई-बुक्स व फसल डॉक्टर">🌾 कृषि ई-बुक्स</option>
               </select>
             </div>
           </div>
 
-          <div style="margin-bottom:14px;">
-            <label style="display:block; font-size:0.84rem; font-weight:800; color:#334155; margin-bottom:5px;">संबंधित विषय / श्रेणी *</label>
-            <select id="review-user-topic" style="width:100%; padding:10px 14px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.88rem; background:#fff; box-sizing:border-box;">
-              <option value="${escapeHtml(defaultTopic)}" selected>📌 ${escapeHtml(defaultTopic)}</option>
-              <option value="पशु पालन व दुग्ध संवर्धन">🐄 पशु पालन व दुग्ध वृद्धि</option>
-              <option value="मधुमेह व ब्लड शुगर">🩸 मधुमेह (डायबिटीज) केयर</option>
-              <option value="जोड़ों का दर्द व गठिया">🦴 जोड़ों का दर्द व गठिया</option>
-              <option value="वजन नियंत्रण व मोटापा">🔥 मोटापा व वजन नियंत्रण</option>
-              <option value="महिला स्वास्थ्य व PCOD">🌸 महिला स्वास्थ्य (PCOD/PCOS)</option>
-              <option value="हेयर केयर व डैंड्रफ">💇‍♀️ हेयर केयर व डैंड्रफ</option>
-              <option value="स्किन केयर व त्वचा ग्लो">🌺 स्किन केयर व सौंदर्य</option>
-              <option value="डिजिटल बिज़नेस व नेटसर्फ">💼 नेटसर्फ कैरियर व बिज़नेस</option>
-              <option value="कृषि ई-बुक्स व फसल डॉक्टर">🌾 कृषि ई-बुक्स व फसल सुरक्षा</option>
-            </select>
-          </div>
-
           <div style="margin-bottom:18px;">
             <label style="display:block; font-size:0.84rem; font-weight:800; color:#334155; margin-bottom:5px;">आपका वास्तविक अनुभव व समीक्षा *</label>
-            <textarea id="review-user-text" rows="3" required placeholder="आपको इस उत्पाद, ई-बुक या परामर्श से क्या लाभ मिला और कितने दिन में सुधार दिखा..." style="width:100%; padding:10px 14px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.9rem; box-sizing:border-box; resize:vertical; font-family:inherit; outline:none;"></textarea>
+            <textarea id="review-user-text" rows="3" required placeholder="आपको इस उत्पाद, ई-बुक या सेवा से क्या लाभ मिला..." style="width:100%; padding:10px 14px; border:1.5px solid #cbd5e1; border-radius:12px; font-size:0.9rem; box-sizing:border-box; resize:vertical; font-family:inherit; outline:none;"></textarea>
           </div>
 
           <button type="submit" style="width:100%; background:linear-gradient(135deg, #16a34a, #15803d); color:#fff; border:none; padding:13px; border-radius:30px; font-weight:900; font-size:0.98rem; cursor:pointer; box-shadow:0 6px 20px rgba(22,163,74,0.35); transition:transform 0.15s ease;">
@@ -934,12 +1039,14 @@
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     const name = document.getElementById('review-user-name')?.value?.trim();
     const loc = document.getElementById('review-user-location')?.value?.trim();
+    const mobile = document.getElementById('review-user-mobile')?.value?.trim() || '';
+    const profileId = document.getElementById('review-user-profile-id')?.value?.trim() || null;
     const rating = parseInt(document.getElementById('review-user-rating')?.value || '5', 10);
     const topic = document.getElementById('review-user-topic')?.value || 'सामान्य समीक्षा';
     const text = document.getElementById('review-user-text')?.value?.trim();
 
     if (!name || !text) {
-      alert('कृपया अपना नाम और समीक्षा अवश्य लिखें।');
+      alert('कृपया अपनी समीक्षा दर्ज करें।');
       return;
     }
 
@@ -953,13 +1060,15 @@
       page_id: pageId,
       page_url: window.location.pathname,
       name: name,
+      mobile: mobile,
       location: loc,
       rating: rating,
       topic: topic,
       comment: text,
       text: text,
       date: new Date().toLocaleDateString('hi-IN'),
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      status: 'approved'
     };
 
     // 1. Instant client-side display in localStorage
@@ -969,29 +1078,67 @@
       localStorage.setItem('aarogyam_user_reviews', JSON.stringify(existing));
     } catch (err) {}
 
-    // 2. Direct pipeline into Admin Panel Tab 7 (AOI_PENDING_REVIEWS)
+    // 2. Direct pipeline into Admin Panel Tab 4 & Storage
     try {
-      const pending = JSON.parse(localStorage.getItem('AOI_PENDING_REVIEWS') || '[]');
-      pending.unshift({
+      const approved = JSON.parse(localStorage.getItem('AOI_APPROVED_REVIEWS') || '[]');
+      approved.unshift({
         id: revId,
         book_id: pageId,
         book_title: pageTitle,
         page_url: window.location.pathname,
         user_name: name,
+        mobile: mobile,
         location: loc,
         rating: rating,
         review_text: text,
         created_at: new Date().toISOString(),
-        status: 'pending'
+        status: 'approved'
       });
-      localStorage.setItem('AOI_PENDING_REVIEWS', JSON.stringify(pending));
+      localStorage.setItem('AOI_APPROVED_REVIEWS', JSON.stringify(approved));
     } catch (err) {}
 
-    // 3. Close modal
+    // 3. Cloud synchronization via Supabase surveys table (Real online storage for all visitors & admin panel)
+    try {
+      const SUPABASE_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
+      const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      const targetProfId = profileId || '9e58ecb9-c8f1-4fc7-a845-07ecedb159a0';
+      const surveyPayload = {
+        profile_id: targetProfId,
+        name: name,
+        mobile: mobile || '9999999999',
+        state: loc || 'भारत',
+        selected_categories: ['customer_review', pageId],
+        category_answers: {
+          type: 'review',
+          rating: rating,
+          comment: text,
+          text: text,
+          page_url: window.location.pathname,
+          page_id: pageId,
+          page_title: pageTitle,
+          topic: topic,
+          status: 'approved',
+          created_at: new Date().toISOString()
+        }
+      };
+
+      fetch(`${SUPABASE_REST_URL}/surveys`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(surveyPayload)
+      }).catch(err => console.warn('Supabase review insert:', err));
+    } catch (e) {}
+
+    // 4. Close modal
     const modal = document.getElementById('user-review-modal');
     if (modal) modal.remove();
 
-    // 4. Render immediately into active review grid
+    // 5. Render immediately into active review grid
     const grid = document.getElementById('sec-reviews-grid') || 
                  document.getElementById('home-reviews-grid') || 
                  document.querySelector('#sec-reviews .reviews-grid') || 
@@ -1007,7 +1154,7 @@
         <div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <div style="color:#eab308; font-size:0.95rem; letter-spacing:2px;">${stars}</div>
-            <span style="background:#22c55e; color:#fff; font-size:0.7rem; font-weight:900; padding:2px 8px; border-radius:10px;">✓ आपका नया रिव्यू</span>
+            <span style="background:#22c55e; color:#fff; font-size:0.7rem; font-weight:900; padding:2px 8px; border-radius:10px;">✓ आपका नया रिव्यू (लाइव)</span>
           </div>
           <p style="font-size:0.86rem; color:#1e293b; line-height:1.5; margin:0 0 14px 0;">"${escapeHtml(text)}"</p>
         </div>
@@ -1022,7 +1169,7 @@
       grid.prepend(card);
     }
 
-    alert('धन्यवाद ' + name + '! आपका रिव्यू सफलतापूर्वक सबमिट हो गया है। यह पेज पर प्रदर्शित हो गया है और एडमिन पैनल में भी दर्ज कर लिया गया है।');
+    alert('धन्यवाद ' + name + '! आपका रिव्यू सफलतापूर्वक सबमिट हो गया है और लाइव प्रदर्शित है।');
   };
 
   function renderDynamicNetsurfPlan(pageConfig) {
@@ -1580,6 +1727,19 @@
       // Ensure page is scrollable (prevent any modal/drawer scroll freeze)
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
+
+      // Instant 0ms cached hydration (Eliminates flash-of-unstyled/old content)
+      try {
+        const cachedStr = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
+        if (cachedStr) {
+          const cachedPages = JSON.parse(cachedStr);
+          const cachedMatch = getPageMatch(cachedPages);
+          if (cachedMatch) {
+            window.AAROGYAM_ACTIVE_PAGE_CMS = cachedMatch;
+            renderDynamicHeroSlides(cachedMatch);
+          }
+        }
+      } catch(cErr) {}
 
       const allPages = await loadConfigData();
       const pageConfig = getPageMatch(allPages);

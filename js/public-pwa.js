@@ -8,7 +8,16 @@
 */
 
 let deferredPrompt = null;
-let isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+function checkIsStandalone() {
+  try {
+    return window.matchMedia('(display-mode: standalone)').matches || 
+           window.navigator.standalone === true ||
+           (document.referrer && document.referrer.startsWith('android-app://'));
+  } catch(e) {
+    return false;
+  }
+}
+let isStandalone = checkIsStandalone();
 
 // Initialize on DOM ready
 if (document.readyState === 'loading') {
@@ -270,6 +279,7 @@ function initInstallPromptCapture() {
   window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
     isStandalone = true;
+    try { localStorage.setItem('AI_PWA_INSTALLED', 'true'); } catch(e) {}
     console.log('🎉 [Public PWA] Aarogyam India App was successfully installed!');
     updateAllInstallButtons();
     syncAppInstallToSupabase();
@@ -375,34 +385,32 @@ export function bindInstallButtons() {
 }
 
 export function updateAllInstallButtons() {
+  isStandalone = checkIsStandalone();
   const desktopBtn = document.getElementById('desktop-pwa-install-btn');
   const mobileBtn = document.getElementById('mobile-pwa-install-btn');
   const libraryBtn = document.getElementById('library-pwa-install-btn');
   const libraryCard = document.getElementById('library-pwa-card');
-
-  if (desktopBtn) {
-    desktopBtn.style.display = ''; // Clear inline style so CSS controls desktop/mobile display
-  }
+  const stickyBtn = document.getElementById('universal-sticky-pwa-install-btn');
 
   if (isStandalone) {
-    // App is running in standalone mode
-    if (desktopBtn) {
-      desktopBtn.innerHTML = '<span>✓</span> App Installed';
-      desktopBtn.classList.add('pwa-installed-btn');
-    }
-    if (mobileBtn) {
-      mobileBtn.innerHTML = '<span>✓</span> App Installed';
-      mobileBtn.classList.add('pwa-installed-btn');
-      mobileBtn.style.display = 'flex';
-    }
-    if (libraryCard) {
-      libraryCard.style.display = 'none'; // Don't nag user inside installed app
-    }
+    // App is running in standalone mode / installed - HIDE all install buttons
+    if (desktopBtn) desktopBtn.style.setProperty('display', 'none', 'important');
+    if (mobileBtn) mobileBtn.style.setProperty('display', 'none', 'important');
+    if (libraryCard) libraryCard.style.setProperty('display', 'none', 'important');
+    if (libraryBtn) libraryBtn.style.setProperty('display', 'none', 'important');
+    if (stickyBtn) stickyBtn.style.setProperty('display', 'none', 'important');
+    const allPwaPills = document.querySelectorAll('.sticky-float-install-pill, .btn-pwa-install, #header-pwa-install-btn');
+    allPwaPills.forEach(el => el.style.setProperty('display', 'none', 'important'));
   } else {
-    // Browser mode
+    // Browser mode - Ensure Install App buttons are visible
+    if (stickyBtn) stickyBtn.style.removeProperty('display');
+    const allPwaPills = document.querySelectorAll('.sticky-float-install-pill, .btn-pwa-install, #header-pwa-install-btn');
+    allPwaPills.forEach(el => el.style.removeProperty('display'));
+
     if (desktopBtn) {
       desktopBtn.innerHTML = '<span>📱</span> Install App';
       desktopBtn.classList.remove('pwa-installed-btn');
+      desktopBtn.style.removeProperty('display');
     }
     if (mobileBtn) {
       mobileBtn.innerHTML = '<span>📱</span> Install App';
@@ -414,6 +422,7 @@ export function updateAllInstallButtons() {
     }
     if (libraryBtn) {
       libraryBtn.innerHTML = '<span>📱</span> Install App Now';
+      libraryBtn.style.removeProperty('display');
     }
   }
 }

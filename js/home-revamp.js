@@ -1206,53 +1206,94 @@
   }
 
   // -------------------------------------------------------------
-  // 8. USER REVIEWS SUBMISSION & LOCALSTORAGE SYNC
+  // 8. USER REVIEWS SUBMISSION & UNIVERSAL CLOUD SYNC
   // -------------------------------------------------------------
-  window.openSubmitReviewModal = function () {
-    let modal = document.getElementById('user-review-modal');
-    if (!modal) {
+  // Respect universal modal if provided by live-page-cms-bridge.js
+  if (typeof window.openSubmitReviewModal !== 'function') {
+    window.openSubmitReviewModal = function () {
+      let modal = document.getElementById('user-review-modal');
+      if (modal) modal.remove();
+
+      let authUser = null;
+      try {
+        if (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function') {
+          authUser = window.V1_SESSION.getCurrentUser();
+        }
+      } catch(e) {}
+      if (!authUser) {
+        try {
+          authUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || 'null');
+        } catch(e) {}
+      }
+      const authMobile = authUser?.mobile || authUser?.phone || localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_phone') || '';
+      const authName = (authUser?.full_name && authUser.full_name !== 'Valued Member') ? authUser.full_name : (authUser?.name || localStorage.getItem('aim_user_name') || localStorage.getItem('aarogyam_user_name') || '');
+      const authLoc = authUser?.district ? `${authUser.district}, ${authUser.State || authUser.state || ''}` : (authUser?.State || authUser?.state || authUser?.city || 'भारत');
+      const isRegistered = !!(authName && authMobile);
+
       modal = document.createElement('div');
       modal.id = 'user-review-modal';
-      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.75);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
+      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.78);backdrop-filter:blur(6px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
       modal.innerHTML = `
-        <div style="background:#ffffff;border-radius:22px;max-width:500px;width:100%;padding:26px;box-shadow:0 20px 50px rgba(0,0,0,0.3);position:relative;border:1.5px solid #cbd5e1;max-height:90vh;overflow-y:auto;box-sizing:border-box;">
+        <div style="background:#ffffff;border-radius:22px;max-width:480px;width:100%;padding:26px;box-shadow:0 20px 50px rgba(0,0,0,0.3);position:relative;border:1.5px solid #cbd5e1;max-height:90vh;overflow-y:auto;box-sizing:border-box;">
           <button type="button" onclick="document.getElementById('user-review-modal').remove()" style="position:absolute;top:16px;right:16px;background:#f1f5f9;border:none;width:34px;height:34px;border-radius:50%;font-size:1.1rem;font-weight:900;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
           
           <div style="text-align:center;margin-bottom:18px;">
-            <div style="width:50px;height:50px;border-radius:50%;background:#dcfce7;color:#16a34a;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:8px;">✍️</div>
+            <div style="width:50px;height:50px;border-radius:50%;background:#dcfce7;color:#16a34a;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:8px;">⭐</div>
             <h3 style="margin:0;font-size:1.3rem;font-weight:900;color:#0f172a;">अपना रिव्यू / अनुभव साझा करें</h3>
             <p style="margin:4px 0 0 0;font-size:0.84rem;color:#64748b;">Aarogyam India परिवार के साथ अपना बहुमूल्य फीडबैक शेयर करें</p>
           </div>
 
           <form id="aarogyam-review-form" onsubmit="window.handleReviewFormSubmit(event)">
-            <div style="margin-bottom:14px;">
-              <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">आपका पूरा नाम *</label>
-              <input type="text" id="review-user-name" required placeholder="उदा. रमेश पटेल" style="width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.9rem;box-sizing:border-box;" />
-            </div>
+            ${isRegistered ? `
+              <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:14px; padding:12px 14px; margin-bottom:16px; display:flex; align-items:center; gap:12px;">
+                <div style="width:40px; height:40px; border-radius:50%; background:#22c55e; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:900; flex-shrink:0;">✓</div>
+                <div style="flex:1;">
+                  <div style="font-size:0.95rem; font-weight:800; color:#14532d;">${escapeHtml(authName)}</div>
+                  <div style="font-size:0.78rem; color:#16a34a; font-weight:700;">📱 ${escapeHtml(authMobile)} ${authLoc ? `• 📍 ${escapeHtml(authLoc)}` : ''}</div>
+                </div>
+                <span style="background:#22c55e; color:#fff; font-size:0.7rem; font-weight:900; padding:3px 10px; border-radius:12px; white-space:nowrap;">लॉगिन सदस्य</span>
+              </div>
+              <input type="hidden" id="review-user-name" value="${escapeHtml(authName)}" />
+              <input type="hidden" id="review-user-location" value="${escapeHtml(authLoc || 'भारत')}" />
+              <input type="hidden" id="review-user-mobile" value="${escapeHtml(authMobile)}" />
+              <input type="hidden" id="review-user-profile-id" value="${escapeHtml(authUser?.id || '')}" />
+            ` : `
+              <div style="margin-bottom:14px;">
+                <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">आपका पूरा नाम *</label>
+                <input type="text" id="review-user-name" required placeholder="उदा. रमेश पटेल" style="width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.9rem;box-sizing:border-box;" />
+              </div>
+
+              <div style="margin-bottom:14px;display:flex;gap:12px;">
+                <div style="flex:1;">
+                  <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">स्थान / ज़िला *</label>
+                  <input type="text" id="review-user-location" required placeholder="उदा. रीवा, मध्य प्रदेश" style="width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.9rem;box-sizing:border-box;" />
+                </div>
+                <div style="flex:1;">
+                  <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">मोबाइल नंबर</label>
+                  <input type="tel" id="review-user-mobile" placeholder="10 अंकों का मोबाइल" style="width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.9rem;box-sizing:border-box;" />
+                </div>
+              </div>
+              <input type="hidden" id="review-user-profile-id" value="" />
+            `}
 
             <div style="margin-bottom:14px;display:flex;gap:12px;">
               <div style="flex:1;">
-                <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">स्थान / ज़िला *</label>
-                <input type="text" id="review-user-location" required placeholder="उदा. रीवा, मध्य प्रदेश" style="width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.9rem;box-sizing:border-box;" />
-              </div>
-              <div style="width:120px;">
                 <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">रेटिंग *</label>
                 <select id="review-user-rating" style="width:100%;padding:10px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.9rem;background:#fff;box-sizing:border-box;">
-                  <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
-                  <option value="4">⭐⭐⭐⭐ (4/5)</option>
-                  <option value="3">⭐⭐⭐ (3/5)</option>
+                  <option value="5" selected>⭐⭐⭐⭐⭐ (5/5 बहुत शानदार)</option>
+                  <option value="4">⭐⭐⭐⭐ (4/5 अच्छा)</option>
+                  <option value="3">⭐⭐⭐ (3/5 ठीक-ठाक)</option>
                 </select>
               </div>
-            </div>
-
-            <div style="margin-bottom:14px;">
-              <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">संबंधित विषय *</label>
-              <select id="review-user-topic" style="width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.9rem;background:#fff;box-sizing:border-box;">
-                <option value="कृषि ई-बुक्स">🌱 कृषि ई-बुक्स व फसल डॉक्टर</option>
-                <option value="पशु पालन व दुग्ध">🐄 पशु पालन व दुग्ध वृद्धि</option>
-                <option value="स्वास्थ्य व वेलनेस">❤️ स्वास्थ्य परामर्श व हर्बल सप्लीमेंट्स</option>
-                <option value="डिजिटल बिज़नेस">💼 डिजिटल करियर व Netsurf ग्रोथ</option>
-              </select>
+              <div style="flex:1;">
+                <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">संबंधित श्रेणी *</label>
+                <select id="review-user-topic" style="width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.9rem;background:#fff;box-sizing:border-box;">
+                  <option value="कृषि ई-बुक्स">🌱 कृषि ई-बुक्स</option>
+                  <option value="पशु पालन व दुग्ध">🐄 पशु पालन व दुग्ध</option>
+                  <option value="स्वास्थ्य व वेलनेस">❤️ स्वास्थ्य परामर्श</option>
+                  <option value="डिजिटल बिज़नेस">💼 डिजिटल करियर</option>
+                </select>
+              </div>
             </div>
 
             <div style="margin-bottom:18px;">
@@ -1267,74 +1308,179 @@
         </div>
       `;
       document.body.appendChild(modal);
-    }
-  };
-
-  window.handleReviewFormSubmit = function (e) {
-    e.preventDefault();
-    const name = document.getElementById('review-user-name')?.value?.trim();
-    const loc = document.getElementById('review-user-location')?.value?.trim();
-    const rating = parseInt(document.getElementById('review-user-rating')?.value || '5', 10);
-    const topic = document.getElementById('review-user-topic')?.value || 'सामान्य';
-    const text = document.getElementById('review-user-text')?.value?.trim();
-
-    if (!name || !text) return;
-
-    const newRev = {
-      id: 'REV_' + Date.now(),
-      name,
-      location: loc,
-      rating,
-      topic,
-      text,
-      date: new Date().toLocaleDateString('hi-IN')
     };
+  }
 
-    try {
-      const existing = JSON.parse(localStorage.getItem('aarogyam_user_reviews') || '[]');
-      existing.unshift(newRev);
-      localStorage.setItem('aarogyam_user_reviews', JSON.stringify(existing));
-    } catch (err) { }
+  if (typeof window.handleReviewFormSubmit !== 'function') {
+    window.handleReviewFormSubmit = function (e) {
+      if (e && typeof e.preventDefault === 'function') e.preventDefault();
+      const name = document.getElementById('review-user-name')?.value?.trim();
+      const loc = document.getElementById('review-user-location')?.value?.trim();
+      const mobile = document.getElementById('review-user-mobile')?.value?.trim() || '';
+      const profileId = document.getElementById('review-user-profile-id')?.value?.trim() || null;
+      const rating = parseInt(document.getElementById('review-user-rating')?.value || '5', 10);
+      const topic = document.getElementById('review-user-topic')?.value || 'सामान्य';
+      const text = document.getElementById('review-user-text')?.value?.trim();
 
-    // Close modal
-    const modal = document.getElementById('user-review-modal');
-    if (modal) modal.remove();
+      if (!name || !text) return;
 
-    // Render immediately into review grid
-    renderSavedReviews();
+      const revId = 'REV_' + Date.now();
+      const newRev = {
+        id: revId,
+        name,
+        mobile,
+        location: loc,
+        rating,
+        topic,
+        text,
+        comment: text,
+        date: new Date().toLocaleDateString('hi-IN'),
+        created_at: new Date().toISOString(),
+        status: 'approved'
+      };
 
-    alert('धन्यवाद ' + name + '! आपका रिव्यू सफलतापूर्वक दर्ज कर लिया गया है।');
-  };
+      try {
+        const existing = JSON.parse(localStorage.getItem('aarogyam_user_reviews') || '[]');
+        existing.unshift(newRev);
+        localStorage.setItem('aarogyam_user_reviews', JSON.stringify(existing));
+      } catch (err) { }
+
+      try {
+        const approved = JSON.parse(localStorage.getItem('AOI_APPROVED_REVIEWS') || '[]');
+        approved.unshift({
+          id: revId,
+          book_id: 'index',
+          book_title: 'मुख्य पृष्ठ',
+          user_name: name,
+          mobile,
+          location: loc,
+          rating,
+          review_text: text,
+          created_at: new Date().toISOString(),
+          status: 'approved'
+        });
+        localStorage.setItem('AOI_APPROVED_REVIEWS', JSON.stringify(approved));
+      } catch(err) {}
+
+      // Supabase cloud sync
+      try {
+        const SUPABASE_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
+        const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+        const targetProfId = profileId || '9e58ecb9-c8f1-4fc7-a845-07ecedb159a0';
+        fetch(`${SUPABASE_REST_URL}/surveys`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            profile_id: targetProfId,
+            name: name,
+            mobile: mobile || '9999999999',
+            state: loc || 'भारत',
+            selected_categories: ['customer_review', 'index'],
+            category_answers: {
+              type: 'review',
+              rating,
+              comment: text,
+              text,
+              page_url: '/',
+              page_id: 'index',
+              topic,
+              status: 'approved',
+              created_at: new Date().toISOString()
+            }
+          })
+        }).catch(() => {});
+      } catch(e) {}
+
+      // Close modal
+      const modal = document.getElementById('user-review-modal');
+      if (modal) modal.remove();
+
+      // Render immediately into review grid
+      renderSavedReviews();
+
+      alert('धन्यवाद ' + name + '! आपका रिव्यू सफलतापूर्वक सबमिट हो गया है और लाइव प्रदर्शित है।');
+    };
+  }
 
   function renderSavedReviews() {
     try {
-      const saved = JSON.parse(localStorage.getItem('aarogyam_user_reviews') || '[]');
       const grid = document.getElementById('home-reviews-grid');
-      if (!grid || !saved.length) return;
+      if (!grid) return;
 
       const stars = (count) => '★'.repeat(count) + '☆'.repeat(5 - count);
 
-      saved.forEach(r => {
-        if (document.getElementById(r.id)) return;
-        const card = document.createElement('div');
-        card.id = r.id;
-        card.style.cssText = 'background:#ffffff;border:2px solid #86efac;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(22,163,74,0.1);position:relative;';
-        card.innerHTML = `
-          <span style="position:absolute;top:12px;right:14px;background:#dcfce7;color:#15803d;font-size:0.7rem;font-weight:900;padding:2px 8px;border-radius:12px;">नया रिव्यू</span>
-          <div style="color:#facc15;font-size:1rem;margin-bottom:8px;">${stars(r.rating)}</div>
-          <p style="font-size:0.88rem;color:#334155;line-height:1.5;margin-bottom:14px;">
-            "${r.text}"
-          </p>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:42px;height:42px;border-radius:50%;background:#dcfce7;border:1.5px solid #16a34a;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">👤</div>
-            <div>
-              <h4 style="font-size:0.95rem;font-weight:800;margin:0;color:#0f172a;">${r.name}</h4>
-              <div style="font-size:0.75rem;color:#64748b;">📍 ${r.location || 'भारत'} • <span style="color:#16a34a;font-weight:700;">${r.topic}</span></div>
+      // 1. Local reviews
+      const saved = JSON.parse(localStorage.getItem('aarogyam_user_reviews') || '[]');
+      if (Array.isArray(saved)) {
+        saved.forEach(r => {
+          if (!r || (!r.text && !r.comment)) return;
+          if (document.getElementById(r.id)) return;
+          const card = document.createElement('div');
+          card.id = r.id;
+          card.style.cssText = 'background:#ffffff;border:2px solid #86efac;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(22,163,74,0.1);position:relative;animation:fadeIn 0.3s ease;';
+          card.innerHTML = `
+            <span style="position:absolute;top:12px;right:14px;background:#dcfce7;color:#15803d;font-size:0.7rem;font-weight:900;padding:2px 8px;border-radius:12px;">नया रिव्यू</span>
+            <div style="color:#facc15;font-size:1rem;margin-bottom:8px;">${stars(r.rating || 5)}</div>
+            <p style="font-size:0.88rem;color:#334155;line-height:1.5;margin-bottom:14px;">
+              "${r.text || r.comment}"
+            </p>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:42px;height:42px;border-radius:50%;background:#dcfce7;border:1.5px solid #16a34a;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">👤</div>
+              <div>
+                <h4 style="font-size:0.95rem;font-weight:800;margin:0;color:#0f172a;">${r.name}</h4>
+                <div style="font-size:0.75rem;color:#64748b;">📍 ${r.location || 'भारत'} • <span style="color:#16a34a;font-weight:700;">${r.topic || 'सामान्य'}</span></div>
+              </div>
             </div>
-          </div>
-        `;
-        grid.prepend(card);
-      });
+          `;
+          grid.prepend(card);
+        });
+      }
+
+      // 2. Online cloud reviews from Supabase
+      const SUPABASE_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
+      const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      fetch(`${SUPABASE_REST_URL}/surveys?select=id,name,mobile,state,district,selected_categories,category_answers,created_at&selected_categories=cs.{"customer_review"}&order=created_at.desc&limit=30`, {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      })
+      .then(res => res.ok ? res.json() : [])
+      .then(surveys => {
+        if (!Array.isArray(surveys) || surveys.length === 0) return;
+        surveys.forEach(s => {
+          if (document.getElementById(s.id)) return;
+          const ans = s.category_answers || {};
+          if (ans.status === 'rejected') return;
+          const comment = ans.comment || ans.text;
+          if (!comment) return;
+
+          const card = document.createElement('div');
+          card.id = s.id;
+          card.style.cssText = 'background:#ffffff;border:2px solid #86efac;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(22,163,74,0.1);position:relative;animation:fadeIn 0.3s ease;';
+          card.innerHTML = `
+            <span style="position:absolute;top:12px;right:14px;background:#dcfce7;color:#15803d;font-size:0.7rem;font-weight:900;padding:2px 8px;border-radius:12px;">✓ प्रमाणित ग्राहक</span>
+            <div style="color:#facc15;font-size:1rem;margin-bottom:8px;">${stars(ans.rating || 5)}</div>
+            <p style="font-size:0.88rem;color:#334155;line-height:1.5;margin-bottom:14px;">
+              "${comment}"
+            </p>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:42px;height:42px;border-radius:50%;background:#dcfce7;border:1.5px solid #16a34a;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">👤</div>
+              <div>
+                <h4 style="font-size:0.95rem;font-weight:800;margin:0;color:#0f172a;">${s.name}</h4>
+                <div style="font-size:0.75rem;color:#64748b;">📍 ${s.state || s.district || 'भारत'} • <span style="color:#16a34a;font-weight:700;">${ans.topic || 'रिव्यू'}</span></div>
+              </div>
+            </div>
+          `;
+          grid.prepend(card);
+        });
+      })
+      .catch(() => {});
     } catch (e) { }
   }
 

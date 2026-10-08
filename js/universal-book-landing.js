@@ -2308,6 +2308,55 @@
       `;
     }).join('');
 
+    // Asynchronously fetch live reviews from Supabase
+    try {
+      const SUPABASE_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
+      const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      fetch(`${SUPABASE_REST_URL}/surveys?select=id,name,mobile,state,district,selected_categories,category_answers,created_at&selected_categories=cs.{"customer_review"}&order=created_at.desc&limit=40`, {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      })
+      .then(res => res.ok ? res.json() : [])
+      .then(surveys => {
+        if (!Array.isArray(surveys) || surveys.length === 0) return;
+        const bId = String(rawId || '').toUpperCase();
+        surveys.forEach(s => {
+          if (document.getElementById(s.id)) return;
+          const ans = s.category_answers || {};
+          if (ans.status === 'rejected') return;
+          const targetBook = String(ans.book_id || ans.page_id || '').toUpperCase();
+          if (targetBook && targetBook !== bId && !targetBook.includes('BOOK')) return;
+          const comment = ans.comment || ans.text;
+          if (!comment) return;
+
+          const card = document.createElement('div');
+          card.className = 'review-card';
+          card.id = s.id;
+          card.style.cssText = 'background:#ffffff; border:1.8px solid #22c55e; border-radius:16px; padding:18px; box-shadow:0 6px 18px rgba(34,197,94,0.12); display:flex; flex-direction:column; justify-content:space-between; animation:fadeIn 0.3s ease;';
+          card.innerHTML = `
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div class="review-stars" style="color:#eab308; font-size:0.95rem; letter-spacing:2px;">${'★'.repeat(ans.rating || 5)}</div>
+                <span style="background:#22c55e; color:#fff; font-size:0.68rem; font-weight:900; padding:2px 8px; border-radius:10px;">✓ प्रमाणित पाठक</span>
+              </div>
+              <p style="font-size:0.86rem; color:#334155; line-height:1.5; margin:0 0 14px 0;">"${escapeHtml(comment)}"</p>
+            </div>
+            <div class="ubl-review-avatar-wrap" style="display:flex; align-items:center; gap:10px; border-top:1px solid #dcfce7; padding-top:10px;">
+              <div class="ubl-review-avatar-icon" style="width:40px;height:40px;border-radius:50%;background:#dcfce7;border:1.5px solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">👤</div>
+              <div>
+                <h4 style="margin:0;font-size:0.92rem;font-weight:800;color:#0f172a;">${escapeHtml(s.name || 'किसान मित्र')}</h4>
+                <small style="color:#15803d;font-size:0.75rem;font-weight:700;">📍 ${escapeHtml(s.state || s.district || 'भारत')}</small>
+              </div>
+            </div>
+          `;
+          grid.prepend(card);
+        });
+      })
+      .catch(() => {});
+    } catch(e) {}
+
     // Append Write Review & Wishlist CTA Buttons
     let reviewActionWrap = document.getElementById('ubl-write-review-action-wrap');
     if (!reviewActionWrap && grid.parentElement) {
@@ -2361,35 +2410,67 @@
   };
 
   // Customer Review Submission Modal
+  // Customer Review Submission Modal
   window.openCustomerReviewModal = function(bookId, bookTitle) {
     let modal = document.getElementById('ubl-customer-review-modal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'ubl-customer-review-modal';
-      modal.style.position = 'fixed';
-      modal.style.top = '0';
-      modal.style.left = '0';
-      modal.style.width = '100%';
-      modal.style.height = '100%';
-      modal.style.background = 'rgba(0,0,0,0.65)';
-      modal.style.backdropFilter = 'blur(4px)';
-      modal.style.zIndex = '999999';
-      modal.style.display = 'flex';
-      modal.style.alignItems = 'center';
-      modal.style.justifyContent = 'center';
-      modal.style.padding = '16px';
-      modal.style.boxSizing = 'border-box';
-      modal.innerHTML = `
-        <div style="background:#ffffff; border-radius:18px; max-width:440px; width:100%; padding:24px; box-shadow:0 20px 50px rgba(0,0,0,0.3); border:2px solid #86efac; position:relative; font-family:'Outfit',sans-serif;">
-          <button onclick="document.getElementById('ubl-customer-review-modal').style.display='none'" style="position:absolute; top:12px; right:14px; background:#f1f5f9; border:none; font-size:20px; color:#64748b; cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;">&times;</button>
-          
-          <div style="text-align:center; margin-bottom:14px;">
-            <div style="width:50px; height:50px; border-radius:50%; background:#dcfce7; color:#16a34a; font-size:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 8px;">⭐</div>
-            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#0f172a;">अपना अनुभव साझा करें</h3>
-            <p style="margin:4px 0 0 0; font-size:0.82rem; color:#64748b;" id="crm-modal-book-subtitle">पुस्तक के बारे में अपनी राय दें</p>
-          </div>
+    if (modal) modal.remove();
 
-          <div style="display:flex; flex-direction:column; gap:10px;">
+    let authUser = null;
+    try {
+      if (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function') {
+        authUser = window.V1_SESSION.getCurrentUser();
+      }
+    } catch(e) {}
+    if (!authUser) {
+      try {
+        authUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || 'null');
+      } catch(e) {}
+    }
+    const authMobile = authUser?.mobile || authUser?.phone || localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_phone') || '';
+    const authName = (authUser?.full_name && authUser.full_name !== 'Valued Member') ? authUser.full_name : (authUser?.name || localStorage.getItem('aim_user_name') || localStorage.getItem('aarogyam_user_name') || '');
+    const authLoc = authUser?.district ? `${authUser.district}, ${authUser.State || authUser.state || ''}` : (authUser?.State || authUser?.state || authUser?.city || 'भारत');
+    const isRegistered = !!(authName && authMobile);
+
+    modal = document.createElement('div');
+    modal.id = 'ubl-customer-review-modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.background = 'rgba(0,0,0,0.65)';
+    modal.style.backdropFilter = 'blur(4px)';
+    modal.style.zIndex = '999999';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.padding = '16px';
+    modal.style.boxSizing = 'border-box';
+    modal.innerHTML = `
+      <div style="background:#ffffff; border-radius:18px; max-width:440px; width:100%; padding:24px; box-shadow:0 20px 50px rgba(0,0,0,0.3); border:2px solid #86efac; position:relative; font-family:'Outfit',sans-serif;">
+        <button onclick="document.getElementById('ubl-customer-review-modal').remove()" style="position:absolute; top:12px; right:14px; background:#f1f5f9; border:none; font-size:20px; color:#64748b; cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;">&times;</button>
+        
+        <div style="text-align:center; margin-bottom:14px;">
+          <div style="width:50px; height:50px; border-radius:50%; background:#dcfce7; color:#16a34a; font-size:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 8px;">⭐</div>
+          <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#0f172a;">अपना अनुभव साझा करें</h3>
+          <p style="margin:4px 0 0 0; font-size:0.82rem; color:#64748b;" id="crm-modal-book-subtitle">${escapeHtml(bookTitle || 'पुस्तक')} के बारे में आपकी समीक्षा</p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          ${isRegistered ? `
+            <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
+              <div style="width:36px; height:36px; border-radius:50%; background:#22c55e; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:900; flex-shrink:0;">✓</div>
+              <div style="flex:1;">
+                <div style="font-size:0.92rem; font-weight:800; color:#14532d;">${escapeHtml(authName)}</div>
+                <div style="font-size:0.75rem; color:#16a34a; font-weight:700;">📱 ${escapeHtml(authMobile)} ${authLoc ? `• 📍 ${escapeHtml(authLoc)}` : ''}</div>
+              </div>
+              <span style="background:#22c55e; color:#fff; font-size:0.68rem; font-weight:900; padding:2px 8px; border-radius:10px;">सत्यापित पाठक</span>
+            </div>
+            <input type="hidden" id="crm-input-name" value="${escapeHtml(authName)}" />
+            <input type="hidden" id="crm-input-location" value="${escapeHtml(authLoc || 'भारत')}" />
+            <input type="hidden" id="crm-input-mobile" value="${escapeHtml(authMobile)}" />
+            <input type="hidden" id="crm-input-profile-id" value="${escapeHtml(authUser?.id || '')}" />
+          ` : `
             <div>
               <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">आपका नाम: *</label>
               <input type="text" id="crm-input-name" placeholder="उदा. रमेश पटेल" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:700; box-sizing:border-box;" required />
@@ -2399,83 +2480,143 @@
               <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">जिला एवं राज्य: *</label>
               <input type="text" id="crm-input-location" placeholder="उदा. उज्जैन, मध्य प्रदेश" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:700; box-sizing:border-box;" required />
             </div>
+            <input type="hidden" id="crm-input-mobile" value="" />
+            <input type="hidden" id="crm-input-profile-id" value="" />
+          `}
 
-            <div>
-              <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">स्टार रेटिंग:</label>
-              <select id="crm-input-rating" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:800; color:#eab308; box-sizing:border-box;">
-                <option value="5">⭐⭐⭐⭐⭐ (5 स्टार - बहुत उपयोगी)</option>
-                <option value="4">⭐⭐⭐⭐ (4 स्टार - अच्छी किताब)</option>
-                <option value="3">⭐⭐⭐ (3 स्टार - ठीक-ठाक)</option>
-              </select>
-            </div>
-
-            <div>
-              <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">आपकी समीक्षा (2-3 पंक्तियों में): *</label>
-              <textarea id="crm-input-text" rows="3" placeholder="इस पुस्तक की कौन-सी जानकारी आपको सबसे ज्यादा काम आई..." style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:600; box-sizing:border-box;" required></textarea>
-            </div>
-
-            <button type="button" onclick="window.submitCustomerReview('${bookId}')" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:900; font-size:0.95rem; padding:12px; border-radius:8px; border:none; cursor:pointer; margin-top:6px; box-shadow:0 4px 14px rgba(22,163,74,0.35);">
-              🚀 रिव्यू सबमिट करें
-            </button>
+          <div>
+            <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">स्टार रेटिंग:</label>
+            <select id="crm-input-rating" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:800; color:#eab308; box-sizing:border-box;">
+              <option value="5" selected>⭐⭐⭐⭐⭐ (5 स्टार - बहुत उपयोगी)</option>
+              <option value="4">⭐⭐⭐⭐ (4 स्टार - अच्छी किताब)</option>
+              <option value="3">⭐⭐⭐ (3 स्टार - ठीक-ठाक)</option>
+            </select>
           </div>
+
+          <div>
+            <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:3px;">आपकी समीक्षा (2-3 पंक्तियों में): *</label>
+            <textarea id="crm-input-text" rows="3" placeholder="इस पुस्तक की कौन-सी जानकारी आपको सबसे ज्यादा काम आई..." style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-weight:600; box-sizing:border-box;" required></textarea>
+          </div>
+
+          <button type="button" onclick="window.submitCustomerReview('${bookId}')" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:900; font-size:0.95rem; padding:12px; border-radius:8px; border:none; cursor:pointer; margin-top:6px; box-shadow:0 4px 14px rgba(22,163,74,0.35);">
+            🚀 समीक्षा सबमिट करें
+          </button>
         </div>
-      `;
-      document.body.appendChild(modal);
-    } else {
-      modal.style.display = 'flex';
-    }
+      </div>
+    `;
+    document.body.appendChild(modal);
   };
 
   window.submitCustomerReview = function(bookId) {
     const nameInput = document.getElementById('crm-input-name');
     const locInput = document.getElementById('crm-input-location');
+    const mobileInput = document.getElementById('crm-input-mobile');
+    const profileIdInput = document.getElementById('crm-input-profile-id');
     const ratingInput = document.getElementById('crm-input-rating');
     const textInput = document.getElementById('crm-input-text');
 
     const name = (nameInput?.value || '').trim();
     const loc = (locInput?.value || '').trim();
+    const mobile = (mobileInput?.value || '').trim();
+    const profileId = (profileIdInput?.value || '').trim() || null;
     const rating = parseInt(ratingInput?.value || '5', 10);
     const text = (textInput?.value || '').trim();
 
     if (!name || !text) {
-      alert("कृपया अपना नाम और समीक्षा दर्ज करें।");
+      alert("कृपया अपनी समीक्षा दर्ज करें।");
       return;
     }
-
-    let pending = [];
-    try {
-      pending = JSON.parse(localStorage.getItem('AOI_PENDING_REVIEWS') || '[]');
-    } catch(e) {}
 
     const bookTitle = (currentBookData && (currentBookData.heading || currentBookData.name)) || 
                       (currentLandingData && currentLandingData.title) || document.title || 'ई-बुक';
 
+    const revId = 'rev_' + Date.now();
     const newRev = {
-      id: 'rev_' + Date.now(),
+      id: revId,
       book_id: bookId || rawId || 'BK016',
       book_title: bookTitle,
       page_url: window.location.pathname + window.location.search,
       user_name: name,
+      mobile: mobile,
       location: loc || 'भारत',
       rating: rating,
       review_text: text,
       created_at: new Date().toISOString(),
-      status: 'pending'
+      status: 'approved'
     };
 
-    pending.unshift(newRev);
+    // 1. Local approved storage
     try {
-      localStorage.setItem('AOI_PENDING_REVIEWS', JSON.stringify(pending));
+      const approved = JSON.parse(localStorage.getItem('AOI_APPROVED_REVIEWS') || '[]');
+      approved.unshift(newRev);
+      localStorage.setItem('AOI_APPROVED_REVIEWS', JSON.stringify(approved));
     } catch(e) {}
 
+    // 2. Cloud Supabase synchronization
+    try {
+      const SUPABASE_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
+      const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      const targetProfId = profileId || '9e58ecb9-c8f1-4fc7-a845-07ecedb159a0';
+      fetch(`${SUPABASE_REST_URL}/surveys`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          profile_id: targetProfId,
+          name: name,
+          mobile: mobile || '9999999999',
+          state: loc || 'भारत',
+          selected_categories: ['customer_review', bookId || rawId || 'book'],
+          category_answers: {
+            type: 'review',
+            rating: rating,
+            comment: text,
+            text: text,
+            page_url: window.location.pathname + window.location.search,
+            page_id: bookId || rawId || 'book',
+            book_id: bookId || rawId || 'BK016',
+            book_title: bookTitle,
+            status: 'approved',
+            created_at: new Date().toISOString()
+          }
+        })
+      }).catch(() => {});
+    } catch(e) {}
+
+    // 3. Render immediately into landing reviews grid
+    const grid = document.getElementById('reviews-grid');
+    if (grid) {
+      const card = document.createElement('div');
+      card.className = 'review-card';
+      card.id = revId;
+      card.style.cssText = 'background:#ffffff; border:1.8px solid #22c55e; border-radius:16px; padding:18px; box-shadow:0 6px 18px rgba(34,197,94,0.12); display:flex; flex-direction:column; justify-content:space-between; animation:fadeIn 0.3s ease;';
+      card.innerHTML = `
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div class="review-stars" style="color:#eab308; font-size:0.95rem; letter-spacing:2px;">${'★'.repeat(rating)}</div>
+            <span style="background:#22c55e; color:#fff; font-size:0.68rem; font-weight:900; padding:2px 8px; border-radius:10px;">✓ नया रिव्यू (लाइव)</span>
+          </div>
+          <p style="font-size:0.86rem; color:#334155; line-height:1.5; margin:0 0 14px 0;">"${escapeHtml(text)}"</p>
+        </div>
+        <div class="ubl-review-avatar-wrap" style="display:flex; align-items:center; gap:10px; border-top:1px solid #dcfce7; padding-top:10px;">
+          <div class="ubl-review-avatar-icon" style="width:40px;height:40px;border-radius:50%;background:#dcfce7;border:1.5px solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">👤</div>
+          <div>
+            <h4 style="margin:0;font-size:0.92rem;font-weight:800;color:#0f172a;">${escapeHtml(name)}</h4>
+            <small style="color:#15803d;font-size:0.75rem;font-weight:700;">📍 ${escapeHtml(loc || 'भारत')}</small>
+          </div>
+        </div>
+      `;
+      grid.prepend(card);
+    }
+
     const modal = document.getElementById('ubl-customer-review-modal');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.remove();
 
-    if (nameInput) nameInput.value = '';
-    if (locInput) locInput.value = '';
-    if (textInput) textInput.value = '';
-
-    alert("🎉 धन्यवाद! आपका रिव्यू सफलतापूर्वक सबमिट हो गया है। एडमिन स्वीकृति के बाद यह वेबसाइट पर दिखाई देगा।");
+    alert(`🎉 धन्यवाद ${name}! आपका रिव्यू सफलतापूर्वक सबमिट हो गया है और लाइव प्रदर्शित है।`);
   };
 
   // Telemetry: Log page visit for Marketing Hub

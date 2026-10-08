@@ -293,98 +293,163 @@
 
 /* -------------------------------------------------------------
    STICKY FLOATING ACTIONS CONTAINER (FIXED RIGHT CORNER)
+   SMART COMPACT CIRCULAR FAB DESIGN (STRICTLY ICONS ONLY)
    ------------------------------------------------------------- */
+@media all and (display-mode: standalone) {
+  #universal-sticky-pwa-install-btn,
+  .sticky-float-install-pill {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
 .sticky-float-widget-container {
   position: fixed;
-  right: 18px;
+  right: 14px;
   bottom: 28px;
   display: flex !important;
   flex-direction: column;
   align-items: flex-end;
-  gap: 10px;
+  gap: 8px;
   z-index: 999990 !important;
+  pointer-events: auto;
 }
 
+/* Strict Circular Icon-Only Floating Action Button (FAB) */
 .sticky-float-pill {
-  display: flex !important;
-  align-items: center;
-  gap: 8px;
-  background: #25D366;
-  color: #ffffff !important;
-  padding: 10px 16px;
-  border-radius: 30px;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   text-decoration: none !important;
-  font-weight: 900;
-  font-size: 0.85rem;
-  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
   user-select: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  border: 2px solid rgba(255, 255, 255, 0.9) !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  color: #ffffff !important;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sticky-float-pill i {
+  font-size: 1.15rem !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .sticky-float-pill:hover {
-  transform: translate3d(0, -3px, 0) scale(1.04);
-  box-shadow: 0 12px 28px rgba(37, 211, 102, 0.6);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
   color: #ffffff !important;
 }
 
-/* Red Sticky Install App Button */
+.sticky-float-pill:active {
+  transform: scale(0.92);
+}
+
+/* Ensure no text can ever appear inside pill */
+.sticky-float-pill .pill-label,
+.sticky-float-pill span {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+}
+
+/* 1. Red Sticky Install App Button */
 .sticky-float-install-pill {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
-  color: #ffffff !important;
-  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.5) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45) !important;
 }
 
 .sticky-float-install-pill:hover {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-  box-shadow: 0 12px 28px rgba(220, 38, 38, 0.7) !important;
+  box-shadow: 0 8px 22px rgba(220, 38, 38, 0.65) !important;
 }
 
-/* Blue Share Referral Button */
-.sticky-float-share-pill {
-  background: #1d4ed8 !important;
-  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.45) !important;
-}
-
-.sticky-float-share-pill:hover {
-  box-shadow: 0 12px 28px rgba(29, 78, 216, 0.6) !important;
-}
-
-/* Purple Audio Greeting Button */
+/* 2. Purple Audio Greeting Button */
 .sticky-float-audio-pill {
-  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%) !important;
-  color: #ffffff !important;
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.45) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%) !important;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.45) !important;
 }
 
 .sticky-float-audio-pill:hover {
-  transform: translate3d(0, -3px, 0) scale(1.04);
-  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.6) !important;
+  box-shadow: 0 8px 22px rgba(139, 92, 246, 0.65) !important;
 }
 
 .sticky-float-audio-pill.playing {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-  animation: pulse-audio 1.5s infinite !important;
+  animation: pulse-audio-fab 1.3s infinite ease-in-out !important;
 }
 
-/* Mobile Screen Floating Stack */
+@keyframes pulse-audio-fab {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* 3. Blue Share Referral Button */
+.sticky-float-share-pill {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45) !important;
+}
+
+.sticky-float-share-pill:hover {
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.65) !important;
+}
+
+/* 4. Green AI Expert WhatsApp Button */
+.sticky-float-ai-pill {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45) !important;
+}
+
+.sticky-float-ai-pill i {
+  font-size: 1.25rem !important;
+}
+
+.sticky-float-ai-pill:hover {
+  box-shadow: 0 8px 22px rgba(16, 185, 129, 0.65) !important;
+}
+
+/* Mobile Screen Floating Stack (< 768px) */
 @media (max-width: 768px) {
   .sticky-float-widget-container {
-    right: 10px;
+    right: 10px !important;
     bottom: 74px !important;
-    gap: 7px;
+    gap: 7px !important;
     pointer-events: auto;
     z-index: 9985 !important;
   }
 
+  /* Strict 40px Icon-Only Circular Buttons on Mobile */
   .sticky-float-pill {
-    padding: 6px 11px;
-    font-size: 0.72rem;
-    border-radius: 20px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    border-width: 1.8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  .sticky-float-pill i {
+    font-size: 1.05rem !important;
+  }
+
+  .sticky-float-ai-pill i {
+    font-size: 1.18rem !important;
   }
 }
 

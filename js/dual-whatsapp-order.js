@@ -10,16 +10,123 @@
 (function () {
   'use strict';
 
-  const AAROGYAM_CENTRAL_PHONE = '917974422572';
   const CART_STORAGE_KEY = 'aarogyam_whatsapp_cart';
 
-  // Read referrer from URL if provided (e.g., ?ref=9876543210)
+  // Read referrer from URL if provided (e.g., ?ref=9876543210 or ?ref=AI000004)
   const urlParams = new URLSearchParams(window.location.search);
-  const refFromUrl = urlParams.get('ref') || urlParams.get('sponsor') || urlParams.get('upline');
+  const refFromUrl = urlParams.get('ref') || urlParams.get('sponsor') || urlParams.get('upline') || urlParams.get('share_id');
   if (refFromUrl) {
     const cleanRef = refFromUrl.replace(/\D/g, '');
     if (cleanRef.length >= 10) {
       localStorage.setItem('aarogyam_upline_phone', cleanRef);
+    } else if (/^AI\d{4,8}$/i.test(refFromUrl)) {
+      localStorage.setItem('aim_last_sponsor_id', refFromUrl.toUpperCase());
+    }
+  }
+
+  let currentAdvisorData = {
+    name: 'आरोग्यम सलाहकार',
+    phone: '917974422572',
+    display: '7974422572'
+  };
+
+  async function resolveCurrentAdvisor() {
+    try {
+      let uplineId = '';
+      let uplineMobile = '';
+
+      if (refFromUrl) {
+        const cleanRef = refFromUrl.replace(/\D/g, '');
+        if (cleanRef.length >= 10) uplineMobile = cleanRef;
+        else if (/^AI\d{4,8}$/i.test(refFromUrl)) uplineId = refFromUrl.toUpperCase();
+      }
+
+      if (!uplineId && !uplineMobile && window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function') {
+        const sRef = window.V1_SESSION.getReferralId();
+        if (sRef && /^AI\d{4,8}$/i.test(sRef)) uplineId = sRef.toUpperCase();
+      }
+
+      if (!uplineId && !uplineMobile) {
+        let aiUser = {};
+        try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+        if (aiUser.referral_mobile) uplineMobile = String(aiUser.referral_mobile).replace(/\D/g, '').slice(-10);
+        if (aiUser.referral_code && /^AI\d{4,8}$/i.test(aiUser.referral_code)) uplineId = aiUser.referral_code.toUpperCase();
+      }
+
+      if (!uplineId && !uplineMobile) {
+        const lastSp = localStorage.getItem('aim_last_sponsor_id');
+        if (lastSp && /^AI\d{4,8}$/i.test(lastSp)) uplineId = lastSp.toUpperCase();
+        const savedPhone = (localStorage.getItem('aarogyam_upline_phone') || '').replace(/\D/g, '').slice(-10);
+        if (savedPhone.length === 10) uplineMobile = savedPhone;
+      }
+
+      if (uplineMobile && uplineMobile.length === 10) {
+        currentAdvisorData = {
+          name: 'आरोग्यम सलाहकार',
+          phone: '91' + uplineMobile,
+          display: uplineMobile
+        };
+        updateDrawerAdvisorLabel();
+        return currentAdvisorData;
+      }
+
+      if (!uplineId) uplineId = 'AI000004';
+
+      if (uplineId === 'AI000004') {
+        currentAdvisorData = {
+          name: 'आरोग्यम मुख्य सलाहकार',
+          phone: '917974422572',
+          display: '7974422572'
+        };
+        updateDrawerAdvisorLabel();
+        return currentAdvisorData;
+      }
+
+      // Check cache in localStorage
+      const cached = localStorage.getItem('aim_sharer_prof_' + uplineId);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        const data = parsed.data || parsed;
+        if (data && data.mobile) {
+          const mob = String(data.mobile).replace(/\D/g, '').slice(-10);
+          currentAdvisorData = {
+            name: data.full_name || 'आरोग्यम सलाहकार',
+            phone: '91' + mob,
+            display: mob
+          };
+          updateDrawerAdvisorLabel();
+          return currentAdvisorData;
+        }
+      }
+
+      // Supabase lookup
+      const activeDb = window.supabaseClient || window.db || (window.supabase && typeof window.supabase.createClient === 'function' ? window.supabase.createClient('https://qjhjrzsnrtahmhswxyvb.supabase.co', 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU') : null);
+      if (activeDb) {
+        const { data: prof } = await activeDb.from('profiles').select('full_name, mobile').eq('share_id', uplineId).limit(1).maybeSingle();
+        if (prof && prof.mobile) {
+          const mob = String(prof.mobile).replace(/\D/g, '').slice(-10);
+          currentAdvisorData = {
+            name: prof.full_name || 'आरोग्यम सलाहकार',
+            phone: '91' + mob,
+            display: mob
+          };
+          try {
+            localStorage.setItem('aim_sharer_prof_' + uplineId, JSON.stringify({ data: prof, _ts: Date.now() }));
+          } catch(e) {}
+          updateDrawerAdvisorLabel();
+          return currentAdvisorData;
+        }
+      }
+    } catch(e) {}
+
+    updateDrawerAdvisorLabel();
+    return currentAdvisorData;
+  }
+
+  function updateDrawerAdvisorLabel() {
+    const el = document.getElementById('wa-drawer-advisor-sub');
+    if (el) {
+      el.textContent = `${currentAdvisorData.name} (${currentAdvisorData.display})`;
     }
   }
 
@@ -89,7 +196,7 @@
       totalMrp += (Number(item.mrp) || 0) * (item.qty || 1);
     });
 
-    const uplinePhone = localStorage.getItem('aarogyam_upline_phone') || '';
+    resolveCurrentAdvisor();
 
     drawer.innerHTML = `
       <div class="container sticky-order-drawer-content">
@@ -106,22 +213,13 @@
             </div>
           </div>
 
-          <div class="order-actions-dual">
-            <!-- Button 1: Central Aarogyam Helpline -->
-            <button type="button" class="btn-wa-order btn-wa-aarogyam" onclick="window.sendWhatsAppOrder('admin')">
-              <i class="fa-brands fa-whatsapp"></i>
-              <div class="wa-btn-text">
-                <span class="wa-btn-title">WhatsApp ऑर्डर भेजें</span>
-                <span class="wa-btn-sub">7974422572 पर</span>
-              </div>
-            </button>
-
-            <!-- Button 2: Upline / Referrer -->
-            <button type="button" class="btn-wa-order btn-wa-upline" onclick="window.sendWhatsAppOrder('upline')">
+          <div class="order-actions-single" style="display:flex; align-items:center; gap:10px;">
+            <!-- Dedicated Referral Salahkar Button (Only Advisor) -->
+            <button type="button" class="btn-wa-order btn-wa-upline" onclick="window.sendWhatsAppOrder()" style="background:linear-gradient(135deg, #16a34a 0%, #15803d 100%);">
               <i class="fa-solid fa-user-check"></i>
               <div class="wa-btn-text">
-                <span class="wa-btn-title">सलाहकार को भेजें</span>
-                <span class="wa-btn-sub">${uplinePhone ? '...' + uplinePhone.slice(-4) : 'नंबर दर्ज करें'}</span>
+                <span class="wa-btn-title">सलाहकार को ऑर्डर भेजें</span>
+                <span class="wa-btn-sub" id="wa-drawer-advisor-sub">${currentAdvisorData.name} (${currentAdvisorData.display})</span>
               </div>
             </button>
 
@@ -241,29 +339,13 @@
   };
 
   // Construct structured WhatsApp message and dispatch
-  window.sendWhatsAppOrder = function (target) {
+  window.sendWhatsAppOrder = function () {
     if (cartItems.length === 0) {
       alert('कृपया पहले कम से कम एक उत्पाद चुनें!');
       return;
     }
 
-    let targetPhone = AAROGYAM_CENTRAL_PHONE;
-
-    if (target === 'upline') {
-      let savedUpline = localStorage.getItem('aarogyam_upline_phone') || '';
-      if (!savedUpline || savedUpline.trim() === '') {
-        const inputPhone = prompt('कृपया अपने सलाहकार/अपलाइन का 10 अंकों का व्हाट्सएप नंबर दर्ज करें:', '');
-        if (!inputPhone) return;
-        const clean = inputPhone.replace(/\D/g, '');
-        if (clean.length < 10) {
-          alert('अमान्य फोन नंबर! कृपया 10 अंकों का वैध व्हाट्सएप नंबर डालें।');
-          return;
-        }
-        savedUpline = clean.length === 10 ? '91' + clean : clean;
-        localStorage.setItem('aarogyam_upline_phone', savedUpline);
-      }
-      targetPhone = savedUpline;
-    }
+    const targetPhone = currentAdvisorData.phone || '917974422572';
 
     const userName = getUserName();
     const userPhone = getUserPhone();
@@ -323,7 +405,7 @@
         max-width: 900px;
         margin: 0 auto;
       }
-      .order-actions-dual {
+      .order-actions-dual, .order-actions-single {
         display: flex;
         align-items: center;
         gap: 10px;
