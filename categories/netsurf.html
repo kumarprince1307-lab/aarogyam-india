@@ -1097,17 +1097,20 @@
        16. MOBILE STICKY BOTTOM ACTION BAR
   ========================================== -->
   <div class="ns-mobile-bar">
-    <a href="tel:+917974422572" class="ns-mobile-btn-call" id="nsMobileCallBtn">
+    <a href="tel:+917974422572" class="ns-mobile-btn-call" id="nsMobileCallBtn" title="प्रायोजक को कॉल करें">
       <i class="fa-solid fa-phone"></i>
       <span>प्रायोजक को कॉल</span>
     </a>
-    <a href="#sec-survey-form" class="ns-mobile-btn-wa" id="nsMobileWaBtn">
+    <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87!%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20%E0%A4%A8%E0%A5%87%E0%A4%9F%E0%A4%B8%E0%A4%B0%E0%A5%8D%E0%A4%AB%20%E0%A4%95%E0%A5%87%20%E0%A4%AC%E0%A4%BE%E0%A4%B0%E0%A5%87%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%9C%E0%A4%BE%E0%A4%A8%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%80%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F" target="_blank" rel="noopener noreferrer" class="ns-mobile-btn-wa" id="nsMobileWaBtn" title="व्हाट्सएप पर चैट करें">
       <i class="fa-brands fa-whatsapp"></i>
-      <span>फ्री सर्वे भरें</span>
+      <span>व्हाट्सएप संदेश</span>
     </a>
   </div>
 
   <!-- Core Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
   <script src="/js/universal-nav-drawer.js?v=20261001_v3"></script>
   <script src="/js/recent-purchase-toast.js"></script>

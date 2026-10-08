@@ -105,37 +105,164 @@
   }
 
   /**
-   * 1. DETECT SPONSOR REFERRAL FROM URL
+   * 1. DETECT SPONSOR REFERRAL FROM URL & UNIFIED SHARE ID
    */
-  function detectSponsorReferral() {
+  async function detectSponsorReferral() {
     const params = new URLSearchParams(window.location.search);
-    const refPhone = params.get('ref') || params.get('sponsor_phone') || params.get('phone');
+    const rawRef = (params.get('ref') || params.get('share_id') || params.get('aff') || params.get('r') || params.get('upline') || params.get('sponsor_phone') || params.get('phone') || '').trim();
     const refName = params.get('sponsor') || params.get('name') || params.get('by');
 
-    if (refPhone && refPhone.trim().length >= 10) {
-      let cleanPhone = refPhone.replace(/\D/g, '');
-      if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
-      currentSponsor.phone = cleanPhone;
-      currentSponsor.name = refName ? decodeURIComponent(refName).trim() : 'अधिकृत बिज़नेस पार्टनर';
-      currentSponsor.isPersonalized = true;
+    if (rawRef) {
+      try { 
+        localStorage.setItem('AOI_REFERRER_ID', rawRef);
+        const dig = rawRef.replace(/\D/g, '');
+        if (dig.length >= 10) {
+          localStorage.setItem('aarogyam_upline_phone', dig.slice(-10));
+          localStorage.setItem('aim_ns_sponsor_phone', '91' + dig.slice(-10));
+        } else {
+          localStorage.setItem('aim_last_sponsor_id', rawRef.toUpperCase());
+        }
+      } catch(e) {}
+    }
 
-      // Save in session
+    let effectiveRef = rawRef;
+    if (!effectiveRef) {
+      effectiveRef = localStorage.getItem('AOI_REFERRER_ID') || 
+                     localStorage.getItem('aim_last_sponsor_id') || 
+                     localStorage.getItem('aarogyam_upline_phone') || 
+                     localStorage.getItem('aim_ns_sponsor_phone') || '';
+    }
+
+    const cleanDigits = effectiveRef.replace(/\D/g, '').slice(-10);
+
+    // Case A: 10-digit direct phone number
+    if (cleanDigits.length === 10 && cleanDigits !== '7974422572') {
+      currentSponsor.phone = '91' + cleanDigits;
+      currentSponsor.name = refName ? decodeURIComponent(refName).trim() : (localStorage.getItem('aim_ns_sponsor_name') || 'अधिकृत बिज़नेस पार्टनर');
+      currentSponsor.isPersonalized = true;
       try {
         localStorage.setItem('aim_ns_sponsor_phone', currentSponsor.phone);
         localStorage.setItem('aim_ns_sponsor_name', currentSponsor.name);
+        localStorage.setItem('aarogyam_upline_phone', cleanDigits);
       } catch (e) {}
-    } else {
-      // Check localStorage
-      const savedPhone = localStorage.getItem('aim_ns_sponsor_phone');
-      const savedName = localStorage.getItem('aim_ns_sponsor_name');
-      if (savedPhone) {
-        currentSponsor.phone = savedPhone;
-        currentSponsor.name = savedName || 'अधिकृत बिज़नेस पार्टनर';
-        currentSponsor.isPersonalized = true;
-      }
+      renderSponsorElements();
+      return;
     }
 
-    renderSponsorElements();
+    // Case B: Master Aarogyam Share ID
+    if (effectiveRef.toUpperCase() === 'AI000004') {
+      currentSponsor.phone = DEFAULT_SUPPORT_PHONE;
+      currentSponsor.name = DEFAULT_SPONSOR_NAME;
+      currentSponsor.isPersonalized = false;
+      renderSponsorElements();
+      return;
+    }
+
+    // Case C: Check localStorage cached sponsor
+    const savedPhone = (localStorage.getItem('aim_ns_sponsor_phone') || localStorage.getItem('aarogyam_upline_phone') || '').replace(/\D/g, '').slice(-10);
+    const savedName = localStorage.getItem('aim_ns_sponsor_name');
+    if (savedPhone && savedPhone.length === 10 && savedPhone !== '7974422572') {
+      currentSponsor.phone = '91' + savedPhone;
+      currentSponsor.name = savedName || 'अधिकृत बिज़नेस पार्टनर';
+      currentSponsor.isPersonalized = true;
+      renderSponsorElements();
+    } else {
+      renderSponsorElements();
+    }
+
+    // Case D: Asynchronous resolution for Share IDs (e.g., AI100002, alphanumeric) via Supabase
+    if (effectiveRef && effectiveRef.toUpperCase() !== 'AI000004' && cleanDigits.length !== 10) {
+      resolveSponsorFromDb(effectiveRef);
+    }
+  }
+
+  async function resolveSponsorFromDb(shareId) {
+    try {
+      // 1. Check local cache first
+      const cached = localStorage.getItem('aim_sharer_prof_' + shareId);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          const data = parsed.data || parsed;
+          if (data && data.mobile) {
+            const cleanMob = String(data.mobile).replace(/\D/g, '').slice(-10);
+            if (cleanMob.length === 10) {
+              currentSponsor.phone = '91' + cleanMob;
+              currentSponsor.name = data.full_name || 'अधिकृत बिज़नेस पार्टनर';
+              currentSponsor.isPersonalized = true;
+              renderSponsorElements();
+              return;
+            }
+          }
+        } catch(e) {}
+      }
+
+      // 2. Query Supabase
+      const db = (window.supabaseClient && typeof window.supabaseClient.from === 'function')
+        ? window.supabaseClient
+        : ((window.supabase && typeof window.supabase.from === 'function') ? window.supabase : null);
+
+      if (db) {
+        const { data: prof, error } = await db
+          .from('profiles')
+          .select('id, full_name, mobile, share_id, referral_code')
+          .or(`share_id.eq.${shareId},referral_code.eq.${shareId}`)
+          .limit(1)
+          .maybeSingle();
+
+        if (!error && prof && prof.mobile) {
+          const cleanMob = prof.mobile.replace(/\D/g, '').slice(-10);
+          if (cleanMob.length === 10) {
+            currentSponsor.phone = '91' + cleanMob;
+            currentSponsor.name = prof.full_name || 'अधिकृत बिज़नेस पार्टनर';
+            currentSponsor.isPersonalized = true;
+
+            try {
+              localStorage.setItem('aim_ns_sponsor_phone', currentSponsor.phone);
+              localStorage.setItem('aim_ns_sponsor_name', currentSponsor.name);
+              localStorage.setItem('aarogyam_upline_phone', cleanMob);
+              localStorage.setItem('aim_sharer_prof_' + shareId, JSON.stringify({ data: prof, _ts: Date.now() }));
+            } catch (e) {}
+
+            renderSponsorElements();
+            return;
+          }
+        }
+      } else {
+        // Direct REST fetch fallback
+        const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+        const res = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(share_id.eq.${encodeURIComponent(shareId)},referral_code.eq.${encodeURIComponent(shareId)})&select=full_name,mobile&limit=1`, {
+          headers: {
+            'apikey': sbKey,
+            'Authorization': 'Bearer ' + sbKey
+          }
+        });
+        if (res.ok) {
+          const rows = await res.json();
+          if (rows && rows[0] && rows[0].mobile) {
+            const prof = rows[0];
+            const cleanMob = String(prof.mobile).replace(/\D/g, '').slice(-10);
+            if (cleanMob.length === 10) {
+              currentSponsor.phone = '91' + cleanMob;
+              currentSponsor.name = prof.full_name || 'अधिकृत बिज़नेस पार्टनर';
+              currentSponsor.isPersonalized = true;
+
+              try {
+                localStorage.setItem('aim_ns_sponsor_phone', currentSponsor.phone);
+                localStorage.setItem('aim_ns_sponsor_name', currentSponsor.name);
+                localStorage.setItem('aarogyam_upline_phone', cleanMob);
+                localStorage.setItem('aim_sharer_prof_' + shareId, JSON.stringify({ data: prof, _ts: Date.now() }));
+              } catch (e) {}
+
+              renderSponsorElements();
+              return;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[Netsurf] Sponsor lookup note:', err);
+    }
   }
 
   function renderSponsorElements() {
@@ -154,12 +281,42 @@
 
     if (callBtn) callBtn.href = telLink;
     if (waBtn) waBtn.href = waLink;
-    if (mobileCallBtn) mobileCallBtn.href = telLink;
-    if (mobileWaBtn) mobileWaBtn.href = waLink;
+
+    if (mobileCallBtn) {
+      mobileCallBtn.href = telLink;
+      mobileCallBtn.title = 'कॉल करें: ' + currentSponsor.name;
+      const callSpan = mobileCallBtn.querySelector('span');
+      if (callSpan) {
+        callSpan.textContent = currentSponsor.isPersonalized ? 'अपलाइन को कॉल' : 'प्रायोजक को कॉल';
+      }
+    }
+
+    if (mobileWaBtn) {
+      mobileWaBtn.href = waLink;
+      mobileWaBtn.target = '_blank';
+      mobileWaBtn.rel = 'noopener noreferrer';
+      mobileWaBtn.title = 'व्हाट्सएप चैट: ' + currentSponsor.name;
+      const waSpan = mobileWaBtn.querySelector('span');
+      if (waSpan) {
+        waSpan.textContent = currentSponsor.isPersonalized ? 'अपलाइन व्हाट्सएप' : 'व्हाट्सएप संदेश';
+      }
+    }
 
     if (banner && currentSponsor.isPersonalized) {
       banner.style.display = 'flex';
     }
+
+    // Synchronize all on-page product card WhatsApp links with current sponsor
+    const targetPhone = currentSponsor.isPersonalized ? currentSponsor.phone : DEFAULT_SUPPORT_PHONE;
+    const prodWaLinks = document.querySelectorAll('.ns-product-card a[href*="whatsapp.com"], .ns-product-card a[href*="wa.me"]');
+    prodWaLinks.forEach(a => {
+      try {
+        const currentHref = a.getAttribute('href') || '';
+        if (currentHref.includes('phone=')) {
+          a.href = currentHref.replace(/phone=\d+/, `phone=${targetPhone}`);
+        }
+      } catch(e) {}
+    });
   }
 
   /**

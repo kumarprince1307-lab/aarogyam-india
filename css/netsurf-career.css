@@ -1006,7 +1006,7 @@
 .ns-mobile-bar {
   display: none;
   position: fixed;
-  bottom: 60px; /* Positioned directly above universal bottom nav */
+  bottom: calc(60px + env(safe-area-inset-bottom, 0px)); /* Positioned directly above universal bottom nav */
   left: 0;
   right: 0;
   background: rgba(11, 19, 41, 0.95);
@@ -1023,7 +1023,10 @@
     display: flex;
   }
   .ns-page-wrapper {
-    padding-bottom: 125px; /* Clear space for both action bar and bottom nav */
+    padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)); /* Clear space for both action bar and bottom nav */
+  }
+  .sticky-float-widget-container {
+    bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 

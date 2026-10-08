@@ -224,10 +224,47 @@
     document.getElementById('closeAoiShareModal').onclick = closeModal;
     modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 
+    function recordShareEvent(platform) {
+      try {
+        const shareId = getCurrentUserRefId();
+        const event = {
+          id: 'sh_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          share_id: shareId,
+          platform: platform,
+          title: title || document.title,
+          page: window.location.pathname,
+          url: shareUrl || window.location.href,
+          timestamp: new Date().toISOString()
+        };
+
+        const shares = JSON.parse(localStorage.getItem('AOI_SHARE_TELEMETRY') || '[]');
+        shares.unshift(event);
+        if (shares.length > 300) shares.pop();
+        localStorage.setItem('AOI_SHARE_TELEMETRY', JSON.stringify(shares));
+
+        if (window.AarogyamTelemetry && typeof window.AarogyamTelemetry.trackEvent === 'function') {
+          window.AarogyamTelemetry.trackEvent('page_share', event);
+        }
+
+        if (typeof fetch === 'function') {
+          fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/rpc/increment_share_count', {
+            method: 'POST',
+            headers: {
+              'apikey': 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU',
+              'Authorization': 'Bearer sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ p_share_id: shareId, p_platform: platform, p_page: window.location.pathname })
+          }).catch(() => {});
+        }
+      } catch (e) {}
+    }
+
     // 1. WhatsApp Button Click
     const waBtn = document.getElementById('btnAoiWhatsAppShare');
     if (waBtn) {
       waBtn.onclick = () => {
+        recordShareEvent('whatsapp');
         closeModal();
       };
     }
@@ -236,6 +273,7 @@
     const nativeBtn = document.getElementById('btnAoiNativeShare');
     if (nativeBtn) {
       nativeBtn.onclick = async () => {
+        recordShareEvent('native');
         if (navigator.share) {
           try {
             await navigator.share({
@@ -263,6 +301,7 @@
     const copyBtn = document.getElementById('btnCopyShareUrl');
     if (copyBtn) {
       copyBtn.onclick = () => {
+        recordShareEvent('copy_link');
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(shareUrl);

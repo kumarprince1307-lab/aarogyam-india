@@ -12,22 +12,25 @@
 
   const CART_STORAGE_KEY = 'aarogyam_whatsapp_cart';
 
-  // Read referrer from URL if provided (e.g., ?ref=9876543210 or ?ref=AI000004)
+  // Read referrer from URL or localStorage
   const urlParams = new URLSearchParams(window.location.search);
-  const refFromUrl = urlParams.get('ref') || urlParams.get('sponsor') || urlParams.get('upline') || urlParams.get('share_id');
+  const refFromUrl = urlParams.get('ref') || urlParams.get('sponsor') || urlParams.get('upline') || urlParams.get('share_id') || urlParams.get('r') || urlParams.get('aff');
   if (refFromUrl) {
     const cleanRef = refFromUrl.replace(/\D/g, '');
     if (cleanRef.length >= 10) {
-      localStorage.setItem('aarogyam_upline_phone', cleanRef);
-    } else if (/^AI\d{4,8}$/i.test(refFromUrl)) {
-      localStorage.setItem('aim_last_sponsor_id', refFromUrl.toUpperCase());
+      localStorage.setItem('aarogyam_upline_phone', cleanRef.slice(-10));
+      localStorage.setItem('aim_ns_sponsor_phone', '91' + cleanRef.slice(-10));
+    } else {
+      localStorage.setItem('aim_last_sponsor_id', refFromUrl.trim().toUpperCase());
+      localStorage.setItem('AOI_REFERRER_ID', refFromUrl.trim().toUpperCase());
     }
   }
 
   let currentAdvisorData = {
     name: 'आरोग्यम सलाहकार',
     phone: '917974422572',
-    display: '7974422572'
+    display: '7974422572',
+    isPersonalized: false
   };
 
   async function resolveCurrentAdvisor() {
@@ -35,48 +38,71 @@
       let uplineId = '';
       let uplineMobile = '';
 
+      // 1. Direct from URL
       if (refFromUrl) {
         const cleanRef = refFromUrl.replace(/\D/g, '');
-        if (cleanRef.length >= 10) uplineMobile = cleanRef;
-        else if (/^AI\d{4,8}$/i.test(refFromUrl)) uplineId = refFromUrl.toUpperCase();
+        if (cleanRef.length >= 10) uplineMobile = cleanRef.slice(-10);
+        else uplineId = refFromUrl.trim().toUpperCase();
       }
 
+      // 2. Check netsurf sponsor phone or aarogyam upline phone in storage
+      if (!uplineMobile) {
+        const nsPhone = (localStorage.getItem('aim_ns_sponsor_phone') || '').replace(/\D/g, '').slice(-10);
+        if (nsPhone.length === 10 && nsPhone !== '7974422572') uplineMobile = nsPhone;
+      }
+
+      if (!uplineMobile) {
+        const savedPhone = (localStorage.getItem('aarogyam_upline_phone') || '').replace(/\D/g, '').slice(-10);
+        if (savedPhone.length === 10 && savedPhone !== '7974422572') uplineMobile = savedPhone;
+      }
+
+      // 3. Check V1_SESSION or AI_USER
       if (!uplineId && !uplineMobile && window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function') {
         const sRef = window.V1_SESSION.getReferralId();
-        if (sRef && /^AI\d{4,8}$/i.test(sRef)) uplineId = sRef.toUpperCase();
+        if (sRef && sRef !== 'AI000004') uplineId = sRef.toUpperCase();
       }
 
       if (!uplineId && !uplineMobile) {
         let aiUser = {};
         try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
         if (aiUser.referral_mobile) uplineMobile = String(aiUser.referral_mobile).replace(/\D/g, '').slice(-10);
-        if (aiUser.referral_code && /^AI\d{4,8}$/i.test(aiUser.referral_code)) uplineId = aiUser.referral_code.toUpperCase();
+        if (aiUser.referral_code && aiUser.referral_code !== 'AI000004') uplineId = aiUser.referral_code.toUpperCase();
+      }
+
+      if (!uplineId && !uplineMobile) {
+        const aoiRef = localStorage.getItem('AOI_REFERRER_ID');
+        if (aoiRef && aoiRef !== 'AI000004') {
+          const cRef = aoiRef.replace(/\D/g, '');
+          if (cRef.length >= 10) uplineMobile = cRef.slice(-10);
+          else uplineId = aoiRef.toUpperCase();
+        }
       }
 
       if (!uplineId && !uplineMobile) {
         const lastSp = localStorage.getItem('aim_last_sponsor_id');
-        if (lastSp && /^AI\d{4,8}$/i.test(lastSp)) uplineId = lastSp.toUpperCase();
-        const savedPhone = (localStorage.getItem('aarogyam_upline_phone') || '').replace(/\D/g, '').slice(-10);
-        if (savedPhone.length === 10) uplineMobile = savedPhone;
+        if (lastSp && lastSp !== 'AI000004') uplineId = lastSp.toUpperCase();
       }
 
-      if (uplineMobile && uplineMobile.length === 10) {
+      // If upline mobile is directly known (10-digit)
+      if (uplineMobile && uplineMobile.length === 10 && uplineMobile !== '7974422572') {
+        const cachedName = localStorage.getItem('aim_ns_sponsor_name') || 'अधिकृत बिज़नेस पार्टनर';
         currentAdvisorData = {
-          name: 'आरोग्यम सलाहकार',
+          name: cachedName,
           phone: '91' + uplineMobile,
-          display: uplineMobile
+          display: uplineMobile,
+          isPersonalized: true
         };
         updateDrawerAdvisorLabel();
         return currentAdvisorData;
       }
 
-      if (!uplineId) uplineId = 'AI000004';
-
-      if (uplineId === 'AI000004') {
+      // If no valid ID or default master ID
+      if (!uplineId || uplineId === 'AI000004') {
         currentAdvisorData = {
           name: 'आरोग्यम मुख्य सलाहकार',
           phone: '917974422572',
-          display: '7974422572'
+          display: '7974422572',
+          isPersonalized: false
         };
         updateDrawerAdvisorLabel();
         return currentAdvisorData;
@@ -85,36 +111,79 @@
       // Check cache in localStorage
       const cached = localStorage.getItem('aim_sharer_prof_' + uplineId);
       if (cached) {
-        const parsed = JSON.parse(cached);
-        const data = parsed.data || parsed;
-        if (data && data.mobile) {
-          const mob = String(data.mobile).replace(/\D/g, '').slice(-10);
-          currentAdvisorData = {
-            name: data.full_name || 'आरोग्यम सलाहकार',
-            phone: '91' + mob,
-            display: mob
-          };
-          updateDrawerAdvisorLabel();
-          return currentAdvisorData;
-        }
+        try {
+          const parsed = JSON.parse(cached);
+          const data = parsed.data || parsed;
+          if (data && data.mobile) {
+            const mob = String(data.mobile).replace(/\D/g, '').slice(-10);
+            if (mob.length === 10) {
+              currentAdvisorData = {
+                name: data.full_name || 'आरोग्यम सलाहकार',
+                phone: '91' + mob,
+                display: mob,
+                isPersonalized: true
+              };
+              updateDrawerAdvisorLabel();
+              return currentAdvisorData;
+            }
+          }
+        } catch(e) {}
       }
 
-      // Supabase lookup
+      // Supabase lookup: try SDK first, then direct REST API fetch
       const activeDb = window.supabaseClient || window.db || (window.supabase && typeof window.supabase.createClient === 'function' ? window.supabase.createClient('https://qjhjrzsnrtahmhswxyvb.supabase.co', 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU') : null);
       if (activeDb) {
-        const { data: prof } = await activeDb.from('profiles').select('full_name, mobile').eq('share_id', uplineId).limit(1).maybeSingle();
+        const { data: prof } = await activeDb.from('profiles').select('full_name, mobile').or(`share_id.eq.${uplineId},referral_code.eq.${uplineId}`).limit(1).maybeSingle();
         if (prof && prof.mobile) {
           const mob = String(prof.mobile).replace(/\D/g, '').slice(-10);
-          currentAdvisorData = {
-            name: prof.full_name || 'आरोग्यम सलाहकार',
-            phone: '91' + mob,
-            display: mob
-          };
-          try {
-            localStorage.setItem('aim_sharer_prof_' + uplineId, JSON.stringify({ data: prof, _ts: Date.now() }));
-          } catch(e) {}
-          updateDrawerAdvisorLabel();
-          return currentAdvisorData;
+          if (mob.length === 10) {
+            currentAdvisorData = {
+              name: prof.full_name || 'आरोग्यम सलाहकार',
+              phone: '91' + mob,
+              display: mob,
+              isPersonalized: true
+            };
+            try {
+              localStorage.setItem('aim_sharer_prof_' + uplineId, JSON.stringify({ data: prof, _ts: Date.now() }));
+              localStorage.setItem('aarogyam_upline_phone', mob);
+              localStorage.setItem('aim_ns_sponsor_phone', '91' + mob);
+              localStorage.setItem('aim_ns_sponsor_name', currentAdvisorData.name);
+            } catch(e) {}
+            updateDrawerAdvisorLabel();
+            return currentAdvisorData;
+          }
+        }
+      } else {
+        // Direct REST fetch fallback
+        const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+        const res = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(share_id.eq.${encodeURIComponent(uplineId)},referral_code.eq.${encodeURIComponent(uplineId)})&select=full_name,mobile&limit=1`, {
+          headers: {
+            'apikey': sbKey,
+            'Authorization': 'Bearer ' + sbKey
+          }
+        });
+        if (res.ok) {
+          const rows = await res.json();
+          if (rows && rows[0] && rows[0].mobile) {
+            const prof = rows[0];
+            const mob = String(prof.mobile).replace(/\D/g, '').slice(-10);
+            if (mob.length === 10) {
+              currentAdvisorData = {
+                name: prof.full_name || 'आरोग्यम सलाहकार',
+                phone: '91' + mob,
+                display: mob,
+                isPersonalized: true
+              };
+              try {
+                localStorage.setItem('aim_sharer_prof_' + uplineId, JSON.stringify({ data: prof, _ts: Date.now() }));
+                localStorage.setItem('aarogyam_upline_phone', mob);
+                localStorage.setItem('aim_ns_sponsor_phone', '91' + mob);
+                localStorage.setItem('aim_ns_sponsor_name', currentAdvisorData.name);
+              } catch(e) {}
+              updateDrawerAdvisorLabel();
+              return currentAdvisorData;
+            }
+          }
         }
       }
     } catch(e) {}
@@ -365,7 +434,8 @@
 
     const message = `🌿 *आरोग्यम इंडिया - नया उत्पाद ऑर्डर व परामर्श* 🌿\n\n` +
       `👤 *ग्राहक का नाम:* ${userName}${userPhone ? ' (' + userPhone + ')' : ''}\n` +
-      `📋 *पेज / संदर्भ:* ${topic}\n\n` +
+      `📋 *पेज / संदर्भ:* ${topic}\n` +
+      `🤝 *आरोग्यम सलाहकार:* ${currentAdvisorData.name} (${currentAdvisorData.display})\n\n` +
       `📦 *ऑर्डर सूची (${totalQty} नग):*\n${productLines}\n` +
       `💰 *कुल अनुमानित MRP:* ₹${totalMrp.toLocaleString('en-IN')}\n\n` +
       `ℹ️ *नोट:* कृपया मुझे इन उत्पादों के लिए विशेष डिस्काउंट, प्रयोग विधि और कैश ऑन डिलीवरी (COD) की जानकारी भेजें। धन्यवाद!`;
@@ -477,7 +547,7 @@
       }
       @media (max-width: 640px) {
         .sticky-order-drawer-wrap {
-          bottom: 56px;
+          bottom: calc(60px + env(safe-area-inset-bottom, 0px));
           padding: 8px 10px;
         }
         .order-actions-dual {
