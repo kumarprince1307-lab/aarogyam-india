@@ -2435,7 +2435,7 @@
           "image": "/images/products/product-------------new-pr-824493-y893.webp",
           "mrp": 375,
           "price": 375,
-          "discount_pct": 0,
+          "discount_pct": 1,
           "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग के निर्देशों के अनुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतर और लंबे समय तक स्वस्थ परिणामों के लिए इसका नियमित उपयोग करें।",
           "badge": "✨ New Launch",
           "whatsapp_link": "https://wa.me/917974422572"
@@ -2447,7 +2447,7 @@
           "image": "/images/products/product-multi-vitamin-for--705279-tr2v.webp",
           "mrp": 375,
           "price": 375,
-          "discount_pct": 0,
+          "discount_pct": 1,
           "dose": "मात्रा व तरीका: 1 टैबलेट/कैप्सूल दिन में एक या दो बार (या पैकेजिंग/चिकित्सक के निर्देशानुसार) भोजन के बाद पानी के साथ लें।\n\nनियमित सेवन: बेहतरीन परिणामों के लिए इसे प्रतिदिन नियमित रूप से लें।",
           "badge": "✨ New Launch",
           "whatsapp_link": "https://wa.me/917974422572"
@@ -2459,7 +2459,7 @@
           "image": "/images/products/product--joint-care-new-30-770549-y5ld.webp",
           "mrp": 450,
           "price": 450,
-          "discount_pct": 0,
+          "discount_pct": 1,
           "dose": "1 कैप्सूल सुबह व 1 शाम भोजन के आधे घंटे बाद गुनगुने पानी के साथ।",
           "badge": "🦴 जोड़ों का दर्द व कार्टिलेज",
           "whatsapp_link": "https://wa.me/917974422572"
@@ -2471,7 +2471,7 @@
           "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
           "mrp": 1425,
           "price": 1425,
-          "discount_pct": 0,
+          "discount_pct": 1,
           "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।",
           "badge": "❤️ संपूर्ण परिवार पोषण",
           "whatsapp_link": "https://wa.me/917974422572"
@@ -2511,7 +2511,7 @@
         "subtitle": "",
         "cards": [
           {
-            "id": "CB_1791500344761_wuw0",
+            "id": "CB_1791500412470_kpvc",
             "title": "❓ जोड़ों में दर्द क्यों होता है? (Causes)",
             "badge": "",
             "color": "#2563eb",
@@ -2527,7 +2527,7 @@
             "catalog_btn": null
           },
           {
-            "id": "CB_1791500344761_x96e",
+            "id": "CB_1791500412470_khac",
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
             "badge": "",
             "color": "#2563eb",
@@ -2543,7 +2543,7 @@
             "catalog_btn": null
           },
           {
-            "id": "CB_1791500344761_jgfa",
+            "id": "CB_1791500412470_49cw",
             "title": "🚨 साइड इफेक्ट्स व खतरे (Risks)",
             "badge": "",
             "color": "#dc2626",
@@ -2559,7 +2559,7 @@
           }
         ]
       },
-      "admin_edited": 1791500344762,
+      "admin_edited": 1791500412470,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
