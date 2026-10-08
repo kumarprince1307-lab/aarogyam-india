@@ -3,20 +3,19 @@
 const MENU = [
   { label: 'Dashboard', href: 'dashboard.html', icon: '🏠', route: 'dashboard' },
   { label: '🚀 Marketing Hub (मार्केटिंग हब)', href: 'reports.html', icon: '📈', route: 'reports' },
-  { label: 'Users', icon: '👥', children: [ 
-    { label: 'All Users', href: 'users.html', route: 'users' }, 
-    { label: '🎥 Webinar Reports (वेबिनार रिपोर्ट)', href: 'webinar-reports.html', route: 'webinar-reports' },
-    { label: 'User Details', href: 'user-details.html', route: 'user-details' },
-    { label: 'All User Permissions', href: 'user-permissions.html', route: 'user-permissions' },
-    { label: 'All Phonebook', href: 'all-phonebook.html', route: 'all-phonebook' },
-    { label: 'All Survey List', href: 'all-surveys.html', route: 'all-surveys' }
+  { label: 'Users (उपयोगकर्ता)', icon: '👥', children: [ 
+    { label: 'All Users (सभी यूजर)', href: 'users.html', route: 'users' }, 
+    { label: '🔍 User Details & Search', href: 'user-details.html', route: 'user-details' },
+    { label: '🛡️ All User Permissions', href: 'user-permissions.html', route: 'user-permissions' },
+    { label: '📱 All Phonebook Contacts', href: 'all-phonebook.html', route: 'all-phonebook' },
+    { label: '📋 All Survey List', href: 'all-surveys.html', route: 'all-surveys' }
   ] },
-  { label: 'Books', icon: '📚', children: [ 
+  { label: 'Books & Audio (पुस्तकें)', icon: '📚', children: [ 
     { label: 'Book Landing Pages (बुक पेज)', href: 'book-landing-pages.html', route: 'book-landing-pages' },
     { label: '🎧 Audio Book Studio (वॉइस रिकॉर्डर)', href: 'book-audio-studio.html', route: 'book-audio-studio' },
-    { label: 'Categories', href: '#' },
-    { label: 'Books', href: '#' },
-    { label: 'Demo Books', href: '#' }
+    { label: '📁 Categories (श्रेणियां)', href: 'book-landing-pages.html#categories', route: 'book-landing-pages' },
+    { label: '📚 All Books (सभी पुस्तकें)', href: 'book-landing-pages.html#all-books', route: 'book-landing-pages' },
+    { label: '👁️ Demo Books (डेमो पुस्तक)', href: 'book-landing-pages.html#demo-books', route: 'book-landing-pages' }
   ] },
   { label: 'Page Editor (पेज एडिटर)', icon: '📑', children: [
     { label: 'All Site Pages (सभी पेज एडिटर)', href: 'page-editor.html', route: 'page-editor' },
@@ -39,44 +38,75 @@ const MENU = [
     { label: '💼 Netsurf Career (नेटसर्फ करियर) Editor', href: 'page-editor.html?page=page_netsurf_career', route: 'page-editor?page=page_netsurf_career' }
   ] },
   { label: '👑 Smart eTailer (₹8.19L)', icon: '👑', href: 'smart-etailer.html', route: 'smart-etailer' },
-  { label: 'Products', icon: '🛍️', children: [ 
+  { label: 'Products (उत्पाद)', icon: '🛍️', children: [ 
     { label: 'Product Landing Pages', href: 'product-landing-pages.html', route: 'product-landing-pages' }, 
-    { label: 'Categories', href: '#' }, 
-    { label: 'Products', href: '#' } 
+    { label: '📁 Categories (श्रेणियां)', href: 'product-landing-pages.html#categories', route: 'product-landing-pages' }, 
+    { label: '🛍️ All Products (उत्पाद सूची)', href: 'product-landing-pages.html#products', route: 'product-landing-pages' } 
   ] },
-  { label: 'Diseases', icon: '🩺', href: '#' },
-  { label: 'Orders', icon: '🧾', children: [ 
-    { label: 'Purchases', href: 'purchases.html', route: 'purchases' }, 
-    { label: 'Checkout Funnel', href: 'checkout-funnel.html', route: 'checkout-funnel' }, 
-    { label: 'Downloads', href: 'downloads.html', route: 'downloads' } 
+  { label: 'Diseases (रोग व समाधान)', icon: '🩺', href: 'crop-doctor.html', route: 'crop-doctor' },
+  { label: 'Orders & Sales (ऑर्डर्स)', icon: '🧾', children: [ 
+    { label: 'Purchases (खरीद विवरण)', href: 'purchases.html', route: 'purchases' }, 
+    { label: 'Checkout Funnel (चेकआउट फ़नल)', href: 'checkout-funnel.html', route: 'checkout-funnel' }, 
+    { label: 'Downloads (डाउनलोड आंकड़े)', href: 'downloads.html', route: 'downloads' } 
   ] },
-  { label: 'Reports', icon: '📈', children: [ 
-    { label: '🔄 Share & Offer Conversions (कन्वर्जन रिपोर्ट)', href: 'reports.html#share-conversions', route: 'reports' }, 
+  { label: 'Reports & Analytics (रिपोर्ट्स)', icon: '📈', children: [ 
+    { label: '🔄 Share & Offer Conversions (कन्वर्जन)', href: 'reports.html#share-conversions', route: 'reports' }, 
     { label: '🎯 Offer Purchases (ऑफ़र खरीद)', href: 'reports.html#offer-purchases', route: 'reports' }, 
     { label: '👥 Share Links (शेयर कन्वर्जन)', href: 'reports.html#share-report', route: 'reports' }, 
-    { label: 'Daily Reports', href: 'reports.html#daily-report', route: 'reports' }, 
-    { label: 'Lead Source', href: 'reports.html#lead-report', route: 'reports' } 
+    { label: '📊 Daily Reports (दैनिक रिपोर्ट)', href: 'reports.html#daily-report', route: 'reports' }, 
+    { label: '🌐 Lead Source (लीड स्त्रोत)', href: 'reports.html#lead-report', route: 'reports' },
+    { label: '🎥 Webinar Reports (वेबिनार रिपोर्ट)', href: 'webinar-reports.html', route: 'webinar-reports' }
   ] },
-  { label: 'Marketing', icon: '📣', children: [ 
+  { label: 'Marketing (मार्केटिंग)', icon: '📣', children: [ 
     { label: 'UCAS Landing Pages', href: 'all-landing-pages.html', route: 'all-landing-pages' }, 
-    { label: 'Hook Templates & Shayari (हुक व शायरी)', href: 'smart-etailer.html?tab=adm-sec-marketing', route: 'marketing-templates' }, 
-    { label: 'Share Links', href: '#' }, 
-    { label: 'Campaigns', href: '#' } 
+    { label: 'Hook Templates & Shayari', href: 'smart-etailer.html?tab=adm-sec-marketing', route: 'marketing-templates' }, 
+    { label: '👥 Share Links Analytics', href: 'reports.html#share-report', route: 'reports' }, 
+    { label: '🎯 Campaigns Analytics', href: 'reports.html#lead-report', route: 'reports' } 
   ] },
-  { label: 'Webinars (वेबिनार)', href: 'all-webinars.html', icon: '🎥', route: 'all-webinars' },
-  { label: 'Notifications', icon: '🔔', children: [ 
+  { label: 'Webinars (वेबिनार हब)', href: 'all-webinars.html', icon: '🎥', route: 'all-webinars' },
+  { label: 'Notifications (सूचनाएं)', icon: '🔔', children: [ 
     { label: 'All Notifications', href: 'notifications.html', route: 'notifications' }, 
     { label: '📢 Broadcast Center', href: 'broadcast.html', route: 'broadcast' } 
   ] },
+
+  /* ========================================================
+     🌟 1. DUPLICATE / REVIEW HUB (2 दिन तुलना और परीक्षण हेतु)
+     ======================================================== */
+  { label: '🔄 डुप्लीकेट मेनू (Duplicate Hub)', icon: '🔄', children: [
+    { label: '📑 1. UCAS Landing Pages (v1)', href: 'all-landing-pages.html', route: 'all-landing-pages' },
+    { label: '🛡️ 2. Landing & Webinar Review Shield', href: 'landing-page-control.html', route: 'landing-page-control' },
+    { label: '✍️ 3. Marketing Templates (स्टैंडअलोन CRUD)', href: 'marketing-templates.html', route: 'marketing-templates-standalone' },
+    { label: '👑 4. Smart eTailer Marketing Hooks Tab', href: 'smart-etailer.html?tab=adm-sec-marketing', route: 'marketing-templates' },
+    { label: '📊 5. Marketing Hub (Full Page View)', href: 'reports.html', route: 'reports' },
+    { label: '🎥 6. Webinar Reports (Users Sub-Report)', href: 'webinar-reports.html', route: 'webinar-reports' },
+    { label: '🎬 7. Webinars Hub (Main Video Hub)', href: 'all-webinars.html', route: 'all-webinars' }
+  ] },
+
+  /* ========================================================
+     🌟 2. UNUSED / ARCHIVES HUB (सुरक्षित परीक्षण हेतु)
+     ======================================================== */
+  { label: '📦 अनयूज़्ड व आर्काइव (Archive Hub)', icon: '📦', children: [
+    { label: '🎙️ 1. Audio Studio Prototype v1', href: 'book-audio-studio.html?v=1', route: 'audio-studio-v1' },
+    { label: '📱 2. Admin App Standalone PWA', href: 'admin-app.html', route: 'admin-app' },
+    { label: '📶 3. Offline Mode Screen Check', href: 'offline.html', route: 'offline-preview' },
+    { label: '🔐 4. Auth & Session Diagnostics', href: 'settings.html#auth', route: 'auth-diagnostics' },
+    { label: '🛒 5. Standalone Checkout Funnel', href: 'checkout-funnel.html', route: 'checkout-funnel' },
+    { label: '📥 6. Standalone Downloads', href: 'downloads.html', route: 'downloads' }
+  ] },
+
   { label: 'Admin App', href: 'admin-app.html', icon: '📱', route: 'admin-app' },
   { label: 'Settings', href: 'settings.html', icon: '⚙️', route: 'settings' },
-  { label: 'Support', href: '#', icon: '🆘' },
-  { label: 'Logout', href: '#', icon: '⛔' }
+  { label: 'Support (सहायता)', href: 'support.html', icon: '🆘', route: 'support' },
+  { label: 'Logout (लॉगआउट)', href: 'javascript:void(0)', icon: '⛔', action: 'logout' }
 ];
 
 function createMenuItem(item) {
+  if (item.action === 'logout' || item.label.includes('Logout')) {
+    return `<li><a href="javascript:void(0)" id="admin-logout-btn" class="menu-link"><span class="menu-icon">${item.icon || '⛔'}</span><span class="menu-label">${item.label}</span></a></li>`;
+  }
+
   if (item.children && item.children.length) {
-    const id = `menu-${item.label.replace(/\s+/g,'').toLowerCase()}`;
+    const id = `menu-${item.label.replace(/[^a-zA-Z0-9]/g,'').toLowerCase()}`;
     return `
       <li class="menu-group">
         <button class="menu-toggle" data-target="${id}"><span class="menu-icon">${item.icon || ''}</span><span class="menu-label">${item.label}</span><span class="menu-caret">▸</span></button>
@@ -125,6 +155,17 @@ export function renderSidebar(containerId = 'sidebar-placeholder') {
   closeBtn?.addEventListener('click', (e) => {
     e.preventDefault();
     document.body.classList.remove('mobile-drawer-open');
+  });
+
+  // --- Admin Logout Button Handler ---
+  const logoutBtn = c.querySelector('#admin-logout-btn');
+  logoutBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (confirm('क्या आप एडमिन पैनल से लॉगआउट करना चाहते हैं? (Are you sure you want to log out?)')) {
+      localStorage.removeItem('admin_session');
+      sessionStorage.clear();
+      window.location.replace('login.html');
+    }
   });
 
   // --- Close mobile drawer on any route link click ---

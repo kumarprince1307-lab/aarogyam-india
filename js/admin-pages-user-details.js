@@ -8,7 +8,8 @@ import {
   fetchAvailableBooks, 
   addManualPurchase, 
   deletePurchase,
-  updateUserPermissionAdmin
+  updateUserPermissionAdmin,
+  fetchAllUsersAdmin
 } from './admin-api.js';
 
 function renderSubscriptionSection(sub) {
@@ -691,7 +692,7 @@ export async function initUserDetails() {
   if (!container) return;
 
   if (!userId) {
-    container.innerHTML = '<div class="admin-error"><strong>No user ID provided.</strong><br>Please go back to the users list and select a user.</div>';
+    await renderUserPicker(container);
     return;
   }
 
@@ -927,3 +928,97 @@ export async function initUserDetails() {
     }
   });
 }
+
+async function renderUserPicker(container) {
+  container.innerHTML = `
+    <div class="admin-card" style="padding: 24px; max-width: 900px; margin: 0 auto; background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border); border-radius: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+        <div>
+          <h3 style="margin: 0 0 4px 0; color: var(--admin-text); display: flex; align-items: center; gap: 8px; font-size: 1.2rem;">
+            <span>🔍</span> <span>उपयोगकर्ता विवरण चुनें (Select User to Inspect)</span>
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--admin-muted); margin: 0;">
+            किसी भी यूज़र की प्रोफ़ाइल, UCAS सर्वे, फोनबुक, 26 परमिशन और खरीद इतिहास देखने के लिए चुनें:
+          </p>
+        </div>
+      </div>
+      <input type="search" id="user-picker-search" class="admin-input" placeholder="🔍 नाम, मोबाइल नंबर, ईमेल या ID दर्ज करें..." style="width: 100%; margin-bottom: 16px; font-size: 0.95rem; padding: 10px 14px; border-radius: 8px;" />
+      <div id="user-picker-list" class="admin-loading" style="padding: 20px; text-align: center;">उपयोगकर्ता डेटा लोड हो रहा है...</div>
+    </div>
+  `;
+
+  const listElem = document.getElementById('user-picker-list');
+  const searchInput = document.getElementById('user-picker-search');
+
+  try {
+    const res = await fetchAllUsersAdmin();
+    const users = (res && res.data) ? res.data : [];
+
+    function renderList(filtered) {
+      if (!listElem) return;
+      if (filtered.length === 0) {
+        listElem.innerHTML = '<div class="admin-empty-sm" style="padding:24px;text-align:center;color:var(--admin-muted);">कोई उपयोगकर्ता नहीं मिला।</div>';
+        return;
+      }
+      listElem.innerHTML = `
+        <div class="admin-table-wrapper" style="max-height: 480px; overflow-y: auto; border: 1px solid var(--admin-border); border-radius: 8px;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>नाम</th>
+                <th>मोबाइल</th>
+                <th>स्थान / जिला</th>
+                <th>स्टेटस</th>
+                <th>एक्शन</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.slice(0, 35).map((u, idx) => `
+                <tr>
+                  <td><small class="admin-muted">#${idx + 1}</small></td>
+                  <td><strong>${u.full_name || 'N/A'}</strong></td>
+                  <td>
+                    <span style="font-family:monospace;font-weight:600;">${u.mobile || '-'}</span>
+                  </td>
+                  <td>${u.State || u.district || '-'}</td>
+                  <td>
+                    <span class="status-pill ${u.is_active !== false ? 'active' : 'inactive'}">
+                      ${u.is_active !== false ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td>
+                    <button type="button" class="admin-button small-button" onclick="window.navigateTo('user-details?id=${encodeURIComponent(u.id)}')" style="background:#2563eb;color:#fff;font-weight:700;padding:4px 10px;font-size:0.8rem;">
+                      विवरण देखें →
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    renderList(users);
+
+    searchInput?.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        renderList(users);
+        return;
+      }
+      const filtered = users.filter(u => 
+        (u.full_name && u.full_name.toLowerCase().includes(q)) ||
+        (u.mobile && String(u.mobile).includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q)) ||
+        (u.id && String(u.id).toLowerCase().includes(q))
+      );
+      renderList(filtered);
+    });
+
+  } catch (err) {
+    if (listElem) listElem.innerHTML = `<div class="admin-error">यूजर सूची लोड करने में त्रुटि: ${err?.message || 'अज्ञात'}</div>`;
+  }
+}
+
