@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:37:42.673Z",
+  "updated_at": "2026-10-10T09:38:02.624Z",
   "total_products": 39,
   "categories": [
     {
@@ -737,8 +737,8 @@
       "category_label": "स्वास्थ्य नेचुरामोरे",
       "badge": "🌿 आंतों की सफाई व लिवर डिटॉक्स",
       "mrp": 800,
-      "discount_pct": 20,
-      "discounted_price": 640,
+      "discount_pct": 0,
+      "discounted_price": 800,
       "dose": "1 या 2 टैबलेट रात को सोने से पहले गुनगुने पानी के साथ।",
       "image": "/images/products/product--------------------929114-1dtr.webp",
       "description": "त्रिफला, सनाय व कालमेघ से कब्ज, खट्टी डकारें, गैस व फैटी लिवर की समस्या से 100% राहत।",
