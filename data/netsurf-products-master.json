@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:45:52.029Z",
+  "updated_at": "2026-10-10T09:46:10.573Z",
   "total_products": 39,
   "categories": [
     {
@@ -908,8 +908,8 @@
       "category_label": "हर्ब्स एंड मोर",
       "badge": "❄️ रूसी व सिर की खुजली मुक्त",
       "mrp": 560,
-      "discount_pct": 25,
-      "discounted_price": 420,
+      "discount_pct": 0,
+      "discounted_price": 560,
       "dose": "गीले बालों में लगाकर झाग बनाएं, 2 मिनट रहने दें और फिर पानी से धो लें।",
       "image": "/images/products/product-scalp-renaissance--603882-ulwy.webp",
       "description": "अदरक का अर्क और टी-ट्री ऑयल से पहली वॉश से ही रूसी का खात्मा और स्कैल्प को ठंडक।",
