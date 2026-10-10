@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:36:08.610Z",
+  "updated_at": "2026-10-10T09:36:26.617Z",
   "total_products": 39,
   "categories": [
     {
@@ -642,8 +642,8 @@
       "category_label": "स्वास्थ्य नेचुरामोरे",
       "badge": "🥛 प्रोटीन व इम्युनिटी बूस्टर",
       "mrp": 1425,
-      "discount_pct": 25,
-      "discounted_price": 1069,
+      "discount_pct": 0,
+      "discounted_price": 1425,
       "dose": "1 चम्मच (10-15 ग्राम) सुबह और शाम दूध या पानी के साथ।",
       "image": "/images/products/product-naturamore-origina-711440-v0ra.webp",
       "description": "स्वादिष्ट वैनिला फ्लेवर में व्हे प्रोटीन, सोया प्रोटीन व एलोवेरा का शक्तिवर्धक प्राकृतिक योग।",
@@ -654,7 +654,14 @@
       "pack_size": "400 gm",
       "problem_tags": [
         "health_general",
-        "kids_care"
+        "kids_care",
+        "weight_loss",
+        "hair_care",
+        "skin_care",
+        "womens_care",
+        "vitality_wellness",
+        "joint_pain",
+        "diabetes"
       ]
     },
     {
