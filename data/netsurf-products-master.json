@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:35:42.554Z",
+  "updated_at": "2026-10-10T09:36:08.610Z",
   "total_products": 39,
   "categories": [
     {
@@ -613,8 +613,8 @@
       "category_label": "स्वास्थ्य नेचुरामोरे",
       "badge": "❤️ संपूर्ण परिवार पोषण",
       "mrp": 1425,
-      "discount_pct": 25,
-      "discounted_price": 1069,
+      "discount_pct": 0,
+      "discounted_price": 1425,
       "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी के साथ भोजन के बाद।",
       "image": "/images/products/product-naturamore-active--589353-0lfo.webp",
       "description": "13 विटामिन्स, 10 मिनरल्स, 5 सप्लीमेंट्री प्रोटीन्स और ओमेगा 3 DHA युक्त सम्पूर्ण स्वास्थ्य टॉनिक।",
@@ -628,7 +628,11 @@
         "kids_care",
         "joint_pain",
         "diabetes",
-        "weight_loss"
+        "weight_loss",
+        "hair_care",
+        "skin_care",
+        "womens_care",
+        "vitality_wellness"
       ]
     },
     {
