@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:25:48.038Z",
+  "updated_at": "2026-10-10T09:26:28.278Z",
   "total_products": 39,
   "categories": [
     {
@@ -468,8 +468,8 @@
       "category_label": "कृषि बायोफिट",
       "badge": "🌾 मिट्टी सुधारक जीवाणु",
       "mrp": 850,
-      "discount_pct": 25,
-      "discounted_price": 638,
+      "discount_pct": 0,
+      "discounted_price": 850,
       "dose": "30ml प्रति 15 लीटर पंप।  1 लीटर प्रति एकड़ ड्रिप, क्यारी में पानी के साथ या 200 लीटर पानी में घोलकर जमीन पर छिड़कें।",
       "image": "/images/products/product------biofit-shet---191286-cejz.webp",
       "description": "कड़क व खारी मिट्टी को भुरभुरी और उपजाऊ बनाता है। केंचुओं को सक्रिय कर यूरिया-डीएपी की 30-40% बचत करता है।",
@@ -479,7 +479,13 @@
       "precautions": "रासायनिक कॉपर या फंगीसाइड के प्रयोग के तुरंत बाद न दें। नमी युक्त जमीन में ही प्रयोग करें।",
       "pack_size": "1 Litre",
       "problem_tags": [
-        "crop_yield"
+        "crop_yield",
+        "agri_soil_health",
+        "crop_chana",
+        "crop_soybean",
+        "crop_mustard",
+        "crop_wheat",
+        "crop_paddy"
       ]
     },
     {
