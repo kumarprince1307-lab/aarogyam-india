@@ -452,10 +452,15 @@ async function checkUserLogin() {
         }
 
         const userData = data[0];
-        // Clean previous user purchases and session caches before logging into new account
+        // Clean previous user purchases, session caches, and sponsor cache before logging into new account
         localStorage.removeItem('AI_PURCHASES');
         localStorage.removeItem('purchases');
         localStorage.removeItem('user_purchases');
+        localStorage.removeItem('aim_ns_sponsor_phone');
+        localStorage.removeItem('aim_ns_sponsor_name');
+        localStorage.removeItem('aarogyam_upline_phone');
+        localStorage.removeItem('aim_last_sponsor_id');
+        localStorage.removeItem('AOI_REFERRER_ID');
         try { sessionStorage.clear(); } catch(e) {}
 
         SessionManager.save({
@@ -528,6 +533,11 @@ function logoutUser() {
     localStorage.removeItem('purchases');
     localStorage.removeItem('aim_user_name');
     localStorage.removeItem('aim_user_mobile');
+    localStorage.removeItem('aim_ns_sponsor_phone');
+    localStorage.removeItem('aim_ns_sponsor_name');
+    localStorage.removeItem('aarogyam_upline_phone');
+    localStorage.removeItem('aim_last_sponsor_id');
+    localStorage.removeItem('AOI_REFERRER_ID');
     try { sessionStorage.clear(); } catch(e) {}
     return true;
 }

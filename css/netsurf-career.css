@@ -41,20 +41,9 @@
   padding: 0 16px;
 }
 
-/* Sponsor Referral Top Banner */
+/* Sponsor Referral Top Banner (Disabled - Consolidated to Bottom Sticky Bar) */
 .ns-sponsor-banner {
-  background: linear-gradient(90deg, #1e1b4b 0%, #1e3a8a 100%);
-  color: #ffffff;
-  padding: 10px 16px;
-  font-size: 0.88rem;
-  border-bottom: 1.5px solid #3b82f6;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  position: relative;
-  z-index: 99;
+  display: none !important;
 }
 .ns-sponsor-info {
   display: flex;
@@ -1002,21 +991,89 @@
   transform: rotate(180deg);
 }
 
-/* 12. MOBILE STICKY BOTTOM BAR */
+/* 12. MOBILE STICKY BOTTOM BAR (अधिकृत विक्रेता + Call & WhatsApp Icons) */
 .ns-mobile-bar {
   display: none;
   position: fixed;
   bottom: calc(60px + env(safe-area-inset-bottom, 0px)); /* Positioned directly above universal bottom nav */
   left: 0;
   right: 0;
-  background: rgba(11, 19, 41, 0.95);
-  backdrop-filter: blur(12px);
-  border-top: 1.5px solid #1e293b;
-  padding: 10px 16px;
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.38);
+  padding: 8px 16px;
   z-index: 99990;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+}
+.ns-sticky-seller-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  flex: 1;
+}
+.ns-sticky-seller-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+.ns-sticky-seller-badge i {
+  color: #22c55e;
+  font-size: 0.72rem;
+}
+.ns-sticky-seller-name {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.2px;
+  line-height: 1.3;
+}
+.ns-sticky-seller-actions {
+  display: flex;
+  align-items: center;
   gap: 10px;
+  flex-shrink: 0;
+}
+.ns-sticky-btn-call,
+.ns-sticky-btn-wa {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  font-size: 1.15rem;
+}
+.ns-sticky-btn-call {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+}
+.ns-sticky-btn-call:active {
+  transform: scale(0.92);
+}
+.ns-sticky-btn-wa {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+}
+.ns-sticky-btn-wa:active {
+  transform: scale(0.92);
 }
 @media (max-width: 768px) {
   .ns-mobile-bar {

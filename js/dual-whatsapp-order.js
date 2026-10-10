@@ -35,158 +35,181 @@
 
   async function resolveCurrentAdvisor() {
     try {
-      let uplineId = '';
-      let uplineMobile = '';
-
       // 1. Direct from URL
       if (refFromUrl) {
         const cleanRef = refFromUrl.replace(/\D/g, '');
-        if (cleanRef.length >= 10) uplineMobile = cleanRef.slice(-10);
-        else uplineId = refFromUrl.trim().toUpperCase();
-      }
+        if (cleanRef.length >= 10 && cleanRef !== '7974422572') {
+          currentAdvisorData = {
+            name: 'अधिकृत विक्रेता',
+            phone: '91' + cleanRef.slice(-10),
+            display: cleanRef.slice(-10),
+            isPersonalized: true
+          };
+          updateDrawerAdvisorLabel();
+          return currentAdvisorData;
+        }
 
-      // 2. Check netsurf sponsor phone or aarogyam upline phone in storage
-      if (!uplineMobile) {
-        const nsPhone = (localStorage.getItem('aim_ns_sponsor_phone') || '').replace(/\D/g, '').slice(-10);
-        if (nsPhone.length === 10 && nsPhone !== '7974422572') uplineMobile = nsPhone;
-      }
-
-      if (!uplineMobile) {
-        const savedPhone = (localStorage.getItem('aarogyam_upline_phone') || '').replace(/\D/g, '').slice(-10);
-        if (savedPhone.length === 10 && savedPhone !== '7974422572') uplineMobile = savedPhone;
-      }
-
-      // 3. Check V1_SESSION or AI_USER
-      if (!uplineId && !uplineMobile && window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function') {
-        const sRef = window.V1_SESSION.getReferralId();
-        if (sRef && sRef !== 'AI000004') uplineId = sRef.toUpperCase();
-      }
-
-      if (!uplineId && !uplineMobile) {
-        let aiUser = {};
-        try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
-        if (aiUser.referral_mobile) uplineMobile = String(aiUser.referral_mobile).replace(/\D/g, '').slice(-10);
-        if (aiUser.referral_code && aiUser.referral_code !== 'AI000004') uplineId = aiUser.referral_code.toUpperCase();
-      }
-
-      if (!uplineId && !uplineMobile) {
-        const aoiRef = localStorage.getItem('AOI_REFERRER_ID');
-        if (aoiRef && aoiRef !== 'AI000004') {
-          const cRef = aoiRef.replace(/\D/g, '');
-          if (cRef.length >= 10) uplineMobile = cRef.slice(-10);
-          else uplineId = aoiRef.toUpperCase();
+        if (refFromUrl.trim().toUpperCase() !== 'AI000004' && cleanRef.length < 10) {
+          const uplineId = refFromUrl.trim().toUpperCase();
+          const activeDb = window.supabaseClient || window.db || (window.supabase && typeof window.supabase.createClient === 'function' ? window.supabase.createClient('https://qjhjrzsnrtahmhswxyvb.supabase.co', 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU') : null);
+          if (activeDb) {
+            const { data: prof } = await activeDb.from('profiles').select('full_name, mobile').or(`share_id.eq.${uplineId},referral_code.eq.${uplineId}`).limit(1).maybeSingle();
+            if (prof && prof.mobile) {
+              const mob = String(prof.mobile).replace(/\D/g, '').slice(-10);
+              if (mob.length === 10) {
+                currentAdvisorData = {
+                  name: prof.full_name || 'अधिकृत विक्रेता',
+                  phone: '91' + mob,
+                  display: mob,
+                  isPersonalized: true
+                };
+                updateDrawerAdvisorLabel();
+                return currentAdvisorData;
+              }
+            }
+          }
         }
       }
 
-      if (!uplineId && !uplineMobile) {
-        const lastSp = localStorage.getItem('aim_last_sponsor_id');
-        if (lastSp && lastSp !== 'AI000004') uplineId = lastSp.toUpperCase();
+      // 2. NO URL Referral -> Dynamic Check for Active Logged-in User
+      let currentUser = null;
+      if (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function') {
+        currentUser = window.V1_SESSION.getCurrentUser();
+      }
+      if (!currentUser) {
+        try { currentUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}'); } catch(e) {}
       }
 
-      // If upline mobile is directly known (10-digit)
-      if (uplineMobile && uplineMobile.length === 10 && uplineMobile !== '7974422572') {
-        const cachedName = localStorage.getItem('aim_ns_sponsor_name') || 'अधिकृत बिज़नेस पार्टनर';
-        currentAdvisorData = {
-          name: cachedName,
-          phone: '91' + uplineMobile,
-          display: uplineMobile,
-          isPersonalized: true
-        };
-        updateDrawerAdvisorLabel();
-        return currentAdvisorData;
-      }
+      const currentMobile = currentUser && currentUser.mobile ? String(currentUser.mobile).replace(/\D/g, '').slice(-10) : '';
 
-      // If no valid ID or default master ID
-      if (!uplineId || uplineId === 'AI000004') {
+      if (currentMobile && currentMobile.length === 10) {
+        const userCacheKey = 'aim_upline_for_user_' + currentMobile;
+        const cached = localStorage.getItem(userCacheKey);
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (parsed && parsed.phone) {
+              currentAdvisorData = {
+                name: parsed.name || 'अधिकृत विक्रेता',
+                phone: parsed.phone,
+                display: parsed.phone.slice(-10),
+                isPersonalized: parsed.isPersonalized !== false
+              };
+              updateDrawerAdvisorLabel();
+              return currentAdvisorData;
+            }
+          } catch(e) {}
+        }
+
+        const db = window.supabaseClient || window.db || null;
+        let sponsorProf = null;
+
+        if (db) {
+          const { data: myProf } = await db.from('profiles')
+            .select('id, full_name, mobile, referral_code, referral_mobile, referred_by')
+            .eq('mobile', currentMobile)
+            .limit(1)
+            .maybeSingle();
+
+          if (myProf) {
+            if (myProf.referred_by) {
+              const { data: upProf } = await db.from('profiles').select('id, full_name, mobile').eq('id', myProf.referred_by).limit(1).maybeSingle();
+              if (upProf && upProf.mobile) sponsorProf = upProf;
+            }
+            if (!sponsorProf && myProf.referral_code && myProf.referral_code.toUpperCase() !== 'AI000004') {
+              const { data: upProf } = await db.from('profiles').select('id, full_name, mobile').or(`share_id.eq.${myProf.referral_code},referral_code.eq.${myProf.referral_code}`).limit(1).maybeSingle();
+              if (upProf && upProf.mobile) sponsorProf = upProf;
+            }
+            if (!sponsorProf && myProf.referral_mobile) {
+              const cleanRefMob = String(myProf.referral_mobile).replace(/\D/g, '').slice(-10);
+              if (cleanRefMob.length === 10 && cleanRefMob !== '7974422572') {
+                const { data: upProf } = await db.from('profiles').select('id, full_name, mobile').eq('mobile', cleanRefMob).limit(1).maybeSingle();
+                if (upProf && upProf.mobile) sponsorProf = upProf;
+                else sponsorProf = { full_name: 'अधिकृत विक्रेता', mobile: cleanRefMob };
+              }
+            }
+          }
+        } else {
+          // Direct REST fetch fallback
+          const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+          const myRes = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?mobile=eq.${encodeURIComponent(currentMobile)}&select=id,referral_code,referral_mobile,referred_by&limit=1`, {
+            headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+          });
+          if (myRes.ok) {
+            const myRows = await myRes.json();
+            const myProf = myRows && myRows[0];
+            if (myProf) {
+              if (myProf.referred_by) {
+                const upRes = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?id=eq.${encodeURIComponent(myProf.referred_by)}&select=full_name,mobile&limit=1`, {
+                  headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+                });
+                if (upRes.ok) {
+                  const upRows = await upRes.json();
+                  if (upRows && upRows[0] && upRows[0].mobile) sponsorProf = upRows[0];
+                }
+              }
+              if (!sponsorProf && myProf.referral_code && myProf.referral_code.toUpperCase() !== 'AI000004') {
+                const upRes = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(share_id.eq.${encodeURIComponent(myProf.referral_code)},referral_code.eq.${encodeURIComponent(myProf.referral_code)})&select=full_name,mobile&limit=1`, {
+                  headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+                });
+                if (upRes.ok) {
+                  const upRows = await upRes.json();
+                  if (upRows && upRows[0] && upRows[0].mobile) sponsorProf = upRows[0];
+                }
+              }
+            }
+          }
+        }
+
+        if (sponsorProf && sponsorProf.mobile) {
+          const mob = String(sponsorProf.mobile).replace(/\D/g, '').slice(-10);
+          if (mob.length === 10 && mob !== '7974422572') {
+            currentAdvisorData = {
+              name: sponsorProf.full_name || 'अधिकृत विक्रेता',
+              phone: '91' + mob,
+              display: mob,
+              isPersonalized: true
+            };
+            try {
+              localStorage.setItem(userCacheKey, JSON.stringify({
+                name: currentAdvisorData.name,
+                phone: currentAdvisorData.phone,
+                isPersonalized: true
+              }));
+            } catch(e) {}
+            updateDrawerAdvisorLabel();
+            return currentAdvisorData;
+          }
+        }
+
+        // Direct user with no upline in DB
         currentAdvisorData = {
           name: 'आरोग्यम मुख्य सलाहकार',
           phone: '917974422572',
           display: '7974422572',
           isPersonalized: false
         };
+        try {
+          localStorage.setItem(userCacheKey, JSON.stringify({
+            name: currentAdvisorData.name,
+            phone: currentAdvisorData.phone,
+            isPersonalized: false
+          }));
+        } catch(e) {}
         updateDrawerAdvisorLabel();
         return currentAdvisorData;
       }
 
-      // Check cache in localStorage
-      const cached = localStorage.getItem('aim_sharer_prof_' + uplineId);
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          const data = parsed.data || parsed;
-          if (data && data.mobile) {
-            const mob = String(data.mobile).replace(/\D/g, '').slice(-10);
-            if (mob.length === 10) {
-              currentAdvisorData = {
-                name: data.full_name || 'आरोग्यम सलाहकार',
-                phone: '91' + mob,
-                display: mob,
-                isPersonalized: true
-              };
-              updateDrawerAdvisorLabel();
-              return currentAdvisorData;
-            }
-          }
-        } catch(e) {}
-      }
-
-      // Supabase lookup: try SDK first, then direct REST API fetch
-      const activeDb = window.supabaseClient || window.db || (window.supabase && typeof window.supabase.createClient === 'function' ? window.supabase.createClient('https://qjhjrzsnrtahmhswxyvb.supabase.co', 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU') : null);
-      if (activeDb) {
-        const { data: prof } = await activeDb.from('profiles').select('full_name, mobile').or(`share_id.eq.${uplineId},referral_code.eq.${uplineId}`).limit(1).maybeSingle();
-        if (prof && prof.mobile) {
-          const mob = String(prof.mobile).replace(/\D/g, '').slice(-10);
-          if (mob.length === 10) {
-            currentAdvisorData = {
-              name: prof.full_name || 'आरोग्यम सलाहकार',
-              phone: '91' + mob,
-              display: mob,
-              isPersonalized: true
-            };
-            try {
-              localStorage.setItem('aim_sharer_prof_' + uplineId, JSON.stringify({ data: prof, _ts: Date.now() }));
-              localStorage.setItem('aarogyam_upline_phone', mob);
-              localStorage.setItem('aim_ns_sponsor_phone', '91' + mob);
-              localStorage.setItem('aim_ns_sponsor_name', currentAdvisorData.name);
-            } catch(e) {}
-            updateDrawerAdvisorLabel();
-            return currentAdvisorData;
-          }
-        }
-      } else {
-        // Direct REST fetch fallback
-        const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
-        const res = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(share_id.eq.${encodeURIComponent(uplineId)},referral_code.eq.${encodeURIComponent(uplineId)})&select=full_name,mobile&limit=1`, {
-          headers: {
-            'apikey': sbKey,
-            'Authorization': 'Bearer ' + sbKey
-          }
-        });
-        if (res.ok) {
-          const rows = await res.json();
-          if (rows && rows[0] && rows[0].mobile) {
-            const prof = rows[0];
-            const mob = String(prof.mobile).replace(/\D/g, '').slice(-10);
-            if (mob.length === 10) {
-              currentAdvisorData = {
-                name: prof.full_name || 'आरोग्यम सलाहकार',
-                phone: '91' + mob,
-                display: mob,
-                isPersonalized: true
-              };
-              try {
-                localStorage.setItem('aim_sharer_prof_' + uplineId, JSON.stringify({ data: prof, _ts: Date.now() }));
-                localStorage.setItem('aarogyam_upline_phone', mob);
-                localStorage.setItem('aim_ns_sponsor_phone', '91' + mob);
-                localStorage.setItem('aim_ns_sponsor_name', currentAdvisorData.name);
-              } catch(e) {}
-              updateDrawerAdvisorLabel();
-              return currentAdvisorData;
-            }
-          }
-        }
-      }
-    } catch(e) {}
+      // 3. Guest User -> Default Official Advisor
+      currentAdvisorData = {
+        name: 'आरोग्यम मुख्य सलाहकार',
+        phone: '917974422572',
+        display: '7974422572',
+        isPersonalized: false
+      };
+    } catch(e) {
+      console.warn('[WhatsAppOrder] Advisor resolution notice:', e);
+    }
 
     updateDrawerAdvisorLabel();
     return currentAdvisorData;

@@ -237,6 +237,14 @@
                     user.share_id = 'AI' + masterMobile.slice(-6);
                     try { localStorage.setItem(USER_KEY, JSON.stringify(user)); } catch(e) {}
                 }
+
+                // 6. Proactively clean legacy unkeyed stale sponsor keys so active user resolves their own upline
+                const legacySponsorName = localStorage.getItem('aim_ns_sponsor_name');
+                if (legacySponsorName && legacySponsorName.includes('Pavan Pandey')) {
+                    localStorage.removeItem('aim_ns_sponsor_name');
+                    localStorage.removeItem('aim_ns_sponsor_phone');
+                    localStorage.removeItem('aarogyam_upline_phone');
+                }
             }
         } catch (e) {
             console.warn("[V1_SESSION] Session reconciliation notice:", e);
@@ -299,6 +307,10 @@
         localStorage.removeItem('CURRENT_USER');
         localStorage.removeItem('wb_registered');
         localStorage.removeItem('AOI_REFERRER_ID');
+        localStorage.removeItem('aim_ns_sponsor_phone');
+        localStorage.removeItem('aim_ns_sponsor_name');
+        localStorage.removeItem('aarogyam_upline_phone');
+        localStorage.removeItem('aim_last_sponsor_id');
         try { sessionStorage.clear(); } catch(e) {}
         
         console.log("100% User session cleared. Reloading...");

@@ -55,25 +55,8 @@
 </head>
 <body class="ns-page-wrapper">
 
-  <!-- =========================================
-       DYNAMIC SPONSOR REFERRAL TOP BANNER
-  ========================================== -->
-  <div class="ns-sponsor-banner" id="nsSponsorBanner" style="display:none;">
-    <div class="ns-container" style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:10px;">
-      <div class="ns-sponsor-info">
-        <span class="ns-sponsor-badge">🤝 अधिकृत बिज़नेस पार्टनर</span>
-        <span>आपके मार्गदर्शक: <strong id="nsSponsorNameText" style="color:#fde047;">आरोग्यम इंडिया</strong></span>
-      </div>
-      <div class="ns-sponsor-actions">
-        <a href="tel:+917974422572" class="ns-btn-sponsor-call" id="nsSponsorCallBtn" title="कॉल करें">
-          <i class="fa-solid fa-phone"></i> <span>कॉल करें</span>
-        </a>
-        <a href="https://api.whatsapp.com/send?phone=917974422572" class="ns-btn-sponsor-wa" id="nsSponsorWaBtn" target="_blank" title="व्हाट्सएप परामर्श">
-          <i class="fa-brands fa-whatsapp"></i> <span>WhatsApp चैट</span>
-        </a>
-      </div>
-    </div>
-  </div>
+  <!-- TOP SPONSOR BANNER REMOVED (Consolidated to Bottom Sticky Bar as requested) -->
+  <div id="nsSponsorBanner" style="display:none !important;"></div>
 
   <!-- =========================================
        1. STICKY LIVE REAL-TIME SOCIAL PROOF TICKER
@@ -1094,17 +1077,21 @@
   </footer>
 
   <!-- =========================================
-       16. MOBILE STICKY BOTTOM ACTION BAR
+       16. MOBILE STICKY BOTTOM ACTION BAR (अधिकृत विक्रेता + Call & WhatsApp Icons)
   ========================================== -->
-  <div class="ns-mobile-bar">
-    <a href="tel:+917974422572" class="ns-mobile-btn-call" id="nsMobileCallBtn" title="प्रायोजक को कॉल करें">
-      <i class="fa-solid fa-phone"></i>
-      <span>प्रायोजक को कॉल</span>
-    </a>
-    <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87!%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20%E0%A4%A8%E0%A5%87%E0%A4%9F%E0%A4%B8%E0%A4%B0%E0%A5%8D%E0%A4%AB%20%E0%A4%95%E0%A5%87%20%E0%A4%AC%E0%A4%BE%E0%A4%B0%E0%A5%87%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%9C%E0%A4%BE%E0%A4%A8%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%80%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F" target="_blank" rel="noopener noreferrer" class="ns-mobile-btn-wa" id="nsMobileWaBtn" title="व्हाट्सएप पर चैट करें">
-      <i class="fa-brands fa-whatsapp"></i>
-      <span>व्हाट्सएप संदेश</span>
-    </a>
+  <div class="ns-mobile-bar" id="nsMobileBar">
+    <div class="ns-sticky-seller-info">
+      <span class="ns-sticky-seller-badge"><i class="fa-solid fa-circle-check"></i> अधिकृत विक्रेता</span>
+      <span class="ns-sticky-seller-name" id="nsStickySellerName">आरोग्यम इंडिया</span>
+    </div>
+    <div class="ns-sticky-seller-actions">
+      <a href="tel:+917974422572" class="ns-sticky-btn-call" id="nsMobileCallBtn" title="कॉल करें" aria-label="कॉल करें">
+        <i class="fa-solid fa-phone"></i>
+      </a>
+      <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87!%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20%E0%A4%A8%E0%A5%87%E0%A4%9F%E0%A4%B8%E0%A4%B0%E0%A5%8D%E0%A4%AB%20%E0%A4%95%E0%A5%87%20%E0%A4%AC%E0%A4%BE%E0%A4%B0%E0%A5%87%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%9C%E0%A4%BE%E0%A4%A8%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%80%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F" target="_blank" rel="noopener noreferrer" class="ns-sticky-btn-wa" id="nsMobileWaBtn" title="WhatsApp चैट" aria-label="WhatsApp चैट">
+        <i class="fa-brands fa-whatsapp"></i>
+      </a>
+    </div>
   </div>
 
   <!-- Core Scripts -->

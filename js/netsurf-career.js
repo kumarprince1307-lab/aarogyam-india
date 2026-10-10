@@ -112,92 +112,210 @@
     const rawRef = (params.get('ref') || params.get('share_id') || params.get('aff') || params.get('r') || params.get('upline') || params.get('sponsor_phone') || params.get('phone') || '').trim();
     const refName = params.get('sponsor') || params.get('name') || params.get('by');
 
+    // 1. Explicit referral from URL has top priority for visitors clicking links
     if (rawRef) {
-      try { 
-        localStorage.setItem('AOI_REFERRER_ID', rawRef);
-        const dig = rawRef.replace(/\D/g, '');
-        if (dig.length >= 10) {
-          localStorage.setItem('aarogyam_upline_phone', dig.slice(-10));
-          localStorage.setItem('aim_ns_sponsor_phone', '91' + dig.slice(-10));
-        } else {
-          localStorage.setItem('aim_last_sponsor_id', rawRef.toUpperCase());
-        }
-      } catch(e) {}
-    }
+      const cleanDigits = rawRef.replace(/\D/g, '').slice(-10);
+      if (cleanDigits.length === 10 && cleanDigits !== '7974422572') {
+        currentSponsor.phone = '91' + cleanDigits;
+        currentSponsor.name = refName ? decodeURIComponent(refName).trim() : 'अधिकृत विक्रेता';
+        currentSponsor.isPersonalized = true;
+        renderSponsorElements();
+        return;
+      }
 
-    let effectiveRef = rawRef;
-    if (!effectiveRef) {
-      effectiveRef = localStorage.getItem('AOI_REFERRER_ID') || 
-                     localStorage.getItem('aim_last_sponsor_id') || 
-                     localStorage.getItem('aarogyam_upline_phone') || 
-                     localStorage.getItem('aim_ns_sponsor_phone') || '';
-    }
+      if (rawRef.toUpperCase() === 'AI000004') {
+        currentSponsor.phone = DEFAULT_SUPPORT_PHONE;
+        currentSponsor.name = DEFAULT_SPONSOR_NAME;
+        currentSponsor.isPersonalized = false;
+        renderSponsorElements();
+        return;
+      }
 
-    const cleanDigits = effectiveRef.replace(/\D/g, '').slice(-10);
-
-    // Case A: 10-digit direct phone number
-    if (cleanDigits.length === 10 && cleanDigits !== '7974422572') {
-      currentSponsor.phone = '91' + cleanDigits;
-      currentSponsor.name = refName ? decodeURIComponent(refName).trim() : (localStorage.getItem('aim_ns_sponsor_name') || 'अधिकृत बिज़नेस पार्टनर');
-      currentSponsor.isPersonalized = true;
-      try {
-        localStorage.setItem('aim_ns_sponsor_phone', currentSponsor.phone);
-        localStorage.setItem('aim_ns_sponsor_name', currentSponsor.name);
-        localStorage.setItem('aarogyam_upline_phone', cleanDigits);
-      } catch (e) {}
-      renderSponsorElements();
+      await resolveSponsorFromDb(rawRef);
       return;
     }
 
-    // Case B: Master Aarogyam Share ID
-    if (effectiveRef.toUpperCase() === 'AI000004') {
+    // 2. NO URL Referral -> Dynamic Check for Active Logged-in User
+    let currentUser = null;
+    if (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function') {
+      currentUser = window.V1_SESSION.getCurrentUser();
+    }
+    if (!currentUser) {
+      try {
+        currentUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      } catch(e) {}
+    }
+
+    const currentMobile = currentUser && currentUser.mobile ? String(currentUser.mobile).replace(/\D/g, '').slice(-10) : '';
+
+    if (currentMobile && currentMobile.length === 10) {
+      // Resolve the actual upline assigned to THIS user in Supabase
+      await resolveUplineForUser(currentUser);
+      return;
+    }
+
+    // 3. Guest visitor without URL referral -> Default to Official Aarogyam India
+    currentSponsor.phone = DEFAULT_SUPPORT_PHONE;
+    currentSponsor.name = DEFAULT_SPONSOR_NAME;
+    currentSponsor.isPersonalized = false;
+    renderSponsorElements();
+  }
+
+  /**
+   * Resolves the actual upline sponsor for the logged-in user dynamically.
+   * Completely eliminates cross-ID contamination or stale browser cache.
+   */
+  async function resolveUplineForUser(user) {
+    try {
+      const userMobile = user && user.mobile ? String(user.mobile).replace(/\D/g, '').slice(-10) : '';
+      if (!userMobile || userMobile.length !== 10) {
+        currentSponsor.phone = DEFAULT_SUPPORT_PHONE;
+        currentSponsor.name = DEFAULT_SPONSOR_NAME;
+        currentSponsor.isPersonalized = false;
+        renderSponsorElements();
+        return;
+      }
+
+      // Check user-scoped cache to avoid repeated queries
+      const userCacheKey = 'aim_upline_for_user_' + userMobile;
+      const cached = localStorage.getItem(userCacheKey);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.phone) {
+            currentSponsor.phone = parsed.phone;
+            currentSponsor.name = parsed.name || 'अधिकृत विक्रेता';
+            currentSponsor.isPersonalized = parsed.isPersonalized !== false;
+            renderSponsorElements();
+            return;
+          }
+        } catch(e) {}
+      }
+
+      const db = (window.supabaseClient && typeof window.supabaseClient.from === 'function')
+        ? window.supabaseClient
+        : ((window.supabase && typeof window.supabase.from === 'function') ? window.supabase : null);
+
+      let sponsorProf = null;
+
+      if (db) {
+        const { data: myProf } = await db.from('profiles')
+          .select('id, full_name, mobile, referral_code, referral_mobile, referred_by')
+          .eq('mobile', userMobile)
+          .limit(1)
+          .maybeSingle();
+
+        if (myProf) {
+          // A. If referred_by (UUID of upline sponsor) exists
+          if (myProf.referred_by) {
+            const { data: upProf } = await db.from('profiles')
+              .select('id, full_name, mobile')
+              .eq('id', myProf.referred_by)
+              .limit(1)
+              .maybeSingle();
+            if (upProf && upProf.mobile) sponsorProf = upProf;
+          }
+
+          // B. If referral_code (share_id of upline sponsor) exists
+          if (!sponsorProf && myProf.referral_code && myProf.referral_code.toUpperCase() !== 'AI000004') {
+            const { data: upProf } = await db.from('profiles')
+              .select('id, full_name, mobile')
+              .or(`share_id.eq.${myProf.referral_code},referral_code.eq.${myProf.referral_code}`)
+              .limit(1)
+              .maybeSingle();
+            if (upProf && upProf.mobile) sponsorProf = upProf;
+          }
+
+          // C. If referral_mobile exists
+          if (!sponsorProf && myProf.referral_mobile) {
+            const cleanRefMob = String(myProf.referral_mobile).replace(/\D/g, '').slice(-10);
+            if (cleanRefMob.length === 10 && cleanRefMob !== '7974422572') {
+              const { data: upProf } = await db.from('profiles')
+                .select('id, full_name, mobile')
+                .eq('mobile', cleanRefMob)
+                .limit(1)
+                .maybeSingle();
+              if (upProf && upProf.mobile) sponsorProf = upProf;
+              else sponsorProf = { full_name: 'अधिकृत विक्रेता', mobile: cleanRefMob };
+            }
+          }
+        }
+      } else {
+        // Direct REST fetch fallback
+        const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+        const myRes = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?mobile=eq.${encodeURIComponent(userMobile)}&select=id,referral_code,referral_mobile,referred_by&limit=1`, {
+          headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+        });
+        if (myRes.ok) {
+          const myRows = await myRes.json();
+          const myProf = myRows && myRows[0];
+          if (myProf) {
+            if (myProf.referred_by) {
+              const upRes = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?id=eq.${encodeURIComponent(myProf.referred_by)}&select=full_name,mobile&limit=1`, {
+                headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+              });
+              if (upRes.ok) {
+                const upRows = await upRes.json();
+                if (upRows && upRows[0] && upRows[0].mobile) sponsorProf = upRows[0];
+              }
+            }
+            if (!sponsorProf && myProf.referral_code && myProf.referral_code.toUpperCase() !== 'AI000004') {
+              const upRes = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(share_id.eq.${encodeURIComponent(myProf.referral_code)},referral_code.eq.${encodeURIComponent(myProf.referral_code)})&select=full_name,mobile&limit=1`, {
+                headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+              });
+              if (upRes.ok) {
+                const upRows = await upRes.json();
+                if (upRows && upRows[0] && upRows[0].mobile) sponsorProf = upRows[0];
+              }
+            }
+          }
+        }
+      }
+
+      if (sponsorProf && sponsorProf.mobile) {
+        const cleanMob = String(sponsorProf.mobile).replace(/\D/g, '').slice(-10);
+        if (cleanMob.length === 10 && cleanMob !== '7974422572') {
+          currentSponsor.phone = '91' + cleanMob;
+          currentSponsor.name = sponsorProf.full_name || 'अधिकृत विक्रेता';
+          currentSponsor.isPersonalized = true;
+
+          try {
+            localStorage.setItem(userCacheKey, JSON.stringify({
+              name: currentSponsor.name,
+              phone: currentSponsor.phone,
+              isPersonalized: true
+            }));
+          } catch(e) {}
+
+          renderSponsorElements();
+          return;
+        }
+      }
+
+      // If user has no upline in DB, default to official Aarogyam India
+      currentSponsor.phone = DEFAULT_SUPPORT_PHONE;
+      currentSponsor.name = DEFAULT_SPONSOR_NAME;
+      currentSponsor.isPersonalized = false;
+      try {
+        localStorage.setItem(userCacheKey, JSON.stringify({
+          name: DEFAULT_SPONSOR_NAME,
+          phone: DEFAULT_SUPPORT_PHONE,
+          isPersonalized: false
+        }));
+      } catch(e) {}
+      renderSponsorElements();
+
+    } catch(err) {
+      console.warn('[Netsurf] resolveUplineForUser notice:', err);
       currentSponsor.phone = DEFAULT_SUPPORT_PHONE;
       currentSponsor.name = DEFAULT_SPONSOR_NAME;
       currentSponsor.isPersonalized = false;
       renderSponsorElements();
-      return;
-    }
-
-    // Case C: Check localStorage cached sponsor
-    const savedPhone = (localStorage.getItem('aim_ns_sponsor_phone') || localStorage.getItem('aarogyam_upline_phone') || '').replace(/\D/g, '').slice(-10);
-    const savedName = localStorage.getItem('aim_ns_sponsor_name');
-    if (savedPhone && savedPhone.length === 10 && savedPhone !== '7974422572') {
-      currentSponsor.phone = '91' + savedPhone;
-      currentSponsor.name = savedName || 'अधिकृत बिज़नेस पार्टनर';
-      currentSponsor.isPersonalized = true;
-      renderSponsorElements();
-    } else {
-      renderSponsorElements();
-    }
-
-    // Case D: Asynchronous resolution for Share IDs (e.g., AI100002, alphanumeric) via Supabase
-    if (effectiveRef && effectiveRef.toUpperCase() !== 'AI000004' && cleanDigits.length !== 10) {
-      resolveSponsorFromDb(effectiveRef);
     }
   }
 
   async function resolveSponsorFromDb(shareId) {
     try {
-      // 1. Check local cache first
-      const cached = localStorage.getItem('aim_sharer_prof_' + shareId);
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          const data = parsed.data || parsed;
-          if (data && data.mobile) {
-            const cleanMob = String(data.mobile).replace(/\D/g, '').slice(-10);
-            if (cleanMob.length === 10) {
-              currentSponsor.phone = '91' + cleanMob;
-              currentSponsor.name = data.full_name || 'अधिकृत बिज़नेस पार्टनर';
-              currentSponsor.isPersonalized = true;
-              renderSponsorElements();
-              return;
-            }
-          }
-        } catch(e) {}
-      }
-
-      // 2. Query Supabase
       const db = (window.supabaseClient && typeof window.supabaseClient.from === 'function')
         ? window.supabaseClient
         : ((window.supabase && typeof window.supabase.from === 'function') ? window.supabase : null);
@@ -214,22 +332,13 @@
           const cleanMob = prof.mobile.replace(/\D/g, '').slice(-10);
           if (cleanMob.length === 10) {
             currentSponsor.phone = '91' + cleanMob;
-            currentSponsor.name = prof.full_name || 'अधिकृत बिज़नेस पार्टनर';
+            currentSponsor.name = prof.full_name || 'अधिकृत विक्रेता';
             currentSponsor.isPersonalized = true;
-
-            try {
-              localStorage.setItem('aim_ns_sponsor_phone', currentSponsor.phone);
-              localStorage.setItem('aim_ns_sponsor_name', currentSponsor.name);
-              localStorage.setItem('aarogyam_upline_phone', cleanMob);
-              localStorage.setItem('aim_sharer_prof_' + shareId, JSON.stringify({ data: prof, _ts: Date.now() }));
-            } catch (e) {}
-
             renderSponsorElements();
             return;
           }
         }
       } else {
-        // Direct REST fetch fallback
         const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
         const res = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(share_id.eq.${encodeURIComponent(shareId)},referral_code.eq.${encodeURIComponent(shareId)})&select=full_name,mobile&limit=1`, {
           headers: {
@@ -244,16 +353,8 @@
             const cleanMob = String(prof.mobile).replace(/\D/g, '').slice(-10);
             if (cleanMob.length === 10) {
               currentSponsor.phone = '91' + cleanMob;
-              currentSponsor.name = prof.full_name || 'अधिकृत बिज़नेस पार्टनर';
+              currentSponsor.name = prof.full_name || 'अधिकृत विक्रेता';
               currentSponsor.isPersonalized = true;
-
-              try {
-                localStorage.setItem('aim_ns_sponsor_phone', currentSponsor.phone);
-                localStorage.setItem('aim_ns_sponsor_name', currentSponsor.name);
-                localStorage.setItem('aarogyam_upline_phone', cleanMob);
-                localStorage.setItem('aim_sharer_prof_' + shareId, JSON.stringify({ data: prof, _ts: Date.now() }));
-              } catch (e) {}
-
               renderSponsorElements();
               return;
             }
@@ -268,12 +369,14 @@
   function renderSponsorElements() {
     const banner = document.getElementById('nsSponsorBanner');
     const nameEl = document.getElementById('nsSponsorNameText');
+    const stickySellerName = document.getElementById('nsStickySellerName');
     const callBtn = document.getElementById('nsSponsorCallBtn');
     const waBtn = document.getElementById('nsSponsorWaBtn');
     const mobileCallBtn = document.getElementById('nsMobileCallBtn');
     const mobileWaBtn = document.getElementById('nsMobileWaBtn');
 
     if (nameEl) nameEl.textContent = currentSponsor.name;
+    if (stickySellerName) stickySellerName.textContent = currentSponsor.name;
 
     const telLink = 'tel:+' + currentSponsor.phone;
     const waText = encodeURIComponent(`नमस्ते ${currentSponsor.name} जी! मैंने आपका नेटसर्फ डायरेक्ट सेलिंग करियर पेज देखा। मुझे इस बिज़नेस मॉडल और ₹8,19,250 क्लोजिंग प्लान की पूरी जानकारी चाहिए।`);
@@ -285,25 +388,18 @@
     if (mobileCallBtn) {
       mobileCallBtn.href = telLink;
       mobileCallBtn.title = 'कॉल करें: ' + currentSponsor.name;
-      const callSpan = mobileCallBtn.querySelector('span');
-      if (callSpan) {
-        callSpan.textContent = currentSponsor.isPersonalized ? 'अपलाइन को कॉल' : 'प्रायोजक को कॉल';
-      }
     }
 
     if (mobileWaBtn) {
       mobileWaBtn.href = waLink;
       mobileWaBtn.target = '_blank';
       mobileWaBtn.rel = 'noopener noreferrer';
-      mobileWaBtn.title = 'व्हाट्सएप चैट: ' + currentSponsor.name;
-      const waSpan = mobileWaBtn.querySelector('span');
-      if (waSpan) {
-        waSpan.textContent = currentSponsor.isPersonalized ? 'अपलाइन व्हाट्सएप' : 'व्हाट्सएप संदेश';
-      }
+      mobileWaBtn.title = 'WhatsApp चैट: ' + currentSponsor.name;
     }
 
-    if (banner && currentSponsor.isPersonalized) {
-      banner.style.display = 'flex';
+    // Top banner is explicitly hidden per user requirement
+    if (banner) {
+      banner.style.display = 'none';
     }
 
     // Synchronize all on-page product card WhatsApp links with current sponsor
