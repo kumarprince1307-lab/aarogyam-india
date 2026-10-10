@@ -694,6 +694,7 @@
       const mrp = Number(activeProd.mrp || activeProd.price || p.mrp || p.price || 0);
       const discount = Number(activeProd.discount_pct !== undefined ? activeProd.discount_pct : (p.discount_pct || 0));
       const offerPrice = (mrp > 0 && discount > 0) ? Math.round(mrp * (1 - discount / 100)) : (Number(activeProd.price || p.price) || mrp);
+      const packSize = activeProd.pack_size || p.pack_size || '';
       const badge = activeProd.badge || activeProd.category_label || p.badge || (isPashu ? 'आयुर्वेदिक पशु पोषण' : 'प्रमाणित हर्बल किट');
       const desc = activeProd.description || activeProd.dose || p.description || p.dose || '';
       const rawImg = resolveAssetSrc(activeProd, 'image', '') || resolveAssetSrc(p, 'image', '');
@@ -704,7 +705,10 @@
           <div>
             ${hasRealImg ? `<div class="cms-product-img-wrap"><img src="${escapeHtml(rawImg)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : ''}
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap; gap:4px;">
-              <span style="background:#fef08a; color:#854d0e; font-weight:800; font-size:0.7rem; padding:2px 8px; border-radius:8px; white-space:nowrap;">${escapeHtml(badge)}</span>
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <span style="background:#fef08a; color:#854d0e; font-weight:800; font-size:0.7rem; padding:2px 8px; border-radius:8px; white-space:nowrap;">${escapeHtml(badge)}</span>
+                ${packSize ? `<span style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:0.68rem; padding:2px 7px; border-radius:8px; border:1px solid #bae6fd;">📦 ${escapeHtml(packSize)}</span>` : ''}
+              </div>
               <div style="text-align:right;">
                 <span style="font-size:1.05rem; font-weight:900; color:${primaryColor};">&#x20B9;${offerPrice || mrp}</span>
                 ${discount > 0 ? `<span style="font-size:0.72rem; text-decoration:line-through; color:#94a3b8; margin-left:4px;">&#x20B9;${mrp}</span>` : ''}

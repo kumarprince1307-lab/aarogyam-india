@@ -659,7 +659,10 @@
               <span class="ns-product-badge" style="background:#dcfce7;color:#15803d;font-size:0.72rem;padding:3px 8px;border-radius:12px;font-weight:700;">
                 ${p.category_label || p.category}
               </span>
-              ${p.subcategory_label ? `<span style="font-size:0.7rem;background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:10px;font-weight:600;">${p.subcategory_label}</span>` : ''}
+              <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+                ${p.pack_size ? `<span style="font-size:0.7rem;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-weight:700;border:1px solid #bae6fd;">📦 ${p.pack_size}</span>` : ''}
+                ${p.subcategory_label ? `<span style="font-size:0.7rem;background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:10px;font-weight:600;">${p.subcategory_label}</span>` : ''}
+              </div>
             </div>
             <h3 class="ns-product-title" style="font-size:1.1rem;font-weight:800;color:#0f172a;margin:2px 0 6px 0;line-height:1.35;">${p.name}</h3>
             

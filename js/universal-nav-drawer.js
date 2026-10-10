@@ -621,6 +621,10 @@
                 <div class="drawer-item-left"><i class="fa-solid fa-briefcase" style="color:#059669;"></i><span>💼 NetSurf Career (डायरेक्ट सेलिंग)</span></div>
                 <span class="drawer-cat-badge" style="background:#dcfce7;color:#15803d;">करियर 4.0</span>
               </a>
+              <a href="/categories/netsurf-products.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><i class="fa-solid fa-boxes-stacked" style="color:#10b981;"></i><span>🌟 All Netsurf Products (उत्पाद कैटलॉग)</span></div>
+                <span class="drawer-cat-badge" style="background:#dbeafe;color:#1e40af;">39+ उत्पाद</span>
+              </a>
               <a href="/categories/health.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><i class="fa-solid fa-heart-pulse" style="color:#ec4899;"></i><span>❤️ Health & Wellness (स्वास्थ्य केंद्र)</span></div>
               </a>

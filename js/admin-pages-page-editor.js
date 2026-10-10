@@ -4262,6 +4262,20 @@ export async function initPageEditor() {
   let mpmSearchQuery = '';
   let mpmExpandedIdx = null;
 
+  const AVAILABLE_PROBLEM_TAGS = [
+    { id: 'diabetes', label: '🩸 डायबिटीज / शुगर' },
+    { id: 'joint_pain', label: '🦴 जोड़ों का दर्द / गठिया' },
+    { id: 'weight_loss', label: '⚖️ मोटापा व वजन नियंत्रण' },
+    { id: 'hair_care', label: '💇 हेयर फॉल व डैंड्रफ' },
+    { id: 'skin_care', label: '✨ स्किन ग्लो व पिंपल्स' },
+    { id: 'womens_care', label: '🌸 महिला स्वास्थ्य' },
+    { id: 'kids_care', label: '👶 बच्चों का विकास' },
+    { id: 'vitality_wellness', label: '⚡ पौरुष शक्ति व स्टैमिना' },
+    { id: 'cattle_care', label: '🐄 पशु पोषण (दूध व फैट)' },
+    { id: 'crop_yield', label: '🌾 फसल पैदावार व कीट नियंत्रण' },
+    { id: 'home_care', label: '🏡 इको-फ्रेंडली होम केयर' }
+  ];
+
   async function fetchMasterProductsData() {
     try {
       // 1. Try local storage cache
@@ -4438,6 +4452,7 @@ export async function initPageEditor() {
                   <span>MRP: <strong style="color: #cbd5e1;">₹${mrp}</strong></span>
                   <span>छूट: <strong style="color: #f87171;">${discountPct}%</strong></span>
                   <span>ऑफर रेट: <strong style="color: #34d399; font-size: 0.85rem;">₹${offerPrice}</strong></span>
+                  ${p.pack_size ? `<span style="background: rgba(2,132,199,0.25); color: #38bdf8; padding: 1px 7px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(56,189,248,0.3);">📦 ${escapeHtml(p.pack_size)}</span>` : ''}
                 </div>
               </div>
             </div>
@@ -4491,6 +4506,43 @@ export async function initPageEditor() {
                 <div>
                   <label class="admin-label" style="font-size: 0.78rem;">हाईलाइट बैज (Badge Text)</label>
                   <input type="text" value="${escapeHtml(p.badge || '')}" oninput="window.updateMpmProductField(${idx}, 'badge', this.value)" class="admin-input" placeholder="उदा. 🌱 100% जैविक, Best Seller" style="width: 100%;" />
+                </div>
+              </div>
+
+              <!-- Row 1.5: Pack Size & Health Concern Tags -->
+              <div style="background: rgba(15,23,42,0.85); border: 1.5px solid #1e293b; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label class="admin-label" style="font-size: 0.78rem; margin: 0; color: #38bdf8; font-weight: 800;">📦 पैकिंग / मात्रा (Pack Size & Quantity)*</label>
+                    <span style="font-size: 0.7rem; color: #94a3b8;">क्विक पिल दबाएं या सीधा टाइप करें</span>
+                  </div>
+                  <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <input type="text" id="mpm_pack_size_${idx}" value="${escapeHtml(p.pack_size || '')}" oninput="window.updateMpmProductField(${idx}, 'pack_size', this.value)" class="admin-input" placeholder="उदा. 250 ml, 500 gm, 1 kg, 30 कैप्सूल" style="flex: 1; min-width: 180px; font-weight: 700; color: #38bdf8;" />
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                      ${['100 ml', '250 ml', '500 ml', '1 Ltr', '20 gm', '100 gm', '200 gm', '400 gm', '500 gm', '1 kg', '30 कैप्सूल', '60 गोलियां', '1 पीस'].map(q => `
+                        <button type="button" onclick="window.setMpmProductPackSize(${idx}, '${q}')" class="admin-button small-button" style="padding: 3px 8px; font-size: 0.72rem; background: ${p.pack_size === q ? '#0284c7' : '#1e293b'}; color: ${p.pack_size === q ? '#fff' : '#cbd5e1'}; border: 1px solid ${p.pack_size === q ? '#38bdf8' : '#334155'}; font-weight: 700;">
+                          ${q}
+                        </button>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label class="admin-label" style="font-size: 0.78rem; margin: 0; color: #f59e0b; font-weight: 800;">🩺 संबंधित बीमारी / समस्या फ़िल्टर (Problem / Health Concern Tags)*</label>
+                    <span style="font-size: 0.7rem; color: #94a3b8;">क्लिक करके चुनें (एक या अधिक)</span>
+                  </div>
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    ${AVAILABLE_PROBLEM_TAGS.map(t => {
+                      const isChecked = Array.isArray(p.problem_tags) && p.problem_tags.includes(t.id);
+                      return `
+                        <button type="button" onclick="window.toggleMpmProductTag(${idx}, '${t.id}')" style="cursor: pointer; padding: 4px 10px; border-radius: 14px; font-size: 0.72rem; font-weight: 700; border: 1.5px solid ${isChecked ? '#f59e0b' : '#334155'}; background: ${isChecked ? 'rgba(245,158,11,0.25)' : '#070d19'}; color: ${isChecked ? '#fbbf24' : '#94a3b8'}; transition: all 0.15s ease;">
+                          ${isChecked ? '✓ ' : '+ '}${t.label}
+                        </button>
+                      `;
+                    }).join('')}
+                  </div>
                 </div>
               </div>
 
@@ -4576,6 +4628,29 @@ export async function initPageEditor() {
       if (field === 'image') {
         delete masterProducts[idx].image_preview;
       }
+    }
+  window.setMpmProductPackSize = function(idx, val) {
+    if (masterProducts[idx]) {
+      masterProducts[idx].pack_size = val;
+      const input = document.getElementById(`mpm_pack_size_${idx}`);
+      if (input) input.value = val;
+      renderMasterProductsList();
+    }
+  };
+
+  window.toggleMpmProductTag = function(idx, tag) {
+    if (masterProducts[idx]) {
+      if (!Array.isArray(masterProducts[idx].problem_tags)) {
+        masterProducts[idx].problem_tags = [];
+      }
+      const tags = masterProducts[idx].problem_tags;
+      const pos = tags.indexOf(tag);
+      if (pos >= 0) {
+        tags.splice(pos, 1);
+      } else {
+        tags.push(tag);
+      }
+      renderMasterProductsList();
     }
   };
 
@@ -4746,7 +4821,7 @@ export async function initPageEditor() {
     });
 
     const masterPayload = {
-      version: "2026.2",
+      version: "2026.3",
       updated_at: new Date().toISOString(),
       total_products: cleanProducts.length,
       categories: masterCategories,
@@ -4760,7 +4835,28 @@ export async function initPageEditor() {
       console.warn('LocalStorage quota warning for master products:', e);
     }
 
-    // 1. Try local disk write via port 5505 (if localhost)
+    // 1. Triple-Sync Step A: Dedicated PHP File Writer API (Direct Server Disk Write + Git Push)
+    let phpSaved = false;
+    try {
+      const phpRes = await fetch('/api/save_netsurf_products.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_netsurf_products',
+          products: cleanProducts,
+          categories: masterCategories
+        })
+      });
+      const phpData = await phpRes.json().catch(() => ({}));
+      if (phpRes.ok && phpData.success) {
+        phpSaved = true;
+        console.log('[Master Products] PHP API saved successfully:', phpData);
+      }
+    } catch (e) {
+      console.warn('[Master Products] PHP save attempt error:', e);
+    }
+
+    // 2. Triple-Sync Step B: Try local disk write via port 5505 (if localhost / 127.0.0.1)
     let localOk = false;
     if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
       try {
@@ -4778,7 +4874,7 @@ export async function initPageEditor() {
       } catch (e) {}
     }
 
-    // 2. Push pending product images to GitHub + local disk
+    // 3. Push pending product images to GitHub + local disk
     const pendingImgPushes = [];
     try {
       const offStore = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
@@ -4788,7 +4884,6 @@ export async function initPageEditor() {
         const cleanPath = imgPath.replace(/^\//, '');
         const dataUrl = offStore['/' + cleanPath] || offStore[cleanPath] || prod.image_preview;
         if (dataUrl && dataUrl.startsWith('data:')) {
-          // Convert dataURL to base64 (strip prefix)
           const base64 = dataUrl.split(',')[1];
           if (base64) pendingImgPushes.push({ path: cleanPath, base64 });
         }
@@ -4798,7 +4893,6 @@ export async function initPageEditor() {
     // Push images to local disk (port 5505) and GitHub
     let imgsPushed = 0;
     for (const { path, base64 } of pendingImgPushes) {
-      // Local disk
       if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
         try {
           await fetch('http://127.0.0.1:5505', {
@@ -4808,7 +4902,6 @@ export async function initPageEditor() {
           });
         } catch (e) {}
       }
-      // GitHub
       try {
         await syncAssetToGitHub(path, base64);
         imgsPushed++;
@@ -4819,19 +4912,59 @@ export async function initPageEditor() {
       showToast(`📸 ${imgsPushed} उत्पाद फोटो Git पर अपलोड हो गई!`, 'info');
     }
 
-    // 3. Push JSON to GitHub
+    // 4. Triple-Sync Step C: GitHub Serverless Contents API
+    let gitOk = false;
     try {
       const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
       const syncRes = await syncAssetToGitHub('data/netsurf-products-master.json', base64Data);
-      if (syncRes.success) {
-        showToast(`✅ ${masterProducts.length} उत्पाद व कैटेगरी Git पर सफलतापूर्वक पुश हो गए!`, 'success');
-      } else if (localOk) {
-        showToast(`✅ ${masterProducts.length} उत्पाद लोकल डिस्क पर सुरक्षित हो गए!`, 'success');
-      } else {
-        showToast(`✅ ${masterProducts.length} उत्पाद स्थानीय मेमोरी (LocalStorage) में सुरक्षित हो गए!`, 'success');
-      }
+      if (syncRes.success) gitOk = true;
     } catch (err) {
-      showToast(`✅ ${masterProducts.length} उत्पाद सुरक्षित हो गए!`, 'success');
+      console.warn('[Master Products] GitHub sync warning:', err);
+    }
+
+    // 5. Cross-Page Dynamic Synchronization: Keep sitePages config products aligned with Master
+    try {
+      let pagesModified = false;
+      if (Array.isArray(allPages) && allPages.length > 0) {
+        allPages.forEach(page => {
+          if (Array.isArray(page.products) && page.products.length > 0) {
+            page.products.forEach(p => {
+              const match = cleanProducts.find(m =>
+                (m.id && p.id && String(m.id).toLowerCase() === String(p.id).toLowerCase()) ||
+                (m.name && p.name && m.name.trim().toLowerCase() === p.name.trim().toLowerCase()) ||
+                (m.name && p.title && m.name.trim().toLowerCase() === p.title.trim().toLowerCase())
+              );
+              if (match) {
+                p.id = match.id;
+                p.name = match.name;
+                p.mrp = match.mrp;
+                p.price = match.discounted_price || match.price || match.mrp;
+                p.pack_size = match.pack_size || p.pack_size || '';
+                p.discount_pct = match.discount_pct;
+                p.badge = match.badge || p.badge;
+                p.description = match.description || p.description;
+                if (match.image && !match.image.includes('logo.png')) p.image = match.image;
+                pagesModified = true;
+              }
+            });
+          }
+        });
+      }
+      if (pagesModified) {
+        fetch('/api/save_site_pages.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save_site_pages', sitePages: allPages })
+        }).catch(() => null);
+      }
+    } catch (e) {}
+
+    if (phpSaved || gitOk) {
+      showToast(`✅ ${masterProducts.length} उत्पाद व कैटेगरी सर्वर और Git पर सफलतापूर्वक लाइव हो गए!`, 'success');
+    } else if (localOk) {
+      showToast(`✅ ${masterProducts.length} उत्पाद लोकल डिस्क पर सुरक्षित हो गए!`, 'success');
+    } else {
+      showToast(`✅ ${masterProducts.length} उत्पाद स्थानीय मेमोरी (LocalStorage) में सुरक्षित हो गए!`, 'success');
     }
 
     syncMpmWithPresetDropdown();
