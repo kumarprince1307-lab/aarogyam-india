@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:25:14.655Z",
+  "updated_at": "2026-10-10T09:25:48.038Z",
   "total_products": 39,
   "categories": [
     {
@@ -437,8 +437,8 @@
       "category_label": "कृषि बायोफिट",
       "badge": "💧 100% सिलिकॉन स्प्रेडर",
       "mrp": 299,
-      "discount_pct": 25,
-      "discounted_price": 224,
+      "discount_pct": 0,
+      "discounted_price": 299,
       "dose": "5ml प्रति 15 लीटर पानी का पंप। किसी भी कीटनाशक, फफूंदनाशक या टॉनिक के साथ मिलाएं।",
       "image": "/images/products/product------99--biofit-bi-132062-t2y2.webp",
       "description": "सुपर सिलिकॉन स्प्रेडर, स्टीकर व पेनिट्रेटर। दवा को पत्ते के आर-पार फैलाता है और बारिश में धुलने नहीं देता।",
@@ -448,7 +448,17 @@
       "precautions": "निर्धारित 5ml मात्रा से अधिक न डालें। बच्चों की पहुँच से दूर और ठंडी जगह पर रखें।",
       "pack_size": "100 ml",
       "problem_tags": [
-        "crop_yield"
+        "crop_yield",
+        "agri_pest",
+        "agri_fungus",
+        "agri_virus",
+        "agri_soil_health",
+        "agri_flower_fruit",
+        "crop_chana",
+        "crop_soybean",
+        "crop_mustard",
+        "crop_wheat",
+        "crop_paddy"
       ]
     },
     {
