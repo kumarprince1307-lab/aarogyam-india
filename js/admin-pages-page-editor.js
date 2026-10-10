@@ -2835,6 +2835,9 @@ export async function initPageEditor() {
             <div id="mpm-category-pills" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
           </div>
 
+          <!-- Catalog Cover & Last Page Settings Accordion -->
+          <div id="mpm-catalog-settings-container" style="background: #0d1527; border: 1.5px solid #1e293b; border-radius: 12px; overflow: hidden;"></div>
+
           <!-- Products Accordion Container -->
           <div id="master-products-list-container" style="display: flex; flex-direction: column; gap: 14px;">
             <div style="text-align: center; padding: 40px; color: #94a3b8;">उत्पाद लोड हो रहे हैं...</div>
@@ -4255,12 +4258,27 @@ export async function initPageEditor() {
   // ====================================================================
   // MASTER PRODUCT MANAGER & CATEGORIES STUDIO (ULTIMATE PRO)
   // ====================================================================
+  // NETSURF MASTER PRODUCTS MANAGER (Dedicated Studio Modal)
+  // ====================================================================
   let masterCategories = [];
   let masterProducts = [];
+  let masterCatalogSettings = {
+    cover_badge: "🌿 100% प्राकृतिक व वैज्ञानिक बायो-टेक्नोलॉजी उत्पाद",
+    cover_title: "आरोग्यम भारत - सम्पूर्ण नेट्सर्फ उत्पाद कैटलॉग 2026",
+    cover_subtitle: "स्वास्थ्य, जैविक कृषि, पशु पोषण, त्वचा-केश देखभाल एवं पर्यावरण अनुकूल होम केयर के प्रामाणिक समाधान",
+    company_profile: "सन 2000 से स्थापित, 26 वर्षों की अटूट विश्वसनीयता और भारत सरकार के विज्ञान एवं प्रौद्योगिकी मंत्रालय (DSIR) द्वारा मान्यता प्राप्त इन-हाउस R&D केंद्र। 25 लाख से अधिक संतुष्ट उपभोक्ताओं का अटूट विश्वास।",
+    categories_overview: "प्रमुख श्रेणियां: बायोफिट जैविक कृषि (Biofit Agriculture), बायोफिट पशु पोषण (Cattle Care), नेचुरामोरे न्यूट्रिशन (Naturamore Health), हर्ब्स एंड मोर पर्सनल केयर (Herbs & More) व क्लीन एंड मोर होम केयर (Clean & More)।",
+    distributor_heading: "अधिकृत प्रस्तुतकर्ता / वितरक संपर्क (Presented By)",
+    order_note: "ऑर्डर देने, डिलीवरी स्थिति या बिज़नेस कंसल्टेंसी हेतु सीधे ऊपर दिए गए नंबर पर संपर्क करें।",
+    customer_care_text: "Netsurf Customer Care: 020-42111111 | helpdesk@netsurfdirect.com | www.netsurfdirect.com",
+    official_address: "Netsurf Communications Pvt. Ltd., Sr. No. 107, Plot No. 2, Emirus Building, Baner, Pune - 411045, Maharashtra.",
+    legal_disclaimer: "वैधानिक सूचना एवं अस्वीकरण: इस कैटलॉग में दी गई समस्त जानकारी, उत्पाद विनिर्देश, घटक व खुराक आधिकारिक निर्माता पोर्टल (netsurfdirect.com) के सार्वजनिक लिटरेचर से संदर्भ हेतु ली गई है। Aarogyam India एक स्वतंत्र अधिकृत वितरक नेटवर्क है और प्रत्यक्ष विनिर्माण दायित्व का दावा नहीं करता।"
+  };
   let mpmActiveCatFilter = 'all';
   let mpmActiveSubFilter = 'all';
   let mpmSearchQuery = '';
   let mpmExpandedIdx = null;
+  let mpmCatalogSettingsExpanded = false;
 
   const AVAILABLE_PROBLEM_TAGS = [
     { id: 'diabetes', label: '🩸 डायबिटीज / शुगर' },
@@ -4285,6 +4303,9 @@ export async function initPageEditor() {
         if (parsed.categories && parsed.products) {
           masterCategories = parsed.categories;
           masterProducts = parsed.products;
+          if (parsed.catalog_settings) {
+            masterCatalogSettings = { ...masterCatalogSettings, ...parsed.catalog_settings };
+          }
         }
       }
     } catch (e) {}
@@ -4297,6 +4318,9 @@ export async function initPageEditor() {
         if (remoteData && remoteData.products && remoteData.products.length > 0) {
           masterCategories = remoteData.categories || masterCategories;
           masterProducts = remoteData.products;
+          if (remoteData.catalog_settings) {
+            masterCatalogSettings = { ...masterCatalogSettings, ...remoteData.catalog_settings };
+          }
           localStorage.setItem('aim_netsurf_products_master', JSON.stringify(remoteData));
         }
       }
@@ -4305,6 +4329,7 @@ export async function initPageEditor() {
     }
 
     renderMpmFilters();
+    renderMpmCatalogSettings();
     renderMasterProductsList();
     syncMpmWithPresetDropdown();
   }
@@ -4376,6 +4401,126 @@ export async function initPageEditor() {
       });
       pillsWrap.innerHTML = pillsHtml;
     }
+  }
+
+  window.toggleMpmCatalogSettings = function(forceState) {
+    mpmCatalogSettingsExpanded = typeof forceState === 'boolean' ? forceState : !mpmCatalogSettingsExpanded;
+    renderMpmCatalogSettings();
+  };
+
+  window.updateCatalogSetting = function(field, val) {
+    if (!masterCatalogSettings) masterCatalogSettings = {};
+    masterCatalogSettings[field] = val;
+  };
+
+  function renderMpmCatalogSettings() {
+    const container = document.getElementById('mpm-catalog-settings-container');
+    if (!container) return;
+
+    const s = masterCatalogSettings || {};
+
+    container.innerHTML = `
+      <div style="padding: 12px 16px; background: #0f1c34; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: ${mpmCatalogSettingsExpanded ? '1px solid #1e293b' : 'none'}; user-select: none;" onclick="window.toggleMpmCatalogSettings()">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.25rem;">📑</span>
+          <div>
+            <strong style="color: #38bdf8; font-size: 0.95rem; display: block;">PDF कैटलॉग फ्रंट व लास्ट पेज कस्टमाइज़र (Front & Last Page Text)</strong>
+            <span style="color: #94a3b8; font-size: 0.76rem;">कैटलॉग कवर पेज टाइटल, कंपनी प्रोफाइल, प्रस्तुतकर्ता हेडिंग, कस्टमर केयर व लीगल डिस्क्लेमर यहाँ से बदलें</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; font-weight: 700;">
+            10 कस्टमाइज्ड फ़ील्ड्स
+          </span>
+          <button type="button" class="admin-button small-button" style="background: transparent; color: #cbd5e1; font-size: 0.82rem; padding: 4px 8px;">
+            ${mpmCatalogSettingsExpanded ? '▲ समेटें' : '▼ एडिट करें'}
+          </button>
+        </div>
+      </div>
+
+      ${mpmCatalogSettingsExpanded ? `
+        <div style="padding: 16px; display: flex; flex-direction: column; gap: 18px; background: #0b1120;">
+          
+          <!-- Section 1: FRONT PAGE (Cover) -->
+          <div style="background: rgba(15,23,42,0.85); border: 1.5px solid #1e293b; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
+              <span style="font-size: 1.1rem;">🌟</span>
+              <strong style="color: #34d399; font-size: 0.88rem;">कैटलॉग फ्रंट पेज सेटिंग्स (Front Cover Page)</strong>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; color: #cbd5e1;">कवर बैज / टैगलाइन (Cover Badge)</label>
+                <input type="text" class="admin-input" style="width: 100%; color: #f59e0b; font-weight: 700;" value="${escapeHtml(s.cover_badge || '')}" oninput="window.updateCatalogSetting('cover_badge', this.value)" placeholder="उदा. 🌿 100% प्राकृतिक व वैज्ञानिक बायो-टेक्नोलॉजी उत्पाद" />
+              </div>
+
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; color: #cbd5e1;">कैटलॉग मुख्य शीर्षक (Cover Title)*</label>
+                <input type="text" class="admin-input" style="width: 100%; color: #34d399; font-weight: 800;" value="${escapeHtml(s.cover_title || '')}" oninput="window.updateCatalogSetting('cover_title', this.value)" placeholder="उदा. आरोग्यम भारत - सम्पूर्ण नेट्सर्फ उत्पाद कैटलॉग 2026" />
+              </div>
+            </div>
+
+            <div>
+              <label class="admin-label" style="font-size: 0.76rem; color: #cbd5e1;">उप-शीर्षक (Cover Subtitle)</label>
+              <input type="text" class="admin-input" style="width: 100%;" value="${escapeHtml(s.cover_subtitle || '')}" oninput="window.updateCatalogSetting('cover_subtitle', this.value)" placeholder="उदा. स्वास्थ्य, जैविक कृषि, पशु पोषण व पर्सनल केयर के प्रामाणिक समाधान" />
+            </div>
+
+            <div>
+              <label class="admin-label" style="font-size: 0.76rem; color: #cbd5e1;">कंपनी परिचय / प्रोफाइल विवरण (Company Profile Text)*</label>
+              <textarea class="admin-textarea" rows="3" style="width: 100%; font-size: 0.82rem; line-height: 1.45;" oninput="window.updateCatalogSetting('company_profile', this.value)" placeholder="कंपनी की स्थापना, विश्वसनीयता, DSIR रिसर्च लैब आदि का विवरण">${escapeHtml(s.company_profile || '')}</textarea>
+            </div>
+
+            <div>
+              <label class="admin-label" style="font-size: 0.76rem; color: #cbd5e1;">उत्पाद कैटेगरीज परिचय (Categories Overview)</label>
+              <textarea class="admin-textarea" rows="2" style="width: 100%; font-size: 0.82rem; line-height: 1.45;" oninput="window.updateCatalogSetting('categories_overview', this.value)" placeholder="प्रमुख 5 श्रेणियों का संक्षिप्त विवरण">${escapeHtml(s.categories_overview || '')}</textarea>
+            </div>
+          </div>
+
+          <!-- Section 2: LAST PAGE (Back Cover & Presenter) -->
+          <div style="background: rgba(15,23,42,0.85); border: 1.5px solid #1e293b; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
+              <span style="font-size: 1.1rem;">🏁</span>
+              <strong style="color: #38bdf8; font-size: 0.88rem;">कैटलॉग लास्ट पेज सेटिंग्स (Last Page & Contact)</strong>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; color: #cbd5e1;">प्रस्तुतकर्ता बॉक्स शीर्षक (Distributor Heading)</label>
+                <input type="text" class="admin-input" style="width: 100%; font-weight: 700; color: #38bdf8;" value="${escapeHtml(s.distributor_heading || '')}" oninput="window.updateCatalogSetting('distributor_heading', this.value)" placeholder="उदा. अधिकृत प्रस्तुतकर्ता / वितरक संपर्क (Presented By)" />
+              </div>
+
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; color: #cbd5e1;">ऑर्डर व परामर्श संदेश (Order & Consultation Note)</label>
+                <input type="text" class="admin-input" style="width: 100%;" value="${escapeHtml(s.order_note || '')}" oninput="window.updateCatalogSetting('order_note', this.value)" placeholder="उदा. ऑर्डर देने, डिलीवरी स्थिति या परामर्श हेतु सीधे ऊपर दिए गए नंबर पर संपर्क करें।" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; color: #cbd5e1;">कंपनी कस्टमर केयर / हेल्पलाइन (Customer Care)</label>
+                <input type="text" class="admin-input" style="width: 100%;" value="${escapeHtml(s.customer_care_text || '')}" oninput="window.updateCatalogSetting('customer_care_text', this.value)" placeholder="उदा. 020-42111111 | helpdesk@netsurfdirect.com" />
+              </div>
+
+              <div>
+                <label class="admin-label" style="font-size: 0.76rem; color: #cbd5e1;">कंपनी का आधिकारिक पता (Registered Office Address)</label>
+                <input type="text" class="admin-input" style="width: 100%;" value="${escapeHtml(s.official_address || '')}" oninput="window.updateCatalogSetting('official_address', this.value)" placeholder="उदा. Netsurf Communications Pvt. Ltd., Baner, Pune - 411045" />
+              </div>
+            </div>
+
+            <div>
+              <label class="admin-label" style="font-size: 0.76rem; color: #f87171;">वैधानिक एवं सुरक्षा अस्वीकरण (Legal Disclaimer)*</label>
+              <textarea class="admin-textarea" rows="3" style="width: 100%; font-size: 0.8rem; line-height: 1.45; color: #cbd5e1;" oninput="window.updateCatalogSetting('legal_disclaimer', this.value)" placeholder="आरोग्यम भारत व वितरक की सुरक्षा हेतु लीगल अस्वीकरण">${escapeHtml(s.legal_disclaimer || '')}</textarea>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+            <button type="button" onclick="window.saveMasterProducts()" class="admin-button small-button" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 800; padding: 7px 16px; border-radius: 8px; font-size: 0.82rem;">
+              💾 कैटलॉग सेटिंग्स अभी सेव करें (Live Save)
+            </button>
+          </div>
+        </div>
+      ` : ''}
+    `;
   }
 
   function renderMasterProductsList() {
@@ -4629,6 +4774,8 @@ export async function initPageEditor() {
         delete masterProducts[idx].image_preview;
       }
     }
+  };
+
   window.setMpmProductPackSize = function(idx, val) {
     if (masterProducts[idx]) {
       masterProducts[idx].pack_size = val;
@@ -4767,6 +4914,8 @@ export async function initPageEditor() {
       subcategory: firstSub.id,
       subcategory_label: firstSub.name,
       badge: '✨ New Launch',
+      pack_size: '250 ml',
+      problem_tags: [],
       mrp: 600,
       discount_pct: 25,
       discounted_price: 450,
@@ -4825,6 +4974,7 @@ export async function initPageEditor() {
       updated_at: new Date().toISOString(),
       total_products: cleanProducts.length,
       categories: masterCategories,
+      catalog_settings: masterCatalogSettings,
       products: cleanProducts
     };
 
@@ -4844,7 +4994,8 @@ export async function initPageEditor() {
         body: JSON.stringify({
           action: 'save_netsurf_products',
           products: cleanProducts,
-          categories: masterCategories
+          categories: masterCategories,
+          catalog_settings: masterCatalogSettings
         })
       });
       const phpData = await phpRes.json().catch(() => ({}));
@@ -4972,10 +5123,11 @@ export async function initPageEditor() {
 
   window.exportMasterProductsJson = function() {
     const masterPayload = {
-      version: "2026.2",
+      version: "2026.3",
       updated_at: new Date().toISOString(),
       total_products: masterProducts.length,
       categories: masterCategories,
+      catalog_settings: masterCatalogSettings,
       products: masterProducts
     };
     const blob = new Blob([JSON.stringify(masterPayload, null, 2)], { type: 'application/json' });

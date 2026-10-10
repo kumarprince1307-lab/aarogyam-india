@@ -44,13 +44,26 @@ if (file_exists($productsJsonPath)) {
 
 $products = null;
 $categories = null;
+$catalogSettings = null;
 
 if (isset($payload['products']) && is_array($payload['products'])) {
     $products = $payload['products'];
     $categories = $payload['categories'] ?? [];
+    $catalogSettings = $payload['catalog_settings'] ?? null;
 } elseif (isset($payload['masterPayload']) && is_array($payload['masterPayload'])) {
     $products = $payload['masterPayload']['products'] ?? [];
     $categories = $payload['masterPayload']['categories'] ?? [];
+    $catalogSettings = $payload['masterPayload']['catalog_settings'] ?? null;
+}
+
+// Fallback to existing catalog_settings if not in incoming payload
+if (!$catalogSettings && file_exists($productsJsonPath)) {
+    try {
+        $cur = json_decode(file_get_contents($productsJsonPath), true);
+        if (isset($cur['catalog_settings'])) {
+            $catalogSettings = $cur['catalog_settings'];
+        }
+    } catch (\Exception $e) {}
 }
 
 if (!$products) {
@@ -63,6 +76,7 @@ $newPayload = [
     'updated_at' => date('c'),
     'total_products' => count($products),
     'categories' => $categories,
+    'catalog_settings' => $catalogSettings,
     'products' => $products
 ];
 
