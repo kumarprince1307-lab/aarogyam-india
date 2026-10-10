@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:39:05.042Z",
+  "updated_at": "2026-10-10T09:44:43.227Z",
   "total_products": 39,
   "categories": [
     {
@@ -1035,7 +1035,7 @@
       "category_label": "क्लीन एंड मोर",
       "subcategory_label": "होम व डिश हाइजीन",
       "mrp": 350,
-      "discount_pct": 20,
+      "discount_pct": 0,
       "price": 280,
       "image": "/images/products/product-clean---more-dish--013316-62du.webp",
       "badge": "🏡 फर्श, टाइल्स व सतह सैनिटाइजर",
@@ -1046,7 +1046,8 @@
       "pack_size": "500 ml",
       "problem_tags": [
         "home_care"
-      ]
+      ],
+      "discounted_price": 350
     }
   ]
 }
