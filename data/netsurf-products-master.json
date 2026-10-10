@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:37:06.827Z",
+  "updated_at": "2026-10-10T09:37:42.673Z",
   "total_products": 39,
   "categories": [
     {
@@ -714,8 +714,8 @@
       "category_label": "स्वास्थ्य नेचुरामोरे",
       "badge": "🫀 कोलेस्ट्रॉल व स्वस्थ हृदय",
       "mrp": 450,
-      "discount_pct": 25,
-      "discounted_price": 338,
+      "discount_pct": 0,
+      "discounted_price": 450,
       "dose": "1 कैप्सूल दिन में 2 बार भोजन के बाद गुनगुने पानी से।",
       "image": "/images/products/product--------------------880009-w0ip.webp",
       "description": "अर्जुन छाल, लहसुन अर्क और गुग्गुल से धमनियों में जमा कोलेस्ट्रॉल साफ और सामान्य रक्तचाप।",
@@ -725,7 +725,9 @@
       "precautions": "ब्लड प्रेशर की नियमित जांच करते रहें। अत्यधिक तैलीय भोजन से परहेज करें।",
       "pack_size": "30 कैप्सूल",
       "problem_tags": [
-        "health_general"
+        "health_general",
+        "diabetes",
+        "vitality_wellness"
       ]
     },
     {
