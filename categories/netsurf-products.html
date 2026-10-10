@@ -400,6 +400,9 @@
       </a>
 
       <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+        <button type="button" onclick="window.shareNetsurfCatalogPage()" class="btn" style="background:#0284c7; color:#fff; border:none; padding:8px 14px; border-radius:20px; font-weight:800; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 10px rgba(2,132,199,0.3);">
+          <span>📤</span> <span>शेयर</span>
+        </button>
         <button type="button" onclick="window.openCatalogDownloadModal()" class="btn" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border:none; padding:8px 16px; border-radius:20px; font-weight:800; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 10px rgba(16,185,129,0.3);">
           <span>📥</span> <span>कैटलॉग PDF</span>
         </button>
@@ -572,6 +575,66 @@
       </div>
     </div>
   </section>
+
+  <!-- 6.5 LEAD CAPTURE GATEKEEPER MODAL (AarogyamTube Universal Style) -->
+  <div class="np-modal-overlay" id="npLeadGateModal" onclick="if(event.target === this) window.closeLeadGateModal()">
+    <div class="np-modal-box" style="max-width: 480px; padding: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
+            <i class="fa-solid fa-file-pdf"></i>
+          </div>
+          <div>
+            <span style="background:#ecfdf5; color:#059669; font-size:0.75rem; font-weight:800; padding:2px 8px; border-radius:10px; border:1px solid #a7f3d0;">
+              🔒 कैटलॉग एक्सेस गेट
+            </span>
+            <h3 style="font-size:1.25rem; font-weight:900; color:#0f172a; margin:3px 0 0 0;">
+              सम्पूर्ण कैटलॉग डाउनलोड
+            </h3>
+          </div>
+        </div>
+        <button type="button" onclick="window.closeLeadGateModal()" style="background:#f1f5f9; border:none; width:32px; height:32px; border-radius:50%; font-size:1rem; cursor:pointer; color:#64748b;">✕</button>
+      </div>
+
+      <!-- Presenter Pill -->
+      <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:12px; padding:10px 14px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;">
+        <div style="font-size:0.8rem; color:#166534;">
+          <span style="font-weight:700;">👤 शेयरकर्ता / प्रस्तुतकर्ता:</span>
+          <strong id="npLeadSharerName" style="display:block; font-size:0.95rem; color:#0f172a; margin-top:2px;">आरोग्यम इंडिया अधिकृत केंद्र</strong>
+        </div>
+        <span style="background:#dcfce7; color:#15803d; font-size:0.72rem; font-weight:800; padding:3px 8px; border-radius:8px;">
+          ✓ अधिकृत लिंक
+        </span>
+      </div>
+
+      <p style="font-size:0.82rem; color:#475569; margin:0 0 16px 0; line-height:1.45;">
+        पीडीएफ कैटलॉग डाउनलोड करने एवं अपने नाम से शेयरिंग लिंक प्राप्त करने के लिए कृपया अपना नाम व मोबाइल नंबर दर्ज करें:
+      </p>
+
+      <form id="npLeadGateForm" onsubmit="window.handleLeadGateSubmit(event)" style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:5px;">👤 आपका पूरा नाम *</label>
+          <input type="text" id="npLeadName" class="np-search-input" placeholder="उदा. सुरेश पटेल" required style="padding:10px 14px; font-size:0.9rem;">
+        </div>
+
+        <div>
+          <label style="font-size:0.8rem; font-weight:800; color:#334155; display:block; margin-bottom:5px;">📱 10-अंकों का व्हाट्सएप मोबाइल नंबर *</label>
+          <input type="tel" id="npLeadPhone" class="np-search-input" placeholder="उदा. 9876543210" maxlength="10" required style="padding:10px 14px; font-size:0.9rem;">
+        </div>
+
+        <div id="npLeadGateMsg" style="display:none; font-size:0.8rem; padding:8px 12px; border-radius:8px; font-weight:700;"></div>
+
+        <button type="submit" id="npLeadGateSubmitBtn" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff; border:none; padding:12px 18px; border-radius:12px; font-weight:900; font-size:0.92rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(16,185,129,0.35); margin-top:4px;">
+          <span>🟢 विवरण सुरक्षित करें व कैटलॉग खोलें</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <small style="text-align:center; color:#64748b; font-size:0.73rem; margin-top:4px;">
+          🔒 आपकी जानकारी 100% सुरक्षित है। कोई अनचाहा कॉल नहीं किया जाएगा।
+        </small>
+      </form>
+    </div>
+  </div>
 
   <!-- 7. MULTI-LANGUAGE DOWNLOAD CATALOG MODAL -->
   <div class="np-modal-overlay" id="npCatalogModal" onclick="if(event.target === this) window.closeCatalogDownloadModal()">

@@ -550,15 +550,27 @@
   // 1. Resolve Sponsor & Logged-In User from Session or URL
   function resolveSponsor() {
     const params = new URLSearchParams(window.location.search);
-    const sponsorParam = params.get('u') || params.get('s') || params.get('ref') || params.get('sponsor');
+    const sponsorNameParam = params.get('sponsor_name') || params.get('name') || params.get('u') || params.get('s') || params.get('sponsor');
+    const sponsorPhoneParam = (params.get('sponsor_phone') || params.get('phone') || params.get('m') || '').replace(/\D/g, '');
+    const refParam = params.get('ref') || params.get('share_id') || params.get('share');
 
-    if (sponsorParam) {
-      currentSponsor.name = sponsorParam.toUpperCase();
+    if (sponsorNameParam) {
+      currentSponsor.name = sponsorNameParam.trim();
       currentSponsor.isPersonalized = true;
+    }
+    if (sponsorPhoneParam && sponsorPhoneParam.length === 10) {
+      currentSponsor.phone = sponsorPhoneParam;
+      currentSponsor.isPersonalized = true;
+    }
+    if (refParam) {
+      currentSponsor.shareId = refParam.trim();
     }
 
     // Comprehensive multi-key resolution of logged-in user profile
     const sessionKeys = [
+      'AI_USER',
+      'AI_PROFILE',
+      'UCAS_USER',
       'aoi_user_session',
       'current_user',
       'CURRENT_USER',
@@ -578,7 +590,7 @@
             const name = parsed.name || parsed.full_name || parsed.userName || parsed.user_name || '';
             const phone = (parsed.phone || parsed.mobile || parsed.user_phone || parsed.user_mobile || '').replace(/\D/g, '');
             if (phone || name) {
-              loggedInProfile = { name, phone };
+              loggedInProfile = { name, phone, share_id: parsed.share_id || parsed.referral_code };
               break;
             }
           }
@@ -588,20 +600,18 @@
 
     // Direct string keys fallback
     if (!loggedInProfile) {
-      const fallbackPhone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('user_phone') || localStorage.getItem('aim_user_phone') || localStorage.getItem('active_user_mobile') || '').replace(/\D/g, '');
-      const fallbackName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('user_name') || localStorage.getItem('aim_user_name') || '';
+      const fallbackPhone = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('user_phone') || localStorage.getItem('aim_user_phone') || localStorage.getItem('active_user_mobile') || '').replace(/\D/g, '');
+      const fallbackName = localStorage.getItem('aim_user_name') || localStorage.getItem('aarogyam_user_name') || localStorage.getItem('user_name') || '';
       if (fallbackPhone || fallbackName) {
         loggedInProfile = { name: fallbackName, phone: fallbackPhone };
       }
     }
 
-    if (loggedInProfile) {
-      if (loggedInProfile.name && !sponsorParam) {
-        currentSponsor.name = loggedInProfile.name;
-      }
-      if (loggedInProfile.phone) {
-        currentSponsor.phone = loggedInProfile.phone;
-      }
+    // If visitor is logged in and URL didn't specify another sponsor, use logged-in user as sponsor
+    if (loggedInProfile && !sponsorNameParam) {
+      if (loggedInProfile.name) currentSponsor.name = loggedInProfile.name;
+      if (loggedInProfile.phone) currentSponsor.phone = loggedInProfile.phone;
+      if (loggedInProfile.share_id) currentSponsor.shareId = loggedInProfile.share_id;
       currentSponsor.isPersonalized = true;
     }
 
@@ -622,6 +632,9 @@
     const distPhoneInput = document.getElementById('npDistributorPhone');
     if (distNameInput) distNameInput.value = currentSponsor.name;
     if (distPhoneInput) distPhoneInput.value = currentSponsor.phone;
+
+    const leadSharer = document.getElementById('npLeadSharerName');
+    if (leadSharer) leadSharer.textContent = `${currentSponsor.name} (+91 ${currentSponsor.phone})`;
   }
 
   // 2. Fetch Master Products (Multi-path with Cache Busting)
@@ -957,16 +970,176 @@
     window.toggleAudioTutorial(true);
   };
 
-  // 6. Download Catalog Modal Handlers
+  // 6. Universal Lead Gatekeeper & Registration Handlers
+  window.isCatalogUserRegistered = function () {
+    if (typeof window.isLoggedIn === 'function' && window.isLoggedIn()) return true;
+    if (typeof window.getCurrentUser === 'function') {
+      const u = window.getCurrentUser();
+      if (u && (u.mobile || u.id)) return true;
+    }
+    const reg = localStorage.getItem('aarogyam_user_registered');
+    const mob = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_phone') || '').replace(/\D/g, '').slice(-10);
+    return (reg === 'true' && mob.length === 10) || (mob.length === 10);
+  };
+
+  window.openLeadGateModal = function () {
+    const modal = document.getElementById('npLeadGateModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      const sharerEl = document.getElementById('npLeadSharerName');
+      if (sharerEl) {
+        sharerEl.textContent = `${currentSponsor.name} (+91 ${currentSponsor.phone})`;
+      }
+    }
+  };
+
+  window.closeLeadGateModal = function () {
+    const modal = document.getElementById('npLeadGateModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.handleLeadGateSubmit = function (e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const nameInput = document.getElementById('npLeadName');
+    const phoneInput = document.getElementById('npLeadPhone');
+    const msgEl = document.getElementById('npLeadGateMsg');
+    const name = (nameInput ? nameInput.value : '').trim();
+    const phone = (phoneInput ? phoneInput.value : '').replace(/\D/g, '').slice(-10);
+
+    if (!name || name.length < 2) {
+      if (msgEl) {
+        msgEl.style.display = 'block';
+        msgEl.style.background = '#fee2e2';
+        msgEl.style.color = '#dc2626';
+        msgEl.textContent = 'कृपया अपना पूरा नाम दर्ज करें।';
+      }
+      return;
+    }
+    if (phone.length !== 10) {
+      if (msgEl) {
+        msgEl.style.display = 'block';
+        msgEl.style.background = '#fee2e2';
+        msgEl.style.color = '#dc2626';
+        msgEl.textContent = 'कृपया 10-अंकों का वैध व्हाट्सएप मोबाइल नंबर दर्ज करें।';
+      }
+      return;
+    }
+
+    const newShareId = 'AI' + phone.slice(-6);
+    const userObj = {
+      id: 'AI_' + phone,
+      name: name,
+      full_name: name,
+      mobile: phone,
+      phone: phone,
+      share_id: newShareId,
+      referral_code: currentSponsor.shareId || 'AI000004',
+      referral_name: currentSponsor.name,
+      referral_phone: currentSponsor.phone,
+      registration_source: 'NetsurfCatalog'
+    };
+
+    // 1. Universal local storage sync
+    try {
+      localStorage.setItem('AI_USER', JSON.stringify(userObj));
+      localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
+      localStorage.setItem('UCAS_USER', JSON.stringify(userObj));
+      localStorage.setItem('aim_user_name', name);
+      localStorage.setItem('aim_user_mobile', phone);
+      localStorage.setItem('aarogyam_user_registered', 'true');
+
+      let existingSession = {};
+      try { existingSession = JSON.parse(localStorage.getItem('AI_SESSION') || '{}'); } catch(err) {}
+      existingSession.user_id = userObj.id;
+      existingSession.mobile = phone;
+      existingSession.full_name = name;
+      existingSession.referral_share_id = currentSponsor.shareId || 'AI000004';
+      localStorage.setItem('AI_SESSION', JSON.stringify(existingSession));
+    } catch(err) {
+      console.warn('Local session write notice:', err);
+    }
+
+    // 2. Non-blocking Supabase cloud registration
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        const db = window.supabase.createClient('https://qjhjrzsnrtahmhswxyvb.supabase.co', 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU');
+        db.from('profiles').upsert([{
+          full_name: name,
+          mobile: phone,
+          share_id: newShareId,
+          referral_code: currentSponsor.shareId || 'AI000004',
+          referral_mobile: currentSponsor.phone,
+          registration_source: 'NetsurfCatalog'
+        }]).then(() => {}).catch(() => {});
+      }
+    } catch(err) {}
+
+    // 3. Make User B the active sponsor/presenter for subsequent sharing
+    currentSponsor.name = name;
+    currentSponsor.phone = phone;
+    currentSponsor.shareId = newShareId;
+    currentSponsor.isPersonalized = true;
+
+    // Update UI elements
+    const stickyName = document.getElementById('npStickySellerName');
+    if (stickyName) stickyName.textContent = name;
+    const distNameInput = document.getElementById('npDistributorName');
+    const distPhoneInput = document.getElementById('npDistributorPhone');
+    if (distNameInput) distNameInput.value = name;
+    if (distPhoneInput) distPhoneInput.value = phone;
+
+    // 4. Close gate & open catalog download modal
+    window.closeLeadGateModal();
+    const catModal = document.getElementById('npCatalogModal');
+    if (catModal) catModal.style.display = 'flex';
+  };
+
+  // Viral Universal Sharing for Netsurf Catalog
+  window.shareNetsurfCatalogPage = function () {
+    if (!window.isCatalogUserRegistered()) {
+      window.openLeadGateModal();
+      return;
+    }
+    const user = (typeof window.getCurrentUser === 'function') ? window.getCurrentUser() : null;
+    const name = user?.full_name || localStorage.getItem('aim_user_name') || currentSponsor.name || 'आरोग्यम मित्र';
+    const phone = (user?.mobile || localStorage.getItem('aim_user_mobile') || currentSponsor.phone || '').replace(/\D/g, '').slice(-10);
+    const shareId = (typeof window.getUnifiedShareId === 'function') ? window.getUnifiedShareId() : ('AI' + (phone ? phone.slice(-6) : '000004'));
+
+    const baseUrl = window.location.origin + '/categories/netsurf-products.html';
+    const shareUrl = `${baseUrl}?ref=${shareId}&sponsor_name=${encodeURIComponent(name)}&sponsor_phone=${encodeURIComponent(phone)}`;
+    const shareText = `🌿 *आरोग्यम भारत - सम्पूर्ण नेटसर्फ उत्पाद कैटलॉग 2026*\n\nकृषि बायोफिट, पशु पोषण, नेचुरामोरे न्यूट्रिशन और पर्सनल केयर के 100% प्रामाणिक जैविक व आयुर्वेदिक उत्पाद देखें एवं पर्सनलाइज्ड PDF कैटलॉग डाउनलोड करें:\n👉 ${shareUrl}\n\n_प्रस्तुतकर्ता: ${name} (+91 ${phone})_`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: 'सम्पूर्ण नेटसर्फ उत्पाद कैटलॉग 2026',
+        text: shareText,
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+    }
+  };
+
+  // Download Catalog Modal Handlers
   window.openCatalogDownloadModal = function () {
+    // If user is not registered, force lead gatekeeper first
+    if (!window.isCatalogUserRegistered()) {
+      window.openLeadGateModal();
+      return;
+    }
+
     const modal = document.getElementById('npCatalogModal');
     if (modal) modal.style.display = 'flex';
 
     // Ensure logged-in distributor name & phone are defaulted
+    const user = (typeof window.getCurrentUser === 'function') ? window.getCurrentUser() : null;
+    const defName = user?.full_name || user?.name || localStorage.getItem('aim_user_name') || currentSponsor.name;
+    const defPhone = (user?.mobile || user?.phone || localStorage.getItem('aim_user_mobile') || currentSponsor.phone || '').replace(/\D/g, '').slice(-10);
+
     const distNameInput = document.getElementById('npDistributorName');
     const distPhoneInput = document.getElementById('npDistributorPhone');
-    if (distNameInput && currentSponsor.name) distNameInput.value = currentSponsor.name;
-    if (distPhoneInput && currentSponsor.phone) distPhoneInput.value = currentSponsor.phone;
+    if (distNameInput && defName) distNameInput.value = defName;
+    if (distPhoneInput && defPhone) distPhoneInput.value = defPhone;
   };
 
   window.closeCatalogDownloadModal = function () {
@@ -974,7 +1147,7 @@
     if (modal) modal.style.display = 'none';
   };
 
-  // 7. Ultra High-Definition Personalized PDF Catalog Generator (100% Full Translation)
+  // 7. Ultra High-Definition Personalized PDF Catalog Generator (Max 4 Products Per Page Chunking)
   window.generateAndDownloadPdfCatalog = function () {
     const scopeRadio = document.querySelector('input[name="catalogScope"]:checked');
     const langRadio = document.querySelector('input[name="catalogLang"]:checked');
@@ -982,7 +1155,7 @@
     const langKey = langRadio ? langRadio.value : 'hi';
     const baseI18n = I18N_CATALOG[langKey] || I18N_CATALOG.hi;
 
-    // Merge dynamic custom settings from masterCatalogSettings (customized in Admin Studio)
+    // Merge dynamic custom settings from masterCatalogSettings
     const s = masterCatalogSettings || {};
     const i18n = {
       ...baseI18n,
@@ -1017,12 +1190,13 @@
 
     window.closeCatalogDownloadModal();
 
-    // Open print document window
-    const printDoc = window.open('', '_blank');
-    if (!printDoc) {
-      alert('कृपया ब्राउज़र में पॉपअप को अनुमति दें (Allow Popups) ताकि कैटलॉग खुल सके।');
-      return;
+    // Chunk products into exact slices of maximum 4 products per page
+    const productPages = [];
+    for (let i = 0; i < prodsToPrint.length; i += 4) {
+      productPages.push(prodsToPrint.slice(i, i + 4));
     }
+    const totalProductPages = productPages.length;
+    const totalPages = totalProductPages + 2; // Cover + Products + Final Page
 
     const todayDate = new Date().toLocaleDateString(langKey === 'en' ? 'en-US' : (langKey === 'hi' ? 'hi-IN' : 'en-IN'), { year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -1035,18 +1209,79 @@
       clean_more: { bg: '#eef2ff', text: '#3730a3', border: '#c7d2fe' }
     };
 
+    // Helper to render individual product card with fixed 120x120px uniform image & readable fonts
+    function renderProductCardHtml(p) {
+      const mrp = parseInt(p.mrp, 10) || 0;
+      const discountPct = parseInt(p.discount_pct, 10) || 0;
+      const offerPrice = p.discounted_price || (discountPct ? Math.round(mrp * (1 - discountPct / 100)) : mrp);
+      const imgSrc = (p.image && !p.image.includes('logo.png')) ? (p.image.startsWith('http') ? p.image : 'https://aarogyamindia.online' + p.image) : 'https://aarogyamindia.online/images/logo/logo.png';
+      const translatedCat = getTranslatedCategory(p.category, langKey);
+      const catColors = catColorMap[p.category] || { bg: '#f1f5f9', text: '#334155', border: '#cbd5e1' };
+      const multi = getProductMultilingualData(p, langKey);
+      const packTranslated = translatePackSize(p.pack_size, langKey);
+
+      return `
+        <div class="product-card">
+          <div class="product-card-img-box">
+            <img src="${imgSrc}" alt="${escapeHtml(multi.name)}" onerror="this.src='https://aarogyamindia.online/images/logo/logo.png'">
+          </div>
+
+          <div class="product-info-wrap">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 4px; margin-bottom: 2px;">
+                <span class="product-cat-chip" style="background: ${catColors.bg}; color: ${catColors.text}; border-color: ${catColors.border};">
+                  ${escapeHtml(translatedCat)}
+                </span>
+                ${packTranslated ? `<span class="product-pack-chip">📦 ${escapeHtml(packTranslated)}</span>` : ''}
+              </div>
+
+              <h4 class="product-title">${escapeHtml(multi.name)}</h4>
+
+              <div class="price-row">
+                <span class="offer-price">${i18n.offerLabel} ₹${offerPrice}</span>
+                ${mrp > offerPrice ? `
+                  <span class="mrp-cross">₹${mrp}</span>
+                  <span class="discount-badge">${discountPct}% ${i18n.discountBadge}</span>
+                ` : ''}
+              </div>
+
+              ${multi.description ? `
+                <div class="card-snippet">
+                  ${escapeHtml(multi.description)}
+                </div>
+              ` : ''}
+            </div>
+
+            <div>
+              ${multi.ingredients ? `
+                <div class="card-ing-box">
+                  <strong style="color: #059669;">${i18n.ingLabel}</strong> ${escapeHtml(multi.ingredients)}
+                </div>
+              ` : ''}
+              ${multi.dose ? `
+                <div class="card-dose-box">
+                  <strong style="color: #15803d;">${i18n.doseLabel}</strong> ${escapeHtml(multi.dose)}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     const htmlContent = `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
-        <title>${i18n.title} - ${distName}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${escapeHtml(i18n.title)} - ${escapeHtml(distName)}</title>
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
           @page {
             size: A4 portrait;
-            margin: 12mm 10mm;
+            margin: 8mm 9mm;
           }
 
           * {
@@ -1065,6 +1300,15 @@
             line-height: 1.45;
           }
 
+          @media print {
+            .no-print {
+              display: none !important;
+            }
+            body {
+              background: #ffffff !important;
+            }
+          }
+
           .page-break {
             page-break-after: always;
             break-after: page;
@@ -1076,7 +1320,7 @@
             border-radius: 18px;
             padding: 6px;
             background: #ffffff;
-            min-height: 260mm;
+            min-height: 270mm;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -1085,7 +1329,7 @@
           .cover-inner-frame {
             border: 1.5px solid #d97706;
             border-radius: 12px;
-            padding: 24px 20px;
+            padding: 22px 20px;
             display: flex;
             flex-direction: column;
             height: 100%;
@@ -1096,7 +1340,7 @@
             background: linear-gradient(135deg, #0a192f 0%, #0f2b48 55%, #053b3b 100%);
             color: #ffffff;
             border-radius: 16px;
-            padding: 28px 22px;
+            padding: 26px 20px;
             text-align: center;
             box-shadow: 0 8px 24px rgba(10,25,47,0.25);
             position: relative;
@@ -1114,9 +1358,9 @@
             display: inline-block;
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: #000000;
-            font-size: 10.5px;
+            font-size: 11px;
             font-weight: 900;
-            padding: 4px 14px;
+            padding: 5px 16px;
             border-radius: 20px;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -1124,7 +1368,7 @@
           }
 
           .cover-title-text {
-            font-size: 26px;
+            font-size: 27px;
             font-weight: 900;
             color: #34d399;
             margin: 14px 0 6px 0;
@@ -1133,51 +1377,81 @@
           }
 
           .cover-subtitle-text {
-            font-size: 13px;
+            font-size: 13.5px;
             color: #e2e8f0;
             margin: 0;
             line-height: 1.45;
           }
 
-          /* Running Page Header */
+          /* Running Page Header & Footer */
           .running-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #0f172a;
-            padding-bottom: 8px;
-            margin-bottom: 14px;
+            padding-bottom: 7px;
+            margin-bottom: 8px;
           }
 
-          /* Product Grid: 2 Crisp Columns */
-          .product-grid {
+          .running-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 5px;
+            margin-top: 6px;
+            font-size: 9.5px;
+            color: #64748b;
+            font-weight: 600;
+          }
+
+          /* Product Page Layout: Exactly 4 Products (2x2 Grid) */
+          .product-page-wrap {
+            min-height: 275mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #ffffff;
+          }
+
+          .product-grid-4 {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
             gap: 12px;
+            flex: 1;
+            margin: 4px 0;
           }
 
           .product-card {
-            border: 1.2px solid #cbd5e1;
-            border-radius: 10px;
-            padding: 10px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 11px 13px;
             background: #ffffff;
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            box-sizing: border-box;
             break-inside: avoid;
             page-break-inside: avoid;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            overflow: hidden;
           }
 
           .product-card-img-box {
-            width: 95px;
-            height: 95px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            width: 120px;
+            height: 120px;
+            min-width: 120px;
+            max-width: 120px;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
             overflow: hidden;
+            flex-shrink: 0;
+            padding: 4px;
+            box-sizing: border-box;
           }
 
           .product-card-img-box img {
@@ -1186,20 +1460,28 @@
             object-fit: contain;
           }
 
+          .product-info-wrap {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+
           .product-cat-chip {
             display: inline-block;
-            font-size: 9px;
+            font-size: 9.5px;
             font-weight: 800;
-            padding: 2px 6px;
+            padding: 2px 7px;
             border-radius: 4px;
             border: 1px solid transparent;
           }
 
           .product-pack-chip {
             display: inline-block;
-            font-size: 9px;
+            font-size: 9.5px;
             font-weight: 800;
-            padding: 2px 6px;
+            padding: 2px 7px;
             border-radius: 4px;
             background: #e0f2fe;
             color: #0369a1;
@@ -1207,67 +1489,83 @@
           }
 
           .product-title {
-            font-size: 11.5px;
+            font-size: 14px;
             font-weight: 800;
             color: #0a192f;
-            margin: 3px 0;
+            margin: 3px 0 2px 0;
             line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
           }
 
           .price-row {
             display: flex;
             align-items: baseline;
-            gap: 6px;
-            margin: 3px 0 5px 0;
+            gap: 7px;
+            margin: 2px 0 4px 0;
           }
 
           .offer-price {
-            font-size: 13.5px;
+            font-size: 16px;
             font-weight: 900;
             color: #059669;
           }
 
           .mrp-cross {
-            font-size: 10px;
+            font-size: 11.5px;
             color: #94a3b8;
             text-decoration: line-through;
           }
 
           .discount-badge {
-            font-size: 8.5px;
+            font-size: 9.5px;
             font-weight: 800;
             background: #fee2e2;
             color: #dc2626;
-            padding: 1px 4px;
+            padding: 1.5px 6px;
             border-radius: 4px;
           }
 
           .card-snippet {
-            font-size: 9px;
-            color: #475569;
-            line-height: 1.35;
+            font-size: 10px;
+            color: #334155;
+            line-height: 1.4;
             margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
           }
 
           .card-ing-box {
             background: #f8fafc;
-            border-left: 2.5px solid #10b981;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-size: 8.5px;
-            color: #334155;
-            margin-bottom: 3px;
-            line-height: 1.3;
+            border-left: 3px solid #10b981;
+            padding: 3.5px 7px;
+            border-radius: 4px;
+            font-size: 9.5px;
+            color: #1e293b;
+            margin-bottom: 2.5px;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
           }
 
           .card-dose-box {
             background: #f0fdf4;
-            border-left: 2.5px solid #22c55e;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-size: 8.5px;
-            color: #166534;
-            line-height: 1.3;
+            border-left: 3px solid #22c55e;
+            padding: 3.5px 7px;
+            border-radius: 4px;
+            font-size: 9.5px;
+            color: #14532d;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
           }
 
           /* Last Page Certificate & Contacts */
@@ -1295,7 +1593,7 @@
             border-left: 4px solid #f59e0b;
             border-radius: 8px;
             padding: 10px 14px;
-            font-size: 9px;
+            font-size: 9.5px;
             line-height: 1.45;
             color: #475569;
             margin-top: 14px;
@@ -1304,253 +1602,294 @@
       </head>
       <body>
 
-        <!-- ================= PAGE 1: LUXURY COVER ================= -->
-        <div class="page-break">
-          <div class="cover-outer-frame">
-            <div class="cover-inner-frame">
-              
-              <!-- Top Branding Header -->
-              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  <img src="https://aarogyamindia.online/images/logo/logo.png" style="height: 52px; width: auto;" alt="Aarogyam India" onerror="this.style.display='none';">
-                  <div>
-                    <h1 style="font-size: 22px; font-weight: 900; color: #0a192f; margin: 0; letter-spacing: -0.5px;">AAROGYAM INDIA</h1>
-                    <span style="font-size: 10.5px; font-weight: 800; color: #059669; letter-spacing: 1px;">NATIONAL DIRECT HEALTH & AGRI NETWORK</span>
-                  </div>
-                </div>
-                <div style="text-align: right;">
-                  <span style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-size: 9.5px; font-weight: 800; padding: 4px 10px; border-radius: 20px;">
-                    🛡️ ${i18n.genuineBadge}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Main Hero Plaque -->
-              <div class="cover-hero-card" style="margin: 20px 0;">
-                <div class="cover-badge-pill">${i18n.coverBadge}</div>
-                <h2 class="cover-title-text">${i18n.title}</h2>
-                <p class="cover-subtitle-text">${i18n.subtitle}</p>
-                <div style="margin-top: 16px; display: flex; justify-content: center; gap: 18px; font-size: 10.5px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px;">
-                  <span>📅 ${i18n.dateLabel} <strong style="color: #ffffff;">${todayDate}</strong></span>
-                  <span>📦 ${i18n.totalProductsLabel} <strong style="color: #34d399;">${prodsToPrint.length}</strong></span>
-                  <span>🌐 <strong style="color: #38bdf8;">7-Language Certified</strong></span>
-                </div>
-              </div>
-
-              <!-- Corporate Profile Card -->
-              <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-left: 4px solid #10b981; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <h3 style="font-size: 14px; font-weight: 800; color: #0a192f; margin: 0 0 6px 0;">
-                  🏢 ${i18n.coverCompanyTitle}
-                </h3>
-                <p style="font-size: 10.5px; color: #334155; line-height: 1.55; margin: 0 0 10px 0;">
-                  ${i18n.coverCompanyDesc}
-                </p>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                  <span style="background: #ffffff; border: 1px solid #cbd5e1; font-size: 9.5px; font-weight: 700; color: #0f172a; padding: 3px 8px; border-radius: 6px;">
-                    🏛️ 26 Years Corporate Trust
-                  </span>
-                  <span style="background: #ffffff; border: 1px solid #cbd5e1; font-size: 9.5px; font-weight: 700; color: #059669; padding: 3px 8px; border-radius: 6px;">
-                    🔬 DSIR Recognized In-House R&D
-                  </span>
-                  <span style="background: #ffffff; border: 1px solid #cbd5e1; font-size: 9.5px; font-weight: 700; color: #d97706; padding: 3px 8px; border-radius: 6px;">
-                    👥 2.5 Million+ Satisfied Families
-                  </span>
-                </div>
-              </div>
-
-              <!-- Categories Overview Directory -->
-              <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 18px;">
-                <div style="font-size: 10.5px; font-weight: 800; color: #059669; margin-bottom: 8px;">
-                  🌱 ${i18n.categoryIntroTitle}
-                </div>
-                <p style="font-size: 10px; color: #475569; margin: 0 0 10px 0; line-height: 1.45;">
-                  ${i18n.categoryIntro}
-                </p>
-                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; text-align: center;">
-                  <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; padding: 6px 4px; font-size: 9px; font-weight: 800; color: #065f46;">
-                    🌾 Biofit Agri
-                  </div>
-                  <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 4px; font-size: 9px; font-weight: 800; color: #92400e;">
-                    🐄 Cattle Care
-                  </div>
-                  <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 6px; padding: 6px 4px; font-size: 9px; font-weight: 800; color: #9f1239;">
-                    ❤️ Naturamore
-                  </div>
-                  <div style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 6px; padding: 6px 4px; font-size: 9px; font-weight: 800; color: #115e59;">
-                    🌿 Herbs & More
-                  </div>
-                  <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 6px; padding: 6px 4px; font-size: 9px; font-weight: 800; color: #3730a3;">
-                    🏡 Clean & More
-                  </div>
-                </div>
-              </div>
-
-              <!-- Executive Presenter Badge on Cover -->
-              <div style="background: #0a192f; color: #ffffff; border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <span style="font-size: 9.5px; font-weight: 800; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px;">${i18n.distributorTitle}</span>
-                  <div style="font-size: 16px; font-weight: 900; color: #ffffff; margin-top: 2px;">${distName}</div>
-                  <div style="font-size: 12.5px; font-weight: 800; color: #38bdf8; margin-top: 2px;">${i18n.phoneWaLabel} +91 ${distPhone}</div>
-                </div>
-                <div style="text-align: right;">
-                  <span style="font-size: 9.5px; color: #94a3b8;">${i18n.helplineLabel}</span>
-                  <strong style="display: block; font-size: 12.5px; color: #34d399;">+91 79744 22572</strong>
-                  <span style="font-size: 9px; color: #cbd5e1;">www.aarogyamindia.online</span>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <!-- ================= PRODUCT PAGES ================= -->
-        <div class="running-header">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <strong style="font-size: 13px; color: #0a192f;">AAROGYAM INDIA</strong>
-            <span style="color: #cbd5e1;">•</span>
-            <span style="font-size: 11px; font-weight: 700; color: #059669;">${i18n.title}</span>
-          </div>
-          <div style="font-size: 10px; color: #64748b;">
-            ${i18n.distributorTitle.split('(')[0]} <strong style="color: #0a192f;">${distName}</strong> (+91 ${distPhone})
-          </div>
-        </div>
-
-        <div class="product-grid">
-          ${prodsToPrint.map(p => {
-            const mrp = parseInt(p.mrp, 10) || 0;
-            const discountPct = parseInt(p.discount_pct, 10) || 0;
-            const offerPrice = p.discounted_price || (discountPct ? Math.round(mrp * (1 - discountPct / 100)) : mrp);
-            const imgSrc = (p.image && !p.image.includes('logo.png')) ? (p.image.startsWith('http') ? p.image : 'https://aarogyamindia.online' + p.image) : 'https://aarogyamindia.online/images/logo/logo.png';
-            const translatedCat = getTranslatedCategory(p.category, langKey);
-            const catColors = catColorMap[p.category] || { bg: '#f1f5f9', text: '#334155', border: '#cbd5e1' };
-
-            const multi = getProductMultilingualData(p, langKey);
-            const packTranslated = translatePackSize(p.pack_size, langKey);
-
-            return `
-              <div class="product-card">
-                <div class="product-card-img-box">
-                  <img src="${imgSrc}" alt="${escapeHtml(multi.name)}" onerror="this.src='https://aarogyamindia.online/images/logo/logo.png'">
-                </div>
-
-                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between;">
-                  <div>
-                    <!-- Category & Pack Size Pills -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 4px; margin-bottom: 2px;">
-                      <span class="product-cat-chip" style="background: ${catColors.bg}; color: ${catColors.text}; border-color: ${catColors.border};">
-                        ${escapeHtml(translatedCat)}
-                      </span>
-                      ${packTranslated ? `<span class="product-pack-chip">📦 ${escapeHtml(packTranslated)}</span>` : ''}
-                    </div>
-
-                    <!-- Title -->
-                    <h4 class="product-title">${escapeHtml(multi.name)}</h4>
-
-                    <!-- Price Row -->
-                    <div class="price-row">
-                      <span class="offer-price">${i18n.offerLabel} ₹${offerPrice}</span>
-                      ${mrp > offerPrice ? `
-                        <span class="mrp-cross">₹${mrp}</span>
-                        <span class="discount-badge">${discountPct}% ${i18n.discountBadge}</span>
-                      ` : ''}
-                    </div>
-
-                    <!-- Description Snippet -->
-                    ${multi.description ? `
-                      <div class="card-snippet" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                        ${escapeHtml(multi.description)}
-                      </div>
-                    ` : ''}
-                  </div>
-
-                  <!-- Ingredients & Dose Details -->
-                  <div>
-                    ${multi.ingredients ? `
-                      <div class="card-ing-box">
-                        <strong style="color: #059669;">${i18n.ingLabel}</strong> ${escapeHtml(multi.ingredients)}
-                      </div>
-                    ` : ''}
-                    ${multi.dose ? `
-                      <div class="card-dose-box">
-                        <strong style="color: #15803d;">${i18n.doseLabel}</strong> ${escapeHtml(multi.dose)}
-                      </div>
-                    ` : ''}
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-
-        <!-- ================= FINAL CERTIFICATE & DISCLAIMER PAGE ================= -->
-        <div style="margin-top: 24px;" class="last-page-frame">
-          
-          <!-- Distributor Gold Certificate Card -->
-          <div class="distributor-gold-card">
-            <span style="font-size: 10px; font-weight: 900; color: #059669; text-transform: uppercase; letter-spacing: 1px;">
-              ${i18n.distributorTitle}
-            </span>
-            <h2 style="font-size: 22px; font-weight: 900; color: #0a192f; margin: 4px 0 6px 0;">
-              ${distName}
-            </h2>
-            <div style="font-size: 17px; font-weight: 900; color: #0284c7; margin-bottom: 6px;">
-              ${i18n.phoneWaLabel} +91 ${distPhone}
-            </div>
-            <p style="font-size: 11px; color: #334155; margin: 0 0 10px 0; font-weight: 600;">
-              ${i18n.orderNote}
-            </p>
-          </div>
-
-          <!-- 3-Step Easy Ordering Guide -->
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-top: 14px;">
-            <div style="font-size: 11px; font-weight: 800; color: #0a192f; margin-bottom: 6px;">
-              📦 ${i18n.howToOrderTitle}
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 10px; color: #475569;">
-              <div>${i18n.howToOrderStep1}</div>
-              <div>${i18n.howToOrderStep2}</div>
-              <div>${i18n.howToOrderStep3}</div>
-            </div>
-          </div>
-
-          <!-- Corporate Compliance & Helpline Box -->
-          <div style="background: #f1f5f9; border-radius: 8px; padding: 10px 14px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 9.5px; color: #475569;">
+        <!-- Top Floating Bar (Interactive on Screen / Hidden in Print) -->
+        <div class="no-print" style="position: sticky; top: 0; z-index: 99999; background: #0f172a; color: #ffffff; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 16px rgba(0,0,0,0.3); border-bottom: 2px solid #10b981;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:22px;">📥</span>
             <div>
-              <strong>${i18n.corporateAddressTitle}</strong> ${i18n.corporateAddressText}
+              <strong style="font-size:13.5px; display:block;">सम्पूर्ण नेटसर्फ कैटलॉग तैयार है (${prodsToPrint.length} उत्पाद)</strong>
+              <span style="font-size:10.5px; color:#94a3b8;">उच्च गुणवत्ता 4-उत्पाद A4 फॉर्मेट • सीधे प्रिंट करें या PDF सेव करें</span>
             </div>
-            <div style="text-align: right; flex-shrink: 0; padding-left: 12px;">
-              <strong>${i18n.customerCareLabel}</strong> ${i18n.customerCareText}
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button type="button" onclick="window.print()" style="background:#10b981; color:#fff; border:none; padding:8px 18px; border-radius:20px; font-weight:800; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(16,185,129,0.4);">
+              📥 PDF डाउनलोड / प्रिंट करें
+            </button>
+            <button type="button" onclick="window.close()" style="background:#334155; color:#cbd5e1; border:none; padding:8px 14px; border-radius:20px; font-weight:700; font-size:12px; cursor:pointer;">
+              ✕ बंद करें
+            </button>
+          </div>
+        </div>
+
+        <div style="padding: 10px 14px;">
+
+          <!-- ================= PAGE 1: LUXURY COVER ================= -->
+          <div class="page-break">
+            <div class="cover-outer-frame">
+              <div class="cover-inner-frame">
+                
+                <!-- Top Branding Header: Aarogyam India on Left, Netsurf Official Logo on Right -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 12px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="https://aarogyamindia.online/images/logo/logo.png" style="height: 52px; width: auto;" alt="Aarogyam India" onerror="this.style.display='none';">
+                    <div>
+                      <h1 style="font-size: 22px; font-weight: 900; color: #0a192f; margin: 0; letter-spacing: -0.5px;">AAROGYAM INDIA</h1>
+                      <span style="font-size: 10.5px; font-weight: 800; color: #059669; letter-spacing: 1px;">NATIONAL DIRECT HEALTH & AGRI NETWORK</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Netsurf Official Logo Top-Right on Cover -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="text-align: right;">
+                      <span style="font-size: 9px; font-weight: 800; color: #64748b; letter-spacing: 0.5px; text-transform: uppercase;">Official Manufacturer</span>
+                      <div style="font-size: 12px; font-weight: 900; color: #0f172a;">NETSURF DIRECT</div>
+                    </div>
+                    <img src="https://aarogyamindia.online/images/logo/netsurf-logo.png" style="height: 48px; width: 48px; object-fit: contain; border-radius: 8px; border: 1px solid #cbd5e1;" alt="Netsurf Direct">
+                  </div>
+                </div>
+
+                <!-- Main Hero Plaque -->
+                <div class="cover-hero-card" style="margin: 18px 0;">
+                  <div class="cover-badge-pill">${i18n.coverBadge}</div>
+                  <h2 class="cover-title-text">${i18n.title}</h2>
+                  <p class="cover-subtitle-text">${i18n.subtitle}</p>
+                  <div style="margin-top: 14px; display: flex; justify-content: center; gap: 18px; font-size: 11px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px;">
+                    <span>📅 ${i18n.dateLabel} <strong style="color: #ffffff;">${todayDate}</strong></span>
+                    <span>📦 ${i18n.totalProductsLabel} <strong style="color: #34d399;">${prodsToPrint.length}</strong></span>
+                    <span>🌐 <strong style="color: #38bdf8;">7-Language Certified</strong></span>
+                  </div>
+                </div>
+
+                <!-- Corporate Profile Card -->
+                <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-left: 4px solid #10b981; border-radius: 12px; padding: 15px; margin-bottom: 14px;">
+                  <h3 style="font-size: 14px; font-weight: 800; color: #0a192f; margin: 0 0 6px 0;">
+                    🏢 ${i18n.coverCompanyTitle}
+                  </h3>
+                  <p style="font-size: 10.5px; color: #334155; line-height: 1.55; margin: 0 0 8px 0;">
+                    ${i18n.coverCompanyDesc}
+                  </p>
+                  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <span style="background: #ffffff; border: 1px solid #cbd5e1; font-size: 9.5px; font-weight: 700; color: #0f172a; padding: 3px 8px; border-radius: 6px;">
+                      🏛️ 26 Years Corporate Trust
+                    </span>
+                    <span style="background: #ffffff; border: 1px solid #cbd5e1; font-size: 9.5px; font-weight: 700; color: #059669; padding: 3px 8px; border-radius: 6px;">
+                      🔬 DSIR Recognized In-House R&D
+                    </span>
+                    <span style="background: #ffffff; border: 1px solid #cbd5e1; font-size: 9.5px; font-weight: 700; color: #d97706; padding: 3px 8px; border-radius: 6px;">
+                      👥 2.5 Million+ Satisfied Families
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Categories Overview Directory -->
+                <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 13px; margin-bottom: 16px;">
+                  <div style="font-size: 11px; font-weight: 800; color: #059669; margin-bottom: 6px;">
+                    🌱 ${i18n.categoryIntroTitle}
+                  </div>
+                  <p style="font-size: 10px; color: #475569; margin: 0 0 8px 0; line-height: 1.45;">
+                    ${i18n.categoryIntro}
+                  </p>
+                  <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; text-align: center;">
+                    <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; padding: 6px 4px; font-size: 9.5px; font-weight: 800; color: #065f46;">
+                      🌾 Biofit Agri
+                    </div>
+                    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 4px; font-size: 9.5px; font-weight: 800; color: #92400e;">
+                      🐄 Cattle Care
+                    </div>
+                    <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 6px; padding: 6px 4px; font-size: 9.5px; font-weight: 800; color: #9f1239;">
+                      ❤️ Naturamore
+                    </div>
+                    <div style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 6px; padding: 6px 4px; font-size: 9.5px; font-weight: 800; color: #115e59;">
+                      🌿 Herbs & More
+                    </div>
+                    <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 6px; padding: 6px 4px; font-size: 9.5px; font-weight: 800; color: #3730a3;">
+                      🏡 Clean & More
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Executive Presenter Badge on Cover -->
+                <div style="background: #0a192f; color: #ffffff; border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <span style="font-size: 9.5px; font-weight: 800; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px;">${i18n.distributorTitle}</span>
+                    <div style="font-size: 16px; font-weight: 900; color: #ffffff; margin-top: 2px;">${escapeHtml(distName)}</div>
+                    <div style="font-size: 13px; font-weight: 800; color: #38bdf8; margin-top: 2px;">${i18n.phoneWaLabel} +91 ${escapeHtml(distPhone)}</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <span style="font-size: 9.5px; color: #94a3b8;">${i18n.helplineLabel}</span>
+                    <strong style="display: block; font-size: 13px; color: #34d399;">+91 79744 22572</strong>
+                    <span style="font-size: 9.5px; color: #cbd5e1;">www.aarogyamindia.online</span>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
 
-          <!-- Comprehensive Legal Disclaimer -->
-          <div class="legal-disclaimer-box">
-            <strong style="color: #b45309; display: block; margin-bottom: 2px;">
-              ⚖️ ${i18n.disclaimerTitle}
-            </strong>
-            ${i18n.disclaimerText}
+          <!-- ================= PRODUCT PAGES (MAX 4 PRODUCTS PER PAGE CHUNK) ================= -->
+          ${productPages.map((pageGroup, pageIdx) => `
+            <div class="page-break product-page-wrap">
+              
+              <!-- Running Header: Official Netsurf Logo on Top-Right -->
+              <div class="running-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <img src="https://aarogyamindia.online/images/logo/logo.png" style="height: 32px; width: auto;" alt="Aarogyam India" onerror="this.style.display='none';">
+                  <div>
+                    <strong style="font-size: 13.5px; color: #0a192f; display: block; line-height: 1.2;">AAROGYAM INDIA</strong>
+                    <span style="font-size: 10.5px; font-weight: 700; color: #059669;">${escapeHtml(i18n.title)}</span>
+                  </div>
+                </div>
+
+                <div style="text-align: center; font-size: 10.5px; color: #475569;">
+                  <span>प्रस्तुतकर्ता: <strong style="color: #0a192f;">${escapeHtml(distName)}</strong></span>
+                  <span style="display: block; font-size: 10px; color: #0284c7; font-weight: 800;">📞 WhatsApp: +91 ${escapeHtml(distPhone)}</span>
+                </div>
+
+                <!-- Official Netsurf Logo on Top-Right of Every Page -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="text-align: right;">
+                    <span style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Official Partner</span>
+                    <strong style="font-size: 11px; font-weight: 900; color: #0f172a;">NETSURF DIRECT</strong>
+                  </div>
+                  <img src="https://aarogyamindia.online/images/logo/netsurf-logo.png" style="height: 34px; width: 34px; object-fit: contain; border-radius: 6px; border: 1px solid #cbd5e1;" alt="Netsurf Direct">
+                </div>
+              </div>
+
+              <!-- 2x2 Grid with exactly up to 4 products -->
+              <div class="product-grid-4">
+                ${pageGroup.map(p => renderProductCardHtml(p)).join('')}
+              </div>
+
+              <!-- Running Footer -->
+              <div class="running-footer">
+                <span>📄 पृष्ठ ${pageIdx + 2} / ${totalPages}</span>
+                <span>🛡️ 100% प्रामाणिक व DSIR मान्यता प्राप्त उत्पाद</span>
+                <span>24×7 सहायता: +91 79744 22572 • www.aarogyamindia.online</span>
+              </div>
+            </div>
+          `).join('')}
+
+          <!-- ================= FINAL CERTIFICATE & DISCLAIMER PAGE ================= -->
+          <div class="page-break product-page-wrap">
+            
+            <!-- Running Header on Final Page as well -->
+            <div class="running-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="https://aarogyamindia.online/images/logo/logo.png" style="height: 32px; width: auto;" alt="Aarogyam India" onerror="this.style.display='none';">
+                <div>
+                  <strong style="font-size: 13.5px; color: #0a192f; display: block; line-height: 1.2;">AAROGYAM INDIA</strong>
+                  <span style="font-size: 10.5px; font-weight: 700; color: #059669;">${escapeHtml(i18n.title)}</span>
+                </div>
+              </div>
+              <div style="text-align: center; font-size: 10.5px; color: #475569;">
+                <span>प्रस्तुतकर्ता: <strong style="color: #0a192f;">${escapeHtml(distName)}</strong></span>
+                <span style="display: block; font-size: 10px; color: #0284c7; font-weight: 800;">📞 WhatsApp: +91 ${escapeHtml(distPhone)}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="text-align: right;">
+                  <span style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Official Partner</span>
+                  <strong style="font-size: 11px; font-weight: 900; color: #0f172a;">NETSURF DIRECT</strong>
+                </div>
+                <img src="https://aarogyamindia.online/images/logo/netsurf-logo.png" style="height: 34px; width: 34px; object-fit: contain; border-radius: 6px; border: 1px solid #cbd5e1;" alt="Netsurf Direct">
+              </div>
+            </div>
+
+            <div class="last-page-frame" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+              
+              <!-- Distributor Gold Certificate Card -->
+              <div class="distributor-gold-card">
+                <span style="font-size: 11px; font-weight: 900; color: #059669; text-transform: uppercase; letter-spacing: 1px;">
+                  ${i18n.distributorTitle}
+                </span>
+                <h2 style="font-size: 24px; font-weight: 900; color: #0a192f; margin: 6px 0 6px 0;">
+                  ${escapeHtml(distName)}
+                </h2>
+                <div style="font-size: 18px; font-weight: 900; color: #0284c7; margin-bottom: 8px;">
+                  ${i18n.phoneWaLabel} +91 ${escapeHtml(distPhone)}
+                </div>
+                <p style="font-size: 12px; color: #334155; margin: 0 0 10px 0; font-weight: 600;">
+                  ${i18n.orderNote}
+                </p>
+              </div>
+
+              <!-- 3-Step Easy Ordering Guide -->
+              <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; margin-top: 14px;">
+                <div style="font-size: 12px; font-weight: 800; color: #0a192f; margin-bottom: 8px;">
+                  📦 ${i18n.howToOrderTitle}
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 10.5px; color: #475569;">
+                  <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">${i18n.howToOrderStep1}</div>
+                  <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">${i18n.howToOrderStep2}</div>
+                  <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">${i18n.howToOrderStep3}</div>
+                </div>
+              </div>
+
+              <!-- Corporate Compliance & Helpline Box -->
+              <div style="background: #f1f5f9; border-radius: 10px; padding: 12px 16px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #475569;">
+                <div>
+                  <strong>${i18n.corporateAddressTitle}</strong> ${i18n.corporateAddressText}
+                </div>
+                <div style="text-align: right; flex-shrink: 0; padding-left: 14px;">
+                  <strong>${i18n.customerCareLabel}</strong> ${i18n.customerCareText}
+                </div>
+              </div>
+
+              <!-- Comprehensive Legal Disclaimer -->
+              <div class="legal-disclaimer-box">
+                <strong style="color: #b45309; display: block; margin-bottom: 3px; font-size: 10px;">
+                  ⚖️ ${i18n.disclaimerTitle}
+                </strong>
+                ${i18n.disclaimerText}
+              </div>
+
+              <!-- Footer Mission -->
+              <div style="text-align: center; margin-top: 14px; font-size: 10.5px; font-weight: 700; color: #059669;">
+                ${i18n.footerMission}
+              </div>
+            </div>
+
+            <!-- Running Footer on Final Page -->
+            <div class="running-footer">
+              <span>📄 पृष्ठ ${totalPages} / ${totalPages}</span>
+              <span>🛡️ आधिकारिक कॉर्पोरेट एवं वितरक दस्तावेज</span>
+              <span>24×7 सहायता: +91 79744 22572 • www.aarogyamindia.online</span>
+            </div>
           </div>
 
-          <!-- Footer Mission -->
-          <div style="text-align: center; margin-top: 12px; font-size: 9.5px; font-weight: 700; color: #059669;">
-            ${i18n.footerMission}
-          </div>
         </div>
 
         <script>
-          window.onload = function() {
+          window.addEventListener('load', function() {
             setTimeout(function() {
-              window.print();
-            }, 600);
-          };
+              try {
+                window.print();
+              } catch(e) {}
+            }, 800);
+          });
         </script>
       </body>
       </html>
     `;
 
-    printDoc.document.open();
-    printDoc.document.write(htmlContent);
-    printDoc.document.close();
+    // High reliability Blob download / open (solves mobile popup blocker & browser issues)
+    try {
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const blobUrl = URL.createObjectURL(blob);
+      const printDoc = window.open(blobUrl, '_blank');
+      if (!printDoc) {
+        window.location.href = blobUrl;
+      }
+    } catch(err) {
+      // Fallback
+      const printDoc = window.open('', '_blank');
+      if (printDoc) {
+        printDoc.document.open();
+        printDoc.document.write(htmlContent);
+        printDoc.document.close();
+      } else {
+        alert('कृपया ब्राउज़र में पॉपअप को अनुमति दें (Allow Popups) ताकि कैटलॉग खुल सके।');
+      }
+    }
   };
 
   // 8. Initialization
