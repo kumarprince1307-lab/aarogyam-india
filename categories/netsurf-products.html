@@ -516,18 +516,43 @@
         </label>
         <div style="position:relative;">
           <select id="npProblemSelect" onchange="window.filterByProblem(this.value)" style="width:100%; box-sizing:border-box; padding:12px 38px 12px 14px; border-radius:12px; border:1.8px solid #cbd5e1; font-size:0.9rem; font-weight:700; color:#0f172a; background:#ffffff; appearance:none; -webkit-appearance:none; outline:none; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.04); transition:all 0.2s;">
-            <option value="all">🌟 सभी स्वास्थ्य समस्याएं व समाधान (All Health Concerns & Benefits)</option>
-            <option value="diabetes">🩸 डायबिटीज / शुगर नियंत्रण (Diabetes & Sugar Care)</option>
-            <option value="joint_pain">🦴 जोड़ों का दर्द / गठिया व सायटिका (Joint Pain & Arthritis)</option>
-            <option value="weight_loss">⚖️ मोटापा व वजन नियंत्रण (Weight Management)</option>
-            <option value="hair_care">💇 हेयर फॉल, डैंड्रफ व बालों का झड़ना (Hair Fall & Dandruff)</option>
-            <option value="skin_care">✨ कील-मुंहासे, पिंपल्स व स्किन ग्लो (Skin Acne & Glow)</option>
-            <option value="womens_care">🌸 महिला स्वास्थ्य व हार्मोनल संतुलन (Women's Wellness)</option>
-            <option value="kids_care">👶 बच्चों का पोषण व मानसिक विकास (Kids Nutrition)</option>
-            <option value="vitality_wellness">⚡ पौरुष शक्ति, स्टैमिना व ऊर्जा (Vitality & Stamina)</option>
-            <option value="cattle_care">🐄 पशु पोषण, दुग्ध वृद्धि व फैट (Cattle Milk & Fat Boost)</option>
-            <option value="crop_yield">🌾 फसल पैदावार, जैविक कीट सुरक्षा व जीवाणु खाद (Crop Yield)</option>
-            <option value="home_care">🏡 इको-फ्रेंडली होम व फैब्रिक हाइजीन (Eco Home Hygiene)</option>
+            <option value="all">🌟 सम्पूर्ण समाधान व सभी समस्याएं (All Categories & Problems)</option>
+            
+            <optgroup label="🌾 कृषि, प्रमुख फसलें एवं जैविक कीट-रोग सुरक्षा">
+              <option value="agri_pest">🐛 कीट, इल्ली व रसचूसक कीट (Pest & Insect Control)</option>
+              <option value="agri_fungus">🍄 फंगस, फफूंद व ब्लाइट सुरक्षा (Fungus & Blight)</option>
+              <option value="agri_virus">🦠 वायरस व विषाणु जनित रोग (Plant Virus & Bacteria)</option>
+              <option value="agri_soil_health">🌱 मिट्टी सुधार, जीवाणु खाद व जड़ विकास (Soil Health & NPK)</option>
+              <option value="agri_flower_fruit">🌸 फूल-फल झड़ना रोकना व पैदावार वृद्धि (Flower & Fruit Yield)</option>
+              <option value="crop_chana">🌱 चना फसल विशेष (Gram / Chickpea Care)</option>
+              <option value="crop_soybean">🌿 सोयाबीन फसल विशेष (Soybean Care)</option>
+              <option value="crop_mustard">🌼 सरसों फसल विशेष (Mustard Care)</option>
+              <option value="crop_wheat">🌾 गेहूँ फसल विशेष (Wheat Care)</option>
+              <option value="crop_paddy">🌾 धान व चावल फसल विशेष (Paddy / Rice Care)</option>
+            </optgroup>
+
+            <optgroup label="🐄 पशु पोषण, डेयरी, मत्स्य एवं कुक्कुट पालन">
+              <option value="cattle_care">🥛 गाय-भैंस दुग्ध वृद्धि व फैट बढ़ोत्तरी (CFC Milk & Fat Boost)</option>
+              <option value="cattle_health">💪 पशु रोग प्रतिरोधक क्षमता, पाचन व गर्भाधान (Livestock Care)</option>
+              <option value="aqua_fish">🐟 मछली पालन व जल संवर्धन (Fish Aquaculture Care)</option>
+              <option value="poultry_care">🐔 मुर्गी पालन व अंडा उत्पादन (Poultry Farming)</option>
+              <option value="goat_care">🐐 बकरी व भेड़ पालन पोषण (Goat & Sheep Care)</option>
+            </optgroup>
+
+            <optgroup label="❤️ मानव स्वास्थ्य, न्यूट्रिशन एवं वेलनेस">
+              <option value="diabetes">🩸 डायबिटीज / शुगर नियंत्रण (Diabetes & Sugar Care)</option>
+              <option value="joint_pain">🦴 जोड़ों का दर्द / गठिया व सायटिका (Joint Pain & Arthritis)</option>
+              <option value="weight_loss">⚖️ मोटापा व वजन नियंत्रण (Weight Management)</option>
+              <option value="hair_care">💇 हेयर फॉल, डैंड्रफ व बालों का झड़ना (Hair Fall & Dandruff)</option>
+              <option value="skin_care">✨ कील-मुंहासे, पिंपल्स व स्किन ग्लो (Skin Acne & Glow)</option>
+              <option value="womens_care">🌸 महिला स्वास्थ्य व हार्मोनल संतुलन (Women's Wellness)</option>
+              <option value="kids_care">👶 बच्चों का पोषण व मानसिक विकास (Kids Nutrition)</option>
+              <option value="vitality_wellness">⚡ पौरुष शक्ति, स्टैमिना व ऊर्जा (Vitality & Stamina)</option>
+            </optgroup>
+
+            <optgroup label="🏡 पर्यावरण अनुकूल होम केयर व हाइजीन">
+              <option value="home_care">🏡 इको-फ्रेंडली फैब्रिक व होम हाइजीन (Eco Home & Fabric Care)</option>
+            </optgroup>
           </select>
           <div style="position:absolute; right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:#64748b; font-size:0.85rem;">
             <i class="fa-solid fa-chevron-down"></i>

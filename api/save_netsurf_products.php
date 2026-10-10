@@ -46,7 +46,28 @@ $products = null;
 $categories = null;
 $catalogSettings = null;
 
-if (isset($payload['products']) && is_array($payload['products'])) {
+// Support single product save or batch save
+if (isset($payload['product']) && is_array($payload['product'])) {
+    $singleProd = $payload['product'];
+    $curData = file_exists($productsJsonPath) ? json_decode(file_get_contents($productsJsonPath), true) : [];
+    $existingProducts = $curData['products'] ?? [];
+    $found = false;
+    if (!empty($singleProd['id'])) {
+        foreach ($existingProducts as $k => $item) {
+            if (isset($item['id']) && $item['id'] === $singleProd['id']) {
+                $existingProducts[$k] = $singleProd;
+                $found = true;
+                break;
+            }
+        }
+    }
+    if (!$found) {
+        array_unshift($existingProducts, $singleProd);
+    }
+    $products = $existingProducts;
+    $categories = $payload['categories'] ?? ($curData['categories'] ?? []);
+    $catalogSettings = $payload['catalog_settings'] ?? ($curData['catalog_settings'] ?? null);
+} elseif (isset($payload['products']) && is_array($payload['products'])) {
     $products = $payload['products'];
     $categories = $payload['categories'] ?? [];
     $catalogSettings = $payload['catalog_settings'] ?? null;

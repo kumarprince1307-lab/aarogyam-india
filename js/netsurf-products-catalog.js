@@ -68,9 +68,9 @@
       customerCareLabel: "कंपनी हेल्पलाइन:",
       customerCareText: "020-42111111 | helpdesk@netsurfdirect.com | www.netsurfdirect.com",
       disclaimerTitle: "वैधानिक सूचना एवं सुरक्षा अस्वीकरण (Legal Disclaimer):",
-      disclaimerText: "इस कैटलॉग में दी गई समस्त जानकारी, उत्पाद विनिर्देश, घटक व खुराक आधिकारिक निर्माता पोर्टल (netsurfdirect.com) के सार्वजनिक लिटरेचर से संदर्भ व जन-सुविधा हेतु ली गई है। Aarogyam India एक स्वतंत्र अधिकृत वितरक नेटवर्क है और प्रत्यक्ष विनिर्माण दायित्व का दावा नहीं करता। आधिकारिक कॉर्पोरेट जानकारी, बैच व गुणवत्ता प्रमाणन हेतु निर्माता Netsurf Communications Pvt. Ltd. से संपर्क करें। किसी भी गंभीर स्वास्थ्य विकार में उपयोग से पूर्व चिकित्सक से परामर्श लें।",
-      helplineLabel: "आरोग्यम भारत सपोर्ट:",
-      footerMission: "आरोग्यम भारत डिजिटल स्वास्थ्य एवं जैविक संवर्धन मिशन • www.aarogyamindia.online",
+      disclaimerText: "इस कैटलॉग में दी गई समस्त जानकारी, उत्पाद विनिर्देश, घटक व खुराक आधिकारिक निर्माता पोर्टल (netsurfdirect.com) के सार्वजनिक लिटरेचर से संदर्भ व जन-सुविधा हेतु ली गई है। AAROGYAM INDIA एक स्वतंत्र अधिकृत वितरक नेटवर्क है और प्रत्यक्ष विनिर्माण दायित्व का दावा नहीं करता। आधिकारिक कॉर्पोरेट जानकारी, बैच व गुणवत्ता प्रमाणन हेतु निर्माता Netsurf Communications Pvt. Ltd. से संपर्क करें। किसी भी गंभीर स्वास्थ्य विकार में उपयोग से पूर्व चिकित्सक से परामर्श लें।",
+      helplineLabel: "AAROGYAM INDIA सपोर्ट:",
+      footerMission: "AAROGYAM INDIA • Digital Health & Agro Mission • www.aarogyamindia.online",
       categories: {
         agri: "🌾 कृषि बायोफिट (Biofit)",
         cattle: "🐄 पशु पोषण (Biofit Cattle Care)",
@@ -314,9 +314,9 @@
       customerCareLabel: "কোম্পানি হেল্পলাইন:",
       customerCareText: "020-42111111 | helpdesk@netsurfdirect.com | www.netsurfdirect.com",
       disclaimerTitle: "আইনি বিজ্ঞপ্তি ও দাবিত্যাগ (Legal Disclaimer):",
-      disclaimerText: "সমস্ত তথ্য netsurfdirect.com থেকে রেফারেন্স হিসেবে সংগৃহীত। আরোগ্যম ইন্ডিয়া একটি স্বাধীন পরিবেশক নেটওয়ার্ক। বিশদ তথ্যের জন্য Netsurf Communications Pvt. Ltd.-এর সাথে যোগাযোগ করুন।",
-      helplineLabel: "আরোগ্যম ইন্ডিয়া সাপোর্ট:",
-      footerMission: "আরোগ্যম ইন্ডিয়া ডিজিটাল স্বাস্থ্য ও জৈব মিশন • www.aarogyamindia.online",
+      disclaimerText: "সমস্ত তথ্য netsurfdirect.com থেকে রেফারেন্স হিসেবে সংগৃহীত। AAROGYAM INDIA একটি স্বাধীন পরিবেশক নেটওয়ার্ক। বিশদ তথ্যের জন্য Netsurf Communications Pvt. Ltd.-এর সাথে যোগাযোগ করুন।",
+      helplineLabel: "AAROGYAM INDIA Support:",
+      footerMission: "AAROGYAM INDIA • Digital Health & Agro Mission • www.aarogyamindia.online",
       categories: {
         agri: "🌾 কৃষি বায়োফিট (Biofit Agriculture)",
         cattle: "🐄 পশু পুষ্টি ও দুগ্ধ বিকাশ (Cattle Care)",
@@ -547,7 +547,7 @@
     };
   }
 
-  // 1. Resolve Sponsor from Session or URL
+  // 1. Resolve Sponsor & Logged-In User from Session or URL
   function resolveSponsor() {
     const params = new URLSearchParams(window.location.search);
     const sponsorParam = params.get('u') || params.get('s') || params.get('ref') || params.get('sponsor');
@@ -557,14 +557,53 @@
       currentSponsor.isPersonalized = true;
     }
 
-    try {
-      const activeSession = JSON.parse(localStorage.getItem('aim_user_session') || '{}');
-      if (activeSession && activeSession.name) {
-        currentSponsor.name = activeSession.name;
-        if (activeSession.phone) currentSponsor.phone = activeSession.phone.replace(/\D/g, '');
-        currentSponsor.isPersonalized = true;
+    // Comprehensive multi-key resolution of logged-in user profile
+    const sessionKeys = [
+      'aoi_user_session',
+      'current_user',
+      'CURRENT_USER',
+      'user',
+      'loggedInUser',
+      'aim_user_session',
+      'active_user'
+    ];
+
+    let loggedInProfile = null;
+    for (const key of sessionKeys) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            const name = parsed.name || parsed.full_name || parsed.userName || parsed.user_name || '';
+            const phone = (parsed.phone || parsed.mobile || parsed.user_phone || parsed.user_mobile || '').replace(/\D/g, '');
+            if (phone || name) {
+              loggedInProfile = { name, phone };
+              break;
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Direct string keys fallback
+    if (!loggedInProfile) {
+      const fallbackPhone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('user_phone') || localStorage.getItem('aim_user_phone') || localStorage.getItem('active_user_mobile') || '').replace(/\D/g, '');
+      const fallbackName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('user_name') || localStorage.getItem('aim_user_name') || '';
+      if (fallbackPhone || fallbackName) {
+        loggedInProfile = { name: fallbackName, phone: fallbackPhone };
       }
-    } catch (e) {}
+    }
+
+    if (loggedInProfile) {
+      if (loggedInProfile.name && !sponsorParam) {
+        currentSponsor.name = loggedInProfile.name;
+      }
+      if (loggedInProfile.phone) {
+        currentSponsor.phone = loggedInProfile.phone;
+      }
+      currentSponsor.isPersonalized = true;
+    }
 
     // Update UI elements
     const stickyName = document.getElementById('npStickySellerName');
@@ -581,8 +620,8 @@
 
     const distNameInput = document.getElementById('npDistributorName');
     const distPhoneInput = document.getElementById('npDistributorPhone');
-    if (distNameInput && currentSponsor.isPersonalized) distNameInput.value = currentSponsor.name;
-    if (distPhoneInput && currentSponsor.isPersonalized) distPhoneInput.value = currentSponsor.phone;
+    if (distNameInput) distNameInput.value = currentSponsor.name;
+    if (distPhoneInput) distPhoneInput.value = currentSponsor.phone;
   }
 
   // 2. Fetch Master Products (Multi-path with Cache Busting)
@@ -672,10 +711,16 @@
       if (currentCategory !== 'all' && p.category !== currentCategory) {
         return false;
       }
-      // 2. Problem / Concern Filter
+      // 2. Problem / Crop / Concern Filter
       if (currentProblem !== 'all') {
         const tags = Array.isArray(p.problem_tags) ? p.problem_tags : [];
-        if (!tags.includes(currentProblem)) {
+        const sub = (p.subcategory || '').toLowerCase();
+        const prob = currentProblem.toLowerCase();
+
+        const matchTag = tags.includes(currentProblem);
+        const matchSub = sub === prob || sub.includes(prob) || prob.includes(sub);
+
+        if (!matchTag && !matchSub) {
           if (currentProblem === 'cattle_care' && p.category === 'cattle') return true;
           if (currentProblem === 'crop_yield' && p.category === 'agri') return true;
           if (currentProblem === 'home_care' && p.category === 'clean_more') return true;
@@ -916,6 +961,12 @@
   window.openCatalogDownloadModal = function () {
     const modal = document.getElementById('npCatalogModal');
     if (modal) modal.style.display = 'flex';
+
+    // Ensure logged-in distributor name & phone are defaulted
+    const distNameInput = document.getElementById('npDistributorName');
+    const distPhoneInput = document.getElementById('npDistributorPhone');
+    if (distNameInput && currentSponsor.name) distNameInput.value = currentSponsor.name;
+    if (distPhoneInput && currentSponsor.phone) distPhoneInput.value = currentSponsor.phone;
   };
 
   window.closeCatalogDownloadModal = function () {

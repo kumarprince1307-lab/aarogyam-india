@@ -8,30 +8,74 @@
       "name": "🌾 कृषि बायोफिट (Biofit Agriculture)",
       "subcategories": [
         {
+          "id": "agri_chana",
+          "name": "🌱 चना फसल (Gram / Chickpea)"
+        },
+        {
+          "id": "agri_soybean",
+          "name": "🌿 सोयाबीन फसल (Soybean Care)"
+        },
+        {
+          "id": "agri_mustard",
+          "name": "🌼 सरसों फसल (Mustard Care)"
+        },
+        {
+          "id": "agri_wheat",
+          "name": "🌾 गेहूँ फसल (Wheat Care)"
+        },
+        {
+          "id": "agri_paddy",
+          "name": "🌾 धान व चावल (Paddy / Rice)"
+        },
+        {
+          "id": "agri_pest",
+          "name": "🐛 कीट, इल्ली व रसचूसक कीट (Pest & Insect)"
+        },
+        {
+          "id": "agri_fungus",
+          "name": "🍄 फफूंद व ब्लाइट सुरक्षा (Fungus & Blight)"
+        },
+        {
+          "id": "agri_virus",
+          "name": "🦠 वायरस व विषाणु सुरक्षा (Plant Virus)"
+        },
+        {
           "id": "agri_growth",
           "name": "🌱 पौध विकास व पैदावार (Plant Growth)"
         },
         {
-          "id": "agri_protection",
-          "name": "🛡️ जैविक कीट व फफूंद सुरक्षा (Crop Protection)"
-        },
-        {
           "id": "agri_soil",
           "name": "🌾 मिट्टी सुधार व जीवाणु खाद (Soil Health)"
+        },
+        {
+          "id": "agri_protection",
+          "name": "🛡️ जैविक फसल सुरक्षा (Crop Protection)"
         }
       ]
     },
     {
       "id": "cattle",
-      "name": "🐄 पशु पोषण (Biofit Cattle Care)",
+      "name": "🐄 पशु पोषण व मत्स्य पालन (Biofit Cattle & Aquaculture)",
       "subcategories": [
         {
           "id": "cattle_cfc",
-          "name": "🥛 दुग्ध वृद्धि व पोषण (Feed Supplement)"
+          "name": "🥛 दुग्ध वृद्धि व पोषण (Dairy Milk & Fat - CFC)"
         },
         {
           "id": "cattle_health",
-          "name": "💪 पशु स्वास्थ्य व पाचन (Animal Care)"
+          "name": "💪 पशु स्वास्थ्य व पाचन (Livestock Health)"
+        },
+        {
+          "id": "cattle_fish",
+          "name": "🐟 मछली पालन व संवर्धन (Fish Farming & Aquaculture)"
+        },
+        {
+          "id": "cattle_poultry",
+          "name": "🐔 मुर्गी पालन व अंडा उत्पादन (Poultry Care)"
+        },
+        {
+          "id": "cattle_goat",
+          "name": "🐐 बकरी व भेड़ पालन पोषण (Goat & Sheep Care)"
         }
       ]
     },

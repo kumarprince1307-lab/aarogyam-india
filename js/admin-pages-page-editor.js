@@ -4281,6 +4281,24 @@ export async function initPageEditor() {
   let mpmCatalogSettingsExpanded = false;
 
   const AVAILABLE_PROBLEM_TAGS = [
+    // 1. Agriculture Crops & Plant Diseases
+    { id: 'agri_pest', label: '🐛 कीट, इल्ली व रसचूसक (Pest & Insect)' },
+    { id: 'agri_fungus', label: '🍄 फंगस व फफूंद (Fungus & Blight)' },
+    { id: 'agri_virus', label: '🦠 वायरस व विषाणु (Plant Virus)' },
+    { id: 'agri_soil_health', label: '🌱 मिट्टी सुधार व जैविक खाद (Soil Health)' },
+    { id: 'agri_flower_fruit', label: '🌸 फूल-फल विकास व झड़ना (Flower & Fruit)' },
+    { id: 'crop_chana', label: '🌱 चना फसल (Chana / Gram)' },
+    { id: 'crop_soybean', label: '🌿 सोयाबीन (Soybean Special)' },
+    { id: 'crop_mustard', label: '🌼 सरसों (Mustard Special)' },
+    { id: 'crop_wheat', label: '🌾 गेहूँ (Wheat Special)' },
+    { id: 'crop_paddy', label: '🌾 धान व चावल (Paddy / Rice)' },
+    // 2. Animal & Aquaculture
+    { id: 'cattle_care', label: '🥛 पशु दुग्ध वृद्धि व फैट (CFC Dairy)' },
+    { id: 'cattle_health', label: '🐄 पशु स्वास्थ्य व पाचन (Livestock)' },
+    { id: 'aqua_fish', label: '🐟 मछली पालन (Fish Aquaculture)' },
+    { id: 'poultry_care', label: '🐔 मुर्गी पालन (Poultry Care)' },
+    { id: 'goat_care', label: '🐐 बकरी व भेड़ पालन (Goat Care)' },
+    // 3. Human Wellness & Health
     { id: 'diabetes', label: '🩸 डायबिटीज / शुगर' },
     { id: 'joint_pain', label: '🦴 जोड़ों का दर्द / गठिया' },
     { id: 'weight_loss', label: '⚖️ मोटापा व वजन नियंत्रण' },
@@ -4289,8 +4307,6 @@ export async function initPageEditor() {
     { id: 'womens_care', label: '🌸 महिला स्वास्थ्य' },
     { id: 'kids_care', label: '👶 बच्चों का विकास' },
     { id: 'vitality_wellness', label: '⚡ पौरुष शक्ति व स्टैमिना' },
-    { id: 'cattle_care', label: '🐄 पशु पोषण (दूध व फैट)' },
-    { id: 'crop_yield', label: '🌾 फसल पैदावार व कीट नियंत्रण' },
     { id: 'home_care', label: '🏡 इको-फ्रेंडली होम केयर' }
   ];
 
@@ -4603,6 +4619,9 @@ export async function initPageEditor() {
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation()">
+              <button type="button" onclick="window.saveSingleMpmProduct(${idx})" class="admin-button small-button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: none; font-size: 0.72rem; padding: 4px 10px; font-weight: 800; border-radius: 6px; box-shadow: 0 2px 8px rgba(16,185,129,0.35); display: inline-flex; align-items: center; gap: 4px;" title="इस उत्पाद को अभी सुरक्षित करें">
+                <span>💾</span> <span>सेव</span>
+              </button>
               <button type="button" onclick="window.duplicateMpmProduct(${idx})" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f640; font-size: 0.72rem; padding: 4px 8px;" title="डुप्लीकेट कॉपी बनाएं">
                 📋 कॉपी
               </button>
@@ -4675,7 +4694,7 @@ export async function initPageEditor() {
 
                 <div>
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <label class="admin-label" style="font-size: 0.78rem; margin: 0; color: #f59e0b; font-weight: 800;">🩺 संबंधित बीमारी / समस्या फ़िल्टर (Problem / Health Concern Tags)*</label>
+                    <label class="admin-label" style="font-size: 0.78rem; margin: 0; color: #f59e0b; font-weight: 800;">🩺 संबंधित बीमारी, फसल या पशु फ़िल्टर (Problem / Crop / Animal Tags)*</label>
                     <span style="font-size: 0.7rem; color: #94a3b8;">क्लिक करके चुनें (एक या अधिक)</span>
                   </div>
                   <div style="display: flex; gap: 6px; flex-wrap: wrap;">
@@ -4747,6 +4766,17 @@ export async function initPageEditor() {
                 </div>
               </div>
 
+              <!-- Row 5: DEDICATED SINGLE PRODUCT SAVE ACTION BAR -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.95); border: 1.5px solid #10b98150; padding: 12px 16px; border-radius: 10px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                  <strong style="color: #34d399; font-size: 0.88rem; display: block;">💾 एकल उत्पाद त्वरित सुरक्षा (Save This Product)</strong>
+                  <span style="font-size: 0.74rem; color: #94a3b8;">केवल इसी उत्पाद में किए गए बदलाव तुरंत सर्वर व सभी पेजों पर लाइव हो जाएंगे।</span>
+                </div>
+                <button type="button" onclick="window.saveSingleMpmProduct(${idx})" class="admin-button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; font-weight: 900; font-size: 0.85rem; padding: 8px 22px; border-radius: 8px; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(16,185,129,0.4); display: inline-flex; align-items: center; gap: 6px;">
+                  <span>💾</span> <span>इस उत्पाद को अभी सेव करें</span>
+                </button>
+              </div>
+
             </div>
           ` : ''}
         </div>
@@ -4765,6 +4795,121 @@ export async function initPageEditor() {
   window.toggleMpmCard = function(idx) {
     mpmExpandedIdx = mpmExpandedIdx === idx ? null : idx;
     renderMasterProductsList();
+  };
+
+  // Dedicated 1-Click Single Product Save Handler
+  window.saveSingleMpmProduct = async function(idx) {
+    if (!masterProducts[idx]) return;
+    const prod = masterProducts[idx];
+    const prodName = prod.name || 'उत्पाद';
+    showToast(`⏳ '${prodName}' सुरक्षित हो रहा है...`, 'info');
+
+    // Clean single product
+    const cleanProd = { ...prod };
+    delete cleanProd.image_preview;
+    delete cleanProd._idx;
+    masterProducts[idx] = cleanProd;
+
+    // Clean master products list
+    const cleanProducts = masterProducts.map(p => {
+      const copy = { ...p };
+      delete copy.image_preview;
+      delete copy._idx;
+      return copy;
+    });
+
+    const masterPayload = {
+      version: "2026.3",
+      updated_at: new Date().toISOString(),
+      total_products: cleanProducts.length,
+      categories: masterCategories,
+      catalog_settings: masterCatalogSettings,
+      products: cleanProducts
+    };
+
+    const jsonStr = JSON.stringify(masterPayload, null, 2);
+    try {
+      localStorage.setItem('aim_netsurf_products_master', jsonStr);
+    } catch (e) {}
+
+    let phpSaved = false;
+    try {
+      const phpRes = await fetch('/api/save_netsurf_products.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_single_product',
+          product: cleanProd,
+          products: cleanProducts,
+          categories: masterCategories,
+          catalog_settings: masterCatalogSettings
+        })
+      });
+      const phpData = await phpRes.json().catch(() => ({}));
+      if (phpRes.ok && phpData.success) {
+        phpSaved = true;
+      }
+    } catch (e) {}
+
+    // Local Disk Sync (port 5505)
+    let localOk = false;
+    if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+      try {
+        const locRes = await fetch('http://127.0.0.1:5505', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save_config',
+            path: 'data/netsurf-products-master.json',
+            base64: btoa(unescape(encodeURIComponent(jsonStr)))
+          })
+        });
+        const locData = await locRes.json().catch(() => ({}));
+        if (locRes.ok && locData.success) localOk = true;
+      } catch (e) {}
+    }
+
+    // Remote GitHub Sync fallback
+    try {
+      const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
+      syncAssetToGitHub('data/netsurf-products-master.json', base64Data);
+    } catch (e) {}
+
+    // Cross-page synchronization for this specific product
+    try {
+      let pagesModified = false;
+      if (Array.isArray(allPages) && allPages.length > 0) {
+        allPages.forEach(page => {
+          if (Array.isArray(page.products) && page.products.length > 0) {
+            page.products.forEach(p => {
+              if (
+                (p.id && cleanProd.id && String(p.id).toLowerCase() === String(cleanProd.id).toLowerCase()) ||
+                (p.name && cleanProd.name && p.name.trim().toLowerCase() === cleanProd.name.trim().toLowerCase()) ||
+                (p.title && cleanProd.name && p.title.trim().toLowerCase() === cleanProd.name.trim().toLowerCase())
+              ) {
+                p.id = cleanProd.id;
+                p.name = cleanProd.name;
+                p.mrp = cleanProd.mrp;
+                p.price = cleanProd.discounted_price || cleanProd.mrp;
+                p.discount_pct = cleanProd.discount_pct;
+                p.pack_size = cleanProd.pack_size || p.pack_size || '';
+                pagesModified = true;
+              }
+            });
+          }
+        });
+      }
+      if (pagesModified) {
+        fetch('/api/save_site_pages.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save_site_pages', sitePages: allPages })
+        }).catch(() => null);
+      }
+    } catch (e) {}
+
+    renderMasterProductsList();
+    showToast(`✅ '${prodName}' सफलतापूर्वक सुरक्षित व लाइव हो गया!`, 'success');
   };
 
   window.updateMpmProductField = function(idx, field, val) {
