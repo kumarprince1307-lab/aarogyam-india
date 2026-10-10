@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:28:11.174Z",
+  "updated_at": "2026-10-10T09:28:33.917Z",
   "total_products": 39,
   "categories": [
     {
@@ -570,8 +570,8 @@
       "category_label": "पशु पोषण",
       "badge": "🥛 प्रीमियम कैटल फीड कंसंट्रेट",
       "mrp": 699,
-      "discount_pct": 25,
-      "discounted_price": 524,
+      "discount_pct": 0,
+      "discounted_price": 699,
       "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने में मिलाकर दें। 60 से 90 दिन लगातार खिलाएं।",
       "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp",
       "description": "चेलेटेड मिनरल्स, विटामिन्स, प्रीबायोटिक व प्रोबायोटिक्स से भरपूर सम्पूर्ण पशु आहार पूरक।",
@@ -581,7 +581,10 @@
       "precautions": "सूखा न खिलाएं। पैकेट खोलने के बाद एयरटाइट डिब्बे में रखें और नमी से बचाएं।",
       "pack_size": "500 gm",
       "problem_tags": [
-        "cattle_care"
+        "cattle_care",
+        "cattle_health",
+        "poultry_care",
+        "goat_care"
       ]
     },
     {
