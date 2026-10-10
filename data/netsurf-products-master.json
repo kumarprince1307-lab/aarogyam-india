@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:27:32.789Z",
+  "updated_at": "2026-10-10T09:28:11.174Z",
   "total_products": 39,
   "categories": [
     {
@@ -546,8 +546,8 @@
       "category_label": "पशु पोषण",
       "badge": "🐄 दूध व फैट बूस्टर",
       "mrp": 1275,
-      "discount_pct": 25,
-      "discounted_price": 956,
+      "discount_pct": 0,
+      "discounted_price": 1275,
       "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने या बांटे में मिलाकर दें। बछड़े/बकरियां: 5 ग्राम प्रतिदिन।",
       "image": "/images/products/product-pet-vet-advanced-c-454250-7umw.webp",
       "description": "गाय-भैंस में 1 से 1.5 लीटर दूध वृद्धि, 0.8 से 1.2 डिग्री फैट बढ़त और समय पर गाभिन ठहराने में 100% सहायक।",
@@ -557,7 +557,10 @@
       "precautions": "सूखा सीधे मुंह में न डालें, दाने में मिलाकर खिलाएं। पर्याप्त स्वच्छ पानी उपलब्ध रखें।",
       "pack_size": "1 kg",
       "problem_tags": [
-        "cattle_care"
+        "cattle_care",
+        "poultry_care",
+        "goat_care",
+        "cattle_health"
       ]
     },
     {
