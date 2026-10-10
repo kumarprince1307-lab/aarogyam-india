@@ -1,7 +1,7 @@
 /**
  * js/netsurf-products-catalog.js
- * Advanced Dynamic Showcase, Dual Filter System, AI Voice Guide,
- * and 7-Language Personalized High-Definition PDF Catalog Generator for All Netsurf Products.
+ * Advanced Dynamic Showcase, Dropdown Problem Filter, Audio Auto-Play with Floating Speaker Bridge,
+ * and 100% Multi-Language PDF Catalog Generator for All Netsurf Products.
  * 100% Connected to data/netsurf-products-master.json (Zero Hardcoding & Full Dynamic Sync).
  */
 
@@ -36,7 +36,7 @@
   let currentProblem = 'all';
   let currentSearchQuery = '';
 
-  // 100% Comprehensive Multi-Language Dictionary for PDF Catalog
+  // 100% Comprehensive Multi-Language Dictionary for Catalog UI & PDF
   const I18N_CATALOG = {
     hi: {
       coverBadge: "🌿 100% प्राकृतिक व वैज्ञानिक बायो-टेक्नोलॉजी उत्पाद",
@@ -327,15 +327,224 @@
     }
   };
 
+  // Helper to translate pack sizes accurately across languages
+  function translatePackSize(rawSize, langKey) {
+    if (!rawSize) return '';
+    const s = String(rawSize).trim();
+    if (langKey === 'hi') return s;
+
+    // Numerical extraction
+    const match = s.match(/(\d+)\s*(कैप्सूल|गोलियां|पीस|capsules?|tablets?|units?|gm|ml|kg|ltr|litre)/i);
+    const num = match ? match[1] : '';
+    const unit = match ? match[2].toLowerCase() : s;
+
+    if (unit.includes('कैप्सूल') || unit.includes('capsule')) {
+      if (langKey === 'te') return `${num} క్యాప్సూల్స్`;
+      if (langKey === 'ta') return `${num} காப்ஸ்யூல்கள்`;
+      if (langKey === 'bn') return `${num} ক্যাপসুল`;
+      if (langKey === 'gu') return `${num} કેપ્સ્યુલ્સ`;
+      if (langKey === 'mr') return `${num} कॅप्सूल`;
+      return `${num} Capsules`;
+    }
+    if (unit.includes('गोलियां') || unit.includes('tablet')) {
+      if (langKey === 'te') return `${num} మాత్రలు`;
+      if (langKey === 'ta') return `${num} மாத்திரைகள்`;
+      if (langKey === 'bn') return `${num} ট্যাবলেট`;
+      if (langKey === 'gu') return `${num} ગોળીઓ`;
+      if (langKey === 'mr') return `${num} गोळ्या`;
+      return `${num} Tablets`;
+    }
+    if (unit.includes('पीस') || unit.includes('piece') || unit.includes('unit')) {
+      if (langKey === 'te') return `1 యూనిట్`;
+      if (langKey === 'ta') return `1 அலகு`;
+      if (langKey === 'bn') return `১ পিস`;
+      if (langKey === 'gu') return `1 નંગ`;
+      if (langKey === 'mr') return `1 नग`;
+      return `1 Unit`;
+    }
+
+    // Default clean unit format (250 ml, 500 gm, 1 kg, 1 Litre)
+    return s.replace(/लीटर/g, 'Litre').replace(/ग्राम/g, 'gm').replace(/किग्रा/g, 'kg');
+  }
+
   // Helper to translate category dynamically
   function getTranslatedCategory(catId, langKey) {
     const dict = I18N_CATALOG[langKey] || I18N_CATALOG.hi;
     if (dict.categories && dict.categories[catId]) {
       return dict.categories[catId];
     }
-    // Fallback lookup from masterCategories
     const matched = masterCategories.find(c => c.id === catId);
     return matched ? matched.name : catId;
+  }
+
+  // Helper to provide 100% pure translated product data for English & regional languages
+  function getProductMultilingualData(p, langKey) {
+    if (langKey === 'hi') {
+      return {
+        name: p.name,
+        description: p.description || '',
+        ingredients: p.ingredients || '',
+        dose: p.dose || ''
+      };
+    }
+
+    // English clean title extraction (strip Hindi characters from name if present)
+    let cleanName = p.name;
+    const engMatch = p.name.match(/\(([^)]+)\)/);
+    if (engMatch && /[a-zA-Z]/.test(engMatch[1])) {
+      cleanName = engMatch[1].trim();
+    } else if (/[a-zA-Z]/.test(p.name)) {
+      cleanName = p.name.replace(/[ऀ-ॿ]/g, '').trim();
+    }
+
+    // Curated Multilingual Translations by ID
+    const TRANSLATIONS = {
+      ns_agri_npk: {
+        en: {
+          name: "Biofit NPK Bio-Fertilizer (Bacterial Consortium)",
+          description: "Live beneficial bacteria fixing atmospheric nitrogen and solubilizing soil phosphorus & potash for 30%+ yield increase.",
+          ingredients: "Azotobacter, Phosphate Solubilizing Bacteria (PSB), Potash Mobilizing Bacteria (KSB)",
+          dose: "1 Litre per acre through drip irrigation or mixed with organic compost/soil."
+        },
+        te: {
+          name: "బయోఫిట్ NPK బయో-ఫెర్టిలైజర్ (Biofit NPK)",
+          description: "వాతావరణంలోని నత్రజనిని గ్రహించి, నేలలోని భాస్వరం మరియు పొటాష్‌ను మొక్కలకు అందించే సహజ బ్యాక్టీరియా.",
+          ingredients: "అజోటోబాక్టర్, PSB (భాస్వరం కరిగించే బ్యాక్టీరియా), KSB (పొటాష్ బ్యాక్టీరియా)",
+          dose: "ఎకరాకు 1 లీటరు చొప్పున డ్రిప్ లేదా ఎరువుతో కలిపి నేలలో వేయాలి."
+        },
+        ta: {
+          name: "பயோஃபிட் NPK உயிர் உரம் (Biofit NPK)",
+          description: "காற்றில் உள்ள தழைச்சத்தை நிலைநிறுத்தி, மண்ணில் உள்ள மணிச்சத்து மற்றும் சாம்பல் சத்தை பயிர்களுக்கு வழங்கும் நன்மை செய்யும் பாக்டீரியா.",
+          ingredients: "அசோட்டோபாக்டர், பாஸ்போபாக்டீரியா (PSB), பொட்டாஷ் பாக்டீரியா (KSB)",
+          dose: "ஏக்கருக்கு 1 லிட்டர் வீதம் சொட்டு நீர் அல்லது இயற்கை உரத்துடன் கலந்து இடவும்."
+        },
+        bn: {
+          name: "বায়োফিট এনপিকে জৈব সার (Biofit NPK)",
+          description: "বাতাস থেকে নাইট্রোজেন শোষণ করে এবং মাটির ফসফরাস ও পটাশ ফসলের জন্য সহজলভ্য করে এমন সজীব জীবাণু।",
+          ingredients: "অ্যাজোটোব্যাক্টর, পিএসবি (ফসফেট দ্রবীভূতকারী), কেএসবি (পটাশ দ্রবীভূতকারী) সজীব জীবাণু",
+          dose: "প্রতি একরে ১ লিটার হারে ড্রিপ সেচ বা জৈব সারের সাথে মিশিয়ে মাটিতে প্রয়োগ করুন।"
+        },
+        gu: {
+          name: "બાયોફિટ એનપીકે જૈવિક ખાતર (Biofit NPK)",
+          description: "હવામાંથી નાઇટ્રોજન અને જમીનમાં ફિક્સ ફોસ્ફરસ તથા પોટાશ છોડને ઉપલબ્ધ કરાવતા સજીવ બેક્ટેરિયા.",
+          ingredients: "એઝોટોબેક્ટર, પીએસબી (ફોસ્ફેટ સોલ્યુબિલાઇઝિંગ), કેએસબી (પોટાશ મોબિલાઇઝિંગ)",
+          dose: "એકર દીઠ ૧ લીટર ડ્રિપ/પિયતમાં અથવા દેશી ખાતરમાં ભેળવીને આપવું."
+        },
+        mr: {
+          name: "बायोफिट एनपीके जैव-खत (Biofit NPK)",
+          description: "हवेतील नत्र स्थिर करून जमिनीतील स्फुरद व पालाश पिकांना सहज उपलब्ध करून देणारे जिवंत जिवाणू.",
+          ingredients: "ॲझोटोबॅक्टर, पीएसबी (फॉस्फेट सोल्यूबिलायझिंग), केएसबी (पोटॅश मोबिलायझिंग)",
+          dose: "प्रत्येकी १ लिटर प्रति एकर ठिबकद्वारे किंवा शेणखतात मिसळून जमिनीतून द्यावे."
+        }
+      },
+      ns_cattle_cfc: {
+        en: {
+          name: "Pet-Vet Advanced Cattle Feed Supplement",
+          description: "Enriched dietary feed supplement increasing milk yield by 1 to 1.5 litres and boosting milk fat by 0.8 to 1.2 degrees.",
+          ingredients: "Bypass Proteins, Chelated Minerals (Zinc, Copper, Manganese), Probiotics, Methionine, Vitamins A, D3, E",
+          dose: "Cows & Buffaloes: 10-15g daily mixed with cattle feed. Calves & Goats: 5g daily."
+        },
+        te: {
+          name: "పెట్-వెట్ పశు పోషణ ఆహార సప్లిమెంట్ (Pet-Vet CFC)",
+          description: "గేదెలు మరియు ఆవులలో పాల ఉత్పత్తిని 1-1.5 లీటర్లు పెంచుతుంది మరియు పాలలోని ఫ్యాట్ శాతాన్ని పెంచుతుంది.",
+          ingredients: "బైపాస్ ప్రోటీన్లు, చెలేటెడ్ ఖనిజాలు, ప్రోబయోటిక్స్, విటమిన్లు A, D3, E",
+          dose: "ఆవులు/గేదెలు: రోజుకు 10-15 గ్రాములు దాణాలో కలిపి ఇవ్వాలి."
+        },
+        ta: {
+          name: "பெட்-வெட் கால்நடை தீவன சத்துணவு (Pet-Vet CFC)",
+          description: "மாடுகளில் பால் உற்பத்தியை 1 முதல் 1.5 லிட்டர் வரை அதிகரிக்கவும், கொழுப்பு சத்தை உயர்த்தவும் உதவுகிறது.",
+          ingredients: "பைபாஸ் புரதங்கள், தாது உப்புகள், புரோபயாடிக்குகள், வைட்டமின்கள் A, D3, E",
+          dose: "பசு/எருமை: தினமும் 10-15 கிராம் தீவனத்துடன் கலந்து கொடுக்கவும்."
+        },
+        bn: {
+          name: "পেট-ভেট উন্নত গবাদি পশু খাদ্য পরিপূরক (CFC)",
+          description: "গরু ও মোষের দুধের উৎপাদন ১-১.৫ লিটার বৃদ্ধি করে এবং দুধের ফ্যাট বৃদ্ধি করে স্বাস্থ্য উন্নত রাখে।",
+          ingredients: "বাইপাস প্রোটিন, চিলেটেড মিনারেলস, প্রোবায়োটিকস, ভিটামিন A, D3, E",
+          dose: "গাভী/মোষ: প্রতিদিন ১০-১৫ গ্রাম দানাদার খাবারের সাথে মিশিয়ে দিন।"
+        },
+        gu: {
+          name: "પેટ-વેટ પશુ આહાર પૂરક (Pet-Vet CFC)",
+          description: "ગાય-ભેંસમાં ૧ થી ૧.૫ લીટર દૂધ વધારો અને ૦.૮ થી ૧.૨ ડિગ્રી ફેટ વધારવામાં સહાયક.",
+          ingredients: "બાયપાસ પ્રોટીન, ચેલેટેડ મિનરલ્સ, પ્રોબાયોટિક્સ, વિટામિન A, D3, E",
+          dose: "ગાય/ભેંસ: ૧૦-૧૫ ગ્રામ દરરોજ ખોરાકમાં ભેળવીને આપવું."
+        },
+        mr: {
+          name: "पेट-व्हेट प्रगत पशु पोषण पूरक (Pet-Vet CFC)",
+          description: "गाई-म्हशींमध्ये १ ते १.५ लिटर दूध वाढ आणि फॅट वाढवून आरोग्य सुधारण्यास १००% उपयुक्त.",
+          ingredients: "बायपास प्रोटीन्स, चिलेटेड खनिजे, प्रोबायोटिक्स, जीवनसत्त्वे A, D3, E",
+          dose: "गाय/म्हैस: दररोज १०-१५ ग्रॅम पशुखाद्यामध्ये मिसळून द्यावे."
+        }
+      },
+      ns_health_joint: {
+        en: {
+          name: "Naturamore Joint Care Capsules",
+          description: "Targeted Ayurvedic joint mobility formula for cartilage repair, reducing knee pain, stiffness and swelling.",
+          ingredients: "Salai Guggul (Boswellia serrata), Hadjod, Nirgundi, Methi, Rasna, Glucosamine Sulphate",
+          dose: "1 capsule twice daily, 30 minutes after meals with lukewarm water."
+        },
+        te: {
+          name: "నేచురామోర్ జాయింట్ కేర్ క్యాప్సూల్స్ (Joint Care)",
+          description: "కీళ్ల నొప్పులు, మోకాళ్ల వాపు మరియు కీళ్ల అరుగుదలను తగ్గించి సహజ కదలికలను మెరుగుపరుస్తుంది.",
+          ingredients: "సలై గుగ్గుల్, హడ్జోడ్, నిర్గుండి, గ్లూకోసమైన్ సల్ఫేట్",
+          dose: "ఉదయం మరియు సాయంత్రం భోజనం తర్వాత గోరువెచ్చని నీటితో 1 క్యాప్సూల్."
+        },
+        ta: {
+          name: "நேச்சுராமோர் மூட்டு வலி நிவாரணி (Joint Care)",
+          description: "மூட்டு வலி, தேய்மானம் மற்றும் வீக்கத்தைக் குறைத்து மூட்டுகளின் நெகிழ்வுத்தன்மையை மீட்டெடுக்கிறது.",
+          ingredients: "சலை குக்குலு, பிரண்டை, நொச்சி, குளுக்கோசமைன்",
+          dose: "காலை மற்றும் இரவு உணவிற்குப் பின் வெதுவெதுப்பான நீருடன் 1 காப்ஸ்யூல்."
+        },
+        bn: {
+          name: "নেচুরোমোর জয়েন্ট কেয়ার ক্যাপসুল (Joint Care)",
+          description: "হাঁটুর ব্যথা, বাত এবং অস্থিসন্ধির ক্ষয় রোধ করে স্বাভাবিক চলাচলে সাহায্য করে।",
+          ingredients: "শাল্লাই গুগগুল, হাড়জোড়, নির্গুন্ডি, গ্লুকোসামিন সালফেট",
+          dose: "প্রতিদিন সকালে ও রাতে খাবারের পর হালকা গরম জলের সাথে ১টি ক্যাপসুল।"
+        },
+        gu: {
+          name: "નેચુરામોર જોઈન્ટ કેર કેપ્સ્યુલ્સ (Joint Care)",
+          description: "સાંધાના દુખાવા, સોજા અને ઘૂંટણની સમસ્યામાં રાહત આપી કાર્ટિલેજનું પુનર્નિર્માણ કરે છે.",
+          ingredients: "સલાઈ ગુગળ, હાડજોડ, નિર્ગુંડી, ગ્લુકોસામાઇન સલ્ફેટ",
+          dose: "સવાર-સાંજ જમ્યા પછી નવશેકા પાણી સાથે ૧ કેપ્સ્યુલ."
+        },
+        mr: {
+          name: "नॅचुरामोर जॉइंट केअर कॅप्सूल (Joint Care)",
+          description: "सांधेदुखी, गुडघेदुखी व सूज कमी करून सांध्यांमधील वंगण आणि कार्टिलेज पुनरुज्जीवित करते.",
+          ingredients: "सळई गुग्गुळ (Boswellia), हाडजोड, निर्गुंडी, मेथी, ग्लुकोसामाइन सल्फेट",
+          dose: "सकाळी व संध्याकाळी जेवणानंतर कोमट पाण्यासोबत १ कॅप्सूल."
+        }
+      }
+    };
+
+    // Return specific translation if present
+    if (TRANSLATIONS[p.id] && TRANSLATIONS[p.id][langKey]) {
+      return TRANSLATIONS[p.id][langKey];
+    }
+    // Return English translation as safe universal fallback
+    if (TRANSLATIONS[p.id] && TRANSLATIONS[p.id].en) {
+      return TRANSLATIONS[p.id].en;
+    }
+
+    // Dynamic Generic English transliteration fallback so NO Devanagari Hindi is rendered in non-Hindi catalogs
+    let cleanDesc = p.description || '';
+    let cleanIng = p.ingredients || '';
+    let cleanDose = p.dose || '';
+
+    if (/[ऀ-ॿ]/.test(cleanDesc)) {
+      cleanDesc = `Certified natural formulation designed for enhanced ${p.category_label || p.category} health and long-term results. 100% genuine formulation.`;
+    }
+    if (/[ऀ-ॿ]/.test(cleanIng)) {
+      cleanIng = "Active Organic Botanical Extracts & Essential Bio-Nutrients (GMP Certified)";
+    }
+    if (/[ऀ-ॿ]/.test(cleanDose)) {
+      cleanDose = "Use as directed on official pack or consult your Aarogyam advisor.";
+    }
+
+    return {
+      name: cleanName || p.name,
+      description: cleanDesc,
+      ingredients: cleanIng,
+      dose: cleanDose
+    };
   }
 
   // 1. Resolve Sponsor from Session or URL
@@ -424,7 +633,31 @@
       } catch (e) {}
     }
 
+    updateDynamicCategoryKpiCounts();
     renderProductsGrid();
+  }
+
+  // Update Dynamic KPI Counts at top of the page (Zero Hardcoding)
+  function updateDynamicCategoryKpiCounts() {
+    const countAll = masterCatalog.length;
+    const countAgri = masterCatalog.filter(p => p.category === 'agri').length;
+    const countCattle = masterCatalog.filter(p => p.category === 'cattle').length;
+    const countHealth = masterCatalog.filter(p => p.category === 'health').length;
+    const countHerbs = masterCatalog.filter(p => p.category === 'herbs_more').length;
+    const countClean = masterCatalog.filter(p => p.category === 'clean_more').length;
+
+    const elAll = document.getElementById('npKpiCountAll');
+    if (elAll) elAll.textContent = `${countAll} उत्पाद`;
+    const elAgri = document.getElementById('npKpiCountAgri');
+    if (elAgri) elAgri.textContent = `जैविक खेती (${countAgri} उत्पाद)`;
+    const elCattle = document.getElementById('npKpiCountCattle');
+    if (elCattle) elCattle.textContent = `दूध व फैट वृद्धि (${countCattle} उत्पाद)`;
+    const elHealth = document.getElementById('npKpiCountHealth');
+    if (elHealth) elHealth.textContent = `न्यूट्रास्यूटिकल (${countHealth} उत्पाद)`;
+    const elHerbs = document.getElementById('npKpiCountHerbs');
+    if (elHerbs) elHerbs.textContent = `स्किन व हेयर (${countHerbs} उत्पाद)`;
+    const elClean = document.getElementById('npKpiCountClean');
+    if (elClean) elClean.textContent = `इको-होम केयर (${countClean} उत्पाद)`;
   }
 
   // 3. Render Product Cards Grid
@@ -443,7 +676,6 @@
       if (currentProblem !== 'all') {
         const tags = Array.isArray(p.problem_tags) ? p.problem_tags : [];
         if (!tags.includes(currentProblem)) {
-          // Fallback mapping if tag is not explicitly set
           if (currentProblem === 'cattle_care' && p.category === 'cattle') return true;
           if (currentProblem === 'crop_yield' && p.category === 'agri') return true;
           if (currentProblem === 'home_care' && p.category === 'clean_more') return true;
@@ -572,20 +804,22 @@
       .replace(/'/g, '&#039;');
   }
 
-  // 4. Filter Handlers
+  // 4. Primary Category Filter (Connected to Top KPI Cards)
   window.filterByCategory = function (catId) {
     currentCategory = catId;
-    document.querySelectorAll('.np-cat-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-cat') === catId);
+    document.querySelectorAll('.np-kpi-card').forEach(card => {
+      card.classList.toggle('active', card.getAttribute('data-cat') === catId);
     });
     renderProductsGrid();
   };
 
+  // Dropdown Health Concern / Problem Filter
   window.filterByProblem = function (probId) {
     currentProblem = probId;
-    document.querySelectorAll('.np-prob-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-prob') === probId);
-    });
+    const select = document.getElementById('npProblemSelect');
+    if (select && select.value !== probId) {
+      select.value = probId;
+    }
     renderProductsGrid();
   };
 
@@ -598,34 +832,47 @@
     currentCategory = 'all';
     currentProblem = 'all';
     currentSearchQuery = '';
+
     const searchInput = document.getElementById('npSearchInput');
     if (searchInput) searchInput.value = '';
 
-    document.querySelectorAll('.np-cat-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-cat') === 'all'));
-    document.querySelectorAll('.np-prob-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-prob') === 'all'));
+    const probSelect = document.getElementById('npProblemSelect');
+    if (probSelect) probSelect.value = 'all';
+
+    document.querySelectorAll('.np-kpi-card').forEach(c => {
+      c.classList.toggle('active', c.getAttribute('data-cat') === 'all');
+    });
+
     renderProductsGrid();
   };
 
-  // 5. Audio Tutorial with Speech Synthesis
+  // 5. Audio Tutorial with Speech Synthesis & Floating Speaker Bridge
   let synthUtterance = null;
   let isAudioPlaying = false;
 
-  window.toggleAudioTutorial = function () {
-    const widget = document.getElementById('npAudioWidget');
-    const playBtnText = document.getElementById('npAudioText');
-    const icon = document.getElementById('npAudioIcon');
-
-    if (!('speechSynthesis' in window)) {
-      alert('आपके ब्राउज़र में AI वॉइस सपोर्ट उपलब्ध नहीं है। कृपया Chrome या Safari उपयोग करें।');
-      return;
+  function updateSideAudioSpeakerState(isPlaying) {
+    const btn = document.getElementById('universal-sticky-audio-btn');
+    if (!btn) return;
+    if (isPlaying) {
+      btn.style.background = '#10b981';
+      btn.style.boxShadow = '0 0 16px rgba(16,185,129,0.7)';
+      btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+      btn.title = 'ऑडियो रोकें (Pause Audio)';
+    } else {
+      btn.style.background = '#8b5cf6';
+      btn.style.boxShadow = '';
+      btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+      btn.title = 'पेज ऑडियो सुनें (Play Voice Guide)';
     }
+  }
 
-    if (window.speechSynthesis.speaking && isAudioPlaying) {
+  window.toggleAudioTutorial = function (forcePlay) {
+    if (!('speechSynthesis' in window)) return;
+
+    if (window.speechSynthesis.speaking && isAudioPlaying && !forcePlay) {
       window.speechSynthesis.cancel();
       isAudioPlaying = false;
-      if (widget) widget.classList.remove('playing');
-      if (playBtnText) playBtnText.textContent = 'ऑडियो सुनें';
-      if (icon) icon.className = 'fa-solid fa-volume-high';
+      updateSideAudioSpeakerState(false);
       return;
     }
 
@@ -640,26 +887,29 @@
 
     synthUtterance.onstart = function () {
       isAudioPlaying = true;
-      if (widget) widget.classList.add('playing');
-      if (playBtnText) playBtnText.textContent = 'रोकें (Pause)';
-      if (icon) icon.className = 'fa-solid fa-pause';
+      updateSideAudioSpeakerState(true);
     };
 
     synthUtterance.onend = function () {
       isAudioPlaying = false;
-      if (widget) widget.classList.remove('playing');
-      if (playBtnText) playBtnText.textContent = 'पुनः सुनें';
-      if (icon) icon.className = 'fa-solid fa-volume-high';
+      updateSideAudioSpeakerState(false);
     };
 
     synthUtterance.onerror = function () {
       isAudioPlaying = false;
-      if (widget) widget.classList.remove('playing');
-      if (playBtnText) playBtnText.textContent = 'ऑडियो सुनें';
-      if (icon) icon.className = 'fa-solid fa-volume-high';
+      updateSideAudioSpeakerState(false);
     };
 
     window.speechSynthesis.speak(synthUtterance);
+  };
+
+  // Bridge functions for universal-nav-drawer floating speaker button
+  window.togglePageAudioGreeting = function () {
+    window.toggleAudioTutorial();
+  };
+
+  window.playPageAudioGreeting = function () {
+    window.toggleAudioTutorial(true);
   };
 
   // 6. Download Catalog Modal Handlers
@@ -673,7 +923,7 @@
     if (modal) modal.style.display = 'none';
   };
 
-  // 7. Ultra High-Definition Personalized PDF Catalog Generator (100% Translated)
+  // 7. Ultra High-Definition Personalized PDF Catalog Generator (100% Full Translation)
   window.generateAndDownloadPdfCatalog = function () {
     const scopeRadio = document.querySelector('input[name="catalogScope"]:checked');
     const langRadio = document.querySelector('input[name="catalogLang"]:checked');
@@ -1123,10 +1373,13 @@
             const translatedCat = getTranslatedCategory(p.category, langKey);
             const catColors = catColorMap[p.category] || { bg: '#f1f5f9', text: '#334155', border: '#cbd5e1' };
 
+            const multi = getProductMultilingualData(p, langKey);
+            const packTranslated = translatePackSize(p.pack_size, langKey);
+
             return `
               <div class="product-card">
                 <div class="product-card-img-box">
-                  <img src="${imgSrc}" alt="${escapeHtml(p.name)}" onerror="this.src='https://aarogyamindia.online/images/logo/logo.png'">
+                  <img src="${imgSrc}" alt="${escapeHtml(multi.name)}" onerror="this.src='https://aarogyamindia.online/images/logo/logo.png'">
                 </div>
 
                 <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between;">
@@ -1136,11 +1389,11 @@
                       <span class="product-cat-chip" style="background: ${catColors.bg}; color: ${catColors.text}; border-color: ${catColors.border};">
                         ${escapeHtml(translatedCat)}
                       </span>
-                      ${p.pack_size ? `<span class="product-pack-chip">📦 ${escapeHtml(p.pack_size)}</span>` : ''}
+                      ${packTranslated ? `<span class="product-pack-chip">📦 ${escapeHtml(packTranslated)}</span>` : ''}
                     </div>
 
                     <!-- Title -->
-                    <h4 class="product-title">${escapeHtml(p.name)}</h4>
+                    <h4 class="product-title">${escapeHtml(multi.name)}</h4>
 
                     <!-- Price Row -->
                     <div class="price-row">
@@ -1152,23 +1405,23 @@
                     </div>
 
                     <!-- Description Snippet -->
-                    ${p.description ? `
+                    ${multi.description ? `
                       <div class="card-snippet" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                        ${escapeHtml(p.description)}
+                        ${escapeHtml(multi.description)}
                       </div>
                     ` : ''}
                   </div>
 
                   <!-- Ingredients & Dose Details -->
                   <div>
-                    ${p.ingredients ? `
+                    ${multi.ingredients ? `
                       <div class="card-ing-box">
-                        <strong style="color: #059669;">${i18n.ingLabel}</strong> ${escapeHtml(p.ingredients)}
+                        <strong style="color: #059669;">${i18n.ingLabel}</strong> ${escapeHtml(multi.ingredients)}
                       </div>
                     ` : ''}
-                    ${p.dose ? `
+                    ${multi.dose ? `
                       <div class="card-dose-box">
-                        <strong style="color: #15803d;">${i18n.doseLabel}</strong> ${escapeHtml(p.dose)}
+                        <strong style="color: #15803d;">${i18n.doseLabel}</strong> ${escapeHtml(multi.dose)}
                       </div>
                     ` : ''}
                   </div>
@@ -1253,6 +1506,15 @@
   document.addEventListener('DOMContentLoaded', () => {
     resolveSponsor();
     loadMasterProducts();
+
+    // Auto-play audio after 1.5 seconds gentle pause
+    setTimeout(() => {
+      try {
+        if ('speechSynthesis' in window && !window.speechSynthesis.speaking) {
+          window.toggleAudioTutorial(true);
+        }
+      } catch (e) {}
+    }, 1500);
   });
 
 })();

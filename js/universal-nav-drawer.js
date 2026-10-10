@@ -487,6 +487,15 @@
               </div>
             </a>
 
+            <!-- 1.1 ALL NETSURF PRODUCTS (Prominent Direct Super Link) -->
+            <a href="/categories/netsurf-products.html" class="drawer-nav-item-btn ${currentPath.includes('netsurf-products') ? 'active-pill' : ''}">
+              <div class="drawer-item-left">
+                <i class="fa-solid fa-boxes-stacked drawer-item-icon" style="color:#10b981;"></i>
+                <span style="font-weight: 800; color:#10b981;">🌟 All Netsurf Products (सम्पूर्ण कैटलॉग)</span>
+              </div>
+              <span class="drawer-cat-badge" style="background:#dcfce7;color:#15803d;font-weight:900;">7 भाषा PDF 📥</span>
+            </a>
+
             <!-- 2. SMART eTAILER / MISSION 8,19,250 (Direct Super Link) -->
             <a href="/pages/smart-etailer.html" class="drawer-nav-item-btn ${currentPath.includes('smart-etailer') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
@@ -779,8 +788,13 @@
           <div class="u-icon-wrap"><i class="fa-solid fa-book-bookmark"></i></div>
           <span>Library</span>
         </a>
-        <!-- 4. Netsurf -->
-        <a href="/categories/netsurf.html" class="u-nav-tab ${currentPath.includes('netsurf') ? 'active' : ''}">
+        <!-- 4. Netsurf All Products Catalog -->
+        <a href="/categories/netsurf-products.html" class="u-nav-tab ${currentPath.includes('netsurf-products') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-solid fa-boxes-stacked" style="color:#10b981;"></i></div>
+          <span style="color:#10b981;font-weight:800;">कैटलॉग</span>
+        </a>
+        <!-- 4.1 Netsurf Career -->
+        <a href="/categories/netsurf.html" class="u-nav-tab ${currentPath.includes('netsurf') && !currentPath.includes('netsurf-products') ? 'active' : ''}">
           <div class="u-icon-wrap"><i class="fa-solid fa-briefcase" style="color:#059669;"></i></div>
           <span style="color:#059669;font-weight:800;">Netsurf</span>
         </a>
