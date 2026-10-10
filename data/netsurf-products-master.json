@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:36:46.580Z",
+  "updated_at": "2026-10-10T09:37:06.827Z",
   "total_products": 39,
   "categories": [
     {
@@ -692,8 +692,8 @@
       "category_label": "स्वास्थ्य नेचुरामोरे",
       "badge": "🩺 ब्लड शुगर व डायबिटीज संतुलन",
       "mrp": 450,
-      "discount_pct": 20,
-      "discounted_price": 360,
+      "discount_pct": 0,
+      "discounted_price": 450,
       "dose": "1 कैप्सूल सुबह और 1 शाम भोजन से 30 मिनट पहले पानी के साथ।",
       "image": "/images/products/product--------------------836232-cht7.webp",
       "description": "करेला, जामुन बीज, गुड़मार और विजयसार से पैंक्रियाज को जाग्रत कर प्राकृतिक इंसुलिन संतुलन बनाता है।",
@@ -703,7 +703,8 @@
       "precautions": "शुगर के स्तर की नियमित जांच करते रहें। अपनी एलोपैथिक दवा एकदम बंद न करें।",
       "pack_size": "30 कैप्सूल",
       "problem_tags": [
-        "diabetes"
+        "diabetes",
+        "vitality_wellness"
       ]
     },
     {
