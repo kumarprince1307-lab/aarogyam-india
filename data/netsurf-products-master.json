@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:46:10.573Z",
+  "updated_at": "2026-10-10T09:46:24.085Z",
   "total_products": 39,
   "categories": [
     {
@@ -887,8 +887,8 @@
       "category_label": "हर्ब्स एंड मोर",
       "badge": "💆 बाल झड़ना बंद व घने बाल",
       "mrp": 450,
-      "discount_pct": 23,
-      "discounted_price": 347,
+      "discount_pct": 0,
+      "discounted_price": 450,
       "dose": "सप्ताह में 2-3 बार बालों की जड़ों में हल्के हाथों से 10 मिनट मालिश करें।",
       "image": "/images/products/product-----------------he-371545-w7a1.webp",
       "description": "भृंगराज, ब्राह्मी, आंवला और तिल का तेल। नए बाल उगाने और बालों का झड़ना 15 दिन में रोकने में असरदार।",
