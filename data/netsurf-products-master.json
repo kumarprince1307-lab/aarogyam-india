@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:46:44.093Z",
+  "updated_at": "2026-10-10T09:46:57.164Z",
   "total_products": 39,
   "categories": [
     {
@@ -845,8 +845,8 @@
       "category_label": "हर्ब्स एंड मोर",
       "badge": "🌿 कील-मुंहासे व पिंपल्स से राहत",
       "mrp": 120,
-      "discount_pct": 20,
-      "discounted_price": 96,
+      "discount_pct": 0,
+      "discounted_price": 120,
       "dose": "चेहरा धोने के बाद केवल मुंहासों और दाग-धब्बों पर लगाएं। रात में प्रयोग उत्तम।",
       "image": "/images/products/product-anti-acne-gel-new--244348-r2pn.webp",
       "description": "नीम, टी-ट्री ऑयल और लौंग के तेल से जिद्दी मुंहासे, लालिमा व बैक्टीरिया का खात्मा करता है।",
