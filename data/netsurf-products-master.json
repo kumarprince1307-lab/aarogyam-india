@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:27:04.622Z",
+  "updated_at": "2026-10-10T09:27:32.789Z",
   "total_products": 39,
   "categories": [
     {
@@ -518,8 +518,8 @@
       "category_label": "कृषि बायोफिट",
       "badge": "🧪 नाइट्रोजन, फास्फोरस, पोटाश जीवाणु",
       "mrp": 1800,
-      "discount_pct": 25,
-      "discounted_price": 1350,
+      "discount_pct": 0,
+      "discounted_price": 1800,
       "dose": "प्रत्येक का 1 लीटर प्रति एकड़ ड्रिप/सिंचाई में या गोबर की खाद में मिलाकर जमीन में दें।",
       "image": "/images/products/product--------------------361242-xj50.webp",
       "description": "हवा से नाइट्रोजन और मिट्टी में फिक्स फास्फोरस व पोटाश को पौधे को उपलब्ध कराने वाले जीवित बैक्टीरिया।",
@@ -529,7 +529,14 @@
       "precautions": "सीधी धूप से बचाएं। रासायनिक यूरिया या डीएपी के साथ सीधे न मिलाएं, 7 दिन का अंतर रखें।",
       "pack_size": "1 Litre",
       "problem_tags": [
-        "crop_yield"
+        "crop_yield",
+        "crop_chana",
+        "crop_soybean",
+        "crop_mustard",
+        "crop_wheat",
+        "crop_paddy",
+        "agri_flower_fruit",
+        "agri_soil_health"
       ]
     },
     {
