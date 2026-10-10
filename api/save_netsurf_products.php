@@ -112,12 +112,135 @@ if (!rename($tmpPath, $productsJsonPath)) {
     json_resp(500, ['error' => 'Failed to atomically update netsurf-products-master.json']);
 }
 
+// 2.5 CROSS-SYNC WITH SITE-PAGES-CONFIG.JSON
+$sitePagesPath = __DIR__ . '/../data/site-pages-config.json';
+if (file_exists($sitePagesPath)) {
+    try {
+        $spData = json_decode(file_get_contents($sitePagesPath), true);
+        if ($spData && isset($spData['sitePages']) && is_array($spData['sitePages'])) {
+            $masterMap = [];
+            foreach ($products as $mp) {
+                if (!empty($mp['id'])) {
+                    $masterMap[strtolower($mp['id'])] = $mp;
+                }
+                if (!empty($mp['name'])) {
+                    $masterMap[strtolower(trim($mp['name']))] = $mp;
+                }
+            }
+
+            $spModified = false;
+            foreach ($spData['sitePages'] as &$page) {
+                $pid = $page['id'] ?? '';
+                $slug = $page['slug'] ?? '';
+                
+                // Pashu Palan Cattle page sync
+                if ($pid === 'page_cattle_care' || $slug === 'pashu-palan') {
+                    $cattleProds = [];
+                    foreach ($products as $mp) {
+                        if (($mp['category'] ?? '') === 'cattle') {
+                            $mrp = floatval($mp['mrp'] ?? 0);
+                            $disc = floatval($mp['discount_pct'] ?? 0);
+                            $price = ($disc > 0) ? round($mrp * (1 - $disc / 100)) : ($mp['discounted_price'] ?? $mrp);
+                            $cattleProds[] = [
+                                'id' => $mp['id'],
+                                'title' => $mp['name'],
+                                'name' => $mp['name'],
+                                'description' => $mp['description'] ?? '',
+                                'image' => $mp['image'] ?? '',
+                                'mrp' => $mrp,
+                                'price' => $price,
+                                'discount_pct' => $disc,
+                                'pack_size' => $mp['pack_size'] ?? '',
+                                'dose' => $mp['dose'] ?? '',
+                                'badge' => $mp['badge'] ?? '🐄 पशु पोषण',
+                                'whatsapp_link' => 'https://wa.me/917974422572'
+                            ];
+                        }
+                    }
+                    if (!empty($cattleProds)) {
+                        $page['products'] = $cattleProds;
+                        $spModified = true;
+                    }
+                }
+                // Health Hub page sync
+                elseif ($pid === 'page_health' || $slug === 'health') {
+                    $healthProds = [];
+                    foreach ($products as $mp) {
+                        if (($mp['category'] ?? '') === 'health') {
+                            $mrp = floatval($mp['mrp'] ?? 0);
+                            $disc = floatval($mp['discount_pct'] ?? 0);
+                            $price = ($disc > 0) ? round($mrp * (1 - $disc / 100)) : ($mp['discounted_price'] ?? $mrp);
+                            $healthProds[] = [
+                                'id' => $mp['id'],
+                                'title' => $mp['name'],
+                                'name' => $mp['name'],
+                                'description' => $mp['description'] ?? '',
+                                'image' => $mp['image'] ?? '',
+                                'mrp' => $mrp,
+                                'price' => $price,
+                                'discount_pct' => $disc,
+                                'pack_size' => $mp['pack_size'] ?? '',
+                                'dose' => $mp['dose'] ?? '',
+                                'badge' => $mp['badge'] ?? '🌿 स्वास्थ्य नेचुरामोरे',
+                                'whatsapp_link' => 'https://wa.me/917974422572'
+                            ];
+                        }
+                    }
+                    if (!empty($healthProds)) {
+                        $page['products'] = $healthProds;
+                        $spModified = true;
+                    }
+                }
+                // Individual health disease & other pages: sync existing products with master
+                elseif (isset($page['products']) && is_array($page['products']) && count($page['products']) > 0) {
+                    foreach ($page['products'] as &$p) {
+                        $pKeyId = !empty($p['id']) ? strtolower($p['id']) : '';
+                        $pKeyTitle = !empty($p['title']) ? strtolower(trim($p['title'])) : '';
+                        $pKeyName = !empty($p['name']) ? strtolower(trim($p['name'])) : '';
+                        $mMatch = null;
+                        if ($pKeyId && isset($masterMap[$pKeyId])) $mMatch = $masterMap[$pKeyId];
+                        elseif ($pKeyName && isset($masterMap[$pKeyName])) $mMatch = $masterMap[$pKeyName];
+                        elseif ($pKeyTitle && isset($masterMap[$pKeyTitle])) $mMatch = $masterMap[$pKeyTitle];
+
+                        if ($mMatch) {
+                            $mrp = floatval($mMatch['mrp'] ?? $p['mrp'] ?? 0);
+                            $disc = floatval($mMatch['discount_pct'] ?? 0);
+                            $price = ($disc > 0) ? round($mrp * (1 - $disc / 100)) : ($mMatch['discounted_price'] ?? $mrp);
+                            $p['id'] = $mMatch['id'];
+                            $p['title'] = $mMatch['name'];
+                            $p['name'] = $mMatch['name'];
+                            $p['mrp'] = $mrp;
+                            $p['price'] = $price;
+                            $p['discount_pct'] = $disc;
+                            if (!empty($mMatch['pack_size'])) $p['pack_size'] = $mMatch['pack_size'];
+                            if (!empty($mMatch['dose'])) $p['dose'] = $mMatch['dose'];
+                            if (!empty($mMatch['badge'])) $p['badge'] = $mMatch['badge'];
+                            if (!empty($mMatch['image']) && strpos($mMatch['image'], 'logo.png') === false) $p['image'] = $mMatch['image'];
+                            $spModified = true;
+                        }
+                    }
+                }
+            }
+            unset($page);
+
+            if ($spModified) {
+                $spTmpPath = $sitePagesPath . '.tmp';
+                $spEncoded = json_encode($spData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                if (file_put_contents($spTmpPath, $spEncoded) !== false) {
+                    rename($spTmpPath, $sitePagesPath);
+                }
+            }
+        }
+    } catch (\Exception $e) {}
+}
+
 // 3. BACKGROUND GIT COMMIT AND PUSH
-$commitMsg = "Update netsurf-products-master.json via PHP API [Timestamp {$timestamp}]";
+$commitMsg = "Update netsurf-products-master.json and sync site-pages-config.json [Timestamp {$timestamp}]";
 $gitCmd = sprintf(
-    'git -C %s add %s && git -C %s commit -m %s && git -C %s push',
+    'git -C %s add %s %s && git -C %s commit -m %s && git -C %s push',
     escapeshellarg(__DIR__ . '/..'),
     escapeshellarg('data/netsurf-products-master.json'),
+    escapeshellarg('data/site-pages-config.json'),
     escapeshellarg(__DIR__ . '/..'),
     escapeshellarg('"' . $commitMsg . '"'),
     escapeshellarg(__DIR__ . '/..')
@@ -128,7 +251,7 @@ $gitCmd = sprintf(
 
 json_resp(200, [
     'success' => true,
-    'message' => 'Netsurf Products Master safely saved to server disk and repository.',
+    'message' => 'Netsurf Products Master safely saved and site-pages-config.json synced.',
     'total_products' => count($products),
     'timestamp' => $timestamp,
     'gitPushed' => ($returnCode === 0)

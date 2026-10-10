@@ -570,39 +570,85 @@
 
   // Master Product Catalog Live Linking (Instant Multi-Page Sync)
   let masterProductsCatalog = [];
-  async function loadMasterCatalogForSync() {
-    try {
-      const cached = localStorage.getItem('aim_netsurf_products_master');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed && Array.isArray(parsed.products) && parsed.products.length > 0) {
-          masterProductsCatalog = parsed.products;
+  let masterCatalogPromise = null;
+  function loadMasterCatalogForSync() {
+    if (masterCatalogPromise) return masterCatalogPromise;
+    masterCatalogPromise = (async () => {
+      try {
+        const cached = localStorage.getItem('aim_netsurf_products_master');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && Array.isArray(parsed.products) && parsed.products.length > 0) {
+            masterProductsCatalog = parsed.products;
+          }
         }
-      }
-    } catch (e) {}
+      } catch (e) {}
 
-    try {
-      const res = await fetch('/data/netsurf-products-master.json?v=' + Date.now());
-      if (res.ok) {
-        const d = await res.json();
-        if (d && Array.isArray(d.products) && d.products.length > 0) {
-          masterProductsCatalog = d.products;
-          try { localStorage.setItem('aim_netsurf_products_master', JSON.stringify(d)); } catch(e){}
+      try {
+        const res = await fetch('/data/netsurf-products-master.json?v=' + Date.now());
+        if (res.ok) {
+          const d = await res.json();
+          if (d && Array.isArray(d.products) && d.products.length > 0) {
+            masterProductsCatalog = d.products;
+            try { localStorage.setItem('aim_netsurf_products_master', JSON.stringify(d)); } catch(e){}
+            if (window.AAROGYAM_ACTIVE_PAGE_CMS) {
+              renderDynamicProducts(window.AAROGYAM_ACTIVE_PAGE_CMS);
+            }
+          }
         }
-      }
-    } catch (e) {}
+      } catch (e) {}
+      return masterProductsCatalog;
+    })();
+    return masterCatalogPromise;
   }
   loadMasterCatalogForSync();
 
   function renderDynamicProducts(pageConfig) {
-    if (!pageConfig || !Array.isArray(pageConfig.products) || pageConfig.products.length === 0) {
-      return;
-    }
-
     const section = document.getElementById('sec-products') ||
                     document.getElementById('products-cattle') ||
                     document.querySelector('.products-catalog-section');
     if (!section) return;
+
+    const path = (window.location.pathname || '').toLowerCase();
+    const isPashu = path.includes('pashu');
+    const isHealthHub = path.includes('/categories/health.html') || path.endsWith('health.html');
+
+    let prods = Array.isArray(pageConfig?.products) ? [...pageConfig.products] : [];
+
+    // Live Auto-Join from Master Catalog
+    if (isPashu) {
+      const cattleMaster = masterProductsCatalog.filter(m => m.category === 'cattle');
+      if (cattleMaster.length > 0) {
+        prods = cattleMaster;
+      }
+    } else if (isHealthHub) {
+      const healthMaster = masterProductsCatalog.filter(m => m.category === 'health');
+      if (healthMaster.length > 0) {
+        prods = healthMaster;
+      }
+    } else if (prods.length === 0 && path.includes('/health/')) {
+      const subslug = (path.split('/').pop() || '').replace('.html', '').replace('health-', '');
+      const tagMap = {
+        'diabetes': 'diabetes',
+        'joint-care': 'joint_pain',
+        'weight-loss': 'weight_loss',
+        'hair-care': 'hair_care',
+        'skin-care': 'skin_care',
+        'womens-care': 'womens_care',
+        'kids-care': 'kids_care',
+        'home-care': 'home_care',
+        'sexual-wellness': 'sexual_wellness'
+      };
+      const targetTag = tagMap[subslug];
+      if (targetTag) {
+        const matchingMaster = masterProductsCatalog.filter(m => 
+          Array.isArray(m.problem_tags) && m.problem_tags.includes(targetTag)
+        );
+        if (matchingMaster.length > 0) prods = matchingMaster;
+      }
+    }
+
+    if (prods.length === 0) return;
 
     const container = section.querySelector('.container') || section;
     const grid = container.querySelector('div[style*="grid"]') || container.querySelector('.products-grid') || container.children[1];
@@ -610,9 +656,7 @@
 
     grid.classList.add('cms-dynamic-products-grid');
 
-    const prods = pageConfig.products;
-    const isPashu = window.location.pathname.includes('pashu');
-    const primaryColor = isPashu ? '#15803d' : (pageConfig.theme_primary || '#2563eb');
+    const primaryColor = isPashu ? '#15803d' : (pageConfig?.theme_primary || (isHealthHub ? '#dc2626' : '#2563eb'));
 
     // Inject product responsive CSS (1-col on mobile, uncapped contain images)
     if (!document.getElementById('cms-products-responsive-style')) {
@@ -691,9 +735,9 @@
       const activeProd = masterMatch ? { ...p, ...masterMatch, ...((p.dose && !masterMatch.dose) ? { dose: p.dose } : {}) } : p;
       const id = activeProd.id || p.id || `PROD_${idx + 1}`;
       const name = activeProd.name || activeProd.title || p.name || p.title || 'आरोग्यम उत्पाद';
-      const mrp = Number(activeProd.mrp || activeProd.price || p.mrp || p.price || 0);
-      const discount = Number(activeProd.discount_pct !== undefined ? activeProd.discount_pct : (p.discount_pct || 0));
-      const offerPrice = (mrp > 0 && discount > 0) ? Math.round(mrp * (1 - discount / 100)) : (Number(activeProd.price || p.price) || mrp);
+      const mrp = Number(activeProd.mrp !== undefined ? activeProd.mrp : (p.mrp || p.price || 0));
+      const discount = Number(activeProd.discount_pct !== undefined ? activeProd.discount_pct : (p.discount_pct !== undefined ? p.discount_pct : 0));
+      const offerPrice = (discount > 0) ? Math.round(mrp * (1 - discount / 100)) : (Number(activeProd.discounted_price) || mrp);
       const packSize = activeProd.pack_size || p.pack_size || '';
       const badge = activeProd.badge || activeProd.category_label || p.badge || (isPashu ? 'आयुर्वेदिक पशु पोषण' : 'प्रमाणित हर्बल किट');
       const desc = activeProd.description || activeProd.dose || p.description || p.dose || '';
@@ -1746,6 +1790,7 @@
       } catch(cErr) {}
 
       const allPages = await loadConfigData();
+      await loadMasterCatalogForSync();
       const pageConfig = getPageMatch(allPages);
       if (pageConfig) {
         window.AAROGYAM_ACTIVE_PAGE_CMS = pageConfig;

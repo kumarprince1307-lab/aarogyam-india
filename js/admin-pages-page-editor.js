@@ -7162,6 +7162,63 @@ export async function initPageEditor() {
     currentCrops = Array.isArray(p.crops) ? JSON.parse(JSON.stringify(p.crops)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_CROPS_LIST)));
     currentPashuCards = Array.isArray(p.pashu_cards) ? JSON.parse(JSON.stringify(p.pashu_cards)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST)));
     currentProducts = Array.isArray(p.products) ? JSON.parse(JSON.stringify(p.products)) : [];
+    // Auto sync & enrich with master products catalog
+    if (Array.isArray(masterProducts) && masterProducts.length > 0) {
+      if ((p.id === 'page_health' || p.slug === 'health') && currentProducts.length === 0) {
+        currentProducts = masterProducts.filter(m => m.category === 'health').map(m => ({
+          id: m.id,
+          title: m.name,
+          name: m.name,
+          description: m.description,
+          image: m.image,
+          mrp: m.mrp,
+          price: (m.discount_pct > 0) ? Math.round(m.mrp * (1 - m.discount_pct / 100)) : (m.discounted_price || m.mrp),
+          discount_pct: m.discount_pct !== undefined ? m.discount_pct : 0,
+          pack_size: m.pack_size || '',
+          dose: m.dose || '',
+          badge: m.badge || '🌿 स्वास्थ्य नेचुरामोरे',
+          whatsapp_link: 'https://wa.me/917974422572'
+        }));
+      } else if (p.id === 'page_cattle_care' || p.slug === 'pashu-palan') {
+        const cattleMasters = masterProducts.filter(m => m.category === 'cattle');
+        if (cattleMasters.length > 0) {
+          currentProducts = cattleMasters.map(m => ({
+            id: m.id,
+            title: m.name,
+            name: m.name,
+            description: m.description,
+            image: m.image,
+            mrp: m.mrp,
+            price: (m.discount_pct > 0) ? Math.round(m.mrp * (1 - m.discount_pct / 100)) : (m.discounted_price || m.mrp),
+            discount_pct: m.discount_pct !== undefined ? m.discount_pct : 0,
+            pack_size: m.pack_size || '',
+            dose: m.dose || '',
+            badge: m.badge || '🐄 पशु पोषण',
+            whatsapp_link: 'https://wa.me/917974422572'
+          }));
+        }
+      } else {
+        currentProducts.forEach(prod => {
+          const m = masterProducts.find(x => 
+            (x.id && prod.id && String(x.id).toLowerCase() === String(prod.id).toLowerCase()) ||
+            (x.name && prod.name && x.name.trim().toLowerCase() === prod.name.trim().toLowerCase()) ||
+            (x.name && prod.title && x.name.trim().toLowerCase() === prod.title.trim().toLowerCase())
+          );
+          if (m) {
+            prod.id = m.id;
+            prod.title = m.name;
+            prod.name = m.name;
+            prod.mrp = m.mrp;
+            prod.discount_pct = m.discount_pct !== undefined ? m.discount_pct : 0;
+            prod.price = (prod.discount_pct > 0) ? Math.round(prod.mrp * (1 - prod.discount_pct / 100)) : (m.discounted_price || prod.mrp);
+            if (m.pack_size) prod.pack_size = m.pack_size;
+            if (m.dose) prod.dose = m.dose;
+            if (m.badge) prod.badge = m.badge;
+            if (m.image && !m.image.includes('logo.png')) prod.image = m.image;
+          }
+        });
+      }
+    }
     currentPageKpiSections = Array.isArray(p.page_kpi_sections) ? JSON.parse(JSON.stringify(p.page_kpi_sections)) : [];
     currentDietImages = Array.isArray(dietData.images) ? JSON.parse(JSON.stringify(dietData.images)) : [];
     currentExerciseImages = Array.isArray(exData.images) ? JSON.parse(JSON.stringify(exData.images)) : [];
@@ -7572,7 +7629,50 @@ export async function initPageEditor() {
     try {
       const cleanAllPages = stripImagePreviews(allPages);
       const configStr = JSON.stringify({ sitePages: cleanAllPages }, null, 2);
-      const base64Data = btoa(unescape(encodeURIComponent(configStr)));
+      // Keep master products catalog synced if products on this page were edited
+      if (Array.isArray(currentProducts) && currentProducts.length > 0 && Array.isArray(masterProducts) && masterProducts.length > 0) {
+        let masterModified = false;
+        currentProducts.forEach(cp => {
+          const m = masterProducts.find(x => 
+            (x.id && cp.id && String(x.id).toLowerCase() === String(cp.id).toLowerCase()) ||
+            (x.name && cp.name && x.name.trim().toLowerCase() === cp.name.trim().toLowerCase()) ||
+            (x.name && cp.title && x.name.trim().toLowerCase() === cp.title.trim().toLowerCase())
+          );
+          if (m) {
+            if (cp.mrp !== undefined && cp.mrp > 0) m.mrp = cp.mrp;
+            if (cp.discount_pct !== undefined) {
+              m.discount_pct = cp.discount_pct;
+              m.discounted_price = (cp.discount_pct > 0) ? Math.round(m.mrp * (1 - cp.discount_pct / 100)) : m.mrp;
+            }
+            if (cp.pack_size) m.pack_size = cp.pack_size;
+            if (cp.description) m.description = cp.description;
+            if (cp.image && !cp.image.includes('logo.png')) m.image = cp.image;
+            masterModified = true;
+          }
+        });
+        if (masterModified) {
+          try {
+            localStorage.setItem('aim_netsurf_products_master', JSON.stringify({
+              version: "2026.3",
+              updated_at: new Date().toISOString(),
+              total_products: masterProducts.length,
+              categories: masterCategories,
+              catalog_settings: masterCatalogSettings,
+              products: masterProducts
+            }));
+            fetch('/api/save_netsurf_products.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'save_master_products',
+                products: masterProducts,
+                categories: masterCategories,
+                catalog_settings: masterCatalogSettings
+              })
+            }).catch(() => null);
+          } catch(e) {}
+        }
+      }
 
       // Call dedicated PHP save API (matches Universal Book Landing flow)
       fetch('/api/save_site_pages.php', {
