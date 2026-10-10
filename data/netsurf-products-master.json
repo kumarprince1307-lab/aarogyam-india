@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T08:56:39.252Z",
+  "updated_at": "2026-10-10T09:25:14.655Z",
   "total_products": 39,
   "categories": [
     {
@@ -410,8 +410,8 @@
       "category_label": "कृषि बायोफिट",
       "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
       "mrp": 1695,
-      "discount_pct": 25,
-      "discounted_price": 1271,
+      "discount_pct": 0,
+      "discounted_price": 1695,
       "dose": "30ml प्रति 15 लीटर पंप। फसल के कल्ले फूटने व फूल आने से पहले छिड़काव करें।",
       "image": "/images/products/product-----------biofit-s-069210-gir4.webp",
       "description": "कल्ले, नई शाखाओं और फूलों की संख्या में 30-40% वृद्धि। फूल झड़ने से रोकता है और पैदावार बढ़ाता है।",
@@ -421,7 +421,13 @@
       "precautions": "कड़ी धूप या बारिश की संभावना में छिड़काव न करें। रासायनिक खरपतवारनाशक के साथ न मिलाएं।",
       "pack_size": "1 Litre",
       "problem_tags": [
-        "crop_yield"
+        "crop_yield",
+        "crop_soybean",
+        "crop_chana",
+        "crop_mustard",
+        "crop_wheat",
+        "crop_paddy",
+        "agri_flower_fruit"
       ]
     },
     {
