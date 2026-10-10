@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:46:57.164Z",
+  "updated_at": "2026-10-10T09:47:09.520Z",
   "total_products": 39,
   "categories": [
     {
@@ -824,8 +824,8 @@
       "category_label": "हर्ब्स एंड मोर",
       "badge": "✨ विटामिन E व B3 नेचुरल ग्लो",
       "mrp": 250,
-      "discount_pct": 15,
-      "discounted_price": 213,
+      "discount_pct": 0,
+      "discounted_price": 250,
       "dose": "दिन में 2 बार चेहरे को पानी से गीला करके हल्की मसाज करें और धो लें।",
       "image": "/images/products/product-anti-pollution-fac-183712-pfhx.webp",
       "description": "विटामिन E व B3 से भरपूर सौम्य क्लींजर। धूल-मिट्टी साफ कर चेहरे पर तुरंत प्राकृतिक निखार लाता है।",
