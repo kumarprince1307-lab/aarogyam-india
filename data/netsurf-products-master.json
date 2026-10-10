@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:26:28.278Z",
+  "updated_at": "2026-10-10T09:27:04.622Z",
   "total_products": 39,
   "categories": [
     {
@@ -495,8 +495,8 @@
       "category_label": "कृषि बायोफिट",
       "badge": "🛡️ जैविक फफूंद सुरक्षा",
       "mrp": 800,
-      "discount_pct": 20,
-      "discounted_price": 640,
+      "discount_pct": 0,
+      "discounted_price": 800,
       "dose": "30ml प्रति 15 लीटर पंप (पत्ते पर छिड़काव) या 1 लीटर प्रति एकड़ ड्रेंचिंग।",
       "image": "/images/products/product--------biofit-wrap-278702-ozh4.webp",
       "description": "पौधों पर सुरक्षात्मक जैविक परत बनाकर फंगस, उकठा और जड़ गलन से 100% जैविक सुरक्षा प्रदान करता है।",
@@ -506,7 +506,9 @@
       "precautions": "रोग के शुरुआती लक्षण दिखते ही प्रयोग करें। रासायनिक विषैले रसायनों से अलग रखें।",
       "pack_size": "1 Litre",
       "problem_tags": [
-        "crop_yield"
+        "crop_yield",
+        "agri_fungus",
+        "crop_chana"
       ]
     },
     {
