@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:38:23.901Z",
+  "updated_at": "2026-10-10T09:38:48.840Z",
   "total_products": 39,
   "categories": [
     {
@@ -780,9 +780,9 @@
       "category": "health",
       "category_label": "स्वास्थ्य नेचुरामोरे",
       "badge": "⚡ पौरुष शक्ति, स्टैमिना व टेस्टोस्टेरोन",
-      "mrp": 689,
-      "discount_pct": 25,
-      "discounted_price": 517,
+      "mrp": 620,
+      "discount_pct": 0,
+      "discounted_price": 620,
       "dose": "1 कैप्सूल रात को भोजन के बाद गुनगुने दूध या पानी के साथ।",
       "image": "/images/products/product--------------------051545-547x.webp",
       "description": "अश्वगंधा, जिनसेंग, गोक्षुर, कौंच बीज व सफेद मूसली से प्राकृतिक ऊर्जा, स्टैमिना और आत्मविश्वास।",
@@ -792,7 +792,8 @@
       "precautions": "उच्च रक्तचाप वाले व्यक्ति नियमित बीपी जांच रखें और अत्यधिक गर्म तासीर की चीजें कम खाएं।",
       "pack_size": "30 कैप्सूल",
       "problem_tags": [
-        "vitality_wellness"
+        "vitality_wellness",
+        "diabetes"
       ]
     },
     {
