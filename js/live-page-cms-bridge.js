@@ -568,6 +568,39 @@
     `;
   }
 
+  function renderDynamicHealthDomainMatrix(pageConfig) {
+    const grid = document.querySelector('.health-kpi-matrix-grid');
+    if (!grid || !Array.isArray(pageConfig?.health_diseases) || pageConfig.health_diseases.length === 0) return;
+
+    grid.innerHTML = pageConfig.health_diseases.map(d => {
+      const theme = d.color || '#dc2626';
+      const bg = d.bg || (theme.startsWith('#') ? `${theme}18` : '#fee2e2');
+      const link = d.action_link || d.url || `/health/${d.slug || d.id || 'diabetes'}.html`;
+      const icon = d.icon || '🩺';
+      const badge = d.badge || 'स्वास्थ्य सुरक्षा';
+      const question = d.name || d.title || 'स्वास्थ्य समस्या';
+      const desc = d.description || '';
+      const cta = d.solution || 'समाधान व डाइट चार्ट देखें';
+
+      return `
+        <a href="${escapeHtml(link)}" class="smart-kpi-nav-card" style="--kpi-theme:${escapeHtml(theme)}; --kpi-bg:${escapeHtml(bg)};">
+          <div>
+            <div class="smart-kpi-top-row">
+              <div class="smart-kpi-icon">${icon}</div>
+              <span class="smart-kpi-badge">${escapeHtml(badge)}</span>
+            </div>
+            <h3 class="smart-kpi-question">${escapeHtml(question)}</h3>
+            <p class="smart-kpi-desc">${escapeHtml(desc)}</p>
+          </div>
+          <div class="smart-kpi-cta-bar">
+            <span>${escapeHtml(cta)}</span>
+            <span class="cta-arrow">→</span>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
   // Master Product Catalog Live Linking (Instant Multi-Page Sync)
   let masterProductsCatalog = [];
   let masterCatalogPromise = null;
@@ -637,7 +670,11 @@
         'womens-care': 'womens_care',
         'kids-care': 'kids_care',
         'home-care': 'home_care',
-        'sexual-wellness': 'sexual_wellness'
+        'sexual-wellness': 'sexual_wellness',
+        'dental-care': 'dental_care',
+        'liver-care': 'liver_care',
+        'thyroid-care': 'thyroid_care',
+        'heart-care': 'heart_care'
       };
       const targetTag = tagMap[subslug];
       if (targetTag) {
@@ -645,6 +682,22 @@
           Array.isArray(m.problem_tags) && m.problem_tags.includes(targetTag)
         );
         if (matchingMaster.length > 0) prods = matchingMaster;
+      }
+      // Direct product fallback from master catalog if problem_tags didn't match
+      if (prods.length === 0) {
+        if (subslug === 'dental-care') {
+          const m = masterProductsCatalog.find(x => x.id === 'ns_herbs_toothpaste');
+          if (m) prods = [m];
+        } else if (subslug === 'liver-care') {
+          const m = masterProductsCatalog.find(x => x.id === 'ns_prod_85933');
+          if (m) prods = [m];
+        } else if (subslug === 'thyroid-care') {
+          const m = masterProductsCatalog.find(x => x.id === 'ns_health_women');
+          if (m) prods = [m];
+        } else if (subslug === 'heart-care') {
+          const m = masterProductsCatalog.find(x => x.id === 'ns_health_heart');
+          if (m) prods = [m];
+        }
       }
     }
 
@@ -1459,7 +1512,7 @@
               </div>
             ` : ''}
             <div style="padding:18px;">
-              <h3 style="font-size:1.15rem; font-weight:900; color:#0f172a; margin:0 0 10px 0; line-height:1.35;">${escapeHtml(title)}</h3>
+              <h3 style="font-size:1.15rem; font-weight:900; color:${color || '#0f172a'}; margin:0 0 10px 0; line-height:1.35;">${escapeHtml(title)}</h3>
               <div style="font-size:0.85rem; color:#475569; line-height:1.55; margin-bottom:12px;">
                 ${points.map(pt => `<p style="margin:0 0 6px 0;">• ${escapeHtml(pt.replace(/^[•\-\*\s]+/, ''))}</p>`).join('')}
               </div>
@@ -1801,6 +1854,7 @@
         applySectionReorderingAndVisibility(pageConfig);
         renderDynamicKpiBadges(pageConfig);
         renderDynamicPageKpiSections(pageConfig);
+        renderDynamicHealthDomainMatrix(pageConfig);
         renderDynamicProducts(pageConfig);
         renderDynamicClinicalBreakdown(pageConfig);
         renderDynamicDietExercise(pageConfig);
