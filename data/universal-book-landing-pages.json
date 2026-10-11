@@ -4754,7 +4754,7 @@
     },
     {
       "id": "BK018",
-      "updated_at": "2026-10-11T14:20:05.517Z",
+      "updated_at": "2026-10-11T14:30:09.015Z",
       "admin_edited": true,
       "slug": "bk018",
       "book_type": "paid",
@@ -4807,7 +4807,10 @@
         "sec_pdf_main",
         "sec_pdf_free"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_vip_stack",
+        "sec_ai_support"
+      ],
       "section_banners": {
         "sec_audio": "/images/banners/bk018-sec_audio-banner.webp",
         "sec_preview": "/images/banners/bk018-sec_preview-banner.webp",
@@ -4880,7 +4883,7 @@
       },
       "hero": {
         "tag": "Bestseller Income Guide 2026",
-        "title": "घर बैठे पैसे कैसे कमाएँ? 2026 — 60 कमाई के तरीके और 150+ वेबसाइट्स की संपूर्ण गाइड",
+        "title": "घर बैठे पैसे कैसे कमाएँ? 60 कमाई के तरीके और 150+ वेबसाइट्स की संपूर्ण गाइड",
         "subtitle": "ऑनलाइन और ऑफलाइन कमाई के 60 तरीके • 150+ उपयोगी वेबसाइट्स • शुरुआत से काम समझने की व्यावहारिक गाइड",
         "description": "क्या आप घर बैठे कमाई शुरू करने का रास्ता खोज रहे हैं? इस गाइड में जानिए 60 ऑनलाइन और ऑफलाइन कमाई के तरीके, 150+ उपयोगी वेबसाइट्स और हर विकल्प को समझकर शुरुआत करने की जानकारी। अपनी रुचि, कौशल और बजट के अनुसार सही रास्ता चुनें। पूरी गाइड अभी सिर्फ ₹149 में ऑर्डर करें!",
         "mrp": 1001,
@@ -4917,17 +4920,55 @@
       ],
       "demo_reader_pages": "",
       "demoPages": "",
-      "suggested_books_list": [],
-      "suggested_books": [],
+      "suggested_books_list": [
+        {
+          "id": "BK016",
+          "link": "BK016",
+          "title": "कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा की पूरी गाइड",
+          "image": "/images/books/bk016-cover.webp",
+          "offerPrice": 149,
+          "mrp": 499
+        },
+        {
+          "id": "BK001",
+          "link": "BK001",
+          "title": "खरीफ फसल मास्टर गाइड 2026",
+          "image": "/images/books/kharif-master-guide-2026-cover.webp",
+          "offerPrice": 99,
+          "mrp": 299
+        },
+        {
+          "id": "BK002",
+          "link": "BK002",
+          "title": "खेती का डॉक्टर",
+          "image": "/images/books/fasal-ka-doctor-cover.webp",
+          "offerPrice": 99,
+          "mrp": 299
+        },
+        {
+          "id": "BK015",
+          "link": "BK015",
+          "title": "🌱 सब्जी खेती मास्टर  (PART 1)",
+          "image": "/images/books/bk015-cover.webp",
+          "offerPrice": 149,
+          "mrp": 1999
+        }
+      ],
+      "suggested_books": [
+        "BK016",
+        "BK001",
+        "BK002",
+        "BK015"
+      ],
       "table_of_contents": [],
       "videos": [],
       "testimonials": [
         {
-          "name": "संतुष्ट पाठक",
-          "location": "भारत",
+          "name": "राहुल शर्मा",
+          "location": "भोपाल, मध्य प्रदेश",
           "rating": 5,
           "gender": "male",
-          "comment": "बहुत ही उपयोगी व व्यावहारिक पुस्तक है।"
+          "comment": "इस किताब में ऑनलाइन कमाई के कई विकल्प एक जगह समझने को मिलते हैं। नए रास्ते खोजने वालों के लिए उपयोगी जानकारी है।"
         },
         {
           "name": "संतुष्ट पाठक",
@@ -5026,6 +5067,16 @@
           "rating": 5,
           "gender": "male",
           "comment": "बहुत ही उपयोगी व व्यावहारिक पुस्तक है।"
+        }
+      ],
+      "faqs": [
+        {
+          "q": "📘Income Guide क्या है और इसमें क्या मिलेगा?",
+          "a": "यह घर बैठे कमाई के अलग-अलग अवसरों को समझने के लिए तैयार की गई डिजिटल गाइड है। इसमें 60 कमाई के आइडिया और 150+ उपयोगी वेबसाइटों की जानकारी दी गई है।"
+        },
+        {
+          "q": "नया प्रश्न",
+          "a": "नया उत्तर"
         }
       ],
       "final_buy": {
