@@ -1964,11 +1964,43 @@
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [],
-      "demo_images": [],
-      "preview_images": [],
-      "previewImages": [],
-      "demoAvailable": false,
+      "demoImages": [
+        "/images/books/bk018-preview-1.webp",
+        "/images/books/bk018-preview-2.webp",
+        "/images/books/bk018-preview-3.webp",
+        "/images/books/bk018-preview-4.webp",
+        "/images/books/bk018-preview-5.webp",
+        "/images/books/bk018-preview-6.webp",
+        "/images/books/bk018-preview-7.webp"
+      ],
+      "demo_images": [
+        "/images/books/bk018-preview-1.webp",
+        "/images/books/bk018-preview-2.webp",
+        "/images/books/bk018-preview-3.webp",
+        "/images/books/bk018-preview-4.webp",
+        "/images/books/bk018-preview-5.webp",
+        "/images/books/bk018-preview-6.webp",
+        "/images/books/bk018-preview-7.webp"
+      ],
+      "preview_images": [
+        "/images/books/bk018-preview-1.webp",
+        "/images/books/bk018-preview-2.webp",
+        "/images/books/bk018-preview-3.webp",
+        "/images/books/bk018-preview-4.webp",
+        "/images/books/bk018-preview-5.webp",
+        "/images/books/bk018-preview-6.webp",
+        "/images/books/bk018-preview-7.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk018-preview-1.webp",
+        "/images/books/bk018-preview-2.webp",
+        "/images/books/bk018-preview-3.webp",
+        "/images/books/bk018-preview-4.webp",
+        "/images/books/bk018-preview-5.webp",
+        "/images/books/bk018-preview-6.webp",
+        "/images/books/bk018-preview-7.webp"
+      ],
+      "demoAvailable": true,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/bk018-og.webp",
@@ -1984,6 +2016,32 @@
         "mp3_url": "",
         "tts_text": "क्या आप भी घर बैठे कमाई के नए रास्ते तलाश रहे हैं?\n\nक्या आपको समझ नहीं आता कि शुरुआत कहाँ से करें?\n\nतो यह गाइड आपके लिए मददगार हो सकती है।\n\nइसमें जानिए कमाई के साठ तरीके... और एक सौ पचास से अधिक वेबसाइटों की जानकारी।\n\nऑनलाइन काम, ऑफलाइन व्यवसाय, डिजिटल सेवाएँ और दूसरे अवसर... अपनी रुचि और कौशल के अनुसार विकल्प समझिए।\n\nहर किसी का रास्ता अलग होता है। इसलिए जानकारी लेकर सोच-समझकर शुरुआत कीजिए।\n\nऔर खास बात...\n\nइस गाइड की कीमत है सिर्फ एक सौ उनचास रुपये!\n\nअगर आप भी नए अवसरों को समझना चाहते हैं, तो आज ही ऑर्डर करें।\n\nघर बैठे पैसे कैसे कमाएँ? आपकी अगली शुरुआत... यहीं से हो सकती है!",
         "story_text": "क्या आप भी घर बैठे कमाई के नए रास्ते तलाश रहे हैं?\n\nक्या आपको समझ नहीं आता कि शुरुआत कहाँ से करें?\n\nतो यह गाइड आपके लिए मददगार हो सकती है।\n\nइसमें जानिए कमाई के साठ तरीके... और एक सौ पचास से अधिक वेबसाइटों की जानकारी।\n\nऑनलाइन काम, ऑफलाइन व्यवसाय, डिजिटल सेवाएँ और दूसरे अवसर... अपनी रुचि और कौशल के अनुसार विकल्प समझिए।\n\nहर किसी का रास्ता अलग होता है। इसलिए जानकारी लेकर सोच-समझकर शुरुआत कीजिए।\n\nऔर खास बात...\n\nइस गाइड की कीमत है सिर्फ एक सौ उनचास रुपये!\n\nअगर आप भी नए अवसरों को समझना चाहते हैं, तो आज ही ऑर्डर करें।\n\nघर बैठे पैसे कैसे कमाएँ? आपकी अगली शुरुआत... यहीं से हो सकती है!",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
         "offer_callout": "🔥 खास लॉन्च ऑफर — सिर्फ ₹149!  60 कमाई के तरीके और 150+ वेबसाइटों की जानकारी वाली गाइड अभी किफायती कीमत पर पाएँ। नए अवसरों को समझें, अपने लिए सही विकल्प चुनें और सोच-समझकर शुरुआत करें।",
         "bgm_enabled": true,
         "banner_image": "/images/banners/bk018-sec_audio-banner.webp"
@@ -1995,7 +2053,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK018",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-10-11T13:45:41.013Z",
+      "updated_at": "2026-10-11T14:20:05.518Z",
       "admin_edited": true
     }
   ]
