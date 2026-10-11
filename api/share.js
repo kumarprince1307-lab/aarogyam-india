@@ -219,6 +219,62 @@ const SITE_PAGES_FALLBACK_MAP = {
     og_title: 'केमिकल-मुक्त सुरक्षित व स्वच्छ घर समाधान | Aarogyam India',
     og_description: 'फलों-सब्जियों से कीटनाशक हटाने व बायो-एंजाइम क्लीनिंग के 100% प्राकृतिक समाधान।',
     og_image: 'https://aarogyamindia.online/images/banners/health-home-care.jpg'
+  },
+  'health-dental-care': {
+    id: 'page_health_dental_care',
+    destUrl: 'https://aarogyamindia.online/health/dental-care.html',
+    og_title: '🦷 क्या आपका टूथपेस्ट आपके दांतों को धीरे-धीरे सड़ा रहा है? फ्लोराइड का कड़वा सच',
+    og_description: 'मार्केट के केमिकल टूथपेस्ट, पायरिया, मुंह के छाले और दांतों में झनझनाहट (Sensitivity) का स्थायी आयुर्वेदिक समाधान व दंत पोषण गाइड।',
+    og_image: 'https://aarogyamindia.online/images/banners/health-banner.jpeg'
+  },
+  'dental-care': {
+    id: 'page_health_dental_care',
+    destUrl: 'https://aarogyamindia.online/health/dental-care.html',
+    og_title: '🦷 क्या आपका टूथपेस्ट आपके दांतों को धीरे-धीरे सड़ा रहा है? फ्लोराइड का कड़वा सच',
+    og_description: 'मार्केट के केमिकल टूथपेस्ट, पायरिया, मुंह के छाले और दांतों में झनझनाहट (Sensitivity) का स्थायी आयुर्वेदिक समाधान व दंत पोषण गाइड।',
+    og_image: 'https://aarogyamindia.online/images/banners/health-banner.jpeg'
+  },
+  'health-liver-care': {
+    id: 'page_health_liver_care',
+    destUrl: 'https://aarogyamindia.online/health/liver-care.html',
+    og_title: '🫀 क्या आपका लिवर धीरे-धीरे फेल हो रहा है? फैटी लिवर और सिरोसिस का कड़वा सच',
+    og_description: 'भारत में हर 3 में से 1 व्यक्ति फैटी लिवर का शिकार! लिवर सिरोसिस, पीलिया, पेट में भारीपन व थकान का संपूर्ण आयुर्वेदिक डिटॉक्स व डाइट चार्ट।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-health-og-676433-sb3k.webp'
+  },
+  'liver-care': {
+    id: 'page_health_liver_care',
+    destUrl: 'https://aarogyamindia.online/health/liver-care.html',
+    og_title: '🫀 क्या आपका लिवर धीरे-धीरे फेल हो रहा है? फैटी लिवर और सिरोसिस का कड़वा सच',
+    og_description: 'भारत में हर 3 में से 1 व्यक्ति फैटी लिवर का शिकार! लिवर सिरोसिस, पीलिया, पेट में भारीपन व थकान का संपूर्ण आयुर्वेदिक डिटॉक्स व डाइट चार्ट।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-health-og-676433-sb3k.webp'
+  },
+  'health-thyroid-care': {
+    id: 'page_health_thyroid_care',
+    destUrl: 'https://aarogyamindia.online/health/thyroid-care.html',
+    og_title: '🦋 क्या गोली खाने के बाद भी थायरॉइड ठीक नहीं हो रहा? लिवर-थायरॉइड का अनदेखा सच',
+    og_description: 'शरीर में 80% T4 को सक्रिय T3 में बदलने का काम लिवर करता है! थायरॉइड, अचानक वजन बढ़ना, बाल झड़ना व थकान का संपूर्ण आयुर्वेदिक व वैज्ञानिक डाइट चार्ट।',
+    og_image: 'https://aarogyamindia.online/images/banners/health_card-2-585308-wpfz.webp'
+  },
+  'thyroid-care': {
+    id: 'page_health_thyroid_care',
+    destUrl: 'https://aarogyamindia.online/health/thyroid-care.html',
+    og_title: '🦋 क्या गोली खाने के बाद भी थायरॉइड ठीक नहीं हो रहा? लिवर-थायरॉइड का अनदेखा सच',
+    og_description: 'शरीर में 80% T4 को सक्रिय T3 में बदलने का काम लिवर करता है! थायरॉइड, अचानक वजन बढ़ना, बाल झड़ना व थकान का संपूर्ण आयुर्वेदिक व वैज्ञानिक डाइट चार्ट।',
+    og_image: 'https://aarogyamindia.online/images/banners/health_card-2-585308-wpfz.webp'
+  },
+  'health-heart-care': {
+    id: 'page_health_heart_care',
+    destUrl: 'https://aarogyamindia.online/health/heart-care.html',
+    og_title: '❤️ क्या आपकी धमनियां धीरे-धीरे ब्लॉक हो रही हैं? भारत में कम उम्र में हार्ट अटैक का खौफनाक सच',
+    og_description: '25 से 45 साल में अचानक हार्ट अटैक क्यों? रेस्टिंग हार्ट रेट (RHR), सीने में भारीपन, सांस फूलने के लक्षण और धमनियों की प्राकृतिक सफाई की संपूर्ण आयुर्वेदिक गाइड।',
+    og_image: 'https://aarogyamindia.online/images/banners/health-banner.jpeg'
+  },
+  'heart-care': {
+    id: 'page_health_heart_care',
+    destUrl: 'https://aarogyamindia.online/health/heart-care.html',
+    og_title: '❤️ क्या आपकी धमनियां धीरे-धीरे ब्लॉक हो रही हैं? भारत में कम उम्र में हार्ट अटैक का खौफनाक सच',
+    og_description: '25 से 45 साल में अचानक हार्ट अटैक क्यों? रेस्टिंग हार्ट रेट (RHR), सीने में भारीपन, सांस फूलने के लक्षण और धमनियों की प्राकृतिक सफाई की संपूर्ण आयुर्वेदिक गाइड।',
+    og_image: 'https://aarogyamindia.online/images/banners/health-banner.jpeg'
   }
 };
 
