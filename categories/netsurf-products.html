@@ -70,15 +70,17 @@
       max-width: 1320px;
       margin: 0 auto;
       padding: 0 16px;
+      box-sizing: border-box;
     }
+
     /* Hero Header */
     .np-hero-banner {
       background: linear-gradient(135deg, #091326 0%, #0f1d3a 50%, #15284f 100%);
       color: #ffffff;
-      padding: 36px 0 28px 0;
+      padding: 30px 0 24px 0;
       position: relative;
       border-bottom: 2px solid #2563eb40;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     }
     .np-badge-pill {
       display: inline-flex;
@@ -91,237 +93,335 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    /* KPI Strip */
-    .np-kpi-grid {
+
+    /* Animated Glassmorphic Category KPI Cards */
+    .np-glass-kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: 12px;
       margin-top: 24px;
     }
-    .np-kpi-card {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 14px;
-      padding: 12px 14px;
-      backdrop-filter: blur(8px);
+    @media (max-width: 1100px) {
+      .np-glass-kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+    }
+    @media (max-width: 640px) {
+      .np-glass-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+    }
+    .np-glass-kpi-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(255, 255, 255, 0.16);
+      border-radius: 16px;
+      padding: 10px 12px;
       cursor: pointer;
-      transition: all 0.22s ease;
       display: flex;
       align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: #fff;
+      gap: 10px;
+      color: #ffffff;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     }
-    .np-kpi-card:hover, .np-kpi-card.active {
-      background: rgba(16,185,129,0.15);
-      border-color: #10b981;
+    .np-glass-kpi-card[data-cat="all"] {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+      border-color: rgba(245, 158, 11, 0.32);
+    }
+    .np-glass-kpi-card[data-cat="agri"] {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+      border-color: rgba(16, 185, 129, 0.32);
+    }
+    .np-glass-kpi-card[data-cat="cattle"] {
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+      border-color: rgba(217, 119, 6, 0.32);
+    }
+    .np-glass-kpi-card[data-cat="health"] {
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+      border-color: rgba(244, 63, 94, 0.32);
+    }
+    .np-glass-kpi-card[data-cat="herbs_more"] {
+      background: linear-gradient(135deg, rgba(20, 184, 166, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+      border-color: rgba(20, 184, 166, 0.32);
+    }
+    .np-glass-kpi-card[data-cat="clean_more"] {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+      border-color: rgba(99, 102, 241, 0.32);
+    }
+    .np-glass-kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+      transition: left 0.6s ease;
+    }
+    .np-glass-kpi-card:hover::before {
+      left: 100%;
+    }
+    .np-glass-kpi-card:hover {
+      transform: translateY(-3px) scale(1.02);
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+    }
+    .np-glass-kpi-card.active {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(16,185,129,0.25);
     }
-    .np-kpi-icon {
-      font-size: 1.6rem;
-      width: 42px;
-      height: 42px;
+    .np-glass-kpi-card[data-cat="all"].active {
+      border-color: #f59e0b;
+      box-shadow: 0 8px 26px rgba(245, 158, 11, 0.45);
+      background: linear-gradient(135deg, rgba(245,158,11,0.36) 0%, rgba(120,53,15,0.55) 100%);
+    }
+    .np-glass-kpi-card[data-cat="agri"].active {
+      border-color: #10b981;
+      box-shadow: 0 8px 26px rgba(16, 185, 129, 0.45);
+      background: linear-gradient(135deg, rgba(16,185,129,0.36) 0%, rgba(6,78,59,0.55) 100%);
+    }
+    .np-glass-kpi-card[data-cat="cattle"].active {
+      border-color: #f59e0b;
+      box-shadow: 0 8px 26px rgba(245, 158, 11, 0.45);
+      background: linear-gradient(135deg, rgba(245,158,11,0.36) 0%, rgba(120,53,15,0.55) 100%);
+    }
+    .np-glass-kpi-card[data-cat="health"].active {
+      border-color: #f43f5e;
+      box-shadow: 0 8px 26px rgba(244, 63, 94, 0.45);
+      background: linear-gradient(135deg, rgba(244,63,94,0.36) 0%, rgba(136,19,55,0.55) 100%);
+    }
+    .np-glass-kpi-card[data-cat="herbs_more"].active {
+      border-color: #14b8a6;
+      box-shadow: 0 8px 26px rgba(20, 184, 166, 0.45);
+      background: linear-gradient(135deg, rgba(20,184,166,0.36) 0%, rgba(19,78,74,0.55) 100%);
+    }
+    .np-glass-kpi-card[data-cat="clean_more"].active {
+      border-color: #6366f1;
+      box-shadow: 0 8px 26px rgba(99, 102, 241, 0.45);
+      background: linear-gradient(135deg, rgba(99,102,241,0.36) 0%, rgba(49,46,129,0.55) 100%);
+    }
+    .np-shelf-highlight {
+      animation: npShelfPulseHighlight 1.5s ease-out;
+    }
+    @keyframes npShelfPulseHighlight {
+      0% { box-shadow: 0 0 0 4px #10b981, 0 10px 30px rgba(16,185,129,0.35); transform: scale(1.006); }
+      100% { box-shadow: 0 4px 16px rgba(0,0,0,0.03); transform: scale(1); }
+    }
+    .np-glass-icon-bubble {
+      width: 36px;
+      height: 36px;
       border-radius: 10px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.12);
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 1.3rem;
       flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.18);
     }
-    /* Audio Tutorial Bar */
-    .np-audio-widget {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-      border: 1.5px solid #6366f1;
-      border-radius: 16px;
-      padding: 14px 18px;
-      margin: 20px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      color: #ffffff;
-      box-shadow: 0 8px 24px rgba(99,102,241,0.25);
-      flex-wrap: wrap;
-    }
-    .np-audio-btn {
-      background: #10b981;
-      color: #fff;
-      border: none;
-      border-radius: 30px;
-      padding: 8px 18px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s;
-      box-shadow: 0 4px 12px rgba(16,185,129,0.35);
-    }
-    .np-audio-btn:hover {
-      background: #059669;
-      transform: scale(1.02);
-    }
-    .np-audio-waves {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      height: 18px;
-    }
-    .np-wave-bar {
-      width: 3px;
-      background: #a5b4fc;
-      border-radius: 2px;
-      height: 6px;
-      transition: height 0.15s ease;
-    }
-    .np-audio-widget.playing .np-wave-bar:nth-child(1) { animation: wave 0.8s infinite 0.1s; }
-    .np-audio-widget.playing .np-wave-bar:nth-child(2) { animation: wave 0.8s infinite 0.3s; }
-    .np-audio-widget.playing .np-wave-bar:nth-child(3) { animation: wave 0.8s infinite 0.2s; }
-    .np-audio-widget.playing .np-wave-bar:nth-child(4) { animation: wave 0.8s infinite 0.4s; }
-    .np-audio-widget.playing .np-wave-bar:nth-child(5) { animation: wave 0.8s infinite 0.15s; }
-    @keyframes wave {
-      0%, 100% { height: 4px; }
-      50% { height: 18px; background: #34d399; }
-    }
-    /* Filter Bar */
-    .np-filter-section {
-      background: #ffffff;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 16px;
-      margin: 22px 0;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    .np-glass-kpi-info {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      overflow: hidden;
     }
-    .np-search-input-wrap {
+    .np-glass-kpi-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+    .np-glass-kpi-count {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .np-glass-kpi-card.active .np-glass-kpi-count {
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    /* Sleek Sticky Category Navigation Bar */
+    .np-sticky-nav-bar {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1.5px solid #e2e8f0;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+      padding: 10px 0;
+      transition: all 0.2s ease;
+    }
+    .np-nav-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .np-nav-search-wrap {
       position: relative;
-      width: 100%;
+      flex: 1;
+      min-width: 250px;
     }
-    .np-search-input {
+    .np-nav-search-input {
       width: 100%;
       box-sizing: border-box;
-      padding: 12px 16px 12px 42px;
+      padding: 10px 38px 10px 36px;
       border-radius: 12px;
       border: 1.5px solid #cbd5e1;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
+      font-weight: 600;
       background: #f8fafc;
       color: #0f172a;
       outline: none;
       transition: all 0.2s;
     }
-    .np-search-input:focus {
+    .np-nav-search-input:focus {
       border-color: #10b981;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
     }
-    .np-search-icon {
+    .np-nav-search-icon {
       position: absolute;
-      left: 14px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
       color: #94a3b8;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
-    /* Category Tabs */
-    .np-category-tabs {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: thin;
-    }
-    .np-cat-btn {
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1.5px solid #e2e8f0;
-      background: #f8fafc;
-      color: #334155;
-      font-size: 0.84rem;
-      font-weight: 700;
+    .np-nav-search-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #94a3b8;
       cursor: pointer;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.18s ease;
+      font-size: 0.9rem;
+      padding: 0;
     }
-    .np-cat-btn:hover {
-      background: #e2e8f0;
-    }
-    .np-cat-btn.active {
-      background: #10b981;
-      color: #ffffff;
-      border-color: #10b981;
-      box-shadow: 0 4px 12px rgba(16,185,129,0.3);
-    }
-    /* Problem Tags Bar */
-    .np-problem-pills-bar {
+
+    /* Main Shelves Container & Shelves Architecture */
+    .np-shelves-container {
+      width: 100%;
       display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: thin;
+      flex-direction: column;
+      gap: 32px;
+      margin: 24px 0 50px 0;
     }
-    .np-prob-btn {
-      padding: 6px 12px;
-      border-radius: 14px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      color: #475569;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-    .np-prob-btn:hover {
-      background: #f1f5f9;
-      border-color: #94a3b8;
-    }
-    .np-prob-btn.active {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #0284c7;
-      box-shadow: 0 2px 8px rgba(2,132,199,0.3);
-    }
-    /* Product Grid & Cards */
-    .np-products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-      gap: 20px;
-      margin-bottom: 50px;
-    }
-    @media (max-width: 640px) {
-      .np-products-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-    }
-    .np-card {
+    .np-shelf {
+      width: 100%;
       background: #ffffff;
       border: 1.5px solid #e2e8f0;
       border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      box-sizing: border-box;
+      transition: all 0.22s ease;
+    }
+    .np-shelf:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Shelf Header */
+    .np-shelf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      border-bottom: 2px solid #f1f5f9;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .np-shelf-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .np-shelf-icon {
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+    .np-shelf-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -0.3px;
+    }
+    .np-shelf-count-badge {
+      font-size: 0.76rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 12px;
+      border: 1px solid;
+    }
+
+    /* Responsive Product Cards Grid Inside Shelf */
+    .np-shelf-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    @media (max-width: 1200px) {
+      .np-shelf-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
+    @media (max-width: 860px) {
+      .np-shelf-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+    }
+    @media (max-width: 560px) {
+      .np-shelf-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+    }
+
+    /* Product Card */
+    .np-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.25s ease;
+      transition: all 0.22s ease;
       position: relative;
+      box-sizing: border-box;
     }
     .np-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 22px rgba(16, 185, 129, 0.1);
       border-color: #10b981;
     }
     .np-img-box {
       width: 100%;
-      height: 190px;
-      border-radius: 14px;
+      height: 180px;
+      border-radius: 12px;
       background: #f8fafc;
       border: 1px solid #f1f5f9;
       display: flex;
@@ -330,7 +430,7 @@
       overflow: hidden;
       margin-bottom: 12px;
       position: relative;
-      padding: 10px;
+      padding: 8px;
       box-sizing: border-box;
     }
     .np-img-box img {
@@ -342,6 +442,7 @@
     .np-card:hover .np-img-box img {
       transform: scale(1.04);
     }
+
     /* Modal Styles */
     .np-modal-overlay {
       position: fixed;
@@ -413,75 +514,80 @@
     </div>
   </header>
 
-  <!-- 3. HERO & KPI NAVIGATION SHOWCASE -->
+  <!-- 3. HERO SHOWCASE WITH OFFICIAL SLOGAN & ANIMATED GLASSY KPIS -->
   <section class="np-hero-banner" id="sec-np-hero">
     <div class="np-container">
       
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
         <div style="max-width:750px;">
-          <span class="np-badge-pill" style="background:rgba(16,185,129,0.2); color:#6ee7b7; border:1px solid #10b98140;">
-            🌟 ALL NETSURF PRODUCTS • 100% ORGANIC & BIOTECH
-          </span>
-          <h1 style="font-size:2.3rem; font-weight:900; margin:12px 0 8px 0; line-height:1.2; font-family:'Outfit',sans-serif;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <span class="np-badge-pill" style="background:rgba(16,185,129,0.2); color:#6ee7b7; border:1px solid #10b98140;">
+              🌟 ALL NETSURF PRODUCTS • 100% ORGANIC & BIOTECH
+            </span>
+            <span class="np-badge-pill" style="background:rgba(245,158,11,0.2); color:#fde68a; border:1px solid #f59e0b40;">
+              ✨ सेहत • बरकत • मुस्कुराहट ✨
+            </span>
+          </div>
+          <h1 style="font-size:2.2rem; font-weight:900; margin:6px 0 8px 0; line-height:1.2; font-family:'Outfit',sans-serif;">
             सम्पूर्ण नेटसर्फ उत्पाद कैटलॉग
           </h1>
-          <p style="font-size:0.95rem; color:#cbd5e1; line-height:1.55; margin:0 0 16px 0;">
-            कृषि (Biofit), पशु पोषण (Pet-Vet), संपूर्ण स्वास्थ्य (Naturamore), त्वचा-केश सौंदर्य (Herbs & More) व होम केयर (Clean & More) के सभी प्रमाणित उत्पाद। लाइव MRP, डिस्काउंट व 7 भाषाओं में पर्सनलाइज्ड PDF कैटलॉग।
+          <p style="font-size:0.92rem; color:#cbd5e1; line-height:1.55; margin:0 0 14px 0;">
+            कृषि (Biofit), पशु पोषण (Pet-Vet), संपूर्ण स्वास्थ्य (Naturamore), त्वचा-केश सौंदर्य (Herbs & More) व होम केयर (Clean & More)। श्रेणी-वार व्यवस्थित शेल्फ व 7 भाषाओं में पर्सनलाइज्ड कॉर्पोरेट PDF कैटलॉग।
           </p>
         </div>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button type="button" onclick="window.openCatalogDownloadModal()" style="background:#f59e0b; color:#0b1329; border:none; padding:12px 22px; border-radius:30px; font-weight:900; font-size:0.92rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 6px 20px rgba(245,158,11,0.4);">
+          <button type="button" onclick="window.openCatalogDownloadModal()" style="background:#f59e0b; color:#0b1329; border:none; padding:11px 20px; border-radius:30px; font-weight:900; font-size:0.9rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 6px 20px rgba(245,158,11,0.4);">
             <span>📥</span> <span>डाउनलोड PDF कैटलॉग</span>
           </button>
-          <a href="/categories/netsurf.html" style="background:rgba(255,255,255,0.1); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:12px 20px; border-radius:30px; font-weight:800; font-size:0.88rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-            <span>💼</span> <span>नेटसर्फ करियर व बिज़नेस</span>
+          <a href="/categories/netsurf.html" style="background:rgba(255,255,255,0.1); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:11px 18px; border-radius:30px; font-weight:800; font-size:0.86rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+            <span>💼</span> <span>नेटसर्फ बिज़नेस हब</span>
           </a>
         </div>
       </div>
 
-      <!-- Quick Category KPI Chips (Primary Category Filter) -->
-      <div class="np-kpi-grid" id="npTopKpiGrid">
-        <div class="np-kpi-card active" data-cat="all" onclick="window.filterByCategory('all')">
-          <div class="np-kpi-icon">🌟</div>
-          <div>
-            <strong style="font-size:0.92rem; display:block;">सभी उत्पाद (All)</strong>
-            <small style="color:#94a3b8; font-size:0.75rem;" id="npKpiCountAll">सम्पूर्ण उत्पाद</small>
+      <!-- Glassy Animated Category KPI Cards (Executive Styling & Eye-Pleasing Colors) -->
+      <div class="np-glass-kpi-grid" id="npTopKpiGrid">
+        <div class="np-glass-kpi-card active" data-cat="all" onclick="window.filterByCategory('all')">
+          <div class="np-glass-icon-bubble">🌟</div>
+          <div class="np-glass-kpi-info">
+            <span class="np-glass-kpi-title">सभी उत्पाद</span>
+            <span class="np-glass-kpi-count" id="npKpiCountAll">39 उत्पाद</span>
           </div>
         </div>
-        <div class="np-kpi-card" data-cat="agri" onclick="window.filterByCategory('agri')">
-          <div class="np-kpi-icon">🌱</div>
-          <div>
-            <strong style="font-size:0.92rem; display:block;">कृषि बायोफिट</strong>
-            <small style="color:#94a3b8; font-size:0.75rem;" id="npKpiCountAgri">जैविक खेती</small>
+        <div class="np-glass-kpi-card" data-cat="agri" onclick="window.filterByCategory('agri')">
+          <div class="np-glass-icon-bubble">🌾</div>
+          <div class="np-glass-kpi-info">
+            <span class="np-glass-kpi-title">कृषि बायोफिट</span>
+            <span class="np-glass-kpi-count" id="npKpiCountAgri">5 उत्पाद</span>
           </div>
         </div>
-        <div class="np-kpi-card" data-cat="cattle" onclick="window.filterByCategory('cattle')">
-          <div class="np-kpi-icon">🐄</div>
-          <div>
-            <strong style="font-size:0.92rem; display:block;">पशु पोषण (CFC)</strong>
-            <small style="color:#94a3b8; font-size:0.75rem;" id="npKpiCountCattle">दूध व फैट वृद्धि</small>
+        <div class="np-glass-kpi-card" data-cat="cattle" onclick="window.filterByCategory('cattle')">
+          <div class="np-glass-icon-bubble">🐄</div>
+          <div class="np-glass-kpi-info">
+            <span class="np-glass-kpi-title">पशु पोषण (CFC)</span>
+            <span class="np-glass-kpi-count" id="npKpiCountCattle">4 उत्पाद</span>
           </div>
         </div>
-        <div class="np-kpi-card" data-cat="health" onclick="window.filterByCategory('health')">
-          <div class="np-kpi-icon">❤️</div>
-          <div>
-            <strong style="font-size:0.92rem; display:block;">नेचुरामोरे हेल्थ</strong>
-            <small style="color:#94a3b8; font-size:0.75rem;" id="npKpiCountHealth">न्यूट्रास्यूटिकल</small>
+        <div class="np-glass-kpi-card" data-cat="health" onclick="window.filterByCategory('health')">
+          <div class="np-glass-icon-bubble">❤️</div>
+          <div class="np-glass-kpi-info">
+            <span class="np-glass-kpi-title">नेचुरामोरे हेल्थ</span>
+            <span class="np-glass-kpi-count" id="npKpiCountHealth">18 उत्पाद</span>
           </div>
         </div>
-        <div class="np-kpi-card" data-cat="herbs_more" onclick="window.filterByCategory('herbs_more')">
-          <div class="np-kpi-icon">🌿</div>
-          <div>
-            <strong style="font-size:0.92rem; display:block;">हर्ब्स एंड मोर</strong>
-            <small style="color:#94a3b8; font-size:0.75rem;" id="npKpiCountHerbs">स्किन व हेयर केयर</small>
+        <div class="np-glass-kpi-card" data-cat="herbs_more" onclick="window.filterByCategory('herbs_more')">
+          <div class="np-glass-icon-bubble">🌿</div>
+          <div class="np-glass-kpi-info">
+            <span class="np-glass-kpi-title">हर्ब्स एंड मोर</span>
+            <span class="np-glass-kpi-count" id="npKpiCountHerbs">9 उत्पाद</span>
           </div>
         </div>
-        <div class="np-kpi-card" data-cat="clean_more" onclick="window.filterByCategory('clean_more')">
-          <div class="np-kpi-icon">🏡</div>
-          <div>
-            <strong style="font-size:0.92rem; display:block;">क्लीन एंड मोर</strong>
-            <small style="color:#94a3b8; font-size:0.75rem;" id="npKpiCountClean">इको-होम केयर</small>
+        <div class="np-glass-kpi-card" data-cat="clean_more" onclick="window.filterByCategory('clean_more')">
+          <div class="np-glass-icon-bubble">🏡</div>
+          <div class="np-glass-kpi-info">
+            <span class="np-glass-kpi-title">क्लीन एंड मोर</span>
+            <span class="np-glass-kpi-count" id="npKpiCountClean">3 उत्पाद</span>
           </div>
         </div>
       </div>
@@ -489,92 +595,77 @@
     </div>
   </section>
 
-  <!-- 5. SEARCH & PROBLEM DROPDOWN FILTER SECTION -->
-  <section class="np-container">
-    <div class="np-filter-section">
+  <!-- 4. STICKY SEARCH & PROBLEM/CONCERN FILTER BAR -->
+  <section class="np-sticky-nav-bar" id="npStickyNavBar">
+    <div class="np-container">
       
-      <!-- Top Row: Search Input & Results Badge -->
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-        <div class="np-search-input-wrap" style="flex:1; min-width:280px;">
-          <i class="fa-solid fa-magnifying-glass np-search-icon"></i>
-          <input type="text" id="npSearchInput" class="np-search-input" placeholder="🔍 उत्पाद का नाम, पैकिंग साइज़ (250ml/1kg), बीमारी या घटक खोजें..." oninput="window.handleSearchInput(this.value)">
+      <div class="np-nav-top-row">
+        <!-- Smart Search Input -->
+        <div class="np-nav-search-wrap">
+          <i class="fa-solid fa-magnifying-glass np-nav-search-icon"></i>
+          <input type="text" id="npSearchInput" class="np-nav-search-input" placeholder="🔍 उत्पाद का नाम, घटक, बीमारी या पैकिंग खोजें (उदा. Biofit, CFC, शुगर...)" oninput="window.handleSearchInput(this.value)">
+          <button type="button" id="npSearchClearBtn" onclick="window.clearSearchInput()" style="display:none;" class="np-nav-search-clear">✕</button>
         </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span id="npProductCountBadge" style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:0.8rem; padding:6px 14px; border-radius:20px; border:1px solid #bae6fd;">
-            लोड हो रहा है...
+
+        <!-- Problem / Disease Concern Dropdown Filter -->
+        <div style="min-width:240px; flex:1; max-width:380px; position:relative;">
+          <select id="npProblemSelect" onchange="window.filterByProblem(this.value)" style="width:100%; box-sizing:border-box; padding:10px 32px 10px 12px; border-radius:12px; border:1.5px solid #cbd5e1; font-size:0.86rem; font-weight:700; color:#0f172a; background:#f8fafc; appearance:none; -webkit-appearance:none; outline:none; cursor:pointer; transition:all 0.2s;">
+            <option value="all">🩺 सभी समस्याएं व समाधान (All Health Concerns)</option>
+            <optgroup label="🌾 कृषि व फसल सुरक्षा (Biofit Agriculture)">
+              <option value="agri_pest">🐛 कीट, इल्ली व रसचूसक कीट (Pest & Insect)</option>
+              <option value="agri_fungus">🍄 फंगस, फफूंद व ब्लाइट (Fungus & Blight)</option>
+              <option value="agri_virus">🦠 वायरस व विषाणु सुरक्षा (Plant Virus)</option>
+              <option value="agri_growth">🌱 पौध विकास व पैदावार (Plant Growth)</option>
+              <option value="agri_soil">🌾 मिट्टी सुधार व जीवाणु खाद (Soil Health)</option>
+            </optgroup>
+            <optgroup label="🐄 पशु पोषण व डेयरी (Cattle Care / Pet-Vet)">
+              <option value="cattle_care">🥛 गाय-भैंस दूध व फैट वृद्धि (Milk & Fat Boost)</option>
+              <option value="cattle_health">💪 पशु पाचन व रोग प्रतिरोध (Livestock Care)</option>
+              <option value="aqua_fish">🐟 मछली पालन पोषण (Fish Aqua)</option>
+              <option value="poultry_care">🐔 मुर्गी व पक्षी पालन (Poultry)</option>
+            </optgroup>
+            <optgroup label="❤️ मानव स्वास्थ्य व न्यूट्रिशन (Naturamore)">
+              <option value="diabetes">🩸 डायबिटीज / शुगर नियंत्रण (Diabetes Care)</option>
+              <option value="joint_pain">🦴 जोड़ों का दर्द / गठिया (Joint & Arthritis)</option>
+              <option value="weight_loss">⚖️ वजन नियंत्रण (Weight Management)</option>
+              <option value="hair_care">💇 हेयर फॉल व डैंड्रफ (Hair Care)</option>
+              <option value="skin_care">✨ पिंपल्स व स्किन ग्लो (Skin Care)</option>
+              <option value="womens_care">🌸 महिला स्वास्थ्य व हार्मोनल (Women's Care)</option>
+              <option value="kids_care">👶 बच्चों का पोषण व विकास (Kids Nutrition)</option>
+              <option value="vitality_wellness">⚡ ऊर्जा, स्टैमिना व पौरुष शक्ति (Vitality)</option>
+            </optgroup>
+            <optgroup label="🏡 पर्यावरण अनुकूल होम केयर (Clean & More)">
+              <option value="home_care">🏡 इको फैब्रिक व होम हाइजीन (Home Care)</option>
+            </optgroup>
+          </select>
+          <div style="position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; color:#64748b; font-size:0.8rem;">
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+        </div>
+
+        <!-- Total Count Badge & Reset -->
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span id="npProductCountBadge" style="background:#ecfdf5; color:#059669; font-weight:800; font-size:0.78rem; padding:7px 12px; border-radius:14px; border:1px solid #a7f3d0; white-space:nowrap;">
+            39 उत्पाद उपलब्ध
           </span>
-          <button type="button" onclick="window.resetAllFilters()" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:0.78rem; font-weight:700; cursor:pointer;">
-            🔄 रीसेट फ़िल्टर
+          <button type="button" onclick="window.resetAllFilters()" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:7px 12px; border-radius:14px; font-size:0.75rem; font-weight:700; cursor:pointer; white-space:nowrap;">
+            🔄 रीसेट
           </button>
         </div>
       </div>
 
-      <!-- Health Concern / Problem Filter Dropdown -->
-      <div>
-        <label for="npProblemSelect" style="display:flex; align-items:center; justify-content:space-between; font-size:0.8rem; font-weight:800; color:#334155; margin-bottom:6px; text-transform:uppercase;">
-          <span style="display:flex; align-items:center; gap:6px;">
-            <span>🩺</span> <span>बीमारी व स्वास्थ्य समस्या अनुसार फ़िल्टर (Select Health Concern):</span>
-          </span>
-          <span style="font-size:0.72rem; color:#64748b; font-weight:600;">(ड्रॉपडाउन से चुनें)</span>
-        </label>
-        <div style="position:relative;">
-          <select id="npProblemSelect" onchange="window.filterByProblem(this.value)" style="width:100%; box-sizing:border-box; padding:12px 38px 12px 14px; border-radius:12px; border:1.8px solid #cbd5e1; font-size:0.9rem; font-weight:700; color:#0f172a; background:#ffffff; appearance:none; -webkit-appearance:none; outline:none; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.04); transition:all 0.2s;">
-            <option value="all">🌟 सम्पूर्ण समाधान व सभी समस्याएं (All Categories & Problems)</option>
-            
-            <optgroup label="🌾 कृषि, प्रमुख फसलें एवं जैविक कीट-रोग सुरक्षा">
-              <option value="agri_pest">🐛 कीट, इल्ली व रसचूसक कीट (Pest & Insect Control)</option>
-              <option value="agri_fungus">🍄 फंगस, फफूंद व ब्लाइट सुरक्षा (Fungus & Blight)</option>
-              <option value="agri_virus">🦠 वायरस व विषाणु जनित रोग (Plant Virus & Bacteria)</option>
-              <option value="agri_soil_health">🌱 मिट्टी सुधार, जीवाणु खाद व जड़ विकास (Soil Health & NPK)</option>
-              <option value="agri_flower_fruit">🌸 फूल-फल झड़ना रोकना व पैदावार वृद्धि (Flower & Fruit Yield)</option>
-              <option value="crop_chana">🌱 चना फसल विशेष (Gram / Chickpea Care)</option>
-              <option value="crop_soybean">🌿 सोयाबीन फसल विशेष (Soybean Care)</option>
-              <option value="crop_mustard">🌼 सरसों फसल विशेष (Mustard Care)</option>
-              <option value="crop_wheat">🌾 गेहूँ फसल विशेष (Wheat Care)</option>
-              <option value="crop_paddy">🌾 धान व चावल फसल विशेष (Paddy / Rice Care)</option>
-            </optgroup>
-
-            <optgroup label="🐄 पशु पोषण, डेयरी, मत्स्य एवं कुक्कुट पालन">
-              <option value="cattle_care">🥛 गाय-भैंस दुग्ध वृद्धि व फैट बढ़ोत्तरी (CFC Milk & Fat Boost)</option>
-              <option value="cattle_health">💪 पशु रोग प्रतिरोधक क्षमता, पाचन व गर्भाधान (Livestock Care)</option>
-              <option value="aqua_fish">🐟 मछली पालन व जल संवर्धन (Fish Aquaculture Care)</option>
-              <option value="poultry_care">🐔 मुर्गी पालन व अंडा उत्पादन (Poultry Farming)</option>
-              <option value="goat_care">🐐 बकरी व भेड़ पालन पोषण (Goat & Sheep Care)</option>
-            </optgroup>
-
-            <optgroup label="❤️ मानव स्वास्थ्य, न्यूट्रिशन एवं वेलनेस">
-              <option value="diabetes">🩸 डायबिटीज / शुगर नियंत्रण (Diabetes & Sugar Care)</option>
-              <option value="joint_pain">🦴 जोड़ों का दर्द / गठिया व सायटिका (Joint Pain & Arthritis)</option>
-              <option value="weight_loss">⚖️ मोटापा व वजन नियंत्रण (Weight Management)</option>
-              <option value="hair_care">💇 हेयर फॉल, डैंड्रफ व बालों का झड़ना (Hair Fall & Dandruff)</option>
-              <option value="skin_care">✨ कील-मुंहासे, पिंपल्स व स्किन ग्लो (Skin Acne & Glow)</option>
-              <option value="womens_care">🌸 महिला स्वास्थ्य व हार्मोनल संतुलन (Women's Wellness)</option>
-              <option value="kids_care">👶 बच्चों का पोषण व मानसिक विकास (Kids Nutrition)</option>
-              <option value="vitality_wellness">⚡ पौरुष शक्ति, स्टैमिना व ऊर्जा (Vitality & Stamina)</option>
-            </optgroup>
-
-            <optgroup label="🏡 पर्यावरण अनुकूल होम केयर व हाइजीन">
-              <option value="home_care">🏡 इको-फ्रेंडली फैब्रिक व होम हाइजीन (Eco Home & Fabric Care)</option>
-            </optgroup>
-          </select>
-          <div style="position:absolute; right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:#64748b; font-size:0.85rem;">
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-        </div>
-      </div>
-
     </div>
   </section>
 
-  <!-- 6. PRODUCTS DYNAMIC GRID -->
-  <section class="np-container">
-    <div class="np-products-grid" id="npProductsGridContainer">
-      <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:#64748b;">
+  <!-- 5. MAIN CATEGORY SHELVES CONTAINER (Dynamic Shelves / Rack) -->
+  <main class="np-container">
+    <div class="np-shelves-container" id="npShelvesContainer">
+      <div style="text-align:center; padding:60px 20px; color:#64748b;">
         <div style="font-size:2.2rem; margin-bottom:12px;">⏳</div>
-        <strong>उत्पाद लोड हो रहे हैं...</strong>
+        <strong>उत्पाद शेल्फ लोड हो रहे हैं...</strong>
       </div>
     </div>
-  </section>
+  </main>
 
   <!-- 6.5 LEAD CAPTURE GATEKEEPER MODAL (AarogyamTube Universal Style) -->
   <div class="np-modal-overlay" id="npLeadGateModal" onclick="if(event.target === this) window.closeLeadGateModal()">
@@ -679,6 +770,10 @@
           <label style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:8px; cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.8rem; font-weight:700;">
             <input type="radio" name="catalogLang" value="en" style="accent-color:#10b981;">
             <span>🇬🇧 English</span>
+          </label>
+          <label style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:8px; cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.8rem; font-weight:700;">
+            <input type="radio" name="catalogLang" value="pa" style="accent-color:#10b981;">
+            <span>🌾 ਪੰਜਾਬੀ (Punjabi)</span>
           </label>
           <label style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:8px; cursor:pointer; display:flex; align-items:center; gap:6px; font-size:0.8rem; font-weight:700;">
             <input type="radio" name="catalogLang" value="gu" style="accent-color:#10b981;">
@@ -808,6 +903,6 @@
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
   <script src="/js/universal-nav-drawer.js?v=20261001_v3"></script>
   <script src="/js/live-page-cms-bridge.js?v=20261001_v3"></script>
-  <script src="/js/netsurf-products-catalog.js?v=20261010_v1"></script>
+  <script src="/js/netsurf-products-catalog.js?v=20261011_v3"></script>
 </body>
 </html>
