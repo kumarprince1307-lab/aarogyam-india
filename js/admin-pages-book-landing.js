@@ -2837,6 +2837,15 @@ Instant Download & Lifetime Access
         allBooks.map(b => `<option value="${b.id}">+ [${b.id}] ${b.heading || b.name} (₹${b.offerPrice || 99})</option>`).join('');
     }
 
+    const importSourceSelect = document.getElementById('blp_import_source_book');
+    if (importSourceSelect) {
+      const curVal = importSourceSelect.value;
+      const mainBooks = allBooks.filter(b => b.id && !b.id.startsWith('DEMO') && !b.id.startsWith('FREE') && !b.id.startsWith('BONUS'));
+      importSourceSelect.innerHTML = mainBooks.map(b => `
+        <option value="${b.id}" ${b.id === curVal ? 'selected' : ''}>${b.id}: ${b.heading || b.name || ''}</option>
+      `).join('');
+    }
+
     allLandingPages = [];
     try {
       let res = await fetch('/data/universal-book-landing-pages.json?v=' + cacheTime);
@@ -7201,10 +7210,19 @@ Instant Download & Lifetime Access
   }
 
   window.renderAttachedBooksTray = function(selectedBookIds = []) {
+    const bookList = getAllRegisteredMainBooks();
+
+    const importSel = document.getElementById('blp_import_source_book');
+    if (importSel) {
+      const curVal = importSel.value || 'BK001';
+      importSel.innerHTML = bookList.map(b => `
+        <option value="${b.id}" ${b.id === curVal ? 'selected' : ''}>${b.name.includes(b.id) ? b.name : `${b.id}: ${b.name}`}</option>
+      `).join('');
+    }
+
     const tray = document.getElementById('blp_attached_books_tray');
     if (!tray) return;
 
-    const bookList = getAllRegisteredMainBooks();
     tray.innerHTML = bookList.map(b => {
       const isChecked = selectedBookIds.includes(b.id) || selectedBookIds.includes('ALL');
       return `
