@@ -4769,7 +4769,7 @@
       "status": "active",
       "is_coming_soon": false,
       "isComingSoon": false,
-      "store_badge": "new_arrival",
+      "store_badge": "best_seller",
       "badge": "new_arrival",
       "publish_targets": [
         "ebook_store",
