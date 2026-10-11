@@ -5,8 +5,20 @@ const path = require('path');
 
 const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
-const DEFAULT_FALLBACK_IMAGE = 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg';
+const DEFAULT_FALLBACK_IMAGE = 'https://aarogyamindia.online/images/banners/og_image-bk015-sec_audio-ba-436589-2buf.webp';
 const HOST_ORIGIN = 'https://aarogyamindia.online';
+
+function readJsonSafely(filePath) {
+  try {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '').trim();
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    console.warn(`[SafeJSON] Failed to parse ${filePath}:`, e.message);
+  }
+  return null;
+}
 
 function getBookLandingPageData(bId) {
   if (!bId) return null;
@@ -15,9 +27,8 @@ function getBookLandingPageData(bId) {
 
   try {
     const dataPath = path.join(process.cwd(), 'data', 'universal-book-landing-pages.json');
-    if (fs.existsSync(dataPath)) {
-      const content = fs.readFileSync(dataPath, 'utf8');
-      const json = JSON.parse(content);
+    const json = readJsonSafely(dataPath);
+    if (json) {
       const list = json.bookLandingPages || [];
       const found = list.find(p => (p.id && p.id.toUpperCase() === cleanId) || (p.slug && p.slug.toLowerCase() === cleanSlug));
       if (found) {
@@ -29,9 +40,8 @@ function getBookLandingPageData(bId) {
 
   try {
     const booksPath = path.join(process.cwd(), 'data', 'books.json');
-    if (fs.existsSync(booksPath)) {
-      const content = fs.readFileSync(booksPath, 'utf8');
-      const json = JSON.parse(content);
+    const json = readJsonSafely(booksPath);
+    if (json) {
       const list = json.books || [];
       const found = list.find(p => (p.id && p.id.toUpperCase() === cleanId) || (p.slug && p.slug.toLowerCase() === cleanSlug));
       if (found) {
@@ -55,30 +65,195 @@ function getBookLandingPageData(bId) {
   return null;
 }
 
+const SITE_PAGES_FALLBACK_MAP = {
+  'index': {
+    id: 'page_home',
+    destUrl: 'https://aarogyamindia.online/index.html',
+    og_title: '🏠 मुख्य पृष्ठ (Home Page) | Aarogyam India',
+    og_description: 'Aarogyam India - भारत का सम्पूर्ण डिजिटल मंच। कृषि ई-बुक्स, फसल सुरक्षा, मौसम, मंडी भाव, स्वास्थ्य परामर्श, पशु पालन, और Netsurf डायरेक्ट बिज़नेस ग्रोथ।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-bk015-sec_audio-ba-436589-2buf.webp'
+  },
+  'home': {
+    id: 'page_home',
+    destUrl: 'https://aarogyamindia.online/index.html',
+    og_title: '🏠 मुख्य पृष्ठ (Home Page) | Aarogyam India',
+    og_description: 'Aarogyam India - भारत का सम्पूर्ण डिजिटल मंच। कृषि ई-बुक्स, फसल सुरक्षा, मौसम, मंडी भाव, स्वास्थ्य परामर्श, पशु पालन, और Netsurf डायरेक्ट बिज़नेस ग्रोथ।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-bk015-sec_audio-ba-436589-2buf.webp'
+  },
+  'pashu-palan': {
+    id: 'page_pashu_palan',
+    destUrl: 'https://aarogyamindia.online/pashu-palan.html',
+    og_title: 'गाय-भैंस में दूध और FAT 2X बढ़ाएं | 100% आयुर्वेदिक पशु पोषण एवं देखभाल',
+    og_description: 'बांझपन, थनैला और पाचन समस्याओं का सटीक समाधान। 24×7 WhatsApp AI डॉक्टर परामर्श और प्रमाणित बायो-फिट Pet-Vet उत्पाद प्राप्त करें।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-pashupalan-029612-sv0a.webp'
+  },
+  'netsurf': {
+    id: 'page_netsurf_career',
+    destUrl: 'https://aarogyamindia.online/categories/netsurf.html',
+    og_title: 'क्या आप पार्ट टाइम में अपने सपने पूरे करना चाहते हैं? | Netsurf & Aarogyam India',
+    og_description: 'बिना नौकरी छोड़े पार्ट-टाइम में पाएं फाइनेंशियल फ्रीडम! 26 साल पुरानी भरोसेमंद डायरेक्ट सेलिंग कंपनी Netsurf और Aarogyam के डिजिटल ऑटोमेशन सिस्टम से 15-दिवसीय क्लोजिंग में ₹8,19,250 तक कमाने का सुनहरा मौका।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-netsurf-398382-r3uq.webp'
+  },
+  'netsurf-products': {
+    id: 'page_netsurf_products',
+    destUrl: 'https://aarogyamindia.online/categories/netsurf-products.html',
+    og_title: 'सम्पूर्ण नेटसर्फ उत्पाद कैटलॉग (All Netsurf Products) | 7 भाषाओं में PDF',
+    og_description: 'कृषि, पशु पोषण, स्वास्थ्य व पर्सनल केयर के सभी 39+ ऑर्गेनिक प्रोडक्ट्स। 7 भाषाओं में पर्सनलाइज्ड PDF कैटलॉग डाउनलोड करें।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-netsurf-398382-r3uq.webp'
+  },
+  'health': {
+    id: 'page_health',
+    destUrl: 'https://aarogyamindia.online/categories/health.html',
+    og_title: 'आरोग्यम स्वास्थ्य केंद्र | प्राकृतिक व आयुर्वेदिक समाधान',
+    og_description: 'मधुमेह, जोड़ों का दर्द, मोटापा, बाल झड़ना व त्वचा समस्याओं का 100% आयुर्वेदिक व वैज्ञानिक समाधान।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-health-og-676433-sb3k.webp'
+  },
+  'health-joint-care': {
+    id: 'page_health_joint_care',
+    destUrl: 'https://aarogyamindia.online/health/joint-care.html',
+    og_title: '🔥 क्या आपको पता है आपके जोड़ों का दर्द बार-बार क्यों लौटता है?',
+    og_description: 'घुटनों का दर्द, कट-कट की आवाज, कार्टिलेज घिसाव व यूरिक एसिड का आयुर्वेदिक उपचार व डाइट चार्ट।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-1003678899-976100-9wi4.webp'
+  },
+  'joint-care': {
+    id: 'page_health_joint_care',
+    destUrl: 'https://aarogyamindia.online/health/joint-care.html',
+    og_title: '🔥 क्या आपको पता है आपके जोड़ों का दर्द बार-बार क्यों लौटता है?',
+    og_description: 'घुटनों का दर्द, कट-कट की आवाज, कार्टिलेज घिसाव व यूरिक एसिड का आयुर्वेदिक उपचार व डाइट चार्ट।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-1003678899-976100-9wi4.webp'
+  },
+  'health-diabetes': {
+    id: 'page_health_diabetes',
+    destUrl: 'https://aarogyamindia.online/health/diabetes.html',
+    og_title: 'Aarogyam India | मधुमेह नियंत्रण की सही राह | डाइट, एक्सरसाइज और सही मार्गदर्शन',
+    og_description: '“90 दिन में शुगर कंट्रोल? 😳 सच क्या है? जो बात आपको आज तक नहीं बताई गई - HbA1c, इंसुलिन रेजिस्टेंस और प्राकृतिक डाइट चार्ट।”',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-whatsapp-image-202-936789-y196.webp'
+  },
+  'diabetes': {
+    id: 'page_health_diabetes',
+    destUrl: 'https://aarogyamindia.online/health/diabetes.html',
+    og_title: 'Aarogyam India | मधुमेह नियंत्रण की सही राह | डाइट, एक्सरसाइज और सही मार्गदर्शन',
+    og_description: '“90 दिन में शुगर कंट्रोल? 😳 सच क्या है? जो बात आपको आज तक नहीं बताई गई - HbA1c, इंसुलिन रेजिस्टेंस और प्राकृतिक डाइट चार्ट।”',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-whatsapp-image-202-936789-y196.webp'
+  },
+  'health-hair-care': {
+    id: 'page_health_hair_care',
+    destUrl: 'https://aarogyamindia.online/health/hair-care.html',
+    og_title: '🚨 क्या आप भी बालों के झड़ने और गंजेपन से परेशान हैं? | 100% आयुर्वेदिक समाधान',
+    og_description: 'कंघी करते समय गुच्छों में गिरते बाल, चौड़ी होती मांग या जिद्दी डैंड्रफ? जानिए बालों के झड़ने की असली जड़ और 100% आयुर्वेदिक हेयर री-ग्रोथ फॉर्मूला।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-hair-77-154412-g45q.webp'
+  },
+  'hair-care': {
+    id: 'page_health_hair_care',
+    destUrl: 'https://aarogyamindia.online/health/hair-care.html',
+    og_title: '🚨 क्या आप भी बालों के झड़ने और गंजेपन से परेशान हैं? | 100% आयुर्वेदिक समाधान',
+    og_description: 'कंघी करते समय गुच्छों में गिरते बाल, चौड़ी होती मांग या जिद्दी डैंड्रफ? जानिए बालों के झड़ने की असली जड़ और 100% आयुर्वेदिक हेयर री-ग्रोथ फॉर्मूला।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-hair-77-154412-g45q.webp'
+  },
+  'health-skin-care': {
+    id: 'page_health_skin_care',
+    destUrl: 'https://aarogyamindia.online/health/skin-care.html',
+    og_title: '🚨 चेहरे पर पिंपल्स, जिद्दी झाइयां व डार्क सर्कल्स? | 100% आयुर्वेदिक समाधान',
+    og_description: 'क्या महंगे प्रोडक्ट्स लगाकर भी दाग-धब्बे और मुँहासे ठीक नहीं हो रहे? जानिए त्वचा समस्याओं की अंदरूनी जड़ और प्राकृतिक त्वचा कायाकल्प फॉर्मूला।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-skine-1-794718-e42c.webp'
+  },
+  'skin-care': {
+    id: 'page_health_skin_care',
+    destUrl: 'https://aarogyamindia.online/health/skin-care.html',
+    og_title: '🚨 चेहरे पर पिंपल्स, जिद्दी झाइयां व डार्क सर्कल्स? | 100% आयुर्वेदिक समाधान',
+    og_description: 'क्या महंगे प्रोडक्ट्स लगाकर भी दाग-धब्बे और मुँहासे ठीक नहीं हो रहे? जानिए त्वचा समस्याओं की अंदरूनी जड़ और प्राकृतिक त्वचा कायाकल्प फॉर्मूला।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-skine-1-794718-e42c.webp'
+  },
+  'health-weight-loss': {
+    id: 'page_health_weight_loss',
+    destUrl: 'https://aarogyamindia.online/health/weight-loss.html',
+    og_title: 'मोटापा व पेट की चर्बी घटाने का प्राकृतिक डाइट चार्ट | Aarogyam India',
+    og_description: 'बिना कमजोरी और बिना भूखे रहे 30 दिनों में 4 से 6 किलो वजन नियंत्रित करने का संपूर्ण वैज्ञानिक व आयुर्वेदिक मार्गदर्शन।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-motapa-490448-grer.webp'
+  },
+  'weight-loss': {
+    id: 'page_health_weight_loss',
+    destUrl: 'https://aarogyamindia.online/health/weight-loss.html',
+    og_title: 'मोटापा व पेट की चर्बी घटाने का प्राकृतिक डाइट चार्ट | Aarogyam India',
+    og_description: 'बिना कमजोरी और बिना भूखे रहे 30 दिनों में 4 से 6 किलो वजन नियंत्रित करने का संपूर्ण वैज्ञानिक व आयुर्वेदिक मार्गदर्शन।',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-motapa-490448-grer.webp'
+  },
+  'health-sexual-wellness': {
+    id: 'page_health_sexual_wellness',
+    destUrl: 'https://aarogyamindia.online/health/sexual-wellness.html',
+    og_title: 'Aarogyam India | पौरुष शक्ति व यौन स्वास्थ्य | वैज्ञानिक व प्राकृतिक समाधान',
+    og_description: '“ED, शीघ्रपतन, लो टेस्टोस्टेरोन और स्पर्म काउंट की कमी का सच। भ्रामक विज्ञापनों से बचें, प्राकृतिक व वैज्ञानिक समाधान अपनाएं।”',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-ed-677895-iqr6.webp'
+  },
+  'sexual-wellness': {
+    id: 'page_health_sexual_wellness',
+    destUrl: 'https://aarogyamindia.online/health/sexual-wellness.html',
+    og_title: 'Aarogyam India | पौरुष शक्ति व यौन स्वास्थ्य | वैज्ञानिक व प्राकृतिक समाधान',
+    og_description: '“ED, शीघ्रपतन, लो टेस्टोस्टेरोन और स्पर्म काउंट की कमी का सच। भ्रामक विज्ञापनों से बचें, प्राकृतिक व वैज्ञानिक समाधान अपनाएं।”',
+    og_image: 'https://aarogyamindia.online/images/banners/og_image-ed-677895-iqr6.webp'
+  },
+  'health-kids-care': {
+    id: 'page_health_kids_care',
+    destUrl: 'https://aarogyamindia.online/health/kids-care.html',
+    og_title: 'बच्चों का संपूर्ण शारीरिक व मानसिक विकास गाइड | Aarogyam India',
+    og_description: 'बच्चों की लंबाई, वजन, रोग प्रतिरोधक क्षमता व याददाश्त बढ़ाने के प्राकृतिक पोषण उपाय।',
+    og_image: 'https://aarogyamindia.online/images/banners/health-kids-care.jpg'
+  },
+  'kids-care': {
+    id: 'page_health_kids_care',
+    destUrl: 'https://aarogyamindia.online/health/kids-care.html',
+    og_title: 'बच्चों का संपूर्ण शारीरिक व मानसिक विकास गाइड | Aarogyam India',
+    og_description: 'बच्चों की लंबाई, वजन, रोग प्रतिरोधक क्षमता व याददाश्त बढ़ाने के प्राकृतिक पोषण उपाय।',
+    og_image: 'https://aarogyamindia.online/images/banners/health-kids-care.jpg'
+  },
+  'health-home-care': {
+    id: 'page_health_home_care',
+    destUrl: 'https://aarogyamindia.online/health/home-care.html',
+    og_title: 'केमिकल-मुक्त सुरक्षित व स्वच्छ घर समाधान | Aarogyam India',
+    og_description: 'फलों-सब्जियों से कीटनाशक हटाने व बायो-एंजाइम क्लीनिंग के 100% प्राकृतिक समाधान।',
+    og_image: 'https://aarogyamindia.online/images/banners/health-home-care.jpg'
+  },
+  'home-care': {
+    id: 'page_health_home_care',
+    destUrl: 'https://aarogyamindia.online/health/home-care.html',
+    og_title: 'केमिकल-मुक्त सुरक्षित व स्वच्छ घर समाधान | Aarogyam India',
+    og_description: 'फलों-सब्जियों से कीटनाशक हटाने व बायो-एंजाइम क्लीनिंग के 100% प्राकृतिक समाधान।',
+    og_image: 'https://aarogyamindia.online/images/banners/health-home-care.jpg'
+  }
+};
+
 function getSitePageData(pageTarget) {
   if (!pageTarget) return null;
   const target = String(pageTarget).trim().toLowerCase();
 
+  // 1. Dynamic check against site-pages-config.json
   try {
     const pathsToTry = [
       path.join(process.cwd(), 'data', 'site-pages-config.json'),
       path.join(__dirname, '..', 'data', 'site-pages-config.json')
     ];
     for (const p of pathsToTry) {
-      if (fs.existsSync(p)) {
-        const content = fs.readFileSync(p, 'utf8');
-        const json = JSON.parse(content);
+      const json = readJsonSafely(p);
+      if (json) {
         const list = json.sitePages || [];
         const found = list.find(item => {
           const pid = (item.id || '').toLowerCase();
           const pslug = (item.slug || '').toLowerCase();
           const purl = (item.url || '').toLowerCase();
-          return pid === target || pslug === target || purl === target ||
-                 pid === `page_${target.replace(/-/g, '_')}` ||
-                 pslug === target.replace('health-', '') ||
-                 purl.endsWith(target) || purl.endsWith(`${target}.html`);
+          return (
+            (target === 'index' && (pid === 'page_home' || pslug === 'home' || purl.endsWith('/index.html'))) ||
+            pid === target ||
+            pslug === target ||
+            purl === target ||
+            pid === `page_${target.replace(/-/g, '_')}` ||
+            pslug === target.replace('health-', '') ||
+            purl.endsWith(target) ||
+            purl.endsWith(`${target}.html`) ||
+            purl.endsWith(`/${target}`) ||
+            purl.endsWith(`/${target}.html`)
+          );
         });
-        if (found) {
+        if (found && (found.og_image || found.og_title)) {
           let ogImg = found.og_image || '/images/banners/og_image-bk015-sec_audio-ba-436589-2buf.webp';
           if (ogImg && !ogImg.startsWith('http')) {
             ogImg = `${HOST_ORIGIN}${ogImg.startsWith('/') ? '' : '/'}${ogImg}`;
@@ -97,7 +272,19 @@ function getSitePageData(pageTarget) {
         }
       }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.warn('Error reading dynamic site pages config:', e);
+  }
+
+  // 2. High-reliability fallback dictionary
+  if (SITE_PAGES_FALLBACK_MAP[target]) {
+    return SITE_PAGES_FALLBACK_MAP[target];
+  }
+  const strippedTarget = target.replace(/^health-/, '');
+  if (SITE_PAGES_FALLBACK_MAP[strippedTarget]) {
+    return SITE_PAGES_FALLBACK_MAP[strippedTarget];
+  }
+
   return null;
 }
 
@@ -396,7 +583,7 @@ module.exports = async function handler(req, res) {
 
   // 0. Check if request is for a Site Page (Homepage, Pashu-Palan, Netsurf, Health, etc.)
   if (queryPage) {
-    const pageData = getSitePageData(queryPage);
+    let pageData = getSitePageData(queryPage) || SITE_PAGES_FALLBACK_MAP['index'];
     if (pageData) {
       const finalTitle = pageData.og_title;
       const finalDesc = pageData.og_description;

@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/*.js": {
+      "includeFiles": "data/**"
+    }
+  },
   "redirects": [
     {
       "source": "/ebooks/book-landing.html",
@@ -74,7 +79,31 @@
       "permanent": false
     },
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=index",
+      "permanent": false
+    },
+    {
       "source": "/index.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=index",
+      "permanent": false
+    },
+    {
+      "source": "/index",
       "has": [
         {
           "type": "header",
@@ -98,6 +127,18 @@
       "permanent": false
     },
     {
+      "source": "/pashu-palan",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=pashu-palan",
+      "permanent": false
+    },
+    {
       "source": "/categories/netsurf.html",
       "has": [
         {
@@ -107,6 +148,42 @@
         }
       ],
       "destination": "/api/share?page=netsurf",
+      "permanent": false
+    },
+    {
+      "source": "/categories/netsurf",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=netsurf",
+      "permanent": false
+    },
+    {
+      "source": "/categories/netsurf-products.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=netsurf-products",
+      "permanent": false
+    },
+    {
+      "source": "/categories/netsurf-products",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=netsurf-products",
       "permanent": false
     },
     {
@@ -122,7 +199,31 @@
       "permanent": false
     },
     {
+      "source": "/categories/health",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=health",
+      "permanent": false
+    },
+    {
       "source": "/health/:slug.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?page=health-:slug",
+      "permanent": false
+    },
+    {
+      "source": "/health/:slug",
       "has": [
         {
           "type": "header",
